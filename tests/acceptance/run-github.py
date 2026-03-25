@@ -6,6 +6,7 @@ Config sourced from .drone.star localApiTests — single source of truth.
 Usage: BEHAT_SUITES=apiGraph python3 tests/acceptance/run-github.py
 """
 
+import json
 import os
 import sys
 import subprocess
@@ -113,6 +114,7 @@ LOCAL_API_TESTS = {
             "OCM_OCM_INVITE_MANAGER_INSECURE": "true",
             "OCM_OCM_SHARE_PROVIDER_INSECURE": "true",
             "OCM_OCM_STORAGE_PROVIDER_INSECURE": "true",
+            "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": "",  # set at runtime
             "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
             "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
             "NOTIFICATIONS_SMTP_INSECURE": "true",
@@ -310,12 +312,20 @@ def main() -> int:
     ocis_url = "https://localhost:9200"
     ocis_config_dir = Path.home() / ".ocis/config"
 
+    ocis_fed_url = "https://localhost:10200"
+
     cfg = merged_config(suites)
     print(f"Suites: {suites}")
-    print(f"Services: email={cfg['emailNeeded']} tika={cfg['tikaNeeded']} antivirus={cfg['antivirusNeeded']}")
+    print(f"Services: email={cfg['emailNeeded']} tika={cfg['tikaNeeded']} "
+          f"antivirus={cfg['antivirusNeeded']} federation={cfg['federationServer']} "
+          f"wopi={cfg['collaborationServiceNeeded']}")
 
-    # build
-    run(["make", "-C", str(repo_root / "ocis"), "build"])
+    # build (ENABLE_VIPS=true when libvips-dev is installed, matching drone)
+    build_env = {}
+    if subprocess.run(["pkg-config", "--exists", "vips"],
+                      capture_output=True).returncode == 0:
+        build_env["ENABLE_VIPS"] = "true"
+    run(["make", "-C", str(repo_root / "ocis"), "build"], env=build_env)
     run(["make", "-C", str(repo_root / "tests/ociswrapper"), "build"],
         env={"GOWORK": "off"})
 
@@ -351,6 +361,26 @@ def main() -> int:
         wait_for(tika_healthy, 120, "tika")
         print("tika ready.")
 
+    # OCM federation: rewrite providers.json with localhost URLs
+    if cfg["federationServer"]:
+        providers_src = repo_root / "tests/config/drone/providers.json"
+        providers = json.loads(providers_src.read_text())
+        for p in providers:
+            # replace container DNS names with localhost
+            p["domain"] = p["domain"].replace("ocis-server:9200", "localhost:9200")
+            p["domain"] = p["domain"].replace("federation-ocis-server:10200", "localhost:10200")
+            for svc in p.get("services", []):
+                ep = svc.get("endpoint", {})
+                ep["path"] = ep.get("path", "").replace("ocis-server:9200", "localhost:9200")
+                ep["path"] = ep.get("path", "").replace("federation-ocis-server:10200", "localhost:10200")
+                svc["host"] = svc.get("host", "").replace("ocis-server:9200", "localhost:9200")
+                svc["host"] = svc.get("host", "").replace("federation-ocis-server:10200", "localhost:10200")
+        providers_tmp = tempfile.NamedTemporaryFile(
+            mode="w", suffix=".json", prefix="ocm-providers-", delete=False)
+        json.dump(providers, providers_tmp)
+        providers_tmp.close()
+        cfg["extraServerEnvironment"]["OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE"] = providers_tmp.name
+
     # init ocis
     run([str(ocis_bin), "init", "--insecure", "true"])
     shutil.copy(
@@ -358,12 +388,20 @@ def main() -> int:
         ocis_config_dir / "app-registry.yaml",
     )
 
+    # generate fontsMap.json with correct font path (drone hardcodes /drone/src/...)
+    font_path = str(repo_root / "tests/config/drone/NotoSans.ttf")
+    fontmap_tmp = tempfile.NamedTemporaryFile(
+        mode="w", suffix=".json", prefix="fontsMap-", delete=False)
+    json.dump({"defaultFont": font_path}, fontmap_tmp)
+    fontmap_tmp.close()
+
     # assemble ocis server env
     server_env = {**os.environ}
     server_env.update(base_server_env(repo_root, ocis_url, str(ocis_config_dir)))
+    server_env["THUMBNAILS_TXT_FONTMAP_FILE"] = fontmap_tmp.name
     server_env.update(cfg["extraServerEnvironment"])
 
-    # start ociswrapper
+    # start ociswrapper (primary ocis)
     print("Starting ocis...")
     wrapper_proc = subprocess.Popen(
         [str(wrapper_bin), "serve",
@@ -374,6 +412,83 @@ def main() -> int:
         env=server_env,
     )
     procs.append(wrapper_proc)
+
+    # start federation ocis server (second instance on port 10200)
+    if cfg["federationServer"]:
+        fed_config_dir = Path.home() / ".ocis-federation/config"
+        fed_config_dir.mkdir(parents=True, exist_ok=True)
+        fed_data_dir = Path.home() / ".ocis-federation"
+
+        fed_env = {**os.environ}
+        fed_env.update(base_server_env(repo_root, ocis_fed_url, str(fed_config_dir)))
+        fed_env.update(cfg["extraServerEnvironment"])
+        fed_env.update({
+            "OCIS_URL": ocis_fed_url,
+            "PROXY_HTTP_ADDR": "0.0.0.0:10200",
+            "OCIS_BASE_DATA_PATH": str(fed_data_dir),
+            # use different ports to avoid conflicts with primary
+            "GATEWAY_GRPC_ADDR": "0.0.0.0:10142",
+            "NATS_NATS_PORT": "10233",
+            "NATS_NATS_HOST": "0.0.0.0",
+        })
+
+        # init federation ocis with separate config
+        run([str(ocis_bin), "init", "--insecure", "true",
+             "--config-path", str(fed_config_dir)])
+        shutil.copy(
+            repo_root / "tests/config/drone/app-registry.yaml",
+            fed_config_dir / "app-registry.yaml",
+        )
+
+        print("Starting federation ocis...")
+        fed_proc = subprocess.Popen(
+            [str(ocis_bin), "server"],
+            env=fed_env,
+        )
+        procs.append(fed_proc)
+
+    # start collaboration services (fakeoffice WOPI)
+    if cfg["collaborationServiceNeeded"]:
+        # fakeoffice: serves hosting-discovery.xml
+        discovery_xml = repo_root / "tests/config/drone/hosting-discovery.xml"
+        if discovery_xml.exists():
+            print("Starting fakeoffice...")
+            run(["docker", "run", "-d", "--name", "fakeoffice", "--network", "host",
+                 "-v", f"{discovery_xml}:/discovery.xml:ro",
+                 "python:3-alpine",
+                 "sh", "-c",
+                 "pip install flask && python -c \""
+                 "from flask import Flask; app = Flask(__name__)\n"
+                 "@app.route('/hosting/discovery')\n"
+                 "def discovery(): return open('/discovery.xml').read(), 200, {'Content-Type': 'text/xml'}\n"
+                 "app.run(host='0.0.0.0', port=8080)\""])
+
+        # wopi-fakeoffice collaboration service
+        wopi_env = {
+            **os.environ,
+            "OCIS_URL": ocis_url,
+            "MICRO_REGISTRY": "nats-js-kv",
+            "MICRO_REGISTRY_ADDRESS": "localhost:9233",
+            "COLLABORATION_LOG_LEVEL": "debug",
+            "COLLABORATION_GRPC_ADDR": "0.0.0.0:9301",
+            "COLLABORATION_HTTP_ADDR": "0.0.0.0:9300",
+            "COLLABORATION_DEBUG_ADDR": "0.0.0.0:9304",
+            "COLLABORATION_APP_PROOF_DISABLE": "true",
+            "COLLABORATION_APP_INSECURE": "true",
+            "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": "true",
+            "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
+            "COLLABORATION_WOPI_SECRET": "some-wopi-secret",
+            "COLLABORATION_APP_NAME": "FakeOffice",
+            "COLLABORATION_APP_PRODUCT": "Microsoft",
+            "COLLABORATION_APP_ADDR": "http://localhost:8080",
+            "COLLABORATION_WOPI_SRC": "http://localhost:9300",
+        }
+        print("Starting wopi-fakeoffice collaboration service...")
+        wopi_proc = subprocess.Popen(
+            [str(ocis_bin), "collaboration", "server"],
+            env=wopi_env,
+        )
+        procs.append(wopi_proc)
 
     def cleanup(*_):
         for p in procs:
@@ -388,6 +503,10 @@ def main() -> int:
     try:
         wait_for(lambda: ocis_healthy(ocis_url), 300, "ocis")
         print("ocis ready.")
+
+        if cfg["federationServer"]:
+            wait_for(lambda: ocis_healthy(ocis_fed_url), 300, "federation ocis")
+            print("federation ocis ready.")
 
         # expected failures file
         if acceptance_test_type == "core-api":
@@ -415,6 +534,7 @@ def main() -> int:
         behat_env = {
             **os.environ,
             "TEST_SERVER_URL": ocis_url,
+            "TEST_SERVER_FED_URL": ocis_fed_url,
             "OCIS_WRAPPER_URL": "http://localhost:5200",
             "BEHAT_SUITES": behat_suites_raw,
             "ACCEPTANCE_TEST_TYPE": acceptance_test_type,
@@ -424,6 +544,7 @@ def main() -> int:
             "UPLOAD_DELETE_WAIT_TIME": "0",
             "EMAIL_HOST": "localhost",
             "EMAIL_PORT": EMAIL_PORT,
+            "COLLABORATION_SERVICE_URL": "http://localhost:9300",
         }
         behat_env.update(cfg["extraEnvironment"])
 
