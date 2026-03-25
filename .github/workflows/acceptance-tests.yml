@@ -111,8 +111,75 @@ jobs:
           EXPECTED_FAILURES_FILE=tests/acceptance/expected-failures-API-on-OCIS-storage.md
           bash tests/acceptance/run-github.sh
 
+  core-api-tests:
+    name: ${{ matrix.suite }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
+          - "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
+          - "coreApiSharees,coreApiSharePublicLink2"
+          - "coreApiShareOperationsToShares1,coreApiShareOperationsToShares2,coreApiSharePublicLink1,coreApiShareCreateSpecialToShares1,coreApiShareCreateSpecialToShares2,coreApiShareUpdateToShares"
+          - "coreApiTrashbin,coreApiTrashbinRestore,coreApiWebdavEtagPropagation1,coreApiWebdavEtagPropagation2"
+          - "coreApiWebdavDelete,coreApiWebdavOperations,coreApiWebdavMove2"
+          - "coreApiWebdavProperties"
+          - "coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip
+          tools: composer
+
+      - name: Run ${{ matrix.suite }}
+        run: >
+          BEHAT_SUITES="${{ matrix.suite }}"
+          ACCEPTANCE_TEST_TYPE=core-api
+          EXPECTED_FAILURES_FILE=tests/acceptance/expected-failures-API-on-OCIS-storage.md
+          bash tests/acceptance/run-github.sh
+
+      - name: Upload test logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-${{ matrix.suite }}
+          path: tests/acceptance/output/
+
+  litmus:
+    name: litmus
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Run litmus
+        run: bash tests/acceptance/run-litmus.sh
+
+  cs3-api-tests:
+    name: cs3ApiTests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Run cs3ApiTests
+        run: bash tests/acceptance/run-cs3api.sh
+
   all-acceptance-tests:
-    needs: [acceptance-tests, core-api-tests]
+    needs: [acceptance-tests, core-api-tests, litmus, cs3-api-tests]
     runs-on: ubuntu-latest
     if: always()
     steps:
