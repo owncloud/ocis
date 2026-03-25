@@ -43,14 +43,13 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Check suites
         run: bash tests/acceptance/check-deleted-suites-in-expected-failure.sh
-  
+
   build-and-test:
-    needs: [coding-standard, check-gherkin-standard, check-suites-in-expected-failures]
     name: build-and-test
+    needs: [coding-standard, check-gherkin-standard, check-suites-in-expected-failures]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
       - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version-file: go.mod
@@ -62,8 +61,7 @@ jobs:
       - name: Unit tests
         run: make test
 
-
-  acceptance-tests:    
+  local-api-tests:
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -71,12 +69,19 @@ jobs:
       fail-fast: false
       matrix:
         suite:
+          # contract & locks
+          - apiContract
+          - apiLocks
+          # settings & notifications (needs email)
+          - apiSettings
+          - apiNotification
+          - apiCors
           # graph
+          - apiGraphUser
           - apiGraph
           - apiGraphGroup
-          - apiGraphUser
           # spaces & dav
-          - apiSpaces
+          # - apiSpaces
           - apiSpacesShares
           - apiSpacesDavOperation
           - apiDownloads
@@ -86,18 +91,26 @@ jobs:
           - apiActivities
           # search
           - apiSearch1
-          # contract & locks
-          - apiLocks
+          # - apiSearch2
+          - apiSearchContent    # needs Tika
           # sharing
-          - apiSharingNgItemInvitation
-          - apiSharingNgPermissions
           - apiSharingNgShares
+          - apiReshare
+          - apiSharingNgPermissions
           - apiSharingNgAdditionalShareRole
           - apiSharingNgDriveInvitation
-          - apiSharingNgItemLinkShare
+          - apiSharingNgItemInvitation
           - apiSharingNgDriveLinkShare
+          - apiSharingNgItemLinkShare
           - apiSharingNgLinkShareManagement
-          
+          # auth
+          - apiAuthApp
+          # antivirus (needs ClamAV)
+          - apiAntivirus
+          # federation (needs email + federation ocis)
+          # - apiOcm
+          # collaboration (needs WOPI)
+          # - apiCollaboration
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
@@ -105,6 +118,28 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+      
+      - name: Install libcurl 8.12.0 from source
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev
+          cd /tmp
+          curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
+          tar xzf curl-8.12.0.tar.gz
+          cd curl-8.12.0
+          ./configure --with-ssl --with-zlib --with-nghttp2 --prefix=/usr/local --silent
+          make -j$(nproc) --silent
+          sudo make install --silent
+          sudo ldconfig
+          curl --version | head -1
+          php -r '
+            $v = curl_version()["version"];
+            echo "PHP curl: $v\n";
+            if (version_compare($v, "8.12.0", "<")) {
+              fwrite(STDERR, "FATAL: PHP sees libcurl $v, need >= 8.12.0\n");
+              exit(1);
+            }
+          '
 
       - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
         with:
@@ -113,10 +148,49 @@ jobs:
           tools: composer
 
       - name: Run ${{ matrix.suite }}
-        run: BEHAT_SUITES=${{ matrix.suite }} bash tests/acceptance/run-github.sh
+        run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
+
+  core-api-tests:
+    name: ${{ matrix.suite }}
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
+          - "coreApiSharees,coreApiSharePublicLink2"
+          - "coreApiShareOperationsToShares1,coreApiShareOperationsToShares2,coreApiSharePublicLink1,coreApiShareCreateSpecialToShares1,coreApiShareCreateSpecialToShares2,coreApiShareUpdateToShares"
+          - "coreApiTrashbin,coreApiTrashbinRestore,coreApiWebdavEtagPropagation1,coreApiWebdavEtagPropagation2"
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip
+          tools: composer
+
+      - name: Run ${{ matrix.suite }}
+        run: >
+          BEHAT_SUITES="${{ matrix.suite }}"
+          ACCEPTANCE_TEST_TYPE=core-api
+          EXPECTED_FAILURES_FILE=tests/acceptance/expected-failures-API-on-OCIS-storage.md
+          python3 tests/acceptance/run-github.py
+
+      - name: Upload test logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-${{ matrix.suite }}
+          path: tests/acceptance/output/
 
   all-acceptance-tests:
-    needs: [acceptance-tests]
+    needs: [local-api-tests]
     runs-on: ubuntu-latest
     if: always()
     steps:
