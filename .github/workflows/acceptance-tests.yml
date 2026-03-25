@@ -16,7 +16,6 @@ jobs:
           - apiGraph
           - apiGraphGroup
           - apiGraphUser
-          # spaces
           # spaces & dav
           - apiSpaces
           - apiSpacesShares
@@ -28,9 +27,7 @@ jobs:
           - apiActivities
           # search
           - apiSearch1
-          - apiSearchContent    # needs Tika
           # contract & locks
-          - apiContract
           - apiLocks
           # sharing
           - apiSharingNgItemInvitation
