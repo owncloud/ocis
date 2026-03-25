@@ -55,8 +55,7 @@ branches:
         require_code_owner_reviews: false
       required_status_checks:
         strict: false
-        contexts:
-          - continuous-integration/drone/pr
+        contexts: []
       enforce_admins: null
       restrictions:
         apps: []
@@ -74,8 +73,7 @@ branches:
         require_code_owner_reviews: false
       required_status_checks:
         strict: false
-        contexts:
-          - continuous-integration/drone/pr
+        contexts: []
       enforce_admins: null
       restrictions:
         apps: []
