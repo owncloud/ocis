@@ -54,11 +54,23 @@ timeout 300 bash -c \
 echo "ocis ready."
 
 # run acceptance tests for declared suites
-echo "Running suites: $BEHAT_SUITES"
+# ACCEPTANCE_TEST_TYPE: "api" (default) or "core-api"
+ACCEPTANCE_TEST_TYPE="${ACCEPTANCE_TEST_TYPE:-api}"
+
+if [ "$ACCEPTANCE_TEST_TYPE" = "core-api" ]; then
+  _FILTER_TAGS="~@skipOnGraph&&~@skipOnOcis-OCIS-Storage"
+  _EXPECTED_FAILURES="${EXPECTED_FAILURES_FILE:-$REPO_ROOT/tests/acceptance/expected-failures-API-on-OCIS-storage.md}"
+else
+  _FILTER_TAGS="~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage"
+  _EXPECTED_FAILURES="${EXPECTED_FAILURES_FILE:-$REPO_ROOT/tests/acceptance/expected-failures-localAPI-on-OCIS-storage.md}"
+fi
+
+echo "Running suites: $BEHAT_SUITES (type: $ACCEPTANCE_TEST_TYPE)"
 TEST_SERVER_URL=$OCIS_URL \
 OCIS_WRAPPER_URL=http://localhost:5200 \
 BEHAT_SUITES=$BEHAT_SUITES \
-BEHAT_FILTER_TAGS="~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage" \
-EXPECTED_FAILURES_FILE="$REPO_ROOT/tests/acceptance/expected-failures-localAPI-on-OCIS-storage.md" \
+ACCEPTANCE_TEST_TYPE=$ACCEPTANCE_TEST_TYPE \
+BEHAT_FILTER_TAGS="$_FILTER_TAGS" \
+EXPECTED_FAILURES_FILE="$_EXPECTED_FAILURES" \
 STORAGE_DRIVER=ocis \
   make -C "$REPO_ROOT" test-acceptance-api
