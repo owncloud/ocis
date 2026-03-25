@@ -5,16 +5,40 @@ on:
   workflow_dispatch:
 
 jobs:
-  acceptance-tests-graph:
+  acceptance-tests:
     name: ${{ matrix.suite }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         suite:
+          # graph
           - apiGraph
           - apiGraphGroup
           - apiGraphUser
+          # spaces & dav
+          - apiSpaces
+          - apiSpacesShares
+          - apiSpacesDavOperation
+          - apiDownloads
+          - apiAsyncUpload
+          - apiDepthInfinity
+          - apiArchiver
+          - apiActivities
+          # search
+          - apiSearch1
+          # contract & locks
+          - apiLocks
+          # sharing
+          - apiSharingNgItemInvitation
+          - apiSharingNgPermissions
+          - apiSharingNgShares
+          - apiSharingNgAdditionalShareRole
+          - apiSharingNgDriveInvitation
+          - apiSharingNgItemLinkShare
+          - apiSharingNgDriveLinkShare
+          - apiSharingNgLinkShareManagement
+          
     steps:
       - uses: actions/checkout@v4
 
@@ -38,3 +62,14 @@ jobs:
         with:
           name: test-logs-${{ matrix.suite }}
           path: tests/acceptance/output/
+
+  all-acceptance-tests:
+    needs: [acceptance-tests]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check all jobs passed
+        run: |
+          if [[ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            exit 1
+          fi
