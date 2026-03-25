@@ -7,23 +7,14 @@ WRAPPER_BIN="$REPO_ROOT/tests/ociswrapper/bin/ociswrapper"
 OCIS_URL="https://localhost:9200"
 OCIS_CONFIG_DIR="$HOME/.ocis/config"
 
-# suite(s) to run — set via env or passed from CI matrix
-: "${BEHAT_SUITES:?BEHAT_SUITES is required, e.g. BEHAT_SUITES=apiGraph bash run-graph.sh}"
-
 # build
 make -C "$REPO_ROOT/ocis" build
 GOWORK=off make -C "$REPO_ROOT/tests/ociswrapper" build
 
-# php deps
-cd "$REPO_ROOT"
-composer install --no-progress
-composer bin behat install --no-progress
-
-# init ocis config
+# init + start ocis
 "$OCIS_BIN" init --insecure true
 cp "$REPO_ROOT/tests/config/drone/app-registry.yaml" "$OCIS_CONFIG_DIR/app-registry.yaml"
 
-# start ociswrapper in background, kill on exit
 OCIS_URL=$OCIS_URL \
 OCIS_CONFIG_DIR=$OCIS_CONFIG_DIR \
 STORAGE_USERS_DRIVER=ocis \
@@ -46,31 +37,32 @@ WEB_UI_CONFIG_FILE="$REPO_ROOT/tests/config/drone/ocis-config.json" \
 WRAPPER_PID=$!
 trap "kill $WRAPPER_PID 2>/dev/null || true" EXIT
 
-# wait for ocis graph API to be ready
 echo "Waiting for ocis..."
 timeout 300 bash -c \
   "while [ \$(curl -sk -uadmin:admin $OCIS_URL/graph/v1.0/users/admin \
     -w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done"
 echo "ocis ready."
 
-# run acceptance tests for declared suites
-# ACCEPTANCE_TEST_TYPE: "api" (default) or "core-api"
-ACCEPTANCE_TEST_TYPE="${ACCEPTANCE_TEST_TYPE:-api}"
+# setup: creates test folder, share, and exports SPACE_ID + PUBLIC_TOKEN to .env
+TEST_SERVER_URL=$OCIS_URL bash "$REPO_ROOT/tests/config/drone/setup-for-litmus.sh"
+source .env
 
-if [ "$ACCEPTANCE_TEST_TYPE" = "core-api" ]; then
-  _FILTER_TAGS="~@skipOnGraph&&~@skipOnOcis-OCIS-Storage"
-  _EXPECTED_FAILURES="${EXPECTED_FAILURES_FILE:-$REPO_ROOT/tests/acceptance/expected-failures-API-on-OCIS-storage.md}"
-else
-  _FILTER_TAGS="~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage"
-  _EXPECTED_FAILURES="${EXPECTED_FAILURES_FILE:-$REPO_ROOT/tests/acceptance/expected-failures-localAPI-on-OCIS-storage.md}"
-fi
+# run litmus against each WebDAV endpoint
+ENDPOINTS=(
+  "$OCIS_URL/remote.php/webdav"
+  "$OCIS_URL/remote.php/dav/files/admin"
+  "$OCIS_URL/remote.php/dav/files/admin/Shares/new_folder/"
+  "$OCIS_URL/remote.php/webdav/Shares/new_folder/"
+  "$OCIS_URL/remote.php/dav/spaces/$SPACE_ID"
+)
 
-echo "Running suites: $BEHAT_SUITES (type: $ACCEPTANCE_TEST_TYPE)"
-TEST_SERVER_URL=$OCIS_URL \
-OCIS_WRAPPER_URL=http://localhost:5200 \
-BEHAT_SUITES=$BEHAT_SUITES \
-ACCEPTANCE_TEST_TYPE=$ACCEPTANCE_TEST_TYPE \
-BEHAT_FILTER_TAGS="$_FILTER_TAGS" \
-EXPECTED_FAILURES_FILE="$_EXPECTED_FAILURES" \
-STORAGE_DRIVER=ocis \
-  make -C "$REPO_ROOT" test-acceptance-api
+for ENDPOINT in "${ENDPOINTS[@]}"; do
+  echo "Testing endpoint: $ENDPOINT"
+  docker run --rm --network host \
+    -e LITMUS_URL="$ENDPOINT" \
+    -e LITMUS_USERNAME=admin \
+    -e LITMUS_PASSWORD=admin \
+    -e TESTS="basic copymove props http" \
+    owncloudci/litmus:latest \
+    /usr/local/bin/litmus-wrapper
+done

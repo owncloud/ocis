@@ -9,8 +9,8 @@ jobs:
     name: coding-standard
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"
           extensions: curl, xml, mbstring, zip
@@ -27,8 +27,8 @@ jobs:
     name: check-gherkin-standard
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "24"
       - name: Lint feature files
@@ -40,18 +40,18 @@ jobs:
     name: check-suites-in-expected-failures
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@v4
       - name: Check suites
         run: bash tests/acceptance/check-deleted-suites-in-expected-failure.sh
-  
+
   build-and-test:
-    needs: [coding-standard, check-gherkin-standard, check-suites-in-expected-failures]
     name: build-and-test
+    needs: [coding-standard, check-gherkin-standard, check-suites-in-expected-failures]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+      - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: true
@@ -62,8 +62,7 @@ jobs:
       - name: Unit tests
         run: make test
 
-
-  acceptance-tests:    
+  local-api-tests:
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -71,10 +70,17 @@ jobs:
       fail-fast: false
       matrix:
         suite:
+          # contract & locks
+          - apiContract
+          - apiLocks
+          # settings & notifications (needs email)
+          - apiSettings
+          - apiNotification
+          - apiCors
           # graph
+          - apiGraphUser
           - apiGraph
           - apiGraphGroup
-          - apiGraphUser
           # spaces & dav
           - apiSpaces
           - apiSpacesShares
@@ -86,18 +92,26 @@ jobs:
           - apiActivities
           # search
           - apiSearch1
-          # contract & locks
-          - apiLocks
+          - apiSearch2
+          - apiSearchContent    # needs Tika
           # sharing
-          - apiSharingNgItemInvitation
-          - apiSharingNgPermissions
           - apiSharingNgShares
+          - apiReshare
+          - apiSharingNgPermissions
           - apiSharingNgAdditionalShareRole
           - apiSharingNgDriveInvitation
-          - apiSharingNgItemLinkShare
+          - apiSharingNgItemInvitation
           - apiSharingNgDriveLinkShare
+          - apiSharingNgItemLinkShare
           - apiSharingNgLinkShareManagement
-          
+          # auth
+          - apiAuthApp
+          # antivirus (needs ClamAV)
+          - apiAntivirus
+          # federation (needs email + federation ocis)
+          - apiOcm
+          # collaboration (needs WOPI)
+          - apiCollaboration
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
@@ -105,6 +119,28 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+      
+      - name: Install libcurl 8.12.0 from source
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev
+          cd /tmp
+          curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
+          tar xzf curl-8.12.0.tar.gz
+          cd curl-8.12.0
+          ./configure --with-ssl --with-zlib --with-nghttp2 --prefix=/usr/local --silent
+          make -j$(nproc) --silent
+          sudo make install --silent
+          sudo ldconfig
+          curl --version | head -1
+          php -r '
+            $v = curl_version()["version"];
+            echo "PHP curl: $v\n";
+            if (version_compare($v, "8.12.0", "<")) {
+              fwrite(STDERR, "FATAL: PHP sees libcurl $v, need >= 8.12.0\n");
+              exit(1);
+            }
+          '
 
       - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
         with:
@@ -113,10 +149,156 @@ jobs:
           tools: composer
 
       - name: Run ${{ matrix.suite }}
+        run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
+
+  cli-tests:
+    name: ${{ matrix.suite }}
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - cliCommands          # needs ClamAV + email
+          - apiServiceAvailability
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip
+          tools: composer
+
+      - name: Run ${{ matrix.suite }}
         run: BEHAT_SUITES=${{ matrix.suite }} bash tests/acceptance/run-github.sh
 
+      - name: Upload test logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-${{ matrix.suite }}
+          path: tests/acceptance/output/
+
+  core-api-tests:
+    name: ${{ matrix.suite }}
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
+          - "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
+          - "coreApiSharees,coreApiSharePublicLink2"
+          - "coreApiShareOperationsToShares1,coreApiShareOperationsToShares2,coreApiSharePublicLink1,coreApiShareCreateSpecialToShares1,coreApiShareCreateSpecialToShares2,coreApiShareUpdateToShares"
+          - "coreApiTrashbin,coreApiTrashbinRestore,coreApiWebdavEtagPropagation1,coreApiWebdavEtagPropagation2"
+          - "coreApiWebdavDelete,coreApiWebdavOperations,coreApiWebdavMove2"
+          - "coreApiWebdavProperties"
+          - "coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip
+          tools: composer
+
+      - name: Run ${{ matrix.suite }}
+        run: >
+          BEHAT_SUITES="${{ matrix.suite }}"
+          ACCEPTANCE_TEST_TYPE=core-api
+          EXPECTED_FAILURES_FILE=tests/acceptance/expected-failures-API-on-OCIS-storage.md
+          bash tests/acceptance/run-github.sh
+
+      - name: Upload test logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-${{ matrix.suite }}
+          path: tests/acceptance/output/
+
+  e2e-tests:
+    name: e2e-${{ matrix.suite }}
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: part-1
+            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 1"
+          - suite: part-2
+            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 2"
+          - suite: part-3
+            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 3"
+          - suite: part-4
+            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 4"
+          - suite: search
+            args: "--suites search"          # needs Tika
+          - suite: keycloak
+            args: "--suites journeys,keycloak"  # needs postgres + keycloak
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Run e2e-${{ matrix.suite }}
+        run: E2E_ARGS="${{ matrix.args }}" bash tests/acceptance/run-e2e.sh
+
+      - name: Upload tracing results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-tracing-${{ matrix.suite }}
+          path: webTestRunner/reports/e2e/playwright/tracing/
+
+  litmus:
+    name: litmus
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Run litmus
+        run: bash tests/acceptance/run-litmus.sh
+
+  cs3-api-tests:
+    name: cs3ApiTests
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Run cs3ApiTests
+        run: bash tests/acceptance/run-cs3api.sh
+
   all-acceptance-tests:
-    needs: [acceptance-tests]
+    needs: [build-and-test, local-api-tests, cli-tests, core-api-tests, e2e-tests, litmus, cs3-api-tests]
     runs-on: ubuntu-latest
     if: always()
     steps:
