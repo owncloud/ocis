@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  acceptance-tests-graph:
+  acceptance-tests:
     name: ${{ matrix.suite }}
     runs-on: ubuntu-latest
     strategy:
@@ -17,9 +17,15 @@ jobs:
           - apiGraphGroup
           - apiGraphUser
           # spaces
+          # spaces & dav
           - apiSpaces
           - apiSpacesShares
           - apiSpacesDavOperation
+          - apiDownloads
+          - apiAsyncUpload
+          - apiDepthInfinity
+          - apiArchiver
+          - apiActivities
           # search
           - apiSearch1
           - apiSearchContent    # needs Tika
