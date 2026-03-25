@@ -12,9 +12,30 @@ jobs:
       fail-fast: false
       matrix:
         suite:
+          # graph
           - apiGraph
           - apiGraphGroup
           - apiGraphUser
+          # spaces
+          - apiSpaces
+          - apiSpacesShares
+          - apiSpacesDavOperation
+          # search
+          - apiSearch1
+          - apiSearchContent    # needs Tika
+          # contract & locks
+          - apiContract
+          - apiLocks
+          # sharing
+          - apiSharingNgItemInvitation
+          - apiSharingNgPermissions
+          - apiSharingNgShares
+          - apiSharingNgAdditionalShareRole
+          - apiSharingNgDriveInvitation
+          - apiSharingNgItemLinkShare
+          - apiSharingNgDriveLinkShare
+          - apiSharingNgLinkShareManagement
+          
     steps:
       - uses: actions/checkout@v4
 
