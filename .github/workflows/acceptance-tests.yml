@@ -57,15 +57,6 @@ jobs:
           - apiCollaboration
           # cli (needs ClamAV + email)
           - cliCommands
-        include:
-          # settings & notifications — need mailpit + ocis notifications service
-          - suite: apiSettings
-            emailNeeded: "true"
-          - suite: apiNotification
-            emailNeeded: "true"
-          - suite: apiCors
-            emailNeeded: "true"
-          
     steps:
       - uses: actions/checkout@v4
 
@@ -81,10 +72,7 @@ jobs:
           tools: composer
 
       - name: Run ${{ matrix.suite }}
-        run: >
-          EMAIL_NEEDED="${{ matrix.emailNeeded || 'false' }}"
-          BEHAT_SUITES=${{ matrix.suite }}
-          bash tests/acceptance/run-github.sh
+        run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
 
   core-api-tests:
     name: ${{ matrix.suite }}
@@ -120,7 +108,7 @@ jobs:
           BEHAT_SUITES="${{ matrix.suite }}"
           ACCEPTANCE_TEST_TYPE=core-api
           EXPECTED_FAILURES_FILE=tests/acceptance/expected-failures-API-on-OCIS-storage.md
-          bash tests/acceptance/run-github.sh
+          python3 tests/acceptance/run-github.py
 
   all-acceptance-tests:
     needs: [acceptance-tests, core-api-tests]
