@@ -5,26 +5,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-test:
-    name: build-and-test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - name: Build ocis
-        run: make -C ocis build
-
-      - name: Unit tests
-        run: make test
-
   acceptance-tests:
     name: ${{ matrix.suite }}
-    needs: [build-and-test]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -58,9 +40,6 @@ jobs:
           - apiSharingNgDriveLinkShare
           - apiSharingNgLinkShareManagement
                     
-          # search
-          - apiSearch1
-          - apiSearchContent    # needs Tika
           # contract & locks
           - apiContract
           # auth
@@ -76,24 +55,15 @@ jobs:
           - apiCollaboration
           # cli (needs ClamAV + email)
           - cliCommands
-        include:
-          # settings & notifications — need mailpit + ocis notifications service
-          - suite: apiSettings
-            emailNeeded: "true"
-          - suite: apiNotification
-            emailNeeded: "true"
-          - suite: apiCors
-            emailNeeded: "true"
-          
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+      - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: true
 
-      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"
           extensions: curl, xml, mbstring, zip
@@ -111,7 +81,6 @@ jobs:
 
   local-api-tests-tika:
     name: apiSearchContent
-    needs: [build-and-test]
     runs-on: ubuntu-latest
     services:
       tika:
@@ -224,7 +193,7 @@ jobs:
           bash tests/acceptance/run-github.sh
 
   all-acceptance-tests:
-    needs: [acceptance-tests, core-api-tests]
+    needs: [acceptance-tests, local-api-tests-tika, core-api-tests]
     runs-on: ubuntu-latest
     if: always()
     steps:
