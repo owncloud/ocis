@@ -47,6 +47,7 @@ jobs:
           - apiSearch1
           # contract & locks
           - apiLocks
+          - apiSearch2
           # sharing
           - apiSharingNgItemInvitation
           - apiSharingNgPermissions
@@ -99,10 +100,92 @@ jobs:
           tools: composer
 
       - name: Run ${{ matrix.suite }}
-        run: >
-          EMAIL_NEEDED="${{ matrix.emailNeeded || 'false' }}"
-          BEHAT_SUITES=${{ matrix.suite }}
+        run: BEHAT_SUITES=${{ matrix.suite }} bash tests/acceptance/run-github.sh
+
+      - name: Upload test logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-${{ matrix.suite }}
+          path: tests/acceptance/output/
+
+  local-api-tests-tika:
+    name: apiSearchContent
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    services:
+      tika:
+        image: apache/tika:3.2.2.0-full
+        ports:
+          - 9998:9998
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip
+          tools: composer
+
+      - name: Wait for Tika
+        run: |
+          timeout 120 bash -c \
+            "until curl -sf http://localhost:9998/tika; do sleep 2; done"
+          echo "Tika ready."
+
+      - name: Run apiSearchContent
+        run: |
+          BEHAT_SUITES=apiSearchContent \
+          SEARCH_EXTRACTOR_TYPE=tika \
+          SEARCH_EXTRACTOR_TIKA_TIKA_URL=http://localhost:9998 \
+          FRONTEND_FULL_TEXT_SEARCH_ENABLED=true \
           bash tests/acceptance/run-github.sh
+
+      - name: Upload test logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-apiSearchContent
+          path: tests/acceptance/output/
+
+  cli-tests:
+    name: ${{ matrix.suite }}
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - cliCommands          # needs ClamAV + email
+          - apiServiceAvailability
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip
+          tools: composer
+
+      - name: Run ${{ matrix.suite }}
+        run: BEHAT_SUITES=${{ matrix.suite }} bash tests/acceptance/run-github.sh
+
+      - name: Upload test logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-${{ matrix.suite }}
+          path: tests/acceptance/output/
 
   core-api-tests:
     name: ${{ matrix.suite }}

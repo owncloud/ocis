@@ -7,11 +7,8 @@ WRAPPER_BIN="$REPO_ROOT/tests/ociswrapper/bin/ociswrapper"
 OCIS_URL="https://localhost:9200"
 OCIS_CONFIG_DIR="$HOME/.ocis/config"
 
-# optional service flags — set to "true" to enable
-EMAIL_NEEDED="${EMAIL_NEEDED:-false}"
-
 # suite(s) to run — set via env or passed from CI matrix
-: "${BEHAT_SUITES:?BEHAT_SUITES is required, e.g. BEHAT_SUITES=apiGraph bash run-github.sh}"
+: "${BEHAT_SUITES:?BEHAT_SUITES is required, e.g. BEHAT_SUITES=apiGraph bash run-graph.sh}"
 
 # build
 make -C "$REPO_ROOT/ocis" build
@@ -22,50 +19,28 @@ cd "$REPO_ROOT"
 composer install --no-progress
 composer bin behat install --no-progress
 
-# start mailpit (email service) if needed
-if [ "$EMAIL_NEEDED" = "true" ]; then
-  echo "Starting mailpit..."
-  docker run -d --name mailpit --network host axllent/mailpit:v1.22.3
-  timeout 60 bash -c 'while ! curl -sf http://localhost:8025/api/v1/messages > /dev/null; do sleep 1; done'
-  echo "mailpit ready."
-fi
-
 # init ocis config
 "$OCIS_BIN" init --insecure true
 cp "$REPO_ROOT/tests/config/drone/app-registry.yaml" "$OCIS_CONFIG_DIR/app-registry.yaml"
 
-# build ociswrapper env — base vars always present
-WRAPPER_ENV=(
-  OCIS_URL=$OCIS_URL
-  OCIS_CONFIG_DIR=$OCIS_CONFIG_DIR
-  STORAGE_USERS_DRIVER=ocis
-  PROXY_ENABLE_BASIC_AUTH=true
-  OCIS_EXCLUDE_RUN_SERVICES=idp
-  OCIS_LOG_LEVEL=error
-  IDM_CREATE_DEMO_USERS=true
-  IDM_ADMIN_PASSWORD=admin
-  OCIS_ASYNC_UPLOADS=true
-  OCIS_EVENTS_ENABLE_TLS=false
-  NATS_NATS_HOST=0.0.0.0
-  NATS_NATS_PORT=9233
-  OCIS_JWT_SECRET=some-ocis-jwt-secret
-  "WEB_UI_CONFIG_FILE=$REPO_ROOT/tests/config/drone/ocis-config.json"
-)
-
-# add notifications service env when email is needed
-if [ "$EMAIL_NEEDED" = "true" ]; then
-  WRAPPER_ENV+=(
-    OCIS_ADD_RUN_SERVICES=notifications
-    NOTIFICATIONS_SMTP_HOST=localhost
-    NOTIFICATIONS_SMTP_PORT=1025
-    NOTIFICATIONS_SMTP_INSECURE=true
-    "NOTIFICATIONS_SMTP_SENDER=ownCloud <noreply@example.com>"
-    NOTIFICATIONS_DEBUG_ADDR=0.0.0.0:9174
-  )
-fi
-
 # start ociswrapper in background, kill on exit
-env "${WRAPPER_ENV[@]}" \
+OCIS_URL=$OCIS_URL \
+OCIS_CONFIG_DIR=$OCIS_CONFIG_DIR \
+STORAGE_USERS_DRIVER=ocis \
+PROXY_ENABLE_BASIC_AUTH=true \
+OCIS_EXCLUDE_RUN_SERVICES=idp \
+OCIS_LOG_LEVEL=error \
+IDM_CREATE_DEMO_USERS=true \
+IDM_ADMIN_PASSWORD=admin \
+OCIS_ASYNC_UPLOADS=true \
+OCIS_EVENTS_ENABLE_TLS=false \
+NATS_NATS_HOST=0.0.0.0 \
+NATS_NATS_PORT=9233 \
+OCIS_JWT_SECRET=some-ocis-jwt-secret \
+WEB_UI_CONFIG_FILE="$REPO_ROOT/tests/config/drone/ocis-config.json" \
+SEARCH_EXTRACTOR_TYPE="${SEARCH_EXTRACTOR_TYPE:-basic}" \
+SEARCH_EXTRACTOR_TIKA_TIKA_URL="${SEARCH_EXTRACTOR_TIKA_TIKA_URL:-}" \
+FRONTEND_FULL_TEXT_SEARCH_ENABLED="${FRONTEND_FULL_TEXT_SEARCH_ENABLED:-false}" \
   "$WRAPPER_BIN" serve \
     --bin "$OCIS_BIN" \
     --url "$OCIS_URL" \
@@ -101,6 +76,4 @@ ACCEPTANCE_TEST_TYPE=$ACCEPTANCE_TEST_TYPE \
 BEHAT_FILTER_TAGS="$_FILTER_TAGS" \
 EXPECTED_FAILURES_FILE="$_EXPECTED_FAILURES" \
 STORAGE_DRIVER=ocis \
-EMAIL_HOST=localhost \
-EMAIL_PORT=8025 \
   make -C "$REPO_ROOT" test-acceptance-api
