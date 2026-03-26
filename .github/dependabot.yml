@@ -19,4 +19,9 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 2
+    
+  - package-ecosystem: "github-actions"
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
 
