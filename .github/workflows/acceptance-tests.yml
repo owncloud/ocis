@@ -57,6 +57,14 @@ jobs:
           - apiCollaboration
           # cli (needs ClamAV + email)
           - cliCommands
+        include:
+          # settings & notifications — need mailpit + ocis notifications service
+          - suite: apiSettings
+            emailNeeded: "true"
+          - suite: apiNotification
+            emailNeeded: "true"
+          - suite: apiCors
+            emailNeeded: "true"
           
     steps:
       - uses: actions/checkout@v4
@@ -73,7 +81,10 @@ jobs:
           tools: composer
 
       - name: Run ${{ matrix.suite }}
-        run: BEHAT_SUITES=${{ matrix.suite }} bash tests/acceptance/run-github.sh
+        run: >
+          EMAIL_NEEDED="${{ matrix.emailNeeded || 'false' }}"
+          BEHAT_SUITES=${{ matrix.suite }}
+          bash tests/acceptance/run-github.sh
 
   core-api-tests:
     name: ${{ matrix.suite }}
