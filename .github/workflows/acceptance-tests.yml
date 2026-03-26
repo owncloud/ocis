@@ -108,6 +108,7 @@ jobs:
           BEHAT_SUITES=apiSearchContent \
           SEARCH_EXTRACTOR_TYPE=tika \
           SEARCH_EXTRACTOR_TIKA_TIKA_URL=http://localhost:9998 \
+          SEARCH_EXTRACTOR_CS3SOURCE_INSECURE=true \
           FRONTEND_FULL_TEXT_SEARCH_ENABLED=true \
           bash tests/acceptance/run-github.sh
 
