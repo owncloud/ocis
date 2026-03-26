@@ -29,6 +29,7 @@ jobs:
           - apiSearch1
           - apiSearch2
           # contract & locks
+          - apiContract
           - apiLocks
           # sharing
           - apiSharingNgItemInvitation
@@ -39,9 +40,6 @@ jobs:
           - apiSharingNgItemLinkShare
           - apiSharingNgDriveLinkShare
           - apiSharingNgLinkShareManagement
-                    
-          # contract & locks
-          - apiContract
           # auth
           - apiAuthApp
           # settings & notifications (needs email)
@@ -53,8 +51,6 @@ jobs:
           - apiOcm
           # collaboration (needs WOPI)
           - apiCollaboration
-          # cli (needs ClamAV + email)
-          - cliCommands
     steps:
       - uses: actions/checkout@v4
 
@@ -124,7 +120,6 @@ jobs:
 
   cli-tests:
     name: ${{ matrix.suite }}
-    needs: [build-and-test]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -193,7 +188,7 @@ jobs:
           bash tests/acceptance/run-github.sh
 
   all-acceptance-tests:
-    needs: [acceptance-tests, local-api-tests-tika, core-api-tests]
+    needs: [acceptance-tests, local-api-tests-tika, cli-tests, core-api-tests]
     runs-on: ubuntu-latest
     if: always()
     steps:
