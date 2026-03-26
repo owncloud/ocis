@@ -27,9 +27,9 @@ jobs:
           - apiActivities
           # search
           - apiSearch1
+          - apiSearch2
           # contract & locks
           - apiLocks
-          - apiSearch2
           # sharing
           - apiSharingNgItemInvitation
           - apiSharingNgPermissions
