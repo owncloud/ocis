@@ -5,7 +5,47 @@ on:
   workflow_dispatch:
 
 jobs:
+  coding-standard:
+    name: coding-standard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip
+          tools: composer
+      - name: PHP code style
+        run: |
+          make vendor-bin-codestyle
+          make vendor-bin-codesniffer
+          make test-php-style
+      - name: Check env var annotations
+        run: make check-env-var-annotations
+
+  check-gherkin-standard:
+    name: check-gherkin-standard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Lint feature files
+        run: |
+          npm install -g @gherlint/gherlint@1.1.0
+          make test-gherkin-lint
+
+  check-suites-in-expected-failures:
+    name: check-suites-in-expected-failures
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check suites
+        run: bash tests/acceptance/check-deleted-suites-in-expected-failure.sh
+  
   acceptance-tests:
+    needs: [coding-standard, check-gherkin-standard, check-suites-in-expected-failures]
     name: ${{ matrix.suite }}
     runs-on: ubuntu-latest
     strategy:
@@ -55,13 +95,6 @@ jobs:
 
       - name: Run ${{ matrix.suite }}
         run: BEHAT_SUITES=${{ matrix.suite }} bash tests/acceptance/run-github.sh
-
-      - name: Upload test logs
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-logs-${{ matrix.suite }}
-          path: tests/acceptance/output/
 
   all-acceptance-tests:
     needs: [acceptance-tests]
