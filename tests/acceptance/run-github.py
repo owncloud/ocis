@@ -164,6 +164,16 @@ for _cfg in LOCAL_API_TESTS.values():
         _SUITE_TO_CONFIG[_s] = _cfg
 
 
+# GitHub Actions uses --network host: all wopi services share one network namespace.
+# Drone gives each service its own container → all can use 9300/9301/9304.
+# Assign distinct ports here to avoid collisions.
+_WOPI_PORTS = {
+    "collabora":  {"grpc": 9301, "http": 9300, "debug": 9304},
+    "onlyoffice": {"grpc": 9311, "http": 9310, "debug": 9314},
+    "fakeoffice": {"grpc": 9321, "http": 9320, "debug": 9324},
+}
+
+
 def merged_config(suites: list) -> dict:
     """Union config for all requested suites."""
     merged = {
@@ -248,12 +258,31 @@ def base_server_env(repo_root: Path, ocis_url: str, ocis_config_dir: str) -> dic
     }
 
 
-def wait_for(condition_fn, timeout: int, label: str) -> None:
-    deadline = time.time() + timeout
+def wait_for(condition_fn, timeout: int, label: str, container: str = None) -> None:
+    start = time.time()
+    deadline = start + timeout
+    last_log = start
     while not condition_fn():
-        if time.time() > deadline:
-            print(f"Timeout waiting for {label}", file=sys.stderr)
+        now = time.time()
+        if now > deadline:
+            elapsed = int(now - start)
+            print(f"Timeout waiting for {label} after {elapsed}s", file=sys.stderr)
+            # dump docker diagnostics — use explicit container name if provided
+            cname = container or label
+            for cmd in (
+                ["docker", "ps", "-a", "--filter", f"name={cname}", "--no-trunc"],
+                ["docker", "logs", "--tail", "50", cname],
+            ):
+                r = subprocess.run(cmd, capture_output=True, text=True)
+                if r.stdout.strip():
+                    print(f"--- {' '.join(cmd)} ---", file=sys.stderr)
+                    print(r.stdout, file=sys.stderr)
+                if r.stderr.strip():
+                    print(r.stderr, file=sys.stderr)
             sys.exit(1)
+        if now - last_log >= 30:
+            print(f"  Waiting for {label}... {int(now - start)}s")
+            last_log = now
         time.sleep(1)
 
 
@@ -281,14 +310,19 @@ def tika_healthy() -> bool:
     ).returncode == 0
 
 
-def clamav_healthy() -> bool:
-    """Check ClamAV is ready by attempting a TCP connection to port 3310."""
+def _tcp_ready(host: str, port: int) -> bool:
+    """Check if a TCP port is accepting connections."""
     import socket
     try:
-        with socket.create_connection(("localhost", 3310), timeout=2):
+        with socket.create_connection((host, port), timeout=2):
             return True
     except (ConnectionRefusedError, OSError):
         return False
+
+
+def clamav_healthy() -> bool:
+    return _tcp_ready("localhost", 3310)
+
 
 
 def run(cmd: list, env: dict = None, check: bool = True):
@@ -449,48 +483,137 @@ def main() -> int:
         )
         procs.append(fed_proc)
 
-    # start collaboration services (fakeoffice WOPI)
-    if cfg["collaborationServiceNeeded"]:
-        # fakeoffice: serves hosting-discovery.xml
-        discovery_xml = repo_root / "tests/config/drone/hosting-discovery.xml"
-        if discovery_xml.exists():
-            print("Starting fakeoffice...")
-            run(["docker", "run", "-d", "--name", "fakeoffice", "--network", "host",
-                 "-v", f"{discovery_xml}:/discovery.xml:ro",
-                 "python:3-alpine",
-                 "sh", "-c",
-                 "pip install flask && python -c \""
-                 "from flask import Flask; app = Flask(__name__)\n"
-                 "@app.route('/hosting/discovery')\n"
-                 "def discovery(): return open('/discovery.xml').read(), 200, {'Content-Type': 'text/xml'}\n"
-                 "app.run(host='0.0.0.0', port=8080)\""])
+    # ---------------------------------------------------------------------------
+    # Collaboration service helpers — same names/call pattern as drone.star
+    # Only deviation: container hostnames → localhost
+    # ---------------------------------------------------------------------------
+    def fakeOffice():
+        # drone: OC_CI_ALPINE container running serve-hosting-discovery.sh with repo at /drone/src
+        # use same image so BusyBox nc (not OpenBSD nc) handles FIN correctly on stdin EOF
+        run(["docker", "run", "-d", "--name", "fakeoffice", "--network", "host",
+             "-v", f"{repo_root}:/drone/src:ro",
+             "owncloudci/alpine:latest",
+             "sh", "/drone/src/tests/config/drone/serve-hosting-discovery.sh"])
+        return []
 
-        # wopi-fakeoffice collaboration service
-        wopi_env = {
+    def collaboraService():
+        # drone commands copy-pasted verbatim
+        run(["docker", "run", "-d", "--name", "collabora", "--network", "host",
+             "-e", "DONT_GEN_SSL_CERT=set",
+             "-e", f"extra_params=--o:ssl.enable=true --o:ssl.termination=true "
+                   f"--o:welcome.enable=false --o:net.frame_ancestors=https://localhost:9200",
+             "--entrypoint", "/bin/sh",
+             "collabora/code:24.04.5.1.1",
+             "-c", "\n".join([
+                 "set -e",
+                 "coolconfig generate-proof-key",
+                 "bash /start-collabora-online.sh",
+             ])])
+        return []
+
+    def onlyofficeService():
+        # GitHub runner ships PostgreSQL pre-started on 5432.
+        # OnlyOffice supervisord starts its own PostgreSQL on 5432 internally.
+        # With --network host both compete for the same port → OnlyOffice DB never
+        # starts → docservice stays down → nginx returns 502 forever.
+        # Drone avoids this because each service has its own network namespace.
+        subprocess.run(["sudo", "systemctl", "stop", "postgresql"],
+                       capture_output=True)
+        only_office_json = repo_root / "tests/config/drone/only-office.json"
+        run(["docker", "run", "-d", "--name", "onlyoffice", "--network", "host",
+             "-e", "WOPI_ENABLED=true",
+             "-e", "USE_UNAUTHORIZED_STORAGE=true",
+             "-v", f"{only_office_json}:/tmp/only-office.json:ro",
+             "--entrypoint", "/bin/sh",
+             "onlyoffice/documentserver:9.0.0",
+             "-c", "\n".join([
+                 "set -e",
+                 "cp /tmp/only-office.json /etc/onlyoffice/documentserver/local.json",
+                 "openssl req -x509 -newkey rsa:4096 -keyout onlyoffice.key -out onlyoffice.crt -sha256 -days 365 -batch -nodes",
+                 "mkdir -p /var/www/onlyoffice/Data/certs",
+                 "cp onlyoffice.key /var/www/onlyoffice/Data/certs/",
+                 "cp onlyoffice.crt /var/www/onlyoffice/Data/certs/",
+                 "chmod 400 /var/www/onlyoffice/Data/certs/onlyoffice.key",
+                 "/app/ds/run-document-server.sh",
+             ])])
+        return []
+
+    def wopiCollaborationService(name, ocis_url=ocis_url):
+        # drone: startOcisService("collaboration", "wopi-{name}", environment)
+        # runs: ocis/bin/ocis-debug collaboration server
+        service_name = "wopi-%s" % name
+        ports = _WOPI_PORTS[name]
+        environment = {
             **os.environ,
             "OCIS_URL": ocis_url,
             "MICRO_REGISTRY": "nats-js-kv",
             "MICRO_REGISTRY_ADDRESS": "localhost:9233",
             "COLLABORATION_LOG_LEVEL": "debug",
-            "COLLABORATION_GRPC_ADDR": "0.0.0.0:9301",
-            "COLLABORATION_HTTP_ADDR": "0.0.0.0:9300",
-            "COLLABORATION_DEBUG_ADDR": "0.0.0.0:9304",
+            "COLLABORATION_GRPC_ADDR": f"0.0.0.0:{ports['grpc']}",
+            "COLLABORATION_HTTP_ADDR": f"0.0.0.0:{ports['http']}",
+            "COLLABORATION_DEBUG_ADDR": f"0.0.0.0:{ports['debug']}",
             "COLLABORATION_APP_PROOF_DISABLE": "true",
             "COLLABORATION_APP_INSECURE": "true",
             "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": "true",
             "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
             "COLLABORATION_WOPI_SECRET": "some-wopi-secret",
-            "COLLABORATION_APP_NAME": "FakeOffice",
-            "COLLABORATION_APP_PRODUCT": "Microsoft",
-            "COLLABORATION_APP_ADDR": "http://localhost:8080",
-            "COLLABORATION_WOPI_SRC": "http://localhost:9300",
         }
-        print("Starting wopi-fakeoffice collaboration service...")
-        wopi_proc = subprocess.Popen(
-            [str(ocis_bin), "collaboration", "server"],
-            env=wopi_env,
+        if name == "collabora":
+            environment["COLLABORATION_APP_NAME"] = "Collabora"
+            environment["COLLABORATION_APP_PRODUCT"] = "Collabora"
+            environment["COLLABORATION_APP_ADDR"] = "https://localhost:9980"
+            environment["COLLABORATION_APP_ICON"] = "https://localhost:9980/favicon.ico"
+        elif name == "onlyoffice":
+            environment["COLLABORATION_APP_NAME"] = "OnlyOffice"
+            environment["COLLABORATION_APP_PRODUCT"] = "OnlyOffice"
+            environment["COLLABORATION_APP_ADDR"] = "https://localhost:443"
+            environment["COLLABORATION_APP_ICON"] = "https://localhost:443/web-apps/apps/documenteditor/main/resources/img/favicon.ico"
+        elif name == "fakeoffice":
+            environment["COLLABORATION_APP_NAME"] = "FakeOffice"
+            environment["COLLABORATION_APP_PRODUCT"] = "Microsoft"
+            environment["COLLABORATION_APP_ADDR"] = "http://localhost:8080"
+        environment["COLLABORATION_WOPI_SRC"] = f"http://localhost:{ports['http']}"
+        print(f"Starting {service_name}...")
+        return [subprocess.Popen([str(ocis_bin), "collaboration", "server"], env=environment)]
+
+    def ocisHealthCheck(name, services=[]):
+        # drone: curl healthz + readyz on each service (timeout 300s)
+        for service in services:
+            host, port = service.rsplit(":", 1)
+            for endpoint in ("healthz", "readyz"):
+                wait_for(
+                    lambda h="localhost", p=int(port), ep=endpoint: subprocess.run(
+                        ["curl", "-sf", f"http://{h}:{p}/{ep}"], capture_output=True
+                    ).returncode == 0,
+                    300, f"{service}/{endpoint}",
+                )
+        print(f"health-check-{name}: all services healthy.")
+
+    def wopi_discovery_ready(app_url: str) -> bool:
+        """Return True once the WOPI app's /hosting/discovery returns HTTP 200."""
+        url = app_url.rstrip("/") + "/hosting/discovery"
+        r = subprocess.run(
+            ["curl", "-sfk", url], capture_output=True
         )
-        procs.append(wopi_proc)
+        return r.returncode == 0
+
+    # drone.star non-k8s collaborationServiceNeeded path (lines 1195-1196, 1140-1141, 1179-1183)
+    if cfg["collaborationServiceNeeded"]:
+        procs += fakeOffice() + collaboraService() + onlyofficeService()
+        # Wait for each app's /hosting/discovery to return 200 before starting its
+        # collaboration service. GetAppURLs in server.go calls discovery synchronously
+        # at startup — non-200 exits the process immediately, healthz never binds.
+        wait_for(lambda: wopi_discovery_ready("http://localhost:8080"),  300, "fakeoffice discovery",  container="fakeoffice")
+        wait_for(lambda: wopi_discovery_ready("https://localhost:9980"), 300, "collabora discovery",   container="collabora")
+        wait_for(lambda: wopi_discovery_ready("https://localhost:443"),  300, "onlyoffice discovery",  container="onlyoffice")
+        procs += wopiCollaborationService("fakeoffice") + \
+                 wopiCollaborationService("collabora") + \
+                 wopiCollaborationService("onlyoffice")
+        ocisHealthCheck("wopi", [
+            f"localhost:{_WOPI_PORTS['collabora']['debug']}",
+            f"localhost:{_WOPI_PORTS['onlyoffice']['debug']}",
+            f"localhost:{_WOPI_PORTS['fakeoffice']['debug']}",
+        ])
 
     def cleanup(*_):
         for p in procs:
@@ -546,7 +669,7 @@ def main() -> int:
             "UPLOAD_DELETE_WAIT_TIME": "0",
             "EMAIL_HOST": "localhost",
             "EMAIL_PORT": EMAIL_PORT,
-            "COLLABORATION_SERVICE_URL": "http://localhost:9300",
+            "COLLABORATION_SERVICE_URL": f"http://localhost:{_WOPI_PORTS['fakeoffice']['http']}",
         }
         behat_env.update(cfg["extraEnvironment"])
 
