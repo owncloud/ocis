@@ -218,10 +218,14 @@ jobs:
       fail-fast: false
       matrix:
         suite:
+          - "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
           - "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
           - "coreApiSharees,coreApiSharePublicLink2"
           - "coreApiShareOperationsToShares1,coreApiShareOperationsToShares2,coreApiSharePublicLink1,coreApiShareCreateSpecialToShares1,coreApiShareCreateSpecialToShares2,coreApiShareUpdateToShares"
           - "coreApiTrashbin,coreApiTrashbinRestore,coreApiWebdavEtagPropagation1,coreApiWebdavEtagPropagation2"
+          - "coreApiWebdavDelete,coreApiWebdavOperations,coreApiWebdavMove2"
+          - "coreApiWebdavProperties"
+          - "coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS"
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
@@ -268,23 +272,16 @@ jobs:
         run: >
           BEHAT_SUITES="${{ matrix.suite }}"
           ACCEPTANCE_TEST_TYPE=core-api
-          EXPECTED_FAILURES_FILE=tests/acceptance/expected-failures-API-on-OCIS-storage.md
+          WITH_REMOTE_PHP=true
           python3 tests/acceptance/run-github.py
-
-      - name: Upload test logs
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-logs-${{ matrix.suite }}
-          path: tests/acceptance/output/
 
   litmus:
     name: litmus
     needs: [build-and-test]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version-file: go.mod
           cache: true
@@ -296,8 +293,8 @@ jobs:
     needs: [build-and-test]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version-file: go.mod
           cache: true
@@ -309,8 +306,8 @@ jobs:
     needs: [build-and-test]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version-file: go.mod
           cache: true
@@ -322,8 +319,8 @@ jobs:
     needs: [build-and-test]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version-file: go.mod
           cache: true

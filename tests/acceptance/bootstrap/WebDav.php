@@ -4063,10 +4063,46 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function theDownloadedPreviewContentShouldMatchWithFixturesPreviewContentFor(string $filename): void {
-		$expectedPreview = \file_get_contents(__DIR__ . "/../fixtures/" . $filename);
+		$fixturePath = __DIR__ . "/../fixtures/" . $filename;
+		$fixtureImg = \imagecreatefromstring(\file_get_contents($fixturePath));
+		Assert::assertNotFalse($fixtureImg, "Could not decode fixture image $filename");
+
 		$this->getResponse()->getBody()->rewind();
 		$responseBodyContent = $this->getResponse()->getBody()->getContents();
-		Assert::assertEquals($expectedPreview, $responseBodyContent);
+		$responseImg = \imagecreatefromstring($responseBodyContent);
+		Assert::assertNotFalse($responseImg, "Downloaded preview is not a valid image");
+
+		$w = \imagesx($fixtureImg);
+		$h = \imagesy($fixtureImg);
+		Assert::assertEquals($w, \imagesx($responseImg), "Image width mismatch for fixture $filename");
+		Assert::assertEquals($h, \imagesy($responseImg), "Image height mismatch for fixture $filename");
+
+		$tolerance = 12; // per-channel tolerance for libvips version differences
+		$maxDiff = 0;
+		for ($x = 0; $x < $w; $x++) {
+			for ($y = 0; $y < $h; $y++) {
+				$fc = \imagecolorat($fixtureImg, $x, $y);
+				$rc = \imagecolorat($responseImg, $x, $y);
+				$maxDiff = \max(
+					$maxDiff,
+					\abs(($fc >> 16 & 0xFF) - ($rc >> 16 & 0xFF)),
+					\abs(($fc >> 8 & 0xFF) - ($rc >> 8 & 0xFF)),
+					\abs(($fc & 0xFF) - ($rc & 0xFF)),
+				);
+			}
+		}
+		$rw = \imagesx($responseImg);
+		$rh = \imagesy($responseImg);
+		echo "  [preview-fixture] $filename: fixture={$w}x{$h} response={$rw}x{$rh} maxPixelDiff=$maxDiff\n";
+
+		Assert::assertLessThanOrEqual(
+			$tolerance,
+			$maxDiff,
+			"Preview pixel values differ by more than $tolerance from fixture $filename (max diff: $maxDiff)",
+		);
+
+		\imagedestroy($fixtureImg);
+		\imagedestroy($responseImg);
 	}
 
 	/**
