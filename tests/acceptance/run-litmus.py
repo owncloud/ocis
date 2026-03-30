@@ -151,16 +151,22 @@ def main() -> int:
     # build (matching drone: restores binary from cache, then runs ocis server directly)
     subprocess.run(["make", "-C", str(repo_root / "ocis"), "build"], check=True)
 
-    # init ocis (same as drone ocisServer() commands)
-    subprocess.run([str(ocis_bin), "init", "--insecure", "true"], check=True)
+    # assemble server env first — same env vars drone sets on the container before
+    # running `ocis init`, so IDM_ADMIN_PASSWORD=admin is present during init and
+    # the config is written with the correct password (not a random one)
+    server_env = {**os.environ}
+    server_env.update(base_server_env(repo_root, str(ocis_config_dir)))
+
+    # init ocis with full server env (mirrors drone: env is set before ocis init runs)
+    subprocess.run(
+        [str(ocis_bin), "init", "--insecure", "true"],
+        env=server_env,
+        check=True,
+    )
     shutil.copy(
         repo_root / "tests/config/drone/app-registry.yaml",
         ocis_config_dir / "app-registry.yaml",
     )
-
-    # assemble server env
-    server_env = {**os.environ}
-    server_env.update(base_server_env(repo_root, str(ocis_config_dir)))
 
     # start ocis server directly (matching drone: no ociswrapper for litmus)
     print("Starting ocis...")
