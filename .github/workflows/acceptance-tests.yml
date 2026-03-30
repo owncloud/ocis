@@ -5,153 +5,6 @@ on:
   workflow_dispatch:
 
 jobs:
-<<<<<<< feat/ocisdev-744-3
-#  coding-standard:
-#    name: coding-standard
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-#      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
-#        with:
-#          php-version: "8.4"
-#          extensions: curl, xml, mbstring, zip
-#          tools: composer
-#      - name: PHP code style
-#        run: |
-#          make vendor-bin-codestyle
-#          make vendor-bin-codesniffer
-#          make test-php-style
-#      - name: Check env var annotations
-#        run: make check-env-var-annotations
-#
-#  check-gherkin-standard:
-#    name: check-gherkin-standard
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-#      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-#        with:
-#          node-version: "24"
-#      - name: Lint feature files
-#        run: |
-#          npm install -g @gherlint/gherlint@1.1.0
-#          make test-gherkin-lint
-#
-#  check-suites-in-expected-failures:
-#    name: check-suites-in-expected-failures
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-#      - name: Check suites
-#        run: bash tests/acceptance/check-deleted-suites-in-expected-failure.sh
-#
-#  build-and-test:
-#    name: build-and-test
-#    needs: [coding-standard, check-gherkin-standard, check-suites-in-expected-failures]
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-#      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
-#        with:
-#          go-version-file: go.mod
-#          cache: true
-#
-#      - name: Build ocis
-#        run: make -C ocis build
-#
-#      - name: Unit tests
-#        run: make test
-#
-#  local-api-tests:
-#    name: ${{ matrix.suite }}
-#    needs: [build-and-test]
-#    runs-on: ubuntu-latest
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        suite:
-#          # contract & locks
-#          - apiContract
-#          - apiLocks
-#          # settings & notifications (needs email)
-#          - apiSettings
-#          - apiNotification
-#          - apiCors
-#          # graph
-#          - apiGraphUser
-#          - apiGraph
-#          - apiGraphGroup
-#          # spaces & dav
-#          - apiSpaces
-#          - apiSpacesShares
-#          - apiSpacesDavOperation
-#          - apiDownloads
-#          - apiAsyncUpload
-#          - apiDepthInfinity
-#          - apiArchiver
-#          - apiActivities
-#          # search
-#          - apiSearch1
-#          # - apiSearch2
-#          - apiSearchContent    # needs Tika
-#          # sharing
-#          - apiSharingNgShares
-#          - apiReshare
-#          - apiSharingNgPermissions
-#          - apiSharingNgAdditionalShareRole
-#          - apiSharingNgDriveInvitation
-#          - apiSharingNgItemInvitation
-#          - apiSharingNgDriveLinkShare
-#          - apiSharingNgItemLinkShare
-#          - apiSharingNgLinkShareManagement
-#          # auth
-#          - apiAuthApp
-#          # antivirus (needs ClamAV)
-#          - apiAntivirus
-#          # federation (needs email + federation ocis)
-#          # - apiOcm
-#          # collaboration (needs WOPI)
-#          # - apiCollaboration
-#    steps:
-#      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-#
-#      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
-#        with:
-#          go-version-file: go.mod
-#          cache: true
-#      
-#      - name: Install libcurl 8.12.0 from source
-#        run: |
-#          sudo apt-get update -qq
-#          sudo apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
-#          cd /tmp
-#          curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
-#          tar xzf curl-8.12.0.tar.gz
-#          cd curl-8.12.0
-#          ./configure --with-ssl --with-zlib --with-nghttp2 --prefix=/usr/local --enable-versioned-symbols --silent
-#          make -j$(nproc) --silent
-#          sudo make install --silent
-#          sudo ldconfig
-#          curl --version | head -1
-#          php -r '
-#            $v = curl_version()["version"];
-#            echo "PHP curl: $v\n";
-#            if (version_compare($v, "8.12.0", "<")) {
-#              fwrite(STDERR, "FATAL: PHP sees libcurl $v, need >= 8.12.0\n");
-#              exit(1);
-#            }
-#          '
-#
-#      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
-#        with:
-#          php-version: "8.4"
-#          extensions: curl, xml, mbstring, zip
-#          tools: composer
-#
-#      - name: Run ${{ matrix.suite }}
-#        run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
-#
-=======
   coding-standard:
     name: coding-standard
     runs-on: ubuntu-latest
@@ -335,7 +188,6 @@ jobs:
       - name: Run ${{ matrix.suite }}
         run: BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
 
->>>>>>> master
   core-api-tests:
     name: ${{ matrix.suite }}
     needs: []
@@ -359,11 +211,7 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-<<<<<<< feat/ocisdev-744-3
-      - uses: actions/setup-node@v4
-=======
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
->>>>>>> master
         with:
           node-version: "24"
 
@@ -373,7 +221,9 @@ jobs:
       - name: Install libcurl 8.12.0 from source
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
+          sudo apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev \
+            cmake nasm meson ninja-build \
+            libglib2.0-dev libexpat1-dev libpng-dev libwebp-dev libtiff5-dev liborc-0.4-dev
           cd /tmp
           curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
           tar xzf curl-8.12.0.tar.gz
@@ -392,6 +242,31 @@ jobs:
             }
           '
 
+      - name: Install libjpeg-turbo 3.1.2 and libvips 8.17.3 from source
+        run: |
+          # libjpeg-turbo 3.1.2 — matches Alpine 3.23 (owncloudci/golang:1.25)
+          cd /tmp
+          curl -sLO https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.2/libjpeg-turbo-3.1.2.tar.gz
+          tar xzf libjpeg-turbo-3.1.2.tar.gz
+          cd libjpeg-turbo-3.1.2
+          cmake -G"Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_INSTALL_LIBDIR=/usr/local/lib .
+          make -j$(nproc)
+          sudo make install
+          sudo ldconfig
+
+          # libvips 8.17.3 — matches Alpine 3.23 (owncloudci/golang:1.25)
+          cd /tmp
+          curl -sLO https://github.com/libvips/libvips/releases/download/v8.17.3/vips-8.17.3.tar.xz
+          tar xf vips-8.17.3.tar.xz
+          cd vips-8.17.3
+          meson setup build --prefix=/usr/local --buildtype=release
+          cd build
+          ninja -j$(nproc)
+          sudo ninja install
+          sudo ldconfig
+
+          vips --version
+
       - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
         with:
           php-version: "8.4"
@@ -406,11 +281,7 @@ jobs:
           python3 tests/acceptance/run-github.py
 
   all-acceptance-tests:
-<<<<<<< feat/ocisdev-744-3
-    needs: [core-api-tests]
-=======
     needs: [local-api-tests, cli-tests, core-api-tests]
->>>>>>> master
     runs-on: ubuntu-latest
     if: always()
     steps:
