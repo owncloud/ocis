@@ -355,6 +355,8 @@ def main() -> int:
 
     # generate IDP web assets (required for IDP service to start; matches drone ci-node-generate)
     run(["make", "-C", str(repo_root / "services/idp"), "ci-node-generate"])
+    # download web UI assets (required for robots.txt and other static assets; no pnpm needed)
+    run(["make", "-C", str(repo_root / "services/web"), "ci-node-generate"])
 
     # build (ENABLE_VIPS=true when libvips-dev is installed, matching drone)
     build_env = {}
@@ -646,13 +648,15 @@ def main() -> int:
             p = Path(ef_override)
             base_failures = p if p.is_absolute() else repo_root / p
 
-        # merge expected-failures-without-remotephp.md (drone does this)
+        # merge expected-failures-without-remotephp.md only when not using remote.php
+        # (mirrors drone.star: "" if run_with_remote_php else "cat ...without-remotephp.md >> ...")
         tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False)
         tmp.write(base_failures.read_text())
-        without_rphp = repo_root / "tests/acceptance/expected-failures-without-remotephp.md"
-        if without_rphp.exists():
-            tmp.write("\n")
-            tmp.write(without_rphp.read_text())
+        if os.environ.get("WITH_REMOTE_PHP", "false").lower() != "true":
+            without_rphp = repo_root / "tests/acceptance/expected-failures-without-remotephp.md"
+            if without_rphp.exists():
+                tmp.write("\n")
+                tmp.write(without_rphp.read_text())
         tmp.close()
 
         # run tests
