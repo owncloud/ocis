@@ -27,21 +27,22 @@ SHARE_ENDPOINT = "ocs/v2.php/apps/files_sharing/api/v1/shares"
 
 
 def base_server_env(repo_root: Path, ocis_config_dir: str) -> dict:
-    """OCIS server environment matching drone ocisServer() / run-litmus.sh."""
+    """OCIS server environment matching drone ocisServer() for litmus."""
     return {
         "OCIS_URL": OCIS_URL,
         "OCIS_CONFIG_DIR": ocis_config_dir,
         "STORAGE_USERS_DRIVER": "ocis",
         "PROXY_ENABLE_BASIC_AUTH": "true",
-        "OCIS_EXCLUDE_RUN_SERVICES": "idp",
         "OCIS_LOG_LEVEL": "error",
         "IDM_CREATE_DEMO_USERS": "true",
         "IDM_ADMIN_PASSWORD": "admin",
+        "FRONTEND_SEARCH_MIN_LENGTH": "2",
         "OCIS_ASYNC_UPLOADS": "true",
         "OCIS_EVENTS_ENABLE_TLS": "false",
         "NATS_NATS_HOST": "0.0.0.0",
         "NATS_NATS_PORT": "9233",
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
+        "EVENTHISTORY_STORE": "memory",
         "WEB_UI_CONFIG_FILE": str(repo_root / "tests/config/drone/ocis-config.json"),
     }
 
@@ -145,18 +146,12 @@ def run_litmus(name: str, endpoint: str) -> int:
 def main() -> int:
     repo_root = Path(__file__).resolve().parents[2]
     ocis_bin = repo_root / "ocis/bin/ocis"
-    wrapper_bin = repo_root / "tests/ociswrapper/bin/ociswrapper"
     ocis_config_dir = Path.home() / ".ocis/config"
 
-    # build
+    # build (matching drone: restores binary from cache, then runs ocis server directly)
     subprocess.run(["make", "-C", str(repo_root / "ocis"), "build"], check=True)
-    subprocess.run(
-        ["make", "-C", str(repo_root / "tests/ociswrapper"), "build"],
-        env={**os.environ, "GOWORK": "off"},
-        check=True,
-    )
 
-    # init ocis
+    # init ocis (same as drone ocisServer() commands)
     subprocess.run([str(ocis_bin), "init", "--insecure", "true"], check=True)
     shutil.copy(
         repo_root / "tests/config/drone/app-registry.yaml",
@@ -167,20 +162,16 @@ def main() -> int:
     server_env = {**os.environ}
     server_env.update(base_server_env(repo_root, str(ocis_config_dir)))
 
-    # start ociswrapper
+    # start ocis server directly (matching drone: no ociswrapper for litmus)
     print("Starting ocis...")
-    wrapper_proc = subprocess.Popen(
-        [str(wrapper_bin), "serve",
-         "--bin", str(ocis_bin),
-         "--url", OCIS_URL,
-         "--admin-username", "admin",
-         "--admin-password", "admin"],
+    ocis_proc = subprocess.Popen(
+        [str(ocis_bin), "server"],
         env=server_env,
     )
 
     def cleanup(*_):
         try:
-            wrapper_proc.terminate()
+            ocis_proc.terminate()
         except Exception:
             pass
 
