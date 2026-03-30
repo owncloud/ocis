@@ -113,12 +113,18 @@ jobs:
           # - apiCollaboration
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
       - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version-file: go.mod
           cache: true
-      
+
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "24"
+
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+
       - name: Install libcurl 8.12.0 from source
         run: |
           sudo apt-get update -qq
@@ -150,6 +156,38 @@ jobs:
       - name: Run ${{ matrix.suite }}
         run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
 
+  cli-tests:
+    needs: [build-and-test]
+    name: ${{ matrix.suite }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - cliCommands,apiServiceAvailability   # grouped like drone; needs ClamAV + email
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "24"
+
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+
+      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip
+          tools: composer
+
+      - name: Run ${{ matrix.suite }}
+        run: BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
+
   core-api-tests:
     name: ${{ matrix.suite }}
     needs: [build-and-test]
@@ -168,6 +206,13 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "24"
+
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
 
       - name: Install libcurl 8.12.0 from source
         run: |
@@ -212,7 +257,7 @@ jobs:
           path: tests/acceptance/output/
 
   all-acceptance-tests:
-    needs: [local-api-tests, core-api-tests]
+    needs: [local-api-tests, cli-tests, core-api-tests]
     runs-on: ubuntu-latest
     if: always()
     steps:
