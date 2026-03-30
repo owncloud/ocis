@@ -21,7 +21,7 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 
 OCIS_URL = "https://localhost:9200"
-OCIS_HTTP_URL = "http://localhost:9100"
+OCIS_HTTP_URL = "http://localhost:9998"
 LITMUS_IMAGE = "owncloudci/litmus:latest"
 LITMUS_TESTS = "basic copymove props http"
 SHARE_ENDPOINT = "ocs/v2.php/apps/files_sharing/api/v1/shares"
@@ -34,7 +34,7 @@ def base_server_env(repo_root: Path, ocis_config_dir: str) -> dict:
         "OCIS_CONFIG_DIR": ocis_config_dir,
         "STORAGE_USERS_DRIVER": "ocis",
         "PROXY_ENABLE_BASIC_AUTH": "true",
-        "PROXY_HTTP_ADDR": "0.0.0.0:9100",
+        "PROXY_HTTP_ADDR": "0.0.0.0:9998",
         "OCIS_EXCLUDE_RUN_SERVICES": "idp",
         "OCIS_LOG_LEVEL": "error",
         "IDM_CREATE_DEMO_USERS": "true",
