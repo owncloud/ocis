@@ -20,7 +20,7 @@ from pathlib import Path
 # Constants (mirroring .drone.star)
 # ---------------------------------------------------------------------------
 
-OCIS_URL = "http://localhost:9200"
+OCIS_URL = "http://127.0.0.1:9200"
 LITMUS_IMAGE = "owncloudci/litmus:latest"
 LITMUS_TESTS = "basic copymove props http"
 SHARE_ENDPOINT = "ocs/v2.php/apps/files_sharing/api/v1/shares"
@@ -134,7 +134,8 @@ def setup_for_litmus(ocis_url: str) -> tuple:
 def run_litmus(name: str, endpoint: str) -> int:
     print(f"\nTesting endpoint [{name}]: {endpoint}")
     result = subprocess.run(
-        ["docker", "run", "--rm", "--network", "host",
+        ["docker", "run", "--rm",
+         "--add-host=host.docker.internal:host-gateway",
          "-e", f"LITMUS_URL={endpoint}",
          "-e", "LITMUS_USERNAME=admin",
          "-e", "LITMUS_PASSWORD=admin",
@@ -192,12 +193,13 @@ def main() -> int:
 
         space_id, _ = setup_for_litmus(OCIS_URL)
 
+        litmus_base = "http://host.docker.internal:9200"
         endpoints = [
-            ("old-endpoint",    f"{OCIS_URL}/remote.php/webdav"),
-            ("new-endpoint",    f"{OCIS_URL}/remote.php/dav/files/admin"),
-            ("new-shared",      f"{OCIS_URL}/remote.php/dav/files/admin/Shares/new_folder/"),
-            ("old-shared",      f"{OCIS_URL}/remote.php/webdav/Shares/new_folder/"),
-            ("spaces-endpoint", f"{OCIS_URL}/remote.php/dav/spaces/{space_id}"),
+            ("old-endpoint",    f"{litmus_base}/remote.php/webdav"),
+            ("new-endpoint",    f"{litmus_base}/remote.php/dav/files/admin"),
+            ("new-shared",      f"{litmus_base}/remote.php/dav/files/admin/Shares/new_folder/"),
+            ("old-shared",      f"{litmus_base}/remote.php/webdav/Shares/new_folder/"),
+            ("spaces-endpoint", f"{litmus_base}/remote.php/dav/spaces/{space_id}"),
         ]
 
         failed = []
