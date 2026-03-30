@@ -222,7 +222,7 @@ jobs:
           go-version-file: go.mod
           cache: true
       - name: Run litmus
-        run: bash tests/acceptance/run-litmus.sh
+        run: python3 tests/acceptance/run-litmus.py
 
   all-acceptance-tests:
     needs: [litmus]

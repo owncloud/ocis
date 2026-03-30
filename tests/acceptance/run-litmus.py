@@ -1,0 +1,221 @@
+#!/usr/bin/env python3
+"""
+Run litmus WebDAV compliance tests locally and in GitHub Actions CI.
+
+Config sourced from .drone.star litmus() / setupForLitmus() — single source of truth.
+Usage: python3 tests/acceptance/run-litmus.py
+"""
+
+import json
+import os
+import re
+import shutil
+import signal
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+# ---------------------------------------------------------------------------
+# Constants (mirroring .drone.star)
+# ---------------------------------------------------------------------------
+
+OCIS_URL = "https://localhost:9200"
+LITMUS_IMAGE = "owncloudci/litmus:latest"
+LITMUS_TESTS = "basic copymove props http"
+SHARE_ENDPOINT = "ocs/v2.php/apps/files_sharing/api/v1/shares"
+
+
+def base_server_env(repo_root: Path, ocis_config_dir: str) -> dict:
+    """OCIS server environment matching drone ocisServer() / run-litmus.sh."""
+    return {
+        "OCIS_URL": OCIS_URL,
+        "OCIS_CONFIG_DIR": ocis_config_dir,
+        "STORAGE_USERS_DRIVER": "ocis",
+        "PROXY_ENABLE_BASIC_AUTH": "true",
+        "OCIS_EXCLUDE_RUN_SERVICES": "idp",
+        "OCIS_LOG_LEVEL": "error",
+        "IDM_CREATE_DEMO_USERS": "true",
+        "IDM_ADMIN_PASSWORD": "admin",
+        "OCIS_ASYNC_UPLOADS": "true",
+        "OCIS_EVENTS_ENABLE_TLS": "false",
+        "NATS_NATS_HOST": "0.0.0.0",
+        "NATS_NATS_PORT": "9233",
+        "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
+        "WEB_UI_CONFIG_FILE": str(repo_root / "tests/config/drone/ocis-config.json"),
+    }
+
+
+def wait_for(condition_fn, timeout: int, label: str) -> None:
+    deadline = time.time() + timeout
+    while not condition_fn():
+        if time.time() > deadline:
+            print(f"Timeout waiting for {label}", file=sys.stderr)
+            sys.exit(1)
+        time.sleep(1)
+
+
+def ocis_healthy(ocis_url: str) -> bool:
+    r = subprocess.run(
+        ["curl", "-sk", "-uadmin:admin",
+         f"{ocis_url}/graph/v1.0/users/admin",
+         "-w", "%{http_code}", "-o", "/dev/null"],
+        capture_output=True, text=True,
+    )
+    return r.stdout.strip() == "200"
+
+
+def setup_for_litmus(ocis_url: str) -> tuple:
+    """
+    Translate tests/config/drone/setup-for-litmus.sh to Python.
+    Returns (space_id, public_token).
+    """
+    # get personal space ID
+    r = subprocess.run(
+        ["curl", "-ks", "-uadmin:admin", f"{ocis_url}/graph/v1.0/me/drives"],
+        capture_output=True, text=True, check=True,
+    )
+    drives = json.loads(r.stdout)
+    space_id = ""
+    for drive in drives.get("value", []):
+        if drive.get("driveType") == "personal":
+            web_dav_url = drive.get("root", {}).get("webDavUrl", "")
+            # last non-empty path segment (same as cut -d"/" -f6 in bash)
+            space_id = [p for p in web_dav_url.split("/") if p][-1]
+            break
+    if not space_id:
+        print("ERROR: could not determine personal space ID", file=sys.stderr)
+        sys.exit(1)
+    print(f"SPACE_ID={space_id}")
+
+    # create test folder as einstein
+    subprocess.run(
+        ["curl", "-ks", "-ueinstein:relativity", "-X", "MKCOL",
+         f"{ocis_url}/remote.php/webdav/new_folder"],
+        capture_output=True, check=True,
+    )
+
+    # create share from einstein to admin
+    r = subprocess.run(
+        ["curl", "-ks", "-ueinstein:relativity",
+         f"{ocis_url}/{SHARE_ENDPOINT}",
+         "-d", "path=/new_folder&shareType=0&permissions=15&name=new_folder&shareWith=admin"],
+        capture_output=True, text=True, check=True,
+    )
+    share_id_match = re.search(r"<id>(.+?)</id>", r.stdout)
+    if share_id_match:
+        share_id = share_id_match.group(1)
+        # accept the share as admin
+        subprocess.run(
+            ["curl", "-X", "POST", "-ks", "-uadmin:admin",
+             f"{ocis_url}/{SHARE_ENDPOINT}/pending/{share_id}"],
+            capture_output=True, check=True,
+        )
+
+    # create public share as einstein
+    r = subprocess.run(
+        ["curl", "-ks", "-ueinstein:relativity",
+         f"{ocis_url}/{SHARE_ENDPOINT}",
+         "-d", "path=/new_folder&shareType=3&permissions=15&name=new_folder"],
+        capture_output=True, text=True, check=True,
+    )
+    public_token = ""
+    token_match = re.search(r"<token>(.+?)</token>", r.stdout)
+    if token_match:
+        public_token = token_match.group(1)
+    print(f"PUBLIC_TOKEN={public_token}")
+
+    return space_id, public_token
+
+
+def run_litmus(name: str, endpoint: str) -> int:
+    print(f"\nTesting endpoint [{name}]: {endpoint}")
+    result = subprocess.run(
+        ["docker", "run", "--rm", "--network", "host",
+         "-e", f"LITMUS_URL={endpoint}",
+         "-e", "LITMUS_USERNAME=admin",
+         "-e", "LITMUS_PASSWORD=admin",
+         "-e", f"TESTS={LITMUS_TESTS}",
+         LITMUS_IMAGE,
+         "/usr/local/bin/litmus-wrapper"],
+    )
+    return result.returncode
+
+
+def main() -> int:
+    repo_root = Path(__file__).resolve().parents[2]
+    ocis_bin = repo_root / "ocis/bin/ocis"
+    wrapper_bin = repo_root / "tests/ociswrapper/bin/ociswrapper"
+    ocis_config_dir = Path.home() / ".ocis/config"
+
+    # build
+    subprocess.run(["make", "-C", str(repo_root / "ocis"), "build"], check=True)
+    subprocess.run(
+        ["make", "-C", str(repo_root / "tests/ociswrapper"), "build"],
+        env={**os.environ, "GOWORK": "off"},
+        check=True,
+    )
+
+    # init ocis
+    subprocess.run([str(ocis_bin), "init", "--insecure", "true"], check=True)
+    shutil.copy(
+        repo_root / "tests/config/drone/app-registry.yaml",
+        ocis_config_dir / "app-registry.yaml",
+    )
+
+    # assemble server env
+    server_env = {**os.environ}
+    server_env.update(base_server_env(repo_root, str(ocis_config_dir)))
+
+    # start ociswrapper
+    print("Starting ocis...")
+    wrapper_proc = subprocess.Popen(
+        [str(wrapper_bin), "serve",
+         "--bin", str(ocis_bin),
+         "--url", OCIS_URL,
+         "--admin-username", "admin",
+         "--admin-password", "admin"],
+        env=server_env,
+    )
+
+    def cleanup(*_):
+        try:
+            wrapper_proc.terminate()
+        except Exception:
+            pass
+
+    signal.signal(signal.SIGTERM, cleanup)
+    signal.signal(signal.SIGINT, cleanup)
+
+    try:
+        wait_for(lambda: ocis_healthy(OCIS_URL), 300, "ocis")
+        print("ocis ready.")
+
+        space_id, _ = setup_for_litmus(OCIS_URL)
+
+        endpoints = [
+            ("old-endpoint",   f"{OCIS_URL}/remote.php/webdav"),
+            ("new-endpoint",   f"{OCIS_URL}/remote.php/dav/files/admin"),
+            ("new-shared",     f"{OCIS_URL}/remote.php/dav/files/admin/Shares/new_folder/"),
+            ("old-shared",     f"{OCIS_URL}/remote.php/webdav/Shares/new_folder/"),
+            ("spaces-endpoint", f"{OCIS_URL}/remote.php/dav/spaces/{space_id}"),
+        ]
+
+        failed = []
+        for name, endpoint in endpoints:
+            rc = run_litmus(name, endpoint)
+            if rc != 0:
+                failed.append(name)
+
+        if failed:
+            print(f"\nFailed endpoints: {', '.join(failed)}", file=sys.stderr)
+            return 1
+        print("\nAll litmus tests passed.")
+        return 0
+
+    finally:
+        cleanup()
+
+
+if __name__ == "__main__":
+    sys.exit(main())
