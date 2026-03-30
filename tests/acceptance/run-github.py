@@ -193,7 +193,6 @@ def base_server_env(repo_root: Path, ocis_url: str, ocis_config_dir: str) -> dic
         "OCIS_CONFIG_DIR": ocis_config_dir,
         "STORAGE_USERS_DRIVER": "ocis",
         "PROXY_ENABLE_BASIC_AUTH": "true",
-        "OCIS_EXCLUDE_RUN_SERVICES": "idp",
         "OCIS_LOG_LEVEL": "error",
         "IDM_CREATE_DEMO_USERS": "true",
         "IDM_ADMIN_PASSWORD": "admin",
