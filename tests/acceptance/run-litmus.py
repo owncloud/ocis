@@ -210,6 +210,20 @@ def main() -> int:
 
         space_id, _ = setup_for_litmus(OCIS_URL)
 
+        # Diagnostic: see exactly what OCIS returns for a PROPFIND from host and Docker
+        for label, url in [("host", f"{OCIS_URL}/remote.php/webdav"),
+                            ("docker", f"{litmus_base}/remote.php/webdav")]:
+            cmd = ["curl", "-s", "-v", "-X", "PROPFIND", "-uadmin:admin",
+                   url, "-H", "Depth: 0", "--max-time", "10"]
+            if label == "docker":
+                cmd = ["docker", "run", "--rm", LITMUS_IMAGE,
+                       "sh", "-c",
+                       f"curl -s -v -X PROPFIND -uadmin:admin {url} -H 'Depth: 0' 2>&1"]
+            r = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            print(f"\n--- PROPFIND ({label}) rc={r.returncode} ---", flush=True)
+            out = (r.stdout + r.stderr)[:800]
+            print(out, flush=True)
+
         endpoints = [
             ("old-endpoint",    f"{litmus_base}/remote.php/webdav"),
             ("new-endpoint",    f"{litmus_base}/remote.php/dav/files/admin"),
