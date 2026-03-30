@@ -20,7 +20,9 @@ from pathlib import Path
 # Constants (mirroring .drone.star)
 # ---------------------------------------------------------------------------
 
-OCIS_URL = "http://127.0.0.1:9200"
+# HTTPS — matching drone: ocis init generates a self-signed cert; proxy uses TLS by default.
+# Host-side curl calls use -k (insecure) to skip cert verification.
+OCIS_URL = "https://127.0.0.1:9200"
 LITMUS_IMAGE = "owncloudci/litmus:latest"
 LITMUS_TESTS = "basic copymove props http"
 SHARE_ENDPOINT = "ocs/v2.php/apps/files_sharing/api/v1/shares"
@@ -43,8 +45,8 @@ def base_server_env(repo_root: Path, ocis_config_dir: str, ocis_public_url: str)
         "OCIS_CONFIG_DIR": ocis_config_dir,
         "STORAGE_USERS_DRIVER": "ocis",
         "PROXY_ENABLE_BASIC_AUTH": "true",
-        "PROXY_TLS": "false",
-        "OCIS_EXCLUDE_RUN_SERVICES": "idp",
+        # No PROXY_TLS override — drone lets ocis use its default TLS (self-signed cert from init)
+        # No OCIS_EXCLUDE_RUN_SERVICES — drone runs all services including IDP for litmus
         "OCIS_LOG_LEVEL": "error",
         "IDM_CREATE_DEMO_USERS": "true",
         "IDM_ADMIN_PASSWORD": "admin",
@@ -70,7 +72,7 @@ def wait_for(condition_fn, timeout: int, label: str) -> None:
 
 def ocis_healthy(ocis_url: str) -> bool:
     r = subprocess.run(
-        ["curl", "-s", "-uadmin:admin",
+        ["curl", "-sk", "-uadmin:admin",
          f"{ocis_url}/graph/v1.0/users/admin",
          "-w", "%{http_code}", "-o", "/dev/null"],
         capture_output=True, text=True,
@@ -85,7 +87,7 @@ def setup_for_litmus(ocis_url: str) -> tuple:
     """
     # get personal space ID
     r = subprocess.run(
-        ["curl", "-s", "-uadmin:admin", f"{ocis_url}/graph/v1.0/me/drives"],
+        ["curl", "-sk", "-uadmin:admin", f"{ocis_url}/graph/v1.0/me/drives"],
         capture_output=True, text=True, check=True,
     )
     drives = json.loads(r.stdout)
@@ -103,14 +105,14 @@ def setup_for_litmus(ocis_url: str) -> tuple:
 
     # create test folder as einstein
     subprocess.run(
-        ["curl", "-s", "-ueinstein:relativity", "-X", "MKCOL",
+        ["curl", "-sk", "-ueinstein:relativity", "-X", "MKCOL",
          f"{ocis_url}/remote.php/webdav/new_folder"],
         capture_output=True, check=True,
     )
 
     # create share from einstein to admin
     r = subprocess.run(
-        ["curl", "-s", "-ueinstein:relativity",
+        ["curl", "-sk", "-ueinstein:relativity",
          f"{ocis_url}/{SHARE_ENDPOINT}",
          "-d", "path=/new_folder&shareType=0&permissions=15&name=new_folder&shareWith=admin"],
         capture_output=True, text=True, check=True,
@@ -120,14 +122,14 @@ def setup_for_litmus(ocis_url: str) -> tuple:
         share_id = share_id_match.group(1)
         # accept the share as admin
         subprocess.run(
-            ["curl", "-X", "POST", "-s", "-uadmin:admin",
+            ["curl", "-X", "POST", "-sk", "-uadmin:admin",
              f"{ocis_url}/{SHARE_ENDPOINT}/pending/{share_id}"],
             capture_output=True, check=True,
         )
 
     # create public share as einstein
     r = subprocess.run(
-        ["curl", "-s", "-ueinstein:relativity",
+        ["curl", "-sk", "-ueinstein:relativity",
          f"{ocis_url}/{SHARE_ENDPOINT}",
          "-d", "path=/new_folder&shareType=3&permissions=15&name=new_folder"],
         capture_output=True, text=True, check=True,
@@ -141,17 +143,40 @@ def setup_for_litmus(ocis_url: str) -> tuple:
     return space_id, public_token
 
 
-def run_litmus(name: str, endpoint: str) -> int:
+def run_litmus(name: str, endpoint: str, capture_debug: bool = False) -> int:
     print(f"\nTesting endpoint [{name}]: {endpoint}", flush=True)
-    result = subprocess.run(
-        ["docker", "run", "--rm",
-         "-e", f"LITMUS_URL={endpoint}",
-         "-e", "LITMUS_USERNAME=admin",
-         "-e", "LITMUS_PASSWORD=admin",
-         "-e", f"TESTS={LITMUS_TESTS}",
-         LITMUS_IMAGE,
-         "/usr/local/bin/litmus-wrapper"],
-    )
+    container_name = f"litmus-{name}" if capture_debug else None
+    cmd = ["docker", "run"]
+    if container_name:
+        cmd += ["--name", container_name]
+    else:
+        cmd += ["--rm"]
+    cmd += [
+        "-e", f"LITMUS_URL={endpoint}",
+        "-e", "LITMUS_USERNAME=admin",
+        "-e", "LITMUS_PASSWORD=admin",
+        "-e", f"TESTS={LITMUS_TESTS}",
+        LITMUS_IMAGE,
+        "/usr/local/bin/litmus-wrapper",
+    ]
+    result = subprocess.run(cmd)
+    if capture_debug and container_name:
+        # try to copy debug.log from the container
+        for log_path in ["/debug.log", "/tmp/debug.log", "/home/debug.log"]:
+            r = subprocess.run(
+                ["docker", "cp", f"{container_name}:{log_path}", f"/tmp/litmus-debug-{name}.log"],
+                capture_output=True,
+            )
+            if r.returncode == 0:
+                try:
+                    with open(f"/tmp/litmus-debug-{name}.log") as f:
+                        content = f.read()
+                    print(f"\n--- litmus debug.log ({log_path}) ---", flush=True)
+                    print(content[:3000], flush=True)
+                except Exception:
+                    pass
+                break
+        subprocess.run(["docker", "rm", "-f", container_name], capture_output=True)
     return result.returncode
 
 
@@ -167,8 +192,9 @@ def main() -> int:
     # and Docker containers (via bridge network default gateway). Use this as OCIS_URL
     # so that any redirects OCIS generates stay on a hostname the litmus container
     # can follow — matching how drone uses "ocis-server:9200" consistently.
+    # HTTPS: owncloudci/litmus accepts insecure (self-signed) certs, just like drone does.
     bridge_ip = get_docker_bridge_ip()
-    litmus_base = f"http://{bridge_ip}:9200"
+    litmus_base = f"https://{bridge_ip}:9200"
     print(f"Docker bridge IP: {bridge_ip}", flush=True)
 
     # assemble server env first — same env vars drone sets on the container before
@@ -183,6 +209,12 @@ def main() -> int:
         env=server_env,
         check=True,
     )
+    # Diagnostic: print generated config (drone does this too)
+    ocis_yaml = ocis_config_dir / "ocis.yaml"
+    if ocis_yaml.exists():
+        print("\n--- ocis.yaml ---", flush=True)
+        print(ocis_yaml.read_text()[:2000], flush=True)
+
     shutil.copy(
         repo_root / "tests/config/drone/app-registry.yaml",
         ocis_config_dir / "app-registry.yaml",
@@ -210,20 +242,28 @@ def main() -> int:
 
         space_id, _ = setup_for_litmus(OCIS_URL)
 
-        # Diagnostic: test TCP + HTTP connectivity to OCIS from Docker containers
-        # BusyBox wget --spider makes a GET and reports HTTP status without downloading body
-        for label, extra_args, test_url in [
-            ("docker-host-net", ["--network", "host"], "http://localhost:9200/graph/v1.0/users/admin"),
-            ("docker-bridge",   [],                    f"http://{bridge_ip}:9200/graph/v1.0/users/admin"),
+        # Diagnostic: full HTTP trace for WebDAV OPTIONS and PROPFIND from the host
+        for label, curl_args in [
+            ("OPTIONS no-auth",  ["-X", "OPTIONS"]),
+            ("OPTIONS auth",     ["-u", "admin:admin", "-X", "OPTIONS"]),
+            ("PROPFIND auth",    ["-u", "admin:admin", "-X", "PROPFIND", "-H", "Depth: 0"]),
         ]:
-            wget_cmd = f"wget -S --spider '{test_url}' 2>&1; echo exit:$?"
             r = subprocess.run(
-                ["docker", "run", "--rm"] + extra_args +
-                ["--entrypoint", "sh", LITMUS_IMAGE, "-c", wget_cmd],
-                capture_output=True, text=True, timeout=30,
+                ["curl", "-vsk"] + curl_args + [f"{OCIS_URL}/remote.php/webdav"],
+                capture_output=True, text=True,
             )
-            print(f"\n--- {label} rc={r.returncode} ---", flush=True)
-            print((r.stdout + r.stderr)[:400], flush=True)
+            print(f"\n--- {label} ---", flush=True)
+            print((r.stdout + r.stderr)[:1500], flush=True)
+
+        # Diagnostic: confirm WebDAV endpoint reachable from Docker bridge network (HTTPS, insecure)
+        webdav_url = f"https://{bridge_ip}:9200/remote.php/webdav"
+        wget_cmd = f"wget -S --no-check-certificate --spider '{webdav_url}' 2>&1; echo exit:$?"
+        r = subprocess.run(
+            ["docker", "run", "--rm", "--entrypoint", "sh", LITMUS_IMAGE, "-c", wget_cmd],
+            capture_output=True, text=True, timeout=30,
+        )
+        print(f"\n--- docker-bridge WebDAV (https) rc={r.returncode} ---", flush=True)
+        print((r.stdout + r.stderr)[:400], flush=True)
 
         endpoints = [
             ("old-endpoint",    f"{litmus_base}/remote.php/webdav"),
@@ -234,8 +274,8 @@ def main() -> int:
         ]
 
         failed = []
-        for name, endpoint in endpoints:
-            rc = run_litmus(name, endpoint)
+        for i, (name, endpoint) in enumerate(endpoints):
+            rc = run_litmus(name, endpoint, capture_debug=(i == 0))
             if rc != 0:
                 failed.append(name)
 
