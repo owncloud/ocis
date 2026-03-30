@@ -210,32 +210,20 @@ def main() -> int:
 
         space_id, _ = setup_for_litmus(OCIS_URL)
 
-        # Diagnostic: test connectivity and OCIS response from host and Docker containers
-        # Use --entrypoint sh to bypass litmus-wrapper; wget is available in Alpine
-        for label, extra_args, url in [
-            ("host-curl",    [],
-             f"{OCIS_URL}/remote.php/webdav"),
-            ("docker-host-net", ["--network", "host"],
-             f"http://localhost:9200/remote.php/webdav"),
-            ("docker-bridge",   [],
-             f"{litmus_base}/remote.php/webdav"),
+        # Diagnostic: test TCP + HTTP connectivity to OCIS from Docker containers
+        # BusyBox wget --spider makes a GET and reports HTTP status without downloading body
+        for label, extra_args, test_url in [
+            ("docker-host-net", ["--network", "host"], "http://localhost:9200/graph/v1.0/users/admin"),
+            ("docker-bridge",   [],                    f"http://{bridge_ip}:9200/graph/v1.0/users/admin"),
         ]:
-            if label == "host-curl":
-                cmd = ["curl", "-s", "-v", "-X", "PROPFIND", "-uadmin:admin",
-                       url, "-H", "Depth: 0", "--max-time", "10"]
-                r = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
-            else:
-                wget_cmd = (f"wget -q -O - -S --header='Depth: 0' "
-                            f"--header='Authorization: Basic YWRtaW46YWRtaW4=' "
-                            f"--method=PROPFIND '{url}' 2>&1 | head -20 "
-                            f"|| echo FAILED_rc=$?")
-                r = subprocess.run(
-                    ["docker", "run", "--rm"] + extra_args +
-                    ["--entrypoint", "sh", LITMUS_IMAGE, "-c", wget_cmd],
-                    capture_output=True, text=True, timeout=30,
-                )
+            wget_cmd = f"wget -S --spider '{test_url}' 2>&1; echo exit:$?"
+            r = subprocess.run(
+                ["docker", "run", "--rm"] + extra_args +
+                ["--entrypoint", "sh", LITMUS_IMAGE, "-c", wget_cmd],
+                capture_output=True, text=True, timeout=30,
+            )
             print(f"\n--- {label} rc={r.returncode} ---", flush=True)
-            print((r.stdout + r.stderr)[:600], flush=True)
+            print((r.stdout + r.stderr)[:400], flush=True)
 
         endpoints = [
             ("old-endpoint",    f"{litmus_base}/remote.php/webdav"),
