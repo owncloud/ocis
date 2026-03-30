@@ -26,10 +26,20 @@ LITMUS_TESTS = "basic copymove props http"
 SHARE_ENDPOINT = "ocs/v2.php/apps/files_sharing/api/v1/shares"
 
 
-def base_server_env(repo_root: Path, ocis_config_dir: str) -> dict:
+def get_docker_bridge_ip() -> str:
+    """Return the Docker bridge gateway IP, reachable from host and Docker containers."""
+    r = subprocess.run(
+        ["docker", "network", "inspect", "bridge",
+         "--format", "{{range .IPAM.Config}}{{.Gateway}}{{end}}"],
+        capture_output=True, text=True, check=True,
+    )
+    return r.stdout.strip()
+
+
+def base_server_env(repo_root: Path, ocis_config_dir: str, ocis_public_url: str) -> dict:
     """OCIS server environment matching drone ocisServer() for litmus."""
     return {
-        "OCIS_URL": OCIS_URL,
+        "OCIS_URL": ocis_public_url,
         "OCIS_CONFIG_DIR": ocis_config_dir,
         "STORAGE_USERS_DRIVER": "ocis",
         "PROXY_ENABLE_BASIC_AUTH": "true",
@@ -135,7 +145,6 @@ def run_litmus(name: str, endpoint: str) -> int:
     print(f"\nTesting endpoint [{name}]: {endpoint}", flush=True)
     result = subprocess.run(
         ["docker", "run", "--rm",
-         "--add-host=host.docker.internal:host-gateway",
          "-e", f"LITMUS_URL={endpoint}",
          "-e", "LITMUS_USERNAME=admin",
          "-e", "LITMUS_PASSWORD=admin",
@@ -154,11 +163,19 @@ def main() -> int:
     # build (matching drone: restores binary from cache, then runs ocis server directly)
     subprocess.run(["make", "-C", str(repo_root / "ocis"), "build"], check=True)
 
+    # Docker bridge gateway IP: reachable from both the host (via docker0 interface)
+    # and Docker containers (via bridge network default gateway). Use this as OCIS_URL
+    # so that any redirects OCIS generates stay on a hostname the litmus container
+    # can follow — matching how drone uses "ocis-server:9200" consistently.
+    bridge_ip = get_docker_bridge_ip()
+    litmus_base = f"http://{bridge_ip}:9200"
+    print(f"Docker bridge IP: {bridge_ip}", flush=True)
+
     # assemble server env first — same env vars drone sets on the container before
     # running `ocis init`, so IDM_ADMIN_PASSWORD=admin is present during init and
     # the config is written with the correct password (not a random one)
     server_env = {**os.environ}
-    server_env.update(base_server_env(repo_root, str(ocis_config_dir)))
+    server_env.update(base_server_env(repo_root, str(ocis_config_dir), litmus_base))
 
     # init ocis with full server env (mirrors drone: env is set before ocis init runs)
     subprocess.run(
@@ -193,7 +210,6 @@ def main() -> int:
 
         space_id, _ = setup_for_litmus(OCIS_URL)
 
-        litmus_base = "http://host.docker.internal:9200"
         endpoints = [
             ("old-endpoint",    f"{litmus_base}/remote.php/webdav"),
             ("new-endpoint",    f"{litmus_base}/remote.php/dav/files/admin"),
