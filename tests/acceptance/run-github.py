@@ -319,6 +319,9 @@ def main() -> int:
           f"antivirus={cfg['antivirusNeeded']} federation={cfg['federationServer']} "
           f"wopi={cfg['collaborationServiceNeeded']}")
 
+    # generate IDP web assets (required for IDP service to start; matches drone ci-node-generate)
+    run(["make", "-C", str(repo_root / "services/idp"), "ci-node-generate"])
+
     # build (ENABLE_VIPS=true when libvips-dev is installed, matching drone)
     build_env = {}
     if subprocess.run(["pkg-config", "--exists", "vips"],
