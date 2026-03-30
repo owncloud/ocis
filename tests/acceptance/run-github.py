@@ -321,6 +321,7 @@ def main() -> int:
 
     # generate IDP web assets (required for IDP service to start; matches drone ci-node-generate)
     run(["make", "-C", str(repo_root / "services/idp"), "ci-node-generate"])
+<<<<<<< feat/ocisdev-744-3
     # download web UI assets (required for robots.txt and other static assets; no pnpm needed)
     run(["make", "-C", str(repo_root / "services/web"), "ci-node-generate"])
 
@@ -334,6 +335,15 @@ def main() -> int:
          "owncloudci/golang:1.25",
          "sh", "-c",
          f"make -C {repo_root}/ocis build ENABLE_VIPS=true"])
+=======
+
+    # build (ENABLE_VIPS=true when libvips-dev is installed, matching drone)
+    build_env = {}
+    if subprocess.run(["pkg-config", "--exists", "vips"],
+                      capture_output=True).returncode == 0:
+        build_env["ENABLE_VIPS"] = "true"
+    run(["make", "-C", str(repo_root / "ocis"), "build"], env=build_env)
+>>>>>>> master
     run(["make", "-C", str(repo_root / "tests/ociswrapper"), "build"],
         env={"GOWORK": "off"})
 
