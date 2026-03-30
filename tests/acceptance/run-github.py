@@ -193,7 +193,6 @@ def base_server_env(repo_root: Path, ocis_url: str, ocis_config_dir: str) -> dic
         "OCIS_CONFIG_DIR": ocis_config_dir,
         "STORAGE_USERS_DRIVER": "ocis",
         "PROXY_ENABLE_BASIC_AUTH": "true",
-        "OCIS_EXCLUDE_RUN_SERVICES": "idp",
         "OCIS_LOG_LEVEL": "error",
         "IDM_CREATE_DEMO_USERS": "true",
         "IDM_ADMIN_PASSWORD": "admin",
@@ -319,6 +318,9 @@ def main() -> int:
     print(f"Services: email={cfg['emailNeeded']} tika={cfg['tikaNeeded']} "
           f"antivirus={cfg['antivirusNeeded']} federation={cfg['federationServer']} "
           f"wopi={cfg['collaborationServiceNeeded']}")
+
+    # generate IDP web assets (required for IDP service to start; matches drone ci-node-generate)
+    run(["make", "-C", str(repo_root / "services/idp"), "ci-node-generate"])
 
     # build (ENABLE_VIPS=true when libvips-dev is installed, matching drone)
     build_env = {}
