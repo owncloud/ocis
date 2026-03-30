@@ -324,16 +324,12 @@ def main() -> int:
     # download web UI assets (required for robots.txt and other static assets; no pnpm needed)
     run(["make", "-C", str(repo_root / "services/web"), "ci-node-generate"])
 
-    # Build inside owncloudci/golang:1.25 (same image as Drone) so the binary links against
-    # the exact same libvips version that the fixture PNGs were generated with.
-    # Different libvips versions produce different JPEG bytes for the same input, breaking
-    # byte-exact preview comparisons in coreApiWebdavPreviews.
-    run(["docker", "run", "--rm",
-         "-v", f"{repo_root}:{repo_root}",
-         "-w", str(repo_root),
-         "owncloudci/golang:1.25",
-         "sh", "-c",
-         f"make -C {repo_root}/ocis build ENABLE_VIPS=true"])
+    # build (ENABLE_VIPS=true when libvips-dev is installed, matching drone)
+    build_env = {}
+    if subprocess.run(["pkg-config", "--exists", "vips"],
+                      capture_output=True).returncode == 0:
+        build_env["ENABLE_VIPS"] = "true"
+    run(["make", "-C", str(repo_root / "ocis"), "build"], env=build_env)
     run(["make", "-C", str(repo_root / "tests/ociswrapper"), "build"],
         env={"GOWORK": "off"})
 
