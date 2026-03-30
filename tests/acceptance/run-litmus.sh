@@ -63,6 +63,5 @@ for ENDPOINT in "${ENDPOINTS[@]}"; do
     -e LITMUS_USERNAME=admin \
     -e LITMUS_PASSWORD=admin \
     -e TESTS="basic copymove props http" \
-    owncloudci/litmus:latest \
-    /usr/local/bin/litmus-wrapper
+    owncloudci/litmus:latest
 done

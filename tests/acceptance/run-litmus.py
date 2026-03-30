@@ -158,7 +158,8 @@ def run_litmus(name: str, endpoint: str, capture_debug: bool = False) -> int:
         "-e", "LITMUS_PASSWORD=admin",
         "-e", f"TESTS={LITMUS_TESTS}",
         LITMUS_IMAGE,
-        "/usr/local/bin/litmus-wrapper",
+        # No extra CMD — ENTRYPOINT is already litmus-wrapper; passing it again
+        # would make the wrapper use the path as LITMUS_URL, overriding the env var.
     ]
     result = subprocess.run(cmd)
     if capture_debug and container_name:
