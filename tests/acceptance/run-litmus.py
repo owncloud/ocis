@@ -33,6 +33,7 @@ def base_server_env(repo_root: Path, ocis_config_dir: str) -> dict:
         "OCIS_CONFIG_DIR": ocis_config_dir,
         "STORAGE_USERS_DRIVER": "ocis",
         "PROXY_ENABLE_BASIC_AUTH": "true",
+        "OCIS_EXCLUDE_RUN_SERVICES": "idp",
         "OCIS_LOG_LEVEL": "error",
         "IDM_CREATE_DEMO_USERS": "true",
         "IDM_ADMIN_PASSWORD": "admin",
@@ -169,7 +170,7 @@ def main() -> int:
     )
 
     # start ocis server directly (matching drone: no ociswrapper for litmus)
-    print("Starting ocis...")
+    print("Starting ocis...", flush=True)
     ocis_proc = subprocess.Popen(
         [str(ocis_bin), "server"],
         env=server_env,
