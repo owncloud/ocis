@@ -275,6 +275,118 @@ jobs:
           WITH_REMOTE_PHP=true
           python3 tests/acceptance/run-github.py
 
+  e2e-tests:
+    name: e2e-${{ matrix.suite }}
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: part-1
+            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 1"
+          - suite: part-2
+            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 2"
+          - suite: part-3
+            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 3"
+          - suite: part-4
+            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 4"
+          - suite: search
+            args: "--suites search"
+            tika: true
+          - suite: keycloak
+            args: "--suites journeys,keycloak"
+            keycloak: true
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "24"
+      - name: Setup pnpm
+        uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+        with:
+          version: "10.28.1"
+      - name: Generate code
+        run: |
+          pnpm config set store-dir ./.pnpm-store
+          make ci-node-generate
+        env:
+          CHROMEDRIVER_SKIP_DOWNLOAD: "true"
+
+      - name: Cache Playwright Chromium
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ hashFiles('.drone.env') }}
+
+      # --- Tika (search suite only) ---
+      - name: Start Tika
+        if: matrix.tika == true
+        run: |
+          docker run -d --name tika --network host apache/tika:3.2.2.0-full
+          timeout 120 bash -c 'until curl -sf http://localhost:9998; do sleep 2; done'
+          echo "tika ready."
+
+      # --- Keycloak (keycloak suite only) ---
+      - name: Generate Keycloak certs
+        if: matrix.keycloak == true
+        run: |
+          mkdir -p keycloak-certs
+          openssl req -x509 -newkey rsa:2048 \
+            -keyout keycloak-certs/keycloakkey.pem \
+            -out keycloak-certs/keycloakcrt.pem \
+            -nodes -days 365 -subj '/CN=keycloak'
+          chmod -R 777 keycloak-certs
+
+      - name: Start Postgres
+        if: matrix.keycloak == true
+        run: |
+          docker run -d --name postgres --network host \
+            -e POSTGRES_DB=keycloak \
+            -e POSTGRES_USER=keycloak \
+            -e POSTGRES_PASSWORD=keycloak \
+            postgres:alpine3.18
+          timeout 30 bash -c 'until docker exec postgres pg_isready -U keycloak; do sleep 1; done'
+
+      - name: Start Keycloak
+        if: matrix.keycloak == true
+        run: |
+          # Patch realm: replace Drone Docker hostname with localhost IP
+          sed 's|https://ocis-server:9200|https://127.0.0.1:9200|g' \
+            tests/config/drone/ocis-ci-realm.dist.json > /tmp/ocis-realm.json
+          docker run -d --name keycloak --network host \
+            -e OCIS_DOMAIN=https://127.0.0.1:9200 \
+            -e KC_HOSTNAME=localhost \
+            -e KC_PORT=8443 \
+            -e KC_DB=postgres \
+            -e "KC_DB_URL=jdbc:postgresql://localhost:5432/keycloak" \
+            -e KC_DB_USERNAME=keycloak \
+            -e KC_DB_PASSWORD=keycloak \
+            -e KC_FEATURES=impersonation \
+            -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
+            -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+            -e KC_HTTPS_CERTIFICATE_FILE=/keycloak-certs/keycloakcrt.pem \
+            -e KC_HTTPS_CERTIFICATE_KEY_FILE=/keycloak-certs/keycloakkey.pem \
+            -v "$(pwd)/keycloak-certs:/keycloak-certs:ro" \
+            -v "/tmp/ocis-realm.json:/opt/keycloak/data/import/oCIS-realm.json:ro" \
+            quay.io/keycloak/keycloak:26.2.5 \
+            start-dev --proxy-headers xforwarded \
+              --spi-connections-http-client-default-disable-trust-manager=true \
+              --import-realm --health-enabled=true
+          timeout 300 bash -c 'until curl -skf https://localhost:9000/health/ready; do sleep 3; done' \
+            || (echo "=== keycloak logs ===" && docker logs keycloak --tail 80 && exit 1)
+          echo "keycloak ready."
+
+      - name: Run e2e-${{ matrix.suite }}
+        run: E2E_ARGS="${{ matrix.args }}" python3 tests/acceptance/run-e2e.py
+        env:
+          TIKA_NEEDED: ${{ matrix.tika == true && 'true' || 'false' }}
+          KEYCLOAK_NEEDED: ${{ matrix.keycloak == true && 'true' || 'false' }}
+
   litmus:
     name: litmus
     needs: [build-and-test]
@@ -328,7 +440,7 @@ jobs:
         run: python3 tests/acceptance/run-wopi.py --type cs3
 
   all-acceptance-tests:
-    needs: [local-api-tests, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3]
+    needs: [local-api-tests, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests]
     runs-on: ubuntu-latest
     if: always()
     steps:
