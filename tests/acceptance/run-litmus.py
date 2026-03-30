@@ -20,8 +20,7 @@ from pathlib import Path
 # Constants (mirroring .drone.star)
 # ---------------------------------------------------------------------------
 
-OCIS_URL = "https://localhost:9200"
-OCIS_HTTP_URL = "http://localhost:9998"
+OCIS_URL = "http://localhost:9200"
 LITMUS_IMAGE = "owncloudci/litmus:latest"
 LITMUS_TESTS = "basic copymove props http"
 SHARE_ENDPOINT = "ocs/v2.php/apps/files_sharing/api/v1/shares"
@@ -34,7 +33,7 @@ def base_server_env(repo_root: Path, ocis_config_dir: str) -> dict:
         "OCIS_CONFIG_DIR": ocis_config_dir,
         "STORAGE_USERS_DRIVER": "ocis",
         "PROXY_ENABLE_BASIC_AUTH": "true",
-        "PROXY_HTTP_ADDR": "0.0.0.0:9998",
+        "PROXY_TLS": "false",
         "OCIS_EXCLUDE_RUN_SERVICES": "idp",
         "OCIS_LOG_LEVEL": "error",
         "IDM_CREATE_DEMO_USERS": "true",
@@ -61,7 +60,7 @@ def wait_for(condition_fn, timeout: int, label: str) -> None:
 
 def ocis_healthy(ocis_url: str) -> bool:
     r = subprocess.run(
-        ["curl", "-sk", "-uadmin:admin",
+        ["curl", "-s", "-uadmin:admin",
          f"{ocis_url}/graph/v1.0/users/admin",
          "-w", "%{http_code}", "-o", "/dev/null"],
         capture_output=True, text=True,
@@ -76,7 +75,7 @@ def setup_for_litmus(ocis_url: str) -> tuple:
     """
     # get personal space ID
     r = subprocess.run(
-        ["curl", "-ks", "-uadmin:admin", f"{ocis_url}/graph/v1.0/me/drives"],
+        ["curl", "-s", "-uadmin:admin", f"{ocis_url}/graph/v1.0/me/drives"],
         capture_output=True, text=True, check=True,
     )
     drives = json.loads(r.stdout)
@@ -94,14 +93,14 @@ def setup_for_litmus(ocis_url: str) -> tuple:
 
     # create test folder as einstein
     subprocess.run(
-        ["curl", "-ks", "-ueinstein:relativity", "-X", "MKCOL",
+        ["curl", "-s", "-ueinstein:relativity", "-X", "MKCOL",
          f"{ocis_url}/remote.php/webdav/new_folder"],
         capture_output=True, check=True,
     )
 
     # create share from einstein to admin
     r = subprocess.run(
-        ["curl", "-ks", "-ueinstein:relativity",
+        ["curl", "-s", "-ueinstein:relativity",
          f"{ocis_url}/{SHARE_ENDPOINT}",
          "-d", "path=/new_folder&shareType=0&permissions=15&name=new_folder&shareWith=admin"],
         capture_output=True, text=True, check=True,
@@ -111,14 +110,14 @@ def setup_for_litmus(ocis_url: str) -> tuple:
         share_id = share_id_match.group(1)
         # accept the share as admin
         subprocess.run(
-            ["curl", "-X", "POST", "-ks", "-uadmin:admin",
+            ["curl", "-X", "POST", "-s", "-uadmin:admin",
              f"{ocis_url}/{SHARE_ENDPOINT}/pending/{share_id}"],
             capture_output=True, check=True,
         )
 
     # create public share as einstein
     r = subprocess.run(
-        ["curl", "-ks", "-ueinstein:relativity",
+        ["curl", "-s", "-ueinstein:relativity",
          f"{ocis_url}/{SHARE_ENDPOINT}",
          "-d", "path=/new_folder&shareType=3&permissions=15&name=new_folder"],
         capture_output=True, text=True, check=True,
@@ -193,13 +192,12 @@ def main() -> int:
 
         space_id, _ = setup_for_litmus(OCIS_URL)
 
-        # Use plain HTTP so litmus/neon doesn't need to trust the self-signed cert
         endpoints = [
-            ("old-endpoint",    f"{OCIS_HTTP_URL}/remote.php/webdav"),
-            ("new-endpoint",    f"{OCIS_HTTP_URL}/remote.php/dav/files/admin"),
-            ("new-shared",      f"{OCIS_HTTP_URL}/remote.php/dav/files/admin/Shares/new_folder/"),
-            ("old-shared",      f"{OCIS_HTTP_URL}/remote.php/webdav/Shares/new_folder/"),
-            ("spaces-endpoint", f"{OCIS_HTTP_URL}/remote.php/dav/spaces/{space_id}"),
+            ("old-endpoint",    f"{OCIS_URL}/remote.php/webdav"),
+            ("new-endpoint",    f"{OCIS_URL}/remote.php/dav/files/admin"),
+            ("new-shared",      f"{OCIS_URL}/remote.php/dav/files/admin/Shares/new_folder/"),
+            ("old-shared",      f"{OCIS_URL}/remote.php/webdav/Shares/new_folder/"),
+            ("spaces-endpoint", f"{OCIS_URL}/remote.php/dav/spaces/{space_id}"),
         ]
 
         failed = []
