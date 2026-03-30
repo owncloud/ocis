@@ -46,7 +46,8 @@ def base_server_env(repo_root: Path, ocis_config_dir: str, ocis_public_url: str)
         "STORAGE_USERS_DRIVER": "ocis",
         "PROXY_ENABLE_BASIC_AUTH": "true",
         # No PROXY_TLS override — drone lets ocis use its default TLS (self-signed cert from init)
-        # No OCIS_EXCLUDE_RUN_SERVICES — drone runs all services including IDP for litmus
+        # IDP excluded: its static assets are absent when running as a host process
+        "OCIS_EXCLUDE_RUN_SERVICES": "idp",
         "OCIS_LOG_LEVEL": "error",
         "IDM_CREATE_DEMO_USERS": "true",
         "IDM_ADMIN_PASSWORD": "admin",
