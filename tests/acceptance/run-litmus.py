@@ -134,8 +134,7 @@ def setup_for_litmus(ocis_url: str) -> tuple:
 def run_litmus(name: str, endpoint: str) -> int:
     print(f"\nTesting endpoint [{name}]: {endpoint}")
     result = subprocess.run(
-        ["docker", "run", "--rm",
-         "--add-host=host.docker.internal:host-gateway",
+        ["docker", "run", "--rm", "--network", "host",
          "-e", f"LITMUS_URL={endpoint}",
          "-e", "LITMUS_USERNAME=admin",
          "-e", "LITMUS_PASSWORD=admin",
@@ -193,13 +192,12 @@ def main() -> int:
 
         space_id, _ = setup_for_litmus(OCIS_URL)
 
-        litmus_base = "http://host.docker.internal:9200"
         endpoints = [
-            ("old-endpoint",    f"{litmus_base}/remote.php/webdav"),
-            ("new-endpoint",    f"{litmus_base}/remote.php/dav/files/admin"),
-            ("new-shared",      f"{litmus_base}/remote.php/dav/files/admin/Shares/new_folder/"),
-            ("old-shared",      f"{litmus_base}/remote.php/webdav/Shares/new_folder/"),
-            ("spaces-endpoint", f"{litmus_base}/remote.php/dav/spaces/{space_id}"),
+            ("old-endpoint",    f"{OCIS_URL}/remote.php/webdav"),
+            ("new-endpoint",    f"{OCIS_URL}/remote.php/dav/files/admin"),
+            ("new-shared",      f"{OCIS_URL}/remote.php/dav/files/admin/Shares/new_folder/"),
+            ("old-shared",      f"{OCIS_URL}/remote.php/webdav/Shares/new_folder/"),
+            ("spaces-endpoint", f"{OCIS_URL}/remote.php/dav/spaces/{space_id}"),
         ]
 
         failed = []
