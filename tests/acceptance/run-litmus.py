@@ -144,41 +144,19 @@ def setup_for_litmus(ocis_url: str) -> tuple:
     return space_id, public_token
 
 
-def run_litmus(name: str, endpoint: str, capture_debug: bool = False) -> int:
+def run_litmus(name: str, endpoint: str) -> int:
     print(f"\nTesting endpoint [{name}]: {endpoint}", flush=True)
-    container_name = f"litmus-{name}" if capture_debug else None
-    cmd = ["docker", "run"]
-    if container_name:
-        cmd += ["--name", container_name]
-    else:
-        cmd += ["--rm"]
-    cmd += [
-        "-e", f"LITMUS_URL={endpoint}",
-        "-e", "LITMUS_USERNAME=admin",
-        "-e", "LITMUS_PASSWORD=admin",
-        "-e", f"TESTS={LITMUS_TESTS}",
-        LITMUS_IMAGE,
-        # No extra CMD — ENTRYPOINT is already litmus-wrapper; passing it again
-        # would make the wrapper use the path as LITMUS_URL, overriding the env var.
-    ]
-    result = subprocess.run(cmd)
-    if capture_debug and container_name:
-        # try to copy debug.log from the container
-        for log_path in ["/debug.log", "/tmp/debug.log", "/home/debug.log"]:
-            r = subprocess.run(
-                ["docker", "cp", f"{container_name}:{log_path}", f"/tmp/litmus-debug-{name}.log"],
-                capture_output=True,
-            )
-            if r.returncode == 0:
-                try:
-                    with open(f"/tmp/litmus-debug-{name}.log") as f:
-                        content = f.read()
-                    print(f"\n--- litmus debug.log ({log_path}) ---", flush=True)
-                    print(content[:3000], flush=True)
-                except Exception:
-                    pass
-                break
-        subprocess.run(["docker", "rm", "-f", container_name], capture_output=True)
+    result = subprocess.run(
+        ["docker", "run", "--rm",
+         "-e", f"LITMUS_URL={endpoint}",
+         "-e", "LITMUS_USERNAME=admin",
+         "-e", "LITMUS_PASSWORD=admin",
+         "-e", f"TESTS={LITMUS_TESTS}",
+         LITMUS_IMAGE,
+         # No extra CMD — ENTRYPOINT is already litmus-wrapper; passing it again
+         # would make the wrapper use the path as LITMUS_URL, overriding the env var.
+         ],
+    )
     return result.returncode
 
 
@@ -211,12 +189,6 @@ def main() -> int:
         env=server_env,
         check=True,
     )
-    # Diagnostic: print generated config (drone does this too)
-    ocis_yaml = ocis_config_dir / "ocis.yaml"
-    if ocis_yaml.exists():
-        print("\n--- ocis.yaml ---", flush=True)
-        print(ocis_yaml.read_text()[:2000], flush=True)
-
     shutil.copy(
         repo_root / "tests/config/drone/app-registry.yaml",
         ocis_config_dir / "app-registry.yaml",
@@ -244,29 +216,6 @@ def main() -> int:
 
         space_id, _ = setup_for_litmus(OCIS_URL)
 
-        # Diagnostic: full HTTP trace for WebDAV OPTIONS and PROPFIND from the host
-        for label, curl_args in [
-            ("OPTIONS no-auth",  ["-X", "OPTIONS"]),
-            ("OPTIONS auth",     ["-u", "admin:admin", "-X", "OPTIONS"]),
-            ("PROPFIND auth",    ["-u", "admin:admin", "-X", "PROPFIND", "-H", "Depth: 0"]),
-        ]:
-            r = subprocess.run(
-                ["curl", "-vsk"] + curl_args + [f"{OCIS_URL}/remote.php/webdav"],
-                capture_output=True, text=True,
-            )
-            print(f"\n--- {label} ---", flush=True)
-            print((r.stdout + r.stderr)[:1500], flush=True)
-
-        # Diagnostic: confirm WebDAV endpoint reachable from Docker bridge network (HTTPS, insecure)
-        webdav_url = f"https://{bridge_ip}:9200/remote.php/webdav"
-        wget_cmd = f"wget -S --no-check-certificate --spider '{webdav_url}' 2>&1; echo exit:$?"
-        r = subprocess.run(
-            ["docker", "run", "--rm", "--entrypoint", "sh", LITMUS_IMAGE, "-c", wget_cmd],
-            capture_output=True, text=True, timeout=30,
-        )
-        print(f"\n--- docker-bridge WebDAV (https) rc={r.returncode} ---", flush=True)
-        print((r.stdout + r.stderr)[:400], flush=True)
-
         endpoints = [
             ("old-endpoint",    f"{litmus_base}/remote.php/webdav"),
             ("new-endpoint",    f"{litmus_base}/remote.php/dav/files/admin"),
@@ -276,8 +225,8 @@ def main() -> int:
         ]
 
         failed = []
-        for i, (name, endpoint) in enumerate(endpoints):
-            rc = run_litmus(name, endpoint, capture_debug=(i == 0))
+        for name, endpoint in endpoints:
+            rc = run_litmus(name, endpoint)
             if rc != 0:
                 failed.append(name)
 

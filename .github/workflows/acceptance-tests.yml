@@ -224,8 +224,21 @@ jobs:
       - name: Run litmus
         run: python3 tests/acceptance/run-litmus.py
 
+  cs3api:
+    name: cs3api
+    needs: []
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Run cs3api validator
+        run: python3 tests/acceptance/run-cs3api.py
+
   all-acceptance-tests:
-    needs: [litmus]
+    needs: [litmus, cs3api]
     runs-on: ubuntu-latest
     if: always()
     steps:
