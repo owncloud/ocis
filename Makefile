@@ -333,7 +333,7 @@ changelog-csv: $(CALENS)
 
 .PHONY: govulncheck
 govulncheck: $(GOVULNCHECK)
-	$(GOVULNCHECK) ./...
+	scripts/govulncheck-wrapper.sh $(GOVULNCHECK)
 
 .PHONY: l10n-push
 l10n-push:
