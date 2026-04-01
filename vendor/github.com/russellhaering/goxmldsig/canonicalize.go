@@ -1,7 +1,6 @@
 package dsig
 
 import (
-	"maps"
 	"sort"
 
 	"github.com/beevik/etree"
@@ -165,7 +164,9 @@ func canonicalPrep(el *etree.Element, strip bool, comments bool) *etree.Element 
 
 func canonicalPrepInner(el *etree.Element, seenSoFar map[string]string, strip bool, comments bool) *etree.Element {
 	_seenSoFar := make(map[string]string)
-	maps.Copy(_seenSoFar, seenSoFar)
+	for k, v := range seenSoFar {
+		_seenSoFar[k] = v
+	}
 
 	ne := el.Copy()
 	sort.Sort(etreeutils.SortedAttrs(ne.Attr))

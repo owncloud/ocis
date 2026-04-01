@@ -306,10 +306,9 @@ func (ctx *ValidationContext) validateSignature(el *etree.Element, sig *types.Si
 	var ref *types.Reference
 
 	// Find the first reference which references the top-level element
-	for i := range signedInfo.References {
-		if signedInfo.References[i].URI == "" || signedInfo.References[i].URI[1:] == idAttr {
-			ref = &signedInfo.References[i]
-			break
+	for _, _ref := range signedInfo.References {
+		if _ref.URI == "" || _ref.URI[1:] == idAttr {
+			ref = &_ref
 		}
 	}
 
