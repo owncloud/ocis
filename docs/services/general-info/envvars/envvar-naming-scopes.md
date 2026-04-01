@@ -52,24 +52,25 @@ The envvar struct tag contains at maximum the following key/value pairs to docum
 
 ### Introduce new Envvars
 
-If a new envvar is introduced, the complete struct needs to be added, but only the `introductionVersion` requires data.
+* If a **new** envvar is introduced, the entire structure must be added, including the `introductionVersion` field. Note that 'introduced' means, that the new envvar was not present in any of the services.
 
-{{< hint info >}}
-* During development, set `introductionVersion` to a short, **alphabetic code name** that represents the upcoming release (e.g. `releaseX`).
-* This identifier stays constant until the release receives its final production semantic-version number.
-{{< /hint >}}
+  {{< hint info >}}
+  * During development, set the `introductionVersion` to a short, **alphabetic code name** that represents the upcoming release such as `releaseX` or the project name for that release such as `Daledda`.
+  * This identifier stays constant until the release receives its final production semantic-version number.
+  * Although the pipeline checks the semver string when a PR is created, you can perform this check upfront manually by entering the following command from the ocis root:
 
-The docs helper scripts render these alphabetic identifiers verbatim. They appear in the next (master) branch of the admin docs as rendered here.
+    ```bash
+    .make/check-env-var-annotations.sh
+    ```
+  {{< /hint >}}
 
-Once the release is cut, before tagging, replace them with the actual semantic version (e.g. `releaseX` → `7.2.0`). 
+  The doc helper scripts render these alphabetic identifiers verbatim. They appear in the next (master) branch of the admin documentation exactly as they are entered.
 
-{{< hint info >}}
-A new production version **MUST NOT** contain any alphabetic identifyers but the semantic version only.
-{{< /hint >}}
+* See the [Set the Correct IntroductionVersion]({{< ref "./new-release-process/" >}}) documentation before starting a new release candidate.
 
 ### Adding Envvars to Existing Ones
 
-If an envvar has been introduced with a particular version, the `introductionVersion` gets a value accordingly. If an additional envvar like a global one is added to this existing envvar later on, the introduction version will *not* be changed.
+If an envvar has been introduced with a particular release, the `introductionVersion` got a semver value accordingly. If an additional envvar is added to this existing one such as a global envvar, the introduction version **must not** be changed.
 
 ### Deprecate Existing Envvars
 
