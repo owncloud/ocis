@@ -389,7 +389,6 @@ type Options struct {
 	JetStreamRequestQueueLimit int64
 	JetStreamMetaCompact       uint64
 	JetStreamMetaCompactSize   uint64
-	JetStreamMetaCompactSync   bool
 	StreamMaxBufferedMsgs      int               `json:"-"`
 	StreamMaxBufferedSize      int64             `json:"-"`
 	StoreDir                   string            `json:"-"`
@@ -1269,9 +1268,7 @@ func (o *Options) processConfigFileLine(k string, v any, errors *[]error, warnin
 	case "proxy_protocol":
 		o.ProxyProtocol = v.(bool)
 	case "max_connections", "max_conn":
-		if o.MaxConn = int(v.(int64)); o.MaxConn == 0 {
-			o.MaxConn = -1
-		}
+		o.MaxConn = int(v.(int64))
 	case "max_traced_msg_len":
 		o.MaxTracedMsgLen = int(v.(int64))
 	case "max_subscriptions", "max_subs":
@@ -2656,8 +2653,6 @@ func parseJetStream(v any, opts *Options, errors *[]error, warnings *[]error) er
 					return &configErr{tk, fmt.Sprintf("Expected an absolute size for %q, got %v", mk, mv)}
 				}
 				opts.JetStreamMetaCompactSize = uint64(s)
-			case "meta_compact_sync":
-				opts.JetStreamMetaCompactSync = mv.(bool)
 			default:
 				if !tk.IsUsedVariable() {
 					err := &unknownConfigFieldErr{

@@ -181,7 +181,8 @@ func (c *client) processAccountUnsub(arg []byte) {
 // we have an origin cluster and we force header semantics.
 func (c *client) processRoutedOriginClusterMsgArgs(arg []byte) error {
 	// Unroll splitArgs to avoid runtime/heap issues
-	args := c.argsa[:0]
+	a := [MAX_HMSG_ARGS + 1][]byte{}
+	args := a[:0]
 	start := -1
 	for i, b := range arg {
 		switch b {
@@ -279,7 +280,8 @@ func (c *client) processRoutedOriginClusterMsgArgs(arg []byte) error {
 // Process an inbound HMSG specification from the remote route.
 func (c *client) processRoutedHeaderMsgArgs(arg []byte) error {
 	// Unroll splitArgs to avoid runtime/heap issues
-	args := c.argsa[:0]
+	a := [MAX_HMSG_ARGS][]byte{}
+	args := a[:0]
 	var an []byte
 	if c.kind == ROUTER {
 		if an = c.route.accName; len(an) > 0 {
@@ -375,7 +377,8 @@ func (c *client) processRoutedHeaderMsgArgs(arg []byte) error {
 // Process an inbound RMSG or LMSG specification from the remote route.
 func (c *client) processRoutedMsgArgs(arg []byte) error {
 	// Unroll splitArgs to avoid runtime/heap issues
-	args := c.argsa[:0]
+	a := [MAX_RMSG_ARGS][]byte{}
+	args := a[:0]
 	var an []byte
 	if c.kind == ROUTER {
 		if an = c.route.accName; len(an) > 0 {

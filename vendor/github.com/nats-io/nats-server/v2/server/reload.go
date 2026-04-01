@@ -564,20 +564,21 @@ type maxConnOption struct {
 // below the limit if necessary.
 func (m *maxConnOption) Apply(server *Server) {
 	server.mu.Lock()
-	clients := make([]*client, 0, len(server.clients))
+	var (
+		clients = make([]*client, len(server.clients))
+		i       = 0
+	)
 	// Map iteration is random, which allows us to close random connections.
 	for _, client := range server.clients {
-		if isInternalClient(client.kind) {
-			continue
-		}
-		clients = append(clients, client)
+		clients[i] = client
+		i++
 	}
 	server.mu.Unlock()
 
-	if newc := max(0, m.newValue); len(clients) > newc {
+	if m.newValue > 0 && len(clients) > m.newValue {
 		// Close connections til we are within the limit.
 		var (
-			numClose = len(clients) - newc
+			numClose = len(clients) - m.newValue
 			closed   = 0
 		)
 		for _, client := range clients {
@@ -1658,7 +1659,7 @@ func (s *Server) diffOptions(newOpts *Options) ([]option, error) {
 					return nil, fmt.Errorf("config reload not supported for jetstream max memory and store")
 				}
 			}
-		case "jetstreammetacompact", "jetstreammetacompactsize", "jetstreammetacompactsync":
+		case "jetstreammetacompact", "jetstreammetacompactsize":
 			// Allowed at runtime but monitorCluster looks at s.opts directly, so no further work needed here.
 		case "websocket":
 			// Similar to gateways

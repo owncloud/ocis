@@ -124,25 +124,7 @@ func (t *SubjectTree[T]) Match(filter []byte, cb func(subject []byte, val *T)) {
 	var raw [16][]byte
 	parts := genParts(filter, raw[:0])
 	var _pre [256]byte
-	t.match(t.root, parts, _pre[:0], func(subject []byte, val *T) bool {
-		cb(subject, val)
-		return true
-	})
-}
-
-// MatchUntil will match against a subject that can have wildcards and invoke
-// the callback func for each matched value.
-// Returning false from the callback will stop matching immediately.
-// Returns true if matching ran to completion, false if callback stopped it early.
-func (t *SubjectTree[T]) MatchUntil(filter []byte, cb func(subject []byte, val *T) bool) bool {
-	if t == nil || t.root == nil || len(filter) == 0 || cb == nil {
-		return true
-	}
-	// We need to break this up into chunks based on wildcards, either pwc '*' or fwc '>'.
-	var raw [16][]byte
-	parts := genParts(filter, raw[:0])
-	var _pre [256]byte
-	return t.match(t.root, parts, _pre[:0], cb)
+	t.match(t.root, parts, _pre[:0], cb)
 }
 
 // IterOrdered will walk all entries in the SubjectTree lexicographically. The callback can return false to terminate the walk.
@@ -314,8 +296,7 @@ func (t *SubjectTree[T]) delete(np *node, subject []byte, si int) (*T, bool) {
 
 // Internal function which can be called recursively to match all leaf nodes to a given filter subject which
 // once here has been decomposed to parts. These parts only care about wildcards, both pwc and fwc.
-// Returns false if the callback requested to stop matching.
-func (t *SubjectTree[T]) match(n node, parts [][]byte, pre []byte, cb func(subject []byte, val *T) bool) bool {
+func (t *SubjectTree[T]) match(n node, parts [][]byte, pre []byte, cb func(subject []byte, val *T)) {
 	// Capture if we are sitting on a terminal fwc.
 	var hasFWC bool
 	if lp := len(parts); lp > 0 && len(parts[lp-1]) > 0 && parts[lp-1][0] == fwc {
@@ -326,17 +307,15 @@ func (t *SubjectTree[T]) match(n node, parts [][]byte, pre []byte, cb func(subje
 		nparts, matched := n.matchParts(parts)
 		// Check if we did not match.
 		if !matched {
-			return true
+			return
 		}
 		// We have matched here. If we are a leaf and have exhausted all parts or he have a FWC fire callback.
 		if n.isLeaf() {
 			if len(nparts) == 0 || (hasFWC && len(nparts) == 1) {
 				ln := n.(*leaf[T])
-				if !cb(append(pre, ln.suffix...), &ln.value) {
-					return false
-				}
+				cb(append(pre, ln.suffix...), &ln.value)
 			}
-			return true
+			return
 		}
 		// We have normal nodes here.
 		// We need to append our prefix
@@ -364,23 +343,17 @@ func (t *SubjectTree[T]) match(n node, parts [][]byte, pre []byte, cb func(subje
 				if cn.isLeaf() {
 					ln := cn.(*leaf[T])
 					if len(ln.suffix) == 0 {
-						if !cb(append(pre, ln.suffix...), &ln.value) {
-							return false
-						}
+						cb(append(pre, ln.suffix...), &ln.value)
 					} else if hasTermPWC && bytes.IndexByte(ln.suffix, tsep) < 0 {
-						if !cb(append(pre, ln.suffix...), &ln.value) {
-							return false
-						}
+						cb(append(pre, ln.suffix...), &ln.value)
 					}
 				} else if hasTermPWC {
 					// We have terminal pwc so call into match again with the child node.
-					if !t.match(cn, nparts, pre, cb) {
-						return false
-					}
+					t.match(cn, nparts, pre, cb)
 				}
 			}
 			// Return regardless.
-			return true
+			return
 		}
 		// If we are sitting on a terminal fwc, put back and continue.
 		if hasFWC && len(nparts) == 0 {
@@ -397,21 +370,18 @@ func (t *SubjectTree[T]) match(n node, parts [][]byte, pre []byte, cb func(subje
 			// to see if we match further down.
 			for _, cn := range n.children() {
 				if cn != nil {
-					if !t.match(cn, nparts, pre, cb) {
-						return false
-					}
+					t.match(cn, nparts, pre, cb)
 				}
 			}
-			return true
+			return
 		}
 		// Here we have normal traversal, so find the next child.
 		nn := n.findChild(p)
 		if nn == nil {
-			return true
+			return
 		}
 		n, parts = *nn, nparts
 	}
-	return true
 }
 
 // Internal iter function to walk nodes in lexicographical order.

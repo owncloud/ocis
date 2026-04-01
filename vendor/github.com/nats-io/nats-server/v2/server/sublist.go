@@ -1327,9 +1327,8 @@ func SubjectsCollide(subj1, subj2 string) bool {
 	if subj1 == subj2 {
 		return true
 	}
-	tsa, tsb := [32]string{}, [32]string{}
-	toks1 := tokenizeSubjectIntoSlice(tsa[:0], subj1)
-	toks2 := tokenizeSubjectIntoSlice(tsb[:0], subj2)
+	toks1 := strings.Split(subj1, tsep)
+	toks2 := strings.Split(subj2, tsep)
 	pwc1, fwc1 := analyzeTokens(toks1)
 	pwc2, fwc2 := analyzeTokens(toks2)
 	// if both literal just string compare.
@@ -1339,9 +1338,9 @@ func SubjectsCollide(subj1, subj2 string) bool {
 	}
 	// So one or both have wildcards. If one is literal than we can do subset matching.
 	if l1 && !l2 {
-		return isSubsetMatchTokenized(toks1, toks2)
+		return isSubsetMatch(toks1, subj2)
 	} else if l2 && !l1 {
-		return isSubsetMatchTokenized(toks2, toks1)
+		return isSubsetMatch(toks2, subj1)
 	}
 	// Both have wildcards.
 	// If they only have partials then the lengths must match.

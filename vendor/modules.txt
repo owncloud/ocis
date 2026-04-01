@@ -88,7 +88,7 @@ github.com/alexedwards/argon2id
 # github.com/amoghe/go-crypt v0.0.0-20220222110647-20eada5f5964
 ## explicit
 github.com/amoghe/go-crypt
-# github.com/antithesishq/antithesis-sdk-go v0.6.0-default-no-op
+# github.com/antithesishq/antithesis-sdk-go v0.5.0-default-no-op
 ## explicit; go 1.20
 github.com/antithesishq/antithesis-sdk-go/assert
 github.com/antithesishq/antithesis-sdk-go/internal
@@ -849,7 +849,7 @@ github.com/justinas/alice
 # github.com/kevinburke/ssh_config v1.2.0
 ## explicit
 github.com/kevinburke/ssh_config
-# github.com/klauspost/compress v1.18.4
+# github.com/klauspost/compress v1.18.3
 ## explicit; go 1.23
 github.com/klauspost/compress
 github.com/klauspost/compress/flate
@@ -1097,8 +1097,8 @@ github.com/munnerz/goautoneg
 # github.com/nats-io/jwt/v2 v2.8.0
 ## explicit; go 1.23.0
 github.com/nats-io/jwt/v2
-# github.com/nats-io/nats-server/v2 v2.12.5
-## explicit; go 1.25.0
+# github.com/nats-io/nats-server/v2 v2.12.4
+## explicit; go 1.24.0
 github.com/nats-io/nats-server/v2/conf
 github.com/nats-io/nats-server/v2/internal/fastrand
 github.com/nats-io/nats-server/v2/internal/ldap
@@ -1115,13 +1115,13 @@ github.com/nats-io/nats-server/v2/server/stree
 github.com/nats-io/nats-server/v2/server/sysmem
 github.com/nats-io/nats-server/v2/server/thw
 github.com/nats-io/nats-server/v2/server/tpm
-# github.com/nats-io/nats.go v1.49.0
-## explicit; go 1.24.0
+# github.com/nats-io/nats.go v1.48.0
+## explicit; go 1.23.0
 github.com/nats-io/nats.go
 github.com/nats-io/nats.go/encoders/builtin
 github.com/nats-io/nats.go/internal/parser
 github.com/nats-io/nats.go/util
-# github.com/nats-io/nkeys v0.4.15
+# github.com/nats-io/nkeys v0.4.12
 ## explicit; go 1.24.0
 github.com/nats-io/nkeys
 # github.com/nats-io/nuid v1.0.1
@@ -2332,8 +2332,8 @@ golang.org/x/oauth2/internal
 golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
 golang.org/x/sync/singleflight
-# golang.org/x/sys v0.42.0
-## explicit; go 1.25.0
+# golang.org/x/sys v0.41.0
+## explicit; go 1.24.0
 golang.org/x/sys/cpu
 golang.org/x/sys/execabs
 golang.org/x/sys/plan9
@@ -2371,8 +2371,8 @@ golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 golang.org/x/text/width
-# golang.org/x/time v0.15.0
-## explicit; go 1.25.0
+# golang.org/x/time v0.14.0
+## explicit; go 1.24.0
 golang.org/x/time/rate
 # golang.org/x/tools v0.41.0
 ## explicit; go 1.24.0

@@ -296,7 +296,8 @@ type jsOpts struct {
 }
 
 const (
-	defaultRequestWait = 5 * time.Second
+	defaultRequestWait  = 5 * time.Second
+	defaultAccountCheck = 20 * time.Second
 )
 
 // JetStream returns a JetStreamContext for messaging and stream management.
@@ -2834,15 +2835,12 @@ func ConsumerFilterSubjects(subjects ...string) SubOpt {
 func (sub *Subscription) ConsumerInfo() (*ConsumerInfo, error) {
 	sub.mu.Lock()
 	// TODO(dlc) - Better way to mark especially if we attach.
-	if sub.jsi == nil {
-		sub.mu.Unlock()
-		return nil, ErrTypeSubscription
-	} else if sub.jsi.consumer == _EMPTY_ {
-		ordered := sub.jsi.ordered
-		sub.mu.Unlock()
-		if ordered {
+	if sub.jsi == nil || sub.jsi.consumer == _EMPTY_ {
+		if sub.jsi.ordered {
+			sub.mu.Unlock()
 			return nil, ErrConsumerInfoOnOrderedReset
 		}
+		sub.mu.Unlock()
 		return nil, ErrTypeSubscription
 	}
 
