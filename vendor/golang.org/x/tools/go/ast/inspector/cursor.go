@@ -18,11 +18,8 @@ import (
 //
 // Two Cursors compare equal if they represent the same node.
 //
-// The zero value of Cursor is not valid.
-//
-// Call [Inspector.Root] to obtain a cursor for the virtual root node
-// of the traversal. This is the sole valid cursor for which [Cursor.Node]
-// returns nil.
+// Call [Inspector.Root] to obtain a valid cursor for the virtual root
+// node of the traversal.
 //
 // Use the following methods to navigate efficiently around the tree:
 //   - for ancestors, use [Cursor.Parent] and [Cursor.Enclosing];
@@ -40,7 +37,7 @@ type Cursor struct {
 	index int32 // index of push node; -1 for virtual root node
 }
 
-// Root returns a valid cursor for the virtual root node,
+// Root returns a cursor for the virtual root node,
 // whose children are the files provided to [New].
 //
 // Its [Cursor.Node] method return nil.
@@ -64,23 +61,14 @@ func (in *Inspector) At(index int32) Cursor {
 	return Cursor{in, index}
 }
 
-// Valid reports whether the cursor is valid.
-// The zero value of cursor is invalid.
-// Unless otherwise documented, it is not safe to call
-// any other method on an invalid cursor.
-func (c Cursor) Valid() bool {
-	return c.in != nil
-}
-
 // Inspector returns the cursor's Inspector.
-// It returns nil if the Cursor is not valid.
 func (c Cursor) Inspector() *Inspector { return c.in }
 
 // Index returns the index of this cursor position within the package.
 //
 // Clients should not assume anything about the numeric Index value
 // except that it increases monotonically throughout the traversal.
-// It is provided for use with [Inspector.At].
+// It is provided for use with [At].
 //
 // Index must not be called on the Root node.
 func (c Cursor) Index() int32 {
@@ -101,7 +89,7 @@ func (c Cursor) Node() ast.Node {
 
 // String returns information about the cursor's node, if any.
 func (c Cursor) String() string {
-	if !c.Valid() {
+	if c.in == nil {
 		return "(invalid)"
 	}
 	if c.index < 0 {
@@ -243,18 +231,6 @@ func (c Cursor) ParentEdge() (edge.Kind, int) {
 	events := c.in.events
 	pop := events[c.index].index
 	return unpackEdgeKindAndIndex(events[pop].parent)
-}
-
-// ParentEdgeKind returns the kind component of the result of [Cursor.ParentEdge].
-func (c Cursor) ParentEdgeKind() edge.Kind {
-	ek, _ := c.ParentEdge()
-	return ek
-}
-
-// ParentEdgeIndex returns the index component of the result of [Cursor.ParentEdge].
-func (c Cursor) ParentEdgeIndex() int {
-	_, index := c.ParentEdge()
-	return index
 }
 
 // ChildAt returns the cursor for the child of the

@@ -19,8 +19,12 @@ type Key interface {
 	Name() string
 	// Description returns a string that can be used to describe the value.
 	Description() string
-	// Append appends the formatted value of the label to the supplied buffer.
-	Append(buf []byte, l Label) []byte
+
+	// Format is used in formatting to append the value of the label to the
+	// supplied buffer.
+	// The formatter may use the supplied buf as a scratch area to avoid
+	// allocations.
+	Format(w io.Writer, buf []byte, l Label)
 }
 
 // Label holds a key and value pair.
@@ -127,7 +131,8 @@ func (t Label) Format(f fmt.State, r rune) {
 	}
 	io.WriteString(f, t.Key().Name())
 	io.WriteString(f, "=")
-	f.Write(t.Key().Append(nil, t)) // ignore error
+	var buf [128]byte
+	t.Key().Format(f, buf[:0], t)
 }
 
 func (l *list) Valid(index int) bool {

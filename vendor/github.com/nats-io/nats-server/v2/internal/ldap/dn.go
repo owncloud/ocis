@@ -235,19 +235,19 @@ func (d *DN) RDNsMatch(other *DN) bool {
 	if len(d.RDNs) != len(other.RDNs) {
 		return false
 	}
-	matched := make([]bool, len(other.RDNs))
+
+CheckNextRDN:
 	for _, irdn := range d.RDNs {
-		found := false
-		for j, ordn := range other.RDNs {
-			if !matched[j] && irdn.Equal(ordn) {
-				matched[j] = true
-				found = true
-				break
+		for _, ordn := range other.RDNs {
+			if (len(irdn.Attributes) == len(ordn.Attributes)) &&
+				(irdn.hasAllAttributes(ordn.Attributes) && ordn.hasAllAttributes(irdn.Attributes)) {
+				// Found the RDN, check if next one matches.
+				continue CheckNextRDN
 			}
 		}
-		if !found {
-			return false
-		}
+
+		// Could not find a matching individual RDN, auth fails.
+		return false
 	}
 	return true
 }

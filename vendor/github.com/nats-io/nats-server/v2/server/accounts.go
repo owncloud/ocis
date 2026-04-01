@@ -1616,12 +1616,10 @@ func (a *Account) checkServiceImportsForCycles(from string, visited map[string]b
 				}
 				// Push ourselves and check si.acc
 				visited[a.Name] = true
-				// Make a copy to not overwrite the passed value.
-				f := from
-				if subjectIsSubsetMatch(si.from, f) {
-					f = si.from
+				if subjectIsSubsetMatch(si.from, from) {
+					from = si.from
 				}
-				if err := si.acc.checkServiceImportsForCycles(f, visited); err != nil {
+				if err := si.acc.checkServiceImportsForCycles(from, visited); err != nil {
 					return err
 				}
 				a.mu.RLock()
@@ -1676,12 +1674,10 @@ func (a *Account) checkStreamImportsForCycles(to string, visited map[string]bool
 			}
 			// Push ourselves and check si.acc
 			visited[a.Name] = true
-			// Make a copy to not overwrite the passed value.
-			t := to
-			if subjectIsSubsetMatch(si.to, t) {
-				t = si.to
+			if subjectIsSubsetMatch(si.to, to) {
+				to = si.to
 			}
-			if err := si.acc.checkStreamImportsForCycles(t, visited); err != nil {
+			if err := si.acc.checkStreamImportsForCycles(to, visited); err != nil {
 				return err
 			}
 			a.mu.RLock()

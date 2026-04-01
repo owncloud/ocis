@@ -210,6 +210,7 @@ func iimportCommon(fset *token.FileSet, getPackages GetPackagesFunc, data []byte
 	p := iimporter{
 		version: int(version),
 		ipath:   path,
+		aliases: aliases.Enabled(),
 		shallow: shallow,
 		reportf: reportf,
 
@@ -369,6 +370,7 @@ type iimporter struct {
 	version int
 	ipath   string
 
+	aliases bool
 	shallow bool
 	reportf ReportFunc // if non-nil, used to report bugs
 
@@ -574,7 +576,7 @@ func (r *importReader) obj(pkg *types.Package, name string) {
 			tparams = r.tparamList()
 		}
 		typ := r.typ()
-		obj := aliases.New(pos, pkg, name, typ, tparams)
+		obj := aliases.NewAlias(r.p.aliases, pos, pkg, name, typ, tparams)
 		markBlack(obj) // workaround for golang/go#69912
 		r.declare(obj)
 

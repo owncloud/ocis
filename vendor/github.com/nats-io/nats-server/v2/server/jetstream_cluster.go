@@ -1437,7 +1437,7 @@ func (js *jetStream) getOrphans() (streams []*stream, consumers []*consumer) {
 				streams = append(streams, mset)
 			} else {
 				// This one is good, check consumers now.
-				for _, o := range mset.getPublicConsumers() {
+				for _, o := range mset.getConsumers() {
 					if sa.consumers[o.String()] == nil {
 						consumers = append(consumers, o)
 					}
@@ -2216,10 +2216,6 @@ func (js *jetStream) collectStreamAndConsumerChanges(c RaftNodeCheckpoint, strea
 			as = make(map[string]*streamAssignment)
 			streams[sa.Client.serviceAccount()] = as
 		}
-		// Preserve consumers from the previous assignment.
-		if osa := as[sa.Config.Name]; osa != nil {
-			sa.consumers = osa.consumers
-		}
 		as[sa.Config.Name] = sa
 	}
 	for _, cas := range ru.updateConsumers {
@@ -2487,9 +2483,7 @@ func (js *jetStream) applyMetaEntries(entries []*Entry, ru *recoveryUpdates) (bo
 		}
 
 		if e.Type == EntrySnapshot {
-			if err := js.applyMetaSnapshot(e.Data, ru, isRecovering); err != nil {
-				return isRecovering, didSnap, err
-			}
+			js.applyMetaSnapshot(e.Data, ru, isRecovering)
 			didSnap = true
 		} else if e.Type == EntryRemovePeer {
 			if !js.isMetaRecovering() {
@@ -6014,9 +6008,6 @@ func (js *jetStream) consumerAssignmentsOrInflightSeq(account, stream string) it
 			}
 		}
 		sa := js.streamAssignment(account, stream)
-		if sa == nil {
-			return
-		}
 		for _, ca := range sa.consumers {
 			// Skip if we already iterated over it as inflight.
 			if _, ok := inflight[ca.Name]; ok {
@@ -7543,9 +7534,9 @@ func (js *jetStream) tieredStreamAndReservationCount(accName, tier string, cfg *
 				// If tier is empty, all storage is flat and we should adjust for replicas.
 				// Otherwise if tiered, storage replication already taken into consideration.
 				if tier == _EMPTY_ && sa.Config.Replicas > 1 {
-					reservation = addSaturate(reservation, mulSaturate(int64(sa.Config.Replicas), sa.Config.MaxBytes))
+					reservation += sa.Config.MaxBytes * int64(sa.Config.Replicas)
 				} else {
-					reservation = addSaturate(reservation, sa.Config.MaxBytes)
+					reservation += sa.Config.MaxBytes
 				}
 			}
 		}
@@ -7655,17 +7646,6 @@ func (s *Server) jsClusteredStreamRequest(ci *ClientInfo, acc *Account, subject,
 	// Capture if we have existing/inflight assignment first.
 	if osa := js.streamAssignmentOrInflight(acc.Name, cfg.Name); osa != nil {
 		copyStreamMetadata(cfg, osa.Config)
-		// Set the index name on both to ensure the DeepEqual works
-		currentIName := make(map[string]struct{})
-		for _, s := range osa.Config.Sources {
-			currentIName[s.iname] = struct{}{}
-		}
-		for _, s := range cfg.Sources {
-			s.setIndexName()
-			if _, ok := currentIName[s.iname]; !ok {
-				s.iname = _EMPTY_
-			}
-		}
 		if !reflect.DeepEqual(osa.Config, cfg) {
 			resp.Error = NewJSStreamNameExistError()
 			s.sendAPIErrResponse(ci, acc, subject, reply, string(rmsg), s.jsonResponse(&resp))
@@ -8230,16 +8210,6 @@ func (s *Server) jsClusteredStreamRestoreRequest(
 		return
 	}
 
-	resp := JSApiStreamRestoreResponse{ApiResponse: ApiResponse{Type: JSApiStreamRestoreResponseType}}
-
-	// check stream config at the start of the restore process, not at the end
-	cfg, apiErr := s.checkStreamCfg(&req.Config, acc, false)
-	if apiErr != nil {
-		resp.Error = apiErr
-		s.sendAPIErrResponse(ci, acc, subject, reply, string(rmsg), s.jsonResponse(&resp))
-		return
-	}
-
 	js.mu.Lock()
 	defer js.mu.Unlock()
 
@@ -8247,7 +8217,10 @@ func (s *Server) jsClusteredStreamRestoreRequest(
 		return
 	}
 
-	if err := js.jsClusteredStreamLimitsCheck(acc, &cfg); err != nil {
+	cfg := &req.Config
+	resp := JSApiStreamRestoreResponse{ApiResponse: ApiResponse{Type: JSApiStreamRestoreResponseType}}
+
+	if err := js.jsClusteredStreamLimitsCheck(acc, cfg); err != nil {
 		resp.Error = err
 		s.sendAPIErrResponse(ci, acc, subject, reply, string(rmsg), s.jsonResponse(&resp))
 		return
@@ -8260,7 +8233,7 @@ func (s *Server) jsClusteredStreamRestoreRequest(
 	}
 
 	// Raft group selection and placement.
-	rg, err := js.createGroupForStream(ci, &cfg)
+	rg, err := js.createGroupForStream(ci, cfg)
 	if err != nil {
 		resp.Error = NewJSClusterNoPeersError(err)
 		s.sendAPIErrResponse(ci, acc, subject, reply, string(rmsg), s.jsonResponse(&resp))
@@ -8268,7 +8241,7 @@ func (s *Server) jsClusteredStreamRestoreRequest(
 	}
 	// Pick a preferred leader.
 	rg.setPreferred(s)
-	sa := &streamAssignment{Group: rg, Sync: syncSubjForStream(), Config: &cfg, Subject: subject, Reply: reply, Client: ci, Created: time.Now().UTC()}
+	sa := &streamAssignment{Group: rg, Sync: syncSubjForStream(), Config: cfg, Subject: subject, Reply: reply, Client: ci, Created: time.Now().UTC()}
 	// Now add in our restore state and pre-select a peer to handle the actual receipt of the snapshot.
 	sa.Restore = &req.State
 	if err := cc.meta.Propose(encodeAddStreamAssignment(sa)); err == nil {
@@ -8335,9 +8308,6 @@ func (s *Server) jsClusteredStreamListRequest(acc *Account, ci *ClientInfo, filt
 	}
 
 	scnt := len(streams)
-	if offset < 0 {
-		offset = 0
-	}
 	if offset > scnt {
 		offset = scnt
 	}
@@ -8488,9 +8458,6 @@ func (s *Server) jsClusteredConsumerListRequest(acc *Account, ci *ClientInfo, of
 	}
 
 	ocnt := len(consumers)
-	if offset < 0 {
-		offset = 0
-	}
 	if offset > ocnt {
 		offset = ocnt
 	}

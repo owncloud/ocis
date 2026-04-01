@@ -131,22 +131,19 @@ func detectProxyProtoVersion(conn net.Conn) (version int, header []byte, err err
 
 // readProxyProtoV1Header parses PROXY protocol v1 text format.
 // Expects the "PROXY " prefix (6 bytes) to have already been consumed.
-// Returns any bytes that were read past the trailing CRLF so the caller can
-// replay them into the next protocol layer.
-func readProxyProtoV1Header(conn net.Conn) (*proxyProtoAddr, []byte, error) {
+func readProxyProtoV1Header(conn net.Conn) (*proxyProtoAddr, error) {
 	// Read rest of line (max 107 bytes total, already read 6)
 	maxRemaining := proxyProtoV1MaxLineLen - 6
 
 	// Read up to maxRemaining bytes at once (more efficient than byte-by-byte)
 	buf := make([]byte, maxRemaining)
 	var line []byte
-	var remaining []byte
 
 	for len(line) < maxRemaining {
 		// Read available data
 		n, err := conn.Read(buf[len(line):])
 		if err != nil {
-			return nil, nil, fmt.Errorf("failed to read v1 line: %w", err)
+			return nil, fmt.Errorf("failed to read v1 line: %w", err)
 		}
 
 		line = buf[:len(line)+n]
@@ -154,8 +151,7 @@ func readProxyProtoV1Header(conn net.Conn) (*proxyProtoAddr, []byte, error) {
 		// Look for CRLF in what we've read so far
 		for i := 0; i < len(line)-1; i++ {
 			if line[i] == '\r' && line[i+1] == '\n' {
-				// Found CRLF - keep any over-read bytes for the client parser.
-				remaining = append(remaining, line[i+2:]...)
+				// Found CRLF - extract just the line portion
 				line = line[:i]
 				goto foundCRLF
 			}
@@ -163,7 +159,7 @@ func readProxyProtoV1Header(conn net.Conn) (*proxyProtoAddr, []byte, error) {
 	}
 
 	// Exceeded max length without finding CRLF
-	return nil, nil, fmt.Errorf("%w: v1 line too long", errProxyProtoInvalid)
+	return nil, fmt.Errorf("%w: v1 line too long", errProxyProtoInvalid)
 
 foundCRLF:
 	// Get parts from the protocol
@@ -171,17 +167,17 @@ foundCRLF:
 
 	// Validate format
 	if len(parts) < 1 {
-		return nil, nil, fmt.Errorf("%w: invalid v1 format", errProxyProtoInvalid)
+		return nil, fmt.Errorf("%w: invalid v1 format", errProxyProtoInvalid)
 	}
 
 	// Handle UNKNOWN (health check, like v2 LOCAL)
 	if parts[0] == proxyProtoV1Unknown {
-		return nil, remaining, nil
+		return nil, nil
 	}
 
 	// Must have exactly 5 parts: protocol, src-ip, dst-ip, src-port, dst-port
 	if len(parts) != 5 {
-		return nil, nil, fmt.Errorf("%w: invalid v1 format", errProxyProtoInvalid)
+		return nil, fmt.Errorf("%w: invalid v1 format", errProxyProtoInvalid)
 	}
 
 	protocol := parts[0]
@@ -189,29 +185,29 @@ foundCRLF:
 	dstIP := net.ParseIP(parts[2])
 
 	if srcIP == nil || dstIP == nil {
-		return nil, nil, fmt.Errorf("%w: invalid address", errProxyProtoInvalid)
+		return nil, fmt.Errorf("%w: invalid address", errProxyProtoInvalid)
 	}
 
 	// Parse ports
 	srcPort, err := strconv.ParseUint(parts[3], 10, 16)
 	if err != nil {
-		return nil, nil, fmt.Errorf("invalid source port: %w", err)
+		return nil, fmt.Errorf("invalid source port: %w", err)
 	}
 
 	dstPort, err := strconv.ParseUint(parts[4], 10, 16)
 	if err != nil {
-		return nil, nil, fmt.Errorf("invalid dest port: %w", err)
+		return nil, fmt.Errorf("invalid dest port: %w", err)
 	}
 
 	// Validate protocol matches IP version
 	if protocol == proxyProtoV1TCP4 && srcIP.To4() == nil {
-		return nil, nil, fmt.Errorf("%w: TCP4 with IPv6 address", errProxyProtoInvalid)
+		return nil, fmt.Errorf("%w: TCP4 with IPv6 address", errProxyProtoInvalid)
 	}
 	if protocol == proxyProtoV1TCP6 && srcIP.To4() != nil {
-		return nil, nil, fmt.Errorf("%w: TCP6 with IPv4 address", errProxyProtoInvalid)
+		return nil, fmt.Errorf("%w: TCP6 with IPv4 address", errProxyProtoInvalid)
 	}
 	if protocol != proxyProtoV1TCP4 && protocol != proxyProtoV1TCP6 {
-		return nil, nil, fmt.Errorf("%w: invalid protocol %s", errProxyProtoInvalid, protocol)
+		return nil, fmt.Errorf("%w: invalid protocol %s", errProxyProtoInvalid, protocol)
 	}
 
 	return &proxyProtoAddr{
@@ -219,27 +215,25 @@ foundCRLF:
 		srcPort: uint16(srcPort),
 		dstIP:   dstIP,
 		dstPort: uint16(dstPort),
-	}, remaining, nil
+	}, nil
 }
 
 // readProxyProtoHeader reads and parses PROXY protocol (v1 or v2) from the connection.
 // Automatically detects version and routes to appropriate parser.
 // If the command is LOCAL/UNKNOWN (health check), it returns nil for addr and no error.
 // If the command is PROXY, it returns the parsed address information.
-// It also returns any bytes that were read past the v1 header terminator so the
-// caller can replay them into the normal client parser.
 // The connection must be fresh (no data read yet).
-func readProxyProtoHeader(conn net.Conn) (*proxyProtoAddr, []byte, error) {
+func readProxyProtoHeader(conn net.Conn) (*proxyProtoAddr, error) {
 	// Set read deadline to prevent hanging on slow/malicious clients
 	if err := conn.SetReadDeadline(time.Now().Add(proxyProtoReadTimeout)); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	defer conn.SetReadDeadline(time.Time{})
 
 	// Detect version
 	version, firstBytes, err := detectProxyProtoVersion(conn)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	switch version {
@@ -250,26 +244,25 @@ func readProxyProtoHeader(conn net.Conn) (*proxyProtoAddr, []byte, error) {
 		// Read rest of v2 signature (bytes 6-11, total 6 more bytes)
 		remaining := make([]byte, 6)
 		if _, err := io.ReadFull(conn, remaining); err != nil {
-			return nil, nil, fmt.Errorf("failed to read v2 signature: %w", err)
+			return nil, fmt.Errorf("failed to read v2 signature: %w", err)
 		}
 
 		// Verify full signature
 		fullSig := string(firstBytes) + string(remaining)
 		if fullSig != proxyProtoV2Sig {
-			return nil, nil, fmt.Errorf("%w: invalid signature", errProxyProtoInvalid)
+			return nil, fmt.Errorf("%w: invalid signature", errProxyProtoInvalid)
 		}
 
 		// Read rest of header: ver/cmd, fam/proto, addr-len (4 bytes)
 		header := make([]byte, 4)
 		if _, err := io.ReadFull(conn, header); err != nil {
-			return nil, nil, fmt.Errorf("failed to read v2 header: %w", err)
+			return nil, fmt.Errorf("failed to read v2 header: %w", err)
 		}
 
 		// Continue with parsing
-		addr, err := parseProxyProtoV2Header(conn, header)
-		return addr, nil, err
+		return parseProxyProtoV2Header(conn, header)
 	default:
-		return nil, nil, fmt.Errorf("unsupported PROXY protocol version: %d", version)
+		return nil, fmt.Errorf("unsupported PROXY protocol version: %d", version)
 	}
 }
 

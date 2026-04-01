@@ -36,7 +36,7 @@ func (s *server) processRequestBytes(reqData []byte) []byte {
 		return []byte{agentFailure}
 	}
 
-	if rep == nil {
+	if err == nil && rep == nil {
 		return []byte{agentSuccess}
 	}
 

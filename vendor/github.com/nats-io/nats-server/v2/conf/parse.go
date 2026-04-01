@@ -114,28 +114,42 @@ func ParseFileWithChecks(fp string) (map[string]any, error) {
 	return p.mapping, nil
 }
 
-// configDigest returns a digest for the parsed config.
-func configDigest(m map[string]any) (string, error) {
-	digest := sha256.New()
-	e := json.NewEncoder(digest)
-	if err := e.Encode(m); err != nil {
-		return _EMPTY_, err
+// cleanupUsedEnvVars will recursively remove all already used
+// environment variables which might be in the parsed tree.
+func cleanupUsedEnvVars(m map[string]any) {
+	for k, v := range m {
+		t := v.(*token)
+		if t.usedVariable {
+			delete(m, k)
+			continue
+		}
+		// Cleanup any other env var that is still in the map.
+		if tm, ok := t.value.(map[string]any); ok {
+			cleanupUsedEnvVars(tm)
+		}
 	}
-	return fmt.Sprintf("sha256:%x", digest.Sum(nil)), nil
 }
 
 // ParseFileWithChecksDigest returns the processed config and a digest
 // that represents the configuration.
 func ParseFileWithChecksDigest(fp string) (map[string]any, string, error) {
-	m, err := ParseFileWithChecks(fp)
+	data, err := os.ReadFile(fp)
 	if err != nil {
 		return nil, _EMPTY_, err
 	}
-	digest, err := configDigest(m)
+	p, err := parse(string(data), fp, true)
 	if err != nil {
 		return nil, _EMPTY_, err
 	}
-	return m, digest, nil
+	// Filter out any environment variables before taking the digest.
+	cleanupUsedEnvVars(p.mapping)
+	digest := sha256.New()
+	e := json.NewEncoder(digest)
+	err = e.Encode(p.mapping)
+	if err != nil {
+		return nil, _EMPTY_, err
+	}
+	return p.mapping, fmt.Sprintf("sha256:%x", digest.Sum(nil)), nil
 }
 
 type token struct {
