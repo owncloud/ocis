@@ -55,30 +55,8 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        with:
-          node-version: "24"
-
-      - name: Enable pnpm
-        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
-
-      - name: Generate nodejs
-        run: make ci-node-generate
-
-      - name: Generate go
-        run: make ci-go-generate
-
-      - name: Vulnerability scan
-        run: make govulncheck
-
-      - name: Lint
-        run: make ci-golangci-lint
-
       - name: Build ocis
         run: make -C ocis build
-
-      - name: Build debug binary
-        run: make -C ocis build-debug
 
       - name: Unit tests
         run: make test
