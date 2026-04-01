@@ -59,7 +59,7 @@ Feature: List upload sessions via CLI command
 
   Scenario: list and cleanup the expired upload sessions
     Given a file "large.zip" with the size of "2GB" has been created locally
-    And the config "STORAGE_USERS_UPLOAD_EXPIRATION" has been set to "3" for "storageuser" service
+    And the config "STORAGE_USERS_UPLOAD_EXPIRATION" has been set to "1" for "storageuser" service
     And user "Alice" has uploaded a file from "filesForUpload/textfile.txt" to "file.txt" via TUS inside of the space "Personal" using the WebDAV API
     And user "Alice" has tried to upload file "filesForUpload/large.zip" to "large.zip" inside space "Personal" via TUS
     When the administrator lists all the upload sessions with flag "expired"
@@ -203,7 +203,7 @@ Feature: List upload sessions via CLI command
 
   Scenario: restart expired upload sessions
     Given a file "large.zip" with the size of "2GB" has been created locally
-    And the config "STORAGE_USERS_UPLOAD_EXPIRATION" has been set to "3" for "storageuser" service
+    And the config "STORAGE_USERS_UPLOAD_EXPIRATION" has been set to "1" for "storageuser" service
     And user "Alice" has uploaded a file from "filesForUpload/textfile.txt" to "file.txt" via TUS inside of the space "Personal" using the WebDAV API
     And user "Alice" has tried to upload file "filesForUpload/large.zip" to "large.zip" inside space "Personal" via TUS
     When the administrator restarts the expired upload sessions using the CLI
