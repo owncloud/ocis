@@ -27,6 +27,7 @@ func TestFromCS3Status(t *testing.T) {
 		{&cs3rpc.Status{Code: cs3rpc.Code_CODE_PERMISSION_DENIED, Message: "msg"}, nil, nil, errorcode.New(errorcode.AccessDenied, "msg")},
 		{&cs3rpc.Status{Code: cs3rpc.Code_CODE_UNAUTHENTICATED, Message: "msg"}, nil, nil, errorcode.New(errorcode.Unauthenticated, "msg")},
 		{&cs3rpc.Status{Code: cs3rpc.Code_CODE_INVALID_ARGUMENT, Message: "msg"}, nil, nil, errorcode.New(errorcode.InvalidRequest, "msg")},
+		{&cs3rpc.Status{Code: cs3rpc.Code_CODE_INVALID_ARGUMENT, Message: "no share permission"}, nil, nil, errorcode.New(errorcode.AccessDenied, "no share permission")},
 		{&cs3rpc.Status{Code: cs3rpc.Code_CODE_ALREADY_EXISTS, Message: "msg"}, nil, nil, errorcode.New(errorcode.NameAlreadyExists, "msg")},
 		{&cs3rpc.Status{Code: cs3rpc.Code_CODE_FAILED_PRECONDITION, Message: "msg"}, nil, nil, errorcode.New(errorcode.InvalidRequest, "msg")},
 		{&cs3rpc.Status{Code: cs3rpc.Code_CODE_UNIMPLEMENTED, Message: "msg"}, nil, nil, errorcode.New(errorcode.NotSupported, "msg")},
