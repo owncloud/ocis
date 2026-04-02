@@ -39,6 +39,36 @@ class SearchContext implements Context {
 	private FeatureContext $featureContext;
 
 	/**
+	 * Retry search until results are non-empty or timeout is reached.
+	 * Indexing of newly uploaded files in ocis is async, so a single
+	 * fixed sleep is not reliable — poll instead.
+	 */
+	private function searchWithRetry(
+		string $user,
+		string $pattern,
+		?string $limit = null,
+		?string $scopeType = null,
+		?string $scope = null,
+		?string $spaceName = null,
+		?TableNode $properties = null,
+	): ResponseInterface {
+		// Indexing is async — poll until results appear.
+		// Initial wait 3s, then retry every 2s, up to ~13s total.
+		$maxAttempts = STANDARD_RETRY_COUNT;
+		$response = null;
+		for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
+			\sleep($attempt === 0 ? 3 : 2);
+			$response = $this->searchFiles($user, $pattern, $limit, $scopeType, $scope, $spaceName, $properties);
+			$parsed = HttpRequestHelper::parseResponseAsXml($response);
+			if (\is_array($parsed) && isset($parsed["value"]) && !empty($parsed["value"])) {
+				return $response;
+			}
+		}
+		// return last response even if empty — let the assertion step produce the failure message
+		return $response;
+	}
+
+	/**
 	 * @param string $user
 	 * @param string $pattern
 	 * @param string|null $limit
@@ -146,10 +176,7 @@ class SearchContext implements Context {
 		?string $limit = null,
 		?TableNode $properties = null,
 	): void {
-		// NOTE: because indexing of newly uploaded files or directories with ocis is decoupled and occurs asynchronously
-		// short wait is necessary before searching
-		sleep(5);
-		$response = $this->searchFiles($user, $pattern, $limit, null, null, null, $properties);
+		$response = $this->searchWithRetry($user, $pattern, $limit, null, null, null, $properties);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -269,10 +296,7 @@ class SearchContext implements Context {
 		string $scope,
 		?string $spaceName = null,
 	): void {
-		// NOTE: since indexing of newly uploaded files or directories with ocis is decoupled and occurs asynchronously,
-		// a short wait is necessary before searching
-		sleep(5);
-		$response = $this-> searchFiles($user, $pattern, null, $scopeType, $scope, $spaceName);
+		$response = $this->searchWithRetry($user, $pattern, null, $scopeType, $scope, $spaceName);
 		$this->featureContext->setResponse($response);
 	}
 }
