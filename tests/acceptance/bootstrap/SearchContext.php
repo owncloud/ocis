@@ -42,6 +42,16 @@ class SearchContext implements Context {
 	 * Retry search until results are non-empty or timeout is reached.
 	 * Indexing of newly uploaded files in ocis is async, so a single
 	 * fixed sleep is not reliable — poll instead.
+	 *
+	 * @param string $user
+	 * @param string $pattern
+	 * @param string|null $limit
+	 * @param string|null $scopeType
+	 * @param string|null $scope
+	 * @param string|null $spaceName
+	 * @param TableNode|null $properties
+	 *
+	 * @return ResponseInterface
 	 */
 	private function searchWithRetry(
 		string $user,
