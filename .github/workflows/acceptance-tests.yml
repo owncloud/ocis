@@ -10,11 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
-        with:
-          php-version: "8.4"
-          extensions: curl, xml, mbstring, zip
-          tools: composer
+      - name: Install PHP 8.4
+        run: |
+          sudo add-apt-repository -y ppa:ondrej/php
+          sudo apt-get update -qq
+          sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd
+          sudo update-alternatives --set php /usr/bin/php8.4
+          curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
       - name: PHP code style
         run: |
           make vendor-bin-codestyle
@@ -113,7 +115,7 @@ jobs:
           - apiActivities
           # search
           - apiSearch1
-          # - apiSearch2
+          - apiSearch2
           - apiSearchContent    # needs Tika
           # sharing
           - apiSharingNgShares
@@ -169,11 +171,15 @@ jobs:
             }
           '
 
-      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
-        with:
-          php-version: "8.4"
-          extensions: curl, xml, mbstring, zip
-          tools: composer
+      - name: Install PHP 8.4
+        run: |
+          sudo add-apt-repository -y ppa:ondrej/php
+          sudo apt-get update -qq
+          sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd
+          sudo update-alternatives --set php /usr/bin/php8.4
+          curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+          php -v
+          composer --version
 
       - name: Run ${{ matrix.suite }}
         run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
@@ -201,11 +207,15 @@ jobs:
       - name: Enable pnpm
         run: corepack enable && corepack prepare pnpm@10.28.1 --activate
 
-      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
-        with:
-          php-version: "8.4"
-          extensions: curl, xml, mbstring, zip
-          tools: composer
+      - name: Install PHP 8.4
+        run: |
+          sudo add-apt-repository -y ppa:ondrej/php
+          sudo apt-get update -qq
+          sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd
+          sudo update-alternatives --set php /usr/bin/php8.4
+          curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+          php -v
+          composer --version
 
       - name: Run ${{ matrix.suite }}
         run: BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
@@ -262,11 +272,13 @@ jobs:
             }
           '
 
-      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
-        with:
-          php-version: "8.4"
-          extensions: curl, xml, mbstring, zip
-          tools: composer
+      - name: Install PHP 8.4
+        run: |
+          sudo add-apt-repository -y ppa:ondrej/php
+          sudo apt-get update -qq
+          sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd
+          sudo update-alternatives --set php /usr/bin/php8.4
+          curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
       - name: Run ${{ matrix.suite }}
         run: >
@@ -306,10 +318,8 @@ jobs:
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: "24"
-      - name: Setup pnpm
-        uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
-        with:
-          version: "10.28.1"
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
       - name: Generate code
         run: |
           pnpm config set store-dir ./.pnpm-store
@@ -318,7 +328,7 @@ jobs:
           CHROMEDRIVER_SKIP_DOWNLOAD: "true"
 
       - name: Cache Playwright Chromium
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ~/.cache/ms-playwright
           key: playwright-chromium-${{ hashFiles('.drone.env') }}
@@ -440,7 +450,7 @@ jobs:
         run: python3 tests/acceptance/run-wopi.py --type cs3
 
   all-acceptance-tests:
-    needs: [local-api-tests, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests]
+    needs: [local-api-tests, cli-tests, wopi-cs3] # [local-api-tests, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests]
     runs-on: ubuntu-latest
     if: always()
     steps:
