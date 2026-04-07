@@ -119,6 +119,7 @@ LOCAL_API_TESTS = {
             "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
             "NOTIFICATIONS_SMTP_INSECURE": "true",
             "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
+            "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
         },
     },
     "authApp": {
@@ -211,6 +212,7 @@ def base_server_env(repo_root: Path, ocis_url: str, ocis_config_dir: str) -> dic
         "OCIS_EVENTS_ENABLE_TLS": "false",
         "NATS_NATS_HOST": "0.0.0.0",
         "NATS_NATS_PORT": "9233",
+        "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
         "EVENTHISTORY_STORE": "memory",
         "OCIS_TRANSLATION_PATH": str(repo_root / "tests/config/translations"),
@@ -323,6 +325,20 @@ def _tcp_ready(host: str, port: int) -> bool:
 def clamav_healthy() -> bool:
     return _tcp_ready("localhost", 3310)
 
+
+
+def load_env_file(path: Path) -> dict:
+    """Parse a bash-style env file (export KEY=value) into a dict."""
+    env = {}
+    for line in path.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or line.startswith("!"):
+            continue
+        line = line.removeprefix("export ").strip()
+        if "=" in line:
+            k, v = line.split("=", 1)
+            env[k.strip()] = v.strip()
+    return env
 
 
 def run(cmd: list, env: dict = None, check: bool = True):
@@ -460,14 +476,15 @@ def main() -> int:
         fed_env = {**os.environ}
         fed_env.update(base_server_env(repo_root, ocis_fed_url, str(fed_config_dir)))
         fed_env.update(cfg["extraServerEnvironment"])
+        # load federation port mappings from canonical env file (single source of truth)
+        fed_env.update(load_env_file(repo_root / "tests/config/local/.env-federation"))
+        # CI-specific overrides
         fed_env.update({
             "OCIS_URL": ocis_fed_url,
-            "PROXY_HTTP_ADDR": "0.0.0.0:10200",
             "OCIS_BASE_DATA_PATH": str(fed_data_dir),
-            # use different ports to avoid conflicts with primary
-            "GATEWAY_GRPC_ADDR": "0.0.0.0:10142",
-            "NATS_NATS_PORT": "10233",
-            "NATS_NATS_HOST": "0.0.0.0",
+            "OCIS_CONFIG_DIR": str(fed_config_dir),
+            "OCIS_RUNTIME_PORT": "10250",
+            "MICRO_REGISTRY_ADDRESS": "127.0.0.1:10233",
         })
 
         # init federation ocis with separate config
