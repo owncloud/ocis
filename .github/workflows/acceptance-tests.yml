@@ -152,7 +152,8 @@ jobs:
       - name: Install libcurl 8.12.0 from source
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
+          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
+          sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
           cd /tmp
           curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
           tar xzf curl-8.12.0.tar.gz
@@ -253,7 +254,8 @@ jobs:
       - name: Install libcurl 8.12.0 from source
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
+          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
+          sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
           cd /tmp
           curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
           tar xzf curl-8.12.0.tar.gz
