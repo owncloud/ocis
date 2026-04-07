@@ -87,6 +87,8 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"prefix":                        cfg.OCMD.Prefix,
 					"gatewaysvc":                    cfg.Reva.Address,
 					"expose_recipient_display_name": cfg.OCMD.ExposeRecipientDisplayName,
+					"service_account_id":            cfg.ServiceAccount.ID,
+					"service_account_secret":        cfg.ServiceAccount.Secret,
 				},
 				"dataprovider": map[string]interface{}{
 					"prefix": "data",

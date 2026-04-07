@@ -28,6 +28,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	ocmcore "github.com/cs3org/go-cs3apis/cs3/ocm/core/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/go-chi/render"
 	"github.com/owncloud/reva/v2/pkg/appctx"
@@ -43,7 +44,9 @@ const (
 // var validate = validator.New()
 
 type notifHandler struct {
-	gatewaySelector *pool.Selector[gateway.GatewayAPIClient]
+	gatewaySelector      *pool.Selector[gateway.GatewayAPIClient]
+	serviceAccountID     string
+	serviceAccountSecret string
 }
 
 func (h *notifHandler) init(c *config) error {
@@ -52,6 +55,8 @@ func (h *notifHandler) init(c *config) error {
 		return err
 	}
 	h.gatewaySelector = gatewaySelector
+	h.serviceAccountID = c.ServiceAccountID
+	h.serviceAccountSecret = c.ServiceAccountSecret
 
 	return nil
 }
@@ -161,6 +166,7 @@ func (h *notifHandler) handleShareUnshared(ctx context.Context, req *notificatio
 	return res.GetStatus(), nil
 }
 
+// Current implementation supports only WebDAV protocol permissions update
 func (h *notifHandler) handleShareChangePermission(ctx context.Context, req *notificationRequest) (*rpc.Status, error) {
 	gatewayClient, err := h.gatewaySelector.Next()
 	if err != nil {
@@ -171,17 +177,67 @@ func (h *notifHandler) handleShareChangePermission(ctx context.Context, req *not
 		return nil, fmt.Errorf("error getting protocols from notification")
 	}
 
+	// get the grantee user ID object
+	granteeUser, err := getUserIDFromOCMUser(req.Notification.Grantee)
+	if err != nil {
+		return nil, fmt.Errorf("error getting grantee user id: %w", err)
+	}
+
+	// authenticate as a service account
+	authCtx, err := utils.GetServiceUserContextWithContext(ctx, gatewayClient, h.serviceAccountID, h.serviceAccountSecret)
+	if err != nil {
+		return nil, fmt.Errorf("error authenticating as service account: %w", err)
+	}
+	ctx = authCtx
+
 	o := &typesv1beta1.Opaque{}
 	utils.AppendPlainToOpaque(o, "grantee", req.Notification.Grantee)
 	utils.AppendPlainToOpaque(o, "resourceType", req.ResourceType)
 
+	getRes, err := gatewayClient.GetReceivedOCMShare(ctx, &ocm.GetReceivedOCMShareRequest{
+		Opaque: utils.AppendJSONToOpaque(nil, "userid", granteeUser),
+		Ref: &ocm.ShareReference{
+			Spec: &ocm.ShareReference_Id{
+				Id: &ocm.ShareId{
+					OpaqueId: req.ProviderId,
+				},
+			},
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error getting received ocm share: %w", err)
+	}
+	if getRes.Status.Code != rpc.Code_CODE_OK {
+		return getRes.Status, nil
+	}
+
+	share := getRes.Share
+	newProtocols := getProtocols(req.Notification.Protocols, o)
+
+	var newWebdav *ocm.WebDAVProtocol
+	for _, p := range newProtocols {
+		if wd := p.GetWebdavOptions(); wd != nil {
+			newWebdav = wd
+			break
+		}
+	}
+
+	if newWebdav != nil && newWebdav.Permissions != nil {
+		for _, p := range share.Protocols {
+			if wd := p.GetWebdavOptions(); wd != nil {
+				wd.Permissions = newWebdav.Permissions
+				break
+			}
+		}
+	}
+
 	res, err := gatewayClient.UpdateOCMCoreShare(ctx, &ocmcore.UpdateOCMCoreShareRequest{
 		OcmShareId: req.ProviderId,
-		Protocols:  getProtocols(req.Notification.Protocols, o),
+		Protocols:  share.Protocols,
 		Opaque:     o,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("error calling DeleteOCMCoreShare: %w", err)
+		return nil, fmt.Errorf("error calling UpdateOCMCoreShare: %w", err)
 	}
 	return res.GetStatus(), nil
 }
