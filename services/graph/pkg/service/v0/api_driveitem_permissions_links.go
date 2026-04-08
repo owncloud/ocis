@@ -82,8 +82,8 @@ func (s DriveItemPermissionsService) CreateLink(ctx context.Context, driveItemID
 		s.logger.Error().Err(err).Msg("transport error, could not create link")
 		return libregraph.Permission{}, errorcode.New(errorcode.GeneralException, err.Error())
 	}
-	if statusCode := createResp.GetStatus().GetCode(); statusCode != rpc.Code_CODE_OK {
-		return libregraph.Permission{}, errorcode.NewFromStatusCode(statusCode, createResp.Status.Message)
+	if err := errorcode.FromCS3Status(createResp.GetStatus(), nil); err != nil {
+		return libregraph.Permission{}, err
 	}
 	link := createResp.GetShare()
 	perm, err := s.libreGraphPermissionFromCS3PublicShare(link)
