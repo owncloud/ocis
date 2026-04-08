@@ -235,7 +235,7 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
       - run: |
-          make -C ocis release-${{ matrix.os }}
+          make -C ocis release-${{ matrix.os }} OUTPUT=${{ needs.determine-release-type.outputs.version }}
           make -C ocis release-finish
           [[ "${{ matrix.os }}" == "linux" ]] && \
             cp assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf ocis/dist/release/
