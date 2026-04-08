@@ -231,7 +231,8 @@ jobs:
         suite:
           - "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
           - "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
-          - "coreApiSharees,coreApiSharePublicLink2"
+          - "coreApiSharees"
+          - "coreApiSharePublicLink2"
           - "coreApiShareOperationsToShares1,coreApiShareOperationsToShares2,coreApiSharePublicLink1,coreApiShareCreateSpecialToShares1,coreApiShareCreateSpecialToShares2,coreApiShareUpdateToShares"
           - "coreApiTrashbin,coreApiTrashbinRestore,coreApiWebdavEtagPropagation1,coreApiWebdavEtagPropagation2"
           - "coreApiWebdavDelete,coreApiWebdavOperations,coreApiWebdavMove2"
