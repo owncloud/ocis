@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - 'v*'
+    branches:
+      - 'feat/release-pipeline**'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -46,7 +48,7 @@ jobs:
       dry_run: ${{ steps.version.outputs.dry_run }}
     steps:
       - name: Checkout code
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && inputs.version_override == '' }}
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run && inputs.version_override == '') || github.ref_type == 'branch' }}
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
@@ -65,6 +67,13 @@ jobs:
               IFS='.' read -r MAJOR MINOR PATCH <<< "${LATEST_VERSION%%-*}"
               VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))-dryrun"
             fi
+          elif [[ "${{ github.ref_type }}" == "branch" ]]; then
+            # Branch push (e.g. feat/release-pipeline**) — always a dry-run
+            DRY_RUN=true
+            LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+            LATEST_VERSION="${LATEST_TAG#v}"
+            IFS='.' read -r MAJOR MINOR PATCH <<< "${LATEST_VERSION%%-*}"
+            VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))-dryrun"
           else
             VERSION=${GITHUB_REF#refs/tags/v}
             DRY_RUN=false
