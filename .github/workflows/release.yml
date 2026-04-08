@@ -9,167 +9,97 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Dry run — build everything but skip Docker push and GitHub Release creation'
+        description: 'Skip Docker push and GitHub Release creation'
         type: boolean
         default: true
       version_override:
-        description: 'Version to use for dry-run (e.g. 8.0.2-dryrun). Leave empty to auto-detect from latest tag.'
+        description: 'Version override (leave empty to auto-detect from latest tag)'
         type: string
         default: ''
 
 env:
-  # Production release tags (semver patterns)
   PRODUCTION_RELEASE_TAGS: '5.0,7,8'
-
-  # Docker configuration
   DOCKER_REPO_ROLLING: owncloud/ocis-rolling
   DOCKER_REPO_PRODUCTION: owncloud/ocis
-
-  # Build configuration
   GO_VERSION: '1.25.7'
   NODE_VERSION: '24'
-  PHP_VERSION: '8.4'
   PNPM_VERSION: '10.11.0'
 
 jobs:
-  # ============================================================================
-  # PREPARATION JOBS
-  # ============================================================================
-
   determine-release-type:
-    name: Determine Release Type
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.version.outputs.version }}
-      is_production: ${{ steps.check.outputs.is_production }}
-      is_prerelease: ${{ steps.check.outputs.is_prerelease }}
-      release_folder: ${{ steps.check.outputs.release_folder }}
-      docker_repos: ${{ steps.check.outputs.docker_repos }}
-      dry_run: ${{ steps.version.outputs.dry_run }}
+      version:      ${{ steps.info.outputs.version }}
+      is_production: ${{ steps.info.outputs.is_production }}
+      is_prerelease: ${{ steps.info.outputs.is_prerelease }}
+      docker_repos:  ${{ steps.info.outputs.docker_repos }}
+      dry_run:       ${{ steps.info.outputs.dry_run }}
     steps:
-      - name: Checkout code
-        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run && inputs.version_override == '') || github.ref_type == 'branch' }}
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        if: ${{ github.ref_type == 'branch' || (github.event_name == 'workflow_dispatch' && inputs.version_override == '') }}
         with:
           fetch-depth: 0
 
-      - name: Extract version
-        id: version
+      - id: info
         run: |
+          next_patch() {
+            local tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+            local ver="${tag#v}"; IFS='.' read -r M m p <<< "${ver%%-*}"
+            echo "${M}.${m}.$((p + 1))-dryrun"
+          }
+
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             DRY_RUN="${{ inputs.dry_run }}"
-            if [[ -n "${{ inputs.version_override }}" ]]; then
-              VERSION="${{ inputs.version_override }}"
-            else
-              # Auto-detect: bump patch of latest tag and append -dryrun
-              LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-              LATEST_VERSION="${LATEST_TAG#v}"
-              IFS='.' read -r MAJOR MINOR PATCH <<< "${LATEST_VERSION%%-*}"
-              VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))-dryrun"
-            fi
+            VERSION="${{ inputs.version_override }}"
+            [[ -z "$VERSION" ]] && VERSION=$(next_patch)
           elif [[ "${{ github.ref_type }}" == "branch" ]]; then
-            # Branch push (e.g. feat/release-pipeline**) — always a dry-run
             DRY_RUN=true
-            LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-            LATEST_VERSION="${LATEST_TAG#v}"
-            IFS='.' read -r MAJOR MINOR PATCH <<< "${LATEST_VERSION%%-*}"
-            VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))-dryrun"
+            VERSION=$(next_patch)
           else
-            VERSION=${GITHUB_REF#refs/tags/v}
+            VERSION="${GITHUB_REF#refs/tags/v}"
             DRY_RUN=false
           fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "dry_run=$DRY_RUN" >> $GITHUB_OUTPUT
-          echo "Version: $VERSION  Dry-run: $DRY_RUN"
 
-      - name: Check release type
-        id: check
-        run: |
-          VERSION="${{ steps.version.outputs.version }}"
-
-          # Check if production release
           IS_PRODUCTION=false
           for TAG in ${PRODUCTION_RELEASE_TAGS//,/ }; do
-            if [[ "$VERSION" == "$TAG"* ]]; then
-              IS_PRODUCTION=true
-              break
-            fi
+            [[ "$VERSION" == "$TAG"* ]] && IS_PRODUCTION=true && break
           done
-          echo "is_production=$IS_PRODUCTION" >> $GITHUB_OUTPUT
 
-          # Check if prerelease (contains -, like alpha/beta/rc)
-          IS_PRERELEASE=false
-          if [[ "$VERSION" == *"-"* ]]; then
-            IS_PRERELEASE=true
-          fi
-          echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+          [[ "$VERSION" == *"-"* ]] && IS_PRERELEASE=true || IS_PRERELEASE=false
 
-          # Determine release folder
-          if [[ "$IS_PRERELEASE" == "true" ]]; then
-            FOLDER="testing"
-          else
-            FOLDER="stable"
-          fi
-          echo "release_folder=$FOLDER" >> $GITHUB_OUTPUT
-
-          # Determine Docker repos
           if [[ "$IS_PRODUCTION" == "true" ]]; then
             REPOS=[\"$DOCKER_REPO_ROLLING\",\"$DOCKER_REPO_PRODUCTION\"]
           else
             REPOS=[\"$DOCKER_REPO_ROLLING\"]
           fi
-          echo "docker_repos=$REPOS" >> $GITHUB_OUTPUT
 
-          echo "Release Type Summary:"
-          echo "  Version: $VERSION"
-          echo "  Production: $IS_PRODUCTION"
-          echo "  Prerelease: $IS_PRERELEASE"
-          echo "  Folder: $FOLDER"
-          echo "  Docker Repos: $REPOS"
-
-  # ============================================================================
-  # CODE GENERATION
-  # ============================================================================
+          echo "version=$VERSION"         >> $GITHUB_OUTPUT
+          echo "dry_run=$DRY_RUN"         >> $GITHUB_OUTPUT
+          echo "is_production=$IS_PRODUCTION" >> $GITHUB_OUTPUT
+          echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+          echo "docker_repos=$REPOS"      >> $GITHUB_OUTPUT
 
   generate-code:
-    name: Generate code
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Setup Go
-        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version: ${{ env.GO_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install npm packages
-        run: npm install --silent -g yarn npx --force
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4
+      - run: npm install --silent -g yarn npx --force
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4
         with:
           version: ${{ env.PNPM_VERSION }}
-
-      - name: Generate Node.js code
-        run: |
-          pnpm config set store-dir ./.pnpm-store
-          make ci-node-generate
+      - run: pnpm config set store-dir ./.pnpm-store && make ci-node-generate
         env:
           CHROMEDRIVER_SKIP_DOWNLOAD: 'true'
-
-      - name: Generate Go code
-        run: make ci-go-generate
+      - run: make ci-go-generate
         env:
           BUF_TOKEN: ${{ secrets.BUF_API_TOKEN }}
-
-      - name: Upload generated code
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: generated-code
           path: |
@@ -177,96 +107,61 @@ jobs:
             !.git
           retention-days: 1
 
-  # ============================================================================
-  # DOCKER BUILDS
-  # ============================================================================
-
   docker-build:
-    name: Build Docker Image (${{ matrix.arch }}-${{ matrix.repo }})
-    runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-24.04' || matrix.arch == 'arm64' && 'ubuntu-24.04-arm' }}
+    name: docker-build (${{ matrix.arch }}, ${{ matrix.repo }})
+    runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     if: ${{ needs.determine-release-type.outputs.dry_run != 'true' }}
     needs: [determine-release-type, generate-code]
     outputs:
-      digest-amd64-rolling: ${{ steps.write-digest.outputs.digest-amd64-rolling }}
-      digest-arm64-rolling: ${{ steps.write-digest.outputs.digest-arm64-rolling }}
-      digest-amd64: ${{ steps.write-digest.outputs.digest-amd64 }}
-      digest-arm64: ${{ steps.write-digest.outputs.digest-arm64 }}
+      digest-amd64-rolling: ${{ steps.build.outputs.digest-amd64-rolling }}
+      digest-arm64-rolling: ${{ steps.build.outputs.digest-arm64-rolling }}
+      digest-amd64: ${{ steps.build.outputs.digest-amd64 }}
+      digest-arm64: ${{ steps.build.outputs.digest-arm64 }}
     strategy:
       matrix:
         arch: [amd64, arm64]
         repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Download generated code
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: generated-code
           path: .
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
-
-      - name: Login to DockerHub
-        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Setup Go
-        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+      - run: docker buildx create --use --name release-builder
+      - run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version: ${{ env.GO_VERSION }}
-
-      - name: Install additional packages
-        run: |
-          sudo apt update
-          sudo apt install -y libvips libvips-dev
-
-      - name: Build binary
-        run: make -C ocis release-linux-docker-${{ matrix.arch }}
+      - run: sudo apt-get update -q && sudo apt-get install -qy libvips libvips-dev
+      - run: make -C ocis release-linux-docker-${{ matrix.arch }}
         env:
           CGO_ENABLED: 1
           GOOS: linux
           ENABLE_VIPS: true
-
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
-        with:
-          images: ${{ matrix.repo }}
-          tags: |
-            type=semver,pattern={{version}},suffix=-linux-${{ matrix.arch }}
-            type=semver,pattern={{major}}.{{minor}},suffix=-linux-${{ matrix.arch }}
-            type=semver,pattern={{major}},suffix=-linux-${{ matrix.arch }}
-
-      - name: Build and push Docker image
-        id: build-and-push
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
-        with:
-          context: ocis
-          file: ocis/docker/Dockerfile.linux.${{ matrix.arch }}
-          platforms: linux/${{ matrix.arch }}
-          push: true
-          provenance: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            REVISION=${{ github.sha }}
-            VERSION=${{ needs.determine-release-type.outputs.version }}
-
-      - name: Write Digest
-        id: write-digest
+      - id: build
         run: |
-          if [[ "${{ matrix.repo }}" == *"rolling"* ]]; then
-            echo "digest-${{ matrix.arch }}-rolling=${{ steps.build-and-push.outputs.digest }}" >> $GITHUB_OUTPUT
-          else
-            echo "digest-${{ matrix.arch }}=${{ steps.build-and-push.outputs.digest }}" >> $GITHUB_OUTPUT
-          fi
+          VERSION="${{ needs.determine-release-type.outputs.version }}"
+          REPO="${{ matrix.repo }}"
+          ARCH="${{ matrix.arch }}"
+
+          docker buildx build \
+            --platform "linux/${ARCH}" \
+            --file "ocis/docker/Dockerfile.linux.${ARCH}" \
+            --push --provenance=false \
+            --build-arg "REVISION=${{ github.sha }}" \
+            --build-arg "VERSION=${VERSION}" \
+            -t "${REPO}:${VERSION}-linux-${ARCH}" \
+            -t "${REPO}:$(echo "$VERSION" | cut -d. -f1-2)-linux-${ARCH}" \
+            -t "${REPO}:$(echo "$VERSION" | cut -d. -f1)-linux-${ARCH}" \
+            ocis
+
+          DIGEST=$(docker buildx imagetools inspect "${REPO}:${VERSION}-linux-${ARCH}" --format '{{.Manifest.Digest}}')
+          [[ "${REPO}" == *"rolling"* ]] \
+            && echo "digest-${ARCH}-rolling=${DIGEST}" >> $GITHUB_OUTPUT \
+            || echo "digest-${ARCH}=${DIGEST}"         >> $GITHUB_OUTPUT
 
   docker-scan:
-    name: Scan Docker Image (${{ matrix.arch }}-${{ matrix.repo }})
+    name: docker-scan (${{ matrix.arch }}, ${{ matrix.repo }})
     runs-on: ubuntu-latest
     if: ${{ needs.determine-release-type.outputs.dry_run != 'true' }}
     needs: [determine-release-type, docker-build]
@@ -275,17 +170,13 @@ jobs:
         arch: [amd64]
         repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
     steps:
-      - name: Run Trivy vulnerability scanner on Docker image
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
-        with:
-          image-ref: ${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-${{ matrix.arch }}
-          scan-type: 'image'
-          format: 'table'
-          exit-code: '0'
-          severity: 'CRITICAL,HIGH'
+      - run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+          trivy image --format table --exit-code 0 --severity CRITICAL,HIGH \
+            "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-${{ matrix.arch }}"
 
   docker-manifest:
-    name: Create Docker Manifest (${{ matrix.repo }})
+    name: docker-manifest (${{ matrix.repo }})
     runs-on: ubuntu-latest
     if: ${{ needs.determine-release-type.outputs.dry_run != 'true' }}
     needs: [determine-release-type, docker-build]
@@ -293,32 +184,22 @@ jobs:
       matrix:
         repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
     steps:
-      - name: Login to DockerHub
-        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Create and push multiarch manifest (rolling)
-        uses: int128/docker-manifest-create-action@44422a4b046d55dc036df622039ed3aec43c613c # v2.17.0
-        if: ${{ contains(matrix.repo, 'rolling') }}
-        with:
-          tags: ${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}
-          sources: |
-            ${{ needs.docker-build.outputs.digest-amd64-rolling }}
-            ${{ needs.docker-build.outputs.digest-arm64-rolling }}
-
-      - name: Create and push multiarch manifest
-        uses: int128/docker-manifest-create-action@44422a4b046d55dc036df622039ed3aec43c613c # v2.17.0
-        if: ${{ ! contains(matrix.repo, 'rolling') }}
-        with:
-          tags: ${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}
-          sources: |
-            ${{ needs.docker-build.outputs.digest-amd64 }}
-            ${{ needs.docker-build.outputs.digest-arm64 }}
+      - run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      - if: ${{ contains(matrix.repo, 'rolling') }}
+        run: |
+          docker buildx imagetools create \
+            -t "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}" \
+            "${{ needs.docker-build.outputs.digest-amd64-rolling }}" \
+            "${{ needs.docker-build.outputs.digest-arm64-rolling }}"
+      - if: ${{ !contains(matrix.repo, 'rolling') }}
+        run: |
+          docker buildx imagetools create \
+            -t "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}" \
+            "${{ needs.docker-build.outputs.digest-amd64 }}" \
+            "${{ needs.docker-build.outputs.digest-arm64 }}"
 
   docker-readme:
-    name: Update Docker README
+    name: docker-readme (${{ matrix.repo }})
     runs-on: ubuntu-latest
     if: ${{ needs.determine-release-type.outputs.dry_run != 'true' }}
     needs: [determine-release-type, docker-manifest]
@@ -326,284 +207,155 @@ jobs:
       matrix:
         repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Update DockerHub README
-        uses: peter-evans/dockerhub-description@dc67fad7001ef9e8e3c124cb7a64e16d0a63d864 # v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: ${{ matrix.repo }}
-          short-description: Docker images for ownCloud Infinite Scale
-
-  # ============================================================================
-  # BINARY BUILDS
-  # ============================================================================
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - run: |
+          README=$(python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" < ocis/docker/README.md)
+          TOKEN=$(curl -sf -X POST -H 'Content-Type: application/json' \
+            -d "{\"username\":\"${{ secrets.DOCKER_USERNAME }}\",\"password\":\"${{ secrets.DOCKER_PASSWORD }}\"}" \
+            https://hub.docker.com/v2/users/login | python3 -c 'import sys,json; print(json.load(sys.stdin)["token"])')
+          curl -sf -X PATCH \
+            -H "Authorization: JWT ${TOKEN}" -H "Content-Type: application/json" \
+            -d "{\"full_description\": ${README}}" \
+            "https://hub.docker.com/v2/repositories/${{ matrix.repo }}/"
 
   build-binaries:
-    name: Build Binaries (${{ matrix.os }})
+    name: build-binaries (${{ matrix.os }})
     runs-on: ubuntu-latest
     needs: [determine-release-type, generate-code]
     strategy:
       matrix:
         os: [linux, darwin]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Download generated code
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: generated-code
           path: .
-
-      - name: Setup Go
-        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version: ${{ env.GO_VERSION }}
-
-      - name: Build binaries
-        run: make -C ocis release-${{ matrix.os }}
-
-      - name: Finish build
-        run: |
+      - run: |
+          make -C ocis release-${{ matrix.os }}
           make -C ocis release-finish
-          if [ "${{ matrix.os }}" == "linux" ]; then
+          [[ "${{ matrix.os }}" == "linux" ]] && \
             cp assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf ocis/dist/release/
-          fi
-
-      - name: Upload binaries
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: binaries-${{ matrix.os }}
           path: ocis/dist/release/*
           retention-days: 1
 
-  # ============================================================================
-  # SECURITY SCAN
-  # ============================================================================
-
   security-scan-trivy:
-    name: Trivy Filesystem Scan
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
-        with:
-          scan-type: 'fs'
-          format: 'table'
-          exit-code: '0'
-          severity: 'CRITICAL,HIGH'
-
-  # ============================================================================
-  # LICENSE CHECK
-  # ============================================================================
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+          trivy fs --format table --exit-code 0 --severity CRITICAL,HIGH .
 
   license-check:
-    name: Check and Upload Licenses
     runs-on: ubuntu-latest
     needs: [determine-release-type, generate-code]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Download generated code
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: generated-code
           path: .
-
-      - name: Setup Node.js
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      - name: Setup Go
-        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version: ${{ env.GO_VERSION }}
-
-      - name: Install pnpm
-        run: npm install --silent -g yarn npx "pnpm@$PNPM_VERSION" --force
-
-      - name: Check Node.js licenses
-        run: make ci-node-check-licenses
-
-      - name: Save Node.js licenses
-        run: make ci-node-save-licenses
-
-      - name: Check Go licenses
-        run: make ci-go-check-licenses
-
-      - name: Save Go licenses
-        run: make ci-go-save-licenses
-
-      - name: Create tarball
-        run: |
-          cd third-party-licenses
-          tar -czf ../third-party-licenses.tar.gz *
-
-      - name: Upload licenses artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - run: npm install --silent -g yarn npx "pnpm@$PNPM_VERSION" --force
+      - run: make ci-node-check-licenses && make ci-node-save-licenses
+      - run: make ci-go-check-licenses && make ci-go-save-licenses
+      - run: tar -czf third-party-licenses.tar.gz -C third-party-licenses .
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: third-party-licenses
           path: third-party-licenses.tar.gz
           retention-days: 1
 
-  # ============================================================================
-  # CHANGELOG GENERATION
-  # ============================================================================
-
   generate-changelog:
-    name: Generate Changelog
     runs-on: ubuntu-latest
     needs: [determine-release-type]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
-
-      - name: Setup Go
-        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version: ${{ env.GO_VERSION }}
-
-      - name: Generate changelog
-        run: |
-          VERSION="${{ needs.determine-release-type.outputs.version }}"
-          # Remove pre-release suffix for changelog
-          CHANGELOG_VERSION=$(echo $VERSION | cut -d'-' -f1)
-          make changelog CHANGELOG_VERSION=$CHANGELOG_VERSION
-
-      - name: Upload changelog
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - run: make changelog CHANGELOG_VERSION=$(echo "${{ needs.determine-release-type.outputs.version }}" | cut -d'-' -f1)
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: changelog
           path: ocis/dist/CHANGELOG.md
           retention-days: 1
 
-  # ============================================================================
-  # GITHUB RELEASE
-  # ============================================================================
-
   create-github-release:
-    name: Create GitHub Release
     runs-on: ubuntu-latest
-    needs:
-      - determine-release-type
-      - build-binaries
-      - license-check
-      - generate-changelog
+    needs: [determine-release-type, build-binaries, license-check, generate-changelog]
     steps:
-      - name: Download Linux binaries
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: binaries-linux
           path: release-assets
-
-      - name: Download Darwin binaries
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: binaries-darwin
           path: release-assets
-
-      - name: Download licenses
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: third-party-licenses
           path: release-assets
-
-      - name: Download changelog
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: changelog
           path: .
-
-      - name: Create GitHub Release
-        if: ${{ needs.determine-release-type.outputs.dry_run != 'true' }}
-        uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe # v2.6.1
-        with:
-          name: ${{ needs.determine-release-type.outputs.version }}
-          body_path: CHANGELOG.md
-          files: release-assets/*
-          prerelease: ${{ needs.determine-release-type.outputs.is_prerelease == 'true' }}
-          draft: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Dry-run summary
-        if: ${{ needs.determine-release-type.outputs.dry_run == 'true' }}
+      - if: ${{ needs.determine-release-type.outputs.dry_run != 'true' }}
         run: |
-          echo "## DRY RUN — artifacts that would be uploaded to a GitHub Release:"
+          [[ "${{ needs.determine-release-type.outputs.is_prerelease }}" == "true" ]] && PRERELEASE=--prerelease
+          gh release create "${{ needs.determine-release-type.outputs.version }}" \
+            --title "${{ needs.determine-release-type.outputs.version }}" \
+            --notes-file CHANGELOG.md \
+            ${PRERELEASE:-} release-assets/*
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - if: ${{ needs.determine-release-type.outputs.dry_run == 'true' }}
+        run: |
           find release-assets/ -type f | sort | while read f; do
-            size=$(stat -c%s "$f")
-            hash=$(sha256sum "$f" | awk '{print $1}')
-            printf "  %-60s  %s bytes  sha256:%s\n" "$(basename $f)" "$size" "$hash"
+            printf "  %-60s  %s  sha256:%s\n" "$(basename $f)" "$(stat -c%s $f) bytes" "$(sha256sum $f | awk '{print $1}')"
           done
 
-  # ============================================================================
-  # NOTIFICATION
-  # ============================================================================
-
   notify:
-    name: Notify Matrix room
     runs-on: ubuntu-latest
     if: always()
     needs:
       - determine-release-type
+      - generate-code
       - docker-build
       - docker-scan
       - docker-manifest
       - docker-readme
-      - generate-code
       - build-binaries
+      - security-scan-trivy
       - license-check
       - generate-changelog
       - create-github-release
-      - security-scan-trivy
     steps:
-    - name: Set short git commit SHA
-      run: echo "SHORT_SHA=`echo ${{ github.sha }} | cut -c1-8`" >> $GITHUB_ENV
-
-    - name: Decide whether the needed jobs succeeded or failed
-      id: check-state
-      continue-on-error: true
-      uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe # v1.2.2
-      with:
-        # docker jobs are skipped on dry-run — treat skip as success
-        allowed-skips: docker-build, docker-scan, docker-manifest, docker-readme
-        jobs: ${{ toJSON(needs) }}
-
-    - name: Set failure message
-      if: ${{ steps.check-state.outcome != 'success' }}
-      run: echo 'BUILD_STATUS=❌️ Failure' >> $GITHUB_ENV
-
-    - name: Set success message
-      if: ${{ steps.check-state.outcome == 'success' }}
-      run: echo 'BUILD_STATUS=✅ Success' >> $GITHUB_ENV
-
-    - name: Set build source default
-      run: echo 'BUILD_SOURCE=${{ github.ref_name }}' >> $GITHUB_ENV
-
-    - name: Set build source cron/schedule
-      if: github.event_name == 'schedule'
-      run: echo 'BUILD_SOURCE=nightly-${{ github.ref_name }}' >> $GITHUB_ENV
-
-    - name: Set build source tag
-      if: github.ref_type == 'tag'
-      run: echo 'BUILD_SOURCE=tag ${{ github.ref_name }}' >> $GITHUB_ENV
-
-    - name: Send message to Matrix room
-      id: matrix-chat-message
-      uses: fadenb/matrix-chat-message@89baab2b9ea06ffdd5f5b1ca80e9f888c3d7c9d3 # v0.0.6
-      with:
-        homeserver: ${{ secrets.MATRIX_HOMESERVER }}
-        token: ${{ secrets.MATRIX_TOKEN }}
-        channel: ${{ secrets.MATRIX_ROOMID }}
-        message: |
-          **${{ env.BUILD_STATUS }}** [${{ github.repository }}#${{ env.SHORT_SHA }}](${{ github.server_url}}/${{ github.repository }}/actions/runs/${{ github.run_id }}) (${{ env.BUILD_SOURCE }}) by **${{ github.triggering_actor }}**
+      - run: |
+          [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]] \
+            && STATUS="FAILURE" || STATUS="SUCCESS"
+          [[ "${{ github.event_name }}" == "schedule" ]] \
+            && SOURCE="nightly-${{ github.ref_name }}" \
+            || SOURCE="${{ github.ref_type == 'tag' && format('tag {0}', github.ref_name) || github.ref_name }}"
+          SHA="${{ github.sha }}"
+          MSG="${STATUS} [${{ github.repository }}#${SHA:0:8}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) (${SOURCE}) by **${{ github.triggering_actor }}**"
+          curl -sf -X PUT \
+            -H "Authorization: Bearer ${{ secrets.MATRIX_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"msgtype\":\"m.text\",\"body\":\"${MSG}\"}" \
+            "${{ secrets.MATRIX_HOMESERVER }}/_matrix/client/r0/rooms/${{ secrets.MATRIX_ROOMID }}/send/m.room.message/$(date +%s)"
