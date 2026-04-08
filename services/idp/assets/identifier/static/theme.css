@@ -1,0 +1,211 @@
+/*
+ * ownCloud login page styles.
+ * Derived from services/idp/src/app.css (Kopano/kpop SPA) and
+ * services/idp/src/theme/default.js (MUI theme).
+ *
+ * Theme palette (from default.js):
+ *   Primary: KopanoBlue  (#00b3f0 base, #1e98d7 700)
+ *   Secondary: blueGrey
+ *   Error: red / #fe4600
+ *
+ *   Used by getContrastText() to maximize the contrast between the
+ *   background and the text.
+ *   NOTE(longsleep): KopanoBlue is too light and thus needs 2.4
+ *   contrastThreshold to make sure the default 500 color is still
+ *   using white text.  It will show warnings in development mode
+ *   that the contrast is too low as W3C recommends the threshold
+ *   to be 3 or more.  This cannot be helped.
+ *     contrastThreshold: 2.4
+ *
+ *   Used to shift a color's luminance by approximately two indexes
+ *   within its tonal palette.
+ *   E.g., shift from Red 500 to Red 300 or Red 700.
+ *     tonalOffset: 0.2
+ */
+
+/* additional css on top of kpop */
+@font-face {
+  font-family: Inter;
+  src: url('media/inter.d5c51099..woff2') format('woff2'),
+       url('media/inter.aadb65ac..ttf') format('truetype');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-feature-settings: 'cv11';
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Inter, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+strong {
+  font-weight: 600;
+}
+
+.oc-login-bg {
+  background-image: url('media/background.7296b9ab..jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: #1b223d;
+  z-index: 0;
+  width: 100%;
+}
+
+main {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.oc-login-form {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  padding-top: 80px;
+}
+
+.oc-login-form div:not(:last-of-type) {
+  margin-bottom: 15px;
+}
+
+.oc-logo {
+  position: absolute;
+  top: -130px;
+  left: 50%;
+  height: 80px;
+  transform: translateX(-50%);
+}
+
+.oc-label {
+  color: #fff;
+  display: inline-block;
+  margin-bottom: 5px;
+}
+
+.oc-input {
+  background-color: #fff;
+  border: 1px solid #fff;
+  border-radius: 3px;
+  height: 40px;
+  width: 300px;
+  max-width: 100%;
+  padding: 16px;
+  font-size: 1rem;
+  font-family: inherit;
+  color: #333;
+}
+
+.oc-input.error {
+  outline: none;
+  border: 1px solid #fe4600;
+}
+
+.oc-input:focus {
+  outline: none;
+  border: 1px solid #fff;
+}
+
+.oc-button-primary {
+  display: block;
+  width: 100%;
+  height: 40px;
+  margin-top: 8px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: linear-gradient(to right, #2c588e, #4e85c8) -1px;
+  background-size: 103%;
+  color: #fff;
+  font-size: 1.0625rem;
+  font-family: inherit;
+  font-weight: 500;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.oc-button-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.oc-button-primary:hover:not(:disabled) {
+  opacity: 0.92;
+}
+
+.oc-error-message {
+  color: #fe4600;
+  font-size: 0.875rem;
+  margin: 0 0 10px;
+}
+
+.oc-footer-message {
+  color: white;
+  padding: 10px;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+/* Helpers */
+.oc-mt-l {
+  margin-top: 24px;
+}
+
+.oc-light {
+  color: #fff;
+}
+
+.oc-message {
+  color: #fff;
+  text-align: center;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+a {
+  color: #1e98d7; /* KopanoBlue700 */
+  font-size: 0.875rem;
+}
+
+/*
+ * Special SR classes
+ * Used to hide an element visually, but keeping it accessible for accessibility tools.
+ */
+.oc-invisible-sr {
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+
+  /* Need to make sure we override any existing styles. */
+  position: absolute;
+  top: 0;
+  white-space: nowrap;
+  width: 1px;
+}
+
+@media only screen and (max-width: 768px) {
+  .oc-logo {
+    height: 60px;
+    top: -90px;
+  }
+
+  .oc-login-form {
+    padding-top: 50px;
+  }
+}

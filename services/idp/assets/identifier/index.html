@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="{{.Lang}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1b223d">
+  <title>{{.Title}}</title>
+  <link rel="icon" href="{{.PathPrefix}}/static/favicon.ico">
+  <link rel="stylesheet" href="{{.PathPrefix}}/static/theme.css">
+  <style nonce="{{.Nonce}}">{{if .BgImgURL}}body.oc-login-bg{background-image:url('{{.BgImgURL}}')}{{end}}</style>
+  <meta property="csp-nonce" content="{{.Nonce}}">
+</head>
+<body class="oc-login-bg">
+  <main>
+    <div class="oc-login-form" id="login-root">
+      <img class="oc-logo" src="/themes/owncloud/assets/logo.svg" alt="ownCloud">
+      <h1 class="oc-invisible-sr">{{.Headline}}</h1>
+      <p id="oc-login-error-message" class="oc-error-message" hidden></p>
+      <form id="login-form" method="post" action="#"
+        data-msg-required="{{.ErrRequired}}"
+        data-msg-invalid="{{.ErrInvalid}}"
+        data-msg-failed="{{.ErrFailed}}"
+        data-msg-default="{{.ErrDefault}}"
+        data-msg-signing-in="{{.ButtonSigningIn}}"
+        data-msg-sign-in="{{.ButtonSignIn}}">
+        <div>
+          <label class="oc-label" for="oc-login-username">{{.LabelUsername}}</label>
+          <input class="oc-input" type="text" id="oc-login-username" name="username" autocomplete="username" required>
+        </div>
+        <div>
+          <label class="oc-label" for="oc-login-password">{{.LabelPassword}}</label>
+          <input class="oc-input" type="password" id="oc-login-password" name="password" autocomplete="current-password" required>
+        </div>
+        <div>
+          <button class="oc-button-primary" type="submit" id="submit-btn">{{.ButtonSignIn}}</button>
+        </div>
+      </form>
+      {{if .PasswordResetURI}}<p><a href="{{.PasswordResetURI}}">{{.ResetLabel}}</a></p>{{end}}
+      <footer class="oc-footer-message">ownCloud – a safe home for all your data</footer>
+    </div>
+  </main>
+  <script nonce="{{.Nonce}}">
+(function() {
+  var form = document.getElementById("login-form");
+  var errorEl = document.getElementById("oc-login-error-message");
+  var btnEl = document.getElementById("submit-btn");
+
+  var MSG_REQUIRED = form.dataset.msgRequired;
+  var MSG_INVALID = form.dataset.msgInvalid;
+  var MSG_FAILED = form.dataset.msgFailed;
+  var MSG_DEFAULT = form.dataset.msgDefault;
+  var MSG_SIGNING_IN = form.dataset.msgSigningIn;
+  var MSG_SIGN_IN = form.dataset.msgSignIn;
+
+  var pathPrefix = {{.PathPrefix}};
+  var apiBase = pathPrefix + "/identifier";
+  var xsrf = "1";
+
+  var params = new URLSearchParams(window.location.search);
+  function qs(name) { return params.get(name) || ""; }
+
+  function helloRequest() {
+    return {
+      state: qs("state"),
+      flow: qs("flow") || "oidc",
+      scope: qs("scope"),
+      prompt: qs("prompt"),
+      client_id: qs("client_id"),
+      redirect_uri: qs("redirect_uri"),
+      id_token_hint: qs("id_token_hint"),
+      max_age: qs("max_age")
+    };
+  }
+
+  function fetchApi(path, body) {
+    return fetch(apiBase + path, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Kopano-Konnect-XSRF": xsrf
+      },
+      body: body ? JSON.stringify(body) : undefined,
+      credentials: "same-origin"
+    });
+  }
+
+  function parseJsonMaybe(res) {
+    if (res.status === 204) return Promise.resolve(null);
+    return res.text().then(function(text) {
+      if (!text) return null;
+      try {
+        return JSON.parse(text);
+      } catch (_) {
+        return null;
+      }
+    });
+  }
+
+  function showError(msg) {
+    errorEl.textContent = msg || MSG_DEFAULT;
+    errorEl.hidden = false;
+  }
+
+  function hideError() {
+    errorEl.hidden = true;
+  }
+
+  function setLoading(loading) {
+    btnEl.disabled = loading;
+    btnEl.textContent = loading ? MSG_SIGNING_IN : MSG_SIGN_IN;
+  }
+
+  function isSameOrigin(url) {
+    try { return new URL(url, window.location.origin).origin === window.location.origin; }
+    catch (_) { return false; }
+  }
+
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    hideError();
+    setLoading(true);
+    var username = document.getElementById("oc-login-username").value.trim();
+    var password = document.getElementById("oc-login-password").value;
+    if (!username || !password) {
+      showError(MSG_REQUIRED);
+      setLoading(false);
+      return;
+    }
+    var hello = helloRequest();
+    var logonBody = {
+      state: hello.state,
+      params: [username, password, "1"],
+      hello: hello
+    };
+    fetchApi("/_/logon", logonBody)
+      .then(function(res) {
+        return parseJsonMaybe(res).then(function(data) {
+          return { ok: res.ok, status: res.status, data: data };
+        });
+      })
+      .then(function(result) {
+        setLoading(false);
+        if (result.ok && result.data.success) {
+          var hello = result.data.hello;
+          if (hello && hello.next === 'consent') {
+            window.location.href = '/signin/v1/consent' + window.location.search;
+            return;
+          }
+          var next = hello && (hello.continue_uri || hello.next);
+          if (next) {
+            var base = window.location.origin + pathPrefix + "/";
+            var target = new URL(next, next.indexOf("http") === 0 ? undefined : base);
+            var current = new URLSearchParams(window.location.search);
+            current.forEach(function(v, k) { if (!target.searchParams.has(k)) target.searchParams.set(k, v); });
+            if (isSameOrigin(target.href)) {
+              window.location.href = target.href;
+            }
+            return;
+          }
+        }
+        if (result.status === 204 || (result.data && !result.data.success)) {
+          showError(MSG_INVALID);
+          return;
+        }
+        showError(MSG_FAILED);
+      })
+      .catch(function(err) {
+        setLoading(false);
+        if (err instanceof DOMException && err.name === "AbortError") {
+          showError(MSG_INVALID);
+          return;
+        }
+        if (err instanceof TypeError) {
+          showError(MSG_FAILED);
+          return;
+        }
+        showError(MSG_FAILED);
+      });
+  });
+
+  var hello = helloRequest();
+  if (hello.state || hello.client_id) {
+    fetchApi("/_/hello", hello)
+      .then(function(res) { return parseJsonMaybe(res); })
+      .then(function(data) {
+        if (data && data.success && data.continue_uri && isSameOrigin(data.continue_uri)) {
+          if (data.next === 'consent') {
+            window.location.href = '/signin/v1/consent' + window.location.search;
+          } else {
+            window.location.href = data.continue_uri;
+          }
+        }
+      })
+      .catch(function() {});
+  }
+})();
+  </script>
+</body>
+</html>

@@ -3,8 +3,11 @@ package svc
 import (
 	"bytes"
 	"context"
+	"embed"
 	"fmt"
+	"html/template"
 	"io"
+	"io/fs"
 	"net/http"
 	"os"
 	"path"
@@ -18,6 +21,7 @@ import (
 	libreGraphBackendSupport "github.com/libregraph/lico/bootstrap/backends/libregraph"
 	licoconfig "github.com/libregraph/lico/config"
 	"github.com/libregraph/lico/server"
+	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	"github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/assets"
@@ -25,9 +29,13 @@ import (
 	"github.com/owncloud/ocis/v2/services/idp/pkg/config"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/middleware"
 	"go.opentelemetry.io/otel/trace"
+	"golang.org/x/text/language"
 	"gopkg.in/yaml.v2"
 	"stash.kopano.io/kgol/rndm"
 )
+
+//go:embed l10n/locale
+var _translationFS embed.FS
 
 // Service defines the service handlers.
 type Service interface {
@@ -123,11 +131,16 @@ func NewService(opts ...Option) Service {
 	routes := []server.WithRoutes{managers.Must("identity").(server.WithRoutes)}
 	handlers := managers.Must("handler").(http.Handler)
 
+	var translationFS fs.FS
+	translationFS, _ = fs.Sub(_translationFS, "l10n/locale")
+	translator := l10n.NewTranslator("en", "idp", translationFS)
+
 	svc := &IDP{
-		logger: options.Logger,
-		config: options.Config,
-		assets: assetVFS,
-		tp:     options.TraceProvider,
+		logger:     options.Logger,
+		config:     options.Config,
+		assets:     assetVFS,
+		tp:         options.TraceProvider,
+		translator: translator,
 	}
 
 	svc.initMux(ctx, routes, handlers, options)
@@ -249,11 +262,12 @@ func initLicoInternalLDAPEnvVars(ldap *config.Ldap) error {
 
 // IDP defines implements the business logic for Service.
 type IDP struct {
-	logger log.Logger
-	config *config.Config
-	mux    *chi.Mux
-	assets http.FileSystem
-	tp     trace.TracerProvider
+	logger     log.Logger
+	config     *config.Config
+	mux        *chi.Mux
+	assets     http.FileSystem
+	tp         trace.TracerProvider
+	translator l10n.Translator
 }
 
 // initMux initializes the internal idp gorilla mux and mounts it in to an ocis chi-router
@@ -280,10 +294,13 @@ func (idp *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handl
 		idp.tp,
 	))
 
-	// handle / | index.html with a template that needs to have the BASE_PREFIX replaced
+	// Login and static pages (must be before Mount so chi matches first)
 	idp.mux.Get("/signin/v1/identifier", idp.Index())
 	idp.mux.Get("/signin/v1/identifier/", idp.Index())
 	idp.mux.Get("/signin/v1/identifier/index.html", idp.Index())
+	idp.mux.Get("/signin/v1/welcome", idp.Welcome())
+	idp.mux.Get("/signin/v1/goodbye", idp.Goodbye())
+	idp.mux.Get("/signin/v1/consent", idp.Consent())
 
 	idp.mux.Mount("/", gm)
 
@@ -298,37 +315,191 @@ func (idp *IDP) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	idp.mux.ServeHTTP(w, r)
 }
 
-// Index renders the static html with templated variables.
+type indexData struct {
+	Lang, Title, Headline, Nonce, PathPrefix       string
+	BgImgURL                                       template.CSS
+	LabelUsername, LabelPassword                   string
+	ButtonSignIn, ButtonSigningIn                  string
+	ErrRequired, ErrInvalid, ErrFailed, ErrDefault string
+	PasswordResetURI                               template.URL
+	ResetLabel                                     string
+}
+
+type pageData struct {
+	Lang, Title, Headline, Nonce, PathPrefix string
+	BgImgURL                                 template.CSS
+	Message                                  string
+}
+
+type consentData struct {
+	Lang, Title, Headline, Nonce, PathPrefix string
+	BgImgURL                                 template.CSS
+	AllowLabel, DenyLabel                    string
+}
+
+// Index renders the login page with templated variables.
 func (idp *IDP) Index() http.HandlerFunc {
-	f, err := idp.assets.Open("/identifier/index.html")
+	tpl, err := idp.parseTemplate("/identifier/index.html")
 	if err != nil {
-		idp.logger.Fatal().Err(err).Msg("Could not open index template")
+		idp.logger.Fatal().Err(err).Msg("Could not load index template")
 	}
-
-	template, err := io.ReadAll(f)
-	if err != nil {
-		idp.logger.Fatal().Err(err).Msg("Could not read index template")
-	}
-	if err = f.Close(); err != nil {
-		idp.logger.Fatal().Err(err).Msg("Could not close body")
-	}
-
-	// TODO add environment variable to make the path prefix configurable
-	pp := "/signin/v1"
-	indexHTML := bytes.Replace(template, []byte("__PATH_PREFIX__"), []byte(pp), 1)
-
-	background := idp.config.Asset.LoginBackgroundUrl
-	indexHTML = bytes.Replace(template, []byte("__BG_IMG_URL__"), []byte(background), 1)
-
-	nonce := rndm.GenerateRandomString(32)
-	indexHTML = bytes.Replace(indexHTML, []byte("__CSP_NONCE__"), []byte(nonce), 1)
-
-	indexHTML = bytes.Replace(indexHTML, []byte("__PASSWORD_RESET_LINK__"), []byte(idp.config.Service.PasswordResetURI), 1)
-
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		if _, err := w.Write(indexHTML); err != nil {
-			idp.logger.Error().Err(err).Msg("could not write to response writer")
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("flow") == "consent" {
+			http.Redirect(w, r, "/signin/v1/consent?"+r.URL.RawQuery, http.StatusFound)
+			return
 		}
-	})
+		lang := detectLocale(r)
+		t := idp.translator.Locale(lang)
+		nonce := rndm.GenerateRandomString(32)
+		data := indexData{
+			Lang:             lang,
+			Title:            t.Get("Sign in - ownCloud"),
+			Headline:         t.Get("Login"),
+			Nonce:            nonce,
+			PathPrefix:       "/signin/v1",
+			BgImgURL:         template.CSS(idp.config.Asset.LoginBackgroundUrl),
+			LabelUsername:    t.Get("Username"),
+			LabelPassword:    t.Get("Password"),
+			ButtonSignIn:     t.Get("Sign in"),
+			ButtonSigningIn:  t.Get("Signing in…"),
+			ErrRequired:      t.Get("Username and password are required."),
+			ErrInvalid:       t.Get("Invalid username or password."),
+			ErrFailed:        t.Get("Login failed. Please try again."),
+			ErrDefault:       t.Get("Login failed."),
+			PasswordResetURI: template.URL(idp.config.Service.PasswordResetURI),
+			ResetLabel:       t.Get("Reset password"),
+		}
+		var buf bytes.Buffer
+		if err := tpl.Execute(&buf, data); err != nil {
+			http.Error(w, "template error", http.StatusInternalServerError)
+			return
+		}
+		writeSecureHTML(w, buf.Bytes(), nonce)
+	}
+}
+
+// Welcome renders the signed-in confirmation page.
+func (idp *IDP) Welcome() http.HandlerFunc {
+	tpl, err := idp.parseTemplate("/identifier/welcome.html")
+	if err != nil {
+		idp.logger.Fatal().Err(err).Msg("Could not load welcome template")
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		lang := detectLocale(r)
+		t := idp.translator.Locale(lang)
+		nonce := rndm.GenerateRandomString(32)
+		data := pageData{
+			Lang:       lang,
+			Title:      t.Get("Signed in - ownCloud"),
+			Headline:   t.Get("Signed in"),
+			Nonce:      nonce,
+			PathPrefix: "/signin/v1",
+			BgImgURL:   template.CSS(idp.config.Asset.LoginBackgroundUrl),
+			Message:    t.Get("You are signed in. You can close this window and return to the application."),
+		}
+		var buf bytes.Buffer
+		if err := tpl.Execute(&buf, data); err != nil {
+			http.Error(w, "template error", http.StatusInternalServerError)
+			return
+		}
+		writeSecureHTML(w, buf.Bytes(), nonce)
+	}
+}
+
+// Goodbye renders the signed-out confirmation page.
+func (idp *IDP) Goodbye() http.HandlerFunc {
+	tpl, err := idp.parseTemplate("/identifier/goodbye.html")
+	if err != nil {
+		idp.logger.Fatal().Err(err).Msg("Could not load goodbye template")
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		lang := detectLocale(r)
+		t := idp.translator.Locale(lang)
+		nonce := rndm.GenerateRandomString(32)
+		data := pageData{
+			Lang:       lang,
+			Title:      t.Get("Signed out - ownCloud"),
+			Headline:   t.Get("Signed out"),
+			Nonce:      nonce,
+			PathPrefix: "/signin/v1",
+			BgImgURL:   template.CSS(idp.config.Asset.LoginBackgroundUrl),
+			Message:    t.Get("You are signed out. You can close this window."),
+		}
+		var buf bytes.Buffer
+		if err := tpl.Execute(&buf, data); err != nil {
+			http.Error(w, "template error", http.StatusInternalServerError)
+			return
+		}
+		writeSecureHTML(w, buf.Bytes(), nonce)
+	}
+}
+
+// Consent renders the OAuth2 consent page.
+func (idp *IDP) Consent() http.HandlerFunc {
+	tpl, err := idp.parseTemplate("/identifier/consent.html")
+	if err != nil {
+		idp.logger.Fatal().Err(err).Msg("Could not load consent template")
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		lang := detectLocale(r)
+		t := idp.translator.Locale(lang)
+		nonce := rndm.GenerateRandomString(32)
+		data := consentData{
+			Lang:       lang,
+			Title:      t.Get("Authorize - ownCloud"),
+			Headline:   t.Get("Authorize"),
+			Nonce:      nonce,
+			PathPrefix: "/signin/v1",
+			BgImgURL:   template.CSS(idp.config.Asset.LoginBackgroundUrl),
+			AllowLabel: t.Get("Allow"),
+			DenyLabel:  t.Get("Deny"),
+		}
+		var buf bytes.Buffer
+		if err := tpl.Execute(&buf, data); err != nil {
+			http.Error(w, "template error", http.StatusInternalServerError)
+			return
+		}
+		writeSecureHTML(w, buf.Bytes(), nonce)
+	}
+}
+
+func (idp *IDP) parseTemplate(name string) (*template.Template, error) {
+	f, err := idp.assets.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	b, err := io.ReadAll(f)
+	if err != nil {
+		return nil, err
+	}
+	return template.New(name).Parse(string(b))
+}
+
+var supportedLangs = []language.Tag{
+	language.English,
+	language.German,
+	language.French,
+	language.Dutch,
+}
+var langMatcher = language.NewMatcher(supportedLangs)
+
+func detectLocale(r *http.Request) string {
+	accept := r.Header.Get("Accept-Language")
+	tag, _ := language.MatchStrings(langMatcher, accept)
+	base, _ := tag.Base()
+	return base.String()
+}
+
+func writeSecureHTML(w http.ResponseWriter, body []byte, nonce string) {
+	h := w.Header()
+	h.Set("Content-Type", "text/html; charset=utf-8")
+	h.Set("Content-Security-Policy", fmt.Sprintf(
+		"default-src 'self'; script-src 'nonce-%s'; style-src 'self' 'nonce-%s'; img-src 'self' data:; font-src 'self'; base-uri 'none'; frame-ancestors 'none';",
+		nonce, nonce))
+	h.Set("X-Frame-Options", "DENY")
+	h.Set("X-Content-Type-Options", "nosniff")
+	h.Set("Referrer-Policy", "origin")
+	w.WriteHeader(http.StatusOK)
+	w.Write(body) //nolint:errcheck
 }
