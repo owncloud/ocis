@@ -9,18 +9,20 @@ var config = map[string]string{
 	"namespace":     "ocis",
 }
 
-var services = map[string]int{
+var debugPorts = map[string]int{
 	"ocis":               9250,
 	"activitylog":        9197,
-	"app-provider":       9165,
+	"antivirus":          9277,
 	"app-registry":       9243,
+	"app-provider":       9165,
 	"audit":              9229,
 	"auth-app":           9245,
-	"auth-bearer":        9149,
 	"auth-basic":         9147,
+	"auth-bearer":        9149,
 	"auth-machine":       9167,
 	"auth-service":       9198,
 	"clientlog":          9260,
+	"collaboration":      9304,
 	"eventhistory":       9270,
 	"frontend":           9141,
 	"gateway":            9143,
@@ -30,6 +32,7 @@ var services = map[string]int{
 	"idp":                9134,
 	"invitations":        9269,
 	"nats":               9234,
+	"notifications":      9174,
 	"ocdav":              9163,
 	"ocm":                9281,
 	"ocs":                9114,
@@ -52,6 +55,32 @@ var services = map[string]int{
 	"webfinger":          9279,
 }
 
+// only some services have gRPC ports
+var grpcPorts = map[string]int{
+	"app-registry":       9242,
+	"app-provider":       9164,
+	"auth-app":           9246,
+	"auth-basic":         9146,
+	"auth-bearer":        9148,
+	"auth-machine":       9166,
+	"auth-service":       9616, // 9199
+	"collaboration":      9301,
+	"eventhistory":       8080, // 9274
+	"gateway":            9142,
+	"groups":             9160,
+	"ocm":                9282,
+	"policies":           9125,
+	"search":             9220,
+	"settings":           9191,
+	"sharing":            9150,
+	"storage-publiclink": 9178,
+	"storage-shares":     9154,
+	"storage-system":     9215,
+	"storage-users":      9157,
+	"thumbnails":         9185,
+	"users":              9144,
+}
+
 func Set(key string, value string) {
 	config[key] = value
 }
@@ -61,9 +90,17 @@ func Get(key string) string {
 }
 
 func SetServiceDebugPort(key string, value int) {
-	services[key] = value
+	debugPorts[key] = value
 }
 
 func GetServiceDebugPort(key string) int {
-	return services[key]
+	return debugPorts[key]
+}
+
+func SetServiceGRPCPort(key string, value int) {
+	grpcPorts[key] = value
+}
+
+func GetServiceGRPCPort(key string) int {
+	return grpcPorts[key]
 }

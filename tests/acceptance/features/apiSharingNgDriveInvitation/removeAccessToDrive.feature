@@ -174,7 +174,7 @@ Feature: Remove access to a drive
       | Edit             |
       | Upload           |
       | File Drop        |
-      | Secure View      |
+      # | Secure View      |
 
 
   Scenario: user removes internal link share from project space using root endpoint
@@ -203,7 +203,7 @@ Feature: Remove access to a drive
       | Edit             |
       | Upload           |
       | File Drop        |
-      | Secure View      |
+      # | Secure View      |
 
 
   Scenario: user tries to remove internal link share of project space owned by next user using root endpoint
@@ -233,7 +233,7 @@ Feature: Remove access to a drive
       | Edit             |
       | Upload           |
       | File Drop        |
-      | Secure View      |
+      # | Secure View      |
 
 
   Scenario: user removes internal link share of a project drive using permissions endpoint

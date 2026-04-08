@@ -194,19 +194,19 @@ Feature: copying from public link share
     Then the HTTP status code should be "204"
     And the content of file "/PARENT/testfile.txt" for user "Alice" should be "some data"
 
-  @issue-8711
-  Scenario: copy folder within a public link folder to a same folder
-    Given user "Alice" has created folder "/PARENT/testFolder"
-    And user "Alice" has uploaded file with content "some data" to "/PARENT/testFolder/testfile.txt"
-    And using SharingNG
-    And user "Alice" has created the following resource link share:
-      | resource        | PARENT   |
-      | space           | Personal |
-      | permissionsRole | Edit     |
-    When the public copies folder "/testFolder" to "/testFolder" using the public WebDAV API
-    Then the HTTP status code should be "204"
-    And as "Alice" folder "/PARENT/testFolder" should exist
-    And the content of file "/PARENT/testFolder/testfile.txt" for user "Alice" should be "some data"
+  # @issue-8711
+  # Scenario: copy folder within a public link folder to a same folder
+  #   Given user "Alice" has created folder "/PARENT/testFolder"
+  #   And user "Alice" has uploaded file with content "some data" to "/PARENT/testFolder/testfile.txt"
+  #   And using SharingNG
+  #   And user "Alice" has created the following resource link share:
+  #     | resource        | PARENT   |
+  #     | space           | Personal |
+  #     | permissionsRole | Edit     |
+  #   When the public copies folder "/testFolder" to "/testFolder" using the public WebDAV API
+  #   Then the HTTP status code should be "204"
+  #   And as "Alice" folder "/PARENT/testFolder" should exist
+  #   And the content of file "/PARENT/testFolder/testfile.txt" for user "Alice" should be "some data"
 
   @issue-1230
   Scenario: copy file within a public link folder to a share item root

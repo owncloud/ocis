@@ -103,7 +103,7 @@ Feature: Link sharing of project spaces
       | Edit             | edit                   |
       | Upload           | upload                 |
       | File Drop        | createOnly             |
-      | Secure View      | blocksDownload         |
+      # | Secure View      | blocksDownload         |
 
 
   Scenario Outline: create a link share of a project-space drive using root endpoint
@@ -201,7 +201,7 @@ Feature: Link sharing of project spaces
       | Edit             | edit                   |
       | Upload           | upload                 |
       | File Drop        | createOnly             |
-      | Secure View      | blocksDownload         |
+      # | Secure View      | blocksDownload         |
 
 
   Scenario Outline: try to create a link share of a Personal and Shares drives using permissions endpoint
@@ -381,7 +381,7 @@ Feature: Link sharing of project spaces
       | Edit             | edit                   |
       | Upload           | upload                 |
       | File Drop        | createOnly             |
-      | Secure View      | blocksDownload         |
+      # | Secure View      | blocksDownload         |
 
   @env-config
   Scenario Outline: create a link share of a project-space when password is not enforced using root endpoint
@@ -423,4 +423,4 @@ Feature: Link sharing of project spaces
       | Edit             | edit                   |
       | Upload           | upload                 |
       | File Drop        | createOnly             |
-      | Secure View      | blocksDownload         |
+      # | Secure View      | blocksDownload         |

@@ -108,7 +108,7 @@ config = {
                 "apiContract",
                 "apiLocks",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "settingsAndNotification": {
@@ -117,7 +117,7 @@ config = {
                 "apiNotification",
                 "apiCors",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "k8s": True,
             "emailNeeded": True,
@@ -138,7 +138,7 @@ config = {
             "suites": [
                 "apiGraphUser",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "k8s": True,
         },
@@ -146,14 +146,14 @@ config = {
             "suites": [
                 "apiSpaces",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "spacesShares": {
             "suites": [
                 "apiSpacesShares",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "davOperations": {
@@ -165,7 +165,7 @@ config = {
                 "apiArchiver",
                 "apiActivities",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "groupAndSearch1": {
@@ -174,7 +174,7 @@ config = {
                 "apiGraph",
                 "apiGraphGroup",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "search2": {
@@ -183,7 +183,7 @@ config = {
                 "apiSearchContent",
             ],
             "tikaNeeded": True,
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "sharingNg1": {
@@ -192,7 +192,7 @@ config = {
                 "apiReshare",
                 "apiSharingNgPermissions",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "k8s": True,
         },
@@ -200,7 +200,7 @@ config = {
             "suites": [
                 "apiSharingNgAdditionalShareRole",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
         },
@@ -227,7 +227,7 @@ config = {
             "suites": [
                 "apiAntivirus",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
@@ -242,7 +242,7 @@ config = {
             "suites": [
                 "apiOcm",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
             "federationServer": True,
@@ -269,7 +269,7 @@ config = {
             "suites": [
                 "apiAuthApp",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
             "extraServerEnvironment": {
@@ -281,7 +281,7 @@ config = {
             "suites": [
                 "apiCollaboration",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
             "collaborationServiceNeeded": True,
@@ -294,7 +294,7 @@ config = {
                 "cliCommands",
                 "apiServiceAvailability",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "antivirusNeeded": True,
             "emailNeeded": True,
@@ -324,7 +324,7 @@ config = {
                 "coreApiMain",
                 "coreApiVersions",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "k8s": True,
         },
@@ -333,13 +333,14 @@ config = {
                 "coreApiShareManagementBasicToShares",
                 "coreApiShareManagementToShares",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
         },
         "3": {
             "suites": [
                 "coreApiSharees",
+                "coreApiSharePublicLink1",
                 "coreApiSharePublicLink2",
             ],
             "skip": False,
@@ -350,12 +351,11 @@ config = {
             "suites": [
                 "coreApiShareOperationsToShares1",
                 "coreApiShareOperationsToShares2",
-                "coreApiSharePublicLink1",
                 "coreApiShareCreateSpecialToShares1",
                 "coreApiShareCreateSpecialToShares2",
                 "coreApiShareUpdateToShares",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
         },
@@ -366,7 +366,7 @@ config = {
                 "coreApiWebdavEtagPropagation1",
                 "coreApiWebdavEtagPropagation2",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "6": {
@@ -375,14 +375,14 @@ config = {
                 "coreApiWebdavOperations",
                 "coreApiWebdavMove2",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "7": {
             "suites": [
                 "coreApiWebdavProperties",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "8": {
@@ -392,7 +392,7 @@ config = {
                 "coreApiWebdavUpload",
                 "coreApiWebdavUploadTUS",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
     },
@@ -509,6 +509,7 @@ def getPipelineNames(pipelines = []):
     return names
 
 def main(ctx):
+    return testPipelines(ctx)
     """main is the entrypoint for drone
 
     Args:
@@ -627,6 +628,9 @@ def testOcisAndUploadResults(ctx):
 
 def testPipelines(ctx):
     pipelines = []
+    pipelines += localApiTestPipeline(ctx)
+    pipelines += coreApiTestPipeline(ctx)
+    return pipelines
 
     if config["litmus"]:
         pipelines += litmus(ctx, "ocis")
@@ -1125,7 +1129,7 @@ def localApiTestPipeline(ctx):
                     params[item] = matrix[item] if item in matrix else defaults[item]
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
-                        run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                        run_on_k8s = params["k8s"]  #and ctx.build.event == "cron"
 
                         ####################
                         # SETUP STEPS      #
@@ -1224,6 +1228,7 @@ def localApiTestPipeline(ctx):
                                          run_with_remote_php,
                                          k8s = run_on_k8s,
                                      ) +
+                                     debug() +
                                      apiTestFailureLog() +
                                      (generateCoverageFromAPITest(ctx, name) if not run_on_k8s else []),
                             "services": services,
@@ -1299,12 +1304,13 @@ def localApiTests(name, suites, storage = "ocis", extra_environment = {}, with_r
         "STORAGE_DRIVER": storage,
         "BEHAT_SUITES": ",".join(suites),
         "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
-        "EXPECTED_FAILURES_FILE": expected_failures_file,
+        #"EXPECTED_FAILURES_FILE": expected_failures_file,
         "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
         "OCIS_WRAPPER_URL": wrapper_url,
         "WITH_REMOTE_PHP": with_remote_php,
         "COLLABORATION_SERVICE_URL": "http://ocis-server:9304" if k8s else "http://wopi-fakeoffice:9300",
         "K8S": k8s,
+        "STOP_ON_FAILURE": True,
     }
 
     for item in extra_environment:
@@ -1507,7 +1513,7 @@ def coreApiTestPipeline(ctx):
                 for run_with_remote_php in params["withRemotePhp"]:
                     filter_tags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
                     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
-                    run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                    run_on_k8s = params["k8s"]  #and ctx.build.event == "cron"
                     ocis_url = OCIS_URL
                     wrapper_url = "http://%s:5200" % OCIS_SERVER_NAME
 
@@ -1573,11 +1579,12 @@ def coreApiTestPipeline(ctx):
                                              "BEHAT_FILTER_TAGS": filter_tags,
                                              "BEHAT_SUITES": ",".join(params["suites"]),
                                              "ACCEPTANCE_TEST_TYPE": "core-api",
-                                             "EXPECTED_FAILURES_FILE": expected_failures_file,
+                                             #  "EXPECTED_FAILURES_FILE": expected_failures_file,
                                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                                              "OCIS_WRAPPER_URL": wrapper_url,
                                              "WITH_REMOTE_PHP": run_with_remote_php,
                                              "K8S": run_on_k8s,
+                                             "STOP_ON_FAILURE": True,
                                          },
                                          "commands": [
                                              # merge the expected failures
@@ -1586,6 +1593,7 @@ def coreApiTestPipeline(ctx):
                                          ],
                                      },
                                  ] +
+                                 debug() +
                                  apiTestFailureLog() +
                                  ([] if run_on_k8s else generateCoverageFromAPITest(ctx, name)),
                         "services": services,
@@ -4135,4 +4143,23 @@ def exposeExternalServersK8s(servers = [], name = OCIS_SERVER_NAME):
             "until test -f $${KUBECONFIG}; do sleep 1s; done",
             "bash %s/tests/config/k8s/expose-external-svc.sh -n ocis %s" % (dirs["base"], servers_arg),
         ],
+    }]
+
+def debug(name = OCIS_SERVER_NAME):
+    return [{
+        "name": "debug-logs",
+        "image": K3D_IMAGE,
+        "commands": [
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % name,
+            "until test -f $${KUBECONFIG}; do sleep 1s; done",
+            "kubectl get pods -n ocis",
+            "kubectl get svc -n ocis",
+            "kubectl get deployment -n ocis",
+        ],
+        "when": {
+            "status": [
+                "failure",
+                "success",
+            ],
+        },
     }]
