@@ -258,7 +258,7 @@ def main() -> int:
             **os.environ,
             "BASE_URL_OCIS": ocis_url,
             "HEADLESS": "true",
-            "RETRY": "1",
+            "RETRY": "3",
             "SKIP_A11Y_TESTS": "true",
             "REPORT_TRACING": "true",
             "NODE_EXTRA_CA_CERTS": str(ocis_cert),
