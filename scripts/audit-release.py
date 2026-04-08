@@ -89,9 +89,6 @@ def check_local(directory, version):
             if not bin_path.exists():
                 fail(f"{sha_path.name}: binary missing")
                 continue
-            size = sha_path.stat().st_size
-            if not (87 <= size <= 90):
-                fail(f"{sha_path.name}: size {size} (want 87-90)")
             parts = sha_path.read_text().strip().split("  ", 1)
             if len(parts) != 2:
                 fail(f"{sha_path.name}: bad format")

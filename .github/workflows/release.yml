@@ -237,8 +237,9 @@ jobs:
       - run: |
           make -C ocis release-${{ matrix.os }} OUTPUT=${{ needs.determine-release-type.outputs.version }}
           make -C ocis release-finish
-          [[ "${{ matrix.os }}" == "linux" ]] && \
+          if [[ "${{ matrix.os }}" == "linux" ]]; then
             cp assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf ocis/dist/release/
+          fi
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: binaries-${{ matrix.os }}
