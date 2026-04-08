@@ -159,6 +159,34 @@ def check_docker(version):
         else:       ok(f"{ref}: amd64+arm64 present")
 
 
+def resolve_run_id(branch, token):
+    r = gh_api(f"/repos/owncloud/ocis/actions/workflows/release.yml/runs?branch={branch}&per_page=1", token)
+    runs = r.get("workflow_runs", [])
+    if not runs:
+        sys.exit(f"no runs found for branch '{branch}'")
+    run = runs[0]
+    print(f"run {run['id']}  {run['status']}  {run['conclusion'] or 'in_progress'}  {run['html_url']}")
+    return str(run["id"])
+
+
+def check_run_artifacts(run_id):
+    token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    if not token:
+        fail("GH_TOKEN / GITHUB_TOKEN not set"); return
+    try:
+        r = gh_api(f"/repos/owncloud/ocis/actions/runs/{run_id}/artifacts", token)
+    except urllib.error.HTTPError as e:
+        fail(f"run {run_id}: {e}"); return
+
+    by_name = {a["name"]: a for a in r.get("artifacts", [])}
+    for name in ("binaries-linux", "binaries-darwin", "third-party-licenses"):
+        a = by_name.get(name)
+        if not a:                   fail(f"{name}: missing");  continue
+        if a.get("expired"):        fail(f"{name}: expired");  continue
+        if a["size_in_bytes"] == 0: fail(f"{name}: empty");    continue
+        ok(f"{name}: {a['size_in_bytes']:,} bytes")
+
+
 def check_git(version):
     tag = f"v{version}"
     r = run(["git", "tag", "-v", tag])
@@ -175,17 +203,28 @@ def check_git(version):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--version",        required=True)
+    p.add_argument("--version",        required=False)
+    p.add_argument("--run",            metavar="RUN_ID")
+    p.add_argument("--branch",         metavar="BRANCH")
     p.add_argument("--dir",            type=Path)
     p.add_argument("--github-release", action="store_true")
     p.add_argument("--docker",         action="store_true")
     p.add_argument("--git",            action="store_true")
     args = p.parse_args()
 
-    if args.dir:            check_local(args.dir, args.version)
-    if args.github_release: check_github_release(args.version)
-    if args.docker:         check_docker(args.version)
-    if args.git:            check_git(args.version)
+    if not args.run and not args.branch and not args.version:
+        p.error("--version is required unless --run or --branch is used")
+
+    if args.branch:
+        token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+        if not token: sys.exit("GH_TOKEN / GITHUB_TOKEN not set")
+        args.run = resolve_run_id(args.branch, token)
+
+    if args.run:             check_run_artifacts(args.run)
+    if args.dir:             check_local(args.dir, args.version)
+    if args.github_release:  check_github_release(args.version)
+    if args.docker:          check_docker(args.version)
+    if args.git:             check_git(args.version)
 
     print(f"\n{passed + failed} checks: {passed} passed, {failed} failed")
     sys.exit(1 if failed else 0)
