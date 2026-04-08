@@ -4,6 +4,16 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — build everything but skip Docker push and GitHub Release creation'
+        type: boolean
+        default: true
+      version_override:
+        description: 'Version to use for dry-run (e.g. 8.0.2-dryrun). Leave empty to auto-detect from latest tag.'
+        type: string
+        default: ''
 
 env:
   # Production release tags (semver patterns)
@@ -33,13 +43,35 @@ jobs:
       is_prerelease: ${{ steps.check.outputs.is_prerelease }}
       release_folder: ${{ steps.check.outputs.release_folder }}
       docker_repos: ${{ steps.check.outputs.docker_repos }}
+      dry_run: ${{ steps.version.outputs.dry_run }}
     steps:
+      - name: Checkout code
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && inputs.version_override == '' }}
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
       - name: Extract version
         id: version
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            DRY_RUN="${{ inputs.dry_run }}"
+            if [[ -n "${{ inputs.version_override }}" ]]; then
+              VERSION="${{ inputs.version_override }}"
+            else
+              # Auto-detect: bump patch of latest tag and append -dryrun
+              LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+              LATEST_VERSION="${LATEST_TAG#v}"
+              IFS='.' read -r MAJOR MINOR PATCH <<< "${LATEST_VERSION%%-*}"
+              VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))-dryrun"
+            fi
+          else
+            VERSION=${GITHUB_REF#refs/tags/v}
+            DRY_RUN=false
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Version: $VERSION"
+          echo "dry_run=$DRY_RUN" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION  Dry-run: $DRY_RUN"
 
       - name: Check release type
         id: check
@@ -152,6 +184,7 @@ jobs:
   docker-build:
     name: Build Docker Image (${{ matrix.arch }}-${{ matrix.repo }})
     runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-24.04' || matrix.arch == 'arm64' && 'ubuntu-24.04-arm' }}
+    if: ${{ needs.determine-release-type.outputs.dry_run != 'true' }}
     needs: [determine-release-type, generate-code]
     outputs:
       digest-amd64-rolling: ${{ steps.write-digest.outputs.digest-amd64-rolling }}
@@ -236,6 +269,7 @@ jobs:
   docker-manifest:
     name: Create Docker Manifest (${{ matrix.repo }})
     runs-on: ubuntu-latest
+    if: ${{ needs.determine-release-type.outputs.dry_run != 'true' }}
     needs: [determine-release-type, docker-build]
     strategy:
       matrix:
@@ -268,6 +302,7 @@ jobs:
   docker-readme:
     name: Update Docker README
     runs-on: ubuntu-latest
+    if: ${{ needs.determine-release-type.outputs.dry_run != 'true' }}
     needs: [determine-release-type, docker-manifest]
     strategy:
       matrix:
@@ -444,7 +479,6 @@ jobs:
     needs:
       - determine-release-type
       - build-binaries
-      - docker-build
       - license-check
       - generate-changelog
     steps:
@@ -473,6 +507,7 @@ jobs:
           path: .
 
       - name: Create GitHub Release
+        if: ${{ needs.determine-release-type.outputs.dry_run != 'true' }}
         uses: softprops/action-gh-release@v2.4.2
         with:
           name: ${{ needs.determine-release-type.outputs.version }}
@@ -482,6 +517,16 @@ jobs:
           draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Dry-run summary
+        if: ${{ needs.determine-release-type.outputs.dry_run == 'true' }}
+        run: |
+          echo "## DRY RUN — artifacts that would be uploaded to a GitHub Release:"
+          find release-assets/ -type f | sort | while read f; do
+            size=$(stat -c%s "$f")
+            hash=$(sha256sum "$f" | awk '{print $1}')
+            printf "  %-60s  %s bytes  sha256:%s\n" "$(basename $f)" "$size" "$hash"
+          done
 
 
   # ============================================================================
@@ -512,6 +557,8 @@ jobs:
       continue-on-error: true
       uses: re-actors/alls-green@release/v1
       with:
+        # docker-build/manifest/readme are skipped on dry-run — treat skip as success
+        allowed-skips: docker-build, docker-manifest, docker-readme
         jobs: ${{ toJSON(needs) }}
 
     - name: Set failure message
