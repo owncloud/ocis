@@ -1,0 +1,79 @@
+name: test-ocis-compose
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"   # every day at 00:00 UTC
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - example: ocis_full
+            urls: "https://ocis.owncloud.test"
+          - example: ocis_ldap
+            urls: "https://ocis.owncloud.test https://ldap.owncloud.test"
+          - example: ocis_multi
+            urls: "https://ocis.owncloud.test https://ocis.ocm.owncloud.test"
+          - example: ocis_ocm
+            urls: "https://ocis.owncloud.test https://ocis.ocm.owncloud.test https://ocis.ocm.next.owncloud.test"
+          - example: ocis_keycloak
+            urls: "https://ocis.owncloud.test https://keycloak.owncloud.test"
+
+    steps:
+      - name: Checkout ocis repo
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: owncloud/ocis
+
+      - name: Set up Docker Compose
+        uses: docker/setup-compose-action@8cccb8c14b6500aaffebff1aa49c502c34d2e5e6 # v2.1.0
+
+      - name: Prepare hosts entry
+        run: |
+          echo "127.0.0.1 ocis.owncloud.test collabora.owncloud.test keycloak.owncloud.test mail.owncloud.test minio.owncloud.test onlyoffice.owncloud.test tika ldap.owncloud.test ocis.ocm.owncloud.test ocis.ocm.next.owncloud.test onlyoffice.owncloud.test" | sudo tee -a /etc/hosts
+
+      - name: Run compose stack
+        working-directory: deployments/examples/${{ matrix.example }}
+        run: |
+          set -e
+          echo "=== Running ${{ matrix.example }} ==="
+          docker compose up -d
+
+      - name: Wait for services
+        run: |
+          set -e
+
+          URLS="${{ matrix.urls }}"
+
+          for url in $URLS; do
+            echo "=== Waiting for $url ==="
+
+            end=$((SECONDS+150))
+            ready=false
+
+            while [ $SECONDS -lt $end ]; do
+              echo "Trying $url"
+              if curl -kfsS --max-time 5 "$url" > /dev/null; then
+                echo "✅ $url is ready"
+                ready=true
+                break
+              fi
+              echo "⏳ Not ready yet, retrying in 5s..."
+              sleep 5
+            done
+
+            if [ "$ready" = false ]; then
+              echo "❌ $url never became ready"
+              exit 1
+            fi
+          done
+
+      - name: Tear down
+        if: always()
+        working-directory: deployments/examples/${{ matrix.example }}
+        run: docker compose down -v
