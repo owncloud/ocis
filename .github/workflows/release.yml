@@ -39,7 +39,7 @@ jobs:
       - id: info
         run: |
           next_dev() {
-            local tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+            local tag=$(git tag --sort=-version:refname | grep -m1 '^v' || echo "v0.0.0")
             local ver="${tag#v}"; IFS='.' read -r M m p <<< "${ver%%-*}"
             echo "${M}.${m}.$((p + 1))-dev.1"
           }
