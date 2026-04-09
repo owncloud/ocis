@@ -301,7 +301,13 @@ jobs:
       - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version: ${{ env.GO_VERSION }}
-      - run: make changelog CHANGELOG_VERSION=$(echo "${{ needs.determine-release-type.outputs.version }}" | cut -d'-' -f1)
+      - run: |
+          make changelog CHANGELOG_VERSION=$(echo "${{ needs.determine-release-type.outputs.version }}" | cut -d'-' -f1)
+          # calens produces empty output when no versioned changelog directory exists (e.g. dev builds).
+          # Fall back to a pointer to the unreleased entries.
+          if [[ $(wc -l < ocis/dist/CHANGELOG.md) -lt 5 ]]; then
+            echo "Development release — no release notes yet. See [unreleased changes](https://github.com/owncloud/ocis/tree/master/changelog/unreleased/)." > ocis/dist/CHANGELOG.md
+          fi
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: changelog
