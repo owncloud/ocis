@@ -34,6 +34,7 @@ jobs:
         if: ${{ github.ref_type == 'branch' || (github.event_name == 'workflow_dispatch' && inputs.version_override == '') }}
         with:
           fetch-depth: 0
+          fetch-tags: true
 
       - id: info
         run: |
