@@ -822,9 +822,8 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(err).ToNot(HaveOccurred())
 		})
 		It("deletes a space permission as expected", func() {
-			getPublicShareResponse.Status = status.NewNotFound(context.Background(), "")
-			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(&getPublicShareResponse, nil)
-
+			// No GetPublicShare mock needed — space permissions (u:/g: prefixed IDs)
+			// are recognised by their format and skip the public share lookup.
 			gatewayClient.On("RemoveShare",
 				mock.Anything,
 				mock.Anything,
