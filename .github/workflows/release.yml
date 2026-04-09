@@ -59,7 +59,7 @@ jobs:
 
           [[ "$VERSION" == *"-"* ]] && IS_PRERELEASE=true || IS_PRERELEASE=false
 
-          if [[ "$IS_PRODUCTION" == "true" ]]; then
+          if [[ "$IS_PRODUCTION" == "true" && "$IS_PRERELEASE" == "false" ]]; then
             REPOS=[\"$DOCKER_REPO_ROLLING\",\"$DOCKER_REPO_PRODUCTION\"]
           else
             REPOS=[\"$DOCKER_REPO_ROLLING\"]
