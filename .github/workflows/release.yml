@@ -132,6 +132,17 @@ jobs:
           CGO_ENABLED: 1
           GOOS: linux
           ENABLE_VIPS: true
+      - id: tags
+        run: |
+          VERSION="${{ needs.determine-release-type.outputs.version }}"
+          REPO="${{ matrix.repo }}"
+          ARCH="${{ matrix.arch }}"
+          MAJOR_MINOR=$(echo "$VERSION" | cut -d. -f1-2)
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          printf "tags<<EOF\n%s\n%s\n%s\nEOF\n" \
+            "${REPO}:${VERSION}-linux-${ARCH}" \
+            "${REPO}:${MAJOR_MINOR}-linux-${ARCH}" \
+            "${REPO}:${MAJOR}-linux-${ARCH}" >> $GITHUB_OUTPUT
       - id: build
         uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
         with:
@@ -143,10 +154,7 @@ jobs:
           build-args: |
             REVISION=${{ github.sha }}
             VERSION=${{ needs.determine-release-type.outputs.version }}
-          tags: |
-            ${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-${{ matrix.arch }}
-            ${{ matrix.repo }}:${{ join(slice(split(needs.determine-release-type.outputs.version, '.'), 0, 2), '.') }}-linux-${{ matrix.arch }}
-            ${{ matrix.repo }}:${{ split(needs.determine-release-type.outputs.version, '.')[0] }}-linux-${{ matrix.arch }}
+          tags: ${{ steps.tags.outputs.tags }}
       - id: digest
         run: |
           [[ "${{ matrix.repo }}" == *"rolling"* ]] \
