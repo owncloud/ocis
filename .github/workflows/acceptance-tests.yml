@@ -156,12 +156,18 @@ jobs:
           path: /opt/libcurl
           key: libcurl-8.12.0-${{ runner.os }}
 
-      - name: Install libcurl 8.12.0 from source
-        if: steps.cache-libcurl.outputs.cache-hit != 'true'
+      - name: Install libcurl 8.12.0 build dependencies
+        # Always run: libvips-dev is needed at runtime (govips thumbnails) and for
+        # pkg-config --exists vips to succeed so oCIS is built with ENABLE_VIPS=true.
+        # Skipping this on cache hit would cause oCIS to fall back to the imaging library.
         run: |
           sudo apt-get update -qq
           # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
           sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
+
+      - name: Compile libcurl 8.12.0 from source
+        if: steps.cache-libcurl.outputs.cache-hit != 'true'
+        run: |
           cd /tmp
           curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
           tar xzf curl-8.12.0.tar.gz
@@ -169,6 +175,12 @@ jobs:
           ./configure --with-ssl --with-zlib --with-nghttp2 --prefix=/opt/libcurl --enable-versioned-symbols --silent
           make -j$(nproc) --silent
           sudo make install --silent
+
+      - name: Restore libcurl ldconfig
+        # Always run: on cache hit the .so files are restored to /opt/libcurl/lib but
+        # /etc/ld.so.cache on the fresh runner doesn't know about them yet.
+        # Without ldconfig, PHP's curl extension can't find libcurl even though it's present.
+        run: |
           echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
           sudo ldconfig
           /opt/libcurl/bin/curl --version | head -1
@@ -180,14 +192,6 @@ jobs:
               exit(1);
             }
           '
-
-      - name: Restore libcurl ldconfig
-        # Always run: on cache hit the .so files are restored to /opt/libcurl/lib but
-        # /etc/ld.so.cache on the fresh runner doesn't know about them yet.
-        # Without ldconfig, PHP's curl extension can't find libcurl even though it's present.
-        run: |
-          echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
-          sudo ldconfig
 
       - name: Install PHP 8.4
         run: |
@@ -276,12 +280,18 @@ jobs:
           path: /opt/libcurl
           key: libcurl-8.12.0-${{ runner.os }}
 
-      - name: Install libcurl 8.12.0 from source
-        if: steps.cache-libcurl.outputs.cache-hit != 'true'
+      - name: Install libcurl 8.12.0 build dependencies
+        # Always run: libvips-dev is needed at runtime (govips thumbnails) and for
+        # pkg-config --exists vips to succeed so oCIS is built with ENABLE_VIPS=true.
+        # Skipping this on cache hit would cause oCIS to fall back to the imaging library.
         run: |
           sudo apt-get update -qq
           # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
           sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
+
+      - name: Compile libcurl 8.12.0 from source
+        if: steps.cache-libcurl.outputs.cache-hit != 'true'
+        run: |
           cd /tmp
           curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
           tar xzf curl-8.12.0.tar.gz
@@ -289,6 +299,12 @@ jobs:
           ./configure --with-ssl --with-zlib --with-nghttp2 --prefix=/opt/libcurl --enable-versioned-symbols --silent
           make -j$(nproc) --silent
           sudo make install --silent
+
+      - name: Restore libcurl ldconfig
+        # Always run: on cache hit the .so files are restored to /opt/libcurl/lib but
+        # /etc/ld.so.cache on the fresh runner doesn't know about them yet.
+        # Without ldconfig, PHP's curl extension can't find libcurl even though it's present.
+        run: |
           echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
           sudo ldconfig
           /opt/libcurl/bin/curl --version | head -1
@@ -300,14 +316,6 @@ jobs:
               exit(1);
             }
           '
-
-      - name: Restore libcurl ldconfig
-        # Always run: on cache hit the .so files are restored to /opt/libcurl/lib but
-        # /etc/ld.so.cache on the fresh runner doesn't know about them yet.
-        # Without ldconfig, PHP's curl extension can't find libcurl even though it's present.
-        run: |
-          echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
-          sudo ldconfig
 
       - name: Install PHP 8.4
         run: |
