@@ -8,10 +8,6 @@ on:
       - 'feat/release-pipeline**'
   workflow_dispatch:
     inputs:
-      dry_run:
-        description: 'Skip Docker push and GitHub Release creation'
-        type: boolean
-        default: true
       version_override:
         description: 'Version override (leave empty to auto-detect from latest tag)'
         type: string
@@ -29,11 +25,10 @@ jobs:
   determine-release-type:
     runs-on: ubuntu-latest
     outputs:
-      version:      ${{ steps.info.outputs.version }}
+      version:       ${{ steps.info.outputs.version }}
       is_production: ${{ steps.info.outputs.is_production }}
       is_prerelease: ${{ steps.info.outputs.is_prerelease }}
       docker_repos:  ${{ steps.info.outputs.docker_repos }}
-      dry_run:       ${{ steps.info.outputs.dry_run }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         if: ${{ github.ref_type == 'branch' || (github.event_name == 'workflow_dispatch' && inputs.version_override == '') }}
@@ -42,22 +37,19 @@ jobs:
 
       - id: info
         run: |
-          next_patch() {
+          next_dev() {
             local tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
             local ver="${tag#v}"; IFS='.' read -r M m p <<< "${ver%%-*}"
-            echo "${M}.${m}.$((p + 1))-dryrun"
+            echo "${M}.${m}.$((p + 1))-dev.1"
           }
 
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            DRY_RUN="${{ inputs.dry_run }}"
             VERSION="${{ inputs.version_override }}"
-            [[ -z "$VERSION" ]] && VERSION=$(next_patch)
+            [[ -z "$VERSION" ]] && VERSION=$(next_dev)
           elif [[ "${{ github.ref_type }}" == "branch" ]]; then
-            DRY_RUN=true
-            VERSION=$(next_patch)
+            VERSION=$(next_dev)
           else
             VERSION="${GITHUB_REF#refs/tags/v}"
-            DRY_RUN=false
           fi
 
           IS_PRODUCTION=false
@@ -73,11 +65,10 @@ jobs:
             REPOS=[\"$DOCKER_REPO_ROLLING\"]
           fi
 
-          echo "version=$VERSION"         >> $GITHUB_OUTPUT
-          echo "dry_run=$DRY_RUN"         >> $GITHUB_OUTPUT
+          echo "version=$VERSION"             >> $GITHUB_OUTPUT
           echo "is_production=$IS_PRODUCTION" >> $GITHUB_OUTPUT
           echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
-          echo "docker_repos=$REPOS"      >> $GITHUB_OUTPUT
+          echo "docker_repos=$REPOS"          >> $GITHUB_OUTPUT
 
   generate-code:
     runs-on: ubuntu-latest
@@ -110,7 +101,6 @@ jobs:
   docker-build:
     name: docker-build (${{ matrix.arch }}, ${{ matrix.repo }})
     runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
-    if: ${{ needs.determine-release-type.outputs.dry_run != 'true' }}
     needs: [determine-release-type, generate-code]
     outputs:
       digest-amd64-rolling: ${{ steps.build.outputs.digest-amd64-rolling }}
@@ -163,7 +153,6 @@ jobs:
   docker-scan:
     name: docker-scan (${{ matrix.arch }}, ${{ matrix.repo }})
     runs-on: ubuntu-latest
-    if: ${{ needs.determine-release-type.outputs.dry_run != 'true' }}
     needs: [determine-release-type, docker-build]
     strategy:
       matrix:
@@ -178,7 +167,6 @@ jobs:
   docker-manifest:
     name: docker-manifest (${{ matrix.repo }})
     runs-on: ubuntu-latest
-    if: ${{ needs.determine-release-type.outputs.dry_run != 'true' }}
     needs: [determine-release-type, docker-build]
     strategy:
       matrix:
@@ -201,7 +189,6 @@ jobs:
   docker-readme:
     name: docker-readme (${{ matrix.repo }})
     runs-on: ubuntu-latest
-    if: ${{ needs.determine-release-type.outputs.dry_run != 'true' }}
     needs: [determine-release-type, docker-manifest]
     strategy:
       matrix:
@@ -316,8 +303,7 @@ jobs:
         with:
           name: changelog
           path: .
-      - if: ${{ needs.determine-release-type.outputs.dry_run != 'true' }}
-        run: |
+      - run: |
           [[ "${{ needs.determine-release-type.outputs.is_prerelease }}" == "true" ]] && PRERELEASE=--prerelease
           gh release create "${{ needs.determine-release-type.outputs.version }}" \
             --title "${{ needs.determine-release-type.outputs.version }}" \
@@ -325,11 +311,6 @@ jobs:
             ${PRERELEASE:-} release-assets/*
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - if: ${{ needs.determine-release-type.outputs.dry_run == 'true' }}
-        run: |
-          find release-assets/ -type f | sort | while read f; do
-            printf "  %-60s  %s  sha256:%s\n" "$(basename $f)" "$(stat -c%s $f) bytes" "$(sha256sum $f | awk '{print $1}')"
-          done
 
   audit-release:
     runs-on: ubuntu-latest
@@ -349,13 +330,10 @@ jobs:
           name: third-party-licenses
           path: release-assets
       - run: |
-          EXTRA=""
-          [[ "${{ needs.determine-release-type.outputs.dry_run }}" != "true" ]] && \
-            EXTRA="--github-release --docker"
           python3 scripts/audit-release.py \
             --version "${{ needs.determine-release-type.outputs.version }}" \
             --dir release-assets/ \
-            $EXTRA
+            --github-release --docker
 
   notify:
     runs-on: ubuntu-latest

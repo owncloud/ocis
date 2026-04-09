@@ -217,6 +217,10 @@ def main():
         if not token: sys.exit("GH_TOKEN / GITHUB_TOKEN not set")
         args.run = resolve_run_id(args.branch, token)
 
+    needs_version = args.dir or args.github_release or args.docker or args.git
+    if needs_version and not args.version:
+        p.error("--version is required with --dir / --github-release / --docker / --git")
+
     if args.run:             check_run_artifacts(args.run)
     if args.dir:             check_local(args.dir, args.version)
     if args.github_release:  check_github_release(args.version)
