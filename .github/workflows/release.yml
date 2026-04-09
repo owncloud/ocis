@@ -397,6 +397,7 @@ jobs:
             || SOURCE="${{ github.ref_type == 'tag' && format('tag {0}', github.ref_name) || github.ref_name }}"
           SHA="${{ github.sha }}"
           MSG="${STATUS} [${{ github.repository }}#${SHA:0:8}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) (${SOURCE}) by **${{ github.triggering_actor }}**"
+          [[ -z "${{ secrets.MATRIX_HOMESERVER }}" ]] && { echo "MATRIX_HOMESERVER not set, skipping notification"; exit 0; }
           curl -sf -X PUT \
             -H "Authorization: Bearer ${{ secrets.MATRIX_TOKEN }}" \
             -H "Content-Type: application/json" \
