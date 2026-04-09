@@ -222,7 +222,7 @@ jobs:
           curl -sf -X PATCH \
             -H "Authorization: Bearer $TOKEN" \
             -H "Content-Type: application/json" \
-            --data-binary "{\"full_description\":$(python3 -c 'import json,sys; print(json.dumps(open("ocis/docker/README.md").read()))')}" \
+            --data-binary "{\"full_description\":$(python3 -c 'import json,sys; print(json.dumps(open("ocis/README.md").read()))')}" \
             "https://hub.docker.com/v2/repositories/${{ matrix.repo }}/"
 
   build-binaries:
