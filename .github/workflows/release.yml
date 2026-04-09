@@ -305,7 +305,7 @@ jobs:
           path: .
       - run: |
           [[ "${{ needs.determine-release-type.outputs.is_prerelease }}" == "true" ]] && PRERELEASE=--prerelease
-          gh release create "${{ needs.determine-release-type.outputs.version }}" \
+          gh release create -R "${{ github.repository }}" "${{ needs.determine-release-type.outputs.version }}" \
             --title "${{ needs.determine-release-type.outputs.version }}" \
             --notes-file CHANGELOG.md \
             ${PRERELEASE:-} release-assets/*
