@@ -104,10 +104,10 @@ jobs:
     runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     needs: [determine-release-type, generate-code]
     outputs:
-      digest-amd64-rolling: ${{ steps.build.outputs.digest-amd64-rolling }}
-      digest-arm64-rolling: ${{ steps.build.outputs.digest-arm64-rolling }}
-      digest-amd64: ${{ steps.build.outputs.digest-amd64 }}
-      digest-arm64: ${{ steps.build.outputs.digest-arm64 }}
+      digest-amd64-rolling: ${{ steps.digest.outputs.digest-amd64-rolling }}
+      digest-arm64-rolling: ${{ steps.digest.outputs.digest-arm64-rolling }}
+      digest-amd64: ${{ steps.digest.outputs.digest-amd64 }}
+      digest-arm64: ${{ steps.digest.outputs.digest-arm64 }}
     strategy:
       matrix:
         arch: [amd64, arm64]
@@ -118,8 +118,11 @@ jobs:
         with:
           name: generated-code
           path: .
-      - run: docker buildx create --use --name release-builder
-      - run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      - uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+      - uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version: ${{ env.GO_VERSION }}
@@ -130,26 +133,25 @@ jobs:
           GOOS: linux
           ENABLE_VIPS: true
       - id: build
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
+        with:
+          context: ocis
+          file: ocis/docker/Dockerfile.linux.${{ matrix.arch }}
+          platforms: linux/${{ matrix.arch }}
+          push: true
+          provenance: false
+          build-args: |
+            REVISION=${{ github.sha }}
+            VERSION=${{ needs.determine-release-type.outputs.version }}
+          tags: |
+            ${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-${{ matrix.arch }}
+            ${{ matrix.repo }}:${{ join(slice(split(needs.determine-release-type.outputs.version, '.'), 0, 2), '.') }}-linux-${{ matrix.arch }}
+            ${{ matrix.repo }}:${{ split(needs.determine-release-type.outputs.version, '.')[0] }}-linux-${{ matrix.arch }}
+      - id: digest
         run: |
-          VERSION="${{ needs.determine-release-type.outputs.version }}"
-          REPO="${{ matrix.repo }}"
-          ARCH="${{ matrix.arch }}"
-
-          docker buildx build \
-            --platform "linux/${ARCH}" \
-            --file "ocis/docker/Dockerfile.linux.${ARCH}" \
-            --push --provenance=false \
-            --build-arg "REVISION=${{ github.sha }}" \
-            --build-arg "VERSION=${VERSION}" \
-            -t "${REPO}:${VERSION}-linux-${ARCH}" \
-            -t "${REPO}:$(echo "$VERSION" | cut -d. -f1-2)-linux-${ARCH}" \
-            -t "${REPO}:$(echo "$VERSION" | cut -d. -f1)-linux-${ARCH}" \
-            ocis
-
-          DIGEST=$(docker buildx imagetools inspect "${REPO}:${VERSION}-linux-${ARCH}" --format '{{.Manifest.Digest}}')
-          [[ "${REPO}" == *"rolling"* ]] \
-            && echo "digest-${ARCH}-rolling=${DIGEST}" >> $GITHUB_OUTPUT \
-            || echo "digest-${ARCH}=${DIGEST}"         >> $GITHUB_OUTPUT
+          [[ "${{ matrix.repo }}" == *"rolling"* ]] \
+            && echo "digest-${{ matrix.arch }}-rolling=${{ steps.build.outputs.digest }}" >> $GITHUB_OUTPUT \
+            || echo "digest-${{ matrix.arch }}=${{ steps.build.outputs.digest }}"         >> $GITHUB_OUTPUT
 
   docker-scan:
     name: docker-scan (${{ matrix.arch }}, ${{ matrix.repo }})
@@ -160,10 +162,12 @@ jobs:
         arch: [amd64]
         repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
     steps:
-      - run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-          trivy image --format table --exit-code 0 --severity CRITICAL,HIGH \
-            "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-${{ matrix.arch }}"
+      - uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+        with:
+          image-ref: ${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-${{ matrix.arch }}
+          format: table
+          exit-code: 0
+          severity: CRITICAL,HIGH
 
   docker-manifest:
     name: docker-manifest (${{ matrix.repo }})
@@ -173,7 +177,10 @@ jobs:
       matrix:
         repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
     steps:
-      - run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      - uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - if: ${{ contains(matrix.repo, 'rolling') }}
         run: |
           docker buildx imagetools create \
@@ -196,15 +203,12 @@ jobs:
         repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - run: |
-          README=$(python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" < ocis/docker/README.md)
-          TOKEN=$(curl -sf -X POST -H 'Content-Type: application/json' \
-            -d "{\"username\":\"${{ secrets.DOCKER_USERNAME }}\",\"password\":\"${{ secrets.DOCKER_PASSWORD }}\"}" \
-            https://hub.docker.com/v2/users/login | python3 -c 'import sys,json; print(json.load(sys.stdin)["token"])')
-          curl -sf -X PATCH \
-            -H "Authorization: JWT ${TOKEN}" -H "Content-Type: application/json" \
-            -d "{\"full_description\": ${README}}" \
-            "https://hub.docker.com/v2/repositories/${{ matrix.repo }}/"
+      - uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa # v5.0.0
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ${{ matrix.repo }}
+          readme-filepath: ocis/docker/README.md
 
   build-binaries:
     name: build-binaries (${{ matrix.os }})
@@ -238,9 +242,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-          trivy fs --format table --exit-code 0 --severity CRITICAL,HIGH .
+      - uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+        with:
+          scan-type: fs
+          format: table
+          exit-code: 0
+          severity: CRITICAL,HIGH
 
   license-check:
     runs-on: ubuntu-latest
@@ -304,14 +311,13 @@ jobs:
         with:
           name: changelog
           path: .
-      - run: |
-          [[ "${{ needs.determine-release-type.outputs.is_prerelease }}" == "true" ]] && PRERELEASE=--prerelease
-          gh release create -R "${{ github.repository }}" "${{ needs.determine-release-type.outputs.version }}" \
-            --title "${{ needs.determine-release-type.outputs.version }}" \
-            --notes-file CHANGELOG.md \
-            ${PRERELEASE:-} release-assets/*
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe # v2.6.1
+        with:
+          tag_name: ${{ needs.determine-release-type.outputs.version }}
+          name: ${{ needs.determine-release-type.outputs.version }}
+          body_path: CHANGELOG.md
+          prerelease: ${{ needs.determine-release-type.outputs.is_prerelease == 'true' }}
+          files: release-assets/*
 
   audit-release:
     runs-on: ubuntu-latest
