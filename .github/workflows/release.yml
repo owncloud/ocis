@@ -358,6 +358,8 @@ jobs:
             --version "${{ needs.determine-release-type.outputs.version }}" \
             --dir release-assets/ \
             --github-release --docker
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   notify:
     runs-on: ubuntu-latest

@@ -37,7 +37,7 @@ def expected_files(v):
     return [f for p in BINARY_PLATFORMS for f in (f"ocis-{v}-{p}", f"ocis-{v}-{p}.sha256")] + [EULA, LICENSES]
 
 def is_production(v):
-    return any(v.startswith(t) for t in PROD_TAGS)
+    return any(v.startswith(t) for t in PROD_TAGS) and "-" not in v
 
 def run(cmd):
     return subprocess.run(cmd, capture_output=True, text=True)
