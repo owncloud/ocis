@@ -302,6 +302,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiOcm/share.feature:1238](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1238)
 - [apiOcm/share.feature:1349](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1349)
 
+#### [[OCM] thumbnail preview of federated shared image fails](https://github.com/owncloud/ocis/issues/10495)
+
+- [apiOcm/share.feature:942](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L942)
+
 #### [[OCM] federated user trying to download file shared with permissions role Secure Viewer returns 500 status code](https://github.com/owncloud/ocis/issues/10822)
 
 - [apiOcm/enableDisablePermissionsRole.feature:18](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/enableDisablePermissionsRole.feature#L18)
