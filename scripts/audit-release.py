@@ -128,7 +128,7 @@ def check_github_release(version):
 
     checks = [
         (r.get("tag_name") == f"v{version}", f"tag_name: {r.get('tag_name')}"),
-        (r.get("name") == version,            f"name: {r.get('name')}"),
+        (r.get("name") == f"v{version}",       f"name: {r.get('name')}"),
         (not r.get("draft"),                  "draft: false"),
         (r.get("prerelease") == ("-" in version), f"prerelease: {r.get('prerelease')}"),
     ]
