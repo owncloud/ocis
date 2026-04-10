@@ -50,12 +50,18 @@ jobs:
           for PID in "${PIDS[@]}"; do wait "$PID" || FAILED=1; done
           kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
 
-          echo "=== phase 1 runner load ==="
-          cat /tmp/vmstat-phase1.log
-          awk 'NR>2 { cpu+=($13+$14); io+=$16; n++ }
-               END  { printf "avg CPU load: %d%%  avg I/O wait: %d%%\n", cpu/n, io/n }' /tmp/vmstat-phase1.log
+          # How to read the load line:
+          #   busy    — % of time CPUs were doing work  (100% = fully saturated)
+          #   runq    — processes waiting for a CPU turn; runq >> nCPU means tasks
+          #             compete and each runs slower (runq 10 on 2 vCPU = ~5× slower)
+          #   wa      — % waiting on disk/network; wa > 20% = I/O bound, not CPU bound
+          #             → high wa: add more parallel tasks; high runq: reduce them
+          awk '/^[ ]*[0-9]/ { busy=100-$15; sum_b+=busy; if(busy>pk_b)pk_b=busy;
+                               sum_r+=$1;   if($1>pk_r) pk_r=$1; sum_wa+=$16; n++ }
+               END { printf "=== phase 1 load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
+                     sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat-phase1.log
 
-          echo "=== php-style ==="        && cat /tmp/php-style.log
+          echo "=== php-style ==="       && cat /tmp/php-style.log
           echo "=== gherkin ==="          && cat /tmp/gherkin.log
           echo "=== suites ==="           && cat /tmp/suites.log
           echo "=== govulncheck ==="      && cat /tmp/govulncheck.log
@@ -80,12 +86,13 @@ jobs:
           for PID in "${PIDS[@]}"; do wait "$PID" || FAILED=1; done
           kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
 
-          echo "=== phase 2 runner load ==="
-          cat /tmp/vmstat-phase2.log
-          awk 'NR>2 { cpu+=($13+$14); io+=$16; n++ }
-               END  { printf "avg CPU load: %d%%  avg I/O wait: %d%%\n", cpu/n, io/n }' /tmp/vmstat-phase2.log
+          # Signal: busy=saturated  runq>>2=tasks competing(slows each)  wa>20%=I/O bound
+          awk '/^[ ]*[0-9]/ { busy=100-$15; sum_b+=busy; if(busy>pk_b)pk_b=busy;
+                               sum_r+=$1;   if($1>pk_r) pk_r=$1; sum_wa+=$16; n++ }
+               END { printf "=== phase 2 load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
+                     sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat-phase2.log
 
-          echo "=== golangci-lint ===" && cat /tmp/golangci-lint.log
+          echo "=== golangci-lint ==="&& cat /tmp/golangci-lint.log
           echo "=== ocis build ==="   && cat /tmp/ocis-build.log
           echo "=== unit tests ==="   && cat /tmp/unit-tests.log
 
