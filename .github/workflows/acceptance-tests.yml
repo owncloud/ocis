@@ -5,6 +5,8 @@ on:
   workflow_dispatch:
 
 jobs:
+  pre-checks:
+    name: pre-checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -18,38 +20,49 @@ jobs:
           sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd
           sudo update-alternatives --set php /usr/bin/php8.4
           curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-      - name: PHP code style
+      - name: Checks
         run: |
-          make vendor-bin-codestyle
-          make vendor-bin-codesniffer
-          make test-php-style
-      - name: Check env var annotations
-        run: make check-env-var-annotations
+          # Runner load legend (ubuntu-latest = 2 vCPU / 7 GB RAM):
+          #   us  — user-space CPU %   (our processes)
+          #   sy  — kernel CPU %
+          #   id  — idle %;  load % ≈ 100 - id
+          #   wa  — I/O wait %;  high wa = disk-bound, not CPU-bound
+          #
+          # Expected pressure per task:
+          #   gherkin lint     ~10 % CPU  (JS parsing, mostly I/O for npm install)
+          #   php-style        ~30 % CPU  (PHP AST analysis, light CPU; composer install is I/O-bound)
+          #   suite check      ~5  % CPU  (bash + grep over .md files, negligible)
+          #
+          # Total expected load: ~40-50 % CPU, wa spikes during npm/composer installs.
 
-  check-gherkin-standard:
-    name: check-gherkin-standard
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        with:
-          node-version: "24"
-      - name: Lint feature files
-        run: |
-          npm install -g @gherlint/gherlint@1.1.0
-          make test-gherkin-lint
+          vmstat 2 > /tmp/vmstat.log & MONITOR_PID=$!
 
-  check-suites-in-expected-failures:
-    name: check-suites-in-expected-failures
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Check suites
-        run: bash tests/acceptance/check-deleted-suites-in-expected-failure.sh
+          (npm install -g @gherlint/gherlint@1.1.0 && make test-gherkin-lint)                                               > /tmp/gherkin.log 2>&1    & PIDS=($!)
+          (make vendor-bin-codestyle && make vendor-bin-codesniffer && make test-php-style && make check-env-var-annotations) > /tmp/php-style.log 2>&1 & PIDS+=($!)
+          bash tests/acceptance/check-deleted-suites-in-expected-failure.sh                                                   > /tmp/suites.log 2>&1    & PIDS+=($!)
+
+          FAILED=0
+          for PID in "${PIDS[@]}"; do
+            wait "$PID" || FAILED=1
+          done
+
+          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null
+
+          echo "=== runner load ==="
+          cat /tmp/vmstat.log
+          awk 'NR>2 { cpu+=($13+$14); io+=$16; n++ }
+               END  { printf "avg CPU load: %d%%  avg I/O wait: %d%%\n",
+                              cpu/n, io/n }' /tmp/vmstat.log
+
+          echo "=== gherkin ===" && cat /tmp/gherkin.log
+          echo "=== php-style ===" && cat /tmp/php-style.log
+          echo "=== suites ===" && cat /tmp/suites.log
+
+          exit $FAILED
 
   build-and-test:
     name: build-and-test
-    needs: [coding-standard, check-gherkin-standard, check-suites-in-expected-failures]
+    needs: [pre-checks]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
