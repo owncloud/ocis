@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-01-03 00:30+0000\n"
+"POT-Creation-Date: 2026-03-24 00:06+0000\n"
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
 "Last-Translator: Cesare Capoferri, 2026\n"
 "Language-Team: Italian (https://app.transifex.com/owncloud-org/teams/6149/it/)\n"
@@ -23,63 +23,97 @@ msgstr ""
 "Language: it\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
-#. UnifiedRole EditorListGrantsWithVersions, Role DisplayName (resolves
+#. EditorLite
+#. UnifiedRole EditorLite, Role DisplayName (resolves directly)
+#. FileEditor
+#. UnifiedRole FileEditor, Role DisplayName (resolves directly)
+#. Editor without Versions
+#. UnifiedRole SpaceEditorWithoutVersions, Role DisplayName (resolves
 #. directly)
-#. UnifiedRole SpaseEditor, Role DisplayName (resolves directly)
-#. UnifiedRole FileEditorListGrants, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:134 pkg/unifiedrole/roles.go:140
-#: pkg/unifiedrole/roles.go:170
+#: pkg/unifiedrole/roles.go:138 pkg/unifiedrole/roles.go:172
+#: pkg/unifiedrole/roles.go:206
 msgid "Can edit"
 msgstr "Può modificare"
 
+#. FileEditor + ListGrants
+#. UnifiedRole FileEditorListGrants, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:180
+msgid "Can edit and show invitees"
+msgstr "Può modificare e mostrare gli invitati"
+
+#. Editor
+#. UnifiedRole Editor, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:146
+msgid "Can edit with trashbin"
+msgstr "Può modificare con il cestino"
+
+#. Editor + ListGrants
+#. UnifiedRole EditorListGrants, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:154
+msgid "Can edit with trashbin and show invitees"
+msgstr "Può modificare con il cestino e mostrare gli invitati"
+
+#. Editor + ListGrants + Version
+#. UnifiedRole EditorListGrantsWithVersions, Role DisplayName (resolves
+#. directly)
+#: pkg/unifiedrole/roles.go:162
+msgid "Can edit with trashbin, versions and show invitees"
+msgstr "Può modificare con cestino, versioni e mostrare gli invitati"
+
+#. Editor without Trashbin
 #. UnifiedRole SpaceEditorWithoutTrashbin, Role DisplayName (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:149
-msgid "Can edit without trashbin"
-msgstr "Può modificare senza cestino"
+#: pkg/unifiedrole/roles.go:214
+msgid "Can edit with versions"
+msgstr "Può modificare con versioni"
 
-#. UnifiedRole Editor, Role DisplayName (resolves directly)
-#. UnifiedRole EditorListGrants, Role DisplayName (resolves directly)
-#. UnifiedRole SpaseEditorWithoutVersions, Role DisplayName (resolves
+#. FileEditor + ListGrants + Versions
+#. UnifiedRole FileEditorListGrantsWithVersions, Role DisplayName (resolves
 #. directly)
-#. UnifiedRole FileEditor, Role DisplayName (resolves directly)
-#. UnifiedRole FileEditorListGrants, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:122 pkg/unifiedrole/roles.go:128
-#: pkg/unifiedrole/roles.go:146 pkg/unifiedrole/roles.go:158
-#: pkg/unifiedrole/roles.go:164
-msgid "Can edit without versions"
-msgstr "Può modificare senza versioni"
+#: pkg/unifiedrole/roles.go:188
+msgid "Can edit with versions and show invitees"
+msgstr "Può modificare con versioni e mostrare gli invitati"
 
+#. Editor
+#. UnifiedRole SpaceEditor, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:222
+msgid "Can edit with versions and trashbin"
+msgstr "Può modificare con versioni e cestino"
+
+#. Manager
 #. UnifiedRole Manager, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:182
+#: pkg/unifiedrole/roles.go:230
 msgid "Can manage"
 msgstr "Può gestire"
 
-#. UnifiedRole EditorLite, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:176
-msgid "Can upload"
-msgstr "Può caricare"
-
+#. Viewer
 #. UnifiedRole Viewer, Role DisplayName (resolves directly)
-#. UnifiedRole ViewerListGrants, Role DisplayName (resolves directly)
-#. UnifiedRole SpaseViewer, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:104 pkg/unifiedrole/roles.go:110
-#: pkg/unifiedrole/roles.go:116
+#. Viewer
+#. UnifiedRole SpaceViewer, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:112 pkg/unifiedrole/roles.go:198
 msgid "Can view"
 msgstr "Può visualizzare"
 
+#. SecureViewer
 #. UnifiedRole SecureViewer, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:188
+#: pkg/unifiedrole/roles.go:104
 msgid "Can view (secure)"
 msgstr "Può visualizzare (sicuro)"
 
+#. Viewer + ListGrants
+#. UnifiedRole ViewerListGrants, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:120
+msgid "Can view and show invitees"
+msgstr "Può visualizzare e mostrare gli invitati"
+
+#. Denial
 #. UnifiedRole FullDenial, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:194
+#: pkg/unifiedrole/roles.go:130
 msgid "Cannot access"
 msgstr "Impossibile accedere"
 
 #. UnifiedRole FullDenial, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:191
+#: pkg/unifiedrole/roles.go:132
 msgid "Deny all access."
 msgstr "Nega qualunque accesso."
 
@@ -90,81 +124,90 @@ msgstr "Qui puoi aggiungere una descrizione per questo spazio."
 
 #. UnifiedRole Viewer, Role Description (resolves directly)
 #. UnifiedRole SpaceViewer, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:101 pkg/unifiedrole/roles.go:113
+#: pkg/unifiedrole/roles.go:114 pkg/unifiedrole/roles.go:200
 msgid "View and download."
 msgstr "Visualizza e scarica."
 
 #. UnifiedRole SecureViewer, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:185
+#: pkg/unifiedrole/roles.go:106
 msgid "View only documents, images and PDFs. Watermarks will be applied."
 msgstr ""
 "Visualizza solo documenti, immagini e PDF. Saranno applicate delle "
 "filigrane."
 
-#. UnifiedRole FileEditor, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:155
-msgid "View, download and edit."
-msgstr "Visualizza, scarica e modifica."
-
 #. UnifiedRole ViewerListGrants, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:107
+#: pkg/unifiedrole/roles.go:122
 msgid "View, download and show all invited people."
 msgstr "Visualizza, scarica e mostra tutte le persone invitate."
 
+#. UnifiedRole FileEditor, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:174
+msgid "View, download, upload and edit."
+msgstr "Visualizza, scarica, carica e modifica."
+
 #. UnifiedRole EditorLite, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:173
-msgid "View, download and upload."
-msgstr "Visualizza, scarica e carica."
+#. UnifiedRole SpaceEditorWithoutVersions, Role Description (resolves
+#. directly)
+#: pkg/unifiedrole/roles.go:140 pkg/unifiedrole/roles.go:208
+msgid "View, download, upload, edit and add."
+msgstr "Visualizza, scarica, carica, modifica e aggiungi."
 
 #. UnifiedRole FileEditorListGrants, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:167
-msgid "View, download, edit and show all invited people, show all versions."
+#: pkg/unifiedrole/roles.go:182
+msgid "View, download, upload, edit and show all invited people."
 msgstr ""
-"Visualizza, scarica, modifica e mostra tutte le persone invitate, mostra "
-"tutte le versioni."
-
-#. UnifiedRole FileEditorListGrants, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:161
-msgid "View, download, edit and show all invited people."
-msgstr "Visualizza, scarica, modifica e mostra tutte le persone invitate."
+"Visualizza, scarica, carica, modifica e mostra tutte le persone invitate."
 
 #. UnifiedRole Editor, Role Description (resolves directly)
-#. UnifiedRole SpaseEditorWithoutVersions, Role Description (resolves
-#. directly)
-#. UnifiedRole SpaceEditorWithoutTrashbin, Role Description (resolves
-#. directly)
-#: pkg/unifiedrole/roles.go:119 pkg/unifiedrole/roles.go:143
-#: pkg/unifiedrole/roles.go:152
+#: pkg/unifiedrole/roles.go:148
 msgid "View, download, upload, edit, add and delete."
 msgstr "Visualizza, scarica, carica, modifica, aggiungi ed elimina."
 
-#. UnifiedRole Manager, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:179
-msgid "View, download, upload, edit, add, delete and manage members."
+#. UnifiedRole SpaceEditorWithoutTrashbin, Role Description (resolves
+#. directly)
+#: pkg/unifiedrole/roles.go:216
+msgid "View, download, upload, edit, add and show all versions."
 msgstr ""
-"Visualizza, scarica, carica, modifica, aggiungi, elimina e gestisci i "
-"membri."
+"Visualizza, scarica, carica, modifica, aggiungi e mostra tutte le versioni."
 
 #. UnifiedRole EditorListGrants Editor, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:125
+#: pkg/unifiedrole/roles.go:156
 msgid "View, download, upload, edit, add, delete and show all invited people."
 msgstr ""
 "Visualizza, scarica, carica, modifica, aggiungi, elimina e mostra tutte le "
 "persone invitate."
 
-#. UnifiedRole SpaseEditor, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:137
-msgid "View, download, upload, edit, add, delete including the history."
+#. UnifiedRole SpaceEditor, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:224
+msgid "View, download, upload, edit, add, show all versions and delete."
 msgstr ""
-"Visualizza, scarica, carica, modifica, aggiungi, elimina inclusa la "
-"cronologia."
+"Visualizza, scarica, carica, modifica, aggiungi, mostra tutte le versioni ed"
+" elimina."
+
+#. UnifiedRole Manager, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:232
+msgid ""
+"View, download, upload, edit, add, show all versions, delete and manage "
+"members."
+msgstr ""
+"Visualizza, scarica, carica, modifica, aggiungi, mostra tutte le versioni, "
+"elimina e gestisci i membri."
 
 #. UnifiedRole EditorListGrantsWithVersions, Role Description (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:131
+#: pkg/unifiedrole/roles.go:164
 msgid ""
-"View, download, upload, edit, delete and show all invited people, show all "
-"versions."
+"View, download, upload, edit, delete, show all versions and all invited "
+"people."
 msgstr ""
-"Visualizza, scarica, carica, modifica, elimina e mostra tutte le persone "
-"invitate, mostra tutte le versioni."
+"Visualizza, scarica, carica, modifica, elimina, mostra tutte le versioni e "
+"tutte le persone invitate."
+
+#. UnifiedRole FileEditorListGrantsWithVersions, Role Description (resolves
+#. directly)
+#: pkg/unifiedrole/roles.go:190
+msgid ""
+"View, download, upload, edit, show all versions and all invited people."
+msgstr ""
+"Visualizza, scarica, carica, modifica, mostra tutte le versioni e tutte le "
+"persone invitate."

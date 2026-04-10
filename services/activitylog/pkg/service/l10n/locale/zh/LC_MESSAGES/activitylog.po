@@ -1,0 +1,108 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# Martin <github@diemattels.at>, 2026
+# guanu244, 2026
+# 許明凱 <yuteson@gmail.com>, 2026
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: EMAIL\n"
+"POT-Creation-Date: 2026-03-24 00:06+0000\n"
+"PO-Revision-Date: 2026-01-02 10:10+0000\n"
+"Last-Translator: 許明凱 <yuteson@gmail.com>, 2026\n"
+"Language-Team: Chinese (https://app.transifex.com/owncloud-org/teams/6149/zh/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: pkg/service/response.go:44
+msgid "description"
+msgstr "描述"
+
+#: pkg/service/response.go:43
+msgid "display name"
+msgstr "顯示名稱"
+
+#: pkg/service/response.go:42
+msgid "expiration date"
+msgstr "設置到期日期"
+
+#: pkg/service/response.go:41
+msgid "password"
+msgstr "密碼"
+
+#: pkg/service/response.go:40
+msgid "permission"
+msgstr "權限"
+
+#: pkg/service/response.go:45
+msgid "shared-with-me"
+msgstr "與我共享"
+
+#: pkg/service/response.go:39
+msgid "some field"
+msgstr "部分欄位"
+
+#: pkg/service/response.go:26
+msgid "{resource} was downloaded via public link {token}"
+msgstr "{resource} 透過公開連結{token} 被下載了"
+
+#: pkg/service/response.go:24
+msgid "{user} added {resource} to {folder}"
+msgstr "{user} 已将 {resource} 加入空间 {folder}"
+
+#: pkg/service/response.go:36
+msgid "{user} added {sharee} as member of {space}"
+msgstr "{user} 已将 {sharee} 添加为空间 {space} 的成员"
+
+#: pkg/service/response.go:27
+msgid "{user} deleted {resource} from {folder}"
+msgstr "{user} 已从空间 {folder} 中删除了 {resource}"
+
+#: pkg/service/response.go:28
+msgid "{user} moved {resource} to {folder}"
+msgstr "{user} 已将 {resource} 移动至空间 {folder} 中"
+
+#: pkg/service/response.go:35
+msgid "{user} removed link to {resource}"
+msgstr "{user} 移除了 {resource} 的链接"
+
+#: pkg/service/response.go:32
+msgid "{user} removed {sharee} from {resource}"
+msgstr "{user} 从空间 {resource} 中移除了{sharee}"
+
+#: pkg/service/response.go:37
+msgid "{user} removed {sharee} from {space}"
+msgstr "{user} 移除了 {space} 的 {sharee}"
+
+#: pkg/service/response.go:29
+msgid "{user} renamed {oldResource} to {resource}"
+msgstr "{user} 重命名了 {oldResource} 为 {resource}"
+
+#: pkg/service/response.go:33
+msgid "{user} shared {resource} via link"
+msgstr "{user} 通过链接分享了 {resource}"
+
+#: pkg/service/response.go:30
+msgid "{user} shared {resource} with {sharee}"
+msgstr "{user} 通过 {sharee} 共享了 {resource}"
+
+#: pkg/service/response.go:34
+msgid "{user} updated {field} for a link {token} on {resource}"
+msgstr "{user} 更新了 {resource} 連結 {token} 的 {field} 欄位"
+
+#: pkg/service/response.go:31
+msgid "{user} updated {field} for the {resource}"
+msgstr "{user} 更新了 {resource} 的 {field}"
+
+#: pkg/service/response.go:25
+msgid "{user} updated {resource} in {folder}"
+msgstr "{user} 已在 {folder} 內更新 {resource}"
