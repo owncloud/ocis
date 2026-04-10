@@ -171,6 +171,8 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+        id: trivy
+        continue-on-error: true
         with:
           image-ref: ${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-${{ matrix.arch }}
           format: table
@@ -181,6 +183,12 @@ jobs:
           hide-progress: true
         env:
           TRIVY_IGNOREFILE: .trivyignore
+
+      - name: Block on vulnerabilities
+        if: steps.trivy.outcome == 'failure'
+        run: |
+          echo "::error title=Security scan blocked release::Image ${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-${{ matrix.arch }} has HIGH or CRITICAL vulnerabilities (see Trivy report above). Fix all findings before releasing."
+          exit 1
 
   docker-manifest:
     name: docker-manifest (${{ matrix.repo }})
