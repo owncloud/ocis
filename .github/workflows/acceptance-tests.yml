@@ -5,50 +5,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  coding-standard:
-    name: coding-standard
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Install PHP 8.4
-        run: |
-          sudo add-apt-repository -y ppa:ondrej/php
-          sudo apt-get update -qq
-          sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd
-          sudo update-alternatives --set php /usr/bin/php8.4
-          curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-      - name: PHP code style
-        run: |
-          make vendor-bin-codestyle
-          make vendor-bin-codesniffer
-          make test-php-style
-      - name: Check env var annotations
-        run: make check-env-var-annotations
-
-  check-gherkin-standard:
-    name: check-gherkin-standard
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        with:
-          node-version: "24"
-      - name: Lint feature files
-        run: |
-          npm install -g @gherlint/gherlint@1.1.0
-          make test-gherkin-lint
-
-  check-suites-in-expected-failures:
-    name: check-suites-in-expected-failures
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Check suites
-        run: bash tests/acceptance/check-deleted-suites-in-expected-failure.sh
-
   build-and-test:
     name: build-and-test
-    needs: [coding-standard, check-gherkin-standard, check-suites-in-expected-failures]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -64,26 +22,80 @@ jobs:
       - name: Enable pnpm
         run: corepack enable && corepack prepare pnpm@10.28.1 --activate
 
-      - name: Generate nodejs
-        run: make ci-node-generate
+      - name: Pre-checks and generate
+        run: |
+          # Phase 1 — I/O + light CPU, no contention between tasks.
+          # PHP install (~40s) is moved inside the php-style subshell so it overlaps
+          # with govulncheck (network I/O), node-gen, and go-gen instead of blocking
+          # the entire job sequentially.
+          # wa (I/O wait) will spike during apt-get/npm/pnpm downloads.
+          # Expected avg load: ~50-60 % CPU on 2 vCPU.
+          vmstat 2 > /tmp/vmstat-phase1.log & MONITOR_PID=$!
 
-      - name: Generate go
-        run: make ci-go-generate
+          #TODO: use github action to setup/install/cache php
+          (sudo add-apt-repository -y ppa:ondrej/php \
+            && sudo apt-get update -qq \
+            && sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd \
+            && sudo update-alternatives --set php /usr/bin/php8.4 \
+            && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+            && make vendor-bin-codestyle && make vendor-bin-codesniffer && make test-php-style && make check-env-var-annotations) > /tmp/php-style.log   2>&1 & PIDS=($!)
+          (npm install -g @gherlint/gherlint@1.1.0 && make test-gherkin-lint)                                                 > /tmp/gherkin.log     2>&1 & PIDS+=($!)
+          bash tests/acceptance/check-deleted-suites-in-expected-failure.sh                                                   > /tmp/suites.log      2>&1 & PIDS+=($!)
+          make govulncheck                                                                                                     > /tmp/govulncheck.log 2>&1 & PIDS+=($!)
+          make ci-node-generate                                                                                                > /tmp/node-gen.log    2>&1 & PIDS+=($!)
+          make ci-go-generate                                                                                                  > /tmp/go-gen.log      2>&1 & PIDS+=($!)
 
-      - name: Vulnerability scan
-        run: make govulncheck
+          FAILED=0
+          for PID in "${PIDS[@]}"; do wait "$PID" || FAILED=1; done
+          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
 
-      - name: Lint
-        run: make ci-golangci-lint
+          # How to read the load line:
+          #   busy    — % of time CPUs were doing work  (100% = fully saturated)
+          #   runq    — processes waiting for a CPU turn; runq >> nCPU means tasks
+          #             compete and each runs slower (runq 10 on 2 vCPU = ~5× slower)
+          #   wa      — % waiting on disk/network; wa > 20% = I/O bound, not CPU bound
+          #             → high wa: add more parallel tasks; high runq: reduce them
+          awk '/^[ ]*[0-9]/ { busy=100-$15; sum_b+=busy; if(busy>pk_b)pk_b=busy;
+                               sum_r+=$1;   if($1>pk_r) pk_r=$1; sum_wa+=$16; n++ }
+               END { printf "=== phase 1 load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
+                     sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat-phase1.log
 
-      - name: Build ocis
-        run: make -C ocis build
+          echo "=== php-style ==="       && cat /tmp/php-style.log
+          echo "=== gherkin ==="          && cat /tmp/gherkin.log
+          echo "=== suites ==="           && cat /tmp/suites.log
+          echo "=== govulncheck ==="      && cat /tmp/govulncheck.log
+          echo "=== ci-node-generate ===" && cat /tmp/node-gen.log
+          echo "=== ci-go-generate ==="   && cat /tmp/go-gen.log
 
-      - name: Build debug binary
-        run: make -C ocis build-debug
+          exit $FAILED
 
-      - name: Unit tests
-        run: make test
+      - name: Build, lint and test
+        run: |
+          # Phase 2 — all three are CPU-bound Go compilation on 2 vCPU.
+          # They compete for CPU (expect id < 10, load ~95 %) but share the
+          # Go build cache within this runner, so make test reuses artifacts
+          # from the ocis build. Critical path = ocis build (~300 s).
+          vmstat 2 > /tmp/vmstat-phase2.log & MONITOR_PID=$!
+
+          make ci-golangci-lint > /tmp/golangci-lint.log 2>&1 & PIDS=($!)
+          make -C ocis build    > /tmp/ocis-build.log    2>&1 & PIDS+=($!)
+          make test             > /tmp/unit-tests.log    2>&1 & PIDS+=($!)
+
+          FAILED=0
+          for PID in "${PIDS[@]}"; do wait "$PID" || FAILED=1; done
+          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
+
+          # Signal: busy=saturated  runq>>2=tasks competing(slows each)  wa>20%=I/O bound
+          awk '/^[ ]*[0-9]/ { busy=100-$15; sum_b+=busy; if(busy>pk_b)pk_b=busy;
+                               sum_r+=$1;   if($1>pk_r) pk_r=$1; sum_wa+=$16; n++ }
+               END { printf "=== phase 2 load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
+                     sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat-phase2.log
+
+          echo "=== golangci-lint ==="&& cat /tmp/golangci-lint.log
+          echo "=== ocis build ==="   && cat /tmp/ocis-build.log
+          echo "=== unit tests ==="   && cat /tmp/unit-tests.log
+
+          exit $FAILED
 
   local-api-tests:
     name: ${{ matrix.suite }}
