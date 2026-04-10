@@ -67,6 +67,13 @@ jobs:
       - name: Generate nodejs
         run: make ci-node-generate
 
+      - name: Download go dependencies
+        run: |
+          go mod download
+          go mod download -C tests/ociswrapper
+        env:
+          GOTOOLCHAIN: auto
+
       - name: Generate go
         run: make ci-go-generate
 
