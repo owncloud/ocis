@@ -1,0 +1,3 @@
+# Trivy vulnerability ignore file
+# Add CVE IDs or file paths here to suppress known/accepted findings.
+# See: https://aquasecurity.github.io/trivy/latest/docs/configuration/filtering/#trivyignore

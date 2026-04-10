@@ -17,9 +17,8 @@ env:
   PRODUCTION_RELEASE_TAGS: '5.0,7,8'
   DOCKER_REPO_ROLLING: owncloud/ocis-rolling
   DOCKER_REPO_PRODUCTION: owncloud/ocis
-  GO_VERSION: '1.25.7'
   NODE_VERSION: '24'
-  PNPM_VERSION: '10.11.0'
+  PNPM_VERSION: '10.28.1'
 
 jobs:
   determine-release-type:
@@ -77,7 +76,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version-file: go.mod
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -125,7 +124,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version-file: go.mod
       - run: sudo apt-get update -q && sudo apt-get install -qy libvips libvips-dev
       - run: make -C ocis release-linux-docker-${{ matrix.arch }}
         env:
@@ -239,7 +238,7 @@ jobs:
           path: .
       - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version-file: go.mod
       - run: |
           make -C ocis release-${{ matrix.os }} OUTPUT=${{ needs.determine-release-type.outputs.version }}
           make -C ocis release-finish
@@ -277,7 +276,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
       - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version-file: go.mod
       - run: npm install --silent -g yarn npx "pnpm@$PNPM_VERSION" --force
       - run: make ci-node-check-licenses && make ci-node-save-licenses
       - run: make ci-go-check-licenses && make ci-go-save-licenses
@@ -297,7 +296,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version-file: go.mod
       - run: |
           make changelog CHANGELOG_VERSION=$(echo "${{ needs.determine-release-type.outputs.version }}" | cut -d'-' -f1)
           # calens produces empty output when no versioned changelog directory exists (e.g. dev builds).
