@@ -5,11 +5,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  coding-standard:
-    name: coding-standard
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "24"
       - name: Install PHP 8.4
         run: |
           sudo add-apt-repository -y ppa:ondrej/php
@@ -72,6 +73,24 @@ jobs:
 
       - name: Build, lint and test
         run: |
+          # Runner load legend (ubuntu-latest = 2 vCPU / 7 GB RAM):
+          #   us  — user-space CPU %   (our processes)
+          #   sy  — kernel CPU %
+          #   id  — idle %;  load % ≈ 100 - id
+          #   wa  — I/O wait %;  high wa = disk-bound, not CPU-bound
+          #
+          # Expected pressure per task:
+          #   govulncheck      ~15 % CPU  (network I/O fetching module graph, wa spikes)
+          #   golangci-lint    ~60 % CPU  (Go compilation + AST analysis, CPU-bound)
+          #   ocis build       ~90 % CPU  (heavy Go compilation, fully CPU-bound)
+          #   make test        ~70 % CPU  (compiles + runs test binaries, CPU-bound)
+          #
+          # Running all four on 2 vCPUs will saturate them (id < 10, load ≈ 100 %).
+          # If wa is consistently > 20 % the bottleneck is disk/module-cache, not CPU.
+
+          # sample CPU every 2 s for the duration of this step
+          vmstat 2 > /tmp/vmstat.log & MONITOR_PID=$!
+
           make govulncheck      > /tmp/govulncheck.log 2>&1      & PIDS=($!)
           make ci-golangci-lint > /tmp/golangci-lint.log 2>&1    & PIDS+=($!)
           make -C ocis build    > /tmp/ocis-build.log 2>&1       & PIDS+=($!)
@@ -81,6 +100,14 @@ jobs:
           for PID in "${PIDS[@]}"; do
             wait "$PID" || FAILED=1
           done
+
+          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null
+
+          echo "=== runner load ==="
+          cat /tmp/vmstat.log
+          awk 'NR>2 { cpu+=($13+$14); io+=$16; n++ }
+               END  { printf "avg CPU load: %d%%  avg I/O wait: %d%%\n",
+                              cpu/n, io/n }' /tmp/vmstat.log
 
           echo "=== govulncheck ===" && cat /tmp/govulncheck.log
           echo "=== golangci-lint ===" && cat /tmp/golangci-lint.log
