@@ -5,64 +5,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  pre-checks:
-    name: pre-checks
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        with:
-          node-version: "24"
-      - name: Install PHP 8.4
-        run: |
-          sudo add-apt-repository -y ppa:ondrej/php
-          sudo apt-get update -qq
-          sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd
-          sudo update-alternatives --set php /usr/bin/php8.4
-          curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-      - name: Checks
-        run: |
-          # Runner load legend (ubuntu-latest = 2 vCPU / 7 GB RAM):
-          #   us  — user-space CPU %   (our processes)
-          #   sy  — kernel CPU %
-          #   id  — idle %;  load % ≈ 100 - id
-          #   wa  — I/O wait %;  high wa = disk-bound, not CPU-bound
-          #
-          # Expected pressure per task:
-          #   gherkin lint     ~10 % CPU  (JS parsing, mostly I/O for npm install)
-          #   php-style        ~30 % CPU  (PHP AST analysis, light CPU; composer install is I/O-bound)
-          #   suite check      ~5  % CPU  (bash + grep over .md files, negligible)
-          #
-          # Total expected load: ~40-50 % CPU, wa spikes during npm/composer installs.
-
-          vmstat 2 > /tmp/vmstat.log & MONITOR_PID=$!
-
-          (npm install -g @gherlint/gherlint@1.1.0 && make test-gherkin-lint)                                               > /tmp/gherkin.log 2>&1    & PIDS=($!)
-          (make vendor-bin-codestyle && make vendor-bin-codesniffer && make test-php-style && make check-env-var-annotations) > /tmp/php-style.log 2>&1 & PIDS+=($!)
-          bash tests/acceptance/check-deleted-suites-in-expected-failure.sh                                                   > /tmp/suites.log 2>&1    & PIDS+=($!)
-
-          FAILED=0
-          for PID in "${PIDS[@]}"; do
-            wait "$PID" || FAILED=1
-          done
-
-          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
-
-          echo "=== runner load ==="
-          cat /tmp/vmstat.log
-          awk 'NR>2 { cpu+=($13+$14); io+=$16; n++ }
-               END  { printf "avg CPU load: %d%%  avg I/O wait: %d%%\n",
-                              cpu/n, io/n }' /tmp/vmstat.log
-
-          echo "=== gherkin ===" && cat /tmp/gherkin.log
-          echo "=== php-style ===" && cat /tmp/php-style.log
-          echo "=== suites ===" && cat /tmp/suites.log
-
-          exit $FAILED
-
   build-and-test:
     name: build-and-test
-    needs: [pre-checks]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -78,54 +22,72 @@ jobs:
       - name: Enable pnpm
         run: corepack enable && corepack prepare pnpm@10.28.1 --activate
 
-      - name: Generate
+      - name: Install PHP 8.4
         run: |
-          make ci-node-generate &
-          make ci-go-generate &
-          wait $(jobs -p)
+          sudo add-apt-repository -y ppa:ondrej/php
+          sudo apt-get update -qq
+          sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd
+          sudo update-alternatives --set php /usr/bin/php8.4
+          curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+      - name: Pre-checks and generate
+        run: |
+          # Phase 1 — I/O + light CPU, no contention between tasks.
+          # govulncheck fetches the vuln DB over the network (I/O-bound, ~15 % CPU)
+          # so it doesn't compete with the generates.
+          # wa (I/O wait) will spike during npm/pnpm downloads.
+          # Expected avg load: ~40-50 % CPU on 2 vCPU.
+          vmstat 2 > /tmp/vmstat-phase1.log & MONITOR_PID=$!
+
+          (make vendor-bin-codestyle && make vendor-bin-codesniffer && make test-php-style && make check-env-var-annotations) > /tmp/php-style.log   2>&1 & PIDS=($!)
+          (npm install -g @gherlint/gherlint@1.1.0 && make test-gherkin-lint)                                                 > /tmp/gherkin.log     2>&1 & PIDS+=($!)
+          bash tests/acceptance/check-deleted-suites-in-expected-failure.sh                                                   > /tmp/suites.log      2>&1 & PIDS+=($!)
+          make govulncheck                                                                                                     > /tmp/govulncheck.log 2>&1 & PIDS+=($!)
+          make ci-node-generate                                                                                                > /tmp/node-gen.log    2>&1 & PIDS+=($!)
+          make ci-go-generate                                                                                                  > /tmp/go-gen.log      2>&1 & PIDS+=($!)
+
+          FAILED=0
+          for PID in "${PIDS[@]}"; do wait "$PID" || FAILED=1; done
+          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
+
+          echo "=== phase 1 runner load ==="
+          cat /tmp/vmstat-phase1.log
+          awk 'NR>2 { cpu+=($13+$14); io+=$16; n++ }
+               END  { printf "avg CPU load: %d%%  avg I/O wait: %d%%\n", cpu/n, io/n }' /tmp/vmstat-phase1.log
+
+          echo "=== php-style ==="        && cat /tmp/php-style.log
+          echo "=== gherkin ==="          && cat /tmp/gherkin.log
+          echo "=== suites ==="           && cat /tmp/suites.log
+          echo "=== govulncheck ==="      && cat /tmp/govulncheck.log
+          echo "=== ci-node-generate ===" && cat /tmp/node-gen.log
+          echo "=== ci-go-generate ==="   && cat /tmp/go-gen.log
+
+          exit $FAILED
 
       - name: Build, lint and test
         run: |
-          # Runner load legend (ubuntu-latest = 2 vCPU / 7 GB RAM):
-          #   us  — user-space CPU %   (our processes)
-          #   sy  — kernel CPU %
-          #   id  — idle %;  load % ≈ 100 - id
-          #   wa  — I/O wait %;  high wa = disk-bound, not CPU-bound
-          #
-          # Expected pressure per task:
-          #   govulncheck      ~15 % CPU  (network I/O fetching module graph, wa spikes)
-          #   golangci-lint    ~60 % CPU  (Go compilation + AST analysis, CPU-bound)
-          #   ocis build       ~90 % CPU  (heavy Go compilation, fully CPU-bound)
-          #   make test        ~70 % CPU  (compiles + runs test binaries, CPU-bound)
-          #
-          # Running all four on 2 vCPUs will saturate them (id < 10, load ≈ 100 %).
-          # If wa is consistently > 20 % the bottleneck is disk/module-cache, not CPU.
+          # Phase 2 — all three are CPU-bound Go compilation on 2 vCPU.
+          # They compete for CPU (expect id < 10, load ~95 %) but share the
+          # Go build cache within this runner, so make test reuses artifacts
+          # from the ocis build. Critical path = ocis build (~300 s).
+          vmstat 2 > /tmp/vmstat-phase2.log & MONITOR_PID=$!
 
-          # sample CPU every 2 s for the duration of this step
-          vmstat 2 > /tmp/vmstat.log & MONITOR_PID=$!
-
-          make govulncheck      > /tmp/govulncheck.log 2>&1      & PIDS=($!)
-          make ci-golangci-lint > /tmp/golangci-lint.log 2>&1    & PIDS+=($!)
-          make -C ocis build    > /tmp/ocis-build.log 2>&1       & PIDS+=($!)
-          make test             > /tmp/unit-tests.log 2>&1       & PIDS+=($!)
+          make ci-golangci-lint > /tmp/golangci-lint.log 2>&1 & PIDS=($!)
+          make -C ocis build    > /tmp/ocis-build.log    2>&1 & PIDS+=($!)
+          make test             > /tmp/unit-tests.log    2>&1 & PIDS+=($!)
 
           FAILED=0
-          for PID in "${PIDS[@]}"; do
-            wait "$PID" || FAILED=1
-          done
-
+          for PID in "${PIDS[@]}"; do wait "$PID" || FAILED=1; done
           kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
 
-          echo "=== runner load ==="
-          cat /tmp/vmstat.log
+          echo "=== phase 2 runner load ==="
+          cat /tmp/vmstat-phase2.log
           awk 'NR>2 { cpu+=($13+$14); io+=$16; n++ }
-               END  { printf "avg CPU load: %d%%  avg I/O wait: %d%%\n",
-                              cpu/n, io/n }' /tmp/vmstat.log
+               END  { printf "avg CPU load: %d%%  avg I/O wait: %d%%\n", cpu/n, io/n }' /tmp/vmstat-phase2.log
 
-          echo "=== govulncheck ===" && cat /tmp/govulncheck.log
           echo "=== golangci-lint ===" && cat /tmp/golangci-lint.log
-          echo "=== ocis build ===" && cat /tmp/ocis-build.log
-          echo "=== unit tests ===" && cat /tmp/unit-tests.log
+          echo "=== ocis build ==="   && cat /tmp/ocis-build.log
+          echo "=== unit tests ==="   && cat /tmp/unit-tests.log
 
           exit $FAILED
 
