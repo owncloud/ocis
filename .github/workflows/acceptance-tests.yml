@@ -46,7 +46,7 @@ jobs:
             wait "$PID" || FAILED=1
           done
 
-          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null
+          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
 
           echo "=== runner load ==="
           cat /tmp/vmstat.log
@@ -114,7 +114,7 @@ jobs:
             wait "$PID" || FAILED=1
           done
 
-          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null
+          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
 
           echo "=== runner load ==="
           cat /tmp/vmstat.log
