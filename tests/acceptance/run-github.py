@@ -208,7 +208,7 @@ def _apply_port_offset(env: dict, offset: int) -> dict:
         m = re.match(r'^(.*:)(\d{4,5})$', str(v))
         if m:
             port = int(m.group(2))
-            if 9100 <= port < 9400:
+            if 9100 <= port < 9500:  # covers all OCIS ports incl. store (9460/9464)
                 v = m.group(1) + str(port + offset)
         result[k] = v
     return result
@@ -251,6 +251,52 @@ def base_server_env(repo_root: Path, ocis_url: str, ocis_config_dir: str,
         # default tika off (overridden by search2 extraServerEnvironment)
         "SEARCH_EXTRACTOR_TYPE": "basic",
         "FRONTEND_FULL_TEXT_SEARCH_ENABLED": "false",
+        # OCIS events endpoint (NATS) — each slot needs its own NATS port
+        "OCIS_EVENTS_ENDPOINT": f"127.0.0.1:{p(9233)}",
+        # LDAP (IDM) — each slot needs its own LDAP listener
+        "OCIS_LDAP_URI":                 f"ldaps://localhost:{p(9235)}",
+        "IDM_LDAPS_ADDR":                f"0.0.0.0:{p(9235)}",
+        # proxy HTTP — must be set explicitly so each slot binds to its own port
+        "PROXY_HTTP_ADDR":               f"0.0.0.0:{p(9200)}",
+        # gRPC listen addresses — ALL services; same port-block reasoning as debug addrs
+        "APP_PROVIDER_GRPC_ADDR":        f"0.0.0.0:{p(9164)}",
+        "APP_REGISTRY_GRPC_ADDR":        f"0.0.0.0:{p(9242)}",
+        "AUTH_BASIC_GRPC_ADDR":          f"0.0.0.0:{p(9146)}",
+        "AUTH_MACHINE_GRPC_ADDR":        f"0.0.0.0:{p(9166)}",
+        "AUTH_SERVICE_GRPC_ADDR":        f"0.0.0.0:{p(9199)}",
+        "EVENTHISTORY_GRPC_ADDR":        f"0.0.0.0:{p(9274)}",
+        "GATEWAY_GRPC_ADDR":             f"0.0.0.0:{p(9142)}",
+        "GROUPS_GRPC_ADDR":              f"0.0.0.0:{p(9160)}",
+        "SEARCH_GRPC_ADDR":              f"0.0.0.0:{p(9220)}",
+        "SETTINGS_GRPC_ADDR":            f"0.0.0.0:{p(9185)}",
+        "SHARING_GRPC_ADDR":             f"0.0.0.0:{p(9150)}",
+        "STORAGE_PUBLICLINK_GRPC_ADDR":  f"0.0.0.0:{p(9178)}",
+        "STORAGE_SHARES_GRPC_ADDR":      f"0.0.0.0:{p(9154)}",
+        "STORAGE_SYSTEM_GRPC_ADDR":      f"0.0.0.0:{p(9215)}",
+        "STORAGE_USERS_GRPC_ADDR":       f"0.0.0.0:{p(9157)}",
+        "THUMBNAILS_GRPC_ADDR":          f"0.0.0.0:{p(9191)}",
+        "USERS_GRPC_ADDR":               f"0.0.0.0:{p(9144)}",
+        "STORE_GRPC_ADDR":               f"0.0.0.0:{p(9460)}",
+        # HTTP listen addresses
+        "ACTIVITYLOG_HTTP_ADDR":         f"0.0.0.0:{p(9195)}",
+        "FRONTEND_HTTP_ADDR":            f"0.0.0.0:{p(9140)}",
+        "GRAPH_HTTP_ADDR":               f"0.0.0.0:{p(9120)}",
+        "IDP_HTTP_ADDR":                 f"0.0.0.0:{p(9130)}",
+        "OCDAV_HTTP_ADDR":               f"0.0.0.0:{p(9162)}",
+        "OCS_HTTP_ADDR":                 f"0.0.0.0:{p(9110)}",
+        "SETTINGS_HTTP_ADDR":            f"0.0.0.0:{p(9186)}",
+        "SSE_HTTP_ADDR":                 f"0.0.0.0:{p(9132)}",
+        "STORAGE_SYSTEM_HTTP_ADDR":      f"0.0.0.0:{p(9216)}",
+        "STORAGE_USERS_HTTP_ADDR":       f"0.0.0.0:{p(9158)}",
+        "THUMBNAILS_HTTP_ADDR":          f"0.0.0.0:{p(9190)}",
+        "USERLOG_HTTP_ADDR":             f"0.0.0.0:{p(9211)}",
+        "WEB_HTTP_ADDR":                 f"0.0.0.0:{p(9100)}",
+        "WEBDAV_HTTP_ADDR":              f"0.0.0.0:{p(9115)}",
+        "WEBFINGER_HTTP_ADDR":           f"0.0.0.0:{p(9275)}",
+        # data server URLs — must reference the slot-specific HTTP port
+        "STORAGE_USERS_DATA_SERVER_URL":  f"http://localhost:{p(9158)}/data",
+        "STORAGE_SYSTEM_DATA_SERVER_URL": f"http://localhost:{p(9216)}/data",
+        "THUMBNAILS_DATA_ENDPOINT":       f"http://127.0.0.1:{p(9190)}/thumbnails/data",
         # debug addresses
         "ACTIVITYLOG_DEBUG_ADDR":        f"0.0.0.0:{p(9197)}",
         "APP_PROVIDER_DEBUG_ADDR":       f"0.0.0.0:{p(9165)}",
@@ -269,7 +315,7 @@ def base_server_env(repo_root: Path, ocis_url: str, ocis_config_dir: str,
         "INVITATIONS_DEBUG_ADDR":        f"0.0.0.0:{p(9269)}",
         "NATS_DEBUG_ADDR":               f"0.0.0.0:{p(9234)}",
         "OCDAV_DEBUG_ADDR":              f"0.0.0.0:{p(9163)}",
-        "OCM_DEBUG_ADDR":                f"0.0.0.0:{p(9281)}",
+        "OCM_DEBUG_ADDR":                f"0.0.0.0:{p(9281)}",  # debug only — OCM service not started unless OCIS_ADD_RUN_SERVICES=ocm
         "OCS_DEBUG_ADDR":                f"0.0.0.0:{p(9114)}",
         "POSTPROCESSING_DEBUG_ADDR":     f"0.0.0.0:{p(9255)}",
         "PROXY_DEBUG_ADDR":              f"0.0.0.0:{p(9205)}",
@@ -281,6 +327,7 @@ def base_server_env(repo_root: Path, ocis_url: str, ocis_config_dir: str,
         "STORAGE_SHARES_DEBUG_ADDR":     f"0.0.0.0:{p(9156)}",
         "STORAGE_SYSTEM_DEBUG_ADDR":     f"0.0.0.0:{p(9217)}",
         "STORAGE_USERS_DEBUG_ADDR":      f"0.0.0.0:{p(9159)}",
+        "STORE_DEBUG_ADDR":              f"0.0.0.0:{p(9464)}",
         "THUMBNAILS_DEBUG_ADDR":         f"0.0.0.0:{p(9189)}",
         "USERLOG_DEBUG_ADDR":            f"0.0.0.0:{p(9214)}",
         "USERS_DEBUG_ADDR":              f"0.0.0.0:{p(9145)}",
