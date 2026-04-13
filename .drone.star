@@ -572,14 +572,6 @@ def main(ctx):
                 pipelines,
             )
 
-    # always append notification step
-    pipelines.append(
-        pipelineDependsOn(
-            notify(ctx),
-            pipelines,
-        ),
-    )
-
     pipelineSanityChecks(ctx, pipelines)
     return pipelines
 
@@ -2671,45 +2663,6 @@ def makeGoGenerate(module):
             "volumes": [stepVolumeGo],
         },
     ]
-
-def notify(ctx):
-    status = ["failure"]
-    if ctx.build.event in ["cron", "tag"]:
-        status.append("success")
-
-    return {
-        "kind": "pipeline",
-        "type": "docker",
-        "name": "chat-notifications",
-        "clone": {
-            "disable": True,
-        },
-        "steps": [
-            {
-                "name": "notify-matrix",
-                "image": OC_CI_ALPINE,
-                "environment": {
-                    "MATRIX_TOKEN": {
-                        "from_secret": "matrix_token",
-                    },
-                },
-                "commands": [
-                    "wget https://raw.githubusercontent.com/%s/%s/tests/config/drone/notification.sh" % (ctx.repo.slug, ctx.build.commit),
-                    "bash notification.sh",
-                ],
-            },
-        ],
-        "depends_on": [],
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/heads/stable-*",
-                "refs/heads/release*",
-                "refs/tags/**",
-            ],
-            "status": status,
-        },
-    }
 
 def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False, debug = True, external_idp = False):
     user = "0:0"
