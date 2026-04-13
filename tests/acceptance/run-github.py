@@ -8,12 +8,14 @@ Usage: BEHAT_SUITES=apiGraph python3 tests/acceptance/run-github.py
 
 import json
 import os
+import re
 import sys
 import subprocess
 import signal
 import time
 import tempfile
 import shutil
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -197,8 +199,35 @@ def merged_config(suites: list) -> dict:
     return merged
 
 
-def base_server_env(repo_root: Path, ocis_url: str, ocis_config_dir: str) -> dict:
+def _apply_port_offset(env: dict, offset: int) -> dict:
+    """Offset OCIS service ports (9100–9399) embedded in env values like '0.0.0.0:9174'."""
+    if offset == 0:
+        return env
+    result = {}
+    for k, v in env.items():
+        m = re.match(r'^(.*:)(\d{4,5})$', str(v))
+        if m:
+            port = int(m.group(2))
+            if 9100 <= port < 9400:
+                v = m.group(1) + str(port + offset)
+        result[k] = v
+    return result
+
+
+def _ocis_slot_dirs(slot: int):
+    """Return (config_dir, data_dir) for the given isolation slot."""
+    if slot == 0:
+        return Path.home() / ".ocis" / "config", Path.home() / ".ocis"
+    return (Path.home() / f".ocis-slot-{slot}" / "config",
+            Path.home() / f".ocis-slot-{slot}")
+
+
+def base_server_env(repo_root: Path, ocis_url: str, ocis_config_dir: str,
+                    port_offset: int = 0) -> dict:
     """Base ocis server environment matching drone ocisServer() function."""
+    def p(base: int) -> str:
+        return str(base + port_offset)
+
     return {
         "OCIS_URL": ocis_url,
         "OCIS_CONFIG_DIR": ocis_config_dir,
@@ -211,8 +240,9 @@ def base_server_env(repo_root: Path, ocis_url: str, ocis_config_dir: str) -> dic
         "OCIS_ASYNC_UPLOADS": "true",
         "OCIS_EVENTS_ENABLE_TLS": "false",
         "NATS_NATS_HOST": "0.0.0.0",
-        "NATS_NATS_PORT": "9233",
-        "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
+        "NATS_NATS_PORT": p(9233),
+        "MICRO_REGISTRY_ADDRESS": f"127.0.0.1:{p(9233)}",
+        "OCIS_RUNTIME_PORT": p(9250),
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
         "EVENTHISTORY_STORE": "memory",
         "OCIS_TRANSLATION_PATH": str(repo_root / "tests/config/translations"),
@@ -222,41 +252,41 @@ def base_server_env(repo_root: Path, ocis_url: str, ocis_config_dir: str) -> dic
         "SEARCH_EXTRACTOR_TYPE": "basic",
         "FRONTEND_FULL_TEXT_SEARCH_ENABLED": "false",
         # debug addresses
-        "ACTIVITYLOG_DEBUG_ADDR": "0.0.0.0:9197",
-        "APP_PROVIDER_DEBUG_ADDR": "0.0.0.0:9165",
-        "APP_REGISTRY_DEBUG_ADDR": "0.0.0.0:9243",
-        "AUTH_BASIC_DEBUG_ADDR": "0.0.0.0:9147",
-        "AUTH_MACHINE_DEBUG_ADDR": "0.0.0.0:9167",
-        "AUTH_SERVICE_DEBUG_ADDR": "0.0.0.0:9198",
-        "CLIENTLOG_DEBUG_ADDR": "0.0.0.0:9260",
-        "EVENTHISTORY_DEBUG_ADDR": "0.0.0.0:9270",
-        "FRONTEND_DEBUG_ADDR": "0.0.0.0:9141",
-        "GATEWAY_DEBUG_ADDR": "0.0.0.0:9143",
-        "GRAPH_DEBUG_ADDR": "0.0.0.0:9124",
-        "GROUPS_DEBUG_ADDR": "0.0.0.0:9161",
-        "IDM_DEBUG_ADDR": "0.0.0.0:9239",
-        "IDP_DEBUG_ADDR": "0.0.0.0:9134",
-        "INVITATIONS_DEBUG_ADDR": "0.0.0.0:9269",
-        "NATS_DEBUG_ADDR": "0.0.0.0:9234",
-        "OCDAV_DEBUG_ADDR": "0.0.0.0:9163",
-        "OCM_DEBUG_ADDR": "0.0.0.0:9281",
-        "OCS_DEBUG_ADDR": "0.0.0.0:9114",
-        "POSTPROCESSING_DEBUG_ADDR": "0.0.0.0:9255",
-        "PROXY_DEBUG_ADDR": "0.0.0.0:9205",
-        "SEARCH_DEBUG_ADDR": "0.0.0.0:9224",
-        "SETTINGS_DEBUG_ADDR": "0.0.0.0:9194",
-        "SHARING_DEBUG_ADDR": "0.0.0.0:9151",
-        "SSE_DEBUG_ADDR": "0.0.0.0:9139",
-        "STORAGE_PUBLICLINK_DEBUG_ADDR": "0.0.0.0:9179",
-        "STORAGE_SHARES_DEBUG_ADDR": "0.0.0.0:9156",
-        "STORAGE_SYSTEM_DEBUG_ADDR": "0.0.0.0:9217",
-        "STORAGE_USERS_DEBUG_ADDR": "0.0.0.0:9159",
-        "THUMBNAILS_DEBUG_ADDR": "0.0.0.0:9189",
-        "USERLOG_DEBUG_ADDR": "0.0.0.0:9214",
-        "USERS_DEBUG_ADDR": "0.0.0.0:9145",
-        "WEB_DEBUG_ADDR": "0.0.0.0:9104",
-        "WEBDAV_DEBUG_ADDR": "0.0.0.0:9119",
-        "WEBFINGER_DEBUG_ADDR": "0.0.0.0:9279",
+        "ACTIVITYLOG_DEBUG_ADDR":        f"0.0.0.0:{p(9197)}",
+        "APP_PROVIDER_DEBUG_ADDR":       f"0.0.0.0:{p(9165)}",
+        "APP_REGISTRY_DEBUG_ADDR":       f"0.0.0.0:{p(9243)}",
+        "AUTH_BASIC_DEBUG_ADDR":         f"0.0.0.0:{p(9147)}",
+        "AUTH_MACHINE_DEBUG_ADDR":       f"0.0.0.0:{p(9167)}",
+        "AUTH_SERVICE_DEBUG_ADDR":       f"0.0.0.0:{p(9198)}",
+        "CLIENTLOG_DEBUG_ADDR":          f"0.0.0.0:{p(9260)}",
+        "EVENTHISTORY_DEBUG_ADDR":       f"0.0.0.0:{p(9270)}",
+        "FRONTEND_DEBUG_ADDR":           f"0.0.0.0:{p(9141)}",
+        "GATEWAY_DEBUG_ADDR":            f"0.0.0.0:{p(9143)}",
+        "GRAPH_DEBUG_ADDR":              f"0.0.0.0:{p(9124)}",
+        "GROUPS_DEBUG_ADDR":             f"0.0.0.0:{p(9161)}",
+        "IDM_DEBUG_ADDR":                f"0.0.0.0:{p(9239)}",
+        "IDP_DEBUG_ADDR":                f"0.0.0.0:{p(9134)}",
+        "INVITATIONS_DEBUG_ADDR":        f"0.0.0.0:{p(9269)}",
+        "NATS_DEBUG_ADDR":               f"0.0.0.0:{p(9234)}",
+        "OCDAV_DEBUG_ADDR":              f"0.0.0.0:{p(9163)}",
+        "OCM_DEBUG_ADDR":                f"0.0.0.0:{p(9281)}",
+        "OCS_DEBUG_ADDR":                f"0.0.0.0:{p(9114)}",
+        "POSTPROCESSING_DEBUG_ADDR":     f"0.0.0.0:{p(9255)}",
+        "PROXY_DEBUG_ADDR":              f"0.0.0.0:{p(9205)}",
+        "SEARCH_DEBUG_ADDR":             f"0.0.0.0:{p(9224)}",
+        "SETTINGS_DEBUG_ADDR":           f"0.0.0.0:{p(9194)}",
+        "SHARING_DEBUG_ADDR":            f"0.0.0.0:{p(9151)}",
+        "SSE_DEBUG_ADDR":                f"0.0.0.0:{p(9139)}",
+        "STORAGE_PUBLICLINK_DEBUG_ADDR": f"0.0.0.0:{p(9179)}",
+        "STORAGE_SHARES_DEBUG_ADDR":     f"0.0.0.0:{p(9156)}",
+        "STORAGE_SYSTEM_DEBUG_ADDR":     f"0.0.0.0:{p(9217)}",
+        "STORAGE_USERS_DEBUG_ADDR":      f"0.0.0.0:{p(9159)}",
+        "THUMBNAILS_DEBUG_ADDR":         f"0.0.0.0:{p(9189)}",
+        "USERLOG_DEBUG_ADDR":            f"0.0.0.0:{p(9214)}",
+        "USERS_DEBUG_ADDR":              f"0.0.0.0:{p(9145)}",
+        "WEB_DEBUG_ADDR":                f"0.0.0.0:{p(9104)}",
+        "WEBDAV_DEBUG_ADDR":             f"0.0.0.0:{p(9119)}",
+        "WEBFINGER_DEBUG_ADDR":          f"0.0.0.0:{p(9279)}",
     }
 
 
@@ -359,8 +389,6 @@ def main() -> int:
     ocis_bin = repo_root / "ocis/bin/ocis"
     wrapper_bin = repo_root / "tests/ociswrapper/bin/ociswrapper"
     ocis_url = "https://localhost:9200"
-    ocis_config_dir = Path.home() / ".ocis/config"
-
     ocis_fed_url = "https://localhost:10200"
 
     cfg = merged_config(suites)
@@ -435,13 +463,6 @@ def main() -> int:
         providers_tmp.close()
         cfg["extraServerEnvironment"]["OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE"] = providers_tmp.name
 
-    # init ocis
-    run([str(ocis_bin), "init", "--insecure", "true"])
-    shutil.copy(
-        repo_root / "tests/config/drone/app-registry.yaml",
-        ocis_config_dir / "app-registry.yaml",
-    )
-
     # generate fontsMap.json with correct font path (drone hardcodes /drone/src/...)
     font_path = str(repo_root / "tests/config/drone/NotoSans.ttf")
     fontmap_tmp = tempfile.NamedTemporaryFile(
@@ -449,25 +470,50 @@ def main() -> int:
     json.dump({"defaultFont": font_path}, fontmap_tmp)
     fontmap_tmp.close()
 
-    # assemble ocis server env
-    server_env = {**os.environ}
-    server_env.update(base_server_env(repo_root, ocis_url, str(ocis_config_dir)))
-    server_env["THUMBNAILS_TXT_FONTMAP_FILE"] = fontmap_tmp.name
-    server_env.update(cfg["extraServerEnvironment"])
+    # Per-slot startup: each suite gets its own isolated OCIS instance.
+    # slot 0 uses ~/.ocis (default path, backward compat); slot N uses ~/.ocis-slot-N.
+    # Port offset = slot × 300; OCIS debug ports span 9104–9281 (width 177) so offset
+    # 300 gives clean separation: slot 0→9100-9399, slot 1→9400-9699, slot 2→9700-9999.
+    slot_info = []  # list of (suite, ocis_url, wrapper_url, server_env)
+    for slot, suite in enumerate(suites):
+        offset = slot * 300
+        config_dir, _ = _ocis_slot_dirs(slot)
+        config_dir.mkdir(parents=True, exist_ok=True)
+        suite_ocis_url = f"https://localhost:{9200 + offset}"
+        suite_wrapper_url = f"http://localhost:{5200 + offset}"
 
-    # start ociswrapper (primary ocis)
-    print("Starting ocis...")
-    wrapper_proc = subprocess.Popen(
-        [str(wrapper_bin), "serve",
-         "--bin", str(ocis_bin),
-         "--url", ocis_url,
-         "--admin-username", "admin",
-         "--admin-password", "admin"],
-        env=server_env,
-    )
-    procs.append(wrapper_proc)
+        s_env = {**os.environ}
+        s_env.update(base_server_env(repo_root, suite_ocis_url, str(config_dir),
+                                     port_offset=offset))
+        s_env["THUMBNAILS_TXT_FONTMAP_FILE"] = fontmap_tmp.name
+        s_env.update(_apply_port_offset(cfg["extraServerEnvironment"], offset))
+
+        # init (idempotent — safe to re-run if config dir already exists)
+        run([str(ocis_bin), "init", "--insecure", "true"], env=s_env)
+        shutil.copy(
+            repo_root / "tests/config/drone/app-registry.yaml",
+            config_dir / "app-registry.yaml",
+        )
+
+        print(f"Starting ocis slot {slot} (suite: {suite}, port: {9200 + offset}, "
+              f"wrapper: {5200 + offset})...")
+        wrapper_proc = subprocess.Popen(
+            [str(wrapper_bin), "serve",
+             "--bin", str(ocis_bin),
+             "--url", suite_ocis_url,
+             "--admin-username", "admin",
+             "--admin-password", "admin",
+             "--port", str(5200 + offset)],
+            env=s_env,
+        )
+        procs.append(wrapper_proc)
+        slot_info.append((suite, suite_ocis_url, suite_wrapper_url, s_env))
+
+    # convenience: for single-suite callers, keep the old names pointing at slot 0
+    ocis_url = slot_info[0][1]
 
     # start federation ocis server (second instance on port 10200)
+    # only used by ocm group (single suite) — always slot 0, no offset conflict
     if cfg["federationServer"]:
         fed_config_dir = Path.home() / ".ocis-federation/config"
         fed_config_dir.mkdir(parents=True, exist_ok=True)
@@ -645,8 +691,9 @@ def main() -> int:
     signal.signal(signal.SIGINT, cleanup)
 
     try:
-        wait_for(lambda: ocis_healthy(ocis_url), 300, "ocis")
-        print("ocis ready.")
+        for suite, suite_ocis_url, _, _ in slot_info:
+            wait_for(lambda u=suite_ocis_url: ocis_healthy(u), 300, f"ocis ({suite})")
+            print(f"ocis ready for suite: {suite}.")
 
         if cfg["federationServer"]:
             wait_for(lambda: ocis_healthy(ocis_fed_url), 300, "federation ocis")
@@ -676,13 +723,10 @@ def main() -> int:
                 tmp.write(without_rphp.read_text())
         tmp.close()
 
-        # run tests
-        behat_env = {
+        # base behat env (suite-specific TEST_SERVER_URL / OCIS_WRAPPER_URL added per slot)
+        behat_env_base = {
             **os.environ,
-            "TEST_SERVER_URL": ocis_url,
             "TEST_SERVER_FED_URL": ocis_fed_url,
-            "OCIS_WRAPPER_URL": "http://localhost:5200",
-            "BEHAT_SUITES": behat_suites_raw,
             "ACCEPTANCE_TEST_TYPE": acceptance_test_type,
             "BEHAT_FILTER_TAGS": filter_tags,
             "EXPECTED_FAILURES_FILE": tmp.name,
@@ -692,14 +736,60 @@ def main() -> int:
             "EMAIL_PORT": EMAIL_PORT,
             "COLLABORATION_SERVICE_URL": f"http://localhost:{_WOPI_PORTS['fakeoffice']['http']}",
         }
-        behat_env.update(cfg["extraEnvironment"])
+        behat_env_base.update(cfg["extraEnvironment"])
 
-        print(f"Running suites: {behat_suites_raw} (type: {acceptance_test_type})")
-        result = subprocess.run(
-            ["make", "-C", str(repo_root), "test-acceptance-api"],
-            env=behat_env,
-        )
-        return result.returncode
+        def _run_suite(suite: str, suite_ocis_url: str, suite_wrapper_url: str) -> tuple:
+            """Run behat for one suite; capture output to file; return (suite, rc, log_path)."""
+            log_path = Path(f"/tmp/behat-{suite}.log")
+            env = {
+                **behat_env_base,
+                "TEST_SERVER_URL": suite_ocis_url,
+                "OCIS_WRAPPER_URL": suite_wrapper_url,
+                "BEHAT_SUITES": suite,
+            }
+            with open(log_path, "w") as lf:
+                rc = subprocess.run(
+                    ["make", "-C", str(repo_root), "test-acceptance-api"],
+                    env=env, stdout=lf, stderr=subprocess.STDOUT,
+                ).returncode
+            return suite, rc, log_path
+
+        if len(slot_info) == 1:
+            # single suite — stream output directly (unchanged behaviour)
+            suite, suite_ocis_url, suite_wrapper_url, _ = slot_info[0]
+            print(f"Running suite: {suite} (type: {acceptance_test_type})")
+            env = {
+                **behat_env_base,
+                "TEST_SERVER_URL": suite_ocis_url,
+                "OCIS_WRAPPER_URL": suite_wrapper_url,
+                "BEHAT_SUITES": suite,
+            }
+            return subprocess.run(
+                ["make", "-C", str(repo_root), "test-acceptance-api"], env=env,
+            ).returncode
+
+        # multiple suites — run in parallel, print logs serially after all finish
+        print(f"Running {len(slot_info)} suites in parallel (type: {acceptance_test_type}): "
+              f"{[s for s, *_ in slot_info]}")
+        failed = []
+        with ThreadPoolExecutor(max_workers=len(slot_info)) as ex:
+            futures = {
+                ex.submit(_run_suite, suite, suite_ocis_url, suite_wrapper_url): suite
+                for suite, suite_ocis_url, suite_wrapper_url, _ in slot_info
+            }
+            for fut in as_completed(futures):
+                suite, rc, log_path = fut.result()
+                print(f"\n{'='*60}\n=== Suite: {suite} (rc={rc}) ===\n{'='*60}")
+                sys.stdout.write(log_path.read_text())
+                sys.stdout.flush()
+                if rc != 0:
+                    failed.append(suite)
+
+        if failed:
+            print(f"\nFailed suites: {', '.join(failed)}", file=sys.stderr)
+            return 1
+        print(f"\nAll {len(slot_info)} suites passed.")
+        return 0
 
     finally:
         cleanup()

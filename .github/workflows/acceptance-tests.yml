@@ -105,9 +105,8 @@ jobs:
       fail-fast: false
       matrix:
         suite:
-          # contract & locks
-          - apiContract
-          - apiLocks
+          # contractAndLock — parallel: 2 isolated OCIS instances (slot 0 :9200, slot 1 :9500)
+          - "apiContract,apiLocks"
           # settings & notifications (needs email)
           - apiSettings
           - apiNotification
