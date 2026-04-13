@@ -24,19 +24,24 @@ import json
 import sys
 
 def parse_json_stream(path):
-    with open(path) as f:
-        content = f.read()
-    decoder = json.JSONDecoder()
-    idx = 0
+    """Parse a stream of JSON objects, skipping any non-JSON lines.
+
+    govulncheck -format json writes one JSON object per line, but stderr is
+    redirected into the same file (> TMPFILE 2>&1), so diagnostic messages
+    (e.g. "Running govulncheck...", error text) may appear between objects.
+    Skip those lines rather than crashing.
+    """
     objects = []
-    while idx < len(content):
-        while idx < len(content) and content[idx] in ' \t\n\r':
-            idx += 1
-        if idx >= len(content):
-            break
-        obj, end_idx = decoder.raw_decode(content, idx)
-        idx = end_idx
-        objects.append(obj)
+    with open(path) as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                objects.append(json.loads(line))
+            except json.JSONDecodeError:
+                # non-JSON diagnostic line — print for visibility, then ignore
+                print(f"[govulncheck non-JSON]: {line}", file=sys.stderr)
     return objects
 
 objects = parse_json_stream(sys.argv[1])
