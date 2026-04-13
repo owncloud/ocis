@@ -216,7 +216,16 @@ jobs:
           composer --version
 
       - name: Run ${{ matrix.suite }}
-        run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
+        run: |
+          vmstat 2 > /tmp/vmstat.log & MONITOR_PID=$!
+          BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
+          EXIT=$?
+          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
+          awk '/^[ ]*[0-9]/ { busy=100-$15; sum_b+=busy; if(busy>pk_b)pk_b=busy;
+                               sum_r+=$1;   if($1>pk_r) pk_r=$1; sum_wa+=$16; n++ }
+               END { printf "=== load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
+                     sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat.log
+          exit $EXIT
 
   cli-tests:
     needs: [build-and-test]
@@ -252,7 +261,16 @@ jobs:
           composer --version
 
       - name: Run ${{ matrix.suite }}
-        run: BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
+        run: |
+          vmstat 2 > /tmp/vmstat.log & MONITOR_PID=$!
+          BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
+          EXIT=$?
+          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
+          awk '/^[ ]*[0-9]/ { busy=100-$15; sum_b+=busy; if(busy>pk_b)pk_b=busy;
+                               sum_r+=$1;   if($1>pk_r) pk_r=$1; sum_wa+=$16; n++ }
+               END { printf "=== load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
+                     sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat.log
+          exit $EXIT
 
   core-api-tests:
     name: ${{ matrix.suite }}
@@ -338,11 +356,17 @@ jobs:
           curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
       - name: Run ${{ matrix.suite }}
-        run: >
-          BEHAT_SUITES="${{ matrix.suite }}"
-          ACCEPTANCE_TEST_TYPE=core-api
-          WITH_REMOTE_PHP=true
-          python3 tests/acceptance/run-github.py
+        run: |
+          vmstat 2 > /tmp/vmstat.log & MONITOR_PID=$!
+          BEHAT_SUITES="${{ matrix.suite }}" ACCEPTANCE_TEST_TYPE=core-api WITH_REMOTE_PHP=true \
+            python3 tests/acceptance/run-github.py
+          EXIT=$?
+          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
+          awk '/^[ ]*[0-9]/ { busy=100-$15; sum_b+=busy; if(busy>pk_b)pk_b=busy;
+                               sum_r+=$1;   if($1>pk_r) pk_r=$1; sum_wa+=$16; n++ }
+               END { printf "=== load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
+                     sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat.log
+          exit $EXIT
 
   e2e-tests:
     name: e2e-${{ matrix.suite }}
@@ -449,7 +473,16 @@ jobs:
           echo "keycloak ready."
 
       - name: Run e2e-${{ matrix.suite }}
-        run: E2E_ARGS="${{ matrix.args }}" python3 tests/acceptance/run-e2e.py
+        run: |
+          vmstat 2 > /tmp/vmstat.log & MONITOR_PID=$!
+          E2E_ARGS="${{ matrix.args }}" python3 tests/acceptance/run-e2e.py
+          EXIT=$?
+          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
+          awk '/^[ ]*[0-9]/ { busy=100-$15; sum_b+=busy; if(busy>pk_b)pk_b=busy;
+                               sum_r+=$1;   if($1>pk_r) pk_r=$1; sum_wa+=$16; n++ }
+               END { printf "=== load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
+                     sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat.log
+          exit $EXIT
         env:
           TIKA_NEEDED: ${{ matrix.tika == true && 'true' || 'false' }}
           KEYCLOAK_NEEDED: ${{ matrix.keycloak == true && 'true' || 'false' }}
@@ -465,7 +498,16 @@ jobs:
           go-version-file: go.mod
           cache: true
       - name: Run litmus
-        run: python3 tests/acceptance/run-litmus.py
+        run: |
+          vmstat 2 > /tmp/vmstat.log & MONITOR_PID=$!
+          python3 tests/acceptance/run-litmus.py
+          EXIT=$?
+          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
+          awk '/^[ ]*[0-9]/ { busy=100-$15; sum_b+=busy; if(busy>pk_b)pk_b=busy;
+                               sum_r+=$1;   if($1>pk_r) pk_r=$1; sum_wa+=$16; n++ }
+               END { printf "=== load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
+                     sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat.log
+          exit $EXIT
 
   cs3api:
     name: cs3api
@@ -478,7 +520,16 @@ jobs:
           go-version-file: go.mod
           cache: true
       - name: Run cs3api validator
-        run: python3 tests/acceptance/run-cs3api.py
+        run: |
+          vmstat 2 > /tmp/vmstat.log & MONITOR_PID=$!
+          python3 tests/acceptance/run-cs3api.py
+          EXIT=$?
+          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
+          awk '/^[ ]*[0-9]/ { busy=100-$15; sum_b+=busy; if(busy>pk_b)pk_b=busy;
+                               sum_r+=$1;   if($1>pk_r) pk_r=$1; sum_wa+=$16; n++ }
+               END { printf "=== load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
+                     sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat.log
+          exit $EXIT
 
   wopi-builtin:
     name: wopi-builtin
@@ -491,7 +542,16 @@ jobs:
           go-version-file: go.mod
           cache: true
       - name: Run WOPI validator (builtin)
-        run: python3 tests/acceptance/run-wopi.py --type builtin
+        run: |
+          vmstat 2 > /tmp/vmstat.log & MONITOR_PID=$!
+          python3 tests/acceptance/run-wopi.py --type builtin
+          EXIT=$?
+          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
+          awk '/^[ ]*[0-9]/ { busy=100-$15; sum_b+=busy; if(busy>pk_b)pk_b=busy;
+                               sum_r+=$1;   if($1>pk_r) pk_r=$1; sum_wa+=$16; n++ }
+               END { printf "=== load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
+                     sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat.log
+          exit $EXIT
 
   wopi-cs3:
     name: wopi-cs3
@@ -504,7 +564,16 @@ jobs:
           go-version-file: go.mod
           cache: true
       - name: Run WOPI validator (cs3)
-        run: python3 tests/acceptance/run-wopi.py --type cs3
+        run: |
+          vmstat 2 > /tmp/vmstat.log & MONITOR_PID=$!
+          python3 tests/acceptance/run-wopi.py --type cs3
+          EXIT=$?
+          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
+          awk '/^[ ]*[0-9]/ { busy=100-$15; sum_b+=busy; if(busy>pk_b)pk_b=busy;
+                               sum_r+=$1;   if($1>pk_r) pk_r=$1; sum_wa+=$16; n++ }
+               END { printf "=== load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
+                     sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat.log
+          exit $EXIT
 
   all-acceptance-tests:
     needs: [local-api-tests, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests]
