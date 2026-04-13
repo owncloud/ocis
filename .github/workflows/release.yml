@@ -136,12 +136,8 @@ jobs:
           VERSION="${{ needs.determine-release-type.outputs.version }}"
           REPO="${{ matrix.repo }}"
           ARCH="${{ matrix.arch }}"
-          MAJOR_MINOR=$(echo "$VERSION" | cut -d. -f1-2)
-          MAJOR=$(echo "$VERSION" | cut -d. -f1)
-          printf "tags<<EOF\n%s\n%s\n%s\nEOF\n" \
-            "${REPO}:${VERSION}-linux-${ARCH}" \
-            "${REPO}:${MAJOR_MINOR}-linux-${ARCH}" \
-            "${REPO}:${MAJOR}-linux-${ARCH}" >> $GITHUB_OUTPUT
+          printf "tags<<EOF\n%s\nEOF\n" \
+            "${REPO}:${VERSION}-linux-${ARCH}" >> $GITHUB_OUTPUT
       - id: build
         uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
         with:
