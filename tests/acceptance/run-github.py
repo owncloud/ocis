@@ -526,7 +526,7 @@ def main() -> int:
     slot_info = []  # list of (suite, ocis_url, wrapper_url, server_env)
     for slot, suite in enumerate(suites):
         offset = slot * 300
-        config_dir, _ = _ocis_slot_dirs(slot)
+        config_dir, data_dir = _ocis_slot_dirs(slot)
         config_dir.mkdir(parents=True, exist_ok=True)
         suite_ocis_url = f"https://localhost:{9200 + offset}"
         suite_wrapper_url = f"http://localhost:{5200 + offset}"
@@ -534,6 +534,9 @@ def main() -> int:
         s_env = {**os.environ}
         s_env.update(base_server_env(repo_root, suite_ocis_url, str(config_dir),
                                      port_offset=offset))
+        # Each slot needs its own data directory; without this all slots share the
+        # default ~/.ocis data path, causing IDM/LDAP data conflicts and auth failures.
+        s_env["OCIS_BASE_DATA_PATH"] = str(data_dir)
         s_env["THUMBNAILS_TXT_FONTMAP_FILE"] = fontmap_tmp.name
         s_env.update(_apply_port_offset(cfg["extraServerEnvironment"], offset))
 
