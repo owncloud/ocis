@@ -59,6 +59,10 @@ type Options struct {
 	DefaultAccessTokenTTL time.Duration
 	// UserInfoCache sets the access token cache store
 	UserInfoCache store.Store
+	// MFAStore is used to persist verified MFA status so that non-OIDC
+	// requests (e.g. signed-URL archiver downloads) can inherit the status
+	// from the user's most recent OIDC-authenticated session.
+	MFAStore store.Store
 	// CredentialsByUserAgent sets the auth challenges on a per user-agent basis
 	CredentialsByUserAgent map[string]string
 	// AccessTokenVerifyMethod configures how access_tokens should be verified but the oidc_auth middleware.
@@ -214,6 +218,13 @@ func DefaultAccessTokenTTL(ttl time.Duration) Option {
 func UserInfoCache(val store.Store) Option {
 	return func(o *Options) {
 		o.UserInfoCache = val
+	}
+}
+
+// MFAStore provides a function to set the MFA session store.
+func MFAStore(val store.Store) Option {
+	return func(o *Options) {
+		o.MFAStore = val
 	}
 }
 

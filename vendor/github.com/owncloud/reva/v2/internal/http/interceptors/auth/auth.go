@@ -354,6 +354,15 @@ func ctxWithUserInfo(ctx context.Context, r *http.Request, user *userpb.User, to
 	ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.UserAgentHeader, r.UserAgent())
 	ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.InitiatorHeader, initiatorid)
 	ctx = ctxpkg.ContextSetScopes(ctx, tokenScope)
+
+	// Forward MFA status from the proxy's HTTP header to outgoing gRPC metadata.
+	// The proxy MultiFactor middleware always sets X-Multi-Factor-Authentication:
+	// "true" when MFA is disabled globally, or the real outcome when enabled.
+	if mfaVal := r.Header.Get("X-Multi-Factor-Authentication"); mfaVal != "" {
+		ctx = ctxpkg.ContextSetMFA(ctx, mfaVal == "true")
+		ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.MFAHeader, mfaVal)
+	}
+
 	return ctx
 }
 

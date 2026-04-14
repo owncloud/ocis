@@ -357,7 +357,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			middleware.EventsPublisher(publisher),
 			middleware.MultiInstance(cfg.MultiInstance.Enabled, cfg.MultiInstance.InstanceID, cfg.MultiInstance.MemberClaim, cfg.MultiInstance.GuestClaim, cfg.MultiInstance.GuestRole),
 		),
-		middleware.MultiFactor(cfg.MultiFactorAuthentication, middleware.Logger(logger)),
+		middleware.MultiFactor(cfg.MultiFactorAuthentication, middleware.Logger(logger), middleware.MFAStore(signingKeyStore)),
 		middleware.SelectorCookie(
 			middleware.Logger(logger),
 			middleware.PolicySelectorConfig(*cfg.PolicySelector),

@@ -18,6 +18,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"github.com/pkg/errors"
 	merrors "go-micro.dev/v4/errors"
+	gmmetadata "go-micro.dev/v4/metadata"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -140,7 +141,7 @@ func (g Thumbnail) checkThumbnail(req *thumbnailssvc.GetThumbnailRequest, sRes *
 
 func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest) (string, error) {
 	src := req.GetCs3Source()
-	sRes, err := g.stat(src.GetPath(), src.GetAuthorization())
+	sRes, err := g.stat(ctx, src.GetPath(), src.GetAuthorization())
 	if err != nil {
 		return "", err
 	}
@@ -223,7 +224,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 		auth = src.GetRevaAuthorization()
 		statPath = req.GetFilepath()
 	}
-	sRes, err := g.stat(statPath, auth)
+	sRes, err := g.stat(ctx, statPath, auth)
 	if err != nil {
 		return "", err
 	}
@@ -272,8 +273,24 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 	return key, err
 }
 
-func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
-	ctx := metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, auth)
+func (g Thumbnail) stat(ctx context.Context, path, auth string) (*provider.StatResponse, error) {
+	outCtx := metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, auth)
+
+	// Propagate MFA status to the outgoing gRPC call so that vault storage
+	// (guarded by the mfa interceptor) grants access.
+	// go-micro callers (e.g. webdav service) send metadata via go-micro's own
+	// mechanism (Grpc-Metadata-<key> headers), which is read back via
+	// gmmetadata.FromContext. Standard gRPC incoming metadata is checked as
+	// fallback for non-go-micro callers.
+	if md, ok := gmmetadata.FromContext(ctx); ok {
+		if v, ok := md.Get(revactx.MFAHeader); ok && v != "" {
+			outCtx = metadata.AppendToOutgoingContext(outCtx, revactx.MFAHeader, v)
+		}
+	} else if md, ok := metadata.FromIncomingContext(ctx); ok {
+		if vals := md.Get(revactx.MFAHeader); len(vals) > 0 && vals[0] != "" {
+			outCtx = metadata.AppendToOutgoingContext(outCtx, revactx.MFAHeader, vals[0])
+		}
+	}
 
 	ref, err := storagespace.ParseReference(path)
 	if err != nil {
@@ -289,7 +306,7 @@ func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
 		return nil, merrors.InternalServerError(g.serviceID, "could not select next gateway client: %s", err.Error())
 	}
 	req := &provider.StatRequest{Ref: &ref}
-	rsp, err := client.Stat(ctx, req)
+	rsp, err := client.Stat(outCtx, req)
 	if err != nil {
 		g.logger.Error().Err(err).Str("path", path).Msg("could not stat file")
 		return nil, merrors.InternalServerError(g.serviceID, "could not stat file: %s", err.Error())

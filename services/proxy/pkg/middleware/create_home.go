@@ -12,10 +12,12 @@ import (
 	"github.com/jellydator/ttlcache/v3"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
+	gmmetadata "go-micro.dev/v4/metadata"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -101,12 +103,27 @@ func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 
 		if m.createVaultHome {
+			// TODO there is no MFA context
+			if md, ok := gmmetadata.FromContext(ctx); ok {
+				if v, ok := md.Get(revactx.MFAHeader); ok && v != "" {
+					ctx = metadata.AppendToOutgoingContext(ctx, revactx.MFAHeader, v)
+				}
+			} else if md, ok := metadata.FromIncomingContext(ctx); ok {
+				if vals := md.Get(revactx.MFAHeader); len(vals) > 0 && vals[0] != "" {
+					ctx = metadata.AppendToOutgoingContext(ctx, revactx.MFAHeader, vals[0])
+				}
+			}
+			// TODO Can we avoid to force MFA and get it from the context?
+			vctx := ctxpkg.ContextSetMFA(ctx, true)
+			vctx = metadata.AppendToOutgoingContext(vctx, ctxpkg.MFAHeader, "true")
+
 			vaultKey := storagespace.FormatStorageID(utils.VaultStorageProviderID, u.GetId().GetOpaqueId())
 			if !m.cache.Has(vaultKey) {
 				// Create vault personal space
 				// Inject storage_id into opaque for vault personal space
 				createHomeReq.Opaque = utils.AppendPlainToOpaque(createHomeReq.Opaque, "storage_id", utils.VaultStorageProviderID)
-				cpsRes, err := client.CreateHome(ctx, createHomeReq)
+
+				cpsRes, err := client.CreateHome(vctx, createHomeReq)
 				switch {
 				case err != nil:
 					m.logger.Err(err).Msg("error calling CreateHome for vault personal")

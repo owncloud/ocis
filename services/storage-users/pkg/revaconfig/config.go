@@ -116,11 +116,19 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 			},
 		},
 	}
+	gcfg := rcfg["grpc"].(map[string]interface{})
 	if cfg.ReadOnly {
-		gcfg := rcfg["grpc"].(map[string]interface{})
+		// Replace all interceptors with readonly when the storage is read-only.
+		// eventsmiddleware and prometheus are intentionally dropped in this mode.
 		gcfg["interceptors"] = map[string]interface{}{
 			"readonly": map[string]interface{}{},
 		}
+	}
+	if cfg.EnableVaultMode {
+		// Add the mfa interceptor so that all gRPC calls to this vault
+		// storage-users instance require MFA authentication.
+		interceptors := gcfg["interceptors"].(map[string]interface{})
+		interceptors["mfa"] = map[string]interface{}{}
 	}
 	return rcfg
 }

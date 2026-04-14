@@ -18,6 +18,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/rhttp"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
+	gmmetadata "go-micro.dev/v4/metadata"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -60,6 +61,21 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	}
 
 	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, auth)
+
+	// Propagate MFA status to the outgoing gRPC call so that vault storage
+	// (guarded by the mfa interceptor) grants access.
+	// go-micro callers send MFA via go-micro metadata; non-go-micro callers
+	// via standard gRPC incoming metadata.
+	if md, ok := gmmetadata.FromContext(ctx); ok {
+		if v, ok := md.Get(revactx.MFAHeader); ok && v != "" {
+			ctx = metadata.AppendToOutgoingContext(ctx, revactx.MFAHeader, v)
+		}
+	} else if md, ok := metadata.FromIncomingContext(ctx); ok {
+		if vals := md.Get(revactx.MFAHeader); len(vals) > 0 && vals[0] != "" {
+			ctx = metadata.AppendToOutgoingContext(ctx, revactx.MFAHeader, vals[0])
+		}
+	}
+
 	err = s.checkImageFileSize(ctx, ref)
 	if err != nil {
 		return nil, err

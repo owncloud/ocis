@@ -27,6 +27,7 @@ import (
 	authpb "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/auth/scope"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
@@ -36,12 +37,12 @@ import (
 	"github.com/owncloud/reva/v2/pkg/token"
 	tokenmgr "github.com/owncloud/reva/v2/pkg/token/manager/registry"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -154,6 +155,7 @@ func NewUnary(m map[string]interface{}, unprotected []string, tp trace.TracerPro
 		// store user and scopes in context
 		ctx = ctxpkg.ContextSetUser(ctx, u)
 		ctx = ctxpkg.ContextSetScopes(ctx, tokenScope)
+		ctx = grantMFAForServiceAccount(ctx, u)
 
 		span.SetAttributes(semconv.EnduserIDKey.String(u.Id.OpaqueId))
 
@@ -243,6 +245,7 @@ func NewStream(m map[string]interface{}, unprotected []string, tp trace.TracerPr
 		// store user and scopes in context
 		ctx = ctxpkg.ContextSetUser(ctx, u)
 		ctx = ctxpkg.ContextSetScopes(ctx, tokenScope)
+		ctx = grantMFAForServiceAccount(ctx, u)
 		wrapped := newWrappedServerStream(ctx, ss)
 
 		span.SetAttributes(semconv.EnduserIDKey.String(u.Id.OpaqueId))
@@ -298,6 +301,23 @@ func dismantleToken(ctx context.Context, tkn string, req interface{}, mgr token.
 	}
 
 	return u, tokenScope, nil
+}
+
+// grantMFAForServiceAccount automatically sets MFA=true for service accounts.
+// Service accounts are trusted internal processes that never authenticate via OIDC and
+// therefore never carry an acr/MFA claim. Granting them implicit MFA allows
+// them to access MFA-gated resources such as vault storage without
+// compromising the MFA requirement for regular users.
+func grantMFAForServiceAccount(ctx context.Context, u *userpb.User) context.Context {
+	if u.GetId().GetType() != userpb.UserType_USER_TYPE_SERVICE {
+		return ctx
+	}
+	if _, alreadySet := ctxpkg.ContextGetMFA(ctx); alreadySet {
+		return ctx
+	}
+	ctx = ctxpkg.ContextSetMFA(ctx, true)
+	ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.MFAHeader, "true")
+	return ctx
 }
 
 func getUserGroups(ctx context.Context, u *userpb.User, client gatewayv1beta1.GatewayAPIClient) ([]string, error) {

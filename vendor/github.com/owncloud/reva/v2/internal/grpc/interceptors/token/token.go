@@ -47,6 +47,13 @@ func NewUnary() grpc.UnaryServerInterceptor {
 					ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.InitiatorHeader, initiatorID)
 				}
 			}
+
+			if val, ok := md[ctxpkg.MFAHeader]; ok {
+				if len(val) > 0 && val[0] != "" {
+					ctx = ctxpkg.ContextSetMFA(ctx, val[0] == "true")
+					ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.MFAHeader, val[0])
+				}
+			}
 		}
 
 		return handler(ctx, req)
@@ -75,6 +82,13 @@ func NewStream() grpc.StreamServerInterceptor {
 					initiatorID := val[0]
 					ctx = ctxpkg.ContextSetInitiator(ctx, initiatorID)
 					ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.InitiatorHeader, initiatorID)
+				}
+			}
+
+			if val, ok := md[ctxpkg.MFAHeader]; ok {
+				if len(val) > 0 && val[0] != "" {
+					ctx = ctxpkg.ContextSetMFA(ctx, val[0] == "true")
+					ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.MFAHeader, val[0])
 				}
 			}
 		}
