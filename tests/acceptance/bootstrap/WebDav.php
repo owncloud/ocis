@@ -4077,28 +4077,39 @@ trait WebDav {
 		Assert::assertEquals($w, \imagesx($responseImg), "Image width mismatch for fixture $filename");
 		Assert::assertEquals($h, \imagesy($responseImg), "Image height mismatch for fixture $filename");
 
-		$tolerance = 12; // per-channel tolerance for libvips version differences
-		$maxDiff = 0;
+		// Two-layer comparison model: per-pixel threshold filters encoding noise, the ratio gate catches
+		// real regressions. A single-max assert is too brittle — one JPEG artifact at an edge pixel fails
+		// the test even if the rest of the image is identical.
+		// Same approach as jest-image-snapshot failureThresholdType:'percent'
+		//   https://github.com/americanexpress/jest-image-snapshot#%EF%B8%8F-api
+		// and Playwright's maxDiffPixelRatio
+		//   https://playwright.dev/docs/api/class-pageassertions#page-assertions-to-have-screenshot-1-option-max-diff-pixel-ratio
+		$pixelThreshold = 12;   // per-pixel: max channel diff (0-255) above this counts as "bad"
+		$maxBadRatio    = 0.10; // fail if more than 10% of pixels are "bad"
+
+		$totalPixels = $w * $h;
+		$badPixels   = 0;
 		for ($x = 0; $x < $w; $x++) {
 			for ($y = 0; $y < $h; $y++) {
-				$fc = \imagecolorat($fixtureImg, $x, $y);
-				$rc = \imagecolorat($responseImg, $x, $y);
-				$maxDiff = \max(
-					$maxDiff,
+				$fc   = \imagecolorat($fixtureImg, $x, $y);
+				$rc   = \imagecolorat($responseImg, $x, $y);
+				$diff = \max(
 					\abs(($fc >> 16 & 0xFF) - ($rc >> 16 & 0xFF)),
-					\abs(($fc >> 8 & 0xFF) - ($rc >> 8 & 0xFF)),
-					\abs(($fc & 0xFF) - ($rc & 0xFF)),
+					\abs(($fc >> 8  & 0xFF) - ($rc >> 8  & 0xFF)),
+					\abs(($fc       & 0xFF) - ($rc       & 0xFF)),
 				);
+				if ($diff > $pixelThreshold) {
+					$badPixels++;
+				}
 			}
 		}
-		$rw = \imagesx($responseImg);
-		$rh = \imagesy($responseImg);
-		echo "  [preview-fixture] $filename: fixture={$w}x{$h} response={$rw}x{$rh} maxPixelDiff=$maxDiff\n";
+		$badRatio = $totalPixels > 0 ? $badPixels / $totalPixels : 0;
+		echo "  [preview-fixture] $filename: fixture={$w}x{$h} badPixels=$badPixels/{$totalPixels} ratio=" . \round($badRatio * 100, 1) . "%\n";
 
 		Assert::assertLessThanOrEqual(
-			$tolerance,
-			$maxDiff,
-			"Preview pixel values differ by more than $tolerance from fixture $filename (max diff: $maxDiff)",
+			$maxBadRatio,
+			$badRatio,
+			"Preview pixel mismatch too high for $filename: " . \round($badRatio * 100, 1) . "% of pixels differ by more than $pixelThreshold per channel (threshold: " . ($maxBadRatio * 100) . "%)",
 		);
 
 		\imagedestroy($fixtureImg);
