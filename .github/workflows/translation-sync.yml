@@ -12,6 +12,8 @@ jobs:
     uses: owncloud/reusable-workflows/.github/workflows/translation-sync.yml@main
     with:
       mode: make
+      reviewers: kobergj,mmattel          # individual users
+      # team_reviewers: owncloud/ocis-team  # and/or a GitHub team slug if exists
       sub_path: .
     secrets:
       TX_TOKEN: ${{ secrets.TX_TOKEN }}
