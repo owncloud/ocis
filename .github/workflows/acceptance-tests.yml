@@ -22,23 +22,20 @@ jobs:
       - name: Enable pnpm
         run: corepack enable && corepack prepare pnpm@10.28.1 --activate
 
+      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+
       - name: Pre-checks and generate
         run: |
           # Phase 1 — I/O + light CPU, no contention between tasks.
-          # PHP install (~40s) is moved inside the php-style subshell so it overlaps
-          # with govulncheck (network I/O), node-gen, and go-gen instead of blocking
-          # the entire job sequentially.
-          # wa (I/O wait) will spike during apt-get/npm/pnpm downloads.
+          # wa (I/O wait) will spike during npm/pnpm downloads.
           # Expected avg load: ~50-60 % CPU on 2 vCPU.
           vmstat 2 > /tmp/vmstat-phase1.log & MONITOR_PID=$!
 
-          #TODO: use github action to setup/install/cache php
-          (sudo add-apt-repository -y ppa:ondrej/php \
-            && sudo apt-get update -qq \
-            && sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd \
-            && sudo update-alternatives --set php /usr/bin/php8.4 \
-            && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-            && make vendor-bin-codestyle && make vendor-bin-codesniffer && make test-php-style && make check-env-var-annotations) > /tmp/php-style.log   2>&1 & PIDS=($!)
+          (make vendor-bin-codestyle && make vendor-bin-codesniffer && make test-php-style && make check-env-var-annotations) > /tmp/php-style.log   2>&1 & PIDS=($!)
           (npm install -g @gherlint/gherlint@1.1.0 && make test-gherkin-lint)                                                 > /tmp/gherkin.log     2>&1 & PIDS+=($!)
           bash tests/acceptance/check-deleted-suites-in-expected-failure.sh                                                   > /tmp/suites.log      2>&1 & PIDS+=($!)
           make govulncheck                                                                                                     > /tmp/govulncheck.log 2>&1 & PIDS+=($!)
@@ -160,6 +157,12 @@ jobs:
 
       - name: Enable pnpm
         run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+
+      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
 
       - name: Cache libcurl 8.12.0
         id: cache-libcurl
@@ -344,6 +347,12 @@ jobs:
 
       - name: Enable pnpm
         run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+
+      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
 
       - name: Cache libcurl 8.12.0
         id: cache-libcurl
