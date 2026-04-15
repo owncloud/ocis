@@ -46,8 +46,6 @@ jobs:
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             VERSION="${{ inputs.version_override }}"
             [[ -z "$VERSION" ]] && VERSION=$(next_dev)
-          elif [[ "${{ github.ref_type }}" == "branch" ]]; then
-            VERSION="8.0.2-dev.1"
           else
             VERSION="${GITHUB_REF#refs/tags/v}"
           fi
