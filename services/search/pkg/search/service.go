@@ -491,13 +491,6 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 
 	logDocCount(s.engine, s.logger)
 
-	if opt, ok := s.engine.(engine.Optimizer); ok {
-		s.logger.Info().Msg("optimizing search index after space walk")
-		if err := opt.Optimize(ownerCtx); err != nil {
-			s.logger.Warn().Err(err).Msg("index optimization failed")
-		}
-	}
-
 	return nil
 }
 
