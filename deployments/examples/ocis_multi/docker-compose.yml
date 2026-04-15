@@ -105,6 +105,7 @@ services:
       # Multi-Instance Configuration
       OCIS_MULTI_INSTANCE_ENABLED: true
       OCIS_MULTI_INSTANCE_INSTANCEID: "ec730a6c-1b63-4b45-b83b-9e2311afdf85"
+      OCIS_MULTI_INSTANCE_MASTER_ID: "11111111-1111-1111-1111-111111111111"
       OCIS_LDAP_USER_FILTER: "(&(objectclass=owncloud)(|(ownCloudMemberOf=ec730a6c-1b63-4b45-b83b-9e2311afdf85)(ownCloudGuestOf=ec730a6c-1b63-4b45-b83b-9e2311afdf85)))"
       OCIS_LDAP_GROUP_FILTER: "(&(objectclass=owncloud)(ownCloudMemberOf=ec730a6c-1b63-4b45-b83b-9e2311afdf85))"
       OCIS_LDAP_USER_MEMBER_ATTRIBUTE: "owncloudMemberOf"
@@ -206,6 +207,7 @@ services:
       # Multi-Instance
       OCIS_MULTI_INSTANCE_ENABLED: true
       OCIS_MULTI_INSTANCE_INSTANCEID: "8d24cb5f-6ee6-4b98-86df-c4c268dddb46"
+      OCIS_MULTI_INSTANCE_MASTER_ID: "11111111-1111-1111-1111-111111111111"
       OCIS_LDAP_USER_FILTER: "(&(objectclass=owncloud)(|(ownCloudMemberOf=8d24cb5f-6ee6-4b98-86df-c4c268dddb46)(ownCloudGuestOf=8d24cb5f-6ee6-4b98-86df-c4c268dddb46)))"
       OCIS_LDAP_GROUP_FILTER: "(&(objectclass=owncloud)(ownCloudMemberOf=8d24cb5f-6ee6-4b98-86df-c4c268dddb46))"
       OCIS_LDAP_USER_MEMBER_ATTRIBUTE: "owncloudMemberOf"
