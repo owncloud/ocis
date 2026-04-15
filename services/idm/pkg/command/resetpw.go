@@ -34,9 +34,10 @@ func ResetPassword(cfg *config.Config) *cli.Command {
 				Usage:   "User name",
 				Value:   "admin",
 			},
-			&cli.BoolFlag{
-				Name:  "service-user",
-				Usage: "Target a service user (ou=sysusers) instead of a regular user (ou=users)",
+			&cli.StringFlag{
+				Name:  "user-type",
+				Usage: "Type of user account: 'user' (ou=users) or 'service' (ou=sysusers)",
+				Value: "user",
 			},
 		},
 		Before: func(_ *cli.Context) error {
@@ -47,12 +48,18 @@ func ResetPassword(cfg *config.Config) *cli.Command {
 			ctx, cancel := context.WithCancel(c.Context)
 
 			defer cancel()
-			return resetPassword(ctx, logger, cfg, c.String("user-name"), c.Bool("service-user"))
+
+			userType := c.String("user-type")
+			if userType != "user" && userType != "service" {
+				return fmt.Errorf("invalid --user-type %q: must be 'user' or 'service'", userType)
+			}
+
+			return resetPassword(ctx, logger, cfg, c.String("user-name"), userType)
 		},
 	}
 }
 
-func resetPassword(_ context.Context, logger log.Logger, cfg *config.Config, userName string, serviceUser bool) error {
+func resetPassword(_ context.Context, logger log.Logger, cfg *config.Config, userName string, userType string) error {
 	servercfg := server.Config{
 		Logger:      log.LogrusWrap(logger.Logger),
 		LDAPHandler: "boltdb",
@@ -62,7 +69,7 @@ func resetPassword(_ context.Context, logger log.Logger, cfg *config.Config, use
 	}
 
 	ou := "users"
-	if serviceUser {
+	if userType == "service" {
 		ou = "sysusers"
 	}
 	userDN := fmt.Sprintf("uid=%s,ou=%s,%s", userName, ou, servercfg.LDAPBaseDN)
