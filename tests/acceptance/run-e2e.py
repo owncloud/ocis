@@ -74,7 +74,7 @@ def main() -> int:
     # clone + install web only if not already provided (e.g. via artifact)
     if not web_dir.exists():
         drone_env = {}
-        drone_env_file = repo_root / ".drone.env"
+        drone_env_file = repo_root / ".drone.env"  # TODO: [DRONE-REMOVAL] read WEB_COMMITID/WEB_BRANCH from a different source
         if drone_env_file.exists():
             for line in drone_env_file.read_text().splitlines():
                 if "=" in line and not line.startswith("#"):

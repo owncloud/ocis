@@ -1,4 +1,5 @@
 services/settings/ @lukashirt
 services/web/ @lukashirt
+# TODO: [DRONE-REMOVAL] remove .drone.star CODEOWNERS entry
 .drone.star @kobergj @phil-davis @individual-it
 assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf @kobergj @hodyroff

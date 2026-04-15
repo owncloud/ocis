@@ -36,7 +36,7 @@ Use this checklist with copy/paste in your PR - right from the beginning. It ren
   - Add the service config to `ocis-pkg/config/defaultconfig.go`
 - [ ] If the service is using service accounts, add it to `ocis/pkg/init/init.go`
 - [ ] Check that the service properly responds to `ocis <service-name> health` and has `/healthz` and `/readyz` endpoints
-- [ ] Add the service to `.drone.star` to enable CI.
+- [ ] Add the service to `.drone.star` to enable CI. <!-- TODO: [DRONE-REMOVAL] update this checklist item -->
 - [ ] Inform doc team in an *early stage* to review the readme AND the environment variables created.
   - The description must reflect the behaviour AND usually has a positive code quality impact.
 - [ ] Create proper description strings for envvars - see other services for examples, especially when it comes to multiple values. This must include:

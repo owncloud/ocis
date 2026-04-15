@@ -1,4 +1,5 @@
 #!/bin/bash
+# TODO: [DRONE-REMOVAL] this entire script depends on .drone.env and Drone S3 cache
 source .drone.env
 
 # if no $1 is supplied end the script

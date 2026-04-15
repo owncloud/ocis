@@ -3,6 +3,7 @@
 Run ocis acceptance tests locally and in GitHub Actions CI.
 
 Config sourced from .drone.star localApiTests — single source of truth.
+TODO: [DRONE-REMOVAL] decouple from .drone.star constants when Drone CI is removed.
 Usage: BEHAT_SUITES=apiGraph python3 tests/acceptance/run-github.py
 """
 
@@ -17,7 +18,7 @@ import shutil
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
-# Config sourced from .drone.star
+# Config sourced from .drone.star  # TODO: [DRONE-REMOVAL]
 # NOTE: EMAIL_SMTP_HOST is "email" (container name) in drone, "localhost" here
 # ---------------------------------------------------------------------------
 

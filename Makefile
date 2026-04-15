@@ -20,7 +20,7 @@ L10N_MODULES := \
 	services/userlog \
 	services/settings
 
-# if you add a module here please also add it to the .drone.star file
+# TODO: [DRONE-REMOVAL] if you add a module here please also add it to the .drone.star file
 OCIS_MODULES = \
 	services/activitylog \
 	services/antivirus \
@@ -367,6 +367,7 @@ l10n-write:
 
 .PHONY: ci-format
 ci-format: $(BUILDIFIER)
+	# TODO: [DRONE-REMOVAL] remove ci-format target when .drone.star is removed
 	$(BUILDIFIER) --mode=fix .drone.star
 
 .PHONY: test-php-style

@@ -3,6 +3,7 @@
 Run WOPI validator tests locally and in GitHub Actions CI.
 
 Config sourced from .drone.star wopiValidatorTests() — single source of truth.
+TODO: [DRONE-REMOVAL] decouple from .drone.star constants when Drone CI is removed.
 Usage: python3 tests/acceptance/run-wopi.py --type builtin
        python3 tests/acceptance/run-wopi.py --type cs3
 """
@@ -21,7 +22,7 @@ import urllib.parse
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
-# Constants (mirroring .drone.star)
+# Constants (mirroring .drone.star)  # TODO: [DRONE-REMOVAL]
 # ---------------------------------------------------------------------------
 
 # HTTPS — matching drone; host-side curl calls use -k.

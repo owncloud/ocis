@@ -3,6 +3,7 @@
 Run CS3 API validator tests locally and in GitHub Actions CI.
 
 Config sourced from .drone.star cs3ApiTests() — single source of truth.
+TODO: [DRONE-REMOVAL] decouple from .drone.star constants when Drone CI is removed.
 Usage: python3 tests/acceptance/run-cs3api.py
 """
 
@@ -15,7 +16,7 @@ import time
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
-# Constants (mirroring .drone.star)
+# Constants (mirroring .drone.star)  # TODO: [DRONE-REMOVAL]
 # ---------------------------------------------------------------------------
 
 # HTTPS — matching drone: ocis init generates a self-signed cert; proxy uses TLS by default.

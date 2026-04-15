@@ -17,7 +17,7 @@ services:
       EMAIL_HOST: email
       EMAIL_PORT: 8025
     env_file:
-      - ../../../../.drone.env
+      - ../../../../.drone.env  # TODO: [DRONE-REMOVAL] inline or replace this env_file source
     volumes:
       - ./run-tests.sh:/test/run-tests.sh
       - ../../../../:/drone/src
