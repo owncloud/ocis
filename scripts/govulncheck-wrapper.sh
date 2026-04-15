@@ -14,10 +14,12 @@ set -euo pipefail
 
 GOVULNCHECK="${1:-govulncheck}"
 TMPFILE=$(mktemp)
-trap 'rm -f "$TMPFILE"' EXIT
+STDERRFILE=$(mktemp)
+trap 'rm -f "$TMPFILE" "$STDERRFILE"' EXIT
 
 echo "Running govulncheck..."
-"$GOVULNCHECK" -format json ./... > "$TMPFILE" 2>&1 || true
+"$GOVULNCHECK" -format json ./... > "$TMPFILE" 2>"$STDERRFILE" || true
+cat "$STDERRFILE" >&2
 
 python3 - "$TMPFILE" <<'PYEOF'
 import json
