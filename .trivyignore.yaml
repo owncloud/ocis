@@ -1,0 +1,4 @@
+secrets:
+  - id: private-key
+    paths:
+      - "vendor/github.com/crewjam/saml/xmlenc/fuzz.go"
