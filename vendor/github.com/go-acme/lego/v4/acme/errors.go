@@ -2,6 +2,7 @@ package acme
 
 import (
 	"fmt"
+	"strings"
 )
 
 // Errors types.
@@ -9,6 +10,7 @@ const (
 	errNS              = "urn:ietf:params:acme:error:"
 	BadNonceErr        = errNS + "badNonce"
 	AlreadyReplacedErr = errNS + "alreadyReplaced"
+	RateLimitedErr     = errNS + "rateLimited"
 )
 
 // ProblemDetails the problem details object.
@@ -27,21 +29,25 @@ type ProblemDetails struct {
 }
 
 func (p *ProblemDetails) Error() string {
-	msg := fmt.Sprintf("acme: error: %d", p.HTTPStatus)
+	msg := new(strings.Builder)
+
+	_, _ = fmt.Fprintf(msg, "acme: error: %d", p.HTTPStatus)
+
 	if p.Method != "" || p.URL != "" {
-		msg += fmt.Sprintf(" :: %s :: %s", p.Method, p.URL)
+		_, _ = fmt.Fprintf(msg, " :: %s :: %s", p.Method, p.URL)
 	}
-	msg += fmt.Sprintf(" :: %s :: %s", p.Type, p.Detail)
+
+	_, _ = fmt.Fprintf(msg, " :: %s :: %s", p.Type, p.Detail)
 
 	for _, sub := range p.SubProblems {
-		msg += fmt.Sprintf(", problem: %q :: %s", sub.Type, sub.Detail)
+		_, _ = fmt.Fprintf(msg, ", problem: %q :: %s", sub.Type, sub.Detail)
 	}
 
 	if p.Instance != "" {
-		msg += ", url: " + p.Instance
+		msg.WriteString(", url: " + p.Instance)
 	}
 
-	return msg
+	return msg.String()
 }
 
 // SubProblem a "subproblems".
@@ -49,7 +55,7 @@ func (p *ProblemDetails) Error() string {
 type SubProblem struct {
 	Type       string     `json:"type,omitempty"`
 	Detail     string     `json:"detail,omitempty"`
-	Identifier Identifier `json:"identifier,omitempty"`
+	Identifier Identifier `json:"identifier"`
 }
 
 // NonceError represents the error which is returned
@@ -58,9 +64,30 @@ type NonceError struct {
 	*ProblemDetails
 }
 
+func (e *NonceError) Unwrap() error {
+	return e.ProblemDetails
+}
+
 // AlreadyReplacedError represents the error which is returned
-// If the Server rejects the request because the identified certificate has already been marked as replaced.
+// if the Server rejects the request because the identified certificate has already been marked as replaced.
 // - https://www.rfc-editor.org/rfc/rfc9773.html#section-5
 type AlreadyReplacedError struct {
 	*ProblemDetails
+}
+
+func (e *AlreadyReplacedError) Unwrap() error {
+	return e.ProblemDetails
+}
+
+// RateLimitedError represents the error which is returned
+// if the server rejects the request because the client has exceeded the rate limit.
+// - https://www.rfc-editor.org/rfc/rfc8555.html#section-6.6
+type RateLimitedError struct {
+	*ProblemDetails
+
+	RetryAfter string
+}
+
+func (e *RateLimitedError) Unwrap() error {
+	return e.ProblemDetails
 }

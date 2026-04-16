@@ -897,23 +897,41 @@ func (r *Request) TraceInfo() TraceInfo {
 		return TraceInfo{}
 	}
 
+	ct.lock.RLock()
+	defer ct.lock.RUnlock()
+
 	ti := TraceInfo{
-		DNSLookup:      ct.dnsDone.Sub(ct.dnsStart),
-		TLSHandshake:   ct.tlsHandshakeDone.Sub(ct.tlsHandshakeStart),
-		ServerTime:     ct.gotFirstResponseByte.Sub(ct.gotConn),
+		DNSLookup:      0,
+		TCPConnTime:    0,
+		ServerTime:     0,
 		IsConnReused:   ct.gotConnInfo.Reused,
 		IsConnWasIdle:  ct.gotConnInfo.WasIdle,
 		ConnIdleTime:   ct.gotConnInfo.IdleTime,
 		RequestAttempt: r.Attempt,
 	}
 
-	// Calculate the total time accordingly,
-	// when connection is reused
-	if ct.gotConnInfo.Reused {
-		ti.TotalTime = ct.endTime.Sub(ct.getConn)
-	} else {
-		ti.TotalTime = ct.endTime.Sub(ct.dnsStart)
+	if !ct.dnsStart.IsZero() && !ct.dnsDone.IsZero() {
+		ti.DNSLookup = ct.dnsDone.Sub(ct.dnsStart)
 	}
+
+	if !ct.tlsHandshakeDone.IsZero() && !ct.tlsHandshakeStart.IsZero() {
+		ti.TLSHandshake = ct.tlsHandshakeDone.Sub(ct.tlsHandshakeStart)
+	}
+
+	if !ct.gotFirstResponseByte.IsZero() && !ct.gotConn.IsZero() {
+		ti.ServerTime = ct.gotFirstResponseByte.Sub(ct.gotConn)
+	}
+
+	// Calculate the total time accordingly when connection is reused,
+	// and DNS start and get conn time may be zero if the request is invalid.
+	// See issue #1016.
+	requestStartTime := r.Time
+	if ct.gotConnInfo.Reused && !ct.getConn.IsZero() {
+		requestStartTime = ct.getConn
+	} else if !ct.dnsStart.IsZero() {
+		requestStartTime = ct.dnsStart
+	}
+	ti.TotalTime = ct.endTime.Sub(requestStartTime)
 
 	// Only calculate on successful connections
 	if !ct.connectDone.IsZero() {
@@ -1077,7 +1095,8 @@ type SRVRecord struct {
 
 func (r *Request) fmtBodyString(sl int64) (body string) {
 	body = "***** NO CONTENT *****"
-	if !isPayloadSupported(r.Method, r.client.AllowGetMethodPayload) {
+	if !isPayloadSupported(r.Method, r.client.AllowGetMethodPayload) ||
+		r.Body == http.NoBody {
 		return
 	}
 
