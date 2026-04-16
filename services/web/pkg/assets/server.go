@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"golang.org/x/net/html"
 )
@@ -119,8 +120,25 @@ func isValid(f *fileServer, path string) bool {
 		if len(rel) > 0 && rel[0] == '/' {
 			rel = rel[1:]
 		}
+		// Build a candidate path under the HTTP directory root.
 		candidate := filepath.Join(rootAbs, filepath.FromSlash(rel))
-		fi, err := os.Lstat(candidate)
+
+		// Resolve to an absolute, cleaned path and ensure it is still within rootAbs
+		candidateAbs, err := filepath.Abs(candidate)
+		if err != nil {
+			return false
+		}
+		root := filepath.Clean(rootAbs)
+		relToRoot, err := filepath.Rel(root, candidateAbs)
+		if err != nil {
+			return false
+		}
+		relToRoot = filepath.Clean(relToRoot)
+		if relToRoot == ".." || strings.HasPrefix(relToRoot, ".."+string(os.PathSeparator)) {
+			return false
+		}
+
+		fi, err := os.Lstat(candidateAbs)
 		if err != nil {
 			return false
 		}
