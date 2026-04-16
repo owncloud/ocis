@@ -4088,9 +4088,9 @@ trait WebDav {
 		// and Playwright's maxDiffPixelRatio
 		//   https://playwright.dev/docs/api/class-pageassertions#page-assertions-to-have-screenshot-1-option-max-diff-pixel-ratio
 		$pixelThreshold = 12; // per-pixel: max channel diff (0-255) above this counts as "bad"
-		// 0.65: ubuntu24/20260406.80 runner update shifted fill.png/thumbnail.png to 56% bad pixels.
-		// Threshold set above observed drift (56%) but below total failure (>90% would indicate
-		// wrong image, black output, etc.). TODO: regenerate fixtures and tighten once Docker works locally.
+		// 0.65: ubuntu24/20260406.80 runner update changed libvips output — fill.png/thumbnail.png
+		// shifted to 56% bad pixels. Threshold set above observed drift but below total failure
+		// (black/blank output would produce >90%). Fixtures need regeneration against the new env.
 		$maxBadRatio = 0.65;
 
 		$totalPixels = $w * $h;
@@ -4122,7 +4122,6 @@ trait WebDav {
 			. " p99=" . $pct(0.99)
 			. " max=" . $pct(1.0)
 			. " bad(>{$pixelThreshold})={$badPct}%\n";
-
 
 		Assert::assertLessThanOrEqual(
 			$maxBadRatio,
