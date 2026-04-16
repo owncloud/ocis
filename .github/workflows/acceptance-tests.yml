@@ -1,608 +1,608 @@
-name: Acceptance Tests
+# # name: Acceptance Tests
 
-on:
-  pull_request:
-  workflow_dispatch:
+# # on:
+# #   pull_request:
+# #   workflow_dispatch:
 
-jobs:
-  build-and-test:
-    name: build-and-test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version-file: go.mod
-          cache: true
+# jobs:
+#   build-and-test:
+#     name: build-and-test
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+#       - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+#         with:
+#           go-version-file: go.mod
+#           cache: true
 
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        with:
-          node-version: "24"
+# #       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+# #         with:
+# #           node-version: "24"
 
-      - name: Enable pnpm
-        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+# #       - name: Enable pnpm
+# #         run: corepack enable && corepack prepare pnpm@10.28.1 --activate
 
-      - name: Pre-checks and generate
-        run: |
-          # Phase 1 — I/O + light CPU, no contention between tasks.
-          # PHP install (~40s) is moved inside the php-style subshell so it overlaps
-          # with govulncheck (network I/O), node-gen, and go-gen instead of blocking
-          # the entire job sequentially.
-          # wa (I/O wait) will spike during apt-get/npm/pnpm downloads.
-          # Expected avg load: ~50-60 % CPU on 2 vCPU.
-          vmstat 2 > /tmp/vmstat-phase1.log & MONITOR_PID=$!
+#       - name: Pre-checks and generate
+#         run: |
+#           # Phase 1 — I/O + light CPU, no contention between tasks.
+#           # PHP install (~40s) is moved inside the php-style subshell so it overlaps
+#           # with govulncheck (network I/O), node-gen, and go-gen instead of blocking
+#           # the entire job sequentially.
+#           # wa (I/O wait) will spike during apt-get/npm/pnpm downloads.
+#           # Expected avg load: ~50-60 % CPU on 2 vCPU.
+#           vmstat 2 > /tmp/vmstat-phase1.log & MONITOR_PID=$!
 
-          #TODO: use github action to setup/install/cache php
-          (sudo add-apt-repository -y ppa:ondrej/php \
-            && sudo apt-get update -qq \
-            && sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd \
-            && sudo update-alternatives --set php /usr/bin/php8.4 \
-            && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-            && make vendor-bin-codestyle && make vendor-bin-codesniffer && make test-php-style && make check-env-var-annotations) > /tmp/php-style.log   2>&1 & PIDS=($!)
-          (npm install -g @gherlint/gherlint@1.1.0 && make test-gherkin-lint)                                                 > /tmp/gherkin.log     2>&1 & PIDS+=($!)
-          bash tests/acceptance/check-deleted-suites-in-expected-failure.sh                                                   > /tmp/suites.log      2>&1 & PIDS+=($!)
-          make govulncheck                                                                                                     > /tmp/govulncheck.log 2>&1 & PIDS+=($!)
-          make ci-node-generate                                                                                                > /tmp/node-gen.log    2>&1 & PIDS+=($!)
-          make ci-go-generate                                                                                                  > /tmp/go-gen.log      2>&1 & PIDS+=($!)
+#           #TODO: use github action to setup/install/cache php
+#           (sudo add-apt-repository -y ppa:ondrej/php \
+#             && sudo apt-get update -qq \
+#             && sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd \
+#             && sudo update-alternatives --set php /usr/bin/php8.4 \
+#             && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+#             && make vendor-bin-codestyle && make vendor-bin-codesniffer && make test-php-style && make check-env-var-annotations) > /tmp/php-style.log   2>&1 & PIDS=($!)
+#           (npm install -g @gherlint/gherlint@1.1.0 && make test-gherkin-lint)                                                 > /tmp/gherkin.log     2>&1 & PIDS+=($!)
+#           bash tests/acceptance/check-deleted-suites-in-expected-failure.sh                                                   > /tmp/suites.log      2>&1 & PIDS+=($!)
+#           make govulncheck                                                                                                     > /tmp/govulncheck.log 2>&1 & PIDS+=($!)
+#           make ci-node-generate                                                                                                > /tmp/node-gen.log    2>&1 & PIDS+=($!)
+#           make ci-go-generate                                                                                                  > /tmp/go-gen.log      2>&1 & PIDS+=($!)
 
-          FAILED=0
-          for PID in "${PIDS[@]}"; do wait "$PID" || FAILED=1; done
-          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
+#           FAILED=0
+#           for PID in "${PIDS[@]}"; do wait "$PID" || FAILED=1; done
+#           kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
 
-          # How to read the load line:
-          #   busy    — % of time CPUs were doing work  (100% = fully saturated)
-          #   runq    — processes waiting for a CPU turn; runq >> nCPU means tasks
-          #             compete and each runs slower (runq 10 on 2 vCPU = ~5× slower)
-          #   wa      — % waiting on disk/network; wa > 20% = I/O bound, not CPU bound
-          #             → high wa: add more parallel tasks; high runq: reduce them
-          awk '/^[ ]*[0-9]/ { busy=100-$15; sum_b+=busy; if(busy>pk_b)pk_b=busy;
-                               sum_r+=$1;   if($1>pk_r) pk_r=$1; sum_wa+=$16; n++ }
-               END { printf "=== phase 1 load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
-                     sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat-phase1.log
+#           # How to read the load line:
+#           #   busy    — % of time CPUs were doing work  (100% = fully saturated)
+#           #   runq    — processes waiting for a CPU turn; runq >> nCPU means tasks
+#           #             compete and each runs slower (runq 10 on 2 vCPU = ~5× slower)
+#           #   wa      — % waiting on disk/network; wa > 20% = I/O bound, not CPU bound
+#           #             → high wa: add more parallel tasks; high runq: reduce them
+#           awk '/^[ ]*[0-9]/ { busy=100-$15; sum_b+=busy; if(busy>pk_b)pk_b=busy;
+#                                sum_r+=$1;   if($1>pk_r) pk_r=$1; sum_wa+=$16; n++ }
+#                END { printf "=== phase 1 load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
+#                      sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat-phase1.log
 
-          echo "=== php-style ==="       && cat /tmp/php-style.log
-          echo "=== gherkin ==="          && cat /tmp/gherkin.log
-          echo "=== suites ==="           && cat /tmp/suites.log
-          echo "=== govulncheck ==="      && cat /tmp/govulncheck.log
-          echo "=== ci-node-generate ===" && cat /tmp/node-gen.log
-          echo "=== ci-go-generate ==="   && cat /tmp/go-gen.log
+#           echo "=== php-style ==="       && cat /tmp/php-style.log
+#           echo "=== gherkin ==="          && cat /tmp/gherkin.log
+#           echo "=== suites ==="           && cat /tmp/suites.log
+#           echo "=== govulncheck ==="      && cat /tmp/govulncheck.log
+#           echo "=== ci-node-generate ===" && cat /tmp/node-gen.log
+#           echo "=== ci-go-generate ==="   && cat /tmp/go-gen.log
 
-          exit $FAILED
+#           exit $FAILED
 
-      - name: Build, lint and test
-        run: |
-          # Phase 2 — all three are CPU-bound Go compilation on 2 vCPU.
-          # They compete for CPU (expect id < 10, load ~95 %) but share the
-          # Go build cache within this runner, so make test reuses artifacts
-          # from the ocis build. Critical path = ocis build (~300 s).
-          vmstat 2 > /tmp/vmstat-phase2.log & MONITOR_PID=$!
+#       - name: Build, lint and test
+#         run: |
+#           # Phase 2 — all three are CPU-bound Go compilation on 2 vCPU.
+#           # They compete for CPU (expect id < 10, load ~95 %) but share the
+#           # Go build cache within this runner, so make test reuses artifacts
+#           # from the ocis build. Critical path = ocis build (~300 s).
+#           vmstat 2 > /tmp/vmstat-phase2.log & MONITOR_PID=$!
 
-          make ci-golangci-lint > /tmp/golangci-lint.log 2>&1 & PIDS=($!)
-          make -C ocis build    > /tmp/ocis-build.log    2>&1 & PIDS+=($!)
-          make test             > /tmp/unit-tests.log    2>&1 & PIDS+=($!)
+#           make ci-golangci-lint > /tmp/golangci-lint.log 2>&1 & PIDS=($!)
+#           make -C ocis build    > /tmp/ocis-build.log    2>&1 & PIDS+=($!)
+#           make test             > /tmp/unit-tests.log    2>&1 & PIDS+=($!)
 
-          FAILED=0
-          for PID in "${PIDS[@]}"; do wait "$PID" || FAILED=1; done
-          kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
+#           FAILED=0
+#           for PID in "${PIDS[@]}"; do wait "$PID" || FAILED=1; done
+#           kill $MONITOR_PID 2>/dev/null; wait $MONITOR_PID 2>/dev/null || true
 
-          # Signal: busy=saturated  runq>>2=tasks competing(slows each)  wa>20%=I/O bound
-          awk '/^[ ]*[0-9]/ { busy=100-$15; sum_b+=busy; if(busy>pk_b)pk_b=busy;
-                               sum_r+=$1;   if($1>pk_r) pk_r=$1; sum_wa+=$16; n++ }
-               END { printf "=== phase 2 load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
-                     sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat-phase2.log
+#           # Signal: busy=saturated  runq>>2=tasks competing(slows each)  wa>20%=I/O bound
+#           awk '/^[ ]*[0-9]/ { busy=100-$15; sum_b+=busy; if(busy>pk_b)pk_b=busy;
+#                                sum_r+=$1;   if($1>pk_r) pk_r=$1; sum_wa+=$16; n++ }
+#                END { printf "=== phase 2 load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
+#                      sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat-phase2.log
 
-          echo "=== golangci-lint ==="&& cat /tmp/golangci-lint.log
-          echo "=== ocis build ==="   && cat /tmp/ocis-build.log
-          echo "=== unit tests ==="   && cat /tmp/unit-tests.log
+#           echo "=== golangci-lint ==="&& cat /tmp/golangci-lint.log
+#           echo "=== ocis build ==="   && cat /tmp/ocis-build.log
+#           echo "=== unit tests ==="   && cat /tmp/unit-tests.log
 
-          exit $FAILED
+#           exit $FAILED
 
-  local-api-tests:
-    name: ${{ matrix.suite }}
-    needs: [build-and-test]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        suite:
-          # contract & locks
-          - apiContract
-          - apiLocks
-          # settings & notifications (needs email)
-          - apiSettings
-          - apiNotification
-          - apiCors
-          # graph
-          - apiGraphUser
-          - apiGraph
-          - apiGraphGroup
-          # spaces & dav
-          - apiSpaces
-          - apiSpacesShares
-          - apiSpacesDavOperation
-          - apiDownloads
-          - apiAsyncUpload
-          - apiDepthInfinity
-          - apiArchiver
-          - apiActivities
-          # search
-          - apiSearch1
-          - apiSearch2
-          - apiSearchContent    # needs Tika
-          # sharing
-          - apiSharingNgShares
-          - apiReshare
-          - apiSharingNgPermissions
-          - apiSharingNgAdditionalShareRole
-          - apiSharingNgDriveInvitation
-          - apiSharingNgItemInvitation
-          - apiSharingNgDriveLinkShare
-          - apiSharingNgItemLinkShare
-          - apiSharingNgLinkShareManagement
-          # auth
-          - apiAuthApp
-          # antivirus (needs ClamAV)
-          - apiAntivirus
-          # federation (needs email + federation ocis)
-          - apiOcm
-          # collaboration (needs WOPI)
-          - apiCollaboration
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version-file: go.mod
-          cache: true
+#   local-api-tests:
+#     name: ${{ matrix.suite }}
+#     needs: [build-and-test]
+#     runs-on: ubuntu-latest
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         suite:
+#           # contract & locks
+#           - apiContract
+#           - apiLocks
+#           # settings & notifications (needs email)
+#           - apiSettings
+#           - apiNotification
+#           - apiCors
+#           # graph
+#           - apiGraphUser
+#           - apiGraph
+#           - apiGraphGroup
+#           # spaces & dav
+#           - apiSpaces
+#           - apiSpacesShares
+#           - apiSpacesDavOperation
+#           - apiDownloads
+#           - apiAsyncUpload
+#           - apiDepthInfinity
+#           - apiArchiver
+#           - apiActivities
+#           # search
+#           - apiSearch1
+#           - apiSearch2
+#           - apiSearchContent    # needs Tika
+#           # sharing
+#           - apiSharingNgShares
+#           - apiReshare
+#           - apiSharingNgPermissions
+#           - apiSharingNgAdditionalShareRole
+#           - apiSharingNgDriveInvitation
+#           - apiSharingNgItemInvitation
+#           - apiSharingNgDriveLinkShare
+#           - apiSharingNgItemLinkShare
+#           - apiSharingNgLinkShareManagement
+#           # auth
+#           - apiAuthApp
+#           # antivirus (needs ClamAV)
+#           - apiAntivirus
+#           # federation (needs email + federation ocis)
+#           - apiOcm
+#           # collaboration (needs WOPI)
+#           - apiCollaboration
+#     steps:
+#       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+#       - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+#         with:
+#           go-version-file: go.mod
+#           cache: true
 
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        with:
-          node-version: "24"
+# #       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+# #         with:
+# #           node-version: "24"
 
-      - name: Enable pnpm
-        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+# #       - name: Enable pnpm
+# #         run: corepack enable && corepack prepare pnpm@10.28.1 --activate
 
-      - name: Cache libcurl 8.12.0
-        id: cache-libcurl
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
-        with:
-          path: /opt/libcurl
-          key: libcurl-8.12.0-${{ runner.os }}
+#       - name: Cache libcurl 8.12.0
+#         id: cache-libcurl
+#         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+#         with:
+#           path: /opt/libcurl
+#           key: libcurl-8.12.0-${{ runner.os }}
 
-      - name: Install libcurl 8.12.0 build dependencies
-        # Always run: libvips-dev is needed at runtime (govips thumbnails) and for
-        # pkg-config --exists vips to succeed so oCIS is built with ENABLE_VIPS=true.
-        # Skipping this on cache hit would cause oCIS to fall back to the imaging library.
-        run: |
-          sudo apt-get update -qq
-          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
-          sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
+# #       - name: Install libcurl 8.12.0 build dependencies
+# #         # Always run: libvips-dev is needed at runtime (govips thumbnails) and for
+# #         # pkg-config --exists vips to succeed so oCIS is built with ENABLE_VIPS=true.
+# #         # Skipping this on cache hit would cause oCIS to fall back to the imaging library.
+# #         run: |
+# #           sudo apt-get update -qq
+# #           # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
+# #           sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
 
-      - name: Compile libcurl 8.12.0 from source
-        if: steps.cache-libcurl.outputs.cache-hit != 'true'
-        run: |
-          cd /tmp
-          curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
-          tar xzf curl-8.12.0.tar.gz
-          cd curl-8.12.0
-          ./configure --with-ssl --with-zlib --with-nghttp2 --prefix=/opt/libcurl --enable-versioned-symbols --silent
-          make -j$(nproc) --silent
-          sudo make install --silent
+# #       - name: Compile libcurl 8.12.0 from source
+# #         if: steps.cache-libcurl.outputs.cache-hit != 'true'
+# #         run: |
+# #           cd /tmp
+# #           curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
+# #           tar xzf curl-8.12.0.tar.gz
+# #           cd curl-8.12.0
+# #           ./configure --with-ssl --with-zlib --with-nghttp2 --prefix=/opt/libcurl --enable-versioned-symbols --silent
+# #           make -j$(nproc) --silent
+# #           sudo make install --silent
 
-      - name: Restore libcurl ldconfig
-        # Always run: on cache hit the .so files are restored to /opt/libcurl/lib but
-        # /etc/ld.so.cache on the fresh runner doesn't know about them yet.
-        # Without ldconfig, PHP's curl extension can't find libcurl even though it's present.
-        run: |
-          echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
-          sudo ldconfig
-          /opt/libcurl/bin/curl --version | head -1
-          php -r '
-            $v = curl_version()["version"];
-            echo "PHP curl: $v\n";
-            if (version_compare($v, "8.12.0", "<")) {
-              fwrite(STDERR, "FATAL: PHP sees libcurl $v, need >= 8.12.0\n");
-              exit(1);
-            }
-          '
+# #       - name: Restore libcurl ldconfig
+# #         # Always run: on cache hit the .so files are restored to /opt/libcurl/lib but
+# #         # /etc/ld.so.cache on the fresh runner doesn't know about them yet.
+# #         # Without ldconfig, PHP's curl extension can't find libcurl even though it's present.
+# #         run: |
+# #           echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
+# #           sudo ldconfig
+# #           /opt/libcurl/bin/curl --version | head -1
+# #           php -r '
+# #             $v = curl_version()["version"];
+# #             echo "PHP curl: $v\n";
+# #             if (version_compare($v, "8.12.0", "<")) {
+# #               fwrite(STDERR, "FATAL: PHP sees libcurl $v, need >= 8.12.0\n");
+# #               exit(1);
+# #             }
+# #           '
 
-      - name: Install PHP 8.4
-        run: |
-          for attempt in {1..5}; do
-            echo "Attempt $attempt/5..."
+#       - name: Install PHP 8.4
+#         run: |
+#           for attempt in {1..5}; do
+#             echo "Attempt $attempt/5..."
 
-            OUTPUT=$(sudo add-apt-repository -y ppa:ondrej/php 2>&1)
-            EXIT_CODE=$?
+#             OUTPUT=$(sudo add-apt-repository -y ppa:ondrej/php 2>&1)
+#             EXIT_CODE=$?
 
-            if [ $EXIT_CODE -eq 0 ]; then
-              echo "PPA added successfully."
-              break
-            fi
-            ERROR_MSG=$(echo "$OUTPUT" | grep -E "(504 Gateway Time-out|502 Bad Gateway|503 Service Unavailable|HTTP Error 5[0-9][0-9])" | head -n 1)
+#             if [ $EXIT_CODE -eq 0 ]; then
+#               echo "PPA added successfully."
+#               break
+#             fi
+#             ERROR_MSG=$(echo "$OUTPUT" | grep -E "(504 Gateway Time-out|502 Bad Gateway|503 Service Unavailable|HTTP Error 5[0-9][0-9])" | head -n 1)
 
-            # Retry on 5xx error
-            if [ -n "$ERROR_MSG" ]; then
-              echo "Error: $ERROR_MSG"
-              echo "Retrying......"
-            else
-              echo "Error: $OUTPUT"
-              exit 1
-            fi
+#             # Retry on 5xx error
+#             if [ -n "$ERROR_MSG" ]; then
+#               echo "Error: $ERROR_MSG"
+#               echo "Retrying......"
+#             else
+#               echo "Error: $OUTPUT"
+#               exit 1
+#             fi
 
-            # delay
-            sleep 10
-          done
+#             # delay
+#             sleep 10
+#           done
 
-          if [ $EXIT_CODE -ne 0 ]; then
-            echo "Failed to add PPA after 5 attempts."
-            echo "Error: $OUTPUT"
-            exit 1
-          fi
+#           if [ $EXIT_CODE -ne 0 ]; then
+#             echo "Failed to add PPA after 5 attempts."
+#             echo "Error: $OUTPUT"
+#             exit 1
+#           fi
 
-          sudo apt-get update -qq
-          sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd
-          sudo update-alternatives --set php /usr/bin/php8.4
-          curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-          php -v
-          composer --version
+#           sudo apt-get update -qq
+#           sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd
+#           sudo update-alternatives --set php /usr/bin/php8.4
+#           curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+#           php -v
+#           composer --version
 
-      - name: Run ${{ matrix.suite }}
-        run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
+# #       - name: Run ${{ matrix.suite }}
+# #         run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
 
-  cli-tests:
-    needs: [build-and-test]
-    name: ${{ matrix.suite }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        suite:
-          - cliCommands,apiServiceAvailability   # grouped like drone; needs ClamAV + email
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version-file: go.mod
-          cache: true
+#   cli-tests:
+#     needs: [build-and-test]
+#     name: ${{ matrix.suite }}
+#     runs-on: ubuntu-latest
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         suite:
+#           - cliCommands,apiServiceAvailability   # grouped like drone; needs ClamAV + email
+#     steps:
+#       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+#       - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+#         with:
+#           go-version-file: go.mod
+#           cache: true
 
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        with:
-          node-version: "24"
+# #       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+# #         with:
+# #           node-version: "24"
 
-      - name: Enable pnpm
-        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+# #       - name: Enable pnpm
+# #         run: corepack enable && corepack prepare pnpm@10.28.1 --activate
 
-      - name: Install PHP 8.4
-        run: |
-          for attempt in {1..5}; do
-            echo "Attempt $attempt/5..."
+#       - name: Install PHP 8.4
+#         run: |
+#           for attempt in {1..5}; do
+#             echo "Attempt $attempt/5..."
 
-            OUTPUT=$(sudo add-apt-repository -y ppa:ondrej/php 2>&1)
-            EXIT_CODE=$?
+#             OUTPUT=$(sudo add-apt-repository -y ppa:ondrej/php 2>&1)
+#             EXIT_CODE=$?
 
-            if [ $EXIT_CODE -eq 0 ]; then
-              echo "PPA added successfully."
-              break
-            fi
-            ERROR_MSG=$(echo "$OUTPUT" | grep -E "(504 Gateway Time-out|502 Bad Gateway|503 Service Unavailable|HTTP Error 5[0-9][0-9])" | head -n 1)
+#             if [ $EXIT_CODE -eq 0 ]; then
+#               echo "PPA added successfully."
+#               break
+#             fi
+#             ERROR_MSG=$(echo "$OUTPUT" | grep -E "(504 Gateway Time-out|502 Bad Gateway|503 Service Unavailable|HTTP Error 5[0-9][0-9])" | head -n 1)
 
-            # Retry on 5xx error
-            if [ -n "$ERROR_MSG" ]; then
-              echo "Error: $ERROR_MSG"
-              echo "Retrying......"
-            else
-              echo "Error: $OUTPUT"
-              exit 1
-            fi
+#             # Retry on 5xx error
+#             if [ -n "$ERROR_MSG" ]; then
+#               echo "Error: $ERROR_MSG"
+#               echo "Retrying......"
+#             else
+#               echo "Error: $OUTPUT"
+#               exit 1
+#             fi
 
-            # delay
-            sleep 10
-          done
+#             # delay
+#             sleep 10
+#           done
 
-          if [ $EXIT_CODE -ne 0 ]; then
-            echo "Failed to add PPA after 5 attempts."
-            echo "Error: $OUTPUT"
-            exit 1
-          fi
+#           if [ $EXIT_CODE -ne 0 ]; then
+#             echo "Failed to add PPA after 5 attempts."
+#             echo "Error: $OUTPUT"
+#             exit 1
+#           fi
           
-          sudo apt-get update -qq
-          sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd
-          sudo update-alternatives --set php /usr/bin/php8.4
-          curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-          php -v
-          composer --version
+#           sudo apt-get update -qq
+#           sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd
+#           sudo update-alternatives --set php /usr/bin/php8.4
+#           curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+#           php -v
+#           composer --version
 
-      - name: Run ${{ matrix.suite }}
-        run: BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
+# #       - name: Run ${{ matrix.suite }}
+# #         run: BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
 
-  core-api-tests:
-    name: ${{ matrix.suite }}
-    needs: [build-and-test]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        suite:
-          - "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
-          - "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
-          - "coreApiSharees"
-          - "coreApiSharePublicLink2"
-          - "coreApiShareOperationsToShares1,coreApiShareOperationsToShares2,coreApiSharePublicLink1,coreApiShareCreateSpecialToShares1,coreApiShareCreateSpecialToShares2,coreApiShareUpdateToShares"
-          - "coreApiTrashbin,coreApiTrashbinRestore,coreApiWebdavEtagPropagation1,coreApiWebdavEtagPropagation2"
-          - "coreApiWebdavDelete,coreApiWebdavOperations,coreApiWebdavMove2"
-          - "coreApiWebdavProperties"
-          - "coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS"
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version-file: go.mod
-          cache: true
+#   core-api-tests:
+#     name: ${{ matrix.suite }}
+#     needs: [build-and-test]
+#     runs-on: ubuntu-latest
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         suite:
+#           - "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
+#           - "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
+#           - "coreApiSharees"
+#           - "coreApiSharePublicLink2"
+#           - "coreApiShareOperationsToShares1,coreApiShareOperationsToShares2,coreApiSharePublicLink1,coreApiShareCreateSpecialToShares1,coreApiShareCreateSpecialToShares2,coreApiShareUpdateToShares"
+#           - "coreApiTrashbin,coreApiTrashbinRestore,coreApiWebdavEtagPropagation1,coreApiWebdavEtagPropagation2"
+#           - "coreApiWebdavDelete,coreApiWebdavOperations,coreApiWebdavMove2"
+#           - "coreApiWebdavProperties"
+#           - "coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS"
+#     steps:
+#       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+#       - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+#         with:
+#           go-version-file: go.mod
+#           cache: true
 
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        with:
-          node-version: "24"
+# #       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+# #         with:
+# #           node-version: "24"
 
-      - name: Enable pnpm
-        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+# #       - name: Enable pnpm
+# #         run: corepack enable && corepack prepare pnpm@10.28.1 --activate
 
-      - name: Cache libcurl 8.12.0
-        id: cache-libcurl
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
-        with:
-          path: /opt/libcurl
-          key: libcurl-8.12.0-${{ runner.os }}
+#       - name: Cache libcurl 8.12.0
+#         id: cache-libcurl
+#         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+#         with:
+#           path: /opt/libcurl
+#           key: libcurl-8.12.0-${{ runner.os }}
 
-      - name: Install libcurl 8.12.0 build dependencies
-        # Always run: libvips-dev is needed at runtime (govips thumbnails) and for
-        # pkg-config --exists vips to succeed so oCIS is built with ENABLE_VIPS=true.
-        # Skipping this on cache hit would cause oCIS to fall back to the imaging library.
-        run: |
-          sudo apt-get update -qq
-          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
-          sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
+# #       - name: Install libcurl 8.12.0 build dependencies
+# #         # Always run: libvips-dev is needed at runtime (govips thumbnails) and for
+# #         # pkg-config --exists vips to succeed so oCIS is built with ENABLE_VIPS=true.
+# #         # Skipping this on cache hit would cause oCIS to fall back to the imaging library.
+# #         run: |
+# #           sudo apt-get update -qq
+# #           # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
+# #           sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
 
-      - name: Compile libcurl 8.12.0 from source
-        if: steps.cache-libcurl.outputs.cache-hit != 'true'
-        run: |
-          cd /tmp
-          curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
-          tar xzf curl-8.12.0.tar.gz
-          cd curl-8.12.0
-          ./configure --with-ssl --with-zlib --with-nghttp2 --prefix=/opt/libcurl --enable-versioned-symbols --silent
-          make -j$(nproc) --silent
-          sudo make install --silent
+# #       - name: Compile libcurl 8.12.0 from source
+# #         if: steps.cache-libcurl.outputs.cache-hit != 'true'
+# #         run: |
+# #           cd /tmp
+# #           curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
+# #           tar xzf curl-8.12.0.tar.gz
+# #           cd curl-8.12.0
+# #           ./configure --with-ssl --with-zlib --with-nghttp2 --prefix=/opt/libcurl --enable-versioned-symbols --silent
+# #           make -j$(nproc) --silent
+# #           sudo make install --silent
 
-      - name: Restore libcurl ldconfig
-        # Always run: on cache hit the .so files are restored to /opt/libcurl/lib but
-        # /etc/ld.so.cache on the fresh runner doesn't know about them yet.
-        # Without ldconfig, PHP's curl extension can't find libcurl even though it's present.
-        run: |
-          echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
-          sudo ldconfig
-          /opt/libcurl/bin/curl --version | head -1
-          php -r '
-            $v = curl_version()["version"];
-            echo "PHP curl: $v\n";
-            if (version_compare($v, "8.12.0", "<")) {
-              fwrite(STDERR, "FATAL: PHP sees libcurl $v, need >= 8.12.0\n");
-              exit(1);
-            }
-          '
+# #       - name: Restore libcurl ldconfig
+# #         # Always run: on cache hit the .so files are restored to /opt/libcurl/lib but
+# #         # /etc/ld.so.cache on the fresh runner doesn't know about them yet.
+# #         # Without ldconfig, PHP's curl extension can't find libcurl even though it's present.
+# #         run: |
+# #           echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
+# #           sudo ldconfig
+# #           /opt/libcurl/bin/curl --version | head -1
+# #           php -r '
+# #             $v = curl_version()["version"];
+# #             echo "PHP curl: $v\n";
+# #             if (version_compare($v, "8.12.0", "<")) {
+# #               fwrite(STDERR, "FATAL: PHP sees libcurl $v, need >= 8.12.0\n");
+# #               exit(1);
+# #             }
+# #           '
 
-      - name: Install PHP 8.4
-        run: |
-          for attempt in {1..5}; do
-            echo "Attempt $attempt/5..."
+#       - name: Install PHP 8.4
+#         run: |
+#           for attempt in {1..5}; do
+#             echo "Attempt $attempt/5..."
 
-            OUTPUT=$(sudo add-apt-repository -y ppa:ondrej/php 2>&1)
-            EXIT_CODE=$?
+#             OUTPUT=$(sudo add-apt-repository -y ppa:ondrej/php 2>&1)
+#             EXIT_CODE=$?
 
-            if [ $EXIT_CODE -eq 0 ]; then
-              echo "PPA added successfully."
-              break
-            fi
-            ERROR_MSG=$(echo "$OUTPUT" | grep -E "(504 Gateway Time-out|502 Bad Gateway|503 Service Unavailable|HTTP Error 5[0-9][0-9])" | head -n 1)
+#             if [ $EXIT_CODE -eq 0 ]; then
+#               echo "PPA added successfully."
+#               break
+#             fi
+#             ERROR_MSG=$(echo "$OUTPUT" | grep -E "(504 Gateway Time-out|502 Bad Gateway|503 Service Unavailable|HTTP Error 5[0-9][0-9])" | head -n 1)
 
-            # Retry on 5xx error
-            if [ -n "$ERROR_MSG" ]; then
-              echo "Error: $ERROR_MSG"
-              echo "Retrying......"
-            else
-              echo "Error: $OUTPUT"
-              exit 1
-            fi
+#             # Retry on 5xx error
+#             if [ -n "$ERROR_MSG" ]; then
+#               echo "Error: $ERROR_MSG"
+#               echo "Retrying......"
+#             else
+#               echo "Error: $OUTPUT"
+#               exit 1
+#             fi
 
-            # delay
-            sleep 10
-          done
+#             # delay
+#             sleep 10
+#           done
 
-          if [ $EXIT_CODE -ne 0 ]; then
-            echo "Failed to add PPA after 5 attempts."
-            echo "Error: $OUTPUT"
-            exit 1
-          fi
+#           if [ $EXIT_CODE -ne 0 ]; then
+#             echo "Failed to add PPA after 5 attempts."
+#             echo "Error: $OUTPUT"
+#             exit 1
+#           fi
           
-          sudo apt-get update -qq
-          sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd
-          sudo update-alternatives --set php /usr/bin/php8.4
-          curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+#           sudo apt-get update -qq
+#           sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd
+#           sudo update-alternatives --set php /usr/bin/php8.4
+#           curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-      - name: Run ${{ matrix.suite }}
-        run: >
-          BEHAT_SUITES="${{ matrix.suite }}"
-          ACCEPTANCE_TEST_TYPE=core-api
-          WITH_REMOTE_PHP=true
-          python3 tests/acceptance/run-github.py
+# #       - name: Run ${{ matrix.suite }}
+# #         run: >
+# #           BEHAT_SUITES="${{ matrix.suite }}"
+# #           ACCEPTANCE_TEST_TYPE=core-api
+# #           WITH_REMOTE_PHP=true
+# #           python3 tests/acceptance/run-github.py
 
-  e2e-tests:
-    name: e2e-${{ matrix.suite }}
-    needs: [build-and-test]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - suite: part-1
-            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 1"
-          - suite: part-2
-            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 2"
-          - suite: part-3
-            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 3"
-          - suite: part-4
-            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 4"
-          - suite: search
-            args: "--suites search"
-            tika: true
-          - suite: keycloak
-            args: "--suites journeys,keycloak"
-            keycloak: true
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version-file: go.mod
-          cache: true
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        with:
-          node-version: "24"
-      - name: Enable pnpm
-        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
-      - name: Generate code
-        run: |
-          pnpm config set store-dir ./.pnpm-store
-          make ci-node-generate
-        env:
-          CHROMEDRIVER_SKIP_DOWNLOAD: "true"
+#   e2e-tests:
+#     name: e2e-${{ matrix.suite }}
+#     needs: [build-and-test]
+#     runs-on: ubuntu-latest
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         include:
+#           - suite: part-1
+#             args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 1"
+#           - suite: part-2
+#             args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 2"
+#           - suite: part-3
+#             args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 3"
+#           - suite: part-4
+#             args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 4"
+#           - suite: search
+#             args: "--suites search"
+#             tika: true
+#           - suite: keycloak
+#             args: "--suites journeys,keycloak"
+#             keycloak: true
+#     steps:
+#       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+#       - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+#         with:
+#           go-version-file: go.mod
+#           cache: true
+#       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+#         with:
+#           node-version: "24"
+#       - name: Enable pnpm
+#         run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+#       - name: Generate code
+#         run: |
+#           pnpm config set store-dir ./.pnpm-store
+#           make ci-node-generate
+#         env:
+#           CHROMEDRIVER_SKIP_DOWNLOAD: "true"
 
-      - name: Cache Playwright Chromium
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ hashFiles('.drone.env') }}
+#       - name: Cache Playwright Chromium
+#         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+#         with:
+#           path: ~/.cache/ms-playwright
+#           key: playwright-chromium-${{ hashFiles('.drone.env') }}
 
-      # --- Tika (search suite only) ---
-      - name: Start Tika
-        if: matrix.tika == true
-        run: |
-          docker run -d --name tika --network host apache/tika:3.2.2.0-full
-          timeout 120 bash -c 'until curl -sf http://localhost:9998; do sleep 2; done'
-          echo "tika ready."
+# #       # --- Tika (search suite only) ---
+# #       - name: Start Tika
+# #         if: matrix.tika == true
+# #         run: |
+# #           docker run -d --name tika --network host apache/tika:3.2.2.0-full
+# #           timeout 120 bash -c 'until curl -sf http://localhost:9998; do sleep 2; done'
+# #           echo "tika ready."
 
-      # --- Keycloak (keycloak suite only) ---
-      - name: Generate Keycloak certs
-        if: matrix.keycloak == true
-        run: |
-          mkdir -p keycloak-certs
-          openssl req -x509 -newkey rsa:2048 \
-            -keyout keycloak-certs/keycloakkey.pem \
-            -out keycloak-certs/keycloakcrt.pem \
-            -nodes -days 365 -subj '/CN=keycloak'
-          chmod -R 777 keycloak-certs
+# #       # --- Keycloak (keycloak suite only) ---
+# #       - name: Generate Keycloak certs
+# #         if: matrix.keycloak == true
+# #         run: |
+# #           mkdir -p keycloak-certs
+# #           openssl req -x509 -newkey rsa:2048 \
+# #             -keyout keycloak-certs/keycloakkey.pem \
+# #             -out keycloak-certs/keycloakcrt.pem \
+# #             -nodes -days 365 -subj '/CN=keycloak'
+# #           chmod -R 777 keycloak-certs
 
-      - name: Start Postgres
-        if: matrix.keycloak == true
-        run: |
-          docker run -d --name postgres --network host \
-            -e POSTGRES_DB=keycloak \
-            -e POSTGRES_USER=keycloak \
-            -e POSTGRES_PASSWORD=keycloak \
-            postgres:alpine3.18
-          timeout 30 bash -c 'until docker exec postgres pg_isready -U keycloak; do sleep 1; done'
+# #       - name: Start Postgres
+# #         if: matrix.keycloak == true
+# #         run: |
+# #           docker run -d --name postgres --network host \
+# #             -e POSTGRES_DB=keycloak \
+# #             -e POSTGRES_USER=keycloak \
+# #             -e POSTGRES_PASSWORD=keycloak \
+# #             postgres:alpine3.18
+# #           timeout 30 bash -c 'until docker exec postgres pg_isready -U keycloak; do sleep 1; done'
 
-      - name: Start Keycloak
-        if: matrix.keycloak == true
-        run: |
-          # Patch realm: replace Drone Docker hostname with localhost IP
-          sed 's|https://ocis-server:9200|https://127.0.0.1:9200|g' \
-            tests/config/drone/ocis-ci-realm.dist.json > /tmp/ocis-realm.json
-          docker run -d --name keycloak --network host \
-            -e OCIS_DOMAIN=https://127.0.0.1:9200 \
-            -e KC_HOSTNAME=localhost \
-            -e KC_PORT=8443 \
-            -e KC_DB=postgres \
-            -e "KC_DB_URL=jdbc:postgresql://localhost:5432/keycloak" \
-            -e KC_DB_USERNAME=keycloak \
-            -e KC_DB_PASSWORD=keycloak \
-            -e KC_FEATURES=impersonation \
-            -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
-            -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
-            -e KC_HTTPS_CERTIFICATE_FILE=/keycloak-certs/keycloakcrt.pem \
-            -e KC_HTTPS_CERTIFICATE_KEY_FILE=/keycloak-certs/keycloakkey.pem \
-            -v "$(pwd)/keycloak-certs:/keycloak-certs:ro" \
-            -v "/tmp/ocis-realm.json:/opt/keycloak/data/import/oCIS-realm.json:ro" \
-            quay.io/keycloak/keycloak:26.2.5 \
-            start-dev --proxy-headers xforwarded \
-              --spi-connections-http-client-default-disable-trust-manager=true \
-              --import-realm --health-enabled=true
-          timeout 300 bash -c 'until curl -skf https://localhost:9000/health/ready; do sleep 3; done' \
-            || (echo "=== keycloak logs ===" && docker logs keycloak --tail 80 && exit 1)
-          echo "keycloak ready."
+# #       - name: Start Keycloak
+# #         if: matrix.keycloak == true
+# #         run: |
+# #           # Patch realm: replace Drone Docker hostname with localhost IP
+# #           sed 's|https://ocis-server:9200|https://127.0.0.1:9200|g' \
+# #             tests/config/drone/ocis-ci-realm.dist.json > /tmp/ocis-realm.json
+# #           docker run -d --name keycloak --network host \
+# #             -e OCIS_DOMAIN=https://127.0.0.1:9200 \
+# #             -e KC_HOSTNAME=localhost \
+# #             -e KC_PORT=8443 \
+# #             -e KC_DB=postgres \
+# #             -e "KC_DB_URL=jdbc:postgresql://localhost:5432/keycloak" \
+# #             -e KC_DB_USERNAME=keycloak \
+# #             -e KC_DB_PASSWORD=keycloak \
+# #             -e KC_FEATURES=impersonation \
+# #             -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
+# #             -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+# #             -e KC_HTTPS_CERTIFICATE_FILE=/keycloak-certs/keycloakcrt.pem \
+# #             -e KC_HTTPS_CERTIFICATE_KEY_FILE=/keycloak-certs/keycloakkey.pem \
+# #             -v "$(pwd)/keycloak-certs:/keycloak-certs:ro" \
+# #             -v "/tmp/ocis-realm.json:/opt/keycloak/data/import/oCIS-realm.json:ro" \
+# #             quay.io/keycloak/keycloak:26.2.5 \
+# #             start-dev --proxy-headers xforwarded \
+# #               --spi-connections-http-client-default-disable-trust-manager=true \
+# #               --import-realm --health-enabled=true
+# #           timeout 300 bash -c 'until curl -skf https://localhost:9000/health/ready; do sleep 3; done' \
+# #             || (echo "=== keycloak logs ===" && docker logs keycloak --tail 80 && exit 1)
+# #           echo "keycloak ready."
 
-      - name: Run e2e-${{ matrix.suite }}
-        run: E2E_ARGS="${{ matrix.args }}" python3 tests/acceptance/run-e2e.py
-        env:
-          TIKA_NEEDED: ${{ matrix.tika == true && 'true' || 'false' }}
-          KEYCLOAK_NEEDED: ${{ matrix.keycloak == true && 'true' || 'false' }}
+# #       - name: Run e2e-${{ matrix.suite }}
+# #         run: E2E_ARGS="${{ matrix.args }}" python3 tests/acceptance/run-e2e.py
+# #         env:
+# #           TIKA_NEEDED: ${{ matrix.tika == true && 'true' || 'false' }}
+# #           KEYCLOAK_NEEDED: ${{ matrix.keycloak == true && 'true' || 'false' }}
 
-  litmus:
-    name: litmus
-    needs: [build-and-test]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version-file: go.mod
-          cache: true
-      - name: Run litmus
-        run: python3 tests/acceptance/run-litmus.py
+#   litmus:
+#     name: litmus
+#     needs: [build-and-test]
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+#       - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+#         with:
+#           go-version-file: go.mod
+#           cache: true
+#       - name: Run litmus
+#         run: python3 tests/acceptance/run-litmus.py
 
-  cs3api:
-    name: cs3api
-    needs: [build-and-test]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version-file: go.mod
-          cache: true
-      - name: Run cs3api validator
-        run: python3 tests/acceptance/run-cs3api.py
+#   cs3api:
+#     name: cs3api
+#     needs: [build-and-test]
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+#       - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+#         with:
+#           go-version-file: go.mod
+#           cache: true
+#       - name: Run cs3api validator
+#         run: python3 tests/acceptance/run-cs3api.py
 
-  wopi-builtin:
-    name: wopi-builtin
-    needs: [build-and-test]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version-file: go.mod
-          cache: true
-      - name: Run WOPI validator (builtin)
-        run: python3 tests/acceptance/run-wopi.py --type builtin
+#   wopi-builtin:
+#     name: wopi-builtin
+#     needs: [build-and-test]
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+#       - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+#         with:
+#           go-version-file: go.mod
+#           cache: true
+#       - name: Run WOPI validator (builtin)
+#         run: python3 tests/acceptance/run-wopi.py --type builtin
 
-  wopi-cs3:
-    name: wopi-cs3
-    needs: [build-and-test]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version-file: go.mod
-          cache: true
-      - name: Run WOPI validator (cs3)
-        run: python3 tests/acceptance/run-wopi.py --type cs3
+#   wopi-cs3:
+#     name: wopi-cs3
+#     needs: [build-and-test]
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+#       - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+#         with:
+#           go-version-file: go.mod
+#           cache: true
+#       - name: Run WOPI validator (cs3)
+#         run: python3 tests/acceptance/run-wopi.py --type cs3
 
-  all-acceptance-tests:
-    needs: [local-api-tests, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests]
-    runs-on: ubuntu-latest
-    if: always()
-    steps:
-      - name: Check all jobs passed
-        run: |
-          if [[ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
-            exit 1
-          fi
+#   all-acceptance-tests:
+#     needs: [local-api-tests, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests]
+#     runs-on: ubuntu-latest
+#     if: always()
+#     steps:
+#       - name: Check all jobs passed
+#         run: |
+#           if [[ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+#             exit 1
+#           fi

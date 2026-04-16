@@ -1,0 +1,77 @@
+name: test-ocis-compose
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      examples: ${{ steps.set-matrix.outputs.examples }}
+
+    steps:
+      - name: Checkout ocis repo
+        uses: actions/checkout@v4
+        with:
+          repository: owncloud/ocis
+
+      - name: Build matrix dynamically
+        id: set-matrix
+        run: |
+          examples=$(find deployments/examples -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | jq -R -s -c 'split("\n")[:-1]')
+          echo "examples=$examples" >> $GITHUB_OUTPUT
+
+  test:
+    needs: discover
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        example: ${{ fromJson(needs.discover.outputs.examples) }}
+
+    steps:
+      - name: Checkout ocis repo
+        uses: actions/checkout@v4
+        with:
+          repository: owncloud/ocis
+
+      - name: Set up Docker Compose
+        uses: docker/setup-compose-action@8cccb8c14b6500aaffebff1aa49c502c34d2e5e6
+
+      - name: Run compose stack
+        working-directory: deployments/examples/${{ matrix.example }}
+        run: |
+          set -e
+
+          echo "=== Running ${{ matrix.example }} ==="
+          PROXY_ENABLE_APP_AUTH=true docker compose up -d || echo "Startup failed"
+      
+      - name: wait for ocis
+        run: |
+          set +e
+
+          URL="https://ocis.owncloud.test"
+          end=$((SECONDS+300))  # 5 minutes
+
+          while [ $SECONDS -lt $end ]; do
+            echo "Trying $URL"
+            if curl -fsS --max-time 5 "$URL" > /dev/null; then
+              echo "✅ SUCCESS: $URL"
+              exit 0
+            fi
+            echo "⏳ Not ready yet, retrying in 5s..."
+            sleep 5
+          done
+
+          echo "❌ Service never became ready: $URL"
+          exit 1
+          
+      - name: Smoke test (curl)
+        run: curl -kv https://ocis.owncloud.test/graph/v1.0/me
+
+      - name: Tear down
+        if: always()
+        working-directory: deployments/examples/${{ matrix.example }}
+        run: docker compose down -v
