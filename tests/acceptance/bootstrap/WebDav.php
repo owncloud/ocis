@@ -4072,12 +4072,17 @@ trait WebDav {
 		$responseImg = \imagecreatefromstring($responseBodyContent);
 		Assert::assertNotFalse($responseImg, "Downloaded preview is not a valid image");
 
-		$w = \imagesx($fixtureImg);
-		$h = \imagesy($fixtureImg);
+		$fw = \imagesx($fixtureImg);
+		$fh = \imagesy($fixtureImg);
+		$rw = \imagesx($responseImg);
+		$rh = \imagesy($responseImg);
 		// ±1px tolerance: aspect-ratio processors (fit) can produce off-by-one dimensions
 		// across rendering library versions (e.g. ubuntu24/20260406.80 runner update: height 17→16).
-		Assert::assertEqualsWithDelta($w, \imagesx($responseImg), 1, "Image width mismatch for fixture $filename");
-		Assert::assertEqualsWithDelta($h, \imagesy($responseImg), 1, "Image height mismatch for fixture $filename");
+		Assert::assertEqualsWithDelta($fw, $rw, 1, "Image width mismatch for fixture $filename");
+		Assert::assertEqualsWithDelta($fh, $rh, 1, "Image height mismatch for fixture $filename");
+		// Clamp to overlapping region so imagecolorat() stays in bounds when dimensions differ by 1.
+		$w = \min($fw, $rw);
+		$h = \min($fh, $rh);
 
 		// Collect per-pixel diffs for distribution analysis.
 		// Two-layer comparison model: per-pixel threshold filters encoding noise, the ratio gate catches
