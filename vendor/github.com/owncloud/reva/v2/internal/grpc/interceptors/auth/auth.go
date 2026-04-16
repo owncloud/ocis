@@ -20,6 +20,7 @@ package auth
 
 import (
 	"context"
+	"slices"
 	"sync"
 	"time"
 
@@ -63,6 +64,7 @@ type config struct {
 	GatewayAddr             string                            `mapstructure:"gateway_addr"`
 	UserGroupsCacheSize     int                               `mapstructure:"usergroups_cache_size"`
 	ScopeExpansionCacheSize int                               `mapstructure:"scope_expansion_cache_size"`
+	MFAEnabled              bool                              `mapstructure:"mfa_enabled"`
 }
 
 func parseConfig(m map[string]interface{}) (*config, error) {
@@ -156,6 +158,12 @@ func NewUnary(m map[string]interface{}, unprotected []string, tp trace.TracerPro
 		ctx = ctxpkg.ContextSetUser(ctx, u)
 		ctx = ctxpkg.ContextSetScopes(ctx, tokenScope)
 		ctx = grantMFAForServiceAccount(ctx, u)
+		if conf.MFAEnabled {
+			if mfav := metadata.ValueFromIncomingContext(ctx, ctxpkg.MFAOutgoingHeader); !slices.Contains(mfav, "true") {
+				log.Warn().Err(err).Msg("access token is invalid: MFA is required")
+				return mfaResponse(ctx, req, info)
+			}
+		}
 
 		span.SetAttributes(semconv.EnduserIDKey.String(u.Id.OpaqueId))
 
@@ -246,6 +254,12 @@ func NewStream(m map[string]interface{}, unprotected []string, tp trace.TracerPr
 		ctx = ctxpkg.ContextSetUser(ctx, u)
 		ctx = ctxpkg.ContextSetScopes(ctx, tokenScope)
 		ctx = grantMFAForServiceAccount(ctx, u)
+		if conf.MFAEnabled {
+			if mfav := metadata.ValueFromIncomingContext(ctx, ctxpkg.MFAOutgoingHeader); !slices.Contains(mfav, "true") {
+				log.Warn().Err(err).Msg("access token is invalid: MFA is required")
+				return status.Errorf(codes.PermissionDenied, "MFA required to access vault storage")
+			}
+		}
 		wrapped := newWrappedServerStream(ctx, ss)
 
 		span.SetAttributes(semconv.EnduserIDKey.String(u.Id.OpaqueId))
@@ -303,7 +317,8 @@ func dismantleToken(ctx context.Context, tkn string, req interface{}, mgr token.
 	return u, tokenScope, nil
 }
 
-// grantMFAForServiceAccount automatically sets MFA=true for service accounts.
+// grantMFAForServiceAccount automatically grants MFA for service accounts by
+// injecting the autoprop-prefixed metadata key into outgoing context.
 // Service accounts are trusted internal processes that never authenticate via OIDC and
 // therefore never carry an acr/MFA claim. Granting them implicit MFA allows
 // them to access MFA-gated resources such as vault storage without
@@ -312,12 +327,7 @@ func grantMFAForServiceAccount(ctx context.Context, u *userpb.User) context.Cont
 	if u.GetId().GetType() != userpb.UserType_USER_TYPE_SERVICE {
 		return ctx
 	}
-	if _, alreadySet := ctxpkg.ContextGetMFA(ctx); alreadySet {
-		return ctx
-	}
-	ctx = ctxpkg.ContextSetMFA(ctx, true)
-	ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.MFAHeader, "true")
-	return ctx
+	return metadata.AppendToOutgoingContext(ctx, ctxpkg.MFAOutgoingHeader, "true")
 }
 
 func getUserGroups(ctx context.Context, u *userpb.User, client gatewayv1beta1.GatewayAPIClient) ([]string, error) {

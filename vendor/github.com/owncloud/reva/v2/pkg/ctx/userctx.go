@@ -33,7 +33,6 @@ const (
 	lockIDKey
 	scopeKey
 	initiatorKey
-	mfaKey
 )
 
 // ContextGetUser returns the user if set in the given context.

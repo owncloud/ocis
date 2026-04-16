@@ -17,7 +17,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	gmmetadata "go-micro.dev/v4/metadata"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -103,19 +102,9 @@ func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 
 		if m.createVaultHome {
-			// TODO there is no MFA context
-			if md, ok := gmmetadata.FromContext(ctx); ok {
-				if v, ok := md.Get(revactx.MFAHeader); ok && v != "" {
-					ctx = metadata.AppendToOutgoingContext(ctx, revactx.MFAHeader, v)
-				}
-			} else if md, ok := metadata.FromIncomingContext(ctx); ok {
-				if vals := md.Get(revactx.MFAHeader); len(vals) > 0 && vals[0] != "" {
-					ctx = metadata.AppendToOutgoingContext(ctx, revactx.MFAHeader, vals[0])
-				}
-			}
-			// TODO Can we avoid to force MFA and get it from the context?
-			vctx := ctxpkg.ContextSetMFA(ctx, true)
-			vctx = metadata.AppendToOutgoingContext(vctx, ctxpkg.MFAHeader, "true")
+			// Force MFA=true for vault home creation so provisioning succeeds even
+			// before the user has made a regular MFA-verified request.
+			vctx := metadata.AppendToOutgoingContext(ctx, ctxpkg.MFAOutgoingHeader, "true")
 
 			vaultKey := storagespace.FormatStorageID(utils.VaultStorageProviderID, u.GetId().GetOpaqueId())
 			if !m.cache.Has(vaultKey) {

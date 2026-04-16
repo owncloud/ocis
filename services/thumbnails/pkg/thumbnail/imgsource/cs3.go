@@ -62,17 +62,12 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 
 	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, auth)
 
-	// Propagate MFA status to the outgoing gRPC call so that vault storage
-	// (guarded by the mfa interceptor) grants access.
-	// go-micro callers send MFA via go-micro metadata; non-go-micro callers
-	// via standard gRPC incoming metadata.
+	// Bridge MFA status from go-micro metadata into outgoing gRPC metadata.
+	// The autoprop-prefixed key is then forwarded automatically at every
+	// subsequent gRPC hop by the metadata interceptor.
 	if md, ok := gmmetadata.FromContext(ctx); ok {
-		if v, ok := md.Get(revactx.MFAHeader); ok && v != "" {
-			ctx = metadata.AppendToOutgoingContext(ctx, revactx.MFAHeader, v)
-		}
-	} else if md, ok := metadata.FromIncomingContext(ctx); ok {
-		if vals := md.Get(revactx.MFAHeader); len(vals) > 0 && vals[0] != "" {
-			ctx = metadata.AppendToOutgoingContext(ctx, revactx.MFAHeader, vals[0])
+		if v, ok := md.Get(revactx.MFAOutgoingHeader); ok && v != "" {
+			ctx = metadata.AppendToOutgoingContext(ctx, revactx.MFAOutgoingHeader, v)
 		}
 	}
 

@@ -29,6 +29,7 @@ import (
 	tjwt "github.com/owncloud/ocis/v2/services/thumbnails/pkg/service/jwt"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail/imgsource"
+	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 )
 
 // NewService returns a service implementation for Service.
@@ -276,19 +277,12 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 func (g Thumbnail) stat(ctx context.Context, path, auth string) (*provider.StatResponse, error) {
 	outCtx := metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, auth)
 
-	// Propagate MFA status to the outgoing gRPC call so that vault storage
-	// (guarded by the mfa interceptor) grants access.
-	// go-micro callers (e.g. webdav service) send metadata via go-micro's own
-	// mechanism (Grpc-Metadata-<key> headers), which is read back via
-	// gmmetadata.FromContext. Standard gRPC incoming metadata is checked as
-	// fallback for non-go-micro callers.
+	// Bridge MFA status from go-micro metadata (set by the webdav service) into
+	// outgoing gRPC metadata. The autoprop-prefixed key is then forwarded
+	// automatically at every subsequent gRPC hop by the metadata interceptor.
 	if md, ok := gmmetadata.FromContext(ctx); ok {
-		if v, ok := md.Get(revactx.MFAHeader); ok && v != "" {
-			outCtx = metadata.AppendToOutgoingContext(outCtx, revactx.MFAHeader, v)
-		}
-	} else if md, ok := metadata.FromIncomingContext(ctx); ok {
-		if vals := md.Get(revactx.MFAHeader); len(vals) > 0 && vals[0] != "" {
-			outCtx = metadata.AppendToOutgoingContext(outCtx, revactx.MFAHeader, vals[0])
+		if v, ok := md.Get(ctxpkg.MFAOutgoingHeader); ok && v != "" {
+			outCtx = metadata.AppendToOutgoingContext(outCtx, ctxpkg.MFAOutgoingHeader, v)
 		}
 	}
 

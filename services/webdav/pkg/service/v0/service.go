@@ -25,6 +25,7 @@ import (
 	grpcmetadata "google.golang.org/grpc/metadata"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	thumbnailsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/thumbnails/v0"
@@ -506,10 +507,10 @@ func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w
 // when calling the gateway / vault storage.
 func mfaOutgoingCtx(r *http.Request) context.Context {
 	mfaVal := "false"
-	if r.Header.Get("X-Multi-Factor-Authentication") == "true" {
+	if r.Header.Get(mfa.MFAHeader) == "true" {
 		mfaVal = "true"
 	}
-	return gmmetadata.Set(r.Context(), revactx.MFAHeader, mfaVal)
+	return gmmetadata.Set(r.Context(), revactx.MFAOutgoingHeader, mfaVal)
 }
 
 func extensionToThumbnailType(ext string) thumbnailsmsg.ThumbnailType {

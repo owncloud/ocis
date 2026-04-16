@@ -125,10 +125,16 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 		}
 	}
 	if cfg.EnableVaultMode {
-		// Add the mfa interceptor so that all gRPC calls to this vault
-		// storage-users instance require MFA authentication.
+		// Set mfa_enabled inside the auth interceptor config so that all gRPC
+		// calls to this vault storage-users instance require MFA authentication.
 		interceptors := gcfg["interceptors"].(map[string]interface{})
-		interceptors["mfa"] = map[string]interface{}{}
+		if authCfg, ok := interceptors["auth"].(map[string]interface{}); ok {
+			authCfg["mfa_enabled"] = true
+		} else {
+			interceptors["auth"] = map[string]interface{}{
+				"mfa_enabled": true,
+			}
+		}
 	}
 	return rcfg
 }
