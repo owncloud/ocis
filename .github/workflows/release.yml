@@ -38,14 +38,24 @@ jobs:
       - id: info
         run: |
           next_dev() {
+            # If latest tag is already a pre-release (e.g. v8.0.2-dev.1), reuse its base
+            # version (8.0.2-dev.1) so repeated branch runs don't bump the patch counter.
+            # If latest tag is a production release (e.g. v8.0.1), increment patch (8.0.2-dev.1).
             local tag=$(git tag --sort=-version:refname | grep -m1 '^v' || echo "v0.0.0")
-            local ver="${tag#v}"; IFS='.' read -r M m p <<< "${ver%%-*}"
-            echo "${M}.${m}.$((p + 1))-dev.1"
+            local ver="${tag#v}"
+            if [[ "$ver" == *"-"* ]]; then
+              echo "${ver%%-*}-dev.1"
+            else
+              IFS='.' read -r M m p <<< "$ver"
+              echo "${M}.${m}.$((p + 1))-dev.1"
+            fi
           }
 
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             VERSION="${{ inputs.version_override }}"
             [[ -z "$VERSION" ]] && VERSION=$(next_dev)
+          elif [[ "${{ github.ref_type }}" == "branch" ]]; then
+            VERSION=$(next_dev)
           else
             VERSION="${GITHUB_REF#refs/tags/v}"
           fi
