@@ -4108,9 +4108,9 @@ trait WebDav {
 		}
 		\sort($diffs);
 		$n = \count($diffs);
-		$pct = fn(float $p) => $diffs[(int)(\round($p * ($n - 1)))];
+		$pct = fn (float $p) => $diffs[(int)(\round($p * ($n - 1)))];
 		$mean = \array_sum($diffs) / $n;
-		$badPixels = \count(\array_filter($diffs, fn($d) => $d > $pixelThreshold));
+		$badPixels = \count(\array_filter($diffs, fn ($d) => $d > $pixelThreshold));
 		$badRatio = $totalPixels > 0 ? $badPixels / $totalPixels : 0;
 		$badPct = \round($badRatio * 100, 1);
 		echo "  [preview-fixture] $filename: fixture={$w}x{$h} n=$n"
