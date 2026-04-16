@@ -207,7 +207,37 @@ jobs:
 
       - name: Install PHP 8.4
         run: |
-          sudo add-apt-repository -y ppa:ondrej/php
+          for attempt in {1..5}; do
+            echo "Attempt $attempt/5..."
+
+            OUTPUT=$(sudo add-apt-repository -y ppa:ondrej/php 2>&1)
+            EXIT_CODE=$?
+
+            if [ $EXIT_CODE -eq 0 ]; then
+              echo "PPA added successfully."
+              break
+            fi
+            ERROR_MSG=$(echo "$OUTPUT" | grep -E "(504 Gateway Time-out|502 Bad Gateway|503 Service Unavailable|HTTP Error 5[0-9][0-9])" | head -n 1)
+
+            # Retry on 5xx error
+            if [ -n "$ERROR_MSG" ]; then
+              echo "Error: $ERROR_MSG"
+              echo "Retrying......"
+            else
+              echo "Error: $OUTPUT"
+              exit 1
+            fi
+
+            # delay
+            sleep 10
+          done
+
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "Failed to add PPA after 5 attempts."
+            echo "Error: $OUTPUT"
+            exit 1
+          fi
+
           sudo apt-get update -qq
           sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd
           sudo update-alternatives --set php /usr/bin/php8.4
@@ -243,7 +273,37 @@ jobs:
 
       - name: Install PHP 8.4
         run: |
-          sudo add-apt-repository -y ppa:ondrej/php
+          for attempt in {1..5}; do
+            echo "Attempt $attempt/5..."
+
+            OUTPUT=$(sudo add-apt-repository -y ppa:ondrej/php 2>&1)
+            EXIT_CODE=$?
+
+            if [ $EXIT_CODE -eq 0 ]; then
+              echo "PPA added successfully."
+              break
+            fi
+            ERROR_MSG=$(echo "$OUTPUT" | grep -E "(504 Gateway Time-out|502 Bad Gateway|503 Service Unavailable|HTTP Error 5[0-9][0-9])" | head -n 1)
+
+            # Retry on 5xx error
+            if [ -n "$ERROR_MSG" ]; then
+              echo "Error: $ERROR_MSG"
+              echo "Retrying......"
+            else
+              echo "Error: $OUTPUT"
+              exit 1
+            fi
+
+            # delay
+            sleep 10
+          done
+
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "Failed to add PPA after 5 attempts."
+            echo "Error: $OUTPUT"
+            exit 1
+          fi
+          
           sudo apt-get update -qq
           sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd
           sudo update-alternatives --set php /usr/bin/php8.4
@@ -331,7 +391,37 @@ jobs:
 
       - name: Install PHP 8.4
         run: |
-          sudo add-apt-repository -y ppa:ondrej/php
+          for attempt in {1..5}; do
+            echo "Attempt $attempt/5..."
+
+            OUTPUT=$(sudo add-apt-repository -y ppa:ondrej/php 2>&1)
+            EXIT_CODE=$?
+
+            if [ $EXIT_CODE -eq 0 ]; then
+              echo "PPA added successfully."
+              break
+            fi
+            ERROR_MSG=$(echo "$OUTPUT" | grep -E "(504 Gateway Time-out|502 Bad Gateway|503 Service Unavailable|HTTP Error 5[0-9][0-9])" | head -n 1)
+
+            # Retry on 5xx error
+            if [ -n "$ERROR_MSG" ]; then
+              echo "Error: $ERROR_MSG"
+              echo "Retrying......"
+            else
+              echo "Error: $OUTPUT"
+              exit 1
+            fi
+
+            # delay
+            sleep 10
+          done
+
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "Failed to add PPA after 5 attempts."
+            echo "Error: $OUTPUT"
+            exit 1
+          fi
+          
           sudo apt-get update -qq
           sudo apt-get install -y php8.4 php8.4-curl php8.4-xml php8.4-mbstring php8.4-zip php8.4-ldap php8.4-gd
           sudo update-alternatives --set php /usr/bin/php8.4
