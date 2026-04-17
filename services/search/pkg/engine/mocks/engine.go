@@ -125,6 +125,52 @@ func (_c *Engine_DocCount_Call) RunAndReturn(run func() (uint64, error)) *Engine
 	return _c
 }
 
+// Optimize provides a mock function with given fields: ctx
+func (_m *Engine) Optimize(ctx context.Context) error {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Optimize")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context) error); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Engine_Optimize_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Optimize'
+type Engine_Optimize_Call struct {
+	*mock.Call
+}
+
+// Optimize is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *Engine_Expecter) Optimize(ctx interface{}) *Engine_Optimize_Call {
+	return &Engine_Optimize_Call{Call: _e.mock.On("Optimize", ctx)}
+}
+
+func (_c *Engine_Optimize_Call) Run(run func(ctx context.Context)) *Engine_Optimize_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *Engine_Optimize_Call) Return(_a0 error) *Engine_Optimize_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Engine_Optimize_Call) RunAndReturn(run func(context.Context) error) *Engine_Optimize_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Lookup provides a mock function with given fields: id
 func (_m *Engine) Lookup(id string) (*engine.Resource, error) {
 	ret := _m.Called(id)

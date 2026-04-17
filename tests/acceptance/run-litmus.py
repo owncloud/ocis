@@ -52,7 +52,6 @@ def base_server_env(repo_root: Path, ocis_config_dir: str, ocis_public_url: str)
         "IDM_CREATE_DEMO_USERS": "true",
         "IDM_ADMIN_PASSWORD": "admin",
         "FRONTEND_SEARCH_MIN_LENGTH": "2",
-        "OCIS_ASYNC_UPLOADS": "true",
         "OCIS_EVENTS_ENABLE_TLS": "false",
         "NATS_NATS_HOST": "0.0.0.0",
         "NATS_NATS_PORT": "9233",
