@@ -1281,6 +1281,8 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		fileinfo.KeyFileVersionURL: createVersionsUrl(privateLinkURL),
 
 		fileinfo.KeyEnableOwnerTermination:     true, // only for collabora
+		fileinfo.KeyEnableInsertRemoteImage:    true,
+		fileinfo.KeyEnableInsertRemoteFile:     true,
 		fileinfo.KeySupportsExtendedLockLength: true,
 		fileinfo.KeySupportsGetLock:            true,
 		fileinfo.KeySupportsLocks:              true,
