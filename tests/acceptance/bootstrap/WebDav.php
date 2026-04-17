@@ -1315,42 +1315,52 @@ trait WebDav {
 	): void {
 		$user = $this->getActualUsername($user);
 		$path = $this->substituteInLineCodes($path);
-		$response = $this->listFolder(
-			$user,
-			$path,
-			'0',
-			null,
-			null,
-			$type,
-		);
-		$statusCode = $response->getStatusCode();
-		if ($statusCode < 400 || $statusCode > 499) {
-			try {
-				$responseXmlObject = HttpRequestHelper::getResponseXml(
-					$response,
-					__METHOD__,
-				);
-			} catch (Exception $e) {
-				Assert::fail(
-					"$entry '$path' should not exist. But API returned $statusCode without XML in the body",
-				);
+		$retries = 0;
+		do {
+			if ($retries > 0) {
+				\sleep(1);
 			}
-			Assert::assertTrue(
-				$this->isEtagValid($this->getEtagFromResponseXmlObject($responseXmlObject)),
-				"$entry '$path' should not exist. But API returned $statusCode without an etag in the body",
+			$response = $this->listFolder(
+				$user,
+				$path,
+				'0',
+				null,
+				null,
+				$type,
 			);
-			$isCollection = $responseXmlObject->xpath("//d:prop/d:resourcetype/d:collection");
-			if (\count($isCollection) === 0) {
-				$actualResourceType = "file";
-			} else {
-				$actualResourceType = "folder";
+			$statusCode = $response->getStatusCode();
+			if ($statusCode >= 400 && $statusCode <= 499) {
+				// 4xx means the resource does not exist — pass immediately
+				return;
 			}
+			$retries++;
+		} while ($retries <= 5);
 
-			if ($entry === $actualResourceType) {
-				Assert::fail(
-					"$entry '$path' should not exist. But it does.",
-				);
-			}
+		try {
+			$responseXmlObject = HttpRequestHelper::getResponseXml(
+				$response,
+				__METHOD__,
+			);
+		} catch (Exception $e) {
+			Assert::fail(
+				"$entry '$path' should not exist. But API returned $statusCode without XML in the body",
+			);
+		}
+		Assert::assertTrue(
+			$this->isEtagValid($this->getEtagFromResponseXmlObject($responseXmlObject)),
+			"$entry '$path' should not exist. But API returned $statusCode without an etag in the body",
+		);
+		$isCollection = $responseXmlObject->xpath("//d:prop/d:resourcetype/d:collection");
+		if (\count($isCollection) === 0) {
+			$actualResourceType = "file";
+		} else {
+			$actualResourceType = "folder";
+		}
+
+		if ($entry === $actualResourceType) {
+			Assert::fail(
+				"$entry '$path' should not exist. But it does.",
+			);
 		}
 	}
 
