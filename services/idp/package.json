@@ -90,7 +90,7 @@
     "i18next-browser-languagedetector": "^7.2.2",
     "i18next-http-backend": "^2.7.3",
     "i18next-resources-to-backend": "^1.2.1",
-    "notistack": "^1.0.10",
+    "notistack": "^3.0.2",
     "query-string": "^9.3.1",
     "react": "^17.0.2",
     "react-app-polyfill": "^2.0.0",
