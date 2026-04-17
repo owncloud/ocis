@@ -421,6 +421,13 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 	return res, nil
 }
 
+// Retry constants for IndexSpace extraction failure handling.
+const (
+	_extractionRetries    = 5               // max retry attempts per file
+	_extractionRetryDelay = 1 * time.Second // delay between retries
+	_consecutiveAbort     = 5               // abort walk after this many consecutive file failures
+)
+
 // IndexSpace (re)indexes all resources of a given space.
 func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 	ownerCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
@@ -438,6 +445,8 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 		return fmt.Errorf("invalid space id")
 	}
 	rootID.OpaqueId = rootID.SpaceId
+
+	failures := 0
 
 	w := walker.NewWalker(s.gatewaySelector)
 	err = w.Walk(ownerCtx, &rootID, func(wd string, info *provider.ResourceInfo, err error) error {
@@ -480,8 +489,20 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 			}
 		}
 
-		s.UpsertItem(ref)
+		if err := s.upsertItem(ref, _extractionRetries); err != nil {
+			failures++
+			s.logger.Warn().Err(err).
+				Int("failures", failures).
+				Str("path", ref.Path).
+				Msg("extraction failed after retries")
 
+			if failures >= _consecutiveAbort {
+				return fmt.Errorf("aborting index walk: %d consecutive extraction failures, last error: %w", failures, err)
+			}
+			return nil
+		}
+
+		failures = 0
 		return nil
 	})
 
@@ -504,29 +525,50 @@ func (s *Service) TrashItem(rID *provider.ResourceId) {
 
 // UpsertItem indexes or stores Resource data fields.
 func (s *Service) UpsertItem(ref *provider.Reference) {
+	if err := s.upsertItem(ref, 0); err != nil {
+		s.logger.Error().Err(err).Msg("failed to upsert resource")
+	}
+}
+
+// upsertItem is the core extraction-and-index method. When retries > 0,
+// a failed extraction is retried up to that many times with a fixed delay.
+func (s *Service) upsertItem(ref *provider.Reference, retries int) error {
 	ctx, stat, path := s.resInfo(ref)
 	if ctx == nil || stat == nil || path == "" {
-		return
+		return fmt.Errorf("could not resolve resource info for %s", ref.GetPath())
 	}
 
 	if slices.Contains(_skipPathNames, path) || slices.Contains(_skipPathDirs, path) {
 		s.logger.Info().Str("path", path).Msg("file won't be indexed")
-		return
+		return nil
 	}
 
 	for _, skipPath := range _skipPathDirs {
 		if strings.HasPrefix(path, skipPath+"/") {
 			s.logger.Info().Str("path", path).Msg("file is in a directory that won't be indexed")
-			return
+			return nil
 		}
 	}
 
 	resourceID := storagespace.FormatResourceID(stat.Info.Id)
 
-	doc, err := s.extractor.Extract(ctx, stat.Info)
+	var doc content.Document
+	var err error
+	for attempt := range retries + 1 {
+		doc, err = s.extractor.Extract(ctx, stat.Info)
+		if err == nil {
+			break
+		}
+		if attempt < retries {
+			s.logger.Debug().Err(err).
+				Int("attempt", attempt+1).
+				Str("path", ref.Path).
+				Msg("extraction attempt failed, retrying")
+			time.Sleep(_extractionRetryDelay)
+		}
+	}
 	if err != nil {
-		s.logger.Error().Err(err).Msg("failed to extract resource content")
-		return
+		return fmt.Errorf("extraction failed for %s: %w", ref.Path, err)
 	}
 
 	r := engine.Resource{
@@ -548,12 +590,12 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 	}
 
 	if err = s.engine.Upsert(r.ID, r); err != nil {
-		s.logger.Error().Err(err).Msg("error adding updating the resource in the index")
-	} else {
-		logDocCount(s.engine, s.logger)
+		return fmt.Errorf("index upsert for %s: %w", ref.Path, err)
 	}
 
+	logDocCount(s.engine, s.logger)
 	s.storeExtractedMetadata(ctx, ref, doc)
+	return nil
 }
 
 // storeExtractedMetadata persists Tika-extracted audio, image, location, and
