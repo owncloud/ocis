@@ -93,6 +93,15 @@ func Auth(opts ...account.Option) func(http.Handler) http.Handler {
 				ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.InitiatorHeader, initiatorID)
 			}
 
+			// Propagate MFA status to outgoing gRPC metadata so that services
+			// protected by the mfa interceptor (e.g. storage-users-vault)
+			// can enforce MFA at the gRPC layer.
+			mfaVal := "false"
+			if mfa.Has(ctx) {
+				mfaVal = "true"
+			}
+			ctx = metadata.AppendToOutgoingContext(ctx, revactx.MFAOutgoingHeader, mfaVal)
+
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

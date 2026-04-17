@@ -143,6 +143,12 @@ func (s *svc) CreateHome(ctx context.Context, req *provider.CreateHomeRequest) (
 			},
 		}
 	}
+
+	// pass storage_id to the storage provider to handle vault storage id
+	if storageId := utils.ReadPlainFromOpaque(req.GetOpaque(), "storage_id"); storageId != "" {
+		createReq.Opaque = utils.AppendPlainToOpaque(createReq.Opaque, "storage_id", storageId)
+	}
+
 	res, err := s.CreateStorageSpace(ctx, createReq)
 	if err != nil {
 		return &provider.CreateHomeResponse{
@@ -168,6 +174,11 @@ func (s *svc) CreateStorageSpace(ctx context.Context, req *provider.CreateStorag
 		if req.Opaque.Map["space_id"].Decoder == "plain" {
 			space.Id = &provider.StorageSpaceId{OpaqueId: string(req.Opaque.Map["id"].Value)}
 		}
+	}
+
+	if storageId := utils.ReadPlainFromOpaque(req.GetOpaque(), "storage_id"); storageId != "" {
+		space.Root = &provider.ResourceId{StorageId: storageId}
+		req.Opaque = utils.AppendPlainToOpaque(req.Opaque, "storage_id", storageId)
 	}
 
 	srClient, err := s.getStorageRegistryClient(ctx, s.c.StorageRegistryEndpoint)
@@ -247,6 +258,7 @@ func (s *svc) ListStorageSpaces(ctx context.Context, req *provider.ListStorageSp
 		filters["path"] = path
 	}
 
+	hasFileIdFilter := false
 	for _, f := range req.Filters {
 		switch f.Type {
 		case provider.ListStorageSpacesRequest_Filter_TYPE_ID:
@@ -255,6 +267,7 @@ func (s *svc) ListStorageSpaces(ctx context.Context, req *provider.ListStorageSp
 				continue
 			}
 			filters["storage_id"], filters["space_id"], filters["opaque_id"] = sid, spid, oid
+			hasFileIdFilter = true
 		case provider.ListStorageSpacesRequest_Filter_TYPE_OWNER:
 			filters["owner_idp"] = f.GetOwner().GetIdp()
 			filters["owner_id"] = f.GetOwner().GetOpaqueId()
@@ -268,6 +281,10 @@ func (s *svc) ListStorageSpaces(ctx context.Context, req *provider.ListStorageSp
 				Status: status.NewInvalid(ctx, fmt.Sprintf("unknown filter %v", f.Type)),
 			}, nil
 		}
+	}
+
+	if !hasFileIdFilter && utils.ReadPlainFromOpaque(req.Opaque, "storage_id") != "" {
+		filters["storage_id"] = utils.ReadPlainFromOpaque(req.Opaque, "storage_id")
 	}
 
 	c, err := s.getStorageRegistryClient(ctx, s.c.StorageRegistryEndpoint)

@@ -32,6 +32,8 @@ import (
 	authpb "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	"github.com/juliangruber/go-intersect"
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/auth"
 	"github.com/owncloud/reva/v2/pkg/auth/manager/registry"
@@ -41,8 +43,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/rhttp"
 	"github.com/owncloud/reva/v2/pkg/sharedconf"
-	"github.com/juliangruber/go-intersect"
-	"github.com/mitchellh/mapstructure"
+	"github.com/owncloud/reva/v2/pkg/utils"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 )
@@ -239,6 +240,15 @@ func (am *mgr) Authenticate(ctx context.Context, clientID, clientSecret string) 
 		DisplayName:  claims["name"].(string),
 		UidNumber:    claims[am.c.UIDClaim].(int64),
 		GidNumber:    claims[am.c.GIDClaim].(int64),
+	}
+
+	// Embed the OIDC acr (Authentication Context Class Reference) claim into
+	// User.Opaque so it is cryptographically bound to the minted reva JWT.
+	// Downstream services (e.g. the mfa gRPC interceptor) can use this
+	// as a secondary MFA proof independent of the X-Multi-Factor-Authentication
+	// HTTP header propagation path.
+	if acr, ok := claims["acr"].(string); ok && acr != "" {
+		u.Opaque = utils.AppendPlainToOpaque(u.Opaque, "acr", acr)
 	}
 
 	var scopes map[string]*authpb.Scope

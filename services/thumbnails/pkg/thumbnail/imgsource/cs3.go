@@ -18,6 +18,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/rhttp"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
+	gmmetadata "go-micro.dev/v4/metadata"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -60,6 +61,16 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	}
 
 	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, auth)
+
+	// Bridge MFA status from go-micro metadata into outgoing gRPC metadata.
+	// The autoprop-prefixed key is then forwarded automatically at every
+	// subsequent gRPC hop by the metadata interceptor.
+	if md, ok := gmmetadata.FromContext(ctx); ok {
+		if v, ok := md.Get(revactx.MFAOutgoingHeader); ok && v != "" {
+			ctx = metadata.AppendToOutgoingContext(ctx, revactx.MFAOutgoingHeader, v)
+		}
+	}
+
 	err = s.checkImageFileSize(ctx, ref)
 	if err != nil {
 		return nil, err

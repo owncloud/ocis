@@ -354,6 +354,14 @@ func ctxWithUserInfo(ctx context.Context, r *http.Request, user *userpb.User, to
 	ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.UserAgentHeader, r.UserAgent())
 	ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.InitiatorHeader, initiatorid)
 	ctx = ctxpkg.ContextSetScopes(ctx, tokenScope)
+
+	// Forward MFA status from the proxy's HTTP header into outgoing gRPC metadata.
+	// Using the autoprop-prefixed key causes the metadata interceptor to propagate
+	// it automatically at every subsequent gRPC hop.
+	if mfaVal := r.Header.Get(ctxpkg.MFAHeader); mfaVal != "" {
+		ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.MFAOutgoingHeader, mfaVal)
+	}
+
 	return ctx
 }
 

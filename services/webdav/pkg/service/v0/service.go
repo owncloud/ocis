@@ -21,9 +21,11 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/templates"
 	merrors "go-micro.dev/v4/errors"
+	gmmetadata "go-micro.dev/v4/metadata"
 	grpcmetadata "google.golang.org/grpc/metadata"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	thumbnailsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/thumbnails/v0"
@@ -228,7 +230,7 @@ func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
 	t := r.Header.Get(revactx.TokenHeader)
 
 	fullPath := filepath.Join(tr.Identifier, tr.Filepath)
-	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnailssvc.GetThumbnailRequest{
+	rsp, err := g.thumbnailsClient.GetThumbnail(mfaOutgoingCtx(r), &thumbnailssvc.GetThumbnailRequest{
 		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
 		ThumbnailType: extensionToThumbnailType(strings.TrimLeft(tr.Extension, ".")),
 		Width:         tr.Width,
@@ -326,7 +328,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fullPath := filepath.Join(templates.WithUser(user, g.config.WebdavNamespace), tr.Filepath)
-	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnailssvc.GetThumbnailRequest{
+	rsp, err := g.thumbnailsClient.GetThumbnail(mfaOutgoingCtx(r), &thumbnailssvc.GetThumbnailRequest{
 		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
 		ThumbnailType: extensionToThumbnailType(strings.TrimLeft(tr.Extension, ".")),
 		Width:         tr.Width,
@@ -376,7 +378,7 @@ func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnailssvc.GetThumbnailRequest{
+	rsp, err := g.thumbnailsClient.GetThumbnail(mfaOutgoingCtx(r), &thumbnailssvc.GetThumbnailRequest{
 		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
 		ThumbnailType: extensionToThumbnailType(strings.TrimLeft(tr.Extension, ".")),
 		Width:         tr.Width,
@@ -421,7 +423,7 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnailssvc.GetThumbnailRequest{
+	_, err = g.thumbnailsClient.GetThumbnail(mfaOutgoingCtx(r), &thumbnailssvc.GetThumbnailRequest{
 		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
 		ThumbnailType: extensionToThumbnailType(strings.TrimLeft(tr.Extension, ".")),
 		Width:         tr.Width,
@@ -495,6 +497,20 @@ func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to write thumbnail to response writer")
 	}
+}
+
+// mfaOutgoingCtx returns a context derived from the HTTP request with the
+// MFA status forwarded as go-micro metadata. The thumbnail service is a
+// go-micro service: go-micro propagates metadata via its own mechanism
+// (sent as Grpc-Metadata-<key> headers), not standard gRPC outgoing metadata.
+// The thumbnail service then converts this to standard gRPC outgoing metadata
+// when calling the gateway / vault storage.
+func mfaOutgoingCtx(r *http.Request) context.Context {
+	mfaVal := "false"
+	if r.Header.Get(mfa.MFAHeader) == "true" {
+		mfaVal = "true"
+	}
+	return gmmetadata.Set(r.Context(), revactx.MFAOutgoingHeader, mfaVal)
 }
 
 func extensionToThumbnailType(ext string) thumbnailsmsg.ThumbnailType {

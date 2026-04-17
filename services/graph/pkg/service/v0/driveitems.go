@@ -30,6 +30,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
 )
 
 // CreateUploadSession create an upload session to allow your app to upload files up to the maximum file size.
@@ -157,6 +158,11 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	filters := []*storageprovider.ListStorageSpacesRequest_Filter{}
 	filters = append(filters, listStorageSpacesUserFilter(currentUser.GetId().GetOpaqueId()))
 	filters = append(filters, listStorageSpacesTypeFilter("personal"))
+
+	// force vault storage space if vault mode is enabled
+	if middleware.IsVaultMode(ctx) {
+		filters = append(filters, listStorageSpacesIDFilter(storagespace.FormatStorageID(utils.VaultStorageProviderID, currentUser.GetId().GetOpaqueId())))
+	}
 
 	res, err := gatewayClient.ListStorageSpaces(ctx, &storageprovider.ListStorageSpacesRequest{
 		Filters: filters,

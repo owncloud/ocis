@@ -59,6 +59,10 @@ type Options struct {
 	DefaultAccessTokenTTL time.Duration
 	// UserInfoCache sets the access token cache store
 	UserInfoCache store.Store
+	// MFAStore is used to persist verified MFA status so that non-OIDC
+	// requests (e.g. signed-URL archiver downloads) can inherit the status
+	// from the user's most recent OIDC-authenticated session.
+	MFAStore store.Store
 	// CredentialsByUserAgent sets the auth challenges on a per user-agent basis
 	CredentialsByUserAgent map[string]string
 	// AccessTokenVerifyMethod configures how access_tokens should be verified but the oidc_auth middleware.
@@ -69,6 +73,8 @@ type Options struct {
 	// RoleQuotas hold userid:quota mappings. These will be used when provisioning new users.
 	// The users will get as much quota as is set for their role.
 	RoleQuotas map[string]uint64
+	// CreateVaultHome creates a new vault home for the user if it does not exist.
+	CreateVaultHome bool
 	// TraceProvider sets the tracing provider.
 	TraceProvider trace.TracerProvider
 	// SkipUserInfo prevents the oidc middleware from querying the userinfo endpoint and read any claims directly from the access token instead
@@ -215,6 +221,13 @@ func UserInfoCache(val store.Store) Option {
 	}
 }
 
+// MFAStore provides a function to set the MFA session store.
+func MFAStore(val store.Store) Option {
+	return func(o *Options) {
+		o.MFAStore = val
+	}
+}
+
 // UserProvider sets the accounts user provider
 func UserProvider(up backend.UserBackend) Option {
 	return func(o *Options) {
@@ -240,6 +253,13 @@ func AccessTokenVerifyMethod(method string) Option {
 func RoleQuotas(roleQuotas map[string]uint64) Option {
 	return func(o *Options) {
 		o.RoleQuotas = roleQuotas
+	}
+}
+
+// CreateVaultHome sets the create vault home flag
+func CreateVaultHome(createVaultHome bool) Option {
+	return func(o *Options) {
+		o.CreateVaultHome = createVaultHome
 	}
 }
 

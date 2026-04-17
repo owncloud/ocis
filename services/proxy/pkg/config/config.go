@@ -48,6 +48,7 @@ type Config struct {
 	ClaimSpaceManagement      ClaimSpaceManagement `yaml:"claim_space_management"`
 	MultiFactorAuthentication MFAConfig            `yaml:"mfa"`
 	MultiInstance             MultiInstanceConfig  `yaml:"multi_instance"`
+	CreateVaultHome           bool                 `yaml:"create_vault_home" env:"PROXY_CREATE_VAULT_HOME" desc:"Set this to true to automatically create a new vault home for the user if it does not exist." introductionVersion:"daledda"`
 
 	Context context.Context `json:"-" yaml:"-"`
 }

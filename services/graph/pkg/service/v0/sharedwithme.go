@@ -8,8 +8,10 @@ import (
 	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/reva/v2/pkg/utils"
 
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
 
@@ -40,6 +42,9 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 		g.logger.Error().Err(err).Msg("listing shares failed")
 		return nil, err
 	}
+
+	listReceivedSharesResponse.Shares = filterVaultShares(ctx, listReceivedSharesResponse.GetShares())
+
 	availableRoles := unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...))
 	driveItems, err := cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, listReceivedSharesResponse.GetShares(), availableRoles)
 	if err != nil {
@@ -62,4 +67,18 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 	}
 
 	return driveItems, err
+}
+
+// filterVaultShares filters out shares that are not relevant to the current mode (vault or regular).
+func filterVaultShares(ctx context.Context, shares []*collaboration.ReceivedShare) []*collaboration.ReceivedShare {
+	result := make([]*collaboration.ReceivedShare, 0, len(shares))
+	isVault := middleware.IsVaultMode(ctx)
+	for _, share := range shares {
+		if isVault && share.GetShare().GetResourceId().StorageId == utils.VaultStorageProviderID {
+			result = append(result, share)
+		} else if !isVault && share.GetShare().GetResourceId().StorageId != utils.VaultStorageProviderID {
+			result = append(result, share)
+		}
+	}
+	return result
 }

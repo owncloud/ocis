@@ -13,6 +13,7 @@ import (
 	v1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	l10n_pkg "github.com/owncloud/ocis/v2/services/graph/pkg/l10n"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/metadata"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
@@ -53,7 +54,11 @@ func (g Graph) applySpaceTemplate(ctx context.Context, gwc gateway.GatewayAPICli
 }
 
 func (g Graph) applyDefaultTemplate(ctx context.Context, gwc gateway.GatewayAPIClient, root *storageprovider.ResourceId, locale string) error {
-	mdc := metadata.NewCS3(g.config.Reva.Address, g.config.Spaces.StorageUsersAddress)
+	storageUsersAddress := g.config.Spaces.StorageUsersAddress
+	if middleware.IsVaultMode(ctx) {
+		storageUsersAddress = storageUsersAddress + "-vault"
+	}
+	mdc := metadata.NewCS3(g.config.Reva.Address, storageUsersAddress)
 	mdc.SpaceRoot = root
 
 	var opaque *v1beta1.Opaque

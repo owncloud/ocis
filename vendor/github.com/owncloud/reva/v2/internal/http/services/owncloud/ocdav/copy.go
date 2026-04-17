@@ -553,6 +553,13 @@ func (s *svc) executeSpacesCopy(ctx context.Context, w http.ResponseWriter, sele
 }
 
 func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Request, srcRef, dstRef *provider.Reference, log *zerolog.Logger, destInShareJail bool) *copy {
+	// restict copy from the vault
+	if destinationIsNotAllowed(srcRef, dstRef) {
+		w.WriteHeader(http.StatusConflict)
+		b, err := errors.Marshal(http.StatusBadRequest, "destination is not allowed", "", "")
+		errors.HandleWebdavError(log, w, b, err)
+		return nil
+	}
 	isChild, err := s.referenceIsChildOf(ctx, s.gatewaySelector, dstRef, srcRef)
 	if err != nil {
 		switch err.(type) {
