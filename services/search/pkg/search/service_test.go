@@ -147,6 +147,7 @@ var _ = Describe("Searchprovider", func() {
 			Status: status.NewOK(ctx),
 		}, nil)
 		indexClient.On("DocCount").Return(uint64(1), nil)
+		indexClient.On("Optimize", mock.Anything).Return(nil)
 	})
 
 	Describe("New", func() {

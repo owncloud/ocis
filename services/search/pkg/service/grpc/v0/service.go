@@ -30,8 +30,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
-	bleveEngine "github.com/owncloud/ocis/v2/services/search/pkg/engine/bleve"
-	"github.com/owncloud/ocis/v2/services/search/pkg/query/bleve"
 	"github.com/owncloud/ocis/v2/services/search/pkg/search"
 )
 
@@ -43,29 +41,12 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 	cfg := options.Config
 
 	// initialize search engine
-	var eng engine.Engine
-	switch cfg.Engine.Type {
-	case "bleve":
-		bleveMapping, err := engine.BuildBleveMapping()
-		if err != nil {
-			return nil, teardown, err
-		}
-
-		var indexGetter bleveEngine.IndexGetter
-		indexGetter = bleveEngine.NewIndexGetterPersistent(cfg.Engine.Bleve.Datapath, bleveMapping)
-		if cfg.Engine.Bleve.Scale {
-			indexGetter = bleveEngine.NewIndexGetterPersistentScale(cfg.Engine.Bleve.Datapath, bleveMapping)
-		}
-
-		bleveEngine := engine.NewBleveEngine(indexGetter, bleve.DefaultCreator)
-
-		teardown = func() {
-			_ = bleveEngine.Close()
-		}
-		eng = bleveEngine
-
-	default:
-		return nil, teardown, fmt.Errorf("unknown search engine: %s", cfg.Engine.Type)
+	eng, engCloser, err := engine.NewEngineFromConfig(cfg)
+	if err != nil {
+		return nil, teardown, err
+	}
+	teardown = func() {
+		_ = engCloser.Close()
 	}
 
 	// initialize gateway
