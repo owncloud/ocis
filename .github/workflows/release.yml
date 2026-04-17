@@ -1,0 +1,419 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - 'feat/release-pipeline**'
+  workflow_dispatch:
+    inputs:
+      version_override:
+        description: 'Version override (leave empty to auto-detect from latest tag)'
+        type: string
+        default: ''
+
+env:
+  PRODUCTION_RELEASE_TAGS: '5.0,7,8'
+  DOCKER_REPO_ROLLING: owncloud/ocis-rolling
+  DOCKER_REPO_PRODUCTION: owncloud/ocis
+  NODE_VERSION: '24'
+  PNPM_VERSION: '10.28.1'
+
+jobs:
+  determine-release-type:
+    runs-on: ubuntu-latest
+    outputs:
+      version:       ${{ steps.info.outputs.version }}
+      is_production: ${{ steps.info.outputs.is_production }}
+      is_prerelease: ${{ steps.info.outputs.is_prerelease }}
+      docker_repos:  ${{ steps.info.outputs.docker_repos }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        if: ${{ github.ref_type == 'branch' || (github.event_name == 'workflow_dispatch' && inputs.version_override == '') }}
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - id: info
+        run: |
+          next_dev() {
+            # If latest tag is already a pre-release (e.g. v8.0.2-dev.1), reuse its base
+            # version (8.0.2-dev.1) so repeated branch runs don't bump the patch counter.
+            # If latest tag is a production release (e.g. v8.0.1), increment patch (8.0.2-dev.1).
+            local tag=$(git tag --sort=-version:refname | grep -m1 '^v' || echo "v0.0.0")
+            local ver="${tag#v}"
+            if [[ "$ver" == *"-"* ]]; then
+              echo "${ver%%-*}-dev.1"
+            else
+              IFS='.' read -r M m p <<< "$ver"
+              echo "${M}.${m}.$((p + 1))-dev.1"
+            fi
+          }
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            VERSION="${{ inputs.version_override }}"
+            [[ -z "$VERSION" ]] && VERSION=$(next_dev)
+          elif [[ "${{ github.ref_type }}" == "branch" ]]; then
+            VERSION=$(next_dev)
+          else
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          fi
+
+          IS_PRODUCTION=false
+          for TAG in ${PRODUCTION_RELEASE_TAGS//,/ }; do
+            [[ "$VERSION" == "$TAG"* ]] && IS_PRODUCTION=true && break
+          done
+
+          [[ "$VERSION" == *"-"* ]] && IS_PRERELEASE=true || IS_PRERELEASE=false
+
+          if [[ "$IS_PRODUCTION" == "true" && "$IS_PRERELEASE" == "false" ]]; then
+            REPOS=[\"$DOCKER_REPO_ROLLING\",\"$DOCKER_REPO_PRODUCTION\"]
+          else
+            REPOS=[\"$DOCKER_REPO_ROLLING\"]
+          fi
+
+          echo "version=$VERSION"             >> $GITHUB_OUTPUT
+          echo "is_production=$IS_PRODUCTION" >> $GITHUB_OUTPUT
+          echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+          echo "docker_repos=$REPOS"          >> $GITHUB_OUTPUT
+
+  generate-code:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - run: npm install --silent -g yarn npx --force
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - run: pnpm config set store-dir ./.pnpm-store && make ci-node-generate
+        env:
+          CHROMEDRIVER_SKIP_DOWNLOAD: 'true'
+      - run: make ci-go-generate
+        env:
+          BUF_TOKEN: ${{ secrets.BUF_API_TOKEN }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: generated-code
+          path: |
+            .
+            !.git
+          retention-days: 1
+
+  docker-build:
+    name: docker-build (${{ matrix.arch }}, ${{ matrix.repo }})
+    runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
+    needs: [determine-release-type, generate-code]
+    outputs:
+      digest-amd64-rolling: ${{ steps.digest.outputs.digest-amd64-rolling }}
+      digest-arm64-rolling: ${{ steps.digest.outputs.digest-arm64-rolling }}
+      digest-amd64: ${{ steps.digest.outputs.digest-amd64 }}
+      digest-arm64: ${{ steps.digest.outputs.digest-arm64 }}
+    strategy:
+      matrix:
+        arch: [amd64, arm64]
+        repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: generated-code
+          path: .
+      - uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+      - uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+      - run: sudo apt-get update -q && sudo apt-get install -qy libvips libvips-dev
+      - run: make -C ocis release-linux-docker-${{ matrix.arch }}
+        env:
+          CGO_ENABLED: 1
+          GOOS: linux
+          ENABLE_VIPS: true
+      - id: tags
+        run: |
+          VERSION="${{ needs.determine-release-type.outputs.version }}"
+          REPO="${{ matrix.repo }}"
+          ARCH="${{ matrix.arch }}"
+          printf "tags<<EOF\n%s\nEOF\n" \
+            "${REPO}:${VERSION}-linux-${ARCH}" >> $GITHUB_OUTPUT
+      - id: build
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
+        with:
+          context: ocis
+          file: ocis/docker/Dockerfile.linux.${{ matrix.arch }}
+          platforms: linux/${{ matrix.arch }}
+          push: true
+          provenance: false
+          build-args: |
+            REVISION=${{ github.sha }}
+            VERSION=${{ needs.determine-release-type.outputs.version }}
+          tags: ${{ steps.tags.outputs.tags }}
+      - id: digest
+        run: |
+          [[ "${{ matrix.repo }}" == *"rolling"* ]] \
+            && echo "digest-${{ matrix.arch }}-rolling=${{ steps.build.outputs.digest }}" >> $GITHUB_OUTPUT \
+            || echo "digest-${{ matrix.arch }}=${{ steps.build.outputs.digest }}"         >> $GITHUB_OUTPUT
+
+  docker-scan:
+    name: docker-scan (${{ matrix.arch }}, ${{ matrix.repo }})
+    runs-on: ubuntu-latest
+    needs: [determine-release-type, docker-build]
+    strategy:
+      matrix:
+        arch: [amd64]
+        repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+        id: trivy
+        continue-on-error: true
+        with:
+          image-ref: ${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-${{ matrix.arch }}
+          format: table
+          exit-code: 1
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          skip-files: /usr/bin/gomplate,/usr/bin/wait-for
+          hide-progress: true
+        env:
+          TRIVY_IGNOREFILE: .trivyignore
+
+      - name: Block on vulnerabilities
+        if: steps.trivy.outcome == 'failure'
+        run: |
+          echo "::error title=Security scan blocked release::Image ${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-${{ matrix.arch }} has HIGH or CRITICAL vulnerabilities (see Trivy report above). Fix all findings before releasing."
+          exit 1
+
+  docker-manifest:
+    name: docker-manifest (${{ matrix.repo }})
+    runs-on: ubuntu-latest
+    needs: [determine-release-type, docker-build]
+    strategy:
+      matrix:
+        repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
+    steps:
+      - uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - if: ${{ contains(matrix.repo, 'rolling') }}
+        run: |
+          docker buildx imagetools create \
+            -t "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}" \
+            "${{ needs.docker-build.outputs.digest-amd64-rolling }}" \
+            "${{ needs.docker-build.outputs.digest-arm64-rolling }}"
+      - if: ${{ !contains(matrix.repo, 'rolling') }}
+        run: |
+          docker buildx imagetools create \
+            -t "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}" \
+            "${{ needs.docker-build.outputs.digest-amd64 }}" \
+            "${{ needs.docker-build.outputs.digest-arm64 }}"
+
+  docker-readme:
+    name: docker-readme (${{ matrix.repo }})
+    runs-on: ubuntu-latest
+    needs: [determine-release-type, docker-manifest]
+    strategy:
+      matrix:
+        repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa # v5.0.0
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ${{ matrix.repo }}
+          readme-filepath: ocis/README.md
+
+  build-binaries:
+    name: build-binaries (${{ matrix.os }})
+    runs-on: ubuntu-latest
+    needs: [determine-release-type, generate-code]
+    strategy:
+      matrix:
+        os: [linux, darwin]
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: generated-code
+          path: .
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+      - run: |
+          make -C ocis release-${{ matrix.os }} OUTPUT=${{ needs.determine-release-type.outputs.version }}
+          make -C ocis release-finish
+          if [[ "${{ matrix.os }}" == "linux" ]]; then
+            cp assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf ocis/dist/release/
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: binaries-${{ matrix.os }}
+          path: ocis/dist/release/*
+          retention-days: 1
+
+  security-scan-trivy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+        with:
+          scan-type: fs
+          format: table
+          exit-code: 0
+          severity: CRITICAL,HIGH
+
+  license-check:
+    runs-on: ubuntu-latest
+    needs: [determine-release-type, generate-code]
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: generated-code
+          path: .
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+      - run: npm install --silent -g yarn npx "pnpm@$PNPM_VERSION" --force
+      - run: make ci-node-check-licenses && make ci-node-save-licenses
+      - run: make ci-go-check-licenses && make ci-go-save-licenses
+      - run: tar -czf third-party-licenses.tar.gz -C third-party-licenses .
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: third-party-licenses
+          path: third-party-licenses.tar.gz
+          retention-days: 1
+
+  generate-changelog:
+    runs-on: ubuntu-latest
+    needs: [determine-release-type]
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+      - run: |
+          make changelog CHANGELOG_VERSION=$(echo "${{ needs.determine-release-type.outputs.version }}" | cut -d'-' -f1)
+          # calens produces empty output when no versioned changelog directory exists (e.g. dev builds).
+          # Fall back to a pointer to the unreleased entries.
+          if [[ $(wc -l < ocis/dist/CHANGELOG.md) -lt 5 ]]; then
+            echo "Development release — no release notes yet. See [unreleased changes](https://github.com/owncloud/ocis/tree/master/changelog/unreleased/)." > ocis/dist/CHANGELOG.md
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: changelog
+          path: ocis/dist/CHANGELOG.md
+          retention-days: 1
+
+  create-github-release:
+    runs-on: ubuntu-latest
+    needs: [determine-release-type, build-binaries, license-check, generate-changelog]
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: binaries-linux
+          path: release-assets
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: binaries-darwin
+          path: release-assets
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: third-party-licenses
+          path: release-assets
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: changelog
+          path: .
+      - uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe # v2.6.1
+        with:
+          tag_name: v${{ needs.determine-release-type.outputs.version }}
+          name: v${{ needs.determine-release-type.outputs.version }}
+          body_path: CHANGELOG.md
+          prerelease: ${{ needs.determine-release-type.outputs.is_prerelease == 'true' }}
+          files: release-assets/*
+
+  audit-release:
+    runs-on: ubuntu-latest
+    needs:
+      - determine-release-type
+      - generate-code
+      - docker-build
+      - docker-scan
+      - docker-manifest
+      - docker-readme
+      - build-binaries
+      - security-scan-trivy
+      - license-check
+      - generate-changelog
+      - create-github-release
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: binaries-linux
+          path: release-assets
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: binaries-darwin
+          path: release-assets
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: third-party-licenses
+          path: release-assets
+      - run: |
+          python3 scripts/audit-release.py \
+            --version "${{ needs.determine-release-type.outputs.version }}" \
+            --dir release-assets/ \
+            --github-release --docker
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  notify:
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - determine-release-type
+      - generate-code
+      - docker-build
+      - docker-scan
+      - docker-manifest
+      - docker-readme
+      - build-binaries
+      - security-scan-trivy
+      - license-check
+      - generate-changelog
+      - create-github-release
+      - audit-release
+    steps:
+      - run: |
+          [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]] \
+            && STATUS="FAILURE" || STATUS="SUCCESS"
+          [[ "${{ github.event_name }}" == "schedule" ]] \
+            && SOURCE="nightly-${{ github.ref_name }}" \
+            || SOURCE="${{ github.ref_type == 'tag' && format('tag {0}', github.ref_name) || github.ref_name }}"
+          SHA="${{ github.sha }}"
+          MSG="${STATUS} [${{ github.repository }}#${SHA:0:8}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) (${SOURCE}) by **${{ github.triggering_actor }}**"
+          [[ -z "${{ secrets.MATRIX_HOMESERVER }}" ]] && { echo "MATRIX_HOMESERVER not set, skipping notification"; exit 0; }
+          curl -sf -X PUT \
+            -H "Authorization: Bearer ${{ secrets.MATRIX_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"msgtype\":\"m.text\",\"body\":\"${MSG}\"}" \
+            "${{ secrets.MATRIX_HOMESERVER }}/_matrix/client/r0/rooms/${{ secrets.MATRIX_ROOMID }}/send/m.room.message/$(date +%s)"
