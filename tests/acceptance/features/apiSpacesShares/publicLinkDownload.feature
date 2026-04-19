@@ -45,3 +45,24 @@ Feature: Public can download folders from project space public link
     And the downloaded zip archive should contain these files:
       | name            | content      |
       | folder/test.txt | some content |
+
+  @env-config
+  Scenario: download multiple files from a public link of a folder inside a space
+    Given the config "SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
+    And using SharingNG
+    And user "Alice" has created a folder "project-folder" in space "new-space"
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content1" to "project-folder/test1.txt"
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content2" to "project-folder/test2.txt"
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content3" to "project-folder/test3.txt"
+    And user "Alice" has created the following resource link share:
+      | resource        | project-folder |
+      | space           | new-space      |
+      | permissionsRole | View           |
+      | password        | %public%       |
+    When the public sends "PROPFIND" request to fetch archive metadata using the public WebDAV API with password "%public%"
+    Then the HTTP status code should be "207"
+    When public downloads the archive of these items from a public link
+      | project-folder/test1.txt |
+      | project-folder/test2.txt |
+      | project-folder/test3.txt |
+    Then the HTTP status code should be "200"

@@ -1752,6 +1752,40 @@ class FeatureContext extends BehatVariablesContext {
 			$this->getAdminPassword(),
 		);
 	}
+	private string $publicLinkPropfindXml = '';
+	private array $publicLinkArchiveData = [];
+
+	/**
+	 * @param string $xml
+	 * 
+	 * @return void
+	 */
+	public function setPublicLinkPropfindXml(string $xml): void {
+		$this->publicLinkPropfindXml = $xml;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getPublicLinkPropfindXml(): string {
+		return $this->publicLinkPropfindXml;
+	}
+
+	/**
+	 * @param array $data
+	 * 
+	 * @return void
+	 */
+	public function setPublicLinkArchiveData(array $data): void {
+		$this->publicLinkArchiveData = $data;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getPublicLinkArchiveData(): array {
+		return $this->publicLinkArchiveData;
+	}
 
 	/**
 	 * @return string
