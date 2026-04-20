@@ -1,6 +1,3 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-
 package ntlmssp
 
 type negotiateFlags uint32
@@ -51,5 +48,5 @@ func (field negotiateFlags) Has(flags negotiateFlags) bool {
 }
 
 func (field *negotiateFlags) Unset(flags negotiateFlags) {
-	*field ^= *field & flags
+	*field = *field ^ (*field & flags)
 }

@@ -35,10 +35,6 @@ type pkgReader struct {
 
 	// laterFns holds functions that need to be invoked at the end of
 	// import reading.
-	//
-	// TODO(mdempsky): Is it safe to have a single "later" slice or do
-	// we need to have multiple passes? See comments on CL 386002 and
-	// go.dev/issue/52104.
 	laterFns []func()
 	// laterFors is used in case of 'type A B' to ensure that B is processed before A.
 	laterFors map[types.Type]int
@@ -162,11 +158,12 @@ type reader struct {
 // A readerDict holds the state for type parameters that parameterize
 // the current unified IR element.
 type readerDict struct {
-	rtbounds []typeInfo         // contains constraint types for each parameter in rtparams
-	rtparams []*types.TypeParam // contains receiver type parameters for an element
+	// bounds is a slice of typeInfos corresponding to the underlying
+	// bounds of the element's type parameters.
+	bounds []typeInfo
 
-	tbounds []typeInfo         // contains constraint types for each parameter in tparams
-	tparams []*types.TypeParam // contains type parameters for an element
+	// tparams is a slice of the constructed TypeParams for the element.
+	tparams []*types.TypeParam
 
 	// derived is a slice of types derived from tparams, which may be
 	// instantiated while reading the current element.
@@ -356,11 +353,7 @@ func (r *reader) doTyp() (res types.Type) {
 		return name.Type()
 
 	case pkgbits.TypeTypeParam:
-		n := r.Len()
-		if n < len(r.dict.rtbounds) {
-			return r.dict.rtparams[n]
-		}
-		return r.dict.tparams[n-len(r.dict.rtbounds)]
+		return r.dict.tparams[r.Len()]
 
 	case pkgbits.TypeArray:
 		len := int64(r.Uint64())
@@ -541,7 +534,7 @@ func (pr *pkgReader) objIdx(idx pkgbits.Index) (*types.Package, string) {
 			pos := r.pos()
 			var tparams []*types.TypeParam
 			if r.Version().Has(pkgbits.AliasTypeParamNames) {
-				tparams = r.typeParamNames(false)
+				tparams = r.typeParamNames()
 			}
 			typ := r.typ()
 			declare(aliases.New(pos, objPkg, objName, typ, tparams))
@@ -554,15 +547,8 @@ func (pr *pkgReader) objIdx(idx pkgbits.Index) (*types.Package, string) {
 
 		case pkgbits.ObjFunc:
 			pos := r.pos()
-			var rtparams []*types.TypeParam
-			var recv *types.Var
-			if r.Version().Has(pkgbits.GenericMethods) && r.Bool() {
-				r.selector()
-				rtparams = r.typeParamNames(true)
-				recv = r.param()
-			}
-			tparams := r.typeParamNames(false)
-			sig := r.signature(recv, rtparams, tparams)
+			tparams := r.typeParamNames()
+			sig := r.signature(nil, nil, tparams)
 			declare(types.NewFunc(pos, objPkg, objName, sig))
 
 		case pkgbits.ObjType:
@@ -572,7 +558,7 @@ func (pr *pkgReader) objIdx(idx pkgbits.Index) (*types.Package, string) {
 			named := types.NewNamed(obj, nil, nil)
 			declare(obj)
 
-			named.SetTypeParams(r.typeParamNames(false))
+			named.SetTypeParams(r.typeParamNames())
 
 			setUnderlying := func(underlying types.Type) {
 				// If the underlying type is an interface, we need to
@@ -652,20 +638,9 @@ func (pr *pkgReader) objDictIdx(idx pkgbits.Index) *readerDict {
 			errorf("unexpected object with %v implicit type parameter(s)", implicits)
 		}
 
-		nreceivers := 0
-		if r.Version().Has(pkgbits.GenericMethods) && r.Bool() {
-			nreceivers = r.Len()
-		}
-		nexplicits := r.Len()
-
-		dict.rtbounds = make([]typeInfo, nreceivers)
-		for i := range dict.rtbounds {
-			dict.rtbounds[i] = r.typInfo()
-		}
-
-		dict.tbounds = make([]typeInfo, nexplicits)
-		for i := range dict.tbounds {
-			dict.tbounds[i] = r.typInfo()
+		dict.bounds = make([]typeInfo, r.Len())
+		for i := range dict.bounds {
+			dict.bounds[i] = r.typInfo()
 		}
 
 		dict.derived = make([]derivedInfo, r.Len())
@@ -684,24 +659,15 @@ func (pr *pkgReader) objDictIdx(idx pkgbits.Index) *readerDict {
 	return &dict
 }
 
-func (r *reader) typeParamNames(isGenMeth bool) []*types.TypeParam {
+func (r *reader) typeParamNames() []*types.TypeParam {
 	r.Sync(pkgbits.SyncTypeParamNames)
 
-	// Note: This code assumes there are no implicit type parameters.
-	// This is fine since it only reads exported declarations, which
-	// never have implicits.
+	// Note: This code assumes it only processes objects without
+	// implement type parameters. This is currently fine, because
+	// reader is only used to read in exported declarations, which are
+	// always package scoped.
 
-	var in []typeInfo
-	var out *[]*types.TypeParam
-	if isGenMeth {
-		in = r.dict.rtbounds
-		out = &r.dict.rtparams
-	} else {
-		in = r.dict.tbounds
-		out = &r.dict.tparams
-	}
-
-	if len(in) == 0 {
+	if len(r.dict.bounds) == 0 {
 		return nil
 	}
 
@@ -710,34 +676,40 @@ func (r *reader) typeParamNames(isGenMeth bool) []*types.TypeParam {
 	// create all the TypeNames and TypeParams, then we construct and
 	// set the bound type.
 
-	// We have to save tparams outside of the closure, because typeParamNames
-	// can be called multiple times with the same dictionary instance.
-	tparams := make([]*types.TypeParam, len(in))
-	*out = tparams
-
-	for i := range in {
+	r.dict.tparams = make([]*types.TypeParam, len(r.dict.bounds))
+	for i := range r.dict.bounds {
 		pos := r.pos()
 		pkg, name := r.localIdent()
 
 		tname := types.NewTypeName(pos, pkg, name, nil)
-		tparams[i] = types.NewTypeParam(tname, nil)
+		r.dict.tparams[i] = types.NewTypeParam(tname, nil)
 	}
 
-	// The reader dictionary will continue mutating before we have time
-	// to call delayed functions; make a local copy of the constraints.
-	types := make([]types.Type, len(in))
-	for i, info := range in {
-		types[i] = r.p.typIdx(info, r.dict)
+	typs := make([]types.Type, len(r.dict.bounds))
+	for i, bound := range r.dict.bounds {
+		typs[i] = r.p.typIdx(bound, r.dict)
 	}
 
-	// This needs to happen later to make sure SetUnderlying has been called.
+	// TODO(mdempsky): This is subtle, elaborate further.
+	//
+	// We have to save tparams outside of the closure, because
+	// typeParamNames() can be called multiple times with the same
+	// dictionary instance.
+	//
+	// Also, this needs to happen later to make sure SetUnderlying has
+	// been called.
+	//
+	// TODO(mdempsky): Is it safe to have a single "later" slice or do
+	// we need to have multiple passes? See comments on CL 386002 and
+	// go.dev/issue/52104.
+	tparams := r.dict.tparams
 	r.p.later(func() {
-		for i, typ := range types {
+		for i, typ := range typs {
 			tparams[i].SetConstraint(typ)
 		}
 	})
 
-	return tparams
+	return r.dict.tparams
 }
 
 func (r *reader) method() *types.Func {
@@ -745,7 +717,7 @@ func (r *reader) method() *types.Func {
 	pos := r.pos()
 	pkg, name := r.selector()
 
-	rparams := r.typeParamNames(false)
+	rparams := r.typeParamNames()
 	sig := r.signature(r.param(), rparams, nil)
 
 	_ = r.pos() // TODO(mdempsky): Remove; this is a hacker for linker.go.

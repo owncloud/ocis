@@ -23,10 +23,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/sharedconf"
 	"github.com/owncloud/reva/v2/pkg/storage/cache"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 )
 
@@ -103,7 +103,8 @@ type AsyncPropagatorOptions struct {
 
 // EventOptions are the configurable options for events
 type EventOptions struct {
-	NumConsumers int `mapstructure:"numconsumers"`
+	NumConsumers  int    `mapstructure:"numconsumers"`
+	ConsumerGroup string `mapstructure:"consumer_group"`
 }
 
 // TokenOptions are the configurable option for tokens
@@ -170,6 +171,10 @@ func New(m map[string]interface{}) (*Options, error) {
 
 	if o.UploadDirectory == "" {
 		o.UploadDirectory = filepath.Join(o.Root, "uploads")
+	}
+
+	if o.Events.ConsumerGroup == "" {
+		o.Events.ConsumerGroup = "dcfs"
 	}
 
 	return o, nil

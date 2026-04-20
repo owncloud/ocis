@@ -67,8 +67,6 @@ var (
 	RequestMethodPut RequestMethodAttr = "PUT"
 	// RequestMethodTrace is the TRACE method.
 	RequestMethodTrace RequestMethodAttr = "TRACE"
-	// RequestMethodQuery is the QUERY method.
-	RequestMethodQuery RequestMethodAttr = "QUERY"
 	// RequestMethodOther is the any HTTP method that the instrumentation has no
 	// prior knowledge of.
 	RequestMethodOther RequestMethodAttr = "_OTHER"
@@ -160,10 +158,7 @@ func (m ClientActiveRequests) Add(
 	attrs ...attribute.KeyValue,
 ) {
 	if len(attrs) == 0 {
-		m.Int64UpDownCounter.Add(ctx, incr, metric.WithAttributes(
-			attribute.String("server.address", serverAddress),
-			attribute.Int("server.port", serverPort),
-		))
+		m.Int64UpDownCounter.Add(ctx, incr)
 		return
 	}
 
@@ -177,7 +172,7 @@ func (m ClientActiveRequests) Add(
 		*o,
 		metric.WithAttributes(
 			append(
-				attrs[:len(attrs):len(attrs)],
+				attrs,
 				attribute.String("server.address", serverAddress),
 				attribute.Int("server.port", serverPort),
 			)...,
@@ -303,10 +298,7 @@ func (m ClientConnectionDuration) Record(
 	attrs ...attribute.KeyValue,
 ) {
 	if len(attrs) == 0 {
-		m.Float64Histogram.Record(ctx, val, metric.WithAttributes(
-			attribute.String("server.address", serverAddress),
-			attribute.Int("server.port", serverPort),
-		))
+		m.Float64Histogram.Record(ctx, val)
 		return
 	}
 
@@ -320,7 +312,7 @@ func (m ClientConnectionDuration) Record(
 		*o,
 		metric.WithAttributes(
 			append(
-				attrs[:len(attrs):len(attrs)],
+				attrs,
 				attribute.String("server.address", serverAddress),
 				attribute.Int("server.port", serverPort),
 			)...,
@@ -449,11 +441,7 @@ func (m ClientOpenConnections) Add(
 	attrs ...attribute.KeyValue,
 ) {
 	if len(attrs) == 0 {
-		m.Int64UpDownCounter.Add(ctx, incr, metric.WithAttributes(
-			attribute.String("http.connection.state", string(connectionState)),
-			attribute.String("server.address", serverAddress),
-			attribute.Int("server.port", serverPort),
-		))
+		m.Int64UpDownCounter.Add(ctx, incr)
 		return
 	}
 
@@ -467,7 +455,7 @@ func (m ClientOpenConnections) Add(
 		*o,
 		metric.WithAttributes(
 			append(
-				attrs[:len(attrs):len(attrs)],
+				attrs,
 				attribute.String("http.connection.state", string(connectionState)),
 				attribute.String("server.address", serverAddress),
 				attribute.Int("server.port", serverPort),
@@ -602,11 +590,7 @@ func (m ClientRequestBodySize) Record(
 	attrs ...attribute.KeyValue,
 ) {
 	if len(attrs) == 0 {
-		m.Int64Histogram.Record(ctx, val, metric.WithAttributes(
-			attribute.String("http.request.method", string(requestMethod)),
-			attribute.String("server.address", serverAddress),
-			attribute.Int("server.port", serverPort),
-		))
+		m.Int64Histogram.Record(ctx, val)
 		return
 	}
 
@@ -620,7 +604,7 @@ func (m ClientRequestBodySize) Record(
 		*o,
 		metric.WithAttributes(
 			append(
-				attrs[:len(attrs):len(attrs)],
+				attrs,
 				attribute.String("http.request.method", string(requestMethod)),
 				attribute.String("server.address", serverAddress),
 				attribute.Int("server.port", serverPort),
@@ -782,11 +766,7 @@ func (m ClientRequestDuration) Record(
 	attrs ...attribute.KeyValue,
 ) {
 	if len(attrs) == 0 {
-		m.Float64Histogram.Record(ctx, val, metric.WithAttributes(
-			attribute.String("http.request.method", string(requestMethod)),
-			attribute.String("server.address", serverAddress),
-			attribute.Int("server.port", serverPort),
-		))
+		m.Float64Histogram.Record(ctx, val)
 		return
 	}
 
@@ -800,7 +780,7 @@ func (m ClientRequestDuration) Record(
 		*o,
 		metric.WithAttributes(
 			append(
-				attrs[:len(attrs):len(attrs)],
+				attrs,
 				attribute.String("http.request.method", string(requestMethod)),
 				attribute.String("server.address", serverAddress),
 				attribute.Int("server.port", serverPort),
@@ -962,11 +942,7 @@ func (m ClientResponseBodySize) Record(
 	attrs ...attribute.KeyValue,
 ) {
 	if len(attrs) == 0 {
-		m.Int64Histogram.Record(ctx, val, metric.WithAttributes(
-			attribute.String("http.request.method", string(requestMethod)),
-			attribute.String("server.address", serverAddress),
-			attribute.Int("server.port", serverPort),
-		))
+		m.Int64Histogram.Record(ctx, val)
 		return
 	}
 
@@ -980,7 +956,7 @@ func (m ClientResponseBodySize) Record(
 		*o,
 		metric.WithAttributes(
 			append(
-				attrs[:len(attrs):len(attrs)],
+				attrs,
 				attribute.String("http.request.method", string(requestMethod)),
 				attribute.String("server.address", serverAddress),
 				attribute.Int("server.port", serverPort),
@@ -1140,10 +1116,7 @@ func (m ServerActiveRequests) Add(
 	attrs ...attribute.KeyValue,
 ) {
 	if len(attrs) == 0 {
-		m.Int64UpDownCounter.Add(ctx, incr, metric.WithAttributes(
-			attribute.String("http.request.method", string(requestMethod)),
-			attribute.String("url.scheme", urlScheme),
-		))
+		m.Int64UpDownCounter.Add(ctx, incr)
 		return
 	}
 
@@ -1157,7 +1130,7 @@ func (m ServerActiveRequests) Add(
 		*o,
 		metric.WithAttributes(
 			append(
-				attrs[:len(attrs):len(attrs)],
+				attrs,
 				attribute.String("http.request.method", string(requestMethod)),
 				attribute.String("url.scheme", urlScheme),
 			)...,
@@ -1280,10 +1253,7 @@ func (m ServerRequestBodySize) Record(
 	attrs ...attribute.KeyValue,
 ) {
 	if len(attrs) == 0 {
-		m.Int64Histogram.Record(ctx, val, metric.WithAttributes(
-			attribute.String("http.request.method", string(requestMethod)),
-			attribute.String("url.scheme", urlScheme),
-		))
+		m.Int64Histogram.Record(ctx, val)
 		return
 	}
 
@@ -1297,7 +1267,7 @@ func (m ServerRequestBodySize) Record(
 		*o,
 		metric.WithAttributes(
 			append(
-				attrs[:len(attrs):len(attrs)],
+				attrs,
 				attribute.String("http.request.method", string(requestMethod)),
 				attribute.String("url.scheme", urlScheme),
 			)...,
@@ -1348,9 +1318,8 @@ func (ServerRequestBodySize) AttrResponseStatusCode(val int) attribute.KeyValue 
 }
 
 // AttrRoute returns an optional attribute for the "http.route" semantic
-// convention. It represents the matched route template for the request. This
-// MUST be low-cardinality and include all static path segments, with dynamic
-// path segments represented with placeholders.
+// convention. It represents the matched route, that is, the path template in the
+// format used by the respective server framework.
 func (ServerRequestBodySize) AttrRoute(val string) attribute.KeyValue {
 	return attribute.String("http.route", val)
 }
@@ -1467,10 +1436,7 @@ func (m ServerRequestDuration) Record(
 	attrs ...attribute.KeyValue,
 ) {
 	if len(attrs) == 0 {
-		m.Float64Histogram.Record(ctx, val, metric.WithAttributes(
-			attribute.String("http.request.method", string(requestMethod)),
-			attribute.String("url.scheme", urlScheme),
-		))
+		m.Float64Histogram.Record(ctx, val)
 		return
 	}
 
@@ -1484,7 +1450,7 @@ func (m ServerRequestDuration) Record(
 		*o,
 		metric.WithAttributes(
 			append(
-				attrs[:len(attrs):len(attrs)],
+				attrs,
 				attribute.String("http.request.method", string(requestMethod)),
 				attribute.String("url.scheme", urlScheme),
 			)...,
@@ -1528,9 +1494,8 @@ func (ServerRequestDuration) AttrResponseStatusCode(val int) attribute.KeyValue 
 }
 
 // AttrRoute returns an optional attribute for the "http.route" semantic
-// convention. It represents the matched route template for the request. This
-// MUST be low-cardinality and include all static path segments, with dynamic
-// path segments represented with placeholders.
+// convention. It represents the matched route, that is, the path template in the
+// format used by the respective server framework.
 func (ServerRequestDuration) AttrRoute(val string) attribute.KeyValue {
 	return attribute.String("http.route", val)
 }
@@ -1654,10 +1619,7 @@ func (m ServerResponseBodySize) Record(
 	attrs ...attribute.KeyValue,
 ) {
 	if len(attrs) == 0 {
-		m.Int64Histogram.Record(ctx, val, metric.WithAttributes(
-			attribute.String("http.request.method", string(requestMethod)),
-			attribute.String("url.scheme", urlScheme),
-		))
+		m.Int64Histogram.Record(ctx, val)
 		return
 	}
 
@@ -1671,7 +1633,7 @@ func (m ServerResponseBodySize) Record(
 		*o,
 		metric.WithAttributes(
 			append(
-				attrs[:len(attrs):len(attrs)],
+				attrs,
 				attribute.String("http.request.method", string(requestMethod)),
 				attribute.String("url.scheme", urlScheme),
 			)...,
@@ -1722,9 +1684,8 @@ func (ServerResponseBodySize) AttrResponseStatusCode(val int) attribute.KeyValue
 }
 
 // AttrRoute returns an optional attribute for the "http.route" semantic
-// convention. It represents the matched route template for the request. This
-// MUST be low-cardinality and include all static path segments, with dynamic
-// path segments represented with placeholders.
+// convention. It represents the matched route, that is, the path template in the
+// format used by the respective server framework.
 func (ServerResponseBodySize) AttrRoute(val string) attribute.KeyValue {
 	return attribute.String("http.route", val)
 }

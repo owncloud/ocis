@@ -40,10 +40,9 @@ func Voc(raw []byte, _ uint32) bool {
 	return bytes.HasPrefix(raw, []byte("Creative Voice File"))
 }
 
-// M3U matches a Playlist file.
-func M3U(raw []byte, _ uint32) bool {
-	return bytes.HasPrefix(raw, []byte("#EXTM3U\n")) ||
-		bytes.HasPrefix(raw, []byte("#EXTM3U\r\n"))
+// M3u matches a Playlist file.
+func M3u(raw []byte, _ uint32) bool {
+	return bytes.HasPrefix(raw, []byte("#EXTM3U"))
 }
 
 // AAC matches an Advanced Audio Coding file.
