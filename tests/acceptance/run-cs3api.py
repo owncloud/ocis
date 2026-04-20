@@ -3,6 +3,9 @@
 Run CS3 API validator tests locally and in GitHub Actions CI.
 
 Usage: python3 tests/acceptance/run-cs3api.py
+
+DRONE: Docker images and service config mirror .drone.star cs3ApiTests().
+After .drone.star removal this script becomes the authoritative config source.
 """
 
 import os
