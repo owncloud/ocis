@@ -1796,8 +1796,8 @@ github.com/rs/zerolog/internal/cbor
 github.com/rs/zerolog/internal/json
 github.com/rs/zerolog/log
 github.com/rs/zerolog/pkgerrors
-# github.com/russellhaering/goxmldsig v1.5.0
-## explicit; go 1.21.0
+# github.com/russellhaering/goxmldsig v1.6.0
+## explicit; go 1.23.0
 github.com/russellhaering/goxmldsig
 github.com/russellhaering/goxmldsig/etreeutils
 github.com/russellhaering/goxmldsig/types
@@ -2149,7 +2149,7 @@ go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp/internal/semconv
 ## explicit; go 1.24.0
 go.opentelemetry.io/contrib/zpages
 go.opentelemetry.io/contrib/zpages/internal
-# go.opentelemetry.io/otel v1.39.0
+# go.opentelemetry.io/otel v1.40.0
 ## explicit; go 1.24.0
 go.opentelemetry.io/otel
 go.opentelemetry.io/otel/attribute
@@ -2168,6 +2168,8 @@ go.opentelemetry.io/otel/semconv/v1.37.0
 go.opentelemetry.io/otel/semconv/v1.37.0/httpconv
 go.opentelemetry.io/otel/semconv/v1.37.0/otelconv
 go.opentelemetry.io/otel/semconv/v1.37.0/rpcconv
+go.opentelemetry.io/otel/semconv/v1.39.0
+go.opentelemetry.io/otel/semconv/v1.39.0/otelconv
 go.opentelemetry.io/otel/semconv/v1.4.0
 # go.opentelemetry.io/otel/exporters/jaeger v1.17.0
 ## explicit; go 1.19
@@ -2190,12 +2192,12 @@ go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal/observ
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal/otlpconfig
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal/retry
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal/x
-# go.opentelemetry.io/otel/metric v1.39.0
+# go.opentelemetry.io/otel/metric v1.40.0
 ## explicit; go 1.24.0
 go.opentelemetry.io/otel/metric
 go.opentelemetry.io/otel/metric/embedded
 go.opentelemetry.io/otel/metric/noop
-# go.opentelemetry.io/otel/sdk v1.39.0
+# go.opentelemetry.io/otel/sdk v1.40.0
 ## explicit; go 1.24.0
 go.opentelemetry.io/otel/sdk
 go.opentelemetry.io/otel/sdk/instrumentation
@@ -2204,7 +2206,7 @@ go.opentelemetry.io/otel/sdk/resource
 go.opentelemetry.io/otel/sdk/trace
 go.opentelemetry.io/otel/sdk/trace/internal/env
 go.opentelemetry.io/otel/sdk/trace/internal/observ
-# go.opentelemetry.io/otel/trace v1.39.0
+# go.opentelemetry.io/otel/trace v1.40.0
 ## explicit; go 1.24.0
 go.opentelemetry.io/otel/trace
 go.opentelemetry.io/otel/trace/embedded
@@ -2273,8 +2275,8 @@ golang.org/x/exp/slices
 golang.org/x/exp/slog
 golang.org/x/exp/slog/internal
 golang.org/x/exp/slog/internal/buffer
-# golang.org/x/image v0.32.0
-## explicit; go 1.24.0
+# golang.org/x/image v0.38.0
+## explicit; go 1.25.0
 golang.org/x/image/bmp
 golang.org/x/image/ccitt
 golang.org/x/image/font
@@ -2409,7 +2411,7 @@ google.golang.org/genproto/googleapis/api/httpbody
 ## explicit; go 1.24.0
 google.golang.org/genproto/googleapis/rpc/errdetails
 google.golang.org/genproto/googleapis/rpc/status
-# google.golang.org/grpc v1.78.0
+# google.golang.org/grpc v1.79.3
 ## explicit; go 1.24.0
 google.golang.org/grpc
 google.golang.org/grpc/attributes
@@ -2439,6 +2441,7 @@ google.golang.org/grpc/health/grpc_health_v1
 google.golang.org/grpc/internal
 google.golang.org/grpc/internal/backoff
 google.golang.org/grpc/internal/balancer/gracefulswitch
+google.golang.org/grpc/internal/balancer/weight
 google.golang.org/grpc/internal/balancerload
 google.golang.org/grpc/internal/binarylog
 google.golang.org/grpc/internal/buffer
