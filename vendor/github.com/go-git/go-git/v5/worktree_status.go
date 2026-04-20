@@ -141,7 +141,7 @@ func (w *Worktree) diffStagingWithWorktree(reverse, excludeIgnoredChanges bool) 
 		return nil, err
 	}
 
-	to := filesystem.NewRootNode(w.Filesystem, submodules)
+	to := filesystem.NewRootNodeWithOptions(w.Filesystem, submodules, filesystem.Options{Index: idx})
 
 	var c merkletrie.Changes
 	if reverse {
@@ -369,6 +369,8 @@ func (w *Worktree) doAdd(path string, ignorePattern []gitignore.Pattern, skipSta
 			return plumbing.ZeroHash, err2
 		}
 	}
+
+	path = filepath.Clean(path)
 
 	if err != nil || !fi.IsDir() {
 		added, h, err = w.doAddFile(idx, s, path, ignorePattern)
