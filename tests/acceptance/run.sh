@@ -677,6 +677,7 @@ then
 	${RED_COLOR}; printf "%s\n" "${UNEXPECTED_BEHAT_EXIT_STATUSES[@]}"
 fi
 
+# DRONE: Dead code — workarounds for Drone log-flushing issues. Kept as archaeology.
 # # sync the file-system so all output will be flushed to storage.
 # # In drone we sometimes see that the last lines of output are missing from the
 # # drone log.

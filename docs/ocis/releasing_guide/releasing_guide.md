@@ -108,10 +108,10 @@ https://owncloud.dev/ocis/releasing_guide/
     * [ ] Create orphan branch: `git checkout --orphan docs-stable-7.2`
     * [ ] Initial commit: `git commit --allow-empty -m "initial commit"`
     * [ ] Push it: `git push`
-  * [ ] Adjust the `.drone.star` file to write to `docs-stable-7.2`
+  * [ ] Adjust the `.drone.star` file to write to `docs-stable-7.2` <!-- DRONE: obsolete after .drone.star removal; equivalent step needed in GitHub Actions -->
     * [ ] Find target_branch value in the docs section and change it to `docs-stable-7.2`
     * [ ] Example: https://github.com/owncloud/ocis/blame/56f7645f0b11c9112e15ce46f6effd2fea01d6be/.drone.star#L2249
-  * [ ] Add `stable-7.2` to the nightly cron jobs in drone (`Settings` -> `Cron Jobs`)
+  * [ ] Add `stable-7.2` to the nightly cron jobs in drone (`Settings` -> `Cron Jobs`) <!-- DRONE: obsolete after migration; equivalent cron must be added in GitHub Actions -->
 ```
 
 ### Steps for Patch Releases Only

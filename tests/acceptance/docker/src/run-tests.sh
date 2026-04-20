@@ -1,4 +1,7 @@
 #!/bin/bash
+# DRONE: Hardcodes /drone/src as the repo root (Drone workspace mount point).
+# Lines 3-4 (commented out) and line 15 reference this path.
+# When migrating: replace /drone/src with the appropriate env var or argument.
 
 #mkdir -p /drone/src/vendor-bin/behat
 #cp /tmp/vendor-bin/behat/composer.json /drone/src/vendor-bin/behat/composer.json

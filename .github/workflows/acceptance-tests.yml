@@ -219,6 +219,8 @@ jobs:
       fail-fast: false
       matrix:
         suite:
+          # DRONE MIGRATION: Suite grouping mirrors .drone.star localApiTests() grouping.
+          # After .drone.star removal, this comment and grouping become the canonical source.
           - cliCommands,apiServiceAvailability   # grouped like drone; needs ClamAV + email
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -375,6 +377,8 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ~/.cache/ms-playwright
+          # DRONE MIGRATION: Cache key uses .drone.env (WEB_COMMITID) — shared with Drone.
+          # After Drone removal, if .drone.env is renamed, update this hashFiles() path.
           key: playwright-chromium-${{ hashFiles('.drone.env') }}
 
       # --- Tika (search suite only) ---
@@ -410,6 +414,9 @@ jobs:
         if: matrix.keycloak == true
         run: |
           # Patch realm: replace Drone Docker hostname with localhost IP
+          # DRONE MIGRATION: ocis-ci-realm.dist.json uses ocis-server:9200 as hostname
+          # because that is the Docker service name in the Drone pipeline. GitHub Actions
+          # runs on the host network so it must be patched to 127.0.0.1.
           sed 's|https://ocis-server:9200|https://127.0.0.1:9200|g' \
             tests/config/drone/ocis-ci-realm.dist.json > /tmp/ocis-realm.json
           docker run -d --name keycloak --network host \

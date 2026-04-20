@@ -1,5 +1,11 @@
 """oCIS CI definition
 """
+# DRONE: This entire file is the Drone CI pipeline definition for oCIS.
+# It covers: linting, unit tests, API/e2e/WOPI/CS3 acceptance tests, Docker builds,
+# binary releases (linux/darwin/amd64/arm64), Ansible deployments, SonarCloud,
+# Trivy security scans, and cron-based nightly runs.
+# It is being REPLACED by GitHub Actions (.github/workflows/acceptance-tests.yml).
+# Safe to delete once GitHub Actions migration is complete.
 
 # Production release tags
 # NOTE: need to be updated if new production releases are determined

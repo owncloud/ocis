@@ -581,7 +581,7 @@ THUMBNAILS_TXT_FONTMAP_FILE="/path/to/fontsMap.json"
 ocis/bin/ocis server
 ```
 
-The sample `fontsMap.json` file is located in `tests/config/drone/fontsMap.json`.
+The sample `fontsMap.json` file is located in `tests/config/drone/fontsMap.json`. <!-- DRONE: this file hardcodes /drone/src as the font path; after migration update fontsMap.json path to a non-Drone location -->
 
 ```json
 {

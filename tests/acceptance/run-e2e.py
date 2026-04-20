@@ -73,6 +73,9 @@ def main() -> int:
 
     # clone + install web only if not already provided (e.g. via artifact)
     if not web_dir.exists():
+        # DRONE: Reads .drone.env to get WEB_BRANCH and WEB_COMMITID for cloning the
+        # correct ownCloud Web version. This file is shared with Drone CI and GitHub Actions.
+        # After Drone removal, consider renaming .drone.env to ci.env or similar.
         drone_env = {}
         drone_env_file = repo_root / ".drone.env"
         if drone_env_file.exists():

@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# DRONE: Checks S3 MinIO cache for Go binary artifacts (.bingo tools).
+# Defaults root path to /drone/src (Drone workspace mount point).
+# Exit code 78 is the Drone "skip pipeline without failure" signal.
+# Used by .drone.star get-go-bin-cache pipeline step.
 
 #
 # $1 - root path where .bingo resides

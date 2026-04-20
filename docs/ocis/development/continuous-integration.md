@@ -9,6 +9,10 @@ geekdocFilePath: continuous-integration.md
 
 {{< toc >}}
 
+<!-- DRONE: This entire page describes Drone CI which is being replaced by GitHub Actions (.github/workflows/). Update once migration is complete. -->
+
+> **Migration note:** This section describes Drone CI which is being replaced by GitHub Actions.
+
 oCIS uses [DRONE](https://www.drone.io/) as CI system. You can find the pipeline logs [here](https://drone.owncloud.com/owncloud/ocis) or in your PR.
 
 ## Concepts

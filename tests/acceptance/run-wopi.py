@@ -5,6 +5,9 @@ Run WOPI validator tests locally and in GitHub Actions CI.
 Config sourced from .drone.star wopiValidatorTests() — single source of truth.
 Usage: python3 tests/acceptance/run-wopi.py --type builtin
        python3 tests/acceptance/run-wopi.py --type cs3
+
+DRONE: Docker images, service ports, and config paths mirror .drone.star wopiValidatorTests().
+After .drone.star removal this script becomes the authoritative config source.
 """
 
 import argparse

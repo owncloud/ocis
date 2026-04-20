@@ -45,6 +45,8 @@ vendor-php
 # QA activity reports
 tests/qa-activity-report/reports/
 
+# DRONE: .drone.star is the Drone CI Starlark config; running `drone starlark` converts it
+# to .drone.yml locally — ignore that generated file to prevent accidental commits.
 # drone CI is in .drone.star, do not let someone accidentally commit a local .drone.yml
 .drone.yml
 
