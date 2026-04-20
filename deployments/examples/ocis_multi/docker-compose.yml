@@ -60,7 +60,6 @@ services:
     command: [ "-c", "ocis init || true; exec ocis server" ]
     environment:
       # Keycloak IDP specific configuration
-      PROXY_AUTOPROVISION_ACCOUNTS: "true"
       PROXY_ROLE_ASSIGNMENT_DRIVER: "oidc"
       OCIS_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/realms/${KEYCLOAK_REALM:-oCIS}
       PROXY_OIDC_REWRITE_WELLKNOWN: "true"
@@ -75,6 +74,9 @@ services:
       PROXY_USER_CS3_CLAIM: "username"
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
       OCIS_INSECURE: "${INSECURE:-true}"
+      OCIS_ADD_RUN_SERVICES: "auth-app"
+      PROXY_ENABLE_APP_AUTH: true
+      AUTH_APP_ENABLE_IMPERSONATION: true
       OCIS_EXCLUDE_RUN_SERVICES: "idp,idm"
       GRAPH_ASSIGN_DEFAULT_USER_ROLE: "false"
       GRAPH_USERNAME_MATCH: "none"
@@ -90,7 +92,8 @@ services:
       OCIS_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
       OCIS_LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
       GRAPH_LDAP_GROUP_CREATE_BASE_DN: "ou=groups-ec730a6c-1b63-4b45-b83b-9e2311afdf85,ou=groups,dc=owncloud,dc=com"
-      OCIS_LDAP_GROUP_OBJECTCLASS: "owncloudGroup"
+      OCIS_LDAP_GROUP_OBJECTCLASS: "groupOfNames"
+      OCIS_LDAP_GROUP_ADDITIONAL_OBJECTCLASSES: "ownCloudGroup"
       OCIS_LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
       OCIS_LDAP_USER_OBJECTCLASS: "inetOrgPerson"
       LDAP_LOGIN_ATTRIBUTES: "uid"
@@ -122,8 +125,6 @@ services:
       OCIS_MULTI_INSTANCE_GUEST_ROLE: "user-light"
       OCIS_LDAP_CROSS_INSTANCE_REFERENCE_TEMPLATE: "{{.Username}}@{{.Instancename}}.owncloud.test"
       OCIS_LDAP_INSTANCE_URL_TEMPLATE: "https://{{.Instancename}}.owncloud.test"
-      # FIXME: sync groups properly to keycloak and remove the next line
-      PROXY_AUTOPROVISION_CLAIM_GROUPS: ""
       # specific for deployment example
       PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM: ownCloudRole
     volumes:
@@ -154,7 +155,6 @@ services:
     command: ["-c", "ocis init || true; ocis server"]
     environment:
       # Keycloak IDP specific configuration
-      PROXY_AUTOPROVISION_ACCOUNTS: "true"
       PROXY_ROLE_ASSIGNMENT_DRIVER: "oidc"
       OCIS_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/realms/${KEYCLOAK_REALM:-oCIS}
       PROXY_OIDC_REWRITE_WELLKNOWN: "true"
@@ -224,8 +224,6 @@ services:
       OCIS_MULTI_INSTANCE_GUEST_ROLE: "user-light"
       OCIS_LDAP_CROSS_INSTANCE_REFERENCE_TEMPLATE: "{{.Username}}@{{.Instancename}}.owncloud.test"
       OCIS_LDAP_INSTANCE_URL_TEMPLATE: "https://{{.Instancename}}.owncloud.test"
-      # FIXME: sync groups properly to keycloak and remove the next line
-      PROXY_AUTOPROVISION_CLAIM_GROUPS: ""
       PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM: ownCloudRole
     volumes:
       - ./config/ocis/csp-ocm.yaml:/etc/ocis/csp-ocm.yaml

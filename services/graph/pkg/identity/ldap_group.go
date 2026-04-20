@@ -459,6 +459,8 @@ func (i *LDAP) groupToLDAPAttrValues(group libregraph.Group) (map[string][]strin
 		i.groupAttributeMap.member: {""},
 	}
 
+	attrs["objectClass"] = append(attrs["objectClass"], i.groupAdditionalObjectClasses...)
+
 	if !i.useServerUUID {
 		attrs["owncloudUUID"] = []string{uuid.Must(uuid.NewV4()).String()}
 		attrs["objectClass"] = append(attrs["objectClass"], "owncloud")
