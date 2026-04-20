@@ -27,6 +27,7 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/pkg/auth"
@@ -34,6 +35,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/auth/scope"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/reva/v2/pkg/storage/utils/grants"
 	"github.com/owncloud/reva/v2/pkg/store"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"github.com/pkg/errors"
@@ -160,6 +162,12 @@ func (m *manager) Authenticate(ctx context.Context, token, secret string) (*user
 		return nil, nil, errtypes.InvalidCredentials(publicShareResponse.Status.Message)
 	case publicShareResponse.Status.Code != rpcv1beta1.Code_CODE_OK:
 		return nil, nil, errtypes.InternalError(publicShareResponse.Status.Message)
+	}
+
+	// Reject internal links — they require authentication and cannot be accessed anonymously.
+	// An internal link has no effective permissions.
+	if grants.PermissionsEqual(publicShareResponse.GetShare().GetPermissions().GetPermissions(), &provider.ResourcePermissions{}) {
+		return nil, nil, errtypes.PermissionDenied("internal links require authentication and cannot be accessed anonymously")
 	}
 
 	var owner *user.User
