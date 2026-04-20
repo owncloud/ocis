@@ -9,48 +9,47 @@ geekdocFilePath: continuous-integration.md
 
 {{< toc >}}
 
-oCIS uses [DRONE](https://www.drone.io/) as CI system. You can find the pipeline logs [here](https://drone.owncloud.com/owncloud/ocis) or in your PR.
+## Overview
+
+oCIS uses [GitHub Actions](https://github.com/owncloud/ocis/actions) as its CI system. Pipeline logs are visible directly in pull requests.
 
 ## Concepts
 
-The pipeline is defined in [Starlark](https://github.com/bazelbuild/starlark) and transformed to YAML upon pipeline run. This enables us to do a highly dynamic and non repeating pipeline configuration. We enforce Starlark format guidelines with Bazel Buildifier. You can format the .drone.star file by running `make ci-format`.
+Pipelines are defined in `.github/workflows/`. The main acceptance test workflow is `.github/workflows/acceptance-tests.yml`.
 
-Upon running the pipeline, your branch gets merged to the master branch. This ensures that we always test your changeset if as it was applied to the master of oCIS. Please note that this does not apply to the pipeline definition (`.drone.star`).
+Upon running the pipeline, tests run against the branch as-is. Make sure your branch is rebased onto the latest master before running CI to avoid false failures.
 
 ## Things done in CI
 
 - static code analysis
 - linting
 - running UI tests
-- running ownCloud 10 test suite against oCIS
+- running API acceptance tests
 - build and release docker images
 - build and release binaries
 - build and release documentation
 
 ## Flags in commit message and PR title
 
-You may add flags to your commit message or PR title in order to speed up pipeline runs and take load from the CI runners.
+You may add flags to your commit message or PR title to control pipeline runs.
 
 - `[CI SKIP]`: no CI is run on the commit or PR
-
-- `[full-ci]`: deactivates the fail early mechanism and runs all available test (as default only smoke tests are run)
+- `[full-ci]`: deactivates the fail-early mechanism and runs all available tests (by default only smoke tests run)
 
 ### Knowledge base
 
 - My pipeline fails because some CI related files or commands are missing.
 
-  Please make sure to rebase your branch onto the latest master of oCIS. It could be that the pipeline definition (`.drone.star`) was changed on the master branch. This is the only file, that will not be auto merged to master upon pipeline run. So things could be out of sync.
+  Make sure your branch is rebased onto the latest master. Workflow files in `.github/workflows/` change over time and a stale branch may reference steps or configs that no longer exist.
 
-- How can I see the YAML drone pipeline definition?
+- How can I see what a workflow does?
 
-  In order to see the Yaml pipeline definition you can use the drone-cli to convert the Starlark file.
+  Workflow definitions are plain YAML in `.github/workflows/`. Open the relevant file directly in the repo — no CLI tool needed. The main acceptance test entry point is `.github/workflows/acceptance-tests.yml`.
 
+- How can I re-run a failed job?
+
+  In the GitHub Actions UI, click **Re-run jobs** → **Re-run failed jobs** on the failed workflow run. You can also trigger a full re-run from `gh`:
+
+  ```bash
+  gh run rerun <run-id> --failed --repo owncloud/ocis
   ```
-  drone starlark
-  ```
-
-  {{< hint info >}}
-  If you experience a `"build" struct has no .title attribute` you need a newer version of drone-cli.
-
-  You currently need to build it yourself from this [source code](https://github.com/drone/drone-cli). If you are not using master as source, please ensure that this [PR](https://github.com/drone/drone-cli/pull/175) is included.
-  {{< /hint >}}

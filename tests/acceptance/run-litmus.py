@@ -2,7 +2,6 @@
 """
 Run litmus WebDAV compliance tests locally and in GitHub Actions CI.
 
-Config sourced from .drone.star litmus() / setupForLitmus() — single source of truth.
 Usage: python3 tests/acceptance/run-litmus.py
 """
 
@@ -17,7 +16,7 @@ import time
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
-# Constants (mirroring .drone.star)
+# Constants
 # ---------------------------------------------------------------------------
 
 # HTTPS — matching drone: ocis init generates a self-signed cert; proxy uses TLS by default.

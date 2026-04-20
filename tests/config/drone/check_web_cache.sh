@@ -1,5 +1,7 @@
 #!/bin/bash
-source .drone.env
+# Checks S3 MinIO cache for web test runner artifacts (acceptance/e2e/web).
+# Sources ci.env to get WEB_COMMITID used as the cache key.
+source ci.env
 
 # if no $1 is supplied end the script
 # Can be web, acceptance or e2e
