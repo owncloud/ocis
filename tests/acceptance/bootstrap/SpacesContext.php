@@ -2145,6 +2145,20 @@ class SpacesContext implements Context {
 			$spaceId,
 		);
 		if ($shouldOrNot === 'should') {
+			// Async uploads (OCIS_ASYNC_UPLOADS=true) may leave the file in
+			// postprocessing state briefly.  Retry on HTTP 425 (Too Early).
+			$retries = 10;
+			while ($response->getStatusCode() === 425 && $retries > 0) {
+				\sleep(1);
+				$response = $this->featureContext->downloadFileAsUserUsingPassword(
+					$user,
+					$fileName,
+					$this->featureContext->getPasswordForUser($user),
+					null,
+					$spaceId,
+				);
+				$retries--;
+			}
 			$this->featureContext->theHTTPStatusCodeShouldBe(
 				200,
 				__METHOD__ . "Expected response status code is 200 but got " . $response->getStatusCode(),
