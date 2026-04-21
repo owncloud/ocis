@@ -507,12 +507,26 @@ def main() -> int:
     # Only deviation: container hostnames → localhost
     # ---------------------------------------------------------------------------
     def fakeOffice():
-        # drone: OC_CI_ALPINE container running serve-hosting-discovery.sh with repo at /drone/src
-        # use same image so BusyBox nc (not OpenBSD nc) handles FIN correctly on stdin EOF
+        # BusyBox nc -k has a race between connections: after each response the
+        # while-loop restarts nc, leaving a window where connections are refused.
+        # The collaboration service hits that window at startup → readLoopPeekFailLocked
+        # → healthz never binds → 300s timeout.  Use Python's built-in HTTP server
+        # instead; it handles concurrent connections without gaps.
         run(["docker", "run", "-d", "--name", "fakeoffice", "--network", "host",
              "-v", f"{repo_root}:/drone/src:ro",
-             "owncloudci/alpine:latest",
-             "sh", "/drone/src/tests/config/drone/serve-hosting-discovery.sh"])
+             "python:3-alpine",
+             "python3", "-c",
+             "import http.server, pathlib\n"
+             "body = pathlib.Path('/drone/src/tests/config/drone/hosting-discovery.xml').read_bytes()\n"
+             "class H(http.server.BaseHTTPRequestHandler):\n"
+             "    def do_GET(self):\n"
+             "        self.send_response(200)\n"
+             "        self.send_header('Content-Type', 'text/xml')\n"
+             "        self.end_headers()\n"
+             "        self.wfile.write(body)\n"
+             "    def log_message(self, *a): pass\n"
+             "http.server.HTTPServer(('', 8080), H).serve_forever()\n"
+             ])
         return []
 
     def collaboraService():
