@@ -3,11 +3,6 @@
 Run ocis acceptance tests locally and in GitHub Actions CI.
 
 Usage: BEHAT_SUITES=apiGraph python3 tests/acceptance/run-github.py
-
-DRONE: This script was derived from .drone.star to run acceptance tests in GitHub Actions.
-Docker images, test suite lists, service ports, and env var defaults mirror .drone.star.
-When .drone.star is removed, this script becomes the authoritative config source — update
-defaults here rather than cross-referencing the deleted file.
 """
 
 import json
