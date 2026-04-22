@@ -1,0 +1,94 @@
+name: ocis-test
+description: Run oCIS Behat acceptance tests against a running oCIS instance
+
+inputs:
+  suite:
+    description: Behat suite(s) to run, comma-separated (e.g. apiGraph or apiAntivirus,apiSettings)
+    required: true
+  ocis-url:
+    description: oCIS instance URL
+    required: false
+    default: https://localhost:9200
+  expected-failures-file:
+    description: Path to expected failures markdown (relative to repo root)
+    required: false
+    default: ""
+  acceptance-test-type:
+    description: Test type passed as ACCEPTANCE_TEST_TYPE (api or core-api)
+    required: false
+    default: api
+  with-remote-php:
+    description: Include remote.php expected failures (WITH_REMOTE_PHP)
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Install libcurl 8.12.0 build dependencies
+      shell: bash
+      run: |
+        sudo apt-get update -qq
+        sudo NEEDRESTART_MODE=a apt-get install -y \
+          libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
+
+    - name: Cache libcurl 8.12.0
+      id: cache-libcurl
+      uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+      with:
+        path: /opt/libcurl
+        key: libcurl-8.12.0-${{ runner.os }}
+
+    - name: Compile libcurl 8.12.0 from source
+      if: steps.cache-libcurl.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        cd /tmp
+        curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
+        tar xzf curl-8.12.0.tar.gz
+        cd curl-8.12.0
+        ./configure --with-ssl --with-zlib --with-nghttp2 --prefix=/opt/libcurl \
+          --enable-versioned-symbols --silent
+        make -j$(nproc) --silent
+        sudo make install --silent
+
+    - name: Restore libcurl ldconfig
+      shell: bash
+      run: |
+        echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
+        sudo ldconfig
+        /opt/libcurl/bin/curl --version | head -1
+        php -r '
+          $v = curl_version()["version"];
+          echo "PHP curl: $v\n";
+          if (version_compare($v, "8.12.0", "<")) {
+            fwrite(STDERR, "FATAL: PHP sees libcurl $v, need >= 8.12.0\n");
+            exit(1);
+          }
+        '
+
+    - name: Install Composer dependencies
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: |
+        COMPOSER_NO_INTERACTION=1 COMPOSER_NO_AUDIT=1 composer install --no-progress
+        COMPOSER_NO_INTERACTION=1 COMPOSER_NO_AUDIT=1 \
+          composer bin behat install --no-progress
+
+    - name: Run ${{ inputs.suite }}
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      env:
+        BEHAT_SUITES: ${{ inputs.suite }}
+        TEST_SERVER_URL: ${{ inputs.ocis-url }}
+        OCIS_WRAPPER_URL: http://localhost:5200
+        ACCEPTANCE_TEST_TYPE: ${{ inputs.acceptance-test-type }}
+        WITH_REMOTE_PHP: ${{ inputs.with-remote-php }}
+        EXPECTED_FAILURES_FILE: ${{ inputs.expected-failures-file }}
+        STORAGE_DRIVER: ocis
+        UPLOAD_DELETE_WAIT_TIME: "0"
+        EMAIL_HOST: localhost
+        EMAIL_PORT: "8025"
+        # Filter tags mirror run-github.py logic
+        BEHAT_FILTER_TAGS: ${{ inputs.acceptance-test-type == 'core-api' && '~@skipOnGraph&&~@skipOnOcis-OCIS-Storage' || '~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage' }}
+      run: make test-acceptance-api

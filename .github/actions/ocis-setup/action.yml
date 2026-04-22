@@ -1,0 +1,166 @@
+name: ocis-setup
+description: Start an oCIS instance with optional services (antivirus, email, tika, ociswrapper)
+
+inputs:
+  ocis-version:
+    description: oCIS release version (e.g. 8.0.1) or "latest" — ignored when ocis-binary is set
+    required: false
+    default: latest
+  ocis-binary:
+    description: Path to a pre-built oCIS binary; skips download when provided
+    required: false
+    default: ""
+  admin-password:
+    description: Admin user password
+    required: false
+    default: admin
+  log-level:
+    description: oCIS log level
+    required: false
+    default: error
+  demo-users:
+    description: Create demo users (IDM_CREATE_DEMO_USERS=true)
+    required: false
+    default: "false"
+  wrapper:
+    description: Start ociswrapper on :5200 for dynamic reconfiguration
+    required: false
+    default: "true"
+  tika:
+    description: Start Apache Tika on :9998 for full-text search
+    required: false
+    default: "false"
+  email:
+    description: Start Mailpit SMTP (:1025) and API (:8025)
+    required: false
+    default: "false"
+  antivirus:
+    description: Start ClamAV on :3310 and enable postprocessing
+    required: false
+    default: "false"
+  extra-server-env:
+    description: JSON object of additional env vars to pass to the oCIS server
+    required: false
+    default: "{}"
+
+outputs:
+  ocis-url:
+    description: oCIS instance URL
+    value: https://localhost:9200
+
+runs:
+  using: composite
+  steps:
+    # -------------------------------------------------------------------------
+    # 1. Install oCIS binary (skip when a pre-built binary is provided)
+    # -------------------------------------------------------------------------
+    - name: Install oCIS binary from release
+      if: inputs.ocis-binary == ''
+      shell: bash
+      env:
+        OCIS_VERSION: ${{ inputs.ocis-version }}
+      run: ${{ github.action_path }}/scripts/install-ocis.sh
+
+    - name: Use pre-built oCIS binary
+      if: inputs.ocis-binary != ''
+      shell: bash
+      run: |
+        sudo cp "${{ inputs.ocis-binary }}" /usr/local/bin/ocis
+        sudo chmod +x /usr/local/bin/ocis
+        echo "Using pre-built oCIS: $(ocis --version 2>&1 | head -1)"
+
+    # -------------------------------------------------------------------------
+    # 2. Build ociswrapper (always — it is always used as the process launcher)
+    # -------------------------------------------------------------------------
+    - name: Build ociswrapper from source (when using release binary)
+      if: inputs.ocis-binary == ''
+      shell: bash
+      env:
+        OCIS_VERSION: ${{ inputs.ocis-version }}
+      run: ${{ github.action_path }}/scripts/install-wrapper.sh
+
+    - name: Build ociswrapper from local source (when using pre-built binary)
+      if: inputs.ocis-binary != ''
+      shell: bash
+      working-directory: ${{ github.workspace }}/tests/ociswrapper
+      run: |
+        GOWORK=off go build -o /tmp/ociswrapper .
+        sudo mv /tmp/ociswrapper /usr/local/bin/ociswrapper
+        echo "ociswrapper built from local source."
+
+    # -------------------------------------------------------------------------
+    # 3. Optional services
+    # -------------------------------------------------------------------------
+    - name: Start Mailpit (email)
+      if: inputs.email == 'true'
+      shell: bash
+      run: |
+        docker run -d --name mailpit --network host axllent/mailpit:v1.22.3
+        timeout 60 bash -c 'until curl -sf http://localhost:8025/api/v1/messages; do sleep 1; done'
+        echo "mailpit ready."
+
+    - name: Start ClamAV (antivirus)
+      if: inputs.antivirus == 'true'
+      shell: bash
+      run: |
+        docker run -d --name clamav --network host owncloudci/clamavd
+        echo "Waiting for ClamAV on :3310 (may take up to 5 min for virus DB download)..."
+        timeout 300 bash -c '
+          while true; do
+            if (echo "" | nc -z localhost 3310) 2>/dev/null || \
+               python3 -c "import socket,sys; s=socket.create_connection((\"localhost\",3310),2); s.close()" 2>/dev/null; then
+              break
+            fi
+            sleep 2
+          done
+        '
+        echo "clamav ready."
+
+    - name: Start Tika (full-text search)
+      if: inputs.tika == 'true'
+      shell: bash
+      run: |
+        docker run -d --name tika --network host apache/tika:3.2.2.0-full
+        timeout 120 bash -c 'until curl -sf http://localhost:9998; do sleep 2; done'
+        echo "tika ready."
+
+    # -------------------------------------------------------------------------
+    # 4. Init oCIS + copy config files
+    # -------------------------------------------------------------------------
+    - name: Init oCIS
+      shell: bash
+      env:
+        OCIS_ACTION_PATH: ${{ github.action_path }}
+      run: ${{ github.action_path }}/scripts/init-ocis.sh
+
+    # -------------------------------------------------------------------------
+    # 5. Start oCIS via ociswrapper
+    # -------------------------------------------------------------------------
+    - name: Start oCIS
+      shell: bash
+      env:
+        ADMIN_PASSWORD: ${{ inputs.admin-password }}
+        LOG_LEVEL: ${{ inputs.log-level }}
+        DEMO_USERS: ${{ inputs.demo-users }}
+        ANTIVIRUS_ENABLED: ${{ inputs.antivirus }}
+        EMAIL_ENABLED: ${{ inputs.email }}
+        TIKA_ENABLED: ${{ inputs.tika }}
+        EXTRA_SERVER_ENV: ${{ inputs.extra-server-env }}
+        OCIS_REPO_ROOT: ${{ github.workspace }}
+      run: ${{ github.action_path }}/scripts/start-ocis.sh
+
+    # -------------------------------------------------------------------------
+    # 6. Wait for oCIS to be healthy
+    # -------------------------------------------------------------------------
+    - name: Wait for oCIS
+      shell: bash
+      run: |
+        echo "Waiting for oCIS at https://localhost:9200..."
+        timeout 300 bash -c '
+          until curl -sk -uadmin:admin https://localhost:9200/graph/v1.0/users/admin \
+                -w "%{http_code}" -o /dev/null 2>/dev/null | grep -q "200"; do
+            sleep 2
+          done
+        ' || (echo "=== oCIS failed to start ===" && \
+               cat /tmp/ocis-server.log 2>/dev/null | tail -50 && exit 1)
+        echo "ocis ready."
