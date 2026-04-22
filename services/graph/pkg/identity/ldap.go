@@ -66,8 +66,9 @@ type LDAP struct {
 	groupBaseDN          string
 	groupCreateBaseDN    string
 	groupFilter          string
-	groupObjectClass     string
-	groupIDisOctetString bool
+	groupObjectClass                string
+	groupAdditionalObjectClasses    []string
+	groupIDisOctetString            bool
 	groupScope           int
 	groupAttributeMap    groupAttributeMap
 
@@ -202,6 +203,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		groupCreateBaseDN:              config.GroupCreateBaseDN,
 		groupFilter:                    config.GroupFilter,
 		groupObjectClass:               config.GroupObjectClass,
+		groupAdditionalObjectClasses:   config.GroupAdditionalObjectClasses,
 		groupIDisOctetString:           config.GroupIDIsOctetString,
 		groupScope:                     groupScope,
 		groupAttributeMap:              gam,
@@ -1310,8 +1312,9 @@ func replaceDN(fullDN *ldap.DN, newDN string) (string, error) {
 func (i *LDAP) CreateLDAPGroupByDN(dn string) error {
 	ar := ldap.NewAddRequest(dn, nil)
 
+	objectClasses := append([]string{i.groupObjectClass, "top"}, i.groupAdditionalObjectClasses...)
 	attrs := map[string][]string{
-		"objectClass": {i.groupObjectClass, "top"},
+		"objectClass": objectClasses,
 		"member":      {""},
 	}
 
