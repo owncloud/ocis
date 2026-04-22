@@ -21,103 +21,78 @@ echo "Running govulncheck..."
 "$GOVULNCHECK" -format json ./... > "$TMPFILE" 2>"$STDERRFILE" || true
 cat "$STDERRFILE" >&2
 
-python3 - "$TMPFILE" <<'PYEOF'
-import json
-import sys
+# govulncheck -format json outputs one JSON object per line (NDJSON).
+# Classify each finding and display results.
+jq -rn '
+  [inputs] |
 
-def parse_json_stream(path):
-    with open(path) as f:
-        content = f.read()
-    decoder = json.JSONDecoder()
-    idx = 0
-    objects = []
-    while idx < len(content):
-        while idx < len(content) and content[idx] in ' \t\n\r':
-            idx += 1
-        if idx >= len(content):
-            break
-        obj, end_idx = decoder.raw_decode(content, idx)
-        idx = end_idx
-        objects.append(obj)
-    return objects
+  # OSV summary lookup: { id: summary }
+  (map(select(has("osv")))
+   | map({ (.osv.id): (.osv.summary // .osv.id) })
+   | add // {}) as $osvs |
 
-objects = parse_json_stream(sys.argv[1])
+  # Classify every vuln group
+  (map(select(has("finding"))) | map(.finding)
+   | group_by(.osv)
+   | map(
+       . as $e |
+       ($e[0].osv) as $vid |
+       ($e | any(.[].trace[]?; has("function"))) as $called |
+       ($e[0].fixed_version // "") as $fixed |
+       ($e[0].trace[0]?.module // "") as $mod |
+       {
+         id:            $vid,
+         summary:       ($osvs[$vid] // $vid),
+         module:        $mod,
+         fixed_version: $fixed,
+         category: (
+           if   ($called | not) then "IMPORTED"
+           elif ($fixed == "")  then "NO_FIX"
+           elif ($mod == "stdlib") then "STDLIB"
+           else "FIXABLE"
+           end
+         )
+       }
+     )
+  ) as $vulns |
 
-# Collect OSV details
-osvs = {}
-for obj in objects:
-    if 'osv' in obj:
-        osv = obj['osv']
-        osvs[osv['id']] = osv
+  ($vulns | map(select(.category != "FIXABLE"))) as $warns |
+  ($vulns | map(select(.category == "FIXABLE"))) as $fails |
 
-# Collect findings
-findings = [obj['finding'] for obj in objects if 'finding' in obj]
+  # Warnings
+  if ($warns | length) > 0 then "\n⚠ Vulnerabilities acknowledged (not blocking):" else empty end,
+  ($warns[] |
+    "  \(.id): \(.summary)",
+    (if   .category == "NO_FIX"   then "    module=\(.module) (no upstream fix available)"
+     elif .category == "STDLIB"   then "    module=\(.module) (needs Go toolchain upgrade to \(.fixed_version))"
+     else                              "    module=\(.module) (code does not call vulnerable function)"
+     end)
+  ),
 
-# Group by vuln ID
-from collections import defaultdict
-by_vuln = defaultdict(list)
-for f in findings:
-    by_vuln[f['osv']].append(f)
-
-fail_vulns = []
-warn_vulns = []
-
-for vid, entries in sorted(by_vuln.items()):
-    # Check if any trace reaches symbol level (has 'function' in trace frames)
-    is_called = any(
-        any('function' in frame for frame in entry.get('trace', []))
-        for entry in entries
+  # Failures or success
+  if ($fails | length) > 0 then
+    "\n✗ \($fails | length) fixable vulnerability(ies) found:",
+    ($fails[] |
+      "  \(.id): \(.summary)",
+      "    module=\(.module), fix: bump to \(.fixed_version)"
     )
-    fixed_version = entries[0].get('fixed_version', '')
-    trace = entries[0].get('trace', [])
-    module = trace[0].get('module', '') if trace else ''
+  else
+    "\n✓ No fixable vulnerabilities found (\($warns | length) acknowledged warnings)"
+  end
+' "$TMPFILE"
 
-    # Determine category
-    if not is_called:
-        category = "IMPORTED"
-    elif not fixed_version:
-        category = "NO_FIX"
-    elif module == "stdlib":
-        category = "STDLIB"
-    else:
-        category = "FIXABLE"
-
-    osv = osvs.get(vid, {})
-    summary = osv.get('summary', vid)
-
-    info = {
-        'id': vid,
-        'category': category,
-        'module': module,
-        'fixed_version': fixed_version,
-        'summary': summary,
-    }
-
-    if category == "FIXABLE":
-        fail_vulns.append(info)
-    else:
-        warn_vulns.append(info)
-
-# Print warnings
-if warn_vulns:
-    print("\n⚠ Vulnerabilities acknowledged (not blocking):")
-    for v in warn_vulns:
-        reason = {
-            'NO_FIX': 'no upstream fix available',
-            'STDLIB': f'needs Go toolchain upgrade to {v["fixed_version"]}',
-            'IMPORTED': 'code does not call vulnerable function',
-        }.get(v['category'], v['category'])
-        print(f"  {v['id']}: {v['summary']}")
-        print(f"    module={v['module']} ({reason})")
-
-# Print failures
-if fail_vulns:
-    print(f"\n✗ {len(fail_vulns)} fixable vulnerability(ies) found:")
-    for v in fail_vulns:
-        print(f"  {v['id']}: {v['summary']}")
-        print(f"    module={v['module']}, fix: bump to {v['fixed_version']}")
-    sys.exit(1)
-else:
-    print(f"\n✓ No fixable vulnerabilities found ({len(warn_vulns)} acknowledged warnings)")
-    sys.exit(0)
-PYEOF
+# Exit 1 if any fixable vulnerabilities
+FAIL_COUNT=$(jq -n '
+  [inputs]
+  | map(select(has("finding"))) | map(.finding)
+  | group_by(.osv)
+  | map(
+      . as $e |
+      ($e | any(.[].trace[]?; has("function"))) as $called |
+      ($e[0].fixed_version // "") as $fixed |
+      ($e[0].trace[0]?.module // "") as $mod |
+      select($called and ($fixed != "") and ($mod != "stdlib"))
+    )
+  | length
+' "$TMPFILE")
+[ "$FAIL_COUNT" -eq 0 ]

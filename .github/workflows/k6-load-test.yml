@@ -42,11 +42,11 @@ jobs:
 
       - name: Run k6 load tests
         if: ${{ !cancelled() }}
-        run: sh tests/config/drone/run_k6_tests.sh
+        run: sh tests/config/ci/run_k6_tests.sh
 
       - name: Retrieve OCIS logs
         if: ${{ !cancelled() }}
-        run: sh tests/config/drone/run_k6_tests.sh --ocis-log
+        run: sh tests/config/ci/run_k6_tests.sh --ocis-log
 
       - name: Show Grafana dashboard link
         if: ${{ !cancelled() }}
