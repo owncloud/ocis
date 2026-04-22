@@ -20,8 +20,6 @@ L10N_MODULES := \
 	services/userlog \
 	services/settings
 
-# DRONE: Reminder to add new Go modules to the .drone.star test matrix so Drone CI picks them up.
-# if you add a module here please also add it to the .drone.star file
 OCIS_MODULES = \
 	services/activitylog \
 	services/antivirus \
@@ -207,10 +205,10 @@ docs-serve:
 docs-clean:
 	@$(MAKE) --no-print-directory -C docs docs-clean
 
-# DRONE: docs-local imitates the Drone 3-step docs build pipeline (generate → copy → build)
+# docs-local imitates the 3-step docs build pipeline (generate → copy → build)
 # locally without pushing. docs-hugo-drone-prep creates the ../hugo symlink required by
-# the Hugo Docker image (hugomods/hugo:base-0.129.0) that Drone uses.
-# imitate a full drone run locally to build docs without pushing to the web.
+# the Hugo Docker image (hugomods/hugo:base-0.129.0).
+# imitate a full docs build run locally without pushing to the web.
 # this can help identify uncaught issues when running `make docs-serve` only.
 .PHONY: docs-local             # run all steps as drone would do it (1, 2, 3)
 docs-local:
@@ -369,11 +367,6 @@ l10n-write:
 		$(MAKE) -C $$extension l10n-write || exit 1; \
     done
 
-# DRONE: ci-format formats .drone.star with Bazel Buildifier (Starlark linter).
-# This entire target becomes dead code once .drone.star is deleted.
-.PHONY: ci-format
-ci-format: $(BUILDIFIER)
-	$(BUILDIFIER) --mode=fix .drone.star
 
 .PHONY: test-php-style
 test-php-style: vendor-bin/owncloud-codestyle/vendor vendor-bin/php_codesniffer/vendor

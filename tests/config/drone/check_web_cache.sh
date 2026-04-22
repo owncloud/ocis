@@ -1,9 +1,7 @@
 #!/bin/bash
-# DRONE: Checks S3 MinIO cache for web test runner artifacts (acceptance/e2e/web).
-# Sources .drone.env to get WEB_COMMITID used as the cache key.
-# Exit code 78 is the Drone "skip pipeline without failure" signal.
-# Used by .drone.star build-web-cache pipeline step.
-source .drone.env
+# Checks S3 MinIO cache for web test runner artifacts (acceptance/e2e/web).
+# Sources ci.env to get WEB_COMMITID used as the cache key.
+source ci.env
 
 # if no $1 is supplied end the script
 # Can be web, acceptance or e2e

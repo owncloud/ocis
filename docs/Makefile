@@ -37,9 +37,8 @@ help:
 .PHONY:list
 list: help
 
-# DRONE: This target creates a symlink ../hugo → hugo/ required by the Drone Hugo Docker
-# image (hugomods/hugo:base-0.129.0), which expects the hugo folder at the repo root.
-# for drone only. drone uses an image for hugo that needs the hugo folder in the root
+# Creates a symlink ../hugo → hugo/ required by the Hugo Docker image
+# (hugomods/hugo:base-0.129.0), which expects the hugo folder at the repo root.
 # CURDIR will work for make only but not when running manually in the shell
 .PHONY: docs-hugo-drone-prep
 docs-hugo-drone-prep:

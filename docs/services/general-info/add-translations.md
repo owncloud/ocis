@@ -16,12 +16,7 @@ Services can have texts that need to be translated. These translations will be s
 The process for _synchronisation_ with Transifex is already setup and nothing needs to be done here. For any translation, it is necessary to set it up in the respective service and tell to sync it.
 
 **IMPORTANT**\
-Translations are automatically synced on a daily basis in the night. To do so, there is an own repo that covers the process for ALL translations from all configured repos: [translation-sync](https://github.com/owncloud/translation-sync). If there is a manual "emergency" sync necessary, you only need to trigger [drone](https://drone.owncloud.com/owncloud/translation-sync) via cli <!-- DRONE: translation-sync is triggered via Drone cron; after migration update to GitHub Actions workflow_dispatch -->
-
-```bash
-drone cron exec owncloud/translation-sync nightly
-```
-Note that you need to be logged on in drone to execute the command. <!-- DRONE: drone CLI command — obsolete after migration -->
+Translations are automatically synced on a daily basis in the night. To do so, there is an own repo that covers the process for ALL translations from all configured repos: [translation-sync](https://github.com/owncloud/translation-sync). If there is a manual "emergency" sync necessary, trigger the workflow manually via the [GitHub Actions UI](https://github.com/owncloud/translation-sync/actions) using `workflow_dispatch`.
 
 ## Implementing ocis Translations
 

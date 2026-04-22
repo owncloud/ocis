@@ -2,11 +2,7 @@
 """
 Run CS3 API validator tests locally and in GitHub Actions CI.
 
-Config sourced from .drone.star cs3ApiTests() — single source of truth.
 Usage: python3 tests/acceptance/run-cs3api.py
-
-DRONE: Docker images and service config mirror .drone.star cs3ApiTests().
-After .drone.star removal this script becomes the authoritative config source.
 """
 
 import os
@@ -18,7 +14,7 @@ import time
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
-# Constants (mirroring .drone.star)
+# Constants
 # ---------------------------------------------------------------------------
 
 # HTTPS — matching drone: ocis init generates a self-signed cert; proxy uses TLS by default.

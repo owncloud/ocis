@@ -1,5 +1,3 @@
 services/settings/ @lukashirt
 services/web/ @lukashirt
-# DRONE: .drone.star code owners — remove this entry when .drone.star is deleted.
-.drone.star @kobergj @phil-davis @individual-it
 assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf @kobergj @hodyroff
