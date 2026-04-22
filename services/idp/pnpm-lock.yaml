@@ -16,7 +16,7 @@ overrides:
   brace-expansion@>=1.0.0 <=1.1.11: '>=1.1.12'
   brace-expansion@>=2.0.0 <=2.0.1: '>=2.0.2'
   rollup: 2.80.0
-  serialize-javascript: 7.0.3
+  serialize-javascript: '>=7.0.5'
   ajv@>=6.0.0 <6.14.0: 6.14.0
   ajv@>=8.0.0 <8.18.0: 8.18.0
 
@@ -5972,8 +5972,8 @@ packages:
   seq@0.3.5:
     resolution: {integrity: sha512-sisY2Ln1fj43KBkRtXkesnRHYNdswIkIibvNe/0UKm2GZxjMbqmccpiatoKr/k2qX5VKiLU8xm+tz/74LAho4g==}
 
-  serialize-javascript@7.0.3:
-    resolution: {integrity: sha512-h+cZ/XXarqDgCjo+YSyQU/ulDEESGGf8AMK9pPNmhNSl/FzPl6L8pMp1leca5z6NuG6tvV/auC8/43tmovowww==}
+  serialize-javascript@7.0.5:
+    resolution: {integrity: sha512-F4LcB0UqUl1zErq+1nYEEzSHJnIwb3AF2XWB94b+afhrekOUijwooAYqFyRbjYkm2PAKBabx6oYv/xDxNi8IBw==}
     engines: {node: '>=20.0.0'}
 
   set-function-length@1.2.2:
@@ -8759,7 +8759,7 @@ snapshots:
 
   '@rollup/plugin-terser@0.4.4(rollup@2.80.0)':
     dependencies:
-      serialize-javascript: 7.0.3
+      serialize-javascript: 7.0.5
       smob: 1.5.0
       terser: 5.44.0
     optionalDependencies:
@@ -10101,7 +10101,7 @@ snapshots:
       jest-worker: 30.2.0
       postcss: 8.5.6
       schema-utils: 4.3.3
-      serialize-javascript: 7.0.3
+      serialize-javascript: 7.0.5
       webpack: 5.104.1
 
   css-prefers-color-scheme@10.0.0(postcss@8.5.6):
@@ -13566,7 +13566,7 @@ snapshots:
       chainsaw: 0.0.9
       hashish: 0.0.4
 
-  serialize-javascript@7.0.3: {}
+  serialize-javascript@7.0.5: {}
 
   set-function-length@1.2.2:
     dependencies:
