@@ -214,8 +214,9 @@ func u32(b []byte) uint32 {
 // copying from the source to a caller-supplied buffer, and instead provide
 // direct access to the underlying []byte data.
 type source struct {
-	b []byte
-	r io.ReaderAt
+	b       []byte
+	r       io.ReaderAt
+	minSize int // r is known to contain at least minSize bytes
 
 	// TODO: add a caching layer, if we're using the io.ReaderAt? Note that
 	// this might make a source no longer safe to use concurrently.
@@ -253,6 +254,17 @@ func (s *source) view(buf []byte, offset, length int) ([]byte, error) {
 			return nil, errInvalidBounds
 		}
 		return s.b[offset : offset+length], nil
+	}
+
+	if end := offset + length; end > s.minSize && length > 1<<20 {
+		// We're reading more than 1MiB, and we don't know whether
+		// the file contains this data. Check that the data exists
+		// before we try to allocate.
+		var oneByte [1]byte
+		if n, err := s.r.ReadAt(oneByte[:], int64(end)-1); err != nil || n != 1 {
+			return nil, errInvalidBounds
+		}
+		s.minSize = end
 	}
 
 	// Read from the io.ReaderAt.
