@@ -172,6 +172,7 @@
       "minimatch@>=9.0.0 <9.0.7": "9.0.7",
       "js-yaml": ">=4.1.1",
       "lodash": ">=4.18.1",
+      "follow-redirects": ">=1.16.0",
       "undici": ">=7.18.2",
       "vue-template-compiler": "^3.0.0",
       "brace-expansion@>=1.0.0 <=1.1.11": ">=1.1.12",
