@@ -9,6 +9,9 @@ if [[ "$VERSION" == "latest" ]]; then
     | python3 -c "import sys,json; print(json.load(sys.stdin)['tag_name'].lstrip('v'))")
 fi
 
+# Write resolved version so install-wrapper.sh uses the same tag without a second API call.
+echo "$VERSION" > /tmp/ocis-resolved-version
+
 echo "Installing oCIS $VERSION..."
 ARCH=$(uname -m)
 case "$ARCH" in

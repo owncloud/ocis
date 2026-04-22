@@ -6,8 +6,12 @@ set -euo pipefail
 VERSION="${OCIS_VERSION:-latest}"
 
 if [[ "$VERSION" == "latest" ]]; then
-  VERSION=$(curl -s https://api.github.com/repos/owncloud/ocis/releases/latest \
-    | python3 -c "import sys,json; print(json.load(sys.stdin)['tag_name'].lstrip('v'))")
+  if [[ -f /tmp/ocis-resolved-version ]]; then
+    VERSION=$(cat /tmp/ocis-resolved-version)
+  else
+    VERSION=$(curl -s https://api.github.com/repos/owncloud/ocis/releases/latest \
+      | python3 -c "import sys,json; print(json.load(sys.stdin)['tag_name'].lstrip('v'))")
+  fi
 fi
 
 CLONE_DIR="/tmp/ocis-src-wrapper"

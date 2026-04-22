@@ -164,3 +164,15 @@ runs:
         ' || (echo "=== oCIS failed to start ===" && \
                cat /tmp/ocis-server.log 2>/dev/null | tail -50 && exit 1)
         echo "ocis ready."
+
+    # -------------------------------------------------------------------------
+    # 7. Stop oCIS (always runs — cleans up PID and log on both success and failure)
+    # -------------------------------------------------------------------------
+    - name: Stop oCIS
+      if: always()
+      shell: bash
+      run: |
+        if [[ -f /tmp/ocis-wrapper.pid ]]; then
+          kill "$(cat /tmp/ocis-wrapper.pid)" 2>/dev/null || true
+          rm -f /tmp/ocis-wrapper.pid /tmp/ocis-server.log
+        fi
