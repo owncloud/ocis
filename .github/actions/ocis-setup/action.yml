@@ -125,7 +125,62 @@ runs:
         echo "tika ready."
 
     # -------------------------------------------------------------------------
-    # 4. Init oCIS + copy config files
+    # 4. Install test-runner dependencies (must happen before oCIS starts —
+    #    apt-get pulls in libcurl4-openssl-dev which replaces the system libcurl
+    #    and would kill the running oCIS process if installed afterwards)
+    # -------------------------------------------------------------------------
+    - name: Install libcurl 8.12.0 build dependencies
+      shell: bash
+      run: |
+        sudo apt-get update -qq
+        sudo NEEDRESTART_MODE=a apt-get install -y \
+          libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
+
+    - name: Cache libcurl 8.12.0
+      id: cache-libcurl
+      uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+      with:
+        path: /opt/libcurl
+        key: libcurl-8.12.0-${{ runner.os }}
+
+    - name: Compile libcurl 8.12.0 from source
+      if: steps.cache-libcurl.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        cd /tmp
+        curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
+        tar xzf curl-8.12.0.tar.gz
+        cd curl-8.12.0
+        ./configure --with-ssl --with-zlib --with-nghttp2 --prefix=/opt/libcurl \
+          --enable-versioned-symbols --silent
+        make -j$(nproc) --silent
+        sudo make install --silent
+
+    - name: Restore libcurl ldconfig
+      shell: bash
+      run: |
+        echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
+        sudo ldconfig
+        /opt/libcurl/bin/curl --version | head -1
+        php -r '
+          $v = curl_version()["version"];
+          echo "PHP curl: $v\n";
+          if (version_compare($v, "8.12.0", "<")) {
+            fwrite(STDERR, "FATAL: PHP sees libcurl $v, need >= 8.12.0\n");
+            exit(1);
+          }
+        '
+
+    - name: Install Composer dependencies
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: |
+        COMPOSER_NO_INTERACTION=1 COMPOSER_NO_AUDIT=1 composer install --no-progress
+        COMPOSER_NO_INTERACTION=1 COMPOSER_NO_AUDIT=1 \
+          composer bin behat install --no-progress
+
+    # -------------------------------------------------------------------------
+    # 6. Init oCIS + copy config files
     # -------------------------------------------------------------------------
     - name: Init oCIS
       shell: bash
@@ -134,7 +189,7 @@ runs:
       run: ${{ github.action_path }}/scripts/init-ocis.sh
 
     # -------------------------------------------------------------------------
-    # 5. Start oCIS via ociswrapper
+    # 7. Start oCIS via ociswrapper
     # -------------------------------------------------------------------------
     - name: Start oCIS
       shell: bash
@@ -150,7 +205,7 @@ runs:
       run: ${{ github.action_path }}/scripts/start-ocis.sh
 
     # -------------------------------------------------------------------------
-    # 6. Wait for oCIS to be healthy
+    # 8. Wait for oCIS to be healthy
     # -------------------------------------------------------------------------
     - name: Wait for oCIS
       shell: bash
@@ -166,7 +221,7 @@ runs:
         echo "ocis ready."
 
     # -------------------------------------------------------------------------
-    # 7. Stop oCIS (always runs — cleans up PID and log on both success and failure)
+    # 9. Stop oCIS (always runs — cleans up PID and log on both success and failure)
     # -------------------------------------------------------------------------
     - name: Stop oCIS
       if: always()

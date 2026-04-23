@@ -2,6 +2,8 @@ name: Acceptance Tests
 
 on:
   pull_request:
+    paths-ignore:
+      - .github/actions/**
   workflow_dispatch:
 
 jobs:
