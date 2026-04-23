@@ -212,6 +212,16 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (*Co
 		return NewResponse(400), nil
 	}
 
+	// For read-only and view-only modes, the user has no write access.
+	// OnlyOffice sends a Lock request even for view-only documents, but
+	// attempting SetLock with a read-only token would fail at the CS3 layer.
+	// Return 200 OK immediately without acquiring a lock.
+	if wopiContext.ViewMode == appproviderv1beta1.ViewMode_VIEW_MODE_READ_ONLY ||
+		wopiContext.ViewMode == appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY {
+		logger.Debug().Msg("Lock: view-only mode, skipping lock")
+		return NewResponseWithVersion(nil), nil
+	}
+
 	var setOrRefreshStatus *rpcv1beta1.Status
 	if oldLockID == "" {
 		// If the oldLockID is empty, this is a "LOCK" request
