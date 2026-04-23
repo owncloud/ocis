@@ -1,0 +1,44 @@
+name: ocis-test
+description: Run oCIS Behat acceptance tests against a running oCIS instance
+
+inputs:
+  suite:
+    description: Behat suite(s) to run, comma-separated (e.g. apiGraph or apiAntivirus,apiSettings)
+    required: true
+  ocis-url:
+    description: oCIS instance URL
+    required: false
+    default: https://localhost:9200
+  expected-failures-file:
+    description: Path to expected failures markdown (relative to repo root)
+    required: false
+    default: ""
+  acceptance-test-type:
+    description: Test type passed as ACCEPTANCE_TEST_TYPE (api or core-api)
+    required: false
+    default: api
+  with-remote-php:
+    description: Include remote.php expected failures (WITH_REMOTE_PHP)
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Run ${{ inputs.suite }}
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      env:
+        BEHAT_SUITES: ${{ inputs.suite }}
+        TEST_SERVER_URL: ${{ inputs.ocis-url }}
+        OCIS_WRAPPER_URL: http://localhost:5200
+        ACCEPTANCE_TEST_TYPE: ${{ inputs.acceptance-test-type }}
+        WITH_REMOTE_PHP: ${{ inputs.with-remote-php }}
+        EXPECTED_FAILURES_FILE: ${{ inputs.expected-failures-file }}
+        STORAGE_DRIVER: ocis
+        UPLOAD_DELETE_WAIT_TIME: "0"
+        EMAIL_HOST: localhost
+        EMAIL_PORT: "8025"
+        # Filter tags mirror run-github.py logic
+        BEHAT_FILTER_TAGS: ${{ inputs.acceptance-test-type == 'core-api' && '~@skipOnGraph&&~@skipOnOcis-OCIS-Storage' || '~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage' }}
+      run: make test-acceptance-api
