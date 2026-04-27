@@ -352,9 +352,14 @@ func (s *service) RemovePublicShare(ctx context.Context, req *link.RemovePublicS
 	user := ctxpkg.ContextMustGetUser(ctx)
 	ps, err := s.sm.GetPublicShare(ctx, user, req.GetRef(), false)
 	if err != nil {
-		return &link.RemovePublicShareResponse{
-			Status: status.NewInternal(ctx, "error loading public share"),
-		}, err
+		var st *rpc.Status
+		switch err.(type) {
+		case errtypes.IsNotFound:
+			st = status.NewNotFound(ctx, err.Error())
+		default:
+			st = status.NewInternal(ctx, "error loading public share")
+		}
+		return &link.RemovePublicShareResponse{Status: st}, nil
 	}
 
 	sRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: ps.ResourceId}})
