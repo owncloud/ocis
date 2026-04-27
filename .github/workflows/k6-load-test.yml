@@ -45,4 +45,4 @@ jobs:
 
       - name: Show Grafana dashboard link
         if: always()
-        run: echo 'Grafana Dashboard: https://grafana.k6.infra.owncloud.works'
+        run: echo "Grafana Dashboard: https://grafana.k6.infra.owncloud.works"
