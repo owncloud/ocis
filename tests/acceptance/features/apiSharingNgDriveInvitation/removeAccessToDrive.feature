@@ -247,6 +247,7 @@ Feature: Remove access to a drive
     Then the HTTP status code should be "204"
     And user "Alice" should not have any "link" permissions on space "projectSpace"
 
+
   Scenario: user tries to remove an already-deleted link share from project space using root endpoint
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
@@ -258,7 +259,6 @@ Feature: Remove access to a drive
     And the HTTP status code should be "204"
     When user "Alice" removes the link from space "NewSpace" using root endpoint of the Graph API
     Then the HTTP status code should be "404"
-
 
   @env-config
   Scenario: remove space share after the share role Space Editor Without Versions has been disabled

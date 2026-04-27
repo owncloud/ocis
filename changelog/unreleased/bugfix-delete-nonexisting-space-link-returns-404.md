@@ -7,4 +7,4 @@ reva `RemovePublicShare` and `RemoveShare` handlers now propagate
 not-found errors as `CODE_NOT_FOUND` rather than `CODE_INTERNAL`,
 ensuring the correct `404` HTTP response is returned.
 
-https://github.com/owncloud/ocis/issues/TODO
+https://github.com/owncloud/ocis/issues/12266
