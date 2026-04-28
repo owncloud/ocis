@@ -12,7 +12,7 @@ fi
 # start ocis server
 sshpass -p "$SSH_OCIS_PASSWORD" ssh $SSH_OPTS "$SSH_OCIS_USERNAME@$SSH_OCIS_REMOTE" \
     "OCIS_URL=${TEST_SERVER_URL} \
-    OCIS_COMMIT_ID=${DRONE_COMMIT} \
+    OCIS_COMMIT_ID=${OCIS_COMMIT_SHA} \
     bash ~/scripts/ocis.sh start"
 
 # wait for ocis to be ready (via SSH since TEST_SERVER_URL is on a private network)

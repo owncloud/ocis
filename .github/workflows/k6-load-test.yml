@@ -29,7 +29,7 @@ jobs:
       SSH_K6_REMOTE: ${{ secrets.SSH_K6_REMOTE }}
       SSH_K6_USERNAME: ${{ secrets.SSH_K6_USERNAME }}
       SSH_K6_PASSWORD: ${{ secrets.SSH_K6_PASSWORD }}
-      DRONE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+      OCIS_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
