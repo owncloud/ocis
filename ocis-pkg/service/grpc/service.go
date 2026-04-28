@@ -21,7 +21,7 @@ import (
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
-	ocismetadata "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc/handler/metadata"
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 )
 
 // Service simply wraps the go-micro grpc service.
@@ -65,7 +65,8 @@ func NewServiceWithClient(client client.Client, opts ...Option) (Service, error)
 		mtracer.NewHandlerWrapper(
 			mtracer.WithTraceProvider(sopts.TraceProvider),
 		),
-		ocismetadata.NewHandlerWrapper(),
+		//ocismetadata.NewHandlerWrapper(),
+		autoprop.NewGoMicroServerHandlerWrapper(),
 	}
 	if sopts.Logger.GetLevel() == zerolog.DebugLevel {
 		handlerWrappers = append(handlerWrappers, LogHandler(&sopts.Logger))
@@ -85,13 +86,17 @@ func NewServiceWithClient(client client.Client, opts ...Option) (Service, error)
 		micro.RegisterTTL(registry.GetRegisterTTL()),
 		micro.RegisterInterval(registry.GetRegisterInterval()),
 		micro.WrapHandler(prometheus.NewHandlerWrapper()),
-		micro.WrapClient(mtracer.NewClientWrapper(
-			mtracer.WithTraceProvider(sopts.TraceProvider),
-		)),
+		micro.WrapClient(
+			mtracer.NewClientWrapper(
+				mtracer.WithTraceProvider(sopts.TraceProvider),
+			),
+			autoprop.NewGoMicroClientWrapper(),
+		),
 		micro.WrapHandler(handlerWrappers...),
 		micro.WrapSubscriber(
 			mtracer.NewSubscriberWrapper(mtracer.WithTraceProvider(sopts.TraceProvider)),
-			ocismetadata.NewSubscriberWrapper(),
+			//ocismetadata.NewSubscriberWrapper(),
+			autoprop.NewGoMicroServerSubscriberWrapper(),
 		),
 	}
 

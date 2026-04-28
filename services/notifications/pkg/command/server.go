@@ -136,7 +136,7 @@ func Server(cfg *config.Config) *cli.Command {
 				store.Authentication(cfg.Store.AuthUsername, cfg.Store.AuthPassword),
 			)
 
-			svc := service.NewEventsNotifier(evts, channel, logger, gatewaySelector, valueService,
+			svc := service.NewEventsNotifier(traceProvider, evts, channel, logger, gatewaySelector, valueService,
 				cfg.ServiceAccount.ServiceAccountID, cfg.ServiceAccount.ServiceAccountSecret,
 				cfg.Notifications.EmailTemplatePath, cfg.Notifications.DefaultLanguage, cfg.WebUIURL,
 				cfg.Notifications.TranslationPath, cfg.Notifications.SMTP.Sender, notificationStore, historyClient, registeredEvents)

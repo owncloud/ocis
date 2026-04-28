@@ -17,6 +17,7 @@ import (
 	"github.com/jellydator/ttlcache/v3"
 	microstore "go-micro.dev/v4/store"
 
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/store"
@@ -564,14 +565,19 @@ func (g *Graph) StartListenForLogonEvents(ctx context.Context, l log.Logger) err
 		for loop := true; loop; {
 			select {
 			case e := <-evChannel:
+				ctx2, span := events.TraceEventConsumer(ctx, g.traceProvider, e)
+				ctx2 = autoprop.SetMetaToContext(ctx2, e.ExtraInfo)
+
 				switch ev := e.Event.(type) {
 				default:
 					l.Error().Interface("event", e).Msg("unhandled event")
 				case events.UserSignedIn:
-					if err := g.identityBackend.UpdateLastSignInDate(ctx, ev.Executant.OpaqueId, utils.TSToTime(ev.Timestamp)); err != nil {
+					if err := g.identityBackend.UpdateLastSignInDate(ctx2, ev.Executant.OpaqueId, utils.TSToTime(ev.Timestamp)); err != nil {
 						l.Error().Err(err).Str("userid", ev.Executant.OpaqueId).Msg("Error updating last sign in date")
 					}
 				}
+
+				span.End()
 			case <-ctx.Done():
 				l.Info().Msg("context cancelled")
 				loop = false

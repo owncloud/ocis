@@ -13,6 +13,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	"github.com/owncloud/reva/v2/pkg/bytesize"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/events"
@@ -178,9 +179,11 @@ func (av Antivirus) Close() {
 }
 
 func (av Antivirus) processEvent(e events.Event, s events.Publisher) error {
-	ctx := e.GetTraceContext(context.Background())
-	ctx, span := av.tp.Tracer("antivirus").Start(ctx, "processEvent")
+	evCtx := context.Background()
+	ctx, span := events.TraceEventConsumer(evCtx, av.tp, e)
+	ctx = autoprop.SetMetaToContext(ctx, e.ExtraInfo)
 	defer span.End()
+
 	av.l.Info().Str("traceID", span.SpanContext().TraceID().String()).Msg("TraceID")
 	ev := e.Event.(events.StartPostprocessingStep)
 	if ev.StepToStart != events.PPStepAntivirus {

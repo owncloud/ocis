@@ -70,14 +70,14 @@ func logDocCount(engine engine.Engine, logger log.Logger) {
 	logger.Debug().Interface("count", c).Msg("new document count")
 }
 
-func getAuthContext(serviceAccountID string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], secret string, logger log.Logger) (context.Context, error) {
+func getAuthContext(ctx context.Context, serviceAccountID string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], secret string, logger log.Logger) (context.Context, error) {
 	gatewayClient, err := gatewaySelector.Next()
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get reva gatewayClient")
 		return nil, err
 	}
 
-	return utils.GetServiceUserContext(serviceAccountID, gatewayClient, secret)
+	return utils.GetServiceUserContextWithContext(ctx, gatewayClient, serviceAccountID, secret)
 }
 
 func statResource(ctx context.Context, ref *provider.Reference, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], logger log.Logger) (*provider.StatResponse, error) {
