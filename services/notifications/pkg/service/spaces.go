@@ -12,12 +12,12 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func (s eventsNotifier) handleSpaceShared(e events.SpaceShared, eventId string) {
+func (s eventsNotifier) handleSpaceShared(baseCtx context.Context, e events.SpaceShared, eventId string) {
 	logger := s.logger.With().
 		Str("event", "SpaceShared").
 		Str("itemid", e.ID.OpaqueId).
 		Logger()
-	executant, spaceName, shareLink, ctx, err := s.prepareSpaceShared(logger, e)
+	executant, spaceName, shareLink, ctx, err := s.prepareSpaceShared(baseCtx, logger, e)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not prepare vars for email")
 		return
@@ -48,14 +48,14 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared, eventId string) 
 	s.send(ctx, emails)
 }
 
-func (s eventsNotifier) prepareSpaceShared(logger zerolog.Logger, e events.SpaceShared) (executant *user.User, spaceName, shareLink string, ctx context.Context, err error) {
+func (s eventsNotifier) prepareSpaceShared(baseCtx context.Context, logger zerolog.Logger, e events.SpaceShared) (executant *user.User, spaceName, shareLink string, ctx context.Context, err error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		logger.Error().Err(err).Msg("could not select next gateway client")
 		return executant, spaceName, shareLink, ctx, err
 	}
 
-	ctx, err = utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
+	ctx, err = utils.GetServiceUserContextWithContext(baseCtx, gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get service user context")
 		return executant, spaceName, shareLink, ctx, err
@@ -96,13 +96,13 @@ func (s eventsNotifier) prepareSpaceShared(logger zerolog.Logger, e events.Space
 	return executant, spaceName, shareLink, ctx, err
 }
 
-func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared, eventId string) {
+func (s eventsNotifier) handleSpaceUnshared(baseCtx context.Context, e events.SpaceUnshared, eventId string) {
 	logger := s.logger.With().
 		Str("event", "SpaceUnshared").
 		Str("itemid", e.ID.OpaqueId).
 		Logger()
 
-	executant, spaceName, shareLink, ctx, err := s.prepareSpaceUnshared(logger, e)
+	executant, spaceName, shareLink, ctx, err := s.prepareSpaceUnshared(baseCtx, logger, e)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not prepare vars for email")
 		return
@@ -133,14 +133,14 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared, eventId stri
 	s.send(ctx, emails)
 }
 
-func (s eventsNotifier) prepareSpaceUnshared(logger zerolog.Logger, e events.SpaceUnshared) (executant *user.User, spaceName, shareLink string, ctx context.Context, err error) {
+func (s eventsNotifier) prepareSpaceUnshared(baseCtx context.Context, logger zerolog.Logger, e events.SpaceUnshared) (executant *user.User, spaceName, shareLink string, ctx context.Context, err error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		logger.Error().Err(err).Msg("could not select next gateway client")
 		return executant, spaceName, shareLink, ctx, err
 	}
 
-	ctx, err = utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
+	ctx, err = utils.GetServiceUserContextWithContext(baseCtx, gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get service user context")
 		return executant, spaceName, shareLink, ctx, err
@@ -181,7 +181,7 @@ func (s eventsNotifier) prepareSpaceUnshared(logger zerolog.Logger, e events.Spa
 	return executant, spaceName, shareLink, ctx, err
 }
 
-func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExpired, eventId string) {
+func (s eventsNotifier) handleSpaceMembershipExpired(baseCtx context.Context, e events.SpaceMembershipExpired, eventId string) {
 	logger := s.logger.With().
 		Str("event", "SpaceMembershipExpired").
 		Str("itemid", e.SpaceID.GetOpaqueId()).
@@ -193,7 +193,7 @@ func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExp
 		return
 	}
 
-	ctx, err := utils.GetServiceUserContext(s.serviceAccountID, gatewayClient, s.serviceAccountSecret)
+	ctx, err := utils.GetServiceUserContextWithContext(baseCtx, gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
 	if err != nil {
 		logger.Error().Err(err).Msg("Could not impersonate sharer")
 		return

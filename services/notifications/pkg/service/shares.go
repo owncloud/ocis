@@ -12,13 +12,13 @@ import (
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
-func (s eventsNotifier) handleShareCreated(e events.ShareCreated, eventId string) {
+func (s eventsNotifier) handleShareCreated(baseCtx context.Context, e events.ShareCreated, eventId string) {
 	logger := s.logger.With().
 		Str("event", "ShareCreated").
 		Str("itemid", e.ItemID.OpaqueId).
 		Logger()
 
-	owner, shareFolder, shareLink, ctx, err := s.prepareShareCreated(logger, e)
+	owner, shareFolder, shareLink, ctx, err := s.prepareShareCreated(baseCtx, logger, e)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not prepare vars for email")
 		return
@@ -49,14 +49,14 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated, eventId string
 	s.send(ctx, emails)
 }
 
-func (s eventsNotifier) prepareShareCreated(logger zerolog.Logger, e events.ShareCreated) (owner *user.User, shareFolder, shareLink string, ctx context.Context, err error) {
+func (s eventsNotifier) prepareShareCreated(baseCtx context.Context, logger zerolog.Logger, e events.ShareCreated) (owner *user.User, shareFolder, shareLink string, ctx context.Context, err error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		logger.Error().Err(err).Msg("could not select next gateway client")
 		return owner, shareFolder, shareLink, ctx, err
 	}
 
-	ctx, err = utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
+	ctx, err = utils.GetServiceUserContextWithContext(baseCtx, gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get service user context")
 		return owner, shareFolder, shareLink, ctx, err
@@ -90,7 +90,7 @@ func (s eventsNotifier) prepareShareCreated(logger zerolog.Logger, e events.Shar
 	return owner, shareFolder, shareLink, ctx, err
 }
 
-func (s eventsNotifier) handleShareExpired(e events.ShareExpired, eventId string) {
+func (s eventsNotifier) handleShareExpired(baseCtx context.Context, e events.ShareExpired, eventId string) {
 	logger := s.logger.With().
 		Str("event", "ShareExpired").
 		Str("itemid", e.ItemID.GetOpaqueId()).
@@ -102,7 +102,7 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired, eventId string
 		return
 	}
 
-	shareFolder, ctx, err := s.prepareShareExpired(logger, e)
+	shareFolder, ctx, err := s.prepareShareExpired(baseCtx, logger, e)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not prepare vars for email")
 		return
@@ -137,14 +137,14 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired, eventId string
 	s.send(ctx, emails)
 }
 
-func (s eventsNotifier) prepareShareExpired(logger zerolog.Logger, e events.ShareExpired) (shareFolder string, ctx context.Context, err error) {
+func (s eventsNotifier) prepareShareExpired(baseCtx context.Context, logger zerolog.Logger, e events.ShareExpired) (shareFolder string, ctx context.Context, err error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		logger.Error().Err(err).Msg("could not select next gateway client")
 		return shareFolder, ctx, err
 	}
 
-	ctx, err = utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
+	ctx, err = utils.GetServiceUserContextWithContext(baseCtx, gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get service user context")
 		return shareFolder, ctx, err
@@ -162,13 +162,13 @@ func (s eventsNotifier) prepareShareExpired(logger zerolog.Logger, e events.Shar
 	return shareFolder, ctx, err
 }
 
-func (s eventsNotifier) handleShareRemoved(e events.ShareRemoved, eventId string) {
+func (s eventsNotifier) handleShareRemoved(baseCtx context.Context, e events.ShareRemoved, eventId string) {
 	logger := s.logger.With().
 		Str("event", "ShareRemoved").
 		Str("itemid", e.ItemID.OpaqueId).
 		Logger()
 
-	executant, shareFolder, ctx, err := s.prepareShareRemoved(logger, e)
+	executant, shareFolder, ctx, err := s.prepareShareRemoved(baseCtx, logger, e)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not prepare vars for email")
 		return
@@ -199,14 +199,14 @@ func (s eventsNotifier) handleShareRemoved(e events.ShareRemoved, eventId string
 	s.send(ctx, emails)
 }
 
-func (s eventsNotifier) prepareShareRemoved(logger zerolog.Logger, e events.ShareRemoved) (executant *user.User, shareFolder string, ctx context.Context, err error) {
+func (s eventsNotifier) prepareShareRemoved(baseCtx context.Context, logger zerolog.Logger, e events.ShareRemoved) (executant *user.User, shareFolder string, ctx context.Context, err error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		logger.Error().Err(err).Msg("could not select next gateway client")
 		return executant, shareFolder, ctx, err
 	}
 
-	ctx, err = utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
+	ctx, err = utils.GetServiceUserContextWithContext(baseCtx, gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get service user context")
 		return executant, shareFolder, ctx, err
