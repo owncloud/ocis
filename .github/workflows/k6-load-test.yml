@@ -1,0 +1,49 @@
+name: k6 Load Test
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  k6-load-test:
+    name: k6-load-test
+    runs-on: ubuntu-latest
+    container:
+      image: owncloudci/alpine:latest
+    if: >-
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' &&
+       contains(github.event.pull_request.title || '', 'k6-test'))
+    env:
+      SSH_OCIS_REMOTE: ${{ secrets.SSH_OCIS_REMOTE }}
+      SSH_OCIS_USERNAME: ${{ secrets.SSH_OCIS_USERNAME }}
+      SSH_OCIS_PASSWORD: ${{ secrets.SSH_OCIS_PASSWORD }}
+      TEST_SERVER_URL: ${{ secrets.TEST_SERVER_URL }}
+      SSH_K6_REMOTE: ${{ secrets.SSH_K6_REMOTE }}
+      SSH_K6_USERNAME: ${{ secrets.SSH_K6_USERNAME }}
+      SSH_K6_PASSWORD: ${{ secrets.SSH_K6_PASSWORD }}
+      OCIS_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Install SSH dependencies
+        run: apk add --no-cache openssh-client sshpass
+
+      - name: Run k6 load tests
+        run: sh tests/config/drone/run_k6_tests.sh
+
+      - name: Retrieve OCIS logs
+        if: always()
+        run: sh tests/config/drone/run_k6_tests.sh --ocis-log
+
+      - name: Show Grafana dashboard link
+        if: always()
+        run: |
+          echo "Grafana Dashboard: https://grafana.k6.infra.owncloud.works"
