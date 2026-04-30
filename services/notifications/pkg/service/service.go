@@ -20,6 +20,8 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/go-playground/validator/v10"
 	"go-micro.dev/v4/metadata"
+	"go.opentelemetry.io/otel/trace"
+	grpcmeta "google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
@@ -48,6 +50,7 @@ type Service interface {
 
 // NewEventsNotifier provides a new eventsNotifier
 func NewEventsNotifier(
+	traceProvider trace.TracerProvider,
 	events <-chan events.Event,
 	channel channels.Channel,
 	logger log.Logger,
@@ -59,6 +62,7 @@ func NewEventsNotifier(
 	registeredEvents map[string]events.Unmarshaller) Service {
 
 	return eventsNotifier{
+		traceProvider:        traceProvider,
 		logger:               logger,
 		channel:              channel,
 		events:               events,
@@ -81,6 +85,7 @@ func NewEventsNotifier(
 }
 
 type eventsNotifier struct {
+	traceProvider        trace.TracerProvider
 	logger               log.Logger
 	channel              channels.Channel
 	events               <-chan events.Event
@@ -118,23 +123,28 @@ EventLoop:
 			go func() {
 				defer wg.Done()
 
+				evCtx := context.Background()
+				ctx, span := events.TraceEventConsumer(evCtx, s.traceProvider, evt)
+				ctx = grpcmeta.NewOutgoingContext(ctx, evt.ExtraInfo)
+				defer span.End()
+
 				switch e := evt.Event.(type) {
 				case events.SpaceShared:
-					s.handleSpaceShared(e, evt.ID)
+					s.handleSpaceShared(ctx, e, evt.ID)
 				case events.SpaceUnshared:
-					s.handleSpaceUnshared(e, evt.ID)
+					s.handleSpaceUnshared(ctx, e, evt.ID)
 				case events.SpaceMembershipExpired:
-					s.handleSpaceMembershipExpired(e, evt.ID)
+					s.handleSpaceMembershipExpired(ctx, e, evt.ID)
 				case events.ShareCreated:
-					s.handleShareCreated(e, evt.ID)
+					s.handleShareCreated(ctx, e, evt.ID)
 				case events.ShareExpired:
-					s.handleShareExpired(e, evt.ID)
+					s.handleShareExpired(ctx, e, evt.ID)
 				case events.ShareRemoved:
-					s.handleShareRemoved(e, evt.ID)
+					s.handleShareRemoved(ctx, e, evt.ID)
 				case events.ScienceMeshInviteTokenGenerated:
-					s.handleScienceMeshInviteTokenGenerated(e)
+					s.handleScienceMeshInviteTokenGenerated(ctx, e)
 				case events.SendEmailsEvent:
-					s.sendGroupedEmailsJob(e, evt.ID)
+					s.sendGroupedEmailsJob(ctx, e, evt.ID)
 				}
 			}()
 

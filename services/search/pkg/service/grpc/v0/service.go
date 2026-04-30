@@ -171,9 +171,9 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 }
 
 // IndexSpace (re)indexes all resources of a given space.
-func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, _ *searchsvc.IndexSpaceResponse) error {
+func (s Service) IndexSpace(ctx context.Context, in *searchsvc.IndexSpaceRequest, _ *searchsvc.IndexSpaceResponse) error {
 	if in.GetSpaceId() != "" {
-		return s.searcher.IndexSpace(&provider.StorageSpaceId{OpaqueId: in.GetSpaceId()})
+		return s.searcher.IndexSpace(ctx, &provider.StorageSpaceId{OpaqueId: in.GetSpaceId()})
 	}
 
 	// index all spaces instead
@@ -182,12 +182,12 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 		return err
 	}
 
-	ctx, err := utils.GetServiceUserContext(s.cfg.ServiceAccount.ServiceAccountID, gwc, s.cfg.ServiceAccount.ServiceAccountSecret)
+	ownerCtx, err := utils.GetServiceUserContextWithContext(ctx, gwc, s.cfg.ServiceAccount.ServiceAccountID, s.cfg.ServiceAccount.ServiceAccountSecret)
 	if err != nil {
 		return err
 	}
 
-	resp, err := gwc.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{})
+	resp, err := gwc.ListStorageSpaces(ownerCtx, &provider.ListStorageSpacesRequest{})
 	if err != nil {
 		return err
 	}
@@ -197,7 +197,7 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 	}
 
 	for _, space := range resp.GetStorageSpaces() {
-		if err := s.searcher.IndexSpace(space.GetId()); err != nil {
+		if err := s.searcher.IndexSpace(ownerCtx, space.GetId()); err != nil {
 			return err
 		}
 	}

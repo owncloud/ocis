@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -17,8 +18,10 @@ import (
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	microstore "go-micro.dev/v4/store"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/config"
@@ -98,78 +101,88 @@ func New(opts ...Option) (*ActivitylogService, error) {
 func (a *ActivitylogService) Run() {
 	for e := range a.events {
 		var err error
+
+		// trace provider is available here, otherwise the activitylog service should have crashed
+		tp, _ := tracing.GetServiceTraceProvider(a.cfg.Tracing, a.cfg.Service.Name)
+		evCtx := context.Background()
+		ctx, span := events.TraceEventConsumer(evCtx, tp, e)
+		ctx = metadata.NewOutgoingContext(ctx, e.ExtraInfo)
+		// span is closed at the end of the loop
+
 		switch ev := e.Event.(type) {
 		case events.UploadReady:
-			err = a.AddActivity(ev.FileRef, e.ID, utils.TSToTime(ev.Timestamp))
+			err = a.AddActivity(ctx, ev.FileRef, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.FileTouched:
-			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
+			err = a.AddActivity(ctx, ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
 		// Disabled https://github.com/owncloud/ocis/issues/10293
 		//case events.FileDownloaded:
 		// we are only interested in public link downloads - so no need to store others.
 		//if ev.ImpersonatingUser.GetDisplayName() == "Public" {
-		//	err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
+		//	err = a.AddActivity(ctx, ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
 		//}
 		case events.ContainerCreated:
-			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
+			err = a.AddActivity(ctx, ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.ItemTrashed:
-			err = a.AddActivityTrashed(ev.ID, ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
+			err = a.AddActivityTrashed(ctx, ev.ID, ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.ItemPurged:
-			err = a.RemoveResource(ev.ID)
+			err = a.RemoveResource(ev.ID) // no ctx needed at the moment
 		case events.ItemMoved:
-			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
+			err = a.AddActivity(ctx, ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.ShareCreated:
-			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.CTime))
+			err = a.AddActivity(ctx, toRef(ev.ItemID), e.ID, utils.TSToTime(ev.CTime))
 		case events.ShareUpdated:
 			if ev.Sharer != nil && ev.ItemID != nil && ev.Sharer.GetOpaqueId() != ev.ItemID.GetSpaceId() {
-				err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.MTime))
+				err = a.AddActivity(ctx, toRef(ev.ItemID), e.ID, utils.TSToTime(ev.MTime))
 			}
 		case events.ShareRemoved:
-			err = a.AddActivity(toRef(ev.ItemID), e.ID, ev.Timestamp)
+			err = a.AddActivity(ctx, toRef(ev.ItemID), e.ID, ev.Timestamp)
 		case events.LinkCreated:
-			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.CTime))
+			err = a.AddActivity(ctx, toRef(ev.ItemID), e.ID, utils.TSToTime(ev.CTime))
 		case events.LinkUpdated:
 			if ev.Sharer != nil && ev.ItemID != nil && ev.Sharer.GetOpaqueId() != ev.ItemID.GetSpaceId() {
-				err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.MTime))
+				err = a.AddActivity(ctx, toRef(ev.ItemID), e.ID, utils.TSToTime(ev.MTime))
 			}
 		case events.LinkRemoved:
-			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.Timestamp))
+			err = a.AddActivity(ctx, toRef(ev.ItemID), e.ID, utils.TSToTime(ev.Timestamp))
 		case events.SpaceShared:
-			err = a.AddSpaceActivity(ev.ID, e.ID, ev.Timestamp)
+			err = a.AddSpaceActivity(ev.ID, e.ID, ev.Timestamp) // no ctx needed at the moment
 		case events.SpaceUnshared:
-			err = a.AddSpaceActivity(ev.ID, e.ID, ev.Timestamp)
+			err = a.AddSpaceActivity(ev.ID, e.ID, ev.Timestamp) // no ctx needed at the moment
 		}
 
 		if err != nil {
 			a.log.Error().Err(err).Interface("event", e).Msg("could not process event")
 		}
+
+		span.End()
 	}
 }
 
 // AddActivity adds the activity to the given resource and all its parents
-func (a *ActivitylogService) AddActivity(initRef *provider.Reference, eventID string, timestamp time.Time) error {
+func (a *ActivitylogService) AddActivity(ctx context.Context, initRef *provider.Reference, eventID string, timestamp time.Time) error {
 	gwc, err := a.gws.Next()
 	if err != nil {
 		return fmt.Errorf("cant get gateway client: %w", err)
 	}
 
-	ctx, err := utils.GetServiceUserContext(a.cfg.ServiceAccount.ServiceAccountID, gwc, a.cfg.ServiceAccount.ServiceAccountSecret)
+	ctx2, err := utils.GetServiceUserContextWithContext(ctx, gwc, a.cfg.ServiceAccount.ServiceAccountID, a.cfg.ServiceAccount.ServiceAccountSecret)
 	if err != nil {
 		return fmt.Errorf("cant get service user context: %w", err)
 	}
 
 	return a.addActivity(initRef, eventID, timestamp, func(ref *provider.Reference) (*provider.ResourceInfo, error) {
-		return utils.GetResource(ctx, ref, gwc)
+		return utils.GetResource(ctx2, ref, gwc)
 	})
 }
 
 // AddActivityTrashed adds the activity to given trashed resource and all its former parents
-func (a *ActivitylogService) AddActivityTrashed(resourceID *provider.ResourceId, reference *provider.Reference, eventID string, timestamp time.Time) error {
+func (a *ActivitylogService) AddActivityTrashed(ctx context.Context, resourceID *provider.ResourceId, reference *provider.Reference, eventID string, timestamp time.Time) error {
 	gwc, err := a.gws.Next()
 	if err != nil {
 		return fmt.Errorf("cant get gateway client: %w", err)
 	}
 
-	ctx, err := utils.GetServiceUserContext(a.cfg.ServiceAccount.ServiceAccountID, gwc, a.cfg.ServiceAccount.ServiceAccountSecret)
+	ctx2, err := utils.GetServiceUserContextWithContext(ctx, gwc, a.cfg.ServiceAccount.ServiceAccountID, a.cfg.ServiceAccount.ServiceAccountSecret)
 	if err != nil {
 		return fmt.Errorf("cant get service user context: %w", err)
 	}
@@ -186,7 +199,7 @@ func (a *ActivitylogService) AddActivityTrashed(resourceID *provider.ResourceId,
 	}
 
 	return a.addActivity(ref, eventID, timestamp, func(ref *provider.Reference) (*provider.ResourceInfo, error) {
-		return utils.GetResource(ctx, ref, gwc)
+		return utils.GetResource(ctx2, ref, gwc)
 	})
 }
 

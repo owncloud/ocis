@@ -19,6 +19,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/events/stream"
 	"github.com/owncloud/reva/v2/pkg/rhttp"
 	"go.opentelemetry.io/otel/trace"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -178,9 +179,11 @@ func (av Antivirus) Close() {
 }
 
 func (av Antivirus) processEvent(e events.Event, s events.Publisher) error {
-	ctx := e.GetTraceContext(context.Background())
-	ctx, span := av.tp.Tracer("antivirus").Start(ctx, "processEvent")
+	evCtx := context.Background()
+	ctx, span := events.TraceEventConsumer(evCtx, av.tp, e)
+	ctx = metadata.NewOutgoingContext(ctx, e.ExtraInfo)
 	defer span.End()
+
 	av.l.Info().Str("traceID", span.SpanContext().TraceID().String()).Msg("TraceID")
 	ev := e.Event.(events.StartPostprocessingStep)
 	if ev.StepToStart != events.PPStepAntivirus {

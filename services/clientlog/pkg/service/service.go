@@ -15,6 +15,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"go.opentelemetry.io/otel/trace"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
@@ -104,13 +105,18 @@ func (cl *ClientlogService) Close() {
 }
 
 func (cl *ClientlogService) processEvent(event events.Event) {
+	baseCtx := context.Background()
+	evCtx, span := events.TraceEventConsumer(baseCtx, cl.tp, event)
+	evCtx = metadata.NewOutgoingContext(evCtx, event.ExtraInfo)
+	defer span.End()
+
 	gwc, err := cl.gatewaySelector.Next()
 	if err != nil {
 		cl.log.Error().Err(err).Interface("event", event).Msg("error getting gateway client")
 		return
 	}
 
-	ctx, err := utils.GetServiceUserContextWithContext(context.Background(), gwc, cl.cfg.ServiceAccount.ServiceAccountID, cl.cfg.ServiceAccount.ServiceAccountSecret)
+	ctx, err := utils.GetServiceUserContextWithContext(evCtx, gwc, cl.cfg.ServiceAccount.ServiceAccountID, cl.cfg.ServiceAccount.ServiceAccountSecret)
 	if err != nil {
 		cl.log.Error().Err(err).Interface("event", event).Msg("error authenticating service user")
 		return

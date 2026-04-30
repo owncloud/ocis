@@ -16,6 +16,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"github.com/rs/zerolog"
 	"go-micro.dev/v4/metadata"
+	grpcmeta "google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
@@ -92,12 +93,17 @@ func ListenForEvents(ctx context.Context, cfg *config.Config, l log.Logger) erro
 			for {
 				select {
 				case e := <-ch:
+					ctx2, span := events.TraceEventConsumer(ctx, traceProvider, e)
+					ctx2 = grpcmeta.NewOutgoingContext(ctx2, e.ExtraInfo)
+
 					switch ev := e.Event.(type) {
 					default:
 						l.Error().Interface("event", e).Msg("unhandled event")
 					case events.ShareCreated:
-						AutoAcceptShares(ev, cfg.AutoAcceptShares, l, gatewaySelector, valueService, cfg.ServiceAccount, cfg.MaxConcurrency)
+						AutoAcceptShares(ctx2, ev, cfg.AutoAcceptShares, l, gatewaySelector, valueService, cfg.ServiceAccount, cfg.MaxConcurrency)
 					}
+
+					span.End()
 				case <-ctx.Done():
 					l.Info().Msg("context cancelled")
 					return
@@ -112,13 +118,13 @@ func ListenForEvents(ctx context.Context, cfg *config.Config, l log.Logger) erro
 }
 
 // AutoAcceptShares automatically accepts shares if configured by the admin or user
-func AutoAcceptShares(ev events.ShareCreated, autoAcceptDefault bool, l log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], vs settingssvc.ValueService, cfg config.ServiceAccount, maxConcurrency int) {
+func AutoAcceptShares(baseCtx context.Context, ev events.ShareCreated, autoAcceptDefault bool, l log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], vs settingssvc.ValueService, cfg config.ServiceAccount, maxConcurrency int) {
 	gwc, err := gatewaySelector.Next()
 	if err != nil {
 		l.Error().Err(err).Msg("cannot get gateway client")
 		return
 	}
-	ctx, err := utils.GetServiceUserContextWithContext(context.Background(), gwc, cfg.ServiceAccountID, cfg.ServiceAccountSecret)
+	ctx, err := utils.GetServiceUserContextWithContext(baseCtx, gwc, cfg.ServiceAccountID, cfg.ServiceAccountSecret)
 	if err != nil {
 		l.Error().Err(err).Msg("cannot impersonate user")
 		return

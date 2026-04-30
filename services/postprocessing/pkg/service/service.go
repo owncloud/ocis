@@ -17,6 +17,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel/trace"
+	"google.golang.org/grpc/metadata"
 )
 
 // PostprocessingService is an instance of the service handling postprocessing of files
@@ -142,8 +143,9 @@ func (pps *PostprocessingService) processEvent(e events.Event) error {
 		err  error
 	)
 
-	ctx := e.GetTraceContext(pps.ctx)
-	ctx, span := pps.tp.Tracer("postprocessing").Start(ctx, "processEvent")
+	evCtx := context.Background()
+	ctx, span := events.TraceEventConsumer(evCtx, pps.tp, e)
+	ctx = metadata.NewOutgoingContext(ctx, e.ExtraInfo)
 	defer span.End()
 
 	switch ev := e.Event.(type) {

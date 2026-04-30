@@ -16,6 +16,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel/trace"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -117,13 +118,18 @@ func (ul *UserlogService) processEvent(event events.Event) {
 		err       error
 	)
 
+	baseCtx := context.Background()
+	evCtx, span := events.TraceEventConsumer(baseCtx, ul.tp, event)
+	evCtx = metadata.NewOutgoingContext(evCtx, event.ExtraInfo)
+	defer span.End()
+
 	gwc, err := ul.gatewaySelector.Next()
 	if err != nil {
 		ul.log.Error().Err(err).Msg("cannot get gateway client")
 		return
 	}
 
-	ctx, err := utils.GetServiceUserContext(ul.cfg.ServiceAccount.ServiceAccountID, gwc, ul.cfg.ServiceAccount.ServiceAccountSecret)
+	ctx, err := utils.GetServiceUserContextWithContext(evCtx, gwc, ul.cfg.ServiceAccount.ServiceAccountID, ul.cfg.ServiceAccount.ServiceAccountSecret)
 	if err != nil {
 		ul.log.Error().Err(err).Msg("cannot get service account")
 		return
