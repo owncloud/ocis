@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-03-24 00:06+0000\n"
+"POT-Creation-Date: 2026-04-28 03:18+0000\n"
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
 "Last-Translator: 許明凱 <yuteson@gmail.com>, 2026\n"
 "Language-Team: Chinese (Hong Kong) (https://app.transifex.com/owncloud-org/teams/6149/zh_HK/)\n"
@@ -28,62 +28,65 @@ msgstr ""
 #. UnifiedRole EditorLite, Role DisplayName (resolves directly)
 #. FileEditor
 #. UnifiedRole FileEditor, Role DisplayName (resolves directly)
-#. Editor without Versions
-#. UnifiedRole SpaceEditorWithoutVersions, Role DisplayName (resolves
-#. directly)
-#: pkg/unifiedrole/roles.go:138 pkg/unifiedrole/roles.go:172
-#: pkg/unifiedrole/roles.go:206
+#. Editor without Versions without Trashbin
+#. UnifiedRole SpaceEditorWithoutVersionsWithoutTrashbin, Role DisplayName
+#. (resolves directly)
+#: pkg/unifiedrole/roles.go:140 pkg/unifiedrole/roles.go:174
+#: pkg/unifiedrole/roles.go:224
 msgid "Can edit"
 msgstr "可以編輯"
 
 #. FileEditor + ListGrants
 #. UnifiedRole FileEditorListGrants, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:180
+#: pkg/unifiedrole/roles.go:182
 msgid "Can edit and show invitees"
 msgstr "可以編輯以及顯示共享者"
 
 #. Editor
 #. UnifiedRole Editor, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:146
+#. Editor without Versions
+#. UnifiedRole SpaceEditorWithoutVersions, Role DisplayName (resolves
+#. directly)
+#: pkg/unifiedrole/roles.go:148 pkg/unifiedrole/roles.go:208
 msgid "Can edit with trashbin"
 msgstr "可以編輯及使用垃圾桶"
 
 #. Editor + ListGrants
 #. UnifiedRole EditorListGrants, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:154
+#: pkg/unifiedrole/roles.go:156
 msgid "Can edit with trashbin and show invitees"
 msgstr "可以編輯、使用垃圾桶及顯示受邀者"
 
 #. Editor + ListGrants + Version
 #. UnifiedRole EditorListGrantsWithVersions, Role DisplayName (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:162
+#: pkg/unifiedrole/roles.go:164
 msgid "Can edit with trashbin, versions and show invitees"
 msgstr "可以編輯、使用垃圾桶、版本紀錄及顯示受邀者"
 
 #. Editor without Trashbin
 #. UnifiedRole SpaceEditorWithoutTrashbin, Role DisplayName (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:214
+#: pkg/unifiedrole/roles.go:216
 msgid "Can edit with versions"
 msgstr "可以編輯及使用版本紀錄"
 
 #. FileEditor + ListGrants + Versions
 #. UnifiedRole FileEditorListGrantsWithVersions, Role DisplayName (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:188
+#: pkg/unifiedrole/roles.go:190
 msgid "Can edit with versions and show invitees"
 msgstr "可以編輯、使用版本紀錄及顯示受邀者"
 
 #. Editor
 #. UnifiedRole SpaceEditor, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:222
-msgid "Can edit with versions and trashbin"
-msgstr "可以編輯、使用版本紀錄及垃圾桶"
+#: pkg/unifiedrole/roles.go:232
+msgid "Can edit with versions and trash bin"
+msgstr ""
 
 #. Manager
 #. UnifiedRole Manager, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:230
+#: pkg/unifiedrole/roles.go:240
 msgid "Can manage"
 msgstr "可管理"
 
@@ -91,30 +94,30 @@ msgstr "可管理"
 #. UnifiedRole Viewer, Role DisplayName (resolves directly)
 #. Viewer
 #. UnifiedRole SpaceViewer, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:112 pkg/unifiedrole/roles.go:198
+#: pkg/unifiedrole/roles.go:114 pkg/unifiedrole/roles.go:200
 msgid "Can view"
 msgstr "可查看"
 
 #. SecureViewer
 #. UnifiedRole SecureViewer, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:104
+#: pkg/unifiedrole/roles.go:106
 msgid "Can view (secure)"
 msgstr "可查看（安全模式）"
 
 #. Viewer + ListGrants
 #. UnifiedRole ViewerListGrants, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:120
+#: pkg/unifiedrole/roles.go:122
 msgid "Can view and show invitees"
 msgstr "可查看及顯示受邀者"
 
 #. Denial
 #. UnifiedRole FullDenial, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:130
+#: pkg/unifiedrole/roles.go:132
 msgid "Cannot access"
 msgstr "無法存取"
 
 #. UnifiedRole FullDenial, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:132
+#: pkg/unifiedrole/roles.go:134
 msgid "Deny all access."
 msgstr "拒絕所有存取"
 
@@ -125,68 +128,76 @@ msgstr "你可以在此添加這空間的描述"
 
 #. UnifiedRole Viewer, Role Description (resolves directly)
 #. UnifiedRole SpaceViewer, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:114 pkg/unifiedrole/roles.go:200
+#: pkg/unifiedrole/roles.go:116 pkg/unifiedrole/roles.go:202
 msgid "View and download."
 msgstr "查看并下载"
 
 #. UnifiedRole SecureViewer, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:106
+#: pkg/unifiedrole/roles.go:108
 msgid "View only documents, images and PDFs. Watermarks will be applied."
 msgstr "僅能查看文件、圖片和 PDF。將會套用浮水印。"
 
 #. UnifiedRole ViewerListGrants, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:122
+#: pkg/unifiedrole/roles.go:124
 msgid "View, download and show all invited people."
 msgstr "查看、下載及顯示所有受邀者。"
 
 #. UnifiedRole FileEditor, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:174
+#: pkg/unifiedrole/roles.go:176
 msgid "View, download, upload and edit."
 msgstr "查看、下載、上傳及編輯。"
 
 #. UnifiedRole EditorLite, Role Description (resolves directly)
-#. UnifiedRole SpaceEditorWithoutVersions, Role Description (resolves
-#. directly)
-#: pkg/unifiedrole/roles.go:140 pkg/unifiedrole/roles.go:208
+#: pkg/unifiedrole/roles.go:142
 msgid "View, download, upload, edit and add."
 msgstr "查看、下載、上傳、編輯及新增。"
 
 #. UnifiedRole FileEditorListGrants, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:182
+#: pkg/unifiedrole/roles.go:184
 msgid "View, download, upload, edit and show all invited people."
 msgstr "查看、下載、上傳、編輯及顯示所有受邀者。"
 
 #. UnifiedRole Editor, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:148
+#. UnifiedRole SpaceEditorWithoutVersionsWithoutTrashbin, Role Description
+#. (resolves directly)
+#: pkg/unifiedrole/roles.go:150 pkg/unifiedrole/roles.go:226
 msgid "View, download, upload, edit, add and delete."
 msgstr "查看，下载，上传，编辑和删除"
 
 #. UnifiedRole SpaceEditorWithoutTrashbin, Role Description (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:216
+#: pkg/unifiedrole/roles.go:218
 msgid "View, download, upload, edit, add and show all versions."
 msgstr "查看、下載、上傳、編輯、新增及刪除。"
 
+#. UnifiedRole SpaceEditorWithoutVersions, Role Description (resolves
+#. directly)
+#: pkg/unifiedrole/roles.go:210
+msgid "View, download, upload, edit, add, delete and restore from trash bin."
+msgstr ""
+
 #. UnifiedRole EditorListGrants Editor, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:156
+#: pkg/unifiedrole/roles.go:158
 msgid "View, download, upload, edit, add, delete and show all invited people."
 msgstr "查看、下載、上傳、編輯、新增、刪除及顯示所有受邀者。"
 
 #. UnifiedRole SpaceEditor, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:224
-msgid "View, download, upload, edit, add, show all versions and delete."
-msgstr "查看、下載、上傳、編輯、新增、顯示所有版本及刪除。"
+#: pkg/unifiedrole/roles.go:234
+msgid ""
+"View, download, upload, edit, add, delete, show all versions and restore "
+"from trash bin."
+msgstr ""
 
 #. UnifiedRole Manager, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:232
+#: pkg/unifiedrole/roles.go:242
 msgid ""
-"View, download, upload, edit, add, show all versions, delete and manage "
-"members."
-msgstr "查看、下載、上傳、編輯、新增、顯示所有版本、刪除及管理成員。"
+"View, download, upload, edit, add, delete, show all versions, restore from "
+"trash bin, empty the trash bin and manage members."
+msgstr ""
 
 #. UnifiedRole EditorListGrantsWithVersions, Role Description (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:164
+#: pkg/unifiedrole/roles.go:166
 msgid ""
 "View, download, upload, edit, delete, show all versions and all invited "
 "people."
@@ -194,7 +205,7 @@ msgstr "查看、下載、上傳、編輯、刪除、顯示所有版本及所有
 
 #. UnifiedRole FileEditorListGrantsWithVersions, Role Description (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:190
+#: pkg/unifiedrole/roles.go:192
 msgid ""
 "View, download, upload, edit, show all versions and all invited people."
 msgstr "查看、下載、上傳、編輯、顯示所有版本及所有受邀者。"

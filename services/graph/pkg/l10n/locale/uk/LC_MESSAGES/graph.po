@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-03-24 00:06+0000\n"
+"POT-Creation-Date: 2026-04-28 03:18+0000\n"
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
 "Last-Translator: Roman Perekhod, 2026\n"
 "Language-Team: Ukrainian (https://app.transifex.com/owncloud-org/teams/6149/uk/)\n"
@@ -26,62 +26,65 @@ msgstr ""
 #. UnifiedRole EditorLite, Role DisplayName (resolves directly)
 #. FileEditor
 #. UnifiedRole FileEditor, Role DisplayName (resolves directly)
-#. Editor without Versions
-#. UnifiedRole SpaceEditorWithoutVersions, Role DisplayName (resolves
-#. directly)
-#: pkg/unifiedrole/roles.go:138 pkg/unifiedrole/roles.go:172
-#: pkg/unifiedrole/roles.go:206
+#. Editor without Versions without Trashbin
+#. UnifiedRole SpaceEditorWithoutVersionsWithoutTrashbin, Role DisplayName
+#. (resolves directly)
+#: pkg/unifiedrole/roles.go:140 pkg/unifiedrole/roles.go:174
+#: pkg/unifiedrole/roles.go:224
 msgid "Can edit"
 msgstr "Може редагувати"
 
 #. FileEditor + ListGrants
 #. UnifiedRole FileEditorListGrants, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:180
+#: pkg/unifiedrole/roles.go:182
 msgid "Can edit and show invitees"
 msgstr "Можна редагувати та показувати запрошених"
 
 #. Editor
 #. UnifiedRole Editor, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:146
+#. Editor without Versions
+#. UnifiedRole SpaceEditorWithoutVersions, Role DisplayName (resolves
+#. directly)
+#: pkg/unifiedrole/roles.go:148 pkg/unifiedrole/roles.go:208
 msgid "Can edit with trashbin"
 msgstr "Можна редагувати, включно з кошиком"
 
 #. Editor + ListGrants
 #. UnifiedRole EditorListGrants, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:154
+#: pkg/unifiedrole/roles.go:156
 msgid "Can edit with trashbin and show invitees"
 msgstr "Можна редагувати, включно з кошиком та показувати запрошених"
 
 #. Editor + ListGrants + Version
 #. UnifiedRole EditorListGrantsWithVersions, Role DisplayName (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:162
+#: pkg/unifiedrole/roles.go:164
 msgid "Can edit with trashbin, versions and show invitees"
 msgstr "Можна редагувати, включно з кошиком, версіями показувати запрошених"
 
 #. Editor without Trashbin
 #. UnifiedRole SpaceEditorWithoutTrashbin, Role DisplayName (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:214
+#: pkg/unifiedrole/roles.go:216
 msgid "Can edit with versions"
 msgstr "Можна редагувати, включно з версіями "
 
 #. FileEditor + ListGrants + Versions
 #. UnifiedRole FileEditorListGrantsWithVersions, Role DisplayName (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:188
+#: pkg/unifiedrole/roles.go:190
 msgid "Can edit with versions and show invitees"
 msgstr "Можна редагувати, включно з версіями та показувати запрошених"
 
 #. Editor
 #. UnifiedRole SpaceEditor, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:222
-msgid "Can edit with versions and trashbin"
-msgstr "Можна редагувати, включно з версіями та кошиком"
+#: pkg/unifiedrole/roles.go:232
+msgid "Can edit with versions and trash bin"
+msgstr ""
 
 #. Manager
 #. UnifiedRole Manager, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:230
+#: pkg/unifiedrole/roles.go:240
 msgid "Can manage"
 msgstr "Може керувати"
 
@@ -89,30 +92,30 @@ msgstr "Може керувати"
 #. UnifiedRole Viewer, Role DisplayName (resolves directly)
 #. Viewer
 #. UnifiedRole SpaceViewer, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:112 pkg/unifiedrole/roles.go:198
+#: pkg/unifiedrole/roles.go:114 pkg/unifiedrole/roles.go:200
 msgid "Can view"
 msgstr "Може переглядати"
 
 #. SecureViewer
 #. UnifiedRole SecureViewer, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:104
+#: pkg/unifiedrole/roles.go:106
 msgid "Can view (secure)"
 msgstr "Може переглядати (безпечно)"
 
 #. Viewer + ListGrants
 #. UnifiedRole ViewerListGrants, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:120
+#: pkg/unifiedrole/roles.go:122
 msgid "Can view and show invitees"
 msgstr "Можна переглядати та показувати запрошених"
 
 #. Denial
 #. UnifiedRole FullDenial, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:130
+#: pkg/unifiedrole/roles.go:132
 msgid "Cannot access"
 msgstr "Не може отримати доступ"
 
 #. UnifiedRole FullDenial, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:132
+#: pkg/unifiedrole/roles.go:134
 msgid "Deny all access."
 msgstr "Заборонити будь-який доступ."
 
@@ -123,43 +126,43 @@ msgstr "Тут ви можете додати опис цього Простор
 
 #. UnifiedRole Viewer, Role Description (resolves directly)
 #. UnifiedRole SpaceViewer, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:114 pkg/unifiedrole/roles.go:200
+#: pkg/unifiedrole/roles.go:116 pkg/unifiedrole/roles.go:202
 msgid "View and download."
 msgstr "Переглядати та завантажувати."
 
 #. UnifiedRole SecureViewer, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:106
+#: pkg/unifiedrole/roles.go:108
 msgid "View only documents, images and PDFs. Watermarks will be applied."
 msgstr ""
 "Переглядати лише документи, зображення та PDF файли. Будуть застосовані "
 "водяні знаки."
 
 #. UnifiedRole ViewerListGrants, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:122
+#: pkg/unifiedrole/roles.go:124
 msgid "View, download and show all invited people."
 msgstr "Переглядати, завантажувати та показувати всіх запрошених людей."
 
 #. UnifiedRole FileEditor, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:174
+#: pkg/unifiedrole/roles.go:176
 msgid "View, download, upload and edit."
 msgstr "Переглядати, завантажувати, відвантажувати та редагувати."
 
 #. UnifiedRole EditorLite, Role Description (resolves directly)
-#. UnifiedRole SpaceEditorWithoutVersions, Role Description (resolves
-#. directly)
-#: pkg/unifiedrole/roles.go:140 pkg/unifiedrole/roles.go:208
+#: pkg/unifiedrole/roles.go:142
 msgid "View, download, upload, edit and add."
 msgstr "Переглядати, завантажувати, відвантажувати, редагувати та додавати."
 
 #. UnifiedRole FileEditorListGrants, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:182
+#: pkg/unifiedrole/roles.go:184
 msgid "View, download, upload, edit and show all invited people."
 msgstr ""
 "Переглядати, завантажувати, відвантажувати, редагувати та показувати всіх "
 "запрошених людей."
 
 #. UnifiedRole Editor, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:148
+#. UnifiedRole SpaceEditorWithoutVersionsWithoutTrashbin, Role Description
+#. (resolves directly)
+#: pkg/unifiedrole/roles.go:150 pkg/unifiedrole/roles.go:226
 msgid "View, download, upload, edit, add and delete."
 msgstr ""
 "Переглядати, завантажувати, відвантажувати, редагувати, додавати та "
@@ -167,38 +170,42 @@ msgstr ""
 
 #. UnifiedRole SpaceEditorWithoutTrashbin, Role Description (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:216
+#: pkg/unifiedrole/roles.go:218
 msgid "View, download, upload, edit, add and show all versions."
 msgstr ""
 "Переглядати, завантажувати, відвантажувати, редагувати та показувати всі "
 "версії."
 
+#. UnifiedRole SpaceEditorWithoutVersions, Role Description (resolves
+#. directly)
+#: pkg/unifiedrole/roles.go:210
+msgid "View, download, upload, edit, add, delete and restore from trash bin."
+msgstr ""
+
 #. UnifiedRole EditorListGrants Editor, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:156
+#: pkg/unifiedrole/roles.go:158
 msgid "View, download, upload, edit, add, delete and show all invited people."
 msgstr ""
 "Переглядати, завантажувати, відвантажувати, редагувати, додавати, видаляти "
 "та показувати всіх запрошених людей."
 
 #. UnifiedRole SpaceEditor, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:224
-msgid "View, download, upload, edit, add, show all versions and delete."
+#: pkg/unifiedrole/roles.go:234
+msgid ""
+"View, download, upload, edit, add, delete, show all versions and restore "
+"from trash bin."
 msgstr ""
-"Переглядати, завантажувати, відвантажувати, редагувати, додавати, показувати"
-" всі версії та видаляти."
 
 #. UnifiedRole Manager, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:232
+#: pkg/unifiedrole/roles.go:242
 msgid ""
-"View, download, upload, edit, add, show all versions, delete and manage "
-"members."
+"View, download, upload, edit, add, delete, show all versions, restore from "
+"trash bin, empty the trash bin and manage members."
 msgstr ""
-"Переглядати, завантажувати, відвантажувати, редагувати, додавати, показувати"
-" всі версії, видаляти та керувати учасниками."
 
 #. UnifiedRole EditorListGrantsWithVersions, Role Description (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:164
+#: pkg/unifiedrole/roles.go:166
 msgid ""
 "View, download, upload, edit, delete, show all versions and all invited "
 "people."
@@ -208,7 +215,7 @@ msgstr ""
 
 #. UnifiedRole FileEditorListGrantsWithVersions, Role Description (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:190
+#: pkg/unifiedrole/roles.go:192
 msgid ""
 "View, download, upload, edit, show all versions and all invited people."
 msgstr ""
