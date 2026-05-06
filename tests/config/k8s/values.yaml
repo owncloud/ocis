@@ -1,7 +1,7 @@
 ---
 image:
-  repository: owncloud/ocis-rolling
-  tag: 8.0.2-rc.1
+  repository: owncloud/ocis
+  tag: master
 ingress:
   enabled: true
   ingressClassName: traefik
@@ -17,7 +17,7 @@ features:
   authapp:
     enabled: false
   emailNotifications:
-    enabled: true
+    enabled: false
     smtp:
       host: email
       port: 1025
@@ -27,7 +27,7 @@ features:
     branding:
       enabled: false
   virusscan:
-    enabled: true
+    enabled: false
     infectedFileHandling: delete
   policies:
     enabled: false
@@ -166,9 +166,9 @@ services:
         concurrency: 10
   search:
     extractor:
-      type: tika
+      type: basic
       tika:
-        url: http://localhost:9998
+        url: http://tika:9998
     persistence:
       enabled: true
       accessModes:

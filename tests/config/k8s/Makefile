@@ -5,8 +5,10 @@ HOST_IP := $(shell ip route get 1 | awk '{print $$7}')
 
 OCM ?= false
 DOMAIN := ocis-server
+CLUSTER := local-ocis
 ifeq ($(OCM), true)
 	DOMAIN := federation-ocis-server
+	CLUSTER := local-ocis-fed
 endif
 
 .PHONY: create-cluster
@@ -14,7 +16,7 @@ create-cluster:
 	@echo $(LOGS_DIR)
 	@mkdir -p $(LOGS_DIR)
 	@chmod 777 $(LOGS_DIR)
-	k3d cluster create local-ocis \
+	k3d cluster create $(CLUSTER) \
 		-p '80:80@loadbalancer' -p '443:443@loadbalancer' -p '9100-9399:30100-30399@loadbalancer' \
 		--k3s-arg '--tls-san=k3d@server:*' --k3s-arg '--disable=metrics-server@server:*' \
 		--host-alias $(HOST_IP):ocis-server --host-alias $(HOST_IP):federation-ocis-server \
@@ -40,6 +42,6 @@ show-logs:
 
 .PHONY: cleanup
 cleanup:
-	k3d cluster delete local-ocis
+	k3d cluster delete $(CLUSTER)
 	rm -rf $(LOGS_DIR)
 	rm -rf $(CHART_REPO)
