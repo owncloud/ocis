@@ -66,6 +66,8 @@ type Config struct {
 
 	MultiFactorAuthentication MFAConfig `yaml:"mfa"`
 
+	EnableVaultMode bool `yaml:"enable_vault_mode" env:"OCIS_ENABLE_VAULT_MODE;FRONTEND_ENABLE_VAULT_MODE" desc:"Enable vault mode. When enabled, the capabilities endpoint will report vault as enabled and the capabilities?vault=true endpoint will return capabilities with public sharing and federation disabled." introductionVersion:"Deledda"`
+
 	Context context.Context `yaml:"-"`
 }
 
