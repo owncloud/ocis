@@ -4,8 +4,7 @@ services:
       OCIS_MFA_ENABLED: true
       NATS_NATS_HOST: 0.0.0.0
       SETTINGS_GRPC_ADDR: ocis:9191
-      PROXY_CREATE_VAULT_HOME: true
-      GRAPH_ENABLE_VAULT_MODE: true
+      OCIS_ENABLE_VAULT_MODE: true
 
   storage-users-vault:
     image: ${OCIS_DOCKER_IMAGE}:${OCIS_DOCKER_TAG}

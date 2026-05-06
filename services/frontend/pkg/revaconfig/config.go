@@ -351,6 +351,9 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 									"levelnames": cfg.MultiFactorAuthentication.AuthLevelNames,
 								},
 							},
+							"vault": map[string]interface{}{
+								"enabled": cfg.EnableVaultMode,
+							},
 						},
 						"version": map[string]interface{}{
 							"product":        "Infinite Scale",
