@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
+	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/auth-basic/pkg/config"
@@ -128,5 +129,5 @@ func EnsureDefaults(cfg *config.Config) {
 
 // Sanitize sanitized the configuration
 func Sanitize(cfg *config.Config) {
-	// nothing to sanitize here atm
+	cfg.AuthProviders.LDAP.UserFilter = ocisldap.EnhanceFilterWithMasterID(cfg.AuthProviders.LDAP.UserFilter, cfg.AuthProviders.LDAP.MasterID, cfg.AuthProviders.LDAP.UserMemberAttribute, cfg.AuthProviders.LDAP.UserGuestAttribute)
 }
