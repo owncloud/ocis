@@ -9,6 +9,9 @@ if [ "$1" = "--ocis-log" ]; then
     exit 0
 fi
 
+# clean up from previous runs
+sshpass -p "$SSH_OCIS_PASSWORD" ssh $SSH_OPTS "$SSH_OCIS_USERNAME@$SSH_OCIS_REMOTE" "rm -rf k6-ocis"
+
 # start ocis server
 sshpass -p "$SSH_OCIS_PASSWORD" ssh $SSH_OPTS "$SSH_OCIS_USERNAME@$SSH_OCIS_REMOTE" \
     "OCIS_URL=${TEST_SERVER_URL} \
