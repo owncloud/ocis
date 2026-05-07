@@ -25,7 +25,7 @@ prepare-charts:
 	@test -d "$(CHART_REPO)" || git clone --single-branch -b main --depth 1 https://github.com/owncloud/ocis-charts.git $(CHART_REPO)
 	bash setup.sh $(CHART_REPO)
 	kubectl create namespace $(DOMAIN) || true
-	kubectl create configmap -n $(DOMAIN) ocis-fonts-ttf --from-file=../drone/NotoSans.ttf || true # DRONE: NotoSans.ttf lives in tests/config/drone/ — move if that directory is removed
+	kubectl create configmap -n $(DOMAIN) ocis-fonts-ttf --from-file=../ci/NotoSans.ttf || true
 
 .PHONY: deploy-ocis
 deploy-ocis:
