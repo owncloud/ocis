@@ -41,13 +41,14 @@ jobs:
         run: apk add --no-cache openssh-client sshpass
 
       - name: Run k6 load tests
+        if: ${{ !cancelled() }}
         run: sh tests/config/drone/run_k6_tests.sh
 
       - name: Retrieve OCIS logs
-        if: always()
+        if: ${{ !cancelled() }}
         run: sh tests/config/drone/run_k6_tests.sh --ocis-log
 
       - name: Show Grafana dashboard link
-        if: always()
+        if: ${{ !cancelled() }}
         run: |
           echo "Grafana Dashboard: https://grafana.k6.infra.owncloud.works"
