@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: k6-load-test-server
+  cancel-in-progress: false
+
 jobs:
   k6-load-test:
     name: k6-load-test
