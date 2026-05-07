@@ -215,8 +215,8 @@ def base_server_env(repo_root: Path, ocis_url: str, ocis_config_dir: str) -> dic
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
         "EVENTHISTORY_STORE": "memory",
         "OCIS_TRANSLATION_PATH": str(repo_root / "tests/config/translations"),
-        "WEB_UI_CONFIG_FILE": str(repo_root / "tests/config/drone/ocis-config.json"),
-        "THUMBNAILS_TXT_FONTMAP_FILE": str(repo_root / "tests/config/drone/fontsMap.json"),
+        "WEB_UI_CONFIG_FILE": str(repo_root / "tests/config/ci/ocis-config.json"),
+        "THUMBNAILS_TXT_FONTMAP_FILE": str(repo_root / "tests/config/ci/fontsMap.json"),
         # default tika off (overridden by search2 extraServerEnvironment)
         "SEARCH_EXTRACTOR_TYPE": "basic",
         "FRONTEND_FULL_TEXT_SEARCH_ENABLED": "false",
@@ -416,7 +416,7 @@ def main() -> int:
 
     # OCM federation: rewrite providers.json with localhost URLs
     if cfg["federationServer"]:
-        providers_src = repo_root / "tests/config/drone/providers.json"
+        providers_src = repo_root / "tests/config/ci/providers.json"
         providers = json.loads(providers_src.read_text())
         for p in providers:
             # replace container DNS names with localhost
@@ -437,12 +437,12 @@ def main() -> int:
     # init ocis
     run([str(ocis_bin), "init", "--insecure", "true"])
     shutil.copy(
-        repo_root / "tests/config/drone/app-registry.yaml",
+        repo_root / "tests/config/ci/app-registry.yaml",
         ocis_config_dir / "app-registry.yaml",
     )
 
-    # generate fontsMap.json with correct font path (drone hardcodes /drone/src/...)
-    font_path = str(repo_root / "tests/config/drone/NotoSans.ttf")
+    # generate fontsMap.json with the correct absolute font path for this runner
+    font_path = str(repo_root / "tests/config/ci/NotoSans.ttf")
     fontmap_tmp = tempfile.NamedTemporaryFile(
         mode="w", suffix=".json", prefix="fontsMap-", delete=False)
     json.dump({"defaultFont": font_path}, fontmap_tmp)
@@ -490,7 +490,7 @@ def main() -> int:
         run([str(ocis_bin), "init", "--insecure", "true",
              "--config-path", str(fed_config_dir)])
         shutil.copy(
-            repo_root / "tests/config/drone/app-registry.yaml",
+            repo_root / "tests/config/ci/app-registry.yaml",
             fed_config_dir / "app-registry.yaml",
         )
 
@@ -512,11 +512,11 @@ def main() -> int:
         # → healthz never binds → 300s timeout.  Use Python's built-in HTTP server
         # instead; it handles concurrent connections without gaps.
         run(["docker", "run", "-d", "--name", "fakeoffice", "--network", "host",
-             "-v", f"{repo_root}:/drone/src:ro",
+             "-v", f"{repo_root}:/ocis:ro",
              "python:3-alpine",
              "python3", "-c",
              "import http.server, pathlib\n"
-             "body = pathlib.Path('/drone/src/tests/config/drone/hosting-discovery.xml').read_bytes()\n"
+             "body = pathlib.Path('/ocis/tests/config/ci/hosting-discovery.xml').read_bytes()\n"
              "class H(http.server.BaseHTTPRequestHandler):\n"
              "    def do_GET(self):\n"
              "        self.send_response(200)\n"
@@ -551,7 +551,7 @@ def main() -> int:
         # Drone avoids this because each service has its own network namespace.
         subprocess.run(["sudo", "systemctl", "stop", "postgresql"],
                        capture_output=True)
-        only_office_json = repo_root / "tests/config/drone/only-office.json"
+        only_office_json = repo_root / "tests/config/ci/only-office.json"
         run(["docker", "run", "-d", "--name", "onlyoffice", "--network", "host",
              "-e", "WOPI_ENABLED=true",
              "-e", "USE_UNAUTHORIZED_STORAGE=true",

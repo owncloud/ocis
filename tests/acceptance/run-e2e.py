@@ -99,7 +99,7 @@ def main() -> int:
     # init ocis
     run([str(ocis_bin), "init", "--insecure", "true"])
     shutil.copy(
-        repo_root / "tests/config/drone/app-registry.yaml",
+        repo_root / "tests/config/ci/app-registry.yaml",
         ocis_config_dir / "app-registry.yaml",
     )
 
@@ -115,7 +115,7 @@ def main() -> int:
 
     # Patch web UI config: replace Drone Docker service name with our URL
     drone_web_cfg = json.loads(
-        (repo_root / "tests/config/drone/ocis-config.json").read_text()
+        (repo_root / "tests/config/ci/ocis-config.json").read_text()
     )
 
     def _patch_urls(obj, old, new):
@@ -151,9 +151,9 @@ def main() -> int:
         "EVENTHISTORY_STORE": "memory",
         "OCIS_TRANSLATION_PATH": str(repo_root / "tests/config/translations"),
         "WEB_UI_CONFIG_FILE": str(gha_web_cfg_path),
-        "THUMBNAILS_TXT_FONTMAP_FILE": str(repo_root / "tests/config/drone/fontsMap.json"),
+        "THUMBNAILS_TXT_FONTMAP_FILE": str(repo_root / "tests/config/ci/fontsMap.json"),
         # extra_server_environment — matches drone e2eTestPipeline()
-        "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": str(repo_root / "tests/config/drone/banned-password-list.txt"),
+        "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": str(repo_root / "tests/config/ci/banned-password-list.txt"),
         "GRAPH_AVAILABLE_ROLES": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5,a8d5fe5e-96e3-418d-825b-534dbdf22b99,fb6c3e19-e378-47e5-b277-9732f9de6e21,58c63c02-1d89-4572-916a-870abc5a1b7d,2d00ce52-1fc2-4dbc-8b95-a73b73395f5a,1c996275-f1c9-4e71-abdf-a42f6495e960,312c0871-5ef7-4b3a-85b6-0e4074c64049,aa97fe03-7980-45ac-9e50-b325749fd7e6,63e64e19-8d43-42ec-a738-2b6af2610efa",
         "FRONTEND_CONFIGURABLE_NOTIFICATIONS": "true",
         # debug addresses
@@ -215,7 +215,7 @@ def main() -> int:
             "OCIS_ADMIN_USER_ID": "",
             "GRAPH_ASSIGN_DEFAULT_USER_ROLE": "false",
             "GRAPH_USERNAME_MATCH": "none",
-            "PROXY_CSP_CONFIG_FILE_LOCATION": str(repo_root / "tests/config/drone/csp.yaml"),
+            "PROXY_CSP_CONFIG_FILE_LOCATION": str(repo_root / "tests/config/ci/csp.yaml"),
             "KEYCLOAK_DOMAIN": "localhost:8443",
             "IDM_CREATE_DEMO_USERS": "false",
         })

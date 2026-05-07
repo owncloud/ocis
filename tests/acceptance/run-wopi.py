@@ -118,7 +118,7 @@ def base_server_env(repo_root: Path, ocis_config_dir: str, ocis_public_url: str,
         "NATS_NATS_PORT": "9233",
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
         "EVENTHISTORY_STORE": "memory",
-        "WEB_UI_CONFIG_FILE": str(repo_root / "tests/config/drone/ocis-config.json"),
+        "WEB_UI_CONFIG_FILE": str(repo_root / "tests/config/ci/ocis-config.json"),
         # wopi_validator extras (drone ocisServer deploy_type="wopi_validator")
         "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
         "APP_PROVIDER_EXTERNAL_ADDR": "com.owncloud.api.app-provider",
@@ -264,16 +264,15 @@ def main() -> int:
 
     try:
         # --- fakeoffice: serves hosting-discovery.xml on :8080 ---
-        # Mirrors drone fakeOffice() — owncloudci/alpine running serve-hosting-discovery.sh.
-        # Repo is mounted at /drone/src (the path the script uses).
+        # Mirrors the old fakeOffice() step — owncloudci/alpine running serve-hosting-discovery.sh.
         containers.append("wopi-fakeoffice-fake")
         subprocess.run(["docker", "rm", "-f", "wopi-fakeoffice-fake"], capture_output=True)
         subprocess.run([
             "docker", "run", "-d", "--name", "wopi-fakeoffice-fake",
             "-p", "8080:8080",
-            "-v", f"{repo_root}:/drone/src",
+            "-v", f"{repo_root}:/ocis",
             FAKEOFFICE_IMAGE,
-            "sh", "/drone/src/tests/config/drone/serve-hosting-discovery.sh",
+            "sh", "/ocis/tests/config/ci/serve-hosting-discovery.sh",
         ], check=True)
 
         wait_for(lambda: tcp_reachable(bridge_ip, 8080), 60, "fakeoffice:8080")
@@ -290,7 +289,7 @@ def main() -> int:
             env=server_env, check=True,
         )
         shutil.copy(
-            repo_root / "tests/config/drone/app-registry.yaml",
+            repo_root / "tests/config/ci/app-registry.yaml",
             ocis_config_dir / "app-registry.yaml",
         )
 
@@ -323,7 +322,7 @@ def main() -> int:
         else:
             # cs3: patch wopiserver.conf (replace container hostname with bridge_ip),
             # then run cs3org/wopiserver as a Docker container.
-            conf_text = (repo_root / "tests/config/drone/wopiserver.conf").read_text()
+            conf_text = (repo_root / "tests/config/ci/wopiserver.conf").read_text()
             conf_text = conf_text.replace("ocis-server", bridge_ip)
             conf_tmp = Path("/tmp/wopiserver-patched.conf")
             conf_tmp.write_text(conf_text)

@@ -53,7 +53,7 @@ def base_server_env(repo_root: Path, ocis_config_dir: str, ocis_public_url: str)
         "NATS_NATS_PORT": "9233",
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
         "EVENTHISTORY_STORE": "memory",
-        "WEB_UI_CONFIG_FILE": str(repo_root / "tests/config/drone/ocis-config.json"),
+        "WEB_UI_CONFIG_FILE": str(repo_root / "tests/config/ci/ocis-config.json"),
         # cs3api_validator extras (drone ocisServer deploy_type="cs3api_validator")
         "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
         "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD": "false",
@@ -101,7 +101,7 @@ def main() -> int:
         check=True,
     )
     shutil.copy(
-        repo_root / "tests/config/drone/app-registry.yaml",
+        repo_root / "tests/config/ci/app-registry.yaml",
         ocis_config_dir / "app-registry.yaml",
     )
 
