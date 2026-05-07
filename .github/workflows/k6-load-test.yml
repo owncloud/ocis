@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, edited]
   schedule:
-    - cron: '0 4 * * *'
+    - cron: '0 1 * * *'
   workflow_dispatch:
 
 permissions:
@@ -24,7 +24,9 @@ jobs:
       github.event_name == 'schedule' ||
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'pull_request' &&
-       contains(github.event.pull_request.title || '', 'k6-test'))
+       contains(github.event.pull_request.title || '', 'k6-test') &&
+       (github.event.action != 'edited' ||
+        !contains(github.event.changes.title.from || '', 'k6-test')))
     env:
       SSH_OCIS_REMOTE: ${{ secrets.SSH_OCIS_REMOTE }}
       SSH_OCIS_USERNAME: ${{ secrets.SSH_OCIS_USERNAME }}
