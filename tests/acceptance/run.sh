@@ -677,19 +677,4 @@ then
 	${RED_COLOR}; printf "%s\n" "${UNEXPECTED_BEHAT_EXIT_STATUSES[@]}"
 fi
 
-# DRONE: Dead code — workarounds for Drone log-flushing issues. Kept as archaeology.
-# # sync the file-system so all output will be flushed to storage.
-# # In drone we sometimes see that the last lines of output are missing from the
-# # drone log.
-# sync
-
-# # If we are running in drone CI, then sleep for a bit to (hopefully) let the
-# # drone agent send all the output to the drone server.
-# NOTE: Not using this anymore, please enable it if needed
-# if [ -n "${CI_REPO}" ]
-# then
-# 	echo "sleeping for 30 seconds at end of test run"
-# 	sleep 30
-# fi
-
 exit ${FINAL_EXIT_STATUS}

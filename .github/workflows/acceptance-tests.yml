@@ -412,7 +412,7 @@ jobs:
           # Patch realm: ocis-ci-realm.dist.json uses ocis-server:9200 as hostname.
           # GitHub Actions runs on the host network so patch it to 127.0.0.1.
           sed 's|https://ocis-server:9200|https://127.0.0.1:9200|g' \
-            tests/config/drone/ocis-ci-realm.dist.json > /tmp/ocis-realm.json
+            tests/config/ci/ocis-ci-realm.dist.json > /tmp/ocis-realm.json
           docker run -d --name keycloak --network host \
             -e OCIS_DOMAIN=https://127.0.0.1:9200 \
             -e KC_HOSTNAME=localhost \

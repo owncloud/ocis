@@ -15,8 +15,6 @@ web_cache=$(mc find s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/$1 2>&1 
 
 if [[ -z "$web_cache" ]]; then
   echo "$1 cache with commit id $WEB_COMMITID already available."
-  # https://discourse.drone.io/t/how-to-exit-a-pipeline-early-without-failing/3951
-  # exit a Pipeline early without failing
   exit 78
 else
   echo "$1 cache with commit id $WEB_COMMITID was not available."

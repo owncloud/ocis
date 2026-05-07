@@ -581,11 +581,11 @@ THUMBNAILS_TXT_FONTMAP_FILE="/path/to/fontsMap.json"
 ocis/bin/ocis server
 ```
 
-The sample `fontsMap.json` file is located in `tests/config/drone/fontsMap.json`.
+The sample `fontsMap.json` file is located in `tests/config/ci/fontsMap.json`.
 
 ```json
 {
-  "defaultFont": "/path/to/ocis/tests/config/drone/NotoSans.ttf"
+  "defaultFont": "/path/to/ocis/tests/config/ci/NotoSans.ttf"
 }
 ```
 
