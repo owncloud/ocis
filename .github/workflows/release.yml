@@ -386,34 +386,3 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  notify:
-    runs-on: ubuntu-latest
-    if: always()
-    needs:
-      - determine-release-type
-      - generate-code
-      - docker-build
-      - docker-scan
-      - docker-manifest
-      - docker-readme
-      - build-binaries
-      - security-scan-trivy
-      - license-check
-      - generate-changelog
-      - create-github-release
-      - audit-release
-    steps:
-      - run: |
-          [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]] \
-            && STATUS="FAILURE" || STATUS="SUCCESS"
-          [[ "${{ github.event_name }}" == "schedule" ]] \
-            && SOURCE="nightly-${{ github.ref_name }}" \
-            || SOURCE="${{ github.ref_type == 'tag' && format('tag {0}', github.ref_name) || github.ref_name }}"
-          SHA="${{ github.sha }}"
-          MSG="${STATUS} [${{ github.repository }}#${SHA:0:8}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) (${SOURCE}) by **${{ github.triggering_actor }}**"
-          [[ -z "${{ secrets.MATRIX_HOMESERVER }}" ]] && { echo "MATRIX_HOMESERVER not set, skipping notification"; exit 0; }
-          curl -sf -X PUT \
-            -H "Authorization: Bearer ${{ secrets.MATRIX_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d "{\"msgtype\":\"m.text\",\"body\":\"${MSG}\"}" \
-            "${{ secrets.MATRIX_HOMESERVER }}/_matrix/client/r0/rooms/${{ secrets.MATRIX_ROOMID }}/send/m.room.message/$(date +%s)"
