@@ -1,4 +1,4 @@
-name: test-ocis-compose
+name: test deployment example
 
 on:
   workflow_dispatch:
