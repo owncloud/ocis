@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-05-05 03:17+0000\n"
+"POT-Creation-Date: 2026-05-07 03:20+0000\n"
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
 "Last-Translator: David Walter, 2026\n"
 "Language-Team: German (https://app.transifex.com/owncloud-org/teams/6149/de/)\n"
@@ -38,7 +38,7 @@ msgstr "Kann bearbeiten"
 #. UnifiedRole FileEditorListGrants, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:182
 msgid "Can edit and show invitees"
-msgstr "Kann eingeladene Personen bearbeiten und anzeigen"
+msgstr "Kann bearbeiten"
 
 #. Editor
 #. UnifiedRole Editor, Role DisplayName (resolves directly)
@@ -74,13 +74,13 @@ msgstr "Kann bearbeiten mit Versionen"
 #. directly)
 #: pkg/unifiedrole/roles.go:190
 msgid "Can edit with versions and show invitees"
-msgstr "Kann bearbeiten mit Versionen und eingeladene Personen anzeigen"
+msgstr "Kann bearbeiten mit Versionen"
 
 #. Editor
 #. UnifiedRole SpaceEditor, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:232
 msgid "Can edit with versions and trash bin"
-msgstr "Kann bearbeiten mit Versionen und Papierborb"
+msgstr "Kann bearbeiten mit Versionen"
 
 #. Manager
 #. UnifiedRole Manager, Role DisplayName (resolves directly)
@@ -100,13 +100,13 @@ msgstr "Kann anzeigen"
 #. UnifiedRole SecureViewer, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:106
 msgid "Can view (secure)"
-msgstr "Kann anzeigen (sichere Ansicht)"
+msgstr "Kann anzeigen (mit Wasserzeichen)"
 
 #. Viewer + ListGrants
 #. UnifiedRole ViewerListGrants, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:122
 msgid "Can view and show invitees"
-msgstr "Kann anzeigen und eingeladene Personen anzeigen"
+msgstr "Kann anzeigen"
 
 #. Denial
 #. UnifiedRole FullDenial, Role DisplayName (resolves directly)
