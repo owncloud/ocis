@@ -19,6 +19,7 @@ env:
   DOCKER_REPO_PRODUCTION: owncloud/ocis
   NODE_VERSION: '24'
   PNPM_VERSION: '10.28.1'
+  GOLANG_BUILD_IMAGE: 'golang:1.25.9-alpine3.23@sha256:5caaf1cca9dc351e13deafbc3879fd4754801acba8653fa9540cea125d01a71f'
 
 jobs:
   determine-release-type:
@@ -130,15 +131,15 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
-        with:
-          go-version-file: go.mod
-      - run: sudo apt-get update -q && sudo apt-get install -qy libvips libvips-dev
-      - run: make -C ocis release-linux-docker-${{ matrix.arch }}
-        env:
-          CGO_ENABLED: 1
-          GOOS: linux
-          ENABLE_VIPS: true
+      - run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace \
+            ${{ env.GOLANG_BUILD_IMAGE }} \
+            sh -c "apk add --no-cache bash gcc musl-dev vips-dev make git && \
+                   git config --global --add safe.directory /workspace && \
+                   CGO_ENABLED=1 ENABLE_VIPS=true \
+                   make -C ocis release-linux-docker-${{ matrix.arch }}"
       - id: tags
         run: |
           VERSION="${{ needs.determine-release-type.outputs.version }}"
