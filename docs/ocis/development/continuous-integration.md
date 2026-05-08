@@ -34,7 +34,7 @@ Upon running the pipeline, tests run against the branch as-is. Make sure your br
 You may add flags to your commit message or PR title to control pipeline runs.
 
 - `[CI SKIP]`: no CI is run on the commit or PR
-- `[full-ci]`: deactivates the fail-early mechanism and runs all available tests (by default only smoke tests run)
+- `[k6-test]`: enabled the run of the k6 with smoke and performance test
 
 ### Knowledge base
 
