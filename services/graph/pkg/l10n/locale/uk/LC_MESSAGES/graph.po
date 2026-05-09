@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-04-28 03:18+0000\n"
+"POT-Creation-Date: 2026-05-09 03:18+0000\n"
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
 "Last-Translator: Roman Perekhod, 2026\n"
 "Language-Team: Ukrainian (https://app.transifex.com/owncloud-org/teams/6149/uk/)\n"
@@ -181,6 +181,8 @@ msgstr ""
 #: pkg/unifiedrole/roles.go:210
 msgid "View, download, upload, edit, add, delete and restore from trash bin."
 msgstr ""
+"Переглядати, завантажувати, відвантажувати, редагувати, додавати, видаляти "
+"та відновлювати з кошика."
 
 #. UnifiedRole EditorListGrants Editor, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:158
