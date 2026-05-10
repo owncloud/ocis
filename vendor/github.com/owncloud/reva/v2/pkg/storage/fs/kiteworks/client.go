@@ -9,6 +9,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 	"strconv"
 )
 
@@ -167,13 +168,13 @@ func (c *Client) RenameFile(id, name string, replace bool) error {
 
 // MoveResource moves a file or folder to a new parent folder
 func (c *Client) MoveResource(sourceID, destFolderID string, replace bool) error {
-	return c.doJSON(http.MethodPost, "/rest/files/actions/move",
+	return c.doJSON(http.MethodPost, "/rest/files/"+sourceID+"/actions/move",
 		&FileCopyMove{DestFolderID: destFolderID, Replace: replace}, nil)
 }
 
 // CopyResource copies a file or folder to a destination folder
 func (c *Client) CopyResource(sourceID, destFolderID string, replace bool) error {
-	return c.doJSON(http.MethodPost, "/rest/files/actions/copy",
+	return c.doJSON(http.MethodPost, "/rest/files/"+sourceID+"/actions/copy",
 		&FileCopyMove{DestFolderID: destFolderID, Replace: replace}, nil)
 }
 
@@ -251,7 +252,7 @@ func (c *Client) Search(path string) ([]FileInfo, error) {
 		Files   []FileInfo `json:"files"`
 		Folders []FileInfo `json:"folders"`
 	}
-	err := c.doJSON(http.MethodGet, "/rest/query?query="+path, nil, &result)
+	err := c.doJSON(http.MethodGet, "/rest/query?query="+url.QueryEscape(path), nil, &result)
 	if err != nil {
 		return nil, err
 	}
