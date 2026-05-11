@@ -2,7 +2,7 @@ name: k6 Load Test
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, edited]
+    types: [opened, synchronize, reopened]
   schedule:
     - cron: '0 1 * * *'
   workflow_dispatch:
@@ -24,10 +24,7 @@ jobs:
       github.event_name == 'schedule' ||
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'pull_request' &&
-       contains(github.event.pull_request.title || '', 'k6-test') &&
-       (github.event.action != 'edited' ||
-        (github.event.changes.title &&
-         !contains(github.event.changes.title.from || '', 'k6-test'))))
+       contains(github.event.pull_request.title || '', 'k6-test'))
     env:
       SSH_OCIS_REMOTE: ${{ secrets.SSH_OCIS_REMOTE }}
       SSH_OCIS_USERNAME: ${{ secrets.SSH_OCIS_USERNAME }}
