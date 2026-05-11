@@ -97,16 +97,11 @@ func NewService(opts ...Option) (Service, error) {
 				r.Get("/remote.php/dav/spaces/{id}/*", svc.SpacesThumbnail)
 				r.Get("/dav/spaces/{id}", svc.SpacesThumbnail)
 				r.Get("/dav/spaces/{id}/*", svc.SpacesThumbnail)
-				r.MethodFunc("REPORT", "/remote.php/dav/spaces*", svc.Search)
-				r.MethodFunc("REPORT", "/dav/spaces*", svc.Search)
 
 				r.Get("/remote.php/dav/files/{id}", svc.Thumbnail)
 				r.Get("/remote.php/dav/files/{id}/*", svc.Thumbnail)
 				r.Get("/dav/files/{id}", svc.Thumbnail)
 				r.Get("/dav/files/{id}/*", svc.Thumbnail)
-
-				r.MethodFunc("REPORT", "/remote.php/dav/files*", svc.Search)
-				r.MethodFunc("REPORT", "/dav/files*", svc.Search)
 			})
 
 			r.Group(func(r chi.Router) {
@@ -123,11 +118,22 @@ func NewService(opts ...Option) (Service, error) {
 				r.Use(svc.WebDAVContext())
 				r.Get("/remote.php/webdav/*", svc.Thumbnail)
 				r.Get("/webdav/*", svc.Thumbnail)
-
-				r.MethodFunc("REPORT", "/remote.php/webdav*", svc.Search)
-				r.MethodFunc("REPORT", "/webdav*", svc.Search)
 			})
 		}
+
+		r.Group(func(r chi.Router) {
+			r.Use(svc.DavUserContext())
+			r.MethodFunc("REPORT", "/remote.php/dav/spaces*", svc.Search)
+			r.MethodFunc("REPORT", "/dav/spaces*", svc.Search)
+			r.MethodFunc("REPORT", "/remote.php/dav/files*", svc.Search)
+			r.MethodFunc("REPORT", "/dav/files*", svc.Search)
+		})
+
+		r.Group(func(r chi.Router) {
+			r.Use(svc.WebDAVContext())
+			r.MethodFunc("REPORT", "/remote.php/webdav*", svc.Search)
+			r.MethodFunc("REPORT", "/webdav*", svc.Search)
+		})
 
 	})
 
