@@ -24,6 +24,12 @@ func StorageKiteworksConfigFromStruct(cfg *config.Config) map[string]interface{}
 				"certificate": cfg.GRPC.TLS.Cert,
 				"key":         cfg.GRPC.TLS.Key,
 			},
+			"interceptors": map[string]interface{}{
+				"prometheus": map[string]interface{}{
+					"namespace": "ocis",
+					"subsystem": "storage_kiteworks",
+				},
+			},
 			"services": map[string]interface{}{
 				"storageprovider": map[string]interface{}{
 					"driver": "kiteworks",
