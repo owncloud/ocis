@@ -3,8 +3,9 @@ FROM amd64/alpine:latest
 ARG VERSION=""
 ARG REVISION=""
 
-RUN apk add --no-cache attr bash ca-certificates curl delve inotify-tools libc6-compat mailcap tree vips patch && \
-	echo 'hosts: files dns' >| /etc/nsswitch.conf
+RUN apk add --no-cache attr bash ca-certificates curl delve inotify-tools libc6-compat mailcap tree patch \
+    && apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community "vips=8.18.2-r0" \
+    && echo 'hosts: files dns' >| /etc/nsswitch.conf
 
 LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
   org.opencontainers.image.title="ownCloud Infinite Scale" \
