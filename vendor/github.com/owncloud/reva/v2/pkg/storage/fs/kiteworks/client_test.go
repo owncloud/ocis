@@ -63,11 +63,13 @@ var _ = Describe("Client", func() {
 
 	Describe("IsSharedWithUser", func() {
 		It("returns false for owned folder", func() {
-			folders, _ := client.GetTopFolders()
+			folders, err := client.GetTopFolders()
+			Expect(err).ToNot(HaveOccurred())
 			Expect(folders[0].IsSharedWithUser()).To(BeFalse())
 		})
 		It("returns true for received share", func() {
-			folders, _ := client.GetTopFolders()
+			folders, err := client.GetTopFolders()
+			Expect(err).ToNot(HaveOccurred())
 			Expect(folders[1].IsSharedWithUser()).To(BeTrue())
 		})
 	})
