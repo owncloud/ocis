@@ -168,14 +168,30 @@ func (c *Client) RenameFile(id, name string, replace bool) error {
 
 // MoveResource moves a file or folder to a new parent folder
 func (c *Client) MoveResource(sourceID, destFolderID string, replace bool) error {
-	return c.doJSON(http.MethodPost, "/rest/files/"+sourceID+"/actions/move",
+	err := c.doJSON(http.MethodPost, "/rest/files/"+sourceID+"/actions/move",
 		&FileCopyMove{DestFolderID: destFolderID, Replace: replace}, nil)
+	if err != nil {
+		if ce, ok := err.(*ClientError); ok && ce.StatusCode == 404 {
+			return c.doJSON(http.MethodPost, "/rest/folders/"+sourceID+"/actions/move",
+				&FileCopyMove{DestFolderID: destFolderID, Replace: replace}, nil)
+		}
+		return err
+	}
+	return nil
 }
 
 // CopyResource copies a file or folder to a destination folder
 func (c *Client) CopyResource(sourceID, destFolderID string, replace bool) error {
-	return c.doJSON(http.MethodPost, "/rest/files/"+sourceID+"/actions/copy",
+	err := c.doJSON(http.MethodPost, "/rest/files/"+sourceID+"/actions/copy",
 		&FileCopyMove{DestFolderID: destFolderID, Replace: replace}, nil)
+	if err != nil {
+		if ce, ok := err.(*ClientError); ok && ce.StatusCode == 404 {
+			return c.doJSON(http.MethodPost, "/rest/folders/"+sourceID+"/actions/copy",
+				&FileCopyMove{DestFolderID: destFolderID, Replace: replace}, nil)
+		}
+		return err
+	}
+	return nil
 }
 
 // InitiateUpload starts a chunked upload session

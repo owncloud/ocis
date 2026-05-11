@@ -90,7 +90,7 @@ func DefaultConfig() *Config {
 		Settings:          settings.DefaultConfig(),
 		Sharing:           sharing.DefaultConfig(),
 		SSE:               sse.DefaultConfig(),
-		StorageKiteworks:  storagekiteworks.FullDefaultConfig(),
+		StorageKiteworks:  storagekiteworks.DefaultConfig(),
 		StoragePublicLink: storagepublic.DefaultConfig(),
 		StorageShares:     storageshares.DefaultConfig(),
 		StorageSystem:     storageSystem.DefaultConfig(),
