@@ -18,7 +18,7 @@ func FullDefaultConfig() *config.Config {
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
-			Addr:   "127.0.0.1:9179",
+			Addr:   "127.0.0.1:9181",
 			Token:  "",
 			Pprof:  false,
 			Zpages: false,
