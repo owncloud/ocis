@@ -1609,6 +1609,7 @@ github.com/owncloud/reva/v2/pkg/storage/fs/eosgrpc
 github.com/owncloud/reva/v2/pkg/storage/fs/eosgrpchome
 github.com/owncloud/reva/v2/pkg/storage/fs/eoshome
 github.com/owncloud/reva/v2/pkg/storage/fs/hello
+github.com/owncloud/reva/v2/pkg/storage/fs/kiteworks
 github.com/owncloud/reva/v2/pkg/storage/fs/loader
 github.com/owncloud/reva/v2/pkg/storage/fs/local
 github.com/owncloud/reva/v2/pkg/storage/fs/localhome
