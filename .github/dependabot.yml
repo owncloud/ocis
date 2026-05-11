@@ -1,27 +1,57 @@
 version: 2
 updates:
-  - package-ecosystem: "gomod"
+  - package-ecosystem: gomod
     directory: "/"
     schedule:
-      interval: "daily"
-    open-pull-requests-limit: 2
+      interval: weekly
+      day: sunday
+      time: '22:00'
+      timezone: Etc/UTC
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
 
-  - package-ecosystem: "npm"
+  - package-ecosystem: composer
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: sunday
+      time: '22:00'
+      timezone: Etc/UTC
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: npm
     directory: "/services/idp"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 2
+      interval: weekly
+      day: sunday
+      time: '22:00'
+      timezone: Etc/UTC
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
 
-  - package-ecosystem: "docker"
-    directories:
-      - "/"
-      - "/ocis/docker"
+  - package-ecosystem: github-actions
+    directory: "/"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 2
-    
-  - package-ecosystem: "github-actions"
-    directory: "/" # Location of package manifests
-    schedule:
-      interval: "weekly"
-
+      interval: weekly
+      day: sunday
+      time: '22:00'
+      timezone: Etc/UTC
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
