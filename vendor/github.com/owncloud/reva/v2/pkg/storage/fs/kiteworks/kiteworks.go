@@ -309,6 +309,9 @@ func (d *Driver) CreateDir(ctx context.Context, ref *provider.Reference) error {
 	}
 	parentID := ref.GetResourceId().GetOpaqueId()
 	name := ref.GetPath()
+	if parentID == "" || name == "" {
+		return errtypes.NotFound("kiteworks: CreateDir requires a parent ID and name")
+	}
 	_, err = c.CreateFolder(parentID, name)
 	return err
 }
@@ -319,6 +322,9 @@ func (d *Driver) TouchFile(ctx context.Context, ref *provider.Reference, _ bool,
 	}
 	parentID := ref.GetResourceId().GetOpaqueId()
 	name := ref.GetPath()
+	if parentID == "" || name == "" {
+		return errtypes.NotFound("kiteworks: TouchFile requires a parent ID and name")
+	}
 	_, err = uploadFile(c, parentID, name, 0, strings.NewReader(""), d.cfg.ChunkSize)
 	return err
 }
@@ -346,10 +352,20 @@ func (d *Driver) Move(ctx context.Context, oldRef, newRef *provider.Reference) e
 		return err
 	}
 	sourceID := oldRef.GetResourceId().GetOpaqueId()
+	if sourceID == "" {
+		return errtypes.NotFound("kiteworks: source reference has no id")
+	}
 	destFolderID := newRef.GetResourceId().GetOpaqueId()
 	if destFolderID == "" {
-		// rename: newRef has path only
-		return c.RenameFile(sourceID, newRef.GetPath(), false)
+		// rename: try file first, fall back to folder
+		err = c.RenameFile(sourceID, newRef.GetPath(), false)
+		if err != nil {
+			if ce, ok := err.(*ClientError); ok && ce.StatusCode == 404 {
+				return c.RenameFolder(sourceID, newRef.GetPath())
+			}
+			return err
+		}
+		return nil
 	}
 	return c.MoveResource(sourceID, destFolderID, false)
 }
@@ -391,7 +407,10 @@ func (d *Driver) Upload(ctx context.Context, req storage.UploadRequest, uploadFu
 	}
 	ri := fileInfoToResourceInfo(fi)
 	if uploadFunc != nil {
-		u := ctxpkg.ContextMustGetUser(ctx)
+		u, ok := ctxpkg.ContextGetUser(ctx)
+		if !ok {
+			return nil, errtypes.PermissionDenied("kiteworks: no user in context")
+		}
 		uploadFunc(u.GetId(), u.GetId(), req.Ref)
 	}
 	return ri, nil
