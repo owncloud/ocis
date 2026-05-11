@@ -4,8 +4,11 @@ package kiteworks
 import (
 	"context"
 	"io"
+	"math"
 	"net/url"
+	"strings"
 
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typespb "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/mitchellh/mapstructure"
@@ -299,23 +302,99 @@ func (d *Driver) GetHome(_ context.Context) (string, error) {
 func (d *Driver) CreateReference(_ context.Context, _ string, _ *url.URL) error {
 	return errtypes.NotSupported("kiteworks: CreateReference")
 }
-func (d *Driver) CreateDir(_ context.Context, _ *provider.Reference) error {
-	return errtypes.NotSupported("kiteworks: CreateDir")
+func (d *Driver) CreateDir(ctx context.Context, ref *provider.Reference) error {
+	c, err := d.client(ctx)
+	if err != nil {
+		return err
+	}
+	parentID := ref.GetResourceId().GetOpaqueId()
+	name := ref.GetPath()
+	_, err = c.CreateFolder(parentID, name)
+	return err
 }
-func (d *Driver) TouchFile(_ context.Context, _ *provider.Reference, _ bool, _ string) error {
-	return errtypes.NotSupported("kiteworks: TouchFile")
+func (d *Driver) TouchFile(ctx context.Context, ref *provider.Reference, _ bool, _ string) error {
+	c, err := d.client(ctx)
+	if err != nil {
+		return err
+	}
+	parentID := ref.GetResourceId().GetOpaqueId()
+	name := ref.GetPath()
+	_, err = uploadFile(c, parentID, name, 0, strings.NewReader(""), d.cfg.ChunkSize)
+	return err
 }
-func (d *Driver) Delete(_ context.Context, _ *provider.Reference) error {
-	return errtypes.NotSupported("kiteworks: Delete")
+func (d *Driver) Delete(ctx context.Context, ref *provider.Reference) error {
+	c, err := d.client(ctx)
+	if err != nil {
+		return err
+	}
+	id := ref.GetResourceId().GetOpaqueId()
+	if id == "" {
+		return errtypes.NotFound("kiteworks: reference has no id")
+	}
+	err = c.DeleteFolder(id)
+	if err != nil {
+		if ce, ok := err.(*ClientError); ok && ce.StatusCode == 404 {
+			return c.DeleteFile(id)
+		}
+		return err
+	}
+	return nil
 }
-func (d *Driver) Move(_ context.Context, _, _ *provider.Reference) error {
-	return errtypes.NotSupported("kiteworks: Move")
+func (d *Driver) Move(ctx context.Context, oldRef, newRef *provider.Reference) error {
+	c, err := d.client(ctx)
+	if err != nil {
+		return err
+	}
+	sourceID := oldRef.GetResourceId().GetOpaqueId()
+	destFolderID := newRef.GetResourceId().GetOpaqueId()
+	if destFolderID == "" {
+		// rename: newRef has path only
+		return c.RenameFile(sourceID, newRef.GetPath(), false)
+	}
+	return c.MoveResource(sourceID, destFolderID, false)
 }
-func (d *Driver) InitiateUpload(_ context.Context, _ *provider.Reference, _ int64, _ map[string]string) (map[string]string, error) {
-	return nil, errtypes.NotSupported("kiteworks: InitiateUpload")
+func (d *Driver) InitiateUpload(ctx context.Context, ref *provider.Reference, uploadLength int64, metadata map[string]string) (map[string]string, error) {
+	c, err := d.client(ctx)
+	if err != nil {
+		return nil, err
+	}
+	parentID := ref.GetResourceId().GetOpaqueId()
+	filename := metadata["filename"]
+	if filename == "" {
+		filename = ref.GetPath()
+	}
+	numChunks := 1
+	if uploadLength > 0 {
+		numChunks = int(math.Ceil(float64(uploadLength) / float64(d.cfg.ChunkSize)))
+	}
+	result, err := c.InitiateUpload(parentID, filename, uploadLength, numChunks)
+	if err != nil {
+		return nil, err
+	}
+	return map[string]string{
+		"uploadID":  result.ID,
+		"uploadURI": result.URI,
+		"filename":  filename,
+		"parentID":  parentID,
+	}, nil
 }
-func (d *Driver) Upload(_ context.Context, _ storage.UploadRequest, _ storage.UploadFinishedFunc) (*provider.ResourceInfo, error) {
-	return nil, errtypes.NotSupported("kiteworks: Upload")
+func (d *Driver) Upload(ctx context.Context, req storage.UploadRequest, uploadFunc storage.UploadFinishedFunc) (*provider.ResourceInfo, error) {
+	c, err := d.client(ctx)
+	if err != nil {
+		return nil, err
+	}
+	parentID := req.Ref.GetResourceId().GetOpaqueId()
+	filename := req.Ref.GetPath()
+	fi, err := uploadFile(c, parentID, filename, req.Length, req.Body, d.cfg.ChunkSize)
+	if err != nil {
+		return nil, err
+	}
+	ri := fileInfoToResourceInfo(fi)
+	if uploadFunc != nil {
+		u := ctxpkg.ContextMustGetUser(ctx)
+		uploadFunc(u.GetId(), u.GetId(), req.Ref)
+	}
+	return ri, nil
 }
 func (d *Driver) ListRevisions(_ context.Context, _ *provider.Reference) ([]*provider.FileVersion, error) {
 	return nil, errtypes.NotSupported("kiteworks: ListRevisions")
@@ -339,19 +418,59 @@ func (d *Driver) EmptyRecycle(_ context.Context, _ *provider.Reference) error {
 	return errtypes.NotSupported("kiteworks: EmptyRecycle")
 }
 func (d *Driver) AddGrant(_ context.Context, _ *provider.Reference, _ *provider.Grant) error {
-	return errtypes.NotSupported("kiteworks: AddGrant")
+	return errtypes.NotSupported("kiteworks: AddGrant — permission mapping not yet implemented")
 }
 func (d *Driver) DenyGrant(_ context.Context, _ *provider.Reference, _ *provider.Grantee) error {
 	return errtypes.NotSupported("kiteworks: DenyGrant")
 }
 func (d *Driver) RemoveGrant(_ context.Context, _ *provider.Reference, _ *provider.Grant) error {
-	return errtypes.NotSupported("kiteworks: RemoveGrant")
+	return errtypes.NotSupported("kiteworks: RemoveGrant — permission mapping not yet implemented")
 }
 func (d *Driver) UpdateGrant(_ context.Context, _ *provider.Reference, _ *provider.Grant) error {
-	return errtypes.NotSupported("kiteworks: UpdateGrant")
+	return errtypes.NotSupported("kiteworks: UpdateGrant — permission mapping not yet implemented")
 }
-func (d *Driver) ListGrants(_ context.Context, _ *provider.Reference) ([]*provider.Grant, error) {
-	return nil, errtypes.NotSupported("kiteworks: ListGrants")
+func (d *Driver) ListGrants(ctx context.Context, ref *provider.Reference) ([]*provider.Grant, error) {
+	c, err := d.client(ctx)
+	if err != nil {
+		return nil, err
+	}
+	id := ref.GetResourceId().GetOpaqueId()
+	if id == "" {
+		return nil, errtypes.NotFound("kiteworks: reference has no id")
+	}
+	fi, err := c.GetFolder(id)
+	if err != nil {
+		if ce, ok := err.(*ClientError); ok && ce.StatusCode == 404 {
+			fi, err = c.GetFile(id)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			return nil, err
+		}
+	}
+	var grants []*provider.Grant
+	for _, perm := range fi.Permissions {
+		if !perm.Allowed {
+			continue
+		}
+		grants = append(grants, &provider.Grant{
+			Grantee: &provider.Grantee{
+				Type: provider.GranteeType_GRANTEE_TYPE_USER,
+				Id: &provider.Grantee_UserId{
+					UserId: &userpb.UserId{OpaqueId: perm.Name},
+				},
+			},
+			Permissions: &provider.ResourcePermissions{
+				GetPath:              true,
+				InitiateFileDownload: true,
+				InitiateFileUpload:   true,
+				ListContainer:        true,
+				Stat:                 true,
+			},
+		})
+	}
+	return grants, nil
 }
 func (d *Driver) SetArbitraryMetadata(_ context.Context, _ *provider.Reference, _ *provider.ArbitraryMetadata) error {
 	return errtypes.NotSupported("kiteworks: SetArbitraryMetadata")
