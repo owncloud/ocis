@@ -40,6 +40,7 @@ import (
 	settings "github.com/owncloud/ocis/v2/services/settings/pkg/command"
 	sharing "github.com/owncloud/ocis/v2/services/sharing/pkg/command"
 	sse "github.com/owncloud/ocis/v2/services/sse/pkg/command"
+	storagekiteworks "github.com/owncloud/ocis/v2/services/storage-kiteworks/pkg/command"
 	storagepubliclink "github.com/owncloud/ocis/v2/services/storage-publiclink/pkg/command"
 	storageshares "github.com/owncloud/ocis/v2/services/storage-shares/pkg/command"
 	storagesystem "github.com/owncloud/ocis/v2/services/storage-system/pkg/command"
@@ -231,6 +232,11 @@ var svccmds = []register.Command{
 	func(cfg *config.Config) *cli.Command {
 		return ServiceCommand(cfg, cfg.StorageUsers.Service.Name, storageusers.GetCommands(cfg.StorageUsers), func(c *config.Config) {
 			cfg.StorageUsers.Commons = cfg.Commons
+		})
+	},
+	func(cfg *config.Config) *cli.Command {
+		return ServiceCommand(cfg, cfg.StorageKiteworks.Service.Name, storagekiteworks.GetCommands(cfg.StorageKiteworks), func(c *config.Config) {
+			cfg.StorageKiteworks.Commons = cfg.Commons
 		})
 	},
 	func(cfg *config.Config) *cli.Command {
