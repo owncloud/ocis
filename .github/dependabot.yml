@@ -42,6 +42,22 @@ updates:
           - minor
           - patch
 
+  - package-ecosystem: docker
+    directories:
+      - "/"
+      - "/ocis/docker"
+    schedule:
+      interval: weekly
+      day: sunday
+      time: '22:00'
+      timezone: Etc/UTC
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
