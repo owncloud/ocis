@@ -172,6 +172,9 @@ func (d *Driver) GetMD(ctx context.Context, ref *provider.Reference, _, _ []stri
 		return nil, err
 	}
 	id := ref.GetResourceId().GetOpaqueId()
+	if id == "" && ref.GetPath() == "" {
+		return nil, errtypes.NotFound("kiteworks: reference has no id or path")
+	}
 	if id == "" && ref.GetPath() != "" {
 		// path-based lookup via search
 		results, err := c.Search(ref.GetPath())
@@ -205,6 +208,9 @@ func (d *Driver) ListFolder(ctx context.Context, ref *provider.Reference, _, _ [
 		return nil, err
 	}
 	id := ref.GetResourceId().GetOpaqueId()
+	if id == "" {
+		return nil, errtypes.NotFound("kiteworks: reference has no id")
+	}
 	dir, err := c.ListFolder(id)
 	if err != nil {
 		return nil, err
@@ -226,6 +232,9 @@ func (d *Driver) Download(ctx context.Context, ref *provider.Reference, openRead
 		return nil, nil, err
 	}
 	id := ref.GetResourceId().GetOpaqueId()
+	if id == "" {
+		return nil, nil, errtypes.NotFound("kiteworks: reference has no id")
+	}
 	fi, err := c.GetFile(id)
 	if err != nil {
 		return nil, nil, err
@@ -238,11 +247,19 @@ func (d *Driver) Download(ctx context.Context, ref *provider.Reference, openRead
 	if err != nil {
 		return nil, nil, err
 	}
+	if resp.StatusCode >= 300 {
+		body, _ := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		return nil, nil, &ClientError{StatusCode: resp.StatusCode, Body: body}
+	}
 	return ri, resp.Body, nil
 }
 
 // GetPathByID implements storage.FS
 func (d *Driver) GetPathByID(ctx context.Context, id *provider.ResourceId) (string, error) {
+	if id == nil || id.OpaqueId == "" {
+		return "", errtypes.NotFound("kiteworks: missing resource id")
+	}
 	c, err := d.client(ctx)
 	if err != nil {
 		return "", err
