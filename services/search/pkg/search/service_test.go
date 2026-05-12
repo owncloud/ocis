@@ -26,7 +26,9 @@ import (
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/status"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/reva/v2/pkg/utils"
 	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
 )
@@ -736,8 +738,334 @@ var _ = Describe("Searchprovider", func() {
 				})
 			})
 		})
+
+		Context("vault mode", func() {
+			var vaultSpace *sprovider.StorageSpace
+
+			BeforeEach(func() {
+				vaultSpace = &sprovider.StorageSpace{
+					SpaceType: "personal",
+					Owner:     user,
+					Id:        &sprovider.StorageSpaceId{OpaqueId: utils.VaultStorageProviderID + "$vaultspace!vaultspace"},
+					Root:      &sprovider.ResourceId{StorageId: utils.VaultStorageProviderID, SpaceId: "vaultspace", OpaqueId: "vaultspace"},
+					Name:      "vaultspace",
+				}
+				gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+					Status: status.NewOK(context.Background()),
+					Info:   ri,
+				}, nil)
+			})
+
+			It("searches only the vault space when vault:true is in query AND context has MFA", func() {
+				mfaCtx := mfa.Set(ctx, true)
+				// First call: general spaces (no storage_id opaque key) — returns only the personal space.
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.MatchedBy(func(req *sprovider.ListStorageSpacesRequest) bool {
+					return utils.ReadPlainFromOpaque(req.Opaque, "storage_id") == ""
+				})).Return(&sprovider.ListStorageSpacesResponse{
+					Status:        status.NewOK(mfaCtx),
+					StorageSpaces: []*sprovider.StorageSpace{personalSpace},
+				}, nil)
+				// Second call: vault-specific (storage_id set) — returns the vault space.
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.MatchedBy(func(req *sprovider.ListStorageSpacesRequest) bool {
+					return utils.ReadPlainFromOpaque(req.Opaque, "storage_id") == utils.VaultStorageProviderID
+				})).Return(&sprovider.ListStorageSpacesResponse{
+					Status:        status.NewOK(mfaCtx),
+					StorageSpaces: []*sprovider.StorageSpace{vaultSpace},
+				}, nil)
+				indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
+					return req.Ref.ResourceId.SpaceId == vaultSpace.Root.SpaceId
+				})).Return(&searchsvc.SearchIndexResponse{
+					TotalMatches: 1,
+					Matches: []*searchmsg.Match{
+						{
+							Score: 1,
+							Entity: &searchmsg.Entity{
+								Ref: &searchmsg.Reference{
+									ResourceId: &searchmsg.ResourceID{
+										StorageId: vaultSpace.Root.StorageId,
+										SpaceId:   vaultSpace.Root.SpaceId,
+										OpaqueId:  vaultSpace.Root.OpaqueId,
+									},
+									Path: "./vault-file.pdf",
+								},
+								Id: &searchmsg.ResourceID{
+									StorageId: vaultSpace.Root.StorageId,
+									OpaqueId:  "vault-file-id",
+								},
+								Name: "vault-file.pdf",
+							},
+						},
+					},
+				}, nil)
+
+				res, err := s.Search(mfaCtx, &searchsvc.SearchRequest{Query: "secret vault:true"})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(res).ToNot(BeNil())
+				Expect(len(res.Matches)).To(Equal(1))
+				Expect(res.Matches[0].Entity.Id.OpaqueId).To(Equal("vault-file-id"))
+			})
+
+			It("searches only regular spaces when MFA context is set but vault:true is absent", func() {
+				mfaCtx := mfa.Set(ctx, true)
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
+					Status:        status.NewOK(mfaCtx),
+					StorageSpaces: []*sprovider.StorageSpace{personalSpace, vaultSpace},
+				}, nil)
+				indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
+					return req.Ref.ResourceId.SpaceId == personalSpace.Root.SpaceId
+				})).Return(&searchsvc.SearchIndexResponse{
+					TotalMatches: 1,
+					Matches: []*searchmsg.Match{
+						{
+							Score: 1,
+							Entity: &searchmsg.Entity{
+								Ref: &searchmsg.Reference{
+									ResourceId: &searchmsg.ResourceID{
+										StorageId: personalSpace.Root.StorageId,
+										SpaceId:   personalSpace.Root.SpaceId,
+										OpaqueId:  personalSpace.Root.OpaqueId,
+									},
+									Path: "./path/to/Foo.pdf",
+								},
+								Id: &searchmsg.ResourceID{
+									StorageId: personalSpace.Root.StorageId,
+									OpaqueId:  "foo-id",
+								},
+								Name: "Foo.pdf",
+							},
+						},
+					},
+				}, nil)
+
+				res, err := s.Search(mfaCtx, &searchsvc.SearchRequest{Query: "secret"})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(res).ToNot(BeNil())
+				Expect(len(res.Matches)).To(Equal(1))
+				Expect(res.Matches[0].Entity.Id.OpaqueId).To(Equal("foo-id"))
+			})
+
+			It("searches only regular spaces when vault:true is in query but context has no MFA", func() {
+				// ctx has no MFA — a non-MFA client cannot opt into vault mode
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
+					Status:        status.NewOK(ctx),
+					StorageSpaces: []*sprovider.StorageSpace{personalSpace, vaultSpace},
+				}, nil)
+				indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
+					return req.Ref.ResourceId.SpaceId == personalSpace.Root.SpaceId
+				})).Return(&searchsvc.SearchIndexResponse{
+					TotalMatches: 1,
+					Matches: []*searchmsg.Match{
+						{
+							Score: 1,
+							Entity: &searchmsg.Entity{
+								Ref: &searchmsg.Reference{
+									ResourceId: &searchmsg.ResourceID{
+										StorageId: personalSpace.Root.StorageId,
+										SpaceId:   personalSpace.Root.SpaceId,
+										OpaqueId:  personalSpace.Root.OpaqueId,
+									},
+									Path: "./path/to/Foo.pdf",
+								},
+								Id: &searchmsg.ResourceID{
+									StorageId: personalSpace.Root.StorageId,
+									OpaqueId:  "foo-id",
+								},
+								Name: "Foo.pdf",
+							},
+						},
+					},
+				}, nil)
+
+				res, err := s.Search(ctx, &searchsvc.SearchRequest{Query: "secret vault:true"})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(res).ToNot(BeNil())
+				Expect(len(res.Matches)).To(Equal(1))
+				Expect(res.Matches[0].Entity.Id.OpaqueId).To(Equal("foo-id"))
+			})
+
+			It("regular search includes received shares but excludes vault spaces", func() {
+				grantSpace := &sprovider.StorageSpace{
+					SpaceType: "grant",
+					Owner:     otherUser,
+					Id:        &sprovider.StorageSpaceId{OpaqueId: "storageproviderid$spaceid!otherspacegrant"},
+					Root:      &sprovider.ResourceId{StorageId: "storageproviderid", SpaceId: "spaceid", OpaqueId: "otherspacegrant"},
+					Name:      "grantspace",
+					RootInfo: &sprovider.ResourceInfo{
+						Id: &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "opaqueid"},
+					},
+				}
+				mountpointSpace := &sprovider.StorageSpace{
+					SpaceType: "mountpoint",
+					Owner:     otherUser,
+					Id:        &sprovider.StorageSpaceId{OpaqueId: "storageproviderid$spaceid!otherspacemountpoint"},
+					Root:      &sprovider.ResourceId{StorageId: "storageproviderid", SpaceId: "spaceid", OpaqueId: "otherspacemountpoint"},
+					Name:      "mountpointspace",
+					Opaque: &typesv1beta1.Opaque{
+						Map: map[string]*typesv1beta1.OpaqueEntry{
+							"grantStorageID": {Decoder: "plain", Value: []byte("storageproviderid")},
+							"grantSpaceID":   {Decoder: "plain", Value: []byte("spaceid")},
+							"grantOpaqueID":  {Decoder: "plain", Value: []byte("otherspacegrant")},
+						},
+					},
+				}
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
+					Status:        status.NewOK(ctx),
+					StorageSpaces: []*sprovider.StorageSpace{personalSpace, grantSpace, mountpointSpace, vaultSpace},
+				}, nil)
+				gatewayClient.On("GetPath", mock.Anything, mock.Anything).Return(&sprovider.GetPathResponse{
+					Status: status.NewOK(ctx),
+					Path:   "/grant/path",
+				}, nil)
+				indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
+					return req.Ref.ResourceId.SpaceId == grantSpace.Root.SpaceId
+				})).Return(&searchsvc.SearchIndexResponse{
+					TotalMatches: 1,
+					Matches: []*searchmsg.Match{
+						{
+							Score: 1,
+							Entity: &searchmsg.Entity{
+								Ref: &searchmsg.Reference{
+									ResourceId: &searchmsg.ResourceID{
+										StorageId: grantSpace.Root.StorageId,
+										SpaceId:   grantSpace.Root.SpaceId,
+										OpaqueId:  grantSpace.Root.OpaqueId,
+									},
+									Path: "./grant/path/to/Shared.pdf",
+								},
+								Id:   &searchmsg.ResourceID{StorageId: grantSpace.Root.StorageId, OpaqueId: "shared-id"},
+								Name: "Shared.pdf",
+							},
+						},
+					},
+				}, nil)
+				indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
+					return req.Ref.ResourceId.SpaceId == personalSpace.Root.SpaceId
+				})).Return(&searchsvc.SearchIndexResponse{}, nil)
+
+				res, err := s.Search(ctx, &searchsvc.SearchRequest{Query: "file"})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(res).ToNot(BeNil())
+				Expect(len(res.Matches)).To(Equal(1))
+				// Result is the share, mapped to the mountpoint path.
+				Expect(res.Matches[0].Entity.Id.OpaqueId).To(Equal("shared-id"))
+				Expect(res.Matches[0].Entity.Ref.ResourceId.OpaqueId).To(Equal(mountpointSpace.Root.OpaqueId))
+				// Vault space was not searched.
+				indexClient.AssertNotCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
+					return req.Ref.ResourceId.StorageId == utils.VaultStorageProviderID
+				}))
+			})
+
+			It("vault mode search excludes received shares from regular storage", func() {
+				grantSpace := &sprovider.StorageSpace{
+					SpaceType: "grant",
+					Owner:     otherUser,
+					Id:        &sprovider.StorageSpaceId{OpaqueId: "storageproviderid$spaceid!otherspacegrant"},
+					Root:      &sprovider.ResourceId{StorageId: "storageproviderid", SpaceId: "spaceid", OpaqueId: "otherspacegrant"},
+					Name:      "grantspace",
+				}
+				mountpointSpace := &sprovider.StorageSpace{
+					SpaceType: "mountpoint",
+					Owner:     otherUser,
+					Id:        &sprovider.StorageSpaceId{OpaqueId: "storageproviderid$spaceid!otherspacemountpoint"},
+					Root:      &sprovider.ResourceId{StorageId: "storageproviderid", SpaceId: "spaceid", OpaqueId: "otherspacemountpoint"},
+					Name:      "mountpointspace",
+					Opaque: &typesv1beta1.Opaque{
+						Map: map[string]*typesv1beta1.OpaqueEntry{
+							"grantStorageID": {Decoder: "plain", Value: []byte("storageproviderid")},
+							"grantSpaceID":   {Decoder: "plain", Value: []byte("spaceid")},
+							"grantOpaqueID":  {Decoder: "plain", Value: []byte("otherspacegrant")},
+						},
+					},
+				}
+				mfaCtx := mfa.Set(ctx, true)
+				// First LSS call: general — returns personal + grant + mountpoint (no vault).
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.MatchedBy(func(req *sprovider.ListStorageSpacesRequest) bool {
+					return utils.ReadPlainFromOpaque(req.Opaque, "storage_id") == ""
+				})).Return(&sprovider.ListStorageSpacesResponse{
+					Status:        status.NewOK(mfaCtx),
+					StorageSpaces: []*sprovider.StorageSpace{personalSpace, grantSpace, mountpointSpace},
+				}, nil)
+				// Second LSS call: vault-specific — returns vault space.
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.MatchedBy(func(req *sprovider.ListStorageSpacesRequest) bool {
+					return utils.ReadPlainFromOpaque(req.Opaque, "storage_id") == utils.VaultStorageProviderID
+				})).Return(&sprovider.ListStorageSpacesResponse{
+					Status:        status.NewOK(mfaCtx),
+					StorageSpaces: []*sprovider.StorageSpace{vaultSpace},
+				}, nil)
+				indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
+					return req.Ref.ResourceId.SpaceId == vaultSpace.Root.SpaceId
+				})).Return(&searchsvc.SearchIndexResponse{
+					TotalMatches: 1,
+					Matches: []*searchmsg.Match{
+						{
+							Score: 1,
+							Entity: &searchmsg.Entity{
+								Ref: &searchmsg.Reference{
+									ResourceId: &searchmsg.ResourceID{
+										StorageId: vaultSpace.Root.StorageId,
+										SpaceId:   vaultSpace.Root.SpaceId,
+										OpaqueId:  vaultSpace.Root.OpaqueId,
+									},
+									Path: "./vault-file.pdf",
+								},
+								Id:   &searchmsg.ResourceID{StorageId: vaultSpace.Root.StorageId, OpaqueId: "vault-file-id"},
+								Name: "vault-file.pdf",
+							},
+						},
+					},
+				}, nil)
+
+				res, err := s.Search(mfaCtx, &searchsvc.SearchRequest{Query: "file vault:true"})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(res).ToNot(BeNil())
+				Expect(len(res.Matches)).To(Equal(1))
+				Expect(res.Matches[0].Entity.Id.OpaqueId).To(Equal("vault-file-id"))
+				// Grant/mountpoint spaces were not searched.
+				indexClient.AssertNotCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
+					return req.Ref.ResourceId.SpaceId == grantSpace.Root.SpaceId
+				}))
+			})
+		})
 	})
 })
+
+var _ = DescribeTable("Parse Vault Mode",
+	func(pattern, wantQuery string, wantVault bool) {
+		gotQuery, gotVault := search.ParseVaultMode(pattern)
+		Expect(gotQuery).To(Equal(wantQuery))
+		Expect(gotVault).To(Equal(wantVault))
+	},
+	Entry("vault:true present",
+		`file vault:true`,
+		`file`,
+		true,
+	),
+	Entry("vault:true at the beginning",
+		`vault:true file`,
+		`file`,
+		true,
+	),
+	Entry("vault:true in the middle",
+		`foo vault:true bar`,
+		`foo  bar`,
+		true,
+	),
+	Entry("vault:false is not vault mode",
+		`+Name:*file* vault:false +Tags:&quot;foo&quot;`,
+		`+Name:*file*  +Tags:&quot;foo&quot;`,
+		false,
+	),
+	Entry("vault:false is not vault mode",
+		`file vault:false`,
+		`file`,
+		false,
+	),
+	Entry("no vault token",
+		`+Name:*file* +Tags:&quot;foo&quot;`,
+		`+Name:*file* +Tags:&quot;foo&quot;`,
+		false,
+	),
+)
 
 var _ = DescribeTable("Parse Scope",
 	func(pattern, wantSearch, wantScope string) {
