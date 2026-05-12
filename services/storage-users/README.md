@@ -407,3 +407,76 @@ Store specific notes:
   -   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OCIS_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
   -   When using `nats-js-kv` it is recommended to set `OCIS_CACHE_STORE_NODES` to the same value as `OCIS_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
   -   When using the `nats-js-kv` store, it is possible to set `OCIS_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
+
+## Vault Mode
+
+Vault mode provides a dedicated, separately stored vault storage that can be MFA-protected. Vault resources are isolated from the default user storage and have their own search, shares, and spaces — while public links are explicitly disallowed.
+
+### Architecture
+
+*   A dedicated `storage-users` vault storage instance is configured with a `VaultStorageProviderID` and mounted at `/vault/users` and `/vault/projects`.
+*   The `graph` service API is extended to serve the `/vault` prefix when vault mode is active.
+*   WebDAV access is supported for vault resources.
+*   Search is scoped separately for default and vault files, including their shares and spaces.
+*   Public links are disallowed for vault resources. The capabilities endpoint accepts a `vault=true` query parameter to advertise vault-specific capabilities.
+
+TODO: Describe the `vault mode` configuration and environment variables
+
+
+```
+~/.ocis/storage
+$ tree  users*
+users
+├── indexes
+│   ├── by-group-id
+│   ├── by-type
+│   │   └── personal.mpk
+│   └── by-user-id
+│       └── a032f2bd-fa5c-430b-a163-2c19f54190d0.mpk
+├── spaces
+│   └── a0
+│       └── 32f2bd-fa5c-430b-a163-2c19f54190d0
+│           └── nodes
+│               └── a0
+│                   └── 32
+│                       └── f2
+│                           └── bd
+│                               ├── -fa5c-430b-a163-2c19f54190d0
+│                               ├── -fa5c-430b-a163-2c19f54190d0.mlock
+│                               └── -fa5c-430b-a163-2c19f54190d0.mpk
+└── uploads
+users-vault
+├── indexes
+│   ├── by-group-id
+│   ├── by-type
+│   │   └── personal.mpk
+│   └── by-user-id
+│       └── a032f2bd-fa5c-430b-a163-2c19f54190d0.mpk
+├── spaces
+│   └── a0
+│       └── 32f2bd-fa5c-430b-a163-2c19f54190d0
+│           └── nodes
+│               └── a0
+│                   └── 32
+│                       └── f2
+│                           └── bd
+│                               ├── -fa5c-430b-a163-2c19f54190d0
+│                               ├── -fa5c-430b-a163-2c19f54190d0.mlock
+│                               └── -fa5c-430b-a163-2c19f54190d0.mpk
+└── uploads
+```
+
+### Running with Docker
+
+To enable vault mode in the `ocis_full` docker-compose stack, edit `deployments/examples/ocis_full/.env` and uncomment the following lines:
+
+```.env
+KEYCLOAK=:keycloak.yml
+VAULT_STORAGE=:vault-storage.yml
+```
+
+Then start the stack:
+
+```bash
+docker compose up -d
+```

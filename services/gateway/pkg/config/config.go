@@ -47,6 +47,8 @@ type Config struct {
 	AppRegistryEndpoint       string `yaml:"app_registry_endpoint" env:"GATEWAY_APP_REGISTRY_ENDPOINT" desc:"The endpoint of the app-registry service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol." introductionVersion:"7.0.0"`
 	OCMEndpoint               string `yaml:"ocm_endpoint" env:"GATEWAY_OCM_ENDPOINT" desc:"The endpoint of the ocm service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol." introductionVersion:"7.0.0"`
 
+	EnableVaultMode bool `yaml:"enable_vault_mode" env:"OCIS_ENABLE_VAULT_MODE;GATEWAY_ENABLE_VAULT_MODE" desc:"Set this to true to enable the default rule for vault storage provider configuration. Only applicable if the storage-users-vault service, a specially configured storage-users service, is configured." introductionVersion:"Deledda"`
+
 	StorageRegistry StorageRegistry `yaml:"storage_registry"` // TODO: should we even support switching this?
 
 	Context context.Context `yaml:"-"`

@@ -138,7 +138,7 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 		return rules
 	}
 	// generate rules based on default config
-	return map[string]map[string]interface{}{
+	rules := map[string]map[string]interface{}{
 		cfg.StorageUsersEndpoint: {
 			"providerid": cfg.StorageRegistry.StorageUsersMountID,
 			"spaces": map[string]interface{}{
@@ -149,22 +149,6 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 				"project": map[string]interface{}{
 					"mount_point":   "/projects",
 					"path_template": "/projects/{{.Space.Name}}",
-				},
-			},
-		},
-		cfg.StorageUsersVaultEndpoint: {
-			// Use the dedicated storage provider for vault
-			"providerid": utils.VaultStorageProviderID,
-			"spaces": map[string]interface{}{
-				"personal": map[string]interface{}{
-					// The mount point must have the "vault/" prefix to be picked up by the vault storage provider
-					"mount_point":   "/vault/users",
-					"path_template": "/vault/users/{{.Space.Owner.Id.OpaqueId}}",
-				},
-				"project": map[string]interface{}{
-					// The mount point must have the "vault/" prefix to be picked up by the vault storage provider
-					"mount_point":   "/vault/projects",
-					"path_template": "/vault/projects/{{.Space.Name}}",
 				},
 			},
 		},
@@ -214,4 +198,23 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 		},
 		// medatada storage not part of the global namespace
 	}
+	// enable the default rule for vault storage provider configuration
+	if cfg.EnableVaultMode {
+		rules[cfg.StorageUsersVaultEndpoint] = map[string]interface{}{
+			"providerid": utils.VaultStorageProviderID,
+			"spaces": map[string]interface{}{
+				"personal": map[string]interface{}{
+					// The mount point must have the "vault/" prefix to be picked up by the vault storage provider
+					"mount_point":   "/vault/users",
+					"path_template": "/vault/users/{{.Space.Owner.Id.OpaqueId}}",
+				},
+				"project": map[string]interface{}{
+					// The mount point must have the "vault/" prefix to be picked up by the vault storage provider
+					"mount_point":   "/vault/projects",
+					"path_template": "/vault/projects/{{.Space.Name}}",
+				},
+			},
+		}
+	}
+	return rules
 }
