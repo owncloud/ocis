@@ -25,20 +25,20 @@
         data-msg-sign-in="{{.ButtonSignIn}}">
         <div>
           <label class="oc-label" for="oc-login-username">{{.LabelUsername}}</label>
-          <input class="oc-input" type="text" id="oc-login-username" name="username" autocomplete="username" required>
+          <input class="oc-input" type="text" id="oc-login-username" name="username" autocomplete="username" placeholder="{{.LabelUsername}}" required>
         </div>
         <div>
           <label class="oc-label" for="oc-login-password">{{.LabelPassword}}</label>
-          <input class="oc-input" type="password" id="oc-login-password" name="password" autocomplete="current-password" required>
+          <input class="oc-input" type="password" id="oc-login-password" name="password" autocomplete="current-password" placeholder="{{.LabelPassword}}" required>
         </div>
         <div>
           <button class="oc-button-primary" type="submit" id="submit-btn">{{.ButtonSignIn}}</button>
         </div>
       </form>
       {{if .PasswordResetURI}}<p><a href="{{.PasswordResetURI}}">{{.ResetLabel}}</a></p>{{end}}
-      <footer class="oc-footer-message">ownCloud – a safe home for all your data</footer>
     </div>
   </main>
+  <footer class="oc-footer-message">ownCloud – a safe home for all your data</footer>
   <script nonce="{{.Nonce}}">
 (function() {
   var form = document.getElementById("login-form");

@@ -25,9 +25,9 @@
           <button class="oc-button-secondary" id="consent-deny-btn">{{.DenyLabel}}</button>
         </div>
       </div>
-      <footer class="oc-footer-message">ownCloud – a safe home for all your data</footer>
     </div>
   </main>
+  <footer class="oc-footer-message">ownCloud – a safe home for all your data</footer>
   <script nonce="{{.Nonce}}">
 (function() {
   var errorEl = document.getElementById("oc-consent-error-message");
@@ -134,10 +134,15 @@
           return;
         }
         if (result.ok && result.data && result.data.success) {
-          var continueURI = (helloData && helloData.continue_uri) || qs("redirect_uri");
-          if (continueURI && isSameOrigin(continueURI)) {
-            var sep = continueURI.indexOf('?') >= 0 ? '&' : '?';
-            window.location.href = continueURI + sep + "prompt=none&" + params.toString();
+          var continueURI = helloData && helloData.continue_uri;
+          if (continueURI) {
+            window.location.href = continueURI;
+            return;
+          }
+          var fallback = qs("redirect_uri");
+          if (fallback && isSameOrigin(fallback)) {
+            var sep = fallback.indexOf('?') >= 0 ? '&' : '?';
+            window.location.href = fallback + sep + "prompt=none&" + params.toString();
           }
           return;
         }
