@@ -139,6 +139,7 @@ jobs:
           CGO_ENABLED: 1
           GOOS: linux
           ENABLE_VIPS: true
+          VERSION: ${{ needs.determine-release-type.outputs.version }}
       - id: tags
         run: |
           VERSION="${{ needs.determine-release-type.outputs.version }}"
