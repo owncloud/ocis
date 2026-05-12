@@ -26,10 +26,10 @@ msgstr "Utilisateur"
 msgid "Password"
 msgstr "Mot de passe"
 
-msgid "Sign in"
+msgid "Log in"
 msgstr "Suivant"
 
-msgid "Signing in…"
+msgid "Logging in…"
 msgstr "Connexion…"
 
 msgid "Reset password"

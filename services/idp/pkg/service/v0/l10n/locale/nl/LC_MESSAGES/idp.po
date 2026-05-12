@@ -26,10 +26,10 @@ msgstr "Gebruikersnaam"
 msgid "Password"
 msgstr "Wachtwoord"
 
-msgid "Sign in"
+msgid "Log in"
 msgstr "Volgende"
 
-msgid "Signing in…"
+msgid "Logging in…"
 msgstr "Aanmelden…"
 
 msgid "Reset password"
