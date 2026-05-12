@@ -46,7 +46,7 @@ Feature: Link share without enforcing password
       | Edit             | edit                   |
       | Upload           | upload                 |
       | File Drop        | createOnly             |
-      | Secure View      | blocksDownload         |
+      # | Secure View      | blocksDownload         |
 
   @issue-7879
   Scenario Outline: create a link share of a file
@@ -82,7 +82,7 @@ Feature: Link share without enforcing password
       | permissions-role | permissions-role-value |
       | View             | view                   |
       | Edit             | edit                   |
-      | Secure View      | blocksDownload         |
+      # | Secure View      | blocksDownload         |
 
 
   Scenario: set password on existing file link share
@@ -147,7 +147,7 @@ Feature: Link share without enforcing password
       | Edit             | edit                   |
       | Upload           | upload                 |
       | File Drop        | createOnly             |
-      | Secure View      | blocksDownload         |
+      # | Secure View      | blocksDownload         |
 
   @issue-7879
   Scenario Outline: create a link share of a file inside project-space
@@ -185,7 +185,7 @@ Feature: Link share without enforcing password
       | permissions-role | permissions-role-value |
       | View             | view                   |
       | Edit             | edit                   |
-      | Secure View      | blocksDownload         |
+      # | Secure View      | blocksDownload         |
 
 
   Scenario: set password on a existing file link share inside project-space

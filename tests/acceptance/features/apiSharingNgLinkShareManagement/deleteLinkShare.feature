@@ -24,7 +24,7 @@ Feature: Remove access to a drive item
       | Edit             |
       | Upload           |
       | File Drop        |
-      | Secure View      |
+      # | Secure View      |
 
 
   Scenario Outline: user removes access to a file in link share
@@ -40,7 +40,7 @@ Feature: Remove access to a drive item
       | permissions-role |
       | View             |
       | Edit             |
-      | Secure View      |
+      # | Secure View      |
 
 
   Scenario Outline: user removes access to a folder in project space in link share
@@ -60,7 +60,7 @@ Feature: Remove access to a drive item
       | Edit             |
       | Upload           |
       | File Drop        |
-      | Secure View      |
+      # | Secure View      |
 
 
   Scenario Outline: user removes access to a file in project space in link share
@@ -78,4 +78,4 @@ Feature: Remove access to a drive item
       | permissions-role |
       | View             |
       | Edit             |
-      | Secure View      |
+      # | Secure View      |

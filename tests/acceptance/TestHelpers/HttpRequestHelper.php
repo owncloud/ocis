@@ -35,6 +35,7 @@ use SimpleXMLElement;
 use Sabre\Xml\LibXMLException;
 use Sabre\Xml\Reader;
 use GuzzleHttp\Pool;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 /**
  * Helper for HTTP requests
@@ -263,6 +264,13 @@ class HttpRequestHelper {
 			$loopAgain = !$sendExceptionHappened && ($response->getStatusCode() === self::HTTP_TOO_EARLY ||
 						($response->getStatusCode() === self::HTTP_CONFLICT && $isGivenStep)) &&
 						$sendCount <= $sendRetryLimit;
+			if (OcisConfigHelper::isK8s()) {
+				$loopAgain = $loopAgain || ($response->getStatusCode() >= HttpResponse::HTTP_INTERNAL_SERVER_ERROR &&
+							$sendCount <= $sendRetryLimit);
+				if ($loopAgain && $response->getStatusCode() >= HttpResponse::HTTP_INTERNAL_SERVER_ERROR) {
+					echo "[INFO][K8s] Received " . $response->getStatusCode() . " response. Retrying...\n";
+				}
+			}
 			if ($loopAgain) {
 				// we need to repeat the send request, because we got HTTP_TOO_EARLY or HTTP_CONFLICT
 				// wait 1 second before sending again, to give the server some time

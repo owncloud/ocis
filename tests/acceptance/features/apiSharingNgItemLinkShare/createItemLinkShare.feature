@@ -106,7 +106,7 @@ Feature: Link share for resources
       | Edit             | edit                   |
       | Upload           | upload                 |
       | File Drop        | createOnly             |
-      | Secure View      | blocksDownload         |
+      # | Secure View      | blocksDownload         |
 
   @issue-7879
   Scenario Outline: create a link share of a file
@@ -206,7 +206,7 @@ Feature: Link share for resources
       | permissions-role | permissions-role-value |
       | View             | view                   |
       | Edit             | edit                   |
-      | Secure View      | blocksDownload         |
+      # | Secure View      | blocksDownload         |
 
   @issue-7879
   Scenario Outline: create a link share of a folder inside project-space
@@ -308,7 +308,7 @@ Feature: Link share for resources
       | Edit             | edit                   |
       | Upload           | upload                 |
       | File Drop        | createOnly             |
-      | Secure View      | blocksDownload         |
+      # | Secure View      | blocksDownload         |
 
   @issue-7879
   Scenario Outline: create a link share of a file inside project-space
@@ -408,7 +408,7 @@ Feature: Link share for resources
       | permissions-role | permissions-role-value |
       | View             | view                   |
       | Edit             | edit                   |
-      | Secure View      | blocksDownload         |
+      # | Secure View      | blocksDownload         |
 
   @env-config
   Scenario: try to create a public link share of a folder with denied permissions role

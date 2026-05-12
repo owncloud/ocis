@@ -264,7 +264,20 @@ Feature: enforce password on public link
 
 
   Scenario Outline: try to create a public link with a password that does not comply with the password policy (invalid cases)
-    Given using OCS API version "2"
+    Given the following configs have been set:
+      | service  | config                                            | value |
+      | sharing  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | true  |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_CHARACTERS            | 8     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS  | 1     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS  | 1     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_DIGITS                | 1     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS    | 1     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 8     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 1     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 1     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_DIGITS               | 1     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 1     |
+    And using OCS API version "2"
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings

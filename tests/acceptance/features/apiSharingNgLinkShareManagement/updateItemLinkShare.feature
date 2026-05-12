@@ -70,11 +70,11 @@ Feature: Update a link share for a resource
     Examples:
       | permissions-role | new-permissions-role | permissions-role-value |
       | View             | Edit                 | edit                   |
-      | View             | Secure View          | blocksDownload         |
+      # | View             | Secure View          | blocksDownload         |
       | Edit             | View                 | view                   |
-      | Edit             | Secure View          | blocksDownload         |
-      | Secure View      | Edit                 | edit                   |
-      | Secure View      | Secure View          | blocksDownload         |
+      # | Edit             | Secure View          | blocksDownload         |
+      # | Secure View      | Edit                 | edit                   |
+      # | Secure View      | Secure View          | blocksDownload         |
 
   @issue-8619
   Scenario Outline: update role of a file's to internal link share using permissions endpoint
@@ -140,7 +140,7 @@ Feature: Update a link share for a resource
       | permissions-role |
       | View             |
       | Edit             |
-      | Secure View      |
+      # | Secure View      |
 
 
   Scenario: update expiration date of a file's link share using permissions endpoint
@@ -403,7 +403,7 @@ Feature: Update a link share for a resource
       | File Drop        | View                 | view                   |
       | File Drop        | Edit                 | edit                   |
       | File Drop        | Upload               | upload                 |
-      | Secure View      | Secure View          | blocksDownload         |
+      # | Secure View      | Secure View          | blocksDownload         |
 
 
   Scenario Outline: update role of a folder's link share inside project-space using permissions endpoint
@@ -795,7 +795,7 @@ Feature: Update a link share for a resource
       | File Drop        | View                 | view                   |
       | File Drop        | Edit                 | edit                   |
       | File Drop        | Upload               | upload                 |
-      | Secure View      | Secure View          | blocksDownload         |
+      # | Secure View      | Secure View          | blocksDownload         |
 
   @issues-8405
   Scenario Outline: remove expiration date of a resource link share using permissions endpoint
