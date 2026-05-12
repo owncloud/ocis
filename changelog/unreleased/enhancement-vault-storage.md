@@ -1,7 +1,7 @@
 Enhancement: Add vault storage with MFA-protected access
 
 Added a dedicated vault storage that can be protected with MFA. A separate
-`storage-users-vault` service instance runs in vault mode and serves
+`storage-users` service instance configured in vault mode runs and serves
 `/vault/users` and `/vault/projects` mount points with a dedicated
 `VaultStorageProviderID`. The `graph` service gained a new vault mode
 (`GRAPH_ENABLE_VAULT_MODE`) that serves the vault API under the `/vault`
