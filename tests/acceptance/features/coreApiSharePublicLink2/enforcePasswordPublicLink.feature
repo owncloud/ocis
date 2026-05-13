@@ -283,8 +283,8 @@ Feature: enforce password on public link
 
 
   Scenario Outline: update a public link with a password that is listed in the Banned-Password-List
-    Given the config "SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt" for "sharing" service
-    And the config "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt" for "frontend" service
+    Given the config "SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/ci/banned-password-list.txt" for "sharing" service
+    And the config "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/ci/banned-password-list.txt" for "frontend" service
     And using OCS API version "2"
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
@@ -307,8 +307,8 @@ Feature: enforce password on public link
 
 
   Scenario Outline: create  a public link with a password that is listed in the Banned-Password-List
-    Given the config "SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt" for "sharing" service
-    And the config "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt" for "frontend" service
+    Given the config "SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/ci/banned-password-list.txt" for "sharing" service
+    And the config "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/ci/banned-password-list.txt" for "frontend" service
     And using OCS API version "2"
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"

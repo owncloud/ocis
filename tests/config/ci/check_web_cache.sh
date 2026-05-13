@@ -1,5 +1,7 @@
 #!/bin/bash
-source .drone.env
+# Checks S3 MinIO cache for web test runner artifacts (acceptance/e2e/web).
+# Sources ci.env to get WEB_COMMITID used as the cache key.
+source ci.env
 
 # if no $1 is supplied end the script
 # Can be web, acceptance or e2e
@@ -13,8 +15,6 @@ web_cache=$(mc find s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/$1 2>&1 
 
 if [[ -z "$web_cache" ]]; then
   echo "$1 cache with commit id $WEB_COMMITID already available."
-  # https://discourse.drone.io/t/how-to-exit-a-pipeline-early-without-failing/3951
-  # exit a Pipeline early without failing
   exit 78
 else
   echo "$1 cache with commit id $WEB_COMMITID was not available."

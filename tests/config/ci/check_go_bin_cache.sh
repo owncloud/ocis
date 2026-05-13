@@ -7,7 +7,7 @@
 
 ROOT_PATH="$1"
 if [ -z "$1" ]; then
-  ROOT_PATH="/drone/src"
+  ROOT_PATH="."
 fi
 BINGO_DIR="$ROOT_PATH/.bingo"
 
@@ -19,8 +19,6 @@ go_cache=$(mc find s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH/$2 2>&1 | grep 'Obje
 if [[ -z "$go_cache" ]]
 then
   echo "[INFO] Go bin cache with has '$BINGO_HASH' exists."
-  # https://discourse.drone.io/t/how-to-exit-a-pipeline-early-without-failing/3951
-  # exit a Pipeline early without failing
   exit 78
 else
   # stored hash of a .bingo folder to '.bingo_hash' file
