@@ -1,8 +1,5 @@
 #!/bin/bash
 
-#mkdir -p /drone/src/vendor-bin/behat
-#cp /tmp/vendor-bin/behat/composer.json /drone/src/vendor-bin/behat/composer.json
-
 git config --global advice.detachedHead false
 
 ## CONFIGURE TEST
@@ -12,7 +9,7 @@ if [ "$TEST_SOURCE" = "oc10" ]; then
     if [ "$STORAGE_DRIVER" = "ocis" ]; then
         export OCIS_REVA_DATA_ROOT=''
         export BEHAT_FILTER_TAGS='~@skipOnOcis-OCIS-Storage'
-        export EXPECTED_FAILURES_FILE='/drone/src/tests/acceptance/expected-failures-API-on-OCIS-storage.md'
+        export EXPECTED_FAILURES_FILE='/ocis/tests/acceptance/expected-failures-API-on-OCIS-storage.md'
     elif [ "$STORAGE_DRIVER" = "s3ng" ]; then
         export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOcis-S3NG-Storage'
         export OCIS_REVA_DATA_ROOT=''

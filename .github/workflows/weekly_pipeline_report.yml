@@ -18,15 +18,14 @@ jobs:
     container: golang:1.25-alpine
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Run CI Reporter
         working-directory: tools/ci-reporter
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # Review the pipelines in last 14 days before the dorne logs expire
         run: |
-          GOWORK=off go run ./cmd/list-failed-commits \
+          GOWORK=off go run ./cmd/list-flaky-tests \
             --github-token "$GITHUB_TOKEN" \
-            --since 14d \
-            --max-commits 9999999
+            --workflow acceptance-tests.yml \
+            --since 4w
