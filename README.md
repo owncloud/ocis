@@ -1,7 +1,7 @@
 # ownCloud Infinite Scale
 
 [![Matrix](https://img.shields.io/matrix/ocis%3Amatrix.org?logo=matrix)](https://app.element.io/#/room/#ocis:matrix.org)
-[![Build Status](https://drone.owncloud.com/api/badges/owncloud/ocis/status.svg)](https://drone.owncloud.com/owncloud/ocis)
+[![Build Status](https://github.com/owncloud/ocis/actions/workflows/acceptance-tests.yml/badge.svg)](https://github.com/owncloud/ocis/actions/workflows/acceptance-tests.yml)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=owncloud_ocis&metric=security_rating)](https://sonarcloud.io/dashboard?id=owncloud_ocis)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=owncloud_ocis&metric=coverage)](https://sonarcloud.io/dashboard?id=owncloud_ocis)
 [![Acceptance Test Coverage](https://sonarcloud.io/api/project_badges/measure?project=owncloud-1_ocis_acceptance-tests&metric=coverage)](https://sonarcloud.io/summary/new_code?id=owncloud-1_ocis_acceptance-tests)
