@@ -114,7 +114,7 @@ jobs:
   docker-build:
     name: docker-build (${{ matrix.arch }}, ${{ matrix.repo }})
     runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
-    needs: [determine-release-type, generate-code]
+    needs: [determine-release-type, generate-code, security-scan-trivy]
     strategy:
       matrix:
         arch: [amd64, arm64]
@@ -295,6 +295,7 @@ jobs:
           format: table
           exit-code: 1
           severity: CRITICAL,HIGH
+          trivy-config: .trivy.yaml
 
   license-check:
     runs-on: ubuntu-latest
