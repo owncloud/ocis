@@ -68,7 +68,7 @@ We also suggest using the last port in your extensions' range as a debug/metrics
 | 9270-9274  | [eventhistory]({{< ref "../eventhistory/_index.md" >}})                                |
 | 9275-9279  | [webfinger]({{< ref "../webfinger/_index.md" >}})                                      |
 | 9280-9284  | [ocm]({{< ref "../ocm/_index.md" >}})                                                  |
-| 9285-9289  | FREE                                                                                   |
+| 9285-9289  | [storage-kiteworks]({{< ref "../storage-kiteworks/_index.md" >}})                      |
 | 9290-9294  | FREE                                                                                   |
 | 9295-9299  | FREE                                                                                   |
 | 9300-9304  | [collaboration]({{< ref "../collaboration/_index.md" >}})                              |

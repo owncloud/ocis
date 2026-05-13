@@ -34,6 +34,7 @@ import (
 	settings "github.com/owncloud/ocis/v2/services/settings/pkg/config/defaults"
 	sharing "github.com/owncloud/ocis/v2/services/sharing/pkg/config/defaults"
 	sse "github.com/owncloud/ocis/v2/services/sse/pkg/config/defaults"
+	storagekiteworks "github.com/owncloud/ocis/v2/services/storage-kiteworks/pkg/config/defaults"
 	storagepublic "github.com/owncloud/ocis/v2/services/storage-publiclink/pkg/config/defaults"
 	storageshares "github.com/owncloud/ocis/v2/services/storage-shares/pkg/config/defaults"
 	storageSystem "github.com/owncloud/ocis/v2/services/storage-system/pkg/config/defaults"
@@ -89,6 +90,7 @@ func DefaultConfig() *Config {
 		Settings:          settings.DefaultConfig(),
 		Sharing:           sharing.DefaultConfig(),
 		SSE:               sse.DefaultConfig(),
+		StorageKiteworks:  storagekiteworks.DefaultConfig(),
 		StoragePublicLink: storagepublic.DefaultConfig(),
 		StorageShares:     storageshares.DefaultConfig(),
 		StorageSystem:     storageSystem.DefaultConfig(),

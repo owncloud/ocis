@@ -59,6 +59,7 @@ import (
 	settings "github.com/owncloud/ocis/v2/services/settings/pkg/command"
 	sharing "github.com/owncloud/ocis/v2/services/sharing/pkg/command"
 	sse "github.com/owncloud/ocis/v2/services/sse/pkg/command"
+	storagekiteworks "github.com/owncloud/ocis/v2/services/storage-kiteworks/pkg/command"
 	storagepublic "github.com/owncloud/ocis/v2/services/storage-publiclink/pkg/command"
 	storageshares "github.com/owncloud/ocis/v2/services/storage-shares/pkg/command"
 	storageSystem "github.com/owncloud/ocis/v2/services/storage-system/pkg/command"
@@ -354,6 +355,11 @@ func NewService(ctx context.Context, options ...Option) (*Service, error) {
 		cfg.Notifications.Context = ctx
 		cfg.Notifications.Commons = cfg.Commons
 		return runServerCommand(ctx, notifications.Server(cfg.Notifications))
+	})
+	areg(opts.Config.StorageKiteworks.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.StorageKiteworks.Context = ctx
+		cfg.StorageKiteworks.Commons = cfg.Commons
+		return runServerCommand(ctx, storagekiteworks.Server(cfg.StorageKiteworks))
 	})
 
 	return s, nil

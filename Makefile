@@ -53,6 +53,7 @@ OCIS_MODULES = \
 	services/settings \
 	services/sharing \
 	services/sse \
+	services/storage-kiteworks \
 	services/storage-system \
 	services/storage-publiclink \
 	services/storage-shares \
