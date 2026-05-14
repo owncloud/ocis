@@ -1,0 +1,591 @@
+name: Acceptance Tests K8S
+
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 1 * * *"
+
+env:
+  PHP_VERSION: "8.4"
+  K3D_VERSION: "v5.8.3"
+  KUBECTL_VERSION: v1.36.0
+  HELM_VERSION: "v3.18.4"
+  TEST_SERVER_URL: https://ocis-server
+  STORAGE_DRIVER: ocis
+  OCIS_WRAPPER_URL: http://localhost:5200
+  K8S: true
+  LIBCURL_VERSION: 8.12.0
+
+jobs:
+  api-tests:
+    name: ${{ matrix.suite }}-k8s
+    runs-on: ubuntu-latest
+
+    if: >-
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' &&
+       contains(github.event.pull_request.title || '', 'k8s'))
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: apiContract
+          - suite: apiLocks
+          - suite: apiSettings
+          # - suite: apiNotification
+          - suite: apiCors
+          - suite: apiGraphUser
+          - suite: apiGraph
+          - suite: apiGraphGroup
+          # - suite: apiSpaces
+          - suite: apiSpacesShares
+          - suite: apiSpacesDavOperation
+          - suite: apiDownloads
+          - suite: apiAsyncUpload
+          - suite: apiDepthInfinity
+          - suite: apiArchiver
+          - suite: apiActivities
+          - suite: apiSearch1
+          - suite: apiSearch2
+          # - suite: apiSearchContent
+          - suite: apiSharingNgShares
+          - suite: apiReshare
+          - suite: apiSharingNgPermissions
+          - suite: apiSharingNgAdditionalShareRole
+          - suite: apiSharingNgDriveInvitation
+          # - suite: apiSharingNgItemInvitation
+          - suite: apiSharingNgDriveLinkShare
+          - suite: apiSharingNgItemLinkShare
+          - suite: apiSharingNgLinkShareManagement
+          - suite: apiAuthApp
+          # - suite: apiAntivirus
+          - suite: apiOcm
+          # - suite: apiCollaboration
+          # - suite: "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
+          - suite: "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
+          - suite: "coreApiSharees"
+          - suite: "coreApiSharePublicLink2"
+          - suite: "coreApiShareOperationsToShares1,coreApiShareOperationsToShares2,coreApiSharePublicLink1,coreApiShareCreateSpecialToShares1,coreApiShareCreateSpecialToShares2,coreApiShareUpdateToShares"
+          - suite: "coreApiTrashbin,coreApiTrashbinRestore,coreApiWebdavEtagPropagation1,coreApiWebdavEtagPropagation2"
+          - suite: "coreApiWebdavDelete,coreApiWebdavOperations,coreApiWebdavMove2"
+          - suite: "coreApiWebdavProperties"
+          # - suite: "coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup PHP ${{ env.PHP_VERSION }}
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+
+      - name: Cache libcurl ${{ env.LIBCURL_VERSION }}
+        id: cache-libcurl
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        with:
+          path: /opt/libcurl
+          key: libcurl-${{ env.LIBCURL_VERSION }}-${{ runner.os }}
+
+      - name: Install libcurl build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo NEEDRESTART_MODE=a apt-get install -y \
+            libssl-dev \
+            libnghttp2-dev \
+            libpsl-dev \
+            libldap-dev \
+            libssh-dev \
+            zlib1g-dev \
+            libvips-dev
+
+      - name: Compile libcurl
+        if: steps.cache-libcurl.outputs.cache-hit != 'true'
+        run: |
+          cd /tmp
+          curl -sLO https://curl.se/download/curl-${{ env.LIBCURL_VERSION }}.tar.gz
+          tar xzf curl-${{ env.LIBCURL_VERSION }}.tar.gz
+          cd curl-${{ env.LIBCURL_VERSION }}
+          ./configure \
+            --with-ssl \
+            --with-zlib \
+            --with-nghttp2 \
+            --prefix=/opt/libcurl \
+            --enable-versioned-symbols \
+            --silent
+          make -j$(nproc) --silent
+          sudo make install --silent
+
+      - name: Restore libcurl
+        run: |
+          echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
+          sudo ldconfig
+
+          /opt/libcurl/bin/curl --version | head -1
+
+          php -r '
+            $v = curl_version()["version"];
+            echo "PHP curl: $v\n";
+            if (version_compare($v,"${{ env.LIBCURL_VERSION }}","<")) {
+              fwrite(STDERR,"Need >= ${{ env.LIBCURL_VERSION }}\n");
+              exit(1);
+            }
+          '
+
+      - name: Download k3d
+        run: |
+          curl -L \
+            -o k3d \
+            https://github.com/k3d-io/k3d/releases/download/${{ env.K3D_VERSION }}/k3d-linux-amd64
+          echo "dbaa79a76ace7f4ca230a1ff41dc7d8a5036a8ad0309e9c54f9bf3836dbe853e k3d" | sha256sum --check
+          chmod +x k3d
+          sudo mv k3d /usr/local/bin/
+          k3d version
+
+      - name: Prepare hosts
+        run: |
+          echo "127.0.0.1 ocis-server clamav email collabora onlyoffice fakeoffice tika federation-ocis-server" \
+            | sudo tee -a /etc/hosts
+
+      - name: Spin up K3d Cluster
+        run: make -C tests/config/k8s create-cluster
+
+      - name: Prepare Helm Charts & Deploy oCIS
+        env:
+          ENABLE_ANTIVIRUS: ${{ matrix.suite == 'apiAntivirus' }}
+          ENABLE_EMAIL: ${{ matrix.suite == 'apiNotification' || matrix.suite == 'apiSettings' || matrix.suite == 'apiOcm' }}
+          ENABLE_TIKA: ${{ matrix.suite == 'apiSearchContent' }}
+          ENABLE_WOPI: ${{ matrix.suite == 'apiCollaboration' }}
+          ENABLE_OCM: ${{ matrix.suite == 'apiOcm' }}
+          ENABLE_AUTH_APP: ${{ matrix.suite == 'apiAuthApp' }}
+        run: |
+          cd tests/config/k8s
+          make prepare-charts
+          kubectl get pods -n ocis-server -Aw &
+          make deploy-ocis
+          if [[ "${{ matrix.suite }}" == "apiOcm" ]]; then
+            OCM=true make prepare-charts
+            OCM=true make deploy-ocis
+          fi
+
+      - name: Deploy Suite-Specific External Backends
+        run: |
+          if [[ "${{ matrix.suite }}" == "apiNotification" || \
+                "${{ matrix.suite }}" == "apiSettings" || \
+                "${{ matrix.suite }}" == "apiOcm" ]]; then
+            docker run -d \
+              -p 1025:1025 \
+              -p 8025:8025 \
+              --name mailpit \
+              axllent/mailpit:v1.22.3
+            bash tests/config/k8s/expose-external-svc.sh email:1025
+          fi
+          if [[ "${{ matrix.suite }}" == "apiAntivirus" ]]; then
+            docker run -d \
+              -p 3310:3310 \
+              --name clamav \
+              owncloudci/clamavd
+            bash tests/config/k8s/expose-external-svc.sh clamav:3310
+          fi
+
+          if [[ "${{ matrix.suite }}" == "apiSearchContent" ]]; then
+            docker run -d \
+              -p 9998:9998 \
+              --name tika \
+              apache/tika:3.2.2.0-full
+            bash tests/config/k8s/expose-external-svc.sh tika:9998
+          fi
+      
+      - name: Wait for oCIS to be ready
+        run: |
+          kubectl wait \
+            --namespace ocis-server \
+            --for=condition=Available \
+            deployment \
+            --all \
+            --timeout=10m
+
+          kubectl wait \
+            --namespace ocis-server \
+            --for=condition=Ready \
+            pod \
+            --all \
+            --timeout=10m
+
+          kubectl get pods -n ocis-server
+
+      - name: Expose debug ports
+        run: bash tests/config/k8s/expose-debug-svc.sh
+      - name: Build ociswrapper
+        run: make -C tests/ociswrapper/
+
+      - name: Start ociswrapper
+        run: |
+          tests/ociswrapper/bin/ociswrapper serve \
+            --url ${{ env.TEST_SERVER_URL }} \
+            --admin-username admin \
+            --admin-password admin \
+            --skip-ocis-run \
+            -n ocis-server &
+
+      - name: Prepare expected failures
+        if: startsWith( matrix.suite, 'core' )
+        env:
+          EXPECTED_FAILURES_FILE: tests/acceptance/expected-failures-API-on-OCIS-storage.md
+          WITH_REMOTE_PHP: "false"
+        run: |
+          if [[ "$WITH_REMOTE_PHP" != "true" ]]; then
+            cat tests/acceptance/expected-failures-without-remotephp.md >> \
+              "$EXPECTED_FAILURES_FILE"
+          fi
+
+      - name: Run ${{ matrix.suite }} tests
+        if: startsWith( matrix.suite, 'api' )
+        env:
+          TEST_SERVER_URL: ${{ env.TEST_SERVER_URL }}
+          TEST_SERVER_FED_URL: https://federation-ocis-server
+          STORAGE_DRIVER: ${{ env.STORAGE_DRIVER }}
+          BEHAT_SUITES: ${{ matrix.suite }}
+          BEHAT_FILTER_TAGS: "~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage"
+          EXPECTED_FAILURES_FILE: tests/acceptance/expected-failures-localAPI-on-OCIS-storage.md
+          OCIS_WRAPPER_URL: ${{ env.OCIS_WRAPPER_URL }}
+          COLLABORATION_SERVICE_URL: http://ocis-server:9304
+          K8S: "true"
+        run: make test-acceptance-api
+
+      - name: Run ${{ matrix.suite }} tests
+        if: startsWith( matrix.suite, 'core' )
+        env:
+          TEST_SERVER_URL: ${{ env.TEST_SERVER_URL }}
+          OCIS_REVA_DATA_ROOT: ""
+          STORAGE_DRIVER: ocis
+          BEHAT_FILTER_TAGS: "~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage"
+          BEHAT_SUITES: ${{ matrix.suite }}
+          ACCEPTANCE_TEST_TYPE: core-api
+          EXPECTED_FAILURES_FILE: tests/acceptance/expected-failures-API-on-OCIS-storage.md
+          UPLOAD_DELETE_WAIT_TIME: "0"
+          OCIS_WRAPPER_URL: ${{ env.OCIS_WRAPPER_URL }}
+          WITH_REMOTE_PHP: "false"
+          K8S: ${{ env.K8S }}
+        run: make test-acceptance-api
+name: Acceptance Tests K8S
+
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 1 * * *"
+
+env:
+  PHP_VERSION: "8.4"
+  K3D_VERSION: "v5.8.3"
+  KUBECTL_VERSION: v1.36.0
+  HELM_VERSION: "v3.18.4"
+  TEST_SERVER_URL: https://ocis-server
+  STORAGE_DRIVER: ocis
+  OCIS_WRAPPER_URL: http://localhost:5200
+  K8S: true
+  LIBCURL_VERSION: 8.12.0
+
+jobs:
+  api-tests:
+    name: ${{ matrix.suite }}-k8s
+    runs-on: ubuntu-latest
+
+    if: >-
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' &&
+       contains(github.event.pull_request.title || '', 'k8s'))
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: apiContract
+          - suite: apiLocks
+          - suite: apiSettings
+          # - suite: apiNotification
+          - suite: apiCors
+          - suite: apiGraphUser
+          - suite: apiGraph
+          - suite: apiGraphGroup
+          # - suite: apiSpaces
+          - suite: apiSpacesShares
+          - suite: apiSpacesDavOperation
+          - suite: apiDownloads
+          - suite: apiAsyncUpload
+          - suite: apiDepthInfinity
+          - suite: apiArchiver
+          - suite: apiActivities
+          - suite: apiSearch1
+          - suite: apiSearch2
+          # - suite: apiSearchContent
+          - suite: apiSharingNgShares
+          - suite: apiReshare
+          - suite: apiSharingNgPermissions
+          - suite: apiSharingNgAdditionalShareRole
+          - suite: apiSharingNgDriveInvitation
+          # - suite: apiSharingNgItemInvitation
+          - suite: apiSharingNgDriveLinkShare
+          - suite: apiSharingNgItemLinkShare
+          - suite: apiSharingNgLinkShareManagement
+          - suite: apiAuthApp
+          # - suite: apiAntivirus
+          - suite: apiOcm
+          # - suite: apiCollaboration
+          # - suite: "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
+          - suite: "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
+          - suite: "coreApiSharees"
+          - suite: "coreApiSharePublicLink2"
+          - suite: "coreApiShareOperationsToShares1,coreApiShareOperationsToShares2,coreApiSharePublicLink1,coreApiShareCreateSpecialToShares1,coreApiShareCreateSpecialToShares2,coreApiShareUpdateToShares"
+          - suite: "coreApiTrashbin,coreApiTrashbinRestore,coreApiWebdavEtagPropagation1,coreApiWebdavEtagPropagation2"
+          - suite: "coreApiWebdavDelete,coreApiWebdavOperations,coreApiWebdavMove2"
+          - suite: "coreApiWebdavProperties"
+          # - suite: "coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup PHP ${{ env.PHP_VERSION }}
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+
+      - name: Cache libcurl ${{ env.LIBCURL_VERSION }}
+        id: cache-libcurl
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        with:
+          path: /opt/libcurl
+          key: libcurl-${{ env.LIBCURL_VERSION }}-${{ runner.os }}
+
+      - name: Install libcurl build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo NEEDRESTART_MODE=a apt-get install -y \
+            libssl-dev \
+            libnghttp2-dev \
+            libpsl-dev \
+            libldap-dev \
+            libssh-dev \
+            zlib1g-dev \
+            libvips-dev
+
+      - name: Compile libcurl
+        if: steps.cache-libcurl.outputs.cache-hit != 'true'
+        run: |
+          cd /tmp
+          curl -sLO https://curl.se/download/curl-${{ env.LIBCURL_VERSION }}.tar.gz
+          tar xzf curl-${{ env.LIBCURL_VERSION }}.tar.gz
+          cd curl-${{ env.LIBCURL_VERSION }}
+          ./configure \
+            --with-ssl \
+            --with-zlib \
+            --with-nghttp2 \
+            --prefix=/opt/libcurl \
+            --enable-versioned-symbols \
+            --silent
+          make -j$(nproc) --silent
+          sudo make install --silent
+
+      - name: Restore libcurl
+        run: |
+          echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
+          sudo ldconfig
+
+          /opt/libcurl/bin/curl --version | head -1
+
+          php -r '
+            $v = curl_version()["version"];
+            echo "PHP curl: $v\n";
+            if (version_compare($v,"${{ env.LIBCURL_VERSION }}","<")) {
+              fwrite(STDERR,"Need >= ${{ env.LIBCURL_VERSION }}\n");
+              exit(1);
+            }
+          '
+
+      - name: Download k3d
+        run: |
+          curl -L \
+            -o k3d \
+            https://github.com/k3d-io/k3d/releases/download/${{ env.K3D_VERSION }}/k3d-linux-amd64
+          echo "dbaa79a76ace7f4ca230a1ff41dc7d8a5036a8ad0309e9c54f9bf3836dbe853e k3d" | sha256sum --check
+          chmod +x k3d
+          sudo mv k3d /usr/local/bin/
+          k3d version
+
+      - name: Prepare hosts
+        run: |
+          echo "127.0.0.1 ocis-server clamav email collabora onlyoffice fakeoffice tika federation-ocis-server" \
+            | sudo tee -a /etc/hosts
+
+      - name: Spin up K3d Cluster
+        run: make -C tests/config/k8s create-cluster
+
+      - name: Prepare Helm Charts & Deploy oCIS
+        env:
+          ENABLE_ANTIVIRUS: ${{ matrix.suite == 'apiAntivirus' }}
+          ENABLE_EMAIL: ${{ matrix.suite == 'apiNotification' || matrix.suite == 'apiSettings' || matrix.suite == 'apiOcm' }}
+          ENABLE_TIKA: ${{ matrix.suite == 'apiSearchContent' }}
+          ENABLE_WOPI: ${{ matrix.suite == 'apiCollaboration' }}
+          ENABLE_OCM: ${{ matrix.suite == 'apiOcm' }}
+          ENABLE_AUTH_APP: ${{ matrix.suite == 'apiAuthApp' }}
+        run: |
+          cd tests/config/k8s
+          make prepare-charts
+          kubectl get pods -n ocis-server -Aw &
+          make deploy-ocis
+          if [[ "${{ matrix.suite }}" == "apiOcm" ]]; then
+            OCM=true make prepare-charts
+            OCM=true make deploy-ocis
+          fi
+
+      - name: Deploy Suite-Specific External Backends
+        run: |
+          if [[ "${{ matrix.suite }}" == "apiNotification" || \
+                "${{ matrix.suite }}" == "apiSettings" || \
+                "${{ matrix.suite }}" == "apiOcm" ]]; then
+            docker run -d \
+              -p 1025:1025 \
+              -p 8025:8025 \
+              --name mailpit \
+              axllent/mailpit:v1.22.3
+            bash tests/config/k8s/expose-external-svc.sh email:1025
+          fi
+          if [[ "${{ matrix.suite }}" == "apiAntivirus" ]]; then
+            docker run -d \
+              -p 3310:3310 \
+              --name clamav \
+              owncloudci/clamavd
+            bash tests/config/k8s/expose-external-svc.sh clamav:3310
+          fi
+
+          if [[ "${{ matrix.suite }}" == "apiSearchContent" ]]; then
+            docker run -d \
+              -p 9998:9998 \
+              --name tika \
+              apache/tika:3.2.2.0-full
+            bash tests/config/k8s/expose-external-svc.sh tika:9998
+          fi
+      
+      - name: Wait for oCIS to be ready
+        run: |
+          kubectl wait \
+            --namespace ocis-server \
+            --for=condition=Available \
+            deployment \
+            --all \
+            --timeout=10m
+
+          kubectl wait \
+            --namespace ocis-server \
+            --for=condition=Ready \
+            pod \
+            --all \
+            --timeout=10m
+
+          kubectl get pods -n ocis-server
+          FILE_URL="https://ocis-server/remote.php/dav/files/admin/hello1.txt"
+
+          echo "Creating test file in oCIS..."
+
+          request() {
+            local method=$1
+            shift
+            curl -ks -o /dev/null -w "%{http_code}" \
+              -X "$method" \
+              -u admin:admin \
+              "$@" \
+              "$FILE_URL"
+          }
+
+          retry_http() {
+            local expected=$1
+            shift
+            for i in {1..30}; do
+              status=$("$@")
+              if [ "$status" = "$expected" ]; then
+                echo "Succeeded (HTTP $status)"
+                return 0
+              fi
+              echo "Attempt $i failed (HTTP $status), retrying in 10s..."
+              sleep 10
+            done
+            echo "Failed after 30 attempts"
+            return 1
+          }
+          put_file() {
+            request PUT \
+              -H "Content-Type: text/plain" \
+              --data "Hello from GitHub Actions!"
+          }
+          delete_file() {
+            request DELETE
+          }
+          echo "Creating test file..."
+          retry_http 201 put_file || exit 1
+          echo "Deleting test file..."
+          retry_http 204 delete_file || exit 1
+
+      - name: Expose debug ports
+        run: bash tests/config/k8s/expose-debug-svc.sh
+      - name: Build ociswrapper
+        run: make -C tests/ociswrapper/
+
+      - name: Start ociswrapper
+        run: |
+          tests/ociswrapper/bin/ociswrapper serve \
+            --url ${{ env.TEST_SERVER_URL }} \
+            --admin-username admin \
+            --admin-password admin \
+            --skip-ocis-run \
+            -n ocis-server &
+
+      - name: Prepare expected failures
+        if: startsWith( matrix.suite, 'core' )
+        env:
+          EXPECTED_FAILURES_FILE: tests/acceptance/expected-failures-API-on-OCIS-storage.md
+          WITH_REMOTE_PHP: "false"
+        run: |
+          if [[ "$WITH_REMOTE_PHP" != "true" ]]; then
+            cat tests/acceptance/expected-failures-without-remotephp.md >> \
+              "$EXPECTED_FAILURES_FILE"
+          fi
+
+      - name: Run ${{ matrix.suite }} tests
+        if: startsWith( matrix.suite, 'api' )
+        env:
+          TEST_SERVER_URL: ${{ env.TEST_SERVER_URL }}
+          TEST_SERVER_FED_URL: https://federation-ocis-server
+          STORAGE_DRIVER: ${{ env.STORAGE_DRIVER }}
+          BEHAT_SUITES: ${{ matrix.suite }}
+          BEHAT_FILTER_TAGS: "~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage"
+          EXPECTED_FAILURES_FILE: tests/acceptance/expected-failures-localAPI-on-OCIS-storage.md
+          OCIS_WRAPPER_URL: ${{ env.OCIS_WRAPPER_URL }}
+          COLLABORATION_SERVICE_URL: http://ocis-server:9304
+          K8S: "true"
+        run: make test-acceptance-api
+
+      - name: Run ${{ matrix.suite }} tests
+        if: startsWith( matrix.suite, 'core' )
+        env:
+          TEST_SERVER_URL: ${{ env.TEST_SERVER_URL }}
+          OCIS_REVA_DATA_ROOT: ""
+          STORAGE_DRIVER: ocis
+          BEHAT_FILTER_TAGS: "~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage"
+          BEHAT_SUITES: ${{ matrix.suite }}
+          ACCEPTANCE_TEST_TYPE: core-api
+          EXPECTED_FAILURES_FILE: tests/acceptance/expected-failures-API-on-OCIS-storage.md
+          UPLOAD_DELETE_WAIT_TIME: "0"
+          OCIS_WRAPPER_URL: ${{ env.OCIS_WRAPPER_URL }}
+          WITH_REMOTE_PHP: "false"
+          K8S: ${{ env.K8S }}
+        run: make test-acceptance-api

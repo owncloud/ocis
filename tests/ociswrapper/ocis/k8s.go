@@ -61,12 +61,15 @@ func K8sUpdateEnv(service string, envMap []string) (bool, string) {
 		K8sOcisInitEnv[service].CurrentPod = podName
 	}
 
-	envSet, err := setServiceEnv(service, envMap, "Failed to set env")
+	envSet, skipWaitForService, err := setServiceEnv(service, envMap, "Failed to set env")
 	if err != nil {
 		return false, "error setting env"
 	}
 
-	_, err = waitForService(service, envSet)
+	if !skipWaitForService {
+		_, err = waitForService(service, envSet)
+	}
+
 	if err != nil {
 		return false, "error waiting for service"
 	}
@@ -181,7 +184,7 @@ func waitForService(service string, waitDeletion bool) (bool, error) {
 	}
 }
 
-func setServiceEnv(service string, envMap []string, errMsgPrefix string) (bool, error) {
+func setServiceEnv(service string, envMap []string, errMsgPrefix string) (bool, bool, error) {
 	cmdArgs := append([]string{"set", "env", "-n", config.Get("namespace"), "deployment", service}, envMap...)
 	cmd := exec.Command("kubectl", cmdArgs...)
 	output, err := cmd.Output()
@@ -192,14 +195,14 @@ func setServiceEnv(service string, envMap []string, errMsgPrefix string) (bool, 
 			errMsg = strings.TrimSpace(string(exitErr.Stderr))
 		}
 		log.Println(fmt.Sprintf("[%s] %s. %s", service, errMsgPrefix, errMsg))
-		return false, fmt.Errorf("error setting env")
+		return false, true, fmt.Errorf("error setting env")
 	}
 	outString := strings.TrimSpace(string(output))
 	if strings.Contains(outString, "env updated") {
-		return true, nil
+		return true, false, nil
 	}
 	log.Println(fmt.Sprintf("[%s] No change in env. Current pod will be used.", service))
-	return false, nil
+	return true, true, nil
 }
 
 func checkServiceGrpc(service string, podName string) error {
@@ -334,12 +337,15 @@ func K8sRollback() (bool, string) {
 		K8sOcisInitEnv[service].CurrentPod = podName
 		log.Println(fmt.Sprintf("[%s] Rolling back service. Current Pod: %s", service, podName))
 
-		envSet, err := setServiceEnv(service, envs, fmt.Sprintf("Failed to rollback service. Pod: %s", podName))
+		envSet, skipWaitForService, err := setServiceEnv(service, envs, fmt.Sprintf("Failed to rollback service. Pod: %s", podName))
 		if err != nil {
 			return false, "failed to rollback"
 		}
 
-		_, err = waitForService(service, envSet)
+		if !skipWaitForService {
+			_, err = waitForService(service, envSet)
+		}
+
 		if err != nil {
 			return false, "error waiting for service"
 		}

@@ -75,6 +75,15 @@ class KeycloakHelper {
 	}
 
 	/**
+	 * Reset the cached admin access token
+	 *
+	 * @return void
+	 */
+	public static function resetAdminAccessToken(): void {
+		self::$adminAccessToken = null;
+	}
+
+	/**
 	 * @return string
 	 * @throws GuzzleException
 	 */
@@ -343,6 +352,77 @@ class KeycloakHelper {
 		$authorizationCode = self::getCode($user, $authorizationUrl, $cookie);
 		$tokenResponse = self::getToken($authorizationCode);
 		return json_decode($tokenResponse->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+	}
+
+	/**
+	 * @return array
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 * @throws Exception
+	 */
+	public static function getRealm(): array {
+		$url = self::getKeycloakUrl() . '/admin/realms/oCIS';
+		$response = HttpRequestHelper::get(
+			$url,
+			null,
+			null,
+			[
+				'Authorization' => 'Bearer ' . self::getAdminAccessToken(),
+			],
+		);
+		if ($response->getStatusCode() !== 200) {
+			throw new Exception("Failed to get realm roles.");
+		}
+		return json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+	}
+
+	/**
+	 * @param string $key
+	 * @param string $value
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public static function updateRealmAttribute(string $key, string $value): ResponseInterface {
+		$realm = self::getRealm();
+		$attributes = $realm['attributes'] ?? [];
+		$attributes[$key] = $value;
+		$url = self::getKeycloakUrl() . '/admin/realms/oCIS';
+		return HttpRequestHelper::put(
+			$url,
+			null,
+			null,
+			[
+				'Authorization' => 'Bearer ' . self::getAdminAccessToken(),
+				'Content-Type' => 'application/json',
+			],
+			json_encode(['attributes' => $attributes], JSON_THROW_ON_ERROR),
+		);
+	}
+
+	/**
+	 * @param string $key
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public static function deleteRealmAttribute(string $key): ResponseInterface {
+		$realm = self::getRealm();
+		$attributes = $realm['attributes'] ?? [];
+		unset($attributes[$key]);
+		$url = self::getKeycloakUrl() . '/admin/realms/oCIS';
+		return HttpRequestHelper::put(
+			$url,
+			null,
+			null,
+			[
+				'Authorization' => 'Bearer ' . self::getAdminAccessToken(),
+				'Content-Type' => 'application/json',
+			],
+			json_encode(['attributes' => $attributes], JSON_THROW_ON_ERROR),
+		);
 	}
 
 	/**
