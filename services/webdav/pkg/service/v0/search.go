@@ -27,7 +27,7 @@ import (
 
 const (
 	elementNameSearchFiles = "search-files"
-	// TODO elementNameFilterFiles = "filter-files"
+	elementNameFilterFiles = "filter-files"
 )
 
 // Search is the endpoint for retrieving search results for REPORT requests
@@ -40,35 +40,37 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if rep.SearchFiles == nil {
-		renderError(w, r, errBadRequest("missing search-files tag"))
-		logger.Debug().Err(err).Msg("error reading report")
-		return
-	}
+	switch {
+	case rep.SearchFiles != nil:
+		t := r.Header.Get(revactx.TokenHeader)
+		ctx := revactx.ContextSetToken(r.Context(), t)
+		ctx = metadata.Set(ctx, revactx.TokenHeader, t)
 
-	t := r.Header.Get(revactx.TokenHeader)
-	ctx := revactx.ContextSetToken(r.Context(), t)
-	ctx = metadata.Set(ctx, revactx.TokenHeader, t)
-
-	req := &searchsvc.SearchRequest{
-		Query:    rep.SearchFiles.Search.Pattern,
-		PageSize: int32(rep.SearchFiles.Search.Limit),
-	}
-
-	rsp, err := g.searchClient.Search(ctx, req)
-	if err != nil {
-		e := merrors.Parse(err.Error())
-		switch e.Code {
-		case http.StatusBadRequest:
-			renderError(w, r, errBadRequest(e.Detail))
-		default:
-			renderError(w, r, errInternalError(err.Error()))
+		req := &searchsvc.SearchRequest{
+			Query:    rep.SearchFiles.Search.Pattern,
+			PageSize: int32(rep.SearchFiles.Search.Limit),
 		}
-		logger.Error().Err(err).Msg("could not get search results")
-		return
-	}
 
-	g.sendSearchResponse(rsp, w, r)
+		rsp, err := g.searchClient.Search(ctx, req)
+		if err != nil {
+			e := merrors.Parse(err.Error())
+			switch e.Code {
+			case http.StatusBadRequest:
+				renderError(w, r, errBadRequest(e.Detail))
+			default:
+				renderError(w, r, errInternalError(err.Error()))
+			}
+			logger.Error().Err(err).Msg("could not get search results")
+			return
+		}
+
+		g.sendSearchResponse(rsp, w, r)
+	case rep.FilterFiles != nil:
+		g.handleFilterFiles(w, r, rep.FilterFiles)
+	default:
+		renderError(w, r, errBadRequest("missing search-files or filter-files element"))
+		logger.Debug().Msg("error reading report: no recognized element")
+	}
 }
 
 func (g Webdav) sendSearchResponse(rsp *searchsvc.SearchResponse, w http.ResponseWriter, r *http.Request) {
@@ -354,15 +356,13 @@ func readReport(r io.Reader) (rep *report, err error) {
 					return nil, err
 				}
 				rep.SearchFiles = &repSF
-				/*
-					} else if v.Name.Local == elementNameFilterFiles {
-						var repFF reportFilterFiles
-						err = decoder.DecodeElement(&repFF, &v)
-						if err != nil {
-							return nil, http.StatusBadRequest, err
-						}
-						rep.FilterFiles = &repFF
-				*/
+			} else if v.Name.Local == elementNameFilterFiles {
+				var repFF reportFilterFiles
+				err = decoder.DecodeElement(&repFF, &v)
+				if err != nil {
+					return nil, err
+				}
+				rep.FilterFiles = &repFF
 			}
 		}
 	}
