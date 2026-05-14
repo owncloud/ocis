@@ -420,8 +420,19 @@ Vault mode provides a dedicated, separately stored vault storage that can be MFA
 *   Search is scoped separately for default and vault files, including their shares and spaces.
 *   Public links are disallowed for vault resources. The capabilities endpoint accepts a `vault=true` query parameter to advertise vault-specific capabilities.
 
-TODO: Describe the `vault mode` configuration and environment variables
+#### The `vault mode` configuration and environment variables
+Set `OCIS_ENABLE_VAULT_MODE: true`, `OCIS_MFA_ENABLED: true`  to true to enable the vault mode in a OCIS. Only applicapable if the storage-users-vault service, a special configured storage-users service is configured.
 
+The storage-users-vault configuration:
+```
+STORAGE_USERS_SERVICE_NAME: storage-users-vault
+STORAGE_USERS_GRPC_ADDR: storage-users-vault:9285
+STORAGE_USERS_HTTP_ADDR: storage-users-vault:9286
+STORAGE_USERS_DATA_SERVER_URL: http://storage-users-vault:9286/data
+STORAGE_USERS_DEBUG_ADDR: storage-users-vault:9287
+STORAGE_USERS_OCIS_ROOT: /var/lib/ocis/storage/users-vault
+STORAGE_USERS_EVENTS_CONSUMER_GROUP: vault-dcfs
+```
 
 ```
 ~/.ocis/storage

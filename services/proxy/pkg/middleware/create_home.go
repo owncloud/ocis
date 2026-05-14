@@ -31,7 +31,7 @@ func CreateHome(optionSetters ...Option) func(next http.Handler) http.Handler {
 			logger:              logger,
 			revaGatewaySelector: options.RevaGatewaySelector,
 			roleQuotas:          options.RoleQuotas,
-			createVaultHome:     options.CreateVaultHome,
+			enableVaultMode:     options.EnableVaultMode,
 			cache:               sync.Map{},
 		}
 	}
@@ -42,7 +42,7 @@ type createHome struct {
 	logger              log.Logger
 	revaGatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 	roleQuotas          map[string]uint64
-	createVaultHome     bool
+	enableVaultMode     bool
 	cache               sync.Map // Store users for which personal space has been in memory indefinitely. Persistence isn't critical.
 }
 
@@ -96,7 +96,7 @@ func (m *createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 
 		// TODO Perekhod: Create the vault home based on User permission
-		if m.createVaultHome && mfa.IsMFAHeaderTrue(req) {
+		if m.enableVaultMode && mfa.IsMFAHeaderTrue(req) {
 			// Force MFA=true for vault home creation
 			vctx := metadata.AppendToOutgoingContext(ctx, ctxpkg.MFAOutgoingHeader, "true")
 

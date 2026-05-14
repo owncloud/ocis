@@ -73,8 +73,8 @@ type Options struct {
 	// RoleQuotas hold userid:quota mappings. These will be used when provisioning new users.
 	// The users will get as much quota as is set for their role.
 	RoleQuotas map[string]uint64
-	// CreateVaultHome creates a new vault home for the user if it does not exist.
-	CreateVaultHome bool
+	// EnableVaultMode creates a new vault home for the user if it does not exist.
+	EnableVaultMode bool
 	// TraceProvider sets the tracing provider.
 	TraceProvider trace.TracerProvider
 	// SkipUserInfo prevents the oidc middleware from querying the userinfo endpoint and read any claims directly from the access token instead
@@ -257,10 +257,10 @@ func RoleQuotas(roleQuotas map[string]uint64) Option {
 	}
 }
 
-// CreateVaultHome sets the create vault home flag
-func CreateVaultHome(createVaultHome bool) Option {
+// EnableVaultMode sets the enable vault mode flag
+func EnableVaultMode(enableVaultMode bool) Option {
 	return func(o *Options) {
-		o.CreateVaultHome = createVaultHome
+		o.EnableVaultMode = enableVaultMode
 	}
 }
 
