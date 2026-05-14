@@ -3,6 +3,7 @@ package ocis
 import (
 	"bytes"
 	"fmt"
+	"ociswrapper/ocis/config"
 	"os/exec"
 	"strings"
 	"time"
@@ -19,7 +20,7 @@ func UpdateEnv(service string, envMap []string) (bool, string) {
 	for _, value := range envMap {
 		fmt.Fprintf(cmdArgs, "%s ", value)
 	}
-	envMap = append([]string{"set", "env", "-n", "ocis", "deployment", service}, envMap...)
+	envMap = append([]string{"set", "env", "-n", config.Get("namespace"), "deployment", service}, envMap...)
 	cmd = exec.Command("kubectl", envMap...)
 	_, err := cmd.Output()
 	if err != nil {
@@ -41,7 +42,7 @@ func IsServiceRunning(service string) {
 			fmt.Printf("Timeout: %s service did not become ready in time.\n",service)
 			return
 		case <-tick.C:
-			cmd := exec.Command("sh", "-c", fmt.Sprintf("kubectl get pods -n ocis -A | grep %s | wc -l", service))
+			cmd := exec.Command("sh", "-c", fmt.Sprintf("kubectl get pods -n %s -A | grep %s | wc -l", config.Get("namespace"),service))
 			stdout, err := cmd.Output()
 			if err != nil {
 				fmt.Println(err.Error())
@@ -54,7 +55,7 @@ func IsServiceRunning(service string) {
 						fmt.Println("Timeout: service did not reach 'Running' state in time.")
 						return
 					case <-tick.C:
-						cmd := exec.Command("sh", "-c", fmt.Sprintf("kubectl get pods -n ocis -A | grep %s | grep Running | wc -l", service))
+						cmd := exec.Command("sh", "-c", fmt.Sprintf("kubectl get pods -n %s -A | grep %s | grep Running | wc -l", config.Get("namespace"),service))
 						stdout, err := cmd.Output()
 						if err != nil {
 							fmt.Println(err.Error())
@@ -72,7 +73,7 @@ func IsServiceRunning(service string) {
 
 func Rollback() (bool, string) {
 	for service, envs := range K3dServiceEnvConfigs {
-		cmdArgs := []string{"set", "env", "-n", "ocis"}
+		cmdArgs := []string{"set", "env", "-n", config.Get("namespace")}
 		cmdArgs = append(cmdArgs, fmt.Sprintf("deployment/%s",service))
 		for _, env := range envs {
 			cmdArgs = append(cmdArgs, strings.SplitN(env, "=", 2)[0]+"-")
