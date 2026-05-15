@@ -137,8 +137,7 @@ func (h *Handler) addSpaceMember(w http.ResponseWriter, r *http.Request, info *p
 		response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "error getting storage provider", err)
 		return
 	}
-
-	providerClient, err := h.getStorageProviderClient(p)
+	providerClient, err := pool.GetStorageProviderServiceClient(p.Address)
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "error getting storage provider client", err)
 		return
@@ -244,8 +243,7 @@ func (h *Handler) removeSpaceMember(w http.ResponseWriter, r *http.Request, spac
 	if ref.ResourceId.OpaqueId == "" {
 		ref.ResourceId.OpaqueId = ref.ResourceId.SpaceId
 	}
-
-	providerClient, err := h.getStorageProviderClient(prov)
+	providerClient, err := pool.GetStorageProviderServiceClient(prov.Address)
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "error getting storage provider client", err)
 		return
@@ -288,16 +286,6 @@ func (h *Handler) removeSpaceMember(w http.ResponseWriter, r *http.Request, spac
 	}
 
 	response.WriteOCSSuccess(w, r, nil)
-}
-
-func (h *Handler) getStorageProviderClient(p *registry.ProviderInfo) (provider.ProviderAPIClient, error) {
-	c, err := pool.GetStorageProviderServiceClient(p.Address)
-	if err != nil {
-		err = errors.Wrap(err, "shares spaces: error getting a storage provider client")
-		return nil, err
-	}
-
-	return c, nil
 }
 
 func (h *Handler) findProvider(ctx context.Context, ref *provider.Reference) (*registry.ProviderInfo, error) {

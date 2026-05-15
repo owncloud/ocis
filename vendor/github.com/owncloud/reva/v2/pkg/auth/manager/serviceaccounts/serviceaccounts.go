@@ -6,10 +6,10 @@ import (
 	authpb "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/pkg/auth"
 	"github.com/owncloud/reva/v2/pkg/auth/manager/registry"
 	"github.com/owncloud/reva/v2/pkg/auth/scope"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 )
 

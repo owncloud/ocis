@@ -64,6 +64,9 @@ var (
 	// OCMStorageSpaceID is the space id used by the ocmreceived storageprovider
 	OCMStorageSpaceID = "89f37a33-858b-45fa-8890-a1f2b27d90e1"
 
+	// VaultStorageProviderID is the storage id used by the vault storageprovider
+	VaultStorageProviderID = "1a01c2c4-4309-4483-a845-842fd56d8622"
+
 	// SpaceGrant is used to signal the storageprovider that the grant is on a space
 	SpaceGrant struct{}
 )
