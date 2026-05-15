@@ -234,5 +234,31 @@ func (h *Handler) Init(c *config.Config) {
 // Handler renders the capabilities
 func (h *Handler) GetCapabilities(w http.ResponseWriter, r *http.Request) {
 	c := h.getCapabilitiesForUserAgent(r.UserAgent())
+	if r.URL.Query().Get("vault") == "true" && c.Capabilities != nil && c.Capabilities.Vault != nil && bool(c.Capabilities.Vault.Enabled) {
+		c = h.vaultCapabilities(c)
+	}
 	response.WriteOCSSuccess(w, r, c)
+}
+
+// vaultCapabilities returns a copy of the capabilities with public sharing and federation disabled.
+func (h *Handler) vaultCapabilities(c ocs.CapabilitiesData) ocs.CapabilitiesData {
+	if c.Capabilities == nil || c.Capabilities.FilesSharing == nil {
+		return c
+	}
+	sharing := *c.Capabilities.FilesSharing
+	if sharing.Public != nil {
+		pub := *sharing.Public
+		pub.Enabled = false
+		sharing.Public = &pub
+	}
+	if sharing.Federation != nil {
+		fed := *sharing.Federation
+		fed.Outgoing = false
+		fed.Incoming = false
+		sharing.Federation = &fed
+	}
+	caps := *c.Capabilities
+	caps.FilesSharing = &sharing
+	c.Capabilities = &caps
+	return c
 }

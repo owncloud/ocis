@@ -224,7 +224,7 @@ func (session *OcisSession) FinishUploadDecomposed(ctx context.Context) error {
 			URL:               s,
 			SpaceOwner:        n.SpaceOwnerOrManager(session.Context(ctx)),
 			ExecutingUser:     u,
-			ResourceID:        &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID},
+			ResourceID:        &provider.ResourceId{StorageId: session.ProviderID(), SpaceId: n.SpaceID, OpaqueId: n.ID},
 			Filename:          session.Filename(),
 			Filesize:          uint64(session.Size()),
 			ImpersonatingUser: iu,
