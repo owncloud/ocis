@@ -1,6 +1,3 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-
 package ntlmssp
 
 import (
@@ -26,33 +23,27 @@ var defaultFlags = negotiateFlagNTLMSSPNEGOTIATETARGETINFO |
 	negotiateFlagNTLMSSPNEGOTIATE56 |
 	negotiateFlagNTLMSSPNEGOTIATE128 |
 	negotiateFlagNTLMSSPNEGOTIATEUNICODE |
-	negotiateFlagNTLMSSPNEGOTIATEEXTENDEDSESSIONSECURITY |
-	negotiateFlagNTLMSSPNEGOTIATENTLM |
-	negotiateFlagNTLMSSPNEGOTIATEALWAYSSIGN
+	negotiateFlagNTLMSSPNEGOTIATEEXTENDEDSESSIONSECURITY
 
-// NewNegotiateMessage creates a new NEGOTIATE message with the flags that this package supports.
-// Note that domain and workstation refer to the client machine, not the user that is authenticating.
-// It is recommended to leave them empty unless you know which are their correct values.
-//
-// The server may ignore these values, or may use them to infer that the client if running on the
-// same machine.
-func NewNegotiateMessage(domain, workstation string) ([]byte, error) {
+//NewNegotiateMessage creates a new NEGOTIATE message with the
+//flags that this package supports.
+func NewNegotiateMessage(domainName, workstationName string) ([]byte, error) {
 	payloadOffset := expMsgBodyLen
 	flags := defaultFlags
 
-	if domain != "" {
+	if domainName != "" {
 		flags |= negotiateFlagNTLMSSPNEGOTIATEOEMDOMAINSUPPLIED
 	}
 
-	if workstation != "" {
+	if workstationName != "" {
 		flags |= negotiateFlagNTLMSSPNEGOTIATEOEMWORKSTATIONSUPPLIED
 	}
 
 	msg := negotiateMessageFields{
 		messageHeader:  newMessageHeader(1),
 		NegotiateFlags: flags,
-		Domain:         newVarField(&payloadOffset, len(domain)),
-		Workstation:    newVarField(&payloadOffset, len(workstation)),
+		Domain:         newVarField(&payloadOffset, len(domainName)),
+		Workstation:    newVarField(&payloadOffset, len(workstationName)),
 		Version:        DefaultVersion(),
 	}
 
@@ -64,7 +55,7 @@ func NewNegotiateMessage(domain, workstation string) ([]byte, error) {
 		return nil, errors.New("incorrect body length")
 	}
 
-	payload := strings.ToUpper(domain + workstation)
+	payload := strings.ToUpper(domainName + workstationName)
 	if _, err := b.WriteString(payload); err != nil {
 		return nil, err
 	}
