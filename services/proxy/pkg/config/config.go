@@ -48,6 +48,7 @@ type Config struct {
 	ClaimSpaceManagement      ClaimSpaceManagement `yaml:"claim_space_management"`
 	MultiFactorAuthentication MFAConfig            `yaml:"mfa"`
 	MultiInstance             MultiInstanceConfig  `yaml:"multi_instance"`
+	EnableVaultMode           bool                 `yaml:"enable_vault_mode" env:"OCIS_ENABLE_VAULT_MODE;PROXY_ENABLE_VAULT_MODE" desc:"Set this to true to automatically create a new vault home for the user if it does not exist. Only applicapable if the storage-users-vault service, a special configured storage-users service is configured." introductionVersion:"Deledda"`
 
 	Context context.Context `json:"-" yaml:"-"`
 }

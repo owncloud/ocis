@@ -274,6 +274,10 @@ func DefaultPolicies() []config.Policy {
 					Service:  "com.owncloud.web.graph",
 				},
 				{
+					Endpoint: "/vault/graph/",
+					Service:  "com.owncloud.web.graph",
+				},
+				{
 					Endpoint: "/api/v0/settings",
 					Service:  "com.owncloud.web.settings",
 				},

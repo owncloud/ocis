@@ -21,6 +21,7 @@ import (
 )
 
 var scopeRegex = regexp.MustCompile(`scope:\s*([^" "\n\r]*)`)
+var vaultRegex = regexp.MustCompile(`vault:\s*(\S+)`)
 
 // ResolveReference makes sure the path is relative to the space root
 func ResolveReference(ctx context.Context, ref *provider.Reference, ri *provider.ResourceInfo, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*provider.Reference, error) {
@@ -147,6 +148,17 @@ func convertToWebDAVPermissions(isShared, isMountpoint, isDir bool, p *provider.
 		fmt.Fprintf(&b, "X")
 	}
 	return b.String()
+}
+
+// ParseVaultMode extracts "vault:<value>" from the query string and returns the
+// cleaned query and whether vault mode was requested (value == "true").
+func ParseVaultMode(query string) (string, bool) {
+	match := vaultRegex.FindStringSubmatch(query)
+	if len(match) < 2 {
+		return query, false
+	}
+	cleaned := strings.TrimSpace(strings.ReplaceAll(query, match[0], ""))
+	return cleaned, match[1] == "true"
 }
 
 // ParseScope extract a scope value from the query string and returns search, scope strings

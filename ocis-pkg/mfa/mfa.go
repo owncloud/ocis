@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-// MFAHeader is the header to be used across grpc and http services
+// MFAHeader is the header to be used across http services
 // to forward the access token.
 const MFAHeader = "X-Multi-Factor-Authentication"
 
@@ -56,4 +56,9 @@ func SetHeader(r *http.Request, mfa bool) {
 	}
 
 	r.Header.Set(MFAHeader, "false")
+}
+
+// IsMFAHeaderTrue checks if the MFA header is set to "true".
+func IsMFAHeaderTrue(r *http.Request) bool {
+	return r.Header.Get(MFAHeader) == "true"
 }

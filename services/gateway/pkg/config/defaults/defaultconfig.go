@@ -58,6 +58,7 @@ func DefaultConfig() *config.Config {
 		StoragePublicLinkEndpoint: "com.owncloud.api.storage-publiclink",
 		StorageSharesEndpoint:     "com.owncloud.api.storage-shares",
 		StorageUsersEndpoint:      "com.owncloud.api.storage-users",
+		StorageUsersVaultEndpoint: "com.owncloud.api.storage-users-vault",
 		UsersEndpoint:             "com.owncloud.api.users",
 		OCMEndpoint:               "com.owncloud.api.ocm",
 
