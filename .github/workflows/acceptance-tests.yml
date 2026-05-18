@@ -533,6 +533,15 @@ jobs:
         with:
           suite: apiGraph
 
+      - name: Stop oCIS
+        if: always()
+        shell: bash
+        run: |
+          if [[ -f /tmp/ocis-wrapper.pid ]]; then
+            kill "$(cat /tmp/ocis-wrapper.pid)" 2>/dev/null || true
+            rm -f /tmp/ocis-wrapper.pid /tmp/ocis-server.log
+          fi
+
   all-acceptance-tests:
     needs: [local-api-tests, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests, composite-actions-apiGraph]
     runs-on: ubuntu-latest
