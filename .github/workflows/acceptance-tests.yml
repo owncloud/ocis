@@ -96,7 +96,12 @@ jobs:
 
           exit $FAILED
 
-  local-api-tests:
+  # ---------------------------------------------------------------------------
+  # API acceptance tests — split by required services so each group gets a
+  # single fixed ocis-setup call with no per-suite conditionals.
+  # ---------------------------------------------------------------------------
+
+  api-tests-plain:
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -107,10 +112,6 @@ jobs:
           # contract & locks
           - apiContract
           - apiLocks
-          # settings & notifications (needs email)
-          - apiSettings
-          - apiNotification
-          - apiCors
           # graph
           - apiGraphUser
           - apiGraph
@@ -124,10 +125,8 @@ jobs:
           - apiDepthInfinity
           - apiArchiver
           - apiActivities
-          # search
+          # search (no tika)
           - apiSearch1
-          - apiSearch2
-          - apiSearchContent    # needs Tika
           # sharing
           - apiSharingNgShares
           - apiReshare
@@ -138,50 +137,261 @@ jobs:
           - apiSharingNgDriveLinkShare
           - apiSharingNgItemLinkShare
           - apiSharingNgLinkShareManagement
-          # auth
-          - apiAuthApp
-          # antivirus (needs ClamAV)
-          - apiAntivirus
-          # federation (needs email + federation ocis)
-          - apiOcm
-          # collaboration (needs WOPI)
-          - apiCollaboration
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
         with:
           go-version-file: go.mod
           cache: true
-
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: "24"
-
       - name: Enable pnpm
         run: corepack enable && corepack prepare pnpm@10.28.1 --activate
-
       - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
         with:
           php-version: "8.4"
           extensions: curl, xml, mbstring, zip, ldap, gd
           tools: composer
+      - name: Build oCIS from source
+        run: |
+          make ci-node-generate
+          make -C ocis build
+      - name: Setup oCIS
+        uses: ./.github/actions/ocis-setup
+        with:
+          ocis-binary: ocis/bin/ocis
+          demo-users: "true"
+      - name: Test ${{ matrix.suite }}
+        uses: ./.github/actions/ocis-test
+        with:
+          suite: ${{ matrix.suite }}
+      - name: Stop oCIS
+        if: always()
+        shell: bash
+        run: |
+          if [[ -f /tmp/ocis-wrapper.pid ]]; then
+            kill "$(cat /tmp/ocis-wrapper.pid)" 2>/dev/null || true
+            rm -f /tmp/ocis-wrapper.pid /tmp/ocis-server.log
+          fi
 
+  api-tests-email:
+    name: ${{ matrix.suite }}
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          # settings & notifications (needs Mailpit)
+          - apiSettings
+          - apiNotification
+          - apiCors
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: "24"
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+      - name: Build oCIS from source
+        run: |
+          make ci-node-generate
+          make -C ocis build
+      - name: Setup oCIS
+        uses: ./.github/actions/ocis-setup
+        with:
+          ocis-binary: ocis/bin/ocis
+          demo-users: "true"
+          email: "true"
+      - name: Test ${{ matrix.suite }}
+        uses: ./.github/actions/ocis-test
+        with:
+          suite: ${{ matrix.suite }}
+      - name: Stop oCIS
+        if: always()
+        shell: bash
+        run: |
+          if [[ -f /tmp/ocis-wrapper.pid ]]; then
+            kill "$(cat /tmp/ocis-wrapper.pid)" 2>/dev/null || true
+            rm -f /tmp/ocis-wrapper.pid /tmp/ocis-server.log
+          fi
+
+  api-tests-tika:
+    name: ${{ matrix.suite }}
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          # full-text search (needs Tika)
+          - apiSearch2
+          - apiSearchContent
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: "24"
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+      - name: Build oCIS from source
+        run: |
+          make ci-node-generate
+          make -C ocis build
+      - name: Setup oCIS
+        uses: ./.github/actions/ocis-setup
+        with:
+          ocis-binary: ocis/bin/ocis
+          demo-users: "true"
+          tika: "true"
+      - name: Test ${{ matrix.suite }}
+        uses: ./.github/actions/ocis-test
+        with:
+          suite: ${{ matrix.suite }}
+      - name: Stop oCIS
+        if: always()
+        shell: bash
+        run: |
+          if [[ -f /tmp/ocis-wrapper.pid ]]; then
+            kill "$(cat /tmp/ocis-wrapper.pid)" 2>/dev/null || true
+            rm -f /tmp/ocis-wrapper.pid /tmp/ocis-server.log
+          fi
+
+  api-tests-antivirus:
+    name: apiAntivirus
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: "24"
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+      - name: Build oCIS from source
+        run: |
+          make ci-node-generate
+          make -C ocis build
+      - name: Setup oCIS
+        uses: ./.github/actions/ocis-setup
+        with:
+          ocis-binary: ocis/bin/ocis
+          demo-users: "true"
+          antivirus: "true"
+      - name: Test apiAntivirus
+        uses: ./.github/actions/ocis-test
+        with:
+          suite: apiAntivirus
+      - name: Stop oCIS
+        if: always()
+        shell: bash
+        run: |
+          if [[ -f /tmp/ocis-wrapper.pid ]]; then
+            kill "$(cat /tmp/ocis-wrapper.pid)" 2>/dev/null || true
+            rm -f /tmp/ocis-wrapper.pid /tmp/ocis-server.log
+          fi
+
+  api-tests-auth-app:
+    name: apiAuthApp
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: "24"
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+      - name: Build oCIS from source
+        run: |
+          make ci-node-generate
+          make -C ocis build
+      - name: Setup oCIS
+        uses: ./.github/actions/ocis-setup
+        with:
+          ocis-binary: ocis/bin/ocis
+          demo-users: "true"
+          extra-server-env: '{"OCIS_ADD_RUN_SERVICES":"auth-app","PROXY_ENABLE_APP_AUTH":"true"}'
+      - name: Test apiAuthApp
+        uses: ./.github/actions/ocis-test
+        with:
+          suite: apiAuthApp
+      - name: Stop oCIS
+        if: always()
+        shell: bash
+        run: |
+          if [[ -f /tmp/ocis-wrapper.pid ]]; then
+            kill "$(cat /tmp/ocis-wrapper.pid)" 2>/dev/null || true
+            rm -f /tmp/ocis-wrapper.pid /tmp/ocis-server.log
+          fi
+
+  api-tests-ocm:
+    name: apiOcm
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: "24"
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
       - name: Cache libcurl 8.12.0
         id: cache-libcurl
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: /opt/libcurl
           key: libcurl-8.12.0-${{ runner.os }}
-
       - name: Install libcurl 8.12.0 build dependencies
-        # Always run: libvips-dev is needed at runtime (govips thumbnails) and for
-        # pkg-config --exists vips to succeed so oCIS is built with ENABLE_VIPS=true.
-        # Skipping this on cache hit would cause oCIS to fall back to the imaging library.
         run: |
           sudo apt-get update -qq
-          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
           sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
-
       - name: Compile libcurl 8.12.0 from source
         if: steps.cache-libcurl.outputs.cache-hit != 'true'
         run: |
@@ -192,11 +402,7 @@ jobs:
           ./configure --with-ssl --with-zlib --with-nghttp2 --prefix=/opt/libcurl --enable-versioned-symbols --silent
           make -j$(nproc) --silent
           sudo make install --silent
-
       - name: Restore libcurl ldconfig
-        # Always run: on cache hit the .so files are restored to /opt/libcurl/lib but
-        # /etc/ld.so.cache on the fresh runner doesn't know about them yet.
-        # Without ldconfig, PHP's curl extension can't find libcurl even though it's present.
         run: |
           echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
           sudo ldconfig
@@ -209,9 +415,64 @@ jobs:
               exit(1);
             }
           '
+      - name: Run apiOcm
+        run: BEHAT_SUITES=apiOcm python3 tests/acceptance/run-github.py
 
-      - name: Run ${{ matrix.suite }}
-        run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
+  api-tests-wopi:
+    name: apiCollaboration
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: "24"
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+      - name: Cache libcurl 8.12.0
+        id: cache-libcurl
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: /opt/libcurl
+          key: libcurl-8.12.0-${{ runner.os }}
+      - name: Install libcurl 8.12.0 build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
+      - name: Compile libcurl 8.12.0 from source
+        if: steps.cache-libcurl.outputs.cache-hit != 'true'
+        run: |
+          cd /tmp
+          curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
+          tar xzf curl-8.12.0.tar.gz
+          cd curl-8.12.0
+          ./configure --with-ssl --with-zlib --with-nghttp2 --prefix=/opt/libcurl --enable-versioned-symbols --silent
+          make -j$(nproc) --silent
+          sudo make install --silent
+      - name: Restore libcurl ldconfig
+        run: |
+          echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
+          sudo ldconfig
+          /opt/libcurl/bin/curl --version | head -1
+          php -r '
+            $v = curl_version()["version"];
+            echo "PHP curl: $v\n";
+            if (version_compare($v, "8.12.0", "<")) {
+              fwrite(STDERR, "FATAL: PHP sees libcurl $v, need >= 8.12.0\n");
+              exit(1);
+            }
+          '
+      - name: Run apiCollaboration
+        run: BEHAT_SUITES=apiCollaboration python3 tests/acceptance/run-github.py
 
   cli-tests:
     needs: [build-and-test]
@@ -228,22 +489,39 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
-
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: "24"
-
       - name: Enable pnpm
         run: corepack enable && corepack prepare pnpm@10.28.1 --activate
-
       - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
         with:
           php-version: "8.4"
           extensions: curl, xml, mbstring, zip, ldap, gd
           tools: composer
-
-      - name: Run ${{ matrix.suite }}
-        run: BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
+      - name: Build oCIS from source
+        run: |
+          make ci-node-generate
+          make -C ocis build
+      - name: Setup oCIS
+        uses: ./.github/actions/ocis-setup
+        with:
+          ocis-binary: ocis/bin/ocis
+          demo-users: "true"
+          email: "true"
+          antivirus: "true"
+      - name: Test ${{ matrix.suite }}
+        uses: ./.github/actions/ocis-test
+        with:
+          suite: ${{ matrix.suite }}
+      - name: Stop oCIS
+        if: always()
+        shell: bash
+        run: |
+          if [[ -f /tmp/ocis-wrapper.pid ]]; then
+            kill "$(cat /tmp/ocis-wrapper.pid)" 2>/dev/null || true
+            rm -f /tmp/ocis-wrapper.pid /tmp/ocis-server.log
+          fi
 
   core-api-tests:
     name: ${{ matrix.suite }}
@@ -268,70 +546,39 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
-
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: "24"
-
       - name: Enable pnpm
         run: corepack enable && corepack prepare pnpm@10.28.1 --activate
-
       - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
         with:
           php-version: "8.4"
           extensions: curl, xml, mbstring, zip, ldap, gd
           tools: composer
-
-      - name: Cache libcurl 8.12.0
-        id: cache-libcurl
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      - name: Build oCIS from source
+        run: |
+          make ci-node-generate
+          make -C ocis build
+      - name: Setup oCIS
+        uses: ./.github/actions/ocis-setup
         with:
-          path: /opt/libcurl
-          key: libcurl-8.12.0-${{ runner.os }}
-
-      - name: Install libcurl 8.12.0 build dependencies
-        # Always run: libvips-dev is needed at runtime (govips thumbnails) and for
-        # pkg-config --exists vips to succeed so oCIS is built with ENABLE_VIPS=true.
-        # Skipping this on cache hit would cause oCIS to fall back to the imaging library.
+          ocis-binary: ocis/bin/ocis
+          demo-users: "true"
+      - name: Test ${{ matrix.suite }}
+        uses: ./.github/actions/ocis-test
+        with:
+          suite: ${{ matrix.suite }}
+          acceptance-test-type: core-api
+          with-remote-php: "true"
+      - name: Stop oCIS
+        if: always()
+        shell: bash
         run: |
-          sudo apt-get update -qq
-          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
-          sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
-
-      - name: Compile libcurl 8.12.0 from source
-        if: steps.cache-libcurl.outputs.cache-hit != 'true'
-        run: |
-          cd /tmp
-          curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
-          tar xzf curl-8.12.0.tar.gz
-          cd curl-8.12.0
-          ./configure --with-ssl --with-zlib --with-nghttp2 --prefix=/opt/libcurl --enable-versioned-symbols --silent
-          make -j$(nproc) --silent
-          sudo make install --silent
-
-      - name: Restore libcurl ldconfig
-        # Always run: on cache hit the .so files are restored to /opt/libcurl/lib but
-        # /etc/ld.so.cache on the fresh runner doesn't know about them yet.
-        # Without ldconfig, PHP's curl extension can't find libcurl even though it's present.
-        run: |
-          echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
-          sudo ldconfig
-          /opt/libcurl/bin/curl --version | head -1
-          php -r '
-            $v = curl_version()["version"];
-            echo "PHP curl: $v\n";
-            if (version_compare($v, "8.12.0", "<")) {
-              fwrite(STDERR, "FATAL: PHP sees libcurl $v, need >= 8.12.0\n");
-              exit(1);
-            }
-          '
-
-      - name: Run ${{ matrix.suite }}
-        run: >
-          BEHAT_SUITES="${{ matrix.suite }}"
-          ACCEPTANCE_TEST_TYPE=core-api
-          WITH_REMOTE_PHP=true
-          python3 tests/acceptance/run-github.py
+          if [[ -f /tmp/ocis-wrapper.pid ]]; then
+            kill "$(cat /tmp/ocis-wrapper.pid)" 2>/dev/null || true
+            rm -f /tmp/ocis-wrapper.pid /tmp/ocis-server.log
+          fi
 
   e2e-tests:
     name: e2e-${{ matrix.suite }}
@@ -543,7 +790,7 @@ jobs:
           fi
 
   all-acceptance-tests:
-    needs: [local-api-tests, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests, composite-actions-apiGraph]
+    needs: [api-tests-plain, api-tests-email, api-tests-tika, api-tests-antivirus, api-tests-auth-app, api-tests-ocm, api-tests-wopi, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests, composite-actions-apiGraph]
     runs-on: ubuntu-latest
     if: always()
     steps:
