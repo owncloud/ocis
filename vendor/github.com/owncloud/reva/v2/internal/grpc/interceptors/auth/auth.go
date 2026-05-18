@@ -20,6 +20,7 @@ package auth
 
 import (
 	"context"
+	"slices"
 	"sync"
 	"time"
 
@@ -27,6 +28,7 @@ import (
 	authpb "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/auth/scope"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
@@ -36,12 +38,12 @@ import (
 	"github.com/owncloud/reva/v2/pkg/token"
 	tokenmgr "github.com/owncloud/reva/v2/pkg/token/manager/registry"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -62,6 +64,7 @@ type config struct {
 	GatewayAddr             string                            `mapstructure:"gateway_addr"`
 	UserGroupsCacheSize     int                               `mapstructure:"usergroups_cache_size"`
 	ScopeExpansionCacheSize int                               `mapstructure:"scope_expansion_cache_size"`
+	MFAEnabled              bool                              `mapstructure:"mfa_enabled"`
 }
 
 func parseConfig(m map[string]interface{}) (*config, error) {
@@ -154,6 +157,14 @@ func NewUnary(m map[string]interface{}, unprotected []string, tp trace.TracerPro
 		// store user and scopes in context
 		ctx = ctxpkg.ContextSetUser(ctx, u)
 		ctx = ctxpkg.ContextSetScopes(ctx, tokenScope)
+		// TODO: MFA enforcement should be moved to the individual service level, so each service can
+		// decide which endpoints require MFA and which are accessible without it.
+		if conf.MFAEnabled {
+			if mfav := metadata.ValueFromIncomingContext(ctx, ctxpkg.MFAOutgoingHeader); !slices.Contains(mfav, "true") {
+				log.Warn().Str("user_id", u.Id.OpaqueId).Strs("mfa_values", mfav).Msg("MFA is required")
+				return mfaResponse(ctx, req, info)
+			}
+		}
 
 		span.SetAttributes(semconv.EnduserIDKey.String(u.Id.OpaqueId))
 
@@ -243,6 +254,14 @@ func NewStream(m map[string]interface{}, unprotected []string, tp trace.TracerPr
 		// store user and scopes in context
 		ctx = ctxpkg.ContextSetUser(ctx, u)
 		ctx = ctxpkg.ContextSetScopes(ctx, tokenScope)
+		// TODO: MFA enforcement should be moved to the individual service level, so each service can
+		// decide which endpoints require MFA and which are accessible without it.
+		if conf.MFAEnabled {
+			if mfav := metadata.ValueFromIncomingContext(ctx, ctxpkg.MFAOutgoingHeader); !slices.Contains(mfav, "true") {
+				log.Warn().Str("user_id", u.Id.OpaqueId).Strs("mfa_values", mfav).Msg("MFA is required")
+				return status.Errorf(codes.PermissionDenied, "MFA required to access vault storage")
+			}
+		}
 		wrapped := newWrappedServerStream(ctx, ss)
 
 		span.SetAttributes(semconv.EnduserIDKey.String(u.Id.OpaqueId))

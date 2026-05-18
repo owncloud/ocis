@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-04-28 03:18+0000\n"
+"POT-Creation-Date: 2026-05-16 03:18+0000\n"
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
 "Last-Translator: 許明凱 <yuteson@gmail.com>, 2026\n"
 "Language-Team: Chinese (https://app.transifex.com/owncloud-org/teams/6149/zh/)\n"
@@ -120,7 +120,7 @@ msgid "Deny all access."
 msgstr "拒絕所有存取"
 
 #. default description for new spaces
-#: pkg/service/v0/spacetemplates.go:32
+#: pkg/service/v0/spacetemplates.go:33
 msgid "Here you can add a description for this Space."
 msgstr "在此处添加此空间的描述。"
 

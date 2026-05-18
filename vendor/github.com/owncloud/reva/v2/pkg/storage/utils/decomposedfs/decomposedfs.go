@@ -258,7 +258,7 @@ func New(o *options.Options, aspects aspects.Aspects, log *zerolog.Logger) (stor
 			return nil, errors.New("need nats for async file processing")
 		}
 
-		ch, err := events.Consume(fs.stream, "dcfs", _registeredEvents...)
+		ch, err := events.Consume(fs.stream, o.Events.ConsumerGroup, _registeredEvents...)
 		if err != nil {
 			return nil, err
 		}
@@ -285,6 +285,10 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 		switch ev := event.Event.(type) {
 		case events.PostprocessingFinished:
 			sublog := log.With().Str("event", "PostprocessingFinished").Str("uploadid", ev.UploadID).Logger()
+			if ev.ResourceID != nil && ev.ResourceID.GetStorageId() != "" && ev.ResourceID.GetStorageId() != fs.o.MountID {
+				sublog.Debug().Msg("ignoring event for different storage")
+				continue
+			}
 			session, err := fs.sessionStore.Get(ctx, ev.UploadID)
 			if err != nil {
 				sublog.Error().Err(err).Msg("Failed to get upload")
@@ -450,6 +454,10 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 			session.Cleanup(true, !ev.KeepUpload, !ev.KeepUpload, true)
 		case events.RevertRevision:
 			sublog := log.With().Str("event", "RevertRevision").Interface("nodeid", ev.ResourceID).Logger()
+			if ev.ResourceID != nil && ev.ResourceID.GetStorageId() != "" && ev.ResourceID.GetStorageId() != fs.o.MountID {
+				sublog.Debug().Msg("ignoring event for different storage")
+				continue
+			}
 			n, err := fs.lu.NodeFromID(ctx, ev.ResourceID)
 			if err != nil {
 				sublog.Error().Err(err).Msg("Failed to get node")
@@ -462,6 +470,10 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 			}
 		case events.PostprocessingStepFinished:
 			sublog := log.With().Str("event", "PostprocessingStepFinished").Str("uploadid", ev.UploadID).Logger()
+			if ev.ResourceID != nil && ev.ResourceID.GetStorageId() != "" && ev.ResourceID.GetStorageId() != fs.o.MountID {
+				sublog.Debug().Msg("ignoring event for different storage")
+				continue
+			}
 			if ev.FinishedStep != events.PPStepAntivirus {
 				// atm we are only interested in antivirus results
 				continue

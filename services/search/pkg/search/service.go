@@ -25,10 +25,12 @@ import (
 	"github.com/owncloud/reva/v2/pkg/tags"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"golang.org/x/sync/errgroup"
+	grpcmetadata "google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
@@ -104,8 +106,14 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 	}
 	currentUser := revactx.ContextMustGetUser(ctx)
 
-	// Extract scope from query if set
-	query, scope := ParseScope(req.Query)
+	// Extract vault mode and scope from query if set
+	query, isVault := ParseVaultMode(req.Query)
+	ctx = mfa.Set(ctx, isVault && mfa.Has(ctx))
+	if mfa.Has(ctx) {
+		ctx = grpcmetadata.AppendToOutgoingContext(ctx, revactx.MFAOutgoingHeader, "true")
+	}
+
+	query, scope := ParseScope(query)
 	if query == "" {
 		return nil, errtypes.BadRequest("empty query provided")
 	}
@@ -156,15 +164,46 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 
 	// Get the spaces to search
 	spaces := []*provider.StorageSpace{}
-	listSpacesRes, err := gatewayClient.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{Filters: filters})
+	lssReq := &provider.ListStorageSpacesRequest{Filters: filters}
+	listSpacesRes, err := gatewayClient.ListStorageSpaces(ctx, lssReq)
 	if err != nil {
 		s.logger.Error().Err(err).Msg("failed to list the user's storage spaces")
 		return nil, err
+	}
+	if mfa.Has(ctx) {
+		// When the "storage_id" is set the ListStorageSpaces request omits "+grant"
+		// spaces, so we have to make an additional request to get the vault space in vault mode
+		lssReq.Opaque = utils.AppendPlainToOpaque(lssReq.Opaque, "storage_id", utils.VaultStorageProviderID)
+		listVaultSpacesRes, err := gatewayClient.ListStorageSpaces(ctx, lssReq)
+		if err != nil {
+			s.logger.Error().Err(err).Msg("failed to list the user's storage spaces")
+			return nil, err
+		}
+		if len(listVaultSpacesRes.StorageSpaces) > 0 {
+			listSpacesRes.StorageSpaces = append(listSpacesRes.StorageSpaces, listVaultSpacesRes.StorageSpaces...)
+		}
 	}
 	for _, space := range listSpacesRes.StorageSpaces {
 		if utils.ReadPlainFromOpaque(space.Opaque, "trashed") == _spaceStateTrashed {
 			// Do not consider disabled spaces
 			continue
+		}
+		{
+			// Filter out spaces that don't match the current mode (vault or regular)
+			opaqueMap := sdk.DecodeOpaqueMap(space.Opaque)
+			var storageID string
+			if space.SpaceType == _spaceTypeMountpoint {
+				storageID = opaqueMap["grantStorageID"]
+			} else {
+				storageID = space.Root.GetStorageId()
+			}
+			isVaultSpace := storageID == utils.VaultStorageProviderID
+			if mfa.Has(ctx) && !isVaultSpace {
+				continue // vault mode: skip non-vault spaces
+			}
+			if !mfa.Has(ctx) && isVaultSpace {
+				continue // regular mode: skip vault spaces
+			}
 		}
 		if space.SpaceType != "mountpoint" && req.Ref != nil && (req.Ref.GetResourceId().GetSpaceId() != space.Root.GetSpaceId()) {
 			// Do not search (non-mountpoint) spaces that do not match the given scope (if a scope is set)
@@ -445,6 +484,10 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 		return fmt.Errorf("invalid space id")
 	}
 	rootID.OpaqueId = rootID.SpaceId
+
+	if rootID.StorageId == utils.VaultStorageProviderID {
+		ownerCtx = grpcmetadata.AppendToOutgoingContext(ownerCtx, revactx.MFAOutgoingHeader, "true")
+	}
 
 	failures := 0
 
@@ -760,6 +803,10 @@ func (s *Service) resInfo(ref *provider.Reference) (context.Context, *provider.S
 	ownerCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
 	if err != nil {
 		return nil, nil, ""
+	}
+
+	if ref.GetResourceId().GetStorageId() == utils.VaultStorageProviderID {
+		ownerCtx = grpcmetadata.AppendToOutgoingContext(ownerCtx, revactx.MFAOutgoingHeader, "true")
 	}
 
 	statRes, err := statResource(ownerCtx, ref, s.gatewaySelector, s.logger)

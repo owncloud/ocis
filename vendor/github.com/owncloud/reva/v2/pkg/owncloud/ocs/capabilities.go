@@ -62,6 +62,7 @@ type Capabilities struct {
 	Theme          *CapabilitiesTheme          `json:"theme,omitempty" xml:"theme,omitempty" mapstructure:"theme"`
 	Notifications  *CapabilitiesNotifications  `json:"notifications,omitempty" xml:"notifications,omitempty"`
 	Auth           *CapabilitiesAuth           `json:"auth,omitempty" xml:"auth,omitempty"`
+	Vault          *CapabilitiesVault          `json:"vault,omitempty" xml:"vault,omitempty" mapstructure:"vault"`
 }
 
 // CapabilitiesSearch holds the search capabilities
@@ -331,4 +332,9 @@ type Version struct {
 	Edition        string `json:"edition" xml:"edition"`
 	Product        string `json:"product" xml:"product"`
 	ProductVersion string `json:"productversion" xml:"productversion"`
+}
+
+// CapabilitiesVault holds vault capabilities
+type CapabilitiesVault struct {
+	Enabled ocsBool `json:"enabled" xml:"enabled" mapstructure:"enabled"`
 }

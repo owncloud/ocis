@@ -31,6 +31,7 @@ use Psr\Http\Message\ResponseInterface;
 use splitbrain\PHPArchive\Tar;
 use splitbrain\PHPArchive\Zip;
 use splitbrain\PHPArchive\Archive;
+use TestHelpers\WebDavHelper;
 
 require_once 'bootstrap.php';
 
@@ -253,6 +254,109 @@ class ArchiverContext implements Context {
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 			),
+		);
+	}
+
+	/**
+	 * Sends a PROPFIND request to the public WebDAV endpoint for the last created public link
+	 * and extracts archive-related metadata from the XML response.
+	 *
+	 * The returned data includes:
+	 * - fileIds: IDs of all files included in the public link
+	 * - signature: signature required for archive download
+	 * - expiration: expiration timestamp required for archive download
+	 *
+	 * @param string $password
+	 *
+	 * @return array {
+	 *     fileIds: string[],
+	 *     signature: string|null,
+	 *     expiration: string|null
+	 * }
+	 *
+	 * @throws GuzzleException
+	 */
+	private function fetchPublicLinkArchiveData(string $password = ''): array {
+		$token = $this->featureContext->isUsingSharingNG()
+			? $this->featureContext->shareNgGetLastCreatedLinkShareToken()
+			: $this->featureContext->getLastCreatedPublicShareToken();
+		$password = $this->featureContext->getActualPassword($password);
+		$response = WebDavHelper::propfind(
+			$this->featureContext->getBaseUrl(),
+			null,
+			(string) $password,
+			(string) $token,
+			['oc:public-link-item-type', 'oc:fileid', 'oc:downloadURL', 'oc:signature-auth'],
+			null,
+			null,
+			"public-files",
+		);
+		$xmlDocument = HttpRequestHelper::getResponseXml($response);
+
+		$fileIds = [];
+		$signature = null;
+		$expiration = null;
+
+		foreach ($xmlDocument->xpath('//d:response') as $responseNode) {
+			$type = $responseNode->xpath('.//oc:public-link-item-type');
+			$fileId = $responseNode->xpath('.//oc:fileid');
+
+			$sig = $responseNode->xpath('.//oc:signature-auth/oc:signature');
+			$exp = $responseNode->xpath('.//oc:signature-auth/oc:expiration');
+
+			if (!empty($type) && (string)$type[0] === 'file' && !empty($fileId)) {
+				$fileIds[] = (string)$fileId[0];
+			}
+
+			if ($signature === null && !empty($sig)) {
+				$signature = (string)$sig[0];
+			}
+
+			if ($expiration === null && !empty($exp)) {
+				$expiration = (string)$exp[0];
+			}
+		}
+
+		return [
+			'fileIds' => $fileIds,
+			'signature' => $signature,
+			'expiration' => $expiration,
+		];
+	}
+
+	/**
+	 * @When /^the public downloads the archive of the last created public link with password "([^"]*)"$/
+	 *
+	 * @param string $password
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException|Exception
+	 */
+	public function publicDownloadsTheArchiveOfTheLastCreatedPublicLink(string $password = ""): void {
+		$data = $this->fetchPublicLinkArchiveData($password);
+		$fileIds = $data['fileIds'];
+		$signature = $data['signature'];
+		$expiration = $data['expiration'];
+
+		$token = $this->featureContext->isUsingSharingNG()
+				? $this->featureContext->shareNgGetLastCreatedLinkShareToken()
+				: $this->featureContext->getLastCreatedPublicShareToken();
+		$password = $this->featureContext->getActualPassword($password);
+		$queryParts = [];
+		$queryParts[] = "public-token=" . urlencode($token);
+
+		foreach ($fileIds as $fileId) {
+			$queryParts[] = "id=" . urlencode($fileId);
+		}
+
+		$queryParts[] = "signature=" . urlencode($signature);
+		$queryParts[] = "expiration=" . urlencode($expiration);
+		$queryString = implode('&', $queryParts);
+		$url = $this->featureContext->getBaseUrl() . "/archiver?" . $queryString;
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::get($url, 'public', $password),
 		);
 	}
 

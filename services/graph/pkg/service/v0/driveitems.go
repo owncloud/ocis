@@ -30,6 +30,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
 )
 
 // CreateUploadSession create an upload session to allow your app to upload files up to the maximum file size.
@@ -154,13 +155,19 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 
 	currentUser := revactx.ContextMustGetUser(r.Context())
 	// do we need to list all or only the personal drive
-	filters := []*storageprovider.ListStorageSpacesRequest_Filter{}
-	filters = append(filters, listStorageSpacesUserFilter(currentUser.GetId().GetOpaqueId()))
-	filters = append(filters, listStorageSpacesTypeFilter("personal"))
+	listReq := &storageprovider.ListStorageSpacesRequest{
+		Filters: []*storageprovider.ListStorageSpacesRequest_Filter{
+			listStorageSpacesUserFilter(currentUser.GetId().GetOpaqueId()),
+			listStorageSpacesTypeFilter("personal"),
+		},
+	}
 
-	res, err := gatewayClient.ListStorageSpaces(ctx, &storageprovider.ListStorageSpacesRequest{
-		Filters: filters,
-	})
+	// force vault storage space if vault mode is enabled
+	if middleware.IsVaultMode(ctx) {
+		listReq.Opaque = utils.AppendPlainToOpaque(listReq.Opaque, "storage_id", utils.VaultStorageProviderID)
+	}
+
+	res, err := gatewayClient.ListStorageSpaces(ctx, listReq)
 	switch {
 	case err != nil:
 		g.logger.Error().Err(err).Msg("error making ListStorageSpaces grpc call")

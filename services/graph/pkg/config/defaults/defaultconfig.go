@@ -69,10 +69,11 @@ func DefaultConfig() *config.Config {
 		},
 		Reva: shared.DefaultRevaConfig(),
 		Spaces: config.Spaces{
-			StorageUsersAddress: "com.owncloud.api.storage-users",
-			WebDavBase:          "https://localhost:9200",
-			WebDavPath:          "/dav/spaces/",
-			DefaultQuota:        "1000000000",
+			StorageUsersAddress:      "com.owncloud.api.storage-users",
+			StorageUsersVaultAddress: "com.owncloud.api.storage-users-vault",
+			WebDavBase:               "https://localhost:9200",
+			WebDavPath:               "/dav/spaces/",
+			DefaultQuota:             "1000000000",
 			// 1 minute
 			ExtendedSpacePropertiesCacheTTL: 60,
 			// 1 minute

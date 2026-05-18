@@ -29,11 +29,7 @@ ifndef OUTPUT
 endif
 
 ifndef VERSION
-	ifneq ($(DRONE_TAG),)
-		VERSION ?= $(subst v,,$(DRONE_TAG))
-	else
-		STRING ?= $(shell git rev-parse --short HEAD)
-	endif
+	STRING ?= $(shell git rev-parse --short HEAD)
 endif
 
 ifndef DATE
@@ -118,7 +114,6 @@ debug-linux-docker-amd64: release-dirs
         -gcflags="all=-N -l" \
 		-tags 'netgo $(TAGS)' \
 		-buildmode=exe \
-		-trimpath \
 		-ldflags '-extldflags "-static" $(DEBUG_LDFLAGS) $(DOCKER_LDFLAGS)' \
 		-o '$(DIST)/binaries/$(EXECUTABLE)-linux-amd64' \
 		./cmd/$(NAME)
@@ -130,7 +125,6 @@ debug-linux-docker-arm64: release-dirs
         -gcflags="all=-N -l" \
 		-tags 'netgo $(TAGS)' \
 		-buildmode=exe \
-		-trimpath \
 		-ldflags '-extldflags "-static" $(DEBUG_LDFLAGS) $(DOCKER_LDFLAGS)' \
 		-o '$(DIST)/binaries/$(EXECUTABLE)-linux-arm64' \
 		./cmd/$(NAME)

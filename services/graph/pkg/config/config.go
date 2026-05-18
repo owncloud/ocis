@@ -39,6 +39,8 @@ type Config struct {
 
 	Validation Validation `yaml:"validation"`
 
+	EnableVaultMode bool `yaml:"enable_vault_mode" env:"OCIS_ENABLE_VAULT_MODE;GRAPH_ENABLE_VAULT_MODE" desc:"Enable vault mode in addition to the regular graph service. This only applies when the additional storage-users-vault service is running, which is a special configured storage-users service." introductionVersion:"Deledda"`
+
 	Context context.Context `yaml:"-"`
 }
 
@@ -50,6 +52,7 @@ type Spaces struct {
 	UsersCacheTTL                   int    `yaml:"users_cache_ttl" env:"GRAPH_SPACES_USERS_CACHE_TTL" desc:"Max TTL in seconds for the spaces users cache." introductionVersion:"pre5.0"`
 	GroupsCacheTTL                  int    `yaml:"groups_cache_ttl" env:"GRAPH_SPACES_GROUPS_CACHE_TTL" desc:"Max TTL in seconds for the spaces groups cache." introductionVersion:"pre5.0"`
 	StorageUsersAddress             string `yaml:"storage_users_address" env:"GRAPH_SPACES_STORAGE_USERS_ADDRESS" desc:"The address of the storage-users service." introductionVersion:"5.0"`
+	StorageUsersVaultAddress        string `yaml:"storage_users_vault_address" env:"GRAPH_SPACES_STORAGE_USERS_VAULT_ADDRESS" desc:"The address of the storage-users-vault service, a special configured storage-users service. Applicable only when 'GRAPH_ENABLE_VAULT_MODE' is enabled." introductionVersion:"Deledda"`
 	DefaultLanguage                 string `yaml:"default_language" env:"OCIS_DEFAULT_LANGUAGE" desc:"The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details." introductionVersion:"5.0"`
 	TranslationPath                 string `yaml:"translation_path" env:"OCIS_TRANSLATION_PATH;GRAPH_TRANSLATION_PATH" desc:"(optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details." introductionVersion:"7.0.0"`
 }

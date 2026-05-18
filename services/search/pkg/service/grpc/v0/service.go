@@ -24,6 +24,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
@@ -143,7 +144,10 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 	}
 	ctx = revactx.ContextSetUser(ctx, u)
 
-	key := cacheKey(in.Query, in.PageSize, in.Ref, u)
+	mfaVal, _ := metadata.Get(ctx, revactx.MFAOutgoingHeader)
+	ctx = mfa.Set(ctx, mfaVal == "true")
+
+	key := cacheKey(in.Query, in.PageSize, in.Ref, u, mfa.Has(ctx))
 	res, ok := s.FromCache(key)
 	if !ok {
 		var err error
@@ -222,6 +226,9 @@ func (s Service) Cache(key string, res *searchsvc.SearchResponse) {
 	_ = s.cache.Set(key, res)
 }
 
-func cacheKey(query string, pagesize int32, ref *v0.Reference, user *user.User) string {
-	return fmt.Sprintf("%s|%d|%s$%s!%s/%s|%s", query, pagesize, ref.GetResourceId().GetStorageId(), ref.GetResourceId().GetSpaceId(), ref.GetResourceId().GetOpaqueId(), ref.GetPath(), user.GetId().GetOpaqueId())
+func cacheKey(query string, pagesize int32, ref *v0.Reference, user *user.User, isVault bool) string {
+	return fmt.Sprintf("%s|%d|%s$%s!%s/%s|%s|%v", query, pagesize, ref.GetResourceId().GetStorageId(), ref.GetResourceId().GetSpaceId(), ref.GetResourceId().GetOpaqueId(), ref.GetPath(), user.GetId().GetOpaqueId(), isVault)
 }
+
+// ExportedCacheKey is exported for testing only.
+var ExportedCacheKey = cacheKey
