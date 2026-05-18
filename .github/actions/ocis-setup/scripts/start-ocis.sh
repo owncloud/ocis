@@ -17,7 +17,7 @@ CONFIG_DIR="${HOME}/.ocis/config"
 # Generate a throw-away fontsMap.json pointing at the font shipped in the repo.
 # Tests that render thumbnails from text files need this.
 REPO_ROOT="${OCIS_REPO_ROOT:-${GITHUB_WORKSPACE}}"
-FONT_PATH="${REPO_ROOT}/tests/config/drone/NotoSans.ttf"
+FONT_PATH="${REPO_ROOT}/tests/config/ci/NotoSans.ttf"
 FONTMAP=$(mktemp /tmp/fontsMap-XXXXXX.json)
 echo "{\"defaultFont\": \"${FONT_PATH}\"}" > "$FONTMAP"
 
@@ -38,7 +38,7 @@ declare -A SERVER_ENV=(
   [OCIS_JWT_SECRET]="some-ocis-jwt-secret"
   [EVENTHISTORY_STORE]="memory"
   [OCIS_TRANSLATION_PATH]="${REPO_ROOT}/tests/config/translations"
-  [WEB_UI_CONFIG_FILE]="${REPO_ROOT}/tests/config/drone/ocis-config.json"
+  [WEB_UI_CONFIG_FILE]="${REPO_ROOT}/tests/config/ci/ocis-config.json"
   [THUMBNAILS_TXT_FONTMAP_FILE]="$FONTMAP"
   [SEARCH_EXTRACTOR_TYPE]="basic"
   [FRONTEND_FULL_TEXT_SEARCH_ENABLED]="false"
