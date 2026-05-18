@@ -29,11 +29,7 @@ ifndef OUTPUT
 endif
 
 ifndef VERSION
-	ifneq ($(DRONE_TAG),)
-		VERSION ?= $(subst v,,$(DRONE_TAG))
-	else
-		STRING ?= $(shell git rev-parse --short HEAD)
-	endif
+	STRING ?= $(shell git rev-parse --short HEAD)
 endif
 
 ifndef DATE
