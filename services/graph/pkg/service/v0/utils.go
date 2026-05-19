@@ -101,6 +101,11 @@ func IsShareJail(id *storageprovider.ResourceId) bool {
 	return id.GetStorageId() == utils.ShareStorageProviderID && id.GetSpaceId() == utils.ShareStorageSpaceID
 }
 
+// IsVaultResource returns true if given id belongs to the vault storage provider.
+func IsVaultResource(id *storageprovider.ResourceId) bool {
+	return id.GetStorageId() == utils.VaultStorageProviderID
+}
+
 // userIdToIdentity looks the user for the supplied id using the cache and returns it
 // as a libregraph.Identity
 func userIdToIdentity(ctx context.Context, cache identity.IdentityCache, userID string) (libregraph.Identity, error) {

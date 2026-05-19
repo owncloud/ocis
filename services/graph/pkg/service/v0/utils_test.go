@@ -120,6 +120,24 @@ var _ = Describe("Utils", func() {
 		}, false),
 	)
 
+	DescribeTable("IsVaultResource",
+		func(resourceID *provider.ResourceId, isVault bool) {
+			Expect(service.IsVaultResource(resourceID)).To(Equal(isVault))
+		},
+		Entry("valid: vault resource", &provider.ResourceId{
+			StorageId: utils.VaultStorageProviderID,
+			SpaceId:   "2",
+			OpaqueId:  "3",
+		}, true),
+		Entry("invalid: non-vault storageId", &provider.ResourceId{
+			StorageId: "123",
+			SpaceId:   "2",
+			OpaqueId:  "3",
+		}, false),
+		Entry("invalid: empty resourceId", &provider.ResourceId{}, false),
+		Entry("invalid: nil resourceId", nil, false),
+	)
+
 	DescribeTable("_cs3ReceivedShareToLibreGraphPermissions",
 		func(permissionSet *provider.ResourcePermissions, match func(*libregraph.Permission)) {
 			permission, err := service.CS3ReceivedShareToLibreGraphPermissions(
