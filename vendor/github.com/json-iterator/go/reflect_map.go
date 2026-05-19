@@ -2,12 +2,11 @@ package jsoniter
 
 import (
 	"fmt"
+	"github.com/modern-go/reflect2"
 	"io"
 	"reflect"
 	"sort"
 	"unsafe"
-
-	"github.com/modern-go/reflect2"
 )
 
 func decoderOfMap(ctx *ctx, typ reflect2.Type) ValDecoder {
@@ -107,17 +106,15 @@ func encoderOfMapKey(ctx *ctx, typ reflect2.Type) ValEncoder {
 		}
 	}
 
-	if typ.Kind() != reflect.String {
-		if typ == textMarshalerType {
-			return &directTextMarshalerEncoder{
-				stringEncoder: ctx.EncoderOf(reflect2.TypeOf("")),
-			}
+	if typ == textMarshalerType {
+		return &directTextMarshalerEncoder{
+			stringEncoder: ctx.EncoderOf(reflect2.TypeOf("")),
 		}
-		if typ.Implements(textMarshalerType) {
-			return &textMarshalerEncoder{
-				valType:       typ,
-				stringEncoder: ctx.EncoderOf(reflect2.TypeOf("")),
-			}
+	}
+	if typ.Implements(textMarshalerType) {
+		return &textMarshalerEncoder{
+			valType:       typ,
+			stringEncoder: ctx.EncoderOf(reflect2.TypeOf("")),
 		}
 	}
 

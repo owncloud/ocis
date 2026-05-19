@@ -258,10 +258,6 @@ func (p *Path) Filter(target, v interface{}) error {
 // FilterFile filter from ast.File by YAMLPath.
 func (p *Path) FilterFile(f *ast.File) (ast.Node, error) {
 	for _, doc := range f.Docs {
-		// For simplicity, directives cannot be the target of operations
-		if doc.Body != nil && doc.Body.Type() == ast.DirectiveType {
-			continue
-		}
 		node, err := p.FilterNode(doc.Body)
 		if err != nil {
 			return nil, err
@@ -356,10 +352,6 @@ func (p *Path) ReplaceWithFile(dst *ast.File, src *ast.File) error {
 // ReplaceNode replace ast.File with ast.Node.
 func (p *Path) ReplaceWithNode(dst *ast.File, node ast.Node) error {
 	for _, doc := range dst.Docs {
-		// For simplicity, directives cannot be the target of operations
-		if doc.Body != nil && doc.Body.Type() == ast.DirectiveType {
-			continue
-		}
 		if node.Type() == ast.DocumentType {
 			node = node.(*ast.DocumentNode).Body
 		}
@@ -372,7 +364,7 @@ func (p *Path) ReplaceWithNode(dst *ast.File, node ast.Node) error {
 
 // AnnotateSource add annotation to passed source ( see section 5.1 in README.md ).
 func (p *Path) AnnotateSource(source []byte, colored bool) ([]byte, error) {
-	file, err := parser.ParseBytes(source, 0)
+	file, err := parser.ParseBytes([]byte(source), 0)
 	if err != nil {
 		return nil, err
 	}
