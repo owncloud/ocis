@@ -712,15 +712,9 @@ func (e *Encoder) encodeMap(ctx context.Context, value reflect.Value, column int
 			anchorNode.Value = encoded
 			encoded = anchorNode
 		}
-
-		kn, err := e.encodeValue(ctx, reflect.ValueOf(key), column)
-		keyNode, ok := kn.(ast.MapKeyNode)
-		if !ok || err != nil {
-			keyNode = e.encodeString(fmt.Sprint(key), column)
-		}
 		node.Values = append(node.Values, ast.MappingValue(
 			nil,
-			keyNode,
+			e.encodeString(keyText, column),
 			encoded,
 		))
 		e.setSmartAnchor(vRef, keyText)
