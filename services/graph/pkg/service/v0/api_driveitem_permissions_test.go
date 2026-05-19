@@ -1272,6 +1272,25 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "expiration date is in the past").WithOrigin(errorcode.ErrorOriginCS3)))
 			Expect(res).To(BeZero())
 		})
+		It("rejects updating a public link permission on a vault resource", func() {
+			vaultDriveItemId := &provider.ResourceId{
+				StorageId: utils.VaultStorageProviderID,
+				SpaceId:   "2",
+				OpaqueId:  "3",
+			}
+			getPublicShareMockResponse.Share.ResourceId = vaultDriveItemId
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.MatchedBy(func(req *link.GetPublicShareRequest) bool {
+				return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+			})).Return(getPublicShareMockResponse, nil)
+
+			link := libregraph.NewSharingLink()
+			link.SetLibreGraphDisplayName(TestLinkName)
+			driveItemPermission.SetLink(*link)
+
+			res, err := driveItemPermissionsService.UpdatePermission(context.Background(), vaultDriveItemId, "permissionid", driveItemPermission)
+			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "public links are not allowed for vault resources")))
+			Expect(res).To(BeZero())
+		})
 	})
 
 })

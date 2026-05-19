@@ -21,6 +21,9 @@ import (
 )
 
 func (s DriveItemPermissionsService) CreateLink(ctx context.Context, driveItemID *storageprovider.ResourceId, createLink libregraph.DriveItemCreateLink) (libregraph.Permission, error) {
+	if IsVaultResource(driveItemID) {
+		return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "public links are not allowed for vault resources")
+	}
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		s.logger.Error().Err(err).Msg("could not select next gateway client")
@@ -112,6 +115,9 @@ func (s DriveItemPermissionsService) CreateSpaceRootLink(ctx context.Context, dr
 }
 
 func (s DriveItemPermissionsService) SetPublicLinkPassword(ctx context.Context, driveItemId *storageprovider.ResourceId, permissionID string, password string) (libregraph.Permission, error) {
+	if IsVaultResource(driveItemId) {
+		return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "public links are not allowed for vault resources")
+	}
 	publicShare, err := s.getCS3PublicShareByID(ctx, permissionID)
 	if err != nil {
 		return libregraph.Permission{}, err
@@ -281,6 +287,9 @@ func (api DriveItemPermissionsApi) SetSpaceRootLinkPassword(w http.ResponseWrite
 }
 
 func (s DriveItemPermissionsService) updatePublicLinkPermission(ctx context.Context, permissionID string, itemID *storageprovider.ResourceId, newPermission *libregraph.Permission) (perm *libregraph.Permission, err error) {
+	if IsVaultResource(itemID) {
+		return nil, errorcode.New(errorcode.InvalidRequest, "public links are not allowed for vault resources")
+	}
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		s.logger.Error().Err(err).Msg("could not select next gateway client")
