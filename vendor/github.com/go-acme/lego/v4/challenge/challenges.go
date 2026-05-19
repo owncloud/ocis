@@ -40,6 +40,5 @@ func GetTargetedDomain(authz acme.Authorization) string {
 	if authz.Wildcard {
 		return "*." + authz.Identifier.Value
 	}
-
 	return authz.Identifier.Value
 }
