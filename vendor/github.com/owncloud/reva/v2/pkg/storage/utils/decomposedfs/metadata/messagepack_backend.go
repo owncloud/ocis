@@ -28,8 +28,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/owncloud/reva/v2/pkg/storage/cache"
 	"github.com/google/renameio/v2"
+	"github.com/owncloud/reva/v2/pkg/storage/cache"
 	"github.com/pkg/xattr"
 	"github.com/rogpeppe/go-internal/lockedfile"
 	"github.com/shamaton/msgpack/v2"
@@ -250,11 +250,13 @@ func (b MessagePackBackend) loadAttributes(ctx context.Context, path string, sou
 	if err != nil {
 		return nil, err
 	}
-	if len(msgBytes) > 0 {
-		err = msgpack.Unmarshal(msgBytes, &attribs)
-		if err != nil {
-			return nil, err
-		}
+	if len(msgBytes) == 0 {
+		return nil, errors.New("encountered empty metadata file")
+	}
+
+	err = msgpack.Unmarshal(msgBytes, &attribs)
+	if err != nil {
+		return nil, err
 	}
 
 	_, subspan := tracer.Start(ctx, "metaCache.PushToCache")
