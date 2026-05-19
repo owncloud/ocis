@@ -1,0 +1,3 @@
+scan:
+  skip-files:
+    - vendor/github.com/crewjam/saml/xmlenc/fuzz.go
