@@ -103,7 +103,7 @@ jobs:
         run: |
           VERSION="${{ needs.determine-release-type.outputs.version }}"
           sed -i "s/LatestTag = \".*\"/LatestTag = \"$VERSION\"/" ocis-pkg/version/version.go
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: generated-code
           path: |
@@ -279,7 +279,7 @@ jobs:
           if [[ "${{ matrix.os }}" == "linux" ]]; then
             cp assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf ocis/dist/release/
           fi
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: binaries-${{ matrix.os }}
           path: ocis/dist/release/*
@@ -316,7 +316,7 @@ jobs:
       - run: make ci-node-check-licenses && make ci-node-save-licenses
       - run: make ci-go-check-licenses && make ci-go-save-licenses
       - run: tar -czf third-party-licenses.tar.gz -C third-party-licenses .
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: third-party-licenses
           path: third-party-licenses.tar.gz
@@ -339,7 +339,7 @@ jobs:
           if [[ $(wc -l < ocis/dist/CHANGELOG.md) -lt 5 ]]; then
             echo "Development release — no release notes yet. See [unreleased changes](https://github.com/owncloud/ocis/tree/master/changelog/unreleased/)." > ocis/dist/CHANGELOG.md
           fi
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: changelog
           path: ocis/dist/CHANGELOG.md
