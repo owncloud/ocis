@@ -13,33 +13,37 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 )
 
-// mfaStoreTTL is how long a verified MFA status is remembered for non-OIDC
-// requests (e.g. signed-URL archiver downloads). It should be at least as
-// long as the signed-URL expiry (OC-Expires). Default: 1 hour.
-const mfaStoreTTL = time.Hour
+const defaultMFASessionDuration = 3600
 
 // MultiFactor returns a middleware that checks requests for mfa
 func MultiFactor(cfg config.MFAConfig, opts ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(opts...)
 	logger := options.Logger
 
+	sessionDuration := cfg.SessionDuration
+	if sessionDuration <= 0 {
+		sessionDuration = defaultMFASessionDuration
+	}
+
 	return func(next http.Handler) http.Handler {
 		return &MultiFactorAuthentication{
-			next:           next,
-			logger:         logger,
-			enabled:        cfg.Enabled,
-			authLevelNames: cfg.AuthLevelNames,
-			store:          options.MFAStore,
+			next:            next,
+			logger:          logger,
+			enabled:         cfg.Enabled,
+			authLevelNames:  cfg.AuthLevelNames,
+			store:           options.MFAStore,
+			sessionDuration: time.Duration(sessionDuration) * time.Second,
 		}
 	}
 }
 
 // MultiFactorAuthentication is a authenticator that checks for mfa on specific paths
 type MultiFactorAuthentication struct {
-	next           http.Handler
-	logger         log.Logger
-	enabled        bool
-	authLevelNames []string
+	next            http.Handler
+	logger          log.Logger
+	enabled         bool
+	authLevelNames  []string
+	sessionDuration time.Duration
 	// store persists verified MFA status so that non-OIDC requests (e.g.
 	// signed-URL archiver downloads) can inherit it from the user's most
 	// recent OIDC session. Nil when no store is configured.
@@ -103,7 +107,7 @@ func (m MultiFactorAuthentication) ServeHTTP(w http.ResponseWriter, req *http.Re
 	// Persist the verified MFA status so that subsequent non-OIDC requests
 	// (e.g. signed-URL archiver downloads) can inherit it. The entry is
 	// refreshed on every successful OIDC MFA verification and expires after
-	// mfaStoreTTL if no further OIDC requests are made.
+	// the configured session duration if no further OIDC requests are made.
 	if m.store != nil {
 		if u, ok := revactx.ContextGetUser(req.Context()); ok && u.GetId().GetOpaqueId() != "" {
 			m.writeMFAToStore(u.GetId().GetOpaqueId())
@@ -123,7 +127,7 @@ func (m MultiFactorAuthentication) writeMFAToStore(userID string) {
 	if err := m.store.Write(&microstore.Record{
 		Key:    key(userID),
 		Value:  []byte("true"),
-		Expiry: mfaStoreTTL,
+		Expiry: m.sessionDuration,
 	}); err != nil {
 		m.logger.Error().Err(err).Str("userID", userID).Msg("failed to write MFA status to store")
 	}
