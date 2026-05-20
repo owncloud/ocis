@@ -142,7 +142,8 @@ func DefaultConfig() *config.Config {
 			MaxTagLength: 100,
 		},
 		MultiFactorAuthentication: config.MFAConfig{
-			AuthLevelNames: []string{"advanced"},
+			AuthLevelNames:  []string{"advanced"},
+			SessionDuration: 3600,
 		},
 	}
 }
