@@ -131,14 +131,21 @@ func (g Graph) GetUserDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	caller, ok := revactx.ContextGetUser(r.Context())
+	if !ok {
+		logger.Debug().Msg("could not get drive: user not in context")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "user not in context")
+		return
+	}
+
 	if userID == "" {
-		u, ok := revactx.ContextGetUser(r.Context())
-		if !ok {
-			logger.Debug().Msg("could not get user: user not in context")
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "user not in context")
-			return
-		}
-		userID = u.GetId().GetOpaqueId()
+		userID = caller.GetId().GetOpaqueId()
+	}
+
+	if userID != caller.GetId().GetOpaqueId() && !g.contextUserHasFullAccountPerms(r.Context()) {
+		logger.Debug().Str("userID", userID).Msg("forbidden: non-admin requesting another user's drive")
+		errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "Forbidden")
+		return
 	}
 
 	logger.Debug().Str("userID", userID).Msg("calling list storage spaces with user and personal filter")
@@ -568,6 +575,18 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 	if userID == "" {
 		logger.Debug().Msg("could not get user: missing user id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
+		return
+	}
+
+	caller, ok := revactx.ContextGetUser(r.Context())
+	if !ok {
+		logger.Debug().Msg("could not get user: user not in context")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "user not in context")
+		return
+	}
+	if userID != caller.GetId().GetOpaqueId() && !g.contextUserHasFullAccountPerms(r.Context()) {
+		logger.Debug().Str("userID", userID).Msg("forbidden: non-admin requesting another user")
+		errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "Forbidden")
 		return
 	}
 
