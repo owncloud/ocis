@@ -7,4 +7,4 @@ spurious storage-users error logs (S3 NoSuchKey). The walker now skips
 nodes marked as processing; they are indexed when their own UploadReady
 event arrives.
 
-https://github.com/owncloud/ocis/pull/00000
+https://github.com/owncloud/ocis/pull/12350
