@@ -1,5 +1,4 @@
 //go:build mint
-// +build mint
 
 /*
  * MinIO Go Library for Amazon S3 Compatible Cloud Storage
@@ -74,7 +73,24 @@ const (
 	enableKMS          = "ENABLE_KMS"
 	appVersion         = "0.1.0"
 	skipCERTValidation = "SKIP_CERT_VALIDATION"
+
+	// TODO: remove when server supports the 2026 checksum types.
+	ignore2026Checksums = true
 )
+
+func ignore2026ChecksumError(cs minio.ChecksumType, err error) bool {
+	if !ignore2026Checksums {
+		return false
+	}
+	switch cs.Base() {
+	case minio.ChecksumMD5, minio.ChecksumSHA512,
+		minio.ChecksumXXHash64, minio.ChecksumXXHash3, minio.ChecksumXXHash128:
+	default:
+		return false
+	}
+	var er minio.ErrorResponse
+	return errors.As(err, &er) && er.Code == "InvalidArgument"
+}
 
 func createHTTPTransport() (transport *http.Transport) {
 	var err error
@@ -1965,6 +1981,100 @@ func testObjectTaggingWithVersioning() {
 	logSuccess(testName, function, args, startTime)
 }
 
+func testPutObjectWithAutoChecksums() {
+	// initialize logging params
+	startTime := time.Now()
+	testName := getFuncName()
+	function := "PutObject(bucketName, objectName, reader, size, opts)"
+	args := map[string]interface{}{
+		"bucketName": "",
+		"objectName": "",
+		"opts":       "minio.PutObjectOptions{UserMetadata: metadata, Progress: progress}",
+	}
+
+	if !isFullMode() {
+		logIgnored(testName, function, args, startTime, "Skipping functional tests for short/quick runs")
+		return
+	}
+
+	c, err := NewClient(ClientConfig{TrailingHeaders: true})
+	if err != nil {
+		logError(testName, function, args, startTime, "", "MinIO client object creation failed", err)
+		return
+	}
+
+	// Generate a new random bucket name.
+	bucketName := randString(60, rand.NewSource(time.Now().UnixNano()), "minio-go-test-")
+	args["bucketName"] = bucketName
+
+	// Make a new bucket.
+	err = c.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{Region: "us-east-1"})
+	if err != nil {
+		logError(testName, function, args, startTime, "", "Make bucket failed", err)
+		return
+	}
+
+	defer cleanupBucket(bucketName, c)
+	const testfile = "datafile-1.03-MB"
+	bufSize := dataFileMap[testfile]
+
+	// Save the data
+	objectName := randString(60, rand.NewSource(time.Now().UnixNano()), "")
+	args["objectName"] = objectName
+
+	cmpChecksum := func(got, want string) {
+		if want != got {
+			logError(testName, function, args, startTime, "", "checksum mismatch", fmt.Errorf("want %s, got %s", want, got))
+			return
+		}
+	}
+
+	meta := map[string]string{}
+	reader := getDataReader(testfile)
+	b, err := io.ReadAll(reader)
+	if err != nil {
+		logError(testName, function, args, startTime, "", "Read failed", err)
+		return
+	}
+	h := minio.ChecksumCRC64NVME.Hasher()
+	h.Reset()
+	h.Write(b)
+	// Upload the data without explicit checksum.
+	resp, err := c.PutObject(context.Background(), bucketName, objectName, bytes.NewReader(b), int64(bufSize), minio.PutObjectOptions{
+		DisableMultipart:     true,
+		DisableContentSha256: false,
+		UserMetadata:         meta,
+		AutoChecksum:         minio.ChecksumNone,
+		Checksum:             minio.ChecksumNone,
+	})
+	_ = resp
+	if err != nil {
+		logError(testName, function, args, startTime, "", "PutObject failed", err)
+		return
+	}
+
+	// Read the metadata back
+	gopts := minio.GetObjectOptions{Checksum: true}
+	st, err := c.StatObject(context.Background(), bucketName, objectName, gopts)
+	if err != nil {
+		logError(testName, function, args, startTime, "", "GetObject failed", err)
+		return
+	}
+	if st.ChecksumCRC64NVME != "" {
+		meta[minio.ChecksumCRC64NVME.Key()] = base64.StdEncoding.EncodeToString(h.Sum(nil))
+		cmpChecksum(st.ChecksumCRC64NVME, meta["x-amz-checksum-crc64nvme"])
+		if st.ChecksumMode != minio.ChecksumFullObjectMode.String() {
+			logError(testName, function, args, startTime, "", "Checksum mode is not full object", fmt.Errorf("got %s, want %s", st.ChecksumMode, minio.ChecksumFullObjectMode.String()))
+		}
+	}
+	if st.Size != int64(bufSize) {
+		logError(testName, function, args, startTime, "", "Number of bytes returned by PutObject does not match GetObject, expected "+string(bufSize)+" got "+string(st.Size), err)
+		return
+	}
+
+	logSuccess(testName, function, args, startTime)
+}
+
 // Test PutObject with custom checksums.
 func testPutObjectWithChecksums() {
 	// initialize logging params
@@ -2003,6 +2113,11 @@ func testPutObjectWithChecksums() {
 	tests := []struct {
 		cs minio.ChecksumType
 	}{
+		{cs: minio.ChecksumMD5},
+		{cs: minio.ChecksumSHA512},
+		{cs: minio.ChecksumXXHash64},
+		{cs: minio.ChecksumXXHash3},
+		{cs: minio.ChecksumXXHash128},
 		{cs: minio.ChecksumCRC32C},
 		{cs: minio.ChecksumCRC32},
 		{cs: minio.ChecksumSHA1},
@@ -2067,6 +2182,10 @@ func testPutObjectWithChecksums() {
 			UserMetadata:         meta,
 		})
 		if err != nil {
+			if ignore2026ChecksumError(test.cs, err) {
+				logIgnored(testName, function, args, startTime, "server does not support "+test.cs.String())
+				continue
+			}
 			logError(testName, function, args, startTime, "", "PutObject failed", err)
 			return
 		}
@@ -2075,6 +2194,11 @@ func testPutObjectWithChecksums() {
 		cmpChecksum(resp.ChecksumCRC32, meta["x-amz-checksum-crc32"])
 		cmpChecksum(resp.ChecksumCRC32C, meta["x-amz-checksum-crc32c"])
 		cmpChecksum(resp.ChecksumCRC64NVME, meta["x-amz-checksum-crc64nvme"])
+		cmpChecksum(resp.ChecksumMD5, meta["x-amz-checksum-md5"])
+		cmpChecksum(resp.ChecksumSHA512, meta["x-amz-checksum-sha512"])
+		cmpChecksum(resp.ChecksumXXHash64, meta["x-amz-checksum-xxhash64"])
+		cmpChecksum(resp.ChecksumXXHash3, meta["x-amz-checksum-xxhash3"])
+		cmpChecksum(resp.ChecksumXXHash128, meta["x-amz-checksum-xxhash128"])
 		if resp.ChecksumMode != minio.ChecksumFullObjectMode.String() {
 			logError(testName, function, args, startTime, "", "Checksum mode is not full object", fmt.Errorf("got %s, want %s", resp.ChecksumMode, minio.ChecksumFullObjectMode.String()))
 		}
@@ -2098,6 +2222,11 @@ func testPutObjectWithChecksums() {
 		cmpChecksum(st.ChecksumCRC32, meta["x-amz-checksum-crc32"])
 		cmpChecksum(st.ChecksumCRC32C, meta["x-amz-checksum-crc32c"])
 		cmpChecksum(st.ChecksumCRC64NVME, meta["x-amz-checksum-crc64nvme"])
+		cmpChecksum(st.ChecksumMD5, meta["x-amz-checksum-md5"])
+		cmpChecksum(st.ChecksumSHA512, meta["x-amz-checksum-sha512"])
+		cmpChecksum(st.ChecksumXXHash64, meta["x-amz-checksum-xxhash64"])
+		cmpChecksum(st.ChecksumXXHash3, meta["x-amz-checksum-xxhash3"])
+		cmpChecksum(st.ChecksumXXHash128, meta["x-amz-checksum-xxhash128"])
 		if st.ChecksumMode != minio.ChecksumFullObjectMode.String() {
 			logError(testName, function, args, startTime, "", "Checksum mode is not full object", fmt.Errorf("got %s, want %s", st.ChecksumMode, minio.ChecksumFullObjectMode.String()))
 		}
@@ -2145,6 +2274,11 @@ func testPutObjectWithChecksums() {
 		cmpChecksum(st.ChecksumCRC32, "")
 		cmpChecksum(st.ChecksumCRC32C, "")
 		cmpChecksum(st.ChecksumCRC64NVME, "")
+		cmpChecksum(st.ChecksumMD5, "")
+		cmpChecksum(st.ChecksumSHA512, "")
+		cmpChecksum(st.ChecksumXXHash64, "")
+		cmpChecksum(st.ChecksumXXHash3, "")
+		cmpChecksum(st.ChecksumXXHash128, "")
 
 		delete(args, "range")
 		delete(args, "metadata")
@@ -2190,6 +2324,11 @@ func testPutObjectWithTrailingChecksums() {
 	tests := []struct {
 		cs minio.ChecksumType
 	}{
+		{cs: minio.ChecksumMD5},
+		{cs: minio.ChecksumSHA512},
+		{cs: minio.ChecksumXXHash64},
+		{cs: minio.ChecksumXXHash3},
+		{cs: minio.ChecksumXXHash128},
 		{cs: minio.ChecksumCRC64NVME},
 		{cs: minio.ChecksumCRC32C},
 		{cs: minio.ChecksumCRC32},
@@ -2236,6 +2375,10 @@ func testPutObjectWithTrailingChecksums() {
 			Checksum:             test.cs,
 		})
 		if err != nil {
+			if ignore2026ChecksumError(test.cs, err) {
+				logIgnored(testName, function, args, startTime, "server does not support "+test.cs.String())
+				continue
+			}
 			logError(testName, function, args, startTime, "", "PutObject failed", err)
 			return
 		}
@@ -2248,6 +2391,11 @@ func testPutObjectWithTrailingChecksums() {
 		cmpChecksum(resp.ChecksumCRC32, meta["x-amz-checksum-crc32"])
 		cmpChecksum(resp.ChecksumCRC32C, meta["x-amz-checksum-crc32c"])
 		cmpChecksum(resp.ChecksumCRC64NVME, meta["x-amz-checksum-crc64nvme"])
+		cmpChecksum(resp.ChecksumMD5, meta["x-amz-checksum-md5"])
+		cmpChecksum(resp.ChecksumSHA512, meta["x-amz-checksum-sha512"])
+		cmpChecksum(resp.ChecksumXXHash64, meta["x-amz-checksum-xxhash64"])
+		cmpChecksum(resp.ChecksumXXHash3, meta["x-amz-checksum-xxhash3"])
+		cmpChecksum(resp.ChecksumXXHash128, meta["x-amz-checksum-xxhash128"])
 
 		// Read the data back
 		gopts := minio.GetObjectOptions{Checksum: true}
@@ -2268,7 +2416,12 @@ func testPutObjectWithTrailingChecksums() {
 		cmpChecksum(st.ChecksumSHA1, meta["x-amz-checksum-sha1"])
 		cmpChecksum(st.ChecksumCRC32, meta["x-amz-checksum-crc32"])
 		cmpChecksum(st.ChecksumCRC32C, meta["x-amz-checksum-crc32c"])
-		cmpChecksum(resp.ChecksumCRC64NVME, meta["x-amz-checksum-crc64nvme"])
+		cmpChecksum(st.ChecksumCRC64NVME, meta["x-amz-checksum-crc64nvme"])
+		cmpChecksum(st.ChecksumMD5, meta["x-amz-checksum-md5"])
+		cmpChecksum(st.ChecksumSHA512, meta["x-amz-checksum-sha512"])
+		cmpChecksum(st.ChecksumXXHash64, meta["x-amz-checksum-xxhash64"])
+		cmpChecksum(st.ChecksumXXHash3, meta["x-amz-checksum-xxhash3"])
+		cmpChecksum(st.ChecksumXXHash128, meta["x-amz-checksum-xxhash128"])
 
 		if st.Size != int64(bufSize) {
 			logError(testName, function, args, startTime, "", "Number of bytes returned by PutObject does not match GetObject, expected "+string(bufSize)+" got "+string(st.Size), err)
@@ -2314,6 +2467,11 @@ func testPutObjectWithTrailingChecksums() {
 		cmpChecksum(st.ChecksumCRC32, "")
 		cmpChecksum(st.ChecksumCRC32C, "")
 		cmpChecksum(st.ChecksumCRC64NVME, "")
+		cmpChecksum(st.ChecksumMD5, "")
+		cmpChecksum(st.ChecksumSHA512, "")
+		cmpChecksum(st.ChecksumXXHash64, "")
+		cmpChecksum(st.ChecksumXXHash3, "")
+		cmpChecksum(st.ChecksumXXHash128, "")
 
 		function = "GetObjectAttributes(...)"
 		s, err := c.GetObjectAttributes(context.Background(), bucketName, objectName, minio.ObjectAttributesOptions{})
@@ -2325,6 +2483,16 @@ func testPutObjectWithTrailingChecksums() {
 		cmpChecksum(s.Checksum.ChecksumSHA1, meta["x-amz-checksum-sha1"])
 		cmpChecksum(s.Checksum.ChecksumCRC32, meta["x-amz-checksum-crc32"])
 		cmpChecksum(s.Checksum.ChecksumCRC32C, meta["x-amz-checksum-crc32c"])
+		cmpChecksum(s.Checksum.ChecksumCRC64NVME, meta["x-amz-checksum-crc64nvme"])
+		cmpChecksum(s.Checksum.ChecksumMD5, meta["x-amz-checksum-md5"])
+		cmpChecksum(s.Checksum.ChecksumSHA512, meta["x-amz-checksum-sha512"])
+		cmpChecksum(s.Checksum.ChecksumXXHash64, meta["x-amz-checksum-xxhash64"])
+		cmpChecksum(s.Checksum.ChecksumXXHash3, meta["x-amz-checksum-xxhash3"])
+		cmpChecksum(s.Checksum.ChecksumXXHash128, meta["x-amz-checksum-xxhash128"])
+		if s.Checksum.ChecksumType != "" && s.Checksum.ChecksumType != minio.ChecksumFullObjectMode.String() {
+			logError(testName, function, args, startTime, "", "ChecksumType mismatch in GetObjectAttributes", fmt.Errorf("want %s, got %s", minio.ChecksumFullObjectMode.String(), s.Checksum.ChecksumType))
+			return
+		}
 
 		delete(args, "range")
 		delete(args, "metadata")
@@ -2402,6 +2570,11 @@ func testPutMultipartObjectWithChecksums() {
 	tests := []struct {
 		cs minio.ChecksumType
 	}{
+		{cs: minio.ChecksumMD5},
+		{cs: minio.ChecksumSHA512},
+		{cs: minio.ChecksumXXHash64},
+		{cs: minio.ChecksumXXHash3},
+		{cs: minio.ChecksumXXHash128},
 		{cs: minio.ChecksumFullObjectCRC32},
 		{cs: minio.ChecksumFullObjectCRC32C},
 		{cs: minio.ChecksumCRC64NVME},
@@ -2459,6 +2632,10 @@ func testPutMultipartObjectWithChecksums() {
 			Checksum:             cs,
 		})
 		if err != nil {
+			if ignore2026ChecksumError(test.cs, err) {
+				logIgnored(testName, function, args, startTime, "server does not support "+test.cs.String())
+				continue
+			}
 			logError(testName, function, args, startTime, "", "PutObject failed", err)
 			return
 		}
@@ -2474,6 +2651,16 @@ func testPutMultipartObjectWithChecksums() {
 			cmpChecksum(resp.ChecksumSHA256, wantChksm)
 		case minio.ChecksumCRC64NVME:
 			cmpChecksum(resp.ChecksumCRC64NVME, wantChksm)
+		case minio.ChecksumMD5:
+			cmpChecksum(resp.ChecksumMD5, wantChksm)
+		case minio.ChecksumSHA512:
+			cmpChecksum(resp.ChecksumSHA512, wantChksm)
+		case minio.ChecksumXXHash64:
+			cmpChecksum(resp.ChecksumXXHash64, wantChksm)
+		case minio.ChecksumXXHash3:
+			cmpChecksum(resp.ChecksumXXHash3, wantChksm)
+		case minio.ChecksumXXHash128:
+			cmpChecksum(resp.ChecksumXXHash128, wantChksm)
 		}
 
 		args["section"] = "HeadObject"
@@ -2493,6 +2680,16 @@ func testPutMultipartObjectWithChecksums() {
 			cmpChecksum(st.ChecksumSHA256, wantChksm)
 		case minio.ChecksumCRC64NVME:
 			cmpChecksum(st.ChecksumCRC64NVME, wantChksm)
+		case minio.ChecksumMD5:
+			cmpChecksum(st.ChecksumMD5, wantChksm)
+		case minio.ChecksumSHA512:
+			cmpChecksum(st.ChecksumSHA512, wantChksm)
+		case minio.ChecksumXXHash64:
+			cmpChecksum(st.ChecksumXXHash64, wantChksm)
+		case minio.ChecksumXXHash3:
+			cmpChecksum(st.ChecksumXXHash3, wantChksm)
+		case minio.ChecksumXXHash128:
+			cmpChecksum(st.ChecksumXXHash128, wantChksm)
 		}
 
 		// Use the CopyObject API to make a copy, in the case it was a composite checksum,
@@ -2529,6 +2726,16 @@ func testPutMultipartObjectWithChecksums() {
 			cmpChecksum(st.ChecksumSHA256, wantFullObjectChksm)
 		case minio.ChecksumCRC64NVME:
 			cmpChecksum(st.ChecksumCRC64NVME, wantFullObjectChksm)
+		case minio.ChecksumMD5:
+			cmpChecksum(st.ChecksumMD5, wantFullObjectChksm)
+		case minio.ChecksumSHA512:
+			cmpChecksum(st.ChecksumSHA512, wantFullObjectChksm)
+		case minio.ChecksumXXHash64:
+			cmpChecksum(st.ChecksumXXHash64, wantFullObjectChksm)
+		case minio.ChecksumXXHash3:
+			cmpChecksum(st.ChecksumXXHash3, wantFullObjectChksm)
+		case minio.ChecksumXXHash128:
+			cmpChecksum(st.ChecksumXXHash128, wantFullObjectChksm)
 		}
 
 		args["section"] = "GetObjectAttributes"
@@ -2551,6 +2758,35 @@ func testPutMultipartObjectWithChecksums() {
 			cmpChecksum(s.Checksum.ChecksumSHA1, wantChksm)
 		case minio.ChecksumSHA256:
 			cmpChecksum(s.Checksum.ChecksumSHA256, wantChksm)
+		case minio.ChecksumCRC64NVME:
+			cmpChecksum(s.Checksum.ChecksumCRC64NVME, wantChksm)
+		case minio.ChecksumMD5:
+			cmpChecksum(s.Checksum.ChecksumMD5, wantChksm)
+		case minio.ChecksumSHA512:
+			cmpChecksum(s.Checksum.ChecksumSHA512, wantChksm)
+		case minio.ChecksumXXHash64:
+			cmpChecksum(s.Checksum.ChecksumXXHash64, wantChksm)
+		case minio.ChecksumXXHash3:
+			cmpChecksum(s.Checksum.ChecksumXXHash3, wantChksm)
+		case minio.ChecksumXXHash128:
+			cmpChecksum(s.Checksum.ChecksumXXHash128, wantChksm)
+		}
+
+		if s.Checksum.ChecksumType != "" {
+			var wantType string
+			if test.cs.FullObjectRequested() {
+				wantType = minio.ChecksumFullObjectMode.String()
+			} else {
+				wantType = minio.ChecksumCompositeMode.String()
+			}
+			cmpChecksum(s.Checksum.ChecksumType, wantType)
+		}
+
+		for _, part := range s.ObjectParts.Parts {
+			if test.cs == minio.ChecksumCRC64NVME && part.ChecksumCRC64NVME == "" {
+				logError(testName, function, args, startTime, "", "Part missing CRC64NVME checksum in GetObjectAttributes", fmt.Errorf("part %d", part.PartNumber))
+				return
+			}
 		}
 
 		// Read the data back
@@ -2591,6 +2827,16 @@ func testPutMultipartObjectWithChecksums() {
 			if st.ChecksumCRC64NVME != "" {
 				cmpChecksum(st.ChecksumCRC64NVME, wantChksm)
 			}
+		case minio.ChecksumMD5:
+			cmpChecksum(st.ChecksumMD5, wantChksm)
+		case minio.ChecksumSHA512:
+			cmpChecksum(st.ChecksumSHA512, wantChksm)
+		case minio.ChecksumXXHash64:
+			cmpChecksum(st.ChecksumXXHash64, wantChksm)
+		case minio.ChecksumXXHash3:
+			cmpChecksum(st.ChecksumXXHash3, wantChksm)
+		case minio.ChecksumXXHash128:
+			cmpChecksum(st.ChecksumXXHash128, wantChksm)
 		}
 
 		delete(args, "metadata")
@@ -3382,6 +3628,8 @@ func validateObjectAttributeRequest(OA *minio.ObjectAttributes, opts *minio.Obje
 			checksumFound = true
 		} else if v.ChecksumCRC32C != "" {
 			checksumFound = true
+		} else if v.ChecksumCRC64NVME != "" {
+			checksumFound = true
 		}
 		if !checksumFound {
 			partsMissingChecksum = true
@@ -3404,6 +3652,7 @@ func validateObjectAttributeRequest(OA *minio.ObjectAttributes, opts *minio.Obje
 
 	hasFullObjectChecksum := (OA.Checksum.ChecksumCRC32 != "" ||
 		OA.Checksum.ChecksumCRC32C != "" ||
+		OA.Checksum.ChecksumCRC64NVME != "" ||
 		OA.Checksum.ChecksumSHA1 != "" ||
 		OA.Checksum.ChecksumSHA256 != "")
 
@@ -5191,6 +5440,25 @@ func testGetObjectReadAtFunctional() {
 	}
 	offset += 512
 
+	readOffset := 0
+	bufRead := make([]byte, 512)
+	// Read (again) using the regular read function.
+	// Should not have been affected by ReadAt.
+	m, err = io.ReadFull(r, bufRead)
+	if err != nil {
+		logError(testName, function, args, startTime, "", "ReadFull failed", err)
+		return
+	}
+	if m != len(bufRead) {
+		logError(testName, function, args, startTime, "", "ReadFull read shorter bytes before reaching EOF, expected "+string(len(bufRead))+", got "+string(m), err)
+		return
+	}
+	if !bytes.Equal(bufRead, buf[readOffset:readOffset+len(bufRead)]) {
+		logError(testName, function, args, startTime, "", "Incorrect Read from offset", err)
+		return
+	}
+	readOffset += len(bufRead)
+
 	st, err := r.Stat()
 	if err != nil {
 		logError(testName, function, args, startTime, "", "Stat failed", err)
@@ -5215,6 +5483,23 @@ func testGetObjectReadAtFunctional() {
 		logError(testName, function, args, startTime, "", "Incorrect read between two ReadAt from same offset", err)
 		return
 	}
+
+	// Read (again) using the regular read function.
+	// Should not have been affected by ReadAt.
+	m, err = io.ReadFull(r, bufRead)
+	if err != nil {
+		logError(testName, function, args, startTime, "", "ReadFull (2) failed", err)
+		return
+	}
+	if m != len(bufRead) {
+		logError(testName, function, args, startTime, "", "ReadFull read shorter bytes before reaching EOF", err)
+		return
+	}
+	if !bytes.Equal(bufRead, buf[readOffset:readOffset+len(bufRead)]) {
+		logError(testName, function, args, startTime, "", "Incorrect Read from offset", err)
+		return
+	}
+	readOffset += len(bufRead)
 
 	offset += 512
 	m, err = r.ReadAt(buf3, offset)
@@ -14660,6 +14945,9 @@ func main() {
 
 	// execute tests
 	if isFullMode() {
+		testPutObjectWithChecksums()
+		testPutObjectWithTrailingChecksums()
+		testPutMultipartObjectWithChecksums()
 		testCopyObjectWithChecksums()
 		testReplaceObjectWithChecksums()
 		testCorsSetGetDelete()
@@ -14679,13 +14967,11 @@ func main() {
 		testComposeObjectErrorCasesV2()
 		testCompose10KSourcesV2()
 		testUserMetadataCopyingV2()
-		testPutObjectWithChecksums()
-		testPutObjectWithTrailingChecksums()
-		testPutMultipartObjectWithChecksums()
 		testPutObject0ByteV2()
 		testPutObjectMetadataNonUSASCIIV2()
 		testPutObjectNoLengthV2()
 		testPutObjectsUnknownV2()
+		testPutObjectWithAutoChecksums()
 		testGetObjectContextV2()
 		testFPutObjectContextV2()
 		testFGetObjectContextV2()

@@ -1,4 +1,4 @@
-// Copyright 2012-2024 The NATS Authors
+// Copyright 2012-2026 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -38,6 +38,7 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+	"syscall"
 	"time"
 
 	"github.com/nats-io/nkeys"
@@ -48,7 +49,7 @@ import (
 
 // Default Constants
 const (
-	Version                   = "1.49.0"
+	Version                   = "1.51.0"
 	DefaultURL                = "nats://127.0.0.1:4222"
 	DefaultPort               = 4222
 	DefaultMaxReconnect       = 60
@@ -60,6 +61,7 @@ const (
 	DefaultMaxPingOut         = 2
 	DefaultMaxChanLen         = 64 * 1024       // 64k
 	DefaultReconnectBufSize   = 8 * 1024 * 1024 // 8MB
+	DefaultWriteBufSize       = defaultBufSize
 	RequestChanLen            = 8
 	DefaultDrainTimeout       = 30 * time.Second
 	DefaultFlusherTimeout     = time.Minute
@@ -150,6 +152,7 @@ var (
 	ErrMaxConnectionsExceeded        = errors.New("nats: server maximum connections exceeded")
 	ErrMaxAccountConnectionsExceeded = errors.New("nats: maximum account active connections exceeded")
 	ErrConnectionNotTLS              = errors.New("nats: connection is not tls")
+	ErrTLS                           = errors.New("nats: tls error")
 	ErrMaxSubscriptionsExceeded      = errors.New("nats: server maximum subscriptions exceeded")
 	ErrWebSocketHeadersAlreadySet    = errors.New("nats: websocket connection headers already set")
 	ErrServerNotInPool               = errors.New("nats: selected server is not in the pool")
@@ -407,6 +410,34 @@ type Options struct {
 	// Defaults to 1m.
 	FlusherTimeout time.Duration
 
+	// ReconnectOnFlusherError, when set to true, causes the client to
+	// trigger a reconnect if the background flusher fails to write to the
+	// underlying connection for any reason (timeout, broken pipe,
+	// connection reset, EOF etc.).
+	//
+	// This is an advanced option. Most applications do not need to enable
+	// it: the server-side stale connection detection (via PingInterval /
+	// MaxPingsOut) and the read loop's own error handling will eventually
+	// notice a dead connection and the client will reconnect. Enable this
+	// only if you need faster recovery from a stalled or broken TCP write
+	// — for example, in latency-sensitive setups where waiting for a ping
+	// timeout is unacceptable.
+	//
+	// Messages buffered at the time of the error are lost, as they are
+	// with any flusher write error. The purpose of this option is to
+	// limit the blast radius by preventing further messages from being
+	// buffered into a potentially corrupted connection, not to recover
+	// the in-flight data.
+	//
+	// When triggered, the standard DisconnectErrHandler and
+	// ReconnectHandler callbacks are invoked as with any other reconnect.
+	// The first reconnect attempt bypasses the configured ReconnectWait
+	// so that recovery is as fast as possible; if that attempt fails,
+	// subsequent attempts obey the normal backoff.
+	//
+	// Defaults to false.
+	ReconnectOnFlusherError bool
+
 	// PingInterval is the period at which the client will be sending ping
 	// commands to the server, disabled if 0 or negative.
 	// Defaults to 2m.
@@ -572,6 +603,14 @@ type Options struct {
 	// IgnoreDiscoveredServers will disable adding advertised server URLs
 	// from INFO messages to the server pool.
 	IgnoreDiscoveredServers bool
+
+	// WriteBufferSize is an advanced option that sets the flush threshold
+	// of the write buffer used to batch outgoing data before writing to
+	// the underlying connection. In most cases, the default value should
+	// not be changed. A smaller buffer reduces the amount of data that
+	// can be lost on blocked writes but may significantly reduce throughput.
+	// Defaults to 32768 bytes (32KB).
+	WriteBufferSize int
 }
 
 const (
@@ -886,6 +925,14 @@ type ServerInfo struct {
 	Cluster      string   `json:"cluster,omitempty"`
 	ConnectURLs  []string `json:"connect_urls,omitempty"`
 	LameDuckMode bool     `json:"ldm,omitempty"`
+	// JetStream indicates whether the server has JetStream enabled.
+	JetStream bool `json:"jetstream,omitempty"`
+	// IsSystemAccount indicates whether the connected client's account
+	// is the system account.
+	IsSystemAccount bool `json:"acc_is_sys,omitempty"`
+	// JSApiLevel is the JetStream API level advertised by the server.
+	// Requires nats-server v2.12.0 or later; older servers will report 0.
+	JSApiLevel int `json:"api_lvl,omitempty"`
 }
 
 const (
@@ -1170,6 +1217,19 @@ func ReconnectBufSize(size int) Option {
 	}
 }
 
+// WriteBufferSize is an advanced option that sets the flush threshold
+// of the write buffer used to batch outgoing data before writing to
+// the underlying connection. In most cases, the default value should
+// not be changed. A smaller buffer reduces the amount of data that
+// can be lost on blocked writes but may significantly reduce throughput.
+// Defaults to 32768 bytes (32KB).
+func WriteBufferSize(size int) Option {
+	return func(o *Options) error {
+		o.WriteBufferSize = size
+		return nil
+	}
+}
+
 // Timeout is an Option to set the timeout for Dial on a connection.
 // Defaults to 2s.
 func Timeout(t time.Duration) Option {
@@ -1183,6 +1243,17 @@ func Timeout(t time.Duration) Option {
 func FlusherTimeout(t time.Duration) Option {
 	return func(o *Options) error {
 		o.FlusherTimeout = t
+		return nil
+	}
+}
+
+// ReconnectOnFlusherError is an Option to automatically trigger a
+// reconnect when the background flusher hits any write error. See
+// [Options.ReconnectOnFlusherError] for details. This is an
+// advanced option and is usually not required.
+func ReconnectOnFlusherError() Option {
+	return func(o *Options) error {
+		o.ReconnectOnFlusherError = true
 		return nil
 	}
 }
@@ -1739,6 +1810,10 @@ func (o Options) Connect() (*Conn, error) {
 	if nc.Opts.ReconnectBufSize == 0 {
 		nc.Opts.ReconnectBufSize = DefaultReconnectBufSize
 	}
+	// Default WriteBufferSize
+	if nc.Opts.WriteBufferSize <= 0 {
+		nc.Opts.WriteBufferSize = DefaultWriteBufSize
+	}
 	// Ensure that Timeout is not 0
 	if nc.Opts.Timeout == 0 {
 		nc.Opts.Timeout = DefaultTimeout
@@ -2078,7 +2153,7 @@ func (nc *Conn) newReaderWriter() {
 		off: -1,
 	}
 	nc.bw = &natsWriter{
-		limit:  defaultBufSize,
+		limit:  nc.Opts.WriteBufferSize,
 		plimit: nc.Opts.ReconnectBufSize,
 	}
 }
@@ -2342,7 +2417,7 @@ func (nc *Conn) makeTLSConn() error {
 	nc.conn = tls.Client(nc.conn, tlsCopy)
 	conn := nc.conn.(*tls.Conn)
 	if err := conn.Handshake(); err != nil {
-		return err
+		return fmt.Errorf("%w: %w", ErrTLS, err)
 	}
 	nc.bindToNewConn()
 	return nil
@@ -2412,8 +2487,10 @@ func (nc *Conn) ForceReconnect() error {
 	// Stop ping timer if set.
 	nc.stopPingTimer()
 
-	// Go ahead and make sure we have flushed the outbound
+	// flush any pending data and switch to pending mode to buffer new outgoing
+	// data until we reconnect and can flush it.
 	nc.bw.flush()
+	nc.bw.switchToPending()
 	nc.conn.Close()
 
 	nc.changeConnStatus(RECONNECTING)
@@ -2572,6 +2649,40 @@ func (nc *Conn) ConnectedClusterName() string {
 	return nc.info.Cluster
 }
 
+// ConnectedServerJetStream reports whether the connected server has
+// JetStream enabled and, if so, its API level. The API level is
+// advertised by nats-server v2.12.0 or later; older servers will
+// report 0 even when JetStream is enabled.
+func (nc *Conn) ConnectedServerJetStream() (bool, int) {
+	if nc == nil {
+		return false, 0
+	}
+
+	nc.mu.RLock()
+	defer nc.mu.RUnlock()
+
+	if nc.status != CONNECTED {
+		return false, 0
+	}
+	return nc.info.JetStream, nc.info.JSApiLevel
+}
+
+// IsSystemAccount reports whether the connected client's account
+// is the system account.
+func (nc *Conn) IsSystemAccount() bool {
+	if nc == nil {
+		return false
+	}
+
+	nc.mu.RLock()
+	defer nc.mu.RUnlock()
+
+	if nc.status != CONNECTED {
+		return false
+	}
+	return nc.info.IsSystemAccount
+}
+
 // Low level setup for structs, etc
 func (nc *Conn) setup() {
 	nc.subs = make(map[int64]*Subscription)
@@ -2583,6 +2694,31 @@ func (nc *Conn) setup() {
 	// Setup scratch outbound buffer for PUB/HPUB
 	pub := nc.scratch[:len(_HPUB_P_)]
 	copy(pub, _HPUB_P_)
+}
+
+// tlsHandshakeEOF wraps an error with context when it occurs right after
+// a completed TLS handshake, which typically indicates the remote side
+// rejected the client certificate (e.g. an mTLS proxy like nginx).
+// Depending on timing, the error may be io.EOF (read from closed conn)
+// or a "broken pipe"/"connection reset" (write to closed conn).
+func (nc *Conn) tlsHandshakeEOF(err error) error {
+	tlsConn, ok := nc.conn.(*tls.Conn)
+	if !ok || !tlsConn.ConnectionState().HandshakeComplete {
+		return err
+	}
+	if errors.Is(err, io.EOF) || isConnClosedError(err) {
+		return fmt.Errorf("%w: connection closed by remote after TLS handshake: %w", ErrTLS, err)
+	}
+	return err
+}
+
+// isConnClosedError reports whether the error indicates the remote
+// side closed the connection (broken pipe or connection reset).
+// NOTE: On Windows, connection resets use WSAECONNRESET which may not
+// match syscall.ECONNRESET. In that case, the error will not be
+// detected here but will still be returned unwrapped by the caller.
+func isConnClosedError(err error) bool {
+	return errors.Is(err, syscall.EPIPE) || errors.Is(err, syscall.ECONNRESET)
 }
 
 // Process a connected connection and initialize properly.
@@ -2605,14 +2741,14 @@ func (nc *Conn) processConnectInit() error {
 	// Process the INFO protocol received from the server
 	err := nc.processExpectedInfo()
 	if err != nil {
-		return err
+		return nc.tlsHandshakeEOF(err)
 	}
 
 	// Send the CONNECT protocol along with the initial PING protocol.
 	// Wait for the PONG response (or any error that we get from the server).
 	err = nc.sendConnect()
 	if err != nil {
-		return err
+		return nc.tlsHandshakeEOF(err)
 	}
 
 	// Reset the number of PING sent out
@@ -3289,8 +3425,10 @@ func (nc *Conn) doReconnect(err error, forceReconnect bool) {
 }
 
 // processOpErr handles errors from reading or parsing the protocol.
-// The lock should not be held entering this function.
-func (nc *Conn) processOpErr(err error) bool {
+// The lock should not be held entering this function. If forceReconnect
+// is true, the first reconnect attempt will bypass the configured
+// ReconnectWait; subsequent attempts still obey the normal backoff.
+func (nc *Conn) processOpErr(err error, forceReconnect bool) bool {
 	nc.mu.Lock()
 	defer nc.mu.Unlock()
 	if nc.isConnecting() || nc.isClosed() || nc.isReconnecting() {
@@ -3313,7 +3451,7 @@ func (nc *Conn) processOpErr(err error) bool {
 		// Clear any queued pongs, e.g. pending flush calls.
 		nc.clearPendingFlushCalls()
 
-		go nc.doReconnect(err, false)
+		go nc.doReconnect(err, forceReconnect)
 		return false
 	}
 
@@ -3416,7 +3554,7 @@ func (nc *Conn) readLoop() {
 			err = nc.parse(buf)
 		}
 		if err != nil {
-			if shouldClose := nc.processOpErr(err); shouldClose {
+			if shouldClose := nc.processOpErr(err, false); shouldClose {
 				nc.close(CLOSED, true, nil)
 			}
 			break
@@ -3864,6 +4002,13 @@ func (nc *Conn) flusher() {
 				if asyncErrorCB := nc.Opts.AsyncErrorCB; asyncErrorCB != nil {
 					nc.ach.push(func() { asyncErrorCB(nc, nil, err) })
 				}
+				if nc.Opts.ReconnectOnFlusherError {
+					nc.mu.Unlock()
+					if shouldClose := nc.processOpErr(err, true); shouldClose {
+						nc.close(CLOSED, true, nil)
+					}
+					return
+				}
 			}
 		}
 		nc.mu.Unlock()
@@ -4043,11 +4188,11 @@ func (nc *Conn) processErr(ie string) {
 
 	// FIXME(dlc) - process Slow Consumer signals special.
 	if e == STALE_CONNECTION {
-		close = nc.processOpErr(ErrStaleConnection)
+		close = nc.processOpErr(ErrStaleConnection, false)
 	} else if e == MAX_CONNECTIONS_ERR {
-		close = nc.processOpErr(ErrMaxConnectionsExceeded)
+		close = nc.processOpErr(ErrMaxConnectionsExceeded, false)
 	} else if e == MAX_ACCOUNT_CONNECTIONS_ERR {
-		close = nc.processOpErr(ErrMaxAccountConnectionsExceeded)
+		close = nc.processOpErr(ErrMaxAccountConnectionsExceeded, false)
 	} else if strings.HasPrefix(e, PERMISSIONS_ERR) {
 		nc.processTransientError(fmt.Errorf("%w: %s", ErrPermissionViolation, ne))
 	} else if strings.HasPrefix(e, MAX_SUBSCRIPTIONS_ERR) {
@@ -5629,7 +5774,7 @@ func (nc *Conn) processPingTimer() {
 	nc.pout++
 	if nc.pout > nc.Opts.MaxPingsOut {
 		nc.mu.Unlock()
-		if shouldClose := nc.processOpErr(ErrStaleConnection); shouldClose {
+		if shouldClose := nc.processOpErr(ErrStaleConnection, false); shouldClose {
 			nc.close(CLOSED, true, nil)
 		}
 		return
