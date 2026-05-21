@@ -339,6 +339,48 @@ var _ = Describe("Searchprovider", func() {
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(int(upsertCount.Load())).To(Equal(numDirs), "every unindexed file inside an already-indexed directory must be visited")
 		})
+
+		It("skips files still in postprocessing", func() {
+			gatewayClient.On("GetUserByClaim", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserByClaimResponse{
+				Status: status.NewOK(context.Background()),
+				User:   user,
+			}, nil)
+
+			processingFile := &sprovider.ResourceInfo{
+				Id: &sprovider.ResourceId{
+					StorageId: "storageid",
+					SpaceId:   "spaceid",
+					OpaqueId:  "opaqueid",
+				},
+				ParentId: &sprovider.ResourceId{
+					StorageId: "storageid",
+					SpaceId:   "spaceid",
+					OpaqueId:  "parentopaqueid",
+				},
+				Type:   sprovider.ResourceType_RESOURCE_TYPE_FILE,
+				Path:   "./inflight.pdf",
+				Size:   1024,
+				Mtime:  &typesv1beta1.Timestamp{Seconds: 4000},
+				Opaque: utils.AppendPlainToOpaque(nil, "status", "processing"),
+			}
+
+			gatewayClient.On("Stat", mock.Anything, mock.MatchedBy(func(sreq *sprovider.StatRequest) bool {
+				return sreq.Ref.ResourceId.StorageId == "storageid" &&
+					sreq.Ref.ResourceId.OpaqueId == "spaceid" &&
+					sreq.Ref.ResourceId.SpaceId == "spaceid"
+			})).Return(&sprovider.StatResponse{
+				Status: status.NewOK(context.Background()),
+				Info:   processingFile,
+			}, nil)
+
+			err := s.IndexSpace(&sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			Expect(err).ShouldNot(HaveOccurred())
+
+			// The skip gate fires before any index lookup or extraction.
+			indexClient.AssertNotCalled(GinkgoT(), "Lookup", mock.Anything)
+			indexClient.AssertNotCalled(GinkgoT(), "Upsert", mock.Anything, mock.Anything)
+			extractor.AssertNotCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
+		})
 	})
 
 	Describe("UpdateTags", func() {
