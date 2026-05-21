@@ -130,8 +130,9 @@ type JWKS struct {
 }
 
 type MFAConfig struct {
-	Enabled        bool     `yaml:"enabled" env:"OCIS_MFA_ENABLED" desc:"Enable MFA enforcement. If enabled users need to complete MFA before they can access specific paths" introductionVersion:"7.3.0"`
-	AuthLevelNames []string `yaml:"auth_level_name" env:"OCIS_MFA_AUTH_LEVEL_NAMES" desc:"This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA)." introductionVersion:"7.3.0"`
+	Enabled         bool     `yaml:"enabled" env:"OCIS_MFA_ENABLED" desc:"Enable MFA enforcement. If enabled users need to complete MFA before they can access specific paths" introductionVersion:"7.3.0"`
+	AuthLevelNames  []string `yaml:"auth_level_name" env:"OCIS_MFA_AUTH_LEVEL_NAMES" desc:"This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA)." introductionVersion:"7.3.0"`
+	SessionDuration int      `yaml:"session_duration" env:"OCIS_MFA_SESSION_DURATION" desc:"The duration in seconds that a multi-factor authentication session is valid for non-OIDC requests. Defaults to 3600 (1 hour)." introductionVersion:"7.3.0"`
 }
 
 // Cache is a TTL cache configuration.

@@ -207,6 +207,7 @@ type Validation struct {
 
 // MFAConfig configures multi factor multifactor authentication
 type MFAConfig struct {
-	Enabled        bool     `yaml:"enabled" env:"OCIS_MFA_ENABLED" desc:"Set to true to enable multi factor authentication. See the documentation for more details." introductionVersion:"7.3.0"`
-	AuthLevelNames []string `yaml:"auth_level_names" env:"OCIS_MFA_AUTH_LEVEL_NAMES" desc:"This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA)." introductionVersion:"7.3.0"`
+	Enabled         bool     `yaml:"enabled" env:"OCIS_MFA_ENABLED" desc:"Set to true to enable multi factor authentication. See the documentation for more details." introductionVersion:"7.3.0"`
+	AuthLevelNames  []string `yaml:"auth_level_names" env:"OCIS_MFA_AUTH_LEVEL_NAMES" desc:"This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA)." introductionVersion:"7.3.0"`
+	SessionDuration int      `yaml:"session_duration" env:"OCIS_MFA_SESSION_DURATION" desc:"The duration in seconds that a multi-factor authentication session is valid. After this time the user will be prompted to re-authenticate. Defaults to 3600 (1 hour)." introductionVersion:"8.1.0"`
 }
