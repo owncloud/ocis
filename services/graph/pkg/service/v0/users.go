@@ -287,8 +287,9 @@ func getUsersAttributes(displayedAttributes []string, user *libregraph.User) ([]
 
 	attributes := []string{}
 
-	for attrStr, val := range userMap {
-		if !slices.Contains(displayedAttributes, attrStr) {
+	for _, attrStr := range displayedAttributes {
+		val, ok := userMap[attrStr]
+		if !ok {
 			continue
 		}
 
@@ -300,8 +301,7 @@ func getUsersAttributes(displayedAttributes []string, user *libregraph.User) ([]
 				attributes = append(attributes, *v)
 			}
 		case []libregraph.Group:
-			groups := userMap[attrStr].([]libregraph.Group)
-			for _, group := range groups {
+			for _, group := range v {
 				attributes = append(attributes, *group.DisplayName)
 			}
 		default:
