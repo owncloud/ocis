@@ -605,7 +605,7 @@ func RoleFromResourcePermissions(rp *provider.ResourcePermissions, islink bool) 
 		r.ocsPermissions |= PermissionRead
 	}
 	if rp.InitiateFileUpload &&
-		rp.RestoreRecycleItem {
+		(rp.RestoreRecycleItem || (rp.Delete && !rp.ListRecycle)) {
 		r.ocsPermissions |= PermissionWrite
 	}
 	if rp.Stat &&
