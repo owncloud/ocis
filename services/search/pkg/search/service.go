@@ -513,6 +513,11 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 			ResourceId: &rootID,
 		}
 		s.logger.Debug().Str("path", ref.Path).Msg("Walking tree")
+		// Skip nodes still in postprocessing — their blob isn't in the
+		// blobstore yet. Their own UploadReady will re-trigger IndexSpace.
+		if utils.ReadPlainFromOpaque(info.Opaque, "status") == "processing" {
+			return nil
+		}
 
 		resourceID := storagespace.FormatResourceID(info.Id)
 		r, err := s.engine.Lookup(resourceID)
