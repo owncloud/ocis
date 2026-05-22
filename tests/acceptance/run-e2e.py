@@ -260,7 +260,9 @@ def main() -> int:
             "HEADLESS": "true",
             "RETRY": "3",
             "SKIP_A11Y_TESTS": "true",
-            "REPORT_TRACING": "true",
+            # web 12.4: enabling this both sets `use.trace=on` in playwright.config.ts
+            # AND triggers actor.ts to call tracing.start(), which double-starts and fails.
+            "REPORT_TRACING": "false",
             "NODE_EXTRA_CA_CERTS": str(ocis_cert),
             "BROWSER": "chromium",
         }

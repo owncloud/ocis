@@ -340,18 +340,18 @@ jobs:
       matrix:
         include:
           - suite: part-1
-            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 1"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 1"
           - suite: part-2
-            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 2"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 2"
           - suite: part-3
-            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 3"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 3"
           - suite: part-4
-            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 4"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 4"
           - suite: search
-            args: "--suites search"
+            args: "--type playwright --suites search"
             tika: true
           - suite: keycloak
-            args: "--suites journeys,keycloak"
+            args: "--type playwright --suites journeys,keycloak"
             keycloak: true
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
