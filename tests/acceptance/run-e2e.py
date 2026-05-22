@@ -56,6 +56,9 @@ def main() -> int:
 
     tika_needed = os.environ.get("TIKA_NEEDED", "").lower() == "true"
     keycloak_needed = os.environ.get("KEYCLOAK_NEEDED", "").lower() == "true"
+    mfa_needed = os.environ.get("MFA_NEEDED", "").lower() == "true"
+    # MFA mode runs ocis behind keycloak with TOTP enforced
+    keycloak_needed = keycloak_needed or mfa_needed
 
     repo_root = Path(__file__).resolve().parents[2]
     ocis_bin = repo_root / "ocis/bin/ocis"
@@ -220,6 +223,12 @@ def main() -> int:
             "IDM_CREATE_DEMO_USERS": "false",
         })
 
+    if mfa_needed:
+        server_env.update({
+            "OCIS_MFA_ENABLED": "true",
+            "WEB_OIDC_SCOPE": "openid profile email acr",
+        })
+
     procs = []
 
     print("Starting ocis...")
@@ -272,6 +281,9 @@ def main() -> int:
                 "KEYCLOAK": "true",
                 "KEYCLOAK_HOST": "localhost:8443",
             })
+
+        if mfa_needed:
+            playwright_env["MFA"] = "true"
 
         print(f"Running e2e: {e2e_args}")
         result = subprocess.run(
