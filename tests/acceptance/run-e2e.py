@@ -56,6 +56,11 @@ def main() -> int:
 
     tika_needed = os.environ.get("TIKA_NEEDED", "").lower() == "true"
     keycloak_needed = os.environ.get("KEYCLOAK_NEEDED", "").lower() == "true"
+    mfa_needed = os.environ.get("MFA_NEEDED", "").lower() == "true"
+    oidc_needed = os.environ.get("OIDC_NEEDED", "").lower() == "true"
+    oidc_iframe_needed = os.environ.get("OIDC_IFRAME_NEEDED", "").lower() == "true"
+    # MFA mode runs ocis behind keycloak with TOTP enforced
+    keycloak_needed = keycloak_needed or mfa_needed
 
     repo_root = Path(__file__).resolve().parents[2]
     ocis_bin = repo_root / "ocis/bin/ocis"
@@ -128,6 +133,16 @@ def main() -> int:
         return obj
 
     gha_web_cfg = _patch_urls(drone_web_cfg, "https://ocis-server:9200", ocis_url)
+
+    # The web client reads its OIDC scope from openIdConnect.scope in this UI
+    # config, NOT from the WEB_OIDC_SCOPE server env var, so override it here.
+    # - oidc (refresh-token) spec asserts the scope contains `offline_access`.
+    # - mfa flow needs `acr` so Keycloak emits the LoA claim used for step-up.
+    if oidc_needed:
+        gha_web_cfg["openIdConnect"]["scope"] = "openid profile email offline_access"
+    if mfa_needed:
+        gha_web_cfg["openIdConnect"]["scope"] = "openid profile email acr"
+
     gha_web_cfg_path = ocis_config_dir / "web-ui-config.json"
     gha_web_cfg_path.write_text(json.dumps(gha_web_cfg, indent=2))
 
@@ -154,6 +169,14 @@ def main() -> int:
         "THUMBNAILS_TXT_FONTMAP_FILE": str(repo_root / "tests/config/ci/fontsMap.json"),
         # extra_server_environment — matches drone e2eTestPipeline()
         "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": str(repo_root / "tests/config/ci/banned-password-list.txt"),
+        # Web's e2e tests use simple passwords (e.g. %public%, 123); relax the policy
+        # to match web's own CI (tests/actions/.env.ocis) so the client-side check
+        # doesn't block them.
+        "OCIS_PASSWORD_POLICY_MIN_CHARACTERS": "3",
+        "OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS": "0",
+        "OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS": "0",
+        "OCIS_PASSWORD_POLICY_MIN_DIGITS": "0",
+        "OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS": "0",
         "GRAPH_AVAILABLE_ROLES": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5,a8d5fe5e-96e3-418d-825b-534dbdf22b99,fb6c3e19-e378-47e5-b277-9732f9de6e21,58c63c02-1d89-4572-916a-870abc5a1b7d,2d00ce52-1fc2-4dbc-8b95-a73b73395f5a,1c996275-f1c9-4e71-abdf-a42f6495e960,312c0871-5ef7-4b3a-85b6-0e4074c64049,aa97fe03-7980-45ac-9e50-b325749fd7e6,63e64e19-8d43-42ec-a738-2b6af2610efa",
         "FRONTEND_CONFIGURABLE_NOTIFICATIONS": "true",
         # debug addresses
@@ -220,6 +243,24 @@ def main() -> int:
             "IDM_CREATE_DEMO_USERS": "false",
         })
 
+    if mfa_needed:
+        server_env.update({
+            "OCIS_MFA_ENABLED": "true",
+            "WEB_OIDC_SCOPE": "openid profile email acr",
+        })
+
+    # The two oidc tests need a short access-token lifetime so token renewal
+    # actually triggers within the test window. refreshToken.spec.ts uses a
+    # refresh token (offline_access scope); iframeTokenRenewal.spec.ts uses
+    # silent iframe renewal (no offline_access).
+    if oidc_needed:
+        server_env.update({
+            "IDP_ACCESS_TOKEN_EXPIRATION": "30",
+            "WEB_OIDC_SCOPE": "openid profile email offline_access",
+        })
+    if oidc_iframe_needed:
+        server_env["IDP_ACCESS_TOKEN_EXPIRATION"] = "30"
+
     procs = []
 
     print("Starting ocis...")
@@ -260,7 +301,9 @@ def main() -> int:
             "HEADLESS": "true",
             "RETRY": "3",
             "SKIP_A11Y_TESTS": "true",
-            "REPORT_TRACING": "true",
+            # web 12.4: enabling this both sets `use.trace=on` in playwright.config.ts
+            # AND triggers actor.ts to call tracing.start(), which double-starts and fails.
+            "REPORT_TRACING": "false",
             "NODE_EXTRA_CA_CERTS": str(ocis_cert),
             "BROWSER": "chromium",
         }
@@ -270,6 +313,9 @@ def main() -> int:
                 "KEYCLOAK": "true",
                 "KEYCLOAK_HOST": "localhost:8443",
             })
+
+        if mfa_needed:
+            playwright_env["MFA"] = "true"
 
         print(f"Running e2e: {e2e_args}")
         result = subprocess.run(

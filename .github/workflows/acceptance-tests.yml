@@ -340,19 +340,28 @@ jobs:
       matrix:
         include:
           - suite: part-1
-            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 1"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc --run-part 1"
           - suite: part-2
-            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 2"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc --run-part 2"
           - suite: part-3
-            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 3"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc --run-part 3"
           - suite: part-4
-            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 4"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc --run-part 4"
           - suite: search
-            args: "--suites search"
+            args: "--type playwright --suites search"
             tika: true
           - suite: keycloak
-            args: "--suites journeys,keycloak"
+            args: "--type playwright --suites journeys,keycloak"
             keycloak: true
+          - suite: mfa
+            args: "--type playwright --suites mfa"
+            mfa: true
+          - suite: oidc
+            args: "--type playwright specs/oidc/refreshToken.spec.ts"
+            oidc: true
+          - suite: oidc-iframe
+            args: "--type playwright specs/oidc/iframeTokenRenewal.spec.ts"
+            oidc_iframe: true
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
@@ -385,9 +394,9 @@ jobs:
           timeout 120 bash -c 'until curl -sf http://localhost:9998; do sleep 2; done'
           echo "tika ready."
 
-      # --- Keycloak (keycloak suite only) ---
+      # --- Keycloak (keycloak and mfa suites) ---
       - name: Generate Keycloak certs
-        if: matrix.keycloak == true
+        if: matrix.keycloak == true || matrix.mfa == true
         run: |
           mkdir -p keycloak-certs
           openssl req -x509 -newkey rsa:2048 \
@@ -397,7 +406,7 @@ jobs:
           chmod -R 777 keycloak-certs
 
       - name: Start Postgres
-        if: matrix.keycloak == true
+        if: matrix.keycloak == true || matrix.mfa == true
         run: |
           docker run -d --name postgres --network host \
             -e POSTGRES_DB=keycloak \
@@ -407,12 +416,19 @@ jobs:
           timeout 30 bash -c 'until docker exec postgres pg_isready -U keycloak; do sleep 1; done'
 
       - name: Start Keycloak
-        if: matrix.keycloak == true
+        if: matrix.keycloak == true || matrix.mfa == true
         run: |
-          # Patch realm: ocis-ci-realm.dist.json uses ocis-server:9200 as hostname.
-          # GitHub Actions runs on the host network so patch it to 127.0.0.1.
-          sed 's|https://ocis-server:9200|https://127.0.0.1:9200|g' \
-            tests/config/ci/ocis-ci-realm.dist.json > /tmp/ocis-realm.json
+          # The mfa suite needs a different realm with TOTP MFA configured.
+          # ocis-ci-realm uses ocis-server:9200, ocis-mfa-ci-realm uses localhost:9200;
+          # ocis runs on 127.0.0.1:9200 so we rewrite both forms.
+          if [[ "${{ matrix.mfa }}" == "true" ]]; then
+            REALM_FILE=tests/config/ci/ocis-mfa-ci-realm.dist.json
+          else
+            REALM_FILE=tests/config/ci/ocis-ci-realm.dist.json
+          fi
+          sed -e 's|https://ocis-server:9200|https://127.0.0.1:9200|g' \
+              -e 's|https://localhost:9200|https://127.0.0.1:9200|g' \
+            "$REALM_FILE" > /tmp/ocis-realm.json
           docker run -d --name keycloak --network host \
             -e OCIS_DOMAIN=https://127.0.0.1:9200 \
             -e KC_HOSTNAME=localhost \
@@ -441,6 +457,9 @@ jobs:
         env:
           TIKA_NEEDED: ${{ matrix.tika == true && 'true' || 'false' }}
           KEYCLOAK_NEEDED: ${{ matrix.keycloak == true && 'true' || 'false' }}
+          MFA_NEEDED: ${{ matrix.mfa == true && 'true' || 'false' }}
+          OIDC_NEEDED: ${{ matrix.oidc == true && 'true' || 'false' }}
+          OIDC_IFRAME_NEEDED: ${{ matrix.oidc_iframe == true && 'true' || 'false' }}
 
   litmus:
     name: litmus
