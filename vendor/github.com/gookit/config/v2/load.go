@@ -15,6 +15,7 @@ import (
 	"dario.cat/mergo"
 	"github.com/gookit/goutil/errorx"
 	"github.com/gookit/goutil/fsutil"
+	"github.com/gookit/goutil/strutil"
 )
 
 // LoadFiles load one or multi files, will fire OnLoadData event
@@ -49,6 +50,30 @@ func (c *Config) LoadExists(sourceFiles ...string) (err error) {
 		}
 
 		if err = c.loadFile(file, true, ""); err != nil {
+			return
+		}
+	}
+	return
+}
+
+// FileFilterFn for check file is should load.
+type FileFilterFn func(file string, c *Config) (shouldLoad bool, format string)
+
+// LoadFilesByFilter load one or multi files by give filter checked, will fire OnLoadData event
+func LoadFilesByFilter(configFiles []string, filter FileFilterFn) error {
+	return dc.LoadFilesByFilter(configFiles, filter)
+}
+
+// LoadFilesByFilter load one or multi files by give filter checked, will fire OnLoadData event
+//   - `filter` return format can be emtpy, will auto detect it by file extension
+func (c *Config) LoadFilesByFilter(configFiles []string, filter FileFilterFn) (err error) {
+	for _, file := range configFiles {
+		shouldLoad, format := filter(file, c)
+		if !shouldLoad {
+			continue
+		}
+
+		if err = c.loadFile(file, false, format); err != nil {
 			return
 		}
 	}
@@ -125,6 +150,25 @@ func (c *Config) LoadOSEnvs(nameToKeyMap map[string]string) {
 	}
 
 	c.fireHook(OnLoadData)
+}
+
+// LoadOSEnvByFilter load OS ENVs by custom fitler func. eg: use for load ENV by prefix.
+func LoadOSEnvByFilter(filterFn func(key string) (loadIt bool, cfgKey string)) { dc.LoadOSEnvByFilter(filterFn) }
+
+// LoadOSEnvByFilter load OS ENVs by custom fitler func. eg: use for load ENV by prefix.
+//
+//   - `filterFn` return cfgKey can be empty, will use key instead.
+func (c *Config) LoadOSEnvByFilter(filterFn func(key string) (loadIt bool, cfgKey string)) {
+	for _, str := range os.Environ() {
+		key, val := strutil.SplitKV(str, "=")
+		if loadIt, cfgKey := filterFn(key); loadIt {
+			if cfgKey == "" {
+				cfgKey = strings.ToLower(key)
+			}
+
+			_ = c.Set(cfgKey, val)
+		}
+	}
 }
 
 // support bound types for CLI flags vars
@@ -445,6 +489,7 @@ func (c *Config) ReloadFiles() (err error) {
 }
 
 // load config file, will fire OnLoadData event
+//   - loadExist=false will return error on file not exists
 func (c *Config) loadFile(file string, loadExist bool, format string) (err error) {
 	fd, err := os.Open(file)
 	if err != nil {

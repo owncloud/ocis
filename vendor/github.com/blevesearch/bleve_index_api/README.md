@@ -1,8 +1,7 @@
 # Bleve Index API
 
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/blevesearch/bleve_index_api)](https://pkg.go.dev/github.com/blevesearch/bleve_index_api)
-[![Tests](https://github.com/blevesearch/bleve_index_api/workflows/Tests/badge.svg?branch=master&event=push)](https://github.com/blevesearch/bleve_index_api/actions?query=workflow%3ATests+event%3Apush+branch%3Amaster)
-[![Lint](https://github.com/blevesearch/bleve_index_api/workflows/Lint/badge.svg?branch=master&event=push)](https://github.com/blevesearch/bleve_index_api/actions?query=workflow%3ALint+event%3Apush+branch%3Amaster)
+[![Go Reference](https://pkg.go.dev/badge/github.com/blevesearch/bleve_index_api.svg)](https://pkg.go.dev/github.com/blevesearch/bleve_index_api)
+[![Tests](https://github.com/blevesearch/bleve_index_api/actions/workflows/tests.yml/badge.svg?branch=master&event=push)](https://github.com/blevesearch/bleve_index_api/actions/workflows/tests.yml?query=event%3Apush+branch%3Amaster)
 
 Bleve supports a pluggable Index interface.
 

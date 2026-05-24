@@ -2,6 +2,7 @@ package util
 
 import (
 	"slices"
+	"strconv"
 	"strings"
 	"sync"
 	"unsafe"
@@ -108,6 +109,11 @@ func NumDigitsUint(n uint64) int {
 	return count
 }
 
+// AppendInt is a less messy version of strconv.AppendInt for base 10 ints.
+func AppendInt(buf []byte, n int) []byte {
+	return strconv.AppendInt(buf, int64(n), 10)
+}
+
 // SplitMap calls fn for each delim-separated part of text and returns a slice of the results.
 // Cheaper than calling fn on strings.Split(text, delim), as it avoids allocating an intermediate slice of strings.
 func SplitMap[T any](text string, delim string, fn func(string) T) []T {
@@ -155,7 +161,6 @@ func (sp *SlicePool[T]) Get(length int) *[]T {
 	clear(d)
 
 	*s = d
-
 	return s
 }
 
@@ -164,4 +169,10 @@ func (sp *SlicePool[T]) Put(s *[]T) {
 	if s != nil {
 		sp.pool.Put(s)
 	}
+}
+
+// SortedFunc is simply a shorthand for [slices.SortFunc] which also returns the sorted slice.
+func SortedFunc[T any, S ~[]T](s S, cmp func(a, b T) int) S {
+	slices.SortFunc(s, cmp)
+	return s
 }

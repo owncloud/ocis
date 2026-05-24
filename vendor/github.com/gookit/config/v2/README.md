@@ -2,7 +2,6 @@
 
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/gookit/config?style=flat-square)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/1e0f0ca096d94ffdab375234ec4167ee)](https://app.codacy.com/gh/gookit/config?utm_source=github.com&utm_medium=referral&utm_content=gookit/config&utm_campaign=Badge_Grade_Settings)
-[![Build Status](https://travis-ci.org/gookit/config.svg?branch=master)](https://travis-ci.org/gookit/config)
 [![Actions Status](https://github.com/gookit/config/workflows/Unit-Tests/badge.svg)](https://github.com/gookit/config/actions)
 [![Coverage Status](https://coveralls.io/repos/github/gookit/config/badge.svg?branch=master)](https://coveralls.io/github/gookit/config?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gookit/config)](https://goreportcard.com/report/github.com/gookit/config)
@@ -14,8 +13,9 @@
 
 ## Features
 
-- Support multi format: `JSON`(default), `JSON5`, `INI`, `Properties`, `YAML`, `TOML`, `HCL`, `ENV`, `Flags`
+- Support multi format: `JSON`(default), `JSON5`, `INI`, `Properties`, `YAML`, `TOML`, `ENV`, `Flags`
   - `JSON` content support comments. will auto clear comments
+  - `HCL` need to import `github.com/hashicorp/hcl` for custom driver
   - Other drivers are used on demand, not used will not be loaded into the application.
     - Possibility to add custom driver for your specific format
 - Support multi-file and multi-data loading
@@ -303,6 +303,9 @@ myConf := config.New("my-conf")
 // create empty instance
 myConf := config.NewEmpty("my-conf")
 
+// default add options: ParseEnv, ParseDefault, ParseTime
+myConf := config.NewGeneric("my-conf")
+
 // create and with some options
 myConf := config.NewWithOptions("my-conf", config.ParseEnv, config.ReadOnly)
 ```
@@ -515,13 +518,6 @@ go test -cover
 // contains all sub-folder
 go test -cover ./...
 ```
-
-## Projects using config
-
-Check out these projects, which use https://github.com/gookit/config :
-
-- https://github.com/JanDeDobbeleer/oh-my-posh A prompt theme engine for any shell.
-- [+ See More](https://pkg.go.dev/github.com/gookit/config?tab=importedby)
 
 ## Gookit packages
 

@@ -61,6 +61,8 @@ func FileExists(path string) bool {
 }
 
 // IsFile reports whether the named file or directory exists.
+//
+// - NOTE: not support symlink file
 func IsFile(path string) bool {
 	if path == "" || len(path) > 468 {
 		return false
@@ -72,10 +74,30 @@ func IsFile(path string) bool {
 	return false
 }
 
-// IsAbsPath is abs path.
+// IsSymlink reports whether the named file is a symlink.
+func IsSymlink(path string) bool {
+	fi, err := os.Lstat(path)
+	if err != nil {
+		return false
+	}
+	return fi.Mode()&os.ModeSymlink != 0
+}
+
+// IsAbsPath is abs path check
 func IsAbsPath(aPath string) bool {
 	if len(aPath) > 0 {
 		if aPath[0] == '/' {
+			return true
+		}
+		return filepath.IsAbs(aPath)
+	}
+	return false
+}
+
+// IsAbsPath2 is abs path check. if start withs / OR ~, will direct return true.
+func IsAbsPath2(aPath string) bool {
+	if len(aPath) > 0 {
+		if aPath[0] == '/' || aPath[0] == '~' {
 			return true
 		}
 		return filepath.IsAbs(aPath)

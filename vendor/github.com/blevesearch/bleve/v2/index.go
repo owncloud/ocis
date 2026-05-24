@@ -389,10 +389,25 @@ type SynonymIndex interface {
 	IndexSynonym(id string, collection string, definition *SynonymDefinition) error
 }
 
+type IndexWithCallbacks interface {
+	FileWriterIDsInUse() (map[string]struct{}, error)
+	DropFileWriterIDs(ids map[string]struct{}) error
+}
+
 type InsightsIndex interface {
 	Index
 	// TermFrequencies returns the tokens ordered by frequencies for the field index.
 	TermFrequencies(field string, limit int, descending bool) ([]index.TermFreq, error)
 	// CentroidCardinalities returns the centroids (clusters) from IVF indexes ordered by data density.
 	CentroidCardinalities(field string, limit int, desceding bool) ([]index.CentroidCardinality, error)
+}
+
+type TrainableIndex interface {
+	Index
+	Train(*Batch) error
+}
+
+type IndexFileCopyable interface {
+	SetPathInBolt(key []byte, value []byte) error       //dest index
+	CopyFile(file string, d index.IndexDirectory) error // source index
 }

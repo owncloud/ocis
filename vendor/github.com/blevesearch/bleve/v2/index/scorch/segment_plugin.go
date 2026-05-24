@@ -28,6 +28,7 @@ import (
 	zapv14 "github.com/blevesearch/zapx/v14"
 	zapv15 "github.com/blevesearch/zapx/v15"
 	zapv16 "github.com/blevesearch/zapx/v16"
+	zapv17 "github.com/blevesearch/zapx/v17"
 )
 
 // SegmentPlugin represents the essential functions required by a package to plug in
@@ -45,9 +46,13 @@ type SegmentPlugin interface {
 	// New takes a set of Documents and turns them into a new Segment
 	New(results []index.Document) (segment.Segment, uint64, error)
 
+	NewUsing(results []index.Document, config map[string]interface{}) (segment.Segment, uint64, error)
+
 	// Open attempts to open the file at the specified path and
 	// return the corresponding Segment
 	Open(path string) (segment.Segment, error)
+
+	OpenUsing(path string, config map[string]interface{}) (segment.Segment, error)
 
 	// Merge takes a set of Segments, and creates a new segment on disk at
 	// the specified path.
@@ -66,6 +71,10 @@ type SegmentPlugin interface {
 	Merge(segments []segment.Segment, drops []*roaring.Bitmap, path string,
 		closeCh chan struct{}, s segment.StatsReporter) (
 		[][]uint64, uint64, error)
+
+	MergeUsing(segments []segment.Segment, drops []*roaring.Bitmap, path string,
+		closeCh chan struct{}, s segment.StatsReporter, config map[string]interface{}) (
+		[][]uint64, uint64, error)
 }
 
 var supportedSegmentPlugins map[string]map[uint32]SegmentPlugin
@@ -73,7 +82,8 @@ var defaultSegmentPlugin SegmentPlugin
 
 func init() {
 	ResetSegmentPlugins()
-	RegisterSegmentPlugin(&zapv16.ZapPlugin{}, true)
+	RegisterSegmentPlugin(&zapv17.ZapPlugin{}, true)
+	RegisterSegmentPlugin(&zapv16.ZapPlugin{}, false)
 	RegisterSegmentPlugin(&zapv15.ZapPlugin{}, false)
 	RegisterSegmentPlugin(&zapv14.ZapPlugin{}, false)
 	RegisterSegmentPlugin(&zapv13.ZapPlugin{}, false)

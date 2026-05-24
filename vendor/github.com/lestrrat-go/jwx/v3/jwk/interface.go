@@ -92,9 +92,14 @@ type Set interface {
 	Len() int
 
 	// LookupKeyID returns the first key matching the given key id.
+	//
 	// The second return value is false if there are no keys matching the key id.
 	// The set *may* contain multiple keys with the same key id. If you
-	// need all of them, use `Iterate()`
+	// need all of them, Len() and Key(int)
+	//
+	// This method is meant to be used to lookup a key with a unique ID.
+	// Bacauseof this, you cannot use this method to lookup keys with an empty key ID
+	// (i.e. `kid` is not specified, or is an empty string).
 	LookupKeyID(string) (Key, bool)
 
 	// RemoveKey removes the key from the set.
@@ -114,10 +119,12 @@ type Set interface {
 }
 
 type set struct {
-	keys          []Key
-	mu            sync.RWMutex
-	dc            DecodeCtx
-	privateParams map[string]any
+	keys               []Key
+	mu                 sync.RWMutex
+	dc                 DecodeCtx
+	privateParams      map[string]any
+	maxKeys            int  // scratch cap consumed by UnmarshalJSON; 0 means use global default
+	rejectDuplicateKID bool // scratch flag consumed by UnmarshalJSON; false falls back to global
 }
 
 type PublicKeyer interface {
