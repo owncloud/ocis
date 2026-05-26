@@ -73,7 +73,7 @@ func (rb *Bitmap) WriteTo(stream io.Writer) (int64, error) {
 			return n, err
 		}
 		written, err := c.WriteTo(stream)
-		n += int64(written)
+		n += written
 		if err != nil {
 			return n, err
 		}
@@ -119,7 +119,7 @@ func (rb *Bitmap) FromUnsafeBytes(data []byte) (p int64, err error) {
 		n, err := rb.highlowcontainer.containers[i].ReadFrom(stream)
 
 		if n == 0 || err != nil {
-			return int64(n), fmt.Errorf("Could not deserialize bitmap for key #%d: %s", i, err)
+			return n, fmt.Errorf("Could not deserialize bitmap for key #%d: %s", i, err)
 		}
 	}
 
@@ -167,9 +167,9 @@ func (rb *Bitmap) ReadFrom(stream io.Reader) (p int64, err error) {
 		n, err := rb.highlowcontainer.containers[i].ReadFrom(stream)
 
 		if n == 0 || err != nil {
-			return int64(n), fmt.Errorf("Could not deserialize bitmap for key #%d: %s", i, err)
+			return n, fmt.Errorf("Could not deserialize bitmap for key #%d: %s", i, err)
 		}
-		p += int64(n)
+		p += n
 	}
 	return p, nil
 }
@@ -249,7 +249,7 @@ func (rb *Bitmap) String() string {
 	counter := 0
 	if i.HasNext() {
 		counter = counter + 1
-		buffer.WriteString(strconv.FormatUint(uint64(i.Next()), 10))
+		buffer.WriteString(strconv.FormatUint(i.Next(), 10))
 	}
 	for i.HasNext() {
 		buffer.WriteString(",")
@@ -259,7 +259,7 @@ func (rb *Bitmap) String() string {
 			buffer.WriteString("...")
 			break
 		}
-		buffer.WriteString(strconv.FormatUint(uint64(i.Next()), 10))
+		buffer.WriteString(strconv.FormatUint(i.Next(), 10))
 	}
 	buffer.WriteString("}")
 	return buffer.String()
@@ -346,7 +346,7 @@ func (rb *Bitmap) CheckedAdd(x uint64) bool {
 	return true
 }
 
-// AddInt adds the integer x to the bitmap (convenience method: the parameter is casted to uint32 and we call Add)
+// AddInt adds the integer x to the bitmap (convenience method: the parameter is casted to uint64 and we call Add)
 func (rb *Bitmap) AddInt(x int) {
 	rb.Add(uint64(x))
 }
@@ -1248,9 +1248,13 @@ func (rb *Bitmap) Validate() error {
 // Roaring32AsRoaring64 inserts a 32-bit roaring bitmap into
 // a 64-bit roaring bitmap. No copy is made.
 func Roaring32AsRoaring64(bm32 *roaring.Bitmap) *Bitmap {
+	return roaring32AsRoaring64(bm32, 0)
+}
+
+func roaring32AsRoaring64(bm32 *roaring.Bitmap, key uint32) *Bitmap {
 	rb := NewBitmap()
 	rb.highlowcontainer.resize(0)
-	rb.highlowcontainer.keys = append(rb.highlowcontainer.keys, 0)
+	rb.highlowcontainer.keys = append(rb.highlowcontainer.keys, key)
 	rb.highlowcontainer.containers = append(rb.highlowcontainer.containers, bm32)
 	rb.highlowcontainer.needCopyOnWrite = append(rb.highlowcontainer.needCopyOnWrite, false)
 	return rb

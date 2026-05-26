@@ -2,7 +2,6 @@
 
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/gookit/config?style=flat-square)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/1e0f0ca096d94ffdab375234ec4167ee)](https://app.codacy.com/gh/gookit/config?utm_source=github.com&utm_medium=referral&utm_content=gookit/config&utm_campaign=Badge_Grade_Settings)
-[![Build Status](https://travis-ci.org/gookit/config.svg?branch=master)](https://travis-ci.org/gookit/config)
 [![Actions Status](https://github.com/gookit/config/workflows/Unit-Tests/badge.svg)](https://github.com/gookit/config/actions)
 [![Coverage Status](https://coveralls.io/repos/github/gookit/config/badge.svg?branch=master)](https://coveralls.io/github/gookit/config?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gookit/config)](https://goreportcard.com/report/github.com/gookit/config)
@@ -16,6 +15,7 @@
 
 - 支持多种格式: `JSON`(默认), `JSON5`, `INI`, `Properties`, `YAML`, `TOML`, `HCL`, `ENV`, `Flags`
   - `JSON` 内容支持注释，可以设置解析时清除注释
+  - `HCL` 需要手动引入 `github.com/hashicorp/hcl` 添加自定义驱动
   - 其他驱动都是按需使用，不使用的不会加载编译到应用中
 - 支持多个文件、多数据加载
 - 支持从 OS ENV 变量数据加载配置
@@ -296,6 +296,9 @@ myConf := config.New("my-conf")
 // create empty instance
 myConf := config.NewEmpty("my-conf")
 
+// default add options: ParseEnv, ParseDefault, ParseTime
+myConf := config.NewGeneric("my-conf")
+
 // create and with some options
 myConf := config.NewWithOptions("my-conf", config.ParseEnv, config.ReadOnly)
 ```
@@ -506,13 +509,6 @@ go test -cover
 // contains all sub-folder
 go test -cover ./...
 ```
-
-## 使用Config的项目
-
-看看这些使用了 https://github.com/gookit/config 的项目:
-
-- https://github.com/JanDeDobbeleer/oh-my-posh A prompt theme engine for any shell.
-- [+ See More](https://pkg.go.dev/github.com/gookit/config?tab=importedby)
 
 ## Gookit 工具包
 

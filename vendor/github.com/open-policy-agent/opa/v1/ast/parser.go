@@ -20,7 +20,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 
 	"github.com/open-policy-agent/opa/v1/ast/internal/scanner"
 	"github.com/open-policy-agent/opa/v1/ast/internal/tokens"
@@ -71,6 +71,10 @@ var (
 	// copy them to  the call term only when needed
 	memberWithKeyRef = MemberWithKey.Ref()
 	memberRef        = Member.Ref()
+
+	newlineBytes       = []byte{'\n'}
+	metadataBytes      = []byte("METADATA")
+	metadataParserPool = util.NewSyncPool[metadataParser]()
 )
 
 func (v RegoVersion) Int() int {
@@ -144,6 +148,7 @@ type Parser struct {
 	cache             parsedTermCache
 	recursionDepth    int
 	maxRecursionDepth int
+	notBodies         bool
 }
 
 type parsedTermCacheItem struct {
@@ -430,9 +435,25 @@ func (p *Parser) Parse() ([]Statement, []*Comment, Errors) {
 	}
 
 	selected := map[string]tokens.Token{}
-	if p.po.AllFutureKeywords || p.po.EffectiveRegoVersion() == RegoV1 {
+	if p.po.AllFutureKeywords {
 		maps.Copy(selected, allowedFutureKeywords)
 	} else {
+		if p.po.EffectiveRegoVersion() == RegoV1 {
+			for kw := range futureKeywordsV0 {
+				tok, ok := allowedFutureKeywords[kw]
+				if !ok {
+					return nil, nil, Errors{
+						&Error{
+							Code:     ParseErr,
+							Message:  fmt.Sprintf("unknown future keyword: %v", kw),
+							Location: nil,
+						},
+					}
+				}
+				selected[kw] = tok
+			}
+		}
+
 		for _, kw := range p.po.FutureKeywords {
 			tok, ok := allowedFutureKeywords[kw]
 			if !ok {
@@ -447,10 +468,15 @@ func (p *Parser) Parse() ([]Statement, []*Comment, Errors) {
 			selected[kw] = tok
 		}
 	}
+
+	if _, ok := selected["not"]; ok {
+		p.notBodies = true
+	}
+
 	p.s.s = p.s.s.WithKeywords(selected)
 
 	if p.po.EffectiveRegoVersion() == RegoV1 {
-		for kw, tok := range allowedFutureKeywords {
+		for kw, tok := range futureKeywordsV0 {
 			p.s.s.AddKeyword(kw, tok)
 		}
 	}
@@ -540,42 +566,44 @@ func (p *Parser) parseAnnotations(stmts []Statement) []Statement {
 	return stmts
 }
 
-func parseAnnotations(comments []*Comment) ([]*Annotations, Errors) {
+func parseAnnotations(comments []*Comment) (stmts []*Annotations, errs Errors) {
+	numBlocks := CountFunc(comments, IsMetadataComment)
+	if numBlocks == 0 {
+		return nil, nil
+	}
 
-	var hint = []byte("METADATA")
-	var curr *metadataParser
-	var blocks []*metadataParser
+	stmts = make([]*Annotations, 0, numBlocks)
+	mdp := metadataParserPool.Get()
+	if mdp.buf == nil {
+		mdp.buf = &bytes.Buffer{}
+	}
 
 	for i := range comments {
-		if curr != nil {
-			if comments[i].Location.Row == comments[i-1].Location.Row+1 && comments[i].Location.Col == 1 {
-				curr.Append(comments[i])
-				continue
+		if IsMetadataComment(comments[i]) { // scan until end of block
+			mdp.Reset(comments[i].Location)
+			for i++; i < len(comments) && !blockBuster(comments[i], comments[i-1]); i++ {
+				mdp.Append(comments[i])
 			}
-			curr = nil
-		}
-		if bytes.HasPrefix(bytes.TrimSpace(comments[i].Text), hint) {
-			curr = newMetadataParser(comments[i].Location)
-			blocks = append(blocks, curr)
+
+			if a, err := mdp.Parse(); err != nil {
+				errs = append(errs, &Error{Code: ParseErr, Message: err.Error(), Location: mdp.loc})
+			} else {
+				stmts = append(stmts, a)
+			}
 		}
 	}
 
-	stmts := make([]*Annotations, 0, len(blocks))
-
-	var errs Errors
-	for _, b := range blocks {
-		if a, err := b.Parse(); err != nil {
-			errs = append(errs, &Error{
-				Code:     ParseErr,
-				Message:  err.Error(),
-				Location: b.loc,
-			})
-		} else {
-			stmts = append(stmts, a)
-		}
-	}
+	metadataParserPool.Put(mdp)
 
 	return stmts, errs
+}
+
+func IsMetadataComment(c *Comment) bool {
+	return c.Location.Col == 1 && bytes.HasPrefix(bytes.TrimSpace(c.Text), metadataBytes)
+}
+
+func blockBuster(curr, prev *Comment) bool { // or endOfBlock, but the name was too good to pass up
+	return curr.Location.Col != 1 || curr.Location.Row-1 != prev.Location.Row || IsMetadataComment(curr)
 }
 
 func (p *Parser) parsePackage() *Package {
@@ -1232,6 +1260,10 @@ func (p *Parser) parseLiteral() (expr *Expr) {
 		}
 	}
 
+	if negated && p.notBodies && p.s.tok == tokens.LBrace {
+		return p.parseNotBody()
+	}
+
 	switch p.s.tok {
 	case tokens.Some:
 		if negated {
@@ -1266,7 +1298,6 @@ func (p *Parser) parseLiteralExpr(negated bool) *Expr {
 	s := p.save()
 	expr := p.parseExpr()
 	if expr != nil {
-		expr.Negated = negated
 		if p.s.tok == tokens.With {
 			if expr.With = p.parseWith(); expr.With == nil {
 				return nil
@@ -1288,6 +1319,16 @@ func (p *Parser) parseLiteralExpr(negated bool) *Expr {
 					p.hint("`import future.keywords.every` for `every x in xs { ... }` expressions")
 				}
 			}
+		}
+
+		if negated && p.notBodies {
+			// Move 'with' statement to outer not expr
+			w := expr.With
+			expr.With = nil
+			expr = NewExpr(&Not{Body: NewBody(expr), Location: p.s.Loc()})
+			expr.With = w
+		} else {
+			expr.Negated = negated
 		}
 	}
 	return expr
@@ -1419,6 +1460,28 @@ func (p *Parser) parseSome() *Expr {
 	}
 
 	return NewExpr(decl).SetLocation(decl.Location)
+}
+
+func (p *Parser) parseNotBody() *Expr {
+	loc := p.s.Loc()
+	p.scan()
+
+	body := p.parseBody(tokens.RBrace)
+	if body == nil {
+		return nil
+	}
+	p.scan()
+
+	not := &Not{Body: body, ExplicitBody: true, Location: loc}
+	expr := NewExpr(not).SetLocation(loc)
+
+	if p.s.tok == tokens.With {
+		if expr.With = p.parseWith(); expr.With == nil {
+			return nil
+		}
+	}
+
+	return expr
 }
 
 func (p *Parser) parseEvery() *Expr {
@@ -1725,6 +1788,7 @@ func (p *Parser) parseTerm() *Term {
 	s0 := p.save()
 
 	var term *Term
+	var unaryMinusLoc *Location
 	switch p.s.tok {
 	case tokens.Null:
 		term = NullTerm().SetLocation(p.s.Loc())
@@ -1732,7 +1796,21 @@ func (p *Parser) parseTerm() *Term {
 		term = BooleanTerm(true).SetLocation(p.s.Loc())
 	case tokens.False:
 		term = BooleanTerm(false).SetLocation(p.s.Loc())
-	case tokens.Sub, tokens.Dot, tokens.Number:
+	case tokens.Sub:
+		loc := p.s.Loc()
+		s := p.save()
+		p.scan()
+		if p.s.tok == tokens.Ident || p.s.tok == tokens.Contains {
+			// Unary minus on a reference: -ref → minus(0, ref).
+			// parseTermFinish below will resolve the full ref (e.g. input.number),
+			// after which we wrap the result in a minus call.
+			unaryMinusLoc = loc
+			term = p.parseVar()
+		} else {
+			p.restore(s)
+			term = p.parseNumber()
+		}
+	case tokens.Dot, tokens.Number:
 		term = p.parseNumber()
 	case tokens.String:
 		term = p.parseString()
@@ -1762,6 +1840,10 @@ func (p *Parser) parseTerm() *Term {
 	}
 
 	term = p.parseTermFinish(term, false)
+	if unaryMinusLoc != nil && term != nil {
+		zero := IntNumberTerm(0).SetLocation(unaryMinusLoc)
+		term = p.setLoc(Minus.Call(zero, term), unaryMinusLoc, unaryMinusLoc.Offset, p.s.lastEnd)
+	}
 	p.parsedTermCachePush(term, s0)
 	return term
 }
@@ -1887,7 +1969,7 @@ func (p *Parser) parseNumber() *Term {
 func (p *Parser) parseString() *Term {
 	if p.s.lit[0] == '"' {
 		if p.s.lit == "\"\"" {
-			return NewTerm(InternedEmptyString.Value).SetLocation(p.s.Loc())
+			return NewTerm(InternedEmptyStringValue).SetLocation(p.s.Loc())
 		}
 
 		inner := p.s.lit[1 : len(p.s.lit)-1]
@@ -2455,7 +2537,8 @@ func (p *Parser) parseTermPairList(end tokens.Token, r [][2]*Term) [][2]*Term {
 
 func (p *Parser) parseTermOp(values ...tokens.Token) *Term {
 	if slices.Contains(values, p.s.tok) {
-		r := RefTerm(VarTerm(p.s.tok.String()).SetLocation(p.s.Loc())).SetLocation(p.s.Loc())
+		loc := p.s.Loc()
+		r := RefTerm(VarTerm(p.s.tok.String()).SetLocation(loc)).SetLocation(loc)
 		p.scan()
 		return r
 	}
@@ -2465,11 +2548,12 @@ func (p *Parser) parseTermOp(values ...tokens.Token) *Term {
 func (p *Parser) parseTermOpName(ref Ref, values ...tokens.Token) *Term {
 	if slices.Contains(values, p.s.tok) {
 		cp := ref.Copy()
+		loc := p.s.Loc()
 		for _, r := range cp {
-			r.SetLocation(p.s.Loc())
+			r.SetLocation(loc)
 		}
 		t := RefTerm(cp...)
-		t.SetLocation(p.s.Loc())
+		t.SetLocation(loc)
 		p.scan()
 		return t
 	}
@@ -2743,13 +2827,17 @@ type rawAnnotation struct {
 }
 
 type metadataParser struct {
-	buf      *bytes.Buffer
 	comments []*Comment
+	buf      *bytes.Buffer
 	loc      *location.Location
 }
 
-func newMetadataParser(loc *Location) *metadataParser {
-	return &metadataParser{loc: loc, buf: bytes.NewBuffer(nil)}
+func (b *metadataParser) Reset(loc *location.Location) {
+	b.comments = b.comments[:0]
+	b.loc = loc
+	if b.buf != nil {
+		b.buf.Reset()
+	}
 }
 
 func (b *metadataParser) Append(c *Comment) {
@@ -2760,14 +2848,12 @@ func (b *metadataParser) Append(c *Comment) {
 
 var yamlLineErrRegex = regexp.MustCompile(`^yaml:(?: unmarshal errors:[\n\s]*)? line ([[:digit:]]+):`)
 
-func (b *metadataParser) Parse() (*Annotations, error) {
-
-	var raw rawAnnotation
-
+func (b *metadataParser) Parse() (result *Annotations, err error) {
 	if len(bytes.TrimSpace(b.buf.Bytes())) == 0 {
 		return nil, errors.New("expected METADATA block, found whitespace")
 	}
 
+	var raw rawAnnotation
 	if err := yaml.Unmarshal(b.buf.Bytes(), &raw); err != nil {
 		var comment *Comment
 		match := yamlLineErrRegex.FindStringSubmatch(err.Error())
@@ -2790,13 +2876,14 @@ func (b *metadataParser) Parse() (*Annotations, error) {
 		return nil, augmentYamlError(err, b.comments)
 	}
 
-	var result Annotations
-	result.comments = b.comments
-	result.Scope = raw.Scope
-	result.Entrypoint = raw.Entrypoint
-	result.Title = raw.Title
-	result.Description = raw.Description
-	result.Organizations = raw.Organizations
+	result = &Annotations{
+		comments:      b.comments,
+		Scope:         raw.Scope,
+		Entrypoint:    raw.Entrypoint,
+		Title:         raw.Title,
+		Description:   raw.Description,
+		Organizations: raw.Organizations,
+	}
 
 	for _, v := range raw.RelatedResources {
 		rr, err := parseRelatedResource(v)
@@ -2878,32 +2965,30 @@ func (b *metadataParser) Parse() (*Annotations, error) {
 		result.Authors = append(result.Authors, author)
 	}
 
-	result.Custom = make(map[string]any)
-	for k, v := range raw.Custom {
-		val, err := convertYAMLMapKeyTypes(v, nil)
-		if err != nil {
-			return nil, err
+	if raw.Custom != nil {
+		result.Custom = make(map[string]any, len(raw.Custom))
+		for k, v := range raw.Custom {
+			if result.Custom[k], err = convertYAMLMapKeyTypes(v, nil); err != nil {
+				return nil, err
+			}
 		}
-		result.Custom[k] = val
 	}
 
 	result.Location = b.loc
 
 	// recreate original text of entire metadata block for location text attribute
-	sb := strings.Builder{}
-	sb.WriteString("# METADATA\n")
+	original := bytes.TrimSuffix(b.buf.Bytes(), newlineBytes)
+	numLines := bytes.Count(original, newlineBytes) + 1
+	preAlloc := len("# METADATA\n") + len(original) + numLines*2 // '# ' prefix added per line
 
-	lines := bytes.Split(b.buf.Bytes(), []byte{'\n'})
+	result.Location.Text = append(make([]byte, 0, preAlloc), "# METADATA\n"...)
 
-	for _, line := range lines[:len(lines)-1] {
-		sb.WriteString("# ")
-		sb.Write(line)
-		sb.WriteByte('\n')
+	for line := range bytes.SplitAfterSeq(original, newlineBytes) {
+		result.Location.Text = append(result.Location.Text, "# "...)
+		result.Location.Text = append(result.Location.Text, line...)
 	}
 
-	result.Location.Text = []byte(strings.TrimSuffix(sb.String(), "\n"))
-
-	return &result, nil
+	return result, err
 }
 
 // augmentYamlError augments a YAML error with hints intended to help the user figure out the cause of an otherwise
@@ -2912,30 +2997,29 @@ func (b *metadataParser) Parse() (*Annotations, error) {
 func augmentYamlError(err error, comments []*Comment) error {
 	// Adding hints for when key/value ':' separator isn't suffixed with a legal YAML space symbol
 	for _, comment := range comments {
-		txt := string(comment.Text)
-		parts := strings.Split(txt, ":")
-		if len(parts) > 1 {
-			parts = parts[1:]
-			var invalidSpaces []string
-			for partIndex, part := range parts {
-				if len(part) == 0 && partIndex == len(parts)-1 {
-					invalidSpaces = []string{}
-					break
-				}
+		if bytes.IndexByte(comment.Text, ':') == -1 {
+			continue
+		}
+		parts := bytes.Split(comment.Text, []byte{':'})[1:]
 
-				r, _ := utf8.DecodeRuneInString(part)
-				if r == ' ' || r == '\t' {
-					invalidSpaces = []string{}
-					break
-				}
+		var invalidSpaces []string
+		for partIndex, part := range parts {
+			if len(part) == 0 && partIndex == len(parts)-1 {
+				break
+			}
 
-				invalidSpaces = append(invalidSpaces, fmt.Sprintf("%+q", r))
+			r, _ := utf8.DecodeRune(part)
+			if r == ' ' || r == '\t' {
+				break
 			}
-			if len(invalidSpaces) > 0 {
-				err = fmt.Errorf(
-					"%s\n  Hint: on line %d, symbol(s) %v immediately following a key/value separator ':' is not a legal yaml space character",
-					err.Error(), comment.Location.Row, invalidSpaces)
-			}
+
+			invalidSpaces = append(invalidSpaces, fmt.Sprintf("%+q", r))
+		}
+		if len(invalidSpaces) > 0 {
+			err = fmt.Errorf(
+				"%s\n  Hint: on line %d, symbol(s) %v immediately following a"+
+					" key/value separator ':' is not a legal yaml space character",
+				err.Error(), comment.Location.Row, invalidSpaces)
 		}
 	}
 	return err
@@ -3053,7 +3137,7 @@ func parseAuthorString(s string) (*AuthorAnnotation, error) {
 	if len(trailing) >= len(emailPrefix)+len(emailSuffix) && strings.HasPrefix(trailing, emailPrefix) &&
 		strings.HasSuffix(trailing, emailSuffix) {
 		email = trailing[len(emailPrefix):]
-		email = email[0 : len(email)-len(emailSuffix)]
+		email = email[:len(email)-len(emailSuffix)]
 		namePartCount -= 1
 	}
 
@@ -3093,7 +3177,9 @@ func convertYAMLMapKeyTypes(x any, path []string) (any, error) {
 
 // futureKeywords is the source of truth for future keywords that will
 // eventually become standard keywords inside of Rego.
-var futureKeywords = map[string]tokens.Token{}
+var futureKeywords = map[string]tokens.Token{
+	"not": tokens.Not,
+}
 
 // futureKeywordsV0 is the source of truth for future keywords that were
 // not yet a standard part of Rego in v0, and required importing.
@@ -3159,8 +3245,13 @@ func (p *Parser) futureImport(imp *Import, allowedFutureKeywords map[string]toke
 			return
 		}
 
-		kwds = []string{keyword} // overwrite
+		if keyword == "not" {
+			p.notBodies = true
+		} else {
+			kwds = []string{keyword} // overwrite
+		}
 	}
+
 	for _, kw := range kwds {
 		p.s.s.AddKeyword(kw, allowedFutureKeywords[kw])
 	}

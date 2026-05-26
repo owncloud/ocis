@@ -26,7 +26,8 @@ typedef enum types {
   BMP,
   AVIF,
   JP2K,
-  JXL
+  JXL,
+  PSD,
 } ImageType;
 
 typedef enum ParamType {
@@ -64,8 +65,10 @@ typedef struct LoadParams {
   Param n;
   Param dpi;
   Param jpegShrink;
+  Param webpScale;
   Param heifThumbnail;
   Param svgUnlimited;
+  Param access;
 
 } LoadParams;
 
@@ -134,6 +137,12 @@ typedef struct SaveParams {
   double jxlDistance;
   int jxlEffort;
   BOOL jxlLossless;
+
+  // MAGICK
+  char *magickFormat;
+  BOOL magickOptimizeGifFrames;
+  BOOL magickOptimizeGifTransparency;
+  int magickBitDepth;
 } SaveParams;
 
 SaveParams create_save_params(ImageType outputFormat);

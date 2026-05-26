@@ -9,12 +9,15 @@ import (
 )
 
 // DirPath get dir path from filepath, without a last name.
+//  eg: "/foo/bar/baz.js" => "/foo/bar"
 func DirPath(fPath string) string { return filepath.Dir(fPath) }
 
 // Dir get dir path from filepath, without a last name.
+//  eg: "/foo/bar/baz.js" => "/foo/bar"
 func Dir(fPath string) string { return filepath.Dir(fPath) }
 
-// PathName get file/dir name from a full path
+// PathName get file/dir name from a full path.
+//  eg: "/foo/bar/baz.js" => "baz.js"
 func PathName(fPath string) string { return filepath.Base(fPath) }
 
 // PathNoExt get path from full path, without ext.
@@ -30,7 +33,9 @@ func PathNoExt(fPath string) string {
 
 // Name get file/dir name from full path.
 //
-// eg: path/to/main.go => "main.go"
+// eg:
+//  "path/to/main.go" => "main.go"
+//  "/foo/bar/baz" => "baz"
 func Name(fPath string) string {
 	if fPath == "" {
 		return ""
@@ -74,16 +79,15 @@ func Extname(fPath string) string {
 func Suffix(fPath string) string { return filepath.Ext(fPath) }
 
 // Expand will parse first `~` to user home dir path.
-func Expand(pathStr string) string {
-	return comfunc.ExpandHome(pathStr)
-}
+func Expand(pathStr string) string { return comfunc.ExpandHome(pathStr) }
+
+// ExpandHome will parse first `~` to user home dir path.
+func ExpandHome(pathStr string) string { return comfunc.ExpandHome(pathStr) }
 
 // ExpandPath will parse `~` to user home dir path.
-func ExpandPath(pathStr string) string {
-	return comfunc.ExpandHome(pathStr)
-}
+func ExpandPath(pathStr string) string { return comfunc.ExpandHome(pathStr) }
 
-// ResolvePath will parse `~` and env var in path
+// ResolvePath will parse `~` and ENV var in path
 func ResolvePath(pathStr string) string {
 	pathStr = comfunc.ExpandHome(pathStr)
 	// return comfunc.ParseEnvVar()
@@ -91,6 +95,18 @@ func ResolvePath(pathStr string) string {
 }
 
 // SplitPath splits path immediately following the final Separator, separating it into a directory and file name component
-func SplitPath(pathStr string) (dir, name string) {
-	return filepath.Split(pathStr)
+func SplitPath(pathStr string) (dir, name string) { return filepath.Split(pathStr) }
+
+// homeDir cache
+var _homeDir string
+
+// UserHomeDir is alias of os.UserHomeDir, but ignore error.(by os.UserHomeDir)
+func UserHomeDir() string {
+	if _homeDir == "" {
+		_homeDir, _ = os.UserHomeDir()
+	}
+	return _homeDir
 }
+
+// HomeDir get user home dir path.
+func HomeDir() string { return UserHomeDir() }

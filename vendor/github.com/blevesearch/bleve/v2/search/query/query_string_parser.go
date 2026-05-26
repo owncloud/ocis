@@ -37,11 +37,13 @@ func parseQuerySyntax(query string) (rq Query, err error) {
 	if query == "" {
 		return NewMatchNoneQuery(), nil
 	}
-	lex := newLexerWrapper(newQueryStringLex(strings.NewReader(query)))
+	qsl := getQueryStringLex(strings.NewReader(query))
+	defer putQueryStringLex(qsl)
+	lex := newLexerWrapper(qsl)
 	doParse(lex)
 
 	if len(lex.errs) > 0 {
-		return nil, fmt.Errorf(strings.Join(lex.errs, "\n"))
+		return nil, fmt.Errorf("%s", strings.Join(lex.errs, "\n"))
 	}
 	return lex.query, nil
 }

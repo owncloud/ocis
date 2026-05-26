@@ -6,11 +6,14 @@ package vips
 // #include "govips.h"
 import "C"
 import (
+	"errors"
 	"fmt"
 	"os"
 	"runtime"
 	"strings"
 	"sync"
+	"sync/atomic"
+	"testing"
 )
 
 const (
@@ -56,9 +59,9 @@ type Config struct {
 
 // Startup sets up the libvips support and ensures the versions are correct. Pass in nil for
 // default configuration.
-func Startup(config *Config) {
+func Startup(config *Config) error {
 	if hasShutdown {
-		panic("govips cannot be stopped and restarted")
+		return errors.New("govips cannot be stopped and restarted")
 	}
 
 	initLock.Lock()
@@ -69,15 +72,15 @@ func Startup(config *Config) {
 
 	if running {
 		govipsLog("govips", LogLevelInfo, "warning libvips already started")
-		return
+		return nil
 	}
 
 	if MajorVersion < 8 {
-		panic("govips requires libvips version 8.10+")
+		return errors.New("govips requires libvips version 8.10+")
 	}
 
 	if MajorVersion == 8 && MinorVersion < 10 {
-		panic("govips requires libvips version 8.10+")
+		return errors.New("govips requires libvips version 8.10+")
 	}
 
 	cName := C.CString("govips")
@@ -93,7 +96,7 @@ func Startup(config *Config) {
 
 	err := C.vips_init(cName)
 	if err != 0 {
-		panic(fmt.Sprintf("Failed to start vips code=%v", err))
+		return fmt.Errorf("failed to start vips code=%v", err)
 	}
 
 	running = true
@@ -129,14 +132,13 @@ func Startup(config *Config) {
 			C.vips_cache_set_max(defaultMaxCacheSize)
 		}
 
-		if config.CacheTrace {
-			C.vips_cache_set_trace(toGboolean(true))
-		}
+		C.vips_cache_set_trace(toGboolean(config.CacheTrace))
 	} else {
 		C.vips_concurrency_set(defaultConcurrencyLevel)
 		C.vips_cache_set_max(defaultMaxCacheSize)
 		C.vips_cache_set_max_mem(defaultMaxCacheMem)
 		C.vips_cache_set_max_files(defaultMaxCacheFiles)
+		C.vips_cache_set_trace(toGboolean(false))
 	}
 
 	govipsLog("govips", LogLevelInfo, fmt.Sprintf("vips %s started with concurrency=%d cache_max_files=%d cache_max_mem=%d cache_max=%d",
@@ -147,6 +149,7 @@ func Startup(config *Config) {
 		int(C.vips_cache_get_max())))
 
 	initTypes()
+	return nil
 }
 
 func enableLogging() {
@@ -223,6 +226,23 @@ type MemoryStats struct {
 	Allocs  int64
 }
 
+var openImageRefs atomic.Int64
+
+// OpenImageRefs returns the number of ImageRef instances that haven't been closed.
+func OpenImageRefs() int64 {
+	return openImageRefs.Load()
+}
+
+// AssertNoLeaks fails the test if any ImageRef instances remain open.
+// Call this at the end of tests to catch leaked images.
+func AssertNoLeaks(t testing.TB) {
+	t.Helper()
+	n := openImageRefs.Load()
+	if n != 0 {
+		t.Errorf("govips: %d ImageRef(s) not closed (leaked)", n)
+	}
+}
+
 // ReadVipsMemStats returns various memory statistics such as allocated memory and open files.
 func ReadVipsMemStats(stats *MemoryStats) {
 	stats.Mem = int64(C.vips_tracked_get_mem())
@@ -231,11 +251,14 @@ func ReadVipsMemStats(stats *MemoryStats) {
 	stats.Files = int64(C.vips_tracked_get_files())
 }
 
-func startupIfNeeded() {
+func startupIfNeeded() error {
 	if !running {
 		govipsLog("govips", LogLevelInfo, "libvips was forcibly started automatically, consider calling Startup/Shutdown yourself")
-		Startup(nil)
+		if err := Startup(nil); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 // InitTypes initializes caches and figures out which image types are supported

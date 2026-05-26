@@ -95,6 +95,7 @@ var DefaultBuiltins = [...]*Builtin{
 
 	// Arrays
 	ArrayConcat,
+	ArrayFlatten,
 	ArraySlice,
 	ArrayReverse,
 
@@ -173,6 +174,8 @@ var DefaultBuiltins = [...]*Builtin{
 	URLQueryEncode,
 	URLQueryEncodeObject,
 	URLQueryDecodeObject,
+	URIParse,
+	URIIsValid,
 	YAMLMarshal,
 	YAMLUnmarshal,
 	YAMLIsValid,
@@ -889,6 +892,18 @@ var ArrayConcat = &Builtin{
 			types.Named("y", types.NewArray(nil, types.A)).Description("the second array"),
 		),
 		types.Named("z", types.NewArray(nil, types.A)).Description("the concatenation of `x` and `y`"),
+	),
+	CanSkipBctx: true,
+}
+
+var ArrayFlatten = &Builtin{
+	Name:        "array.flatten",
+	Description: "Non-recursively unpacks array items in arr into the flattened array. Other types are appended as-is.",
+	Decl: types.NewFunction(
+		types.Args(
+			types.Named("arr", types.NewArray(nil, types.A)).Description("the array to be flattened"),
+		),
+		types.Named("flattened", types.NewArray(nil, types.A)).Description("array flattened one level"),
 	),
 	CanSkipBctx: true,
 }
@@ -1662,7 +1677,7 @@ var JSONPatch = &Builtin{
 		"Additionally works on sets, where a value contained in the set is considered to be its path.",
 	Decl: types.NewFunction(
 		types.Args(
-			types.Named("object", types.A).Description("the object to patch"), // TODO(sr): types.A?
+			types.Named("target", types.A).Description("the object, array or set to patch"),
 			types.Named("patches", types.NewArray(
 				nil,
 				types.NewObject(
@@ -1823,7 +1838,8 @@ var ObjectKeys = &Builtin{
 /*
  *  Encoding
  */
-var encoding = category("encoding")
+// Not using 'encoding' to avoid having to alias stdlib "encoding" imports
+var catEncoding = category("encoding")
 
 var JSONMarshal = &Builtin{
 	Name:        "json.marshal",
@@ -1834,7 +1850,7 @@ var JSONMarshal = &Builtin{
 		),
 		types.Named("y", types.S).Description("the JSON string representation of `x`"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
 	CanSkipBctx: true,
 }
 
@@ -1856,7 +1872,7 @@ var JSONMarshalWithOptions = &Builtin{
 		),
 		types.Named("y", types.S).Description("the JSON string representation of `x`, with configured prefix/indent string(s) as appropriate"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
 	CanSkipBctx: true,
 }
 
@@ -1869,7 +1885,7 @@ var JSONUnmarshal = &Builtin{
 		),
 		types.Named("y", types.A).Description("the term deserialized from `x`"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
 	CanSkipBctx: true,
 }
 
@@ -1882,7 +1898,7 @@ var JSONIsValid = &Builtin{
 		),
 		types.Named("result", types.B).Description("`true` if `x` is valid JSON, `false` otherwise"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
 	CanSkipBctx: true,
 }
 
@@ -1895,7 +1911,7 @@ var Base64Encode = &Builtin{
 		),
 		types.Named("y", types.S).Description("base64 serialization of `x`"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
 	CanSkipBctx: true,
 }
 
@@ -1908,7 +1924,7 @@ var Base64Decode = &Builtin{
 		),
 		types.Named("y", types.S).Description("base64 deserialization of `x`"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
 	CanSkipBctx: true,
 }
 
@@ -1921,7 +1937,7 @@ var Base64IsValid = &Builtin{
 		),
 		types.Named("result", types.B).Description("`true` if `x` is valid base64 encoded value, `false` otherwise"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
 	CanSkipBctx: true,
 }
 
@@ -1934,7 +1950,7 @@ var Base64UrlEncode = &Builtin{
 		),
 		types.Named("y", types.S).Description("base64url serialization of `x`"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
 	CanSkipBctx: true,
 }
 
@@ -1947,7 +1963,7 @@ var Base64UrlEncodeNoPad = &Builtin{
 		),
 		types.Named("y", types.S).Description("base64url serialization of `x`"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
 	CanSkipBctx: true,
 }
 
@@ -1960,7 +1976,7 @@ var Base64UrlDecode = &Builtin{
 		),
 		types.Named("y", types.S).Description("base64url deserialization of `x`"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
 	CanSkipBctx: true,
 }
 
@@ -1973,7 +1989,7 @@ var URLQueryDecode = &Builtin{
 		),
 		types.Named("y", types.S).Description("URL-encoding deserialization of `x`"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
 	CanSkipBctx: true,
 }
 
@@ -1986,7 +2002,7 @@ var URLQueryEncode = &Builtin{
 		),
 		types.Named("y", types.S).Description("URL-encoding serialization of `x`"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
 	CanSkipBctx: true,
 }
 
@@ -2010,7 +2026,7 @@ var URLQueryEncodeObject = &Builtin{
 		),
 		types.Named("y", types.S).Description("the URL-encoded serialization of `object`"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
 	CanSkipBctx: true,
 }
 
@@ -2025,7 +2041,34 @@ var URLQueryDecodeObject = &Builtin{
 			types.S,
 			types.NewArray(nil, types.S)))).Description("the resulting object"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
+	CanSkipBctx: true,
+}
+
+var URIParse = &Builtin{
+	Name: "uri.parse",
+	Description: "Parses a URI and returns an object containing its components according to RFC 3986. " +
+		"Empty components are omitted. " +
+		"In addition to the standard components, `raw_query` is returned for use with `urlquery` builtins, " +
+		"and `raw_path` is returned to allow detection of path-based exploits using percent-encoded characters.",
+	Decl: types.NewFunction(
+		types.Args(
+			types.Named("uri", types.S).Description("the URI string to parse"),
+		),
+		types.Named("output", types.NewObject(nil, types.NewDynamicProperty(types.S, types.S))).Description("object containing URI components"),
+	),
+	CanSkipBctx: true,
+}
+
+var URIIsValid = &Builtin{
+	Name:        "uri.is_valid",
+	Description: "Returns true if the input can be parsed as a URI.",
+	Decl: types.NewFunction(
+		types.Args(
+			types.Named("uri", types.S).Description("the URI string to validate"),
+		),
+		types.Named("result", types.B).Description("true if `uri` is a valid URI, false otherwise"),
+	),
 	CanSkipBctx: true,
 }
 
@@ -2038,7 +2081,7 @@ var YAMLMarshal = &Builtin{
 		),
 		types.Named("y", types.S).Description("the YAML string representation of `x`"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
 	CanSkipBctx: true,
 }
 
@@ -2051,7 +2094,7 @@ var YAMLUnmarshal = &Builtin{
 		),
 		types.Named("y", types.A).Description("the term deserialized from `x`"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
 	CanSkipBctx: true,
 }
 
@@ -2065,7 +2108,7 @@ var YAMLIsValid = &Builtin{
 		),
 		types.Named("result", types.B).Description("`true` if `x` is valid YAML, `false` otherwise"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
 	CanSkipBctx: true,
 }
 
@@ -2078,7 +2121,7 @@ var HexEncode = &Builtin{
 		),
 		types.Named("y", types.S).Description("serialization of `x` using hex-encoding"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
 	CanSkipBctx: true,
 }
 
@@ -2091,7 +2134,7 @@ var HexDecode = &Builtin{
 		),
 		types.Named("y", types.S).Description("deserialized from `x`"),
 	),
-	Categories:  encoding,
+	Categories:  catEncoding,
 	CanSkipBctx: true,
 }
 
@@ -2402,7 +2445,7 @@ var ParseDurationNanos = &Builtin{
 	Description: "Returns the duration in nanoseconds represented by a string.",
 	Decl: types.NewFunction(
 		types.Args(
-			types.Named("duration", types.S).Description("a duration like \"3m\"; see the [Go `time` package documentation](https://golang.org/pkg/time/#ParseDuration) for more details"),
+			types.Named("duration", types.S).Description("a duration like \"3m\"; see the [OPA `Duration Parsing` documentation](https://www.openpolicyagent.org/docs/latest/policy-reference/builtins/time#duration-parsing) for more details"),
 		),
 		types.Named("ns", types.N).Description("the `duration` in nanoseconds"),
 	),
@@ -3390,8 +3433,9 @@ var InternalTestCase = &Builtin{
 }
 
 var InternalTemplateString = &Builtin{
-	Name: "internal.template_string",
-	Decl: types.NewFunction([]types.Type{types.NewArray(nil, types.A)}, types.S),
+	Name:        "internal.template_string",
+	Decl:        types.NewFunction([]types.Type{types.NewArray(nil, types.A)}, types.S),
+	CanSkipBctx: true, // Uses bctx.Location for error reporting, but that is always provided in eval
 }
 
 /**

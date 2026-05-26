@@ -124,3 +124,11 @@ type SynonymDocument interface {
 	// The provided visitor function is called for each synonym field.
 	VisitSynonymFields(visitor SynonymFieldVisitor)
 }
+
+// NestedDocument is a document that contains other documents inside it.
+type NestedDocument interface {
+	Document
+	// VisitNestedDocuments allows iteration over all nested documents in the document.
+	// The provided visitor function is called for each nested document.
+	VisitNestedDocuments(visitor func(doc Document))
+}

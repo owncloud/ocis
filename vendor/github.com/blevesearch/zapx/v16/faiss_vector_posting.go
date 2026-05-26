@@ -274,8 +274,7 @@ func (vpItr *VecPostingsIterator) BytesWritten() uint64 {
 // (2) search limited to a subset of documents within an attached vector index
 // (3) close attached vector index
 // (4) get the size of the attached vector index
-func (sb *SegmentBase) InterpretVectorIndex(field string, requiresFiltering bool,
-	except *roaring.Bitmap) (
+func (sb *SegmentBase) InterpretVectorIndex(field string, except *roaring.Bitmap) (
 	segment.VectorIndex, error) {
 
 	rv := &vectorIndexWrapper{sb: sb}
@@ -304,7 +303,7 @@ func (sb *SegmentBase) InterpretVectorIndex(field string, requiresFiltering bool
 
 	var err error
 	rv.vecIndex, rv.vecDocIDMap, rv.docVecIDMap, rv.vectorIDsToExclude, err =
-		sb.vecIndexCache.loadOrCreate(fieldIDPlus1, sb.mem[pos:], requiresFiltering,
+		sb.vecIndexCache.loadOrCreate(fieldIDPlus1, sb.mem[pos:], true, // always load docVecIDMap
 			except)
 	if err != nil {
 		return nil, err

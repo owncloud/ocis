@@ -44,13 +44,3 @@ func (idx *IndexFlat) Xb() []float32 {
 	C.faiss_IndexFlat_xb(idx.cPtr(), &ptr, &size)
 	return (*[1 << 30]float32)(unsafe.Pointer(ptr))[:size:size]
 }
-
-// AsFlat casts idx to a flat index.
-// AsFlat panics if idx is not a flat index.
-func (idx *IndexImpl) AsFlat() *IndexFlat {
-	ptr := C.faiss_IndexFlat_cast(idx.cPtr())
-	if ptr == nil {
-		panic("index is not a flat index")
-	}
-	return &IndexFlat{&faissIndex{ptr}}
-}

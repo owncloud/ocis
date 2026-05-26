@@ -25,6 +25,11 @@
       "Minor": 17,
       "Patch": 0
     },
+    "array.flatten": {
+      "Major": 1,
+      "Minor": 13,
+      "Patch": 0
+    },
     "array.reverse": {
       "Major": 0,
       "Minor": 36,
@@ -963,6 +968,16 @@
     "upper": {
       "Major": 0,
       "Minor": 17,
+      "Patch": 0
+    },
+    "uri.is_valid": {
+      "Major": 1,
+      "Minor": 16,
+      "Patch": 0
+    },
+    "uri.parse": {
+      "Major": 1,
+      "Minor": 16,
       "Patch": 0
     },
     "urlquery.decode": {
