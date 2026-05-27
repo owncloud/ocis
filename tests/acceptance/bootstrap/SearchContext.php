@@ -272,6 +272,7 @@ class SearchContext implements Context {
 		foreach ($elementRows as $expectedFile) {
 			$filename = $expectedFile[0];
 			$content = $foundEntries[$filename];
+			var_dump('contenttttttttttttt', $content);
 			// Extract the content between the <mark> tags
 			preg_match('/<mark>(.*?)<\/mark>/s', $content, $matches);
 			$actualContent = $matches[1] ?? '';
