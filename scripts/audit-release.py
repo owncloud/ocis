@@ -42,6 +42,9 @@ def is_production(v):
 def run(cmd):
     return subprocess.run(cmd, capture_output=True, text=True)
 
+def get_github_token():
+    return os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+
 def gh_api(path, token):
     req = urllib.request.Request(
         f"https://api.github.com{path}",
@@ -49,6 +52,17 @@ def gh_api(path, token):
     )
     with urllib.request.urlopen(req) as r:
         return json.load(r)
+
+def check_file_magic(path, expected_magic, min_size, fmt_name):
+    if not path.exists():
+        return
+    data = path.read_bytes()
+    if not data.startswith(expected_magic):
+        fail(f"{path.name}: not {fmt_name} ({data[:len(expected_magic)].hex()})")
+    elif len(data) < min_size:
+        fail(f"{path.name}: too small ({len(data):,} bytes)")
+    else:
+        ok(f"{path.name}: {fmt_name} {len(data):,} bytes")
 
 
 def check_local(directory, version):
@@ -61,15 +75,16 @@ def check_local(directory, version):
     if extra:   fail(f"file set: unexpected {extra}")
 
     for platform in BINARY_PLATFORMS:
-        bin_path = directory / f"ocis-{version}-{platform}"
-        sha_path = directory / f"ocis-{version}-{platform}.sha256"
+        bin_path  = directory / f"ocis-{version}-{platform}"
+        sha_path  = directory / f"ocis-{version}-{platform}.sha256"
+        bin_bytes = bin_path.read_bytes() if bin_path.exists() else None
 
-        if bin_path.exists():
+        if bin_bytes is not None:
             magic, bits, machine = BINARY_REF[platform]
-            if bin_path.stat().st_size == 0:
+            if len(bin_bytes) == 0:
                 fail(f"{bin_path.name}: empty file")
             else:
-                h = bin_path.read_bytes()[:20]
+                h = bin_bytes[:20]
                 if not h.startswith(magic):
                     fail(f"{bin_path.name}: wrong magic {h[:4].hex()}")
                 elif magic == ELF_MAGIC:
@@ -86,7 +101,7 @@ def check_local(directory, version):
                         ok(f"{bin_path.name}: Mach-O 0x{cputype:08x}")
 
         if sha_path.exists():
-            if not bin_path.exists():
+            if bin_bytes is None:
                 fail(f"{sha_path.name}: binary missing")
                 continue
             parts = sha_path.read_text().strip().split("  ", 1)
@@ -96,29 +111,18 @@ def check_local(directory, version):
             rec_hash, rec_name = parts
             if rec_name != bin_path.name:
                 fail(f"{sha_path.name}: filename mismatch '{rec_name}'")
-            actual = hashlib.sha256(bin_path.read_bytes()).hexdigest()
+            actual = hashlib.sha256(bin_bytes).hexdigest()
             if actual != rec_hash:
                 fail(f"{sha_path.name}: hash mismatch\n  want: {rec_hash}\n  got:  {actual}")
             else:
                 ok(f"{sha_path.name}: hash ok")
 
-    lic = directory / LICENSES
-    if lic.exists():
-        magic, size = lic.read_bytes()[:2], lic.stat().st_size
-        if magic != b"\x1f\x8b": fail(f"{LICENSES}: not gzip ({magic.hex()})")
-        elif size < 100_000:     fail(f"{LICENSES}: too small ({size:,} bytes)")
-        else:                    ok(f"{LICENSES}: gzip {size:,} bytes")
-
-    eula = directory / EULA
-    if eula.exists():
-        magic, size = eula.read_bytes()[:4], eula.stat().st_size
-        if magic != b"%PDF":  fail(f"{EULA}: not PDF ({magic})")
-        elif size < 10_000:   fail(f"{EULA}: too small ({size:,} bytes)")
-        else:                 ok(f"{EULA}: PDF {size:,} bytes")
+    check_file_magic(directory / LICENSES, b"\x1f\x8b", 100_000, "gzip")
+    check_file_magic(directory / EULA,     b"%PDF",     10_000,  "PDF")
 
 
 def check_github_release(version):
-    token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    token = get_github_token()
     if not token:
         fail("GH_TOKEN / GITHUB_TOKEN not set"); return
     try:
@@ -132,8 +136,8 @@ def check_github_release(version):
         (not r.get("draft"),                  "draft: false"),
         (r.get("prerelease") == ("-" in version), f"prerelease: {r.get('prerelease')}"),
     ]
-    for passed_check, label in checks:
-        ok(label) if passed_check else fail(label)
+    for result, label in checks:
+        ok(label) if result else fail(label)
 
     published = {a["name"] for a in r.get("assets", [])}
     expected  = set(expected_files(version))
@@ -144,16 +148,51 @@ def check_github_release(version):
 
 
 def check_docker(version):
-    refs = [f"owncloud/ocis-rolling:{version}"]
-    if is_production(version):
-        refs.append(f"owncloud/ocis:{version}")
-    for ref in refs:
-        r = run(["docker", "buildx", "imagetools", "inspect", ref])
+    # Returns dict of "os/arch" -> digest for a multi-arch manifest, or (None, err).
+    def inspect_manifest(ref):
+        r = run(["docker", "buildx", "imagetools", "inspect", "--format",
+                 "{{range .Manifest.Manifests}}{{.Platform.OS}}/{{.Platform.Architecture}}={{.Digest}} {{end}}", ref])
         if r.returncode != 0:
-            fail(f"{ref}: {r.stderr.strip()}"); continue
-        missing = [a for a in ("linux/amd64", "linux/arm64") if a not in r.stdout]
+            return None, r.stderr.strip()
+        return dict(e.split("=", 1) for e in r.stdout.split() if "=" in e), None
+
+    def check_arches(ref, manifests):
+        missing = [a for a in ("linux/amd64", "linux/arm64") if a not in manifests]
         if missing: fail(f"{ref}: missing {missing}")
         else:       ok(f"{ref}: amd64+arm64 present")
+
+    rolling = f"owncloud/ocis-rolling:{version}"
+    m, err = inspect_manifest(rolling)
+    if m is None: fail(f"{rolling}: {err}")
+    else:         check_arches(rolling, m)
+
+    if not is_production(version):
+        return
+
+    prod = f"owncloud/ocis:{version}"
+    versioned, err = inspect_manifest(prod)
+    if versioned is None:
+        fail(f"{prod}: {err}")
+    else:
+        check_arches(prod, versioned)
+    versioned_digests = set(versioned.values()) if versioned else set()
+
+    parts = version.split(".")
+    major, major_minor = parts[0], ".".join(parts[:2])
+    # If a newer minor/major is already live (e.g. auditing an 8.0.x backport
+    # while 8.1 is out) floating tags must NOT be downgraded — that's a regression.
+    for floating in (f"owncloud/ocis:{major_minor}", f"owncloud/ocis:{major}", "owncloud/ocis:latest"):
+        m, err = inspect_manifest(floating)
+        if m is None:
+            fail(f"{floating}: not found or inspect failed — tag was not pushed")
+            continue
+        if not versioned_digests:
+            fail(f"{floating}: cannot compare — versioned manifest inspect failed")
+            continue
+        if set(m.values()) == versioned_digests:
+            ok(f"{floating}: matches {version}")
+            continue
+        fail(f"{floating}: points to a different manifest than {version} — floating tag not updated or downgrade regression")
 
 
 def resolve_run_id(branch, token):
@@ -167,7 +206,7 @@ def resolve_run_id(branch, token):
 
 
 def check_run_artifacts(run_id):
-    token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    token = get_github_token()
     if not token:
         fail("GH_TOKEN / GITHUB_TOKEN not set"); return
     try:
@@ -213,7 +252,7 @@ def main():
         p.error("--version is required unless --run or --branch is used")
 
     if args.branch:
-        token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+        token = get_github_token()
         if not token: sys.exit("GH_TOKEN / GITHUB_TOKEN not set")
         args.run = resolve_run_id(args.branch, token)
 

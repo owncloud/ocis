@@ -236,10 +236,17 @@ jobs:
             "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-arm64"
       - if: ${{ !contains(matrix.repo, 'rolling') }}
         run: |
+          VERSION="${{ needs.determine-release-type.outputs.version }}"
+          REPO="${{ matrix.repo }}"
+          MAJOR="${VERSION%%.*}"
+          MINOR="${VERSION#*.}"; MINOR="${MINOR%%.*}"
           docker buildx imagetools create \
-            -t "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}" \
-            "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-amd64" \
-            "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-arm64"
+            -t "${REPO}:${VERSION}" \
+            -t "${REPO}:${MAJOR}.${MINOR}" \
+            -t "${REPO}:${MAJOR}" \
+            -t "${REPO}:latest" \
+            "${REPO}:${VERSION}-linux-amd64" \
+            "${REPO}:${VERSION}-linux-arm64"
 
   docker-readme:
     name: docker-readme (${{ matrix.repo }})
