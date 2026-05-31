@@ -96,7 +96,7 @@
     "i18next-http-backend": "^3.0.5",
     "i18next-resources-to-backend": "^1.2.1",
     "notistack": "^1.0.10",
-    "query-string": "^9.3.1",
+    "query-string": "^9.4.0",
     "react": "^17.0.2",
     "react-app-polyfill": "^3.0.0",
     "react-dom": "^17.0.2",
@@ -109,7 +109,7 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.4.2",
     "render-if": "^0.1.1",
-    "web-vitals": "^5.2.0"
+    "web-vitals": "^5.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
