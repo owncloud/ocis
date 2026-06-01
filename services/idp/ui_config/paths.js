@@ -11,15 +11,13 @@ const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
 
 const envPublicUrl = process.env.PUBLIC_URL;
 
-function ensureSlash(inputPath, needsSlash) {
+function ensureSlash(inputPath) {
   const hasSlash = inputPath.endsWith('/');
-  if (hasSlash && !needsSlash) {
-    return inputPath.slice(0, -1);
-  } else if (!hasSlash && needsSlash) {
-    return `${inputPath}/`;
-  } else {
+  if (hasSlash) {
     return inputPath;
   }
+
+  return `${inputPath}/`;
 }
 
 const getPublicUrl = appPackageJson =>
@@ -35,7 +33,7 @@ function getServedPath(appPackageJson) {
   const publicUrl = getPublicUrl(appPackageJson);
   const servedUrl =
     envPublicUrl || (publicUrl ? url.parse(publicUrl).pathname : '/');
-  return ensureSlash(servedUrl, true);
+  return ensureSlash(servedUrl);
 }
 
 const moduleFileExtensions = [
