@@ -5,9 +5,8 @@ package mocks
 import (
 	context "context"
 
-	client "go-micro.dev/v4/client"
-
 	mock "github.com/stretchr/testify/mock"
+	client "go-micro.dev/v4/client"
 
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 )

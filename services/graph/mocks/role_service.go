@@ -5,11 +5,9 @@ package mocks
 import (
 	context "context"
 
-	client "go-micro.dev/v4/client"
-
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
-
 	mock "github.com/stretchr/testify/mock"
+	client "go-micro.dev/v4/client"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 )
