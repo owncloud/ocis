@@ -37,8 +37,9 @@ jobs:
           DOCS_ONLY=true
           while IFS= read -r file; do
             case "$file" in
+              .github/workflows/*) DOCS_ONLY=false; break ;;
               .github/*|.vscode/*|changelog/*|docs/*|deployments/*) ;;
-              CHANGELOG.md|CONTRIBUTING.md|LICENSE|README.md) ;;
+              */CHANGELOG.md|*/CONTRIBUTING.md|*/README.md|CHANGELOG.md|CONTRIBUTING.md|LICENSE|README.md) ;;
               *) DOCS_ONLY=false; break ;;
             esac
           done <<< "$CHANGED_FILES"
