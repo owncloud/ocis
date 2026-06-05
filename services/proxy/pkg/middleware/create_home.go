@@ -10,9 +10,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
-	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
@@ -96,9 +94,8 @@ func (m *createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 
 		// TODO Perekhod: Create the vault home based on User permission
-		if m.enableVaultMode && mfa.IsMFAHeaderTrue(req) {
+		if m.enableVaultMode && revactx.HasMFA(ctx) {
 			// Force MFA=true for vault home creation
-			vctx := metadata.AppendToOutgoingContext(ctx, ctxpkg.MFAOutgoingHeader, "true")
 
 			vaultKey := storagespace.FormatStorageID(utils.VaultStorageProviderID, u.GetId().GetOpaqueId())
 			if _, exists := m.cache.Load(vaultKey); !exists {
@@ -106,7 +103,7 @@ func (m *createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 				// Inject storage_id into opaque for vault personal space
 				createHomeReq.Opaque = utils.AppendPlainToOpaque(createHomeReq.Opaque, "storage_id", utils.VaultStorageProviderID)
 
-				cpsRes, err := client.CreateHome(vctx, createHomeReq)
+				cpsRes, err := client.CreateHome(ctx, createHomeReq)
 				switch {
 				case err != nil:
 					m.logger.Err(err).Msg("error calling CreateHome for vault personal")

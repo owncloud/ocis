@@ -65,7 +65,6 @@ func NewServiceWithClient(client client.Client, opts ...Option) (Service, error)
 		mtracer.NewHandlerWrapper(
 			mtracer.WithTraceProvider(sopts.TraceProvider),
 		),
-		//ocismetadata.NewHandlerWrapper(),
 		autoprop.NewGoMicroServerHandlerWrapper(),
 	}
 	if sopts.Logger.GetLevel() == zerolog.DebugLevel {
@@ -95,7 +94,6 @@ func NewServiceWithClient(client client.Client, opts ...Option) (Service, error)
 		micro.WrapHandler(handlerWrappers...),
 		micro.WrapSubscriber(
 			mtracer.NewSubscriberWrapper(mtracer.WithTraceProvider(sopts.TraceProvider)),
-			//ocismetadata.NewSubscriberWrapper(),
 			autoprop.NewGoMicroServerSubscriberWrapper(),
 		),
 	}

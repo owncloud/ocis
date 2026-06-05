@@ -8,7 +8,6 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	opkgm "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/reva/v2/pkg/auth/scope"
@@ -43,8 +42,6 @@ func Auth(opts ...account.Option) func(http.Handler) http.Handler {
 	}
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			r = mfa.EnhanceRequest(r)
-
 			ctx := r.Context()
 			t := r.Header.Get("x-access-token")
 			if t == "" {
@@ -92,10 +89,6 @@ func Auth(opts ...account.Option) func(http.Handler) http.Handler {
 				ctx = ctxpkg.ContextSetInitiator(ctx, initiatorID)
 				ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.InitiatorHeader, initiatorID)
 			}
-
-			// Propagate MFA status to outgoing gRPC metadata so that services protected 
-			// by the mfa interceptor (e.g. storage-users-vault) can enforce MFA at the gRPC layer.
-			ctx = ctxpkg.AppendMFAToOutgoingContext(ctx, mfa.Has(ctx))
 
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
