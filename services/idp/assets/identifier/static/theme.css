@@ -99,7 +99,7 @@ main {
   font-size: 1.5rem;
   font-weight: 400;
   line-height: 1.334;
-  margin: 0 0 0;
+  margin: 0;
 }
 
 .oc-consent-username {
@@ -162,8 +162,7 @@ main {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding: 8px;
-  padding-top: 0;
+  padding: 0 8px 8px;
   gap: 0;
 }
 
