@@ -301,6 +301,7 @@ func (idp *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handl
 	idp.mux.Get("/signin/v1/welcome", idp.Welcome())
 	idp.mux.Get("/signin/v1/goodbye", idp.Goodbye())
 	idp.mux.Get("/signin/v1/consent", idp.Consent())
+	idp.mux.Get("/signin/v1/loginerror", idp.LoginError())
 
 	idp.mux.Mount("/", gm)
 
@@ -334,7 +335,7 @@ type pageData struct {
 type consentData struct {
 	Lang, Title, Headline, Nonce, PathPrefix string
 	BgImgURL                                 template.CSS
-	AllowLabel, DenyLabel                    string
+	AllowLabel, DenyLabel, ConsentConsequence string
 }
 
 // Index renders the login page with templated variables.
@@ -434,6 +435,38 @@ func (idp *IDP) Goodbye() http.HandlerFunc {
 	}
 }
 
+// LoginError renders the login error page.
+func (idp *IDP) LoginError() http.HandlerFunc {
+	tpl, err := idp.parseTemplate("/identifier/loginerror.html")
+	if err != nil {
+		idp.logger.Fatal().Err(err).Msg("Could not load loginerror template")
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		lang := detectLocale(r)
+		t := idp.translator.Locale(lang)
+		nonce := rndm.GenerateRandomString(32)
+		msg := r.URL.Query().Get("message")
+		if msg == "" {
+			msg = t.Get("Login Error")
+		}
+		data := pageData{
+			Lang:       lang,
+			Title:      t.Get("Login Error - ownCloud"),
+			Headline:   t.Get("Login Error"),
+			Nonce:      nonce,
+			PathPrefix: "/signin/v1",
+			BgImgURL:   template.CSS(idp.config.Asset.LoginBackgroundUrl),
+			Message:    msg,
+		}
+		var buf bytes.Buffer
+		if err := tpl.Execute(&buf, data); err != nil {
+			http.Error(w, "template error", http.StatusInternalServerError)
+			return
+		}
+		writeSecureHTML(w, buf.Bytes(), nonce)
+	}
+}
+
 // Consent renders the OAuth2 consent page.
 func (idp *IDP) Consent() http.HandlerFunc {
 	tpl, err := idp.parseTemplate("/identifier/consent.html")
@@ -451,8 +484,9 @@ func (idp *IDP) Consent() http.HandlerFunc {
 			Nonce:      nonce,
 			PathPrefix: "/signin/v1",
 			BgImgURL:   template.CSS(idp.config.Asset.LoginBackgroundUrl),
-			AllowLabel: t.Get("Allow"),
-			DenyLabel:  t.Get("Deny"),
+			AllowLabel:         t.Get("Allow"),
+			DenyLabel:          t.Get("Cancel"),
+			ConsentConsequence: t.Get("By clicking Allow, you allow this app to use your information."),
 		}
 		var buf bytes.Buffer
 		if err := tpl.Execute(&buf, data); err != nil {
