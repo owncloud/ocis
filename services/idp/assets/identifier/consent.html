@@ -87,6 +87,22 @@
     catch (_) { return false; }
   }
 
+  function redirectViaContinueURI(continueURI, konnectState, stripConsentPrompt) {
+    var target = new URL(continueURI);
+    params.forEach(function(v, k) { if (!target.searchParams.has(k)) target.searchParams.set(k, v); });
+    if (stripConsentPrompt) {
+      var prompt = (target.searchParams.get("prompt") || "").split(" ").filter(function(p) {
+        return p !== "select_account" && p !== "consent";
+      }).join(" ");
+      if (prompt) target.searchParams.set("prompt", prompt);
+      else target.searchParams.delete("prompt");
+    } else {
+      target.searchParams.set("prompt", "none");
+    }
+    target.searchParams.set("konnect", konnectState);
+    window.location.href = target.href;
+  }
+
   function scopeDescription(scopeID, definitions) {
     var def = definitions && definitions[scopeID];
     if (!def) return null;
@@ -171,7 +187,6 @@
       allowQuestionEl.appendChild(em2);
       allowQuestionEl.appendChild(allowQ);
 
-      allowBtn.dataset.clientName = clientName;
       bodyEl.hidden = false;
     })
     .catch(function() { showError("Could not load consent information."); });
@@ -200,27 +215,13 @@
       .then(function(result) {
         if (!allow) {
           var continueURI = helloData && helloData.continue_uri;
-          if (continueURI) {
-            var target = new URL(continueURI);
-            params.forEach(function(v, k) { if (!target.searchParams.has(k)) target.searchParams.set(k, v); });
-            target.searchParams.set("prompt", "none");
-            target.searchParams.set("konnect", body.state);
-            window.location.href = target.href;
-          }
+          if (continueURI) redirectViaContinueURI(continueURI, body.state, false);
           return;
         }
         if (result.ok && result.data && result.data.success) {
           var continueURI = helloData && helloData.continue_uri;
           if (continueURI) {
-            var target = new URL(continueURI);
-            params.forEach(function(v, k) { if (!target.searchParams.has(k)) target.searchParams.set(k, v); });
-            var prompt = (target.searchParams.get("prompt") || "").split(" ").filter(function(p) {
-              return p !== "select_account" && p !== "consent";
-            }).join(" ");
-            if (prompt) target.searchParams.set("prompt", prompt);
-            else target.searchParams.delete("prompt");
-            target.searchParams.set("konnect", body.state);
-            window.location.href = target.href;
+            redirectViaContinueURI(continueURI, body.state, true);
             return;
           }
           var fallback = qs("redirect_uri");
