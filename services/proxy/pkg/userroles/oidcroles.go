@@ -101,7 +101,7 @@ func matchesClaimMapping(mappingValue string, claimRoles map[string]struct{}) bo
 func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *cs3user.User, claims map[string]interface{}, overwriteRole string) (*cs3user.User, error) {
 	userID := user.GetId().GetOpaqueId()
 	logger := ra.logger.SubloggerWithRequestID(ctx).With().Str("userid", userID).Logger()
-	roleNamesToRoleIDs, err := ra.roleNamesToRoleIDs()
+	roleNamesToRoleIDs, err := ra.roleNamesToRoleIDs(ctx)
 	if err != nil {
 		logger.Error().Err(err).Msg("Error mapping role names to role ids")
 		return nil, err
@@ -151,7 +151,7 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 
 	if len(assignedRoles) != 1 || (assignedRoles[0] != roleIDFromClaim) {
 		logger.Debug().Interface("assignedRoleIds", assignedRoles).Interface("newRoleId", roleIDFromClaim).Msg("Updating role assignment for user")
-		newctx, err := ra.prepareAdminContext()
+		newctx, err := ra.prepareAdminContext(ctx)
 		if err != nil {
 			logger.Error().Err(err).Msg("Error creating admin context")
 			return nil, err
@@ -170,7 +170,7 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 			return nil, err
 		}
 
-		canCreateDrives := ra.checkPermission("Drives.Create", user, client)
+		canCreateDrives := ra.checkPermission(newctx, "Drives.Create", user, client) // TODO: check if it's ctx or newctx
 		if canCreateDrives {
 			libreUser := identity.CreateUserModelFromCS3(user)
 			err = shared.RestorePersonalSpace(newctx, client, libreUser.GetId())
@@ -204,13 +204,13 @@ func (ra oidcRoleAssigner) ApplyUserRole(ctx context.Context, user *cs3user.User
 	return user, nil
 }
 
-func (ra oidcRoleAssigner) prepareAdminContext() (context.Context, error) {
+func (ra oidcRoleAssigner) prepareAdminContext(ctx context.Context) (context.Context, error) {
 	gatewayClient, err := ra.gatewaySelector.Next()
 	if err != nil {
 		ra.logger.Error().Err(err).Msg("could not select next gateway client")
 		return nil, err
 	}
-	newctx, err := utils.GetServiceUserContext(ra.serviceAccount.ServiceAccountID, gatewayClient, ra.serviceAccount.ServiceAccountSecret)
+	newctx, err := utils.GetServiceUserContextWithContext(ctx, gatewayClient, ra.serviceAccount.ServiceAccountID, ra.serviceAccount.ServiceAccountSecret)
 	if err != nil {
 		ra.logger.Error().Err(err).Msg("Error preparing request context for provisioning role assignments.")
 		return nil, err
@@ -228,7 +228,7 @@ type roleNameToIDCache struct {
 
 var roleNameToID roleNameToIDCache
 
-func (ra oidcRoleAssigner) roleNamesToRoleIDs() (map[string]string, error) {
+func (ra oidcRoleAssigner) roleNamesToRoleIDs(ctx context.Context) (map[string]string, error) {
 	cacheTTL := 5 * time.Minute
 	roleNameToID.lock.RLock()
 
@@ -251,14 +251,14 @@ func (ra oidcRoleAssigner) roleNamesToRoleIDs() (map[string]string, error) {
 	// Get all roles to find the role IDs.
 	// To list roles we need some elevated access to the settings service
 	// prepare a new request context for that until we have service accounts
-	ctx, err := ra.prepareAdminContext()
+	newctx, err := ra.prepareAdminContext(ctx)
 	if err != nil {
 		ra.logger.Error().Err(err).Msg("Error creating admin context")
 		return nil, err
 	}
 
 	req := &settingssvc.ListBundlesRequest{}
-	res, err := ra.roleService.ListRoles(ctx, req)
+	res, err := ra.roleService.ListRoles(newctx, req)
 	if err != nil {
 		ra.logger.Error().Err(err).Msg("Failed to list all roles")
 		return map[string]string{}, err
@@ -275,8 +275,8 @@ func (ra oidcRoleAssigner) roleNamesToRoleIDs() (map[string]string, error) {
 	return roleNameToID.roleNameToID, nil
 }
 
-func (ra oidcRoleAssigner) checkPermission(perm string, user *cs3user.User, gwc gateway.GatewayAPIClient) bool {
-	if ok, err := utils.CheckPermission(revactx.ContextSetUser(context.Background(), user), perm, gwc); ok {
+func (ra oidcRoleAssigner) checkPermission(ctx context.Context, perm string, user *cs3user.User, gwc gateway.GatewayAPIClient) bool {
+	if ok, err := utils.CheckPermission(revactx.ContextSetUser(ctx, user), perm, gwc); ok {
 		return true
 	} else if err != nil {
 		ra.logger.Error().Err(err).Msg("error checking permission")

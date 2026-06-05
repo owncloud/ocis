@@ -50,12 +50,6 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 	ctx := revactx.ContextSetToken(r.Context(), t)
 	ctx = metadata.Set(ctx, revactx.TokenHeader, t)
 
-	mfaVal := "false"
-	if r.Header.Get(revactx.MFAHeader) == "true" {
-		mfaVal = "true"
-	}
-	ctx = metadata.Set(ctx, revactx.MFAOutgoingHeader, mfaVal)
-
 	req := &searchsvc.SearchRequest{
 		Query:    rep.SearchFiles.Search.Pattern,
 		PageSize: int32(rep.SearchFiles.Search.Limit),

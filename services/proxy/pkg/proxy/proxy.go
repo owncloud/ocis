@@ -16,6 +16,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/proxy/policy"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	"github.com/rs/zerolog"
 )
 
@@ -43,6 +44,7 @@ func NewMultiHostReverseProxy(opts ...Option) (*MultiHostReverseProxy, error) {
 	}
 
 	rp.Rewrite = func(r *httputil.ProxyRequest) {
+		r.Out = r.Out.WithContext(autoprop.CopyMetaFromContextToContext(r.In.Context(), r.Out.Context()))
 		ri := router.ContextRoutingInfo(r.In.Context())
 		ri.Rewrite()(r)
 	}
@@ -88,6 +90,7 @@ func NewMultiHostReverseProxy(opts ...Option) (*MultiHostReverseProxy, error) {
 		TLSClientConfig:       tlsConf,
 	}
 	rp.Transport = middleware.GetOtelhttpClientTransport(transport, options.TraceProvider)
+	rp.Transport = autoprop.NewHttpRoundTripper(rp.Transport)
 	return rp, nil
 }
 

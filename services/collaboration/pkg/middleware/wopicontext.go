@@ -135,7 +135,9 @@ func WopiContextAuthMiddleware(cfg *config.Config, st microstore.Store, next htt
 		ctx = ctxpkg.ContextSetScopes(ctx, scopes)
 
 		// Propagate MFA status embedded in the WOPI token to outgoing gRPC metadata.
-		ctx = ctxpkg.AppendMFAToOutgoingContext(ctx, claims.WopiContext.HasMFA)
+		if claims.WopiContext.HasMFA {
+			ctx = ctxpkg.SetMFA(ctx)
+		}
 
 		// include additional info in the context's logger
 		wopiLogger = wopiLogger.With().

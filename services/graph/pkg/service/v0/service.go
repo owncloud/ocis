@@ -235,7 +235,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 				})
 			})
 			r.Route("/drives", func(r chi.Router) {
-				r.With(drivesRequireMFA).Get("/", svc.GetAllDrives(APIVersion_1_Beta_1))
+				r.With(autoprop.NewHttpHandler(), drivesRequireMFA).Get("/", svc.GetAllDrives(APIVersion_1_Beta_1))
 				r.Post("/", svc.CreateDriveV1Beta1)
 				r.Route("/{driveID}", func(r chi.Router) {
 					r.Get("/", svc.GetSingleDriveV1Beta1)
@@ -331,7 +331,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 				})
 			})
 			r.Route("/drives", func(r chi.Router) {
-				r.With(drivesRequireMFA).Get("/", svc.GetAllDrives(APIVersion_1))
+				r.With(autoprop.NewHttpHandler(), drivesRequireMFA).Get("/", svc.GetAllDrives(APIVersion_1))
 				r.Post("/", svc.CreateDrive)
 				r.Route("/{driveID}", func(r chi.Router) {
 					r.Patch("/", svc.UpdateDrive)
@@ -406,6 +406,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 	// Initialize the Vault routes
 	if options.Config.EnableVaultMode {
 		m.Route("/vault/graph", func(r chi.Router) {
+			r.Use(autoprop.NewHttpHandler())
 			r.Use(requireMFA)
 			r.Use(graphm.VaultModeMiddleware())
 			graphRoutes(r, blankMW)

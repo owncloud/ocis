@@ -24,7 +24,6 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
@@ -144,10 +143,7 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 	}
 	ctx = revactx.ContextSetUser(ctx, u)
 
-	mfaVal, _ := metadata.Get(ctx, revactx.MFAOutgoingHeader)
-	ctx = mfa.Set(ctx, mfaVal == "true")
-
-	key := cacheKey(in.Query, in.PageSize, in.Ref, u, mfa.Has(ctx))
+	key := cacheKey(in.Query, in.PageSize, in.Ref, u, revactx.HasMFA(ctx))
 	res, ok := s.FromCache(key)
 	if !ok {
 		var err error

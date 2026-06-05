@@ -25,12 +25,10 @@ import (
 	"github.com/owncloud/reva/v2/pkg/tags"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"golang.org/x/sync/errgroup"
-	grpcmetadata "google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
@@ -107,11 +105,8 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 	currentUser := revactx.ContextMustGetUser(ctx)
 
 	// Extract vault mode and scope from query if set
-	query, isVault := ParseVaultMode(req.Query)
-	ctx = mfa.Set(ctx, isVault && mfa.Has(ctx))
-	if mfa.Has(ctx) {
-		ctx = grpcmetadata.AppendToOutgoingContext(ctx, revactx.MFAOutgoingHeader, "true")
-	}
+	query, isVaultRequested := ParseVaultMode(req.Query)
+	hasMFA := revactx.HasMFA(ctx)
 
 	query, scope := ParseScope(query)
 	if query == "" {
@@ -170,7 +165,7 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 		s.logger.Error().Err(err).Msg("failed to list the user's storage spaces")
 		return nil, err
 	}
-	if mfa.Has(ctx) {
+	if isVaultRequested && hasMFA {
 		// When the "storage_id" is set the ListStorageSpaces request omits "+grant"
 		// spaces, so we have to make an additional request to get the vault space in vault mode
 		lssReq.Opaque = utils.AppendPlainToOpaque(lssReq.Opaque, "storage_id", utils.VaultStorageProviderID)
@@ -198,10 +193,10 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 				storageID = space.Root.GetStorageId()
 			}
 			isVaultSpace := storageID == utils.VaultStorageProviderID
-			if mfa.Has(ctx) && !isVaultSpace {
+			if (isVaultRequested && hasMFA) && !isVaultSpace {
 				continue // vault mode: skip non-vault spaces
 			}
-			if !mfa.Has(ctx) && isVaultSpace {
+			if !(isVaultRequested && hasMFA) && isVaultSpace {
 				continue // regular mode: skip vault spaces
 			}
 		}
@@ -484,10 +479,6 @@ func (s *Service) IndexSpace(ctx context.Context, spaceID *provider.StorageSpace
 		return fmt.Errorf("invalid space id")
 	}
 	rootID.OpaqueId = rootID.SpaceId
-
-	if rootID.StorageId == utils.VaultStorageProviderID {
-		ownerCtx = grpcmetadata.AppendToOutgoingContext(ownerCtx, revactx.MFAOutgoingHeader, "true")
-	}
 
 	failures := 0
 
@@ -808,10 +799,6 @@ func (s *Service) resInfo(ctx context.Context, ref *provider.Reference) (context
 	ownerCtx, err := getAuthContext(ctx, s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
 	if err != nil {
 		return nil, nil, ""
-	}
-
-	if ref.GetResourceId().GetStorageId() == utils.VaultStorageProviderID {
-		ownerCtx = grpcmetadata.AppendToOutgoingContext(ownerCtx, revactx.MFAOutgoingHeader, "true")
 	}
 
 	statRes, err := statResource(ownerCtx, ref, s.gatewaySelector, s.logger)
