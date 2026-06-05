@@ -17,12 +17,15 @@
       <h1 class="oc-invisible-sr">{{.Headline}}</h1>
       <p id="oc-consent-error-message" class="oc-error-message" hidden></p>
       <div id="consent-body" hidden>
-        <p id="consent-client-name" class="oc-message"></p>
+        <p id="consent-display-name" class="oc-light oc-consent-headline"></p>
+        <p id="consent-username" class="oc-light oc-consent-username"></p>
+        <p id="consent-client-wants" class="oc-light oc-mb-m"></p>
+        <ul id="consent-scopes" class="oc-consent-scopes"></ul>
+        <p id="consent-allow-question" class="oc-light oc-mb-m"></p>
+        <p class="oc-light oc-consent-consequence">{{.ConsentConsequence}}</p>
         <div id="consent-actions">
-          <button class="oc-button-primary" id="consent-allow-btn"
-            data-msg-allow="{{.AllowLabel}}"
-            data-msg-deny="{{.DenyLabel}}">{{.AllowLabel}}</button>
-          <button class="oc-button-secondary" id="consent-deny-btn">{{.DenyLabel}}</button>
+          <div class="oc-consent-btn-wrap"><button class="oc-button-cancel" id="consent-deny-btn">{{.DenyLabel}}</button></div>
+          <div class="oc-consent-btn-wrap"><button class="oc-button-consent" id="consent-allow-btn">{{.AllowLabel}}</button></div>
         </div>
       </div>
     </div>
@@ -32,7 +35,11 @@
 (function() {
   var errorEl = document.getElementById("oc-consent-error-message");
   var bodyEl = document.getElementById("consent-body");
-  var clientNameEl = document.getElementById("consent-client-name");
+  var displayNameEl = document.getElementById("consent-display-name");
+  var usernameEl = document.getElementById("consent-username");
+  var clientWantsEl = document.getElementById("consent-client-wants");
+  var scopesEl = document.getElementById("consent-scopes");
+  var allowQuestionEl = document.getElementById("consent-allow-question");
   var allowBtn = document.getElementById("consent-allow-btn");
   var denyBtn = document.getElementById("consent-deny-btn");
 
@@ -80,6 +87,45 @@
     catch (_) { return false; }
   }
 
+  function scopeDescription(scopeID, definitions) {
+    var def = definitions && definitions[scopeID];
+    if (!def) return null;
+    switch (def.id) {
+      case "scope_alias_basic": return "Access your basic account information";
+      case "scope_offline_access": return "Keep the allowed access persistently and forever";
+    }
+    return def.description || null;
+  }
+
+  function buildScopeList(scopes, meta) {
+    scopesEl.innerHTML = "";
+    if (!scopes || !meta) return;
+    var mapping = meta.mapping || {};
+    var definitions = meta.definitions || {};
+    var seen = {};
+    for (var scope in scopes) {
+      if (!scopes[scope]) continue;
+      var alias = mapping[scope] || scope;
+      if (seen[alias]) continue;
+      seen[alias] = true;
+      var desc = scopeDescription(alias, definitions);
+      if (!desc) desc = "Scope: " + scope;
+      var li = document.createElement("li");
+      li.className = "oc-consent-scope-item";
+      var cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = true;
+      cb.disabled = true;
+      cb.className = "oc-consent-checkbox";
+      var label = document.createElement("span");
+      label.className = "oc-light";
+      label.textContent = desc;
+      li.appendChild(cb);
+      li.appendChild(label);
+      scopesEl.appendChild(li);
+    }
+  }
+
   var helloReq = {
     state: qs("state"),
     flow: qs("flow") || "oidc",
@@ -101,8 +147,31 @@
         return;
       }
       helloData = data;
-      var clientName = (data.client && data.client.display_name) || qs("client_id");
-      clientNameEl.textContent = "\"" + clientName + "\" is requesting access to your account.";
+      var client = data.client || {};
+      var clientName = client.display_name || qs("client_id");
+
+      displayNameEl.textContent = "Hi " + (data.displayName || data.username || "");
+      usernameEl.textContent = data.username || "";
+
+      var wantsEl = document.createElement("span");
+      wantsEl.textContent = " wants to";
+      var em = document.createElement("em");
+      em.textContent = clientName;
+      clientWantsEl.innerHTML = "";
+      clientWantsEl.appendChild(em);
+      clientWantsEl.appendChild(wantsEl);
+
+      buildScopeList(data.scopes, data.meta && data.meta.scopes);
+
+      var allowQ = document.createElement("span");
+      allowQ.textContent = " to do this?";
+      var em2 = document.createElement("em");
+      em2.textContent = clientName;
+      allowQuestionEl.innerHTML = "Allow ";
+      allowQuestionEl.appendChild(em2);
+      allowQuestionEl.appendChild(allowQ);
+
+      allowBtn.dataset.clientName = clientName;
       bodyEl.hidden = false;
     })
     .catch(function() { showError("Could not load consent information."); });
@@ -130,13 +199,28 @@
       })
       .then(function(result) {
         if (!allow) {
-          showError("Access denied.");
+          var continueURI = helloData && helloData.continue_uri;
+          if (continueURI) {
+            var target = new URL(continueURI);
+            params.forEach(function(v, k) { if (!target.searchParams.has(k)) target.searchParams.set(k, v); });
+            target.searchParams.set("prompt", "none");
+            target.searchParams.set("konnect", body.state);
+            window.location.href = target.href;
+          }
           return;
         }
         if (result.ok && result.data && result.data.success) {
           var continueURI = helloData && helloData.continue_uri;
           if (continueURI) {
-            window.location.href = continueURI;
+            var target = new URL(continueURI);
+            params.forEach(function(v, k) { if (!target.searchParams.has(k)) target.searchParams.set(k, v); });
+            var prompt = (target.searchParams.get("prompt") || "").split(" ").filter(function(p) {
+              return p !== "select_account" && p !== "consent";
+            }).join(" ");
+            if (prompt) target.searchParams.set("prompt", prompt);
+            else target.searchParams.delete("prompt");
+            target.searchParams.set("konnect", body.state);
+            window.location.href = target.href;
             return;
           }
           var fallback = qs("redirect_uri");

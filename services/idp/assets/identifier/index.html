@@ -15,7 +15,6 @@
     <div class="oc-login-form" id="login-root">
       <img class="oc-logo" src="/themes/owncloud/assets/logo.svg" alt="ownCloud">
       <h1 class="oc-invisible-sr">{{.Headline}}</h1>
-      <p id="oc-login-error-message" class="oc-error-message" hidden></p>
       <form id="login-form" method="post" action="#"
         data-msg-required="{{.ErrRequired}}"
         data-msg-invalid="{{.ErrInvalid}}"
@@ -30,6 +29,7 @@
         <div>
           <label class="oc-label" for="oc-login-password">{{.LabelPassword}}</label>
           <input class="oc-input" type="password" id="oc-login-password" name="password" autocomplete="current-password" placeholder="{{.LabelPassword}}" required>
+          <p id="oc-login-error-message" class="oc-error-message" hidden></p>
         </div>
         <div>
           <button class="oc-button-primary" type="submit" id="submit-btn">{{.ButtonSignIn}}</button>
@@ -96,13 +96,20 @@
     });
   }
 
+  var usernameEl = document.getElementById("oc-login-username");
+  var passwordEl = document.getElementById("oc-login-password");
+
   function showError(msg) {
     errorEl.textContent = msg || MSG_DEFAULT;
     errorEl.hidden = false;
+    usernameEl.classList.add("error");
+    passwordEl.classList.add("error");
   }
 
   function hideError() {
     errorEl.hidden = true;
+    usernameEl.classList.remove("error");
+    passwordEl.classList.remove("error");
   }
 
   function setLoading(loading) {
@@ -119,8 +126,8 @@
     e.preventDefault();
     hideError();
     setLoading(true);
-    var username = document.getElementById("oc-login-username").value.trim();
-    var password = document.getElementById("oc-login-password").value;
+    var username = usernameEl.value.trim();
+    var password = passwordEl.value;
     if (!username || !password) {
       showError(MSG_REQUIRED);
       setLoading(false);
@@ -152,13 +159,18 @@
             var target = new URL(next, next.indexOf("http") === 0 ? undefined : base);
             var current = new URLSearchParams(window.location.search);
             current.forEach(function(v, k) { if (!target.searchParams.has(k)) target.searchParams.set(k, v); });
+            var prompt = (target.searchParams.get("prompt") || "").split(" ").filter(function(p) {
+              return p !== "select_account" && p !== "consent";
+            }).join(" ");
+            if (prompt) target.searchParams.set("prompt", prompt);
+            else target.searchParams.delete("prompt");
             if (isSameOrigin(target.href)) {
               window.location.href = target.href;
             }
             return;
           }
         }
-        if (result.status === 204 || (result.data && !result.data.success)) {
+        if (result.status === 204 || result.status === 401 || (result.data && !result.data.success)) {
           showError(MSG_INVALID);
           return;
         }

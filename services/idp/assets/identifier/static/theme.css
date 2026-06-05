@@ -81,12 +81,157 @@ main {
   padding-top: 8px;
 }
 
-.oc-login-form div:not(:last-of-type) {
+#login-form div:not(:last-of-type) {
   margin-bottom: 15px;
 }
 
-.oc-login-form div:last-of-type {
+#login-form div:last-of-type {
   padding-top: 24px;
+}
+
+.oc-mb-m {
+  margin-bottom: 0.35em;
+  line-height: 1.75;
+  font-size: 1rem;
+}
+
+.oc-consent-headline {
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.334;
+  margin: 0 0 0;
+}
+
+.oc-consent-username {
+  font-size: 1rem;
+  line-height: 1.75;
+  margin: 0 0 16px;
+}
+
+.oc-consent-scopes {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+}
+
+.oc-consent-scope-item {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  font-size: 0.875rem;
+  line-height: 1.43;
+}
+
+.oc-consent-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0 8px 0 9px;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 2px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.oc-consent-checkbox::after {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 11px;
+  border: 2px solid #1b223d;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) translateY(-2px);
+}
+
+#consent-body {
+  padding: 0;
+}
+
+.oc-consent-consequence {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+#consent-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 8px;
+  padding-top: 0;
+  gap: 0;
+}
+
+.oc-consent-btn-wrap {
+  display: inline-block;
+  position: relative;
+  margin-top: 16px;
+}
+
+.oc-consent-btn-wrap + .oc-consent-btn-wrap {
+  margin-left: 8px;
+}
+
+.oc-button-cancel {
+  min-width: 64px;
+  height: 36px;
+  padding: 6px 8px;
+  border: none;
+  background: transparent;
+  color: #78909c;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0.02857em;
+  cursor: pointer;
+  border-radius: 4px;
+  line-height: 1.75;
+}
+
+.oc-button-cancel:hover:not(:disabled) {
+  background: rgba(120, 144, 156, 0.04);
+}
+
+.oc-button-cancel:disabled {
+  color: rgba(0, 0, 0, 0.26);
+  cursor: default;
+}
+
+.oc-button-consent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 64px;
+  height: 36px;
+  padding: 6px 16px;
+  border: none;
+  border-radius: 4px;
+  background: #00b3f0;
+  color: #fff;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0.02857em;
+  line-height: 1.75;
+  cursor: pointer;
+  box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
+}
+
+.oc-button-consent:hover:not(:disabled) {
+  background: #1e98d7;
+}
+
+.oc-button-consent:disabled {
+  color: rgba(0, 0, 0, 0.26);
+  box-shadow: none;
+  background: rgba(0, 0, 0, 0.12);
+  cursor: default;
 }
 
 .oc-logo {
