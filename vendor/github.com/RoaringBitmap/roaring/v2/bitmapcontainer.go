@@ -262,6 +262,39 @@ func (bc *bitmapContainer) getManyIterator() manyIterable {
 	return newBitmapContainerManyIterator(bc)
 }
 
+type bitmapContainerUnsetIterator struct {
+	ptr *bitmapContainer
+	i   int
+}
+
+func (bcui *bitmapContainerUnsetIterator) next() uint16 {
+	j := bcui.i
+	bcui.i = bcui.ptr.NextUnsetBit(uint(bcui.i) + 1)
+	return uint16(j)
+}
+
+func (bcui *bitmapContainerUnsetIterator) hasNext() bool {
+	return bcui.i >= 0 && bcui.i < 65536
+}
+
+func (bcui *bitmapContainerUnsetIterator) peekNext() uint16 {
+	return uint16(bcui.i)
+}
+
+func (bcui *bitmapContainerUnsetIterator) advanceIfNeeded(minval uint16) {
+	if bcui.hasNext() && bcui.peekNext() < minval {
+		bcui.i = bcui.ptr.NextUnsetBit(uint(minval))
+	}
+}
+
+func newBitmapContainerUnsetIterator(a *bitmapContainer) *bitmapContainerUnsetIterator {
+	return &bitmapContainerUnsetIterator{a, a.NextUnsetBit(0)}
+}
+
+func (bc *bitmapContainer) getUnsetIterator() shortPeekable {
+	return newBitmapContainerUnsetIterator(bc)
+}
+
 func (bc *bitmapContainer) getSizeInBytes() int {
 	return len(bc.bitmap) * 8
 }
@@ -882,6 +915,43 @@ func (bc *bitmapContainer) iandBitmap(value2 *bitmapContainer) container {
 	return bc
 }
 
+func (bc *bitmapContainer) ixor(a container) container {
+	switch x := a.(type) {
+	case *arrayContainer:
+		return bc.ixorArray(x)
+	case *bitmapContainer:
+		return bc.ixorBitmap(x)
+	case *runContainer16:
+		return bc.ixorRun16(x)
+	}
+	panic("unsupported container type")
+}
+
+func (bc *bitmapContainer) ixorArray(value2 *arrayContainer) container {
+	vbc := value2.toBitmapContainer()
+	return bc.ixorBitmap(vbc)
+}
+
+func (bc *bitmapContainer) ixorRun16(value2 *runContainer16) container {
+	rcb := value2.toBitmapContainer()
+	return bc.ixorBitmap(rcb)
+}
+
+func (bc *bitmapContainer) ixorBitmap(value2 *bitmapContainer) container {
+	newCardinality := int(popcntXorSlice(bc.bitmap, value2.bitmap))
+	if newCardinality > arrayDefaultMaxSize {
+		for k := 0; k < len(bc.bitmap); k++ {
+			bc.bitmap[k] = bc.bitmap[k] ^ value2.bitmap[k]
+		}
+		bc.cardinality = newCardinality
+		return bc
+	}
+	ac := newArrayContainerSize(newCardinality)
+	fillArrayXOR(ac.content, bc.bitmap, value2.bitmap)
+	ac.content = ac.content[:newCardinality]
+	return ac
+}
+
 func (bc *bitmapContainer) andNot(a container) container {
 	switch x := a.(type) {
 	case *arrayContainer:
@@ -1100,7 +1170,7 @@ func (bc *bitmapContainer) NextSetBit(i uint) int {
 		return -1
 	}
 	w := bc.bitmap[x]
-	w = w >> uint(i%64)
+	w = w >> (i % 64)
 	if w != 0 {
 		return int(i) + countTrailingZeros(w)
 	}
@@ -1111,6 +1181,29 @@ func (bc *bitmapContainer) NextSetBit(i uint) int {
 		}
 	}
 	return -1
+}
+
+func (bc *bitmapContainer) NextUnsetBit(i uint) int {
+	var (
+		x      = i / 64
+		length = uint(len(bc.bitmap))
+	)
+	if x >= length {
+		return int(i)
+	}
+	w := bc.bitmap[x]
+	w = w >> (i % 64)
+	w = ^w
+	if w != 0 {
+		return int(i) + countTrailingZeros(w)
+	}
+	x++
+	for ; x < length; x++ {
+		if bc.bitmap[x] != 0xFFFFFFFFFFFFFFFF {
+			return int(x*64) + countTrailingZeros(^bc.bitmap[x])
+		}
+	}
+	return int(length * 64)
 }
 
 // PrevSetBit returns the previous set bit e.g the previous int packed into the bitmaparray
@@ -1136,7 +1229,7 @@ func (bc *bitmapContainer) uPrevSetBit(i uint) int {
 
 	b := i % 64
 
-	w = w << uint(63-b)
+	w = w << (63 - b)
 	if w != 0 {
 		return int(i) - countLeadingZeros(w)
 	}

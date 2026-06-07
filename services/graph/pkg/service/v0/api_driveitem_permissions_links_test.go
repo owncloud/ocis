@@ -50,7 +50,7 @@ var _ = Describe("createLinkTests", func() {
 		gatewayClient = cs3mocks.NewGatewayAPIClient(GinkgoT())
 
 		gatewaySelector = mocks.NewSelectable[gateway.GatewayAPIClient](GinkgoT())
-		gatewaySelector.On("Next").Return(gatewayClient, nil)
+		gatewaySelector.On("Next").Return(gatewayClient, nil).Maybe()
 
 		cache := identity.NewIdentityCache(identity.IdentityCacheWithGatewaySelector(gatewaySelector))
 
@@ -239,6 +239,17 @@ var _ = Describe("createLinkTests", func() {
 			Expect(perm.GetId()).To(Equal("expTest"))
 			Expect(perm.GetExpirationDateTime().Equal(providedExp)).To(BeTrue())
 		})
+
+		It("rejects creating a public link on a vault resource", func() {
+			vaultDriveItemId := &provider.ResourceId{
+				StorageId: utils.VaultStorageProviderID,
+				SpaceId:   "2",
+				OpaqueId:  "3",
+			}
+			perm, err := svc.CreateLink(context.Background(), vaultDriveItemId, driveItemCreateLink)
+			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "public links are not allowed for vault resources")))
+			Expect(perm).To(BeZero())
+		})
 	})
 
 	Describe("SetLinPassword", func() {
@@ -288,6 +299,18 @@ var _ = Describe("createLinkTests", func() {
 			linkType := perm.Link.GetType()
 			Expect(string(linkType)).To(Equal("view"))
 			Expect(perm.GetHasPassword()).To(BeTrue())
+		})
+
+		It("rejects updating a public link password on a vault resource", func() {
+			vaultDriveItemId := &provider.ResourceId{
+				StorageId: utils.VaultStorageProviderID,
+				SpaceId:   "2",
+				OpaqueId:  "3",
+			}
+
+			perm, err := svc.SetPublicLinkPassword(context.Background(), vaultDriveItemId, "permissionid", "OC123!")
+			Expect(err).To(MatchError(errorcode.New(errorcode.InvalidRequest, "public links are not allowed for vault resources")))
+			Expect(perm).To(BeZero())
 		})
 	})
 })

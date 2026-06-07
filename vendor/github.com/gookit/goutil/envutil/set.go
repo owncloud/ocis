@@ -34,7 +34,8 @@ func UnsetEnvs(keys ...string) {
 // LoadText parse multiline text to ENV. Can use to load .env file contents.
 //
 // Usage:
-// 	envutil.LoadText(fsutil.ReadFile(".env"))
+//
+//	envutil.LoadText(fsutil.ReadFile(".env"))
 func LoadText(text string) {
 	envMp := SplitText2map(text)
 	for key, value := range envMp {
@@ -42,7 +43,7 @@ func LoadText(text string) {
 	}
 }
 
-// LoadString set line to ENV. e.g.: KEY=VALUE
+// LoadString set line to ENV. e.g.: "KEY=VALUE"
 func LoadString(line string) bool {
 	k, v := comfunc.SplitLineToKv(line, "=")
 	if len(k) > 0 {

@@ -287,8 +287,9 @@ func getUsersAttributes(displayedAttributes []string, user *libregraph.User) ([]
 
 	attributes := []string{}
 
-	for attrStr, val := range userMap {
-		if !slices.Contains(displayedAttributes, attrStr) {
+	for _, attrStr := range displayedAttributes {
+		val, ok := userMap[attrStr]
+		if !ok {
 			continue
 		}
 
@@ -300,8 +301,7 @@ func getUsersAttributes(displayedAttributes []string, user *libregraph.User) ([]
 				attributes = append(attributes, *v)
 			}
 		case []libregraph.Group:
-			groups := userMap[attrStr].([]libregraph.Group)
-			for _, group := range groups {
+			for _, group := range v {
 				attributes = append(attributes, *group.DisplayName)
 			}
 		default:
@@ -442,18 +442,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// If the user isn't admin, we'll show just the minimum user attributes
-		finalUser := &libregraph.User{
-			Id:          user.Id,
-			DisplayName: user.DisplayName,
-			UserType:    user.UserType,
-			Identities:  user.Identities,
-		}
-
-		if ctxHasFullPerms {
-			finalUser = user
-		} else if slices.Contains(displayedAttributes, "mail") {
-			finalUser.Mail = user.Mail
-		}
+		finalUser := g.filterOutPrivateUserAttrs(r.Context(), user)
 
 		usersWithAttributes = append(usersWithAttributes, &UserWithAttributes{
 			User:       finalUser,
@@ -687,12 +676,10 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if !slices.Contains(g.config.API.UserSearchDisplayedAttributes, "mail") {
-		user.Mail = nil
-	}
+	finalUser := g.filterOutPrivateUserAttrs(r.Context(), user)
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, user)
+	render.JSON(w, r, finalUser)
 }
 
 // getUserLanguage returns the language of the user in the context.
@@ -1073,8 +1060,10 @@ func (g *Graph) patchUserResponse(w http.ResponseWriter, r *http.Request, user *
 
 	g.publishEvent(r.Context(), e)
 
+	finalUser := g.filterOutPrivateUserAttrs(r.Context(), user)
+
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, user)
+	render.JSON(w, r, finalUser)
 }
 
 const (
@@ -1205,4 +1194,38 @@ func (g Graph) parseExternalSearch(req *godata.GoDataRequest) (string, string) {
 	}
 
 	return parts[1], parts[2]
+}
+
+// filterOutPrivateUserAttrs will create a shallow copy of the user with just
+// public user information unless the caller has full account permissions or
+// is the same user.
+// The public information is the "Id", "DisplayName", "UserType", and "Identities";
+// the "Mail" will be included if the graph service has the mail configured as a
+// displayed attribute.
+func (g Graph) filterOutPrivateUserAttrs(ctx context.Context, user *libregraph.User) *libregraph.User {
+	var finalUser *libregraph.User
+
+	isSameUser := false
+	if currentUser, ok := revactx.ContextGetUser(ctx); ok {
+		isSameUser = currentUser.GetId().GetOpaqueId() == user.GetId()
+	}
+
+	ctxHasFullPerms := g.contextUserHasFullAccountPerms(ctx)
+	if ctxHasFullPerms || isSameUser {
+		finalUser = new(libregraph.User)
+		*finalUser = *user
+	} else {
+		finalUser = &libregraph.User{
+			Id:          user.Id,
+			DisplayName: user.DisplayName,
+			UserType:    user.UserType,
+			Identities:  user.Identities,
+		}
+
+		displayedAttributes := g.config.API.UserSearchDisplayedAttributes
+		if slices.Contains(displayedAttributes, "mail") {
+			finalUser.Mail = user.Mail
+		}
+	}
+	return finalUser
 }

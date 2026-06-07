@@ -27,7 +27,6 @@ import (
 	"github.com/open-policy-agent/opa/v1/loader"
 	"github.com/open-policy-agent/opa/v1/loader/filter"
 	"github.com/open-policy-agent/opa/v1/metrics"
-	"github.com/open-policy-agent/opa/v1/plugins"
 	"github.com/open-policy-agent/opa/v1/resolver"
 	"github.com/open-policy-agent/opa/v1/storage"
 	"github.com/open-policy-agent/opa/v1/storage/inmem"
@@ -43,10 +42,7 @@ import (
 const (
 	defaultPartialNamespace = "partial"
 	wasmVarPrefix           = "^"
-)
 
-// nolint:varcheck
-const (
 	targetWasm = "wasm"
 	targetRego = "rego"
 )
@@ -129,6 +125,8 @@ type EvalContext struct {
 	baseCache                   topdown.BaseCache
 	tracing                     tracing.Options
 	externalCancel              topdown.Cancel // Note(philip): If non-nil, the cancellation is handled outside of this package.
+	requestMetadata             map[string]any
+	responseMetadata            map[string]any
 }
 
 func (e *EvalContext) RawInput() *any {
@@ -412,6 +410,23 @@ func EvalExternalCancel(ec topdown.Cancel) EvalOption {
 	}
 }
 
+// EvalRequestMetadata sets arbitrary metadata from the caller that can be
+// passed through to the evaluation. This allows wrapping projects to attach
+// custom metadata to queries.
+func EvalRequestMetadata(m map[string]any) EvalOption {
+	return func(e *EvalContext) {
+		e.requestMetadata = m
+	}
+}
+
+// EvalResponseMetadata sets a map that wrapping projects can populate during
+// evaluation to include additional fields in the API response.
+func EvalResponseMetadata(m map[string]any) EvalOption {
+	return func(e *EvalContext) {
+		e.responseMetadata = m
+	}
+}
+
 func (pq preparedQuery) Modules() map[string]*ast.Module {
 	mods := make(map[string]*ast.Module)
 
@@ -666,8 +681,6 @@ type Rego struct {
 	enablePrintStatements       bool
 	distributedTracingOpts      tracing.Options
 	strict                      bool
-	pluginMgr                   *plugins.Manager
-	plugins                     []TargetPlugin
 	targetPrepState             TargetPluginEval
 	regoVersion                 ast.RegoVersion
 	compilerHook                func(*ast.Compiler)
@@ -1080,6 +1093,16 @@ func Store(s storage.Store) func(r *Rego) {
 	}
 }
 
+// Data returns an argument that sets the Rego data document. Data should be
+// a map representing the data document. This is a simpler alternative to
+// using Store with inmem.NewFromObject for cases where an in-memory store
+// with static data is sufficient.
+func Data(x map[string]any) func(r *Rego) {
+	return func(r *Rego) {
+		r.store = inmem.NewFromObject(x)
+	}
+}
+
 // StoreReadAST returns an argument that sets whether the store should eagerly convert data to AST values.
 //
 // Only applicable when no store has been set on the Rego object through the Store option.
@@ -1364,6 +1387,7 @@ func New(options ...func(r *Rego)) *Rego {
 	callHook := r.compiler == nil // call hook only if we created the compiler here
 
 	if r.compiler == nil {
+		//nolint:staticcheck
 		r.compiler = ast.NewCompiler().
 			WithUnsafeBuiltins(r.unsafeBuiltins).
 			WithBuiltins(r.builtinDecls).
@@ -1416,15 +1440,6 @@ func New(options ...func(r *Rego)) *Rego {
 
 	if r.generateJSON == nil {
 		r.generateJSON = generateJSON
-	}
-
-	if r.pluginMgr != nil {
-		for _, pluginName := range r.pluginMgr.Plugins() {
-			p := r.pluginMgr.Plugin(pluginName)
-			if p0, ok := p.(TargetPlugin); ok {
-				r.plugins = append(r.plugins, p0)
-			}
-		}
 	}
 
 	if t := r.targetPlugin(r.target); t != nil {
@@ -2231,7 +2246,7 @@ func (r *Rego) compileQuery(query ast.Body, imports []*ast.Import, _ metrics.Met
 		WithStrict(false)
 
 	for _, extra := range extras {
-		qc = qc.WithStageAfter(extra.after, extra.stage)
+		qc = qc.WithStageAfterID(extra.after, extra.stage)
 	}
 
 	compiled, err := qc.Compile(query)
@@ -2275,7 +2290,9 @@ func (r *Rego) eval(ctx context.Context, ectx *EvalContext) (ResultSet, error) {
 		WithPrintHook(ectx.printHook).
 		WithDistributedTracingOpts(r.distributedTracingOpts).
 		WithVirtualCache(ectx.virtualCache).
-		WithBaseCache(ectx.baseCache)
+		WithBaseCache(ectx.baseCache).
+		WithRequestMetadata(ectx.requestMetadata).
+		WithResponseMetadata(ectx.responseMetadata)
 
 	if !ectx.time.IsZero() {
 		q = q.WithTime(ectx.time)
@@ -2498,7 +2515,7 @@ func (r *Rego) partialResult(ctx context.Context, pCfg *PrepareConfig) (PartialR
 			Module: module,
 		}
 		module.Rules[i] = rule
-		if checkPartialResultForRecursiveRefs(body, rule.Path()) {
+		if checkPartialResultForRecursiveRefs(body, module.Package.Path.Extend(rule.Head.Reference.GroundPrefix())) {
 			return PartialResult{}, Errors{errPartialEvaluationNotEffective}
 		}
 	}
@@ -2569,7 +2586,9 @@ func (r *Rego) partial(ctx context.Context, ectx *EvalContext) (*PartialQueries,
 		WithInterQueryBuiltinValueCache(ectx.interQueryBuiltinValueCache).
 		WithStrictBuiltinErrors(ectx.strictBuiltinErrors).
 		WithSeed(ectx.seed).
-		WithPrintHook(ectx.printHook)
+		WithPrintHook(ectx.printHook).
+		WithRequestMetadata(ectx.requestMetadata).
+		WithResponseMetadata(ectx.responseMetadata)
 
 	if !ectx.time.IsZero() {
 		q = q.WithTime(ectx.time)
@@ -2620,31 +2639,31 @@ func (r *Rego) partial(ctx context.Context, ectx *EvalContext) (*PartialQueries,
 		for i, mod := range support {
 			// We can't apply the RegoV0CompatV1 version to the support module if it contains rules or vars that
 			// conflict with future keywords.
-			applyRegoVersion := true
+			applyCompatRegoVersion := true
 
 			ast.WalkRules(mod, func(r *ast.Rule) bool {
 				name := r.Head.Name
 				if name == "" && len(r.Head.Reference) > 0 {
 					name = r.Head.Reference[0].Value.(ast.Var)
 				}
-				if ast.IsFutureKeywordForRegoVersion(name.String(), ast.RegoV0) {
-					applyRegoVersion = false
+				if ast.IsFutureKeywordForRegoVersion(name.String(), ast.RegoV0) && !ast.IsFutureKeywordForRegoVersion(name.String(), ast.RegoV1) {
+					applyCompatRegoVersion = false
 					return true
 				}
 				return false
 			})
 
-			if applyRegoVersion {
+			if applyCompatRegoVersion {
 				ast.WalkVars(mod, func(v ast.Var) bool {
-					if ast.IsFutureKeywordForRegoVersion(v.String(), ast.RegoV0) {
-						applyRegoVersion = false
+					if ast.IsFutureKeywordForRegoVersion(v.String(), ast.RegoV0) && !ast.IsFutureKeywordForRegoVersion(v.String(), ast.RegoV1) {
+						applyCompatRegoVersion = false
 						return true
 					}
 					return false
 				})
 			}
 
-			if applyRegoVersion {
+			if applyCompatRegoVersion {
 				support[i].SetRegoVersion(ast.RegoV0CompatV1)
 			} else {
 				support[i].SetRegoVersion(r.regoVersion)
@@ -2689,7 +2708,7 @@ func (r *Rego) rewriteQueryToCaptureValue(_ ast.QueryCompiler, query ast.Body) (
 			expr.Terms = ast.Equality.Expr(terms, capture).Terms
 			r.capture[expr] = capture.Value.(ast.Var)
 		case []*ast.Term:
-			tpe := r.compiler.TypeEnv.Get(terms[0])
+			tpe := r.compiler.TypeEnv.GetByValue(terms[0].Value)
 			if !types.Void(tpe) && types.Arity(tpe) == len(terms)-1 {
 				capture = r.generateTermVar()
 				expr.Terms = append(terms, capture)
@@ -2879,7 +2898,7 @@ func (m rawModule) ParseWithOpts(opts ast.ParserOptions) (*ast.Module, error) {
 }
 
 type extraStage struct {
-	after string
+	after ast.StageID
 	stage ast.QueryCompilerStageDefinition
 }
 

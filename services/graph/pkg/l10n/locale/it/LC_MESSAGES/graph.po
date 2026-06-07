@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-04-28 03:18+0000\n"
+"POT-Creation-Date: 2026-06-03 03:23+0000\n"
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
 "Last-Translator: Cesare Capoferri, 2026\n"
 "Language-Team: Italian (https://app.transifex.com/owncloud-org/teams/6149/it/)\n"
@@ -121,7 +121,7 @@ msgid "Deny all access."
 msgstr "Nega qualunque accesso."
 
 #. default description for new spaces
-#: pkg/service/v0/spacetemplates.go:32
+#: pkg/service/v0/spacetemplates.go:33
 msgid "Here you can add a description for this Space."
 msgstr "Qui puoi aggiungere una descrizione per questo spazio."
 

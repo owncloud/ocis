@@ -5,8 +5,52 @@ on:
   workflow_dispatch:
 
 jobs:
+  detect-changes:
+    name: detect-changes
+    runs-on: ubuntu-latest
+    outputs:
+      docs-only: ${{ steps.check.outputs.docs-only }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Check if changes are docs-only
+        id: check
+        run: |
+          # Always run full CI on workflow_dispatch, tags, or when PR title contains [full-ci]
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "docs-only=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          if echo "$PR_TITLE" | grep -qi "\[full-ci\]"; then
+            echo "docs-only=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Get changed files between the PR base and head
+          CHANGED_FILES=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" 2>/dev/null || git diff --name-only HEAD~1)
+
+          # Patterns that are considered documentation/non-code changes
+          DOCS_ONLY=true
+          while IFS= read -r file; do
+            case "$file" in
+              .github/workflows/*) DOCS_ONLY=false; break ;;
+              .github/*|.vscode/*|changelog/*|docs/*|deployments/*) ;;
+              */CHANGELOG.md|*/CONTRIBUTING.md|*/README.md|CHANGELOG.md|CONTRIBUTING.md|LICENSE|README.md) ;;
+              *) DOCS_ONLY=false; break ;;
+            esac
+          done <<< "$CHANGED_FILES"
+
+          echo "docs-only=$DOCS_ONLY" >> "$GITHUB_OUTPUT"
+          echo "Changed files docs-only: $DOCS_ONLY"
+
   build-and-test:
     name: build-and-test
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.docs-only != 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -340,19 +384,28 @@ jobs:
       matrix:
         include:
           - suite: part-1
-            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 1"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc --run-part 1"
           - suite: part-2
-            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 2"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc --run-part 2"
           - suite: part-3
-            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 3"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc --run-part 3"
           - suite: part-4
-            args: "--total-parts 4 --xsuites search,app-provider,ocm,keycloak --run-part 4"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc --run-part 4"
           - suite: search
-            args: "--suites search"
+            args: "--type playwright --suites search"
             tika: true
           - suite: keycloak
-            args: "--suites journeys,keycloak"
+            args: "--type playwright --suites journeys,keycloak"
             keycloak: true
+          - suite: mfa
+            args: "--type playwright --suites mfa"
+            mfa: true
+          - suite: oidc
+            args: "--type playwright specs/oidc/refreshToken.spec.ts"
+            oidc: true
+          - suite: oidc-iframe
+            args: "--type playwright specs/oidc/iframeTokenRenewal.spec.ts"
+            oidc_iframe: true
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
@@ -361,7 +414,9 @@ jobs:
           cache: true
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
-          node-version: "24"
+          # 24.16.0 breaks playwright install (yauzl zip extraction hangs); pin to last known good.
+          # https://github.com/microsoft/playwright/issues/40724
+          node-version: "24.15.0"
       - name: Enable pnpm
         run: corepack enable && corepack prepare pnpm@10.28.1 --activate
       - name: Generate code
@@ -385,9 +440,9 @@ jobs:
           timeout 120 bash -c 'until curl -sf http://localhost:9998; do sleep 2; done'
           echo "tika ready."
 
-      # --- Keycloak (keycloak suite only) ---
+      # --- Keycloak (keycloak and mfa suites) ---
       - name: Generate Keycloak certs
-        if: matrix.keycloak == true
+        if: matrix.keycloak == true || matrix.mfa == true
         run: |
           mkdir -p keycloak-certs
           openssl req -x509 -newkey rsa:2048 \
@@ -397,7 +452,7 @@ jobs:
           chmod -R 777 keycloak-certs
 
       - name: Start Postgres
-        if: matrix.keycloak == true
+        if: matrix.keycloak == true || matrix.mfa == true
         run: |
           docker run -d --name postgres --network host \
             -e POSTGRES_DB=keycloak \
@@ -407,12 +462,19 @@ jobs:
           timeout 30 bash -c 'until docker exec postgres pg_isready -U keycloak; do sleep 1; done'
 
       - name: Start Keycloak
-        if: matrix.keycloak == true
+        if: matrix.keycloak == true || matrix.mfa == true
         run: |
-          # Patch realm: ocis-ci-realm.dist.json uses ocis-server:9200 as hostname.
-          # GitHub Actions runs on the host network so patch it to 127.0.0.1.
-          sed 's|https://ocis-server:9200|https://127.0.0.1:9200|g' \
-            tests/config/ci/ocis-ci-realm.dist.json > /tmp/ocis-realm.json
+          # The mfa suite needs a different realm with TOTP MFA configured.
+          # ocis-ci-realm uses ocis-server:9200, ocis-mfa-ci-realm uses localhost:9200;
+          # ocis runs on 127.0.0.1:9200 so we rewrite both forms.
+          if [[ "${{ matrix.mfa }}" == "true" ]]; then
+            REALM_FILE=tests/config/ci/ocis-mfa-ci-realm.dist.json
+          else
+            REALM_FILE=tests/config/ci/ocis-ci-realm.dist.json
+          fi
+          sed -e 's|https://ocis-server:9200|https://127.0.0.1:9200|g' \
+              -e 's|https://localhost:9200|https://127.0.0.1:9200|g' \
+            "$REALM_FILE" > /tmp/ocis-realm.json
           docker run -d --name keycloak --network host \
             -e OCIS_DOMAIN=https://127.0.0.1:9200 \
             -e KC_HOSTNAME=localhost \
@@ -441,6 +503,9 @@ jobs:
         env:
           TIKA_NEEDED: ${{ matrix.tika == true && 'true' || 'false' }}
           KEYCLOAK_NEEDED: ${{ matrix.keycloak == true && 'true' || 'false' }}
+          MFA_NEEDED: ${{ matrix.mfa == true && 'true' || 'false' }}
+          OIDC_NEEDED: ${{ matrix.oidc == true && 'true' || 'false' }}
+          OIDC_IFRAME_NEEDED: ${{ matrix.oidc_iframe == true && 'true' || 'false' }}
 
   litmus:
     name: litmus
@@ -495,12 +560,17 @@ jobs:
         run: python3 tests/acceptance/run-wopi.py --type cs3
 
   all-acceptance-tests:
-    needs: [local-api-tests, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests]
+    needs: [detect-changes, local-api-tests, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests]
     runs-on: ubuntu-latest
     if: always()
     steps:
       - name: Check all jobs passed
         run: |
+          # If docs-only, all test jobs are expected to be skipped — that's a pass
+          if [[ "${{ needs.detect-changes.outputs.docs-only }}" == "true" ]]; then
+            echo "Docs-only change — skipping tests is expected."
+            exit 0
+          fi
           if [[ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
             exit 1
           fi

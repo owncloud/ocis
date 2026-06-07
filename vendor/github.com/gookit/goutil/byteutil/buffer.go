@@ -16,9 +16,7 @@ type Buffer struct {
 }
 
 // NewBuffer instance
-func NewBuffer() *Buffer {
-	return &Buffer{}
-}
+func NewBuffer() *Buffer { return &Buffer{} }
 
 // PrintByte to buffer, ignore error. alias of WriteByte()
 func (b *Buffer) PrintByte(c byte) {
@@ -26,14 +24,10 @@ func (b *Buffer) PrintByte(c byte) {
 }
 
 // WriteStr1 quiet write one string to buffer
-func (b *Buffer) WriteStr1(s string) {
-	b.writeStringNl(s, false)
-}
+func (b *Buffer) WriteStr1(s string) { b.writeStringNl(s, false) }
 
 // WriteStr1Nl quiet write one string and end with newline
-func (b *Buffer) WriteStr1Nl(s string) {
-	b.writeStringNl(s, true)
-}
+func (b *Buffer) WriteStr1Nl(s string) { b.writeStringNl(s, true) }
 
 // writeStringNl quiet write one string and end with newline
 func (b *Buffer) writeStringNl(s string, nl bool) {
@@ -93,6 +87,9 @@ func (b *Buffer) writeAnysWithNl(vs []any, nl bool) {
 	}
 }
 
+// Writef write message to buffer, ignore error. alias of Printf()
+func (b *Buffer) Writef(tpl string, vs ...any) { _, _ = fmt.Fprintf(b, tpl, vs...) }
+
 // Printf quick write message to buffer, ignore error.
 func (b *Buffer) Printf(tpl string, vs ...any) { _, _ = fmt.Fprintf(b, tpl, vs...) }
 
@@ -112,16 +109,10 @@ func (b *Buffer) ResetAndGet() string {
 }
 
 // Close buffer
-func (b *Buffer) Close() error {
-	return b.CloseErr
-}
+func (b *Buffer) Close() error { return b.CloseErr }
 
 // Flush buffer
-func (b *Buffer) Flush() error {
-	return b.FlushErr
-}
+func (b *Buffer) Flush() error { return b.FlushErr }
 
 // Sync anf flush buffer
-func (b *Buffer) Sync() error {
-	return b.SyncErr
-}
+func (b *Buffer) Sync() error { return b.SyncErr }

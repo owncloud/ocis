@@ -57,7 +57,7 @@ services:
     # run ocis init to initialize a configuration file with random secrets
     # it will fail on subsequent runs, because the config file already exists
     # therefore we ignore the error and then start the ocis server
-    command: [ "-c", "ocis init || true; exec ocis server" ]
+    command: ["-c", "ocis init || true; exec ocis server"]
     environment:
       # Keycloak IDP specific configuration
       PROXY_ROLE_ASSIGNMENT_DRIVER: "oidc"
@@ -252,7 +252,7 @@ services:
     networks:
       ocis-net:
     volumes:
-      - keycloak_postgres_data:/var/lib/postgresql/data
+      - keycloak_postgres_data:/var/lib/postgresql
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
@@ -265,7 +265,12 @@ services:
     image: quay.io/keycloak/keycloak:26.2.5
     networks:
       ocis-net:
-    command: ["start", "--spi-connections-http-client-default-disable-trust-manager=${INSECURE:-false}", "--import-realm"]
+    command:
+      [
+        "start",
+        "--spi-connections-http-client-default-disable-trust-manager=${INSECURE:-false}",
+        "--import-realm",
+      ]
     entrypoint: ["/bin/sh", "/opt/keycloak/bin/docker-entrypoint-override.sh"]
     volumes:
       - "./config/keycloak/docker-entrypoint-override.sh:/opt/keycloak/bin/docker-entrypoint-override.sh"

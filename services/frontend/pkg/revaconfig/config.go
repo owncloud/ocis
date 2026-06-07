@@ -347,8 +347,9 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 							},
 							"auth": map[string]interface{}{
 								"mfa": map[string]interface{}{
-									"enabled":    cfg.MultiFactorAuthentication.Enabled,
-									"levelnames": cfg.MultiFactorAuthentication.AuthLevelNames,
+									"enabled":          cfg.MultiFactorAuthentication.Enabled,
+									"levelnames":       cfg.MultiFactorAuthentication.AuthLevelNames,
+									"session_duration": cfg.MultiFactorAuthentication.SessionDuration,
 								},
 							},
 							"vault": map[string]interface{}{

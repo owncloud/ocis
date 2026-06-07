@@ -2,6 +2,8 @@
 //
 // It's internal because we don't want to expose _anything_ about these errors
 // so users absolutely cannot do anything other than use them as opaque errors.
+//
+//nolint:revive
 package errors
 
 import (
@@ -171,11 +173,8 @@ type MissingRequiredClaimError struct {
 }
 
 func (err *MissingRequiredClaimError) Is(target error) bool {
-	err1, ok := target.(*MissingRequiredClaimError)
-	if !ok {
-		return false
-	}
-	return err1 == ErrMissingRequiredClaimDefault || err1.claim == err.claim
+	_, ok := target.(*MissingRequiredClaimError)
+	return ok
 }
 
 func MissingRequiredClaimErrorf(name string) error {

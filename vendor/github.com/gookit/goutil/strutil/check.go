@@ -3,6 +3,7 @@ package strutil
 import (
 	"path"
 	"regexp"
+	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -17,17 +18,42 @@ var IsHttpURL = checkfn.IsHttpURL
 // IsNumChar returns true if the given character is a numeric, otherwise false.
 func IsNumChar(c byte) bool { return c >= '0' && c <= '9' }
 
-var intReg = regexp.MustCompile(`^\d+$`)
-var floatReg = regexp.MustCompile(`^[-+]?\d*\.?\d+$`)
+var (
+	uintReg = regexp.MustCompile(`^\d+$`)
+	intReg  = regexp.MustCompile(`^[-+]?\d+$`)
+
+	floatReg = regexp.MustCompile(`^[-+]?\d*\.?\d+$`)
+)
 
 // IsInt check the string is an integer number
-func IsInt(s string) bool { return intReg.MatchString(s) }
+func IsInt(s string) bool {
+	if s == "" {
+		return false
+	}
+	return intReg.MatchString(s)
+}
+
+// IsUint check the string is an unsigned integer number
+func IsUint(s string) bool {
+	if s == "" {
+		return false
+	}
+	return uintReg.MatchString(s)
+}
 
 // IsFloat check the string is a float number
-func IsFloat(s string) bool { return floatReg.MatchString(s) }
+func IsFloat(s string) bool {
+	if s == "" {
+		return false
+	}
+	return floatReg.MatchString(s)
+}
 
 // IsNumeric returns true if the given string is a numeric(int/float), otherwise false.
 func IsNumeric(s string) bool { return checkfn.IsNumeric(s) }
+
+// IsPositiveNum check the string is a positive number
+func IsPositiveNum(s string) bool { return checkfn.IsPositiveNum(s) }
 
 // IsAlphabet char
 func IsAlphabet(char uint8) bool {
@@ -46,6 +72,38 @@ func IsAlphabet(char uint8) bool {
 // IsAlphaNum reports whether the byte is an ASCII letter, number, or underscore
 func IsAlphaNum(c uint8) bool {
 	return c == '_' || '0' <= c && c <= '9' || 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z'
+}
+
+// IsUpper returns true if the given string is an uppercase, otherwise false.
+func IsUpper(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] >= 'A' && s[i] <= 'Z' {
+			continue
+		}
+		return false
+	}
+	return true
+}
+
+// IsLower returns true if the given string is a lowercase, otherwise false.
+func IsLower(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] >= 'a' && s[i] <= 'z' {
+			continue
+		}
+		return false
+	}
+	return true
+}
+
+// IsAllASCII 判断字符串是否全为可打印 ASCII（无中文等多字节字符）
+func IsAllASCII(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] > 0x7E || s[i] < 0x20 {
+			return false
+		}
+	}
+	return true
 }
 
 // StrPos alias of the strings.Index
@@ -67,6 +125,16 @@ func IContains(s, sub string) bool {
 
 // ContainsByte in given string.
 func ContainsByte(s string, c byte) bool { return strings.IndexByte(s, c) >= 0 }
+
+// ContainsByteOne in given string.
+func ContainsByteOne(s string, bs []byte) bool {
+	for _, b := range bs {
+		if strings.IndexByte(s, b) >= 0 {
+			return true
+		}
+	}
+	return false
+}
 
 // InArray alias of HasOneSub()
 var InArray = HasOneSub
@@ -95,10 +163,10 @@ func IContainsOne(s string, subs []string) bool {
 	return false
 }
 
-// ContainsAll substr(s) in the given string. alias of HasAllSubs()
+// ContainsAll given string should contain all substrings. alias of HasAllSubs()
 func ContainsAll(s string, subs []string) bool { return HasAllSubs(s, subs) }
 
-// HasAllSubs all substr in the given string.
+// HasAllSubs given string should contain all substrings
 func HasAllSubs(s string, subs []string) bool {
 	for _, sub := range subs {
 		if !strings.Contains(s, sub) {
@@ -227,8 +295,12 @@ var (
 	verRegex = regexp.MustCompile(`^[0-9][\d.]+(-\w+)?$`)
 	// regex for check variable name
 	varRegex = regexp.MustCompile(`^[a-zA-Z][\w-]*$`)
+	// regex for check env var name
+	envRegex = regexp.MustCompile(`^[A-Z][A-Z0-9_]*$`)
 	// IsVariableName alias for IsVarName
 	IsVariableName = IsVarName
+	// regex for check uuid string. format: 8-4-4-4-12
+	uuidPattern = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`)
 )
 
 // IsVersion number. eg: 1.2.0
@@ -237,25 +309,93 @@ func IsVersion(s string) bool { return verRegex.MatchString(s) }
 // IsVarName is valid variable name.
 func IsVarName(s string) bool { return varRegex.MatchString(s) }
 
-// Compare for two strings.
-func Compare(s1, s2, op string) bool { return VersionCompare(s1, s2, op) }
+// IsEnvName is valid ENV var name. eg: APP_NAME
+func IsEnvName(s string) bool { return envRegex.MatchString(s) }
 
-// VersionCompare for two version strings.
-func VersionCompare(v1, v2, op string) bool {
+// IsUUID check if the string is a valid UUID format.
+func IsUUID(s string) bool { return uuidPattern.MatchString(s) }
+
+// Compare for two strings.
+func Compare(s1, s2, op string) bool {
 	switch op {
 	case ">", "gt":
-		return v1 > v2
+		return s1 > s2
 	case "<", "lt":
-		return v1 < v2
+		return s1 < s2
 	case ">=", "gte":
-		return v1 >= v2
+		return s1 >= s2
 	case "<=", "lte":
-		return v1 <= v2
+		return s1 <= s2
 	case "!=", "ne", "neq":
-		return v1 != v2
+		return s1 != s2
 	default: // eq
-		return v1 == v2
+		return s1 == s2
 	}
+}
+
+// VersionCompare for two version strings. eg: 1.2.0 > 1.1.0
+func VersionCompare(v1, v2, op string) bool {
+	parts1 := parseVersion(v1)
+	parts2 := parseVersion(v2)
+
+	result := compareVersions(parts1, parts2)
+	switch op {
+	case ">", "gt":
+		return result > 0
+	case "<", "lt":
+		return result < 0
+	case "=", "==", "eq":
+		return result == 0
+	case "!=", "ne", "neq":
+		return result != 0
+	case ">=", "gte":
+		return result >= 0
+	case "<=", "lte":
+		return result <= 0
+	default:
+		return false
+	}
+}
+
+// parseVersion 将版本号字符串解析为整数数组
+func parseVersion(version string) []int {
+	parts := strings.Split(version, ".")
+	result := make([]int, len(parts))
+
+	for i, part := range parts {
+		num, _ := strconv.Atoi(part)
+		result[i] = num
+	}
+	return result
+}
+
+// compareVersions 比较两个版本号数组
+// 返回: -1 表示 v1 < v2, 0 表示 v1 = v2, 1 表示 v1 > v2
+func compareVersions(v1, v2 []int) int {
+	maxLen := len(v1)
+	if len(v2) > maxLen {
+		maxLen = len(v2)
+	}
+
+	for i := 0; i < maxLen; i++ {
+		num1 := 0
+		if i < len(v1) {
+			num1 = v1[i]
+		}
+
+		num2 := 0
+		if i < len(v2) {
+			num2 = v2[i]
+		}
+
+		if num1 > num2 {
+			return 1
+		} else if num1 < num2 {
+			return -1
+		}
+	}
+
+	return 0
 }
 
 // SimpleMatch all substring in the give text string.

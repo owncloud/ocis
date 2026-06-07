@@ -41,12 +41,14 @@ type (
 
 	// VarVisitorParams contains settings for a VarVisitor.
 	VarVisitorParams struct {
-		SkipRefHead     bool
-		SkipRefCallHead bool
-		SkipObjectKeys  bool
-		SkipClosures    bool
-		SkipWithTarget  bool
-		SkipSets        bool
+		SkipRefHead         bool
+		SkipRefCallHead     bool
+		SkipObjectKeys      bool
+		SkipClosures        bool
+		SkipWithTarget      bool
+		SkipSets            bool
+		SkipTemplateStrings bool
+		customVisit         func(vis *VarVisitor, v any) bool
 	}
 
 	// Visitor defines the interface for iterating AST elements. The Visit function
@@ -160,7 +162,7 @@ func walk(v Visitor, x any) {
 		}
 	case *Expr:
 		switch ts := x.Terms.(type) {
-		case *Term, *SomeDecl, *Every:
+		case *Term, *SomeDecl, *Every, *Not:
 			Walk(w, ts)
 		case []*Term:
 			for i := range ts {
@@ -235,7 +237,7 @@ func WalkVars(x any, f func(Var) bool) {
 func WalkClosures(x any, f func(any) bool) {
 	vis := NewGenericVisitor(func(x any) bool {
 		switch x := x.(type) {
-		case *ArrayComprehension, *ObjectComprehension, *SetComprehension, *Every:
+		case *ArrayComprehension, *ObjectComprehension, *SetComprehension, *Every, *Not:
 			return f(x)
 		}
 		return false
@@ -395,7 +397,7 @@ func (tv *typeVisitor[T]) walk(x any, visit func(x T) bool) {
 		}
 	case *Expr:
 		switch ts := x.Terms.(type) {
-		case *Term, *SomeDecl, *Every:
+		case *Term, *SomeDecl, *Every, *Not:
 			tv.walk(ts, visit)
 		case []*Term:
 			for i := range ts {
@@ -462,6 +464,8 @@ func (tv *typeVisitor[T]) walk(x any, visit func(x T) bool) {
 		for i := range x.Parts {
 			tv.walk(x.Parts[i], visit)
 		}
+	case *Not:
+		tv.walk(x.Body, visit)
 	}
 }
 
@@ -532,7 +536,7 @@ func (vis *GenericVisitor) Walk(x any) {
 		}
 	case *Expr:
 		switch ts := x.Terms.(type) {
-		case *Term, *SomeDecl, *Every:
+		case *Term, *SomeDecl, *Every, *Not:
 			vis.Walk(ts)
 		case []*Term:
 			for i := range ts {
@@ -599,6 +603,8 @@ func (vis *GenericVisitor) Walk(x any) {
 		for i := range x.Parts {
 			vis.Walk(x.Parts[i])
 		}
+	case *Not:
+		vis.Walk(x.Body)
 	}
 }
 
@@ -667,7 +673,7 @@ func (vis *BeforeAfterVisitor) Walk(x any) {
 		}
 	case *Expr:
 		switch ts := x.Terms.(type) {
-		case *Term, *SomeDecl, *Every:
+		case *Term, *SomeDecl, *Every, *Not:
 			vis.Walk(ts)
 		case []*Term:
 			for i := range ts {
@@ -806,7 +812,7 @@ func (vis *VarVisitor) visit(v any) bool {
 	}
 	if vis.params.SkipClosures {
 		switch v := v.(type) {
-		case *ArrayComprehension, *ObjectComprehension, *SetComprehension, *TemplateString:
+		case *ArrayComprehension, *ObjectComprehension, *SetComprehension, *TemplateString, *Not:
 			return true
 		case *Expr:
 			if ev, ok := v.Terms.(*Every); ok {
@@ -870,8 +876,14 @@ func (vis *VarVisitor) visit(v any) bool {
 			return true
 		}
 	}
+	if vis.params.SkipTemplateStrings {
+		if _, ok := v.(*TemplateString); ok {
+			return true
+		}
+	}
 	if v, ok := v.(Var); ok {
 		vis.Add(v)
+		return true
 	}
 	return false
 }
@@ -879,6 +891,12 @@ func (vis *VarVisitor) visit(v any) bool {
 // Walk iterates the AST by calling the function f on the [VarVisitor] before recursing.
 // Contrary to the deprecated [Walk] function, this does not require allocating the visitor from heap.
 func (vis *VarVisitor) Walk(x any) {
+	if vis.params.customVisit != nil {
+		if vis.params.customVisit(vis, x) {
+			return
+		}
+	}
+
 	if vis.visit(x) {
 		return
 	}
@@ -920,7 +938,7 @@ func (vis *VarVisitor) Walk(x any) {
 		vis.WalkArgs(x)
 	case *Expr:
 		switch ts := x.Terms.(type) {
-		case *Term, *SomeDecl, *Every:
+		case *Term, *SomeDecl, *Every, *Not:
 			vis.Walk(ts)
 		case []*Term:
 			for i := range ts {
@@ -935,6 +953,9 @@ func (vis *VarVisitor) Walk(x any) {
 		vis.Walk(x.Value.Value)
 	case *Term:
 		vis.Walk(x.Value)
+		if vVar, ok := x.Value.(Var); ok {
+			vis.vars.AddLocation(vVar, x.Location)
+		}
 	case Ref:
 		for i := range x {
 			vis.Walk(x[i].Value)
@@ -982,6 +1003,8 @@ func (vis *VarVisitor) Walk(x any) {
 		for i := range x.Parts {
 			vis.Walk(x.Parts[i])
 		}
+	case *Not:
+		vis.Walk(x.Body)
 	}
 }
 
@@ -1001,6 +1024,9 @@ func (vis *VarVisitor) WalkRef(ref Ref) {
 	}
 	for _, term := range ref {
 		vis.Walk(term.Value)
+		if vVar, ok := term.Value.(Var); ok {
+			vis.vars.AddLocation(vVar, term.Location)
+		}
 	}
 }
 

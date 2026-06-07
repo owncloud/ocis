@@ -45,3 +45,29 @@ Feature: Public can download folders from project space public link
     And the downloaded zip archive should contain these files:
       | name            | content      |
       | folder/test.txt | some content |
+
+  @env-config
+  Scenario Outline: download an archive of a password protected public link share (project space)
+    And using SharingNG
+    And user "Alice" has created a folder "project-folder" in space "new-space"
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content1" to "project-folder/test1.txt"
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content2" to "project-folder/test2.txt"
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content3" to "project-folder/test3.txt"
+    And user "Alice" has created the following resource link share:
+      | resource         | project-folder    |
+      | space            | new-space         |
+      | permissionsRole  | <permissionsRole> |
+      | password         | %public%          |
+    When the public downloads the archive of the last created public link with password "%public%"
+    Then the HTTP status code should be "200"
+    And the downloaded "zip" archive should contain these files:
+      | name      | content       |
+      | test1.txt | some content1 |
+      | test2.txt | some content2 |
+      | test3.txt | some content3 |
+
+    Examples:
+      | permissionsRole |
+      | Edit            |
+      | View            |
+      | Upload          |

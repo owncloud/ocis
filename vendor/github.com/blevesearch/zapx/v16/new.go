@@ -42,11 +42,16 @@ var ValidateDocFields = func(field index.Field) error {
 // New creates an in-memory zap-encoded SegmentBase from a set of Documents
 func (z *ZapPlugin) New(results []index.Document) (
 	segment.Segment, uint64, error) {
-	return z.newWithChunkMode(results, DefaultChunkMode)
+	return z.newWithChunkMode(results, DefaultChunkMode, nil)
+}
+
+func (z *ZapPlugin) NewUsing(results []index.Document, config map[string]interface{}) (
+	segment.Segment, uint64, error) {
+	return z.newWithChunkMode(results, DefaultChunkMode, config)
 }
 
 func (*ZapPlugin) newWithChunkMode(results []index.Document,
-	chunkMode uint32) (segment.Segment, uint64, error) {
+	chunkMode uint32, config map[string]interface{}) (segment.Segment, uint64, error) {
 	s := interimPool.Get().(*interim)
 
 	var br bytes.Buffer
@@ -72,7 +77,7 @@ func (*ZapPlugin) newWithChunkMode(results []index.Document,
 	}
 
 	sb, err := InitSegmentBase(br.Bytes(), s.w.Sum32(), chunkMode,
-		uint64(len(results)), storedIndexOffset, sectionsIndexOffset)
+		uint64(len(results)), storedIndexOffset, sectionsIndexOffset, config)
 
 	// get the bytes written before the interim's reset() call
 	// write it to the newly formed segment base.

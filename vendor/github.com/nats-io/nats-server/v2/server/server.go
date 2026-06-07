@@ -31,7 +31,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"reflect"
 	"regexp"
 	"runtime"
 	"runtime/pprof"
@@ -234,7 +233,8 @@ type Server struct {
 		resolver    netResolver
 		dialTimeout time.Duration
 	}
-	leafRemoteCfgs     []*leafNodeCfg
+	leafRemoteCfgs     map[*leafNodeCfg]struct{}
+	rmLeafRemoteCfgs   map[string]*leafNodeCfg
 	leafRemoteAccounts sync.Map
 	leafNodeEnabled    bool
 	leafDisableConnect bool // Used in test only
@@ -367,7 +367,8 @@ type Server struct {
 	syncOutSem chan struct{}
 
 	// Queue to process JS API requests that come from routes (or gateways)
-	jsAPIRoutedReqs *ipQueue[*jsAPIRoutedReq]
+	jsAPIRoutedReqs     *ipQueue[*jsAPIRoutedReq]
+	jsAPIRoutedInfoReqs *ipQueue[*jsAPIRoutedReq]
 
 	// Delayed API responses.
 	delayedAPIResponses *ipQueue[*delayedAPIResponse]
@@ -401,9 +402,13 @@ type nodeInfo struct {
 
 type stats struct {
 	inMsgs           int64
-	outMsgs          int64
 	inBytes          int64
+	inClientMsgs     int64
+	inClientBytes    int64
+	outMsgs          int64
 	outBytes         int64
+	outClientMsgs    int64
+	outClientBytes   int64
 	slowConsumers    int64
 	staleConnections int64
 	stalls           int64
@@ -643,32 +648,6 @@ func selectS2AutoModeBasedOnRTT(rtt time.Duration, rttThresholds []time.Duration
 		return CompressionS2Better
 	}
 	return CompressionS2Best
-}
-
-func compressOptsEqual(c1, c2 *CompressionOpts) bool {
-	if c1 == c2 {
-		return true
-	}
-	if (c1 == nil && c2 != nil) || (c1 != nil && c2 == nil) {
-		return false
-	}
-	if c1.Mode != c2.Mode {
-		return false
-	}
-	// For s2_auto, if one has an empty RTTThresholds, it is equivalent
-	// to the defaultCompressionS2AutoRTTThresholds array, so compare with that.
-	if c1.Mode == CompressionS2Auto {
-		if len(c1.RTTThresholds) == 0 && !reflect.DeepEqual(c2.RTTThresholds, defaultCompressionS2AutoRTTThresholds) {
-			return false
-		}
-		if len(c2.RTTThresholds) == 0 && !reflect.DeepEqual(c1.RTTThresholds, defaultCompressionS2AutoRTTThresholds) {
-			return false
-		}
-		if !reflect.DeepEqual(c1.RTTThresholds, c2.RTTThresholds) {
-			return false
-		}
-	}
-	return true
 }
 
 // Returns an array of s2 WriterOption based on the route compression mode.
@@ -1956,12 +1935,7 @@ func (s *Server) registerAccount(acc *Account) *Account {
 // Helper to set the sublist based on preferences.
 func (s *Server) setAccountSublist(acc *Account) {
 	if acc != nil && acc.sl == nil {
-		opts := s.getOpts()
-		if opts != nil && opts.NoSublistCache {
-			acc.sl = NewSublistNoCache()
-		} else {
-			acc.sl = NewSublistWithCache()
-		}
+		acc.sl = NewSublistForServer(s)
 	}
 }
 
@@ -2293,6 +2267,7 @@ func (s *Server) Start() {
 		s.Noticef("  Node:     %s", getHash(s.info.Name))
 	}
 	s.Noticef("  ID:       %s", s.info.ID)
+	s.printFeatureFlags(opts)
 
 	defer s.Noticef("Server is ready")
 
@@ -2584,6 +2559,10 @@ func (s *Server) Shutdown() {
 	if s == nil {
 		return
 	}
+	// Prevent issues with multiple calls.
+	if !s.shutdown.CompareAndSwap(false, true) {
+		return
+	}
 	// This is for JetStream R1 Pull Consumers to allow signaling
 	// that pending pull requests are invalid.
 	s.signalPullConsumers()
@@ -2597,11 +2576,6 @@ func (s *Server) Shutdown() {
 	// eventing items associated with accounts.
 	s.shutdownEventing()
 
-	// Prevent issues with multiple calls.
-	if s.isShuttingDown() {
-		return
-	}
-
 	s.mu.Lock()
 	s.Noticef("Initiating Shutdown...")
 
@@ -2609,7 +2583,6 @@ func (s *Server) Shutdown() {
 
 	opts := s.getOpts()
 
-	s.shutdown.Store(true)
 	s.running.Store(false)
 	s.grMu.Lock()
 	s.grRunning = false
@@ -3440,8 +3413,12 @@ func (s *Server) createClientEx(conn net.Conn, inProcess bool) *client {
 		}
 	}
 
-	// Check for proxy protocol if enabled.
-	if !isClosed && !tlsRequired && opts.ProxyProtocol {
+	// Check for proxy protocol if enabled. The PROXY header is sent as
+	// plaintext before any TLS handshake per the spec, so we must read it
+	// before doing TLS even when TLS is required. Any bytes read past the
+	// header are kept in `pre` and replayed into the TLS handshake (or the
+	// non-TLS protocol parser) by the tlsMixConn wrapper used below.
+	if !isClosed && opts.ProxyProtocol {
 		if len(pre) == 0 {
 			// There has been no pre-read yet, do so so we can work out
 			// if the client is trying to negotiate PROXY.
@@ -3586,7 +3563,7 @@ func (s *Server) saveClosedClient(c *client, nc net.Conn, subs map[string]*subsc
 	if c.acc != nil && c.acc.Name != globalAccountName {
 		cc.acc = c.acc.Name
 	}
-	cc.JWT = c.opts.JWT
+	cc.JWT = redactBearerJWT(c.opts.JWT)
 	cc.IssuerKey = issuerForClient(c)
 	cc.Tags = c.tags
 	cc.NameTag = c.nameTag
@@ -3669,7 +3646,11 @@ func tlsTimeout(c *client, conn *tls.Conn) {
 	}
 	cs := conn.ConnectionState()
 	if !cs.HandshakeComplete {
-		c.Errorf("TLS handshake timeout")
+		if c.kind == CLIENT || c.kind == LEAF {
+			c.Debugf("TLS handshake timeout")
+		} else {
+			c.Errorf("TLS handshake timeout")
+		}
 		c.sendErr("Secure Connection - TLS Required")
 		c.closeConnection(TLSHandshakeError)
 	}

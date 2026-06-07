@@ -420,8 +420,13 @@ Vault mode provides a dedicated, separately stored vault storage that can be MFA
 *   Search is scoped separately for default and vault files, including their shares and spaces.
 *   Public links are disallowed for vault resources. The capabilities endpoint accepts a `vault=true` query parameter to advertise vault-specific capabilities.
 
-#### The `vault mode` configuration and environment variables
-Set `OCIS_ENABLE_VAULT_MODE: true`, `OCIS_MFA_ENABLED: true`  to true to enable the vault mode in a OCIS. Only applicapable if the storage-users-vault service, a special configured storage-users service is configured.
+#### The `vault mode` Configuration and Environment Variables
+
+Set\
+`OCIS_MFA_ENABLED: true`\
+`OCIS_ENABLE_VAULT_MODE: true` and\
+to enable the vault mode in a OCIS.\
+Only applicapable if the storage-users-vault service, a special configured storage-users service is configured.
 
 The storage-users-vault configuration:
 ```
@@ -475,6 +480,20 @@ users-vault
 │                               ├── -fa5c-430b-a163-2c19f54190d0.mlock
 │                               └── -fa5c-430b-a163-2c19f54190d0.mpk
 └── uploads
+```
+
+### Checking Vault Mode in the Frontend
+
+To check whether vault mode is enabled in the frontend, use the `@ownclouders/web-pkg` package:
+
+```typescript
+import { useAbility } from '@ownclouders/web-pkg'
+import { useCapabilityStore } from '@ownclouders/web-pkg'
+
+const capabilityStore = useCapabilityStore()
+const { can } = useAbility()
+
+const isVaultModeEnabled = capabilityStore.vaultEnabled && can('read-all', 'Vault')
 ```
 
 ### Running with Docker

@@ -31,13 +31,29 @@ func IsSpaceRune(r rune) bool {
 	return r <= 256 && IsSpace(byte(r)) || unicode.IsSpace(r)
 }
 
-// Utf8Len count of the string
+// Utf8Len count rune of the string.
+//
+// Examples:
+//
+//	str := "hi,你好"
+//
+//	len(str) // 9
+//	strutil.RunesWidth(str) // 7 一个中文字占两个字符
+//	RuneCount(str) = Utf8Len(s) // 5 按字算
 func Utf8Len(s string) int { return utf8.RuneCountInString(s) }
 
-// Utf8len of the string
+// Utf8len count rune of the string.
 func Utf8len(s string) int { return utf8.RuneCountInString(s) }
 
-// RuneCount of the string
+// RuneCount of the string.
+//
+// Examples:
+//
+//	str := "hi,你好"
+//
+//	len(str) // 9
+//	strutil.RunesWidth(str) // 7 一个中文字占两个字符
+//	RuneCount(str) = utf8.RuneCountInString(s) // 5 按字算
 func RuneCount(s string) int { return len([]rune(s)) }
 
 // RuneWidth of the rune.
@@ -75,8 +91,8 @@ func Utf8Width(s string) int { return RunesWidth([]rune(s)) }
 //	str := "hi,你好"
 //
 //	len(str) // 9
-//	strutil.Utf8Width(str) // 7
-//	len([]rune(str)) = utf8.RuneCountInString(s) // 5
+//	strutil.RunesWidth(str) // 7 一个中文字占两个字符
+//	len([]rune(str)) = utf8.RuneCountInString(s) // 5 按字算
 func RunesWidth(rs []rune) (w int) {
 	if len(rs) == 0 {
 		return
@@ -95,8 +111,11 @@ func Truncate(s string, w int, tail string) string { return Utf8Truncate(s, w, t
 func TextTruncate(s string, w int, tail string) string { return Utf8Truncate(s, w, tail) }
 
 // Utf8Truncate a string with given width.
-func Utf8Truncate(s string, w int, tail string) string {
-	if sw := Utf8Width(s); sw <= w {
+func Utf8Truncate(s string, w int, tail string) string { return utf8Truncate(s, Utf8Width(s), w, tail) }
+
+// utf8Truncate a string with given width.
+func utf8Truncate(s string, sw, w int, tail string) string {
+	if sw <= w {
 		return s
 	}
 
@@ -161,10 +180,14 @@ func Utf8Split(s string, w int) []string {
 	return ss
 }
 
-// TextWrap a string by "\n"
+// TextWrap a string by "\n". alias of the WidthWrap()
 func TextWrap(s string, w int) string { return WidthWrap(s, w) }
 
 // WidthWrap a string by "\n"
+//
+// Example:
+//	s := "hello 你好, world 世界"
+//  s1 := strutil.TextWrap(s, 6) // "hello \n你好, \nworld \n世界"
 func WidthWrap(s string, w int) string {
 	tmpW := 0
 	out := ""

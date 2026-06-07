@@ -108,23 +108,57 @@ func Contains(data, elem any) (valid, found bool) {
 	return true, false
 }
 
-// StringsContains check string slice contains string
-func StringsContains(ss []string, s string) bool {
+// StringsContains check string slice contains sub-string
+func StringsContains(ss []string, sub string) bool {
 	for _, v := range ss {
-		if v == s {
+		if v == sub {
 			return true
 		}
 	}
 	return false
 }
 
-// check is number: int or float
-var numReg = regexp.MustCompile(`^[-+]?\d*\.?\d+$`)
+var (
+	// check is number: int or float
+	numReg = regexp.MustCompile(`^[-+]?\d*\.?\d+$`)
+	// is positive number: int or float
+	pNumReg = regexp.MustCompile(`^\d*\.?\d+$`)
+)
 
 // IsNumeric returns true if the given string is a numeric, otherwise false.
-func IsNumeric(s string) bool { return numReg.MatchString(s) }
+func IsNumeric(s string) bool {
+	if s == "" {
+		return false
+	}
+	return numReg.MatchString(s)
+}
+
+// IsPositiveNum check input string is positive number
+func IsPositiveNum(s string) bool {
+	if s == "" {
+		return false
+	}
+	if s[0] == '-' {
+		return false
+	}
+	return pNumReg.MatchString(s)
+}
 
 // IsHttpURL check input is http/https url
 func IsHttpURL(s string) bool {
 	return strings.HasPrefix(s, "http://") || strings.HasPrefix(s, "https://")
+}
+
+// IndexByteAfter find index of byte after startIndex. return -1 if not found
+//
+// eg:
+//
+//	IndexByteAfter("abcabc", 'b', 0) = 1
+//	IndexByteAfter("abcabc", 'b', 2) = 4
+func IndexByteAfter(s string, b byte, startIndex int) int {
+	idx := strings.IndexByte(s[startIndex:], b)
+	if idx < 0 {
+		return -1
+	}
+	return idx + startIndex
 }

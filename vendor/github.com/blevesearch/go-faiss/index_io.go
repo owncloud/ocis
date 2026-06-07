@@ -118,3 +118,43 @@ func ReadIndex(filename string, ioflags int) (*IndexImpl, error) {
 	}
 	return &IndexImpl{&idx}, nil
 }
+
+func WriteBinaryIndexIntoBuffer(idx BinaryIndex) ([]byte, error) {
+	// the values to be returned by the faiss APIs
+	tempBuf := (*C.uchar)(nil)
+	bufSize := C.size_t(0)
+
+	if c := C.faiss_write_index_binary_buf(
+		idx.bPtr(),
+		&bufSize,
+		&tempBuf,
+	); c != 0 {
+		C.faiss_free_buf(&tempBuf)
+		return nil, getLastError()
+	}
+
+	val := unsafe.Slice((*byte)(unsafe.Pointer(tempBuf)), uint(bufSize))
+
+	rv := make([]byte, uint(bufSize))
+	copy(rv, val)
+
+	C.faiss_free_buf(&tempBuf)
+	val = nil
+
+	return rv, nil
+}
+
+func ReadBinaryIndexFromBuffer(buf []byte, ioflags int) (*BinaryIndexImpl, error) {
+	ptr := (*C.uchar)(unsafe.Pointer(&buf[0]))
+	size := C.size_t(len(buf))
+
+	var bIdx faissBinaryIndex
+	if c := C.faiss_read_index_binary_buf(ptr,
+		size,
+		C.int(ioflags),
+		&bIdx.bIdx); c != 0 {
+		return nil, getLastError()
+	}
+
+	return &BinaryIndexImpl{&bIdx}, nil
+}

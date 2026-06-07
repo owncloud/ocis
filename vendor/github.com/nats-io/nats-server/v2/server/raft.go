@@ -86,9 +86,11 @@ type RaftNode interface {
 	WaitForStop()
 	Delete()
 	IsDeleted() bool
+	Reset()
 	RecreateInternalSubs() error
 	IsSystemAccount() bool
 	GetTrafficAccountName() string
+	GetWriteErr() error
 }
 
 // RaftNodeCheckpoint is used as an alternative to a direct InstallSnapshot.
@@ -248,6 +250,9 @@ type raft struct {
 	scaleUp      bool // The node is part of a scale up, puts us in observer mode until the log contains data.
 	deleted      bool // If the node was deleted.
 	snapshotting bool // Snapshot is in progress.
+	quorumPaused bool // Pause replication and quorum participation to prevent log growth during slow applies.
+
+	overrunCount uint64 // Counter of how many times we were overrun, either as follower or as leader.
 }
 
 type proposedEntry struct {
@@ -340,6 +345,7 @@ var (
 	errNoInternalClient  = errors.New("raft: no internal client")
 	errMembershipChange  = errors.New("raft: membership change in progress")
 	errRemoveLastNode    = errors.New("raft: cannot remove the last peer")
+	errPeerNotFound      = errors.New("raft: peer not found")
 )
 
 // This will bootstrap a raftNode by writing its config into the store directory.
@@ -487,9 +493,12 @@ func (s *Server) initRaftNode(accName string, cfg *RaftConfig, labels pprofLabel
 	n.papplied = 0
 	if _, ok := n.wal.(*memStore); ok {
 		_ = os.RemoveAll(filepath.Join(n.sd, snapshotsDir))
-	} else {
-		// See if we have any snapshots and if so load and process on startup.
-		n.setupLastSnapshot()
+	} else if err := n.setupLastSnapshot(); err != nil && err != errNoSnapAvailable {
+		// If we failed to recover from the snapshot, then we should surface
+		// the error upwards, otherwise we can complete recovery but have only
+		// a partial view of the world.
+		n.shutdown()
+		return nil, err
 	}
 
 	// We may have restored the peer state from the
@@ -503,6 +512,7 @@ func (s *Server) initRaftNode(accName string, cfg *RaftConfig, labels pprofLabel
 
 	// Make sure that the snapshots directory exists.
 	if err := os.MkdirAll(filepath.Join(n.sd, snapshotsDir), defaultDirPerms); err != nil {
+		n.shutdown()
 		return nil, fmt.Errorf("could not create snapshots directory - %v", err)
 	}
 
@@ -521,12 +531,6 @@ func (s *Server) initRaftNode(accName string, cfg *RaftConfig, labels pprofLabel
 
 	if state.Msgs > 0 {
 		n.debug("Replaying state of %d entries", state.Msgs)
-		if first, err := n.loadFirstEntry(); err == nil {
-			n.pterm, n.pindex = first.pterm, first.pindex
-			if first.commit > 0 && first.commit > n.commit {
-				n.commit = first.commit
-			}
-		}
 
 		// This process will queue up entries on our applied queue but prior to the upper
 		// state machine running. So we will monitor how much we have queued and if we
@@ -537,6 +541,25 @@ func (s *Server) initRaftNode(accName string, cfg *RaftConfig, labels pprofLabel
 		// yet. Replay them.
 		for index, qsz := state.FirstSeq, 0; index <= state.LastSeq; index++ {
 			ae, err := n.loadEntry(index)
+			// The first entry in our WAL initializes state but must align with our snapshot if we had one.
+			// Importantly, check this first, as we might need to truncate the WAL further than the index.
+			if index == state.FirstSeq {
+				// If the entry is missing, corrupt, or doesn't align with the snapshot, truncate the WAL.
+				if err != nil || ae == nil || ae.pindex != index-1 || n.pindex != ae.pindex {
+					if err != nil {
+						n.warn("Could not load %d from WAL [%+v]: %v", index, state, err)
+					} else {
+						n.warn("Misaligned WAL, will truncate")
+					}
+					// Truncate to the snapshot or beginning if there is none.
+					truncateAndErr(n.pindex)
+					break
+				}
+				n.pterm, n.pindex = ae.pterm, ae.pindex
+				if ae.commit > 0 && ae.commit > n.commit {
+					n.commit = ae.commit
+				}
+			}
 			if err != nil {
 				n.warn("Could not load %d from WAL [%+v]: %v", index, state, err)
 				// Truncate to the previous correct entry.
@@ -902,6 +925,16 @@ func (n *raft) Propose(data []byte) error {
 	if werr := n.werr; werr != nil {
 		return werr
 	}
+
+	if n.isLeaderOverrun() {
+		var state StreamState
+		n.wal.FastState(&state)
+		n.warn("Leader falling behind, stepping down: pindex %d, commit %d, applied %d, WAL size %s", n.pindex, n.commit, n.applied, friendlyBytes(state.Bytes))
+		// Stepdown without leader transfer, likely all replicas will be overrun, and we need time to recover.
+		n.stepdownLocked(noLeader)
+		n.overrunCount++
+		return errNotLeader
+	}
 	n.prop.push(newProposedEntry(newEntry(EntryNormal, data), _EMPTY_))
 	return nil
 }
@@ -921,10 +954,37 @@ func (n *raft) ProposeMulti(entries []*Entry) error {
 	if werr := n.werr; werr != nil {
 		return werr
 	}
+
+	if n.isLeaderOverrun() {
+		var state StreamState
+		n.wal.FastState(&state)
+		n.warn("Leader falling behind, stepping down: pindex %d, commit %d, applied %d, WAL size %s", n.pindex, n.commit, n.applied, friendlyBytes(state.Bytes))
+		// Stepdown without leader transfer, likely all replicas will be overrun, and we need time to recover.
+		n.stepdownLocked(noLeader)
+		n.overrunCount++
+		return errNotLeader
+	}
 	for _, e := range entries {
 		n.prop.push(newProposedEntry(e, _EMPTY_))
 	}
 	return nil
+}
+
+// isLeaderOverrun returns whether we are overrun and should step down due to continuously increasing
+// uncommitted or unapplied entries. If triggered, this means we're being severely overrun by
+// incoming proposals or the system is degraded such that it's too slow (or unable) to process them.
+// Stepping down means the system gets to "breathe" for a bit, until a new leader can be elected.
+// Lock should be held.
+func (n *raft) isLeaderOverrun() bool {
+	applied := max(n.applied, n.papplied)
+	commit := max(n.commit, n.papplied)
+	// We only do this past a high threshold to protect ourselves.
+	// Worst-case we'll have 2x the threshold, once in uncommitted and once in unapplied entries.
+	// Either the number of uncommitted entries is over the threshold: we're not getting quorum from our followers.
+	uncommittedThreshold := n.pindex > commit && n.pindex-commit > pauseQuorumThreshold
+	// Or, the number of in-memory committed but not yet applied entries is over the threshold: we're slow to apply.
+	unappliedThreshold := commit > applied && commit-applied > pauseQuorumThreshold
+	return uncommittedThreshold || unappliedThreshold
 }
 
 // ForwardProposal will forward the proposal to the leader if known.
@@ -988,7 +1048,10 @@ func (n *raft) ProposeRemovePeer(peer string) error {
 		n.RUnlock()
 		return errMembershipChange
 	}
-
+	if _, ok := n.peers[peer]; !ok {
+		n.RUnlock()
+		return errPeerNotFound
+	}
 	if len(n.peers) <= 1 {
 		n.RUnlock()
 		return errRemoveLastNode
@@ -1075,8 +1138,8 @@ func (n *raft) PauseApply() error {
 }
 
 func (n *raft) pauseApplyLocked() {
-	// If we are currently a candidate make sure we step down.
-	if n.State() == Candidate {
+	// If we are currently not a follower, make sure we step down.
+	if n.State() != Follower {
 		n.stepdownLocked(noLeader)
 	}
 
@@ -1325,6 +1388,11 @@ func (n *raft) installSnapshot(snap *snapshot) error {
 		return err
 	}
 
+	// If installing a snapshot past our commits, clear the cache.
+	if snap.lastIndex > n.commit && len(n.pae) > 0 {
+		n.pae = make(map[uint64]*appendEntry)
+	}
+
 	var state StreamState
 	n.wal.FastState(&state)
 	n.papplied = snap.lastIndex
@@ -1485,12 +1553,20 @@ func (c *checkpoint) InstallSnapshot(data []byte) (uint64, error) {
 	n.Unlock()
 	err := writeFileWithSync(c.snapFile, encoded, defaultFilePerms)
 	n.Lock()
+	// On either failure path, drop the file we just wrote so it doesn't get
+	// picked up by setupLastSnapshot on restart. Skip the remove if it's the
+	// snapshot already adopted into n.snapfile for this term/applied.
 	if err != nil {
+		if c.snapFile != n.snapfile {
+			os.Remove(c.snapFile)
+		}
 		// We could set write err here, but if this is a temporary situation, too many open files etc.
 		// we want to retry and snapshots are not fatal.
 		return 0, err
 	} else if !n.snapshotting {
-		// The checkpoint can be aborted at any time, don't continue if that happened.
+		if c.snapFile != n.snapfile {
+			os.Remove(c.snapFile)
+		}
 		return 0, errSnapAborted
 	}
 
@@ -1552,17 +1628,23 @@ func termAndIndexFromSnapFile(sn string) (term, index uint64, err error) {
 	if n, err := fmt.Sscanf(fn, snapFileT, &term, &index); err != nil || n != 2 {
 		return 0, 0, errBadSnapName
 	}
+	if fn != fmt.Sprintf(snapFileT, term, index) {
+		return 0, 0, errBadSnapName
+	}
 	return term, index, nil
 }
 
 // setupLastSnapshot is called at startup to try and recover the last snapshot from
 // the disk if possible. We will try to recover the term, index and commit/applied
 // indices and then notify the upper layer what we found. Compacts the WAL if needed.
-func (n *raft) setupLastSnapshot() {
+func (n *raft) setupLastSnapshot() error {
 	snapDir := filepath.Join(n.sd, snapshotsDir)
 	psnaps, err := os.ReadDir(snapDir)
 	if err != nil {
-		return
+		if os.IsNotExist(err) {
+			return errNoSnapAvailable
+		}
+		return err
 	}
 
 	var lterm, lindex uint64
@@ -1586,18 +1668,8 @@ func (n *raft) setupLastSnapshot() {
 			os.Remove(sfile)
 		}
 	}
-
-	// Now cleanup any old entries
-	for _, sf := range psnaps {
-		sfile := filepath.Join(snapDir, sf.Name())
-		if sfile != latest {
-			n.debug("Removing old snapshot: %q", sfile)
-			os.Remove(sfile)
-		}
-	}
-
 	if latest == _EMPTY_ {
-		return
+		return nil
 	}
 
 	// Set latest snapshot we have.
@@ -1607,13 +1679,7 @@ func (n *raft) setupLastSnapshot() {
 	n.snapfile = latest
 	snap, err := n.loadLastSnapshot()
 	if err != nil {
-		// We failed to recover the last snapshot for some reason, so we will
-		// assume it has been corrupted and will try to delete it.
-		if n.snapfile != _EMPTY_ {
-			os.Remove(n.snapfile)
-			n.snapfile = _EMPTY_
-		}
-		return
+		return err
 	}
 
 	// We successfully recovered the last snapshot from the disk.
@@ -1627,8 +1693,8 @@ func (n *raft) setupLastSnapshot() {
 	n.papplied = snap.lastIndex
 	// Restore the peerState
 	ps, err := decodePeerState(snap.peerstate)
-	if err == nil {
-		n.processPeerState(ps)
+	if err != nil {
+		return err
 	}
 	n.processPeerState(ps)
 	n.extSt = ps.domainExt
@@ -1636,7 +1702,19 @@ func (n *raft) setupLastSnapshot() {
 	n.apply.push(newCommittedEntry(n.commit, []*Entry{{EntrySnapshot, snap.data}}))
 	if _, err := n.wal.Compact(snap.lastIndex + 1); err != nil {
 		n.setWriteErrLocked(err)
+		return err
 	}
+
+	// Now cleanup any old entries. We only do this once we know that the
+	// latest snapshot was OK.
+	for _, sf := range psnaps {
+		if sfile := filepath.Join(snapDir, sf.Name()); sfile != latest {
+			n.debug("Removing old snapshot: %q", sfile)
+			os.Remove(sfile)
+		}
+	}
+
+	return nil
 }
 
 // loadLastSnapshot will load and return our last snapshot.
@@ -1652,14 +1730,10 @@ func (n *raft) loadLastSnapshot() (*snapshot, error) {
 
 	if err != nil {
 		n.warn("Error reading snapshot: %v", err)
-		os.Remove(n.snapfile)
-		n.snapfile = _EMPTY_
 		return nil, err
 	}
 	if len(buf) < minSnapshotLen {
 		n.warn("Snapshot corrupt, too short")
-		os.Remove(n.snapfile)
-		n.snapfile = _EMPTY_
 		return nil, errSnapshotCorrupt
 	}
 
@@ -1671,8 +1745,6 @@ func (n *raft) loadLastSnapshot() (*snapshot, error) {
 	var hb [highwayhash.Size64]byte
 	if !bytes.Equal(lchk[:], n.hh.Sum(hb[:0])) {
 		n.warn("Snapshot corrupt, checksums did not match")
-		os.Remove(n.snapfile)
-		n.snapfile = _EMPTY_
 		return nil, errSnapshotCorrupt
 	}
 
@@ -1686,12 +1758,12 @@ func (n *raft) loadLastSnapshot() (*snapshot, error) {
 	}
 
 	// We had a bug in 2.9.12 that would allow snapshots on last index of 0.
-	// Detect that here and return err.
+	// Detect that and continue anyway, nothing else we can do about it.
 	if snap.lastIndex == 0 {
 		n.warn("Snapshot with last index 0 is invalid, cleaning up")
 		os.Remove(n.snapfile)
 		n.snapfile = _EMPTY_
-		return nil, errSnapshotCorrupt
+		return nil, errNoSnapAvailable
 	}
 
 	return snap, nil
@@ -2167,6 +2239,64 @@ func (n *raft) shutdown() {
 		n.leaderSince.Store(nil)
 		close(n.quit)
 	}
+}
+
+// Reset discards this node's local raft state (log, snapshots, peer set,
+// term/vote) so it can be caught up cleanly by another group with the same
+// name. The caller is responsible for parking the node first (typically via
+// SetObserver) if it should not compete for leadership immediately after;
+// Reset itself steps the node down but does not flip observer mode.
+func (n *raft) Reset() {
+	n.Lock()
+	defer n.Unlock()
+
+	n.debug("Resetting Raft state")
+
+	n.stepdownLocked(_EMPTY_)
+
+	// Cancel any in-flight catchup so it does not race the reset.
+	n.cancelCatchup()
+
+	// Drop proposals and inbound entries; they are no longer meaningful
+	// against whatever log this node ends up following.
+	n.prop.drain()
+	n.entry.drain()
+	n.resp.drain()
+	n.apply.drain()
+	n.reqs.drain()
+	n.votes.drain()
+
+	// Remove every snapshot under our snapshots dir, not just the one referenced
+	// by n.snapfile. Orphans (e.g. from a crash between install and the previous
+	// file's removal) would otherwise be picked up by setupLastSnapshot on the
+	// next restart and reseed the state we are discarding here.
+	snapDir := filepath.Join(n.sd, snapshotsDir)
+	if err := os.RemoveAll(snapDir); err != nil {
+		n.warn("Error removing snapshots directory during reset: %v", err)
+	}
+	if err := os.MkdirAll(snapDir, defaultDirPerms); err != nil {
+		n.warn("Error recreating snapshots directory during reset: %v", err)
+	}
+	n.snapfile = _EMPTY_
+
+	// Abort any inflight async snapshot checkpoint.
+	n.snapshotting = false
+
+	// Reset the WAL, but reset these first to not trip the assertion.
+	n.commit, n.hcommit, n.applied, n.processed, n.papplied = 0, 0, 0, 0, 0
+	n.resetWAL()
+
+	// Reset peer set to just ourselves; a new leader will fold us back into
+	// the cluster's membership view via processPeerState.
+	n.peers = map[string]*lps{n.id: {time.Time{}, 0, true}}
+	n.removed = nil
+	n.adjustClusterSizeAndQuorum()
+
+	n.term, n.vote = 0, _EMPTY_
+	n.writeTermVote()
+
+	// Persist the cleared peer state so a restart picks up the reset.
+	n.writePeerState(n.currentPeerStateLocked())
 }
 
 const (
@@ -2733,9 +2863,9 @@ func decodeAppendEntry(msg []byte, sub *subscription, reply string) (*appendEntr
 	ae.reply, ae.sub = reply, sub
 
 	// Decode Entries.
-	ne, ri := int(le.Uint16(msg[40:])), uint64(42)
+	ne, ri := int(le.Uint16(msg[40:])), uint64(appendEntryBaseLen)
 	for i, max := 0, uint64(len(msg)); i < ne; i++ {
-		if ri >= max-1 {
+		if max-ri < 4 {
 			return nil, errBadAppendEntry
 		}
 		ml := uint64(le.Uint32(msg[ri:]))
@@ -2853,6 +2983,16 @@ func (n *raft) handleForwardedRemovePeerProposal(sub *subscription, c *client, _
 		n.RUnlock()
 		return
 	}
+	if _, ok := n.peers[string(msg)]; !ok {
+		n.debug("Ignoring forwarded peer removal proposal, peer not found")
+		n.RUnlock()
+		return
+	}
+	if len(n.peers) <= 1 {
+		n.debug("Ignoring forwarded peer removal proposal, remove last node")
+		n.RUnlock()
+		return
+	}
 	prop := n.prop
 	n.RUnlock()
 
@@ -2867,20 +3007,44 @@ func (n *raft) handleForwardedProposal(sub *subscription, c *client, _ *Account,
 	msg = copyBytes(msg)
 
 	n.RLock()
+	prop := n.prop
 	// Check state under lock, we might not be leader anymore.
 	if n.State() != Leader || !n.leaderState.Load() {
 		n.debug("Ignoring forwarded proposal, not leader")
 		n.RUnlock()
 		return
 	}
-	prop, werr := n.prop, n.werr
-	n.RUnlock()
 
 	// Ignore if we have had a write error previous.
-	if werr != nil {
+	if n.werr != nil {
+		n.RUnlock()
 		return
 	}
 
+	if n.isLeaderOverrun() {
+		n.RUnlock()
+		n.Lock()
+		defer n.Unlock()
+		// Now that we've reacquired as write lock, we need to make sure that everything we
+		// believed before is still true. Otherwise we've either stepped down already from
+		// another goroutine or we've stopped being overrun and shouldn't drop the entry.
+		if n.State() != Leader || !n.leaderState.Load() {
+			return
+		} else if !n.isLeaderOverrun() {
+			prop.push(newProposedEntry(newEntry(EntryNormal, msg), reply))
+			return
+		}
+		var state StreamState
+		n.wal.FastState(&state)
+		n.warn("Leader falling behind, stepping down: pindex %d, commit %d, applied %d, WAL size %s", n.pindex, n.commit, n.applied, friendlyBytes(state.Bytes))
+		// Stepdown without leader transfer, likely all replicas will be overrun, and we need time to recover.
+		n.stepdownLocked(noLeader)
+		n.overrunCount++
+		return
+	}
+	// Possible that we could fall through to here from multiple connections but if
+	// one does end up stepping down then the proposal queue gets drained anyway.
+	n.RUnlock()
 	prop.push(newProposedEntry(newEntry(EntryNormal, msg), reply))
 }
 
@@ -3252,8 +3416,6 @@ func (n *raft) sendSnapshotToFollower(subject string) (uint64, error) {
 	if err != nil {
 		// We need to stepdown here when this happens.
 		n.stepdownLocked(noLeader)
-		// We need to reset our state here as well.
-		n.resetWAL()
 		return 0, err
 	}
 	// Go ahead and send the snapshot and peerstate here as first append entry to the catchup follower.
@@ -3828,6 +3990,19 @@ func (n *raft) truncateWAL(term, index uint64) {
 	// Set after we know we have truncated properly.
 	n.pterm, n.pindex = term, index
 
+	// Invalidate cached entries the WAL no longer has.
+	if index == 0 {
+		if len(n.pae) > 0 {
+			n.pae = make(map[uint64]*appendEntry)
+		}
+	} else {
+		for k := range n.pae {
+			if k > index {
+				delete(n.pae, k)
+			}
+		}
+	}
+
 	// Check if we're truncating an uncommitted membership change.
 	if n.membChangeIndex > 0 && n.membChangeIndex > index {
 		n.membChangeIndex = 0
@@ -4041,6 +4216,42 @@ func (n *raft) processAppendEntry(ae *appendEntry, sub *subscription) {
 		}
 	}
 
+	// If commits are outpacing our applies, temporarily stop accepting new entries to avoid falling further behind.
+	// This encourages the leader to sync us via a snapshot instead. We use max(applied, papplied) to avoid
+	// incorrectly triggering this pause immediately after receiving a snapshot.
+	applied := max(n.applied, n.papplied)
+	commit := max(n.commit, n.papplied)
+	if sub != nil && (commit > applied || n.quorumPaused) {
+		diff := commit - applied
+		if n.quorumPaused {
+			if diff > paeWarnThreshold {
+				if catchingUp {
+					n.cancelCatchup()
+				}
+				n.Unlock()
+				return
+			}
+			// Once we're sufficiently below the threshold, we continue again. We'll likely receive a snapshot
+			// from the leader.
+			n.quorumPaused = false
+			var state StreamState
+			n.wal.FastState(&state)
+			n.warn("Quorum resumed: commit %d, applied %d, WAL size %s", commit, applied, friendlyBytes(state.Bytes))
+		} else if diff > pauseQuorumThreshold {
+			// It takes a while until we reach the pause threshold, but once we do we enter a "cooldown period".
+			n.quorumPaused = true
+			n.overrunCount++
+			var state StreamState
+			n.wal.FastState(&state)
+			n.warn("Quorum paused, falling behind: commit %d != applied %d, WAL size %s", commit, applied, friendlyBytes(state.Bytes))
+			if catchingUp {
+				n.cancelCatchup()
+			}
+			n.Unlock()
+			return
+		}
+	}
+
 	if ae.pterm != n.pterm || ae.pindex != n.pindex {
 		// Check if this is a lower or equal index than what we were expecting.
 		if ae.pindex <= n.pindex {
@@ -4086,9 +4297,26 @@ func (n *raft) processAppendEntry(ae *appendEntry, sub *subscription) {
 				}
 			} else {
 				// If terms mismatched, delete that entry and all others past it.
-				// Make sure to cancel any catchups in progress.
-				// Truncate will reset our pterm and pindex. Only do so if we have an entry.
-				n.truncateWAL(eae.pterm, eae.pindex)
+				// But only if we haven't already committed past this point.
+				if eae.pindex < n.commit {
+					success = true
+					assert.Unreachable("Truncate to earlier entry would lose commits", map[string]any{
+						"n.accName":  n.accName,
+						"n.group":    n.group,
+						"n.id":       n.id,
+						"n.term":     n.term,
+						"n.pindex":   n.pindex,
+						"n.commit":   n.commit,
+						"n.applied":  n.applied,
+						"ae.pindex":  ae.pindex,
+						"ae.pterm":   ae.pterm,
+						"ae.commit":  ae.commit,
+						"eae.pterm":  eae.pterm,
+						"eae.pindex": eae.pindex,
+					})
+				} else {
+					n.truncateWAL(eae.pterm, eae.pindex)
+				}
 			}
 			// Cancel regardless if unsuccessful.
 			if !success {
@@ -4129,13 +4357,10 @@ func (n *raft) processAppendEntry(ae *appendEntry, sub *subscription) {
 
 			// Inherit state from appendEntry with the leader's snapshot.
 			hadPreviousSnapshot := n.snapfile != _EMPTY_
-			n.pindex = ae.pindex
-			n.pterm = ae.pterm
-			n.commit = ae.pindex
 
 			snap := &snapshot{
-				lastTerm:  n.pterm,
-				lastIndex: n.pindex,
+				lastTerm:  ae.pterm,
+				lastIndex: ae.pindex,
 				peerstate: encodePeerState(&peerState{n.peerNames(), n.csz, n.extSt}),
 				data:      ae.entries[0].Data,
 			}
@@ -4145,6 +4370,9 @@ func (n *raft) processAppendEntry(ae *appendEntry, sub *subscription) {
 				n.Unlock()
 				return
 			}
+			n.pindex = ae.pindex
+			n.pterm = ae.pterm
+			n.commit = ae.pindex
 			n.resetInitializing()
 
 			if !hadPreviousSnapshot {
@@ -4420,9 +4648,10 @@ func (n *raft) storeToWAL(ae *appendEntry) error {
 }
 
 const (
-	paeDropThreshold = 20_000
-	paeWarnThreshold = 10_000
-	paeWarnModulo    = 5_000
+	pauseQuorumThreshold = 100_000
+	paeDropThreshold     = 20_000
+	paeWarnThreshold     = 10_000
+	paeWarnModulo        = 5_000
 )
 
 func (n *raft) sendAppendEntry(entries []*Entry) {
@@ -4699,11 +4928,18 @@ func (n *raft) setWriteErrLocked(err error) {
 	}
 	// If this is a not found report but do not disable.
 	if os.IsNotExist(err) {
-		n.error("Resource not found: %v", err)
+		n.warn("Resource not found: %v", err)
 		return
 	}
 	n.error("Critical write error: %v", err)
 	n.werr = err
+	n.shutdown()
+	assert.Unreachable("Raft encountered write error", map[string]any{
+		"n.accName": n.accName,
+		"n.group":   n.group,
+		"n.id":      n.id,
+		"err":       err,
+	})
 
 	if isPermissionError(err) {
 		go n.s.handleWritePermissionError()
@@ -4718,6 +4954,13 @@ func (n *raft) setWriteErrLocked(err error) {
 // Helper to check if we are closed when we do not hold a lock already.
 func (n *raft) isClosed() bool {
 	return n.State() == Closed
+}
+
+// GetWriteErr returns the write error (if any).
+func (n *raft) GetWriteErr() error {
+	n.RLock()
+	defer n.RUnlock()
+	return n.werr
 }
 
 // Capture our write error if any and hold.
@@ -5033,6 +5276,8 @@ func (n *raft) switchToCandidate() {
 	// Increment the term.
 	n.term++
 	n.vote = noVote
+	// Reset quorum paused. If it was previously set, we checked above that we've applied all committed entries.
+	n.quorumPaused = false
 	// Clear current Leader.
 	n.updateLeader(noLeader)
 	n.switchState(Candidate)
