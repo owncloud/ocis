@@ -75,6 +75,7 @@ jobs:
       - name: Install libvips-dev for ENABLE_VIPS build
         run: |
           sudo apt-get update -qq
+          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
           sudo NEEDRESTART_MODE=a apt-get install -y libvips-dev
 
       - name: Pre-checks and generate
@@ -153,6 +154,7 @@ jobs:
             ocis/bin/ocis
             tests/ociswrapper/bin/ociswrapper
           retention-days: 1
+          if-no-files-found: error
 
   local-api-tests:
     name: ${{ matrix.suite }}
