@@ -1,0 +1,228 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# Martin <github@diemattels.at>, 2026
+# Domainmasteri, 2026
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: EMAIL\n"
+"POT-Creation-Date: 2026-06-08 03:23+0000\n"
+"PO-Revision-Date: 2026-01-02 10:10+0000\n"
+"Last-Translator: Domainmasteri, 2026\n"
+"Language-Team: Finnish (Finland) (https://app.transifex.com/owncloud-org/teams/6149/fi_FI/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fi_FI\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. EditorLite
+#. UnifiedRole EditorLite, Role DisplayName (resolves directly)
+#. FileEditor
+#. UnifiedRole FileEditor, Role DisplayName (resolves directly)
+#. Editor without Versions without Trashbin
+#. UnifiedRole SpaceEditorWithoutVersionsWithoutTrashbin, Role DisplayName
+#. (resolves directly)
+#: pkg/unifiedrole/roles.go:140 pkg/unifiedrole/roles.go:174
+#: pkg/unifiedrole/roles.go:224
+msgid "Can edit"
+msgstr "Voi muokata"
+
+#. FileEditor + ListGrants
+#. UnifiedRole FileEditorListGrants, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:182
+msgid "Can edit and show invitees"
+msgstr "Voi muokata ja nähdä kutsutut"
+
+#. Editor
+#. UnifiedRole Editor, Role DisplayName (resolves directly)
+#. Editor without Versions
+#. UnifiedRole SpaceEditorWithoutVersions, Role DisplayName (resolves
+#. directly)
+#: pkg/unifiedrole/roles.go:148 pkg/unifiedrole/roles.go:208
+msgid "Can edit with trashbin"
+msgstr "Voi muokata ja käyttää roskakoria"
+
+#. Editor + ListGrants
+#. UnifiedRole EditorListGrants, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:156
+msgid "Can edit with trashbin and show invitees"
+msgstr "Voi muokata, käyttää roskakoria ja nähdä kutsutut"
+
+#. Editor + ListGrants + Version
+#. UnifiedRole EditorListGrantsWithVersions, Role DisplayName (resolves
+#. directly)
+#: pkg/unifiedrole/roles.go:164
+msgid "Can edit with trashbin, versions and show invitees"
+msgstr ""
+"Voi muokata, käyttää roskakoria, tarkastella versioita ja nähdä kutsutut"
+
+#. Editor without Trashbin
+#. UnifiedRole SpaceEditorWithoutTrashbin, Role DisplayName (resolves
+#. directly)
+#: pkg/unifiedrole/roles.go:216
+msgid "Can edit with versions"
+msgstr "Voi muokata ja tarkastella versioita"
+
+#. FileEditor + ListGrants + Versions
+#. UnifiedRole FileEditorListGrantsWithVersions, Role DisplayName (resolves
+#. directly)
+#: pkg/unifiedrole/roles.go:190
+msgid "Can edit with versions and show invitees"
+msgstr "Voi muokata, tarkastella versioita ja nähdä kutsutut"
+
+#. Editor
+#. UnifiedRole SpaceEditor, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:232
+msgid "Can edit with versions and trash bin"
+msgstr "Voi muokata sekä käyttää versioita ja roskakoria"
+
+#. Manager
+#. UnifiedRole Manager, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:240
+msgid "Can manage"
+msgstr "Voi hallinnoida"
+
+#. Viewer
+#. UnifiedRole Viewer, Role DisplayName (resolves directly)
+#. Viewer
+#. UnifiedRole SpaceViewer, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:114 pkg/unifiedrole/roles.go:200
+msgid "Can view"
+msgstr "Voi tarkastella"
+
+#. SecureViewer
+#. UnifiedRole SecureViewer, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:106
+msgid "Can view (secure)"
+msgstr "Voi tarkastella (suojattu)"
+
+#. Viewer + ListGrants
+#. UnifiedRole ViewerListGrants, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:122
+msgid "Can view and show invitees"
+msgstr "Voi tarkastella ja nähdä kutsutut"
+
+#. Denial
+#. UnifiedRole FullDenial, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:132
+msgid "Cannot access"
+msgstr "Ei käyttöoikeutta"
+
+#. UnifiedRole FullDenial, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:134
+msgid "Deny all access."
+msgstr "Estä kaikki käyttö."
+
+#. default description for new spaces
+#: pkg/service/v0/spacetemplates.go:33
+msgid "Here you can add a description for this Space."
+msgstr "Tähän voit lisätä tämän tilan kuvauksen."
+
+#. UnifiedRole Viewer, Role Description (resolves directly)
+#. UnifiedRole SpaceViewer, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:116 pkg/unifiedrole/roles.go:202
+msgid "View and download."
+msgstr "Voi tarkastella ja ladata."
+
+#. UnifiedRole SecureViewer, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:108
+msgid "View only documents, images and PDFs. Watermarks will be applied."
+msgstr ""
+"Voi tarkastella vain asiakirjoja, kuvia ja PDF-tiedostoja. Niihin lisätään "
+"vesileimat."
+
+#. UnifiedRole ViewerListGrants, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:124
+msgid "View, download and show all invited people."
+msgstr "Voi tarkastella, ladata ja nähdä kaikki kutsutut henkilöt."
+
+#. UnifiedRole FileEditor, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:176
+msgid "View, download, upload and edit."
+msgstr "Voi tarkastella, ladata, lähettää ja muokata."
+
+#. UnifiedRole EditorLite, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:142
+msgid "View, download, upload, edit and add."
+msgstr "Voi tarkastella, ladata, lähettää, muokata ja lisätä."
+
+#. UnifiedRole FileEditorListGrants, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:184
+msgid "View, download, upload, edit and show all invited people."
+msgstr ""
+"Voi tarkastella, ladata, lähettää, muokata ja nähdä kaikki kutsutut "
+"henkilöt."
+
+#. UnifiedRole Editor, Role Description (resolves directly)
+#. UnifiedRole SpaceEditorWithoutVersionsWithoutTrashbin, Role Description
+#. (resolves directly)
+#: pkg/unifiedrole/roles.go:150 pkg/unifiedrole/roles.go:226
+msgid "View, download, upload, edit, add and delete."
+msgstr "Voi tarkastella, ladata, lähettää, muokata, lisätä ja poistaa."
+
+#. UnifiedRole SpaceEditorWithoutTrashbin, Role Description (resolves
+#. directly)
+#: pkg/unifiedrole/roles.go:218
+msgid "View, download, upload, edit, add and show all versions."
+msgstr ""
+"Voi tarkastella, ladata, lähettää, muokata, lisätä ja nähdä kaikki versiot."
+
+#. UnifiedRole SpaceEditorWithoutVersions, Role Description (resolves
+#. directly)
+#: pkg/unifiedrole/roles.go:210
+msgid "View, download, upload, edit, add, delete and restore from trash bin."
+msgstr ""
+"Voi tarkastella, ladata, lähettää, muokata, lisätä, poistaa ja palauttaa "
+"roskakorista."
+
+#. UnifiedRole EditorListGrants Editor, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:158
+msgid "View, download, upload, edit, add, delete and show all invited people."
+msgstr ""
+"Voi tarkastella, ladata, lähettää, muokata, lisätä, poistaa ja nähdä kaikki "
+"kutsutut henkilöt."
+
+#. UnifiedRole SpaceEditor, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:234
+msgid ""
+"View, download, upload, edit, add, delete, show all versions and restore "
+"from trash bin."
+msgstr ""
+"Voi tarkastella, ladata, lähettää, muokata, lisätä, poistaa, nähdä kaikki "
+"versiot ja palauttaa roskakorista."
+
+#. UnifiedRole Manager, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:242
+msgid ""
+"View, download, upload, edit, add, delete, show all versions, restore from "
+"trash bin, empty the trash bin and manage members."
+msgstr ""
+"Voi tarkastella, ladata, lähettää, muokata, lisätä, poistaa, nähdä kaikki "
+"versiot, palauttaa roskakorista, tyhjentää roskakorin ja hallinnoida "
+"jäseniä."
+
+#. UnifiedRole EditorListGrantsWithVersions, Role Description (resolves
+#. directly)
+#: pkg/unifiedrole/roles.go:166
+msgid ""
+"View, download, upload, edit, delete, show all versions and all invited "
+"people."
+msgstr ""
+"Voi tarkastella, ladata, lähettää, muokata, poistaa sekä nähdä kaikki "
+"versiot ja kutsutut henkilöt."
+
+#. UnifiedRole FileEditorListGrantsWithVersions, Role Description (resolves
+#. directly)
+#: pkg/unifiedrole/roles.go:192
+msgid ""
+"View, download, upload, edit, show all versions and all invited people."
+msgstr ""
+"Voi tarkastella, ladata, lähettää, muokata sekä nähdä kaikki versiot ja "
+"kutsutut henkilöt."
