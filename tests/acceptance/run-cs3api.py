@@ -84,7 +84,8 @@ def main() -> int:
     ocis_bin = repo_root / "ocis/bin/ocis"
     ocis_config_dir = Path.home() / ".ocis/config"
 
-    subprocess.run(["make", "-C", str(repo_root / "ocis"), "build"], check=True)
+    if not ocis_bin.exists():
+        subprocess.run(["make", "-C", str(repo_root / "ocis"), "build"], check=True)
 
     # Docker bridge gateway IP: reachable from both the host and Docker containers.
     # cs3api-validator connects to the GRPC gateway at {bridge_ip}:9142.

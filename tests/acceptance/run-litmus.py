@@ -163,8 +163,8 @@ def main() -> int:
     ocis_bin = repo_root / "ocis/bin/ocis"
     ocis_config_dir = Path.home() / ".ocis/config"
 
-    # build (matching drone: restores binary from cache, then runs ocis server directly)
-    subprocess.run(["make", "-C", str(repo_root / "ocis"), "build"], check=True)
+    if not ocis_bin.exists():
+        subprocess.run(["make", "-C", str(repo_root / "ocis"), "build"], check=True)
 
     # Docker bridge gateway IP: reachable from both the host (via docker0 interface)
     # and Docker containers (via bridge network default gateway). Use this as OCIS_URL

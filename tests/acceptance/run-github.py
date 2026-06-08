@@ -368,19 +368,20 @@ def main() -> int:
           f"antivirus={cfg['antivirusNeeded']} federation={cfg['federationServer']} "
           f"wopi={cfg['collaborationServiceNeeded']}")
 
-    # generate IDP web assets (required for IDP service to start; matches drone ci-node-generate)
-    run(["make", "-C", str(repo_root / "services/idp"), "ci-node-generate"])
-    # download web UI assets (required for robots.txt and other static assets; no pnpm needed)
-    run(["make", "-C", str(repo_root / "services/web"), "ci-node-generate"])
+    if not ocis_bin.exists():
+        # generate IDP/web assets and build (skipped when pre-built binary is provided)
+        run(["make", "-C", str(repo_root / "services/idp"), "ci-node-generate"])
+        run(["make", "-C", str(repo_root / "services/web"), "ci-node-generate"])
 
-    # build (ENABLE_VIPS=true when libvips-dev is installed, matching drone)
-    build_env = {}
-    if subprocess.run(["pkg-config", "--exists", "vips"],
-                      capture_output=True).returncode == 0:
-        build_env["ENABLE_VIPS"] = "true"
-    run(["make", "-C", str(repo_root / "ocis"), "build"], env=build_env)
-    run(["make", "-C", str(repo_root / "tests/ociswrapper"), "build"],
-        env={"GOWORK": "off"})
+        build_env = {}
+        if subprocess.run(["pkg-config", "--exists", "vips"],
+                          capture_output=True).returncode == 0:
+            build_env["ENABLE_VIPS"] = "true"
+        run(["make", "-C", str(repo_root / "ocis"), "build"], env=build_env)
+
+    if not wrapper_bin.exists():
+        run(["make", "-C", str(repo_root / "tests/ociswrapper"), "build"],
+            env={"GOWORK": "off"})
 
     # php deps
     run(["composer", "install", "--no-progress"],
