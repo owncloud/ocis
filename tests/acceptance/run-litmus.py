@@ -142,8 +142,7 @@ def setup_for_litmus(ocis_url: str) -> tuple:
     return space_id, public_token
 
 
-def run_litmus(name: str, endpoint: str) -> int:
-    print(f"\nTesting endpoint [{name}]: {endpoint}", flush=True)
+def run_litmus(name: str, endpoint: str) -> tuple:
     result = subprocess.run(
         ["docker", "run", "--rm",
          "-e", f"LITMUS_URL={endpoint}",
@@ -154,8 +153,9 @@ def run_litmus(name: str, endpoint: str) -> int:
          # No extra CMD — ENTRYPOINT is already litmus-wrapper; passing it again
          # would make the wrapper use the path as LITMUS_URL, overriding the env var.
          ],
+        capture_output=True, text=True,
     )
-    return result.returncode
+    return result.returncode, result.stdout + result.stderr
 
 
 def main() -> int:
@@ -222,11 +222,21 @@ def main() -> int:
             ("spaces-endpoint", f"{litmus_base}/remote.php/dav/spaces/{space_id}"),
         ]
 
-        failed = []
-        for name, endpoint in endpoints:
-            rc = run_litmus(name, endpoint)
-            if rc != 0:
-                failed.append(name)
+        import concurrent.futures
+
+        # all 5 endpoints are independent docker containers — run in parallel
+        print(f"Running {len(endpoints)} litmus endpoints in parallel", flush=True)
+        results = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(endpoints)) as pool:
+            fut_to_name = {pool.submit(run_litmus, n, e): n for n, e in endpoints}
+            for fut in concurrent.futures.as_completed(fut_to_name):
+                name = fut_to_name[fut]
+                rc, output = fut.result()
+                print(f"\n{'=' * 60}\n=== endpoint: {name} (exit {rc}) ===\n{'=' * 60}", flush=True)
+                print(output, flush=True)
+                results.append((name, rc))
+
+        failed = [name for name, rc in results if rc != 0]
 
         if failed:
             print(f"\nFailed endpoints: {', '.join(failed)}", file=sys.stderr)
