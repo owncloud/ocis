@@ -217,8 +217,7 @@ def prepare_test_file(bridge_ip: str) -> tuple:
 
 
 def run_validator(group: str, token: str, wopi_src: str, ttl: str,
-                  secure: bool = False) -> int:
-    print(f"\nRunning testgroup [{group}] secure={secure}", flush=True)
+                  secure: bool = False) -> tuple:
     cmd = [
         "docker", "run", "--rm",
         "--workdir", "/app",
@@ -228,7 +227,8 @@ def run_validator(group: str, token: str, wopi_src: str, ttl: str,
     if secure:
         cmd.append("-s")
     cmd += ["-t", token, "-w", wopi_src, "-l", ttl, "--testgroup", group]
-    return subprocess.run(cmd).returncode
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    return result.returncode, result.stdout + result.stderr
 
 
 def main() -> int:
@@ -346,18 +346,28 @@ def main() -> int:
         # --- prepare-test-file: upload file, get WOPI credentials ---
         access_token, ttl, wopi_src = prepare_test_file(bridge_ip)
 
-        # --- Run validator for each testgroup ---
-        failed = []
-        for group in SHARED_TESTGROUPS:
-            rc = run_validator(group, access_token, wopi_src, ttl, secure=False)
-            if rc != 0:
-                failed.append(group)
+        # --- Run all validator testgroups in parallel ---
+        import concurrent.futures
 
+        all_groups = [(g, False) for g in SHARED_TESTGROUPS]
         if wopi_type == "builtin":
-            for group in BUILTIN_ONLY_TESTGROUPS:
-                rc = run_validator(group, access_token, wopi_src, ttl, secure=True)
-                if rc != 0:
-                    failed.append(group)
+            all_groups += [(g, True) for g in BUILTIN_ONLY_TESTGROUPS]
+
+        print(f"Running {len(all_groups)} WOPI testgroups in parallel", flush=True)
+        results = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(all_groups)) as pool:
+            fut_to_group = {
+                pool.submit(run_validator, g, access_token, wopi_src, ttl, s): g
+                for g, s in all_groups
+            }
+            for fut in concurrent.futures.as_completed(fut_to_group):
+                group = fut_to_group[fut]
+                rc, output = fut.result()
+                print(f"\n{'=' * 60}\n=== testgroup: {group} (exit {rc}) ===\n{'=' * 60}", flush=True)
+                print(output, flush=True)
+                results.append((group, rc))
+
+        failed = [g for g, rc in results if rc != 0]
 
         if failed:
             print(f"\nFailed testgroups: {', '.join(failed)}", file=sys.stderr)

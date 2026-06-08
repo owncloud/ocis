@@ -707,12 +707,42 @@ def main() -> int:
         }
         behat_env.update(cfg["extraEnvironment"])
 
-        print(f"Running suites: {behat_suites_raw} (type: {acceptance_test_type})")
-        result = subprocess.run(
-            ["make", "-C", str(repo_root), "test-acceptance-api"],
-            env=behat_env,
-        )
-        return result.returncode
+        print(f"Running suites: {suites} (type: {acceptance_test_type})")
+
+        if len(suites) == 1:
+            # single suite: stream output directly
+            result = subprocess.run(
+                ["make", "-C", str(repo_root), "test-acceptance-api"],
+                env=behat_env,
+            )
+            return result.returncode
+
+        # multiple suites: run in parallel against the shared OCIS instance,
+        # one behat process per suite, output captured and printed serially on completion.
+        import concurrent.futures
+
+        def run_suite(suite: str) -> tuple:
+            env = {**behat_env, "BEHAT_SUITES": suite}
+            proc = subprocess.run(
+                ["make", "-C", str(repo_root), "test-acceptance-api"],
+                env=env, capture_output=True, text=True,
+            )
+            return suite, proc.returncode, proc.stdout + proc.stderr
+
+        results = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(suites)) as pool:
+            fut_to_suite = {pool.submit(run_suite, s): s for s in suites}
+            for fut in concurrent.futures.as_completed(fut_to_suite):
+                suite, rc, output = fut.result()
+                print(f"\n{'=' * 60}\n=== suite: {suite} (exit {rc}) ===\n{'=' * 60}", flush=True)
+                print(output, flush=True)
+                results.append((suite, rc))
+
+        failed = [s for s, rc in results if rc != 0]
+        if failed:
+            print(f"FAILED suites: {failed}")
+            return 1
+        return 0
 
     finally:
         cleanup()
