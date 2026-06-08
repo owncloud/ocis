@@ -681,6 +681,12 @@ var _ = Describe("Users", func() {
 			})
 
 			It("gets the user", func() {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
 				user := &libregraph.User{}
 				user.SetId("user1")
 
@@ -724,6 +730,12 @@ var _ = Describe("Users", func() {
 			})
 
 			It("includes the personal space if requested", func() {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
 				user := &libregraph.User{}
 				user.SetId("user1")
 
@@ -790,6 +802,12 @@ var _ = Describe("Users", func() {
 			})
 
 			It("includes the drives if requested", func() {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
 				user := &libregraph.User{}
 				user.SetId("user1")
 
@@ -849,6 +867,12 @@ var _ = Describe("Users", func() {
 			})
 
 			It("expands the appRoleAssignments", func() {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
 				user := &libregraph.User{}
 				user.SetId("user1")
 
@@ -908,6 +932,166 @@ var _ = Describe("Users", func() {
 				Expect(responseUser.GetAppRoleAssignments()[0].GetAppRoleId()).To(Equal("some-appRole-ID"))
 				Expect(responseUser.GetAppRoleAssignments()[0].GetPrincipalId()).To(Equal("user1"))
 				Expect(responseUser.GetAppRoleAssignments()[0].GetResourceId()).To(Equal("some-application-ID"))
+			})
+
+			It("denies non-admin requesting another user", func() {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users/other-user?$expand=drive,memberOf,appRoleAssignments", nil)
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("userID", "other-user")
+				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+				svc.GetUser(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusForbidden))
+				identityBackend.AssertNotCalled(GinkgoT(), "GetUser", mock.Anything, mock.Anything, mock.Anything)
+			})
+
+			It("allows non-admin requesting their own record", func() {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
+
+				self := &libregraph.User{}
+				self.SetId(currentUser.GetId().GetOpaqueId())
+				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(self, nil)
+				valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
+					Return(&settings.GetValueResponse{
+						Value: &settingsmsg.ValueWithIdentifier{
+							Value: &settingsmsg.Value{
+								Value: &settingsmsg.Value_ListValue{
+									ListValue: &settingsmsg.ListValue{
+										Values: []*settingsmsg.ListOptionValue{
+											{
+												Option: &settingsmsg.ListOptionValue_StringValue{
+													StringValue: "it",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users/"+currentUser.GetId().GetOpaqueId(), nil)
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("userID", currentUser.GetId().GetOpaqueId())
+				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+				svc.GetUser(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+			})
+
+			It("allows admin requesting another user", func() {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
+
+				other := &libregraph.User{}
+				other.SetId("other-user")
+				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(other, nil)
+				valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
+					Return(&settings.GetValueResponse{
+						Value: &settingsmsg.ValueWithIdentifier{
+							Value: &settingsmsg.Value{
+								Value: &settingsmsg.Value_ListValue{
+									ListValue: &settingsmsg.ListValue{
+										Values: []*settingsmsg.ListOptionValue{
+											{
+												Option: &settingsmsg.ListOptionValue_StringValue{
+													StringValue: "it",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users/other-user", nil)
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("userID", "other-user")
+				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+				svc.GetUser(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+			})
+		})
+
+		Describe("GetUserDrive", func() {
+			It("denies non-admin requesting another user's drive", func() {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users/other-user/drive", nil)
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("userID", "other-user")
+				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+				svc.GetUserDrive(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusForbidden))
+				gatewayClient.AssertNotCalled(GinkgoT(), "ListStorageSpaces", mock.Anything, mock.Anything, mock.Anything)
+			})
+
+			It("allows non-admin requesting their own drive", func() {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
+				gatewayClient.On("GetQuota", mock.Anything, mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
+					Status:     status.NewOK(ctx),
+					TotalBytes: 10,
+				}, nil)
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+					Status: status.NewOK(ctx),
+					StorageSpaces: []*provider.StorageSpace{
+						{
+							Id:        &provider.StorageSpaceId{OpaqueId: "personal"},
+							Owner:     &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: currentUser.GetId().GetOpaqueId()}},
+							Root:      &provider.ResourceId{SpaceId: "personal", OpaqueId: "personal"},
+							SpaceType: "personal",
+						},
+					},
+				}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users/"+currentUser.GetId().GetOpaqueId()+"/drive", nil)
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("userID", currentUser.GetId().GetOpaqueId())
+				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+				svc.GetUserDrive(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+			})
+
+			It("allows admin requesting another user's drive", func() {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
+				gatewayClient.On("GetQuota", mock.Anything, mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
+					Status:     status.NewOK(ctx),
+					TotalBytes: 10,
+				}, nil)
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+					Status: status.NewOK(ctx),
+					StorageSpaces: []*provider.StorageSpace{
+						{
+							Id:        &provider.StorageSpaceId{OpaqueId: "personal"},
+							Owner:     &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: "other-user"}},
+							Root:      &provider.ResourceId{SpaceId: "personal", OpaqueId: "personal"},
+							SpaceType: "personal",
+						},
+					},
+				}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users/other-user/drive", nil)
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("userID", "other-user")
+				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+				svc.GetUserDrive(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
 			})
 		})
 
