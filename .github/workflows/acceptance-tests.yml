@@ -145,30 +145,10 @@ jobs:
       fail-fast: false
       matrix:
         suite:
-          # contract & locks — 2 suites in parallel (contractAndLock group)
+          # simple: no external services (contractAndLock group) — validates basic parallelization
           - "apiContract,apiLocks"
-          # settings, notifications & cors — 3 suites in parallel (needs email)
-          - "apiSettings,apiNotification,apiCors"
-          # graph + search-no-tika — 4 suites in parallel (graphUser + groupAndSearch1 groups)
-          - "apiGraphUser,apiSearch1,apiGraph,apiGraphGroup"
-          # spaces — 2 suites in parallel (spaces + spacesShares groups)
-          - "apiSpaces,apiSpacesShares"
-          # dav operations — 6 suites in parallel (davOperations group)
-          - "apiSpacesDavOperation,apiDownloads,apiAsyncUpload,apiDepthInfinity,apiArchiver,apiActivities"
-          # search with Tika — 2 suites in parallel (search2 group)
+          # complex: Tika required (search2 group) — validates parallelization with 3rd-party service
           - "apiSearch2,apiSearchContent"
-          # sharing ng part 1 — 4 suites in parallel (sharingNg1 + sharingNgAdditionalShareRole groups)
-          - "apiSharingNgShares,apiReshare,apiSharingNgPermissions,apiSharingNgAdditionalShareRole"
-          # sharing ng part 2 — 5 suites in parallel (sharingNgShareInvitation + sharingNgLinkShare groups)
-          - "apiSharingNgDriveInvitation,apiSharingNgItemInvitation,apiSharingNgDriveLinkShare,apiSharingNgItemLinkShare,apiSharingNgLinkShareManagement"
-          # auth app — kept isolated (enables auth-app service + PROXY_ENABLE_APP_AUTH)
-          - "apiAuthApp"
-          # antivirus — kept isolated (needs ClamAV)
-          - "apiAntivirus"
-          # federation — kept isolated (needs email + federation ocis)
-          - "apiOcm"
-          # collaboration — kept isolated (needs WOPI)
-          - "apiCollaboration"
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
