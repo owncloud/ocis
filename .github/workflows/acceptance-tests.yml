@@ -281,23 +281,26 @@ jobs:
           - cliCommands,apiServiceAvailability   # grouped: both need ClamAV + email services
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
-        with:
-          node-version: "24"
-
-      - name: Enable pnpm
-        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
 
       - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
         with:
           php-version: "8.4"
           extensions: curl, xml, mbstring, zip, ldap, gd
           tools: composer
+
+      - name: Install libvips runtime
+        run: |
+          sudo apt-get update -qq
+          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ocis-build-artifacts
+
+      - name: Restore binary permissions
+        run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
 
       - name: Run ${{ matrix.suite }}
         run: BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
@@ -525,10 +528,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+
+      - name: Install libvips runtime
+        run: |
+          sudo apt-get update -qq
+          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          go-version-file: go.mod
-          cache: true
+          name: ocis-build-artifacts
+
+      - name: Restore binary permissions
+        run: chmod +x ocis/bin/ocis
+
       - name: Run litmus
         run: python3 tests/acceptance/run-litmus.py
 
@@ -538,10 +552,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+
+      - name: Install libvips runtime
+        run: |
+          sudo apt-get update -qq
+          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          go-version-file: go.mod
-          cache: true
+          name: ocis-build-artifacts
+
+      - name: Restore binary permissions
+        run: chmod +x ocis/bin/ocis
+
       - name: Run cs3api validator
         run: python3 tests/acceptance/run-cs3api.py
 
@@ -551,10 +576,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+
+      - name: Install libvips runtime
+        run: |
+          sudo apt-get update -qq
+          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          go-version-file: go.mod
-          cache: true
+          name: ocis-build-artifacts
+
+      - name: Restore binary permissions
+        run: chmod +x ocis/bin/ocis
+
       - name: Run WOPI validator (builtin)
         run: python3 tests/acceptance/run-wopi.py --type builtin
 
@@ -564,10 +600,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+
+      - name: Install libvips runtime
+        run: |
+          sudo apt-get update -qq
+          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          go-version-file: go.mod
-          cache: true
+          name: ocis-build-artifacts
+
+      - name: Restore binary permissions
+        run: chmod +x ocis/bin/ocis
+
       - name: Run WOPI validator (cs3)
         run: python3 tests/acceptance/run-wopi.py --type cs3
 
