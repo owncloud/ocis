@@ -72,6 +72,11 @@ jobs:
           extensions: curl, xml, mbstring, zip, ldap, gd
           tools: composer
 
+      - name: Install libvips-dev for ENABLE_VIPS build
+        run: |
+          sudo apt-get update -qq
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips-dev
+
       - name: Pre-checks and generate
         run: |
           # Phase 1 — I/O + light CPU, no contention between tasks.
@@ -118,9 +123,10 @@ jobs:
           # from the ocis build. Critical path = ocis build (~300 s).
           vmstat 2 > /tmp/vmstat-phase2.log & MONITOR_PID=$!
 
-          make ci-golangci-lint > /tmp/golangci-lint.log 2>&1 & PIDS=($!)
-          make -C ocis build    > /tmp/ocis-build.log    2>&1 & PIDS+=($!)
-          make test             > /tmp/unit-tests.log    2>&1 & PIDS+=($!)
+          make ci-golangci-lint                          > /tmp/golangci-lint.log      2>&1 & PIDS=($!)
+          ENABLE_VIPS=true make -C ocis build            > /tmp/ocis-build.log         2>&1 & PIDS+=($!)
+          make test                                      > /tmp/unit-tests.log         2>&1 & PIDS+=($!)
+          GOWORK=off make -C tests/ociswrapper build     > /tmp/ociswrapper-build.log  2>&1 & PIDS+=($!)
 
           FAILED=0
           for PID in "${PIDS[@]}"; do wait "$PID" || FAILED=1; done
@@ -132,11 +138,21 @@ jobs:
                END { printf "=== phase 2 load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
                      sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat-phase2.log
 
-          echo "=== golangci-lint ==="&& cat /tmp/golangci-lint.log
-          echo "=== ocis build ==="   && cat /tmp/ocis-build.log
-          echo "=== unit tests ==="   && cat /tmp/unit-tests.log
+          echo "=== golangci-lint ==="     && cat /tmp/golangci-lint.log
+          echo "=== ocis build ==="        && cat /tmp/ocis-build.log
+          echo "=== ociswrapper build ===" && cat /tmp/ociswrapper-build.log
+          echo "=== unit tests ==="        && cat /tmp/unit-tests.log
 
           exit $FAILED
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ocis-build-artifacts
+          path: |
+            ocis/bin/ocis
+            tests/ociswrapper/bin/ociswrapper
+          retention-days: 1
 
   local-api-tests:
     name: ${{ matrix.suite }}
