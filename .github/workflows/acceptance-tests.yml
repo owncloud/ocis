@@ -223,9 +223,7 @@ jobs:
           key: libcurl-8.12.0-${{ runner.os }}
 
       - name: Install libcurl 8.12.0 build dependencies
-        # Always run: libvips-dev is needed at runtime (govips thumbnails) and for
-        # pkg-config --exists vips to succeed so oCIS is built with ENABLE_VIPS=true.
-        # Skipping this on cache hit would cause oCIS to fall back to the imaging library.
+        # Always run: libvips-dev is needed at runtime (govips thumbnails in the pre-built binary)
         run: |
           sudo apt-get update -qq
           # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
@@ -292,7 +290,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
-          sudo NEEDRESTART_MODE=a apt-get install -y libvips42
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
 
       - name: Download build artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -339,9 +337,7 @@ jobs:
           key: libcurl-8.12.0-${{ runner.os }}
 
       - name: Install libcurl 8.12.0 build dependencies
-        # Always run: libvips-dev is needed at runtime (govips thumbnails) and for
-        # pkg-config --exists vips to succeed so oCIS is built with ENABLE_VIPS=true.
-        # Skipping this on cache hit would cause oCIS to fall back to the imaging library.
+        # Always run: libvips-dev is needed at runtime (govips thumbnails in the pre-built binary)
         run: |
           sudo apt-get update -qq
           # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
@@ -437,7 +433,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
-          sudo NEEDRESTART_MODE=a apt-get install -y libvips42
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
 
       - name: Download build artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -539,7 +535,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
-          sudo NEEDRESTART_MODE=a apt-get install -y libvips42
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
 
       - name: Download build artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -563,7 +559,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
-          sudo NEEDRESTART_MODE=a apt-get install -y libvips42
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
 
       - name: Download build artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -587,7 +583,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
-          sudo NEEDRESTART_MODE=a apt-get install -y libvips42
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
 
       - name: Download build artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -611,7 +607,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
-          sudo NEEDRESTART_MODE=a apt-get install -y libvips42
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
 
       - name: Download build artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
