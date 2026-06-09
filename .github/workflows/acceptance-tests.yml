@@ -37,8 +37,9 @@ jobs:
           DOCS_ONLY=true
           while IFS= read -r file; do
             case "$file" in
+              .github/workflows/*) DOCS_ONLY=false; break ;;
               .github/*|.vscode/*|changelog/*|docs/*|deployments/*) ;;
-              CHANGELOG.md|CONTRIBUTING.md|LICENSE|README.md) ;;
+              */CHANGELOG.md|*/CONTRIBUTING.md|*/README.md|CHANGELOG.md|CONTRIBUTING.md|LICENSE|README.md) ;;
               *) DOCS_ONLY=false; break ;;
             esac
           done <<< "$CHANGED_FILES"
@@ -70,6 +71,12 @@ jobs:
           php-version: "8.4"
           extensions: curl, xml, mbstring, zip, ldap, gd
           tools: composer
+
+      - name: Install libvips-dev for ENABLE_VIPS build
+        run: |
+          sudo apt-get update -qq
+          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips-dev
 
       - name: Pre-checks and generate
         run: |
@@ -117,9 +124,10 @@ jobs:
           # from the ocis build. Critical path = ocis build (~300 s).
           vmstat 2 > /tmp/vmstat-phase2.log & MONITOR_PID=$!
 
-          make ci-golangci-lint > /tmp/golangci-lint.log 2>&1 & PIDS=($!)
-          make -C ocis build    > /tmp/ocis-build.log    2>&1 & PIDS+=($!)
-          make test             > /tmp/unit-tests.log    2>&1 & PIDS+=($!)
+          make ci-golangci-lint                          > /tmp/golangci-lint.log      2>&1 & PIDS=($!)
+          ENABLE_VIPS=true make -C ocis build            > /tmp/ocis-build.log         2>&1 & PIDS+=($!)
+          make test                                      > /tmp/unit-tests.log         2>&1 & PIDS+=($!)
+          GOWORK=off make -C tests/ociswrapper build     > /tmp/ociswrapper-build.log  2>&1 & PIDS+=($!)
 
           FAILED=0
           for PID in "${PIDS[@]}"; do wait "$PID" || FAILED=1; done
@@ -131,11 +139,22 @@ jobs:
                END { printf "=== phase 2 load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
                      sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat-phase2.log
 
-          echo "=== golangci-lint ==="&& cat /tmp/golangci-lint.log
-          echo "=== ocis build ==="   && cat /tmp/ocis-build.log
-          echo "=== unit tests ==="   && cat /tmp/unit-tests.log
+          echo "=== golangci-lint ==="     && cat /tmp/golangci-lint.log
+          echo "=== ocis build ==="        && cat /tmp/ocis-build.log
+          echo "=== ociswrapper build ===" && cat /tmp/ociswrapper-build.log
+          echo "=== unit tests ==="        && cat /tmp/unit-tests.log
 
           exit $FAILED
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ocis-build-artifacts
+          path: |
+            ocis/bin/ocis
+            tests/ociswrapper/bin/ociswrapper
+          retention-days: 1
+          if-no-files-found: error
 
   local-api-tests:
     name: ${{ matrix.suite }}
@@ -189,17 +208,6 @@ jobs:
           - apiCollaboration
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
-        with:
-          node-version: "24"
-
-      - name: Enable pnpm
-        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
 
       - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
         with:
@@ -215,9 +223,7 @@ jobs:
           key: libcurl-8.12.0-${{ runner.os }}
 
       - name: Install libcurl 8.12.0 build dependencies
-        # Always run: libvips-dev is needed at runtime (govips thumbnails) and for
-        # pkg-config --exists vips to succeed so oCIS is built with ENABLE_VIPS=true.
-        # Skipping this on cache hit would cause oCIS to fall back to the imaging library.
+        # Always run: libvips-dev is needed at runtime (govips thumbnails in the pre-built binary)
         run: |
           sudo apt-get update -qq
           # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
@@ -251,6 +257,14 @@ jobs:
             }
           '
 
+      - name: Download build artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ocis-build-artifacts
+
+      - name: Restore binary permissions
+        run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
+
       - name: Run ${{ matrix.suite }}
         run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
 
@@ -265,23 +279,26 @@ jobs:
           - cliCommands,apiServiceAvailability   # grouped: both need ClamAV + email services
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
-        with:
-          node-version: "24"
-
-      - name: Enable pnpm
-        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
 
       - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
         with:
           php-version: "8.4"
           extensions: curl, xml, mbstring, zip, ldap, gd
           tools: composer
+
+      - name: Install libvips runtime
+        run: |
+          sudo apt-get update -qq
+          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ocis-build-artifacts
+
+      - name: Restore binary permissions
+        run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
 
       - name: Run ${{ matrix.suite }}
         run: BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
@@ -305,17 +322,6 @@ jobs:
           - "coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS"
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
-        with:
-          node-version: "24"
-
-      - name: Enable pnpm
-        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
 
       - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
         with:
@@ -331,9 +337,7 @@ jobs:
           key: libcurl-8.12.0-${{ runner.os }}
 
       - name: Install libcurl 8.12.0 build dependencies
-        # Always run: libvips-dev is needed at runtime (govips thumbnails) and for
-        # pkg-config --exists vips to succeed so oCIS is built with ENABLE_VIPS=true.
-        # Skipping this on cache hit would cause oCIS to fall back to the imaging library.
+        # Always run: libvips-dev is needed at runtime (govips thumbnails in the pre-built binary)
         run: |
           sudo apt-get update -qq
           # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
@@ -366,6 +370,14 @@ jobs:
               exit(1);
             }
           '
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ocis-build-artifacts
+
+      - name: Restore binary permissions
+        run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
 
       - name: Run ${{ matrix.suite }}
         run: >
@@ -407,21 +419,29 @@ jobs:
             oidc_iframe: true
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version-file: go.mod
-          cache: true
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
-          node-version: "24"
+          # 24.16.0 breaks playwright install (yauzl zip extraction hangs); pin to last known good.
+          # https://github.com/microsoft/playwright/issues/40724
+          node-version: "24.15.0"
       - name: Enable pnpm
-        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
-      - name: Generate code
         run: |
+          corepack enable && corepack prepare pnpm@10.28.1 --activate
           pnpm config set store-dir ./.pnpm-store
-          make ci-node-generate
-        env:
-          CHROMEDRIVER_SKIP_DOWNLOAD: "true"
+
+      - name: Install libvips runtime
+        run: |
+          sudo apt-get update -qq
+          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ocis-build-artifacts
+
+      - name: Restore binary permissions
+        run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
 
       - name: Cache Playwright Chromium
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
@@ -510,10 +530,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+
+      - name: Install libvips runtime
+        run: |
+          sudo apt-get update -qq
+          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          go-version-file: go.mod
-          cache: true
+          name: ocis-build-artifacts
+
+      - name: Restore binary permissions
+        run: chmod +x ocis/bin/ocis
+
       - name: Run litmus
         run: python3 tests/acceptance/run-litmus.py
 
@@ -523,10 +554,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+
+      - name: Install libvips runtime
+        run: |
+          sudo apt-get update -qq
+          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          go-version-file: go.mod
-          cache: true
+          name: ocis-build-artifacts
+
+      - name: Restore binary permissions
+        run: chmod +x ocis/bin/ocis
+
       - name: Run cs3api validator
         run: python3 tests/acceptance/run-cs3api.py
 
@@ -536,10 +578,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+
+      - name: Install libvips runtime
+        run: |
+          sudo apt-get update -qq
+          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          go-version-file: go.mod
-          cache: true
+          name: ocis-build-artifacts
+
+      - name: Restore binary permissions
+        run: chmod +x ocis/bin/ocis
+
       - name: Run WOPI validator (builtin)
         run: python3 tests/acceptance/run-wopi.py --type builtin
 
@@ -549,10 +602,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+
+      - name: Install libvips runtime
+        run: |
+          sudo apt-get update -qq
+          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          go-version-file: go.mod
-          cache: true
+          name: ocis-build-artifacts
+
+      - name: Restore binary permissions
+        run: chmod +x ocis/bin/ocis
+
       - name: Run WOPI validator (cs3)
         run: python3 tests/acceptance/run-wopi.py --type cs3
 

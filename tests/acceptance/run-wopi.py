@@ -242,7 +242,8 @@ def main() -> int:
     ocis_bin = repo_root / "ocis/bin/ocis"
     ocis_config_dir = Path.home() / ".ocis/config"
 
-    subprocess.run(["make", "-C", str(repo_root / "ocis"), "build"], check=True)
+    if not ocis_bin.exists():
+        subprocess.run(["make", "-C", str(repo_root / "ocis"), "build"], check=True)
 
     bridge_ip = get_docker_bridge_ip()
     print(f"Docker bridge IP: {bridge_ip}", flush=True)

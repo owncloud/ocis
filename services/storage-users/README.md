@@ -482,6 +482,20 @@ users-vault
 └── uploads
 ```
 
+### Checking Vault Mode in the Frontend
+
+To check whether vault mode is enabled in the frontend, use the `@ownclouders/web-pkg` package:
+
+```typescript
+import { useAbility } from '@ownclouders/web-pkg'
+import { useCapabilityStore } from '@ownclouders/web-pkg'
+
+const capabilityStore = useCapabilityStore()
+const { can } = useAbility()
+
+const isVaultModeEnabled = capabilityStore.vaultEnabled && can('read-all', 'Vault')
+```
+
 ### Running with Docker
 
 To enable vault mode in the `ocis_full` docker-compose stack, edit `deployments/examples/ocis_full/.env` and uncomment the following lines:
