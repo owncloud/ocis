@@ -102,6 +102,7 @@ const (
 	KeyTemplateSource    = "TemplateSource"
 
 	KeyEnableInsertRemoteImage = "EnableInsertRemoteImage"
+	KeyEnableInsertRemoteFile  = "EnableInsertRemoteFile"
 	KeyDisableInsertLocalImage = "DisableInsertLocalImage"
 	KeyHidePrintOption         = "HidePrintOption"
 	KeyHideSaveOption          = "HideSaveOption"
