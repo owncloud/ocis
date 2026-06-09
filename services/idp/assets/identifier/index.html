@@ -150,7 +150,9 @@
         if (result.ok && result.data.success) {
           var hello = result.data.hello;
           if (hello && hello.next === 'consent') {
-            window.location.href = '/signin/v1/consent' + window.location.search;
+            var consentParams = new URLSearchParams(window.location.search);
+            consentParams.set("prompt", "consent");
+            window.location.href = '/signin/v1/consent?' + consentParams.toString();
             return;
           }
           var next = hello && (hello.continue_uri || hello.next);
@@ -191,7 +193,9 @@
   });
 
   var hello = helloRequest();
-  if (hello.state || hello.client_id) {
+  var helloPrompts = (hello.prompt || "").split(" ");
+  var skipAutoRedirect = helloPrompts.indexOf("login") !== -1 || helloPrompts.indexOf("select_account") !== -1;
+  if ((hello.state || hello.client_id) && !skipAutoRedirect) {
     fetchApi("/_/hello", hello)
       .then(function(res) { return parseJsonMaybe(res); })
       .then(function(data) {

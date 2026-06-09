@@ -302,6 +302,11 @@ func (idp *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handl
 	idp.mux.Get("/signin/v1/goodbye", idp.Goodbye())
 	idp.mux.Get("/signin/v1/consent", idp.Consent())
 	idp.mux.Get("/signin/v1/loginerror", idp.LoginError())
+	idp.mux.Get("/signin/v1/chooseaccount", func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+		q.Set("prompt", "login")
+		http.Redirect(w, r, "/signin/v1/identifier?"+q.Encode(), http.StatusFound)
+	})
 
 	idp.mux.Mount("/", gm)
 
