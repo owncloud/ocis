@@ -98,11 +98,10 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	httpReq.Header.Set(revactx.TokenHeader, auth)
 	httpReq.Header.Set(TokenTransportHeader, tk)
 
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{
-		MinVersion:         tls.VersionTLS12,
-		InsecureSkipVerify: s.insecure, //nolint:gosec
-	}
-	client := &http.Client{}
+	client := rhttp.GetHTTPClient(
+		rhttp.MinVersion(tls.VersionTLS12),
+		rhttp.Insecure(s.insecure),
+	)
 
 	resp, err := client.Do(httpReq)
 	if err != nil {
