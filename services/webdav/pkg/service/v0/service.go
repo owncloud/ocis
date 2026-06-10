@@ -19,6 +19,7 @@ import (
 	"github.com/go-chi/render"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/reva/v2/pkg/rhttp"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/templates"
 	merrors "go-micro.dev/v4/errors"
 	grpcmetadata "google.golang.org/grpc/metadata"
@@ -465,9 +466,9 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 
 func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w http.ResponseWriter, r *http.Request) {
 	logger := g.log.SubloggerWithRequestID(r.Context())
-	client := &http.Client{
-		// Timeout: time.Second * 5,
-	}
+	client := rhttp.GetHTTPClient(
+	// double-check options; previous code only had 5s timeout and it was commented
+	)
 
 	dlReq, err := tracing.GetNewRequest(r.Context(), http.MethodGet, rsp.DataEndpoint, http.NoBody)
 	if err != nil {
