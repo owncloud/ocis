@@ -68,7 +68,7 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 		case http.StatusBadRequest:
 			renderError(w, r, errBadRequest(e.Detail))
 		default:
-			renderError(w, r, errInternalError(err.Error()))
+			renderError(w, r, errInternalError("could not get search results"))
 		}
 		logger.Error().Err(err).Msg("could not get search results")
 		return

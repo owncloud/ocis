@@ -268,7 +268,7 @@ func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
 		case http.StatusForbidden:
 			renderError(w, r, errPermissionDenied(e.Detail))
 		default:
-			renderError(w, r, errInternalError(err.Error()))
+			renderError(w, r, errInternalError("could not get thumbnail"))
 		}
 		logger.Debug().Err(err).Msg("could not get thumbnail")
 		return
@@ -366,7 +366,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		case http.StatusForbidden:
 			renderError(w, r, errPermissionDenied(e.Detail))
 		default:
-			renderError(w, r, errInternalError(err.Error()))
+			renderError(w, r, errInternalError("could not get thumbnail"))
 		}
 		g.log.Error().Err(err).Msg("could not get thumbnail")
 		return
@@ -411,7 +411,7 @@ func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
 			addRetryAfterHeader(w)
 			renderError(w, r, errTooManyRequests(e.Detail))
 		default:
-			renderError(w, r, errInternalError(err.Error()))
+			renderError(w, r, errInternalError("could not get thumbnail"))
 		}
 		g.log.Error().Err(err).Msg("could not get thumbnail")
 		return
@@ -456,7 +456,7 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 			addRetryAfterHeader(w)
 			renderError(w, r, errTooManyRequests(e.Detail))
 		default:
-			renderError(w, r, errInternalError(err.Error()))
+			renderError(w, r, errInternalError("could not get thumbnail"))
 		}
 		logger.Debug().Err(err).Msg("could not get thumbnail")
 		return
@@ -473,7 +473,7 @@ func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w
 
 	dlReq, err := tracing.GetNewRequest(r.Context(), http.MethodGet, rsp.DataEndpoint, http.NoBody)
 	if err != nil {
-		renderError(w, r, errInternalError(err.Error()))
+		renderError(w, r, errInternalError("could not download thumbnail"))
 		logger.Error().Err(err).Msg("could not create download thumbnail request")
 		return
 	}
@@ -481,7 +481,7 @@ func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w
 
 	dlRsp, err := client.Do(dlReq)
 	if err != nil {
-		renderError(w, r, errInternalError(err.Error()))
+		renderError(w, r, errInternalError("could not download thumbnail"))
 		logger.Error().Err(err).Msg("could not download thumbnail: transport error")
 		return
 	}
