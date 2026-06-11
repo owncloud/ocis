@@ -163,7 +163,7 @@ strong {
 }
 
 .oc-login-bg {
-  background-image: url(./images/background.jpg);
+  background-image: var(--oc-login-background-image, url(./images/background.jpg));
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;

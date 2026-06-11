@@ -1,0 +1,144 @@
+/*
+ * ownCloud branding for the Keycloak login theme.
+ *
+ * Styled to match the oCIS IDP (LibreGraph Connect) login screen, see
+ * services/idp/src/app.css in owncloud/ocis (.oc-login-bg, .oc-input,
+ * .oc-label, .oc-button-primary, .oc-logo).
+ *
+ * To replace the background image, overwrite
+ * resources/img/owncloud-background.png or change the custom property below.
+ */
+
+:root {
+  --oc-login-background-image: url('../img/owncloud-background.png');
+}
+
+/* full-viewport branded background, same sizing as .oc-login-bg on the IDP */
+.login-pf body {
+  background: var(--oc-login-background-image) no-repeat center center fixed;
+  background-size: cover;
+}
+
+/* no separate logo above the card, the background image already contains the ownCloud logo */
+#kc-header {
+  display: none;
+}
+
+/* center the card vertically, like the IDP login screen */
+.login-pf-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0;
+  min-height: 100vh;
+  padding: 0;
+}
+
+/* centered login card with subtle shadow and semi-transparent background */
+.login-pf-page .card-pf {
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  background: rgba(4, 30, 66, 0.45);
+  border: 0;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  margin: 0 auto;
+  max-width: 420px;
+  padding: 20px 40px 30px;
+}
+
+#kc-page-title,
+.login-pf-page .login-pf-page-header,
+.login-pf-page .login-pf-header h1 {
+  color: #fff;
+}
+
+/* labels match .oc-label on the IDP screen */
+.card-pf label,
+.card-pf .control-label,
+.login-pf-page .checkbox,
+#kc-form-options span {
+  color: #fff;
+  display: inline-block;
+  margin-bottom: 5px;
+}
+
+/* inputs match .oc-input on the IDP screen */
+.card-pf input[type='text'],
+.card-pf input[type='email'],
+.card-pf input[type='password'] {
+  background-color: #fff;
+  border: 1px solid #fff;
+  border-radius: 3px;
+  box-shadow: none;
+  box-sizing: border-box;
+  font-size: 1rem;
+  height: 40px;
+  padding: 16px;
+  width: 100%;
+}
+
+.card-pf input[type='text']:focus,
+.card-pf input[type='email']:focus,
+.card-pf input[type='password']:focus {
+  border: 1px solid #fff;
+  outline: none;
+}
+
+.card-pf input[aria-invalid='true'] {
+  border: 1px solid #fe4600;
+  outline: none;
+}
+
+#input-error,
+.card-pf .kc-feedback-text {
+  color: #fe4600;
+}
+
+/* submit button matches .oc-button-primary on the IDP screen */
+#kc-login,
+.card-pf .btn-primary {
+  background: linear-gradient(to right, #2c588e, #4e85c8);
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: #fff;
+  font-size: 1.0625rem;
+  height: 40px;
+  width: 100%;
+}
+
+#kc-login:hover,
+#kc-login:focus,
+.card-pf .btn-primary:hover,
+.card-pf .btn-primary:focus {
+  background: linear-gradient(to right, #35689f, #5b93d6);
+  color: #fff;
+}
+
+/* secondary links (forgot password, register, back to login) */
+.login-pf-page a,
+.login-pf-page a:hover,
+#kc-registration span,
+#kc-info-wrapper,
+.login-pf-page .login-pf-signup {
+  color: #fff;
+}
+
+.login-pf-page a:hover {
+  text-decoration: underline;
+}
+
+/* keep the card usable on small viewports */
+@media only screen and (max-width: 1280px) {
+  .login-pf-page .card-pf {
+    max-width: 400px;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .login-pf-page .card-pf {
+    margin: 0 10px;
+    max-width: none;
+    padding: 15px 20px 25px;
+  }
+}

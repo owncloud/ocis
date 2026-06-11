@@ -44,7 +44,7 @@ const App = ({ bgImg }): ReactElement => {
 
   return (
     <InfiniteScaleContext.Provider value={{ theme, config }}>
-      <div className="oc-login-bg" style={{ backgroundImage: bgImg ? `url(${bgImg})` : undefined }}>
+      <div className="oc-login-bg" style={bgImg ? { '--oc-login-background-image': `url(${bgImg})` } : undefined}>
         <MuiThemeProvider theme={defaultTheme}>
           <Suspense fallback={<Spinner />}>
             <LazyMain />
