@@ -96,7 +96,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.43.0
 	golang.org/x/crypto v0.51.0
 	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f
-	golang.org/x/image v0.39.0
+	golang.org/x/image v0.41.0
 	golang.org/x/net v0.55.0
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sync v0.20.0
