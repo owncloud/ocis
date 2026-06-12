@@ -19,7 +19,7 @@ type Config struct {
 	Reva         *shared.Reva  `yaml:"reva"`
 
 	// TODO: when using multiple service accounts we need to find a way to configure them
-	ServiceAccount ServiceAccount `yaml:"service_account"`
+	ServiceAccount ServiceAccount `yaml:"service_account" mask:"struct"`
 
 	Context context.Context `yaml:"-"`
 }
@@ -52,5 +52,5 @@ type GRPCConfig struct {
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
 	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;AUTH_SERVICE_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
-	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;AUTH_SERVICE_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;AUTH_SERVICE_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0" mask:"password"`
 }

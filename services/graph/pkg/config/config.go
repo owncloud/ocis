@@ -34,7 +34,7 @@ type Config struct {
 	MaxConcurrency    int          `yaml:"max_concurrency" env:"OCIS_MAX_CONCURRENCY;GRAPH_MAX_CONCURRENCY" desc:"The maximum number of concurrent requests the service will handle." introductionVersion:"7.0.0"`
 
 	Keycloak       Keycloak            `yaml:"keycloak"`
-	ServiceAccount ServiceAccount      `yaml:"service_account"`
+	ServiceAccount ServiceAccount      `yaml:"service_account" mask:"struct"`
 	MultiInstance  MultiInstanceConfig `yaml:"multi_instance"`
 
 	Validation Validation `yaml:"validation"`
@@ -172,7 +172,7 @@ type Keycloak struct {
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
 	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;GRAPH_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
-	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;GRAPH_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;GRAPH_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0" mask:"password"`
 }
 
 type Validation struct {

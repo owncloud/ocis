@@ -28,7 +28,7 @@ type Config struct {
 	Policies                  []Policy             `yaml:"policies"`
 	AdditionalPolicies        []Policy             `yaml:"additional_policies"`
 	OIDC                      OIDC                 `yaml:"oidc"`
-	ServiceAccount            ServiceAccount       `yaml:"service_account"`
+	ServiceAccount            ServiceAccount       `yaml:"service_account" mask:"struct"`
 	RoleAssignment            RoleAssignment       `yaml:"role_assignment"`
 	PolicySelector            *PolicySelector      `yaml:"policy_selector"`
 	PreSignedURL              PreSignedURL         `yaml:"pre_signed_url"`
@@ -227,7 +227,7 @@ type RegexRuleConf struct {
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
 	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;PROXY_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
-	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;PROXY_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;PROXY_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0" mask:"password"`
 }
 
 // Events combines the configuration options for the event bus.

@@ -55,7 +55,7 @@ type Config struct {
 	Events           Events                `yaml:"events"`
 	GRPCClientTLS    *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 	AutoAcceptShares bool                  `yaml:"auto_accept_shares" env:"FRONTEND_AUTO_ACCEPT_SHARES" desc:"Defines if shares should be auto accepted by default. Users can change this setting individually in their profile." introductionVersion:"5.0"`
-	ServiceAccount   ServiceAccount        `yaml:"service_account"`
+	ServiceAccount   ServiceAccount        `yaml:"service_account" mask:"struct"`
 
 	PasswordPolicy PasswordPolicy `yaml:"password_policy"`
 	Validation     Validation     `yaml:"validation"`
@@ -187,7 +187,7 @@ type Events struct {
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
 	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;FRONTEND_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
-	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;FRONTEND_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;FRONTEND_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0" mask:"password"`
 }
 
 // PasswordPolicy configures reva password policy
