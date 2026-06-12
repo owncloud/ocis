@@ -69,6 +69,18 @@ func NewStore(opts ...store.Option) store.Store {
 
 	n.setOption(opts...)
 
+	// register unset connection callback
+	f := n.nopts.ClosedCB
+	n.nopts.ClosedCB = func(c *nats.Conn) {
+		// reset connection
+		n.resetConn()
+
+		// execute the original callback if set
+		if f != nil {
+			f(c)
+		}
+	}
+
 	return n
 }
 
@@ -417,7 +429,19 @@ func (n *natsStore) hasConn() bool {
 	n.RLock()
 	defer n.RUnlock()
 
-	return n.conn != nil
+	// A non-nil conn is not enough: once the client has exhausted its
+	// reconnect attempts the conn is permanently closed but stays non-nil,
+	// which would gate initConn() off forever. Treat a closed connection as
+	// "no connection" so the next operation re-initializes it.
+	return n.conn != nil && !n.conn.IsClosed()
+}
+
+// thread safe way to reset the connection.
+func (n *natsStore) resetConn() {
+	n.Lock()
+	defer n.Unlock()
+
+	n.conn = nil
 }
 
 // mustGetDefaultBucket returns the bucket with the given name creating it with default configuration if needed.
