@@ -4433,6 +4433,8 @@ trait WebDav {
 		if ($multistatusResults === null) {
 			$multistatusResults = [];
 		}
+		// var_dump($responseXmlArray);
+		var_dump("numfilesssssssssssssssssssssssssss", $numFiles);
 		Assert::assertEquals(
 			$numFiles,
 			\count($multistatusResults),

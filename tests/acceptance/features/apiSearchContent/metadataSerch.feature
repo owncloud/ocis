@@ -123,19 +123,46 @@ Feature: metadata type search
       | permissionsRole | Space Viewer |
     When user "Brian" searches for '<query>' using the WebDAV API
     Then the HTTP status code should be "207"
-    And the search result should contain "1" entries
+    And the search result should contain "<expectedCount>" entries
     And the search result of user "Brian" should contain these entries:
-      | testavatar.jpg |
+      | <expectedFile1> |
+      | <expectedFile2> |
+    # Examples:
+    #   | query                             |
+    #   | photo.cameraMake=NIKON            |
+    #   | photo.cameraModel="COOLPIX P6000" |
+    #   | photo.exposureDenominator=178     |
+    #   | photo.exposureNumerator=1         |
+    #   | photo.fNumber=4.5                 |
+    #   | photo.focalLength=6               |
+    #   | photo.orientation=1               |
+    #   | photo.takenDateTime=2008-10-22    |
+    #   | location.latitude=43.467157       |
+    #   | location.longitude=11.885395      |
+    #   | location.altitude=100             |
+
     Examples:
-      | query                             |
-      | photo.cameraMake=NIKON            |
-      | photo.cameraModel="COOLPIX P6000" |
-      | photo.exposureDenominator=178     |
-      | photo.exposureNumerator=1         |
-      | photo.fNumber=4.5                 |
-      | photo.focalLength=6               |
-      | photo.orientation=1               |
-      | photo.takenDateTime=2008-10-22    |
-      | location.latitude=43.467157       |
-      | location.longitude=11.885395      |
-      | location.altitude=100             |
+      | query                                  | expectedCount | expectedFile1  | expectedFile2  |
+      | photo.cameraMake=NIKON                 | 1             | testavatar.jpg |                |
+      | photo.cameraModel="COOLPIX P6000"      | 1             | testavatar.jpg |                |
+      | photo.exposureDenominator=178          | 1             | testavatar.jpg |                |
+      | photo.exposureNumerator=1              | 1             | testavatar.jpg |                |
+      | photo.fNumber=4.5                      | 1             | testavatar.jpg |                |
+      | photo.focalLength=6                    | 1             | testavatar.jpg |                |
+      | photo.orientation=1                    | 1             | testavatar.jpg |                |
+      | photo.takenDateTime=2008-10-22         | 1             | testavatar.jpg |                |
+      | location.latitude=43.467157            | 1             | testavatar.jpg |                |
+      | location.longitude=11.885395           | 1             | testavatar.jpg |                |
+      | location.altitude=100                  | 1             | testavatar.jpg |                |
+      | NOT photo.cameraMake=CANON             | 2             | testavatar.jpg | testavatar.png |
+      | NOT photo.exposureDenominator=180      | 2             | testavatar.jpg | testavatar.png |
+      | NOT photo.orientation=2                | 2             | testavatar.jpg | testavatar.png |
+      | NOT photo.takenDateTime=2007-01-01     | 2             | testavatar.jpg | testavatar.png |
+      | photo.exposureDenominator<180          | 1             | testavatar.jpg |                |
+      | photo.exposureDenominator<=178         | 1             | testavatar.jpg |                |
+      | photo.fNumber>4                        | 1             | testavatar.jpg |                |
+      | location.altitude<150                  | 1             | testavatar.jpg |                |
+      | location.altitude>=100                 | 1             | testavatar.jpg |                |
+      | photo.focalLength<10                   | 1             | testavatar.jpg |                |
+      | photo.focalLength>4                    | 1             | testavatar.jpg |                |
+      | photo.focalLength>=6                   | 1             | testavatar.jpg |                |
