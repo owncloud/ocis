@@ -446,6 +446,8 @@ var _ = Describe("EducationUsers", func() {
 			svc.DeleteEducationUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
+			identityEducationBackend.AssertCalled(GinkgoT(), "DeleteEducationUser", mock.Anything, lu.GetId())
+			identityEducationBackend.AssertNotCalled(GinkgoT(), "DeleteEducationUser", mock.Anything, lu.GetExternalID())
 			gatewayClient.AssertNumberOfCalls(GinkgoT(), "DeleteStorageSpace", 2) // 2 calls for the home space. first trash, then purge
 		})
 	})
