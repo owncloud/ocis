@@ -24,6 +24,7 @@ import (
 	"github.com/owncloud/reva/v2/internal/http/services/owncloud/ocs/config"
 	"github.com/owncloud/reva/v2/internal/http/services/owncloud/ocs/response"
 	"github.com/owncloud/reva/v2/pkg/owncloud/ocs"
+	"github.com/owncloud/reva/v2/pkg/utils"
 )
 
 // Handler renders the capability endpoint
@@ -260,5 +261,6 @@ func (h *Handler) vaultCapabilities(c ocs.CapabilitiesData) ocs.CapabilitiesData
 	caps := *c.Capabilities
 	caps.FilesSharing = &sharing
 	c.Capabilities = &caps
+	c.Capabilities.Vault.VaultStorageProvider = utils.VaultStorageProviderID
 	return c
 }
