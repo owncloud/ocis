@@ -1968,7 +1968,7 @@ func (s *Server) registerAccountNoLock(acc *Account) *Account {
 	// TODO(dlc)- Double check that we need this for GWs.
 	if acc.rm == nil && s.opts != nil && s.shouldTrackSubscriptions() {
 		acc.rm = make(map[string]int32)
-		acc.lqws = make(map[string]int32)
+		acc.lws = make(map[string]int32)
 	}
 	acc.srv = s
 	acc.updated = time.Now()
