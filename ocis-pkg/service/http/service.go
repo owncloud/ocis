@@ -7,6 +7,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/broker"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 
 	mhttps "github.com/go-micro/plugins/v4/server/http"
 	mtracer "github.com/go-micro/plugins/v4/wrapper/trace/opentelemetry"
@@ -66,15 +67,18 @@ func NewService(opts ...Option) (Service, error) {
 		micro.Registry(registry.GetRegistry()),
 		micro.RegisterTTL(registry.GetRegisterTTL()),
 		micro.RegisterInterval(registry.GetRegisterInterval()),
-		micro.WrapClient(mtracer.NewClientWrapper(
-			mtracer.WithTraceProvider(sopts.TraceProvider),
-		)),
-		micro.WrapHandler(mtracer.NewHandlerWrapper(
-			mtracer.WithTraceProvider(sopts.TraceProvider),
-		)),
-		micro.WrapSubscriber(mtracer.NewSubscriberWrapper(
-			mtracer.WithTraceProvider(sopts.TraceProvider),
-		)),
+		micro.WrapClient(
+			mtracer.NewClientWrapper(mtracer.WithTraceProvider(sopts.TraceProvider)),
+			autoprop.NewGoMicroClientWrapper(),
+		),
+		micro.WrapHandler(
+			mtracer.NewHandlerWrapper(mtracer.WithTraceProvider(sopts.TraceProvider)),
+			autoprop.NewGoMicroServerHandlerWrapper(),
+		),
+		micro.WrapSubscriber(
+			mtracer.NewSubscriberWrapper(mtracer.WithTraceProvider(sopts.TraceProvider)),
+			autoprop.NewGoMicroServerSubscriberWrapper(),
+		),
 	}
 	if sopts.TLSConfig.Enabled {
 		wopts = append(wopts, micro.Metadata(map[string]string{"use_tls": "true"}))

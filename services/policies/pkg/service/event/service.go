@@ -6,6 +6,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/policies/pkg/engine"
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -82,8 +83,9 @@ func (s Service) Close() {
 }
 
 func (s Service) processEvent(e events.Event) error {
-	ctx := e.GetTraceContext(s.ctx)
-	ctx, span := s.tp.Tracer("policies").Start(ctx, "processEvent")
+	evCtx := context.Background()
+	ctx, span := events.TraceEventConsumer(evCtx, s.tp, e)
+	ctx = autoprop.SetMetaToContext(ctx, e.ExtraInfo)
 	defer span.End()
 
 	switch ev := e.Event.(type) {

@@ -15,12 +15,12 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/reva/v2/pkg/rhttp"
 	"github.com/rs/zerolog"
 )
 
@@ -72,7 +72,6 @@ func newHttpRequest(ctx context.Context, wopiContext middleware.WopiContext, met
 	} else {
 		httpReq.Header.Add("X-Access-Token", wopiContext.AccessToken)
 	}
-	mfa.SetHeader(httpReq, wopiContext.HasMFA)
 	return httpReq, nil
 }
 
@@ -144,14 +143,11 @@ func (c *ContentConnector) GetFile(ctx context.Context, w http.ResponseWriter) e
 		Str("Endpoint", downloadEndpoint).
 		Bool("HasDownloadToken", hasDownloadToken).Logger()
 
-	httpClient := http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				MinVersion:         tls.VersionTLS12,
-				InsecureSkipVerify: c.cfg.CS3Api.DataGateway.Insecure,
-			},
-		},
-	}
+	// autopropagation of metadata is already included in the client
+	httpClient := rhttp.GetHTTPClient(
+		rhttp.MinVersion(tls.VersionTLS12),
+		rhttp.Insecure(c.cfg.CS3Api.DataGateway.Insecure),
+	)
 
 	// Prepare the request to download the file
 	// public link downloads have the token in the download endpoint
@@ -309,15 +305,12 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 			Str("Endpoint", uploadEndpoint).
 			Bool("HasUploadToken", hasUploadToken).Logger()
 
-		httpClient := http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					MinVersion:         tls.VersionTLS12,
-					InsecureSkipVerify: c.cfg.CS3Api.DataGateway.Insecure,
-				},
-			},
-			Timeout: 10 * time.Second,
-		}
+		// autopropagation of metadata is already included in the client
+		httpClient := rhttp.GetHTTPClient(
+			rhttp.MinVersion(tls.VersionTLS12),
+			rhttp.Insecure(c.cfg.CS3Api.DataGateway.Insecure),
+			rhttp.Timeout(10*time.Second),
+		)
 
 		// prepare the request to upload the contents to the upload endpoint
 		// public link uploads have the token in the upload endpoint

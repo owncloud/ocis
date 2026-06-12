@@ -14,21 +14,21 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/reva/v2/pkg/rhttp"
 )
 
 type cs3 struct {
-	httpClient      http.Client
+	httpClient      *http.Client
 	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 	logger          log.Logger
 }
 
 func newCS3Retriever(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], logger log.Logger, insecure bool) cs3 {
 	return cs3{
-		httpClient: http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure}, //nolint:gosec
-			},
-		},
+		httpClient: rhttp.GetHTTPClient(
+			rhttp.MinVersion(tls.VersionTLS12),
+			rhttp.Insecure(insecure),
+		),
 		gatewaySelector: gatewaySelector,
 		logger:          logger,
 	}

@@ -15,6 +15,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
 	thumbnailerErrors "github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 	"github.com/owncloud/reva/v2/pkg/bytesize"
+	"github.com/owncloud/reva/v2/pkg/rhttp"
 	"github.com/pkg/errors"
 )
 
@@ -40,16 +41,14 @@ func (s WebDav) Get(ctx context.Context, url string) (io.ReadCloser, error) {
 		return nil, errors.Wrapf(err, `could not get the image "%s"`, url)
 	}
 
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{
-		MinVersion:         tls.VersionTLS12,
-		InsecureSkipVerify: s.insecure, //nolint:gosec
-	}
-
 	if auth, ok := ContextGetAuthorization(ctx); ok {
 		req.Header.Add("Authorization", auth)
 	}
 
-	client := &http.Client{}
+	client := rhttp.GetHTTPClient(
+		rhttp.MinVersion(tls.VersionTLS12),
+		rhttp.Insecure(s.insecure),
+	)
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, errors.Wrapf(err, `could not get the image "%s"`, url)
