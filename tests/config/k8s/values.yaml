@@ -1,7 +1,8 @@
 ---
 image:
-  repository: owncloud/ocis-rolling
-  tag: master
+  repository: owncloud/ocis
+  tag: latest
+  pullPolicy: IfNotPresent
 ingress:
   enabled: true
   ingressClassName: traefik

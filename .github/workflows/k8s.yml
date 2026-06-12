@@ -1,0 +1,455 @@
+name: Acceptance Tests K8S
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  # Evaluates to 'true' if criteria are met, otherwise empty string or 'false'
+  K8S: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && contains(github.event.pull_request.title || '', 'k8s')) }}
+
+jobs:
+  local-api-tests:
+    name: ${{ matrix.suite }}-k8s
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          # contract & locks
+          - apiContract
+          - apiLocks
+          # settings & notifications (needs email)
+          - apiSettings
+          - apiNotification
+          - apiCors
+          # graph
+          - apiGraphUser
+          - apiGraph
+          - apiGraphGroup
+          # spaces & dav
+          - apiSpaces
+          - apiSpacesShares
+          - apiSpacesDavOperation
+          - apiDownloads
+          - apiAsyncUpload
+          - apiDepthInfinity
+          - apiArchiver
+          - apiActivities
+          # search
+          - apiSearch1
+          - apiSearch2
+          - apiSearchContent # needs Tika
+          # sharing
+          - apiSharingNgShares
+          - apiReshare
+          - apiSharingNgPermissions
+          - apiSharingNgAdditionalShareRole
+          - apiSharingNgDriveInvitation
+          - apiSharingNgItemInvitation
+          - apiSharingNgDriveLinkShare
+          - apiSharingNgItemLinkShare
+          - apiSharingNgLinkShareManagement
+          # auth
+          - apiAuthApp
+          # antivirus (needs ClamAV)
+          - apiAntivirus
+          # federation (needs email + federation ocis)
+          - apiOcm
+          # collaboration (needs WOPI)
+          - apiCollaboration
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # - name: Create docker image
+      #   if: env.K8S == 'true'
+      #   run: make -C ocis dev-docker
+
+      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+
+      - name: Cache libcurl 8.12.0
+        id: cache-libcurl
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: /opt/libcurl
+          key: libcurl-8.12.0-${{ runner.os }}
+
+      - name: Install libcurl 8.12.0 build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
+
+      - name: Compile libcurl 8.12.0 from source
+        if: steps.cache-libcurl.outputs.cache-hit != 'true'
+        run: |
+          cd /tmp
+          curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
+          tar xzf curl-8.12.0.tar.gz
+          cd curl-8.12.0
+          ./configure --with-ssl --with-zlib --with-nghttp2 --prefix=/opt/libcurl --enable-versioned-symbols --silent
+          make -j$(nproc) --silent
+          sudo make install --silent
+
+      - name: Restore libcurl ldconfig
+        run: |
+          echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
+          sudo ldconfig
+          /opt/libcurl/bin/curl --version | head -1
+          php -r '
+            $v = curl_version()["version"];
+            echo "PHP curl: $v\n";
+            if (version_compare($v, "8.12.0", "<")) {
+              fwrite(STDERR, "FATAL: PHP sees libcurl $v, need >= 8.12.0\n");
+              exit(1);
+            }
+          '
+
+      - name: Download k3d binary
+        if: env.K8S == 'true'
+        run: |
+          K3D_VERSION="v5.8.3"
+          curl -L -o k3d https://github.com/k3d-io/k3d/releases/download/${K3D_VERSION}/k3d-linux-amd64
+          echo "dbaa79a76ace7f4ca230a1ff41dc7d8a5036a8ad0309e9c54f9bf3836dbe853e k3d" | sha256sum --check
+          chmod +x k3d
+          sudo mv k3d /usr/local/bin/
+          k3d version
+
+      - name: Set up kubectl
+        if: env.K8S == 'true'
+        run: |
+          KUBECTL_VERSION=v1.36.0
+          curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+          curl -LO "https://dl.k8s.io/${KUBECTL_VERSION}/bin/linux/amd64/kubectl.sha256"
+          echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+          kubectl version --client
+
+      - name: Install Helm
+        if: env.K8S == 'true'
+        run: |
+          HELM_VERSION="v3.18.4"
+          curl -LO "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz"
+          echo "f8180838c23d7c7d797b208861fecb591d9ce1690d8704ed1e4cb8e2add966c1 helm-${HELM_VERSION}-linux-amd64.tar.gz" | sha256sum --check
+          tar -zxvf helm-${HELM_VERSION}-linux-amd64.tar.gz
+          sudo mv linux-amd64/helm /usr/local/bin/helm
+          rm -rf linux-amd64 helm-${HELM_VERSION}-linux-amd64.tar.gz
+          helm version
+
+      - name: Prepare hosts entry
+        run: |
+          echo "127.0.0.1 ocis-server clamav email collabora onlyoffice fakeoffice tika federation-ocis-server" | sudo tee -a /etc/hosts
+
+      - name: Spin up K3d Cluster
+        if: env.K8S == 'true'
+        run: make -C tests/config/k8s create-cluster
+
+      - name: Prepare Helm Charts & Deploy oCIS
+        if: env.K8S == 'true'
+        run: |
+          cd tests/config/k8s
+
+          # Map Matrix item requirement flags dynamically
+          export ENABLE_ANTIVIRUS=${{ matrix.suite == 'apiAntivirus' }}
+          export ENABLE_EMAIL=${{ matrix.suite == 'apiNotification' || matrix.suite == 'apiSettings' || matrix.suite == 'apiOcm' }}
+          export ENABLE_TIKA=${{ matrix.suite == 'apiSearchContent' }}
+          export ENABLE_WOPI=${{ matrix.suite == 'apiCollaboration' }}
+          export ENABLE_OCM=${{ matrix.suite == 'apiOcm' }}
+          export ENABLE_AUTH_APP=${{ matrix.suite == 'apiAuthApp' }}
+
+          # Prepare base charts and deploy
+          make prepare-charts
+          kubectl get pods -n ocis-server -Aw&
+          make deploy-ocis
+
+          # Deploy dynamic sidecar elements for OCM suite if required
+          if [[ "${{ matrix.suite }}" == "apiOcm" ]]; then
+            OCM=true make prepare-charts
+            OCM=true make deploy-ocis
+          fi
+
+      - name: Deploy Suite-Specific External Backends
+        if: env.K8S == 'true'
+        run: |
+          if [[ "${{ matrix.suite }}" == "apiNotification" || "${{ matrix.suite }}" == "apiSettings" || "${{ matrix.suite }}" == "apiOcm" ]]; then
+            docker run -d -p 1025:1025 -p 8025:8025 --name mailpit axllent/mailpit:v1.22.3
+            bash tests/config/k8s/expose-external-svc.sh email:1025
+          fi
+
+          if [[ "${{ matrix.suite }}" == "apiAntivirus" ]]; then
+            docker run -d -p 3310:3310 --name clamav owncloudci/clamavd
+            bash tests/config/k8s/expose-external-svc.sh clamav:3310
+          fi
+
+          if [[ "${{ matrix.suite }}" == "apiSearchContent" ]]; then
+            docker run -d -p 9998:9998 --name tika apache/tika:3.2.2.0-full
+            bash tests/config/k8s/expose-external-svc.sh tika:9998
+          fi
+
+      - name: Build and Run ociswrapper via Docker
+        run: |
+          # 1. Build using the explicit Dockerfile path from the repo root context
+          cd tests/ociswrapper/
+          docker build -f Dockerfile -t ociswrapper:latest .
+
+          # 2. Run the container on the host network
+          docker run -d \
+            --name ociswrapper \
+            --network host \
+            ociswrapper:latest \
+            serve \
+              --url https://ocis-server \
+              --admin-username admin \
+              --admin-password admin \
+              --skip-ocis-run \
+              -n ocis-server
+
+          # 3. Health check loop to ensure the service is ready
+          echo "Waiting for containerized service to respond..."
+          TIMEOUT=30
+          while ! curl -s http://localhost:5200 > /dev/null; do
+            if [ $TIMEOUT -le 0 ]; then
+              echo "Error: Containerized service failed to start. Logs:"
+              docker logs ociswrapper
+              exit 1
+            fi
+            sleep 1
+            TIMEOUT=$((TIMEOUT - 1))
+          done
+          echo "Containerized service is fully up!"
+
+      - name: Run ${{ matrix.suite }}
+        env:
+          TEST_SERVER_URL: https://ocis-server
+          TEST_SERVER_FED_URL: https://federation-ocis-server
+          STORAGE_DRIVER: ocis
+          BEHAT_SUITES: ${{ matrix.suite }}
+          BEHAT_FILTER_TAGS: "~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage"
+          EXPECTED_FAILURES_FILE: tests/acceptance/expected-failures-localAPI-on-OCIS-storage.md
+          OCIS_WRAPPER_URL: http://localhost:5200
+          COLLABORATION_SERVICE_URL: http://ocis-server:9304
+          K8S: "true"
+        run: |
+          make test-acceptance-api
+
+      - name: Cleanup Environment Setup
+        if: always() && env.K8S == 'true'
+        run: |
+          make -C tests/config/k8s cleanup || true
+          docker rm -vf $(docker ps -aq) || true
+
+  core-api-tests:
+    name: ${{ matrix.suite }}-k8s
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
+          - "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
+          - "coreApiSharees"
+          - "coreApiSharePublicLink2"
+          - "coreApiShareOperationsToShares1,coreApiShareOperationsToShares2,coreApiSharePublicLink1,coreApiShareCreateSpecialToShares1,coreApiShareCreateSpecialToShares2,coreApiShareUpdateToShares"
+          - "coreApiTrashbin,coreApiTrashbinRestore,coreApiWebdavEtagPropagation1,coreApiWebdavEtagPropagation2"
+          - "coreApiWebdavDelete,coreApiWebdavOperations,coreApiWebdavMove2"
+          - "coreApiWebdavProperties"
+          - "coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS"
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # - name: Create docker image
+      #   if: env.K8S == 'true'
+      #   run: make -C ocis dev-docker
+
+      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+
+      - name: Cache libcurl 8.12.0
+        id: cache-libcurl
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: /opt/libcurl
+          key: libcurl-8.12.0-${{ runner.os }}
+
+      - name: Install libcurl 8.12.0 build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
+
+      - name: Compile libcurl 8.12.0 from source
+        if: steps.cache-libcurl.outputs.cache-hit != 'true'
+        run: |
+          cd /tmp
+          curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
+          tar xzf curl-8.12.0.tar.gz
+          cd curl-8.12.0
+          ./configure --with-ssl --with-zlib --with-nghttp2 --prefix=/opt/libcurl --enable-versioned-symbols --silent
+          make -j$(nproc) --silent
+          sudo make install --silent
+
+      - name: Restore libcurl ldconfig
+        run: |
+          echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
+          sudo ldconfig
+          /opt/libcurl/bin/curl --version | head -1
+          php -r '
+            $v = curl_version()["version"];
+            echo "PHP curl: $v\n";
+            if (version_compare($v, "8.12.0", "<")) {
+              fwrite(STDERR, "FATAL: PHP sees libcurl $v, need >= 8.12.0\n");
+              exit(1);
+            }
+          '
+
+      - name: Download k3d binary
+        if: env.K8S == 'true'
+        run: |
+          K3D_VERSION="v5.8.3"
+          curl -L -o k3d https://github.com/k3d-io/k3d/releases/download/${K3D_VERSION}/k3d-linux-amd64
+          echo "dbaa79a76ace7f4ca230a1ff41dc7d8a5036a8ad0309e9c54f9bf3836dbe853e k3d" | sha256sum --check
+          chmod +x k3d
+          sudo mv k3d /usr/local/bin/
+          k3d version
+
+      - name: Set up kubectl
+        if: env.K8S == 'true'
+        run: |
+          KUBECTL_VERSION=v1.36.0
+          curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+          curl -LO "https://dl.k8s.io/${KUBECTL_VERSION}/bin/linux/amd64/kubectl.sha256"
+          echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+          kubectl version --client
+
+      - name: Install Helm
+        if: env.K8S == 'true'
+        run: |
+          HELM_VERSION="v3.18.4"
+          curl -LO "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz"
+          echo "f8180838c23d7c7d797b208861fecb591d9ce1690d8704ed1e4cb8e2add966c1 helm-${HELM_VERSION}-linux-amd64.tar.gz" | sha256sum --check
+          tar -zxvf helm-${HELM_VERSION}-linux-amd64.tar.gz
+          sudo mv linux-amd64/helm /usr/local/bin/helm
+          rm -rf linux-amd64 helm-${HELM_VERSION}-linux-amd64.tar.gz
+          helm version
+
+      - name: Prepare hosts entry
+        run: |
+          echo "127.0.0.1 ocis-server clamav email collabora onlyoffice fakeoffice tika federation-ocis-server" | sudo tee -a /etc/hosts
+
+      # --- K8s SETUP & EXTERNAL SERVICES DEPLOYMENT ---
+
+      - name: Spin up K3d Cluster
+        if: env.K8S == 'true'
+        run: make -C tests/config/k8s create-cluster
+
+      - name: Prepare Helm Charts & Deploy oCIS
+        if: env.K8S == 'true'
+        run: |
+          cd tests/config/k8s
+
+          # Map Matrix item requirement flags dynamically
+          export ENABLE_ANTIVIRUS=${{ matrix.suite == 'apiAntivirus' }}
+          export ENABLE_EMAIL=${{ matrix.suite == 'apiNotification' || matrix.suite == 'apiSettings' || matrix.suite == 'apiOcm' }}
+          export ENABLE_TIKA=${{ matrix.suite == 'apiSearchContent' }}
+          export ENABLE_WOPI=${{ matrix.suite == 'apiCollaboration' }}
+          export ENABLE_OCM=${{ matrix.suite == 'apiOcm' }}
+          export ENABLE_AUTH_APP=${{ matrix.suite == 'apiAuthApp' }}
+
+          # Prepare base charts and deploy
+          make prepare-charts
+          kubectl get pods -n ocis-server -Aw&
+          make deploy-ocis
+
+          # Deploy dynamic sidecar elements for OCM suite if required
+          if [[ "${{ matrix.suite }}" == "apiOcm" ]]; then
+            OCM=true make prepare-charts
+            OCM=true make deploy-ocis
+          fi
+
+      - name: Deploy Suite-Specific External Backends
+        if: env.K8S == 'true'
+        run: |
+          if [[ "${{ matrix.suite }}" == "apiNotification" || "${{ matrix.suite }}" == "apiSettings" || "${{ matrix.suite }}" == "apiOcm" ]]; then
+            docker run -d -p 1025:1025 -p 8025:8025 --name mailpit axllent/mailpit:v1.22.3
+            bash tests/config/k8s/expose-external-svc.sh email:1025
+          fi
+
+          if [[ "${{ matrix.suite }}" == "apiAntivirus" ]]; then
+            docker run -d -p 3310:3310 --name clamav owncloudci/clamavd
+            bash tests/config/k8s/expose-external-svc.sh clamav:3310
+          fi
+
+          if [[ "${{ matrix.suite }}" == "apiSearchContent" ]]; then
+            docker run -d -p 9998:9998 --name tika apache/tika:3.2.2.0-full
+            bash tests/config/k8s/expose-external-svc.sh tika:9998
+          fi
+
+      - name: Build and Run ociswrapper via Docker
+        run: |
+          # 1. Build using the explicit Dockerfile path from the repo root context
+          cd tests/ociswrapper/
+          docker build -f Dockerfile -t ociswrapper:latest .
+
+          # 2. Run the container on the host network
+          docker run -d \
+            --name ociswrapper \
+            --network host \
+            ociswrapper:latest \
+            serve \
+              --url https://ocis-server \
+              --admin-username admin \
+              --admin-password admin \
+              --skip-ocis-run \
+              -n ocis-server
+
+          # 3. Health check loop to ensure the service is ready
+          echo "Waiting for containerized service to respond..."
+          TIMEOUT=30
+          while ! curl -s http://localhost:5200 > /dev/null; do
+            if [ $TIMEOUT -le 0 ]; then
+              echo "Error: Containerized service failed to start. Logs:"
+              docker logs ociswrapper
+              exit 1
+            fi
+            sleep 1
+            TIMEOUT=$((TIMEOUT - 1))
+          done
+          echo "Containerized service is fully up!"
+
+      # --- RUN TESTS ---
+
+      - name: Run API tests ${{matrix.suite}}
+        env:
+          TEST_SERVER_URL: https://ocis-server
+          OCIS_REVA_DATA_ROOT: ""
+          STORAGE_DRIVER: ocis
+          BEHAT_FILTER_TAGS: "~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage"
+          BEHAT_SUITES: ${{ matrix.suite }}
+          ACCEPTANCE_TEST_TYPE: core-api
+          EXPECTED_FAILURES_FILE: tests/acceptance/expected-failures-localAPI-on-OCIS-storage.md
+          UPLOAD_DELETE_WAIT_TIME: "0"
+          OCIS_WRAPPER_URL: http://localhost:5200
+          WITH_REMOTE_PHP: "false"
+          K8S: "true"
+        run: |
+          if [[ "$WITH_REMOTE_PHP" != "true" ]]; then
+            cat tests/acceptance/expected-failures-without-remotephp.md >> \
+              "$EXPECTED_FAILURES_FILE"
+          fi
+
+          make test-acceptance-api
+
+      - name: Cleanup Environment Setup
+        if: always() && env.K8S == 'true'
+        run: |
+          make -C tests/config/k8s cleanup || true
+          docker rm -vf $(docker ps -aq) || true

@@ -9,6 +9,7 @@ import json
 import os
 import sys
 import subprocess
+from subprocess import check_output
 import signal
 import time
 import tempfile
@@ -28,10 +29,12 @@ EMAIL_SMTP_SENDER = "ownCloud <noreply@example.com>"
 LOCAL_API_TESTS = {
     "contractAndLock": {
         "suites": ["apiContract", "apiLocks"],
+        "k8s": True,
     },
     "settingsAndNotification": {
         "suites": ["apiSettings", "apiNotification", "apiCors"],
         "emailNeeded": True,
+        "k8s": False,
         "extraEnvironment": {
             "EMAIL_HOST": EMAIL_SMTP_HOST,
             "EMAIL_PORT": EMAIL_PORT,
@@ -47,46 +50,56 @@ LOCAL_API_TESTS = {
     },
     "graphUser": {
         "suites": ["apiGraphUser"],
+        "k8s": True,
     },
     "spaces": {
         "suites": ["apiSpaces"],
+        "k8s": True,
     },
     "spacesShares": {
         "suites": ["apiSpacesShares"],
+        "k8s": True,
     },
     "davOperations": {
         "suites": [
             "apiSpacesDavOperation", "apiDownloads", "apiAsyncUpload",
             "apiDepthInfinity", "apiArchiver", "apiActivities",
         ],
+        "k8s": True,
     },
     "groupAndSearch1": {
         "suites": ["apiSearch1", "apiGraph", "apiGraphGroup"],
+        "k8s": True,
     },
     "search2": {
         "suites": ["apiSearch2", "apiSearchContent"],
-        "tikaNeeded": True,
+        "tikaNeeded": False,
         "extraServerEnvironment": {
             "FRONTEND_FULL_TEXT_SEARCH_ENABLED": "true",
             "SEARCH_EXTRACTOR_TYPE": "tika",
             "SEARCH_EXTRACTOR_TIKA_TIKA_URL": "http://localhost:9998",
             "SEARCH_EXTRACTOR_CS3SOURCE_INSECURE": "true",
         },
+        "k8s": True,
     },
     "sharingNg1": {
         "suites": ["apiSharingNgShares", "apiReshare", "apiSharingNgPermissions"],
+        "k8s": True,
     },
     "sharingNgAdditionalShareRole": {
         "suites": ["apiSharingNgAdditionalShareRole"],
+        "k8s": True,
     },
     "sharingNgShareInvitation": {
         "suites": ["apiSharingNgDriveInvitation", "apiSharingNgItemInvitation"],
+        "k8s": True,
     },
     "sharingNgLinkShare": {
         "suites": [
             "apiSharingNgDriveLinkShare", "apiSharingNgItemLinkShare",
             "apiSharingNgLinkShareManagement",
         ],
+        "k8s": False,
     },
     "antivirus": {
         "suites": ["apiAntivirus"],
@@ -98,11 +111,13 @@ LOCAL_API_TESTS = {
             "OCIS_ADD_RUN_SERVICES": "antivirus",
             "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9277",
         },
+        "k8s": True,
     },
     "ocm": {
         "suites": ["apiOcm"],
         "emailNeeded": True,
         "federationServer": True,
+        "k8s": False,
         "extraEnvironment": {
             "EMAIL_HOST": EMAIL_SMTP_HOST,
             "EMAIL_PORT": EMAIL_PORT,
@@ -123,6 +138,7 @@ LOCAL_API_TESTS = {
     },
     "authApp": {
         "suites": ["apiAuthApp"],
+        "k8s": True,
         "extraServerEnvironment": {
             "OCIS_ADD_RUN_SERVICES": "auth-app",
             "PROXY_ENABLE_APP_AUTH": "true",
@@ -130,6 +146,7 @@ LOCAL_API_TESTS = {
     },
     "wopi": {
         "suites": ["apiCollaboration"],
+        "k8s": False,
         "collaborationServiceNeeded": True,
         "extraServerEnvironment": {
             "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
@@ -139,6 +156,7 @@ LOCAL_API_TESTS = {
         "suites": ["cliCommands", "apiServiceAvailability"],
         "antivirusNeeded": True,
         "emailNeeded": True,
+        "k8s": False,
         "extraEnvironment": {
             "EMAIL_HOST": EMAIL_SMTP_HOST,
             "EMAIL_PORT": EMAIL_PORT,
@@ -184,11 +202,12 @@ def merged_config(suites: list) -> dict:
         "collaborationServiceNeeded": False,
         "extraServerEnvironment": {},
         "extraEnvironment": {},
+        "k8s": False,
     }
     for suite in suites:
         cfg = _SUITE_TO_CONFIG.get(suite, {})
         for flag in ("emailNeeded", "antivirusNeeded", "tikaNeeded",
-                     "federationServer", "collaborationServiceNeeded"):
+                     "federationServer", "collaborationServiceNeeded", "k8s"):
             if cfg.get(flag):
                 merged[flag] = True
         merged["extraServerEnvironment"].update(cfg.get("extraServerEnvironment", {}))
@@ -303,6 +322,15 @@ def mailpit_healthy() -> bool:
         capture_output=True,
     ).returncode == 0
 
+def wrapper_healthy() -> bool:
+    return (
+        subprocess.run(
+            ["curl", "-sf", "http://localhost:5200"],
+            capture_output=True,
+        ).returncode
+        == 0
+    )
+
 
 def tika_healthy() -> bool:
     return subprocess.run(
@@ -345,6 +373,138 @@ def run(cmd: list, env: dict = None, check: bool = True):
     return subprocess.run(cmd, env=e, check=check)
 
 
+def run_k8s_ocis(repo_root: Path, suites: list, cfg: dict,ocis_url: str) -> int:
+    """Run tests using k3d + helm (Drone K8s equivalent)."""
+
+    print("Starting K8s test environment...")
+
+    os.environ["KUBECONFIG"] = str(Path.home() / ".kube/config")
+    servers = []
+    env = {}
+
+    if cfg.get("antivirusNeeded"):
+        env["ENABLE_ANTIVIRUS"]='true'
+        servers.append("clamav:3310")
+        wait_for(clamav_healthy, 300, "clamav")
+        print("clamav ready.")
+    if cfg.get("emailNeeded"):
+        env["ENABLE_EMAIL"]='true'
+        wait_for(mailpit_healthy, 60, "mailpit")
+        servers.append("email:1025")
+    if cfg.get("tikaNeeded"):
+        env["ENABLE_TIKA"]='true'
+        servers.append("tika:9998")
+        wait_for(tika_healthy, 120, "tika")
+        print("tika ready.")
+    if "OCIS_ADD_RUN_SERVICES" in cfg["extraServerEnvironment"] and cfg["extraServerEnvironment"]["OCIS_ADD_RUN_SERVICES"] == "auth-app":
+        env["ENABLE_AUTH_APP"]='true'
+    run(["make", "-C", str(repo_root / "tests/config/k8s"), "create-cluster"])
+    subprocess.Popen(["kubectl", "get", "pods", "-n", "local-ocis", "-Aw"])
+    run(["echo", "image"])
+    run(["k3d", "image","import","owncloud/ocis:dev","-c","local-ocis"])
+    run(["make", "-C", str(repo_root / "tests/config/k8s"), "prepare-charts"],env)
+    try:
+        run(["make", "-C", str(repo_root / "tests/config/k8s"), "deploy-ocis"],env=env)
+    except subprocess.CalledProcessError as e:
+        pod_name = check_output([
+                    "kubectl",
+                    "get",
+                    "pod",
+                    "-n",
+                    "ocis-server",
+                    "-l",
+                    "app=idp",
+                    "-o",
+                    "jsonpath={.items[0].metadata.name}"
+                ]).decode().strip()
+        run(["kubectl", "describe", "pod", f"{pod_name}", "-n", "ocis-server"])
+        run(["kubectl", "logs", "-n", "ocis-server", f"{pod_name}"])
+        run(["kubectl", "logs", "-n", "ocis-server", f"{pod_name}","--previous"])
+        run(["cat", str(repo_root / "tests/config/k8s/logs/ocis.log")])
+
+    if cfg.get("federationServer"):
+        env["ENABLE_OCM"]='true'
+        env["OCM"]='true'
+        run(["make", "-C", str(repo_root / "tests/config/k8s"), "create-cluster"],env)
+        run(["k3d", "image","import","owncloud/ocis:dev","-c","local-ocis-fed"])
+        run(["make", "-C", str(repo_root / "tests/config/k8s"), "prepare-charts"],env)
+        run(["make", "-C", str(repo_root / "tests/config/k8s"), "deploy-ocis"],env)
+
+    if servers:
+        run(
+            [
+                "bash",
+                str(repo_root / "tests/config/k8s/expose-external-svc.sh"),
+                "-n",
+                "ocis-server",
+                ",".join(servers),
+            ]
+        )
+
+def run_test(
+    repo_root: Path,
+    suites: list,
+    cfg: dict,
+    ocis_url: str,
+    ocis_fed_url: str,
+    acceptance_test_type: str,
+    k8s: bool = False
+) -> int:
+    wait_for(lambda: ocis_healthy(ocis_url), 300, "ocis")
+    print("ocis ready.")
+    if cfg["federationServer"]:
+        wait_for(lambda: ocis_healthy(ocis_fed_url), 300, "federation ocis")
+        print("federation ocis ready.")
+
+    # expected failures file
+    if acceptance_test_type == "core-api":
+        filter_tags = "~@skipOnGraph&&~@skipOnOcis-OCIS-Storage"
+        base_failures = repo_root / "tests/acceptance/expected-failures-API-on-OCIS-storage.md"
+    else:
+        filter_tags = "~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage"
+        base_failures = repo_root / "tests/acceptance/expected-failures-localAPI-on-OCIS-storage.md"
+
+    ef_override = os.environ.get("EXPECTED_FAILURES_FILE")
+    if ef_override:
+        p = Path(ef_override)
+        base_failures = p if p.is_absolute() else repo_root / p
+
+    # merge expected-failures-without-remotephp.md only when not using remote.php
+    # (mirrors drone.star: "" if run_with_remote_php else "cat ...without-remotephp.md >> ...")
+    tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False)
+    tmp.write(base_failures.read_text())
+    if os.environ.get("WITH_REMOTE_PHP", "false").lower() != "true":
+        without_rphp = repo_root / "tests/acceptance/expected-failures-without-remotephp.md"
+        if without_rphp.exists():
+            tmp.write("\n")
+            tmp.write(without_rphp.read_text())
+    tmp.close()
+
+    # run tests
+    behat_env = {
+        **os.environ,
+        "TEST_SERVER_URL": ocis_url,
+        "TEST_SERVER_FED_URL": ocis_fed_url,
+        "OCIS_WRAPPER_URL": "http://localhost:5200",
+        "BEHAT_SUITES": ",".join(suites),
+        "ACCEPTANCE_TEST_TYPE": "core-api",
+        "BEHAT_FILTER_TAGS": filter_tags,
+        "EXPECTED_FAILURES_FILE": tmp.name,
+        "STORAGE_DRIVER": "ocis",
+        "UPLOAD_DELETE_WAIT_TIME": "0",
+        "EMAIL_HOST": "email" if k8s else EMAIL_SMTP_HOST,
+        "EMAIL_PORT": EMAIL_PORT,
+        "COLLABORATION_SERVICE_URL": f"http://localhost:{_WOPI_PORTS['fakeoffice']['http']}",
+    }
+
+    behat_env.update(cfg["extraEnvironment"])
+    print(f"Running suites: {suites} (type: {acceptance_test_type})")
+    result = subprocess.run(
+        ["make", "-C", str(repo_root), "test-acceptance-api"],
+        env=behat_env,
+    )
+    return result.returncode
+
 def main() -> int:
     behat_suites_raw = os.environ.get("BEHAT_SUITES", "").strip()
     if not behat_suites_raw:
@@ -353,6 +513,7 @@ def main() -> int:
 
     suites = [s.strip() for s in behat_suites_raw.split(",") if s.strip()]
     acceptance_test_type = os.environ.get("ACCEPTANCE_TEST_TYPE", "api")
+    k8s = os.environ.get("K8S", "false")
 
     repo_root = Path(__file__).resolve().parents[2]
     ocis_bin = repo_root / "ocis/bin/ocis"
@@ -362,7 +523,23 @@ def main() -> int:
 
     ocis_fed_url = "https://localhost:10200"
 
+    # generate fontsMap.json with correct font path (drone hardcodes /drone/src/...)
+    font_path = str(repo_root / "tests/config/drone/NotoSans.ttf")
+    fontmap_tmp = tempfile.NamedTemporaryFile(
+        mode="w", suffix=".json", prefix="fontsMap-", delete=False)
+    json.dump({"defaultFont": font_path}, fontmap_tmp)
+    fontmap_tmp.close()
+
+    # assemble ocis server env
     cfg = merged_config(suites)
+    server_env = {**os.environ}
+    server_env.update(base_server_env(repo_root, ocis_url, str(ocis_config_dir)))
+    server_env["THUMBNAILS_TXT_FONTMAP_FILE"] = fontmap_tmp.name
+    server_env.update(cfg["extraServerEnvironment"])
+    # optional services
+    procs = []
+    run(["make", "-C", str(repo_root / "tests/ociswrapper"), "build"],
+        env={"GOWORK": "off"})
     print(f"Suites: {suites}")
     print(f"Services: email={cfg['emailNeeded']} tika={cfg['tikaNeeded']} "
           f"antivirus={cfg['antivirusNeeded']} federation={cfg['federationServer']} "
@@ -416,24 +593,54 @@ def main() -> int:
         print("tika ready.")
 
     # OCM federation: rewrite providers.json with localhost URLs
-    if cfg["federationServer"]:
-        providers_src = repo_root / "tests/config/ci/providers.json"
-        providers = json.loads(providers_src.read_text())
-        for p in providers:
-            # replace container DNS names with localhost
-            p["domain"] = p["domain"].replace("ocis-server:9200", "localhost:9200")
-            p["domain"] = p["domain"].replace("federation-ocis-server:10200", "localhost:10200")
-            for svc in p.get("services", []):
-                ep = svc.get("endpoint", {})
-                ep["path"] = ep.get("path", "").replace("ocis-server:9200", "localhost:9200")
-                ep["path"] = ep.get("path", "").replace("federation-ocis-server:10200", "localhost:10200")
-                svc["host"] = svc.get("host", "").replace("ocis-server:9200", "localhost:9200")
-                svc["host"] = svc.get("host", "").replace("federation-ocis-server:10200", "localhost:10200")
-        providers_tmp = tempfile.NamedTemporaryFile(
-            mode="w", suffix=".json", prefix="ocm-providers-", delete=False)
-        json.dump(providers, providers_tmp)
-        providers_tmp.close()
-        cfg["extraServerEnvironment"]["OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE"] = providers_tmp.name
+    if cfg["federationServer"] and k8s and cfg[k8s]:
+        cfg["extraServerEnvironment"]["OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE"] = repo_root / "tests/config/ci/providers.json"
+    else:
+        cfg["extraServerEnvironment"]["OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE"] = repo_root / "tests/config/local/providers.json"
+
+    if k8s == "true" and cfg[k8s]:
+        ocis_url = "https://ocis-server"
+        ocis_fed_url = "https://federation-ocis-server"
+        wrapper_proc = subprocess.Popen(
+            [
+                str(wrapper_bin),
+                "serve",
+                "--url",
+                ocis_url,
+                "--skip-ocis-run",
+                "-n",
+                "ocis-server",
+                "--admin-username",
+                "admin",
+                "--admin-password",
+                "admin",
+            ],
+            env=server_env,
+        )
+        run_k8s_ocis(repo_root, suites, cfg,ocis_url)
+        test_result = run_test(repo_root, suites, cfg, ocis_url, ocis_fed_url, acceptance_test_type, True)
+        wrapper_proc.terminate()
+        return test_result
+
+
+    # php deps
+    run(["composer", "install", "--no-progress"],
+        env={"COMPOSER_NO_INTERACTION": "1", "COMPOSER_NO_AUDIT": "1"})
+    run(["composer", "bin", "behat", "install", "--no-progress"],
+        env={"COMPOSER_NO_INTERACTION": "1", "COMPOSER_NO_AUDIT": "1"})
+
+
+    # generate IDP web assets (required for IDP service to start; matches drone ci-node-generate)
+    run(["make", "-C", str(repo_root / "services/idp"), "ci-node-generate"])
+    # download web UI assets (required for robots.txt and other static assets; no pnpm needed)
+    run(["make", "-C", str(repo_root / "services/web"), "ci-node-generate"])
+
+    # build (ENABLE_VIPS=true when libvips-dev is installed, matching drone)
+    build_env = {}
+    if subprocess.run(["pkg-config", "--exists", "vips"],
+                      capture_output=True).returncode == 0:
+        build_env["ENABLE_VIPS"] = "true"
+    run(["make", "-C", str(repo_root / "ocis"), "build"], env=build_env)
 
     # init ocis
     run([str(ocis_bin), "init", "--insecure", "true"])
@@ -441,19 +648,6 @@ def main() -> int:
         repo_root / "tests/config/ci/app-registry.yaml",
         ocis_config_dir / "app-registry.yaml",
     )
-
-    # generate fontsMap.json with the correct absolute font path for this runner
-    font_path = str(repo_root / "tests/config/ci/NotoSans.ttf")
-    fontmap_tmp = tempfile.NamedTemporaryFile(
-        mode="w", suffix=".json", prefix="fontsMap-", delete=False)
-    json.dump({"defaultFont": font_path}, fontmap_tmp)
-    fontmap_tmp.close()
-
-    # assemble ocis server env
-    server_env = {**os.environ}
-    server_env.update(base_server_env(repo_root, ocis_url, str(ocis_config_dir)))
-    server_env["THUMBNAILS_TXT_FONTMAP_FILE"] = fontmap_tmp.name
-    server_env.update(cfg["extraServerEnvironment"])
 
     # start ociswrapper (primary ocis)
     print("Starting ocis...")
@@ -512,6 +706,7 @@ def main() -> int:
         # The collaboration service hits that window at startup → readLoopPeekFailLocked
         # → healthz never binds → 300s timeout.  Use Python's built-in HTTP server
         # instead; it handles concurrent connections without gaps.
+        # tests/config/ci/hosting-discovery.xml
         run(["docker", "run", "-d", "--name", "fakeoffice", "--network", "host",
              "-v", f"{repo_root}:/ocis:ro",
              "python:3-alpine",
@@ -659,61 +854,8 @@ def main() -> int:
     signal.signal(signal.SIGINT, cleanup)
 
     try:
-        wait_for(lambda: ocis_healthy(ocis_url), 300, "ocis")
-        print("ocis ready.")
-
-        if cfg["federationServer"]:
-            wait_for(lambda: ocis_healthy(ocis_fed_url), 300, "federation ocis")
-            print("federation ocis ready.")
-
-        # expected failures file
-        if acceptance_test_type == "core-api":
-            filter_tags = "~@skipOnGraph&&~@skipOnOcis-OCIS-Storage"
-            base_failures = repo_root / "tests/acceptance/expected-failures-API-on-OCIS-storage.md"
-        else:
-            filter_tags = "~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage"
-            base_failures = repo_root / "tests/acceptance/expected-failures-localAPI-on-OCIS-storage.md"
-
-        ef_override = os.environ.get("EXPECTED_FAILURES_FILE")
-        if ef_override:
-            p = Path(ef_override)
-            base_failures = p if p.is_absolute() else repo_root / p
-
-        # merge expected-failures-without-remotephp.md only when not using remote.php
-        # (mirrors drone.star: "" if run_with_remote_php else "cat ...without-remotephp.md >> ...")
-        tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False)
-        tmp.write(base_failures.read_text())
-        if os.environ.get("WITH_REMOTE_PHP", "false").lower() != "true":
-            without_rphp = repo_root / "tests/acceptance/expected-failures-without-remotephp.md"
-            if without_rphp.exists():
-                tmp.write("\n")
-                tmp.write(without_rphp.read_text())
-        tmp.close()
-
-        # run tests
-        behat_env = {
-            **os.environ,
-            "TEST_SERVER_URL": ocis_url,
-            "TEST_SERVER_FED_URL": ocis_fed_url,
-            "OCIS_WRAPPER_URL": "http://localhost:5200",
-            "BEHAT_SUITES": behat_suites_raw,
-            "ACCEPTANCE_TEST_TYPE": acceptance_test_type,
-            "BEHAT_FILTER_TAGS": filter_tags,
-            "EXPECTED_FAILURES_FILE": tmp.name,
-            "STORAGE_DRIVER": "ocis",
-            "UPLOAD_DELETE_WAIT_TIME": "0",
-            "EMAIL_HOST": "localhost",
-            "EMAIL_PORT": EMAIL_PORT,
-            "COLLABORATION_SERVICE_URL": f"http://localhost:{_WOPI_PORTS['fakeoffice']['http']}",
-        }
-        behat_env.update(cfg["extraEnvironment"])
-
-        print(f"Running suites: {behat_suites_raw} (type: {acceptance_test_type})")
-        result = subprocess.run(
-            ["make", "-C", str(repo_root), "test-acceptance-api"],
-            env=behat_env,
-        )
-        return result.returncode
+        test_result = run_test(repo_root, suites, cfg, ocis_url, ocis_fed_url,acceptance_test_type)
+        return test_result
 
     finally:
         cleanup()
