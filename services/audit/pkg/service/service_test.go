@@ -252,7 +252,7 @@ var testCases = []struct {
 				GranteeGroupID: nil,
 				Sharer:         userID("sharing-userid"),
 				MTime:          timestamp(10e8),
-				State:          "SHARE_STATE_DECLINED",
+				State:          "SHARE_STATE_REJECTED",
 			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
