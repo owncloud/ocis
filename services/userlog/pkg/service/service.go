@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"sync"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -40,6 +41,13 @@ type UserlogService struct {
 	tracer           trace.Tracer
 	publisher        events.Publisher
 	filter           *userlogFilter
+
+	// storeMu serializes the read-modify-write cycles in alterUserEventList and
+	// alterGlobalEvents. The events are processed by MaxConcurrency workers, so
+	// without this lock two workers operating on the same user event list (or on
+	// the single global-events key) can interleave their read and write and drop
+	// each other's updates, silently losing notifications.
+	storeMu sync.Mutex
 }
 
 // NewUserlogService returns an EventHistory service
@@ -416,6 +424,9 @@ func (ul *UserlogService) removeExpiredEvents(userid string, all []string, recei
 }
 
 func (ul *UserlogService) alterUserEventList(userid string, alter func([]string) []string) error {
+	ul.storeMu.Lock()
+	defer ul.storeMu.Unlock()
+
 	recs, err := ul.store.Read(userid)
 	if err != nil && err != store.ErrNotFound {
 		return err
@@ -449,6 +460,10 @@ func (ul *UserlogService) alterUserEventList(userid string, alter func([]string)
 func (ul *UserlogService) alterGlobalEvents(ctx context.Context, alter func(map[string]json.RawMessage) error) error {
 	_, span := ul.tracer.Start(ctx, "alterGlobalEvents")
 	defer span.End()
+
+	ul.storeMu.Lock()
+	defer ul.storeMu.Unlock()
+
 	evs, err := ul.GetGlobalEvents(ctx)
 	if err != nil && err != store.ErrNotFound {
 		return err
