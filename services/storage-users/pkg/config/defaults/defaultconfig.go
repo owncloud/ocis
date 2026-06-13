@@ -165,7 +165,11 @@ func DefaultConfig() *config.Config {
 			Store:    "memory",
 			Nodes:    []string{"127.0.0.1:9233"},
 			Database: "ids-storage-users",
-			TTL:      24 * 60 * time.Second,
+			// No default TTL: the ID cache holds the authoritative id<->path
+			// index, not transient data. Expiring it makes the storage provider
+			// lose track of existing nodes (files appear to vanish / are
+			// re-resolved from disk) once entries age out. A TTL of 0 keeps the
+			// entries until they are explicitly invalidated.
 		},
 		Tasks: config.Tasks{
 			PurgeTrashBin: config.PurgeTrashBin{
