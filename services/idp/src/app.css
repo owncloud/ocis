@@ -163,8 +163,12 @@ strong {
 }
 
 .oc-login-bg {
-  background-image: url(./images/background.jpg);
-  background-size: cover;
+  background-image: var(--oc-login-background-image, url(./images/background.jpg));
+  /* contain (not cover) so the logo baked into the artwork is never cropped
+     at viewport aspect ratios that differ from the image; the matching solid
+     color fills any letterbox so it blends with the artwork's edges */
+  background-color: #3c4d9b;
+  background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
   z-index: 0;

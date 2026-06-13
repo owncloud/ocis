@@ -37,6 +37,10 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "idp",
 		},
+		Asset: config.Asset{
+			// builtin ownCloud branding background, can be overridden with IDP_LOGIN_BACKGROUND_URL
+			LoginBackgroundUrl: "/signin/v1/static/owncloud-background.jpg",
+		},
 		IDP: config.Settings{
 			Iss:                                "https://localhost:9200",
 			IdentityManager:                    "ldap",

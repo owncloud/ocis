@@ -318,7 +318,7 @@ func (idp *IDP) Index() http.HandlerFunc {
 	indexHTML := bytes.Replace(template, []byte("__PATH_PREFIX__"), []byte(pp), 1)
 
 	background := idp.config.Asset.LoginBackgroundUrl
-	indexHTML = bytes.Replace(template, []byte("__BG_IMG_URL__"), []byte(background), 1)
+	indexHTML = bytes.Replace(indexHTML, []byte("__BG_IMG_URL__"), []byte(background), 1)
 
 	nonce := rndm.GenerateRandomString(32)
 	indexHTML = bytes.Replace(indexHTML, []byte("__CSP_NONCE__"), []byte(nonce), 1)
