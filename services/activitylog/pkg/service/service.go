@@ -16,6 +16,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
+	"github.com/shamaton/msgpack/v2"
 	microstore "go-micro.dev/v4/store"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -34,6 +35,78 @@ type RawActivity struct {
 	Timestamp time.Time `json:"timestamp"`
 }
 
+// Debouncer coalesces activities per resource id over a configurable window
+// before flushing them to the store in a single read-modify-write. This removes
+// most of the per-event marshal/unmarshal/write cycles that make the activitylog
+// consumer fall behind under bursty load.
+type Debouncer struct {
+	after time.Duration
+	flush func(id string, activities []RawActivity) error
+	log   log.Logger
+
+	mutex   sync.Mutex
+	pending map[string]*queueItem
+}
+
+type queueItem struct {
+	activities []RawActivity
+	timer      *time.Timer
+}
+
+// NewDebouncer returns a new Debouncer. A duration of 0 flushes synchronously,
+// which preserves the previous (un-buffered) behaviour and is convenient for tests.
+func NewDebouncer(after time.Duration, logger log.Logger, flush func(id string, activities []RawActivity) error) *Debouncer {
+	return &Debouncer{
+		after:   after,
+		flush:   flush,
+		log:     logger,
+		pending: make(map[string]*queueItem),
+	}
+}
+
+// Debounce queues an activity for the given resource id. With a zero window the
+// activity is flushed immediately. Otherwise the flush happens once the window
+// has elapsed since the first queued activity for that id; further activities in
+// the window are appended and flushed together.
+func (d *Debouncer) Debounce(id string, ra RawActivity) {
+	if d.after == 0 {
+		if err := d.flush(id, []RawActivity{ra}); err != nil {
+			d.log.Error().Err(err).Str("resourceid", id).Msg("could not store activity")
+		}
+		return
+	}
+
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	item, ok := d.pending[id]
+	if !ok {
+		item = &queueItem{}
+		d.pending[id] = item
+		item.timer = time.AfterFunc(d.after, func() { d.flushItem(id) })
+	}
+	item.activities = append(item.activities, ra)
+}
+
+// flushItem removes the queued activities for id under the lock and flushes them
+// outside of it, so the (potentially slow) store write never blocks Debounce and
+// the activities slice is never read and appended to concurrently.
+func (d *Debouncer) flushItem(id string) {
+	d.mutex.Lock()
+	item, ok := d.pending[id]
+	if !ok {
+		d.mutex.Unlock()
+		return
+	}
+	delete(d.pending, id)
+	activities := item.activities
+	d.mutex.Unlock()
+
+	if err := d.flush(id, activities); err != nil {
+		d.log.Error().Err(err).Str("resourceid", id).Msg("could not store buffered activities")
+	}
+}
+
 // ActivitylogService logs events per resource
 type ActivitylogService struct {
 	cfg        *config.Config
@@ -45,6 +118,8 @@ type ActivitylogService struct {
 	evHistory  ehsvc.EventHistoryService
 	valService settingssvc.ValueService
 	lock       sync.RWMutex
+
+	debouncer *Debouncer
 
 	registeredEvents map[string]events.Unmarshaller
 }
@@ -81,6 +156,7 @@ func New(opts ...Option) (*ActivitylogService, error) {
 		lock:             sync.RWMutex{},
 		registeredEvents: make(map[string]events.Unmarshaller),
 	}
+	s.debouncer = NewDebouncer(o.Config.WriteBufferDuration, o.Logger, s.storeActivity)
 
 	s.mux.Get("/graph/v1beta1/extensions/org.libregraph/activities", s.HandleGetItemActivities)
 
@@ -175,7 +251,11 @@ func (a *ActivitylogService) AddActivityTrashed(resourceID *provider.ResourceId,
 	}
 
 	// store activity on trashed item
-	if err := a.storeActivity(storagespace.FormatResourceID(resourceID), eventID, 0, timestamp); err != nil {
+	if err := a.storeActivity(storagespace.FormatResourceID(resourceID), []RawActivity{{
+		EventID:   eventID,
+		Depth:     0,
+		Timestamp: timestamp,
+	}}); err != nil {
 		return fmt.Errorf("could not store activity: %w", err)
 	}
 
@@ -200,8 +280,11 @@ func (a *ActivitylogService) AddSpaceActivity(spaceID *provider.StorageSpaceId, 
 		return fmt.Errorf("could not parse space id: %w", err)
 	}
 	rid.OpaqueId = rid.GetSpaceId()
-	return a.storeActivity(storagespace.FormatResourceID(&rid), eventID, 0, timestamp)
-
+	return a.storeActivity(storagespace.FormatResourceID(&rid), []RawActivity{{
+		EventID:   eventID,
+		Depth:     0,
+		Timestamp: timestamp,
+	}})
 }
 
 // Activities returns the activities for the given resource
@@ -229,7 +312,7 @@ func (a *ActivitylogService) RemoveActivities(rid *provider.ResourceId, toDelete
 		}
 	}
 
-	b, err := json.Marshal(acts)
+	b, err := msgpack.Marshal(acts)
 	if err != nil {
 		return err
 	}
@@ -265,7 +348,7 @@ func (a *ActivitylogService) activities(rid *provider.ResourceId) ([]RawActivity
 	}
 
 	var activities []RawActivity
-	if err := json.Unmarshal(records[0].Value, &activities); err != nil {
+	if err := unmarshalActivities(records[0].Value, &activities); err != nil {
 		return nil, fmt.Errorf("could not unmarshal activities: %w", err)
 	}
 
@@ -286,9 +369,11 @@ func (a *ActivitylogService) addActivity(initRef *provider.Reference, eventID st
 			return fmt.Errorf("could not get resource info: %w", err)
 		}
 
-		if err := a.storeActivity(storagespace.FormatResourceID(info.GetId()), eventID, depth, timestamp); err != nil {
-			return fmt.Errorf("could not store activity: %w", err)
-		}
+		a.debouncer.Debounce(storagespace.FormatResourceID(info.GetId()), RawActivity{
+			EventID:   eventID,
+			Depth:     depth,
+			Timestamp: timestamp,
+		})
 
 		if info != nil && utils.IsSpaceRoot(info) {
 			return nil
@@ -299,7 +384,7 @@ func (a *ActivitylogService) addActivity(initRef *provider.Reference, eventID st
 	}
 }
 
-func (a *ActivitylogService) storeActivity(resourceID string, eventID string, depth int, timestamp time.Time) error {
+func (a *ActivitylogService) storeActivity(resourceID string, activities []RawActivity) error {
 	a.lock.Lock()
 	defer a.lock.Unlock()
 
@@ -308,24 +393,19 @@ func (a *ActivitylogService) storeActivity(resourceID string, eventID string, de
 		return err
 	}
 
-	var activities []RawActivity
+	var existing []RawActivity
 	if len(records) > 0 {
-		if err := json.Unmarshal(records[0].Value, &activities); err != nil {
+		if err := unmarshalActivities(records[0].Value, &existing); err != nil {
 			return err
 		}
 	}
 
-	if l := len(activities); l >= _maxActivities {
-		activities = activities[l-_maxActivities+1:]
+	existing = append(existing, activities...)
+	if l := len(existing); l > _maxActivities {
+		existing = existing[l-_maxActivities:]
 	}
 
-	activities = append(activities, RawActivity{
-		EventID:   eventID,
-		Depth:     depth,
-		Timestamp: timestamp,
-	})
-
-	b, err := json.Marshal(activities)
+	b, err := msgpack.Marshal(existing)
 	if err != nil {
 		return err
 	}
@@ -334,6 +414,16 @@ func (a *ActivitylogService) storeActivity(resourceID string, eventID string, de
 		Key:   resourceID,
 		Value: b,
 	})
+}
+
+// unmarshalActivities decodes a stored activity list. New records are written
+// with msgpack; the json fallback keeps records written before the upgrade
+// readable.
+func unmarshalActivities(b []byte, activities *[]RawActivity) error {
+	if err := msgpack.Unmarshal(b, activities); err != nil {
+		return json.Unmarshal(b, activities)
+	}
+	return nil
 }
 
 func toRef(r *provider.ResourceId) *provider.Reference {

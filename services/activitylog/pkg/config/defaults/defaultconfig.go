@@ -1,6 +1,8 @@
 package defaults
 
 import (
+	"time"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/config"
@@ -37,8 +39,9 @@ func DefaultConfig() *config.Config {
 			Database: "activitylog",
 			Table:    "",
 		},
-		RevaGateway:     shared.DefaultRevaConfig().Address,
-		DefaultLanguage: "en",
+		RevaGateway:         shared.DefaultRevaConfig().Address,
+		DefaultLanguage:     "en",
+		WriteBufferDuration: 10 * time.Second,
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:9195",
 			Root:      "/",

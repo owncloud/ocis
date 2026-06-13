@@ -220,6 +220,9 @@ def base_server_env(repo_root: Path, ocis_url: str, ocis_config_dir: str) -> dic
         # default tika off (overridden by search2 extraServerEnvironment)
         "SEARCH_EXTRACTOR_TYPE": "basic",
         "FRONTEND_FULL_TEXT_SEARCH_ENABLED": "false",
+        # flush activities synchronously so they are immediately visible to the
+        # acceptance tests, which assert on activities right after an action
+        "ACTIVITYLOG_WRITE_BUFFER_DURATION": "0",
         # debug addresses
         "ACTIVITYLOG_DEBUG_ADDR": "0.0.0.0:9197",
         "APP_PROVIDER_DEBUG_ADDR": "0.0.0.0:9165",
