@@ -391,10 +391,24 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(listSharesResponse, nil)
 			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(listPublicSharesResponse, nil)
-			permissions, err := driveItemPermissionsService.ListPermissions(context.Background(), itemID, false, false)
+			permissions, err := driveItemPermissionsService.ListPermissions(context.Background(), itemID, false, false, false)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(len(permissions.LibreGraphPermissionsActionsAllowedValues)).ToNot(BeZero())
 			Expect(len(permissions.LibreGraphPermissionsRolesAllowedValues)).ToNot(BeZero())
+		})
+		It("returns only the roles allowedValues when roles are selected", func() {
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
+			permissions, err := driveItemPermissionsService.ListPermissions(context.Background(), itemID, false, true, false)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(permissions.LibreGraphPermissionsRolesAllowedValues)).ToNot(BeZero())
+			Expect(permissions.LibreGraphPermissionsActionsAllowedValues).To(BeEmpty())
+		})
+		It("returns only the actions allowedValues when actions are selected", func() {
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
+			permissions, err := driveItemPermissionsService.ListPermissions(context.Background(), itemID, false, false, true)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(permissions.LibreGraphPermissionsActionsAllowedValues)).ToNot(BeZero())
+			Expect(permissions.LibreGraphPermissionsRolesAllowedValues).To(BeEmpty())
 		})
 		It("returns one permission per share", func() {
 			statResponse.Info.PermissionSet = roleconversions.NewEditorRole().CS3ResourcePermissions()
@@ -439,7 +453,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(listSharesResponse, nil)
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(listPublicSharesResponse, nil)
-			permissions, err := driveItemPermissionsService.ListPermissions(context.Background(), itemID, false, false)
+			permissions, err := driveItemPermissionsService.ListPermissions(context.Background(), itemID, false, false, false)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(len(permissions.LibreGraphPermissionsActionsAllowedValues)).ToNot(BeZero())
 			Expect(len(permissions.LibreGraphPermissionsRolesAllowedValues)).ToNot(BeZero())
@@ -475,7 +489,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(listSharesResponse, nil)
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(listPublicSharesResponse, nil)
-			permissions, err := driveItemPermissionsService.ListPermissions(context.Background(), itemID, false, false)
+			permissions, err := driveItemPermissionsService.ListPermissions(context.Background(), itemID, false, false, false)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(len(permissions.LibreGraphPermissionsActionsAllowedValues)).ToNot(BeZero())
 			Expect(len(permissions.LibreGraphPermissionsRolesAllowedValues)).ToNot(BeZero())
@@ -511,7 +525,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(listSharesResponse, nil)
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(listPublicSharesResponse, nil)
-			permissions, err := driveItemPermissionsService.ListPermissions(context.Background(), itemID, false, false)
+			permissions, err := driveItemPermissionsService.ListPermissions(context.Background(), itemID, false, false, false)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(len(permissions.LibreGraphPermissionsActionsAllowedValues)).ToNot(BeZero())
 			Expect(len(permissions.LibreGraphPermissionsRolesAllowedValues)).ToNot(BeZero())
@@ -1476,8 +1490,8 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 			inviteJson, err := json.Marshal(invite)
 			Expect(err).ToNot(HaveOccurred())
 
-			mockProvider.On("ListPermissions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-				Return(func(ctx context.Context, itemid *provider.ResourceId, listFederatedRoles, selectRoles bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+			mockProvider.On("ListPermissions", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				Return(func(ctx context.Context, itemid *provider.ResourceId, listFederatedRoles, selectRoles, selectActions bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
 					Expect(listFederatedRoles).To(Equal(false))
 					Expect(storagespace.FormatResourceID(itemid)).To(Equal("1$2!3"))
 					return libregraph.CollectionOfPermissionsWithAllowedValues{}, nil
