@@ -116,6 +116,16 @@ var _ = Describe("Users", func() {
 			})
 
 			It("gets the information", func() {
+				user := &libregraph.User{
+					Id: libregraph.PtrString("user"),
+					Identities: []libregraph.ObjectIdentity{
+						{
+							Issuer:           libregraph.PtrString("https://idp.example.com"),
+							IssuerAssignedId: libregraph.PtrString("the-oidc-sub"),
+						},
+					},
+				}
+				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 				valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
 					Return(&settings.GetValueResponse{
 						Value: &settingsmsg.ValueWithIdentifier{
@@ -140,6 +150,19 @@ var _ = Describe("Users", func() {
 				svc.GetMe(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusOK))
+
+				data, err := io.ReadAll(rr.Body)
+				Expect(err).ToNot(HaveOccurred())
+
+				responseUser := &libregraph.User{}
+				err = json.Unmarshal(data, &responseUser)
+				Expect(err).ToNot(HaveOccurred())
+
+				// The identity (issuerAssignedId, the OIDC sub) must come from the
+				// backend, not be fabricated from the internal user UUID. See
+				// OCISDEV-751.
+				Expect(responseUser.GetIdentities()).To(HaveLen(1))
+				Expect(responseUser.GetIdentities()[0].GetIssuerAssignedId()).To(Equal("the-oidc-sub"))
 			})
 
 			It("expands the memberOf", func() {
@@ -194,6 +217,10 @@ var _ = Describe("Users", func() {
 						RoleId:      "some-appRole-ID",
 					},
 				}
+				user := &libregraph.User{
+					Id: libregraph.PtrString("user"),
+				}
+				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 				roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: assignments}, nil)
 				valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
 					Return(&settings.GetValueResponse{
