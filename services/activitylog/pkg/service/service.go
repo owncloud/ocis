@@ -12,7 +12,6 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/go-chi/chi/v5"
-	"github.com/jellydator/ttlcache/v2"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
@@ -28,10 +27,6 @@ import (
 
 // Nats runs into max payload exceeded errors at around 7k activities. Let's keep a buffer.
 var _maxActivities = 6000
-
-// _parentIDCacheTTL is how long a resource's parent id is remembered to avoid
-// re-stating the same resource while walking the tree for every event.
-const _parentIDCacheTTL = 10 * time.Second
 
 // RawActivity represents an activity as it is stored in the activitylog store
 type RawActivity struct {
@@ -124,8 +119,7 @@ type ActivitylogService struct {
 	valService settingssvc.ValueService
 	lock       sync.RWMutex
 
-	debouncer     *Debouncer
-	parentIDCache *ttlcache.Cache
+	debouncer *Debouncer
 
 	registeredEvents map[string]events.Unmarshaller
 }
@@ -150,13 +144,6 @@ func New(opts ...Option) (*ActivitylogService, error) {
 		return nil, err
 	}
 
-	parentIDCache := ttlcache.NewCache()
-	if err := parentIDCache.SetTTL(_parentIDCacheTTL); err != nil {
-		return nil, err
-	}
-	// the cache is only a lookup optimisation, no need to keep expired entries around
-	parentIDCache.SkipTTLExtensionOnHit(true)
-
 	s := &ActivitylogService{
 		log:              o.Logger,
 		cfg:              o.Config,
@@ -167,7 +154,6 @@ func New(opts ...Option) (*ActivitylogService, error) {
 		evHistory:        o.HistoryClient,
 		valService:       o.ValueClient,
 		lock:             sync.RWMutex{},
-		parentIDCache:    parentIDCache,
 		registeredEvents: make(map[string]events.Unmarshaller),
 	}
 	s.debouncer = NewDebouncer(o.Config.WriteBufferDuration, o.Logger, s.storeActivity)
@@ -206,12 +192,6 @@ func (a *ActivitylogService) Run() {
 		case events.ItemPurged:
 			err = a.RemoveResource(ev.ID)
 		case events.ItemMoved:
-			// the resource moved, so its cached parent is no longer valid
-			if rid := ev.Ref.GetResourceId(); rid != nil {
-				if rerr := a.parentIDCache.Remove(storagespace.FormatResourceID(rid)); rerr != nil && rerr != ttlcache.ErrNotFound {
-					a.log.Error().Err(rerr).Interface("event", ev).Msg("could not invalidate parent id cache")
-				}
-			}
 			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.ShareCreated:
 			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.CTime))
@@ -378,52 +358,29 @@ func (a *ActivitylogService) activities(rid *provider.ResourceId) ([]RawActivity
 // note: getResource is abstracted to allow unit testing, in general this will just be utils.GetResource
 func (a *ActivitylogService) addActivity(initRef *provider.Reference, eventID string, timestamp time.Time, getResource func(*provider.Reference) (*provider.ResourceInfo, error)) error {
 	var (
+		info  *provider.ResourceInfo
+		err   error
 		depth int
 		ref   = initRef
 	)
 	for {
-		id := ref.GetResourceId()
-		if ref.GetPath() != "" {
-			// path based reference: resolve the resource id first
-			info, err := getResource(ref)
-			if err != nil {
-				return fmt.Errorf("could not get resource info: %w", err)
-			}
-			id = info.GetId()
-		}
-		if id == nil {
-			return fmt.Errorf("resource id is required")
+		info, err = getResource(ref)
+		if err != nil {
+			return fmt.Errorf("could not get resource info: %w", err)
 		}
 
-		key := storagespace.FormatResourceID(id)
-		a.debouncer.Debounce(key, RawActivity{
+		a.debouncer.Debounce(storagespace.FormatResourceID(info.GetId()), RawActivity{
 			EventID:   eventID,
 			Depth:     depth,
 			Timestamp: timestamp,
 		})
 
-		if id.GetOpaqueId() == id.GetSpaceId() {
-			// reached the space root, nothing more to walk up
+		if info != nil && utils.IsSpaceRoot(info) {
 			return nil
 		}
 
-		// resolve the parent, caching it so we don't re-stat the same resource for
-		// every event that touches it (and its children).
-		var parentID *provider.ResourceId
-		if v, err := a.parentIDCache.Get(key); err == nil {
-			parentID, _ = v.(*provider.ResourceId)
-		}
-		if parentID == nil {
-			info, err := getResource(ref)
-			if err != nil {
-				return fmt.Errorf("could not get resource info: %w", err)
-			}
-			parentID = info.GetParentId()
-			_ = a.parentIDCache.Set(key, parentID)
-		}
-
 		depth++
-		ref = &provider.Reference{ResourceId: parentID}
+		ref = &provider.Reference{ResourceId: info.GetParentId()}
 	}
 }
 

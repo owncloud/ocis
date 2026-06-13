@@ -5,7 +5,6 @@ import (
 	"time"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/jellydator/ttlcache/v2"
 	"github.com/owncloud/reva/v2/pkg/store"
 	"github.com/stretchr/testify/require"
 
@@ -126,8 +125,7 @@ func TestAddActivity(t *testing.T) {
 
 	for _, tc := range testCases {
 		alog := &ActivitylogService{
-			store:         store.Create(),
-			parentIDCache: ttlcache.NewCache(),
+			store: store.Create(),
 		}
 		// flush synchronously so the assertions below see the activities immediately
 		alog.debouncer = NewDebouncer(0, log.NewLogger(), alog.storeActivity)

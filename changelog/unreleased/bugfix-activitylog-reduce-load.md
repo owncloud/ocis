@@ -10,9 +10,9 @@ redelivered, pinning CPU and growing the JetStream store.
 
 The per-event cost is now reduced: activity writes are coalesced per resource
 over a configurable window (`ACTIVITYLOG_WRITE_BUFFER_DURATION`, default 10s;
-set to 0 to write synchronously) and flushed in a single read-modify-write;
-parent ids are cached for a short time so the tree walk no longer re-stats the
-same resources for every event; and activity lists are stored with msgpack
+set to 0 to write synchronously) and flushed in a single read-modify-write,
+which removes most of the marshal/unmarshal cycles on hot parent nodes that were
+the main cause of the high CPU load; and activity lists are stored with msgpack
 instead of JSON, with a JSON read fallback so existing records stay readable.
 
 https://github.com/owncloud/ocis/issues/10825
