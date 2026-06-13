@@ -13,10 +13,13 @@
   --oc-login-background-image: url('../img/owncloud-background.png');
 }
 
-/* full-viewport branded background, same sizing as .oc-login-bg on the IDP */
+/* full-viewport branded background, same sizing as .oc-login-bg on the IDP.
+   contain (not cover) keeps the logo baked into the artwork visible at every
+   viewport aspect ratio; the matching solid color fills any letterbox so it
+   blends with the artwork's edges */
 .login-pf body {
-  background: var(--oc-login-background-image) no-repeat center center fixed;
-  background-size: cover;
+  background: #3c4d9b var(--oc-login-background-image) no-repeat center center fixed;
+  background-size: contain;
 }
 
 /* no separate logo above the card, the background image already contains the ownCloud logo */
