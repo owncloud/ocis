@@ -165,7 +165,8 @@ func DefaultConfig() *config.Config {
 			Store:    "memory",
 			Nodes:    []string{"127.0.0.1:9233"},
 			Database: "ids-storage-users",
-			TTL:      24 * 60 * time.Second,
+			// The ID cache has no TTL knob: its id<->path index must never
+			// expire. The reva cache TTL is pinned to 0 in revaconfig.
 		},
 		Tasks: config.Tasks{
 			PurgeTrashBin: config.PurgeTrashBin{
