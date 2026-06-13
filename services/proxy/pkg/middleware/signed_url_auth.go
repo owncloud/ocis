@@ -150,9 +150,13 @@ func (m SignedURLAuthenticator) signatureIsValid(req *http.Request) (err error) 
 		m.Logger.Error().Err(err).Msg("could not retrieve signing key")
 		return err
 	}
-	if len(signingKey[0].Value) == 0 {
-		m.Logger.Error().Err(err).Msg("signing key empty")
-		return err
+	// A store may return an empty result set without an error (e.g. the "noop"
+	// store, or a store that has no signing key for this user). Guard the index
+	// access to avoid an out-of-range panic, and return a real error so the
+	// request fails authentication instead of proceeding with an empty key.
+	if len(signingKey) == 0 || len(signingKey[0].Value) == 0 {
+		m.Logger.Error().Str("userid", c.Id.OpaqueId).Msg("signing key empty or not found")
+		return errors.New("signing key not found")
 	}
 	u := m.buildUrlToSign(req)
 	computedSignature := m.createSignature(u, signingKey[0].Value)
