@@ -5,8 +5,11 @@ import (
 	"time"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/jellydator/ttlcache/v2"
 	"github.com/owncloud/reva/v2/pkg/store"
 	"github.com/stretchr/testify/require"
+
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
 func TestAddActivity(t *testing.T) {
@@ -123,8 +126,11 @@ func TestAddActivity(t *testing.T) {
 
 	for _, tc := range testCases {
 		alog := &ActivitylogService{
-			store: store.Create(),
+			store:         store.Create(),
+			parentIDCache: ttlcache.NewCache(),
 		}
+		// flush synchronously so the assertions below see the activities immediately
+		alog.debouncer = NewDebouncer(0, log.NewLogger(), alog.storeActivity)
 
 		getResource := func(ref *provider.Reference) (*provider.ResourceInfo, error) {
 			return tc.Tree[ref.GetResourceId().GetOpaqueId()], nil
@@ -138,9 +144,20 @@ func TestAddActivity(t *testing.T) {
 		for id, acts := range tc.Expected {
 			activities, err := alog.Activities(resourceID(id))
 			require.NoError(t, err, tc.Name+":"+id)
-			require.ElementsMatch(t, acts, activities, tc.Name+":"+id)
+			// msgpack round-trips time.Time with an explicit UTC location, so
+			// compare the wall-clock instant rather than the Location pointer.
+			require.ElementsMatch(t, normalizeTimestamps(acts), normalizeTimestamps(activities), tc.Name+":"+id)
 		}
 	}
+}
+
+func normalizeTimestamps(acts []RawActivity) []RawActivity {
+	out := make([]RawActivity, len(acts))
+	for i, a := range acts {
+		a.Timestamp = a.Timestamp.UTC()
+		out[i] = a
+	}
+	return out
 }
 
 func activitites(acts ...interface{}) []RawActivity {
