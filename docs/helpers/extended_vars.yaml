@@ -40,7 +40,7 @@ variables:
   description: ""
   do_ignore: true
 - rawname: GITHUB_TOKEN
-  path: tools/ci-reporter/cmd/list-flaky-tests/main.go:64
+  path: tools/ci-reporter/cmd/list-flaky-tests/main.go:66
   foundincode: true
   name: GITHUB_TOKEN
   type: ""
