@@ -1336,6 +1336,8 @@ func (mset *stream) addConsumerWithAssignment(config *ConsumerConfig, oname stri
 		// Clustered non-direct consumers defer this to setLeader so the
 		// expensive store scans don't block the meta apply goroutine.
 		if err := o.selectStartingSeqNo(); err != nil {
+			mset.mu.Unlock()
+			o.deleteWithoutAdvisory()
 			return nil, err
 		}
 	}
