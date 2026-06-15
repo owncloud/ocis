@@ -45,7 +45,7 @@ type Config struct {
 	MachineAuthAPIKey        string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;STORAGE_USERS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services." introductionVersion:"5.0"`
 	CliMaxAttemptsRenameFile int    `yaml:"max_attempts_rename_file" env:"STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE" desc:"The maximum number of attempts to rename a file when a user restores a file to an existing destination with the same name. The minimum value is 100." introductionVersion:"5.0"`
 
-	EnableVaultMode bool `yaml:"enable_vault_mode" env:"STORAGE_USERS_ENABLE_VAULT_MODE" desc:"Enabling the flag forces the storage-users service to run with a MountID set to VaultStorageProviderID. Not applicable for use with the primary storage-users service. Use only if an additional storage-users-vault service, a special configured storage-users service is configured." introductionVersion:"Deledda"`
+	EnableVaultMode bool `yaml:"enable_vault_mode" env:"STORAGE_USERS_ENABLE_VAULT_MODE" desc:"Enabling the flag forces the storage-users service to run with a MountID set to VaultStorageProviderID. Not applicable for use with the primary storage-users service. Use only if an additional storage-users-vault service, a special configured storage-users service is configured." introductionVersion:"8.1.0"`
 
 	Context context.Context `yaml:"-"`
 }
@@ -217,7 +217,7 @@ type Events struct {
 	TLSRootCaCertPath string `yaml:"tls_root_ca_cert_path" env:"OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided STORAGE_USERS_EVENTS_TLS_INSECURE will be seen as false." introductionVersion:"pre5.0"`
 	EnableTLS         bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;STORAGE_USERS_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"pre5.0"`
 	NumConsumers      int    `yaml:"num_consumers" env:"STORAGE_USERS_EVENTS_NUM_CONSUMERS" desc:"The amount of concurrent event consumers to start. Event consumers are used for post-processing files. Multiple consumers increase parallelisation, but will also increase CPU and memory demands. The setting has no effect when the OCIS_ASYNC_UPLOADS is set to false. The default and minimum value is 1." introductionVersion:"pre5.0"`
-	ConsumerGroup     string `yaml:"consumer_group" env:"STORAGE_USERS_EVENTS_CONSUMER_GROUP" desc:"The name of the consumer group to be used at the event to help consumers identify the unique group." introductionVersion:"Deledda"`
+	ConsumerGroup     string `yaml:"consumer_group" env:"STORAGE_USERS_EVENTS_CONSUMER_GROUP" desc:"The name of the consumer group to be used at the event to help consumers identify the unique group." introductionVersion:"8.1.0"`
 	AuthUsername      string `yaml:"username" env:"OCIS_EVENTS_AUTH_USERNAME;STORAGE_USERS_EVENTS_AUTH_USERNAME" desc:"The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
 	AuthPassword      string `yaml:"password" env:"OCIS_EVENTS_AUTH_PASSWORD;STORAGE_USERS_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
 }

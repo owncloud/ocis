@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# this script can run from everywhere in the ocis repo because it uses git grep
+# This script must be run from the root folder of the ocis repo such as:
+# docs/helpers/identify_envvar_placeholder_names.sh
 
 # The following grep will filter out every line containing an `env` annotation AND
 # containing a non semver `introductionVersion` annotation that is used as placeholder.
@@ -47,9 +48,11 @@ read -s -n 1 n
 case $n in
   1) USEREGEX="${IV_REGEX}"
      NAME="${IV_NAME}"
+     echo "Running..."
      ;;
   2) USEREGEX="${RV_REGEX}"
      NAME="${RV_NAME}"
+     echo "Running..."
      ;;
   3) echo
      print_version_examples "${IV_NAME}"
@@ -64,7 +67,7 @@ case $n in
 esac
 
 # query the code
-QS=$(git grep -n "env:" -- '*.go' | grep -v -E "${EXCLUDE_PATHS}" | grep --color=always -P "${USEREGEX}")
+QS=$(grep -rn --include=\*.go "env:" | grep -v -E "${EXCLUDE_PATHS}" | grep --color=always -P "${USEREGEX}")
 
 # count the results found
 RESULTS_COUNT=$(echo "${QS}"|wc -l)
