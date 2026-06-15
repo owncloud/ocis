@@ -302,11 +302,7 @@ func (idp *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handl
 	idp.mux.Get("/signin/v1/goodbye", idp.Goodbye())
 	idp.mux.Get("/signin/v1/consent", idp.Consent())
 	idp.mux.Get("/signin/v1/loginerror", idp.LoginError())
-	idp.mux.Get("/signin/v1/chooseaccount", func(w http.ResponseWriter, r *http.Request) {
-		q := r.URL.Query()
-		q.Set("prompt", "login")
-		http.Redirect(w, r, "/signin/v1/identifier?"+q.Encode(), http.StatusFound)
-	})
+	idp.mux.Get("/signin/v1/chooseaccount", idp.Chooseaccount())
 
 	idp.mux.Mount("/", gm)
 
@@ -341,6 +337,41 @@ type consentData struct {
 	Lang, Title, Headline, Nonce, PathPrefix string
 	BgImgURL                                 template.CSS
 	AllowLabel, DenyLabel, ConsentConsequence string
+}
+
+type chooseaccountData struct {
+	Lang, Title, Headline, HeadlineSub, Nonce, PathPrefix string
+	BgImgURL                                              template.CSS
+	UseAnotherLabel                                       string
+}
+
+// Chooseaccount renders the account picker page.
+func (idp *IDP) Chooseaccount() http.HandlerFunc {
+	tpl, err := idp.parseTemplate("/identifier/chooseaccount.html")
+	if err != nil {
+		idp.logger.Fatal().Err(err).Msg("Could not load chooseaccount template")
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		lang := detectLocale(r)
+		t := idp.translator.Locale(lang)
+		nonce := rndm.GenerateRandomString(32)
+		data := chooseaccountData{
+			Lang:            lang,
+			Title:           t.Get("Choose an account - ownCloud"),
+			Headline:        t.Get("Choose an account"),
+			HeadlineSub:     t.Get("to sign in"),
+			Nonce:           nonce,
+			PathPrefix:      "/signin/v1",
+			BgImgURL:        template.CSS(idp.config.Asset.LoginBackgroundUrl),
+			UseAnotherLabel: t.Get("Use another account"),
+		}
+		var buf bytes.Buffer
+		if err := tpl.Execute(&buf, data); err != nil {
+			http.Error(w, "template error", http.StatusInternalServerError)
+			return
+		}
+		writeSecureHTML(w, buf.Bytes(), nonce)
+	}
 }
 
 // Index renders the login page with templated variables.

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="{{.Lang}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1b223d">
+  <title>{{.Title}}</title>
+  <link rel="icon" href="{{.PathPrefix}}/static/favicon.ico">
+  <link rel="stylesheet" href="{{.PathPrefix}}/static/theme.css">
+  <style nonce="{{.Nonce}}">{{if .BgImgURL}}body.oc-login-bg{background-image:url('{{.BgImgURL}}')}{{end}}</style>
+  <meta property="csp-nonce" content="{{.Nonce}}">
+</head>
+<body class="oc-login-bg">
+  <main>
+    <div class="oc-login-form" id="chooseaccount-root">
+      <img class="oc-logo" src="/themes/owncloud/assets/logo.svg" alt="ownCloud">
+      <h1 class="oc-invisible-sr">{{.Headline}}</h1>
+      <p id="oc-chooseaccount-error" class="oc-error-message" hidden></p>
+      <div id="chooseaccount-body" hidden>
+        <p class="oc-light oc-consent-headline" id="chooseaccount-title">{{.HeadlineSub}}</p>
+        <ul class="oc-consent-scopes" id="account-list">
+          <li class="oc-chooseaccount-item" id="item-current">
+            <span class="oc-chooseaccount-avatar" id="avatar-current"></span>
+            <span class="oc-light oc-chooseaccount-label" id="label-current"></span>
+          </li>
+          <li class="oc-chooseaccount-item" id="item-other">
+            <span class="oc-chooseaccount-avatar">?</span>
+            <span class="oc-light oc-chooseaccount-label">{{.UseAnotherLabel}}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </main>
+  <footer class="oc-footer-message">ownCloud – a safe home for all your data</footer>
+  <script nonce="{{.Nonce}}">
+(function() {
+  var errorEl = document.getElementById("oc-chooseaccount-error");
+  var bodyEl = document.getElementById("chooseaccount-body");
+  var avatarEl = document.getElementById("avatar-current");
+  var labelEl = document.getElementById("label-current");
+  var itemCurrent = document.getElementById("item-current");
+  var itemOther = document.getElementById("item-other");
+
+  var pathPrefix = {{.PathPrefix}};
+  var apiBase = pathPrefix + "/identifier";
+  var xsrf = "1";
+
+  var params = new URLSearchParams(window.location.search);
+  function qs(name) { return params.get(name) || ""; }
+
+  function fetchApi(path, body) {
+    return fetch(apiBase + path, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Kopano-Konnect-XSRF": xsrf
+      },
+      body: body ? JSON.stringify(body) : undefined,
+      credentials: "same-origin"
+    });
+  }
+
+  function parseJsonMaybe(res) {
+    if (res.status === 204) return Promise.resolve(null);
+    return res.text().then(function(text) {
+      if (!text) return null;
+      try { return JSON.parse(text); } catch (_) { return null; }
+    });
+  }
+
+  function showError(msg) {
+    errorEl.textContent = msg || "An error occurred.";
+    errorEl.hidden = false;
+  }
+
+  function isSameOrigin(url) {
+    try { return new URL(url, window.location.origin).origin === window.location.origin; }
+    catch (_) { return false; }
+  }
+
+  var helloReq = {
+    state: qs("state"),
+    flow: qs("flow") || "oidc",
+    scope: qs("scope"),
+    prompt: qs("prompt"),
+    client_id: qs("client_id"),
+    redirect_uri: qs("redirect_uri"),
+    id_token_hint: qs("id_token_hint"),
+    max_age: qs("max_age")
+  };
+
+  var helloData = null;
+
+  fetchApi("/_/hello", helloReq)
+    .then(function(res) { return parseJsonMaybe(res); })
+    .then(function(data) {
+      if (!data || !data.success || !data.username) {
+        // No active session — go to login form
+        window.location.href = pathPrefix + '/identifier' + window.location.search;
+        return;
+      }
+      helloData = data;
+      avatarEl.textContent = data.username.charAt(0).toUpperCase();
+      labelEl.textContent = data.username;
+      bodyEl.hidden = false;
+    })
+    .catch(function() {
+      window.location.href = pathPrefix + '/identifier' + window.location.search;
+    });
+
+  // "Continue as current user" — mode=0 logon (cookie re-auth, no password)
+  itemCurrent.addEventListener("click", function() {
+    if (!helloData) return;
+    itemCurrent.style.opacity = "0.5";
+    itemOther.style.pointerEvents = "none";
+
+    var logonBody = {
+      state: helloReq.state,
+      params: [helloData.username, "", "0"],
+      hello: helloReq
+    };
+    fetchApi("/_/logon", logonBody)
+      .then(function(res) {
+        return parseJsonMaybe(res).then(function(d) {
+          return { ok: res.ok, status: res.status, data: d };
+        });
+      })
+      .then(function(result) {
+        if (result.ok && result.data && result.data.success) {
+          var hello = result.data.hello;
+          if (hello && hello.next === 'consent') {
+            var consentParams = new URLSearchParams(window.location.search);
+            consentParams.set("prompt", "consent");
+            window.location.href = pathPrefix + '/consent?' + consentParams.toString();
+            return;
+          }
+          var next = hello && (hello.continue_uri || hello.next);
+          if (next && isSameOrigin(next)) {
+            window.location.href = next;
+            return;
+          }
+        }
+        showError("Could not sign in. Please try again.");
+        itemCurrent.style.opacity = "";
+        itemOther.style.pointerEvents = "";
+      })
+      .catch(function() {
+        showError("Could not sign in. Please try again.");
+        itemCurrent.style.opacity = "";
+        itemOther.style.pointerEvents = "";
+      });
+  });
+
+  // "Use another account" — go to login form
+  itemOther.addEventListener("click", function() {
+    var loginParams = new URLSearchParams(window.location.search);
+    loginParams.set("prompt", "login");
+    loginParams.delete("flow");
+    window.location.href = pathPrefix + '/identifier?' + loginParams.toString();
+  });
+})();
+  </script>
+</body>
+</html>

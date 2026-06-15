@@ -152,6 +152,38 @@ main {
   padding: 0;
 }
 
+.oc-chooseaccount-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.oc-chooseaccount-item:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.oc-chooseaccount-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #4e85c8;
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 500;
+  flex-shrink: 0;
+  margin-right: 16px;
+}
+
+.oc-chooseaccount-label {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
 .oc-consent-consequence {
   margin: 0;
   font-size: 1rem;
