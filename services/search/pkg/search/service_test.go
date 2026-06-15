@@ -28,7 +28,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
-	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
 )
@@ -178,7 +177,7 @@ var _ = Describe("Searchprovider", func() {
 				Status: status.NewOK(context.Background()),
 				Info:   ri,
 			}, nil)
-			err := s.IndexSpace(&sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			err := s.IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 
@@ -203,7 +202,7 @@ var _ = Describe("Searchprovider", func() {
 
 			indexClient.AssertNotCalled(GinkgoT(), "Upsert", mock.Anything, mock.Anything)
 			indexClient.AssertNotCalled(GinkgoT(), "Search", mock.Anything, mock.Anything)
-			err := s.IndexSpace(&sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			err := s.IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 
@@ -335,7 +334,7 @@ var _ = Describe("Searchprovider", func() {
 				upsertCount.Add(1)
 			}).Return(nil)
 
-			err := s.IndexSpace(&sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			err := s.IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(int(upsertCount.Load())).To(Equal(numDirs), "every unindexed file inside an already-indexed directory must be visited")
 		})
@@ -373,7 +372,7 @@ var _ = Describe("Searchprovider", func() {
 				Info:   processingFile,
 			}, nil)
 
-			err := s.IndexSpace(&sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			err := s.IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
 			Expect(err).ShouldNot(HaveOccurred())
 
 			// The skip gate fires before any index lookup or extraction.
@@ -405,7 +404,7 @@ var _ = Describe("Searchprovider", func() {
 		It("updates tags without content extraction when resource is indexed", func() {
 			indexClient.On("Update", "storageid$spaceid!opaqueid", mock.Anything).Return(nil)
 
-			s.UpdateTags(&sprovider.Reference{ResourceId: ri.Id})
+			s.UpdateTags(context.Background(), &sprovider.Reference{ResourceId: ri.Id})
 
 			extractor.AssertNotCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
 			indexClient.AssertCalled(GinkgoT(), "Update", "storageid$spaceid!opaqueid", mock.Anything)
@@ -416,7 +415,7 @@ var _ = Describe("Searchprovider", func() {
 			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{Name: "foo.pdf"}, nil)
 			indexClient.On("Upsert", mock.Anything, mock.Anything).Return(nil)
 
-			s.UpdateTags(&sprovider.Reference{ResourceId: ri.Id})
+			s.UpdateTags(context.Background(), &sprovider.Reference{ResourceId: ri.Id})
 
 			extractor.AssertCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
 		})
@@ -424,7 +423,7 @@ var _ = Describe("Searchprovider", func() {
 		It("logs an error and does not fall back on non-retriable errors", func() {
 			indexClient.On("Update", mock.Anything, mock.Anything).Return(errors.New("connection refused"))
 
-			s.UpdateTags(&sprovider.Reference{ResourceId: ri.Id})
+			s.UpdateTags(context.Background(), &sprovider.Reference{ResourceId: ri.Id})
 
 			extractor.AssertNotCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
 			indexClient.AssertNotCalled(GinkgoT(), "Upsert", mock.Anything, mock.Anything)
@@ -799,7 +798,7 @@ var _ = Describe("Searchprovider", func() {
 			})
 
 			It("searches only the vault space when vault:true is in query AND context has MFA", func() {
-				mfaCtx := mfa.Set(ctx, true)
+				mfaCtx := revactx.SetMFA(ctx)
 				// First call: general spaces (no storage_id opaque key) — returns only the personal space.
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.MatchedBy(func(req *sprovider.ListStorageSpacesRequest) bool {
 					return utils.ReadPlainFromOpaque(req.Opaque, "storage_id") == ""
@@ -848,7 +847,7 @@ var _ = Describe("Searchprovider", func() {
 			})
 
 			It("searches only regular spaces when MFA context is set but vault:true is absent", func() {
-				mfaCtx := mfa.Set(ctx, true)
+				mfaCtx := revactx.SetMFA(ctx)
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
 					Status:        status.NewOK(mfaCtx),
 					StorageSpaces: []*sprovider.StorageSpace{personalSpace, vaultSpace},
@@ -1019,7 +1018,7 @@ var _ = Describe("Searchprovider", func() {
 						},
 					},
 				}
-				mfaCtx := mfa.Set(ctx, true)
+				mfaCtx := revactx.SetMFA(ctx)
 				// First LSS call: general — returns personal + grant + mountpoint (no vault).
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.MatchedBy(func(req *sprovider.ListStorageSpacesRequest) bool {
 					return utils.ReadPlainFromOpaque(req.Opaque, "storage_id") == ""

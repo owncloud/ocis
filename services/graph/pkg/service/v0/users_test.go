@@ -26,7 +26,6 @@ import (
 	"go-micro.dev/v4/client"
 	"google.golang.org/grpc"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -258,7 +257,7 @@ var _ = Describe("Users", func() {
 				identityBackend.On("GetUsers", mock.Anything, mock.Anything, mock.Anything).Return(users, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users", nil)
-				r = r.WithContext(mfa.Set(r.Context(), true))
+				r = r.WithContext(revactx.SetMFA(r.Context()))
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusOK))
@@ -371,7 +370,7 @@ var _ = Describe("Users", func() {
 					}, nil)
 
 					r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$search=einstein", nil)
-					r = r.WithContext(mfa.Set(r.Context(), true))
+					r = r.WithContext(revactx.SetMFA(r.Context()))
 					svc.GetUsers(rr, r)
 
 					Expect(rr.Code).To(Equal(http.StatusOK))
@@ -452,7 +451,7 @@ var _ = Describe("Users", func() {
 
 				getUsers := func(path string) []*service.UserWithAttributes {
 					r := httptest.NewRequest(http.MethodGet, path, nil)
-					r = r.WithContext(mfa.Set(r.Context(), true))
+					r = r.WithContext(revactx.SetMFA(r.Context()))
 					rec := httptest.NewRecorder()
 					svc.GetUsers(rec, r)
 
@@ -512,7 +511,7 @@ var _ = Describe("Users", func() {
 
 				// Handles invalid sort field
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$orderby=invalid", nil)
-				r = r.WithContext(mfa.Set(r.Context(), true))
+				r = r.WithContext(revactx.SetMFA(r.Context()))
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -551,7 +550,7 @@ var _ = Describe("Users", func() {
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$expand=appRoleAssignments", nil)
 				r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
-				r = r.WithContext(mfa.Set(r.Context(), true))
+				r = r.WithContext(revactx.SetMFA(r.Context()))
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusOK))
@@ -592,7 +591,7 @@ var _ = Describe("Users", func() {
 				}, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape(filter), nil)
-				r = r.WithContext(mfa.Set(r.Context(), true))
+				r = r.WithContext(revactx.SetMFA(r.Context()))
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(status))
@@ -653,7 +652,7 @@ var _ = Describe("Users", func() {
 						}}
 					}, nil)
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape(filter), nil)
-				r = r.WithContext(mfa.Set(r.Context(), true))
+				r = r.WithContext(revactx.SetMFA(r.Context()))
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(status))
