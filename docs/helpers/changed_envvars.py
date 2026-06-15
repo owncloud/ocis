@@ -17,27 +17,35 @@ from urllib.request import urlopen
 ## like: python3 docs/helpers/changed_envvars.py
 ## create a branch to prepare the changes
 
+## WHAT TO CHANGE FOR A NEW RELEASE
+##
+## versionOld: To do a proper change comparision from the old to new version, update this var to the FORMER release
+## versionNew: Change only if master already contains new ennvars that are NOT part of the new release. Set to heads/stable-<new-release>
+##             For the latter case, the relevant env_vars.yaml file mustr be part of the branch referenced !!
+## from_version and to_version are print strings only used in the generated adoc files
+## excludePattern: add the FORMER release to the list. The code then searches for anything that does not match the exclude pattern.
+
 # CHANGE according your needs
 # old is the base version to compare from which is always a tagged release
 # new is the target version to compare to and can be a branch or tagged
 # tagged versions must be of format:            'tags/v7.1.0'
 # branches are different, master or stable-x.y: 'heads/master'
 # stick with master because the follow up process is much easier and you avoid confusion
-versionOld: str = 'tags/v7.3.0'
+versionOld: str = 'tags/v8.0.0'
 versionNew: str = 'heads/master'
 
 # CHANGE according your needs
-from_version: str = '7.3.0'
-to_version: str = '8.0.0'
+from_version: str = '8.0.0'
+to_version: str = '8.1.0'
 
 # CHANGE according your needs
 # this will create files like 5.0.0-7.0.0-added and 5.0.0-7.0.0-removed
 # this should match which versions you compare. master is ok if that is the base for a named release
-nameComponent: str = '7.3.0-8.0.0'
+nameComponent: str = '8.0.0-8.1.0'
 
 # ADD new elements when a new version has been published so that it gets excluded
 # array of version patterns to be excluded for added items. we dont need patch versions
-excludePattern: list[str] = ['pre5.0', '5.0', '6.0', '6.0.0', '6.0.1', '6.1.0', '6.7', '7.0', '7.0.0', '7.1.0', '7.2.0', '7.3.0']
+excludePattern: list[str] = ['pre5.0', '5.0', '6.0', '6.0.0', '6.0.1', '6.1.0', '6.7', '7.0', '7.0.0', '7.1.0', '7.2.0', '7.3.0', '8.0.0']
 
 # DO NOT CHANGE
 # this is the path the added/removed result is written to
