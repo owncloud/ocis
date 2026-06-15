@@ -48,7 +48,7 @@ type Config struct {
 	ClaimSpaceManagement      ClaimSpaceManagement `yaml:"claim_space_management"`
 	MultiFactorAuthentication MFAConfig            `yaml:"mfa"`
 	MultiInstance             MultiInstanceConfig  `yaml:"multi_instance"`
-	EnableVaultMode           bool                 `yaml:"enable_vault_mode" env:"OCIS_ENABLE_VAULT_MODE;PROXY_ENABLE_VAULT_MODE" desc:"Set this to true to automatically create a new vault home for the user if it does not exist. Only applicapable if the storage-users-vault service, a special configured storage-users service is configured." introductionVersion:"Deledda"`
+	EnableVaultMode           bool                 `yaml:"enable_vault_mode" env:"OCIS_ENABLE_VAULT_MODE;PROXY_ENABLE_VAULT_MODE" desc:"Set this to true to automatically create a new vault home for the user if it does not exist. Only applicapable if the storage-users-vault service, a special configured storage-users service is configured." introductionVersion:"8.1.0"`
 
 	Context context.Context `json:"-" yaml:"-"`
 }
@@ -253,7 +253,7 @@ type ClaimSpaceManagement struct {
 type MultiInstanceConfig struct {
 	Enabled     bool   `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enable multiple instances of Infinite Scale." introductionVersion:"8.0.0"`
 	InstanceID  string `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique id of this instance" introductionVersion:"8.0.0"`
-	MasterID    string `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master ID that grants access to all instances. Users with this ID in their memberOf or guestOf claims can access any instance. Leave empty to disable." introductionVersion:"NEXT"`
+	MasterID    string `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master ID that grants access to all instances. Users with this ID in their memberOf or guestOf claims can access any instance. Leave empty to disable." introductionVersion:"8.1.0"`
 	MemberClaim string `yaml:"member_claim" env:"OCIS_MULTI_INSTANCE_MEMBER_CLAIM" desc:"The claim name for the 'memberOf' property" introductionVersion:"8.0.0"`
 	GuestClaim  string `yaml:"guest_claim" env:"OCIS_MULTI_INSTANCE_GUEST_CLAIM" desc:"The claim name for the 'guestOf' property" introductionVersion:"8.0.0"`
 	GuestRole   string `yaml:"guest_role" env:"OCIS_MULTI_INSTANCE_GUEST_ROLE" desc:"The role that should be assigned to a guest user" introductionVersion:"8.0.0"`
