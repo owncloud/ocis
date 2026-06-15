@@ -511,7 +511,60 @@ var _ = Describe("AppRoleAssignments", func() {
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.CreateAppRoleAssignment(rr, r)
 
-			Expect(rr.Code).To(Equal(http.StatusCreated))
+			// The user lookup failed, so the Drives.Create permission could not be
+			// determined. The code must fail closed: surface the error and leave
+			// the personal space untouched rather than trashing it.
+			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
+			gatewayClient.AssertNotCalled(GinkgoT(), "DeleteStorageSpace", mock.Anything, mock.Anything)
+		})
+
+		It("does not disable the personal space when the permission check is inconclusive", func() {
+			userRoleAssignment := &settingsmsg.UserRoleAssignment{
+				Id:          "some-appRoleAssignment-ID",
+				AccountUuid: "user1",
+				RoleId:      settingsService.BundleUUIDRoleUserLight,
+			}
+			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{}}, nil)
+			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{Assignment: userRoleAssignment}, nil)
+
+			// CheckPermission returns a non-OK status that is NOT PERMISSION_DENIED
+			// (here: an internal error in the settings service). The permission
+			// therefore could not be authoritatively determined, so the code must
+			// fail closed and must NOT delete (trash) the personal space.
+			gatewayClient.ExpectedCalls = nil
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+				User:   currentUser,
+			}, nil)
+			gatewayClient.On("CheckPermission", mock.Anything, mock.Anything).Return(&permissions.CheckPermissionResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_INTERNAL, Message: "settings unavailable"},
+			}, nil)
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+				StorageSpaces: []*storageprovider.StorageSpace{
+					{Id: &storageprovider.StorageSpaceId{OpaqueId: "ps1"}},
+				},
+			}, nil)
+			gatewayClient.On("DeleteStorageSpace", mock.Anything, mock.Anything).Return(&storageprovider.DeleteStorageSpaceResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+			}, nil)
+
+			ara := libregraph.NewAppRoleAssignmentWithDefaults()
+			ara.SetAppRoleId(settingsService.BundleUUIDRoleUserLight)
+			ara.SetPrincipalId("user1")
+			ara.SetResourceId(cfg.Application.ID)
+
+			araJson, err := json.Marshal(ara)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users/user1/appRoleAssignments", bytes.NewBuffer(araJson))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", "user1")
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.CreateAppRoleAssignment(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
+			gatewayClient.AssertNotCalled(GinkgoT(), "DeleteStorageSpace", mock.Anything, mock.Anything)
 		})
 	})
 

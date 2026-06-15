@@ -3,12 +3,15 @@ package userroles
 import (
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
 	"sync"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -170,7 +173,14 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 			return nil, err
 		}
 
-		canCreateDrives := ra.checkPermission("Drives.Create", user, client)
+		canCreateDrives, err := ra.checkPermission("Drives.Create", user, client)
+		if err != nil {
+			// The permission could not be determined. Fail closed and leave the
+			// personal space untouched rather than disabling (trashing) it on an
+			// indeterminate result. The role transition is retried on the next login.
+			logger.Error().Any("userID", userID).Err(err).Msg("could not determine Drives.Create permission, leaving personal space unchanged")
+			return nil, err
+		}
 		if canCreateDrives {
 			libreUser := identity.CreateUserModelFromCS3(user)
 			err = shared.RestorePersonalSpace(newctx, client, libreUser.GetId())
@@ -275,11 +285,35 @@ func (ra oidcRoleAssigner) roleNamesToRoleIDs() (map[string]string, error) {
 	return roleNameToID.roleNameToID, nil
 }
 
-func (ra oidcRoleAssigner) checkPermission(perm string, user *cs3user.User, gwc gateway.GatewayAPIClient) bool {
-	if ok, err := utils.CheckPermission(revactx.ContextSetUser(context.Background(), user), perm, gwc); ok {
-		return true
-	} else if err != nil {
-		ra.logger.Error().Err(err).Msg("error checking permission")
+// checkPermission reports whether the user holds the given permission.
+//
+// It distinguishes three outcomes that must not be collapsed into a single
+// boolean: the permission is granted (true, nil), the permission is
+// authoritatively denied (false, nil), or the permission could not be
+// determined (false, err). The last case happens when the gateway/settings
+// call fails at the transport level or returns a non-OK status other than
+// PERMISSION_DENIED. Callers must treat a non-nil error as "unknown" and fail
+// closed: an indeterminate result must never be mistaken for a deliberate
+// denial, because the caller acts destructively (disabling the personal space)
+// on denial.
+func (ra oidcRoleAssigner) checkPermission(perm string, user *cs3user.User, gwc gateway.GatewayAPIClient) (bool, error) {
+	resp, err := gwc.CheckPermission(revactx.ContextSetUser(context.Background(), user), &permissions.CheckPermissionRequest{
+		SubjectRef: &permissions.SubjectReference{
+			Spec: &permissions.SubjectReference_UserId{
+				UserId: user.GetId(),
+			},
+		},
+		Permission: perm,
+	})
+	if err != nil {
+		return false, err
 	}
-	return false
+	switch code := resp.GetStatus().GetCode(); code {
+	case rpc.Code_CODE_OK:
+		return true, nil
+	case rpc.Code_CODE_PERMISSION_DENIED:
+		return false, nil
+	default:
+		return false, fmt.Errorf("permission check for %q returned non-authoritative status %q: %s", perm, code, resp.GetStatus().GetMessage())
+	}
 }

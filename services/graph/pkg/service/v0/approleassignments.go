@@ -7,6 +7,8 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -100,7 +102,15 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	canCreateDrives := g.checkPermission(r.Context(), "Drives.Create", userID, client)
+	canCreateDrives, err := g.checkPermission(r.Context(), "Drives.Create", userID, client)
+	if err != nil {
+		// The permission could not be determined. Fail closed and leave the
+		// personal space untouched rather than disabling (trashing) it on an
+		// indeterminate result.
+		logger.Error().Any("userID", userID).Err(err).Msg("could not determine Drives.Create permission, leaving personal space unchanged")
+		errorcode.RenderError(w, r, err)
+		return
+	}
 	if canCreateDrives {
 		err = shared.RestorePersonalSpace(r.Context(), client, userID)
 		if err != nil {
@@ -192,17 +202,40 @@ func (g Graph) assignmentToAppRoleAssignment(assignment *settingsmsg.UserRoleAss
 	return *appRoleAssignment
 }
 
-func (g Graph) checkPermission(ctx context.Context, perm string, userID string, gwc gateway.GatewayAPIClient) bool {
+// checkPermission reports whether the given user holds the given permission.
+//
+// It distinguishes three outcomes that must not be collapsed into a single
+// boolean: the permission is granted (true, nil), the permission is
+// authoritatively denied (false, nil), or the permission could not be
+// determined (false, err). The last case happens when the user lookup or the
+// gateway/settings permission call fails at the transport level or returns a
+// non-OK status other than PERMISSION_DENIED. Callers must treat a non-nil
+// error as "unknown" and fail closed: an indeterminate result must never be
+// mistaken for a deliberate denial, because the caller acts destructively
+// (disabling the personal space) on denial.
+func (g Graph) checkPermission(ctx context.Context, perm string, userID string, gwc gateway.GatewayAPIClient) (bool, error) {
 	u, err := utils.GetUserWithContext(ctx, &userv1beta1.UserId{OpaqueId: userID}, gwc)
 	if err != nil {
-		g.logger.Error().Err(err).Msg("could not get user")
-		return false
+		return false, err
 	}
 
-	if ok, err := utils.CheckPermission(revactx.ContextSetUser(context.Background(), u), perm, gwc); ok {
-		return true
-	} else if err != nil {
-		g.logger.Error().Err(err).Msg("error checking permission")
+	resp, err := gwc.CheckPermission(revactx.ContextSetUser(context.Background(), u), &permissions.CheckPermissionRequest{
+		SubjectRef: &permissions.SubjectReference{
+			Spec: &permissions.SubjectReference_UserId{
+				UserId: u.GetId(),
+			},
+		},
+		Permission: perm,
+	})
+	if err != nil {
+		return false, err
 	}
-	return false
+	switch code := resp.GetStatus().GetCode(); code {
+	case rpc.Code_CODE_OK:
+		return true, nil
+	case rpc.Code_CODE_PERMISSION_DENIED:
+		return false, nil
+	default:
+		return false, fmt.Errorf("permission check for %q returned non-authoritative status %q: %s", perm, code, resp.GetStatus().GetMessage())
+	}
 }
