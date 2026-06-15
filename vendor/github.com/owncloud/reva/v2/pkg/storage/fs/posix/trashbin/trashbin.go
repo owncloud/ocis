@@ -226,10 +226,10 @@ func (tb *Trashbin) ListRecycle(ctx context.Context, ref *provider.Reference, ke
 }
 
 // RestoreRecycleItem restores the specified item
-func (tb *Trashbin) RestoreRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string, restoreRef *provider.Reference) error {
+func (tb *Trashbin) RestoreRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string, restoreRef *provider.Reference) (*storage.RestoreRecycleItemResult, error) {
 	n, err := tb.lu.NodeFromResource(ctx, ref)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	trashRoot := trashRootForNode(n)
@@ -237,33 +237,33 @@ func (tb *Trashbin) RestoreRecycleItem(ctx context.Context, ref *provider.Refere
 
 	restoreBaseNode, err := tb.lu.NodeFromID(ctx, restoreRef.GetResourceId())
 	if err != nil {
-		return err
+		return nil, err
 	}
 	restorePath := filepath.Join(restoreBaseNode.InternalPath(), restoreRef.GetPath())
 
 	id, err := tb.lu.MetadataBackend().Get(ctx, trashPath, prefixes.IDAttr)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// update parent id in case it was restored to a different location
 	parentID, err := tb.lu.MetadataBackend().Get(ctx, filepath.Dir(restorePath), prefixes.IDAttr)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if len(parentID) == 0 {
-		return fmt.Errorf("trashbin: parent id not found for %s", restorePath)
+		return nil, fmt.Errorf("trashbin: parent id not found for %s", restorePath)
 	}
 
 	err = tb.lu.MetadataBackend().Set(ctx, trashPath, prefixes.ParentidAttr, parentID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// restore the item
 	err = os.Rename(trashPath, restorePath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if err := tb.lu.CacheID(ctx, n.SpaceID, string(id), restorePath); err != nil {
 		tb.log.Error().Err(err).Str("spaceID", n.SpaceID).Str("id", string(id)).Str("path", restorePath).Msg("trashbin: error caching id")
@@ -271,10 +271,11 @@ func (tb *Trashbin) RestoreRecycleItem(ctx context.Context, ref *provider.Refere
 
 	// cleanup trash info
 	if relativePath == "." || relativePath == "/" {
-		return os.Remove(filepath.Join(trashRoot, "info", key+".trashinfo"))
-	} else {
-		return nil
+		if err := os.Remove(filepath.Join(trashRoot, "info", key+".trashinfo")); err != nil {
+			return nil, err
+		}
 	}
+	return &storage.RestoreRecycleItemResult{SpaceOwner: n.SpaceOwnerOrManager(ctx)}, nil
 }
 
 // PurgeRecycleItem purges the specified item, all its children and all their revisions
