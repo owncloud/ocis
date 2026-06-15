@@ -133,11 +133,10 @@
       setLoading(false);
       return;
     }
-    var hello = helloRequest();
     var logonBody = {
-      state: hello.state,
+      state: helloReq.state,
       params: [username, password, "1"],
-      hello: hello
+      hello: helloReq
     };
     fetchApi("/_/logon", logonBody)
       .then(function(res) {
@@ -192,21 +191,20 @@
       });
   });
 
-  var hello = helloRequest();
-  var helloPrompts = (hello.prompt || "").split(" ");
+  var helloReq = helloRequest();
+  var helloPrompts = (helloReq.prompt || "").split(" ");
   var hasLogin = helloPrompts.indexOf("login") !== -1;
-  var hasSelectAccount = helloPrompts.indexOf("select_account") !== -1;
 
   function showForm() {
     document.getElementById("login-form").hidden = false;
   }
 
-  if ((hello.state || hello.client_id) && !hasLogin) {
-    fetchApi("/_/hello", hello)
+  if ((helloReq.state || helloReq.client_id) && !hasLogin) {
+    fetchApi("/_/hello", helloReq)
       .then(function(res) { return parseJsonMaybe(res); })
       .then(function(data) {
         if (!data || !data.success) { showForm(); return; }
-        if (hasSelectAccount && data.username) {
+        if (helloPrompts.indexOf("select_account") !== -1 && data.username) {
           window.location.href = '/signin/v1/chooseaccount' + window.location.search;
           return;
         }

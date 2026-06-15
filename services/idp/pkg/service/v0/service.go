@@ -287,10 +287,7 @@ func (idp *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handl
 
 	idp.mux.Use(middleware.Static(
 		"/signin/v1/",
-		assets.New(
-			assets.Logger(options.Logger),
-			assets.Config(options.Config),
-		),
+		idp.assets,
 		idp.tp,
 	))
 
@@ -317,9 +314,13 @@ func (idp *IDP) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	idp.mux.ServeHTTP(w, r)
 }
 
+type basePageData struct {
+	Lang, Title, Headline, Nonce, PathPrefix string
+	BgImgURL                                 template.CSS
+}
+
 type indexData struct {
-	Lang, Title, Headline, Nonce, PathPrefix       string
-	BgImgURL                                       template.CSS
+	basePageData
 	LabelUsername, LabelPassword                   string
 	ButtonSignIn, ButtonSigningIn                  string
 	ErrRequired, ErrInvalid, ErrFailed, ErrDefault string
@@ -328,73 +329,76 @@ type indexData struct {
 }
 
 type pageData struct {
-	Lang, Title, Headline, Nonce, PathPrefix string
-	BgImgURL                                 template.CSS
-	Message                                  string
+	basePageData
+	Message string
 }
 
 type consentData struct {
-	Lang, Title, Headline, Nonce, PathPrefix string
-	BgImgURL                                 template.CSS
+	basePageData
 	AllowLabel, DenyLabel, ConsentConsequence string
 }
 
 type chooseaccountData struct {
-	Lang, Title, Headline, HeadlineSub, Nonce, PathPrefix string
-	BgImgURL                                              template.CSS
-	UseAnotherLabel                                       string
+	basePageData
+	HeadlineSub     string
+	UseAnotherLabel string
+}
+
+func (idp *IDP) basePage(r *http.Request, title, headline string) (basePageData, l10n.OcisLocale) {
+	lang := detectLocale(r)
+	t := idp.translator.Locale(lang)
+	return basePageData{
+		Lang:       lang,
+		Title:      t.Get(title),
+		Headline:   t.Get(headline),
+		Nonce:      rndm.GenerateRandomString(32),
+		PathPrefix: "/signin/v1",
+		BgImgURL:   template.CSS(idp.config.Asset.LoginBackgroundUrl),
+	}, t
+}
+
+func (idp *IDP) renderPage(w http.ResponseWriter, tpl *template.Template, nonce string, data any) {
+	var buf bytes.Buffer
+	if err := tpl.Execute(&buf, data); err != nil {
+		http.Error(w, "template error", http.StatusInternalServerError)
+		return
+	}
+	writeSecureHTML(w, buf.Bytes(), nonce)
+}
+
+func (idp *IDP) mustParseTemplate(name, errMsg string) *template.Template {
+	tpl, err := idp.parseTemplate(name)
+	if err != nil {
+		idp.logger.Fatal().Err(err).Msg(errMsg)
+	}
+	return tpl
 }
 
 // Chooseaccount renders the account picker page.
 func (idp *IDP) Chooseaccount() http.HandlerFunc {
-	tpl, err := idp.parseTemplate("/identifier/chooseaccount.html")
-	if err != nil {
-		idp.logger.Fatal().Err(err).Msg("Could not load chooseaccount template")
-	}
+	tpl := idp.mustParseTemplate("/identifier/chooseaccount.html", "Could not load chooseaccount template")
 	return func(w http.ResponseWriter, r *http.Request) {
-		lang := detectLocale(r)
-		t := idp.translator.Locale(lang)
-		nonce := rndm.GenerateRandomString(32)
+		base, t := idp.basePage(r, "Choose an account - ownCloud", "Choose an account")
 		data := chooseaccountData{
-			Lang:            lang,
-			Title:           t.Get("Choose an account - ownCloud"),
-			Headline:        t.Get("Choose an account"),
+			basePageData:    base,
 			HeadlineSub:     t.Get("to sign in"),
-			Nonce:           nonce,
-			PathPrefix:      "/signin/v1",
-			BgImgURL:        template.CSS(idp.config.Asset.LoginBackgroundUrl),
 			UseAnotherLabel: t.Get("Use another account"),
 		}
-		var buf bytes.Buffer
-		if err := tpl.Execute(&buf, data); err != nil {
-			http.Error(w, "template error", http.StatusInternalServerError)
-			return
-		}
-		writeSecureHTML(w, buf.Bytes(), nonce)
+		idp.renderPage(w, tpl, base.Nonce, data)
 	}
 }
 
 // Index renders the login page with templated variables.
 func (idp *IDP) Index() http.HandlerFunc {
-	tpl, err := idp.parseTemplate("/identifier/index.html")
-	if err != nil {
-		idp.logger.Fatal().Err(err).Msg("Could not load index template")
-	}
+	tpl := idp.mustParseTemplate("/identifier/index.html", "Could not load index template")
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("flow") == "consent" {
 			http.Redirect(w, r, "/signin/v1/consent?"+r.URL.RawQuery, http.StatusFound)
 			return
 		}
-		lang := detectLocale(r)
-		t := idp.translator.Locale(lang)
-		nonce := rndm.GenerateRandomString(32)
+		base, t := idp.basePage(r, "Sign in - ownCloud", "Login")
 		data := indexData{
-			Lang:             lang,
-			Title:            t.Get("Sign in - ownCloud"),
-			Headline:         t.Get("Login"),
-			Nonce:            nonce,
-			PathPrefix:       "/signin/v1",
-			BgImgURL:         template.CSS(idp.config.Asset.LoginBackgroundUrl),
+			basePageData:     base,
 			LabelUsername:    t.Get("Username"),
 			LabelPassword:    t.Get("Password"),
 			ButtonSignIn:     t.Get("Log in"),
@@ -406,130 +410,62 @@ func (idp *IDP) Index() http.HandlerFunc {
 			PasswordResetURI: template.URL(idp.config.Service.PasswordResetURI),
 			ResetLabel:       t.Get("Reset password"),
 		}
-		var buf bytes.Buffer
-		if err := tpl.Execute(&buf, data); err != nil {
-			http.Error(w, "template error", http.StatusInternalServerError)
-			return
-		}
-		writeSecureHTML(w, buf.Bytes(), nonce)
+		idp.renderPage(w, tpl, base.Nonce, data)
 	}
 }
 
 // Welcome renders the signed-in confirmation page.
 func (idp *IDP) Welcome() http.HandlerFunc {
-	tpl, err := idp.parseTemplate("/identifier/welcome.html")
-	if err != nil {
-		idp.logger.Fatal().Err(err).Msg("Could not load welcome template")
-	}
+	tpl := idp.mustParseTemplate("/identifier/welcome.html", "Could not load welcome template")
 	return func(w http.ResponseWriter, r *http.Request) {
-		lang := detectLocale(r)
-		t := idp.translator.Locale(lang)
-		nonce := rndm.GenerateRandomString(32)
+		base, t := idp.basePage(r, "Signed in - ownCloud", "Signed in")
 		data := pageData{
-			Lang:       lang,
-			Title:      t.Get("Signed in - ownCloud"),
-			Headline:   t.Get("Signed in"),
-			Nonce:      nonce,
-			PathPrefix: "/signin/v1",
-			BgImgURL:   template.CSS(idp.config.Asset.LoginBackgroundUrl),
-			Message:    t.Get("You are signed in. You can close this window and return to the application."),
+			basePageData: base,
+			Message:      t.Get("You are signed in. You can close this window and return to the application."),
 		}
-		var buf bytes.Buffer
-		if err := tpl.Execute(&buf, data); err != nil {
-			http.Error(w, "template error", http.StatusInternalServerError)
-			return
-		}
-		writeSecureHTML(w, buf.Bytes(), nonce)
+		idp.renderPage(w, tpl, base.Nonce, data)
 	}
 }
 
 // Goodbye renders the signed-out confirmation page.
 func (idp *IDP) Goodbye() http.HandlerFunc {
-	tpl, err := idp.parseTemplate("/identifier/goodbye.html")
-	if err != nil {
-		idp.logger.Fatal().Err(err).Msg("Could not load goodbye template")
-	}
+	tpl := idp.mustParseTemplate("/identifier/goodbye.html", "Could not load goodbye template")
 	return func(w http.ResponseWriter, r *http.Request) {
-		lang := detectLocale(r)
-		t := idp.translator.Locale(lang)
-		nonce := rndm.GenerateRandomString(32)
+		base, t := idp.basePage(r, "Signed out - ownCloud", "Signed out")
 		data := pageData{
-			Lang:       lang,
-			Title:      t.Get("Signed out - ownCloud"),
-			Headline:   t.Get("Signed out"),
-			Nonce:      nonce,
-			PathPrefix: "/signin/v1",
-			BgImgURL:   template.CSS(idp.config.Asset.LoginBackgroundUrl),
-			Message:    t.Get("You are signed out. You can close this window."),
+			basePageData: base,
+			Message:      t.Get("You are signed out. You can close this window."),
 		}
-		var buf bytes.Buffer
-		if err := tpl.Execute(&buf, data); err != nil {
-			http.Error(w, "template error", http.StatusInternalServerError)
-			return
-		}
-		writeSecureHTML(w, buf.Bytes(), nonce)
+		idp.renderPage(w, tpl, base.Nonce, data)
 	}
 }
 
 // LoginError renders the login error page.
 func (idp *IDP) LoginError() http.HandlerFunc {
-	tpl, err := idp.parseTemplate("/identifier/loginerror.html")
-	if err != nil {
-		idp.logger.Fatal().Err(err).Msg("Could not load loginerror template")
-	}
+	tpl := idp.mustParseTemplate("/identifier/loginerror.html", "Could not load loginerror template")
 	return func(w http.ResponseWriter, r *http.Request) {
-		lang := detectLocale(r)
-		t := idp.translator.Locale(lang)
-		nonce := rndm.GenerateRandomString(32)
+		base, t := idp.basePage(r, "Login Error - ownCloud", "Login Error")
 		msg := r.URL.Query().Get("message")
 		if msg == "" {
 			msg = t.Get("Login Error")
 		}
-		data := pageData{
-			Lang:       lang,
-			Title:      t.Get("Login Error - ownCloud"),
-			Headline:   t.Get("Login Error"),
-			Nonce:      nonce,
-			PathPrefix: "/signin/v1",
-			BgImgURL:   template.CSS(idp.config.Asset.LoginBackgroundUrl),
-			Message:    msg,
-		}
-		var buf bytes.Buffer
-		if err := tpl.Execute(&buf, data); err != nil {
-			http.Error(w, "template error", http.StatusInternalServerError)
-			return
-		}
-		writeSecureHTML(w, buf.Bytes(), nonce)
+		data := pageData{basePageData: base, Message: msg}
+		idp.renderPage(w, tpl, base.Nonce, data)
 	}
 }
 
 // Consent renders the OAuth2 consent page.
 func (idp *IDP) Consent() http.HandlerFunc {
-	tpl, err := idp.parseTemplate("/identifier/consent.html")
-	if err != nil {
-		idp.logger.Fatal().Err(err).Msg("Could not load consent template")
-	}
+	tpl := idp.mustParseTemplate("/identifier/consent.html", "Could not load consent template")
 	return func(w http.ResponseWriter, r *http.Request) {
-		lang := detectLocale(r)
-		t := idp.translator.Locale(lang)
-		nonce := rndm.GenerateRandomString(32)
+		base, t := idp.basePage(r, "Authorize - ownCloud", "Authorize")
 		data := consentData{
-			Lang:       lang,
-			Title:      t.Get("Authorize - ownCloud"),
-			Headline:   t.Get("Authorize"),
-			Nonce:      nonce,
-			PathPrefix: "/signin/v1",
-			BgImgURL:   template.CSS(idp.config.Asset.LoginBackgroundUrl),
+			basePageData:       base,
 			AllowLabel:         t.Get("Allow"),
 			DenyLabel:          t.Get("Cancel"),
 			ConsentConsequence: t.Get("By clicking Allow, you allow this app to use your information."),
 		}
-		var buf bytes.Buffer
-		if err := tpl.Execute(&buf, data); err != nil {
-			http.Error(w, "template error", http.StatusInternalServerError)
-			return
-		}
-		writeSecureHTML(w, buf.Bytes(), nonce)
+		idp.renderPage(w, tpl, base.Nonce, data)
 	}
 }
 

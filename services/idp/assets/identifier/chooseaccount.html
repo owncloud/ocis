@@ -89,67 +89,56 @@
     max_age: qs("max_age")
   };
 
-  var helloData = null;
+  function resetSignInState() {
+    showError("Could not sign in. Please try again.");
+    itemCurrent.style.opacity = "";
+    itemOther.style.pointerEvents = "";
+  }
 
   fetchApi("/_/hello", helloReq)
     .then(function(res) { return parseJsonMaybe(res); })
     .then(function(data) {
       if (!data || !data.success || !data.username) {
-        // No active session — go to login form
         window.location.href = pathPrefix + '/identifier' + window.location.search;
         return;
       }
-      helloData = data;
       avatarEl.textContent = data.username.charAt(0).toUpperCase();
       labelEl.textContent = data.username;
       bodyEl.hidden = false;
+
+      // "Continue as current user" — mode=0 logon (cookie re-auth, no password)
+      itemCurrent.addEventListener("click", function() {
+        itemCurrent.style.opacity = "0.5";
+        itemOther.style.pointerEvents = "none";
+        fetchApi("/_/logon", { state: helloReq.state, params: [data.username, "", "0"], hello: helloReq })
+          .then(function(res) {
+            return parseJsonMaybe(res).then(function(d) {
+              return { ok: res.ok, data: d };
+            });
+          })
+          .then(function(result) {
+            if (result.ok && result.data && result.data.success) {
+              var hello = result.data.hello;
+              if (hello && hello.next === 'consent') {
+                var consentParams = new URLSearchParams(window.location.search);
+                consentParams.set("prompt", "consent");
+                window.location.href = pathPrefix + '/consent?' + consentParams.toString();
+                return;
+              }
+              var next = hello && (hello.continue_uri || hello.next);
+              if (next && isSameOrigin(next)) {
+                window.location.href = next;
+                return;
+              }
+            }
+            resetSignInState();
+          })
+          .catch(resetSignInState);
+      });
     })
     .catch(function() {
       window.location.href = pathPrefix + '/identifier' + window.location.search;
     });
-
-  // "Continue as current user" — mode=0 logon (cookie re-auth, no password)
-  itemCurrent.addEventListener("click", function() {
-    if (!helloData) return;
-    itemCurrent.style.opacity = "0.5";
-    itemOther.style.pointerEvents = "none";
-
-    var logonBody = {
-      state: helloReq.state,
-      params: [helloData.username, "", "0"],
-      hello: helloReq
-    };
-    fetchApi("/_/logon", logonBody)
-      .then(function(res) {
-        return parseJsonMaybe(res).then(function(d) {
-          return { ok: res.ok, status: res.status, data: d };
-        });
-      })
-      .then(function(result) {
-        if (result.ok && result.data && result.data.success) {
-          var hello = result.data.hello;
-          if (hello && hello.next === 'consent') {
-            var consentParams = new URLSearchParams(window.location.search);
-            consentParams.set("prompt", "consent");
-            window.location.href = pathPrefix + '/consent?' + consentParams.toString();
-            return;
-          }
-          var next = hello && (hello.continue_uri || hello.next);
-          if (next && isSameOrigin(next)) {
-            window.location.href = next;
-            return;
-          }
-        }
-        showError("Could not sign in. Please try again.");
-        itemCurrent.style.opacity = "";
-        itemOther.style.pointerEvents = "";
-      })
-      .catch(function() {
-        showError("Could not sign in. Please try again.");
-        itemCurrent.style.opacity = "";
-        itemOther.style.pointerEvents = "";
-      });
-  });
 
   // "Use another account" — go to login form
   itemOther.addEventListener("click", function() {
