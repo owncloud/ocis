@@ -1,0 +1,72 @@
+// # Added Variables between oCIS 8.0.0 and oCIS 8.1.0
+// commenting the headline to make it better includable
+
+// table created per 2026.06.15
+// the table should be recreated/updated on source () changes
+
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Service | Variable | Description | Default
+
+| xref:deployment/services/env-vars-special-scope.adoc[Special Scope Envvars]
+| OCIS_ENABLE_VAULT_MODE
+| Enable vault mode in addition to the regular graph service. This only applies when the additional storage-users-vault service is running, which is a special configured storage-users service.
+| false
+
+| xref:deployment/services/env-vars-special-scope.adoc[Special Scope Envvars]
+| OCIS_LDAP_GROUP_ADDITIONAL_OBJECTCLASSES
+| Additional object classes to set when creating new groups (e.g. 'posixGroup'). The value of 'GRAPH_LDAP_GROUP_OBJECTCLASS' is always included.
+| []
+
+| xref:deployment/services/env-vars-special-scope.adoc[Special Scope Envvars]
+| OCIS_MFA_SESSION_DURATION
+| The duration in seconds that a multi-factor authentication session is valid. After this time the user will be prompted to re-authenticate. Defaults to 3600 (1 hour).
+| 3600
+
+| xref:{s-path}/frontend.adoc[Frontend]
+| FRONTEND_ENABLE_VAULT_MODE
+| Enable vault mode. When enabled, the capabilities endpoint will report vault as enabled and the capabilities?vault=true endpoint will return capabilities with public sharing and federation disabled.
+| false
+
+| xref:{s-path}/gateway.adoc[Gateway]
+| GATEWAY_ENABLE_VAULT_MODE
+| Set this to true to enable the default rule for vault storage provider configuration. Only applicable if the storage-users-vault service, a specially configured storage-users service, is configured.
+| false
+
+| 
+| GATEWAY_STORAGE_USERS_VAULT_ENDPOINT
+| The endpoint of the storage-users-vault service. The storage-users-vault is an additional storage-users service that runs in vault mode. It can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.
+| com.owncloud.api.storage-users-vault
+
+| xref:{s-path}/graph.adoc[Graph]
+| GRAPH_ENABLE_VAULT_MODE
+| Enable vault mode in addition to the regular graph service. This only applies when the additional storage-users-vault service is running, which is a special configured storage-users service.
+| false
+
+| 
+| GRAPH_LDAP_GROUP_ADDITIONAL_OBJECTCLASSES
+| Additional object classes to set when creating new groups (e.g. 'posixGroup'). The value of 'GRAPH_LDAP_GROUP_OBJECTCLASS' is always included.
+| []
+
+| 
+| GRAPH_SPACES_STORAGE_USERS_VAULT_ADDRESS
+| The address of the storage-users-vault service, a special configured storage-users service. Applicable only when 'GRAPH_ENABLE_VAULT_MODE' is enabled.
+| com.owncloud.api.storage-users-vault
+
+| xref:{s-path}/proxy.adoc[Proxy]
+| PROXY_ENABLE_VAULT_MODE
+| Set this to true to automatically create a new vault home for the user if it does not exist. Only applicapable if the storage-users-vault service, a special configured storage-users service is configured.
+| false
+
+| xref:{s-path}/storage-users.adoc[Storage-Users]
+| STORAGE_USERS_ENABLE_VAULT_MODE
+| Enabling the flag forces the storage-users service to run with a MountID set to VaultStorageProviderID. Not applicable for use with the primary storage-users service. Use only if an additional storage-users-vault service, a special configured storage-users service is configured.
+| false
+
+| 
+| STORAGE_USERS_EVENTS_CONSUMER_GROUP
+| The name of the consumer group to be used at the event to help consumers identify the unique group.
+| 
+
+|===
+
