@@ -337,5 +337,6 @@ type Version struct {
 
 // CapabilitiesVault holds vault capabilities
 type CapabilitiesVault struct {
-	Enabled ocsBool `json:"enabled" xml:"enabled" mapstructure:"enabled"`
+	Enabled              ocsBool `json:"enabled" xml:"enabled" mapstructure:"enabled"`
+	VaultStorageProvider string  `json:"vault_storage_provider" xml:"vault_storage_provider" mapstructure:"vault_storage_provider"`
 }

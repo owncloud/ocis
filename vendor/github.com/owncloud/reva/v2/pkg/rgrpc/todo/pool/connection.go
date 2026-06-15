@@ -23,6 +23,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	rtrace "github.com/owncloud/reva/v2/pkg/trace"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
@@ -112,6 +113,12 @@ func NewConn(target string, opts ...Option) (*grpc.ClientConn, error) {
 			]
 		}`),
 		*/
+		grpc.WithChainUnaryInterceptor(
+			autoprop.GetGoGRPCUnaryClientInterceptor(),
+		),
+		grpc.WithChainStreamInterceptor(
+			autoprop.GetGoGRPCStreamClientInterceptor(),
+		),
 		grpc.WithStatsHandler(otelgrpc.NewClientHandler(
 			otelgrpc.WithTracerProvider(
 				options.tracerProvider,

@@ -37,7 +37,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/node"
-	"github.com/owncloud/reva/v2/pkg/storagespace"
 )
 
 type DecomposedfsTrashbin struct {
@@ -346,18 +345,18 @@ func (tb *DecomposedfsTrashbin) listTrashRoot(ctx context.Context, spaceID strin
 }
 
 // RestoreRecycleItem restores the specified item
-func (tb *DecomposedfsTrashbin) RestoreRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string, restoreRef *provider.Reference) error {
+func (tb *DecomposedfsTrashbin) RestoreRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string, restoreRef *provider.Reference) (*storage.RestoreRecycleItemResult, error) {
 	_, span := tracer.Start(ctx, "RestoreRecycleItem")
 	defer span.End()
 	if ref == nil {
-		return errtypes.BadRequest("missing reference, needs a space id")
+		return nil, errtypes.BadRequest("missing reference, needs a space id")
 	}
 
 	var targetNode *node.Node
 	if restoreRef != nil {
 		tn, err := tb.fs.lu.NodeFromResource(ctx, restoreRef)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		targetNode = tn
@@ -365,39 +364,40 @@ func (tb *DecomposedfsTrashbin) RestoreRecycleItem(ctx context.Context, ref *pro
 
 	rn, parent, restoreFunc, err := tb.fs.tp.RestoreRecycleItemFunc(ctx, ref.ResourceId.SpaceId, key, relativePath, targetNode)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// check permissions of deleted node
 	rp, err := tb.fs.p.AssembleTrashPermissions(ctx, rn)
 	switch {
 	case err != nil:
-		return err
+		return nil, err
 	case !rp.RestoreRecycleItem:
 		if rp.Stat {
-			return errtypes.PermissionDenied(key)
+			return nil, errtypes.PermissionDenied(key)
 		}
-		return errtypes.NotFound(key)
+		return nil, errtypes.NotFound(key)
 	}
 
-	// Set space owner in context
-	storagespace.ContextSendSpaceOwnerID(ctx, rn.SpaceOwnerOrManager(ctx))
+	spaceOwner := rn.SpaceOwnerOrManager(ctx)
 
 	// check we can write to the parent of the restore reference
 	pp, err := tb.fs.p.AssemblePermissions(ctx, parent)
 	switch {
 	case err != nil:
-		return err
+		return nil, err
 	case !pp.InitiateFileUpload:
 		// share receiver cannot restore to a shared resource to which she does not have write permissions.
 		if rp.Stat {
-			return errtypes.PermissionDenied(key)
+			return nil, errtypes.PermissionDenied(key)
 		}
-		return errtypes.NotFound(key)
+		return nil, errtypes.NotFound(key)
 	}
 
-	// Run the restore func
-	return restoreFunc()
+	if err := restoreFunc(); err != nil {
+		return nil, err
+	}
+	return &storage.RestoreRecycleItemResult{SpaceOwner: spaceOwner, SpaceID: rn.SpaceID}, nil
 }
 
 // PurgeRecycleItem purges the specified item, all its children and all their revisions

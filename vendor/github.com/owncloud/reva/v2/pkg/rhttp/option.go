@@ -32,6 +32,7 @@ type Options struct {
 	Timeout          time.Duration
 	Insecure         bool
 	DisableKeepAlive bool
+	MinVersion       uint16
 }
 
 // newOptions initializes the available default options.
@@ -70,5 +71,13 @@ func Timeout(t time.Duration) Option {
 func DisableKeepAlive(disable bool) Option {
 	return func(o *Options) {
 		o.DisableKeepAlive = disable
+	}
+}
+
+// MinVersion sets the minimum TLS version to use
+// Use tls.VersionTLS10 to tls.VersionTLS13
+func MinVersion(version uint16) Option {
+	return func(o *Options) {
+		o.MinVersion = version
 	}
 }

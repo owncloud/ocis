@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
 	"reflect"
 	"strings"
 
@@ -195,4 +196,29 @@ func getProtocolName(p Protocol) string {
 	n := reflect.TypeOf(p).String()
 	s := strings.Split(n, ".")
 	return strings.ToLower(s[len(s)-1])
+}
+
+// validateURIScheme rejects a URI whose scheme is not https. Plain http is
+// only accepted when allowHTTP is true. The URI must have a non-empty host.
+// Webapp URI templates are accepted because RFC 6570 placeholders only ever
+// appear in the path/query, never in the scheme or authority.
+func validateURIScheme(raw string, allowHTTP bool) error {
+	u, err := url.Parse(raw)
+	if err != nil {
+		return fmt.Errorf("invalid uri %q: %w", raw, err)
+	}
+	if u.Host == "" {
+		return fmt.Errorf("invalid uri %q: missing host", raw)
+	}
+	switch u.Scheme {
+	case "https":
+		return nil
+	case "http":
+		if allowHTTP {
+			return nil
+		}
+		return fmt.Errorf("invalid uri %q: plain http is not allowed", raw)
+	default:
+		return fmt.Errorf("invalid uri %q: scheme %q is not allowed", raw, u.Scheme)
+	}
 }
