@@ -266,23 +266,25 @@ func TestCSPNonceConsistency(t *testing.T) {
 
 	_, body, _ := getPage(t, srv, "/signin/v1/identifier", "")
 
-	metaNonce := regexp.MustCompile(`<meta property="csp-nonce" content="([^"]+)"`)
+	// No-JS templates inject the nonce directly into <style> and <script> attributes;
+	// there is no <meta property="csp-nonce"> (that was only needed by the React SPA).
+	styleNonce := regexp.MustCompile(`<style nonce="([^"]+)"`)
 	scriptNonce := regexp.MustCompile(`<script nonce="([^"]+)"`)
 
-	metaMatch := metaNonce.FindStringSubmatch(body)
+	styleMatch := styleNonce.FindStringSubmatch(body)
 	scriptMatch := scriptNonce.FindStringSubmatch(body)
 
-	if len(metaMatch) < 2 {
-		t.Fatal("could not find CSP nonce in <meta> tag")
+	if len(styleMatch) < 2 {
+		t.Fatal("could not find nonce in <style> tag")
 	}
 	if len(scriptMatch) < 2 {
 		t.Fatal("could not find nonce in <script> tag")
 	}
-	if metaMatch[1] != scriptMatch[1] {
-		t.Errorf("nonce mismatch: meta=%q script=%q", metaMatch[1], scriptMatch[1])
+	if styleMatch[1] != scriptMatch[1] {
+		t.Errorf("nonce mismatch: style=%q script=%q", styleMatch[1], scriptMatch[1])
 	}
-	if len(metaMatch[1]) < 16 {
-		t.Errorf("nonce too short: %q", metaMatch[1])
+	if len(styleMatch[1]) < 16 {
+		t.Errorf("nonce too short: %q", styleMatch[1])
 	}
 }
 
