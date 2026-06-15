@@ -23,10 +23,50 @@ import (
 	"io"
 	"net/url"
 
+	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	registry "github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
 )
+
+type MoveResult struct {
+	SpaceOwner   *user.UserId
+	OldReference *provider.Reference
+	NewReference *provider.Reference
+}
+
+type CreateDirResult struct {
+	SpaceOwner *userpb.UserId
+	SpaceID    string
+	ResourceID *provider.ResourceId
+}
+
+type TouchFileResult struct {
+	SpaceOwner *userpb.UserId
+	SpaceID    string
+	ResourceID *provider.ResourceId
+}
+
+type RestoreRevisionResult struct {
+	SpaceOwner *userpb.UserId
+	SpaceID    string
+}
+
+type RestoreRecycleItemResult struct {
+	SpaceOwner *userpb.UserId
+	SpaceID    string
+}
+
+type SetLockResult struct {
+	SpaceOwner *userpb.UserId
+	SpaceID    string
+}
+
+type UnlockResult struct {
+	SpaceOwner *userpb.UserId
+	SpaceID    string
+}
 
 // FS is the interface to implement access to the storage.
 type FS interface {
@@ -59,16 +99,17 @@ type FS interface {
 	// CreateReference creates a resource of type reference
 	CreateReference(ctx context.Context, path string, targetURI *url.URL) error
 	// CreateDir creates a resource of type container
-	CreateDir(ctx context.Context, ref *provider.Reference) error
+	CreateDir(ctx context.Context, ref *provider.Reference) (*CreateDirResult, error)
 	// TouchFile sets the mtime of a resource, creating an empty file if it does not exist
 	// FIXME the markprocessing flag is an implementation detail of decomposedfs, remove it from the function
 	// FIXME the mtime should either be a time.Time or a CS3 Timestamp, not a string
-	TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool, mtime string) error
+	TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool, mtime string) (*TouchFileResult, error)
 	// Delete deletes a resource.
-	// If the storage driver supports a recycle bin it should moves it to the recycle bin
-	Delete(ctx context.Context, ref *provider.Reference) error
+	// If the storage driver supports a recycle bin it should move it to the recycle bin
+	// On success, returns a DeleteResult used by the wrapper to publish ItemTrashed.
+	Delete(ctx context.Context, ref *provider.Reference) (*DeleteResult, error)
 	// Move changes the path of a resource
-	Move(ctx context.Context, oldRef, newRef *provider.Reference) error
+	Move(ctx context.Context, oldRef, newRef *provider.Reference) (*MoveResult, error)
 	// InitiateUpload returns a list of protocols with urls that can be used to append bytes to a new upload session
 	InitiateUpload(ctx context.Context, ref *provider.Reference, uploadLength int64, metadata map[string]string) (map[string]string, error)
 	// Upload creates or updates a resource of type file with a new revision
@@ -81,7 +122,7 @@ type FS interface {
 	// DownloadRevision downloads a revision
 	DownloadRevision(ctx context.Context, ref *provider.Reference, key string, openReaderFunc func(md *provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error)
 	// RestoreRevision restores a revision
-	RestoreRevision(ctx context.Context, ref *provider.Reference, key string) error
+	RestoreRevision(ctx context.Context, ref *provider.Reference, key string) (*RestoreRevisionResult, error)
 
 	// Recyce bin
 
@@ -89,7 +130,7 @@ type FS interface {
 	ListRecycle(ctx context.Context, ref *provider.Reference, key, relativePath string) ([]*provider.RecycleItem, error)
 	// RestoreRecycleItem restores an item from the recyle bin
 	// if restoreRef is nil the resource should be restored at the original path
-	RestoreRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string, restoreRef *provider.Reference) error
+	RestoreRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string, restoreRef *provider.Reference) (*RestoreRecycleItemResult, error)
 	// PurgeRecycleItem removes a resource from the recycle bin
 	PurgeRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string) error
 	// EmptyRecycle removes all resource from the recycle bin
@@ -121,11 +162,11 @@ type FS interface {
 	// GetLock returns an existing lock on the given reference
 	GetLock(ctx context.Context, ref *provider.Reference) (*provider.Lock, error)
 	// SetLock puts a lock on the given reference
-	SetLock(ctx context.Context, ref *provider.Reference, lock *provider.Lock) error
+	SetLock(ctx context.Context, ref *provider.Reference, lock *provider.Lock) (*SetLockResult, error)
 	// RefreshLock refreshes an existing lock on the given reference
 	RefreshLock(ctx context.Context, ref *provider.Reference, lock *provider.Lock, existingLockID string) error
 	// Unlock removes an existing lock from the given reference
-	Unlock(ctx context.Context, ref *provider.Reference, lock *provider.Lock) error
+	Unlock(ctx context.Context, ref *provider.Reference, lock *provider.Lock) (*UnlockResult, error)
 
 	// Spaces
 
@@ -133,8 +174,10 @@ type FS interface {
 	CreateStorageSpace(ctx context.Context, req *provider.CreateStorageSpaceRequest) (*provider.CreateStorageSpaceResponse, error)
 	// UpdateStorageSpace updates a storage space
 	UpdateStorageSpace(ctx context.Context, req *provider.UpdateStorageSpaceRequest) (*provider.UpdateStorageSpaceResponse, error)
-	// DeleteStorageSpace deletes a storage space
-	DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorageSpaceRequest) error
+	// DeleteStorageSpace deletes a storage space.
+	// On a successful delete (purge), returns a DeleteStorageSpaceResult used by
+	// the wrapper to publish SpaceDeleted. SpaceDisabled does not need this data.
+	DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorageSpaceRequest) (*DeleteStorageSpaceResult, error)
 
 	// CreateHome creates a users home
 	// Deprecated: use CreateStorageSpace with type personal
@@ -142,6 +185,26 @@ type FS interface {
 	// GetHome returns the path to the users home
 	// Deprecated: use ListStorageSpaces with type personal
 	GetHome(ctx context.Context) (string, error)
+}
+
+// DeleteResult is returned by FS.Delete on success. It carries the data the
+// storageprovider wrapper needs to publish the ItemTrashed event.
+type DeleteResult struct {
+	// SpaceOwner is the owner of the space the deleted resource belonged to.
+	SpaceOwner *userpb.UserId
+	// ResourceId is the stable identifier of the deleted resource, used as ItemTrashed.ID in the published event.
+	ResourceId *provider.ResourceId
+}
+
+// DeleteStorageSpaceResult is returned by FS.DeleteStorageSpace on a successful
+// purge. It carries the data the storageprovider wrapper needs to publish the
+// SpaceDeleted event. The SpaceDisabled flow does not consume it.
+type DeleteStorageSpaceResult struct {
+	// SpaceName is the name of the space at the time of deletion.
+	SpaceName string
+	// FinalMembers is the grant map of the space at the time of deletion,
+	// keyed by user/group opaque id.
+	FinalMembers map[string]provider.ResourcePermissions
 }
 
 // UnscopeFunc is a function that unscopes a user

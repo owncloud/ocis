@@ -36,13 +36,13 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/mime"
 	"github.com/owncloud/reva/v2/pkg/storage"
 	"github.com/owncloud/reva/v2/pkg/storage/fs/registry"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 )
@@ -288,8 +288,8 @@ func (fs *s3FS) GetLock(ctx context.Context, ref *provider.Reference) (*provider
 }
 
 // SetLock puts a lock on the given reference
-func (fs *s3FS) SetLock(ctx context.Context, ref *provider.Reference, lock *provider.Lock) error {
-	return errtypes.NotSupported("unimplemented")
+func (fs *s3FS) SetLock(ctx context.Context, ref *provider.Reference, lock *provider.Lock) (*storage.SetLockResult, error) {
+	return nil, errtypes.NotSupported("unimplemented")
 }
 
 // RefreshLock refreshes an existing lock on the given reference
@@ -298,8 +298,8 @@ func (fs *s3FS) RefreshLock(ctx context.Context, ref *provider.Reference, lock *
 }
 
 // Unlock removes an existing lock from the given reference
-func (fs *s3FS) Unlock(ctx context.Context, ref *provider.Reference, lock *provider.Lock) error {
-	return errtypes.NotSupported("unimplemented")
+func (fs *s3FS) Unlock(ctx context.Context, ref *provider.Reference, lock *provider.Lock) (*storage.UnlockResult, error) {
+	return nil, errtypes.NotSupported("unimplemented")
 }
 
 func (fs *s3FS) CreateReference(ctx context.Context, path string, targetURI *url.URL) error {
@@ -315,12 +315,12 @@ func (fs *s3FS) CreateHome(ctx context.Context) error {
 	return errtypes.NotSupported("s3fs: not supported")
 }
 
-func (fs *s3FS) CreateDir(ctx context.Context, ref *provider.Reference) error {
+func (fs *s3FS) CreateDir(ctx context.Context, ref *provider.Reference) (*storage.CreateDirResult, error) {
 	log := appctx.GetLogger(ctx)
 
 	fn, err := fs.resolve(ctx, ref)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	fn = fs.addRoot(fn) + "/" // append / to indicate folder // TODO only if fn does not end in /
@@ -337,28 +337,28 @@ func (fs *s3FS) CreateDir(ctx context.Context, ref *provider.Reference) error {
 		log.Error().Err(err)
 		if aerr, ok := err.(awserr.Error); ok {
 			if aerr.Code() == s3.ErrCodeNoSuchBucket {
-				return errtypes.NotFound(ref.Path)
+				return nil, errtypes.NotFound(ref.Path)
 			}
 		}
 		// FIXME we also need already exists error, webdav expects 405 MethodNotAllowed
-		return errors.Wrap(err, "s3fs: error creating dir "+ref.Path)
+		return nil, errors.Wrap(err, "s3fs: error creating dir "+ref.Path)
 	}
 
 	log.Debug().Interface("result", result) // todo cache etag?
-	return nil
+	return &storage.CreateDirResult{}, nil
 }
 
 // TouchFile as defined in the storage.FS interface
-func (fs *s3FS) TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool, mtime string) error {
-	return fmt.Errorf("unimplemented: TouchFile")
+func (fs *s3FS) TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool, mtime string) (*storage.TouchFileResult, error) {
+	return nil, fmt.Errorf("unimplemented: TouchFile")
 }
 
-func (fs *s3FS) Delete(ctx context.Context, ref *provider.Reference) error {
+func (fs *s3FS) Delete(ctx context.Context, ref *provider.Reference) (*storage.DeleteResult, error) {
 	log := appctx.GetLogger(ctx)
 
 	fn, err := fs.resolve(ctx, ref)
 	if err != nil {
-		return errors.Wrap(err, "error resolving ref")
+		return nil, errors.Wrap(err, "error resolving ref")
 	}
 
 	// first we need to find out if fn is a dir or a file
@@ -373,7 +373,7 @@ func (fs *s3FS) Delete(ctx context.Context, ref *provider.Reference) error {
 			switch aerr.Code() {
 			case s3.ErrCodeNoSuchBucket:
 			case s3.ErrCodeNoSuchKey:
-				return errtypes.NotFound(fn)
+				return nil, errtypes.NotFound(fn)
 			}
 		}
 		// it might be a directory, so we can batch delete the prefix + /
@@ -383,10 +383,10 @@ func (fs *s3FS) Delete(ctx context.Context, ref *provider.Reference) error {
 		})
 		batcher := s3manager.NewBatchDeleteWithClient(fs.client)
 		if err := batcher.Delete(aws.BackgroundContext(), iter); err != nil {
-			return err
+			return nil, err
 		}
 		// ok, we are done
-		return nil
+		return &storage.DeleteResult{}, nil
 	}
 
 	// we found an object, let's get rid of it
@@ -400,14 +400,14 @@ func (fs *s3FS) Delete(ctx context.Context, ref *provider.Reference) error {
 			switch aerr.Code() {
 			case s3.ErrCodeNoSuchBucket:
 			case s3.ErrCodeNoSuchKey:
-				return errtypes.NotFound(fn)
+				return nil, errtypes.NotFound(fn)
 			}
 		}
-		return errors.Wrap(err, "s3fs: error deleting "+fn)
+		return nil, errors.Wrap(err, "s3fs: error deleting "+fn)
 	}
 
 	log.Debug().Interface("result", result)
-	return nil
+	return &storage.DeleteResult{}, nil
 }
 
 // CreateStorageSpace creates a storage space
@@ -449,17 +449,17 @@ func (fs *s3FS) moveObject(ctx context.Context, oldKey string, newKey string) er
 	return nil
 }
 
-func (fs *s3FS) Move(ctx context.Context, oldRef, newRef *provider.Reference) error {
+func (fs *s3FS) Move(ctx context.Context, oldRef, newRef *provider.Reference) (*storage.MoveResult, error) {
 	log := appctx.GetLogger(ctx)
 
 	fn, err := fs.resolve(ctx, oldRef)
 	if err != nil {
-		return errors.Wrap(err, "error resolving ref")
+		return nil, errors.Wrap(err, "error resolving ref")
 	}
 
 	newName, err := fs.resolve(ctx, newRef)
 	if err != nil {
-		return errors.Wrap(err, "error resolving ref")
+		return nil, errors.Wrap(err, "error resolving ref")
 	}
 
 	// first we need to find out if fn is a dir or a file
@@ -474,7 +474,7 @@ func (fs *s3FS) Move(ctx context.Context, oldRef, newRef *provider.Reference) er
 			switch aerr.Code() {
 			case s3.ErrCodeNoSuchBucket:
 			case s3.ErrCodeNoSuchKey:
-				return errtypes.NotFound(fn)
+				return nil, errtypes.NotFound(fn)
 			}
 		}
 
@@ -488,7 +488,7 @@ func (fs *s3FS) Move(ctx context.Context, oldRef, newRef *provider.Reference) er
 		for isTruncated {
 			output, err := fs.client.ListObjectsV2(input)
 			if err != nil {
-				return errors.Wrap(err, "s3FS: error listing "+fn)
+				return nil, errors.Wrap(err, "s3FS: error listing "+fn)
 			}
 
 			for _, o := range output.Contents {
@@ -499,7 +499,7 @@ func (fs *s3FS) Move(ctx context.Context, oldRef, newRef *provider.Reference) er
 
 				err := fs.moveObject(ctx, *o.Key, strings.Replace(*o.Key, fn+"/", newName+"/", 1))
 				if err != nil {
-					return err
+					return nil, err
 				}
 			}
 
@@ -507,15 +507,15 @@ func (fs *s3FS) Move(ctx context.Context, oldRef, newRef *provider.Reference) er
 			isTruncated = *output.IsTruncated
 		}
 		// ok, we are done
-		return nil
+		return &storage.MoveResult{}, nil
 	}
 
 	// move single object
 	err = fs.moveObject(ctx, fn, newName)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return &storage.MoveResult{}, nil
 }
 
 func (fs *s3FS) GetMD(ctx context.Context, ref *provider.Reference, mdKeys []string, fieldMask []string) (*provider.ResourceInfo, error) {
@@ -663,8 +663,8 @@ func (fs *s3FS) DownloadRevision(ctx context.Context, ref *provider.Reference, r
 	return nil, nil, errtypes.NotSupported("download revision")
 }
 
-func (fs *s3FS) RestoreRevision(ctx context.Context, ref *provider.Reference, revisionKey string) error {
-	return errtypes.NotSupported("restore revision")
+func (fs *s3FS) RestoreRevision(ctx context.Context, ref *provider.Reference, revisionKey string) (*storage.RestoreRevisionResult, error) {
+	return nil, errtypes.NotSupported("restore revision")
 }
 
 func (fs *s3FS) PurgeRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string) error {
@@ -679,8 +679,8 @@ func (fs *s3FS) ListRecycle(ctx context.Context, ref *provider.Reference, key, r
 	return nil, errtypes.NotSupported("list recycle")
 }
 
-func (fs *s3FS) RestoreRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string, restoreRef *provider.Reference) error {
-	return errtypes.NotSupported("restore recycle")
+func (fs *s3FS) RestoreRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string, restoreRef *provider.Reference) (*storage.RestoreRecycleItemResult, error) {
+	return nil, errtypes.NotSupported("restore recycle")
 }
 
 func (fs *s3FS) ListStorageSpaces(ctx context.Context, filter []*provider.ListStorageSpacesRequest_Filter, unrestricted bool) ([]*provider.StorageSpace, error) {
@@ -693,6 +693,6 @@ func (fs *s3FS) UpdateStorageSpace(ctx context.Context, req *provider.UpdateStor
 }
 
 // DeleteStorageSpace deletes a storage space
-func (fs *s3FS) DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorageSpaceRequest) error {
-	return errtypes.NotSupported("delete storage space")
+func (fs *s3FS) DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorageSpaceRequest) (*storage.DeleteStorageSpaceResult, error) {
+	return nil, errtypes.NotSupported("delete storage space")
 }

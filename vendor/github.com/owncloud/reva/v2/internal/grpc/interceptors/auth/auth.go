@@ -159,7 +159,7 @@ func NewUnary(m map[string]interface{}, unprotected []string, tp trace.TracerPro
 		ctx = ctxpkg.ContextSetScopes(ctx, tokenScope)
 		// TODO: MFA enforcement should be moved to the individual service level, so each service can
 		// decide which endpoints require MFA and which are accessible without it.
-		if conf.MFAEnabled {
+		if conf.MFAEnabled && u.Id.Type != userpb.UserType_USER_TYPE_SERVICE {
 			if mfav := metadata.ValueFromIncomingContext(ctx, ctxpkg.MFAOutgoingHeader); !slices.Contains(mfav, "true") {
 				log.Warn().Str("user_id", u.Id.OpaqueId).Strs("mfa_values", mfav).Msg("MFA is required")
 				return mfaResponse(ctx, req, info)
@@ -256,7 +256,7 @@ func NewStream(m map[string]interface{}, unprotected []string, tp trace.TracerPr
 		ctx = ctxpkg.ContextSetScopes(ctx, tokenScope)
 		// TODO: MFA enforcement should be moved to the individual service level, so each service can
 		// decide which endpoints require MFA and which are accessible without it.
-		if conf.MFAEnabled {
+		if conf.MFAEnabled && u.Id.Type != userpb.UserType_USER_TYPE_SERVICE {
 			if mfav := metadata.ValueFromIncomingContext(ctx, ctxpkg.MFAOutgoingHeader); !slices.Contains(mfav, "true") {
 				log.Warn().Str("user_id", u.Id.OpaqueId).Strs("mfa_values", mfav).Msg("MFA is required")
 				return status.Errorf(codes.PermissionDenied, "MFA required to access vault storage")
