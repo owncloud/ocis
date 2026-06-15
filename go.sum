@@ -760,6 +760,12 @@ github.com/owncloud/reva/v2 v2.0.0-20260521135517-5cf6fa2c7dbf h1:VSRW0jZVcDrmwC
 github.com/owncloud/reva/v2 v2.0.0-20260521135517-5cf6fa2c7dbf/go.mod h1:oHjvB9PhfF8QqiNGz7Hd4AVvR7CSPx3CLVRxUzmjK0w=
 github.com/owncloud/reva/v2 v2.0.0-20260612153304-63930c859f43 h1:5nkkNr1hnrU+a8thc84zollqkP6CazilEuz+EIp8YWk=
 github.com/owncloud/reva/v2 v2.0.0-20260612153304-63930c859f43/go.mod h1:gNSgpblFyfCDi1OQfU4VqPIHWtAPR3YPTE1ZaTNnG/U=
+github.com/owncloud/reva/v2 v2.0.0-20260615121532-bd663f8d0aed h1:QKiUkC6uBq7wjRhUHWaho/MkXPP9bleVinJ+wwyxbUQ=
+github.com/owncloud/reva/v2 v2.0.0-20260615121532-bd663f8d0aed/go.mod h1:gNSgpblFyfCDi1OQfU4VqPIHWtAPR3YPTE1ZaTNnG/U=
+github.com/owncloud/reva/v2 v2.0.0-20260615124328-892e11ba709b h1:18qsAy2Z6K/+FgVh2FbM1C2So4WRLCzS9fsM3uotO5o=
+github.com/owncloud/reva/v2 v2.0.0-20260615124328-892e11ba709b/go.mod h1:gNSgpblFyfCDi1OQfU4VqPIHWtAPR3YPTE1ZaTNnG/U=
+github.com/owncloud/reva/v2 v2.0.0-20260615133621-ad8d76aff9d6 h1:5FupdFnTwLdUbwoGyvw89qPob0dnYSxEBdebtt0VbPw=
+github.com/owncloud/reva/v2 v2.0.0-20260615133621-ad8d76aff9d6/go.mod h1:gNSgpblFyfCDi1OQfU4VqPIHWtAPR3YPTE1ZaTNnG/U=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pablodz/inotifywaitgo v0.0.9 h1:njquRbBU7fuwIe5rEvtaniVBjwWzcpdUVptSgzFqZsw=
