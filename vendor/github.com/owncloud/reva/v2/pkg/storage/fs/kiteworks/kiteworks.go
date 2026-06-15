@@ -25,18 +25,20 @@ func init() {
 	registry.Register("kiteworks", New)
 }
 
-const storageID = "kiteworks"
-
 // Config holds the driver configuration.
 type Config struct {
 	Endpoint string `mapstructure:"endpoint"`
+	APIToken string `mapstructure:"api_token"`
 	Insecure bool   `mapstructure:"insecure"`
+	MountID  string `mapstructure:"mount_id"`
 }
 
 // Driver implements storage.FS against a Kiteworks box (read-only).
 type Driver struct {
-	factory *kwlib.APIClientFactory
-	log     zerolog.Logger
+	factory   *kwlib.APIClientFactory
+	apiToken  string
+	storageID string
+	log       zerolog.Logger
 }
 
 // New returns a read-only Kiteworks storage driver.
@@ -47,32 +49,48 @@ func New(m map[string]interface{}, _ events.Stream, log *zerolog.Logger) (storag
 	}
 	c.Endpoint = strings.TrimRight(c.Endpoint, "/")
 
+	storageID := c.MountID
+	if storageID == "" {
+		storageID = "kiteworks"
+	}
+
 	l := zerolog.Nop()
 	if log != nil {
 		l = *log
 	}
 
 	return &Driver{
-		factory: kwlib.NewClientFactory(c.Endpoint, "reva-kiteworks/1.0", c.Insecure),
-		log:     l,
+		factory:   kwlib.NewClientFactory(c.Endpoint, "reva-kiteworks/1.0", c.Insecure),
+		apiToken:  c.APIToken,
+		storageID: storageID,
+		log:       l,
 	}, nil
 }
 
 func (d *Driver) client(ctx context.Context) *kwlib.APIClient {
-	token, _ := ctxpkg.ContextGetToken(ctx)
+	token := d.apiToken
+	if token == "" {
+		token, _ = ctxpkg.ContextGetToken(ctx)
+	}
 	return d.factory.Build("", "", "", token, &d.log)
 }
 
 // toResourceInfo converts a kwlib.FileInfo to a CS3 ResourceInfo.
-func (d *Driver) toResourceInfo(fi *kwlib.FileInfo, spaceID string) *provider.ResourceInfo {
+// spaceRootPath is the absolute KW path of the space root folder; it is stripped
+// from fi.Path to produce a space-relative path with a leading "/".
+func (d *Driver) toResourceInfo(fi *kwlib.FileInfo, spaceID, spaceRootPath string) *provider.ResourceInfo {
+	relPath := strings.TrimPrefix(fi.Path, spaceRootPath)
+	if !strings.HasPrefix(relPath, "/") {
+		relPath = "/" + relPath
+	}
 	ri := &provider.ResourceInfo{
 		Id: &provider.ResourceId{
-			StorageId: storageID,
+			StorageId: d.storageID,
 			SpaceId:   spaceID,
 			OpaqueId:  fi.ID,
 		},
 		Name:  fi.Name,
-		Path:  fi.Path,
+		Path:  relPath,
 		Etag:  fi.ETag(),
 		Mtime: utils.TimeToTS(fi.MTime()),
 		PermissionSet: &provider.ResourcePermissions{
@@ -113,11 +131,11 @@ func (d *Driver) ListStorageSpaces(ctx context.Context, _ []*provider.ListStorag
 			Name:      fi.Name,
 			SpaceType: "project",
 			Root: &provider.ResourceId{
-				StorageId: storageID,
+				StorageId: d.storageID,
 				SpaceId:   fi.ID,
 				OpaqueId:  fi.ID,
 			},
-			RootInfo: d.toResourceInfo(fi, fi.ID),
+			RootInfo: d.toResourceInfo(fi, fi.ID, fi.Path),
 			Mtime:    utils.TimeToTS(fi.MTime()),
 			Opaque:   utils.AppendPlainToOpaque(nil, "spaceAlias", "project/"+fi.Name),
 		})
@@ -125,26 +143,66 @@ func (d *Driver) ListStorageSpaces(ctx context.Context, _ []*provider.ListStorag
 	return spaces, nil
 }
 
-func resolveNodeID(ref *provider.Reference) (nodeID, spaceID string) {
+// resolveRef resolves a CS3 reference to a KW node ID, space ID, and the
+// absolute KW path of the space root. If ref.Path is set it walks the path
+// component-by-component through the KW folder tree.
+func (d *Driver) resolveRef(ctx context.Context, ref *provider.Reference) (nodeID, spaceID, spaceRootPath string, err error) {
 	spaceID = ref.GetResourceId().GetSpaceId()
 	nodeID = ref.GetResourceId().GetOpaqueId()
 	if nodeID == "" {
 		nodeID = spaceID
 	}
-	return
+
+	root, err := d.client(ctx).GetFolderByID(spaceID)
+	if err != nil {
+		return "", "", "", err
+	}
+	spaceRootPath = root.Path
+
+	relPath := strings.TrimPrefix(strings.Trim(ref.GetPath(), "/"), ".")
+	relPath = strings.Trim(relPath, "/")
+	if relPath == "" {
+		return nodeID, spaceID, spaceRootPath, nil
+	}
+
+	c := d.client(ctx)
+	for _, part := range strings.Split(relPath, "/") {
+		if part == "" {
+			continue
+		}
+		children, err := c.ListFolderContents(nodeID)
+		if err != nil {
+			return "", "", "", err
+		}
+		var found bool
+		for i := range children {
+			if children[i].Name == part {
+				nodeID = children[i].ID
+				found = true
+				break
+			}
+		}
+		if !found {
+			return "", "", "", errtypes.NotFound(part)
+		}
+	}
+	return nodeID, spaceID, spaceRootPath, nil
 }
 
 func (d *Driver) GetMD(ctx context.Context, ref *provider.Reference, _, _ []string) (*provider.ResourceInfo, error) {
-	nodeID, spaceID := resolveNodeID(ref)
-	return d.nodeMD(ctx, nodeID, spaceID)
+	nodeID, spaceID, spaceRootPath, err := d.resolveRef(ctx, ref)
+	if err != nil {
+		return nil, err
+	}
+	return d.nodeMD(ctx, nodeID, spaceID, spaceRootPath)
 }
 
 // nodeMD fetches metadata for a node, trying folder first then file.
-func (d *Driver) nodeMD(ctx context.Context, nodeID, spaceID string) (*provider.ResourceInfo, error) {
+func (d *Driver) nodeMD(ctx context.Context, nodeID, spaceID, spaceRootPath string) (*provider.ResourceInfo, error) {
 	c := d.client(ctx)
 	fi, err := c.GetFolderByID(nodeID)
 	if err == nil {
-		return d.toResourceInfo(fi, spaceID), nil
+		return d.toResourceInfo(fi, spaceID, spaceRootPath), nil
 	}
 	var ce *kwlib.ClientError
 	if !errors.As(err, &ce) || ce.StatusCode != http.StatusNotFound {
@@ -158,11 +216,14 @@ func (d *Driver) nodeMD(ctx context.Context, nodeID, spaceID string) (*provider.
 		}
 		return nil, err
 	}
-	return d.toResourceInfo(fi, spaceID), nil
+	return d.toResourceInfo(fi, spaceID, spaceRootPath), nil
 }
 
 func (d *Driver) ListFolder(ctx context.Context, ref *provider.Reference, _, _ []string) ([]*provider.ResourceInfo, error) {
-	nodeID, spaceID := resolveNodeID(ref)
+	nodeID, spaceID, spaceRootPath, err := d.resolveRef(ctx, ref)
+	if err != nil {
+		return nil, err
+	}
 
 	items, err := d.client(ctx).ListFolderContents(nodeID)
 	if err != nil {
@@ -171,15 +232,20 @@ func (d *Driver) ListFolder(ctx context.Context, ref *provider.Reference, _, _ [
 
 	infos := make([]*provider.ResourceInfo, 0, len(items))
 	for i := range items {
-		infos = append(infos, d.toResourceInfo(&items[i], spaceID))
+		ri := d.toResourceInfo(&items[i], spaceID, spaceRootPath)
+		ri.Path = "/" + items[i].Name
+		infos = append(infos, ri)
 	}
 	return infos, nil
 }
 
 func (d *Driver) Download(ctx context.Context, ref *provider.Reference, openReaderFunc func(*provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
-	nodeID, spaceID := resolveNodeID(ref)
+	nodeID, spaceID, spaceRootPath, err := d.resolveRef(ctx, ref)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	ri, err := d.nodeMD(ctx, nodeID, spaceID)
+	ri, err := d.nodeMD(ctx, nodeID, spaceID, spaceRootPath)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -196,7 +262,11 @@ func (d *Driver) Download(ctx context.Context, ref *provider.Reference, openRead
 }
 
 func (d *Driver) GetPathByID(ctx context.Context, id *provider.ResourceId) (string, error) {
-	ri, err := d.nodeMD(ctx, id.GetOpaqueId(), id.GetSpaceId())
+	root, err := d.client(ctx).GetFolderByID(id.GetSpaceId())
+	if err != nil {
+		return "", err
+	}
+	ri, err := d.nodeMD(ctx, id.GetOpaqueId(), id.GetSpaceId(), root.Path)
 	if err != nil {
 		return "", err
 	}
@@ -210,7 +280,8 @@ func (d *Driver) ListGrants(_ context.Context, _ *provider.Reference) ([]*provid
 func (d *Driver) GetQuota(ctx context.Context, _ *provider.Reference) (uint64, uint64, uint64, error) {
 	q, err := d.client(ctx).GetQuotaInfo()
 	if err != nil {
-		return 0, 0, 0, err
+		// Non-fatal for read-only driver; return zero quota rather than failing.
+		return 0, 0, 0, nil
 	}
 	total := uint64(q.FolderQuotaAllowed)
 	used := uint64(q.FolderQuotaUsed)

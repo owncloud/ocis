@@ -13,6 +13,7 @@ import (
 	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/constants"

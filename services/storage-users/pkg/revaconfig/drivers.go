@@ -4,6 +4,15 @@ import (
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 )
 
+// Kiteworks is the config mapping for the Kiteworks storage driver
+func Kiteworks(cfg *config.Config) map[string]interface{} {
+	return map[string]interface{}{
+		"endpoint":  cfg.Drivers.Kiteworks.Endpoint,
+		"api_token": cfg.Drivers.Kiteworks.APIToken,
+		"insecure":  cfg.Drivers.Kiteworks.Insecure,
+	}
+}
+
 // EOS is the config mapping for the EOS storage driver
 func EOS(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{

@@ -105,9 +105,17 @@ type Drivers struct {
 	OwnCloudSQL OwnCloudSQLDriver `yaml:"owncloudsql"`
 	Posix       PosixDriver       `yaml:"posix"`
 
-	S3    S3Driver    `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
-	EOS   EOSDriver   `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
-	Local LocalDriver `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
+	S3        S3Driver        `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
+	EOS       EOSDriver       `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
+	Local     LocalDriver     `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
+	Kiteworks KiteworksDriver `yaml:",omitempty"`
+}
+
+// KiteworksDriver is the storage driver configuration when using 'kiteworks' storage driver
+type KiteworksDriver struct {
+	Endpoint string `yaml:"endpoint" env:"STORAGE_USERS_KITEWORKS_ENDPOINT" desc:"Base URL of the Kiteworks instance (e.g. https://kw.example.com)." introductionVersion:"pre5.0"`
+	APIToken string `yaml:"api_token" env:"STORAGE_USERS_KITEWORKS_API_TOKEN" desc:"Static Kiteworks API token. If set, overrides the per-request bearer token." introductionVersion:"pre5.0"`
+	Insecure bool   `yaml:"insecure" env:"STORAGE_USERS_KITEWORKS_INSECURE" desc:"Disable TLS certificate verification (development only)." introductionVersion:"pre5.0"`
 }
 
 // AsyncPropagatorOptions configures the async propagator
