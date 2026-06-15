@@ -8,7 +8,6 @@
   <link rel="icon" href="{{.PathPrefix}}/static/favicon.ico">
   <link rel="stylesheet" href="{{.PathPrefix}}/static/theme.css">
   <style nonce="{{.Nonce}}">{{if .BgImgURL}}body.oc-login-bg{background-image:url('{{.BgImgURL}}')}{{end}}</style>
-  <meta property="csp-nonce" content="{{.Nonce}}">
 </head>
 <body class="oc-login-bg">
   <main>
@@ -52,7 +51,7 @@
   var MSG_SIGNING_IN = form.dataset.msgSigningIn;
   var MSG_SIGN_IN = form.dataset.msgSignIn;
 
-  var pathPrefix = {{.PathPrefix}};
+  var pathPrefix = "{{.PathPrefix}}";
   var apiBase = pathPrefix + "/identifier";
   var xsrf = "1";
 

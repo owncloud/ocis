@@ -8,7 +8,6 @@
   <link rel="icon" href="{{.PathPrefix}}/static/favicon.ico">
   <link rel="stylesheet" href="{{.PathPrefix}}/static/theme.css">
   <style nonce="{{.Nonce}}">{{if .BgImgURL}}body.oc-login-bg{background-image:url('{{.BgImgURL}}')}{{end}}</style>
-  <meta property="csp-nonce" content="{{.Nonce}}">
 </head>
 <body class="oc-login-bg">
   <main>
@@ -43,7 +42,7 @@
   var allowBtn = document.getElementById("consent-allow-btn");
   var denyBtn = document.getElementById("consent-deny-btn");
 
-  var pathPrefix = {{.PathPrefix}};
+  var pathPrefix = "{{.PathPrefix}}";
   var apiBase = pathPrefix + "/identifier";
   var xsrf = "1";
 
@@ -215,12 +214,12 @@
       .then(function(result) {
         if (!allow) {
           var continueURI = helloData && helloData.continue_uri;
-          if (continueURI) redirectViaContinueURI(continueURI, body.state, false);
+          if (continueURI && isSameOrigin(continueURI)) redirectViaContinueURI(continueURI, body.state, false);
           return;
         }
         if (result.ok && result.data && result.data.success) {
           var continueURI = helloData && helloData.continue_uri;
-          if (continueURI) {
+          if (continueURI && isSameOrigin(continueURI)) {
             redirectViaContinueURI(continueURI, body.state, true);
             return;
           }

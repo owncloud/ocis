@@ -9,6 +9,7 @@ import (
 	"io"
 	"io/fs"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strings"
@@ -136,11 +137,13 @@ func NewService(opts ...Option) Service {
 	translator := l10n.NewTranslator("en", "idp", translationFS)
 
 	svc := &IDP{
-		logger:     options.Logger,
-		config:     options.Config,
-		assets:     assetVFS,
-		tp:         options.TraceProvider,
-		translator: translator,
+		logger:           options.Logger,
+		config:           options.Config,
+		assets:           assetVFS,
+		tp:               options.TraceProvider,
+		translator:       translator,
+		bgImgURL:         safeBgImgURL(options.Config.Asset.LoginBackgroundUrl),
+		passwordResetURI: safePasswordResetURI(options.Config.Service.PasswordResetURI),
 	}
 
 	svc.initMux(ctx, routes, handlers, options)
@@ -262,12 +265,14 @@ func initLicoInternalLDAPEnvVars(ldap *config.Ldap) error {
 
 // IDP defines implements the business logic for Service.
 type IDP struct {
-	logger     log.Logger
-	config     *config.Config
-	mux        *chi.Mux
-	assets     http.FileSystem
-	tp         trace.TracerProvider
-	translator l10n.Translator
+	logger           log.Logger
+	config           *config.Config
+	mux              *chi.Mux
+	assets           http.FileSystem
+	tp               trace.TracerProvider
+	translator       l10n.Translator
+	bgImgURL         template.CSS
+	passwordResetURI template.URL
 }
 
 // initMux initializes the internal idp gorilla mux and mounts it in to an ocis chi-router
@@ -353,7 +358,7 @@ func (idp *IDP) basePage(r *http.Request, title, headline string) (basePageData,
 		Headline:   t.Get(headline),
 		Nonce:      rndm.GenerateRandomString(32),
 		PathPrefix: "/signin/v1",
-		BgImgURL:   template.CSS(idp.config.Asset.LoginBackgroundUrl),
+		BgImgURL:   idp.bgImgURL,
 	}, t
 }
 
@@ -404,10 +409,10 @@ func (idp *IDP) Index() http.HandlerFunc {
 			ButtonSignIn:     t.Get("Log in"),
 			ButtonSigningIn:  t.Get("Logging in…"),
 			ErrRequired:      t.Get("Username and password are required."),
-			ErrInvalid:       t.Get("Invalid username or password."),
-			ErrFailed:        t.Get("Login failed. Please try again."),
-			ErrDefault:       t.Get("Login failed."),
-			PasswordResetURI: template.URL(idp.config.Service.PasswordResetURI),
+			ErrInvalid:       t.Get("Login failed. Invalid username or password."),
+			ErrFailed:        t.Get("Login failed. Invalid username or password."),
+			ErrDefault:       t.Get("Login failed. Invalid username or password."),
+			PasswordResetURI: idp.passwordResetURI,
 			ResetLabel:       t.Get("Reset password"),
 		}
 		idp.renderPage(w, tpl, base.Nonce, data)
@@ -445,7 +450,12 @@ func (idp *IDP) LoginError() http.HandlerFunc {
 	tpl := idp.mustParseTemplate("/identifier/loginerror.html", "Could not load loginerror template")
 	return func(w http.ResponseWriter, r *http.Request) {
 		base, t := idp.basePage(r, "Login Error - ownCloud", "Login Error")
-		msg := r.URL.Query().Get("message")
+		allowedMessages := map[string]string{
+			"access_denied":    t.Get("Access denied."),
+			"session_expired":  t.Get("Your session has expired."),
+			"interaction_required": t.Get("Login required."),
+		}
+		msg := allowedMessages[r.URL.Query().Get("code")]
 		if msg == "" {
 			msg = t.Get("Login Error")
 		}
@@ -497,15 +507,49 @@ func detectLocale(r *http.Request) string {
 	return base.String()
 }
 
+// safeExternalURL validates that raw is an absolute http/https URL with a
+// non-empty host, then returns a normalised form built from the parsed
+// structure so that encoding tricks in the raw string cannot bypass the check.
+func safeExternalURL(raw string) *url.URL {
+	if raw == "" {
+		return nil
+	}
+	u, err := url.ParseRequestURI(raw) // rejects relative refs and opaque URIs
+	if err != nil || u.Host == "" {
+		return nil
+	}
+	switch strings.ToLower(u.Scheme) {
+	case "http", "https":
+		return u
+	}
+	return nil
+}
+
+func safeBgImgURL(raw string) template.CSS {
+	if u := safeExternalURL(raw); u != nil {
+		return template.CSS(u.String()) //nolint:gosec
+	}
+	return ""
+}
+
+func safePasswordResetURI(raw string) template.URL {
+	if u := safeExternalURL(raw); u != nil {
+		return template.URL(u.String()) //nolint:gosec
+	}
+	return ""
+}
+
 func writeSecureHTML(w http.ResponseWriter, body []byte, nonce string) {
 	h := w.Header()
 	h.Set("Content-Type", "text/html; charset=utf-8")
 	h.Set("Content-Security-Policy", fmt.Sprintf(
-		"default-src 'self'; script-src 'nonce-%s'; style-src 'self' 'nonce-%s'; img-src 'self' data:; font-src 'self'; base-uri 'none'; frame-ancestors 'none';",
+		"default-src 'self'; script-src 'nonce-%s' 'strict-dynamic'; style-src 'self' 'nonce-%s'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; form-action 'self'; base-uri 'none'; frame-ancestors 'none';",
 		nonce, nonce))
+	h.Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
 	h.Set("X-Frame-Options", "DENY")
 	h.Set("X-Content-Type-Options", "nosniff")
 	h.Set("Referrer-Policy", "origin")
+	h.Set("Cache-Control", "no-store, no-cache, must-revalidate")
 	w.WriteHeader(http.StatusOK)
 	w.Write(body) //nolint:errcheck
 }

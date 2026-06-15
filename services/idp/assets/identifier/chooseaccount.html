@@ -8,7 +8,6 @@
   <link rel="icon" href="{{.PathPrefix}}/static/favicon.ico">
   <link rel="stylesheet" href="{{.PathPrefix}}/static/theme.css">
   <style nonce="{{.Nonce}}">{{if .BgImgURL}}body.oc-login-bg{background-image:url('{{.BgImgURL}}')}{{end}}</style>
-  <meta property="csp-nonce" content="{{.Nonce}}">
 </head>
 <body class="oc-login-bg">
   <main>
@@ -41,7 +40,7 @@
   var itemCurrent = document.getElementById("item-current");
   var itemOther = document.getElementById("item-other");
 
-  var pathPrefix = {{.PathPrefix}};
+  var pathPrefix = "{{.PathPrefix}}";
   var apiBase = pathPrefix + "/identifier";
   var xsrf = "1";
 
@@ -140,12 +139,15 @@
       window.location.href = pathPrefix + '/identifier' + window.location.search;
     });
 
-  // "Use another account" — go to login form
+  // "Use another account" — invalidate current session then go to login form
   itemOther.addEventListener("click", function() {
     var loginParams = new URLSearchParams(window.location.search);
     loginParams.set("prompt", "login");
     loginParams.delete("flow");
-    window.location.href = pathPrefix + '/identifier?' + loginParams.toString();
+    var target = pathPrefix + '/identifier?' + loginParams.toString();
+    fetchApi("/_/logoff", { state: helloReq.state }).then(function() {
+      window.location.href = target;
+    });
   });
 })();
   </script>
