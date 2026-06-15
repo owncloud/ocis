@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -426,6 +427,48 @@ func TestNoRawPlaceholders(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestLogoURL(t *testing.T) {
+	pages := []string{
+		"/signin/v1/identifier",
+		"/signin/v1/welcome",
+		"/signin/v1/goodbye",
+		"/signin/v1/consent",
+	}
+
+	t.Run("default fallback logo when theme server not configured", func(t *testing.T) {
+		_, srv := newTestService(t, func(cfg *config.Config) {
+			cfg.Commons.OcisURL = ""
+		})
+		for _, page := range pages {
+			_, body, _ := getPage(t, srv, page, "")
+			if !strings.Contains(body, `src="/themes/owncloud/assets/logo.svg"`) {
+				t.Errorf("page %s: expected default logo URL, got none; snippet: %.200s",
+					page, body)
+			}
+		}
+	})
+
+	t.Run("custom logo from theme server", func(t *testing.T) {
+		// Serve a minimal theme.json with a custom login logo.
+		themeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			fmt.Fprint(w, `{"common":{"logo":"themes/_branding/custom.png"}}`)
+		}))
+		defer themeServer.Close()
+
+		_, srv := newTestService(t, func(cfg *config.Config) {
+			cfg.Commons.OcisURL = themeServer.URL
+		})
+		for _, page := range pages {
+			_, body, _ := getPage(t, srv, page, "")
+			if !strings.Contains(body, `src="/themes/_branding/custom.png"`) {
+				t.Errorf("page %s: expected custom logo URL, got none; snippet: %.200s",
+					page, body)
+			}
+		}
+	})
 }
 
 func TestConsentRedirect(t *testing.T) {

@@ -3,7 +3,9 @@ package svc
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"embed"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
@@ -13,6 +15,8 @@ import (
 	"os"
 	"path"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/mux"
@@ -273,6 +277,8 @@ type IDP struct {
 	translator       l10n.Translator
 	bgImgURL         template.CSS
 	passwordResetURI template.URL
+	logoURL          string
+	logoOnce         sync.Once
 }
 
 // initMux initializes the internal idp gorilla mux and mounts it in to an ocis chi-router
@@ -322,6 +328,7 @@ func (idp *IDP) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 type basePageData struct {
 	Lang, Title, Headline, Nonce, PathPrefix string
 	BgImgURL                                 template.CSS
+	LogoURL                                  string
 }
 
 type indexData struct {
@@ -350,6 +357,10 @@ type chooseaccountData struct {
 }
 
 func (idp *IDP) basePage(r *http.Request, title, headline string) (basePageData, l10n.OcisLocale) {
+	idp.logoOnce.Do(func() {
+		insecure := idp.config.IDP.Insecure || os.Getenv("OCIS_INSECURE") == "true"
+		idp.logoURL = fetchLoginLogoURL(idp.config.Commons.OcisURL, insecure)
+	})
 	lang := detectLocale(r)
 	t := idp.translator.Locale(lang)
 	return basePageData{
@@ -359,6 +370,7 @@ func (idp *IDP) basePage(r *http.Request, title, headline string) (basePageData,
 		Nonce:      rndm.GenerateRandomString(32),
 		PathPrefix: "/signin/v1",
 		BgImgURL:   idp.bgImgURL,
+		LogoURL:    idp.logoURL,
 	}, t
 }
 
@@ -537,6 +549,42 @@ func safePasswordResetURI(raw string) template.URL {
 		return template.URL(u.String()) //nolint:gosec
 	}
 	return ""
+}
+
+// fetchLoginLogoURL fetches the ownCloud theme.json from the web service at startup
+// and returns the login logo URL. Falls back to the default ownCloud logo if unreachable.
+func fetchLoginLogoURL(ocisURL string, insecure bool) string {
+	const fallback = "/themes/owncloud/assets/logo.svg"
+	if ocisURL == "" {
+		return fallback
+	}
+	themeURL := strings.TrimRight(ocisURL, "/") + "/themes/owncloud/theme.json"
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure}} //nolint:gosec
+	client := &http.Client{Transport: tr, Timeout: 5 * time.Second}
+	resp, err := client.Get(themeURL)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		return fallback
+	}
+	defer resp.Body.Close()
+	var theme themeJSON
+	if err := json.NewDecoder(resp.Body).Decode(&theme); err != nil {
+		return fallback
+	}
+	logo := theme.Common.Logo
+	if logo == "" {
+		return fallback
+	}
+	// theme.json returns relative paths like "themes/owncloud/assets/logo.svg"
+	if !strings.HasPrefix(logo, "/") && !strings.HasPrefix(logo, "http") {
+		logo = "/" + logo
+	}
+	return logo
+}
+
+type themeJSON struct {
+	Common struct {
+		Logo string `json:"logo"`
+	} `json:"common"`
 }
 
 func writeSecureHTML(w http.ResponseWriter, body []byte, nonce string) {
