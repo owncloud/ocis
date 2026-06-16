@@ -100,7 +100,17 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	canCreateDrives := g.checkPermission(r.Context(), "Drives.Create", userID, client)
+	canCreateDrives, err := g.checkUserPermission(r.Context(), "Drives.Create", userID, client)
+	if err != nil {
+		// The permission could not be determined. Fail closed: leave the personal
+		// space untouched rather than disabling (trashing) it on an indeterminate
+		// result, and revert the role assignment so the user is not left in a
+		// half-applied state (new role persisted but space reconciliation skipped).
+		logger.Error().Any("userID", userID).Err(err).Msg("could not determine Drives.Create permission, reverting role assignment and leaving personal space unchanged")
+		g.revertRoleAssignment(r.Context(), userID, oldRole, artur.GetAssignment().GetId())
+		errorcode.RenderError(w, r, err)
+		return
+	}
 	if canCreateDrives {
 		err = shared.RestorePersonalSpace(r.Context(), client, userID)
 		if err != nil {
@@ -192,17 +202,34 @@ func (g Graph) assignmentToAppRoleAssignment(assignment *settingsmsg.UserRoleAss
 	return *appRoleAssignment
 }
 
-func (g Graph) checkPermission(ctx context.Context, perm string, userID string, gwc gateway.GatewayAPIClient) bool {
+func (g Graph) checkUserPermission(ctx context.Context, perm string, userID string, gwc gateway.GatewayAPIClient) (bool, error) {
 	u, err := utils.GetUserWithContext(ctx, &userv1beta1.UserId{OpaqueId: userID}, gwc)
 	if err != nil {
-		g.logger.Error().Err(err).Msg("could not get user")
-		return false
+		return false, err
 	}
 
-	if ok, err := utils.CheckPermission(revactx.ContextSetUser(context.Background(), u), perm, gwc); ok {
-		return true
-	} else if err != nil {
-		g.logger.Error().Err(err).Msg("error checking permission")
+	return utils.CheckPermission(revactx.ContextSetUser(context.Background(), u), perm, gwc)
+}
+
+// revertRoleAssignment best-effort restores the user's previous role after a
+// failed reconciliation, so the user is not left with the new role applied but
+// the personal space unreconciled. A user has exactly one role, so this means
+// re-assigning the previous role, or removing the new assignment if there was
+// none. Failures are only logged; the next login reconciles idempotently.
+func (g Graph) revertRoleAssignment(ctx context.Context, userID, oldRoleID, newAssignmentID string) {
+	logger := g.logger.SubloggerWithRequestID(ctx)
+	if oldRoleID != "" {
+		if _, err := g.roleService.AssignRoleToUser(ctx, &settingssvc.AssignRoleToUserRequest{
+			AccountUuid: userID,
+			RoleId:      oldRoleID,
+		}); err != nil {
+			logger.Error().Any("userID", userID).Str("roleID", oldRoleID).Err(err).Msg("could not revert role assignment to previous role")
+		}
+		return
 	}
-	return false
+	if _, err := g.roleService.RemoveRoleFromUser(ctx, &settingssvc.RemoveRoleFromUserRequest{
+		Id: newAssignmentID,
+	}); err != nil {
+		logger.Error().Any("userID", userID).Str("assignmentID", newAssignmentID).Err(err).Msg("could not revert role assignment by removing the new assignment")
+	}
 }

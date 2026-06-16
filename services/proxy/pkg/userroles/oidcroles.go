@@ -7,7 +7,6 @@ import (
 	"sync"
 	"time"
 
-	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
@@ -151,15 +150,20 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 
 	if len(assignedRoles) != 1 || (assignedRoles[0] != roleIDFromClaim) {
 		logger.Debug().Interface("assignedRoleIds", assignedRoles).Interface("newRoleId", roleIDFromClaim).Msg("Updating role assignment for user")
+		var oldRole string
+		if len(assignedRoles) > 0 {
+			oldRole = assignedRoles[0]
+		}
 		newctx, err := ra.prepareAdminContext()
 		if err != nil {
 			logger.Error().Err(err).Msg("Error creating admin context")
 			return nil, err
 		}
-		if _, err = ra.roleService.AssignRoleToUser(newctx, &settingssvc.AssignRoleToUserRequest{
+		assignResp, err := ra.roleService.AssignRoleToUser(newctx, &settingssvc.AssignRoleToUserRequest{
 			AccountUuid: userID,
 			RoleId:      roleIDFromClaim,
-		}); err != nil {
+		})
+		if err != nil {
 			logger.Error().Err(err).Msg("Role assignment failed")
 			return nil, err
 		}
@@ -170,7 +174,16 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 			return nil, err
 		}
 
-		canCreateDrives := ra.checkPermission("Drives.Create", user, client)
+		canCreateDrives, err := utils.CheckPermission(revactx.ContextSetUser(context.Background(), user), "Drives.Create", client)
+		if err != nil {
+			// The permission could not be determined. Fail closed: leave the personal
+			// space untouched rather than disabling (trashing) it on an indeterminate
+			// result, and revert the role assignment so the user is not left in a
+			// half-applied state. The role transition is retried on the next login.
+			logger.Error().Any("userID", userID).Err(err).Msg("could not determine Drives.Create permission, reverting role assignment and leaving personal space unchanged")
+			ra.revertRoleAssignment(newctx, userID, oldRole, assignResp.GetAssignment().GetId())
+			return nil, err
+		}
 		if canCreateDrives {
 			libreUser := identity.CreateUserModelFromCS3(user)
 			err = shared.RestorePersonalSpace(newctx, client, libreUser.GetId())
@@ -275,11 +288,24 @@ func (ra oidcRoleAssigner) roleNamesToRoleIDs() (map[string]string, error) {
 	return roleNameToID.roleNameToID, nil
 }
 
-func (ra oidcRoleAssigner) checkPermission(perm string, user *cs3user.User, gwc gateway.GatewayAPIClient) bool {
-	if ok, err := utils.CheckPermission(revactx.ContextSetUser(context.Background(), user), perm, gwc); ok {
-		return true
-	} else if err != nil {
-		ra.logger.Error().Err(err).Msg("error checking permission")
+// revertRoleAssignment best-effort restores the user's previous role after a
+// failed reconciliation, so the user is not left with the new role applied but
+// the personal space unreconciled. A user has exactly one role, so this means
+// re-assigning the previous role, or removing the new assignment if there was
+// none. Failures are only logged; the next login reconciles idempotently.
+func (ra oidcRoleAssigner) revertRoleAssignment(ctx context.Context, userID, oldRoleID, newAssignmentID string) {
+	if oldRoleID != "" {
+		if _, err := ra.roleService.AssignRoleToUser(ctx, &settingssvc.AssignRoleToUserRequest{
+			AccountUuid: userID,
+			RoleId:      oldRoleID,
+		}); err != nil {
+			ra.logger.Error().Any("userID", userID).Str("roleID", oldRoleID).Err(err).Msg("could not revert role assignment to previous role")
+		}
+		return
 	}
-	return false
+	if _, err := ra.roleService.RemoveRoleFromUser(ctx, &settingssvc.RemoveRoleFromUserRequest{
+		Id: newAssignmentID,
+	}); err != nil {
+		ra.logger.Error().Any("userID", userID).Str("assignmentID", newAssignmentID).Err(err).Msg("could not revert role assignment by removing the new assignment")
+	}
 }
