@@ -1284,8 +1284,8 @@ func canDeleteSpace(ctx context.Context, spaceID string, typ string, purge bool,
 		return nil
 	}
 
-	// user has no grant at all: hide existence rather than reveal it
-	if err == nil && !rp.GetStat() {
+	// active space, user has no grant at all: hide existence rather than reveal it
+	if err == nil && !rp.GetStat() && !n.IsDisabled(ctx) {
 		return errtypes.NotFound(spaceID)
 	}
 

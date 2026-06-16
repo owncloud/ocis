@@ -766,6 +766,8 @@ github.com/owncloud/reva/v2 v2.0.0-20260615124328-892e11ba709b h1:18qsAy2Z6K/+Fg
 github.com/owncloud/reva/v2 v2.0.0-20260615124328-892e11ba709b/go.mod h1:gNSgpblFyfCDi1OQfU4VqPIHWtAPR3YPTE1ZaTNnG/U=
 github.com/owncloud/reva/v2 v2.0.0-20260615133621-ad8d76aff9d6 h1:5FupdFnTwLdUbwoGyvw89qPob0dnYSxEBdebtt0VbPw=
 github.com/owncloud/reva/v2 v2.0.0-20260615133621-ad8d76aff9d6/go.mod h1:gNSgpblFyfCDi1OQfU4VqPIHWtAPR3YPTE1ZaTNnG/U=
+github.com/owncloud/reva/v2 v2.0.0-20260616081804-228bd580fa22 h1:AHc4Ck0AeKJcbGAUblYGvKtXx8/0NetMB6OjtgCDU1E=
+github.com/owncloud/reva/v2 v2.0.0-20260616081804-228bd580fa22/go.mod h1:gNSgpblFyfCDi1OQfU4VqPIHWtAPR3YPTE1ZaTNnG/U=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pablodz/inotifywaitgo v0.0.9 h1:njquRbBU7fuwIe5rEvtaniVBjwWzcpdUVptSgzFqZsw=
