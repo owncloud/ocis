@@ -3,12 +3,20 @@ package svc
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
+	"embed"
+	"encoding/json"
 	"fmt"
+	"html/template"
 	"io"
+	"io/fs"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/mux"
@@ -18,6 +26,7 @@ import (
 	libreGraphBackendSupport "github.com/libregraph/lico/bootstrap/backends/libregraph"
 	licoconfig "github.com/libregraph/lico/config"
 	"github.com/libregraph/lico/server"
+	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	"github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/assets"
@@ -25,9 +34,13 @@ import (
 	"github.com/owncloud/ocis/v2/services/idp/pkg/config"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/middleware"
 	"go.opentelemetry.io/otel/trace"
+	"golang.org/x/text/language"
 	"gopkg.in/yaml.v2"
 	"stash.kopano.io/kgol/rndm"
 )
+
+//go:embed l10n/locale
+var _translationFS embed.FS
 
 // Service defines the service handlers.
 type Service interface {
@@ -123,11 +136,18 @@ func NewService(opts ...Option) Service {
 	routes := []server.WithRoutes{managers.Must("identity").(server.WithRoutes)}
 	handlers := managers.Must("handler").(http.Handler)
 
+	var translationFS fs.FS
+	translationFS, _ = fs.Sub(_translationFS, "l10n/locale")
+	translator := l10n.NewTranslator("en", "idp", translationFS)
+
 	svc := &IDP{
-		logger: options.Logger,
-		config: options.Config,
-		assets: assetVFS,
-		tp:     options.TraceProvider,
+		logger:           options.Logger,
+		config:           options.Config,
+		assets:           assetVFS,
+		tp:               options.TraceProvider,
+		translator:       translator,
+		bgImgURL:         safeBgImgURL(options.Config.Asset.LoginBackgroundUrl),
+		passwordResetURI: safePasswordResetURI(options.Config.Service.PasswordResetURI),
 	}
 
 	svc.initMux(ctx, routes, handlers, options)
@@ -249,11 +269,16 @@ func initLicoInternalLDAPEnvVars(ldap *config.Ldap) error {
 
 // IDP defines implements the business logic for Service.
 type IDP struct {
-	logger log.Logger
-	config *config.Config
-	mux    *chi.Mux
-	assets http.FileSystem
-	tp     trace.TracerProvider
+	logger           log.Logger
+	config           *config.Config
+	mux              *chi.Mux
+	assets           http.FileSystem
+	tp               trace.TracerProvider
+	translator       l10n.Translator
+	bgImgURL         template.CSS
+	passwordResetURI template.URL
+	logoURL          string
+	logoOnce         sync.Once
 }
 
 // initMux initializes the internal idp gorilla mux and mounts it in to an ocis chi-router
@@ -273,17 +298,19 @@ func (idp *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handl
 
 	idp.mux.Use(middleware.Static(
 		"/signin/v1/",
-		assets.New(
-			assets.Logger(options.Logger),
-			assets.Config(options.Config),
-		),
+		idp.assets,
 		idp.tp,
 	))
 
-	// handle / | index.html with a template that needs to have the BASE_PREFIX replaced
+	// Login and static pages (must be before Mount so chi matches first)
 	idp.mux.Get("/signin/v1/identifier", idp.Index())
 	idp.mux.Get("/signin/v1/identifier/", idp.Index())
 	idp.mux.Get("/signin/v1/identifier/index.html", idp.Index())
+	idp.mux.Get("/signin/v1/welcome", idp.Welcome())
+	idp.mux.Get("/signin/v1/goodbye", idp.Goodbye())
+	idp.mux.Get("/signin/v1/consent", idp.Consent())
+	idp.mux.Get("/signin/v1/loginerror", idp.LoginError())
+	idp.mux.Get("/signin/v1/chooseaccount", idp.Chooseaccount())
 
 	idp.mux.Mount("/", gm)
 
@@ -298,37 +325,279 @@ func (idp *IDP) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	idp.mux.ServeHTTP(w, r)
 }
 
-// Index renders the static html with templated variables.
-func (idp *IDP) Index() http.HandlerFunc {
-	f, err := idp.assets.Open("/identifier/index.html")
-	if err != nil {
-		idp.logger.Fatal().Err(err).Msg("Could not open index template")
-	}
+type basePageData struct {
+	Lang, Title, Headline, Nonce, PathPrefix string
+	BgImgURL                                 template.CSS
+	LogoURL                                  string
+}
 
-	template, err := io.ReadAll(f)
-	if err != nil {
-		idp.logger.Fatal().Err(err).Msg("Could not read index template")
-	}
-	if err = f.Close(); err != nil {
-		idp.logger.Fatal().Err(err).Msg("Could not close body")
-	}
+type indexData struct {
+	basePageData
+	LabelUsername, LabelPassword                   string
+	ButtonSignIn, ButtonSigningIn                  string
+	ErrRequired, ErrInvalid, ErrFailed, ErrDefault string
+	PasswordResetURI                               template.URL
+	ResetLabel                                     string
+}
 
-	// TODO add environment variable to make the path prefix configurable
-	pp := "/signin/v1"
-	indexHTML := bytes.Replace(template, []byte("__PATH_PREFIX__"), []byte(pp), 1)
+type pageData struct {
+	basePageData
+	Message string
+}
 
-	background := idp.config.Asset.LoginBackgroundUrl
-	indexHTML = bytes.Replace(template, []byte("__BG_IMG_URL__"), []byte(background), 1)
+type consentData struct {
+	basePageData
+	AllowLabel, DenyLabel, ConsentConsequence string
+}
 
-	nonce := rndm.GenerateRandomString(32)
-	indexHTML = bytes.Replace(indexHTML, []byte("__CSP_NONCE__"), []byte(nonce), 1)
+type chooseaccountData struct {
+	basePageData
+	HeadlineSub     string
+	UseAnotherLabel string
+}
 
-	indexHTML = bytes.Replace(indexHTML, []byte("__PASSWORD_RESET_LINK__"), []byte(idp.config.Service.PasswordResetURI), 1)
-
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		if _, err := w.Write(indexHTML); err != nil {
-			idp.logger.Error().Err(err).Msg("could not write to response writer")
-		}
+func (idp *IDP) basePage(r *http.Request, title, headline string) (basePageData, l10n.OcisLocale) {
+	idp.logoOnce.Do(func() {
+		insecure := idp.config.IDP.Insecure || os.Getenv("OCIS_INSECURE") == "true"
+		idp.logoURL = fetchLoginLogoURL(idp.config.Commons.OcisURL, insecure)
 	})
+	lang := detectLocale(r)
+	t := idp.translator.Locale(lang)
+	return basePageData{
+		Lang:       lang,
+		Title:      t.Get(title),
+		Headline:   t.Get(headline),
+		Nonce:      rndm.GenerateRandomString(32),
+		PathPrefix: "/signin/v1",
+		BgImgURL:   idp.bgImgURL,
+		LogoURL:    idp.logoURL,
+	}, t
+}
+
+func (idp *IDP) renderPage(w http.ResponseWriter, tpl *template.Template, nonce string, data any) {
+	var buf bytes.Buffer
+	if err := tpl.Execute(&buf, data); err != nil {
+		http.Error(w, "template error", http.StatusInternalServerError)
+		return
+	}
+	writeSecureHTML(w, buf.Bytes(), nonce)
+}
+
+func (idp *IDP) mustParseTemplate(name, errMsg string) *template.Template {
+	tpl, err := idp.parseTemplate(name)
+	if err != nil {
+		idp.logger.Fatal().Err(err).Msg(errMsg)
+	}
+	return tpl
+}
+
+// Chooseaccount renders the account picker page.
+func (idp *IDP) Chooseaccount() http.HandlerFunc {
+	tpl := idp.mustParseTemplate("/identifier/chooseaccount.html", "Could not load chooseaccount template")
+	return func(w http.ResponseWriter, r *http.Request) {
+		base, t := idp.basePage(r, "Choose an account - ownCloud", "Choose an account")
+		data := chooseaccountData{
+			basePageData:    base,
+			HeadlineSub:     t.Get("to sign in"),
+			UseAnotherLabel: t.Get("Use another account"),
+		}
+		idp.renderPage(w, tpl, base.Nonce, data)
+	}
+}
+
+// Index renders the login page with templated variables.
+func (idp *IDP) Index() http.HandlerFunc {
+	tpl := idp.mustParseTemplate("/identifier/index.html", "Could not load index template")
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("flow") == "consent" {
+			http.Redirect(w, r, "/signin/v1/consent?"+r.URL.RawQuery, http.StatusFound)
+			return
+		}
+		base, t := idp.basePage(r, "Sign in - ownCloud", "Login")
+		data := indexData{
+			basePageData:     base,
+			LabelUsername:    t.Get("Username"),
+			LabelPassword:    t.Get("Password"),
+			ButtonSignIn:     t.Get("Log in"),
+			ButtonSigningIn:  t.Get("Logging in…"),
+			ErrRequired:      t.Get("Username and password are required."),
+			ErrInvalid:       t.Get("Login failed. Invalid username or password."),
+			ErrFailed:        t.Get("Login failed. Invalid username or password."),
+			ErrDefault:       t.Get("Login failed. Invalid username or password."),
+			PasswordResetURI: idp.passwordResetURI,
+			ResetLabel:       t.Get("Reset password"),
+		}
+		idp.renderPage(w, tpl, base.Nonce, data)
+	}
+}
+
+// Welcome renders the signed-in confirmation page.
+func (idp *IDP) Welcome() http.HandlerFunc {
+	tpl := idp.mustParseTemplate("/identifier/welcome.html", "Could not load welcome template")
+	return func(w http.ResponseWriter, r *http.Request) {
+		base, t := idp.basePage(r, "Signed in - ownCloud", "Signed in")
+		data := pageData{
+			basePageData: base,
+			Message:      t.Get("You are signed in. You can close this window and return to the application."),
+		}
+		idp.renderPage(w, tpl, base.Nonce, data)
+	}
+}
+
+// Goodbye renders the signed-out confirmation page.
+func (idp *IDP) Goodbye() http.HandlerFunc {
+	tpl := idp.mustParseTemplate("/identifier/goodbye.html", "Could not load goodbye template")
+	return func(w http.ResponseWriter, r *http.Request) {
+		base, t := idp.basePage(r, "Signed out - ownCloud", "Signed out")
+		data := pageData{
+			basePageData: base,
+			Message:      t.Get("You are signed out. You can close this window."),
+		}
+		idp.renderPage(w, tpl, base.Nonce, data)
+	}
+}
+
+// LoginError renders the login error page.
+func (idp *IDP) LoginError() http.HandlerFunc {
+	tpl := idp.mustParseTemplate("/identifier/loginerror.html", "Could not load loginerror template")
+	return func(w http.ResponseWriter, r *http.Request) {
+		base, t := idp.basePage(r, "Login Error - ownCloud", "Login Error")
+		allowedMessages := map[string]string{
+			"access_denied":    t.Get("Access denied."),
+			"session_expired":  t.Get("Your session has expired."),
+			"interaction_required": t.Get("Login required."),
+		}
+		msg := allowedMessages[r.URL.Query().Get("code")]
+		if msg == "" {
+			msg = t.Get("Login Error")
+		}
+		data := pageData{basePageData: base, Message: msg}
+		idp.renderPage(w, tpl, base.Nonce, data)
+	}
+}
+
+// Consent renders the OAuth2 consent page.
+func (idp *IDP) Consent() http.HandlerFunc {
+	tpl := idp.mustParseTemplate("/identifier/consent.html", "Could not load consent template")
+	return func(w http.ResponseWriter, r *http.Request) {
+		base, t := idp.basePage(r, "Authorize - ownCloud", "Authorize")
+		data := consentData{
+			basePageData:       base,
+			AllowLabel:         t.Get("Allow"),
+			DenyLabel:          t.Get("Cancel"),
+			ConsentConsequence: t.Get("By clicking Allow, you allow this app to use your information."),
+		}
+		idp.renderPage(w, tpl, base.Nonce, data)
+	}
+}
+
+func (idp *IDP) parseTemplate(name string) (*template.Template, error) {
+	f, err := idp.assets.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	b, err := io.ReadAll(f)
+	if err != nil {
+		return nil, err
+	}
+	return template.New(name).Parse(string(b))
+}
+
+var supportedLangs = []language.Tag{
+	language.English,
+	language.German,
+	language.French,
+	language.Dutch,
+}
+var langMatcher = language.NewMatcher(supportedLangs)
+
+func detectLocale(r *http.Request) string {
+	accept := r.Header.Get("Accept-Language")
+	tag, _ := language.MatchStrings(langMatcher, accept)
+	base, _ := tag.Base()
+	return base.String()
+}
+
+// safeExternalURL validates that raw is an absolute http/https URL with a
+// non-empty host, then returns a normalised form built from the parsed
+// structure so that encoding tricks in the raw string cannot bypass the check.
+func safeExternalURL(raw string) *url.URL {
+	if raw == "" {
+		return nil
+	}
+	u, err := url.ParseRequestURI(raw) // rejects relative refs and opaque URIs
+	if err != nil || u.Host == "" {
+		return nil
+	}
+	switch strings.ToLower(u.Scheme) {
+	case "http", "https":
+		return u
+	}
+	return nil
+}
+
+func safeBgImgURL(raw string) template.CSS {
+	if u := safeExternalURL(raw); u != nil {
+		return template.CSS(u.String()) //nolint:gosec
+	}
+	return ""
+}
+
+func safePasswordResetURI(raw string) template.URL {
+	if u := safeExternalURL(raw); u != nil {
+		return template.URL(u.String()) //nolint:gosec
+	}
+	return ""
+}
+
+// fetchLoginLogoURL fetches the ownCloud theme.json from the web service at startup
+// and returns the login logo URL. Falls back to the default ownCloud logo if unreachable.
+func fetchLoginLogoURL(ocisURL string, insecure bool) string {
+	const fallback = "/themes/owncloud/assets/logo.svg"
+	if ocisURL == "" {
+		return fallback
+	}
+	themeURL := strings.TrimRight(ocisURL, "/") + "/themes/owncloud/theme.json"
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure}} //nolint:gosec
+	client := &http.Client{Transport: tr, Timeout: 5 * time.Second}
+	resp, err := client.Get(themeURL)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		return fallback
+	}
+	defer resp.Body.Close()
+	var theme themeJSON
+	if err := json.NewDecoder(resp.Body).Decode(&theme); err != nil {
+		return fallback
+	}
+	logo := theme.Common.Logo
+	if logo == "" {
+		return fallback
+	}
+	// theme.json returns relative paths like "themes/owncloud/assets/logo.svg"
+	if !strings.HasPrefix(logo, "/") && !strings.HasPrefix(logo, "http") {
+		logo = "/" + logo
+	}
+	return logo
+}
+
+type themeJSON struct {
+	Common struct {
+		Logo string `json:"logo"`
+	} `json:"common"`
+}
+
+func writeSecureHTML(w http.ResponseWriter, body []byte, nonce string) {
+	h := w.Header()
+	h.Set("Content-Type", "text/html; charset=utf-8")
+	h.Set("Content-Security-Policy", fmt.Sprintf(
+		"default-src 'self'; script-src 'nonce-%s' 'strict-dynamic'; style-src 'self' 'nonce-%s'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; form-action 'self'; base-uri 'none'; frame-ancestors 'none';",
+		nonce, nonce))
+	h.Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+	h.Set("X-Frame-Options", "DENY")
+	h.Set("X-Content-Type-Options", "nosniff")
+	h.Set("Referrer-Policy", "origin")
+	h.Set("Cache-Control", "no-store, no-cache, must-revalidate")
+	w.WriteHeader(http.StatusOK)
+	w.Write(body) //nolint:errcheck
 }

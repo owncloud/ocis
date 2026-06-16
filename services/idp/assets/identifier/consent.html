@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="{{.Lang}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1b223d">
+  <title>{{.Title}}</title>
+  <link rel="icon" href="{{.PathPrefix}}/static/favicon.ico">
+  <link rel="stylesheet" href="{{.PathPrefix}}/static/theme.css">
+  <style nonce="{{.Nonce}}">{{if .BgImgURL}}body.oc-login-bg{background-image:url('{{.BgImgURL}}')}{{end}}</style>
+</head>
+<body class="oc-login-bg">
+  <main>
+    <div class="oc-login-form" id="consent-root">
+      <img class="oc-logo" src="{{.LogoURL}}" alt="ownCloud">
+      <h1 class="oc-invisible-sr">{{.Headline}}</h1>
+      <p id="oc-consent-error-message" class="oc-error-message" hidden></p>
+      <div id="consent-body" hidden>
+        <p id="consent-display-name" class="oc-light oc-consent-headline"></p>
+        <p id="consent-username" class="oc-light oc-consent-username"></p>
+        <p id="consent-client-wants" class="oc-light oc-mb-m"></p>
+        <ul id="consent-scopes" class="oc-consent-scopes"></ul>
+        <p id="consent-allow-question" class="oc-light oc-mb-m"></p>
+        <p class="oc-light oc-consent-consequence">{{.ConsentConsequence}}</p>
+        <div id="consent-actions">
+          <div class="oc-consent-btn-wrap"><button class="oc-button-cancel" id="consent-deny-btn">{{.DenyLabel}}</button></div>
+          <div class="oc-consent-btn-wrap"><button class="oc-button-consent" id="consent-allow-btn">{{.AllowLabel}}</button></div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer class="oc-footer-message">ownCloud - a safe home for all your data</footer>
+  <script nonce="{{.Nonce}}">
+(function() {
+  var errorEl = document.getElementById("oc-consent-error-message");
+  var bodyEl = document.getElementById("consent-body");
+  var displayNameEl = document.getElementById("consent-display-name");
+  var usernameEl = document.getElementById("consent-username");
+  var clientWantsEl = document.getElementById("consent-client-wants");
+  var scopesEl = document.getElementById("consent-scopes");
+  var allowQuestionEl = document.getElementById("consent-allow-question");
+  var allowBtn = document.getElementById("consent-allow-btn");
+  var denyBtn = document.getElementById("consent-deny-btn");
+
+  var pathPrefix = "{{.PathPrefix}}";
+  var apiBase = pathPrefix + "/identifier";
+  var xsrf = "1";
+
+  var params = new URLSearchParams(window.location.search);
+  function qs(name) { return params.get(name) || ""; }
+
+  function fetchApi(path, body) {
+    return fetch(apiBase + path, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Kopano-Konnect-XSRF": xsrf
+      },
+      body: body ? JSON.stringify(body) : undefined,
+      credentials: "same-origin"
+    });
+  }
+
+  function parseJsonMaybe(res) {
+    if (res.status === 204) return Promise.resolve(null);
+    return res.text().then(function(text) {
+      if (!text) return null;
+      try { return JSON.parse(text); } catch (_) { return null; }
+    });
+  }
+
+  function showError(msg) {
+    errorEl.textContent = msg || "An error occurred.";
+    errorEl.hidden = false;
+    bodyEl.hidden = true;
+  }
+
+  function randomHex(len) {
+    var arr = new Uint8Array(len);
+    window.crypto.getRandomValues(arr);
+    return Array.from(arr).map(function(b) { return ('0' + b.toString(16)).slice(-2); }).join('');
+  }
+
+  function isSameOrigin(url) {
+    try { return new URL(url, window.location.origin).origin === window.location.origin; }
+    catch (_) { return false; }
+  }
+
+  function redirectViaContinueURI(continueURI, konnectState, stripConsentPrompt) {
+    var target = new URL(continueURI);
+    params.forEach(function(v, k) { if (!target.searchParams.has(k)) target.searchParams.set(k, v); });
+    if (stripConsentPrompt) {
+      var prompt = (target.searchParams.get("prompt") || "").split(" ").filter(function(p) {
+        return p !== "select_account" && p !== "consent";
+      }).join(" ");
+      if (prompt) target.searchParams.set("prompt", prompt);
+      else target.searchParams.delete("prompt");
+    } else {
+      target.searchParams.set("prompt", "none");
+    }
+    target.searchParams.set("konnect", konnectState);
+    window.location.href = target.href;
+  }
+
+  function scopeDescription(scopeID, definitions) {
+    var def = definitions && definitions[scopeID];
+    if (!def) return null;
+    switch (def.id) {
+      case "scope_alias_basic": return "Access your basic account information";
+      case "scope_offline_access": return "Keep the allowed access persistently and forever";
+    }
+    return def.description || null;
+  }
+
+  function buildScopeList(scopes, meta) {
+    scopesEl.innerHTML = "";
+    if (!scopes || !meta) return;
+    var mapping = meta.mapping || {};
+    var definitions = meta.definitions || {};
+    var seen = {};
+    for (var scope in scopes) {
+      if (!scopes[scope]) continue;
+      var alias = mapping[scope] || scope;
+      if (seen[alias]) continue;
+      seen[alias] = true;
+      var desc = scopeDescription(alias, definitions);
+      if (!desc) desc = "Scope: " + scope;
+      var li = document.createElement("li");
+      li.className = "oc-consent-scope-item";
+      var cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = true;
+      cb.disabled = true;
+      cb.className = "oc-consent-checkbox";
+      var label = document.createElement("span");
+      label.className = "oc-light";
+      label.textContent = desc;
+      li.appendChild(cb);
+      li.appendChild(label);
+      scopesEl.appendChild(li);
+    }
+  }
+
+  var helloReq = {
+    state: qs("state"),
+    flow: qs("flow") || "oidc",
+    scope: qs("scope"),
+    prompt: qs("prompt"),
+    client_id: qs("client_id"),
+    redirect_uri: qs("redirect_uri"),
+    id_token_hint: qs("id_token_hint"),
+    max_age: qs("max_age")
+  };
+
+  var helloData = null;
+
+  fetchApi("/_/hello", helloReq)
+    .then(function(res) { return parseJsonMaybe(res); })
+    .then(function(data) {
+      if (!data || !data.success) {
+        showError("Could not load consent information.");
+        return;
+      }
+      helloData = data;
+      var client = data.client || {};
+      var clientName = client.display_name || qs("client_id");
+
+      displayNameEl.textContent = "Hi " + (data.displayName || data.username || "");
+      usernameEl.textContent = data.username || "";
+
+      var wantsEl = document.createElement("span");
+      wantsEl.textContent = " wants to";
+      var em = document.createElement("em");
+      em.textContent = clientName;
+      clientWantsEl.innerHTML = "";
+      clientWantsEl.appendChild(em);
+      clientWantsEl.appendChild(wantsEl);
+
+      buildScopeList(data.scopes, data.meta && data.meta.scopes);
+
+      var allowQ = document.createElement("span");
+      allowQ.textContent = " to do this?";
+      var em2 = document.createElement("em");
+      em2.textContent = clientName;
+      allowQuestionEl.innerHTML = "Allow ";
+      allowQuestionEl.appendChild(em2);
+      allowQuestionEl.appendChild(allowQ);
+
+      bodyEl.hidden = false;
+    })
+    .catch(function() { showError("Could not load consent information."); });
+
+  function doConsent(allow) {
+    allowBtn.disabled = true;
+    denyBtn.disabled = true;
+
+    var scope = qs("scope") || "openid";
+    var body = {
+      state: randomHex(16),
+      allow: allow,
+      scope: scope,
+      client_id: qs("client_id"),
+      redirect_uri: qs("redirect_uri"),
+      ref: qs("state"),
+      flow_nonce: qs("nonce")
+    };
+
+    fetchApi("/_/consent", body)
+      .then(function(res) {
+        return parseJsonMaybe(res).then(function(data) {
+          return { ok: res.ok, status: res.status, data: data };
+        });
+      })
+      .then(function(result) {
+        if (!allow) {
+          var continueURI = helloData && helloData.continue_uri;
+          if (continueURI && isSameOrigin(continueURI)) redirectViaContinueURI(continueURI, body.state, false);
+          return;
+        }
+        if (result.ok && result.data && result.data.success) {
+          var continueURI = helloData && helloData.continue_uri;
+          if (continueURI && isSameOrigin(continueURI)) {
+            redirectViaContinueURI(continueURI, body.state, true);
+            return;
+          }
+          var fallback = qs("redirect_uri");
+          if (fallback && isSameOrigin(fallback)) {
+            var sep = fallback.indexOf('?') >= 0 ? '&' : '?';
+            window.location.href = fallback + sep + "prompt=none&" + params.toString();
+          }
+          return;
+        }
+        showError("Consent failed. Please try again.");
+        allowBtn.disabled = false;
+        denyBtn.disabled = false;
+      })
+      .catch(function() {
+        showError("Consent failed. Please try again.");
+        allowBtn.disabled = false;
+        denyBtn.disabled = false;
+      });
+  }
+
+  allowBtn.addEventListener("click", function() { doConsent(true); });
+  denyBtn.addEventListener("click", function() { doConsent(false); });
+})();
+  </script>
+</body>
+</html>

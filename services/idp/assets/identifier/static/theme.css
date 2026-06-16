@@ -1,0 +1,391 @@
+/*
+ * ownCloud login page styles.
+ * Derived from services/idp/src/app.css (Kopano/kpop SPA) and
+ * services/idp/src/theme/default.js (MUI theme).
+ *
+ * Theme palette (from default.js):
+ *   Primary: KopanoBlue  (#00b3f0 base, #1e98d7 700)
+ *   Secondary: blueGrey
+ *   Error: red / #fe4600
+ *
+ *   Used by getContrastText() to maximize the contrast between the
+ *   background and the text.
+ *   NOTE(longsleep): KopanoBlue is too light and thus needs 2.4
+ *   contrastThreshold to make sure the default 500 color is still
+ *   using white text.  It will show warnings in development mode
+ *   that the contrast is too low as W3C recommends the threshold
+ *   to be 3 or more.  This cannot be helped.
+ *     contrastThreshold: 2.4
+ *
+ *   Used to shift a color's luminance by approximately two indexes
+ *   within its tonal palette.
+ *   E.g., shift from Red 500 to Red 300 or Red 700.
+ *     tonalOffset: 0.2
+ */
+
+/* additional css on top of kpop */
+@font-face {
+  font-family: Inter;
+  src: url('media/inter.d5c51099..woff2') format('woff2'),
+       url('media/inter.aadb65ac..ttf') format('truetype');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-feature-settings: 'cv11';
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Inter, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+strong {
+  font-weight: 600;
+}
+
+.oc-login-bg {
+  background-image: url('media/background.7296b9ab..jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 0;
+  width: 100%;
+}
+
+main {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;
+}
+
+.oc-login-form {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  padding-top: 8px;
+}
+
+#login-form div:not(:last-of-type) {
+  margin-bottom: 15px;
+}
+
+#login-form div:last-of-type {
+  padding-top: 24px;
+}
+
+.oc-mb-m {
+  margin-bottom: 0.35em;
+  line-height: 1.75;
+  font-size: 1rem;
+}
+
+.oc-consent-headline {
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.334;
+  margin: 0;
+}
+
+.oc-consent-username {
+  font-size: 1rem;
+  line-height: 1.75;
+  margin: 0 0 16px;
+}
+
+.oc-consent-scopes {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+}
+
+.oc-consent-scope-item {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  font-size: 0.875rem;
+  line-height: 1.43;
+}
+
+.oc-consent-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0 8px 0 9px;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 2px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.oc-consent-checkbox::after {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 11px;
+  border: 2px solid #1b223d;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) translateY(-2px);
+}
+
+#consent-body {
+  padding: 0;
+}
+
+.oc-chooseaccount-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.oc-chooseaccount-item:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.oc-chooseaccount-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #4e85c8;
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 500;
+  flex-shrink: 0;
+  margin-right: 16px;
+}
+
+.oc-chooseaccount-label {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.oc-consent-consequence {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+#consent-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 8px 8px;
+  gap: 0;
+}
+
+.oc-consent-btn-wrap {
+  display: inline-block;
+  position: relative;
+  margin-top: 16px;
+}
+
+.oc-consent-btn-wrap + .oc-consent-btn-wrap {
+  margin-left: 8px;
+}
+
+.oc-button-cancel {
+  min-width: 64px;
+  height: 36px;
+  padding: 6px 8px;
+  border: none;
+  background: transparent;
+  color: #78909c;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0.02857em;
+  cursor: pointer;
+  border-radius: 4px;
+  line-height: 1.75;
+}
+
+.oc-button-cancel:hover:not(:disabled) {
+  background: rgba(120, 144, 156, 0.04);
+}
+
+.oc-button-cancel:disabled {
+  color: rgba(0, 0, 0, 0.26);
+  cursor: default;
+}
+
+.oc-button-consent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 64px;
+  height: 36px;
+  padding: 6px 16px;
+  border: none;
+  border-radius: 4px;
+  background: #00b3f0;
+  color: #fff;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0.02857em;
+  line-height: 1.75;
+  cursor: pointer;
+  box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
+}
+
+.oc-button-consent:hover:not(:disabled) {
+  background: #1e98d7;
+}
+
+.oc-button-consent:disabled {
+  color: rgba(0, 0, 0, 0.26);
+  box-shadow: none;
+  background: rgba(0, 0, 0, 0.12);
+  cursor: default;
+}
+
+.oc-logo {
+  position: absolute;
+  top: -130px;
+  left: 50%;
+  height: 80px;
+  transform: translateX(-50%);
+}
+
+.oc-label {
+  color: #fff;
+  display: inline-block;
+  margin-bottom: 5px;
+}
+
+.oc-input {
+  background-color: #fff;
+  border: 1px solid #fff;
+  border-radius: 3px;
+  height: 40px;
+  width: 300px;
+  max-width: 100%;
+  padding: 16px;
+  font-size: 1rem;
+  font-family: inherit;
+  color: #333;
+}
+
+.oc-input.error {
+  outline: none;
+  border: 1px solid #fe4600;
+}
+
+.oc-input:focus {
+  outline: none;
+  border: 1px solid #fff;
+}
+
+.oc-button-primary {
+  display: block;
+  width: 100%;
+  height: 40px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: linear-gradient(to right, #2c588e, #4e85c8) -1px;
+  background-size: 103%;
+  color: #fff;
+  font-size: 1.0625rem;
+  font-family: inherit;
+  font-weight: 500;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.oc-button-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.oc-button-primary:hover:not(:disabled) {
+  opacity: 0.92;
+}
+
+.oc-error-message {
+  color: #fe4600;
+  font-size: 0.875rem;
+  margin: 0 0 10px;
+}
+
+.oc-footer-message {
+  color: white;
+  padding: 10px;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+/* Helpers */
+.oc-mt-l {
+  margin-top: 24px;
+}
+
+.oc-light {
+  color: #fff;
+}
+
+.oc-message {
+  color: #fff;
+  text-align: center;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+a {
+  color: #1e98d7; /* KopanoBlue700 */
+  font-size: 0.875rem;
+}
+
+/*
+ * Special SR classes
+ * Used to hide an element visually, but keeping it accessible for accessibility tools.
+ */
+.oc-invisible-sr {
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+
+  /* Need to make sure we override any existing styles. */
+  position: absolute;
+  top: 0;
+  white-space: nowrap;
+  width: 1px;
+}
+
+@media only screen and (max-width: 768px) {
+  .oc-logo {
+    height: 60px;
+    top: -90px;
+  }
+
+  .oc-login-form {
+    padding-top: 50px;
+  }
+}
