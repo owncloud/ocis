@@ -1553,10 +1553,11 @@ func (c *client) wsCollapsePtoNB() (net.Buffers, int64) {
 				if mask {
 					wsMaskBuf(key, p[:lp])
 				}
-				bufs = append(bufs, fh[:n], p[:lp])
+				bufs = append(bufs, fh[:n], append(nbPoolGet(lp), p[:lp]...))
 				csz += n + lp
 				p = p[lp:]
 			}
+			nbPoolPut(b)
 		} else {
 			ol := len(p)
 			h, key := wsCreateFrameHeader(mask, true, wsBinaryMessage, ol)

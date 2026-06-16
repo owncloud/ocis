@@ -8340,26 +8340,7 @@ func (s *Server) jsClusteredStreamUpdateRequest(ci *ClientInfo, acc *Account, su
 				js.mu.Lock()
 			}
 			// If we identified a leader make sure its part of the new group.
-			selected := make([]string, 0, newCfg.Replicas)
-
-			if curLeader != _EMPTY_ {
-				selected = append(selected, curLeader)
-			}
-			for _, peer := range rg.Peers {
-				if len(selected) == newCfg.Replicas {
-					break
-				}
-				if peer == curLeader {
-					continue
-				}
-				if si, ok := s.nodeToInfo.Load(peer); ok && si != nil {
-					if si.(nodeInfo).offline {
-						continue
-					}
-					selected = append(selected, peer)
-				}
-			}
-			rg.Peers = selected
+			rg.Peers = s.selectScaleDownPeers(rg.Peers, curLeader, newCfg.Replicas)
 			// Single nodes are not recorded by the NRG layer so we can rename.
 			// MUST do this, otherwise a scaleup afterward could potentially lead to inconsistencies.
 			if len(rg.Peers) == 1 {
@@ -8679,6 +8660,43 @@ func (s *Server) allPeersOffline(rg *raftGroup) bool {
 		}
 	}
 	return true
+}
+
+// Select the peers to keep when scaling a raft group down to replicas.
+// The current leader, if known and in peer set, is kept. Online peers are preferred,
+// but we will fall back to offline peers to honor the requested replica count.
+func (s *Server) selectScaleDownPeers(peers []string, curLeader string, replicas int) []string {
+	selected := make([]string, 0, replicas)
+	if curLeader != _EMPTY_ && slices.Contains(peers, curLeader) {
+		selected = append(selected, curLeader)
+		if len(selected) == replicas {
+			return selected
+		}
+	}
+	// Prefer online peers.
+	for _, peer := range peers {
+		if peer == curLeader {
+			continue
+		}
+		if si, ok := s.nodeToInfo.Load(peer); ok && si != nil && !si.(nodeInfo).offline {
+			selected = append(selected, peer)
+			if len(selected) == replicas {
+				return selected
+			}
+		}
+	}
+
+	// Fall back to offline peers for the remainder.
+	for _, peer := range peers {
+		if slices.Contains(selected, peer) {
+			continue
+		}
+		selected = append(selected, peer)
+		if len(selected) == replicas {
+			break
+		}
+	}
+	return selected
 }
 
 // This will do a scatter and gather operation for all streams for this account. This is only called from metadata leader.
@@ -9526,7 +9544,7 @@ func (s *Server) jsClusteredConsumerRequest(ci *ClientInfo, acc *Account, subjec
 				if ci, err := sysRequest[ConsumerInfo](s, clusterConsumerInfoT, ci.serviceAccount(), sa.Config.Name, oname); err != nil {
 					s.Warnf("Did not receive consumer info results for '%s > %s > %s' due to: %s", acc, sa.Config.Name, oname, err)
 				} else if ci != nil {
-					if cl := ci.Cluster; cl != nil {
+					if cl := ci.Cluster; cl != nil && cl.Leader != _EMPTY_ {
 						curLeader = getHash(cl.Leader)
 					}
 				}
@@ -9570,20 +9588,9 @@ func (s *Server) jsClusteredConsumerRequest(ci *ClientInfo, acc *Account, subjec
 			nca.Group.Preferred = curLeader
 			nca.Group.ScaleUp = true
 		} else if rBefore > rAfter {
-			newPeerSet := nca.Group.Peers
-			// mark leader preferred and move it to end
+			// Mark the current leader as preferred, it will be kept in the new peer set.
 			nca.Group.Preferred = curLeader
-			if nca.Group.Preferred != _EMPTY_ {
-				for i, p := range newPeerSet {
-					if nca.Group.Preferred == p {
-						newPeerSet[i] = newPeerSet[len(newPeerSet)-1]
-						newPeerSet[len(newPeerSet)-1] = p
-					}
-				}
-			}
-			// scale down by removing peers from the end
-			newPeerSet = newPeerSet[len(newPeerSet)-rAfter:]
-			nca.Group.Peers = newPeerSet
+			nca.Group.Peers = s.selectScaleDownPeers(nca.Group.Peers, curLeader, rAfter)
 			// Single nodes are not recorded by the NRG layer so we can rename.
 			// MUST do this, otherwise a scaleup afterward could potentially lead to inconsistencies.
 			if len(nca.Group.Peers) == 1 {
@@ -10249,6 +10256,17 @@ var (
 	errCatchupTooManyRetries  = errors.New("catchup failed, too many retries")
 )
 
+// Catchup inactivity timers.
+const (
+	defaultStreamCatchupStartInterval    = 5 * time.Second
+	defaultStreamCatchupActivityInterval = 30 * time.Second
+)
+
+var (
+	streamCatchupStartInterval    = defaultStreamCatchupStartInterval
+	streamCatchupActivityInterval = defaultStreamCatchupActivityInterval
+)
+
 // Process a stream snapshot.
 func (mset *stream) processSnapshot(snap *StreamReplicatedState, index uint64) (e error) {
 	// Update any deletes, etc.
@@ -10307,10 +10325,8 @@ func (mset *stream) processSnapshot(snap *StreamReplicatedState, index uint64) (
 	var sub *subscription
 	var err error
 
-	const (
-		startInterval    = 5 * time.Second
-		activityInterval = 30 * time.Second
-	)
+	startInterval := streamCatchupStartInterval
+	activityInterval := streamCatchupActivityInterval
 	notActive := time.NewTimer(startInterval)
 	defer notActive.Stop()
 
@@ -10962,7 +10978,7 @@ func (mset *stream) runCatchup(sendSubject string, sreq *streamSyncRequest) {
 	nextBatchC <- struct{}{}
 	remoteQuitCh := make(chan struct{})
 
-	const activityInterval = 30 * time.Second
+	activityInterval := streamCatchupActivityInterval
 	notActive := time.NewTimer(activityInterval)
 	defer notActive.Stop()
 
@@ -11231,7 +11247,8 @@ func (mset *stream) runCatchup(sendSubject string, sreq *streamSyncRequest) {
 			return
 		case <-notActive.C:
 			s.Warnf("Catchup for stream '%s > %s' stalled", mset.account(), mset.name())
-			mset.clearCatchupPeer(sreq.Peer)
+			// Do NOT clear the catchup peer on a transient inactivity stall, this allows the
+			// follower to retry without us losing track of it requiring catchup.
 			return
 		case <-nextBatchC:
 			if !sendNextBatchAndContinue(qch) {
