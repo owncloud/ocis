@@ -9,9 +9,9 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-// NewTracing returns a service that instruments traces.
+// NewAutoProp returns a service that autopropagates information from and to other services.
 func NewAutoProp(next DecoratedService) DecoratedService {
-	return tracing{
+	return autoProp{
 		Decorator: Decorator{next: next},
 	}
 }
