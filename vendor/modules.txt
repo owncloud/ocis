@@ -1319,7 +1319,7 @@ github.com/orcaman/concurrent-map
 # github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245
 ## explicit; go 1.18
 github.com/owncloud/libre-graph-api-go
-# github.com/owncloud/reva/v2 v2.0.0-20260615083845-32986860e8f3
+# github.com/owncloud/reva/v2 v2.0.0-20260617085643-abda3f89dbd0
 ## explicit; go 1.25.7
 github.com/owncloud/reva/v2/cmd/revad/internal/grace
 github.com/owncloud/reva/v2/cmd/revad/runtime
@@ -1611,6 +1611,8 @@ github.com/owncloud/reva/v2/pkg/storage/fs/eosgrpc
 github.com/owncloud/reva/v2/pkg/storage/fs/eosgrpchome
 github.com/owncloud/reva/v2/pkg/storage/fs/eoshome
 github.com/owncloud/reva/v2/pkg/storage/fs/hello
+github.com/owncloud/reva/v2/pkg/storage/fs/kiteworks
+github.com/owncloud/reva/v2/pkg/storage/fs/kiteworks/kwlib
 github.com/owncloud/reva/v2/pkg/storage/fs/loader
 github.com/owncloud/reva/v2/pkg/storage/fs/local
 github.com/owncloud/reva/v2/pkg/storage/fs/localhome
@@ -2533,7 +2535,7 @@ google.golang.org/protobuf/types/known/wrapperspb
 # gopkg.in/cenkalti/backoff.v1 v1.1.0
 ## explicit
 gopkg.in/cenkalti/backoff.v1
-# gopkg.in/ini.v1 v1.67.2
+# gopkg.in/ini.v1 v1.67.3
 ## explicit; go 1.13
 gopkg.in/ini.v1
 # gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7
