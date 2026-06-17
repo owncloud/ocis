@@ -2,8 +2,10 @@ package middleware
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	microstore "go-micro.dev/v4/store"
 
@@ -51,6 +53,13 @@ type MultiFactorAuthentication struct {
 
 // ServeHTTP adds the mfa header if the request contains a valid mfa token
 func (m MultiFactorAuthentication) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	// Incoming requests must not have autopropagation headers
+	for key, _ := range req.Header {
+		if strings.HasPrefix(key, autoprop.HTTPAutoPropPrefix) || strings.HasPrefix(key, autoprop.MicroAutoPropPrefix) {
+			req.Header.Del(key)
+		}
+	}
+
 	if !m.enabled {
 		// if mfa is disabled we always set the header to true.
 		// this allows all other services to assume mfa is always active.
