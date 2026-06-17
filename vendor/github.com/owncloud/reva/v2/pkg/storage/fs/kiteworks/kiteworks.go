@@ -143,26 +143,18 @@ func (d *Driver) ListStorageSpaces(ctx context.Context, _ []*provider.ListStorag
 	return spaces, nil
 }
 
-// resolveRef resolves a CS3 reference to a KW node ID, space ID, and the
-// absolute KW path of the space root. If ref.Path is set it walks the path
-// component-by-component through the KW folder tree.
-func (d *Driver) resolveRef(ctx context.Context, ref *provider.Reference) (nodeID, spaceID, spaceRootPath string, err error) {
+// resolveRef walks a CS3 reference to the target KW node ID and space ID.
+// If ref.Path is non-empty it resolves each component through ListFolderContents.
+func (d *Driver) resolveRef(ctx context.Context, ref *provider.Reference) (nodeID, spaceID string, err error) {
 	spaceID = ref.GetResourceId().GetSpaceId()
 	nodeID = ref.GetResourceId().GetOpaqueId()
 	if nodeID == "" {
 		nodeID = spaceID
 	}
 
-	root, err := d.client(ctx).GetFolderByID(spaceID)
-	if err != nil {
-		return "", "", "", err
-	}
-	spaceRootPath = root.Path
-
-	relPath := strings.TrimPrefix(strings.Trim(ref.GetPath(), "/"), ".")
-	relPath = strings.Trim(relPath, "/")
+	relPath := strings.Trim(strings.TrimPrefix(ref.GetPath(), "./"), "/.")
 	if relPath == "" {
-		return nodeID, spaceID, spaceRootPath, nil
+		return nodeID, spaceID, nil
 	}
 
 	c := d.client(ctx)
@@ -172,7 +164,7 @@ func (d *Driver) resolveRef(ctx context.Context, ref *provider.Reference) (nodeI
 		}
 		children, err := c.ListFolderContents(nodeID)
 		if err != nil {
-			return "", "", "", err
+			return "", "", err
 		}
 		var found bool
 		for i := range children {
@@ -183,18 +175,32 @@ func (d *Driver) resolveRef(ctx context.Context, ref *provider.Reference) (nodeI
 			}
 		}
 		if !found {
-			return "", "", "", errtypes.NotFound(part)
+			return "", "", errtypes.NotFound(part)
 		}
 	}
-	return nodeID, spaceID, spaceRootPath, nil
+	return nodeID, spaceID, nil
+}
+
+// spaceRootPath fetches the absolute KW path of the space root folder.
+// Used by callers that need to convert absolute KW paths to space-relative paths.
+func (d *Driver) spaceRootPath(ctx context.Context, spaceID string) (string, error) {
+	root, err := d.client(ctx).GetFolderByID(spaceID)
+	if err != nil {
+		return "", err
+	}
+	return root.Path, nil
 }
 
 func (d *Driver) GetMD(ctx context.Context, ref *provider.Reference, _, _ []string) (*provider.ResourceInfo, error) {
-	nodeID, spaceID, spaceRootPath, err := d.resolveRef(ctx, ref)
+	nodeID, spaceID, err := d.resolveRef(ctx, ref)
 	if err != nil {
 		return nil, err
 	}
-	return d.nodeMD(ctx, nodeID, spaceID, spaceRootPath)
+	rootPath, err := d.spaceRootPath(ctx, spaceID)
+	if err != nil {
+		return nil, err
+	}
+	return d.nodeMD(ctx, nodeID, spaceID, rootPath)
 }
 
 // nodeMD fetches metadata for a node, trying folder first then file.
@@ -220,7 +226,7 @@ func (d *Driver) nodeMD(ctx context.Context, nodeID, spaceID, spaceRootPath stri
 }
 
 func (d *Driver) ListFolder(ctx context.Context, ref *provider.Reference, _, _ []string) ([]*provider.ResourceInfo, error) {
-	nodeID, spaceID, spaceRootPath, err := d.resolveRef(ctx, ref)
+	nodeID, spaceID, err := d.resolveRef(ctx, ref)
 	if err != nil {
 		return nil, err
 	}
@@ -232,7 +238,7 @@ func (d *Driver) ListFolder(ctx context.Context, ref *provider.Reference, _, _ [
 
 	infos := make([]*provider.ResourceInfo, 0, len(items))
 	for i := range items {
-		ri := d.toResourceInfo(&items[i], spaceID, spaceRootPath)
+		ri := d.toResourceInfo(&items[i], spaceID, "")
 		ri.Path = "/" + items[i].Name
 		infos = append(infos, ri)
 	}
@@ -240,12 +246,16 @@ func (d *Driver) ListFolder(ctx context.Context, ref *provider.Reference, _, _ [
 }
 
 func (d *Driver) Download(ctx context.Context, ref *provider.Reference, openReaderFunc func(*provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
-	nodeID, spaceID, spaceRootPath, err := d.resolveRef(ctx, ref)
+	nodeID, spaceID, err := d.resolveRef(ctx, ref)
+	if err != nil {
+		return nil, nil, err
+	}
+	rootPath, err := d.spaceRootPath(ctx, spaceID)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	ri, err := d.nodeMD(ctx, nodeID, spaceID, spaceRootPath)
+	ri, err := d.nodeMD(ctx, nodeID, spaceID, rootPath)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -262,11 +272,11 @@ func (d *Driver) Download(ctx context.Context, ref *provider.Reference, openRead
 }
 
 func (d *Driver) GetPathByID(ctx context.Context, id *provider.ResourceId) (string, error) {
-	root, err := d.client(ctx).GetFolderByID(id.GetSpaceId())
+	rootPath, err := d.spaceRootPath(ctx, id.GetSpaceId())
 	if err != nil {
 		return "", err
 	}
-	ri, err := d.nodeMD(ctx, id.GetOpaqueId(), id.GetSpaceId(), root.Path)
+	ri, err := d.nodeMD(ctx, id.GetOpaqueId(), id.GetSpaceId(), rootPath)
 	if err != nil {
 		return "", err
 	}

@@ -1,0 +1,50 @@
+---
+services:
+  ocis:
+    environment:
+      NATS_NATS_HOST: 0.0.0.0
+      SETTINGS_GRPC_ADDR: ocis:9191
+      # register the kiteworks storage-users sidecar in the gateway storage registry
+      GATEWAY_STORAGE_KITEWORKS_ENDPOINT: storage-users-kiteworks:9460
+      GATEWAY_STORAGE_KITEWORKS_MOUNT_ID: ${KITEWORKS_MOUNT_ID:-aa309def-b364-417b-8e41-85b8a9393c4b}
+
+  storage-users-kiteworks:
+    image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-dev}
+    networks:
+      ocis-net:
+    depends_on:
+      ocis:
+        condition: service_started
+    command: ["storage-users", "server"]
+    environment:
+      OCIS_LOG_LEVEL: ${LOG_LEVEL:-info}
+      OCIS_LOG_COLOR: "${LOG_PRETTY:-false}"
+      OCIS_LOG_PRETTY: "${LOG_PRETTY:-false}"
+      OCIS_INSECURE: "${INSECURE:-false}"
+      # point all service-discovery and event endpoints at the main ocis container
+      OCIS_GATEWAY_GRPC_ADDR: ocis:9142
+      OCIS_EVENTS_ENDPOINT: ocis:9233
+      OCIS_CACHE_STORE_NODES: ocis:9233
+      MICRO_REGISTRY_ADDRESS: ocis:9233
+      # required when INSECURE=true (ocis uses self-signed TLS on its NATS)
+      STORAGE_USERS_EVENTS_TLS_INSECURE: "${INSECURE:-false}"
+      STORAGE_USERS_EVENTS_CONSUMER_GROUP: kiteworks-dcfs
+      # unique service identity so the registry treats this as a separate provider
+      STORAGE_USERS_SERVICE_NAME: storage-users-kiteworks
+      STORAGE_USERS_MOUNT_ID: ${KITEWORKS_MOUNT_ID:-aa309def-b364-417b-8e41-85b8a9393c4b}
+      # use ports that don't conflict with the default storage-users (9160/9161/9159)
+      STORAGE_USERS_GRPC_ADDR: storage-users-kiteworks:9460
+      STORAGE_USERS_HTTP_ADDR: storage-users-kiteworks:9461
+      STORAGE_USERS_DATA_SERVER_URL: http://storage-users-kiteworks:9461/data
+      STORAGE_USERS_DEBUG_ADDR: storage-users-kiteworks:9459
+      # kiteworks driver configuration
+      STORAGE_USERS_DRIVER: kiteworks
+      STORAGE_USERS_KITEWORKS_ENDPOINT: ${KITEWORKS_ENDPOINT}
+      STORAGE_USERS_KITEWORKS_API_TOKEN: ${KITEWORKS_API_TOKEN}
+      STORAGE_USERS_KITEWORKS_INSECURE: "${KITEWORKS_INSECURE:-false}"
+    volumes:
+      - ${OCIS_CONFIG_DIR:-ocis-config}:/etc/ocis
+      - ${OCIS_DATA_DIR:-ocis-data}:/var/lib/ocis
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always

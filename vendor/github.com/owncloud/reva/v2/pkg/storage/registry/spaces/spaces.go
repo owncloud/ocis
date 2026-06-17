@@ -79,6 +79,9 @@ type Provider struct {
 	// Spaces is a map from space type to space config
 	Spaces     map[string]*spaceConfig `mapstructure:"spaces"`
 	ProviderID string                  `mapstructure:"providerid"`
+	// ReadOnly marks providers that serve existing spaces but cannot create new ones.
+	// GetProvider skips them unless the request explicitly targets this provider via storage_id.
+	ReadOnly bool `mapstructure:"readonly"`
 }
 
 type templateData struct {
@@ -203,6 +206,10 @@ func (r *registry) GetProvider(ctx context.Context, space *providerpb.StorageSpa
 			} else {
 				// Filter out vault spaces if no storageId is provided
 				if provider.ProviderID == utils.VaultStorageProviderID {
+					continue
+				}
+				// Skip read-only providers (e.g. kiteworks) — they cannot create spaces
+				if provider.ReadOnly {
 					continue
 				}
 			}
