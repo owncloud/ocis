@@ -230,6 +230,10 @@ func (d *Driver) ListFolder(ctx context.Context, ref *provider.Reference, _, _ [
 	if err != nil {
 		return nil, err
 	}
+	rootPath, err := d.spaceRootPath(ctx, spaceID)
+	if err != nil {
+		return nil, err
+	}
 
 	items, err := d.client(ctx).ListFolderContents(nodeID)
 	if err != nil {
@@ -238,9 +242,7 @@ func (d *Driver) ListFolder(ctx context.Context, ref *provider.Reference, _, _ [
 
 	infos := make([]*provider.ResourceInfo, 0, len(items))
 	for i := range items {
-		ri := d.toResourceInfo(&items[i], spaceID, "")
-		ri.Path = "/" + items[i].Name
-		infos = append(infos, ri)
+		infos = append(infos, d.toResourceInfo(&items[i], spaceID, rootPath))
 	}
 	return infos, nil
 }
