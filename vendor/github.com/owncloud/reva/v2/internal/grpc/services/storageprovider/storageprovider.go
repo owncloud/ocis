@@ -239,7 +239,7 @@ func (s *Service) SetLock(ctx context.Context, req *provider.SetLockRequest) (*p
 			Status: status.NewPermissionDenied(ctx, nil, "no permission to lock the share"),
 		}, nil
 	}
-	err := s.Storage.SetLock(ctx, req.Ref, req.Lock)
+	_, err := s.Storage.SetLock(ctx, req.Ref, req.Lock)
 
 	return &provider.SetLockResponse{
 		Status: status.NewStatusFromErrType(ctx, "set lock", err),
@@ -279,7 +279,7 @@ func (s *Service) Unlock(ctx context.Context, req *provider.UnlockRequest) (*pro
 		}, nil
 	}
 
-	err := s.Storage.Unlock(ctx, req.Ref, req.Lock)
+	_, err := s.Storage.Unlock(ctx, req.Ref, req.Lock)
 
 	return &provider.UnlockResponse{
 		Status: status.NewStatusFromErrType(ctx, "unlock", err),
@@ -641,7 +641,7 @@ func (s *Service) DeleteStorageSpace(ctx context.Context, req *provider.DeleteSt
 		}, nil
 	}
 
-	if err := s.Storage.DeleteStorageSpace(ctx, req); err != nil {
+	if _, err := s.Storage.DeleteStorageSpace(ctx, req); err != nil {
 		var st *rpc.Status
 		switch err.(type) {
 		case errtypes.IsNotFound:
@@ -683,7 +683,7 @@ func (s *Service) CreateContainer(ctx context.Context, req *provider.CreateConta
 		}
 	}
 
-	err := s.Storage.CreateDir(ctx, req.Ref)
+	_, err := s.Storage.CreateDir(ctx, req.Ref)
 
 	return &provider.CreateContainerResponse{
 		Status: status.NewStatusFromErrType(ctx, "create container", err),
@@ -700,7 +700,7 @@ func (s *Service) TouchFile(ctx context.Context, req *provider.TouchFileRequest)
 		mtime = utils.ReadPlainFromOpaque(req.Opaque, "X-OC-Mtime")
 	}
 
-	err := s.Storage.TouchFile(ctx, req.Ref, utils.ExistsInOpaque(req.Opaque, "markprocessing"), mtime)
+	_, err := s.Storage.TouchFile(ctx, req.Ref, utils.ExistsInOpaque(req.Opaque, "markprocessing"), mtime)
 
 	return &provider.TouchFileResponse{
 		Status: status.NewStatusFromErrType(ctx, "touch file", err),
@@ -746,7 +746,7 @@ func (s *Service) Delete(ctx context.Context, req *provider.DeleteRequest) (*pro
 		}, nil
 	}
 
-	err = s.Storage.Delete(ctx, req.Ref)
+	_, err = s.Storage.Delete(ctx, req.Ref)
 
 	return &provider.DeleteResponse{
 		Status: status.NewStatusFromErrType(ctx, "delete", err),
@@ -761,7 +761,7 @@ func (s *Service) Delete(ctx context.Context, req *provider.DeleteRequest) (*pro
 func (s *Service) Move(ctx context.Context, req *provider.MoveRequest) (*provider.MoveResponse, error) {
 	ctx = ctxpkg.ContextSetLockID(ctx, req.LockId)
 
-	err := s.Storage.Move(ctx, req.Source, req.Destination)
+	_, err := s.Storage.Move(ctx, req.Source, req.Destination)
 
 	return &provider.MoveResponse{
 		Status: status.NewStatusFromErrType(ctx, "move", err),
@@ -874,7 +874,7 @@ func (s *Service) ListFileVersions(ctx context.Context, req *provider.ListFileVe
 func (s *Service) RestoreFileVersion(ctx context.Context, req *provider.RestoreFileVersionRequest) (*provider.RestoreFileVersionResponse, error) {
 	ctx = ctxpkg.ContextSetLockID(ctx, req.LockId)
 
-	err := s.Storage.RestoreRevision(ctx, req.Ref, req.Key)
+	_, err := s.Storage.RestoreRevision(ctx, req.Ref, req.Key)
 
 	return &provider.RestoreFileVersionResponse{
 		Status: status.NewStatusFromErrType(ctx, "restore file version", err),
@@ -973,7 +973,7 @@ func (s *Service) RestoreRecycleItem(ctx context.Context, req *provider.RestoreR
 
 	// TODO(labkode): CRITICAL: fill recycle info with storage provider.
 	key, relativePath := splitKeyAndPath(req.GetKey())
-	err := s.Storage.RestoreRecycleItem(ctx, req.Ref, key, relativePath, req.RestoreRef)
+	_, err := s.Storage.RestoreRecycleItem(ctx, req.Ref, key, relativePath, req.RestoreRef)
 
 	res := &provider.RestoreRecycleItemResponse{
 		Status: status.NewStatusFromErrType(ctx, "restore recycle item", err),
