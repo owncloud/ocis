@@ -232,7 +232,7 @@ func spanRows(s sdktrace.ReadOnlySpan) []spanRow {
 		sort.Sort(a)
 		var s []string
 		for i := range a {
-			s = append(s, fmt.Sprintf("%s=%v", a[i].Key, a[i].Value.Emit()))
+			s = append(s, fmt.Sprintf("%s=%v", a[i].Key, a[i].Value.Emit())) //nolint:staticcheck // Use deprecated method for formatting backward compatibility.
 		}
 		return "Attributes:{" + strings.Join(s, ", ") + "}"
 	}

@@ -2539,21 +2539,21 @@ func (s *Server) updateRouteSubscriptionMap(acc *Account, sub *subscription, del
 		// queue subscriptions updates (sub/unsub).
 		// See https://github.com/nats-io/nats-server/pull/1126 for more details.
 		if isq {
-			acc.sqmu.Lock()
+			acc.smu.Lock()
 		}
 		acc.mu.Lock()
 	}
 	accUnlock := func() {
 		acc.mu.Unlock()
 		if isq {
-			acc.sqmu.Unlock()
+			acc.smu.Unlock()
 		}
 	}
 
 	accLock()
 
 	// This is non-nil when we know we are in cluster mode.
-	rm, lqws := acc.rm, acc.lqws
+	rm, lws := acc.rm, acc.lws
 	if rm == nil {
 		accUnlock()
 		return
@@ -2573,9 +2573,7 @@ func (s *Server) updateRouteSubscriptionMap(acc *Account, sub *subscription, del
 		n += delta
 		if n <= 0 {
 			delete(rm, key)
-			if isq {
-				delete(lqws, key)
-			}
+			delete(lws, key)
 			update = true // Update for deleting (N->0)
 		} else {
 			rm[key] = n
@@ -2650,29 +2648,29 @@ func (s *Server) updateRouteSubscriptionMap(acc *Account, sub *subscription, del
 	trace := atomic.LoadInt32(&s.logging.trace) == 1
 	s.mu.RUnlock()
 
-	// If we are a queue subscriber we need to make sure our updates are serialized from
-	// potential multiple connections. We want to make sure that the order above is preserved
-	// here but not necessarily all updates need to be sent. We need to block and recheck the
-	// n count with the lock held through sending here. We will suppress duplicate sends of same qw.
-	if isq {
-		// However, we can't hold the acc.mu lock since we allow client.mu.Lock -> acc.mu.Lock
-		// but not the opposite. So use a dedicated lock while holding the route's lock.
-		acc.sqmu.Lock()
-		defer acc.sqmu.Unlock()
+	// We need to make sure our updates are serialized from potential multiple connections. We want
+	// to make sure that the order above is preserved here but not necessarily all updates need to
+	// be sent. We need to block and recheck the n count with the lock held through sending here.
+	//
+	// However, we can't hold the acc.mu lock since we allow client.mu.Lock -> acc.mu.Lock
+	// but not the opposite. So use a dedicated lock while holding the route's lock.
+	acc.smu.Lock()
+	defer acc.smu.Unlock()
 
-		acc.mu.Lock()
-		n = rm[key]
+	acc.mu.Lock()
+	n = rm[key]
+	if isq {
 		sub.qw = n
-		// Check the last sent weight here. If same, then someone
-		// beat us to it and we can just return here. Otherwise update
-		if ls, ok := lqws[key]; ok && ls == n {
-			acc.mu.Unlock()
-			return
-		} else if n > 0 {
-			lqws[key] = n
-		}
-		acc.mu.Unlock()
 	}
+	// Check the last sent value here. If same, then someone beat us to it and
+	// we can just return here. Otherwise update.
+	if ls, ok := lws[key]; ok && ls == n {
+		acc.mu.Unlock()
+		return
+	} else if n > 0 {
+		lws[key] = n
+	}
+	acc.mu.Unlock()
 
 	// Snapshot into array
 	subs := []*subscription{sub}

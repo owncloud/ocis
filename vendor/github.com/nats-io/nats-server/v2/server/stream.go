@@ -1752,6 +1752,9 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account, pedantic boo
 		if cfg.AllowMsgTTL {
 			return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("counter stream cannot use message TTLs"))
 		}
+		if cfg.AllowMsgSchedules {
+			return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("counter stream cannot use message schedules"))
+		}
 		if cfg.Retention != LimitsPolicy {
 			return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("counter stream can only use limits retention"))
 		}
@@ -1788,6 +1791,9 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account, pedantic boo
 	}
 
 	if cfg.AllowMsgSchedules {
+		if cfg.Discard == DiscardNew {
+			return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("message scheduling cannot use discard new"))
+		}
 		if !cfg.AllowRollup {
 			if pedantic {
 				return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("message scheduling cannot be set if roll-ups are disabled"))
@@ -8563,14 +8569,16 @@ func (mset *stream) setConsumer(o *consumer) {
 
 // Lock should be held.
 func (mset *stream) removeConsumer(o *consumer) {
-	if o.cfg.FilterSubject != _EMPTY_ && mset.numFilter > 0 {
-		mset.numFilter--
-	}
-	if (o.cfg.Direct || o.cfg.Sourcing) && mset.sourcingConsumers > 0 {
-		mset.sourcingConsumers--
-	}
-	if mset.consumers != nil {
+	if _, ok := mset.consumers[o.name]; ok {
 		delete(mset.consumers, o.name)
+
+		if o.cfg.FilterSubject != _EMPTY_ && mset.numFilter > 0 {
+			mset.numFilter--
+		}
+		if (o.cfg.Direct || o.cfg.Sourcing) && mset.sourcingConsumers > 0 {
+			mset.sourcingConsumers--
+		}
+
 		// Now update consumers list as well
 		mset.clsMu.Lock()
 		for i, ol := range mset.cList {
