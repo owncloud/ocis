@@ -2,13 +2,14 @@ package middleware
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	microstore "go-micro.dev/v4/store"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 )
@@ -52,20 +53,26 @@ type MultiFactorAuthentication struct {
 
 // ServeHTTP adds the mfa header if the request contains a valid mfa token
 func (m MultiFactorAuthentication) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	defer m.next.ServeHTTP(w, req)
+	// Incoming requests must not have autopropagation headers
+	for key, _ := range req.Header {
+		if strings.HasPrefix(key, autoprop.HTTPAutoPropPrefix) || strings.HasPrefix(key, autoprop.MicroAutoPropPrefix) {
+			req.Header.Del(key)
+		}
+	}
 
 	if !m.enabled {
 		// if mfa is disabled we always set the header to true.
 		// this allows all other services to assume mfa is always active.
 		// this should reduce code and configuration complexity in other services.
-		mfa.SetHeader(req, true)
+		req = req.WithContext(revactx.SetMFA(req.Context()))
+		m.next.ServeHTTP(w, req)
 		return
 	}
 
 	// overwrite the mfa header to avoid passing on wrong information
-	mfa.SetHeader(req, false)
+	ctx := revactx.RemoveMFA(req.Context())
 
-	claims := oidc.FromContext(req.Context())
+	claims := oidc.FromContext(ctx)
 
 	if claims == nil {
 		// No OIDC claims — request was authenticated via a non-OIDC method
@@ -77,15 +84,15 @@ func (m MultiFactorAuthentication) ServeHTTP(w http.ResponseWriter, req *http.Re
 		// archiver download to succeed when the user has recently proven MFA
 		// in their browser session.
 		if m.store != nil {
-			if u, ok := revactx.ContextGetUser(req.Context()); ok && u.GetId().GetOpaqueId() != "" {
+			if u, ok := revactx.ContextGetUser(ctx); ok && u.GetId().GetOpaqueId() != "" {
 				if m.readMFAFromStore(u.GetId().GetOpaqueId()) {
-					mfa.SetHeader(req, true)
-					m.logger.Debug().Str("path", req.URL.Path).Msg("MFA status restored from store for non-OIDC request")
-					return
+					ctx = revactx.SetMFA(ctx)
 				}
 			}
 		}
-		m.logger.Debug().Str("path", req.URL.Path).Msg("no OIDC claims in context, skipping MFA check")
+
+		m.logger.Debug().Str("path", req.URL.Path).Bool("mfaStatus", revactx.HasMFA(ctx)).Msg("no OIDC claims in context")
+		m.next.ServeHTTP(w, req.WithContext(ctx)) // ensure the request has the right context
 		return
 	}
 
@@ -93,26 +100,25 @@ func (m MultiFactorAuthentication) ServeHTTP(w http.ResponseWriter, req *http.Re
 	value, err := oidc.ReadStringClaim("acr", claims)
 	if err != nil {
 		m.logger.Debug().Str("path", req.URL.Path).Interface("required", m.authLevelNames).Err(err).Msg("acr claim not set in access token")
-		return
-	}
-
-	if !m.containsMFA(value) {
+	} else if !m.containsMFA(value) {
 		m.logger.Debug().Str("acr", value).Str("url", req.URL.Path).Msg("accessing path without mfa")
-		return
-	}
-
-	mfa.SetHeader(req, true)
-	m.logger.Debug().Str("acr", value).Str("url", req.URL.Path).Msg("mfa authenticated")
-
-	// Persist the verified MFA status so that subsequent non-OIDC requests
-	// (e.g. signed-URL archiver downloads) can inherit it. The entry is
-	// refreshed on every successful OIDC MFA verification and expires after
-	// the configured session duration if no further OIDC requests are made.
-	if m.store != nil {
-		if u, ok := revactx.ContextGetUser(req.Context()); ok && u.GetId().GetOpaqueId() != "" {
-			m.writeMFAToStore(u.GetId().GetOpaqueId())
+	} else {
+		m.logger.Debug().Str("acr", value).Str("url", req.URL.Path).Msg("mfa authenticated")
+		ctx = revactx.SetMFA(ctx)
+		// Persist the verified MFA status so that subsequent non-OIDC requests
+		// (e.g. signed-URL archiver downloads) can inherit it. The entry is
+		// refreshed on every successful OIDC MFA verification and expires after
+		// the configured session duration if no further OIDC requests are made.
+		if m.store != nil {
+			if u, ok := revactx.ContextGetUser(ctx); ok && u.GetId().GetOpaqueId() != "" {
+				m.writeMFAToStore(u.GetId().GetOpaqueId())
+			}
 		}
 	}
+
+	// MFA status will only be true if the acr claim contains the proper value,
+	// otherwise it wll be false (removed from the context early)
+	m.next.ServeHTTP(w, req.WithContext(ctx))
 }
 
 func (m MultiFactorAuthentication) readMFAFromStore(userID string) bool {

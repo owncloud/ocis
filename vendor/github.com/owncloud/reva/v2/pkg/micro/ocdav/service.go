@@ -22,19 +22,20 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	httpServer "github.com/go-micro/plugins/v4/server/http"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/reva/v2/internal/http/interceptors/appctx"
 	"github.com/owncloud/reva/v2/internal/http/interceptors/auth"
 	cors2 "github.com/owncloud/reva/v2/internal/http/interceptors/cors"
 	revaLogMiddleware "github.com/owncloud/reva/v2/internal/http/interceptors/log"
 	"github.com/owncloud/reva/v2/internal/http/services/owncloud/ocdav"
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/rhttp/global"
 	"github.com/owncloud/reva/v2/pkg/storage/favorite/memory"
 	rtrace "github.com/owncloud/reva/v2/pkg/trace"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	httpServer "github.com/go-micro/plugins/v4/server/http"
-	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -159,6 +160,9 @@ func setDefaults(sopts *Options) error {
 }
 
 func useMiddlewares(r *chi.Mux, sopts *Options, svc global.Service, tp trace.TracerProvider) error {
+	// autoprop
+	autopropMid := autoprop.NewHttpHandler()
+
 	// auth
 	for _, v := range svc.Unprotected() {
 		sopts.Logger.Info().Str("url", v).Msg("unprotected URL")
@@ -226,7 +230,7 @@ func useMiddlewares(r *chi.Mux, sopts *Options, svc global.Service, tp trace.Tra
 	rm := middleware.RequestID
 
 	// actually register
-	r.Use(pm, tm, lm, authMiddle, rm, cm, cors)
+	r.Use(autopropMid, pm, tm, lm, authMiddle, rm, cm, cors)
 	return nil
 }
 

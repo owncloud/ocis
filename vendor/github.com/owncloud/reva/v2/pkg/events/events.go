@@ -23,10 +23,13 @@ import (
 	"log"
 	"reflect"
 
-	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/google/uuid"
+	"github.com/owncloud/reva/v2/pkg/autoprop"
+	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"go-micro.dev/v4/events"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var (
@@ -47,6 +50,11 @@ var (
 
 	// MetadatakeyInitiatorID is the key used for the initiator id in the metadata map of the event
 	MetadatakeyInitiatorID = "initiatorid"
+
+	// MetadatakeyExtraInfo is the key used for the extra information associated to the event.
+	// This usually includes information that should be propagated across services.
+	// The information is a map[string][]string encoded as a JSON string
+	MetadatakeyExtraInfo = "extrainfo"
 )
 
 type (
@@ -77,6 +85,7 @@ type (
 		ID          string
 		TraceParent string
 		InitiatorID string
+		ExtraInfo   *autoprop.Meta
 		Event       interface{}
 	}
 )
@@ -112,11 +121,13 @@ func Consume(s Consumer, group string, evs ...Unmarshaller) (<-chan Event, error
 				continue
 			}
 
+			extraInfo := autoprop.NewMetaFromJsonString(e.Metadata[MetadatakeyExtraInfo])
 			outchan <- Event{
 				Type:        et,
 				ID:          e.Metadata[MetadatakeyEventID],
 				TraceParent: e.Metadata[MetadatakeyTraceParent],
 				InitiatorID: e.Metadata[MetadatakeyInitiatorID],
+				ExtraInfo:   extraInfo,
 				Event:       event,
 			}
 		}
@@ -135,11 +146,13 @@ func ConsumeAll(s Consumer, group string) (<-chan Event, error) {
 	go func() {
 		for {
 			e := <-c
+			extraInfo := autoprop.NewMetaFromJsonString(e.Metadata[MetadatakeyExtraInfo])
 			outchan <- Event{
 				Type:        e.Metadata[MetadatakeyEventType],
 				ID:          e.Metadata[MetadatakeyEventID],
 				TraceParent: e.Metadata[MetadatakeyTraceParent],
 				InitiatorID: e.Metadata[MetadatakeyInitiatorID],
+				ExtraInfo:   extraInfo,
 				Event:       e.Payload,
 			}
 		}
@@ -150,14 +163,23 @@ func ConsumeAll(s Consumer, group string) (<-chan Event, error) {
 // Publish publishes the ev to the MainQueue from where it is distributed to all subscribers
 // NOTE: needs to use reflect on runtime
 func Publish(ctx context.Context, s Publisher, ev interface{}) error {
+	prevSpan := trace.SpanFromContext(ctx)
+	ctx2, span := TraceEventProducer(ctx, prevSpan.TracerProvider(), ev)
+	defer span.End()
+
 	evName := reflect.TypeOf(ev).String()
-	traceParent := getTraceParentFromCtx(ctx)
-	iid, _ := ctxpkg.ContextGetInitiator(ctx)
+	traceParent := getTraceParentFromCtx(ctx2)
+	iid, _ := ctxpkg.ContextGetInitiator(ctx2)
+	meta := autoprop.GetMetaFromContext(ctx2)
+	if meta == nil {
+		meta = autoprop.NewMeta()
+	}
 	return s.Publish(MainQueueName, ev, events.WithMetadata(map[string]string{
 		MetadatakeyEventType:   evName,
 		MetadatakeyEventID:     uuid.New().String(),
 		MetadatakeyTraceParent: traceParent,
 		MetadatakeyInitiatorID: iid,
+		MetadatakeyExtraInfo:   meta.ToJsonString(),
 	}))
 }
 
@@ -177,4 +199,56 @@ func getTraceParentFromCtx(ctx context.Context) string {
 	tc := propagation.TraceContext{}
 	tc.Inject(ctx, &mc)
 	return mc["traceparent"]
+}
+
+// TraceEventProducer will add a span to trace an event producer.
+// The returned span needs to end manually (span.End()).
+// This is currently used in the Publish method, any published event will
+// be tracked. You shouldn't care about calling this method.
+func TraceEventProducer(ctx context.Context, tp trace.TracerProvider, evPayload interface{}) (context.Context, trace.Span) {
+	tracer := tp.Tracer("github.com/owncloud/reva/pkg/events")
+	evType := reflect.TypeOf(evPayload).String()
+	iid, _ := ctxpkg.ContextGetInitiator(ctx)
+
+	newCtx, span := tracer.Start(
+		ctx,
+		"Event "+evType,
+		trace.WithSpanKind(trace.SpanKindProducer),
+		trace.WithAttributes(
+			attribute.String("ocis.event.type", evType),
+			attribute.String("ocis.event.initiator", iid),
+		),
+	)
+	return newCtx, span
+}
+
+// TraceEventConsumer will trace an event consumer. Every event consumer needs
+// to call this method so the consumer is linked with the producer. The event
+// information is used to know who produced the event and link the traces.
+// The returned span needs to be closed manually.
+func TraceEventConsumer(ctx context.Context, tp trace.TracerProvider, ev Event) (context.Context, trace.Span) {
+	tracer := tp.Tracer("github.com/owncloud/reva/pkg/events")
+	return TraceEventConsumerWithTracer(ctx, tracer, ev)
+}
+
+// TraceEventConsumerWithTracer does the same as TraceEventConsumer, but using
+// a tracer instead of a tracerProvider
+func TraceEventConsumerWithTracer(ctx context.Context, tracer trace.Tracer, ev Event) (context.Context, trace.Span) {
+	evCtx := ev.GetTraceContext(ctx)
+
+	newCtx, span := tracer.Start(
+		ctx,
+		"Event "+ev.Type,
+		trace.WithNewRoot(),
+		trace.WithSpanKind(trace.SpanKindConsumer),
+		trace.WithAttributes(
+			attribute.String("ocis.event.type", ev.Type),
+			attribute.String("ocis.event.id", ev.ID),
+			attribute.String("ocis.event.initiator", ev.InitiatorID),
+		),
+		trace.WithLinks(
+			trace.LinkFromContext(evCtx),
+		),
+	)
+	return newCtx, span
 }

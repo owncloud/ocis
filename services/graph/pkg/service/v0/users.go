@@ -325,7 +325,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
-	hasMFA := mfa.Has(r.Context())
+	hasMFA := revactx.HasMFA(r.Context())
 
 	if !hasAcceptableSearch(odataReq.Query, g.config.API.IdentitySearchMinLength) {
 		if !ctxHasFullPerms {

@@ -10,6 +10,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	svc "github.com/owncloud/ocis/v2/services/thumbnails/pkg/service/http/v0"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail/storage"
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	"go-micro.dev/v4"
 )
 
@@ -38,6 +39,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
+			autoprop.NewHttpHandler(),
 			ocismiddleware.GetOtelhttpMiddleware(options.Config.Service.Name, options.TraceProvider),
 			middleware.RealIP,
 			middleware.RequestID,

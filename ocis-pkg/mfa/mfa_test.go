@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/test-go/testify/require"
 )
 
@@ -13,13 +14,15 @@ func exampleUsage() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// In a central place of your service enhance request once.
 		// Note: This will not overwrite existing context values so it's safe (but unnecessary) to call multiple times.
-		r = mfa.EnhanceRequest(r)
+		if mfa.IsMFAHeaderTrue(r) { // this is just a condition to set the MFA status. There could be other conditions.
+			r = r.WithContext(revactx.SetMFA(r.Context()))
+		}
 
 		// somewhere in your code extract the context
 		ctx := r.Context()
 
 		// now you can check if the user has MFA enabled
-		if !mfa.Has(ctx) {
+		if !revactx.HasMFA(ctx) {
 			// use this line to log access denied information
 			// mfa package will not log anything by itself
 			mfa.SetRequiredStatus(w)

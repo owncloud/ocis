@@ -170,6 +170,15 @@ func NewTooManyRequests(ctx context.Context, msg string) *rpc.Status {
 	}
 }
 
+// NewTooEarly returns a Status with CODE_TOO_EARLY.
+func NewTooEarly(ctx context.Context, msg string) *rpc.Status {
+	return &rpc.Status{
+		Code:    rpc.Code_CODE_TOO_EARLY,
+		Message: msg,
+		Trace:   getTrace(ctx),
+	}
+}
+
 // NewStatusFromErrType returns a status that corresponds to the given errtype
 func NewStatusFromErrType(ctx context.Context, msg string, err error) *rpc.Status {
 	switch e := err.(type) {
@@ -202,6 +211,8 @@ func NewStatusFromErrType(ctx context.Context, msg string, err error) *rpc.Statu
 		return NewInvalid(ctx, msg+":"+err.Error())
 	case errtypes.TooManyRequests:
 		return NewTooManyRequests(ctx, msg+": "+err.Error())
+	case errtypes.TooEarly:
+		return NewTooEarly(ctx, msg+": "+err.Error())
 	}
 
 	// map GRPC status codes coming from the auth middleware

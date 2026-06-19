@@ -26,6 +26,7 @@ import (
 
 	"go.opencensus.io/plugin/ochttp"
 
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/pkg/errors"
 )
@@ -39,13 +40,14 @@ func GetHTTPClient(opts ...Option) *http.Client {
 	tr := http.DefaultTransport.(*http.Transport).Clone()
 	tr.DisableKeepAlives = options.DisableKeepAlive
 	tr.TLSClientConfig = &tls.Config{
+		MinVersion:         options.MinVersion,
 		InsecureSkipVerify: options.Insecure,
 	}
 
 	httpClient := &http.Client{
 		Timeout: options.Timeout,
 		Transport: &ochttp.Transport{
-			Base: tr,
+			Base: autoprop.NewHttpRoundTripper(tr),
 		},
 	}
 

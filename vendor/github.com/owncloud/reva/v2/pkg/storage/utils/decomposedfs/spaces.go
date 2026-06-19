@@ -43,6 +43,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rgrpc/status"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	sdk "github.com/owncloud/reva/v2/pkg/sdk/common"
+	"github.com/owncloud/reva/v2/pkg/storage"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/node"
@@ -700,7 +701,7 @@ func (fs *Decomposedfs) UpdateStorageSpace(ctx context.Context, req *provider.Up
 				},
 			}
 			// delete old image after new image was successfully set
-			_ = fs.Delete(ctx, delRef)
+			_, _ = fs.Delete(ctx, delRef)
 			// silently ignore failed deletion
 		}
 	}
@@ -724,7 +725,7 @@ func (fs *Decomposedfs) UpdateStorageSpace(ctx context.Context, req *provider.Up
 }
 
 // DeleteStorageSpace deletes a storage space
-func (fs *Decomposedfs) DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorageSpaceRequest) error {
+func (fs *Decomposedfs) DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorageSpaceRequest) (*storage.DeleteStorageSpaceResult, error) {
 	opaque := req.Opaque
 	var purge bool
 	if opaque != nil {
@@ -733,39 +734,49 @@ func (fs *Decomposedfs) DeleteStorageSpace(ctx context.Context, req *provider.De
 
 	_, spaceID, _, err := storagespace.SplitID(req.Id.GetOpaqueId())
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	n, err := node.ReadNode(ctx, fs.lu, spaceID, spaceID, true, nil, false) // permission to read disabled space is checked later
 	if err != nil {
-		return err
+		return nil, err
+	}
+	if !n.Exists {
+		return nil, errtypes.NotFound(spaceID)
 	}
 
 	st, err := n.SpaceRoot.XattrString(ctx, prefixes.SpaceTypeAttr)
 	if err != nil {
-		return errtypes.InternalError(fmt.Sprintf("space %s does not have a spacetype, possible corrupt decompsedfs", n.ID))
+		return nil, errtypes.InternalError(fmt.Sprintf("space %s does not have a spacetype, possible corrupt decompsedfs", n.ID))
 	}
 
 	if err := canDeleteSpace(ctx, spaceID, st, purge, n, fs.p); err != nil {
-		return err
+		return nil, err
 	}
 	if purge {
 		if !n.IsDisabled(ctx) {
-			return errtypes.NewErrtypeFromStatus(status.NewInvalid(ctx, "can't purge enabled space"))
+			return nil, errtypes.NewErrtypeFromStatus(status.NewInvalid(ctx, "can't purge enabled space"))
+		}
+
+		// Capture data for SpaceDeleted before any destructive work.
+		spaceName, _ := n.SpaceRoot.XattrString(ctx, prefixes.SpaceNameAttr)
+		finalMembers, err := fs.readFinalMembers(ctx, n, spaceName)
+		if err != nil {
+			return nil, err
 		}
 
 		// TODO invalidate ALL indexes in msgpack, not only by type
 		spaceType, err := n.XattrString(ctx, prefixes.SpaceTypeAttr)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if err := fs.spaceTypeIndex.Remove(spaceType, spaceID); err != nil {
-			return err
+			return nil, err
 		}
 
 		// invalidate cache
 		if err := fs.lu.MetadataBackend().Purge(ctx, n.InternalPath()); err != nil {
-			return err
+			return nil, err
 		}
 
 		root := fs.getSpaceRoot(spaceID)
@@ -809,24 +820,110 @@ func (fs *Decomposedfs) DeleteStorageSpace(ctx context.Context, req *provider.De
 		// This is deletes all blobs of the space
 		// NOTE: This isn't needed when no s3 is used, but we can't differentiate that here...
 		if err := filepath.Walk(root, walkfn); err != nil {
-			return err
+			return nil, err
 		}
 
 		// remove space metadata
 		if err := os.RemoveAll(root); err != nil {
-			return err
+			return nil, err
 		}
 
 		// try removing the space root node
 		// Note that this will fail when there are other spaceids starting with the same two digits.
 		_ = os.Remove(filepath.Dir(root))
 
-		return nil
+		return &storage.DeleteStorageSpaceResult{
+			SpaceName:    spaceName,
+			FinalMembers: finalMembers,
+		}, nil
 	}
 
 	// mark as disabled by writing a dtime attribute
 	dtime := time.Now()
-	return n.SetDTime(ctx, &dtime)
+	if err := n.SetDTime(ctx, &dtime); err != nil {
+		return nil, err
+	}
+	return &storage.DeleteStorageSpaceResult{}, nil
+}
+
+// readFinalMembers returns the space's active user/group grants
+// keyed by grantee opaque ID. Expired grants are pruned as a side
+// effect: the grant is deleted, the corresponding user/group space
+// index entry is removed, and a SpaceMembershipExpired event is
+// published, so expired grantees are absent from the result.
+func (fs *Decomposedfs) readFinalMembers(ctx context.Context, n *node.Node, spaceName string) (map[string]provider.ResourcePermissions, error) {
+	sublog := appctx.GetLogger(ctx).With().Str("spaceid", n.SpaceID).Logger()
+
+	grants, err := n.ListGrants(ctx)
+	if err != nil {
+		return nil, err
+	}
+	tmp := make(map[string]*provider.ResourcePermissions, len(grants))
+	for _, g := range grants {
+		var id string
+		switch g.Grantee.Type {
+		case provider.GranteeType_GRANTEE_TYPE_USER:
+			id = g.Grantee.GetUserId().GetOpaqueId()
+		case provider.GranteeType_GRANTEE_TYPE_GROUP:
+			id = g.Grantee.GetGroupId().GetOpaqueId()
+		default:
+			continue
+		}
+
+		if g.Expiration != nil && isGrantExpired(g) {
+			errDeleteGrant := n.DeleteGrant(ctx, g, true)
+			if errDeleteGrant != nil {
+				sublog.Error().Err(errDeleteGrant).Str("grantee", id).
+					Msg("failed to delete expired space grant")
+			}
+			if n.IsSpaceRoot(ctx) {
+				switch g.Grantee.Type {
+				case provider.GranteeType_GRANTEE_TYPE_USER:
+					if errIndexRemove := fs.userSpaceIndex.Remove(g.Grantee.GetUserId().GetOpaqueId(), n.SpaceID); errIndexRemove != nil {
+						sublog.Error().Err(errIndexRemove).Str("grantee", id).
+							Msg("failed to delete expired user space index")
+					}
+				case provider.GranteeType_GRANTEE_TYPE_GROUP:
+					if errIndexRemove := fs.groupSpaceIndex.Remove(g.Grantee.GetGroupId().GetOpaqueId(), n.SpaceID); errIndexRemove != nil {
+						sublog.Error().Err(errIndexRemove).Str("grantee", id).
+							Msg("failed to delete expired group space index")
+					}
+				}
+
+				if errDeleteGrant == nil {
+					ev := events.SpaceMembershipExpired{
+						SpaceOwner: n.SpaceOwnerOrManager(ctx),
+						SpaceID:    &provider.StorageSpaceId{OpaqueId: n.SpaceID},
+						SpaceName:  spaceName,
+						ExpiredAt:  time.Unix(int64(g.Expiration.Seconds), int64(g.Expiration.Nanos)),
+						Timestamp:  utils.TSNow(),
+					}
+					switch g.Grantee.Type {
+					case provider.GranteeType_GRANTEE_TYPE_USER:
+						ev.GranteeUserID = g.Grantee.GetUserId()
+					case provider.GranteeType_GRANTEE_TYPE_GROUP:
+						ev.GranteeGroupID = g.Grantee.GetGroupId()
+					}
+					if errPublish := events.Publish(ctx, fs.stream, ev); errPublish != nil {
+						sublog.Error().Err(errPublish).Msg("error publishing SpaceMembershipExpired event")
+					}
+				}
+			}
+			continue
+		}
+
+		tmp[id] = g.Permissions
+	}
+
+	b, err := json.Marshal(tmp)
+	if err != nil {
+		return nil, err
+	}
+	out := make(map[string]provider.ResourcePermissions, len(tmp))
+	if err := json.Unmarshal(b, &out); err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 // the value of `target` depends on the implementation:
@@ -1172,7 +1269,8 @@ func canDeleteSpace(ctx context.Context, spaceID string, typ string, purge bool,
 	}
 
 	// space managers are allowed to disable and delete their project spaces
-	if rp, err := p.AssemblePermissions(ctx, n); err == nil && permissions.IsManager(rp) {
+	rp, err := p.AssemblePermissions(ctx, n)
+	if err == nil && permissions.IsManager(rp) {
 		return nil
 	}
 
@@ -1184,6 +1282,11 @@ func canDeleteSpace(ctx context.Context, spaceID string, typ string, purge bool,
 	// Drive.ReadWriteEnabled allows to disable a space
 	if !purge && p.SpaceAbility(ctx, spaceID) {
 		return nil
+	}
+
+	// active space, user has no grant at all: hide existence rather than reveal it
+	if err == nil && !rp.GetStat() && !n.IsDisabled(ctx) {
+		return errtypes.NotFound(spaceID)
 	}
 
 	return errtypes.PermissionDenied(fmt.Sprintf("user is not allowed to delete space %s", n.ID))

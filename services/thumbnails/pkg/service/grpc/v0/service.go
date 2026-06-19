@@ -18,7 +18,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"github.com/pkg/errors"
 	merrors "go-micro.dev/v4/errors"
-	gmmetadata "go-micro.dev/v4/metadata"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -29,7 +28,6 @@ import (
 	tjwt "github.com/owncloud/ocis/v2/services/thumbnails/pkg/service/jwt"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail/imgsource"
-	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 )
 
 // NewService returns a service implementation for Service.
@@ -276,15 +274,6 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 
 func (g Thumbnail) stat(ctx context.Context, path, auth string) (*provider.StatResponse, error) {
 	outCtx := metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, auth)
-
-	// Bridge MFA status from go-micro metadata (set by the webdav service) into
-	// outgoing gRPC metadata. The autoprop-prefixed key is then forwarded
-	// automatically at every subsequent gRPC hop by the metadata interceptor.
-	if md, ok := gmmetadata.FromContext(ctx); ok {
-		if v, ok := md.Get(ctxpkg.MFAOutgoingHeader); ok && v != "" {
-			outCtx = metadata.AppendToOutgoingContext(outCtx, ctxpkg.MFAOutgoingHeader, v)
-		}
-	}
 
 	ref, err := storagespace.ParseReference(path)
 	if err != nil {

@@ -25,12 +25,10 @@ import (
 	"github.com/owncloud/reva/v2/pkg/tags"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"golang.org/x/sync/errgroup"
-	grpcmetadata "google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
@@ -59,12 +57,12 @@ var (
 // Searcher is the interface to the SearchService
 type Searcher interface {
 	Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error)
-	IndexSpace(rID *provider.StorageSpaceId) error
-	TrashItem(rID *provider.ResourceId)
-	UpsertItem(ref *provider.Reference)
-	UpdateTags(ref *provider.Reference)
-	RestoreItem(ref *provider.Reference)
-	MoveItem(ref *provider.Reference)
+	IndexSpace(ctx context.Context, rID *provider.StorageSpaceId) error
+	TrashItem(ctx context.Context, rID *provider.ResourceId)
+	UpsertItem(ctx context.Context, ref *provider.Reference)
+	UpdateTags(ctx context.Context, ref *provider.Reference)
+	RestoreItem(ctx context.Context, ref *provider.Reference)
+	MoveItem(ctx context.Context, ref *provider.Reference)
 }
 
 // Service is responsible for indexing spaces and pass on a search
@@ -107,11 +105,8 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 	currentUser := revactx.ContextMustGetUser(ctx)
 
 	// Extract vault mode and scope from query if set
-	query, isVault := ParseVaultMode(req.Query)
-	ctx = mfa.Set(ctx, isVault && mfa.Has(ctx))
-	if mfa.Has(ctx) {
-		ctx = grpcmetadata.AppendToOutgoingContext(ctx, revactx.MFAOutgoingHeader, "true")
-	}
+	query, isVaultRequested := ParseVaultMode(req.Query)
+	hasMFA := revactx.HasMFA(ctx)
 
 	query, scope := ParseScope(query)
 	if query == "" {
@@ -170,7 +165,7 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 		s.logger.Error().Err(err).Msg("failed to list the user's storage spaces")
 		return nil, err
 	}
-	if mfa.Has(ctx) {
+	if isVaultRequested && hasMFA {
 		// When the "storage_id" is set the ListStorageSpaces request omits "+grant"
 		// spaces, so we have to make an additional request to get the vault space in vault mode
 		lssReq.Opaque = utils.AppendPlainToOpaque(lssReq.Opaque, "storage_id", utils.VaultStorageProviderID)
@@ -198,10 +193,10 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 				storageID = space.Root.GetStorageId()
 			}
 			isVaultSpace := storageID == utils.VaultStorageProviderID
-			if mfa.Has(ctx) && !isVaultSpace {
+			if (isVaultRequested && hasMFA) && !isVaultSpace {
 				continue // vault mode: skip non-vault spaces
 			}
-			if !mfa.Has(ctx) && isVaultSpace {
+			if !(isVaultRequested && hasMFA) && isVaultSpace {
 				continue // regular mode: skip vault spaces
 			}
 		}
@@ -350,7 +345,7 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 			return nil, err
 		}
 
-		serviceCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
+		serviceCtx, err := getAuthContext(ctx, s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
 		if err != nil {
 			return nil, err
 		}
@@ -468,8 +463,8 @@ const (
 )
 
 // IndexSpace (re)indexes all resources of a given space.
-func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
-	ownerCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
+func (s *Service) IndexSpace(ctx context.Context, spaceID *provider.StorageSpaceId) error {
+	ownerCtx, err := getAuthContext(ctx, s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
 	if err != nil {
 		return err
 	}
@@ -484,10 +479,6 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 		return fmt.Errorf("invalid space id")
 	}
 	rootID.OpaqueId = rootID.SpaceId
-
-	if rootID.StorageId == utils.VaultStorageProviderID {
-		ownerCtx = grpcmetadata.AppendToOutgoingContext(ownerCtx, revactx.MFAOutgoingHeader, "true")
-	}
 
 	failures := 0
 
@@ -537,7 +528,7 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 			}
 		}
 
-		if err := s.upsertItem(ref, _extractionRetries); err != nil {
+		if err := s.upsertItem(ownerCtx, ref, _extractionRetries); err != nil {
 			failures++
 			s.logger.Warn().Err(err).
 				Int("failures", failures).
@@ -564,7 +555,7 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 }
 
 // TrashItem marks the item as deleted.
-func (s *Service) TrashItem(rID *provider.ResourceId) {
+func (s *Service) TrashItem(_ context.Context, rID *provider.ResourceId) {
 	err := s.engine.Delete(storagespace.FormatResourceID(rID))
 	if err != nil {
 		s.logger.Error().Err(err).Interface("Id", rID).Msg("failed to remove item from index")
@@ -572,17 +563,17 @@ func (s *Service) TrashItem(rID *provider.ResourceId) {
 }
 
 // UpsertItem indexes or stores Resource data fields.
-func (s *Service) UpsertItem(ref *provider.Reference) {
-	if err := s.upsertItem(ref, 0); err != nil {
+func (s *Service) UpsertItem(ctx context.Context, ref *provider.Reference) {
+	if err := s.upsertItem(ctx, ref, 0); err != nil {
 		s.logger.Error().Err(err).Msg("failed to upsert resource")
 	}
 }
 
 // upsertItem is the core extraction-and-index method. When retries > 0,
 // a failed extraction is retried up to that many times with a fixed delay.
-func (s *Service) upsertItem(ref *provider.Reference, retries int) error {
-	ctx, stat, path := s.resInfo(ref)
-	if ctx == nil || stat == nil || path == "" {
+func (s *Service) upsertItem(ctx context.Context, ref *provider.Reference, retries int) error {
+	ctx2, stat, path := s.resInfo(ctx, ref)
+	if ctx2 == nil || stat == nil || path == "" {
 		return fmt.Errorf("could not resolve resource info for %s", ref.GetPath())
 	}
 
@@ -603,7 +594,7 @@ func (s *Service) upsertItem(ref *provider.Reference, retries int) error {
 	var doc content.Document
 	var err error
 	for attempt := range retries + 1 {
-		doc, err = s.extractor.Extract(ctx, stat.Info)
+		doc, err = s.extractor.Extract(ctx2, stat.Info)
 		if err == nil {
 			break
 		}
@@ -642,7 +633,7 @@ func (s *Service) upsertItem(ref *provider.Reference, retries int) error {
 	}
 
 	logDocCount(s.engine, s.logger)
-	s.storeExtractedMetadata(ctx, ref, doc)
+	s.storeExtractedMetadata(ctx2, ref, doc)
 	return nil
 }
 
@@ -681,8 +672,8 @@ func (s *Service) storeExtractedMetadata(ctx context.Context, ref *provider.Refe
 // UpdateTags updates only the tags of an already-indexed resource without
 // triggering a full content re-extraction via Tika. If the resource is not
 // yet in the index it falls back to a full UpsertItem.
-func (s *Service) UpdateTags(ref *provider.Reference) {
-	_, stat, _ := s.resInfo(ref)
+func (s *Service) UpdateTags(ctx context.Context, ref *provider.Reference) {
+	_, stat, _ := s.resInfo(ctx, ref)
 	if stat == nil {
 		return
 	}
@@ -708,7 +699,7 @@ func (s *Service) UpdateTags(ref *provider.Reference) {
 	if errors.Is(err, engine.ErrResourceNotFound) {
 		// Resource is not yet indexed — fall back to the full extraction path.
 		s.logger.Debug().Str("id", resourceID).Msg("resource not in index, falling back to full upsert for tag update")
-		s.UpsertItem(ref)
+		s.UpsertItem(ctx, ref)
 		return
 	}
 
@@ -781,9 +772,9 @@ func valueToString(value interface{}) string {
 }
 
 // RestoreItem makes the item available again.
-func (s *Service) RestoreItem(ref *provider.Reference) {
-	ctx, stat, path := s.resInfo(ref)
-	if ctx == nil || stat == nil || path == "" {
+func (s *Service) RestoreItem(ctx context.Context, ref *provider.Reference) {
+	ctx2, stat, path := s.resInfo(ctx, ref)
+	if ctx2 == nil || stat == nil || path == "" {
 		return
 	}
 
@@ -793,9 +784,9 @@ func (s *Service) RestoreItem(ref *provider.Reference) {
 }
 
 // MoveItem updates the resource location and all of its necessary fields.
-func (s *Service) MoveItem(ref *provider.Reference) {
-	ctx, stat, path := s.resInfo(ref)
-	if ctx == nil || stat == nil || path == "" {
+func (s *Service) MoveItem(ctx context.Context, ref *provider.Reference) {
+	ctx2, stat, path := s.resInfo(ctx, ref)
+	if ctx2 == nil || stat == nil || path == "" {
 		return
 	}
 
@@ -804,14 +795,10 @@ func (s *Service) MoveItem(ref *provider.Reference) {
 	}
 }
 
-func (s *Service) resInfo(ref *provider.Reference) (context.Context, *provider.StatResponse, string) {
-	ownerCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
+func (s *Service) resInfo(ctx context.Context, ref *provider.Reference) (context.Context, *provider.StatResponse, string) {
+	ownerCtx, err := getAuthContext(ctx, s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
 	if err != nil {
 		return nil, nil, ""
-	}
-
-	if ref.GetResourceId().GetStorageId() == utils.VaultStorageProviderID {
-		ownerCtx = grpcmetadata.AppendToOutgoingContext(ownerCtx, revactx.MFAOutgoingHeader, "true")
 	}
 
 	statRes, err := statResource(ownerCtx, ref, s.gatewaySelector, s.logger)

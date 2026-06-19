@@ -33,7 +33,7 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
-	hasMFA := mfa.Has(r.Context())
+	hasMFA := revactx.HasMFA(r.Context())
 	if !hasAcceptableSearch(odataReq.Query, g.config.API.IdentitySearchMinLength) {
 		if !ctxHasFullPerms {
 			// for regular user the search term must have a minimum length

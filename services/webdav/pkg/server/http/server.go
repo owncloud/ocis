@@ -9,6 +9,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	svc "github.com/owncloud/ocis/v2/services/webdav/pkg/service/v0"
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	"go-micro.dev/v4"
 )
 
@@ -38,6 +39,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
+			autoprop.NewHttpHandler(),
 			middleware.GetOtelhttpMiddleware(options.Config.Service.Name, options.TraceProvider),
 			chimiddleware.RealIP,
 			chimiddleware.RequestID,
