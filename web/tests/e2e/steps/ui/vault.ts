@@ -25,6 +25,7 @@ export async function userIsRedirectedToAuthenticatorPage({
   const world = getWorld()
   const { page } = world.actorsEnvironment.getActor({ key: stepUser })
   const vaultPage = new VaultPage(page)
+  console.log("keycloakpage urlllllllllllllllllllll", config.keycloakUrl);
   await expect(page).toHaveURL((url) => url.href.startsWith(config.keycloakUrl))
   await expect(vaultPage.authenticatorHeading).toBeVisible()
 }
@@ -44,11 +45,16 @@ export async function userAuthenticatesToVault({ stepUser }: { stepUser: string 
 /**
  * Assert user is in Vault mode
  */
-export async function userIsInVaultMode({ stepUser }: { stepUser: string }): Promise<void> {
+export async function userIsInVaultMode({
+    stepUser
+  }: {
+    stepUser: string
+  }): Promise<void> {
   const world = getWorld()
   const { page } = world.actorsEnvironment.getActor({ key: stepUser })
   const vaultPage = new VaultPage(page)
   const vaultPageUrl = `${config.baseUrlOcis}/vault`
+  console.log("vaultpage urlllllllllllllllllllll", vaultPageUrl);
   await expect(page).toHaveURL((url) => url.href.startsWith(vaultPageUrl))
   await expect(vaultPage.vaultBreadcrumb).toBeVisible()
 }
@@ -71,6 +77,7 @@ export async function userIsInDriveMode({ stepUser }: { stepUser: string }): Pro
   const { page } = world.actorsEnvironment.getActor({ key: stepUser })
   const vaultPage = new VaultPage(page)
   const drivePageUrl = `${config.baseUrlOcis}/files`
+  console.log("drivepage urlllllllllllllllllllll", drivePageUrl);
   await expect(page).toHaveURL((url) => url.href.startsWith(drivePageUrl))
   await expect(vaultPage.driveBreadcrumb).toBeVisible()
 }

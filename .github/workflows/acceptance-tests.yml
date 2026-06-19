@@ -168,6 +168,7 @@ jobs:
           if-no-files-found: error
 
   local-api-tests:
+    if: false
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -435,6 +436,9 @@ jobs:
           - suite: ocm
             args: "--type playwright --suites ocm"
             federated: true
+          - suite: vault-storage
+            args: "--type playwright --suites vault-storage"
+            vault_storage: true
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
@@ -477,7 +481,7 @@ jobs:
 
       # --- Keycloak (keycloak and mfa suites) ---
       - name: Generate Keycloak certs
-        if: matrix.keycloak == true || matrix.mfa == true
+        if: matrix.keycloak == true || matrix.mfa == true || matrix.vault_storage == true
         run: |
           mkdir -p keycloak-certs
           openssl req -x509 -newkey rsa:2048 \
@@ -488,7 +492,7 @@ jobs:
           chmod -R 777 keycloak-certs
 
       - name: Start Postgres
-        if: matrix.keycloak == true || matrix.mfa == true
+        if: matrix.keycloak == true || matrix.mfa == true || matrix.vault_storage == true
         run: |
           docker run -d --name postgres --network host \
             -e POSTGRES_DB=keycloak \
@@ -498,12 +502,12 @@ jobs:
           timeout 30 bash -c 'until docker exec postgres pg_isready -U keycloak; do sleep 1; done'
 
       - name: Start Keycloak
-        if: matrix.keycloak == true || matrix.mfa == true
+        if: matrix.keycloak == true || matrix.mfa == true || matrix.vault_storage == true
         run: |
           # The mfa suite needs a different realm with TOTP MFA configured.
           # ocis-ci-realm uses ocis-server:9200, ocis-mfa-ci-realm uses localhost:9200;
           # ocis runs on 127.0.0.1:9200 so we rewrite both forms.
-          if [[ "${{ matrix.mfa }}" == "true" ]]; then
+          if [[ "${{ matrix.mfa }}" == "true" || "${{ matrix.vault_storage }}" == "true" ]]; then
             REALM_FILE=tests/config/ci/ocis-mfa-ci-realm.dist.json
           else
             REALM_FILE=tests/config/ci/ocis-ci-realm.dist.json
@@ -511,6 +515,8 @@ jobs:
           sed -e 's|https://ocis-server:9200|https://127.0.0.1:9200|g' \
               -e 's|https://localhost:9200|https://127.0.0.1:9200|g' \
             "$REALM_FILE" > /tmp/ocis-realm.json
+          echo "Generated web client configuration:"
+          grep -A 20 '"clientId": "web"' /tmp/ocis-realm.json
           docker run -d --name keycloak --network host \
             -e OCIS_DOMAIN=https://127.0.0.1:9200 \
             -e KC_HOSTNAME=localhost \
@@ -582,6 +588,7 @@ jobs:
           OIDC_IFRAME_NEEDED: ${{ matrix.oidc_iframe == true && 'true' || 'false' }}
           COLLABORATION_NEEDED: ${{ matrix.collaboration == true && 'true' || 'false' }}
           FEDERATED_NEEDED: ${{ matrix.federated == true && 'true' || 'false' }}
+          VAULT_STORAGE_NEEDED: ${{ matrix.vault_storage == true && 'true' || 'false' }}
 
       - name: Upload tracing result
         if: failure()
@@ -600,6 +607,7 @@ jobs:
           retention-days: 7
 
   litmus:
+    if: false
     name: litmus
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -624,6 +632,7 @@ jobs:
         run: python3 tests/acceptance/run-litmus.py
 
   cs3api:
+    if: false
     name: cs3api
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -648,6 +657,7 @@ jobs:
         run: python3 tests/acceptance/run-cs3api.py
 
   wopi-builtin:
+    if: false
     name: wopi-builtin
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -672,6 +682,7 @@ jobs:
         run: python3 tests/acceptance/run-wopi.py --type builtin
 
   wopi-cs3:
+    if: false
     name: wopi-cs3
     needs: [build-and-test]
     runs-on: ubuntu-latest

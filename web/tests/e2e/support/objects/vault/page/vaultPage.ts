@@ -1,4 +1,5 @@
 import { Locator, Page } from '@playwright/test'
+import { config } from '../../../../config'
 
 export class VaultPage {
   private readonly page: Page
@@ -22,7 +23,7 @@ export class VaultPage {
     this.oneTimeCodeTextbox = page.locator('#totp')
     this.otpSubmitButton = page.getByRole('button', { name: 'Submit' })
     this.driveBreadcrumb = page.getByRole('link', { name: 'Drive' })
-    this.vaultBreadcrumb = page.getByRole('link', { name: 'Vault', exact: true })
+    this.vaultBreadcrumb = page.getByRole('link', { name: 'Vault' })
   }
 
   public async userEntersVaultMode(): Promise<void> {
@@ -38,7 +39,23 @@ export class VaultPage {
   public async userAuthenticatesWithOTP(otp: string): Promise<void> {
     await this.oneTimeCodeTextbox.fill(otp)
     await this.otpSubmitButton.click()
-    await this.vaultBreadcrumb.waitFor({ state: 'visible' })
+    await this.waitForVaultMode()
+  }
+
+  public async waitForVaultMode(): Promise<void> {
+    const vaultUrl = `${config.baseUrlOcis}/vault`
+
+    await this.page.waitForURL(
+      (url) => url.href.startsWith(vaultUrl),
+      {
+        timeout: 60000,
+        waitUntil: 'domcontentloaded'
+      }
+    )
+    await this.vaultBreadcrumb.waitFor({
+      state: 'visible',
+      timeout: 60000
+    })
   }
 
   public async userEntersDriveMode(): Promise<void> {

@@ -127,8 +127,9 @@ def main() -> int:
     oidc_iframe_needed = os.environ.get("OIDC_IFRAME_NEEDED", "").lower() == "true"
     collaboration_needed = os.environ.get("COLLABORATION_NEEDED", "").lower() == "true"
     federated_needed = os.environ.get("FEDERATED_NEEDED", "").lower() == "true"
+    vault_storage_needed = os.environ.get("VAULT_STORAGE_NEEDED", "").lower() == "true"
     # MFA mode runs ocis behind keycloak with TOTP enforced
-    keycloak_needed = keycloak_needed or mfa_needed
+    keycloak_needed = keycloak_needed or mfa_needed or vault_storage_needed
 
     repo_root = Path(__file__).resolve().parents[2]
     ocis_bin = repo_root / "ocis/bin/ocis"
@@ -306,28 +307,39 @@ def main() -> int:
 
     if keycloak_needed:
         server_env.update({
-            "OCIS_EXCLUDE_RUN_SERVICES": "idp",
-            "PROXY_AUTOPROVISION_ACCOUNTS": "true",
-            # Group sync is opt-in and does not create groups by default; the group
-            # sync e2e test relies on both being enabled so Keycloak groups appear.
-            "PROXY_AUTOPROVISION_CLAIM_GROUPS": "groups",
-            "PROXY_AUTOPROVISION_GROUP_CREATE": "true",
-            "PROXY_ROLE_ASSIGNMENT_DRIVER": "oidc",
-            "OCIS_OIDC_ISSUER": "https://localhost:8443/realms/oCIS",
-            "PROXY_OIDC_REWRITE_WELLKNOWN": "true",
-            "WEB_OIDC_CLIENT_ID": "web",
-            "PROXY_USER_OIDC_CLAIM": "preferred_username",
-            "PROXY_USER_CS3_CLAIM": "username",
-            "OCIS_ADMIN_USER_ID": "",
-            "GRAPH_ASSIGN_DEFAULT_USER_ROLE": "false",
-            "GRAPH_USERNAME_MATCH": "none",
-            "PROXY_CSP_CONFIG_FILE_LOCATION": str(repo_root / "tests/config/ci/csp.yaml"),
-            "KEYCLOAK_DOMAIN": "localhost:8443",
-            "IDM_CREATE_DEMO_USERS": "false",
+        "OCIS_EXCLUDE_RUN_SERVICES": "idp",
+        "PROXY_AUTOPROVISION_ACCOUNTS": "true",
+        # Group sync is opt-in and does not create groups by default; the group
+        # sync e2e test relies on both being enabled so Keycloak groups appear.
+        "PROXY_AUTOPROVISION_CLAIM_GROUPS": "groups",
+        "PROXY_AUTOPROVISION_GROUP_CREATE": "true",
+        "PROXY_ROLE_ASSIGNMENT_DRIVER": "oidc",
+        "OCIS_OIDC_ISSUER": "https://localhost:8443/realms/oCIS",
+        "PROXY_OIDC_REWRITE_WELLKNOWN": "true",
+        "WEB_OIDC_CLIENT_ID": "web",
+        "PROXY_USER_OIDC_CLAIM": "preferred_username",
+        "PROXY_USER_CS3_CLAIM": "username",
+        "OCIS_ADMIN_USER_ID": "",
+        "GRAPH_ASSIGN_DEFAULT_USER_ROLE": "false",
+        "GRAPH_USERNAME_MATCH": "none",
+        "PROXY_CSP_CONFIG_FILE_LOCATION": str(repo_root / "tests/config/ci/csp.yaml"),
+        "KEYCLOAK_DOMAIN": "localhost:8443",
+        "IDM_CREATE_DEMO_USERS": "false",
+        # Explicitly configure the web OIDC redirect origin
+        "WEB_OIDC_AUTHORITY": "https://localhost:8443/realms/oCIS",
+        "WEB_OIDC_REDIRECT_URI": f"{ocis_url}/web-oidc-callback",
         })
 
     if mfa_needed:
         server_env.update({
+            "OCIS_MFA_ENABLED": "true",
+            "WEB_OIDC_SCOPE": "openid profile email acr",
+        })
+
+    if vault_storage_needed:
+        server_env.update({
+            "OCIS_ENABLE_VAULT_MODE": "true",
+            "FRONTEND_ENABLE_VAULT_MODE": "true",
             "OCIS_MFA_ENABLED": "true",
             "WEB_OIDC_SCOPE": "openid profile email acr",
         })
@@ -396,6 +408,18 @@ def main() -> int:
 
     procs = []
 
+    print("========== OCIS CONFIG ==========")
+    print(f"OCIS_URL: {ocis_url}")
+    print(f"WEB_UI_CONFIG_FILE: {gha_web_cfg_path}")
+
+    if gha_web_cfg_path.exists():
+        print("========== WEB UI CONFIG ==========")
+        print(gha_web_cfg_path.read_text())
+        print("====================================")
+
+    print(f"OCIS_OIDC_ISSUER: {server_env.get('OCIS_OIDC_ISSUER')}")
+    print(f"KEYCLOAK_DOMAIN: {server_env.get('KEYCLOAK_DOMAIN')}")
+    print("====================================")
     print("Starting ocis...")
     if keycloak_needed:
         # external IdP: run ocis server directly (no ociswrapper)
@@ -428,7 +452,37 @@ def main() -> int:
 
     try:
         wait_for(lambda: ocis_healthy(ocis_url, use_basic_auth=not keycloak_needed), 300, "ocis")
+        print(f"Web UI config: {gha_web_cfg_path}")
+
+        if gha_web_cfg_path.exists():
+            print(gha_web_cfg_path.read_text())
         print("ocis ready.")
+
+        print("========== OIDC DISCOVERY ==========")
+
+        subprocess.run(
+            [
+                "curl",
+                "-k",
+                "-sS",
+                f"{ocis_url}/.well-known/openid-configuration",
+            ],
+            check=False,
+        )
+
+        print("\n========== KEYCLOAK OIDC ==========")
+
+        subprocess.run(
+            [
+                "curl",
+                "-k",
+                "-sS",
+                "https://localhost:8443/realms/oCIS/.well-known/openid-configuration",
+            ],
+            check=False,
+        )
+
+        print("\n====================================")
 
         if tika_needed:
             wait_for(lambda: tika_warm(tika_url), 60, "tika warm-up")
@@ -515,6 +569,7 @@ def main() -> int:
             "REPORT_TRACING": "false",
             "NODE_EXTRA_CA_CERTS": str(ocis_cert),
             "BROWSER": "chromium",
+            "KEYCLOAK_HOST": "localhost:8443",
         }
 
         trusted_certs = [ocis_cert]
@@ -530,6 +585,41 @@ def main() -> int:
 
         if mfa_needed:
             playwright_env["MFA"] = "true"
+
+        if vault_storage_needed:
+            vault_data_dir = Path.home() / ".ocis/storage/users-vault"
+            vault_data_dir.mkdir(parents=True, exist_ok=True)
+
+            vault_env = {
+                **server_env,
+                "STORAGE_USERS_ENABLE_VAULT_MODE": "true",
+                "STORAGE_USERS_SERVICE_NAME": "storage-users-vault",
+                "STORAGE_USERS_GRPC_ADDR": "127.0.0.1:19285",
+                "STORAGE_USERS_HTTP_ADDR": "127.0.0.1:19286",
+                "STORAGE_USERS_DATA_SERVER_URL": "http://127.0.0.1:19286/data",
+                "STORAGE_USERS_DEBUG_ADDR": "127.0.0.1:19287",
+                "STORAGE_USERS_OCIS_ROOT": str(vault_data_dir),
+                "STORAGE_USERS_EVENTS_CONSUMER_GROUP": "vault-dcfs",
+            }
+
+            print("Starting storage-users-vault...")
+
+            vault_proc = subprocess.Popen(
+                [str(ocis_bin), "storage-users", "server"],
+                env=vault_env,
+            )
+            procs.append(vault_proc)
+
+            wait_for(
+                lambda: subprocess.run(
+                    ["curl", "-sf", "http://127.0.0.1:19287/healthz"],
+                    capture_output=True,
+                ).returncode == 0,
+                120,
+                "storage-users-vault",
+            )
+
+            print("vault ready.")
 
         if federated_needed:
             playwright_env["FEDERATED_BASE_URL_OCIS"] = "localhost:10200"
