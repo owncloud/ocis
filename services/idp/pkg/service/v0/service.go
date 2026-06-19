@@ -295,24 +295,29 @@ func (idp *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handl
 
 	idp.mux = chi.NewMux()
 	idp.mux.Use(options.Middleware...)
-
 	idp.mux.Use(middleware.Static(
 		"/signin/v1/",
 		idp.assets,
 		idp.tp,
 	))
 
-	// Login and static pages (must be before Mount so chi matches first)
-	idp.mux.Get("/signin/v1/identifier", idp.Index())
-	idp.mux.Get("/signin/v1/identifier/", idp.Index())
-	idp.mux.Get("/signin/v1/identifier/index.html", idp.Index())
-	idp.mux.Get("/signin/v1/welcome", idp.Welcome())
-	idp.mux.Get("/signin/v1/goodbye", idp.Goodbye())
-	idp.mux.Get("/signin/v1/consent", idp.Consent())
-	idp.mux.Get("/signin/v1/loginerror", idp.LoginError())
-	idp.mux.Get("/signin/v1/chooseaccount", idp.Chooseaccount())
+	idp.mux.Group(func(r chi.Router) {
+		// Login and static pages (must be before Mount so chi matches first)
+		r.Get("/signin/v1/identifier", idp.Index())
+		r.Get("/signin/v1/identifier/", idp.Index())
+		r.Get("/signin/v1/identifier/index.html", idp.Index())
+		r.Get("/signin/v1/welcome", idp.Welcome())
+		r.Get("/signin/v1/goodbye", idp.Goodbye())
+		r.Get("/signin/v1/consent", idp.Consent())
+		r.Get("/signin/v1/loginerror", idp.LoginError())
+		r.Get("/signin/v1/chooseaccount", idp.Chooseaccount())
+	})
 
-	idp.mux.Mount("/", gm)
+	idp.mux.Group(func(r chi.Router) {
+		// routes handled by lico
+		r.Use(middleware.CheckRedirect(options.Config, options.Logger))
+		r.Mount("/", gm)
+	})
 
 	_ = chi.Walk(idp.mux, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		options.Logger.Debug().Str("method", method).Str("route", route).Int("middlewares", len(middlewares)).Msg("serving endpoint")
@@ -463,8 +468,8 @@ func (idp *IDP) LoginError() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		base, t := idp.basePage(r, "Login Error - ownCloud", "Login Error")
 		allowedMessages := map[string]string{
-			"access_denied":    t.Get("Access denied."),
-			"session_expired":  t.Get("Your session has expired."),
+			"access_denied":        t.Get("Access denied."),
+			"session_expired":      t.Get("Your session has expired."),
 			"interaction_required": t.Get("Login required."),
 		}
 		msg := allowedMessages[r.URL.Query().Get("code")]
