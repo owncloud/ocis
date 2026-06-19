@@ -262,9 +262,14 @@ func (s *service) RemoveShare(ctx context.Context, req *collaboration.RemoveShar
 	user := ctxpkg.ContextMustGetUser(ctx)
 	share, err := s.sm.GetShare(ctx, req.Ref)
 	if err != nil {
-		return &collaboration.RemoveShareResponse{
-			Status: status.NewInternal(ctx, "error getting share"),
-		}, nil
+		var st *rpc.Status
+		switch err.(type) {
+		case errtypes.IsNotFound:
+			st = status.NewNotFound(ctx, err.Error())
+		default:
+			st = status.NewInternal(ctx, "error getting share")
+		}
+		return &collaboration.RemoveShareResponse{Status: st}, nil
 	}
 
 	gatewayClient, err := s.gatewaySelector.Next()

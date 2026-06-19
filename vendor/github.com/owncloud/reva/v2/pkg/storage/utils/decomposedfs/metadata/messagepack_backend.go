@@ -29,6 +29,7 @@ import (
 	"strings"
 
 	"github.com/google/renameio/v2"
+	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/storage/cache"
 	"github.com/pkg/xattr"
 	"github.com/rogpeppe/go-internal/lockedfile"
@@ -263,7 +264,10 @@ func (b MessagePackBackend) loadAttributes(ctx context.Context, path string, sou
 	err = b.metaCache.PushToCache(b.cacheKey(path), attribs)
 	subspan.End()
 	if err != nil {
-		return nil, err
+		// The attributes were read successfully from disk. A failure to
+		// write them back into the cache (e.g. a dead NATS connection) must
+		// not fail the read - log it and return the data we already have.
+		appctx.GetLogger(ctx).Warn().Err(err).Str("path", path).Msg("failed to write attributes to cache")
 	}
 
 	return attribs, nil
