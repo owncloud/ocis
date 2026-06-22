@@ -31,13 +31,13 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/pkg/password"
 	"github.com/owncloud/reva/v2/pkg/permission"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/sharedconf"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/grants"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
@@ -352,9 +352,14 @@ func (s *service) RemovePublicShare(ctx context.Context, req *link.RemovePublicS
 	user := ctxpkg.ContextMustGetUser(ctx)
 	ps, err := s.sm.GetPublicShare(ctx, user, req.GetRef(), false)
 	if err != nil {
-		return &link.RemovePublicShareResponse{
-			Status: status.NewInternal(ctx, "error loading public share"),
-		}, err
+		var st *rpc.Status
+		switch err.(type) {
+		case errtypes.IsNotFound:
+			st = status.NewNotFound(ctx, err.Error())
+		default:
+			st = status.NewInternal(ctx, "error loading public share")
+		}
+		return &link.RemovePublicShareResponse{Status: st}, nil
 	}
 
 	sRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: ps.ResourceId}})
