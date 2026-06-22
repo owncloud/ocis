@@ -91,3 +91,13 @@ if (!\defined('ACCEPTANCE_TEST_DIR_ON_REMOTE_SERVER')) {
 if (!\defined('TEMPORARY_STORAGE_DIR_ON_REMOTE_SERVER')) {
 	\define('TEMPORARY_STORAGE_DIR_ON_REMOTE_SERVER', ACCEPTANCE_TEST_DIR_ON_REMOTE_SERVER . '/server_tmp');
 }
+
+// Max HTTP request retry count
+if (!\defined('MAX_REQUEST_RETRY_COUNT')) {
+	\define('MAX_REQUEST_RETRY_COUNT', 10);
+}
+
+// Standard request polling interval in seconds
+if (!\defined('STANDARD_REQUEST_POLLING_INTERVAL_SEC')) {
+	\define('STANDARD_REQUEST_POLLING_INTERVAL_SEC', 1);
+}
