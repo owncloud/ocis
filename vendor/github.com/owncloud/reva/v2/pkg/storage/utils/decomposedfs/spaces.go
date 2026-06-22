@@ -1269,8 +1269,7 @@ func canDeleteSpace(ctx context.Context, spaceID string, typ string, purge bool,
 	}
 
 	// space managers are allowed to disable and delete their project spaces
-	rp, err := p.AssemblePermissions(ctx, n)
-	if err == nil && permissions.IsManager(rp) {
+	if rp, err := p.AssemblePermissions(ctx, n); err == nil && permissions.IsManager(rp) {
 		return nil
 	}
 
@@ -1282,11 +1281,6 @@ func canDeleteSpace(ctx context.Context, spaceID string, typ string, purge bool,
 	// Drive.ReadWriteEnabled allows to disable a space
 	if !purge && p.SpaceAbility(ctx, spaceID) {
 		return nil
-	}
-
-	// active space, user has no grant at all: hide existence rather than reveal it
-	if err == nil && !rp.GetStat() && !n.IsDisabled(ctx) {
-		return errtypes.NotFound(spaceID)
 	}
 
 	return errtypes.PermissionDenied(fmt.Sprintf("user is not allowed to delete space %s", n.ID))

@@ -147,13 +147,22 @@ func OpenSnapDiff(config SnapDiffConfig) (*SnapDiffInfo, error) {
 
 	rawCephSnapDiffInfo := &C._ceph_snapdiff_info{}
 
+	cRootPath := C.CString(config.RootPath)
+	defer C.free(unsafe.Pointer(cRootPath))
+	cRelPath := C.CString(config.RelPath)
+	defer C.free(unsafe.Pointer(cRelPath))
+	cSnap1 := C.CString(config.Snap1)
+	defer C.free(unsafe.Pointer(cSnap1))
+	cSnap2 := C.CString(config.Snap2)
+	defer C.free(unsafe.Pointer(cSnap2))
+
 	ret := C.open_snapdiff_dlsym(
 		cephOpenSnapDiff,
 		config.CMount.mount,
-		C.CString(config.RootPath),
-		C.CString(config.RelPath),
-		C.CString(config.Snap1),
-		C.CString(config.Snap2),
+		cRootPath,
+		cRelPath,
+		cSnap1,
+		cSnap2,
 		rawCephSnapDiffInfo)
 
 	if ret != 0 {
