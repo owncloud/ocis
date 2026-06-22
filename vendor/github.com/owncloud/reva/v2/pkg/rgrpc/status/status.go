@@ -213,6 +213,8 @@ func NewStatusFromErrType(ctx context.Context, msg string, err error) *rpc.Statu
 		return NewTooManyRequests(ctx, msg+": "+err.Error())
 	case errtypes.TooEarly:
 		return NewTooEarly(ctx, msg+": "+err.Error())
+	case errtypes.ResourceProcessing:
+		return NewTooEarly(ctx, msg+": "+err.Error())
 	}
 
 	// map GRPC status codes coming from the auth middleware

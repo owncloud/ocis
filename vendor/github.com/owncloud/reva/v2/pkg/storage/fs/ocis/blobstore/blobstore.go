@@ -53,6 +53,7 @@ func New(root string) (*Blobstore, error) {
 }
 
 // Upload stores some data in the blobstore under the given key
+// TODO(OCISDEV-901): remove once FinishUploadDecomposed is replaced by the upload coordinator (OCISDEV-900).
 func (bs *Blobstore) Upload(node *node.Node, source string) error {
 	if node.BlobID == "" {
 		return ErrBlobIDEmpty
@@ -100,6 +101,48 @@ func (bs *Blobstore) Upload(node *node.Node, source string) error {
 		return errors.Wrapf(err, "could not sync blob '%s' to disk", dest)
 	}
 
+	return nil
+}
+
+// UploadFromReader stores data from a reader in the blobstore under the given key.
+// It buffers to a temp file on the same filesystem as the destination so that the
+// final placement is an atomic os.Rename.
+func (bs *Blobstore) UploadFromReader(node *node.Node, r io.Reader, size int64) error {
+	if node.BlobID == "" {
+		return ErrBlobIDEmpty
+	}
+
+	dest := bs.Path(node)
+
+	if err := os.MkdirAll(filepath.Dir(dest), 0700); err != nil {
+		return errors.Wrap(err, "Decomposedfs: oCIS blobstore: error creating parent folders for blob")
+	}
+
+	tmp, err := os.CreateTemp(filepath.Dir(dest), "reva-blobstore-upload-*")
+	if err != nil {
+		return errors.Wrap(err, "Decomposedfs: oCIS blobstore: error creating temp file for upload")
+	}
+	tmpName := tmp.Name()
+	defer func() {
+		tmp.Close()
+		os.Remove(tmpName)
+	}()
+
+	w := bufio.NewWriter(tmp)
+	if _, err = io.Copy(w, r); err != nil {
+		return errors.Wrapf(err, "could not write blob to temp file '%s'", tmpName)
+	}
+	if err = w.Flush(); err != nil {
+		return errors.Wrapf(err, "could not flush blob temp file '%s'", tmpName)
+	}
+	if err = tmp.Sync(); err != nil {
+		return errors.Wrapf(err, "could not sync blob temp file '%s'", tmpName)
+	}
+	tmp.Close()
+
+	if err = os.Rename(tmpName, dest); err != nil {
+		return errors.Wrapf(err, "could not rename blob temp file to '%s'", dest)
+	}
 	return nil
 }
 

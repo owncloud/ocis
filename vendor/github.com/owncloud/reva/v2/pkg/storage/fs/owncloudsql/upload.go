@@ -31,6 +31,7 @@ import (
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/google/uuid"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/conversions"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
@@ -41,7 +42,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/storage/utils/chunking"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/templates"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
@@ -167,6 +167,14 @@ func (fs *owncloudsqlfs) InitiateUpload(ctx context.Context, ref *provider.Refer
 		"simple": info.ID,
 		"tus":    info.ID,
 	}, nil
+}
+
+func (fs *owncloudsqlfs) MarkProcessing(ctx context.Context, ref *provider.Reference, processing bool, sessionID string) error {
+	return errtypes.NotSupported("op not supported")
+}
+
+func (fs *owncloudsqlfs) CommitUpload(ctx context.Context, ref *provider.Reference, source storage.UploadSource) (*provider.ResourceInfo, error) {
+	return nil, errtypes.NotSupported("op not supported")
 }
 
 // UseIn tells the tus upload middleware which extensions it supports.

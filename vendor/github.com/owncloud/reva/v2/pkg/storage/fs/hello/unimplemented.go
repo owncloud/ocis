@@ -84,6 +84,16 @@ func (fs *hellofs) InitiateUpload(ctx context.Context, ref *provider.Reference, 
 	return nil, errtypes.NotSupported("hellofs: initiate upload not supported")
 }
 
+// MarkProcessing toggles a processing flag on the resource.
+func (fs *hellofs) MarkProcessing(ctx context.Context, ref *provider.Reference, processing bool, sessionID string) error {
+	return errtypes.NotSupported("hellofs: mark processing not supported")
+}
+
+// CommitUpload writes the staged bytes from source to the resource at ref.
+func (fs *hellofs) CommitUpload(ctx context.Context, ref *provider.Reference, source storage.UploadSource) (*provider.ResourceInfo, error) {
+	return nil, errtypes.NotSupported("hellofs: commit upload not supported")
+}
+
 // grants
 
 // DenyGrant marks a resource as denied for a recipient
