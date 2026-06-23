@@ -259,10 +259,28 @@ func (c *cs3backend) UpdateUserIfNeeded(ctx context.Context, user *cs3.User, cla
 	return nil
 }
 
+// groupsClaimPresent reports whether the configured groups claim is present and
+// non-null in the token claims. An absent or null claim must not be treated as
+// an empty group list, otherwise the user would be removed from all groups.
+func groupsClaimPresent(claims map[string]interface{}, claimName string) bool {
+	v, ok := claims[claimName]
+	return ok && v != nil
+}
+
 // SyncGroupMemberships maintains a users group memberships based on an OIDC claim
 func (c *cs3backend) SyncGroupMemberships(ctx context.Context, user *cs3.User, claims map[string]interface{}) error {
 	if c.autoProvisionClaims.Groups == "" {
 		// do not sync groups when claim is not set
+		return nil
+	}
+
+	if !groupsClaimPresent(claims, c.autoProvisionClaims.Groups) {
+		// The token does not carry the groups claim (e.g. it was issued for an
+		// OIDC client that has no groups mapper configured). Treating an absent
+		// claim as an empty group list would remove the user from all of their
+		// groups, so skip the sync entirely. A present-but-empty claim is a
+		// legitimate "no groups" signal and still triggers reconciliation.
+		c.logger.Debug().Msg("groups claim not present in token, skipping group membership sync")
 		return nil
 	}
 
