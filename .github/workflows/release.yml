@@ -14,21 +14,16 @@ on:
         default: ''
 
 env:
-  PRODUCTION_RELEASE_TAGS: '5.0,7,8'
-  DOCKER_REPO_ROLLING: owncloud/ocis-rolling
-  DOCKER_REPO_PRODUCTION: owncloud/ocis
   NODE_VERSION: '24'
   PNPM_VERSION: '10.28.1'
-  GOLANG_BUILD_IMAGE: 'golang:1.25.10-alpine3.23@sha256:8d22e29d960bc50cd025d93d5b7c7d220b1ee9aa7a239b3c8f55a57e987e8d45'
+  GOLANG_BUILD_IMAGE: 'golang:1.25.11-alpine3.23@sha256:c05ba4b73604069d376c4f41346b05374335b5ca0c46fb6dfede5a59f5196931'
 
 jobs:
   determine-release-type:
     runs-on: ubuntu-latest
     outputs:
       version:       ${{ steps.info.outputs.version }}
-      is_production: ${{ steps.info.outputs.is_production }}
       is_prerelease: ${{ steps.info.outputs.is_prerelease }}
-      docker_repos:  ${{ steps.info.outputs.docker_repos }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         if: ${{ github.ref_type == 'branch' || (github.event_name == 'workflow_dispatch' && inputs.version_override == '') }}
@@ -61,23 +56,10 @@ jobs:
             VERSION="${GITHUB_REF#refs/tags/v}"
           fi
 
-          IS_PRODUCTION=false
-          for TAG in ${PRODUCTION_RELEASE_TAGS//,/ }; do
-            [[ "$VERSION" == "$TAG"* ]] && IS_PRODUCTION=true && break
-          done
-
           [[ "$VERSION" == *"-"* ]] && IS_PRERELEASE=true || IS_PRERELEASE=false
 
-          if [[ "$IS_PRODUCTION" == "true" && "$IS_PRERELEASE" == "false" ]]; then
-            REPOS=[\"$DOCKER_REPO_ROLLING\",\"$DOCKER_REPO_PRODUCTION\"]
-          else
-            REPOS=[\"$DOCKER_REPO_ROLLING\"]
-          fi
-
           echo "version=$VERSION"             >> $GITHUB_OUTPUT
-          echo "is_production=$IS_PRODUCTION" >> $GITHUB_OUTPUT
           echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
-          echo "docker_repos=$REPOS"          >> $GITHUB_OUTPUT
 
   generate-code:
     runs-on: ubuntu-latest
@@ -112,14 +94,16 @@ jobs:
             !.git
           retention-days: 1
 
+  # Builds the release image locally and runs the Trivy security gate against it.
+  # Image publishing to Docker Hub happens in a separate repository; this job only
+  # builds (load, no push) so the vulnerability gate still blocks a bad release.
   docker-build:
-    name: docker-build (${{ matrix.arch }}, ${{ matrix.repo }})
+    name: docker-build (${{ matrix.arch }})
     runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     needs: [determine-release-type, generate-code, security-scan-trivy]
     strategy:
       matrix:
         arch: [amd64, arm64]
-        repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
@@ -127,10 +111,6 @@ jobs:
           name: generated-code
           path: .
       - uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
-      - uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - id: goversion
         uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
         with:
@@ -148,10 +128,9 @@ jobs:
       - id: tags
         run: |
           VERSION="${{ needs.determine-release-type.outputs.version }}"
-          REPO="${{ matrix.repo }}"
           ARCH="${{ matrix.arch }}"
           printf "tags<<EOF\n%s\nEOF\n" \
-            "${REPO}:${VERSION}-linux-${ARCH}" >> $GITHUB_OUTPUT
+            "owncloud/ocis:${VERSION}-linux-${ARCH}" >> $GITHUB_OUTPUT
       - id: build
         uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
         with:
@@ -183,80 +162,6 @@ jobs:
         run: |
           echo "::error title=Security scan blocked release::Image ${{ steps.tags.outputs.tags }} has HIGH or CRITICAL vulnerabilities (see Trivy report above). Fix all findings before releasing."
           exit 1
-      - name: push
-        if: steps.trivy.outcome == 'success'
-        run: docker push ${{ steps.tags.outputs.tags }}
-
-  docker-scan:
-    name: docker-scan (${{ matrix.arch }}, ${{ matrix.repo }})
-    runs-on: ubuntu-latest
-    needs: [determine-release-type, docker-build]
-    strategy:
-      matrix:
-        arch: [amd64]
-        repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
-        id: trivy
-        continue-on-error: true
-        with:
-          image-ref: ${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-${{ matrix.arch }}
-          format: table
-          exit-code: 1
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          skip-files: /usr/bin/gomplate,/usr/bin/wait-for
-          hide-progress: true
-        env:
-          TRIVY_IGNOREFILE: .trivyignore
-
-      - name: Block on vulnerabilities
-        if: steps.trivy.outcome == 'failure'
-        run: |
-          echo "::error title=Security scan blocked release::Image ${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-${{ matrix.arch }} has HIGH or CRITICAL vulnerabilities (see Trivy report above). Fix all findings before releasing."
-          exit 1
-
-  docker-manifest:
-    name: docker-manifest (${{ matrix.repo }})
-    runs-on: ubuntu-latest
-    needs: [determine-release-type, docker-build, docker-scan]
-    strategy:
-      matrix:
-        repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
-    steps:
-      - uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - if: ${{ contains(matrix.repo, 'rolling') }}
-        run: |
-          docker buildx imagetools create \
-            -t "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}" \
-            "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-amd64" \
-            "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-arm64"
-      - if: ${{ !contains(matrix.repo, 'rolling') }}
-        run: |
-          docker buildx imagetools create \
-            -t "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}" \
-            "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-amd64" \
-            "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-arm64"
-
-  docker-readme:
-    name: docker-readme (${{ matrix.repo }})
-    runs-on: ubuntu-latest
-    needs: [determine-release-type, docker-manifest]
-    strategy:
-      matrix:
-        repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa # v5.0.0
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: ${{ matrix.repo }}
-          readme-filepath: ocis/README.md
 
   build-binaries:
     name: build-binaries (${{ matrix.os }})
@@ -348,7 +253,7 @@ jobs:
 
   create-github-release:
     runs-on: ubuntu-latest
-    needs: [determine-release-type, build-binaries, license-check, generate-changelog, security-scan-trivy, docker-readme]
+    needs: [determine-release-type, build-binaries, license-check, generate-changelog, security-scan-trivy, docker-build]
     steps:
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
@@ -380,9 +285,6 @@ jobs:
       - determine-release-type
       - generate-code
       - docker-build
-      - docker-scan
-      - docker-manifest
-      - docker-readme
       - build-binaries
       - security-scan-trivy
       - license-check
@@ -406,7 +308,7 @@ jobs:
           python3 scripts/audit-release.py \
             --version "${{ needs.determine-release-type.outputs.version }}" \
             --dir release-assets/ \
-            --github-release --docker
+            --github-release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -417,9 +319,6 @@ jobs:
       - determine-release-type
       - generate-code
       - docker-build
-      - docker-scan
-      - docker-manifest
-      - docker-readme
       - build-binaries
       - security-scan-trivy
       - license-check
