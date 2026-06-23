@@ -52,7 +52,7 @@ const (
 type DriveItemPermissionsProvider interface {
 	Invite(ctx context.Context, resourceId *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
 	SpaceRootInvite(ctx context.Context, driveID *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
-	ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId, listFederatedRoles, selectRoles bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
+	ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId, listFederatedRoles, selectRoles, selectActions bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
 	ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
 	DeletePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string) error
 	DeleteSpaceRootPermission(ctx context.Context, driveID *storageprovider.ResourceId, permissionID string) error
@@ -390,7 +390,7 @@ func (s DriveItemPermissionsService) SpaceRootInvite(ctx context.Context, driveI
 }
 
 // ListPermissions lists the permissions of a driveItem
-func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId, listFederatedRoles, selectRoles bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId, listFederatedRoles, selectRoles, selectActions bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
 
 	ctx, span := s.tp.Tracer("graph").Start(ctx, "ListPermissions")
 	defer span.End()
@@ -440,6 +440,13 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 		// drop the actions
 		collectionOfPermissions.LibreGraphPermissionsActionsAllowedValues = nil
 		// no need to fetch shares, we are only interested in the roles
+		return collectionOfPermissions, nil
+	}
+
+	if selectActions {
+		// drop the roles
+		collectionOfPermissions.LibreGraphPermissionsRolesAllowedValues = nil
+		// no need to fetch shares, we are only interested in the actions
 		return collectionOfPermissions, nil
 	}
 
@@ -527,7 +534,7 @@ func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Contex
 	}
 
 	rootResourceID := space.GetRoot()
-	return s.ListPermissions(ctx, rootResourceID, false, false) // federated roles are not supported for spaces
+	return s.ListPermissions(ctx, rootResourceID, false, false, false) // federated roles are not supported for spaces
 }
 
 // GetPermission returns a single permission of a drive item identified by permissionID
@@ -536,7 +543,7 @@ func (s DriveItemPermissionsService) GetPermission(ctx context.Context, itemID *
 	defer span.End()
 
 	// Reuse ListPermissions to obtain all permissions and select the requested one
-	collection, err := s.ListPermissions(ctx, itemID, false, false)
+	collection, err := s.ListPermissions(ctx, itemID, false, false, false)
 	if err != nil {
 		return libregraph.Permission{}, err
 	}
@@ -887,9 +894,14 @@ func (api DriveItemPermissionsApi) ListPermissions(w http.ResponseWriter, r *htt
 		selectRoles = true
 	}
 
+	var selectActions bool
+	if GetSelectParam(r) == "@libre.graph.permissions.actions.allowedValues" {
+		selectActions = true
+	}
+
 	ctx := r.Context()
 
-	permissions, err := api.driveItemPermissionsService.ListPermissions(ctx, itemID, listFederatedRoles, selectRoles)
+	permissions, err := api.driveItemPermissionsService.ListPermissions(ctx, itemID, listFederatedRoles, selectRoles, selectActions)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
