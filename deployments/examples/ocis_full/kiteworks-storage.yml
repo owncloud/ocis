@@ -5,7 +5,7 @@ services:
       NATS_NATS_HOST: 0.0.0.0
       SETTINGS_GRPC_ADDR: ocis:9191
       # register the kiteworks storage-users sidecar in the gateway storage registry
-      GATEWAY_STORAGE_KITEWORKS_ENDPOINT: storage-users-kiteworks:9460
+      GATEWAY_STORAGE_KITEWORKS_ENDPOINT: dns:///storage-users-kiteworks:9460
       GATEWAY_STORAGE_KITEWORKS_MOUNT_ID: ${KITEWORKS_MOUNT_ID:-aa309def-b364-417b-8e41-85b8a9393c4b}
 
   storage-users-kiteworks:

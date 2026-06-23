@@ -211,7 +211,7 @@ func (d *Driver) nodeMD(ctx context.Context, nodeID, spaceID, spaceRootPath stri
 		return d.toResourceInfo(fi, spaceID, spaceRootPath), nil
 	}
 	var ce *kwlib.ClientError
-	if !errors.As(err, &ce) || ce.StatusCode != http.StatusNotFound {
+	if !errors.As(err, &ce) || (ce.StatusCode != http.StatusNotFound && ce.StatusCode != http.StatusForbidden) {
 		return nil, err
 	}
 	fi, err = c.GetFileByID(nodeID)
@@ -242,7 +242,11 @@ func (d *Driver) ListFolder(ctx context.Context, ref *provider.Reference, _, _ [
 
 	infos := make([]*provider.ResourceInfo, 0, len(items))
 	for i := range items {
-		infos = append(infos, d.toResourceInfo(&items[i], spaceID, rootPath))
+		ri := d.toResourceInfo(&items[i], spaceID, rootPath)
+		// ocdav does path.Join(requestPath, info.Path) for ListFolder results,
+		// so Path must be just the filename — not the space-root-relative path.
+		ri.Path = ri.Name
+		infos = append(infos, ri)
 	}
 	return infos, nil
 }

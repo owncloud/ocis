@@ -57,11 +57,24 @@ docker compose -f docker-compose.yml -f ocis.yml -f kiteworks-storage.yml up -d
 **Verify:**
 ```bash
 # Kiteworks folders appear as project spaces alongside the personal decomposedfs space
-curl -su admin:admin "https://${OCIS_DOMAIN}/graph/v1.0/me/drives" \
-  | jq '.value[] | {name, driveType}'
+curl -ksu admin:admin "https://${OCIS_DOMAIN}/graph/v1.0/me/drives" \
+  | jq '.value[] | {id, name, driveType}'
 
 # Creating a new project space must succeed (HTTP 201) and land on decomposedfs
-curl -su admin:admin -X POST "https://${OCIS_DOMAIN}/graph/v1.0/drives" \
+curl -ksu admin:admin -X POST "https://${OCIS_DOMAIN}/graph/v1.0/drives" \
   -H "Content-Type: application/json" \
   -d '{"name":"my space","driveType":"project"}' -w "\nHTTP %{http_code}\n"
+
+# List files in a Kiteworks space → HTTP 207 (smoke-tests KW ListFolder)
+# Use the space id from the drives listing above (the one with driveType "project" whose id
+# starts with the KITEWORKS_MOUNT_ID, default aa309def-b364-417b-8e41-85b8a9393c4b)
+curl -ksu admin:admin -X PROPFIND \
+  "https://${OCIS_DOMAIN}/dav/spaces/<kw-space-id>/" \
+  -H "Depth: 1" -w "\nHTTP %{http_code}\n"
+
+# Download a file from a Kiteworks space → HTTP 200 (smoke-tests KW Download)
+# Use any file path from the PROPFIND listing above
+curl -ksu admin:admin \
+  "https://${OCIS_DOMAIN}/dav/spaces/<kw-space-id>/<subfolder>/<filename>" \
+  -w "\nHTTP %{http_code}\n"
 ```
