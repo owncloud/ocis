@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"google.golang.org/grpc"
@@ -25,16 +26,29 @@ var _ = Describe("Authenticating requests", Label("AppAuthAuthenticator"), func(
 				"com.owncloud.api.gateway",
 				func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
 					return mockGatewayClient{
-						AuthenticateFunc: func(authType, clientID, clientSecret string) (string, rpcv1beta1.Code) {
+						AuthenticateFunc: func(authType, clientID, clientSecret string) *gateway.AuthenticateResponse {
 							if authType != "appauth" {
-								return "", rpcv1beta1.Code_CODE_NOT_FOUND
+								return &gateway.AuthenticateResponse{
+									Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_NOT_FOUND},
+								}
 							}
 
 							if clientID == "test-user" && clientSecret == "AppPassword" {
-								return "reva-token", rpcv1beta1.Code_CODE_OK
+								return &gateway.AuthenticateResponse{
+									Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_OK},
+									Token:  "reva-token",
+									User: &userv1beta1.User{
+										Id:          &userv1beta1.UserId{Idp: "testIDP", OpaqueId: "abcd-1234", Type: userv1beta1.UserType_USER_TYPE_PRIMARY},
+										Username:    "alice",
+										Mail:        "alice@example.prv",
+										DisplayName: "Alice Wong",
+									},
+								}
 							}
 
-							return "", rpcv1beta1.Code_CODE_NOT_FOUND
+							return &gateway.AuthenticateResponse{
+								Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_NOT_FOUND},
+							}
 						},
 					}
 				},
