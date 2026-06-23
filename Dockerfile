@@ -28,7 +28,7 @@ COPY --from=generate /ocis /ocis
 WORKDIR /ocis/ocis
 RUN make ci-go-generate build ENABLE_VIPS=true
 
-FROM alpine:3.23.4
+FROM alpine:3.24.1
 
 RUN apk add --no-cache attr ca-certificates curl mailcap tree \
     && apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community "vips=8.18.2-r0" \
