@@ -6,6 +6,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 )
@@ -48,6 +49,16 @@ func (m AppAuthAuthenticator) Authenticate(r *http.Request) (*http.Request, bool
 	}
 
 	r.Header.Set(revactx.TokenHeader, authenticateResponse.GetToken())
+
+	user := authenticateResponse.GetUser()
+	// fake oidc claims for the account resolver
+	claims := map[string]interface{}{
+		oidc.Iss:               user.Id.Idp,
+		oidc.PreferredUsername: user.Username,
+		oidc.Email:             user.Mail,
+		oidc.OwncloudUUID:      user.Id.OpaqueId,
+	}
+	r = r.WithContext(oidc.NewContext(r.Context(), claims))
 
 	return r, true
 }
