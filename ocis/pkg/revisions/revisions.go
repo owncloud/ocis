@@ -164,8 +164,13 @@ func PurgeRevisions(nodes <-chan string, bs DelBlobstore, dryRun, verbose bool) 
 
 		if !dryRun {
 			if blobID != "" {
-				//  TODO: needs spaceID for s3ng
-				if err := bs.Delete(&node.Node{BlobID: blobID}); err != nil {
+				// The blobstore derives the blob path from the node's SpaceID and
+				// BlobID, so the SpaceID must be set. Without it the wrong (empty
+				// space) path is targeted: the s3ng delete is a no-op and the
+				// posix delete misses, leaving the blob orphaned while the
+				// revision metadata below is still removed.
+				spaceID, _ := getIDsFromPath(d)
+				if err := bs.Delete(&node.Node{SpaceID: spaceID, BlobID: blobID}); err != nil {
 					fmt.Printf("error deleting blob %s: %v\n", blobID, err)
 					continue
 				}
