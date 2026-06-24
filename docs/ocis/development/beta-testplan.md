@@ -46,7 +46,7 @@ Prerequisite:
 
 documentation resources:
   - [configure ocis with LDAP](https://owncloud.dev/ocis/deployment/ocis_ldap/)
-  - [sharing API is compatible to ownCloud Classic 10](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
+  - [sharing API is compatible to ownCloud Classic](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
   - [webDav operations](#webdav)
 
 | Test Case                                                                                             | Expected Result                                                                       | Comment |
@@ -65,7 +65,7 @@ documentation resources:
 should be tried in various ways and in different environments
 
 documentation resources:
-- [sharing API is compatible to ownCloud Classic 10](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
+- [sharing API is compatible to ownCloud Classic](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
 - [webDav operations](#webdav)
 
 | Test Case                                                                             | Expected Result                                                       | Comment                                                   |
@@ -85,7 +85,7 @@ documentation resources:
 - create users and groups in LDAP
 
 documentation resources:
-- [sharing API is compatible to ownCloud Classic 10](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
+- [sharing API is compatible to ownCloud Classic](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
 
 | Test Case                                                                                                                                                        | Expected Result                                          | Comment |
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------|---------|
@@ -257,7 +257,7 @@ Prerequisite:
 
 | Test Case                                                     | Expected Result                                             | Comment                                                                                                      |
 |---------------------------------------------------------------|-------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
-| use ocis as webDAV external storage in ownCloud Classic 10            | resource access works                                       |                                                                                                              |
+| use ocis as webDAV external storage in ownCloud Classic            | resource access works                                       |                                                                                                              |
 | access webDAV with your file-manager                          | that will not give you a good UX, but ocis should not crash | Urls: https://\<ocis-server\>/remote.php/webdav  & https://\<ocis-server\>/remote.php/dav/files/\<username\> |
 | access webDAV with the "remote-files" function of LibreOffice | files are accessible and can be written back                |                                                                                                              |
 

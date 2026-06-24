@@ -20,7 +20,7 @@ The datagateway endpoint, by default `/data`, forwards file up- and download req
 
 ### ocs
 
-The ocs endpoint, by default `/ocs`, implements the ownCloud Classic 10 Open Collaboration Services API by translating it into CS3 API requests. It can handle users, groups, capabilities and also implements the files sharing functionality on top of CS3. The `/ocs/v[12].php/cloud/user/signing-key` is currently handled by the dedicated [ocs](https://github.com/owncloud/ocis/tree/master/services/ocs) service.
+The ocs endpoint, by default `/ocs`, implements the ownCloud Classic Open Collaboration Services API by translating it into CS3 API requests. It can handle users, groups, capabilities and also implements the files sharing functionality on top of CS3. The `/ocs/v[12].php/cloud/user/signing-key` is currently handled by the dedicated [ocs](https://github.com/owncloud/ocis/tree/master/services/ocs) service.
 
 #### Event Handler
 
