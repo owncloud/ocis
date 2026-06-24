@@ -338,12 +338,21 @@ class GraphHelper {
 		string $userName,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users/' . $userName);
-		return HttpRequestHelper::get(
-			$url,
-			$adminUser,
-			$adminPassword,
-			self::getRequestHeaders(),
-		);
+//		return HttpRequestHelper::get(
+//			$url,
+//			$adminUser,
+//			$adminPassword,
+//			self::getRequestHeaders(),
+//		);
+        return HttpRequestHelper::get(
+            $url,
+            null,
+            null,
+            [
+                'Authorization' => 'Bearer ' . KeycloakHelper::getAdminAccessToken(),
+                'Content-Type' => 'application/json',
+            ]
+        );
 	}
 
 	/**

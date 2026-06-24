@@ -310,6 +310,12 @@ trait WebDav {
 			$password = $this->getPasswordForUser($user);
 		}
 
+        if(\TestHelpers\KeycloakHelper::isTestingWithKeycloak()) {
+            $user = null;
+            $password = null;
+            $headers = [""]
+        }
+
 		return WebDavHelper::makeDavRequest(
 			$this->getBaseUrl(),
 			$user,

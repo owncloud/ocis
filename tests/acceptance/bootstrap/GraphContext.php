@@ -19,6 +19,7 @@ use TestHelpers\GraphHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\BehatHelper;
+use TestHelpers\KeycloakHelper;
 
 require_once 'bootstrap.php';
 
@@ -1804,6 +1805,7 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 */
 	public function theAdministratorHasGivenTheRoleUsingTheGraphApi(string $role, string $user): void {
+        if (KeycloakHelper::isTestingWithKeycloak()) {}
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?: $user;
 
 		if (empty($this->appEntity)) {
