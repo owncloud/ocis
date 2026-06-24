@@ -15,11 +15,11 @@ Technical Story: [Public issue](https://github.com/owncloud/ocis/issues/6993)
 
 ## Context and Problem Statement
 
-In the early days of the rewrite of ownCloud it was an important goal to keep all important APIs compatible with ownCloud 10. Infinite Scale embraced that goal until version 1.0.0.
+In the early days of the rewrite of ownCloud it was an important goal to keep all important APIs compatible with ownCloud Classic. Infinite Scale embraced that goal until version 1.0.0.
 
 After that first release, the focus changed.
 
-Infinite Scale started the spaces feature which brings a whole new set of APIs and concepts. We made the conscious decision to keep the sharing API as it was, live with its shortcomings and create workarounds to support spaces. We have come a long way so far. Now we need to move on. The Web Client has made the decision to drop the support of ownCloud 10 and keep version 7.0 alive for ownCloud 10 to keep the easy migration path intact.
+Infinite Scale started the spaces feature which brings a whole new set of APIs and concepts. We made the conscious decision to keep the sharing API as it was, live with its shortcomings and create workarounds to support spaces. We have come a long way so far. Now we need to move on. The Web Client has made the decision to drop the support of ownCloud Classic and keep version 7.0 alive for ownCloud Classic to keep the easy migration path intact.
 
 The desktop and mobile client platforms were suffering from poor support from the server and can now move forward with a new API implementation. By using openApi 3 and all the needed tooling around it developing the LibreGraph specification, documentaion and SDKs, we now feel confident to move on.
 

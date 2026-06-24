@@ -16,11 +16,11 @@ geekdocFilePath: oc10_ocis_parallel.md
 - OpenLDAP server with demo users
 - LDAP admin interface to edit users
 - Keycloak as OpenID Connect provider in federation with the LDAP server
-- ownCloud 10 with MariaDB and Redis
-  - ownCloud 10 is configured to synchronize users from the LDAP server
-  - ownCloud 10 is used to use OpenID Connect for authentication with Keycloak
+- ownCloud Classic with MariaDB and Redis
+  - ownCloud Classic is configured to synchronize users from the LDAP server
+  - ownCloud Classic is used to use OpenID Connect for authentication with Keycloak
 - oCIS running behind Traefik as reverse proxy
-  - oCIS is using the ownCloudSQL storage driver on the same files and same database as ownCloud 10
+  - oCIS is using the ownCloudSQL storage driver on the same files and same database as ownCloud Classic
   - oCIS is using Keycloak as OpenID Connect provider
   - oCIS is using the LDAP server as user backend
 - All requests to both oCIS and oC10 are routed through the oCIS proxy and will be routed based on an OIDC claim to one of them. Therefore admins can change on a user basis in the LDAP which backend is used.
@@ -88,7 +88,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
   OC10_DOCKER_TAG=
   # client secret which the openidconnect app uses to authenticate to Keycloak. Defaults to "oc10-oidc-secret"
   OC10_OIDC_CLIENT_SECRET=
-  # app which will be shown when opening the ownCloud 10 UI. Defaults to "files" but also could be set to "web"
+  # app which will be shown when opening the ownCloud Classic UI. Defaults to "files" but also could be set to "web"
   OWNCLOUD_DEFAULT_APP=
   # if set to "false" (default) links will be opened in the classic UI, if set to "true" ownCloud Web is used
   OWNCLOUD_WEB_REWRITE_LINKS=
@@ -122,9 +122,9 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   Set your domain for the oC10 and oCIS frontend in `CLOUD_DOMAIN=`, e.g. `CLOUD_DOMAIN=cloud.owncloud.test`.
 
-  By default ownCloud 10 will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OC10_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
+  By default ownCloud Classic will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OC10_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
 
-  You can switch the default application of ownCloud 10 by setting`OWNCLOUD_DEFAULT_APP=files` in oder to have the classic UI as frontend, which is also the default. If you prefer ownCloud Web as the default application in ownCloud 10 just set `OWNCLOUD_DEFAULT_APP=web`.
+  You can switch the default application of ownCloud Classic by setting`OWNCLOUD_DEFAULT_APP=files` in oder to have the classic UI as frontend, which is also the default. If you prefer ownCloud Web as the default application in ownCloud Classic just set `OWNCLOUD_DEFAULT_APP=web`.
 
   In oder to change the default link open action which defaults to the classic UI (`OWNCLOUD_WEB_REWRITE_LINKS=false`) you can set it to `OWNCLOUD_WEB_REWRITE_LINKS=true`. This will lead to links being opened in ownCloud Web.
 

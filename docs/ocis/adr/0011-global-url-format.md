@@ -13,7 +13,7 @@ geekdocFilePath: 0011-global-url-format.md
 
 ## Context and Problem Statement
 
-When speaking about URLs we have to make a difference between browser URLs and API URLs. Only browser URLs are visible to end users and will be bookmarked. The currently existing and bookmarked ownCloud 10 URLs look something like this:
+When speaking about URLs we have to make a difference between browser URLs and API URLs. Only browser URLs are visible to end users and will be bookmarked. The currently existing and bookmarked ownCloud Classic URLs look something like this:
 
 ```
 GET https://demo.owncloud.com/apps/files/?dir=/path/to/resource&fileid=5472225
@@ -88,7 +88,7 @@ This ADR is limited to the scope of "how will a web client deal with the browser
 
 ## Considered Options
 
-* Existing ownCloud 10 URLs
+* Existing ownCloud Classic URLs
 * ID based URLs
 * Path based URLs
 * Space based URLs
@@ -112,9 +112,9 @@ Chosen option: "Mixed global URLs", because it meets the requirement to contain 
 
 ## Pros and Cons of the Options
 
-### Existing OwnCloud 10 URLs
+### Existing ownCloud Classic URLs
 
-The existing ownCloud 10 URLs look like this
+The existing ownCloud Classic URLs look like this
 
 | URL | comment |
 |-----|---------|
@@ -291,7 +291,7 @@ Not every deployment may have the requirement to have the path in the URL. We co
 | `https://<host>/files?id=<resource_id>` | default id based navigation |
 | `https://<host>/files</namespaced/alias></relative/path/to/resource>?id=<resource_id>` | optional path based navigation with fallback to id |
 
-In contrast to ownCloud 10 path takes precedence and the user is warned when the fileid in his bookmark no longer matches the id on the server: sth. like "The path of the resource has changed, please verify and update your bookmark!"
+In contrast to ownCloud Classic path takes precedence and the user is warned when the fileid in his bookmark no longer matches the id on the server: sth. like "The path of the resource has changed, please verify and update your bookmark!"
 
 When a file is selected the filename also becomes part of the URL so individual files can be bookmarked.
 
