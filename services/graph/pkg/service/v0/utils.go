@@ -177,12 +177,14 @@ func identitySetToSpacePermissionID(identitySet libregraph.SharePointIdentitySet
 	return id
 }
 
-// _receivedShareStatTimeout bounds how long the resource Stat for a single
-// received share may take. Without it, one slow or stuck downstream resource
-// consumes the whole request deadline budget, which causes the other shares to
-// be dropped from the sharedWithMe listing (and the request to occasionally
-// 502). Keeping it small relative to a typical request deadline lets one bad
-// share fail fast without affecting the visibility of the others.
+// _receivedShareStatTimeout is the default bound for how long the resource Stat
+// for a single received share may take. It is used when the configured
+// GRAPH_RECEIVED_SHARES_STAT_TIMEOUT is not set (or non-positive). Without a
+// per-share bound, one slow or stuck downstream resource consumes the whole
+// request deadline budget, which causes the other shares to be dropped from the
+// sharedWithMe listing (and the request to occasionally 502). Keeping it small
+// relative to a typical request deadline lets one bad share fail fast without
+// affecting the visibility of the others.
 const _receivedShareStatTimeout = 10 * time.Second
 
 func cs3ReceivedSharesToDriveItems(ctx context.Context,
@@ -191,7 +193,14 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 	identityCache identity.IdentityCache,
 	receivedShares []*collaboration.ReceivedShare,
 	availableRoles []*libregraph.UnifiedRoleDefinition,
+	statTimeout time.Duration,
 ) ([]libregraph.DriveItem, error) {
+
+	// Fall back to the default when unconfigured: a non-positive timeout would
+	// make context.WithTimeout cancel immediately and drop every share.
+	if statTimeout <= 0 {
+		statTimeout = _receivedShareStatTimeout
+	}
 
 	group := new(errgroup.Group)
 	// Set max concurrency
@@ -218,7 +227,7 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 		group.Go(func() error {
 			// Bound the per-share Stat so one slow/stuck resource cannot consume
 			// the request deadline shared by all the other shares.
-			statCtx, cancel := context.WithTimeout(ctx, _receivedShareStatTimeout)
+			statCtx, cancel := context.WithTimeout(ctx, statTimeout)
 			defer cancel()
 			shareStat, err := gatewayClient.Stat(statCtx, &storageprovider.StatRequest{
 				Ref: &storageprovider.Reference{

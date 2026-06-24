@@ -434,6 +434,44 @@ var _ = Describe("SharedWithMe", func() {
 			Expect(remoteIDs).To(ContainElement(storagespace.FormatResourceID(brokenShare.Share.ResourceId)))
 		})
 
+		It("bounds the per-share Stat with the configured GRAPH_RECEIVED_SHARES_STAT_TIMEOUT", func() {
+			// Use a value distinct from the 10s default so we can tell the
+			// configured timeout (not the default) is the one applied. The service
+			// holds cfg by pointer, so setting it here is observed by the handler.
+			cfg.ReceivedSharesStatTimeout = 3 * time.Second
+
+			var statDeadline time.Time
+			var statHadDeadline bool
+			gatewayClient.ExpectedCalls = nil
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponseDefault, nil)
+			gatewayClient.On("ListReceivedShares", mock.Anything, mock.Anything).Return(listReceivedSharesResponse, nil)
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(func(statCtx context.Context, r *providerv1beta1.StatRequest, _ ...grpc.CallOption) (*providerv1beta1.StatResponse, error) {
+				// the worker writes these before returning; cs3ReceivedSharesToDriveItems
+				// only returns after group.Wait(), so reading them after the handler
+				// call is race-free.
+				statDeadline, statHadDeadline = statCtx.Deadline()
+				return &providerv1beta1.StatResponse{
+					Status: status.NewOK(ctx),
+					Info: &providerv1beta1.ResourceInfo{
+						Id:   r.Ref.ResourceId,
+						Type: providerv1beta1.ResourceType_RESOURCE_TYPE_CONTAINER,
+					},
+				}, nil
+			})
+
+			svc.ListSharedWithMe(
+				tape,
+				httptest.NewRequest(http.MethodGet, "/graph/v1beta1/me/drive/sharedWithMe", nil),
+			)
+
+			Expect(tape.Code).To(Equal(http.StatusOK))
+			// the per-share Stat must carry a deadline derived from the configured
+			// timeout: never above the configured 3s, and clearly below the 10s default.
+			Expect(statHadDeadline).To(BeTrue())
+			Expect(time.Until(statDeadline)).To(BeNumerically("<=", 3*time.Second))
+			Expect(time.Until(statDeadline)).To(BeNumerically(">", 2*time.Second))
+		})
+
 		It("drops a share when the storage returns an error for its resource (e.g. the sharer was deleted)", func() {
 			// a second share whose resource the storage cannot serve (definitive status error) must not be listed
 			goneShare := &collaborationv1beta1.ReceivedShare{

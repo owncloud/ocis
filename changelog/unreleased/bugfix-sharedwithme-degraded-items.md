@@ -12,7 +12,8 @@ subsets of the user's shares.
 The handler now:
 
 - bounds each per-share `Stat` with its own timeout derived from the request context, so one
-  slow resource can no longer consume the deadline shared by all the other shares;
+  slow resource can no longer consume the deadline shared by all the other shares. The bound
+  is configurable via `GRAPH_RECEIVED_SHARES_STAT_TIMEOUT` (default `10s`);
 - returns a degraded drive item built from the data already present in the share record
   (ids, permissions, grantees, timestamps, mountpoint name) when the resource cannot be statted
   due to a transient or indeterminate failure (timeout, slow or unavailable downstream), so the
