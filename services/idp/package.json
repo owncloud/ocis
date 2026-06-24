@@ -90,7 +90,7 @@
     "@types/redux-logger": "^3.0.13",
     "axios": "^1.16.1",
     "classnames": "^2.5.1",
-    "form-data": "4.0.4",
+    "form-data": "4.0.6",
     "i18next": "^23.16.8",
     "i18next-browser-languagedetector": "^7.2.2",
     "i18next-http-backend": "^3.0.5",
@@ -192,7 +192,8 @@
       "flatted": ">=3.4.2",
       "svgo": ">=4.0.1",
       "ajv@>=6.0.0 <6.14.0": "6.14.0",
-      "ajv@>=8.0.0 <8.18.0": "8.18.0"
+      "ajv@>=8.0.0 <8.18.0": "8.18.0",
+      "form-data": ">=4.0.6"
     },
     "ignoredBuiltDependencies": [
       "core-js-pure",
