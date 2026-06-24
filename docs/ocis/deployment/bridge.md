@@ -9,19 +9,19 @@ geekdocFilePath: bridge.md
 
 {{< toc >}}
 
-We are planning to build a bridge from ownCloud 10 to ocis. The idea is to have a reverse proxy in front of ownCloud 10 that will forward requests to ownCloud 10 or ocis-reva, depending on the migration status of the logged-in user.
+We are planning to build a bridge from ownCloud Classic 10 to ocis. The idea is to have a reverse proxy in front of ownCloud Classic 10 that will forward requests to ownCloud Classic 10 or ocis-reva, depending on the migration status of the logged-in user.
 
 This document is a work in progress of the current setup.
 
 ## Current status
 
-Using ocis and the ownCloud 10 [graphapi app](https://github.com/owncloud/graphapi/) it is possible today to use an existing owncloud 10 instance as a user backend and storage backend for ocis.
+Using ocis and the ownCloud Classic 10 [graphapi app](https://github.com/owncloud/graphapi/) it is possible today to use an existing ownCloud Classic 10 instance as a user backend and storage backend for ocis.
 
 ## How to do it
 
-### Install the owncloud 10 graphapi app
+### Install the ownCloud Classic 10 graphapi app
 
-In an owncloud 10 apps folder
+In an ownCloud Classic 10 apps folder
 ```
 $ git clone git@github.com:owncloud/graphapi.git
 $ cd graphapi
@@ -76,7 +76,7 @@ You can check out a custom branch and build a custom binary which can then be us
 
 ### Start ocis glauth
 
-We are going to use the built binary and ownCloud 10 graphapi app to turn ownCloud 10 into the datastore for an LDAP proxy.
+We are going to use the built binary and ownCloud Classic 10 graphapi app to turn ownCloud Classic 10 into the datastore for an LDAP proxy.
 
 #### configure it
 
@@ -106,7 +106,7 @@ $ OCIS_LOG_PRETTY=true OCIS_LOG_COLOR=true ocis/bin/ocis server --extensions "gl
 
 #### Check it is up and running
 
-You should now be able to list accounts from your ownCloud 10 oc_accounts table using:
+You should now be able to list accounts from your ownCloud Classic 10 oc_accounts table using:
 ```console
 $ ldapsearch -x -H ldap://127.0.0.1:9125 -b dc=ocis,dc=test -D "cn=admin,dc=ocis,dc=test" -W '(objectclass=posixaccount)'
 ```
@@ -271,15 +271,15 @@ $ bin/web server --web-config-server https://cloud.example.com --oidc-authority 
 
 ### Patch owncloud
 
-While the UserSession in ownCloud 10 is currently used to test all available IAuthModule implementations, it immediately logs out the user when an exception occurs. However, existing owncloud 10 instances use the oauth2 app to create Bearer tokens for mobile and desktop clients.
+While the UserSession in ownCloud Classic 10 is currently used to test all available IAuthModule implementations, it immediately logs out the user when an exception occurs. However, existing ownCloud Classic 10 instances use the oauth2 app to create Bearer tokens for mobile and desktop clients.
 
 To give the openidconnect app a chance to verify the tokens we need to change the code a bit. See https://github.com/owncloud/core/pull/37043 for a possible solution.
 
 > Note: The PR is hot ... as in *younger than this list of steps*. And it messes with authentication. Use with caution.
 
-### Install the owncloud 10 openidconnect app
+### Install the ownCloud Classic 10 openidconnect app
 
-In an owncloud 10 apps folder
+In an ownCloud Classic 10 apps folder
 ```
 $ git clone git@github.com:owncloud/openidconnect.git
 $ cd openidconnect
@@ -306,7 +306,7 @@ $CONFIG = [
 
 In the above configuration replace
 - `provider-url` with the URL to your `ocis-idp` issuer
-- `https://cloud.example.com` with the URL to your ownCloud 10 instance
+- `https://cloud.example.com` with the URL to your ownCloud Classic 10 instance
 - `http://localhost:9100` with the URL to your ownCloud Web instance
 
 > Note: By default the openidconnect app will use the email of the user to match the user from the oidc userinfo endpoint with the ownCloud account. So make sure your users have a unique primary email.
@@ -315,4 +315,4 @@ In the above configuration replace
 
 Aside from the above todos these are the next steps
 - tie it all together behind `ocis-proxy`
-- create an `ocis bridge` command that runs all the ocis services in one step with a properly preconfigured idp OIDC client `ocis-idp` for `ownCloud Web` and the owncloud 10 `openidconnect` app, as well as a randomized `--signing-kid`.
+- create an `ocis bridge` command that runs all the ocis services in one step with a properly preconfigured idp OIDC client `ocis-idp` for `ownCloud Web` and the ownCloud Classic 10 `openidconnect` app, as well as a randomized `--signing-kid`.

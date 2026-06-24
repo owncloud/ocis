@@ -13,7 +13,7 @@ Some architectural changes still need to be clarified or changed. Maybe an ADR i
 
 ## A dedicated shares storage provider
 
-Currently, when a user accepts a share, a cs3 reference is created in the users `/home/shares` folder. This reference represents the mount point of a share and can be renamed, similar to the share jail in ownCloud 10. This spreads the metadata of a share in two places:
+Currently, when a user accepts a share, a cs3 reference is created in the users `/home/shares` folder. This reference represents the mount point of a share and can be renamed, similar to the share jail in ownCloud Classic 10. This spreads the metadata of a share in two places:
 - the share is persisted in the *share manager*
 - the mount point of a share is persisted in the home *storage provider*
 

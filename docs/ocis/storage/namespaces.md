@@ -8,7 +8,7 @@ geekdocFilePath: namespaces.md
 ---
 
 A *namespace* is a set of paths with a common prefix. Depending on the endpoint you are talking to you will encounter a different kind of namespace:
-In ownCloud 10 all paths are considered relative to the users home. The CS3 API uses a global namespace and the *storage providers* use a local namespace with paths relative to the storage providers root.
+In ownCloud Classic 10 all paths are considered relative to the users home. The CS3 API uses a global namespace and the *storage providers* use a local namespace with paths relative to the storage providers root.
 
 {{< figure src="/ocis/storage/static/namespaces.drawio.svg" >}}
 
@@ -22,7 +22,7 @@ The different paths in the namespaces need to be translated while passing [*refe
 
 
 {{< hint danger >}}
-oCIS currently is configured to jail users into the CS3 `/home` namespace in the oc10 endpoints to mimic ownCloud 10. CernBox has been exposing a global namespace on `/webdav` for years already. The ocs service returns urls that are relative to the CS3 global namespace which makes both scenarios work, but only one of them at a time. Which is why the testsuite hiccups when trying to [Allow full paths targets in reva#1605](https://github.com/cs3org/reva/pull/1605).
+oCIS currently is configured to jail users into the CS3 `/home` namespace in the oc10 endpoints to mimic ownCloud Classic 10. CernBox has been exposing a global namespace on `/webdav` for years already. The ocs service returns urls that are relative to the CS3 global namespace which makes both scenarios work, but only one of them at a time. Which is why the testsuite hiccups when trying to [Allow full paths targets in reva#1605](https://github.com/cs3org/reva/pull/1605).
 {{< /hint >}}
 
 
@@ -63,7 +63,7 @@ The `/shares` namespace is used to solve two problems:
 {{< /hint >}}
 
 ## Browser URLs vs API URLs
-In ownCloud 10 you can not only create *public links* but also *private links*. Both can be copy pasted into an email or chat to grant others access to a file. Most often though, end users will copy and paste the URL from their browsers location bar.
+In ownCloud Classic 10 you can not only create *public links* but also *private links*. Both can be copy pasted into an email or chat to grant others access to a file. Most often though, end users will copy and paste the URL from their browsers location bar.
 
 | URL | description |
 |-|-|

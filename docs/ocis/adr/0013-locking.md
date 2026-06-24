@@ -87,7 +87,7 @@ We remove or disable the file based locking of the CS3org WOPI server.
 **CS3 API locking is good**, because:
 
 - you can lock files on the actual storage (if the storage supports that -> storage driver dependent)
-- you can lock files in ownCloud 10 when using the ownCloudSQL storage driver in the migration deployment (but oC10 Collabora / OnlyOffice also need to implement locking, to fully leverage that)
+- you can lock files in ownCloud Classic 10 when using the ownCloudSQL storage driver in the migration deployment (but oC10 Collabora / OnlyOffice also need to implement locking, to fully leverage that)
 - clients can get the lock information via the api without ignoring / hiding lock file changes
 - clients can use the lock information to lock the file in their context (e.g. via some file explorer integration)
 

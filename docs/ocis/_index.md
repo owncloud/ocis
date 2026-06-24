@@ -14,7 +14,7 @@ geekdocCollapseSection: true
 Welcome to oCIS, the modern file-sync and share platform, which is based on our knowledge and experience with the PHP based [ownCloud server](https://owncloud.com/#server).
 
 ### The idea of federated storage
-To create a truly federated storage architecture oCIS breaks down the old ownCloud 10 user specific namespace, which is assembled on the server side, and makes the individual parts accessible to clients as storage spaces and storage space registries.
+To create a truly federated storage architecture oCIS breaks down the old ownCloud Classic 10 user specific namespace, which is assembled on the server side, and makes the individual parts accessible to clients as storage spaces and storage space registries.
 
 The diagram below shows the core concepts that are the foundation for the new architecture:
 - End user devices can fetch the list of *storage spaces* a user has access to, by querying one or multiple *storage space registries*. The list contains a unique endpoint for every *storage space*.
@@ -58,7 +58,7 @@ A lot of embedded services in oCIS are built upon the [REVA](https://reva.link/)
 Interacting with oCIS involves a multitude af APIs. The server and all clients rely on [OpenID Connect](https://openid.net/connect/) for authentication. The [embedded LibreGraph Connect](https://owncloud.dev/services/idp/) can be replaced with any other OpenID Connect Identity Provider. Clients use the [WebDAV](http://webdav.org/) based [oc sync protocol](https://github.com/cernbox/smashbox/blob/master/protocol/protocol.md) to manage files and folders, [ocs to manage shares](https://doc.owncloud.com/server/developer_manual/core/apis/ocs-share-api.html) and [TUS](https://tus.io/protocols/resumable-upload.html) to upload files in a resumable way. On the server side [REVA](https://reva.link/) is the reference implementation of the [CS3 apis](https://github.com/cs3org/cs3apis) which is defined using [protobuf](https://developers.google.com/protocol-buffers/). By embedding [libregraph/idm](https://github.com/libregraph/idm), oCIS provides a [LDAP](https://tools.ietf.org/html/rfc2849) interface to make accounts, including guests available to firewalls and other systems. In the future, we are looking into [the Microsoft Graph API](https://docs.microsoft.com/en-us/graph/api/overview?view=graph-rest-1.0), which is based on [odata](http://docs.oasis-open.org/odata/odata/v4.0/odata-v4.0-part1-protocol.html), as a well-defined REST/JSON dialect for the existing endpoints.
 
 ### Acceptance test suite
-We run a huge [test suite](https://github.com/owncloud/core/tree/master/tests), which originated in ownCloud 10 and continues to grow. A detailed description can be found in the developer docs for [testing]({{< ref "development/testing" >}}).
+We run a huge [test suite](https://github.com/owncloud/core/tree/master/tests), which originated in ownCloud Classic 10 and continues to grow. A detailed description can be found in the developer docs for [testing]({{< ref "development/testing" >}}).
 
 ### Architecture Overview
 

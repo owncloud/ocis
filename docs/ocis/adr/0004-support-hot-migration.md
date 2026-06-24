@@ -55,7 +55,7 @@ Chosen option: "\[option 1\]", because \[justification. e.g., only option, which
 
 ### Cold Migration
 
-The migration happens while the service is offline. File metadata, blobs and share data is exported from ownCloud 10 and imported in oCIS. This can happen user by user, where every user export would contain the file blobs, their metadata, trash, versions, shares and all metadata that belongs to the user's storage. To prevent group shares from breaking, users in the same groups must be migrated in batch. Depending on the actual group shares in an instance this may effectively require a complete migration in a single batch.
+The migration happens while the service is offline. File metadata, blobs and share data is exported from ownCloud Classic 10 and imported in oCIS. This can happen user by user, where every user export would contain the file blobs, their metadata, trash, versions, shares and all metadata that belongs to the user's storage. To prevent group shares from breaking, users in the same groups must be migrated in batch. Depending on the actual group shares in an instance this may effectively require a complete migration in a single batch.
 
 - Good, because oCIS can be tested in a staging system without writing to the production system.
 - Good, because file layout on disk can be changed to support new storage driver capabilities.

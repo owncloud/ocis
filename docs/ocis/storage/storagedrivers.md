@@ -26,7 +26,7 @@ While the *storage provider* is responsible for managing the tree, file up- and 
 ## Storage aspects
 A lot of different storage technologies exist, ranging from general purpose file systems with POSIX semantics to software defined storage with multiple APIs. Choosing any of them is making a tradeoff decision. Or, if a storage technology is already in place it automatically predetermines the capabilities that can be made available. *Not all storage systems are created equal.*
 
-Unfortunately, no POSIX filesystem natively supports all storage aspects that ownCloud 10 requires:
+Unfortunately, no POSIX filesystem natively supports all storage aspects that ownCloud Classic 10 requires:
 
 ### A hierarchical file tree
 An important aspect of a filesystem is organizing files and directories in a file hierarchy, or tree. It allows you to create, move and delete nodes. Beside the name a node also has well known metadata like size and mtime that are persisted in the tree as well.
