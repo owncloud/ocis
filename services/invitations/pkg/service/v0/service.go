@@ -57,6 +57,7 @@ func New(opts ...Option) (Service, error) {
 		options.Config.Keycloak.ClientRealm,
 		options.Config.Keycloak.UserRealm,
 		options.Config.Keycloak.InsecureSkipVerify,
+		options.Config.Keycloak.ExecuteActions,
 	)
 
 	return svc{
