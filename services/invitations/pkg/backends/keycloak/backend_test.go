@@ -114,6 +114,12 @@ func TestBackend_CreateUser(t *testing.T) {
 			got, err := b.CreateUser(ctx, tt.args.invitation)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
+			// On success the created user is recorded on the invitation as invitedUser.
+			if err == nil && assert.NotNil(t, tt.args.invitation.InvitedUser) {
+				assert.Equal(t, tt.args.invitation.InvitedUserEmailAddress, tt.args.invitation.InvitedUser.GetMail())
+				assert.Equal(t, "Guest", tt.args.invitation.InvitedUser.GetUserType())
+				assert.NotEmpty(t, tt.args.invitation.InvitedUser.GetId())
+			}
 		})
 	}
 }

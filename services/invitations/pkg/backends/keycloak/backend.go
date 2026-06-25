@@ -94,6 +94,12 @@ func (b Backend) CreateUser(ctx context.Context, invitation *invitations.Invitat
 		return "", err
 	}
 
+	// Record the created user on the invitation so the service can return it as
+	// the invitedUser relation of the Graph invitation response. user.Id holds the
+	// OWNCLOUD_ID, i.e. the identity oCIS uses once the guest is provisioned locally
+	// (not the Keycloak-internal id returned for sending the actions mail).
+	invitation.InvitedUser = user
+
 	return id, nil
 }
 
