@@ -4,14 +4,12 @@ on:
   push:
     tags:
       - 'v*'
-    branches:
-      - 'feat/release-pipeline**'
   workflow_dispatch:
     inputs:
       version_override:
-        description: 'Version override (leave empty to auto-detect from latest tag)'
+        description: 'Version (required, e.g. 8.1.0-rc.3)'
         type: string
-        default: ''
+        required: true
 
 env:
   PRODUCTION_RELEASE_TAGS: '5.0,7,8'
@@ -29,33 +27,10 @@ jobs:
       is_prerelease: ${{ steps.info.outputs.is_prerelease }}
       docker_repos:  ${{ steps.info.outputs.docker_repos }}
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        if: ${{ github.ref_type == 'branch' || (github.event_name == 'workflow_dispatch' && inputs.version_override == '') }}
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
       - id: info
         run: |
-          next_dev() {
-            # If latest tag is already a pre-release (e.g. v8.0.2-dev.1), reuse its base
-            # version (8.0.2-dev.1) so repeated branch runs don't bump the patch counter.
-            # If latest tag is a production release (e.g. v8.0.1), increment patch (8.0.2-dev.1).
-            local tag=$(git tag --sort=-version:refname | grep -m1 '^v' || echo "v0.0.0")
-            local ver="${tag#v}"
-            if [[ "$ver" == *"-"* ]]; then
-              echo "${ver%%-*}-dev.1"
-            else
-              IFS='.' read -r M m p <<< "$ver"
-              echo "${M}.${m}.$((p + 1))-dev.1"
-            fi
-          }
-
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             VERSION="${{ inputs.version_override }}"
-            [[ -z "$VERSION" ]] && VERSION=$(next_dev)
-          elif [[ "${{ github.ref_type }}" == "branch" ]]; then
-            VERSION=$(next_dev)
           else
             VERSION="${GITHUB_REF#refs/tags/v}"
           fi
@@ -333,7 +308,15 @@ jobs:
         with:
           go-version-file: go.mod
       - run: |
-          make changelog CHANGELOG_VERSION=$(echo "${{ needs.determine-release-type.outputs.version }}" | cut -d'-' -f1)
+          VERSION="${{ needs.determine-release-type.outputs.version }}"
+          # For prereleases (e.g. 8.1.0-rc.2), pass the full version so calens finds
+          # changelog/8.1.0-rc.2_*/ rather than falling through to the missing 8.1.0_*/ dir.
+          if [[ "$VERSION" == *-* ]]; then
+            CHANGELOG_VERSION="$VERSION"
+          else
+            CHANGELOG_VERSION=$(echo "$VERSION" | cut -d'-' -f1)
+          fi
+          make changelog CHANGELOG_VERSION="$CHANGELOG_VERSION"
           # calens produces empty output when no versioned changelog directory exists (e.g. dev builds).
           # Fall back to a pointer to the unreleased entries.
           if [[ $(wc -l < ocis/dist/CHANGELOG.md) -lt 5 ]]; then
@@ -405,7 +388,7 @@ jobs:
           python3 scripts/audit-release.py \
             --version "${{ needs.determine-release-type.outputs.version }}" \
             --dir release-assets/ \
-            --github-release --docker
+            --github-release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
