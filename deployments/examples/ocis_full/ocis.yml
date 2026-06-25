@@ -36,6 +36,16 @@ services:
       IDM_ADMIN_PASSWORD: "${ADMIN_PASSWORD:-admin}" # this overrides the admin password from the configuration file
       # demo users
       IDM_CREATE_DEMO_USERS: "${DEMO_USERS:-false}"
+      # Provision invited guests directly into the (writable) identity backend so
+      # they are immediately resolvable and usable as share recipients (closes the
+      # invitation provisioning-delay gap). NOTE: the 'ldap' invitation backend
+      # provisions the guest but does NOT send a credential-setup mail (that is a
+      # Keycloak feature); combine with the keycloak.yml overlay for a guest
+      # login/email flow. See services/invitations.
+      OCIS_LDAP_SERVER_WRITE_ENABLED: "${LDAP_WRITE_ENABLED:-true}"
+      INVITATIONS_BACKEND: "${INVITATIONS_BACKEND:-ldap}"
+      # the bundled idm ships a self-signed cert; skip LDAP TLS verification when running insecure
+      INVITATIONS_LDAP_INSECURE: "${INSECURE:-false}"
       # email server (if configured)
       NOTIFICATIONS_SMTP_HOST: "${SMTP_HOST}"
       NOTIFICATIONS_SMTP_PORT: "${SMTP_PORT}"

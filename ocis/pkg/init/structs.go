@@ -46,6 +46,7 @@ type OcisConfig struct {
 	AuthService       AuthService           `yaml:"auth_service"`
 	Clientlog         Clientlog             `yaml:"clientlog"`
 	Activitylog       Activitylog           `yaml:"activitylog"`
+	Invitations       LdapBasedService      `yaml:"invitations,omitempty"`
 }
 
 // Activitylog is the configuration for the activitylog service

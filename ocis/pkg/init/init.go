@@ -215,6 +215,14 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 			},
 			ServiceAccount: serviceAccount,
 		},
+		// The invitations service can provision guests directly into the identity
+		// backend (INVITATIONS_BACKEND=ldap). It binds with the same service user
+		// as the graph identity backend, so it shares the idm service password.
+		Invitations: LdapBasedService{
+			Ldap: LdapSettings{
+				BindPassword: idmServicePassword,
+			},
+		},
 		Thumbnails: ThumbnailService{
 			Thumbnail: ThumbnailSettings{
 				TransferSecret: thumbnailsTransferSecret,
