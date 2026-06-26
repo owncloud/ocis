@@ -964,9 +964,29 @@ var _ = Describe("Users", func() {
 				assertHandleBadAttributes(user)
 			})
 
-			It("handles set userType - it's read-only", func() {
-				user.SetUserType("Member")
+			It("rejects an invalid userType", func() {
+				user.SetUserType("not-a-valid-usertype")
 				assertHandleBadAttributes(user)
+			})
+
+			It("honors an explicit valid userType like Guest", func() {
+				roleService.On("AssignRoleToUser", mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{}, nil)
+				identityBackend.On("CreateUser", mock.Anything, mock.Anything).Return(func(ctx context.Context, u libregraph.User) *libregraph.User {
+					u.SetId("/users/guest")
+					return &u
+				}, nil)
+				user.SetUserType("Guest")
+				userJson, err := json.Marshal(user)
+				Expect(err).ToNot(HaveOccurred())
+
+				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users", bytes.NewBuffer(userJson))
+				r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+				svc.PostUser(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusCreated))
+				createdUser := libregraph.User{}
+				Expect(json.Unmarshal(rr.Body.Bytes(), &createdUser)).To(Succeed())
+				Expect(createdUser.GetUserType()).To(Equal("Guest"))
 			})
 
 			It("creates a user", func() {
