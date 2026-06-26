@@ -14,7 +14,9 @@ Feature: clean orphaned grants using CLI
     Then the command should be successful
     And the command output should contain "== Pre-flight =="
     And the command output should contain "mode: dry run enabled"
+    And the command output should contain "target space(s)"
     And the command output should contain "== Primary scan =="
+    And the command output should contain "Summary:"
     And the command output should contain "Dry run mode: no grants were modified"
     And the command output should contain "== Reverse orphan scan =="
 
@@ -23,6 +25,9 @@ Feature: clean orphaned grants using CLI
     When the administrator runs clean-orphaned-grants in non-dry-run mode
     Then the command should be successful
     And the command output should contain "mode: dry run disabled: grants may be changed"
+    And the command output should contain "Summary:"
+    And the command output should contain "Orphans: 0 candidate(s)"
+    And the command output should contain "Reverse orphans: 0 candidate(s)"
 
 
   Scenario: administrator runs clean-orphaned-grants with space-id filter
@@ -31,9 +36,35 @@ Feature: clean orphaned grants using CLI
     When the administrator runs clean-orphaned-grants for space "project1" owned by "Alice"
     Then the command should be successful
     And the command output should contain "scope: limiting scan to space"
+    And the command output should contain "1 target space(s)"
+    And the command output should contain "Summary:"
+    And the command output should contain "Orphans: 0 candidate(s)"
+    And the command output should contain "Reverse orphans: 0 candidate(s)"
 
 
   Scenario: administrator runs clean-orphaned-grants with force flag
     When the administrator runs clean-orphaned-grants with force flag
     Then the command should be successful
     And the command output should contain "flags: --force active"
+    And the command output should contain "Summary:"
+    And the command output should contain "Orphans: 0 candidate(s)"
+    And the command output should contain "Reverse orphans: 0 candidate(s)"
+
+
+  Scenario: administrator runs clean-orphaned-grants on a space with shares
+    Given these users have been created with default attributes:
+      | username |
+      | Brian    |
+    And user "Alice" has uploaded file with content "test content" to "testfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    When the administrator runs clean-orphaned-grants in non-dry-run mode
+    Then the command should be successful
+    And the command output should contain "== Primary scan =="
+    And the command output should contain "Summary:"
+    And the command output should contain "Orphans: 0 candidate(s)"
+    And the command output should contain "Reverse orphans: 0 candidate(s)"
