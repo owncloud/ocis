@@ -1154,4 +1154,101 @@ class CliContext implements Context {
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
+
+	/**
+	 * @Given the administrator has configured service account credentials
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorHasConfiguredServiceAccountCredentials(): void {
+		$envs = [
+			"OCIS_SERVICE_ACCOUNT_ID" => $this->getServiceAccountId(),
+			"OCIS_SERVICE_ACCOUNT_SECRET" => $this->getServiceAccountSecret(),
+		];
+		$response = OcisConfigHelper::reConfigureOcis($envs);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Failed to configure service account credentials",
+			$response,
+		);
+	}
+
+	/**
+	 * @When the administrator runs clean-orphaned-grants in dry-run mode
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRunsCleanOrphanedGrantsInDryRunMode(): void {
+		$command = "shares clean-orphaned-grants"
+			. " --service-account-id=" . $this->getServiceAccountId()
+			. " --service-account-secret=" . $this->getServiceAccountSecret()
+			. " --dry-run=true";
+		$body = ["command" => $command];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator runs clean-orphaned-grants in non-dry-run mode
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRunsCleanOrphanedGrantsInNonDryRunMode(): void {
+		$command = "shares clean-orphaned-grants"
+			. " --service-account-id=" . $this->getServiceAccountId()
+			. " --service-account-secret=" . $this->getServiceAccountSecret()
+			. " --dry-run=false";
+		$body = ["command" => $command];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator runs clean-orphaned-grants for space :spaceName owned by :user
+	 *
+	 * @param string $spaceName
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRunsCleanOrphanedGrantsForSpaceOwnedBy(
+		string $spaceName,
+		string $user,
+	): void {
+		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
+		$command = "shares clean-orphaned-grants"
+			. " --service-account-id=" . $this->getServiceAccountId()
+			. " --service-account-secret=" . $this->getServiceAccountSecret()
+			. " --space-id=" . $spaceId
+			. " --dry-run=false";
+		$body = ["command" => $command];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator runs clean-orphaned-grants with force flag
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRunsCleanOrphanedGrantsWithForceFlag(): void {
+		$command = "shares clean-orphaned-grants"
+			. " --service-account-id=" . $this->getServiceAccountId()
+			. " --service-account-secret=" . $this->getServiceAccountSecret()
+			. " --force --dry-run=false";
+		$body = ["command" => $command];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @return string
+	 */
+	private function getServiceAccountId(): string {
+		return "service-account-id";
+	}
+
+	/**
+	 * @return string
+	 */
+	private function getServiceAccountSecret(): string {
+		return "service-account-secret";
+	}
 }
