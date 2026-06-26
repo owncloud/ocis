@@ -41,7 +41,7 @@ func (g Graph) listSharedWithMe(ctx context.Context) ([]libregraph.DriveItem, er
 		return nil, err
 	}
 	availableRoles := unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...))
-	driveItems, err := cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, listReceivedSharesResponse.GetShares(), availableRoles)
+	driveItems, err := cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, listReceivedSharesResponse.GetShares(), availableRoles, g.config.ReceivedSharesStatTimeout)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("could not convert received shares to drive items")
 		return nil, err
