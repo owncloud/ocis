@@ -87,7 +87,7 @@ func (g BaseGraphService) CS3ReceivedSharesToDriveItems(ctx context.Context, rec
 	}
 
 	availableRoles := unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...))
-	return cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, receivedShares, availableRoles)
+	return cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, receivedShares, availableRoles, g.config.ReceivedSharesStatTimeout)
 }
 
 func (g BaseGraphService) CS3ReceivedOCMSharesToDriveItems(ctx context.Context, receivedShares []*ocm.ReceivedShare) ([]libregraph.DriveItem, error) {

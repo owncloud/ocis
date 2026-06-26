@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -265,6 +266,7 @@ var _ = Describe("Utils", func() {
 				identityCache,
 				receivedShares,
 				unifiedrole.GetRoles(unifiedrole.RoleFilterAll()),
+				10*time.Second,
 			)
 
 			Expect(err).ToNot(HaveOccurred())
