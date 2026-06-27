@@ -48,7 +48,7 @@ func New(
 			Logger(),
 	}
 	client := keycloak.New(baseURL, clientID, clientSecret, clientRealm, insecureSkipVerify)
-	return NewWithClient(logger, client, userRealm, parseUserActions(logger, executeActions))
+	return NewWithClient(logger, client, userRealm, parseUserActions(executeActions))
 }
 
 // NewWithClient creates a new backend with the supplied keycloak client.
@@ -111,23 +111,20 @@ func (b Backend) SendMail(ctx context.Context, id string) error {
 	return b.client.SendActionsMail(ctx, b.userRealm, id, b.userActions)
 }
 
-// parseUserActions converts the configured Keycloak required-action strings into
-// typed UserActions. Unknown actions are logged and skipped. If no valid action
-// remains, the defaults (UPDATE_PASSWORD, VERIFY_EMAIL) are used so an invited
-// guest always has a way to set up their account.
-func parseUserActions(logger log.Logger, executeActions []string) []keycloak.UserAction {
+// parseUserActions converts the configured Keycloak required-action strings
+// into UserActions. Each non-empty value is passed through to Keycloak as-is
+// (Keycloak validates the actions), so operators can configure any action their
+// Keycloak supports without this list having to be kept in sync. If none are
+// configured, the defaults (UPDATE_PASSWORD, VERIFY_EMAIL) are used so an
+// invited guest always has a way to set up their account.
+func parseUserActions(executeActions []string) []keycloak.UserAction {
 	actions := make([]keycloak.UserAction, 0, len(executeActions))
 	for _, a := range executeActions {
 		a = strings.TrimSpace(a)
 		if a == "" {
 			continue
 		}
-		action, ok := keycloak.UserActionFromString(a)
-		if !ok {
-			logger.Warn().Str("action", a).Msg("ignoring unknown keycloak required action")
-			continue
-		}
-		actions = append(actions, action)
+		actions = append(actions, keycloak.UserAction(a))
 	}
 	if len(actions) == 0 {
 		return defaultUserActions

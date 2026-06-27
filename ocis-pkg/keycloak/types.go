@@ -7,68 +7,37 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
-// UserAction defines a type for user actions
-type UserAction int8
+// UserAction is a Keycloak required-action provider ID. It is a free-form
+// string so operators can configure any action Keycloak supports; it is passed
+// to Keycloak verbatim. The constants below are the common built-ins, provided
+// for convenience only - the list does not need to be exhaustive or kept in
+// sync with Keycloak.
+type UserAction string
 
-// An incomplete list of UserActions. The string values match Keycloak's
-// built-in required-action provider IDs.
 const (
 	// UserActionUpdatePassword sets it that the user needs to change their password.
-	UserActionUpdatePassword UserAction = iota
+	UserActionUpdatePassword UserAction = "UPDATE_PASSWORD"
 	// UserActionVerifyEmail sets it that the user needs to verify their email address.
-	UserActionVerifyEmail
+	UserActionVerifyEmail UserAction = "VERIFY_EMAIL"
 	// UserActionUpdateProfile sets it that the user needs to update their profile.
-	UserActionUpdateProfile
+	UserActionUpdateProfile UserAction = "UPDATE_PROFILE"
 	// UserActionConfigureTOTP sets it that the user needs to configure a one-time password.
-	UserActionConfigureTOTP
+	UserActionConfigureTOTP UserAction = "CONFIGURE_TOTP"
 	// UserActionTermsAndConditions sets it that the user needs to accept the terms and conditions.
-	UserActionTermsAndConditions
+	UserActionTermsAndConditions UserAction = "TERMS_AND_CONDITIONS"
 	// UserActionVerifyProfile sets it that the user needs to verify their profile.
-	UserActionVerifyProfile
+	UserActionVerifyProfile UserAction = "VERIFY_PROFILE"
 	// UserActionDeleteAccount sets it that the user is allowed to delete their account.
-	UserActionDeleteAccount
+	UserActionDeleteAccount UserAction = "delete_account"
 	// UserActionUpdateLocale sets it that the user needs to update their locale.
-	UserActionUpdateLocale
+	UserActionUpdateLocale UserAction = "update_user_locale"
 	// UserActionWebauthnRegister sets it that the user needs to register a WebAuthn authenticator.
-	UserActionWebauthnRegister
+	UserActionWebauthnRegister UserAction = "webauthn-register"
 	// UserActionWebauthnRegisterPasswordless sets it that the user needs to register a passwordless WebAuthn authenticator.
-	UserActionWebauthnRegisterPasswordless
+	UserActionWebauthnRegisterPasswordless UserAction = "webauthn-register-passwordless"
 	// UserActionConfigureRecoveryAuthnCodes sets it that the user needs to configure recovery authentication codes.
-	UserActionConfigureRecoveryAuthnCodes
+	UserActionConfigureRecoveryAuthnCodes UserAction = "CONFIGURE_RECOVERY_AUTHN_CODES"
 )
-
-// A lookup table to translate user actions to their string equivalents
-var userActionsToString = map[UserAction]string{
-	UserActionUpdatePassword:               "UPDATE_PASSWORD",
-	UserActionVerifyEmail:                  "VERIFY_EMAIL",
-	UserActionUpdateProfile:                "UPDATE_PROFILE",
-	UserActionConfigureTOTP:                "CONFIGURE_TOTP",
-	UserActionTermsAndConditions:           "TERMS_AND_CONDITIONS",
-	UserActionVerifyProfile:                "VERIFY_PROFILE",
-	UserActionDeleteAccount:                "delete_account",
-	UserActionUpdateLocale:                 "update_user_locale",
-	UserActionWebauthnRegister:             "webauthn-register",
-	UserActionWebauthnRegisterPasswordless: "webauthn-register-passwordless",
-	UserActionConfigureRecoveryAuthnCodes:  "CONFIGURE_RECOVERY_AUTHN_CODES",
-}
-
-// stringToUserAction is the reverse lookup of userActionsToString. It is derived
-// from userActionsToString so the two stay in sync.
-var stringToUserAction = func() map[string]UserAction {
-	m := make(map[string]UserAction, len(userActionsToString))
-	for action, s := range userActionsToString {
-		m[s] = action
-	}
-	return m
-}()
-
-// UserActionFromString returns the UserAction matching the given Keycloak
-// required-action string (e.g. "UPDATE_PASSWORD"). The boolean return value
-// reports whether the string mapped to a known action.
-func UserActionFromString(s string) (UserAction, bool) {
-	action, ok := stringToUserAction[s]
-	return action, ok
-}
 
 // PIIReport is a structure of all the PersonalIdentifiableInformation contained in keycloak.
 type PIIReport struct {
