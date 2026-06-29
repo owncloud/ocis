@@ -294,11 +294,21 @@ class GraphContext implements Context {
 	 */
 	public function adminDeletesUserUsingTheGraphApi(string $user, ?string $byUser = null): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
+		$adminUser = $credentials["username"];
+		$adminPass = $credentials["password"];
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$access_token = $this->featureContext->getOcisUserToken($adminUser)["token"]["accessToken"];
+			$headers['Authorization'] = 'Bearer ' . $access_token;
+			$adminUser = null;
+			$adminPass = null;
+		}
 		$response = GraphHelper::deleteUser(
 			$this->featureContext->getBaseUrl(),
-			$credentials["username"],
-			$credentials["password"],
 			$user,
+			$adminUser,
+			$adminPass,
+			$headers,
 		);
 		if ($response->getStatusCode() === 204) {
 			$this->featureContext->rememberThatUserIsNotExpectedToExist($user);
@@ -1805,27 +1815,35 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 */
 	public function theAdministratorHasGivenTheRoleUsingTheGraphApi(string $role, string $user): void {
-        if (KeycloakHelper::isTestingWithKeycloak()) {}
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?: $user;
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$response = KeycloakHelper::assignrole($userId, $role);
+			Assert::assertEquals(
+				204,
+				$response->getStatusCode(),
+				__METHOD__
+				. "\nExpected status code '204' but got '" . $response->getStatusCode() . "'",
+			);
+		} else {
+			if (empty($this->appEntity)) {
+				$this->setApplicationEntity();
+			}
 
-		if (empty($this->appEntity)) {
-			$this->setApplicationEntity();
+			$response = GraphHelper::assignRole(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getAdminUsername(),
+				$this->featureContext->getAdminPassword(),
+				$this->appEntity["appRoles"][$role],
+				$this->appEntity["id"],
+				$userId,
+			);
+			Assert::assertEquals(
+				201,
+				$response->getStatusCode(),
+				__METHOD__
+				. "\nExpected status code '200' but got '" . $response->getStatusCode() . "'",
+			);
 		}
-
-		$response = GraphHelper::assignRole(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-			$this->appEntity["appRoles"][$role],
-			$this->appEntity["id"],
-			$userId,
-		);
-		Assert::assertEquals(
-			201,
-			$response->getStatusCode(),
-			__METHOD__
-			. "\nExpected status code '200' but got '" . $response->getStatusCode() . "'",
-		);
 	}
 
 	/**

@@ -191,15 +191,20 @@ class GraphHelper {
 	/**
 	 * @param string $baseUrl
 	 * @param string $path
+	 * @param boolean $isVault
 	 *
 	 * @return string
 	 */
-	public static function getFullUrl(string $baseUrl, string $path): string {
+	public static function getFullUrl(string $baseUrl, string $path, bool $isVault = false): string {
 		$fullUrl = $baseUrl;
 		if (\substr($fullUrl, -1) !== '/') {
 			$fullUrl .= '/';
 		}
-		$fullUrl .= 'graph/v1.0/' . $path;
+		if ($isVault) {
+			$fullUrl .= 'vault/graph/v1.0/' . $path;
+		} else {
+			$fullUrl .= 'graph/v1.0/' . $path;
+		}
 		return $fullUrl;
 	}
 
@@ -338,21 +343,24 @@ class GraphHelper {
 		string $userName,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users/' . $userName);
-//		return HttpRequestHelper::get(
-//			$url,
-//			$adminUser,
-//			$adminPassword,
-//			self::getRequestHeaders(),
-//		);
-        return HttpRequestHelper::get(
-            $url,
-            null,
-            null,
-            [
-                'Authorization' => 'Bearer ' . KeycloakHelper::getAdminAccessToken(),
-                'Content-Type' => 'application/json',
-            ]
-        );
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			return HttpRequestHelper::get(
+				$url,
+				null,
+				null,
+				[
+					'Authorization' => 'Bearer ' . KeycloakHelper::getAdminAccessToken(),
+					'Content-Type' => 'application/json',
+				],
+			);
+		}
+		return HttpRequestHelper::get(
+			$url,
+			$adminUser,
+			$adminPassword,
+			self::getRequestHeaders(),
+		);
+
 	}
 
 	/**
@@ -425,24 +433,27 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $adminUser
-	 * @param string $adminPassword
 	 * @param string $userName
+	 * @param string|null $adminUser
+	 * @param string|null $adminPassword
+	 * @param array|null $headers
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function deleteUser(
 		string $baseUrl,
-		string $adminUser,
-		string $adminPassword,
 		string $userName,
+		?string $adminUser = null,
+		?string $adminPassword = null,
+		?array $headers = null,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users/' . $userName);
 		return HttpRequestHelper::delete(
 			$url,
 			$adminUser,
 			$adminPassword,
+			$headers,
 		);
 	}
 
@@ -920,22 +931,24 @@ class GraphHelper {
 	 * Send Graph Create Space Request
 	 *
 	 * @param string $baseUrl
-	 * @param  string $user
-	 * @param  string $password
+	 * @param  string|null $user
+	 * @param  string|null $password
 	 * @param  string $body
 	 * @param  array  $headers
+	 * @param boolean $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function createSpace(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user = null,
+		?string $password = null,
 		string $body,
 		array $headers = [],
+		bool $isVault = false,
 	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'drives');
+		$url = self::getFullUrl($baseUrl, 'drives', $isVault);
 
 		return HttpRequestHelper::post($url, $user, $password, $headers, $body);
 	}
@@ -970,11 +983,12 @@ class GraphHelper {
 	 * Send Graph List My Spaces Request
 	 *
 	 * @param  string $baseUrl
-	 * @param  string $user
-	 * @param  string $password
-	 * @param  string $urlArguments
-	 * @param  array  $body
-	 * @param  array  $headers
+	 * @param  string|null $user
+	 * @param  string|null $password
+	 * @param  string|null $urlArguments
+	 * @param  array|null $body
+	 * @param  array|null $headers
+	 * @param boolean $isVault
 	 *
 	 * @return ResponseInterface
 	 *
@@ -982,14 +996,15 @@ class GraphHelper {
 	 */
 	public static function getMySpaces(
 		string $baseUrl,
-		string $user,
-		string $password,
-		string $urlArguments = '',
-		array $body = [],
-		array $headers = [],
+		?string $user = null,
+		?string $password = null,
+		?string $urlArguments = '',
+		?array $body = [],
+		?array $headers = [],
+		?bool $isVault = false,
 	): ResponseInterface {
 		$urlArguments = $urlArguments ? "?$urlArguments" : "";
-		$url = self::getFullUrl($baseUrl, "me/drives" . $urlArguments);
+		$url = self::getFullUrl($baseUrl, "me/drives" . $urlArguments, $isVault);
 
 		return HttpRequestHelper::get($url, $user, $password, $headers, $body);
 	}

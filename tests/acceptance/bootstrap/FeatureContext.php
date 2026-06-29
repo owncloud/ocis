@@ -395,13 +395,6 @@ class FeatureContext extends BehatVariablesContext {
 		return (\getenv('REPLACE_USERNAMES') === "true");
 	}
 
-//    /**
-//     * @return bool
-//     */
-//    public function isTestingWithKeycloak(): bool {
-//        return (\getenv('KEYCLOAK') === "true");
-//    }
-
 	/**
 	 * @return array|null
 	 */

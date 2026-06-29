@@ -34,6 +34,7 @@ use TestHelpers\WebDavHelper;
 use TestHelpers\GraphHelper;
 use TestHelpers\OcisHelper;
 use TestHelpers\BehatHelper;
+use TestHelpers\KeycloakHelper;
 
 require_once 'bootstrap.php';
 
@@ -132,13 +133,15 @@ class SpacesContext implements Context {
 	/**
 	 * @param string $user
 	 * @param object $space
+	 * @param boolean $isVault
 	 *
 	 * @return void
 	 */
-	public function addPersonalSpaceForUser(string $user, object $space): void {
+	public function addPersonalSpaceForUser(string $user, object $space, bool $isVault = false): void {
 		$spaceName = $this->featureContext->getUserDisplayName($user);
 		$this->personalSpaces[$spaceName] = $space;
 		$this->personalSpaces[$spaceName]->serverType = $this->featureContext->getCurrentServer();
+		$this->personalSpaces[$spaceName]->isVault = $isVault;
 	}
 
 	/**
@@ -189,11 +192,12 @@ class SpacesContext implements Context {
 	/**
 	 * @param string $user
 	 * @param string $spaceName
+	 * @param boolean $isVault
 	 *
 	 * @return array
 	 * @throws GuzzleException
 	 */
-	public function getSpaceByName(string $user, string $spaceName): array {
+	public function getSpaceByName(string $user, string $spaceName, bool $isVault = false): array {
 		$password = $this->featureContext->getPasswordForUser($user);
 		$createdSpaces = $this->getCreatedSpaces();
 		$personalSpaces = $this->getPersonalSpaces();
@@ -205,10 +209,16 @@ class SpacesContext implements Context {
 
 		if (isset($allSpaces[$spaceName])
 			&& $allSpaces[$spaceName]->serverType === $this->featureContext->getCurrentServer()
+			&& (!isset($allSpaces[$spaceName]->isVault) || $allSpaces[$spaceName]->isVault === $isVault)
 		) {
 			return json_decode(json_encode($allSpaces[$spaceName]), true);
 		}
 
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$access_token = $this->featureContext->getOcisUserToken($user)["token"]["accessToken"];
+			$headers['Authorization'] = 'Bearer ' . $access_token;
+		}
 		// Sometimes listing available spaces might not return newly created/shared spaces.
 		// So we try again until we find the space or we reach the max number of retries (i.e. 10)
 		$retried = 0;
@@ -216,9 +226,12 @@ class SpacesContext implements Context {
 			// list 'me/drives' as given user
 			$response = GraphHelper::getMySpaces(
 				$this->featureContext->getBaseUrl(),
-				$user,
-				$password,
+				KeycloakHelper::isTestingWithKeycloak() ? null : $user,
+				KeycloakHelper::isTestingWithKeycloak() ? null : $password,
 				"",
+				[],
+				$headers,
+				$isVault,
 			);
 			// NOTE: user can be created with empty password
 			// so if that's the case, the user won't be able to request using empty password
@@ -254,7 +267,7 @@ class SpacesContext implements Context {
 					if ($space->driveType === "project") {
 						$this->addToCreatedSpace($user, $space);
 					} elseif (!($space->name === "Shares" && $space->driveType === "virtual")) {
-						$this->addPersonalSpaceForUser($user, $space);
+						$this->addPersonalSpaceForUser($user, $space, $isVault);
 					}
 					break;
 				}
@@ -278,12 +291,13 @@ class SpacesContext implements Context {
 	 *
 	 * @param string $user
 	 * @param string $spaceName
+	 * @param boolean $isVault
 	 *
 	 * @return string
 	 * @throws GuzzleException
 	 */
-	public function getSpaceIdByName(string $user, string $spaceName): string {
-		$space = $this->getSpaceByName($user, $spaceName);
+	public function getSpaceIdByName(string $user, string $spaceName, bool $isVault = false): string {
+		$space = $this->getSpaceByName($user, $spaceName, $isVault);
 		return $space["id"];
 	}
 
@@ -797,22 +811,38 @@ class SpacesContext implements Context {
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param string $foldersPath
+	 * @param boolean $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function propfindSpace(string $user, string $spaceName, string $foldersPath = ''): ResponseInterface {
-		$spaceId = $this->getSpaceIdByName($user, $spaceName);
+	public function propfindSpace(
+		string $user,
+		string $spaceName,
+		string $foldersPath = '',
+		bool $isVault = false,
+	): ResponseInterface {
+		$spaceId = $this->getSpaceIdByName($user, $spaceName, $isVault);
+		$password = $this->featureContext->getPasswordForUser($user);
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$access_token = $this->featureContext->getOcisUserToken($user)["token"]["accessToken"];
+			$headers['Authorization'] = 'Bearer ' . $access_token;
+			$user = null;
+			$password = null;
+		}
 		return WebDavHelper::propfind(
 			$this->featureContext->getBaseUrl(),
 			$user,
-			$this->featureContext->getPasswordForUser($user),
+			$password,
 			$foldersPath,
 			[],
 			null,
 			$spaceId,
 			'files',
 			WebDavHelper::DAV_VERSION_SPACES,
+			null,
+			$headers,
 		);
 	}
 
@@ -888,10 +918,11 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^for user "([^"]*)" the space "([^"]*)" should (not|)\s?contain these (?:files|entries):$/
+	 * @Then /^for user "([^"]*)" the space "([^"]*)"(| in vault)? should (not|)\s?contain these (?:files|entries):$/
 	 *
 	 * @param string    $user
 	 * @param string    $spaceName
+	 * @param string    $isVault
 	 * @param string    $shouldOrNot   (not|)
 	 * @param TableNode $expectedFiles
 	 *
@@ -902,11 +933,13 @@ class SpacesContext implements Context {
 	public function userTheSpaceShouldContainEntries(
 		string $user,
 		string $spaceName,
+		string $isVault,
 		string $shouldOrNot,
 		TableNode $expectedFiles,
 	): void {
-		$space = $this->getSpaceByName($user, $spaceName);
-		$this->featureContext->setResponse($this->propfindSpace($user, $spaceName));
+		$isVault = trim($isVault) === "in vault";
+		$space = $this->getSpaceByName($user, $spaceName, $isVault);
+		$this->featureContext->setResponse($this->propfindSpace($user, $spaceName, '', $isVault));
 		$this->featureContext->propfindResultShouldContainEntries(
 			$shouldOrNot,
 			$expectedFiles,
@@ -1275,11 +1308,12 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" creates a (?:folder|subfolder) "([^"]*)" in space "([^"]*)" using the WebDav Api$/
+	 * @When /^user "([^"]*)" creates a (?:folder|subfolder) "([^"]*)" in space "([^"]*)"(| in vault)? using the WebDav Api$/
 	 *
 	 * @param string $user
 	 * @param string $folder
 	 * @param string $spaceName
+	 * @param string $isVault
 	 *
 	 * @return void
 	 *
@@ -1289,13 +1323,15 @@ class SpacesContext implements Context {
 		string $user,
 		string $folder,
 		string $spaceName,
+		string $isVault,
 	): void {
 		$folder = \trim($folder, '/');
 		$exploded = explode('/', $folder);
 		$path = '';
+		$isVault = trim($isVault) === "in vault";
 		for ($i = 0; $i < \count($exploded); $i++) {
 			$path = $path . $exploded[$i] . '/';
-			$response = $this->createFolderInSpace($user, $path, $spaceName);
+			$response = $this->createFolderInSpace($user, $path, $spaceName, '', $isVault);
 			$this->featureContext->setResponse($response);
 		}
 	}
@@ -1378,6 +1414,7 @@ class SpacesContext implements Context {
 	 * @param string $folder
 	 * @param string $spaceName
 	 * @param string $ownerUser
+	 * @param boolean $isVault
 	 *
 	 * @return ResponseInterface
 	 *
@@ -1388,11 +1425,12 @@ class SpacesContext implements Context {
 		string $folder,
 		string $spaceName,
 		string $ownerUser = '',
+		bool $isVault = false,
 	): ResponseInterface {
 		if ($ownerUser === '') {
 			$ownerUser = $user;
 		}
-		$spaceId = $this->getSpaceIdByName($ownerUser, $spaceName);
+		$spaceId = $this->getSpaceIdByName($ownerUser, $spaceName, $isVault);
 		return $this->featureContext->createFolder($user, $folder, false, null, $spaceId);
 	}
 
@@ -1419,12 +1457,13 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" uploads a file inside space "([^"]*)" with content "([^"]*)" to "([^"]*)" using the WebDAV API$/
+	 * @When /^user "([^"]*)" uploads a file inside space "([^"]*)" with content "([^"]*)" to "([^"]*)"(| in vault)? using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param string $content
 	 * @param string $destination
+	 * @param string $isVault
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -1435,8 +1474,10 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $content,
 		string $destination,
+		string $isVault,
 	): void {
-		$spaceId = $this->getSpaceIdByName($user, $spaceName);
+		$isVault = trim($isVault) === "in vault";
+		$spaceId = $this->getSpaceIdByName($user, $spaceName, $isVault);
 		if ($spaceName === "Shares" && !\str_starts_with($destination, "Shares/")) {
 			$destination = "Shares/" . \ltrim($destination, "/");
 		}
@@ -1831,10 +1872,11 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has created a space "([^"]*)" with the default quota using the Graph API$/
+	 * @Given /^user "([^"]*)" has created a space "([^"]*)"(| in vault)? with the default quota using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
+	 * @param string $isVault
 	 *
 	 * @return void
 	 *
@@ -1844,9 +1886,11 @@ class SpacesContext implements Context {
 	public function theUserHasCreatedASpaceByDefaultUsingTheGraphApi(
 		string $user,
 		string $spaceName,
+		string $isVault,
 	): void {
 		$space = ["name" => $spaceName];
-		$response = $this->createSpace($user, $space);
+		$isVault = trim($isVault) === "in vault";
+		$response = $this->createSpace($user, $space, $isVault);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201 (Created)",
@@ -1859,6 +1903,7 @@ class SpacesContext implements Context {
 	/**
 	 * @param string $user
 	 * @param string $space
+	 * @param boolean $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -1867,13 +1912,24 @@ class SpacesContext implements Context {
 	public function createSpace(
 		string $user,
 		array $space,
+		bool $isVault = false,
 	): ResponseInterface {
 		$body = json_encode($space, JSON_THROW_ON_ERROR);
+		$password = $this->featureContext->getPasswordForUser($user);
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$access_token = $this->featureContext->getOcisUserToken($user)["token"]["accessToken"];
+			$headers['Authorization'] = 'Bearer ' . $access_token;
+			$user = null;
+			$password = null;
+		}
 		return GraphHelper::createSpace(
 			$this->featureContext->getBaseUrl(),
 			$user,
-			$this->featureContext->getPasswordForUser($user),
+			$password,
 			$body,
+			$headers,
+			$isVault,
 		);
 	}
 
