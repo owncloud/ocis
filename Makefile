@@ -328,6 +328,18 @@ endif
 	mkdir -p ocis/dist
 	$(CALENS) --version $(CHANGELOG_VERSION) -o ocis/dist/CHANGELOG.md
 
+.PHONY: changelog-lint
+changelog-lint:
+	@FAILED=0; \
+	for f in $$(git diff --name-only origin/master...HEAD -- 'changelog/*.md'); do \
+	  [ -f "$$f" ] || continue; \
+	  title=$$(head -1 "$$f"); \
+	  if [ $${#title} -gt 80 ]; then \
+	    echo "$$f: title is too long ($${#title} chars, max 80)"; FAILED=1; \
+	  fi; \
+	done; \
+	exit $$FAILED
+
 .PHONY: changelog-csv
 changelog-csv: $(CALENS)
 	mkdir -p ocis/dist
