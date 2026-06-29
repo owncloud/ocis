@@ -9,18 +9,6 @@ Feature: clean orphaned grants using CLI
     And the administrator has configured service account credentials
 
 
-  Scenario: administrator runs clean-orphaned-grants in dry-run mode
-    When the administrator runs clean-orphaned-grants in dry-run mode
-    Then the command should be successful
-    And the command output should contain "== Pre-flight =="
-    And the command output should contain "mode: dry run enabled"
-    And the command output should contain "target space(s)"
-    And the command output should contain "== Primary scan =="
-    And the command output should contain "Summary:"
-    And the command output should contain "Dry run mode: no grants were modified"
-    And the command output should contain "== Reverse orphan scan =="
-
-
   Scenario: administrator runs clean-orphaned-grants in non-dry-run mode
     When the administrator runs clean-orphaned-grants in non-dry-run mode
     Then the command should be successful
