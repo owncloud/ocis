@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"net"
 	"net/http"
 	"net/url"
 
@@ -17,7 +18,7 @@ func CheckRedirect(cfg *config.Config, logger log.Logger) func(http.Handler) htt
 				return
 			}
 
-			if parsedUri, ok := url.Parse(uriString); ok == nil {
+			if parsedUri, err := url.Parse(uriString); err == nil {
 				if isValidRedirect(parsedUri, cfg) {
 					next.ServeHTTP(w, r)
 					return
@@ -30,13 +31,31 @@ func CheckRedirect(cfg *config.Config, logger log.Logger) func(http.Handler) htt
 	}
 }
 
-// urisMatch will check if both URL match. They match if they have the same
-// scheme, hostname and opaque; other elements (in particular the port)
-// are ignored. Note that we need to deal with URLs like
+// urisMatch will check if both URL match. In case of localhost, only the port
+// will be ignored. Note that we need to deal with URLs like
 // "[scheme:][//[userinfo@]host][/]path[?query][#fragment]"
 // and also like "scheme:opaque[?query][#fragment]"
 func urisMatch(u1, u2 *url.URL) bool {
-	return u1.Scheme == u2.Scheme && u1.Hostname() == u2.Hostname() && u1.Opaque == u2.Opaque
+	if isLocalhost(u1) && isLocalhost(u2) {
+		copyu1 := *u1
+		copyu2 := *u2
+		// if there is a port, remove it from the URL
+		if copyu1.Port() != "" {
+			host1, _, _ := net.SplitHostPort(copyu1.Host)
+			copyu1.Host = host1
+		}
+		if copyu2.Port() != "" {
+			host2, _, _ := net.SplitHostPort(copyu2.Host)
+			copyu2.Host = host2
+		}
+		return copyu1.String() == copyu2.String()
+	}
+	return u1.String() == u2.String()
+}
+
+func isLocalhost(u1 *url.URL) bool {
+	hostname := u1.Hostname()
+	return hostname == "localhost" || hostname == "127.0.0.1" || hostname == "::1"
 }
 
 // isValidRedirect check if the u1 URL is part of the configured redirect URIs.
@@ -44,7 +63,7 @@ func urisMatch(u1, u2 *url.URL) bool {
 func isValidRedirect(u1 *url.URL, cfg *config.Config) bool {
 	for _, client := range cfg.Clients {
 		for _, redirect_uri := range client.RedirectURIs {
-			if parsedRedirect, ok2 := url.Parse(redirect_uri); ok2 == nil {
+			if parsedRedirect, err := url.Parse(redirect_uri); err == nil {
 				if urisMatch(u1, parsedRedirect) {
 					return true
 				}
