@@ -115,7 +115,15 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 					isGroup = group
 				}
 			default:
-				q = bleveQuery.NewQueryStringQuery(k + ":" + v)
+				// Explicit name: queries use TermQuery to bypass NewQueryStringQuery's
+				// Unicode word-boundary splitting, which breaks non-ASCII filenames.
+				if n.Key != "" && k == "Name" && !strings.ContainsAny(n.Value, "*?") {
+					tq := bleveQuery.NewTermQuery(strings.ToLower(n.Value))
+					tq.SetField(k)
+					q = tq
+				} else {
+					q = bleveQuery.NewQueryStringQuery(k + ":" + v)
+				}
 			}
 
 			if prev == nil {
