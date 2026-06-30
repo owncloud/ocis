@@ -461,8 +461,8 @@ github.com/gdexlab/go-render/render
 # github.com/ggwhite/go-masker v1.1.0
 ## explicit; go 1.17
 github.com/ggwhite/go-masker
-# github.com/go-acme/lego/v4 v4.25.2
-## explicit; go 1.24.0
+# github.com/go-acme/lego/v4 v4.34.0
+## explicit; go 1.25.0
 github.com/go-acme/lego/v4/acme
 github.com/go-acme/lego/v4/challenge
 # github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667
@@ -624,8 +624,8 @@ github.com/go-redis/redis/v8/internal/pool
 github.com/go-redis/redis/v8/internal/proto
 github.com/go-redis/redis/v8/internal/rand
 github.com/go-redis/redis/v8/internal/util
-# github.com/go-resty/resty/v2 v2.16.5
-## explicit; go 1.20
+# github.com/go-resty/resty/v2 v2.17.2
+## explicit; go 1.23.0
 github.com/go-resty/resty/v2
 github.com/go-resty/resty/v2/shellescape
 # github.com/go-sql-driver/mysql v1.10.0
@@ -727,8 +727,8 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/google/go-querystring v1.1.0
-## explicit; go 1.10
+# github.com/google/go-querystring v1.2.0
+## explicit; go 1.13
 github.com/google/go-querystring/query
 # github.com/google/go-tika v0.3.1
 ## explicit; go 1.11
@@ -846,7 +846,7 @@ github.com/jmespath/go-jmespath
 # github.com/jonboulle/clockwork v0.5.0
 ## explicit; go 1.21
 github.com/jonboulle/clockwork
-# github.com/json-iterator/go v1.1.12
+# github.com/json-iterator/go v1.1.13-0.20220915233716-71ac16282d12
 ## explicit; go 1.12
 github.com/json-iterator/go
 # github.com/juliangruber/go-intersect v1.1.0
@@ -1024,8 +1024,8 @@ github.com/mattermost/xml-roundtrip-validator
 # github.com/mattn/go-colorable v0.1.14
 ## explicit; go 1.18
 github.com/mattn/go-colorable
-# github.com/mattn/go-isatty v0.0.20
-## explicit; go 1.15
+# github.com/mattn/go-isatty v0.0.21
+## explicit; go 1.21
 github.com/mattn/go-isatty
 # github.com/mattn/go-runewidth v0.0.23
 ## explicit; go 1.20
@@ -1040,8 +1040,8 @@ github.com/maxymania/go-system/syscall_x
 # github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103
 ## explicit
 github.com/mendsley/gojwk
-# github.com/miekg/dns v1.1.68
-## explicit; go 1.23.0
+# github.com/miekg/dns v1.1.72
+## explicit; go 1.24.0
 github.com/miekg/dns
 # github.com/mileusna/useragent v1.3.5
 ## explicit; go 1.14
@@ -1916,7 +1916,7 @@ github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.10
 ## explicit; go 1.12
 github.com/spf13/pflag
-# github.com/stretchr/objx v0.5.2
+# github.com/stretchr/objx v0.5.3
 ## explicit; go 1.20
 github.com/stretchr/objx
 # github.com/stretchr/testify v1.11.1

@@ -118,6 +118,15 @@ jobs:
 
           exit $FAILED
 
+      - name: Trivy scan
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+        with:
+          scan-type: fs
+          format: table
+          exit-code: 1
+          severity: CRITICAL,HIGH
+          trivy-config: .trivy.yaml
+
       - name: Build, lint and test
         run: |
           # Phase 2 — all three are CPU-bound Go compilation on 2 vCPU.
