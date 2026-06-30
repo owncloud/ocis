@@ -42,6 +42,42 @@ def ocis_healthy(ocis_url: str, use_basic_auth: bool = True) -> bool:
     return r.stdout.strip() == "200"
 
 
+def search_ready(ocis_url: str) -> bool:
+    # WebDAV REPORT returning 207 proves auth-basic is registered in the gateway,
+    # the search service is alive, and the NATS startup backlog has drained.
+    body = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<oc:search-files xmlns:oc="http://owncloud.org/ns">'
+        '<oc:search><oc:pattern>warmup-probe</oc:pattern><oc:limit>1</oc:limit></oc:search>'
+        '</oc:search-files>'
+    )
+    cmd = [
+        "curl", "-sk", "-uadmin:admin",
+        "-X", "REPORT",
+        "-H", "Content-Type: application/xml",
+        "-d", body,
+        f"{ocis_url}/dav/spaces",
+        "-w", "%{http_code}", "-o", "/dev/null",
+    ]
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    return r.stdout.strip() == "207"
+
+
+def tika_warm(tika_url: str) -> bool:
+    # Force a JVM extraction before tests start so cold-start latency doesn't
+    # delay the async upload→index pipeline past the test's poll window.
+    cmd = [
+        "curl", "-sf",
+        "-X", "PUT",
+        "-H", "Content-Type: text/plain",
+        "-d", "warmup",
+        f"{tika_url}/tika",
+        "-w", "%{http_code}", "-o", "/dev/null",
+    ]
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    return r.stdout.strip() == "200"
+
+
 def run(cmd: list, env: dict = None, check: bool = True, cwd=None):
     e = {**os.environ, **(env or {})}
     return subprocess.run(cmd, env=e, check=check, cwd=cwd)
@@ -291,9 +327,19 @@ def main() -> int:
     signal.signal(signal.SIGTERM, cleanup)
     signal.signal(signal.SIGINT, cleanup)
 
+    tika_url = "http://localhost:9998"
+
     try:
         wait_for(lambda: ocis_healthy(ocis_url, use_basic_auth=not keycloak_needed), 300, "ocis")
         print("ocis ready.")
+
+        if tika_needed:
+            wait_for(lambda: tika_warm(tika_url), 60, "tika warm-up")
+            print("tika warm.")
+
+        if not keycloak_needed:
+            wait_for(lambda: search_ready(ocis_url), 60, "search service")
+            print("search ready.")
 
         playwright_env = {
             **os.environ,
