@@ -21,7 +21,7 @@ export class VaultPage {
     this.qrImage = page.getByRole('img', { name: 'Figure: Barcode' })
     this.oneTimeCodeTextbox = page.locator('#totp')
     this.otpSubmitButton = page.getByRole('button', { name: 'Submit' })
-    this.driveBreadcrumb = page.getByRole('link', { name: 'Drive' })
+    this.driveBreadcrumb = page.getByRole('link', { name: 'Drive', exact: true })
     this.vaultBreadcrumb = page.getByRole('link', { name: 'Vault', exact: true })
   }
 
