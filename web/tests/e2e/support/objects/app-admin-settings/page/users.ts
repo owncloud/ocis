@@ -13,10 +13,6 @@ export class Users {
   async navigate(): Promise<void> {
     await this.#page.locator(usersNavSelector).click()
     await this.#page.locator(appLoadingSpinnerSelector).waitFor({ state: 'detached' })
-    await objects.a11y.Accessibility.assertNoSevereA11yViolations(
-      this.#page,
-      ['adminSettingsWrapper', 'appSidebar'],
-      'users page'
-    )
+    await objects.a11y.Accessibility.assertNoSevereA11yViolations(this.#page, ['body'], 'users page')
   }
 }
