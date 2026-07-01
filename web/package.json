@@ -118,7 +118,8 @@
     "patchedDependencies": {
       "caf@15.0.1": "patches/caf@15.0.1.patch",
       "vue3-gettext@2.4.0": "patches/vue3-gettext@2.4.0.patch",
-      "portal-vue@3.0.0": "patches/portal-vue@3.0.0.patch"
+      "portal-vue@3.0.0": "patches/portal-vue@3.0.0.patch",
+      "vue-select@4.0.0-beta.6": "patches/vue-select@4.0.0-beta.6.patch"
     }
   },
   "dependencies": {

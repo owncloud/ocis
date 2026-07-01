@@ -10,7 +10,7 @@
         class="details-preview oc-flex oc-flex-middle oc-flex-center oc-mb"
         data-testid="preview"
       >
-        <oc-spinner v-if="isPreviewLoading" />
+        <oc-spinner v-if="isPreviewLoading" :aria-label="$gettext('Loading preview')" />
       </div>
       <div
         v-else

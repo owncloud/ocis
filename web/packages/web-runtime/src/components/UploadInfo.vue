@@ -97,6 +97,7 @@
         :max="100"
         size="small"
         :indeterminate="!filesInProgressCount"
+        :aria-label="$gettext('Upload progress')"
       />
     </div>
     <div
