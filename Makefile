@@ -331,13 +331,12 @@ endif
 .PHONY: changelog-lint
 changelog-lint:
 	@FAILED=0; \
-	for f in $$(git diff --name-only origin/master...HEAD -- 'changelog/*.md'); do \
-	  [ -f "$$f" ] || continue; \
+	while IFS= read -r -d '' f; do \
 	  title=$$(head -1 "$$f"); \
 	  if [ $${#title} -gt 80 ]; then \
-	    echo "$$f: title is too long ($${#title} chars, max 80)"; FAILED=1; \
+	    echo "$$f: title too long ($${#title}/80)"; FAILED=1; \
 	  fi; \
-	done; \
+	done < <(find changelog -mindepth 2 -name "*.md" -print0); \
 	exit $$FAILED
 
 .PHONY: changelog-csv
