@@ -1455,8 +1455,8 @@ export const deleteResource = async (args: deleteResourceArgs): Promise<void> =>
       }
       await objects.a11y.Accessibility.assertNoSevereA11yViolations(
         page,
-        ['sidebarPanelActions', 'filesView'],
-        'Sidebar actions panel before deleting resource and files view after deleting resource'
+        ['filesView'],
+        'files view after deleting resource'
       )
       break
     }

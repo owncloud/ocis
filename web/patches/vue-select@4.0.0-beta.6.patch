@@ -1,0 +1,21 @@
+diff --git a/dist/vue-select.es.js b/dist/vue-select.es.js
+index 6a49eb6ac1e599868f530ba53760387b4eaffc1a..48a9e5a7c44184c38c2f3c082a44724f8672c6fd 100644
+--- a/dist/vue-select.es.js
++++ b/dist/vue-select.es.js
+@@ -632,7 +632,7 @@ https://vue-select.org/api/props.html#getoptionkey`, e, t);
+         return n[e.keyCode](e);
+     }
+   }
+-}, he = ["dir"], ce = ["id", "aria-expanded", "aria-owns"], ue = {
++}, he = ["dir"], ce = ["id", "aria-expanded", "aria-owns", "aria-controls"], ue = {
+   ref: "selectedOptions",
+   class: "vs__selected-options"
+ }, pe = ["disabled", "title", "aria-label", "onClick"], fe = {
+@@ -656,6 +656,7 @@ function ve(e, t, s, n, l, i) {
+       role: "combobox",
+       "aria-expanded": i.dropdownOpen.toString(),
+       "aria-owns": `vs${s.uid}__listbox`,
++      "aria-controls": `vs${s.uid}__listbox`,
+       "aria-label": "Search for option",
+       onMousedown: t[1] || (t[1] = (o) => i.toggleDropdown(o))
+     }, [
