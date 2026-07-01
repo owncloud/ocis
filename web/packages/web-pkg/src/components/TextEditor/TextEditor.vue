@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, unref } from 'vue'
+import { computed, nextTick, onMounted, unref } from 'vue'
 import { Resource } from '@ownclouders/web-client'
 import dompurify from 'dompurify'
 
@@ -106,7 +106,7 @@ const {
 
 defineEmits<TextEditorEmits>()
 
-const { current: currentLanguage } = useGettext()
+const { current: currentLanguage, $gettext } = useGettext()
 const { currentTheme } = useThemeStore()
 
 // Should not be a ref, otherwise functions like setMarkdown won't work
@@ -127,6 +127,18 @@ const theme = computed(() => (unref(currentTheme).isDark ? 'dark' : 'light'))
 
 const sanitize = (html) =>
   dompurify.sanitize(html, { ADD_ATTR: ['target'], ADD_TAGS: ['foreignObject'] })
+
+onMounted(async () => {
+  if (isReadOnly) {
+    return
+  }
+  // md-editor-v3's underlying CodeMirror instance renders its editable div without
+  // an accessible name and doesn't expose a prop for one, so it's set imperatively here
+  await nextTick()
+  document
+    .querySelector('#text-editor-component .cm-content')
+    ?.setAttribute('aria-label', $gettext('Text editor'))
+})
 
 config({
   editorConfig: {
