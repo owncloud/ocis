@@ -36,7 +36,7 @@
       cancel-button-appearance="raw-inverse"
       :cancel-handler="cancelSearch"
       :aria-expanded="showDrop && term ? 'true' : 'false'"
-      aria-controls="files-global-search-options"
+      :aria-controls="showDrop ? 'files-global-search-options' : null"
       aria-describedby="search-description"
       @advanced-search="onKeyUpEnter"
       @input="updateTerm"
@@ -77,7 +77,11 @@
       close-on-click
       same-width-as-target
     >
-      <oc-list role="listbox" class="oc-list-divider">
+      <oc-list
+        :role="loading || showNoResults ? undefined : 'listbox'"
+        :aria-label="loading || showNoResults ? undefined : searchLabel"
+        class="oc-list-divider"
+      >
         <li
           v-if="loading"
           class="loading spinner oc-flex oc-flex-center oc-flex-middle oc-text-muted"
@@ -89,8 +93,8 @@
           {{ $gettext('No results') }}
         </li>
         <template v-else>
-          <li v-for="provider in displayProviders" :key="provider.id" class="provider">
-            <oc-list>
+          <li v-for="provider in displayProviders" :key="provider.id" role="group" class="provider">
+            <oc-list role="presentation">
               <li
                 role="presentation"
                 aria-hidden="true"
