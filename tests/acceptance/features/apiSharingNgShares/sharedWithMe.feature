@@ -138,7 +138,8 @@ Feature: an user gets the resources shared to them
                     "name",
                     "parentReference",
                     "permissions",
-                    "size"
+                    "size",
+                    "spaceId"
                   ],
                   "properties": {
                     "createdBy": {
@@ -297,6 +298,10 @@ Feature: an user gets the resources shared to them
                           }
                         }
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 },
@@ -435,7 +440,8 @@ Feature: an user gets the resources shared to them
                     "lastModifiedDateTime",
                     "name",
                     "parentReference",
-                    "permissions"
+                    "permissions",
+                    "spaceId"
                   ],
                   "properties": {
                     "createdBy": {
@@ -594,6 +600,10 @@ Feature: an user gets the resources shared to them
                           }
                         }
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -738,7 +748,8 @@ Feature: an user gets the resources shared to them
                     "name",
                     "parentReference",
                     "permissions",
-                    "size"
+                    "size",
+                    "spaceId"
                   ],
                   "properties": {
                     "createdBy": {
@@ -886,6 +897,10 @@ Feature: an user gets the resources shared to them
                       "enum": [
                         5
                       ]
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 },
@@ -1011,7 +1026,8 @@ Feature: an user gets the resources shared to them
                     "lastModifiedDateTime",
                     "name",
                     "parentReference",
-                    "permissions"
+                    "permissions",
+                    "spaceId"
                   ],
                   "properties": {
                     "createdBy": {
@@ -1132,6 +1148,10 @@ Feature: an user gets the resources shared to them
                           }
                         }
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -1273,7 +1293,8 @@ Feature: an user gets the resources shared to them
                     "name",
                     "parentReference",
                     "permissions",
-                    "size"
+                    "size",
+                    "spaceId"
                   ],
                   "properties": {
                     "createdBy": {
@@ -1500,6 +1521,10 @@ Feature: an user gets the resources shared to them
                     },
                     "size": {
                       "const": 5
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 },
@@ -1636,7 +1661,8 @@ Feature: an user gets the resources shared to them
                     "lastModifiedDateTime",
                     "name",
                     "parentReference",
-                    "permissions"
+                    "permissions",
+                    "spaceId"
                   ],
                   "properties": {
                     "createdBy": {
@@ -1846,6 +1872,10 @@ Feature: an user gets the resources shared to them
                           }
                         ]
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -1937,7 +1967,8 @@ Feature: an user gets the resources shared to them
                         "lastModifiedDateTime",
                         "name",
                         "parentReference",
-                        "permissions"
+                        "permissions",
+                        "spaceId"
                       ],
                       "properties": {
                         "createdBy": {
@@ -2004,6 +2035,10 @@ Feature: an user gets the resources shared to them
                               }
                             }
                           }
+                        },
+                        "spaceId": {
+                          "type": "string",
+                          "pattern": "^%space_id_pattern%$"
                         }
                       }
                     }
@@ -2058,7 +2093,8 @@ Feature: an user gets the resources shared to them
                         "lastModifiedDateTime",
                         "name",
                         "parentReference",
-                        "permissions"
+                        "permissions",
+                        "spaceId"
                       ],
                       "properties": {
                         "createdBy": {
@@ -2126,6 +2162,10 @@ Feature: an user gets the resources shared to them
                               }
                             }
                           }
+                        },
+                        "spaceId": {
+                          "type": "string",
+                          "pattern": "^%space_id_pattern%$"
                         }
                       }
                     }
@@ -2219,7 +2259,8 @@ Feature: an user gets the resources shared to them
                         "lastModifiedDateTime",
                         "name",
                         "parentReference",
-                        "permissions"
+                        "permissions",
+                        "spaceId"
                       ],
                       "properties": {
                         "createdBy": {
@@ -2286,6 +2327,10 @@ Feature: an user gets the resources shared to them
                               }
                             }
                           }
+                        },
+                        "spaceId": {
+                          "type": "string",
+                          "pattern": "^%space_id_pattern%$"
                         }
                       }
                     }
@@ -2340,7 +2385,8 @@ Feature: an user gets the resources shared to them
                         "lastModifiedDateTime",
                         "name",
                         "parentReference",
-                        "permissions"
+                        "permissions",
+                        "spaceId"
                       ],
                       "properties": {
                         "createdBy": {
@@ -2407,6 +2453,10 @@ Feature: an user gets the resources shared to them
                               }
                             }
                           }
+                        },
+                        "spaceId": {
+                          "type": "string",
+                          "pattern": "^%space_id_pattern%$"
                         }
                       }
                     }
@@ -2609,7 +2659,8 @@ Feature: an user gets the resources shared to them
                     "name",
                     "parentReference",
                     "permissions",
-                    "size"
+                    "size",
+                    "spaceId"
                   ],
                   "properties": {
                     "eTag": {
@@ -2724,6 +2775,10 @@ Feature: an user gets the resources shared to them
                     },
                     "size": {
                       "const": 12
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 },
@@ -2829,7 +2884,8 @@ Feature: an user gets the resources shared to them
                     "lastModifiedDateTime",
                     "name",
                     "parentReference",
-                    "permissions"
+                    "permissions",
+                    "spaceId"
                   ],
                   "properties": {
                     "eTag": {
@@ -2940,6 +2996,10 @@ Feature: an user gets the resources shared to them
                           }
                         }
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -3051,7 +3111,8 @@ Feature: an user gets the resources shared to them
                     "lastModifiedDateTime",
                     "name",
                     "parentReference",
-                    "permissions"
+                    "permissions",
+                    "spaceId"
                   ],
                   "properties": {
                     "eTag": {
@@ -3156,6 +3217,10 @@ Feature: an user gets the resources shared to them
                     },
                     "size": {
                       "const": 11
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 },
@@ -3256,7 +3321,8 @@ Feature: an user gets the resources shared to them
                     "lastModifiedDateTime",
                     "name",
                     "parentReference",
-                    "permissions"
+                    "permissions",
+                    "spaceId"
                   ],
                   "properties": {
                     "eTag": {
@@ -3352,6 +3418,10 @@ Feature: an user gets the resources shared to them
                           }
                         }
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -3466,7 +3536,8 @@ Feature: an user gets the resources shared to them
                     "name",
                     "parentReference",
                     "permissions",
-                    "size"
+                    "size",
+                    "spaceId"
                   ],
                   "properties": {
                     "eTag": {
@@ -3641,6 +3712,10 @@ Feature: an user gets the resources shared to them
                     },
                     "size": {
                       "const": 11
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 },
@@ -3750,7 +3825,8 @@ Feature: an user gets the resources shared to them
                     "lastModifiedDateTime",
                     "name",
                     "parentReference",
-                    "permissions"
+                    "permissions",
+                    "spaceId"
                   ],
                   "properties": {
                     "eTag": {
@@ -3916,6 +3992,10 @@ Feature: an user gets the resources shared to them
                           }
                         ]
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -4150,7 +4230,8 @@ Feature: an user gets the resources shared to them
               "name",
               "parentReference",
               "permissions",
-              "size"
+              "size",
+              "spaceId"
             ],
             "properties": {
               "createdBy": {
@@ -4244,6 +4325,10 @@ Feature: an user gets the resources shared to them
                     }
                   }
                 }
+              },
+              "spaceId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
               }
             }
           }
@@ -4341,7 +4426,8 @@ Feature: an user gets the resources shared to them
                     "lastModifiedDateTime",
                     "name",
                     "parentReference",
-                    "permissions"
+                    "permissions",
+                    "spaceId"
                   ],
                   "properties": {
                     "eTag": {
@@ -4452,6 +4538,10 @@ Feature: an user gets the resources shared to them
                           }
                         }
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -4561,7 +4651,8 @@ Feature: an user gets the resources shared to them
                     "name",
                     "parentReference",
                     "permissions",
-                    "size"
+                    "size",
+                    "spaceId"
                   ],
                   "properties": {
                     "eTag": {
@@ -4685,6 +4776,10 @@ Feature: an user gets the resources shared to them
                     },
                     "size": {
                       "const": 12
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 },
@@ -4767,7 +4862,8 @@ Feature: an user gets the resources shared to them
               "lastModifiedDateTime",
               "name",
               "parentReference",
-              "permissions"
+              "permissions",
+              "spaceId"
             ],
             "properties": {
               "folder": {
@@ -4853,6 +4949,10 @@ Feature: an user gets the resources shared to them
                     }
                   }
                 }
+              },
+              "spaceId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
               }
             }
           }
