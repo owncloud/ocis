@@ -498,12 +498,12 @@ const createDocumentFile = async (
     )
   }
   const a11yObject = new objects.a11y.Accessibility({ page })
+  await page.locator(util.format(createNewOfficeDocumentFileButton, type)).click()
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
     ['ocModal'],
-    'create new folder modal'
+    'create new document modal'
   )
-  await page.locator(util.format(createNewOfficeDocumentFileButton, type)).click()
   await page.locator(resourceNameInput).clear()
   await page.locator(resourceNameInput).fill(name)
   await Promise.all([

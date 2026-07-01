@@ -74,7 +74,7 @@ const publicLinkNameList =
 const publicLink = `//ul//h4[text()='%s']/following-sibling::div//p`
 const publicLinkCurrentRole =
   '//button[contains(@class,"link-role-dropdown-toggle")]//span[contains(@class,"link-current-role")]'
-const linkUpdateDialog = '//div[contains(@class,"oc-notification-message-title")]'
+const linkUpdateDialog = '.oc-notification-message-title'
 const editPublicLinkButton =
   '//span[contains(@class, "files-links-name") and text()="%s"]//ancestor::li//button[contains(@class, "edit-drop-trigger")]'
 const editPublicLinkRenameButton =
@@ -134,12 +134,12 @@ export const createLink = async (args: createLinkArgs): Promise<string> => {
 
   if (role) {
     await page.locator(publicLinkRoleToggle).click()
-    await page.locator(util.format(publicLinkSetRoleButton, role)).click()
     await objects.a11y.Accessibility.assertNoSevereA11yViolations(
       page,
       ['tippyBox'],
       'link role dropdown tippy box'
     )
+    await page.locator(util.format(publicLinkSetRoleButton, role)).click()
   }
 
   await page.locator(editPublicLinkPasswordInput).fill(password)
@@ -238,7 +238,7 @@ export const changeName = async (args: changeNameArgs): Promise<string> => {
   const message = await page.locator(linkUpdateDialog).textContent()
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
-    ['linkUpdateDialog'],
+    [linkUpdateDialog],
     'edit public link success message'
   )
   expect(message.trim()).toBe('Link was updated successfully')
