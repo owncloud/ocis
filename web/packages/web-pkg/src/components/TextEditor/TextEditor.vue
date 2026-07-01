@@ -244,6 +244,11 @@ config({
   .md-editor-preview {
     color: var(--oc-color-text-default);
     font-size: var(--oc-text-default);
+    // override md-editor-v3's default link/inline-code colors, which don't meet
+    // WCAG AA contrast against the app's card background
+    --md-theme-link-color: var(--oc-color-swatch-primary-muted);
+    --md-theme-code-inline-color: var(--oc-color-text-default);
+    --md-theme-code-inline-bg-color: var(--oc-color-background-default);
   }
 }
 </style>
