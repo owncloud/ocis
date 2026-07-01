@@ -13732,7 +13732,7 @@ STORAGE_USERS_DRIVER:
   defaultValue: ocis
   type: string
   description: 'The storage driver which should be used by the service. Defaults to
-    ''ocis'', Supported values are: ''ocis'', ''s3ng'' and ''owncloudsql''. The ''ocis''
+    ''ocis'', Supported values are: ''ocis'', ''s3ng'' and ''owncloudsql'' (deprecated). The ''ocis''
     driver stores all data (blob and meta data) in an POSIX compliant volume. The
     ''s3ng'' driver stores metadata in a POSIX compliant volume and uploads blobs
     to the s3 bucket.'
