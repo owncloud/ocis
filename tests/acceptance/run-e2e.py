@@ -229,6 +229,9 @@ def main() -> int:
         server_env.update({
             "OCIS_EXCLUDE_RUN_SERVICES": "idp",
             "PROXY_AUTOPROVISION_ACCOUNTS": "true",
+            # Group sync is opt-in and does not create groups by default; the group
+            # sync e2e test relies on both being enabled so Keycloak groups appear.
+            "PROXY_AUTOPROVISION_CLAIM_GROUPS": "groups",
             "PROXY_ROLE_ASSIGNMENT_DRIVER": "oidc",
             "OCIS_OIDC_ISSUER": "https://localhost:8443/realms/oCIS",
             "PROXY_OIDC_REWRITE_WELLKNOWN": "true",
