@@ -910,7 +910,7 @@ export const downloadResources = async (args: downloadResourcesArgs): Promise<Do
           resource.type === 'file' ? downloadFileButtonSideBar : downloadFolderButtonSideBar
         await objects.a11y.Accessibility.assertNoSevereA11yViolations(
           page,
-          ['sidebarPanel'],
+          ['appSidebar'],
           'sidebar panel'
         )
         const [download] = await Promise.all([
