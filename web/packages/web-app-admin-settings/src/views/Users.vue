@@ -102,6 +102,7 @@
                 id="users-filter-confirm"
                 class="oc-ml-xs"
                 appearance="raw"
+                :aria-label="$gettext('Search')"
                 @click="filterDisplayName"
               >
                 <oc-icon name="search" fill-type="line" />
