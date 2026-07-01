@@ -87,17 +87,21 @@ const a11yRuleTags = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice
 export const analyzeAccessibilityConformityViolations = async (args: {
   page: Page
   include: string
+  disabledRules?: string[]
 }): Promise<AxeResults['violations']> => {
   if (config.skipA11y) {
     return []
   }
 
-  const { page, include } = args
+  const { page, include, disabledRules } = args
 
-  const a11yResult = await new AxeBuilder({ page })
-    .withTags(a11yRuleTags)
-    .include(include)
-    .analyze()
+  const axeBuilder = new AxeBuilder({ page }).withTags(a11yRuleTags).include(include)
+
+  if (disabledRules?.length) {
+    axeBuilder.disableRules(disabledRules)
+  }
+
+  const a11yResult = await axeBuilder.analyze()
 
   if (config.testType === 'playwright') {
     test.info().attach('accessibility-scan', {

@@ -1873,7 +1873,12 @@ export const searchResourceGlobalSearch = async (
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
     [globalSearchOptions],
-    'global search file list'
+    'global search file list',
+    // search results are rendered as real <a href> links so that native middle-click/ctrl-click
+    // "open in new tab" keeps working; axe always resolves an anchor's role back to "link"
+    // regardless of role="presentation"/tabindex="-1", so nested-interactive can't be silenced
+    // without removing that link, which would be a functional regression
+    ['nested-interactive']
   )
 
   if (pressEnter) {
