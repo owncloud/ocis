@@ -47,6 +47,7 @@ var validate = validator.New()
 type sharesHandler struct {
 	gatewaySelector            *pool.Selector[gateway.GatewayAPIClient]
 	exposeRecipientDisplayName bool
+	allowHTTP                  bool
 }
 
 func (h *sharesHandler) init(c *config) error {
@@ -59,6 +60,7 @@ func (h *sharesHandler) init(c *config) error {
 	h.gatewaySelector = gatewaySelector
 
 	h.exposeRecipientDisplayName = c.ExposeRecipientDisplayName
+	h.allowHTTP = c.AllowHTTP
 	return nil
 }
 
@@ -82,7 +84,7 @@ type createShareRequest struct {
 func (h *sharesHandler) CreateShare(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := appctx.GetLogger(ctx)
-	req, err := getCreateShareRequest(r)
+	req, err := h.getCreateShareRequest(r)
 	if err != nil {
 		reqres.WriteError(w, r, reqres.APIErrorInvalidParameter, err.Error(), nil)
 		return
@@ -245,7 +247,7 @@ func getIDAndMeshProvider(user string) (id, provider string, err error) {
 	return id, provider, nil
 }
 
-func getCreateShareRequest(r *http.Request) (*createShareRequest, error) {
+func (h *sharesHandler) getCreateShareRequest(r *http.Request) (*createShareRequest, error) {
 	var req createShareRequest
 	contentType, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err == nil && contentType == "application/json" {
@@ -258,6 +260,20 @@ func getCreateShareRequest(r *http.Request) (*createShareRequest, error) {
 	// validate the request
 	if err := validate.Struct(req); err != nil {
 		return nil, err
+	}
+	// validate the URI scheme of every protocol that carries a remote URI, so
+	// that no downstream code consumes an unvalidated URI.
+	for _, p := range req.Protocols {
+		switch proto := p.(type) {
+		case *WebDAV:
+			if err := validateURIScheme(proto.URI, h.allowHTTP); err != nil {
+				return nil, err
+			}
+		case *Webapp:
+			if err := validateURIScheme(proto.URITemplate, h.allowHTTP); err != nil {
+				return nil, err
+			}
+		}
 	}
 	return &req, nil
 }

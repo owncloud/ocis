@@ -438,7 +438,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				URL:           s,
 				SpaceOwner:    n.SpaceOwnerOrManager(ctx),
 				ExecutingUser: &user.User{Id: &user.UserId{OpaqueId: "postprocessing-restart"}}, // send nil instead?
-				ResourceID:    &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID},
+				ResourceID:    &provider.ResourceId{StorageId: session.ProviderID(), SpaceId: n.SpaceID, OpaqueId: n.ID},
 				Filename:      session.Filename(),
 				Filesize:      uint64(session.Size()),
 			}); err != nil {
