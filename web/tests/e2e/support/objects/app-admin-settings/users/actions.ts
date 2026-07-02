@@ -394,7 +394,11 @@ export const filterUsers = async (args: {
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
     ['tippyBoxVisible'],
-    `user filter dropdown for filter ${filter}`
+    `user filter dropdown for filter ${filter}`,
+    // ItemFilter.vue nests a real checkbox inside a button so the row is clickable as a whole
+    // while the checkbox still reports selection state to screen readers; making the checkbox
+    // non-focusable would remove that state announcement, and disabling it changes its visuals
+    ['nested-interactive']
   )
 
   for (const value of values) {
@@ -421,7 +425,11 @@ export const filterUsers = async (args: {
     await objects.a11y.Accessibility.assertNoSevereA11yViolations(
       page,
       ['usersList'],
-      `users list after applying user filter ${filter} with value ${filterValue}`
+      `users list after applying user filter ${filter} with value ${filterValue}`,
+      // ItemFilter.vue nests a real checkbox inside a button so the row is clickable as a whole
+      // while the checkbox still reports selection state to screen readers; making the checkbox
+      // non-focusable would remove that state announcement, and disabling it changes its visuals
+      ['nested-interactive']
     )
   }
 }
@@ -637,7 +645,7 @@ export const deleteUserUsingContextMenu = async (args: {
   await page.locator(util.format(userIdSelector, uuid)).click()
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
-    [`util.format(userIdSelector, uuid)`],
+    [util.format(userIdSelector, uuid)],
     'selected user row for deletion'
   )
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
