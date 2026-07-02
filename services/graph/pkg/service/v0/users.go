@@ -863,6 +863,21 @@ func (g Graph) PatchMe(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user is not allowed to change own mail")
 		return
 	}
+	if changes.HasPasswordProfile() {
+		logger.Info().Interface("user", changes).Msg("could not update user: user is not allowed to change own password via PATCH /me, use POST /me/changePassword")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user is not allowed to change own password via PATCH /me, use POST /me/changePassword")
+		return
+	}
+	if changes.HasAccountEnabled() {
+		logger.Info().Interface("user", changes).Msg("could not update user: user is not allowed to change own accountEnabled")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user is not allowed to change own accountEnabled")
+		return
+	}
+	if changes.HasOnPremisesSamAccountName() {
+		logger.Info().Interface("user", changes).Msg("could not update user: user is not allowed to change own onPremisesSamAccountName")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user is not allowed to change own onPremisesSamAccountName")
+		return
+	}
 	g.patchUser(w, r, userID, changes)
 }
 
