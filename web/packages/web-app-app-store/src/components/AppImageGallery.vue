@@ -16,6 +16,7 @@
           class="oc-p-xs"
           appearance="raw"
           variation="primary"
+          :aria-label="$gettext('Previous image')"
           @click="previousImage"
         >
           <oc-icon name="arrow-left-s" />
@@ -27,6 +28,7 @@
           class="oc-py-xs"
           appearance="raw"
           variation="primary"
+          :aria-label="$gettext('Show image %{index}', { index: index + 1 })"
           @click="setImageIndex(index)"
         >
           <oc-icon
@@ -42,6 +44,7 @@
           class="oc-p-xs"
           appearance="raw"
           variation="primary"
+          :aria-label="$gettext('Next image')"
           @click="nextImage"
         >
           <oc-icon name="arrow-right-s" />
@@ -52,6 +55,7 @@
 </template>
 <script lang="ts" setup>
 import { computed, ref, unref } from 'vue'
+import { useGettext } from 'vue3-gettext'
 import { App, AppImage } from '../types'
 
 interface Props {
@@ -59,6 +63,7 @@ interface Props {
   showPagination?: boolean
 }
 const { app = undefined, showPagination = false } = defineProps<Props>()
+const { $gettext } = useGettext()
 const images = computed(() => {
   return [app.coverImage, ...app.screenshots]
 })
