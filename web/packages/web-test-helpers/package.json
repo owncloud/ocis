@@ -40,7 +40,7 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "6.0.1",
     "clean-publish": "^6.0.1",
-    "vite": "^7.2.2",
+    "vite": "^7.3.5",
     "vite-plugin-dts": "^4.5.4"
   },
   "dependencies": {
