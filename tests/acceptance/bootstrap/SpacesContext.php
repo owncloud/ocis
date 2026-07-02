@@ -4642,6 +4642,14 @@ class SpacesContext implements Context {
 						'wrong "remote-item-id" in the response',
 					);
 					break;
+				case "oc:spaceid":
+					$expectedValue = GraphHelper::jsonSchemaRegexToPureRegex($expectedValue);
+					Assert::assertMatchesRegularExpression(
+						$expectedValue,
+						$actualValue,
+						'wrong "spaceid" in the response',
+					);
+					break;
 				default:
 					Assert::assertEquals($expectedValue, $actualValue, "wrong '$itemToFind' in the response");
 					break;

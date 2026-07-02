@@ -22,13 +22,14 @@ Feature: REPORT request to project space
     And the following headers should match these regular expressions
       | X-Request-Id | %request_id_pattern% |
     And as user "Alice" the REPORT response should contain a resource "testFile.txt" with these key and value pairs:
-      | key                | value             |
-      | oc:fileid          | %file_id_pattern% |
-      | oc:file-parent     | %file_id_pattern% |
-      | oc:name            | testFile.txt      |
-      | d:getcontenttype   | text/plain        |
-      | oc:permissions     | RDNVW             |
-      | d:getcontentlength | 12                |
+      | key                | value              |
+      | oc:fileid          | %file_id_pattern%  |
+      | oc:file-parent     | %file_id_pattern%  |
+      | oc:name            | testFile.txt       |
+      | d:getcontenttype   | text/plain         |
+      | oc:permissions     | RDNVW              |
+      | d:getcontentlength | 12                 |
+      | oc:spaceid         | %space_id_pattern% |
 
 
   Scenario: check the response of the searched sub-file
@@ -48,6 +49,7 @@ Feature: REPORT request to project space
       | d:getcontenttype   | text/plain          |
       | oc:permissions     | RDNVW               |
       | d:getcontentlength | 12                  |
+      | oc:spaceid         | %space_id_pattern%  |
 
 
   Scenario: check the response of the searched folder
@@ -66,6 +68,7 @@ Feature: REPORT request to project space
       | d:getcontenttype | httpd/unix-directory |
       | oc:permissions   | RDNVCK               |
       | oc:size          | 0                    |
+      | oc:spaceid       | %space_id_pattern%   |
 
 
   Scenario: check the response of the searched sub-folder
@@ -85,3 +88,4 @@ Feature: REPORT request to project space
       | d:getcontenttype | httpd/unix-directory |
       | oc:permissions   | RDNVCK               |
       | oc:size          | 0                    |
+      | oc:spaceid       | %space_id_pattern%   |
