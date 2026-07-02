@@ -1,0 +1,31 @@
+{
+  "common": {
+    "name": "ownCloud",
+    "slogan": "ownCloud – A safe home for all your data"
+  },
+  "clients": {
+    "android": {},
+    "desktop": {},
+    "ios": {},
+    "web": {
+      "defaults": {
+        "appBanner": {},
+        "logo": {
+          "topbar": "themes/owncloud/assets/logo.svg",
+          "favicon": "themes/owncloud/assets/favicon.jpg",
+          "login": "themes/owncloud/assets/logo.svg"
+        }
+      },
+      "themes": [
+        {
+          "isDark": false,
+          "name": "Light Theme"
+        },
+        {
+          "isDark": true,
+          "name": "Dark Theme"
+        }
+      ]
+    }
+  }
+}

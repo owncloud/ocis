@@ -1,0 +1,32 @@
+$transition-duration-short: 200ms;
+$directions: (
+  "t": "top",
+  "r": "right",
+  "b": "bottom",
+  "l": "left",
+  "x": ("right", "left"),
+  "y": ("top", "bottom")
+);
+$sizes: (
+  "xs": $oc-space-xsmall,
+  "s": $oc-space-small,
+  "m": $oc-space-medium,
+  "l": $oc-space-large,
+  "xl": $oc-space-xlarge,
+  "xxl": $oc-space-xxlarge
+);
+
+$weights: (
+  "thin": $oc-font-weight-thin,
+  "extralight": $oc-font-weight-extralight,
+  "light": $oc-font-weight-light,
+  "normal": $oc-font-weight-normal,
+  "medium": $oc-font-weight-medium,
+  "semibold": $oc-font-weight-semibold,
+  "bold": $oc-font-weight-bold,
+  "extrabold": $oc-font-weight-extrabold,
+  "black": $oc-font-weight-black
+);
+
+$global-control-height: 15px;
+$global-border-width: 2px;

@@ -1,0 +1,19 @@
+{
+  "name": "text-editor",
+  "version": "0.0.0",
+  "private": true,
+  "description": "ownCloud Web simple text editor",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test:unit": "NODE_OPTIONS=--unhandled-rejections=throw vitest"
+  },
+  "devDependencies": {
+    "@ownclouders/web-test-helpers": "workspace:*"
+  },
+  "peerDependencies": {
+    "@ownclouders/web-client": "workspace:*",
+    "@ownclouders/web-pkg": "workspace:*",
+    "vue-concurrency": "5.0.3",
+    "vue3-gettext": "2.4.0"
+  }
+}

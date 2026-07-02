@@ -1,0 +1,19 @@
+{
+  "server" : "",
+  "theme": "https://localhost:9200/themes/owncloud/theme.json",
+  "auth": {
+    "clientId": "",
+    "url": "",
+    "authUrl": ""
+  },
+  "apps" : [
+    "files",
+    "pdf-viewer",
+    "preview",
+    "search",
+    "text-editor",
+    "html-editor",
+    "epub-reader"
+  ],
+  "applications" : []
+}

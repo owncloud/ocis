@@ -1,0 +1,12 @@
+diff --git a/package.json b/package.json
+index eddbb0a8f9ca9d022d7257d3c9428ae71e3be54c..04f790375ef36f03457c047f9cb0aba24ac0888f 100644
+--- a/package.json
++++ b/package.json
+@@ -3,7 +3,6 @@
+ 	"version": "15.0.1",
+ 	"description": "Cancelable Async Flows: a wrapper to treat generators as cancelable async functions",
+ 	"main": "./index.js",
+-	"browser": "./src/caf.js",
+ 	"scripts": {
+ 		"test": "node scripts/node-tests.js",
+ 		"test:package": "TEST_PACKAGE=true npm test",

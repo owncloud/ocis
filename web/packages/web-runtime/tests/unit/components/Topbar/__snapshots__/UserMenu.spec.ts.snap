@@ -1,0 +1,286 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`User Menu component > when no quota and email is set > the user menu does not contain a quota 1`] = `
+"<nav data-v-0550d31b="" aria-label="Account menu">
+  <oc-button-stub data-v-0550d31b="" id="_userMenuButton" class="oc-topbar-personal" appearance="raw" aria-label="My Account">
+    <avatar-image-stub data-v-0550d31b="" class="oc-topbar-avatar oc-topbar-personal-avatar oc-flex-inline oc-flex-center oc-flex-middle" width="32" userid="einstein" user-name="Albert Einstein"></avatar-image-stub>
+  </oc-button-stub>
+  <oc-drop-stub data-v-0550d31b="" drop-id="account-info-container" toggle="#_userMenuButton" mode="click" close-on-click="" padding-size="small" class="oc-overflow-hidden">
+    <oc-list-stub data-v-0550d31b="" class="user-menu-list">
+      <li data-v-0550d31b="" class="profile-info-wrapper oc-pl-s">
+        <avatar-image-stub data-v-0550d31b="" width="32" userid="einstein" user-name="Albert Einstein"></avatar-image-stub> <span data-v-0550d31b="" class="profile-info-wrapper"><span data-v-0550d31b="" class="oc-display-block">Albert Einstein</span> <span data-v-0550d31b="" class="oc-text-small">test@test.de</span>
+        <!--v-if--></span>
+      </li>
+      <li data-v-0550d31b="">
+        <oc-button-stub data-v-0550d31b="" id="oc-topbar-account-manage" type="router-link" to="[object Object]" appearance="raw">
+          <oc-icon-stub data-v-0550d31b="" name="settings-4" fill-type="line" class="oc-p-xs"></oc-icon-stub> <span data-v-0550d31b="">Preferences</span>
+        </oc-button-stub>
+      </li>
+      <!--v-if-->
+      <li data-v-0550d31b="">
+        <oc-button-stub data-v-0550d31b="" id="oc-topbar-account-logout" appearance="raw">
+          <oc-icon-stub data-v-0550d31b="" name="logout-box-r" fill-type="line" class="oc-p-xs"></oc-icon-stub> <span data-v-0550d31b="">Log out</span>
+        </oc-button-stub>
+      </li>
+    </oc-list-stub>
+    <!--v-if-->
+  </oc-drop-stub>
+</nav>"
+`;
+
+exports[`User Menu component > when no quota and no email is set > the user menu does not contain a quota 1`] = `
+"<nav data-v-0550d31b="" aria-label="Account menu">
+  <oc-button-stub data-v-0550d31b="" id="_userMenuButton" class="oc-topbar-personal" appearance="raw" aria-label="My Account">
+    <avatar-image-stub data-v-0550d31b="" class="oc-topbar-avatar oc-topbar-personal-avatar oc-flex-inline oc-flex-center oc-flex-middle" width="32" userid="einstein" user-name="Albert Einstein"></avatar-image-stub>
+  </oc-button-stub>
+  <oc-drop-stub data-v-0550d31b="" drop-id="account-info-container" toggle="#_userMenuButton" mode="click" close-on-click="" padding-size="small" class="oc-overflow-hidden">
+    <oc-list-stub data-v-0550d31b="" class="user-menu-list">
+      <li data-v-0550d31b="" class="profile-info-wrapper oc-pl-s">
+        <avatar-image-stub data-v-0550d31b="" width="32" userid="einstein" user-name="Albert Einstein"></avatar-image-stub> <span data-v-0550d31b="" class="profile-info-wrapper oc-py-xs"><span data-v-0550d31b="" class="oc-display-block">Albert Einstein</span>
+        <!--v-if-->
+        <!--v-if--></span>
+      </li>
+      <li data-v-0550d31b="">
+        <oc-button-stub data-v-0550d31b="" id="oc-topbar-account-manage" type="router-link" to="[object Object]" appearance="raw">
+          <oc-icon-stub data-v-0550d31b="" name="settings-4" fill-type="line" class="oc-p-xs"></oc-icon-stub> <span data-v-0550d31b="">Preferences</span>
+        </oc-button-stub>
+      </li>
+      <!--v-if-->
+      <li data-v-0550d31b="">
+        <oc-button-stub data-v-0550d31b="" id="oc-topbar-account-logout" appearance="raw">
+          <oc-icon-stub data-v-0550d31b="" name="logout-box-r" fill-type="line" class="oc-p-xs"></oc-icon-stub> <span data-v-0550d31b="">Log out</span>
+        </oc-button-stub>
+      </li>
+    </oc-list-stub>
+    <!--v-if-->
+  </oc-drop-stub>
+</nav>"
+`;
+
+exports[`User Menu component > when quota and no email is set > renders a navigation without email 1`] = `
+"<nav data-v-0550d31b="" aria-label="Account menu">
+  <oc-button-stub data-v-0550d31b="" id="_userMenuButton" class="oc-topbar-personal" appearance="raw" aria-label="My Account">
+    <avatar-image-stub data-v-0550d31b="" class="oc-topbar-avatar oc-topbar-personal-avatar oc-flex-inline oc-flex-center oc-flex-middle" width="32" userid="einstein" user-name="Albert Einstein"></avatar-image-stub>
+  </oc-button-stub>
+  <oc-drop-stub data-v-0550d31b="" drop-id="account-info-container" toggle="#_userMenuButton" mode="click" close-on-click="" padding-size="small" class="oc-overflow-hidden">
+    <oc-list-stub data-v-0550d31b="" class="user-menu-list">
+      <li data-v-0550d31b="" class="profile-info-wrapper oc-pl-s">
+        <avatar-image-stub data-v-0550d31b="" width="32" userid="einstein" user-name="Albert Einstein"></avatar-image-stub> <span data-v-0550d31b="" class="profile-info-wrapper oc-py-xs"><span data-v-0550d31b="" class="oc-display-block">Albert Einstein</span>
+        <!--v-if-->
+        <div data-v-0550d31b="" class="quota-information oc-flex oc-flex-bottom oc-text-small oc-mt-xs">
+          <oc-icon-stub name="hard-drive-2" size="small" fill-type="line" class="oc-mr-xs"></oc-icon-stub>
+          <div>
+            <p class="oc-my-rm"><span class="quota-information-text">300 B of 1 kB used (30%)</span></p>
+            <oc-progress-stub class="quota-information-progress-bar" max="100" size="small" variation="primary" value="30"></oc-progress-stub>
+          </div>
+        </div></span>
+      </li>
+      <li data-v-0550d31b="">
+        <oc-button-stub data-v-0550d31b="" id="oc-topbar-account-manage" type="router-link" to="[object Object]" appearance="raw">
+          <oc-icon-stub data-v-0550d31b="" name="settings-4" fill-type="line" class="oc-p-xs"></oc-icon-stub> <span data-v-0550d31b="">Preferences</span>
+        </oc-button-stub>
+      </li>
+      <!--v-if-->
+      <li data-v-0550d31b="">
+        <oc-button-stub data-v-0550d31b="" id="oc-topbar-account-logout" appearance="raw">
+          <oc-icon-stub data-v-0550d31b="" name="logout-box-r" fill-type="line" class="oc-p-xs"></oc-icon-stub> <span data-v-0550d31b="">Log out</span>
+        </oc-button-stub>
+      </li>
+    </oc-list-stub>
+    <!--v-if-->
+  </oc-drop-stub>
+</nav>"
+`;
+
+exports[`User Menu component > when quota is above 80% and below 90% > renders a warning quota progress bar 1`] = `
+"<nav data-v-0550d31b="" aria-label="Account menu">
+  <oc-button-stub data-v-0550d31b="" id="_userMenuButton" class="oc-topbar-personal" appearance="raw" aria-label="My Account">
+    <avatar-image-stub data-v-0550d31b="" class="oc-topbar-avatar oc-topbar-personal-avatar oc-flex-inline oc-flex-center oc-flex-middle" width="32" userid="einstein" user-name="Albert Einstein"></avatar-image-stub>
+  </oc-button-stub>
+  <oc-drop-stub data-v-0550d31b="" drop-id="account-info-container" toggle="#_userMenuButton" mode="click" close-on-click="" padding-size="small" class="oc-overflow-hidden">
+    <oc-list-stub data-v-0550d31b="" class="user-menu-list">
+      <li data-v-0550d31b="" class="profile-info-wrapper oc-pl-s">
+        <avatar-image-stub data-v-0550d31b="" width="32" userid="einstein" user-name="Albert Einstein"></avatar-image-stub> <span data-v-0550d31b="" class="profile-info-wrapper"><span data-v-0550d31b="" class="oc-display-block">Albert Einstein</span> <span data-v-0550d31b="" class="oc-text-small">test@test.de</span>
+        <div data-v-0550d31b="" class="quota-information oc-flex oc-flex-bottom oc-text-small oc-mt-xs">
+          <oc-icon-stub name="hard-drive-2" size="small" fill-type="line" class="oc-mr-xs"></oc-icon-stub>
+          <div>
+            <p class="oc-my-rm"><span class="quota-information-text">810 B of 1 kB used (81%)</span></p>
+            <oc-progress-stub class="quota-information-progress-bar" max="100" size="small" variation="warning" value="81"></oc-progress-stub>
+          </div>
+        </div></span>
+      </li>
+      <li data-v-0550d31b="">
+        <oc-button-stub data-v-0550d31b="" id="oc-topbar-account-manage" type="router-link" to="[object Object]" appearance="raw">
+          <oc-icon-stub data-v-0550d31b="" name="settings-4" fill-type="line" class="oc-p-xs"></oc-icon-stub> <span data-v-0550d31b="">Preferences</span>
+        </oc-button-stub>
+      </li>
+      <!--v-if-->
+      <li data-v-0550d31b="">
+        <oc-button-stub data-v-0550d31b="" id="oc-topbar-account-logout" appearance="raw">
+          <oc-icon-stub data-v-0550d31b="" name="logout-box-r" fill-type="line" class="oc-p-xs"></oc-icon-stub> <span data-v-0550d31b="">Log out</span>
+        </oc-button-stub>
+      </li>
+    </oc-list-stub>
+    <!--v-if-->
+  </oc-drop-stub>
+</nav>"
+`;
+
+exports[`User Menu component > when quota is above 90% > renders a danger quota progress bar 1`] = `
+"<nav data-v-0550d31b="" aria-label="Account menu">
+  <oc-button-stub data-v-0550d31b="" id="_userMenuButton" class="oc-topbar-personal" appearance="raw" aria-label="My Account">
+    <avatar-image-stub data-v-0550d31b="" class="oc-topbar-avatar oc-topbar-personal-avatar oc-flex-inline oc-flex-center oc-flex-middle" width="32" userid="einstein" user-name="Albert Einstein"></avatar-image-stub>
+  </oc-button-stub>
+  <oc-drop-stub data-v-0550d31b="" drop-id="account-info-container" toggle="#_userMenuButton" mode="click" close-on-click="" padding-size="small" class="oc-overflow-hidden">
+    <oc-list-stub data-v-0550d31b="" class="user-menu-list">
+      <li data-v-0550d31b="" class="profile-info-wrapper oc-pl-s">
+        <avatar-image-stub data-v-0550d31b="" width="32" userid="einstein" user-name="Albert Einstein"></avatar-image-stub> <span data-v-0550d31b="" class="profile-info-wrapper"><span data-v-0550d31b="" class="oc-display-block">Albert Einstein</span> <span data-v-0550d31b="" class="oc-text-small">test@test.de</span>
+        <div data-v-0550d31b="" class="quota-information oc-flex oc-flex-bottom oc-text-small oc-mt-xs">
+          <oc-icon-stub name="hard-drive-2" size="small" fill-type="line" class="oc-mr-xs"></oc-icon-stub>
+          <div>
+            <p class="oc-my-rm"><span class="quota-information-text">910 B of 1 kB used (91%)</span></p>
+            <oc-progress-stub class="quota-information-progress-bar" max="100" size="small" variation="danger" value="91"></oc-progress-stub>
+          </div>
+        </div></span>
+      </li>
+      <li data-v-0550d31b="">
+        <oc-button-stub data-v-0550d31b="" id="oc-topbar-account-manage" type="router-link" to="[object Object]" appearance="raw">
+          <oc-icon-stub data-v-0550d31b="" name="settings-4" fill-type="line" class="oc-p-xs"></oc-icon-stub> <span data-v-0550d31b="">Preferences</span>
+        </oc-button-stub>
+      </li>
+      <!--v-if-->
+      <li data-v-0550d31b="">
+        <oc-button-stub data-v-0550d31b="" id="oc-topbar-account-logout" appearance="raw">
+          <oc-icon-stub data-v-0550d31b="" name="logout-box-r" fill-type="line" class="oc-p-xs"></oc-icon-stub> <span data-v-0550d31b="">Log out</span>
+        </oc-button-stub>
+      </li>
+    </oc-list-stub>
+    <!--v-if-->
+  </oc-drop-stub>
+</nav>"
+`;
+
+exports[`User Menu component > when quota is below 80% > renders a primary quota progress bar 1`] = `
+"<nav data-v-0550d31b="" aria-label="Account menu">
+  <oc-button-stub data-v-0550d31b="" id="_userMenuButton" class="oc-topbar-personal" appearance="raw" aria-label="My Account">
+    <avatar-image-stub data-v-0550d31b="" class="oc-topbar-avatar oc-topbar-personal-avatar oc-flex-inline oc-flex-center oc-flex-middle" width="32" userid="einstein" user-name="Albert Einstein"></avatar-image-stub>
+  </oc-button-stub>
+  <oc-drop-stub data-v-0550d31b="" drop-id="account-info-container" toggle="#_userMenuButton" mode="click" close-on-click="" padding-size="small" class="oc-overflow-hidden">
+    <oc-list-stub data-v-0550d31b="" class="user-menu-list">
+      <li data-v-0550d31b="" class="profile-info-wrapper oc-pl-s">
+        <avatar-image-stub data-v-0550d31b="" width="32" userid="einstein" user-name="Albert Einstein"></avatar-image-stub> <span data-v-0550d31b="" class="profile-info-wrapper"><span data-v-0550d31b="" class="oc-display-block">Albert Einstein</span> <span data-v-0550d31b="" class="oc-text-small">test@test.de</span>
+        <div data-v-0550d31b="" class="quota-information oc-flex oc-flex-bottom oc-text-small oc-mt-xs">
+          <oc-icon-stub name="hard-drive-2" size="small" fill-type="line" class="oc-mr-xs"></oc-icon-stub>
+          <div>
+            <p class="oc-my-rm"><span class="quota-information-text">300 B of 1 kB used (30%)</span></p>
+            <oc-progress-stub class="quota-information-progress-bar" max="100" size="small" variation="primary" value="30"></oc-progress-stub>
+          </div>
+        </div></span>
+      </li>
+      <li data-v-0550d31b="">
+        <oc-button-stub data-v-0550d31b="" id="oc-topbar-account-manage" type="router-link" to="[object Object]" appearance="raw">
+          <oc-icon-stub data-v-0550d31b="" name="settings-4" fill-type="line" class="oc-p-xs"></oc-icon-stub> <span data-v-0550d31b="">Preferences</span>
+        </oc-button-stub>
+      </li>
+      <!--v-if-->
+      <li data-v-0550d31b="">
+        <oc-button-stub data-v-0550d31b="" id="oc-topbar-account-logout" appearance="raw">
+          <oc-icon-stub data-v-0550d31b="" name="logout-box-r" fill-type="line" class="oc-p-xs"></oc-icon-stub> <span data-v-0550d31b="">Log out</span>
+        </oc-button-stub>
+      </li>
+    </oc-list-stub>
+    <!--v-if-->
+  </oc-drop-stub>
+</nav>"
+`;
+
+exports[`User Menu component > when quota is not defined > renders no percentag of total and no progress bar 1`] = `
+"<nav data-v-0550d31b="" aria-label="Account menu">
+  <oc-button-stub data-v-0550d31b="" id="_userMenuButton" class="oc-topbar-personal" appearance="raw" aria-label="My Account">
+    <avatar-image-stub data-v-0550d31b="" class="oc-topbar-avatar oc-topbar-personal-avatar oc-flex-inline oc-flex-center oc-flex-middle" width="32" userid="einstein" user-name="Albert Einstein"></avatar-image-stub>
+  </oc-button-stub>
+  <oc-drop-stub data-v-0550d31b="" drop-id="account-info-container" toggle="#_userMenuButton" mode="click" close-on-click="" padding-size="small" class="oc-overflow-hidden">
+    <oc-list-stub data-v-0550d31b="" class="user-menu-list">
+      <li data-v-0550d31b="" class="profile-info-wrapper oc-pl-s">
+        <avatar-image-stub data-v-0550d31b="" width="32" userid="einstein" user-name="Albert Einstein"></avatar-image-stub> <span data-v-0550d31b="" class="profile-info-wrapper"><span data-v-0550d31b="" class="oc-display-block">Albert Einstein</span> <span data-v-0550d31b="" class="oc-text-small">test@test.de</span>
+        <div data-v-0550d31b="" class="quota-information oc-flex oc-flex-bottom oc-text-small oc-mt-xs">
+          <oc-icon-stub name="hard-drive-2" size="small" fill-type="line" class="oc-mr-xs"></oc-icon-stub>
+          <div>
+            <p class="oc-my-rm"><span class="quota-information-text">910 B used</span></p>
+            <!--v-if-->
+          </div>
+        </div></span>
+      </li>
+      <li data-v-0550d31b="">
+        <oc-button-stub data-v-0550d31b="" id="oc-topbar-account-manage" type="router-link" to="[object Object]" appearance="raw">
+          <oc-icon-stub data-v-0550d31b="" name="settings-4" fill-type="line" class="oc-p-xs"></oc-icon-stub> <span data-v-0550d31b="">Preferences</span>
+        </oc-button-stub>
+      </li>
+      <!--v-if-->
+      <li data-v-0550d31b="">
+        <oc-button-stub data-v-0550d31b="" id="oc-topbar-account-logout" appearance="raw">
+          <oc-icon-stub data-v-0550d31b="" name="logout-box-r" fill-type="line" class="oc-p-xs"></oc-icon-stub> <span data-v-0550d31b="">Log out</span>
+        </oc-button-stub>
+      </li>
+    </oc-list-stub>
+    <!--v-if-->
+  </oc-drop-stub>
+</nav>"
+`;
+
+exports[`User Menu component > when quota is unlimited > renders no percentag of total and no progress bar 1`] = `
+"<nav data-v-0550d31b="" aria-label="Account menu">
+  <oc-button-stub data-v-0550d31b="" id="_userMenuButton" class="oc-topbar-personal" appearance="raw" aria-label="My Account">
+    <avatar-image-stub data-v-0550d31b="" class="oc-topbar-avatar oc-topbar-personal-avatar oc-flex-inline oc-flex-center oc-flex-middle" width="32" userid="einstein" user-name="Albert Einstein"></avatar-image-stub>
+  </oc-button-stub>
+  <oc-drop-stub data-v-0550d31b="" drop-id="account-info-container" toggle="#_userMenuButton" mode="click" close-on-click="" padding-size="small" class="oc-overflow-hidden">
+    <oc-list-stub data-v-0550d31b="" class="user-menu-list">
+      <li data-v-0550d31b="" class="profile-info-wrapper oc-pl-s">
+        <avatar-image-stub data-v-0550d31b="" width="32" userid="einstein" user-name="Albert Einstein"></avatar-image-stub> <span data-v-0550d31b="" class="profile-info-wrapper"><span data-v-0550d31b="" class="oc-display-block">Albert Einstein</span> <span data-v-0550d31b="" class="oc-text-small">test@test.de</span>
+        <div data-v-0550d31b="" class="quota-information oc-flex oc-flex-bottom oc-text-small oc-mt-xs">
+          <oc-icon-stub name="hard-drive-2" size="small" fill-type="line" class="oc-mr-xs"></oc-icon-stub>
+          <div>
+            <p class="oc-my-rm"><span class="quota-information-text">300 B used</span></p>
+            <!--v-if-->
+          </div>
+        </div></span>
+      </li>
+      <li data-v-0550d31b="">
+        <oc-button-stub data-v-0550d31b="" id="oc-topbar-account-manage" type="router-link" to="[object Object]" appearance="raw">
+          <oc-icon-stub data-v-0550d31b="" name="settings-4" fill-type="line" class="oc-p-xs"></oc-icon-stub> <span data-v-0550d31b="">Preferences</span>
+        </oc-button-stub>
+      </li>
+      <!--v-if-->
+      <li data-v-0550d31b="">
+        <oc-button-stub data-v-0550d31b="" id="oc-topbar-account-logout" appearance="raw">
+          <oc-icon-stub data-v-0550d31b="" name="logout-box-r" fill-type="line" class="oc-p-xs"></oc-icon-stub> <span data-v-0550d31b="">Log out</span>
+        </oc-button-stub>
+      </li>
+    </oc-list-stub>
+    <!--v-if-->
+  </oc-drop-stub>
+</nav>"
+`;
+
+exports[`User Menu component > when user is not logged in > renders a navigation with login button 1`] = `
+"<nav data-v-0550d31b="" aria-label="Account menu">
+  <oc-button-stub data-v-0550d31b="" id="_userMenuButton" class="oc-topbar-personal" appearance="raw" aria-label="My Account">
+    <div data-v-0550d31b="" data-test-item-name="User Menu login" aria-hidden="true" focusable="false" class="oc-topbar-avatar oc-topbar-unauthenticated-avatar oc-flex-inline oc-flex-center oc-flex-middle"><span class="oc-avatar-item" style="background-color: var(--oc-color-swatch-brand-contrast); --icon-color: var(--oc-color-swatch-brand-default); --width: 32px;"><oc-icon-stub name="user" filltype="line" accessiblelabel="" type="span" size="small" variation="passive" color=""></oc-icon-stub></span></div>
+  </oc-button-stub>
+  <oc-drop-stub data-v-0550d31b="" drop-id="account-info-container" toggle="#_userMenuButton" mode="click" close-on-click="" padding-size="small" class="oc-overflow-hidden">
+    <oc-list-stub data-v-0550d31b="" class="user-menu-list">
+      <li data-v-0550d31b="">
+        <oc-button-stub data-v-0550d31b="" id="oc-topbar-account-manage" type="router-link" to="[object Object]" appearance="raw">
+          <oc-icon-stub data-v-0550d31b="" name="settings-4" fill-type="line" class="oc-p-xs"></oc-icon-stub> <span data-v-0550d31b="">Preferences</span>
+        </oc-button-stub>
+      </li>
+      <li data-v-0550d31b="">
+        <oc-button-stub data-v-0550d31b="" id="oc-topbar-account-login" appearance="raw" type="router-link" to="[object Object]">
+          <oc-icon-stub data-v-0550d31b="" name="login-box" fill-type="line" class="oc-p-xs"></oc-icon-stub> <span data-v-0550d31b="">Log in</span>
+        </oc-button-stub>
+      </li>
+    </oc-list-stub>
+    <!--v-if-->
+  </oc-drop-stub>
+</nav>"
+`;

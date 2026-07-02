@@ -1,0 +1,8 @@
+// We import "styles" automatically in every component
+// via css.preprocessorOptions.scss.additionalData but strip
+// it after the file has been processed. That's why we we need to
+// include it once more globally - to make global rules available.
+// If we try to just load "styles.scss" from index.html, Vite
+// complains that the file is already loaded.
+// Hence this wrapper file exists to workaround that behavior.
+@import "styles"

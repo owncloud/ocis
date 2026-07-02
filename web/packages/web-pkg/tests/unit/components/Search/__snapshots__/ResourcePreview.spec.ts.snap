@@ -1,0 +1,13 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Preview component > should render preview component 1`] = `
+"<div class="oc-resource oc-text-overflow"><span class="oc-resource-icon-wrapper"><img src="blob:image" alt="" aria-hidden="true" loading="eager" class="oc-resource-thumbnail" width="40" height="40"></span>
+  <div class="oc-resource-details oc-text-overflow oc-pl-s"><button target="_self" type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-left oc-button-gap-undefined oc-button-passive oc-button-passive-raw oc-resource-link oc-text-overflow" draggable="false">
+      <!--v-if-->
+      <!-- @slot Content of the button --> <span class="oc-resource-name" data-test-resource-path="/" data-test-resource-name="lorem.txt" title="lorem.txt" aria-label="lorem.txt"><span class="oc-text-truncate"><span class="oc-resource-basename">lorem.txt</span></span>
+      <!--v-if--></span>
+    </button>
+    <div class="oc-resource-indicators"><a attrs="[object Object]" style="cursor: pointer;" class="parent-folder oc-text-truncate" aria-current="page"></a></div>
+  </div>
+</div>"
+`;

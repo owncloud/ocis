@@ -1,0 +1,42 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Projects view > different files view states > lists all available project spaces 1`] = `
+"<div class="oc-flex oc-width-1-1">
+  <div data-v-e62b9535="" class="files-view-wrapper oc-width-expand">
+    <div data-v-e62b9535="" id="files-view">
+      <app-bar-stub viewmodedefault="resource-tiles" breadcrumbs="[object Object]" breadcrumbscontextactionsitems="" viewmodes="[object Object]" hasbulkactions="true" hasviewoptions="true" hashiddenfiles="false" hasfileextensions="false" haspagination="false" issidebaropen="false"></app-bar-stub>
+      <div class="spaces-list">
+        <div class="spaces-list-filters oc-flex oc-flex-between oc-flex-wrap oc-flex-bottom oc-mx-m oc-mb-m">
+          <fieldset class="oc-flex">
+            <div>
+              <legend class="oc-mr-m oc-flex oc-flex-middle"><span class="oc-icon oc-icon-m oc-icon-passive oc-mr-xs"><!----></span> <span>Filter:</span></legend>
+            </div>
+            <div class="item-filter oc-flex item-filter-includeDisabled spaces-list-filter-include-disabled oc-mr-s">
+              <div class="oc-filter-chip oc-flex oc-filter-chip-toggle"><span id="004nym8equapq009bx8gtholfh" class="oc-invisible-sr oc-hidden-announcer" aria-live="polite" aria-atomic="true"></span> <button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-filter-chip-button oc-pill" id="oc-filter-chip-1" aria-pressed="false">
+                  <!--v-if-->
+                  <!-- @slot Content of the button --> <span class="oc-icon oc-icon-s oc-icon-passive oc-filter-check-icon-inactive"><!----></span> <span class="oc-text-truncate oc-filter-chip-label">Include disabled</span>
+                  <!--v-if-->
+                  <!--v-if-->
+                </button>
+                <!--v-if-->
+                <!--v-if-->
+              </div>
+            </div>
+          </fieldset>
+          <div class="" autocomplete="off"><label class="oc-label" for="spaces-filter">Search</label>
+            <div class="oc-position-relative">
+              <!--v-if--> <input id="spaces-filter" autocomplete="off" aria-invalid="false" class="oc-text-input oc-input oc-rounded" type="text" value="">
+              <!--v-if-->
+            </div>
+            <!--v-if-->
+            <!--v-if-->
+          </div>
+        </div>
+        <div class="resource-table" selected-ids="" resource-type="space" resources="[object Object],[object Object]" fields-displayed="image,name,manager,members,totalQuota,usedQuota,remainingQuota,status,mdate" sort-fields="[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]" sort-by="name" sort-dir="asc" header-position="0" is-side-bar-open="false" view-size="1"></div>
+      </div>
+    </div>
+  </div>
+  <!--v-if-->
+  <file-side-bar-stub isopen="false"></file-side-bar-stub>
+</div>"
+`;

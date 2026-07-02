@@ -1,0 +1,14 @@
+---
+space:
+  xsmall:
+    value: 4px
+  small:
+    value: 8px
+  medium:
+    value: 16px
+  large:
+    value: 24px
+  xlarge:
+    value: 48px
+  xxlarge:
+    value: 96px

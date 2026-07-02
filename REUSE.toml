@@ -1,0 +1,9 @@
+version = 1
+SPDX-PackageName = "ocis"
+SPDX-PackageSupplier = "ownCloud GmbH <devops@owncloud.com>"
+SPDX-PackageDownloadLocation = "https://github.com/owncloud/ocis"
+
+[[annotations]]
+path = "**"
+SPDX-FileCopyrightText = "2020-2026 ownCloud GmbH"
+SPDX-License-Identifier = "Apache-2.0"

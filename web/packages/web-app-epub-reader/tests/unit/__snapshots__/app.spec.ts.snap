@@ -1,0 +1,61 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Epub reader app > renders correctly 1`] = `
+"<div class="epub-reader oc-flex">
+  <ul class="oc-list oc-my-rm oc-mx-rm epub-reader-chapters-list oc-pl-s oc-visible@l">
+    <li class="epub-reader-chapters-list-item oc-py-s active"><button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-text-truncate">
+        <!--v-if-->
+        <!-- @slot Content of the button --> <span class="oc-text-truncate oc-mr-s">Chapter 1</span>
+      </button></li>
+    <li class="epub-reader-chapters-list-item oc-py-s"><button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-text-truncate">
+        <!--v-if-->
+        <!-- @slot Content of the button --> <span class="oc-text-truncate oc-mr-s">Chapter 2</span>
+      </button></li>
+  </ul>
+  <div class="oc-width-1-1 oc-height-1-1">
+    <div class="epub-reader-controls oc-flex oc-flex-middle oc-m-s">
+      <div class="epub-reader-controls-font-size oc-flex oc-button-group"><button type="button" aria-label="Decrease font size" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-undefined oc-button-passive oc-button-passive-outline epub-reader-controls-font-size-decrease">
+          <!--v-if-->
+          <!-- @slot Content of the button --> <span class="oc-icon oc-icon-s oc-icon-passive"><!----></span> <span class="oc-icon oc-icon-xs oc-icon-passive"><!----></span>
+        </button> <button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-undefined oc-button-passive oc-button-passive-outline epub-reader-controls-font-size-reset">
+          <!--v-if-->
+          <!-- @slot Content of the button --> 100%
+        </button> <button type="button" aria-label="Increase font size" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-undefined oc-button-passive oc-button-passive-outline epub-reader-controls-font-size-increase">
+          <!--v-if-->
+          <!-- @slot Content of the button --> <span class="oc-icon oc-icon-s oc-icon-passive"><!----></span> <span class="oc-icon oc-icon-xs oc-icon-passive"><!----></span>
+        </button></div>
+      <div class="epub-reader-controls-chapters-select oc-width-1-1 oc-px-s oc-hidden@l" options="[object Object],[object Object]" modelvalue="[object Object]">
+        <!--v-if-->
+        <!--v-if-->
+        <div dir="auto" class="v-select vs--single vs--unsearchable oc-select epub-reader-controls-chapters-select oc-width-1-1 oc-px-s oc-hidden@l" style="background: transparent;">
+          <div id="vs1__combobox" class="vs__dropdown-toggle" role="combobox" aria-expanded="false" aria-owns="vs1__listbox" aria-label="Search for option">
+            <div class="vs__selected-options"><span class="vs__selected"><!--v-if--> Chapter 1 <!--v-if--></span><input class="vs__search" readonly="" id="oc-select-1" aria-autocomplete="list" aria-labelledby="vs1__combobox" aria-controls="oc-select-1-listbox" type="search" autocomplete="off" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-label="Chapter" value=""></div>
+            <div class="vs__actions"><button type="button" class="vs__clear" title="Clear Selected" aria-label="Clear Selected" style="display: none;"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">
+                  <path d="M6.895455 5l2.842897-2.842898c.348864-.348863.348864-.914488 0-1.263636L9.106534.261648c-.348864-.348864-.914489-.348864-1.263636 0L5 3.104545 2.157102.261648c-.348863-.348864-.914488-.348864-1.263636 0L.261648.893466c-.348864.348864-.348864.914489 0 1.263636L3.104545 5 .261648 7.842898c-.348864.348863-.348864.914488 0 1.263636l.631818.631818c.348864.348864.914773.348864 1.263636 0L5 6.895455l2.842898 2.842897c.348863.348864.914772.348864 1.263636 0l.631818-.631818c.348864-.348864.348864-.914489 0-1.263636L6.895455 5z"></path>
+                </svg></button><svg xmlns="http://www.w3.org/2000/svg" width="14" height="10" role="presentation" class="vs__open-indicator">
+                <path d="M9.211364 7.59931l4.48338-4.867229c.407008-.441854.407008-1.158247 0-1.60046l-.73712-.80023c-.407008-.441854-1.066904-.441854-1.474243 0L7 5.198617 2.51662.33139c-.407008-.441853-1.066904-.441853-1.474243 0l-.737121.80023c-.407008.441854-.407008 1.158248 0 1.600461l4.48338 4.867228L7 10l2.211364-2.40069z"></path>
+              </svg>
+              <div class="vs__spinner" style="display: none;">Loading...</div>
+            </div>
+          </div>
+          <transition-stub name="vs__fade" appear="false" persisted="false" css="true">
+            <ul id="vs1__listbox" role="listbox" style="display: none; visibility: hidden;"></ul>
+          </transition-stub>
+        </div>
+        <!--v-if-->
+      </div>
+    </div>
+    <div class="oc-flex oc-flex-center oc-width-1-1 oc-height-1-1">
+      <div class="oc-flex oc-flex-middle oc-mx-l"><button type="button" aria-label="Navigate to previous page" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw epub-reader-navigate-left">
+          <!--v-if-->
+          <!-- @slot Content of the button --> <span class="oc-icon oc-icon-xl oc-icon-passive"><!----></span>
+        </button></div>
+      <div id="reader" class="oc-flex oc-flex-center"></div>
+      <div class="oc-flex oc-flex-middle oc-mx-l"><button type="button" aria-label="Navigate to next page" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw epub-reader-navigate-right">
+          <!--v-if-->
+          <!-- @slot Content of the button --> <span class="oc-icon oc-icon-xl oc-icon-passive"><!----></span>
+        </button></div>
+    </div>
+  </div>
+</div>"
+`;

@@ -1,0 +1,38 @@
+$directives: ("m": "margin", "p": "padding");
+
+@each $directiveKey, $directiveValue in $directives {
+  .oc-#{$directiveKey} {
+    #{$directiveValue}: $oc-space-medium !important;
+
+    @each $directionKey, $directionValues in $directions {
+      &#{$directionKey} {
+        @each $direction in $directionValues {
+          & {
+            #{$directiveValue}-#{$direction}: $oc-space-medium !important;
+          }
+
+
+          @each $sizeKey, $sizeValue in $sizes {
+            &-#{$sizeKey} {
+              #{$directiveValue}-#{$direction}: $sizeValue !important;
+            }
+          }
+
+          &-rm {
+            #{$directiveValue}-#{$direction}: 0 !important;
+          }
+        }
+      }
+    }
+
+    @each $sizeKey, $sizeValue in $sizes {
+      &-#{$sizeKey} {
+        #{$directiveValue}: $sizeValue !important;
+      }
+    }
+
+    &-rm {
+      #{$directiveValue}: 0 !important;
+    }
+  }
+}

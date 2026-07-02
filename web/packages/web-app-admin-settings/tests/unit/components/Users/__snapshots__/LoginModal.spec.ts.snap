@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`LoginModal > renders the input including two options 1`] = `
+"<div>
+  <oc-select-stub label="Login" id="oc-select-1" filter="[Function]" disabled="false" labelhidden="false" optionlabel="label" searchable="true" clearable="false" loading="false" warningmessage="" fixmessageline="false" multiple="false" readonly="false" positionfixed="true" options="[object Object],[object Object]" placeholder="Select..."></oc-select-stub>
+</div>"
+`;

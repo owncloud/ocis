@@ -1,0 +1,68 @@
+@mixin oc-background-primary-gradient {
+  background:
+    linear-gradient(
+      90deg,
+      var(--oc-color-swatch-primary-muted) 0%,
+      var(--oc-color-swatch-primary-gradient) 100%
+    );
+
+  &:focus:not([disabled]),
+  &:hover:not([disabled])
+  {
+    background: linear-gradient(
+      90deg,
+      var(--oc-color-swatch-primary-muted-hover) 0%,
+      var(--oc-color-swatch-primary-gradient-hover) 100%
+    );
+  }
+}
+
+.oc-background-selected {
+  background-color: var(--oc-color-background-highlight) !important;
+}
+
+.oc-background-brand {
+  background-color: var(--oc-color-swatch-brand-default) !important;
+}
+
+.oc-background-default {
+  background-color: var(--oc-color-background-default) !important;
+}
+
+/* stylelint-disable */
+.oc-background-primary-gradient {
+  @include oc-background-primary-gradient;
+}
+
+/* stylelint-enable */
+
+.oc-background-secondary {
+  background-color: var(--oc-color-background-secondary) !important;
+}
+
+.oc-background-muted {
+  background-color: var(--oc-color-background-muted) !important;
+}
+
+.oc-background-highlight {
+  background-color: var(--oc-color-background-highlight) !important;
+}
+
+.oc-background-warning {
+  background-color: var(--oc-color-swatch-warning-default) !important;
+  color: var(--oc-color-text-inverse) !important;
+}
+
+.oc-background-contain {
+  background-size: contain;
+}
+
+.oc-background-cover {
+  background-size: cover;
+}
+
+.oc-background-contain,
+.oc-background-cover {
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+}

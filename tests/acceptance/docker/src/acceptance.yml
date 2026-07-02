@@ -16,8 +16,6 @@ services:
       # email
       EMAIL_HOST: email
       EMAIL_PORT: 8025
-    env_file:
-      - ../../../../ci.env
     volumes:
       - ./run-tests.sh:/test/run-tests.sh
       - ../../../../:/ocis

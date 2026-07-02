@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`General view > renders component 1`] = `
+"<div>
+  <app-template-stub breadcrumbs="[object Object],[object Object]" issidebaropen="false" sidebaravailablepanels="[object Object]" sidebarpanelcontext="[object Object]" loading="false" sidebarloading="false" showviewoptions="false" showbatchactions="false" batchactionitems="" batchactions="" showappbar="false"></app-template-stub>
+</div>"
+`;

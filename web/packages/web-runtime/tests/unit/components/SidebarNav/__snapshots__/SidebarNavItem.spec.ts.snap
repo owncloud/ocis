@@ -1,0 +1,13 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`OcSidebarNav > renders navItem with toolTip if collapsed 1`] = `
+"<li class="oc-sidebar-nav-item oc-pb-xs oc-px-s" id="123">
+  <router-link-stub to="/files/list/all" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-sidebar-nav-item-link oc-oc-width-1-1" data-nav-id="5" data-nav-name="route.name"></router-link-stub>
+</li>"
+`;
+
+exports[`OcSidebarNav > renders navItem without toolTip if expanded 1`] = `
+"<li class="oc-sidebar-nav-item oc-pb-xs oc-px-s" id="123">
+  <router-link-stub to="/files/list/all" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-sidebar-nav-item-link oc-oc-width-1-1" data-nav-id="5" data-nav-name="route.name"></router-link-stub>
+</li>"
+`;

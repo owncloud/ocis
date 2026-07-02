@@ -1,0 +1,33 @@
+clients:
+  - id: web
+    name: ownCloud web app
+    application_type: web
+    insecure: true
+    trusted: true
+    redirect_uris:
+      - https://host.docker.internal:9200/
+      - https://host.docker.internal:9200/oidc-callback.html
+      - https://host.docker.internal:9200/oidc-silent-redirect.html
+      - https://host.docker.internal:9201/
+      - https://host.docker.internal:9201/oidc-callback.html
+      - https://host.docker.internal:9201/oidc-silent-redirect.html
+      - https://host.docker.internal:10200/
+      - https://host.docker.internal:10200/oidc-callback.html
+      - https://host.docker.internal:10200/oidc-silent-redirect.html
+      - https://host.docker.internal:10201/
+      - https://host.docker.internal:10201/oidc-callback.html
+      - https://host.docker.internal:10201/oidc-silent-redirect.html
+    origins:
+      - https://host.docker.internal:9200
+      - https://host.docker.internal:9201
+      - https://host.docker.internal:10200
+      - https://host.docker.internal:10201
+
+  - id: xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69
+    name: ownCloud desktop client
+    application_type: native
+    trusted: true
+    secret: UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh
+    redirect_uris:
+      - http://localhost
+      - http://127.0.0.1

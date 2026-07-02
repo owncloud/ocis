@@ -1,0 +1,38 @@
+---
+font:
+  family:
+    value: 'Inter, sans-serif'
+  size:
+    default:
+      value: 0.875rem
+    xsmall:
+      value: 0.80rem
+    small:
+      value: 0.86rem
+    medium:
+      value: 1rem
+    large:
+      value: 1.14rem
+    xlarge:
+      value: 1.29rem
+  weight:
+    default:
+      value: '400'
+    thin:
+      value: '100'
+    extralight:
+      value: '200'
+    light:
+      value: '300'
+    normal:
+      value: '400'
+    medium:
+      value: '500'
+    semibold:
+      value: '600'
+    bold:
+      value: '700'
+    extrabold:
+      value: '800'
+    black:
+      value: '900'

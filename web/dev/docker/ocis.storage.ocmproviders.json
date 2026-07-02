@@ -1,0 +1,23 @@
+[
+  {
+    "name": "ocis",
+    "full_name": "ocis server",
+    "organization": "ownCloud",
+    "domain": "host.docker.internal:(9200|10200)",
+    "homepage": "https://owncloud.com",
+    "services": [
+      {
+        "endpoint": {
+          "type": {
+            "name": "OCM",
+            "description": "ownCloud Open Cloud Mesh API"
+          },
+          "name": "ownCloud - OCM API",
+          "path": "https://host.docker.internal:(9200|10200)/ocm/",
+          "is_monitored": true
+        },
+        "host": "host.docker.internal:(9200|10200)"
+      }
+    ]
+  }
+]

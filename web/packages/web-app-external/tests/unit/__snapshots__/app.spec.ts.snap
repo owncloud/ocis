@@ -1,0 +1,24 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`The app provider extension > should be able to load an iFrame via get 1`] = `
+"<iframe src="https://example.test/d12ab86/loe009157-MzBw" class="oc-width-1-1 oc-height-1-1" title="&quot;example-app&quot; app content area" allowfullscreen="" allow="camera; clipboard-read; clipboard-write"></iframe>
+
+<!--v-if-->"
+`;
+
+exports[`The app provider extension > should be able to load an iFrame via post 1`] = `
+"<!--v-if-->
+
+<div class="oc-height-1-1 oc-width-1-1">
+  <form action="https://example.test/d12ab86/loe009157-MzBw" target="app-iframe" method="post"><input type="submit" class="oc-hidden" value="[object Object]">
+    <div><input name="access_token" type="hidden" value="asdfsadfsadf"></div>
+    <div><input name="access_token_ttl" type="hidden" value="123456"></div>
+  </form> <iframe name="app-iframe" src="https://example.test/d12ab86/loe009157-MzBw" class="oc-width-1-1 oc-height-1-1" title="&quot;example-app&quot; app content area" allowfullscreen="" allow="camera; clipboard-read; clipboard-write"></iframe>
+</div>"
+`;
+
+exports[`The app provider extension > should fail for unauthenticated users 1`] = `
+"<!--v-if-->
+
+<!--v-if-->"
+`;

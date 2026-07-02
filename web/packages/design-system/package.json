@@ -1,0 +1,146 @@
+{
+  "name": "@ownclouders/design-system",
+  "version": "12.5.0",
+  "description": "ownCloud Design System is based on VueDesign Systems and is used to design ownCloud UI components",
+  "keywords": [
+    "vue design system",
+    "design system",
+    "vue.js",
+    "vue",
+    "design",
+    "system"
+  ],
+  "homepage": "https://owncloud.design/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/owncloud/web",
+    "directory": "packages/design-system"
+  },
+  "license": "Apache-2.0",
+  "author": "ownClouders",
+  "type": "module",
+  "main": "src/index.ts",
+  "private": false,
+  "scripts": {
+    "lint": "lint:stylelint",
+    "lint:stylelint": "stylelint './src/styles/**/*.scss' --cache",
+    "tokens": "node build/build-tokens.js",
+    "tokens:w": "onchange -i \"./src/tokens/**/*.json\" -- npm run tokens",
+    "vite": "vite",
+    "prepublishOnly": "rm -rf ./package && clean-publish && find package && cat package/package.json",
+    "postpublish": "rm -rf ./package",
+    "test:unit": "NODE_OPTIONS=--unhandled-rejections=throw vitest"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not Explorer > 0",
+    "not ExplorerMobile > 0",
+    "not BlackBerry > 0",
+    "not OperaMini all",
+    "not OperaMobile > 0"
+  ],
+  "files": [
+    "dist/"
+  ],
+  "publishConfig": {
+    "directory": "package",
+    "linkDirectory": false,
+    "exports": {
+      ".": {
+        "default": "./dist/design-system.js",
+        "require": "./dist/design-system.cjs",
+        "types": "./dist/types/index.d.ts"
+      },
+      "./components": {
+        "default": "./dist/design-system/components.js",
+        "require": "./dist/design-system/components.cjs",
+        "types": "./dist/types/components/index.d.ts"
+      },
+      "./composables": {
+        "default": "./dist/design-system/composables.js",
+        "require": "./dist/design-system/composables.cjs",
+        "types": "./dist/types/composables/index.d.ts"
+      },
+      "./helpers": {
+        "default": "./dist/design-system/helpers.js",
+        "require": "./dist/design-system/helpers.cjs",
+        "types": "./dist/types/helpers/index.d.ts"
+      }
+    }
+  },
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./components": {
+      "default": "./src/components/index.ts"
+    },
+    "./composables": {
+      "default": "./src/composables/index.ts"
+    },
+    "./helpers": {
+      "default": "./src/helpers/index.ts"
+    },
+    "./l10n": {
+      "default": "./l10n/translations.json"
+    }
+  },
+  "dependencies": {
+    "@emoji-mart/data": "^1.2.1",
+    "@popperjs/core": "^2.11.8",
+    "deepmerge": "^4.3.1",
+    "emoji-mart": "5.6.0",
+    "focus-trap": "^8.2.0",
+    "focus-trap-vue": "^4.1.0",
+    "fuse.js": "^7.3.0",
+    "lodash-es": "^4.18.1",
+    "luxon": "^3.7.2",
+    "tippy.js": "^6.3.7",
+    "vue-inline-svg": "^4.0.1",
+    "vue-router": "^5.0.6",
+    "vue-select": "4.0.0-beta.6",
+    "vue3-gettext": "^2.4.0",
+    "webfontloader": "^1.6.28"
+  },
+  "devDependencies": {
+    "@babel/core": "7.28.5",
+    "@babel/plugin-transform-runtime": "7.28.5",
+    "@babel/preset-env": "7.28.5",
+    "@babel/runtime": "7.28.4",
+    "@ownclouders/web-test-helpers": "workspace:*",
+    "@vitejs/plugin-vue": "6.0.1",
+    "autoprefixer": "10.4.22",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-loader": "^10.0.0",
+    "babel-plugin-require-context-hook": "^1.0.0",
+    "clean-publish": "^6.0.1",
+    "glob": "^13.0.0",
+    "mini-css-extract-plugin": "^2.9.4",
+    "node-notifier": "^10.0.1",
+    "onchange": "^7.1.0",
+    "postcss-nested": "^7.0.2",
+    "postcss-safe-parser": "7.0.1",
+    "postcss-simple-vars": "^7.0.1",
+    "process": "^0.11.10",
+    "sass": "1.94.1",
+    "semver": "7.7.3",
+    "shelljs": "^0.10.0",
+    "style-dictionary": "^5.1.1",
+    "style-value-types": "^5.1.2",
+    "stylelint": "17.0.0",
+    "stylelint-config-sass-guidelines": "^12.1.0",
+    "stylelint-config-standard": "^40.0.0",
+    "tinycolor2": "^1.6.0",
+    "typescript": "5.9.3",
+    "url": "^0.11.4",
+    "url-loader": "^4.1.1",
+    "vite": "^7.2.2",
+    "vite-plugin-dts": "^4.5.4",
+    "vite-plugin-node-polyfills": "^0.24.0",
+    "yaml": "^2.8.1"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.29"
+  }
+}

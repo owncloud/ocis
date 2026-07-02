@@ -1,0 +1,14 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SpaceInfo > shows space info 1`] = `
+"<div class="space_info oc-p-s">
+  <div class="space_info__body oc-text-overflow oc-flex oc-flex-middle">
+    <div class="oc-mr-s">
+      <oc-icon-stub name="layout-grid" filltype="fill" accessiblelabel="" type="span" size="medium" variation="passive" color="" class="oc-display-block"></oc-icon-stub>
+    </div>
+    <div>
+      <h3 data-testid="space-info-name" class="oc-font-semibold oc-m-rm"> space</h3> <span data-testid="space-info-subtitle"></span>
+    </div>
+  </div>
+</div>"
+`;

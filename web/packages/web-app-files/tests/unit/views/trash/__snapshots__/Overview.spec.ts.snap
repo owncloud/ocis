@@ -1,0 +1,68 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`TrashOverview > view states > should render spaces list 1`] = `
+"<div class="oc-flex">
+  <div data-v-e62b9535="" class="files-view-wrapper oc-width-expand">
+    <div data-v-e62b9535="" id="files-view">
+      <app-bar-stub viewmodedefault="resource-table" breadcrumbs="[object Object]" breadcrumbscontextactionsitems="" viewmodes="" hasbulkactions="false" hasviewoptions="false" hashiddenfiles="false" hasfileextensions="false" haspagination="false" issidebaropen="false"></app-bar-stub>
+      <div class="trash-bin-filters oc-flex oc-flex-right oc-flex-wrap oc-flex-bottom oc-mx-m oc-mb-m">
+        <div class="" autocomplete="off"><label class="oc-label" for="spaces-filter">Search</label>
+          <div class="oc-position-relative">
+            <!--v-if--> <input id="spaces-filter" autocomplete="off" aria-invalid="false" class="oc-text-input oc-input oc-rounded" type="text" value="">
+            <!--v-if-->
+          </div>
+          <!--v-if-->
+          <!--v-if-->
+        </div>
+      </div>
+      <table class="oc-table oc-table-hover oc-table-sticky has-item-context-menu spaces-table">
+        <caption class=""> <span class="oc-invisible-sr">Column headers with buttons are sortable.</span></caption>
+        <thead class="oc-thead">
+          <tr class="oc-table-header-row">
+            <th class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-shrink oc-text-nowrap oc-th oc-table-header-cell oc-table-header-cell-icon oc-pl-s" style="top: 0px;">
+              <div><span class="oc-table-thead-content header-text oc-invisible-sr" aria-hidden="true">Icons</span></div>
+            </th>
+            <th class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-auto oc-text-nowrap oc-th oc-table-header-cell oc-table-header-cell-name oc-pr-s" style="top: 0px;" aria-sort="ascending"><button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-button-sort oc-width-1-1">
+                <!--v-if-->
+                <!-- @slot Content of the button --> <span class="oc-table-thead-content header-text">Name</span> <span class="oc-icon oc-icon-s oc-icon-passive"><!----></span>
+              </button></th>
+          </tr>
+        </thead>
+        <tbody class="has-item-context-menu">
+          <tr class="oc-tbody-tr oc-tbody-tr-1" data-item-id="1" draggable="false">
+            <td class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-shrink oc-td oc-table-data-cell oc-table-data-cell-icon oc-pl-s"><span class="oc-icon oc-icon-m oc-icon-passive oc-pl-m"><!----></span></td>
+            <td class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-auto oc-td oc-table-data-cell oc-table-data-cell-name oc-pr-s">
+              <router-link-stub to="[object Object]" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-display-block trash-bin-route"></router-link-stub>
+            </td>
+          </tr>
+          <tr class="oc-tbody-tr oc-tbody-tr-2" data-item-id="2" draggable="false">
+            <td class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-shrink oc-td oc-table-data-cell oc-table-data-cell-icon oc-pl-s"><span class="oc-icon oc-icon-m oc-icon-passive oc-pl-m"><!----></span></td>
+            <td class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-auto oc-td oc-table-data-cell oc-table-data-cell-name oc-pr-s">
+              <router-link-stub to="[object Object]" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-display-block trash-bin-route"></router-link-stub>
+            </td>
+          </tr>
+          <tr class="oc-tbody-tr oc-tbody-tr-3" data-item-id="3" draggable="false">
+            <td class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-shrink oc-td oc-table-data-cell oc-table-data-cell-icon oc-pl-s"><span class="oc-icon oc-icon-m oc-icon-passive oc-pl-m"><!----></span></td>
+            <td class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-auto oc-td oc-table-data-cell oc-table-data-cell-name oc-pr-s">
+              <router-link-stub to="[object Object]" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-display-block trash-bin-route"></router-link-stub>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot class="oc-table-footer">
+          <tr class="oc-table-footer-row">
+            <td colspan="2" class="oc-table-footer-cell">
+              <!-- @slot Footer of the table -->
+              <div class="oc-text-center oc-width-1-1 oc-my-s">
+                <p class="oc-text-muted">3 trashes in total</p>
+                <!--v-if-->
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  <!--v-if-->
+  <file-side-bar-stub isopen="false"></file-side-bar-stub>
+</div>"
+`;

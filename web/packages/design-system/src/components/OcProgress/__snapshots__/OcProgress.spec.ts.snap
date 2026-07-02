@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`OcProgress > sets correct classes 1`] = `
+"<div class="oc-progress oc-progress-small oc-progress-warning" aria-valuemax="10" aria-valuenow="3" aria-busy="true" aria-valuemin="0" role="progressbar">
+  <div class="oc-progress-current" style="width: 30%;"></div>
+</div>"
+`;

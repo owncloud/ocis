@@ -1,0 +1,57 @@
+{
+  "name": "@ownclouders/web-test-helpers",
+  "version": "12.5.0",
+  "description": "ownCloud web test helpers",
+  "license": "Apache-2.0",
+  "private": false,
+  "type": "module",
+  "main": "src/index.ts",
+  "author": "ownCloud GmbH <devops@owncloud.com>",
+  "homepage": "https://github.com/owncloud/web/tree/master/packages/web-test-helpers",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/owncloud/web",
+    "directory": "packages/web-test-helpers"
+  },
+  "files": [
+    "dist/"
+  ],
+  "publishConfig": {
+    "directory": "package",
+    "linkDirectory": false,
+    "exports": {
+      ".": {
+        "import": "./dist/web-test-helpers.es.js",
+        "require": "./dist/web-test-helpers.umd.cjs",
+        "types": "./dist/types/index.d.ts"
+      }
+    }
+  },
+  "scripts": {
+    "vite": "vite",
+    "prepublishOnly": "rm -rf ./package && clean-publish && find package && cat package/package.json",
+    "postpublish": "rm -rf ./package"
+  },
+  "peerDependencies": {
+    "@ownclouders/web-pkg": "workspace:^",
+    "@vue/test-utils": "^2.4.6",
+    "vue": "^3.5.29"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "6.0.1",
+    "clean-publish": "^6.0.1",
+    "vite": "^7.2.2",
+    "vite-plugin-dts": "^4.5.4"
+  },
+  "dependencies": {
+    "@casl/ability": "^6.8.1",
+    "@casl/vue": "^2.2.6",
+    "@ownclouders/design-system": "workspace:^",
+    "@ownclouders/web-client": "workspace:^",
+    "@pinia/testing": "^1.0.3",
+    "axios": "^1.18.1",
+    "vitest-mock-extended": "3.1.1",
+    "vue-router": "5.0.6",
+    "vue3-gettext": "2.4.0"
+  }
+}

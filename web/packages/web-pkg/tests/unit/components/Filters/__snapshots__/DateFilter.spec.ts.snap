@@ -1,0 +1,171 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`DateFilter > can use a custom attribute as display name 1`] = `
+"<div class="date-filter oc-flex date-filter-users">
+  <div class="oc-filter-chip oc-flex"><span id="004nym8equapq009bx8gtholfh" class="oc-invisible-sr oc-hidden-announcer" aria-live="polite" aria-atomic="true"></span> <button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-filter-chip-button oc-pill" id="oc-filter-chip-5" aria-pressed="false">
+      <!--v-if-->
+      <!-- @slot Content of the button --> <span class="oc-icon oc-icon-s oc-icon-passive oc-filter-check-icon-inactive"><!----></span> <span class="oc-text-truncate oc-filter-chip-label">Users</span>
+      <!--v-if--> <span class="oc-icon oc-icon-s oc-icon-passive"><!----></span>
+    </button>
+    <div id="oc-drop-6" class="oc-drop oc-box-shadow-medium oc-rounded oc-filter-chip-drop">
+      <!-- eslint-enable vuejs-accessibility/no-static-element-interactions -->
+      <!-- eslint-enable vuejs-accessibility/click-events-have-key-events -->
+      <div class="oc-card oc-card-body oc-background-secondary oc-p-s">
+        <ul class="oc-list oc-my-rm oc-mx-rm date-filter-list">
+          <li class="oc-my-xs"><button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-space-between oc-button-gap-m oc-button-passive oc-button-passive-raw date-filter-list-item oc-flex oc-flex-between oc-flex-middle oc-width-1-1 oc-p-xs" data-testid="today">
+              <!--v-if-->
+              <!-- @slot Content of the button -->
+              <div class="oc-flex oc-flex-middle oc-text-truncate">
+                <div class="oc-text-truncate oc-ml-s">today</div>
+              </div>
+              <div class="oc-flex">
+                <!--v-if-->
+              </div>
+            </button></li>
+          <li class="oc-my-xs"><button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-space-between oc-button-gap-m oc-button-passive oc-button-passive-raw date-filter-list-item oc-flex oc-flex-between oc-flex-middle oc-width-1-1 oc-p-xs" data-testid="yesterday">
+              <!--v-if-->
+              <!-- @slot Content of the button -->
+              <div class="oc-flex oc-flex-middle oc-text-truncate">
+                <div class="oc-text-truncate oc-ml-s">yesterday</div>
+              </div>
+              <div class="oc-flex">
+                <!--v-if-->
+              </div>
+            </button></li>
+          <li class="oc-my-xs"><button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-space-between oc-button-gap-m oc-button-passive oc-button-passive-raw date-filter-list-item oc-flex oc-flex-between oc-flex-middle oc-width-1-1 oc-p-xs" data-testid="custom-date-range">
+              <!--v-if-->
+              <!-- @slot Content of the button -->
+              <div class="oc-flex oc-flex-middle oc-text-truncate">
+                <div class="oc-text-truncate oc-ml-s"><span>Custom date range</span></div>
+              </div>
+              <div class="oc-flex">
+                <!--v-if-->
+              </div>
+            </button></li>
+        </ul>
+        <div class="date-filter-range-panel oc-py-s">
+          <div class="oc-flex oc-flex-middle oc-flex-between oc-mb-m"><button type="button" aria-label="Go back to filter options" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw date-filter-range-panel-back">
+              <!--v-if-->
+              <!-- @slot Content of the button --> <span class="oc-icon oc-icon-m oc-icon-passive"><!----></span>
+            </button> <span>Custom date range</span> <button type="button" aria-label="Close filter" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw date-filter-range-panel-close">
+              <!--v-if-->
+              <!-- @slot Content of the button --> <span class="oc-icon oc-icon-m oc-icon-passive"><!----></span>
+            </button></div>
+          <div class="oc-mt-s">
+            <div class="oc-date-picker"><label class="oc-label" for="oc-textinput-7">From</label>
+              <div class="oc-position-relative">
+                <!--v-if--> <input id="oc-textinput-7" aria-invalid="false" class="oc-text-input oc-input oc-rounded" type="date" value="">
+                <!--v-if-->
+              </div>
+              <div class="oc-text-input-message" aria-live="off" aria-atomic="true" role="alert">
+                <!--v-if--> <span id="oc-textinput-7-message" class=""></span>
+              </div>
+              <!--v-if-->
+            </div>
+            <div class="oc-date-picker"><label class="oc-label" for="oc-textinput-8">To</label>
+              <div class="oc-position-relative">
+                <!--v-if--> <input id="oc-textinput-8" aria-invalid="false" class="oc-text-input oc-input oc-rounded" type="date" value="">
+                <!--v-if-->
+              </div>
+              <div class="oc-text-input-message" aria-live="off" aria-atomic="true" role="alert">
+                <!--v-if--> <span id="oc-textinput-8-message" class=""></span>
+              </div>
+              <!--v-if-->
+            </div>
+          </div>
+          <div class="date-filter-apply-btn"><button type="button" disabled="" class="oc-button oc-rounded oc-button-s oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-outline">
+              <!--v-if-->
+              <!-- @slot Content of the button --> Apply
+            </button></div>
+        </div>
+      </div>
+    </div>
+    <!--v-if-->
+  </div>
+</div>"
+`;
+
+exports[`DateFilter > renders all items 1`] = `
+"<div class="date-filter oc-flex date-filter-users">
+  <div class="oc-filter-chip oc-flex"><span id="004nym8equapq009bx8gtholfh" class="oc-invisible-sr oc-hidden-announcer" aria-live="polite" aria-atomic="true"></span> <button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-filter-chip-button oc-pill" id="oc-filter-chip-1" aria-pressed="false">
+      <!--v-if-->
+      <!-- @slot Content of the button --> <span class="oc-icon oc-icon-s oc-icon-passive oc-filter-check-icon-inactive"><!----></span> <span class="oc-text-truncate oc-filter-chip-label">Users</span>
+      <!--v-if--> <span class="oc-icon oc-icon-s oc-icon-passive"><!----></span>
+    </button>
+    <div id="oc-drop-2" class="oc-drop oc-box-shadow-medium oc-rounded oc-filter-chip-drop">
+      <!-- eslint-enable vuejs-accessibility/no-static-element-interactions -->
+      <!-- eslint-enable vuejs-accessibility/click-events-have-key-events -->
+      <div class="oc-card oc-card-body oc-background-secondary oc-p-s">
+        <ul class="oc-list oc-my-rm oc-mx-rm date-filter-list">
+          <li class="oc-my-xs"><button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-space-between oc-button-gap-m oc-button-passive oc-button-passive-raw date-filter-list-item oc-flex oc-flex-between oc-flex-middle oc-width-1-1 oc-p-xs" data-testid="today">
+              <!--v-if-->
+              <!-- @slot Content of the button -->
+              <div class="oc-flex oc-flex-middle oc-text-truncate">
+                <div class="oc-text-truncate oc-ml-s">today</div>
+              </div>
+              <div class="oc-flex">
+                <!--v-if-->
+              </div>
+            </button></li>
+          <li class="oc-my-xs"><button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-space-between oc-button-gap-m oc-button-passive oc-button-passive-raw date-filter-list-item oc-flex oc-flex-between oc-flex-middle oc-width-1-1 oc-p-xs" data-testid="yesterday">
+              <!--v-if-->
+              <!-- @slot Content of the button -->
+              <div class="oc-flex oc-flex-middle oc-text-truncate">
+                <div class="oc-text-truncate oc-ml-s">yesterday</div>
+              </div>
+              <div class="oc-flex">
+                <!--v-if-->
+              </div>
+            </button></li>
+          <li class="oc-my-xs"><button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-space-between oc-button-gap-m oc-button-passive oc-button-passive-raw date-filter-list-item oc-flex oc-flex-between oc-flex-middle oc-width-1-1 oc-p-xs" data-testid="custom-date-range">
+              <!--v-if-->
+              <!-- @slot Content of the button -->
+              <div class="oc-flex oc-flex-middle oc-text-truncate">
+                <div class="oc-text-truncate oc-ml-s"><span>Custom date range</span></div>
+              </div>
+              <div class="oc-flex">
+                <!--v-if-->
+              </div>
+            </button></li>
+        </ul>
+        <div class="date-filter-range-panel oc-py-s">
+          <div class="oc-flex oc-flex-middle oc-flex-between oc-mb-m"><button type="button" aria-label="Go back to filter options" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw date-filter-range-panel-back">
+              <!--v-if-->
+              <!-- @slot Content of the button --> <span class="oc-icon oc-icon-m oc-icon-passive"><!----></span>
+            </button> <span>Custom date range</span> <button type="button" aria-label="Close filter" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw date-filter-range-panel-close">
+              <!--v-if-->
+              <!-- @slot Content of the button --> <span class="oc-icon oc-icon-m oc-icon-passive"><!----></span>
+            </button></div>
+          <div class="oc-mt-s">
+            <div class="oc-date-picker"><label class="oc-label" for="oc-textinput-3">From</label>
+              <div class="oc-position-relative">
+                <!--v-if--> <input id="oc-textinput-3" aria-invalid="false" class="oc-text-input oc-input oc-rounded" type="date" value="">
+                <!--v-if-->
+              </div>
+              <div class="oc-text-input-message" aria-live="off" aria-atomic="true" role="alert">
+                <!--v-if--> <span id="oc-textinput-3-message" class=""></span>
+              </div>
+              <!--v-if-->
+            </div>
+            <div class="oc-date-picker"><label class="oc-label" for="oc-textinput-4">To</label>
+              <div class="oc-position-relative">
+                <!--v-if--> <input id="oc-textinput-4" aria-invalid="false" class="oc-text-input oc-input oc-rounded" type="date" value="">
+                <!--v-if-->
+              </div>
+              <div class="oc-text-input-message" aria-live="off" aria-atomic="true" role="alert">
+                <!--v-if--> <span id="oc-textinput-4-message" class=""></span>
+              </div>
+              <!--v-if-->
+            </div>
+          </div>
+          <div class="date-filter-apply-btn"><button type="button" disabled="" class="oc-button oc-rounded oc-button-s oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-outline">
+              <!--v-if-->
+              <!-- @slot Content of the button --> Apply
+            </button></div>
+        </div>
+      </div>
+    </div>
+    <!--v-if-->
+  </div>
+</div>"
+`;

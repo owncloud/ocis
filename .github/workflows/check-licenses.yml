@@ -1,0 +1,46 @@
+name: Check licenses
+on:
+  pull_request:
+  push:
+    branches: [master, stable-*]
+
+jobs:
+  license-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Install REUSE tool
+        run: pip install reuse
+
+      - name: Run REUSE lint
+        run: reuse lint
+
+  dependency-license-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24.15.0
+          cache: pnpm
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Check dependency licenses
+        run: |
+          # @ownclouders/* packages are company-owned and externalized from build output — excluded from scan
+          npx license-checker --production \
+            --failOn "GPL-2.0;GPL-3.0;AGPL-3.0;AGPL-1.0" \
+            --excludePrivatePackages

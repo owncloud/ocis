@@ -1,0 +1,525 @@
+// Name:            Form
+// Description:     Styles for forms
+//
+// Component:       `oc-input`
+//                  `oc-select`
+//                  `oc-textarea`
+//                  `oc-radio`
+//                  `oc-checkbox`
+//
+// ========================================================================
+
+@use "sass:string";
+@use "sass:meta";
+
+/* stylelint-disable */
+
+@function str-replace($string, $search, $replace: "") {
+  $index: string.index($string, $search);
+
+  @if $index {
+    @return string.slice($string, 1, $index - 1) + $replace + str-replace(string.slice($string, $index + string.length($search)), $search, $replace);
+  }
+
+  @return $string;
+}
+
+@mixin svg-fill($src, $color-default, $color-new) {
+
+  $replace-src: str-replace($src, $color-default, $color-new) !default;
+  $replace-src: str-replace($replace-src, "#", "%23");
+  $replace-src: string.quote($replace-src);
+
+  background-image: url($replace-src);
+}
+
+// Variables
+// ========================================================================
+
+$form-height: var(--oc-font-size-default) !default;
+$form-line-height: $form-height !default;
+$form-padding-horizontal: var(--oc-space-small) !default;
+$form-padding-vertical: var(--oc-space-xsmall) !default;
+
+$form-background: var(--oc-color-background-muted) !default;
+$form-color: var(--oc-color-text-default) !default;
+
+$form-focus-background: var(--oc-color-background-highlight) !default;
+$form-focus-color: var(--oc-color-text-default) !default;
+
+$form-disabled-background: var(--oc-color-background-muted) !default;
+$form-disabled-color: var(--oc-color-text-muted) !default;
+
+$form-placeholder-color: var(--oc-color-text-muted) !default;
+
+$form-small-height: var(--oc-font-size-small) !default;
+$form-small-padding-horizontal: var(--oc-space-small) !default;
+$form-small-line-height: $form-small-height !default;
+$form-small-font-size: var(--oc-font-size-small) !default;
+
+$form-large-height: var(--oc-font-size-large) !default;
+$form-large-padding-horizontal: var(--oc-space-medium) !default;
+$form-large-line-height: $form-large-height !default;
+$form-large-font-size: var(--oc-font-size-large) !default;
+
+$form-danger-color: var(--oc-color-swatch-danger-default) !default;
+$form-success-color: var(--oc-color-swatch-success-default) !default;
+
+$form-width-xsmall: 50px !default;
+$form-width-small: 130px !default;
+$form-width-medium: 200px !default;
+$form-width-large: 500px !default;
+
+$form-select-padding-right: 20px !default;
+$form-select-icon-color: var(--oc-color-text-default) !default;
+$form-select-option-color: #444 !default;
+$form-select-disabled-icon-color: var(--oc-color-text-muted) !default;
+
+$form-datalist-padding-right: 20px !default;
+$form-datalist-icon-color: var(--oc-color-text-default) !default;
+
+$form-radio-background: var(--oc-color-background-muted) !default;
+
+$form-radio-checked-background: $oc-color-swatch-primary-default !default;
+$form-radio-checked-icon-color: var(--oc-color-input-text-default) !default;
+
+$form-radio-checked-focus-background: $oc-color-swatch-primary-default !default;
+
+$form-radio-disabled-background: $oc-color-background-muted !default;
+$form-radio-disabled-icon-color: var(--oc-color-text-muted) !default;
+
+$form-legend-font-size: var(--oc-font-size-large) !default;
+$form-legend-line-height: 1.4 !default;
+
+$form-stacked-margin-bottom: var(--oc-space-small) !default;
+
+$form-horizontal-label-width: 200px !default;
+$form-horizontal-label-margin-top: 7px !default;
+$form-horizontal-controls-margin-left: 215px !default;
+$form-horizontal-controls-text-padding-top: 7px !default;
+
+$form-icon-width: var(--oc-size-icon-default) !default;
+$form-icon-color: var(--oc-color-text-muted) !default;
+$form-icon-hover-color: var(--oc-color-text-default) !default;
+
+$internal-form-select-image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2224%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2016%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22#000%22%20points%3D%2212%201%209%206%2015%206%22%20%2F%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22#000%22%20points%3D%2212%2013%209%208%2015%208%22%20%2F%3E%0A%3C%2Fsvg%3E%0A" !default;
+$internal-form-datalist-image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2224%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2016%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22#000%22%20points%3D%2212%2012%208%206%2016%206%22%20%2F%3E%0A%3C%2Fsvg%3E%0A" !default;
+$internal-form-radio-image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Ccircle%20fill%3D%22#000%22%20cx%3D%228%22%20cy%3D%228%22%20r%3D%222%22%20%2F%3E%0A%3C%2Fsvg%3E" !default;
+$internal-form-checkbox-image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2214%22%20height%3D%2211%22%20viewBox%3D%220%200%2014%2011%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22#000%22%20points%3D%2212%201%205%207.5%202%205%201%205.5%205%2010%2013%201.5%22%20%2F%3E%0A%3C%2Fsvg%3E%0A" !default;
+$internal-form-checkbox-indeterminate-image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Crect%20fill%3D%22#000%22%20x%3D%223%22%20y%3D%228%22%20width%3D%2210%22%20height%3D%221%22%20%2F%3E%0A%3C%2Fsvg%3E" !default;
+
+
+/* ========================================================================
+   Component: Form
+ ========================================================================== */
+
+/*
+ * 1. Define consistent box sizing.
+ *    Default is `content-box` with following exceptions set to `border-box`
+ *    `select`, `input[type="checkbox"]` and `input[type="radio"]`
+ *    `input[type="search"]` in Chrome, Safari and Opera
+ *    `input[type="color"]` in Firefox
+ * 2. Address margins set differently in Firefox/IE and Chrome/Safari/Opera.
+ * 3. Remove `border-radius` in iOS.
+ * 4. Change font properties to `inherit` in all browsers.
+ */
+
+.oc-input,
+.oc-select,
+.oc-textarea,
+.oc-radio {
+  /* 3 */
+  border-radius: 0;
+
+  /* 1 */
+  box-sizing: border-box;
+
+  /* 4 */
+  font: inherit;
+
+  /* 2 */
+  margin: 0;
+}
+
+/*
+ * Show the overflow in Edge.
+ */
+
+.oc-input { overflow: visible; }
+
+/*
+ * Remove the inheritance of text transform in Firefox.
+ */
+
+.oc-select { text-transform: none; }
+
+/*
+ * 1. Change font properties to `inherit` in all browsers
+ * 2. Don't inherit the `font-weight` and use `bold` instead.
+ * NOTE: Both declarations don't work in Chrome, Safari and Opera.
+ */
+
+.oc-select optgroup {
+  /* 1 */
+  font: inherit;
+
+  /* 2 */
+  font-weight: bold;
+}
+
+/*
+ * Remove the default vertical scrollbar in IE 10+.
+ */
+
+.oc-textarea { overflow: auto; }
+
+/*
+ * Remove the inner padding and cancel buttons in Chrome on OS X and Safari on OS X.
+ */
+
+.oc-input[type="search"]::-webkit-search-cancel-button,
+.oc-input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; }
+
+
+/*
+ * Correct the cursor style of increment and decrement buttons in Chrome.
+ */
+
+.oc-input[type="number"]::-webkit-inner-spin-button,
+.oc-input[type="number"]::-webkit-outer-spin-button { height: auto; }
+
+/*
+ * Removes placeholder transparency in Firefox.
+ */
+
+.oc-input::placeholder,
+.oc-textarea::placeholder { opacity: 1; }
+
+/*
+ * Improves consistency of cursor style for clickable elements
+ */
+
+.oc-radio:not(:disabled) { cursor: pointer; }
+
+/* Input, select and textarea
+ * Allowed: `text`, `password`, `datetime`, `datetime-local`, `date`,  `month`,
+            `time`, `week`, `number`, `email`, `url`, `search`, `tel`, `color`
+ * Disallowed: `range`, `radio`, `checkbox`, `file`, `submit`, `reset` and `image`
+ ========================================================================== */
+
+/*
+ * Remove default style in iOS.
+ */
+
+.oc-input,
+.oc-textarea { -webkit-appearance: none; }
+
+/*
+ * 1. Prevent content overflow if a fixed width is used
+ * 2. Take the full width
+ * 3. Reset default
+ * 4. Style
+ */
+
+.oc-input,
+.oc-select,
+.oc-textarea {
+  background: $form-background;
+
+  /* 3 */
+  border: 0 none;
+  color: $form-color;
+
+  /* 1 */
+  max-width: 100%;
+
+  /* 2 */
+  width: 100%;
+
+  @if (meta.mixin-exists(hook-form)) { @include hook-form(); }
+}
+
+/*
+ * Single-line
+ * 1. Allow any element to look like an `input` or `select` element
+ * 2. Make sure line-height is not larger than height
+ *    Also needed to center the text vertically
+ */
+
+.oc-input {
+  -webkit-appearance: none;
+  background-clip: padding-box, border-box;
+  background-color: $form-focus-background;
+  background-origin: border-box;
+  border-radius: 0;
+  border-radius: 5px;
+  border: 1px solid var(--oc-color-input-border);
+  box-sizing: border-box;
+  color: var(--oc-color-input-text-default);
+  display: inline-block;
+  line-height: inherit;
+  margin: 0;
+  max-width: 100%;
+  outline: none;
+  overflow: visible;
+  padding: calc(var(--oc-space-xsmall) + 2px) 7px;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-in-out;
+  transition-property: color, background-color;
+  vertical-align: middle;
+  width: 100%;
+}
+
+.oc-background-highlight .oc-input {
+  background-color: var(--oc-color-input-bg);
+}
+
+/* 2 */
+.oc-input:not(input),
+.oc-select:not(select) {
+  line-height: $form-line-height;
+}
+
+/*
+ * Multi-line
+ */
+
+.oc-textarea {
+  padding: $form-padding-vertical $form-padding-horizontal;
+  vertical-align: top;
+}
+
+/* Focus */
+.oc-input:focus,
+.oc-select:focus,
+.oc-textarea:focus {
+  outline: none;
+  border-color: var(--oc-color-input-text-default);
+  color: $form-focus-color;
+}
+
+.oc-background-highlight {
+  .oc-input:focus,
+  .oc-select:focus,
+  .oc-textarea:focus {
+    background-color: var(--oc-color-background-default);
+  }
+}
+
+/* Disabled */
+.oc-input:disabled,
+.oc-select:disabled {
+  background-color: $form-disabled-background;
+  color: $form-disabled-color;
+  cursor: not-allowed;
+}
+
+/*
+ * Placeholder
+ */
+
+.oc-input::input-placeholder { color: $form-placeholder-color !important; }
+.oc-input::placeholder { color: $form-placeholder-color; }
+
+.oc-textarea::input-placeholder { color: $form-placeholder-color !important; }
+.oc-textarea::placeholder { color: $form-placeholder-color; }
+
+
+/* Style modifier (`oc-input`, `oc-select` and `oc-textarea`)
+ ========================================================================== */
+
+/*
+ * Small
+ */
+
+.oc-form-small { font-size: $form-small-font-size; }
+
+.oc-form-small:not(textarea):not([multiple]):not([size]) {
+  height: $form-small-height;
+  padding-left: $form-small-padding-horizontal;
+  padding-right: $form-small-padding-horizontal;
+}
+
+.oc-form-small:not(select):not(input):not(textarea) { line-height: $form-small-line-height; }
+
+/*
+ * Large
+ */
+
+.oc-form-large { font-size: $form-large-font-size; }
+
+.oc-form-large:not(textarea):not([multiple]):not([size]) {
+  height: $form-large-height;
+  padding-left: $form-large-padding-horizontal;
+  padding-right: $form-large-padding-horizontal;
+}
+
+.oc-form-large:not(select):not(input):not(textarea) { line-height: $form-large-line-height; }
+
+
+/* Style modifier (`oc-input`, `oc-select` and `oc-textarea`)
+ ========================================================================== */
+
+/*
+ * Error
+ */
+
+.oc-form-danger,
+.oc-form-danger:focus {
+  color: $form-danger-color;
+}
+
+/*
+ * Success
+ */
+
+.oc-form-success,
+.oc-form-success:focus {
+  color: $form-success-color;
+}
+
+/*
+ * Blank
+ */
+
+.oc-form-blank {
+  background: none;
+}
+
+/* Width modifiers (`oc-input`, `oc-select` and `oc-textarea`)
+ ========================================================================== */
+
+/*
+ * Fixed widths
+ * Different widths for mini sized `input` and `select` elements
+ */
+
+input.oc-form-width-xsmall { width: $form-width-xsmall; }
+
+select.oc-form-width-xsmall { width: ($form-width-xsmall + 25px); }
+
+.oc-form-width-small { width: $form-width-small; }
+
+.oc-form-width-medium { width: $form-width-medium; }
+
+.oc-form-width-large { width: $form-width-large; }
+
+
+/* Select
+ ========================================================================== */
+
+/*
+ * 1. Remove default style. Also works in Firefox
+ * 2. Style
+ * 3. Remove default style in IE 10/11
+ * 4. Set `color` for options in the select dropdown, because the inherited `color` might be too light.
+ */
+
+.oc-select:not([multiple]):not([size]) {
+  @include svg-fill($internal-form-select-image, "#000", $form-select-icon-color);
+
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-position: 100% 50%;
+  background-repeat: no-repeat;
+}
+
+/* 3 */
+.oc-select:not([multiple]):not([size])::-ms-expand { display: none; }
+
+/* 4 */
+.oc-select:not([multiple]):not([size]) option { color: $form-select-option-color; }
+
+/*
+ * Disabled
+ */
+
+.oc-select:not([multiple]):not([size]):disabled { @include svg-fill($internal-form-select-image, "#000", $form-select-disabled-icon-color); }
+
+
+/* Datalist
+ ========================================================================== */
+
+/*
+ * 1. Remove default style in Chrome
+ */
+
+.oc-input[list] {
+  background-position: 100% 50%;
+  background-repeat: no-repeat;
+  padding-right: $form-datalist-padding-right;
+}
+
+.oc-input[list]:hover,
+.oc-input[list]:focus { @include svg-fill($internal-form-datalist-image, "#000", $form-datalist-icon-color); }
+
+/* Radio and checkbox
+ * Note: Does not work in IE11
+ ========================================================================== */
+
+/*
+ * 1. Style
+ * 2. Make box more robust so it clips the child element
+ * 3. Vertical alignment
+ * 4. Remove default style
+ * 5. Fix black background on iOS
+ * 6. Center icons
+ */
+
+.oc-radio{
+  /* 4 */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* 5 */
+  background-color: $form-radio-background;
+  background-position: 50% 50%;
+
+  /* 6 */
+  background-repeat: no-repeat;
+
+  /* 1 */
+  display: inline-block;
+
+  /* 2 */
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+.oc-radio { border-radius: 50%; }
+
+/* Focus */
+.oc-radio:focus {
+  outline: none;
+}
+
+/*
+ * Checked
+ */
+
+.oc-radio:checked {
+  background-color: $form-radio-checked-background;
+}
+
+/* Focus */
+.oc-radio:checked:focus {
+  background-color: $form-radio-checked-focus-background;
+}
+
+/*
+ * Icons
+ */
+
+.oc-radio:checked { @include svg-fill($internal-form-radio-image, "#000", $form-radio-checked-icon-color); }
+
+/*
+ * Disabled
+ */
+
+.oc-radio:disabled {
+  background-color: $form-radio-disabled-background;
+}
+
+.oc-radio:disabled:checked { @include svg-fill($internal-form-radio-image, "#000", $form-radio-disabled-icon-color); }
+
+/* stylelint-enable */

@@ -1,0 +1,29 @@
+$directives: ("m": "margin");
+
+@each $directiveKey, $directiveValue in $directives {
+  .-oc-#{$directiveKey} {
+    #{$directiveValue}: calc(-1 * $oc-space-medium) !important;
+
+    @each $directionKey, $directionValues in $directions {
+      &#{$directionKey} {
+        @each $direction in $directionValues {
+          & {
+            #{$directiveValue}-#{$direction}: calc(-1 * $oc-space-medium) !important;
+          }
+
+          @each $sizeKey, $sizeValue in $sizes {
+            &-#{$sizeKey} {
+              #{$directiveValue}-#{$direction}: calc(-1 * $sizeValue) !important;
+            }
+          }
+        }
+      }
+    }
+
+    @each $sizeKey, $sizeValue in $sizes {
+      &-#{$sizeKey} {
+        #{$directiveValue}: calc(-1 * $sizeValue) !important;
+      }
+    }
+  }
+}

@@ -1,0 +1,218 @@
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  color: var(--oc-color-text-default);
+}
+
+html * {
+  font-family: var(--oc-font-family);
+}
+
+html, button {
+  font-feature-settings: "cv11";
+  font-size: var(--oc-font-size-default);
+}
+
+a {
+  color: var(--oc-color-swatch-primary-default);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--oc-color-swatch-primary-hover);
+  }
+}
+
+.oc-heading-divider {
+  border-bottom: calc(0.2px + 0.05em) solid var(--oc-color-border);
+  padding-bottom: calc(5px + 0.1em);
+}
+
+/* -------------------------- */
+
+/* --- wrapping behaviour --- */
+
+/* -------------------------- */
+
+/*
+ * Prevent text from wrapping onto multiple lines
+ */
+.oc-text-nowrap {
+  white-space: nowrap;
+}
+
+/*
+ * Truncate text with an ellipsis if it's exceeding the available width
+ */
+.oc-text-overflow,
+.oc-text-truncate {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.oc-text-truncate {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+th.oc-text-truncate,
+td.oc-text-truncate {
+  overflow: visible;
+  max-width: 0;
+}
+
+/*
+ * Wrap long words onto the next line and break them if they are too long to fit
+ */
+.oc-text-break {
+  overflow-wrap: break-word !important;
+  white-space: unset !important;
+  word-wrap: break-word !important;
+}
+
+th.oc-text-break,
+td.oc-text-break {
+  word-break: break-all !important;
+}
+
+/* ----------------------- */
+
+/* --- different sizes --- */
+
+/* ----------------------- */
+
+/*
+ * x-small text size as defined by the `oc-font-size-xsmall` theme token.
+ * By default 0.72rem.
+ */
+.oc-text-xsmall {
+  font-size: var(--oc-font-size-xsmall);
+}
+
+/*
+ * x-small text size as defined by the `oc-font-size-small` theme token.
+ * By default 0.86rem.
+ */
+.oc-text-small {
+  font-size: var(--oc-font-size-small);
+}
+
+/*
+ * medium text size as defined by the `oc-font-size-medium` theme token.
+ * By default 1rem. This is the base font size as defined on the html document.
+ */
+.oc-text-medium {
+  font-size: var(--oc-font-size-medium);
+}
+
+/*
+ * large text size as defined by the `oc-font-size-large` theme token.
+ * By default 1.14rem.
+ */
+.oc-text-large {
+  font-size: var(--oc-font-size-large);
+}
+
+/*
+ * x-large text size as defined by the `oc-font-size-xlarge` theme token.
+ * By default 1.29rem.
+ */
+.oc-text-xlarge {
+  font-size: var(--oc-font-size-xlarge);
+}
+
+/* ------------------------- */
+
+/* --- different weights --- */
+
+/* ------------------------- */
+
+/*
+ * Normal font weight.
+ */
+.oc-text-normal {
+  font-weight: 400;
+}
+
+/*
+ * Bold font weight.
+ */
+.oc-text-bold {
+  font-weight: 600;
+}
+
+/* ----------------- */
+
+/* --- alignment --- */
+
+/* ----------------- */
+
+/*
+ * Align horizontally centered.
+ */
+.oc-text-center {
+  text-align: center;
+}
+
+/*
+ * Align horizontally left.
+ */
+.oc-text-left {
+  text-align: left;
+}
+
+/*
+ * Align horizontally right.
+ */
+.oc-text-right {
+  text-align: right;
+}
+
+/* ------------------------- */
+
+/* --- special modifiers --- */
+
+/* ------------------------- */
+
+/*
+ * Give text a muted color and small size.
+ */
+.oc-text-meta {
+  color: var(--oc-color-text-muted);
+  font-size: var(--oc-font-size-small);
+}
+
+/*
+ * Give text a muted color.
+ */
+.oc-text-muted {
+  color: var(--oc-color-text-muted);
+}
+
+.oc-text-danger {
+  color: var(--oc-color-swatch-danger-default)
+}
+
+/*
+ * Give text the brand contrast color.
+ */
+ .oc-text-brand-contrast {
+  color: var(--oc-color-swatch-brand-contrast);
+}
+
+/*
+ * Transform text to all uppercase
+ */
+.oc-text-uppercase {
+  text-transform: uppercase !important;
+}
+
+@each $weightKey, $weightValue in $weights {
+  .oc-font-#{$weightKey} {
+    font-weight: $weightValue;
+  }
+}
