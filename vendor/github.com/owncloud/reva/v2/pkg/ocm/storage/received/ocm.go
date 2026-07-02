@@ -25,11 +25,13 @@ import (
 	"encoding/xml"
 	"io"
 	"io/fs"
+	"net"
 	"net/http"
 	"net/url"
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -98,6 +100,20 @@ func (b BearerAuthenticator) Clone() gowebdav.Authenticator {
 // Close is not implemented for the BearerAuthenticator. It always returns nil.
 func (BearerAuthenticator) Close() error {
 	return nil
+}
+
+// noRedirectRoundTripper wraps an http.RoundTripper and tags every outgoing
+// request with gowebdav's XInhibitRedirect header. The default CheckRedirect
+// installed by gowebdav.NewAuthClient then returns http.ErrUseLastResponse on
+// any 3xx response, so the http.Client never follows the redirect.
+type noRedirectRoundTripper struct {
+	base http.RoundTripper
+}
+
+func (t *noRedirectRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	clonedRequest := req.Clone(req.Context())
+	clonedRequest.Header.Set(gowebdav.XInhibitRedirect, "1")
+	return t.base.RoundTrip(clonedRequest)
 }
 
 // New creates an OCM storage driver.
@@ -204,11 +220,23 @@ func (d *driver) webdavClient(ctx context.Context, forUser *userpb.UserId, ref *
 	// FIXME: it's still not clear from the OCM APIs how to use the shared secret
 	// will use as a token in the bearer authentication as this is the reva implementation
 	c := gowebdav.NewAuthClient(endpoint, gowebdav.NewPreemptiveAuth(BearerAuthenticator{Token: secret}))
-	if d.c.Insecure {
-		c.SetTransport(&http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		})
+	base := &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).DialContext,
+		ForceAttemptHTTP2:     true,
+		MaxIdleConns:          100,
+		MaxIdleConnsPerHost:   32, // Bamped up from 2 to keep connections hot
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
 	}
+	if d.c.Insecure {
+		base.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	}
+	c.SetTransport(&noRedirectRoundTripper{base: base})
 
 	return c, share, rel, nil
 }
