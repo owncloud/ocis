@@ -20,3 +20,22 @@ jobs:
       TX_TOKEN: ${{ secrets.TX_TOKEN }}
       TRANSLATION_APP_ID: ${{ secrets.TRANSLATION_APP_ID }}
       TRANSLATION_APP_PRIVATE_KEY: ${{ secrets.TRANSLATION_APP_PRIVATE_KEY }}
+
+  # web/ is a pnpm workspace nested inside the repo, not covered by the
+  # root-level L10N_MODULES/sub_path: . sync above (that job has no
+  # package.json at the repo root, so a pnpm install there would be a
+  # no-op/fail). Run it as its own invocation scoped to sub_path: web,
+  # sequenced after `sync` since the reusable workflow always pushes to
+  # the same hardcoded chore/translations-update branch.
+  sync-web:
+    needs: sync
+    uses: owncloud/reusable-workflows/.github/workflows/translation-sync.yml@main
+    with:
+      mode: make
+      package_manager: pnpm
+      reviewers: kobergj,mmattel
+      sub_path: web
+    secrets:
+      TX_TOKEN: ${{ secrets.TX_TOKEN }}
+      TRANSLATION_APP_ID: ${{ secrets.TRANSLATION_APP_ID }}
+      TRANSLATION_APP_PRIVATE_KEY: ${{ secrets.TRANSLATION_APP_PRIVATE_KEY }}
