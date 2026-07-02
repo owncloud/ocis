@@ -38,6 +38,7 @@ Feature: Report test
       | oc:permissions    | S                    |
       | oc:size           | 12                   |
       | oc:remote-item-id | %file_id_pattern%    |
+      | oc:spaceid        | %space_id_pattern%   |
     Examples:
       | dav-path-version |
       | old              |
@@ -68,6 +69,7 @@ Feature: Report test
       | oc:permissions     | SD                  |
       | d:getcontentlength | 12                  |
       | oc:remote-item-id  | %file_id_pattern%   |
+      | oc:spaceid         | %space_id_pattern%  |
     Examples:
       | dav-path-version |
       | old              |

@@ -36,7 +36,7 @@ The ocdav service not only handles all WebDAV requests under `(remote.php/)(web)
 
 | endpoint | service | CS3 api | CS3 namespace | description | TODO |
 |----------|---------|-------------|------|------|------|
-| *ownCloud 10 / current ocis setup:* |||||
+| *ownCloud Classic / current ocis setup:* |||||
 | `status.php` | ocdav | - |  - | currently static | should return compiled version and dynamic values |
 | `(remote.php/)webdav` | ocdav | storageprovider | `/home` | the old webdav endpoint |  |
 | `(remote.php/)dav/files/<username>` | ocdav | storageprovider | `/home` | the new webdav endpoint |  |
