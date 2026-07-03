@@ -93,6 +93,20 @@ def app_providers_ready(ocis_url: str) -> bool:
     return "Collabora" in names and "OnlyOffice" in names
 
 
+def load_env_file(path: Path) -> dict:
+    """Parse a bash-style env file (export KEY=value) into a dict."""
+    env = {}
+    for line in path.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or line.startswith("!"):
+            continue
+        line = line.removeprefix("export ").strip()
+        if "=" in line:
+            k, v = line.split("=", 1)
+            env[k.strip()] = v.strip()
+    return env
+
+
 def run(cmd: list, env: dict = None, check: bool = True, cwd=None):
     e = {**os.environ, **(env or {})}
     return subprocess.run(cmd, env=e, check=check, cwd=cwd)
@@ -140,8 +154,17 @@ def main() -> int:
 
     # init ocis
     run([str(ocis_bin), "init", "--insecure", "true"])
+    # tests/config/ci/app-registry.yaml maps its one mimetype to "FakeOffice", the
+    # stub used by run-github.py's (Behat) apiCollaboration suite. The app-provider
+    # e2e suite drives real Collabora/OnlyOffice containers instead, so it needs its
+    # own mapping to those app names, for both the odt and docx mimetypes it exercises.
+    app_registry_src = (
+        "tests/config/local/app-registry-office-suites.yaml"
+        if collaboration_needed
+        else "tests/config/ci/app-registry.yaml"
+    )
     shutil.copy(
-        repo_root / "tests/config/ci/app-registry.yaml",
+        repo_root / app_registry_src,
         ocis_config_dir / "app-registry.yaml",
     )
 
@@ -307,27 +330,38 @@ def main() -> int:
             "ONLYOFFICE_DOMAIN": "127.0.0.1:443",
         })
 
-    federated_url = "https://127.0.0.1:10200"
+    federated_url = "https://localhost:10200"
     federated_env = None
     if federated_needed:
-        # Ported from tests/actions/setup-services.sh's `setup_ocis "ocis-federated" 10200`,
-        # which sources a separate tests/actions/.env.ocis-federated file we didn't have
-        # read access to while writing this. This synthesizes an equivalent config by
-        # cloning the primary server_env and offsetting everything that would otherwise
-        # collide with the primary instance on the same host (URL, config dir, debug
-        # ports, NATS port). Diff against .env.ocis-federated and a real CI run before
-        # trusting this for the ocm suite.
+        # run-github.py's (Behat apiOcm) federation setup already solved this exact
+        # problem, so reuse its canonical port-mapping file instead of re-deriving one:
+        # only offsetting *_DEBUG_ADDR left the actual service ports (e.g. gateway's
+        # GATEWAY_GRPC_ADDR 127.0.0.1:9142) on their defaults, so the federated
+        # "ocis server" process crashed trying to bind the same ports the primary
+        # instance already held.
+        providers_file = str(repo_root / "tests/config/local/providers.json")
+        server_env.update({
+            "OCIS_ADD_RUN_SERVICES": "ocm",
+            "OCIS_ENABLE_OCM": "true",
+            "OCM_OCM_INVITE_MANAGER_INSECURE": "true",
+            "OCM_OCM_SHARE_PROVIDER_INSECURE": "true",
+            "OCM_OCM_STORAGE_PROVIDER_INSECURE": "true",
+            "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": providers_file,
+        })
+
         federated_config_dir = Path.home() / ".ocis-federated/config"
+        federated_data_dir = Path.home() / ".ocis-federated"
         federated_env = {**server_env}
-        federated_env["OCIS_URL"] = federated_url
-        federated_env["OCIS_CONFIG_DIR"] = str(federated_config_dir)
-        federated_env["NATS_NATS_PORT"] = "10233"
-        if collaboration_needed:
-            federated_env["MICRO_REGISTRY_ADDRESS"] = "127.0.0.1:10233"
-        for k, v in list(federated_env.items()):
-            if k.endswith("_DEBUG_ADDR") and isinstance(v, str) and ":" in v:
-                host, port = v.rsplit(":", 1)
-                federated_env[k] = f"{host}:{int(port) + 1000}"
+        federated_env.update(load_env_file(repo_root / "tests/config/local/.env-federation"))
+        # override the file's ${HOME}-prefixed paths (load_env_file doesn't expand
+        # shell variables) and anything specific to this script's own layout
+        federated_env.update({
+            "OCIS_URL": federated_url,
+            "OCIS_BASE_DATA_PATH": str(federated_data_dir),
+            "OCIS_CONFIG_DIR": str(federated_config_dir),
+            "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": providers_file,
+            "MICRO_REGISTRY_ADDRESS": "127.0.0.1:10233",
+        })
 
     procs = []
 
@@ -413,8 +447,7 @@ def main() -> int:
 
         if federated_needed:
             # Second, independent ocis instance for OCM federation tests. See the
-            # federated_env comment above main() for the caveat on its exact config.
-            federated_config_dir = Path.home() / ".ocis-federated/config"
+            # federated_env comment above main() for its port-mapping source.
             run([str(ocis_bin), "init", "--insecure", "true"],
                 env={"OCIS_CONFIG_DIR": str(federated_config_dir)})
             federated_proc = subprocess.Popen(
@@ -448,7 +481,7 @@ def main() -> int:
             playwright_env["MFA"] = "true"
 
         if federated_needed:
-            playwright_env["FEDERATED_BASE_URL_OCIS"] = "127.0.0.1:10200"
+            playwright_env["FEDERATED_BASE_URL_OCIS"] = "localhost:10200"
 
         print(f"Running e2e: {e2e_args}")
         result = subprocess.run(

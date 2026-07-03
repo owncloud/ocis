@@ -1,0 +1,16 @@
+app_registry:
+  mimetypes:
+    - mime_type: application/vnd.oasis.opendocument.text
+      extension: odt
+      name: OpenDocument
+      description: OpenDocument text document
+      icon: ""
+      default_app: Collabora
+      allow_creation: true
+    - mime_type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+      extension: docx
+      name: Microsoft Word
+      description: Microsoft Word document
+      icon: ""
+      default_app: OnlyOffice
+      allow_creation: true
