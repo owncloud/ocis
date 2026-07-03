@@ -12,6 +12,7 @@ import sys
 import shlex
 import subprocess
 import signal
+import tempfile
 import time
 import shutil
 from pathlib import Path
@@ -448,8 +449,23 @@ def main() -> int:
         if federated_needed:
             # Second, independent ocis instance for OCM federation tests. See the
             # federated_env comment above main() for its port-mapping source.
+            # OCIS_BASE_DATA_PATH must match federated_env's, or init writes the
+            # proxy cert under the default ~/.ocis (colliding with the primary
+            # instance's) instead of federated_data_dir, and the server then
+            # generates its own untrusted one lazily at startup.
             run([str(ocis_bin), "init", "--insecure", "true"],
-                env={"OCIS_CONFIG_DIR": str(federated_config_dir)})
+                env={
+                    "OCIS_CONFIG_DIR": str(federated_config_dir),
+                    "OCIS_BASE_DATA_PATH": str(federated_data_dir),
+                })
+            federated_cert = federated_data_dir / "proxy/server.crt"
+            if federated_cert.exists():
+                subprocess.run(
+                    ["sudo", "cp", str(federated_cert),
+                     "/usr/local/share/ca-certificates/ocis-federated.crt"],
+                    check=True,
+                )
+                subprocess.run(["sudo", "update-ca-certificates"], check=True)
             federated_proc = subprocess.Popen(
                 [str(ocis_bin), "server"],
                 env=federated_env,
@@ -482,6 +498,15 @@ def main() -> int:
 
         if federated_needed:
             playwright_env["FEDERATED_BASE_URL_OCIS"] = "localhost:10200"
+            # NODE_EXTRA_CA_CERTS takes a single file; concatenate both self-signed
+            # certs so node-fetch/axios calls made directly against the federated
+            # instance (e.g. fetching an OCM invite token) are trusted too.
+            bundle = tempfile.NamedTemporaryFile(
+                mode="w", suffix=".pem", prefix="ocis-ca-bundle-", delete=False)
+            bundle.write(ocis_cert.read_text())
+            bundle.write(federated_cert.read_text())
+            bundle.close()
+            playwright_env["NODE_EXTRA_CA_CERTS"] = bundle.name
 
         print(f"Running e2e: {e2e_args}")
         result = subprocess.run(

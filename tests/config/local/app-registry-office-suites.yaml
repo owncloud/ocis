@@ -1,13 +1,19 @@
 app_registry:
   mimetypes:
-    - mime_type: application/vnd.oasis.opendocument.text
+    # "New file" creation goes through reva's app-provider template mechanism
+    # (vendor/.../appprovider/templates.go), which only stamps target_ext -- the
+    # field the web UI's "New" menu requires -- onto these -template mimetypes,
+    # not the plain document ones. Opening an *existing* odt/docx still works
+    # without an entry here: Collabora/OnlyOffice register their full supported
+    # mimetype list (including the plain ones) dynamically via WOPI discovery.
+    - mime_type: application/vnd.oasis.opendocument.text-template
       extension: odt
       name: OpenDocument
       description: OpenDocument text document
       icon: ""
       default_app: Collabora
       allow_creation: true
-    - mime_type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    - mime_type: application/vnd.openxmlformats-officedocument.wordprocessingml.template
       extension: docx
       name: Microsoft Word
       description: Microsoft Word document
