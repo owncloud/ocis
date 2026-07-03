@@ -133,7 +133,11 @@ def main() -> int:
     repo_root = Path(__file__).resolve().parents[2]
     ocis_bin = repo_root / "ocis/bin/ocis"
     wrapper_bin = repo_root / "tests/ociswrapper/bin/ociswrapper"
-    ocis_url = "https://127.0.0.1:9200"
+    # The ocm invite flow bakes this host into invite codes (token@host), and the
+    # federated instance authorizes it against tests/config/local/providers.json
+    # (shared with run-github.py's apiOcm suite), which only lists localhost:9200
+    # -- so the federated suite must address the primary as localhost.
+    ocis_url = "https://localhost:9200" if federated_needed else "https://127.0.0.1:9200"
     ocis_config_dir = Path.home() / ".ocis/config"
     web_dir = repo_root / "web"
 
@@ -194,6 +198,19 @@ def main() -> int:
         return obj
 
     gha_web_cfg = _patch_urls(drone_web_cfg, "https://ocis-server:9200", ocis_url)
+
+    # The web UI only loads the apps listed in its config. ocis-config.json predates
+    # the playwright suites, so add what specific suites depend on:
+    # - "external" is the blueprint app for the office editors: web-runtime builds
+    #   the per-provider Collabora/OnlyOffice apps (including their "New file" menu
+    #   entries) only when web-app-external itself is loaded.
+    # - "ocm" provides the "open-cloud-mesh" federation UI the ocm suite drives.
+    #   (The federated instance's own config, tests/config/local/fed-ocis-web.json,
+    #   already lists it.)
+    if collaboration_needed:
+        gha_web_cfg["apps"].append("external")
+    if federated_needed:
+        gha_web_cfg["apps"].append("ocm")
 
     # The web client reads its OIDC scope from openIdConnect.scope in this UI
     # config, NOT from the WEB_OIDC_SCOPE server env var, so override it here.
