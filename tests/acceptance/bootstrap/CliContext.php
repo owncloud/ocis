@@ -1224,4 +1224,57 @@ class CliContext implements Context {
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
 
+	/**
+	 * @Given the share grants for space :spaceName owned by :user have been orphaned
+	 *
+	 * @param string $spaceName
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theShareGrantsForSpaceHaveBeenOrphaned(string $spaceName, string $user): void {
+		$parts = \explode('$', $this->spacesContext->getSpaceIdByName($user, $spaceName));
+		$spaceOpaqueId = $parts[1] ?? '';
+		$deadSpaceId = '00000000-0000-0000-0000-000000000000';
+
+		$blobsRoot = $this->featureContext->getOcisDataPath() . '/storage/metadata/spaces/js';
+		$found = false;
+		foreach (['jsoncs3-share-manager-metadata', 'oncs3-share-manager-metadata'] as $metaSpace) {
+			$blobDir = $blobsRoot . '/' . $metaSpace . '/blobs';
+			if (!\is_dir($blobDir)) {
+				continue;
+			}
+			// walk all blob files recursively (blobs/{hex}/{hex}/{hex}/{hex}/{filename})
+			$dirIterator = new \RecursiveDirectoryIterator($blobDir, \RecursiveDirectoryIterator::SKIP_DOTS);
+			$fileIterator = new \RecursiveIteratorIterator($dirIterator);
+			foreach ($fileIterator as $file) {
+				if (!$file->isFile()) {
+					continue;
+				}
+				$data = \json_decode(\file_get_contents($file->getPathname()), true);
+				if (!isset($data['Shares'])) {
+					continue;
+				}
+				$matched = false;
+				foreach ($data['Shares'] as $key => $share) {
+					if (($share['resource_id']['space_id'] ?? '') !== $spaceOpaqueId) {
+						continue;
+					}
+					$data['Shares'][$key]['resource_id']['space_id'] = $deadSpaceId;
+					$matched = true;
+				}
+				if (!$matched) {
+					continue;
+				}
+				\file_put_contents(
+					$file->getPathname(),
+					\json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+				);
+				$found = true;
+			}
+		}
+
+		Assert::assertTrue($found, "Could not find blob for space $spaceName ($spaceOpaqueId)");
+	}
 }
