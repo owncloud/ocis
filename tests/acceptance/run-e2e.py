@@ -133,10 +133,11 @@ def main() -> int:
     repo_root = Path(__file__).resolve().parents[2]
     ocis_bin = repo_root / "ocis/bin/ocis"
     wrapper_bin = repo_root / "tests/ociswrapper/bin/ociswrapper"
-    # The ocm invite flow bakes this host into invite codes (token@host), and the
-    # federated instance authorizes it against tests/config/local/providers.json
-    # (shared with run-github.py's apiOcm suite), which only lists localhost:9200
-    # -- so the federated suite must address the primary as localhost.
+    # The federated suite must address the primary as localhost instead of
+    # 127.0.0.1: the ocm invite flow bakes this host into invite codes
+    # (token@host), and the federated instance authorizes it against
+    # tests/config/local/providers.json (shared with run-github.py's apiOcm
+    # suite), which only lists localhost:9200.
     ocis_url = "https://localhost:9200" if federated_needed else "https://127.0.0.1:9200"
     ocis_config_dir = Path.home() / ".ocis/config"
     web_dir = repo_root / "web"
@@ -344,8 +345,16 @@ def main() -> int:
             "MICRO_REGISTRY": "nats-js-kv",
             "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
             "FRONTEND_APP_HANDLER_SECURE_VIEW_APP_ADDR": "com.owncloud.api.collaboration.Collabora",
+            # These two domains, the page origin, and Collabora's frame_ancestors
+            # (workflow) must all use the same host literal: CSP source
+            # expressions match by exact host.
             "COLLABORA_DOMAIN": "127.0.0.1:9980",
             "ONLYOFFICE_DOMAIN": "127.0.0.1:443",
+            # The default proxy CSP only allows frame-src 'self', so the browser
+            # refuses to embed the office editor iframes (different port). The CSP
+            # file whitelists ${COLLABORA_DOMAIN}/${ONLYOFFICE_DOMAIN} in frame-src
+            # -- without it the editors never load and every office test times out.
+            "PROXY_CSP_CONFIG_FILE_LOCATION": str(repo_root / "tests/config/ci/csp.yaml"),
         })
 
     federated_url = "https://localhost:10200"
