@@ -41,6 +41,7 @@ jobs:
           make govulncheck                                                                                                     > /tmp/govulncheck.log 2>&1 & PIDS+=($!)
           make ci-node-generate                                                                                                > /tmp/node-gen.log    2>&1 & PIDS+=($!)
           make ci-go-generate                                                                                                  > /tmp/go-gen.log      2>&1 & PIDS+=($!)
+          make changelog-lint                                                                                                   > /tmp/changelog-lint.log 2>&1 & PIDS+=($!)
 
           FAILED=0
           for PID in "${PIDS[@]}"; do wait "$PID" || FAILED=1; done
@@ -63,8 +64,18 @@ jobs:
           echo "=== govulncheck ==="      && cat /tmp/govulncheck.log
           echo "=== ci-node-generate ===" && cat /tmp/node-gen.log
           echo "=== ci-go-generate ==="   && cat /tmp/go-gen.log
+          echo "=== changelog-lint ===" && cat /tmp/changelog-lint.log
 
           exit $FAILED
+
+      - name: Trivy scan
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+        with:
+          scan-type: fs
+          format: table
+          exit-code: 1
+          severity: CRITICAL,HIGH
+          trivy-config: .trivy.yaml
 
       - name: Build, lint and test
         run: |
