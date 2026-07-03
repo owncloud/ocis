@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-05-16 03:18+0000\n"
+"POT-Creation-Date: 2026-07-01 03:21+0000\n"
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
 "Last-Translator: Cesare Capoferri, 2026\n"
 "Language-Team: Italian (https://app.transifex.com/owncloud-org/teams/6149/it/)\n"
@@ -81,7 +81,7 @@ msgstr "Può modificare con versioni e mostrare gli invitati"
 #. UnifiedRole SpaceEditor, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:232
 msgid "Can edit with versions and trash bin"
-msgstr ""
+msgstr "Può modificare con accesso a versioni e cestino"
 
 #. Manager
 #. UnifiedRole Manager, Role DisplayName (resolves directly)
@@ -178,6 +178,8 @@ msgstr ""
 #: pkg/unifiedrole/roles.go:210
 msgid "View, download, upload, edit, add, delete and restore from trash bin."
 msgstr ""
+"Visualizza, scarica, carica, modifica, aggiungi, elimina e ripristina dal "
+"cestino."
 
 #. UnifiedRole EditorListGrants Editor, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:158
@@ -192,6 +194,8 @@ msgid ""
 "View, download, upload, edit, add, delete, show all versions and restore "
 "from trash bin."
 msgstr ""
+"Visualizza, scarica, carica, modifica, aggiungi, elimina, mostra tutte le "
+"versioni e ripristina dal cestino."
 
 #. UnifiedRole Manager, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:242
@@ -199,6 +203,8 @@ msgid ""
 "View, download, upload, edit, add, delete, show all versions, restore from "
 "trash bin, empty the trash bin and manage members."
 msgstr ""
+"Visualizza, scarica, carica, modifica, aggiungi, elimina, mostra tutte le "
+"versioni, ripristina dal cestino, svuota il cestino e gestisci i membri."
 
 #. UnifiedRole EditorListGrantsWithVersions, Role Description (resolves
 #. directly)
