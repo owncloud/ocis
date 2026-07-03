@@ -362,8 +362,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [Lost permission when received multiple shares on the same resource](https://github.com/owncloud/ocis/issues/8464)
 
-- [apiSharingNgShares/sharedWithMe.feature:5410](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5410)
-- [apiSharingNgShares/sharedWithMe.feature:5411](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5411)
+- [apiSharingNgShares/sharedWithMe.feature:5510](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5510)
+- [apiSharingNgShares/sharedWithMe.feature:5511](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5511)
 
 #### [Activity. No activity for copying a zero byte file](https://github.com/owncloud/ocis/issues/10417)
 

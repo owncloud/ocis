@@ -893,7 +893,7 @@ Feature: ListGrants role
           "name": {"const": "textfile.txt"},
           "remoteItem": {
             "type": "object",
-            "required": ["createdBy","eTag","file","id","lastModifiedDateTime","name","parentReference","permissions","size"],
+            "required": ["createdBy","eTag","file","id","lastModifiedDateTime","name","parentReference","permissions","size", "spaceId"],
             "properties": {
               "eTag": {"pattern": "%etag_pattern%"},
               "id": {"pattern": "^%file_id_pattern%$"},
@@ -944,6 +944,10 @@ Feature: ListGrants role
                     }
                   }
                 }
+              },
+              "spaceId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
               }
             }
           }
@@ -963,7 +967,7 @@ Feature: ListGrants role
           "name": {"const": "folder"},
           "remoteItem": {
             "type": "object",
-            "required": ["createdBy","eTag","folder","id","lastModifiedDateTime","name","parentReference","permissions"],
+            "required": ["createdBy","eTag","folder","id","lastModifiedDateTime","name","parentReference","permissions", "spaceId"],
             "properties": {
               "eTag": {"pattern": "%etag_pattern%"},
               "file": {},
@@ -1015,6 +1019,10 @@ Feature: ListGrants role
                     }
                   }
                 }
+              },
+              "spaceId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
               }
             }
           }

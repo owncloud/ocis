@@ -100,7 +100,8 @@ Feature: enable disable permissions role
                     "lastModifiedDateTime",
                     "name",
                     "parentReference",
-                    "permissions"
+                    "permissions",
+                    "spaceId"
                   ],
                   "properties": {
                     "name": { "const": "<resource>" },
@@ -127,6 +128,10 @@ Feature: enable disable permissions role
                           "roles": { "const": null }
                         }
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -308,7 +313,8 @@ Feature: enable disable permissions role
                     "lastModifiedDateTime",
                     "name",
                     "parentReference",
-                    "permissions"
+                    "permissions",
+                    "spaceId"
                   ],
                   "properties": {
                     "name": { "const": "<resource>" },
@@ -335,6 +341,10 @@ Feature: enable disable permissions role
                           "roles": { "const": null }
                         }
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -785,7 +795,7 @@ Feature: enable disable permissions role
               "properties": {
                 "remoteItem": {
                   "type": "object",
-                  "required": ["createdBy", "eTag", "folder", "id", "lastModifiedDateTime", "name", "parentReference", "permissions"],
+                  "required": ["createdBy", "eTag", "folder", "id", "lastModifiedDateTime", "name", "parentReference", "permissions", "spaceId"],
                   "properties": {
                     "name": { "const": "folderToShare" },
                     "permissions": {
@@ -814,6 +824,10 @@ Feature: enable disable permissions role
                           "roles": { "const": null }
                         }
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -904,7 +918,7 @@ Feature: enable disable permissions role
               "properties": {
                 "remoteItem": {
                   "type": "object",
-                  "required": ["eTag", "folder", "id", "lastModifiedDateTime", "name", "parentReference", "permissions"],
+                  "required": ["eTag", "folder", "id", "lastModifiedDateTime", "name", "parentReference", "permissions", "spaceId"],
                   "properties": {
                     "name": { "const": "folderToShare" },
                     "permissions": {
@@ -933,6 +947,10 @@ Feature: enable disable permissions role
                           "roles": { "const": null }
                         }
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -1017,7 +1035,7 @@ Feature: enable disable permissions role
               "properties": {
                 "remoteItem": {
                   "type": "object",
-                  "required": ["createdBy", "eTag", "file", "id", "lastModifiedDateTime", "name", "parentReference", "permissions"],
+                  "required": ["createdBy", "eTag", "file", "id", "lastModifiedDateTime", "name", "parentReference", "permissions", "spaceId"],
                   "properties": {
                     "name": { "const": "textfile.txt" },
                     "permissions": {
@@ -1043,6 +1061,10 @@ Feature: enable disable permissions role
                           "roles": { "const": null }
                         }
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -1129,7 +1151,7 @@ Feature: enable disable permissions role
               "properties": {
                 "remoteItem": {
                   "type": "object",
-                  "required": ["eTag", "file", "id", "lastModifiedDateTime", "name", "parentReference", "permissions"],
+                  "required": ["eTag", "file", "id", "lastModifiedDateTime", "name", "parentReference", "permissions", "spaceId"],
                   "properties": {
                     "name": { "const": "textfile.txt" },
                     "permissions": {
@@ -1155,6 +1177,10 @@ Feature: enable disable permissions role
                           "roles": { "const": null }
                         }
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }

@@ -130,7 +130,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                     "name",
                     "parentReference",
                     "permissions",
-                    "size"
+                    "size",
+                    "spaceId"
                   ],
                   "properties": {
                     "createdBy": {
@@ -267,6 +268,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                     "size": {
                       "type": "number",
                       "enum": [8]
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 },
@@ -387,7 +392,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                     "lastModifiedDateTime",
                     "name",
                     "parentReference",
-                    "permissions"
+                    "permissions",
+                    "spaceId"
                   ],
                   "properties": {
                     "createdBy": {
@@ -510,6 +516,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                           }
                         }
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -642,7 +652,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                     "name",
                     "parentReference",
                     "permissions",
-                    "size"
+                    "size",
+                    "spaceId"
                   ],
                   "properties": {
                     "createdBy": {
@@ -779,6 +790,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                     "size": {
                       "type": "number",
                       "enum": [8]
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 },
@@ -903,7 +918,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                     "lastModifiedDateTime",
                     "name",
                     "parentReference",
-                    "permissions"
+                    "permissions",
+                    "spaceId"
                   ],
                   "properties": {
                     "createdBy": {
@@ -1026,6 +1042,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                           }
                         }
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -1139,7 +1159,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                     "name",
                     "parentReference",
                     "permissions",
-                    "size"
+                    "size",
+                    "spaceId"
                   ],
                   "properties": {
                     "eTag": {
@@ -1265,6 +1286,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                     "size": {
                       "type": "number",
                       "enum": [8]
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 },
@@ -1371,7 +1396,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                     "lastModifiedDateTime",
                     "name",
                     "parentReference",
-                    "permissions"
+                    "permissions",
+                    "spaceId"
                   ],
                   "properties": {
                     "eTag": {
@@ -1487,6 +1513,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                           }
                         }
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -1600,7 +1630,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                     "name",
                     "parentReference",
                     "permissions",
-                    "size"
+                    "size",
+                    "spaceId"
                   ],
                   "properties": {
                     "eTag": {
@@ -1717,6 +1748,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                     "size": {
                       "type": "number",
                       "enum": [8]
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 },
@@ -1822,7 +1857,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                     "lastModifiedDateTime",
                     "name",
                     "parentReference",
-                    "permissions"
+                    "permissions",
+                    "spaceId"
                   ],
                   "properties": {
                     "eTag": {
@@ -1925,6 +1961,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                           }
                         }
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -2003,7 +2043,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                     "name",
                     "parentReference",
                     "permissions",
-                    "size"
+                    "size",
+                    "spaceId"
                   ],
                   "properties": {
                     "permissions": {
@@ -2069,6 +2110,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                           }
                         ]
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -2145,7 +2190,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                     "lastModifiedDateTime",
                     "name",
                     "parentReference",
-                    "permissions"
+                    "permissions",
+                    "spaceId"
                   ],
                   "properties": {
                     "permissions": {
@@ -2211,6 +2257,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                           }
                         ]
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -2306,7 +2356,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                         "lastModifiedDateTime",
                         "name",
                         "parentReference",
-                        "permissions"
+                        "permissions",
+                        "spaceId"
                       ],
                       "properties": {
                         "createdBy": {
@@ -2377,6 +2428,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                               }
                             }
                           }
+                        },
+                        "spaceId": {
+                          "type": "string",
+                          "pattern": "^%space_id_pattern%$"
                         }
                       }
                     }
@@ -2435,7 +2490,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                         "lastModifiedDateTime",
                         "name",
                         "parentReference",
-                        "permissions"
+                        "permissions",
+                        "spaceId"
                       ],
                       "properties": {
                         "createdBy": {
@@ -2506,6 +2562,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                               }
                             }
                           }
+                        },
+                        "spaceId": {
+                          "type": "string",
+                          "pattern": "^%space_id_pattern%$"
                         }
                       }
                     }
@@ -2603,7 +2663,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                         "lastModifiedDateTime",
                         "name",
                         "parentReference",
-                        "permissions"
+                        "permissions",
+                        "spaceId"
                       ],
                       "properties": {
                         "createdBy": {
@@ -2674,6 +2735,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                               }
                             }
                           }
+                        },
+                        "spaceId": {
+                          "type": "string",
+                          "pattern": "^%space_id_pattern%$"
                         }
                       }
                     }
@@ -2732,7 +2797,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                         "lastModifiedDateTime",
                         "name",
                         "parentReference",
-                        "permissions"
+                        "permissions",
+                        "spaceId"
                       ],
                       "properties": {
                         "createdBy": {
@@ -2803,6 +2869,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                               }
                             }
                           }
+                        },
+                        "spaceId": {
+                          "type": "string",
+                          "pattern": "^%space_id_pattern%$"
                         }
                       }
                     }
@@ -2883,7 +2953,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                     "name",
                     "parentReference",
                     "permissions",
-                    "size"
+                    "size",
+                    "spaceId"
                   ],
                   "properties": {
                     "permissions": {
@@ -2979,6 +3050,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                           }
                         ]
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -3052,7 +3127,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                     "lastModifiedDateTime",
                     "name",
                     "parentReference",
-                    "permissions"
+                    "permissions",
+                    "spaceId"
                   ],
                   "properties": {
                     "permissions": {
@@ -3148,6 +3224,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                           }
                         ]
                       }
+                    },
+                    "spaceId": {
+                      "type": "string",
+                      "pattern": "^%space_id_pattern%$"
                     }
                   }
                 }
@@ -3249,7 +3329,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                         "lastModifiedDateTime",
                         "name",
                         "parentReference",
-                        "permissions"
+                        "permissions",
+                        "spaceId"
                       ],
                       "properties": {
                         "name": {
@@ -3328,6 +3409,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                               }
                             }
                           }
+                        },
+                        "spaceId": {
+                          "type": "string",
+                          "pattern": "^%space_id_pattern%$"
                         }
                       }
                     }
@@ -3386,7 +3471,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                         "lastModifiedDateTime",
                         "name",
                         "parentReference",
-                        "permissions"
+                        "permissions",
+                        "spaceId"
                       ],
                       "properties": {
                         "name": {
@@ -3465,6 +3551,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                               }
                             }
                           }
+                        },
+                        "spaceId": {
+                          "type": "string",
+                          "pattern": "^%space_id_pattern%$"
                         }
                       }
                     }
@@ -3567,7 +3657,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                         "lastModifiedDateTime",
                         "name",
                         "parentReference",
-                        "permissions"
+                        "permissions",
+                        "spaceId"
                       ],
                       "properties": {
                         "name": {
@@ -3646,6 +3737,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                               }
                             }
                           }
+                        },
+                        "spaceId": {
+                          "type": "string",
+                          "pattern": "^%space_id_pattern%$"
                         }
                       }
                     }
@@ -3704,7 +3799,8 @@ Feature: listing sharedWithMe when auto-sync is disabled
                         "lastModifiedDateTime",
                         "name",
                         "parentReference",
-                        "permissions"
+                        "permissions",
+                        "spaceId"
                       ],
                       "properties": {
                         "name": {
@@ -3767,6 +3863,10 @@ Feature: listing sharedWithMe when auto-sync is disabled
                               }
                             }
                           }
+                        },
+                        "spaceId": {
+                          "type": "string",
+                          "pattern": "^%space_id_pattern%$"
                         }
                       }
                     }
