@@ -135,6 +135,10 @@ LOCAL_API_TESTS = {
             "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
         },
     },
+    "vault": {
+        "suites": ["apiVault"],
+        "extraServerEnvironment": {}
+    },
     "cliCommands": {
         "suites": ["cliCommands", "apiServiceAvailability"],
         "antivirusNeeded": True,
