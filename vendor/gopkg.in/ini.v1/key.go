@@ -15,12 +15,12 @@
 package ini
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
-	"unicode/utf8"
 )
 
 // Key represents a key under a section.
@@ -495,38 +495,31 @@ func (k *Key) Strings(delim string) []string {
 		return []string{}
 	}
 
-	maxParts := strings.Count(str, delim) + 1
-	vals := make([]string, 0, maxParts)
-
-	var buf strings.Builder
-	buf.Grow(len(str))
-
-	i := 0
+	runes := []rune(str)
+	vals := make([]string, 0, 2)
+	var buf bytes.Buffer
+	escape := false
+	idx := 0
 	for {
-		if str[i] == '\\' {
-			i++
-			if i >= len(str) {
-				break
-			}
-
-			if str[i] != '\\' && !strings.HasPrefix(str[i:], delim) {
+		if escape {
+			escape = false
+			if runes[idx] != '\\' && !strings.HasPrefix(string(runes[idx:]), delim) {
 				buf.WriteRune('\\')
 			}
-
-			r, size := utf8.DecodeRuneInString(str[i:])
-			i += size
-			buf.WriteRune(r)
-		} else if strings.HasPrefix(str[i:], delim) {
-			i += len(delim)
-			vals = append(vals, strings.TrimSpace(buf.String()))
-			buf.Reset()
+			buf.WriteRune(runes[idx])
 		} else {
-			r, size := utf8.DecodeRuneInString(str[i:])
-			i += size
-			buf.WriteRune(r)
+			if runes[idx] == '\\' {
+				escape = true
+			} else if strings.HasPrefix(string(runes[idx:]), delim) {
+				idx += len(delim) - 1
+				vals = append(vals, strings.TrimSpace(buf.String()))
+				buf.Reset()
+			} else {
+				buf.WriteRune(runes[idx])
+			}
 		}
-
-		if i >= len(str) {
+		idx++
+		if idx == len(runes) {
 			break
 		}
 	}

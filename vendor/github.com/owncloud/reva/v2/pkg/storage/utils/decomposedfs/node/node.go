@@ -125,7 +125,9 @@ type Tree interface {
 
 	InitNewNode(ctx context.Context, n *Node, fsize uint64) (metadata.UnlockFunc, error)
 
+	// TODO(OCISDEV-901): remove WriteBlob once FinishUploadDecomposed is replaced by the upload coordinator (OCISDEV-900).
 	WriteBlob(node *Node, source string) error
+	WriteBlobFromReader(node *Node, r io.Reader, size int64) error
 	ReadBlob(node *Node) (io.ReadCloser, error)
 	DeleteBlob(node *Node) error
 
@@ -1335,6 +1337,15 @@ var CheckQuota = func(ctx context.Context, spaceRoot *Node, overwrite bool, oldS
 		return false, errtypes.InsufficientStorage("quota exceeded")
 	}
 	return true, nil
+}
+
+// CheckDiskSpace returns an error if the underlying filesystem has insufficient
+// free space for newSize bytes. Does not enforce space-level quota.
+var CheckDiskSpace = func(_ context.Context, spaceRoot *Node, newSize uint64) error {
+	if !enoughDiskSpace(spaceRoot.InternalPath(), newSize) {
+		return errtypes.InsufficientStorage("disk full")
+	}
+	return nil
 }
 
 func enoughDiskSpace(path string, fileSize uint64) bool {

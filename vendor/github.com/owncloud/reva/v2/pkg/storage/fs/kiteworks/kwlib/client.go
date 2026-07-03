@@ -211,19 +211,18 @@ func (c *APIClient) GetQuotaInfo() (*QuotaInfo, error) {
 }
 
 func (c *APIClient) GetGroups(limit, offset int) (*ContactList, error) {
-	u, err := url.Parse("/rest/groups")
-	if err != nil {
-		return nil, err
-	}
-	q := u.Query()
+	q := url.Values{}
 	if limit > 0 {
-		q.Set("limit", fmt.Sprintf("%d", limit))
+		q.Set("limit", strconv.Itoa(limit))
 	}
 	if offset > 0 {
-		q.Set("offset", fmt.Sprintf("%d", offset))
+		q.Set("offset", strconv.Itoa(offset))
 	}
-	u.RawQuery = q.Encode()
-	request, err := c.NewGetRequest(u.String())
+	path := "/rest/groups"
+	if len(q) > 0 {
+		path += "?" + q.Encode()
+	}
+	request, err := c.NewGetRequest(path)
 	if err != nil {
 		return nil, err
 	}
@@ -261,7 +260,6 @@ func (c *APIClient) InitializeUpload(parentID, name string, size int64, numberOf
 	if err != nil {
 		return nil, err
 	}
-	request.Header.Set("Content-Type", "application/json")
 	response, err := c.SendRequest(request)
 	if err != nil {
 		return nil, err
@@ -347,8 +345,10 @@ func (c *APIClient) Copy(source *FileInfo, parent *FileInfo, replace bool) (bool
 
 type moveOrCopy int
 
-var moveOp moveOrCopy = 1
-var copyOp moveOrCopy = 2
+const (
+	moveOp moveOrCopy = iota + 1
+	copyOp
+)
 
 func (c *APIClient) moveOrCopy(op moveOrCopy, source *FileInfo, dest *FileInfo, replace bool) (bool, error) {
 	api := "/rest/files/actions/move"
@@ -392,24 +392,19 @@ func (c *APIClient) NewGetRequest(path string) (*http.Request, error) {
 }
 
 func (c *APIClient) NewPostRequest(path string, v any) (*http.Request, error) {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return nil, err
-	}
-	req, err := c.newRequest("POST", path, bytes.NewBuffer(b))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json")
-	return req, nil
+	return c.newJSONRequest("POST", path, v)
 }
 
 func (c *APIClient) NewPutRequest(path string, v any) (*http.Request, error) {
+	return c.newJSONRequest("PUT", path, v)
+}
+
+func (c *APIClient) newJSONRequest(method, path string, v any) (*http.Request, error) {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return nil, err
 	}
-	req, err := c.newRequest("PUT", path, bytes.NewBuffer(b))
+	req, err := c.newRequest(method, path, bytes.NewBuffer(b))
 	if err != nil {
 		return nil, err
 	}
@@ -437,21 +432,18 @@ func (c *APIClient) newRequest(method, path string, body io.Reader) (*http.Reque
 }
 
 func (c *APIClient) SendRequest(req *http.Request) (*http.Response, error) {
-	client := c.httpClient
-
-	log := c.logger.Debug().Str("method", req.Method).Str("path", req.URL.String())
-	response, err := client.Do(req)
+	response, err := c.httpClient.Do(req)
 	if err != nil {
-		log.Err(err).Msg("kiteworks API call errored")
+		c.logger.Debug().Str("method", req.Method).Str("path", req.URL.String()).Err(err).Msg("kiteworks API call errored")
 		return nil, err
 	}
 	if response.StatusCode >= http.StatusBadRequest {
 		defer response.Body.Close()
 		b, _ := io.ReadAll(response.Body)
-		log.Str("body", string(b)).Int("status", response.StatusCode).Msg("kiteworks API call failed")
+		c.logger.Debug().Str("method", req.Method).Str("path", req.URL.String()).Str("body", string(b)).Int("status", response.StatusCode).Msg("kiteworks API call failed")
 		return response, NewClientError(response.StatusCode)
 	}
-	log.Int("status", response.StatusCode).Msg("kiteworks API call success")
+	c.logger.Debug().Str("method", req.Method).Str("path", req.URL.String()).Int("status", response.StatusCode).Msg("kiteworks API call success")
 	return response, nil
 }
 

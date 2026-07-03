@@ -216,5 +216,17 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 			},
 		}
 	}
+	if cfg.StorageKiteworksEndpoint != "" {
+		rules[cfg.StorageKiteworksEndpoint] = map[string]interface{}{
+			"providerid": cfg.StorageKiteworksMountID,
+			"readonly":   true,
+			"spaces": map[string]interface{}{
+				"project": map[string]interface{}{
+					"mount_point":   "/kiteworks",
+					"path_template": "/kiteworks/{{.Space.Name}}",
+				},
+			},
+		}
+	}
 	return rules
 }

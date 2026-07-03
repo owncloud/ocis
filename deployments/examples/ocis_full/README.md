@@ -23,3 +23,58 @@ Keycloak can be optionally enabled by uncommenting the corresponding variables i
 - `KEYCLOAK=:keycloak.yml`
 
 Note that Keycloak requires the default `ocis` Identity Provider to be disabled, which is automatically handled when the `keycloak.yml` configuration is used.
+
+### Kiteworks Storage
+
+Enables a read-only Kiteworks storage provider alongside the default oCIS storage.
+Kiteworks top-level folders appear as project spaces in the oCIS web UI.
+Creating new project spaces from the UI continues to use decomposedfs.
+
+**Prerequisites:**
+
+The Kiteworks storage driver is not part of an upstream oCIS release. Build the `owncloud/ocis:dev` image locally from this branch:
+```bash
+make -C ocis dev-docker
+```
+
+**Required `.env` variables:**
+```env
+KITEWORKS_ENDPOINT=https://your-kiteworks-instance.example.com
+KITEWORKS_API_TOKEN=<your-api-token>
+```
+
+**Optional `.env` variables:**
+```env
+KITEWORKS_MOUNT_ID=aa309def-b364-417b-8e41-85b8a9393c4b  # stable UUID; change only to avoid collision with another deployment
+KITEWORKS_INSECURE=false                                   # set true only if the Kiteworks TLS cert is self-signed
+```
+
+**Start command:**
+```bash
+docker compose -f docker-compose.yml -f ocis.yml -f kiteworks-storage.yml up -d
+```
+
+**Verify:**
+```bash
+# Kiteworks folders appear as project spaces alongside the personal decomposedfs space
+curl -ksu admin:admin "https://${OCIS_DOMAIN}/graph/v1.0/me/drives" \
+  | jq '.value[] | {id, name, driveType}'
+
+# Creating a new project space must succeed (HTTP 201) and land on decomposedfs
+curl -ksu admin:admin -X POST "https://${OCIS_DOMAIN}/graph/v1.0/drives" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"my space","driveType":"project"}' -w "\nHTTP %{http_code}\n"
+
+# List files in a Kiteworks space → HTTP 207 (smoke-tests KW ListFolder)
+# Use the space id from the drives listing above (the one with driveType "project" whose id
+# starts with the KITEWORKS_MOUNT_ID, default aa309def-b364-417b-8e41-85b8a9393c4b)
+curl -ksu admin:admin -X PROPFIND \
+  "https://${OCIS_DOMAIN}/dav/spaces/<kw-space-id>/" \
+  -H "Depth: 1" -w "\nHTTP %{http_code}\n"
+
+# Download a file from a Kiteworks space → HTTP 200 (smoke-tests KW Download)
+# Use any file path from the PROPFIND listing above
+curl -ksu admin:admin \
+  "https://${OCIS_DOMAIN}/dav/spaces/<kw-space-id>/<subfolder>/<filename>" \
+  -w "\nHTTP %{http_code}\n"
+```
