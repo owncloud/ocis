@@ -24,21 +24,21 @@ var (
 	ErrNotFound = errors.New("personal space not found")
 )
 
-// DisablePersonalSpace disables (deletes) the personal storage space for the given userID.
+// DisablePersonalSpace disables (trashes) the personal storage space for the given userID.
 // If the personal space is already deleted (trashed), it is a no-op.
 // Returns an error if the space cannot be found or the deletion fails.
 func DisablePersonalSpace(ctx context.Context, client gateway.GatewayAPIClient, userID string) error {
 	logger := appctx.GetLogger(ctx)
 	sp, err := getPersonalSpace(ctx, client, userID)
 	if err == ErrNotFound {
-		logger.Debug().Str("userID", userID).Msg("no personal space found to delete")
+		logger.Debug().Str("userID", userID).Msg("no personal space found to disable")
 		return nil
 	}
 	if err != nil {
 		return fmt.Errorf("failed to retrieve personal space: %w", err)
 	}
 	if isTrashed(sp) {
-		logger.Debug().Str("userID", userID).Msg("the personal space already deleted")
+		logger.Debug().Str("userID", userID).Msg("the personal space is already disabled, skipping deletion")
 		return nil
 	}
 

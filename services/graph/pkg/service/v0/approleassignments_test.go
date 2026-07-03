@@ -472,7 +472,7 @@ var _ = Describe("AppRoleAssignments", func() {
 			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
 		})
 
-		It("returns error when GetUser fails for non-UserLight role", func() {
+		It("fails closed and reverts the role assignment when GetUser fails", func() {
 			userRoleAssignment := &settingsmsg.UserRoleAssignment{
 				Id:          "some-appRoleAssignment-ID",
 				AccountUuid: "user1",
@@ -480,6 +480,7 @@ var _ = Describe("AppRoleAssignments", func() {
 			}
 			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{}}, nil)
 			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{Assignment: userRoleAssignment}, nil)
+			roleService.On("RemoveRoleFromUser", mock.Anything, mock.Anything, mock.Anything).Return(&empty.Empty{}, nil)
 
 			// Reset the mock and make GetUser fail
 			gatewayClient.ExpectedCalls = nil
@@ -511,7 +512,74 @@ var _ = Describe("AppRoleAssignments", func() {
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.CreateAppRoleAssignment(rr, r)
 
-			Expect(rr.Code).To(Equal(http.StatusCreated))
+			// The user lookup failed, so the Drives.Create permission could not be
+			// determined. The handler must fail closed: surface the error, leave the
+			// personal space untouched, and revert the just-persisted role assignment
+			// (the user had no previous role, so the new assignment is removed).
+			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
+			gatewayClient.AssertNotCalled(GinkgoT(), "DeleteStorageSpace", mock.Anything, mock.Anything)
+			roleService.AssertCalled(GinkgoT(), "RemoveRoleFromUser", mock.Anything, mock.MatchedBy(func(req *settings.RemoveRoleFromUserRequest) bool {
+				return req.GetId() == "some-appRoleAssignment-ID"
+			}), mock.Anything)
+		})
+
+		It("fails closed and reverts to the previous role when the permission check is inconclusive", func() {
+			previousAssignment := &settingsmsg.UserRoleAssignment{
+				Id:          "old-appRoleAssignment-ID",
+				AccountUuid: "user1",
+				RoleId:      "old-appRole-ID",
+			}
+			newAssignment := &settingsmsg.UserRoleAssignment{
+				Id:          "new-appRoleAssignment-ID",
+				AccountUuid: "user1",
+				RoleId:      "some-appRole-ID",
+			}
+			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{previousAssignment}}, nil)
+			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{Assignment: newAssignment}, nil)
+
+			// CheckPermission returns a non-OK status that is NOT PERMISSION_DENIED
+			// (here: an internal error in the settings service). The permission
+			// therefore could not be authoritatively determined, so the handler must
+			// fail closed and must NOT delete (trash) the personal space.
+			gatewayClient.ExpectedCalls = nil
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+				User:   currentUser,
+			}, nil)
+			gatewayClient.On("CheckPermission", mock.Anything, mock.Anything).Return(&permissions.CheckPermissionResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_INTERNAL, Message: "settings unavailable"},
+			}, nil)
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+				StorageSpaces: []*storageprovider.StorageSpace{
+					{Id: &storageprovider.StorageSpaceId{OpaqueId: "ps1"}},
+				},
+			}, nil)
+			gatewayClient.On("DeleteStorageSpace", mock.Anything, mock.Anything).Return(&storageprovider.DeleteStorageSpaceResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+			}, nil)
+
+			ara := libregraph.NewAppRoleAssignmentWithDefaults()
+			ara.SetAppRoleId("some-appRole-ID")
+			ara.SetPrincipalId("user1")
+			ara.SetResourceId(cfg.Application.ID)
+
+			araJson, err := json.Marshal(ara)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users/user1/appRoleAssignments", bytes.NewBuffer(araJson))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", "user1")
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.CreateAppRoleAssignment(rr, r)
+
+			// The permission was inconclusive: fail closed (500), do not trash the
+			// space, and revert the role assignment back to the previous role.
+			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
+			gatewayClient.AssertNotCalled(GinkgoT(), "DeleteStorageSpace", mock.Anything, mock.Anything)
+			roleService.AssertCalled(GinkgoT(), "AssignRoleToUser", mock.Anything, mock.MatchedBy(func(req *settings.AssignRoleToUserRequest) bool {
+				return req.GetRoleId() == "old-appRole-ID"
+			}), mock.Anything)
 		})
 	})
 
