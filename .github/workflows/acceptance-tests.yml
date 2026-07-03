@@ -581,6 +581,22 @@ jobs:
           COLLABORATION_NEEDED: ${{ matrix.collaboration == true && 'true' || 'false' }}
           FEDERATED_NEEDED: ${{ matrix.federated == true && 'true' || 'false' }}
 
+      - name: Upload tracing result
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: playwright-traces-${{ matrix.suite }}-${{ github.run_attempt }}
+          path: web/reports/e2e
+          retention-days: 7
+
+      - name: Upload a11y result
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: playwright-a11y-result-${{ matrix.suite }}-${{ github.run_attempt }}
+          path: web/reports/e2e/a11y-report.json
+          retention-days: 7
+
   litmus:
     name: litmus
     needs: [build-and-test]
