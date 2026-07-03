@@ -73,3 +73,11 @@ func (fs *s3FS) Upload(ctx context.Context, req storage.UploadRequest, uff stora
 func (fs *s3FS) InitiateUpload(ctx context.Context, ref *provider.Reference, uploadLength int64, metadata map[string]string) (map[string]string, error) {
 	return nil, errtypes.NotSupported("op not supported")
 }
+
+func (fs *s3FS) MarkProcessing(ctx context.Context, ref *provider.Reference, processing bool, sessionID string) error {
+	return errtypes.NotSupported("op not supported")
+}
+
+func (fs *s3FS) CommitUpload(ctx context.Context, ref *provider.Reference, source storage.UploadSource) (*provider.ResourceInfo, error) {
+	return nil, errtypes.NotSupported("op not supported")
+}

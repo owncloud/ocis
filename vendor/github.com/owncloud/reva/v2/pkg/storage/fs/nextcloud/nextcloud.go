@@ -409,6 +409,16 @@ func (nc *StorageDriver) InitiateUpload(ctx context.Context, ref *provider.Refer
 	return respMap, err
 }
 
+// MarkProcessing as defined in the storage.FS interface
+func (nc *StorageDriver) MarkProcessing(ctx context.Context, ref *provider.Reference, processing bool, sessionID string) error {
+	return errtypes.NotSupported("nextcloud: mark processing not supported")
+}
+
+// CommitUpload as defined in the storage.FS interface
+func (nc *StorageDriver) CommitUpload(ctx context.Context, ref *provider.Reference, source storage.UploadSource) (*provider.ResourceInfo, error) {
+	return nil, errtypes.NotSupported("nextcloud: commit upload not supported")
+}
+
 // Upload as defined in the storage.FS interface
 func (nc *StorageDriver) Upload(ctx context.Context, req storage.UploadRequest, _ storage.UploadFinishedFunc) (*provider.ResourceInfo, error) {
 	err := nc.doUpload(ctx, req.Ref.Path, req.Body)
