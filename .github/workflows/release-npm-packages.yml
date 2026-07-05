@@ -48,9 +48,11 @@ jobs:
             if [[ "$TAG" == "${pkg}-v"* ]]; then
               echo "name=$pkg" >> "$GITHUB_OUTPUT"
               echo "version=${TAG#${pkg}-v}" >> "$GITHUB_OUTPUT"
-              break
+              exit 0
             fi
           done
+          echo "tag '$TAG' does not match any known package prefix: $PACKAGES"
+          exit 1
 
       - name: Verify package version
         run: |
