@@ -5,5 +5,5 @@ SPDX-PackageDownloadLocation = "https://github.com/owncloud/ocis"
 
 [[annotations]]
 path = "**"
-SPDX-FileCopyrightText = "2020-2026 ownCloud GmbH"
+SPDX-FileCopyrightText = "2016-2026 ownCloud GmbH - A Kiteworks Company and ownCloud contributors"
 SPDX-License-Identifier = "Apache-2.0"
