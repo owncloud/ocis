@@ -32,9 +32,9 @@ ci-node-generate: build-assets
 
 .PHONY: build-assets
 build-assets:
-	git clean -xfd assets
 	cd $(WEB_DIR) && pnpm install && pnpm check:types && pnpm build
 	cp $(WEB_DIR)/config/config.json.dist $(WEB_DIR)/dist/
+	git clean -xfd assets
 	cp -r $(WEB_DIR)/dist/. assets/core/
 
 ############ licenses ############
