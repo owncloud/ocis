@@ -513,24 +513,32 @@ def main() -> int:
             "BROWSER": "chromium",
         }
 
+        trusted_certs = [ocis_cert]
+
         if keycloak_needed:
             playwright_env.update({
                 "KEYCLOAK": "true",
                 "KEYCLOAK_HOST": "localhost:8443",
             })
+            keycloak_cert = repo_root / "keycloak-certs/keycloakcrt.pem"
+            if keycloak_cert.exists():
+                trusted_certs.append(keycloak_cert)
 
         if mfa_needed:
             playwright_env["MFA"] = "true"
 
         if federated_needed:
             playwright_env["FEDERATED_BASE_URL_OCIS"] = "localhost:10200"
-            # NODE_EXTRA_CA_CERTS takes a single file; concatenate both self-signed
-            # certs so node-fetch/axios calls made directly against the federated
-            # instance (e.g. fetching an OCM invite token) are trusted too.
+            trusted_certs.append(federated_cert)
+
+        if len(trusted_certs) > 1:
+            # NODE_EXTRA_CA_CERTS takes a single file; concatenate every self-signed
+            # cert in play (oCIS, Keycloak, federated instance) so node-fetch/axios
+            # calls made directly against any of them are trusted too.
             bundle = tempfile.NamedTemporaryFile(
                 mode="w", suffix=".pem", prefix="ocis-ca-bundle-", delete=False)
-            bundle.write(ocis_cert.read_text())
-            bundle.write(federated_cert.read_text())
+            for cert in trusted_certs:
+                bundle.write(cert.read_text())
             bundle.close()
             playwright_env["NODE_EXTRA_CA_CERTS"] = bundle.name
 

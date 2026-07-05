@@ -64,7 +64,7 @@ jobs:
           node-version: "24"
 
       - name: Enable pnpm
-        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+        run: corepack enable && corepack prepare pnpm@10.33.3 --activate
 
       - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
         with:
@@ -443,7 +443,7 @@ jobs:
           node-version: "24.15.0"
       - name: Enable pnpm
         run: |
-          corepack enable && corepack prepare pnpm@10.28.1 --activate
+          corepack enable && corepack prepare pnpm@10.33.3 --activate
           pnpm config set store-dir ./.pnpm-store
 
       - name: Install libvips runtime
@@ -482,7 +482,8 @@ jobs:
           openssl req -x509 -newkey rsa:2048 \
             -keyout keycloak-certs/keycloakkey.pem \
             -out keycloak-certs/keycloakcrt.pem \
-            -nodes -days 365 -subj '/CN=keycloak'
+            -nodes -days 365 -subj '/CN=keycloak' \
+            -addext 'subjectAltName=DNS:localhost,IP:127.0.0.1'
           chmod -R 777 keycloak-certs
 
       - name: Start Postgres
