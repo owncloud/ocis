@@ -196,6 +196,7 @@ export const changeRole = async (args: changeRoleArgs): Promise<string> => {
     ),
     page.locator(util.format(publicLinkSetRoleButton, role)).click()
   ])
+  await page.locator(linkUpdateDialog).waitFor()
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
     [linkUpdateDialog],
@@ -235,6 +236,7 @@ export const changeName = async (args: changeNameArgs): Promise<string> => {
   )
   await page.locator(editPublicLinkNameInput).fill(newName)
   await page.locator(editPublicLinkRenameConfirm).click()
+  await page.locator(linkUpdateDialog).waitFor()
   const message = await page.locator(linkUpdateDialog).textContent()
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
@@ -377,6 +379,7 @@ export const addExpiration = async (args: addExpirationArgs): Promise<void> => {
 
   await page.locator(linkExpiryDatepicker).fill(newExpiryDate.toISOString().split('T')[0])
   await page.locator(linkExpiryDatepickerConfirmButton).click()
+  await page.locator(linkUpdateDialog).waitFor()
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
     [linkUpdateDialog],
@@ -407,6 +410,7 @@ export const deleteLink = async (args: deleteLinkArgs): Promise<void> => {
     'Delete public link confirmation modal'
   )
   await page.locator(confirmDeleteButton).click()
+  await page.locator(linkUpdateDialog).waitFor()
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
     [linkUpdateDialog],
@@ -488,14 +492,22 @@ export const copyLinkToClipboard = async (args: copyLinkArgs): Promise<string> =
 
   if (resourceType === 'passwordProtectedFolder') {
     await page.frameLocator(folderModalIframe).getByLabel('Copy link to clipboard').click()
+    // the password-protected-folder notification renders inside its own iframe, not on the top-level page
+    await page.frameLocator(folderModalIframe).locator(linkUpdateDialog).waitFor()
+    await objects.a11y.Accessibility.assertNoSevereA11yViolations(
+      page,
+      [folderModalIframe],
+      'copy link to clipboard notification'
+    )
   } else {
     await page.getByLabel('Copy link to clipboard').click()
+    await page.locator(linkUpdateDialog).waitFor()
+    await objects.a11y.Accessibility.assertNoSevereA11yViolations(
+      page,
+      [linkUpdateDialog],
+      'copy link to clipboard notification'
+    )
   }
-  await objects.a11y.Accessibility.assertNoSevereA11yViolations(
-    page,
-    ['.snackbar'],
-    'copy link to clipboard notification'
-  )
   return await page.evaluate('navigator.clipboard.readText()')
 }
 
