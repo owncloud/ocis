@@ -3,29 +3,29 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
   workflow_dispatch:
     inputs:
       version_override:
-        description: 'Version (required, e.g. 8.1.0-rc.3)'
+        description: "Version (required, e.g. 8.1.0-rc.3)"
         type: string
         required: true
 
 env:
-  PRODUCTION_RELEASE_TAGS: '5.0,7,8'
+  PRODUCTION_RELEASE_TAGS: "5.0,7,8"
   DOCKER_REPO_ROLLING: owncloud/ocis-rolling
   DOCKER_REPO_PRODUCTION: owncloud/ocis
-  NODE_VERSION: '24'
-  PNPM_VERSION: '10.28.1'
+  NODE_VERSION: "24"
+  PNPM_VERSION: "10.28.1"
 
 jobs:
   determine-release-type:
     runs-on: ubuntu-latest
     outputs:
-      version:       ${{ steps.info.outputs.version }}
+      version: ${{ steps.info.outputs.version }}
       is_production: ${{ steps.info.outputs.is_production }}
       is_prerelease: ${{ steps.info.outputs.is_prerelease }}
-      docker_repos:  ${{ steps.info.outputs.docker_repos }}
+      docker_repos: ${{ steps.info.outputs.docker_repos }}
     steps:
       - id: info
         run: |
@@ -70,7 +70,7 @@ jobs:
           version: ${{ env.PNPM_VERSION }}
       - run: pnpm config set store-dir ./.pnpm-store && make ci-node-generate
         env:
-          CHROMEDRIVER_SKIP_DOWNLOAD: 'true'
+          CHROMEDRIVER_SKIP_DOWNLOAD: "true"
       - run: make ci-go-generate
         env:
           BUF_TOKEN: ${{ secrets.BUF_API_TOKEN }}
@@ -127,21 +127,8 @@ jobs:
           ARCH="${{ matrix.arch }}"
           printf "tags<<EOF\n%s\nEOF\n" \
             "${REPO}:${VERSION}-linux-${ARCH}" >> $GITHUB_OUTPUT
-      - id: build
-        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
-        with:
-          context: ocis
-          file: ocis/docker/Dockerfile.linux.${{ matrix.arch }}
-          platforms: linux/${{ matrix.arch }}
-          load: true
-          push: false
-          provenance: false
-          build-args: |
-            REVISION=${{ github.sha }}
-            VERSION=${{ needs.determine-release-type.outputs.version }}
-          tags: ${{ steps.tags.outputs.tags }}
       - id: trivy
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
         continue-on-error: true
         with:
           image-ref: ${{ steps.tags.outputs.tags }}
@@ -172,7 +159,7 @@ jobs:
         repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+      - uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
         id: trivy
         continue-on-error: true
         with:
@@ -267,7 +254,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+      - uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
         with:
           scan-type: fs
           format: table
@@ -333,7 +320,14 @@ jobs:
 
   create-github-release:
     runs-on: ubuntu-latest
-    needs: [determine-release-type, build-binaries, license-check, generate-changelog, security-scan-trivy]
+    needs:
+      [
+        determine-release-type,
+        build-binaries,
+        license-check,
+        generate-changelog,
+        security-scan-trivy,
+      ]
     steps:
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
@@ -390,4 +384,3 @@ jobs:
             --github-release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
