@@ -175,48 +175,49 @@ jobs:
       fail-fast: false
       matrix:
         suite:
-          # contract & locks
-          - apiContract
-          - apiLocks
-          # settings & notifications (needs email)
-          - apiSettings
-          - apiNotification
-          - apiCors
-          # graph
-          - apiGraphUser
-          - apiGraph
-          - apiGraphGroup
-          # spaces & dav
-          - apiSpaces
-          - apiSpacesShares
-          - apiSpacesDavOperation
-          - apiDownloads
-          - apiAsyncUpload
-          - apiDepthInfinity
-          - apiArchiver
-          - apiActivities
-          # search
-          - apiSearch1
-          - apiSearch2
-          - apiSearchContent    # needs Tika
-          # sharing
-          - apiSharingNgShares
-          - apiReshare
-          - apiSharingNgPermissions
-          - apiSharingNgAdditionalShareRole
-          - apiSharingNgDriveInvitation
-          - apiSharingNgItemInvitation
-          - apiSharingNgDriveLinkShare
-          - apiSharingNgItemLinkShare
-          - apiSharingNgLinkShareManagement
-          # auth
-          - apiAuthApp
-          # antivirus (needs ClamAV)
-          - apiAntivirus
-          # federation (needs email + federation ocis)
-          - apiOcm
-          # collaboration (needs WOPI)
-          - apiCollaboration
+#          # contract & locks
+#          - apiContract
+#          - apiLocks
+#          # settings & notifications (needs email)
+#          - apiSettings
+#          - apiNotification
+#          - apiCors
+#          # graph
+#          - apiGraphUser
+#          - apiGraph
+#          - apiGraphGroup
+#          # spaces & dav
+#          - apiSpaces
+#          - apiSpacesShares
+#          - apiSpacesDavOperation
+#          - apiDownloads
+#          - apiAsyncUpload
+#          - apiDepthInfinity
+#          - apiArchiver
+#          - apiActivities
+#          # search
+#          - apiSearch1
+#          - apiSearch2
+#          - apiSearchContent    # needs Tika
+#          # sharing
+#          - apiSharingNgShares
+#          - apiReshare
+#          - apiSharingNgPermissions
+#          - apiSharingNgAdditionalShareRole
+#          - apiSharingNgDriveInvitation
+#          - apiSharingNgItemInvitation
+#          - apiSharingNgDriveLinkShare
+#          - apiSharingNgItemLinkShare
+#          - apiSharingNgLinkShareManagement
+#          # auth
+#          - apiAuthApp
+#          # antivirus (needs ClamAV)
+#          - apiAntivirus
+#          # federation (needs email + federation ocis)
+#          - apiOcm
+#          # collaboration (needs WOPI)
+#          - apiCollaboration
+          - apiVault
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 

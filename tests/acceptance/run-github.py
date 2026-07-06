@@ -25,6 +25,9 @@ EMAIL_SMTP_PORT = "1025"
 EMAIL_PORT = "8025"
 EMAIL_SMTP_SENDER = "ownCloud <noreply@example.com>"
 
+KEYCLOAK_IMAGE = "quay.io/keycloak/keycloak:26.5.6"
+POSTGRES_ALPINE_IMAGE = "postgres:alpine3.18"
+
 LOCAL_API_TESTS = {
     "contractAndLock": {
         "suites": ["apiContract", "apiLocks"],
@@ -137,7 +140,13 @@ LOCAL_API_TESTS = {
     },
     "vault": {
         "suites": ["apiVault"],
-        "extraServerEnvironment": {}
+        "keycloakNeeded": True,
+        "vaultStorage": True,
+        "extraServerEnvironment": {
+            "OCIS_ENABLE_VAULT": True,
+            "FRONTEND_ENAVLE_VAULT_MODE": True,
+            "OCIS_MFA_ENABLED": True
+        }
     },
     "cliCommands": {
         "suites": ["cliCommands", "apiServiceAvailability"],
@@ -186,13 +195,16 @@ def merged_config(suites: list) -> dict:
         "tikaNeeded": False,
         "federationServer": False,
         "collaborationServiceNeeded": False,
+        "keycloakNeeded": False,
+        "vaultStorage": False,
         "extraServerEnvironment": {},
         "extraEnvironment": {},
     }
     for suite in suites:
         cfg = _SUITE_TO_CONFIG.get(suite, {})
         for flag in ("emailNeeded", "antivirusNeeded", "tikaNeeded",
-                     "federationServer", "collaborationServiceNeeded"):
+                     "federationServer", "collaborationServiceNeeded",
+                     "keycloakNeeded", "vaultStorage"):
             if cfg.get(flag):
                 merged[flag] = True
         merged["extraServerEnvironment"].update(cfg.get("extraServerEnvironment", {}))
@@ -329,6 +341,20 @@ def clamav_healthy() -> bool:
     return _tcp_ready("localhost", 3310)
 
 
+def keycloak_healthy() -> bool:
+    return subprocess.run(
+        ["curl", "-skf", "https://localhost:9000/health/ready"],
+        capture_output=True,
+    ).returncode == 0
+
+
+def postgres_healthy() -> bool:
+    return subprocess.run(
+        ["docker", "exec", "postgres", "pg_isready", "-U", "keycloak"],
+        capture_output=True,
+    ).returncode == 0
+
+
 
 def load_env_file(path: Path) -> dict:
     """Parse a bash-style env file (export KEY=value) into a dict."""
@@ -438,6 +464,90 @@ def main() -> int:
         json.dump(providers, providers_tmp)
         providers_tmp.close()
         cfg["extraServerEnvironment"]["OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE"] = providers_tmp.name
+
+    if cfg["keycloakNeeded"]:
+        # Generate TLS certs for keycloak
+        print("Generating keycloak certs...")
+        keycloak_certs_dir = repo_root / "keycloak-certs"
+        keycloak_certs_dir.mkdir(parents=True, exist_ok=True)
+        run(["openssl", "req", "-x509", "-newkey", "rsa:2048",
+             "-keyout", str(keycloak_certs_dir / "keycloakkey.pem"),
+             "-out", str(keycloak_certs_dir / "keycloakcrt.pem"),
+             "-nodes", "-days", "365", "-subj", "/CN=keycloak"])
+        for f in keycloak_certs_dir.iterdir():
+            f.chmod(0o777)
+
+        # Set up postgres (keycloak backend)
+        print("Setting up postgres...")
+        # GitHub runners ship PostgreSQL pre-started on 5432; stop it to avoid conflicts.
+        subprocess.run(["sudo", "systemctl", "stop", "postgresql"], capture_output=True)
+        run(["docker", "run", "-d", "--name", "postgres", "--network", "host",
+             "-e", "POSTGRES_DB=keycloak",
+             "-e", "POSTGRES_USER=keycloak",
+             "-e", "POSTGRES_PASSWORD=keycloak",
+             POSTGRES_ALPINE_IMAGE])
+        wait_for(postgres_healthy, 30, "postgres", container="postgres")
+        print("postgres ready.")
+
+        # Patch realm and start keycloak
+        realm_src = (
+            repo_root / "tests/config/ci/ocis-mfa-ci-realm.dist.json"
+            if cfg.get("vaultStorage")
+            else repo_root / "tests/config/ci/ocis-ci-realm.dist.json"
+        )
+        realm_patched = Path("/tmp/ocis-realm.json")
+        realm_patched.write_text(
+            realm_src.read_text()
+            .replace("https://ocis:9200", "https://localhost:9200")
+        )
+        print("Starting keycloak...")
+        run(["docker", "run", "-d", "--name", "keycloak", "--network", "host",
+             "-e", "OCIS_DOMAIN=https://localhost:9200",
+             "-e", "KC_HOSTNAME=localhost",
+             "-e", "KC_PORT=8443",
+             "-e", "KC_DB=postgres",
+             "-e", "KC_DB_URL=jdbc:postgresql://localhost:5432/keycloak",
+             "-e", "KC_DB_USERNAME=keycloak",
+             "-e", "KC_DB_PASSWORD=keycloak",
+             "-e", "KC_FEATURES=impersonation",
+             "-e", "KC_BOOTSTRAP_ADMIN_USERNAME=admin",
+             "-e", "KC_BOOTSTRAP_ADMIN_PASSWORD=admin",
+             "-e", "KC_HTTPS_CERTIFICATE_FILE=/keycloak-certs/keycloakcrt.pem",
+             "-e", "KC_HTTPS_CERTIFICATE_KEY_FILE=/keycloak-certs/keycloakkey.pem",
+             "-v", f"{repo_root}/keycloak-certs:/keycloak-certs:ro",
+             "-v", "/tmp/ocis-realm.json:/opt/keycloak/data/import/oCIS-realm.json:ro",
+             KEYCLOAK_IMAGE,
+             "start-dev", "--proxy-headers", "xforwarded",
+             "--spi-connections-http-client-default-disable-trust-manager=true",
+             "--import-realm", "--health-enabled=true"])
+        wait_for(keycloak_healthy, 300, "keycloak", container="keycloak")
+        print("keycloak ready.")
+
+    if cfg["vaultStorage"]:
+        vault_data_dir = Path.home() / "ocis/storage/users-vault"
+        vault_data_dir.mkdir(parents=True, exist_ok=True)
+        vault_env = {
+            **os.environ,
+            "OCIS_GATEWAY_GRPC_ADDR": "localhost:9142",
+            "OCIS_EVENTS_ENDPOINT": "localhost:9233",
+            "OCIS_CACHE_STORE_NODES": "localhost:9233",
+            "MICRO_REGISTRY_ADDRESS": "localhost:9233",
+            "OCIS_URL": ocis_url,
+            "STORAGE_USERS_ENABLE_VAULT_MODE": "true",
+            "STORAGE_USERS_SERVICE_NAME": "storage-users-vault",
+            "STORAGE_USERS_GRPC_ADDR": "localhost:19285",
+            "STORAGE_USERS_HTTP_ADDR": "localhost:19286",
+            "STORAGE_USERS_DATA_SERVER_URL": "https://localhost:19286",
+            "STORAGE_USERS_DEBUG_ADDR": "localhost:19287",
+            "STORAGE_USERS_OCIS_ROOT": str(vault_data_dir),
+            "STORAGE_USERS_EVENTS_CONSUMER_GROUP": "vault-dcfs",
+        }
+        print("Starting storage-users-vault...")
+        vault_proc = subprocess.Popen(
+            [str(ocis_bin), "storage-users", "server"],
+            env=vault_env,
+        )
+        procs.append(vault_proc)
 
     # init ocis
     run([str(ocis_bin), "init", "--insecure", "true"])
