@@ -1277,4 +1277,50 @@ class CliContext implements Context {
 
 		Assert::assertTrue($found, "Could not find blob for space $spaceName ($spaceOpaqueId)");
 	}
+
+	/**
+	 * @When the administrator checks the blobstore using the CLI
+	 *
+	 * @return void
+	 */
+	public function theAdministratorChecksTheBlobstoreUsingTheCli(): void {
+		$body = ["command" => "storage-users blobstore check"];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator checks the blobstore with blob size :blobSize using the CLI
+	 *
+	 * @param string $blobSize
+	 *
+	 * @return void
+	 */
+	public function theAdministratorChecksTheBlobstoreWithBlobSizeUsingTheCli(string $blobSize): void {
+		$body = ["command" => "storage-users blobstore check --blob-size=$blobSize"];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator gets a blob from the blobstore using the CLI
+	 *
+	 * @return void
+	 */
+	public function theAdministratorGetsABlobFromTheBlobstoreUsingTheCli(): void {
+		$body = ["command" => "storage-users blobstore get"];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator gets a non-existent blob from the blobstore using the CLI
+	 *
+	 * @return void
+	 */
+	public function theAdministratorGetsANonExistentBlobFromTheBlobstoreUsingTheCli(): void {
+		$body = [
+			"command" => "storage-users blobstore get"
+				. " --blob-id=00000000-0000-0000-0000-000000000001"
+				. " --space-id=00000000-0000-0000-0000-000000000002",
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
 }
