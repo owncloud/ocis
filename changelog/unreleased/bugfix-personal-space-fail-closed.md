@@ -1,4 +1,4 @@
-Bugfix: Do not disable the personal space when the Drives.Create permission check is inconclusive
+Bugfix: Fail closed on inconclusive Drives.Create check; preserve personal space
 
 When a user's role is (re-)assigned, both the proxy (on OIDC login) and the graph
 appRoleAssignment handler check the `Drives.Create` permission to decide whether to
@@ -15,4 +15,4 @@ fail closed. The personal space is left untouched, and the graph appRoleAssignme
 additionally reverts the role assignment it just persisted so the user is not left in a
 half-applied state. The role transition is retried on the next login.
 
-https://github.com/owncloud/ocis/issues/12429
+https://github.com/owncloud/ocis/issues/12499
