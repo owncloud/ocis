@@ -70,7 +70,7 @@ export class Application {
     const result = this.#page.locator(notificationItemsMessages)
     await objects.a11y.Accessibility.assertNoSevereA11yViolations(
       this.#page,
-      [notificationItemsMessages],
+      [notificationsDrop],
       'notifications'
     )
     const messages = []
@@ -91,7 +91,7 @@ export class Application {
 
     await objects.a11y.Accessibility.assertNoSevereA11yViolations(
       this.#page,
-      [notificationItemsMessages],
+      [notificationsDrop],
       'notifications'
     )
     await this.#page.locator(notificationsLoading).waitFor({ state: 'detached' })
