@@ -142,6 +142,9 @@ LOCAL_API_TESTS = {
         "suites": ["apiVault"],
         "keycloakNeeded": True,
         "vaultStorage": True,
+        "extraEnvironment": {
+            "KEYCLOAK": "true"
+        },
         "extraServerEnvironment": {
             "OCIS_ENABLE_VAULT": "true",
             "FRONTEND_ENAVLE_VAULT_MODE": "true",
