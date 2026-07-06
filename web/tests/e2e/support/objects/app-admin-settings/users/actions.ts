@@ -101,7 +101,7 @@ export const changeAccountEnabled = async (args: {
   await page.locator(loginDropDown).waitFor()
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
-    ['loginToggleWithDropdown', 'loginDropDown'],
+    [loginInputDropdownToggle, loginDropDown],
     'login dropdown to change account enabled status'
   )
 
@@ -112,7 +112,7 @@ export const changeAccountEnabled = async (args: {
 
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
-    ['loginToggleWithDropdown'],
+    [loginInputDropdownToggle],
     'login toggle after changing account enabled status'
   )
 
@@ -288,7 +288,7 @@ export const addSelectedUsersToGroups = async (args: {
     await page.keyboard.press('Enter')
     await objects.a11y.Accessibility.assertNoSevereA11yViolations(
       page,
-      ['groupsModalInput'],
+      [groupsModalInput],
       'groups input in add users to groups modal after selecting a group' + group
     )
   }
@@ -351,7 +351,7 @@ export const removeSelectedUsersFromGroups = async (args: {
     await page.keyboard.press('Enter')
     await objects.a11y.Accessibility.assertNoSevereA11yViolations(
       page,
-      ['groupsModalInput'],
+      [groupsModalInput],
       'groups input in remove users from groups modal after selecting a group' + group
     )
   }
