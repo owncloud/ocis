@@ -466,6 +466,12 @@ def main() -> int:
         cfg["extraServerEnvironment"]["OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE"] = providers_tmp.name
 
     if cfg["keycloakNeeded"]:
+        # Install Playwright runtime and browsers (required for web UI tests)
+        print("Installing Playwright...")
+        run([str(repo_root / "vendor-php/bin/playwright-install")])
+        run([str(repo_root / "vendor-php/bin/playwright-install"), "--browsers"])
+        print("Playwright ready.")
+
         # Generate TLS certs for keycloak
         print("Generating keycloak certs...")
         keycloak_certs_dir = repo_root / "keycloak-certs"
