@@ -143,9 +143,9 @@ LOCAL_API_TESTS = {
         "keycloakNeeded": True,
         "vaultStorage": True,
         "extraServerEnvironment": {
-            "OCIS_ENABLE_VAULT": True,
-            "FRONTEND_ENAVLE_VAULT_MODE": True,
-            "OCIS_MFA_ENABLED": True
+            "OCIS_ENABLE_VAULT": "true",
+            "FRONTEND_ENAVLE_VAULT_MODE": "true",
+            "OCIS_MFA_ENABLED": "true",
         }
     },
     "cliCommands": {

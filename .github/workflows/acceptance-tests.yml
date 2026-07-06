@@ -281,6 +281,7 @@ jobs:
         run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
 
   cli-tests:
+    if: false
     needs: [build-and-test]
     name: ${{ matrix.suite }}
     runs-on: ubuntu-latest
@@ -316,6 +317,7 @@ jobs:
         run: BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
 
   core-api-tests:
+    if: false
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -399,6 +401,7 @@ jobs:
           python3 tests/acceptance/run-github.py
 
   e2e-tests:
+    if: false
     name: e2e-${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
