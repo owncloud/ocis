@@ -27,6 +27,7 @@ use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
 use TestHelpers\CliHelper;
+use TestHelpers\HttpRequestHelper;
 use TestHelpers\OcisConfigHelper;
 use TestHelpers\BehatHelper;
 use Psr\Http\Message\ResponseInterface;
@@ -37,6 +38,7 @@ use Psr\Http\Message\ResponseInterface;
 class CliContext implements Context {
 	private FeatureContext $featureContext;
 	private SpacesContext $spacesContext;
+	private array $storedServiceUserPasswords = [];
 
 	/**
 	 * @BeforeScenario
@@ -51,6 +53,7 @@ class CliContext implements Context {
 		// Get all the contexts you need in this context
 		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
 		$this->spacesContext = BehatHelper::getContext($scope, $environment, 'SpacesContext');
+		$this->storedServiceUserPasswords = [];
 	}
 
 	/**
@@ -85,10 +88,12 @@ class CliContext implements Context {
 
 	/**
 	 * @When /^the administrator resets the password of (non-existing|existing) user "([^"]*)" to "([^"]*)" using the CLI$/
+	 * @When /^the administrator resets the password of (non-existing|existing) user "([^"]*)" to "([^"]*)" with user type "([^"]*)" using the CLI$/
 	 *
 	 * @param string $status
 	 * @param string $user
 	 * @param string $password
+	 * @param string|null $userType
 	 *
 	 * @return void
 	 */
@@ -96,18 +101,92 @@ class CliContext implements Context {
 		string $status,
 		string $user,
 		string $password,
+		?string $userType = null,
 	): void {
+		if ($userType === "service") {
+			$this->saveServiceUserCurrentPassword($user);
+		}
+
 		$command = "idm resetpassword -u $user";
+		if ($userType !== null) {
+			$command .= " --user-type $userType";
+		}
 		$body = [
 			"command" => $command,
 			"inputs" => [$password, $password],
 		];
 
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
-		if ($status === "non-existing") {
+		if ($status === "non-existing" || $userType === "service") {
 			return;
 		}
 		$this->featureContext->updateUserPassword($user, $password);
+	}
+
+	/**
+	 * Store the current password of a service user
+	 *
+	 * @param string $serviceUser
+	 *
+	 * @return void
+	 */
+	public function saveServiceUserCurrentPassword(string $serviceUser): void {
+		$configDir = \getenv('OCIS_CONFIG_DIR') ?: $this->featureContext->getOcisDataPath() . '/config';
+		$configFile = "$configDir/ocis.yaml";
+		$content = \file_get_contents($configFile);
+		Assert::assertNotFalse($content, "Could not read the oCIS config '$configFile'");
+		$pattern = '/^\s*' . \preg_quote($serviceUser, '/') . '_password:\s*(\S+)\s*$/m';
+		// user type "service" can also be applied to a regular user that has no
+		// service user password in the config, so only store what actually exists.
+		if (\preg_match($pattern, $content, $matches) !== 1) {
+			return;
+		}
+		$this->storedServiceUserPasswords[$serviceUser] = \trim($matches[1], "'\"");
+	}
+
+	/**
+	 * @When the administrator rollsback the password of service user :user using the CLI
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRollsbackThePasswordOfServiceUserUsingTheCLI(string $user): void {
+		Assert::assertArrayHasKey(
+			$user,
+			$this->storedServiceUserPasswords,
+			"The password of service user '$user' has not been stored in this scenario",
+		);
+		$password = $this->storedServiceUserPasswords[$user];
+		$body = [
+			"command" => "idm resetpassword -u $user --user-type service",
+			"inputs" => [$password, $password],
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @Then the admin user should be able to access the Graph API
+	 *
+	 * oCIS has no basic-auth login endpoint; every request is authenticated by the
+	 * auth_basic service, which binds to LDAP as the reva service user. A 200 here
+	 * therefore fails with 401 when the admin user cannot be authenticated.
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theAdminUserShouldBeAbleToAccessTheGraphAPI(): void {
+		$response = HttpRequestHelper::sendRequest(
+			$this->featureContext->getBaseUrl() . "/graph/v1.0/me/drives",
+			"GET",
+			$this->featureContext->getAdminUsername(),
+			$this->featureContext->getAdminPassword(),
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Admin basic auth failed, check that the service user bind password matches the IDM database",
+			$response,
+		);
 	}
 
 	/**
