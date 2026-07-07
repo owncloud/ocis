@@ -1,0 +1,26 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Spaces view > loading states > should render spaces list after loading has been finished 1`] = `
+"<div>
+  <main class="oc-flex oc-height-1-1 app-content oc-width-1-1">
+    <div id="admin-settings-wrapper" class="oc-width-expand oc-height-1-1 oc-position-relative">
+      <div id="admin-settings-app-bar" class="oc-app-bar oc-py-s admin-settings-app-bar-sticky">
+        <div class="admin-settings-app-bar-controls oc-flex oc-flex-between oc-flex-middle">
+          <oc-breadcrumb-stub items="[object Object],[object Object]" id="admin-settings-breadcrumb" variation="default" contextmenupadding="medium" maxwidth="-1" truncationoffset="2" showcontextactions="false" class="oc-flex oc-flex-middle"></oc-breadcrumb-stub>
+          <portal-target name="app.runtime.mobile.nav"></portal-target>
+          <div class="oc-flex">
+            <view-options-stub perpagestorageprefix="admin-settings" shouldshowflatlisttoggle="true" hashiddenfiles="false" hasfileextensions="false" haspagination="true" paginationoptions="20,50,100,250" perpagequeryname="items-per-page" perpagedefault="50" viewmodedefault="resource-table" viewmodes=""></view-options-stub>
+          </div>
+        </div>
+        <div class="admin-settings-app-bar-actions oc-flex oc-flex-middle oc-mt-xs">
+          <!--v-if-->
+        </div>
+      </div>
+      <div>
+        <spaces-list-stub class=""></spaces-list-stub>
+      </div>
+    </div>
+    <!--v-if-->
+  </main>
+</div>"
+`;

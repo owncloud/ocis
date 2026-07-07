@@ -1,4 +1,4 @@
-Bugfix: Fail closed on inconclusive Drives.Create check; preserve personal space
+Bugfix: Do not disable personal space on inconclusive permission check
 
 When a user's role is (re-)assigned, both the proxy (on OIDC login) and the graph
 appRoleAssignment handler check the `Drives.Create` permission to decide whether to

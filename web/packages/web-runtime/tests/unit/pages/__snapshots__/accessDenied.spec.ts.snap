@@ -1,0 +1,16 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`access denied page > renders component 1`] = `
+"<div class="oc-height-viewport oc-flex oc-flex-column oc-flex-center oc-flex-middle">
+  <div class="oc-login-card"><img class="oc-login-logo" src="themes/owncloud/assets/logo.svg" alt="" aria-hidden="true">
+    <div class="oc-login-card-body oc-width-medium">
+      <h2 class="oc-login-card-title">Not logged in</h2>
+      <p>This could be because of a routine safety log out, or because your account is either inactive or not yet authorized for use. Please try logging in after a while or seek help from your Administrator.</p>
+      <!--v-if-->
+    </div>
+    <div class="oc-login-card-footer oc-pt-rm">
+      <p>ownCloud – A safe home for all your data</p>
+    </div>
+  </div> <a attrs="[object Object]" class="oc-button oc-rounded oc-button-l oc-button-justify-content-center oc-button-gap-m oc-button-primary oc-button-primary-filled oc-mt-m oc-width-medium" id="exitAnchor"></a>
+</div>"
+`;

@@ -1,0 +1,68 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`AppBar component > renders > by default no breadcrumbs, no bulkactions, no sharesnavigation but viewoptions and sidebartoggle 1`] = `
+"<div data-v-f5712619="" id="files-app-bar" class="files-app-bar-sticky">
+  <div data-v-f5712619="" class="files-topbar oc-py-s">
+    <h1 data-v-f5712619="" class="oc-invisible-sr">ExampleTitle</h1>
+    <oc-hidden-announcer-stub data-v-f5712619="" announcement="No items selected." level="polite"></oc-hidden-announcer-stub>
+    <div data-v-f5712619="" class="oc-flex oc-flex-middle files-app-bar-controls oc-flex-right">
+      <!--v-if-->
+      <portal-target data-v-f5712619="" name="app.runtime.mobile.nav"></portal-target>
+      <!--v-if-->
+      <div data-v-f5712619="" id="files-app-bar-controls-right" class="oc-flex">
+        <view-options-stub data-v-f5712619="" perpagestorageprefix="files" shouldshowflatlisttoggle="true" hashiddenfiles="true" hasfileextensions="true" haspagination="true" paginationoptions="20,50,100,250,500" perpagequeryname="items-per-page" perpagedefault="100" viewmodedefault="resource-table" viewmodes=""></view-options-stub>
+      </div>
+    </div>
+    <div data-v-f5712619="" class="files-app-bar-actions oc-mt-xs">
+      <div data-v-f5712619="" class="oc-flex-1 oc-flex oc-flex-start oc-flex-middle">
+        <!--v-if-->
+      </div>
+    </div>
+  </div>
+</div>"
+`;
+
+exports[`AppBar component > renders > if given, with content in the actions slot 1`] = `
+"<div data-v-f5712619="" id="files-app-bar" class="files-app-bar-sticky">
+  <div data-v-f5712619="" class="files-topbar oc-py-s">
+    <h1 data-v-f5712619="" class="oc-invisible-sr">ExampleTitle</h1>
+    <oc-hidden-announcer-stub data-v-f5712619="" announcement="No items selected." level="polite"></oc-hidden-announcer-stub>
+    <div data-v-f5712619="" class="oc-flex oc-flex-middle files-app-bar-controls oc-flex-right">
+      <!--v-if-->
+      <portal-target data-v-f5712619="" name="app.runtime.mobile.nav"></portal-target>
+      <!--v-if-->
+      <div data-v-f5712619="" id="files-app-bar-controls-right" class="oc-flex">
+        <view-options-stub data-v-f5712619="" perpagestorageprefix="files" shouldshowflatlisttoggle="true" hashiddenfiles="true" hasfileextensions="true" haspagination="true" paginationoptions="20,50,100,250,500" perpagequeryname="items-per-page" perpagedefault="100" viewmodedefault="resource-table" viewmodes=""></view-options-stub>
+      </div>
+    </div>
+    <div data-v-f5712619="" class="files-app-bar-actions oc-mt-xs">
+      <div data-v-f5712619="" class="oc-flex-1 oc-flex oc-flex-start oc-flex-middle"><button class="action-slot">Click</button>
+        <!--v-if-->
+      </div>
+    </div>
+  </div>
+</div>"
+`;
+
+exports[`AppBar component > renders > if given, with content in the content slot 1`] = `
+"<div data-v-f5712619="" id="files-app-bar" class="files-app-bar-sticky">
+  <div data-v-f5712619="" class="files-topbar oc-py-s">
+    <h1 data-v-f5712619="" class="oc-invisible-sr">ExampleTitle</h1>
+    <oc-hidden-announcer-stub data-v-f5712619="" announcement="No items selected." level="polite"></oc-hidden-announcer-stub>
+    <div data-v-f5712619="" class="oc-flex oc-flex-middle files-app-bar-controls oc-flex-right">
+      <!--v-if-->
+      <portal-target data-v-f5712619="" name="app.runtime.mobile.nav"></portal-target>
+      <!--v-if-->
+      <div data-v-f5712619="" id="files-app-bar-controls-right" class="oc-flex">
+        <view-options-stub data-v-f5712619="" perpagestorageprefix="files" shouldshowflatlisttoggle="true" hashiddenfiles="true" hasfileextensions="true" haspagination="true" paginationoptions="20,50,100,250,500" perpagequeryname="items-per-page" perpagedefault="100" viewmodedefault="resource-table" viewmodes=""></view-options-stub>
+      </div>
+    </div>
+    <div data-v-f5712619="" class="files-app-bar-actions oc-mt-xs">
+      <div data-v-f5712619="" class="oc-flex-1 oc-flex oc-flex-start oc-flex-middle">
+        <!--v-if-->
+      </div>
+    </div>
+    <div class="content-slot">Foo</div>
+  </div>
+</div>"
+`;

@@ -1,0 +1,24 @@
+{
+  "name": "web-app-password-protected-folders",
+  "version": "0.4.0",
+  "private": true,
+  "description": "ownCloud Web password protected folders",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "pnpm vite build",
+    "build:w": "pnpm vite build --watch --mode development",
+    "check:types": "vue-tsc --noEmit",
+    "test:unit": "NODE_OPTIONS=--unhandled-rejections=throw vitest"
+  },
+  "devDependencies": {
+    "@ownclouders/web-client": "workspace:*",
+    "@ownclouders/web-pkg": "workspace:*",
+    "@ownclouders/web-test-helpers": "workspace:*",
+    "@vue/test-utils": "^2.4.6",
+    "uuid": "^14.0.0",
+    "vitest-mock-extended": "3.1.0",
+    "vue": "^3.5.29",
+    "vue3-gettext": "^2.4.0"
+  }
+}

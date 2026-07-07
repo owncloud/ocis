@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`OcTableCell > Uses correct element 1`] = `"<th class="oc-table-cell oc-table-cell-align-right oc-table-cell-align-bottom oc-table-cell-width-shrink">Hello world!</th>"`;

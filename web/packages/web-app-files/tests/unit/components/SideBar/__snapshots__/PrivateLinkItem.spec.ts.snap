@@ -1,0 +1,22 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PrivateLinkItem > should render a button 1`] = `
+"<button type="button" aria-label="Copy private link to clipboard" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-files-private-link-copy-url">
+  <!--v-if-->
+  <!-- @slot Content of the button --> <span>Private link</span> <span class="oc-icon oc-icon-m oc-icon-passive"><!----></span>
+</button>"
+`;
+
+exports[`PrivateLinkItem > upon clicking it should copy the private link to the clipboard button, render a success message and change icon for half a second 1`] = `
+"<button type="button" aria-label="Copy private link to clipboard" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-files-private-link-copy-url">
+  <!--v-if-->
+  <!-- @slot Content of the button --> <span>Private link</span> <span class="oc-icon oc-icon-m oc-icon-passive"><!----></span>
+</button>"
+`;
+
+exports[`PrivateLinkItem > upon clicking it should copy the private link to the clipboard button, render a success message and change icon for half a second 2`] = `
+"<button type="button" aria-label="Copy private link to clipboard" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-files-private-link-copy-url">
+  <!--v-if-->
+  <!-- @slot Content of the button --> <span>Private link</span> <span class="oc-icon oc-icon-m oc-icon-passive"><!----></span>
+</button>"
+`;

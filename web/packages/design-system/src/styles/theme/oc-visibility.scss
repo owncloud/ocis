@@ -1,0 +1,106 @@
+/*
+ * Hidden
+ * `hidden` attribute also set here to make it stronger
+ */
+
+[hidden],
+.oc-hidden {
+  display: none !important;
+}
+
+/* Phone landscape and bigger */
+@media (min-width: $oc-breakpoint-small-default) {
+  .oc-hidden\@s {
+    display: none !important;
+  }
+}
+
+/* Tablet landscape and bigger */
+@media (min-width: $oc-breakpoint-medium-default) {
+  .oc-hidden\@m {
+    display: none !important;
+  }
+}
+
+/* Desktop and bigger */
+@media (min-width: $oc-breakpoint-large-default) {
+  .oc-hidden\@l {
+    display: none !important;
+  }
+}
+
+/* Large screen and bigger */
+@media (min-width: $oc-breakpoint-xlarge) {
+  .oc-hidden\@xl {
+    display: none !important;
+  }
+}
+
+/*
+ * Visible
+ */
+
+.oc-invisible {
+  visibility: hidden !important;
+}
+
+/* Phone portrait and smaller */
+@media (max-width: $oc-breakpoint-xsmall-max) {
+  .oc-visible\@s {
+    display: none !important;
+  }
+}
+
+/* Phone landscape and smaller */
+@media (max-width: $oc-breakpoint-small-max) {
+  .oc-visible\@m {
+    display: none !important;
+  }
+}
+
+/* Tablet landscape and smaller */
+@media (max-width: $oc-breakpoint-medium-max) {
+  .oc-visible\@l {
+    display: none !important;
+  }
+}
+
+/* Desktop and smaller */
+@media (max-width: $oc-breakpoint-large-max) {
+  .oc-visible\@xl {
+    display: none !important;
+  }
+}
+
+/*
+ * Special SR classes
+ */
+/// Used to hide an element visually, but keeping it accessible for
+/// accessibility tools.
+.oc-invisible-sr {
+  border: 0 !important;
+  clip: rect(1px, 1px, 1px, 1px) !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  // Need to make sure we override any existing styles.
+  position: absolute !important;
+  top: 0;
+  white-space: nowrap;
+  width: 1px !important;
+}
+
+@media (max-width: $oc-breakpoint-xsmall-max) {
+  .oc-invisible-sr\@s {
+    border: 0 !important;
+    clip: rect(1px, 1px, 1px, 1px) !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    // Need to make sure we override any existing styles.
+    position: absolute !important;
+    top: 0;
+    white-space: nowrap;
+    width: 1px !important;
+  }
+}

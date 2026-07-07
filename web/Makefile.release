@@ -1,0 +1,71 @@
+SHELL := /bin/bash
+
+PNPM := $(shell command -v pnpm 2> /dev/null)
+ifndef PNPM
+    $(error pnpm is not available on your system, please install npm)
+endif
+
+app_name=web
+cur_dir=$(CURDIR)
+dist_dir=$(CURDIR)/dist
+third_party_licenses_dir=$(CURDIR)/third-party-licenses
+
+occ=$(CURDIR)/../../occ
+private_key=$(HOME)/.owncloud/certificates/$(app_name).key
+certificate=$(HOME)/.owncloud/certificates/$(app_name).crt
+sign=$(occ) integrity:sign-app --privateKey="$(private_key)" --certificate="$(certificate)"
+sign_skip_msg="Skipping signing, either no key and certificate found in $(private_key) and $(certificate) or occ can not be found at $(occ)"
+ifneq (,$(wildcard $(private_key)))
+ifneq (,$(wildcard $(certificate)))
+ifneq (,$(wildcard $(occ)))
+	CAN_SIGN=true
+endif
+endif
+endif
+
+.DEFAULT_GOAL := build-release
+
+.PHONY: build-release
+build-release: build package
+
+.PHONY: build
+build: build-web copy-config
+
+.PHONY: build-web
+build-web:
+	[ -n "${NO_INSTALL}" ] || $(PNPM) install
+	$(PNPM) check:types
+	$(PNPM) build
+
+.PHONY: copy-config
+copy-config:
+	cp config/config.json.dist $(dist_dir)/
+
+.PHONY: package
+package: create-release-folder create-packages
+
+.PHONY: create-release-folder
+create-release-folder:
+	rm -rf $(CURDIR)/release
+	mkdir $(CURDIR)/release
+
+.PHONY: create-packages
+create-packages: package-plain package-licenses
+
+.PHONY: package-plain
+package-plain:
+	cd $(dist_dir) && tar -czf $(CURDIR)/release/$(app_name).tar.gz -C $(dist_dir) *
+
+.PHONY: package-licenses
+package-licenses:
+	pnpm licenses:csv
+	pnpm licenses:save
+	cd $(third_party_licenses_dir) && tar -czf $(CURDIR)/release/third-party-licenses.tar.gz -C $(third_party_licenses_dir) *
+
+.PHONY: sign
+sign:
+ifdef CAN_SIGN
+	$(sign) --path="$(dist_dir)"
+else
+	@echo $(sign_skip_msg)
+endif

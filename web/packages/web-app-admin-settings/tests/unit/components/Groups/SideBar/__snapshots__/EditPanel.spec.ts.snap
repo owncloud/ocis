@@ -1,0 +1,18 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`EditPanel > renders all available inputs 1`] = `
+"<div id="group-edit-panel" class="oc-mt-xl">
+  <div class="oc-flex group-info oc-mb-l">
+    <avatar-image-stub class="oc-mb-m" width="80" user-name="group"></avatar-image-stub> <span class="oc-text-muted group-info-display-name">group</span> <span class="oc-text-muted">0 members</span>
+  </div>
+  <form id="group-edit-form" class="oc-background-highlight oc-p-m" autocomplete="off">
+    <oc-text-input-stub id="displayName-input" modelvalue="group" class="oc-mb-s" label="Group name" error-message="" fix-message-line="true"></oc-text-input-stub>
+    <div data-v-6b7f7da5="" class="compare-save-dialog oc-width-1-1 oc-flex oc-flex-between oc-flex-middle edit-compare-save-dialog oc-mb-l"><span data-v-6b7f7da5="" class="state-indicator">No changes</span>
+      <div data-v-6b7f7da5="">
+        <oc-button-stub data-v-6b7f7da5="" disabled="true" class="compare-save-dialog-revert-btn"></oc-button-stub>
+        <oc-button-stub data-v-6b7f7da5="" appearance="filled" variation="primary" class="compare-save-dialog-confirm-btn" disabled="true"></oc-button-stub>
+      </div>
+    </div>
+  </form>
+</div>"
+`;

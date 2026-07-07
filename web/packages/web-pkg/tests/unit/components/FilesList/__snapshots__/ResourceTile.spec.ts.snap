@@ -1,0 +1,57 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`OcTile component > renders default space correctly 1`] = `
+"<!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+
+<div class="oc-tile-card oc-card oc-card-default oc-rounded" data-item-id="lorem-id">
+  <resource-link-stub resource="[object Object]" isresourceclickable="true" class="oc-card-media-top oc-flex oc-flex-center oc-flex-middle oc-m-rm" tabindex="-1">
+    <div class="oc-tile-card-selection"></div>
+    <!--v-if-->
+    <div class="oc-tile-card-preview oc-flex oc-flex-middle oc-flex-center">
+      <div class="oc-tile-card-hover"></div>
+      <resource-icon-stub resource="[object Object]" size="xlarge" class="tile-default-image oc-pt-xs"></resource-icon-stub>
+    </div>
+  </resource-link-stub>
+  <div class="oc-card-body oc-p-s">
+    <div class="oc-flex oc-flex-between oc-flex-middle">
+      <div class="oc-flex oc-flex-middle oc-text-truncate resource-name-wrapper">
+        <resource-list-item-stub resource="[object Object]" pathprefix="" ispathdisplayed="false" parentfoldername="" parentfolderlinkiconadditionalattributes="[object Object]" isextensiondisplayed="true" isthumbnaildisplayed="true" isicondisplayed="false" isresourceclickable="true" issearchresult="false"></resource-list-item-stub>
+      </div>
+      <div class="oc-flex oc-flex-middle">
+        <!-- Slot for indicators !-->
+        <!-- Slot for individual actions -->
+        <!-- Slot for contextmenu -->
+      </div>
+    </div>
+    <!--v-if-->
+  </div>
+</div>"
+`;
+
+exports[`OcTile component > renders disabled space correctly 1`] = `
+"<!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+
+<div class="oc-tile-card oc-card oc-card-default oc-rounded oc-tile-card-disabled" data-item-id="lorem-id">
+  <resource-link-stub resource="[object Object]" isresourceclickable="true" class="oc-card-media-top oc-flex oc-flex-center oc-flex-middle oc-m-rm" tabindex="-1">
+    <div class="oc-tile-card-selection"></div>
+    <!--v-if-->
+    <div class="oc-tile-card-preview oc-flex oc-flex-middle oc-flex-center">
+      <div class="oc-tile-card-hover"></div>
+      <resource-icon-stub resource="[object Object]" size="xlarge" class="tile-default-image oc-pt-xs"></resource-icon-stub>
+    </div>
+  </resource-link-stub>
+  <div class="oc-card-body oc-p-s">
+    <div class="oc-flex oc-flex-between oc-flex-middle">
+      <div class="oc-flex oc-flex-middle oc-text-truncate resource-name-wrapper">
+        <resource-list-item-stub resource="[object Object]" pathprefix="" ispathdisplayed="false" parentfoldername="" parentfolderlinkiconadditionalattributes="[object Object]" isextensiondisplayed="true" isthumbnaildisplayed="true" isicondisplayed="false" isresourceclickable="true" issearchresult="false"></resource-list-item-stub>
+      </div>
+      <div class="oc-flex oc-flex-middle">
+        <!-- Slot for indicators !-->
+        <!-- Slot for individual actions -->
+        <!-- Slot for contextmenu -->
+      </div>
+    </div>
+    <!--v-if-->
+  </div>
+</div>"
+`;

@@ -1,0 +1,35 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`CreateAndUpload component > action buttons > should show and be enabled if file creation is possible 1`] = `
+"<div class="create-and-upload-actions oc-flex-inline oc-mr-s"><span><button type="button" aria-label="New folder" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-primary oc-button-primary-filled" id="new-folder-btn"><!--v-if--> <!-- @slot Content of the button --> <oc-icon-stub name="resource-type-folder" filltype="fill" accessiblelabel="" type="span" size="medium" variation="passive" color=""></oc-icon-stub> <span>New Folder</span></button></span> <span><button type="button" aria-label="Upload files or folders" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-outline" id="upload-menu-btn"><!--v-if--> <!-- @slot Content of the button --> <oc-icon-stub name="upload" filltype="line" accessiblelabel="" type="span" size="medium" variation="passive" color=""></oc-icon-stub> <span>Upload</span></button></span>
+  <oc-drop-stub dropid="upload-menu-drop" popperoptions="[object Object]" toggle="#upload-menu-btn" position="bottom-start" mode="click" closeonclick="true" isnested="false" paddingsize="small" offset="" samewidthastarget="false" focusonopen="false" class="oc-width-auto">
+    <oc-list-stub raw="false" id="upload-list">
+      <li class="oc-menu-item-hover">
+        <resource-upload-stub btnlabel="" btnclass="oc-width-1-1" isfolder="false"></resource-upload-stub>
+      </li>
+      <li class="oc-menu-item-hover">
+        <resource-upload-stub btnlabel="" btnclass="oc-width-1-1" isfolder="true"></resource-upload-stub>
+      </li>
+    </oc-list-stub>
+    <!--v-if-->
+  </oc-drop-stub>
+  <!--v-if-->
+</div>"
+`;
+
+exports[`CreateAndUpload component > file handlers > should show entries for all new file handlers 1`] = `
+"<div class="create-and-upload-actions oc-flex-inline oc-mr-s"><span><button type="button" aria-label="New folder" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-primary oc-button-primary-filled" id="new-folder-btn"><!--v-if--> <!-- @slot Content of the button --> <oc-icon-stub name="resource-type-folder" filltype="fill" accessiblelabel="" type="span" size="medium" variation="passive" color=""></oc-icon-stub> <span>New Folder</span></button></span> <span><button type="button" aria-label="Upload files or folders" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-outline" id="upload-menu-btn"><!--v-if--> <!-- @slot Content of the button --> <oc-icon-stub name="upload" filltype="line" accessiblelabel="" type="span" size="medium" variation="passive" color=""></oc-icon-stub> <span>Upload</span></button></span>
+  <oc-drop-stub dropid="upload-menu-drop" popperoptions="[object Object]" toggle="#upload-menu-btn" position="bottom-start" mode="click" closeonclick="true" isnested="false" paddingsize="small" offset="" samewidthastarget="false" focusonopen="false" class="oc-width-auto">
+    <oc-list-stub raw="false" id="upload-list">
+      <li class="oc-menu-item-hover">
+        <resource-upload-stub btnlabel="" btnclass="oc-width-1-1" isfolder="false"></resource-upload-stub>
+      </li>
+      <li class="oc-menu-item-hover">
+        <resource-upload-stub btnlabel="" btnclass="oc-width-1-1" isfolder="true"></resource-upload-stub>
+      </li>
+    </oc-list-stub>
+    <!--v-if-->
+  </oc-drop-stub>
+  <!--v-if-->
+</div>"
+`;

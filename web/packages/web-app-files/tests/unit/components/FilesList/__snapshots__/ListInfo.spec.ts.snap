@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ListInfo > it renders content summary correctly 1`] = `
+"<div class="oc-text-center">
+  <p data-testid="files-list-footer-info" class="oc-text-muted">4 items with 50 kB in total (2 files, 2 folders)</p>
+</div>"
+`;

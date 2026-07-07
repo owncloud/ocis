@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`resolvePublicLink > password required form > should display if password is required 1`] = `
+"<form>
+  <div class="oc-card-header">
+    <h2><span>This resource is password-protected</span></h2>
+  </div>
+  <div class="oc-card-body">
+    <oc-text-input-stub label="Enter password for public link" id="oc-textinput-2" type="password" modelvalue="" clearbuttonenabled="false" clearbuttonaccessiblelabel="" disabled="false" fixmessageline="false" readonly="false" passwordpolicy="[object Object]" class="oc-mb-s"></oc-text-input-stub>
+    <oc-button-stub type="button" disabled="true" size="medium" submit="submit" variation="primary" appearance="filled" justifycontent="center" gapsize="medium" showspinner="false" class="oc-login-authorize-button"></oc-button-stub>
+  </div>
+</form>"
+`;
+
+exports[`resolvePublicLink > should display the configuration theme general slogan as the login card footer 1`] = `
+"<div class="oc-card-footer oc-pt-rm">
+  <p>ownCloud – A safe home for all your data</p>
+</div>"
+`;

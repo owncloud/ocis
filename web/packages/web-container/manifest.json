@@ -1,0 +1,17 @@
+{
+	"name": "ownCloud",
+	"short_name": "ownCloud",
+	"icons": [{
+		"src": "img/owncloud-app-icon.png",
+		"sizes": "512x512",
+		"type": "image/png"
+	}],
+
+	"start_url": "/",
+
+	"display": "fullscreen",
+	"orientation": "portrait",
+
+	"background_color": "#FFFFFF",
+	"theme_color": "#375f7E"
+}

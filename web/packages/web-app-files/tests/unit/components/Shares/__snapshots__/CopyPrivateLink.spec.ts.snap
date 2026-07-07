@@ -1,0 +1,8 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`CopyPrivateLink > should render a button 1`] = `
+"<div class="oc-flex oc-flex-middle copy-private-link"><button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-undefined oc-button-passive oc-button-passive-raw">
+    <!--v-if-->
+    <!-- @slot Content of the button --> <span class="oc-icon oc-icon-s oc-icon-passive"><!----></span> <span class="oc-ml-xs">Permanent link</span>
+  </button></div>"
+`;

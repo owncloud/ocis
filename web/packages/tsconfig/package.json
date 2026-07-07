@@ -1,0 +1,13 @@
+{
+  "name": "@ownclouders/tsconfig",
+  "private": false,
+  "version": "0.0.6",
+  "license": "Apache-2.0",
+  "author": "ownCloud GmbH <devops@owncloud.com>",
+  "homepage": "https://github.com/owncloud/web/tree/master/packages/tsconfig",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/owncloud/web",
+    "directory": "packages/tsconfig"
+  }
+}

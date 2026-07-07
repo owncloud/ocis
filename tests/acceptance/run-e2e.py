@@ -12,12 +12,10 @@ import sys
 import shlex
 import subprocess
 import signal
+import tempfile
 import time
 import shutil
 from pathlib import Path
-
-WEB_REPO = "https://github.com/owncloud/web.git"
-
 
 def wait_for(condition_fn, timeout: int, label: str) -> None:
     deadline = time.time() + timeout
@@ -78,6 +76,38 @@ def tika_warm(tika_url: str) -> bool:
     return r.stdout.strip() == "200"
 
 
+def app_providers_ready(ocis_url: str) -> bool:
+    # Collabora and OnlyOffice register asynchronously with the app registry
+    # over their WOPI bridge connection; don't start tests until both are up.
+    cmd = ["curl", "-sk", "-uadmin:admin", f"{ocis_url}/app/list"]
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    if r.returncode != 0 or not r.stdout.strip():
+        return False
+    try:
+        data = json.loads(r.stdout)
+    except json.JSONDecodeError:
+        return False
+    names = set()
+    for mime in data.get("mime-types", []):
+        for provider in mime.get("app_providers", []):
+            names.add(provider.get("name"))
+    return "Collabora" in names and "OnlyOffice" in names
+
+
+def load_env_file(path: Path) -> dict:
+    """Parse a bash-style env file (export KEY=value) into a dict."""
+    env = {}
+    for line in path.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or line.startswith("!"):
+            continue
+        line = line.removeprefix("export ").strip()
+        if "=" in line:
+            k, v = line.split("=", 1)
+            env[k.strip()] = v.strip()
+    return env
+
+
 def run(cmd: list, env: dict = None, check: bool = True, cwd=None):
     e = {**os.environ, **(env or {})}
     return subprocess.run(cmd, env=e, check=check, cwd=cwd)
@@ -95,15 +125,22 @@ def main() -> int:
     mfa_needed = os.environ.get("MFA_NEEDED", "").lower() == "true"
     oidc_needed = os.environ.get("OIDC_NEEDED", "").lower() == "true"
     oidc_iframe_needed = os.environ.get("OIDC_IFRAME_NEEDED", "").lower() == "true"
+    collaboration_needed = os.environ.get("COLLABORATION_NEEDED", "").lower() == "true"
+    federated_needed = os.environ.get("FEDERATED_NEEDED", "").lower() == "true"
     # MFA mode runs ocis behind keycloak with TOTP enforced
     keycloak_needed = keycloak_needed or mfa_needed
 
     repo_root = Path(__file__).resolve().parents[2]
     ocis_bin = repo_root / "ocis/bin/ocis"
     wrapper_bin = repo_root / "tests/ociswrapper/bin/ociswrapper"
-    ocis_url = "https://127.0.0.1:9200"
+    # The federated suite must address the primary as localhost instead of
+    # 127.0.0.1: the ocm invite flow bakes this host into invite codes
+    # (token@host), and the federated instance authorizes it against
+    # tests/config/local/providers.json (shared with run-github.py's apiOcm
+    # suite), which only lists localhost:9200.
+    ocis_url = "https://localhost:9200" if federated_needed else "https://127.0.0.1:9200"
     ocis_config_dir = Path.home() / ".ocis/config"
-    web_dir = repo_root / "webTestRunner"
+    web_dir = repo_root / "web"
 
     # build ocis + ociswrapper only if not already provided (e.g. via artifact)
     if not ocis_bin.exists():
@@ -111,22 +148,6 @@ def main() -> int:
     if not wrapper_bin.exists():
         run(["make", "-C", str(repo_root / "tests/ociswrapper"), "build"],
             env={"GOWORK": "off"})
-
-    # clone + install web only if not already provided (e.g. via artifact)
-    if not web_dir.exists():
-        ci_env = {}
-        ci_env_file = repo_root / "ci.env"
-        if ci_env_file.exists():
-            for line in ci_env_file.read_text().splitlines():
-                if "=" in line and not line.startswith("#"):
-                    k, v = line.split("=", 1)
-                    ci_env[k.strip()] = v.strip()
-        web_branch = ci_env.get("WEB_BRANCH", "master")
-        web_commitid = ci_env.get("WEB_COMMITID", "")
-        run(["git", "clone", "-b", web_branch, "--single-branch", "--no-tags",
-             WEB_REPO, str(web_dir)])
-        if web_commitid:
-            subprocess.run(["git", "checkout", web_commitid], cwd=web_dir, check=True)
 
     if not (web_dir / "node_modules").exists():
         pkg_manager = json.loads((web_dir / "package.json").read_text()).get("packageManager", "pnpm")
@@ -139,8 +160,17 @@ def main() -> int:
 
     # init ocis
     run([str(ocis_bin), "init", "--insecure", "true"])
+    # tests/config/ci/app-registry.yaml maps its one mimetype to "FakeOffice", the
+    # stub used by run-github.py's (Behat) apiCollaboration suite. The app-provider
+    # e2e suite drives real Collabora/OnlyOffice containers instead, so it needs its
+    # own mapping to those app names, for both the odt and docx mimetypes it exercises.
+    app_registry_src = (
+        "tests/config/local/app-registry-office-suites.yaml"
+        if collaboration_needed
+        else "tests/config/ci/app-registry.yaml"
+    )
     shutil.copy(
-        repo_root / "tests/config/ci/app-registry.yaml",
+        repo_root / app_registry_src,
         ocis_config_dir / "app-registry.yaml",
     )
 
@@ -169,6 +199,19 @@ def main() -> int:
         return obj
 
     gha_web_cfg = _patch_urls(drone_web_cfg, "https://ocis-server:9200", ocis_url)
+
+    # The web UI only loads the apps listed in its config. ocis-config.json predates
+    # the playwright suites, so add what specific suites depend on:
+    # - "external" is the blueprint app for the office editors: web-runtime builds
+    #   the per-provider Collabora/OnlyOffice apps (including their "New file" menu
+    #   entries) only when web-app-external itself is loaded.
+    # - "ocm" provides the "open-cloud-mesh" federation UI the ocm suite drives.
+    #   (The federated instance's own config, tests/config/local/fed-ocis-web.json,
+    #   already lists it.)
+    if collaboration_needed:
+        gha_web_cfg["apps"].append("external")
+    if federated_needed:
+        gha_web_cfg["apps"].append("ocm")
 
     # The web client reads its OIDC scope from openIdConnect.scope in this UI
     # config, NOT from the WEB_OIDC_SCOPE server env var, so override it here.
@@ -297,6 +340,56 @@ def main() -> int:
     if oidc_iframe_needed:
         server_env["IDP_ACCESS_TOKEN_EXPIRATION"] = "30"
 
+    if collaboration_needed:
+        server_env.update({
+            "MICRO_REGISTRY": "nats-js-kv",
+            "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
+            "FRONTEND_APP_HANDLER_SECURE_VIEW_APP_ADDR": "com.owncloud.api.collaboration.Collabora",
+            # These two domains, the page origin, and Collabora's frame_ancestors
+            # (workflow) must all use the same host literal: CSP source
+            # expressions match by exact host.
+            "COLLABORA_DOMAIN": "127.0.0.1:9980",
+            "ONLYOFFICE_DOMAIN": "127.0.0.1:443",
+            # The default proxy CSP only allows frame-src 'self', so the browser
+            # refuses to embed the office editor iframes (different port). The CSP
+            # file whitelists ${COLLABORA_DOMAIN}/${ONLYOFFICE_DOMAIN} in frame-src
+            # -- without it the editors never load and every office test times out.
+            "PROXY_CSP_CONFIG_FILE_LOCATION": str(repo_root / "tests/config/ci/csp.yaml"),
+        })
+
+    federated_url = "https://localhost:10200"
+    federated_env = None
+    if federated_needed:
+        # run-github.py's (Behat apiOcm) federation setup already solved this exact
+        # problem, so reuse its canonical port-mapping file instead of re-deriving one:
+        # only offsetting *_DEBUG_ADDR left the actual service ports (e.g. gateway's
+        # GATEWAY_GRPC_ADDR 127.0.0.1:9142) on their defaults, so the federated
+        # "ocis server" process crashed trying to bind the same ports the primary
+        # instance already held.
+        providers_file = str(repo_root / "tests/config/local/providers.json")
+        server_env.update({
+            "OCIS_ADD_RUN_SERVICES": "ocm",
+            "OCIS_ENABLE_OCM": "true",
+            "OCM_OCM_INVITE_MANAGER_INSECURE": "true",
+            "OCM_OCM_SHARE_PROVIDER_INSECURE": "true",
+            "OCM_OCM_STORAGE_PROVIDER_INSECURE": "true",
+            "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": providers_file,
+        })
+
+        federated_config_dir = Path.home() / ".ocis-federated/config"
+        federated_data_dir = Path.home() / ".ocis-federated"
+        federated_env = {**server_env}
+        federated_env.update(load_env_file(repo_root / "tests/config/local/.env-federation"))
+        # override the file's ${HOME}-prefixed paths (load_env_file doesn't expand
+        # shell variables) and anything specific to this script's own layout
+        federated_env.update({
+            "OCIS_URL": federated_url,
+            "OCIS_BASE_DATA_PATH": str(federated_data_dir),
+            "OCIS_CONFIG_DIR": str(federated_config_dir),
+            "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": providers_file,
+            "MICRO_REGISTRY_ADDRESS": "127.0.0.1:10233",
+        })
+
     procs = []
 
     print("Starting ocis...")
@@ -341,6 +434,72 @@ def main() -> int:
             wait_for(lambda: search_ready(ocis_url), 60, "search service")
             print("search ready.")
 
+        if collaboration_needed:
+            # WOPI bridges: one per office app, started only after ocis itself is up
+            # so they can register with its gateway. Ported from setup_wopi_collabora
+            # / setup_wopi_onlyoffice in tests/actions/setup-services.sh.
+            wopi_common = {
+                "MICRO_REGISTRY": "nats-js-kv",
+                "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
+                "COLLABORATION_APP_INSECURE": "true",
+                "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": "true",
+                "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
+                "COLLABORATION_WOPI_SECRET": "some-wopi-secret",
+            }
+            collabora_env = {
+                **os.environ, **wopi_common,
+                "COLLABORATION_GRPC_ADDR": "0.0.0.0:9301",
+                "COLLABORATION_HTTP_ADDR": "0.0.0.0:9300",
+                "COLLABORATION_DEBUG_ADDR": "0.0.0.0:9304",
+                "COLLABORATION_APP_NAME": "Collabora",
+                "COLLABORATION_APP_ADDR": "https://127.0.0.1:9980",
+                "COLLABORATION_APP_ICON": "https://127.0.0.1:9980/favicon.ico",
+                "COLLABORATION_WOPI_SRC": "http://127.0.0.1:9300",
+            }
+            onlyoffice_env = {
+                **os.environ, **wopi_common,
+                "COLLABORATION_GRPC_ADDR": "0.0.0.0:9303",
+                "COLLABORATION_HTTP_ADDR": "0.0.0.0:9302",
+                "COLLABORATION_DEBUG_ADDR": "0.0.0.0:9305",
+                "COLLABORATION_APP_NAME": "OnlyOffice",
+                "COLLABORATION_APP_PRODUCT": "OnlyOffice",
+                "COLLABORATION_APP_ADDR": "https://127.0.0.1:443",
+                "COLLABORATION_APP_ICON": "https://127.0.0.1/web-apps/apps/documenteditor/main/resources/img/favicon.ico",
+                "COLLABORATION_WOPI_SRC": "http://127.0.0.1:9302",
+            }
+            procs.append(subprocess.Popen([str(ocis_bin), "collaboration", "server"], env=collabora_env))
+            procs.append(subprocess.Popen([str(ocis_bin), "collaboration", "server"], env=onlyoffice_env))
+            wait_for(lambda: app_providers_ready(ocis_url), 150, "Collabora/OnlyOffice app providers")
+            print("app providers ready.")
+
+        if federated_needed:
+            # Second, independent ocis instance for OCM federation tests. See the
+            # federated_env comment above main() for its port-mapping source.
+            # OCIS_BASE_DATA_PATH must match federated_env's, or init writes the
+            # proxy cert under the default ~/.ocis (colliding with the primary
+            # instance's) instead of federated_data_dir, and the server then
+            # generates its own untrusted one lazily at startup.
+            run([str(ocis_bin), "init", "--insecure", "true"],
+                env={
+                    "OCIS_CONFIG_DIR": str(federated_config_dir),
+                    "OCIS_BASE_DATA_PATH": str(federated_data_dir),
+                })
+            federated_cert = federated_data_dir / "proxy/server.crt"
+            if federated_cert.exists():
+                subprocess.run(
+                    ["sudo", "cp", str(federated_cert),
+                     "/usr/local/share/ca-certificates/ocis-federated.crt"],
+                    check=True,
+                )
+                subprocess.run(["sudo", "update-ca-certificates"], check=True)
+            federated_proc = subprocess.Popen(
+                [str(ocis_bin), "server"],
+                env=federated_env,
+            )
+            procs.append(federated_proc)
+            wait_for(lambda: ocis_healthy(federated_url, use_basic_auth=True), 300, "ocis-federated")
+            print("ocis-federated ready.")
+
         playwright_env = {
             **os.environ,
             "BASE_URL_OCIS": ocis_url,
@@ -354,14 +513,34 @@ def main() -> int:
             "BROWSER": "chromium",
         }
 
+        trusted_certs = [ocis_cert]
+
         if keycloak_needed:
             playwright_env.update({
                 "KEYCLOAK": "true",
                 "KEYCLOAK_HOST": "localhost:8443",
             })
+            keycloak_cert = repo_root / "keycloak-certs/keycloakcrt.pem"
+            if keycloak_cert.exists():
+                trusted_certs.append(keycloak_cert)
 
         if mfa_needed:
             playwright_env["MFA"] = "true"
+
+        if federated_needed:
+            playwright_env["FEDERATED_BASE_URL_OCIS"] = "localhost:10200"
+            trusted_certs.append(federated_cert)
+
+        if len(trusted_certs) > 1:
+            # NODE_EXTRA_CA_CERTS takes a single file; concatenate every self-signed
+            # cert in play (oCIS, Keycloak, federated instance) so node-fetch/axios
+            # calls made directly against any of them are trusted too.
+            bundle = tempfile.NamedTemporaryFile(
+                mode="w", suffix=".pem", prefix="ocis-ca-bundle-", delete=False)
+            for cert in trusted_certs:
+                bundle.write(cert.read_text())
+            bundle.close()
+            playwright_env["NODE_EXTRA_CA_CERTS"] = bundle.name
 
         print(f"Running e2e: {e2e_args}")
         result = subprocess.run(

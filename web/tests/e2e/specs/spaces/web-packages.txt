@@ -1,0 +1,10 @@
+######################################################################
+# USED FOR CI ONLY                                                   #
+# Run the test suite only if the changes are in the listed packages. #
+#                                                                    #
+# List of web packages that affect this test suite.                  #
+######################################################################
+
+web-app-files
+web-app-preview
+web-app-text-editor

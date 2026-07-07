@@ -1,0 +1,126 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`OcModal > displays input 1`] = `
+"<div class="oc-modal-background">
+  <focus-trap-stub tabbableoptions="[object Object]" active="true" escapedeactivates="true" returnfocusondeactivate="true" allowoutsideclick="true" clickoutsidedeactivates="false" initialfocus="[Function]" delayinitialfocus="true" preventscroll="false" setreturnfocus="false">
+    <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+    <div class="oc-modal oc-modal-passive" tabindex="0" role="dialog" aria-modal="true" aria-labelledby="oc-modal-title">
+      <div class="oc-modal-title">
+        <!--v-if-->
+        <h2 id="oc-modal-title" class="oc-text-truncate">Create new folder</h2>
+      </div>
+      <div class="oc-modal-body">
+        <!--v-if-->
+        <!--v-if-->
+        <oc-text-input-stub label="Folder name" id="oc-textinput-1" type="text" modelvalue="New folder" clearbuttonenabled="false" clearbuttonaccessiblelabel="" disabled="false" fixmessageline="true" readonly="false" passwordpolicy="[object Object]" class="oc-modal-body-input"></oc-text-input-stub>
+      </div>
+      <div class="oc-modal-body-actions oc-flex oc-flex-right">
+        <div class="oc-modal-body-actions-grid">
+          <oc-button-stub type="button" disabled="false" size="medium" submit="button" variation="passive" appearance="outline" justifycontent="center" gapsize="medium" showspinner="false" class="oc-modal-body-actions-cancel">Cancel</oc-button-stub>
+          <oc-button-stub type="button" disabled="false" size="medium" submit="button" variation="primary" appearance="filled" justifycontent="center" gapsize="medium" showspinner="false" class="oc-modal-body-actions-confirm oc-ml-s">Confirm</oc-button-stub>
+        </div>
+      </div>
+    </div>
+  </focus-trap-stub>
+</div>"
+`;
+
+exports[`OcModal > displays loading state 1`] = `
+"<div class="oc-modal-background">
+  <focus-trap-stub tabbableoptions="[object Object]" active="true" escapedeactivates="true" returnfocusondeactivate="true" allowoutsideclick="true" clickoutsidedeactivates="false" initialfocus="[Function]" delayinitialfocus="true" preventscroll="false" setreturnfocus="false">
+    <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+    <div class="oc-modal oc-modal-passive" tabindex="0" role="dialog" aria-modal="true" aria-labelledby="oc-modal-title">
+      <div class="oc-modal-title">
+        <!--v-if-->
+        <h2 id="oc-modal-title" class="oc-text-truncate">Example title</h2>
+      </div>
+      <div class="oc-modal-body">
+        <p class="oc-modal-body-message oc-mt-rm oc-mb-rm">Example message</p>
+        <!--v-if-->
+        <!--v-if-->
+      </div>
+      <div class="oc-modal-body-actions oc-flex oc-flex-right">
+        <div class="oc-modal-body-actions-grid"><button type="button" disabled="" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-outline oc-modal-body-actions-cancel">
+            <!--v-if-->
+            <!-- @slot Content of the button --> Cancel
+          </button> <button type="button" disabled="" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-primary oc-button-primary-outline oc-modal-body-actions-confirm oc-ml-s"><span class="oc-spinner oc-spinner-s spinner" aria-label="" tabindex="-1" role="img"></span> <!-- @slot Content of the button --> Confirm</button></div>
+      </div>
+    </div>
+  </focus-trap-stub>
+</div>"
+`;
+
+exports[`OcModal > hides icon if not specified 1`] = `
+"<div class="oc-modal-background">
+  <focus-trap-stub tabbableoptions="[object Object]" active="true" escapedeactivates="true" returnfocusondeactivate="true" allowoutsideclick="true" clickoutsidedeactivates="false" initialfocus="[Function]" delayinitialfocus="true" preventscroll="false" setreturnfocus="false">
+    <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+    <div class="oc-modal oc-modal-passive" tabindex="0" role="dialog" aria-modal="true" aria-labelledby="oc-modal-title">
+      <div class="oc-modal-title">
+        <!--v-if-->
+        <h2 id="oc-modal-title" class="oc-text-truncate">Example title</h2>
+      </div>
+      <div class="oc-modal-body">
+        <p class="oc-modal-body-message oc-mt-rm oc-mb-rm">Example message</p>
+        <!--v-if-->
+        <!--v-if-->
+      </div>
+      <div class="oc-modal-body-actions oc-flex oc-flex-right">
+        <div class="oc-modal-body-actions-grid">
+          <oc-button-stub type="button" disabled="false" size="medium" submit="button" variation="passive" appearance="outline" justifycontent="center" gapsize="medium" showspinner="false" class="oc-modal-body-actions-cancel">Cancel</oc-button-stub>
+          <oc-button-stub type="button" disabled="false" size="medium" submit="button" variation="primary" appearance="filled" justifycontent="center" gapsize="medium" showspinner="false" class="oc-modal-body-actions-confirm oc-ml-s">Confirm</oc-button-stub>
+        </div>
+      </div>
+    </div>
+  </focus-trap-stub>
+</div>"
+`;
+
+exports[`OcModal > matches snapshot 1`] = `
+"<div class="oc-modal-background">
+  <focus-trap-stub tabbableoptions="[object Object]" active="true" escapedeactivates="true" returnfocusondeactivate="true" allowoutsideclick="true" clickoutsidedeactivates="false" initialfocus="[Function]" delayinitialfocus="true" preventscroll="false" setreturnfocus="false">
+    <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+    <div class="oc-modal oc-modal-passive" tabindex="0" role="dialog" aria-modal="true" aria-labelledby="oc-modal-title">
+      <div class="oc-modal-title">
+        <oc-icon-stub name="info" filltype="fill" accessiblelabel="" type="span" size="medium" variation="passive" color=""></oc-icon-stub>
+        <h2 id="oc-modal-title" class="oc-text-truncate">Example title</h2>
+      </div>
+      <div class="oc-modal-body">
+        <p class="oc-modal-body-message oc-mt-rm oc-mb-rm">Example message</p>
+        <!--v-if-->
+        <!--v-if-->
+      </div>
+      <div class="oc-modal-body-actions oc-flex oc-flex-right">
+        <div class="oc-modal-body-actions-grid">
+          <oc-button-stub type="button" disabled="false" size="medium" submit="button" variation="passive" appearance="outline" justifycontent="center" gapsize="medium" showspinner="false" class="oc-modal-body-actions-cancel">Cancel</oc-button-stub>
+          <oc-button-stub type="button" disabled="false" size="medium" submit="button" variation="primary" appearance="filled" justifycontent="center" gapsize="medium" showspinner="false" class="oc-modal-body-actions-confirm oc-ml-s">Confirm</oc-button-stub>
+        </div>
+      </div>
+    </div>
+  </focus-trap-stub>
+</div>"
+`;
+
+exports[`OcModal > overrides props message with slot 1`] = `
+"<div class="oc-modal-background">
+  <focus-trap-stub tabbableoptions="[object Object]" active="true" escapedeactivates="true" returnfocusondeactivate="true" allowoutsideclick="true" clickoutsidedeactivates="false" initialfocus="[Function]" delayinitialfocus="true" preventscroll="false" setreturnfocus="false">
+    <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+    <div class="oc-modal oc-modal-passive" tabindex="0" role="dialog" aria-modal="true" aria-labelledby="oc-modal-title">
+      <div class="oc-modal-title">
+        <!--v-if-->
+        <h2 id="oc-modal-title" class="oc-text-truncate">Example title</h2>
+      </div>
+      <div class="oc-modal-body">
+        <div class="oc-modal-body-message">
+          <p>Slot message</p>
+        </div>
+      </div>
+      <div class="oc-modal-body-actions oc-flex oc-flex-right">
+        <div class="oc-modal-body-actions-grid">
+          <oc-button-stub type="button" disabled="false" size="medium" submit="button" variation="passive" appearance="outline" justifycontent="center" gapsize="medium" showspinner="false" class="oc-modal-body-actions-cancel">Cancel</oc-button-stub>
+          <oc-button-stub type="button" disabled="false" size="medium" submit="button" variation="primary" appearance="filled" justifycontent="center" gapsize="medium" showspinner="false" class="oc-modal-body-actions-confirm oc-ml-s">Confirm</oc-button-stub>
+        </div>
+      </div>
+    </div>
+  </focus-trap-stub>
+</div>"
+`;

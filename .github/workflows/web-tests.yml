@@ -1,0 +1,105 @@
+name: Web Tests
+
+on:
+  pull_request:
+  push:
+    branches: [master, stable-*]
+
+jobs:
+  detect-web-changes:
+    name: detect-web-changes
+    runs-on: ubuntu-latest
+    outputs:
+      web-changed: ${{ steps.check.outputs.web-changed }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Check if web/ changed
+        id: check
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "web-changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          if echo "$PR_TITLE" | grep -qi "\[full-ci\]"; then
+            echo "web-changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          CHANGED_FILES=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" 2>/dev/null || git diff --name-only HEAD~1)
+
+          WEB_CHANGED=false
+          while IFS= read -r file; do
+            case "$file" in
+              web/*) WEB_CHANGED=true; break ;;
+              .github/workflows/web-tests.yml) WEB_CHANGED=true; break ;;
+            esac
+          done <<< "$CHANGED_FILES"
+
+          echo "web-changed=$WEB_CHANGED" >> "$GITHUB_OUTPUT"
+          echo "web/ changed: $WEB_CHANGED"
+
+  web-build-test:
+    name: web-build-test
+    needs: [detect-web-changes]
+    if: needs.detect-web-changes.outputs.web-changed == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          version: 10.33.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24.15.0
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Check licenses
+        run: pnpm licenses:check
+
+      - name: Save licenses
+        run: pnpm licenses:csv && pnpm licenses:save
+
+      - name: Check types
+        run: pnpm check:types
+
+      - name: Check format
+        run: pnpm check:format
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Run unit tests
+        run: pnpm test:unit --coverage
+
+      - name: Build
+        run: pnpm build
+
+  web-tests-passed:
+    name: web-tests-passed
+    needs: [detect-web-changes, web-build-test]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check web-build-test passed or was skipped
+        run: |
+          if [[ "${{ needs.web-build-test.result }}" == "failure" || "${{ needs.web-build-test.result }}" == "cancelled" ]]; then
+            exit 1
+          fi

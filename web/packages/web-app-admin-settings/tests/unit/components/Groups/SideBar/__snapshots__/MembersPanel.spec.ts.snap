@@ -1,0 +1,26 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`MembersPanel > should display an empty result if no matching members found 1`] = `
+"<div class="oc-ml-s">
+  <oc-text-input-stub label="Filter members" id="oc-textinput-3" type="text" modelvalue="no-match" clearbuttonenabled="false" clearbuttonaccessiblelabel="" disabled="false" fixmessageline="false" readonly="false" passwordpolicy="[object Object]" class="oc-text-truncate oc-mr-s oc-mt-m"></oc-text-input-stub>
+  <div data-testid="space-members">
+    <div>
+      <h3 class="oc-text-bold oc-text-medium">No members found</h3>
+    </div>
+    <!--v-if-->
+  </div>
+</div>"
+`;
+
+exports[`MembersPanel > should render all members accordingly to their role assignments 1`] = `
+"<div class="oc-ml-s">
+  <oc-text-input-stub label="Filter members" id="oc-textinput-1" type="text" modelvalue="" clearbuttonenabled="false" clearbuttonaccessiblelabel="" disabled="false" fixmessageline="false" readonly="false" passwordpolicy="[object Object]" class="oc-text-truncate oc-mr-s oc-mt-m"></oc-text-input-stub>
+  <div data-testid="space-members">
+    <!--v-if-->
+    <div class="oc-mb-m" data-testid="group-members">
+      <h3 class="oc-text-bold oc-text-medium">Members</h3>
+      <members-role-section-stub groupmembers="undefined"></members-role-section-stub>
+    </div>
+  </div>
+</div>"
+`;

@@ -1,0 +1,97 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ResourceTiles component > renders a footer slot 1`] = `
+"<div id="tiles-view" class="oc-px-m oc-pt-l">
+  <div class="oc-flex oc-flex-middle oc-mb-m oc-pb-s oc-tiles-controls"><span class="oc-ml-s"><input id="tiles-view-select-all" type="checkbox" name="checkbox" class="oc-checkbox oc-rounded oc-checkbox-l" disabled="" aria-label="Select all"> <!--v-if--></span>
+    <!--v-if-->
+  </div>
+  <ul class="oc-list oc-my-rm oc-mx-rm oc-tiles"> </ul>
+  <!--v-if-->
+  <div class="oc-tiles-footer">Hello, ResourceTiles footer!</div>
+</div>"
+`;
+
+exports[`ResourceTiles component > renders an array of spaces correctly 1`] = `
+"<div id="tiles-view" class="oc-px-m oc-pt-l">
+  <div class="oc-flex oc-flex-middle oc-mb-m oc-pb-s oc-tiles-controls"><span class="oc-ml-s"><input id="tiles-view-select-all" type="checkbox" name="checkbox" class="oc-checkbox oc-rounded oc-checkbox-l" aria-label="Select all"> <!--v-if--></span>
+    <!--v-if-->
+  </div>
+  <ul class="oc-list oc-my-rm oc-mx-rm oc-tiles">
+    <li class="oc-tiles-item has-item-context-menu">
+      <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+      <div class="oc-tile-card oc-card oc-card-default oc-rounded" data-item-id="1"><a attrs="[object Object]" target="_self" draggable="false" class="oc-resource-link oc-card-media-top oc-flex oc-flex-center oc-flex-middle oc-m-rm" tabindex="-1"></a>
+        <div class="oc-card-body oc-p-s">
+          <div class="oc-flex oc-flex-between oc-flex-middle">
+            <div class="oc-flex oc-flex-middle oc-text-truncate resource-name-wrapper">
+              <div class="oc-resource oc-text-overflow">
+                <!--v-if-->
+                <div class="oc-resource-details oc-text-overflow"><a attrs="[object Object]" target="_self" draggable="false" class="oc-resource-link oc-text-overflow"></a>
+                  <div class="oc-resource-indicators">
+                    <!--v-if-->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="oc-flex oc-flex-middle">
+              <!-- Slot for indicators !-->
+              <!--v-if-->
+              <!-- Slot for individual actions -->
+              <!-- Slot for contextmenu --> <button type="button" aria-label="Show context menu" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw resource-tiles-btn-action-dropdown" id="context-menu-trigger-1">
+                <!--v-if-->
+                <!-- @slot Content of the button --> <span class="oc-icon oc-icon-m oc-icon-passive"><!----></span>
+                <div id="context-menu-drop-1" class="oc-drop oc-box-shadow-medium oc-rounded oc-overflow-hidden">
+                  <!-- eslint-enable vuejs-accessibility/no-static-element-interactions -->
+                  <!-- eslint-enable vuejs-accessibility/click-events-have-key-events -->
+                  <div class="oc-card oc-card-body oc-background-secondary oc-p-s"></div>
+                </div>
+              </button>
+            </div>
+          </div>
+          <!--v-if-->
+        </div>
+      </div>
+    </li>
+    <li class="oc-tiles-item has-item-context-menu">
+      <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+      <div class="oc-tile-card oc-card oc-card-default oc-rounded" data-item-id="2"><a attrs="[object Object]" target="_self" draggable="false" class="oc-resource-link oc-card-media-top oc-flex oc-flex-center oc-flex-middle oc-m-rm" tabindex="-1"></a>
+        <div class="oc-card-body oc-p-s">
+          <div class="oc-flex oc-flex-between oc-flex-middle">
+            <div class="oc-flex oc-flex-middle oc-text-truncate resource-name-wrapper">
+              <div class="oc-resource oc-text-overflow">
+                <!--v-if-->
+                <div class="oc-resource-details oc-text-overflow"><a attrs="[object Object]" target="_self" draggable="false" class="oc-resource-link oc-text-overflow"></a>
+                  <div class="oc-resource-indicators">
+                    <!--v-if-->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="oc-flex oc-flex-middle">
+              <!-- Slot for indicators !-->
+              <!--v-if-->
+              <!-- Slot for individual actions -->
+              <!-- Slot for contextmenu --> <button type="button" aria-label="Show context menu" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw resource-tiles-btn-action-dropdown" id="context-menu-trigger-2">
+                <!--v-if-->
+                <!-- @slot Content of the button --> <span class="oc-icon oc-icon-m oc-icon-passive"><!----></span>
+                <div id="context-menu-drop-2" class="oc-drop oc-box-shadow-medium oc-rounded oc-overflow-hidden">
+                  <!-- eslint-enable vuejs-accessibility/no-static-element-interactions -->
+                  <!-- eslint-enable vuejs-accessibility/click-events-have-key-events -->
+                  <div class="oc-card oc-card-body oc-background-secondary oc-p-s"></div>
+                </div>
+              </button>
+            </div>
+          </div>
+          <!--v-if-->
+        </div>
+      </div>
+    </li>
+    <li class="ghost-tile" aria-hidden="true"></li>
+    <li class="ghost-tile" aria-hidden="true"></li>
+    <li class="ghost-tile" aria-hidden="true"></li>
+    <li class="ghost-tile" aria-hidden="true"></li>
+    <li class="ghost-tile" aria-hidden="true"></li>
+  </ul>
+  <!--v-if-->
+  <div class="oc-tiles-footer"></div>
+</div>"
+`;

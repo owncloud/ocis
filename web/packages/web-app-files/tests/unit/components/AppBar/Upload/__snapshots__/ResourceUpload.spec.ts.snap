@@ -1,0 +1,15 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Resource Upload Component > file upload > should render component 1`] = `
+"<div data-v-2a53b7b9=""><button data-v-2a53b7b9="" type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-left oc-button-gap-m oc-button-passive oc-button-passive-raw">
+    <!--v-if-->
+    <!-- @slot Content of the button --> <span data-v-2a53b7b9="" class="oc-icon oc-icon-m oc-icon-passive oc-resource-icon oc-resource-icon-file"><!----></span> <span data-v-2a53b7b9="" id="files-file-upload-button">Files</span>
+  </button> <input data-v-2a53b7b9="" id="files-file-upload-input" multiple="" class="upload-input-target" type="file" aria-labelledby="files-file-upload-button" name="folder" tabindex="-1"></div>"
+`;
+
+exports[`Resource Upload Component > folder upload > should render component 1`] = `
+"<div data-v-2a53b7b9=""><button data-v-2a53b7b9="" type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-left oc-button-gap-m oc-button-passive oc-button-passive-raw">
+    <!--v-if-->
+    <!-- @slot Content of the button --> <span data-v-2a53b7b9="" class="oc-icon oc-icon-m oc-icon-passive oc-resource-icon oc-resource-icon-folder"><!----></span> <span data-v-2a53b7b9="" id="files-folder-upload-button">Folder</span>
+  </button> <input data-v-2a53b7b9="" id="files-folder-upload-input" webkitdirectory="true" mozdirectory="true" allowdirs="true" class="upload-input-target" type="file" aria-labelledby="files-folder-upload-button" name="file" tabindex="-1"></div>"
+`;

@@ -1,0 +1,35 @@
+{
+  "name": "web-app-files",
+  "version": "0.0.0",
+  "private": true,
+  "description": "ownCloud web files",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test:unit": "NODE_OPTIONS=--unhandled-rejections=throw vitest"
+  },
+  "devDependencies": {
+    "@ownclouders/web-test-helpers": "workspace:*"
+  },
+  "peerDependencies": {
+    "@ownclouders/design-system": "workspace:^",
+    "@ownclouders/web-client": "workspace:*",
+    "@ownclouders/web-pkg": "workspace:*",
+    "@uppy/core": "5.2.0",
+    "@vueuse/core": "^11.0.0 || ^12.0.0 || ^13.0.0 || ^14.0.0",
+    "axios": "^1.18.1",
+    "dompurify": "^3.4.2",
+    "email-validator": "^2.0.4",
+    "fuse.js": "7.3.0",
+    "lodash-es": "4.18.1",
+    "luxon": "3.7.2",
+    "mark.js": "^8.11.1",
+    "p-queue": "^9.2.0",
+    "pinia": "3.0.4",
+    "qs": "6.14.2",
+    "uuid": "14.0.0",
+    "vue-concurrency": "5.0.3",
+    "vue-router": "5.0.6",
+    "vue3-gettext": "2.4.0",
+    "web-app-search": "workspace:*"
+  }
+}

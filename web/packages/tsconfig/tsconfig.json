@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig.json to read more about this file */
+    /* See also https://www.totaltypescript.com/tsconfig-cheat-sheet */
+
+    /* Base Options */
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "es2022",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+
+    /* Strictness - TODO: switch next two values to true */
+    "strict": false,
+    "noUncheckedIndexedAccess": false,
+    "noImplicitThis": true,
+
+    "module": "preserve",
+    "sourceMap": true,
+
+    "lib": [
+      "ESNext",
+      "es2022",
+      "dom",
+      "dom.iterable"
+    ],
+    "types": ["vitest/globals"]
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "vueCompilerOptions": {
+    "target": 3
+  }
+}

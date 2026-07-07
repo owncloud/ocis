@@ -1,6 +1,6 @@
 SHELL := bash
 NAME := web
-WEB_ASSETS_VERSION = v12.4.0
+WEB_DIR := ../../web
 
 include ../../.make/recursion.mk
 
@@ -28,18 +28,22 @@ include ../../.make/generate.mk
 ci-go-generate: # CI runs ci-node-generate automatically before this target
 
 .PHONY: ci-node-generate
-ci-node-generate: pull-assets
+ci-node-generate: build-assets
 
-.PHONY: pull-assets
-pull-assets:
+.PHONY: build-assets
+build-assets:
+	cd $(WEB_DIR) && pnpm install && pnpm check:types && pnpm build
+	cp $(WEB_DIR)/config/config.json.dist $(WEB_DIR)/dist/
 	git clean -xfd assets
-	curl --fail -slL -o- https://github.com/owncloud/web/releases/download/$(WEB_ASSETS_VERSION)/web.tar.gz | tar xzf - -C assets/core/
+	cp -r $(WEB_DIR)/dist/. assets/core/
 
 ############ licenses ############
 .PHONY: ci-node-check-licenses
-ci-node-check-licenses: # ownCloud Web does the check on it's own
+ci-node-check-licenses:
+	cd $(WEB_DIR) && pnpm licenses:check
 
 .PHONY: ci-node-save-licenses
 ci-node-save-licenses:
 	@mkdir -p ../../third-party-licenses/node/web
-	@curl --fail -slL -o- https://github.com/owncloud/web/releases/download/$(WEB_ASSETS_VERSION)/third-party-licenses.tar.gz | tar xzf - -C ../../third-party-licenses/node/web
+	cd $(WEB_DIR) && pnpm licenses:csv && pnpm licenses:save
+	cp -r $(WEB_DIR)/third-party-licenses/third-party-licenses/. ../../third-party-licenses/node/web/

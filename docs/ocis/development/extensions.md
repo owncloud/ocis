@@ -36,7 +36,7 @@ Depending on the functionality of your extension, you might need to integrate wi
 
 ### ownCloud Web
 
-If your extension is not just doing something in the background, you will need a UI in order to allow the user to interact with your extension. You could just provide your own web frontend for that purpose, but for a better user experience you can easily integrate into the web frontend of oCIS, the new [ownCloud Web](https://github.com/owncloud/web).
+If your extension is not just doing something in the background, you will need a UI in order to allow the user to interact with your extension. You could just provide your own web frontend for that purpose, but for a better user experience you can easily integrate into the web frontend of oCIS, [ownCloud Web](https://github.com/owncloud/ocis/tree/master/web), which ships in-tree as part of oCIS.
 
 ownCloud Web allows you to write an extension for itself and therefore offers a seamless user experience. Upon login, the user will be able to use the application switcher to switch between the files view, settings and other available and installed extensions, yours included. Furthermore it is also possible to register your extension for different file actions. As an example, you could offer your extension to the user for creating and editing office documents. The user will then be able to create or open a file with your application directly from the files view. How to provide create an extension for ownCloud Web can be seen best in [the Hello extension](https://github.com/owncloud/ocis-hello/blob/master/ui/app.js), whereas plain file handling without any web frontend is available in the [WOPI server extension](https://github.com/owncloud/ocis-wopiserver/blob/master/ui/app.js).
 

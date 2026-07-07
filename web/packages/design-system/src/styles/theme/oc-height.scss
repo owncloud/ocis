@@ -1,0 +1,46 @@
+// Ported from UiKit until we change UI frameworks
+
+// Name:            Height
+// Description:     Utilities for heights
+//
+// Component:       `oc-height-*`
+//
+// ========================================================================
+
+// Variables
+// ========================================================================
+
+$height-small-height: 150px !default;
+$height-medium-height: 300px !default;
+$height-large-height: 450px !default;
+
+/* ========================================================================
+   Component: Height
+ ========================================================================== */
+
+[class*="oc-height"] { box-sizing: border-box; }
+
+/*
+ * Only works if parent element has a height set
+ */
+
+.oc-height-1-1 { height: 100%; }
+
+/*
+ * Useful to create image teasers
+ */
+
+.oc-height-viewport { min-height: 100dvh; }
+
+/*
+ * Pixel
+ * Useful for `overflow: auto`
+ */
+
+.oc-height-small { height: $height-small-height; }
+.oc-height-medium { height: $height-medium-height; }
+.oc-height-large { height: $height-large-height; }
+
+.oc-height-max-small { max-height: $height-small-height; }
+.oc-height-max-medium { max-height: $height-medium-height; }
+.oc-height-max-large { max-height: $height-large-height; }

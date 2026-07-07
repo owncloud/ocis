@@ -1,0 +1,14 @@
+{
+  "ignores": [
+    "autoprefixer",
+    "style-loader",
+    "stylelint-config-sass-guidelines",
+    "stylelint-config-standard",
+    "vue-inline-svg",
+    "webfontloader"
+  ],
+  "ignorePatterns": [
+    "src/styles/**/*.scss",
+    "docs/**/*.scss"
+  ]
+}
