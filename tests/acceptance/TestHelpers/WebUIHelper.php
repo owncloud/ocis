@@ -44,6 +44,7 @@ class WebUIHelper {
 		$context = Playwright::chromium(
 			[
 				'headless' => true,
+				'ignoreHTTPSErrors' => true,
 				'args' => ['--ignore-certificate-errors', '--no-sandbox'],
 			],
 		);
@@ -51,11 +52,11 @@ class WebUIHelper {
 		try {
 			$page = $context->newPage();
 			$page->goto($ocisUrl, ['waitUntil' => 'networkidle']);
-			$page->waitForSelector('#kc-header', ['timeout' => 3000]);
+			$page->waitForSelector('#kc-header', ['timeout' => 5000]);
 			$page->locator('#username')->fill($username);
 			$page->locator('#password')->fill($password);
 			$page->locator('#kc-login')->click();
-			$page->waitForSelector('#files-view', ['timeout' => 30000]);
+			$page->waitForSelector('#files-view', ['timeout' => 5000]);
 
 			// change to vault mode
 			$page->locator('#oc-topbar-mode-switch-btn')->click();
@@ -63,7 +64,7 @@ class WebUIHelper {
 				"//button[contains(@class, 'oc-topbar-mode-switch-option')]" .
 				"[.//span[text()='Vault']]",
 			)->click();
-			$page->waitForSelector('#kc-totp-secret-qr-code', ['timeout' => 3000]);
+			$page->waitForSelector('#kc-totp-secret-qr-code', ['timeout' => 5000]);
 			$qrLocator = $page->locator('#kc-totp-secret-qr-code');
 
 			// setup mfa
