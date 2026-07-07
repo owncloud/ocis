@@ -3,6 +3,7 @@ package middleware
 import (
 	"net"
 	"net/http"
+	"net/netip"
 	"net/url"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -39,14 +40,22 @@ func urisMatch(u1, u2 *url.URL) bool {
 	if isLocalhost(u1) && isLocalhost(u2) {
 		copyu1 := *u1
 		copyu2 := *u2
-		// if there is a port, remove it from the URL
+		// If there is a port, remove it from the URL.
+		// Note that the SplitHostPort will remove the "[" and "]"
+		// from the ipv6 address, so we need to get them back.
 		if copyu1.Port() != "" {
 			host1, _, _ := net.SplitHostPort(copyu1.Host)
 			copyu1.Host = host1
+			if addr, err := netip.ParseAddr(host1); err == nil && addr.Is6() {
+				copyu1.Host = "[" + host1 + "]"
+			}
 		}
 		if copyu2.Port() != "" {
 			host2, _, _ := net.SplitHostPort(copyu2.Host)
 			copyu2.Host = host2
+			if addr, err := netip.ParseAddr(host2); err == nil && addr.Is6() {
+				copyu2.Host = "[" + host2 + "]"
+			}
 		}
 		return copyu1.String() == copyu2.String()
 	}

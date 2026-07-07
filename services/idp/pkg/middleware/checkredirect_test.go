@@ -32,7 +32,7 @@ var _ = Describe("check redirect", func() {
 		},
 		config.Client{
 			ID:           "localhost1",
-			RedirectURIs: []string{"http://localhost/"},
+			RedirectURIs: []string{"http://localhost/", "http://127.0.0.1/", "http://[::1]/"},
 		},
 		config.Client{
 			ID:           "with_opaque",
@@ -60,6 +60,7 @@ var _ = Describe("check redirect", func() {
 		},
 		Entry("https web", "https://good.server.prv/oidc-callback.html", http.StatusOK),
 		Entry("https web port", "https://another.server.prv:6767/oidc-callback.html", http.StatusOK),
+		Entry("https web wrong path", "https://good.server.prv/evil", http.StatusInternalServerError),
 		Entry("http web", "http://good.server.prv/oidc-callback.html", http.StatusInternalServerError),
 		Entry("wrong web", "https://nonexisting.server.prv/", http.StatusInternalServerError),
 		Entry("wrong web path", "https://nonexisting.server.prv/very-wrong", http.StatusInternalServerError),
@@ -68,6 +69,11 @@ var _ = Describe("check redirect", func() {
 		Entry("ios", "ios://ios.custom.server/", http.StatusOK),
 		Entry("localhost", "http://localhost/", http.StatusOK),
 		Entry("localhost port", "http://localhost:51515/", http.StatusOK),
+		Entry("local addr", "http://127.0.0.1/", http.StatusOK),
+		Entry("local addr port", "http://127.0.0.1:51515/", http.StatusOK),
+		Entry("ip6 local addr", "http://[::1]/", http.StatusOK),
+		Entry("ip6 local addr port", "http://[::1]:51515/", http.StatusOK),
+		Entry("userinfo spoof", "http://localhost:8080@evil.com/", http.StatusInternalServerError),
 		Entry("localhost wrong scheme", "https://localhost:51515/", http.StatusInternalServerError),
 		Entry("opaque", "app:open?path=/personal/folder", http.StatusOK),
 	)
