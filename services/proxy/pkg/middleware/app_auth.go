@@ -53,10 +53,10 @@ func (m AppAuthAuthenticator) Authenticate(r *http.Request) (*http.Request, bool
 	user := authenticateResponse.GetUser()
 	// fake oidc claims for the account resolver
 	claims := map[string]interface{}{
-		oidc.Iss:               user.Id.Idp,
-		oidc.PreferredUsername: user.Username,
-		oidc.Email:             user.Mail,
-		oidc.OwncloudUUID:      user.Id.OpaqueId,
+		oidc.Iss:               user.GetId().GetIdp(),
+		oidc.PreferredUsername: user.GetUsername(),
+		oidc.Email:             user.GetMail(),
+		oidc.OwncloudUUID:      user.GetId().GetOpaqueId(),
 	}
 	r = r.WithContext(oidc.NewContext(r.Context(), claims))
 

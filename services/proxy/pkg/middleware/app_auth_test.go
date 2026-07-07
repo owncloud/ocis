@@ -13,6 +13,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 )
 
 var _ = Describe("Authenticating requests", Label("AppAuthAuthenticator"), func() {
@@ -66,6 +67,13 @@ var _ = Describe("Authenticating requests", Label("AppAuthAuthenticator"), func(
 			Expect(valid).To(Equal(true))
 			Expect(req2).ToNot(BeNil())
 			Expect(req2.Header.Get("x-access-token")).To(Equal("reva-token"))
+
+			claims := oidc.FromContext(req2.Context())
+			Expect(claims).ToNot(BeNil())
+			Expect(claims[oidc.Iss]).To(Equal("testIDP"))
+			Expect(claims[oidc.PreferredUsername]).To(Equal("alice"))
+			Expect(claims[oidc.Email]).To(Equal("alice@example.prv"))
+			Expect(claims[oidc.OwncloudUUID]).To(Equal("abcd-1234"))
 		})
 	})
 
