@@ -111,6 +111,32 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @When /^the administrator resets the password of existing user "([^"]*)" to "([^"]*)" with user type "([^"]*)" using the CLI$/
+	 *
+	 * @param string $user
+	 * @param string $password
+	 * @param string $userType
+	 *
+	 * @return void
+	 */
+	public function theAdministratorResetsThePasswordOfUserWithUserTypeUsingTheCLI(
+		string $user,
+		string $password,
+		string $userType,
+	): void {
+		$command = "idm resetpassword -u $user --user-type $userType";
+		$body = [
+			"command" => $command,
+			"inputs" => [$password, $password],
+		];
+
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+		if ($userType === "user") {
+			$this->featureContext->updateUserPassword($user, $password);
+		}
+	}
+
+	/**
 	 * @When the administrator deletes the empty trashbin folders using the CLI
 	 *
 	 * @return void
