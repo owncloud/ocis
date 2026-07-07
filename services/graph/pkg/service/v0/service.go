@@ -25,6 +25,7 @@ import (
 
 	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	middlewarepkg "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
@@ -38,6 +39,10 @@ const (
 	// HeaderPurge defines the header name for the purge header.
 	HeaderPurge     = "Purge"
 	displayNameAttr = "displayName"
+
+	// Rate limit per exportPersonalDataWindow endpoint path carries the userID, so effectively per user.
+	exportPersonalDataLimit  = 5
+	exportPersonalDataWindow = time.Minute
 )
 
 // Service defines the service handlers.
@@ -305,7 +310,8 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 				r.Route("/{userID}", func(r chi.Router) {
 					r.Get("/", svc.GetUser)
 					r.Get("/drive", svc.GetUserDrive)
-					r.Post("/exportPersonalData", svc.ExportPersonalData)
+					r.With(middlewarepkg.LimiterPerEndpoint(exportPersonalDataLimit, exportPersonalDataWindow)).
+						Post("/exportPersonalData", svc.ExportPersonalData)
 					r.With(requireAdmin).Delete("/", svc.DeleteUser)
 					r.With(requireAdmin).Patch("/", svc.PatchUser)
 					if svc.roleService != nil {
