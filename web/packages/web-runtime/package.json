@@ -25,7 +25,7 @@
     "axios": "^1.18.1",
     "deepmerge": "4.3.1",
     "email-validator": "2.0.4",
-    "dompurify": "^3.4.2",
+    "dompurify": "^3.4.11",
     "focus-trap-vue": "^4.1.0",
     "focus-trap": "8.2.0",
     "fuse.js": "7.3.0",
