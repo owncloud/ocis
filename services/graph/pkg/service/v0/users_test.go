@@ -1133,6 +1133,49 @@ var _ = Describe("Users", func() {
 			})
 		})
 
+		Describe("PatchMe", func() {
+			It("rejects passwordProfile changes (CWE-620)", func() {
+				update := libregraph.NewUserUpdate()
+				pp := libregraph.NewPasswordProfile()
+				pp.SetPassword("newpassword")
+				update.SetPasswordProfile(*pp)
+				body, err := json.Marshal(update)
+				Expect(err).ToNot(HaveOccurred())
+
+				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me", bytes.NewBuffer(body))
+				r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+				svc.PatchMe(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusBadRequest))
+			})
+
+			It("rejects accountEnabled changes", func() {
+				update := libregraph.NewUserUpdate()
+				update.SetAccountEnabled(false)
+				body, err := json.Marshal(update)
+				Expect(err).ToNot(HaveOccurred())
+
+				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me", bytes.NewBuffer(body))
+				r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+				svc.PatchMe(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusBadRequest))
+			})
+
+			It("rejects onPremisesSamAccountName changes", func() {
+				update := libregraph.NewUserUpdate()
+				update.SetOnPremisesSamAccountName("newusername")
+				body, err := json.Marshal(update)
+				Expect(err).ToNot(HaveOccurred())
+
+				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me", bytes.NewBuffer(body))
+				r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+				svc.PatchMe(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusBadRequest))
+			})
+		})
+
 		Describe("PatchUser", func() {
 			var (
 				user                      *libregraph.User
