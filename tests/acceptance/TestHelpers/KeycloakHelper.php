@@ -58,7 +58,7 @@ class KeycloakHelper {
 	 * @return string
 	 */
 	public static function getKeycloakUrl(): string {
-		$keycloakUrl = \getenv('KEYCLOAK_URL');
+		$keycloakUrl = \getenv('KC_URL');
 		if ($keycloakUrl !== false && $keycloakUrl !== '') {
 			return $keycloakUrl;
 		}

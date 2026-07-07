@@ -143,7 +143,8 @@ LOCAL_API_TESTS = {
         "keycloakNeeded": True,
         "vaultStorage": True,
         "extraEnvironment": {
-            "KEYCLOAK": "true"
+            "KEYCLOAK": "true",
+            "KC_URL": "https://localhost:8443"
         },
         "extraServerEnvironment": {
             "OCIS_ENABLE_VAULT": "true",
