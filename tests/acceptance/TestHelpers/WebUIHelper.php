@@ -44,13 +44,13 @@ class WebUIHelper {
 		$context = Playwright::chromium(
 			[
 				'headless' => true,
-				'ignoreHTTPSErrors' => true,
 				'args' => ['--ignore-certificate-errors', '--no-sandbox'],
 			],
 		);
 		$screenshotPath = '/tmp/qr_' . uniqid() . '.png';
 		try {
 			$page = $context->newPage();
+            var_dump($page->url());
 			$page->goto($ocisUrl, ['waitUntil' => 'networkidle']);
 			$page->waitForSelector('#kc-header', ['timeout' => 5000]);
 			$page->locator('#username')->fill($username);
