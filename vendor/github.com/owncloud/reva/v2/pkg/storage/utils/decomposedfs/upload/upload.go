@@ -178,7 +178,6 @@ func (session *OcisSession) FinishUploadDecomposed(ctx context.Context) error {
 		prefixes.ChecksumPrefix + "md5":     md5h.Sum(nil),
 		prefixes.ChecksumPrefix + "adler32": adler32h.Sum(nil),
 	}
-
 	// At this point we scope by the space to create the final file in the final location
 	if session.store.um != nil && session.info.Storage["SpaceGid"] != "" {
 		gid, err := strconv.Atoi(session.info.Storage["SpaceGid"])

@@ -46,6 +46,9 @@ type UploadsManager interface {
 }
 
 // UploadSessionLister defines the interface for FS implementations that allow listing and purging upload sessions
+// TODO(OCISDEV-901): ListUploadSessions belongs on the coordinator, not the driver. Remove this interface and all
+// driver-side implementations (decomposedfs, posix, middleware, ocm). The CLI (storage-users uploads list) currently
+// instantiates the driver directly to call this — it needs to be rerouted through the coordinator before removal.
 type UploadSessionLister interface {
 	// ListUploadSessions returns the upload sessions matching the given filter
 	ListUploadSessions(ctx context.Context, filter UploadSessionFilter) ([]UploadSession, error)

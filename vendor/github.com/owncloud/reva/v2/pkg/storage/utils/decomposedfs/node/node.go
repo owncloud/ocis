@@ -1283,9 +1283,16 @@ func (n *Node) SetScanData(ctx context.Context, info string, date time.Time) err
 	return n.SetXattrsWithContext(ctx, attribs, true)
 }
 
-// ScanData returns scanning information of the node
+// ScanData returns scanning information of the node.
+// It first checks the new arbitrary-metadata keys (written by the coordinator
+// via SetArbitraryMetadata), then falls back to the legacy xattr keys so that
+// nodes scanned before this change still return correct results.
 func (n *Node) ScanData(ctx context.Context) (scanned bool, virus string, scantime time.Time) {
-	ti, _ := n.XattrString(ctx, prefixes.ScanDatePrefix)
+	ti, _ := n.XattrString(ctx, prefixes.MetadataPrefix+"scandate")
+	if ti == "" {
+		// fall back to legacy xattr key written by the old decomposedfs path
+		ti, _ = n.XattrString(ctx, prefixes.ScanDatePrefix)
+	}
 	if ti == "" {
 		return // not scanned yet
 	}
@@ -1295,9 +1302,9 @@ func (n *Node) ScanData(ctx context.Context) (scanned bool, virus string, scanti
 		return
 	}
 
-	i, err := n.XattrString(ctx, prefixes.ScanStatusPrefix)
-	if err != nil {
-		return
+	i, _ := n.XattrString(ctx, prefixes.MetadataPrefix+"scanstatus")
+	if i == "" {
+		i, _ = n.XattrString(ctx, prefixes.ScanStatusPrefix)
 	}
 
 	return true, i, t
