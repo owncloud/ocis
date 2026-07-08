@@ -230,13 +230,15 @@ func (c *coordinator)handlePostprocessingFinished(ctx context.Context, ev events
 
 	log = c.log.With().Str("spaceid", session.SpaceID()).Str("nodeid", session.NodeID()).Logger()
 	ref := session.Reference()
-	if _, err := c.fs.GetMD(ctx, &ref, []string{}, []string{}); err != nil {
-		log.Debug().Err(err).Msg("node no longer exists or not accessible; cleaning up")
-		session.Cleanup(true, true)
-		if err := c.fs.MarkProcessing(ctx, &ref, false, session.ID()); err != nil {
-			log.Error().Err(err).Msg("could not unmark processing during cleanup of inaccessible node")
+	if _, mdErr := c.fs.GetMD(ctx, &ref, []string{}, []string{}); mdErr != nil {
+		if _, notFound := mdErr.(errtypes.IsNotFound); notFound {
+			log.Debug().Err(mdErr).Msg("node deleted during postprocessing; cleaning up")
+			session.Cleanup(true, true)
+			if err := c.fs.MarkProcessing(ctx, &ref, false, session.ID()); err != nil {
+				log.Error().Err(err).Msg("could not unmark processing during cleanup of deleted node")
+			}
+			return
 		}
-		return
 	}
 
 	var (

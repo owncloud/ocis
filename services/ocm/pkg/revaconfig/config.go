@@ -91,8 +91,9 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"service_account_secret":        cfg.ServiceAccount.Secret,
 				},
 				"dataprovider": map[string]interface{}{
-					"prefix": "data",
-					"driver": "ocmreceived",
+					"prefix":           "data",
+					"driver":           "ocmreceived",
+					"upload_directory": cfg.OCMStorageProvider.StorageRoot,
 					"drivers": map[string]interface{}{
 						"ocmreceived": map[string]interface{}{
 							"insecure":               cfg.OCMStorageProvider.Insecure,
@@ -180,7 +181,8 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					},
 				},
 				"storageprovider": map[string]interface{}{
-					"driver": "ocmreceived",
+					"driver":           "ocmreceived",
+					"upload_directory": cfg.OCMStorageProvider.StorageRoot,
 					"drivers": map[string]interface{}{
 						"ocmreceived": map[string]interface{}{
 							"insecure":     cfg.OCMStorageProvider.Insecure,
