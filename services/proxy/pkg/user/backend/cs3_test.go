@@ -228,12 +228,10 @@ func testUser() *cs3.User {
 	return &cs3.User{Id: &cs3.UserId{OpaqueId: "user-1"}}
 }
 
-// TestSyncGroupMemberships_CreateDisabled is the core regression test (OCISDEV-886):
-// with GroupCreate=false, a claim naming a non-existing group must not create it or
-// join the user - closing the group-injection path.
+// TestSyncGroupMemberships_CreateDisabled is the core regression test (OCISDEV-886): with GroupCreate=false a claim for a non-existing group must not create or join it, closing the group-injection path.
 func TestSyncGroupMemberships_CreateDisabled(t *testing.T) {
 	calls := &graphCalls{}
-	srv := newGraphServer(t, "", nil, calls) // no group exists
+	srv := newGraphServer(t, "", nil, calls)
 	defer srv.Close()
 
 	b := newSyncBackend(t, srv, config.AutoProvisionClaims{
@@ -255,11 +253,10 @@ func TestSyncGroupMemberships_CreateDisabled(t *testing.T) {
 	}
 }
 
-// TestSyncGroupMemberships_CreateEnabled asserts that with GroupCreate=true a
-// claim naming a NON-existing group creates it and joins the user.
+// TestSyncGroupMemberships_CreateEnabled verifies GroupCreate=true creates a non-existing claimed group and joins the user.
 func TestSyncGroupMemberships_CreateEnabled(t *testing.T) {
 	calls := &graphCalls{}
-	srv := newGraphServer(t, "", nil, calls) // group does not exist yet
+	srv := newGraphServer(t, "", nil, calls)
 	defer srv.Close()
 
 	b := newSyncBackend(t, srv, config.AutoProvisionClaims{
@@ -281,9 +278,7 @@ func TestSyncGroupMemberships_CreateEnabled(t *testing.T) {
 	}
 }
 
-// TestSyncGroupMemberships_ExistingGroupJoined pins backward-compatible behaviour
-// this PR preserves: a claim naming an existing group joins the user without
-// re-creating it. Gating this display-name join is deferred to the follow-up PR.
+// TestSyncGroupMemberships_ExistingGroupJoined pins the backward-compatible join-existing behaviour this PR preserves (gating the display-name join is deferred to the follow-up PR).
 func TestSyncGroupMemberships_ExistingGroupJoined(t *testing.T) {
 	for _, groupCreate := range []bool{false, true} {
 		name := "GroupCreate=false"
@@ -317,8 +312,7 @@ func TestSyncGroupMemberships_ExistingGroupJoined(t *testing.T) {
 	}
 }
 
-// TestSyncGroupMemberships_Deprovision: a user is removed from a group not present
-// in their claim.
+// TestSyncGroupMemberships_Deprovision verifies a user is removed from a group absent from their claim.
 func TestSyncGroupMemberships_Deprovision(t *testing.T) {
 	calls := &graphCalls{}
 	// User is currently a member of "editors"; their claim no longer carries it.
