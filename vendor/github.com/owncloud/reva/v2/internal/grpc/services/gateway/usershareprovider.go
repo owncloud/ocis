@@ -218,10 +218,10 @@ func (s *svc) updateSpaceShare(ctx context.Context, req *collaboration.UpdateSha
 			return &collaboration.UpdateShareResponse{Status: status.NewInvalid(ctx, "updating requires a received permission object")}, nil
 		}
 
-		if !grant.GetPermissions().GetRemoveGrant() {
-			// this request might remove Manager Permissions so we need to
-			// check if there is at least one manager remaining of the
-			// resource.
+		if mayRemoveLastPermanentManager(grant) {
+			// This request might drop the manager role or give the manager grant
+			// an expiration, either of which could leave the space without a
+			// permanent manager. Ensure at least one permanent manager remains.
 			if !isSpaceManagerRemaining(listGrantRes.GetGrants(), grant.GetGrantee()) {
 				return &collaboration.UpdateShareResponse{
 					Status: status.NewPermissionDenied(ctx, errtypes.PermissionDenied(""), "can't remove the last manager"),
@@ -810,6 +810,16 @@ func isSpaceManagerRemaining(grants []*provider.Grant, grantee *provider.Grantee
 		}
 	}
 	return false
+}
+
+// mayRemoveLastPermanentManager reports whether applying grant could leave the
+// space without a permanent (non-expiring) manager, so that the caller must
+// verify another permanent manager remains. This is the case when the grant
+// drops the manager role (RemoveGrant is the manager marker) or when a manager
+// grant is given an expiration, since an expiring manager does not count as a
+// permanent manager (see isSpaceManagerRemaining).
+func mayRemoveLastPermanentManager(grant *provider.Grant) bool {
+	return !grant.GetPermissions().GetRemoveGrant() || grant.GetExpiration() != nil
 }
 
 func (s *svc) checkLock(ctx context.Context, shareId *collaboration.ShareId) (*rpc.Status, error) {

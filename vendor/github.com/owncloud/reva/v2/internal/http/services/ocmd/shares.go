@@ -29,6 +29,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	ocmcore "github.com/cs3org/go-cs3apis/cs3/ocm/core/v1beta1"
+	invitepb "github.com/cs3org/go-cs3apis/cs3/ocm/invite/v1beta1"
 	ocmprovider "github.com/cs3org/go-cs3apis/cs3/ocm/provider/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
@@ -115,6 +116,15 @@ func (h *sharesHandler) CreateShare(w http.ResponseWriter, r *http.Request) {
 		reqres.WriteError(w, r, reqres.APIErrorServerError, "error getting gateway client", err)
 		return
 	}
+	infoResp, err := gatewayClient.GetInfoByDomain(ctx, &ocmprovider.GetInfoByDomainRequest{Domain: meshProvider})
+	if err != nil {
+		reqres.WriteError(w, r, reqres.APIErrorServerError, "error sending a grpc get info by domain request", err)
+		return
+	}
+	if infoResp.Status.Code != rpc.Code_CODE_OK {
+		reqres.WriteError(w, r, reqres.APIErrorUnauthenticated, "provider not authorized", errors.New(infoResp.Status.Message))
+		return
+	}
 	providerAllowedResp, err := gatewayClient.IsProviderAllowed(ctx, &ocmprovider.IsProviderAllowedRequest{
 		Provider: &providerInfo,
 	})
@@ -154,6 +164,28 @@ func (h *sharesHandler) CreateShare(w http.ResponseWriter, r *http.Request) {
 	sender, err := getUserIDFromOCMUser(req.Sender)
 	if err != nil {
 		reqres.WriteError(w, r, reqres.APIErrorInvalidParameter, err.Error(), nil)
+		return
+	}
+
+	userFilterJSON, err := utils.MarshalProtoV1ToJSON(userRes.User.Id)
+	if err != nil {
+		reqres.WriteError(w, r, reqres.APIErrorServerError, "error encoding user filter", err)
+		return
+	}
+	acceptedResp, err := gatewayClient.GetAcceptedUser(ctx, &invitepb.GetAcceptedUserRequest{
+		RemoteUserId: sender,
+		Opaque: &types.Opaque{
+			Map: map[string]*types.OpaqueEntry{
+				"user-filter": {Decoder: "json", Value: userFilterJSON},
+			},
+		},
+	})
+	if err != nil {
+		reqres.WriteError(w, r, reqres.APIErrorServerError, "error verifying invite relationship", err)
+		return
+	}
+	if acceptedResp.Status.Code != rpc.Code_CODE_OK {
+		reqres.WriteError(w, r, reqres.APIErrorUnauthenticated, "no accepted invite for this sender", errors.New(acceptedResp.Status.Message))
 		return
 	}
 

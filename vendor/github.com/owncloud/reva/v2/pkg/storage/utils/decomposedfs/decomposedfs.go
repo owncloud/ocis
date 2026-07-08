@@ -928,6 +928,11 @@ func (fs *Decomposedfs) Move(ctx context.Context, oldRef, newRef *provider.Refer
 		return nil, err
 	}
 
+	// check processing on source
+	if oldNode.IsProcessing(ctx) {
+		return nil, errtypes.ResourceProcessing(oldRef.String())
+	}
+
 	if err := fs.tp.Move(ctx, oldNode, newNode); err != nil {
 		return nil, err
 	}
@@ -1103,7 +1108,7 @@ func (fs *Decomposedfs) Delete(ctx context.Context, ref *provider.Reference) (dr
 	}
 
 	if node.IsProcessing(ctx) {
-		return nil, errtypes.TooEarly("file is processing")
+		return nil, errtypes.ResourceProcessing(ref.String())
 	}
 
 	rp, err := fs.p.AssemblePermissions(ctx, node)
@@ -1166,6 +1171,10 @@ func (fs *Decomposedfs) Download(ctx context.Context, ref *provider.Reference, o
 		return nil, nil, errtypes.NotFound(f)
 	}
 
+	// check processing
+	if n.IsProcessing(ctx) {
+		return nil, nil, errtypes.ResourceProcessing(ref.String())
+	}
 	ri, err := n.AsResourceInfo(ctx, rp, nil, []string{"size", "mimetype", "etag"}, true)
 	if err != nil {
 		return nil, nil, err
