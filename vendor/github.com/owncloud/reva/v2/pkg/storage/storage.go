@@ -101,7 +101,7 @@ type FS interface {
 	// CreateDir creates a resource of type container
 	CreateDir(ctx context.Context, ref *provider.Reference) (*CreateDirResult, error)
 	// TouchFile sets the mtime of a resource, creating an empty file if it does not exist
-	// FIXME the markprocessing flag is an implementation detail of decomposedfs, remove it from the function
+	// FIXME(OCISDEV-900) remove markprocessing bool: coordinator calls MarkProcessing(true) explicitly after TouchFile
 	// FIXME the mtime should either be a time.Time or a CS3 Timestamp, not a string
 	TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool, mtime string) (*TouchFileResult, error)
 	// Delete deletes a resource.
@@ -114,6 +114,10 @@ type FS interface {
 	InitiateUpload(ctx context.Context, ref *provider.Reference, uploadLength int64, metadata map[string]string) (map[string]string, error)
 	// Upload creates or updates a resource of type file with a new revision
 	Upload(ctx context.Context, req UploadRequest, uploadFunc UploadFinishedFunc) (*provider.ResourceInfo, error)
+	// MarkProcessing toggles a processing flag on the resource.
+	MarkProcessing(ctx context.Context, ref *provider.Reference, processing bool, sessionID string) error
+	// CommitUpload writes the staged bytes from source to the resource at ref.
+	CommitUpload(ctx context.Context, ref *provider.Reference, source UploadSource) (*provider.ResourceInfo, error)
 
 	// Revisions
 
@@ -205,6 +209,22 @@ type DeleteStorageSpaceResult struct {
 	// FinalMembers is the grant map of the space at the time of deletion,
 	// keyed by user/group opaque id.
 	FinalMembers map[string]provider.ResourcePermissions
+}
+
+// UploadChecksums holds pre-computed checksums for a CommitUpload call.
+// All three must be provided; the driver stores them as xattrs without recomputing.
+type UploadChecksums struct {
+	SHA1    []byte
+	MD5     []byte
+	Adler32 []byte
+}
+
+// UploadSource carries the staged bytes for a CommitUpload call.
+type UploadSource struct {
+	Body      io.ReadCloser
+	Length    int64
+	Metadata  map[string]string
+	Checksums UploadChecksums
 }
 
 // UnscopeFunc is a function that unscopes a user

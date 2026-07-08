@@ -32,12 +32,12 @@ import (
 	cephfs2 "github.com/ceph/go-ceph/cephfs"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/google/uuid"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	ctx2 "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/storage"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
 )
@@ -145,6 +145,14 @@ func (fs *cephfs) InitiateUpload(ctx context.Context, ref *provider.Reference, u
 		"simple": info.ID,
 		"tus":    info.ID,
 	}, nil
+}
+
+func (fs *cephfs) MarkProcessing(ctx context.Context, ref *provider.Reference, processing bool, sessionID string) error {
+	return errtypes.NotSupported("op not supported")
+}
+
+func (fs *cephfs) CommitUpload(ctx context.Context, ref *provider.Reference, source storage.UploadSource) (*provider.ResourceInfo, error) {
+	return nil, errtypes.NotSupported("op not supported")
 }
 
 // UseIn tells the tus upload middleware which extensions it supports.
