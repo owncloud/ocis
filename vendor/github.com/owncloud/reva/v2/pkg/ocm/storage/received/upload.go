@@ -76,8 +76,8 @@ func (d *driver) InitiateUpload(ctx context.Context, ref *provider.Reference, up
 	}, nil
 }
 
-func (d *driver) MarkProcessing(ctx context.Context, ref *provider.Reference, processing bool, sessionID string) error {
-	return errtypes.NotSupported("op not supported")
+func (d *driver) MarkProcessing(_ context.Context, _ *provider.Reference, _ bool, _ string) error {
+	return nil
 }
 
 func (d *driver) CommitUpload(ctx context.Context, ref *provider.Reference, source storage.UploadSource) (*provider.ResourceInfo, error) {

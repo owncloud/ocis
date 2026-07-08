@@ -484,6 +484,21 @@ func (c *coordinator)InitiateUpload(ctx context.Context, ref *provider.Reference
 		nodeName = existing.GetName()
 		spaceOwner = existing.GetOwner()
 
+		diskLock, _ := c.fs.GetLock(ctx, ref)
+		contextLockID, _ := ctxpkg.ContextGetLockID(ctx)
+		if diskLock != nil {
+			switch contextLockID {
+			case "":
+				return nil, errtypes.Locked(diskLock.LockId)
+			case diskLock.LockId:
+				// ok
+			default:
+				return nil, errtypes.Aborted("mismatching lock")
+			}
+		} else if contextLockID != "" {
+			return nil, errtypes.Aborted("not locked")
+		}
+
 		// For overwrites the existing bytes will be freed on commit, so net required
 		// space is uploadLength - existing.Size. Skip for size-deferred uploads.
 		if uploadLength >= 0 {
@@ -629,6 +644,14 @@ func (c *coordinator)InitiateUpload(ctx context.Context, ref *provider.Reference
 
 	if uploadLength == 0 {
 		// Zero-length uploads complete immediately without postprocessing.
+		if err := checksumAndFinish(ctx, session); err != nil {
+			c.rollback(ctx, session)
+			return nil, fmt.Errorf("coordinator: zero-length checksums: %w", err)
+		}
+		if err := session.Persist(ctx); err != nil {
+			c.rollback(ctx, session)
+			return nil, fmt.Errorf("coordinator: zero-length persist: %w", err)
+		}
 		commitRef := session.Reference()
 		if _, err := c.fs.CommitUpload(ctx, &commitRef, storage.UploadSource{
 			Body:      io.NopCloser(bytes.NewReader(nil)),
