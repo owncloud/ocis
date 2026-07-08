@@ -12,5 +12,5 @@ the graph events consumer. When set to 'false' the graph service no longer
 listens for 'UserSignedIn' events and does not write the 'oCLastSignInTimestamp'
 attribute.
 
-https://github.com/owncloud/ocis/pull/12521
+https://github.com/owncloud/ocis/pull/12522
 https://github.com/owncloud/ocis/issues/9942
