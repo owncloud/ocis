@@ -32,7 +32,7 @@ import (
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity/ldap"
-	graphm "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
+	graphmw "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
 )
 
 const (
@@ -205,7 +205,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 
 	var requireAdmin func(http.Handler) http.Handler
 	if options.RequireAdminMiddleware == nil {
-		requireAdmin = graphm.RequireAdmin(roleManager, options.Logger)
+		requireAdmin = graphmw.RequireAdmin(roleManager, options.Logger)
 	} else {
 		requireAdmin = options.RequireAdminMiddleware
 	}
@@ -310,7 +310,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 				r.Route("/{userID}", func(r chi.Router) {
 					r.Get("/", svc.GetUser)
 					r.Get("/drive", svc.GetUserDrive)
-					r.With(middlewarepkg.LimiterPerEndpoint(exportPersonalDataLimit, exportPersonalDataWindow)).
+					r.With(graphmw.RequireSelfUserID(options.Logger)).With(middlewarepkg.LimiterPerEndpoint(exportPersonalDataLimit, exportPersonalDataWindow)).
 						Post("/exportPersonalData", svc.ExportPersonalData)
 					r.With(requireAdmin).Delete("/", svc.DeleteUser)
 					r.With(requireAdmin).Patch("/", svc.PatchUser)
@@ -403,7 +403,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		})
 	}
 
-	requireMFA := graphm.RequireMFA(options.Logger)
+	requireMFA := graphmw.RequireMFA(options.Logger)
 	blankMW := func(next http.Handler) http.Handler { return next }
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
@@ -416,7 +416,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		m.Route("/vault/graph", func(r chi.Router) {
 			r.Use(autoprop.NewHttpHandler())
 			r.Use(requireMFA)
-			r.Use(graphm.VaultModeMiddleware())
+			r.Use(graphmw.VaultModeMiddleware())
 			graphRoutes(r, blankMW)
 		})
 	}
