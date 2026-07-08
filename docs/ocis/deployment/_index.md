@@ -19,7 +19,6 @@ oCIS deployments are super simple, yet there are many configurations possible fo
 - [Basic oCIS setup]({{< ref "basic-remote-setup" >}}) - configure domain, certificates and port
 - [oCIS setup with Keycloak as identity provider]({{< ref "ocis_keycloak" >}})
 - [Flexible oCIS setup with WebOffice and Search capabilities]({{< ref "ocis_full" >}})
-- [Parallel deployment of oC10 and oCIS]({{< ref "oc10_ocis_parallel" >}})
 - [oCIS with the Hello extension example]({{< ref "ocis_hello" >}})
 
 
