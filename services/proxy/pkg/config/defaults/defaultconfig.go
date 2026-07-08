@@ -91,7 +91,6 @@ func DefaultConfig() *config.Config {
 			Email:       "email",
 			DisplayName: "name",
 			Groups:      "",
-			GroupCreate: false,
 		},
 		EnableBasicAuth:       false,
 		InsecureBackends:      false,

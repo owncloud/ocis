@@ -80,8 +80,7 @@ func (g *graphCalls) snapshot() ([]string, []string, []string) {
 		append([]string(nil), g.delMember...)
 }
 
-// newGraphServer emulates the libregraph endpoints SyncGroupMemberships calls, where
-// existingGroup exists without the user as a member and currentGroups are the user's memberships.
+// newGraphServer emulates the libregraph endpoints SyncGroupMemberships calls; existingGroup exists without the user as a member, currentGroups are the user's memberships.
 func newGraphServer(t *testing.T, existingGroup string, currentGroups []string, calls *graphCalls) *httptest.Server {
 	t.Helper()
 
@@ -228,41 +227,13 @@ func testUser() *cs3.User {
 	return &cs3.User{Id: &cs3.UserId{OpaqueId: "user-1"}}
 }
 
-// TestSyncGroupMemberships_CreateDisabled is the core regression test (OCISDEV-886): with GroupCreate=false a claim for a non-existing group must not create or join it, closing the group-injection path.
-func TestSyncGroupMemberships_CreateDisabled(t *testing.T) {
+// TestSyncGroupMemberships_ClaimSet_CreatesAndJoins verifies that with the claim configured, a non-existing claimed group is created and joined.
+func TestSyncGroupMemberships_ClaimSet_CreatesAndJoins(t *testing.T) {
 	calls := &graphCalls{}
 	srv := newGraphServer(t, "", nil, calls)
 	defer srv.Close()
 
-	b := newSyncBackend(t, srv, config.AutoProvisionClaims{
-		Groups:      "groups",
-		GroupCreate: false,
-	})
-
-	claims := map[string]interface{}{"groups": []interface{}{"new-group"}}
-	if err := b.SyncGroupMemberships(context.Background(), testUser(), claims); err != nil {
-		t.Fatal(err)
-	}
-
-	add, create, _ := calls.snapshot()
-	if len(create) != 0 {
-		t.Errorf("GroupCreate=false must not create groups, created: %v", create)
-	}
-	if len(add) != 0 {
-		t.Errorf("GroupCreate=false must not join groups, joined: %v", add)
-	}
-}
-
-// TestSyncGroupMemberships_CreateEnabled verifies GroupCreate=true creates a non-existing claimed group and joins the user.
-func TestSyncGroupMemberships_CreateEnabled(t *testing.T) {
-	calls := &graphCalls{}
-	srv := newGraphServer(t, "", nil, calls)
-	defer srv.Close()
-
-	b := newSyncBackend(t, srv, config.AutoProvisionClaims{
-		Groups:      "groups",
-		GroupCreate: true,
-	})
+	b := newSyncBackend(t, srv, config.AutoProvisionClaims{Groups: "groups"})
 
 	claims := map[string]interface{}{"groups": []interface{}{"new-group"}}
 	if err := b.SyncGroupMemberships(context.Background(), testUser(), claims); err != nil {
@@ -278,37 +249,27 @@ func TestSyncGroupMemberships_CreateEnabled(t *testing.T) {
 	}
 }
 
-// TestSyncGroupMemberships_ExistingGroupJoined pins the backward-compatible join-existing behaviour this PR preserves (gating the display-name join is deferred to the follow-up PR).
+// TestSyncGroupMemberships_ExistingGroupJoined verifies a claim naming an existing
+// group joins the user without re-creating it.
 func TestSyncGroupMemberships_ExistingGroupJoined(t *testing.T) {
-	for _, groupCreate := range []bool{false, true} {
-		name := "GroupCreate=false"
-		if groupCreate {
-			name = "GroupCreate=true"
-		}
-		t.Run(name, func(t *testing.T) {
-			calls := &graphCalls{}
-			// "admin" already exists as a local group; user is not yet a member.
-			srv := newGraphServer(t, "admin", nil, calls)
-			defer srv.Close()
+	calls := &graphCalls{}
+	// "admin" already exists as a local group; user is not yet a member.
+	srv := newGraphServer(t, "admin", nil, calls)
+	defer srv.Close()
 
-			b := newSyncBackend(t, srv, config.AutoProvisionClaims{
-				Groups:      "groups",
-				GroupCreate: groupCreate,
-			})
+	b := newSyncBackend(t, srv, config.AutoProvisionClaims{Groups: "groups"})
 
-			claims := map[string]interface{}{"groups": []interface{}{"admin"}}
-			if err := b.SyncGroupMemberships(context.Background(), testUser(), claims); err != nil {
-				t.Fatal(err)
-			}
+	claims := map[string]interface{}{"groups": []interface{}{"admin"}}
+	if err := b.SyncGroupMemberships(context.Background(), testUser(), claims); err != nil {
+		t.Fatal(err)
+	}
 
-			add, create, _ := calls.snapshot()
-			if len(add) != 1 || add[0] != "admin" {
-				t.Errorf("user should be joined to existing group 'admin', joined: %v", add)
-			}
-			if len(create) != 0 {
-				t.Errorf("an existing group must not be (re)created: %v", create)
-			}
-		})
+	add, create, _ := calls.snapshot()
+	if len(add) != 1 || add[0] != "admin" {
+		t.Errorf("user should be joined to existing group 'admin', joined: %v", add)
+	}
+	if len(create) != 0 {
+		t.Errorf("an existing group must not be (re)created: %v", create)
 	}
 }
 
@@ -319,10 +280,7 @@ func TestSyncGroupMemberships_Deprovision(t *testing.T) {
 	srv := newGraphServer(t, "", []string{"editors"}, calls)
 	defer srv.Close()
 
-	b := newSyncBackend(t, srv, config.AutoProvisionClaims{
-		Groups:      "groups",
-		GroupCreate: false,
-	})
+	b := newSyncBackend(t, srv, config.AutoProvisionClaims{Groups: "groups"})
 
 	claims := map[string]interface{}{"groups": []interface{}{}}
 	if err := b.SyncGroupMemberships(context.Background(), testUser(), claims); err != nil {

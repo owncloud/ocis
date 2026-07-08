@@ -328,14 +328,11 @@ func (c *cs3backend) SyncGroupMemberships(ctx context.Context, user *cs3.User, c
 
 	for group := range newGroupSet {
 		if _, exists := currentGroupSet[group]; !exists {
+			c.logger.Debug().Str("group", group).Msg("adding user to group")
+			// Check if group exists
 			lgGroup, err := c.getLibregraphGroup(newctx, lgClient, group)
 			switch {
 			case errors.Is(err, errGroupNotFound):
-				if !c.autoProvisionClaims.GroupCreate {
-					c.logger.Debug().Str("group", group).Msg("skipping group creation: disabled")
-					continue
-				}
-				c.logger.Debug().Str("group", group).Msg("creating group")
 				newGroup := libregraph.Group{}
 				newGroup.SetDisplayName(group)
 				req := lgClient.GroupsApi.CreateGroup(newctx).Group(newGroup)
@@ -371,7 +368,6 @@ func (c *cs3backend) SyncGroupMemberships(ctx context.Context, user *cs3.User, c
 				return err
 			}
 
-			c.logger.Debug().Str("group", group).Msg("adding user to group")
 			memberref := "https://localhost/graph/v1.0/users/" + user.GetId().GetOpaqueId()
 			resp, err := lgClient.GroupApi.AddMember(newctx, lgGroup.GetId()).MemberReference(
 				libregraph.MemberReference{

@@ -1,13 +1,10 @@
-Enhancement: Make OIDC group sync opt-in and disable claim-driven group creation
+Security: Make OIDC group sync opt-in
 
-**What changed.**
+**What changed.** `PROXY_AUTOPROVISION_CLAIM_GROUPS` now defaults to `""`, which disables OIDC group membership sync (and, with it, creation of local groups from claim values). It previously defaulted to `groups`. Setting it to a non-empty claim name restores the previous behaviour unchanged: memberships are synced and groups named in the claim are created if they do not exist locally.
 
-- `PROXY_AUTOPROVISION_CLAIM_GROUPS` now defaults to `""`, which disables OIDC group membership sync. It previously defaulted to `groups`.
-- The new `PROXY_AUTOPROVISION_GROUP_CREATE` flag (default `false`) controls whether a local group is created when the groups claim contains a name that does not exist locally. When disabled, such a claim value is skipped instead of creating a group.
+**Why.** With `PROXY_AUTOPROVISION_ACCOUNTS=true` and the previous `groups` default, the proxy synced group memberships from the OIDC `groups` claim on every authenticated request out of the box, creating local groups for any claim value that did not already exist. In identity providers that let ordinary users create groups with arbitrary names, this allowed an unprivileged user to inject group names into oCIS. Defaulting the claim to empty makes group sync an explicit opt-in.
 
-**Why.** With `PROXY_AUTOPROVISION_ACCOUNTS=true` and the previous `groups` default, the proxy synced group memberships from the OIDC `groups` claim on every authenticated request out of the box, creating local groups for any claim value that did not already exist. In identity providers that let ordinary users create groups with arbitrary names, this allowed an unprivileged user to inject group names into oCIS. Making sync opt-in and not creating groups from claims by default removes this exposure under the default configuration.
-
-**Upgrade note.** Deployments that relied on the previous `groups` default and did not set `PROXY_AUTOPROVISION_CLAIM_GROUPS` explicitly will stop syncing group memberships after upgrade. To keep syncing, set `PROXY_AUTOPROVISION_CLAIM_GROUPS=groups`; to also keep creating groups from claim values as before, additionally set `PROXY_AUTOPROVISION_GROUP_CREATE=true`.
+**Upgrade note.** Deployments that set `PROXY_AUTOPROVISION_CLAIM_GROUPS` explicitly are unaffected. Deployments that relied on the previous `groups` default without setting it will stop syncing group memberships after upgrade; set `PROXY_AUTOPROVISION_CLAIM_GROUPS=groups` to restore the previous behaviour.
 
 Note: matching claim values to existing local groups is still done by display name. Hardening that matching is tracked separately and is not part of this change.
 
