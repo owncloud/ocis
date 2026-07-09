@@ -49,6 +49,7 @@ type Config struct {
 	Notifications                         map[string]interface{}            `mapstructure:"notifications"`
 	IncludeOCMSharees                     bool                              `mapstructure:"include_ocm_sharees"`
 	ShowEmailInResults                    bool                              `mapstructure:"show_email_in_results"`
+	EnableUserSharing                     bool                              `mapstructure:"enable_user_sharing"`
 }
 
 // Init sets sane defaults

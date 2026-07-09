@@ -67,6 +67,7 @@ type config struct {
 	WriteableShareMustHavePassword bool                              `mapstructure:"writeable_share_must_have_password"`
 	PublicShareMustHavePassword    bool                              `mapstructure:"public_share_must_have_password"`
 	PasswordPolicy                 map[string]interface{}            `mapstructure:"password_policy"`
+	EnablePublicSharing            bool                              `mapstructure:"enable_public_sharing"`
 }
 
 type passwordPolicy struct {
@@ -212,6 +213,12 @@ func (s *service) CreatePublicShare(ctx context.Context, req *link.CreatePublicS
 	}
 
 	isInternalLink := grants.PermissionsEqual(req.GetGrant().GetPermissions().GetPermissions(), &provider.ResourcePermissions{})
+
+	if !isInternalLink && !s.conf.EnablePublicSharing {
+		return &link.CreatePublicShareResponse{
+			Status: status.NewPermissionDenied(ctx, nil, "public sharing is disabled"),
+		}, nil
+	}
 
 	sRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: req.GetResourceInfo().GetId()}})
 	if err != nil {

@@ -141,7 +141,6 @@ func (h *Handler) Init(c *config.Config) {
 	}
 
 	// h.c.Capabilities.FilesSharing.IsPublic.Enabled is boolean
-	h.c.Capabilities.FilesSharing.Public.Enabled = true
 
 	if h.c.Capabilities.FilesSharing.Public.Password == nil {
 		h.c.Capabilities.FilesSharing.Public.Password = &ocs.CapabilitiesFilesSharingPublicPassword{}
