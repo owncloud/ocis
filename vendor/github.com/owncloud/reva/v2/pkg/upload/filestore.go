@@ -128,6 +128,11 @@ func NewFileStore(root string, opts TokenOptions, log *zerolog.Logger) *FileStor
 	return &FileStore{root: root, opts: opts, log: log}
 }
 
+// Root returns the base directory of this FileStore.
+func (fs *FileStore) Root() string {
+	return fs.root
+}
+
 // Setup creates the uploads directory eagerly so permission problems are caught
 // at startup rather than on the first upload.
 func (fs *FileStore) Setup() error {

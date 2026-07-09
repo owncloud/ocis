@@ -21,6 +21,7 @@ package dataprovider
 import (
 	"fmt"
 	"net/http"
+	"path/filepath"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog"
@@ -124,7 +125,8 @@ func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) 
 	}
 	async := evstream != nil
 	coord, err := pkgupload.NewCoordinator(fs, store, evstream, async,
-		conf.MountID, conf.ConsumerGroup, conf.NumConsumers, log)
+		conf.MountID, conf.ConsumerGroup, conf.NumConsumers, log,
+		filepath.Join(store.Root(), "chunks"))
 	if err != nil {
 		return nil, err
 	}

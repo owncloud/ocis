@@ -74,6 +74,7 @@ type Session interface {
 	WriteChunk(ctx context.Context, offset int64, src io.Reader) (int64, error)
 
 	// Internal coordinator plumbing.
+	Chunk() string
 	BinPath() string
 	ProviderID() string
 	SpaceID() string
@@ -156,6 +157,11 @@ func (s *FileSession) Size() int64 {
 // Offset returns the current upload offset.
 func (s *FileSession) Offset() int64 {
 	return s.info.Offset
+}
+
+// Chunk returns the chunk basename stored in the session, or "" for non-chunked uploads.
+func (s *FileSession) Chunk() string {
+	return s.info.Storage["Chunk"]
 }
 
 // BinPath returns the path to the staged binary file.
@@ -256,6 +262,7 @@ func (s *FileSession) Metadata() map[string]string {
 		"mtime":        s.info.MetaData["mtime"],
 		"nodeExists":   s.info.Storage["NodeExists"],
 		"versionsPath": s.info.MetaData["versionsPath"],
+		"sessionID":    s.info.ID,
 	}
 }
 

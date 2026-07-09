@@ -666,6 +666,13 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 		return nil
 	}
 
+	if !srcStatRes.GetInfo().GetPermissionSet().GetInitiateFileDownload() {
+		w.WriteHeader(http.StatusForbidden)
+		b, err := errors.Marshal(http.StatusForbidden, "no permission to copy from this resource", "", "")
+		errors.HandleWebdavError(log, w, b, err)
+		return nil
+	}
+
 	dstStatReq := &provider.StatRequest{Ref: dstRef}
 	dstStatRes, err := client.Stat(ctx, dstStatReq)
 	switch {
