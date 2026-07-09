@@ -81,7 +81,6 @@ documentation resources:
 ## parallel deployment
 
 - [configure ocis with LDAP](https://owncloud.dev/ocis/deployment/ocis_ldap/)
-- [setup oC10 and ocis in parallel](https://owncloud.dev/ocis/deployment/oc10_ocis_parallel/)
 - create users and groups in LDAP
 
 documentation resources:
