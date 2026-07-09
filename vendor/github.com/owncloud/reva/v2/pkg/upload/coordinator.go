@@ -518,13 +518,18 @@ func (c *coordinator)InitiateUpload(ctx context.Context, ref *provider.Reference
 		}
 	} else {
 		if uploadLength > 0 {
-			if _, _, remaining, qErr := c.fs.GetQuota(ctx, ref); qErr == nil && remaining < uint64(uploadLength) {
+			// ref points to the not-yet-existing file; resolve the space root instead so GetQuota finds an existing node.
+			spaceRef := &provider.Reference{ResourceId: &provider.ResourceId{SpaceId: ref.GetResourceId().GetSpaceId()}}
+			if _, _, remaining, qErr := c.fs.GetQuota(ctx, spaceRef); qErr == nil && remaining < uint64(uploadLength) {
 				return nil, errtypes.InsufficientStorage("quota exceeded")
 			}
 		}
 
 		result, tfErr := c.fs.TouchFile(ctx, ref, false, mtime)
 		if tfErr != nil {
+			if _, ok := tfErr.(errtypes.IsNotFound); ok {
+				return nil, errtypes.PreconditionFailed(tfErr.Error())
+			}
 			return nil, tfErr
 		}
 		nodeID = result.ResourceID.GetOpaqueId()
@@ -718,17 +723,12 @@ func (c *coordinator)Upload(ctx context.Context, req storage.UploadRequest, uff 
 			c.rollback(ctx, session)
 			return nil, err
 		}
+		executingUser, _ := ctxpkg.ContextGetUser(ctx)
 		if err := events.Publish(ctx, c.pub, events.BytesReceived{
-			UploadID:   session.ID(),
-			URL:        s,
-			SpaceOwner: session.SpaceOwner(),
-			ExecutingUser: &user.User{
-				Id: &user.UserId{
-					Type:     session.Executant().Type,
-					Idp:      session.Executant().Idp,
-					OpaqueId: session.Executant().OpaqueId,
-				},
-			},
+			UploadID:      session.ID(),
+			URL:           s,
+			SpaceOwner:    session.SpaceOwner(),
+			ExecutingUser: executingUser,
 			ResourceID: &provider.ResourceId{
 				StorageId: session.ProviderID(),
 				SpaceId:   session.SpaceID(),

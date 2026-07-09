@@ -25,10 +25,10 @@ import (
 	"os"
 	"strings"
 
-	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
 
+	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/rhttp/datatx/metrics"
@@ -128,17 +128,12 @@ func (u *coordinatedUpload) FinishUpload(ctx context.Context) error {
 			u.coord.rollback(ctx, u.session)
 			return err
 		}
+		executingUser, _ := ctxpkg.ContextGetUser(ctx)
 		if err := events.Publish(ctx, u.coord.pub, events.BytesReceived{
-			UploadID:   u.session.ID(),
-			URL:        s,
-			SpaceOwner: u.session.SpaceOwner(),
-			ExecutingUser: &user.User{
-				Id: &user.UserId{
-					Type:     u.session.Executant().Type,
-					Idp:      u.session.Executant().Idp,
-					OpaqueId: u.session.Executant().OpaqueId,
-				},
-			},
+			UploadID:      u.session.ID(),
+			URL:           s,
+			SpaceOwner:    u.session.SpaceOwner(),
+			ExecutingUser: executingUser,
 			ResourceID: &provider.ResourceId{
 				StorageId: u.session.ProviderID(),
 				SpaceId:   u.session.SpaceID(),
