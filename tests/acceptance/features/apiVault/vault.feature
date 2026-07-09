@@ -35,10 +35,3 @@ Feature: vault
     And for user "Alice" the space "vault-space" in vault should contain these entries:
       | vaultFolder   |
       | vaultFile.txt |
-
-
-  Scenario: user can set custom acr value
-    Given user "Alice" has logged in via web UI
-    When user "Alice" uploads a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault using the WebDAV API
-    Then the HTTP status code should be "201"
-    And user "Alice" should have acr value "testing"

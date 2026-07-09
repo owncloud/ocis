@@ -358,7 +358,7 @@ class KeycloakHelper {
 			null,
 			null,
 			[
-				"Authorization" => "Bearer  " . self::getAdminAccessToken(),
+				"Authorization" => "Bearer " . self::getAdminAccessToken(),
 			],
 		);
 	}

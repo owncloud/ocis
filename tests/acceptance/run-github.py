@@ -147,9 +147,26 @@ LOCAL_API_TESTS = {
             "KC_URL": "https://localhost:8443"
         },
         "extraServerEnvironment": {
-            "OCIS_ENABLE_VAULT": "true",
-            "FRONTEND_ENAVLE_VAULT_MODE": "true",
+            "OCIS_ENABLE_VAULT_MODE": "true",
+            "FRONTEND_ENABLE_VAULT_MODE": "true",
             "OCIS_MFA_ENABLED": "true",
+            "SETTINGS_GRPC_ADDR": "localhost:9191",
+            # Keycloak as external OIDC provider — disable built-in IDP
+            "OCIS_EXCLUDE_RUN_SERVICES": "idp",
+            "OCIS_OIDC_ISSUER": "https://localhost:8443/realms/oCIS",
+            "PROXY_OIDC_REWRITE_WELLKNOWN": "true",
+            "PROXY_AUTOPROVISION_ACCOUNTS": "true",
+            "PROXY_ROLE_ASSIGNMENT_DRIVER": "oidc",
+            "PROXY_USER_OIDC_CLAIM": "preferred_username",
+            "PROXY_USER_CS3_CLAIM": "username",
+            "WEB_OIDC_CLIENT_ID": "web",
+            "KEYCLOAK_DOMAIN": "localhost:8443",
+            "OCIS_ADMIN_USER_ID": "",
+            "GRAPH_ASSIGN_DEFAULT_USER_ROLE": "false",
+            "GRAPH_USERNAME_MATCH": "none",
+            "IDM_CREATE_DEMO_USERS": "false",
+            "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
+            "WEB_OIDC_SCOPE": "openid profile email acr"
         }
     },
     "cliCommands": {
@@ -315,6 +332,20 @@ def ocis_healthy(ocis_url: str) -> bool:
         capture_output=True, text=True,
     )
     return r.stdout.strip() == "200"
+
+
+def ocis_proxy_ready() -> bool:
+    """Check ocis readiness via the proxy debug port (no auth required).
+
+    In vault mode PROXY_ROLE_ASSIGNMENT_DRIVER=oidc means basic-auth users
+    never receive the admin role, so /graph/v1.0/users/admin returns 403.
+    The proxy debug readyz endpoint (PROXY_DEBUG_ADDR 0.0.0.0:9205) is
+    unauthenticated and becomes available once the proxy is fully started.
+    """
+    return subprocess.run(
+        ["curl", "-sf", "http://localhost:9205/readyz"],
+        capture_output=True,
+    ).returncode == 0
 
 
 def mailpit_healthy() -> bool:
@@ -500,11 +531,7 @@ def main() -> int:
         print("postgres ready.")
 
         # Patch realm and start keycloak
-        realm_src = (
-            repo_root / "tests/config/ci/ocis-mfa-ci-realm.dist.json"
-            if cfg.get("vaultStorage")
-            else repo_root / "tests/config/ci/ocis-ci-realm.dist.json"
-        )
+        realm_src = repo_root / "tests/config/ci/ocis-mfa-ci-realm.dist.json"
         realm_patched = Path("/tmp/ocis-realm.json")
         realm_patched.write_text(
             realm_src.read_text()
@@ -525,7 +552,7 @@ def main() -> int:
              "-e", "KC_HTTPS_CERTIFICATE_FILE=/keycloak-certs/keycloakcrt.pem",
              "-e", "KC_HTTPS_CERTIFICATE_KEY_FILE=/keycloak-certs/keycloakkey.pem",
              "-v", f"{repo_root}/keycloak-certs:/keycloak-certs:ro",
-             "-v", "/tmp/ocis-realm.json:/opt/keycloak/data/import/oCIS-realm.json:ro",
+             "-v", "/tmp/ocis-realm.json:/opt/keycloak/data/import/ocis-mfa-ci-realm.dist.json:ro",
              KEYCLOAK_IMAGE,
              "start-dev", "--proxy-headers", "xforwarded",
              "--spi-connections-http-client-default-disable-trust-manager=true",
@@ -533,34 +560,8 @@ def main() -> int:
         wait_for(keycloak_healthy, 300, "keycloak", container="keycloak")
         print("keycloak ready.")
 
-    if cfg["vaultStorage"]:
-        vault_data_dir = Path.home() / "ocis/storage/users-vault"
-        vault_data_dir.mkdir(parents=True, exist_ok=True)
-        vault_env = {
-            **os.environ,
-            "OCIS_GATEWAY_GRPC_ADDR": "localhost:9142",
-            "OCIS_EVENTS_ENDPOINT": "localhost:9233",
-            "OCIS_CACHE_STORE_NODES": "localhost:9233",
-            "MICRO_REGISTRY_ADDRESS": "localhost:9233",
-            "OCIS_URL": ocis_url,
-            "STORAGE_USERS_ENABLE_VAULT_MODE": "true",
-            "STORAGE_USERS_SERVICE_NAME": "storage-users-vault",
-            "STORAGE_USERS_GRPC_ADDR": "localhost:19285",
-            "STORAGE_USERS_HTTP_ADDR": "localhost:19286",
-            "STORAGE_USERS_DATA_SERVER_URL": "https://localhost:19286",
-            "STORAGE_USERS_DEBUG_ADDR": "localhost:19287",
-            "STORAGE_USERS_OCIS_ROOT": str(vault_data_dir),
-            "STORAGE_USERS_EVENTS_CONSUMER_GROUP": "vault-dcfs",
-        }
-        print("Starting storage-users-vault...")
-        vault_proc = subprocess.Popen(
-            [str(ocis_bin), "storage-users", "server"],
-            env=vault_env,
-        )
-        procs.append(vault_proc)
-
     # init ocis
-    run([str(ocis_bin), "init", "--insecure", "true"])
+    run([str(ocis_bin), "init", "--insecure", "true", "--force-overwrite"])
     shutil.copy(
         repo_root / "tests/config/ci/app-registry.yaml",
         ocis_config_dir / "app-registry.yaml",
@@ -578,6 +579,22 @@ def main() -> int:
     server_env.update(base_server_env(repo_root, ocis_url, str(ocis_config_dir)))
     server_env["THUMBNAILS_TXT_FONTMAP_FILE"] = fontmap_tmp.name
     server_env.update(cfg["extraServerEnvironment"])
+    if cfg["vaultStorage"]:
+        server_env["PROXY_CSP_CONFIG_FILE_LOCATION"] = str(repo_root / "tests/config/ci/csp.yaml")
+
+    # Patch web UI config: replace container DNS name with localhost so the
+    # browser's 'self' CSP origin (localhost:9200) is not violated.
+    web_cfg_src = Path(server_env["WEB_UI_CONFIG_FILE"])
+    web_cfg_data = json.loads(
+        web_cfg_src.read_text().replace("ocis-server:9200", "localhost:9200")
+    )
+    if cfg["vaultStorage"]:
+        web_cfg_data.setdefault("openIdConnect", {})["scope"] = "openid profile email acr"
+    web_cfg_tmp = tempfile.NamedTemporaryFile(
+        mode="w", suffix=".json", prefix="ocis-web-config-", delete=False)
+    json.dump(web_cfg_data, web_cfg_tmp, indent=2)
+    web_cfg_tmp.close()
+    server_env["WEB_UI_CONFIG_FILE"] = web_cfg_tmp.name
 
     # start ociswrapper (primary ocis)
     print("Starting ocis...")
@@ -783,12 +800,48 @@ def main() -> int:
     signal.signal(signal.SIGINT, cleanup)
 
     try:
-        wait_for(lambda: ocis_healthy(ocis_url), 300, "ocis")
+        if cfg["vaultStorage"]:
+            # Basic auth is blocked in vault mode (OIDC role assignment),
+            # use the unauthenticated proxy debug readyz endpoint instead.
+            wait_for(ocis_proxy_ready, 300, "ocis")
+        else:
+            wait_for(lambda: ocis_healthy(ocis_url), 300, "ocis")
         print("ocis ready.")
 
         if cfg["federationServer"]:
             wait_for(lambda: ocis_healthy(ocis_fed_url), 300, "federation ocis")
             print("federation ocis ready.")
+
+        if cfg["vaultStorage"]:
+            vault_data_dir = Path.home() / "ocis/storage/users-vault"
+            vault_data_dir.mkdir(parents=True, exist_ok=True)
+            # Inherit the full server env so the process has PATH, OCIS_JWT_SECRET,
+            # OCIS_CONFIG_DIR, SSL settings, etc. — then override with vault-specific values.
+            vault_env = {
+                **server_env,
+                "STORAGE_USERS_ENABLE_VAULT_MODE": "true",
+                "STORAGE_USERS_SERVICE_NAME": "storage-users-vault",
+                "STORAGE_USERS_GRPC_ADDR": "localhost:19285",
+                "STORAGE_USERS_HTTP_ADDR": "localhost:19286",
+                "STORAGE_USERS_DATA_SERVER_URL": "http://localhost:19286/data",
+                "STORAGE_USERS_DEBUG_ADDR": "localhost:19287",
+                "STORAGE_USERS_OCIS_ROOT": str(vault_data_dir),
+                "STORAGE_USERS_EVENTS_CONSUMER_GROUP": "vault-dcfs",
+            }
+            print("Starting storage-users-vault...")
+            vault_proc = subprocess.Popen(
+                [str(ocis_bin), "storage-users", "server"],
+                env=vault_env,
+            )
+            procs.append(vault_proc)
+            wait_for(
+                lambda: subprocess.run(
+                    ["curl", "-sf", "http://localhost:19287/healthz"],
+                    capture_output=True,
+                ).returncode == 0,
+                120, "storage-users-vault",
+            )
+            print("vault ready.")
 
         # expected failures file
         if acceptance_test_type == "core-api":
