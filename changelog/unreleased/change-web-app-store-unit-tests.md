@@ -5,4 +5,4 @@ repositories pinia stores and the app list overview (no-content state, tile
 rendering, search filtering and reflecting the search term into the route query).
 
 https://github.com/owncloud/web/issues/11634
-https://github.com/owncloud/ocis/pull/PRNUMBER
+https://github.com/owncloud/ocis/pull/12545
