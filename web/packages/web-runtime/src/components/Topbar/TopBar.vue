@@ -64,6 +64,7 @@
           v-bind="feedbackLinkOptions"
         />
         <universal-access-dropdown v-if="isUniversalAccessEnabled" />
+        <help-menu v-if="!hideAccountMenu" />
       </portal>
       <portal to="app.runtime.header.right" :order="100">
         <notifications v-if="isNotificationBellEnabled && !hideAccountMenu" />
@@ -84,6 +85,7 @@ import Notifications from './Notifications.vue'
 import FeedbackLink from './FeedbackLink.vue'
 import SideBarToggle from './SideBarToggle.vue'
 import UniversalAccessDropdown from './UniversalAccessDropdown.vue'
+import HelpMenu from './HelpMenu.vue'
 import {
   ApplicationInformation,
   CustomComponentTarget,
@@ -107,6 +109,7 @@ export default {
     ApplicationsMenu,
     CustomComponentTarget,
     FeedbackLink,
+    HelpMenu,
     Notifications,
     SideBarToggle,
     UserMenu,

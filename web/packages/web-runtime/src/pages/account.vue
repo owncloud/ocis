@@ -40,6 +40,34 @@
             <span v-else v-text="$gettext('No email has been set up')" />
           </oc-td>
         </oc-tr>
+        <oc-tr v-if="softwareLicenseUrl" class="account-page-info-software-license">
+          <oc-td>{{ $gettext('Software License Information') }}</oc-td>
+          <oc-td>
+            <oc-button
+              type="a"
+              appearance="raw"
+              :href="softwareLicenseUrl"
+              target="_blank"
+              data-testid="account-page-software-license-link"
+            >
+              {{ softwareLicenseUrl }}
+            </oc-button>
+          </oc-td>
+        </oc-tr>
+        <oc-tr v-if="helpPageUrl" class="account-page-info-help-page">
+          <oc-td>{{ $gettext('Help Pages') }}</oc-td>
+          <oc-td>
+            <oc-button
+              type="a"
+              appearance="raw"
+              :href="helpPageUrl"
+              target="_blank"
+              data-testid="account-page-help-page-link"
+            >
+              {{ helpPageUrl }}
+            </oc-button>
+          </oc-td>
+        </oc-tr>
         <oc-tr
           v-if="user.crossInstanceReference"
           class="account-page-info-cross-instance-reference"
@@ -338,6 +366,7 @@ import {
   useModals,
   useResourcesStore,
   useSpacesStore,
+  useThemeStore,
   useUserStore,
   useSharesStore,
   useClipboard
@@ -392,6 +421,7 @@ export default defineComponent({
     const spacesStore = useSpacesStore()
     const capabilityStore = useCapabilityStore()
     const configStore = useConfigStore()
+    const themeStore = useThemeStore()
     const {
       options: notificationsOptions,
       emailOptions: emailNotificationsOptions,
@@ -829,6 +859,8 @@ export default defineComponent({
       updateDisableEmailNotifications,
       updateViewOptionsWebDavDetails,
       accountEditLink: computed(() => configStore.options.accountEditLink),
+      softwareLicenseUrl: computed(() => themeStore.currentTheme.common?.urls?.softwareLicense),
+      helpPageUrl: computed(() => themeStore.currentTheme.common?.urls?.helpPage),
       showLogout,
       showGdprExport,
       showNotifications,
