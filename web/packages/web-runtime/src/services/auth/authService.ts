@@ -26,6 +26,40 @@ import { PublicLinkType } from '@ownclouders/web-client'
 import { WebWorkersStore } from '@ownclouders/web-pkg'
 import { isSilentRedirectRoute } from '../../helpers/silentRedirect'
 
+/**
+ * Distinguishes a transient network/connectivity failure from a genuine
+ * authentication rejection.
+ *
+ * When the context is (re-)established on page reload, user data is fetched over
+ * HTTP. If that request fails because of a temporary connectivity issue (offline,
+ * DNS, a page refresh cancelling in-flight requests, ...) we must NOT treat it like
+ * an expired/invalid token and tear down the session. Only errors that carry an HTTP
+ * response (e.g. a `401`) are real auth rejections.
+ *
+ * Recognised connectivity failures:
+ * - Axios errors without an HTTP `response`, with code `ERR_NETWORK` (connection
+ *   refused / DNS / CORS / offline) or `ECONNABORTED` (timeout).
+ * - Browser `fetch` failures, which surface as a `TypeError` (Safari: "Load failed",
+ *   Chromium: "Failed to fetch", Firefox: "NetworkError when attempting to fetch ...").
+ */
+export const isNetworkError = (e: unknown): boolean => {
+  if (e instanceof TypeError) {
+    return /load failed|failed to fetch|networkerror/i.test(e.message)
+  }
+
+  if (e && typeof e === 'object') {
+    const err = e as { response?: unknown; code?: string }
+    // An error that carries an HTTP response is an answered request, not a
+    // connectivity failure - let the regular auth-error handling deal with it.
+    if (err.response) {
+      return false
+    }
+    return err.code === 'ERR_NETWORK' || err.code === 'ECONNABORTED'
+  }
+
+  return false
+}
+
 export class AuthService implements AuthServiceInterface {
   private clientService: ClientService
   private configStore: ConfigStore
@@ -194,7 +228,11 @@ export class AuthService implements AuthServiceInterface {
             this.updateMfaExpiryTimer()
           } catch (e) {
             console.error(e)
-            await this.handleAuthError(unref(this.router.currentRoute))
+            // A transient connectivity failure must not force a logout - keep the
+            // session and let the regular auth flow recover once back online.
+            if (!isNetworkError(e)) {
+              await this.handleAuthError(unref(this.router.currentRoute))
+            }
           }
         })
 
@@ -259,7 +297,11 @@ export class AuthService implements AuthServiceInterface {
           }
         } catch (e) {
           console.error(e)
-          await this.handleAuthError(unref(this.router.currentRoute))
+          // A transient connectivity failure must not force a logout - keep the
+          // session and let the regular auth flow recover once back online.
+          if (!isNetworkError(e)) {
+            await this.handleAuthError(unref(this.router.currentRoute))
+          }
         }
       }
     }
