@@ -267,6 +267,14 @@ func (d *Driver) Upload(_ context.Context, _ storage.UploadRequest, _ storage.Up
 	return nil, errtypes.NotSupported("kiteworks: read-only driver")
 }
 
+func (d *Driver) MarkProcessing(_ context.Context, _ *provider.Reference, _ bool, _ string) error {
+	return errtypes.NotSupported("kiteworks: read-only driver")
+}
+
+func (d *Driver) CommitUpload(_ context.Context, _ *provider.Reference, _ storage.UploadSource) (*provider.ResourceInfo, error) {
+	return nil, errtypes.NotSupported("kiteworks: read-only driver")
+}
+
 func (d *Driver) RestoreRevision(_ context.Context, _ *provider.Reference, _ string) (*storage.RestoreRevisionResult, error) {
 	return nil, errtypes.NotSupported("kiteworks: read-only driver")
 }
@@ -338,4 +346,3 @@ func (d *Driver) CreateHome(_ context.Context) error {
 func (d *Driver) GetHome(_ context.Context) (string, error) {
 	return "", errtypes.NotSupported("kiteworks: read-only driver")
 }
-

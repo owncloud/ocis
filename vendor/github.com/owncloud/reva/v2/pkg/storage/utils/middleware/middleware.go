@@ -361,6 +361,60 @@ func (f *FS) Upload(ctx context.Context, req storage.UploadRequest, uploadFunc s
 	return res0, res1
 }
 
+func (f *FS) MarkProcessing(ctx context.Context, ref *provider.Reference, processing bool, sessionID string) error {
+	var (
+		err     error
+		unhook  UnHook
+		unhooks []UnHook
+	)
+	for _, hook := range f.hooks {
+		ctx, unhook, err = hook("MarkProcessing", ctx, ref.GetResourceId().GetSpaceId())
+		if err != nil {
+			return err
+		}
+		if unhook != nil {
+			unhooks = append(unhooks, unhook)
+		}
+	}
+
+	res := f.next.MarkProcessing(ctx, ref, processing, sessionID)
+
+	for _, unhook := range unhooks {
+		if err := unhook(); err != nil {
+			return err
+		}
+	}
+
+	return res
+}
+
+func (f *FS) CommitUpload(ctx context.Context, ref *provider.Reference, source storage.UploadSource) (*provider.ResourceInfo, error) {
+	var (
+		err     error
+		unhook  UnHook
+		unhooks []UnHook
+	)
+	for _, hook := range f.hooks {
+		ctx, unhook, err = hook("CommitUpload", ctx, ref.GetResourceId().GetSpaceId())
+		if err != nil {
+			return nil, err
+		}
+		if unhook != nil {
+			unhooks = append(unhooks, unhook)
+		}
+	}
+
+	res0, res1 := f.next.CommitUpload(ctx, ref, source)
+
+	for _, unhook := range unhooks {
+		if err := unhook(); err != nil {
+			return nil, err
+		}
+	}
+
+	return res0, res1
+}
+
 func (f *FS) Download(ctx context.Context, ref *provider.Reference, openReaderFunc func(md *provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
 	var (
 		err     error
