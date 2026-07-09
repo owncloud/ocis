@@ -5,4 +5,4 @@ extension, covering its visibility predicate and its file-creation,
 editor-navigation and error-handling flow.
 
 https://github.com/owncloud/web/issues/11786
-https://github.com/owncloud/ocis/pull/PRNUMBER
+https://github.com/owncloud/ocis/pull/12544
