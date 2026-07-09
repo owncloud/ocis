@@ -26,7 +26,9 @@ const CommonSection = z.object({
     privacy: z.string(),
     accessibilityStatement: z.string().optional(),
     universalAccessEasyLanguage: z.string().optional(),
-    universalAccessSignLanguage: z.string().optional()
+    universalAccessSignLanguage: z.string().optional(),
+    softwareLicense: z.string().optional(),
+    helpPage: z.string().optional()
   }),
   shareRoles: z.record(
     z.string(),

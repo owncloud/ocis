@@ -28,6 +28,8 @@ exports[`account page > account information section > displays basic user inform
       </tr>
       <!--v-if-->
       <!--v-if-->
+      <!--v-if-->
+      <!--v-if-->
       <tr class="account-page-info-groups">
         <td class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-auto oc-td">Group memberships</td>
         <td class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-auto oc-td" data-testid="group-names"><span data-testid="group-names-empty">You are not part of any group</span></td>
