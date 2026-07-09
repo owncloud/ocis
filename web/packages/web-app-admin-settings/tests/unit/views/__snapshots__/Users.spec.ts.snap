@@ -37,7 +37,7 @@ exports[`Users view > list view > renders initially warning if filters are manda
               <!--v-if-->
               <!--v-if-->
             </div>
-            <oc-button-stub data-v-10ab5d2a="" type="button" disabled="false" size="medium" submit="button" variation="passive" appearance="raw" justifycontent="center" gapsize="medium" showspinner="false" id="users-filter-confirm" class="oc-ml-xs"></oc-button-stub>
+            <oc-button-stub data-v-10ab5d2a="" type="button" disabled="false" size="medium" arialabel="Search" submit="button" variation="passive" appearance="raw" justifycontent="center" gapsize="medium" showspinner="false" id="users-filter-confirm" class="oc-ml-xs"></oc-button-stub>
           </div>
         </div>
         <div>
@@ -87,7 +87,7 @@ exports[`Users view > list view > renders list initially 1`] = `
               <!--v-if-->
               <!--v-if-->
             </div>
-            <oc-button-stub data-v-10ab5d2a="" type="button" disabled="false" size="medium" submit="button" variation="passive" appearance="raw" justifycontent="center" gapsize="medium" showspinner="false" id="users-filter-confirm" class="oc-ml-xs"></oc-button-stub>
+            <oc-button-stub data-v-10ab5d2a="" type="button" disabled="false" size="medium" arialabel="Search" submit="button" variation="passive" appearance="raw" justifycontent="center" gapsize="medium" showspinner="false" id="users-filter-confirm" class="oc-ml-xs"></oc-button-stub>
           </div>
         </div>
         <div>
