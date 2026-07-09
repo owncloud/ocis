@@ -91,6 +91,7 @@ func DefaultConfig() *config.Config {
 				UseServerUUID:            false,
 				UsePasswordModExOp:       true,
 				WriteEnabled:             true,
+				UpdateUserLastSignInDate: true,
 				UserBaseDN:               "ou=users,o=libregraph-idm",
 				UserSearchScope:          "sub",
 				UserFilter:               "",
