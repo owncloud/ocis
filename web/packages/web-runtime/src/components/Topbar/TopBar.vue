@@ -9,7 +9,18 @@
         v-if="appMenuExtensions.length && !isEmbedModeEnabled && !hideAppSwitcher"
         :menu-items="appMenuExtensions"
       />
-      <router-link v-if="!hideLogo" :to="homeLink" class="oc-logo-href">
+      <!-- eslint-disable-next-line vuejs-accessibility/anchor-has-content -->
+      <a v-if="!hideLogo && logoHref" :href="logoHref" class="oc-logo-href">
+        <oc-responsive-image
+          :src="{
+            xs: currentTheme.logo.topbarSm,
+            md: currentTheme.logo.topbar
+          }"
+          :alt="sidebarLogoAlt"
+          class="oc-logo-image"
+        />
+      </a>
+      <router-link v-else-if="!hideLogo" :to="homeLink" class="oc-logo-href">
         <oc-responsive-image
           :src="{
             xs: currentTheme.logo.topbarSm,
@@ -149,6 +160,8 @@ export default {
       )
     })
 
+    const logoHref = computed(() => unref(currentTheme).logo.href)
+
     const homeLink = computed(() => {
       if (authStore.publicLinkContextReady && !authStore.userContextReady) {
         return {
@@ -228,6 +241,7 @@ export default {
       isEmbedModeEnabled,
       isSideBarToggleVisible,
       isSideBarToggleDisabled,
+      logoHref,
       homeLink,
       topBarCenterExtensionPoint,
       appMenuExtensions,
