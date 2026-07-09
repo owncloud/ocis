@@ -160,8 +160,9 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"gatewaysvc":      cfg.Reva.Address,
 					"provider_domain": providerDomain,
 					"webdav_endpoint": cfg.Commons.OcisURL,
-					"webapp_template": cfg.OCMShareProvider.WebappTemplate,
-					"client_insecure": cfg.OCMShareProvider.Insecure,
+					"webapp_template":     cfg.OCMShareProvider.WebappTemplate,
+					"client_insecure":     cfg.OCMShareProvider.Insecure,
+					"enable_user_sharing": cfg.OCMShareProvider.EnableUserSharing,
 				},
 				"ocmcore": map[string]interface{}{
 					"driver": cfg.OCMCore.Driver,

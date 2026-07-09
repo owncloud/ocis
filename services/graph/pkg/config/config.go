@@ -44,6 +44,8 @@ type Config struct {
 
 	EnableVaultMode bool `yaml:"enable_vault_mode" env:"OCIS_ENABLE_VAULT_MODE;GRAPH_ENABLE_VAULT_MODE" desc:"Enable vault mode in addition to the regular graph service. This only applies when the additional storage-users-vault service is running, which is a special configured storage-users service." introductionVersion:"8.1.0"`
 
+	EnableUserSharing bool `yaml:"enable_user_sharing" env:"OCIS_ENABLE_USER_SHARING" desc:"Enables direct sharing with users and groups. When disabled, creating new user, group or federated shares via the drive item invite endpoints is rejected. Public link sharing and space membership are not affected." introductionVersion:"%%NEXT_PRODUCTION_VERSION%%"`
+
 	Context context.Context `yaml:"-"`
 }
 

@@ -109,7 +109,6 @@ func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Sele
 
 // Invite invites a user to a drive item.
 func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
-
 	ctx, span := s.tp.Tracer("graph").Start(ctx, "Invite")
 	defer span.End()
 
@@ -123,6 +122,10 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 	if err := errorcode.FromStat(statResponse, err); err != nil {
 		s.logger.Error().Err(err).Str("resourceId", resourceId.GetStorageId()).Interface("stat.res", statResponse).Msg("stat failed")
 		return libregraph.Permission{}, err
+	}
+
+	if !s.config.EnableUserSharing && !IsSpaceRoot(statResponse.GetInfo().GetId()) {
+		return libregraph.Permission{}, errorcode.New(errorcode.NotAllowed, "direct sharing is disabled")
 	}
 
 	var condition string
@@ -321,6 +324,7 @@ func createShareRequestToGroup(group libregraph.Group, info *storageprovider.Res
 		},
 	}
 }
+
 func createShareRequestToUser(user libregraph.User, info *storageprovider.ResourceInfo, cs3ResourcePermissions *storageprovider.ResourcePermissions) *collaboration.CreateShareRequest {
 	return &collaboration.CreateShareRequest{
 		ResourceInfo: info,
@@ -337,6 +341,7 @@ func createShareRequestToUser(user libregraph.User, info *storageprovider.Resour
 		},
 	}
 }
+
 func createShareRequestToFederatedUser(user libregraph.User, resourceId *storageprovider.ResourceId, providerInfo *ocmprovider.ProviderInfo, cs3ResourcePermissions *storageprovider.ResourcePermissions) *ocm.CreateOCMShareRequest {
 	return &ocm.CreateOCMShareRequest{
 		ResourceId: resourceId,
@@ -363,7 +368,6 @@ func createShareRequestToFederatedUser(user libregraph.User, resourceId *storage
 
 // SpaceRootInvite handles invitation request on project spaces
 func (s DriveItemPermissionsService) SpaceRootInvite(ctx context.Context, driveID *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
-
 	ctx, span := s.tp.Tracer("graph").Start(ctx, "SpaceRootInvite")
 	defer span.End()
 
@@ -391,7 +395,6 @@ func (s DriveItemPermissionsService) SpaceRootInvite(ctx context.Context, driveI
 
 // ListPermissions lists the permissions of a driveItem
 func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId, listFederatedRoles, selectRoles, selectActions bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
-
 	ctx, span := s.tp.Tracer("graph").Start(ctx, "ListPermissions")
 	defer span.End()
 
@@ -508,7 +511,6 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 
 // ListSpaceRootPermissions handles ListPermissions request on project spaces
 func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
-
 	ctx, span := s.tp.Tracer("graph").Start(ctx, "ListSpaceRootPermissions")
 	defer span.End()
 
@@ -559,7 +561,6 @@ func (s DriveItemPermissionsService) GetPermission(ctx context.Context, itemID *
 
 // DeletePermission deletes a permission from a drive item
 func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string) error {
-
 	ctx, span := s.tp.Tracer("graph").Start(ctx, "DeletePermission")
 	defer span.End()
 
@@ -652,7 +653,6 @@ func (s DriveItemPermissionsService) resolveItemPermission(ctx context.Context, 
 
 // DeleteSpaceRootPermission deletes a permission on the root item of a project space
 func (s DriveItemPermissionsService) DeleteSpaceRootPermission(ctx context.Context, driveID *storageprovider.ResourceId, permissionID string) error {
-
 	ctx, span := s.tp.Tracer("graph").Start(ctx, "DeleteSpaceRootPermission")
 	defer span.End()
 
@@ -680,7 +680,6 @@ func (s DriveItemPermissionsService) DeleteSpaceRootPermission(ctx context.Conte
 
 // UpdatePermission updates a permission on a drive item
 func (s DriveItemPermissionsService) UpdatePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error) {
-
 	ctx, span := s.tp.Tracer("graph").Start(ctx, "UpdatePermission")
 	defer span.End()
 
@@ -735,7 +734,6 @@ func (s DriveItemPermissionsService) UpdatePermission(ctx context.Context, itemI
 
 // UpdateSpaceRootPermission updates a permission on the root item of a project space
 func (s DriveItemPermissionsService) UpdateSpaceRootPermission(ctx context.Context, driveID *storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error) {
-
 	ctx, span := s.tp.Tracer("graph").Start(ctx, "UpdateSpaceRootPermission")
 	defer span.End()
 
@@ -764,7 +762,6 @@ func (s DriveItemPermissionsService) UpdateSpaceRootPermission(ctx context.Conte
 
 // GetSpaceRootPermission handles requests to fetch a single permission on a space root
 func (s DriveItemPermissionsService) GetSpaceRootPermission(ctx context.Context, driveID *storageprovider.ResourceId, permissionID string) (libregraph.Permission, error) {
-
 	ctx, span := s.tp.Tracer("graph").Start(ctx, "GetSpaceRootPermission")
 	defer span.End()
 
@@ -865,7 +862,6 @@ func (api DriveItemPermissionsApi) SpaceRootInvite(w http.ResponseWriter, r *htt
 		return
 	}
 	permission, err := api.driveItemPermissionsService.SpaceRootInvite(ctx, &driveID, *driveItemInvite)
-
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -937,7 +933,6 @@ func (api DriveItemPermissionsApi) ListSpaceRootPermissions(w http.ResponseWrite
 
 	ctx := r.Context()
 	permissions, err := api.driveItemPermissionsService.ListSpaceRootPermissions(ctx, &driveID)
-
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
