@@ -28,7 +28,7 @@
           class="oc-py-xs"
           appearance="raw"
           variation="primary"
-          :aria-label="$gettext('Show image %{index}', { index: index + 1 })"
+          :aria-label="$gettext('Show image %{index}', { index: `${index + 1}` })"
           @click="setImageIndex(index)"
         >
           <oc-icon

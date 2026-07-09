@@ -349,10 +349,7 @@ export const openSpaceAdminActionSidebarPanel = async (args: {
   }
   const panelSelector = page.locator(util.format(sideBarActionButtons, action))
   const nextPanel = page.locator(util.format(siderBarActionPanel, action))
-  await Promise.all([
-    locatorUtils.waitForEvent(nextPanel, 'transitionend'),
-    panelSelector.click()
-  ])
+  await Promise.all([locatorUtils.waitForEvent(nextPanel, 'transitionend'), panelSelector.click()])
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
     ['appSidebar'],
