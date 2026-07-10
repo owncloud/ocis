@@ -1380,11 +1380,12 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has created a (?:folder|subfolder) "([^"]*)" in space "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has created a (?:folder|subfolder) "([^"]*)" in space "([^"]*)"(| in vault)?$/
 	 *
 	 * @param string $user
 	 * @param string $folder
 	 * @param string $spaceName
+	 * @param string $isVault
 	 *
 	 * @return void
 	 *
@@ -1394,13 +1395,15 @@ class SpacesContext implements Context {
 		string $user,
 		string $folder,
 		string $spaceName,
+		string $isVault,
 	): void {
 		$folder = \trim($folder, '/');
 		$paths = explode('/', $folder);
 		$folderPath = '';
+		$isVault = trim($isVault) === "in vault";
 		foreach ($paths as $path) {
 			$folderPath .= "$path/";
-			$response = $this->createFolderInSpace($user, $folderPath, $spaceName);
+			$response = $this->createFolderInSpace($user, $folderPath, $spaceName, '', $isVault);
 		}
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
