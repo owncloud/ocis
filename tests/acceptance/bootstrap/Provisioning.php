@@ -2084,21 +2084,17 @@ trait Provisioning {
 			$this->usingServer($userData["serverType"]);
 
 			$user = $userData['actualUsername'];
-			try {
-				$response = $this->deleteUser($user);
-				$this->theHTTPStatusCodeShouldBe(204, "Failed to delete user '$user'", $response);
-				Assert::assertFalse(
-					$this->userExists($user),
-					"User '$user' should not exist but does exist",
-				);
-			} catch (\Throwable $e) {
-				echo "oCIS user deletion failed for '$user' " . $e->getMessage();
-			} finally {
-				// delete user from keycloak
-				if (KeycloakHelper::isTestingWithKeycloak()) {
-					$res = KeycloakHelper::deleteKeycloakUser($userData['id']);
-					$this->theHTTPStatusCodeShouldBe(204, "Failed to delete keycloak user '$user'", $res);
-				}
+			$response = $this->deleteUser($user);
+			$this->theHTTPStatusCodeShouldBe(204, "Failed to delete user '$user'", $response);
+			Assert::assertFalse(
+				$this->userExists($user),
+				"User '$user' should not exist but does exist",
+			);
+
+			// delete user from keycloak
+			if (KeycloakHelper::isTestingWithKeycloak()) {
+				$res = KeycloakHelper::deleteKeycloakUser($userData['id']);
+				$this->theHTTPStatusCodeShouldBe(204, "Failed to delete keycloak user '$user'", $res);
 			}
 		}
 		$this->usingServer($previousServer);
