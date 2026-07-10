@@ -406,7 +406,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSearchContent/metadataSerch.feature:53](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/metadataSerch.feature#L53)
 - [apiSearchContent/metadataSerch.feature:78](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/metadataSerch.feature#L78)
 - [apiSearchContent/metadataSerch.feature:108](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/metadataSerch.feature#L108)
-- [apiSearchContent/metadataSerch.feature:138](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/metadataSerch.feature#L138)
+- [apiSearchContent/metadataSerch.feature:140](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/metadataSerch.feature#L140)
 
 
 Note: always have an empty line at the end of this file.
