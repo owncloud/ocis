@@ -1100,7 +1100,8 @@ func (api DriveItemPermissionsApi) UpdatePermission(w http.ResponseWriter, r *ht
 		return
 	}
 
-	ctx := r.Context()
+	// enforce the admin role allowlist on updates, same as invite
+	ctx := validate.ContextWithAllowedRoleIDs(r.Context(), api.config.UnifiedRoles.AvailableRoles)
 	if err = validate.StructCtx(ctx, permission); err != nil {
 		api.logger.Error().Err(err).Interface("Body", r.Body).Msg("invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
@@ -1139,7 +1140,8 @@ func (api DriveItemPermissionsApi) UpdateSpaceRootPermission(w http.ResponseWrit
 		return
 	}
 
-	ctx := r.Context()
+	// enforce the admin role allowlist on updates, same as invite
+	ctx := validate.ContextWithAllowedRoleIDs(r.Context(), api.config.UnifiedRoles.AvailableRoles)
 	if err = validate.StructCtx(ctx, permission); err != nil {
 		api.logger.Error().Err(err).Interface("Body", r.Body).Msg("invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
