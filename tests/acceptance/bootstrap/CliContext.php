@@ -1301,11 +1301,11 @@ class CliContext implements Context {
 	}
 
 	/**
-	 * @When the administrator gets a blob from the blobstore using the CLI
+	 * @When the administrator tries to get a blob from the blobstore using the CLI
 	 *
 	 * @return void
 	 */
-	public function theAdministratorGetsABlobFromTheBlobstoreUsingTheCli(): void {
+	public function theAdministratorTriesToGetABlobFromTheBlobstoreUsingTheCli(): void {
 		$body = ["command" => "storage-users blobstore get"];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
