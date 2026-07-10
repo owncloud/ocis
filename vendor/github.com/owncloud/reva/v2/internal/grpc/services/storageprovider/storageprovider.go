@@ -230,7 +230,7 @@ func New(m map[string]interface{}, ss *grpc.Server, log *zerolog.Logger) (rgrpc.
 	async := evstream != nil
 	coord, err := pkgupload.NewCoordinator(fs, store, evstream, async,
 		c.MountID, c.Events.ConsumerGroup, c.Events.NumConsumers, log,
-		filepath.Join(store.Root(), "chunks"))
+		filepath.Join(store.Root(), "uploads"))
 	if err != nil {
 		return nil, err
 	}
