@@ -13,7 +13,7 @@ require (
 	github.com/beevik/etree v1.6.0
 	github.com/blevesearch/bleve/v2 v2.6.0
 	github.com/cenkalti/backoff v2.2.1+incompatible
-	github.com/coreos/go-oidc/v3 v3.19.0
+	github.com/coreos/go-oidc/v3 v3.20.0
 	github.com/cs3org/go-cs3apis v0.0.0-20241105092511-3ad35d174fc1
 	github.com/davidbyttow/govips/v2 v2.18.0
 	github.com/dhowden/tag v0.0.0-20240417053706-3d75831295e8
@@ -21,7 +21,7 @@ require (
 	github.com/egirna/icap-client v0.1.1
 	github.com/gabriel-vasile/mimetype v1.4.13
 	github.com/ggwhite/go-masker v1.1.0
-	github.com/go-chi/chi/v5 v5.3.0
+	github.com/go-chi/chi/v5 v5.3.1
 	github.com/go-chi/httprate v0.16.0
 	github.com/go-chi/render v1.0.3
 	github.com/go-ldap/ldap/v3 v3.4.13
@@ -96,14 +96,14 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.44.0
 	go.opentelemetry.io/otel/sdk v1.44.0
 	go.opentelemetry.io/otel/trace v1.44.0
-	golang.org/x/crypto v0.53.0
+	golang.org/x/crypto v0.54.0
 	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f
-	golang.org/x/image v0.43.0
-	golang.org/x/net v0.56.0
+	golang.org/x/image v0.44.0
+	golang.org/x/net v0.57.0
 	golang.org/x/oauth2 v0.36.0
-	golang.org/x/sync v0.21.0
-	golang.org/x/term v0.44.0
-	golang.org/x/text v0.38.0
+	golang.org/x/sync v0.22.0
+	golang.org/x/term v0.45.0
+	golang.org/x/text v0.40.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260526163538-3dc84a4a5aaa
 	google.golang.org/grpc v1.82.0
 	google.golang.org/protobuf v1.36.11
@@ -341,10 +341,10 @@ require (
 	go.uber.org/zap v1.27.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/mod v0.36.0 // indirect
-	golang.org/x/sys v0.46.0 // indirect
+	golang.org/x/mod v0.37.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
-	golang.org/x/tools v0.45.0 // indirect
+	golang.org/x/tools v0.47.0 // indirect
 	google.golang.org/genproto v0.0.0-20260319201613-d00831a3d3e7 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa // indirect
 	gopkg.in/cenkalti/backoff.v1 v1.1.0 // indirect
