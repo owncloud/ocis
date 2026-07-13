@@ -561,7 +561,7 @@ def main() -> int:
         print("keycloak ready.")
 
     # init ocis
-    run([str(ocis_bin), "init", "--insecure", "true", "--force-overwrite"])
+    run([str(ocis_bin), "init", "--insecure", "true"])
     shutil.copy(
         repo_root / "tests/config/ci/app-registry.yaml",
         ocis_config_dir / "app-registry.yaml",
@@ -579,8 +579,6 @@ def main() -> int:
     server_env.update(base_server_env(repo_root, ocis_url, str(ocis_config_dir)))
     server_env["THUMBNAILS_TXT_FONTMAP_FILE"] = fontmap_tmp.name
     server_env.update(cfg["extraServerEnvironment"])
-    if cfg["vaultStorage"]:
-        server_env["PROXY_CSP_CONFIG_FILE_LOCATION"] = str(repo_root / "tests/config/ci/csp.yaml")
 
     # Patch web UI config: replace container DNS name with localhost so the
     # browser's 'self' CSP origin (localhost:9200) is not violated.
@@ -590,6 +588,7 @@ def main() -> int:
     )
     if cfg["vaultStorage"]:
         web_cfg_data.setdefault("openIdConnect", {})["scope"] = "openid profile email acr"
+        server_env["PROXY_CSP_CONFIG_FILE_LOCATION"] = str(repo_root / "tests/config/ci/csp.yaml")
     web_cfg_tmp = tempfile.NamedTemporaryFile(
         mode="w", suffix=".json", prefix="ocis-web-config-", delete=False)
     json.dump(web_cfg_data, web_cfg_tmp, indent=2)

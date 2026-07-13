@@ -32,6 +32,20 @@ use OTPHP\TOTP;
  * A helper class for setting up user and store user access token using web UI
  */
 class WebUIHelper {
+	private static int $defaultTimeout = 5000;
+	private static string $keycloakHeader = '#kc-header';
+	private static string $usernameInput = '#username';
+	private static string $passwordInput = '#password';
+	private static string $loginButton = '#kc-login';
+	private static string $filesView = '#files-view';
+	private static string $modeSwitchButton = '#oc-topbar-mode-switch-btn';
+	private static string $vaultModeSelector
+		= "//button[contains(@class, 'oc-topbar-mode-switch-option')][.//span[text()='Vault']]";
+	private static string $qrCode = '#kc-totp-secret-qr-code';
+	private static string $totpInput = '#totp';
+	private static string $userLabel = '#userLabel';
+	private static string $saveTotpButton = '#saveTOTPBtn';
+
 	/**
 	 * @param string $ocisUrl
 	 * @param string $username
@@ -51,20 +65,17 @@ class WebUIHelper {
 		try {
 			$page = $context->newPage();
 			$page->goto($ocisUrl, ['waitUntil' => 'networkidle']);
-			$page->waitForSelector('#kc-header', ['timeout' => 5000]);
-			$page->locator('#username')->fill($username);
-			$page->locator('#password')->fill($password);
-			$page->locator('#kc-login')->click();
-			$page->waitForSelector('#files-view', ['timeout' => 5000]);
+			$page->waitForSelector(self::$keycloakHeader, ['timeout' => self::$defaultTimeout]);
+			$page->locator(self::$usernameInput)->fill($username);
+			$page->locator(self::$passwordInput)->fill($password);
+			$page->locator(self::$loginButton)->click();
+			$page->waitForSelector(self::$filesView, ['timeout' => self::$defaultTimeout]);
 
 			// change to vault mode
-			$page->locator('#oc-topbar-mode-switch-btn')->click();
-			$page->locator(
-				"//button[contains(@class, 'oc-topbar-mode-switch-option')]" .
-				"[.//span[text()='Vault']]",
-			)->click();
-			$page->waitForSelector('#kc-totp-secret-qr-code', ['timeout' => 5000]);
-			$qrLocator = $page->locator('#kc-totp-secret-qr-code');
+			$page->locator(self::$modeSwitchButton)->click();
+			$page->locator(self::$vaultModeSelector)->click();
+			$page->waitForSelector(self::$qrCode, ['timeout' => self::$defaultTimeout]);
+			$qrLocator = $page->locator(self::$qrCode);
 
 			// setup mfa
 			$qrLocator->screenshot($screenshotPath);
@@ -72,10 +83,10 @@ class WebUIHelper {
 				throw new Exception("Failed to save QR code screenshot to: " . $screenshotPath);
 			}
 			$otp = self::extractOtpFromQr($screenshotPath);
-			$page->locator('#totp')->fill((string)$otp);
-			$page->locator('#userLabel')->fill('test');
-			$page->locator('#saveTOTPBtn')->click();
-			$page->waitForSelector('#files-view', ['timeout' => 3000]);
+			$page->locator(self::$totpInput)->fill((string)$otp);
+			$page->locator(self::$userLabel)->fill('test');
+			$page->locator(self::$saveTotpButton)->click();
+			$page->waitForSelector(self::$filesView, ['timeout' => self::$defaultTimeout]);
 			return $context->storageState();
 		} catch (\Exception $e) {
 			throw new Exception("Login failed for user '$username': " . $e->getMessage(), 0, $e);
