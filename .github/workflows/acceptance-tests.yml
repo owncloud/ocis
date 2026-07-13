@@ -4,6 +4,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  actions: write
+  contents: read
+
 jobs:
   detect-changes:
     name: detect-changes
@@ -172,7 +176,7 @@ jobs:
     needs: [build-and-test]
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         suite:
           # contract & locks
@@ -279,12 +283,23 @@ jobs:
       - name: Run ${{ matrix.suite }}
         run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
 
+      - name: Cancel workflow on failure
+        if: failure()
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
+
   cli-tests:
     needs: [build-and-test]
     name: ${{ matrix.suite }}
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         suite:
           - cliCommands,apiServiceAvailability   # grouped: both need ClamAV + email services
@@ -314,12 +329,23 @@ jobs:
       - name: Run ${{ matrix.suite }}
         run: BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
 
+      - name: Cancel workflow on failure
+        if: failure()
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
+
   core-api-tests:
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         suite:
           - "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
@@ -397,12 +423,23 @@ jobs:
           WITH_REMOTE_PHP=true
           python3 tests/acceptance/run-github.py
 
+      - name: Cancel workflow on failure
+        if: failure()
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
+
   e2e-tests:
     name: e2e-${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - suite: part-1
@@ -598,6 +635,17 @@ jobs:
           path: web/reports/e2e/a11y-report.json
           retention-days: 7
 
+      - name: Cancel workflow on failure
+        if: failure()
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
+
   litmus:
     name: litmus
     needs: [build-and-test]
@@ -621,6 +669,17 @@ jobs:
 
       - name: Run litmus
         run: python3 tests/acceptance/run-litmus.py
+
+      - name: Cancel workflow on failure
+        if: failure()
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
 
   cs3api:
     name: cs3api
@@ -646,6 +705,17 @@ jobs:
       - name: Run cs3api validator
         run: python3 tests/acceptance/run-cs3api.py
 
+      - name: Cancel workflow on failure
+        if: failure()
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
+
   wopi-builtin:
     name: wopi-builtin
     needs: [build-and-test]
@@ -670,6 +740,17 @@ jobs:
       - name: Run WOPI validator (builtin)
         run: python3 tests/acceptance/run-wopi.py --type builtin
 
+      - name: Cancel workflow on failure
+        if: failure()
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
+
   wopi-cs3:
     name: wopi-cs3
     needs: [build-and-test]
@@ -693,6 +774,17 @@ jobs:
 
       - name: Run WOPI validator (cs3)
         run: python3 tests/acceptance/run-wopi.py --type cs3
+
+      - name: Cancel workflow on failure
+        if: failure()
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
 
   all-acceptance-tests:
     needs: [detect-changes, local-api-tests, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests]
