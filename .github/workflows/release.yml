@@ -317,6 +317,10 @@ jobs:
         with:
           go-version-file: go.mod
       - run: npm install --silent -g yarn npx "pnpm@$PNPM_VERSION" --force
+      # web is excluded from the generated-code artifact (see generate-code) to
+      # avoid OOM on upload, so its node_modules — which provides the
+      # license-checker-rseidelsohn binary — must be reinstalled here.
+      - run: cd web && pnpm install
       - run: make ci-node-check-licenses && make ci-node-save-licenses
       - run: make ci-go-check-licenses && make ci-go-save-licenses
       - run: tar -czf third-party-licenses.tar.gz -C third-party-licenses .
