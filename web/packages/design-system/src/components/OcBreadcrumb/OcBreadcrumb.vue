@@ -33,6 +33,7 @@
         <router-link
           v-if="item.to"
           :aria-current="getAriaCurrent(index)"
+          :tabindex="item.isTruncationPlaceholder ? -1 : undefined"
           :to="item.isTruncationPlaceholder ? lastHiddenItem.to : item.to"
         >
           <span class="oc-breadcrumb-item-text oc-breadcrumb-item-navigable">{{ item.text }}</span>

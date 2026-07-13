@@ -20,6 +20,7 @@ export const uploadLogo = async (path: string, page: Page): Promise<void> => {
   await page.locator('.oc-notification-message').waitFor()
   await page.reload()
   const selectors = new objects.a11y.Accessibility({ page }).getSelectors()
+  await page.locator(selectors.logoWrapper).waitFor()
   // run accessibility scan on the logo area after upload
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
@@ -51,6 +52,7 @@ export const resetLogo = async (page: Page): Promise<void> => {
 
   await page.locator('.oc-notification-message').waitFor()
   await page.reload()
+  await page.locator(selectors.logoWrapper).waitFor()
 
   // run accessibility scan on the logo area after reset
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(

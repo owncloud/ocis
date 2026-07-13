@@ -48,6 +48,7 @@
                   id="groups-filter-confirm"
                   class="oc-ml-xs"
                   appearance="raw"
+                  :aria-label="$gettext('Search')"
                   @click="filterGroups"
                 >
                   <oc-icon name="search" fill-type="line" />

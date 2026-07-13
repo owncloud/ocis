@@ -74,7 +74,7 @@ const publicLinkNameList =
 const publicLink = `//ul//h4[text()='%s']/following-sibling::div//p`
 const publicLinkCurrentRole =
   '//button[contains(@class,"link-role-dropdown-toggle")]//span[contains(@class,"link-current-role")]'
-const linkUpdateDialog = '//div[contains(@class,"oc-notification-message-title")]'
+const linkUpdateDialog = '.oc-notification-message-title'
 const editPublicLinkButton =
   '//span[contains(@class, "files-links-name") and text()="%s"]//ancestor::li//button[contains(@class, "edit-drop-trigger")]'
 const editPublicLinkRenameButton =
@@ -134,12 +134,12 @@ export const createLink = async (args: createLinkArgs): Promise<string> => {
 
   if (role) {
     await page.locator(publicLinkRoleToggle).click()
-    await page.locator(util.format(publicLinkSetRoleButton, role)).click()
     await objects.a11y.Accessibility.assertNoSevereA11yViolations(
       page,
       ['tippyBox'],
       'link role dropdown tippy box'
     )
+    await page.locator(util.format(publicLinkSetRoleButton, role)).click()
   }
 
   await page.locator(editPublicLinkPasswordInput).fill(password)
@@ -196,6 +196,7 @@ export const changeRole = async (args: changeRoleArgs): Promise<string> => {
     ),
     page.locator(util.format(publicLinkSetRoleButton, role)).click()
   ])
+  await page.locator(linkUpdateDialog).waitFor()
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
     [linkUpdateDialog],
@@ -235,10 +236,11 @@ export const changeName = async (args: changeNameArgs): Promise<string> => {
   )
   await page.locator(editPublicLinkNameInput).fill(newName)
   await page.locator(editPublicLinkRenameConfirm).click()
+  await page.locator(linkUpdateDialog).waitFor()
   const message = await page.locator(linkUpdateDialog).textContent()
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
-    ['linkUpdateDialog'],
+    [linkUpdateDialog],
     'edit public link success message'
   )
   expect(message.trim()).toBe('Link was updated successfully')
@@ -377,6 +379,7 @@ export const addExpiration = async (args: addExpirationArgs): Promise<void> => {
 
   await page.locator(linkExpiryDatepicker).fill(newExpiryDate.toISOString().split('T')[0])
   await page.locator(linkExpiryDatepickerConfirmButton).click()
+  await page.locator(linkUpdateDialog).waitFor()
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
     [linkUpdateDialog],
@@ -407,6 +410,7 @@ export const deleteLink = async (args: deleteLinkArgs): Promise<void> => {
     'Delete public link confirmation modal'
   )
   await page.locator(confirmDeleteButton).click()
+  await page.locator(linkUpdateDialog).waitFor()
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
     [linkUpdateDialog],
@@ -488,14 +492,22 @@ export const copyLinkToClipboard = async (args: copyLinkArgs): Promise<string> =
 
   if (resourceType === 'passwordProtectedFolder') {
     await page.frameLocator(folderModalIframe).getByLabel('Copy link to clipboard').click()
+    // the password-protected-folder notification renders inside its own iframe, not on the top-level page
+    await page.frameLocator(folderModalIframe).locator(linkUpdateDialog).waitFor()
+    await objects.a11y.Accessibility.assertNoSevereA11yViolations(
+      page,
+      [folderModalIframe],
+      'copy link to clipboard notification'
+    )
   } else {
     await page.getByLabel('Copy link to clipboard').click()
+    await page.locator(linkUpdateDialog).waitFor()
+    await objects.a11y.Accessibility.assertNoSevereA11yViolations(
+      page,
+      [linkUpdateDialog],
+      'copy link to clipboard notification'
+    )
   }
-  await objects.a11y.Accessibility.assertNoSevereA11yViolations(
-    page,
-    ['.snackbar'],
-    'copy link to clipboard notification'
-  )
   return await page.evaluate('navigator.clipboard.readText()')
 }
 

@@ -173,6 +173,7 @@
       <oc-button
         :disabled="uploadOrFileCreationBlocked"
         class="clear-clipboard-btn"
+        :aria-label="$gettext('Clear clipboard')"
         @click="clearClipboard"
       >
         <oc-icon fill-type="line" name="close" />
