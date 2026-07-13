@@ -138,7 +138,44 @@ func WaitForConnection() (bool, string) {
 			}
 
 			log.Println("oCIS server is ready to accept requests")
+
+			// Proxy health alone causes flakiness: tests hit sharing/gateway before they finish init.
+			results := make(chan bool, 2)
+			go func() { results <- waitServiceReady("sharing") }()
+			go func() { results <- waitServiceReady("gateway") }()
+			sharingOK, gatewayOK := <-results, <-results
+			if !sharingOK || !gatewayOK {
+				return false, "Timeout waiting for sharing/gateway to become ready"
+			}
+
 			return true, "oCIS server is up and running"
+		}
+	}
+}
+
+// waitServiceReady polls http://localhost:<debugPort>/readyz until 200 or 30 s.
+func waitServiceReady(service string) bool {
+	port := config.GetServiceDebugPort(service)
+	url := fmt.Sprintf("http://localhost:%d/readyz", port)
+	timeout := time.After(30 * time.Second)
+	client := http.Client{Timeout: 2 * time.Second}
+
+	for {
+		select {
+		case <-timeout:
+			log.Println(fmt.Sprintf("Timeout waiting for %s /readyz on port %d", service, port))
+			return false
+		default:
+			res, err := client.Get(url)
+			if err == nil && res.StatusCode == 200 {
+				res.Body.Close()
+				log.Println(fmt.Sprintf("%s service is ready (readyz port %d)", service, port))
+				return true
+			}
+			if res != nil {
+				res.Body.Close()
+			}
+			time.Sleep(500 * time.Millisecond)
 		}
 	}
 }
