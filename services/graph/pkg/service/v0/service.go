@@ -536,6 +536,10 @@ func (g *Graph) StartListenForLogonEvents(ctx context.Context, l log.Logger) err
 	if g.eventsConsumer == nil {
 		return nil
 	}
+	if !g.config.Identity.LDAP.UpdateUserLastSignInDate {
+		l.Info().Msg("Updating the last sign-in date is disabled. Not listening for logon events.")
+		return nil
+	}
 	var _registeredEvents = []events.Unmarshaller{
 		events.UserSignedIn{},
 	}
