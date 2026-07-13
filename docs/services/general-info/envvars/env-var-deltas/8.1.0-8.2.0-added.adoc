@@ -1,0 +1,27 @@
+// # Added Variables between oCIS 8.1.0 and oCIS 8.2.0
+// commenting the headline to make it better includable
+
+// table created per 2026.07.09
+// the table should be recreated/updated on source () changes
+
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Service | Variable | Description | Default
+
+| xref:deployment/services/env-vars-special-scope.adoc[Special Scope Envvars]
+| OCIS_LDAP_UPDATE_LAST_SIGNIN_DATE
+| Update the 'oCLastSignInTimestamp' LDAP attribute of a user when the user signs in. The attribute is only persisted when 'OCIS_LDAP_SERVER_WRITE_ENABLED' is also enabled. Set this to 'false' to avoid an LDAP write on every sign-in, e.g. when the last sign-in timestamp is not needed or the LDAP write load should be reduced.
+| true
+
+| xref:{s-path}/graph.adoc[Graph]
+| GRAPH_LDAP_UPDATE_LAST_SIGNIN_DATE
+| Update the 'oCLastSignInTimestamp' LDAP attribute of a user when the user signs in. The attribute is only persisted when 'OCIS_LDAP_SERVER_WRITE_ENABLED' is also enabled. Set this to 'false' to avoid an LDAP write on every sign-in, e.g. when the last sign-in timestamp is not needed or the LDAP write load should be reduced.
+| true
+
+|
+| GRAPH_RECEIVED_SHARES_STAT_TIMEOUT
+| The maximum duration to wait for the storage to respond while resolving a single received share's resource when listing 'sharedWithMe'. Bounding each resource lookup individually prevents one slow or unreachable resource from consuming the request deadline shared by all the other shares. A share whose resource cannot be statted within this time is still listed as a degraded item instead of being dropped. Defaults to '10s'. See the Environment Variable Types description for more details.
+| 10s
+
+|===
+

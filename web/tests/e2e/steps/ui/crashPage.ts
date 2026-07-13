@@ -1,6 +1,6 @@
 import { CrashPage } from '../../support/objects/crash-page'
 import { config } from '../../config'
-import { Page } from '@playwright/test'
+import { expect, Page } from '@playwright/test'
 
 export function expectCrashPageToBeVisible({ page }: { page: Page }) {
   const crashPageObject = new CrashPage({ page })

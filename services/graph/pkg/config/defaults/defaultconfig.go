@@ -91,6 +91,7 @@ func DefaultConfig() *config.Config {
 				UseServerUUID:            false,
 				UsePasswordModExOp:       true,
 				WriteEnabled:             true,
+				UpdateUserLastSignInDate: true,
 				UserBaseDN:               "ou=users,o=libregraph-idm",
 				UserSearchScope:          "sub",
 				UserFilter:               "",
@@ -129,6 +130,7 @@ func DefaultConfig() *config.Config {
 		},
 		MaxConcurrency:            20,
 		ReceivedSharesStatTimeout: 10 * time.Second,
+		EnableUserSharing:         true,
 		UnifiedRoles: config.UnifiedRoles{
 			AvailableRoles: nil, // will be populated with defaults in EnsureDefaults
 		},

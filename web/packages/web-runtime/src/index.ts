@@ -1,6 +1,6 @@
 import { loadDesignSystem, pages, loadTranslations, supportedLanguages } from './defaults'
 import { router } from './router'
-import { PortalTarget, useVault } from '@ownclouders/web-pkg'
+import { PortalTarget, useThemeStore, useVault } from '@ownclouders/web-pkg'
 import { createHead } from '@vueuse/head'
 import { abilitiesPlugin } from '@casl/vue'
 import { createMongoAbility } from '@casl/ability'
@@ -39,7 +39,8 @@ import {
   PublicSpaceResource
 } from '@ownclouders/web-client'
 import { loadCustomTranslations } from './helpers/customTranslations'
-import { createApp, onWatcherCleanup, watch } from 'vue'
+import { buildStaticAppMenuItems } from './helpers/staticAppMenuItems'
+import { createApp, computed, onWatcherCleanup, watch } from 'vue'
 import PortalVue, { createWormhole } from 'portal-vue'
 import { createPinia } from 'pinia'
 import Avatar from './components/Avatar.vue'
@@ -145,6 +146,13 @@ export const bootstrapApp = async (configurationPath: string, appsReadyCallback:
       applicationsPromise,
       themePromise
     ])
+
+    app.runWithContext(() => {
+      const themeStore = useThemeStore()
+      extensionRegistry.registerExtensions(
+        computed(() => buildStaticAppMenuItems(themeStore.currentTheme.common, gettext.$pgettext))
+      )
+    })
 
     // Important: has to happen AFTER native applications are loaded.
     // Reason: the `external` app serves as a blueprint for creating the app provider apps.

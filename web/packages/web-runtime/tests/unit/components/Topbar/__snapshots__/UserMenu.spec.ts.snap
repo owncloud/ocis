@@ -71,7 +71,7 @@ exports[`User Menu component > when quota and no email is set > renders a naviga
           <oc-icon-stub name="hard-drive-2" size="small" fill-type="line" class="oc-mr-xs"></oc-icon-stub>
           <div>
             <p class="oc-my-rm"><span class="quota-information-text">300 B of 1 kB used (30%)</span></p>
-            <oc-progress-stub class="quota-information-progress-bar" max="100" size="small" variation="primary" value="30"></oc-progress-stub>
+            <oc-progress-stub class="quota-information-progress-bar" max="100" size="small" variation="primary" aria-label="300 B of 1 kB used (30%)" value="30"></oc-progress-stub>
           </div>
         </div></span>
       </li>
@@ -105,7 +105,7 @@ exports[`User Menu component > when quota is above 80% and below 90% > renders a
           <oc-icon-stub name="hard-drive-2" size="small" fill-type="line" class="oc-mr-xs"></oc-icon-stub>
           <div>
             <p class="oc-my-rm"><span class="quota-information-text">810 B of 1 kB used (81%)</span></p>
-            <oc-progress-stub class="quota-information-progress-bar" max="100" size="small" variation="warning" value="81"></oc-progress-stub>
+            <oc-progress-stub class="quota-information-progress-bar" max="100" size="small" variation="warning" aria-label="810 B of 1 kB used (81%)" value="81"></oc-progress-stub>
           </div>
         </div></span>
       </li>
@@ -139,7 +139,7 @@ exports[`User Menu component > when quota is above 90% > renders a danger quota 
           <oc-icon-stub name="hard-drive-2" size="small" fill-type="line" class="oc-mr-xs"></oc-icon-stub>
           <div>
             <p class="oc-my-rm"><span class="quota-information-text">910 B of 1 kB used (91%)</span></p>
-            <oc-progress-stub class="quota-information-progress-bar" max="100" size="small" variation="danger" value="91"></oc-progress-stub>
+            <oc-progress-stub class="quota-information-progress-bar" max="100" size="small" variation="danger" aria-label="910 B of 1 kB used (91%)" value="91"></oc-progress-stub>
           </div>
         </div></span>
       </li>
@@ -173,7 +173,7 @@ exports[`User Menu component > when quota is below 80% > renders a primary quota
           <oc-icon-stub name="hard-drive-2" size="small" fill-type="line" class="oc-mr-xs"></oc-icon-stub>
           <div>
             <p class="oc-my-rm"><span class="quota-information-text">300 B of 1 kB used (30%)</span></p>
-            <oc-progress-stub class="quota-information-progress-bar" max="100" size="small" variation="primary" value="30"></oc-progress-stub>
+            <oc-progress-stub class="quota-information-progress-bar" max="100" size="small" variation="primary" aria-label="300 B of 1 kB used (30%)" value="30"></oc-progress-stub>
           </div>
         </div></span>
       </li>

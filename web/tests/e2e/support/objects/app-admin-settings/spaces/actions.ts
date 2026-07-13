@@ -8,6 +8,7 @@ const spaceTrSelector = '.spaces-table tbody > tr'
 const actionConfirmButton = '.oc-modal-body-actions-confirm'
 const contextMenuSelector = `[data-item-id="%s"] .spaces-table-btn-action-dropdown`
 const spaceCheckboxSelector = `[data-item-id="%s"] input[type=checkbox]`
+const spaceDetailsButtonSelector = `[data-item-id="%s"] .spaces-table-btn-details`
 const contextMenuActionButton = `.oc-files-actions-%s-trigger`
 const inputFieldSelector =
   '//div[@class="oc-modal-body-input"]//input[contains(@class,"oc-text-input")]'
@@ -16,7 +17,6 @@ const quotaValueDropDown = `.vs__dropdown-option :text-is("%s")`
 const selectedQuotaValueField = '.vs__dropdown-toggle'
 const spacesQuotaSearchField = '.oc-modal .vs__search'
 const appSidebarDiv = '#app-sidebar'
-const toggleSidebarButton = '#files-toggle-sidebar'
 const sideBarActive = '.sidebar-panel.is-active-root-panel'
 const sideBarCloseButton = '.sidebar-panel .header__close:visible'
 const sideBarBackButton = '.sidebar-panel .header__back:visible'
@@ -80,7 +80,11 @@ const performSpaceAction = async (args: {
     default:
       throw new Error(`${action} not implemented`)
   }
-  await objects.a11y.Accessibility.assertNoSevereA11yViolations(page, ['filesView'], 'space page')
+  await objects.a11y.Accessibility.assertNoSevereA11yViolations(
+    page,
+    ['adminSettingsWrapper'],
+    'space page'
+  )
   await page.locator(actionButtonSelector).click()
 }
 
@@ -303,8 +307,8 @@ const confirmAction = async (args: {
       )
     )
   }
-  await objects.a11y.Accessibility.assertNoSevereA11yViolations(page, ['tippyBox'], 'account page')
   await page.locator(confirmButton).waitFor()
+  await objects.a11y.Accessibility.assertNoSevereA11yViolations(page, ['ocModal'], 'account page')
   await Promise.all([...checkResponses, page.locator(confirmButton).click()])
 }
 
@@ -316,11 +320,13 @@ export const openSpaceAdminSidebarPanel = async (args: {
   if (await page.locator(appSidebarDiv).count()) {
     await page.locator(sideBarCloseButton).click()
   }
-  await selectSpace({ page, id })
-  await page.click(toggleSidebarButton)
+  // clicking "Show details" already selects the space itself; selecting it first via
+  // the checkbox would cause this click to toggle it back off (selectSpace() toggles)
+  await page.locator(util.format(spaceDetailsButtonSelector, id)).click()
+  await page.locator(appSidebarDiv).waitFor()
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
-    ['appSidebarDiv'],
+    ['appSidebar'],
     'app sidebar after opening space admin sidebar panel'
   )
 }
@@ -333,16 +339,20 @@ export const openSpaceAdminActionSidebarPanel = async (args: {
   const currentPanel = page.locator(sideBarActive)
   const backButton = currentPanel.locator(sideBarBackButton)
   if (await backButton.count()) {
-    await backButton.click()
-    await locatorUtils.waitForEvent(currentPanel, 'transitionend')
+    // attach the transitionend listener before the click, otherwise a near-instant
+    // transition (e.g. under prefers-reduced-motion) can finish before the listener
+    // binds and the wait never resolves
+    await Promise.all([
+      locatorUtils.waitForEvent(currentPanel, 'transitionend'),
+      backButton.click()
+    ])
   }
   const panelSelector = page.locator(util.format(sideBarActionButtons, action))
   const nextPanel = page.locator(util.format(siderBarActionPanel, action))
-  await panelSelector.click()
-  await locatorUtils.waitForEvent(nextPanel, 'transitionend')
+  await Promise.all([locatorUtils.waitForEvent(nextPanel, 'transitionend'), panelSelector.click()])
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
-    ['appSidebarDiv'],
+    ['appSidebar'],
     `app sidebar after opening space admin ${action} sidebar panel`
   )
 }

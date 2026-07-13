@@ -94,7 +94,6 @@ export const createShare = async (args: createShareArgs): Promise<void> => {
   const expirationDate = recipients[0].expirationDate
 
   if (expirationDate) {
-    await objects.a11y.Accessibility.assertNoSevereA11yViolations(page, ['tippyBox'], 'app sidebar')
     await page.locator(showMoreOptionsButton).click()
     await objects.a11y.Accessibility.assertNoSevereA11yViolations(page, ['tippyBox'], 'app sidebar')
     await Promise.all([

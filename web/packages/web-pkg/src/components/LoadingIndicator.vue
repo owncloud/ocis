@@ -5,15 +5,18 @@
       :indeterminate="currentProgress === null"
       :value="currentProgress"
       size="small"
+      :aria-label="$gettext('Loading')"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useGettext } from 'vue3-gettext'
 import { eventBus, LoadingEventTopics } from '../services'
 import { useLoadingService } from '../composables'
 
+const { $gettext } = useGettext()
 const loadingService = useLoadingService()
 let addLoadingEventToken: string
 let removeLoadingEventToken: string

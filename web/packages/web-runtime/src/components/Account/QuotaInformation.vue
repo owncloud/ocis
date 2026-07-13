@@ -12,6 +12,7 @@
         :max="100"
         size="small"
         :variation="quotaProgressVariant"
+        :aria-label="personalStorageDetailsLabel"
       />
     </div>
   </div>

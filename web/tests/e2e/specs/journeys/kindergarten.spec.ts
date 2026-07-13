@@ -28,6 +28,10 @@ test.describe('Kindergarten can use web to organize a day', () => {
   })
 
   test('Alice can share this weeks meal plan with all parents', async () => {
+    // This journey performs 16 downloads plus shares and deletes, each cycling the
+    // sidebar with a11y scans - it consistently runs beyond the default 180s budget.
+    test.slow()
+
     // When "Alice" logs in
     await ui.userLogsIn({ stepUser: 'Alice' })
 

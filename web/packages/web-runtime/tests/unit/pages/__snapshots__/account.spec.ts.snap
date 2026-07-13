@@ -28,6 +28,8 @@ exports[`account page > account information section > displays basic user inform
       </tr>
       <!--v-if-->
       <!--v-if-->
+      <!--v-if-->
+      <!--v-if-->
       <tr class="account-page-info-groups">
         <td class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-auto oc-td">Group memberships</td>
         <td class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-auto oc-td" data-testid="group-names"><span data-testid="group-names-empty">You are not part of any group</span></td>
@@ -81,7 +83,7 @@ exports[`account page > public link context > should render a limited view 1`] =
                 <!--v-if-->
                 <!--v-if-->
                 <div dir="auto" class="v-select vs--single vs--searchable oc-select" style="background: transparent;">
-                  <div id="vs1__combobox" class="vs__dropdown-toggle" role="combobox" aria-expanded="false" aria-owns="vs1__listbox" aria-label="Search for option">
+                  <div id="vs1__combobox" class="vs__dropdown-toggle" role="combobox" aria-expanded="false" aria-owns="vs1__listbox" aria-controls="vs1__listbox" aria-label="Search for option">
                     <div class="vs__selected-options"><span class="vs__selected"><!--v-if--> English <!--v-if--></span><input class="vs__search" id="oc-select-1" aria-autocomplete="list" aria-labelledby="vs1__combobox" aria-controls="oc-select-1-listbox" type="search" autocomplete="off" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-label="Language" value=""></div>
                     <div class="vs__actions"><button type="button" class="vs__clear" title="Clear Selected" aria-label="Clear Selected" style="display: none;"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">
                           <path d="M6.895455 5l2.842897-2.842898c.348864-.348863.348864-.914488 0-1.263636L9.106534.261648c-.348864-.348864-.914489-.348864-1.263636 0L5 3.104545 2.157102.261648c-.348863-.348864-.914488-.348864-1.263636 0L.261648.893466c-.348864.348864-.348864.914489 0 1.263636L3.104545 5 .261648 7.842898c-.348864.348863-.348864.914488 0 1.263636l.631818.631818c.348864.348864.914773.348864 1.263636 0L5 6.895455l2.842898 2.842897c.348863.348864.914772.348864 1.263636 0l.631818-.631818c.348864-.348864.348864-.914489 0-1.263636L6.895455 5z"></path>
@@ -109,7 +111,7 @@ exports[`account page > public link context > should render a limited view 1`] =
                   <!--v-if-->
                   <!--v-if-->
                   <div dir="auto" class="v-select vs--single vs--searchable oc-select" style="background: transparent;">
-                    <div id="vs2__combobox" class="vs__dropdown-toggle" role="combobox" aria-expanded="false" aria-owns="vs2__listbox" aria-label="Search for option">
+                    <div id="vs2__combobox" class="vs__dropdown-toggle" role="combobox" aria-expanded="false" aria-owns="vs2__listbox" aria-controls="vs2__listbox" aria-label="Search for option">
                       <div class="vs__selected-options"><span class="vs__selected"><!--v-if--> Auto (same as system) <!--v-if--></span><input class="vs__search" id="oc-select-2" aria-autocomplete="list" aria-labelledby="vs2__combobox" aria-controls="oc-select-2-listbox" type="search" autocomplete="off" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-label="Theme" value=""></div>
                       <div class="vs__actions"><button type="button" class="vs__clear" title="Clear Selected" aria-label="Clear Selected" style="display: none;"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">
                             <path d="M6.895455 5l2.842897-2.842898c.348864-.348863.348864-.914488 0-1.263636L9.106534.261648c-.348864-.348864-.914489-.348864-1.263636 0L5 3.104545 2.157102.261648c-.348863-.348864-.914488-.348864-1.263636 0L.261648.893466c-.348864.348864-.348864.914489 0 1.263636L3.104545 5 .261648 7.842898c-.348864.348863-.348864.914488 0 1.263636l.631818.631818c.348864.348864.914773.348864 1.263636 0L5 6.895455l2.842898 2.842897c.348863.348864.914772.348864 1.263636 0l.631818-.631818c.348864-.348864.348864-.914489 0-1.263636L6.895455 5z"></path>

@@ -571,6 +571,12 @@ onBeforeUnmount(() => {
     }
   }
 
+  // override vue-select's default opacity for the search input while
+  // searching but not yet open, which drops contrast below WCAG AA
+  &.vs--single.vs--searching:not(.vs--open):not(.vs--loading) .vs__search {
+    opacity: 1;
+  }
+
   .keyboard-outline {
     outline: 2px var(--oc-color-swatch-passive-default) solid !important;
     outline-offset: -2px;
