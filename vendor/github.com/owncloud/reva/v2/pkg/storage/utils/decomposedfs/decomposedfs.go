@@ -613,6 +613,10 @@ func (fs *Decomposedfs) GetMD(ctx context.Context, ref *provider.Reference, mdKe
 		return
 	}
 
+	if node.IsProcessing(ctx) {
+		return nil, errtypes.ResourceProcessing(ref.String())
+	}
+
 	rp, err := fs.p.AssemblePermissions(ctx, node)
 	switch {
 	case err != nil:

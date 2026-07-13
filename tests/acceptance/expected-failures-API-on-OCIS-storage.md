@@ -40,6 +40,25 @@ Synchronization features like etag propagation, setting mtime and locking files
 
 ### Share
 
+#### [coordinator: quota not enforced when sharee uploads into sharer's space (GetQuota returns PermissionDenied for sharee, check silently skipped)](https://github.com/owncloud/ocis/issues/TODO)
+
+- [apiSpacesShares/shareOperations.feature:330](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareOperations.feature#L330)
+- [apiSpacesShares/shareOperations.feature:345](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareOperations.feature#L345)
+- [apiSpacesShares/shareOperations.feature:362](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareOperations.feature#L362)
+- [apiSpacesShares/shareOperations.feature:377](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareOperations.feature#L377)
+- [coreApiShareOperationsToShares2/uploadToShare.feature:213](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares2/uploadToShare.feature#L213)
+- [coreApiShareOperationsToShares2/uploadToShare.feature:214](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares2/uploadToShare.feature#L214)
+- [coreApiShareOperationsToShares2/uploadToShare.feature:215](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares2/uploadToShare.feature#L215)
+- [coreApiShareOperationsToShares2/uploadToShare.feature:237](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares2/uploadToShare.feature#L237)
+- [coreApiShareOperationsToShares2/uploadToShare.feature:238](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares2/uploadToShare.feature#L238)
+- [coreApiShareOperationsToShares2/uploadToShare.feature:239](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares2/uploadToShare.feature#L239)
+- [coreApiShareOperationsToShares2/uploadToShare.feature:259](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares2/uploadToShare.feature#L259)
+- [coreApiShareOperationsToShares2/uploadToShare.feature:260](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares2/uploadToShare.feature#L260)
+- [coreApiShareOperationsToShares2/uploadToShare.feature:261](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares2/uploadToShare.feature#L261)
+- [coreApiShareOperationsToShares2/uploadToShare.feature:283](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares2/uploadToShare.feature#L283)
+- [coreApiShareOperationsToShares2/uploadToShare.feature:284](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares2/uploadToShare.feature#L284)
+- [coreApiShareOperationsToShares2/uploadToShare.feature:285](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares2/uploadToShare.feature#L285)
+
 #### [d:quota-available-bytes in dprop of PROPFIND give wrong response value](https://github.com/owncloud/ocis/issues/8197)
 
 - [coreApiWebdavProperties/getQuota.feature:57](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L57)

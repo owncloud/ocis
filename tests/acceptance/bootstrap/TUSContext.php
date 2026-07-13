@@ -786,10 +786,25 @@ class TUSContext implements Context {
 		string $checksum,
 		TableNode $headers,
 	): void {
-		$createResponse = $this->createNewTUSResource($user, $headers);
-		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $createResponse);
-		$resourceLocation = $this->getLastTusResourceLocation();
-		$response = $this->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $data, $checksum);
-		$this->featureContext->setResponse($response);
+		// The node may be processing from a prior upload; retry the full POST+PATCH
+		// cycle on 425 (Too Early) until postprocessing completes and the node is free.
+		$retries = 10;
+		$response = null;
+		do {
+			$createResponse = $this->createNewTUSResource($user, $headers);
+			if ($createResponse->getStatusCode() === 425) {
+				\sleep(1);
+				continue;
+			}
+			$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $createResponse);
+			$resourceLocation = $this->getLastTusResourceLocation();
+			$response = $this->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $data, $checksum);
+			if ($response->getStatusCode() !== 425) {
+				$this->featureContext->setResponse($response);
+				return;
+			}
+			\sleep(1);
+		} while (--$retries > 0);
+		$this->featureContext->setResponse($response ?? $createResponse);
 	}
 }

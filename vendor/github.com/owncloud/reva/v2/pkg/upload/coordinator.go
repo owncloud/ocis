@@ -354,7 +354,7 @@ func (c *coordinator) InitiateUpload(ctx context.Context, ref *provider.Referenc
 		nodeID = existing.GetId().GetOpaqueId()
 		spaceID = existing.GetId().GetSpaceId()
 		parentID = existing.GetParentId().GetOpaqueId()
-		dir = filepath.Dir(existing.GetPath())
+		dir = filepath.Dir(ref.GetPath())
 		nodeName = existing.GetName()
 		spaceOwner = existing.GetOwner()
 
@@ -397,6 +397,23 @@ func (c *coordinator) InitiateUpload(ctx context.Context, ref *provider.Referenc
 		switch pErr.(type) {
 		case nil:
 		case errtypes.IsNotFound:
+			// RFC 4918: missing intermediate dir → 409, no permission → 404.
+			// GetMD returns NotFound for both (hides resources from unauthorized callers).
+			// Walk up the path: if an ancestor is visible, the dir is truly missing (409).
+			// If nothing is visible up to the root, caller has no access (404).
+			ancestor := dir
+			permDenied := true
+			for ancestor != "." && ancestor != "/" {
+				ancestor = filepath.Dir(ancestor)
+				ancestorRef := &provider.Reference{ResourceId: ref.GetResourceId(), Path: ancestor}
+				if _, aErr := c.fs.GetMD(ctx, ancestorRef, []string{}, []string{}); aErr == nil {
+					permDenied = false
+					break
+				}
+			}
+			if permDenied {
+				return nil, errtypes.PermissionDenied(ref.GetPath())
+			}
 			return nil, errtypes.PreconditionFailed(pErr.Error())
 		default:
 			return nil, pErr

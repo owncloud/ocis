@@ -181,13 +181,7 @@ func (c *coordinator) handlePostprocessingFinished(ctx context.Context, ev event
 		}
 	}
 
-	var isVersion bool
-	if session.NodeExists() {
-		info, err := session.GetInfo(ctx)
-		if err == nil && info.MetaData["versionsPath"] != "" {
-			isVersion = true
-		}
-	}
+	isVersion := session.NodeExists()
 
 	if err := events.Publish(
 		ctx,

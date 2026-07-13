@@ -587,6 +587,10 @@ func (p *Handler) getResourceInfos(ctx context.Context, w http.ResponseWriter, r
 			var status *rpc.Status
 			info, status, err = p.statSpace(ctx, spaceRef, metadataKeys, fieldMaskPaths)
 			if err != nil || status.GetCode() != rpc.Code_CODE_OK {
+				if status.GetCode() == rpc.Code_CODE_TOO_EARLY {
+					w.WriteHeader(http.StatusTooEarly)
+					return nil, false, false
+				}
 				continue
 			}
 		}
