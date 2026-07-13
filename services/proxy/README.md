@@ -365,7 +365,6 @@ Store specific notes:
 To authenticate presigned URLs the proxy service needs to read signing keys from a store that is populated by the ocs service. Possible stores are:
   -   `nats-js-kv`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
   -   `redis-sentinel`: Stores data in a configured Redis Sentinel cluster.
-  -   `ocisstoreservice`:  Stores data in the legacy ocis store service. Requires setting `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES` to `com.owncloud.api.store`.
 
 The `memory` store cannot be used as it does not share the memory from the ocs service signing key memory store, even in a single process.
 
