@@ -25,6 +25,9 @@ patchedDependencies:
   portal-vue@3.0.0:
     hash: ce486dc8fb49b1e3f9b160bfede1dfeb31a492b7e1ea6dc8d10bbee39174cdcb
     path: patches/portal-vue@3.0.0.patch
+  vue-select@4.0.0-beta.6:
+    hash: 3cffa7f2dfdb75bd1f98edbf4df29a19c6c0bcb7979a6dfe8610db0175c9e1ef
+    path: patches/vue-select@4.0.0-beta.6.patch
   vue3-gettext@2.4.0:
     hash: 6f231bbef273efbc788b5657c47fc744b52bc838f972357a764c144fde6065f2
     path: patches/vue3-gettext@2.4.0.patch
@@ -273,7 +276,7 @@ importers:
         version: 5.0.6(@vue/compiler-sfc@3.5.29)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.29(typescript@5.9.3)))(vue@3.5.29(typescript@5.9.3))
       vue-select:
         specifier: 4.0.0-beta.6
-        version: 4.0.0-beta.6(vue@3.5.29(typescript@5.9.3))
+        version: 4.0.0-beta.6(patch_hash=3cffa7f2dfdb75bd1f98edbf4df29a19c6c0bcb7979a6dfe8610db0175c9e1ef)(vue@3.5.29(typescript@5.9.3))
       vue3-gettext:
         specifier: ^2.4.0
         version: 2.4.0(patch_hash=6f231bbef273efbc788b5657c47fc744b52bc838f972357a764c144fde6065f2)(@vue/compiler-sfc@3.5.29)(vue@3.5.29(typescript@5.9.3))
@@ -14136,7 +14139,7 @@ snapshots:
       '@vue/compiler-sfc': 3.5.29
       pinia: 3.0.4(typescript@5.9.3)(vue@3.5.29(typescript@5.9.3))
 
-  vue-select@4.0.0-beta.6(vue@3.5.29(typescript@5.9.3)):
+  vue-select@4.0.0-beta.6(patch_hash=3cffa7f2dfdb75bd1f98edbf4df29a19c6c0bcb7979a6dfe8610db0175c9e1ef)(vue@3.5.29(typescript@5.9.3)):
     dependencies:
       vue: 3.5.29(typescript@5.9.3)
 

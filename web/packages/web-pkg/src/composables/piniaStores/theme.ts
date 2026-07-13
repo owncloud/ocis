@@ -26,7 +26,9 @@ const CommonSection = z.object({
     privacy: z.string(),
     accessibilityStatement: z.string().optional(),
     universalAccessEasyLanguage: z.string().optional(),
-    universalAccessSignLanguage: z.string().optional()
+    universalAccessSignLanguage: z.string().optional(),
+    softwareLicense: z.string().optional(),
+    helpPage: z.string().optional()
   }),
   shareRoles: z.record(
     z.string(),
@@ -54,7 +56,8 @@ const Logo = z.object({
   topbarSm: z.string().optional(),
   favicon: z.string(),
   login: z.string(),
-  notFound: z.string().optional()
+  notFound: z.string().optional(),
+  href: z.string().optional()
 })
 
 const Icons = z.object({

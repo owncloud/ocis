@@ -145,6 +145,19 @@ Here, you can specify the images to be used in the `"topbar"`, for the `"favicon
 },
 ```
 
+Optionally, you can set `"href"` to a URL. If set, clicking the logo in the topbar
+navigates to that URL instead of the default behavior of navigating to the user's
+files. If not set, the default navigation behavior is used.
+
+```json
+"logo": {
+  "topbar": "themes/owncloud/assets/logo.svg",
+  "favicon": "themes/owncloud/assets/favicon.jpg",
+  "login": "themes/owncloud/assets/logo.svg",
+  "href": "https://example.com"
+},
+```
+
 ##### The "loginPage" options
 
 You can set the background image for the login page by providing an image file in the `"backgroundImg"` option.

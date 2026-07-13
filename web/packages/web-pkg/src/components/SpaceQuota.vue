@@ -1,11 +1,12 @@
 <template>
   <div class="space-quota">
-    <p class="oc-mb-s oc-mt-rm" v-text="spaceStorageDetailsLabel" />
+    <p id="space-quota-label" class="oc-mb-s oc-mt-rm" v-text="spaceStorageDetailsLabel" />
     <oc-progress
       :value="quotaUsagePercent"
       :max="100"
       size="small"
       :variation="quotaProgressVariant"
+      aria-labelledby="space-quota-label"
     />
   </div>
 </template>

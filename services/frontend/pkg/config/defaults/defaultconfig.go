@@ -124,6 +124,8 @@ func DefaultConfig() *config.Config {
 			},
 		},
 		LDAPServerWriteEnabled: true,
+		EnableUserSharing:      true,
+		EnablePublicSharing:    true,
 		AutoAcceptShares:       true,
 		Events: config.Events{
 			Endpoint:  "127.0.0.1:9233",

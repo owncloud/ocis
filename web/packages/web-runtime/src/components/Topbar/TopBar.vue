@@ -9,7 +9,18 @@
         v-if="appMenuExtensions.length && !isEmbedModeEnabled && !hideAppSwitcher"
         :menu-items="appMenuExtensions"
       />
-      <router-link v-if="!hideLogo" :to="homeLink" class="oc-logo-href">
+      <!-- eslint-disable-next-line vuejs-accessibility/anchor-has-content -->
+      <a v-if="!hideLogo && logoHref" :href="logoHref" class="oc-logo-href">
+        <oc-responsive-image
+          :src="{
+            xs: currentTheme.logo.topbarSm,
+            md: currentTheme.logo.topbar
+          }"
+          :alt="sidebarLogoAlt"
+          class="oc-logo-image"
+        />
+      </a>
+      <router-link v-else-if="!hideLogo" :to="homeLink" class="oc-logo-href">
         <oc-responsive-image
           :src="{
             xs: currentTheme.logo.topbarSm,
@@ -64,6 +75,7 @@
           v-bind="feedbackLinkOptions"
         />
         <universal-access-dropdown v-if="isUniversalAccessEnabled" />
+        <help-menu v-if="!hideAccountMenu" />
       </portal>
       <portal to="app.runtime.header.right" :order="100">
         <notifications v-if="isNotificationBellEnabled && !hideAccountMenu" />
@@ -84,6 +96,7 @@ import Notifications from './Notifications.vue'
 import FeedbackLink from './FeedbackLink.vue'
 import SideBarToggle from './SideBarToggle.vue'
 import UniversalAccessDropdown from './UniversalAccessDropdown.vue'
+import HelpMenu from './HelpMenu.vue'
 import {
   ApplicationInformation,
   CustomComponentTarget,
@@ -107,6 +120,7 @@ export default {
     ApplicationsMenu,
     CustomComponentTarget,
     FeedbackLink,
+    HelpMenu,
     Notifications,
     SideBarToggle,
     UserMenu,
@@ -148,6 +162,8 @@ export default {
         authStore.userContextReady && capabilityStore.notificationsOcsEndpoints.includes('list')
       )
     })
+
+    const logoHref = computed(() => unref(currentTheme).logo.href)
 
     const homeLink = computed(() => {
       if (authStore.publicLinkContextReady && !authStore.userContextReady) {
@@ -228,6 +244,7 @@ export default {
       isEmbedModeEnabled,
       isSideBarToggleVisible,
       isSideBarToggleDisabled,
+      logoHref,
       homeLink,
       topBarCenterExtensionPoint,
       appMenuExtensions,

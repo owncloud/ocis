@@ -157,6 +157,7 @@ export interface Capabilities {
       }
       search_min_length?: number
       user?: {
+        enabled?: boolean
         profile_picture?: boolean
         send_mail?: boolean
         settings?: {

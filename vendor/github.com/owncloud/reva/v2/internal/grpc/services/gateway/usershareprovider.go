@@ -28,6 +28,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/owncloud/reva/v2/pkg/appctx"
+	"github.com/owncloud/reva/v2/pkg/conversions"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/status"
@@ -36,6 +37,14 @@ import (
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"github.com/pkg/errors"
 )
+
+// managerPerms is the canonical Manager bitmap used to reject partial grant-management grants on space roots
+var managerPerms = conversions.NewManagerRole().CS3ResourcePermissions()
+
+// hasGrantManagementBits reports whether p carries any grant-management permission.
+func hasGrantManagementBits(p *provider.ResourcePermissions) bool {
+	return p.GetAddGrant() || p.GetUpdateGrant() || p.GetRemoveGrant() || p.GetDenyGrant()
+}
 
 // TODO(labkode): add multi-phase commit logic when commit share or commit ref is enabled.
 func (s *svc) CreateShare(ctx context.Context, req *collaboration.CreateShareRequest) (*collaboration.CreateShareResponse, error) {
@@ -170,6 +179,10 @@ func (s *svc) updateShare(ctx context.Context, req *collaboration.UpdateShareReq
 func (s *svc) updateSpaceShare(ctx context.Context, req *collaboration.UpdateShareRequest) (*collaboration.UpdateShareResponse, error) {
 	if req.GetShare().GetGrantee() == nil {
 		return &collaboration.UpdateShareResponse{Status: status.NewInvalid(ctx, "updating requires a received grantee object")}, nil
+	}
+	// reject partial grant-management grants that would mint a stealth manager
+	if perms := req.GetShare().GetPermissions().GetPermissions(); hasGrantManagementBits(perms) && !conversions.SufficientCS3Permissions(perms, managerPerms) {
+		return &collaboration.UpdateShareResponse{Status: status.NewInvalid(ctx, "partial grant-management permissions are not allowed on space roots")}, nil
 	}
 	// If the share is a denial we call  denyGrant instead.
 	var st *rpc.Status
@@ -648,6 +661,10 @@ func (s *svc) addSpaceShare(ctx context.Context, req *collaboration.CreateShareR
 	if refIsSpaceRoot(req.GetResourceInfo().GetId()) &&
 		(req.GetResourceInfo().GetSpace().GetSpaceType() == _spaceTypePersonal || req.GetResourceInfo().GetSpace().GetSpaceType() == _spaceTypeVirtual) {
 		return &collaboration.CreateShareResponse{Status: status.NewInvalid(ctx, "space type is not eligible for sharing")}, nil
+	}
+	// reject partial grant-management grants that would mint a stealth manager
+	if perms := req.GetGrant().GetPermissions().GetPermissions(); hasGrantManagementBits(perms) && !conversions.SufficientCS3Permissions(perms, managerPerms) {
+		return &collaboration.CreateShareResponse{Status: status.NewInvalid(ctx, "partial grant-management permissions are not allowed on space roots")}, nil
 	}
 	// If the share is a denial we call  denyGrant instead.
 	var st *rpc.Status

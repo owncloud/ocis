@@ -78,6 +78,8 @@ func DefaultConfig() *config.Config {
 		},
 		EnableExpiredSharesCleanup:  true,
 		PublicShareMustHavePassword: true,
+		EnableUserSharing:           true,
+		EnablePublicSharing:         true,
 		PasswordPolicy: config.PasswordPolicy{
 			MinCharacters:          8,
 			MinLowerCaseCharacters: 1,

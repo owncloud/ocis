@@ -11,11 +11,7 @@
       </div>
       <copy-private-link :resource="resource" />
     </div>
-    <invite-collaborator-form
-      v-if="canShare({ resource, space })"
-      key="new-collaborator"
-      class="oc-my-s"
-    />
+    <invite-collaborator-form v-if="canShareWithUsers" key="new-collaborator" class="oc-my-s" />
     <p
       v-else
       key="no-share-permissions-message"
@@ -108,6 +104,7 @@ import {
   useSharesStore,
   useResourcesStore,
   useCanShare,
+  useCapabilityStore,
   useClientService,
   useRouter
 } from '@ownclouders/web-pkg'
@@ -134,6 +131,7 @@ const clientService = useClientService()
 const { getMatchingSpace } = useGetMatchingSpace()
 const { dispatchModal } = useModals()
 const { canShare } = useCanShare()
+const capabilityStore = useCapabilityStore()
 const { $gettext } = useGettext()
 const router = useRouter()
 const { showMessage, showErrorMessage } = useMessages()
@@ -260,6 +258,13 @@ const showShareToggle = computed(() => {
 
 const showMemberToggle = computed(() => {
   return unref(spaceMembers).length > 3
+})
+
+const canShareWithUsers = computed(() => {
+  if (capabilityStore.sharingUserEnabled === false) {
+    return false
+  }
+  return canShare({ resource: unref(resource), space: unref(space) })
 })
 
 const noSharePermsMessage = computed(() => {

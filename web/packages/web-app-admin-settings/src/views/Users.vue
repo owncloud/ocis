@@ -19,6 +19,7 @@
             v-if="createUserAction.isVisible()"
             id="create-user-btn"
             v-oc-tooltip="limitedScreenSpace ? createUserAction.label() : undefined"
+            :aria-label="limitedScreenSpace ? createUserAction.label() : undefined"
             class="oc-mr-s"
             variation="primary"
             appearance="filled"
@@ -102,6 +103,7 @@
                 id="users-filter-confirm"
                 class="oc-ml-xs"
                 appearance="raw"
+                :aria-label="$gettext('Search')"
                 @click="filterDisplayName"
               >
                 <oc-icon name="search" fill-type="line" />
