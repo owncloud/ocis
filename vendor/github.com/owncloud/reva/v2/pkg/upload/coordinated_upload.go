@@ -22,9 +22,12 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 
 	tusd "github.com/tus/tusd/v2/pkg/handler"
+
+	"github.com/owncloud/reva/v2/pkg/errtypes"
 )
 
 // coordinatedUpload is the TUS interface adapter between the tusd library and the coordinator.
@@ -91,7 +94,25 @@ func (u *coordinatedUpload) ConcatUploads(ctx context.Context, partials []tusd.U
 }
 
 func (u *coordinatedUpload) FinishUpload(ctx context.Context) error {
-	return u.coord.finishUpload(ctx, u.session)
+	err := u.coord.finishUpload(u.session.Context(ctx), u.session)
+	switch err.(type) {
+	case nil:
+		return nil
+	case errtypes.ResourceProcessing, errtypes.TooEarly:
+		return tusd.NewError("ERR_TOO_EARLY", err.Error(), http.StatusTooEarly)
+	case errtypes.Aborted:
+		return tusd.NewError("ERR_PRECONDITION_FAILED", err.Error(), http.StatusPreconditionFailed)
+	case errtypes.PreconditionFailed:
+		return tusd.NewError("ERR_PRECONDITION_FAILED", err.Error(), http.StatusMethodNotAllowed)
+	case errtypes.Locked:
+		return tusd.NewError("ERR_LOCKED", err.Error(), http.StatusLocked)
+	case errtypes.BadRequest:
+		return tusd.NewError("ERR_BAD_REQUEST", err.Error(), http.StatusBadRequest)
+	case errtypes.ChecksumMismatch:
+		return tusd.NewError("ERR_CHECKSUM_MISMATCH", err.Error(), errtypes.StatusChecksumMismatch)
+	default:
+		return err
+	}
 }
 
 // UseIn registers the coordinator as the TUS data store in the composer.

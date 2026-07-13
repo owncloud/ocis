@@ -100,11 +100,12 @@ func (c *coordinator) finishSync(ctx context.Context, session Session) error {
 		c.rollback(ctx, session)
 		return err
 	}
+	cs := session.Checksums()
 	if _, err := c.fs.CommitUpload(ctx, &ref, storage.UploadSource{
 		Body:      f,
 		Length:    session.Size(),
 		Metadata:  session.Metadata(),
-		Checksums: session.Checksums(),
+		Checksums: cs,
 	}); err != nil {
 		c.rollback(ctx, session)
 		return err
@@ -124,10 +125,10 @@ func (c *coordinator) triggerPostprocessing(ctx context.Context, session Session
 	}
 	executingUser, _ := ctxpkg.ContextGetUser(ctx)
 	if err := events.Publish(ctx, c.pub, events.BytesReceived{
-		UploadID:          session.ID(),
-		URL:               s,
-		SpaceOwner:        session.SpaceOwner(),
-		ExecutingUser:     executingUser,
+		UploadID:      session.ID(),
+		URL:           s,
+		SpaceOwner:    session.SpaceOwner(),
+		ExecutingUser: executingUser,
 		ResourceID: &provider.ResourceId{
 			StorageId: session.ProviderID(),
 			SpaceId:   session.SpaceID(),
@@ -208,8 +209,11 @@ func verifyAndStoreChecksums(ctx context.Context, session Session) error {
 func (c *coordinator) touchAndMark(ctx context.Context, session Session) error {
 	if !session.NodeExists() {
 		pathRef := &provider.Reference{
-			ResourceId: &provider.ResourceId{SpaceId: session.SpaceID()},
-			Path:       filepath.Join(session.Dir(), session.Filename()),
+			ResourceId: &provider.ResourceId{
+				SpaceId:  session.SpaceID(),
+				OpaqueId: session.NodeParentID(),
+			},
+			Path: session.Filename(),
 		}
 		result, err := c.fs.TouchFile(ctx, pathRef, false, session.Metadata()["mtime"])
 		if err != nil {
@@ -386,7 +390,7 @@ func (c *coordinator) InitiateUpload(ctx context.Context, ref *provider.Referenc
 		}
 	} else {
 		parentRef := &provider.Reference{
-			ResourceId: &provider.ResourceId{SpaceId: spaceID},
+			ResourceId: ref.GetResourceId(),
 			Path:       dir,
 		}
 		parentMD, pErr := c.fs.GetMD(ctx, parentRef, []string{}, []string{})
@@ -400,6 +404,8 @@ func (c *coordinator) InitiateUpload(ctx context.Context, ref *provider.Referenc
 		if !parentMD.GetPermissionSet().GetInitiateFileUpload() {
 			return nil, errtypes.PermissionDenied(ref.GetPath())
 		}
+		parentID = parentMD.GetId().GetOpaqueId()
+		spaceID = parentMD.GetId().GetSpaceId()
 	}
 
 	if nodeName == "" {
@@ -529,6 +535,7 @@ func (c *coordinator) Upload(ctx context.Context, req storage.UploadRequest, uff
 		}
 		defer assembled.Close()
 		req.Body, req.Length = assembled, assembledSize
+		session.SetSize(assembledSize)
 	}
 
 	size, err := session.WriteChunk(ctx, 0, req.Body)
@@ -556,18 +563,25 @@ func (c *coordinator) Upload(ctx context.Context, req storage.UploadRequest, uff
 		uff(session.SpaceOwner(), &executant, uploadRef)
 	}
 
-	return &provider.ResourceInfo{
+	ri := &provider.ResourceInfo{
 		Id: &provider.ResourceId{
 			StorageId: session.ProviderID(),
 			SpaceId:   session.SpaceID(),
 			OpaqueId:  session.NodeID(),
 		},
 		Name: session.Filename(),
-	}, nil
+	}
+	if mt, ok := session.Metadata()["mtime"]; ok && mt != "" {
+		if t, err := utils.MTimeToTime(mt); err == nil {
+			ri.Etag, _ = utils.CalculateEtag(session.NodeID(), t)
+			ri.Mtime = utils.TimeToTS(t)
+		}
+	}
+	return ri, nil
 }
 
 // ListUploadSessions returns upload sessions matching the given filter.
-func (c *coordinator)ListUploadSessions(ctx context.Context, filter storage.UploadSessionFilter) ([]storage.UploadSession, error) {
+func (c *coordinator) ListUploadSessions(ctx context.Context, filter storage.UploadSessionFilter) ([]storage.UploadSession, error) {
 	if filter.ID != nil && *filter.ID != "" {
 		session, err := c.store.Get(ctx, *filter.ID)
 		if err != nil {
@@ -610,4 +624,3 @@ func (c *coordinator)ListUploadSessions(ctx context.Context, filter storage.Uplo
 	}
 	return result, nil
 }
-

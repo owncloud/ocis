@@ -79,6 +79,7 @@ type Session interface {
 	ProviderID() string
 	SpaceID() string
 	NodeID() string
+	NodeParentID() string
 	NodeExists() bool
 	Dir() string
 	URL(ctx context.Context) (string, error)
@@ -187,6 +188,11 @@ func (s *FileSession) SpaceID() string {
 // NodeID returns the node ID for this upload.
 func (s *FileSession) NodeID() string {
 	return s.info.Storage["NodeId"]
+}
+
+// NodeParentID returns the parent node ID for this upload.
+func (s *FileSession) NodeParentID() string {
+	return s.info.Storage["NodeParentId"]
 }
 
 // NodeExists returns whether the target node existed when the upload was initiated.
@@ -309,6 +315,8 @@ func (s *FileSession) SetExecutant(u *userpb.User) {
 	s.info.Storage["UserDisplayName"] = u.GetDisplayName()
 	b, _ := json.Marshal(u.GetOpaque())
 	s.info.Storage["UserOpaque"] = string(b)
+	g, _ := json.Marshal(u.GetGroups())
+	s.info.Storage["UserGroups"] = string(g)
 }
 
 // TouchBin creates the empty staging file.
@@ -404,6 +412,8 @@ func (s *FileSession) infoPath() string {
 func (s *FileSession) executantUser() *userpb.User {
 	var o *typespb.Opaque
 	_ = json.Unmarshal([]byte(s.info.Storage["UserOpaque"]), &o)
+	var groups []string
+	_ = json.Unmarshal([]byte(s.info.Storage["UserGroups"]), &groups)
 	return &userpb.User{
 		Id: &userpb.UserId{
 			Type:     utils.UserTypeMap(s.info.Storage["UserType"]),
@@ -413,6 +423,7 @@ func (s *FileSession) executantUser() *userpb.User {
 		Username:    s.info.Storage["UserName"],
 		DisplayName: s.info.Storage["UserDisplayName"],
 		Opaque:      o,
+		Groups:      groups,
 	}
 }
 

@@ -506,13 +506,19 @@ class TUSContext implements Context {
 		$mtime = new DateTime($mtime);
 		$mtime = $mtime->format('U');
 		$user = $this->featureContext->getActualUsername($user);
-		$response = $this->uploadFileUsingTus(
-			$user,
-			$source,
-			$destination,
-			null,
-			['mtime' => $mtime],
-		);
+		$retries = 10;
+		do {
+			$response = $this->uploadFileUsingTus(
+				$user,
+				$source,
+				$destination,
+				null,
+				['mtime' => $mtime],
+			);
+			if ($response->getStatusCode() === 425) {
+				\sleep(1);
+			}
+		} while ($response->getStatusCode() === 425 && --$retries > 0);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			["201", "204"],
