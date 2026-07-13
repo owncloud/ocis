@@ -85,9 +85,34 @@ export async function userCreatesResources({
   }
 }
 
+// export async function userSearchesGloballyWithFilter({
+//   stepUser,
+//   keyword,
+//   filter,
+//   command
+// }: {
+//   stepUser: string
+//   keyword: string
+//   filter: typeof searchScope.allFiles | typeof searchScope.currentFolder
+//   command?: string
+// }): Promise<void> {
+//   const world = getWorld()
+//   keyword = keyword ?? ''
+//   const pressEnter = !!command && command.endsWith('presses enter')
+//   const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+//   // let search indexing to complete
+//   await page.waitForTimeout(1000)
+//   const resourceObject = new objects.applicationFiles.Resource({ page })
+//   await resourceObject.searchResource({
+//     keyword,
+//     filter: filter,
+//     pressEnter
+//   })
+// }
+
 export async function userSearchesGloballyWithFilter({
   stepUser,
-  keyword,
+  keyword = '',
   filter,
   command
 }: {
@@ -96,18 +121,27 @@ export async function userSearchesGloballyWithFilter({
   filter: typeof searchScope.allFiles | typeof searchScope.currentFolder
   command?: string
 }): Promise<void> {
-  const world = getWorld()
-  keyword = keyword ?? ''
-  const pressEnter = !!command && command.endsWith('presses enter')
-  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
-  // let search indexing to complete
-  await page.waitForTimeout(1000)
+  const { page } = getWorld().actorsEnvironment.getActor({ key: stepUser })
   const resourceObject = new objects.applicationFiles.Resource({ page })
-  await resourceObject.searchResource({
-    keyword,
-    filter: filter,
-    pressEnter
-  })
+
+  await expect
+    .poll(
+      async () => {
+        await resourceObject.searchResource({
+          keyword,
+          filter,
+          pressEnter: command?.endsWith('presses enter') ?? false
+        })
+
+        return (await resourceObject.reSearchAndGetDisplayedResources()).includes(keyword)
+      },
+      {
+        message: `Waiting for search to index "${keyword}"`,
+        timeout: 30_000,
+        intervals: [500, 1000, 2000]
+      }
+    )
+    .toBe(true)
 }
 
 export async function userSwitchesToTilesViewMode({
