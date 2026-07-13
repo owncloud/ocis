@@ -37,6 +37,7 @@ use Psr\Http\Message\ResponseInterface;
 class CliContext implements Context {
 	private FeatureContext $featureContext;
 	private SpacesContext $spacesContext;
+	private string $storedServiceUserPassword = '';
 
 	/**
 	 * @BeforeScenario
@@ -134,6 +135,108 @@ class CliContext implements Context {
 		if ($userType === "user") {
 			$this->featureContext->updateUserPassword($user, $password);
 		}
+	}
+
+	/**
+	 * @Given the original password for service user :user has been stored
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function theOriginalPasswordForServiceUserHasBeenStored(string $user): void {
+		$servicePassword = '';
+		$passwordSourceEnvs = [
+			'IDM_REVASVC_PASSWORD',
+			'AUTH_BASIC_LDAP_BIND_PASSWORD',
+			'USERS_LDAP_BIND_PASSWORD',
+			'GROUPS_LDAP_BIND_PASSWORD',
+		];
+		foreach ($passwordSourceEnvs as $envName) {
+			$envPassword = \getenv($envName);
+			if ($envPassword !== false && $envPassword !== '') {
+				$servicePassword = $envPassword;
+				break;
+			}
+		}
+
+		if ($servicePassword === '') {
+			$configFile = $this->featureContext->getOcisDataPath() . '/config/ocis.yaml';
+			if (\file_exists($configFile)) {
+				$content = \file_get_contents($configFile);
+				if ($content !== false && \preg_match('/reva_password:\s*(.+)/', $content, $matches)) {
+					$servicePassword = \trim($matches[1]);
+				}
+			}
+		}
+
+		$errorMessage = "Could not determine original password for service user '$user'";
+		Assert::assertNotSame(
+			'',
+			$servicePassword,
+			$errorMessage,
+		);
+
+		$this->storedServiceUserPassword = $servicePassword;
+	}
+
+	/**
+	 * @When the administrator resets the password of service user :user to the stored original password using the CLI
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function theAdministratorResetsThePasswordOfServiceUserToStoredOriginalUsingTheCLI(string $user): void {
+		Assert::assertNotSame('', $this->storedServiceUserPassword, 'Stored service user password is empty');
+		$command = "idm resetpassword -u $user --user-type service";
+		$body = [
+			"command" => $command,
+			"inputs" => [$this->storedServiceUserPassword, $this->storedServiceUserPassword],
+		];
+
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator configures service bind credentials to :password
+	 *
+	 * @param string $password
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorConfiguresServiceBindCredentialsTo(string $password): void {
+		$envs = [
+			'IDM_REVASVC_PASSWORD' => $password,
+			'OCIS_LDAP_BIND_PASSWORD' => $password,
+			'AUTH_BASIC_LDAP_BIND_PASSWORD' => $password,
+			'USERS_LDAP_BIND_PASSWORD' => $password,
+			'GROUPS_LDAP_BIND_PASSWORD' => $password,
+		];
+		$response = OcisConfigHelper::reConfigureOcis($envs);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
+	}
+
+	/**
+	 * @When the administrator configures service bind credentials to the stored original password
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorConfiguresServiceBindCredentialsToTheStoredOriginalPassword(): void {
+		Assert::assertNotSame('', $this->storedServiceUserPassword, 'Stored service user password is empty');
+		$password = $this->storedServiceUserPassword;
+		// Keep all bind credentials aligned with the restored service-user password for stable restarts.
+		$envs = [
+			'IDM_REVASVC_PASSWORD' => $password,
+			'OCIS_LDAP_BIND_PASSWORD' => $password,
+			'AUTH_BASIC_LDAP_BIND_PASSWORD' => $password,
+			'USERS_LDAP_BIND_PASSWORD' => $password,
+			'GROUPS_LDAP_BIND_PASSWORD' => $password,
+		];
+		$response = OcisConfigHelper::reConfigureOcis($envs);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
 
 	/**
