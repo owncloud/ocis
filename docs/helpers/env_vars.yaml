@@ -14068,18 +14068,6 @@ STORAGE_USERS_ID_CACHE_STORE_NODES:
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
-STORAGE_USERS_ID_CACHE_TTL:
-  name: OCIS_CACHE_TTL;STORAGE_USERS_ID_CACHE_TTL
-  defaultValue: 24m0s
-  type: Duration
-  description: Default time to live for user info in the user info cache. Only applied
-    when access tokens have no expiration. Defaults to 300s which is derived from
-    the underlaying package though not explicitly set as default. See the Environment
-    Variable Types description for more details.
-  introductionVersion: pre5.0
-  deprecationVersion: ""
-  removalVersion: ""
-  deprecationInfo: ""
 STORAGE_USERS_JWT_SECRET:
   name: OCIS_JWT_SECRET;STORAGE_USERS_JWT_SECRET
   defaultValue: ""

@@ -1,8 +1,18 @@
 package revaconfig
 
 import (
+	"time"
+
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 )
+
+// idCacheTTL pins the reva cache TTL for the storage-users ID cache to 0 (never
+// expire). The ID cache holds the authoritative id<->path index, not transient
+// data; expiring it makes the storage provider lose track of existing nodes
+// (files vanish on POSIX, re-resolve thrash on the decomposed drivers). It is
+// deliberately not operator-configurable, so this is hard-coded rather than read
+// from config.
+const idCacheTTL = time.Duration(0)
 
 // EOS is the config mapping for the EOS storage driver
 func EOS(cfg *config.Config) map[string]interface{} {
@@ -100,7 +110,7 @@ func Posix(cfg *config.Config, enableFSWatch bool) map[string]interface{} {
 			"cache_store":               cfg.IDCache.Store,
 			"cache_nodes":               cfg.IDCache.Nodes,
 			"cache_database":            cfg.IDCache.Database,
-			"cache_ttl":                 cfg.IDCache.TTL,
+			"cache_ttl":                 idCacheTTL,
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
 			"cache_auth_username":       cfg.IDCache.AuthUsername,
 			"cache_auth_password":       cfg.IDCache.AuthPassword,
@@ -193,7 +203,7 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 			"cache_store":               cfg.IDCache.Store,
 			"cache_nodes":               cfg.IDCache.Nodes,
 			"cache_database":            cfg.IDCache.Database,
-			"cache_ttl":                 cfg.IDCache.TTL,
+			"cache_ttl":                 idCacheTTL,
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
 			"cache_auth_username":       cfg.IDCache.AuthUsername,
 			"cache_auth_password":       cfg.IDCache.AuthPassword,
@@ -248,7 +258,7 @@ func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_store":               cfg.IDCache.Store,
 			"cache_nodes":               cfg.IDCache.Nodes,
 			"cache_database":            cfg.IDCache.Database,
-			"cache_ttl":                 cfg.IDCache.TTL,
+			"cache_ttl":                 idCacheTTL,
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
 			"cache_auth_username":       cfg.IDCache.AuthUsername,
 			"cache_auth_password":       cfg.IDCache.AuthPassword,
@@ -317,7 +327,7 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 			"cache_store":               cfg.IDCache.Store,
 			"cache_nodes":               cfg.IDCache.Nodes,
 			"cache_database":            cfg.IDCache.Database,
-			"cache_ttl":                 cfg.IDCache.TTL,
+			"cache_ttl":                 idCacheTTL,
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
 			"cache_auth_username":       cfg.IDCache.AuthUsername,
 			"cache_auth_password":       cfg.IDCache.AuthPassword,
@@ -376,7 +386,7 @@ func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_store":               cfg.IDCache.Store,
 			"cache_nodes":               cfg.IDCache.Nodes,
 			"cache_database":            cfg.IDCache.Database,
-			"cache_ttl":                 cfg.IDCache.TTL,
+			"cache_ttl":                 idCacheTTL,
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
 			"cache_auth_username":       cfg.IDCache.AuthUsername,
 			"cache_auth_password":       cfg.IDCache.AuthPassword,
