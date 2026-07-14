@@ -128,6 +128,20 @@ func WopiContextAuthMiddleware(cfg *config.Config, st microstore.Store, next htt
 
 		claims.WopiContext.AccessToken = wopiContextAccessToken
 
+		// The view only token is encrypted the same way as the access token
+		// (see GenerateWopiToken). Decrypt it so downstream consumers get the
+		// plaintext reva token. It is only set for view only shares, so skip
+		// the decryption when it is empty.
+		if claims.WopiContext.ViewOnlyToken != "" {
+			wopiContextViewOnlyToken, err := DecryptAES([]byte(cfg.Wopi.Secret), claims.WopiContext.ViewOnlyToken)
+			if err != nil {
+				wopiLogger.Error().Err(err).Msg("failed to decrypt view only token")
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+				return
+			}
+			claims.WopiContext.ViewOnlyToken = wopiContextViewOnlyToken
+		}
+
 		ctx = context.WithValue(ctx, wopiContextKey, claims.WopiContext)
 		// authentication for the CS3 api
 		ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.TokenHeader, claims.WopiContext.AccessToken)
@@ -199,6 +213,18 @@ func GenerateWopiToken(wopiContext WopiContext, cfg *config.Config, st microstor
 	cryptedReqAccessToken, err := EncryptAES([]byte(cfg.Wopi.Secret), wopiContext.AccessToken)
 	if err != nil {
 		return "", 0, err
+	}
+
+	// The view only token is a reva token that impersonates the resource owner.
+	// It must never be exposed in plaintext inside the (readable) WOPI JWT, so
+	// encrypt it the same way as the access token. It is only set for view only
+	// shares, so skip the encryption when it is empty.
+	if wopiContext.ViewOnlyToken != "" {
+		cryptedViewOnlyToken, err := EncryptAES([]byte(cfg.Wopi.Secret), wopiContext.ViewOnlyToken)
+		if err != nil {
+			return "", 0, err
+		}
+		wopiContext.ViewOnlyToken = cryptedViewOnlyToken
 	}
 
 	cs3Claims := &jwt.RegisteredClaims{}
