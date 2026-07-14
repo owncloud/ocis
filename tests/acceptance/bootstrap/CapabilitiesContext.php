@@ -60,20 +60,33 @@ class CapabilitiesContext implements Context {
 	 *
 	 * @param string $username
 	 * @param boolean $formatJson // if true then formats the response in json
+	 * @param boolean $vaultMode
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function userGetsCapabilities(string $username, ?bool $formatJson = false): ResponseInterface {
+	public function userGetsCapabilities(
+		string $username,
+		?bool $formatJson = false,
+		?bool $vaultMode = false,
+	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($username);
 		$password = $this->featureContext->getPasswordForUser($user);
+		$queryParams = [];
+		if ($formatJson) {
+			$queryParams['format'] = 'json';
+		}
+		if ($vaultMode) {
+			$queryParams['vault'] = 'true';
+		}
+		$queryString = $queryParams ? '?' . http_build_query($queryParams) : '';
 		return OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$password,
 			'GET',
-			'/cloud/capabilities' . ($formatJson ? '?format=json' : ''),
+			'/cloud/capabilities' . $queryString,
 			[],
 			$this->featureContext->getOcsApiVersion(),
 		);
@@ -134,17 +147,19 @@ class CapabilitiesContext implements Context {
 	}
 
 	/**
-	 * @When user :username retrieves the capabilities using the capabilities API
+	 * @When /^user "([^"]*)" retrieves the(| vault mode)? capabilities using the capabilities API$/
 	 *
 	 * @param string $username
+	 * @param string $vaultMode
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function userRetrievesCapabilities(string $username): void {
+	public function userRetrievesCapabilities(string $username, string $vaultMode): void {
 		$user = $this->featureContext->getActualUsername($username);
-		$this->featureContext->setResponse($this->userGetsCapabilities($user, true));
+		$vaultMode = trim($vaultMode) === "vault mode";
+		$this->featureContext->setResponse($this->userGetsCapabilities($user, true, $vaultMode));
 	}
 
 	/**

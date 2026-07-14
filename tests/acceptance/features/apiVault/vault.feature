@@ -62,3 +62,121 @@ Feature: vault
     When user "Alice" uploads a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should have acr value "testing"
+
+
+  Scenario: check capabilities endpoint for vault
+    Given user "Alice" has logged in via web UI
+    When user "Alice" retrieves the vault mode capabilities using the capabilities API
+    Then the HTTP status code should be "200"
+    And the ocs JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [ "capabilities" ],
+        "properties": {
+          "capabilities": {
+            "type": "object",
+            "required": [
+              "core",
+              "files",
+              "files_sharing",
+              "auth",
+              "vault"
+            ],
+            "properties": {
+              "files_sharing": {
+                "type": "object",
+                "required": [
+                  "api_enabled",
+                  "default_permissions",
+                  "public",
+                  "resharing",
+                  "federation",
+                  "group_sharing",
+                  "share_with_group_members_only",
+                  "share_with_membership_groups_only",
+                  "auto_accept_share",
+                  "user_enumeration"
+                ],
+                "properties": {
+                  "federation": {
+                    "type": "object",
+                    "required": [
+                      "outgoing",
+                      "incoming"
+                    ],
+                    "properties": {
+                      "outgoing": {
+                        "const": false
+                      },
+                      "incoming": {
+                        "const": false
+                      }
+                    }
+                  },
+                  "public": {
+                    "type": "object",
+                    "required": [
+                      "enabled",
+                      "multiple",
+                      "upload",
+                      "supports_upload_only",
+                      "send_mail",
+                      "social_share"
+                    ],
+                    "properties": {
+                      "enabled": {
+                        "const": false
+                      }
+                    }
+                  }
+                }
+              },
+              "auth": {
+                "type": "object",
+                "required": [
+                  "mfa"
+                ],
+                "properties": {
+                  "mfa": {
+                    "type": "object",
+                    "required": [
+                      "enabled",
+                      "levelnames"
+                    ],
+                    "properties": {
+                      "enabled": {
+                        "const": true
+                      },
+                      "levelnames": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 1,
+                        "items": {
+                          "const": "advanced"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "vault": {
+                "type": "object",
+                "required": [
+                  "enabled",
+                  "vault_storage_provider"
+                ],
+                "properties": {
+                  "enabled": {
+                    "const": true
+                  },
+                  "vault_storage_provider": {
+                    "pattern": "%uuidv4_pattern%"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
