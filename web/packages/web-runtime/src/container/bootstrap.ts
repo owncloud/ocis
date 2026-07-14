@@ -120,12 +120,6 @@ const getEmbedConfigFromQuery = (
     config.delegateAuthentication = delegateAuthentication === 'true'
   }
 
-  const delegateAuthenticationOrigin = getQueryParam('embed-delegate-authentication-origin')
-
-  if (delegateAuthentication) {
-    config.delegateAuthenticationOrigin = delegateAuthenticationOrigin
-  }
-
   return config
 }
 
