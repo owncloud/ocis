@@ -11,6 +11,7 @@ import (
 	appprovider "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/golang-jwt/jwt/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
@@ -167,6 +168,60 @@ var _ = Describe("Wopi Context Middleware", func() {
 
 		mw.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
+	})
+	It("Should encrypt the ViewOnlyToken inside the WOPI token and restore it on the way in", func() {
+		// a known, recognizable plaintext so we can assert it is not readable in the JWT
+		const viewOnlyPlaintext = "my-secret-view-only-token"
+
+		// capture the WopiContext the middleware hands to the next handler
+		var captured middleware.WopiContext
+		var capturedErr error
+		capturingNext := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			captured, capturedErr = middleware.WopiContextFromCtx(r.Context())
+			w.WriteHeader(http.StatusOK)
+		})
+		capturingMw := middleware.WopiContextAuthMiddleware(cfg, nil, capturingNext)
+
+		token, err := tknMngr.MintToken(ctx, user, nil)
+		Expect(err).ToNot(HaveOccurred())
+
+		wopiContext := middleware.WopiContext{
+			AccessToken:   token,
+			ViewOnlyToken: viewOnlyPlaintext,
+			ViewMode:      appprovider.ViewMode_VIEW_MODE_VIEW_ONLY,
+			FileReference: &providerv1beta1.Reference{
+				ResourceId: rid,
+				Path:       ".",
+			},
+		}
+		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, cfg, nil)
+		Expect(err).ToNot(HaveOccurred())
+
+		// Security property: the plaintext view-only token must not be recoverable
+		// from the (readable) JWT. Parse the JWT and assert the ViewOnlyToken claim
+		// is present but is ciphertext, not the plaintext value.
+		claims := &middleware.Claims{}
+		_, err = jwt.ParseWithClaims(wopiToken, claims, func(t *jwt.Token) (interface{}, error) {
+			return []byte(cfg.Wopi.Secret), nil
+		})
+		Expect(err).ToNot(HaveOccurred())
+		Expect(claims.WopiContext.ViewOnlyToken).ToNot(BeEmpty())
+		Expect(claims.WopiContext.ViewOnlyToken).ToNot(Equal(viewOnlyPlaintext))
+
+		// No-regression property: the middleware must decrypt the token back to the
+		// original plaintext so downstream consumers get a usable reva token.
+		req := httptest.NewRequest("GET", src.String(), nil).WithContext(ctx)
+		q := req.URL.Query()
+		q.Add("access_token", wopiToken)
+		q.Add("access_token_ttl", strconv.FormatInt(ttl, 10))
+		req.URL.RawQuery = q.Encode()
+		resp := httptest.NewRecorder()
+
+		capturingMw.ServeHTTP(resp, req)
+
+		Expect(resp.Code).To(Equal(http.StatusOK))
+		Expect(capturedErr).ToNot(HaveOccurred())
+		Expect(captured.ViewOnlyToken).To(Equal(viewOnlyPlaintext))
 	})
 	It("Should authorize successful with template reference", func() {
 		req := httptest.NewRequest("GET", src.String(), nil).WithContext(ctx)
