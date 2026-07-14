@@ -205,6 +205,57 @@ describe('announceConfiguration', () => {
     expect(configStore.options.embed.enabled).toStrictEqual(false)
   })
 
+  it('should not allow delegateAuthenticationOrigin to be set via URL query', async () => {
+    Object.defineProperty(window, 'location', {
+      value: {
+        search:
+          '?embed=true&embed-delegate-authentication=true&embed-delegate-authentication-origin=https://attacker.example'
+      },
+      writable: true
+    })
+    vi.spyOn(global, 'fetch').mockResolvedValue(
+      mock<Response>({
+        status: 200,
+        json: () => Promise.resolve({ theme: '', server: '', options: {} })
+      })
+    )
+    const configStore = useConfigStore()
+    await announceConfiguration({ path: '/config.json', configStore })
+    expect(configStore.options.embed.delegateAuthentication).toStrictEqual(true)
+    expect(configStore.options.embed.delegateAuthenticationOrigin).toBeUndefined()
+  })
+
+  it('should keep the server-configured delegateAuthenticationOrigin even if a URL query tries to override it', async () => {
+    Object.defineProperty(window, 'location', {
+      value: {
+        search: '?embed-delegate-authentication-origin=https://attacker.example'
+      },
+      writable: true
+    })
+    vi.spyOn(global, 'fetch').mockResolvedValue(
+      mock<Response>({
+        status: 200,
+        json: () =>
+          Promise.resolve({
+            theme: '',
+            server: '',
+            options: {
+              embed: {
+                enabled: true,
+                delegateAuthentication: true,
+                delegateAuthenticationOrigin: 'https://trusted.example'
+              }
+            }
+          })
+      })
+    )
+    const configStore = useConfigStore()
+    await announceConfiguration({ path: '/config.json', configStore })
+    expect(configStore.options.embed.delegateAuthenticationOrigin).toStrictEqual(
+      'https://trusted.example'
+    )
+  })
+
   it('should set default language to value set in URL query when it matches supported languages', async () => {
     Object.defineProperty(window, 'location', {
       value: {

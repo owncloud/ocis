@@ -61,7 +61,7 @@ export const useEmbedMode = () => {
 
   const verifyDelegatedAuthenticationOrigin = (eventOrigin: string): boolean => {
     if (!unref(delegateAuthenticationOrigin)) {
-      return true
+      return false
     }
 
     return unref(delegateAuthenticationOrigin) === eventOrigin

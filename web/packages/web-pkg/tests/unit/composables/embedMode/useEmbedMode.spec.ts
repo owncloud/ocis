@@ -168,12 +168,12 @@ describe('useEmbedMode', () => {
   })
 
   describe('verifyDelegatedAuthenticationOrigin', () => {
-    it('when delegateAuthenticationOrigin is not set should return true', () => {
+    it('when delegateAuthenticationOrigin is not set should return false', () => {
       getComposableWrapper(
         () => {
           const { verifyDelegatedAuthenticationOrigin } = useEmbedMode()
 
-          expect(verifyDelegatedAuthenticationOrigin('event-origin')).toStrictEqual(true)
+          expect(verifyDelegatedAuthenticationOrigin('event-origin')).toStrictEqual(false)
         },
         { mocks: defaultComponentMocks() }
       )
@@ -186,7 +186,7 @@ describe('useEmbedMode', () => {
 
           expect(verifyDelegatedAuthenticationOrigin('event-origin')).toStrictEqual(true)
         },
-        getWrapperOptions({ messagesOrigin: 'event-origin' })
+        getWrapperOptions({ delegateAuthenticationOrigin: 'event-origin' })
       )
     })
 

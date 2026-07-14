@@ -159,6 +159,75 @@ describe('AuthService', () => {
     })
   })
 
+  describe('handleDelegatedTokenUpdate', () => {
+    const buildMessageEvent = (origin: string) =>
+      mock<MessageEvent>({
+        origin,
+        data: { name: 'owncloud-embed:update-token', data: { access_token: 'attacker-token' } }
+      })
+
+    it('when delegateAuthenticationOrigin is not configured, should reject the message regardless of its origin', () => {
+      const authService = new AuthService()
+
+      Object.defineProperty(authService, 'userManager', {
+        value: mock<UserManager>({ updateContext: mockUpdateContext })
+      })
+
+      const configStore = useConfigStore()
+      configStore.options = { embed: { enabled: true, delegateAuthentication: true } }
+      initAuthService({ authService, configStore })
+      ;(authService as any).handleDelegatedTokenUpdate(
+        buildMessageEvent('https://attacker.example')
+      )
+
+      expect(mockUpdateContext).not.toHaveBeenCalled()
+    })
+
+    it('when the message origin does not match the configured delegateAuthenticationOrigin, should reject the message', () => {
+      const authService = new AuthService()
+
+      Object.defineProperty(authService, 'userManager', {
+        value: mock<UserManager>({ updateContext: mockUpdateContext })
+      })
+
+      const configStore = useConfigStore()
+      configStore.options = {
+        embed: {
+          enabled: true,
+          delegateAuthentication: true,
+          delegateAuthenticationOrigin: 'https://trusted.example'
+        }
+      }
+      initAuthService({ authService, configStore })
+      ;(authService as any).handleDelegatedTokenUpdate(
+        buildMessageEvent('https://attacker.example')
+      )
+
+      expect(mockUpdateContext).not.toHaveBeenCalled()
+    })
+
+    it('when the message origin matches the configured delegateAuthenticationOrigin, should update the context', () => {
+      const authService = new AuthService()
+
+      Object.defineProperty(authService, 'userManager', {
+        value: mock<UserManager>({ updateContext: mockUpdateContext })
+      })
+
+      const configStore = useConfigStore()
+      configStore.options = {
+        embed: {
+          enabled: true,
+          delegateAuthentication: true,
+          delegateAuthenticationOrigin: 'https://trusted.example'
+        }
+      }
+      initAuthService({ authService, configStore })
+      ;(authService as any).handleDelegatedTokenUpdate(buildMessageEvent('https://trusted.example'))
+
+      expect(mockUpdateContext).toHaveBeenCalled()
+    })
+  })
+
   describe('acr', () => {
     const mockSignInRedirect = vi.fn()
 
