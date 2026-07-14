@@ -7,6 +7,7 @@ directives:
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
     # In contrary to bash and docker the default is given after the | character
     - 'https://${KEYCLOAK_DOMAIN|keycloak.owncloud.test}/'
+    - 'https://localhost:8443/'
   default-src:
     - '''none'''
   font-src:

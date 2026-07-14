@@ -493,8 +493,9 @@ class WebDavHelper {
 	 * fetches personal space id for provided user
 	 *
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
+	 * @param array|null $headers
 	 *
 	 * @return string
 	 * @throws GuzzleException
@@ -502,8 +503,9 @@ class WebDavHelper {
 	 */
 	public static function getPersonalSpaceIdForUser(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user = null,
+		?string $password = null,
+		?array $headers = [],
 	): string {
 		if (\array_key_exists($user, self::$spacesIdRef) && \array_key_exists("personal", self::$spacesIdRef[$user])) {
 			return self::$spacesIdRef[$user]["personal"];
@@ -511,7 +513,7 @@ class WebDavHelper {
 
 		$personalSpaceId = '';
 		if (!OcisHelper::isTestingOnReva()) {
-			$response = GraphHelper::getMySpaces($baseUrl, $user, $password, '');
+			$response = GraphHelper::getMySpaces($baseUrl, $user, $password, '', [], $headers);
 			Assert::assertEquals(200, $response->getStatusCode(), "Cannot list drives for user '$user'");
 
 			$drives = HttpRequestHelper::getJsonDecodedResponseBodyContent($response);
@@ -564,18 +566,21 @@ class WebDavHelper {
 	 * In case of any exception, it returns a fake space ID
 	 *
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
+	 * @param array|null $headers
 	 *
 	 * @return string
 	 * @throws Exception|GuzzleException
 	 */
 	public static function getPersonalSpaceIdForUserOrFakeIfNotFound(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user = null,
+		?string $password = null,
+		?array $headers = [],
 	): string {
-		if (\str_starts_with($user, "non-exist") || \str_starts_with($user, "nonexist")) {
+		// only fake for non-existent users
+		if ($user !== null && (\str_starts_with($user, "non-exist") || \str_starts_with($user, "nonexist"))) {
 			return self::generateUUIDv4();
 		}
 
@@ -583,6 +588,7 @@ class WebDavHelper {
 			$baseUrl,
 			$user,
 			$password,
+			$headers,
 		);
 	}
 
@@ -660,6 +666,7 @@ class WebDavHelper {
 						$baseUrl,
 						$user,
 						$password,
+						$headers,
 					);
 				}
 			}
@@ -732,6 +739,7 @@ class WebDavHelper {
 			$config,
 			null,
 			$stream,
+			false,
 			$timeout,
 			$client,
 			$isGivenStep,

@@ -31,6 +31,7 @@ use TestHelpers\WebDavHelper;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\Asserts\WebDav as WebDavAssert;
 use TestHelpers\GraphHelper;
+use TestHelpers\KeycloakHelper;
 
 /**
  * WebDav functions
@@ -308,6 +309,13 @@ trait WebDav {
 
 		if ($password === null) {
 			$password = $this->getPasswordForUser($user);
+		}
+
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$access_token = $this->getOcisUserToken($user)["token"]["accessToken"];
+			$headers["Authorization"] = "Bearer " . $access_token;
+			$user = null;
+			$password = null;
 		}
 
 		return WebDavHelper::makeDavRequest(
