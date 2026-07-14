@@ -102,6 +102,7 @@ class HttpRequestHelper {
 	 *                     than download it all up-front.
 	 * @param int|null $timeout
 	 * @param Client|null $client
+	 * @param bool $allowRedirects
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -118,6 +119,7 @@ class HttpRequestHelper {
 		bool $stream = false,
 		?int $timeout = 0,
 		?Client $client = null,
+		?bool $allowRedirects = false,
 	): ResponseInterface {
 		if ($client === null) {
 			$client = self::createClient(
@@ -127,6 +129,7 @@ class HttpRequestHelper {
 				$cookies,
 				$stream,
 				$timeout,
+				$allowRedirects,
 			);
 		}
 
@@ -197,6 +200,7 @@ class HttpRequestHelper {
 	 * @param CookieJar|null $cookies
 	 * @param bool $stream Set to true to stream a response rather
 	 *                     than download it all up-front.
+	 * @param bool $allowRedirects
 	 * @param int|null $timeout
 	 * @param Client|null $client
 	 * @param bool|null $isGivenStep
@@ -215,6 +219,7 @@ class HttpRequestHelper {
 		?array $config = null,
 		?CookieJar $cookies = null,
 		bool $stream = false,
+		?bool $allowRedirects = false,
 		?int $timeout = 0,
 		?Client $client = null,
 		?bool $isGivenStep = false,
@@ -241,6 +246,7 @@ class HttpRequestHelper {
 				$stream,
 				$timeout,
 				$client,
+				$allowRedirects,
 			);
 
 			if ($response->getStatusCode() >= 400
@@ -378,6 +384,7 @@ class HttpRequestHelper {
 	 * @param bool $stream Set to true to stream a response rather
 	 *                     than download it all up-front.
 	 * @param int|null $timeout
+	 * @param bool $allowRedirects
 	 *
 	 * @return Client
 	 */
@@ -388,6 +395,7 @@ class HttpRequestHelper {
 		?CookieJar $cookies = null,
 		?bool $stream = false,
 		?int $timeout = 0,
+		?bool $allowRedirects = false,
 	): Client {
 		$options = [];
 		if ($user !== null) {
@@ -402,6 +410,7 @@ class HttpRequestHelper {
 		$options['stream'] = $stream;
 		$options['verify'] = false;
 		$options['timeout'] = $timeout ?: self::getRequestTimeout();
+		$options['allow_redirects'] = $allowRedirects;
 		return new Client($options);
 	}
 
@@ -459,6 +468,7 @@ class HttpRequestHelper {
 	 * @param array|null $config
 	 * @param CookieJar|null $cookies
 	 * @param boolean $stream
+	 * @param boolean $allowRedirects
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -473,6 +483,7 @@ class HttpRequestHelper {
 		?array $config = null,
 		?CookieJar $cookies = null,
 		?bool $stream = false,
+		?bool $allowRedirects = false,
 	): ResponseInterface {
 		return self::sendRequest(
 			$url,
@@ -484,6 +495,7 @@ class HttpRequestHelper {
 			$config,
 			$cookies,
 			$stream,
+			$allowRedirects,
 		);
 	}
 
