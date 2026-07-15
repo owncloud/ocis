@@ -37,6 +37,25 @@ type Collabora struct {
 	ReadOnly bool `json:"ReadOnly"`
 
 	//
+	// File URL properties
+	//
+
+	// copied from MS WOPI
+	CloseURL string `json:"CloseUrl,omitempty"`
+	// copied from MS WOPI
+	DownloadURL string `json:"DownloadUrl,omitempty"`
+	// copied from MS WOPI
+	FileSharingURL string `json:"FileSharingUrl,omitempty"`
+	// copied from MS WOPI
+	FileVersionURL string `json:"FileVersionUrl,omitempty"`
+	// copied from MS WOPI
+	HostEditURL string `json:"HostEditUrl,omitempty"`
+	// copied from MS WOPI
+	HostViewURL string `json:"HostViewUrl,omitempty"`
+	// copied from MS WOPI
+	SignoutURL string `json:"SignoutUrl,omitempty"`
+
+	//
 	// Extended response properties
 	//
 
@@ -120,6 +139,21 @@ func (cinfo *Collabora) SetProperties(props map[string]interface{}) {
 			cinfo.LastModifiedTime = value.(string)
 		case KeyReadOnly:
 			cinfo.ReadOnly = value.(bool)
+
+		case KeyCloseURL:
+			cinfo.CloseURL = value.(string)
+		case KeyDownloadURL:
+			cinfo.DownloadURL = value.(string)
+		case KeyFileSharingURL:
+			cinfo.FileSharingURL = value.(string)
+		case KeyFileVersionURL:
+			cinfo.FileVersionURL = value.(string)
+		case KeyHostEditURL:
+			cinfo.HostEditURL = value.(string)
+		case KeyHostViewURL:
+			cinfo.HostViewURL = value.(string)
+		case KeySignoutURL:
+			cinfo.SignoutURL = value.(string)
 
 		case KeyEnableInsertRemoteImage:
 			cinfo.EnableInsertRemoteImage = value.(bool)

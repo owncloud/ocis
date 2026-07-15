@@ -529,3 +529,111 @@ func TestCollaboraJSONIncludesIsAnonymousUserWhenTrue(t *testing.T) {
 		t.Errorf("IsAnonymousUser field: got %v, want true", val)
 	}
 }
+
+// urlPropertyCases describes each of the 7 WOPI URL properties added to Collabora: the
+// SetProperties key that populates it, the JSON tag it is expected to be marshalled
+// under, a getter for its value, and a distinct sample value for it. Used to drive the
+// table-driven tests below.
+var urlPropertyCases = []struct {
+	name    string
+	key     string
+	jsonTag string
+	value   string
+	getter  func(*Collabora) string
+}{
+	{"CloseURL", KeyCloseURL, "CloseUrl", "https://ocis.example.prv/close", func(c *Collabora) string { return c.CloseURL }},
+	{"DownloadURL", KeyDownloadURL, "DownloadUrl", "https://ocis.example.prv/download", func(c *Collabora) string { return c.DownloadURL }},
+	{"FileSharingURL", KeyFileSharingURL, "FileSharingUrl", "https://ocis.example.prv/share", func(c *Collabora) string { return c.FileSharingURL }},
+	{"FileVersionURL", KeyFileVersionURL, "FileVersionUrl", "https://ocis.example.prv/versions", func(c *Collabora) string { return c.FileVersionURL }},
+	{"HostEditURL", KeyHostEditURL, "HostEditUrl", "https://ocis.example.prv/edit", func(c *Collabora) string { return c.HostEditURL }},
+	{"HostViewURL", KeyHostViewURL, "HostViewUrl", "https://ocis.example.prv/view", func(c *Collabora) string { return c.HostViewURL }},
+	{"SignoutURL", KeySignoutURL, "SignoutUrl", "https://ocis.example.prv/signout", func(c *Collabora) string { return c.SignoutURL }},
+}
+
+// TestCollaboraSetPropertiesURLProperties covers brief item 1: for each of the 7 URL
+// properties, SetProperties must correctly set the corresponding struct field.
+func TestCollaboraSetPropertiesURLProperties(t *testing.T) {
+	for _, prop := range urlPropertyCases {
+		t.Run(prop.name, func(t *testing.T) {
+			cinfo := &Collabora{}
+			cinfo.SetProperties(map[string]interface{}{
+				prop.key: prop.value,
+			})
+
+			if got := prop.getter(cinfo); got != prop.value {
+				t.Errorf("SetProperties %s: got %q, want %q", prop.name, got, prop.value)
+			}
+		})
+	}
+}
+
+// TestCollaboraJSONMarshallingIncludesURLProperties covers brief item 2: marshalling a
+// Collabora struct with all 7 URL properties populated must include all of them in the
+// resulting JSON, under their MS-WOPI-compatible tag names.
+func TestCollaboraJSONMarshallingIncludesURLProperties(t *testing.T) {
+	cinfo := &Collabora{}
+	for _, prop := range urlPropertyCases {
+		cinfo.SetProperties(map[string]interface{}{prop.key: prop.value})
+	}
+
+	jsonBytes, err := json.Marshal(cinfo)
+	if err != nil {
+		t.Fatalf("Failed to marshal JSON: %v", err)
+	}
+
+	var jsonMap map[string]interface{}
+	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
+		t.Fatalf("Failed to unmarshal JSON: %v", err)
+	}
+
+	for _, prop := range urlPropertyCases {
+		val, ok := jsonMap[prop.jsonTag]
+		if !ok {
+			t.Errorf("Expected %q field to be in JSON, but it was not: %s", prop.jsonTag, string(jsonBytes))
+			continue
+		}
+		if val != prop.value {
+			t.Errorf("%s field: got %v, want %q", prop.jsonTag, val, prop.value)
+		}
+	}
+}
+
+// TestCollaboraJSONOmitsEmptyURLProperties covers brief item 3: each of the 7 URL
+// properties has `omitempty` and must be absent from the JSON output when empty.
+func TestCollaboraJSONOmitsEmptyURLProperties(t *testing.T) {
+	cinfo := &Collabora{}
+
+	jsonBytes, err := json.Marshal(cinfo)
+	if err != nil {
+		t.Fatalf("Failed to marshal JSON: %v", err)
+	}
+
+	var jsonMap map[string]interface{}
+	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
+		t.Fatalf("Failed to unmarshal JSON: %v", err)
+	}
+
+	for _, prop := range urlPropertyCases {
+		if _, ok := jsonMap[prop.jsonTag]; ok {
+			t.Errorf("Expected %q field to be omitted from JSON when empty due to omitempty, but it was present: %s", prop.jsonTag, string(jsonBytes))
+		}
+	}
+}
+
+// TestCollaboraSetPropertiesAllURLPropertiesSimultaneously covers brief item 4: setting
+// all 7 URL properties in a single SetProperties call must set all of them correctly.
+func TestCollaboraSetPropertiesAllURLPropertiesSimultaneously(t *testing.T) {
+	props := make(map[string]interface{}, len(urlPropertyCases))
+	for _, prop := range urlPropertyCases {
+		props[prop.key] = prop.value
+	}
+
+	cinfo := &Collabora{}
+	cinfo.SetProperties(props)
+
+	for _, prop := range urlPropertyCases {
+		if got := prop.getter(cinfo); got != prop.value {
+			t.Errorf("SetProperties %s: got %q, want %q", prop.name, got, prop.value)
+		}
+	}
+}
