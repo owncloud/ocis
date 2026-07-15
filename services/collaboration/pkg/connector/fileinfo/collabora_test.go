@@ -238,6 +238,84 @@ func TestCollaboraLastModifiedTimeOmitEmpty(t *testing.T) {
 	}
 }
 
+func TestCollaboraSetPropertiesReadOnly(t *testing.T) {
+	tests := []struct {
+		name           string
+		readOnly       bool
+		expectedResult bool
+	}{
+		{
+			name:           "ReadOnly set to true",
+			readOnly:       true,
+			expectedResult: true,
+		},
+		{
+			name:           "ReadOnly set to false",
+			readOnly:       false,
+			expectedResult: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cinfo := &Collabora{}
+			cinfo.SetProperties(map[string]interface{}{
+				KeyReadOnly: tt.readOnly,
+			})
+
+			if cinfo.ReadOnly != tt.expectedResult {
+				t.Errorf("SetProperties ReadOnly: got %v, want %v", cinfo.ReadOnly, tt.expectedResult)
+			}
+		})
+	}
+}
+
+func TestCollaboraJSONMarshallingIncludesReadOnly(t *testing.T) {
+	// ReadOnly has no `omitempty`, so it must always be present in the JSON
+	// output, including when false.
+	tests := []struct {
+		name     string
+		readOnly bool
+	}{
+		{
+			name:     "ReadOnly true is included",
+			readOnly: true,
+		},
+		{
+			name:     "ReadOnly false is included",
+			readOnly: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cinfo := &Collabora{
+				ReadOnly: tt.readOnly,
+			}
+
+			jsonBytes, err := json.Marshal(cinfo)
+			if err != nil {
+				t.Fatalf("Failed to marshal JSON: %v", err)
+			}
+
+			var jsonMap map[string]interface{}
+			if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
+				t.Fatalf("Failed to unmarshal JSON: %v", err)
+			}
+
+			val, hasReadOnly := jsonMap["ReadOnly"]
+			if !hasReadOnly {
+				t.Fatalf("Expected ReadOnly field to always be present in JSON (no omitempty), but it was missing: %s", string(jsonBytes))
+			}
+
+			boolVal, ok := val.(bool)
+			if !ok || boolVal != tt.readOnly {
+				t.Errorf("ReadOnly field: got %v, want %v", val, tt.readOnly)
+			}
+		})
+	}
+}
+
 func TestCollaboraVersionOmitEmpty(t *testing.T) {
 	tests := []struct {
 		name     string

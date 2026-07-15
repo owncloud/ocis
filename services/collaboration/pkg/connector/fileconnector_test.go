@@ -1840,6 +1840,7 @@ var _ = Describe("FileConnector", func() {
 				PostMessageOrigin:       "https://ocis.example.prv",
 				Version:                 "v162738491234567",
 				LastModifiedTime:        "1970-07-08T08:30:49.0012345Z",
+				ReadOnly:                true,
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -1945,6 +1946,7 @@ var _ = Describe("FileConnector", func() {
 				FileVersionURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
 				HostEditURL:             "https://ocis.example.prv/external-onlyoffice/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
 				PostMessageOrigin:       "https://ocis.example.prv",
+				ReadOnly:                true,
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -2026,6 +2028,7 @@ var _ = Describe("FileConnector", func() {
 				PostMessageOrigin:       "https://ocis.example.prv",
 				Version:                 "v162738490",
 				LastModifiedTime:        "1970-07-08T08:30:49.0000000Z",
+				ReadOnly:                true,
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -2100,6 +2103,7 @@ var _ = Describe("FileConnector", func() {
 				PostMessageOrigin:       "https://ocis.example.prv",
 				Version:                 "v162738490",
 				LastModifiedTime:        "1970-07-08T08:30:49.0000000Z",
+				ReadOnly:                true,
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -2248,6 +2252,110 @@ var _ = Describe("FileConnector", func() {
 			// Verify that the Collabora response includes the LastModifiedTime field,
 			// required for Collabora's X-COOL-WOPI-Timestamp conflict detection
 			Expect(collaboraResponse.LastModifiedTime).To(Equal("1970-07-08T08:30:49.1234567Z"))
+		})
+
+		It("Collabora CheckFileInfo returns ReadOnly=true for a read-only view mode", func() {
+			wopiCtx.ViewMode = appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// change wopi app provider
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.ReadOnly).To(BeTrue())
+		})
+
+		It("Collabora CheckFileInfo returns ReadOnly=false for a writable view mode", func() {
+			// wopiCtx.ViewMode defaults to VIEW_MODE_READ_WRITE (set in BeforeEach)
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// change wopi app provider
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.ReadOnly).To(BeFalse())
 		})
 
 	})

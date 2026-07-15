@@ -1306,6 +1306,8 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		fileinfo.KeyLicenseCheckForEditIsEnabled: f.cfg.App.LicenseCheckEnable,
 	}
 
+	infoMap[fileinfo.KeyReadOnly] = wopiContext.ViewMode != appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE
+
 	switch wopiContext.ViewMode {
 	case appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE:
 		infoMap[fileinfo.KeyUserCanWrite] = true

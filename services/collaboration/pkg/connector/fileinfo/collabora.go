@@ -33,6 +33,8 @@ type Collabora struct {
 	Version string `json:"Version,omitempty"`
 	// copied from MS WOPI - required for Collabora conflict detection via X-COOL-WOPI-Timestamp
 	LastModifiedTime string `json:"LastModifiedTime,omitempty"`
+	// copied from MS WOPI
+	ReadOnly bool `json:"ReadOnly"`
 
 	//
 	// Extended response properties
@@ -112,6 +114,8 @@ func (cinfo *Collabora) SetProperties(props map[string]interface{}) {
 			cinfo.Version = value.(string)
 		case KeyLastModifiedTime:
 			cinfo.LastModifiedTime = value.(string)
+		case KeyReadOnly:
+			cinfo.ReadOnly = value.(bool)
 
 		case KeyEnableInsertRemoteImage:
 			cinfo.EnableInsertRemoteImage = value.(bool)
