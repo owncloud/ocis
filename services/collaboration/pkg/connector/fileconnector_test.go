@@ -1835,6 +1835,7 @@ var _ = Describe("FileConnector", func() {
 				EnableOwnerTermination:  true,
 				SupportsLocks:           true,
 				SupportsRename:          true,
+				SupportsUpdate:          true,
 				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
 				PostMessageOrigin:       "https://ocis.example.prv",
@@ -2023,6 +2024,7 @@ var _ = Describe("FileConnector", func() {
 				WatermarkText:           "",
 				SupportsLocks:           true,
 				SupportsRename:          true,
+				SupportsUpdate:          true,
 				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
 				PostMessageOrigin:       "https://ocis.example.prv",
@@ -2098,6 +2100,7 @@ var _ = Describe("FileConnector", func() {
 				WatermarkText:           "Pet Shaft shaft@example.com",
 				SupportsLocks:           true,
 				SupportsRename:          true,
+				SupportsUpdate:          true,
 				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
 				PostMessageOrigin:       "https://ocis.example.prv",
@@ -2356,6 +2359,112 @@ var _ = Describe("FileConnector", func() {
 
 			collaboraResponse := response.Body.(*fileinfo.Collabora)
 			Expect(collaboraResponse.ReadOnly).To(BeFalse())
+		})
+
+		It("Collabora CheckFileInfo includes SupportsUpdate=true", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// change wopi app provider
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.SupportsUpdate).To(BeTrue())
+		})
+
+		It("Collabora CheckFileInfo verifies SupportsUpdate and UserCanNotWriteRelative consistency", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// change wopi app provider
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			// When SupportsUpdate is true, UserCanNotWriteRelative should reflect
+			// the actual capability of the host (in this case, PutRelativeFile is implemented,
+			// so UserCanNotWriteRelative should be false)
+			Expect(collaboraResponse.SupportsUpdate).To(BeTrue())
+			Expect(collaboraResponse.UserCanNotWriteRelative).To(BeFalse())
 		})
 
 	})

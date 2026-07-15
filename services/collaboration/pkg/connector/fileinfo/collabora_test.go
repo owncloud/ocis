@@ -370,3 +370,81 @@ func TestCollaboraVersionOmitEmpty(t *testing.T) {
 		})
 	}
 }
+
+func TestCollaboraSetPropertiesSupportsUpdate(t *testing.T) {
+	tests := []struct {
+		name           string
+		supportsUpdate bool
+		expectedResult bool
+	}{
+		{
+			name:           "SupportsUpdate set to true",
+			supportsUpdate: true,
+			expectedResult: true,
+		},
+		{
+			name:           "SupportsUpdate set to false",
+			supportsUpdate: false,
+			expectedResult: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cinfo := &Collabora{}
+			cinfo.SetProperties(map[string]interface{}{
+				KeySupportsUpdate: tt.supportsUpdate,
+			})
+
+			if cinfo.SupportsUpdate != tt.expectedResult {
+				t.Errorf("SetProperties SupportsUpdate: got %v, want %v", cinfo.SupportsUpdate, tt.expectedResult)
+			}
+		})
+	}
+}
+
+func TestCollaboraJSONMarshallingIncludesSupportsUpdate(t *testing.T) {
+	// SupportsUpdate has no `omitempty`, so it must always be present in the JSON
+	// output, including when false.
+	tests := []struct {
+		name           string
+		supportsUpdate bool
+	}{
+		{
+			name:           "SupportsUpdate true is included",
+			supportsUpdate: true,
+		},
+		{
+			name:           "SupportsUpdate false is included",
+			supportsUpdate: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cinfo := &Collabora{
+				SupportsUpdate: tt.supportsUpdate,
+			}
+
+			jsonBytes, err := json.Marshal(cinfo)
+			if err != nil {
+				t.Fatalf("Failed to marshal JSON: %v", err)
+			}
+
+			var jsonMap map[string]interface{}
+			if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
+				t.Fatalf("Failed to unmarshal JSON: %v", err)
+			}
+
+			val, hasSupportsUpdate := jsonMap["SupportsUpdate"]
+			if !hasSupportsUpdate {
+				t.Fatalf("Expected SupportsUpdate field to always be present in JSON (no omitempty), but it was missing: %s", string(jsonBytes))
+			}
+
+			boolVal, ok := val.(bool)
+			if !ok || boolVal != tt.supportsUpdate {
+				t.Errorf("SupportsUpdate field: got %v, want %v", val, tt.supportsUpdate)
+			}
+		})
+	}
+}

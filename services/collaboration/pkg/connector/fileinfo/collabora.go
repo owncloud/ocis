@@ -82,6 +82,7 @@ type Collabora struct {
 	HideUserList      string `json:"HideUserList,omitempty"`
 	SupportsLocks     bool   `json:"SupportsLocks"`
 	SupportsRename    bool   `json:"SupportsRename"`
+	SupportsUpdate    bool   `json:"SupportsUpdate"`
 	UserCanRename     bool   `json:"UserCanRename"`
 	BreadcrumbDocName string `json:"BreadcrumbDocName,omitempty"`
 }
@@ -152,6 +153,8 @@ func (cinfo *Collabora) SetProperties(props map[string]interface{}) {
 			cinfo.SupportsLocks = value.(bool)
 		case KeySupportsRename:
 			cinfo.SupportsRename = value.(bool)
+		case KeySupportsUpdate:
+			cinfo.SupportsUpdate = value.(bool)
 		case KeyUserCanRename:
 			cinfo.UserCanRename = value.(bool)
 		case KeyBreadcrumbDocName:
