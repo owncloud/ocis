@@ -500,12 +500,17 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if u.HasUserType() {
-		logger.Info().Interface("user", u).Msg("could not create user: userType is a read-only attribute")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "userType is a read-only attribute")
+	// A userType may be set explicitly on creation (e.g. "Guest" for an invited
+	// external user). It must be a known type; when omitted it defaults to "Member".
+	// Who may create users at all is already gated by the admin requirement on the route.
+	switch {
+	case !u.HasUserType():
+		u.SetUserType("Member")
+	case !isValidUserType(u.GetUserType()):
+		logger.Info().Interface("user", u).Msg("could not create user: invalid userType")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid userType")
 		return
 	}
-	u.SetUserType("Member")
 
 	logger.Debug().Interface("user", u).Msg("calling create user on backend")
 	if u, err = g.identityBackend.CreateUser(r.Context(), *u); err != nil {
