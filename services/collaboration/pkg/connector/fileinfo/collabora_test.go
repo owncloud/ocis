@@ -637,3 +637,128 @@ func TestCollaboraSetPropertiesAllURLPropertiesSimultaneously(t *testing.T) {
 		}
 	}
 }
+
+// breadcrumbPropertyCases describes each of the 4 breadcrumb WOPI properties added to
+// Collabora in addition to the pre-existing BreadcrumbDocName: the SetProperties key
+// that populates it, the JSON tag it is expected to be marshalled under, a getter for
+// its value, and a distinct sample value for it. Used to drive the table-driven tests
+// below.
+var breadcrumbPropertyCases = []struct {
+	name    string
+	key     string
+	jsonTag string
+	value   string
+	getter  func(*Collabora) string
+}{
+	{"BreadcrumbBrandName", KeyBreadcrumbBrandName, "BreadcrumbBrandName", "ownCloud", func(c *Collabora) string { return c.BreadcrumbBrandName }},
+	{"BreadcrumbBrandURL", KeyBreadcrumbBrandURL, "BreadcrumbBrandUrl", "https://ocis.example.prv/f/storageid$spaceid%21rootid", func(c *Collabora) string { return c.BreadcrumbBrandURL }},
+	{"BreadcrumbFolderName", KeyBreadcrumbFolderName, "BreadcrumbFolderName", "Documents", func(c *Collabora) string { return c.BreadcrumbFolderName }},
+	{"BreadcrumbFolderURL", KeyBreadcrumbFolderURL, "BreadcrumbFolderUrl", "https://ocis.example.prv/f/storageid$spaceid%21parentid", func(c *Collabora) string { return c.BreadcrumbFolderURL }},
+}
+
+// TestCollaboraSetPropertiesBreadcrumbProperties covers brief item 1: SetProperties with
+// all four breadcrumb properties must set each of them correctly.
+func TestCollaboraSetPropertiesBreadcrumbProperties(t *testing.T) {
+	props := make(map[string]interface{}, len(breadcrumbPropertyCases))
+	for _, prop := range breadcrumbPropertyCases {
+		props[prop.key] = prop.value
+	}
+
+	cinfo := &Collabora{}
+	cinfo.SetProperties(props)
+
+	for _, prop := range breadcrumbPropertyCases {
+		if got := prop.getter(cinfo); got != prop.value {
+			t.Errorf("SetProperties %s: got %q, want %q", prop.name, got, prop.value)
+		}
+	}
+}
+
+// TestCollaboraJSONMarshallingIncludesBreadcrumbProperties covers brief item 2:
+// marshalling a Collabora struct with all four breadcrumb properties populated must
+// include all of them in the resulting JSON, under their MS-WOPI-compatible tag names.
+func TestCollaboraJSONMarshallingIncludesBreadcrumbProperties(t *testing.T) {
+	cinfo := &Collabora{}
+	for _, prop := range breadcrumbPropertyCases {
+		cinfo.SetProperties(map[string]interface{}{prop.key: prop.value})
+	}
+
+	jsonBytes, err := json.Marshal(cinfo)
+	if err != nil {
+		t.Fatalf("Failed to marshal JSON: %v", err)
+	}
+
+	var jsonMap map[string]interface{}
+	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
+		t.Fatalf("Failed to unmarshal JSON: %v", err)
+	}
+
+	for _, prop := range breadcrumbPropertyCases {
+		val, ok := jsonMap[prop.jsonTag]
+		if !ok {
+			t.Errorf("Expected %q field to be in JSON, but it was not: %s", prop.jsonTag, string(jsonBytes))
+			continue
+		}
+		if val != prop.value {
+			t.Errorf("%s field: got %v, want %q", prop.jsonTag, val, prop.value)
+		}
+	}
+}
+
+// TestCollaboraJSONOmitsEmptyBreadcrumbProperties covers brief item 3: each of the four
+// breadcrumb properties has `omitempty` and must be absent from the JSON output when
+// empty.
+func TestCollaboraJSONOmitsEmptyBreadcrumbProperties(t *testing.T) {
+	cinfo := &Collabora{}
+
+	jsonBytes, err := json.Marshal(cinfo)
+	if err != nil {
+		t.Fatalf("Failed to marshal JSON: %v", err)
+	}
+
+	var jsonMap map[string]interface{}
+	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
+		t.Fatalf("Failed to unmarshal JSON: %v", err)
+	}
+
+	for _, prop := range breadcrumbPropertyCases {
+		if _, ok := jsonMap[prop.jsonTag]; ok {
+			t.Errorf("Expected %q field to be omitted from JSON when empty due to omitempty, but it was present: %s", prop.jsonTag, string(jsonBytes))
+		}
+	}
+}
+
+// TestCollaboraJSONMixedBreadcrumbProperties covers brief item 4: setting only
+// BreadcrumbBrandName and BreadcrumbFolderName (leaving BreadcrumbBrandURL and
+// BreadcrumbFolderURL empty) must result in only the former two appearing in the
+// marshalled JSON.
+func TestCollaboraJSONMixedBreadcrumbProperties(t *testing.T) {
+	cinfo := &Collabora{}
+	cinfo.SetProperties(map[string]interface{}{
+		KeyBreadcrumbBrandName:  "ownCloud",
+		KeyBreadcrumbFolderName: "Documents",
+	})
+
+	jsonBytes, err := json.Marshal(cinfo)
+	if err != nil {
+		t.Fatalf("Failed to marshal JSON: %v", err)
+	}
+
+	var jsonMap map[string]interface{}
+	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
+		t.Fatalf("Failed to unmarshal JSON: %v", err)
+	}
+
+	if val, ok := jsonMap["BreadcrumbBrandName"]; !ok || val != "ownCloud" {
+		t.Errorf("Expected BreadcrumbBrandName to be %q in JSON, got %v (present: %v)", "ownCloud", val, ok)
+	}
+	if val, ok := jsonMap["BreadcrumbFolderName"]; !ok || val != "Documents" {
+		t.Errorf("Expected BreadcrumbFolderName to be %q in JSON, got %v (present: %v)", "Documents", val, ok)
+	}
+	if _, ok := jsonMap["BreadcrumbBrandUrl"]; ok {
+		t.Errorf("Expected BreadcrumbBrandUrl to be omitted from JSON, but it was present: %s", string(jsonBytes))
+	}
+	if _, ok := jsonMap["BreadcrumbFolderUrl"]; ok {
+		t.Errorf("Expected BreadcrumbFolderUrl to be omitted from JSON, but it was present: %s", string(jsonBytes))
+	}
+}

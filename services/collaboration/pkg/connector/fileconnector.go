@@ -1257,6 +1257,22 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 			logger.Error().Err(err).Msg("CheckFileInfo: error getting scopes from the context")
 		}
 	}
+	// BreadcrumbBrandURL points at the space's root resource, exposing an internal
+	// space/resource id; for public shares an anonymous user has no other way to reach
+	// that id, so (like parentFolderURL above) the link is withheld. BreadcrumbBrandName
+	// is just a display string, not a navigable link, so it stays populated either way.
+	// Only build the link when the stat response actually carries space info: without a
+	// root resource id there is nothing to point at, and joining an empty id into the
+	// path would otherwise produce a misleading bare ".../f" URL.
+	breadcrumbBrandURL := ""
+	if !isPublicShare {
+		if spaceRoot := statRes.GetInfo().GetSpace().GetRoot(); spaceRoot != nil {
+			brandURL := &url.URL{}
+			*brandURL = *ocisURL
+			brandURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(spaceRoot))
+			breadcrumbBrandURL = brandURL.String()
+		}
+	}
 	// fileinfo map
 	var size interface{}
 	size = int64(statRes.GetInfo().GetSize())
@@ -1284,6 +1300,8 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		// to get the folder we actually need to do a GetPath() request
 		fileinfo.KeyBreadcrumbFolderName: breadcrumbFolderName,
 		fileinfo.KeyBreadcrumbFolderURL:  parentFolderURL.String(),
+		fileinfo.KeyBreadcrumbBrandName:  statRes.GetInfo().GetSpace().GetName(),
+		fileinfo.KeyBreadcrumbBrandURL:   breadcrumbBrandURL,
 		// the WOPI client should navigate here when the editor is closed; the folder
 		// containing the file is the same target used for the breadcrumb folder link
 		fileinfo.KeyCloseURL: parentFolderURL.String(),

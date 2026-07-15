@@ -1850,19 +1850,22 @@ var _ = Describe("FileConnector", func() {
 				SupportsUpdate:          true,
 				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
+				BreadcrumbFolderName:    "/path/to",
 				PostMessageOrigin:       "https://ocis.example.prv",
 				Version:                 "v162738491234567",
 				LastModifiedTime:        "1970-07-08T08:30:49.0012345Z",
 				ReadOnly:                true,
 				IsAnonymousUser:         true,
 				// no scopes are set in the context for this test, so the parent folder
-				// URL (and therefore CloseURL) falls back to the bare oCIS URL
-				CloseURL:       "https://ocis.example.prv",
-				DownloadURL:    "", // Remove the hardcoded token since it's dynamically generated
-				FileSharingURL: "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=sharing",
-				FileVersionURL: "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
-				HostEditURL:    "https://ocis.example.prv/external-collabora/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
-				HostViewURL:    "https://ocis.example.prv/external-collabora/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=view",
+				// URL (and therefore CloseURL and BreadcrumbFolderURL) falls back to the
+				// bare oCIS URL
+				CloseURL:            "https://ocis.example.prv",
+				BreadcrumbFolderURL: "https://ocis.example.prv",
+				DownloadURL:         "", // Remove the hardcoded token since it's dynamically generated
+				FileSharingURL:      "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=sharing",
+				FileVersionURL:      "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
+				HostEditURL:         "https://ocis.example.prv/external-collabora/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
+				HostViewURL:         "https://ocis.example.prv/external-collabora/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=view",
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -2059,6 +2062,8 @@ var _ = Describe("FileConnector", func() {
 				SupportsUpdate:          true,
 				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
+				BreadcrumbFolderName:    "/path/to",
+				BreadcrumbFolderURL:     "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
 				PostMessageOrigin:       "https://ocis.example.prv",
 				Version:                 "v162738490",
 				LastModifiedTime:        "1970-07-08T08:30:49.0000000Z",
@@ -2258,6 +2263,8 @@ var _ = Describe("FileConnector", func() {
 				SupportsUpdate:          true,
 				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
+				BreadcrumbFolderName:    "/path/to",
+				BreadcrumbFolderURL:     "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
 				PostMessageOrigin:       "https://ocis.example.prv",
 				Version:                 "v162738490",
 				LastModifiedTime:        "1970-07-08T08:30:49.0000000Z",
@@ -2640,10 +2647,11 @@ var _ = Describe("FileConnector", func() {
 		})
 
 		It("CloseURL reuses the exact same parent folder URL as BreadcrumbFolderURL", func() {
-			// Collabora doesn't expose a BreadcrumbFolderURL field, so this is verified
-			// against the Microsoft target, which has both fields. Both are fed from the
-			// exact same infoMap entry (parentFolderURL.String()), so this proves the
-			// reuse that also backs Collabora's CloseURL.
+			// Verified against the Microsoft target here; both CloseURL and
+			// BreadcrumbFolderURL are fed from the exact same infoMap entry
+			// (parentFolderURL.String()), so this proves the reuse that also backs
+			// Collabora's CloseURL/BreadcrumbFolderURL (see the Collabora-specific
+			// CheckFileInfo tests above, which assert the same equality).
 			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 			u := &userv1beta1.User{
 				Id: &userv1beta1.UserId{
@@ -2851,6 +2859,256 @@ var _ = Describe("FileConnector", func() {
 			Expect(collaboraResponse.CloseURL).ToNot(BeEmpty())
 			Expect(collaboraResponse.HostEditURL).ToNot(BeEmpty())
 			Expect(collaboraResponse.HostViewURL).ToNot(BeEmpty())
+		})
+
+		It("Collabora CheckFileInfo populates breadcrumbs for a file in a subfolder", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size:  uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{Seconds: uint64(16273849)},
+					Path:  "/personal/user/Documents/report.docx",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "fileid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "documentsid",
+						SpaceId:   "spaceid",
+					},
+					Space: &providerv1beta1.StorageSpace{
+						Name: "Personal",
+						Root: &providerv1beta1.ResourceId{
+							StorageId: "storageid",
+							OpaqueId:  "rootid",
+							SpaceId:   "spaceid",
+						},
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.BreadcrumbDocName).To(Equal("report.docx"))
+			// BreadcrumbFolderName is derived via path.Dir(), which returns the full parent
+			// path rather than just the leaf folder name; this is pre-existing behavior
+			// (see the "/path/to" expectation in the "Stat success" test above) and is not
+			// something this task changes.
+			Expect(collaboraResponse.BreadcrumbFolderName).To(Equal("/personal/user/Documents"))
+			Expect(collaboraResponse.BreadcrumbFolderURL).To(Equal("https://ocis.example.prv/f/storageid$spaceid%21documentsid"))
+		})
+
+		It("Collabora CheckFileInfo breadcrumb folder name falls back to the space name for a file at the space root", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			rootId := &providerv1beta1.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "rootid",
+				SpaceId:   "spaceid",
+			}
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size:  uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{Seconds: uint64(16273849)},
+					// a file directly at the space root; path.Dir("/file.docx") == "/",
+					// which triggers the existing space-name fallback for the folder name
+					Path:     "/file.docx",
+					Id:       rootId,
+					ParentId: rootId,
+					Space: &providerv1beta1.StorageSpace{
+						Name: "Personal",
+						Root: rootId,
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.BreadcrumbFolderName).To(Equal("Personal"))
+		})
+
+		It("Collabora CheckFileInfo BreadcrumbBrandName/BreadcrumbBrandURL reflect the project space", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size:  uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{Seconds: uint64(16273849)},
+					Path:  "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "projectspaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "projectspaceid",
+					},
+					Space: &providerv1beta1.StorageSpace{
+						Name: "Project Alpha",
+						Root: &providerv1beta1.ResourceId{
+							StorageId: "storageid",
+							OpaqueId:  "rootid",
+							SpaceId:   "projectspaceid",
+						},
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.BreadcrumbBrandName).To(Equal("Project Alpha"))
+			Expect(collaboraResponse.BreadcrumbBrandURL).To(Equal("https://ocis.example.prv/f/storageid$projectspaceid%21rootid"))
+		})
+
+		It("Collabora CheckFileInfo withholds BreadcrumbBrandURL but keeps BreadcrumbBrandName for public link (anonymous) access", func() {
+			ResourceId := &providerv1beta1.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "opaqueid",
+				SpaceId:   "spaceid",
+			}
+
+			// add user's opaque to include public-share-role
+			u := &userv1beta1.User{}
+			u.Opaque = &typesv1beta1.Opaque{
+				Map: map[string]*typesv1beta1.OpaqueEntry{
+					"public-share-role": {
+						Decoder: "plain",
+						Value:   []byte("viewer"),
+					},
+				},
+			}
+			// Create a new "scope share" to only expose the required fields `ResourceId` and `Token` to the scope.
+			scopeShare := &link.PublicShare{ResourceId: ResourceId, Token: "ABC123"}
+			val, err := utils.MarshalProtoV1ToJSON(scopeShare)
+			Expect(err).ToNot(HaveOccurred())
+
+			scopes := map[string]*auth.Scope{
+				"publicshare:ABC123": {
+					Resource: &typesv1beta1.OpaqueEntry{
+						Decoder: "json",
+						Value:   val,
+					},
+					Role: auth.Role(appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY),
+				},
+			}
+			wopiCtx.ViewMode = appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY
+
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+			ctx = ctxpkg.ContextSetScopes(ctx, scopes)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id:   ResourceId,
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+					Space: &providerv1beta1.StorageSpace{
+						Name: "Personal",
+						Root: &providerv1beta1.ResourceId{
+							StorageId: "storageid",
+							OpaqueId:  "rootid",
+							SpaceId:   "spaceid",
+						},
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			// the brand name is just a display string, not a navigable link, so it is not
+			// gated by public-share access
+			Expect(collaboraResponse.BreadcrumbBrandName).To(Equal("Personal"))
+			// the brand URL would expose an internal space/resource id an anonymous user
+			// has no other way to reach, so it must be withheld for public shares (mirrors
+			// how BreadcrumbFolderURL/CloseURL already point at the share token instead of
+			// a "/f/<id>" link for public shares)
+			Expect(collaboraResponse.BreadcrumbBrandURL).To(BeEmpty())
+			Expect(collaboraResponse.BreadcrumbFolderURL).To(Equal("https://ocis.example.prv/s/ABC123"))
 		})
 
 	})

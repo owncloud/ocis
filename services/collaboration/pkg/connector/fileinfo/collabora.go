@@ -107,6 +107,14 @@ type Collabora struct {
 	BreadcrumbDocName string `json:"BreadcrumbDocName,omitempty"`
 	// copied from MS WOPI
 	IsAnonymousUser bool `json:"IsAnonymousUser,omitempty"`
+	// copied from MS WOPI
+	BreadcrumbBrandName string `json:"BreadcrumbBrandName,omitempty"`
+	// copied from MS WOPI
+	BreadcrumbBrandURL string `json:"BreadcrumbBrandUrl,omitempty"`
+	// copied from MS WOPI
+	BreadcrumbFolderName string `json:"BreadcrumbFolderName,omitempty"`
+	// copied from MS WOPI
+	BreadcrumbFolderURL string `json:"BreadcrumbFolderUrl,omitempty"`
 }
 
 // SetProperties will set the file properties for the Collabora implementation.
@@ -198,6 +206,14 @@ func (cinfo *Collabora) SetProperties(props map[string]interface{}) {
 			cinfo.BreadcrumbDocName = value.(string)
 		case KeyIsAnonymousUser:
 			cinfo.IsAnonymousUser = value.(bool)
+		case KeyBreadcrumbBrandName:
+			cinfo.BreadcrumbBrandName = value.(string)
+		case KeyBreadcrumbBrandURL:
+			cinfo.BreadcrumbBrandURL = value.(string)
+		case KeyBreadcrumbFolderName:
+			cinfo.BreadcrumbFolderName = value.(string)
+		case KeyBreadcrumbFolderURL:
+			cinfo.BreadcrumbFolderURL = value.(string)
 		}
 	}
 }
