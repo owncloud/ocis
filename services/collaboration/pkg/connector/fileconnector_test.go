@@ -3111,5 +3111,56 @@ var _ = Describe("FileConnector", func() {
 			Expect(collaboraResponse.BreadcrumbFolderURL).To(Equal("https://ocis.example.prv/s/ABC123"))
 		})
 
+		It("Breadcrumb brand URL is empty when space has no root", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size:  uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{Seconds: uint64(16273849)},
+					Path:  "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "projectspaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "projectspaceid",
+					},
+					Space: &providerv1beta1.StorageSpace{
+						Name: "Some Space Name",
+						// Root is nil/unset
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.BreadcrumbBrandName).To(Equal("Some Space Name"))
+			Expect(collaboraResponse.BreadcrumbBrandURL).To(BeEmpty())
+		})
+
 	})
 })
