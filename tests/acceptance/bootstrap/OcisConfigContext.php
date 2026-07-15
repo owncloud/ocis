@@ -23,6 +23,9 @@
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Http\Message\ResponseInterface;
+use TestHelpers\HttpRequestHelper;
+use TestHelpers\KeycloakHelper;
 use TestHelpers\OcisConfigHelper;
 use TestHelpers\GraphHelper;
 use PHPUnit\Framework\Assert;
@@ -110,11 +113,9 @@ class OcisConfigContext implements Context {
 			$response = OcisConfigHelper::reConfigureOcis($envs);
 		}
 
-		$resBody = $response->getBody()->getContents();
-		Assert::assertEquals(
-			200,
-			$response->getStatusCode(),
-			"Failed to set config $configVariable=$configValue. Response: $resBody",
+		$this->assertOcisRestarted(
+			$response,
+			"Failed to set config $configVariable=$configValue.",
 		);
 	}
 
@@ -346,11 +347,66 @@ class OcisConfigContext implements Context {
 	 */
 	public function rollbackOcis(): void {
 		$response = OcisConfigHelper::rollbackOcis();
-		$resBody = $response->getBody()->getContents();
+		$this->assertOcisRestarted(
+			$response,
+			"Failed to rollback ocis server. Check if oCIS is started with ociswrapper.",
+		);
+	}
+
+	/**
+	 * Asserts that an oCIS restart triggered by ociswrapper succeeded.
+	 * In vault mode the wrapper's admin health-check uses basic-auth which is
+	 * disabled (OIDC role assignment only), so the wrapper always returns HTTP 500
+	 * even after a successful restart. When Keycloak/vault mode is detected we
+	 * poll the unauthenticated proxy debug readyz endpoint instead of failing.
+	 *
+	 * @param ResponseInterface $response
+	 * @param string $errorMessage
+	 *
+	 * @return void
+	 */
+	private function assertOcisRestarted(ResponseInterface $response, string $errorMessage): void {
+		$statusCode = $response->getStatusCode();
+		if ($statusCode === 200) {
+			return;
+		}
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$this->waitForOcisProxyReady();
+			return;
+		}
 		Assert::assertEquals(
 			200,
-			$response->getStatusCode(),
-			"Failed to rollback ocis server. Check if oCIS is started with ociswrapper. Response: $resBody",
+			$statusCode,
+			$errorMessage . " Response: " . $response->getBody()->getContents(),
+		);
+	}
+
+	/**
+	 * Poll the unauthenticated proxy debug readyz endpoint until oCIS is ready.
+	 * Used in vault/Keycloak mode where basic-auth health checks are unavailable.
+	 *
+	 * @param int $timeoutSeconds
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	private function waitForOcisProxyReady(int $timeoutSeconds = 60): void {
+		$readyzUrl = 'http://localhost:9205/readyz';
+		$deadline = time() + $timeoutSeconds;
+		while (time() < $deadline) {
+			try {
+				$response = HttpRequestHelper::get($readyzUrl);
+				if ($response->getStatusCode() === 200) {
+					return;
+				}
+				echo "oCIS not ready yet. Retrying in 1s...\n";
+			} catch (\Exception $e) {
+				throw new Exception("oCIS not ready. Error: $e");
+			}
+			sleep(1);
+		}
+		throw new \RuntimeException(
+			"Timed out after {$timeoutSeconds}s waiting for oCIS proxy readyz at {$readyzUrl}",
 		);
 	}
 

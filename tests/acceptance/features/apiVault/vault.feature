@@ -53,3 +53,12 @@ Feature: vault
     And for user "Alice" the space "Personal" should not contain these entries:
       | vaultFolder   |
       | vaultFile.txt |
+
+  @env-config @keycloak-config
+  Scenario: user can set custom auth level names
+    Given the administrator has set the Keycloak realm attribute "acr.loa.map" to '{"regular":"1","testing":"2"}'
+    And the config "OCIS_MFA_AUTH_LEVEL_NAMES" has been set to "testing"
+    And user "Alice" has logged in via web UI
+    When user "Alice" uploads a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault using the WebDAV API
+    Then the HTTP status code should be "201"
+    And user "Alice" should have acr value "testing"
