@@ -79,9 +79,10 @@ type Collabora struct {
 	// If set to "true", user list on the status bar will be hidden
 	// If set to "mobile" | "tablet" | "desktop", will be hidden on a specified device
 	// (may be joint, delimited by commas eg. "mobile,tablet")
-	HideUserList      string `json:"HideUserList,omitempty"`
-	SupportsLocks     bool   `json:"SupportsLocks"`
-	SupportsRename    bool   `json:"SupportsRename"`
+	HideUserList   string `json:"HideUserList,omitempty"`
+	SupportsLocks  bool   `json:"SupportsLocks"`
+	SupportsRename bool   `json:"SupportsRename"`
+	// copied from MS WOPI
 	SupportsUpdate    bool   `json:"SupportsUpdate"`
 	UserCanRename     bool   `json:"UserCanRename"`
 	BreadcrumbDocName string `json:"BreadcrumbDocName,omitempty"`
