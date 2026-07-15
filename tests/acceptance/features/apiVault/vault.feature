@@ -65,9 +65,11 @@ Feature: vault
 
 
   Scenario: check capabilities endpoint for vault
-    Given user "Alice" has logged in via web UI
+    Given using OCS API version "2"
+    And user "Alice" has logged in via web UI
     When user "Alice" retrieves the vault mode capabilities using the capabilities API
-    Then the HTTP status code should be "200"
+    Then the OCS status code should be "200"
+    And the HTTP status code should be "200"
     And the ocs JSON data of the response should match
       """
       {
