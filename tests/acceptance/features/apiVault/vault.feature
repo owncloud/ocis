@@ -903,7 +903,7 @@ Feature: vault
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
     And the search result of user "Alice" should contain only these files:
-      | testDriveFile.txt  |
+      | testDriveFile.txt |
 
   @tikaServiceNeeded
   Scenario: search result by content of file inside project space should be isolated between vault and drive
@@ -922,7 +922,7 @@ Feature: vault
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
     And the search result of user "Alice" should contain only these files:
-      | testDriveFile.txt  |
+      | testDriveFile.txt |
 
 
   Scenario: search results by resource tags should be isolated between vault and drive
@@ -990,3 +990,143 @@ Feature: vault
     And the search result of user "Alice" should contain only these files:
       | testDriveFile.txt |
       | driveFolder       |
+
+
+  Scenario Outline: folder share received from vault and drive personal space should be isolated
+    Given user "Brian" has been created with default attributes
+    And user "Alice" has logged in via web UI
+    And user "Brian" has logged in via web UI
+    And user "Alice" has created a folder "driveFolder" in space "Personal"
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | driveFolder        |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | vaultFolder        |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "200"
+    And user "Brian" should have a share in vault "vaultFolder" synced
+    And user "Brian" should have the following resource shares:
+      | resource    | permissionsRole    | sharer | space    | storage |
+      | vaultFolder | <permissions-role> | Alice  | Personal | vault   |
+    And user "Brian" should have the following resource shares:
+      | resource    | permissionsRole    | sharer | space    |
+      | driveFolder | <permissions-role> | Alice  | Personal |
+    Examples:
+      | permissions-role |
+      | Viewer           |
+      | Editor           |
+      | Uploader         |
+
+
+  Scenario Outline: file share received from vault and drive personal space should be isolated
+    Given user "Brian" has been created with default attributes
+    And user "Alice" has logged in via web UI
+    And user "Brian" has logged in via web UI
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "driveFile.txt"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | driveFile.txt      |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | vaultFile.txt      |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "200"
+    And user "Brian" should have a share in vault "vaultFile.txt" synced
+    And user "Brian" should have the following resource shares:
+      | resource      | permissionsRole    | sharer | space    | storage |
+      | vaultFile.txt | <permissions-role> | Alice  | Personal | vault   |
+    And user "Brian" should have the following resource shares:
+      | resource      | permissionsRole    | sharer | space    |
+      | driveFile.txt | <permissions-role> | Alice  | Personal |
+    Examples:
+      | permissions-role |
+      | Viewer           |
+      | File Editor      |
+
+
+  Scenario Outline: folder share received from vault and drive project space should be isolated
+    Given user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has logged in via web UI
+    And user "Brian" has logged in via web UI
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    And user "Alice" has created a folder "driveFolder" in space "new-space"
+    And user "Alice" has created a folder "vaultFolder" in space "new-space" in vault
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | driveFolder        |
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | vaultFolder        |
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "200"
+    And user "Brian" should have a share in vault "vaultFolder" synced
+    And user "Brian" should have the following resource shares:
+      | resource    | permissionsRole    | sharer | space     | storage |
+      | vaultFolder | <permissions-role> | Alice  | new-space | vault   |
+    And user "Brian" should have the following resource shares:
+      | resource    | permissionsRole    | sharer | space     |
+      | driveFolder | <permissions-role> | Alice  | new-space |
+    Examples:
+      | permissions-role |
+      | Viewer           |
+      | Editor           |
+      | Uploader         |
+
+
+  Scenario Outline: folder share received from vault and drive project space should be isolated
+    Given user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has logged in via web UI
+    And user "Brian" has logged in via web UI
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "driveFile.txt"
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "vaultFile.txt" in vault
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | driveFile.txt      |
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | vaultFile.txt      |
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "200"
+    And user "Brian" should have a share in vault "vaultFile.txt" synced
+    And user "Brian" should have the following resource shares:
+      | resource      | permissionsRole    | sharer | space     | storage |
+      | vaultFile.txt | <permissions-role> | Alice  | new-space | vault   |
+    And user "Brian" should have the following resource shares:
+      | resource      | permissionsRole    | sharer | space     |
+      | driveFile.txt | <permissions-role> | Alice  | new-space |
+    Examples:
+      | permissions-role |
+      | Viewer           |
+      | File Editor      |
