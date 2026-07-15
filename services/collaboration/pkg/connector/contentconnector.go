@@ -211,7 +211,7 @@ func (c *ContentConnector) GetFile(ctx context.Context, w http.ResponseWriter) e
 // cases or if the method is successful, an empty string will be returned
 // (check for err != nil to know if something went wrong)
 //
-// # On success, the method will return the new mtime of the file
+// On success, the method will return the new mtime of the file.
 //
 // coolWopiTimestamp is the Collabora conflict-detection timestamp sent through
 // the "X-COOL-WOPI-Timestamp" header. If non-empty, it will be compared against
@@ -271,11 +271,13 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 	// means the file was changed since Collabora last checked it (by another user
 	// or process), so we tell Collabora it's a stale-document conflict rather than
 	// proceeding with the upload.
-	if coolWopiTimestamp != "" {
-		currentMtime := ""
-		if mtime := statRes.GetInfo().GetMtime(); mtime != nil {
-			currentMtime = time.Unix(int64(mtime.GetSeconds()), int64(mtime.GetNanos())).UTC().Format(timeFormat)
-		}
+	// If the file has no recorded mtime (e.g. it doesn't exist yet), there is
+	// nothing meaningful to compare the client's timestamp against. Fail open
+	// here (skip the check and let the upload proceed) rather than fail closed,
+	// which would otherwise cause a permanent, unresolvable conflict for every
+	// save attempt.
+	if coolWopiTimestamp != "" && mtime != nil {
+		currentMtime := time.Unix(int64(mtime.GetSeconds()), int64(mtime.GetNanos())).UTC().Format(timeFormat)
 		if currentMtime != coolWopiTimestamp {
 			logger.Error().
 				Str("ClientTimestamp", coolWopiTimestamp).

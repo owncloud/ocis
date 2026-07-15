@@ -544,5 +544,33 @@ var _ = Describe("ContentConnector", func() {
 			Expect(response.Headers).To(HaveLen(1))
 			Expect(response.Headers[connector.HeaderWopiVersion]).To(Equal("v16094592000"))
 		})
+
+		It("COOL WOPI timestamp check is skipped when the file has no mtime", func() {
+			reader := strings.NewReader("")
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Lock: &providerv1beta1.Lock{
+						LockId: "goodAndValidLock",
+						Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
+					},
+					Size: uint64(123456789),
+					// Mtime is intentionally omitted (nil) here.
+				},
+			}, nil)
+
+			gatewayClient.On("InitiateFileUpload", mock.Anything, mock.Anything).Times(1).Return(&gateway.InitiateFileUploadResponse{
+				Status: status.NewOK(ctx),
+			}, nil)
+
+			// there's no mtime to compare against, so the COOL timestamp check
+			// must be skipped (fail open) and the upload must proceed normally
+			// instead of returning a 409 conflict.
+			response, err := cc.PutFile(ctx, reader, reader.Size(), "goodAndValidLock", "2021-01-01T00:00:00.0000000Z")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+		})
 	})
 })
