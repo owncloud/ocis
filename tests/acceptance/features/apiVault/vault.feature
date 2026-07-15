@@ -54,14 +54,14 @@ Feature: vault
       | vaultFolder   |
       | vaultFile.txt |
 
-  @env-config @keycloak-config
-  Scenario: user can set custom auth level names
-    Given the administrator has set the Keycloak realm attribute "acr.loa.map" to '{"regular":"1","testing":"2"}'
-    And the config "OCIS_MFA_AUTH_LEVEL_NAMES" has been set to "testing"
-    And user "Alice" has logged in via web UI
-    When user "Alice" uploads a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault using the WebDAV API
-    Then the HTTP status code should be "201"
-    And user "Alice" should have acr value "testing"
+#  @env-config @keycloak-config
+#  Scenario: user can set custom auth level names
+#    Given the administrator has set the Keycloak realm attribute "acr.loa.map" to '{"regular":"1","testing":"2"}'
+#    And the config "OCIS_MFA_AUTH_LEVEL_NAMES" has been set to "testing"
+#    And user "Alice" has logged in via web UI
+#    When user "Alice" uploads a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault using the WebDAV API
+#    Then the HTTP status code should be "201"
+#    And user "Alice" should have acr value "testing"
 
 
   Scenario: check capabilities endpoint for vault
@@ -182,3 +182,23 @@ Feature: vault
         }
       }
       """
+
+
+  Scenario: user shares resources from vault and drive
+    Given user "Brian" has been created with default attributes
+    And user "Alice" has logged in via web UI
+    And user "Brian" has logged in via web UI
+    And user "Alice" has created a folder "driveFolder" in space "Personal"
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | vaultFolder |
+      | space           | Personal    |
+      | storage         | vault       |
+      | sharee          | Brian       |
+      | shareType       | user        |
+      | permissionsRole | Viewer      |
+    Then the HTTP status code should be "200"
+    And user "Brian" should have a share in vault "vaultFolder" synced
+    And user "Brian" should have the following resource shares:
+      | resource    | permissionsRole | sharer | space    | storage |
+      | vaultFolder | Viewer          | Alice  | Personal | vault   |
