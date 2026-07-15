@@ -615,6 +615,7 @@ trait Provisioning {
 		if (!KeycloakHelper::isTestingWithKeycloak()) {
 			return;
 		}
+		KeycloakHelper::resetAdminAccessToken();
 		$adminUser = [
 			"password" => "admin",
 			"displayname" => "Admin Admin",

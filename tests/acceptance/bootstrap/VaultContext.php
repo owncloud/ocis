@@ -86,6 +86,7 @@ class VaultContext implements Context {
 	public function restoreKeycloakRealmAttributes(): void {
 		foreach ($this->originalRealmAttributes as $key => $value) {
 			if ($value === null) {
+				KeycloakHelper::deleteRealmAttribute($key);
 				continue;
 			}
 			KeycloakHelper::updateRealmAttribute($key, $value);
