@@ -8,6 +8,7 @@ import (
 	"io"
 	"mime"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -53,13 +54,14 @@ type oidcClient struct {
 	// Logger to use for logging, must be set
 	Logger log.Logger
 
-	issuer                  string
-	provider                *ProviderMetadata
-	providerLock            *sync.Mutex
-	skipIssuerValidation    bool
-	accessTokenVerifyMethod string
-	remoteKeySet            KeySet
-	algorithms              []string
+	issuer                    string
+	provider                  *ProviderMetadata
+	providerLock              *sync.Mutex
+	skipIssuerValidation      bool
+	accessTokenVerifyMethod   string
+	accessTokenVerifyAudience []string
+	remoteKeySet              KeySet
+	algorithms                []string
 
 	JWKSOptions config.JWKS
 	JWKS        *keyfunc.JWKS
@@ -88,16 +90,17 @@ func NewOIDCClient(opts ...Option) OIDCClient {
 	options := newOptions(opts...)
 
 	return &oidcClient{
-		Logger:                  options.Logger,
-		issuer:                  options.OIDCIssuer,
-		httpClient:              options.HTTPClient,
-		accessTokenVerifyMethod: options.AccessTokenVerifyMethod,
-		JWKSOptions:             options.JWKSOptions, // TODO I don't like that we pass down config options ...
-		JWKS:                    options.JWKS,
-		providerLock:            &sync.Mutex{},
-		jwksLock:                &sync.Mutex{},
-		remoteKeySet:            options.KeySet,
-		provider:                options.ProviderMetadata,
+		Logger:                    options.Logger,
+		issuer:                    options.OIDCIssuer,
+		httpClient:                options.HTTPClient,
+		accessTokenVerifyMethod:   options.AccessTokenVerifyMethod,
+		accessTokenVerifyAudience: options.AccessTokenVerifyAudience,
+		JWKSOptions:               options.JWKSOptions, // TODO I don't like that we pass down config options ...
+		JWKS:                      options.JWKS,
+		providerLock:              &sync.Mutex{},
+		jwksLock:                  &sync.Mutex{},
+		remoteKeySet:              options.KeySet,
+		provider:                  options.ProviderMetadata,
 	}
 }
 
@@ -314,7 +317,40 @@ func (c *oidcClient) verifyAccessTokenJWT(token string) (RegClaimsWithSID, jwt.M
 		return claims, mapClaims, err
 	}
 
+	// Verify the token was issued for this instance. Keycloak puts a generic
+	// value (e.g. "account") in "aud" and the real client id in "azp", so we
+	// accept the token when the allowlist matches either claim.
+	if err := c.verifyAudience(claims.Audience, azpFromClaims(mapClaims)); err != nil {
+		c.Logger.Info().Err(err).Msg("Access token rejected: audience not allowed.")
+		return claims, mapClaims, err
+	}
+
 	return claims, mapClaims, nil
+}
+
+// verifyAudience checks that the token's "aud" or "azp" claim matches the
+// configured allowlist. An empty allowlist disables the check.
+func (c *oidcClient) verifyAudience(audiences jwt.ClaimStrings, azp string) error {
+	if len(c.accessTokenVerifyAudience) == 0 {
+		return nil
+	}
+	for _, allowed := range c.accessTokenVerifyAudience {
+		allowed = strings.TrimSpace(allowed)
+		if allowed == "" {
+			continue
+		}
+		if allowed == azp || slices.Contains(audiences, allowed) {
+			return nil
+		}
+	}
+	return errors.New("oidc: access token audience is not allowed")
+}
+
+func azpFromClaims(claims jwt.MapClaims) string {
+	if azp, ok := claims["azp"].(string); ok {
+		return azp
+	}
+	return ""
 }
 
 func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawToken string) (*LogoutToken, error) {
