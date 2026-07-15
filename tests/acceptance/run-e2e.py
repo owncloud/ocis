@@ -509,7 +509,7 @@ def main() -> int:
             "BASE_URL_OCIS": ocis_url,
             "HEADLESS": "true",
             "RETRY": "3",
-            "SKIP_A11Y_TESTS": "true",
+            "SKIP_A11Y_TESTS": "false",
             # web 12.4: enabling this both sets `use.trace=on` in playwright.config.ts
             # AND triggers actor.ts to call tracing.start(), which double-starts and fails.
             "REPORT_TRACING": "false",
