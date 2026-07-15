@@ -1838,6 +1838,7 @@ var _ = Describe("FileConnector", func() {
 				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
 				PostMessageOrigin:       "https://ocis.example.prv",
+				Version:                 "v162738491234567",
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -2022,6 +2023,7 @@ var _ = Describe("FileConnector", func() {
 				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
 				PostMessageOrigin:       "https://ocis.example.prv",
+				Version:                 "v162738490",
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -2094,6 +2096,7 @@ var _ = Describe("FileConnector", func() {
 				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
 				PostMessageOrigin:       "https://ocis.example.prv",
+				Version:                 "v162738490",
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -2187,6 +2190,58 @@ var _ = Describe("FileConnector", func() {
 			// the url is using a generated access token which always has a new ttl
 			// so we can't compare the whole url
 			Expect(templateSource).To(HavePrefix(expectedTemplateSource))
+		})
+
+		It("Collabora CheckFileInfo includes Version", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// change wopi app provider
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			// Verify that the Collabora response includes the Version field
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.Version).To(Equal("v16273849123456789"))
 		})
 
 	})

@@ -29,6 +29,8 @@ type Collabora struct {
 	UserID string `json:"UserId,omitempty"`
 	// copied from MS WOPI
 	UserFriendlyName string `json:"UserFriendlyName,omitempty"`
+	// copied from MS WOPI
+	Version string `json:"Version,omitempty"`
 
 	//
 	// Extended response properties
@@ -104,6 +106,8 @@ func (cinfo *Collabora) SetProperties(props map[string]interface{}) {
 			cinfo.UserID = value.(string)
 		case KeyUserFriendlyName:
 			cinfo.UserFriendlyName = value.(string)
+		case KeyVersion:
+			cinfo.Version = value.(string)
 
 		case KeyEnableInsertRemoteImage:
 			cinfo.EnableInsertRemoteImage = value.(bool)
