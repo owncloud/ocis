@@ -1284,6 +1284,9 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		// to get the folder we actually need to do a GetPath() request
 		fileinfo.KeyBreadcrumbFolderName: breadcrumbFolderName,
 		fileinfo.KeyBreadcrumbFolderURL:  parentFolderURL.String(),
+		// the WOPI client should navigate here when the editor is closed; the folder
+		// containing the file is the same target used for the breadcrumb folder link
+		fileinfo.KeyCloseURL: parentFolderURL.String(),
 
 		fileinfo.KeyHostViewURL:    createHostUrl("view", ocisURL, f.cfg.App.Name, statRes.GetInfo()),
 		fileinfo.KeyHostEditURL:    createHostUrl("write", ocisURL, f.cfg.App.Name, statRes.GetInfo()),
@@ -1332,10 +1335,42 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		}
 	}
 
+	// a direct download link for the current file; omitted (not a hard failure) if the
+	// wopi access token can't be generated, e.g. due to a token store misconfiguration
+	if du, err := f.createFileDownloadURL(wopiContext, collaborationURL); err == nil {
+		infoMap[fileinfo.KeyDownloadURL] = du
+	} else {
+		logger.Error().Err(err).Msg("CheckFileInfo: failed to create download URL")
+	}
+
 	info.SetProperties(infoMap)
 
 	logger.Debug().Interface("FileInfo", info).Msg("CheckFileInfo: success")
 	return NewResponseSuccessBody(info), nil
+}
+
+// createWopiResourceURL builds a URL pointing at one of the collaboration service's own
+// WOPI routes for the file referenced by wopiContext, hashing the resource id into the
+// path and attaching a freshly generated WOPI access token as the "access_token" query
+// parameter. routePrefix selects the route (e.g. "wopi/files" or "wopi/templates") and
+// pathSuffix is appended after the hashed resource id (e.g. "contents", or "" when the
+// route ends at the hash).
+func (f *FileConnector) createWopiResourceURL(wopiContext middleware.WopiContext, collaborationURL *url.URL, routePrefix string, pathSuffix string) (string, error) {
+	token, _, err := middleware.GenerateWopiToken(wopiContext, f.cfg, f.store)
+	if err != nil {
+		return "", err
+	}
+	resourceURL := *collaborationURL
+	resourceURL.Path = path.Join(
+		collaborationURL.Path,
+		routePrefix,
+		helpers.HashResourceId(wopiContext.FileReference.GetResourceId()),
+		pathSuffix,
+	)
+	q := resourceURL.Query()
+	q.Add("access_token", token)
+	resourceURL.RawQuery = q.Encode()
+	return resourceURL.String(), nil
 }
 
 // createDownloadURL will create a download URL for the template file.
@@ -1346,20 +1381,15 @@ func (f *FileConnector) createDownloadURL(wopiContext middleware.WopiContext, co
 	templateContext.FileReference = wopiContext.TemplateReference
 	templateContext.TemplateReference = nil
 
-	token, _, err := middleware.GenerateWopiToken(templateContext, f.cfg, f.store)
-	if err != nil {
-		return "", err
-	}
-	downloadURL := *collaborationURL
-	downloadURL.Path = path.Join(
-		collaborationURL.Path,
-		"wopi/templates/",
-		helpers.HashResourceId(templateContext.FileReference.GetResourceId()),
-	)
-	q := downloadURL.Query()
-	q.Add("access_token", token)
-	downloadURL.RawQuery = q.Encode()
-	return downloadURL.String(), nil
+	return f.createWopiResourceURL(templateContext, collaborationURL, "wopi/templates", "")
+}
+
+// createFileDownloadURL creates a direct download URL for the current file (as opposed
+// to a template), pointing at the collaboration service's own WOPI file-content route
+// (GET /wopi/files/{fileid}/contents), authenticated via a freshly generated WOPI access
+// token. Used for the WOPI DownloadUrl CheckFileInfo property.
+func (f *FileConnector) createFileDownloadURL(wopiContext middleware.WopiContext, collaborationURL *url.URL) (string, error) {
+	return f.createWopiResourceURL(wopiContext, collaborationURL, "wopi/files", "contents")
 }
 
 func createHostUrl(mode string, ocisUrl *url.URL, appName string, info *providerv1beta1.ResourceInfo) string {

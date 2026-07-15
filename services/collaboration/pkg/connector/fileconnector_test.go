@@ -1765,12 +1765,24 @@ var _ = Describe("FileConnector", func() {
 				FileVersionURL:             "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
 				HostEditURL:                "https://ocis.example.prv/external-test/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
 				HostViewURL:                "https://ocis.example.prv/external-test/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=view",
+				CloseURL:                   "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
+				DownloadURL:                "", // Remove the hardcoded token since it's dynamically generated
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(200))
-			Expect(response.Body.(*fileinfo.Microsoft)).To(Equal(expectedFileInfo))
+
+			returnedFileInfo := response.Body.(*fileinfo.Microsoft)
+			downloadURL := returnedFileInfo.DownloadURL
+			expectedDownloadURLPrefix := "https://ocis.server.prv/wopi/files/acec9ea008d2e2979556f82e0ec0c4f47c7a906a4cfd84b64bce41db93b64b1a/contents?access_token="
+
+			// take DownloadURL out of the response for easier comparison
+			returnedFileInfo.DownloadURL = ""
+			Expect(returnedFileInfo).To(Equal(expectedFileInfo))
+			// the url is using a generated access token which always has a new ttl
+			// so we can't compare the whole url
+			Expect(downloadURL).To(HavePrefix(expectedDownloadURLPrefix))
 		})
 
 		It("Stat success guests", func() {
@@ -1843,6 +1855,14 @@ var _ = Describe("FileConnector", func() {
 				LastModifiedTime:        "1970-07-08T08:30:49.0012345Z",
 				ReadOnly:                true,
 				IsAnonymousUser:         true,
+				// no scopes are set in the context for this test, so the parent folder
+				// URL (and therefore CloseURL) falls back to the bare oCIS URL
+				CloseURL:       "https://ocis.example.prv",
+				DownloadURL:    "", // Remove the hardcoded token since it's dynamically generated
+				FileSharingURL: "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=sharing",
+				FileVersionURL: "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
+				HostEditURL:    "https://ocis.example.prv/external-collabora/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
+				HostViewURL:    "https://ocis.example.prv/external-collabora/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=view",
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -1857,7 +1877,17 @@ var _ = Describe("FileConnector", func() {
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(200))
-			Expect(response.Body.(*fileinfo.Collabora)).To(Equal(expectedFileInfo))
+
+			returnedFileInfo := response.Body.(*fileinfo.Collabora)
+			downloadURL := returnedFileInfo.DownloadURL
+			expectedDownloadURLPrefix := "https://ocis.server.prv/wopi/files/acec9ea008d2e2979556f82e0ec0c4f47c7a906a4cfd84b64bce41db93b64b1a/contents?access_token="
+
+			// take DownloadURL out of the response for easier comparison
+			returnedFileInfo.DownloadURL = ""
+			Expect(returnedFileInfo).To(Equal(expectedFileInfo))
+			// the url is using a generated access token which always has a new ttl
+			// so we can't compare the whole url
+			Expect(downloadURL).To(HavePrefix(expectedDownloadURLPrefix))
 		})
 
 		It("Stat success guests", func() {
@@ -1949,6 +1979,7 @@ var _ = Describe("FileConnector", func() {
 				HostEditURL:             "https://ocis.example.prv/external-onlyoffice/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
 				PostMessageOrigin:       "https://ocis.example.prv",
 				ReadOnly:                true,
+				CloseURL:                "https://ocis.example.prv/s/ABC123", // Match share token format
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -2032,13 +2063,29 @@ var _ = Describe("FileConnector", func() {
 				Version:                 "v162738490",
 				LastModifiedTime:        "1970-07-08T08:30:49.0000000Z",
 				ReadOnly:                true,
+				CloseURL:                "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
+				DownloadURL:             "", // Remove the hardcoded token since it's dynamically generated
+				FileSharingURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=sharing",
+				FileVersionURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
+				HostEditURL:             "https://ocis.example.prv/external-collabora/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
+				HostViewURL:             "https://ocis.example.prv/external-collabora/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=view",
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(200))
-			Expect(response.Body.(*fileinfo.Collabora)).To(Equal(expectedFileInfo))
+
+			returnedFileInfo := response.Body.(*fileinfo.Collabora)
+			downloadURL := returnedFileInfo.DownloadURL
+			expectedDownloadURLPrefix := "https://ocis.server.prv/wopi/files/acec9ea008d2e2979556f82e0ec0c4f47c7a906a4cfd84b64bce41db93b64b1a/contents?access_token="
+
+			// take DownloadURL out of the response for easier comparison
+			returnedFileInfo.DownloadURL = ""
+			Expect(returnedFileInfo).To(Equal(expectedFileInfo))
+			// the url is using a generated access token which always has a new ttl
+			// so we can't compare the whole url
+			Expect(downloadURL).To(HavePrefix(expectedDownloadURLPrefix))
 		})
 		It("Collabora IsAnonymousUser is true for anonymous user (public share)", func() {
 			// add user's opaque to include public-share-role
@@ -2215,13 +2262,29 @@ var _ = Describe("FileConnector", func() {
 				Version:                 "v162738490",
 				LastModifiedTime:        "1970-07-08T08:30:49.0000000Z",
 				ReadOnly:                true,
+				CloseURL:                "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
+				DownloadURL:             "", // Remove the hardcoded token since it's dynamically generated
+				FileSharingURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=sharing",
+				FileVersionURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
+				HostEditURL:             "https://ocis.example.prv/external-collabora/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
+				HostViewURL:             "https://ocis.example.prv/external-collabora/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=view",
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(200))
-			Expect(response.Body.(*fileinfo.Collabora)).To(Equal(expectedFileInfo))
+
+			returnedFileInfo := response.Body.(*fileinfo.Collabora)
+			downloadURL := returnedFileInfo.DownloadURL
+			expectedDownloadURLPrefix := "https://ocis.server.prv/wopi/files/acec9ea008d2e2979556f82e0ec0c4f47c7a906a4cfd84b64bce41db93b64b1a/contents?access_token="
+
+			// take DownloadURL out of the response for easier comparison
+			returnedFileInfo.DownloadURL = ""
+			Expect(returnedFileInfo).To(Equal(expectedFileInfo))
+			// the url is using a generated access token which always has a new ttl
+			// so we can't compare the whole url
+			Expect(downloadURL).To(HavePrefix(expectedDownloadURLPrefix))
 		})
 		It("Stat success with template", func() {
 			wopiCtx.TemplateReference = &providerv1beta1.Reference{
@@ -2287,6 +2350,7 @@ var _ = Describe("FileConnector", func() {
 				HostEditURL:             "https://ocis.example.prv/external-onlyoffice/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
 				PostMessageOrigin:       "https://ocis.example.prv",
 				TemplateSource:          "", // Remove the hardcoded token since it's dynamically generated
+				CloseURL:                "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
 			}
 
 			// change wopi app provider
@@ -2573,6 +2637,220 @@ var _ = Describe("FileConnector", func() {
 			// so UserCanNotWriteRelative should be false)
 			Expect(collaboraResponse.SupportsUpdate).To(BeTrue())
 			Expect(collaboraResponse.UserCanNotWriteRelative).To(BeFalse())
+		})
+
+		It("CloseURL reuses the exact same parent folder URL as BreadcrumbFolderURL", func() {
+			// Collabora doesn't expose a BreadcrumbFolderURL field, so this is verified
+			// against the Microsoft target, which has both fields. Both are fed from the
+			// exact same infoMap entry (parentFolderURL.String()), so this proves the
+			// reuse that also backs Collabora's CloseURL.
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Microsoft"
+			cfg.App.Product = "Microsoft"
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			msInfo := response.Body.(*fileinfo.Microsoft)
+			Expect(msInfo.CloseURL).ToNot(BeEmpty())
+			Expect(msInfo.CloseURL).To(Equal(msInfo.BreadcrumbFolderURL))
+		})
+
+		It("Collabora CheckFileInfo includes HostEditURL and HostViewURL as distinct URLs", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.HostEditURL).ToNot(BeEmpty())
+			Expect(collaboraResponse.HostViewURL).ToNot(BeEmpty())
+			Expect(collaboraResponse.HostEditURL).ToNot(Equal(collaboraResponse.HostViewURL))
+		})
+
+		It("Collabora CheckFileInfo DownloadURL matches the WOPI file-content download route", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.DownloadURL).To(MatchRegexp(
+				`^https://ocis\.server\.prv/wopi/files/[0-9a-f]+/contents\?access_token=.+$`,
+			))
+		})
+
+		It("Collabora CheckFileInfo omits DownloadURL when WOPI token generation fails, without failing the whole request", func() {
+			// Force middleware.GenerateWopiToken to fail: enabling ShortTokens requires a
+			// persistent microstore to mint the token, but the FileConnector under test
+			// was constructed with a nil store (see BeforeEach above), so token
+			// generation errors out. DownloadURL should simply be omitted, and the rest
+			// of the CheckFileInfo response should be unaffected.
+			cfg.Wopi.ShortTokens = true
+
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			// the overall CheckFileInfo call must still succeed
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.DownloadURL).To(BeEmpty())
+			// other URL properties, which don't depend on WOPI token generation, are unaffected
+			Expect(collaboraResponse.CloseURL).ToNot(BeEmpty())
+			Expect(collaboraResponse.HostEditURL).ToNot(BeEmpty())
+			Expect(collaboraResponse.HostViewURL).ToNot(BeEmpty())
 		})
 
 	})
