@@ -384,6 +384,7 @@ class SpacesContext implements Context {
 	 * @param string $spaceName
 	 * @param string $fileName
 	 * @param bool $federatedShare
+	 * @param bool $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -393,6 +394,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $fileName,
 		bool $federatedShare = false,
+		bool $isVault = false,
 	): ResponseInterface {
 		$baseUrl = $this->featureContext->getBaseUrl();
 
@@ -400,18 +402,27 @@ class SpacesContext implements Context {
 			$remoteItemId = $this->getSharesRemoteItemId($user, $spaceName);
 			$spaceId = \rawurlencode($remoteItemId);
 		} else {
-			$space = $this->getSpaceByName($user, $spaceName);
+			$space = $this->getSpaceByName($user, $spaceName, $isVault);
 			$spaceId = $space["id"];
 		}
 
 		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $spaceId);
 		$fullUrl = "$baseUrl/$davPath/$fileName";
 
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$accessToken = $this->featureContext->getOcisUserToken($user)['token']['accessToken'];
+			$headers['Authorization'] = 'Bearer ' . $accessToken;
+			$user = null;
+			$password = null;
+		} else {
+			$password = $this->featureContext->getPasswordForUser($user);
+		}
 		return HttpRequestHelper::get(
 			$fullUrl,
 			$user,
-			$this->featureContext->getPasswordForUser($user),
-			[],
+			$password,
+			$headers,
 			"{}",
 		);
 	}
@@ -951,11 +962,12 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^for user "([^"]*)" folder "([^"]*)" of the space "([^"]*)" should (not|)\s?contain these (?:files|entries):$/
+	 * @Then /^for user "([^"]*)" folder "([^"]*)" of the space "([^"]*)"(| in vault)? should (not|)\s?contain these (?:files|entries):$/
 	 *
 	 * @param string    $user
 	 * @param string    $folderPath
 	 * @param string    $spaceName
+	 * @param string    $isVault
 	 * @param string    $shouldOrNot   (not|)
 	 * @param TableNode $expectedFiles
 	 *
@@ -967,11 +979,13 @@ class SpacesContext implements Context {
 		string $user,
 		string $folderPath,
 		string $spaceName,
+		string $isVault,
 		string $shouldOrNot,
 		TableNode $expectedFiles,
 	): void {
-		$space = $this->getSpaceByName($user, $spaceName);
-		$this->featureContext->setResponse($this->propfindSpace($user, $spaceName, $folderPath));
+		$isVault = trim($isVault) === 'in vault';
+		$space = $this->getSpaceByName($user, $spaceName, $isVault);
+		$this->featureContext->setResponse($this->propfindSpace($user, $spaceName, $folderPath, $isVault));
 		$this->featureContext->propfindResultShouldContainEntries(
 			$shouldOrNot,
 			$expectedFiles,
@@ -983,11 +997,12 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^for user "([^"]*)" the content of the file "([^"]*)" of the space "([^"]*)" should be "([^"]*)"$/
+	 * @Then /^for user "([^"]*)" the content of the file "([^"]*)" of the space "([^"]*)"(| in vault) should be "([^"]*)"$/
 	 *
 	 * @param string    $user
 	 * @param string    $file
 	 * @param string    $spaceName
+	 * @param string    $isVault
 	 * @param string    $fileContent
 	 *
 	 * @return void
@@ -998,9 +1013,11 @@ class SpacesContext implements Context {
 		string $user,
 		string $file,
 		string $spaceName,
+		string $isVault,
 		string $fileContent,
 	): void {
-		$actualFileContent = $this->getFileData($user, $spaceName, $file)->getBody()->getContents();
+		$isVault = trim($isVault) === 'in vault';
+		$actualFileContent = $this->getFileData($user, $spaceName, $file, false, $isVault)->getBody()->getContents();
 		Assert::assertEquals($fileContent, $actualFileContent, "$file does not contain $fileContent");
 	}
 
@@ -2080,15 +2097,15 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" copies (?:file|folder) "([^"]*)" from space "([^"]*)" to "([^"]*)" inside space "([^"]*)" using the WebDAV API$/
-	 * @When /^user "([^"]*)" copies (?:file|folder) "([^"]*)" from space "([^"]*)" to "([^"]*)" inside space "([^"]*)"(?: with following headers) using the WebDAV API$/
+	 * @When /^user "([^"]*)" copies (?:file|folder) "([^"]*)" from space "([^"]*)"(| in vault)? to "([^"]*)" inside space "([^"]*)"(| in vault)? using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param string $fileSource
 	 * @param string $fromSpaceName
+	 * @param string $isSourceVault
 	 * @param string $fileDestination
 	 * @param string $toSpaceName
-	 * @param TableNode|null $table
+	 * @param string $isDestinationVault
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -2097,15 +2114,86 @@ class SpacesContext implements Context {
 		string $user,
 		string $fileSource,
 		string $fromSpaceName,
+		string $isSourceVault,
 		string $fileDestination,
 		string $toSpaceName,
+		string $isDestinationVault,
+	): void {
+		$isSourceVault = trim($isSourceVault) === "in vault";
+		$isDestinationVault = trim($isDestinationVault) === "in vault";
+		$this->copyFileBetweenSpaces(
+			$user,
+			$fileSource,
+			$fromSpaceName,
+			$fileDestination,
+			$toSpaceName,
+			$isSourceVault,
+			$isDestinationVault,
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" copies (?:file|folder) "([^"]*)" from space "([^"]*)" to "([^"]*)" inside space "([^"]*)" with following headers using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $fileSource
+	 * @param string $fromSpaceName
+	 * @param string $fileDestination
+	 * @param string $toSpaceName
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userCopiesFileFromAndToSpaceBetweenSpacesWithHeaders(
+		string $user,
+		string $fileSource,
+		string $fromSpaceName,
+		string $fileDestination,
+		string $toSpaceName,
+		TableNode $table,
+	): void {
+		$this->copyFileBetweenSpaces(
+			$user,
+			$fileSource,
+			$fromSpaceName,
+			$fileDestination,
+			$toSpaceName,
+			false,
+			false,
+			$table,
+		);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $fileSource
+	 * @param string $fromSpaceName
+	 * @param string $fileDestination
+	 * @param string $toSpaceName
+	 * @param boolean $isSourceVault
+	 * @param boolean $isDestinationVault
+	 * @param TableNode|null $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	private function copyFileBetweenSpaces(
+		string $user,
+		string $fileSource,
+		string $fromSpaceName,
+		string $fileDestination,
+		string $toSpaceName,
+		?bool $isSourceVault = false,
+		?bool $isDestinationVault = false,
 		?TableNode $table = null,
 	): void {
-		$space = $this->getSpaceByName($user, $fromSpaceName);
+		$space = $this->getSpaceByName($user, $fromSpaceName, $isSourceVault);
 		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName(
 			$user,
 			$fileDestination,
 			$toSpaceName,
+			$isDestinationVault,
 		);
 
 		if ($table !== null) {
@@ -2281,6 +2369,7 @@ class SpacesContext implements Context {
 	 * @param string $user
 	 * @param string $fileDestination
 	 * @param string $spaceName
+	 * @param boolean $isVault
 	 * @param string|null $endPath
 	 *
 	 * @return string
@@ -2290,9 +2379,10 @@ class SpacesContext implements Context {
 		string $user,
 		string $fileDestination,
 		string $spaceName,
+		bool $isVault = false,
 		?string $endPath = null,
 	): string {
-		$space = $this->getSpaceByName($user, $spaceName);
+		$space = $this->getSpaceByName($user, $spaceName, $isVault);
 		$fileDestination = $this->escapePath(\ltrim($fileDestination, "/"));
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
@@ -2310,11 +2400,19 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function copyFilesAndFoldersRequest(string $user, string $fullUrl, array $headers): ResponseInterface {
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$access_token = $this->featureContext->getOcisUserToken($user)["token"]["accessToken"];
+			$headers['Authorization'] = 'Bearer ' . $access_token;
+			$user = null;
+			$password = null;
+		} else {
+			$password = $this->featureContext->getPasswordForUser($user);
+		}
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
 			'COPY',
 			$user,
-			$this->featureContext->getPasswordForUser($user),
+			$password,
 			$headers,
 		);
 	}
@@ -2354,6 +2452,7 @@ class SpacesContext implements Context {
 				$user,
 				$fileDestination,
 				$toSpaceName,
+				false,
 				$fileId,
 			);
 		}
@@ -2401,6 +2500,7 @@ class SpacesContext implements Context {
 				$user,
 				$fileDestination,
 				$spaceName,
+				false,
 				$fileId,
 			);
 		}
@@ -2445,6 +2545,7 @@ class SpacesContext implements Context {
 				$user,
 				$fileDestination,
 				$spaceName,
+				false,
 				$fileId,
 			);
 		}
@@ -2493,6 +2594,7 @@ class SpacesContext implements Context {
 				$user,
 				$fileDestination,
 				$spaceName,
+				false,
 				$fileId,
 			);
 		}
@@ -2548,12 +2650,13 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has uploaded a file inside space "([^"]*)" with content "([^"]*)" to "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has uploaded a file inside space "([^"]*)" with content "([^"]*)" to "([^"]*)"(| in vault)?$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param string $fileContent
 	 * @param string $destination
+	 * @param string $isVault
 	 *
 	 * @return array
 	 * @throws GuzzleException
@@ -2563,8 +2666,10 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $fileContent,
 		string $destination,
+		string $isVault,
 	): array {
-		$space = $this->getSpaceByName($user, $spaceName);
+		$isVault = trim($isVault) === "in vault";
+		$space = $this->getSpaceByName($user, $spaceName, $isVault);
 		$response = $this->featureContext->uploadFileWithContent(
 			$user,
 			$fileContent,
