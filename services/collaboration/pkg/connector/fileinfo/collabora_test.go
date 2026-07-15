@@ -448,3 +448,84 @@ func TestCollaboraJSONMarshallingIncludesSupportsUpdate(t *testing.T) {
 		})
 	}
 }
+
+func TestCollaboraSetPropertiesIsAnonymousUser(t *testing.T) {
+	tests := []struct {
+		name           string
+		isAnonymous    bool
+		expectedResult bool
+	}{
+		{
+			name:           "IsAnonymousUser set to true",
+			isAnonymous:    true,
+			expectedResult: true,
+		},
+		{
+			name:           "IsAnonymousUser set to false",
+			isAnonymous:    false,
+			expectedResult: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cinfo := &Collabora{}
+			cinfo.SetProperties(map[string]interface{}{
+				KeyIsAnonymousUser: tt.isAnonymous,
+			})
+
+			if cinfo.IsAnonymousUser != tt.expectedResult {
+				t.Errorf("SetProperties IsAnonymousUser: got %v, want %v", cinfo.IsAnonymousUser, tt.expectedResult)
+			}
+		})
+	}
+}
+
+func TestCollaboraJSONOmitsIsAnonymousUserWhenFalse(t *testing.T) {
+	// IsAnonymousUser has `omitempty`, so it should be omitted from JSON when false
+	cinfo := &Collabora{
+		IsAnonymousUser: false,
+	}
+
+	jsonBytes, err := json.Marshal(cinfo)
+	if err != nil {
+		t.Fatalf("Failed to marshal JSON: %v", err)
+	}
+
+	var jsonMap map[string]interface{}
+	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
+		t.Fatalf("Failed to unmarshal JSON: %v", err)
+	}
+
+	_, hasIsAnonymousUser := jsonMap["IsAnonymousUser"]
+	if hasIsAnonymousUser {
+		t.Errorf("Expected IsAnonymousUser field to be omitted from JSON when false, but it was present: %s", string(jsonBytes))
+	}
+}
+
+func TestCollaboraJSONIncludesIsAnonymousUserWhenTrue(t *testing.T) {
+	// IsAnonymousUser has `omitempty`, so it should be included in JSON when true
+	cinfo := &Collabora{
+		IsAnonymousUser: true,
+	}
+
+	jsonBytes, err := json.Marshal(cinfo)
+	if err != nil {
+		t.Fatalf("Failed to marshal JSON: %v", err)
+	}
+
+	var jsonMap map[string]interface{}
+	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
+		t.Fatalf("Failed to unmarshal JSON: %v", err)
+	}
+
+	val, hasIsAnonymousUser := jsonMap["IsAnonymousUser"]
+	if !hasIsAnonymousUser {
+		t.Errorf("Expected IsAnonymousUser field to be in JSON when true, but it was not: %s", string(jsonBytes))
+	}
+
+	boolVal, ok := val.(bool)
+	if !ok || !boolVal {
+		t.Errorf("IsAnonymousUser field: got %v, want true", val)
+	}
+}

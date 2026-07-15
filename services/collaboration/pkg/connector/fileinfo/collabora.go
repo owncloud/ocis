@@ -86,6 +86,8 @@ type Collabora struct {
 	SupportsUpdate    bool   `json:"SupportsUpdate"`
 	UserCanRename     bool   `json:"UserCanRename"`
 	BreadcrumbDocName string `json:"BreadcrumbDocName,omitempty"`
+	// copied from MS WOPI
+	IsAnonymousUser bool `json:"IsAnonymousUser,omitempty"`
 }
 
 // SetProperties will set the file properties for the Collabora implementation.
@@ -160,6 +162,8 @@ func (cinfo *Collabora) SetProperties(props map[string]interface{}) {
 			cinfo.UserCanRename = value.(bool)
 		case KeyBreadcrumbDocName:
 			cinfo.BreadcrumbDocName = value.(string)
+		case KeyIsAnonymousUser:
+			cinfo.IsAnonymousUser = value.(bool)
 		}
 	}
 }

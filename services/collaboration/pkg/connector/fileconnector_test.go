@@ -1842,6 +1842,7 @@ var _ = Describe("FileConnector", func() {
 				Version:                 "v162738491234567",
 				LastModifiedTime:        "1970-07-08T08:30:49.0012345Z",
 				ReadOnly:                true,
+				IsAnonymousUser:         true,
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -2038,6 +2039,113 @@ var _ = Describe("FileConnector", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(200))
 			Expect(response.Body.(*fileinfo.Collabora)).To(Equal(expectedFileInfo))
+		})
+		It("Collabora IsAnonymousUser is true for anonymous user (public share)", func() {
+			// add user's opaque to include public-share-role
+			u := &userv1beta1.User{}
+			u.Opaque = &typesv1beta1.Opaque{
+				Map: map[string]*typesv1beta1.OpaqueEntry{
+					"public-share-role": {
+						Decoder: "plain",
+						Value:   []byte("viewer"),
+					},
+				},
+			}
+			wopiCtx.ViewMode = appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY
+
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(1234567),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Body.(*fileinfo.Collabora).IsAnonymousUser).To(BeTrue())
+			// Verify UserID is still present for anonymous users
+			Expect(response.Body.(*fileinfo.Collabora).UserID).ToNot(BeEmpty())
+			Expect(response.Body.(*fileinfo.Collabora).UserID).To(HavePrefix(hex.EncodeToString([]byte("guest-"))))
+		})
+		It("Collabora IsAnonymousUser is false for authenticated user", func() {
+			wopiCtx.ViewMode = appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY
+
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "example.com",
+					OpaqueId: "aabbcc",
+					Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+				},
+				DisplayName: "Pet Shaft",
+				Mail:        "shaft@example.com",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+			// IsAnonymousUser should be false (or zero value) for authenticated users
+			Expect(response.Body.(*fileinfo.Collabora).IsAnonymousUser).To(BeFalse())
+			// Verify UserID is present and is the authenticated user's ID
+			Expect(response.Body.(*fileinfo.Collabora).UserID).To(Equal(hex.EncodeToString([]byte("aabbcc@example.com"))))
 		})
 		It("Stat success secure view authenticated user", func() {
 			// change view mode to view only
