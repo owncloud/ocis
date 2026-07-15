@@ -81,6 +81,24 @@ func NewResponseWithVersionAndLock(status int, mtime *types.Timestamp, lockID st
 	return r
 }
 
+// NewResponseCOOLConflict creates a new ConnectorResponse with the status 409
+// and a "COOLStatusCode": 1010 body.
+//
+// This tells Collabora Online that the conflict is a stale-document conflict
+// (detected by comparing the "X-COOL-WOPI-Timestamp" header sent by the client
+// against the file's current mtime in storage), rather than a lock conflict.
+// This lets Collabora prompt the user to overwrite or reload the document
+// instead of just retrying. See the Collabora SDK docs on PutFile:
+// https://sdk.collaboraonline.com/docs/advanced_integration.html
+func NewResponseCOOLConflict() *ConnectorResponse {
+	return &ConnectorResponse{
+		Status: 409,
+		Body: map[string]interface{}{
+			"COOLStatusCode": 1010,
+		},
+	}
+}
+
 // NewResponseSuccessBody creates a new ConnectorResponse with a fixed 200
 // (success) status and the specified body. The headers will be nil.
 //

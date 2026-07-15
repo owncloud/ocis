@@ -472,7 +472,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123").Times(1).Return(nil, errors.New("Something happened"))
+			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123", "").Times(1).Return(nil, errors.New("Something happened"))
 
 			httpAdapter.PutFile(w, req)
 			resp := w.Result()
@@ -489,7 +489,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123").Times(1).Return(nil, connector.NewConnectorError(500, "Something happened"))
+			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123", "").Times(1).Return(nil, connector.NewConnectorError(500, "Something happened"))
 
 			httpAdapter.PutFile(w, req)
 			resp := w.Result()
@@ -506,7 +506,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123").Times(1).Return(
+			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123", "").Times(1).Return(
 				connector.NewResponseLockConflict("zzz111", "Lock Conflict"), nil)
 
 			httpAdapter.PutFile(w, req)
@@ -523,7 +523,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123").Times(1).Return(
+			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123", "").Times(1).Return(
 				connector.NewResponseWithVersionAndLock(
 					200,
 					&typesv1beta1.Timestamp{Seconds: uint64(1234), Nanos: uint32(567)},

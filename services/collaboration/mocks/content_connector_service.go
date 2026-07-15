@@ -74,9 +74,9 @@ func (_c *ContentConnectorService_GetFile_Call) RunAndReturn(run func(context.Co
 	return _c
 }
 
-// PutFile provides a mock function with given fields: ctx, stream, streamLength, lockID
-func (_m *ContentConnectorService) PutFile(ctx context.Context, stream io.Reader, streamLength int64, lockID string) (*connector.ConnectorResponse, error) {
-	ret := _m.Called(ctx, stream, streamLength, lockID)
+// PutFile provides a mock function with given fields: ctx, stream, streamLength, lockID, coolWopiTimestamp
+func (_m *ContentConnectorService) PutFile(ctx context.Context, stream io.Reader, streamLength int64, lockID string, coolWopiTimestamp string) (*connector.ConnectorResponse, error) {
+	ret := _m.Called(ctx, stream, streamLength, lockID, coolWopiTimestamp)
 
 	if len(ret) == 0 {
 		panic("no return value specified for PutFile")
@@ -84,19 +84,19 @@ func (_m *ContentConnectorService) PutFile(ctx context.Context, stream io.Reader
 
 	var r0 *connector.ConnectorResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, io.Reader, int64, string) (*connector.ConnectorResponse, error)); ok {
-		return rf(ctx, stream, streamLength, lockID)
+	if rf, ok := ret.Get(0).(func(context.Context, io.Reader, int64, string, string) (*connector.ConnectorResponse, error)); ok {
+		return rf(ctx, stream, streamLength, lockID, coolWopiTimestamp)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, io.Reader, int64, string) *connector.ConnectorResponse); ok {
-		r0 = rf(ctx, stream, streamLength, lockID)
+	if rf, ok := ret.Get(0).(func(context.Context, io.Reader, int64, string, string) *connector.ConnectorResponse); ok {
+		r0 = rf(ctx, stream, streamLength, lockID, coolWopiTimestamp)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*connector.ConnectorResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, io.Reader, int64, string) error); ok {
-		r1 = rf(ctx, stream, streamLength, lockID)
+	if rf, ok := ret.Get(1).(func(context.Context, io.Reader, int64, string, string) error); ok {
+		r1 = rf(ctx, stream, streamLength, lockID, coolWopiTimestamp)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -114,13 +114,14 @@ type ContentConnectorService_PutFile_Call struct {
 //   - stream io.Reader
 //   - streamLength int64
 //   - lockID string
-func (_e *ContentConnectorService_Expecter) PutFile(ctx interface{}, stream interface{}, streamLength interface{}, lockID interface{}) *ContentConnectorService_PutFile_Call {
-	return &ContentConnectorService_PutFile_Call{Call: _e.mock.On("PutFile", ctx, stream, streamLength, lockID)}
+//   - coolWopiTimestamp string
+func (_e *ContentConnectorService_Expecter) PutFile(ctx interface{}, stream interface{}, streamLength interface{}, lockID interface{}, coolWopiTimestamp interface{}) *ContentConnectorService_PutFile_Call {
+	return &ContentConnectorService_PutFile_Call{Call: _e.mock.On("PutFile", ctx, stream, streamLength, lockID, coolWopiTimestamp)}
 }
 
-func (_c *ContentConnectorService_PutFile_Call) Run(run func(ctx context.Context, stream io.Reader, streamLength int64, lockID string)) *ContentConnectorService_PutFile_Call {
+func (_c *ContentConnectorService_PutFile_Call) Run(run func(ctx context.Context, stream io.Reader, streamLength int64, lockID string, coolWopiTimestamp string)) *ContentConnectorService_PutFile_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(io.Reader), args[2].(int64), args[3].(string))
+		run(args[0].(context.Context), args[1].(io.Reader), args[2].(int64), args[3].(string), args[4].(string))
 	})
 	return _c
 }
@@ -130,7 +131,7 @@ func (_c *ContentConnectorService_PutFile_Call) Return(_a0 *connector.ConnectorR
 	return _c
 }
 
-func (_c *ContentConnectorService_PutFile_Call) RunAndReturn(run func(context.Context, io.Reader, int64, string) (*connector.ConnectorResponse, error)) *ContentConnectorService_PutFile_Call {
+func (_c *ContentConnectorService_PutFile_Call) RunAndReturn(run func(context.Context, io.Reader, int64, string, string) (*connector.ConnectorResponse, error)) *ContentConnectorService_PutFile_Call {
 	_c.Call.Return(run)
 	return _c
 }

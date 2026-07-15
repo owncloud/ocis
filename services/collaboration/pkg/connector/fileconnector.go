@@ -711,7 +711,7 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 		newCtx := middleware.WopiContextToCtx(newLogger.WithContext(ctx), wopiContext)
 
 		// try to put the file. It mustn't return a 400 or 409
-		putResponse, err := ccs.PutFile(newCtx, stream, streamLength, "")
+		putResponse, err := ccs.PutFile(newCtx, stream, streamLength, "", "")
 		if err != nil {
 			newLogger.Error().Err(err).Msg("PutRelativeFileSuggested: put file failed") // fails here
 			return nil, err
@@ -830,7 +830,7 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 	newCtx := middleware.WopiContextToCtx(newLogger.WithContext(ctx), wopiContext)
 
 	// try to put the file
-	putResponse, err := ccs.PutFile(newCtx, stream, streamLength, "")
+	putResponse, err := ccs.PutFile(newCtx, stream, streamLength, "", "")
 	if err != nil {
 		newLogger.Error().Err(err).Msg("PutRelativeFileRelative: put file failed") // or here
 		return nil, err
