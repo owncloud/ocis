@@ -762,3 +762,113 @@ func TestCollaboraJSONMixedBreadcrumbProperties(t *testing.T) {
 		t.Errorf("Expected BreadcrumbFolderUrl to be omitted from JSON, but it was present: %s", string(jsonBytes))
 	}
 }
+
+// postMessagePropertyCases describes each of the 5 PostMessage WOPI properties added to
+// Collabora: the SetProperties key that populates it, the JSON tag it is expected to be
+// marshalled under, and a getter for its value. Used to drive the table-driven tests
+// below.
+var postMessagePropertyCases = []struct {
+	name    string
+	key     string
+	jsonTag string
+	getter  func(*Collabora) bool
+}{
+	{"ClosePostMessage", KeyClosePostMessage, "ClosePostMessage", func(c *Collabora) bool { return c.ClosePostMessage }},
+	{"EditModePostMessage", KeyEditModePostMessage, "EditModePostMessage", func(c *Collabora) bool { return c.EditModePostMessage }},
+	{"EditNotificationPostMessage", KeyEditNotificationPostMessage, "EditNotificationPostMessage", func(c *Collabora) bool { return c.EditNotificationPostMessage }},
+	{"FileSharingPostMessage", KeyFileSharingPostMessage, "FileSharingPostMessage", func(c *Collabora) bool { return c.FileSharingPostMessage }},
+	{"FileVersionPostMessage", KeyFileVersionPostMessage, "FileVersionPostMessage", func(c *Collabora) bool { return c.FileVersionPostMessage }},
+}
+
+// TestCollaboraSetPropertiesPostMessageProperties covers brief item 1: for each of the 5
+// PostMessage properties, SetProperties must correctly set the corresponding struct field,
+// both when set to true and when set to false.
+func TestCollaboraSetPropertiesPostMessageProperties(t *testing.T) {
+	for _, prop := range postMessagePropertyCases {
+		t.Run(prop.name, func(t *testing.T) {
+			for _, value := range []bool{true, false} {
+				cinfo := &Collabora{}
+				cinfo.SetProperties(map[string]interface{}{
+					prop.key: value,
+				})
+
+				if got := prop.getter(cinfo); got != value {
+					t.Errorf("SetProperties %s: got %v, want %v", prop.name, got, value)
+				}
+			}
+		})
+	}
+}
+
+// TestCollaboraJSONMarshallingIncludesPostMessageProperties covers brief item 2:
+// marshalling a Collabora struct with all 5 PostMessage properties set to true must
+// include all of them in the resulting JSON.
+func TestCollaboraJSONMarshallingIncludesPostMessageProperties(t *testing.T) {
+	cinfo := &Collabora{}
+	for _, prop := range postMessagePropertyCases {
+		cinfo.SetProperties(map[string]interface{}{prop.key: true})
+	}
+
+	jsonBytes, err := json.Marshal(cinfo)
+	if err != nil {
+		t.Fatalf("Failed to marshal JSON: %v", err)
+	}
+
+	var jsonMap map[string]interface{}
+	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
+		t.Fatalf("Failed to unmarshal JSON: %v", err)
+	}
+
+	for _, prop := range postMessagePropertyCases {
+		val, ok := jsonMap[prop.jsonTag]
+		if !ok {
+			t.Errorf("Expected %q field to be in JSON, but it was not: %s", prop.jsonTag, string(jsonBytes))
+			continue
+		}
+		if val != true {
+			t.Errorf("%s field: got %v, want true", prop.jsonTag, val)
+		}
+	}
+}
+
+// TestCollaboraJSONOmitsPostMessagePropertiesWhenFalse covers brief item 3: each of the 5
+// PostMessage properties has `omitempty` and must be absent from the JSON output when
+// false (the zero value).
+func TestCollaboraJSONOmitsPostMessagePropertiesWhenFalse(t *testing.T) {
+	cinfo := &Collabora{}
+
+	jsonBytes, err := json.Marshal(cinfo)
+	if err != nil {
+		t.Fatalf("Failed to marshal JSON: %v", err)
+	}
+
+	var jsonMap map[string]interface{}
+	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
+		t.Fatalf("Failed to unmarshal JSON: %v", err)
+	}
+
+	for _, prop := range postMessagePropertyCases {
+		if _, ok := jsonMap[prop.jsonTag]; ok {
+			t.Errorf("Expected %q field to be omitted from JSON when false due to omitempty, but it was present: %s", prop.jsonTag, string(jsonBytes))
+		}
+	}
+}
+
+// TestCollaboraSetPropertiesAllPostMessagePropertiesSimultaneously covers brief item 4:
+// setting all 5 PostMessage properties to true in a single SetProperties call must set
+// all of them correctly.
+func TestCollaboraSetPropertiesAllPostMessagePropertiesSimultaneously(t *testing.T) {
+	props := make(map[string]interface{}, len(postMessagePropertyCases))
+	for _, prop := range postMessagePropertyCases {
+		props[prop.key] = true
+	}
+
+	cinfo := &Collabora{}
+	cinfo.SetProperties(props)
+
+	for _, prop := range postMessagePropertyCases {
+		if got := prop.getter(cinfo); !got {
+			t.Errorf("SetProperties %s: got %v, want true", prop.name, got)
+		}
+	}
+}

@@ -1329,6 +1329,15 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 
 	infoMap[fileinfo.KeyReadOnly] = wopiContext.ViewMode != appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE
 
+	// Only Collabora currently has a web frontend handler wired up for UI_Edit; the other
+	// PostMessage flags (Close, EditNotification, FileSharing, FileVersion) are left unset
+	// so Collabora falls back to the corresponding URL properties instead of sending
+	// PostMessages nobody listens for. OnlyOffice's SetProperties also implements these
+	// keys, so this must stay an explicit target check rather than an unconditional write.
+	if strings.ToLower(f.cfg.App.Product) == "collabora" {
+		infoMap[fileinfo.KeyEditModePostMessage] = true
+	}
+
 	switch wopiContext.ViewMode {
 	case appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE:
 		infoMap[fileinfo.KeyUserCanWrite] = true

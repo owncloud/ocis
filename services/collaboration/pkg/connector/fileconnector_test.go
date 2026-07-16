@@ -3,6 +3,7 @@ package connector_test
 import (
 	"context"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"net/url"
 	"path"
@@ -1852,6 +1853,7 @@ var _ = Describe("FileConnector", func() {
 				BreadcrumbDocName:       "test.txt",
 				BreadcrumbFolderName:    "/path/to",
 				PostMessageOrigin:       "https://ocis.example.prv",
+				EditModePostMessage:     true,
 				Version:                 "v162738491234567",
 				LastModifiedTime:        "1970-07-08T08:30:49.0012345Z",
 				ReadOnly:                true,
@@ -2065,6 +2067,7 @@ var _ = Describe("FileConnector", func() {
 				BreadcrumbFolderName:    "/path/to",
 				BreadcrumbFolderURL:     "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
 				PostMessageOrigin:       "https://ocis.example.prv",
+				EditModePostMessage:     true,
 				Version:                 "v162738490",
 				LastModifiedTime:        "1970-07-08T08:30:49.0000000Z",
 				ReadOnly:                true,
@@ -2266,6 +2269,7 @@ var _ = Describe("FileConnector", func() {
 				BreadcrumbFolderName:    "/path/to",
 				BreadcrumbFolderURL:     "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
 				PostMessageOrigin:       "https://ocis.example.prv",
+				EditModePostMessage:     true,
 				Version:                 "v162738490",
 				LastModifiedTime:        "1970-07-08T08:30:49.0000000Z",
 				ReadOnly:                true,
@@ -3162,5 +3166,241 @@ var _ = Describe("FileConnector", func() {
 			Expect(collaboraResponse.BreadcrumbBrandURL).To(BeEmpty())
 		})
 
+		It("Collabora CheckFileInfo enables EditModePostMessage but leaves the other PostMessage flags unset", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// change wopi app provider
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			// only EditModePostMessage should be enabled: the oCIS web frontend (the one
+			// generic iframe wrapper used for all WOPI targets) only has a real handler for
+			// UI_Edit today, so sending the other PostMessages would go into the void.
+			Expect(collaboraResponse.EditModePostMessage).To(BeTrue())
+			Expect(collaboraResponse.ClosePostMessage).To(BeFalse())
+			Expect(collaboraResponse.EditNotificationPostMessage).To(BeFalse())
+			Expect(collaboraResponse.FileSharingPostMessage).To(BeFalse())
+			Expect(collaboraResponse.FileVersionPostMessage).To(BeFalse())
+		})
+
+		It("Collabora CheckFileInfo PostMessageOrigin is non-empty whenever EditModePostMessage is true", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// change wopi app provider
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.EditModePostMessage).To(BeTrue())
+			// PostMessageOrigin is the prerequisite for any PostMessage to work: it must be
+			// non-empty whenever a PostMessage flag is enabled.
+			Expect(collaboraResponse.PostMessageOrigin).ToNot(BeEmpty())
+		})
+
+		It("Microsoft CheckFileInfo response never carries Collabora PostMessage properties", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// cfg.App.Product defaults to "Microsoft" (see BeforeEach); Microsoft uses its
+			// own PostMessage-equivalent mechanism and its fileinfo struct has no
+			// PostMessage fields at all, so the gate must not attempt to populate them.
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			jsonBytes, err := json.Marshal(response.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			var jsonMap map[string]interface{}
+			Expect(json.Unmarshal(jsonBytes, &jsonMap)).ToNot(HaveOccurred())
+
+			for _, key := range []string{
+				"ClosePostMessage",
+				"EditModePostMessage",
+				"EditNotificationPostMessage",
+				"FileSharingPostMessage",
+				"FileVersionPostMessage",
+			} {
+				_, ok := jsonMap[key]
+				Expect(ok).To(BeFalse(), "expected %q to be absent from the Microsoft CheckFileInfo response, got: %s", key, string(jsonBytes))
+			}
+		})
+
+		It("OnlyOffice CheckFileInfo response never carries Collabora-only PostMessage properties", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// change wopi app provider
+			cfg.App.Name = "OnlyOffice"
+			cfg.App.Product = "OnlyOffice"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			// Unlike Microsoft, OnlyOffice's fileinfo struct *does* have matching
+			// SetProperties cases for all 5 PostMessage keys, so this is the test that
+			// would actually catch a missing/inverted Collabora-only gate: if the `if
+			// strings.ToLower(f.cfg.App.Product) == "collabora"` check in CheckFileInfo were
+			// ever removed or broadened, EditModePostMessage: true would leak into this
+			// OnlyOffice response.
+			onlyOfficeResponse := response.Body.(*fileinfo.OnlyOffice)
+			Expect(onlyOfficeResponse.ClosePostMessage).To(BeFalse())
+			Expect(onlyOfficeResponse.EditModePostMessage).To(BeFalse())
+			Expect(onlyOfficeResponse.EditNotificationPostMessage).To(BeFalse())
+			Expect(onlyOfficeResponse.FileSharingPostMessage).To(BeFalse())
+			Expect(onlyOfficeResponse.FileVersionPostMessage).To(BeFalse())
+		})
 	})
 })

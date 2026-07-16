@@ -37,6 +37,21 @@ type Collabora struct {
 	ReadOnly bool `json:"ReadOnly"`
 
 	//
+	// PostMessage properties
+	//
+
+	// Specifies if Collabora should send UI_Close PostMessage when the user closes the editor
+	ClosePostMessage bool `json:"ClosePostMessage,omitempty"`
+	// Specifies if Collabora should send UI_Edit PostMessage when the user activates edit mode
+	EditModePostMessage bool `json:"EditModePostMessage,omitempty"`
+	// Specifies if Collabora should send Edit_Notification PostMessage when the user starts editing
+	EditNotificationPostMessage bool `json:"EditNotificationPostMessage,omitempty"`
+	// Specifies if Collabora should send UI_Sharing PostMessage when the user activates the share UI
+	FileSharingPostMessage bool `json:"FileSharingPostMessage,omitempty"`
+	// Specifies if Collabora should send UI_FileVersions PostMessage when the user activates version history
+	FileVersionPostMessage bool `json:"FileVersionPostMessage,omitempty"`
+
+	//
 	// File URL properties
 	//
 
@@ -147,6 +162,17 @@ func (cinfo *Collabora) SetProperties(props map[string]interface{}) {
 			cinfo.LastModifiedTime = value.(string)
 		case KeyReadOnly:
 			cinfo.ReadOnly = value.(bool)
+
+		case KeyClosePostMessage:
+			cinfo.ClosePostMessage = value.(bool)
+		case KeyEditModePostMessage:
+			cinfo.EditModePostMessage = value.(bool)
+		case KeyEditNotificationPostMessage:
+			cinfo.EditNotificationPostMessage = value.(bool)
+		case KeyFileSharingPostMessage:
+			cinfo.FileSharingPostMessage = value.(bool)
+		case KeyFileVersionPostMessage:
+			cinfo.FileVersionPostMessage = value.(bool)
 
 		case KeyCloseURL:
 			cinfo.CloseURL = value.(string)
