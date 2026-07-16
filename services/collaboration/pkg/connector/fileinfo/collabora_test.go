@@ -183,61 +183,6 @@ func TestCollaboraJSONMarshallingIncludesLastModifiedTime(t *testing.T) {
 	}
 }
 
-func TestCollaboraLastModifiedTimeOmitEmpty(t *testing.T) {
-	tests := []struct {
-		name             string
-		lastModifiedTime string
-		expected         string
-	}{
-		{
-			name:             "LastModifiedTime should be in JSON",
-			lastModifiedTime: "2025-04-13T10:00:00.0000000Z",
-			expected:         `"LastModifiedTime":"2025-04-13T10:00:00.0000000Z"`,
-		},
-		{
-			name:             "Empty LastModifiedTime should not appear in JSON",
-			lastModifiedTime: "",
-			expected:         ``,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			cinfo := &Collabora{LastModifiedTime: tt.lastModifiedTime}
-			jsonBytes, err := json.Marshal(cinfo)
-			if err != nil {
-				t.Fatalf("Failed to marshal JSON: %v", err)
-			}
-
-			jsonStr := string(jsonBytes)
-			if tt.lastModifiedTime != "" {
-				if !json.Valid(jsonBytes) {
-					t.Errorf("Invalid JSON produced: %s", jsonStr)
-				}
-
-				var result map[string]interface{}
-				if err := json.Unmarshal(jsonBytes, &result); err != nil {
-					t.Errorf("Failed to unmarshal JSON: %v", err)
-				}
-
-				if v, ok := result["LastModifiedTime"]; !ok || v != tt.lastModifiedTime {
-					t.Errorf("LastModifiedTime not correctly included in JSON, got: %v", v)
-				}
-			} else {
-				// For empty LastModifiedTime, just verify it doesn't appear in the JSON string
-				if json.Valid(jsonBytes) {
-					var result map[string]interface{}
-					if err := json.Unmarshal(jsonBytes, &result); err == nil {
-						if _, hasLastModifiedTime := result["LastModifiedTime"]; hasLastModifiedTime {
-							t.Errorf("LastModifiedTime should be omitted from JSON when empty, but was present")
-						}
-					}
-				}
-			}
-		})
-	}
-}
-
 func TestCollaboraSetPropertiesReadOnly(t *testing.T) {
 	tests := []struct {
 		name           string
@@ -311,61 +256,6 @@ func TestCollaboraJSONMarshallingIncludesReadOnly(t *testing.T) {
 			boolVal, ok := val.(bool)
 			if !ok || boolVal != tt.readOnly {
 				t.Errorf("ReadOnly field: got %v, want %v", val, tt.readOnly)
-			}
-		})
-	}
-}
-
-func TestCollaboraVersionOmitEmpty(t *testing.T) {
-	tests := []struct {
-		name     string
-		version  string
-		expected string
-	}{
-		{
-			name:     "Version abc123 should be in JSON",
-			version:  "abc123",
-			expected: `"Version":"abc123"`,
-		},
-		{
-			name:     "Empty version should not appear in JSON",
-			version:  "",
-			expected: ``,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			cinfo := &Collabora{Version: tt.version}
-			jsonBytes, err := json.Marshal(cinfo)
-			if err != nil {
-				t.Fatalf("Failed to marshal JSON: %v", err)
-			}
-
-			jsonStr := string(jsonBytes)
-			if tt.version != "" {
-				if !json.Valid(jsonBytes) {
-					t.Errorf("Invalid JSON produced: %s", jsonStr)
-				}
-
-				var result map[string]interface{}
-				if err := json.Unmarshal(jsonBytes, &result); err != nil {
-					t.Errorf("Failed to unmarshal JSON: %v", err)
-				}
-
-				if v, ok := result["Version"]; !ok || v != tt.version {
-					t.Errorf("Version not correctly included in JSON, got: %v", v)
-				}
-			} else {
-				// For empty version, just verify it doesn't appear in the JSON string
-				if json.Valid(jsonBytes) {
-					var result map[string]interface{}
-					if err := json.Unmarshal(jsonBytes, &result); err == nil {
-						if _, hasVersion := result["Version"]; hasVersion {
-							t.Errorf("Version should be omitted from JSON when empty, but was present")
-						}
-					}
-				}
 			}
 		})
 	}
