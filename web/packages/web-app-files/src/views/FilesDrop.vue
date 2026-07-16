@@ -2,7 +2,7 @@
   <div id="files-drop">
     <app-loading-spinner v-if="loading" />
     <div v-else id="files-drop-wrapper" class="oc-height-1-1">
-      <h1 class="oc-invisible-sr">{{ pageTitle }}</h1>
+      <h1 v-if="pageTitle" class="oc-invisible-sr">{{ pageTitle }}</h1>
 
       <div v-if="dragareaEnabled" class="dragarea" />
       <div key="loaded-drop" class="oc-flex oc-flex-center oc-height-1-1">
