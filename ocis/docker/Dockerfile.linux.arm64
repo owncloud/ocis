@@ -5,7 +5,7 @@ ARG REVISION=""
 
 RUN apk upgrade --no-cache \
     && apk add --no-cache attr bash ca-certificates curl inotify-tools libc6-compat mailcap tree patch \
-    && apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community "vips=8.18.3-r0" \
+    && apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community "vips=8.18.4-r0" \
     && echo 'hosts: files dns' >| /etc/nsswitch.conf
 
 LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
