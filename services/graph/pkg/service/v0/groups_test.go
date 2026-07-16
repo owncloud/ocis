@@ -303,6 +303,12 @@ var _ = Describe("Groups", func() {
 
 		Context("with an existing group", func() {
 			BeforeEach(func() {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
 				identityBackend.On("GetGroup", mock.Anything, mock.Anything, mock.Anything).Return(newGroup, nil)
 			})
 
@@ -316,6 +322,76 @@ var _ = Describe("Groups", func() {
 
 				Expect(rr.Code).To(Equal(http.StatusOK))
 			})
+		})
+
+		It("does not leak group members to unprivileged users", func() {
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
+
+			group := &libregraph.Group{}
+			group.SetId("group1")
+			group.SetDisplayName("Group Name")
+			group.SetMembers(
+				[]libregraph.User{
+					{
+						Id: libregraph.PtrString("userid"),
+					},
+				},
+			)
+			identityBackend.On("GetGroup", mock.Anything, mock.Anything, mock.Anything).Return(group, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups/group1?$expand=members", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("groupID", "group1")
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+
+			svc.GetGroup(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			respGroup := libregraph.Group{}
+			err = json.Unmarshal(data, &respGroup)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(respGroup.Members).To(BeEmpty())
+		})
+
+		It("returns group members to privileged users", func() {
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+				Permission: &settingsmsg.Permission{
+					Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
+					Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+				},
+			}, nil)
+
+			group := &libregraph.Group{}
+			group.SetId("group1")
+			group.SetDisplayName("Group Name")
+			group.SetMembers(
+				[]libregraph.User{
+					{
+						Id: libregraph.PtrString("userid"),
+					},
+				},
+			)
+			identityBackend.On("GetGroup", mock.Anything, mock.Anything, mock.Anything).Return(group, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups/group1?$expand=members", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("groupID", "group1")
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+
+			svc.GetGroup(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			respGroup := libregraph.Group{}
+			err = json.Unmarshal(data, &respGroup)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(respGroup.Members).To(HaveLen(1))
+			Expect(respGroup.Members[0].GetId()).To(Equal("userid"))
 		})
 	})
 
