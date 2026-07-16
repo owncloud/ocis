@@ -287,7 +287,7 @@ func TestVerifyAccessTokenAudience(t *testing.T) {
 				oidc.WithJWKS(key.jwks),
 				oidc.WithProviderMetadata(&oidc.ProviderMetadata{}),
 				oidc.WithAccessTokenVerifyMethod(config.AccessTokenVerificationJWT),
-				oidc.WithAccessTokenVerifyAudience(tc.verifyAud),
+				oidc.WithAccessTokenVerifyAudiences(tc.verifyAud),
 			)
 
 			_, _, err = client.VerifyAccessToken(context.Background(), signed)

@@ -54,14 +54,14 @@ type oidcClient struct {
 	// Logger to use for logging, must be set
 	Logger log.Logger
 
-	issuer                    string
-	provider                  *ProviderMetadata
-	providerLock              *sync.Mutex
-	skipIssuerValidation      bool
-	accessTokenVerifyMethod   string
-	accessTokenVerifyAudience []string
-	remoteKeySet              KeySet
-	algorithms                []string
+	issuer                     string
+	provider                   *ProviderMetadata
+	providerLock               *sync.Mutex
+	skipIssuerValidation       bool
+	accessTokenVerifyMethod    string
+	accessTokenVerifyAudiences []string
+	remoteKeySet               KeySet
+	algorithms                 []string
 
 	JWKSOptions config.JWKS
 	JWKS        *keyfunc.JWKS
@@ -90,17 +90,17 @@ func NewOIDCClient(opts ...Option) OIDCClient {
 	options := newOptions(opts...)
 
 	return &oidcClient{
-		Logger:                    options.Logger,
-		issuer:                    options.OIDCIssuer,
-		httpClient:                options.HTTPClient,
-		accessTokenVerifyMethod:   options.AccessTokenVerifyMethod,
-		accessTokenVerifyAudience: options.AccessTokenVerifyAudience,
-		JWKSOptions:               options.JWKSOptions, // TODO I don't like that we pass down config options ...
-		JWKS:                      options.JWKS,
-		providerLock:              &sync.Mutex{},
-		jwksLock:                  &sync.Mutex{},
-		remoteKeySet:              options.KeySet,
-		provider:                  options.ProviderMetadata,
+		Logger:                     options.Logger,
+		issuer:                     options.OIDCIssuer,
+		httpClient:                 options.HTTPClient,
+		accessTokenVerifyMethod:    options.AccessTokenVerifyMethod,
+		accessTokenVerifyAudiences: options.AccessTokenVerifyAudiences,
+		JWKSOptions:                options.JWKSOptions, // TODO I don't like that we pass down config options ...
+		JWKS:                       options.JWKS,
+		providerLock:               &sync.Mutex{},
+		jwksLock:                   &sync.Mutex{},
+		remoteKeySet:               options.KeySet,
+		provider:                   options.ProviderMetadata,
 	}
 }
 
@@ -331,10 +331,10 @@ func (c *oidcClient) verifyAccessTokenJWT(token string) (RegClaimsWithSID, jwt.M
 // verifyAudience checks that the token's "aud" or "azp" claim matches the
 // configured allowlist. An empty allowlist disables the check.
 func (c *oidcClient) verifyAudience(audiences jwt.ClaimStrings, azp string) error {
-	if len(c.accessTokenVerifyAudience) == 0 {
+	if len(c.accessTokenVerifyAudiences) == 0 {
 		return nil
 	}
-	for _, allowed := range c.accessTokenVerifyAudience {
+	for _, allowed := range c.accessTokenVerifyAudiences {
 		allowed = strings.TrimSpace(allowed)
 		if allowed == "" {
 			continue
