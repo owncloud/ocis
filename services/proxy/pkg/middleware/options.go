@@ -37,8 +37,10 @@ type Options struct {
 	SettingsRoleService settingssvc.RoleService
 	// PoliciesProviderService for policy evaluation
 	PoliciesProviderService policiessvc.PoliciesProviderService
-	// OIDCClient to fetch user info and verify tokens, must be set for the oidc_auth middleware
+	// OIDCClient to fetch user info and verify logout tokens, must be set for the oidc_auth middleware
 	OIDCClient oidc.OIDCClient
+	// AccessTokenVerifier to verify bearer access tokens, must be set for the oidc_auth middleware
+	AccessTokenVerifier oidc.AccessTokenVerifier
 	// OIDCIss is the oidcAuth-issuer
 	OIDCIss string
 	// RevaGatewaySelector to send requests to the reva gateway
@@ -142,6 +144,13 @@ func PoliciesProviderService(pps policiessvc.PoliciesProviderService) Option {
 func OIDCClient(val oidc.OIDCClient) Option {
 	return func(o *Options) {
 		o.OIDCClient = val
+	}
+}
+
+// AccessTokenVerifier provides a function to set the access token verifier option.
+func AccessTokenVerifier(val oidc.AccessTokenVerifier) Option {
+	return func(o *Options) {
+		o.AccessTokenVerifier = val
 	}
 }
 

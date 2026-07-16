@@ -108,8 +108,6 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			oidcClient := oidc.NewOIDCClient(
-				oidc.WithAccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
-				oidc.WithAccessTokenVerifyAudience(cfg.OIDC.AccessTokenVerifyAud),
 				oidc.WithLogger(logger),
 				oidc.WithHTTPClient(oidcHTTPClient),
 				oidc.WithOidcIssuer(cfg.OIDC.Issuer),
@@ -301,8 +299,14 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 		middleware.HTTPClient(oidcHTTPClient),
 		middleware.OIDCIss(cfg.OIDC.Issuer),
 		middleware.OIDCClient(oidc.NewOIDCClient(
+			oidc.WithLogger(logger),
+			oidc.WithHTTPClient(oidcHTTPClient),
+			oidc.WithOidcIssuer(cfg.OIDC.Issuer),
+			oidc.WithJWKSOptions(cfg.OIDC.JWKS),
+		)),
+		middleware.AccessTokenVerifier(oidc.NewAccessTokenVerifier(
 			oidc.WithAccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
-			oidc.WithAccessTokenVerifyAudience(cfg.OIDC.AccessTokenVerifyAud),
+			oidc.WithAccessTokenVerifyAudiences(cfg.OIDC.AccessTokenVerifyAud),
 			oidc.WithLogger(logger),
 			oidc.WithHTTPClient(oidcHTTPClient),
 			oidc.WithOidcIssuer(cfg.OIDC.Issuer),

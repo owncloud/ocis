@@ -33,6 +33,7 @@ func NewOIDCAuthenticator(opts ...Option) *OIDCAuthenticator {
 		HTTPClient:              options.HTTPClient,
 		OIDCIss:                 options.OIDCIss,
 		oidcClient:              options.OIDCClient,
+		accessTokenVerifier:     options.AccessTokenVerifier,
 		AccessTokenVerifyMethod: options.AccessTokenVerifyMethod,
 		skipUserInfo:            options.SkipUserInfo,
 		TimeFunc:                time.Now,
@@ -47,6 +48,7 @@ type OIDCAuthenticator struct {
 	userInfoCache           store.Store
 	DefaultTokenCacheTTL    time.Duration
 	oidcClient              oidc.OIDCClient
+	accessTokenVerifier     oidc.AccessTokenVerifier
 	AccessTokenVerifyMethod string
 	skipUserInfo            bool
 	TimeFunc                func() time.Time
@@ -83,7 +85,7 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 		}
 	}
 
-	aClaims, claims, err := m.oidcClient.VerifyAccessToken(req.Context(), token)
+	aClaims, claims, err := m.accessTokenVerifier.VerifyAccessToken(req.Context(), token)
 	if err != nil {
 		return nil, false, errors.Wrap(err, "failed to verify access token")
 	}

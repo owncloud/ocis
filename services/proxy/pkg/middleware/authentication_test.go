@@ -47,7 +47,8 @@ var _ = Describe("Authenticating requests", Label("Authentication"), func() {
 		authenticators []Authenticator
 	)
 	oc := oidcmocks.OIDCClient{}
-	oc.On("VerifyAccessToken", mock.Anything, mock.Anything).Return(
+	atv := oidcmocks.AccessTokenVerifier{}
+	atv.On("VerifyAccessToken", mock.Anything, mock.Anything).Return(
 		oidc.RegClaimsWithSID{
 			SessionID: "a-session-id",
 			RegisteredClaims: jwt.RegisteredClaims{
@@ -85,11 +86,12 @@ var _ = Describe("Authenticating requests", Label("Authentication"), func() {
 				UserProvider: &ub,
 			},
 			&OIDCAuthenticator{
-				OIDCIss:       "http://idp.example.com",
-				Logger:        logger,
-				oidcClient:    &oc,
-				userInfoCache: store.NewMemoryStore(),
-				skipUserInfo:  true,
+				OIDCIss:             "http://idp.example.com",
+				Logger:              logger,
+				oidcClient:          &oc,
+				accessTokenVerifier: &atv,
+				userInfoCache:       store.NewMemoryStore(),
+				skipUserInfo:        true,
 			},
 			PublicShareAuthenticator{
 				Logger: logger,

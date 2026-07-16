@@ -8,6 +8,7 @@ import (
 const (
 	Iss               = "iss"
 	Sub               = "sub"
+	Azp               = "azp"
 	Email             = "email"
 	Name              = "name"
 	PreferredUsername = "preferred_username"

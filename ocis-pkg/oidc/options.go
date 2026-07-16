@@ -35,11 +35,11 @@ type Options struct {
 	// AccessTokenVerifyMethod to use when verifying access tokens
 	// TODO pass a function or interface to verify? an AccessTokenVerifier?
 	AccessTokenVerifyMethod string
-	// AccessTokenVerifyAudience is the list of accepted audiences for JWT
+	// AccessTokenVerifyAudiences is the list of accepted audiences for JWT
 	// access tokens. When non-empty, a token is only accepted if one of these
 	// values is present in its "aud" claim or matches its "azp" claim. An empty
 	// list disables the check.
-	AccessTokenVerifyAudience []string
+	AccessTokenVerifyAudiences []string
 	// Config to use
 	Config *goidc.Config
 
@@ -79,11 +79,10 @@ func WithAccessTokenVerifyMethod(val string) Option {
 	}
 }
 
-// WithAccessTokenVerifyAudience provides a function to set the
-// accessTokenVerifyAudience option.
-func WithAccessTokenVerifyAudience(val []string) Option {
+// WithAccessTokenVerifyAudiences provides a function to set the accessTokenVerifyAudiences option.
+func WithAccessTokenVerifyAudiences(val []string) Option {
 	return func(o *Options) {
-		o.AccessTokenVerifyAudience = val
+		o.AccessTokenVerifyAudiences = val
 	}
 }
 

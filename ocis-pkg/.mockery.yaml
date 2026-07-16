@@ -7,3 +7,4 @@ packages:
     github.com/owncloud/ocis/v2/ocis-pkg/oidc:
         interfaces:
             OIDCClient:
+            AccessTokenVerifier:

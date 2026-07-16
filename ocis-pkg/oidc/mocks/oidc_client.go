@@ -5,9 +5,7 @@ package mocks
 import (
 	context "context"
 
-	jwt "github.com/golang-jwt/jwt/v5"
 	mock "github.com/stretchr/testify/mock"
-
 	oauth2 "golang.org/x/oauth2"
 
 	oidc "github.com/owncloud/ocis/v2/ocis-pkg/oidc"
@@ -81,72 +79,6 @@ func (_c *OIDCClient_UserInfo_Call) Return(_a0 *oidc.UserInfo, _a1 error) *OIDCC
 }
 
 func (_c *OIDCClient_UserInfo_Call) RunAndReturn(run func(context.Context, oauth2.TokenSource) (*oidc.UserInfo, error)) *OIDCClient_UserInfo_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// VerifyAccessToken provides a mock function with given fields: ctx, token
-func (_m *OIDCClient) VerifyAccessToken(ctx context.Context, token string) (oidc.RegClaimsWithSID, jwt.MapClaims, error) {
-	ret := _m.Called(ctx, token)
-
-	if len(ret) == 0 {
-		panic("no return value specified for VerifyAccessToken")
-	}
-
-	var r0 oidc.RegClaimsWithSID
-	var r1 jwt.MapClaims
-	var r2 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (oidc.RegClaimsWithSID, jwt.MapClaims, error)); ok {
-		return rf(ctx, token)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) oidc.RegClaimsWithSID); ok {
-		r0 = rf(ctx, token)
-	} else {
-		r0 = ret.Get(0).(oidc.RegClaimsWithSID)
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, string) jwt.MapClaims); ok {
-		r1 = rf(ctx, token)
-	} else {
-		if ret.Get(1) != nil {
-			r1 = ret.Get(1).(jwt.MapClaims)
-		}
-	}
-
-	if rf, ok := ret.Get(2).(func(context.Context, string) error); ok {
-		r2 = rf(ctx, token)
-	} else {
-		r2 = ret.Error(2)
-	}
-
-	return r0, r1, r2
-}
-
-// OIDCClient_VerifyAccessToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'VerifyAccessToken'
-type OIDCClient_VerifyAccessToken_Call struct {
-	*mock.Call
-}
-
-// VerifyAccessToken is a helper method to define mock.On call
-//   - ctx context.Context
-//   - token string
-func (_e *OIDCClient_Expecter) VerifyAccessToken(ctx interface{}, token interface{}) *OIDCClient_VerifyAccessToken_Call {
-	return &OIDCClient_VerifyAccessToken_Call{Call: _e.mock.On("VerifyAccessToken", ctx, token)}
-}
-
-func (_c *OIDCClient_VerifyAccessToken_Call) Run(run func(ctx context.Context, token string)) *OIDCClient_VerifyAccessToken_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
-	})
-	return _c
-}
-
-func (_c *OIDCClient_VerifyAccessToken_Call) Return(_a0 oidc.RegClaimsWithSID, _a1 jwt.MapClaims, _a2 error) *OIDCClient_VerifyAccessToken_Call {
-	_c.Call.Return(_a0, _a1, _a2)
-	return _c
-}
-
-func (_c *OIDCClient_VerifyAccessToken_Call) RunAndReturn(run func(context.Context, string) (oidc.RegClaimsWithSID, jwt.MapClaims, error)) *OIDCClient_VerifyAccessToken_Call {
 	_c.Call.Return(run)
 	return _c
 }

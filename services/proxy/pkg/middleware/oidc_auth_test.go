@@ -23,12 +23,13 @@ var _ = Describe("Authenticating requests", Label("OIDCAuthenticator"), func() {
 	var authenticator Authenticator
 
 	oc := oidcmocks.OIDCClient{}
+	atv := oidcmocks.AccessTokenVerifier{}
 	// Return a fresh claims map on every call. getClaims mutates the returned
 	// map (claims["exp"] = ...) and then reads it from a fire-and-forget cache
 	// goroutine, so handing every call the same map instance would let one
-	// spec's goroutine race another spec's mutation. The real OIDC client
-	// returns a new map per call, which this mirrors.
-	oc.On("VerifyAccessToken", mock.Anything, mock.Anything).Return(
+	// spec's goroutine race another spec's mutation. The real access token
+	// verifier returns a new map per call, which this mirrors.
+	atv.On("VerifyAccessToken", mock.Anything, mock.Anything).Return(
 		oidc.RegClaimsWithSID{
 			SessionID: "a-session-id",
 			RegisteredClaims: jwt.RegisteredClaims{
@@ -57,11 +58,12 @@ var _ = Describe("Authenticating requests", Label("OIDCAuthenticator"), func() {
 
 	BeforeEach(func() {
 		authenticator = &OIDCAuthenticator{
-			OIDCIss:       "http://idp.example.com",
-			Logger:        log.NewLogger(),
-			oidcClient:    &oc,
-			userInfoCache: store.NewMemoryStore(),
-			skipUserInfo:  true,
+			OIDCIss:             "http://idp.example.com",
+			Logger:              log.NewLogger(),
+			oidcClient:          &oc,
+			accessTokenVerifier: &atv,
+			userInfoCache:       store.NewMemoryStore(),
+			skipUserInfo:        true,
 		}
 	})
 
@@ -135,12 +137,13 @@ var _ = Describe("Authenticating requests", Label("OIDCAuthenticator"), func() {
 			Expect(cache.Write(&store.Record{Key: encodedHash, Value: value})).To(Succeed())
 
 			oidcAuth := &OIDCAuthenticator{
-				OIDCIss:       "http://idp.example.com",
-				Logger:        log.NewLogger(),
-				oidcClient:    &oc,
-				userInfoCache: cache,
-				skipUserInfo:  true,
-				TimeFunc:      time.Now,
+				OIDCIss:             "http://idp.example.com",
+				Logger:              log.NewLogger(),
+				oidcClient:          &oc,
+				accessTokenVerifier: &atv,
+				userInfoCache:       cache,
+				skipUserInfo:        true,
+				TimeFunc:            time.Now,
 			}
 
 			req := httptest.NewRequest(http.MethodGet, "http://example.com/example/path", http.NoBody)
@@ -170,18 +173,19 @@ var _ = Describe("Authenticating requests", Label("OIDCAuthenticator"), func() {
 			cache := store.NewMemoryStore()
 			Expect(cache.Write(&store.Record{Key: encodedHash, Value: value})).To(Succeed())
 
-			rejectingClient := oidcmocks.OIDCClient{}
-			rejectingClient.On("VerifyAccessToken", mock.Anything, mock.Anything).Return(
+			rejectingVerifier := oidcmocks.AccessTokenVerifier{}
+			rejectingVerifier.On("VerifyAccessToken", mock.Anything, mock.Anything).Return(
 				oidc.RegClaimsWithSID{}, jwt.MapClaims{}, jwt.ErrTokenExpired,
 			)
 
 			oidcAuth := &OIDCAuthenticator{
-				OIDCIss:       "http://idp.example.com",
-				Logger:        log.NewLogger(),
-				oidcClient:    &rejectingClient,
-				userInfoCache: cache,
-				skipUserInfo:  true,
-				TimeFunc:      time.Now,
+				OIDCIss:             "http://idp.example.com",
+				Logger:              log.NewLogger(),
+				oidcClient:          &oc,
+				accessTokenVerifier: &rejectingVerifier,
+				userInfoCache:       cache,
+				skipUserInfo:        true,
+				TimeFunc:            time.Now,
 			}
 
 			req := httptest.NewRequest(http.MethodGet, "http://example.com/example/path", http.NoBody)

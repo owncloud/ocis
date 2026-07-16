@@ -8,7 +8,6 @@ import (
 	"io"
 	"mime"
 	"net/http"
-	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -26,7 +25,6 @@ import (
 // OIDCClient used to mock the oidc client during tests
 type OIDCClient interface {
 	UserInfo(ctx context.Context, ts oauth2.TokenSource) (*UserInfo, error)
-	VerifyAccessToken(ctx context.Context, token string) (RegClaimsWithSID, jwt.MapClaims, error)
 	VerifyLogoutToken(ctx context.Context, token string) (*LogoutToken, error)
 }
 
@@ -54,14 +52,12 @@ type oidcClient struct {
 	// Logger to use for logging, must be set
 	Logger log.Logger
 
-	issuer                    string
-	provider                  *ProviderMetadata
-	providerLock              *sync.Mutex
-	skipIssuerValidation      bool
-	accessTokenVerifyMethod   string
-	accessTokenVerifyAudience []string
-	remoteKeySet              KeySet
-	algorithms                []string
+	issuer               string
+	provider             *ProviderMetadata
+	providerLock         *sync.Mutex
+	skipIssuerValidation bool
+	remoteKeySet         KeySet
+	algorithms           []string
 
 	JWKSOptions config.JWKS
 	JWKS        *keyfunc.JWKS
@@ -90,17 +86,15 @@ func NewOIDCClient(opts ...Option) OIDCClient {
 	options := newOptions(opts...)
 
 	return &oidcClient{
-		Logger:                    options.Logger,
-		issuer:                    options.OIDCIssuer,
-		httpClient:                options.HTTPClient,
-		accessTokenVerifyMethod:   options.AccessTokenVerifyMethod,
-		accessTokenVerifyAudience: options.AccessTokenVerifyAudience,
-		JWKSOptions:               options.JWKSOptions, // TODO I don't like that we pass down config options ...
-		JWKS:                      options.JWKS,
-		providerLock:              &sync.Mutex{},
-		jwksLock:                  &sync.Mutex{},
-		remoteKeySet:              options.KeySet,
-		provider:                  options.ProviderMetadata,
+		Logger:       options.Logger,
+		issuer:       options.OIDCIssuer,
+		httpClient:   options.HTTPClient,
+		JWKSOptions:  options.JWKSOptions, // TODO I don't like that we pass down config options ...
+		JWKS:         options.JWKS,
+		providerLock: &sync.Mutex{},
+		jwksLock:     &sync.Mutex{},
+		remoteKeySet: options.KeySet,
+		provider:     options.ProviderMetadata,
 	}
 }
 
@@ -271,86 +265,6 @@ func (c *oidcClient) UserInfo(ctx context.Context, tokenSource oauth2.TokenSourc
 		EmailVerified: bool(userInfo.EmailVerified),
 		claims:        body,
 	}, nil
-}
-
-func (c *oidcClient) VerifyAccessToken(ctx context.Context, token string) (RegClaimsWithSID, jwt.MapClaims, error) {
-	if err := c.lookupWellKnownOpenidConfiguration(ctx); err != nil {
-		return RegClaimsWithSID{}, jwt.MapClaims{}, err
-	}
-	switch c.accessTokenVerifyMethod {
-	case config.AccessTokenVerificationJWT:
-		return c.verifyAccessTokenJWT(token)
-	case config.AccessTokenVerificationNone:
-		c.Logger.Debug().Msg("Access Token verification disabled")
-		return RegClaimsWithSID{}, jwt.MapClaims{}, nil
-	default:
-		c.Logger.Error().Str("access_token_verify_method", c.accessTokenVerifyMethod).Msg("Unknown Access Token verification setting")
-		return RegClaimsWithSID{}, jwt.MapClaims{}, errors.New("unknown Access Token Verification method")
-	}
-}
-
-// verifyAccessTokenJWT tries to parse and verify the access token as a JWT.
-func (c *oidcClient) verifyAccessTokenJWT(token string) (RegClaimsWithSID, jwt.MapClaims, error) {
-	var claims RegClaimsWithSID
-	mapClaims := jwt.MapClaims{}
-	jwks := c.getKeyfunc()
-	if jwks == nil {
-		return claims, mapClaims, errors.New("error initializing jwks keyfunc")
-	}
-
-	issuer := c.issuer
-	if c.provider.AccessTokenIssuer != "" {
-		// AD FS .well-known/openid-configuration has an optional `access_token_issuer` which takes precedence over `issuer`
-		// See https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-oidce/586de7dd-3385-47c7-93a2-935d9e90441c
-		issuer = c.provider.AccessTokenIssuer
-	}
-
-	_, err := jwt.ParseWithClaims(token, &claims, jwks.Keyfunc, jwt.WithIssuer(issuer))
-	if err != nil {
-		return claims, mapClaims, err
-	}
-	_, _, err = new(jwt.Parser).ParseUnverified(token, mapClaims)
-	// TODO: decode mapClaims to sth readable
-	c.Logger.Debug().Interface("access token", &claims).Msg("parsed access token")
-	if err != nil {
-		c.Logger.Info().Err(err).Msg("Failed to parse/verify the access token.")
-		return claims, mapClaims, err
-	}
-
-	// Verify the token was issued for this instance. Keycloak puts a generic
-	// value (e.g. "account") in "aud" and the real client id in "azp", so we
-	// accept the token when the allowlist matches either claim.
-	if err := c.verifyAudience(claims.Audience, azpFromClaims(mapClaims)); err != nil {
-		c.Logger.Info().Err(err).Msg("Access token rejected: audience not allowed.")
-		return claims, mapClaims, err
-	}
-
-	return claims, mapClaims, nil
-}
-
-// verifyAudience checks that the token's "aud" or "azp" claim matches the
-// configured allowlist. An empty allowlist disables the check.
-func (c *oidcClient) verifyAudience(audiences jwt.ClaimStrings, azp string) error {
-	if len(c.accessTokenVerifyAudience) == 0 {
-		return nil
-	}
-	for _, allowed := range c.accessTokenVerifyAudience {
-		allowed = strings.TrimSpace(allowed)
-		if allowed == "" {
-			continue
-		}
-		if allowed == azp || slices.Contains(audiences, allowed) {
-			return nil
-		}
-	}
-	return errors.New("oidc: access token audience is not allowed")
-}
-
-func azpFromClaims(claims jwt.MapClaims) string {
-	if azp, ok := claims["azp"].(string); ok {
-		return azp
-	}
-	return ""
 }
 
 func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawToken string) (*LogoutToken, error) {
