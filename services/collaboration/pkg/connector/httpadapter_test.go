@@ -472,7 +472,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123", "").Times(1).Return(nil, errors.New("Something happened"))
+			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123").Times(1).Return(nil, errors.New("Something happened"))
 
 			httpAdapter.PutFile(w, req)
 			resp := w.Result()
@@ -489,7 +489,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123", "").Times(1).Return(nil, connector.NewConnectorError(500, "Something happened"))
+			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123").Times(1).Return(nil, connector.NewConnectorError(500, "Something happened"))
 
 			httpAdapter.PutFile(w, req)
 			resp := w.Result()
@@ -506,7 +506,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123", "").Times(1).Return(
+			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123").Times(1).Return(
 				connector.NewResponseLockConflict("zzz111", "Lock Conflict"), nil)
 
 			httpAdapter.PutFile(w, req)
@@ -523,7 +523,7 @@ var _ = Describe("HttpAdapter", func() {
 
 			w := httptest.NewRecorder()
 
-			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123", "").Times(1).Return(
+			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123").Times(1).Return(
 				connector.NewResponseWithVersionAndLock(
 					200,
 					&typesv1beta1.Timestamp{Seconds: uint64(1234), Nanos: uint32(567)},
@@ -535,27 +535,6 @@ var _ = Describe("HttpAdapter", func() {
 			Expect(resp.StatusCode).To(Equal(200))
 			Expect(resp.Header.Get(connector.HeaderWopiLock)).To(Equal("abc123"))
 			Expect(resp.Header.Get(connector.HeaderWopiVersion)).To(Equal("v1234567"))
-		})
-
-		It("Passes the X-COOL-WOPI-Timestamp header through to the content connector", func() {
-			contentBody := "this is the new fake content"
-			req := httptest.NewRequest("GET", "/wopi/files/abcdef/contents", strings.NewReader(contentBody))
-			req.Header.Set(connector.HeaderWopiLock, "abc123")
-			req.Header.Set(connector.HeaderCoolWopiTimestamp, "2021-01-01T00:00:00.0000000Z")
-
-			w := httptest.NewRecorder()
-
-			cc.On("PutFile", mock.Anything, mock.Anything, int64(len(contentBody)), "abc123", "2021-01-01T00:00:00.0000000Z").Times(1).Return(
-				connector.NewResponseWithVersionAndLock(
-					200,
-					&typesv1beta1.Timestamp{Seconds: uint64(1234), Nanos: uint32(567)},
-					"abc123",
-				), nil)
-
-			httpAdapter.PutFile(w, req)
-			resp := w.Result()
-			Expect(resp.StatusCode).To(Equal(200))
-			cc.AssertExpectations(GinkgoT())
 		})
 	})
 

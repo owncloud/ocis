@@ -36,13 +36,7 @@ type ContentConnectorService interface {
 	// locked beforehand, so the lockID needs to be provided.
 	// The current lockID will be returned ONLY if a conflict happens (the file is
 	// locked with a different lockID)
-	//
-	// coolWopiTimestamp is the Collabora conflict-detection timestamp sent through
-	// the "X-COOL-WOPI-Timestamp" header. It is optional: an empty string skips the
-	// check entirely, which is what happens for WOPI clients (Microsoft, OnlyOffice)
-	// that never send this header. When provided, it is compared against the file's
-	// current mtime in storage and a mismatch results in a 409 conflict response.
-	PutFile(ctx context.Context, stream io.Reader, streamLength int64, lockID string, coolWopiTimestamp string) (*ConnectorResponse, error)
+	PutFile(ctx context.Context, stream io.Reader, streamLength int64, lockID string) (*ConnectorResponse, error)
 }
 
 // ContentConnector implements the "File contents" endpoint.
@@ -212,14 +206,7 @@ func (c *ContentConnector) GetFile(ctx context.Context, w http.ResponseWriter) e
 // (check for err != nil to know if something went wrong)
 //
 // On success, the method will return the new mtime of the file.
-//
-// coolWopiTimestamp is the Collabora conflict-detection timestamp sent through
-// the "X-COOL-WOPI-Timestamp" header. If non-empty, it will be compared against
-// the current mtime of the file in storage; a mismatch means the file was
-// changed since Collabora last checked it, and a COOL conflict response (409
-// with COOLStatusCode 1010) will be returned instead of proceeding with the
-// upload. An empty string skips this check entirely.
-func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, streamLength int64, lockID string, coolWopiTimestamp string) (*ConnectorResponse, error) {
+func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, streamLength int64, lockID string) (*ConnectorResponse, error) {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
 		return nil, err
@@ -264,27 +251,6 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 		logger.Error().Msg("PutFile: file must be locked first")
 		// onlyoffice says to send an empty string if the file is unlocked, MS doesn't say anything
 		return NewResponseLockConflict("", "Cannot PutFile on unlocked file"), nil
-	}
-
-	// Collabora conflict detection: if the client sent the X-COOL-WOPI-Timestamp
-	// header, compare it against the file's current mtime in storage. A mismatch
-	// means the file was changed since Collabora last checked it (by another user
-	// or process), so we tell Collabora it's a stale-document conflict rather than
-	// proceeding with the upload.
-	// If the file has no recorded mtime (e.g. it doesn't exist yet), there is
-	// nothing meaningful to compare the client's timestamp against. Fail open
-	// here (skip the check and let the upload proceed) rather than fail closed,
-	// which would otherwise cause a permanent, unresolvable conflict for every
-	// save attempt.
-	if coolWopiTimestamp != "" && mtime != nil {
-		currentMtime := time.Unix(int64(mtime.GetSeconds()), int64(mtime.GetNanos())).UTC().Format(timeFormat)
-		if currentMtime != coolWopiTimestamp {
-			logger.Error().
-				Str("ClientTimestamp", coolWopiTimestamp).
-				Str("ServerTimestamp", currentMtime).
-				Msg("PutFile: COOL WOPI timestamp mismatch, file changed since last check")
-			return NewResponseCOOLConflict(), nil
-		}
 	}
 
 	// Prepare the data to initiate the upload

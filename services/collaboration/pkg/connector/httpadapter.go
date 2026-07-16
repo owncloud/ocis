@@ -28,7 +28,6 @@ const (
 	HeaderContentLength         string = "Content-Length"
 	HeaderContentType           string = "Content-Type"
 	HeaderWopiVersion           string = "X-WOPI-ItemVersion"
-	HeaderCoolWopiTimestamp     string = "X-COOL-WOPI-Timestamp"
 )
 
 // HttpAdapter will adapt the responses from the connector to HTTP.
@@ -187,10 +186,9 @@ func (h *HttpAdapter) GetFile(w http.ResponseWriter, r *http.Request) {
 // the headers according to the spec
 func (h *HttpAdapter) PutFile(w http.ResponseWriter, r *http.Request) {
 	lockID := h.locks.ParseLock(r.Header.Get(HeaderWopiLock))
-	coolWopiTimestamp := r.Header.Get(HeaderCoolWopiTimestamp)
 
 	contentCon := h.con.GetContentConnector()
-	response, err := contentCon.PutFile(r.Context(), r.Body, r.ContentLength, lockID, coolWopiTimestamp)
+	response, err := contentCon.PutFile(r.Context(), r.Body, r.ContentLength, lockID)
 
 	if err != nil {
 		var connErr *ConnectorError
