@@ -872,3 +872,125 @@ func TestCollaboraSetPropertiesAllPostMessagePropertiesSimultaneously(t *testing
 		}
 	}
 }
+
+// collaboraSpecificPropertyCases describes the 2 Collabora-only WOPI properties added in
+// this task (IsUserLocked, IsAdminUser): the SetProperties key that populates it, the
+// JSON tag it is expected to be marshalled under, and a getter for its value. Used to
+// drive the table-driven tests below.
+var collaboraSpecificPropertyCases = []struct {
+	name    string
+	key     string
+	jsonTag string
+	getter  func(*Collabora) bool
+}{
+	{"IsUserLocked", KeyIsUserLocked, "IsUserLocked", func(c *Collabora) bool { return c.IsUserLocked }},
+	{"IsAdminUser", KeyIsAdminUser, "IsAdminUser", func(c *Collabora) bool { return c.IsAdminUser }},
+}
+
+// TestCollaboraSetPropertiesIsUserLocked covers brief item 1: SetProperties with
+// IsUserLocked=true must set the field.
+func TestCollaboraSetPropertiesIsUserLocked(t *testing.T) {
+	cinfo := &Collabora{}
+	cinfo.SetProperties(map[string]interface{}{
+		KeyIsUserLocked: true,
+	})
+
+	if !cinfo.IsUserLocked {
+		t.Errorf("SetProperties IsUserLocked: got %v, want true", cinfo.IsUserLocked)
+	}
+}
+
+// TestCollaboraSetPropertiesIsAdminUser covers brief item 2: SetProperties with
+// IsAdminUser=true must set the field.
+func TestCollaboraSetPropertiesIsAdminUser(t *testing.T) {
+	cinfo := &Collabora{}
+	cinfo.SetProperties(map[string]interface{}{
+		KeyIsAdminUser: true,
+	})
+
+	if !cinfo.IsAdminUser {
+		t.Errorf("SetProperties IsAdminUser: got %v, want true", cinfo.IsAdminUser)
+	}
+}
+
+// TestCollaboraSetPropertiesCollaboraSpecificPropertiesFalse verifies SetProperties also
+// correctly sets both new properties to false (the values are not simply left at their
+// zero-value default by coincidence).
+func TestCollaboraSetPropertiesCollaboraSpecificPropertiesFalse(t *testing.T) {
+	for _, prop := range collaboraSpecificPropertyCases {
+		t.Run(prop.name, func(t *testing.T) {
+			cinfo := &Collabora{}
+			cinfo.SetProperties(map[string]interface{}{
+				prop.key: false,
+			})
+
+			if got := prop.getter(cinfo); got {
+				t.Errorf("SetProperties %s: got %v, want false", prop.name, got)
+			}
+		})
+	}
+}
+
+// TestCollaboraJSONOmitsCollaboraSpecificPropertiesWhenFalse covers brief item 3: both
+// IsUserLocked and IsAdminUser have `omitempty` and must be absent from the JSON output
+// when false (the zero value).
+func TestCollaboraJSONOmitsCollaboraSpecificPropertiesWhenFalse(t *testing.T) {
+	cinfo := &Collabora{}
+
+	jsonBytes, err := json.Marshal(cinfo)
+	if err != nil {
+		t.Fatalf("Failed to marshal JSON: %v", err)
+	}
+
+	var jsonMap map[string]interface{}
+	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
+		t.Fatalf("Failed to unmarshal JSON: %v", err)
+	}
+
+	for _, prop := range collaboraSpecificPropertyCases {
+		if _, ok := jsonMap[prop.jsonTag]; ok {
+			t.Errorf("Expected %q field to be omitted from JSON when false due to omitempty, but it was present: %s", prop.jsonTag, string(jsonBytes))
+		}
+	}
+}
+
+// TestCollaboraJSONIncludesCollaboraSpecificPropertiesWhenTrue covers brief item 4: both
+// IsUserLocked and IsAdminUser must be included in the JSON output when true.
+func TestCollaboraJSONIncludesCollaboraSpecificPropertiesWhenTrue(t *testing.T) {
+	cinfo := &Collabora{
+		IsUserLocked: true,
+		IsAdminUser:  true,
+	}
+
+	jsonBytes, err := json.Marshal(cinfo)
+	if err != nil {
+		t.Fatalf("Failed to marshal JSON: %v", err)
+	}
+
+	var jsonMap map[string]interface{}
+	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
+		t.Fatalf("Failed to unmarshal JSON: %v", err)
+	}
+
+	for _, prop := range collaboraSpecificPropertyCases {
+		val, ok := jsonMap[prop.jsonTag]
+		if !ok {
+			t.Errorf("Expected %q field to be in JSON, but it was not: %s", prop.jsonTag, string(jsonBytes))
+			continue
+		}
+		if val != true {
+			t.Errorf("%s field: got %v, want true", prop.jsonTag, val)
+		}
+	}
+}
+
+// TestCollaboraConstantsExist covers brief item 5: KeyIsUserLocked and KeyIsAdminUser
+// must be defined with their expected wire-property names.
+func TestCollaboraConstantsExist(t *testing.T) {
+	if KeyIsUserLocked != "IsUserLocked" {
+		t.Errorf("KeyIsUserLocked: got %q, want %q", KeyIsUserLocked, "IsUserLocked")
+	}
+	if KeyIsAdminUser != "IsAdminUser" {
+		t.Errorf("KeyIsAdminUser: got %q, want %q", KeyIsAdminUser, "IsAdminUser")
+	}
+}

@@ -130,6 +130,12 @@ type Collabora struct {
 	BreadcrumbFolderName string `json:"BreadcrumbFolderName,omitempty"`
 	// copied from MS WOPI
 	BreadcrumbFolderURL string `json:"BreadcrumbFolderUrl,omitempty"`
+	// Collabora-specific: when true, Collabora applies the locked_commands configuration
+	// from coolwsd.xml to this user, restricting which UNO commands they can access.
+	IsUserLocked bool `json:"IsUserLocked,omitempty"`
+	// Collabora-specific: when true, Collabora shows the server audit panel to this user.
+	// Only oCIS system administrators should receive this flag.
+	IsAdminUser bool `json:"IsAdminUser,omitempty"`
 }
 
 // SetProperties will set the file properties for the Collabora implementation.
@@ -240,6 +246,10 @@ func (cinfo *Collabora) SetProperties(props map[string]interface{}) {
 			cinfo.BreadcrumbFolderName = value.(string)
 		case KeyBreadcrumbFolderURL:
 			cinfo.BreadcrumbFolderURL = value.(string)
+		case KeyIsUserLocked:
+			cinfo.IsUserLocked = value.(bool)
+		case KeyIsAdminUser:
+			cinfo.IsAdminUser = value.(bool)
 		}
 	}
 }

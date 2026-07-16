@@ -6,10 +6,12 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/url"
 	"path"
+	"slices"
 	"strings"
 	"time"
 
@@ -28,6 +30,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/wopisrc"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
@@ -1225,6 +1228,18 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		}
 	}
 
+	// IsAdminUser is a Collabora-specific property that unlocks the server audit panel.
+	// It must only be set for the built-in oCIS admin role, never for SpaceAdmin or any
+	// other role, so the admin role UUID is compared explicitly rather than checking for
+	// "any elevated role".
+	isAdminUser := false
+	if rolesEntry, ok := user.GetOpaque().GetMap()["roles"]; ok {
+		var roleIDs []string
+		if err := json.Unmarshal(rolesEntry.GetValue(), &roleIDs); err == nil {
+			isAdminUser = slices.Contains(roleIDs, defaults.BundleUUIDRoleAdmin)
+		}
+	}
+
 	breadcrumbFolderName := path.Dir(statRes.GetInfo().GetPath())
 	if breadcrumbFolderName == "." || breadcrumbFolderName == "" || breadcrumbFolderName == "/" {
 		breadcrumbFolderName = statRes.GetInfo().GetSpace().GetName()
@@ -1322,6 +1337,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		fileinfo.KeyIsAnonymousUser:  isAnonymousUser,
 		fileinfo.KeyUserFriendlyName: userFriendlyName,
 		fileinfo.KeyUserID:           userId,
+		fileinfo.KeyIsAdminUser:      isAdminUser, // only for collabora
 
 		fileinfo.KeyPostMessageOrigin:            f.cfg.Commons.OcisURL,
 		fileinfo.KeyLicenseCheckForEditIsEnabled: f.cfg.App.LicenseCheckEnable,
@@ -1350,6 +1366,13 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		infoMap[fileinfo.KeyDisableExport] = true // only for collabora
 		infoMap[fileinfo.KeyDisableCopy] = true   // only for collabora
 		infoMap[fileinfo.KeyDisablePrint] = true
+		if wopiContext.ViewOnlyToken != "" {
+			// Secure-view access (view-only mode reached via a view-only token) is the
+			// codebase's existing definition of a locked-down session; apply Collabora's
+			// feature-locking on top of the Disable*/watermark restrictions above,
+			// regardless of whether the user is a public-share guest or authenticated.
+			infoMap[fileinfo.KeyIsUserLocked] = true // only for collabora
+		}
 		if !isPublicShare && wopiContext.ViewOnlyToken != "" {
 			infoMap[fileinfo.KeyWatermarkText] = f.watermarkText(user) // only for collabora
 		}
