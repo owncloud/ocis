@@ -272,7 +272,7 @@ class HttpRequestHelper {
 						$sendCount <= $sendRetryLimit;
 			if (OcisConfigHelper::isK8s()) {
 				$loopAgain = $loopAgain || ($response->getStatusCode() >= HttpResponse::HTTP_INTERNAL_SERVER_ERROR &&
-							$sendCount <= $sendRetryLimit);
+							$sendCount <= $sendRetryLimit && $response->getStatusCode() !== HttpResponse::HTTP_INSUFFICIENT_STORAGE);
 				if ($loopAgain && $response->getStatusCode() >= HttpResponse::HTTP_INTERNAL_SERVER_ERROR) {
 					echo "[INFO][K8s] Received " . $response->getStatusCode() . " response. Retrying...\n";
 				}
