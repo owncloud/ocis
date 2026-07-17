@@ -71,6 +71,11 @@ jobs:
               "OCIS_MFA_ENABLED": "true",
               "WEB_OIDC_SCOPE": "openid profile email acr"
             }
+      - name: Cache Playwright browsers
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ hashFiles('web/pnpm-lock.yaml') }}
       - name: Install Playwright and browsers
         run: |
           vendor-php/bin/playwright-install
