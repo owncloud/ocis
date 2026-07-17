@@ -1,7 +1,6 @@
 name: Acceptance Tests
 
 on:
-  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -475,17 +474,21 @@ jobs:
           ociswrapper-artifact: ociswrapper-binary
           keycloak: "true"
           keycloak-realm-file: tests/config/ci/ocis-mfa-ci-realm.dist.json
+          web-ui-config: tests/config/ci/ocis-config-vault.json
           extra-server-env: |
             {
               "OCIS_ENABLE_VAULT_MODE": "true",
               "FRONTEND_ENABLE_VAULT_MODE": "true",
               "OCIS_MFA_ENABLED": "true",
-              "SETTINGS_GRPC_ADDR": "localhost:9191",
-              "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
               "WEB_OIDC_SCOPE": "openid profile email acr"
             }
+      - name: Install Playwright and browsers
+        run: |
+          vendor-php/bin/playwright-install
+          vendor-php/bin/playwright-install --browsers
       - name: Start vault storage-users
         run: |
+          OCIS_JWT_SECRET=some-ocis-jwt-secret \
           STORAGE_USERS_ENABLE_VAULT_MODE=true \
           STORAGE_USERS_SERVICE_NAME=storage-users-vault \
           STORAGE_USERS_GRPC_ADDR=localhost:19285 \
@@ -501,6 +504,9 @@ jobs:
         uses: mklos-kw/ocis-github-actions/ocis-test@main
         with:
           suite: apiVault
+        env:
+          KEYCLOAK: "true"
+          KC_URL: "https://localhost:8443"
 
   cli-tests:
     needs: [build-and-test]
