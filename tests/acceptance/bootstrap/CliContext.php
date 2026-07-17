@@ -1311,15 +1311,95 @@ class CliContext implements Context {
 	}
 
 	/**
-	 * @When the administrator gets a non-existent blob from the blobstore using the CLI
+	 * @When the administrator tries to get a non-existent blob from the blobstore using the CLI
 	 *
 	 * @return void
 	 */
-	public function theAdministratorGetsANonExistentBlobFromTheBlobstoreUsingTheCli(): void {
+	public function theAdministratorTriesToGetANonExistentBlobFromTheBlobstoreUsingTheCli(): void {
 		$body = [
 			"command" => "storage-users blobstore get"
 				. " --blob-id=00000000-0000-0000-0000-000000000001"
 				. " --space-id=00000000-0000-0000-0000-000000000002",
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * Finds the most recently written blob in the storage-users blobstore.
+	 * Scoped to the users storage root to avoid picking blobs from metadata storage.
+	 *
+	 * @return string absolute path to a real blob file
+	 */
+	private function findNewestBlobPath(): string {
+		$storageRoot = $this->featureContext->getStorageUsersRoot();
+		$blobDirs = \glob($storageRoot . '/spaces/*/*/blobs', GLOB_ONLYDIR) ?: [];
+		Assert::assertNotEmpty($blobDirs, "No blobstore directory found under $storageRoot");
+
+		$newestPath = null;
+		$newestMtime = 0;
+		foreach ($blobDirs as $blobsDir) {
+			$iterator = new \RecursiveIteratorIterator(
+				new \RecursiveDirectoryIterator($blobsDir, \RecursiveDirectoryIterator::SKIP_DOTS),
+			);
+			foreach ($iterator as $file) {
+				if (!$file->isFile()) {
+					continue;
+				}
+				$mtime = $file->getMTime();
+				if ($mtime > $newestMtime) {
+					$newestMtime = $mtime;
+					$newestPath = $file->getPathname();
+				}
+			}
+		}
+
+		Assert::assertNotNull($newestPath, "No blob file found under $storageRoot");
+		return $newestPath;
+	}
+
+	/**
+	 * @When the administrator gets a blob from the blobstore using the --path flag via the CLI
+	 *
+	 * @return void
+	 */
+	public function theAdministratorGetsABlobFromTheBlobstoreUsingThePathFlagViaTheCli(): void {
+		$blobPath = $this->findNewestBlobPath();
+		$body = ["command" => "storage-users blobstore get --path=" . $blobPath];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator tries to get a blob from the blobstore with path :path using the CLI
+	 *
+	 * @param string $path
+	 *
+	 * @return void
+	 */
+	public function theAdministratorTriesToGetABlobWithPathUsingTheCli(string $path): void {
+		$body = ["command" => "storage-users blobstore get --path=" . $path];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator gets a blob from the blobstore by ID using the CLI
+	 *
+	 * @return void
+	 */
+	public function theAdministratorGetsABlobFromTheBlobstoreByIdUsingTheCli(): void {
+		$blobPath = $this->findNewestBlobPath();
+
+		// The blob path is "<root>/spaces/<pathifiedSpaceID>/blobs/<pathifiedBlobID>".
+		// The raw space/blob IDs are recovered by stripping the pathify separators,
+		// which is exactly what the CLI's depathify does on the way back in.
+		[, $rest] = \explode('/spaces/', $blobPath, 2);
+		[$pathifiedSpaceID, $pathifiedBlobID] = \explode('/blobs/', $rest, 2);
+		$spaceId = \str_replace('/', '', $pathifiedSpaceID);
+		$blobId = \str_replace('/', '', $pathifiedBlobID);
+
+		$body = [
+			"command" => "storage-users blobstore get"
+				. " --blob-id=" . $blobId
+				. " --space-id=" . $spaceId,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
