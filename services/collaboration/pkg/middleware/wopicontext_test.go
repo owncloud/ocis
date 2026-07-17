@@ -2,6 +2,7 @@ package middleware_test
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -11,6 +12,7 @@ import (
 	appprovider "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/golang-jwt/jwt/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -18,6 +20,8 @@ import (
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/wopisrc"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
+	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/token"
 	rjwt "github.com/owncloud/reva/v2/pkg/token/manager/jwt"
 )
@@ -344,5 +348,74 @@ var _ = Describe("Wopi Context Middleware", func() {
 		resp := httptest.NewRecorder()
 		mw.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
+	})
+	It("Should preserve the admin role Opaque entry through the reva token mint/dismantle round trip", func() {
+		// Unlike the fileinfo/fileconnector tests, which inject the user directly
+		// into the context via ctxpkg.ContextSetUser (bypassing token serialization
+		// entirely), this exercises the actual seam IsAdminUser depends on in
+		// production: the reva access token is minted once at file-open time,
+		// then later dismantled here on every WOPI request. If the roles Opaque
+		// entry didn't survive that round trip, IsAdminUser would silently never
+		// fire despite every direct-injection unit test passing.
+		rolesJSON, err := json.Marshal([]string{defaults.BundleUUIDRoleAdmin})
+		Expect(err).ToNot(HaveOccurred())
+
+		adminUser := &userv1beta1.User{
+			Id: &userv1beta1.UserId{
+				Idp:      "example.com",
+				OpaqueId: "12345",
+				Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+			},
+			Username: "admin",
+			Mail:     "admin@example.com",
+			Opaque: &typesv1beta1.Opaque{
+				Map: map[string]*typesv1beta1.OpaqueEntry{
+					"roles": {
+						Decoder: "json",
+						Value:   rolesJSON,
+					},
+				},
+			},
+		}
+
+		var captured *userv1beta1.User
+		capturingNext := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			captured, _ = ctxpkg.ContextGetUser(r.Context())
+			w.WriteHeader(http.StatusOK)
+		})
+		capturingMw := middleware.WopiContextAuthMiddleware(cfg, nil, capturingNext)
+
+		token, err := tknMngr.MintToken(ctx, adminUser, nil)
+		Expect(err).ToNot(HaveOccurred())
+
+		wopiContext := middleware.WopiContext{
+			AccessToken: token,
+			ViewMode:    appprovider.ViewMode_VIEW_MODE_READ_WRITE,
+			FileReference: &providerv1beta1.Reference{
+				ResourceId: rid,
+				Path:       ".",
+			},
+		}
+		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, cfg, nil)
+		Expect(err).ToNot(HaveOccurred())
+
+		req := httptest.NewRequest("GET", src.String(), nil).WithContext(ctx)
+		q := req.URL.Query()
+		q.Add("access_token", wopiToken)
+		q.Add("access_token_ttl", strconv.FormatInt(ttl, 10))
+		req.URL.RawQuery = q.Encode()
+		resp := httptest.NewRecorder()
+
+		capturingMw.ServeHTTP(resp, req)
+
+		Expect(resp.Code).To(Equal(http.StatusOK))
+		Expect(captured).ToNot(BeNil())
+
+		rolesEntry, ok := captured.GetOpaque().GetMap()["roles"]
+		Expect(ok).To(BeTrue())
+
+		var roleIDs []string
+		Expect(json.Unmarshal(rolesEntry.GetValue(), &roleIDs)).To(Succeed())
+		Expect(roleIDs).To(ContainElement(defaults.BundleUUIDRoleAdmin))
 	})
 })

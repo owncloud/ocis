@@ -1372,9 +1372,10 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 			// feature-locking on top of the Disable*/watermark restrictions above,
 			// regardless of whether the user is a public-share guest or authenticated.
 			infoMap[fileinfo.KeyIsUserLocked] = true // only for collabora
-		}
-		if !isPublicShare && wopiContext.ViewOnlyToken != "" {
-			infoMap[fileinfo.KeyWatermarkText] = f.watermarkText(user) // only for collabora
+
+			if !isPublicShare {
+				infoMap[fileinfo.KeyWatermarkText] = f.watermarkText(user) // only for collabora
+			}
 		}
 	}
 
