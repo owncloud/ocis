@@ -6,3 +6,5 @@ tools over the Model Context Protocol, so AI assistants such as Claude can manag
 spaces, files and shares through natural language without the user having to build and
 run the MCP server locally. It is disabled by default and can be enabled by uncommenting
 `OCIS_MCP=:mcp.yml` in `.env`.
+
+https://github.com/owncloud/ocis/pull/12603
