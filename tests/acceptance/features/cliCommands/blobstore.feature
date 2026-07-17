@@ -11,6 +11,12 @@ Feature: blobstore check and get via CLI
     And the command output should contain "Blobstore check successful."
 
 
+  Scenario: administrator checks the blobstore with a valid blob size
+    When the administrator checks the blobstore with blob size "1KB" using the CLI
+    Then the command should be successful
+    And the command output should contain "Blobstore check successful."
+
+
   Scenario: administrator checks the blobstore with an invalid blob size
     When the administrator checks the blobstore with blob size "abc" using the CLI
     Then the command should be unsuccessful
@@ -24,6 +30,34 @@ Feature: blobstore check and get via CLI
 
 
   Scenario: administrator tries to get a non-existent blob from the blobstore
-    When the administrator gets a non-existent blob from the blobstore using the CLI
+    When the administrator tries to get a non-existent blob from the blobstore using the CLI
     Then the command should be unsuccessful
     And the command output should contain "download failed: could not read blob"
+
+  @skipOnOcis-S3NG-Storage
+  Scenario: administrator gets a blob from the blobstore using the --path flag
+    Given user "Alice" has been created with default attributes
+    And user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
+    When the administrator gets a blob from the blobstore using the --path flag via the CLI
+    Then the command should be successful
+    And the command output should contain "Download: OK"
+
+  @skipOnOcis-S3NG-Storage
+  Scenario: administrator gets a blob from the blobstore by ID
+    Given user "Alice" has been created with default attributes
+    And user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
+    When the administrator gets a blob from the blobstore by ID using the CLI
+    Then the command should be successful
+    And the command output should contain "Download: OK"
+
+
+  Scenario: administrator tries to get a blob with a malformed ocis blob path
+    When the administrator tries to get a blob from the blobstore with path "/spaces/b1/9ec764-/nope" using the CLI
+    Then the command should be unsuccessful
+    And the command output should contain "missing /blobs/ segment"
+
+
+  Scenario: administrator tries to get a blob with a malformed s3ng blob path
+    When the administrator tries to get a blob from the blobstore with path "notas3ngpath" using the CLI
+    Then the command should be unsuccessful
+    And the command output should contain "expected <spaceID>/<pathified_blobID>"
