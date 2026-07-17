@@ -32,3 +32,4 @@ The [oCIS MCP Server](https://github.com/owncloud/ocis-mcp-server) exposes this 
 It is reachable at `https://${OCIS_MCP_DOMAIN:-mcp.owncloud.test}` once enabled. Two things must be configured in `.env` before it will start:
 - `OCIS_MCP_HTTP_SECRET` — a shared secret every MCP client must send as `Authorization: Bearer <secret>`. The container refuses to start without it.
 - `OCIS_MCP_APP_TOKEN_USER` / `OCIS_MCP_APP_TOKEN_VALUE` — an oCIS app token, created with `docker-compose exec ocis ocis auth-app create --user-name="admin" --expiration="8760h"`.
+  **Note:** the `auth-app` service is not started by default — add `auth-app` to `START_ADDITIONAL_SERVICES` in `.env` first, or the command above will silently create an empty token.

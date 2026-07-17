@@ -321,6 +321,10 @@ OCIS_MCP_APP_TOKEN_USER=admin
 OCIS_MCP_APP_TOKEN_VALUE=<token printed by "ocis auth-app create">
 ```
 
+{{< hint type=important >}}
+**Note:** the `auth-app` service is not started by default. Add `auth-app` to `START_ADDITIONAL_SERVICES` in `.env` before running the command below, otherwise it will silently succeed with an empty token.
+{{< /hint >}}
+
 Create the app token with:
 
 ```bash
