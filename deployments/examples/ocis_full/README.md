@@ -23,3 +23,12 @@ Keycloak can be optionally enabled by uncommenting the corresponding variables i
 - `KEYCLOAK=:keycloak.yml`
 
 Note that Keycloak requires the default `ocis` Identity Provider to be disabled, which is automatically handled when the `keycloak.yml` configuration is used.
+
+### MCP Server
+
+The [oCIS MCP Server](https://github.com/owncloud/ocis-mcp-server) exposes this deployment as a set of AI-accessible tools over the Model Context Protocol (MCP), so AI assistants such as Claude can manage users, spaces, files and shares through natural language. It can be optionally enabled by uncommenting the corresponding variable in the `.env` file:
+- `OCIS_MCP=:mcp.yml`
+
+It is reachable at `https://${OCIS_MCP_DOMAIN:-mcp.owncloud.test}` once enabled. Two things must be configured in `.env` before it will start:
+- `OCIS_MCP_HTTP_SECRET` — a shared secret every MCP client must send as `Authorization: Bearer <secret>`. The container refuses to start without it.
+- `OCIS_MCP_APP_TOKEN_USER` / `OCIS_MCP_APP_TOKEN_VALUE` — an oCIS app token, created with `docker-compose exec ocis ocis auth-app create --user-name="admin" --expiration="8760h"`.

@@ -308,6 +308,27 @@ CLAMAV=:clamav.yml
 
 After enabling that service, you can add the service to the stack with `docker-compose up -d` again.
 
+### MCP Server
+
+You can add the [oCIS MCP Server](https://github.com/owncloud/ocis-mcp-server) to the stack. It exposes oCIS as a set of AI-accessible tools over the Model Context Protocol (MCP). The service is disabled by default. To enable it, uncomment the `OCIS_MCP` line in the `.env` file, then set a bearer secret and an oCIS app token:
+
+```shell {linenos=table,hl_lines=[3,4,5,6]}
+### oCIS MCP Server Settings ###
+# The leading colon is required to enable the service.
+OCIS_MCP=:mcp.yml
+OCIS_MCP_HTTP_SECRET=change-me-to-a-long-random-value
+OCIS_MCP_APP_TOKEN_USER=admin
+OCIS_MCP_APP_TOKEN_VALUE=<token printed by "ocis auth-app create">
+```
+
+Create the app token with:
+
+```bash
+docker-compose exec ocis ocis auth-app create --user-name="admin" --expiration="8760h"
+```
+
+If running locally, add `mcp.owncloud.test` to your hosts file alongside the other domains (see Local Setup above), then bring up the stack again with `docker-compose up -d`. Point your MCP client at `https://mcp.owncloud.test/mcp`, sending the configured secret as `Authorization: Bearer <OCIS_MCP_HTTP_SECRET>`.
+
 ### Traefik Dashboard
 
 If you want to use the Traefik dashboard, set TRAEFIK_DASHBOARD to `true` (default is `false` and therefore not active). If you activate it, you must set a domain for the Traefik dashboard in `TRAEFIK_DOMAIN=` e.g. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
