@@ -435,7 +435,7 @@ defineExpose({ onConfirm })
 
   li:hover,
   li.active {
-    background-color: var(--oc-color-background-highlight);
+    background-color: var(--oc-color-background-hover);
   }
 }
 </style>
