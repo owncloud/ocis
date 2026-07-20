@@ -20,7 +20,7 @@ exports[`TrashOverview > view states > should render spaces list 1`] = `
         <thead class="oc-thead">
           <tr class="oc-table-header-row">
             <th class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-shrink oc-text-nowrap oc-th oc-table-header-cell oc-table-header-cell-icon oc-pl-s" style="top: 0px;">
-              <div><span class="oc-table-thead-content header-text oc-invisible-sr" aria-hidden="true">Icons</span></div>
+              <div><span class="oc-table-thead-content header-text oc-invisible-sr">Icons</span></div>
             </th>
             <th class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-auto oc-text-nowrap oc-th oc-table-header-cell oc-table-header-cell-name oc-pr-s" style="top: 0px;" aria-sort="ascending"><button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-button-sort oc-width-1-1">
                 <!--v-if-->
