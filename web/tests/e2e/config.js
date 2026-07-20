@@ -55,6 +55,6 @@ export const config = {
   reportHar: process.env.REPORT_HAR === 'true',
   reportTracing: process.env.REPORT_TRACING === 'true',
   failOnUncaughtConsoleError: process.env.FAIL_ON_UNCAUGHT_CONSOLE_ERR === 'true',
-  skipA11y: process.env.SKIP_A11Y_TESTS === 'true',
+  skipA11y: process.env.SKIP_A11Y_TESTS === 'false',
   mfa: process.env.MFA === 'true'
 }

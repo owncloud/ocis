@@ -3,7 +3,7 @@
 <template>
   <main :id="applicationId" class="app-wrapper oc-height-1-1" @keydown.esc="closeApp">
     <!-- eslint-enable vuejs-accessibility/no-static-element-interactions -->
-    <h1 class="oc-invisible-sr" v-text="pageTitle" />
+    <h1 v-if="pageTitle" class="oc-invisible-sr" v-text="pageTitle" />
     <app-top-bar
       v-if="!loading && !loadingError && resource"
       :main-actions="fileActions"

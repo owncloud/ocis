@@ -8,7 +8,7 @@ exports[`OcBreadcrumb > displays all items 1`] = `
       <oc-icon-stub name="arrow-right-s" filltype="line" accessiblelabel="" type="span" size="medium" variation="passive" color="var(--oc-color-text-default)" class="oc-mx-xs"></oc-icon-stub>
       <!--v-if-->
     </li>
-    <li data-key="1" aria-hidden="true" tabindex="-1" class="oc-breadcrumb-list-item oc-flex oc-flex-middle oc-invisible-sr">
+    <li data-key="1" aria-hidden="true" inert="" tabindex="-1" class="oc-breadcrumb-list-item oc-flex oc-flex-middle oc-invisible-sr">
       <router-link-stub tag="a" to="[object Object]" tabindex="-1"><span class="oc-breadcrumb-item-text oc-breadcrumb-item-navigable">...</span></router-link-stub>
       <oc-icon-stub name="arrow-right-s" filltype="line" accessiblelabel="" type="span" size="medium" variation="passive" color="var(--oc-color-text-default)" class="oc-mx-xs"></oc-icon-stub>
       <!--v-if-->
@@ -44,7 +44,7 @@ exports[`OcBreadcrumb > sets correct variation 1`] = `
       <oc-icon-stub name="arrow-right-s" filltype="line" accessiblelabel="" type="span" size="medium" variation="passive" color="var(--oc-color-text-default)" class="oc-mx-xs"></oc-icon-stub>
       <!--v-if-->
     </li>
-    <li data-key="1" aria-hidden="true" tabindex="-1" class="oc-breadcrumb-list-item oc-flex oc-flex-middle oc-invisible-sr">
+    <li data-key="1" aria-hidden="true" inert="" tabindex="-1" class="oc-breadcrumb-list-item oc-flex oc-flex-middle oc-invisible-sr">
       <router-link-stub tag="a" to="[object Object]" tabindex="-1"><span class="oc-breadcrumb-item-text oc-breadcrumb-item-navigable">...</span></router-link-stub>
       <oc-icon-stub name="arrow-right-s" filltype="line" accessiblelabel="" type="span" size="medium" variation="passive" color="var(--oc-color-text-default)" class="oc-mx-xs"></oc-icon-stub>
       <!--v-if-->
