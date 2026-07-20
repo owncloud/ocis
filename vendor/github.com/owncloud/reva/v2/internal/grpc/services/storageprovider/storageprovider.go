@@ -47,6 +47,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/storage"
 	"github.com/owncloud/reva/v2/pkg/storage/fs/registry"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
+	"github.com/owncloud/reva/v2/pkg/upload"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
@@ -106,6 +107,7 @@ func (c *config) init() {
 type Service struct {
 	conf          *config
 	Storage       storage.FS
+	Coordinator   upload.Coordinator
 	dataServerURL *url.URL
 	availableXS   []*provider.ResourceChecksumPriority
 }
@@ -180,6 +182,8 @@ func New(m map[string]interface{}, ss *grpc.Server, log *zerolog.Logger) (rgrpc.
 		return nil, err
 	}
 
+	coordinator := upload.NewCoordinator(fs)
+
 	// parse data server url
 	u, err := url.Parse(c.DataServerURL)
 	if err != nil {
@@ -205,6 +209,7 @@ func New(m map[string]interface{}, ss *grpc.Server, log *zerolog.Logger) (rgrpc.
 	service := &Service{
 		conf:          c,
 		Storage:       fs,
+		Coordinator:   coordinator,
 		dataServerURL: u,
 		availableXS:   xsTypes,
 	}
@@ -427,7 +432,7 @@ func (s *Service) InitiateFileUpload(ctx context.Context, req *provider.Initiate
 		metadata["expires"] = strconv.Itoa(int(expirationTimestamp.Seconds))
 	}
 
-	uploadIDs, err := s.Storage.InitiateUpload(ctx, req.Ref, uploadLength, metadata)
+	uploadIDs, err := s.Coordinator.InitiateUpload(ctx, req.Ref, uploadLength, metadata)
 	if err != nil {
 		var st *rpc.Status
 		switch err.(type) {
