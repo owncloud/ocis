@@ -240,11 +240,22 @@ class GraphContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
 		$userId = $userId ?: $user;
+		$adminUser = $this->featureContext->getAdminUsername();
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$accessToken = $this->featureContext->getOcisUserToken($adminUser)["token"]["accessToken"];
+			$headers['Authorization'] = 'Bearer ' . $accessToken;
+			$adminUser = null;
+			$adminPassword = null;
+		} else {
+			$adminPassword = $this->featureContext->getAdminPassword();
+		}
 		return GraphHelper::getUser(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
+			$adminUser,
+			$adminPassword,
 			$userId,
+			$headers,
 		);
 	}
 
@@ -1815,9 +1826,27 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 */
 	public function theAdministratorHasGivenTheRoleUsingTheGraphApi(string $role, string $user): void {
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?: $user;
 		if (KeycloakHelper::isTestingWithKeycloak()) {
-			$response = KeycloakHelper::assignrole($userId, $role);
+			$userAttribute = $this->featureContext->getCreatedKeycloakUsers();
+			$userId = $userAttribute[strtolower($user)]['id'];
+			$currentRole = $userAttribute[strtolower($user)]['role'];
+
+			/*
+			 * The oCIS API request for assigning roles allows only one role per user,
+			 * whereas the Keycloak API request can assign multiple roles to a user.
+			 * If multiple roles are assigned to a user in Keycloak,
+			 * oCIS map the highest priority role among Keycloak assigned roles.
+			 * Therefore, we need to unassign the previous role before
+			 * assigning a new one when using the Keycloak API.
+			 */
+			$res = KeycloakHelper::unassignRole($userId, $currentRole);
+			Assert::assertEquals(
+				204,
+				$res->getStatusCode(),
+				__METHOD__
+				. "\nExpected status code '204' but got '" . $res->getStatusCode() . "'",
+			);
+			$response = KeycloakHelper::assignRole($userId, $role);
 			Assert::assertEquals(
 				204,
 				$response->getStatusCode(),
@@ -1825,6 +1854,7 @@ class GraphContext implements Context {
 				. "\nExpected status code '204' but got '" . $response->getStatusCode() . "'",
 			);
 		} else {
+			$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?: $user;
 			if (empty($this->appEntity)) {
 				$this->setApplicationEntity();
 			}

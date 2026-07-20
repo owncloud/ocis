@@ -437,12 +437,13 @@ class SpacesContext implements Context {
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param string $folderName
+	 * @param boolean $isVault
 	 *
 	 * @return string
 	 * @throws GuzzleException
 	 */
-	public function getResourceId(string $user, string $spaceName, string $folderName): string {
-		$space = $this->getSpaceByName($user, $spaceName);
+	public function getResourceId(string $user, string $spaceName, string $folderName, bool $isVault = false): string {
+		$space = $this->getSpaceByName($user, $spaceName, $isVault);
 		// For a level 1 folder, the parent is space so $folderName = ''
 		if ($folderName === $space["name"]) {
 			$folderName = '';
@@ -453,12 +454,21 @@ class SpacesContext implements Context {
 		$davPath = WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
 		$fullUrl = "$baseUrl/$davPath/$encodedName";
 
+		$headers = ['Depth' => '0'];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$accessToken = $this->featureContext->getOcisUserToken($user)['token']['accessToken'];
+			$headers['Authorization'] = 'Bearer ' . $accessToken;
+			$user = null;
+			$password = null;
+		} else {
+			$password = $this->featureContext->getPasswordForUser($user);
+		}
 		$response = HttpRequestHelper::sendRequest(
 			$fullUrl,
 			'PROPFIND',
 			$user,
-			$this->featureContext->getPasswordForUser($user),
-			['Depth' => '0'],
+			$password,
+			$headers,
 		);
 
 		$this->featureContext->theHttpStatusCodeShouldBe(207, '', $response);
@@ -3093,10 +3103,11 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has deleted a space "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has deleted a space "([^"]*)"(| in vault)?$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
+	 * @param  string $isVault
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -3104,8 +3115,10 @@ class SpacesContext implements Context {
 	public function userHasDeletedASpaceOwnedByUser(
 		string $user,
 		string $spaceName,
+		string $isVault,
 	): void {
-		$response = $this->deleteSpace($user, $spaceName);
+		$isVault = trim($isVault) === 'in vault';
+		$response = $this->deleteSpace($user, $spaceName, '', $isVault);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			204,
 			"Expected response status code should be 200",
@@ -3117,6 +3130,7 @@ class SpacesContext implements Context {
 	 * @param  string $user
 	 * @param  string $spaceName
 	 * @param  string $owner
+	 * @param  boolean $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -3125,13 +3139,25 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName,
 		string $owner = '',
+		bool $isVault = false,
 	): ResponseInterface {
-		$space = $this->getSpaceByName(($owner !== "") ? $owner : $user, $spaceName);
+		$space = $this->getSpaceByName(($owner !== "") ? $owner : $user, $spaceName, $isVault);
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$accessToken = $this->featureContext->getOcisUserToken(strtolower($user))['token']['accessToken'];
+			$headers['Authorization'] = 'Bearer ' . $accessToken;
+			$user = null;
+			$password = null;
+		} else {
+			$password = $this->featureContext->getPasswordForUser($user);
+		}
 		return GraphHelper::disableSpace(
 			$this->featureContext->getBaseUrl(),
 			$user,
-			$this->featureContext->getPasswordForUser($user),
+			$password,
 			$space["id"],
+			$headers,
+			$isVault,
 		);
 	}
 
@@ -3181,10 +3207,11 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has disabled a space "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has disabled a space "([^"]*)"(| in vault)?$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
+	 * @param  string $isVault
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -3192,8 +3219,10 @@ class SpacesContext implements Context {
 	public function sendUserHasDisabledSpaceRequest(
 		string $user,
 		string $spaceName,
+		string $isVault,
 	): void {
-		$response = $this->disableSpace($user, $spaceName);
+		$isVault = trim($isVault) === 'in vault';
+		$response = $this->disableSpace($user, $spaceName, '', $isVault);
 		$expectedHTTPStatus = "204";
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			$expectedHTTPStatus,
@@ -3234,6 +3263,7 @@ class SpacesContext implements Context {
 	 * @param  string $user
 	 * @param  string $spaceName
 	 * @param string $owner
+	 * @param boolean $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -3242,14 +3272,26 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName,
 		string $owner = '',
+		bool $isVault = false,
 	): ResponseInterface {
-		$space = $this->getSpaceByName(($owner !== "") ? $owner : $user, $spaceName);
+		$space = $this->getSpaceByName(($owner !== "") ? $owner : $user, $spaceName, $isVault);
 
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$accessToken = $this->featureContext->getOcisUserToken(strtolower($user))['token']['accessToken'];
+			$headers['Authorization'] = 'Bearer ' . $accessToken;
+			$user = null;
+			$password = null;
+		} else {
+			$password = $this->featureContext->getPasswordForUser($user);
+		}
 		return GraphHelper::deleteSpace(
 			$this->featureContext->getBaseUrl(),
 			$user,
-			$this->featureContext->getPasswordForUser($user),
+			$password,
 			$space["id"],
+			$headers,
+			$isVault,
 		);
 	}
 

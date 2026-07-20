@@ -26,6 +26,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\GraphHelper;
+use TestHelpers\KeycloakHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\BehatHelper;
@@ -330,7 +331,8 @@ class SharingNgContext implements Context {
 		?string $fileId = null,
 		bool $federatedShare = false,
 	): ResponseInterface {
-		$space = $this->spacesContext->getSpaceByName($user, $shareInfo['space']);
+		$isVault = isset($shareInfo['storage']) && $shareInfo['storage'] === 'vault';
+		$space = $this->spacesContext->getSpaceByName($user, $shareInfo['space'], $isVault);
 		$spaceId = $space['id'];
 
 		// $fileId is used for trying to share deleted files
@@ -343,7 +345,7 @@ class SharingNgContext implements Context {
 			if ($resource === '' && !\in_array($shareInfo['space'], ['Personal', 'Shares'])) {
 				$itemId = $space['fileId'];
 			} else {
-				$itemId = $this->spacesContext->getResourceId($user, $shareInfo['space'], $resource);
+				$itemId = $this->spacesContext->getResourceId($user, $shareInfo['space'], $resource, $isVault);
 			}
 		}
 
@@ -381,10 +383,19 @@ class SharingNgContext implements Context {
 		$permissionsAction = $shareInfo['permissionsAction'] ?? null;
 		$expirationDateTime = $shareInfo["expirationDateTime"] ?? null;
 
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$accessToken = $this->featureContext->getOcisUserToken($user)['token']['accessToken'];
+			$headers['Authorization'] = 'Bearer ' . $accessToken;
+			$user = null;
+			$password = null;
+		} else {
+			$password = $this->featureContext->getPasswordForUser($user);
+		}
 		$response = GraphHelper::sendSharingInvitation(
 			$this->featureContext->getBaseUrl(),
 			$user,
-			$this->featureContext->getPasswordForUser($user),
+			$password,
 			$spaceId,
 			$itemId,
 			$shareeIds,
@@ -392,6 +403,8 @@ class SharingNgContext implements Context {
 			$permissionsRole,
 			$permissionsAction,
 			$expirationDateTime,
+			$headers,
+			$isVault,
 		);
 		if ($response->getStatusCode() === 200) {
 			$this->featureContext->shareNgAddToCreatedUserGroupShares(
@@ -422,7 +435,8 @@ class SharingNgContext implements Context {
 		bool $federatedShare = false,
 	): ResponseInterface {
 		$shareeIds = [];
-		$space = $this->spacesContext->getSpaceByName($user, $rows['space']);
+		$isVault = isset($rows['storage']) && $rows['storage'] === 'vault';
+		$space = $this->spacesContext->getSpaceByName($user, $rows['space'], $isVault);
 		$spaceId = $space['id'];
 
 		$sharees = array_map('trim', explode(',', $rows['sharee']));
@@ -452,16 +466,28 @@ class SharingNgContext implements Context {
 		$permissionsAction = $rows['permissionsAction'] ?? null;
 		$expirationDateTime = $rows["expirationDateTime"] ?? null;
 
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$accessToken = $this->featureContext->getOcisUserToken($user)['token']['accessToken'];
+			$headers['Authorization'] = 'Bearer ' . $accessToken;
+			$user = null;
+			$password = null;
+		} else {
+			$password = $this->featureContext->getPasswordForUser($user);
+		}
+
 		return GraphHelper::sendSharingInvitationForDrive(
 			$this->featureContext->getBaseUrl(),
 			$user,
-			$this->featureContext->getPasswordForUser($user),
+			$password,
 			$spaceId,
 			$shareeIds,
 			$shareTypes,
 			$permissionsRole,
 			$permissionsAction,
 			$expirationDateTime,
+			$headers,
+			$isVault,
 		);
 	}
 

@@ -182,3 +182,440 @@ Feature: vault
         }
       }
       """
+
+
+  Scenario Outline: send share invitation for project space in vault to user with different roles (permissions endpoint)
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has logged in via web UI
+    And user "Brian" has been created with default attributes
+    And user "Brian" has logged in via web UI
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "displayName": {
+                          "const": "Brian Murphy"
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        }
+                      }
+                    }
+                  }
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario Outline: send share invitation for disabled project space in vault to user with different roles (permissions endpoint)
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has logged in via web UI
+    And user "Brian" has been created with default attributes
+    And user "Brian" has logged in via web UI
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    And user "Admin" has disabled a space "new-space" in vault
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "const": "itemNotFound"
+              },
+              "message": {
+                "type": "string",
+                "pattern": "^stat: error: not found: %user_id_pattern%$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario Outline: send share invitation for deleted project space in vault to user with different roles (permissions endpoint)
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has logged in via web UI
+    And user "Brian" has been created with default attributes
+    And user "Brian" has logged in via web UI
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    And user "Admin" has disabled a space "new-space" in vault
+    And user "Admin" has deleted a space "new-space" in vault
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "const": "itemNotFound"
+              },
+              "message": {
+                "const": "stat: error: not found: "
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario Outline: try to send share invitation for personal space in vault to user with different roles (permissions endpoint)
+    Given user "Alice" has logged in via web UI
+    And user "Brian" has been created with default attributes
+    And user "Brian" has logged in via web UI
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "space type is not eligible for sharing"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario Outline: try to share Shares space in vault with a user (permissions endpoint)
+    Given user "Alice" has logged in via web UI
+    And user "Brian" has been created with default attributes
+    And user "Brian" has logged in via web UI
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
+      | space           | Shares             |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "<error-message>"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role | error-message                        |
+      | Space Viewer     | role not applicable to this resource |
+      | Space Editor     | role not applicable to this resource |
+      | Manager          | role not applicable to this resource |
+
+
+  Scenario Outline: invite user to a project space in vault with different roles using root endpoint
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has logged in via web UI
+    And user "Brian" has been created with default attributes
+    And user "Brian" has logged in via web UI
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    When user "Alice" sends the following space share invitation using root endpoint of the Graph API:
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "displayName": {
+                          "type": "string",
+                          "const": "Brian Murphy"
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        }
+                      }
+                    }
+                  }
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario Outline: try to invite user to personal drive in vault with different roles using root endpoint
+    Given user "Alice" has logged in via web UI
+    And user "Brian" has been created with default attributes
+    And user "Brian" has logged in via web UI
+    When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "unsupported space type"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario Outline: try to invite user to Shares drive in vault with different roles using root endpoint
+    Given user "Alice" has logged in via web UI
+    And user "Brian" has been created with default attributes
+    And user "Brian" has logged in via web UI
+    When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
+      | space           | Shares             |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "unsupported space type"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
