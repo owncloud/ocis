@@ -437,12 +437,13 @@ class SpacesContext implements Context {
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param string $folderName
+     * @param boolean $isVault
 	 *
 	 * @return string
 	 * @throws GuzzleException
 	 */
-	public function getResourceId(string $user, string $spaceName, string $folderName): string {
-		$space = $this->getSpaceByName($user, $spaceName);
+	public function getResourceId(string $user, string $spaceName, string $folderName, bool $isVault = false): string {
+		$space = $this->getSpaceByName($user, $spaceName, $isVault);
 		// For a level 1 folder, the parent is space so $folderName = ''
 		if ($folderName === $space["name"]) {
 			$folderName = '';
@@ -453,12 +454,21 @@ class SpacesContext implements Context {
 		$davPath = WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
 		$fullUrl = "$baseUrl/$davPath/$encodedName";
 
+        $headers['Depth'] = '0';
+        if (KeycloakHelper::isTestingWithKeycloak()) {
+            $access_token = $this->featureContext->getOcisUserToken($user)["token"]["accessToken"];
+            $headers['Authorization'] = 'Bearer ' . $access_token;
+            $user = null;
+            $password = null;
+        } else {
+            $password = $this->featureContext->getPasswordForUser($user);
+        }
 		$response = HttpRequestHelper::sendRequest(
 			$fullUrl,
 			'PROPFIND',
 			$user,
-			$this->featureContext->getPasswordForUser($user),
-			['Depth' => '0'],
+			$password,
+			$headers,
 		);
 
 		$this->featureContext->theHttpStatusCodeShouldBe(207, '', $response);

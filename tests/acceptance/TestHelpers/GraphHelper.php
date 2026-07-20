@@ -211,12 +211,18 @@ class GraphHelper {
 	/**
 	 * @param string $baseUrl
 	 * @param string $path
+     * @param boolean $isVault
 	 *
 	 * @return string
 	 */
-	public static function getBetaFullUrl(string $baseUrl, string $path): string {
+	public static function getBetaFullUrl(string $baseUrl, string $path, bool $isVault = false): string {
 		$baseUrl = rtrim($baseUrl, "/");
-		return $baseUrl . '/graph/v1beta1/' . $path;
+        if ($isVault) {
+            $fullUrl = $baseUrl . '/vault/graph/v1beta1/' . $path;
+        } else {
+            $fullUrl = $baseUrl . '/graph/v1beta1/' . $path;
+        }
+		return $fullUrl;
 	}
 
 	/**
@@ -329,36 +335,39 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $adminUser
-	 * @param string $adminPassword
+	 * @param string|null $adminUser
+	 * @param string|null $adminPassword
 	 * @param string $userName
+     * @param array $headers
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function getUser(
 		string $baseUrl,
-		string $adminUser,
-		string $adminPassword,
+		?string $adminUser,
+		?string $adminPassword,
 		string $userName,
+        array $headers = []
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users/' . $userName);
-		if (KeycloakHelper::isTestingWithKeycloak()) {
-			return HttpRequestHelper::get(
-				$url,
-				null,
-				null,
-				[
-					'Authorization' => 'Bearer ' . KeycloakHelper::getAdminAccessToken(),
-					'Content-Type' => 'application/json',
-				],
-			);
-		}
+//		if (KeycloakHelper::isTestingWithKeycloak()) {
+//			return HttpRequestHelper::get(
+//				$url,
+//				null,
+//				null,
+//				[
+//					'Authorization' => 'Bearer ' . KeycloakHelper::getAdminAccessToken(),
+//					'Content-Type' => 'application/json',
+//				],
+//			);
+//		}
+        $requestHeaders = array_merge(self::getRequestHeaders(), $headers);
 		return HttpRequestHelper::get(
 			$url,
 			$adminUser,
 			$adminPassword,
-			self::getRequestHeaders(),
+            $requestHeaders,
 		);
 
 	}
@@ -1737,8 +1746,8 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
 	 * @param string $spaceId
 	 * @param string $itemId
 	 * @param array $shareeIds
@@ -1746,6 +1755,8 @@ class GraphHelper {
 	 * @param string|null $permissionsRole
 	 * @param string|null $permissionsAction
 	 * @param string|null $expirationDateTime
+     * @param array $headers
+     * @param boolean $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws \JsonException
@@ -1753,8 +1764,8 @@ class GraphHelper {
 	 */
 	public static function sendSharingInvitation(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
 		string $spaceId,
 		string $itemId,
 		array $shareeIds,
@@ -1762,8 +1773,10 @@ class GraphHelper {
 		?string $permissionsRole,
 		?string $permissionsAction,
 		?string $expirationDateTime,
+        array $headers = [],
+        bool $isVault = false
 	): ResponseInterface {
-		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/invite");
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/invite", $isVault);
 		$body = self::createShareInviteBody(
 			$shareeIds,
 			$shareTypes,
@@ -1771,13 +1784,15 @@ class GraphHelper {
 			$permissionsAction,
 			$expirationDateTime,
 		);
-		return HttpRequestHelper::post(
+        $requestHeaders = array_merge(self::getRequestHeaders(), $headers);
+		$response = HttpRequestHelper::post(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders(),
+			$requestHeaders,
 			\json_encode($body),
 		);
+        return $response;
 	}
 
 	/**
@@ -1930,23 +1945,28 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
+     * @param array $headers
+     * @param boolean $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function getSharesSharedWithMe(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
+        array $headers = [],
+        bool $isVault = false
 	): ResponseInterface {
-		$url = self::getBetaFullUrl($baseUrl, "me/drive/sharedWithMe");
+		$url = self::getBetaFullUrl($baseUrl, "me/drive/sharedWithMe", $isVault);
+        $requestHeaders = array_merge(self::getRequestHeaders(), $headers);
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders(),
+			$requestHeaders,
 		);
 	}
 

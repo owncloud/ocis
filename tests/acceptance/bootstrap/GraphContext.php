@@ -240,11 +240,22 @@ class GraphContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
 		$userId = $userId ?: $user;
+        $adminUser = $this->featureContext->getAdminUsername();
+        $headers = [];
+        if (KeycloakHelper::isTestingWithKeycloak()) {
+            $accessToken = $this->featureContext->getOcisUserToken($adminUser)["token"]["accessToken"];
+            $headers['Authorization'] = 'Bearer ' . $accessToken;
+            $adminUser = null;
+            $adminPassword = null;
+        } else {
+            $adminPassword = $this->featureContext->getAdminPassword();
+        }
 		return GraphHelper::getUser(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
+			$adminUser,
+			$adminPassword,
 			$userId,
+            $headers
 		);
 	}
 
@@ -1815,8 +1826,9 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 */
 	public function theAdministratorHasGivenTheRoleUsingTheGraphApi(string $role, string $user): void {
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?: $user;
 		if (KeycloakHelper::isTestingWithKeycloak()) {
+            $userAttribute = $this->featureContext->getCreatedKeycloakUsers();
+            $userId = $userAttribute[strtolower($user)]['id'];
 			$response = KeycloakHelper::assignrole($userId, $role);
 			Assert::assertEquals(
 				204,
@@ -1825,6 +1837,7 @@ class GraphContext implements Context {
 				. "\nExpected status code '204' but got '" . $response->getStatusCode() . "'",
 			);
 		} else {
+            $userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?: $user;
 			if (empty($this->appEntity)) {
 				$this->setApplicationEntity();
 			}
