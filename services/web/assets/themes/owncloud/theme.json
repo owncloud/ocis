@@ -147,7 +147,7 @@
             "colorPalette": {
               "background-accentuate": "rgba(255, 255, 5, 0.1)",
               "background-default": "#ffffff",
-              "background-highlight": "#ffffff",
+              "background-highlight": "oklch(87.2% 0.01 258.338)",
               "background-muted": "#ffffff",
               "background-secondary": "#ffffff",
               "background-hover": "oklch(87.2% 0.01 258.338)",
@@ -212,7 +212,7 @@
             "colorPalette": {
               "background-accentuate": "#696969",
               "background-default": "#000000",
-              "background-highlight": "#000000",
+              "background-highlight": "#383838",
               "background-muted": "oklch(21% 0.034 264.665)",
               "background-secondary": "#404040",
               "background-hover": "#383838",
@@ -279,7 +279,7 @@
             "colorPalette": {
               "background-accentuate": "#696969",
               "background-default": "#000000",
-              "background-highlight": "#000000",
+              "background-highlight": "oklch(21% 0.034 264.665)",
               "background-muted": "#000000",
               "background-secondary": "#000000",
               "background-hover": "oklch(21% 0.034 264.665)",
@@ -423,7 +423,7 @@
             "colorPalette": {
               "background-accentuate": "rgba(255, 255, 5, 0.1)",
               "background-default": "#ffffff",
-              "background-highlight": "#ffffff",
+              "background-highlight": "oklch(87.2% 0.01 258.338)",
               "background-muted": "#ffffff",
               "background-secondary": "#ffffff",
               "background-hover": "oklch(87.2% 0.01 258.338)",
@@ -489,7 +489,7 @@
             "colorPalette": {
               "background-accentuate": "#696969",
               "background-default": "#000000",
-              "background-highlight": "#000000",
+              "background-highlight": "#383838",
               "background-muted": "oklch(21% 0.034 264.665)",
               "background-secondary": "#404040",
               "background-hover": "#383838",
@@ -563,7 +563,7 @@
             "colorPalette": {
               "background-accentuate": "#696969",
               "background-default": "#000000",
-              "background-highlight": "#000000",
+              "background-highlight": "oklch(21% 0.034 264.665)",
               "background-muted": "#000000",
               "background-secondary": "#000000",
               "background-hover": "oklch(21% 0.034 264.665)",
