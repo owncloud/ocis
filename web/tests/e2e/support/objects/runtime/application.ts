@@ -45,7 +45,11 @@ export class Application {
       // the global search input can transiently keep aria-controls pointing at its
       // (already unmounted) options dropdown for one render frame right after a route
       // change - see editor.ts close() for the same, more thoroughly investigated case
-      ['aria-valid-attr-value']
+      //
+      // 'label' is disabled because on first admin login the OIDC redirect can land on
+      // Keycloak's own "Configure OTP" required-action page (#totp/#userLabel inputs),
+      // whose markup is Keycloak's default theme, not oCIS web's
+      ['aria-valid-attr-value', 'label']
     )
   }
 
