@@ -74,7 +74,11 @@ func applyModifyToEntry(base *ldap.Entry, mr *ldap.ModifyRequest) *ldap.Entry {
 		}
 	}
 
-	result := ldap.NewEntry(base.DN, nil)
+	dn := base.DN
+	if mr != nil && mr.DN != "" {
+		dn = mr.DN
+	}
+	result := ldap.NewEntry(dn, nil)
 	result.Attributes = make([]*ldap.EntryAttribute, 0, len(order))
 	for _, n := range order {
 		v, ok := attrs[n]
