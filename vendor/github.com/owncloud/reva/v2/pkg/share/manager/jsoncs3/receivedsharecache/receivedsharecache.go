@@ -100,7 +100,7 @@ func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaborati
 	defer unlock()
 
 	if _, ok := c.ReceivedSpaces.Load(userID); !ok {
-		err := c.syncWithLock(ctx, userID)
+		err := c.syncIfStale(ctx, userID)
 		if err != nil {
 			return err
 		}
@@ -110,7 +110,7 @@ func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaborati
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID), attribute.String("cs3.spaceid", spaceID))
 
-	persistFunc := func() error {
+	err := c.retryPersist(ctx, userID, spaceID, func() error {
 		c.initializeIfNeeded(userID, spaceID)
 
 		rss, _ := c.ReceivedSpaces.Load(userID)
@@ -125,56 +125,12 @@ func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaborati
 		}
 
 		return c.persist(ctx, userID)
-	}
-
-	log := appctx.GetLogger(ctx).With().
-		Str("hostname", os.Getenv("HOSTNAME")).
-		Str("userID", userID).
-		Str("spaceID", spaceID).Logger()
-
-	var err error
-	for attempt := 0; attempt < 20; attempt++ {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		default:
-		}
-		err = persistFunc()
-		switch err.(type) {
-		case nil:
-			span.SetStatus(codes.Ok, "")
-			return nil
-		case errtypes.Aborted:
-			log.Debug().Msg("aborted when persisting added received share: etag changed. retrying...")
-			// this is the expected status code from the server when the if-match etag check fails
-			// continue with sync below
-		case errtypes.PreconditionFailed:
-			log.Debug().Msg("precondition failed when persisting added received share: etag changed. retrying...")
-			// actually, this is the wrong status code and we treat it like errtypes.Aborted because of inconsistencies on the server side
-			// continue with sync below
-		case errtypes.AlreadyExists:
-			log.Debug().Msg("already exists when persisting added received share. retrying...")
-			// CS3 uses an already exists error instead of precondition failed when using an If-None-Match=* header / IfExists flag in the InitiateFileUpload call.
-			// Thas happens when the cache thinks there is no file.
-			// continue with sync below
-		default:
-			span.SetStatus(codes.Error, fmt.Sprintf("persisting added received share failed. giving up: %s", err.Error()))
-			log.Error().Err(err).Msg("persisting added received share failed")
-			return err
-		}
-		timer := time.NewTimer(expBackoff(attempt))
-		select {
-		case <-timer.C:
-		case <-ctx.Done():
-			timer.Stop()
-			return ctx.Err()
-		}
-		if err := c.syncWithLock(ctx, userID); err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, err.Error())
-			log.Error().Err(err).Msg("persisting added received share failed. giving up.")
-			return err
-		}
+	})
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+	} else {
+		span.SetStatus(codes.Ok, "")
 	}
 	return err
 }
@@ -187,7 +143,7 @@ func (c *Cache) Get(ctx context.Context, userID, spaceID, shareID string) (*Stat
 	span.SetAttributes(attribute.String("cs3.userid", userID))
 	defer unlock()
 
-	err := c.syncWithLock(ctx, userID)
+	err := c.syncIfStale(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -206,11 +162,11 @@ func (c *Cache) Remove(ctx context.Context, userID, spaceID, shareID string) err
 	span.SetAttributes(attribute.String("cs3.userid", userID))
 	defer unlock()
 
-	ctx, span = appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Add")
+	ctx, span = appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Remove")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID), attribute.String("cs3.spaceid", spaceID))
 
-	persistFunc := func() error {
+	err := c.retryPersist(ctx, userID, spaceID, func() error {
 		c.initializeIfNeeded(userID, spaceID)
 
 		rss, _ := c.ReceivedSpaces.Load(userID)
@@ -224,56 +180,12 @@ func (c *Cache) Remove(ctx context.Context, userID, spaceID, shareID string) err
 		}
 
 		return c.persist(ctx, userID)
-	}
-
-	log := appctx.GetLogger(ctx).With().
-		Str("hostname", os.Getenv("HOSTNAME")).
-		Str("userID", userID).
-		Str("spaceID", spaceID).Logger()
-
-	var err error
-	for attempt := 0; attempt < 20; attempt++ {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		default:
-		}
-		err = persistFunc()
-		switch err.(type) {
-		case nil:
-			span.SetStatus(codes.Ok, "")
-			return nil
-		case errtypes.Aborted:
-			log.Debug().Msg("aborted when persisting added received share: etag changed. retrying...")
-			// this is the expected status code from the server when the if-match etag check fails
-			// continue with sync below
-		case errtypes.PreconditionFailed:
-			log.Debug().Msg("precondition failed when persisting added received share: etag changed. retrying...")
-			// actually, this is the wrong status code and we treat it like errtypes.Aborted because of inconsistencies on the server side
-			// continue with sync below
-		case errtypes.AlreadyExists:
-			log.Debug().Msg("already exists when persisting added received share. retrying...")
-			// CS3 uses an already exists error instead of precondition failed when using an If-None-Match=* header / IfExists flag in the InitiateFileUpload call.
-			// Thas happens when the cache thinks there is no file.
-			// continue with sync below
-		default:
-			span.SetStatus(codes.Error, fmt.Sprintf("persisting added received share failed. giving up: %s", err.Error()))
-			log.Error().Err(err).Msg("persisting added received share failed")
-			return err
-		}
-		timer := time.NewTimer(expBackoff(attempt))
-		select {
-		case <-timer.C:
-		case <-ctx.Done():
-			timer.Stop()
-			return ctx.Err()
-		}
-		if err := c.syncWithLock(ctx, userID); err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, err.Error())
-			log.Error().Err(err).Msg("persisting added received share failed. giving up.")
-			return err
-		}
+	})
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+	} else {
+		span.SetStatus(codes.Ok, "")
 	}
 	return err
 }
@@ -281,13 +193,14 @@ func (c *Cache) Remove(ctx context.Context, userID, spaceID, shareID string) err
 // List returns a list of received shares for a given user
 // The return list is guaranteed to be thread-safe
 func (c *Cache) List(ctx context.Context, userID string) (map[string]*Space, error) {
-	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
-	unlock := c.lockUser(userID)
-	span.End()
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "List")
+	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))
+
+	unlock := c.lockUser(userID)
 	defer unlock()
 
-	err := c.syncWithLock(ctx, userID)
+	err := c.syncIfStale(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -310,8 +223,71 @@ func (c *Cache) List(ctx context.Context, userID string) (map[string]*Space, err
 	return spaces, nil
 }
 
-func (c *Cache) syncWithLock(ctx context.Context, userID string) error {
-	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Sync")
+func isSyncTransient(err error) bool {
+	_, isTooEarly := err.(errtypes.IsTooEarly)
+	_, isInternal := err.(errtypes.IsInternalError)
+	return isTooEarly || isInternal
+}
+
+func (c *Cache) retryPersist(ctx context.Context, userID, spaceID string, persistFunc func() error) error {
+	log := appctx.GetLogger(ctx).With().
+		Str("hostname", os.Getenv("HOSTNAME")).
+		Str("userID", userID).
+		Str("spaceID", spaceID).Logger()
+
+	var err error
+	for attempt := 0; attempt < 20; attempt++ {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+		err = persistFunc()
+		switch err.(type) {
+		case nil:
+			return nil
+		case errtypes.Aborted:
+			// this is the expected status code from the server when the if-match etag check fails
+			// continue with sync below
+			log.Debug().Int("attempt", attempt).Msg("CAS failed: Aborted (etag changed), retrying")
+		case errtypes.PreconditionFailed:
+			// actually, this is the wrong status code and we treat it like errtypes.Aborted because of inconsistencies on the server side
+			// continue with sync below
+			log.Debug().Int("attempt", attempt).Msg("CAS failed: PreconditionFailed (etag changed), retrying")
+		case errtypes.AlreadyExists:
+			// CS3 uses an already exists error instead of precondition failed when using an If-None-Match=* header / IfExists flag in the InitiateFileUpload call.
+			// Thas happens when the cache thinks there is no file.
+			// continue with sync below
+			log.Debug().Int("attempt", attempt).Msg("CAS failed: AlreadyExists (file created concurrently), retrying")
+		case errtypes.TooEarly:
+			// storage-system has an upload in progress for this node; wait for it to finish
+			// continue with sync below
+			log.Debug().Int("attempt", attempt).Msg("CAS failed: TooEarly (upload in progress), retrying")
+		default:
+			log.Error().Int("attempt", attempt).Err(err).Msg("persisting received share failed, giving up")
+			return err
+		}
+		timer := time.NewTimer(expBackoff(attempt))
+		select {
+		case <-timer.C:
+		case <-ctx.Done():
+			timer.Stop()
+			return ctx.Err()
+		}
+		if serr := c.syncIfStale(ctx, userID); serr != nil {
+			if !isSyncTransient(serr) {
+				log.Error().Int("attempt", attempt).Err(serr).Msg("lost update: re-read failed, aborting")
+				return serr
+			}
+			log.Warn().Int("attempt", attempt).Err(serr).Msg("lost update: re-read before retry")
+		}
+	}
+	return err
+}
+
+// syncIfStale pulls the authoritative state from storage when the local replica is stale; caller must hold the user lock.
+func (c *Cache) syncIfStale(ctx context.Context, userID string) error {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "SyncIfStale")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))
 
@@ -340,8 +316,12 @@ func (c *Cache) syncWithLock(ctx context.Context, userID string) error {
 		span.SetStatus(codes.Ok, "")
 		return nil
 	default:
-		span.SetStatus(codes.Error, fmt.Sprintf("Failed to download the received share: %s", err.Error()))
-		log.Error().Err(err).Msg("Failed to download the received share")
+		span.SetStatus(codes.Error, err.Error())
+		if isSyncTransient(err) {
+			log.Warn().Err(err).Msg("lost update: re-read transient error")
+		} else {
+			log.Error().Err(err).Msg("lost update: re-read failed")
+		}
 		return err
 	}
 
@@ -364,6 +344,9 @@ func (c *Cache) persist(ctx context.Context, userID string) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Persist")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))
+
+	log := appctx.GetLogger(ctx)
+	log.Debug().Str("user", userID).Msg("receivedsharecache.persist.start")
 
 	rss, ok := c.ReceivedSpaces.Load(userID)
 	if !ok {
@@ -395,6 +378,7 @@ func (c *Cache) persist(ctx context.Context, userID string) error {
 		ur.IfNoneMatch = []string{"*"}
 	}
 
+	log.Debug().Str("user", userID).Str("path", jsonPath).Str("etag", ur.IfMatchEtag).Msg("receivedsharecache.persist.upload")
 	res, err := c.storage.Upload(ctx, ur)
 	if err != nil {
 		span.RecordError(err)
@@ -403,6 +387,7 @@ func (c *Cache) persist(ctx context.Context, userID string) error {
 	}
 	rss.etag = res.Etag
 
+	log.Debug().Str("user", userID).Str("etag", res.Etag).Msg("receivedsharecache.persist.done")
 	span.SetStatus(codes.Ok, "")
 	return nil
 }
