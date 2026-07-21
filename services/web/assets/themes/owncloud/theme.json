@@ -1,8 +1,8 @@
 {
   "common": {
-    "name": "ownCloud",
-    "slogan": "ownCloud – A safe home for all your data",
-    "logo": "themes/owncloud/assets/logo.svg",
+    "name": "ownCloud – a Kiteworks company",
+    "slogan": "Kiteworks Open Source Program Office",
+    "logo": "themes/owncloud/assets/oc_coloured.svg",
     "urls": {
       "accessDeniedHelp": "",
       "imprint": "",
@@ -73,6 +73,11 @@
         {
           "isDark": false,
           "name": "Light Theme",
+          "logo": {
+            "topbar": "themes/owncloud/assets/oc_white.svg",
+            "favicon": "themes/owncloud/assets/favicon.jpg",
+            "login": "themes/owncloud/assets/oc_white.svg"
+          },
           "designTokens": {
             "colorPalette": {
               "background-accentuate": "rgba(255, 255, 5, 0.1)",
@@ -141,7 +146,7 @@
           "logo": {
             "topbar": "themes/owncloud/assets/logo_dark.svg",
             "favicon": "themes/owncloud/assets/favicon.jpg",
-            "login": "themes/owncloud/assets/logo.svg"
+            "login": "themes/owncloud/assets/oc_white.svg"
           },
           "designTokens": {
             "colorPalette": {
@@ -208,6 +213,11 @@
         {
           "isDark": true,
           "name": "Dark Theme",
+          "logo": {
+            "topbar": "themes/owncloud/assets/logo.svg",
+            "favicon": "themes/owncloud/assets/favicon.jpg",
+            "login": "themes/owncloud/assets/oc_white.svg"
+          },
           "designTokens": {
             "colorPalette": {
               "background-accentuate": "#696969",
@@ -275,6 +285,11 @@
         {
           "isDark": true,
           "name": "Dark Theme – High Contrast",
+          "logo": {
+            "topbar": "themes/owncloud/assets/logo.svg",
+            "favicon": "themes/owncloud/assets/favicon.jpg",
+            "login": "themes/owncloud/assets/oc_white.svg"
+          },
           "designTokens": {
             "colorPalette": {
               "background-accentuate": "#696969",
@@ -346,7 +361,7 @@
           "logo": {
             "topbar": "themes/owncloud/assets/logo_dark.svg",
             "favicon": "themes/owncloud/assets/favicon.jpg",
-            "login": "themes/owncloud/assets/logo.svg"
+            "login": "themes/owncloud/assets/oc_white.svg"
           },
           "designTokens": {
             "colorPalette": {
@@ -417,7 +432,7 @@
           "logo": {
             "topbar": "themes/owncloud/assets/logo_dark.svg",
             "favicon": "themes/owncloud/assets/favicon.jpg",
-            "login": "themes/owncloud/assets/logo.svg"
+            "login": "themes/owncloud/assets/oc_white.svg"
           },
           "designTokens": {
             "colorPalette": {
@@ -485,6 +500,11 @@
           "isDark": true,
           "mode": "vault",
           "name": "Dark Theme",
+          "logo": {
+            "topbar": "themes/owncloud/assets/logo.svg",
+            "favicon": "themes/owncloud/assets/favicon.jpg",
+            "login": "themes/owncloud/assets/oc_white.svg"
+          },
           "designTokens": {
             "colorPalette": {
               "background-accentuate": "#696969",
@@ -557,7 +577,7 @@
           "logo": {
             "topbar": "themes/owncloud/assets/logo_dark.svg",
             "favicon": "themes/owncloud/assets/favicon.jpg",
-            "login": "themes/owncloud/assets/logo.svg"
+            "login": "themes/owncloud/assets/oc_white.svg"
           },
           "designTokens": {
             "colorPalette": {
