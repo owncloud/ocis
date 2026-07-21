@@ -575,13 +575,13 @@ jobs:
       - name: Run e2e-${{ matrix.suite }}
         run: E2E_ARGS="${{ matrix.args }}" python3 tests/acceptance/run-e2e.py
         env:
-          TIKA_NEEDED: ${{ matrix.tika == true && 'true' || 'false' }}
-          KEYCLOAK_NEEDED: ${{ matrix.keycloak == true && 'true' || 'false' }}
-          MFA_NEEDED: ${{ matrix.mfa == true && 'true' || 'false' }}
-          OIDC_NEEDED: ${{ matrix.oidc == true && 'true' || 'false' }}
-          OIDC_IFRAME_NEEDED: ${{ matrix.oidc_iframe == true && 'true' || 'false' }}
-          COLLABORATION_NEEDED: ${{ matrix.collaboration == true && 'true' || 'false' }}
-          FEDERATED_NEEDED: ${{ matrix.federated == true && 'true' || 'false' }}
+          TIKA_NEEDED: ${{ case(matrix.tika == true, 'true', 'false') }}
+          KEYCLOAK_NEEDED: ${{ case(matrix.keycloak == true, 'true', 'false') }}
+          MFA_NEEDED: ${{ case(matrix.mfa == true, 'true', 'false') }}
+          OIDC_NEEDED: ${{ case(matrix.oidc == true, 'true', 'false') }}
+          OIDC_IFRAME_NEEDED: ${{ case(matrix.oidc_iframe == true, 'true', 'false') }}
+          COLLABORATION_NEEDED: ${{ case(matrix.collaboration == true, 'true', 'false') }}
+          FEDERATED_NEEDED: ${{ case(matrix.federated == true, 'true', 'false') }}
 
       - name: Upload tracing result
         if: failure()
