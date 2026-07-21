@@ -115,7 +115,7 @@ jobs:
   docker-build:
     if: false
     name: docker-build (${{ matrix.arch }}, ${{ matrix.repo }})
-    runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
+    runs-on: ${{ case(matrix.arch == 'amd64', 'ubuntu-24.04', 'ubuntu-24.04-arm') }}
     needs: [determine-release-type, generate-code, security-scan-trivy]
     strategy:
       matrix:
