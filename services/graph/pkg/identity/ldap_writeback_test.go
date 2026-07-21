@@ -634,7 +634,10 @@ func TestGetGroupByNameUsesGroupNameAttribute(t *testing.T) {
 	logger := log.NewLogger(log.Level("debug"))
 
 	c := lconfig
-	c.GroupIDIsOctetString = true // makes filterEscapeUUID error on a non-UUID name -> else branch
+	// Octet-string group IDs require server-assigned UUIDs; this also makes
+	// filterEscapeUUID error on a non-UUID name, reaching the name-only else branch.
+	c.UseServerUUID = true
+	c.GroupIDIsOctetString = true
 
 	var groupSearch *ldap.SearchRequest
 	l := &mocks.Client{}
@@ -651,4 +654,47 @@ func TestGetGroupByNameUsesGroupNameAttribute(t *testing.T) {
 	// the filter must use the group name attribute (cn), not the user name attribute (uid)
 	assert.Contains(t, groupSearch.Filter, "("+b.groupAttributeMap.name+"=group)")
 	assert.NotContains(t, groupSearch.Filter, b.userAttributeMap.userName+"=group")
+}
+
+// TestNewLDAPBackendRejectsOctetStringWithoutServerUUID guards the fail-fast check:
+// octet-string ID attributes (server-assigned, e.g. AD objectGUID) are incompatible
+// with UseServerUUID=false, where oCIS generates string UUIDs. The combination must
+// be rejected at startup rather than silently producing corrupt IDs.
+func TestNewLDAPBackendRejectsOctetStringWithoutServerUUID(t *testing.T) {
+	logger := log.NewLogger(log.Level("debug"))
+	l := &mocks.Client{}
+
+	t.Run("user octet-string without server UUID is rejected", func(t *testing.T) {
+		c := lconfig
+		c.UseServerUUID = false
+		c.UserIDIsOctetString = true
+		_, err := NewLDAPBackend(l, c, &logger, "")
+		assert.Error(t, err)
+	})
+
+	t.Run("group octet-string without server UUID is rejected", func(t *testing.T) {
+		c := lconfig
+		c.UseServerUUID = false
+		c.GroupIDIsOctetString = true
+		_, err := NewLDAPBackend(l, c, &logger, "")
+		assert.Error(t, err)
+	})
+
+	t.Run("octet-string with server UUID is allowed", func(t *testing.T) {
+		c := lconfig
+		c.UseServerUUID = true
+		c.UserIDIsOctetString = true
+		c.GroupIDIsOctetString = true
+		_, err := NewLDAPBackend(l, c, &logger, "")
+		assert.NoError(t, err)
+	})
+
+	t.Run("string IDs without server UUID is allowed", func(t *testing.T) {
+		c := lconfig
+		c.UseServerUUID = false
+		c.UserIDIsOctetString = false
+		c.GroupIDIsOctetString = false
+		_, err := NewLDAPBackend(l, c, &logger, "")
+		assert.NoError(t, err)
+	})
 }
