@@ -349,8 +349,7 @@ interface Props {
   isSideBarOpen?: boolean
   dragDrop?: boolean
   viewMode?:
-    | typeof FolderViewModeConstants.name.condensedTable
-    | typeof FolderViewModeConstants.name.table
+    typeof FolderViewModeConstants.name.condensedTable | typeof FolderViewModeConstants.name.table
   hover?: boolean
   sortBy?: string
   sortDir?: SortDir
