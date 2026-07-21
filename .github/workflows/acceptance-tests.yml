@@ -59,6 +59,9 @@ jobs:
           go-version-file: go.mod
           cache: true
 
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: "10.28.1"
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: "24"
@@ -157,17 +160,40 @@ jobs:
 
           exit $FAILED
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - name: Upload oCIS binary
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: ocis-build-artifacts
-          path: |
-            ocis/bin/ocis
-            tests/ociswrapper/bin/ociswrapper
+          name: ocis-binary
+          path: ocis/bin/ocis
           retention-days: 1
           if-no-files-found: error
 
-  local-api-tests:
+      - name: Upload ociswrapper binary
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ociswrapper-binary
+          path: tests/ociswrapper/bin/ociswrapper
+          retention-days: 1
+          if-no-files-found: error
+
+  unit-tests:
+    name: unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Run unit tests
+        run: make test
+
+  # ---------------------------------------------------------------------------
+  # API acceptance tests — split by required services so each group gets a
+  # single fixed ocis-setup call with no per-suite conditionals.
+  # ---------------------------------------------------------------------------
+
+  api-tests-plain:
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -178,10 +204,6 @@ jobs:
           # contract & locks
           - apiContract
           - apiLocks
-          # settings & notifications (needs email)
-          - apiSettings
-          - apiNotification
-          - apiCors
           # graph
           - apiGraphUser
           - apiGraph
@@ -195,10 +217,8 @@ jobs:
           - apiDepthInfinity
           - apiArchiver
           - apiActivities
-          # search
+          # search (no tika)
           - apiSearch1
-          - apiSearch2
-          - apiSearchContent    # needs Tika
           # sharing
           - apiSharingNgShares
           - apiReshare
@@ -209,76 +229,290 @@ jobs:
           - apiSharingNgDriveLinkShare
           - apiSharingNgItemLinkShare
           - apiSharingNgLinkShareManagement
-          # auth
-          - apiAuthApp
-          # antivirus (needs ClamAV)
-          - apiAntivirus
-          # federation (needs email + federation ocis)
-          - apiOcm
-          # collaboration (needs WOPI)
-          - apiCollaboration
-          - apiVault
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-
       - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
         with:
           php-version: "8.4"
           extensions: curl, xml, mbstring, zip, ldap, gd
           tools: composer
+      - name: Setup oCIS
+        uses: mklos-kw/ocis-github-actions/ocis-setup@main
+        with:
+          ocis-binary-artifact: ocis-binary
+          ociswrapper-artifact: ociswrapper-binary
+          demo-users: "true"
+      - name: Test ${{ matrix.suite }}
+        uses: mklos-kw/ocis-github-actions/ocis-test@main
+        with:
+          suite: ${{ matrix.suite }}
 
-      - name: Cache libcurl 8.12.0
-        id: cache-libcurl
+  api-tests-email:
+    name: ${{ matrix.suite }}
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          # settings & notifications (needs Mailpit)
+          - apiSettings
+          - apiNotification
+          - apiCors
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+      - name: Setup oCIS
+        uses: mklos-kw/ocis-github-actions/ocis-setup@main
+        with:
+          ocis-binary-artifact: ocis-binary
+          ociswrapper-artifact: ociswrapper-binary
+          demo-users: "true"
+          email: "true"
+      - name: Test ${{ matrix.suite }}
+        uses: mklos-kw/ocis-github-actions/ocis-test@main
+        with:
+          suite: ${{ matrix.suite }}
+
+  api-tests-tika:
+    name: ${{ matrix.suite }}
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          # full-text search (needs Tika)
+          - apiSearch2
+          - apiSearchContent
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+      - name: Setup oCIS
+        uses: mklos-kw/ocis-github-actions/ocis-setup@main
+        with:
+          ocis-binary-artifact: ocis-binary
+          ociswrapper-artifact: ociswrapper-binary
+          demo-users: "true"
+          tika: "true"
+      - name: Test ${{ matrix.suite }}
+        uses: mklos-kw/ocis-github-actions/ocis-test@main
+        with:
+          suite: ${{ matrix.suite }}
+
+  api-tests-antivirus:
+    name: apiAntivirus
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+      - name: Setup oCIS
+        uses: mklos-kw/ocis-github-actions/ocis-setup@main
+        with:
+          ocis-binary-artifact: ocis-binary
+          ociswrapper-artifact: ociswrapper-binary
+          demo-users: "true"
+          antivirus: "true"
+          extra-server-env: '{"POSTPROCESSING_STEPS":"virusscan"}'
+      - name: Test apiAntivirus
+        uses: mklos-kw/ocis-github-actions/ocis-test@main
+        with:
+          suite: apiAntivirus
+
+  api-tests-auth-app:
+    name: apiAuthApp
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+      - name: Setup oCIS
+        uses: mklos-kw/ocis-github-actions/ocis-setup@main
+        with:
+          ocis-binary-artifact: ocis-binary
+          ociswrapper-artifact: ociswrapper-binary
+          demo-users: "true"
+          extra-server-env: '{"OCIS_ADD_RUN_SERVICES":"auth-app","PROXY_ENABLE_APP_AUTH":"true"}'
+      - name: Test apiAuthApp
+        uses: mklos-kw/ocis-github-actions/ocis-test@main
+        with:
+          suite: apiAuthApp
+
+  api-tests-ocm:
+    name: apiOcm
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+      - name: Patch OCM providers.json — replace Docker hostnames with localhost for CI
+        run: |
+          # providers.json uses Docker Compose hostnames (ocis-server, federation-ocis-server).
+          # In CI both instances run on localhost at ports 9200/10200.
+          sed \
+            -e 's|ocis-server:9200|localhost:9200|g' \
+            -e 's|federation-ocis-server:10200|localhost:10200|g' \
+            tests/config/ci/providers.json > /tmp/ocm-providers.json
+      - name: Setup oCIS
+        uses: mklos-kw/ocis-github-actions/ocis-setup@main
+        with:
+          ocis-binary-artifact: ocis-binary
+          ociswrapper-artifact: ociswrapper-binary
+          demo-users: "true"
+          email: "true"
+          extra-server-env: >-
+            {"OCIS_ADD_RUN_SERVICES":"ocm,notifications","OCIS_ENABLE_OCM":"true",
+            "OCM_OCM_INVITE_MANAGER_INSECURE":"true","OCM_OCM_SHARE_PROVIDER_INSECURE":"true",
+            "OCM_OCM_STORAGE_PROVIDER_INSECURE":"true",
+            "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE":"/tmp/ocm-providers.json",
+            "NOTIFICATIONS_SMTP_HOST":"localhost","NOTIFICATIONS_SMTP_PORT":"1025",
+            "NOTIFICATIONS_SMTP_INSECURE":"true",
+            "NOTIFICATIONS_SMTP_SENDER":"ownCloud <noreply@example.com>",
+            "NOTIFICATIONS_DEBUG_ADDR":"0.0.0.0:9174"}
+      - name: Setup federation oCIS
+        uses: mklos-kw/ocis-github-actions/ocis-setup@main
+        with:
+          ocis-binary: ocis/bin/ocis
+          ocis-url: "https://localhost:10200"
+          ocis-config-dir: /home/runner/.ocis-federation/config
+          wrapper: "false"
+          demo-users: "true"
+          skip-test-runner-setup: "true"
+          pid-file: /tmp/ocis-federation.pid
+          log-file: /tmp/ocis-federation.log
+          debug-port-offset: "1000"
+          extra-server-env: >-
+            {"OCIS_BASE_DATA_PATH":"/home/runner/.ocis-federation",
+            "OCIS_RUNTIME_PORT":"10250",
+            "NATS_NATS_PORT":"10233",
+            "OCIS_EVENTS_ENDPOINT":"127.0.0.1:10233",
+            "MICRO_REGISTRY":"memory",
+            "OCIS_INSECURE":"true",
+            "OCIS_LDAP_URI":"ldaps://localhost:10235",
+            "STORAGE_SYSTEM_DATA_SERVER_URL":"http://localhost:10216/data",
+            "STORAGE_USERS_DATA_SERVER_URL":"http://localhost:10158/data",
+            "OCM_OCM_STORAGE_DATA_SERVER_URL":"http://localhost:10280/data",
+            "THUMBNAILS_DATA_ENDPOINT":"http://127.0.0.1:10190/thumbnails/data",
+            "OCIS_EXCLUDE_RUN_SERVICES":"idp",
+            "OCIS_ADD_RUN_SERVICES":"ocm,notifications",
+            "OCIS_ENABLE_OCM":"true",
+            "OCM_OCM_INVITE_MANAGER_INSECURE":"true",
+            "OCM_OCM_SHARE_PROVIDER_INSECURE":"true",
+            "OCM_OCM_STORAGE_PROVIDER_INSECURE":"true",
+            "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE":"/tmp/ocm-providers.json",
+            "NOTIFICATIONS_SMTP_HOST":"localhost","NOTIFICATIONS_SMTP_PORT":"1025",
+            "NOTIFICATIONS_SMTP_INSECURE":"true",
+            "NOTIFICATIONS_SMTP_SENDER":"ownCloud <noreply@example.com>"}
+      - name: Test apiOcm
+        uses: mklos-kw/ocis-github-actions/ocis-test@main
+        with:
+          suite: apiOcm
+        env:
+          TEST_SERVER_FED_URL: https://localhost:10200
+
+  api-tests-wopi:
+    name: apiCollaboration
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+      - name: Setup oCIS
+        uses: mklos-kw/ocis-github-actions/ocis-setup@main
+        with:
+          ocis-binary-artifact: ocis-binary
+          ociswrapper-artifact: ociswrapper-binary
+          demo-users: "true"
+          extra-server-env: '{"GATEWAY_GRPC_ADDR":"0.0.0.0:9142"}'
+          collaboration-apps: "collabora,onlyoffice,fakeoffice"
+      - name: Test apiCollaboration
+        uses: mklos-kw/ocis-github-actions/ocis-test@main
+        with:
+          suite: apiCollaboration
+        env:
+          COLLABORATION_SERVICE_URL: http://localhost:9320
+
+  api-tests-vault:
+    name: apiVault
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+      - name: Setup oCIS
+        uses: mklos-kw/ocis-github-actions/ocis-setup@main
+        with:
+          ocis-binary-artifact: ocis-binary
+          ociswrapper-artifact: ociswrapper-binary
+          keycloak: "true"
+          keycloak-realm-file: tests/config/ci/ocis-mfa-ci-realm.dist.json
+          web-ui-config: tests/config/ci/ocis-config-vault.json
+          extra-server-env: |
+            {
+              "OCIS_ENABLE_VAULT_MODE": "true",
+              "FRONTEND_ENABLE_VAULT_MODE": "true",
+              "OCIS_MFA_ENABLED": "true",
+              "WEB_OIDC_SCOPE": "openid profile email acr"
+            }
+      - name: Cache Playwright browsers
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: /opt/libcurl
-          key: libcurl-8.12.0-${{ runner.os }}
-
-      - name: Install libcurl 8.12.0 build dependencies
-        # Always run: libvips-dev is needed at runtime (govips thumbnails in the pre-built binary)
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ hashFiles('web/pnpm-lock.yaml') }}
+      - name: Install Playwright and browsers
         run: |
-          sudo apt-get update -qq
-          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
-          sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
-
-      - name: Compile libcurl 8.12.0 from source
-        if: steps.cache-libcurl.outputs.cache-hit != 'true'
+          vendor-php/bin/playwright-install
+          vendor-php/bin/playwright-install --browsers
+      - name: Start vault storage-users
         run: |
-          cd /tmp
-          curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
-          tar xzf curl-8.12.0.tar.gz
-          cd curl-8.12.0
-          ./configure --with-ssl --with-zlib --with-nghttp2 --prefix=/opt/libcurl --enable-versioned-symbols --silent
-          make -j$(nproc) --silent
-          sudo make install --silent
-
-      - name: Restore libcurl ldconfig
-        # Always run: on cache hit the .so files are restored to /opt/libcurl/lib but
-        # /etc/ld.so.cache on the fresh runner doesn't know about them yet.
-        # Without ldconfig, PHP's curl extension can't find libcurl even though it's present.
-        run: |
-          echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
-          sudo ldconfig
-          /opt/libcurl/bin/curl --version | head -1
-          php -r '
-            $v = curl_version()["version"];
-            echo "PHP curl: $v\n";
-            if (version_compare($v, "8.12.0", "<")) {
-              fwrite(STDERR, "FATAL: PHP sees libcurl $v, need >= 8.12.0\n");
-              exit(1);
-            }
-          '
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+          OCIS_JWT_SECRET=some-ocis-jwt-secret \
+          STORAGE_USERS_ENABLE_VAULT_MODE=true \
+          STORAGE_USERS_SERVICE_NAME=storage-users-vault \
+          STORAGE_USERS_GRPC_ADDR=localhost:19285 \
+          STORAGE_USERS_HTTP_ADDR=localhost:19286 \
+          STORAGE_USERS_DATA_SERVER_URL=http://localhost:19286/data \
+          STORAGE_USERS_DEBUG_ADDR=localhost:19287 \
+          STORAGE_USERS_OCIS_ROOT="${HOME}/ocis/storage/users-vault" \
+          STORAGE_USERS_EVENTS_CONSUMER_GROUP=vault-dcfs \
+          ocis storage-users server &>/tmp/vault-storage-users.log &
+          timeout 30 bash -c 'until curl -sf http://localhost:19287/healthz; do sleep 1; done' \
+            || (cat /tmp/vault-storage-users.log && exit 1)
+      - name: Test apiVault
+        uses: mklos-kw/ocis-github-actions/ocis-test@main
         with:
-          name: ocis-build-artifacts
-
-      - name: Restore binary permissions
-        run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
-
-      - name: Run ${{ matrix.suite }}
-        run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
+          suite: apiVault
+        env:
+          KEYCLOAK: "true"
+          KC_URL: "https://localhost:8443"
 
   cli-tests:
     needs: [build-and-test]
@@ -291,29 +525,23 @@ jobs:
           - cliCommands,apiServiceAvailability   # grouped: both need ClamAV + email services
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-
       - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
         with:
           php-version: "8.4"
           extensions: curl, xml, mbstring, zip, ldap, gd
           tools: composer
-
-      - name: Install libvips runtime
-        run: |
-          sudo apt-get update -qq
-          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
-          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      - name: Setup oCIS
+        uses: mklos-kw/ocis-github-actions/ocis-setup@main
         with:
-          name: ocis-build-artifacts
-
-      - name: Restore binary permissions
-        run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
-
-      - name: Run ${{ matrix.suite }}
-        run: BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
+          ocis-binary-artifact: ocis-binary
+          ociswrapper-artifact: ociswrapper-binary
+          demo-users: "true"
+          email: "true"
+          antivirus: "true"
+      - name: Test ${{ matrix.suite }}
+        uses: mklos-kw/ocis-github-actions/ocis-test@main
+        with:
+          suite: ${{ matrix.suite }}
 
   core-api-tests:
     name: ${{ matrix.suite }}
@@ -334,69 +562,23 @@ jobs:
           - "coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS"
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-
       - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
         with:
           php-version: "8.4"
           extensions: curl, xml, mbstring, zip, ldap, gd
           tools: composer
-
-      - name: Cache libcurl 8.12.0
-        id: cache-libcurl
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      - name: Setup oCIS
+        uses: mklos-kw/ocis-github-actions/ocis-setup@main
         with:
-          path: /opt/libcurl
-          key: libcurl-8.12.0-${{ runner.os }}
-
-      - name: Install libcurl 8.12.0 build dependencies
-        # Always run: libvips-dev is needed at runtime (govips thumbnails in the pre-built binary)
-        run: |
-          sudo apt-get update -qq
-          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
-          sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
-
-      - name: Compile libcurl 8.12.0 from source
-        if: steps.cache-libcurl.outputs.cache-hit != 'true'
-        run: |
-          cd /tmp
-          curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
-          tar xzf curl-8.12.0.tar.gz
-          cd curl-8.12.0
-          ./configure --with-ssl --with-zlib --with-nghttp2 --prefix=/opt/libcurl --enable-versioned-symbols --silent
-          make -j$(nproc) --silent
-          sudo make install --silent
-
-      - name: Restore libcurl ldconfig
-        # Always run: on cache hit the .so files are restored to /opt/libcurl/lib but
-        # /etc/ld.so.cache on the fresh runner doesn't know about them yet.
-        # Without ldconfig, PHP's curl extension can't find libcurl even though it's present.
-        run: |
-          echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
-          sudo ldconfig
-          /opt/libcurl/bin/curl --version | head -1
-          php -r '
-            $v = curl_version()["version"];
-            echo "PHP curl: $v\n";
-            if (version_compare($v, "8.12.0", "<")) {
-              fwrite(STDERR, "FATAL: PHP sees libcurl $v, need >= 8.12.0\n");
-              exit(1);
-            }
-          '
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+          ocis-binary-artifact: ocis-binary
+          ociswrapper-artifact: ociswrapper-binary
+          demo-users: "true"
+      - name: Test ${{ matrix.suite }}
+        uses: mklos-kw/ocis-github-actions/ocis-test@main
         with:
-          name: ocis-build-artifacts
-
-      - name: Restore binary permissions
-        run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
-
-      - name: Run ${{ matrix.suite }}
-        run: >
-          BEHAT_SUITES="${{ matrix.suite }}"
-          ACCEPTANCE_TEST_TYPE=core-api
-          WITH_REMOTE_PHP=true
-          python3 tests/acceptance/run-github.py
+          suite: ${{ matrix.suite }}
+          acceptance-test-type: core-api
+          with-remote-php: "true"
 
   e2e-tests:
     name: e2e-${{ matrix.suite }}
@@ -420,9 +602,11 @@ jobs:
           - suite: keycloak
             args: "--type playwright --suites journeys,keycloak"
             keycloak: true
+            demo_users: "false"
           - suite: mfa
             args: "--type playwright --suites mfa"
             mfa: true
+            keycloak_realm_file: tests/config/ci/ocis-mfa-ci-realm.dist.json
           - suite: oidc
             args: "--type playwright specs/oidc/refreshToken.spec.ts"
             oidc: true
@@ -436,6 +620,7 @@ jobs:
             args: "--type playwright --suites ocm"
             federated: true
     steps:
+      # --- tools ---
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
@@ -453,135 +638,145 @@ jobs:
           # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
           sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: ocis-build-artifacts
-
-      - name: Restore binary permissions
-        run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
-
+      # --- install ---
       - name: Cache Playwright Chromium
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: playwright-chromium-${{ hashFiles('web/pnpm-lock.yaml') }}
-
-      # --- Tika (search suite only) ---
-      - name: Start Tika
-        if: matrix.tika == true
+      - name: Install web dependencies and Playwright
         run: |
-          docker run -d --name tika --network host apache/tika:3.2.2.0-full
-          timeout 120 bash -c 'until curl -sf http://localhost:9998; do sleep 2; done'
-          echo "tika ready."
+          pnpm install
+          pnpm exec playwright install --with-deps chromium
+        working-directory: web
 
-      # --- Keycloak (keycloak and mfa suites) ---
-      - name: Generate Keycloak certs
-        if: matrix.keycloak == true || matrix.mfa == true
+      # --- build extra-server-env (merge base + suite-specific vars) ---
+      - name: Build extra-server-env
+        shell: bash
         run: |
-          mkdir -p keycloak-certs
-          openssl req -x509 -newkey rsa:2048 \
-            -keyout keycloak-certs/keycloakkey.pem \
-            -out keycloak-certs/keycloakcrt.pem \
-            -nodes -days 365 -subj '/CN=keycloak' \
-            -addext 'subjectAltName=DNS:localhost,IP:127.0.0.1'
-          chmod -R 777 keycloak-certs
-
-      - name: Start Postgres
-        if: matrix.keycloak == true || matrix.mfa == true
-        run: |
-          docker run -d --name postgres --network host \
-            -e POSTGRES_DB=keycloak \
-            -e POSTGRES_USER=keycloak \
-            -e POSTGRES_PASSWORD=keycloak \
-            postgres:alpine3.18
-          timeout 30 bash -c 'until docker exec postgres pg_isready -U keycloak; do sleep 1; done'
-
-      - name: Start Keycloak
-        if: matrix.keycloak == true || matrix.mfa == true
-        run: |
-          # The mfa suite needs a different realm with TOTP MFA configured.
-          # ocis-ci-realm uses ocis-server:9200, ocis-mfa-ci-realm uses localhost:9200;
-          # ocis runs on 127.0.0.1:9200 so we rewrite both forms.
-          if [[ "${{ matrix.mfa }}" == "true" ]]; then
-            REALM_FILE=tests/config/ci/ocis-mfa-ci-realm.dist.json
-          else
-            REALM_FILE=tests/config/ci/ocis-ci-realm.dist.json
+          BASE='{"THUMBNAILS_TXT_FONTMAP_FILE":"${{ github.workspace }}/tests/config/ci/fontsMap.json","OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST":"${{ github.workspace }}/tests/config/ci/banned-password-list.txt","OCIS_PASSWORD_POLICY_MIN_CHARACTERS":"3","OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS":"0","OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS":"0","OCIS_PASSWORD_POLICY_MIN_DIGITS":"0","OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS":"0","GRAPH_AVAILABLE_ROLES":"b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5,a8d5fe5e-96e3-418d-825b-534dbdf22b99,fb6c3e19-e378-47e5-b277-9732f9de6e21,58c63c02-1d89-4572-916a-870abc5a1b7d,2d00ce52-1fc2-4dbc-8b95-a73b73395f5a,1c996275-f1c9-4e71-abdf-a42f6495e960,312c0871-5ef7-4b3a-85b6-0e4074c64049,aa97fe03-7980-45ac-9e50-b325749fd7e6,63e64e19-8d43-42ec-a738-2b6af2610efa","FRONTEND_CONFIGURABLE_NOTIFICATIONS":"true"}'
+          SUITE_EXTRA='{}'
+          if [[ "${{ matrix.oidc }}" == "true" ]]; then
+            SUITE_EXTRA='{"IDP_ACCESS_TOKEN_EXPIRATION":"30","WEB_OIDC_SCOPE":"openid profile email offline_access"}'
+          elif [[ "${{ matrix.oidc_iframe }}" == "true" ]]; then
+            SUITE_EXTRA='{"IDP_ACCESS_TOKEN_EXPIRATION":"30"}'
+          elif [[ "${{ matrix.mfa }}" == "true" ]]; then
+            SUITE_EXTRA='{"OCIS_MFA_ENABLED":"true"}'
+          elif [[ "${{ matrix.collaboration }}" == "true" ]]; then
+            SUITE_EXTRA='{"PROXY_CSP_CONFIG_FILE_LOCATION":"${{ github.workspace }}/tests/config/ci/csp.yaml","COLLABORA_DOMAIN":"localhost:9980","ONLYOFFICE_DOMAIN":"localhost:443","FRONTEND_APP_HANDLER_SECURE_VIEW_APP_ADDR":"com.owncloud.api.collaboration.Collabora"}'
+          elif [[ "${{ matrix.federated }}" == "true" ]]; then
+            SUITE_EXTRA='{"OCIS_ADD_RUN_SERVICES":"ocm","OCIS_ENABLE_OCM":"true","OCM_OCM_INVITE_MANAGER_INSECURE":"true","OCM_OCM_SHARE_PROVIDER_INSECURE":"true","OCM_OCM_STORAGE_PROVIDER_INSECURE":"true","OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE":"${{ github.workspace }}/tests/config/local/providers.json"}'
           fi
-          sed -e 's|https://ocis-server:9200|https://127.0.0.1:9200|g' \
-              -e 's|https://localhost:9200|https://127.0.0.1:9200|g' \
-            "$REALM_FILE" > /tmp/ocis-realm.json
-          docker run -d --name keycloak --network host \
-            -e OCIS_DOMAIN=https://127.0.0.1:9200 \
-            -e KC_HOSTNAME=localhost \
-            -e KC_PORT=8443 \
-            -e KC_DB=postgres \
-            -e "KC_DB_URL=jdbc:postgresql://localhost:5432/keycloak" \
-            -e KC_DB_USERNAME=keycloak \
-            -e KC_DB_PASSWORD=keycloak \
-            -e KC_FEATURES=impersonation \
-            -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
-            -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
-            -e KC_HTTPS_CERTIFICATE_FILE=/keycloak-certs/keycloakcrt.pem \
-            -e KC_HTTPS_CERTIFICATE_KEY_FILE=/keycloak-certs/keycloakkey.pem \
-            -v "$(pwd)/keycloak-certs:/keycloak-certs:ro" \
-            -v "/tmp/ocis-realm.json:/opt/keycloak/data/import/oCIS-realm.json:ro" \
-            quay.io/keycloak/keycloak:26.2.5 \
-            start-dev --proxy-headers xforwarded \
-              --spi-connections-http-client-default-disable-trust-manager=true \
-              --import-realm --health-enabled=true
-          timeout 300 bash -c 'until curl -skf https://localhost:9000/health/ready; do sleep 3; done' \
-            || (echo "=== keycloak logs ===" && docker logs keycloak --tail 80 && exit 1)
-          echo "keycloak ready."
+          MERGED=$(jq -sc '.[0] * .[1]' <(echo "$BASE") <(echo "$SUITE_EXTRA"))
+          echo "OCIS_EXTRA_SERVER_ENV=$MERGED" >> "$GITHUB_ENV"
 
-      # --- Collabora + OnlyOffice (app-provider suite only) ---
-      - name: Start Collabora
-        if: matrix.collaboration == true
+      # --- patch web-ui-config for suites that need custom OIDC scope or extra apps ---
+      - name: Prepare web-ui-config
+        shell: bash
         run: |
-          docker run -d \
-            --name collabora \
-            --network host \
-            --entrypoint bash \
-            -e DONT_GEN_SSL_CERT=set \
-            -e "extra_params=--o:ssl.enable=true --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=https://127.0.0.1:9200" \
-            collabora/code:25.04.7.3.1 \
-            -c "coolconfig generate-proof-key && bash /start-collabora-online.sh"
-          timeout 150 bash -c 'until curl -kfsSL https://localhost:9980/hosting/discovery > /dev/null; do sleep 5; done'
-          echo "collabora ready."
+          SRC=tests/config/ci/ocis-config.json
+          DEST=tests/config/ci/ocis-config-suite.json
+          cp "$SRC" "$DEST"
+          if [[ "${{ matrix.oidc }}" == "true" ]]; then
+            jq '.openIdConnect.scope = "openid profile email offline_access"' "$DEST" > "$DEST.tmp" && mv "$DEST.tmp" "$DEST"
+          elif [[ "${{ matrix.mfa }}" == "true" ]]; then
+            jq '.openIdConnect.scope = "openid profile email acr"' "$DEST" > "$DEST.tmp" && mv "$DEST.tmp" "$DEST"
+          elif [[ "${{ matrix.federated }}" == "true" ]]; then
+            jq '.apps += ["ocm"]' "$DEST" > "$DEST.tmp" && mv "$DEST.tmp" "$DEST"
+          elif [[ "${{ matrix.collaboration }}" == "true" ]]; then
+            jq '.apps += ["external"]' "$DEST" > "$DEST.tmp" && mv "$DEST.tmp" "$DEST"
+          fi
 
-      - name: Start OnlyOffice
-        if: matrix.collaboration == true
+      # --- services ---
+      - name: Setup oCIS
+        uses: mklos-kw/ocis-github-actions/ocis-setup@main
+        with:
+          ocis-binary-artifact: ocis-binary
+          ociswrapper-artifact: ociswrapper-binary
+          ocis-url: ${{ matrix.federated == true && 'https://localhost:9200' || 'https://127.0.0.1:9200' }}
+          demo-users: ${{ matrix.demo_users || 'true' }}
+          tika: ${{ matrix.tika || 'false' }}
+          keycloak: ${{ (matrix.keycloak == true || matrix.mfa == true) && 'true' || 'false' }}
+          keycloak-realm-file: ${{ matrix.keycloak_realm_file || 'tests/config/ci/ocis-ci-realm.dist.json' }}
+          web-ui-config: tests/config/ci/ocis-config-suite.json
+          collaboration-apps: ${{ matrix.collaboration == true && 'collabora,onlyoffice' || '' }}
+          collabora-image: collabora/code:25.04.7.3.1
+          onlyoffice-image: onlyoffice/documentserver:9.2.1
+          app-registry-file: ${{ matrix.collaboration == true && 'web/dev/docker/ocis/app-registry.yaml' || '' }}
+          # GRAPH_AVAILABLE_ROLES: viewer,spaceViewer,editor,spaceEditor,fileEditor,
+          #   editorLite,manager,secureViewer,denied — full set required by e2e role tests.
+          extra-server-env: ${{ env.OCIS_EXTRA_SERVER_ENV }}
+
+      # Save primary oCIS cert before federation setup overwrites OCIS_CERT
+      - name: Save primary oCIS cert
+        if: matrix.federated == true
+        shell: bash
+        run: echo "PRIMARY_OCIS_CERT=${{ env.OCIS_CERT }}" >> "$GITHUB_ENV"
+
+      # --- OCM federation instance (ocm suite only, starts AFTER primary so binary is available) ---
+      - name: Setup federation oCIS
+        if: matrix.federated == true
+        uses: mklos-kw/ocis-github-actions/ocis-setup@main
+        with:
+          ocis-binary: ocis/bin/ocis
+          ocis-url: "https://localhost:10200"
+          ocis-config-dir: /home/runner/.ocis-federation/config
+          wrapper: "false"
+          demo-users: "true"
+          skip-test-runner-setup: "true"
+          pid-file: /tmp/ocis-federation.pid
+          log-file: /tmp/ocis-federation.log
+          debug-port-offset: "1000"
+          web-ui-config: tests/config/ci/ocis-config-suite.json
+          extra-server-env: >-
+            {"OCIS_BASE_DATA_PATH":"/home/runner/.ocis-federation",
+            "OCIS_RUNTIME_PORT":"10250",
+            "NATS_NATS_PORT":"10233",
+            "OCIS_EVENTS_ENDPOINT":"127.0.0.1:10233",
+            "MICRO_REGISTRY":"memory",
+            "OCIS_INSECURE":"true",
+            "OCIS_LDAP_URI":"ldaps://localhost:10235",
+            "STORAGE_SYSTEM_DATA_SERVER_URL":"http://localhost:10216/data",
+            "STORAGE_USERS_DATA_SERVER_URL":"http://localhost:10158/data",
+            "OCM_OCM_STORAGE_DATA_SERVER_URL":"http://localhost:10280/data",
+            "THUMBNAILS_DATA_ENDPOINT":"http://127.0.0.1:10190/thumbnails/data",
+            "OCIS_ADD_RUN_SERVICES":"ocm",
+            "OCIS_ENABLE_OCM":"true",
+            "OCM_OCM_INVITE_MANAGER_INSECURE":"true",
+            "OCM_OCM_SHARE_PROVIDER_INSECURE":"true",
+            "OCM_OCM_STORAGE_PROVIDER_INSECURE":"true",
+            "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE":"${{ github.workspace }}/tests/config/local/providers.json"}
+
+      # --- run ---
+      - name: Combine CA certs for Node.js
+        shell: bash
         run: |
-          sudo systemctl stop postgresql || true
-          docker run -d \
-            --name onlyoffice \
-            --network host \
-            -e WOPI_ENABLED=true \
-            -e USE_UNAUTHORIZED_STORAGE=true \
-            -v "${{ github.workspace }}/tests/config/ci/only-office.json:/tmp/local.json:ro" \
-            --entrypoint /bin/sh \
-            onlyoffice/documentserver:9.2.1 \
-            -c "set -e
-          cp /tmp/local.json /etc/onlyoffice/documentserver/local.json
-          openssl req -x509 -newkey rsa:4096 -keyout onlyoffice.key -out onlyoffice.crt -sha256 -days 365 -batch -nodes
-          mkdir -p /var/www/onlyoffice/Data/certs
-          cp onlyoffice.key /var/www/onlyoffice/Data/certs/
-          cp onlyoffice.crt /var/www/onlyoffice/Data/certs/
-          chmod 400 /var/www/onlyoffice/Data/certs/onlyoffice.key
-          /app/ds/run-document-server.sh"
-          timeout 150 bash -c 'until curl -kfsSL https://localhost:443/hosting/discovery > /dev/null; do sleep 5; done'
-          echo "onlyoffice ready."
-
-      - name: Run e2e-${{ matrix.suite }}
-        run: E2E_ARGS="${{ matrix.args }}" python3 tests/acceptance/run-e2e.py
+          cat "$OCIS_CERT" \
+            ${KEYCLOAK_CERT:+"$KEYCLOAK_CERT"} \
+            ${FEDERATED_CERT:+"$FEDERATED_CERT"} \
+            > /tmp/combined-ca.pem
+          echo "CA_BUNDLE=/tmp/combined-ca.pem" >> "$GITHUB_ENV"
         env:
-          TIKA_NEEDED: ${{ matrix.tika == true && 'true' || 'false' }}
-          KEYCLOAK_NEEDED: ${{ matrix.keycloak == true && 'true' || 'false' }}
-          MFA_NEEDED: ${{ matrix.mfa == true && 'true' || 'false' }}
-          OIDC_NEEDED: ${{ matrix.oidc == true && 'true' || 'false' }}
-          OIDC_IFRAME_NEEDED: ${{ matrix.oidc_iframe == true && 'true' || 'false' }}
-          COLLABORATION_NEEDED: ${{ matrix.collaboration == true && 'true' || 'false' }}
-          FEDERATED_NEEDED: ${{ matrix.federated == true && 'true' || 'false' }}
+          OCIS_CERT: ${{ env.PRIMARY_OCIS_CERT || env.OCIS_CERT }}
+          KEYCLOAK_CERT: ${{ env.KEYCLOAK_CERT }}
+          FEDERATED_CERT: ${{ matrix.federated == true && '/home/runner/.ocis-federation/proxy/server.crt' || '' }}
+      - name: Run e2e-${{ matrix.suite }}
+        run: bash run-e2e.sh ${{ matrix.args }}
+        working-directory: web/tests/e2e
+        env:
+          BASE_URL_OCIS: ${{ matrix.federated == true && 'https://localhost:9200' || 'https://127.0.0.1:9200' }}
+          HEADLESS: "true"
+          RETRY: "3"
+          SKIP_A11Y_TESTS: "true"
+          NODE_EXTRA_CA_CERTS: ${{ env.CA_BUNDLE }}
+          BROWSER: chromium
+          KEYCLOAK: ${{ (matrix.keycloak == true || matrix.mfa == true) && 'true' || 'false' }}
+          KEYCLOAK_HOST: localhost:8443
+          MFA: ${{ matrix.mfa == true && 'true' || 'false' }}
+          OIDC: ${{ matrix.oidc == true && 'true' || 'false' }}
+          COLLABORATION: ${{ matrix.collaboration == true && 'true' || 'false' }}
+          FEDERATED: ${{ matrix.federated == true && 'true' || 'false' }}
+          FEDERATED_BASE_URL_OCIS: localhost:10200
 
       - name: Upload tracing result
         if: failure()
@@ -605,23 +800,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-
-      - name: Install libvips runtime
-        run: |
-          sudo apt-get update -qq
-          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
-          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      - name: Setup oCIS
+        uses: mklos-kw/ocis-github-actions/ocis-setup@main
         with:
-          name: ocis-build-artifacts
-
-      - name: Restore binary permissions
-        run: chmod +x ocis/bin/ocis
-
+          ocis-binary-artifact: ocis-binary
+          demo-users: "true"
+          wrapper: "false"
+          skip-test-runner-setup: "true"
+          docker-accessible: "true"
+          extra-server-env: '{"OCIS_ASYNC_UPLOADS":"false"}'
       - name: Run litmus
-        run: python3 tests/acceptance/run-litmus.py
+        uses: mklos-kw/ocis-github-actions/ocis-test@main
+        with:
+          suite: litmus
 
   cs3api:
     name: cs3api
@@ -629,23 +820,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-
-      - name: Install libvips runtime
-        run: |
-          sudo apt-get update -qq
-          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
-          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      - name: Setup oCIS
+        uses: mklos-kw/ocis-github-actions/ocis-setup@main
         with:
-          name: ocis-build-artifacts
-
-      - name: Restore binary permissions
-        run: chmod +x ocis/bin/ocis
-
+          ocis-binary-artifact: ocis-binary
+          demo-users: "true"
+          wrapper: "false"
+          skip-test-runner-setup: "true"
+          extra-server-env: >-
+            {"GATEWAY_GRPC_ADDR":"0.0.0.0:9142",
+            "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD":"false"}
       - name: Run cs3api validator
-        run: python3 tests/acceptance/run-cs3api.py
+        uses: mklos-kw/ocis-github-actions/ocis-test@main
+        with:
+          suite: cs3api
 
   wopi-builtin:
     name: wopi-builtin
@@ -653,23 +841,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-
-      - name: Install libvips runtime
-        run: |
-          sudo apt-get update -qq
-          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
-          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      - name: Setup oCIS
+        uses: mklos-kw/ocis-github-actions/ocis-setup@main
         with:
-          name: ocis-build-artifacts
-
-      - name: Restore binary permissions
-        run: chmod +x ocis/bin/ocis
-
-      - name: Run WOPI validator (builtin)
-        run: python3 tests/acceptance/run-wopi.py --type builtin
+          ocis-binary-artifact: ocis-binary
+          wrapper: "false"
+          skip-test-runner-setup: "true"
+          collaboration-apps: "fakeoffice"
+      - name: Run WOPI validator
+        uses: mklos-kw/ocis-github-actions/ocis-test@main
+        with:
+          suite: wopi-builtin
 
   wopi-cs3:
     name: wopi-cs3
@@ -677,26 +859,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-
-      - name: Install libvips runtime
-        run: |
-          sudo apt-get update -qq
-          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
-          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      - name: Setup oCIS
+        uses: mklos-kw/ocis-github-actions/ocis-setup@main
         with:
-          name: ocis-build-artifacts
-
-      - name: Restore binary permissions
-        run: chmod +x ocis/bin/ocis
-
-      - name: Run WOPI validator (cs3)
-        run: python3 tests/acceptance/run-wopi.py --type cs3
+          ocis-binary-artifact: ocis-binary
+          wrapper: "false"
+          skip-test-runner-setup: "true"
+          collaboration-apps: "cs3-wopi"
+          extra-server-env: |
+            {
+              "APP_PROVIDER_DRIVER": "wopi",
+              "APP_PROVIDER_WOPI_APP_NAME": "FakeOffice",
+              "APP_PROVIDER_WOPI_APP_URL": "http://localhost:8080",
+              "APP_PROVIDER_WOPI_INSECURE": "true",
+              "APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL": "http://localhost:9300",
+              "APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL": "https://localhost:9200"
+            }
+      - name: Run WOPI validator
+        uses: mklos-kw/ocis-github-actions/ocis-test@main
+        with:
+          suite: wopi-cs3
 
   all-acceptance-tests:
-    needs: [detect-changes, local-api-tests, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests]
+    # Not yet gating (run but don't block merge): api-tests-email, api-tests-tika,
+    # api-tests-auth-app, core-api-tests, e2e-tests
+    needs: [detect-changes, unit-tests, api-tests-plain, api-tests-antivirus, api-tests-ocm, api-tests-wopi, api-tests-vault, cli-tests, litmus, cs3api, wopi-builtin, wopi-cs3]
     runs-on: ubuntu-latest
     if: always()
     steps:

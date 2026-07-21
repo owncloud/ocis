@@ -1,0 +1,103 @@
+name: apiVault iteration
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/ocisdev-821-5
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: "10.28.1"
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: "24"
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.33.3 --activate
+      - name: Install libvips-dev
+        run: sudo apt-get update -qq && sudo NEEDRESTART_MODE=a apt-get install -y libvips-dev
+      - name: Generate frontend assets
+        run: make ci-node-generate
+      - name: Build ocis and ociswrapper
+        run: |
+          ENABLE_VIPS=true make -C ocis build &
+          GOWORK=off make -C tests/ociswrapper build &
+          wait
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ocis-binary
+          path: ocis/bin/ocis
+          retention-days: 1
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ociswrapper-binary
+          path: tests/ociswrapper/bin/ociswrapper
+          retention-days: 1
+          if-no-files-found: error
+
+  api-tests-vault:
+    name: apiVault
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+      - name: Setup oCIS
+        uses: mklos-kw/ocis-github-actions/ocis-setup@main
+        with:
+          ocis-binary-artifact: ocis-binary
+          ociswrapper-artifact: ociswrapper-binary
+          keycloak: "true"
+          keycloak-realm-file: tests/config/ci/ocis-mfa-ci-realm.dist.json
+          web-ui-config: tests/config/ci/ocis-config-vault.json
+          extra-server-env: |
+            {
+              "OCIS_ENABLE_VAULT_MODE": "true",
+              "FRONTEND_ENABLE_VAULT_MODE": "true",
+              "OCIS_MFA_ENABLED": "true",
+              "WEB_OIDC_SCOPE": "openid profile email acr"
+            }
+      - name: Cache Playwright browsers
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ hashFiles('web/pnpm-lock.yaml') }}
+      - name: Install Playwright and browsers
+        run: |
+          vendor-php/bin/playwright-install
+          vendor-php/bin/playwright-install --browsers
+      - name: Start vault storage-users
+        run: |
+          OCIS_JWT_SECRET=some-ocis-jwt-secret \
+          STORAGE_USERS_ENABLE_VAULT_MODE=true \
+          STORAGE_USERS_SERVICE_NAME=storage-users-vault \
+          STORAGE_USERS_GRPC_ADDR=localhost:19285 \
+          STORAGE_USERS_HTTP_ADDR=localhost:19286 \
+          STORAGE_USERS_DATA_SERVER_URL=http://localhost:19286/data \
+          STORAGE_USERS_DEBUG_ADDR=localhost:19287 \
+          STORAGE_USERS_OCIS_ROOT="${HOME}/ocis/storage/users-vault" \
+          STORAGE_USERS_EVENTS_CONSUMER_GROUP=vault-dcfs \
+          ocis storage-users server &>/tmp/vault-storage-users.log &
+          timeout 30 bash -c 'until curl -sf http://localhost:19287/healthz; do sleep 1; done' \
+            || (cat /tmp/vault-storage-users.log && exit 1)
+      - name: Test apiVault
+        uses: mklos-kw/ocis-github-actions/ocis-test@main
+        with:
+          suite: apiVault
+        env:
+          KEYCLOAK: "true"
+          KC_URL: "https://localhost:8443"
