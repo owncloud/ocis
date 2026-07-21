@@ -212,6 +212,78 @@ var _ = Describe("Discovery", func() {
 			Entry("Collabora no chat lang", "Collabora", "/path/to/file.DOCX", "de", true, "https://test.server.prv/hosting/wopi/word/view?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&dchat=1&lang=de-DE"),
 			Entry("OnlyOffice no chat lang", "OnlyOffice", "/path/to/file.DOCX", "de", true, "https://test.server.prv/hosting/wopi/word/edit?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&dchat=1&ui=de-DE"),
 		)
+		DescribeTable(
+			"selects the discovery action for each view mode",
+			func(appName, path string, viewMode appproviderv1beta1.ViewMode, expectedAppURLPrefix string) {
+				ctx := context.Background()
+				nowTime := time.Now()
+
+				cfg.Wopi.WopiSrc = "https://wopiserver.test.prv"
+				cfg.Wopi.Secret = "topsecret"
+				cfg.App.Name = appName
+				cfg.App.Product = appName
+
+				myself := &userv1beta1.User{
+					Id: &userv1beta1.UserId{
+						Idp:      "myIdp",
+						OpaqueId: "opaque001",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Username: "username",
+				}
+
+				req := &appproviderv1beta1.OpenInAppRequest{
+					ResourceInfo: &providerv1beta1.ResourceInfo{
+						Id: &providerv1beta1.ResourceId{
+							StorageId: "myStorage",
+							OpaqueId:  "storageOpaque001",
+							SpaceId:   "SpaceA",
+						},
+						Path: path,
+					},
+					ViewMode:    viewMode,
+					AccessToken: MintToken(myself, cfg.Wopi.Secret, nowTime),
+				}
+
+				gatewayClient.On("WhoAmI", mock.Anything, mock.Anything).Times(1).Return(&gatewayv1beta1.WhoAmIResponse{
+					Status: status.NewOK(ctx),
+					User:   myself,
+				}, nil)
+
+				resp, err := srv.OpenInApp(ctx, req)
+				Expect(err).To(Succeed())
+				Expect(resp.GetStatus().GetCode()).To(Equal(rpcv1beta1.Code_CODE_OK))
+				Expect(resp.GetAppUrl().GetAppUrl()).To(HavePrefix(expectedAppURLPrefix))
+			},
+			Entry(
+				"uses edit for read-only OnlyOffice sessions",
+				"OnlyOffice",
+				"/path/to/file.docx",
+				appproviderv1beta1.ViewMode_VIEW_MODE_READ_ONLY,
+				"https://test.server.prv/hosting/wopi/word/edit?",
+			),
+			Entry(
+				"keeps view-only OnlyOffice sessions on view",
+				"OnlyOffice",
+				"/path/to/file.docx",
+				appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY,
+				"https://test.server.prv/hosting/wopi/word/view?",
+			),
+			Entry(
+				"keeps read-only sessions for other products on view",
+				"Microsoft",
+				"/path/to/file.docx",
+				appproviderv1beta1.ViewMode_VIEW_MODE_READ_ONLY,
+				"https://test.server.prv/hosting/wopi/word/view?",
+			),
+			Entry(
+				"falls back to view when OnlyOffice has no edit action",
+				"OnlyOffice",
+				"/path/to/file.xls",
+				appproviderv1beta1.ViewMode_VIEW_MODE_READ_ONLY,
+				"https://test.server.prv/hosting/wopi/cell/view?",
+			),
+		)
 		It("Success with Wopi Proxy", func() {
 			ctx := context.Background()
 			nowTime := time.Now()
