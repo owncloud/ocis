@@ -53,8 +53,7 @@ export const useSpaceActionsDisable = () => {
               '%{spaceCount} space was disabled successfully',
               '%{spaceCount} spaces were disabled successfully',
               succeeded.length,
-              { spaceCount: succeeded.length.toString() },
-              true
+              { spaceCount: succeeded.length.toString() }
             )
       showMessage({ title })
     }
@@ -70,8 +69,7 @@ export const useSpaceActionsDisable = () => {
               'Failed to disable %{spaceCount} space',
               'Failed to disable %{spaceCount} spaces',
               failed.length,
-              { spaceCount: failed.length.toString() },
-              true
+              { spaceCount: failed.length.toString() }
             )
       showErrorMessage({
         title,

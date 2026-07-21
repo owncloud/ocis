@@ -375,7 +375,7 @@ const getMemberCount = (space: SpaceResource) => {
 }
 
 const getSelectSpaceLabel = (space: SpaceResource) => {
-  return $gettext('Select %{ space }', { space: space.name }, true)
+  return $gettext('Select %{ space }', { space: space.name })
 }
 
 onMounted(() => {

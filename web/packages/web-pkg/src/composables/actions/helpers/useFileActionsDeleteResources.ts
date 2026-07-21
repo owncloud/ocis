@@ -71,21 +71,13 @@ export const useFileActionsDeleteResources = () => {
 
     if (currentResources.length === 1) {
       if (isFolder) {
-        title = $gettext(
-          'Permanently delete folder "%{name}"',
-          {
-            name: currentResources[0].name
-          },
-          true
-        )
+        title = $gettext('Permanently delete folder "%{name}"', {
+          name: currentResources[0].name
+        })
       } else {
-        title = $gettext(
-          'Permanently delete file "%{name}"',
-          {
-            name: currentResources[0].name
-          },
-          true
-        )
+        title = $gettext('Permanently delete file "%{name}"', {
+          name: currentResources[0].name
+        })
       }
       return title
     }
@@ -94,8 +86,7 @@ export const useFileActionsDeleteResources = () => {
       'Permanently delete selected resource?',
       'Permanently delete %{amount} selected resources?',
       currentResources.length,
-      { amount: currentResources.length.toString() },
-      false
+      { amount: currentResources.length.toString() }
     )
   })
 
@@ -133,8 +124,7 @@ export const useFileActionsDeleteResources = () => {
                   '%{itemCount} item was deleted successfully',
                   '%{itemCount} items were deleted successfully',
                   successful.length,
-                  { itemCount: successful.length.toString() },
-                  true
+                  { itemCount: successful.length.toString() }
                 )
 
           messageStore.showMessage({ title })
@@ -298,8 +288,7 @@ export const useFileActionsDeleteResources = () => {
                       '%{itemCount} item was moved to trash bin',
                       '%{itemCount} items were moved to trash bin',
                       successful.length,
-                      { itemCount: successful.length.toString() },
-                      true
+                      { itemCount: successful.length.toString() }
                     )
 
               messageStore.showMessage({ title })

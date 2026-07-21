@@ -44,8 +44,7 @@ export const useUserActionsDelete = () => {
               '%{userCount} user was deleted successfully',
               '%{userCount} users were deleted successfully',
               succeeded.length,
-              { userCount: succeeded.length.toString() },
-              true
+              { userCount: succeeded.length.toString() }
             )
       showMessage({ title })
     }
@@ -61,8 +60,7 @@ export const useUserActionsDelete = () => {
               'Failed to delete %{userCount} user',
               'Failed to delete %{userCount} users',
               failed.length,
-              { userCount: failed.length.toString() },
-              true
+              { userCount: failed.length.toString() }
             )
       showErrorMessage({
         title,

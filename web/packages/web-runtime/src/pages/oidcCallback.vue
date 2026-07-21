@@ -2,12 +2,12 @@
   <div class="oc-login-card oc-position-center">
     <img class="oc-login-logo" :src="logoImg" alt="" :aria-hidden="true" />
     <div v-show="error" class="oc-login-card-body">
-      <h2 v-translate class="oc-login-card-title">Authentication failed</h2>
-      <p v-translate>Please contact the administrator if this error persists.</p>
+      <h2 class="oc-login-card-title">{{ $gettext('Authentication failed') }}</h2>
+      <p>{{ $gettext('Please contact the administrator if this error persists.') }}</p>
     </div>
     <div v-show="!error" class="oc-login-card-body">
-      <h3 v-translate class="oc-login-card-title">Logging you in</h3>
-      <p v-translate>Please wait, you are being redirected.</p>
+      <h3 class="oc-login-card-title">{{ $gettext('Logging you in') }}</h3>
+      <p>{{ $gettext('Please wait, you are being redirected.') }}</p>
     </div>
     <div class="oc-login-card-footer oc-pt-rm">
       <p>{{ footerSlogan }}</p>

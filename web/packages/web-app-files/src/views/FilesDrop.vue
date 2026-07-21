@@ -186,8 +186,7 @@ const title = computed(() => {
   return $pgettext(
     'A message explaining who shared a folder with secret file upload role to the receiving user',
     '%{owner} shared this folder with you for uploading',
-    { owner: unref(share).publicLinkShareOwnerDisplayName },
-    true
+    { owner: unref(share).publicLinkShareOwnerDisplayName }
   )
 })
 
@@ -199,8 +198,7 @@ const existingContentNote = computed(() => {
   return $pgettext(
     'A note explaining that existing content in secure file drop share is not revealed to anyone else than the owner of the share.',
     'Everyone who has read permission to any parent folder can see the content.',
-    { owner: unref(share).publicLinkShareOwnerDisplayName },
-    true
+    { owner: unref(share).publicLinkShareOwnerDisplayName }
   )
 })
 

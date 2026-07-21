@@ -61,8 +61,7 @@ export const useSpaceActionsRestore = () => {
               '%{spaceCount} space was enabled successfully',
               '%{spaceCount} spaces were enabled successfully',
               succeeded.length,
-              { spaceCount: succeeded.length.toString() },
-              true
+              { spaceCount: succeeded.length.toString() }
             )
       showMessage({ title })
     }
@@ -78,8 +77,7 @@ export const useSpaceActionsRestore = () => {
               'Failed to enable %{spaceCount} space',
               'Failed to enable %{spaceCount} spaces',
               failed.length,
-              { spaceCount: failed.length.toString() },
-              true
+              { spaceCount: failed.length.toString() }
             )
       showErrorMessage({
         title,

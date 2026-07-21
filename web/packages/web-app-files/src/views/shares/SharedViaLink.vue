@@ -15,7 +15,7 @@
           icon="link"
         >
           <template #message>
-            <span v-translate>You have not shared any resource via link.</span>
+            <span>{{ $gettext('You have not shared any resource via link.') }}</span>
           </template>
         </no-content-message>
         <resource-table

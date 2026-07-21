@@ -9,6 +9,6 @@
     variation="primary"
   >
     <oc-icon name="add" />
-    <span v-translate>New project</span>
+    <span>{{ $gettext('New project') }}</span>
   </oc-button>
 </template>

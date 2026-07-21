@@ -2,7 +2,7 @@
   <div id="oc-files-sharing-sidebar" class="oc-position-relative">
     <div class="oc-flex oc-flex-between oc-flex-middle">
       <div class="oc-flex">
-        <h4 v-translate class="oc-text-bold oc-text-medium oc-m-rm">Share with people</h4>
+        <h4 class="oc-text-bold oc-text-medium oc-m-rm">{{ $gettext('Share with people') }}</h4>
         <oc-contextual-helper
           v-if="helpersEnabled"
           class="oc-pl-xs"

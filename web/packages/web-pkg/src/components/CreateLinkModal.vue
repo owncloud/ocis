@@ -269,14 +269,10 @@ const onConfirm = async (options: { copyPassword?: boolean } = {}) => {
 
       if (result.length === 1) {
         clipboardText = options.copyPassword
-          ? $gettext(
-              '%{link} Password:%{password}',
-              {
-                link: succeeded[0].value.webUrl,
-                password: password.value
-              },
-              true
-            )
+          ? $gettext('%{link} Password:%{password}', {
+              link: succeeded[0].value.webUrl,
+              password: password.value
+            })
           : succeeded[0].value.webUrl
 
         successMessage = $gettext('The link has been copied to your clipboard.')

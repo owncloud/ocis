@@ -37,7 +37,7 @@
             icon="layout-grid"
           >
             <template #message>
-              <span v-translate>No spaces in here</span>
+              <span>{{ $gettext('No spaces in here') }}</span>
             </template>
           </no-content-message>
           <div v-else>

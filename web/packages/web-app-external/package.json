@@ -18,7 +18,7 @@
     "qs": "^6.14.2",
     "uuid": "14.0.0",
     "vue-concurrency": "5.0.3",
-    "vue3-gettext": "2.4.0",
+    "vue3-gettext": "^4.0.1",
     "vue-router": "5.0.6",
     "zod": "4.3.6"
   }
