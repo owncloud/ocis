@@ -646,9 +646,15 @@ trait Provisioning {
 			$user["password"],
 		);
 		$localStorageItems = $state['origins'][0]['localStorage'];
-		$tokenItem = current(array_filter($localStorageItems, fn($item) => str_starts_with($item['name'], 'oc_oAuth.user:')));
+		$tokenItem = current(
+			array_filter(
+				$localStorageItems,
+				fn ($item) => str_starts_with($item['name'], 'oc_oAuth.user:'),
+			),
+		);
 		if ($tokenItem === false) {
-			throw new \Exception("OIDC token not found in localStorage; items: " . implode(', ', array_column($localStorageItems, 'name')));
+			$itemNames = implode(', ', array_column($localStorageItems, 'name'));
+			throw new \Exception("OIDC token not found in localStorage; items: " . $itemNames);
 		}
 		$stateData = \json_decode($tokenItem['value']);
 		$this->setOcisUserToken($user, $stateData);

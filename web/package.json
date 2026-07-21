@@ -113,7 +113,10 @@
       "js-cookie": "3.0.7",
       "linkify-it": "5.0.1",
       "minimatch@>=9.0.0 <9.0.7": "9.0.7",
-      "ws": "8.21.0"
+      "ws": "8.21.0",
+      "brace-expansion@>=1.0.0 <1.1.16": "1.1.16",
+      "brace-expansion@>=2.0.0 <2.1.2": "2.1.2",
+      "js-yaml@>=4.0.0 <4.3.0": "4.3.0"
     },
     "patchedDependencies": {
       "caf@15.0.1": "patches/caf@15.0.1.patch",
