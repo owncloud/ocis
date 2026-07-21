@@ -363,11 +363,10 @@ func TestCreateEducationSchoolSynthesizesWhenNotServerUUID(t *testing.T) {
 	l.On("Add", mock.Anything).Run(func(args mock.Arguments) {
 		written = args.Get(0).(*ldap.AddRequest)
 	}).Return(nil)
-	// The duplicate-schoolNumber lookup before Add returns "not found" so create proceeds.
-	// No base-scoped read-back on the created DN must follow the Add.
-	createdDN := "ou=Test School,"
+	// The duplicate-schoolNumber lookup before Add is a subtree search that returns
+	// "not found" so create proceeds. No base-scoped read-back must follow the Add.
 	l.On("Search", mock.MatchedBy(func(sr *ldap.SearchRequest) bool {
-		return sr.BaseDN != createdDN
+		return sr.Scope == ldap.ScopeWholeSubtree
 	})).Return(&ldap.SearchResult{Entries: []*ldap.Entry{}}, nil)
 
 	b, err := getMockedBackend(l, c, &logger)
@@ -384,7 +383,7 @@ func TestCreateEducationSchoolSynthesizesWhenNotServerUUID(t *testing.T) {
 	assert.NotEmpty(t, resSchool.GetId())
 	// no base-scoped read-back on the created school DN
 	l.AssertNotCalled(t, "Search", mock.MatchedBy(func(sr *ldap.SearchRequest) bool {
-		return sr.BaseDN == createdDN
+		return sr.Scope == ldap.ScopeBaseObject
 	}))
 
 	readBackModel := b.createSchoolModelFromLDAP(ldap.NewEntry(written.DN, attrsFromAddRequest(written)))
