@@ -160,10 +160,18 @@ func (i *LDAP) CreateEducationSchool(ctx context.Context, school libregraph.Educ
 		return nil, err
 	}
 
-	// Read	back school from LDAP to get the generated UUID
-	e, err := i.getSchoolByDN(ar.DN)
-	if err != nil {
-		return nil, err
+	var e *ldap.Entry
+	if i.useServerUUID {
+		// The directory assigns the ID and conn.Add cannot return it, so we must
+		// read the entry back to recover the generated UUID.
+		e, err = i.getSchoolByDN(ar.DN)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// oCIS generated the ID and wrote it into the AddRequest, so synthesize the
+		// entry from data already in hand instead of reading it back.
+		e = ldap.NewEntry(ar.DN, attrsFromAddRequest(ar))
 	}
 	return i.createSchoolModelFromLDAP(e), nil
 }
@@ -240,7 +248,9 @@ func (i *LDAP) updateDisplayName(ctx context.Context, dn string, providedDisplay
 
 // updateSchoolProperties updates the properties (other that displayName) of a school.
 // It checks if a school number is already taken, before updating the school number
-func (i *LDAP) updateSchoolProperties(ctx context.Context, dn string, currentSchool, updatedSchool libregraph.EducationSchool) error {
+// updateSchoolProperties applies the ModifyRequest and returns it so the caller can
+// fold the applied changes onto the pre-read entry (avoiding a read-after-write).
+func (i *LDAP) updateSchoolProperties(ctx context.Context, dn string, currentSchool, updatedSchool libregraph.EducationSchool) (*ldap.ModifyRequest, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 
 	mr := ldap.NewModifyRequest(dn, nil)
@@ -248,7 +258,7 @@ func (i *LDAP) updateSchoolProperties(ctx context.Context, dn string, currentSch
 		if *updatedSchoolNumber != "" && currentSchool.GetSchoolNumber() != *updatedSchoolNumber {
 			_, err := i.getSchoolByNumber(*updatedSchoolNumber)
 			if err == nil {
-				return errSchoolNumberExists
+				return nil, errSchoolNumberExists
 			}
 			mr.Replace(i.educationConfig.schoolAttributeMap.schoolNumber, []string{*updatedSchoolNumber})
 		}
@@ -267,10 +277,10 @@ func (i *LDAP) updateSchoolProperties(ctx context.Context, dn string, currentSch
 
 	if err := i.conn.Modify(mr); err != nil {
 		logger.Debug().Err(err).Msg("error updating school number")
-		return err
+		return nil, err
 	}
 
-	return nil
+	return mr, nil
 }
 
 // UpdateEducationSchool updates the supplied school in the identity backend
@@ -287,6 +297,11 @@ func (i *LDAP) UpdateEducationSchool(ctx context.Context, numberOrID string, sch
 	}
 
 	currentSchool := i.createSchoolModelFromLDAP(e)
+	// Fold the applied changes onto the pre-read entry instead of reading it back.
+	// updateDisplayName mutates the RDN via ModifyDN; the model builder reads displayName
+	// from the attribute, so we model the rename as a displayName attribute replace.
+	// updateSchoolProperties returns the ModifyRequest it applied so we can fold it on.
+	fold := ldap.NewModifyRequest(e.DN, nil)
 	switch i.updateEducationSchoolOperation(school, *currentSchool) {
 	case tooManyValues:
 		return nil, fmt.Errorf("school name and school number cannot be updated in the same request")
@@ -297,17 +312,16 @@ func (i *LDAP) UpdateEducationSchool(ctx context.Context, numberOrID string, sch
 		if err := i.updateDisplayName(ctx, e.DN, school.GetDisplayName()); err != nil {
 			return nil, err
 		}
+		fold.Replace(i.educationConfig.schoolAttributeMap.displayName, []string{school.GetDisplayName()})
 	case schoolPropertiesUpdated:
-		if err := i.updateSchoolProperties(ctx, e.DN, *currentSchool, school); err != nil {
+		mr, err := i.updateSchoolProperties(ctx, e.DN, *currentSchool, school)
+		if err != nil {
 			return nil, err
 		}
+		fold.Changes = mr.Changes
 	}
 
-	// Read	back school from LDAP
-	e, err = i.getSchoolByNumberOrID(i.getID(e))
-	if err != nil {
-		return nil, err
-	}
+	e = applyModifyToEntry(e, fold)
 	return i.createSchoolModelFromLDAP(e), nil
 }
 
