@@ -5,4 +5,4 @@ the active collaborative session and see changes before the editor closes the
 document. CheckFileInfo continues to advertise that these users cannot write.
 
 https://github.com/owncloud/ocis/issues/12605
-https://github.com/owncloud/ocis/pull/12617
+https://github.com/owncloud/ocis/pull/12619
