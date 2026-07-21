@@ -147,6 +147,15 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 	if config.GroupNameAttribute == "" || config.GroupIDAttribute == "" {
 		return nil, errors.New("invalid group attribute mappings")
 	}
+
+	// Octet-string ID attributes (e.g. Active Directory's objectGUID) are assigned by
+	// the directory server, which requires UseServerUUID=true. With UseServerUUID=false
+	// oCIS generates the ID and writes it as a string UUID, so an octet-string ID
+	// attribute would be decoded from raw string bytes and produce a corrupt ID. Reject
+	// this incompatible combination at startup instead of silently returning bad IDs.
+	if !config.UseServerUUID && (config.UserIDIsOctetString || config.GroupIDIsOctetString) {
+		return nil, errors.New("invalid config: octet-string ID attributes require GRAPH_LDAP_SERVER_UUID=true")
+	}
 	gam := groupAttributeMap{
 		name:        config.GroupNameAttribute,
 		id:          config.GroupIDAttribute,
