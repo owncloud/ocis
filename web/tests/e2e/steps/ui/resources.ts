@@ -1213,9 +1213,7 @@ export async function userDuplicatesResources({
 }: {
   stepUser: string
   method:
-    | typeof fileAction.sideBarPanel
-    | typeof fileAction.dropDownMenu
-    | typeof fileAction.batchAction
+    typeof fileAction.sideBarPanel | typeof fileAction.dropDownMenu | typeof fileAction.batchAction
   resources: string[]
 }): Promise<void> {
   const world = getWorld()

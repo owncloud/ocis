@@ -129,9 +129,7 @@ export async function userShouldBeInFileViewer({
 }: {
   stepUser: string
   fileViewerType:
-    | typeof application.mediaViewer
-    | typeof application.pdfViewer
-    | typeof application.textEditor
+    typeof application.mediaViewer | typeof application.pdfViewer | typeof application.textEditor
 }): Promise<void> {
   const world = getWorld()
   const { page } = world.actorsEnvironment.getActor({ key: stepUser })
