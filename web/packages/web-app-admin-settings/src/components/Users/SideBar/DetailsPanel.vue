@@ -2,7 +2,7 @@
   <div class="oc-mt-xl">
     <div v-if="noUsers" class="oc-flex user-info oc-text-center">
       <oc-icon name="user" size="xxlarge" />
-      <p v-translate data-testid="no-user-selected">Select a user to view details</p>
+      <p data-testid="no-user-selected">{{ $gettext('Select a user to view details') }}</p>
     </div>
     <div v-if="multipleUsers" class="oc-flex group-info">
       <oc-icon name="group" size="xxlarge" />

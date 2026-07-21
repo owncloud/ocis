@@ -138,11 +138,9 @@ const isMacOs = computed(() => {
 })
 
 const openInNewTabHint = computed(() => {
-  return $gettext(
-    'Hold %{key} and click to open in new tab',
-    { key: unref(isMacOs) ? '⌘' : $gettext('ctrl') },
-    true
-  )
+  return $gettext('Hold %{key} and click to open in new tab', {
+    key: unref(isMacOs) ? '⌘' : $gettext('ctrl')
+  })
 })
 
 const hasExternalImageIcon = computed(() => {

@@ -44,7 +44,7 @@
     "vue-concurrency": "5.0.3",
     "vue-router": "5.0.6",
     "vue": "3.5.29",
-    "vue3-gettext": "2.4.0",
+    "vue3-gettext": "^4.0.1",
     "webdav": "5.9.0",
     "xml-js": "^1.6.11",
     "zod": "4.3.6"

@@ -91,7 +91,7 @@
     "vue": "3.5.29",
     "vue-demi": "0.14.10",
     "vue-tsc": "3.1.4",
-    "vue3-gettext": "2.4.0"
+    "vue3-gettext": "^4.0.1"
   },
   "engines": {
     "node": ">=24.15.0"
@@ -117,7 +117,6 @@
     },
     "patchedDependencies": {
       "caf@15.0.1": "patches/caf@15.0.1.patch",
-      "vue3-gettext@2.4.0": "patches/vue3-gettext@2.4.0.patch",
       "portal-vue@3.0.0": "patches/portal-vue@3.0.0.patch",
       "vue-select@4.0.0-beta.6": "patches/vue-select@4.0.0-beta.6.patch"
     }

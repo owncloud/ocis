@@ -159,15 +159,12 @@ export const useFileActionsRestore = () => {
       }
 
       if (failed.length) {
-        let translated: string
-        const translateParams: Record<string, string> = {}
-        if (failed.length === 1) {
-          translateParams.resource = failed[0].resource.name
-          translated = $gettext('Failed to restore "%{resource}"', translateParams, true)
-        } else {
-          translateParams.resourceCount = failed.length.toString()
-          translated = $gettext('Failed to restore %{resourceCount} files', translateParams, true)
-        }
+        const translated =
+          failed.length === 1
+            ? $gettext('Failed to restore "%{resource}"', { resource: failed[0].resource.name })
+            : $gettext('Failed to restore %{resourceCount} files', {
+                resourceCount: failed.length.toString()
+              })
         showErrorMessage({ title: translated, errors: failed.map(({ error }) => error) })
       }
     })
