@@ -255,4 +255,49 @@ class EmailContext implements Context {
 		);
 		$this->assertEmailContains($user, $expectedEmailBodyContent);
 	}
+
+	/**
+	 * @Then user :user should have received an email from user :sender that does not contain
+	 *
+	 * @param string $user
+	 * @param string $sender
+	 * @param PyStringNode $content
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userShouldHaveReceivedEmailFromUserNotContaining(
+		string $user,
+		string $sender,
+		PyStringNode $content,
+	): void {
+		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
+		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
+			$rawExpectedEmailBodyContent,
+			$sender,
+		);
+		$this->assertEmailNotContains($user, $expectedEmailBodyContent);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $unexpectedEmailBodyContent
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function assertEmailNotContains(
+		string $user,
+		string $unexpectedEmailBodyContent,
+	): void {
+		$address = $this->featureContext->getEmailAddressForUser($user);
+		$actualEmailBodyContent = $this->getBodyOfLastEmail($address);
+		Assert::assertStringNotContainsString(
+			$unexpectedEmailBodyContent,
+			$actualEmailBodyContent,
+			"The email address '$address' should NOT have received an"
+			. "email with the body containing $unexpectedEmailBodyContent
+			but the received email is $actualEmailBodyContent",
+		);
+	}
 }
