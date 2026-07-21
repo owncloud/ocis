@@ -189,9 +189,9 @@ func (s *Service) getAppUrlFor(action, fileExt string) string {
 
 // getAppUrl will get the appURL that should be used based on the extension
 // and the provided view mode.
-// "view" urls will be chosen first, then if the view mode is "read/write",
-// "edit" urls will be prioritized. Note that "view" url might be returned for
-// "read/write" view mode if no "edit" url is found.
+// "view" urls will be chosen first, then "edit" urls will be prioritized for
+// read/write sessions and read-only OnlyOffice sessions. Note that "view" url
+// might be returned if no "edit" url is found.
 func (s *Service) getAppUrl(fileExt string, viewMode appproviderv1beta1.ViewMode) string {
 	// prioritize view action if possible
 	appURL := s.getAppUrlFor("view", fileExt)
@@ -210,8 +210,13 @@ func (s *Service) getAppUrl(fileExt string, viewMode appproviderv1beta1.ViewMode
 		}
 	} else {
 		// If not collabora, there might be an edit action for the extension.
-		// If read/write mode has been requested, prioritize edit action.
-		if viewMode == appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE {
+		// If read/write mode has been requested, prioritize edit action. For
+		// OnlyOffice, read-only sessions also use the edit action to join the
+		// active collaborative session; CheckFileInfo advertises UserCanWrite=false.
+		isReadWrite := viewMode == appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE
+		isOnlyOfficeReadOnly := strings.EqualFold(s.config.App.Product, "onlyoffice") &&
+			viewMode == appproviderv1beta1.ViewMode_VIEW_MODE_READ_ONLY
+		if isReadWrite || isOnlyOfficeReadOnly {
 			if editAppURL := s.getAppUrlFor("edit", fileExt); editAppURL != "" {
 				appURL = editAppURL
 			}
