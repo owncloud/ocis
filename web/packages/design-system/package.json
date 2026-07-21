@@ -104,7 +104,7 @@
     "webfontloader": "^1.6.28"
   },
   "devDependencies": {
-    "@babel/core": "7.28.5",
+    "@babel/core": "7.29.6",
     "@babel/plugin-transform-runtime": "7.28.5",
     "@babel/preset-env": "7.28.5",
     "@babel/runtime": "7.28.4",
