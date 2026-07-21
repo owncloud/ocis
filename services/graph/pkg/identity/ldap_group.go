@@ -470,7 +470,7 @@ func (i *LDAP) groupToLDAPAttrValues(group libregraph.Group) (map[string][]strin
 	attrs["objectClass"] = append(attrs["objectClass"], i.groupAdditionalObjectClasses...)
 
 	if !i.useServerUUID {
-		attrs["owncloudUUID"] = []string{uuid.Must(uuid.NewV4()).String()}
+		attrs[i.groupAttributeMap.id] = []string{uuid.Must(uuid.NewV4()).String()}
 		attrs["objectClass"] = append(attrs["objectClass"], "owncloud")
 	}
 
@@ -498,7 +498,7 @@ func (i *LDAP) getLDAPGroupByNameOrID(nameOrID string, requestMembers bool) (*ld
 	if err == nil {
 		filter = fmt.Sprintf("(|(%s=%s)(%s=%s))", i.groupAttributeMap.name, ldap.EscapeFilter(nameOrID), i.groupAttributeMap.id, idString)
 	} else {
-		filter = fmt.Sprintf("(%s=%s)", i.userAttributeMap.userName, ldap.EscapeFilter(nameOrID))
+		filter = fmt.Sprintf("(%s=%s)", i.groupAttributeMap.name, ldap.EscapeFilter(nameOrID))
 	}
 	return i.getLDAPGroupByFilter(filter, requestMembers)
 }
