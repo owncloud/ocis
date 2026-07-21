@@ -53,3 +53,35 @@ Feature: reset user password via CLI command
     But the command output should not contain "Failed to update user password: entry does not exist"
     And the administrator starts the server
     And user "superUser" using password "newpass" should be able to create a new user "Brian" with default attributes
+
+
+  Scenario: try to reset password of regular user using service user type
+    Given the user "Admin" has created a new user with the following attributes:
+      | userName    | Alice        |
+      | displayName | Alice Hansen |
+      | password    | %alt1%       |
+    And the administrator has stopped the server
+    When the administrator resets the password of existing user "Alice" to "newpass" with user type "service" using the CLI
+    Then the command should be successful
+    But the command output should contain "Failed to update user password: entry does not exist"
+    And the administrator has started the server
+    And user "Alice" should be able to create folder "newFolder" using password "%alt1%"
+    But user "Alice" should not be able to create folder "anotherFolder" using password "newpass"
+
+
+  Scenario: reset password of service user
+    Given the original password for service user "reva" has been stored
+    And the administrator has stopped the server
+    When the administrator resets the password of existing user "reva" to "newpass" with user type "service" using the CLI
+    Then the command should be successful
+    And the command output should contain "Password for user 'uid=reva,ou=sysusers,o=libregraph-idm' updated."
+    But the command output should not contain "Failed to update user password"
+    # Reconfigure updates bind credentials and restarts oCIS via ociswrapper.
+    # Successful 200 here verifies restart with the new password works.
+    And the administrator configures service bind credentials to "newpass"
+    # resetpassword requires IDM DB to be offline, so stop again before cleanup reset.
+    And the administrator has stopped the server
+    And the administrator resets the password of service user "reva" to the stored original password using the CLI
+    And the command should be successful
+    # Restore original bind credentials so following scenarios and @env-config rollback remain stable.
+    And the administrator configures service bind credentials to the stored original password
