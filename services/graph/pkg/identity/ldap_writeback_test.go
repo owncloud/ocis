@@ -248,8 +248,8 @@ func TestSynthesizedEntryPopulatesInstancesWithoutSearch(t *testing.T) {
 func TestCreateGroupSynthesizesWhenNotServerUUID(t *testing.T) {
 	logger := log.NewLogger(log.Level("debug"))
 
-	// oCIS writes the group id to "owncloudUUID" (ldap_group.go), which is the default
-	// GroupIDAttribute, so the synthesized entry must carry the id under that attribute.
+	// oCIS writes the generated group id under the configured GroupIDAttribute, so the
+	// synthesized entry must carry the id under that attribute for the model builder.
 	c := lconfig
 	c.UseServerUUID = false
 	c.GroupIDAttribute = "owncloudUUID"
@@ -541,4 +541,114 @@ func TestUpdateEducationClassFoldPreservesClassificationAndExternalID(t *testing
 	l.AssertNotCalled(t, "Search", mock.MatchedBy(func(sr *ldap.SearchRequest) bool {
 		return sr.Scope == ldap.ScopeBaseObject
 	}))
+}
+
+// TestCreateGroupSynthesizesWithNonDefaultIDAttribute guards the fix for the
+// hardcoded "owncloudUUID" id write: the generated id must be stored under the
+// configured GroupIDAttribute, otherwise the synthesized model has no id and
+// createGroupModelFromLDAP returns nil (CreateGroup would return (nil, nil)).
+func TestCreateGroupSynthesizesWithNonDefaultIDAttribute(t *testing.T) {
+	logger := log.NewLogger(log.Level("debug"))
+
+	c := lconfig
+	c.UseServerUUID = false
+	c.GroupIDAttribute = "entryUUID" // non-default: previously the id was written to owncloudUUID only
+
+	var written *ldap.AddRequest
+	l := &mocks.Client{}
+	l.On("Add", mock.Anything).Run(func(args mock.Arguments) {
+		written = args.Get(0).(*ldap.AddRequest)
+	}).Return(nil)
+
+	b, err := NewLDAPBackend(l, c, &logger, "")
+	assert.Nil(t, err)
+
+	group := libregraph.NewGroup()
+	group.SetDisplayName("mygroup")
+
+	newGroup, err := b.CreateGroup(context.Background(), *group)
+	assert.Nil(t, err)
+	assert.NotNil(t, newGroup)
+	assert.Equal(t, "mygroup", newGroup.GetDisplayName())
+	// the id was written under the configured attribute and survives synthesis
+	assert.NotEmpty(t, newGroup.GetId())
+	assert.NotEmpty(t, written.Attributes)
+	// the AddRequest carries the id under the configured attribute, not "owncloudUUID"
+	var idFromConfigured, idFromHardcoded string
+	for _, a := range written.Attributes {
+		switch a.Type {
+		case c.GroupIDAttribute:
+			if len(a.Vals) > 0 {
+				idFromConfigured = a.Vals[0]
+			}
+		case "owncloudUUID":
+			if len(a.Vals) > 0 {
+				idFromHardcoded = a.Vals[0]
+			}
+		}
+	}
+	assert.NotEmpty(t, idFromConfigured, "id must be written under the configured GroupIDAttribute")
+	assert.Empty(t, idFromHardcoded, "id must not be written under a hardcoded owncloudUUID")
+	assert.Equal(t, idFromConfigured, newGroup.GetId())
+	l.AssertNotCalled(t, "Search", mock.Anything)
+}
+
+// TestCreateEducationClassSynthesizesWithNonDefaultIDAttribute guards the same
+// hardcoded-id fix on the education-class create path, which reuses
+// groupToLDAPAttrValues.
+func TestCreateEducationClassSynthesizesWithNonDefaultIDAttribute(t *testing.T) {
+	logger := log.NewLogger(log.Level("debug"))
+
+	c := eduConfig
+	c.UseServerUUID = false
+	c.GroupIDAttribute = "entryUUID" // non-default
+
+	l := &mocks.Client{}
+	l.On("Add", mock.Anything).Return(nil)
+
+	b, err := getMockedBackend(l, c, &logger)
+	assert.Nil(t, err)
+
+	class := libregraph.NewEducationClass()
+	class.SetExternalId("Math0123")
+	class.SetDisplayName("Math")
+	class.SetClassification("course")
+
+	resClass, err := b.CreateEducationClass(context.Background(), *class)
+	assert.Nil(t, err)
+	assert.NotNil(t, resClass)
+	assert.Equal(t, "Math", resClass.GetDisplayName())
+	// the id survives synthesis under the configured attribute
+	assert.NotEmpty(t, resClass.GetId())
+	l.AssertNotCalled(t, "Search", mock.Anything)
+}
+
+// TestGetGroupByNameUsesGroupNameAttribute guards the fix for the name-only lookup
+// branch of getLDAPGroupByNameOrID, which previously filtered by the user name
+// attribute (uid) instead of the group name attribute (cn), so a group could never
+// be found by name. That else-branch is reached when filterEscapeUUID errors, which
+// happens for a non-UUID name when the id attribute is an octet string. The lookup
+// is exercised directly so the assertion isolates the filter, independent of model
+// building.
+func TestGetGroupByNameUsesGroupNameAttribute(t *testing.T) {
+	logger := log.NewLogger(log.Level("debug"))
+
+	c := lconfig
+	c.GroupIDIsOctetString = true // makes filterEscapeUUID error on a non-UUID name -> else branch
+
+	var groupSearch *ldap.SearchRequest
+	l := &mocks.Client{}
+	l.On("Search", mock.Anything).Run(func(args mock.Arguments) {
+		groupSearch = args.Get(0).(*ldap.SearchRequest)
+	}).Return(&ldap.SearchResult{Entries: []*ldap.Entry{groupEntry}}, nil)
+
+	b, err := getMockedBackend(l, c, &logger)
+	assert.Nil(t, err)
+
+	_, err = b.getLDAPGroupByNameOrID("group", false)
+	assert.Nil(t, err)
+	assert.NotNil(t, groupSearch)
+	// the filter must use the group name attribute (cn), not the user name attribute (uid)
+	assert.Contains(t, groupSearch.Filter, "("+b.groupAttributeMap.name+"=group)")
+	assert.NotContains(t, groupSearch.Filter, b.userAttributeMap.userName+"=group")
 }
