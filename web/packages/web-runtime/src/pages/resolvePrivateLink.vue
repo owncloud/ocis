@@ -1,5 +1,5 @@
 <template>
-  <div
+  <main
     class="oc-link-resolve oc-height-viewport oc-flex oc-flex-column oc-flex-center oc-flex-middle"
   >
     <div class="oc-card oc-text-center oc-width-large">
@@ -35,7 +35,7 @@
     >
       <span class="text" v-text="openSharedWithMeLabel" />
     </oc-button>
-  </div>
+  </main>
 </template>
 
 <script lang="ts">
