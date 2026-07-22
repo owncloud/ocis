@@ -72,7 +72,7 @@
     "pino": "10.1.0",
     "pino-pretty": "13.1.2",
     "prettier": "^3.6.2",
-    "qs": "6.14.2",
+    "qs": "6.15.2",
     "requirejs": "2.3.7",
     "rollup-plugin-gzip": "^4.1.1",
     "rollup-plugin-visualizer": "6.0.5",

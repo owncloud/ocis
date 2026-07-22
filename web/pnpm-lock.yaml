@@ -164,8 +164,8 @@ importers:
         specifier: ^3.6.2
         version: 3.9.6
       qs:
-        specifier: 6.14.2
-        version: 6.14.2
+        specifier: 6.15.2
+        version: 6.15.2
       requirejs:
         specifier: 2.3.7
         version: 2.3.7
@@ -1064,8 +1064,8 @@ importers:
         specifier: ^1.30.0
         version: 1.30.0
       qs:
-        specifier: ^6.14.1
-        version: 6.14.2
+        specifier: ^6.15.2
+        version: 6.15.2
       screenfull:
         specifier: ^6.0.2
         version: 6.0.2
@@ -1198,8 +1198,8 @@ importers:
         specifier: ^8.3.0
         version: 8.3.0
       qs:
-        specifier: 6.14.2
-        version: 6.14.2
+        specifier: 6.15.2
+        version: 6.15.2
       semver:
         specifier: 7.7.4
         version: 7.7.4
@@ -6310,6 +6310,10 @@ packages:
 
   qs@6.14.2:
     resolution: {integrity: sha512-V/yCWTTF7VJ9hIh18Ugr2zhJMP01MY7c5kh4J870L7imm6/DIzBsNLTXzMwUA3yZ5b/KBqLx8Kp3uRvd7xSe3Q==}
+    engines: {node: '>=0.6'}
+
+  qs@6.15.2:
+    resolution: {integrity: sha512-Rzq0KEyX/w/tEybncDgdkZrJgVUsUMk3xjh3t5bv3S1HTAtg+uOYt72+ZfwiQwKdysThkTBdL/rTi6HDmX9Ddw==}
     engines: {node: '>=0.6'}
 
   quansync@0.2.11:
@@ -13235,6 +13239,10 @@ snapshots:
       hookified: 2.2.0
 
   qs@6.14.2:
+    dependencies:
+      side-channel: 1.1.1
+
+  qs@6.15.2:
     dependencies:
       side-channel: 1.1.1
 
