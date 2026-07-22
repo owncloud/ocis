@@ -3,13 +3,13 @@
     id="app-sidebar"
     ref="appSideBar"
     data-testid="app-sidebar"
-    tabindex="-1"
     :class="{
       'has-active-sub-panel': hasActiveSubPanel,
       'oc-flex oc-flex-center oc-flex-middle': loading,
       'app-sidebar-full-width': fullWidthSideBar
     }"
   >
+    <span ref="focusGuard" class="sidebar-focus-guard" tabindex="-1" />
     <oc-spinner v-if="loading" :aria-label="$gettext('Loading sidebar')" />
     <template v-else>
       <div
@@ -41,7 +41,7 @@
             <oc-icon name="arrow-left-s" fill-type="line" />
           </oc-button>
 
-          <h2 class="header__title oc-my-rm">
+          <h2 class="header__title oc-my-rm" :tabindex="activePanelName === panel.name ? -1 : null">
             {{ panel.title(panelContext) }}
           </h2>
 
@@ -129,6 +129,10 @@ const { isOpen, loading, availablePanels, panelContext, activePanel = '' } = def
 const emit = defineEmits<Emits>()
 const { $gettext } = useGettext()
 const appSideBar = useTemplateRef<HTMLElement>('appSideBar')
+const focusGuard = useTemplateRef<HTMLElement>('focusGuard')
+const focusHandoffPending = ref(false)
+const previouslyFocusedElement =
+  document.activeElement instanceof HTMLElement ? document.activeElement : null
 
 const rootPanels = computed(() => {
   return availablePanels.filter((p) => p.isVisible(panelContext) && p.isRoot?.(panelContext))
@@ -199,6 +203,85 @@ const onResize = () => {
   windowWidth.value = window.innerWidth
 }
 
+const focusActivePanel = async () => {
+  if (!unref(focusHandoffPending) || !isOpen || loading) {
+    return
+  }
+
+  const focusOrigin = document.activeElement
+
+  // Let the browser apply `inert` and settle native focus before notifying
+  // assistive technology about the active panel's focus target.
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+
+  const activePanel = Array.from(
+    unref(appSideBar)?.querySelectorAll<HTMLElement>('.sidebar-panel') || []
+  ).find((panel) => panel.id === `sidebar-panel-${unref(activePanelName)}`)
+
+  if (
+    activePanel?.contains(document.activeElement) &&
+    document.activeElement !== unref(focusGuard)
+  ) {
+    focusHandoffPending.value = false
+    return
+  }
+
+  if (unref(hasActiveSubPanel) && activePanel) {
+    const transitionDuration = Number.parseFloat(getComputedStyle(activePanel).transitionDuration)
+    if (transitionDuration > 0) {
+      await new Promise<void>((resolve) => {
+        const finish = () => {
+          window.clearTimeout(timeout)
+          activePanel.removeEventListener('transitionend', finish)
+          resolve()
+        }
+        const timeout = window.setTimeout(finish, transitionDuration * 1000 + 50)
+        activePanel.addEventListener('transitionend', finish, { once: true })
+      })
+    }
+  }
+
+  const focusTarget = unref(hasActiveSubPanel)
+    ? activePanel?.querySelector<HTMLElement>('.header__back')
+    : activePanel?.querySelector<HTMLElement>('.header__title')
+  if (document.activeElement === unref(focusGuard) || document.activeElement === focusOrigin) {
+    focusTarget?.focus({ preventScroll: true })
+  }
+  focusHandoffPending.value = false
+}
+
+const requestPanelFocus = () => {
+  focusHandoffPending.value = true
+  void focusActivePanel()
+}
+
+watch(
+  () => activePanel,
+  () => requestPanelFocus(),
+  { flush: 'post' }
+)
+
+watch(
+  () => loading,
+  (isLoading) => {
+    if (!isLoading) {
+      void focusActivePanel()
+    }
+  },
+  { flush: 'post' }
+)
+
+watch(
+  () => loading,
+  (isLoading) => {
+    if (isLoading && unref(appSideBar)?.contains(document.activeElement)) {
+      focusHandoffPending.value = true
+      unref(focusGuard)?.focus({ preventScroll: true })
+    }
+  },
+  { flush: 'sync' }
+)
+
 watch(
   () => isOpen,
   async (isOpen) => {
@@ -227,18 +310,22 @@ function closeSidebar() {
 }
 
 function openPanel(panel: string) {
+  focusHandoffPending.value = true
+  unref(focusGuard)?.focus({ preventScroll: true })
   setOldPanelName(unref(activePanelName))
   setSidebarPanel(panel)
 }
 
 function closePanel() {
+  focusHandoffPending.value = true
   setOldPanelName(unref(activePanelName))
   resetSidebarPanel()
-  unref(appSideBar).focus()
+  unref(focusGuard)?.focus({ preventScroll: true })
 }
 
 onMounted(() => {
   window.addEventListener('resize', onResize)
+  requestPanelFocus()
 })
 
 onBeforeUnmount(() => {
@@ -247,6 +334,12 @@ onBeforeUnmount(() => {
   if (unref(backgroundContentEl)) {
     unref(backgroundContentEl).style.visibility = 'visible'
   }
+
+  nextTick(() => {
+    if (previouslyFocusedElement?.isConnected) {
+      previouslyFocusedElement.focus()
+    }
+  })
 })
 </script>
 
@@ -257,12 +350,14 @@ onBeforeUnmount(() => {
   overflow: hidden;
   min-width: 440px;
   width: 440px;
+}
 
-  &:focus,
-  &:focus-visible {
-    box-shadow: none;
-    outline: none;
-  }
+.sidebar-focus-guard {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
 }
 .app-sidebar-full-width {
   min-width: 100% !important;
