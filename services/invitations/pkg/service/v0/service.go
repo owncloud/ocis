@@ -2,9 +2,16 @@ package service
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"os"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	graphdefaults "github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
+	graphldap "github.com/owncloud/ocis/v2/services/graph/pkg/identity/ldap"
+	"github.com/owncloud/ocis/v2/services/invitations/pkg/backends/idm"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/backends/keycloak"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/config"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/invitations"
@@ -48,22 +55,87 @@ type Backend interface {
 func New(opts ...Option) (Service, error) {
 	options := newOptions(opts...)
 
-	// Harcode keycloak backend for now, but this should be configurable in the future.
-	backend := keycloak.New(
-		options.Logger,
-		options.Config.Keycloak.BasePath,
-		options.Config.Keycloak.ClientID,
-		options.Config.Keycloak.ClientSecret,
-		options.Config.Keycloak.ClientRealm,
-		options.Config.Keycloak.UserRealm,
-		options.Config.Keycloak.InsecureSkipVerify,
-	)
+	backend, err := newBackend(options)
+	if err != nil {
+		return nil, err
+	}
 
 	return svc{
 		log:     options.Logger,
 		config:  options.Config,
 		backend: backend,
 	}, nil
+}
+
+// newBackend selects the invitation backend based on configuration.
+func newBackend(options Options) (Backend, error) {
+	switch options.Config.Backend {
+	case "ldap", "cs3", "idm":
+		return newLDAPBackend(options)
+	default:
+		return keycloak.New(
+			options.Logger,
+			options.Config.Keycloak.BasePath,
+			options.Config.Keycloak.ClientID,
+			options.Config.Keycloak.ClientSecret,
+			options.Config.Keycloak.ClientRealm,
+			options.Config.Keycloak.UserRealm,
+			options.Config.Keycloak.InsecureSkipVerify,
+		), nil
+	}
+}
+
+// newLDAPBackend builds the backend that provisions guests directly into the
+// oCIS identity backend. The LDAP schema defaults are reused from the graph
+// service so invitations and graph resolve the same directory entries; only the
+// connection and write settings come from the invitations configuration.
+func newLDAPBackend(options Options) (Backend, error) {
+	logger := options.Logger
+	cfg := options.Config.LDAP
+
+	lc := graphdefaults.DefaultConfig().Identity.LDAP
+	if cfg.URI != "" {
+		lc.URI = cfg.URI
+	}
+	if cfg.BindDN != "" {
+		lc.BindDN = cfg.BindDN
+	}
+	if cfg.BindPassword != "" {
+		lc.BindPassword = cfg.BindPassword
+	}
+	if cfg.CACert != "" {
+		lc.CACert = cfg.CACert
+	}
+	if cfg.UserBaseDN != "" {
+		lc.UserBaseDN = cfg.UserBaseDN
+	}
+	lc.Insecure = cfg.Insecure
+	lc.WriteEnabled = cfg.WriteEnabled
+
+	tlsConf := &tls.Config{InsecureSkipVerify: lc.Insecure} //nolint:gosec
+	if !lc.Insecure && lc.CACert != "" {
+		certs := x509.NewCertPool()
+		pemData, err := os.ReadFile(lc.CACert)
+		if err != nil {
+			return nil, fmt.Errorf("invitations: reading LDAP CA cert %q: %w", lc.CACert, err)
+		}
+		if !certs.AppendCertsFromPEM(pemData) {
+			return nil, fmt.Errorf("invitations: adding LDAP CA cert %q failed", lc.CACert)
+		}
+		tlsConf.RootCAs = certs
+	}
+
+	conn := graphldap.NewLDAPWithReconnect(&logger, graphldap.Config{
+		URI:          lc.URI,
+		BindDN:       lc.BindDN,
+		BindPassword: lc.BindPassword,
+		TLSConfig:    tlsConf,
+	})
+	lb, err := identity.NewLDAPBackend(conn, lc, &logger, "", "")
+	if err != nil {
+		return nil, fmt.Errorf("invitations: initializing LDAP backend: %w", err)
+	}
+	return idm.New(logger, lb), nil
 }
 
 type svc struct {
