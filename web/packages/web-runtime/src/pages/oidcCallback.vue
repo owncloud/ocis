@@ -9,9 +9,9 @@
       <h3 v-translate class="oc-login-card-title">Logging you in</h3>
       <p v-translate>Please wait, you are being redirected.</p>
     </div>
-    <div class="oc-login-card-footer oc-pt-rm">
+    <footer class="oc-login-card-footer oc-pt-rm">
       <p>{{ footerSlogan }}</p>
-    </div>
+    </footer>
   </div>
 </template>
 
