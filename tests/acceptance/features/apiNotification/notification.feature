@@ -414,3 +414,28 @@ Feature: Notification
       | resource   |
       | HelloWorld |
       | text.txt   |
+
+  @issue-11908 @env-config @email
+  Scenario Outline: recipient does not get PO file headers in unshare email for translated locale
+    Given the config "OCIS_DEFAULT_LANGUAGE" has been set to "es" for "settings" service
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile1.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    When user "Alice" removes the access of user "Brian" from resource "textfile1.txt" of space "Personal" using the Graph API
+    Then the HTTP status code should be "204"
+    And user "Brian" should have received an email from user "Alice" that does not contain
+      """
+      Project-Id-Version
+      """
+    And user "Brian" should have received the following email from user "Alice"
+      """
+      Alice Hansen ha eliminado la compartición 'textfile1.txt' con usted.
+      """
+    Examples:
+      | user-role  |
+      | User       |
+      | User Light |
