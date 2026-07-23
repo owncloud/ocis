@@ -70,6 +70,7 @@ type config struct {
 	AvailableXS         map[string]uint32                 `mapstructure:"available_checksums" docs:"nil;List of available checksums."`
 	CustomMimeTypesJSON string                            `mapstructure:"custom_mimetypes_json" docs:"nil;An optional mapping file with the list of supported custom file extensions and corresponding mime types."`
 	MountID             string                            `mapstructure:"mount_id"`
+	UploadDirectory     string                            `mapstructure:"upload_directory" docs:";Local directory for staging upload sessions. Overrides the driver's root. Required for drivers that have no local filesystem root."`
 	UploadExpiration    int64                             `mapstructure:"upload_expiration" docs:"0;Duration for how long uploads will be valid."`
 	Events              eventconfig                       `mapstructure:"events" docs:"0;Event stream configuration"`
 }
@@ -182,7 +183,18 @@ func New(m map[string]interface{}, ss *grpc.Server, log *zerolog.Logger) (rgrpc.
 		return nil, err
 	}
 
-	coordinator := upload.NewCoordinator(fs)
+	// Build the coordinator-owned session store. UploadDirectory (service level)
+	// takes precedence over the driver root, so rootless drivers can still get a
+	// coordinator. The store points at the same root as the driver's data path so
+	// it can read the sessions the coordinator writes (decomposedfs on-disk format).
+	store := upload.NewFileStoreFromConfig(c.UploadDirectory, c.Drivers[c.Driver], log)
+	if store == nil {
+		return nil, fmt.Errorf("storageprovider: cannot determine upload directory, set upload_directory in config or driver root")
+	}
+	if err := store.Setup(); err != nil {
+		return nil, fmt.Errorf("storageprovider: upload directory setup failed: %w", err)
+	}
+	coordinator := upload.NewCoordinator(fs, store)
 
 	// parse data server url
 	u, err := url.Parse(c.DataServerURL)
