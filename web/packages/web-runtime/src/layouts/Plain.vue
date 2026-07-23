@@ -3,7 +3,7 @@
     class="oc-login oc-height-viewport"
     :style="{ '--oc-login-background-image': 'url(' + backgroundImg + ')' }"
   >
-    <main>
+    <main id="web-content-main">
       <h1 v-if="pageTitle" class="oc-invisible-sr" v-text="pageTitle" />
       <router-view />
     </main>
