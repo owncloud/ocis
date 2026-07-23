@@ -293,18 +293,13 @@ const fileExtensionsShownModel = computed(() => unref(areFileExtensionsShown))
 .oc-range {
   -webkit-appearance: none;
   -webkit-transition: 0.2s;
+  border: 1px solid var(--oc-color-swatch-passive-default);
   border-radius: 0.3rem;
   background: var(--oc-color-border);
   height: 0.5rem;
-  opacity: 0.7;
   outline: none;
-  transition: opacity 0.2s;
   width: 100%;
   max-width: 50%;
-
-  &:hover {
-    opacity: 1;
-  }
 
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
