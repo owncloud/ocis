@@ -47,6 +47,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/storage"
 	"github.com/owncloud/reva/v2/pkg/storage/fs/registry"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
+	"github.com/owncloud/reva/v2/pkg/upload"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
@@ -69,6 +70,7 @@ type config struct {
 	AvailableXS         map[string]uint32                 `mapstructure:"available_checksums" docs:"nil;List of available checksums."`
 	CustomMimeTypesJSON string                            `mapstructure:"custom_mimetypes_json" docs:"nil;An optional mapping file with the list of supported custom file extensions and corresponding mime types."`
 	MountID             string                            `mapstructure:"mount_id"`
+	UploadDirectory     string                            `mapstructure:"upload_directory" docs:";Local directory for staging upload sessions. Overrides the driver's root. Required for drivers that have no local filesystem root."`
 	UploadExpiration    int64                             `mapstructure:"upload_expiration" docs:"0;Duration for how long uploads will be valid."`
 	Events              eventconfig                       `mapstructure:"events" docs:"0;Event stream configuration"`
 }
@@ -106,6 +108,7 @@ func (c *config) init() {
 type Service struct {
 	conf          *config
 	Storage       storage.FS
+	Coordinator   upload.Coordinator
 	dataServerURL *url.URL
 	availableXS   []*provider.ResourceChecksumPriority
 }
@@ -180,6 +183,19 @@ func New(m map[string]interface{}, ss *grpc.Server, log *zerolog.Logger) (rgrpc.
 		return nil, err
 	}
 
+	// Build the coordinator-owned session store. UploadDirectory (service level)
+	// takes precedence over the driver root, so rootless drivers can still get a
+	// coordinator. The store points at the same root as the driver's data path so
+	// it can read the sessions the coordinator writes (decomposedfs on-disk format).
+	store := upload.NewFileStoreFromConfig(c.UploadDirectory, c.Drivers[c.Driver], log)
+	if store == nil {
+		return nil, fmt.Errorf("storageprovider: cannot determine upload directory, set upload_directory in config or driver root")
+	}
+	if err := store.Setup(); err != nil {
+		return nil, fmt.Errorf("storageprovider: upload directory setup failed: %w", err)
+	}
+	coordinator := upload.NewCoordinator(fs, store)
+
 	// parse data server url
 	u, err := url.Parse(c.DataServerURL)
 	if err != nil {
@@ -205,6 +221,7 @@ func New(m map[string]interface{}, ss *grpc.Server, log *zerolog.Logger) (rgrpc.
 	service := &Service{
 		conf:          c,
 		Storage:       fs,
+		Coordinator:   coordinator,
 		dataServerURL: u,
 		availableXS:   xsTypes,
 	}
@@ -427,7 +444,7 @@ func (s *Service) InitiateFileUpload(ctx context.Context, req *provider.Initiate
 		metadata["expires"] = strconv.Itoa(int(expirationTimestamp.Seconds))
 	}
 
-	uploadIDs, err := s.Storage.InitiateUpload(ctx, req.Ref, uploadLength, metadata)
+	uploadIDs, err := s.Coordinator.InitiateUpload(ctx, req.Ref, uploadLength, metadata)
 	if err != nil {
 		var st *rpc.Status
 		switch err.(type) {
