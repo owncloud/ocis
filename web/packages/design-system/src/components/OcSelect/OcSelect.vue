@@ -519,7 +519,7 @@ onBeforeUnmount(() => {
       &--highlight,
       &--selected {
         background-color: var(--oc-color-background-hover);
-        color: var(--oc-color-swatch-brand-hover);
+        color: var(--oc-color-input-text-default);
       }
     }
 

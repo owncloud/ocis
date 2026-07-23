@@ -720,7 +720,7 @@ onBeforeUnmount(() => {
     height: 2.3rem;
 
     &::placeholder {
-      color: var(--oc-color-search-input-text-muted, --oc-color-text-muted);
+      color: var(--oc-color-search-input-text-muted, var(--oc-color-text-muted));
     }
 
     @media (max-width: 639px) {
@@ -764,7 +764,7 @@ onBeforeUnmount(() => {
         padding-right: 5.875rem;
 
         &::placeholder {
-          color: var(--oc-color-search-input-text-muted, --oc-color-text-muted);
+          color: var(--oc-color-search-input-text-muted, var(--oc-color-text-muted));
         }
       }
     }
