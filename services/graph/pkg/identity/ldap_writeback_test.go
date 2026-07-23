@@ -34,6 +34,19 @@ func TestAttrsFromAddRequest(t *testing.T) {
 	assert.Equal(t, []string{"alice@example.org", "a@example.org"}, e.GetEqualFoldAttributeValues("mail"))
 }
 
+// TestAttrsFromAddRequestDoesNotAliasRequest guards against attrsFromAddRequest
+// returning slices that alias ar.Attributes[].Vals: mutating the returned map must
+// never change the AddRequest's own values, and vice versa.
+func TestAttrsFromAddRequestDoesNotAliasRequest(t *testing.T) {
+	ar := ldap.NewAddRequest("uid=alice,ou=people,dc=test", nil)
+	ar.Attribute("mail", []string{"alice@example.org"})
+
+	attrs := attrsFromAddRequest(ar)
+	attrs["mail"][0] = "mutated@example.org"
+
+	assert.Equal(t, []string{"alice@example.org"}, ar.Attributes[0].Vals)
+}
+
 func TestApplyModifyToEntry(t *testing.T) {
 	base := ldap.NewEntry("uid=alice,ou=people,dc=test", map[string][]string{
 		"uid":         {"alice"},
@@ -80,6 +93,35 @@ func TestApplyModifyToEntry(t *testing.T) {
 
 		got := applyModifyToEntry(base, mr)
 		assert.Equal(t, []string{"cn=b"}, got.GetEqualFoldAttributeValues("member"))
+	})
+
+	t.Run("Delete last remaining value drops the attribute", func(t *testing.T) {
+		single := ldap.NewEntry(base.DN, map[string][]string{
+			"member": {"cn=a"},
+		})
+		mr := &ldap.ModifyRequest{DN: single.DN}
+		mr.Delete("member", []string{"cn=a"})
+
+		got := applyModifyToEntry(single, mr)
+		assert.Empty(t, got.GetEqualFoldAttributeValues("member"))
+		for _, a := range got.Attributes {
+			assert.NotEqual(t, "member", strings.ToLower(a.Name), "attribute must be dropped, not left empty")
+		}
+	})
+
+	t.Run("nil ModifyRequest returns base unchanged", func(t *testing.T) {
+		got := applyModifyToEntry(base, nil)
+		assert.Equal(t, base.DN, got.DN)
+		assert.Equal(t, "Alice Example", got.GetEqualFoldAttributeValue("displayname"))
+		assert.Equal(t, []string{"cn=a", "cn=b"}, got.GetEqualFoldAttributeValues("member"))
+	})
+
+	t.Run("nil base returns nil", func(t *testing.T) {
+		mr := &ldap.ModifyRequest{DN: "uid=alice,ou=people,dc=test"}
+		mr.Replace("displayname", []string{"Alice New"})
+
+		got := applyModifyToEntry(nil, mr)
+		assert.Nil(t, got)
 	})
 
 	t.Run("case-insensitive match creates no duplicate", func(t *testing.T) {
