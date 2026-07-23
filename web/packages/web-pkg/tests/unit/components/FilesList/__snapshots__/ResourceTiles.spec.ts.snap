@@ -2,7 +2,7 @@
 
 exports[`ResourceTiles component > renders a footer slot 1`] = `
 "<div id="tiles-view" class="oc-px-m oc-pt-l">
-  <div class="oc-flex oc-flex-middle oc-mb-m oc-pb-s oc-tiles-controls"><span class="oc-ml-s"><input id="tiles-view-select-all" type="checkbox" name="checkbox" class="oc-checkbox oc-rounded oc-checkbox-l" disabled="" aria-label="Select all"> <!--v-if--></span>
+  <div class="oc-flex oc-flex-middle oc-mb-m oc-pb-s oc-tiles-controls"><span class="oc-ml-s"><input id="tiles-view-select-all" type="checkbox" name="checkbox" class="oc-checkbox oc-rounded oc-checkbox-l" disabled=""> <label for="tiles-view-select-all" class="">Select all</label></span>
     <!--v-if-->
   </div>
   <ul class="oc-list oc-my-rm oc-mx-rm oc-tiles"> </ul>
@@ -13,7 +13,7 @@ exports[`ResourceTiles component > renders a footer slot 1`] = `
 
 exports[`ResourceTiles component > renders an array of spaces correctly 1`] = `
 "<div id="tiles-view" class="oc-px-m oc-pt-l">
-  <div class="oc-flex oc-flex-middle oc-mb-m oc-pb-s oc-tiles-controls"><span class="oc-ml-s"><input id="tiles-view-select-all" type="checkbox" name="checkbox" class="oc-checkbox oc-rounded oc-checkbox-l" aria-label="Select all"> <!--v-if--></span>
+  <div class="oc-flex oc-flex-middle oc-mb-m oc-pb-s oc-tiles-controls"><span class="oc-ml-s"><input id="tiles-view-select-all" type="checkbox" name="checkbox" class="oc-checkbox oc-rounded oc-checkbox-l"> <label for="tiles-view-select-all" class="oc-cursor-pointer">Select all</label></span>
     <!--v-if-->
   </div>
   <ul class="oc-list oc-my-rm oc-mx-rm oc-tiles">

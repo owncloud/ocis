@@ -7,7 +7,7 @@
         class="oc-ml-s"
         size="large"
         :label="selectAllCheckboxLabel"
-        :label-hidden="true"
+        :label-hidden="false"
         :disabled="resources.length === disabledResourceIds.length"
         :model-value="areAllResourcesSelected"
         @click.stop="toggleSelectionAll"
