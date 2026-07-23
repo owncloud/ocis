@@ -180,21 +180,23 @@ func New(m map[string]interface{}, stream events.Stream, log *zerolog.Logger) (s
 }
 
 // ListUploadSessions returns the upload sessions matching the given filter
+// TODO(OCISDEV-901): remove once UploadSessionLister is removed from storage.FS (coordinator responsibility).
 func (fs *posixFS) ListUploadSessions(ctx context.Context, filter storage.UploadSessionFilter) ([]storage.UploadSession, error) {
 	return fs.FS.(storage.UploadSessionLister).ListUploadSessions(ctx, filter)
 }
 
 // UseIn tells the tus upload middleware which extensions it supports.
+// TODO(OCISDEV-901): coordinator now handles TUS registration globally — is per-driver UseIn still needed for
+// capability variation, or can this be removed along with storage.ComposableFS?
 func (fs *posixFS) UseIn(composer *tusd.StoreComposer) {
 	fs.FS.(storage.ComposableFS).UseIn(composer)
 }
 
-// NewUpload returns a new tus Upload instance
+// TODO(OCISDEV-901): remove NewUpload and GetUpload — TUS DataStore is the coordinator's responsibility, not the driver's.
 func (fs *posixFS) NewUpload(ctx context.Context, info tusd.FileInfo) (upload tusd.Upload, err error) {
 	return fs.FS.(tusd.DataStore).NewUpload(ctx, info)
 }
 
-// NewUpload returns a new tus Upload instance
 func (fs *posixFS) GetUpload(ctx context.Context, id string) (upload tusd.Upload, err error) {
 	return fs.FS.(tusd.DataStore).GetUpload(ctx, id)
 }

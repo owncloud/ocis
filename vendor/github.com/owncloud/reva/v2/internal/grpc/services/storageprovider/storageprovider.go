@@ -25,6 +25,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -47,6 +48,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/storage"
 	"github.com/owncloud/reva/v2/pkg/storage/fs/registry"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
+	pkgupload "github.com/owncloud/reva/v2/pkg/upload"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
@@ -70,6 +72,7 @@ type config struct {
 	CustomMimeTypesJSON string                            `mapstructure:"custom_mimetypes_json" docs:"nil;An optional mapping file with the list of supported custom file extensions and corresponding mime types."`
 	MountID             string                            `mapstructure:"mount_id"`
 	UploadExpiration    int64                             `mapstructure:"upload_expiration" docs:"0;Duration for how long uploads will be valid."`
+	UploadDirectory     string                            `mapstructure:"upload_directory" docs:";Local directory for staging upload sessions. Overrides the driver's root. Required for drivers that have no local filesystem root."`
 	Events              eventconfig                       `mapstructure:"events" docs:"0;Event stream configuration"`
 }
 
@@ -81,6 +84,8 @@ type eventconfig struct {
 	EnableTLS            bool   `mapstructure:"nats_enable_tls" docs:"events tls switch"`
 	AuthUsername         string `mapstructure:"nats_username" docs:"event stream username"`
 	AuthPassword         string `mapstructure:"nats_password" docs:"event stream password"`
+	ConsumerGroup        string `mapstructure:"consumer_group" docs:"dcfs;Consumer group for the upload coordinator"`
+	NumConsumers         int    `mapstructure:"numconsumers" docs:"1;Number of concurrent postprocessing event consumers"`
 }
 
 func (c *config) init() {
@@ -101,11 +106,20 @@ func (c *config) init() {
 	if len(c.AvailableXS) == 0 {
 		c.AvailableXS = map[string]uint32{"md5": 100, "unset": 1000}
 	}
+
+	if c.Events.ConsumerGroup == "" {
+		c.Events.ConsumerGroup = "dcfs"
+	}
+	if c.Events.NumConsumers <= 0 {
+		c.Events.NumConsumers = 1
+	}
 }
+
 
 type Service struct {
 	conf          *config
 	Storage       storage.FS
+	Coordinator   pkgupload.Coordinator
 	dataServerURL *url.URL
 	availableXS   []*provider.ResourceChecksumPriority
 }
@@ -202,9 +216,33 @@ func New(m map[string]interface{}, ss *grpc.Server, log *zerolog.Logger) (rgrpc.
 		return nil, err
 	}
 
+	store := pkgupload.NewFileStoreFromConfig(c.UploadDirectory, c.Drivers[c.Driver], log)
+	if store == nil {
+		return nil, fmt.Errorf("storageprovider: cannot determine upload directory, set upload_directory in config or driver root")
+	}
+	if err := store.Setup(); err != nil {
+		return nil, fmt.Errorf("storageprovider: upload directory setup failed: %w", err)
+	}
+	evstream, err := estreamFromConfig(c.Events)
+	if err != nil {
+		return nil, err
+	}
+	async := evstream != nil
+	coord, err := pkgupload.NewCoordinator(fs, store, evstream, async,
+		c.MountID, c.Events.ConsumerGroup, c.Events.NumConsumers, log,
+		filepath.Join(store.Root(), "uploads"))
+	if err != nil {
+		return nil, err
+	}
+	if async {
+		if err := coord.Start(evstream); err != nil {
+			return nil, err
+		}
+	}
 	service := &Service{
 		conf:          c,
 		Storage:       fs,
+		Coordinator:   coord,
 		dataServerURL: u,
 		availableXS:   xsTypes,
 	}
@@ -427,7 +465,7 @@ func (s *Service) InitiateFileUpload(ctx context.Context, req *provider.Initiate
 		metadata["expires"] = strconv.Itoa(int(expirationTimestamp.Seconds))
 	}
 
-	uploadIDs, err := s.Storage.InitiateUpload(ctx, req.Ref, uploadLength, metadata)
+	uploadIDs, err := s.Coordinator.InitiateUpload(ctx, req.Ref, uploadLength, metadata)
 	if err != nil {
 		var st *rpc.Status
 		switch err.(type) {
@@ -1299,7 +1337,15 @@ func estreamFromConfig(c eventconfig) (events.Stream, error) {
 		return nil, nil
 	}
 
-	return stream.NatsFromConfig("storageprovider", false, stream.NatsConfig(c))
+	return stream.NatsFromConfig("storageprovider", false, stream.NatsConfig{
+		Endpoint:             c.Endpoint,
+		Cluster:              c.Cluster,
+		TLSInsecure:          c.TLSInsecure,
+		TLSRootCACertificate: c.TLSRootCACertificate,
+		EnableTLS:            c.EnableTLS,
+		AuthUsername:         c.AuthUsername,
+		AuthPassword:         c.AuthPassword,
+	})
 }
 
 func canLockPublicShare(ctx context.Context) bool {

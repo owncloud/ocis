@@ -322,6 +322,11 @@ Feature: sharing
       """
 
 
+  # BROKEN with coordinator - returns 201 instead of 507
+  # brian uploads into alice space via share. coordinator calls GetQuota with brian context.
+  # brian has no GetQuota perm on alice space -> PermissionDenied -> quota check silently skipped -> upload succeeds.
+  # old decomposedfs called node.CheckQuota directly (reads xattr, no perm check) so it worked.
+  # fix needs driver-independent quota enforcement hook in storage.FS interface.
   Scenario: uploading to a user shared folder with read/write permission when the sharer has insufficient quota
     Given user "Alice" has created folder "FOLDER"
     And user "Alice" has sent the following resource share invitation:

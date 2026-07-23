@@ -539,6 +539,9 @@ func (d *driver) GetLock(ctx context.Context, ref *provider.Reference) (*provide
 		return nil, err
 	}
 
+	if token == "" {
+		return nil, errtypes.NotFound("no lock found")
+	}
 	return &provider.Lock{LockId: token, Type: provider.LockType_LOCK_TYPE_EXCL}, nil
 }
 

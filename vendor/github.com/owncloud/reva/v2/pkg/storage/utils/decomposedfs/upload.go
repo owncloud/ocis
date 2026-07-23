@@ -559,6 +559,12 @@ func (fs *Decomposedfs) CommitUpload(ctx context.Context, ref *provider.Referenc
 	if err := fs.tp.Propagate(ctx, n, sizeDiff); err != nil {
 		return nil, errors.Wrap(err, "Decomposedfs: failed to propagate")
 	}
+	if p, err := n.Parent(ctx); err == nil && p != nil {
+		now := time.Now()
+		_ = p.SetTMTime(ctx, &now)
+		_ = fs.tp.Propagate(ctx, p, 0)
+	}
+
 	// etag is a best-effort, recomputable value; a failure here must not fail an
 	// already-committed upload (matches the legacy Upload path).
 	etag, _ := node.CalculateEtag(n.ID, mtime)

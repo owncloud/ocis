@@ -179,17 +179,24 @@ class ChecksumContext implements Context {
 			  </d:prop>
 			</d:propfind>';
 		$password = $this->featureContext->getPasswordForUser($user);
-		return WebDavHelper::makeDavRequest(
-			$this->featureContext->getBaseUrl(),
-			$user,
-			$password,
-			'PROPFIND',
-			$path,
-			null,
-			$spaceId,
-			$body,
-			$this->featureContext->getDavPathVersion(),
-		);
+		$retries = 10;
+		do {
+			$response = WebDavHelper::makeDavRequest(
+				$this->featureContext->getBaseUrl(),
+				$user,
+				$password,
+				'PROPFIND',
+				$path,
+				null,
+				$spaceId,
+				$body,
+				$this->featureContext->getDavPathVersion(),
+			);
+			if ($response->getStatusCode() === 425) {
+				\sleep(1);
+			}
+		} while ($response->getStatusCode() === 425 && --$retries > 0);
+		return $response;
 	}
 
 	/**

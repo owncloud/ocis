@@ -236,6 +236,13 @@ type ComposableFS interface {
 	UseIn(composer *tusd.StoreComposer)
 }
 
+// TODO(OCISDEV-901): ComposableFS and all driver-side UseIn implementations
+// (middleware.FS, posix.FS) are dead after the coordinator decoupling. The
+// upload coordinator is the universal tusd DataStore for every driver, so TUS
+// capabilities are global — no per-driver UseIn dispatch needed. Delete this
+// interface and its implementations once OCISDEV-901 wires storage-system and
+// removes the legacy decomposedfs upload path.
+
 // Registry is the interface that storage registries implement
 // for discovering storage providers
 type Registry interface {

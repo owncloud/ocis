@@ -2177,7 +2177,16 @@ trait WebDav {
 		?string $content,
 		string $destination,
 	): void {
-		$response = $this->uploadFileWithContent($user, $content, $destination);
+		$user = $this->getActualUsername($user);
+		$retries = 10;
+		$response = null;
+		while ($retries-- > 0) {
+			$response = $this->uploadFileWithContent($user, $content, $destination);
+			if ($response->getStatusCode() !== 425) {
+				break;
+			}
+			\sleep(1);
+		}
 		$this->setResponse($response);
 		$this->pushToLastHttpStatusCodesArray();
 	}
@@ -2331,7 +2340,15 @@ trait WebDav {
 		string $destination,
 	): array {
 		$user = $this->getActualUsername($user);
-		$response = $this->uploadFileWithContent($user, $content, $destination, null, true);
+		$retries = 10;
+		$response = null;
+		while ($retries-- > 0) {
+			$response = $this->uploadFileWithContent($user, $content, $destination, null, true);
+			if ($response->getStatusCode() !== 425) {
+				break;
+			}
+			\sleep(1);
+		}
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to upload file '$destination' for user '$user'",

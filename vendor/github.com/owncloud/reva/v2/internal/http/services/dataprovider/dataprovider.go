@@ -21,6 +21,7 @@ package dataprovider
 import (
 	"fmt"
 	"net/http"
+	"path/filepath"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog"
@@ -33,6 +34,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rhttp/router"
 	"github.com/owncloud/reva/v2/pkg/storage"
 	"github.com/owncloud/reva/v2/pkg/storage/fs/registry"
+	pkgupload "github.com/owncloud/reva/v2/pkg/upload"
 )
 
 func init() {
@@ -44,6 +46,7 @@ type config struct {
 	Driver             string                            `mapstructure:"driver" docs:"localhome;The storage driver to be used."`
 	Drivers            map[string]map[string]interface{} `mapstructure:"drivers" docs:"url:pkg/storage/fs/localhome/localhome.go;The configuration for the storage driver"`
 	DataTXs            map[string]map[string]interface{} `mapstructure:"data_txs" docs:"url:pkg/rhttp/datatx/manager/simple/simple.go;The configuration for the data tx protocols"`
+	MountID            string                            `mapstructure:"mount_id"`
 	NatsAddress        string                            `mapstructure:"nats_address"`
 	NatsClusterID      string                            `mapstructure:"nats_clusterID"`
 	NatsTLSInsecure    bool                              `mapstructure:"nats_tls_insecure"`
@@ -51,6 +54,9 @@ type config struct {
 	NatsEnableTLS      bool                              `mapstructure:"nats_enable_tls"`
 	NatsUsername       string                            `mapstructure:"nats_username"`
 	NatsPassword       string                            `mapstructure:"nats_password"`
+	ConsumerGroup      string                            `mapstructure:"consumer_group"`
+	NumConsumers       int                               `mapstructure:"numconsumers"`
+	UploadDirectory    string                            `mapstructure:"upload_directory" docs:";Local directory for staging upload sessions. Overrides the driver's root. Required for drivers that have no local filesystem root."`
 }
 
 func (c *config) init() {
@@ -59,6 +65,12 @@ func (c *config) init() {
 	}
 	if c.Driver == "" {
 		c.Driver = "localhome"
+	}
+	if c.ConsumerGroup == "" {
+		c.ConsumerGroup = "dcfs"
+	}
+	if c.NumConsumers <= 0 {
+		c.NumConsumers = 1
 	}
 }
 
@@ -104,7 +116,27 @@ func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) 
 		return nil, err
 	}
 
-	dataTXs, err := getDataTXs(conf, fs, evstream, log)
+	store := pkgupload.NewFileStoreFromConfig(conf.UploadDirectory, conf.Drivers[conf.Driver], log)
+	if store == nil {
+		return nil, fmt.Errorf("dataprovider: cannot determine upload directory, set upload_directory in config or driver root")
+	}
+	if err := store.Setup(); err != nil {
+		return nil, fmt.Errorf("dataprovider: upload directory setup failed: %w", err)
+	}
+	async := evstream != nil
+	coord, err := pkgupload.NewCoordinator(fs, store, evstream, async,
+		conf.MountID, conf.ConsumerGroup, conf.NumConsumers, log,
+		filepath.Join(store.Root(), "uploads"))
+	if err != nil {
+		return nil, err
+	}
+	if async {
+		if err := coord.Start(evstream); err != nil {
+			return nil, err
+		}
+	}
+
+	dataTXs, err := getDataTXs(conf, coord, fs, evstream, log)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +158,7 @@ func getFS(c *config, stream events.Stream, log *zerolog.Logger) (storage.FS, er
 	return nil, fmt.Errorf("driver not found: %s", c.Driver)
 }
 
-func getDataTXs(c *config, fs storage.FS, publisher events.Publisher, log *zerolog.Logger) (map[string]http.Handler, error) {
+func getDataTXs(c *config, coord pkgupload.Coordinator, driver storage.FS, publisher events.Publisher, log *zerolog.Logger) (map[string]http.Handler, error) {
 	if c.DataTXs == nil {
 		c.DataTXs = make(map[string]map[string]interface{})
 	}
@@ -146,7 +178,7 @@ func getDataTXs(c *config, fs storage.FS, publisher events.Publisher, log *zerol
 	for t := range c.DataTXs {
 		if f, ok := datatxregistry.NewFuncs[t]; ok {
 			if tx, err := f(c.DataTXs[t], publisher, log); err == nil {
-				if handler, err := tx.Handler(fs); err == nil {
+				if handler, err := tx.Handler(coord, driver); err == nil {
 					txs[t] = handler
 				}
 			}
