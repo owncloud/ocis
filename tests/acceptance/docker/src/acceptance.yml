@@ -1,8 +1,12 @@
 services:
   acceptance-tests:
-    image: owncloudci/php:8.2
+    image: owncloudci/php:8.4
     working_dir: /ocis
-    command: /bin/bash /test/run-tests.sh
+    command: >
+      /bin/bash -c "command -v composer >/dev/null 2>&1 ||
+      (php -r \"copy('https://getcomposer.org/installer', '/tmp/composer-setup.php');\" &&
+      php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer);
+      /bin/bash /test/run-tests.sh"
     environment:
       OCIS_ROOT: /ocis
       TEST_SERVER_URL: https://ocis-server:9200

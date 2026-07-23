@@ -208,6 +208,13 @@ func (c *coordinator) initiateUpload(ctx context.Context, ref *provider.Referenc
 		}
 		parentID = parentMD.GetId().GetOpaqueId()
 		spaceID = parentMD.GetId().GetSpaceId()
+		// id-based refs yield a relative dir ("."); store the parent's full path so
+		// the UploadReady event carries a space-relative path (main: fs.lu.Path). best-effort.
+		if utils.IsRelativeReference(ref) {
+			if parentPath, pErr := c.fs.GetPathByID(ctx, parentMD.GetId()); pErr == nil {
+				dir = parentPath
+			}
+		}
 	}
 
 	if nodeName == "" {
