@@ -659,3 +659,7 @@ func (d *driver) UpdateStorageSpace(ctx context.Context, req *provider.UpdateSto
 func (d *driver) DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorageSpaceRequest) (*storage.DeleteStorageSpaceResult, error) {
 	return nil, errtypes.NotSupported("operation not supported")
 }
+
+func (d *driver) PrepareUpload(_ context.Context, _ *provider.Reference, _ string, info storage.UploadInfo) (*storage.PrepareUploadResult, error) {
+	return &storage.PrepareUploadResult{VersionCreated: info.NodeExisted}, nil
+}

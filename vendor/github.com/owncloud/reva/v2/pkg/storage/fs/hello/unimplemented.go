@@ -94,6 +94,10 @@ func (fs *hellofs) CommitUpload(ctx context.Context, ref *provider.Reference, so
 	return nil, errtypes.NotSupported("hellofs: commit upload not supported")
 }
 
+func (fs *hellofs) PrepareUpload(_ context.Context, _ *provider.Reference, _ string, info storage.UploadInfo) (*storage.PrepareUploadResult, error) {
+	return &storage.PrepareUploadResult{VersionCreated: info.NodeExisted}, nil
+}
+
 // grants
 
 // DenyGrant marks a resource as denied for a recipient

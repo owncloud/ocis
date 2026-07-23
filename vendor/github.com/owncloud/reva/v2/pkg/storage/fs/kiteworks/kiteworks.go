@@ -275,6 +275,10 @@ func (d *Driver) CommitUpload(_ context.Context, _ *provider.Reference, _ storag
 	return nil, errtypes.NotSupported("kiteworks: read-only driver")
 }
 
+func (d *Driver) PrepareUpload(_ context.Context, _ *provider.Reference, _ string, info storage.UploadInfo) (*storage.PrepareUploadResult, error) {
+	return &storage.PrepareUploadResult{VersionCreated: info.NodeExisted}, nil
+}
+
 func (d *Driver) RestoreRevision(_ context.Context, _ *provider.Reference, _ string) (*storage.RestoreRevisionResult, error) {
 	return nil, errtypes.NotSupported("kiteworks: read-only driver")
 }
