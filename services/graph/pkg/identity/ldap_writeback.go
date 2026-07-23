@@ -13,7 +13,9 @@ import (
 func attrsFromAddRequest(ar *ldap.AddRequest) map[string][]string {
 	attrs := make(map[string][]string, len(ar.Attributes))
 	for _, a := range ar.Attributes {
-		attrs[a.Type] = a.Vals
+		vals := make([]string, len(a.Vals))
+		copy(vals, a.Vals)
+		attrs[a.Type] = vals
 	}
 	return attrs
 }
@@ -26,6 +28,12 @@ func attrsFromAddRequest(ar *ldap.AddRequest) map[string][]string {
 // It is used to synthesize the response entry after an update from the pre-read
 // entry plus the ModifyRequest being persisted, avoiding a read-after-write.
 func applyModifyToEntry(base *ldap.Entry, mr *ldap.ModifyRequest) *ldap.Entry {
+	if base == nil {
+		return nil
+	}
+	if mr == nil {
+		mr = &ldap.ModifyRequest{DN: base.DN}
+	}
 	// Deep-copy base into a name->values map so we never touch the original.
 	attrs := make(map[string][]string, len(base.Attributes))
 	// order preserves the original attribute order, with new attributes appended.
@@ -68,14 +76,20 @@ func applyModifyToEntry(base *ldap.Entry, mr *ldap.ModifyRequest) *ldap.Entry {
 					// whole-attribute delete
 					delete(attrs, n)
 				} else {
-					attrs[n] = removeValues(attrs[n], vals)
+					kept := removeValues(attrs[n], vals)
+					if len(kept) == 0 {
+						// the last value was removed; a real server drops the attribute
+						delete(attrs, n)
+					} else {
+						attrs[n] = kept
+					}
 				}
 			}
 		}
 	}
 
 	dn := base.DN
-	if mr != nil && mr.DN != "" {
+	if mr.DN != "" {
 		dn = mr.DN
 	}
 	result := ldap.NewEntry(dn, nil)
