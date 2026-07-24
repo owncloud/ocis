@@ -182,3 +182,100 @@ Feature: vault
         }
       }
       """
+
+
+  Scenario: user copies folder from drive to vault
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "driveFolder" in space "Personal"
+    When user "Alice" copies folder "driveFolder" from space "Personal" to "driveFolder" inside space "Personal" in vault using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" the space "Personal" in vault should contain these entries:
+      | driveFolder |
+    And for user "Alice" the space "Personal" should contain these entries:
+      | driveFolder |
+
+
+  Scenario: user copies file from drive to vault
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testfile.txt"
+    When user "Alice" copies file "testfile.txt" from space "Personal" to "testfile.txt" inside space "Personal" in vault using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" the space "Personal" in vault should contain these entries:
+      | testfile.txt |
+    And for user "Alice" the content of the file "testfile.txt" of the space "Personal" in vault should be "some content"
+    And for user "Alice" the space "Personal" should contain these entries:
+      | testfile.txt |
+
+
+  Scenario: user tries to copy folder from vault to drive
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    When user "Alice" copies folder "vaultFolder" from space "Personal" in vault to "vaultFolder" inside space "Personal" using the WebDAV API
+    Then the HTTP status code should be "409"
+    And for user "Alice" the space "Personal" should not contain these entries:
+      | vaultFolder |
+    And for user "Alice" the space "Personal" in vault should contain these entries:
+      | vaultFolder |
+
+
+  Scenario: user tries to copy file from vault to drive
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testfile.txt" in vault
+    When user "Alice" copies file "testfile.txt" from space "Personal" in vault to "testfile.txt" inside space "Personal" using the WebDAV API
+    Then the HTTP status code should be "409"
+    And for user "Alice" the space "Personal" should not contain these entries:
+      | testfile.txt |
+    And for user "Alice" the space "Personal" in vault should contain these entries:
+      | testfile.txt |
+
+
+  Scenario: user copies sub-folder from drive to vault
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "driveFolder" in space "Personal"
+    And user "Alice" has created a folder "driveFolder/subFolder" in space "Personal"
+    When user "Alice" copies folder "driveFolder/subFolder" from space "Personal" to "subFolder" inside space "Personal" in vault using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" the space "Personal" in vault should contain these entries:
+      | subFolder |
+    And for user "Alice" folder "driveFolder" of the space "Personal" should contain these entries:
+      | subFolder |
+
+
+  Scenario: user copies file inside folder from drive to vault
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "driveFolder" in space "Personal"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "driveFolder/testfile.txt"
+    When user "Alice" copies file "driveFolder/testfile.txt" from space "Personal" to "testfile.txt" inside space "Personal" in vault using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" the space "Personal" in vault should contain these entries:
+      | testfile.txt |
+    And for user "Alice" the content of the file "testfile.txt" of the space "Personal" in vault should be "some content"
+    And for user "Alice" folder "driveFolder" of the space "Personal" should contain these entries:
+      | testfile.txt |
+
+
+  Scenario: user copies sub-folder from drive to a folder in vault
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "driveFolder" in space "Personal"
+    And user "Alice" has created a folder "driveFolder/subFolder" in space "Personal"
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    When user "Alice" copies folder "driveFolder/subFolder" from space "Personal" to "vaultFolder/subFolder" inside space "Personal" in vault using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" folder "vaultFolder" of the space "Personal" in vault should contain these entries:
+      | subFolder |
+    And for user "Alice" folder "driveFolder" of the space "Personal" should contain these entries:
+      | subFolder |
+
+
+  Scenario: user copies file inside folder from drive to a folder in vault
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "driveFolder" in space "Personal"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "driveFolder/testfile.txt"
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    When user "Alice" copies file "driveFolder/testfile.txt" from space "Personal" to "vaultFolder/testfile.txt" inside space "Personal" in vault using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" folder "vaultFolder" of the space "Personal" in vault should contain these entries:
+      | testfile.txt |
+    And for user "Alice" the content of the file "vaultFolder/testfile.txt" of the space "Personal" in vault should be "some content"
+    And for user "Alice" folder "driveFolder" of the space "Personal" should contain these entries:
+      | testfile.txt |
