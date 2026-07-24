@@ -2,6 +2,7 @@
   "id": "ownCloud Infinite Scale Test",
   "realm": "oCIS",
   "displayName": "ownCloud Infinite Scale",
+  "loginTheme": "owncloud",
   "notBefore": 0,
   "defaultSignatureAlgorithm": "RS256",
   "revokeRefreshToken": false,
