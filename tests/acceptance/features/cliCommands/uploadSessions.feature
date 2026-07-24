@@ -246,3 +246,27 @@ Feature: List upload sessions via CLI command
     When the administrator waits for "3" seconds
     Then for user "Alice" file "file2.txt" of space "Personal" should be in postprocessing
     And the content of file "file1.txt" for user "Alice" should be "uploaded content"
+
+
+  Scenario: resume all upload where postprocessing is finished, but not for unfinished upload using postprocessing command
+    Given the config "POSTPROCESSING_DELAY" has been set to "3s"
+    And user "Alice" has created a new TUS resource in the space "Personal" with the following headers:
+      | Upload-Length   | 10                        |
+      #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
+      | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
+      | Tus-Resumable   | 1.0.0                     |
+    And user "Alice" has uploaded file with checksum "SHA1 8cb2237d0679ca88db6464eac60da96345513964" to the last created TUS Location with offset "0" and content "12345" via TUS inside of the space "Personal" using the WebDAV API
+    And user "Alice" has uploaded file with content "uploaded content" to "file.txt"
+    And the administrator has waited for "1" seconds
+    And the administrator has stopped the server
+    And the administrator has started the server
+    When the administrator resumes all the uploads session using the post processing command
+    Then the command should be successful
+    When the administrator waits for "3" seconds
+    Then the content of file "file.txt" for user "Alice" should be "uploaded content"
+    When the administrator lists all the upload sessions
+    Then the command should be successful
+    And the CLI response should contain these entries:
+      | textFile.txt |
+    And the CLI response should not contain these entries:
+      | file.txt |
