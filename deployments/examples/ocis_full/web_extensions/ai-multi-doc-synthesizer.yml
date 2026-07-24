@@ -1,0 +1,37 @@
+---
+# NOTE: ai-multi-doc-synthesizer has no published docker image (owncloud/web-extensions
+# release CI for ai-multi-doc-synthesizer-v0.1.0 failed with startup_failure and
+# never pushed an image). This builds directly from the web-extensions git
+# repository instead. Revisit and switch to a pinned image once ownCloud publishes one.
+services:
+  ocis:
+    volumes:
+      - ./config/ocis/apps.yaml:/etc/ocis/apps.yaml
+    depends_on:
+      ai-multi-doc-synthesizer-init:
+        condition: service_completed_successfully
+
+  ai-multi-doc-synthesizer-init:
+    build:
+      context: https://github.com/owncloud/web-extensions.git#main:packages/web-app-ai-multi-doc-synthesizer
+      dockerfile_inline: |
+        FROM node:24-alpine AS build
+        WORKDIR /src
+        COPY . .
+        # The package's tsconfig.json extends "../../tsconfig.json" (the
+        # monorepo root config), which doesn't exist in this narrower
+        # git-context checkout. Provide it directly instead of via the
+        # @ownclouders/tsconfig npm package, since that package isn't a
+        # listed dependency of this app and pnpm won't fetch it.
+        RUN printf '{"compilerOptions":{"esModuleInterop":true,"skipLibCheck":true,"target":"es2022","resolveJsonModule":true,"isolatedModules":true,"strict":false,"noUncheckedIndexedAccess":false,"noImplicitThis":true,"module":"preserve","sourceMap":true,"lib":["ESNext","es2022","dom","dom.iterable"],"types":["vitest/globals"]},"exclude":["node_modules"],"vueCompilerOptions":{"target":3}}' > /tsconfig.json
+        RUN corepack enable && corepack prepare pnpm@10.27.0 --activate \
+          && pnpm install --no-frozen-lockfile --ignore-scripts \
+          && pnpm build
+        FROM alpine:3.22
+        COPY --from=build /src/dist /dist
+    user: root
+    volumes:
+      - ocis-apps:/apps
+    entrypoint:
+      - /bin/sh
+    command: ["-c", "mkdir -p /apps/ai-multi-doc-synthesizer && cp -R /dist/. /apps/ai-multi-doc-synthesizer/"]

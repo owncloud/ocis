@@ -1,0 +1,30 @@
+---
+# NOTE: ai-llm-proxy has no published docker image on Docker Hub. This builds
+# directly from the web-extensions git repository. Revisit and switch to a
+# pinned image once ownCloud publishes one.
+services:
+  ai-llm-proxy:
+    build:
+      context: https://github.com/owncloud/web-extensions.git#main:packages/ai-llm-proxy
+      dockerfile: Dockerfile
+    networks:
+      ocis-net:
+    environment:
+      PORT: "3030"
+      OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      LLM_ENDPOINT: ${AI_LLM_ENDPOINT:-http://host.docker.internal:11434/v1}
+      LLM_API_KEY: ${AI_LLM_API_KEY:-}
+      LLM_MODEL: ${AI_LLM_MODEL:-}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ai-llm-proxy.entrypoints=https"
+      - "traefik.http.routers.ai-llm-proxy.rule=Host(`${OCIS_DOMAIN:-ocis.owncloud.test}`) && PathPrefix(`/ai-llm-proxy`)"
+      - "traefik.http.routers.ai-llm-proxy.tls.certresolver=http"
+      - "traefik.http.middlewares.ai-llm-proxy-strip.stripprefix.prefixes=/ai-llm-proxy"
+      - "traefik.http.routers.ai-llm-proxy.middlewares=ai-llm-proxy-strip"
+      - "traefik.http.services.ai-llm-proxy.loadbalancer.server.port=3030"
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always

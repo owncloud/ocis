@@ -21,3 +21,74 @@ external-sites:
         color: "#0D856F"
         icon: book
         priority: 51
+
+# The following config blocks are required by the ai-* web extensions and
+# chat-with-file/version-changelog. They all call the ai-llm-proxy service
+# (see web_extensions/ai-llm-proxy.yml), which must be enabled for these to work.
+chat-with-file:
+  config:
+    llm:
+      endpoint: 'https://${OCIS_DOMAIN|ocis.owncloud.test}/ai-llm-proxy/v1'
+      model: 'llama3.2'
+version-changelog:
+  config:
+    llm:
+      endpoint: 'https://${OCIS_DOMAIN|ocis.owncloud.test}/ai-llm-proxy/v1'
+      model: 'llama3.2'
+ai-doc-summary:
+  config:
+    llm:
+      endpoint: 'https://${OCIS_DOMAIN|ocis.owncloud.test}/ai-llm-proxy/v1'
+      model: 'llama3.2'
+ai-image-alt-text-sidebar:
+  config:
+    llm:
+      endpoint: 'https://${OCIS_DOMAIN|ocis.owncloud.test}/ai-llm-proxy/v1'
+      model: 'llava:7b'
+ai-data-insights-sidebar:
+  config:
+    llm:
+      endpoint: 'https://${OCIS_DOMAIN|ocis.owncloud.test}/ai-llm-proxy/v1'
+      model: 'llama3.2'
+ai-sensitive-data-scanner:
+  config:
+    llm:
+      endpoint: 'https://${OCIS_DOMAIN|ocis.owncloud.test}/ai-llm-proxy/v1'
+      model: 'llama3.2'
+ai-folder-brief-sidebar:
+  config:
+    llm:
+      endpoint: 'https://${OCIS_DOMAIN|ocis.owncloud.test}/ai-llm-proxy/v1'
+      model: 'llama3.2'
+# The following extensions have no published docker image and build from git,
+# see web_extensions/<name>.yml for details.
+ai-folder-readme-generator:
+  config:
+    llm:
+      endpoint: 'https://${OCIS_DOMAIN|ocis.owncloud.test}/ai-llm-proxy/v1'
+      model: 'llama3.2'
+ai-multi-doc-synthesizer:
+  config:
+    llm:
+      endpoint: 'https://${OCIS_DOMAIN|ocis.owncloud.test}/ai-llm-proxy/v1'
+      model: 'llama3.2'
+ai-quick-draft-creator:
+  config:
+    llm:
+      endpoint: 'https://${OCIS_DOMAIN|ocis.owncloud.test}/ai-llm-proxy/v1'
+      model: 'llama3.2'
+ai-smart-collections-nav:
+  config:
+    llm:
+      endpoint: 'https://${OCIS_DOMAIN|ocis.owncloud.test}/ai-llm-proxy/v1'
+      model: 'llama3.2'
+ai-smart-file-tagger-qa:
+  config:
+    llm:
+      endpoint: 'https://${OCIS_DOMAIN|ocis.owncloud.test}/ai-llm-proxy/v1'
+      model: 'llama3.2'
+
+# oCIS Workflows (owncloud/ocis-workflows), see workflows.yml.
+workflows:
+  config:
+    backendUrl: "https://${OCIS_DOMAIN|ocis.owncloud.test}/workflows/api/v1beta1"

@@ -1,0 +1,17 @@
+---
+services:
+  ocis:
+    volumes:
+      - ./config/ocis/apps.yaml:/etc/ocis/apps.yaml
+    depends_on:
+      ai-data-insights-sidebar-init:
+        condition: service_completed_successfully
+
+  ai-data-insights-sidebar-init:
+    image: owncloud/web-extensions:ai-data-insights-sidebar-0.1.0
+    user: root
+    volumes:
+      - ocis-apps:/apps
+    entrypoint:
+      - /bin/sh
+    command: ["-c", "cp -R /var/lib/nginx/html/ai-data-insights-sidebar/ /apps"]
