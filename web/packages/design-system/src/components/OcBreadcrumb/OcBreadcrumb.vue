@@ -12,7 +12,8 @@
         :data-key="index"
         :data-item-id="item.id"
         :aria-hidden="item.isTruncationPlaceholder"
-        :tabindex="item.isTruncationPlaceholder ? -1 : 0"
+        :inert="item.isTruncationPlaceholder || undefined"
+        tabindex="-1"
         :class="[
           'oc-breadcrumb-list-item',
           'oc-flex',
