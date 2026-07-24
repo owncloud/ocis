@@ -5,7 +5,7 @@ document this deployment example in: docs/ocis/deployment/ocis_keycloak.md
 Please refer to [our documentation](https://owncloud.dev/ocis/deployment/ocis_keycloak/)
 for instructions on how to deploy this scenario.
 
-## Branding / custom login theme
+## Branding / Custom Login Theme
 
 This example ships a custom Keycloak login theme named `owncloud` in
 [`themes/owncloud/login/`](themes/owncloud/login/). It applies the ownCloud
@@ -20,7 +20,7 @@ match the builtin oCIS IDP login screen. The theme is:
 It inherits everything from the standard `keycloak` login theme
 (`parent=keycloak` in `theme.properties`) and only overrides CSS and images.
 
-### Replacing the background image
+### Replacing the Background Image
 
 Overwrite [`themes/owncloud/login/resources/img/owncloud-background.png`](themes/owncloud/login/resources/img/owncloud-background.png)
 with your own image (PNG/JPEG/WebP, recommended minimum resolution 1920×1080)
@@ -36,7 +36,7 @@ Note: Keycloak caches themes. When iterating on the theme, either restart the
 container or start Keycloak with `--spi-theme-static-max-age=-1
 --spi-theme-cache-themes=false --spi-theme-cache-templates=false`.
 
-### Background of the builtin oCIS IDP (when not using Keycloak)
+### Background of the Builtin oCIS IDP (when not using Keycloak)
 
 Deployments that use the builtin oCIS IDP (LibreGraph Connect) instead of
 Keycloak show the same branding background by default: if the environment
