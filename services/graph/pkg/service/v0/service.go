@@ -55,6 +55,7 @@ type Service interface { //nolint:interfacebloat
 	GetMe(w http.ResponseWriter, r *http.Request)
 	GetUsers(w http.ResponseWriter, r *http.Request)
 	GetUser(w http.ResponseWriter, r *http.Request)
+	GetUserDrive(w http.ResponseWriter, r *http.Request)
 	PostUser(w http.ResponseWriter, r *http.Request)
 	DeleteUser(w http.ResponseWriter, r *http.Request)
 	PatchMe(w http.ResponseWriter, r *http.Request)
