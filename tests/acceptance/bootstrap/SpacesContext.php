@@ -808,6 +808,40 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" (?:creates|tries to create) a space "([^"]*)" of type "([^"]*)" with id "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $spaceType
+	 * @param string $spaceId
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theUserCreatesASpaceWithIdUsingTheGraphApi(
+		string $user,
+		string $spaceName,
+		string $spaceType,
+		string $spaceId,
+	): void {
+		$space = ["name" => $spaceName, "driveType" => $spaceType, "id" => $spaceId];
+		$body = json_encode($space);
+		$response = GraphHelper::createSpace(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$body,
+		);
+		$this->featureContext->setResponse($response);
+		if ($response->getStatusCode() === 201) {
+			$space = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+			$this->addToCreatedSpace($user, $space);
+		}
+	}
+
+	/**
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param string $foldersPath
