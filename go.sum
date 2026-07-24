@@ -739,8 +739,8 @@ github.com/orcaman/concurrent-map v1.0.0 h1:I/2A2XPCb4IuQWcQhBhSwGfiuybl/J0ev9HD
 github.com/orcaman/concurrent-map v1.0.0/go.mod h1:Lu3tH6HLW3feq74c2GC+jIMS/K2CFcDWnWD9XkenwhI=
 github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245 h1:JRidLTAKhnvyLMRtVtSF4lhBa0NSAOs6fof+d6JnKII=
 github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245/go.mod h1:z61VMGAJRtR1nbgXWiNoCkxUXP1B3Je9rMuJbnGd+Og=
-github.com/owncloud/reva/v2 v2.0.0-20260710104539-1f85e04c1e35 h1:40KHez6z6Ea+MHatRfZp4ZTX1TASGRG5UfvOpsQRbgU=
-github.com/owncloud/reva/v2 v2.0.0-20260710104539-1f85e04c1e35/go.mod h1:m2fGRZDsnNSBszbnwysuq7uhlitQ90+weX4FFQRdkak=
+github.com/owncloud/reva/v2 v2.0.0-20260722150855-b3f3d8e889a3 h1:I0TINypq76zgV6bKXJgefErreWmPDNRzbI2B47DIngw=
+github.com/owncloud/reva/v2 v2.0.0-20260722150855-b3f3d8e889a3/go.mod h1:m2fGRZDsnNSBszbnwysuq7uhlitQ90+weX4FFQRdkak=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pablodz/inotifywaitgo v0.0.12 h1:DVJJTFMDlSAdO46yisPF2vzozs/r+4k6ih8MVghq78M=

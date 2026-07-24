@@ -415,6 +415,33 @@ func (f *FS) CommitUpload(ctx context.Context, ref *provider.Reference, source s
 	return res0, res1
 }
 
+func (f *FS) PrepareUpload(ctx context.Context, ref *provider.Reference, sessionID string, info storage.UploadInfo) (*storage.PrepareUploadResult, error) {
+	var (
+		err     error
+		unhook  UnHook
+		unhooks []UnHook
+	)
+	for _, hook := range f.hooks {
+		ctx, unhook, err = hook("PrepareUpload", ctx, ref.GetResourceId().GetSpaceId())
+		if err != nil {
+			return nil, err
+		}
+		if unhook != nil {
+			unhooks = append(unhooks, unhook)
+		}
+	}
+
+	res, err := f.next.PrepareUpload(ctx, ref, sessionID, info)
+
+	for _, unhook := range unhooks {
+		if uerr := unhook(); uerr != nil {
+			return nil, uerr
+		}
+	}
+
+	return res, err
+}
+
 func (f *FS) Download(ctx context.Context, ref *provider.Reference, openReaderFunc func(md *provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
 	var (
 		err     error

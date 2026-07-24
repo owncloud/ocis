@@ -155,6 +155,10 @@ func (fs *cephfs) CommitUpload(ctx context.Context, ref *provider.Reference, sou
 	return nil, errtypes.NotSupported("op not supported")
 }
 
+func (fs *cephfs) PrepareUpload(_ context.Context, _ *provider.Reference, _ string, info storage.UploadInfo) (*storage.PrepareUploadResult, error) {
+	return &storage.PrepareUploadResult{VersionCreated: info.NodeExisted}, nil
+}
+
 // UseIn tells the tus upload middleware which extensions it supports.
 func (fs *cephfs) UseIn(composer *tusd.StoreComposer) {
 	composer.UseCore(fs)

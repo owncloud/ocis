@@ -22,6 +22,7 @@ import (
 	"context"
 	"io"
 	"net/url"
+	"time"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -66,6 +67,20 @@ type SetLockResult struct {
 type UnlockResult struct {
 	SpaceOwner *userpb.UserId
 	SpaceID    string
+}
+
+type UploadInfo struct {
+	NodeExisted       bool // true when the target node existed before the upload started
+	Size              int64
+	MTime             time.Time
+	Checksums         UploadChecksums
+	IfMatch           string
+	IfNoneMatch       string
+	IfUnmodifiedSince time.Time
+}
+
+type PrepareUploadResult struct {
+	VersionCreated bool
 }
 
 // FS is the interface to implement access to the storage.
@@ -118,6 +133,10 @@ type FS interface {
 	MarkProcessing(ctx context.Context, ref *provider.Reference, processing bool, sessionID string) error
 	// CommitUpload writes the staged bytes from source to the resource at ref.
 	CommitUpload(ctx context.Context, ref *provider.Reference, source UploadSource) (*provider.ResourceInfo, error)
+	// PrepareUpload is called after all bytes are received and before postprocessing begins.
+	// Implementations may lock the target node, snapshot the previous version, write new metadata,
+	// and propagate size changes. Drivers that do not require any of these steps may return immediately.
+	PrepareUpload(ctx context.Context, ref *provider.Reference, sessionID string, info UploadInfo) (*PrepareUploadResult, error)
 
 	// Revisions
 
