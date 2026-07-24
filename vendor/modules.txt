@@ -157,7 +157,7 @@ github.com/aws/aws-sdk-go/service/sts/stsiface
 # github.com/bbalet/stopwords v1.0.0
 ## explicit
 github.com/bbalet/stopwords
-# github.com/beevik/etree v1.6.0
+# github.com/beevik/etree v1.7.0
 ## explicit; go 1.23.0
 github.com/beevik/etree
 # github.com/beorn7/perks v1.0.1
@@ -321,7 +321,7 @@ github.com/cloudflare/circl/math/mlsbset
 github.com/cloudflare/circl/sign
 github.com/cloudflare/circl/sign/ed25519
 github.com/cloudflare/circl/sign/ed448
-# github.com/coreos/go-oidc/v3 v3.18.0
+# github.com/coreos/go-oidc/v3 v3.20.0
 ## explicit; go 1.25.0
 github.com/coreos/go-oidc/v3/oidc
 # github.com/coreos/go-semver v0.3.1
@@ -459,10 +459,10 @@ github.com/ggwhite/go-masker
 ## explicit; go 1.25.0
 github.com/go-acme/lego/v4/acme
 github.com/go-acme/lego/v4/challenge
-# github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667
+# github.com/go-asn1-ber/asn1-ber v1.5.8
 ## explicit; go 1.13
 github.com/go-asn1-ber/asn1-ber
-# github.com/go-chi/chi/v5 v5.3.0
+# github.com/go-chi/chi/v5 v5.3.1
 ## explicit; go 1.23
 github.com/go-chi/chi/v5
 github.com/go-chi/chi/v5/middleware
@@ -550,8 +550,8 @@ github.com/go-jose/go-jose/v4/json
 ## explicit; go 1.17
 github.com/go-kit/log
 github.com/go-kit/log/level
-# github.com/go-ldap/ldap/v3 v3.4.13
-## explicit; go 1.24.0
+# github.com/go-ldap/ldap/v3 v3.4.14
+## explicit; go 1.25.0
 github.com/go-ldap/ldap/v3
 # github.com/go-ldap/ldif v0.0.0-20200320164324-fd88d9b715b3
 ## explicit; go 1.14
@@ -882,8 +882,8 @@ github.com/kovidgoyal/go-parallel
 # github.com/kovidgoyal/go-shm v1.0.0
 ## explicit; go 1.24.0
 github.com/kovidgoyal/go-shm
-# github.com/kovidgoyal/imaging v1.8.19
-## explicit; go 1.24.0
+# github.com/kovidgoyal/imaging v1.8.23
+## explicit; go 1.25.0
 github.com/kovidgoyal/imaging
 github.com/kovidgoyal/imaging/apng
 github.com/kovidgoyal/imaging/colorconv
@@ -2246,7 +2246,7 @@ go.yaml.in/yaml/v2
 # go.yaml.in/yaml/v3 v3.0.4
 ## explicit; go 1.16
 go.yaml.in/yaml/v3
-# golang.org/x/crypto v0.52.0
+# golang.org/x/crypto v0.54.0
 ## explicit; go 1.25.0
 golang.org/x/crypto/argon2
 golang.org/x/crypto/bcrypt
@@ -2282,7 +2282,7 @@ golang.org/x/exp/slices
 golang.org/x/exp/slog
 golang.org/x/exp/slog/internal
 golang.org/x/exp/slog/internal/buffer
-# golang.org/x/image v0.43.0
+# golang.org/x/image v0.44.0
 ## explicit; go 1.25.0
 golang.org/x/image/bmp
 golang.org/x/image/ccitt
@@ -2299,12 +2299,12 @@ golang.org/x/image/vector
 golang.org/x/image/vp8
 golang.org/x/image/vp8l
 golang.org/x/image/webp
-# golang.org/x/mod v0.36.0
+# golang.org/x/mod v0.37.0
 ## explicit; go 1.25.0
 golang.org/x/mod/internal/lazyregexp
 golang.org/x/mod/module
 golang.org/x/mod/semver
-# golang.org/x/net v0.55.0
+# golang.org/x/net v0.57.0
 ## explicit; go 1.25.0
 golang.org/x/net/bpf
 golang.org/x/net/context
@@ -2333,12 +2333,12 @@ golang.org/x/net/trace
 ## explicit; go 1.25.0
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
-# golang.org/x/sync v0.21.0
+# golang.org/x/sync v0.22.0
 ## explicit; go 1.25.0
 golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
 golang.org/x/sync/singleflight
-# golang.org/x/sys v0.45.0
+# golang.org/x/sys v0.47.0
 ## explicit; go 1.25.0
 golang.org/x/sys/cpu
 golang.org/x/sys/execabs
@@ -2349,10 +2349,10 @@ golang.org/x/sys/windows/registry
 golang.org/x/sys/windows/svc
 golang.org/x/sys/windows/svc/eventlog
 golang.org/x/sys/windows/svc/mgr
-# golang.org/x/term v0.43.0
+# golang.org/x/term v0.45.0
 ## explicit; go 1.25.0
 golang.org/x/term
-# golang.org/x/text v0.38.0
+# golang.org/x/text v0.40.0
 ## explicit; go 1.25.0
 golang.org/x/text/cases
 golang.org/x/text/encoding
@@ -2380,7 +2380,7 @@ golang.org/x/text/width
 # golang.org/x/time v0.15.0
 ## explicit; go 1.25.0
 golang.org/x/time/rate
-# golang.org/x/tools v0.45.0
+# golang.org/x/tools v0.47.0
 ## explicit; go 1.25.0
 golang.org/x/tools/cover
 golang.org/x/tools/go/ast/astutil
@@ -2414,11 +2414,11 @@ google.golang.org/genproto/protobuf/field_mask
 google.golang.org/genproto/googleapis/api
 google.golang.org/genproto/googleapis/api/annotations
 google.golang.org/genproto/googleapis/api/httpbody
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20260723215102-3fe39f3c1018
 ## explicit; go 1.25.0
 google.golang.org/genproto/googleapis/rpc/errdetails
 google.golang.org/genproto/googleapis/rpc/status
-# google.golang.org/grpc v1.81.1
+# google.golang.org/grpc v1.82.1
 ## explicit; go 1.25.0
 google.golang.org/grpc
 google.golang.org/grpc/attributes
@@ -2440,6 +2440,7 @@ google.golang.org/grpc/encoding
 google.golang.org/grpc/encoding/gzip
 google.golang.org/grpc/encoding/internal
 google.golang.org/grpc/encoding/proto
+google.golang.org/grpc/experimental/balancer/weight
 google.golang.org/grpc/experimental/stats
 google.golang.org/grpc/grpclog
 google.golang.org/grpc/grpclog/internal
@@ -2448,7 +2449,6 @@ google.golang.org/grpc/health/grpc_health_v1
 google.golang.org/grpc/internal
 google.golang.org/grpc/internal/backoff
 google.golang.org/grpc/internal/balancer/gracefulswitch
-google.golang.org/grpc/internal/balancer/weight
 google.golang.org/grpc/internal/balancerload
 google.golang.org/grpc/internal/binarylog
 google.golang.org/grpc/internal/buffer
@@ -2474,6 +2474,7 @@ google.golang.org/grpc/internal/stats
 google.golang.org/grpc/internal/status
 google.golang.org/grpc/internal/syscall
 google.golang.org/grpc/internal/transport
+google.golang.org/grpc/internal/transport/internal
 google.golang.org/grpc/internal/transport/networktype
 google.golang.org/grpc/internal/transport/readyreader
 google.golang.org/grpc/keepalive
