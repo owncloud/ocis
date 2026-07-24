@@ -38,6 +38,8 @@ type ConvertColor struct {
 	// Precomputed combined matrix from XYZ(whitepoint) directly to linear sRGB (D65).
 	// Combined = srgbFromXYZ * adaptMatrix (where adaptMatrix adapts XYZ D50 -> XYZ D65).
 	combined_XYZ_to_linear_SRGB Mat3
+	previous_matrices           Mat3
+	out_of_gamut_handler        *ConvertColor
 }
 
 func (c ConvertColor) String() string {
@@ -47,6 +49,7 @@ func (c ConvertColor) String() string {
 func (cc *ConvertColor) AddPreviousMatrix(a, b, c [3]float64) {
 	prev := Mat3{a, b, c}
 	cc.combined_XYZ_to_linear_SRGB = mulMat3(cc.combined_XYZ_to_linear_SRGB, prev)
+	cc.previous_matrices = mulMat3(cc.previous_matrices, prev)
 }
 
 func NewConvertColor(whitepoint_x, whitepoint_y, whitepoint_z, scale float64) (ans *ConvertColor) {
@@ -59,6 +62,10 @@ func NewConvertColor(whitepoint_x, whitepoint_y, whitepoint_z, scale float64) (a
 		{0.0557 * scale, -0.2040 * scale, 1.0570 * scale},
 	}
 	ans.combined_XYZ_to_linear_SRGB = mulMat3(srgbFromXYZ, adapt)
+	ans.previous_matrices[0][0] = 1
+	ans.previous_matrices[1][1] = 1
+	ans.previous_matrices[2][2] = 1
+	ans.out_of_gamut_handler = &ConvertColor{whitepoint: ans.whitepoint, combined_XYZ_to_linear_SRGB: ans.combined_XYZ_to_linear_SRGB}
 	return
 }
 
@@ -148,6 +155,14 @@ func (c *ConvertColor) XYZToSRGB(X, Y, Z float64) (r, g, b float64) {
 	if inGamut(r, g, b) {
 		return
 	}
+	// When only slightly out of gamut clamp for performance instead of doing actual mapping
+	const lower = -0.001
+	const upper = 1 - lower
+	if r >= lower && r <= upper && g >= lower && g <= upper && b >= lower && b <= upper {
+		return clamp01(r), clamp01(g), clamp01(b)
+	}
+	X, Y, Z = mulMat3Vec(c.previous_matrices, Vec3{X, Y, Z})
+	c = c.out_of_gamut_handler
 	L, a, bb := c.XYZToLab(X, Y, Z)
 	return c.LabToSRGB(L, a, bb)
 }
@@ -384,6 +399,7 @@ func (c *ConvertColor) gamutMapChromaScale(L, a, b float64) (r, g, bl float64) {
 	hi := 1.0
 	var mid float64
 	var foundR, foundG, foundB float64
+	found := false
 	// If even fully desaturated (a=b=0) is out of gamut, we'll clip
 	for range 24 {
 		mid = (lo + hi) / 2.0
@@ -392,6 +408,7 @@ func (c *ConvertColor) gamutMapChromaScale(L, a, b float64) (r, g, bl float64) {
 		r0, g0, b0 := c.LabToSRGBNoGamutMap(L, a2, b2)
 		if inGamut(r0, g0, b0) {
 			foundR, foundG, foundB = r0, g0, b0
+			found = true
 			// can try to keep more chroma
 			lo = mid
 		} else {
@@ -399,7 +416,7 @@ func (c *ConvertColor) gamutMapChromaScale(L, a, b float64) (r, g, bl float64) {
 		}
 	}
 	// If we never found a valid in-gamut during binary search, try a= b =0
-	if !(inGamut(foundR, foundG, foundB)) {
+	if !(found && inGamut(foundR, foundG, foundB)) {
 		r0, g0, b0 := c.LabToSRGBNoGamutMap(L, 0, 0)
 		// if still out-of-gamut (very unlikely), clip
 		return clamp01(r0), clamp01(g0), clamp01(b0)

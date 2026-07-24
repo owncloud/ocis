@@ -5,6 +5,7 @@
 package webp
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"image"
@@ -92,6 +93,9 @@ func decode(r io.Reader, configOnly bool) (image.Image, image.Config, error) {
 			if err != nil {
 				return nil, image.Config{}, err
 			}
+			if seenVP8X && (fh.Width != int(widthMinusOne)+1 || fh.Height != int(heightMinusOne)+1) {
+				return nil, image.Config{}, errInvalidFormat
+			}
 			if configOnly {
 				return nil, image.Config{
 					ColorModel: color.YCbCrModel,
@@ -120,9 +124,40 @@ func decode(r io.Reader, configOnly bool) (image.Image, image.Config, error) {
 				c, err := vp8l.DecodeConfig(chunkData)
 				return nil, c, err
 			}
+			if seenVP8X {
+				// Verify the VP8L chunk dimensions match before
+				// calling vp8l.Decode, to catch malicious images
+				// following a small VP8X header with a huge VP8L chunk.
+				//
+				// Peek the VP8L header.
+				//
+				// chunkData is always an unbuffered riff.chunkReader.
+				// Creating a bufio.Reader here doesn't add any
+				// inefficiency, since the vp8l package will do it
+				// if we don't.
+				bufReader := bufio.NewReader(chunkData)
+				chunkData = bufReader
+				const vp8lHeaderSize = 5
+				vp8lHeader, err := bufReader.Peek(vp8lHeaderSize)
+				if err != nil {
+					if err == io.EOF {
+						err = errInvalidFormat
+					}
+					return nil, image.Config{}, err
+				}
+				c, err := vp8l.DecodeConfig(bytes.NewReader(vp8lHeader))
+				if err != nil {
+					return nil, image.Config{}, err
+				}
+				if c.Width != int(widthMinusOne)+1 || c.Height != int(heightMinusOne)+1 {
+					return nil, image.Config{}, errInvalidFormat
+				}
+			}
 			m, err := vp8l.Decode(chunkData)
-			return m, image.Config{}, err
-
+			if err != nil {
+				return nil, image.Config{}, err
+			}
+			return m, image.Config{}, nil
 		case fccVP8X:
 			if seenVP8X {
 				return nil, image.Config{}, errInvalidFormat
