@@ -35,7 +35,7 @@
   ],
   "devDependencies": {
     "@axe-core/playwright": "^4.11.0",
-    "@babel/core": "7.28.5",
+    "@babel/core": "7.29.6",
     "@babel/preset-env": "7.28.5",
     "@babel/register": "7.28.3",
     "@noble/hashes": "2.0.1",
