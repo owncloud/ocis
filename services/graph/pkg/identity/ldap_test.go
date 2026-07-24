@@ -460,8 +460,12 @@ func TestUpdateUser(t *testing.T) {
 									DN: "uid=oldName",
 									Attributes: []*ldap.EntryAttribute{
 										{
-											Name:   "displayname",
-											Values: []string{"oldmail@example.org"},
+											Name:   lconfig.UserDisplayNameAttribute,
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   lconfig.UserNameAttribute,
+											Values: []string{"testUser"},
 										},
 										{
 											Name:   "entryUUID",
@@ -470,54 +474,6 @@ func TestUpdateUser(t *testing.T) {
 										{
 											Name:   "mail",
 											Values: []string{"oldmail@example.org"},
-										},
-										{
-											Name:   lconfig.UserEnabledAttribute,
-											Values: []string{""},
-										},
-									},
-								},
-							},
-						},
-						nil,
-					},
-				},
-				{
-					funcName: "Search",
-					args: []interface{}{
-						&ldap.SearchRequest{
-							BaseDN:       "uid=oldName",
-							Scope:        0,
-							DerefAliases: 0,
-							SizeLimit:    1,
-							TimeLimit:    0,
-							TypesOnly:    false,
-							Filter:       "(objectClass=inetOrgPerson)",
-							Attributes:   ldapUserAttributes,
-							Controls:     []ldap.Control(nil),
-						},
-					},
-					returns: []interface{}{
-						&ldap.SearchResult{
-							Entries: []*ldap.Entry{
-								{
-									DN: "uid=oldName",
-									Attributes: []*ldap.EntryAttribute{
-										{
-											Name:   lconfig.UserIDAttribute,
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   lconfig.UserEmailAttribute,
-											Values: []string{"testuser@example.org"},
-										},
-										{
-											Name:   lconfig.UserDisplayNameAttribute,
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   lconfig.UserNameAttribute,
-											Values: []string{"testUser"},
 										},
 										{
 											Name:   lconfig.UserEnabledAttribute,
@@ -590,7 +546,11 @@ func TestUpdateUser(t *testing.T) {
 									DN: "uid=oldName",
 									Attributes: []*ldap.EntryAttribute{
 										{
-											Name:   "displayname",
+											Name:   lconfig.UserDisplayNameAttribute,
+											Values: []string{"oldName"},
+										},
+										{
+											Name:   lconfig.UserNameAttribute,
 											Values: []string{"testUser"},
 										},
 										{
@@ -600,54 +560,6 @@ func TestUpdateUser(t *testing.T) {
 										{
 											Name:   "mail",
 											Values: []string{"testuser@example.org"},
-										},
-										{
-											Name:   lconfig.UserEnabledAttribute,
-											Values: []string{""},
-										},
-									},
-								},
-							},
-						},
-						nil,
-					},
-				},
-				{
-					funcName: "Search",
-					args: []interface{}{
-						&ldap.SearchRequest{
-							BaseDN:       "uid=oldName",
-							Scope:        0,
-							DerefAliases: 0,
-							SizeLimit:    1,
-							TimeLimit:    0,
-							TypesOnly:    false,
-							Filter:       "(objectClass=inetOrgPerson)",
-							Attributes:   ldapUserAttributes,
-							Controls:     []ldap.Control(nil),
-						},
-					},
-					returns: []interface{}{
-						&ldap.SearchResult{
-							Entries: []*ldap.Entry{
-								{
-									DN: "uid=oldName",
-									Attributes: []*ldap.EntryAttribute{
-										{
-											Name:   lconfig.UserIDAttribute,
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   lconfig.UserEmailAttribute,
-											Values: []string{"testuser@example.org"},
-										},
-										{
-											Name:   lconfig.UserDisplayNameAttribute,
-											Values: []string{"newName"},
-										},
-										{
-											Name:   lconfig.UserNameAttribute,
-											Values: []string{"testUser"},
 										},
 										{
 											Name:   lconfig.UserEnabledAttribute,
@@ -910,8 +822,12 @@ func TestUpdateUser(t *testing.T) {
 									DN: "uid=name",
 									Attributes: []*ldap.EntryAttribute{
 										{
-											Name:   "displayname",
-											Values: []string{"testuser@example.org"},
+											Name:   lconfig.UserDisplayNameAttribute,
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   lconfig.UserNameAttribute,
+											Values: []string{"testUser"},
 										},
 										{
 											Name:   "entryUUID",
@@ -924,54 +840,6 @@ func TestUpdateUser(t *testing.T) {
 										{
 											Name:   lconfig.UserEnabledAttribute,
 											Values: []string{"TRUE"},
-										},
-									},
-								},
-							},
-						},
-						nil,
-					},
-				},
-				{
-					funcName: "Search",
-					args: []interface{}{
-						&ldap.SearchRequest{
-							BaseDN:       "uid=name",
-							Scope:        0,
-							DerefAliases: 0,
-							SizeLimit:    1,
-							TimeLimit:    0,
-							TypesOnly:    false,
-							Filter:       "(objectClass=inetOrgPerson)",
-							Attributes:   ldapUserAttributes,
-							Controls:     []ldap.Control(nil),
-						},
-					},
-					returns: []interface{}{
-						&ldap.SearchResult{
-							Entries: []*ldap.Entry{
-								{
-									DN: "uid=name",
-									Attributes: []*ldap.EntryAttribute{
-										{
-											Name:   lconfig.UserIDAttribute,
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   lconfig.UserEmailAttribute,
-											Values: []string{"testuser@example.org"},
-										},
-										{
-											Name:   lconfig.UserDisplayNameAttribute,
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   lconfig.UserNameAttribute,
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   lconfig.UserEnabledAttribute,
-											Values: []string{"FALSE"},
 										},
 									},
 								},
@@ -1041,8 +909,12 @@ func TestUpdateUser(t *testing.T) {
 									DN: "uid=name",
 									Attributes: []*ldap.EntryAttribute{
 										{
+											Name:   "uid",
+											Values: []string{"testUser"},
+										},
+										{
 											Name:   "displayname",
-											Values: []string{"testuser@example.org"},
+											Values: []string{"testUser"},
 										},
 										{
 											Name:   "entryUUID",
@@ -1114,58 +986,6 @@ func TestUpdateUser(t *testing.T) {
 					},
 					returns: []interface{}{nil},
 				},
-				{
-					funcName: "Modify",
-					args: []interface{}{
-						&ldap.ModifyRequest{
-							DN:       "uid=name",
-							Changes:  []ldap.Change(nil),
-							Controls: []ldap.Control(nil),
-						},
-					},
-					returns: []interface{}{nil},
-				},
-				{
-					funcName: "Search",
-					args: []interface{}{
-						ldap.NewSearchRequest(
-							"uid=name",
-							ldap.ScopeBaseObject,
-							ldap.NeverDerefAliases, 1, 0, false,
-							"(objectClass=inetOrgPerson)",
-							ldapUserAttributes,
-							[]ldap.Control(nil),
-						),
-					},
-					returns: []interface{}{
-						&ldap.SearchResult{
-							Entries: []*ldap.Entry{
-								{
-									DN: "uid=name",
-									Attributes: []*ldap.EntryAttribute{
-										{
-											Name:   "uid",
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   "displayname",
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   "entryUUID",
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   "mail",
-											Values: []string{"testuser@example.org"},
-										},
-									},
-								},
-							},
-						},
-						nil,
-					},
-				},
 			},
 		},
 		{
@@ -1208,8 +1028,12 @@ func TestUpdateUser(t *testing.T) {
 									DN: "uid=name",
 									Attributes: []*ldap.EntryAttribute{
 										{
+											Name:   "uid",
+											Values: []string{"testUser"},
+										},
+										{
 											Name:   "displayname",
-											Values: []string{"testuser@example.org"},
+											Values: []string{"testUser"},
 										},
 										{
 											Name:   "entryUUID",
@@ -1281,58 +1105,6 @@ func TestUpdateUser(t *testing.T) {
 					},
 					returns: []interface{}{nil},
 				},
-				{
-					funcName: "Modify",
-					args: []interface{}{
-						&ldap.ModifyRequest{
-							DN:       "uid=name",
-							Changes:  []ldap.Change(nil),
-							Controls: []ldap.Control(nil),
-						},
-					},
-					returns: []interface{}{nil},
-				},
-				{
-					funcName: "Search",
-					args: []interface{}{
-						ldap.NewSearchRequest(
-							"uid=name",
-							ldap.ScopeBaseObject,
-							ldap.NeverDerefAliases, 1, 0, false,
-							"(objectClass=inetOrgPerson)",
-							ldapUserAttributes,
-							[]ldap.Control(nil),
-						),
-					},
-					returns: []interface{}{
-						&ldap.SearchResult{
-							Entries: []*ldap.Entry{
-								{
-									DN: "uid=name",
-									Attributes: []*ldap.EntryAttribute{
-										{
-											Name:   "uid",
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   "displayname",
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   "entryUUID",
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   "mail",
-											Values: []string{"testuser@example.org"},
-										},
-									},
-								},
-							},
-						},
-						nil,
-					},
-				},
 			},
 		},
 		{
@@ -1374,8 +1146,12 @@ func TestUpdateUser(t *testing.T) {
 									DN: "uid=name",
 									Attributes: []*ldap.EntryAttribute{
 										{
+											Name:   "uid",
+											Values: []string{"testUser"},
+										},
+										{
 											Name:   "displayname",
-											Values: []string{"testuser@example.org"},
+											Values: []string{"testUser"},
 										},
 										{
 											Name:   "entryUUID",
@@ -1414,62 +1190,6 @@ func TestUpdateUser(t *testing.T) {
 						},
 					},
 					returns: []interface{}{nil},
-				},
-				{
-					funcName: "Modify",
-					args: []interface{}{
-						&ldap.ModifyRequest{
-							DN:       "uid=name",
-							Changes:  []ldap.Change(nil),
-							Controls: []ldap.Control(nil),
-						},
-					},
-					returns: []interface{}{nil},
-				},
-				{
-					funcName: "Search",
-					args: []interface{}{
-						ldap.NewSearchRequest(
-							"uid=name",
-							ldap.ScopeBaseObject,
-							ldap.NeverDerefAliases, 1, 0, false,
-							"(objectClass=inetOrgPerson)",
-							ldapUserAttributes,
-							[]ldap.Control(nil),
-						),
-					},
-					returns: []interface{}{
-						&ldap.SearchResult{
-							Entries: []*ldap.Entry{
-								{
-									DN: "uid=name",
-									Attributes: []*ldap.EntryAttribute{
-										{
-											Name:   "uid",
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   "displayname",
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   "entryUUID",
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   "mail",
-											Values: []string{"testuser@example.org"},
-										},
-										{
-											Name:   lconfig.UserTypeAttribute,
-											Values: []string{"Member"},
-										},
-									},
-								},
-							},
-						},
-						nil,
-					},
 				},
 			},
 		},

@@ -220,10 +220,18 @@ func (i *LDAP) CreateGroup(ctx context.Context, group libregraph.Group) (*libreg
 		}
 	}
 
-	// Read	back group from LDAP to get the generated UUID
-	e, err := i.getGroupByDN(ar.DN)
-	if err != nil {
-		return nil, err
+	var e *ldap.Entry
+	if i.useServerUUID {
+		// The directory assigns the ID and conn.Add cannot return it, so we must
+		// read the entry back to recover the generated UUID.
+		e, err = i.getGroupByDN(ar.DN)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// oCIS generated the ID and wrote it into the AddRequest, so synthesize the
+		// entry from data already in hand instead of reading it back.
+		e = ldap.NewEntry(ar.DN, attrsFromAddRequest(ar))
 	}
 	return i.createGroupModelFromLDAP(e), nil
 }
@@ -462,7 +470,7 @@ func (i *LDAP) groupToLDAPAttrValues(group libregraph.Group) (map[string][]strin
 	attrs["objectClass"] = append(attrs["objectClass"], i.groupAdditionalObjectClasses...)
 
 	if !i.useServerUUID {
-		attrs["owncloudUUID"] = []string{uuid.Must(uuid.NewV4()).String()}
+		attrs[i.groupAttributeMap.id] = []string{uuid.Must(uuid.NewV4()).String()}
 		attrs["objectClass"] = append(attrs["objectClass"], "owncloud")
 	}
 
@@ -490,7 +498,7 @@ func (i *LDAP) getLDAPGroupByNameOrID(nameOrID string, requestMembers bool) (*ld
 	if err == nil {
 		filter = fmt.Sprintf("(|(%s=%s)(%s=%s))", i.groupAttributeMap.name, ldap.EscapeFilter(nameOrID), i.groupAttributeMap.id, idString)
 	} else {
-		filter = fmt.Sprintf("(%s=%s)", i.userAttributeMap.userName, ldap.EscapeFilter(nameOrID))
+		filter = fmt.Sprintf("(%s=%s)", i.groupAttributeMap.name, ldap.EscapeFilter(nameOrID))
 	}
 	return i.getLDAPGroupByFilter(filter, requestMembers)
 }

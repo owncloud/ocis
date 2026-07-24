@@ -147,6 +147,15 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 	if config.GroupNameAttribute == "" || config.GroupIDAttribute == "" {
 		return nil, errors.New("invalid group attribute mappings")
 	}
+
+	// Octet-string ID attributes (e.g. Active Directory's objectGUID) are assigned by
+	// the directory server, which requires UseServerUUID=true. With UseServerUUID=false
+	// oCIS generates the ID and writes it as a string UUID, so an octet-string ID
+	// attribute would be decoded from raw string bytes and produce a corrupt ID. Reject
+	// this incompatible combination at startup instead of silently returning bad IDs.
+	if !config.UseServerUUID && (config.UserIDIsOctetString || config.GroupIDIsOctetString) {
+		return nil, errors.New("invalid config: octet-string ID attributes require GRAPH_LDAP_SERVER_UUID=true")
+	}
 	gam := groupAttributeMap{
 		name:        config.GroupNameAttribute,
 		id:          config.GroupIDAttribute,
@@ -263,10 +272,19 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 		}
 	}
 
-	// Read	back user from LDAP to get the generated UUID
-	e, err := i.getUserByDN(ar.DN, "")
-	if err != nil {
-		return nil, err
+	var e *ldap.Entry
+	if i.useServerUUID {
+		// The directory assigns the ID and conn.Add cannot return it, so we must
+		// read the entry back to recover the generated UUID.
+		e, err = i.getUserByDN(ar.DN, "")
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// oCIS generated the ID and wrote it into the AddRequest, so everything the
+		// model builder needs is already in hand — synthesize the entry instead of
+		// reading it back (avoids a read-after-write against a lagging replica).
+		e = ldap.NewEntry(ar.DN, attrsFromAddRequest(ar))
 	}
 	return i.createUserModelFromLDAP(e), nil
 }
@@ -436,11 +454,12 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 		}
 	}
 
-	// Read	back user from LDAP to get the generated UUID
-	e, err = i.getUserByDN(e.DN, "")
-	if err != nil {
-		return nil, err
-	}
+	// Fold the applied changes onto the pre-read entry instead of reading it back.
+	// The ID is immutable on update (rejected above) and every field the model builder
+	// reads is either already on e or in the ModifyRequest just applied, so no
+	// read-after-write is needed. The rename branch (changeUserName) is handled above
+	// and keeps its own read-back.
+	e = applyModifyToEntry(e, &mr)
 
 	returnUser := i.createUserModelFromLDAP(e)
 
