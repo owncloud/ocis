@@ -133,7 +133,8 @@ func (g Graph) GetAllDrives(version APIVersion) http.HandlerFunc {
 // GetAllDrivesV1 attempts to retrieve the current users drives;
 // it includes another user's drives, if the current user has the permission.
 func (g Graph) GetAllDrivesV1(w http.ResponseWriter, r *http.Request) {
-	spaces, errCode := g.getDrives(r, true, APIVersion_1)
+	unrestricted := g.contextUserHasFullAccountPerms(r.Context()) // only users with full account permissions can have unrestricted access
+	spaces, errCode := g.getDrives(r, unrestricted, APIVersion_1)
 	if errCode != nil {
 		errorcode.RenderError(w, r, errCode)
 		return
@@ -153,7 +154,8 @@ func (g Graph) GetAllDrivesV1(w http.ResponseWriter, r *http.Request) {
 // it includes the grantedtoV2 property
 // it uses unified roles instead of the cs3 representations
 func (g Graph) GetAllDrivesV1Beta1(w http.ResponseWriter, r *http.Request) {
-	drives, errCode := g.getDrives(r, true, APIVersion_1_Beta_1)
+	unrestricted := g.contextUserHasFullAccountPerms(r.Context()) // only users with full account permissions can have unrestricted access
+	drives, errCode := g.getDrives(r, unrestricted, APIVersion_1_Beta_1)
 	if errCode != nil {
 		errorcode.RenderError(w, r, errCode)
 		return
@@ -269,10 +271,12 @@ func (g Graph) getSingleDrive(w http.ResponseWriter, r *http.Request, apiVersion
 
 	log.Debug().Msg("calling list storage spaces with id filter")
 
+	unrestricted := g.contextUserHasFullAccountPerms(ctx) // only users with full account permissions can have unrestricted access
+
 	filters := []*storageprovider.ListStorageSpacesRequest_Filter{
 		listStorageSpacesIDFilter(storagespace.FormatResourceID(&rid)),
 	}
-	res, err := g.ListStorageSpacesWithFilters(ctx, filters, true)
+	res, err := g.ListStorageSpacesWithFilters(ctx, filters, unrestricted)
 	switch {
 	case err != nil:
 		log.Error().Err(err).Msg("could not get drive: transport error")
@@ -578,11 +582,12 @@ func (g Graph) updateDrive(w http.ResponseWriter, r *http.Request, apiVersion AP
 
 	if drive.Quota.HasTotal() {
 		user := revactx.ContextMustGetUser(r.Context())
+		unrestricted := g.contextUserHasFullAccountPerms(r.Context()) // only users with full account permissions can have unrestricted access
 
 		// NOTE: a space admin cannot get a space by ID. We need to fetch all spaces and search for it
 		dt := _spaceTypePersonal
 		filters := []*storageprovider.ListStorageSpacesRequest_Filter{listStorageSpacesTypeFilter(_spaceTypeProject)}
-		res, err := g.ListStorageSpacesWithFilters(r.Context(), filters, true)
+		res, err := g.ListStorageSpacesWithFilters(r.Context(), filters, unrestricted)
 		if err == nil && res.GetStatus().GetCode() == cs3rpc.Code_CODE_OK {
 			for _, sp := range res.StorageSpaces {
 				id, _ := storagespace.ParseID(sp.GetId().GetOpaqueId())
