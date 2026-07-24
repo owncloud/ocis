@@ -205,7 +205,7 @@ func (c *ContentConnector) GetFile(ctx context.Context, w http.ResponseWriter) e
 // cases or if the method is successful, an empty string will be returned
 // (check for err != nil to know if something went wrong)
 //
-// On success, the method will return the new mtime of the file
+// On success, the method will return the new mtime of the file.
 func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, streamLength int64, lockID string) (*ConnectorResponse, error) {
 	wopiContext, err := middleware.WopiContextFromCtx(ctx)
 	if err != nil {
