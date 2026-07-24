@@ -706,6 +706,9 @@ func (t *Tree) InitNewNode(ctx context.Context, n *node.Node, fsize uint64) (met
 	h, err := os.OpenFile(n.InternalPath(), os.O_CREATE|os.O_EXCL, 0600)
 	subspan.End()
 	if err != nil {
+		if errors.Is(err, fs.ErrExist) {
+			return unlock, errtypes.AlreadyExists(n.Name)
+		}
 		return unlock, err
 	}
 	h.Close()
