@@ -22,6 +22,13 @@ describe('OcBreadcrumb', () => {
     )
     expect(wrapper.html()).toMatchSnapshot()
   })
+  it('does not make list items focusable to avoid duplicate screen reader announcements', () => {
+    const { wrapper } = getWrapper()
+    const listItems = wrapper.findAll('.oc-breadcrumb-list-item:not(.oc-invisible-sr)')
+    listItems.forEach((li) => {
+      expect(li.attributes('tabindex')).not.toBe('0')
+    })
+  })
   it('displays context menu trigger if enabled via property', () => {
     const { wrapper } = getWrapper({ showContextActions: true })
     expect(wrapper.find('#oc-breadcrumb-contextmenu-trigger').exists()).toBe(true)
