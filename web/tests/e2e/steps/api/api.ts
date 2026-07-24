@@ -71,6 +71,30 @@ export async function userHasCreatedFiles({
   }
 }
 
+// export async function userHasCreatedVaultFiles({
+//   stepUser,
+//   files
+// }: {
+//   stepUser: string
+//   files: {
+//     pathToFile: string
+//     content: string
+//     mtimeDeltaDays?: string
+//   }[]
+// }): Promise<void> {
+//   const world = getWorld()
+//   const user = world.usersEnvironment.getUser({ key: stepUser })
+
+//   for (const file of files) {
+//     await api.dav.uploadFileInVaultSpace({
+//       user,
+//       pathToFile: file.pathToFile,
+//       content: file.content,
+//       mtimeDeltaDays: file.mtimeDeltaDays
+//     })
+//   }
+// }
+
 export async function userHasSharedResources({
   stepUser,
   shares
