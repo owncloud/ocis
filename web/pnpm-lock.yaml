@@ -577,9 +577,15 @@ importers:
       '@ownclouders/web-pkg':
         specifier: workspace:*
         version: link:../web-pkg
+      '@zip.js/zip.js':
+        specifier: 2.8.33
+        version: 2.8.33
       epubjs:
         specifier: ^0.3.93
         version: 0.3.93
+      focus-trap-vue:
+        specifier: ^4.1.0
+        version: 4.1.0(focus-trap@8.2.0)(vue@3.5.29(typescript@5.9.3))
       vue3-gettext:
         specifier: ^4.0.1
         version: 4.0.1(vue@3.5.29(typescript@5.9.3))
