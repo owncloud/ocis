@@ -14,7 +14,7 @@
     <div class="oc-login-form" id="consent-root">
       <img class="oc-logo" src="{{.LogoURL}}" alt="ownCloud">
       <h1 class="oc-invisible-sr">{{.Headline}}</h1>
-      <p id="oc-consent-error-message" class="oc-error-message" hidden></p>
+      <p id="oc-consent-error-message" class="oc-error-message" role="alert" aria-live="assertive" hidden></p>
       <div id="consent-body" hidden>
         <p id="consent-display-name" class="oc-light oc-consent-headline"></p>
         <p id="consent-username" class="oc-light oc-consent-username"></p>
@@ -127,13 +127,16 @@
       if (!desc) desc = "Scope: " + scope;
       var li = document.createElement("li");
       li.className = "oc-consent-scope-item";
+      var scopeId = "consent-scope-" + alias;
       var cb = document.createElement("input");
       cb.type = "checkbox";
+      cb.id = scopeId;
       cb.checked = true;
       cb.disabled = true;
       cb.className = "oc-consent-checkbox";
-      var label = document.createElement("span");
+      var label = document.createElement("label");
       label.className = "oc-light";
+      label.setAttribute("for", scopeId);
       label.textContent = desc;
       li.appendChild(cb);
       li.appendChild(label);
