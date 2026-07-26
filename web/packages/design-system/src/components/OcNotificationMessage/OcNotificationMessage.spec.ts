@@ -110,15 +110,113 @@ describe('OcNotificationMessage', () => {
     expect(wrapper.emitted('close')).toBeTruthy()
   })
 
+  describe('actions prop', () => {
+    it('should not render actions if none are provided', () => {
+      const wrapper = getWrapper()
+
+      expect(wrapper.find(selectors.actionButton).exists()).toBeFalsy()
+    })
+
+    it('should render an action button for each action', () => {
+      const actions = [
+        { label: 'Undo', ariaLabel: 'Undo delete', onClick: vi.fn() },
+        { label: 'Retry', onClick: vi.fn() }
+      ]
+      const wrapper = getWrapper({ actions })
+      const buttons = wrapper.findAll(selectors.actionButton)
+
+      expect(buttons.length).toBe(2)
+      expect(buttons[0].text()).toBe('Undo')
+      expect(buttons[0].attributes('aria-label')).toBe('Undo delete')
+      expect(buttons[1].attributes('aria-label')).toBe('Retry')
+    })
+
+    it('should call onClick when an action button is clicked', async () => {
+      const onClick = vi.fn()
+      const wrapper = getWrapper({ actions: [{ label: 'Undo', onClick }] })
+
+      await wrapper.find(selectors.actionButton).trigger('click')
+
+      expect(onClick).toHaveBeenCalledTimes(1)
+    })
+
+    it('should close the notification when an action button is clicked, so it cannot be clicked twice', async () => {
+      const onClick = vi.fn()
+      const wrapper = getWrapper({ actions: [{ label: 'Undo', onClick }] })
+
+      await wrapper.find(selectors.actionButton).trigger('click')
+
+      expect(wrapper.emitted('close')).toBeTruthy()
+      expect(wrapper.emitted('close').length).toBe(1)
+    })
+
+    it('should not move focus into the notification on mount', () => {
+      const wrapper = getWrapper(
+        { actions: [{ label: 'Undo', onClick: vi.fn() }] },
+        { attachTo: document.body }
+      )
+
+      expect(document.activeElement).toBe(document.body)
+      wrapper.unmount()
+    })
+  })
+
+  describe('auto-dismiss pause/resume', () => {
+    it('should pause the dismiss timer on hover and resume on mouse leave', async () => {
+      const wrapper = getWrapper({ timeout: 10 })
+      const interactiveEl = wrapper.find(selectors.interactiveWrapper)
+
+      await interactiveEl.trigger('mouseenter')
+      vi.advanceTimersByTime(10000)
+      expect(wrapper.emitted('close')).toBeFalsy()
+
+      await interactiveEl.trigger('mouseleave')
+      vi.advanceTimersByTime(10000)
+      expect(wrapper.emitted('close')).toBeTruthy()
+    })
+
+    it('should pause the dismiss timer on focus and resume on blur', async () => {
+      const wrapper = getWrapper({ timeout: 10 })
+      const interactiveEl = wrapper.find(selectors.interactiveWrapper)
+
+      await interactiveEl.trigger('focusin')
+      vi.advanceTimersByTime(10000)
+      expect(wrapper.emitted('close')).toBeFalsy()
+
+      await interactiveEl.trigger('focusout')
+      vi.advanceTimersByTime(10000)
+      expect(wrapper.emitted('close')).toBeTruthy()
+    })
+
+    it('should still auto-dismiss after hover and focus overlap (e.g. clicking a button)', async () => {
+      const wrapper = getWrapper({ timeout: 10 })
+      const interactiveEl = wrapper.find(selectors.interactiveWrapper)
+
+      // hover and focus both engage (as happens when clicking an action button by mouse)
+      await interactiveEl.trigger('mouseenter')
+      await interactiveEl.trigger('focusin')
+      // then only the mouse leaves, focus remains (e.g. keyboard user tabs through)
+      await interactiveEl.trigger('mouseleave')
+      vi.advanceTimersByTime(10000)
+      expect(wrapper.emitted('close')).toBeFalsy()
+
+      await interactiveEl.trigger('focusout')
+      vi.advanceTimersByTime(10000)
+      expect(wrapper.emitted('close')).toBeTruthy()
+    })
+  })
+
   const selectors = {
     messageTitle: '.oc-notification-message-title',
     messageContent: '.oc-notification-message-content',
     messageWrapper: '.oc-notification-message div',
+    interactiveWrapper: '.oc-notification-message-interactive',
     errorLog: '.oc-error-log',
-    errorLogToggleButton: '.oc-notification-message-error-log-toggle-button'
+    errorLogToggleButton: '.oc-notification-message-error-log-toggle-button',
+    actionButton: '.oc-notification-message-action-button'
   }
 
-  function getWrapper(props = {}) {
+  function getWrapper(props = {}, mountOptions = {}) {
     return mount(OcNotificationMessage, {
       props: {
         ...props,
@@ -129,7 +227,8 @@ describe('OcNotificationMessage', () => {
           'oc-icon': true
         },
         plugins: defaultPlugins()
-      }
+      },
+      ...mountOptions
     })
   }
 })
