@@ -112,10 +112,9 @@
       "immutable": "5.1.8",
       "js-cookie": "3.0.7",
       "linkify-it": "5.0.2",
-      "minimatch@>=9.0.0 <9.0.7": "9.0.7",
+      "minimatch": "10.2.5",
+      "brace-expansion": "5.0.8",
       "ws": "8.21.0",
-      "brace-expansion@1": "1.1.16",
-      "brace-expansion@2": "2.1.2",
       "js-yaml": "4.3.0"
     },
     "patchedDependencies": {
