@@ -1,0 +1,20 @@
+---
+# Overrides oCIS's built-in bundled web-app list (Web.Apps in
+# services/web/pkg/config), which otherwise defaults to:
+# files, search, text-editor, pdf-viewer, external, admin-settings,
+# epub-reader, preview, app-store
+# (see services/web/pkg/config/defaults/defaultconfig.go upstream).
+# Adding html-editor here since it's bundled with oCIS but not enabled by default.
+web:
+  config:
+    apps:
+      - files
+      - search
+      - text-editor
+      - pdf-viewer
+      - external
+      - admin-settings
+      - epub-reader
+      - preview
+      - app-store
+      - html-editor

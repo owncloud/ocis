@@ -56,6 +56,7 @@ services:
     volumes:
       - ./config/ocis/app-registry.yaml:/etc/ocis/app-registry.yaml
       - ./config/ocis/csp.yaml:/etc/ocis/csp.yaml
+      - ./config/ocis/web.yaml:/etc/ocis/web.yaml
       - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
       # configure the .env file to use own paths instead of docker internal volumes
       - ${OCIS_CONFIG_DIR:-ocis-config}:/etc/ocis
