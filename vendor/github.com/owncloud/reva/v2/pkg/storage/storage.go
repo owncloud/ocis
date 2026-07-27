@@ -249,6 +249,11 @@ type DeleteStorageSpaceResult struct {
 type UploadSource struct {
 	Body   io.ReadCloser
 	Length int64
+
+	// ScanResult is the antivirus verdict: empty means clean.
+	ScanResult string
+	// ScanDate is zero when the upload was not scanned.
+	ScanDate time.Time
 }
 
 // UnscopeFunc is a function that unscopes a user
