@@ -314,6 +314,41 @@ jobs:
       - name: Run ${{ matrix.suite }}
         run: BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
 
+  ldap-pool-tests:
+    needs: [build-and-test]
+    name: ldapPool-${{ matrix.suite }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - apiGraphUser,apiGraph,apiGraphGroup
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+
+      - name: Install libvips runtime
+        run: |
+          sudo apt-get update -qq
+          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ocis-build-artifacts
+
+      - name: Restore binary permissions
+        run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
+
+      - name: Run ${{ matrix.suite }} with OCIS_LDAP_POOL_ENABLED=true
+        run: BEHAT_SUITES="${{ matrix.suite }}" OCIS_LDAP_POOL_ENABLED=true python3 tests/acceptance/run-github.py
+
   core-api-tests:
     name: ${{ matrix.suite }}
     needs: [build-and-test]
@@ -695,7 +730,7 @@ jobs:
         run: python3 tests/acceptance/run-wopi.py --type cs3
 
   all-acceptance-tests:
-    needs: [detect-changes, local-api-tests, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests]
+    needs: [detect-changes, local-api-tests, cli-tests, ldap-pool-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests]
     runs-on: ubuntu-latest
     if: always()
     steps:
