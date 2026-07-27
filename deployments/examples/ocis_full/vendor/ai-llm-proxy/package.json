@@ -1,0 +1,23 @@
+{
+  "name": "ai-llm-proxy",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Server-side proxy for the AI Document Summary extension — validates oCIS auth and forwards requests to the configured LLM",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "node --watch dist/index.js",
+    "start": "node dist/index.js",
+    "test:unit": "vitest run",
+    "test:e2e": "echo 'No E2E tests for ai-llm-proxy'"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "typescript": "^5.4.0",
+    "vitest": "4.1.10"
+  }
+}

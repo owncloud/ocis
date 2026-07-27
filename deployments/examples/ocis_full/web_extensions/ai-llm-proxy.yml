@@ -1,11 +1,16 @@
 ---
-# NOTE: ai-llm-proxy has no published docker image on Docker Hub. This builds
-# directly from the web-extensions git repository. Revisit and switch to a
-# pinned image once ownCloud publishes one.
+# NOTE: ai-llm-proxy has no published docker image on Docker Hub. Upstream
+# (owncloud/web-extensions) also hardcodes a 60s timeout on the LLM call,
+# which is too short for local/self-hosted reasoning models (e.g. Ollama)
+# generating a few hundred tokens on modest hardware - measured ~195-296s for
+# a realistic document-drafting prompt. Vendored locally under
+# ./vendor/ai-llm-proxy with that timeout made configurable (LLM_TIMEOUT_MS)
+# instead of building from the upstream git context. Revisit and switch back
+# to a pinned upstream image/context once this is fixed upstream.
 services:
   ai-llm-proxy:
     build:
-      context: https://github.com/owncloud/web-extensions.git#main:packages/ai-llm-proxy
+      context: ./vendor/ai-llm-proxy
       dockerfile: Dockerfile
     networks:
       ocis-net:
@@ -18,6 +23,7 @@ services:
       LLM_ENDPOINT: ${AI_LLM_ENDPOINT:-http://host.docker.internal:11434/v1}
       LLM_API_KEY: ${AI_LLM_API_KEY:-}
       LLM_MODEL: ${AI_LLM_MODEL:-}
+      LLM_TIMEOUT_MS: ${AI_LLM_TIMEOUT_MS:-600000}
     extra_hosts:
       - host.docker.internal:host-gateway
     labels:
