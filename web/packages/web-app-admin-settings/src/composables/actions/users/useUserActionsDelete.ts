@@ -4,13 +4,15 @@ import {
   useCapabilityStore,
   useMessages,
   useModals,
-  useRouteQuery
+  useRouteQuery,
+  useUserStore
 } from '@ownclouders/web-pkg'
 import { useClientService } from '@ownclouders/web-pkg'
 import { UserAction, UserActionOptions } from '@ownclouders/web-pkg'
 import { useGettext } from 'vue3-gettext'
 import { User } from '@ownclouders/web-client/graph/generated'
 import { useUserSettingsStore } from '../../stores/userSettings'
+import DeleteUserModal from '../../../components/Users/DeleteUserModal.vue'
 
 export const useUserActionsDelete = () => {
   const { showMessage, showErrorMessage } = useMessages()
@@ -18,6 +20,7 @@ export const useUserActionsDelete = () => {
   const { $gettext, $ngettext } = useGettext()
   const clientService = useClientService()
   const { dispatchModal } = useModals()
+  const userStore = useUserStore()
   const userSettingsStore = useUserSettingsStore()
 
   const currentPageQuery = useRouteQuery('page', '1')
@@ -31,15 +34,18 @@ export const useUserActionsDelete = () => {
   })
 
   const deleteUsers = async (users: User[]) => {
+    const affectedUsers = users.filter((user) => user.id !== userStore.user.id)
     const graphClient = clientService.graphAuthenticated
-    const promises = users.map((user) => graphClient.users.deleteUser(user.id))
+    const promises = affectedUsers.map((user) => graphClient.users.deleteUser(user.id))
     const results = await Promise.allSettled(promises)
 
     const succeeded = results.filter((r) => r.status === 'fulfilled')
     if (succeeded.length) {
       const title =
-        succeeded.length === 1 && users.length === 1
-          ? $gettext('User "%{user}" was deleted successfully', { user: users[0].displayName })
+        succeeded.length === 1 && affectedUsers.length === 1
+          ? $gettext('User "%{user}" was deleted successfully', {
+              user: affectedUsers[0].displayName
+            })
           : $ngettext(
               '%{userCount} user was deleted successfully',
               '%{userCount} users were deleted successfully',
@@ -55,8 +61,8 @@ export const useUserActionsDelete = () => {
       failed.forEach(console.error)
 
       const title =
-        failed.length === 1 && users.length === 1
-          ? $gettext('Failed to delete user "%{user}"', { user: users[0].displayName })
+        failed.length === 1 && affectedUsers.length === 1
+          ? $gettext('Failed to delete user "%{user}"', { user: affectedUsers[0].displayName })
           : $ngettext(
               'Failed to delete %{userCount} user',
               'Failed to delete %{userCount} users',
@@ -70,7 +76,7 @@ export const useUserActionsDelete = () => {
       })
     }
 
-    userSettingsStore.removeUsers(users)
+    userSettingsStore.removeUsers(affectedUsers)
     userSettingsStore.setSelectedUsers([])
 
     const pageCount = Math.ceil(userSettingsStore.users.length / unref(itemsPerPage))
@@ -92,14 +98,8 @@ export const useUserActionsDelete = () => {
         userCount: resources.length.toString()
       }),
       confirmText: $gettext('Delete'),
-      message: $ngettext(
-        'Are you sure you want to delete this user?',
-        'Are you sure you want to delete the %{userCount} selected users?',
-        resources.length,
-        {
-          userCount: resources.length.toString()
-        }
-      ),
+      customComponent: DeleteUserModal,
+      customComponentAttrs: () => ({ users: resources }),
       hasInput: false,
       onConfirm: () => deleteUsers(resources)
     })
