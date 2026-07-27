@@ -90,6 +90,49 @@ describe('restore', () => {
       })
     })
 
+    it('should upsert restored resources into the current view when not in the trash bin', async () => {
+      const resourcesToRestore = [{ id: '1', path: '/1', name: 'file1' }] as TrashResource[]
+      const restoredResource = mock<Resource>({ id: '1', path: '/1', name: 'file1' })
+
+      const { getWorkerCallbackDone } = getWrapper({
+        invalidLocation: true,
+        setup: ({ restoreResources }, { space }) => {
+          restoreResources(space, resourcesToRestore, [])
+        },
+        restoreResult: { successful: resourcesToRestore, failed: [] },
+        getFileInfoResult: restoredResource
+      })
+      await getWorkerCallbackDone()
+
+      const { removeResources, upsertResources } = useResourcesStore()
+      expect(removeResources).toHaveBeenCalledTimes(0)
+      expect(upsertResources).toHaveBeenCalledWith([restoredResource])
+    })
+
+    it('should upsert the resolvable resources even when one lookup fails', async () => {
+      const resourcesToRestore = [
+        { id: '1', path: '/1', name: 'file1' },
+        { id: '2', path: '/2', name: 'file2' }
+      ] as TrashResource[]
+      const restoredResource = mock<Resource>({ id: '2', path: '/2', name: 'file2' })
+
+      const { getWorkerCallbackDone } = getWrapper({
+        invalidLocation: true,
+        setup: ({ restoreResources }, { space }) => {
+          restoreResources(space, resourcesToRestore, [])
+        },
+        restoreResult: { successful: resourcesToRestore, failed: [] },
+        getFileInfoImplementation: (_, { path }) =>
+          path === '/2'
+            ? Promise.resolve(restoredResource)
+            : Promise.reject(new Error('network error'))
+      })
+      await getWorkerCallbackDone()
+
+      const { upsertResources } = useResourcesStore()
+      expect(upsertResources).toHaveBeenCalledWith([restoredResource])
+    })
+
     it('should show message on error', () => {
       vi.spyOn(console, 'error').mockImplementation(() => undefined)
       const resourcesToRestore = [{ id: '1', path: '/1' }] as TrashResource[]
@@ -153,6 +196,8 @@ function getWrapper({
   invalidLocation = false,
   driveType = 'personal',
   restoreResult = { successful: [], failed: [] },
+  getFileInfoResult,
+  getFileInfoImplementation,
   setup
 }: {
   invalidLocation?: boolean
@@ -161,6 +206,8 @@ function getWrapper({
     successful: TrashResource[]
     failed: { resource: TrashResource; error: HttpError }[]
   }
+  getFileInfoResult?: Resource
+  getFileInfoImplementation?: (...args: any[]) => Promise<Resource>
   setup: (
     instance: ReturnType<typeof useFileActionsRestore>,
     {
@@ -172,9 +219,10 @@ function getWrapper({
     }
   ) => void
 }) {
+  let workerCallbackDone: Promise<unknown> = Promise.resolve()
   vi.mocked(useRestoreWorker).mockReturnValue({
     startWorker: vi.fn().mockImplementation((_, callback) => {
-      callback(restoreResult)
+      workerCallbackDone = Promise.resolve(callback(restoreResult))
     })
   })
 
@@ -189,10 +237,16 @@ function getWrapper({
   mocks.$clientService.webdav.listFiles.mockImplementation(() => {
     return Promise.resolve({ resource: mock<Resource>(), children: [] })
   })
+  if (getFileInfoImplementation) {
+    mocks.$clientService.webdav.getFileInfo.mockImplementation(getFileInfoImplementation)
+  } else {
+    mocks.$clientService.webdav.getFileInfo.mockResolvedValue(getFileInfoResult)
+  }
   mocks.$clientService.graphAuthenticated.drives.getDrive.mockResolvedValue(mock<SpaceResource>())
 
   return {
     mocks,
+    getWorkerCallbackDone: () => workerCallbackDone,
     wrapper: getComposableWrapper(
       () => {
         const instance = useFileActionsRestore()
