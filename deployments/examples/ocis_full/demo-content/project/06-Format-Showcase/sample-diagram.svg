@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="200" viewBox="0 0 600 200">
+  <rect width="600" height="200" fill="#f0f4f8"/>
+  <rect x="20" y="70" width="160" height="60" rx="8" fill="#dae8fc" stroke="#6c8ebf" stroke-width="2"/>
+  <text x="100" y="105" font-family="sans-serif" font-size="14" text-anchor="middle" fill="#333">Submitted</text>
+
+  <rect x="220" y="70" width="160" height="60" rx="8" fill="#ffe6cc" stroke="#d79b00" stroke-width="2"/>
+  <text x="300" y="105" font-family="sans-serif" font-size="14" text-anchor="middle" fill="#333">In Review</text>
+
+  <rect x="420" y="70" width="160" height="60" rx="8" fill="#d5e8d4" stroke="#82b366" stroke-width="2"/>
+  <text x="500" y="105" font-family="sans-serif" font-size="14" text-anchor="middle" fill="#333">Approved</text>
+
+  <line x1="180" y1="100" x2="220" y2="100" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="380" y1="100" x2="420" y2="100" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#333"/>
+    </marker>
+  </defs>
+</svg>

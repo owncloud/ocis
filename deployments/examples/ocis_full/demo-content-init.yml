@@ -1,0 +1,31 @@
+---
+# Seeds admin's personal space and a "Demo Space" project space with demo
+# content whenever DEMO_USERS is enabled, and adds the standard demo users
+# (einstein, marie, moss, richard, katherine) as editors of the Demo Space.
+# The container always exists in the compose graph, but demo-content-init.sh
+# no-ops immediately unless DEMO_USERS is "true" - so this is harmless to
+# leave enabled even when demo users are off.
+#
+# Requires PROXY_ENABLE_BASIC_AUTH (see ocis.yml, defaults to follow
+# DEMO_USERS), since oCIS's OIDC does not support the password grant that a
+# script like this would otherwise need, and talks to oCIS directly over the
+# internal docker network (http://ocis:9200) rather than through Traefik, so
+# it never has to deal with the self-signed certificate.
+services:
+  demo-content-init:
+    image: alpine:3.22
+    user: root
+    networks:
+      ocis-net:
+    depends_on:
+      ocis:
+        condition: service_started
+    environment:
+      DEMO_USERS: "${DEMO_USERS:-false}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD:-admin}"
+    volumes:
+      - ./demo-content:/demo-content:ro
+      - ./demo-content-init.sh:/demo-content-init.sh:ro
+    entrypoint: ["/bin/sh", "/demo-content-init.sh"]
+    logging:
+      driver: ${LOG_DRIVER:-local}
