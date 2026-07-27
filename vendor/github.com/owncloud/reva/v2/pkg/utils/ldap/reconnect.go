@@ -50,14 +50,6 @@ type ConnWithReconnect struct {
 	logger  *zerolog.Logger
 }
 
-// Config holds the basic configuration of the LDAP Connection
-type Config struct {
-	URI          string
-	BindDN       string
-	BindPassword string
-	TLSConfig    *tls.Config
-}
-
 // NewLDAPWithReconnect Returns a new ConnWithReconnect initialized from config
 func NewLDAPWithReconnect(config Config) *ConnWithReconnect {
 	conn := ConnWithReconnect{
@@ -195,14 +187,7 @@ func (c *ConnWithReconnect) ldapAutoConnect(config Config) {
 func (c *ConnWithReconnect) ldapConnect(config Config) (*ldap.Conn, error) {
 	c.logger.Debug().Msgf("Connecting to %s", config.URI)
 
-	var err error
-	var l *ldap.Conn
-	if config.TLSConfig != nil {
-		l, err = ldap.DialURL(config.URI, ldap.DialWithTLSConfig(config.TLSConfig))
-	} else {
-		l, err = ldap.DialURL(config.URI)
-	}
-
+	l, err := ldap.DialURL(config.URI, ldap.DialWithTLSConfig(config.TLSConfig))
 	if err != nil {
 		c.logger.Error().Err(err).Msg("could not get ldap Connection")
 		return nil, err
@@ -301,7 +286,15 @@ func (c *ConnWithReconnect) ExternalBind() error {
 
 // ModifyWithResult implements the ldap.Client interface
 func (c *ConnWithReconnect) ModifyWithResult(m *ldap.ModifyRequest) (*ldap.ModifyResult, error) {
-	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+	var err error
+	var res *ldap.ModifyResult
+
+	retryErr := c.retry(func(c ldap.Client) error {
+		res, err = c.ModifyWithResult(m)
+		return err
+	})
+
+	return res, retryErr
 }
 
 // Compare implements the ldap.Client interface
@@ -310,8 +303,16 @@ func (c *ConnWithReconnect) Compare(dn, attribute, value string) (bool, error) {
 }
 
 // PasswordModify implements the ldap.Client interface
-func (c *ConnWithReconnect) PasswordModify(*ldap.PasswordModifyRequest) (*ldap.PasswordModifyResult, error) {
-	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+func (c *ConnWithReconnect) PasswordModify(m *ldap.PasswordModifyRequest) (*ldap.PasswordModifyResult, error) {
+	var err error
+	var res *ldap.PasswordModifyResult
+
+	retryErr := c.retry(func(c ldap.Client) error {
+		res, err = c.PasswordModify(m)
+		return err
+	})
+
+	return res, retryErr
 }
 
 // SearchWithPaging implements the ldap.Client interface

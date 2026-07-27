@@ -87,6 +87,7 @@ func DefaultConfig() *config.Config {
 				Insecure:                 false,
 				CACert:                   path.Join(defaults.BaseDataPath(), "idm", "ldap.crt"),
 				BindDN:                   "uid=libregraph,ou=sysusers,o=libregraph-idm",
+				PoolEnabled:              false,
 				UseServerUUID:            false,
 				UsePasswordModExOp:       true,
 				WriteEnabled:             true,

@@ -54,6 +54,7 @@ func DefaultConfig() *config.Config {
 				DisableUserMechanism:     "attribute",
 				LdapDisabledUsersGroupDN: "cn=DisabledUsersGroup,ou=groups,o=libregraph-idm",
 				IDP:                      "https://localhost:9200",
+				PoolEnabled:              false,
 				UserSchema: config.LDAPUserSchema{
 					ID:          "ownclouduuid",
 					Mail:        "mail",

@@ -52,6 +52,7 @@ func DefaultConfig() *config.Config {
 				GroupObjectClass:         "groupOfNames",
 				BindDN:                   "uid=reva,ou=sysusers,o=libregraph-idm",
 				IDP:                      "https://localhost:9200",
+				PoolEnabled:              false,
 				UserSchema: config.LDAPUserSchema{
 					ID:          "ownclouduuid",
 					Mail:        "mail",
