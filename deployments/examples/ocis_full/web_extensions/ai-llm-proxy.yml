@@ -11,6 +11,9 @@ services:
       ocis-net:
     environment:
       PORT: "3030"
+      # needed when oCIS / Traefik is using self generated certificates, see
+      # the "companion" service in web_extensions/importer.yml for precedent
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       LLM_ENDPOINT: ${AI_LLM_ENDPOINT:-http://host.docker.internal:11434/v1}
       LLM_API_KEY: ${AI_LLM_API_KEY:-}

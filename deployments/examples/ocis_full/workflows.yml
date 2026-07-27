@@ -18,8 +18,9 @@ services:
   ocis:
     environment:
       PROXY_ENABLE_APP_AUTH: "true"
-    volumes:
-      - ./config/ocis/apps.yaml:/etc/ocis/apps.yaml
+    configs:
+      - source: apps_yaml
+        target: /etc/ocis/apps.yaml
     depends_on:
       workflows-init:
         condition: service_completed_successfully

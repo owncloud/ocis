@@ -5,8 +5,9 @@
 # repository instead. Revisit and switch to a pinned image once ownCloud publishes one.
 services:
   ocis:
-    volumes:
-      - ./config/ocis/apps.yaml:/etc/ocis/apps.yaml
+    configs:
+      - source: apps_yaml
+        target: /etc/ocis/apps.yaml
     depends_on:
       ai-smart-file-tagger-qa-init:
         condition: service_completed_successfully
