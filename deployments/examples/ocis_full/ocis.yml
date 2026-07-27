@@ -51,6 +51,9 @@ services:
       COLLABORA_DOMAIN: ${COLLABORA_DOMAIN:-collabora.owncloud.test}
       ONLYOFFICE_DOMAIN: ${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
       COMPANION_DOMAIN: ${COMPANION_DOMAIN:-companion.owncloud.test}
+      # default model names requested by the ai-* web extensions, see config/ocis/apps.yaml
+      AI_LLM_MODEL_DEFAULT: ${AI_LLM_MODEL_DEFAULT:-llama3.2}
+      AI_LLM_MODEL_VISION: ${AI_LLM_MODEL_VISION:-llava:7b}
       # enable to allow using the banned passwords list
       OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: banned-password-list.txt
     volumes:
