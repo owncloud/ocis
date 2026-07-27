@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
@@ -68,6 +69,10 @@ type LDAP struct {
 	WriteEnabled             bool   `yaml:"write_enabled" env:"OCIS_LDAP_SERVER_WRITE_ENABLED;GRAPH_LDAP_SERVER_WRITE_ENABLED" desc:"Allow creating, modifying and deleting LDAP users via the GRAPH API. This can only be set to 'true' when keeping default settings for the LDAP user and group attribute types (the 'OCIS_LDAP_USER_SCHEMA_* and 'OCIS_LDAP_GROUP_SCHEMA_* variables)." introductionVersion:"pre5.0"`
 	UpdateUserLastSignInDate bool   `yaml:"update_user_last_sign_in_date" env:"OCIS_LDAP_UPDATE_LAST_SIGNIN_DATE;GRAPH_LDAP_UPDATE_LAST_SIGNIN_DATE" desc:"Update the 'oCLastSignInTimestamp' LDAP attribute of a user when the user signs in. The attribute is only persisted when 'OCIS_LDAP_SERVER_WRITE_ENABLED' is also enabled. Set this to 'false' to avoid an LDAP write on every sign-in, e.g. when the last sign-in timestamp is not needed or the LDAP write load should be reduced." introductionVersion:"8.1.1"`
 	RefintEnabled            bool   `yaml:"refint_enabled" env:"GRAPH_LDAP_REFINT_ENABLED" desc:"Signals that the server has the refint plugin enabled, which makes some actions not needed." introductionVersion:"pre5.0"`
+
+	PoolEnabled         bool          `yaml:"pool_enabled" env:"OCIS_LDAP_POOL_ENABLED;GRAPH_LDAP_POOL_ENABLED" desc:"Enable a bounded pool of LDAP connections instead of a single long-lived reconnecting connection. Concurrent requests then no longer serialize on one connection." introductionVersion:"8.0.7"`
+	PoolSize            int           `yaml:"pool_size" env:"OCIS_LDAP_POOL_SIZE;GRAPH_LDAP_POOL_SIZE" desc:"Maximum number of concurrently open LDAP connections when 'OCIS_LDAP_POOL_ENABLED' is 'true'. Defaults to 5 when unset or <= 0." introductionVersion:"8.0.7"`
+	PoolCheckoutTimeout time.Duration `yaml:"pool_checkout_timeout" env:"OCIS_LDAP_POOL_CHECKOUT_TIMEOUT;GRAPH_LDAP_POOL_CHECKOUT_TIMEOUT" desc:"Maximum time to wait for a pooled LDAP connection to become available once the pool is exhausted. Defaults to 30s when unset or <= 0. See the Environment Variable Types description for more details." introductionVersion:"8.0.7"`
 
 	UserBaseDN               string `yaml:"user_base_dn" env:"OCIS_LDAP_USER_BASE_DN;GRAPH_LDAP_USER_BASE_DN" desc:"Search base DN for looking up LDAP users." introductionVersion:"pre5.0"`
 	UserSearchScope          string `yaml:"user_search_scope" env:"OCIS_LDAP_USER_SCOPE;GRAPH_LDAP_USER_SCOPE" desc:"LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'." introductionVersion:"pre5.0"`
