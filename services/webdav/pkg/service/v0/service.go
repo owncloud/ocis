@@ -42,7 +42,14 @@ var (
 		http.StatusUnauthorized:     "Sabre\\DAV\\Exception\\NotAuthenticated",
 		http.StatusNotFound:         "Sabre\\DAV\\Exception\\NotFound",
 		http.StatusMethodNotAllowed: "Sabre\\DAV\\Exception\\MethodNotAllowed",
+		http.StatusForbidden:        "Sabre\\DAV\\Exception\\Forbidden",
+		http.StatusTooEarly:         "Sabre\\DAV\\Exception\\TooEarly",
+		http.StatusTooManyRequests:  "Sabre\\DAV\\Exception\\TooManyRequests",
 	}
+
+	// defaultException is used for status codes which have no dedicated sabredav
+	// exception name, so that clients always receive a non-empty exception.
+	defaultException = "Sabre\\DAV\\Exception"
 )
 
 // Service defines the extension handlers.
@@ -268,7 +275,11 @@ func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
 		case http.StatusForbidden:
 			renderError(w, r, errPermissionDenied(e.Detail))
 		default:
+			// an unmapped error is an infrastructure problem, not a property of the
+			// requested file: log it at error level so it is visible in production.
+			logger.Error().Err(err).Msg("could not get thumbnail")
 			renderError(w, r, errInternalError(err.Error()))
+			return
 		}
 		logger.Debug().Err(err).Msg("could not get thumbnail")
 		return
@@ -366,9 +377,13 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		case http.StatusForbidden:
 			renderError(w, r, errPermissionDenied(e.Detail))
 		default:
+			// an unmapped error is an infrastructure problem, not a property of the
+			// requested file: log it at error level so it is visible in production.
+			logger.Error().Err(err).Msg("could not get thumbnail")
 			renderError(w, r, errInternalError(err.Error()))
+			return
 		}
-		g.log.Error().Err(err).Msg("could not get thumbnail")
+		logger.Debug().Err(err).Msg("could not get thumbnail")
 		return
 	}
 
@@ -411,9 +426,13 @@ func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
 			addRetryAfterHeader(w)
 			renderError(w, r, errTooManyRequests(e.Detail))
 		default:
+			// an unmapped error is an infrastructure problem, not a property of the
+			// requested file: log it at error level so it is visible in production.
+			logger.Error().Err(err).Msg("could not get thumbnail")
 			renderError(w, r, errInternalError(err.Error()))
+			return
 		}
-		g.log.Error().Err(err).Msg("could not get thumbnail")
+		logger.Debug().Err(err).Msg("could not get thumbnail")
 		return
 	}
 
@@ -456,7 +475,11 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 			addRetryAfterHeader(w)
 			renderError(w, r, errTooManyRequests(e.Detail))
 		default:
+			// an unmapped error is an infrastructure problem, not a property of the
+			// requested file: log it at error level so it is visible in production.
+			logger.Error().Err(err).Msg("could not get thumbnail")
 			renderError(w, r, errInternalError(err.Error()))
+			return
 		}
 		logger.Debug().Err(err).Msg("could not get thumbnail")
 		return
@@ -542,11 +565,15 @@ type errResponse struct {
 }
 
 func newErrResponse(statusCode int, msg string) *errResponse {
+	exception, ok := codesEnum[statusCode]
+	if !ok {
+		exception = defaultException
+	}
 	rsp := &errResponse{
 		HTTPStatusCode: statusCode,
 		Xmlnsd:         "DAV",
 		Xmlnss:         "http://sabredav.org/ns",
-		Exception:      codesEnum[statusCode],
+		Exception:      exception,
 	}
 	if msg != "" {
 		rsp.Message = msg
