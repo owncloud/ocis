@@ -264,7 +264,10 @@ func (d *driver) Delete(ctx context.Context, ref *provider.Reference) (*storage.
 }
 
 func (d *driver) TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool, mtime string) (*storage.TouchFileResult, error) {
-	client, _, rel, err := d.webdavClient(ctx, nil, ref)
+	// The coordinator calls this from the upload finish path, which runs under
+	// tusd with no request auth token, so the share must be resolved as the
+	// service account on the executant's behalf.
+	client, _, rel, err := d.serviceWebdavClient(ctx, ref)
 	if err != nil {
 		return nil, err
 	}

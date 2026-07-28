@@ -319,7 +319,11 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 				sReq.Ref.Path = uReq.Ref.GetPath()
 				sReq.Ref.ResourceId = nil
 			} else {
-				if resid, err := storagespace.ParseID(httpRes.Header.Get(net.HeaderOCFileID)); err == nil {
+				// New files get their node id when the upload finishes, which is after
+				// the data server wrote this header, so it can arrive without one. Such
+				// an id names the space, not the file, and statting it would resolve the
+				// space root — keep the path-based reference instead.
+				if resid, err := storagespace.ParseID(httpRes.Header.Get(net.HeaderOCFileID)); err == nil && resid.GetOpaqueId() != "" {
 					sReq.Ref = &provider.Reference{
 						ResourceId: &resid,
 					}
