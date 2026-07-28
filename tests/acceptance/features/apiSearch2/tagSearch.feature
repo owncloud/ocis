@@ -263,3 +263,33 @@ Feature: tag search
       | tag:mathe NOT name:exercises              | 1            | /answers           |                    |
       | tag:mathe AND NOT name:exercises          | 1            | /answers           |                    |
       | NOT tag:mathe                             | 2            | /verification work | /withoutTagFolder  |
+
+
+  Scenario Outline: user removes an already removed tag from a file and searches using the removed tag
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created the following folders
+      | path           |
+      | folderWithFile |
+    And user "Alice" has uploaded the following files with content "some data"
+      | path                                |
+      | fileInRootLevel.txt                 |
+      | folderWithFile/fileInsideFolder.txt |
+    And user "Alice" has tagged the following files of the space "Personal":
+      | path                                | tagName |
+      | fileInRootLevel.txt                 | tag1    |
+      | folderWithFile/fileInsideFolder.txt | tag1    |
+    And user "Alice" has removed the following tags for file "fileInRootLevel.txt" of space "Personal":
+      | tag1 |
+    When user "Alice" removes the following tags for file "fileInRootLevel.txt" of space "Personal":
+      | tag1 |
+    Then the HTTP status code should be "200"
+    When user "Alice" searches for "Tags:tag1" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these files:
+      | folderWithFile/fileInsideFolder.txt |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
