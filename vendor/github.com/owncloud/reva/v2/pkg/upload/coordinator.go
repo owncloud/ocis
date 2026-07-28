@@ -51,19 +51,30 @@ type Coordinator interface {
 	UseIn(composer *tusd.StoreComposer)
 	// ListUploadSessions returns the upload sessions matching the given filter.
 	ListUploadSessions(ctx context.Context, filter storage.UploadSessionFilter) ([]storage.UploadSession, error)
+	// Upload writes the whole body of a non-resumable (PUT) upload into the
+	// session named by req.Ref.Path and finishes it.
+	Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (*provider.ResourceInfo, error)
 }
 
 // coordinator is the concrete implementation of Coordinator.
 type coordinator struct {
-	fs    storage.FS
-	store SessionStore
+	fs           storage.FS
+	store        SessionStore
+	chunkHandler *chunking.ChunkHandler
 }
 
 // NewCoordinator constructs a coordinator backed by the given storage driver
 // and session store. The store must use an on-disk session format the driver's
 // data path can read (the decomposedfs family: ocis/s3ng/posix).
-func NewCoordinator(fs storage.FS, store SessionStore) *coordinator {
-	return &coordinator{fs: fs, store: store}
+//
+// chunkFolder stages legacy chunking-v1 parts until the final one arrives; pass
+// "" to reject chunked uploads.
+func NewCoordinator(fs storage.FS, store SessionStore, chunkFolder string) *coordinator {
+	c := &coordinator{fs: fs, store: store}
+	if chunkFolder != "" {
+		c.chunkHandler = chunking.NewChunkHandler(chunkFolder)
+	}
+	return c
 }
 
 // InitiateUpload returns a list of protocols with urls that can be used to append bytes to a new upload session.
@@ -334,7 +345,7 @@ func (c *coordinator) initiateUpload(ctx context.Context, ref *provider.Referenc
 
 	if uploadLength == 0 {
 		// zero-length uploads have no bytes to append, so finish immediately (main: upload.go:333)
-		if err := c.finishUpload(ctx, session); err != nil {
+		if _, err := c.finishUpload(ctx, session); err != nil {
 			return nil, err
 		}
 	}
@@ -345,20 +356,97 @@ func (c *coordinator) initiateUpload(ctx context.Context, ref *provider.Referenc
 	}, nil
 }
 
+// Upload writes the entire body of a non-resumable (PUT) upload and finishes it.
+// req.Ref.Path carries the session id, as minted by InitiateUpload.
+//
+// This is the driver-agnostic port of decomposedfs.Upload (upload.go:51). It is
+// not yet wired up: the simple and spaces data transfer managers still call
+// driver.Upload, because only decomposedfs and ocm implement CommitUpload and
+// routing the others here would break their PUT path.
+func (c *coordinator) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (*provider.ResourceInfo, error) {
+	session, err := c.store.Get(ctx, req.Ref.GetPath())
+	if err != nil {
+		return nil, err
+	}
+
+	// The session records the user that initiated the upload; the PUT request
+	// context may be a different one (or none, behind the data gateway).
+	ctx = session.Context(ctx)
+
+	if chunk := session.Chunk(); chunk != "" { // legacy chunking v1
+		if c.chunkHandler == nil {
+			return nil, errtypes.NotSupported("coordinator: chunked uploads require a chunk folder")
+		}
+		p, assembledFile, err := c.chunkHandler.WriteChunk(chunk, req.Body)
+		if err != nil {
+			return nil, err
+		}
+		if p == "" {
+			// Not the final chunk. Each chunk arrives as its own PUT with its own
+			// session, while the bytes accumulate in the chunk folder, so this
+			// session has nothing left to hold (main: upload.go:69).
+			session.Cleanup(true, true)
+			return nil, errtypes.PartialContent(req.Ref.String())
+		}
+		fd, err := os.Open(assembledFile)
+		if err != nil {
+			return nil, err
+		}
+		defer fd.Close()
+		defer os.RemoveAll(assembledFile)
+
+		size, err := session.WriteChunk(ctx, 0, fd)
+		if err != nil {
+			return nil, err
+		}
+		session.SetSize(size)
+	} else {
+		size, err := session.WriteChunk(ctx, 0, req.Body)
+		if err != nil {
+			return nil, err
+		}
+		if size != req.Length {
+			return nil, errtypes.PartialContent("coordinator: unexpected end of stream")
+		}
+	}
+
+	ri, err := c.finishUpload(ctx, session)
+	if err != nil {
+		return nil, err
+	}
+
+	if uff != nil {
+		executant := session.Executant()
+		uff(session.SpaceOwner(), &executant, &provider.Reference{
+			ResourceId: &provider.ResourceId{
+				StorageId: session.ProviderID(),
+				SpaceId:   session.SpaceID(),
+				OpaqueId:  session.SpaceID(),
+			},
+			Path: utils.MakeRelativePath(filepath.Join(session.Dir(), session.Filename())),
+		})
+	}
+
+	return ri, nil
+}
+
 // finishUpload lands a fully-received upload: create the node (new files), verify
 // checksums, then commit the staged bytes. Zero-length uploads always finish here
 // synchronously; the async postprocessing path is not ported yet.
-func (c *coordinator) finishUpload(ctx context.Context, session Session) error {
+//
+// Returns the committed resource as the driver reported it, so PUT callers can
+// answer with the new etag/mtime/id without recomputing them.
+func (c *coordinator) finishUpload(ctx context.Context, session Session) (*provider.ResourceInfo, error) {
 	if err := c.touchAndMark(ctx, session); err != nil {
-		return err
+		return nil, err
 	}
 	if err := verifyAndStoreChecksums(ctx, session); err != nil {
 		c.rollback(ctx, session)
-		return err
+		return nil, err
 	}
 	if err := session.Persist(ctx); err != nil {
 		c.rollback(ctx, session)
-		return err
+		return nil, err
 	}
 
 	metrics.UploadProcessing.Inc()
@@ -407,26 +495,27 @@ func (c *coordinator) touchAndMark(ctx context.Context, session Session) error {
 }
 
 // finishSync commits the staged bytes inline, then unmarks processing and cleans up.
-func (c *coordinator) finishSync(ctx context.Context, session Session) error {
+func (c *coordinator) finishSync(ctx context.Context, session Session) (*provider.ResourceInfo, error) {
 	ref := session.Reference()
 	f, err := os.Open(session.BinPath())
 	if err != nil {
 		c.rollback(ctx, session)
-		return err
+		return nil, err
 	}
-	if _, err := c.fs.CommitUpload(ctx, &ref, storage.UploadSource{
+	ri, err := c.fs.CommitUpload(ctx, &ref, storage.UploadSource{
 		Body:      f,
 		Length:    session.Size(),
 		Metadata:  session.Metadata(),
 		Checksums: session.Checksums(),
-	}); err != nil {
+	})
+	if err != nil {
 		c.rollback(ctx, session)
-		return err
+		return nil, err
 	}
 	_ = c.fs.MarkProcessing(ctx, &ref, false, session.ID())
 	session.Cleanup(true, true)
 	metrics.UploadSessionsFinalized.Inc()
-	return nil
+	return ri, nil
 }
 
 // rollback unmarks processing, cleans up session files, and deletes the node if

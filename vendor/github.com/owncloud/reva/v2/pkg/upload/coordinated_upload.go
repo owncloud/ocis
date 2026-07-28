@@ -68,7 +68,9 @@ func (u *coordinatedUpload) WriteChunk(ctx context.Context, offset int64, src io
 // recorded at initiate time. Errors are mapped to tusd errors because tusd turns
 // error types it does not recognise into a bare 500.
 func (u *coordinatedUpload) FinishUpload(ctx context.Context) error {
-	err := u.coord.finishUpload(u.session.Context(ctx), u.session)
+	// tusd reports the result via its own hooks, so the committed resource is
+	// only of interest to the PUT path.
+	_, err := u.coord.finishUpload(u.session.Context(ctx), u.session)
 
 	switch err.(type) {
 	case nil:

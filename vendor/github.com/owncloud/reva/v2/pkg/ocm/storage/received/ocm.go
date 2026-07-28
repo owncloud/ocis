@@ -253,7 +253,10 @@ func (d *driver) CreateDir(ctx context.Context, ref *provider.Reference) (*stora
 }
 
 func (d *driver) Delete(ctx context.Context, ref *provider.Reference) (*storage.DeleteResult, error) {
-	client, _, rel, err := d.webdavClient(ctx, nil, ref)
+	// The coordinator rolls back a failed upload from the tusd finish path, which
+	// carries no request auth token, so the share must be resolved as the service
+	// account on the executant's behalf.
+	client, _, rel, err := d.serviceWebdavClient(ctx, ref)
 	if err != nil {
 		return nil, err
 	}

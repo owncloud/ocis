@@ -25,6 +25,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -194,7 +195,7 @@ func New(m map[string]interface{}, ss *grpc.Server, log *zerolog.Logger) (rgrpc.
 	if err := store.Setup(); err != nil {
 		return nil, fmt.Errorf("storageprovider: upload directory setup failed: %w", err)
 	}
-	coordinator := upload.NewCoordinator(fs, store)
+	coordinator := upload.NewCoordinator(fs, store, filepath.Join(store.Root(), "uploads"))
 
 	// parse data server url
 	u, err := url.Parse(c.DataServerURL)
