@@ -358,6 +358,44 @@ func convertStatToResourceInfo(ref *provider.Reference, f fs.FileInfo, share *oc
 	return &ri, nil
 }
 
+// extractLock reads the DAV:lockdiscovery property and returns the active lock,
+// or nil when the resource carries no usable lock.
+//
+// gowebdav's Props.GetString formats a missing key as the string "<nil>", so an
+// absent lockdiscovery cannot be told apart by emptiness. Instead we require the
+// value to parse as <d:activelock> and to carry a lock token: a lock we cannot
+// name is one the caller could never match against its own, so treating it as
+// absent is the only useful reading.
+func extractLock(props gowebdav.Props) *provider.Lock {
+	raw := props.GetString(xml.Name{Space: "DAV:", Local: "lockdiscovery"})
+
+	// Element names are matched on their local part only: the value is the raw
+	// innerxml of lockdiscovery, so the xmlns:d declaration that bound the "d"
+	// prefix stayed behind on the enclosing element and the prefix is unbound
+	// here.
+	var al struct {
+		LockScope struct {
+			Exclusive *struct{} `xml:"exclusive"`
+			Shared    *struct{} `xml:"shared"`
+		} `xml:"lockscope"`
+		LockToken struct {
+			Href string `xml:"href"`
+		} `xml:"locktoken"`
+	}
+	if err := xml.Unmarshal([]byte(raw), &al); err != nil {
+		return nil
+	}
+	if al.LockToken.Href == "" {
+		return nil
+	}
+
+	lockType := provider.LockType_LOCK_TYPE_EXCL
+	if al.LockScope.Shared != nil && al.LockScope.Exclusive == nil {
+		lockType = provider.LockType_LOCK_TYPE_SHARED
+	}
+	return &provider.Lock{LockId: al.LockToken.Href, Type: lockType}
+}
+
 func extractChecksum(props gowebdav.Props) *provider.ResourceChecksum {
 	checksums := props.GetString(xml.Name{Space: "http://owncloud.org/ns", Local: "checksums"})
 	if checksums == "" {
@@ -545,17 +583,29 @@ func (d *driver) GetLock(ctx context.Context, ref *provider.Reference) (*provide
 		return nil, err
 	}
 
-	token, err := client.GetLock(rel)
+	// gowebdav's GetLock cannot be used: it stats with a fixed property set that
+	// omits lockdiscovery, so it reports the same value whatever the lock state.
+	// getetag is requested alongside because an unlocked resource returns
+	// lockdiscovery in a 404 propstat, and gowebdav only reads the 200 one — with
+	// no other property to carry it, that propstat would be empty and the stat
+	// would fail as if the file were missing.
+	info, err := client.StatWithProps(rel, []string{"lockdiscovery", "getetag"})
 	if err != nil {
 		return nil, err
 	}
-	if token == "" {
-		// An unlocked file yields an empty token. Callers test the returned lock
-		// against nil, so a lock with an empty id would read as "locked".
-		return nil, errtypes.NotFound(ref.GetPath())
+
+	props, ok := info.Sys().(gowebdav.Props)
+	if !ok {
+		return nil, errtypes.InternalError("ocm: unexpected stat result for " + ref.GetPath())
 	}
 
-	return &provider.Lock{LockId: token, Type: provider.LockType_LOCK_TYPE_EXCL}, nil
+	lock := extractLock(props)
+	if lock == nil {
+		// Callers distinguish "locked" from "not locked" by testing the returned
+		// lock against nil, so a lock must never be invented here.
+		return nil, errtypes.NotFound("no lock found")
+	}
+	return lock, nil
 }
 
 func (d *driver) RefreshLock(ctx context.Context, ref *provider.Reference, lock *provider.Lock, existingLockID string) error {

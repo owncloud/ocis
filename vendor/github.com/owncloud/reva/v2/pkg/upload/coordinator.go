@@ -152,7 +152,13 @@ func (c *coordinator) initiateUpload(ctx context.Context, ref *provider.Referenc
 		// such fallback, and the new-file branch never sets spaceOwner at all.
 		spaceOwner = existing.GetOwner()
 
-		diskLock, _ := c.fs.GetLock(ctx, ref)
+		// A driver signals "not locked" with an error (NotFound), and one that
+		// cannot report locks at all with NotSupported. Neither may block the
+		// upload, so only a lock we actually hold is treated as one.
+		diskLock, lockErr := c.fs.GetLock(ctx, ref)
+		if lockErr != nil {
+			diskLock = nil
+		}
 		contextLockID, _ := ctxpkg.ContextGetLockID(ctx)
 		if diskLock != nil {
 			switch contextLockID {
