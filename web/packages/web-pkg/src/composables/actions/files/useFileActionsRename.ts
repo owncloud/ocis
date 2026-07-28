@@ -72,7 +72,7 @@ export const useFileActionsRename = () => {
     )
     if (exists) {
       const translated = $gettext('The name "%{name}" is already taken')
-      return $gettext(translated, { name: newName }, true)
+      return $gettext(translated, { name: newName })
     }
 
     if (parentResources) {
@@ -82,7 +82,7 @@ export const useFileActionsRename = () => {
 
       if (exists) {
         const translated = $gettext('The name "%{name}" is already taken')
-        return $gettext(translated, { name: newName }, true)
+        return $gettext(translated, { name: newName })
       }
     }
 
@@ -137,17 +137,15 @@ export const useFileActionsRename = () => {
       upsertResource(fileResource)
     } catch (error) {
       console.error(error)
-      let title = $gettext(
-        'Failed to rename "%{file}" to "%{newName}"',
-        { file: resource.name, newName },
-        true
-      )
+      let title = $gettext('Failed to rename "%{file}" to "%{newName}"', {
+        file: resource.name,
+        newName
+      })
       if (error.statusCode === 423) {
-        title = $gettext(
-          'Failed to rename "%{file}" to "%{newName}" - the file is locked',
-          { file: resource.name, newName },
-          true
-        )
+        title = $gettext('Failed to rename "%{file}" to "%{newName}" - the file is locked', {
+          file: resource.name,
+          newName
+        })
       }
       showErrorMessage({ title, errors: [error] })
     }

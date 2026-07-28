@@ -72,7 +72,7 @@
     "pino": "10.1.0",
     "pino-pretty": "13.1.2",
     "prettier": "^3.6.2",
-    "qs": "6.14.2",
+    "qs": "6.15.2",
     "requirejs": "2.3.7",
     "rollup-plugin-gzip": "^4.1.1",
     "rollup-plugin-visualizer": "6.0.5",
@@ -91,7 +91,7 @@
     "vue": "3.5.29",
     "vue-demi": "0.14.10",
     "vue-tsc": "3.1.4",
-    "vue3-gettext": "2.4.0"
+    "vue3-gettext": "^4.0.1"
   },
   "engines": {
     "node": ">=24.15.0"
@@ -109,15 +109,16 @@
       "@xmldom/xmldom": "0.8.13",
       "flatted": "3.4.2",
       "form-data": "4.0.6",
-      "immutable": "5.1.5",
+      "immutable": "5.1.8",
       "js-cookie": "3.0.7",
-      "linkify-it": "5.0.1",
-      "minimatch@>=9.0.0 <9.0.7": "9.0.7",
-      "ws": "8.21.0"
+      "linkify-it": "5.0.2",
+      "minimatch": "10.2.5",
+      "brace-expansion": "5.0.8",
+      "ws": "8.21.0",
+      "js-yaml": "4.3.0"
     },
     "patchedDependencies": {
       "caf@15.0.1": "patches/caf@15.0.1.patch",
-      "vue3-gettext@2.4.0": "patches/vue3-gettext@2.4.0.patch",
       "portal-vue@3.0.0": "patches/portal-vue@3.0.0.patch",
       "vue-select@4.0.0-beta.6": "patches/vue-select@4.0.0-beta.6.patch"
     }

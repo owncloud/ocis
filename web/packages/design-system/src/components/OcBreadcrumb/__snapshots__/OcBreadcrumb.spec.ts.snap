@@ -3,7 +3,7 @@
 exports[`OcBreadcrumb > displays all items 1`] = `
 "<nav id="oc-breadcrumbs-2" class="oc-breadcrumb oc-breadcrumb-default" aria-label="Breadcrumbs">
   <ol class="oc-breadcrumb-list oc-flex oc-m-rm oc-p-rm">
-    <li data-key="0" tabindex="0" class="oc-breadcrumb-list-item oc-flex oc-flex-middle">
+    <li data-key="0" tabindex="-1" class="oc-breadcrumb-list-item oc-flex oc-flex-middle">
       <router-link-stub tag="a" to="[object Object]"><span class="oc-breadcrumb-item-text oc-breadcrumb-item-navigable">First folder</span></router-link-stub>
       <oc-icon-stub name="arrow-right-s" filltype="line" accessiblelabel="" type="span" size="medium" variation="passive" color="var(--oc-color-text-default)" class="oc-mx-xs"></oc-icon-stub>
       <!--v-if-->
@@ -13,17 +13,17 @@ exports[`OcBreadcrumb > displays all items 1`] = `
       <oc-icon-stub name="arrow-right-s" filltype="line" accessiblelabel="" type="span" size="medium" variation="passive" color="var(--oc-color-text-default)" class="oc-mx-xs"></oc-icon-stub>
       <!--v-if-->
     </li>
-    <li data-key="2" tabindex="0" class="oc-breadcrumb-list-item oc-flex oc-flex-middle">
+    <li data-key="2" tabindex="-1" class="oc-breadcrumb-list-item oc-flex oc-flex-middle">
       <oc-button-stub type="button" disabled="false" size="medium" submit="button" variation="passive" appearance="raw" justifycontent="center" gapsize="medium" showspinner="false" class="oc-flex"><span class="oc-breadcrumb-item-text oc-breadcrumb-item-navigable">Subfolder</span></oc-button-stub>
       <oc-icon-stub name="arrow-right-s" filltype="line" accessiblelabel="" type="span" size="medium" variation="passive" color="var(--oc-color-text-default)" class="oc-mx-xs"></oc-icon-stub>
       <!--v-if-->
     </li>
-    <li data-key="3" tabindex="0" class="oc-breadcrumb-list-item oc-flex oc-flex-middle">
+    <li data-key="3" tabindex="-1" class="oc-breadcrumb-list-item oc-flex oc-flex-middle">
       <router-link-stub tag="a" to="[object Object]" aria-current="page"><span class="oc-breadcrumb-item-text oc-breadcrumb-item-navigable">Deep</span></router-link-stub>
       <oc-icon-stub name="arrow-right-s" filltype="line" accessiblelabel="" type="span" size="medium" variation="passive" color="var(--oc-color-text-default)" class="oc-mx-xs"></oc-icon-stub>
       <!--v-if-->
     </li>
-    <li data-key="4" tabindex="0" class="oc-breadcrumb-list-item oc-flex oc-flex-middle"><span class="oc-breadcrumb-item-text" tabindex="-1">Deeper ellipsize in responsive mode</span>
+    <li data-key="4" tabindex="-1" class="oc-breadcrumb-list-item oc-flex oc-flex-middle"><span class="oc-breadcrumb-item-text" tabindex="-1">Deeper ellipsize in responsive mode</span>
       <!--v-if-->
       <!--v-if-->
     </li>
@@ -39,7 +39,7 @@ exports[`OcBreadcrumb > displays all items 1`] = `
 exports[`OcBreadcrumb > sets correct variation 1`] = `
 "<nav id="oc-breadcrumbs-1" class="oc-breadcrumb oc-breadcrumb-lead" aria-label="Breadcrumbs">
   <ol class="oc-breadcrumb-list oc-flex oc-m-rm oc-p-rm">
-    <li data-key="0" tabindex="0" class="oc-breadcrumb-list-item oc-flex oc-flex-middle">
+    <li data-key="0" tabindex="-1" class="oc-breadcrumb-list-item oc-flex oc-flex-middle">
       <router-link-stub tag="a" to="[object Object]"><span class="oc-breadcrumb-item-text oc-breadcrumb-item-navigable">First folder</span></router-link-stub>
       <oc-icon-stub name="arrow-right-s" filltype="line" accessiblelabel="" type="span" size="medium" variation="passive" color="var(--oc-color-text-default)" class="oc-mx-xs"></oc-icon-stub>
       <!--v-if-->
@@ -49,17 +49,17 @@ exports[`OcBreadcrumb > sets correct variation 1`] = `
       <oc-icon-stub name="arrow-right-s" filltype="line" accessiblelabel="" type="span" size="medium" variation="passive" color="var(--oc-color-text-default)" class="oc-mx-xs"></oc-icon-stub>
       <!--v-if-->
     </li>
-    <li data-key="2" tabindex="0" class="oc-breadcrumb-list-item oc-flex oc-flex-middle">
+    <li data-key="2" tabindex="-1" class="oc-breadcrumb-list-item oc-flex oc-flex-middle">
       <oc-button-stub type="button" disabled="false" size="medium" submit="button" variation="passive" appearance="raw" justifycontent="center" gapsize="medium" showspinner="false" class="oc-flex"><span class="oc-breadcrumb-item-text oc-breadcrumb-item-navigable">Subfolder</span></oc-button-stub>
       <oc-icon-stub name="arrow-right-s" filltype="line" accessiblelabel="" type="span" size="medium" variation="passive" color="var(--oc-color-text-default)" class="oc-mx-xs"></oc-icon-stub>
       <!--v-if-->
     </li>
-    <li data-key="3" tabindex="0" class="oc-breadcrumb-list-item oc-flex oc-flex-middle">
+    <li data-key="3" tabindex="-1" class="oc-breadcrumb-list-item oc-flex oc-flex-middle">
       <router-link-stub tag="a" to="[object Object]" aria-current="page"><span class="oc-breadcrumb-item-text oc-breadcrumb-item-navigable">Deep</span></router-link-stub>
       <oc-icon-stub name="arrow-right-s" filltype="line" accessiblelabel="" type="span" size="medium" variation="passive" color="var(--oc-color-text-default)" class="oc-mx-xs"></oc-icon-stub>
       <!--v-if-->
     </li>
-    <li data-key="4" tabindex="0" class="oc-breadcrumb-list-item oc-flex oc-flex-middle"><span class="oc-breadcrumb-item-text" tabindex="-1">Deeper ellipsize in responsive mode</span>
+    <li data-key="4" tabindex="-1" class="oc-breadcrumb-list-item oc-flex oc-flex-middle"><span class="oc-breadcrumb-item-text" tabindex="-1">Deeper ellipsize in responsive mode</span>
       <!--v-if-->
       <!--v-if-->
     </li>
