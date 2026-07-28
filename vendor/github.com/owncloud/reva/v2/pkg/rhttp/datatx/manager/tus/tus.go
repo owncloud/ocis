@@ -216,6 +216,14 @@ func setHeaders(coord pkgupload.Coordinator, w http.ResponseWriter, r *http.Requ
 	if expires != "" {
 		w.Header().Set(net.HeaderTusUploadExpires, expires)
 	}
+	// These headers are written before the upload is finished. For a new file the
+	// coordinator has only minted a placeholder node id at initiate; the real one
+	// arrives from TouchFile at commit. Announcing the placeholder makes callers
+	// stat an id that does not exist, so leave the header off and let them resolve
+	// the file by path instead.
+	if info.Storage["NodeExists"] != "true" {
+		return
+	}
 	resourceid := &provider.ResourceId{
 		StorageId: info.MetaData["providerID"],
 		SpaceId:   info.Storage["SpaceRoot"],

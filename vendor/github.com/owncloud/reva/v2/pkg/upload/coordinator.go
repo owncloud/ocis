@@ -364,7 +364,9 @@ func (c *coordinator) initiateUpload(ctx context.Context, ref *provider.Referenc
 // driver.Upload, because only decomposedfs and ocm implement CommitUpload and
 // routing the others here would break their PUT path.
 func (c *coordinator) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (*provider.ResourceInfo, error) {
-	session, err := c.store.Get(ctx, req.Ref.GetPath())
+	// The datatx handler passes the request path straight through, and it arrives
+	// rooted ("/<id>"), while session ids are stored unrooted.
+	session, err := c.store.Get(ctx, strings.TrimPrefix(req.Ref.GetPath(), "/"))
 	if err != nil {
 		return nil, err
 	}
@@ -377,37 +379,30 @@ func (c *coordinator) Upload(ctx context.Context, req storage.UploadRequest, uff
 		if c.chunkHandler == nil {
 			return nil, errtypes.NotSupported("coordinator: chunked uploads require a chunk folder")
 		}
-		p, assembledFile, err := c.chunkHandler.WriteChunk(chunk, req.Body)
-		if err != nil {
-			return nil, err
+		assembled, assembledSize, done, aErr := c.chunkHandler.Assemble(chunk, req.Body)
+		if aErr != nil {
+			return nil, aErr
 		}
-		if p == "" {
+		if !done {
 			// Not the final chunk. Each chunk arrives as its own PUT with its own
 			// session, while the bytes accumulate in the chunk folder, so this
 			// session has nothing left to hold (main: upload.go:69).
 			session.Cleanup(true, true)
 			return nil, errtypes.PartialContent(req.Ref.String())
 		}
-		fd, err := os.Open(assembledFile)
-		if err != nil {
-			return nil, err
-		}
-		defer fd.Close()
-		defer os.RemoveAll(assembledFile)
+		defer assembled.Close()
+		// The assembled size is authoritative: the declared length covers only
+		// the final chunk, not the whole file.
+		req.Body, req.Length = assembled, assembledSize
+		session.SetSize(assembledSize)
+	}
 
-		size, err := session.WriteChunk(ctx, 0, fd)
-		if err != nil {
-			return nil, err
-		}
-		session.SetSize(size)
-	} else {
-		size, err := session.WriteChunk(ctx, 0, req.Body)
-		if err != nil {
-			return nil, err
-		}
-		if size != req.Length {
-			return nil, errtypes.PartialContent("coordinator: unexpected end of stream")
-		}
+	size, err := session.WriteChunk(ctx, 0, req.Body)
+	if err != nil {
+		return nil, err
+	}
+	if size != req.Length {
+		return nil, errtypes.PartialContent("coordinator: unexpected end of stream")
 	}
 
 	ri, err := c.finishUpload(ctx, session)
