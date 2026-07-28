@@ -271,7 +271,18 @@ func (d *driver) TouchFile(ctx context.Context, ref *provider.Reference, markpro
 	if err := client.Write(rel, []byte{}, 0); err != nil {
 		return nil, err
 	}
-	return &storage.TouchFileResult{}, nil
+	// The coordinator threads ResourceID into the session so the following
+	// CommitUpload can address the file, so return the real ids rather than an
+	// empty result. rel is the remote path, encoded the way GetMD encodes it.
+	shareID, _ := shareInfoFromReference(ref)
+	return &storage.TouchFileResult{
+		SpaceID: shareID.GetOpaqueId(),
+		ResourceID: &provider.ResourceId{
+			StorageId: utils.OCMStorageProviderID,
+			SpaceId:   shareID.GetOpaqueId(),
+			OpaqueId:  base64.StdEncoding.EncodeToString([]byte(filepath.Join("/", rel))),
+		},
+	}, nil
 }
 
 func (d *driver) Move(ctx context.Context, oldRef, newRef *provider.Reference) (*storage.MoveResult, error) {
@@ -537,6 +548,11 @@ func (d *driver) GetLock(ctx context.Context, ref *provider.Reference) (*provide
 	token, err := client.GetLock(rel)
 	if err != nil {
 		return nil, err
+	}
+	if token == "" {
+		// An unlocked file yields an empty token. Callers test the returned lock
+		// against nil, so a lock with an empty id would read as "locked".
+		return nil, errtypes.NotFound(ref.GetPath())
 	}
 
 	return &provider.Lock{LockId: token, Type: provider.LockType_LOCK_TYPE_EXCL}, nil

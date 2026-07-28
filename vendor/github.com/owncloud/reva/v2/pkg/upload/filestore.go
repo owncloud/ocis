@@ -73,9 +73,12 @@ func FileStoreFromDriverConf(driverConf map[string]interface{}, log *zerolog.Log
 		return nil
 	}
 
+	// storage_root is the ocm driver's spelling of root; it stages uploads under
+	// the same <root>/uploads/ layout FileStore uses.
 	type driverRootConf struct {
 		Root            string `mapstructure:"root"`
 		UploadDirectory string `mapstructure:"upload_directory"`
+		StorageRoot     string `mapstructure:"storage_root"`
 	}
 	var rc driverRootConf
 	_ = mapstructure.Decode(driverConf, &rc)
@@ -83,6 +86,9 @@ func FileStoreFromDriverConf(driverConf map[string]interface{}, log *zerolog.Log
 	root := rc.UploadDirectory
 	if root == "" {
 		root = rc.Root
+	}
+	if root == "" {
+		root = rc.StorageRoot
 	}
 	if root == "" {
 		return nil

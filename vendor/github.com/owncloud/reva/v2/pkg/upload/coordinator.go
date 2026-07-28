@@ -30,6 +30,7 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/google/uuid"
+	tusd "github.com/tus/tusd/v2/pkg/handler"
 
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
@@ -39,10 +40,17 @@ import (
 	"github.com/owncloud/reva/v2/pkg/utils"
 )
 
-// Coordinator owns the upload lifecycle.
+// Coordinator owns the upload lifecycle: session initiation, the TUS data
+// transfer, and listing sessions.
 type Coordinator interface {
 	// InitiateUpload returns a list of protocols with urls that can be used to append bytes to a new upload session.
 	InitiateUpload(ctx context.Context, ref *provider.Reference, uploadLength int64, metadata map[string]string) (map[string]string, error)
+	// GetUpload returns the session with the given id as a tusd upload.
+	GetUpload(ctx context.Context, id string) (tusd.Upload, error)
+	// UseIn registers the coordinator as the tusd data store.
+	UseIn(composer *tusd.StoreComposer)
+	// ListUploadSessions returns the upload sessions matching the given filter.
+	ListUploadSessions(ctx context.Context, filter storage.UploadSessionFilter) ([]storage.UploadSession, error)
 }
 
 // coordinator is the concrete implementation of Coordinator.
@@ -459,6 +467,52 @@ func verifyAndStoreChecksums(ctx context.Context, session Session) error {
 	}
 	session.SetChecksums(sha1h.Sum(nil), md5h.Sum(nil), adler32h.Sum(nil))
 	return nil
+}
+
+// ListUploadSessions returns the upload sessions matching the given filter.
+func (c *coordinator) ListUploadSessions(ctx context.Context, filter storage.UploadSessionFilter) ([]storage.UploadSession, error) {
+	var sessions []Session
+	if filter.ID != nil && *filter.ID != "" {
+		session, err := c.store.Get(ctx, *filter.ID)
+		if err != nil {
+			return nil, err
+		}
+		sessions = []Session{session}
+	} else {
+		var err error
+		sessions, err = c.store.List(ctx)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	filtered := []storage.UploadSession{}
+	now := time.Now()
+	for _, session := range sessions {
+		if filter.Processing != nil && *filter.Processing != session.IsProcessing() {
+			continue
+		}
+		if filter.Expired != nil {
+			if *filter.Expired {
+				if now.Before(session.Expires()) {
+					continue
+				}
+			} else {
+				if now.After(session.Expires()) {
+					continue
+				}
+			}
+		}
+		if filter.HasVirus != nil {
+			sr, _ := session.ScanData()
+			infected := sr != ""
+			if *filter.HasVirus != infected {
+				continue
+			}
+		}
+		filtered = append(filtered, session)
+	}
+	return filtered, nil
 }
 
 // rewriteChunkedRef parses a legacy chunking-v1 path, returning a reference to the

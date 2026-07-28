@@ -33,6 +33,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rhttp/router"
 	"github.com/owncloud/reva/v2/pkg/storage"
 	"github.com/owncloud/reva/v2/pkg/storage/fs/registry"
+	pkgupload "github.com/owncloud/reva/v2/pkg/upload"
 )
 
 func init() {
@@ -51,6 +52,7 @@ type config struct {
 	NatsEnableTLS      bool                              `mapstructure:"nats_enable_tls"`
 	NatsUsername       string                            `mapstructure:"nats_username"`
 	NatsPassword       string                            `mapstructure:"nats_password"`
+	UploadDirectory    string                            `mapstructure:"upload_directory" docs:";Local directory for staging upload sessions. Overrides the driver root. Required for drivers without a local root."`
 }
 
 func (c *config) init() {
@@ -104,7 +106,18 @@ func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) 
 		return nil, err
 	}
 
-	dataTXs, err := getDataTXs(conf, fs, evstream, log)
+	// The data provider finishes uploads that the storage provider initiated, so
+	// its store must resolve to the same upload directory.
+	store := pkgupload.NewFileStoreFromConfig(conf.UploadDirectory, conf.Drivers[conf.Driver], log)
+	if store == nil {
+		return nil, fmt.Errorf("dataprovider: cannot determine upload directory, set upload_directory in config or driver root")
+	}
+	if err := store.Setup(); err != nil {
+		return nil, fmt.Errorf("dataprovider: upload directory setup failed: %w", err)
+	}
+	coord := pkgupload.NewCoordinator(fs, store)
+
+	dataTXs, err := getDataTXs(conf, coord, fs, evstream, log)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +139,7 @@ func getFS(c *config, stream events.Stream, log *zerolog.Logger) (storage.FS, er
 	return nil, fmt.Errorf("driver not found: %s", c.Driver)
 }
 
-func getDataTXs(c *config, fs storage.FS, publisher events.Publisher, log *zerolog.Logger) (map[string]http.Handler, error) {
+func getDataTXs(c *config, coord pkgupload.Coordinator, driver storage.FS, publisher events.Publisher, log *zerolog.Logger) (map[string]http.Handler, error) {
 	if c.DataTXs == nil {
 		c.DataTXs = make(map[string]map[string]interface{})
 	}
@@ -146,7 +159,7 @@ func getDataTXs(c *config, fs storage.FS, publisher events.Publisher, log *zerol
 	for t := range c.DataTXs {
 		if f, ok := datatxregistry.NewFuncs[t]; ok {
 			if tx, err := f(c.DataTXs[t], publisher, log); err == nil {
-				if handler, err := tx.Handler(fs); err == nil {
+				if handler, err := tx.Handler(coord, driver); err == nil {
 					txs[t] = handler
 				}
 			}
