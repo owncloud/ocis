@@ -32,8 +32,10 @@ import (
 	"github.com/google/uuid"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
 
+	"github.com/owncloud/reva/v2/pkg/appctx"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
+	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/rhttp/datatx/metrics"
 	"github.com/owncloud/reva/v2/pkg/storage"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/chunking"
@@ -61,6 +63,7 @@ type coordinator struct {
 	fs           storage.FS
 	store        SessionStore
 	chunkHandler *chunking.ChunkHandler
+	pub          events.Publisher
 }
 
 // NewCoordinator constructs a coordinator backed by the given storage driver
@@ -69,8 +72,11 @@ type coordinator struct {
 //
 // chunkFolder stages legacy chunking-v1 parts until the final one arrives; pass
 // "" to reject chunked uploads.
-func NewCoordinator(fs storage.FS, store SessionStore, chunkFolder string) *coordinator {
-	c := &coordinator{fs: fs, store: store}
+//
+// pub receives the UploadReady event that tells the rest of the system a file is
+// available; pass nil to disable publishing.
+func NewCoordinator(fs storage.FS, store SessionStore, chunkFolder string, pub events.Publisher) *coordinator {
+	c := &coordinator{fs: fs, store: store, pub: pub}
 	if chunkFolder != "" {
 		c.chunkHandler = chunking.NewChunkHandler(chunkFolder)
 	}
@@ -510,7 +516,40 @@ func (c *coordinator) finishSync(ctx context.Context, session Session) (*provide
 	_ = c.fs.MarkProcessing(ctx, &ref, false, session.ID())
 	session.Cleanup(true, true)
 	metrics.UploadSessionsFinalized.Inc()
+	c.publishUploadReady(ctx, session, ri)
 	return ri, nil
+}
+
+// publishUploadReady announces that the file is available. Consumers such as the
+// search indexer only listen for UploadReady when async uploads are configured,
+// and would otherwise never learn about a coordinator upload. The coordinator
+// commits inline, so by the time we get here the file really is ready and there
+// is no postprocessing round trip to wait for.
+func (c *coordinator) publishUploadReady(ctx context.Context, session Session, ri *provider.ResourceInfo) {
+	if c.pub == nil {
+		return
+	}
+	executant := session.Executant()
+	if err := events.Publish(ctx, c.pub, events.UploadReady{
+		UploadID:   session.ID(),
+		Filename:   session.Filename(),
+		SpaceOwner: session.SpaceOwner(),
+		ExecutingUser: &user.User{
+			Id: &executant,
+		},
+		FileRef: &provider.Reference{
+			ResourceId: &provider.ResourceId{
+				StorageId: session.ProviderID(),
+				SpaceId:   session.SpaceID(),
+				OpaqueId:  session.SpaceID(),
+			},
+			Path: utils.MakeRelativePath(filepath.Join(session.Dir(), session.Filename())),
+		},
+		ResourceID: ri.GetId(),
+		Timestamp:  utils.TSNow(),
+	}); err != nil {
+		appctx.GetLogger(ctx).Error().Err(err).Str("uploadid", session.ID()).Msg("failed to publish UploadReady event")
+	}
 }
 
 // rollback unmarks processing, cleans up session files, and deletes the node if

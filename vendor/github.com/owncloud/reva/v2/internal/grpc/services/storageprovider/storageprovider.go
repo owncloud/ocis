@@ -179,7 +179,12 @@ func New(m map[string]interface{}, ss *grpc.Server, log *zerolog.Logger) (rgrpc.
 
 	c.init()
 
-	fs, err := getFS(c, log)
+	evstream, err := estreamFromConfig(c.Events)
+	if err != nil {
+		return nil, err
+	}
+
+	fs, err := getFS(c, evstream, log)
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +200,7 @@ func New(m map[string]interface{}, ss *grpc.Server, log *zerolog.Logger) (rgrpc.
 	if err := store.Setup(); err != nil {
 		return nil, fmt.Errorf("storageprovider: upload directory setup failed: %w", err)
 	}
-	coordinator := upload.NewCoordinator(fs, store, filepath.Join(store.Root(), "uploads"))
+	coordinator := upload.NewCoordinator(fs, store, filepath.Join(store.Root(), "uploads"), evstream)
 
 	// parse data server url
 	u, err := url.Parse(c.DataServerURL)
@@ -1282,12 +1287,7 @@ func (s *Service) addMissingStorageProviderID(resourceID *provider.ResourceId, s
 	}
 }
 
-func getFS(c *config, log *zerolog.Logger) (storage.FS, error) {
-	evstream, err := estreamFromConfig(c.Events)
-	if err != nil {
-		return nil, err
-	}
-
+func getFS(c *config, evstream events.Stream, log *zerolog.Logger) (storage.FS, error) {
 	if f, ok := registry.NewFuncs[c.Driver]; ok {
 		driverConf := c.Drivers[c.Driver]
 		driverConf["mount_id"] = c.MountID // pass the mount id to the driver
