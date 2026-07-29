@@ -21,12 +21,11 @@ external-sites:
         color: "#0D856F"
         icon: cloud
         priority: 50
-      - name: Wikipedia
-        url: "https://www.wikipedia.org"
+      - name: Kiteworks Open Source Program Office
+        url: "https://www.kiteworks.com/opensource"
         target: external
-        color: "#0D856F"
-        icon: book
-        priority: 51
+        icon: info-i.svg
+        priority: 99
 
 # The following config blocks are required by the ai-* web extensions and
 # chat-with-file/version-changelog. They all call the ai-llm-proxy service
