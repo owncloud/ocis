@@ -21,7 +21,7 @@ directives:
   frame-src:
     - '''self'''
     - 'blob:'
-    - 'https://embed.diagrams.net/'
+    - 'https://${DRAWIO_DOMAIN|drawio.owncloud.test}/'
     # In contrary to bash and docker the default is given after the | character
     - 'https://${ONLYOFFICE_DOMAIN|onlyoffice.owncloud.test}/'
     - 'https://${COLLABORA_DOMAIN|collabora.owncloud.test}/'
