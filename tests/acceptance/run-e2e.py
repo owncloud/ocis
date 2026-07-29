@@ -307,26 +307,27 @@ def main() -> int:
 
     if keycloak_needed:
         server_env.update({
-        "OCIS_ENABLE_VAULT_MODE": "true",
-        "FRONTEND_ENABLE_VAULT_MODE": "true",
-        "OCIS_MFA_ENABLED": "true",
-        "SETTINGS_GRPC_ADDR": "localhost:9191",
-        # Keycloak as external OIDC provider — disable built-in IDP
         "OCIS_EXCLUDE_RUN_SERVICES": "idp",
+        "PROXY_AUTOPROVISION_ACCOUNTS": "true",
+        # Group sync is opt-in and does not create groups by default; the group
+        # sync e2e test relies on both being enabled so Keycloak groups appear.
+        "PROXY_AUTOPROVISION_CLAIM_GROUPS": "groups",
+        "PROXY_AUTOPROVISION_GROUP_CREATE": "true",
+        "PROXY_ROLE_ASSIGNMENT_DRIVER": "oidc",
         "OCIS_OIDC_ISSUER": "https://localhost:8443/realms/oCIS",
         "PROXY_OIDC_REWRITE_WELLKNOWN": "true",
-        "PROXY_AUTOPROVISION_ACCOUNTS": "true",
-        "PROXY_ROLE_ASSIGNMENT_DRIVER": "oidc",
+        "WEB_OIDC_CLIENT_ID": "web",
+        "WEB_OIDC_SCOPE": "openid profile email acr",
         "PROXY_USER_OIDC_CLAIM": "preferred_username",
         "PROXY_USER_CS3_CLAIM": "username",
-        "WEB_OIDC_CLIENT_ID": "web",
-        "KEYCLOAK_DOMAIN": "localhost:8443",
         "OCIS_ADMIN_USER_ID": "",
         "GRAPH_ASSIGN_DEFAULT_USER_ROLE": "false",
         "GRAPH_USERNAME_MATCH": "none",
         "IDM_CREATE_DEMO_USERS": "false",
-        "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
-        "WEB_OIDC_SCOPE": "openid profile email acr"
+        "PROXY_CSP_CONFIG_FILE_LOCATION": str(
+            repo_root / "tests/config/ci/csp.yaml"
+        ),
+        "KEYCLOAK_DOMAIN": "localhost:8443",
         })
 
     if mfa_needed:
