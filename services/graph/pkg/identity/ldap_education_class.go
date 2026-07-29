@@ -93,7 +93,9 @@ func (i *LDAP) CreateEducationClass(ctx context.Context, class libregraph.Educat
 	if i.useServerUUID {
 		// The directory assigns the ID and conn.Add cannot return it, so we must
 		// read the entry back to recover the generated UUID.
-		e, err = i.getEducationClassByDN(ar.DN)
+		e, err = i.readBackAfterWrite(func() (*ldap.Entry, error) {
+			return i.getEducationClassByDN(ar.DN)
+		})
 		if err != nil {
 			return nil, err
 		}

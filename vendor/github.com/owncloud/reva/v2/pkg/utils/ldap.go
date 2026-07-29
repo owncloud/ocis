@@ -24,9 +24,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/go-ldap/ldap/v3"
 	"github.com/owncloud/reva/v2/pkg/logger"
 	ldapReconnect "github.com/owncloud/reva/v2/pkg/utils/ldap"
-	"github.com/go-ldap/ldap/v3"
 	"github.com/pkg/errors"
 )
 
@@ -39,7 +39,11 @@ type LDAPConn struct {
 	BindDN       string `mapstructure:"bind_username"`
 	BindPassword string `mapstructure:"bind_password"`
 
-	// PoolEnabled switches GetLDAPClientWithPool callers to a bounded connection pool instead of
+	RetryMaxCount  int           `mapstructure:"retry_max_count"`
+	RetryBaseDelay time.Duration `mapstructure:"retry_base_delay"`
+	RetryMaxDelay  time.Duration `mapstructure:"retry_max_delay"`
+
+	// PoolEnabled switches GetLDAPClientFromConfig to a bounded connection pool instead of
 	// the single long-lived reconnecting connection. Off by default.
 	PoolEnabled bool `mapstructure:"pool_enabled"`
 	// PoolSize caps the number of concurrently open pooled connections. Defaults to 5 when unset.
@@ -87,10 +91,13 @@ func GetLDAPClientWithReconnect(c *LDAPConn) (ldap.Client, error) {
 
 	conn := ldapReconnect.NewLDAPWithReconnect(
 		ldapReconnect.Config{
-			URI:          c.URI,
-			BindDN:       c.BindDN,
-			BindPassword: c.BindPassword,
-			TLSConfig:    tlsConf,
+			URI:            c.URI,
+			BindDN:         c.BindDN,
+			BindPassword:   c.BindPassword,
+			TLSConfig:      tlsConf,
+			RetryMaxCount:  c.RetryMaxCount,
+			RetryBaseDelay: c.RetryBaseDelay,
+			RetryMaxDelay:  c.RetryMaxDelay,
 		},
 	)
 	return conn, nil

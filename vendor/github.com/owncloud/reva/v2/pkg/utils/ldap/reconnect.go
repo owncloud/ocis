@@ -28,6 +28,7 @@ import (
 	"fmt"
 	"time"
 
+	backoff "github.com/cenkalti/backoff/v5"
 	"github.com/go-ldap/ldap/v3"
 	"github.com/rs/zerolog"
 )
@@ -36,6 +37,84 @@ var (
 	defaultRetries = 1
 	errMaxRetries  = errors.New("max retries")
 )
+
+// RetryPolicy controls retry behaviour for one class of LDAP operations.
+type RetryPolicy struct {
+	MaxRetries     int
+	BaseDelay      time.Duration
+	MaxDelay       time.Duration
+	isRetryable    func(code uint16) bool
+	needsReconnect func(code uint16) bool
+}
+
+// NewReadPolicy returns a RetryPolicy for read operations (Search).
+// Tier 1 (ErrorNetwork/ServerDown/ConnectError/Timeout/LocalError): reconnect + backoff.
+// Tier 2 (Busy/Unavailable): backoff only, no reconnect (server signals transient overload).
+//
+// Deliberately excluded:
+//   - LDAPResultTimeLimitExceeded (3): usually a too-broad query, not transient load;
+//     retrying re-runs the expensive query and worsens a struggling server.
+//   - LDAPResultReferral (10): a routing signal, not a transient error.
+func NewReadPolicy(maxRetries int, baseDelay, maxDelay time.Duration) RetryPolicy {
+	return RetryPolicy{
+		MaxRetries: maxRetries,
+		BaseDelay:  baseDelay,
+		MaxDelay:   maxDelay,
+		isRetryable: func(code uint16) bool {
+			switch code {
+			case ldap.ErrorNetwork,
+				ldap.LDAPResultServerDown,
+				ldap.LDAPResultConnectError,
+				ldap.LDAPResultTimeout,
+				ldap.LDAPResultLocalError,
+				ldap.LDAPResultBusy,
+				ldap.LDAPResultUnavailable:
+				return true
+			}
+			return false
+		},
+		needsReconnect: func(code uint16) bool {
+			switch code {
+			case ldap.ErrorNetwork,
+				ldap.LDAPResultServerDown,
+				ldap.LDAPResultConnectError,
+				ldap.LDAPResultTimeout,
+				ldap.LDAPResultLocalError:
+				return true
+			}
+			return false
+		},
+	}
+}
+
+// NewWritePolicy returns a RetryPolicy for write operations.
+// Only retries on connection-establishment failures that provably never reached the server:
+// ServerDown/ConnectError are raised before the request packet is sent.
+//
+// ErrorNetwork is deliberately NOT retryable for writes: go-ldap's Add/Modify/Del send the
+// request packet (doRequest) and then read the response (readPacket), so a connection drop
+// during the response read surfaces as ErrorNetwork AFTER the mutation was already transmitted.
+// Retrying such a write would double-apply it.
+//
+// Never retries Timeout/LocalError/Busy/Unavailable either, for the same double-write reason.
+func NewWritePolicy(maxRetries int, baseDelay, maxDelay time.Duration) RetryPolicy {
+	return RetryPolicy{
+		MaxRetries: maxRetries,
+		BaseDelay:  baseDelay,
+		MaxDelay:   maxDelay,
+		isRetryable: func(code uint16) bool {
+			switch code {
+			case ldap.LDAPResultServerDown,
+				ldap.LDAPResultConnectError:
+				return true
+			}
+			return false
+		},
+		needsReconnect: func(code uint16) bool {
+			return true // all write-retryable codes are connection failures
+		},
+	}
+}
 
 type ldapConnection struct {
 	Conn  *ldap.Conn
@@ -46,7 +125,10 @@ type ldapConnection struct {
 type ConnWithReconnect struct {
 	conn    chan ldapConnection
 	reset   chan *ldap.Conn
-	retries int
+	read    RetryPolicy
+	write   RetryPolicy
+	sleepFn func(time.Duration)
+	dialFn  func(Config) (*ldap.Conn, error)
 	logger  *zerolog.Logger
 }
 
@@ -55,10 +137,13 @@ func NewLDAPWithReconnect(config Config) *ConnWithReconnect {
 	conn := ConnWithReconnect{
 		conn:    make(chan ldapConnection),
 		reset:   make(chan *ldap.Conn),
-		retries: defaultRetries,
+		read:    NewReadPolicy(config.RetryMaxCount, config.RetryBaseDelay, config.RetryMaxDelay),
+		write:   NewWritePolicy(config.RetryMaxCount, config.RetryBaseDelay, config.RetryMaxDelay),
+		sleepFn: time.Sleep,
 	}
 	logger := zerolog.Nop()
 	conn.logger = &logger
+	conn.dialFn = conn.ldapConnect
 	go conn.ldapAutoConnect(config)
 	return &conn
 }
@@ -68,82 +153,137 @@ func (c *ConnWithReconnect) SetLogger(logger *zerolog.Logger) {
 	c.logger = logger
 }
 
-func (c *ConnWithReconnect) retry(fn func(c ldap.Client) error) error {
-	conn, err := c.getConnection()
 
+// ldapErrCode extracts the LDAP result code from an error.
+// Non-LDAP errors (e.g. plain network errors) are treated as ErrorNetwork.
+func ldapErrCode(err error) uint16 {
+	if err == nil {
+		return 0
+	}
+	var lerr *ldap.Error
+	if errors.As(err, &lerr) {
+		return lerr.ResultCode
+	}
+	// Unknown error type: use a non-retryable sentinel rather than ErrorNetwork,
+	// which is retryable for writes and could cause double-apply.
+	return ldap.LDAPResultOther
+}
+
+// RetryOp executes fn under the given retry policy.
+func (c *ConnWithReconnect) RetryOp(policy RetryPolicy, fn func(*ldap.Conn) error) error {
+	if policy.MaxRetries < 1 {
+		policy.MaxRetries = 1
+	}
+	conn, err := c.getConnection()
 	if err != nil {
 		return err
 	}
 
-	for try := 0; try <= c.retries; try++ {
-		if try > 0 {
-			c.logger.Debug().Msgf("retrying attempt %d", try)
+	var bo *backoff.ExponentialBackOff
+	for try := 0; ; try++ {
+		err = fn(conn)
+		if err == nil {
+			return nil
+		}
+		code := ldapErrCode(err)
+		if !policy.isRetryable(code) || try >= policy.MaxRetries {
+			break
+		}
+
+		if policy.BaseDelay > 0 {
+			if bo == nil {
+				bo = backoff.NewExponentialBackOff()
+				bo.InitialInterval = policy.BaseDelay
+				if policy.MaxDelay > 0 {
+					bo.MaxInterval = policy.MaxDelay
+				}
+				bo.Reset()
+			}
+			// backoff/v5 ExponentialBackOff has no MaxElapsedTime and NextBackOff never
+			// returns Stop, so every retry sleeps the returned interval.
+			c.sleepFn(bo.NextBackOff())
+		}
+
+		if policy.needsReconnect(code) {
 			conn, err = c.reconnect(conn)
 			if err != nil {
-				// reconnection failed stop this attempt
 				return err
 			}
 		}
-		if err = fn(conn); err == nil {
-			// function succeed no need to retry
-			return nil
-		}
-		if !ldap.IsErrorWithCode(err, ldap.ErrorNetwork) {
-			// non network error, stop retrying
-			return err
-		}
 	}
-	return ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
+	return err
 }
 
 // Search implements the ldap.Client interface
 func (c *ConnWithReconnect) Search(sr *ldap.SearchRequest) (*ldap.SearchResult, error) {
-	var err error
 	var res *ldap.SearchResult
-
-	retryErr := c.retry(func(c ldap.Client) error {
-		res, err = c.Search(sr)
-		return err
+	err := c.RetryOp(c.read, func(conn *ldap.Conn) error {
+		var e error
+		res, e = conn.Search(sr)
+		return e
 	})
-
-	return res, retryErr
-
+	return res, err
 }
 
 // Add implements the ldap.Client interface
 func (c *ConnWithReconnect) Add(a *ldap.AddRequest) error {
-	err := c.retry(func(c ldap.Client) error {
-		return c.Add(a)
+	return c.RetryOp(c.write, func(conn *ldap.Conn) error {
+		return conn.Add(a)
 	})
-
-	return err
 }
 
 // Del implements the ldap.Client interface
 func (c *ConnWithReconnect) Del(d *ldap.DelRequest) error {
-	err := c.retry(func(c ldap.Client) error {
-		return c.Del(d)
+	return c.RetryOp(c.write, func(conn *ldap.Conn) error {
+		return conn.Del(d)
 	})
-
-	return err
 }
 
 // Modify implements the ldap.Client interface
 func (c *ConnWithReconnect) Modify(m *ldap.ModifyRequest) error {
-	err := c.retry(func(c ldap.Client) error {
-		return c.Modify(m)
+	return c.RetryOp(c.write, func(conn *ldap.Conn) error {
+		return conn.Modify(m)
 	})
-
-	return err
 }
 
 // ModifyDN implements the ldap.Client interface
 func (c *ConnWithReconnect) ModifyDN(m *ldap.ModifyDNRequest) error {
-	err := c.retry(func(c ldap.Client) error {
-		return c.ModifyDN(m)
+	return c.RetryOp(c.write, func(conn *ldap.Conn) error {
+		return conn.ModifyDN(m)
 	})
+}
 
-	return err
+// Extended implements the ldap.Client interface
+func (c *ConnWithReconnect) Extended(request *ldap.ExtendedRequest) (*ldap.ExtendedResponse, error) {
+	var res *ldap.ExtendedResponse
+	err := c.RetryOp(c.write, func(conn *ldap.Conn) error {
+		var e error
+		res, e = conn.Extended(request)
+		return e
+	})
+	return res, err
+}
+
+// ModifyWithResult implements the ldap.Client interface
+func (c *ConnWithReconnect) ModifyWithResult(m *ldap.ModifyRequest) (*ldap.ModifyResult, error) {
+	var res *ldap.ModifyResult
+	err := c.RetryOp(c.write, func(conn *ldap.Conn) error {
+		var e error
+		res, e = conn.ModifyWithResult(m)
+		return e
+	})
+	return res, err
+}
+
+// PasswordModify implements the ldap.Client interface
+func (c *ConnWithReconnect) PasswordModify(m *ldap.PasswordModifyRequest) (*ldap.PasswordModifyResult, error) {
+	var res *ldap.PasswordModifyResult
+	err := c.RetryOp(c.write, func(conn *ldap.Conn) error {
+		var e error
+		res, e = conn.PasswordModify(m)
+		return e
+	})
+	return res, err
 }
 
 func (c *ConnWithReconnect) getConnection() (*ldap.Conn, error) {
@@ -170,14 +310,14 @@ func (c *ConnWithReconnect) ldapAutoConnect(config Config) {
 			switch {
 			case l == nil:
 				c.logger.Debug().Msg("reconnecting to LDAP")
-				l, err = c.ldapConnect(config)
+				l, err = c.dialFn(config)
 			case l != resConn:
 				c.logger.Debug().Msg("already reconnected")
 				continue
 			default:
 				c.logger.Debug().Msg("closing and reconnecting to LDAP")
 				l.Close()
-				l, err = c.ldapConnect(config)
+				l, err = c.dialFn(config)
 			}
 		case c.conn <- ldapConnection{l, err}:
 		}
@@ -201,10 +341,8 @@ func (c *ConnWithReconnect) ldapConnect(config Config) (*ldap.Conn, error) {
 			l.Close()
 			return nil, err
 		}
-
 	}
 	return l, err
-
 }
 
 func (c *ConnWithReconnect) reconnect(resetConn *ldap.Conn) (*ldap.Conn, error) {
@@ -228,7 +366,6 @@ func (c *ConnWithReconnect) StartTLS(*tls.Config) error {
 // Close implements the ldap.Client interface
 func (c *ConnWithReconnect) Close() (err error) {
 	conn, err := c.getConnection()
-
 	if err != nil {
 		return err
 	}
@@ -237,7 +374,6 @@ func (c *ConnWithReconnect) Close() (err error) {
 
 func (c *ConnWithReconnect) GetLastError() error {
 	conn, err := c.getConnection()
-
 	if err != nil {
 		return err
 	}
@@ -247,18 +383,6 @@ func (c *ConnWithReconnect) GetLastError() error {
 // IsClosing implements the ldap.Client interface
 func (c *ConnWithReconnect) IsClosing() bool {
 	return false
-}
-
-// Extended implements the ldap.Client interface
-func (c *ConnWithReconnect) Extended(request *ldap.ExtendedRequest) (*ldap.ExtendedResponse, error) {
-	var err error
-	var res *ldap.ExtendedResponse
-	
-	retryErr := c.retry(func(c ldap.Client) error {
-		res, err = c.Extended(request)
-		return err
-	})
-	return res, retryErr
 }
 
 // SetTimeout implements the ldap.Client interface
@@ -284,35 +408,9 @@ func (c *ConnWithReconnect) ExternalBind() error {
 	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
 
-// ModifyWithResult implements the ldap.Client interface
-func (c *ConnWithReconnect) ModifyWithResult(m *ldap.ModifyRequest) (*ldap.ModifyResult, error) {
-	var err error
-	var res *ldap.ModifyResult
-
-	retryErr := c.retry(func(c ldap.Client) error {
-		res, err = c.ModifyWithResult(m)
-		return err
-	})
-
-	return res, retryErr
-}
-
 // Compare implements the ldap.Client interface
 func (c *ConnWithReconnect) Compare(dn, attribute, value string) (bool, error) {
 	return false, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
-}
-
-// PasswordModify implements the ldap.Client interface
-func (c *ConnWithReconnect) PasswordModify(m *ldap.PasswordModifyRequest) (*ldap.PasswordModifyResult, error) {
-	var err error
-	var res *ldap.PasswordModifyResult
-
-	retryErr := c.retry(func(c ldap.Client) error {
-		res, err = c.PasswordModify(m)
-		return err
-	})
-
-	return res, retryErr
 }
 
 // SearchWithPaging implements the ldap.Client interface
@@ -322,7 +420,6 @@ func (c *ConnWithReconnect) SearchWithPaging(searchRequest *ldap.SearchRequest, 
 
 // SearchAsync implements the ldap.Client interface
 func (c *ConnWithReconnect) SearchAsync(ctx context.Context, searchRequest *ldap.SearchRequest, bufferSize int) ldap.Response {
-	// unimplemented
 	return nil
 }
 
@@ -348,12 +445,10 @@ func (c *ConnWithReconnect) DirSync(searchRequest *ldap.SearchRequest, flags, ma
 
 // DirSyncAsync implements the ldap.Client interface
 func (c *ConnWithReconnect) DirSyncAsync(ctx context.Context, searchRequest *ldap.SearchRequest, bufferSize int, flags, maxAttrCount int64, cookie []byte) ldap.Response {
-	// unimplemented
 	return nil
 }
 
 // Syncrepl implements the ldap.Client interface
 func (c *ConnWithReconnect) Syncrepl(ctx context.Context, searchRequest *ldap.SearchRequest, bufferSize int, mode ldap.ControlSyncRequestMode, cookie []byte, reloadHint bool) ldap.Response {
-	// unimplemented
 	return nil
 }

@@ -162,7 +162,11 @@ func (p *ConnPool) release(conn ldap.Client, opErr error) {
 // timeout, LB/firewall reaping) is expected to fail the first op after being idle; on a network
 // error, do retries once more with a freshly checked-out connection (the failed one was evicted by
 // release) instead of surfacing the failure to the caller, mirroring ConnWithReconnect's retry.
-func (p *ConnPool) do(fn func(conn ldap.Client) error) error {
+//
+// retryOnNetworkErr must be false for write operations: go-ldap raises ErrorNetwork after the
+// request packet is transmitted (connection drop during response read), so retrying a write would
+// double-apply it. Reads are safe to retry. Either way the failed connection is evicted by release.
+func (p *ConnPool) do(retryOnNetworkErr bool, fn func(conn ldap.Client) error) error {
 	var opErr error
 	for try := 0; try <= defaultRetries; try++ {
 		conn, err := p.checkout()
@@ -171,7 +175,7 @@ func (p *ConnPool) do(fn func(conn ldap.Client) error) error {
 		}
 		opErr = fn(conn)
 		p.release(conn, opErr)
-		if opErr == nil || !ldap.IsErrorWithCode(opErr, ldap.ErrorNetwork) {
+		if opErr == nil || !retryOnNetworkErr || !ldap.IsErrorWithCode(opErr, ldap.ErrorNetwork) {
 			return opErr
 		}
 	}
@@ -200,7 +204,7 @@ func (p *ConnPool) Close() error {
 // Search implements the ldap.Client interface
 func (p *ConnPool) Search(sr *ldap.SearchRequest) (*ldap.SearchResult, error) {
 	var res *ldap.SearchResult
-	err := p.do(func(conn ldap.Client) error {
+	err := p.do(true, func(conn ldap.Client) error {
 		var err error
 		res, err = conn.Search(sr)
 		return err
@@ -210,28 +214,28 @@ func (p *ConnPool) Search(sr *ldap.SearchRequest) (*ldap.SearchResult, error) {
 
 // Add implements the ldap.Client interface
 func (p *ConnPool) Add(a *ldap.AddRequest) error {
-	return p.do(func(conn ldap.Client) error {
+	return p.do(false, func(conn ldap.Client) error {
 		return conn.Add(a)
 	})
 }
 
 // Del implements the ldap.Client interface
 func (p *ConnPool) Del(d *ldap.DelRequest) error {
-	return p.do(func(conn ldap.Client) error {
+	return p.do(false, func(conn ldap.Client) error {
 		return conn.Del(d)
 	})
 }
 
 // Modify implements the ldap.Client interface
 func (p *ConnPool) Modify(m *ldap.ModifyRequest) error {
-	return p.do(func(conn ldap.Client) error {
+	return p.do(false, func(conn ldap.Client) error {
 		return conn.Modify(m)
 	})
 }
 
 // ModifyDN implements the ldap.Client interface
 func (p *ConnPool) ModifyDN(m *ldap.ModifyDNRequest) error {
-	return p.do(func(conn ldap.Client) error {
+	return p.do(false, func(conn ldap.Client) error {
 		return conn.ModifyDN(m)
 	})
 }
@@ -239,7 +243,7 @@ func (p *ConnPool) ModifyDN(m *ldap.ModifyDNRequest) error {
 // Extended implements the ldap.Client interface
 func (p *ConnPool) Extended(request *ldap.ExtendedRequest) (*ldap.ExtendedResponse, error) {
 	var res *ldap.ExtendedResponse
-	err := p.do(func(conn ldap.Client) error {
+	err := p.do(false, func(conn ldap.Client) error {
 		var err error
 		res, err = conn.Extended(request)
 		return err
@@ -304,7 +308,7 @@ func (p *ConnPool) Unbind() error {
 // ModifyWithResult implements the ldap.Client interface
 func (p *ConnPool) ModifyWithResult(m *ldap.ModifyRequest) (*ldap.ModifyResult, error) {
 	var res *ldap.ModifyResult
-	err := p.do(func(conn ldap.Client) error {
+	err := p.do(false, func(conn ldap.Client) error {
 		var err error
 		res, err = conn.ModifyWithResult(m)
 		return err
@@ -320,7 +324,7 @@ func (p *ConnPool) Compare(dn, attribute, value string) (bool, error) {
 // PasswordModify implements the ldap.Client interface
 func (p *ConnPool) PasswordModify(m *ldap.PasswordModifyRequest) (*ldap.PasswordModifyResult, error) {
 	var res *ldap.PasswordModifyResult
-	err := p.do(func(conn ldap.Client) error {
+	err := p.do(false, func(conn ldap.Client) error {
 		var err error
 		res, err = conn.PasswordModify(m)
 		return err
