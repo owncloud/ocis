@@ -152,6 +152,40 @@ func TestInitFailurePropagates(t *testing.T) {
 	Expect(s.mdc).To(BeNil())
 }
 
+// newFailingInitStore builds a store whose metadata client always fails to
+// initialize.
+func newFailingInitStore() *Store {
+	return &Store{
+		Logger: olog.NewLogger(),
+		cfg:    defaults.DefaultConfig(),
+		l:      &sync.Mutex{},
+		newMDC: func() MetadataClient { return &failingInitMetadataClient{} },
+	}
+}
+
+// TestPermissionsInitFailurePropagates verifies that the permission lookups
+// surface the metadata client init error instead of silently reporting "no
+// permissions found".
+func TestPermissionsInitFailurePropagates(t *testing.T) {
+	RegisterTestingT(t)
+	roleIDs := []string{"f36db5e6-a03c-40df-8413-711c67e40b47"}
+
+	s := newFailingInitStore()
+	_, err := s.ListPermissionsByResource(&settingsmsg.Resource{Type: settingsmsg.Resource_TYPE_BUNDLE}, roleIDs)
+	Expect(err).To(HaveOccurred())
+	Expect(err.Error()).To(ContainSubstring("does not have access to metadata space"))
+
+	s = newFailingInitStore()
+	_, err = s.ReadPermissionByID("readID", roleIDs)
+	Expect(err).To(HaveOccurred())
+	Expect(err.Error()).To(ContainSubstring("does not have access to metadata space"))
+
+	s = newFailingInitStore()
+	_, err = s.ReadPermissionByName("read", roleIDs)
+	Expect(err).To(HaveOccurred())
+	Expect(err.Error()).To(ContainSubstring("does not have access to metadata space"))
+}
+
 // TestAdminUserIDInit test the happy path during initialization
 func TestAdminUserIDInit(t *testing.T) {
 	RegisterTestingT(t)
