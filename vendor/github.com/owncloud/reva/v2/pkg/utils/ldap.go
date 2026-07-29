@@ -54,6 +54,7 @@ func tlsConfigFromLDAPConn(c *LDAPConn) (*tls.Config, error) {
 	if c.Insecure {
 		logger.New().Warn().Msg("SSL Certificate verification is disabled. This is strongly discouraged for production environments.")
 		return &tls.Config{
+			MinVersion: tls.VersionTLS12,
 			//nolint:gosec // We need the ability to run with "insecure" (dev/testing)
 			InsecureSkipVerify: true,
 		}, nil
@@ -63,10 +64,13 @@ func tlsConfigFromLDAPConn(c *LDAPConn) (*tls.Config, error) {
 		if err != nil {
 			return nil, errors.Wrapf(err, "Error reading LDAP CA Cert '%s.'", c.CACert)
 		}
-		rpool, _ := x509.SystemCertPool()
-		rpool.AppendCertsFromPEM(pemBytes)
+		rpool := x509.NewCertPool()
+		if !rpool.AppendCertsFromPEM(pemBytes) {
+			return nil, errors.Errorf("Error adding LDAP CA Cert '%s': no valid certificates found", c.CACert)
+		}
 		return &tls.Config{
-			RootCAs: rpool,
+			MinVersion: tls.VersionTLS12,
+			RootCAs:    rpool,
 		}, nil
 	}
 	return nil, nil
