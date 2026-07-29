@@ -599,6 +599,7 @@ def main() -> int:
                 "STORAGE_USERS_DEBUG_ADDR": "127.0.0.1:19287",
                 "STORAGE_USERS_OCIS_ROOT": str(vault_data_dir),
                 "STORAGE_USERS_EVENTS_CONSUMER_GROUP": "vault-dcfs",
+                "PROXY_CSP_CONFIG_FILE_LOCATION": str(repo_root / "tests/config/ci/csp.yaml")
             }
 
             print("Starting storage-users-vault...")
