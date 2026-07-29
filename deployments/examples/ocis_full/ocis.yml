@@ -93,6 +93,12 @@ configs:
             - WebdavPublicLink
             #- OneDrive # needs a client id and secret
             #- GoogleDrive # needs a client id and secret and an addition to the DNS zone
+      drawio:
+        config:
+          # Points the draw-io web extension at our self-hosted instance
+          # (see web_extensions/drawio.yml) instead of its default,
+          # the public https://embed.diagrams.net.
+          url: "https://${DRAWIO_DOMAIN:-drawio.owncloud.test}"
       external-sites:
         config:
           sites:
@@ -103,12 +109,11 @@ configs:
               color: "#0D856F"
               icon: cloud
               priority: 50
-            - name: Wikipedia
-              url: "https://www.wikipedia.org"
+            - name: Kiteworks Open Source Program Office
+              url: "https://www.kiteworks.com/opensource"
               target: external
-              color: "#0D856F"
-              icon: book
-              priority: 51
+              icon: info-i.svg
+              priority: 99
 
       # The following config blocks are required by the ai-* web extensions and
       # chat-with-file/version-changelog. They all call the ai-llm-proxy service

@@ -7,6 +7,10 @@ services:
           - ${DRAWIO_DOMAIN:-drawio.owncloud.test}
 
   ocis:
+    configs:
+      # drawio's own url config (self-hosted domain) lives in apps.yaml
+      - source: apps_yaml
+        target: /etc/ocis/apps.yaml
     depends_on:
       drawio-init:
         condition: service_completed_successfully
