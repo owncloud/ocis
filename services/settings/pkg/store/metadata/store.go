@@ -45,30 +45,39 @@ type Store struct {
 	mdc MetadataClient
 	cfg *config.Config
 
+	// newMDC builds the underlying metadata client. It is a field so it can be
+	// swapped out in tests.
+	newMDC func() MetadataClient
+
 	l *sync.Mutex
 }
 
-// Init initialize the store once, later calls are noops
-func (s *Store) Init() {
+// Init initializes the store once, later calls are noops. It returns the error
+// encountered while initializing the metadata client so that callers can
+// surface a specific, actionable error instead of dereferencing a nil client.
+// On failure s.mdc is left nil so that the next call retries initialization.
+func (s *Store) Init() error {
 	if s.mdc != nil {
-		return
+		return nil
 	}
 
 	s.l.Lock()
 	defer s.l.Unlock()
 
 	if s.mdc != nil {
-		return
+		return nil
 	}
 
 	mdc := &CachedMDC{
-		next:   NewMetadataClient(s.cfg.Metadata),
+		next:   s.newMDC(),
 		cfg:    s.cfg,
 		logger: s.Logger,
 	}
 	if err := s.initMetadataClient(mdc); err != nil {
 		s.Logger.Error().Err(err).Msg("error initializing metadata client")
+		return err
 	}
+	return nil
 }
 
 // New creates a new store
@@ -83,6 +92,7 @@ func New(cfg *config.Config) settings.Manager {
 		cfg: cfg,
 		l:   &sync.Mutex{},
 	}
+	s.newMDC = func() MetadataClient { return NewMetadataClient(s.cfg.Metadata) }
 
 	return &s
 }
