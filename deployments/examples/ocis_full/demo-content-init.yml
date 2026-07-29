@@ -27,5 +27,6 @@ services:
       - ./demo-content:/demo-content:ro
       - ./demo-content-init.sh:/demo-content-init.sh:ro
     entrypoint: ["/bin/sh", "/demo-content-init.sh"]
+    restart: "no"
     logging:
       driver: ${LOG_DRIVER:-local}
