@@ -69,7 +69,7 @@ func (s *Store) Init() error {
 	}
 
 	mdc := &CachedMDC{
-		next:   s.newMDC(),
+		next:   s.metadataClient(),
 		cfg:    s.cfg,
 		logger: s.Logger,
 	}
@@ -78,6 +78,16 @@ func (s *Store) Init() error {
 		return err
 	}
 	return nil
+}
+
+// metadataClient builds the underlying metadata client, falling back to the
+// default factory when newMDC is not set (e.g. when a Store is built via a
+// struct literal instead of New).
+func (s *Store) metadataClient() MetadataClient {
+	if s.newMDC != nil {
+		return s.newMDC()
+	}
+	return NewMetadataClient(s.cfg.Metadata)
 }
 
 // New creates a new store

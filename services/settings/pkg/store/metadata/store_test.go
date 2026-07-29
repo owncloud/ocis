@@ -152,6 +152,22 @@ func TestInitFailurePropagates(t *testing.T) {
 	Expect(s.mdc).To(BeNil())
 }
 
+// TestInitDefaultsMetadataClientFactory verifies that a Store built via a
+// struct literal (without newMDC set) does not panic when the metadata client
+// is constructed, but falls back to the default factory.
+func TestInitDefaultsMetadataClientFactory(t *testing.T) {
+	RegisterTestingT(t)
+	s := &Store{
+		Logger: olog.NewLogger(),
+		cfg:    defaults.DefaultConfig(),
+		l:      &sync.Mutex{},
+	}
+
+	var mdc MetadataClient
+	Expect(func() { mdc = s.metadataClient() }).ToNot(Panic())
+	Expect(mdc).ToNot(BeNil())
+}
+
 // newFailingInitStore builds a store whose metadata client always fails to
 // initialize.
 func newFailingInitStore() *Store {
