@@ -17,7 +17,9 @@ import (
 // If the accountUUID is empty, only values with empty accountUUID are returned.
 // If the accountUUID is not empty, values with an empty or with a matching accountUUID are returned.
 func (s *Store) ListValues(bundleID, accountUUID string) ([]*settingsmsg.Value, error) {
-	s.Init()
+	if err := s.Init(); err != nil {
+		return nil, err
+	}
 	ctx := context.TODO()
 
 	vIDs, err := s.mdc.ReadDir(ctx, valuesFolderLocation)
@@ -68,7 +70,9 @@ func (s *Store) ListValues(bundleID, accountUUID string) ([]*settingsmsg.Value, 
 
 // ReadValue tries to find a value by the given valueId within the dataPath
 func (s *Store) ReadValue(valueID string) (*settingsmsg.Value, error) {
-	s.Init()
+	if err := s.Init(); err != nil {
+		return nil, err
+	}
 	ctx := context.TODO()
 
 	b, err := s.mdc.SimpleDownload(ctx, valuePath(valueID))
@@ -89,7 +93,9 @@ func (s *Store) ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*se
 	if settingID == "" {
 		return nil, fmt.Errorf("settingID can not be empty %w", settings.ErrNotFound)
 	}
-	s.Init()
+	if err := s.Init(); err != nil {
+		return nil, err
+	}
 	ctx := context.TODO()
 
 	vIDs, err := s.mdc.ReadDir(ctx, valuesFolderLocation)
@@ -123,7 +129,9 @@ func (s *Store) ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*se
 
 // WriteValue writes the given value into a file within the dataPath
 func (s *Store) WriteValue(value *settingsmsg.Value) (*settingsmsg.Value, error) {
-	s.Init()
+	if err := s.Init(); err != nil {
+		return nil, err
+	}
 	ctx := context.TODO()
 
 	if value.Id == "" {
