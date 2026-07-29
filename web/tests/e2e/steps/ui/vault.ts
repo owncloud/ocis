@@ -50,6 +50,7 @@ export async function userIsInVaultMode({ stepUser }: { stepUser: string }): Pro
   const { page } = world.actorsEnvironment.getActor({ key: stepUser })
   const vaultPage = new VaultPage(page)
   const vaultPageUrl = `${config.baseUrl}/vault`
+  console.log('vaultPageUrl urlllllllllllllllllllll', vaultPageUrl)
   await expect(page).toHaveURL((url) => url.href.startsWith(vaultPageUrl))
   await expect(vaultPage.vaultBreadcrumb).toBeVisible()
 }
@@ -72,6 +73,7 @@ export async function userIsInDriveMode({ stepUser }: { stepUser: string }): Pro
   const { page } = world.actorsEnvironment.getActor({ key: stepUser })
   const vaultPage = new VaultPage(page)
   const drivePageUrl = `${config.baseUrl}/files`
+  console.log('drivePageUrl urlllllllllllllllllllll', drivePageUrl)
   await expect(page).toHaveURL((url) => url.href.startsWith(drivePageUrl))
   await expect(vaultPage.driveBreadcrumb).toBeVisible()
 }
