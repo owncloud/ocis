@@ -38,7 +38,9 @@ describe('MermaidPreviewPane', () => {
 
   it('renders the sanitized svg for a diagram that parses and renders', async () => {
     vi.mocked(mermaid.parse).mockResolvedValue({ diagramType: 'flowchart' } as never)
-    vi.mocked(mermaid.render).mockResolvedValue({ svg: '<svg><text>A--&gt;B</text></svg>' } as never)
+    vi.mocked(mermaid.render).mockResolvedValue({
+      svg: '<svg><text>A--&gt;B</text></svg>'
+    } as never)
 
     const { wrapper } = getWrapper('graph TD\n  A --> B')
     await flush()

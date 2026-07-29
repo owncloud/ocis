@@ -54,7 +54,8 @@ const configureMermaid = () => {
 // sanitizes label-derived HTML internally, but some diagram types embed real HTML
 // inside <foreignObject>, so the rendered SVG is run through DOMPurify again
 // before it reaches `v-html`.
-const sanitize = (svg: string) => DOMPurify.sanitize(svg, { ADD_ATTR: ['target'], ADD_TAGS: ['foreignObject'] })
+const sanitize = (svg: string) =>
+  DOMPurify.sanitize(svg, { ADD_ATTR: ['target'], ADD_TAGS: ['foreignObject'] })
 
 const renderDiagram = async (source: string) => {
   const token = ++renderToken

@@ -35,9 +35,7 @@ test.describe('Mermaid diagram editor', { tag: '@predefined-users' }, () => {
     //   | diagram.mmd | graph TD; A --> B --> C    |
     await ui.userEditsResources({
       stepUser: 'Alice',
-      resources: [
-        { name: 'diagram.mmd', type: 'mmdFile', content: 'graph TD\n  A --> B --> C' }
-      ]
+      resources: [{ name: 'diagram.mmd', type: 'mmdFile', content: 'graph TD\n  A --> B --> C' }]
     })
 
     // Then re-opening the file shows the rendered diagram and the view-mode
@@ -49,12 +47,16 @@ test.describe('Mermaid diagram editor', { tag: '@predefined-users' }, () => {
       page.locator(mermaidSelectors.mermaidEditorRoot).locator('.mermaid-editor-body-split')
     ).toBeVisible()
 
-    await page.locator(`${mermaidSelectors.mermaidEditorRoot} .mermaid-editor-viewmode-preview`).click()
+    await page
+      .locator(`${mermaidSelectors.mermaidEditorRoot} .mermaid-editor-viewmode-preview`)
+      .click()
     await expect(
       page.locator(mermaidSelectors.mermaidEditorRoot).locator('.mermaid-editor-body-preview-only')
     ).toBeVisible()
 
-    await page.locator(`${mermaidSelectors.mermaidEditorRoot} .mermaid-editor-viewmode-split`).click()
+    await page
+      .locator(`${mermaidSelectors.mermaidEditorRoot} .mermaid-editor-viewmode-split`)
+      .click()
     await expect(
       page.locator(mermaidSelectors.mermaidEditorRoot).locator('.mermaid-editor-body-split')
     ).toBeVisible()
