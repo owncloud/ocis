@@ -13,7 +13,7 @@ gnumeric, gsheet
 Presentations: pptx, pptm, potx, potm, ppsx, ppsm, odp, otp, fodp, gslides
 Drawings/CAD: odg, otg, fodg, svg, dxf
 PDF: pdf, a PDF/A-flavored variant (`Sample-Archival-PDFA.pdf`)
-Text/markup: txt, md, html, htm, xhtml, mhtml, xml
+Text/markup: txt, md, html, htm, xhtml, mhtml, xml, json
 E-books: epub, fb2
 Extensions: oxt (LibreOffice extension package)
 Legacy binary (hand-built, byte-for-byte): dbf, pdb, emf, wmf
