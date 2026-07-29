@@ -1,0 +1,10 @@
+MIME-Version: 1.0
+Content-Type: multipart/related; boundary="----=_NextPart_ocis_showcase"
+
+------=_NextPart_ocis_showcase
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///sample.mhtml
+
+<html><body><h1>Sample MHTML</h1><p>Generated for the oCIS format showcase.</p></body></html>
+------=_NextPart_ocis_showcase--
