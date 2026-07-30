@@ -157,10 +157,14 @@ func (p *ConnPool) checkout() (ldap.Client, error) {
 	return conn, nil
 }
 
-// release returns conn to the pool, or closes and discards it if opErr is a network error (or the
-// pool has since been closed), and frees the slot reserved by checkout.
+// release returns conn to the pool, or closes and discards it if opErr indicates the connection is
+// no longer usable (or the pool has since been closed), and frees the slot reserved by checkout.
+//
+// A failed conn.Write (isSendFailedErr) is evicted as well as ErrorNetwork: it is a plain error
+// carrying no result code, so an IsErrorWithCode check alone would return the dead connection to the
+// idle pool and fail the next checkout that picks it up.
 func (p *ConnPool) release(conn ldap.Client, opErr error) {
-	if p.IsClosing() || (opErr != nil && ldap.IsErrorWithCode(opErr, ldap.ErrorNetwork)) {
+	if p.IsClosing() || (opErr != nil && (ldap.IsErrorWithCode(opErr, ldap.ErrorNetwork) || isSendFailedErr(opErr))) {
 		if err := conn.Close(); err != nil {
 			p.logger.Error().Err(err).Msg("error closing pooled LDAP connection")
 		}
