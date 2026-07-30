@@ -2,6 +2,7 @@ package defaults
 
 import (
 	"path/filepath"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -55,6 +56,9 @@ func DefaultConfig() *config.Config {
 				LdapDisabledUsersGroupDN: "cn=DisabledUsersGroup,ou=groups,o=libregraph-idm",
 				UserTypeAttribute:        "ownCloudUserType",
 				IDP:                      "https://localhost:9200",
+				PoolEnabled:              false,
+				PoolSize:                 5,
+				PoolCheckoutTimeout:      30 * time.Second,
 				UserSchema: config.LDAPUserSchema{
 					ID:          "ownclouduuid",
 					Mail:        "mail",
