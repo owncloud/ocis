@@ -26,6 +26,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	backoff "github.com/cenkalti/backoff/v5"
@@ -33,18 +34,19 @@ import (
 	"github.com/rs/zerolog"
 )
 
-var (
-	defaultRetries = 1
-	errMaxRetries  = errors.New("max retries")
-)
-
 // RetryPolicy controls retry behaviour for one class of LDAP operations.
+//
+// The predicates take the error rather than a bare result code because go-ldap raises every
+// connection failure as ErrorNetwork(200) and distinguishes the pre-transmit case (safe to
+// retry a write) from the post-transmit case only by the wrapped message string. Read policies
+// only care about the code and ignore the message; the write policy inspects the message via
+// isPreSendNetworkErr.
 type RetryPolicy struct {
 	MaxRetries     int
 	BaseDelay      time.Duration
 	MaxDelay       time.Duration
-	isRetryable    func(code uint16) bool
-	needsReconnect func(code uint16) bool
+	isRetryable    func(err error) bool
+	needsReconnect func(err error) bool
 }
 
 // NewReadPolicy returns a RetryPolicy for read operations (Search).
@@ -60,8 +62,8 @@ func NewReadPolicy(maxRetries int, baseDelay, maxDelay time.Duration) RetryPolic
 		MaxRetries: maxRetries,
 		BaseDelay:  baseDelay,
 		MaxDelay:   maxDelay,
-		isRetryable: func(code uint16) bool {
-			switch code {
+		isRetryable: func(err error) bool {
+			switch ldapErrCode(err) {
 			case ldap.ErrorNetwork,
 				ldap.LDAPResultServerDown,
 				ldap.LDAPResultConnectError,
@@ -73,8 +75,8 @@ func NewReadPolicy(maxRetries int, baseDelay, maxDelay time.Duration) RetryPolic
 			}
 			return false
 		},
-		needsReconnect: func(code uint16) bool {
-			switch code {
+		needsReconnect: func(err error) bool {
+			switch ldapErrCode(err) {
 			case ldap.ErrorNetwork,
 				ldap.LDAPResultServerDown,
 				ldap.LDAPResultConnectError,
@@ -88,31 +90,22 @@ func NewReadPolicy(maxRetries int, baseDelay, maxDelay time.Duration) RetryPolic
 }
 
 // NewWritePolicy returns a RetryPolicy for write operations.
-// Only retries on connection-establishment failures that provably never reached the server:
-// ServerDown/ConnectError are raised before the request packet is sent.
 //
-// ErrorNetwork is deliberately NOT retryable for writes: go-ldap's Add/Modify/Del send the
-// request packet (doRequest) and then read the response (readPacket), so a connection drop
-// during the response read surfaces as ErrorNetwork AFTER the mutation was already transmitted.
-// Retrying such a write would double-apply it.
+// A write is retried only when the connection was known-unusable before the request packet was
+// sent, so the mutation provably never reached the server (isPreSendNetworkErr). Every other
+// error — including a network drop while reading the response — may have applied the write, so
+// retrying it could double-apply.
 //
-// Never retries Timeout/LocalError/Busy/Unavailable either, for the same double-write reason.
+// This intentionally does not key on result codes: go-ldap raises all connection failures as
+// ErrorNetwork(200) and never emits LDAPResultServerDown(81)/ConnectError(91), so a code-based
+// write allowlist would match nothing and never retry.
 func NewWritePolicy(maxRetries int, baseDelay, maxDelay time.Duration) RetryPolicy {
 	return RetryPolicy{
-		MaxRetries: maxRetries,
-		BaseDelay:  baseDelay,
-		MaxDelay:   maxDelay,
-		isRetryable: func(code uint16) bool {
-			switch code {
-			case ldap.LDAPResultServerDown,
-				ldap.LDAPResultConnectError:
-				return true
-			}
-			return false
-		},
-		needsReconnect: func(code uint16) bool {
-			return true // all write-retryable codes are connection failures
-		},
+		MaxRetries:     maxRetries,
+		BaseDelay:      baseDelay,
+		MaxDelay:       maxDelay,
+		isRetryable:    isPreSendNetworkErr,
+		needsReconnect: func(error) bool { return true }, // a pre-send network error always needs a fresh connection
 	}
 }
 
@@ -164,9 +157,38 @@ func ldapErrCode(err error) uint16 {
 	if errors.As(err, &lerr) {
 		return lerr.ResultCode
 	}
-	// Unknown error type: use a non-retryable sentinel rather than ErrorNetwork,
-	// which is retryable for writes and could cause double-apply.
+	// Unknown error type: map to a non-retryable code.
 	return ldap.LDAPResultOther
+}
+
+// preSendNetworkErrMsgs are the substrings go-ldap uses for ErrorNetwork(200) failures raised
+// before the request packet is handed to the write loop (Conn.sendMessageWithFlags): the IsClosing
+// check that a reaped idle connection trips, and the "could not send" fallback. Matching one proves
+// the request never left the client, so retrying a write cannot double-apply.
+//
+// go-ldap has no distinct result code for pre- vs post-transmit network errors — both are 200 — so
+// this whitelist keys on its internal message strings. It is deliberately fail-closed: if go-ldap
+// renames a message, isPreSendNetworkErr returns false and the write is surfaced to the caller
+// rather than retried. Revisit this list on every go-ldap upgrade (see TestWritePolicyMatchesEmittableCode).
+var preSendNetworkErrMsgs = []string{
+	"ldap: connection closed",
+	"ldap: could not send message for unknown reason",
+}
+
+// isPreSendNetworkErr reports whether err is an ErrorNetwork(200) raised before the request was
+// transmitted, and is therefore safe to retry for a write. See preSendNetworkErrMsgs.
+func isPreSendNetworkErr(err error) bool {
+	var lerr *ldap.Error
+	if !errors.As(err, &lerr) || lerr.ResultCode != ldap.ErrorNetwork {
+		return false
+	}
+	msg := err.Error()
+	for _, m := range preSendNetworkErrMsgs {
+		if strings.Contains(msg, m) {
+			return true
+		}
+	}
+	return false
 }
 
 // RetryOp executes fn under the given retry policy.
@@ -185,8 +207,7 @@ func (c *ConnWithReconnect) RetryOp(policy RetryPolicy, fn func(*ldap.Conn) erro
 		if err == nil {
 			return nil
 		}
-		code := ldapErrCode(err)
-		if !policy.isRetryable(code) || try >= policy.MaxRetries {
+		if !policy.isRetryable(err) || try >= policy.MaxRetries {
 			break
 		}
 
@@ -199,12 +220,10 @@ func (c *ConnWithReconnect) RetryOp(policy RetryPolicy, fn func(*ldap.Conn) erro
 				}
 				bo.Reset()
 			}
-			// backoff/v5 ExponentialBackOff has no MaxElapsedTime and NextBackOff never
-			// returns Stop, so every retry sleeps the returned interval.
 			c.sleepFn(bo.NextBackOff())
 		}
 
-		if policy.needsReconnect(code) {
+		if policy.needsReconnect(err) {
 			conn, err = c.reconnect(conn)
 			if err != nil {
 				return err
