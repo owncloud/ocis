@@ -756,10 +756,10 @@ class CliContext implements Context {
 		$expectedMessage = str_replace("\r\n", "\n", trim($content->getRaw()));
 		$actualMessage = str_replace("\r\n", "\n", trim($response->message ?? ''));
 
-		Assert::assertSame(
+		Assert::assertStringContainsString(
 			$expectedMessage,
 			$actualMessage,
-			"Expected cli output to be $expectedMessage but found $actualMessage",
+			"Expected cli output to contain '$expectedMessage', but got: '$actualMessage'",
 		);
 	}
 

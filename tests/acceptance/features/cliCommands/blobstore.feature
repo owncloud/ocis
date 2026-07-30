@@ -8,19 +8,25 @@ Feature: blobstore check and get via CLI
   Scenario: administrator checks the blobstore
     When the administrator checks the blobstore using the CLI
     Then the command should be successful
-    And the command output should contain "Upload: OK"
-    And the command output should contain "Download and verify: OK"
-    And the command output should contain "Delete: OK"
-    And the command output should contain "Blobstore check successful."
+    And the CLI response should contain the following message:
+      """
+      Upload: OK
+      Download and verify: OK
+      Delete: OK
+      Blobstore check successful.
+      """
 
 
   Scenario: administrator checks the blobstore with a valid blob size
     When the administrator checks the blobstore with blob size "1KB" using the CLI
     Then the command should be successful
-    And the command output should contain "Upload: OK"
-    And the command output should contain "Download and verify: OK"
-    And the command output should contain "Delete: OK"
-    And the command output should contain "Blobstore check successful."
+    And the CLI response should contain the following message:
+      """
+      Upload: OK
+      Download and verify: OK
+      Delete: OK
+      Blobstore check successful.
+      """
 
 
   Scenario: administrator checks the blobstore with an invalid blob size
