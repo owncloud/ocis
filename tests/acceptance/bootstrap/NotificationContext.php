@@ -27,7 +27,7 @@ class NotificationContext implements Context {
 	private string $notificationEndpointPath = '/apps/notifications/api/v1/notifications';
 	private string $globalNotificationEndpointPath = '/apps/notifications/api/v1/notifications/global';
 
-	private array $notificationIds;
+	private array $notificationIds = [];
 
 	private string $userRecipient;
 
@@ -70,6 +70,7 @@ class NotificationContext implements Context {
 	 * @throws Exception
 	 */
 	public function before(BeforeScenarioScope $scope): void {
+		$this->notificationIds = [];
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context

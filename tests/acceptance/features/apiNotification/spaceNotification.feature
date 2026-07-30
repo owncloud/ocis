@@ -11,6 +11,8 @@ Feature: Notification
       | Brian    |
       | Carol    |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has deleted all notifications
+    And user "Brian" has deleted all notifications
     And user "Alice" has created a space "notification checking" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:
       | space           | notification checking |
