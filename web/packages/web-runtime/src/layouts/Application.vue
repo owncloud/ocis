@@ -57,10 +57,13 @@ import {
   CustomComponentTarget,
   Extension,
   ExtensionPoint,
+  Key,
+  Modifier,
   useAppsStore,
   useAuthStore,
   useConfigStore,
   useExtensionRegistry,
+  useKeyboardActions,
   useLocalStorage
 } from '@ownclouders/web-pkg'
 import TopBar from '../components/Topbar/TopBar.vue'
@@ -110,6 +113,14 @@ export default defineComponent({
     const activeApp = useActiveApp()
     const extensionRegistry = useExtensionRegistry()
     const messageStore = useMessages()
+
+    // global shortcut so users can undo the most recent undoable action (e.g. delete)
+    // via keyboard, not just by clicking "Undo" on its notification. bypasses the
+    // default input-field guard, matching how Ctrl+S (save) is handled in AppWrapper.vue.
+    const { bindKeyAction } = useKeyboardActions({ skipDisabledKeyBindingsCheck: true })
+    bindKeyAction({ modifier: Modifier.Ctrl, primary: Key.Z }, () => {
+      messageStore.triggerLatestAction()
+    })
 
     const allMessages = ref<{ id: string; title: string; desc?: string }[]>([])
 

@@ -29,6 +29,8 @@ import {
 import { storeToRefs } from 'pinia'
 import { useDeleteWorker } from '../../webWorkers'
 import { captureException } from '@sentry/vue'
+import { useResolveRestorableResources } from './useResolveRestorableResources'
+import { useFileActionsRestore } from '../files/useFileActionsRestore'
 
 export const useFileActionsDeleteResources = () => {
   const configStore = useConfigStore()
@@ -44,6 +46,8 @@ export const useFileActionsDeleteResources = () => {
   const { startWorker } = useDeleteWorker({
     concurrentRequests: configStore.options.concurrentRequests.resourceBatchActions
   })
+  const { resolveRestorableResources } = useResolveRestorableResources()
+  const { handler: restoreHandler } = useFileActionsRestore()
 
   const resourcesStore = useResourcesStore()
   const { currentFolder } = storeToRefs(resourcesStore)
@@ -291,7 +295,32 @@ export const useFileActionsDeleteResources = () => {
                       { itemCount: successful.length.toString() }
                     )
 
-              messageStore.showMessage({ title })
+              const restorableResources = await resolveRestorableResources(
+                spaceForDeletion,
+                successful
+              )
+
+              messageStore.showMessage({
+                title,
+                ...(restorableResources && {
+                  timeout: 5,
+                  actions: [
+                    {
+                      label: $gettext('Undo'),
+                      ariaLabel:
+                        restorableResources.length === 1
+                          ? $gettext('Undo delete of "%{item}"', {
+                              item: restorableResources[0].name
+                            })
+                          : $gettext('Undo delete of %{itemCount} items', {
+                              itemCount: restorableResources.length.toString()
+                            }),
+                      onClick: () =>
+                        restoreHandler({ space: spaceForDeletion, resources: restorableResources })
+                    }
+                  ]
+                })
+              })
             }
 
             resourcesStore.removeResourcesFromDeleteQueue(failed.map(({ resource }) => resource.id))

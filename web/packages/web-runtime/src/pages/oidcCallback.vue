@@ -9,9 +9,9 @@
       <h3 class="oc-login-card-title">{{ $gettext('Logging you in') }}</h3>
       <p>{{ $gettext('Please wait, you are being redirected.') }}</p>
     </div>
-    <div class="oc-login-card-footer oc-pt-rm">
+    <footer class="oc-login-card-footer oc-pt-rm">
       <p>{{ footerSlogan }}</p>
-    </div>
+    </footer>
   </div>
 </template>
 

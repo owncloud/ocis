@@ -1,5 +1,5 @@
 <template>
-  <div id="oc-file-versions-sidebar" class="-oc-mt-s">
+  <div id="oc-file-versions-sidebar" ref="fileVersionsSidebar" class="-oc-mt-s">
     <ul v-if="versions.length" class="oc-m-rm oc-position-relative">
       <li class="spacer oc-pb-l" aria-hidden="true"></li>
       <li
@@ -13,25 +13,28 @@
             class="version-date oc-font-semibold"
             data-testid="file-versions-file-last-modified-date"
           >
-            {{ formatVersionDateRelative(item) }}
+            <span aria-hidden="true">{{ formatVersionDateRelative(item) }}</span>
+            <span class="oc-invisible-sr">
+              {{ formatVersionDateRelative(item) }}, {{ formatVersionDate(item) }}
+            </span>
           </span>
 
           -
           <span class="version-filesize" data-testid="file-versions-file-size">
             {{ formatVersionFileSize(item) }}
           </span>
-          <span tabindex="0" class="oc-invisible-sr">
-            {{ formatVersionDateRelative(item) }} {{ formatVersionDate(item) }}
-          </span>
         </div>
-        <oc-list id="oc-file-versions-sidebar-actions" class="oc-pt-xs">
+        <oc-list class="oc-pt-xs">
           <li v-if="isRevertible">
             <oc-button
               data-testid="file-versions-revert-button"
+              :data-version-name="item.name"
               appearance="raw"
-              :aria-label="$gettext('Restore')"
+              :aria-label="
+                $gettext('Restore version from %{date}', { date: formatVersionDate(item) })
+              "
               class="version-action-item oc-width-1-1 oc-rounded oc-button-justify-content-left oc-button-gap-m oc-py-s oc-px-m oc-display-block"
-              @click="revertToVersion(item)"
+              @click="revertToVersion(item, index)"
             >
               <oc-icon name="history" class="oc-icon-m oc-mr-s -oc-mt-xs" fill-type="line" />
               {{ $gettext('Restore') }}
@@ -41,7 +44,9 @@
             <oc-button
               data-testid="file-versions-download-button"
               appearance="raw"
-              :aria-label="$gettext('Download')"
+              :aria-label="
+                $gettext('Download version from %{date}', { date: formatVersionDate(item) })
+              "
               class="version-action-item oc-width-1-1 oc-rounded oc-button-justify-content-left oc-button-gap-m oc-py-s oc-px-m oc-display-block"
               @click="downloadVersion(item)"
             >
@@ -69,7 +74,7 @@ import {
   useDownloadFile,
   useResourcesStore
 } from '@ownclouders/web-pkg'
-import { computed, inject, Ref, unref } from 'vue'
+import { computed, inject, nextTick, onMounted, Ref, unref, useTemplateRef } from 'vue'
 import { isShareSpaceResource, Resource, SpaceResource } from '@ownclouders/web-client'
 import { useGettext } from 'vue3-gettext'
 
@@ -81,6 +86,7 @@ const clientService = useClientService()
 const language = useGettext()
 const { downloadFile } = useDownloadFile({ clientService })
 const { updateResourceField } = useResourcesStore()
+const fileVersionsSidebar = useTemplateRef<HTMLElement>('fileVersionsSidebar')
 
 const space = inject<Ref<SpaceResource>>('space')
 const resource = inject<Ref<Resource>>('resource')
@@ -100,9 +106,13 @@ const isRevertible = computed(() => {
   return true
 })
 
-const revertToVersion = async (version: Resource) => {
+const revertToVersion = async (version: Resource, index: number) => {
   await clientService.webdav.restoreFileVersion(unref(space), unref(resource), version.name)
   const restoredResource = await clientService.webdav.getFileInfo(unref(space), unref(resource))
+
+  const sidebar = unref(fileVersionsSidebar)?.closest<HTMLElement>('#app-sidebar')
+  sidebar?.setAttribute('data-focus-return-version', version.name)
+  sidebar?.setAttribute('data-focus-return-index', index.toString())
 
   const fieldsToUpdate = ['size', 'mdate'] as const
   for (const field of fieldsToUpdate) {
@@ -115,6 +125,30 @@ const revertToVersion = async (version: Resource) => {
     }
   }
 }
+
+onMounted(async () => {
+  await nextTick()
+  const sidebar = unref(fileVersionsSidebar)?.closest<HTMLElement>('#app-sidebar')
+  const versionName = sidebar?.getAttribute('data-focus-return-version')
+  const versionIndex = Number.parseInt(sidebar?.getAttribute('data-focus-return-index') || '', 10)
+  if (!versionName || !sidebar) {
+    return
+  }
+
+  const restoreButtons = Array.from(
+    unref(fileVersionsSidebar)?.querySelectorAll<HTMLElement>(
+      '[data-testid="file-versions-revert-button"]'
+    ) || []
+  )
+  const restoreButton =
+    restoreButtons.find((button) => button.dataset.versionName === versionName) ||
+    restoreButtons[versionIndex] ||
+    restoreButtons[0]
+
+  restoreButton?.focus({ preventScroll: true })
+  sidebar.removeAttribute('data-focus-return-version')
+  sidebar.removeAttribute('data-focus-return-index')
+})
 const downloadVersion = (version: Resource) => {
   return downloadFile(unref(space), unref(resource), version.name)
 }

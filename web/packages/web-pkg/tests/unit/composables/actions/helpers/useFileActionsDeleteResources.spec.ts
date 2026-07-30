@@ -1,17 +1,23 @@
 import { useFileActionsDeleteResources } from '../../../../../src/composables/actions'
 import { mock, mockDeep } from 'vitest-mock-extended'
-import { FolderResource, Resource, SpaceResource } from '@ownclouders/web-client'
+import { FolderResource, Resource, SpaceResource, TrashResource } from '@ownclouders/web-client'
 import {
   defaultComponentMocks,
   getComposableWrapper,
   useGetMatchingSpaceMock
 } from '@ownclouders/web-test-helpers'
 import { useDeleteWorker } from '../../../../../src/composables/webWorkers/deleteWorker'
+import { useRestoreWorker } from '../../../../../src/composables/webWorkers/restoreWorker'
 import { useGetMatchingSpace } from '../../../../../src/composables/spaces/useGetMatchingSpace'
-import { useResourcesStore, useSpacesStore } from '../../../../../src/composables/piniaStores'
+import {
+  useMessages,
+  useResourcesStore,
+  useSpacesStore
+} from '../../../../../src/composables/piniaStores'
 import { MockedFunction } from 'vitest'
 
 vi.mock('../../../../../src/composables/webWorkers/deleteWorker')
+vi.mock('../../../../../src/composables/webWorkers/restoreWorker')
 vi.mock('../../../../../src/composables/spaces/useGetMatchingSpace')
 
 const currentFolder = {
@@ -130,6 +136,107 @@ describe('deleteResources', () => {
         }
       })
     })
+
+    describe('undo action on the success message', () => {
+      const deletedFile = mock<Resource>({
+        id: '2',
+        name: 'fileToDelete.txt',
+        path: '/folder/fileToDelete.txt',
+        storageId: 'personal',
+        spaceId: '1'
+      })
+
+      it('is included when the space allows trash-restore and the trash entry resolves', async () => {
+        const trashEntry = mock<TrashResource>({
+          name: deletedFile.name,
+          path: deletedFile.path,
+          ddate: '2026-01-01T00:00:00Z'
+        })
+
+        const { getWorkerCallbackDone } = getWrapper({
+          currentFolder,
+          result: [deletedFile],
+          listFilesResult: { resource: mock<Resource>(), children: [trashEntry] },
+          setup: ({ filesList_delete }) => {
+            filesList_delete([deletedFile])
+          }
+        })
+        await getWorkerCallbackDone()
+
+        const { showMessage } = useMessages()
+        expect(showMessage).toHaveBeenCalledWith(
+          expect.objectContaining({
+            timeout: 5,
+            actions: [expect.objectContaining({ label: 'Undo' })]
+          })
+        )
+      })
+
+      it('is omitted when the trash entry cannot be resolved', async () => {
+        const { getWorkerCallbackDone } = getWrapper({
+          currentFolder,
+          result: [deletedFile],
+          listFilesResult: { resource: mock<Resource>(), children: [] },
+          setup: ({ filesList_delete }) => {
+            filesList_delete([deletedFile])
+          }
+        })
+        await getWorkerCallbackDone()
+
+        const { showMessage } = useMessages()
+        expect(showMessage).toHaveBeenCalledWith(
+          expect.not.objectContaining({ actions: expect.anything() })
+        )
+      })
+
+      it('is omitted when the space does not allow trash-restore', async () => {
+        const { getWorkerCallbackDone } = getWrapper({
+          currentFolder,
+          result: [deletedFile],
+          spaceDriveType: 'project',
+          canRestoreFromTrashbin: false,
+          setup: ({ filesList_delete }) => {
+            filesList_delete([deletedFile])
+          }
+        })
+        await getWorkerCallbackDone()
+
+        const { showMessage } = useMessages()
+        expect(showMessage).toHaveBeenCalledWith(
+          expect.not.objectContaining({ actions: expect.anything() })
+        )
+      })
+
+      it('restores the resolved trash entry when clicked', async () => {
+        const trashEntry = mock<TrashResource>({
+          name: deletedFile.name,
+          path: deletedFile.path,
+          ddate: '2026-01-01T00:00:00Z'
+        })
+
+        let spaceUnderTest: SpaceResource
+        const { getWorkerCallbackDone } = getWrapper({
+          currentFolder,
+          result: [deletedFile],
+          listFilesResult: { resource: mock<Resource>(), children: [trashEntry] },
+          setup: ({ filesList_delete }, { space }) => {
+            spaceUnderTest = space
+            filesList_delete([deletedFile])
+          }
+        })
+        await getWorkerCallbackDone()
+
+        const { showMessage } = useMessages()
+        const call = (showMessage as MockedFunction<typeof showMessage>).mock.calls[0][0]
+        await call.actions[0].onClick()
+
+        const { startWorker } = vi.mocked(useRestoreWorker)()
+        expect(startWorker).toHaveBeenCalledWith(
+          expect.objectContaining({ space: spaceUnderTest, resources: [trashEntry] }),
+          expect.any(Function)
+        )
+      })
+    })
   })
 })
 
@@ -137,7 +244,10 @@ function getWrapper({
   currentFolder,
   setup,
   result = [],
-  getFileInfoResult
+  getFileInfoResult,
+  listFilesResult = { resource: mock<Resource>(), children: [] },
+  spaceDriveType = 'personal',
+  canRestoreFromTrashbin = true
 }: {
   currentFolder: FolderResource
   setup: (
@@ -152,17 +262,37 @@ function getWrapper({
   ) => void
   result?: Resource[]
   getFileInfoResult?: Resource
+  listFilesResult?: { resource: Resource; children: Resource[] }
+  spaceDriveType?: string
+  canRestoreFromTrashbin?: boolean
 }) {
   const mocks = {
     ...defaultComponentMocks(),
-    space: mockDeep<SpaceResource>({ id: 'personal' })
+    space: mockDeep<SpaceResource>({
+      id: 'personal',
+      driveType: spaceDriveType,
+      canRestoreFromTrashbin: () => canRestoreFromTrashbin
+    })
   }
   mocks.$clientService.webdav.deleteFile.mockResolvedValue(undefined)
   mocks.$clientService.webdav.getFileInfo.mockResolvedValue(getFileInfoResult)
+  mocks.$clientService.webdav.listFiles.mockImplementation((_, __, opts) => {
+    if (opts?.isTrash) {
+      return Promise.resolve(listFilesResult)
+    }
+    return Promise.resolve({ resource: mock<Resource>(), children: [] })
+  })
 
+  let workerCallbackDone: Promise<unknown> = Promise.resolve()
   vi.mocked(useDeleteWorker).mockReturnValue({
     startWorker: vi.fn().mockImplementation((_, callback) => {
-      callback({ successful: result, failed: [] })
+      workerCallbackDone = Promise.resolve(callback({ successful: result, failed: [] }))
+    })
+  })
+
+  vi.mocked(useRestoreWorker).mockReturnValue({
+    startWorker: vi.fn().mockImplementation((_, callback) => {
+      callback({ successful: [], failed: [] })
     })
   })
 
@@ -175,6 +305,7 @@ function getWrapper({
 
   return {
     mocks,
+    getWorkerCallbackDone: () => workerCallbackDone,
     wrapper: getComposableWrapper(
       () => {
         const instance = useFileActionsDeleteResources()

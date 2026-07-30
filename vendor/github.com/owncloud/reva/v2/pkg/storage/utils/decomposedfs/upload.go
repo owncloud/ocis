@@ -136,6 +136,7 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 	_, span := tracer.Start(ctx, "InitiateUpload")
 	defer span.End()
 	log := appctx.GetLogger(ctx)
+	log.Debug().Interface("ref", ref).Msg("decomposedfs:InitiateUpload:start")
 
 	// remember the path from the reference
 	refpath := ref.GetPath()
@@ -336,6 +337,7 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 		}
 	}
 
+	log.Debug().Str("uploadid", session.ID()).Msg("decomposedfs:InitiateUpload:complete")
 	return map[string]string{
 		"simple": session.ID(),
 		"tus":    session.ID(),
@@ -377,9 +379,6 @@ func (fs *Decomposedfs) MarkProcessing(ctx context.Context, ref *provider.Refere
 		return n.RemoveXattr(ctx, prefixes.StatusPrefix, false)
 	}
 
-	if n.IsProcessing(ctx) {
-		return errtypes.ResourceProcessing(ref.String())
-	}
 	return n.SetXattrsWithContext(ctx, node.Attributes{
 		prefixes.StatusPrefix: []byte(node.ProcessingStatus + sessionID),
 	}, false) // acquireLock=false, because outer lock already held

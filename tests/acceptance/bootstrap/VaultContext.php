@@ -25,7 +25,6 @@ declare(strict_types=1);
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use GuzzleHttp\Exception\GuzzleException;
-use JsonException;
 use PHPUnit\Framework\Assert;
 use TestHelpers\BehatHelper;
 use TestHelpers\KeycloakHelper;
