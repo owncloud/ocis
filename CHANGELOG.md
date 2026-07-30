@@ -1,6 +1,11 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 8.2.0-rc.1](#changelog-for-820-rc1-2026-07-10)
+* [Changelog for 8.1.0](#changelog-for-810-2026-07-03)
+* [Changelog for 8.0.4](#changelog-for-804-2026-05-22)
+* [Changelog for 8.0.2](#changelog-for-802-2026-04-30)
+* [Changelog for 8.0.1](#changelog-for-801-2026-03-09)
 * [Changelog for 8.0.0](#changelog-for-800-2026-02-13)
 * [Changelog for 7.3.1](#changelog-for-731-2025-11-24)
 * [Changelog for 7.3.0](#changelog-for-730-2025-10-13)
@@ -65,11 +70,482 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v8.0.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v8.2.0-rc.1...master
+
+## Summary
+
+* Bugfix - Show vault-shared mountpoints in the vault drive list: [#12656](https://github.com/owncloud/ocis/pull/12656)
+* Bugfix - Prevent deleting your own account in the user management: [#12661](https://github.com/owncloud/ocis/pull/12661)
+* Bugfix - Log unmapped thumbnail errors and always report a sabredav exception: [#12667](https://github.com/owncloud/ocis/pull/12667)
+* Bugfix - Fix concurrent map access when listing shares: [#12673](https://github.com/owncloud/ocis/pull/12673)
+* Enhancement - Add audience restriction for OIDC access tokens: [#12581](https://github.com/owncloud/ocis/pull/12581)
+
+## Details
+
+* Bugfix - Show vault-shared mountpoints in the vault drive list: [#12656](https://github.com/owncloud/ocis/pull/12656)
+
+   Shares of vault resources are mountpoints hosted on the shares storage provider
+   that grant into the vault storage provider. When listing spaces with the vault
+   `storage_id`, the storage registry skipped the shares provider entirely, so the
+   vault share mountpoint was missing from the vault drive list while still showing
+   up in the regular drive list.
+
+   The registry now also queries the shares provider when the vault storage id is
+   requested and segregates share mountpoints by their `grantStorageID`, so a vault
+   share only appears in the vault drive list and a regular share only in the
+   regular one.
+
+   https://github.com/owncloud/ocis/pull/12656
+   https://github.com/owncloud/reva/pull/670
+
+* Bugfix - Prevent deleting your own account in the user management: [#12661](https://github.com/owncloud/ocis/pull/12661)
+
+   In the admin settings user management, the account you are currently logged in
+   as could be selected and included in a delete action, even though the backend
+   always rejects self-deletion. Deleting a selection that included your own
+   account produced a "Failed to delete 1 user" error and made your own row
+   temporarily disappear from the list until the page was refreshed.
+
+   The delete action now excludes the current user from the request, so all other
+   selected users are deleted while your own account is left untouched. When your
+   own account is part of the selection, the delete confirmation dialog shows a
+   hint that it will not be deleted.
+
+   https://github.com/owncloud/ocis/issues/12582
+   https://github.com/owncloud/ocis/pull/12661
+
+* Bugfix - Log unmapped thumbnail errors and always report a sabredav exception: [#12667](https://github.com/owncloud/ocis/pull/12667)
+
+   The webdav service logged failures of the thumbnails service at debug level
+   only. Errors which are not a property of the requested file, such as the
+   thumbnails service being unreachable, were therefore invisible at production log
+   levels: a complete preview outage produced HTTP 500 responses without a single
+   log line explaining them. Unmapped errors are now logged at error level, while
+   expected per-file outcomes such as an unsupported file type or a file still
+   being processed stay at debug level. Two of the four thumbnail handlers also
+   logged without the request context, so their messages carried no request id.
+
+   In addition, `codesEnum` only mapped four status codes, so error responses for
+   all other codes were rendered with an empty `<s:exception></s:exception>`
+   element. The missing entries for 403, 425 and 429 have been added and any
+   remaining unmapped code now falls back to a generic exception name, so clients
+   always receive a usable exception.
+
+   https://github.com/owncloud/ocis/pull/12667
+
+* Bugfix - Fix concurrent map access when listing shares: [#12673](https://github.com/owncloud/ocis/pull/12673)
+
+   Listing shares could abort the whole oCIS process with the Go runtime error
+   "fatal error: concurrent map read and map write". This is an unrecoverable
+   runtime fault, so it could not be caught and recovered from, and it dropped all
+   connections that were in flight at that moment.
+
+   When converting CS3 shares into Graph DriveItems, the worker goroutines read
+   from the shared driveItems map while the collecting loop was already writing
+   results into the very same map. The results channel is buffered, so the workers
+   never blocked when handing over an item and the collecting loop started writing
+   while workers were still running. The results are now collected after all
+   workers have finished, which removes the overlapping access.
+
+   Note that lowering the maximum concurrency did not avoid this, as a single
+   worker could still run concurrently with the collecting loop.
+
+   https://github.com/owncloud/ocis/pull/12673
+
+* Enhancement - Add audience restriction for OIDC access tokens: [#12581](https://github.com/owncloud/ocis/pull/12581)
+
+   We added a new proxy configuration option `PROXY_OIDC_ACCESS_TOKEN_VERIFY_AUD`
+   which lets operators restrict the JWT access tokens that are accepted to a list
+   of allowed audiences. When set, a token is only accepted if one of the
+   configured values is present in its `aud` (audience) claim or matches its `azp`
+   (authorized party) claim. This is useful when the OIDC provider (IDP) is shared
+   between multiple applications, so that tokens issued for another application are
+   not accepted by ownCloud Infinite Scale.
+
+   The check is disabled by default (empty list) to preserve the existing behavior.
+
+   https://github.com/owncloud/ocis/pull/12581
+
+# Changelog for [8.2.0-rc.1] (2026-07-10)
+
+The following sections list the changes for 8.2.0-rc.1.
+
+[8.2.0-rc.1]: https://github.com/owncloud/ocis/compare/v8.1.0...v8.2.0-rc.1
+
+## Summary
+
+* Security - Do not leak internal error details in webdav error responses: [#12398](https://github.com/owncloud/ocis/pull/12398)
+* Security - Make OIDC group sync opt-in: [#12490](https://github.com/owncloud/ocis/pull/12490)
+* Security - Block password and account changes via PATCH /graph/v1.0/me: [#12493](https://github.com/owncloud/ocis/pull/12493)
+* Bugfix - Always set an audit action for share updates: [#7661](https://github.com/owncloud/ocis/issues/7661)
+* Bugfix - Fix the proxy readiness check for NATS: [#10661](https://github.com/owncloud/ocis/issues/10661)
+* Bugfix - Honor $select=actions on the drive item permissions endpoint: [#10816](https://github.com/owncloud/ocis/issues/10816)
+* Bugfix - Keep group memberships when the OIDC groups claim is absent: [#11435](https://github.com/owncloud/ocis/issues/11435)
+* Bugfix - Pass the space ID when purging revision blobs: [#11644](https://github.com/owncloud/ocis/issues/11644)
+* Bugfix - Return 404 when deleting a non-existing link share on a space: [#12266](https://github.com/owncloud/ocis/issues/12266)
+* Bugfix - Fix PostgreSQL container restart loop in Keycloak deployments: [#12359](https://github.com/owncloud/ocis/pull/12359)
+* Bugfix - Prevent panic in presigned URL auth when signing key is missing: [#12384](https://github.com/owncloud/ocis/issues/12384)
+* Bugfix - Fix double HTML-escaping of notification emails for multiple recipients: [#12413](https://github.com/owncloud/ocis/pull/12413)
+* Bugfix - Re-verify access tokens with an expired userinfo cache entry: [#12414](https://github.com/owncloud/ocis/pull/12414)
+* Bugfix - Keep shares visible in sharedWithMe when a resource cannot be statted: [#12430](https://github.com/owncloud/ocis/pull/12430)
+* Bugfix - Ensure the redirect URI for the IDP is valid: [#12444](https://github.com/owncloud/ocis/pull/12444)
+* Bugfix - The auth-app will create the user's home if needed: [#12457](https://github.com/owncloud/ocis/pull/12457)
+* Bugfix - Rate-limit the exportPersonalData endpoint: [#12516](https://github.com/owncloud/ocis/issues/12516)
+* Bugfix - Apply the role allowlist on permission updates: [#12540](https://github.com/owncloud/ocis/pull/12540)
+* Enhancement - Replace embedded IDP React SPA with server-rendered login page: [#12086](https://github.com/owncloud/ocis/pull/12086)
+* Enhancement - Add `ocis shares clean-corrupt-public-shares` maintenance command: [#12494](https://github.com/owncloud/ocis/pull/12494)
+* Enhancement - Harden OCM create share: [#12496](https://github.com/owncloud/ocis/pull/12496)
+* Enhancement - Clean up the deployment examples: [#12521](https://github.com/owncloud/ocis/pull/12521)
+* Enhancement - Allow disabling the last sign-in timestamp update: [#12522](https://github.com/owncloud/ocis/pull/12522)
+* Enhancement - Add configurable software license and help page links: [#12528](https://github.com/owncloud/ocis/pull/12528)
+* Enhancement - Configurable logo click-through URL: [#12529](https://github.com/owncloud/ocis/pull/12529)
+* Enhancement - Add option to disable public link sharing: [#12542](https://github.com/owncloud/ocis/pull/12542)
+* Enhancement - Add option to disable direct (user/group) sharing: [#12542](https://github.com/owncloud/ocis/pull/12542)
+
+## Details
+
+* Security - Do not leak internal error details in webdav error responses: [#12398](https://github.com/owncloud/ocis/pull/12398)
+
+   The webdav service returned raw internal error messages to the client when a
+   server-side error occurred. For example, a thumbnail request with a null byte in
+   the filename and `?preview=1` could trigger a `500 Internal Server Error` whose
+   body exposed the internal storage filesystem path (information disclosure).
+
+   Server-side error handlers now return a generic, user-relevant message to the
+   client, while the detailed error is only logged server-side.
+
+   https://github.com/owncloud/ocis/pull/12398
+
+* Security - Make OIDC group sync opt-in: [#12490](https://github.com/owncloud/ocis/pull/12490)
+
+  **What changed.** `PROXY_AUTOPROVISION_CLAIM_GROUPS` now defaults to `""`, which disables OIDC group membership sync (and, with it, creation of local groups from claim values). It previously defaulted to `groups`. Setting it to a non-empty claim name restores the previous behaviour unchanged: memberships are synced and groups named in the claim are created if they do not exist locally.
+
+  **Why.** With `PROXY_AUTOPROVISION_ACCOUNTS=true` and the previous `groups` default, the proxy synced group memberships from the OIDC `groups` claim on every authenticated request out of the box, creating local groups for any claim value that did not already exist. In identity providers that let ordinary users create groups with arbitrary names, this allowed an unprivileged user to inject group names into oCIS. Defaulting the claim to empty makes group sync an explicit opt-in.
+
+  **Upgrade note.** Deployments that set `PROXY_AUTOPROVISION_CLAIM_GROUPS` explicitly are unaffected. Deployments that relied on the previous `groups` default without setting it will stop syncing group memberships after upgrade; set `PROXY_AUTOPROVISION_CLAIM_GROUPS=groups` to restore the previous behaviour.
+
+   Note: matching claim values to existing local groups is still done by display
+   name. Hardening that matching is tracked separately and is not part of this
+   change.
+
+   https://github.com/owncloud/ocis/pull/12490
+
+* Security - Block password and account changes via PATCH /graph/v1.0/me: [#12493](https://github.com/owncloud/ocis/pull/12493)
+
+   `PATCH /graph/v1.0/me` no longer accepts `passwordProfile`, `accountEnabled`, or
+   `onPremisesSamAccountName`. Use `POST /graph/v1.0/me/changePassword` to change
+   your password.
+
+   https://github.com/owncloud/ocis/pull/12493
+
+* Bugfix - Always set an audit action for share updates: [#7661](https://github.com/owncloud/ocis/issues/7661)
+
+   Share-update audit events were written with an empty `action` and a message of
+   `updated field ''`, because the conversion read the deprecated
+   `ShareUpdated.Updated` field, which reva no longer populates (it now sets
+   `UpdateMask`). Received-share declines were also not audited correctly because
+   the conversion matched `SHARE_STATE_DECLINED`, which is not a CS3 share state
+   (the enum value is `SHARE_STATE_REJECTED`), again producing an empty action and
+   message.
+
+   The conversion now derives the updated field and action from `UpdateMask`
+   (falling back to the deprecated field), maps `SHARE_STATE_REJECTED` to the
+   declined action, and uses a generic, non-empty action for any unrecognized
+   update field or share state, so every audit entry carries a meaningful,
+   countable action.
+
+   https://github.com/owncloud/ocis/issues/7661
+   https://github.com/owncloud/ocis/pull/12423
+
+* Bugfix - Fix the proxy readiness check for NATS: [#10661](https://github.com/owncloud/ocis/issues/10661)
+
+   The proxy readiness check passed the events cluster ID instead of the events
+   endpoint to the NATS reachability check. NATS then tried to resolve the cluster
+   ID (e.g. `ocis-cluster`) as a host name, which always failed, so the proxy
+   `/readyz` endpoint reported the service as not ready even when NATS was
+   reachable. The check now uses the events endpoint, consistent with every other
+   service.
+
+   https://github.com/owncloud/ocis/issues/10661
+   https://github.com/owncloud/ocis/pull/12421
+
+* Bugfix - Honor $select=actions on the drive item permissions endpoint: [#10816](https://github.com/owncloud/ocis/issues/10816)
+
+   Listing the permissions of a drive item with
+   `$select=@libre.graph.permissions.actions.allowedValues` still returned the
+   roles allowedValues as well. The handler only had a projection for the roles
+   selection (`@libre.graph.permissions.roles.allowedValues`), which drops the
+   actions, but no symmetric handling for an actions-only selection, so the roles
+   were always included. The actions selection now drops the roles allowedValues
+   (and, like the roles selection, skips the share lookup since only the allowed
+   values are requested).
+
+   https://github.com/owncloud/ocis/issues/10816
+   https://github.com/owncloud/ocis/pull/12419
+
+* Bugfix - Keep group memberships when the OIDC groups claim is absent: [#11435](https://github.com/owncloud/ocis/issues/11435)
+
+   When auto-provisioning group memberships from an OIDC claim, the proxy
+   reconciled the user's groups against the groups claim and removed them from any
+   group not present in the claim. If a token carried no groups claim at all —
+   for example a token issued for an OIDC client that has no groups mapper
+   configured, such as a dedicated desktop-client registration — the parsed group
+   set was empty and the user was removed from all of their groups.
+
+   The sync is now skipped when the groups claim is absent or null in the token. A
+   present-but-empty claim is still treated as a legitimate "no groups" and
+   reconciled as before. This mirrors the guard the role-assignment path already
+   has for a missing roles claim.
+
+   https://github.com/owncloud/ocis/issues/11435
+   https://github.com/owncloud/ocis/pull/12420
+
+* Bugfix - Pass the space ID when purging revision blobs: [#11644](https://github.com/owncloud/ocis/issues/11644)
+
+   The `revisions purge` command removed a revision's metadata but did not delete
+   its blob, because it called the blobstore without the space ID. The blobstore
+   builds the blob path from the space ID and blob ID, so an empty space ID
+   targeted the wrong path: the deletion was a no-op (S3) or missed the file
+   (POSIX), leaving the blob orphaned while the revision was already removed. The
+   space ID parsed from the revision path is now passed to the blobstore.
+
+   https://github.com/owncloud/ocis/issues/11644
+   https://github.com/owncloud/ocis/pull/12422
+
+* Bugfix - Return 404 when deleting a non-existing link share on a space: [#12266](https://github.com/owncloud/ocis/issues/12266)
+
+   Deleting an already-removed link share via `DELETE
+   /graph/v1beta1/drives/{driveID}/root/permissions/{permissionID}` returned `400
+   Bad Request` instead of `404 Not Found`. The underlying reva `RemovePublicShare`
+   and `RemoveShare` handlers now propagate not-found errors as `CODE_NOT_FOUND`
+   rather than `CODE_INTERNAL`, ensuring the correct `404` HTTP response is
+   returned.
+
+   https://github.com/owncloud/ocis/issues/12266
+
+* Bugfix - Fix PostgreSQL container restart loop in Keycloak deployments: [#12359](https://github.com/owncloud/ocis/pull/12359)
+
+   The PostgreSQL volume was mounted directly at `/var/lib/postgresql/data`. On
+   ext4 storage backends, Docker creates a `lost+found` directory at the volume
+   root, causing PostgreSQL's `initdb` to fail because the data directory is not
+   empty. This resulted in the container entering a restart loop.
+
+   The volume mount path has been changed to `/var/lib/postgresql` so that
+   PostgreSQL creates the `data/` subdirectory itself, avoiding the conflict.
+
+   https://github.com/owncloud/ocis/pull/12359
+
+* Bugfix - Prevent panic in presigned URL auth when signing key is missing: [#12384](https://github.com/owncloud/ocis/issues/12384)
+
+   The presigned-URL authenticator read the per-user signing key from a store and
+   indexed the first record without checking that the result was non-empty. When
+   the store returns an empty result without an error — which the `noop` store
+   does, and `OCIS_CACHE_STORE=noop` also switches the presigned-URL signing-key
+   store to `noop` — every signed-URL request panicked with `index out of range
+   [0] with length 0` (recovered per request as an HTTP 502), so all signed-URL
+   downloads failed. The authenticator now guards the lookup and returns a normal
+   authentication error instead of panicking; it also no longer returns a nil error
+   when the stored key is empty.
+
+   https://github.com/owncloud/ocis/issues/12384
+   https://github.com/owncloud/ocis/pull/12418
+
+* Bugfix - Fix double HTML-escaping of notification emails for multiple recipients: [#12413](https://github.com/owncloud/ocis/pull/12413)
+
+   The notifications service reuses the same template variables map for every
+   recipient of an event (for example when a group is invited to a space). The
+   helper that HTML-escapes those variables for the HTML email body escaped the map
+   in place, so every recipient after the first received a plain-text body
+   containing HTML entities and an HTML body with one additional layer of escaping
+   per recipient (a space named `R&D` became `R&amp;amp;D`). The helper now returns
+   a new map and leaves the shared variables untouched, so every recipient renders
+   from the original values.
+
+   https://github.com/owncloud/ocis/pull/12413
+
+* Bugfix - Re-verify access tokens with an expired userinfo cache entry: [#12414](https://github.com/owncloud/ocis/pull/12414)
+
+   The proxy authenticated requests against a cached userinfo entry. When the
+   cached entry's expiry had passed, the request was rejected outright instead of
+   re-verifying the access token. The cached expiry is not always the real token
+   expiry — for opaque access tokens it falls back to the configured cache TTL
+   — so a still-valid token could be rejected just because its cache entry aged
+   out, causing spurious logouts (most noticeable under frequent PROPFIND
+   requests). The proxy now treats an expired cache entry as a cache miss and
+   re-verifies the access token, while a genuinely expired or invalid token is
+   still rejected by the re-verification.
+
+   https://github.com/owncloud/ocis/pull/12414
+
+* Bugfix - Keep shares visible in sharedWithMe when a resource cannot be statted: [#12430](https://github.com/owncloud/ocis/pull/12430)
+
+   The graph `sharedWithMe` handler resolves each received share by fanning out a
+   per-resource `Stat` call with a concurrency limit, all sharing the request
+   context. When a `Stat` failed for any reason (slow or stuck downstream, deleted
+   space, gateway error, deadline exceeded) the worker logged at debug and returned
+   without emitting a drive item, so the share was silently omitted from the
+   response and the handler still returned `200 OK` with a partial,
+   non-deterministic list. A single chronically-slow share could therefore make
+   other, recently-accepted shares intermittently invisible, and repeated calls
+   returned different subsets of the user's shares.
+
+   The handler now:
+
+   - bounds each per-share `Stat` with its own timeout derived from the request
+   context, so one slow resource can no longer consume the deadline shared by all
+   the other shares. The bound is configurable via
+   `GRAPH_RECEIVED_SHARES_STAT_TIMEOUT` (default `10s`); - returns a degraded drive
+   item built from the data already present in the share record (ids, permissions,
+   grantees, timestamps, mountpoint name) when the resource cannot be statted due
+   to a transient or indeterminate failure (timeout, slow or unavailable
+   downstream), so the share stays visible instead of intermittently disappearing.
+   A genuinely missing resource or revoked access (for example after the sharer was
+   deleted) still drops the share, as before; - logs the dropped/degraded shares at
+   warning level with a per-request count for operator visibility.
+
+   https://github.com/owncloud/ocis/pull/12430
+
+* Bugfix - Ensure the redirect URI for the IDP is valid: [#12444](https://github.com/owncloud/ocis/pull/12444)
+
+   The URI sent as redirect URI for the IDP will be validated in oCIS. Invalid URIs
+   will return a 500 error. Note that this should never happen under normal
+   circumstances.
+
+   https://github.com/owncloud/ocis/pull/12444
+   https://github.com/owncloud/ocis/pull/12479
+
+* Bugfix - The auth-app will create the user's home if needed: [#12457](https://github.com/owncloud/ocis/pull/12457)
+
+   When the user logs in, his home must be created. This happens automatically
+   during login via OIDC (web access). Some recent changes in the code broke this
+   behavior when the user logs in via auth-app. Now, this behavior is restored, and
+   the user's home will be created when the user logs in via auth-app.
+
+   https://github.com/owncloud/ocis/pull/12457
+
+* Bugfix - Rate-limit the exportPersonalData endpoint: [#12516](https://github.com/owncloud/ocis/issues/12516)
+
+   We've added a rate limit to the `exportPersonalData` endpoint to mitigate an
+   authenticated application-level denial-of-service. Rate-limit per endpoint path
+   carries the userID, so effectively per user. The endpoint is now limited to 5
+   requests per minute.
+
+   https://github.com/owncloud/ocis/issues/12516
+
+* Bugfix - Apply the role allowlist on permission updates: [#12540](https://github.com/owncloud/ocis/pull/12540)
+
+   The `PATCH` permission and space-root permission handlers now consult the
+   administrator role allowlist when validating a request, consistent with the
+   invite handler.
+
+   https://github.com/owncloud/ocis/pull/12540
+
+* Enhancement - Replace embedded IDP React SPA with server-rendered login page: [#12086](https://github.com/owncloud/ocis/pull/12086)
+
+   Replaced the embedded IDP login's React SPA (pnpm, 21k LOC) with server-rendered
+   HTML keeping theming and localiation support. The login page now works with
+   minimal JavaScript, loads faster, and has a much smaller dependecy vulnerability
+   surface.
+
+   https://github.com/owncloud/ocis/pull/12086
+
+* Enhancement - Add `ocis shares clean-corrupt-public-shares` maintenance command: [#12494](https://github.com/owncloud/ocis/pull/12494)
+
+   A single public-share entry with a nil/empty `resource_id` makes the json
+   public-share manager's `ListPublicShares` panic with a nil-pointer dereference.
+   Because the manager reads all entries and filters them in memory, that one bad
+   entry poisons the endpoint for the whole tenant: every Members/permissions panel
+   load and every password-protected link creation fails.
+
+   The new `ocis shares clean-corrupt-public-shares` command detects and removes
+   such corrupt entries. It reads the raw persistence (so it never triggers the
+   panic itself) and writes back through the same metadata storage path the manager
+   uses, recomputing blob size, mtime and etag automatically. It defaults to
+   `--dry-run` and supports the `jsoncs3` and `json` public-share drivers.
+
+   https://github.com/owncloud/ocis/pull/12494
+
+* Enhancement - Harden OCM create share: [#12496](https://github.com/owncloud/ocis/pull/12496)
+
+   `CreateShare` now validates the provider via `GetInfoByDomain` and verifies an
+   accepted invite relationship via `GetAcceptedUser` before creating the share.
+
+   https://github.com/owncloud/ocis/pull/12496
+
+* Enhancement - Clean up the deployment examples: [#12521](https://github.com/owncloud/ocis/pull/12521)
+
+   Removed the legacy deployment example oc10_ocis_parallel and its documentation
+   references. Removed coverage.out
+
+   https://github.com/owncloud/ocis/pull/12521
+
+* Enhancement - Allow disabling the last sign-in timestamp update: [#12522](https://github.com/owncloud/ocis/pull/12522)
+
+   The graph service maintains the 'oCLastSignInTimestamp' LDAP attribute of a user
+   on every sign-in (when the LDAP identity backend has write access). This can
+   cause a significant amount of LDAP write load, especially when the proxy's OIDC
+   userinfo cache has a short TTL and sign-in events are emitted frequently.
+
+   A new setting 'OCIS_LDAP_UPDATE_LAST_SIGNIN_DATE' /
+   'GRAPH_LDAP_UPDATE_LAST_SIGNIN_DATE' (default 'true') allows disabling the
+   update of the last sign-in timestamp without having to disable all LDAP writes
+   ('OCIS_LDAP_SERVER_WRITE_ENABLED') or the graph events consumer. When set to
+   'false' the graph service no longer listens for 'UserSignedIn' events and does
+   not write the 'oCLastSignInTimestamp' attribute.
+
+   https://github.com/owncloud/ocis/issues/9942
+   https://github.com/owncloud/ocis/pull/12522
+
+* Enhancement - Add configurable software license and help page links: [#12528](https://github.com/owncloud/ocis/pull/12528)
+
+   Themes can now set `common.urls.softwareLicense` and `common.urls.helpPage` to
+   surface deployment-specific legal/help links in the web UI. When set, links
+   appear in a new "Help" menu in the topbar and on the account page.
+
+   https://github.com/owncloud/ocis/pull/12528
+
+* Enhancement - Configurable logo click-through URL: [#12529](https://github.com/owncloud/ocis/pull/12529)
+
+   We've added an optional `href` field to the `logo` theme configuration. When
+   set, clicking the topbar logo navigates to the configured URL instead of the
+   default files navigation. When not set, the existing default behavior is
+   unchanged.
+
+   https://github.com/owncloud/ocis/pull/12529
+
+* Enhancement - Add option to disable public link sharing: [#12542](https://github.com/owncloud/ocis/pull/12542)
+
+   Added an `OCIS_ENABLE_PUBLIC_SHARING` config option, read by the frontend and
+   sharing services. It defaults to `true`. When set to `false`, creating new
+   public links is rejected and the `files_sharing.public.enabled` capability
+   reports `false` so clients hide the corresponding UI. Direct sharing with users
+   and groups is not affected.
+
+   https://github.com/owncloud/ocis/pull/12542
+
+* Enhancement - Add option to disable direct (user/group) sharing: [#12542](https://github.com/owncloud/ocis/pull/12542)
+
+   Added an `OCIS_ENABLE_USER_SHARING` config option, read by the frontend, graph,
+   sharing and ocm services. It defaults to `true`. When set to `false`, creating
+   new user, group or federated shares is rejected, the legacy `sharees` search
+   endpoint returns no results, and the `files_sharing.user.enabled` and
+   `files_sharing.user_enumeration.enabled` capabilities report `false` so clients
+   hide the corresponding UI. Public link sharing and space membership are not
+   affected.
+
+   https://github.com/owncloud/ocis/pull/12542
+
+# Changelog for [8.1.0] (2026-07-03)
+
+The following sections list the changes for 8.1.0.
+
+[8.1.0]: https://github.com/owncloud/ocis/compare/v8.0.4...v8.1.0
 
 ## Summary
 
 * Security - Add X-XSS-Protection header: [#12092](https://github.com/owncloud/ocis/pull/12092)
+* Security - Upgrade libvips to 8.18.2: [#12301](https://github.com/owncloud/ocis/pull/12301)
+* Security - Fix signing-key to public share guests: [#12332](https://github.com/owncloud/ocis/pull/12332)
 * Bugfix - Fix postprocessing resume command --restart flag: [#11692](https://github.com/owncloud/ocis/issues/11692)
 * Bugfix - Don't use hardcoded groupOfNames in group creation: [#11776](https://github.com/owncloud/ocis/pull/11776)
 * Bugfix - Translation for some email notifications: [#11979](https://github.com/owncloud/ocis/pull/11979)
@@ -82,7 +558,23 @@ The following sections list the changes for unreleased.
 * Bugfix - Prevent incomplete Tika extractions from permanently blocking re-index: [#12095](https://github.com/owncloud/ocis/pull/12095)
 * Bugfix - Use O(1) document lookup instead of full search during reindexing: [#12096](https://github.com/owncloud/ocis/pull/12096)
 * Bugfix - Fix IDP build on FreeBSD by disabling absolute Babel runtime: [#12114](https://github.com/owncloud/ocis/pull/12114)
+* Bugfix - Always descend into directories during space reindexing: [#12119](https://github.com/owncloud/ocis/pull/12119)
 * Bugfix - Don't index failed uploads: [#12121](https://github.com/owncloud/ocis/pull/12121)
+* Bugfix - Avoid superfluous GetPublicShare call when deleting space permissions: [#12122](https://github.com/owncloud/ocis/pull/12122)
+* Bugfix - Fix CreateHome cache: [#12128](https://github.com/owncloud/ocis/pull/12128)
+* Bugfix - Return 200 OK for WOPI Lock requests in read-only and view-only modes: [#12257](https://github.com/owncloud/ocis/pull/12257)
+* Bugfix - Fix typo in README: [#12263](https://github.com/owncloud/ocis/pull/12263)
+* Bugfix - Fix space management middleware removing users from spaces on download: [#12285](https://github.com/owncloud/ocis/pull/12285)
+* Bugfix - Search no longer disabled when OCIS_DISABLE_PREVIEWS=true: [#12303](https://github.com/owncloud/ocis/pull/12303)
+* Bugfix - Stable order for user search attributes: [#12337](https://github.com/owncloud/ocis/pull/12337)
+* Bugfix - Cache compiled rego policies to avoid recompiling on every request: [#12345](https://github.com/owncloud/ocis/pull/12345)
+* Bugfix - SpaceEditorWithoutTrashbin roles now correctly allow file editing: [#12346](https://github.com/owncloud/ocis/pull/12346)
+* Bugfix - Skip indexing of files still in postprocessing: [#12350](https://github.com/owncloud/ocis/pull/12350)
+* Bugfix - Mask configs that hold secrets: [#12397](https://github.com/owncloud/ocis/pull/12397)
+* Bugfix - Recover from permanently-closed NATS connections in the nats-js-kv store: [#12404](https://github.com/owncloud/ocis/pull/12404)
+* Bugfix - Education user DELETE no longer 404s while leaving LDAP entry behind: [#12405](https://github.com/owncloud/ocis/pull/12405)
+* Bugfix - Keep personal space when Drives.Create permission check is inconclusive: [#12499](https://github.com/owncloud/ocis/issues/12499)
+* Change - Deprecate the owncloudsql storage driver option: [#12486](https://github.com/owncloud/ocis/pull/12486)
 * Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
 * Enhancement - Add AI-assisted development guide: [#11941](https://github.com/owncloud/ocis/pull/11941)
 * Enhancement - Bump Web to 12.3.1: [#12015](https://github.com/owncloud/ocis/pull/12015)
@@ -93,7 +585,23 @@ The following sections list the changes for unreleased.
 * Enhancement - Support numeric range queries in KQL: [#12094](https://github.com/owncloud/ocis/pull/12094)
 * Enhancement - Add blobstore CLI commands to storage-users service: [#12102](https://github.com/owncloud/ocis/pull/12102)
 * Enhancement - Optimize search index after bulk reindexing: [#12104](https://github.com/owncloud/ocis/pull/12104)
+* Enhancement - Add vault storage with MFA-protected access: [#12108](https://github.com/owncloud/ocis/pull/12108)
+* Enhancement - Retry and abort on repeated extraction failures during indexing: [#12111](https://github.com/owncloud/ocis/pull/12111)
+* Enhancement - Log effective data and config paths at startup: [#12117](https://github.com/owncloud/ocis/pull/12117)
+* Enhancement - Allow resetting IDM service user passwords: [#12118](https://github.com/owncloud/ocis/pull/12118)
 * Enhancement - Update images in the ocis_full deployment example: [#12123](https://github.com/owncloud/ocis/pull/12123)
+* Enhancement - Add `ocis search optimize` CLI command: [#12136](https://github.com/owncloud/ocis/pull/12136)
+* Enhancement - Add Keycloak to the ocis_full deployment example: [#12139](https://github.com/owncloud/ocis/pull/12139)
+* Enhancement - Allow multiple objectClasses on group creation: [#12229](https://github.com/owncloud/ocis/pull/12229)
+* Enhancement - Add SpaceEditorWithoutVersionsWithoutTrashbin space membership role: [#12261](https://github.com/owncloud/ocis/pull/12261)
+* Enhancement - Add vault capabilities to the OCS capabilities endpoint: [#12283](https://github.com/owncloud/ocis/pull/12283)
+* Enhancement - Disable public link sharing for vault resources: [#12321](https://github.com/owncloud/ocis/pull/12321)
+* Enhancement - Update web-extension images in ocis_fuill: [#12324](https://github.com/owncloud/ocis/pull/12324)
+* Enhancement - Bump dependencies: [#12325](https://github.com/owncloud/ocis/pull/12325)
+* Enhancement - Add VaultMode permission: [#12328](https://github.com/owncloud/ocis/pull/12328)
+* Enhancement - Add vault themes: [#12329](https://github.com/owncloud/ocis/pull/12329)
+* Enhancement - Bump Web to 12.3.3: [#13705](https://github.com/owncloud/web/pull/13705)
+* Enhancement - Bump Web to 12.4.0: [#13809](https://github.com/owncloud/web/pull/13809)
 
 ## Details
 
@@ -107,6 +615,22 @@ The following sections list the changes for unreleased.
    of HTTP security headers per OWASP recommendations.
 
    https://github.com/owncloud/ocis/pull/12092
+
+* Security - Upgrade libvips to 8.18.2: [#12301](https://github.com/owncloud/ocis/pull/12301)
+
+   Bumped libvips to 8.18.2 in all Docker images to pick up the fix for a stack
+   buffer overflow.
+
+   https://github.com/owncloud/ocis/pull/12301
+
+* Security - Fix signing-key to public share guests: [#12332](https://github.com/owncloud/ocis/pull/12332)
+
+   The /ocs/v[12].php/cloud/user/signing-key endpoint was reachable through a
+   public share session. The endpoint `public-token` is no longer allowed by the
+   public-share resource scope in reva.
+
+   https://github.com/owncloud/ocis/pull/12332
+   https://github.com/owncloud/reva/pull/608
 
 * Bugfix - Fix postprocessing resume command --restart flag: [#11692](https://github.com/owncloud/ocis/issues/11692)
 
@@ -253,6 +777,18 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/12065
    https://github.com/owncloud/ocis/pull/12114
 
+* Bugfix - Always descend into directories during space reindexing: [#12119](https://github.com/owncloud/ocis/pull/12119)
+
+   The search indexer's `IndexSpace` walk previously used `filepath.SkipDir` to
+   skip entire directory subtrees when the directory itself was already indexed.
+   After a failed or interrupted indexing run (e.g. Tika crash), this caused
+   thousands of unindexed files to be permanently skipped because the parent
+   directory's mtime had not changed. The indexer now always descends into
+   directories, relying on the O(1) per-file DocID lookup to skip already-indexed
+   files efficiently.
+
+   https://github.com/owncloud/ocis/pull/12119
+
 * Bugfix - Don't index failed uploads: [#12121](https://github.com/owncloud/ocis/pull/12121)
 
    The search service was indexing uploads even when they failed. This caused
@@ -260,6 +796,166 @@ The following sections list the changes for unreleased.
    skips indexing when the UploadReady event indicates the upload has failed.
 
    https://github.com/owncloud/ocis/pull/12121
+
+* Bugfix - Avoid superfluous GetPublicShare call when deleting space permissions: [#12122](https://github.com/owncloud/ocis/pull/12122)
+
+   We fixed `DeletePermission` to recognise space permission IDs (prefixed with
+   `u:` or `g:`) by their format before making any gateway calls. Previously,
+   deleting a space member always triggered a `GetPublicShare` lookup that was
+   guaranteed to fail, producing a confusing error log.
+
+   https://github.com/owncloud/ocis/issues/12012
+   https://github.com/owncloud/ocis/pull/12122
+
+* Bugfix - Fix CreateHome cache: [#12128](https://github.com/owncloud/ocis/pull/12128)
+
+   Move the CreateHome middleware cache to the proxy.
+
+   https://github.com/owncloud/ocis/pull/12128
+   https://github.com/owncloud/reva/pull/562
+
+* Bugfix - Return 200 OK for WOPI Lock requests in read-only and view-only modes: [#12257](https://github.com/owncloud/ocis/pull/12257)
+
+   OnlyOffice sends a WOPI Lock request when opening any document, even when the
+   user only has read access. The WOPI Lock handler was attempting to acquire a CS3
+   write lock regardless of the view mode, causing a permission error for read-only
+   tokens that OnlyOffice displayed as an error message on load.
+
+   The Lock handler now returns 200 OK immediately for READ_ONLY and VIEW_ONLY view
+   modes without attempting to acquire a lock, consistent with the WOPI spec.
+
+   https://github.com/owncloud/ocis/pull/12257
+
+* Bugfix - Fix typo in README: [#12263](https://github.com/owncloud/ocis/pull/12263)
+
+   Fixed a typo in the README documentation.
+
+   https://github.com/owncloud/ocis/pull/12263
+
+* Bugfix - Fix space management middleware removing users from spaces on download: [#12285](https://github.com/owncloud/ocis/pull/12285)
+
+   The space management middleware ran on every authenticated request, including
+   signed URL requests used for file downloads. Since signed URL auth does not
+   carry OIDC claims, the middleware interpreted the absence of claims as "user
+   should have no space access" and removed the user from all project spaces. On
+   the next OIDC request the user was re-added, causing an oscillating add/remove
+   cycle that led to intermittent download failures and transient "space not found"
+   errors.
+
+   The middleware now skips reconciliation entirely when no OIDC claims are present
+   in the request context.
+
+   https://github.com/owncloud/ocis/issues/12285
+   https://github.com/owncloud/ocis/pull/12285
+
+* Bugfix - Search no longer disabled when OCIS_DISABLE_PREVIEWS=true: [#12303](https://github.com/owncloud/ocis/pull/12303)
+
+   Setting OCIS_DISABLE_PREVIEWS=true removed the WebDAV REPORT routes from the
+   router, breaking search on /dav/files, /dav/spaces and /webdav. The search
+   routes are now registered independently of the preview flag.
+
+   https://github.com/owncloud/ocis/pull/12303
+
+* Bugfix - Stable order for user search attributes: [#12337](https://github.com/owncloud/ocis/pull/12337)
+
+   The `attributes` field returned from the user search endpoint came back in a
+   random order because `getUsersAttributes` ranged over a Go map. The function now
+   iterates over the configured `UserSearchDisplayedAttributes` slice, so the
+   returned attribute values follow the configured order.
+
+   https://github.com/owncloud/ocis/pull/12337
+
+* Bugfix - Cache compiled rego policies to avoid recompiling on every request: [#12345](https://github.com/owncloud/ocis/pull/12345)
+
+   The policies service was reading and compiling .rego files from disk on every
+   request, causing unnecessary memory pressure and per-request latency. The
+   compiled PreparedEvalQuery is now cached per query string so compilation happens
+   at most once per query string over the lifetime of the service.
+
+   https://github.com/owncloud/ocis/pull/12345
+
+* Bugfix - SpaceEditorWithoutTrashbin roles now correctly allow file editing: [#12346](https://github.com/owncloud/ocis/pull/12346)
+
+   Fixed a bug where the *WithoutTrashbin space editor roles were rendered as
+   read-only in the Web frontend. The OCS PermissionWrite bit was not set for these
+   roles because the RoleFromResourcePermissions round-trip required
+   RestoreRecycleItem, which these roles intentionally omit.
+
+   https://github.com/owncloud/ocis/pull/12346
+
+* Bugfix - Skip indexing of files still in postprocessing: [#12350](https://github.com/owncloud/ocis/pull/12350)
+
+   When the search service re-indexed a space in response to an UploadReady event,
+   the walker visited sibling nodes whose blobs were not yet finalized in the
+   blobstore. Content extraction for those in-flight nodes triggered spurious
+   storage-users error logs (S3 NoSuchKey). The walker now skips nodes marked as
+   processing; they are indexed when their own UploadReady event arrives.
+
+   https://github.com/owncloud/ocis/pull/12350
+
+* Bugfix - Mask configs that hold secrets: [#12397](https://github.com/owncloud/ocis/pull/12397)
+
+   Envvars and their config structs can hold secrets. The ServiceAccount config is
+   now masked.
+
+   https://github.com/owncloud/ocis/pull/12397
+
+* Bugfix - Recover from permanently-closed NATS connections in the nats-js-kv store: [#12404](https://github.com/owncloud/ocis/pull/12404)
+
+   The `nats-js-kv` go-micro store plugin's `hasConn()` only checked whether the
+   connection object was non-nil, not whether it was still alive. Once the
+   underlying NATS client exhausted its reconnect attempts (e.g. a NATS pod restart
+   longer than the client's reconnect window), the connection stayed non-nil but
+   permanently closed. Because connection initialization is gated on `!hasConn()`,
+   it never re-ran, so every subsequent KV operation failed with `nats: connection
+   closed` until the affected pod was restarted.
+
+   This surfaced as several user-visible failures backed by the NATS KV cache, e.g.
+   all spaces becoming invisible (`storage-users` `ListStorageSpaces`) and download
+   failures from missing signing keys (`ocs`).
+
+   The store plugin now treats a closed connection as no connection, so the next
+   operation transparently re-initializes it.
+
+   https://github.com/owncloud/ocis/pull/12404
+
+* Bugfix - Education user DELETE no longer 404s while leaving LDAP entry behind: [#12405](https://github.com/owncloud/ocis/pull/12405)
+
+   The education user delete handler used `user.GetExternalID()` for the backend
+   DELETE, while the regular `/users` handler and the pre-v8.0 code path used
+   `user.GetId()`. With the default `RequireExternalID=false`, the LDAP backend
+   looked up the user by name-or-UUID, so the externalID never matched, the LDAP
+   entry was never removed, and the response was a 404. This is now fixed.
+
+   https://github.com/owncloud/ocis/pull/12405
+
+* Bugfix - Keep personal space when Drives.Create permission check is inconclusive: [#12499](https://github.com/owncloud/ocis/issues/12499)
+
+   When a user's role is (re-)assigned, both the proxy (on OIDC login) and the
+   graph appRoleAssignment handler check the `Drives.Create` permission to decide
+   whether to restore or disable the user's personal space. The permission check
+   collapsed two very different outcomes into a single `false`: the user genuinely
+   lacks the permission, and the permission could not be determined (a transport
+   error, or a non-OK status such as `CODE_INTERNAL` returned by the
+   settings/gateway service). In the second case the code proceeded to disable the
+   personal space, moving it to the trash, even though the user's entitlement was
+   never actually denied.
+
+   `utils.CheckPermission` now distinguishes the three cases at the root: a
+   transport error or a non-OK status other than `PERMISSION_DENIED` is surfaced as
+   an error and the callers fail closed. The personal space is left untouched, and
+   the graph appRoleAssignment handler additionally reverts the role assignment it
+   just persisted so the user is not left in a half-applied state. The role
+   transition is retried on the next login.
+
+   https://github.com/owncloud/ocis/issues/12499
+
+* Change - Deprecate the owncloudsql storage driver option: [#12486](https://github.com/owncloud/ocis/pull/12486)
+
+   The value `owncloudsql` in the `STORAGE_USERS_DRIVER` environment variable is no
+   longer a valid option and has been marked for deprecation.
+
+   https://github.com/owncloud/ocis/pull/12486
 
 * Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
 
@@ -311,6 +1007,10 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/12051
    https://github.com/owncloud/ocis/pull/12087
+   https://github.com/owncloud/ocis/pull/12137
+   https://github.com/owncloud/ocis/pull/12302
+   https://github.com/owncloud/ocis/pull/12439
+   https://github.com/owncloud/ocis/pull/12266
 
 * Enhancement - Add ResourceID field to UploadReady event: [#12060](https://github.com/owncloud/ocis/pull/12060)
 
@@ -375,12 +1075,401 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/12093
    https://github.com/owncloud/ocis/pull/12104
 
+* Enhancement - Add vault storage with MFA-protected access: [#12108](https://github.com/owncloud/ocis/pull/12108)
+
+   Added a dedicated vault storage that can be protected with MFA. A separate
+   `storage-users` service instance configured in vault mode runs and serves
+   `/vault/users` and `/vault/projects` mount points with a dedicated
+   `VaultStorageProviderID`. The `graph` service gained a new vault mode
+   (`OCIS_ENABLE_VAULT_MODE`) that serves the vault API under the `/vault` prefix.
+   The storage registry now routes vault-specific requests exclusively to the vault
+   storage provider, preventing accidental access to vault spaces when no explicit
+   storage ID is provided.
+
+   MFA status is propagated through gRPC metadata and forwarded in HTTP headers for
+   WOPI/collaboration flows.
+
+   https://github.com/owncloud/ocis/pull/12108
+
+* Enhancement - Retry and abort on repeated extraction failures during indexing: [#12111](https://github.com/owncloud/ocis/pull/12111)
+
+   During `ocis search index` bulk reindexing, if the content extractor (e.g. Tika)
+   becomes unavailable, individual file extractions are now retried up to 5 times
+   with a 1-second delay between attempts. If a file still fails after all retries,
+   the failure is logged and the walk continues.
+
+   If 5 consecutive files fail extraction (indicating the extraction service is
+   down rather than a single file being problematic), the index walk is aborted
+   with an error so the admin can investigate.
+
+   Previously, extraction failures were silently logged and the walk continued at
+   full speed, accumulating thousands of wasted "connection refused" errors when
+   Tika was down.
+
+   https://github.com/owncloud/ocis/pull/12111
+
+* Enhancement - Log effective data and config paths at startup: [#12117](https://github.com/owncloud/ocis/pull/12117)
+
+   OCIS now logs the effective data path and config path at startup so operators
+   can immediately verify that data is written to the expected location. This helps
+   catch misconfigured Docker volume mounts where data silently falls back to an
+   ephemeral container path instead of the intended persistent mount.
+
+   https://github.com/owncloud/ocis/issues/12044
+   https://github.com/owncloud/ocis/pull/12117
+
+* Enhancement - Allow resetting IDM service user passwords: [#12118](https://github.com/owncloud/ocis/pull/12118)
+
+   The `ocis idm resetpassword` command now supports a `--user-type` flag to select
+   the account type: `user` (default, ou=users) or `service` (ou=sysusers). This
+   allows resetting passwords for service accounts (libregraph, idp, reva) which
+   live in `ou=sysusers`. Previously, the DN was hardcoded to `ou=users`, making it
+   impossible to reset service user passwords via the CLI.
+
+   https://github.com/owncloud/ocis/issues/12106
+   https://github.com/owncloud/ocis/pull/12118
+
 * Enhancement - Update images in the ocis_full deployment example: [#12123](https://github.com/owncloud/ocis/pull/12123)
 
    - Update the docker images for core services and web-extensions - Moving all
    default image definitions (latest) into the .env file for consistency
 
    https://github.com/owncloud/ocis/pull/12123
+
+* Enhancement - Add `ocis search optimize` CLI command: [#12136](https://github.com/owncloud/ocis/pull/12136)
+
+   Added a new `ocis search optimize` command that compacts the search index by
+   merging Bleve segments, without re-indexing content. The command opens the index
+   directly (without requiring the search service to be running), making it safe to
+   run during maintenance windows without blocking search queries.
+
+   This is useful after bulk reindexing operations that create many small index
+   segments, which can degrade search performance over time.
+
+   https://github.com/owncloud/ocis/pull/12136
+
+* Enhancement - Add Keycloak to the ocis_full deployment example: [#12139](https://github.com/owncloud/ocis/pull/12139)
+
+   Added Keycloak to the ocis_full deployment example.
+
+   https://github.com/owncloud/ocis/pull/12139
+
+* Enhancement - Allow multiple objectClasses on group creation: [#12229](https://github.com/owncloud/ocis/pull/12229)
+
+   Added support for configuring additional LDAP objectClasses when creating
+   groups. The new `OCIS_LDAP_GROUP_ADDITIONAL_OBJECTCLASSES` /
+   `GRAPH_LDAP_GROUP_ADDITIONAL_OBJECTCLASSES` environment variable accepts a list
+   of extra objectClasses that are set alongside the primary
+   `GRAPH_LDAP_GROUP_OBJECTCLASS` when a new group is created in LDAP.
+
+   https://github.com/owncloud/ocis/pull/12229
+
+* Enhancement - Add SpaceEditorWithoutVersionsWithoutTrashbin space membership role: [#12261](https://github.com/owncloud/ocis/pull/12261)
+
+   Added a new space membership role "Can edit"
+   (SpaceEditorWithoutVersionsWithoutTrashbin) that grants full editor permissions
+   (create, upload, download, edit, move, delete) on a space without access to file
+   versions or the trashbin.
+
+   https://github.com/owncloud/ocis/pull/12261
+
+* Enhancement - Add vault capabilities to the OCS capabilities endpoint: [#12283](https://github.com/owncloud/ocis/pull/12283)
+
+   Added `OCIS_ENABLE_VAULT_MODE` / `FRONTEND_ENABLE_VAULT_MODE` config option to
+   the frontend service. When enabled, the OCS capabilities endpoint advertises
+   `vault.enabled = true`. Clients can request vault-specific capabilities via
+   `/ocs/v2.php/cloud/capabilities?vault=true`, which returns a response with
+   public sharing and federation sharing disabled.
+
+   https://github.com/owncloud/ocis/pull/12283
+   https://github.com/owncloud/reva/pull/584
+
+* Enhancement - Disable public link sharing for vault resources: [#12321](https://github.com/owncloud/ocis/pull/12321)
+
+   The `graph` service now rejects creating, updating, and setting passwords on
+   public links when the target resource lives in the vault storage provider.
+   Requests targeting a vault resource return `400 Bad Request` with the message
+   `public links are not allowed for vault resources`.
+
+   https://github.com/owncloud/ocis/pull/12321
+
+* Enhancement - Update web-extension images in ocis_fuill: [#12324](https://github.com/owncloud/ocis/pull/12324)
+
+   The imgages for web-extensions have been updated for the ocis_full deployment
+   example.
+
+   https://github.com/owncloud/ocis/pull/12324
+
+* Enhancement - Bump dependencies: [#12325](https://github.com/owncloud/ocis/pull/12325)
+
+   Bumped Go and npm dependencies, including security fixes:
+
+   - `github.com/owncloud/reva/v2` to `v2.0.0-20260519092700-9da01c6fb954` -
+   `github.com/shamaton/msgpack/v2` v2.4.0 → v2.4.1 (CVE: denial of service) -
+   `filippo.io/edwards25519` v1.1.0 → v1.1.1 - `github.com/cloudflare/circl`
+   v1.6.1 → v1.6.3 - `github.com/russellhaering/goxmldsig` v1.5.0 → v1.6.0 -
+   `postcss`, `fast-uri`, `@babel/plugin-transform-modules-systemjs` (npm, via pnpm
+   lock regen) - GitHub Actions: `actions/upload-artifact` 4→7,
+   `actions/download-artifact` 4→8, `pnpm/action-setup` 5→6,
+   `fpicalausa/remove-stale-branches` 2.4→2.6
+
+   https://github.com/owncloud/ocis/pull/12325
+
+* Enhancement - Add VaultMode permission: [#12328](https://github.com/owncloud/ocis/pull/12328)
+
+   Add a new `VaultMode.ReadWriteEnabled` permission that gates the visibility of
+   the vault mode switcher in the web UI. The permission is assigned to the admin,
+   space admin and user roles. The user light role does not receive it.
+
+   https://github.com/owncloud/ocis/pull/12328
+
+* Enhancement - Add vault themes: [#12329](https://github.com/owncloud/ocis/pull/12329)
+
+   We've added new themes that are available in the vault. These new themes are
+   intended to make a clear distinction between regular drives and vault.
+
+   https://github.com/owncloud/ocis/pull/12329
+
+* Enhancement - Bump Web to 12.3.3: [#13705](https://github.com/owncloud/web/pull/13705)
+
+   - Bugfix [owncloud/web#13638](https://github.com/owncloud/web/pull/13638): Share
+   button not usable when role dropdown text is too long - Bugfix
+   [owncloud/web#13667](https://github.com/owncloud/web/pull/13667): Shared with
+   does not show members - Bugfix
+   [owncloud/web#13680](https://github.com/owncloud/web/pull/13680): Escape strings
+   when returned from server
+
+   https://github.com/owncloud/web/pull/13705
+   https://github.com/owncloud/web/releases/tag/v12.3.3
+
+* Enhancement - Bump Web to 12.4.0: [#13809](https://github.com/owncloud/web/pull/13809)
+
+   - Bugfix [owncloud/web#13363](https://github.com/owncloud/web/issues/13363):
+   Prevent duplicate call for password protected public links - Bugfix
+   [owncloud/web#13578](https://github.com/owncloud/web/pull/13578): Use dynamic
+   viewport units (dvh/dvw) instead of viewport units (vh/vw) - Bugfix
+   [owncloud/web#13610](https://github.com/owncloud/web/pull/13610): Cannot edit
+   public link when name is too long - Bugfix
+   [owncloud/web#13634](https://github.com/owncloud/web/pull/13634): Fix space key
+   selecting wrong resource - Bugfix
+   [owncloud/web#13793](https://github.com/owncloud/web/pull/13793): Fix share
+   invite button being pushed down in space sharing - Bugfix
+   [owncloud/web#13799](https://github.com/owncloud/web/pull/13799): Fix upload
+   confirmation not visible on file drop page - Enhancement
+   [owncloud/web#13545](https://github.com/owncloud/web/pull/13545): Strip WebDAV
+   prefix - Enhancement
+   [owncloud/web#13577](https://github.com/owncloud/web/pull/13577): Use spaceId -
+   Enhancement [owncloud/web#13631](https://github.com/owncloud/web/pull/13631):
+   Add theme mode - Enhancement
+   [owncloud/web#13632](https://github.com/owncloud/web/issues/13632): Support log
+   and conf files in text editor - Enhancement
+   [owncloud/web#13759](https://github.com/owncloud/web/pull/13759): Show correct
+   modal for saveAs and open actions - Enhancement
+   [owncloud/web#13769](https://github.com/owncloud/web/pull/13769): Add vault
+   search separation - Enhancement
+   [owncloud/web#13795](https://github.com/owncloud/web/pull/13795): Add new theme
+   colors - Enhancement
+   [owncloud/web#13802](https://github.com/owncloud/web/pull/13802): Check vault
+   permission - Enhancement
+   [owncloud/web#13803](https://github.com/owncloud/web/pull/13803): MFA session
+   expiry warning - Enhancement
+   [owncloud/web#13803](https://github.com/owncloud/web/pull/13803): Vault-aware
+   breadcrumbs
+
+   https://github.com/owncloud/web/pull/13809
+   https://github.com/owncloud/web/releases/tag/v12.4.0
+
+# Changelog for [8.0.4] (2026-05-22)
+
+The following sections list the changes for 8.0.4.
+
+[8.0.4]: https://github.com/owncloud/ocis/compare/v8.0.2...v8.0.4
+
+## Summary
+
+* Security - Upgrade libvips to 8.18.2: [#12301](https://github.com/owncloud/ocis/pull/12301)
+* Security - Bump Go to 1.25.10: [#12306](https://github.com/owncloud/ocis/pull/12306)
+* Bugfix - SpaceEditorWithoutTrashbin roles now correctly allow file editing: [#12346](https://github.com/owncloud/ocis/pull/12346)
+
+## Details
+
+* Security - Upgrade libvips to 8.18.2: [#12301](https://github.com/owncloud/ocis/pull/12301)
+
+   Bumped libvips to 8.18.2 in all Docker images to pick up the fix for a stack
+   buffer overflow.
+
+   https://github.com/owncloud/ocis/pull/12301
+
+* Security - Bump Go to 1.25.10: [#12306](https://github.com/owncloud/ocis/pull/12306)
+
+   Fixes CVE-2026-33811, CVE-2026-33814, CVE-2026-39820, CVE-2026-39836,
+   CVE-2026-42499.
+
+   https://github.com/owncloud/ocis/pull/12306
+
+* Bugfix - SpaceEditorWithoutTrashbin roles now correctly allow file editing: [#12346](https://github.com/owncloud/ocis/pull/12346)
+
+   Fixed a bug where the *WithoutTrashbin space editor roles were rendered as
+   read-only in the Web frontend. The OCS PermissionWrite bit was not set for these
+   roles because the RoleFromResourcePermissions round-trip required
+   RestoreRecycleItem, which these roles intentionally omit.
+
+   https://github.com/owncloud/ocis/pull/12346
+
+# Changelog for [8.0.2] (2026-04-30)
+
+The following sections list the changes for 8.0.2.
+
+[8.0.2]: https://github.com/owncloud/ocis/compare/v8.0.1...v8.0.2
+
+## Summary
+
+* Bugfix - Fix OCM share permission change notification: [#12190](https://github.com/owncloud/ocis/pull/12190)
+* Bugfix - Fix the internal links: [#12231](https://github.com/owncloud/ocis/pull/12231)
+* Bugfix - Return 200 OK for WOPI Lock requests in read-only and view-only modes: [#12257](https://github.com/owncloud/ocis/pull/12257)
+* Bugfix - Fix space management middleware removing users from spaces on download: [#12285](https://github.com/owncloud/ocis/pull/12285)
+* Enhancement - Add spaceid to REPORT: [#12241](https://github.com/owncloud/ocis/pull/12241)
+* Enhancement - Allow multiple objectClasses on group creation: [#12242](https://github.com/owncloud/ocis/pull/12242)
+* Enhancement - Add SpaceEditorWithoutVersionsWithoutTrashbin space membership role: [#12245](https://github.com/owncloud/ocis/pull/12245)
+* Enhancement - Bump Web to 12.3.3: [#13705](https://github.com/owncloud/web/pull/13705)
+
+## Details
+
+* Bugfix - Fix OCM share permission change notification: [#12190](https://github.com/owncloud/ocis/pull/12190)
+
+   Fix the OCM share permission change notification handling.
+
+   https://github.com/owncloud/ocis/pull/12190
+
+* Bugfix - Fix the internal links: [#12231](https://github.com/owncloud/ocis/pull/12231)
+
+   We fixed the internal links access control
+
+   https://github.com/owncloud/ocis/pull/12231
+
+* Bugfix - Return 200 OK for WOPI Lock requests in read-only and view-only modes: [#12257](https://github.com/owncloud/ocis/pull/12257)
+
+   OnlyOffice sends a WOPI Lock request when opening any document, even when the
+   user only has read access. The WOPI Lock handler was attempting to acquire a CS3
+   write lock regardless of the view mode, causing a permission error for read-only
+   tokens that OnlyOffice displayed as an error message on load.
+
+   The Lock handler now returns 200 OK immediately for READ_ONLY and VIEW_ONLY view
+   modes without attempting to acquire a lock, consistent with the WOPI spec.
+
+   https://github.com/owncloud/ocis/pull/12257
+
+* Bugfix - Fix space management middleware removing users from spaces on download: [#12285](https://github.com/owncloud/ocis/pull/12285)
+
+   The space management middleware ran on every authenticated request, including
+   signed URL requests used for file downloads. Since signed URL auth does not
+   carry OIDC claims, the middleware interpreted the absence of claims as "user
+   should have no space access" and removed the user from all project spaces. On
+   the next OIDC request the user was re-added, causing an oscillating add/remove
+   cycle that led to intermittent download failures and transient "space not found"
+   errors.
+
+   The middleware now skips reconciliation entirely when no OIDC claims are present
+   in the request context.
+
+   https://github.com/owncloud/ocis/issues/12285
+   https://github.com/owncloud/ocis/pull/12285
+
+* Enhancement - Add spaceid to REPORT: [#12241](https://github.com/owncloud/ocis/pull/12241)
+
+   Added the `spaceid` to the REPORT responses. This is aligning the `REPORT`
+   method with the `PROPFIND` method.
+
+   https://github.com/owncloud/ocis/pull/12241
+
+* Enhancement - Allow multiple objectClasses on group creation: [#12242](https://github.com/owncloud/ocis/pull/12242)
+
+   Added support for configuring additional LDAP objectClasses when creating
+   groups. The new `OCIS_LDAP_GROUP_ADDITIONAL_OBJECTCLASSES` /
+   `GRAPH_LDAP_GROUP_ADDITIONAL_OBJECTCLASSES` environment variable accepts a list
+   of extra objectClasses that are set alongside the primary
+   `GRAPH_LDAP_GROUP_OBJECTCLASS` when a new group is created in LDAP.
+
+   https://github.com/owncloud/ocis/pull/12242
+
+* Enhancement - Add SpaceEditorWithoutVersionsWithoutTrashbin space membership role: [#12245](https://github.com/owncloud/ocis/pull/12245)
+
+   Added a new space membership role "Can edit"
+   (SpaceEditorWithoutVersionsWithoutTrashbin) that grants full editor permissions
+   (create, upload, download, edit, move, delete) on a space without access to file
+   versions or the trashbin.
+
+   https://github.com/owncloud/ocis/pull/12245
+
+* Enhancement - Bump Web to 12.3.3: [#13705](https://github.com/owncloud/web/pull/13705)
+
+   - Bugfix [owncloud/web#13638](https://github.com/owncloud/web/pull/13638): Share
+   button not usable when role dropdown text is too long - Bugfix
+   [owncloud/web#13667](https://github.com/owncloud/web/pull/13667): Shared with
+   does not show members - Bugfix
+   [owncloud/web#13680](https://github.com/owncloud/web/pull/13680): Escape strings
+   when returned from server
+
+   https://github.com/owncloud/web/pull/13705
+   https://github.com/owncloud/web/releases/tag/v12.3.3
+
+# Changelog for [8.0.1] (2026-03-09)
+
+The following sections list the changes for 8.0.1.
+
+[8.0.1]: https://github.com/owncloud/ocis/compare/v8.0.0...v8.0.1
+
+## Summary
+
+* Bugfix - Don't use hardcoded groupOfNames in group creation: [#11776](https://github.com/owncloud/ocis/pull/11776)
+* Bugfix - Expose the signature-auth attribute: [#12052](https://github.com/owncloud/ocis/pull/12052)
+* Bugfix - Don't write empty externalID to LDAP: [#12085](https://github.com/owncloud/ocis/pull/12085)
+* Enhancement - Bump Web to 12.3.2: [#12074](https://github.com/owncloud/ocis/pull/12074)
+* Enhancement - Bump reva: [#12097](https://github.com/owncloud/ocis/pull/12097)
+
+## Details
+
+* Bugfix - Don't use hardcoded groupOfNames in group creation: [#11776](https://github.com/owncloud/ocis/pull/11776)
+
+   Formerly, when creating a group with a different objectClass, it will always use
+   groupOfNames instead of the one provided in the config. Now, the server creates
+   groups using the objectClass defined in the config.
+
+   https://github.com/owncloud/ocis/pull/11776
+
+* Bugfix - Expose the signature-auth attribute: [#12052](https://github.com/owncloud/ocis/pull/12052)
+
+   Expose the "oc:signature-auth" attribute for the subfolders in the public link
+   propfinds. This is a necessary change to be able to support archive downloads in
+   password protected public links.
+
+   https://github.com/owncloud/ocis/pull/12052
+
+* Bugfix - Don't write empty externalID to LDAP: [#12085](https://github.com/owncloud/ocis/pull/12085)
+
+   When creating new users in the graph service, the externalID attribute was being
+   written to LDAP even when it was empty. Now, the externalID attribute is only
+   written when it has a non-empty value.
+
+   https://github.com/owncloud/ocis/pull/12085
+
+* Enhancement - Bump Web to 12.3.2: [#12074](https://github.com/owncloud/ocis/pull/12074)
+
+   - Enhancement
+   [owncloud/ocis#11963](https://github.com/owncloud/ocis/issues/11963): Use
+   signature auth
+
+   https://github.com/owncloud/ocis/pull/12074
+   https://github.com/owncloud/web/releases/tag/v12.3.2
+
+* Enhancement - Bump reva: [#12097](https://github.com/owncloud/ocis/pull/12097)
+
+   Bumped reva to the latest version. This includes a refactoring of the scope
+   expansion and verification logic, as well as a fix for the signature-auth
+   propfind attribute that now correctly supports archive downloads in
+   password-protected public links.
+
+   https://github.com/owncloud/ocis/pull/12097
 
 # Changelog for [8.0.0] (2026-02-13)
 
@@ -10358,7 +11447,7 @@ The following sections list the changes for 2.0.0.
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
 * Enhancement - Wrap metadata storage with dedicated reva gateway: [#3602](https://github.com/owncloud/ocis/pull/3602)
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
-* Enhancement - Added `share_jail` and `projects` feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
+* Enhancement - Added share_jail and projects feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
 * Enhancement - Add initial version of the search extensions: [#3635](https://github.com/owncloud/ocis/pull/3635)
 * Enhancement - Don't setup demo role assignments on default: [#3661](https://github.com/owncloud/ocis/issues/3661)
 * Enhancement - Restrict admins from self-removal: [#3713](https://github.com/owncloud/ocis/issues/3713)
@@ -11483,7 +12572,7 @@ The following sections list the changes for 2.0.0.
    https://github.com/owncloud/ocis/issues/3603
    https://github.com/owncloud/ocis/pull/3606
 
-* Enhancement - Added `share_jail` and `projects` feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
+* Enhancement - Added share_jail and projects feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
 
    We've added feature flags to the `spaces` capability to indicate to clients
    which features are supposed to be shown to users.
@@ -15599,7 +16688,7 @@ The following sections list the changes for 1.2.0.
 * Change - Update ownCloud Web to v2.0.0: [#1661](https://github.com/owncloud/ocis/pull/1661)
 * Enhancement - Introduce ADR: [#1042](https://github.com/owncloud/ocis/pull/1042)
 * Enhancement - Functionality to map home directory to different storage providers: [#1186](https://github.com/owncloud/ocis/pull/1186)
-* Enhancement - Use a default protocol parameter instead of explicitly disabling tus: [#1331](https://github.com/cs3org/reva/pull/1331)
+* Enhancement - Use default upload protocol instead of explicitly disabling tus: [#1331](https://github.com/cs3org/reva/pull/1331)
 * Enhancement - Switch to opencontainers annotation scheme: [#1381](https://github.com/owncloud/ocis/pull/1381)
 * Enhancement - Update reva to v1.5.2-0.20210125114636-0c10b333ee69: [#1482](https://github.com/owncloud/ocis/pull/1482)
 * Enhancement - Migrate ocis-graph to ocis monorepo: [#1594](https://github.com/owncloud/ocis/pull/1594)
@@ -15683,7 +16772,7 @@ The following sections list the changes for 1.2.0.
    https://github.com/owncloud/ocis/pull/1186
    https://github.com/cs3org/reva/pull/1142
 
-* Enhancement - Use a default protocol parameter instead of explicitly disabling tus: [#1331](https://github.com/cs3org/reva/pull/1331)
+* Enhancement - Use default upload protocol instead of explicitly disabling tus: [#1331](https://github.com/cs3org/reva/pull/1331)
 
    https://github.com/cs3org/reva/pull/1331
    https://github.com/owncloud/ocis/pull/1374
