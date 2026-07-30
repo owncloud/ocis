@@ -1,6 +1,12 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 8.0.6](#changelog-for-806-2026-07-15)
+* [Changelog for 8.0.5](#changelog-for-805-2026-06-18)
+* [Changelog for 8.0.4](#changelog-for-804-2026-05-22)
+* [Changelog for 8.0.2](#changelog-for-802-2026-04-30)
+* [Changelog for 8.0.1](#changelog-for-801-2026-03-09)
+* [Changelog for 8.0.0](#changelog-for-800-2026-02-13)
 * [Changelog for 7.3.1](#changelog-for-731-2025-11-24)
 * [Changelog for 7.3.0](#changelog-for-730-2025-10-13)
 * [Changelog for 7.2.0](#changelog-for-720-2025-07-14)
@@ -38,8 +44,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
+* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -64,7 +70,383 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v7.3.1...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v8.0.6...master
+
+## Summary
+
+* Bugfix - Return correct issuerAssignedId on /me: [#12635](https://github.com/owncloud/ocis/pull/12635)
+* Bugfix - Log unmapped thumbnail errors and always report a sabredav exception: [#12663](https://github.com/owncloud/ocis/pull/12663)
+* Bugfix - Return metadata client init errors from the settings store: [#12677](https://github.com/owncloud/ocis/pull/12677)
+* Enhancement - Eliminate redundant LDAP read-after-write on create and update: [#12618](https://github.com/owncloud/ocis/pull/12618)
+
+## Details
+
+* Bugfix - Return correct issuerAssignedId on /me: [#12635](https://github.com/owncloud/ocis/pull/12635)
+
+   The `/graph/v1.0/me` endpoint reported the internal user UUID as
+   `identities[].issuerAssignedId` instead of the issuer-assigned identity (the
+   OIDC `sub`). The endpoint took a fast path that built the user model from the
+   CS3 user in the request context, which does not carry the external identity, so
+   it fell back to the internal UUID. `/me` now always resolves the user through
+   the identity backend, which reads the stored external identity and returns the
+   correct value. Group memberships are still only expanded when `$expand=memberOf`
+   is requested.
+
+   https://github.com/owncloud/ocis/pull/12635
+
+* Bugfix - Log unmapped thumbnail errors and always report a sabredav exception: [#12663](https://github.com/owncloud/ocis/pull/12663)
+
+   The webdav service logged failures of the thumbnails service at debug level
+   only. Errors which are not a property of the requested file, such as the
+   thumbnails service being unreachable, were therefore invisible at production log
+   levels: a complete preview outage produced HTTP 500 responses without a single
+   log line explaining them. Unmapped errors are now logged at error level, while
+   expected per-file outcomes such as an unsupported file type or a file still
+   being processed stay at debug level. Two of the four thumbnail handlers also
+   logged without the request context, so their messages carried no request id.
+
+   In addition, `codesEnum` only mapped four status codes, so error responses for
+   all other codes were rendered with an empty `<s:exception></s:exception>`
+   element. The missing entries for 403, 425 and 429 have been added and any
+   remaining unmapped code now falls back to a generic exception name, so clients
+   always receive a usable exception.
+
+   https://github.com/owncloud/ocis/pull/12663
+
+* Bugfix - Return metadata client init errors from the settings store: [#12677](https://github.com/owncloud/ocis/pull/12677)
+
+   The settings metadata store initialized its metadata client lazily. When
+   initialization failed, for example because the settings metadata space was owned
+   by a different user than the configured system user, `Store.Init()` logged the
+   error but left the client nil and returned normally. Every subsequent store call
+   then dereferenced the nil client and panicked with a nil pointer dereference,
+   which masked the real cause and surfaced as opaque proxy 500s during login.
+
+   `Store.Init()` now returns the underlying initialization error and every public
+   store method short-circuits on it, so callers receive a specific, actionable
+   error instead of a panic. The client is left nil on failure so the next call
+   retries initialization.
+
+   https://github.com/owncloud/ocis/pull/12677
+
+* Enhancement - Eliminate redundant LDAP read-after-write on create and update: [#12618](https://github.com/owncloud/ocis/pull/12618)
+
+   The graph LDAP backend no longer re-reads an entry immediately after writing it
+   just to recover the entry ID for the response. When oCIS generates the ID itself
+   (GRAPH_LDAP_SERVER_UUID disabled), the create response is now synthesized from
+   the data already sent to the directory, and update responses are built by
+   folding the applied modifications onto the entry that was read before the write.
+   This avoids a round-trip that, against a replicated directory reached through a
+   proxy, could hit a lagging replica and fail or return stale data.
+
+   When the directory assigns the ID (GRAPH_LDAP_SERVER_UUID enabled), creates keep
+   the existing read-back, since the generated ID cannot otherwise be recovered.
+
+   https://github.com/owncloud/ocis/pull/12618
+
+# Changelog for [8.0.6] (2026-07-15)
+
+The following sections list the changes for 8.0.6.
+
+[8.0.6]: https://github.com/owncloud/ocis/compare/v8.0.5...v8.0.6
+
+## Summary
+
+* Security - Upgrade libvips to 8.18.4: [#12596](https://github.com/owncloud/ocis/pull/12596)
+* Security - Upgrade Go to 1.25.12: [#12602](https://github.com/owncloud/ocis/pull/12602)
+* Enhancement - Allow disabling the last sign-in timestamp update: [#12522](https://github.com/owncloud/ocis/pull/12522)
+
+## Details
+
+* Security - Upgrade libvips to 8.18.4: [#12596](https://github.com/owncloud/ocis/pull/12596)
+
+   Bumped libvips to 8.18.4 in all Docker images. The previous pin (8.18.3-r0) was
+   dropped from the Alpine edge/community repository, which broke the image build.
+
+   https://github.com/owncloud/ocis/pull/12596
+
+* Security - Upgrade Go to 1.25.12: [#12602](https://github.com/owncloud/ocis/pull/12602)
+
+   Bumped the Go toolchain used to build the release binaries and Docker images
+   from 1.25.11 to 1.25.12. Go 1.25.11 is affected by CVE-2026-39822 (os.Root
+   symlink following allows directory traversal), which is fixed in 1.25.12 and was
+   blocking the release image security scan.
+
+   https://github.com/owncloud/ocis/pull/12602
+
+* Enhancement - Allow disabling the last sign-in timestamp update: [#12522](https://github.com/owncloud/ocis/pull/12522)
+
+   The graph service maintains the 'oCLastSignInTimestamp' LDAP attribute of a user
+   on every sign-in (when the LDAP identity backend has write access). This can
+   cause a significant amount of LDAP write load, especially when the proxy's OIDC
+   userinfo cache has a short TTL and sign-in events are emitted frequently.
+
+   A new setting 'OCIS_LDAP_UPDATE_LAST_SIGNIN_DATE' /
+   'GRAPH_LDAP_UPDATE_LAST_SIGNIN_DATE' (default 'true') allows disabling the
+   update of the last sign-in timestamp without having to disable all LDAP writes
+   ('OCIS_LDAP_SERVER_WRITE_ENABLED') or the graph events consumer. When set to
+   'false' the graph service no longer listens for 'UserSignedIn' events and does
+   not write the 'oCLastSignInTimestamp' attribute.
+
+   https://github.com/owncloud/ocis/issues/9942
+   https://github.com/owncloud/ocis/pull/12522
+
+# Changelog for [8.0.5] (2026-06-18)
+
+The following sections list the changes for 8.0.5.
+
+[8.0.5]: https://github.com/owncloud/ocis/compare/v8.0.4...v8.0.5
+
+## Summary
+
+* Security - Bump Go to 1.25.11: [#12446](https://github.com/owncloud/ocis/pull/12446)
+* Security - Upgrade libvips to 8.18.3: [#12446](https://github.com/owncloud/ocis/pull/12446)
+* Bugfix - Education user delete no longer 404s and leaves the LDAP entry behind: [#12395](https://github.com/owncloud/ocis/pull/12395)
+* Bugfix - Recover from permanently-closed NATS connections in the nats-js-kv store: [#12401](https://github.com/owncloud/ocis/pull/12401)
+
+## Details
+
+* Security - Bump Go to 1.25.11: [#12446](https://github.com/owncloud/ocis/pull/12446)
+
+   Fixes CVE-2026-42504, a stdlib MIME header decoding vulnerability flagged by the
+   release image scan.
+
+   https://github.com/owncloud/ocis/pull/12446
+
+* Security - Upgrade libvips to 8.18.3: [#12446](https://github.com/owncloud/ocis/pull/12446)
+
+   Bumped libvips to 8.18.3 in all Docker images. The previous pin (8.18.2-r0) was
+   dropped from the Alpine edge/community repository, which broke the image build.
+
+   https://github.com/owncloud/ocis/pull/12446
+
+* Bugfix - Education user delete no longer 404s and leaves the LDAP entry behind: [#12395](https://github.com/owncloud/ocis/pull/12395)
+
+   `DELETE /graph/v1.0/education/users/{id}` previously returned a 404 without
+   removing the user. The education user delete handler used `user.GetExternalID()`
+   for the backend DELETE, while the regular `/users` handler and the pre-v8.0 code
+   path used `user.GetId()`. With the default `RequireExternalID=false`, the LDAP
+   backend looked up the user by name-or-UUID, so the externalID never matched, the
+   LDAP entry was never removed, and the response was a 404. This is now fixed.
+
+   https://github.com/owncloud/ocis/pull/12395
+
+* Bugfix - Recover from permanently-closed NATS connections in the nats-js-kv store: [#12401](https://github.com/owncloud/ocis/pull/12401)
+
+   The `nats-js-kv` go-micro store plugin's `hasConn()` only checked whether the
+   connection object was non-nil, not whether it was still alive. Once the
+   underlying NATS client exhausted its reconnect attempts (e.g. a NATS pod restart
+   longer than the client's reconnect window), the connection stayed non-nil but
+   permanently closed. Because connection initialization is gated on `!hasConn()`,
+   it never re-ran, so every subsequent KV operation failed with `nats: connection
+   closed` until the affected pod was restarted.
+
+   This surfaced as several user-visible failures backed by the NATS KV cache, e.g.
+   all spaces becoming invisible (`storage-users` `ListStorageSpaces`) and download
+   failures from missing signing keys (`ocs`).
+
+   The store plugin now treats a closed connection as no connection, so the next
+   operation transparently re-initializes it.
+
+   https://github.com/owncloud/ocis/pull/12401
+
+# Changelog for [8.0.4] (2026-05-22)
+
+The following sections list the changes for 8.0.4.
+
+[8.0.4]: https://github.com/owncloud/ocis/compare/v8.0.2...v8.0.4
+
+## Summary
+
+* Security - Upgrade libvips to 8.18.2: [#12301](https://github.com/owncloud/ocis/pull/12301)
+* Security - Bump Go to 1.25.10: [#12306](https://github.com/owncloud/ocis/pull/12306)
+* Bugfix - SpaceEditorWithoutTrashbin roles now correctly allow file editing: [#12346](https://github.com/owncloud/ocis/pull/12346)
+
+## Details
+
+* Security - Upgrade libvips to 8.18.2: [#12301](https://github.com/owncloud/ocis/pull/12301)
+
+   Bumped libvips to 8.18.2 in all Docker images to pick up the fix for a stack
+   buffer overflow.
+
+   https://github.com/owncloud/ocis/pull/12301
+
+* Security - Bump Go to 1.25.10: [#12306](https://github.com/owncloud/ocis/pull/12306)
+
+   Fixes CVE-2026-33811, CVE-2026-33814, CVE-2026-39820, CVE-2026-39836,
+   CVE-2026-42499.
+
+   https://github.com/owncloud/ocis/pull/12306
+
+* Bugfix - SpaceEditorWithoutTrashbin roles now correctly allow file editing: [#12346](https://github.com/owncloud/ocis/pull/12346)
+
+   Fixed a bug where the *WithoutTrashbin space editor roles were rendered as
+   read-only in the Web frontend. The OCS PermissionWrite bit was not set for these
+   roles because the RoleFromResourcePermissions round-trip required
+   RestoreRecycleItem, which these roles intentionally omit.
+
+   https://github.com/owncloud/ocis/pull/12346
+
+# Changelog for [8.0.2] (2026-04-30)
+
+The following sections list the changes for 8.0.2.
+
+[8.0.2]: https://github.com/owncloud/ocis/compare/v8.0.1...v8.0.2
+
+## Summary
+
+* Bugfix - Fix OCM share permission change notification: [#12190](https://github.com/owncloud/ocis/pull/12190)
+* Bugfix - Fix the internal links: [#12231](https://github.com/owncloud/ocis/pull/12231)
+* Bugfix - Return 200 OK for WOPI Lock requests in read-only and view-only modes: [#12257](https://github.com/owncloud/ocis/pull/12257)
+* Bugfix - Fix space management middleware removing users from spaces on download: [#12285](https://github.com/owncloud/ocis/pull/12285)
+* Enhancement - Add spaceid to REPORT: [#12241](https://github.com/owncloud/ocis/pull/12241)
+* Enhancement - Allow multiple objectClasses on group creation: [#12242](https://github.com/owncloud/ocis/pull/12242)
+* Enhancement - Add SpaceEditorWithoutVersionsWithoutTrashbin space membership role: [#12245](https://github.com/owncloud/ocis/pull/12245)
+* Enhancement - Bump Web to 12.3.3: [#13705](https://github.com/owncloud/web/pull/13705)
+
+## Details
+
+* Bugfix - Fix OCM share permission change notification: [#12190](https://github.com/owncloud/ocis/pull/12190)
+
+   Fix the OCM share permission change notification handling.
+
+   https://github.com/owncloud/ocis/pull/12190
+
+* Bugfix - Fix the internal links: [#12231](https://github.com/owncloud/ocis/pull/12231)
+
+   We fixed the internal links access control
+
+   https://github.com/owncloud/ocis/pull/12231
+
+* Bugfix - Return 200 OK for WOPI Lock requests in read-only and view-only modes: [#12257](https://github.com/owncloud/ocis/pull/12257)
+
+   OnlyOffice sends a WOPI Lock request when opening any document, even when the
+   user only has read access. The WOPI Lock handler was attempting to acquire a CS3
+   write lock regardless of the view mode, causing a permission error for read-only
+   tokens that OnlyOffice displayed as an error message on load.
+
+   The Lock handler now returns 200 OK immediately for READ_ONLY and VIEW_ONLY view
+   modes without attempting to acquire a lock, consistent with the WOPI spec.
+
+   https://github.com/owncloud/ocis/pull/12257
+
+* Bugfix - Fix space management middleware removing users from spaces on download: [#12285](https://github.com/owncloud/ocis/pull/12285)
+
+   The space management middleware ran on every authenticated request, including
+   signed URL requests used for file downloads. Since signed URL auth does not
+   carry OIDC claims, the middleware interpreted the absence of claims as "user
+   should have no space access" and removed the user from all project spaces. On
+   the next OIDC request the user was re-added, causing an oscillating add/remove
+   cycle that led to intermittent download failures and transient "space not found"
+   errors.
+
+   The middleware now skips reconciliation entirely when no OIDC claims are present
+   in the request context.
+
+   https://github.com/owncloud/ocis/issues/12285
+   https://github.com/owncloud/ocis/pull/12285
+
+* Enhancement - Add spaceid to REPORT: [#12241](https://github.com/owncloud/ocis/pull/12241)
+
+   Added the `spaceid` to the REPORT responses. This is aligning the `REPORT`
+   method with the `PROPFIND` method.
+
+   https://github.com/owncloud/ocis/pull/12241
+
+* Enhancement - Allow multiple objectClasses on group creation: [#12242](https://github.com/owncloud/ocis/pull/12242)
+
+   Added support for configuring additional LDAP objectClasses when creating
+   groups. The new `OCIS_LDAP_GROUP_ADDITIONAL_OBJECTCLASSES` /
+   `GRAPH_LDAP_GROUP_ADDITIONAL_OBJECTCLASSES` environment variable accepts a list
+   of extra objectClasses that are set alongside the primary
+   `GRAPH_LDAP_GROUP_OBJECTCLASS` when a new group is created in LDAP.
+
+   https://github.com/owncloud/ocis/pull/12242
+
+* Enhancement - Add SpaceEditorWithoutVersionsWithoutTrashbin space membership role: [#12245](https://github.com/owncloud/ocis/pull/12245)
+
+   Added a new space membership role "Can edit"
+   (SpaceEditorWithoutVersionsWithoutTrashbin) that grants full editor permissions
+   (create, upload, download, edit, move, delete) on a space without access to file
+   versions or the trashbin.
+
+   https://github.com/owncloud/ocis/pull/12245
+
+* Enhancement - Bump Web to 12.3.3: [#13705](https://github.com/owncloud/web/pull/13705)
+
+   - Bugfix [owncloud/web#13638](https://github.com/owncloud/web/pull/13638): Share
+   button not usable when role dropdown text is too long - Bugfix
+   [owncloud/web#13667](https://github.com/owncloud/web/pull/13667): Shared with
+   does not show members - Bugfix
+   [owncloud/web#13680](https://github.com/owncloud/web/pull/13680): Escape strings
+   when returned from server
+
+   https://github.com/owncloud/web/pull/13705
+   https://github.com/owncloud/web/releases/tag/v12.3.3
+
+# Changelog for [8.0.1] (2026-03-09)
+
+The following sections list the changes for 8.0.1.
+
+[8.0.1]: https://github.com/owncloud/ocis/compare/v8.0.0...v8.0.1
+
+## Summary
+
+* Bugfix - Don't use hardcoded groupOfNames in group creation: [#11776](https://github.com/owncloud/ocis/pull/11776)
+* Bugfix - Expose the signature-auth attribute: [#12052](https://github.com/owncloud/ocis/pull/12052)
+* Bugfix - Don't write empty externalID to LDAP: [#12085](https://github.com/owncloud/ocis/pull/12085)
+* Enhancement - Bump Web to 12.3.2: [#12074](https://github.com/owncloud/ocis/pull/12074)
+* Enhancement - Bump reva: [#12097](https://github.com/owncloud/ocis/pull/12097)
+
+## Details
+
+* Bugfix - Don't use hardcoded groupOfNames in group creation: [#11776](https://github.com/owncloud/ocis/pull/11776)
+
+   Formerly, when creating a group with a different objectClass, it will always use
+   groupOfNames instead of the one provided in the config. Now, the server creates
+   groups using the objectClass defined in the config.
+
+   https://github.com/owncloud/ocis/pull/11776
+
+* Bugfix - Expose the signature-auth attribute: [#12052](https://github.com/owncloud/ocis/pull/12052)
+
+   Expose the "oc:signature-auth" attribute for the subfolders in the public link
+   propfinds. This is a necessary change to be able to support archive downloads in
+   password protected public links.
+
+   https://github.com/owncloud/ocis/pull/12052
+
+* Bugfix - Don't write empty externalID to LDAP: [#12085](https://github.com/owncloud/ocis/pull/12085)
+
+   When creating new users in the graph service, the externalID attribute was being
+   written to LDAP even when it was empty. Now, the externalID attribute is only
+   written when it has a non-empty value.
+
+   https://github.com/owncloud/ocis/pull/12085
+
+* Enhancement - Bump Web to 12.3.2: [#12074](https://github.com/owncloud/ocis/pull/12074)
+
+   - Enhancement
+   [owncloud/ocis#11963](https://github.com/owncloud/ocis/issues/11963): Use
+   signature auth
+
+   https://github.com/owncloud/ocis/pull/12074
+   https://github.com/owncloud/web/releases/tag/v12.3.2
+
+* Enhancement - Bump reva: [#12097](https://github.com/owncloud/ocis/pull/12097)
+
+   Bumped reva to the latest version. This includes a refactoring of the scope
+   expansion and verification logic, as well as a fix for the signature-auth
+   propfind attribute that now correctly supports archive downloads in
+   password-protected public links.
+
+   https://github.com/owncloud/ocis/pull/12097
+
+# Changelog for [8.0.0] (2026-02-13)
+
+The following sections list the changes for 8.0.0.
+
+[8.0.0]: https://github.com/owncloud/ocis/compare/v7.3.1...v8.0.0
 
 ## Summary
 
@@ -76,6 +458,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix error code when a user can't disable a space: [#11845](https://github.com/owncloud/ocis/pull/11845)
 * Bugfix - Fix Sharingroles: [#11898](https://github.com/owncloud/ocis/pull/11898)
 * Bugfix - Fix the error handling for empty name on space update: [#11933](https://github.com/owncloud/ocis/pull/11933)
+* Bugfix - Fix group creation in ocis-multi example: [#12019](https://github.com/owncloud/ocis/pull/12019)
 * Change - Remove deprecated OCIS_SHOW_USER_EMAIL_IN_RESULTS: [#11942](https://github.com/owncloud/ocis/pull/11942)
 * Enhancement - Bump Reva: [#460](https://github.com/owncloud/reva/pull/460)
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
@@ -99,6 +482,8 @@ The following sections list the changes for unreleased.
 * Enhancement - Update the traefik image for some deployment examples: [#11915](https://github.com/owncloud/ocis/pull/11915)
 * Enhancement - Add users instances: [#11925](https://github.com/owncloud/ocis/pull/11925)
 * Enhancement - Introduce external shares permission: [#11931](https://github.com/owncloud/ocis/pull/11931)
+* Enhancement - Update to go 1.25: [#12004](https://github.com/owncloud/ocis/pull/12004)
+* Enhancement - Bump Web to 12.3.1: [#12016](https://github.com/owncloud/ocis/pull/12016)
 * Enhancement - Bump Web to 12.3.0: [#13519](https://github.com/owncloud/web/pull/13519)
 
 ## Details
@@ -165,6 +550,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11887
    https://github.com/owncloud/ocis/pull/11933
+
+* Bugfix - Fix group creation in ocis-multi example: [#12019](https://github.com/owncloud/ocis/pull/12019)
+
+   Group creation was not working in ocis.ocm instance
+
+   https://github.com/owncloud/ocis/pull/12019
 
 * Change - Remove deprecated OCIS_SHOW_USER_EMAIL_IN_RESULTS: [#11942](https://github.com/owncloud/ocis/pull/11942)
 
@@ -393,6 +784,20 @@ The following sections list the changes for unreleased.
    ocis. This permission is by default added to the admin and space-admin role.
 
    https://github.com/owncloud/ocis/pull/11931
+
+* Enhancement - Update to go 1.25: [#12004](https://github.com/owncloud/ocis/pull/12004)
+
+   We have updated go to version 1.25 and alpine to version 3.23.3
+
+   https://github.com/owncloud/ocis/pull/12004
+
+* Enhancement - Bump Web to 12.3.1: [#12016](https://github.com/owncloud/ocis/pull/12016)
+
+   Bugfix [owncloud/web#13553](https://github.com/owncloud/web/pull/13553): Search
+   Text Overalps With Search Icon In The Search Bar
+
+   https://github.com/owncloud/ocis/pull/12016
+   https://github.com/owncloud/web/releases/tag/v12.3.1
 
 * Enhancement - Bump Web to 12.3.0: [#13519](https://github.com/owncloud/web/pull/13519)
 
@@ -10012,7 +10417,7 @@ The following sections list the changes for 2.0.0.
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
 * Enhancement - Wrap metadata storage with dedicated reva gateway: [#3602](https://github.com/owncloud/ocis/pull/3602)
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
-* Enhancement - Added `share_jail` and `projects` feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
+* Enhancement - Added share_jail and projects feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
 * Enhancement - Add initial version of the search extensions: [#3635](https://github.com/owncloud/ocis/pull/3635)
 * Enhancement - Don't setup demo role assignments on default: [#3661](https://github.com/owncloud/ocis/issues/3661)
 * Enhancement - Restrict admins from self-removal: [#3713](https://github.com/owncloud/ocis/issues/3713)
@@ -11137,7 +11542,7 @@ The following sections list the changes for 2.0.0.
    https://github.com/owncloud/ocis/issues/3603
    https://github.com/owncloud/ocis/pull/3606
 
-* Enhancement - Added `share_jail` and `projects` feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
+* Enhancement - Added share_jail and projects feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
 
    We've added feature flags to the `spaces` capability to indicate to clients
    which features are supposed to be shown to users.
@@ -12409,7 +12814,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
 
 ## Summary
 
@@ -12583,11 +12988,29 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
+
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
 
 ## Summary
 
@@ -12760,24 +13183,6 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
-
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
@@ -15253,7 +15658,7 @@ The following sections list the changes for 1.2.0.
 * Change - Update ownCloud Web to v2.0.0: [#1661](https://github.com/owncloud/ocis/pull/1661)
 * Enhancement - Introduce ADR: [#1042](https://github.com/owncloud/ocis/pull/1042)
 * Enhancement - Functionality to map home directory to different storage providers: [#1186](https://github.com/owncloud/ocis/pull/1186)
-* Enhancement - Use a default protocol parameter instead of explicitly disabling tus: [#1331](https://github.com/cs3org/reva/pull/1331)
+* Enhancement - Use default upload protocol instead of explicitly disabling tus: [#1331](https://github.com/cs3org/reva/pull/1331)
 * Enhancement - Switch to opencontainers annotation scheme: [#1381](https://github.com/owncloud/ocis/pull/1381)
 * Enhancement - Update reva to v1.5.2-0.20210125114636-0c10b333ee69: [#1482](https://github.com/owncloud/ocis/pull/1482)
 * Enhancement - Migrate ocis-graph to ocis monorepo: [#1594](https://github.com/owncloud/ocis/pull/1594)
@@ -15337,7 +15742,7 @@ The following sections list the changes for 1.2.0.
    https://github.com/owncloud/ocis/pull/1186
    https://github.com/cs3org/reva/pull/1142
 
-* Enhancement - Use a default protocol parameter instead of explicitly disabling tus: [#1331](https://github.com/cs3org/reva/pull/1331)
+* Enhancement - Use default upload protocol instead of explicitly disabling tus: [#1331](https://github.com/cs3org/reva/pull/1331)
 
    https://github.com/cs3org/reva/pull/1331
    https://github.com/owncloud/ocis/pull/1374
