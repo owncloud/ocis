@@ -26,6 +26,7 @@ use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
+use TestHelpers\KeycloakHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\BehatHelper;
@@ -45,6 +46,7 @@ class SearchContext implements Context {
 	 *
 	 * @param string $user
 	 * @param string $pattern
+	 * @param bool $isVault
 	 * @param string|null $limit
 	 * @param string|null $scopeType
 	 * @param string|null $scope
@@ -56,6 +58,7 @@ class SearchContext implements Context {
 	private function searchWithRetry(
 		string $user,
 		string $pattern,
+		bool $isVault = false,
 		?string $limit = null,
 		?string $scopeType = null,
 		?string $scope = null,
@@ -68,7 +71,16 @@ class SearchContext implements Context {
 		$response = null;
 		for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
 			\sleep($attempt === 0 ? 3 : 2);
-			$response = $this->searchFiles($user, $pattern, $limit, $scopeType, $scope, $spaceName, $properties);
+			$response = $this->searchFiles(
+				$user,
+				$pattern,
+				$isVault,
+				$limit,
+				$scopeType,
+				$scope,
+				$spaceName,
+				$properties,
+			);
 			$parsed = HttpRequestHelper::parseResponseAsXml($response);
 			if (\is_array($parsed) && isset($parsed["value"]) && !empty($parsed["value"])) {
 				return $response;
@@ -81,6 +93,7 @@ class SearchContext implements Context {
 	/**
 	 * @param string $user
 	 * @param string $pattern
+	 * @param bool $isVault
 	 * @param string|null $limit
 	 * @param string|null $scopeType
 	 * @param string|null $scope
@@ -93,6 +106,7 @@ class SearchContext implements Context {
 	private function searchFiles(
 		string $user,
 		string $pattern,
+		bool $isVault = false,
 		?string $limit = null,
 		?string $scopeType = null,
 		?string $scope = null,
@@ -121,16 +135,21 @@ class SearchContext implements Context {
 			"		<oc:search>\n";
 		if ($scope !== null) {
 			if ($scopeType === "space") {
-				$spaceId = $this->featureContext->spacesContext->getSpaceIdByName($user, $scope);
+				$spaceId = $this->featureContext->spacesContext->getSpaceIdByName($user, $scope, $isVault);
 				$pattern .= " scope:$spaceId";
 			} else {
 				$resourceID = $this->featureContext->spacesContext->getResourceId(
 					$user,
 					$spaceName ?? "Personal",
 					$scope,
+					$isVault,
 				);
 				$pattern .= " scope:$resourceID";
 			}
+		}
+		// Search inside vault uses 'vault:true' query token
+		if ($isVault) {
+			$pattern .= " AND vault:true";
 		}
 		$body .= "<oc:pattern>$pattern</oc:pattern>\n";
 		if ($limit !== null) {
@@ -156,12 +175,19 @@ class SearchContext implements Context {
 		$davPath = WebDavHelper::getDavPath($davPathVersionToUse);
 		$fullUrl = WebDavHelper::sanitizeUrl("$baseUrl/$davPath");
 
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$accessToken = $this->featureContext->getOcisUserToken($user)['token']['accessToken'];
+			$headers['Authorization'] = 'Bearer ' . $accessToken;
+			$user = null;
+			$password = null;
+		}
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
 			'REPORT',
 			$user,
 			$password,
-			null,
+			$headers,
 			$body,
 		);
 	}
@@ -186,7 +212,7 @@ class SearchContext implements Context {
 		?string $limit = null,
 		?TableNode $properties = null,
 	): void {
-		$response = $this->searchWithRetry($user, $pattern, $limit, null, null, null, $properties);
+		$response = $this->searchWithRetry($user, $pattern, false, $limit, null, null, null, $properties);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -287,14 +313,13 @@ class SearchContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" searches for "([^"]*)" inside (folder|space) "([^"]*)" using the WebDAV API$/
-	 * @When /^user "([^"]*)" searches for "([^"]*)" inside (folder) "([^"]*)" in space "([^"]*)" using the WebDAV API$/
+	 * @When /^user "([^"]*)" searches for "([^"]*)" inside (folder|space) "([^"]*)"(| in vault)? using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param string $pattern
 	 * @param string $scopeType
 	 * @param string $scope
-	 * @param string|null $spaceName
+	 * @param string $isVault
 	 *
 	 * @return void
 	 * @throws Exception|GuzzleException
@@ -304,9 +329,36 @@ class SearchContext implements Context {
 		string $pattern,
 		string $scopeType,
 		string $scope,
-		?string $spaceName = null,
+		string $isVault,
 	): void {
-		$response = $this->searchWithRetry($user, $pattern, null, $scopeType, $scope, $spaceName);
+		$isVault = trim($isVault) === 'in vault';
+		$response = $this->searchWithRetry($user, $pattern, $isVault, null, $scopeType, $scope);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" searches for "([^"]*)" inside (folder) "([^"]*)" in space "([^"]*)"(| in vault)? using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $pattern
+	 * @param string $scopeType
+	 * @param string $scope
+	 * @param string $spaceName
+	 * @param string $isVault
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function userSearchesInsideFolderInSpaceUsingWebDavAPI(
+		string $user,
+		string $pattern,
+		string $scopeType,
+		string $scope,
+		string $spaceName,
+		string $isVault,
+	): void {
+		$isVault = trim($isVault) === 'in vault';
+		$response = $this->searchWithRetry($user, $pattern, $isVault, null, $scopeType, $scope, $spaceName);
 		$this->featureContext->setResponse($response);
 	}
 }

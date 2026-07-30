@@ -496,6 +496,7 @@ default:
         - VaultContext:
         - OcisConfigContext:
         - CapabilitiesContext:
+        - SearchContext:
 
     cliCommands:
       paths:
