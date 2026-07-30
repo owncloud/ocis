@@ -8,6 +8,7 @@ Feature: Deprovisioning notification
     Given these users have been created with default attributes:
       | username |
       | Alice    |
+    And user "Alice" has deleted all notifications
 
 
   Scenario: administrator creates a deprovisioning notification about shutting down the instance

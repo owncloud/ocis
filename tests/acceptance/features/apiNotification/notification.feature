@@ -415,9 +415,9 @@ Feature: Notification
       | HelloWorld |
       | text.txt   |
 
-  @issue-11908 @env-config @email
+  @issue-11908 @email
   Scenario: recipient does not get PO file headers in unshare email for translated locale
-    Given the config "OCIS_DEFAULT_LANGUAGE" has been set to "es" for "notifications" service
+    Given user "Brian" has switched the system language to "es" using the Graph API
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile1.txt |
       | space           | Personal      |
@@ -432,5 +432,5 @@ Feature: Notification
       """
     And user "Brian" should have received the following email from user "Alice"
       """
-      Alice Hansen ha eliminado la compartición 'textfile1.txt' con usted.
+      Alice Hansen has unshared 'textfile1.txt' with you.
       """
