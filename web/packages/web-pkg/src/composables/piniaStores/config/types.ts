@@ -126,6 +126,11 @@ const OptionsConfigSchema = z.object({
   hideAppSwitcher: z.boolean().optional(),
   hideAccountMenu: z.boolean().optional(),
   hideNavigation: z.boolean().optional(),
+  // set when this app instance runs framed inside the password-protected-folder view modal,
+  // so a rename of the shared folder can be reported to the parent window (see
+  // PASSWORD_PROTECTED_FOLDER_RENAMED_MESSAGE). Read once at bootstrap from a query param,
+  // because the router rewrites the URL query before a rename ever happens.
+  passwordProtectedFolderView: z.boolean().optional(),
   defaultLanguage: z.string().optional()
 })
 
