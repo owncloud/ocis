@@ -1,7 +1,7 @@
 // # Added Variables between oCIS 8.1.0 and oCIS 8.2.0
 // commenting the headline to make it better includable
 
-// table created per 2026.07.09
+// table created per 2026.07.15
 // the table should be recreated/updated on source () changes
 
 [width="100%",cols="~,~,~,~",options="header"]
@@ -23,5 +23,9 @@
 | The maximum duration to wait for the storage to respond while resolving a single received share's resource when listing 'sharedWithMe'. Bounding each resource lookup individually prevents one slow or unreachable resource from consuming the request deadline shared by all the other shares. A share whose resource cannot be statted within this time is still listed as a degraded item instead of being dropped. Defaults to '10s'. See the Environment Variable Types description for more details.
 | 10s
 
+| xref:{s-path}/proxy.adoc[Proxy]
+| PROXY_OIDC_ACCESS_TOKEN_VERIFY_AUD
+| A list of accepted audiences for OIDC access tokens, usually the OIDC client IDs used to access ownCloud (for example the web and desktop client IDs). When set, a JWT access token is only accepted if one of these values is present in its 'aud' claim or matches its 'azp' claim. This prevents tokens issued for other applications of a shared IDP from being accepted. When set via the environment variable, use a comma-separated list. Has no effect when 'PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD' is set to 'none'. Leave empty to disable the check (default).
+|
 |===
 
