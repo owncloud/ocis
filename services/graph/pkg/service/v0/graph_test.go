@@ -92,6 +92,16 @@ var _ = Describe("Graph", func() {
 		It("returns a service", func() {
 			Expect(svc).ToNot(BeNil())
 		})
+
+		It("fails when the maximum image file size is not parseable", func() {
+			cfg.Validation.MaxImageFileSize = "notasize"
+			_, err := service.NewService(
+				service.Config(cfg),
+				service.WithGatewaySelector(gatewaySelector),
+			)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("max_image_file_size"))
+		})
 	})
 
 	Describe("Drives", func() {
@@ -1202,6 +1212,136 @@ var _ = Describe("Graph", func() {
 			gatewayClient.AssertCalled(GinkgoT(), "UpdateStorageSpace", mock.Anything, mock.MatchedBy(func(req *provider.UpdateStorageSpaceRequest) bool {
 				return req.StorageSpace.Id.OpaqueId == "spaceid" && req.StorageSpace.Quota.QuotaMaxBytes == uint64(1000)
 			}))
+		})
+
+		Describe("setting the space image", func() {
+			var (
+				imageFileID = "spaceid$spaceid!imageid"
+
+				spaceImageUpdate = func() []byte {
+					drive := libregraph.NewDrive("thename")
+					drive.SetSpecial([]libregraph.DriveItem{{
+						Id:            &imageFileID,
+						SpecialFolder: &libregraph.SpecialFolder{Name: libregraph.PtrString("image")},
+					}})
+					driveJson, err := json.Marshal(drive)
+					Expect(err).ToNot(HaveOccurred())
+					return driveJson
+				}
+
+				patchDrive = func(body []byte) {
+					r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/drives/{driveID}/", bytes.NewBuffer(body))
+					rctx := chi.NewRouteContext()
+					rctx.URLParams.Add("driveID", "spaceid")
+					r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+					svc.UpdateDrive(rr, r)
+				}
+
+				onStatReturnSize = func(size uint64) {
+					gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{
+						Status: status.NewOK(ctx),
+						Info:   &provider.ResourceInfo{Size: size},
+					}, nil)
+				}
+
+				onUpdateStorageSpaceOK = func() {
+					gatewayClient.On("UpdateStorageSpace", mock.Anything, mock.Anything).Return(func(_ context.Context, req *provider.UpdateStorageSpaceRequest, _ ...grpc.CallOption) *provider.UpdateStorageSpaceResponse {
+						return &provider.UpdateStorageSpaceResponse{
+							Status:       status.NewOK(ctx),
+							StorageSpace: req.StorageSpace,
+						}
+					}, nil)
+					gatewayClient.On("GetPath", mock.Anything, mock.Anything).Return(&provider.GetPathResponse{
+						Status: status.NewOK(ctx),
+						Path:   "/.space/image.png",
+					}, nil)
+				}
+
+				expectStoredSpecial = func(name, fileID string) {
+					gatewayClient.AssertCalled(GinkgoT(), "UpdateStorageSpace", mock.Anything, mock.MatchedBy(func(req *provider.UpdateStorageSpaceRequest) bool {
+						return utils.ReadPlainFromOpaque(req.StorageSpace.Opaque, name) == fileID
+					}))
+				}
+			)
+
+			setMaxImageFileSize := func(size string) {
+				cfg.Validation.MaxImageFileSize = size
+				var err error
+				svc, err = service.NewService(
+					service.Config(cfg),
+					service.WithGatewaySelector(gatewaySelector),
+					service.EventsPublisher(&eventsPublisher),
+					service.PermissionService(&permissionService),
+				)
+				Expect(err).ToNot(HaveOccurred())
+			}
+
+			BeforeEach(func() {
+				setMaxImageFileSize("1KB")
+			})
+
+			It("rejects an image larger than the configured maximum and stores nothing", func() {
+				onUpdateStorageSpaceOK()
+				onStatReturnSize(2048)
+
+				patchDrive(spaceImageUpdate())
+
+				Expect(rr.Code).To(Equal(http.StatusRequestEntityTooLarge))
+				gatewayClient.AssertNotCalled(GinkgoT(), "UpdateStorageSpace", mock.Anything, mock.Anything)
+			})
+
+			It("accepts an image of exactly the configured maximum", func() {
+				onUpdateStorageSpaceOK()
+				onStatReturnSize(1000) // 1KB, as bytesize uses decimal units
+
+				patchDrive(spaceImageUpdate())
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+				expectStoredSpecial("image", imageFileID)
+			})
+
+			It("accepts any size when the maximum is set to zero", func() {
+				setMaxImageFileSize("0")
+				onUpdateStorageSpaceOK()
+				onStatReturnSize(100 * 1024 * 1024)
+
+				patchDrive(spaceImageUpdate())
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+				expectStoredSpecial("image", imageFileID)
+			})
+
+			It("does not store the image when the size could not be determined", func() {
+				onUpdateStorageSpaceOK()
+				gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{
+					Status: status.NewInternal(ctx, "stat failed"),
+				}, nil)
+
+				patchDrive(spaceImageUpdate())
+
+				Expect(rr.Code).ToNot(Equal(http.StatusOK))
+				Expect(rr.Code).ToNot(Equal(http.StatusRequestEntityTooLarge))
+				gatewayClient.AssertNotCalled(GinkgoT(), "UpdateStorageSpace", mock.Anything, mock.Anything)
+			})
+
+			It("does not restrict the size of the space readme", func() {
+				onUpdateStorageSpaceOK()
+				onStatReturnSize(100 * 1024 * 1024)
+
+				readmeFileID := "spaceid$spaceid!readmeid"
+				drive := libregraph.NewDrive("thename")
+				drive.SetSpecial([]libregraph.DriveItem{{
+					Id:            &readmeFileID,
+					SpecialFolder: &libregraph.SpecialFolder{Name: libregraph.PtrString("readme")},
+				}})
+				driveJson, err := json.Marshal(drive)
+				Expect(err).ToNot(HaveOccurred())
+
+				patchDrive(driveJson)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+				expectStoredSpecial("readme", readmeFileID)
+			})
 		})
 	})
 
