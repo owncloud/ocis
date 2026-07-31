@@ -27,7 +27,7 @@ services:
     networks:
       ocis-net:
     volumes:
-      - keycloak_postgres_data:/var/lib/postgresql/data
+      - keycloak_postgres_data:/var/lib/postgresql
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
@@ -40,7 +40,12 @@ services:
     image: quay.io/keycloak/keycloak:${KEYCLOAK_DOCKER_TAG}
     networks:
       ocis-net:
-    command: ["start", "--spi-connections-http-client-default-disable-trust-manager=${INSECURE:-false}", "--import-realm"]
+    command:
+      [
+        "start",
+        "--spi-connections-http-client-default-disable-trust-manager=${INSECURE:-false}",
+        "--import-realm",
+      ]
     entrypoint: ["/bin/sh", "/opt/keycloak/bin/docker-entrypoint-override.sh"]
     volumes:
       - "./config/keycloak/docker-entrypoint-override.sh:/opt/keycloak/bin/docker-entrypoint-override.sh"

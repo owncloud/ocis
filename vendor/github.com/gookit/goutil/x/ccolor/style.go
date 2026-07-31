@@ -8,8 +8,9 @@ import (
 
 // String color style string. TODO
 // eg:
-// 		s := String("red,bold")
-//		s.Println("some text message")
+//
+//	s := String("red,bold")
+//	s.Println("some text message")
 type String string
 
 // Style for color render.
@@ -61,6 +62,16 @@ func (s *Style) Sprintf(format string, v ...any) string {
 // Fprint like fmt.Fprint, but with color
 func (s *Style) Fprint(w io.Writer, v ...any) {
 	doPrintTo(w, s.String(), fmt.Sprint(v...))
+}
+
+// Fprintf like fmt.Fprintf, but with color
+func (s *Style) Fprintf(w io.Writer, format string, v ...any) {
+	doPrintTo(w, s.String(), fmt.Sprintf(format, v...))
+}
+
+// Fprintln like fmt.Fprintln, but with color
+func (s *Style) Fprintln(w io.Writer, v ...any) {
+	doPrintlnTo(w, s.String(), v)
 }
 
 // String convert style setting to color code string.

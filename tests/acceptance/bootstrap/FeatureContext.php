@@ -599,7 +599,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return void
 	 */
 	public function startOcisServer(): void {
-		if (\getenv('K8S') === "true") {
+		if (OcisConfigHelper::isK8s()) {
 			return;
 		}
 		$response = OcisConfigHelper::startOcis();
@@ -2046,10 +2046,20 @@ class FeatureContext extends BehatVariablesContext {
 		if ($response === null) {
 			$response = $this->getResponse();
 		}
-		return \json_decode(
-			(string)$response->getBody(),
-			true,
-		);
+
+		$body = $response->getBody();
+		$body->rewind();
+		$bodyContent = $body->getContents();
+		if ($bodyContent === '') {
+			return [];
+		}
+
+		$decodedResponse = \json_decode($bodyContent, true);
+		if (!\is_array($decodedResponse)) {
+			return [];
+		}
+
+		return $decodedResponse;
 	}
 
 	/**

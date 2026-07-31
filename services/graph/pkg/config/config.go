@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
@@ -33,11 +34,17 @@ type Config struct {
 	UnifiedRoles      UnifiedRoles `yaml:"unified_roles"`
 	MaxConcurrency    int          `yaml:"max_concurrency" env:"OCIS_MAX_CONCURRENCY;GRAPH_MAX_CONCURRENCY" desc:"The maximum number of concurrent requests the service will handle." introductionVersion:"7.0.0"`
 
+	ReceivedSharesStatTimeout time.Duration `yaml:"received_shares_stat_timeout" env:"GRAPH_RECEIVED_SHARES_STAT_TIMEOUT" desc:"The maximum duration to wait for the storage to respond while resolving a single received share's resource when listing 'sharedWithMe'. Bounding each resource lookup individually prevents one slow or unreachable resource from consuming the request deadline shared by all the other shares. A share whose resource cannot be statted within this time is still listed as a degraded item instead of being dropped. Defaults to '10s'. See the Environment Variable Types description for more details." introductionVersion:"8.2.0"`
+
 	Keycloak       Keycloak            `yaml:"keycloak"`
-	ServiceAccount ServiceAccount      `yaml:"service_account"`
+	ServiceAccount ServiceAccount      `yaml:"service_account" mask:"struct"`
 	MultiInstance  MultiInstanceConfig `yaml:"multi_instance"`
 
 	Validation Validation `yaml:"validation"`
+
+	EnableVaultMode bool `yaml:"enable_vault_mode" env:"OCIS_ENABLE_VAULT_MODE;GRAPH_ENABLE_VAULT_MODE" desc:"Enable vault mode in addition to the regular graph service. This only applies when the additional storage-users-vault service is running, which is a special configured storage-users service." introductionVersion:"8.1.0"`
+
+	EnableUserSharing bool `yaml:"enable_user_sharing" env:"OCIS_ENABLE_USER_SHARING" desc:"Enables direct sharing with users and groups. When disabled, creating new user, group or federated shares via the drive item invite endpoints is rejected. Public link sharing and space membership are not affected." introductionVersion:"%%NEXT_PRODUCTION_VERSION%%"`
 
 	Context context.Context `yaml:"-"`
 }
@@ -50,20 +57,22 @@ type Spaces struct {
 	UsersCacheTTL                   int    `yaml:"users_cache_ttl" env:"GRAPH_SPACES_USERS_CACHE_TTL" desc:"Max TTL in seconds for the spaces users cache." introductionVersion:"pre5.0"`
 	GroupsCacheTTL                  int    `yaml:"groups_cache_ttl" env:"GRAPH_SPACES_GROUPS_CACHE_TTL" desc:"Max TTL in seconds for the spaces groups cache." introductionVersion:"pre5.0"`
 	StorageUsersAddress             string `yaml:"storage_users_address" env:"GRAPH_SPACES_STORAGE_USERS_ADDRESS" desc:"The address of the storage-users service." introductionVersion:"5.0"`
+	StorageUsersVaultAddress        string `yaml:"storage_users_vault_address" env:"GRAPH_SPACES_STORAGE_USERS_VAULT_ADDRESS" desc:"The address of the storage-users-vault service, a special configured storage-users service. Applicable only when 'GRAPH_ENABLE_VAULT_MODE' is enabled." introductionVersion:"8.1.0"`
 	DefaultLanguage                 string `yaml:"default_language" env:"OCIS_DEFAULT_LANGUAGE" desc:"The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details." introductionVersion:"5.0"`
 	TranslationPath                 string `yaml:"translation_path" env:"OCIS_TRANSLATION_PATH;GRAPH_TRANSLATION_PATH" desc:"(optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details." introductionVersion:"7.0.0"`
 }
 
 type LDAP struct {
-	URI                string `yaml:"uri" env:"OCIS_LDAP_URI;GRAPH_LDAP_URI" desc:"URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'" introductionVersion:"pre5.0"`
-	CACert             string `yaml:"cacert" env:"OCIS_LDAP_CACERT;GRAPH_LDAP_CACERT" desc:"Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idm." introductionVersion:"pre5.0"`
-	Insecure           bool   `yaml:"insecure" env:"OCIS_LDAP_INSECURE;GRAPH_LDAP_INSECURE" desc:"Disable TLS certificate validation for the LDAP connections. Do not set this in production environments." introductionVersion:"pre5.0"`
-	BindDN             string `yaml:"bind_dn" env:"OCIS_LDAP_BIND_DN;GRAPH_LDAP_BIND_DN" desc:"LDAP DN to use for simple bind authentication with the target LDAP server." introductionVersion:"pre5.0"`
-	BindPassword       string `yaml:"bind_password" env:"OCIS_LDAP_BIND_PASSWORD;GRAPH_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'." introductionVersion:"pre5.0"`
-	UseServerUUID      bool   `yaml:"use_server_uuid" env:"GRAPH_LDAP_SERVER_UUID" desc:"If set to true, rely on the LDAP Server to generate a unique ID for users and groups, like when using 'entryUUID' as the user ID attribute." introductionVersion:"pre5.0"`
-	UsePasswordModExOp bool   `yaml:"use_password_modify_exop" env:"GRAPH_LDAP_SERVER_USE_PASSWORD_MODIFY_EXOP" desc:"Use the 'Password Modify Extended Operation' for updating user passwords." introductionVersion:"pre5.0"`
-	WriteEnabled       bool   `yaml:"write_enabled" env:"OCIS_LDAP_SERVER_WRITE_ENABLED;GRAPH_LDAP_SERVER_WRITE_ENABLED" desc:"Allow creating, modifying and deleting LDAP users via the GRAPH API. This can only be set to 'true' when keeping default settings for the LDAP user and group attribute types (the 'OCIS_LDAP_USER_SCHEMA_* and 'OCIS_LDAP_GROUP_SCHEMA_* variables)." introductionVersion:"pre5.0"`
-	RefintEnabled      bool   `yaml:"refint_enabled" env:"GRAPH_LDAP_REFINT_ENABLED" desc:"Signals that the server has the refint plugin enabled, which makes some actions not needed." introductionVersion:"pre5.0"`
+	URI                      string `yaml:"uri" env:"OCIS_LDAP_URI;GRAPH_LDAP_URI" desc:"URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'" introductionVersion:"pre5.0"`
+	CACert                   string `yaml:"cacert" env:"OCIS_LDAP_CACERT;GRAPH_LDAP_CACERT" desc:"Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idm." introductionVersion:"pre5.0"`
+	Insecure                 bool   `yaml:"insecure" env:"OCIS_LDAP_INSECURE;GRAPH_LDAP_INSECURE" desc:"Disable TLS certificate validation for the LDAP connections. Do not set this in production environments." introductionVersion:"pre5.0"`
+	BindDN                   string `yaml:"bind_dn" env:"OCIS_LDAP_BIND_DN;GRAPH_LDAP_BIND_DN" desc:"LDAP DN to use for simple bind authentication with the target LDAP server." introductionVersion:"pre5.0"`
+	BindPassword             string `yaml:"bind_password" env:"OCIS_LDAP_BIND_PASSWORD;GRAPH_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'." introductionVersion:"pre5.0"`
+	UseServerUUID            bool   `yaml:"use_server_uuid" env:"GRAPH_LDAP_SERVER_UUID" desc:"If set to true, rely on the LDAP Server to generate a unique ID for users and groups, like when using 'entryUUID' as the user ID attribute." introductionVersion:"pre5.0"`
+	UsePasswordModExOp       bool   `yaml:"use_password_modify_exop" env:"GRAPH_LDAP_SERVER_USE_PASSWORD_MODIFY_EXOP" desc:"Use the 'Password Modify Extended Operation' for updating user passwords." introductionVersion:"pre5.0"`
+	WriteEnabled             bool   `yaml:"write_enabled" env:"OCIS_LDAP_SERVER_WRITE_ENABLED;GRAPH_LDAP_SERVER_WRITE_ENABLED" desc:"Allow creating, modifying and deleting LDAP users via the GRAPH API. This can only be set to 'true' when keeping default settings for the LDAP user and group attribute types (the 'OCIS_LDAP_USER_SCHEMA_* and 'OCIS_LDAP_GROUP_SCHEMA_* variables)." introductionVersion:"pre5.0"`
+	UpdateUserLastSignInDate bool   `yaml:"update_user_last_sign_in_date" env:"OCIS_LDAP_UPDATE_LAST_SIGNIN_DATE;GRAPH_LDAP_UPDATE_LAST_SIGNIN_DATE" desc:"Update the 'oCLastSignInTimestamp' LDAP attribute of a user when the user signs in. The attribute is only persisted when 'OCIS_LDAP_SERVER_WRITE_ENABLED' is also enabled. Set this to 'false' to avoid an LDAP write on every sign-in, e.g. when the last sign-in timestamp is not needed or the LDAP write load should be reduced." introductionVersion:"8.2.0"`
+	RefintEnabled            bool   `yaml:"refint_enabled" env:"GRAPH_LDAP_REFINT_ENABLED" desc:"Signals that the server has the refint plugin enabled, which makes some actions not needed." introductionVersion:"pre5.0"`
 
 	UserBaseDN               string `yaml:"user_base_dn" env:"OCIS_LDAP_USER_BASE_DN;GRAPH_LDAP_USER_BASE_DN" desc:"Search base DN for looking up LDAP users." introductionVersion:"pre5.0"`
 	UserSearchScope          string `yaml:"user_search_scope" env:"OCIS_LDAP_USER_SCOPE;GRAPH_LDAP_USER_SCOPE" desc:"LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'." introductionVersion:"pre5.0"`
@@ -80,15 +89,16 @@ type LDAP struct {
 	DisableUserMechanism     string `yaml:"disable_user_mechanism" env:"OCIS_LDAP_DISABLE_USER_MECHANISM;GRAPH_DISABLE_USER_MECHANISM" desc:"An option to control the behavior for disabling users. Supported options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed. Default is 'attribute'." introductionVersion:"pre5.0"`
 	LdapDisabledUsersGroupDN string `yaml:"ldap_disabled_users_group_dn" env:"OCIS_LDAP_DISABLED_USERS_GROUP_DN;GRAPH_DISABLED_USERS_GROUP_DN" desc:"The distinguished name of the group to which added users will be classified as disabled when 'disable_user_mechanism' is set to 'group'." introductionVersion:"pre5.0"`
 
-	GroupBaseDN          string `yaml:"group_base_dn" env:"OCIS_LDAP_GROUP_BASE_DN;GRAPH_LDAP_GROUP_BASE_DN" desc:"Search base DN for looking up LDAP groups." introductionVersion:"pre5.0"`
-	GroupCreateBaseDN    string `yaml:"group_create_base_dn" env:"GRAPH_LDAP_GROUP_CREATE_BASE_DN" desc:"Parent DN under which new groups are created. This DN needs to be subordinate to the 'GRAPH_LDAP_GROUP_BASE_DN'. This setting is only relevant when 'GRAPH_LDAP_SERVER_WRITE_ENABLED' is 'true'. It defaults to the value of 'GRAPH_LDAP_GROUP_BASE_DN'. All groups outside of this subtree are treated as readonly groups and cannot be updated." introductionVersion:"pre5.0"`
-	GroupSearchScope     string `yaml:"group_search_scope" env:"OCIS_LDAP_GROUP_SCOPE;GRAPH_LDAP_GROUP_SEARCH_SCOPE" desc:"LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'." introductionVersion:"pre5.0"`
-	GroupFilter          string `yaml:"group_filter" env:"OCIS_LDAP_GROUP_FILTER;GRAPH_LDAP_GROUP_FILTER" desc:"LDAP filter to add to the default filters for group searches." introductionVersion:"pre5.0"`
-	GroupObjectClass     string `yaml:"group_objectclass" env:"OCIS_LDAP_GROUP_OBJECTCLASS;GRAPH_LDAP_GROUP_OBJECTCLASS" desc:"The object class to use for groups in the default group search filter ('groupOfNames')." introductionVersion:"pre5.0"`
-	GroupNameAttribute   string `yaml:"group_name_attribute" env:"OCIS_LDAP_GROUP_SCHEMA_GROUPNAME;GRAPH_LDAP_GROUP_NAME_ATTRIBUTE" desc:"LDAP Attribute to use for the name of groups." introductionVersion:"pre5.0"`
-	GroupMemberAttribute string `yaml:"group_member_attribute" env:"OCIS_LDAP_GROUP_SCHEMA_MEMBER;GRAPH_LDAP_GROUP_MEMBER_ATTRIBUTE" desc:"LDAP Attribute that is used for group members." introductionVersion:"pre5.0"`
-	GroupIDAttribute     string `yaml:"group_id_attribute" env:"OCIS_LDAP_GROUP_SCHEMA_ID;GRAPH_LDAP_GROUP_ID_ATTRIBUTE" desc:"LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID." introductionVersion:"pre5.0"`
-	GroupIDIsOctetString bool   `yaml:"group_id_is_octet_string" env:"OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING;GRAPH_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING" desc:"Set this to true if the defined 'ID' attribute for groups is of the 'OCTETSTRING' syntax. This is required when using the 'objectGUID' attribute of Active Directory for the group ID's." introductionVersion:"pre5.0"`
+	GroupBaseDN                  string   `yaml:"group_base_dn" env:"OCIS_LDAP_GROUP_BASE_DN;GRAPH_LDAP_GROUP_BASE_DN" desc:"Search base DN for looking up LDAP groups." introductionVersion:"pre5.0"`
+	GroupCreateBaseDN            string   `yaml:"group_create_base_dn" env:"GRAPH_LDAP_GROUP_CREATE_BASE_DN" desc:"Parent DN under which new groups are created. This DN needs to be subordinate to the 'GRAPH_LDAP_GROUP_BASE_DN'. This setting is only relevant when 'GRAPH_LDAP_SERVER_WRITE_ENABLED' is 'true'. It defaults to the value of 'GRAPH_LDAP_GROUP_BASE_DN'. All groups outside of this subtree are treated as readonly groups and cannot be updated." introductionVersion:"pre5.0"`
+	GroupSearchScope             string   `yaml:"group_search_scope" env:"OCIS_LDAP_GROUP_SCOPE;GRAPH_LDAP_GROUP_SEARCH_SCOPE" desc:"LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'." introductionVersion:"pre5.0"`
+	GroupFilter                  string   `yaml:"group_filter" env:"OCIS_LDAP_GROUP_FILTER;GRAPH_LDAP_GROUP_FILTER" desc:"LDAP filter to add to the default filters for group searches." introductionVersion:"pre5.0"`
+	GroupObjectClass             string   `yaml:"group_objectclass" env:"OCIS_LDAP_GROUP_OBJECTCLASS;GRAPH_LDAP_GROUP_OBJECTCLASS" desc:"The object class to use for groups in the default group search filter ('groupOfNames')." introductionVersion:"pre5.0"`
+	GroupAdditionalObjectClasses []string `yaml:"group_additional_objectclasses" env:"OCIS_LDAP_GROUP_ADDITIONAL_OBJECTCLASSES;GRAPH_LDAP_GROUP_ADDITIONAL_OBJECTCLASSES" desc:"Additional object classes to set when creating new groups (e.g. 'posixGroup'). The value of 'GRAPH_LDAP_GROUP_OBJECTCLASS' is always included." introductionVersion:"8.1.0"`
+	GroupNameAttribute           string   `yaml:"group_name_attribute" env:"OCIS_LDAP_GROUP_SCHEMA_GROUPNAME;GRAPH_LDAP_GROUP_NAME_ATTRIBUTE" desc:"LDAP Attribute to use for the name of groups." introductionVersion:"pre5.0"`
+	GroupMemberAttribute         string   `yaml:"group_member_attribute" env:"OCIS_LDAP_GROUP_SCHEMA_MEMBER;GRAPH_LDAP_GROUP_MEMBER_ATTRIBUTE" desc:"LDAP Attribute that is used for group members." introductionVersion:"pre5.0"`
+	GroupIDAttribute             string   `yaml:"group_id_attribute" env:"OCIS_LDAP_GROUP_SCHEMA_ID;GRAPH_LDAP_GROUP_ID_ATTRIBUTE" desc:"LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID." introductionVersion:"pre5.0"`
+	GroupIDIsOctetString         bool     `yaml:"group_id_is_octet_string" env:"OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING;GRAPH_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING" desc:"Set this to true if the defined 'ID' attribute for groups is of the 'OCTETSTRING' syntax. This is required when using the 'objectGUID' attribute of Active Directory for the group ID's." introductionVersion:"pre5.0"`
 
 	EducationResourcesEnabled bool `yaml:"education_resources_enabled" env:"GRAPH_LDAP_EDUCATION_RESOURCES_ENABLED" desc:"Enable LDAP support for managing education related resources." introductionVersion:"pre5.0"`
 	EducationConfig           LDAPEducationConfig
@@ -168,7 +178,7 @@ type Keycloak struct {
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
 	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;GRAPH_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
-	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;GRAPH_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;GRAPH_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0" mask:"password"`
 }
 
 type Validation struct {
@@ -179,5 +189,6 @@ type Validation struct {
 type MultiInstanceConfig struct {
 	Enabled     bool   `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enable multiple instances of Infinite Scale." introductionVersion:"8.0.0"`
 	InstanceID  string `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique ID of this instance." introductionVersion:"8.0.0"`
+	MasterID    string `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master ID that grants access to all instances. Users with this ID in their memberOf or guestOf claims can access any instance. Leave empty to disable." introductionVersion:"8.1.0"`
 	QueryRegexp string `yaml:"query_regexp" env:"OCIS_MULTI_INSTANCE_QUERY_TEMPLATE" desc:"The regular expression extracting username and instancename from a user provided search." introductionVersion:"8.0.0"`
 }

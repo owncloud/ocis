@@ -411,8 +411,8 @@ func (_c *DriveItemPermissionsProvider_Invite_Call) RunAndReturn(run func(contex
 }
 
 // ListPermissions provides a mock function with given fields: ctx, itemID, listFederatedRoles, selectRoles
-func (_m *DriveItemPermissionsProvider) ListPermissions(ctx context.Context, itemID *providerv1beta1.ResourceId, listFederatedRoles bool, selectRoles bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
-	ret := _m.Called(ctx, itemID, listFederatedRoles, selectRoles)
+func (_m *DriveItemPermissionsProvider) ListPermissions(ctx context.Context, itemID *providerv1beta1.ResourceId, listFederatedRoles bool, selectRoles bool, selectActions bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+	ret := _m.Called(ctx, itemID, listFederatedRoles, selectRoles, selectActions)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListPermissions")
@@ -420,17 +420,17 @@ func (_m *DriveItemPermissionsProvider) ListPermissions(ctx context.Context, ite
 
 	var r0 libregraph.CollectionOfPermissionsWithAllowedValues
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, bool, bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error)); ok {
-		return rf(ctx, itemID, listFederatedRoles, selectRoles)
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, bool, bool, bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error)); ok {
+		return rf(ctx, itemID, listFederatedRoles, selectRoles, selectActions)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, bool, bool) libregraph.CollectionOfPermissionsWithAllowedValues); ok {
-		r0 = rf(ctx, itemID, listFederatedRoles, selectRoles)
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, bool, bool, bool) libregraph.CollectionOfPermissionsWithAllowedValues); ok {
+		r0 = rf(ctx, itemID, listFederatedRoles, selectRoles, selectActions)
 	} else {
 		r0 = ret.Get(0).(libregraph.CollectionOfPermissionsWithAllowedValues)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId, bool, bool) error); ok {
-		r1 = rf(ctx, itemID, listFederatedRoles, selectRoles)
+	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId, bool, bool, bool) error); ok {
+		r1 = rf(ctx, itemID, listFederatedRoles, selectRoles, selectActions)
 	} else {
 		r1 = ret.Error(1)
 	}

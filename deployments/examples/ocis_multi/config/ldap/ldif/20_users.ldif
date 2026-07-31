@@ -126,7 +126,6 @@ uidNumber: 20004
 gidNumber: 30000
 homeDirectory: /home/admin
 ownCloudUUID: ddc2004c-0977-11eb-9d3f-a793888cd0f8
-owncloudMemberOf: ec730a6c-1b63-4b45-b83b-9e2311afdf85
-owncloudMemberOf: 8d24cb5f-6ee6-4b98-86df-c4c268dddb46
+owncloudMemberOf: 11111111-1111-1111-1111-111111111111
 ownCloudRole: ocisAdmin
 userPassword:: e1NTSEF9UWhmaFB3dERydTUydURoWFFObDRMbzVIckI3TkI5Nmo=

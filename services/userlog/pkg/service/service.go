@@ -11,6 +11,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/go-chi/chi/v5"
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/utils"
@@ -117,13 +118,18 @@ func (ul *UserlogService) processEvent(event events.Event) {
 		err       error
 	)
 
+	baseCtx := context.Background()
+	evCtx, span := events.TraceEventConsumer(baseCtx, ul.tp, event)
+	evCtx = autoprop.SetMetaToContext(evCtx, event.ExtraInfo)
+	defer span.End()
+
 	gwc, err := ul.gatewaySelector.Next()
 	if err != nil {
 		ul.log.Error().Err(err).Msg("cannot get gateway client")
 		return
 	}
 
-	ctx, err := utils.GetServiceUserContext(ul.cfg.ServiceAccount.ServiceAccountID, gwc, ul.cfg.ServiceAccount.ServiceAccountSecret)
+	ctx, err := utils.GetServiceUserContextWithContext(evCtx, gwc, ul.cfg.ServiceAccount.ServiceAccountID, ul.cfg.ServiceAccount.ServiceAccountSecret)
 	if err != nil {
 		ul.log.Error().Err(err).Msg("cannot get service account")
 		return

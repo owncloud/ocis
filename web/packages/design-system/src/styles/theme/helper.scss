@@ -1,0 +1,132 @@
+[hidden] {
+  display: none;
+}
+
+.oc-container {
+  box-sizing: content-box;
+  display: flow-root;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1200px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+.oc-cursor-pointer {
+  cursor: pointer;
+}
+
+.oc-display-block {
+  display: block !important;
+}
+
+.oc-display-inline-block {
+  display: inline-block !important;
+}
+
+.oc-display-grid {
+  display: grid;
+}
+
+.oc-overflow-hidden {
+  overflow: hidden;
+}
+
+.oc-box-shadow-medium {
+  box-shadow: 0 3px 8px 1px rgb(0 0 0 / 14%);
+}
+
+.oc-overflow-auto {
+  overflow: auto;
+}
+
+.oc-button-reset {
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  min-height: 0;
+  padding: 0;
+
+  &::-moz-focus-inner {
+    border: 0;
+  }
+}
+
+.oc-align-self-center {
+  align-self: center;
+}
+
+.oc-border {
+  border: $global-border-width solid var(--oc-color-border) !important;
+
+  @each $directionKey, $directionValues in $directions {
+    &-#{$directionKey} {
+      @each $direction in $directionValues {
+        border-#{$direction}: $global-border-width solid var(--oc-color-border) !important;
+      }
+    }
+  }
+}
+
+.oc-light {
+  color: var(--oc-color-text-inverse) !important;
+  fill: var(--oc-color-text-inverse) !important;
+}
+
+.oc-disabled {
+  opacity: 0.4;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--oc-color-border);
+  margin: 0 0 20px;
+  overflow: visible;
+  text-align: inherit;
+}
+
+// Classes for border radius
+.oc {
+  &-rounded {
+    border-radius: 5px;
+  }
+
+  &-rounded-top {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+
+  &-rounded-bottom {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+
+  &-rounded-left {
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+  }
+
+  &-rounded-right {
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+
+  &-pill {
+    border-radius: 100px;
+  }
+}
+
+// outline for visible focus (via tab)
+*:focus-visible:not(input[type=text]):not(input[type=textarea]):not(input[type=search]):not(input[type=password]):not(input[type=email]):not(input[type=date]) {
+  outline: 2px var(--oc-color-swatch-passive-contrast) solid;
+  outline-offset: 0;
+  box-shadow: 0 0 0 4px var(--oc-color-swatch-passive-default);
+}
+
+// inner outline for visible focus on resource names
+// outer outlines don't work because of the hidden overflow (due to text truncation)
+.oc-resource-details a:focus-visible,
+.oc-resource-details button:focus-visible {
+  box-shadow: inset 0px 0px 0px 2px var(--oc-color-swatch-passive-default) !important;
+}

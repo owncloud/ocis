@@ -130,6 +130,9 @@ func NewFile(name, hash, alg string) FileInfo {
 
 // Manifest represents the manifest from a bundle. The manifest may contain
 // metadata such as the bundle revision.
+//
+// Schema mirror: manifest.proto + manifest_proto_test.go. Update both when
+// adding/renaming/removing fields; never reuse a proto field number.
 type Manifest struct {
 	Revision      string         `json:"revision"`
 	Roots         *[]string      `json:"roots,omitempty"`
@@ -1115,6 +1118,10 @@ func (b *Bundle) FormatModulesWithOptions(opts BundleFormatOptions) error {
 			Capabilities: opts.Capabilities,
 		}
 
+		if fmtOpts.Capabilities == nil {
+			fmtOpts.Capabilities = ast.CapabilitiesForThisVersion(ast.CapabilitiesRegoVersion(fmtOpts.RegoVersion))
+		}
+
 		if module.Parsed != nil {
 			fmtOpts.ParserOptions = &ast.ParserOptions{
 				RegoVersion: module.Parsed.RegoVersion(),
@@ -1122,10 +1129,9 @@ func (b *Bundle) FormatModulesWithOptions(opts BundleFormatOptions) error {
 			if opts.PreserveModuleRegoVersion {
 				fmtOpts.RegoVersion = module.Parsed.RegoVersion()
 			}
-		}
-
-		if fmtOpts.Capabilities == nil {
-			fmtOpts.Capabilities = ast.CapabilitiesForThisVersion(ast.CapabilitiesRegoVersion(fmtOpts.RegoVersion))
+			if fmtOpts.ParserOptions.RegoVersion == fmtOpts.RegoVersion {
+				fmtOpts.ParserOptions.Capabilities = fmtOpts.Capabilities
+			}
 		}
 
 		if module.Raw == nil {
@@ -1256,12 +1262,16 @@ func (m *Manifest) numericRegoVersionForFile(path string) (*int, error) {
 
 	if len(m.FileRegoVersions) != len(m.compiledFileRegoVersions) {
 		m.compiledFileRegoVersions = make([]fileRegoVersion, 0, len(m.FileRegoVersions))
-		for pattern, v := range m.FileRegoVersions {
+		// Compile patterns in sorted key order. The behaviour for overlapping
+		// patterns is documented as undefined, however we ensure the ordering
+		// of which patterns are used will be deterministic by sorting the
+		// keys before iterating over the patterns.
+		for _, pattern := range util.KeysSorted(m.FileRegoVersions) {
 			compiled, err := glob.Compile(pattern)
 			if err != nil {
 				return nil, fmt.Errorf("failed to compile glob pattern %s: %s", pattern, err)
 			}
-			m.compiledFileRegoVersions = append(m.compiledFileRegoVersions, fileRegoVersion{compiled, v})
+			m.compiledFileRegoVersions = append(m.compiledFileRegoVersions, fileRegoVersion{compiled, m.FileRegoVersions[pattern]})
 		}
 	}
 

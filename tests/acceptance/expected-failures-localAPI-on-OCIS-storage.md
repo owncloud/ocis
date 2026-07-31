@@ -292,7 +292,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [Readiness check for some services returns 500 status code](https://github.com/owncloud/ocis/issues/10661)
 
-- [apiServiceAvailability/serviceAvailabilityCheck.feature:115](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L115)
 - [apiServiceAvailability/serviceAvailabilityCheck.feature:124](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L124)
 - [apiServiceAvailability/serviceAvailabilityCheck.feature:135](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L135)
 
@@ -301,6 +300,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiOcm/share.feature:1214](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1214)
 - [apiOcm/share.feature:1238](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1238)
 - [apiOcm/share.feature:1349](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1349)
+
 
 #### [[OCM] federated user trying to download file shared with permissions role Secure Viewer returns 500 status code](https://github.com/owncloud/ocis/issues/10822)
 
@@ -362,8 +362,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [Lost permission when received multiple shares on the same resource](https://github.com/owncloud/ocis/issues/8464)
 
-- [apiSharingNgShares/sharedWithMe.feature:5410](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5410)
-- [apiSharingNgShares/sharedWithMe.feature:5411](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5411)
+- [apiSharingNgShares/sharedWithMe.feature:5510](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5510)
+- [apiSharingNgShares/sharedWithMe.feature:5511](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5511)
 
 #### [Activity. No activity for copying a zero byte file](https://github.com/owncloud/ocis/issues/10417)
 
@@ -400,6 +400,14 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraphUser/editUser.feature:235](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/editUser.feature#L235)
 - [apiGraphUser/getUser.feature:696](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/getUser.feature#L696)
 - [apiGraphUser/getUser.feature:700](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/getUser.feature#L700)
+
+#### [metadata search gives 500](https://github.com/owncloud/ocis/issues/12230)
+- [apiSearchContent/metadataSerch.feature:30](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/metadataSerch.feature#L30)
+- [apiSearchContent/metadataSerch.feature:53](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/metadataSerch.feature#L53)
+- [apiSearchContent/metadataSerch.feature:78](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/metadataSerch.feature#L78)
+- [apiSearchContent/metadataSerch.feature:108](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/metadataSerch.feature#L108)
+- [apiSearchContent/metadataSerch.feature:140](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/metadataSerch.feature#L140)
+
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

@@ -1,0 +1,10 @@
+[main]
+host = https://www.transifex.com
+
+[o:owncloud-org:p:owncloud-web:r:html-editor]
+file_filter = locale/<lang>/app.po
+minimum_perc = 0
+resource_name = web-html-editor
+source_file = template.pot
+source_lang = en
+type = PO

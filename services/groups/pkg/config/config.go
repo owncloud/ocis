@@ -75,6 +75,9 @@ type LDAPDriver struct {
 	UserObjectClass          string          `yaml:"user_object_class" env:"OCIS_LDAP_USER_OBJECTCLASS;GROUPS_LDAP_USER_OBJECTCLASS" desc:"The object class to use for users in the default user search filter ('inetOrgPerson')." introductionVersion:"pre5.0"`
 	GroupObjectClass         string          `yaml:"group_object_class" env:"OCIS_LDAP_GROUP_OBJECTCLASS;GROUPS_LDAP_GROUP_OBJECTCLASS" desc:"The object class to use for groups in the default group search filter ('groupOfNames')." introductionVersion:"pre5.0"`
 	IDP                      string          `yaml:"idp" env:"OCIS_URL;OCIS_OIDC_ISSUER;GROUPS_IDP_URL" desc:"The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider." introductionVersion:"pre5.0"`
+	MasterID                 string          `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master instance ID for multi-instance setups. When set, LDAP user filters are enhanced to also match users belonging to the master instance." introductionVersion:"7.0"`
+	UserMemberAttribute      string          `yaml:"user_member_attribute" env:"OCIS_LDAP_USER_MEMBER_ATTRIBUTE" desc:"LDAP attribute that marks a user as a member of an instance." introductionVersion:"7.0"`
+	UserGuestAttribute       string          `yaml:"user_guest_attribute" env:"OCIS_LDAP_USER_GUEST_ATTRIBUTE" desc:"LDAP attribute that marks a user as a guest of an instance." introductionVersion:"7.0"`
 	UserSchema               LDAPUserSchema  `yaml:"user_schema"`
 	GroupSchema              LDAPGroupSchema `yaml:"group_schema"`
 }

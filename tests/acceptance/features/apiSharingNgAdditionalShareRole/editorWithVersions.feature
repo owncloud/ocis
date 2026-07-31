@@ -465,7 +465,7 @@ Feature: an user shares resources
           "remoteItem": {
             "type": "object",
             "required": ["createdBy","eTag","file","id","lastModifiedDateTime","name",
-              "parentReference","permissions","size"],
+              "parentReference","permissions","size","spaceId"],
             "properties": {
               "createdBy": {
                 "type": "object",
@@ -498,6 +498,10 @@ Feature: an user shares resources
                   "driveId": { "pattern": "^%file_id_pattern%$" },
                   "driveType": { "const": "personal" }
                 }
+              },
+              "spaceId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
               },
               "permissions": {
                 "type": "array",
@@ -572,7 +576,7 @@ Feature: an user shares resources
           "remoteItem": {
             "type": "object",
             "required": ["createdBy","eTag","folder","id","lastModifiedDateTime",
-              "name","parentReference","permissions"],
+              "name","parentReference","permissions","spaceId"],
             "properties": {
               "createdBy": {
                 "type": "object",
@@ -605,6 +609,10 @@ Feature: an user shares resources
                   "driveId": { "pattern": "^%file_id_pattern%$" },
                   "driveType": { "const": "personal" }
                 }
+              },
+              "spaceId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
               },
               "permissions": {
                 "type": "array",
@@ -700,7 +708,7 @@ Feature: an user shares resources
           "remoteItem": {
             "type": "object",
             "required": ["eTag","file","id","lastModifiedDateTime",
-              "name","parentReference","permissions","size"],
+              "name","parentReference","permissions","size","spaceId"],
             "properties": {
               "eTag": { "pattern": "%etag_pattern%" },
               "file": {
@@ -719,6 +727,10 @@ Feature: an user shares resources
                   "driveId": { "pattern": "^%file_id_pattern%$" },
                   "driveType": { "const": "project" }
                 }
+              },
+              "spaceId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
               },
               "permissions": {
                 "type": "array",
@@ -793,7 +805,7 @@ Feature: an user shares resources
           "remoteItem": {
             "type": "object",
             "required": ["eTag","folder","id","lastModifiedDateTime",
-              "name","parentReference","permissions"],
+              "name","parentReference","permissions","spaceId"],
             "properties": {
               "eTag": { "pattern": "%etag_pattern%" },
               "file": {
@@ -812,6 +824,10 @@ Feature: an user shares resources
                   "driveId": { "pattern": "^%file_id_pattern%$" },
                   "driveType": { "const": "project" }
                 }
+              },
+              "spaceId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
               },
               "permissions": {
                 "type": "array",

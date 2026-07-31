@@ -1,0 +1,29 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Collaborator ListItem component > share inheritance indicators > show when sharedParentRoute is given 1`] = `
+"<div data-v-2a3edf6c="" data-testid="collaborator-user-item-einstein" class="files-collaborators-collaborator oc-py-xs">
+  <div data-v-2a3edf6c="" class="oc-width-1-1 oc-flex oc-flex-middle files-collaborators-collaborator-details">
+    <div data-v-2a3edf6c="" class="oc-width-2-3 oc-flex oc-flex-middle">
+      <div data-v-2a3edf6c="">
+        <avatar-image-stub data-v-2a3edf6c="" userid="ZWluc3RlaW5AaHR0cHM6Ly93d3cubG9yZW0uY29t@www.lorem.com" user-name="einstein" width="36" class="files-collaborators-collaborator-indicator"></avatar-image-stub>
+      </div>
+      <div data-v-2a3edf6c="" class="files-collaborators-collaborator-name-wrapper oc-pl-s">
+        <div data-v-2a3edf6c="" class="oc-text-truncate"><span data-v-2a3edf6c="" aria-hidden="true" class="files-collaborators-collaborator-name">einstein</span> <span data-v-2a3edf6c="" class="oc-invisible-sr">Share receiver name: einstein</span>
+          <!--v-if-->
+        </div>
+        <!--v-if-->
+        <div data-v-2a3edf6c="">
+          <div data-v-2a3edf6c="" class="oc-flex oc-flex-nowrap oc-flex-middle">
+            <role-dropdown-stub data-v-2a3edf6c="" existingsharerole="undefined" existingsharepermissions="" domselector="1" mode="edit" showicon="false" islocked="false" isexternal="false" class="files-collaborators-collaborator-role"></role-dropdown-stub>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div data-v-2a3edf6c="" class="oc-flex oc-flex-middle oc-width-1-3 files-collaborators-collaborator-navigation">
+      <!--v-if-->
+      <oc-icon-stub data-v-2a3edf6c="" name="folder-shared" fill-type="line" class="files-collaborators-collaborator-shared-via oc-mx-xs"></oc-icon-stub>
+      <edit-dropdown-stub data-v-2a3edf6c="" accessdetails="[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]" sharecategory="user" canedit="true" issharedenied="false" deniable="false" islocked="false" sharedparentroute="[object Object]" class="files-collaborators-collaborator-edit oc-ml-xs" data-testid="collaborator-edit"></edit-dropdown-stub>
+    </div>
+  </div>
+</div>"
+`;

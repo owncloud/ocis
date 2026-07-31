@@ -39,14 +39,10 @@ func DefaultConfig() *config.Config {
 		DisableHomeCreationOnLogin: true,
 		TransferExpires:            24 * 60 * 60,
 		Cache: config.Cache{
-			ProviderCacheStore:      "noop",
-			ProviderCacheNodes:      []string{"127.0.0.1:9233"},
-			ProviderCacheDatabase:   "cache-providers",
-			ProviderCacheTTL:        300 * time.Second,
-			CreateHomeCacheStore:    "memory",
-			CreateHomeCacheNodes:    []string{"127.0.0.1:9233"},
-			CreateHomeCacheDatabase: "cache-createhome",
-			CreateHomeCacheTTL:      300 * time.Second,
+			ProviderCacheStore:    "noop",
+			ProviderCacheNodes:    []string{"127.0.0.1:9233"},
+			ProviderCacheDatabase: "cache-providers",
+			ProviderCacheTTL:      300 * time.Second,
 		},
 
 		FrontendPublicURL: "https://localhost:9200",
@@ -62,6 +58,7 @@ func DefaultConfig() *config.Config {
 		StoragePublicLinkEndpoint: "com.owncloud.api.storage-publiclink",
 		StorageSharesEndpoint:     "com.owncloud.api.storage-shares",
 		StorageUsersEndpoint:      "com.owncloud.api.storage-users",
+		StorageUsersVaultEndpoint: "com.owncloud.api.storage-users-vault",
 		UsersEndpoint:             "com.owncloud.api.users",
 		OCMEndpoint:               "com.owncloud.api.ocm",
 

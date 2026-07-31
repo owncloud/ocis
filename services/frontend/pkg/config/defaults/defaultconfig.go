@@ -124,6 +124,8 @@ func DefaultConfig() *config.Config {
 			},
 		},
 		LDAPServerWriteEnabled: true,
+		EnableUserSharing:      true,
+		EnablePublicSharing:    true,
 		AutoAcceptShares:       true,
 		Events: config.Events{
 			Endpoint:  "127.0.0.1:9233",
@@ -142,7 +144,8 @@ func DefaultConfig() *config.Config {
 			MaxTagLength: 100,
 		},
 		MultiFactorAuthentication: config.MFAConfig{
-			AuthLevelNames: []string{"advanced"},
+			AuthLevelNames:  []string{"advanced"},
+			SessionDuration: 3600,
 		},
 	}
 }

@@ -1,0 +1,20 @@
+# CollectionOfSchools
+
+
+## Properties
+
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**value** | [**Array&lt;EducationSchool&gt;**](EducationSchool.md) |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { CollectionOfSchools } from './api';
+
+const instance: CollectionOfSchools = {
+    value,
+};
+```
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

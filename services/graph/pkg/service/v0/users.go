@@ -62,22 +62,22 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var me *libregraph.User
-	// We can just return the user from context unless we need to expand the group memberships
-	if !slices.Contains(exp, "memberOf") {
-		me = identity.CreateUserModelFromCS3(u)
-	} else {
-		var err error
-		logger.Debug().Msg("calling get user on backend")
-		me, err = g.identityBackend.GetUser(r.Context(), u.GetId().GetOpaqueId(), odataReq)
-		if err != nil {
-			logger.Debug().Err(err).Interface("user", u).Msg("could not get user from backend")
-			errorcode.RenderError(w, r, err)
-			return
-		}
-		if me.MemberOf == nil {
-			me.MemberOf = []libregraph.Group{}
-		}
+	// Always resolve the user through the identity backend. The CS3 user from
+	// the request context does not carry the issuer-assigned identity (OIDC
+	// sub), so building the model from it (CreateUserModelFromCS3) would report
+	// the internal user UUID as identities[].issuerAssignedId. The backend reads
+	// the stored external identity and returns the correct value. Group
+	// memberships are only expanded (and thus only queried) when $expand=memberOf
+	// is requested, so the extra cost here is a single user lookup.
+	logger.Debug().Msg("calling get user on backend")
+	me, err := g.identityBackend.GetUser(r.Context(), u.GetId().GetOpaqueId(), odataReq)
+	if err != nil {
+		logger.Debug().Err(err).Interface("user", u).Msg("could not get user from backend")
+		errorcode.RenderError(w, r, err)
+		return
+	}
+	if slices.Contains(exp, "memberOf") && me.MemberOf == nil {
+		me.MemberOf = []libregraph.Group{}
 	}
 
 	// expand appRoleAssignments if requested
@@ -287,8 +287,9 @@ func getUsersAttributes(displayedAttributes []string, user *libregraph.User) ([]
 
 	attributes := []string{}
 
-	for attrStr, val := range userMap {
-		if !slices.Contains(displayedAttributes, attrStr) {
+	for _, attrStr := range displayedAttributes {
+		val, ok := userMap[attrStr]
+		if !ok {
 			continue
 		}
 
@@ -300,8 +301,7 @@ func getUsersAttributes(displayedAttributes []string, user *libregraph.User) ([]
 				attributes = append(attributes, *v)
 			}
 		case []libregraph.Group:
-			groups := userMap[attrStr].([]libregraph.Group)
-			for _, group := range groups {
+			for _, group := range v {
 				attributes = append(attributes, *group.DisplayName)
 			}
 		default:
@@ -325,7 +325,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
-	hasMFA := mfa.Has(r.Context())
+	hasMFA := revactx.HasMFA(r.Context())
 
 	if !hasAcceptableSearch(odataReq.Query, g.config.API.IdentitySearchMinLength) {
 		if !ctxHasFullPerms {
@@ -442,18 +442,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// If the user isn't admin, we'll show just the minimum user attributes
-		finalUser := &libregraph.User{
-			Id:          user.Id,
-			DisplayName: user.DisplayName,
-			UserType:    user.UserType,
-			Identities:  user.Identities,
-		}
-
-		if ctxHasFullPerms {
-			finalUser = user
-		} else if slices.Contains(displayedAttributes, "mail") {
-			finalUser.Mail = user.Mail
-		}
+		finalUser := g.filterOutPrivateUserAttrs(r.Context(), user)
 
 		usersWithAttributes = append(usersWithAttributes, &UserWithAttributes{
 			User:       finalUser,
@@ -687,12 +676,10 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if !slices.Contains(g.config.API.UserSearchDisplayedAttributes, "mail") {
-		user.Mail = nil
-	}
+	finalUser := g.filterOutPrivateUserAttrs(r.Context(), user)
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, user)
+	render.JSON(w, r, finalUser)
 }
 
 // getUserLanguage returns the language of the user in the context.
@@ -874,6 +861,21 @@ func (g Graph) PatchMe(w http.ResponseWriter, r *http.Request) {
 	if _, ok := changes.GetMailOk(); ok {
 		logger.Info().Interface("user", changes).Msg("could not update user: user is not allowed to change own mail")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user is not allowed to change own mail")
+		return
+	}
+	if changes.HasPasswordProfile() {
+		logger.Info().Interface("user", changes).Msg("could not update user: user is not allowed to change own password via PATCH /me, use POST /me/changePassword")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user is not allowed to change own password via PATCH /me, use POST /me/changePassword")
+		return
+	}
+	if changes.HasAccountEnabled() {
+		logger.Info().Interface("user", changes).Msg("could not update user: user is not allowed to change own accountEnabled")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user is not allowed to change own accountEnabled")
+		return
+	}
+	if changes.HasOnPremisesSamAccountName() {
+		logger.Info().Interface("user", changes).Msg("could not update user: user is not allowed to change own onPremisesSamAccountName")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user is not allowed to change own onPremisesSamAccountName")
 		return
 	}
 	g.patchUser(w, r, userID, changes)
@@ -1073,8 +1075,10 @@ func (g *Graph) patchUserResponse(w http.ResponseWriter, r *http.Request, user *
 
 	g.publishEvent(r.Context(), e)
 
+	finalUser := g.filterOutPrivateUserAttrs(r.Context(), user)
+
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, user)
+	render.JSON(w, r, finalUser)
 }
 
 const (
@@ -1205,4 +1209,38 @@ func (g Graph) parseExternalSearch(req *godata.GoDataRequest) (string, string) {
 	}
 
 	return parts[1], parts[2]
+}
+
+// filterOutPrivateUserAttrs will create a shallow copy of the user with just
+// public user information unless the caller has full account permissions or
+// is the same user.
+// The public information is the "Id", "DisplayName", "UserType", and "Identities";
+// the "Mail" will be included if the graph service has the mail configured as a
+// displayed attribute.
+func (g Graph) filterOutPrivateUserAttrs(ctx context.Context, user *libregraph.User) *libregraph.User {
+	var finalUser *libregraph.User
+
+	isSameUser := false
+	if currentUser, ok := revactx.ContextGetUser(ctx); ok {
+		isSameUser = currentUser.GetId().GetOpaqueId() == user.GetId()
+	}
+
+	ctxHasFullPerms := g.contextUserHasFullAccountPerms(ctx)
+	if ctxHasFullPerms || isSameUser {
+		finalUser = new(libregraph.User)
+		*finalUser = *user
+	} else {
+		finalUser = &libregraph.User{
+			Id:          user.Id,
+			DisplayName: user.DisplayName,
+			UserType:    user.UserType,
+			Identities:  user.Identities,
+		}
+
+		displayedAttributes := g.config.API.UserSearchDisplayedAttributes
+		if slices.Contains(displayedAttributes, "mail") {
+			finalUser.Mail = user.Mail
+		}
+	}
+	return finalUser
 }

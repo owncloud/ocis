@@ -1,0 +1,25 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`OcResourceName > does not show the name as HTML title if the path is being displayed 1`] = `
+"<span class="oc-resource-name" data-test-resource-path="folder" data-test-resource-name="folder" data-test-resource-type="folder" title="folder" aria-label="folder"><span class="oc-text-truncate"><span class="oc-resource-basename">folder</span></span>
+<!--v-if--></span>"
+`;
+
+exports[`OcResourceName > does not truncate a very long name when disabled 1`] = `"<span class="oc-resource-name oc-display-inline-block" data-test-resource-path="super-long-file-name-which-will-be-truncated-when-exceeding-the-screen-space-while-still-preserving-the-file-extension-at-the-end.txt" data-test-resource-name=".super-long-file-name-which-will-be-truncated-when-exceeding-the-screen-space-while-still-preserving-the-file-extension-at-the-end.txt" data-test-resource-type="file" title=".super-long-file-name-which-will-be-truncated-when-exceeding-the-screen-space-while-still-preserving-the-file-extension-at-the-end.txt" aria-label=".super-long-file-name-which-will-be-truncated-when-exceeding-the-screen-space-while-still-preserving-the-file-extension-at-the-end.txt"><span class="oc-resource-basename oc-text-break">.super-long-file-name-which-will-be-truncated-when-exceeding-the-screen-space-while-still-preserving-the-file-extension-at-the-end</span><span class="oc-resource-extension">.txt</span></span>"`;
+
+exports[`OcResourceName > doesn't add extension to hidden folder 1`] = `
+"<span class="oc-resource-name" data-test-resource-path=".hidden" data-test-resource-name=".hidden" data-test-resource-type="folder" title=".hidden" aria-label=".hidden"><span class="oc-text-truncate"><span class="oc-resource-basename">.hidden</span></span>
+<!--v-if--></span>"
+`;
+
+exports[`OcResourceName > renders folder names with dots completely in the basename 1`] = `
+"<span class="oc-resource-name" data-test-resource-path="folder.with.dots" data-test-resource-name="folder.with.dots" data-test-resource-type="folder" title="folder.with.dots" aria-label="folder.with.dots"><span class="oc-text-truncate"><span class="oc-resource-basename">folder.with.dots</span></span>
+<!--v-if--></span>"
+`;
+
+exports[`OcResourceName > shows the name as HTML title if the path is not displayed 1`] = `
+"<span class="oc-resource-name" data-test-resource-path="folder" data-test-resource-name="folder" data-test-resource-type="folder" title="folder" aria-label="folder"><span class="oc-text-truncate"><span class="oc-resource-basename">folder</span></span>
+<!--v-if--></span>"
+`;
+
+exports[`OcResourceName > truncates very long name per default 1`] = `"<span class="oc-resource-name" data-test-resource-path="super-long-file-name-which-will-be-truncated-when-exceeding-the-screen-space-while-still-preserving-the-file-extension-at-the-end.txt" data-test-resource-name=".super-long-file-name-which-will-be-truncated-when-exceeding-the-screen-space-while-still-preserving-the-file-extension-at-the-end.txt" data-test-resource-type="file" title=".super-long-file-name-which-will-be-truncated-when-exceeding-the-screen-space-while-still-preserving-the-file-extension-at-the-end.txt" aria-label=".super-long-file-name-which-will-be-truncated-when-exceeding-the-screen-space-while-still-preserving-the-file-extension-at-the-end.txt"><span class="oc-text-truncate"><span class="oc-resource-basename">.super-long-file-name-which-will-be-truncated-when-exceeding-the-screen-space-while-still-preserving-the-file-extension-at-the-end</span></span><span class="oc-resource-extension">.txt</span></span>"`;

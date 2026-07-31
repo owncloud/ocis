@@ -286,7 +286,7 @@ Feature: Link sharing of project spaces
   @env-config
   Scenario: try to create a link share of a project-space with a password that is listed in the Banned-Password-List using permissions endpoint
     Given using spaces DAV path
-    And the config "SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt" for "sharing" service
+    And the config "SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/ci/banned-password-list.txt" for "sharing" service
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     When user "Alice" creates the following space link share using permissions endpoint of the Graph API:
@@ -315,7 +315,7 @@ Feature: Link sharing of project spaces
   @env-config
   Scenario: try to create a link share of a project-space with a password that is listed in the Banned-Password-List using root endpoint
     Given using spaces DAV path
-    And the config "SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt" for "sharing" service
+    And the config "SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/ci/banned-password-list.txt" for "sharing" service
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     When user "Alice" creates the following space link share using root endpoint of the Graph API:

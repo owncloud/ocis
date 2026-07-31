@@ -32,6 +32,8 @@ const (
 	UnifiedRoleSpaceEditorWithoutVersionsID = "3284f2d5-0070-4ad8-ac40-c247f7c1fb27"
 	// UnifiedRoleSpaceEditorWithoutTrashbinID Unified role space editor without list/restore resources in trashbin id.
 	UnifiedRoleSpaceEditorWithoutTrashbinID = "8f4701d9-c68f-4109-a482-88e22ee32805"
+	// UnifiedRoleSpaceEditorWithoutVersionsWithoutTrashbinID Unified role space editor without list/restore versions and without list/restore resources in trashbin id.
+	UnifiedRoleSpaceEditorWithoutVersionsWithoutTrashbinID = "a5f73816-4d4b-452d-8973-3b61c3d0bed4"
 	// UnifiedRoleFileEditorID Unified role file editor id.
 	UnifiedRoleFileEditorID = "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
 	// UnifiedRoleFileEditorListGrantsID Unified role file editor id.
@@ -203,9 +205,9 @@ var (
 
 	// Editor without Versions
 	// UnifiedRole SpaceEditorWithoutVersions, Role DisplayName (resolves directly)
-	_spaceEditorWithoutVersionsUnifiedRoleDisplayName = l10n.Template("Can edit")
+	_spaceEditorWithoutVersionsUnifiedRoleDisplayName = l10n.Template("Can edit with trashbin")
 	// UnifiedRole SpaceEditorWithoutVersions, Role Description (resolves directly)
-	_spaceEditorWithoutVersionsUnifiedRoleDescription = l10n.Template("View, download, upload, edit and add.")
+	_spaceEditorWithoutVersionsUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add, delete and restore from trash bin.")
 	// UnifiedRole SpaceEditorWithoutVersions, Permissions
 	_spaceEditorWithoutVersionsRole = conversions.NewSpaceEditorWithoutVersionsRole()
 
@@ -217,11 +219,19 @@ var (
 	// UnifiedRole SpaceEditorWithoutTrashbin, Permissions
 	_spaceEditorWithoutTrashbinRole = conversions.NewSpaceEditorWithoutTrashbinRole()
 
+	// Editor without Versions without Trashbin
+	// UnifiedRole SpaceEditorWithoutVersionsWithoutTrashbin, Role DisplayName (resolves directly)
+	_spaceEditorWithoutVersionsWithoutTrashbinUnifiedRoleDisplayName = l10n.Template("Can edit")
+	// UnifiedRole SpaceEditorWithoutVersionsWithoutTrashbin, Role Description (resolves directly)
+	_spaceEditorWithoutVersionsWithoutTrashbinUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add and delete.")
+	// UnifiedRole SpaceEditorWithoutVersionsWithoutTrashbin, Permissions
+	_spaceEditorWithoutVersionsWithoutTrashbinRole = conversions.NewSpaceEditorWithoutVersionsWithoutTrashbinRole()
+
 	// Editor
 	// UnifiedRole SpaceEditor, Role DisplayName (resolves directly)
-	_spaceEditorUnifiedRoleDisplayName = l10n.Template("Can edit with versions and trashbin")
+	_spaceEditorUnifiedRoleDisplayName = l10n.Template("Can edit with versions and trash bin")
 	// UnifiedRole SpaceEditor, Role Description (resolves directly)
-	_spaceEditorUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add, show all versions and delete.")
+	_spaceEditorUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add, delete, show all versions and restore from trash bin.")
 	// UnifiedRole SpaceEditor, Permissions
 	_spaceEditorRole = conversions.NewSpaceEditorRole()
 
@@ -229,7 +239,7 @@ var (
 	// UnifiedRole Manager, Role DisplayName (resolves directly)
 	_managerUnifiedRoleDisplayName = l10n.Template("Can manage")
 	// UnifiedRole Manager, Role Description (resolves directly)
-	_managerUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add, show all versions, delete and manage members.")
+	_managerUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add, delete, show all versions, restore from trash bin, empty the trash bin and manage members.")
 	// UnifiedRole Manager, Permissions
 	_managerRole = conversions.NewManagerRole()
 
@@ -243,7 +253,8 @@ var (
 		UnifiedRoleEditorListGrantsWithVersionsID:     "EditorListGrantsWithVersions",
 		UnifiedRoleSpaceEditorID:                      "SpaceEditor",
 		UnifiedRoleSpaceEditorWithoutVersionsID:       "SpaceEditorWithoutVersions",
-		UnifiedRoleSpaceEditorWithoutTrashbinID:       "SpaceEditorWithoutTrashbin",
+		UnifiedRoleSpaceEditorWithoutTrashbinID:                      "SpaceEditorWithoutTrashbin",
+		UnifiedRoleSpaceEditorWithoutVersionsWithoutTrashbinID:       "SpaceEditorWithoutVersionsWithoutTrashbin",
 		UnifiedRoleFileEditorID:                       "FileEditor",
 		UnifiedRoleFileEditorListGrantsID:             "FileEditorListGrants",
 		UnifiedRoleFileEditorListGrantsWithVersionsID: "FileEditorListGrantsWithVersions",
@@ -504,6 +515,22 @@ var (
 			RolePermissions: []libregraph.UnifiedRolePermission{
 				{
 					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(_spaceViewerRole.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionDrive),
+				},
+			},
+			LibreGraphWeight: proto.Int32(0),
+		}
+	}
+
+	// roleSpaceEditorWithoutVersionsWithoutTrashbin creates an editor without versions and without trashbin role
+	roleSpaceEditorWithoutVersionsWithoutTrashbin = func() *libregraph.UnifiedRoleDefinition {
+		return &libregraph.UnifiedRoleDefinition{
+			Id:          proto.String(UnifiedRoleSpaceEditorWithoutVersionsWithoutTrashbinID),
+			DisplayName: proto.String(_spaceEditorWithoutVersionsWithoutTrashbinUnifiedRoleDisplayName),
+			Description: proto.String(_spaceEditorWithoutVersionsWithoutTrashbinUnifiedRoleDescription),
+			RolePermissions: []libregraph.UnifiedRolePermission{
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(_spaceEditorWithoutVersionsWithoutTrashbinRole.CS3ResourcePermissions()),
 					Condition:              proto.String(UnifiedRoleConditionDrive),
 				},
 			},

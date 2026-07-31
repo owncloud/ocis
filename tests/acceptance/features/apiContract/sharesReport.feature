@@ -35,6 +35,7 @@ Feature: REPORT request to Shares space
       | d:getcontenttype  | httpd/unix-directory |
       | oc:permissions    | S                    |
       | oc:remote-item-id | %file_id_pattern%    |
+      | oc:spaceid        | %space_id_pattern%   |
     Examples:
       | dav-path-version |
       | old              |
@@ -50,15 +51,16 @@ Feature: REPORT request to Shares space
     And the following headers should match these regular expressions
       | X-Request-Id | %request_id_pattern% |
     And as user "Brian" the REPORT response should contain a resource "frodo.txt" with these key and value pairs:
-      | key                | value             |
-      | oc:fileid          | %file_id_pattern% |
-      | oc:file-parent     | %file_id_pattern% |
-      | oc:shareroot       | /folderMain       |
-      | oc:name            | frodo.txt         |
-      | d:getcontenttype   | text/plain        |
-      | oc:permissions     | S                 |
-      | d:getcontentlength | 34                |
-      | oc:remote-item-id  | %file_id_pattern% |
+      | key                | value              |
+      | oc:fileid          | %file_id_pattern%  |
+      | oc:file-parent     | %file_id_pattern%  |
+      | oc:shareroot       | /folderMain        |
+      | oc:name            | frodo.txt          |
+      | d:getcontenttype   | text/plain         |
+      | oc:permissions     | S                  |
+      | d:getcontentlength | 34                 |
+      | oc:remote-item-id  | %file_id_pattern%  |
+      | oc:spaceid         | %space_id_pattern% |
     Examples:
       | dav-path-version |
       | old              |
@@ -112,17 +114,19 @@ Feature: REPORT request to Shares space
       | oc:permissions    | SMX                  |
       | oc:size           | 14                   |
       | oc:remote-item-id | %file_id_pattern%    |
+      | oc:spaceid        | %space_id_pattern%   |
     When user "Brian" searches for "secure.txt" using the WebDAV API
     And the following headers should match these regular expressions
       | X-Request-Id | %request_id_pattern% |
     Then the HTTP status code should be "207"
     And as user "Brian" the REPORT response should contain a resource "secure.txt" with these key and value pairs:
-      | key                | value         |
-      | oc:shareroot       | /secureFolder |
-      | oc:name            | secure.txt    |
-      | d:getcontenttype   | text/plain    |
-      | oc:permissions     | SX            |
-      | d:getcontentlength | 14            |
+      | key                | value              |
+      | oc:shareroot       | /secureFolder      |
+      | oc:name            | secure.txt         |
+      | d:getcontenttype   | text/plain         |
+      | oc:permissions     | SX                 |
+      | d:getcontentlength | 14                 |
+      | oc:spaceid         | %space_id_pattern% |
     Examples:
       | dav-path-version |
       | old              |
@@ -146,12 +150,13 @@ Feature: REPORT request to Shares space
     And the following headers should match these regular expressions
       | X-Request-Id | %request_id_pattern% |
     And as user "Brian" the REPORT response should contain a resource "secure.txt" with these key and value pairs:
-      | key                | value       |
-      | oc:shareroot       | /secure.txt |
-      | oc:name            | secure.txt  |
-      | d:getcontenttype   | text/plain  |
-      | oc:permissions     | SMX         |
-      | d:getcontentlength | 14          |
+      | key                | value              |
+      | oc:shareroot       | /secure.txt        |
+      | oc:name            | secure.txt         |
+      | d:getcontenttype   | text/plain         |
+      | oc:permissions     | SMX                |
+      | d:getcontentlength | 14                 |
+      | oc:spaceid         | %space_id_pattern% |
     Examples:
       | dav-path-version |
       | old              |

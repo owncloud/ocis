@@ -23,6 +23,9 @@
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Http\Message\ResponseInterface;
+use TestHelpers\HttpRequestHelper;
+use TestHelpers\KeycloakHelper;
 use TestHelpers\OcisConfigHelper;
 use TestHelpers\GraphHelper;
 use PHPUnit\Framework\Assert;
@@ -58,7 +61,7 @@ class OcisConfigContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function asyncUploadHasBeenEnabledWithDelayedPostProcessing(string $delayTime): void {
-		if (\getenv('K8S') === "true") {
+		if (OcisConfigHelper::isK8s()) {
 			$envs = [
 				"storageusers" => ["OCIS_ASYNC_UPLOADS" => true, "OCIS_EVENTS_ENABLE_TLS" => false],
 				"postprocessing" => ["POSTPROCESSING_DELAY" => $delayTime . "s"],
@@ -73,10 +76,11 @@ class OcisConfigContext implements Context {
 			$response = OcisConfigHelper::reConfigureOcis($envs);
 		}
 
+		$resBody = $response->getBody()->getContents();
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to set async upload with delayed post processing",
+			"Failed to set async upload with delayed post processing. Response: $resBody",
 		);
 	}
 
@@ -109,10 +113,9 @@ class OcisConfigContext implements Context {
 			$response = OcisConfigHelper::reConfigureOcis($envs);
 		}
 
-		Assert::assertEquals(
-			200,
-			$response->getStatusCode(),
-			"Failed to set config $configVariable=$configValue",
+		$this->assertOcisRestarted(
+			$response,
+			"Failed to set config $configVariable=$configValue.",
 		);
 	}
 
@@ -143,10 +146,11 @@ class OcisConfigContext implements Context {
 			$response = OcisConfigHelper::reConfigureOcis($envs);
 		}
 
+		$resBody = $response->getBody()->getContents();
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to enable role $role",
+			"Failed to enable role $role. Response: $resBody",
 		);
 		$this->setEnabledPermissionsRoles($defaultRoles);
 	}
@@ -182,10 +186,11 @@ class OcisConfigContext implements Context {
 			$response = OcisConfigHelper::reConfigureOcis($envs);
 		}
 
+		$resBody = $response->getBody()->getContents();
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to enable roles: " . implode(', ', $roles),
+			"Failed to enable roles: " . implode(', ', $roles) . ". Response: $resBody",
 		);
 		$this->setEnabledPermissionsRoles($defaultRoles);
 	}
@@ -216,10 +221,11 @@ class OcisConfigContext implements Context {
 			];
 			$response = OcisConfigHelper::reConfigureOcis($envs);
 		}
+		$resBody = $response->getBody()->getContents();
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to disable role $role",
+			"Failed to disable role $role. Response: $resBody",
 		);
 		$this->setEnabledPermissionsRoles($availableRoles);
 	}
@@ -236,7 +242,7 @@ class OcisConfigContext implements Context {
 	 */
 	public function theConfigHasBeenSetToPath(string $configVariable, string $path, ?string $serviceName = null): void {
 		if (getenv("K8S") === "true") {
-			if ($configVariable === "SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST") {
+			if (\str_ends_with($configVariable, "PASSWORD_POLICY_BANNED_PASSWORDS_LIST")) {
 				// The banned password list is already configured in K8s setup.
 				return;
 			}
@@ -255,10 +261,11 @@ class OcisConfigContext implements Context {
 			];
 			$response = OcisConfigHelper::reConfigureOcis($envs);
 		}
+		$resBody = $response->getBody()->getContents();
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to set config $configVariable=$path",
+			"Failed to set config $configVariable=$path. Response: $resBody",
 		);
 	}
 
@@ -284,10 +291,11 @@ class OcisConfigContext implements Context {
 			$response = OcisConfigHelper::reConfigureOcis($envs);
 		}
 
+		$resBody = $response->getBody()->getContents();
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to set config",
+			"Failed to set config. Response: $resBody",
 		);
 	}
 
@@ -310,10 +318,11 @@ class OcisConfigContext implements Context {
 		}
 
 		$response = OcisConfigHelper::startService($service, $envs);
+		$resBody = $response->getBody()->getContents();
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to start service $service.",
+			"Failed to start service $service. Response: $resBody",
 		);
 	}
 
@@ -324,7 +333,7 @@ class OcisConfigContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function rollback(): void {
-		if (\getenv('K8S') === "true") {
+		if (OcisConfigHelper::isK8s()) {
 			$this->rollbackK8sServices();
 			return;
 		}
@@ -338,10 +347,66 @@ class OcisConfigContext implements Context {
 	 */
 	public function rollbackOcis(): void {
 		$response = OcisConfigHelper::rollbackOcis();
+		$this->assertOcisRestarted(
+			$response,
+			"Failed to rollback ocis server. Check if oCIS is started with ociswrapper.",
+		);
+	}
+
+	/**
+	 * Asserts that an oCIS restart triggered by ociswrapper succeeded.
+	 * In vault mode the wrapper's admin health-check uses basic-auth which is
+	 * disabled (OIDC role assignment only), so the wrapper always returns HTTP 500
+	 * even after a successful restart. When Keycloak/vault mode is detected we
+	 * poll the unauthenticated proxy debug readyz endpoint instead of failing.
+	 *
+	 * @param ResponseInterface $response
+	 * @param string $errorMessage
+	 *
+	 * @return void
+	 */
+	private function assertOcisRestarted(ResponseInterface $response, string $errorMessage): void {
+		$statusCode = $response->getStatusCode();
+		if ($statusCode === 200) {
+			return;
+		}
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$this->waitForOcisProxyReady();
+			return;
+		}
 		Assert::assertEquals(
 			200,
-			$response->getStatusCode(),
-			"Failed to rollback ocis server. Check if oCIS is started with ociswrapper.",
+			$statusCode,
+			$errorMessage . " Response: " . $response->getBody()->getContents(),
+		);
+	}
+
+	/**
+	 * Poll the unauthenticated proxy debug readyz endpoint until oCIS is ready.
+	 * Used in vault/Keycloak mode where basic-auth health checks are unavailable.
+	 *
+	 * @param int $timeoutSeconds
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	private function waitForOcisProxyReady(int $timeoutSeconds = 60): void {
+		$readyzUrl = 'http://localhost:9205/readyz';
+		$deadline = time() + $timeoutSeconds;
+		while (time() < $deadline) {
+			try {
+				$response = HttpRequestHelper::get($readyzUrl);
+				if ($response->getStatusCode() === 200) {
+					return;
+				}
+				echo "oCIS not ready yet. Retrying in 1s...\n";
+			} catch (\Exception $e) {
+				throw new Exception("oCIS not ready. Error: $e");
+			}
+			sleep(1);
+		}
+		throw new \RuntimeException(
+			"Timed out after {$timeoutSeconds}s waiting for oCIS proxy readyz at {$readyzUrl}",
 		);
 	}
 
@@ -351,10 +416,11 @@ class OcisConfigContext implements Context {
 	 */
 	public function rollbackServices(): void {
 		$response = OcisConfigHelper::rollbackServices();
+		$resBody = $response->getBody()->getContents();
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to rollback services.",
+			"Failed to rollback services. Response: $resBody",
 		);
 	}
 
@@ -365,10 +431,11 @@ class OcisConfigContext implements Context {
 	public function rollbackK8sServices(): void {
 		$url = OcisConfigHelper::getWrapperUrl() . "/k8s/rollback";
 		$response = OcisConfigHelper::sendRequest($url, "DELETE");
+		$resBody = $response->getBody()->getContents();
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to rollback services.",
+			"Failed to rollback services. Response: $resBody",
 		);
 	}
 }

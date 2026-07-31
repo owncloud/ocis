@@ -7,7 +7,7 @@ services:
           - ${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
 
   collaboration-oo:
-    image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG}
+    image: ${OCIS_DOCKER_IMAGE}:${OCIS_DOCKER_TAG}
     networks:
       ocis-net:
     depends_on:

@@ -1,0 +1,66 @@
+release/*
+
+**/l10n/locale
+**/l10n/template.pot
+**/hugo
+
+build/version.json
+
+.env
+.idea
+.vscode
+*.bundle.js
+*.bundle.js.map
+*.chunk.js
+*.chunk.js.map
+
+config.json
+package-lock.json
+
+node_modules
+dist
+
+*.log
+.DS_Store
+.envrc
+
+reports
+tests/e2e/cucumber/report/cucumber_report.json
+tests/e2e/cucumber/reportGenerator/cucumber_report.json
+tests/ocis
+tests/testing-app
+playwright-report
+
+/webpack.json
+/webpack-build-log.json
+
+/.vite-inspect
+
+/coverage
+**/coverage/
+
+/.pnpm-store/
+
+# drone CI is in .drone.star, do not let someone accidentally commit a local .drone.yml
+.drone.yml
+
+# Themes
+/packages/web-runtime/themes/*
+!/packages/web-runtime/themes/owncloud/
+
+# Compiled tokens
+/packages/design-system/src/assets/tokens/
+
+# Report for tests
+tests/e2e/cucumber/report/*
+!tests/e2e/cucumber/report/index.mjs
+.vscode/settings.json
+
+# third party licenses
+/third-party-licenses
+
+# dev setup
+/dev/docker/ocis-ca
+/dev/docker/traefik/certificates
+docker-compose.override.yml
+/dev/docker/apps

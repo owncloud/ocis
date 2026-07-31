@@ -10,6 +10,7 @@ import (
 	mtracer "github.com/go-micro/plugins/v4/wrapper/trace/opentelemetry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	"go-micro.dev/v4/client"
 	"go.opentelemetry.io/otel/trace"
 	"go.opentelemetry.io/otel/trace/noop"
@@ -71,6 +72,7 @@ func NewClient(opts ...ClientOption) (client.Client, error) {
 		client.Wrap(mtracer.NewClientWrapper(
 			mtracer.WithTraceProvider(options.tp),
 		)),
+		client.Wrap(autoprop.NewGoMicroClientWrapper()),
 	}
 	switch options.tlsMode {
 	case "insecure":

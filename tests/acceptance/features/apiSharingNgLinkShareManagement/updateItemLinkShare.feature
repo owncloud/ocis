@@ -237,7 +237,7 @@ Feature: Update a link share for a resource
 
 
   Scenario Outline: update a file's link share with a password that is listed in the Banned-Password-List using permissions endpoint
-    Given the config "SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt" for "sharing" service
+    Given the config "SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/ci/banned-password-list.txt" for "sharing" service
     And user "Alice" has uploaded file with content "other data" to "text.txt"
     And user "Alice" has created the following resource link share:
       | resource        | text.txt |

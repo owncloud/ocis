@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"github.com/owncloud/reva/v2/pkg/appctx"
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	"github.com/owncloud/reva/v2/pkg/rgrpc"
 	"github.com/rs/zerolog"
 	microstore "go-micro.dev/v4/store"
-	"google.golang.org/grpc/metadata"
 )
 
 const (
@@ -303,7 +303,7 @@ const outgoingContextKey = rgrpc.AutoPropPrefix + "bfp-skip"
 // assuming the metadata interceptors are in place (check
 // internal/grpc/interceptors/metadata/metadata.go)
 func MarkSkipAttemptContext(ctx context.Context, shareToken string) context.Context {
-	return metadata.AppendToOutgoingContext(ctx, outgoingContextKey, shareToken)
+	return autoprop.AppendMetaToContext(ctx, "bfp-skip", shareToken)
 }
 
 // CheckSkipAttempt will check whether we should skip the brute force
@@ -315,8 +315,12 @@ func MarkSkipAttemptContext(ctx context.Context, shareToken string) context.Cont
 // share token as "to skip" (from the MarkSkipAttemptContext method). If there
 // is no such data, it will return false.
 func CheckSkipAttempt(ctx context.Context, shareToken string) bool {
-	possibleValues := metadata.ValueFromIncomingContext(ctx, outgoingContextKey)
-	if possibleValues == nil || len(possibleValues) < 1 {
+	meta := autoprop.GetMetaFromContext(ctx)
+	if meta == nil {
+		return false
+	}
+	possibleValues, exists := meta.GetMetaWithExists("bfp-skip")
+	if !exists || len(possibleValues) < 1 {
 		return false
 	}
 

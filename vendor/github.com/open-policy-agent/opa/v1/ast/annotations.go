@@ -7,6 +7,7 @@ package ast
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"net/url"
 	"slices"
 	"strings"
@@ -36,6 +37,7 @@ type (
 		Schemas          []*SchemaAnnotation          `json:"schemas,omitempty"`
 		Compile          *CompileAnnotation           `json:"compile,omitempty"`
 		Custom           map[string]any               `json:"custom,omitempty"`
+		Labels           map[string]any               `json:"labels,omitempty"`
 		Location         *Location                    `json:"location,omitempty"`
 
 		comments []*Comment
@@ -172,6 +174,10 @@ func (a *Annotations) Compare(other *Annotations) int {
 		return cmp
 	}
 
+	if cmp := util.Compare(a.Labels, other.Labels); cmp != 0 {
+		return cmp
+	}
+
 	return 0
 }
 
@@ -224,8 +230,16 @@ func (a *Annotations) MarshalJSON() ([]byte, error) {
 		data["schemas"] = a.Schemas
 	}
 
+	if a.Compile != nil {
+		data["compile"] = a.Compile
+	}
+
 	if len(a.Custom) > 0 {
 		data["custom"] = a.Custom
+	}
+
+	if len(a.Labels) > 0 {
+		data["labels"] = a.Labels
 	}
 
 	if astJSON.GetOptions().MarshalOptions.IncludeLocation.Annotations {
@@ -419,6 +433,10 @@ func (a *Annotations) Copy(node Node) *Annotations {
 		cpy.Custom = deepcopy.Map(a.Custom)
 	}
 
+	if a.Labels != nil {
+		cpy.Labels = deepcopy.Map(a.Labels)
+	}
+
 	cpy.node = node
 
 	return &cpy
@@ -511,6 +529,14 @@ func (a *Annotations) toObject() (*Object, *Error) {
 			return nil, NewError(CompileErr, a.Location, "invalid custom annotation %s", err.Error())
 		}
 		obj.Insert(InternedTerm("custom"), NewTerm(c))
+	}
+
+	if len(a.Labels) > 0 {
+		l, err := InterfaceToValue(a.Labels)
+		if err != nil {
+			return nil, NewError(CompileErr, a.Location, "invalid labels annotation %s", err.Error())
+		}
+		obj.Insert(InternedTerm("labels"), NewTerm(l))
 	}
 
 	return &obj, nil
@@ -882,6 +908,17 @@ func (as *AnnotationSet) Chain(rule *Rule) AnnotationsRefSet {
 
 	ruleAnnots := as.GetRuleScope(rule)
 
+	// Fall back to the rule's own attached annotations when the rule's source
+	// module isn't tracked by this AnnotationSet. This happens for rules
+	// supplied by an ExternalRuleSource that returns []*Rule directly: their
+	// source module is never compiled by the outer Compiler, so the set has no
+	// entries for them at any scope. attachRuleAnnotations (run at parse time)
+	// populates rule.Annotations with rule-scope and document-scope entries,
+	// which is the upper bound of what's reachable for such rules anyway.
+	if len(ruleAnnots) == 0 && len(rule.Annotations) > 0 && !slices.Contains(as.modules, rule.Module) {
+		ruleAnnots = rule.Annotations
+	}
+
 	if len(ruleAnnots) >= 1 {
 		for _, a := range ruleAnnots {
 			refs = append(refs, NewAnnotationsRef(a))
@@ -921,6 +958,39 @@ func (as *AnnotationSet) Chain(rule *Rule) AnnotationsRefSet {
 	}
 
 	return refs
+}
+
+// MergedLabels returns the inner-scope-wins merged labels for the given rule
+// along with a stable JSON string suitable for content-based deduplication.
+// labels is nil when the rule has no labels anywhere in its annotation chain.
+func (as *AnnotationSet) MergedLabels(rule *Rule) (labels map[string]any, key string) {
+	if as == nil {
+		return nil, ""
+	}
+	labels = mergeChainLabels(as.Chain(rule))
+	if len(labels) > 0 {
+		b, _ := json.Marshal(labels)
+		key = string(b)
+	}
+	return labels, key
+}
+
+// mergeChainLabels folds labels from a rule's annotation chain with inner-wins
+// precedence. AnnotationSet.Chain returns entries in inner-to-outer order, so
+// we iterate in reverse to fold outer-to-inner.
+func mergeChainLabels(chain AnnotationsRefSet) map[string]any {
+	var merged map[string]any
+	for i := len(chain) - 1; i >= 0; i-- {
+		a := chain[i].Annotations
+		if a == nil || len(a.Labels) == 0 {
+			continue
+		}
+		if merged == nil {
+			merged = make(map[string]any, len(a.Labels))
+		}
+		maps.Copy(merged, a.Labels)
+	}
+	return merged
 }
 
 func (ars FlatAnnotationsRefSet) Insert(ar *AnnotationsRef) FlatAnnotationsRefSet {

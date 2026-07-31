@@ -12,6 +12,7 @@ import (
 const (
 	// Sharing
 	ActionShareCreated            = "file_shared"
+	ActionShareUpdated            = "share_updated"
 	ActionSharePermissionUpdated  = "share_permission_updated"
 	ActionShareDisplayNameUpdated = "share_name_updated"
 	ActionSharePasswordUpdated    = "share_password_updated"
@@ -19,6 +20,7 @@ const (
 	ActionShareRemoved            = "file_unshared"
 	ActionShareAccepted           = "share_accepted"
 	ActionShareDeclined           = "share_declined"
+	ActionShareStateChanged       = "share_state_changed"
 	ActionLinkAccessed            = "public_link_accessed"
 
 	// Files
@@ -94,6 +96,12 @@ func MessageShareAccepted(userid, shareID, sharerID string) string {
 // MessageShareDeclined returns the human-readable string that describes the action
 func MessageShareDeclined(userid, shareID, sharerID string) string {
 	return fmt.Sprintf("user '%s' declined share '%s' from user '%s'", userid, shareID, sharerID)
+}
+
+// MessageShareStateChanged returns the human-readable string that describes a
+// received-share state change that is neither an accept nor a decline.
+func MessageShareStateChanged(userid, shareID, sharerID, state string) string {
+	return fmt.Sprintf("user '%s' changed the state of share '%s' from user '%s' to '%s'", userid, shareID, sharerID, state)
 }
 
 // MessageLinkAccessed returns the human-readable string that describes the action

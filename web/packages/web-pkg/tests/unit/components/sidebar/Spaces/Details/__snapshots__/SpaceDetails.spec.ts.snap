@@ -1,0 +1,44 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Details SideBar Panel > displays the details side panel 1`] = `
+"<div data-v-9b5d3526="" id="oc-space-details-sidebar">
+  <div data-v-9b5d3526="" class="oc-space-details-sidebar-image oc-text-center">
+    <oc-icon-stub data-v-9b5d3526="" name="layout-grid" filltype="fill" accessiblelabel="" type="span" size="xxlarge" variation="passive" color="" class="space-default-image oc-px-m oc-py-m"></oc-icon-stub>
+  </div>
+  <div data-v-9b5d3526="" class="oc-flex oc-flex-middle oc-space-details-sidebar-members oc-mb-s oc-text-small" style="gap: 15px;">
+    <oc-button-stub data-v-9b5d3526="" type="button" disabled="false" size="medium" arialabel="Open member list in share panel" submit="button" variation="passive" appearance="raw" justifycontent="center" gapsize="medium" showspinner="false"></oc-button-stub>
+    <!--v-if-->
+    <p data-v-9b5d3526="">This space has 1 member.</p>
+    <oc-button-stub data-v-9b5d3526="" type="button" disabled="false" size="small" arialabel="Open share panel" submit="button" variation="passive" appearance="raw" justifycontent="center" gapsize="medium" showspinner="false"></oc-button-stub>
+  </div>
+  <table data-v-9b5d3526="" class="details-table oc-width-1-1" aria-label="Overview of the information about the selected space">
+    <colgroup data-v-9b5d3526="">
+      <col data-v-9b5d3526="" class="oc-width-1-3">
+      <col data-v-9b5d3526="" class="oc-width-2-3">
+    </colgroup>
+    <tbody data-v-9b5d3526="">
+      <tr data-v-9b5d3526="">
+        <th data-v-9b5d3526="" scope="col" class="oc-pr-s oc-font-semibold">Last activity</th>
+        <td data-v-9b5d3526="">Invalid DateTime</td>
+      </tr>
+      <!--v-if-->
+      <tr data-v-9b5d3526="">
+        <th data-v-9b5d3526="" scope="col" class="oc-pr-s oc-font-semibold">Manager</th>
+        <td data-v-9b5d3526=""><span data-v-9b5d3526="">alice (me)</span></td>
+      </tr>
+      <tr data-v-9b5d3526="">
+        <th data-v-9b5d3526="" scope="col" class="oc-pr-s oc-font-semibold">Quota</th>
+        <td data-v-9b5d3526="">
+          <space-quota-stub data-v-9b5d3526="" spacequota="[object Object]"></space-quota-stub>
+        </td>
+      </tr>
+      <tr data-v-9b5d3526="" data-testid="sizeInfo">
+        <th data-v-9b5d3526="" scope="col" class="oc-pr-s oc-font-semibold">Size</th>
+        <td data-v-9b5d3526="">?, 1 item in total (1 file, 0 folders)</td>
+      </tr>
+      <!--v-if-->
+      <portal-target data-v-9b5d3526="" name="app.files.sidebar.space.details.table" slot-props="[object Object]" multiple="true"></portal-target>
+    </tbody>
+  </table>
+</div>"
+`;

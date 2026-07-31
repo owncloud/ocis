@@ -66,6 +66,7 @@ func SharesCommand(cfg *config.Config) *cli.Command {
 			cleanupCmd(cfg),
 			cleanOrphanedGrantsCmd(cfg),
 			moveStuckUploadBlobsCmd(cfg),
+			cleanCorruptPublicSharesCmd(cfg),
 		},
 	}
 }

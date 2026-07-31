@@ -33,7 +33,7 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
-	hasMFA := mfa.Has(r.Context())
+	hasMFA := revactx.HasMFA(r.Context())
 	if !hasAcceptableSearch(odataReq.Query, g.config.API.IdentitySearchMinLength) {
 		if !ctxHasFullPerms {
 			// for regular user the search term must have a minimum length
@@ -260,6 +260,10 @@ func (g Graph) GetGroup(w http.ResponseWriter, r *http.Request) {
 		logger.Debug().Err(err).Msg("could not get group: backend error")
 		errorcode.RenderError(w, r, err)
 		return
+	}
+
+	if !g.contextUserHasFullAccountPerms(r.Context()) {
+		group.Members = nil
 	}
 
 	render.Status(r, http.StatusOK)

@@ -33,7 +33,7 @@ type Config struct {
 
 	GlobalNotificationsSecret string `yaml:"global_notifications_secret" env:"USERLOG_GLOBAL_NOTIFICATIONS_SECRET" desc:"The secret to secure the global notifications endpoint. Only system admins and users knowing that secret can call the global notifications POST/DELETE endpoints." introductionVersion:"pre5.0"`
 
-	ServiceAccount ServiceAccount `yaml:"service_account"`
+	ServiceAccount ServiceAccount `yaml:"service_account" mask:"struct"`
 
 	Context context.Context `yaml:"-"`
 }
@@ -85,5 +85,5 @@ type TokenManager struct {
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
 	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;USERLOG_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
-	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;USERLOG_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;USERLOG_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0" mask:"password"`
 }

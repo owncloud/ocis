@@ -19,6 +19,7 @@ import (
 	"github.com/go-chi/render"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/reva/v2/pkg/rhttp"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/templates"
 	merrors "go-micro.dev/v4/errors"
 	grpcmetadata "google.golang.org/grpc/metadata"
@@ -40,7 +41,14 @@ var (
 		http.StatusUnauthorized:     "Sabre\\DAV\\Exception\\NotAuthenticated",
 		http.StatusNotFound:         "Sabre\\DAV\\Exception\\NotFound",
 		http.StatusMethodNotAllowed: "Sabre\\DAV\\Exception\\MethodNotAllowed",
+		http.StatusForbidden:        "Sabre\\DAV\\Exception\\Forbidden",
+		http.StatusTooEarly:         "Sabre\\DAV\\Exception\\TooEarly",
+		http.StatusTooManyRequests:  "Sabre\\DAV\\Exception\\TooManyRequests",
 	}
+
+	// defaultException is used for status codes which have no dedicated sabredav
+	// exception name, so that clients always receive a non-empty exception.
+	defaultException = "Sabre\\DAV\\Exception"
 )
 
 // Service defines the extension handlers.
@@ -97,16 +105,11 @@ func NewService(opts ...Option) (Service, error) {
 				r.Get("/remote.php/dav/spaces/{id}/*", svc.SpacesThumbnail)
 				r.Get("/dav/spaces/{id}", svc.SpacesThumbnail)
 				r.Get("/dav/spaces/{id}/*", svc.SpacesThumbnail)
-				r.MethodFunc("REPORT", "/remote.php/dav/spaces*", svc.Search)
-				r.MethodFunc("REPORT", "/dav/spaces*", svc.Search)
 
 				r.Get("/remote.php/dav/files/{id}", svc.Thumbnail)
 				r.Get("/remote.php/dav/files/{id}/*", svc.Thumbnail)
 				r.Get("/dav/files/{id}", svc.Thumbnail)
 				r.Get("/dav/files/{id}/*", svc.Thumbnail)
-
-				r.MethodFunc("REPORT", "/remote.php/dav/files*", svc.Search)
-				r.MethodFunc("REPORT", "/dav/files*", svc.Search)
 			})
 
 			r.Group(func(r chi.Router) {
@@ -123,11 +126,22 @@ func NewService(opts ...Option) (Service, error) {
 				r.Use(svc.WebDAVContext())
 				r.Get("/remote.php/webdav/*", svc.Thumbnail)
 				r.Get("/webdav/*", svc.Thumbnail)
-
-				r.MethodFunc("REPORT", "/remote.php/webdav*", svc.Search)
-				r.MethodFunc("REPORT", "/webdav*", svc.Search)
 			})
 		}
+
+		r.Group(func(r chi.Router) {
+			r.Use(svc.DavUserContext())
+			r.MethodFunc("REPORT", "/remote.php/dav/spaces*", svc.Search)
+			r.MethodFunc("REPORT", "/dav/spaces*", svc.Search)
+			r.MethodFunc("REPORT", "/remote.php/dav/files*", svc.Search)
+			r.MethodFunc("REPORT", "/dav/files*", svc.Search)
+		})
+
+		r.Group(func(r chi.Router) {
+			r.Use(svc.WebDAVContext())
+			r.MethodFunc("REPORT", "/remote.php/webdav*", svc.Search)
+			r.MethodFunc("REPORT", "/webdav*", svc.Search)
+		})
 
 	})
 
@@ -260,7 +274,11 @@ func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
 		case http.StatusForbidden:
 			renderError(w, r, errPermissionDenied(e.Detail))
 		default:
-			renderError(w, r, errInternalError(err.Error()))
+			// an unmapped error is an infrastructure problem, not a property of the
+			// requested file: log it at error level so it is visible in production.
+			logger.Error().Err(err).Msg("could not get thumbnail")
+			renderError(w, r, errInternalError("could not get thumbnail"))
+			return
 		}
 		logger.Debug().Err(err).Msg("could not get thumbnail")
 		return
@@ -358,9 +376,13 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		case http.StatusForbidden:
 			renderError(w, r, errPermissionDenied(e.Detail))
 		default:
-			renderError(w, r, errInternalError(err.Error()))
+			// an unmapped error is an infrastructure problem, not a property of the
+			// requested file: log it at error level so it is visible in production.
+			logger.Error().Err(err).Msg("could not get thumbnail")
+			renderError(w, r, errInternalError("could not get thumbnail"))
+			return
 		}
-		g.log.Error().Err(err).Msg("could not get thumbnail")
+		logger.Debug().Err(err).Msg("could not get thumbnail")
 		return
 	}
 
@@ -403,9 +425,13 @@ func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
 			addRetryAfterHeader(w)
 			renderError(w, r, errTooManyRequests(e.Detail))
 		default:
-			renderError(w, r, errInternalError(err.Error()))
+			// an unmapped error is an infrastructure problem, not a property of the
+			// requested file: log it at error level so it is visible in production.
+			logger.Error().Err(err).Msg("could not get thumbnail")
+			renderError(w, r, errInternalError("could not get thumbnail"))
+			return
 		}
-		g.log.Error().Err(err).Msg("could not get thumbnail")
+		logger.Debug().Err(err).Msg("could not get thumbnail")
 		return
 	}
 
@@ -448,7 +474,11 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 			addRetryAfterHeader(w)
 			renderError(w, r, errTooManyRequests(e.Detail))
 		default:
-			renderError(w, r, errInternalError(err.Error()))
+			// an unmapped error is an infrastructure problem, not a property of the
+			// requested file: log it at error level so it is visible in production.
+			logger.Error().Err(err).Msg("could not get thumbnail")
+			renderError(w, r, errInternalError("could not get thumbnail"))
+			return
 		}
 		logger.Debug().Err(err).Msg("could not get thumbnail")
 		return
@@ -459,13 +489,13 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 
 func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w http.ResponseWriter, r *http.Request) {
 	logger := g.log.SubloggerWithRequestID(r.Context())
-	client := &http.Client{
-		// Timeout: time.Second * 5,
-	}
+	client := rhttp.GetHTTPClient(
+	// double-check options; previous code only had 5s timeout and it was commented
+	)
 
 	dlReq, err := tracing.GetNewRequest(r.Context(), http.MethodGet, rsp.DataEndpoint, http.NoBody)
 	if err != nil {
-		renderError(w, r, errInternalError(err.Error()))
+		renderError(w, r, errInternalError("could not download thumbnail"))
 		logger.Error().Err(err).Msg("could not create download thumbnail request")
 		return
 	}
@@ -473,7 +503,7 @@ func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w
 
 	dlRsp, err := client.Do(dlReq)
 	if err != nil {
-		renderError(w, r, errInternalError(err.Error()))
+		renderError(w, r, errInternalError("could not download thumbnail"))
 		logger.Error().Err(err).Msg("could not download thumbnail: transport error")
 		return
 	}
@@ -520,11 +550,15 @@ type errResponse struct {
 }
 
 func newErrResponse(statusCode int, msg string) *errResponse {
+	exception, ok := codesEnum[statusCode]
+	if !ok {
+		exception = defaultException
+	}
 	rsp := &errResponse{
 		HTTPStatusCode: statusCode,
 		Xmlnsd:         "DAV",
 		Xmlnss:         "http://sabredav.org/ns",
-		Exception:      codesEnum[statusCode],
+		Exception:      exception,
 	}
 	if msg != "" {
 		rsp.Message = msg

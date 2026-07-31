@@ -28,8 +28,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/owncloud/reva/v2/pkg/storage/cache"
 	"github.com/google/renameio/v2"
+	"github.com/owncloud/reva/v2/pkg/appctx"
+	"github.com/owncloud/reva/v2/pkg/storage/cache"
 	"github.com/pkg/xattr"
 	"github.com/rogpeppe/go-internal/lockedfile"
 	"github.com/shamaton/msgpack/v2"
@@ -250,18 +251,23 @@ func (b MessagePackBackend) loadAttributes(ctx context.Context, path string, sou
 	if err != nil {
 		return nil, err
 	}
-	if len(msgBytes) > 0 {
-		err = msgpack.Unmarshal(msgBytes, &attribs)
-		if err != nil {
-			return nil, err
-		}
+	if len(msgBytes) == 0 {
+		return nil, errors.New("encountered empty metadata file")
+	}
+
+	err = msgpack.Unmarshal(msgBytes, &attribs)
+	if err != nil {
+		return nil, err
 	}
 
 	_, subspan := tracer.Start(ctx, "metaCache.PushToCache")
 	err = b.metaCache.PushToCache(b.cacheKey(path), attribs)
 	subspan.End()
 	if err != nil {
-		return nil, err
+		// The attributes were read successfully from disk. A failure to
+		// write them back into the cache (e.g. a dead NATS connection) must
+		// not fail the read - log it and return the data we already have.
+		appctx.GetLogger(ctx).Warn().Err(err).Str("path", path).Msg("failed to write attributes to cache")
 	}
 
 	return attribs, nil

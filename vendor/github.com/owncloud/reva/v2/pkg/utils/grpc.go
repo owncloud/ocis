@@ -200,7 +200,12 @@ func GetResource(ctx context.Context, ref *storageprovider.Reference, gwc gatewa
 	return res.GetInfo(), nil
 }
 
-// CheckPermission checks if the user role contains the given permission
+// CheckPermission checks if the user role contains the given permission.
+//
+// It returns (true, nil) if granted, (false, nil) if denied, and (false, err)
+// if the permission could not be determined (transport error or a non-OK status
+// other than PERMISSION_DENIED). Callers must treat a non-nil error as "unknown"
+// and fail closed rather than as a denial.
 func CheckPermission(ctx context.Context, perm string, gwc gateway.GatewayAPIClient) (bool, error) {
 	user := ctxpkg.ContextMustGetUser(ctx)
 	resp, err := gwc.CheckPermission(ctx, &permissions.CheckPermissionRequest{
@@ -211,7 +216,17 @@ func CheckPermission(ctx context.Context, perm string, gwc gateway.GatewayAPICli
 		},
 		Permission: perm,
 	})
-	return resp.GetStatus().GetCode() == rpc.Code_CODE_OK, err
+	if err != nil {
+		return false, err
+	}
+	switch code := resp.GetStatus().GetCode(); code {
+	case rpc.Code_CODE_OK:
+		return true, nil
+	case rpc.Code_CODE_PERMISSION_DENIED:
+		return false, nil
+	default:
+		return false, fmt.Errorf("permission check for %q returned non-authoritative status %q: %s", perm, code, resp.GetStatus().GetMessage())
+	}
 }
 
 // IsStatusCodeError returns true if `err` was caused because of status code `code`

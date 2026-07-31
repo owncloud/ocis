@@ -2,6 +2,7 @@ package strutil
 
 import (
 	"errors"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -9,6 +10,13 @@ import (
 
 	"github.com/gookit/goutil/byteutil"
 )
+
+var regNumVersion = regexp.MustCompile(`[0-9][\d.]+([_-]\d+)?`)
+
+// NumVersion parse input string, get valid number version. eg: go-1.22.3 -> 1.22.3
+func NumVersion(s string) string {
+	return regNumVersion.FindString(s)
+}
 
 // MustToTime convert date string to time.Time
 func MustToTime(s string, layouts ...string) time.Time {
@@ -48,10 +56,19 @@ var layoutMap = map[int][]string{
 //
 // NOTE: always use local timezone.
 func ToTime(s string, layouts ...string) (t time.Time, err error) {
+	return ToTimeIn(s, time.Local, layouts...)
+}
+
+// ToTimeIn convert date string to time.Time with location.
+func ToTimeIn(s string, loc *time.Location, layouts ...string) (t time.Time, err error) {
+	if loc == nil {
+		loc = time.Local
+	}
+
 	// custom layout
 	if len(layouts) > 0 {
 		if len(layouts[0]) > 0 {
-			return time.ParseInLocation(layouts[0], s, time.Local)
+			return time.ParseInLocation(layouts[0], s, loc)
 		}
 
 		err = ErrDateLayout
@@ -80,16 +97,19 @@ func ToTime(s string, layouts ...string) (t time.Time, err error) {
 
 		// date string has "/". eg: "2006/01/02 15:04:05"
 		if hasSlashR {
-			layout = strings.Replace(layout, "-", "/", -1)
+			layout = strings.ReplaceAll(layout, "-", "/")
+		}
+		if strLn > 10 && s[10] != ' ' && len(layout) > 10 && layout[10] == ' ' {
+			layout = layout[:10] + string(s[10]) + layout[11:]
 		}
 
-		t, err = time.ParseInLocation(layout, s, time.Local)
+		t, err = time.ParseInLocation(layout, s, loc)
 		if err == nil {
 			return
 		}
 	}
 
-	// t, err = time.ParseInLocation(layout, s, time.Local)
+	// t, err = time.ParseInLocation(layout, s, loc)
 	return
 }
 

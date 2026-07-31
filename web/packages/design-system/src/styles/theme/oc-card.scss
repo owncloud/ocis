@@ -1,0 +1,42 @@
+// the original `uikit card` has way more rules,
+// esp. regarding different view sizes
+// trying to get away with as little as possible
+// and shifting towards using our margin/padding helper classes
+
+.oc-card {
+  @extend .oc-rounded;
+
+  background-color: var(--oc-color-background-highlight);
+  box-sizing: border-box;
+  color: var(--oc-color-text-default);
+  position: relative;
+  transition: box-shadow 0.1s ease-in-out;
+}
+
+.oc-card-header {
+  border-bottom: 1px solid var(--oc-color-input-border);
+  display: flow-root;
+  padding: var(--oc-space-small) var(--oc-space-medium);
+}
+
+.oc-card-title {
+  font-size: var(--oc-font-size-large);
+  font-weight: var(--oc-font-weight-semibold);
+  margin: 0 0 var(--oc-space-large) 0;
+}
+
+.oc-card-body {
+  display: flow-root;
+  padding: var(--oc-space-large) var(--oc-space-large);
+}
+
+.oc-card-footer {
+  display: flow-root;
+  padding: var(--oc-space-medium) var(--oc-space-large);
+}
+
+.oc-card-body > :last-child,
+.oc-card-header > :last-child,
+.oc-card-footer > :last-child {
+  margin-bottom: 0;
+}

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/stretchr/testify/assert"
@@ -156,6 +157,34 @@ func TestSignedURLAuth_createSignature(t *testing.T) {
 	if s != expected {
 		t.Fail()
 	}
+}
+
+// TestSignedURLAuth_validateEmptySigningKeyStore guards against an out-of-range
+// panic when the signing-key store returns no record without an error. This
+// happens with the "noop" store (e.g. when OCIS_CACHE_STORE=noop, which also
+// governs the presigned-URL signing-key store). The request must fail
+// authentication, not panic.
+func TestSignedURLAuth_validateEmptySigningKeyStore(t *testing.T) {
+	pua := SignedURLAuthenticator{
+		PreSignedURLConfig: config.PreSignedURL{
+			AllowedHTTPMethods: []string{"get"},
+			Enabled:            true,
+		},
+		Store:  store.NewNoopStore(),
+		Logger: log.NewLogger(),
+		Now: func() time.Time {
+			tm, _ := time.Parse(time.RFC3339, "2019-05-14T11:02:00.000Z")
+			return tm
+		},
+	}
+
+	u := userpb.User{Id: &userpb.UserId{OpaqueId: "useri"}, DisplayName: "Test User"}
+	ctx := revactx.ContextSetUser(context.Background(), &u)
+	r := httptest.NewRequest("", "http://cloud.example.net/?OC-Credential=alice&OC-Date=2019-05-14T11%3A01%3A58.135Z&OC-Expires=1200&OC-Verb=GET&OC-Signature=f9e53a1ee23caef10f72ec392c1b537317491b687bfdd224c782be197d9ca2b6", nil).WithContext(ctx)
+
+	var err error
+	assert.NotPanics(t, func() { err = pua.validate(r) }, "validate must not panic when the signing key store is empty")
+	assert.Error(t, err, "validate must reject the request when no signing key is found")
 }
 
 func TestSignedURLAuth_validate(t *testing.T) {

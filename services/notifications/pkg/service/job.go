@@ -11,7 +11,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func (s eventsNotifier) sendGroupedEmailsJob(sendEmailsEvent events.SendEmailsEvent, eventId string) {
+func (s eventsNotifier) sendGroupedEmailsJob(ctx context.Context, sendEmailsEvent events.SendEmailsEvent, eventId string) {
 	logger := s.logger.With().
 		Str("event", "SendEmailsEvent").
 		Str("eventId", eventId).
@@ -28,8 +28,6 @@ func (s eventsNotifier) sendGroupedEmailsJob(sendEmailsEvent events.SendEmailsEv
 		logger.Error().Err(err).Msg("could not get list of keys")
 		return
 	}
-
-	ctx := context.Background()
 
 	jobs := make(chan string, 10)
 	go func() {
@@ -63,7 +61,7 @@ func (s eventsNotifier) createGroupedMail(ctx context.Context, logger zerolog.Lo
 				Str("eventId", te.ID.OpaqueId).
 				Logger()
 
-			executant, spaceName, shareLink, _, err := s.prepareSpaceShared(logger, te)
+			executant, spaceName, shareLink, _, err := s.prepareSpaceShared(ctx, logger, te)
 			if err != nil {
 				logger.Error().Err(err).Msg("could not prepare vars for grouped email")
 				continue
@@ -81,7 +79,7 @@ func (s eventsNotifier) createGroupedMail(ctx context.Context, logger zerolog.Lo
 				Str("eventId", te.ID.OpaqueId).
 				Logger()
 
-			executant, spaceName, shareLink, _, err := s.prepareSpaceUnshared(logger, te)
+			executant, spaceName, shareLink, _, err := s.prepareSpaceUnshared(ctx, logger, te)
 			if err != nil {
 				logger.Error().Err(err).Msg("could not prepare vars for grouped email")
 				continue
@@ -104,7 +102,7 @@ func (s eventsNotifier) createGroupedMail(ctx context.Context, logger zerolog.Lo
 				Str("eventId", te.ItemID.OpaqueId).
 				Logger()
 
-			owner, shareFolder, shareLink, _, err := s.prepareShareCreated(logger, te)
+			owner, shareFolder, shareLink, _, err := s.prepareShareCreated(ctx, logger, te)
 			if err != nil {
 				logger.Error().Err(err).Msg("could not prepare vars for grouped email")
 				continue
@@ -121,7 +119,7 @@ func (s eventsNotifier) createGroupedMail(ctx context.Context, logger zerolog.Lo
 				Str("eventId", te.ItemID.OpaqueId).
 				Logger()
 
-			shareFolder, _, err := s.prepareShareExpired(logger, te)
+			shareFolder, _, err := s.prepareShareExpired(ctx, logger, te)
 			if err != nil {
 				logger.Error().Err(err).Msg("could not prepare vars for grouped email")
 				continue
@@ -136,7 +134,7 @@ func (s eventsNotifier) createGroupedMail(ctx context.Context, logger zerolog.Lo
 				Str("event", "ShareRemoved").
 				Str("eventId", te.ItemID.OpaqueId).
 				Logger()
-			executant, shareFolder, _, err := s.prepareShareRemoved(logger, te)
+			executant, shareFolder, _, err := s.prepareShareRemoved(ctx, logger, te)
 			if err != nil {
 				logger.Error().Err(err).Msg("could not prepare vars for grouped email")
 				continue

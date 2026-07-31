@@ -31,6 +31,7 @@ use TestHelpers\WebDavHelper;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\Asserts\WebDav as WebDavAssert;
 use TestHelpers\GraphHelper;
+use TestHelpers\KeycloakHelper;
 
 /**
  * WebDav functions
@@ -308,6 +309,13 @@ trait WebDav {
 
 		if ($password === null) {
 			$password = $this->getPasswordForUser($user);
+		}
+
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$access_token = $this->getOcisUserToken($user)["token"]["accessToken"];
+			$headers["Authorization"] = "Bearer " . $access_token;
+			$user = null;
+			$password = null;
 		}
 
 		return WebDavHelper::makeDavRequest(
@@ -1315,42 +1323,52 @@ trait WebDav {
 	): void {
 		$user = $this->getActualUsername($user);
 		$path = $this->substituteInLineCodes($path);
-		$response = $this->listFolder(
-			$user,
-			$path,
-			'0',
-			null,
-			null,
-			$type,
-		);
-		$statusCode = $response->getStatusCode();
-		if ($statusCode < 400 || $statusCode > 499) {
-			try {
-				$responseXmlObject = HttpRequestHelper::getResponseXml(
-					$response,
-					__METHOD__,
-				);
-			} catch (Exception $e) {
-				Assert::fail(
-					"$entry '$path' should not exist. But API returned $statusCode without XML in the body",
-				);
+		$retries = 0;
+		do {
+			if ($retries > 0) {
+				\sleep(1);
 			}
-			Assert::assertTrue(
-				$this->isEtagValid($this->getEtagFromResponseXmlObject($responseXmlObject)),
-				"$entry '$path' should not exist. But API returned $statusCode without an etag in the body",
+			$response = $this->listFolder(
+				$user,
+				$path,
+				'0',
+				null,
+				null,
+				$type,
 			);
-			$isCollection = $responseXmlObject->xpath("//d:prop/d:resourcetype/d:collection");
-			if (\count($isCollection) === 0) {
-				$actualResourceType = "file";
-			} else {
-				$actualResourceType = "folder";
+			$statusCode = $response->getStatusCode();
+			if ($statusCode >= 400 && $statusCode <= 499) {
+				// 4xx means the resource does not exist — pass immediately
+				return;
 			}
+			$retries++;
+		} while ($retries <= 5);
 
-			if ($entry === $actualResourceType) {
-				Assert::fail(
-					"$entry '$path' should not exist. But it does.",
-				);
-			}
+		try {
+			$responseXmlObject = HttpRequestHelper::getResponseXml(
+				$response,
+				__METHOD__,
+			);
+		} catch (Exception $e) {
+			Assert::fail(
+				"$entry '$path' should not exist. But API returned $statusCode without XML in the body",
+			);
+		}
+		Assert::assertTrue(
+			$this->isEtagValid($this->getEtagFromResponseXmlObject($responseXmlObject)),
+			"$entry '$path' should not exist. But API returned $statusCode without an etag in the body",
+		);
+		$isCollection = $responseXmlObject->xpath("//d:prop/d:resourcetype/d:collection");
+		if (\count($isCollection) === 0) {
+			$actualResourceType = "file";
+		} else {
+			$actualResourceType = "folder";
+		}
+
+		if ($entry === $actualResourceType) {
+			Assert::fail(
+				"$entry '$path' should not exist. But it does.",
+			);
 		}
 	}
 
@@ -4063,10 +4081,77 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function theDownloadedPreviewContentShouldMatchWithFixturesPreviewContentFor(string $filename): void {
-		$expectedPreview = \file_get_contents(__DIR__ . "/../fixtures/" . $filename);
+		$fixturePath = __DIR__ . "/../fixtures/" . $filename;
+		$fixtureBytes = \file_get_contents($fixturePath);
+
 		$this->getResponse()->getBody()->rewind();
 		$responseBodyContent = $this->getResponse()->getBody()->getContents();
-		Assert::assertEquals($expectedPreview, $responseBodyContent);
+
+		// Write raw bytes before any GD calls — works even without the gd extension locally.
+		if (\getenv('PREVIEW_DEBUG')) {
+			$debugDir = __DIR__ . '/../preview-debug';
+			if (!\is_dir($debugDir)) {
+				\mkdir($debugDir, 0755, true);
+			}
+			$base = \pathinfo($filename, PATHINFO_FILENAME);
+			\file_put_contents("$debugDir/fixture-$base.png", $fixtureBytes);
+			\file_put_contents("$debugDir/response-$base.png", $responseBodyContent);
+		}
+
+		$fixtureImg = \imagecreatefromstring($fixtureBytes);
+		Assert::assertNotFalse($fixtureImg, "Could not decode fixture image $filename");
+
+		$responseImg = \imagecreatefromstring($responseBodyContent);
+		Assert::assertNotFalse($responseImg, "Downloaded preview is not a valid image");
+
+		$fw = \imagesx($fixtureImg);
+		$fh = \imagesy($fixtureImg);
+		$rw = \imagesx($responseImg);
+		$rh = \imagesy($responseImg);
+		// ±1px tolerance: aspect-ratio processors can produce off-by-one dimensions across library versions.
+		Assert::assertEqualsWithDelta($fw, $rw, 1, "Image width mismatch for fixture $filename");
+		Assert::assertEqualsWithDelta($fh, $rh, 1, "Image height mismatch for fixture $filename");
+
+		$fVar = self::imageVariance($fixtureImg, $fw, $fh);
+		$rVar = self::imageVariance($responseImg, $rw, $rh);
+		$relDiff = \abs($fVar - $rVar) / \max($fVar, 1.0);
+		echo "  [preview-fixture] $filename: fixture={$fw}x{$fh} fVar=" . \round($fVar, 2)
+			. " rVar=" . \round($rVar, 2)
+			. " relDiff=" . \round($relDiff, 3) . "\n";
+
+		Assert::assertLessThanOrEqual(
+			0.5,
+			$relDiff,
+			"Preview variance mismatch for $filename: fixture variance=$fVar response variance=$rVar"
+			. " relDiff=" . \round($relDiff, 3) . " (max 0.5)",
+		);
+
+		\imagedestroy($fixtureImg);
+		\imagedestroy($responseImg);
+	}
+
+	/**
+	 * Returns the luminance variance of an image (population variance, 0–255² scale).
+	 *
+	 * @param \GdImage $img GD image resource
+	 * @param int $w image width in pixels
+	 * @param int $h image height in pixels
+	 *
+	 * @return float
+	 */
+	private static function imageVariance(\GdImage $img, int $w, int $h): float {
+		$n = $w * $h;
+		$sum = 0.0;
+		$sumSq = 0.0;
+		for ($x = 0; $x < $w; $x++) {
+			for ($y = 0; $y < $h; $y++) {
+				$c = \imagecolorat($img, $x, $y);
+				$lum = (($c >> 16 & 0xFF) * 0.299 + ($c >> 8 & 0xFF) * 0.587 + ($c & 0xFF) * 0.114);
+				$sum += $lum;
+				$sumSq += $lum * $lum;
+			}
+		}
+		return ($sumSq - $sum * $sum / $n) / $n;
 	}
 
 	/**

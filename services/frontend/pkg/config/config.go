@@ -33,6 +33,8 @@ type Config struct {
 	DefaultUploadProtocol          string   `yaml:"default_upload_protocol" env:"FRONTEND_DEFAULT_UPLOAD_PROTOCOL" desc:"The default upload protocol to use in clients. Currently only 'tus' is available. See the developer API documentation for more details about TUS." introductionVersion:"pre5.0"`
 	EnableFederatedSharingIncoming bool     `yaml:"enable_federated_sharing_incoming" env:"OCIS_ENABLE_OCM;FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING" desc:"Changing this value is NOT supported. Enables support for incoming federated sharing for clients. The backend behaviour is not changed." introductionVersion:"pre5.0"`
 	EnableFederatedSharingOutgoing bool     `yaml:"enable_federated_sharing_outgoing" env:"OCIS_ENABLE_OCM;FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING" desc:"Changing this value is NOT supported. Enables support for outgoing federated sharing for clients. The backend behaviour is not changed." introductionVersion:"pre5.0"`
+	EnableUserSharing              bool     `yaml:"enable_user_sharing" env:"OCIS_ENABLE_USER_SHARING" desc:"Enables direct sharing with users and groups. When disabled, creating new user or group shares is rejected and searching for users to share with is disabled. Public link sharing is not affected." introductionVersion:"%%NEXT_PRODUCTION_VERSION%%"`
+	EnablePublicSharing            bool     `yaml:"enable_public_sharing" env:"OCIS_ENABLE_PUBLIC_SHARING" desc:"Enables public link sharing. When disabled, creating new public links is rejected. Direct sharing with users and groups is not affected." introductionVersion:"%%NEXT_PRODUCTION_VERSION%%"`
 	SearchMinLength                int      `yaml:"search_min_length" env:"FRONTEND_SEARCH_MIN_LENGTH" desc:"Minimum number of characters to enter before a client should start a search for Share receivers. This setting can be used to customize the user experience if e.g too many results are displayed." introductionVersion:"pre5.0"`
 	UserSearchDisplayedAttributes  []string `yaml:"user_search_displayed_attributes" env:"OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES;FRONTEND_USER_SEARCH_DISPLAYED_ATTRIBUTES" desc:"A list of user attributes to display in the user search results." introductionVersion:"7.3.0"`
 	Edition                        string   `yaml:"edition" env:"OCIS_EDITION;FRONTEND_EDITION" desc:"Edition of oCIS. Used for branding purposes." introductionVersion:"pre5.0"`
@@ -55,7 +57,7 @@ type Config struct {
 	Events           Events                `yaml:"events"`
 	GRPCClientTLS    *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 	AutoAcceptShares bool                  `yaml:"auto_accept_shares" env:"FRONTEND_AUTO_ACCEPT_SHARES" desc:"Defines if shares should be auto accepted by default. Users can change this setting individually in their profile." introductionVersion:"5.0"`
-	ServiceAccount   ServiceAccount        `yaml:"service_account"`
+	ServiceAccount   ServiceAccount        `yaml:"service_account" mask:"struct"`
 
 	PasswordPolicy PasswordPolicy `yaml:"password_policy"`
 	Validation     Validation     `yaml:"validation"`
@@ -65,6 +67,8 @@ type Config struct {
 	ServerManagedSpaces bool `yaml:"server_managed_spaces" env:"OCIS_CLAIM_MANAGED_SPACES_ENABLED" desc:"Enables Space management through OIDC claims. See the text description for more details." introductionVersion:"7.2.0"`
 
 	MultiFactorAuthentication MFAConfig `yaml:"mfa"`
+
+	EnableVaultMode bool `yaml:"enable_vault_mode" env:"OCIS_ENABLE_VAULT_MODE;FRONTEND_ENABLE_VAULT_MODE" desc:"Enable vault mode. When enabled, the capabilities endpoint will report vault as enabled and the capabilities?vault=true endpoint will return capabilities with public sharing and federation disabled." introductionVersion:"8.1.0"`
 
 	Context context.Context `yaml:"-"`
 }
@@ -185,7 +189,7 @@ type Events struct {
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
 	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;FRONTEND_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
-	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;FRONTEND_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;FRONTEND_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0" mask:"password"`
 }
 
 // PasswordPolicy configures reva password policy
@@ -205,6 +209,7 @@ type Validation struct {
 
 // MFAConfig configures multi factor multifactor authentication
 type MFAConfig struct {
-	Enabled        bool     `yaml:"enabled" env:"OCIS_MFA_ENABLED" desc:"Set to true to enable multi factor authentication. See the documentation for more details." introductionVersion:"7.3.0"`
-	AuthLevelNames []string `yaml:"auth_level_names" env:"OCIS_MFA_AUTH_LEVEL_NAMES" desc:"This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA)." introductionVersion:"7.3.0"`
+	Enabled         bool     `yaml:"enabled" env:"OCIS_MFA_ENABLED" desc:"Set to true to enable multi factor authentication. See the documentation for more details." introductionVersion:"7.3.0"`
+	AuthLevelNames  []string `yaml:"auth_level_names" env:"OCIS_MFA_AUTH_LEVEL_NAMES" desc:"This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA)." introductionVersion:"7.3.0"`
+	SessionDuration int      `yaml:"session_duration" env:"OCIS_MFA_SESSION_DURATION" desc:"The duration in seconds that a multi-factor authentication session is valid. After this time the user will be prompted to re-authenticate. Defaults to 3600 (1 hour)." introductionVersion:"8.1.0"`
 }

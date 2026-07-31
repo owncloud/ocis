@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`GroupSelect > renders the select input 1`] = `
+"<div id="user-group-select-form">
+  <oc-select-stub label="Groups" id="oc-select-1" filter="[Function]" disabled="false" labelhidden="false" optionlabel="displayName" searchable="true" clearable="false" loading="false" fixmessageline="true" multiple="true" readonly="false" positionfixed="false" model-value="[object Object]" class="oc-mb-s" options="undefined"></oc-select-stub>
+</div>"
+`;

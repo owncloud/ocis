@@ -6,9 +6,11 @@ import (
 	"errors"
 	"net/http"
 
+	cs3user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/response"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/utils"
 	"go-micro.dev/v4/store"
 )
 
@@ -20,6 +22,13 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		//o.logger.Error().Msg("missing user in context")
 		o.mustRender(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context"))
+		return
+	}
+
+	// Refuse to disclose the signing key to public-share guests; the key belongs to
+	// the share owner and would let the caller forge signed URLs as that user.
+	if u.GetId().GetType() == cs3user.UserType_USER_TYPE_GUEST || utils.ExistsInOpaque(u.GetOpaque(), "public-share-role") {
+		o.mustRender(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "unauthorized"))
 		return
 	}
 

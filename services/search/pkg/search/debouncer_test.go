@@ -1,6 +1,7 @@
 package search_test
 
 import (
+	"context"
 	"sync/atomic"
 	"time"
 
@@ -23,7 +24,7 @@ var _ = Describe("SpaceDebouncer", func() {
 
 	BeforeEach(func() {
 		callCount = atomic.Int32{}
-		debouncer = search.NewSpaceDebouncer(50*time.Millisecond, func(id *sprovider.StorageSpaceId) {
+		debouncer = search.NewSpaceDebouncer(50*time.Millisecond, func(ctx context.Context, id *sprovider.StorageSpaceId) {
 			if id.OpaqueId == "spaceid" {
 				callCount.Add(1)
 			}
@@ -31,22 +32,24 @@ var _ = Describe("SpaceDebouncer", func() {
 	})
 
 	It("debounces", func() {
-		debouncer.Debounce(spaceid)
-		debouncer.Debounce(spaceid)
-		debouncer.Debounce(spaceid)
+		ctx := context.Background()
+		debouncer.Debounce(ctx, spaceid)
+		debouncer.Debounce(ctx, spaceid)
+		debouncer.Debounce(ctx, spaceid)
 		Eventually(func() int {
 			return int(callCount.Load())
 		}, "200ms").Should(Equal(1))
 	})
 
 	It("works multiple times", func() {
-		debouncer.Debounce(spaceid)
-		debouncer.Debounce(spaceid)
-		debouncer.Debounce(spaceid)
+		ctx := context.Background()
+		debouncer.Debounce(ctx, spaceid)
+		debouncer.Debounce(ctx, spaceid)
+		debouncer.Debounce(ctx, spaceid)
 		time.Sleep(100 * time.Millisecond)
 
-		debouncer.Debounce(spaceid)
-		debouncer.Debounce(spaceid)
+		debouncer.Debounce(ctx, spaceid)
+		debouncer.Debounce(ctx, spaceid)
 
 		Eventually(func() int {
 			return int(callCount.Load())
@@ -54,16 +57,17 @@ var _ = Describe("SpaceDebouncer", func() {
 	})
 
 	It("doesn't trigger twice simultaneously", func() {
-		debouncer = search.NewSpaceDebouncer(50*time.Millisecond, func(id *sprovider.StorageSpaceId) {
+		debouncer = search.NewSpaceDebouncer(50*time.Millisecond, func(ctx context.Context, id *sprovider.StorageSpaceId) {
 			if id.OpaqueId == "spaceid" {
 				callCount.Add(1)
 			}
 			time.Sleep(300 * time.Millisecond)
 		})
-		debouncer.Debounce(spaceid)
+		ctx := context.Background()
+		debouncer.Debounce(ctx, spaceid)
 		time.Sleep(100 * time.Millisecond) // Let it trigger once
 
-		debouncer.Debounce(spaceid)
+		debouncer.Debounce(ctx, spaceid)
 		time.Sleep(100 * time.Millisecond) // shouldn't trigger as the other run is still in progress
 		Expect(int(callCount.Load())).To(Equal(1))
 

@@ -247,14 +247,15 @@ type ServerCapability uint64
 
 // ServerInfo identifies remote servers.
 type ServerInfo struct {
-	Name     string            `json:"name"`
-	Host     string            `json:"host"`
-	ID       string            `json:"id"`
-	Cluster  string            `json:"cluster,omitempty"`
-	Domain   string            `json:"domain,omitempty"`
-	Version  string            `json:"ver"`
-	Tags     []string          `json:"tags,omitempty"`
-	Metadata map[string]string `json:"metadata,omitempty"`
+	Name         string            `json:"name"`
+	Host         string            `json:"host"`
+	ID           string            `json:"id"`
+	Cluster      string            `json:"cluster,omitempty"`
+	Domain       string            `json:"domain,omitempty"`
+	Version      string            `json:"ver"`
+	Tags         []string          `json:"tags,omitempty"`
+	Metadata     map[string]string `json:"metadata,omitempty"`
+	FeatureFlags map[string]bool   `json:"feature_flags,omitempty"`
 	// Whether JetStream is enabled (deprecated in favor of the `ServerCapability`).
 	JetStream bool `json:"jetstream"`
 	// Generic capability flags
@@ -328,6 +329,7 @@ type ClientInfo struct {
 	ClientType string        `json:"client_type,omitempty"`
 	MQTTClient string        `json:"client_id,omitempty"` // This is the MQTT client ID
 	Nonce      string        `json:"nonce,omitempty"`
+	Reply      string        `json:"reply,omitempty"` // Original reply subject after a service import (only when needed).
 }
 
 // forAssignmentSnap returns the minimum amount of ClientInfo we need for assignment snapshots.
@@ -372,7 +374,9 @@ type ServerStats struct {
 	ActiveAccounts       int                   `json:"active_accounts"`
 	NumSubs              uint32                `json:"subscriptions"`
 	Sent                 DataStats             `json:"sent"`
+	SentToClients        DataStats             `json:"sent_to_clients"`
 	Received             DataStats             `json:"received"`
+	ReceivedFromClients  DataStats             `json:"received_from_clients"`
 	SlowConsumers        int64                 `json:"slow_consumers"`
 	SlowConsumersStats   *SlowConsumersStats   `json:"slow_consumer_stats,omitempty"`
 	StaleConnections     int64                 `json:"stale_connections,omitempty"`
@@ -518,7 +522,7 @@ RESET:
 
 	// Grab tags and metadata.
 	opts := s.getOpts()
-	tags, metadata := opts.Tags, opts.Metadata
+	tags, metadata, featureFlags := opts.Tags, opts.Metadata, opts.getMergedFeatureFlags()
 
 	for s.eventsRunning() {
 		select {
@@ -536,6 +540,7 @@ RESET:
 					si.Time = time.Now().UTC()
 					si.Tags = tags
 					si.Metadata = metadata
+					si.FeatureFlags = featureFlags
 					si.Flags = 0
 					if js {
 						// New capability based flags.
@@ -609,7 +614,7 @@ RESET:
 
 				// Optional raw header addition.
 				if pm.hdr != nil {
-					b = append(pm.hdr, b...)
+					b = append(pm.hdr[:len(pm.hdr):len(pm.hdr)], b...)
 					nhdr := len(pm.hdr)
 					nsize := len(b) - LEN_CR_LF
 					// MQTT producers don't have CRLF, so add it back.
@@ -945,8 +950,12 @@ func (s *Server) sendStatsz(subj string) {
 	m.Stats.ActiveAccounts = int(atomic.LoadInt32(&s.activeAccounts))
 	m.Stats.Received.Msgs = atomic.LoadInt64(&s.inMsgs)
 	m.Stats.Received.Bytes = atomic.LoadInt64(&s.inBytes)
+	m.Stats.ReceivedFromClients.Msgs = atomic.LoadInt64(&s.inClientMsgs)
+	m.Stats.ReceivedFromClients.Bytes = atomic.LoadInt64(&s.inClientBytes)
 	m.Stats.Sent.Msgs = atomic.LoadInt64(&s.outMsgs)
 	m.Stats.Sent.Bytes = atomic.LoadInt64(&s.outBytes)
+	m.Stats.SentToClients.Msgs = atomic.LoadInt64(&s.outClientMsgs)
+	m.Stats.SentToClients.Bytes = atomic.LoadInt64(&s.outClientBytes)
 	m.Stats.SlowConsumers = atomic.LoadInt64(&s.slowConsumers)
 	// Evaluate the slow consumer stats, but set it only if one of the value is not 0.
 	scs := &SlowConsumersStats{
@@ -1052,8 +1061,15 @@ func (s *Server) sendStatsz(subj string) {
 					Size:   mg.ClusterSize(),
 				}
 			}
-			if ipq := s.jsAPIRoutedReqs; ipq != nil && jStat.Meta != nil {
-				jStat.Meta.Pending = ipq.len()
+			if jStat.Meta != nil {
+				if ipq := s.jsAPIRoutedReqs; ipq != nil {
+					jStat.Meta.PendingRequests = ipq.len()
+				}
+				if ipq := s.jsAPIRoutedInfoReqs; ipq != nil {
+					jStat.Meta.PendingInfos = ipq.len()
+				}
+				jStat.Meta.Pending = jStat.Meta.PendingRequests + jStat.Meta.PendingInfos
+				jStat.Meta.Snapshot = s.metaClusterSnapshotStats(js, mg)
 			}
 		}
 		jStat.Limits = &s.getOpts().JetStreamLimits
@@ -1500,6 +1516,8 @@ func (s *Server) initEventTracking() {
 type UserInfo struct {
 	UserID      string        `json:"user"`
 	Account     string        `json:"account"`
+	AccountName string        `json:"account_name,omitempty"`
+	UserName    string        `json:"user_name,omitempty"`
 	Permissions *Permissions  `json:"permissions,omitempty"`
 	Expires     time.Duration `json:"expires,omitempty"`
 }
@@ -1519,9 +1537,22 @@ func (s *Server) userInfoReq(sub *subscription, c *client, _ *Account, subject, 
 		return
 	}
 
+	// Look up the requester's account directly from ci.Account rather than
+	// using the acc returned by getRequestInfo, which may resolve to the
+	// service account (ci.Service) when the request arrives via a chained
+	// service import.
+	var accountName string
+	if ci.Account != _EMPTY_ {
+		if reqAcc, _ := s.LookupAccount(ci.Account); reqAcc != nil {
+			accountName = reqAcc.getNameTag()
+		}
+	}
+
 	response.Data = &UserInfo{
 		UserID:      ci.User,
 		Account:     ci.Account,
+		AccountName: accountName,
+		UserName:    ci.NameTag,
 		Permissions: c.publicPermissions(),
 		Expires:     c.claimExpiration(),
 	}
@@ -1855,9 +1886,14 @@ func (s *Server) shutdownEventing() {
 	}
 
 	s.mu.Lock()
+	if s.sys == nil || s.sys.resetCh == nil {
+		s.mu.Unlock()
+		return
+	}
 	clearTimer(&s.sys.sweeper)
 	clearTimer(&s.sys.stmr)
-	rc := s.sys.resetCh
+	// We intentionally do not close resetCh. A sender that captured the channel
+	// may still attempt to send after the internal send loop has exited.
 	s.sys.resetCh = nil
 	wg := &s.sys.wg
 	s.mu.Unlock()
@@ -1877,9 +1913,6 @@ func (s *Server) shutdownEventing() {
 	})
 	// Turn everything off here.
 	s.sys = nil
-	// Make sure this is done after s.sys = nil, so that we don't
-	// get sends to closed channels on badly-timed config reloads.
-	close(rc)
 }
 
 // Request for our local connection count.
@@ -2195,7 +2228,7 @@ func (s *Server) statszReq(sub *subscription, c *client, _ *Account, subject, re
 	// No reply is a signal that we should use our normal broadcast subject.
 	if reply == _EMPTY_ {
 		reply = fmt.Sprintf(serverStatsSubj, s.info.ID)
-		s.wrapChk(s.resetLastStatsz)
+		s.wrapChk(s.resetLastStatsz)()
 	}
 
 	opts := StatszEventOptions{}
@@ -2889,7 +2922,7 @@ func (s *Server) remoteLatencyUpdate(sub *subscription, _ *client, _ *Account, s
 	}
 	acc.mu.RLock()
 	si := acc.exports.responses[reply]
-	if si == nil {
+	if si == nil || si.latency == nil {
 		acc.mu.RUnlock()
 		return
 	}

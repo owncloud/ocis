@@ -9,6 +9,7 @@ import (
 	"sort"
 
 	"github.com/open-policy-agent/opa/v1/ast"
+	"github.com/open-policy-agent/opa/v1/util"
 )
 
 // CopyPropagator implements a simple copy propagation optimization to remove
@@ -49,17 +50,7 @@ func (l *localVarGenerator) Generate() ast.Var {
 // New returns a new CopyPropagator that optimizes queries while preserving vars
 // in the livevars set.
 func New(livevars ast.VarSet) *CopyPropagator {
-
-	sorted := make([]ast.Var, 0, len(livevars))
-	for v := range livevars {
-		sorted = append(sorted, v)
-	}
-
-	sort.Slice(sorted, func(i, j int) bool {
-		return sorted[i].Compare(sorted[j]) < 0
-	})
-
-	return &CopyPropagator{livevars: livevars, sorted: sorted, localvargen: &localVarGenerator{}}
+	return &CopyPropagator{livevars: livevars, sorted: util.KeysSorted(livevars), localvargen: &localVarGenerator{}}
 }
 
 // WithEnsureNonEmptyBody configures p to ensure that results are always non-empty.
@@ -105,15 +96,23 @@ func (p *CopyPropagator) Apply(query ast.Body) ast.Body {
 	removedEqs := ast.NewValueMap()
 
 	for _, expr := range query {
-
 		pctx := &plugContext{
 			removedEqs: removedEqs,
 			uf:         uf,
-			negated:    expr.Negated,
+			negated:    expr.IsNegated(),
 			headvars:   headvars,
 		}
 
 		expr = p.plugBindings(pctx, expr)
+
+		// Recurse into not-bodies after plugging outer bindings.
+		if n, ok := expr.Terms.(*ast.Not); ok {
+			innerLive := p.computeNotBodyLivevars(uf, removedEqs, n.Body)
+			innerCp := New(innerLive).
+				WithEnsureNonEmptyBody(true).
+				WithCompiler(p.compiler)
+			n.Body = innerCp.Apply(n.Body)
+		}
 
 		if p.updateBindings(pctx, expr) {
 			result.Append(expr)
@@ -167,7 +166,7 @@ func (p *CopyPropagator) Apply(query ast.Body) ast.Body {
 	safe.Update(ast.ReservedVars)
 	safe.Update(p.livevars)
 	safe.Update(ast.OutputVarsFromBody(p.compiler, result, safe))
-	unsafe := result.Vars(ast.SafetyCheckVisitorParams).Diff(safe)
+	unsafe := result.Vars(ast.SafetyCheckVisitorParamsWithArity(p.compiler.GetArity)).Diff(safe)
 
 	for _, b := range sortbindings(removedEqs) {
 		removedEq := ast.Equality.Expr(ast.NewTerm(b.k), ast.NewTerm(b.v))
@@ -372,6 +371,25 @@ func (p *CopyPropagator) updateBindingsEqAsymmetric(a, b *ast.Term) (ast.Var, as
 	}
 
 	return "", nil, true
+}
+
+// computeNotBodyLivevars returns the set of variables that must be treated as
+// live when recursing into a Not body. A variable is live if it appears in the
+// Not body and is bound or visible in the outer scope.
+func (p *CopyPropagator) computeNotBodyLivevars(uf *unionFind, removedEqs *ast.ValueMap, body ast.Body) ast.VarSet {
+	bodyVars := body.Vars(ast.SafetyCheckVisitorParams)
+
+	innerLive := ast.NewVarSet()
+	for v := range bodyVars {
+		if p.livevars.Contains(v) {
+			innerLive.Add(v)
+		} else if _, ok := uf.Find(v); ok {
+			innerLive.Add(v)
+		} else if removedEqs.Get(v) != nil {
+			innerLive.Add(v)
+		}
+	}
+	return innerLive
 }
 
 type plugContext struct {

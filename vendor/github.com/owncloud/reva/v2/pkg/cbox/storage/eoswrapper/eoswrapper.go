@@ -203,9 +203,9 @@ func (w *wrapper) DownloadRevision(ctx context.Context, ref *provider.Reference,
 	return w.FS.DownloadRevision(ctx, ref, revisionKey, openReaderfunc)
 }
 
-func (w *wrapper) RestoreRevision(ctx context.Context, ref *provider.Reference, revisionKey string) error {
+func (w *wrapper) RestoreRevision(ctx context.Context, ref *provider.Reference, revisionKey string) (*storage.RestoreRevisionResult, error) {
 	if err := w.userIsProjectAdmin(ctx, ref); err != nil {
-		return err
+		return nil, err
 	}
 
 	return w.FS.RestoreRevision(ctx, ref, revisionKey)

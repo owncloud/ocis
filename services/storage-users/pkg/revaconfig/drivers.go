@@ -157,6 +157,7 @@ func OwnCloudSQL(cfg *config.Config) map[string]interface{} {
 // Ocis is the config mapping for the Ocis storage driver
 func Ocis(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
+		"mount_id":         cfg.MountID,
 		"metadata_backend": "messagepack",
 		"propagator":       cfg.Drivers.OCIS.Propagator,
 		"async_propagator_options": map[string]interface{}{
@@ -198,7 +199,8 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 			"cache_auth_password":       cfg.IDCache.AuthPassword,
 		},
 		"events": map[string]interface{}{
-			"numconsumers": cfg.Events.NumConsumers,
+			"numconsumers":   cfg.Events.NumConsumers,
+			"consumer_group": cfg.Events.ConsumerGroup,
 		},
 		"tokens": map[string]interface{}{
 			"transfer_shared_secret": cfg.Commons.TransferSecret,
@@ -321,7 +323,8 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 			"cache_auth_password":       cfg.IDCache.AuthPassword,
 		},
 		"events": map[string]interface{}{
-			"numconsumers": cfg.Events.NumConsumers,
+			"numconsumers":   cfg.Events.NumConsumers,
+			"consumer_group": cfg.Events.ConsumerGroup,
 		},
 		"tokens": map[string]interface{}{
 			"transfer_shared_secret": cfg.Commons.TransferSecret,

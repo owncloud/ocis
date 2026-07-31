@@ -21,6 +21,7 @@ import (
 )
 
 var scopeRegex = regexp.MustCompile(`scope:\s*([^" "\n\r]*)`)
+var vaultRegex = regexp.MustCompile(`vault:\s*(\S+)`)
 
 // ResolveReference makes sure the path is relative to the space root
 func ResolveReference(ctx context.Context, ref *provider.Reference, ri *provider.ResourceInfo, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*provider.Reference, error) {
@@ -69,14 +70,14 @@ func logDocCount(engine engine.Engine, logger log.Logger) {
 	logger.Debug().Interface("count", c).Msg("new document count")
 }
 
-func getAuthContext(serviceAccountID string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], secret string, logger log.Logger) (context.Context, error) {
+func getAuthContext(ctx context.Context, serviceAccountID string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], secret string, logger log.Logger) (context.Context, error) {
 	gatewayClient, err := gatewaySelector.Next()
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get reva gatewayClient")
 		return nil, err
 	}
 
-	return utils.GetServiceUserContext(serviceAccountID, gatewayClient, secret)
+	return utils.GetServiceUserContextWithContext(ctx, gatewayClient, serviceAccountID, secret)
 }
 
 func statResource(ctx context.Context, ref *provider.Reference, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], logger log.Logger) (*provider.StatResponse, error) {
@@ -147,6 +148,17 @@ func convertToWebDAVPermissions(isShared, isMountpoint, isDir bool, p *provider.
 		fmt.Fprintf(&b, "X")
 	}
 	return b.String()
+}
+
+// ParseVaultMode extracts "vault:<value>" from the query string and returns the
+// cleaned query and whether vault mode was requested (value == "true").
+func ParseVaultMode(query string) (string, bool) {
+	match := vaultRegex.FindStringSubmatch(query)
+	if len(match) < 2 {
+		return query, false
+	}
+	cleaned := strings.TrimSpace(strings.ReplaceAll(query, match[0], ""))
+	return cleaned, match[1] == "true"
 }
 
 // ParseScope extract a scope value from the query string and returns search, scope strings

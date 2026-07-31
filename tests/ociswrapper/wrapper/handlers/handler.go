@@ -126,8 +126,7 @@ func K8sSetEnvHandler(res http.ResponseWriter, req *http.Request) {
 		for env, value := range envs.(map[string]any) {
 			envMap = append(envMap, fmt.Sprintf("%s=%v", env, value))
 		}
-		ocis.K3dServiceEnvConfigs[service] = append(ocis.K3dServiceEnvConfigs[service], envMap...)
-		success, _ := ocis.UpdateEnv(service, envMap)
+		success, _ := ocis.K8sUpdateEnv(service, envMap)
 		if !success {
 			message = "Failed to restart oCIS with new configuration"
 			sendResponse(res, http.StatusInternalServerError, message)
@@ -164,14 +163,14 @@ func K8sRollbackHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	var message string
-	success, _ := ocis.Rollback()
+	success, _ := ocis.K8sRollback()
 
 	if success {
-		message = "oCIS configured successfully"
+		message = "oCIS rolled back successfully"
 		sendResponse(res, http.StatusOK, message)
 		return
 	}
-	message = "Failed to restart oCIS with new configuration"
+	message = "Failed to rollback oCIS"
 	sendResponse(res, http.StatusInternalServerError, message)
 }
 

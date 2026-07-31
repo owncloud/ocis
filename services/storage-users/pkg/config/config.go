@@ -24,7 +24,7 @@ type Config struct {
 	SkipUserGroupsInToken   bool `yaml:"skip_user_groups_in_token" env:"STORAGE_USERS_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token." introductionVersion:"pre5.0"`
 	GracefulShutdownTimeout int  `yaml:"graceful_shutdown_timeout" env:"STORAGE_USERS_GRACEFUL_SHUTDOWN_TIMEOUT" desc:"The number of seconds to wait for the 'storage-users' service to shutdown cleanly before exiting with an error that gets logged. Note: This setting is only applicable when running the 'storage-users' service as a standalone service. See the text description for more details." introductionVersion:"pre5.0"`
 
-	Driver         string  `yaml:"driver" env:"STORAGE_USERS_DRIVER" desc:"The storage driver which should be used by the service. Defaults to 'ocis', Supported values are: 'ocis', 's3ng' and 'owncloudsql'. The 'ocis' driver stores all data (blob and meta data) in an POSIX compliant volume. The 's3ng' driver stores metadata in a POSIX compliant volume and uploads blobs to the s3 bucket." introductionVersion:"pre5.0"`
+	Driver         string  `yaml:"driver" env:"STORAGE_USERS_DRIVER" desc:"The storage driver which should be used by the service. Defaults to 'ocis', Supported values are: 'ocis', 's3ng' and 'owncloudsql' (deprecated). The 'ocis' driver stores all data (blob and meta data) in an POSIX compliant volume. The 's3ng' driver stores metadata in a POSIX compliant volume and uploads blobs to the s3 bucket." introductionVersion:"pre5.0"`
 	Drivers        Drivers `yaml:"drivers"`
 	DataServerURL  string  `yaml:"data_server_url" env:"STORAGE_USERS_DATA_SERVER_URL" desc:"URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed." introductionVersion:"pre5.0"`
 	DataGatewayURL string  `yaml:"data_gateway_url" env:"STORAGE_USERS_DATA_GATEWAY_URL" desc:"URL of the data gateway server" introductionVersion:"pre5.0"`
@@ -38,12 +38,14 @@ type Config struct {
 	ReadOnly          bool              `yaml:"readonly" env:"STORAGE_USERS_READ_ONLY" desc:"Set this storage to be read-only." introductionVersion:"pre5.0"`
 	UploadExpiration  int64             `yaml:"upload_expiration" env:"STORAGE_USERS_UPLOAD_EXPIRATION" desc:"Duration in seconds after which uploads will expire. Note that when setting this to a low number, uploads could be cancelled before they are finished and return a 403 to the user." introductionVersion:"pre5.0"`
 	Tasks             Tasks             `yaml:"tasks"`
-	ServiceAccount    ServiceAccount    `yaml:"service_account"`
+	ServiceAccount    ServiceAccount    `yaml:"service_account" mask:"struct"`
 
 	// CLI
 	RevaGatewayGRPCAddr      string `yaml:"gateway_addr" env:"OCIS_GATEWAY_GRPC_ADDR;STORAGE_USERS_GATEWAY_GRPC_ADDR" desc:"The bind address of the gateway GRPC address." introductionVersion:"5.0"`
 	MachineAuthAPIKey        string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;STORAGE_USERS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services." introductionVersion:"5.0"`
 	CliMaxAttemptsRenameFile int    `yaml:"max_attempts_rename_file" env:"STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE" desc:"The maximum number of attempts to rename a file when a user restores a file to an existing destination with the same name. The minimum value is 100." introductionVersion:"5.0"`
+
+	EnableVaultMode bool `yaml:"enable_vault_mode" env:"STORAGE_USERS_ENABLE_VAULT_MODE" desc:"Enabling the flag forces the storage-users service to run with a MountID set to VaultStorageProviderID. Not applicable for use with the primary storage-users service. Use only if an additional storage-users-vault service, a special configured storage-users service is configured." introductionVersion:"8.1.0"`
 
 	Context context.Context `yaml:"-"`
 }
@@ -215,6 +217,7 @@ type Events struct {
 	TLSRootCaCertPath string `yaml:"tls_root_ca_cert_path" env:"OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided STORAGE_USERS_EVENTS_TLS_INSECURE will be seen as false." introductionVersion:"pre5.0"`
 	EnableTLS         bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;STORAGE_USERS_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"pre5.0"`
 	NumConsumers      int    `yaml:"num_consumers" env:"STORAGE_USERS_EVENTS_NUM_CONSUMERS" desc:"The amount of concurrent event consumers to start. Event consumers are used for post-processing files. Multiple consumers increase parallelisation, but will also increase CPU and memory demands. The setting has no effect when the OCIS_ASYNC_UPLOADS is set to false. The default and minimum value is 1." introductionVersion:"pre5.0"`
+	ConsumerGroup     string `yaml:"consumer_group" env:"STORAGE_USERS_EVENTS_CONSUMER_GROUP" desc:"The name of the consumer group to be used at the event to help consumers identify the unique group." introductionVersion:"8.1.0"`
 	AuthUsername      string `yaml:"username" env:"OCIS_EVENTS_AUTH_USERNAME;STORAGE_USERS_EVENTS_AUTH_USERNAME" desc:"The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
 	AuthPassword      string `yaml:"password" env:"OCIS_EVENTS_AUTH_PASSWORD;STORAGE_USERS_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
 }
@@ -323,5 +326,5 @@ type PurgeTrashBin struct {
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
 	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;STORAGE_USERS_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
-	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;STORAGE_USERS_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;STORAGE_USERS_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0" mask:"password"`
 }

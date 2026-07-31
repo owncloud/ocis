@@ -1,0 +1,104 @@
+{
+  "name": "@ownclouders/web-client",
+  "version": "12.5.0",
+  "description": "ownCloud web client",
+  "license": "Apache-2.0",
+  "private": false,
+  "type": "module",
+  "author": "ownCloud GmbH <devops@owncloud.com>",
+  "homepage": "https://github.com/owncloud/web/tree/master/packages/web-client",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/owncloud/web",
+    "directory": "packages/web-client"
+  },
+  "files": [
+    "dist/"
+  ],
+  "publishConfig": {
+    "directory": "package",
+    "linkDirectory": false,
+    "exports": {
+      ".": {
+        "default": "./dist/web-client.js",
+        "require": "./dist/web-client.cjs",
+        "types": "./dist/types/index.d.ts"
+      },
+      "./graph": {
+        "default": "./dist/web-client/graph.js",
+        "require": "./dist/web-client/graph.cjs",
+        "types": "./dist/types/graph/index.d.ts"
+      },
+      "./graph/generated": {
+        "default": "./dist/web-client/graph/generated.js",
+        "require": "./dist/web-client/graph/generated.cjs",
+        "types": "./dist/types/graph/generated/index.d.ts"
+      },
+      "./ocs": {
+        "default": "./dist/web-client/ocs.js",
+        "require": "./dist/web-client/ocs.cjs",
+        "types": "./dist/types/ocs/index.d.ts"
+      },
+      "./sse": {
+        "default": "./dist/web-client/sse.js",
+        "require": "./dist/web-client/sse.cjs",
+        "types": "./dist/types/sse/index.d.ts"
+      },
+      "./webdav": {
+        "default": "./dist/web-client/webdav.js",
+        "require": "./dist/web-client/webdav.cjs",
+        "types": "./dist/types/webdav/index.d.ts"
+      }
+    }
+  },
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./graph": {
+      "default": "./src/graph/index.ts"
+    },
+    "./graph/generated": {
+      "default": "./src/graph/generated/index.ts"
+    },
+    "./ocs": {
+      "default": "./src/ocs/index.ts"
+    },
+    "./sse": {
+      "default": "./src/sse/index.ts"
+    },
+    "./webdav": {
+      "default": "./src/webdav/index.ts"
+    },
+    "./l10n": {
+      "default": "./l10n/translations.json"
+    }
+  },
+  "scripts": {
+    "generate-openapi": "rm -rf src/graph/generated && docker run --rm -v \"${PWD}/src/graph:/local\" openapitools/openapi-generator-cli generate -i https://raw.githubusercontent.com/owncloud/libre-graph-api/main/api/openapi-spec/v1.0.yaml  -g typescript-axios -o /local/generated",
+    "vite": "vite",
+    "prepublishOnly": "rm -rf ./package && clean-publish && rm -rf package/dist/tests && find package && cat package/package.json",
+    "postpublish": "rm -rf ./package",
+    "test:unit": "NODE_OPTIONS=--unhandled-rejections=throw vitest"
+  },
+  "dependencies": {
+    "@casl/ability": "^6.8.1",
+    "@microsoft/fetch-event-source": "^2.0.1",
+    "axios": "^1.18.1",
+    "fast-xml-parser": "^5.8.0",
+    "lodash-es": "^4.18.1",
+    "luxon": "^3.7.2",
+    "uuid": "^14.0.0",
+    "webdav": "^5.9.0",
+    "xml-js": "^1.6.11",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/luxon": "3.7.1",
+    "@vitejs/plugin-vue": "6.0.1",
+    "clean-publish": "6.0.1",
+    "vite": "7.3.5",
+    "vite-plugin-dts": "4.5.4",
+    "vite-plugin-node-polyfills": "0.24.0"
+  }
+}

@@ -114,12 +114,13 @@ func (session *OcisSession) GetReader(ctx context.Context) (io.ReadCloser, error
 // implements tusd.DataStore interface
 // returns tusd errors
 func (session *OcisSession) FinishUpload(ctx context.Context) error {
+	log := appctx.GetLogger(ctx)
+	log.Debug().Msg("decomposedfs:FinishUpload:start")
 	err := session.FinishUploadDecomposed(ctx)
 
 	if err != nil {
 		// this is part of the tusd integration and we might be able to
 		// log the error in another place
-		log := appctx.GetLogger(ctx)
 		log.Error().Err(err).Msg("failed to finish upload")
 	}
 
@@ -140,6 +141,7 @@ func (session *OcisSession) FinishUploadDecomposed(ctx context.Context) error {
 	ctx, span := tracer.Start(session.Context(ctx), "FinishUpload")
 	defer span.End()
 	log := appctx.GetLogger(ctx)
+	log.Debug().Str("session", session.ID()).Msg("decomposedfs:FinishUploadDecomposed:start")
 
 	ctx = ctxpkg.ContextSetInitiator(ctx, session.InitiatorID())
 
@@ -224,7 +226,7 @@ func (session *OcisSession) FinishUploadDecomposed(ctx context.Context) error {
 			URL:               s,
 			SpaceOwner:        n.SpaceOwnerOrManager(session.Context(ctx)),
 			ExecutingUser:     u,
-			ResourceID:        &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID},
+			ResourceID:        &provider.ResourceId{StorageId: session.ProviderID(), SpaceId: n.SpaceID, OpaqueId: n.ID},
 			Filename:          session.Filename(),
 			Filesize:          uint64(session.Size()),
 			ImpersonatingUser: iu,
@@ -238,7 +240,7 @@ func (session *OcisSession) FinishUploadDecomposed(ctx context.Context) error {
 	if !session.store.async || session.info.Size == 0 {
 		// handle postprocessing synchronously
 		err = session.Finalize(ctx)
-		session.Cleanup(err != nil, true, true, true)
+		session.Cleanup(err != nil, err == nil, true, true)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to upload")
 			return err
@@ -246,6 +248,7 @@ func (session *OcisSession) FinishUploadDecomposed(ctx context.Context) error {
 		metrics.UploadSessionsFinalized.Inc()
 	}
 
+	log.Debug().Str("session", session.ID()).Msg("decomposedfs:FinishUploadDecomposed:complete")
 	return session.store.tp.Propagate(ctx, n, session.SizeDiff())
 }
 

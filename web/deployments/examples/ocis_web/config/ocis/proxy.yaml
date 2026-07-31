@@ -1,0 +1,106 @@
+---
+policy_selector:
+  static:
+    policy: ocis
+policies:
+  - name: ocis
+    routes:
+      # serve oC Web assets from the Web container
+      - endpoint: /
+        backend: http://web:8080
+        unprotected: true
+      # serve oC Web config from oCIS
+      - endpoint: /config.json
+        backend: http://localhost:9100
+        unprotected: true
+
+      # begin of regular oCIS proxy configuration
+      # we don't need the root rule for oC Web, since we replaced it
+      # with the both rules above
+      # - endpoint: /
+      #   service: com.owncloud.web.web
+      #   unprotected: true
+      - endpoint: /.well-known/webfinger
+        service: com.owncloud.web.webfinger
+        unprotected: true
+      - endpoint: /.well-known/openid-configuration
+        service: com.owncloud.web.idp
+        unprotected: true
+      - endpoint: /branding/logo
+        service: com.owncloud.web.web
+      - endpoint: /konnect/
+        service: com.owncloud.web.idp
+        unprotected: true
+      - endpoint: /signin/
+        service: com.owncloud.web.idp
+        unprotected: true
+      - endpoint: /archiver
+        service: com.owncloud.web.frontend
+      - endpoint: /ocs/v2.php/apps/notifications/api/v1/notifications/sse
+        service: com.owncloud.sse.sse
+      - endpoint: /ocs/v2.php/apps/notifications/api/v1/notifications
+        service: com.owncloud.web.userlog
+      - type: regex
+        endpoint: /ocs/v[12].php/cloud/user/signing-key
+        service: com.owncloud.web.ocs
+      - type: regex
+        endpoint: /ocs/v[12].php/config
+        service: com.owncloud.web.frontend
+        unprotected: true
+      - endpoint: /sciencemesh/
+        service: com.owncloud.web.ocm
+      - endpoint: /ocm/
+        service: com.owncloud.web.ocm
+      - endpoint: /ocs/
+        service: com.owncloud.web.frontend
+      - type: query
+        endpoint: /remote.php/?preview=1
+        service: com.owncloud.web.webdav
+      - type: regex
+        method: REPORT
+        endpoint: /remote.php/dav/
+        service: com.owncloud.web.webdav
+      - method: REPORT
+        endpoint: (/remote.php)?/(web)?dav
+        service: com.owncloud.web.webdav
+      - method: REPORT
+        endpoint: /dav/spaces
+        service: com.owncloud.web.webdav
+      - type: query
+        endpoint: /dav/?preview=1
+        service: com.owncloud.web.webdav
+      - type: query
+        endpoint: /webdav/?preview=1
+        service: com.owncloud.web.webdav
+      - endpoint: /remote.php/
+        service: com.owncloud.web.ocdav
+      - endpoint: /dav/
+        service: com.owncloud.web.ocdav
+      - endpoint: /webdav/
+        service: com.owncloud.web.ocdav
+      - endpoint: /status
+        service: com.owncloud.web.ocdav
+        unprotected: true
+      - endpoint: /status.php
+        service: com.owncloud.web.ocdav
+        unprotected: true
+      - endpoint: /index.php/
+        service: com.owncloud.web.ocdav
+      - endpoint: /apps/
+        service: com.owncloud.web.ocdav
+      - endpoint: /data
+        service: com.owncloud.web.frontend
+        unprotected: true
+      - endpoint: /app/list
+        service: com.owncloud.web.frontend
+        unprotected: true
+      - endpoint: /app/
+        service: com.owncloud.web.frontend
+      - endpoint: /graph/v1beta1/extensions/org.libregraph/activities
+        service: com.owncloud.web.activitylog
+      - endpoint: /graph/v1.0/invitations
+        service: com.owncloud.web.invitations
+      - endpoint: /graph/
+        service: com.owncloud.web.graph
+      - endpoint: /api/v0/settings
+        service: com.owncloud.web.settings

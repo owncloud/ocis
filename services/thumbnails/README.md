@@ -88,7 +88,7 @@ To have more control over memory (and CPU) consumption the maximum number of con
 
 ## Thumbnails and SecureView
 
-If a resource is shared using SecureView, the share reciever will get a 403 (forbidden) response when requesting a thumbnail. The requesting client needs to decide what to show and usually a placeholder thumbnail is used.
+If a resource is shared using SecureView, the share receiver will get a 403 (forbidden) response when requesting a thumbnail. The requesting client needs to decide what to show and usually a placeholder thumbnail is used.
 
 ## Using libvips for Thumbnail Generation
 

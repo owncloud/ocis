@@ -1,0 +1,20 @@
+{
+  "name": "@ownclouders/prettier-config",
+  "private": false,
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "Apache-2.0",
+  "author": "ownCloud GmbH <devops@owncloud.com>",
+  "homepage": "https://github.com/owncloud/web/tree/master/packages/prettier-config",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/owncloud/web",
+    "directory": "packages/prettier-config"
+  },
+  "exports": {
+    ".": "./index.js"
+  },
+  "dependencies": {
+    "prettier": "^3.8.1"
+  }
+}

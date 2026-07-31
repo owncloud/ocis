@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+set -eo pipefail
+
+URL=http://127.0.0.1:8080
+
+wget --quiet --tries=1 --spider ${URL}
+[ $? -ne 0 ] && exit 1
+
+exit 0

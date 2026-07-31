@@ -8,8 +8,10 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/task"
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
+	"go.opentelemetry.io/otel/trace"
 )
 
 const (
@@ -20,16 +22,18 @@ const (
 type Service struct {
 	gatewaySelector pool.Selectable[apiGateway.GatewayAPIClient]
 	eventStream     events.Stream
+	tp              trace.TracerProvider
 	logger          log.Logger
 	config          config.Config
 	ctx             context.Context
 }
 
 // NewService prepares and returns a Service implementation.
-func NewService(ctx context.Context, gatewaySelector pool.Selectable[apiGateway.GatewayAPIClient], eventStream events.Stream, logger log.Logger, conf config.Config) (Service, error) {
+func NewService(ctx context.Context, gatewaySelector pool.Selectable[apiGateway.GatewayAPIClient], eventStream events.Stream, tp trace.TracerProvider, logger log.Logger, conf config.Config) (Service, error) {
 	svc := Service{
 		gatewaySelector: gatewaySelector,
 		eventStream:     eventStream,
+		tp:              tp,
 		logger:          logger,
 		config:          conf,
 		ctx:             ctx,
@@ -63,6 +67,10 @@ func (s Service) Run() error {
 
 func (s Service) handleEvent(e events.Event) {
 	var errs []error
+
+	ctx, span := events.TraceEventConsumer(s.ctx, s.tp, e)
+	ctx = autoprop.SetMetaToContext(ctx, e.ExtraInfo)
+	defer span.End()
 
 	switch ev := e.Event.(type) {
 	case PurgeTrashBin:

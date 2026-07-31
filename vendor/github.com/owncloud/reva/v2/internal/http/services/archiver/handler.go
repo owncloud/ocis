@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"regexp"
@@ -204,8 +205,15 @@ func (s *svc) writeHTTPError(rw http.ResponseWriter, err error) {
 	s.log.Error().Msg(err.Error())
 
 	switch err.(type) {
-	case errtypes.NotFound, errtypes.PermissionDenied:
+	case errtypes.NotFound:
 		rw.WriteHeader(http.StatusNotFound)
+	case errtypes.PermissionDenied:
+		if strings.Contains(err.Error(), "MFA required") {
+			rw.Header().Set("X-Ocis-Mfa-Required", "true")
+			rw.WriteHeader(http.StatusForbidden)
+		} else {
+			rw.WriteHeader(http.StatusNotFound)
+		}
 	case manager.ErrMaxSize, manager.ErrMaxFileCount:
 		rw.WriteHeader(http.StatusRequestEntityTooLarge)
 	case errtypes.BadRequest:

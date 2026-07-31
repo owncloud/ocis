@@ -189,6 +189,17 @@ func newSubsList(client *client) []string {
 	return subs
 }
 
+func redactBearerJWT(userJWT string) string {
+	if userJWT == _EMPTY_ {
+		return _EMPTY_
+	}
+	uc, err := jwt.DecodeUserClaims(userJWT)
+	if err == nil && uc != nil && uc.BearerToken {
+		return _EMPTY_
+	}
+	return userJWT
+}
+
 // Connz returns a Connz struct containing information about connections.
 func (s *Server) Connz(opts *ConnzOptions) (*Connz, error) {
 	var (
@@ -374,16 +385,26 @@ func (s *Server) Connz(opts *ConnzOptions) (*Connz, error) {
 		// Gather all open clients.
 		if state == ConnOpen || state == ConnAll {
 			for _, client := range clist {
+				// Snapshot each under the client lock.
+				client.mu.RLock()
+				var cAccName string
+				if client.acc != nil {
+					cAccName = client.acc.Name
+				}
+				cAuthUser := client.getRawAuthUser()
+				cMQTTID := client.getMQTTClientID()
+				client.mu.RUnlock()
+
 				// If we have an account specified we need to filter.
-				if acc != _EMPTY_ && (client.acc == nil || client.acc.Name != acc) {
+				if acc != _EMPTY_ && cAccName != acc {
 					continue
 				}
 				// Do user filtering second
-				if user != _EMPTY_ && client.getRawAuthUserLock() != user {
+				if user != _EMPTY_ && cAuthUser != user {
 					continue
 				}
 				// Do mqtt client ID filtering next
-				if mqttCID != _EMPTY_ && client.getMQTTClientID() != mqttCID {
+				if mqttCID != _EMPTY_ && cMQTTID != mqttCID {
 					continue
 				}
 				openClients = append(openClients, client)
@@ -441,12 +462,13 @@ func (s *Server) Connz(opts *ConnzOptions) (*Connz, error) {
 			ci.NameTag = client.acc.getNameTag()
 		}
 		client.mu.Unlock()
+		ci.JWT = redactBearerJWT(ci.JWT)
 		pconns[i] = ci
 		i++
 	}
 	// Closed Clients
 	var needCopy bool
-	if subs || auth {
+	if subs || subsDet || auth {
 		needCopy = true
 	}
 	for _, cc := range closedClients {
@@ -487,6 +509,7 @@ func (s *Server) Connz(opts *ConnzOptions) (*Connz, error) {
 					cc.NameTag = acc.getNameTag()
 				}
 			}
+			cc.JWT = redactBearerJWT(cc.JWT)
 		}
 		pconns[i] = &cc.ConnInfo
 		i++
@@ -527,18 +550,10 @@ func (s *Server) Connz(opts *ConnzOptions) (*Connz, error) {
 		sort.Sort(sort.Reverse(SortByRTT{pconns}))
 	}
 
-	minoff := c.Offset
-	maxoff := c.Offset + c.Limit
-
-	maxIndex := totalClients
-
 	// Make sure these are sane.
-	if minoff > maxIndex {
-		minoff = maxIndex
-	}
-	if maxoff > maxIndex {
-		maxoff = maxIndex
-	}
+	maxIndex := totalClients
+	minoff := min(max(c.Offset, 0), maxIndex)
+	maxoff := minoff + min(c.Limit, maxIndex-minoff)
 
 	// Now pare down to the requested size.
 	// TODO(dlc) - for very large number of connections we
@@ -1064,18 +1079,10 @@ func (s *Server) Subsz(opts *SubszOptions) (*Subsz, error) {
 			sub.client.mu.Unlock()
 			i++
 		}
-		minoff := sz.Offset
-		maxoff := sz.Offset + sz.Limit
-
-		maxIndex := i
-
 		// Make sure these are sane.
-		if minoff > maxIndex {
-			minoff = maxIndex
-		}
-		if maxoff > maxIndex {
-			maxoff = maxIndex
-		}
+		maxIndex := i
+		minoff := min(max(sz.Offset, 0), maxIndex)
+		maxoff := minoff + min(sz.Limit, maxIndex-minoff)
 		sz.Subs = details[minoff:maxoff]
 		sz.Total = len(details)
 	} else {
@@ -1258,10 +1265,14 @@ type Varz struct {
 	Routes                int                    `json:"routes"`                            // Routes is the number of connected route servers
 	Remotes               int                    `json:"remotes"`                           // Remotes is the configured route remote endpoints
 	Leafs                 int                    `json:"leafnodes"`                         // Leafs is the number connected leafnode clients
-	InMsgs                int64                  `json:"in_msgs"`                           // InMsgs is the number of messages this server received
-	OutMsgs               int64                  `json:"out_msgs"`                          // OutMsgs is the number of message this server sent
-	InBytes               int64                  `json:"in_bytes"`                          // InBytes is the number of bytes this server received
-	OutBytes              int64                  `json:"out_bytes"`                         // OutMsgs is the number of bytes this server sent
+	InMsgs                int64                  `json:"in_msgs"`                           // InMsgs is the total number of messages this server received. This includes messages from the clients, routers, gateways and leaf nodes
+	InBytes               int64                  `json:"in_bytes"`                          // InBytes is the total number of bytes this server received. This includes messages from the clients, routers, gateways and leaf nodes
+	InClientMsgs          int64                  `json:"in_client_msgs"`                    // InClientMsgs is the number of messages this server received from the clients
+	InClientBytes         int64                  `json:"in_client_bytes"`                   // InClientBytes is the number of bytes this server received from the clients
+	OutMsgs               int64                  `json:"out_msgs"`                          // OutMsgs is the total number of message this server sent. This includes messages sent to the clients, routers, gateways and leaf nodes
+	OutBytes              int64                  `json:"out_bytes"`                         // OutBytes is the total number of bytes this server sent. This includes messages sent to the clients, routers, gateways and leaf nodes
+	OutClientMsgs         int64                  `json:"out_client_msgs"`                   // OutClientMsgs is the number of messages this server sent to the clients
+	OutClientBytes        int64                  `json:"out_client_bytes"`                  // OutClientBytes is the number of bytes this server sent to the clients
 	SlowConsumers         int64                  `json:"slow_consumers"`                    // SlowConsumers is the total count of clients that were disconnected since start due to being slow consumers
 	StaleConnections      int64                  `json:"stale_connections"`                 // StaleConnections is the total count of stale connections that were detected
 	StalledClients        int64                  `json:"stalled_clients"`                   // StalledClients is the total number of times that clients have been stalled.
@@ -1271,6 +1282,7 @@ type Varz struct {
 	ConfigDigest          string                 `json:"config_digest"`                     // ConfigDigest is a calculated hash of the current configuration
 	Tags                  jwt.TagList            `json:"tags,omitempty"`                    // Tags are the tags assigned to the server in configuration
 	Metadata              map[string]string      `json:"metadata,omitempty"`                // Metadata is the metadata assigned to the server in configuration
+	FeatureFlags          map[string]bool        `json:"feature_flags,omitempty"`           // FeatureFlags is the feature flags enabled/disabled in configuration
 	TrustedOperatorsJwt   []string               `json:"trusted_operators_jwt,omitempty"`   // TrustedOperatorsJwt is the JWTs for all trusted operators
 	TrustedOperatorsClaim []*jwt.OperatorClaims  `json:"trusted_operators_claim,omitempty"` // TrustedOperatorsClaim is the decoded claims for each trusted operator
 	SystemAccount         string                 `json:"system_account,omitempty"`          // SystemAccount is the name of the System account
@@ -1570,8 +1582,13 @@ func (s *Server) updateJszVarz(js *jetStream, v *JetStreamVarz, doConfig bool) {
 				v.Meta.Replicas = ci.Replicas
 			}
 			if ipq := s.jsAPIRoutedReqs; ipq != nil {
-				v.Meta.Pending = ipq.len()
+				v.Meta.PendingRequests = ipq.len()
 			}
+			if ipq := s.jsAPIRoutedInfoReqs; ipq != nil {
+				v.Meta.PendingInfos = ipq.len()
+			}
+			v.Meta.Pending = v.Meta.PendingRequests + v.Meta.PendingInfos
+			v.Meta.Snapshot = s.metaClusterSnapshotStats(js, mg)
 		}
 	}
 }
@@ -1723,34 +1740,40 @@ func (s *Server) createVarz(pcpu float64, rss int64) *Varz {
 		}
 		varz.Gateway.Gateways = rgwa
 	}
-	if l := len(ln.Remotes); l > 0 {
-		rlna := make([]RemoteLeafOptsVarz, l)
-		for i, r := range ln.Remotes {
-			var deny *DenyRules
-			if len(r.DenyImports) > 0 || len(r.DenyExports) > 0 {
-				deny = &DenyRules{
-					Imports: r.DenyImports,
-					Exports: r.DenyExports,
-				}
-			}
-			remoteTlsOCSPPeerVerify := s.ocspPeerVerify && r.tlsConfigOpts != nil && r.tlsConfigOpts.OCSPPeerConfig != nil && r.tlsConfigOpts.OCSPPeerConfig.Verify
-
-			rlna[i] = RemoteLeafOptsVarz{
-				LocalAccount:      r.LocalAccount,
-				URLs:              urlsToStrings(r.URLs),
-				TLSTimeout:        r.TLSTimeout,
-				Deny:              deny,
-				TLSOCSPPeerVerify: remoteTlsOCSPPeerVerify,
-			}
-		}
-		varz.LeafNode.Remotes = rlna
-	}
-
 	// Finish setting it up with fields that can be updated during
 	// configuration reload and runtime.
 	s.updateVarzConfigReloadableFields(varz)
 	s.updateVarzRuntimeFields(varz, true, pcpu, rss)
 	return varz
+}
+
+// Builds the list of remote leafnodes for Varz from the given options.
+// Server lock is held on entry.
+func (s *Server) varzLeafNodeRemotes(opts *Options) []RemoteLeafOptsVarz {
+	l := len(opts.LeafNode.Remotes)
+	if l == 0 {
+		return nil
+	}
+	rlna := make([]RemoteLeafOptsVarz, l)
+	for i, r := range opts.LeafNode.Remotes {
+		var deny *DenyRules
+		if len(r.DenyImports) > 0 || len(r.DenyExports) > 0 {
+			deny = &DenyRules{
+				Imports: r.DenyImports,
+				Exports: r.DenyExports,
+			}
+		}
+		remoteTlsOCSPPeerVerify := s.ocspPeerVerify && r.tlsConfigOpts != nil && r.tlsConfigOpts.OCSPPeerConfig != nil && r.tlsConfigOpts.OCSPPeerConfig.Verify
+
+		rlna[i] = RemoteLeafOptsVarz{
+			LocalAccount:      r.LocalAccount,
+			URLs:              urlsToStrings(r.URLs),
+			TLSTimeout:        r.TLSTimeout,
+			Deny:              deny,
+			TLSOCSPPeerVerify: remoteTlsOCSPPeerVerify,
+		}
+	}
+	return rlna
 }
 
 func urlsToStrings(urls []*url.URL) []string {
@@ -1788,6 +1811,7 @@ func (s *Server) updateVarzConfigReloadableFields(v *Varz) {
 	v.ConfigDigest = opts.configDigest
 	v.Tags = opts.Tags
 	v.Metadata = opts.Metadata
+	v.FeatureFlags = opts.getMergedFeatureFlags()
 	// Update route URLs if applicable
 	if s.varzUpdateRouteURLs {
 		v.Cluster.URLs = urlsToStrings(opts.Routes)
@@ -1805,6 +1829,7 @@ func (s *Server) updateVarzConfigReloadableFields(v *Varz) {
 	v.Cluster.TLSCertNotAfter = tlsCertNotAfter(opts.Cluster.TLSConfig)
 	v.Gateway.TLSCertNotAfter = tlsCertNotAfter(opts.Gateway.TLSConfig)
 	v.LeafNode.TLSCertNotAfter = tlsCertNotAfter(opts.LeafNode.TLSConfig)
+	v.LeafNode.Remotes = s.varzLeafNodeRemotes(opts)
 	v.MQTT.TLSCertNotAfter = tlsCertNotAfter(opts.MQTT.TLSConfig)
 	v.Websocket.TLSCertNotAfter = tlsCertNotAfter(opts.Websocket.TLSConfig)
 
@@ -1857,6 +1882,10 @@ func (s *Server) updateVarzRuntimeFields(v *Varz, forceUpdate bool, pcpu float64
 	v.InBytes = atomic.LoadInt64(&s.inBytes)
 	v.OutMsgs = atomic.LoadInt64(&s.outMsgs)
 	v.OutBytes = atomic.LoadInt64(&s.outBytes)
+	v.InClientMsgs = atomic.LoadInt64(&s.inClientMsgs)
+	v.InClientBytes = atomic.LoadInt64(&s.inClientBytes)
+	v.OutClientMsgs = atomic.LoadInt64(&s.outClientMsgs)
+	v.OutClientBytes = atomic.LoadInt64(&s.outClientBytes)
 	v.SlowConsumers = atomic.LoadInt64(&s.slowConsumers)
 	v.StalledClients = atomic.LoadInt64(&s.stalls)
 	v.SlowConsumersStats = &SlowConsumersStats{
@@ -2491,7 +2520,7 @@ func (s *Server) AccountStatz(opts *AccountStatzOptions) (*AccountStatz, error) 
 		s.accounts.Range(func(key, a any) bool {
 			acc := a.(*Account)
 			acc.mu.RLock()
-			if (opts != nil && opts.IncludeUnused) || acc.numLocalConnections() != 0 {
+			if (opts != nil && opts.IncludeUnused) || acc.numLocalConnections() != 0 || acc.numLocalLeafNodes() != 0 {
 				stz.Accounts = append(stz.Accounts, acc.statz())
 			}
 			acc.mu.RUnlock()
@@ -2502,7 +2531,7 @@ func (s *Server) AccountStatz(opts *AccountStatzOptions) (*AccountStatz, error) 
 			if acc, ok := s.accounts.Load(a); ok {
 				acc := acc.(*Account)
 				acc.mu.RLock()
-				if opts.IncludeUnused || acc.numLocalConnections() != 0 {
+				if opts.IncludeUnused || acc.numLocalConnections() != 0 || acc.numLocalLeafNodes() != 0 {
 					stz.Accounts = append(stz.Accounts, acc.statz())
 				}
 				acc.mu.RUnlock()
@@ -2545,21 +2574,11 @@ func ResponseHandler(w http.ResponseWriter, r *http.Request, data []byte) {
 }
 
 // handleResponse handles responses for monitoring routes with a specific HTTP status code.
-func handleResponse(code int, w http.ResponseWriter, r *http.Request, data []byte) {
-	// Get callback from request
-	callback := r.URL.Query().Get("callback")
-	if callback != _EMPTY_ {
-		// Response for JSONP
-		w.Header().Set("Content-Type", "application/javascript")
-		w.WriteHeader(code)
-		fmt.Fprintf(w, "%s(%s)", callback, data)
-	} else {
-		// Otherwise JSON
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.WriteHeader(code)
-		w.Write(data)
-	}
+func handleResponse(code int, w http.ResponseWriter, _ *http.Request, data []byte) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(code)
+	w.Write(data)
 }
 
 func (reason ClosedState) String() string {
@@ -3008,15 +3027,43 @@ type MetaSnapshotStats struct {
 	LastDuration   time.Duration `json:"last_duration,omitempty"` // LastDuration is how long the last meta snapshot took
 }
 
+// metaClusterSnapshotStats returns snapshot statistics for the meta group.
+func (s *Server) metaClusterSnapshotStats(js *jetStream, mg RaftNode) *MetaSnapshotStats {
+	entries, bytes := mg.Size()
+	snap := &MetaSnapshotStats{
+		PendingEntries: entries,
+		PendingSize:    bytes,
+	}
+
+	js.mu.RLock()
+	cluster := js.cluster
+	js.mu.RUnlock()
+
+	if cluster != nil {
+		timeNanos := atomic.LoadInt64(&cluster.lastMetaSnapTime)
+		durationNanos := atomic.LoadInt64(&cluster.lastMetaSnapDuration)
+		if timeNanos > 0 {
+			snap.LastTime = time.Unix(0, timeNanos).UTC()
+		}
+		if durationNanos > 0 {
+			snap.LastDuration = time.Duration(durationNanos)
+		}
+	}
+
+	return snap
+}
+
 // MetaClusterInfo shows information about the meta group.
 type MetaClusterInfo struct {
-	Name     string             `json:"name,omitempty"`     // Name is the name of the cluster
-	Leader   string             `json:"leader,omitempty"`   // Leader is the server name of the cluster leader
-	Peer     string             `json:"peer,omitempty"`     // Peer is unique ID of the leader
-	Replicas []*PeerInfo        `json:"replicas,omitempty"` // Replicas is a list of known peers
-	Size     int                `json:"cluster_size"`       // Size is the known size of the cluster
-	Pending  int                `json:"pending"`            // Pending is how many RAFT messages are not yet processed
-	Snapshot *MetaSnapshotStats `json:"snapshot"`           // Snapshot contains meta snapshot statistics
+	Name            string             `json:"name,omitempty"`     // Name is the name of the cluster
+	Leader          string             `json:"leader,omitempty"`   // Leader is the server name of the cluster leader
+	Peer            string             `json:"peer,omitempty"`     // Peer is unique ID of the leader
+	Replicas        []*PeerInfo        `json:"replicas,omitempty"` // Replicas is a list of known peers
+	Size            int                `json:"cluster_size"`       // Size is the known size of the cluster
+	Pending         int                `json:"pending"`            // Pending is how many RAFT messages are not yet processed
+	PendingRequests int                `json:"pending_requests"`   // PendingRequests is how many CRUD operations are queued for processing
+	PendingInfos    int                `json:"pending_infos"`      // PendingInfos is how many info operations are queued for processing
+	Snapshot        *MetaSnapshotStats `json:"snapshot"`           // Snapshot contains meta snapshot statistics
 }
 
 // JSInfo has detailed information on JetStream.
@@ -3129,7 +3176,7 @@ func (s *Server) accountDetail(jsa *jsAccount, optStreams, optConsumers, optDire
 						if !optCfg {
 							cInfo.Config = nil
 						}
-						sdet.DirectConsumer = append(sdet.Consumer, cInfo)
+						sdet.DirectConsumer = append(sdet.DirectConsumer, cInfo)
 					}
 				}
 			}
@@ -3233,32 +3280,18 @@ func (s *Server) Jsz(opts *JSzOptions) (*JSInfo, error) {
 
 	if mg := js.getMetaGroup(); mg != nil {
 		if ci := s.raftNodeToClusterInfo(mg); ci != nil {
-			entries, bytes := mg.Size()
 			jsi.Meta = &MetaClusterInfo{Name: ci.Name, Leader: ci.Leader, Peer: getHash(ci.Leader), Size: mg.ClusterSize()}
 			if isLeader {
 				jsi.Meta.Replicas = ci.Replicas
 			}
 			if ipq := s.jsAPIRoutedReqs; ipq != nil {
-				jsi.Meta.Pending = ipq.len()
+				jsi.Meta.PendingRequests = ipq.len()
 			}
-			// Add meta snapshot stats
-			jsi.Meta.Snapshot = &MetaSnapshotStats{
-				PendingEntries: entries,
-				PendingSize:    bytes,
+			if ipq := s.jsAPIRoutedInfoReqs; ipq != nil {
+				jsi.Meta.PendingInfos = ipq.len()
 			}
-			js.mu.RLock()
-			cluster := js.cluster
-			js.mu.RUnlock()
-			if cluster != nil {
-				timeNanos := atomic.LoadInt64(&cluster.lastMetaSnapTime)
-				durationNanos := atomic.LoadInt64(&cluster.lastMetaSnapDuration)
-				if timeNanos > 0 {
-					jsi.Meta.Snapshot.LastTime = time.Unix(0, timeNanos).UTC()
-				}
-				if durationNanos > 0 {
-					jsi.Meta.Snapshot.LastDuration = time.Duration(durationNanos)
-				}
-			}
+			jsi.Meta.Pending = jsi.Meta.PendingRequests + jsi.Meta.PendingInfos
+			jsi.Meta.Snapshot = s.metaClusterSnapshotStats(js, mg)
 		}
 	}
 
@@ -3695,14 +3728,25 @@ func (s *Server) healthz(opts *HealthzOptions) *HealthStatus {
 					})
 					continue
 				}
+				if streamWerr := s.getWriteErr(); streamWerr != nil {
+					if !details {
+						health.Status = na
+						health.Error = fmt.Sprintf("JetStream stream '%s > %s' write error: %v", acc, stream, streamWerr)
+						return health
+					}
+					health.Errors = append(health.Errors, HealthzError{
+						Type:    HealthzErrorStream,
+						Account: acc.Name,
+						Stream:  stream,
+						Error:   fmt.Sprintf("JetStream stream '%s > %s' write error: %v", acc, stream, streamWerr),
+					})
+					continue
+				}
 				if streamFound {
 					// if consumer option is passed, verify that the consumer exists on stream
 					if opts.Consumer != _EMPTY_ {
-						for _, cons := range s.consumers {
-							if cons.name == opts.Consumer {
-								consumerFound = true
-								break
-							}
+						if s.lookupConsumer(opts.Consumer) != nil {
+							consumerFound = true
 						}
 					}
 					break
@@ -3771,49 +3815,37 @@ func (s *Server) healthz(opts *HealthzOptions) *HealthStatus {
 	meta = cc.meta
 	js.mu.RUnlock()
 
-	// If no meta leader.
-	if meta == nil || meta.GroupLeader() == _EMPTY_ {
-		if !details {
-			health.Status = na
-			health.Error = "JetStream has not established contact with a meta leader"
-		} else {
-			health.Errors = []HealthzError{
-				{
-					Type:  HealthzErrorJetStream,
-					Error: "JetStream has not established contact with a meta leader",
-				},
-			}
-		}
-		return health
+	// Check meta layer health.
+	var metaNoLeader, metaClosed, metaUnhealthy bool
+	var metaWerr error
+	if meta != nil {
+		metaNoLeader = meta.GroupLeader() == _EMPTY_
+		metaClosed = meta.State() == Closed
+		metaUnhealthy = !meta.Healthy()
+		metaWerr = meta.GetWriteErr()
 	}
-
-	// If we are not current with the meta leader.
-	if !meta.Healthy() {
-		if !details {
-			health.Status = na
-			health.Error = "JetStream is not current with the meta leader"
+	metaRecovering := js.isMetaRecovering()
+	if meta == nil || metaNoLeader || metaClosed || metaUnhealthy || metaWerr != nil || metaRecovering {
+		var desc string
+		if metaWerr != nil {
+			desc = fmt.Sprintf("JetStream meta layer write error: %v", metaWerr)
+		} else if metaClosed {
+			desc = "JetStream meta layer is not running"
+		} else if meta != nil && metaRecovering {
+			desc = "JetStream is still recovering meta layer"
+		} else if meta == nil || metaNoLeader {
+			desc = "JetStream has not established contact with a meta leader"
 		} else {
-			health.Errors = []HealthzError{
-				{
-					Type:  HealthzErrorJetStream,
-					Error: "JetStream is not current with the meta leader",
-				},
-			}
+			desc = "JetStream is not current with the meta leader"
 		}
-		return health
-	}
-
-	// Are we still recovering meta layer?
-	if js.isMetaRecovering() {
 		if !details {
 			health.Status = na
-			health.Error = "JetStream is still recovering meta layer"
-
+			health.Error = desc
 		} else {
 			health.Errors = []HealthzError{
 				{
 					Type:  HealthzErrorJetStream,
-					Error: "JetStream is still recovering meta layer",
+					Error: desc,
 				},
 			}
 		}
@@ -4090,6 +4122,8 @@ type RaftzGroup struct {
 	QuorumNeeded  int                       `json:"quorum_needed"`
 	Observer      bool                      `json:"observer,omitempty"`
 	Paused        bool                      `json:"paused,omitempty"`
+	Overrun       bool                      `json:"overrun,omitempty"`
+	OverrunCount  uint64                    `json:"overrun_count,omitempty"`
 	Committed     uint64                    `json:"committed"`
 	Applied       uint64                    `json:"applied"`
 	CatchingUp    bool                      `json:"catching_up,omitempty"`
@@ -4198,6 +4232,8 @@ func (s *Server) Raftz(opts *RaftzOptions) *RaftzStatus {
 			QuorumNeeded:  n.qn,
 			Observer:      n.observer,
 			Paused:        n.paused,
+			Overrun:       n.quorumPaused || n.isLeaderOverrun(),
+			OverrunCount:  n.overrunCount,
 			Committed:     n.commit,
 			Applied:       n.applied,
 			CatchingUp:    n.catchup != nil,
@@ -4222,9 +4258,10 @@ func (s *Server) Raftz(opts *RaftzOptions) *RaftzStatus {
 			if id == n.id {
 				continue
 			}
+			kp := n.membChange == nil || n.membChange.peer != id
 			peer := RaftzGroupPeer{
 				Name:                s.serverNameForNode(id),
-				Known:               p.kp,
+				Known:               kp,
 				LastReplicatedIndex: p.li,
 			}
 			if !p.ts.IsZero() {

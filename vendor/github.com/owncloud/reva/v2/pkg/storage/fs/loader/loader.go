@@ -27,6 +27,7 @@ import (
 	_ "github.com/owncloud/reva/v2/pkg/storage/fs/eosgrpchome"
 	_ "github.com/owncloud/reva/v2/pkg/storage/fs/eoshome"
 	_ "github.com/owncloud/reva/v2/pkg/storage/fs/hello"
+	_ "github.com/owncloud/reva/v2/pkg/storage/fs/kiteworks"
 	_ "github.com/owncloud/reva/v2/pkg/storage/fs/local"
 	_ "github.com/owncloud/reva/v2/pkg/storage/fs/localhome"
 	_ "github.com/owncloud/reva/v2/pkg/storage/fs/nextcloud"

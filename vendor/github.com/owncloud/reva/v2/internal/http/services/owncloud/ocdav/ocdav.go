@@ -359,6 +359,10 @@ func (s *svc) sspReferenceIsChildOf(ctx context.Context, selector pool.Selectabl
 }
 
 func (s *svc) referenceIsChildOf(ctx context.Context, selector pool.Selectable[gateway.GatewayAPIClient], child, parent *provider.Reference) (bool, error) {
+	if child.ResourceId.StorageId != parent.ResourceId.StorageId {
+		return false, nil // Not on the same storage -> not a child
+	}
+
 	if child.ResourceId.SpaceId != parent.ResourceId.SpaceId {
 		return false, nil // Not on the same storage -> not a child
 	}
@@ -413,4 +417,12 @@ func isBodyEmpty(r *http.Request) bool {
 		}
 	}
 	return true
+}
+
+func destinationIsNotAllowed(srcRef, dstRef *provider.Reference) bool {
+	if srcRef.GetResourceId().GetStorageId() == utils.VaultStorageProviderID &&
+		dstRef.GetResourceId().GetStorageId() != utils.VaultStorageProviderID {
+		return true
+	}
+	return false
 }

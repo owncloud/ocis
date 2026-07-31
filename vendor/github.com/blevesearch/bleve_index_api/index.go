@@ -17,6 +17,8 @@ package index
 import (
 	"bytes"
 	"context"
+	"encoding/binary"
+	"fmt"
 	"reflect"
 )
 
@@ -55,6 +57,11 @@ type CopyIndex interface {
 	// Obtain a copy reader for the online copy/backup operation,
 	// to handle necessary bookkeeping, instead of using the regular IndexReader.
 	CopyReader() CopyReader
+}
+
+type TrainableIndex interface {
+	Index
+	Train(*Batch) error
 }
 
 // EventIndex is an optional interface for exposing the support for firing event
@@ -185,15 +192,44 @@ func (tfv *TermFieldVector) Size() int {
 		len(tfv.Field) + len(tfv.ArrayPositions)*sizeOfUint64
 }
 
-// IndexInternalID is an opaque document identifier interal to the index impl
+// IndexInternalID is an opaque document identifier internal to the index impl
 type IndexInternalID []byte
 
+// NewIndexInternalID encodes a uint64 into an 8-byte big-endian ID, reusing `buf` when possible.
+func NewIndexInternalID(buf []byte, in uint64) IndexInternalID {
+	if len(buf) != 8 {
+		if cap(buf) >= 8 {
+			buf = buf[0:8]
+		} else {
+			buf = make([]byte, 8)
+		}
+	}
+	binary.BigEndian.PutUint64(buf, in)
+	return buf
+}
+
+// NewIndexInternalIDFrom creates a new IndexInternalID by copying from `other`, reusing `buf` when possible.
+func NewIndexInternalIDFrom(buf IndexInternalID, other IndexInternalID) IndexInternalID {
+	buf = buf[:0]
+	return append(buf, other...)
+}
+
+// Equals checks if two IndexInternalID values are equal.
 func (id IndexInternalID) Equals(other IndexInternalID) bool {
 	return id.Compare(other) == 0
 }
 
+// Compare compares two IndexInternalID values, inherently comparing the encoded uint64 values.
 func (id IndexInternalID) Compare(other IndexInternalID) int {
 	return bytes.Compare(id, other)
+}
+
+// Value returns the uint64 value encoded in the IndexInternalID.
+func (id IndexInternalID) Value() (uint64, error) {
+	if len(id) != 8 {
+		return 0, fmt.Errorf("wrong len for IndexInternalID: %q", id)
+	}
+	return binary.BigEndian.Uint64(id), nil
 }
 
 type TermFieldDoc struct {
@@ -353,6 +389,21 @@ type ThesaurusReader interface {
 	ThesaurusKeysPrefix(name string, termPrefix []byte) (ThesaurusKeys, error)
 }
 
+// EligibleDocumentIterator provides an interface to iterate over eligible document IDs.
+type EligibleDocumentIterator interface {
+	// Next returns the next document ID and whether it exists.
+	// When ok is false, iteration is complete.
+	Next() (id uint64, ok bool)
+}
+
+// EligibleDocumentList represents a list of eligible document IDs for filtering.
+type EligibleDocumentList interface {
+	// Iterator returns an iterator for the eligible document IDs.
+	Iterator() EligibleDocumentIterator
+	// Count returns the number of eligible document IDs.
+	Count() uint64
+}
+
 // EligibleDocumentSelector filters documents based on specific eligibility criteria.
 // It can be extended with additional methods for filtering and retrieval.
 type EligibleDocumentSelector interface {
@@ -360,10 +411,9 @@ type EligibleDocumentSelector interface {
 	// id is the internal identifier of the document to be added.
 	AddEligibleDocumentMatch(id IndexInternalID) error
 
-	// SegmentEligibleDocs returns a list of eligible document IDs within a given segment.
-	// segmentID identifies the segment for which eligible documents are retrieved.
-	// This must be called after all eligible documents have been added.
-	SegmentEligibleDocs(segmentID int) []uint64
+	// SegmentEligibleDocuments returns an EligibleDocumentList for the specified segment.
+	// This must be called after all eligible documents have been added via AddEligibleDocumentMatch.
+	SegmentEligibleDocuments(segmentID int) EligibleDocumentList
 }
 
 // -----------------------------------------------------------------------------
@@ -391,3 +441,55 @@ type IndexInsightsReader interface {
 	// cluster densities (or cardinalities)
 	CentroidCardinalities(field string, limit int, descending bool) (cenCards []CentroidCardinality, err error)
 }
+
+// -----------------------------------------------------------------------------
+// NestedReader is an extended index reader that supports hierarchical document structures.
+type NestedReader interface {
+	IndexReader
+	// Ancestors returns the ancestral chain for a given document ID in the index.
+	// For nested documents, this method retrieves all parent documents in the hierarchy
+	// leading up to the root document ID.
+	Ancestors(id IndexInternalID, prealloc []AncestorID) ([]AncestorID, error)
+}
+
+// AncestorID represents the identifier of an ancestor document in an ancestor chain.
+type AncestorID uint64
+
+// NewAncestorID creates a new AncestorID from the given uint64 value.
+func NewAncestorID(val uint64) AncestorID {
+	return AncestorID(val)
+}
+
+// Compare compares two AncestorID values.
+func (a AncestorID) Compare(b AncestorID) int {
+	switch {
+	case a < b:
+		return -1
+	case a > b:
+		return 1
+	default:
+		return 0
+	}
+}
+
+// Equals checks if two AncestorID values are equal.
+func (a AncestorID) Equals(b AncestorID) bool {
+	return a == b
+}
+
+// Add returns a new AncestorID by adding the given uint64 value to the current AncestorID.
+func (a AncestorID) Add(n uint64) AncestorID {
+	return AncestorID(uint64(a) + n)
+}
+
+// ToIndexInternalID converts the AncestorID to an IndexInternalID.
+func (a AncestorID) ToIndexInternalID(prealloc IndexInternalID) IndexInternalID {
+	return NewIndexInternalID(prealloc, uint64(a))
+}
+
+// Default no-op implementation. Is called before writing any user data to a file.
+var WriterHook func(context []byte) (string, func(data []byte) []byte, error)
+
+// Default no-op implementation. Is called after reading any user data from a file.
+var ReaderHook func(id string, context []byte) (
+	func(data []byte) ([]byte, error), error)

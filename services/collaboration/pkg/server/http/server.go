@@ -36,6 +36,8 @@ func Server(opts ...Option) (http.Service, error) {
 		return http.Service{}, fmt.Errorf("could not initialize http service: %w", err)
 	}
 
+	// autopropagation middleware isn't needed here. The required
+	// information, such as MFA status, must be sent through the access token
 	middlewares := []func(stdhttp.Handler) stdhttp.Handler{
 		middleware.GetOtelhttpMiddleware(options.Config.Service.Name+"."+options.Config.App.Name, options.TracerProvider),
 		chimiddleware.RequestID,

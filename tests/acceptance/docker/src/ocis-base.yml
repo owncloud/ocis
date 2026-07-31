@@ -15,7 +15,7 @@ services:
       STORAGE_SYSTEM_DRIVER_OCIS_ROOT: /srv/app/tmp/ocis/storage/metadata
       SHARING_USER_JSON_FILE: /srv/app/tmp/ocis/shares.json
       PROXY_ENABLE_BASIC_AUTH: "true"
-      WEB_UI_CONFIG_FILE: /drone/src/tests/config/drone/ocis-config.json
+      WEB_UI_CONFIG_FILE: /ocis/tests/config/ci/ocis-config.json
       OCIS_INSECURE: "true"
       IDM_CREATE_DEMO_USERS: "true"
       IDM_ADMIN_PASSWORD: "admin"
@@ -48,7 +48,7 @@ services:
       SEARCH_EXTRACTOR_CS3SOURCE_INSECURE: "true"
 
       # fonts map for txt thumbnails (including unicode support)
-      THUMBNAILS_TXT_FONTMAP_FILE: "/drone/src/tests/config/drone/fontsMap.json"
+      THUMBNAILS_TXT_FONTMAP_FILE: "/ocis/tests/config/ci/fontsMap.json"
     volumes:
-      - ../../../config:/drone/src/tests/config
+      - ../../../config:/ocis/tests/config
       - ../../../ociswrapper/bin/ociswrapper:/usr/bin/ociswrapper

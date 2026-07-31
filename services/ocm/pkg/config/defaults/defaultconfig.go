@@ -119,7 +119,8 @@ func DefaultConfig() *config.Config {
 					File: filepath.Join(defaults.BaseDataPath(), "storage", "ocm", "ocmshares.json"),
 				},
 			},
-			Insecure: false,
+			Insecure:          false,
+			EnableUserSharing: true,
 		},
 		OCMCore: config.OCMCore{
 			Driver: "json",

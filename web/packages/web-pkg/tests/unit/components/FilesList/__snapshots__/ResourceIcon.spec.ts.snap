@@ -1,0 +1,71 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`OcResourceIcon > renders OcIcon for resource type file in size large 1`] = `"<oc-icon name="resource-type-file" color="var(--oc-color-text-default)" size="large" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file in size medium 1`] = `"<oc-icon name="resource-type-file" color="var(--oc-color-text-default)" size="medium" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file in size small 1`] = `"<oc-icon name="resource-type-file" color="var(--oc-color-text-default)" size="small" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file in size xlarge 1`] = `"<oc-icon name="resource-type-file" color="var(--oc-color-text-default)" size="xlarge" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file in size xsmall 1`] = `"<oc-icon name="resource-type-file" color="var(--oc-color-text-default)" size="xsmall" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file in size xxlarge 1`] = `"<oc-icon name="resource-type-file" color="var(--oc-color-text-default)" size="xxlarge" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file in size xxxlarge 1`] = `"<oc-icon name="resource-type-file" color="var(--oc-color-text-default)" size="xxxlarge" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file with extension "not-a-real-extension" in size large 1`] = `"<oc-icon name="resource-type-madeup-extension" color="red" size="large" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file with extension "not-a-real-extension" in size medium 1`] = `"<oc-icon name="resource-type-madeup-extension" color="red" size="medium" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file with extension "not-a-real-extension" in size small 1`] = `"<oc-icon name="resource-type-madeup-extension" color="red" size="small" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file with extension "not-a-real-extension" in size xlarge 1`] = `"<oc-icon name="resource-type-madeup-extension" color="red" size="xlarge" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file with extension "not-a-real-extension" in size xsmall 1`] = `"<oc-icon name="resource-type-madeup-extension" color="red" size="xsmall" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file with extension "not-a-real-extension" in size xxlarge 1`] = `"<oc-icon name="resource-type-madeup-extension" color="red" size="xxlarge" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file with extension "not-a-real-extension" in size xxxlarge 1`] = `"<oc-icon name="resource-type-madeup-extension" color="red" size="xxxlarge" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file with mimetype "not-a-real-mimetype" in size large 1`] = `"<oc-icon name="resource-type-file" color="var(--oc-color-text-default)" size="large" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file with mimetype "not-a-real-mimetype" in size medium 1`] = `"<oc-icon name="resource-type-file" color="var(--oc-color-text-default)" size="medium" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file with mimetype "not-a-real-mimetype" in size small 1`] = `"<oc-icon name="resource-type-file" color="var(--oc-color-text-default)" size="small" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file with mimetype "not-a-real-mimetype" in size xlarge 1`] = `"<oc-icon name="resource-type-file" color="var(--oc-color-text-default)" size="xlarge" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file with mimetype "not-a-real-mimetype" in size xsmall 1`] = `"<oc-icon name="resource-type-file" color="var(--oc-color-text-default)" size="xsmall" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file with mimetype "not-a-real-mimetype" in size xxlarge 1`] = `"<oc-icon name="resource-type-file" color="var(--oc-color-text-default)" size="xxlarge" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type file with mimetype "not-a-real-mimetype" in size xxxlarge 1`] = `"<oc-icon name="resource-type-file" color="var(--oc-color-text-default)" size="xxxlarge" class="oc-resource-icon oc-resource-icon-file"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type folder in size large 1`] = `"<oc-icon name="resource-type-folder" color="var(--oc-color-icon-folder)" size="large" class="oc-resource-icon oc-resource-icon-folder"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type folder in size medium 1`] = `"<oc-icon name="resource-type-folder" color="var(--oc-color-icon-folder)" size="medium" class="oc-resource-icon oc-resource-icon-folder"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type folder in size small 1`] = `"<oc-icon name="resource-type-folder" color="var(--oc-color-icon-folder)" size="small" class="oc-resource-icon oc-resource-icon-folder"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type folder in size xlarge 1`] = `"<oc-icon name="resource-type-folder" color="var(--oc-color-icon-folder)" size="xlarge" class="oc-resource-icon oc-resource-icon-folder"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type folder in size xsmall 1`] = `"<oc-icon name="resource-type-folder" color="var(--oc-color-icon-folder)" size="xsmall" class="oc-resource-icon oc-resource-icon-folder"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type folder in size xxlarge 1`] = `"<oc-icon name="resource-type-folder" color="var(--oc-color-icon-folder)" size="xxlarge" class="oc-resource-icon oc-resource-icon-folder"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type folder in size xxxlarge 1`] = `"<oc-icon name="resource-type-folder" color="var(--oc-color-icon-folder)" size="xxxlarge" class="oc-resource-icon oc-resource-icon-folder"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type space in size large 1`] = `"<oc-icon name="layout-grid" color="var(--oc-color-swatch-passive-default)" size="large" class="oc-resource-icon oc-resource-icon-space"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type space in size medium 1`] = `"<oc-icon name="layout-grid" color="var(--oc-color-swatch-passive-default)" size="medium" class="oc-resource-icon oc-resource-icon-space"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type space in size small 1`] = `"<oc-icon name="layout-grid" color="var(--oc-color-swatch-passive-default)" size="small" class="oc-resource-icon oc-resource-icon-space"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type space in size xlarge 1`] = `"<oc-icon name="layout-grid" color="var(--oc-color-swatch-passive-default)" size="xlarge" class="oc-resource-icon oc-resource-icon-space"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type space in size xsmall 1`] = `"<oc-icon name="layout-grid" color="var(--oc-color-swatch-passive-default)" size="xsmall" class="oc-resource-icon oc-resource-icon-space"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type space in size xxlarge 1`] = `"<oc-icon name="layout-grid" color="var(--oc-color-swatch-passive-default)" size="xxlarge" class="oc-resource-icon oc-resource-icon-space"></oc-icon>"`;
+
+exports[`OcResourceIcon > renders OcIcon for resource type space in size xxxlarge 1`] = `"<oc-icon name="layout-grid" color="var(--oc-color-swatch-passive-default)" size="xxxlarge" class="oc-resource-icon oc-resource-icon-space"></oc-icon>"`;

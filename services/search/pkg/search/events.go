@@ -1,11 +1,14 @@
 package search
 
 import (
+	"context"
 	"time"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 )
@@ -51,48 +54,56 @@ func HandleEvents(s Searcher, bus events.Consumer, logger log.Logger, cfg *confi
 		}
 	}
 
-	indexSpaceDebouncer := NewSpaceDebouncer(time.Duration(cfg.Events.DebounceDuration)*time.Millisecond, func(id *provider.StorageSpaceId) {
-		if err := s.IndexSpace(id); err != nil {
+	indexSpaceDebouncer := NewSpaceDebouncer(time.Duration(cfg.Events.DebounceDuration)*time.Millisecond, func(ctx context.Context, id *provider.StorageSpaceId) {
+		if err := s.IndexSpace(ctx, id); err != nil {
 			logger.Error().Err(err).Interface("spaceID", id).Msg("error while indexing a space")
 		}
 	})
+
+	// trace provider is available here, otherwise the search service should have crashed
+	tp, _ := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 
 	for i := 0; i < cfg.Events.NumConsumers; i++ {
 		go func(s Searcher, ch <-chan events.Event) {
 			for event := range ch {
 				e := event
 				go func() {
+					evCtx := context.Background()
+					tracedEvCtx, span := events.TraceEventConsumer(evCtx, tp, e)
+					tracedEvCtx = autoprop.SetMetaToContext(tracedEvCtx, e.ExtraInfo)
+					defer span.End()
+
 					logger.Debug().Interface("event", e).Msg("updating index")
 
 					switch ev := e.Event.(type) {
 					case events.ItemTrashed:
-						s.TrashItem(ev.ID)
-						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref))
+						s.TrashItem(tracedEvCtx, ev.ID)
+						indexSpaceDebouncer.Debounce(tracedEvCtx, getSpaceID(ev.Ref))
 					case events.ItemMoved:
-						s.MoveItem(ev.Ref)
-						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref))
+						s.MoveItem(tracedEvCtx, ev.Ref)
+						indexSpaceDebouncer.Debounce(tracedEvCtx, getSpaceID(ev.Ref))
 					case events.ItemRestored:
-						s.RestoreItem(ev.Ref)
-						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref))
+						s.RestoreItem(tracedEvCtx, ev.Ref)
+						indexSpaceDebouncer.Debounce(tracedEvCtx, getSpaceID(ev.Ref))
 					case events.ContainerCreated:
-						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref))
+						indexSpaceDebouncer.Debounce(tracedEvCtx, getSpaceID(ev.Ref))
 					case events.FileTouched:
-						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref))
+						indexSpaceDebouncer.Debounce(tracedEvCtx, getSpaceID(ev.Ref))
 					case events.FileVersionRestored:
-						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref))
+						indexSpaceDebouncer.Debounce(tracedEvCtx, getSpaceID(ev.Ref))
 					case events.TagsAdded:
-						s.UpdateTags(ev.Ref)
+						s.UpdateTags(tracedEvCtx, ev.Ref)
 					case events.TagsRemoved:
-						s.UpdateTags(ev.Ref)
+						s.UpdateTags(tracedEvCtx, ev.Ref)
 					case events.FileUploaded:
-						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref))
+						indexSpaceDebouncer.Debounce(tracedEvCtx, getSpaceID(ev.Ref))
 					case events.UploadReady:
 						if ev.Failed {
 							return
 						}
-						indexSpaceDebouncer.Debounce(getSpaceID(ev.FileRef))
+						indexSpaceDebouncer.Debounce(tracedEvCtx, getSpaceID(ev.FileRef))
 					case events.SpaceRenamed:
-						indexSpaceDebouncer.Debounce(ev.ID)
+						indexSpaceDebouncer.Debounce(tracedEvCtx, ev.ID)
 					}
 				}()
 			}

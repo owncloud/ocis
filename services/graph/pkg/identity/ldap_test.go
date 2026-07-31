@@ -18,7 +18,7 @@ import (
 )
 
 func getMockedBackend(l ldap.Client, lc config.LDAP, logger *log.Logger) (*LDAP, error) {
-	return NewLDAPBackend(l, lc, logger, "")
+	return NewLDAPBackend(l, lc, logger, "", "")
 }
 
 const (
@@ -94,29 +94,29 @@ func TestNewLDAPBackend(t *testing.T) {
 
 	tc := lconfig
 	tc.UserDisplayNameAttribute = ""
-	if _, err := NewLDAPBackend(l, tc, &logger, ""); err == nil {
+	if _, err := NewLDAPBackend(l, tc, &logger, "", ""); err == nil {
 		t.Error("Should fail with incomplete user attr config")
 	}
 
 	tc = lconfig
 	tc.GroupIDAttribute = ""
-	if _, err := NewLDAPBackend(l, tc, &logger, ""); err == nil {
+	if _, err := NewLDAPBackend(l, tc, &logger, "", ""); err == nil {
 		t.Errorf("Should fail with incomplete group	config")
 	}
 
 	tc = lconfig
 	tc.UserSearchScope = ""
-	if _, err := NewLDAPBackend(l, tc, &logger, ""); err == nil {
+	if _, err := NewLDAPBackend(l, tc, &logger, "", ""); err == nil {
 		t.Errorf("Should fail with invalid user search scope")
 	}
 
 	tc = lconfig
 	tc.GroupSearchScope = ""
-	if _, err := NewLDAPBackend(l, tc, &logger, ""); err == nil {
+	if _, err := NewLDAPBackend(l, tc, &logger, "", ""); err == nil {
 		t.Errorf("Should fail with invalid group search scope")
 	}
 
-	if _, err := NewLDAPBackend(l, lconfig, &logger, ""); err != nil {
+	if _, err := NewLDAPBackend(l, lconfig, &logger, "", ""); err != nil {
 		t.Errorf("Should fail with invalid group search scope")
 	}
 }
@@ -129,56 +129,79 @@ func TestCreateUser(t *testing.T) {
 	givenName := "givenName"
 	userType := "Member"
 
-	ar := ldap.NewAddRequest(fmt.Sprintf("uid=user,%s", lconfig.UserBaseDN), nil)
-	ar.Attribute(lconfig.UserDisplayNameAttribute, []string{displayName})
-	ar.Attribute(lconfig.UserEmailAttribute, []string{mail})
-	ar.Attribute(lconfig.UserNameAttribute, []string{userName})
-	ar.Attribute("sn", []string{surname})
-	ar.Attribute("givenname", []string{givenName})
-	ar.Attribute(lconfig.UserEnabledAttribute, []string{"TRUE"})
-	ar.Attribute(lconfig.UserTypeAttribute, []string{"Member"})
-	ar.Attribute(lconfig.ExternalIDAttribute, []string{"abcd-efgh-ijkl-mnop"})
-	ar.Attribute("cn", []string{userName})
-	ar.Attribute("objectClass", []string{"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"})
+	tests := []struct {
+		name       string
+		externalID string
+	}{
+		{
+			name:       "with externalID",
+			externalID: "abcd-efgh-ijkl-mnop",
+		},
+		{
+			name:       "without externalID",
+			externalID: "",
+		},
+	}
 
-	l := &mocks.Client{}
-	l.On("Search", mock.Anything).
-		Return(
-			&ldap.SearchResult{
-				Entries: []*ldap.Entry{userEntry},
-			},
-			nil)
-	l.On("Add", ar).Return(nil)
-	logger := log.NewLogger(log.Level("debug"))
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ar := ldap.NewAddRequest(fmt.Sprintf("uid=user,%s", lconfig.UserBaseDN), nil)
+			ar.Attribute(lconfig.UserDisplayNameAttribute, []string{displayName})
+			ar.Attribute(lconfig.UserEmailAttribute, []string{mail})
+			ar.Attribute(lconfig.UserNameAttribute, []string{userName})
+			ar.Attribute("sn", []string{surname})
+			ar.Attribute("givenname", []string{givenName})
+			ar.Attribute(lconfig.UserEnabledAttribute, []string{"TRUE"})
+			ar.Attribute(lconfig.UserTypeAttribute, []string{"Member"})
+			if tt.externalID != "" {
+				ar.Attribute(lconfig.ExternalIDAttribute, []string{tt.externalID})
+			}
+			ar.Attribute("cn", []string{userName})
+			ar.Attribute("objectClass", []string{"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"})
 
-	user := libregraph.NewUser(displayName, userName)
-	user.SetMail(mail)
-	user.SetSurname(surname)
-	user.SetGivenName(givenName)
-	user.SetAccountEnabled(true)
-	user.SetUserType(userType)
-	user.SetExternalID("abcd-efgh-ijkl-mnop")
+			l := &mocks.Client{}
+			l.On("Search", mock.Anything).
+				Return(
+					&ldap.SearchResult{
+						Entries: []*ldap.Entry{userEntry},
+					},
+					nil)
+			l.On("Add", ar).Return(nil)
+			logger := log.NewLogger(log.Level("debug"))
 
-	c := lconfig
-	c.UseServerUUID = true
-	b, _ := NewLDAPBackend(l, c, &logger, "")
+			user := libregraph.NewUser(displayName, userName)
+			user.SetMail(mail)
+			user.SetSurname(surname)
+			user.SetGivenName(givenName)
+			user.SetAccountEnabled(true)
+			user.SetUserType(userType)
+			if tt.externalID != "" {
+				user.SetExternalID(tt.externalID)
+			}
 
-	newUser, err := b.CreateUser(context.Background(), *user)
-	assert.Nil(t, err)
-	assert.Equal(t, displayName, newUser.GetDisplayName())
-	assert.Equal(t, mail, newUser.GetMail())
-	assert.Equal(t, userName, newUser.GetOnPremisesSamAccountName())
-	assert.Equal(t, givenName, newUser.GetGivenName())
-	assert.Equal(t, surname, newUser.GetSurname())
-	assert.True(t, newUser.GetAccountEnabled())
-	assert.Equal(t, userType, newUser.GetUserType())
+			c := lconfig
+			c.UseServerUUID = true
+			b, err := NewLDAPBackend(l, c, &logger, "", "")
+			assert.Nil(t, err)
+
+			newUser, err := b.CreateUser(context.Background(), *user)
+			assert.Nil(t, err)
+			assert.Equal(t, displayName, newUser.GetDisplayName())
+			assert.Equal(t, mail, newUser.GetMail())
+			assert.Equal(t, userName, newUser.GetOnPremisesSamAccountName())
+			assert.Equal(t, givenName, newUser.GetGivenName())
+			assert.Equal(t, surname, newUser.GetSurname())
+			assert.True(t, newUser.GetAccountEnabled())
+			assert.Equal(t, userType, newUser.GetUserType())
+		})
+	}
 }
 
 func TestCreateUserModelFromLDAP(t *testing.T) {
 	l := &mocks.Client{}
 	logger := log.NewLogger(log.Level("debug"))
 
-	b, _ := NewLDAPBackend(l, lconfig, &logger, "")
+	b, _ := NewLDAPBackend(l, lconfig, &logger, "", "")
 	if user := b.createUserModelFromLDAP(nil); user != nil {
 		t.Errorf("createUserModelFromLDAP should return on nil Entry")
 	}

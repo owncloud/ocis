@@ -14,6 +14,7 @@ import (
 	ehmocks "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0/mocks"
 	settingsmocks "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0/mocks"
 	"github.com/owncloud/reva/v2/pkg/store"
+	"go.opentelemetry.io/otel/trace"
 
 	microstore "go-micro.dev/v4/store"
 
@@ -104,7 +105,7 @@ var _ = Describe("Notifications", func() {
 	DescribeTable("Sending notifications",
 		func(tc testChannel, ev events.Event) {
 			ch := make(chan events.Event)
-			evts := NewEventsNotifier(ch, tc, log.NewLogger(), gatewaySelector, vs, "",
+			evts := NewEventsNotifier(trace.NewNoopTracerProvider(), ch, tc, log.NewLogger(), gatewaySelector, vs, "",
 				"", "", "", "", "", "",
 				store.Create(), nil, nil)
 			go evts.Run()
@@ -341,7 +342,7 @@ var _ = Describe("Notifications X-Site Scripting", func() {
 	DescribeTable("Sending notifications",
 		func(tc testChannel, ev events.Event) {
 			ch := make(chan events.Event)
-			evts := NewEventsNotifier(ch, tc, log.NewLogger(), gatewaySelector, vs, "",
+			evts := NewEventsNotifier(trace.NewNoopTracerProvider(), ch, tc, log.NewLogger(), gatewaySelector, vs, "",
 				"", "", "", "", "", "",
 				store.Create(), nil, nil)
 			go evts.Run()
@@ -631,7 +632,7 @@ var _ = Describe("Notifications grouped store", func() {
 
 			// setup EventsNotifier
 			ch := make(chan events.Event)
-			evts := NewEventsNotifier(ch, tc, log.NewLogger(), gatewaySelector, valueService, "",
+			evts := NewEventsNotifier(trace.NewNoopTracerProvider(), ch, tc, log.NewLogger(), gatewaySelector, valueService, "",
 				"", "", "", "", "", "",
 				store, nil, nil)
 			go evts.Run()
@@ -900,7 +901,7 @@ var _ = Describe("Notifications grouped send", func() {
 				registeredEvents[typ.String()] = e
 			}
 			ch := make(chan events.Event)
-			evts := NewEventsNotifier(ch, tc, log.NewLogger(), gatewaySelector, valueService, "",
+			evts := NewEventsNotifier(trace.NewNoopTracerProvider(), ch, tc, log.NewLogger(), gatewaySelector, valueService, "",
 				"", "", "", "", "",
 				sender, store, historyClient, registeredEvents)
 			go evts.Run()

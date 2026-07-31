@@ -142,6 +142,7 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 			SetProjectSpaceQuotaPermission(All),
 			SettingsManagementPermission(All),
 			SpaceAbilityPermission(All),
+			VaultModePermission(Own),
 			WriteFavoritesPermission(Own),
 		},
 	}
@@ -183,6 +184,7 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 			SelfManagementPermission(Own),
 			SetProjectSpaceQuotaPermission(All),
 			SpaceAbilityPermission(All),
+			VaultModePermission(Own),
 			WriteFavoritesPermission(Own),
 		},
 	}
@@ -217,6 +219,7 @@ func generateBundleUserRole() *settingsmsg.Bundle {
 			LanguageManagementPermission(Own),
 			ListFavoritesPermission(Own),
 			SelfManagementPermission(Own),
+			VaultModePermission(Own),
 			WriteFavoritesPermission(Own),
 		},
 	}

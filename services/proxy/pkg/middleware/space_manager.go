@@ -68,6 +68,10 @@ func (csm claimSpaceManager) ServeHTTP(w http.ResponseWriter, req *http.Request)
 		// no user in context, we omit this request
 		return
 	}
+	if spaceAssignments == nil {
+		// no OIDC claims available (e.g. signed URL auth), skip reconciliation
+		return
+	}
 
 	ctx, gwc, err := csm.getCtx()
 	if err != nil {
@@ -153,9 +157,15 @@ func (csm claimSpaceManager) evaluateContext(ctx context.Context) (string, map[s
 	return u.GetId().GetOpaqueId(), csm.getSpaceAssignments(ctx)
 }
 
-// returns a map[spaceID]role
+// returns a map[spaceID]role or nil if no OIDC claims are available in the context
 func (csm claimSpaceManager) getSpaceAssignments(ctx context.Context) map[string]string {
 	claims := oidc.FromContext(ctx)
+	if claims == nil {
+		// No OIDC claims in context (e.g. signed URL auth). Skip reconciliation
+		// to avoid removing the user from all spaces.
+		return nil
+	}
+
 	values, ok := claims[csm.claimName].([]any)
 	if !ok {
 		csm.logger.Error().Interface("claims", claims).Str("claimname", csm.claimName).Msg("configured claims are not an array")

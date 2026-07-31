@@ -1,0 +1,26 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`EditPanel > renders all available inputs 1`] = `
+"<div id="user-edit-panel" class="oc-mt-xl">
+  <user-info-box-stub user="[object Object]"></user-info-box-stub>
+  <form id="user-edit-form" class="oc-background-highlight oc-p-m" autocomplete="off">
+    <div>
+      <oc-text-input-stub label="User name" id="userName-input" type="text" clearbuttonenabled="false" clearbuttonaccessiblelabel="" disabled="false" errormessage="" fixmessageline="true" readonly="false" passwordpolicy="[object Object]" class="oc-mb-s"></oc-text-input-stub>
+      <oc-text-input-stub label="First and last name" id="displayName-input" type="text" modelvalue="jan" clearbuttonenabled="false" clearbuttonaccessiblelabel="" disabled="false" errormessage="" fixmessageline="true" readonly="false" passwordpolicy="[object Object]" class="oc-mb-s"></oc-text-input-stub>
+      <oc-text-input-stub label="Email" id="email-input" type="email" modelvalue="jan@owncloud.com" clearbuttonenabled="false" clearbuttonaccessiblelabel="" disabled="false" errormessage="" fixmessageline="true" readonly="false" passwordpolicy="[object Object]" class="oc-mb-s"></oc-text-input-stub>
+      <oc-text-input-stub label="Password" id="password-input" type="password" modelvalue="" clearbuttonenabled="false" clearbuttonaccessiblelabel="" disabled="false" fixmessageline="true" readonly="false" passwordpolicy="[object Object]" class="oc-mb-s" placeholder="●●●●●●●●"></oc-text-input-stub>
+      <div class="oc-mb-s">
+        <oc-select-stub label="Role" id="role-input" filter="[Function]" disabled="false" labelhidden="false" optionlabel="displayName" searchable="true" clearable="false" loading="false" fixmessageline="false" multiple="false" readonly="false" positionfixed="false" options="[object Object]"></oc-select-stub>
+        <div class="oc-text-input-message"></div>
+      </div>
+      <div class="oc-mb-s">
+        <oc-select-stub label="Login" id="login-input" filter="[Function]" disabled="false" labelhidden="false" optionlabel="label" searchable="true" clearable="false" loading="false" fixmessageline="false" multiple="false" readonly="false" positionfixed="false" model-value="[object Object]" options="[object Object],[object Object]"></oc-select-stub>
+        <div class="oc-text-input-message"></div>
+      </div>
+      <quota-select-stub totalquota="0" maxquota="0" id="quota-select-form" disabled="false" class="oc-mb-s" label="Personal quota" fix-message-line="true" description-message="" read-only="false"></quota-select-stub>
+      <group-select-stub selectedgroups="" groupoptions="undefined,undefined" class="oc-mb-s" read-only="false"></group-select-stub>
+    </div>
+    <compare-save-dialog-stub originalobject="[object Object]" compareobject="[object Object]" confirmbuttondisabled="false" class="edit-compare-save-dialog oc-mb-l"></compare-save-dialog-stub>
+  </form>
+</div>"
+`;

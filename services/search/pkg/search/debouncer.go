@@ -1,6 +1,7 @@
 package search
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 // SpaceDebouncer debounces operations on spaces for a configurable amount of time
 type SpaceDebouncer struct {
 	after      time.Duration
-	f          func(id *provider.StorageSpaceId)
+	f          func(ctx context.Context, id *provider.StorageSpaceId)
 	pending    map[string]*time.Timer
 	inProgress sync.Map
 
@@ -18,7 +19,7 @@ type SpaceDebouncer struct {
 }
 
 // NewSpaceDebouncer returns a new SpaceDebouncer instance
-func NewSpaceDebouncer(d time.Duration, f func(id *provider.StorageSpaceId)) *SpaceDebouncer {
+func NewSpaceDebouncer(d time.Duration, f func(ctx context.Context, id *provider.StorageSpaceId)) *SpaceDebouncer {
 	return &SpaceDebouncer{
 		after:      d,
 		f:          f,
@@ -28,7 +29,7 @@ func NewSpaceDebouncer(d time.Duration, f func(id *provider.StorageSpaceId)) *Sp
 }
 
 // Debounce restars the debounce timer for the given space
-func (d *SpaceDebouncer) Debounce(id *provider.StorageSpaceId) {
+func (d *SpaceDebouncer) Debounce(ctx context.Context, id *provider.StorageSpaceId) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -47,6 +48,6 @@ func (d *SpaceDebouncer) Debounce(id *provider.StorageSpaceId) {
 
 		d.inProgress.Store(id.OpaqueId, true)
 		defer d.inProgress.Delete(id.OpaqueId)
-		d.f(id)
+		d.f(ctx, id)
 	})
 }

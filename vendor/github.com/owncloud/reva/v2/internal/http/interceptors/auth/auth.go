@@ -354,6 +354,7 @@ func ctxWithUserInfo(ctx context.Context, r *http.Request, user *userpb.User, to
 	ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.UserAgentHeader, r.UserAgent())
 	ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.InitiatorHeader, initiatorid)
 	ctx = ctxpkg.ContextSetScopes(ctx, tokenScope)
+
 	return ctx
 }
 

@@ -121,6 +121,18 @@ func NewSublist(enableCache bool) *Sublist {
 	return &Sublist{root: newLevel()}
 }
 
+// NewSublistForServer will create a default sublist with caching enabled determined
+// by the server options.
+func NewSublistForServer(srv *Server) *Sublist {
+	if srv == nil {
+		return NewSublistNoCache() // Probably just unit tests.
+	}
+	if opts := srv.getOpts(); opts != nil {
+		return NewSublist(!opts.NoSublistCache)
+	}
+	return NewSublistNoCache()
+}
+
 // NewSublistWithCache will create a default sublist with caching enabled.
 func NewSublistWithCache() *Sublist {
 	return NewSublist(true)
@@ -626,9 +638,10 @@ func (s *Sublist) hasInterest(subject string, doLock bool, np, nq *int) bool {
 	if doLock {
 		s.RLock()
 	}
-	var matched bool
+	var matched, ok bool
 	if s.cache != nil {
-		if r, ok := s.cache[subject]; ok {
+		var r *SublistResult
+		if r, ok = s.cache[subject]; ok {
 			if np != nil && nq != nil {
 				*np += len(r.psubs)
 				for _, qsub := range r.qsubs {
@@ -641,9 +654,9 @@ func (s *Sublist) hasInterest(subject string, doLock bool, np, nq *int) bool {
 	if doLock {
 		s.RUnlock()
 	}
-	if matched {
+	if ok {
 		atomic.AddUint64(&s.cacheHits, 1)
-		return true
+		return matched
 	}
 
 	tsa := [32]string{}
@@ -1327,8 +1340,9 @@ func SubjectsCollide(subj1, subj2 string) bool {
 	if subj1 == subj2 {
 		return true
 	}
-	toks1 := strings.Split(subj1, tsep)
-	toks2 := strings.Split(subj2, tsep)
+	tsa, tsb := [32]string{}, [32]string{}
+	toks1 := tokenizeSubjectIntoSlice(tsa[:0], subj1)
+	toks2 := tokenizeSubjectIntoSlice(tsb[:0], subj2)
 	pwc1, fwc1 := analyzeTokens(toks1)
 	pwc2, fwc2 := analyzeTokens(toks2)
 	// if both literal just string compare.
@@ -1338,9 +1352,9 @@ func SubjectsCollide(subj1, subj2 string) bool {
 	}
 	// So one or both have wildcards. If one is literal than we can do subset matching.
 	if l1 && !l2 {
-		return isSubsetMatch(toks1, subj2)
+		return isSubsetMatchTokenized(toks1, toks2)
 	} else if l2 && !l1 {
-		return isSubsetMatch(toks2, subj1)
+		return isSubsetMatchTokenized(toks2, toks1)
 	}
 	// Both have wildcards.
 	// If they only have partials then the lengths must match.

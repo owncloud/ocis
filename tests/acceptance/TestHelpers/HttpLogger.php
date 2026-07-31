@@ -79,7 +79,7 @@ class HttpLogger {
 		}
 
 		$logMessage = "\t\t_______________________________________________________________________\n\n";
-		$logMessage .= "\t\t==> REQUEST\n";
+		$logMessage .= "\t\t(" . date('Y/m/d G:i:s') . ") ==> REQUEST\n";
 		$logMessage .= "\t\t$method $path\n";
 		$logMessage .= $query ? "\t\tQUERY: $query\n" : "";
 		$logMessage .= "\t\t$headers";
@@ -107,7 +107,7 @@ class HttpLogger {
 			$headers = $key . ": " . $value[0] . "\n";
 		}
 
-		$logMessage = "\t\t<== RESPONSE\n";
+		$logMessage = "\t\t(" . date('Y/m/d G:i:s') . ") <== RESPONSE\n";
 		$logMessage .= "\t\t$statusCode $statusMessage\n";
 		$logMessage .= "\t\t$headers";
 

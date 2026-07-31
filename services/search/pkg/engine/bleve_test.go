@@ -223,6 +223,24 @@ var _ = Describe("Bleve", func() {
 				assertDocCount(rootResource.ID, "Name:Foo*", 1)
 			})
 
+			It("does a case-insensitive search on photo metadata", func() {
+				// Guards PR #12078: photo keyword fields use the lowercaseKeyword
+				// analyzer, and the compiler lowercases the query value. A mixed-case
+				// indexed value must be found regardless of the query's case, and
+				// crucially the uppercase wildcard form "*Canon*" (what the
+				// advanced-search web extension actually sends) must match.
+				parentResource.Document.Photo = libregraph.NewPhoto()
+				parentResource.Document.Photo.SetCameraMake("Canon")
+
+				err := eng.Upsert(parentResource.ID, parentResource)
+				Expect(err).ToNot(HaveOccurred())
+
+				assertDocCount(rootResource.ID, "photo.cameraMake:canon", 1)
+				assertDocCount(rootResource.ID, "photo.cameraMake:Canon", 1)
+				assertDocCount(rootResource.ID, "photo.cameraMake:*Canon*", 1)
+				assertDocCount(rootResource.ID, "photo.cameraMake:*canon*", 1)
+			})
+
 			Context("and an additional file in a subdirectory", func() {
 				BeforeEach(func() {
 					err := eng.Upsert(parentResource.ID, parentResource)

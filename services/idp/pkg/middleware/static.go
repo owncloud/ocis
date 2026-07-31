@@ -42,6 +42,9 @@ func Static(root string, fs http.FileSystem, tp trace.TracerProvider) func(http.
 				} else {
 					r.URL.Path = strings.Replace(r.URL.Path, "/signin/v1/static/", "/signin/v1/identifier/static/", 1)
 					span.SetAttributes(attribute.KeyValue{Key: "server", Value: attribute.StringValue(r.URL.Path)})
+					if strings.HasSuffix(r.URL.Path, ".css") {
+						w.Header().Set("Cache-Control", "no-cache")
+					}
 					static.ServeHTTP(w, r)
 				}
 				return

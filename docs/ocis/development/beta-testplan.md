@@ -46,7 +46,7 @@ Prerequisite:
 
 documentation resources:
   - [configure ocis with LDAP](https://owncloud.dev/ocis/deployment/ocis_ldap/)
-  - [sharing API is compatible to ownCloud 10](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
+  - [sharing API is compatible to ownCloud Classic](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
   - [webDav operations](#webdav)
 
 | Test Case                                                                                             | Expected Result                                                                       | Comment |
@@ -65,7 +65,7 @@ documentation resources:
 should be tried in various ways and in different environments
 
 documentation resources:
-- [sharing API is compatible to ownCloud 10](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
+- [sharing API is compatible to ownCloud Classic](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
 - [webDav operations](#webdav)
 
 | Test Case                                                                             | Expected Result                                                       | Comment                                                   |
@@ -77,20 +77,6 @@ documentation resources:
 | re-share a file/folder with different permissions                                     | sharing with lower permissions is possible, but not with higher       |                                                           |
 | decline received share                                                                | shared resource should not be shown to the receiver                   |                                                           |
 
-
-## parallel deployment
-
-- [configure ocis with LDAP](https://owncloud.dev/ocis/deployment/ocis_ldap/)
-- [setup oC10 and ocis in parallel](https://owncloud.dev/ocis/deployment/oc10_ocis_parallel/)
-- create users and groups in LDAP
-
-documentation resources:
-- [sharing API is compatible to ownCloud 10](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
-
-| Test Case                                                                                                                                                        | Expected Result                                          | Comment |
-|------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------|---------|
-| share file / folder to a group in one implementation (use different permissions), access the items with the other implementation, try to violate the permissions | receiver should not be able to violate the permissions   |         |
-| share file / folder to a group, remove member from group in LDAP, try to access items with the removed member from both implementations                          | removed member should not have access to the shared item |         |
 
 ## Spaces
 
@@ -257,7 +243,7 @@ Prerequisite:
 
 | Test Case                                                     | Expected Result                                             | Comment                                                                                                      |
 |---------------------------------------------------------------|-------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
-| use ocis as webDAV external storage in ownCloud 10            | resource access works                                       |                                                                                                              |
+| use ocis as webDAV external storage in ownCloud Classic            | resource access works                                       |                                                                                                              |
 | access webDAV with your file-manager                          | that will not give you a good UX, but ocis should not crash | Urls: https://\<ocis-server\>/remote.php/webdav  & https://\<ocis-server\>/remote.php/dav/files/\<username\> |
 | access webDAV with the "remote-files" function of LibreOffice | files are accessible and can be written back                |                                                                                                              |
 

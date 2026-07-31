@@ -25,11 +25,13 @@ import (
 	"encoding/xml"
 	"io"
 	"io/fs"
+	"net"
 	"net/http"
 	"net/url"
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -98,6 +100,20 @@ func (b BearerAuthenticator) Clone() gowebdav.Authenticator {
 // Close is not implemented for the BearerAuthenticator. It always returns nil.
 func (BearerAuthenticator) Close() error {
 	return nil
+}
+
+// noRedirectRoundTripper wraps an http.RoundTripper and tags every outgoing
+// request with gowebdav's XInhibitRedirect header. The default CheckRedirect
+// installed by gowebdav.NewAuthClient then returns http.ErrUseLastResponse on
+// any 3xx response, so the http.Client never follows the redirect.
+type noRedirectRoundTripper struct {
+	base http.RoundTripper
+}
+
+func (t *noRedirectRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	clonedRequest := req.Clone(req.Context())
+	clonedRequest.Header.Set(gowebdav.XInhibitRedirect, "1")
+	return t.base.RoundTrip(clonedRequest)
 }
 
 // New creates an OCM storage driver.
@@ -204,47 +220,68 @@ func (d *driver) webdavClient(ctx context.Context, forUser *userpb.UserId, ref *
 	// FIXME: it's still not clear from the OCM APIs how to use the shared secret
 	// will use as a token in the bearer authentication as this is the reva implementation
 	c := gowebdav.NewAuthClient(endpoint, gowebdav.NewPreemptiveAuth(BearerAuthenticator{Token: secret}))
-	if d.c.Insecure {
-		c.SetTransport(&http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		})
+	base := &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).DialContext,
+		ForceAttemptHTTP2:     true,
+		MaxIdleConns:          100,
+		MaxIdleConnsPerHost:   32, // Bamped up from 2 to keep connections hot
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
 	}
+	if d.c.Insecure {
+		base.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	}
+	c.SetTransport(&noRedirectRoundTripper{base: base})
 
 	return c, share, rel, nil
 }
 
-func (d *driver) CreateDir(ctx context.Context, ref *provider.Reference) error {
+func (d *driver) CreateDir(ctx context.Context, ref *provider.Reference) (*storage.CreateDirResult, error) {
 	client, _, rel, err := d.webdavClient(ctx, nil, ref)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return client.MkdirAll(rel, 0)
+	if err := client.MkdirAll(rel, 0); err != nil {
+		return nil, err
+	}
+	return &storage.CreateDirResult{}, nil
 }
 
-func (d *driver) Delete(ctx context.Context, ref *provider.Reference) error {
+func (d *driver) Delete(ctx context.Context, ref *provider.Reference) (*storage.DeleteResult, error) {
 	client, _, rel, err := d.webdavClient(ctx, nil, ref)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return client.RemoveAll(rel)
+	if err := client.RemoveAll(rel); err != nil {
+		return nil, err
+	}
+	return &storage.DeleteResult{}, nil
 }
 
-func (d *driver) TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool, mtime string) error {
+func (d *driver) TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool, mtime string) (*storage.TouchFileResult, error) {
 	client, _, rel, err := d.webdavClient(ctx, nil, ref)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return client.Write(rel, []byte{}, 0)
+	if err := client.Write(rel, []byte{}, 0); err != nil {
+		return nil, err
+	}
+	return &storage.TouchFileResult{}, nil
 }
 
-func (d *driver) Move(ctx context.Context, oldRef, newRef *provider.Reference) error {
+func (d *driver) Move(ctx context.Context, oldRef, newRef *provider.Reference) (*storage.MoveResult, error) {
 	client, _, relOld, err := d.webdavClient(ctx, nil, oldRef)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	_, relNew := shareInfoFromReference(newRef)
 
-	return client.Rename(relOld, relNew, false)
+	return nil, client.Rename(relOld, relNew, false)
 }
 
 func getPathFromShareIDAndRelPath(shareID *ocmpb.ShareId, relPath string) string {
@@ -422,16 +459,16 @@ func (d *driver) DownloadRevision(ctx context.Context, ref *provider.Reference, 
 	return nil, nil, errtypes.NotSupported("operation not supported")
 }
 
-func (d *driver) RestoreRevision(ctx context.Context, ref *provider.Reference, key string) error {
-	return errtypes.NotSupported("operation not supported")
+func (d *driver) RestoreRevision(ctx context.Context, ref *provider.Reference, key string) (*storage.RestoreRevisionResult, error) {
+	return nil, errtypes.NotSupported("operation not supported")
 }
 
 func (d *driver) ListRecycle(ctx context.Context, ref *provider.Reference, key, relativePath string) ([]*provider.RecycleItem, error) {
 	return nil, errtypes.NotSupported("operation not supported")
 }
 
-func (d *driver) RestoreRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string, restoreRef *provider.Reference) error {
-	return errtypes.NotSupported("operation not supported")
+func (d *driver) RestoreRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string, restoreRef *provider.Reference) (*storage.RestoreRecycleItemResult, error) {
+	return nil, errtypes.NotSupported("operation not supported")
 }
 
 func (d *driver) PurgeRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string) error {
@@ -479,13 +516,16 @@ func (d *driver) UnsetArbitraryMetadata(ctx context.Context, ref *provider.Refer
 }
 
 // SetLock sets a lock on a file
-func (d *driver) SetLock(ctx context.Context, ref *provider.Reference, lock *provider.Lock) error {
+func (d *driver) SetLock(ctx context.Context, ref *provider.Reference, lock *provider.Lock) (*storage.SetLockResult, error) {
 	client, _, rel, err := d.webdavClient(ctx, nil, ref)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return client.Lock(rel, lock.GetLockId())
+	if err := client.Lock(rel, lock.GetLockId()); err != nil {
+		return nil, err
+	}
+	return &storage.SetLockResult{}, nil
 }
 
 func (d *driver) GetLock(ctx context.Context, ref *provider.Reference) (*provider.Lock, error) {
@@ -512,13 +552,16 @@ func (d *driver) RefreshLock(ctx context.Context, ref *provider.Reference, lock 
 }
 
 // Unlock removes a lock from a file
-func (d *driver) Unlock(ctx context.Context, ref *provider.Reference, lock *provider.Lock) error {
+func (d *driver) Unlock(ctx context.Context, ref *provider.Reference, lock *provider.Lock) (*storage.UnlockResult, error) {
 	client, _, rel, err := d.webdavClient(ctx, nil, ref)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return client.Unlock(rel, lock.GetLockId())
+	if err := client.Unlock(rel, lock.GetLockId()); err != nil {
+		return nil, err
+	}
+	return &storage.UnlockResult{}, nil
 }
 
 func (d *driver) ListStorageSpaces(ctx context.Context, filters []*provider.ListStorageSpacesRequest_Filter, _ bool) ([]*provider.StorageSpace, error) {
@@ -613,6 +656,6 @@ func (d *driver) UpdateStorageSpace(ctx context.Context, req *provider.UpdateSto
 	return nil, errtypes.NotSupported("operation not supported")
 }
 
-func (d *driver) DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorageSpaceRequest) error {
-	return errtypes.NotSupported("operation not supported")
+func (d *driver) DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorageSpaceRequest) (*storage.DeleteStorageSpaceResult, error) {
+	return nil, errtypes.NotSupported("operation not supported")
 }

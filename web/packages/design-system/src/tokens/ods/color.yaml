@@ -1,0 +1,149 @@
+---
+color:
+  swatch:
+    brand:
+      default:
+        value: rgb(4, 30, 66)
+      hover:
+        value: rgb(34, 57, 89)
+      muted:
+        value: rgb(0, 20, 40)
+      contrast:
+        value: '{color.text.inverse}'
+    primary:
+      default:
+        value: rgb(74, 118, 172)
+      hover:
+        value: rgb(128, 167, 215)
+      muted:
+        value: rgb(8, 105, 222)
+      gradient:
+        value: rgb(78, 133, 200)
+      contrast:
+        value: '{color.text.inverse}'
+    success:
+      default:
+        value: rgb(3, 84, 63)
+      hover:
+        value: rgb(147, 224, 84)
+      muted:
+        value: rgb(83, 150, 10)
+      contrast:
+        value: '{color.text.inverse}'
+    warning:
+      default:
+        value: rgb(183, 76, 27)
+      hover:
+        value: rgb(183, 76, 27)
+      muted:
+        value: rgba(183, 76, 27, .5)
+      contrast:
+        value: '{color.text.inverse}'
+    danger:
+      default:
+        value: rgb(197, 48, 48)
+      hover:
+        value: rgb(168, 40, 40)
+      muted:
+        value: rgb(204, 117, 117)
+      contrast:
+        value: '{color.text.inverse}'
+    passive:
+      default:
+        value: rgb(76, 95, 121)
+      hover:
+        value: rgb(151, 162, 177)
+      muted:
+        value: rgb(40, 62, 93)
+      contrast:
+        value: '{color.text.inverse}'
+    inverse:
+      default:
+        value: rgb(255, 255, 255)
+      hover:
+        value: rgb(255, 255, 255)
+      muted:
+        value: rgb(191, 191, 191)
+      contrast:
+        value: '{color.text.default}'
+  background:
+    default:
+      value: rgb(255, 255, 255)
+    secondary:
+      value: rgb(255, 255, 255)
+    muted:
+      value: rgb(248, 248, 248)
+    highlight:
+      value: rgb(237, 243, 250)
+    accentuate:
+      value: rgba(255, 255, 5, 0.1)
+    hover:
+      value: rgb(236, 236, 236)
+  border:
+    value: rgb(236, 235, 238)
+  text:
+    default:
+      value: '{color.swatch.brand.default}'
+    muted:
+      value: '{color.swatch.passive.default}'
+    inverse:
+      value: '{color.background.default}'
+  input:
+    text:
+      default:
+        value: '{color.swatch.brand.default}'
+      muted:
+        value: '{color.swatch.passive.default}'
+    border:
+      value: rgb(206, 221, 238)
+    bg:
+      value: rgb(255, 255, 255)
+  components:
+    apptopbar:
+      background:
+        value: 'transparent'
+      border:
+        value: rgb(206, 221, 238)
+  icon:
+    folder:
+      value: rgb(44, 101, 255)
+    archive:
+      value: rgb(255, 207, 1)
+    graphic:
+      value: rgb(235, 201, 74)
+    drawio:
+      value: rgb(255, 111, 0)
+    file:
+      value: '{color.text.default}'
+    ifc:
+      value: rgb(208, 67, 236)
+    image:
+      value: rgb(255, 111, 0)
+    jupyter:
+      value: rgb(243, 119, 38)
+    code:
+      value: '{color.text.default}'
+    text:
+      value: '{color.text.default}'
+    spreadsheet:
+      value: rgb(0, 182, 87)
+    document:
+      value: rgb(44, 101, 255)
+    form:
+      value: rgb(102, 166, 163)
+    markdown:
+      value: rgb(75, 100, 137)
+    video:
+      value: rgb(0, 187, 219)
+    audio:
+      value: rgb(208, 67, 236)
+    presentation:
+      value: rgb(255, 64, 6)
+    pdf:
+      value: rgb(225, 5, 14)
+    root:
+      value: rgb(0, 187, 219)
+    medical:
+      value: rgb(9, 132, 219)
+    epub:
+      value: rgb(244, 187, 68)

@@ -285,8 +285,8 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	logger.Debug().Str("id", user.GetExternalID()).Msg("calling delete education user on backend")
-	err = g.identityEducationBackend.DeleteEducationUser(r.Context(), user.GetExternalID())
+	logger.Debug().Str("id", user.GetId()).Msg("calling delete education user on backend")
+	err = g.identityEducationBackend.DeleteEducationUser(r.Context(), user.GetId())
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete education user: backend error")

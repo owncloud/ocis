@@ -28,6 +28,8 @@ type Config struct {
 	WriteableShareMustHavePassword bool                 `yaml:"public_sharing_writeableshare_must_have_password" env:"OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD;SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares." introductionVersion:"5.0"`
 	PublicShareMustHavePassword    bool                 `yaml:"public_sharing_share_must_have_password" env:"OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD;SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords on all public shares." introductionVersion:"5.0"`
 	EnableExpiredSharesCleanup     bool                 `yaml:"enable_expired_shares_cleanup"`
+	EnableUserSharing              bool                 `yaml:"enable_user_sharing" env:"OCIS_ENABLE_USER_SHARING" desc:"Enables direct sharing with users and groups. When disabled, creating new user or group shares is rejected. Public link sharing is not affected." introductionVersion:"%%NEXT_PRODUCTION_VERSION%%"`
+	EnablePublicSharing            bool                 `yaml:"enable_public_sharing" env:"OCIS_ENABLE_PUBLIC_SHARING" desc:"Enables public link sharing. When disabled, creating new public links is rejected. Direct sharing with users and groups is not affected." introductionVersion:"%%NEXT_PRODUCTION_VERSION%%"`
 	PasswordPolicy                 PasswordPolicy       `yaml:"password_policy"`
 
 	Context context.Context `yaml:"-"`

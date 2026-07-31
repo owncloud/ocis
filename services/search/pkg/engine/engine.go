@@ -3,6 +3,8 @@ package engine
 import (
 	"context"
 	"errors"
+	"fmt"
+	"io"
 	"regexp"
 
 	"github.com/blevesearch/bleve/v2/search"
@@ -10,7 +12,10 @@ import (
 
 	searchMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
+	bleveEngine "github.com/owncloud/ocis/v2/services/search/pkg/engine/bleve"
+	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
+	"github.com/owncloud/ocis/v2/services/search/pkg/query/bleve"
 )
 
 // ErrResourceNotFound is returned when a resource is not present in the index.
@@ -29,12 +34,33 @@ type Engine interface {
 	Restore(id string) error
 	Purge(id string) error
 	DocCount() (uint64, error)
+	Optimize(ctx context.Context) error
 }
 
-// Optimizer is an optional interface that Engine implementations may support
-// to trigger index compaction. Callers should type-assert before use.
-type Optimizer interface {
-	Optimize(ctx context.Context) error
+// NewEngineFromConfig creates an Engine from the search service configuration.
+// The returned io.Closer must be called to release the underlying index
+// resources. This factory is used by CLI commands that need direct engine
+// access without starting the full gRPC service.
+func NewEngineFromConfig(cfg *config.Config) (Engine, io.Closer, error) {
+	switch cfg.Engine.Type {
+	case "bleve":
+		bleveMapping, err := BuildBleveMapping()
+		if err != nil {
+			return nil, nil, err
+		}
+
+		var indexGetter bleveEngine.IndexGetter
+		indexGetter = bleveEngine.NewIndexGetterPersistent(cfg.Engine.Bleve.Datapath, bleveMapping)
+		if cfg.Engine.Bleve.Scale {
+			indexGetter = bleveEngine.NewIndexGetterPersistentScale(cfg.Engine.Bleve.Datapath, bleveMapping)
+		}
+
+		eng := NewBleveEngine(indexGetter, bleve.DefaultCreator)
+		return eng, eng, nil
+
+	default:
+		return nil, nil, fmt.Errorf("unknown search engine: %s", cfg.Engine.Type)
+	}
 }
 
 // Resource is the entity that is stored in the index.

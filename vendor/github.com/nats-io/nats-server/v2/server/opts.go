@@ -27,6 +27,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"runtime"
 	"strconv"
@@ -106,6 +107,34 @@ type CompressionOpts struct {
 	// as CompressionS2Better. Anything above 20ms will result in picking
 	// the CompressionS2Best compression level.
 	RTTThresholds []time.Duration
+}
+
+func (c1 *CompressionOpts) equals(c2 *CompressionOpts) bool {
+	if c1 == c2 {
+		return true
+	}
+	if (c1 == nil && c2 != nil) || (c1 != nil && c2 == nil) {
+		return false
+	}
+	if c1.Mode != c2.Mode {
+		return false
+	}
+	// For s2_auto, if one has an empty RTTThresholds, it is equivalent
+	// to the defaultCompressionS2AutoRTTThresholds array, so compare with that.
+	if c1.Mode == CompressionS2Auto {
+		rtts1 := c1.RTTThresholds
+		if len(rtts1) == 0 {
+			rtts1 = defaultCompressionS2AutoRTTThresholds
+		}
+		rtts2 := c2.RTTThresholds
+		if len(rtts2) == 0 {
+			rtts2 = defaultCompressionS2AutoRTTThresholds
+		}
+		if !reflect.DeepEqual(rtts1, rtts2) {
+			return false
+		}
+	}
+	return true
 }
 
 // GatewayOpts are options for gateways.
@@ -283,6 +312,48 @@ type RemoteLeafOpts struct {
 	// existing connection will be closed and not solicited again (until it is changed
 	// to `false` again.
 	Disabled bool `json:"-"`
+
+	// If this is set to true, this remote will ignore any server leafnode URLs
+	// returned by the hub, allowing the user to fully manage the servers this
+	// remote can connect to.
+	IgnoreDiscoveredServers bool `json:"-"`
+}
+
+// Returns a string representation of this `RemoteLeafOpts` object, containing
+// the URLs (unredacted), the account (or "$G" if none is specified) and, if present,
+// the credentials filename.
+func (r *RemoteLeafOpts) name() string {
+	return generateRemoteLeafOptsName(r, false)
+}
+
+// Same than RemoteLeafOpts.name() but uses redacted URLs. This is to be used for logging.
+func (r *RemoteLeafOpts) safeName() string {
+	return generateRemoteLeafOptsName(r, true)
+}
+
+func generateRemoteLeafOptsName(r *RemoteLeafOpts, redacted bool) string {
+	acc := r.LocalAccount
+	if acc == _EMPTY_ {
+		acc = globalAccountName
+	}
+	var optional string
+	// There could be Credentials or NKey, not both (would be caught as a misconfig)
+	if c := r.Credentials; c != _EMPTY_ {
+		optional = fmt.Sprintf(", credentials=%q", c)
+	} else if nk := r.Nkey; nk != _EMPTY_ {
+		if redacted {
+			optional = ", nkey=\"[REDACTED]\""
+		} else {
+			optional = fmt.Sprintf(", nkey=%q", nk)
+		}
+	}
+	var urls []*url.URL
+	if redacted {
+		urls = redactURLList(r.URLs)
+	} else {
+		urls = r.URLs
+	}
+	return fmt.Sprintf("urls=%q, account=%q%s", urls, acc, optional)
 }
 
 // JSLimitOpts are active limits for the meta cluster
@@ -387,8 +458,10 @@ type Options struct {
 	JetStreamTpm               JSTpmOpts
 	JetStreamMaxCatchup        int64
 	JetStreamRequestQueueLimit int64
+	JetStreamInfoQueueLimit    int64
 	JetStreamMetaCompact       uint64
 	JetStreamMetaCompactSize   uint64
+	JetStreamMetaCompactSync   bool
 	StreamMaxBufferedMsgs      int               `json:"-"`
 	StreamMaxBufferedSize      int64             `json:"-"`
 	StoreDir                   string            `json:"-"`
@@ -476,6 +549,9 @@ type Options struct {
 
 	// Metadata describing the server. They will be included in 'Z' responses.
 	Metadata map[string]string `json:"-"`
+
+	// FeatureFlags the server opts-in to (or opts-out of). They will be included in 'Z' responses.
+	FeatureFlags map[string]bool `json:"-"`
 
 	// OCSPConfig enables OCSP Stapling in the server.
 	OCSPConfig    *OCSPConfig
@@ -1268,7 +1344,9 @@ func (o *Options) processConfigFileLine(k string, v any, errors *[]error, warnin
 	case "proxy_protocol":
 		o.ProxyProtocol = v.(bool)
 	case "max_connections", "max_conn":
-		o.MaxConn = int(v.(int64))
+		if o.MaxConn = int(v.(int64)); o.MaxConn == 0 {
+			o.MaxConn = -1
+		}
 	case "max_traced_msg_len":
 		o.MaxTracedMsgLen = int(v.(int64))
 	case "max_subscriptions", "max_subs":
@@ -1740,6 +1818,29 @@ func (o *Options) processConfigFileLine(k string, v any, errors *[]error, warnin
 			}
 		default:
 			err = &configErr{tk, fmt.Sprintf("error parsing metadata: unsupported type %T", v)}
+		}
+		if err != nil {
+			*errors = append(*errors, err)
+			return
+		}
+	case "feature_flags":
+		var err error
+		switch v := v.(type) {
+		case map[string]any:
+			for mk, mv := range v {
+				tk, mv = unwrapValue(mv, &lt)
+				b, ok := mv.(bool)
+				if !ok {
+					err = &configErr{tk, fmt.Sprintf("error parsing feature flag %q: expected bool, got %T", mk, mv)}
+					break
+				}
+				if o.FeatureFlags == nil {
+					o.FeatureFlags = make(map[string]bool)
+				}
+				o.FeatureFlags[mk] = b
+			}
+		default:
+			err = &configErr{tk, fmt.Sprintf("error parsing feature flags: unsupported type %T", v)}
 		}
 		if err != nil {
 			*errors = append(*errors, err)
@@ -2638,6 +2739,12 @@ func parseJetStream(v any, opts *Options, errors *[]error, warnings *[]error) er
 					return &configErr{tk, fmt.Sprintf("Expected a parseable size for %q, got %v", mk, mv)}
 				}
 				opts.JetStreamRequestQueueLimit = lim
+			case "info_queue_limit":
+				lim, ok := mv.(int64)
+				if !ok {
+					return &configErr{tk, fmt.Sprintf("Expected a parseable size for %q, got %v", mk, mv)}
+				}
+				opts.JetStreamInfoQueueLimit = lim
 			case "meta_compact":
 				thres, ok := mv.(int64)
 				if !ok || thres < 0 {
@@ -2653,6 +2760,8 @@ func parseJetStream(v any, opts *Options, errors *[]error, warnings *[]error) er
 					return &configErr{tk, fmt.Sprintf("Expected an absolute size for %q, got %v", mk, mv)}
 				}
 				opts.JetStreamMetaCompactSize = uint64(s)
+			case "meta_compact_sync":
+				opts.JetStreamMetaCompactSync = mv.(bool)
 			default:
 				if !tk.IsUsedVariable() {
 					err := &unknownConfigFieldErr{
@@ -2931,6 +3040,7 @@ func parseRemoteLeafNodes(v any, errors *[]error, warnings *[]error) ([]*RemoteL
 	if !ok {
 		return nil, &configErr{tk, fmt.Sprintf("Expected remotes field to be an array, got %T", v)}
 	}
+	names := make(map[string]struct{})
 	remotes := make([]*RemoteLeafOpts, 0, len(ra))
 	for _, r := range ra {
 		tk, r = unwrapValue(r, &lt)
@@ -3100,6 +3210,8 @@ func parseRemoteLeafNodes(v any, errors *[]error, warnings *[]error) ([]*RemoteL
 						}
 					}
 				}
+			case "ignore_discovered_servers":
+				remote.IgnoreDiscoveredServers = v.(bool)
 			default:
 				if !tk.IsUsedVariable() {
 					err := &unknownConfigFieldErr{
@@ -3123,6 +3235,12 @@ func parseRemoteLeafNodes(v any, errors *[]error, warnings *[]error) ([]*RemoteL
 				*warnings = append(*warnings, &configErr{proxyToken, warn})
 			}
 		}
+		rn := remote.name()
+		if _, dup := names[rn]; dup {
+			*errors = append(*errors, &configErr{tk, fmt.Sprintf("duplicate remote %s", remote.safeName())})
+			continue
+		}
+		names[rn] = struct{}{}
 		remotes = append(remotes, remote)
 	}
 	return remotes, nil
@@ -6001,6 +6119,9 @@ func setBaselineOptions(opts *Options) {
 	if opts.JetStreamRequestQueueLimit <= 0 {
 		opts.JetStreamRequestQueueLimit = JSDefaultRequestQueueLimit
 	}
+	if opts.JetStreamInfoQueueLimit <= 0 {
+		opts.JetStreamInfoQueueLimit = opts.JetStreamRequestQueueLimit
+	}
 }
 
 func getDefaultAuthTimeout(tls *tls.Config, tlsTimeout float64) float64 {
@@ -6429,4 +6550,61 @@ func expandPath(p string) (string, error) {
 	}
 
 	return filepath.Join(home, p[1:]), nil
+}
+
+// RedactArgs redacts sensitive arguments from the command line.
+// For example, turns '--pass=secret' into '--pass=[REDACTED]'.
+func RedactArgs(args []string) {
+	secretArg := regexp.MustCompile("^-{1,2}(user|pass|auth)(=.*)?$")
+	routeURLArg := regexp.MustCompile("^-{1,2}(routes)(=.*)?$")
+	singleURLArg := regexp.MustCompile("^-{1,2}(cluster|cluster_listen)(=.*)?$")
+	for i, arg := range args {
+		switch {
+		case secretArg.MatchString(arg):
+			redactArgValue(args, i, func(_ string) string { return "[REDACTED]" })
+		case routeURLArg.MatchString(arg):
+			redactArgValue(args, i, redactURLListUser)
+		case singleURLArg.MatchString(arg):
+			redactArgValue(args, i, redactURLUser)
+		}
+	}
+}
+
+func redactArgValue(args []string, i int, redact func(string) string) {
+	if flag, value, ok := strings.Cut(args[i], "="); ok {
+		args[i] = flag + "=" + redact(value)
+	} else if i+1 < len(args) {
+		args[i+1] = redact(args[i+1])
+	}
+}
+
+func redactURLUser(raw string) string {
+	if !strings.Contains(raw, "@") {
+		return raw
+	}
+	parseValue := strings.TrimSpace(raw)
+	restoreRandom := false
+	if prefix, ok := strings.CutSuffix(parseValue, ":-1"); ok {
+		parseValue = prefix + ":0"
+		restoreRandom = true
+	}
+	u, err := url.Parse(parseValue)
+	if err != nil || u.User == nil {
+		return raw
+	}
+	// url.String escapes brackets in userinfo, so use
+	// a placeholder here and rewrite it afterward.
+	u.User = url.User("_REDACTED_")
+	if restoreRandom {
+		u.Host = strings.TrimSuffix(u.Host, ":0") + ":-1"
+	}
+	return strings.Replace(u.String(), "_REDACTED_@", "[REDACTED]@", 1)
+}
+
+func redactURLListUser(raw string) string {
+	parts := strings.Split(raw, ",")
+	for i, part := range parts {
+		parts[i] = redactURLUser(part)
+	}
+	return strings.Join(parts, ",")
 }

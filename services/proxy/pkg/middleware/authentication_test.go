@@ -35,6 +35,10 @@ var _ = Describe("authentication helpers", func() {
 		Entry("token info path", "/ocs/v1.php/apps/files_sharing/api/v1/tokeninfo/unprotected", true),
 		Entry("token info path", "/ocs/v2.php/apps/files_sharing/api/v1/tokeninfo/unprotected", true),
 		Entry("capabilities", "/ocs/v1.php/cloud/capabilities", true),
+		// The signing-key endpoint must NOT be a public path; otherwise a public-share
+		// guest could fetch the share owner's signing key and forge signed URLs.
+		Entry("signing-key v1 must not be public", "/ocs/v1.php/cloud/user/signing-key", false),
+		Entry("signing-key v2 must not be public", "/ocs/v2.php/cloud/user/signing-key", false),
 	)
 })
 
@@ -94,20 +98,30 @@ var _ = Describe("Authenticating requests", Label("Authentication"), func() {
 					"com.owncloud.api.gateway",
 					func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
 						return mockGatewayClient{
-							AuthenticateFunc: func(authType, clientID, clientSecret string) (string, rpcv1beta1.Code) {
+							AuthenticateFunc: func(authType, clientID, clientSecret string) *gateway.AuthenticateResponse {
 								if authType != "publicshares" {
-									return "", rpcv1beta1.Code_CODE_NOT_FOUND
+									return &gateway.AuthenticateResponse{
+										Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_NOT_FOUND},
+									}
 								}
 
 								if clientID == "sharetoken" && (clientSecret == "password|examples3cr3t" || clientSecret == "signature|examplesignature|exampleexpiration") {
-									return "exampletoken", rpcv1beta1.Code_CODE_OK
+									return &gateway.AuthenticateResponse{
+										Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_OK},
+										Token:  "exampletoken",
+									}
 								}
 
 								if clientID == "sharetoken" && clientSecret == "password|" {
-									return "otherexampletoken", rpcv1beta1.Code_CODE_OK
+									return &gateway.AuthenticateResponse{
+										Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_OK},
+										Token:  "otherexampletoken",
+									}
 								}
 
-								return "", rpcv1beta1.Code_CODE_NOT_FOUND
+								return &gateway.AuthenticateResponse{
+									Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_NOT_FOUND},
+								}
 							},
 						}
 					},

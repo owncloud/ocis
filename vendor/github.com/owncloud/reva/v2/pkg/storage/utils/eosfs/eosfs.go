@@ -40,6 +40,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/jellydator/ttlcache/v2"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/conversions"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
@@ -57,7 +58,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/storage/utils/grants"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/templates"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/jellydator/ttlcache/v2"
 	"github.com/pkg/errors"
 )
 
@@ -780,36 +780,36 @@ func (fs *eosfs) setLock(ctx context.Context, lock *provider.Lock, path string, 
 }
 
 // SetLock puts a lock on the given reference
-func (fs *eosfs) SetLock(ctx context.Context, ref *provider.Reference, l *provider.Lock) error {
+func (fs *eosfs) SetLock(ctx context.Context, ref *provider.Reference, l *provider.Lock) (*storage.SetLockResult, error) {
 	if l.Type == provider.LockType_LOCK_TYPE_SHARED {
-		return errtypes.NotSupported("shared lock not yet implemented")
+		return nil, errtypes.NotSupported("shared lock not yet implemented")
 	}
 
 	path, err := fs.resolve(ctx, ref)
 	if err != nil {
-		return errors.Wrap(err, "eosfs: error resolving reference")
+		return nil, errors.Wrap(err, "eosfs: error resolving reference")
 	}
 	path = fs.wrap(ctx, path)
 
 	user, err := getUser(ctx)
 	if err != nil {
-		return errors.Wrap(err, "eosfs: no user in ctx")
+		return nil, errors.Wrap(err, "eosfs: no user in ctx")
 	}
 	auth, err := fs.getUserAuth(ctx, user, path)
 	if err != nil {
-		return errors.Wrap(err, "eosfs: error getting uid and gid for user")
+		return nil, errors.Wrap(err, "eosfs: error getting uid and gid for user")
 	}
 
 	_, err = fs.getLock(ctx, auth, user, path, ref)
 	if err != nil {
 		// if the err is NotFound it is fine, otherwise we have to return
 		if _, ok := err.(errtypes.NotFound); !ok {
-			return err
+			return nil, err
 		}
 	}
 	if err == nil {
 		// the resource is already locked
-		return errtypes.BadRequest("resource already locked")
+		return nil, errtypes.BadRequest("resource already locked")
 	}
 
 	// the cs3apis require to have the write permission on the resource
@@ -818,10 +818,10 @@ func (fs *eosfs) SetLock(ctx context.Context, ref *provider.Reference, l *provid
 	// the request has it
 	has, err := fs.userHasWriteAccess(ctx, user, ref)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("eosfs: cannot check if user %s has write access on resource", user.Username))
+		return nil, errors.Wrap(err, fmt.Sprintf("eosfs: cannot check if user %s has write access on resource", user.Username))
 	}
 	if !has {
-		return errtypes.PermissionDenied(fmt.Sprintf("user %s has not write access on resource", user.Username))
+		return nil, errtypes.PermissionDenied(fmt.Sprintf("user %s has not write access on resource", user.Username))
 	}
 
 	// the user in the lock could differ from the user in the context
@@ -829,14 +829,17 @@ func (fs *eosfs) SetLock(ctx context.Context, ref *provider.Reference, l *provid
 	if l.User != nil && !utils.UserEqual(user.Id, l.User) {
 		has, err := fs.userIDHasWriteAccess(ctx, l.User, ref)
 		if err != nil {
-			return errors.Wrap(err, "eosfs: cannot check if user has write access on resource")
+			return nil, errors.Wrap(err, "eosfs: cannot check if user has write access on resource")
 		}
 		if !has {
-			return errtypes.PermissionDenied(fmt.Sprintf("user %s has not write access on resource", user.Username))
+			return nil, errtypes.PermissionDenied(fmt.Sprintf("user %s has not write access on resource", user.Username))
 		}
 	}
 
-	return fs.setLock(ctx, l, path, true)
+	if err := fs.setLock(ctx, l, path, true); err != nil {
+		return nil, err
+	}
+	return &storage.SetLockResult{}, nil
 }
 
 func (fs *eosfs) getUserFromID(ctx context.Context, userID *userpb.UserId) (*userpb.User, error) {
@@ -952,9 +955,9 @@ func sameHolder(l1, l2 *provider.Lock) bool {
 }
 
 // Unlock removes an existing lock from the given reference
-func (fs *eosfs) Unlock(ctx context.Context, ref *provider.Reference, lock *provider.Lock) error {
+func (fs *eosfs) Unlock(ctx context.Context, ref *provider.Reference, lock *provider.Lock) (*storage.UnlockResult, error) {
 	if lock.Type == provider.LockType_LOCK_TYPE_SHARED {
-		return errtypes.NotSupported("shared lock not yet implemented")
+		return nil, errtypes.NotSupported("shared lock not yet implemented")
 	}
 
 	oldLock, err := fs.GetLock(ctx, ref)
@@ -962,47 +965,50 @@ func (fs *eosfs) Unlock(ctx context.Context, ref *provider.Reference, lock *prov
 		switch err.(type) {
 		case errtypes.NotFound:
 			// the lock does not exist
-			return errtypes.BadRequest("file was not locked")
+			return nil, errtypes.BadRequest("file was not locked")
 		default:
-			return err
+			return nil, err
 		}
 	}
 
 	// check if the lock id of the lock corresponds to the stored lock
 	if oldLock.LockId != lock.LockId {
-		return errtypes.BadRequest("lock id does not match")
+		return nil, errtypes.BadRequest("lock id does not match")
 	}
 
 	if !sameHolder(oldLock, lock) {
-		return errtypes.BadRequest("caller does not hold the lock")
+		return nil, errtypes.BadRequest("caller does not hold the lock")
 	}
 
 	user, err := getUser(ctx)
 	if err != nil {
-		return errors.Wrap(err, "eosfs: error getting user")
+		return nil, errors.Wrap(err, "eosfs: error getting user")
 	}
 
 	// the cs3apis require to have the write permission on the resource
 	// to remove the lock
 	has, err := fs.userHasWriteAccess(ctx, user, ref)
 	if err != nil {
-		return errors.Wrap(err, "eosfs: cannot check if user has write access on resource")
+		return nil, errors.Wrap(err, "eosfs: cannot check if user has write access on resource")
 	}
 	if !has {
-		return errtypes.PermissionDenied(fmt.Sprintf("user %s has not write access on resource", user.Username))
+		return nil, errtypes.PermissionDenied(fmt.Sprintf("user %s has not write access on resource", user.Username))
 	}
 
 	path, err := fs.resolve(ctx, ref)
 	if err != nil {
-		return errors.Wrap(err, "eosfs: error resolving reference")
+		return nil, errors.Wrap(err, "eosfs: error resolving reference")
 	}
 	path = fs.wrap(ctx, path)
 
 	auth, err := fs.getRootAuth(ctx)
 	if err != nil {
-		return errors.Wrap(err, "eosfs: error getting uid and gid for user")
+		return nil, errors.Wrap(err, "eosfs: error getting uid and gid for user")
 	}
-	return fs.removeLockAttrs(ctx, auth, path)
+	if err := fs.removeLockAttrs(ctx, auth, path); err != nil {
+		return nil, err
+	}
+	return &storage.UnlockResult{}, nil
 }
 
 func (fs *eosfs) AddGrant(ctx context.Context, ref *provider.Reference, g *provider.Grant) error {
@@ -1642,44 +1648,49 @@ func (fs *eosfs) createUserDir(ctx context.Context, u *userpb.User, path string,
 	return nil
 }
 
-func (fs *eosfs) CreateDir(ctx context.Context, ref *provider.Reference) error {
+func (fs *eosfs) CreateDir(ctx context.Context, ref *provider.Reference) (*storage.CreateDirResult, error) {
 	log := appctx.GetLogger(ctx)
 	p, err := fs.resolve(ctx, ref)
 	if err != nil {
-		return errors.Wrap(err, "eosfs: error resolving reference")
+		return nil, errors.Wrap(err, "eosfs: error resolving reference")
 	}
 	if fs.isShareFolder(ctx, p) {
-		return errtypes.PermissionDenied("eosfs: cannot perform operation under the virtual share folder")
+		return nil, errtypes.PermissionDenied("eosfs: cannot perform operation under the virtual share folder")
 	}
 	fn := fs.wrap(ctx, p)
 
 	u, err := getUser(ctx)
 	if err != nil {
-		return errors.Wrap(err, "eosfs: no user in ctx")
+		return nil, errors.Wrap(err, "eosfs: no user in ctx")
 	}
 
 	// We need the auth corresponding to the parent directory
 	// as the file might not exist at the moment
 	auth, err := fs.getUserAuth(ctx, u, path.Dir(fn))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	log.Info().Msgf("eosfs: createdir: path=%s", fn)
-	return fs.c.CreateDir(ctx, auth, fn)
+	if err := fs.c.CreateDir(ctx, auth, fn); err != nil {
+		return nil, err
+	}
+	return &storage.CreateDirResult{}, nil
 }
 
 // TouchFile as defined in the storage.FS interface
-func (fs *eosfs) TouchFile(ctx context.Context, ref *provider.Reference, _ bool, _ string) error {
+func (fs *eosfs) TouchFile(ctx context.Context, ref *provider.Reference, _ bool, _ string) (*storage.TouchFileResult, error) {
 	log := appctx.GetLogger(ctx)
 
 	fn, auth, err := fs.resolveRefAndGetAuth(ctx, ref)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	log.Info().Msgf("eosfs: touch file: path=%s", fn)
-
-	return fs.c.Touch(ctx, auth, fn)
+	if err := fs.c.Touch(ctx, auth, fn); err != nil {
+		return nil, err
+	}
+	return &storage.TouchFileResult{}, nil
 }
 
 func (fs *eosfs) CreateReference(ctx context.Context, p string, targetURI *url.URL) error {
@@ -1730,28 +1741,34 @@ func (fs *eosfs) CreateReference(ctx context.Context, p string, targetURI *url.U
 	return nil
 }
 
-func (fs *eosfs) Delete(ctx context.Context, ref *provider.Reference) error {
+func (fs *eosfs) Delete(ctx context.Context, ref *provider.Reference) (*storage.DeleteResult, error) {
 	p, err := fs.resolve(ctx, ref)
 	if err != nil {
-		return errors.Wrap(err, "eosfs: error resolving reference")
+		return nil, errors.Wrap(err, "eosfs: error resolving reference")
 	}
 
 	if fs.isShareFolder(ctx, p) {
-		return fs.deleteShadow(ctx, p)
+		if err = fs.deleteShadow(ctx, p); err != nil {
+			return nil, err
+		}
+		return &storage.DeleteResult{}, nil
 	}
 
 	fn := fs.wrap(ctx, p)
 
 	u, err := getUser(ctx)
 	if err != nil {
-		return errors.Wrap(err, "eosfs: no user in ctx")
+		return nil, errors.Wrap(err, "eosfs: no user in ctx")
 	}
 	auth, err := fs.getUserAuth(ctx, u, fn)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return fs.c.Remove(ctx, auth, fn, false)
+	if err := fs.c.Remove(ctx, auth, fn, false); err != nil {
+		return nil, err
+	}
+	return &storage.DeleteResult{}, nil
 }
 
 func (fs *eosfs) deleteShadow(ctx context.Context, p string) error {
@@ -1776,19 +1793,19 @@ func (fs *eosfs) deleteShadow(ctx context.Context, p string) error {
 	return errors.New("eosfs: shadow delete of share folder that is neither root nor child. path=" + p)
 }
 
-func (fs *eosfs) Move(ctx context.Context, oldRef, newRef *provider.Reference) error {
+func (fs *eosfs) Move(ctx context.Context, oldRef, newRef *provider.Reference) (*storage.MoveResult, error) {
 	oldPath, err := fs.resolve(ctx, oldRef)
 	if err != nil {
-		return errors.Wrap(err, "eosfs: error resolving reference")
+		return nil, errors.Wrap(err, "eosfs: error resolving reference")
 	}
 
 	newPath, err := fs.resolve(ctx, newRef)
 	if err != nil {
-		return errors.Wrap(err, "eosfs: error resolving reference")
+		return nil, errors.Wrap(err, "eosfs: error resolving reference")
 	}
 
 	if fs.isShareFolder(ctx, oldPath) || fs.isShareFolder(ctx, newPath) {
-		return fs.moveShadow(ctx, oldPath, newPath)
+		return nil, fs.moveShadow(ctx, oldPath, newPath)
 	}
 
 	oldFn := fs.wrap(ctx, oldPath)
@@ -1796,14 +1813,17 @@ func (fs *eosfs) Move(ctx context.Context, oldRef, newRef *provider.Reference) e
 
 	u, err := getUser(ctx)
 	if err != nil {
-		return errors.Wrap(err, "eosfs: no user in ctx")
+		return nil, errors.Wrap(err, "eosfs: no user in ctx")
 	}
 	auth, err := fs.getUserAuth(ctx, u, oldFn)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return fs.c.Rename(ctx, auth, oldFn, newFn)
+	if err := fs.c.Rename(ctx, auth, oldFn, newFn); err != nil {
+		return nil, err
+	}
+	return &storage.MoveResult{}, nil
 }
 
 func (fs *eosfs) moveShadow(ctx context.Context, oldPath, newPath string) error {
@@ -1935,7 +1955,7 @@ func (fs *eosfs) DownloadRevision(ctx context.Context, ref *provider.Reference, 
 	return md, reader, err
 }
 
-func (fs *eosfs) RestoreRevision(ctx context.Context, ref *provider.Reference, revisionKey string) error {
+func (fs *eosfs) RestoreRevision(ctx context.Context, ref *provider.Reference, revisionKey string) (*storage.RestoreRevisionResult, error) {
 	var auth eosclient.Authorization
 	var fn string
 	var err error
@@ -1946,26 +1966,29 @@ func (fs *eosfs) RestoreRevision(ctx context.Context, ref *provider.Reference, r
 		// if we have access to it.
 		md, err := fs.GetMD(ctx, ref, nil, nil)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		fn = fs.wrap(ctx, md.Path)
 
 		if md.PermissionSet.RestoreFileVersion {
 			auth, err = fs.getUIDGateway(ctx, md.Owner)
 			if err != nil {
-				return err
+				return nil, err
 			}
 		} else {
-			return errtypes.PermissionDenied("eosfs: user doesn't have permissions to restore revisions")
+			return nil, errtypes.PermissionDenied("eosfs: user doesn't have permissions to restore revisions")
 		}
 	} else {
 		fn, auth, err = fs.resolveRefForbidShareFolder(ctx, ref)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	return fs.c.RollbackToVersion(ctx, auth, fn, revisionKey)
+	if err := fs.c.RollbackToVersion(ctx, auth, fn, revisionKey); err != nil {
+		return nil, err
+	}
+	return &storage.RestoreRevisionResult{}, nil
 }
 
 func (fs *eosfs) PurgeRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string) error {
@@ -2036,7 +2059,7 @@ func (fs *eosfs) ListRecycle(ctx context.Context, ref *provider.Reference, key, 
 	return recycleEntries, nil
 }
 
-func (fs *eosfs) RestoreRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string, restoreRef *provider.Reference) error {
+func (fs *eosfs) RestoreRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string, restoreRef *provider.Reference) (*storage.RestoreRecycleItemResult, error) {
 	var auth eosclient.Authorization
 
 	if !fs.conf.EnableHome && fs.conf.AllowPathRecycleOperations && ref.Path != "/" {
@@ -2045,29 +2068,32 @@ func (fs *eosfs) RestoreRecycleItem(ctx context.Context, ref *provider.Reference
 		// if we have access to it.
 		md, err := fs.GetMD(ctx, &provider.Reference{Path: ref.Path}, nil, nil)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if md.PermissionSet.RestoreRecycleItem {
 			auth, err = fs.getUIDGateway(ctx, md.Owner)
 			if err != nil {
-				return err
+				return nil, err
 			}
 		} else {
-			return errtypes.PermissionDenied("eosfs: user doesn't have permissions to restore recycled items")
+			return nil, errtypes.PermissionDenied("eosfs: user doesn't have permissions to restore recycled items")
 		}
 	} else {
 		// We just act on the logged-in user's recycle bin
 		u, err := getUser(ctx)
 		if err != nil {
-			return errors.Wrap(err, "eosfs: no user in ctx")
+			return nil, errors.Wrap(err, "eosfs: no user in ctx")
 		}
 		auth, err = fs.getUserAuth(ctx, u, "")
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	return fs.c.RestoreDeletedEntry(ctx, auth, key)
+	if err := fs.c.RestoreDeletedEntry(ctx, auth, key); err != nil {
+		return nil, err
+	}
+	return &storage.RestoreRecycleItemResult{}, nil
 }
 
 func (fs *eosfs) convertToRecycleItem(ctx context.Context, eosDeletedItem *eosclient.DeletedEntry) (*provider.RecycleItem, error) {

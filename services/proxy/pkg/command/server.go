@@ -109,6 +109,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			oidcClient := oidc.NewOIDCClient(
 				oidc.WithAccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
+				oidc.WithAccessTokenVerifyAudiences(cfg.OIDC.AccessTokenVerifyAud),
 				oidc.WithLogger(logger),
 				oidc.WithHTTPClient(oidcHTTPClient),
 				oidc.WithOidcIssuer(cfg.OIDC.Issuer),
@@ -301,6 +302,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 		middleware.OIDCIss(cfg.OIDC.Issuer),
 		middleware.OIDCClient(oidc.NewOIDCClient(
 			oidc.WithAccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
+			oidc.WithAccessTokenVerifyAudiences(cfg.OIDC.AccessTokenVerifyAud),
 			oidc.WithLogger(logger),
 			oidc.WithHTTPClient(oidcHTTPClient),
 			oidc.WithOidcIssuer(cfg.OIDC.Issuer),
@@ -346,6 +348,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			middleware.AllowAppAuth(cfg.AuthMiddleware.AllowAppAuth),
 			middleware.TraceProvider(traceProvider),
 		),
+		middleware.MultiFactor(cfg.MultiFactorAuthentication, middleware.Logger(logger), middleware.MFAStore(signingKeyStore)),
 		middleware.AccountResolver(
 			middleware.Logger(logger),
 			middleware.UserProvider(userProvider),
@@ -355,9 +358,8 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			middleware.UserCS3Claim(cfg.UserCS3Claim),
 			middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
 			middleware.EventsPublisher(publisher),
-			middleware.MultiInstance(cfg.MultiInstance.Enabled, cfg.MultiInstance.InstanceID, cfg.MultiInstance.MemberClaim, cfg.MultiInstance.GuestClaim, cfg.MultiInstance.GuestRole),
+			middleware.MultiInstance(cfg.MultiInstance.Enabled, cfg.MultiInstance.InstanceID, cfg.MultiInstance.MasterID, cfg.MultiInstance.MemberClaim, cfg.MultiInstance.GuestClaim, cfg.MultiInstance.GuestRole),
 		),
-		middleware.MultiFactor(cfg.MultiFactorAuthentication, middleware.Logger(logger)),
 		middleware.SelectorCookie(
 			middleware.Logger(logger),
 			middleware.PolicySelectorConfig(*cfg.PolicySelector),
@@ -373,6 +375,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			middleware.Logger(logger),
 			middleware.WithRevaGatewaySelector(gatewaySelector),
 			middleware.RoleQuotas(cfg.RoleQuotas),
+			middleware.EnableVaultMode(cfg.EnableVaultMode),
 		),
 		// trigger space assignment when a user logs in
 		middleware.SpaceManager(

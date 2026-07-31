@@ -29,6 +29,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	ocmcore "github.com/cs3org/go-cs3apis/cs3/ocm/core/v1beta1"
+	invitepb "github.com/cs3org/go-cs3apis/cs3/ocm/invite/v1beta1"
 	ocmprovider "github.com/cs3org/go-cs3apis/cs3/ocm/provider/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
@@ -47,6 +48,7 @@ var validate = validator.New()
 type sharesHandler struct {
 	gatewaySelector            *pool.Selector[gateway.GatewayAPIClient]
 	exposeRecipientDisplayName bool
+	allowHTTP                  bool
 }
 
 func (h *sharesHandler) init(c *config) error {
@@ -59,6 +61,7 @@ func (h *sharesHandler) init(c *config) error {
 	h.gatewaySelector = gatewaySelector
 
 	h.exposeRecipientDisplayName = c.ExposeRecipientDisplayName
+	h.allowHTTP = c.AllowHTTP
 	return nil
 }
 
@@ -82,7 +85,7 @@ type createShareRequest struct {
 func (h *sharesHandler) CreateShare(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := appctx.GetLogger(ctx)
-	req, err := getCreateShareRequest(r)
+	req, err := h.getCreateShareRequest(r)
 	if err != nil {
 		reqres.WriteError(w, r, reqres.APIErrorInvalidParameter, err.Error(), nil)
 		return
@@ -111,6 +114,15 @@ func (h *sharesHandler) CreateShare(w http.ResponseWriter, r *http.Request) {
 	gatewayClient, err := h.gatewaySelector.Next()
 	if err != nil {
 		reqres.WriteError(w, r, reqres.APIErrorServerError, "error getting gateway client", err)
+		return
+	}
+	infoResp, err := gatewayClient.GetInfoByDomain(ctx, &ocmprovider.GetInfoByDomainRequest{Domain: meshProvider})
+	if err != nil {
+		reqres.WriteError(w, r, reqres.APIErrorServerError, "error sending a grpc get info by domain request", err)
+		return
+	}
+	if infoResp.Status.Code != rpc.Code_CODE_OK {
+		reqres.WriteError(w, r, reqres.APIErrorUnauthenticated, "provider not authorized", errors.New(infoResp.Status.Message))
 		return
 	}
 	providerAllowedResp, err := gatewayClient.IsProviderAllowed(ctx, &ocmprovider.IsProviderAllowedRequest{
@@ -152,6 +164,28 @@ func (h *sharesHandler) CreateShare(w http.ResponseWriter, r *http.Request) {
 	sender, err := getUserIDFromOCMUser(req.Sender)
 	if err != nil {
 		reqres.WriteError(w, r, reqres.APIErrorInvalidParameter, err.Error(), nil)
+		return
+	}
+
+	userFilterJSON, err := utils.MarshalProtoV1ToJSON(userRes.User.Id)
+	if err != nil {
+		reqres.WriteError(w, r, reqres.APIErrorServerError, "error encoding user filter", err)
+		return
+	}
+	acceptedResp, err := gatewayClient.GetAcceptedUser(ctx, &invitepb.GetAcceptedUserRequest{
+		RemoteUserId: sender,
+		Opaque: &types.Opaque{
+			Map: map[string]*types.OpaqueEntry{
+				"user-filter": {Decoder: "json", Value: userFilterJSON},
+			},
+		},
+	})
+	if err != nil {
+		reqres.WriteError(w, r, reqres.APIErrorServerError, "error verifying invite relationship", err)
+		return
+	}
+	if acceptedResp.Status.Code != rpc.Code_CODE_OK {
+		reqres.WriteError(w, r, reqres.APIErrorUnauthenticated, "no accepted invite for this sender", errors.New(acceptedResp.Status.Message))
 		return
 	}
 
@@ -245,7 +279,7 @@ func getIDAndMeshProvider(user string) (id, provider string, err error) {
 	return id, provider, nil
 }
 
-func getCreateShareRequest(r *http.Request) (*createShareRequest, error) {
+func (h *sharesHandler) getCreateShareRequest(r *http.Request) (*createShareRequest, error) {
 	var req createShareRequest
 	contentType, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err == nil && contentType == "application/json" {
@@ -258,6 +292,20 @@ func getCreateShareRequest(r *http.Request) (*createShareRequest, error) {
 	// validate the request
 	if err := validate.Struct(req); err != nil {
 		return nil, err
+	}
+	// validate the URI scheme of every protocol that carries a remote URI, so
+	// that no downstream code consumes an unvalidated URI.
+	for _, p := range req.Protocols {
+		switch proto := p.(type) {
+		case *WebDAV:
+			if err := validateURIScheme(proto.URI, h.allowHTTP); err != nil {
+				return nil, err
+			}
+		case *Webapp:
+			if err := validateURIScheme(proto.URITemplate, h.allowHTTP); err != nil {
+				return nil, err
+			}
+		}
 	}
 	return &req, nil
 }

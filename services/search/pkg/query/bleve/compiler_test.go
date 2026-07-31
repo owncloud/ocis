@@ -9,6 +9,12 @@ import (
 	tAssert "github.com/stretchr/testify/assert"
 )
 
+func nameTermQuery(term string) *query.TermQuery {
+	q := query.NewTermQuery(term)
+	q.SetField("Name")
+	return q
+}
+
 var timeMustParse = func(t *testing.T, ts string) time.Time {
 	tp, err := time.Parse(time.RFC3339Nano, ts)
 	if err != nil {
@@ -59,8 +65,8 @@ func Test_compile(t *testing.T) {
 				},
 			},
 			want: query.NewConjunctionQuery([]query.Query{
-				query.NewQueryStringQuery(`Name:john\ smith`),
-				query.NewQueryStringQuery(`Name:jane`),
+				nameTermQuery("john smith"),
+				nameTermQuery("jane"),
 			}),
 			wantErr: false,
 		},
@@ -675,6 +681,23 @@ func Test_compile(t *testing.T) {
 			},
 			want: query.NewConjunctionQuery([]query.Query{
 				query.NewQueryStringQuery(`photo.cameraMake:canon`),
+			}),
+			wantErr: false,
+		},
+		{
+			// Guards PR #12078: the advanced-search web extension sends the
+			// user's input with original case wrapped in wildcards (e.g.
+			// "*Canon*"). Bleve does not run the field analyzer on wildcard
+			// terms, so the compiler must lowercase the value query-side for
+			// it to match the lowercased index term. Wildcards must survive.
+			name: `photo.cameraMake:*Canon* lowercased, wildcards preserved`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "photo.cameraMake", Value: "*Canon*"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`photo.cameraMake:*canon*`),
 			}),
 			wantErr: false,
 		},

@@ -1,0 +1,27 @@
+diff --git a/package.json b/package.json
+index 6fd32604012caa07c4a724d8308246af14bd8b96..3b4514b47a3cefce0f26e2448c69f8f1f874e798 100644
+--- a/package.json
++++ b/package.json
+@@ -18,7 +18,7 @@
+     "Pinned vue-good-table to 2.21.0. 2.21.1+ no longer use scoped styles, which is why we pulled it in to test 3rd party scoped libraries."
+   ],
+   "dependencies": {
+-    "cheerio": "^1.0.0-rc.3",
++    "cheerio": "^1.0.0-rc.12",
+     "htmlparser2": "^7.1.1",
+     "js-beautify": "^1.14.0",
+     "lodash.clonedeep": "^4.5.0"
+diff --git a/src/helpers.js b/src/helpers.js
+index ff6cdff9df5068d806fdaf980707bb0213ea31ea..12fb021c2c4e19353ebfc553dd8efc8b6b64963a 100644
+--- a/src/helpers.js
++++ b/src/helpers.js
+@@ -121,7 +121,8 @@ const helpers = {
+       xmlMode: false
+     };
+     const dom = htmlparser2.parseDOM(html, xmlOptions);
+-    const $ = cheerio.load(dom, { xml: xmlOptions });
++    // const $ = cheerio.load(dom, { xml: xmlOptions });
++    const $ = cheerio.load(html, null, false);
+     return $;
+   },
+ 

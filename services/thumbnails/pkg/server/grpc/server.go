@@ -81,6 +81,7 @@ func NewService(opts ...Option) grpc.Service {
 		thumbnail = decorators.NewInstrument(thumbnail, options.Metrics)
 		thumbnail = decorators.NewLogging(thumbnail, options.Logger)
 		thumbnail = decorators.NewTracing(thumbnail, options.TraceProvider)
+		thumbnail = decorators.NewAutoProp(thumbnail)
 	}
 
 	_ = thumbnailssvc.RegisterThumbnailServiceHandler(

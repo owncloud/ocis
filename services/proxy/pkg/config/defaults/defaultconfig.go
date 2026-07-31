@@ -90,7 +90,7 @@ func DefaultConfig() *config.Config {
 			Username:    "preferred_username",
 			Email:       "email",
 			DisplayName: "name",
-			Groups:      "groups",
+			Groups:      "",
 		},
 		EnableBasicAuth:       false,
 		InsecureBackends:      false,
@@ -101,7 +101,8 @@ func DefaultConfig() *config.Config {
 			EnableTLS: false,
 		},
 		MultiFactorAuthentication: config.MFAConfig{
-			AuthLevelNames: []string{"advanced"},
+			AuthLevelNames:  []string{"advanced"},
+			SessionDuration: 3600,
 		},
 	}
 }
@@ -271,6 +272,10 @@ func DefaultPolicies() []config.Policy {
 				},
 				{
 					Endpoint: "/graph/",
+					Service:  "com.owncloud.web.graph",
+				},
+				{
+					Endpoint: "/vault/graph/",
 					Service:  "com.owncloud.web.graph",
 				},
 				{

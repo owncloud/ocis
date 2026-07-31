@@ -12,6 +12,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/postprocessing"
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/utils"
@@ -142,8 +143,9 @@ func (pps *PostprocessingService) processEvent(e events.Event) error {
 		err  error
 	)
 
-	ctx := e.GetTraceContext(pps.ctx)
-	ctx, span := pps.tp.Tracer("postprocessing").Start(ctx, "processEvent")
+	evCtx := context.Background()
+	ctx, span := events.TraceEventConsumer(evCtx, pps.tp, e)
+	ctx = autoprop.SetMetaToContext(ctx, e.ExtraInfo)
 	defer span.End()
 
 	switch ev := e.Event.(type) {

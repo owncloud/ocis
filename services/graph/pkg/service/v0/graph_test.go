@@ -29,7 +29,6 @@ import (
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -113,7 +112,7 @@ var _ = Describe("Graph", func() {
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
 				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
-				svc.GetDrivesV1(rr, r)
+				svc.ServeHTTP(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusOK))
 			})
 
@@ -124,9 +123,9 @@ var _ = Describe("Graph", func() {
 				}, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives", nil)
-				r = r.WithContext(mfa.Set(ctx, true))
+				r = r.WithContext(revactx.SetMFA(ctx))
 				rr := httptest.NewRecorder()
-				svc.GetAllDrivesV1(rr, r)
+				svc.ServeHTTP(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusOK))
 			})
 
@@ -138,7 +137,7 @@ var _ = Describe("Graph", func() {
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives", nil)
 				rr := httptest.NewRecorder()
-				svc.GetAllDrivesV1(rr, r)
+				svc.ServeHTTP(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusForbidden))
 				Expect(rr.Header().Get("X-Ocis-Mfa-Required")).To(Equal("true"))
 			})

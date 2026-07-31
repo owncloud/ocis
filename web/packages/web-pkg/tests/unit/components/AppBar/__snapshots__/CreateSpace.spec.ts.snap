@@ -1,0 +1,8 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`CreateSpace component > should show the "New Space" button 1`] = `
+"<button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-primary oc-button-primary-filled" id="new-space-menu-btn">
+  <!--v-if-->
+  <!-- @slot Content of the button --> <span class="oc-icon oc-icon-m oc-icon-passive"><!----></span> <span>New Space</span>
+</button>"
+`;

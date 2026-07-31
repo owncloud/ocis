@@ -17,6 +17,7 @@ import (
 	"github.com/jellydator/ttlcache/v3"
 	microstore "go-micro.dev/v4/store"
 
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/store"
@@ -24,19 +25,24 @@ import (
 
 	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	middlewarepkg "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity/ldap"
-	graphm "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
+	graphmw "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
 )
 
 const (
 	// HeaderPurge defines the header name for the purge header.
 	HeaderPurge     = "Purge"
 	displayNameAttr = "displayName"
+
+	// Rate limit per exportPersonalDataWindow endpoint path carries the userID, so effectively per user.
+	exportPersonalDataLimit  = 5
+	exportPersonalDataWindow = time.Minute
 )
 
 // Service defines the service handlers.
@@ -51,6 +57,7 @@ type Service interface { //nolint:interfacebloat
 	GetUser(w http.ResponseWriter, r *http.Request)
 	PostUser(w http.ResponseWriter, r *http.Request)
 	DeleteUser(w http.ResponseWriter, r *http.Request)
+	PatchMe(w http.ResponseWriter, r *http.Request)
 	PatchUser(w http.ResponseWriter, r *http.Request)
 	ChangeOwnPassword(w http.ResponseWriter, r *http.Request)
 
@@ -198,7 +205,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 
 	var requireAdmin func(http.Handler) http.Handler
 	if options.RequireAdminMiddleware == nil {
-		requireAdmin = graphm.RequireAdmin(roleManager, options.Logger)
+		requireAdmin = graphmw.RequireAdmin(roleManager, options.Logger)
 	} else {
 		requireAdmin = options.RequireAdminMiddleware
 	}
@@ -223,9 +230,8 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		return svc, err
 	}
 
-	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
+	graphRoutes := func(r chi.Router, drivesRequireMFA func(http.Handler) http.Handler) {
 		r.Use(middleware.StripSlashes)
-
 		r.Route("/v1beta1", func(r chi.Router) {
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/drives", svc.GetDrives(APIVersion_1_Beta_1))
@@ -235,7 +241,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 				})
 			})
 			r.Route("/drives", func(r chi.Router) {
-				r.Get("/", svc.GetAllDrives(APIVersion_1_Beta_1))
+				r.With(drivesRequireMFA).Get("/", svc.GetAllDrives(APIVersion_1_Beta_1))
 				r.Post("/", svc.CreateDriveV1Beta1)
 				r.Route("/{driveID}", func(r chi.Router) {
 					r.Get("/", svc.GetSingleDriveV1Beta1)
@@ -304,7 +310,8 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 				r.Route("/{userID}", func(r chi.Router) {
 					r.Get("/", svc.GetUser)
 					r.Get("/drive", svc.GetUserDrive)
-					r.Post("/exportPersonalData", svc.ExportPersonalData)
+					r.With(graphmw.RequireSelfUserID(options.Logger)).With(middlewarepkg.LimiterPerEndpoint(exportPersonalDataLimit, exportPersonalDataWindow)).
+						Post("/exportPersonalData", svc.ExportPersonalData)
 					r.With(requireAdmin).Delete("/", svc.DeleteUser)
 					r.With(requireAdmin).Patch("/", svc.PatchUser)
 					if svc.roleService != nil {
@@ -331,7 +338,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 				})
 			})
 			r.Route("/drives", func(r chi.Router) {
-				r.Get("/", svc.GetAllDrives(APIVersion_1))
+				r.With(drivesRequireMFA).Get("/", svc.GetAllDrives(APIVersion_1))
 				r.Post("/", svc.CreateDrive)
 				r.Route("/{driveID}", func(r chi.Router) {
 					r.Patch("/", svc.UpdateDrive)
@@ -394,7 +401,25 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 				})
 			})
 		})
+	}
+
+	requireMFA := graphmw.RequireMFA(options.Logger)
+	blankMW := func(next http.Handler) http.Handler { return next }
+
+	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
+		r.Use(autoprop.NewHttpHandler())
+		graphRoutes(r, requireMFA)
 	})
+
+	// Initialize the Vault routes
+	if options.Config.EnableVaultMode {
+		m.Route("/vault/graph", func(r chi.Router) {
+			r.Use(autoprop.NewHttpHandler())
+			r.Use(requireMFA)
+			r.Use(graphmw.VaultModeMiddleware())
+			graphRoutes(r, blankMW)
+		})
+	}
 
 	_ = chi.Walk(m, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		options.Logger.Debug().Str("method", method).Str("route", route).Int("middlewares", len(middlewares)).Msg("serving endpoint")
@@ -473,11 +498,12 @@ func setIdentityBackends(options Options, svc *Graph) error {
 					TLSConfig:    tlsConf,
 				},
 			)
-			var iid string
+			var iid, masterID string
 			if options.Config.MultiInstance.Enabled {
 				iid = options.Config.MultiInstance.InstanceID
+				masterID = options.Config.MultiInstance.MasterID
 			}
-			lb, err := identity.NewLDAPBackend(conn, options.Config.Identity.LDAP, &options.Logger, iid)
+			lb, err := identity.NewLDAPBackend(conn, options.Config.Identity.LDAP, &options.Logger, iid, masterID)
 			if err != nil {
 				options.Logger.Error().Err(err).Msg("Error initializing LDAP Backend")
 				return err
@@ -536,6 +562,10 @@ func (g *Graph) StartListenForLogonEvents(ctx context.Context, l log.Logger) err
 	if g.eventsConsumer == nil {
 		return nil
 	}
+	if !g.config.Identity.LDAP.UpdateUserLastSignInDate {
+		l.Info().Msg("Updating the last sign-in date is disabled. Not listening for logon events.")
+		return nil
+	}
 	var _registeredEvents = []events.Unmarshaller{
 		events.UserSignedIn{},
 	}
@@ -548,14 +578,19 @@ func (g *Graph) StartListenForLogonEvents(ctx context.Context, l log.Logger) err
 		for loop := true; loop; {
 			select {
 			case e := <-evChannel:
+				ctx2, span := events.TraceEventConsumer(ctx, g.traceProvider, e)
+				ctx2 = autoprop.SetMetaToContext(ctx2, e.ExtraInfo)
+
 				switch ev := e.Event.(type) {
 				default:
 					l.Error().Interface("event", e).Msg("unhandled event")
 				case events.UserSignedIn:
-					if err := g.identityBackend.UpdateLastSignInDate(ctx, ev.Executant.OpaqueId, utils.TSToTime(ev.Timestamp)); err != nil {
+					if err := g.identityBackend.UpdateLastSignInDate(ctx2, ev.Executant.OpaqueId, utils.TSToTime(ev.Timestamp)); err != nil {
 						l.Error().Err(err).Str("userid", ev.Executant.OpaqueId).Msg("Error updating last sign in date")
 					}
 				}
+
+				span.End()
 			case <-ctx.Done():
 				l.Info().Msg("context cancelled")
 				loop = false

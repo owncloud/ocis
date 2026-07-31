@@ -26,7 +26,6 @@ import (
 	"go-micro.dev/v4/client"
 	"google.golang.org/grpc"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -116,6 +115,16 @@ var _ = Describe("Users", func() {
 			})
 
 			It("gets the information", func() {
+				user := &libregraph.User{
+					Id: libregraph.PtrString("user"),
+					Identities: []libregraph.ObjectIdentity{
+						{
+							Issuer:           libregraph.PtrString("https://idp.example.com"),
+							IssuerAssignedId: libregraph.PtrString("the-oidc-sub"),
+						},
+					},
+				}
+				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 				valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
 					Return(&settings.GetValueResponse{
 						Value: &settingsmsg.ValueWithIdentifier{
@@ -140,6 +149,19 @@ var _ = Describe("Users", func() {
 				svc.GetMe(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusOK))
+
+				data, err := io.ReadAll(rr.Body)
+				Expect(err).ToNot(HaveOccurred())
+
+				responseUser := &libregraph.User{}
+				err = json.Unmarshal(data, &responseUser)
+				Expect(err).ToNot(HaveOccurred())
+
+				// The identity (issuerAssignedId, the OIDC sub) must come from the
+				// backend, not be fabricated from the internal user UUID. See
+				// OCISDEV-751.
+				Expect(responseUser.GetIdentities()).To(HaveLen(1))
+				Expect(responseUser.GetIdentities()[0].GetIssuerAssignedId()).To(Equal("the-oidc-sub"))
 			})
 
 			It("expands the memberOf", func() {
@@ -194,6 +216,10 @@ var _ = Describe("Users", func() {
 						RoleId:      "some-appRole-ID",
 					},
 				}
+				user := &libregraph.User{
+					Id: libregraph.PtrString("user"),
+				}
+				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 				roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: assignments}, nil)
 				valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
 					Return(&settings.GetValueResponse{
@@ -258,7 +284,7 @@ var _ = Describe("Users", func() {
 				identityBackend.On("GetUsers", mock.Anything, mock.Anything, mock.Anything).Return(users, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users", nil)
-				r = r.WithContext(mfa.Set(r.Context(), true))
+				r = r.WithContext(revactx.SetMFA(r.Context()))
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusOK))
@@ -371,7 +397,7 @@ var _ = Describe("Users", func() {
 					}, nil)
 
 					r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$search=einstein", nil)
-					r = r.WithContext(mfa.Set(r.Context(), true))
+					r = r.WithContext(revactx.SetMFA(r.Context()))
 					svc.GetUsers(rr, r)
 
 					Expect(rr.Code).To(Equal(http.StatusOK))
@@ -452,7 +478,7 @@ var _ = Describe("Users", func() {
 
 				getUsers := func(path string) []*service.UserWithAttributes {
 					r := httptest.NewRequest(http.MethodGet, path, nil)
-					r = r.WithContext(mfa.Set(r.Context(), true))
+					r = r.WithContext(revactx.SetMFA(r.Context()))
 					rec := httptest.NewRecorder()
 					svc.GetUsers(rec, r)
 
@@ -512,7 +538,7 @@ var _ = Describe("Users", func() {
 
 				// Handles invalid sort field
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$orderby=invalid", nil)
-				r = r.WithContext(mfa.Set(r.Context(), true))
+				r = r.WithContext(revactx.SetMFA(r.Context()))
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -551,7 +577,7 @@ var _ = Describe("Users", func() {
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$expand=appRoleAssignments", nil)
 				r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
-				r = r.WithContext(mfa.Set(r.Context(), true))
+				r = r.WithContext(revactx.SetMFA(r.Context()))
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusOK))
@@ -592,14 +618,14 @@ var _ = Describe("Users", func() {
 				}, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape(filter), nil)
-				r = r.WithContext(mfa.Set(r.Context(), true))
+				r = r.WithContext(revactx.SetMFA(r.Context()))
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(status))
 			},
 			Entry("with invalid filter", "invalid", http.StatusBadRequest),
 			Entry("with unsupported filter for user property", "mail eq 'unsupported'", http.StatusNotImplemented),
-			Entry("with unsupported filter operation", "mail add 10", http.StatusNotImplemented),
+			Entry("with unsupported filter operation", "mail add 10", http.StatusBadRequest),
 			Entry("with unsupported logical operation", "memberOf/any(n:n/id eq 1) or memberOf/any(n:n/id eq 2)", http.StatusNotImplemented),
 			Entry("with unsupported lambda query ", `drives/any(n:n/id eq '1')`, http.StatusNotImplemented),
 			Entry("with unsupported lambda token ", "memberOf/all(n:n/id eq 1)", http.StatusNotImplemented),
@@ -653,7 +679,7 @@ var _ = Describe("Users", func() {
 						}}
 					}, nil)
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape(filter), nil)
-				r = r.WithContext(mfa.Set(r.Context(), true))
+				r = r.WithContext(revactx.SetMFA(r.Context()))
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(status))
@@ -683,6 +709,9 @@ var _ = Describe("Users", func() {
 			It("gets the user", func() {
 				user := &libregraph.User{}
 				user.SetId("user1")
+
+				// anyone can get the userId
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
 
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 				valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
@@ -723,6 +752,13 @@ var _ = Describe("Users", func() {
 			It("includes the personal space if requested", func() {
 				user := &libregraph.User{}
 				user.SetId("user1")
+
+				// requires privileges
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
 
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 				gatewayClient.On("GetQuota", mock.Anything, mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
@@ -783,6 +819,13 @@ var _ = Describe("Users", func() {
 				user := &libregraph.User{}
 				user.SetId("user1")
 
+				// requires privileges
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
+
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 				gatewayClient.On("GetQuota", mock.Anything, mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
 					Status:     status.NewOK(ctx),
@@ -834,6 +877,13 @@ var _ = Describe("Users", func() {
 			It("expands the appRoleAssignments", func() {
 				user := &libregraph.User{}
 				user.SetId("user1")
+
+				// requires privileges
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
 
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 
@@ -1110,6 +1160,49 @@ var _ = Describe("Users", func() {
 			})
 		})
 
+		Describe("PatchMe", func() {
+			It("rejects passwordProfile changes (CWE-620)", func() {
+				update := libregraph.NewUserUpdate()
+				pp := libregraph.NewPasswordProfile()
+				pp.SetPassword("newpassword")
+				update.SetPasswordProfile(*pp)
+				body, err := json.Marshal(update)
+				Expect(err).ToNot(HaveOccurred())
+
+				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me", bytes.NewBuffer(body))
+				r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+				svc.PatchMe(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusBadRequest))
+			})
+
+			It("rejects accountEnabled changes", func() {
+				update := libregraph.NewUserUpdate()
+				update.SetAccountEnabled(false)
+				body, err := json.Marshal(update)
+				Expect(err).ToNot(HaveOccurred())
+
+				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me", bytes.NewBuffer(body))
+				r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+				svc.PatchMe(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusBadRequest))
+			})
+
+			It("rejects onPremisesSamAccountName changes", func() {
+				update := libregraph.NewUserUpdate()
+				update.SetOnPremisesSamAccountName("newusername")
+				body, err := json.Marshal(update)
+				Expect(err).ToNot(HaveOccurred())
+
+				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me", bytes.NewBuffer(body))
+				r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+				svc.PatchMe(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusBadRequest))
+			})
+		})
+
 		Describe("PatchUser", func() {
 			var (
 				user                      *libregraph.User
@@ -1198,6 +1291,12 @@ var _ = Describe("Users", func() {
 
 				expectedUser.SetMail("mail@mail.test")
 				expectedUser.SetDisplayName("New Display Name")
+				// requires privileges
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
 				identityBackend.On("UpdateUser", mock.Anything, user.GetId(), mock.Anything).Return(expectedUser, nil)
 
 				data, err := json.Marshal(userUpdate)

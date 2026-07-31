@@ -78,6 +78,9 @@ type LDAPProvider struct {
 	IDP                      string          `yaml:"idp" env:"OCIS_URL;OCIS_OIDC_ISSUER;AUTH_BASIC_IDP_URL" desc:"The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider." introductionVersion:"pre5.0"`
 	DisableUserMechanism     string          `yaml:"disable_user_mechanism" env:"OCIS_LDAP_DISABLE_USER_MECHANISM;AUTH_BASIC_DISABLE_USER_MECHANISM" desc:"An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed." introductionVersion:"pre5.0"`
 	LdapDisabledUsersGroupDN string          `yaml:"ldap_disabled_users_group_dn" env:"OCIS_LDAP_DISABLED_USERS_GROUP_DN;AUTH_BASIC_DISABLED_USERS_GROUP_DN" desc:"The distinguished name of the group to which added users will be classified as disabled when 'disable_user_mechanism' is set to 'group'." introductionVersion:"pre5.0"`
+	MasterID                 string          `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master instance ID for multi-instance setups. When set, LDAP user filters are enhanced to also match users belonging to the master instance." introductionVersion:"7.0"`
+	UserMemberAttribute      string          `yaml:"user_member_attribute" env:"OCIS_LDAP_USER_MEMBER_ATTRIBUTE" desc:"LDAP attribute that marks a user as a member of an instance." introductionVersion:"7.0"`
+	UserGuestAttribute       string          `yaml:"user_guest_attribute" env:"OCIS_LDAP_USER_GUEST_ATTRIBUTE" desc:"LDAP attribute that marks a user as a guest of an instance." introductionVersion:"7.0"`
 	UserSchema               LDAPUserSchema  `yaml:"user_schema"`
 	GroupSchema              LDAPGroupSchema `yaml:"group_schema"`
 }

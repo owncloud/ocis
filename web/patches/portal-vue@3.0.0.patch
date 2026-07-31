@@ -1,0 +1,14 @@
+diff --git a/package.json b/package.json
+index 578d0d467560411dfdb84d6edab2d01da01c9fb7..8c369e0b392f1bcbdafd19326b40411ee1ddc086 100644
+--- a/package.json
++++ b/package.json
+@@ -27,7 +27,8 @@
+     },
+     "./dist/portal-vue.es.js": "./dist/portal-vue.mjs",
+     "./dist/portal-vue.es.dev.js": "./dist/portal-vue.es.dev.mjs",
+-    "./*": "./*"
++    "./*": "./*",
++    "./types": "./types/types.d.ts"
+   },
+   "files": [
+     "dist",

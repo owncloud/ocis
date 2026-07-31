@@ -15,7 +15,7 @@ The documentation:
 
 * Is based on the [HUGO](https://gohugo.io/) framework written in Go. The underlaying language is markdown plus the extensions provided by hugo.
 * The framwork including the theme used is maintained in the following [repo](https://github.com/owncloud/owncloud.github.io). 
-* The hugo version, currently at `0.129.0` must match the image version defined in the root makefile and the framework repo, defined in `.drone.yml`.\
+* The hugo version, currently at `0.129.0` must match the image version defined in the root makefile and the framework repo.\
 {{< hint info >}}
 * Building the theme is part of the loaded framework while building the documentation is done using a separate container.
 
@@ -24,7 +24,7 @@ The documentation:
 
 * The documentation sources are distributed over several repos such as `ocis`, `web` and others. When building, these sources act individually and only those sources are build and pushed to the web that come from the respective repo. The definition what is going where is defined in the [framework repo](https://github.com/owncloud/owncloud.github.io/blob/main/.batchfile). This means, each merge of a docs change in one of the sourcing repos only pushes that change to the site. There is no global build process and inter doc links must be treated therefore very carefully !
 
-* The documentation setup is, with only a few exceptions, identical for both the `ocis` and the `web` repo. This means, for example, running commands locally are the same, the documentation process section below applies for both; only drone uses some specifics.
+* The documentation setup is, with only a few exceptions, identical for both the `ocis` and the `web` repo. This means, for example, running commands locally are the same, the documentation process section below applies for both.
 
 * {{< hint info >}}
 Any files or folders that need to be excluded from the build process must be defined in the referenced framework repository above, in the file `config.yaml`. 

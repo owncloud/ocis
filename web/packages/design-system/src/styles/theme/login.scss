@@ -1,0 +1,48 @@
+.oc-login {
+  // The branded background is a full-bleed gradient with the ownCloud logo in
+  // the top-right corner. cover fills the viewport edge-to-edge as designed,
+  // and anchoring to the top-right keeps the logo from being cropped at any
+  // viewport aspect ratio. The solid color matches the artwork's darkest edge
+  // as a load-in fallback.
+  @extend .oc-background-cover;
+
+  background-color: #0b294f;
+  background-image: var(--oc-login-background-image);
+  background-position: top right;
+  position: relative;
+
+  &-logo {
+    @extend .oc-background-cover;
+
+    left: 50%;
+    max-height: 200px;
+    max-width: 200px;
+    position: absolute;
+    text-indent: -9999px;
+    transform: translate(-50%, -150%);
+  }
+
+  &-authorize-button {
+    width: 100%;
+  }
+
+  &-card {
+    @extend .oc-card;
+    @extend .oc-text-center;
+
+    border-radius: 15px;
+
+    &-title {
+      @extend .oc-card-title;
+    }
+
+    &-body {
+      @extend .oc-card-body;
+    }
+
+    &-footer {
+      @extend .oc-card-footer;
+      @extend .oc-text-small;
+    }
+  }
+}

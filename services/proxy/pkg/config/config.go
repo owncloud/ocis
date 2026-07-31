@@ -28,7 +28,7 @@ type Config struct {
 	Policies                  []Policy             `yaml:"policies"`
 	AdditionalPolicies        []Policy             `yaml:"additional_policies"`
 	OIDC                      OIDC                 `yaml:"oidc"`
-	ServiceAccount            ServiceAccount       `yaml:"service_account"`
+	ServiceAccount            ServiceAccount       `yaml:"service_account" mask:"struct"`
 	RoleAssignment            RoleAssignment       `yaml:"role_assignment"`
 	PolicySelector            *PolicySelector      `yaml:"policy_selector"`
 	PreSignedURL              PreSignedURL         `yaml:"pre_signed_url"`
@@ -48,6 +48,7 @@ type Config struct {
 	ClaimSpaceManagement      ClaimSpaceManagement `yaml:"claim_space_management"`
 	MultiFactorAuthentication MFAConfig            `yaml:"mfa"`
 	MultiInstance             MultiInstanceConfig  `yaml:"multi_instance"`
+	EnableVaultMode           bool                 `yaml:"enable_vault_mode" env:"OCIS_ENABLE_VAULT_MODE;PROXY_ENABLE_VAULT_MODE" desc:"Set this to true to automatically create a new vault home for the user if it does not exist. Only applicapable if the storage-users-vault service, a special configured storage-users service is configured." introductionVersion:"8.1.0"`
 
 	Context context.Context `json:"-" yaml:"-"`
 }
@@ -112,13 +113,14 @@ const (
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
 // with the configured oidc-provider
 type OIDC struct {
-	Issuer                  string `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;PROXY_OIDC_ISSUER" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP." introductionVersion:"pre5.0"`
-	Insecure                bool   `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments." introductionVersion:"pre5.0"`
-	AccessTokenVerifyMethod string `yaml:"access_token_verify_method" env:"PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD" desc:"Sets how OIDC access tokens should be verified. Possible values are 'none' and 'jwt'. When using 'none', no special validation apart from using it for accessing the IPD's userinfo endpoint will be done. When using 'jwt', it tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'." introductionVersion:"pre5.0"`
-	SkipUserInfo            bool   `yaml:"skip_user_info" env:"PROXY_OIDC_SKIP_USER_INFO" desc:"Do not look up user claims at the userinfo endpoint and directly read them from the access token. Incompatible with 'PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD=none'." introductionVersion:"pre5.0"`
-	UserinfoCache           *Cache `yaml:"user_info_cache"`
-	JWKS                    JWKS   `yaml:"jwks"`
-	RewriteWellKnown        bool   `yaml:"rewrite_well_known" env:"PROXY_OIDC_REWRITE_WELLKNOWN" desc:"Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider." introductionVersion:"pre5.0"`
+	Issuer                  string   `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;PROXY_OIDC_ISSUER" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP." introductionVersion:"pre5.0"`
+	Insecure                bool     `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments." introductionVersion:"pre5.0"`
+	AccessTokenVerifyMethod string   `yaml:"access_token_verify_method" env:"PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD" desc:"Sets how OIDC access tokens should be verified. Possible values are 'none' and 'jwt'. When using 'none', no special validation apart from using it for accessing the IDP's userinfo endpoint will be done. When using 'jwt', it tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'." introductionVersion:"pre5.0"`
+	AccessTokenVerifyAud    []string `yaml:"access_token_verify_aud" env:"PROXY_OIDC_ACCESS_TOKEN_VERIFY_AUD" desc:"A list of accepted audiences for OIDC access tokens, usually the OIDC client IDs used to access ownCloud (for example the web and desktop client IDs). When set, a JWT access token is only accepted if one of these values is present in its 'aud' claim or matches its 'azp' claim. This prevents tokens issued for other applications of a shared IDP from being accepted. When set via the environment variable, use a comma-separated list. Has no effect when 'PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD' is set to 'none'. Leave empty to disable the check (default)." introductionVersion:"8.2.0"`
+	SkipUserInfo            bool     `yaml:"skip_user_info" env:"PROXY_OIDC_SKIP_USER_INFO" desc:"Do not look up user claims at the userinfo endpoint and directly read them from the access token. Incompatible with 'PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD=none'." introductionVersion:"pre5.0"`
+	UserinfoCache           *Cache   `yaml:"user_info_cache"`
+	JWKS                    JWKS     `yaml:"jwks"`
+	RewriteWellKnown        bool     `yaml:"rewrite_well_known" env:"PROXY_OIDC_REWRITE_WELLKNOWN" desc:"Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider." introductionVersion:"pre5.0"`
 }
 
 type JWKS struct {
@@ -129,8 +131,9 @@ type JWKS struct {
 }
 
 type MFAConfig struct {
-	Enabled        bool     `yaml:"enabled" env:"OCIS_MFA_ENABLED" desc:"Enable MFA enforcement. If enabled users need to complete MFA before they can access specific paths" introductionVersion:"7.3.0"`
-	AuthLevelNames []string `yaml:"auth_level_name" env:"OCIS_MFA_AUTH_LEVEL_NAMES" desc:"This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA)." introductionVersion:"7.3.0"`
+	Enabled         bool     `yaml:"enabled" env:"OCIS_MFA_ENABLED" desc:"Enable MFA enforcement. If enabled users need to complete MFA before they can access specific paths" introductionVersion:"7.3.0"`
+	AuthLevelNames  []string `yaml:"auth_level_name" env:"OCIS_MFA_AUTH_LEVEL_NAMES" desc:"This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA)." introductionVersion:"7.3.0"`
+	SessionDuration int      `yaml:"session_duration" env:"OCIS_MFA_SESSION_DURATION" desc:"The duration in seconds that a multi-factor authentication session is valid for non-OIDC requests. Defaults to 3600 (1 hour)." introductionVersion:"7.3.0"`
 }
 
 // Cache is a TTL cache configuration.
@@ -168,7 +171,7 @@ type AutoProvisionClaims struct {
 	Username    string `yaml:"username" env:"PROXY_AUTOPROVISION_CLAIM_USERNAME" desc:"The name of the OIDC claim that holds the username." introductionVersion:"6.0.0"`
 	Email       string `yaml:"email" env:"PROXY_AUTOPROVISION_CLAIM_EMAIL" desc:"The name of the OIDC claim that holds the email." introductionVersion:"6.0.0"`
 	DisplayName string `yaml:"display_name" env:"PROXY_AUTOPROVISION_CLAIM_DISPLAYNAME" desc:"The name of the OIDC claim that holds the display name." introductionVersion:"6.0.0"`
-	Groups      string `yaml:"groups" env:"PROXY_AUTOPROVISION_CLAIM_GROUPS" desc:"The name of the OIDC claim that holds the groups." introductionVersion:"6.1.0"`
+	Groups      string `yaml:"groups" env:"PROXY_AUTOPROVISION_CLAIM_GROUPS" desc:"The name of the OIDC claim that holds the groups. When empty (the default), group membership sync is disabled and groups are not created from claim values. Set it (e.g. to 'groups') to enable syncing and creating groups from the claim." introductionVersion:"6.1.0"`
 }
 
 // PolicySelector is the toplevel-configuration for different selectors
@@ -192,7 +195,7 @@ type PreSignedURL struct {
 
 // SigningKeys is a store configuration.
 type SigningKeys struct {
-	Store              string        `yaml:"store" env:"OCIS_CACHE_STORE;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE" desc:"The type of the signing key store. Supported values are: 'redis-sentinel', 'nats-js-kv' and 'ocisstoreservice' (deprecated). See the text description for details." introductionVersion:"5.0"`
+	Store              string        `yaml:"store" env:"OCIS_CACHE_STORE;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE" desc:"The type of the signing key store. Supported values are: 'redis-sentinel' and 'nats-js-kv'. See the text description for details." introductionVersion:"5.0"`
 	Nodes              []string      `yaml:"addresses" env:"OCIS_CACHE_STORE_NODES;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES" desc:"A list of nodes to access the configured store. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details." introductionVersion:"5.0"`
 	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_TTL" desc:"Default time to live for signing keys. See the Environment Variable Types description for more details." introductionVersion:"5.0"`
 	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_DISABLE_PERSISTENCE" desc:"Disables persistence of the store. Only applies when store type 'nats-js-kv' is configured. Defaults to true." introductionVersion:"5.0"`
@@ -225,7 +228,7 @@ type RegexRuleConf struct {
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
 	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;PROXY_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
-	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;PROXY_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;PROXY_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0" mask:"password"`
 }
 
 // Events combines the configuration options for the event bus.
@@ -251,6 +254,7 @@ type ClaimSpaceManagement struct {
 type MultiInstanceConfig struct {
 	Enabled     bool   `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enable multiple instances of Infinite Scale." introductionVersion:"8.0.0"`
 	InstanceID  string `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique id of this instance" introductionVersion:"8.0.0"`
+	MasterID    string `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master ID that grants access to all instances. Users with this ID in their memberOf or guestOf claims can access any instance. Leave empty to disable." introductionVersion:"8.1.0"`
 	MemberClaim string `yaml:"member_claim" env:"OCIS_MULTI_INSTANCE_MEMBER_CLAIM" desc:"The claim name for the 'memberOf' property" introductionVersion:"8.0.0"`
 	GuestClaim  string `yaml:"guest_claim" env:"OCIS_MULTI_INSTANCE_GUEST_CLAIM" desc:"The claim name for the 'guestOf' property" introductionVersion:"8.0.0"`
 	GuestRole   string `yaml:"guest_role" env:"OCIS_MULTI_INSTANCE_GUEST_ROLE" desc:"The role that should be assigned to a guest user" introductionVersion:"8.0.0"`

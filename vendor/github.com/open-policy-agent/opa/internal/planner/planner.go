@@ -161,7 +161,18 @@ func (p *Planner) buildFunctrie() error {
 }
 
 func (p *Planner) planRules(rules []*ast.Rule) (string, error) {
-	// We know the rules with closer to the root (shorter static path) are ordered first.
+	// We sort rules, first by ref length, and then using the
+	// Ref.Compare method to break ties. This yields a stable
+	// sorting order for the slice of rules to be planned.
+	sort.Slice(rules, func(i, j int) bool {
+		li, lj := len(rules[i].Ref()), len(rules[j].Ref())
+		if li != lj {
+			return li > lj
+		}
+		return rules[i].Ref().Compare(rules[j].Ref()) < 0
+	})
+
+	// We know the rules that are closer to the root (shorter static path) are ordered first.
 	pathRef := rules[0].Ref()
 
 	// figure out what our rules' collective name/path is:
@@ -261,12 +272,6 @@ func (p *Planner) planRules(rules []*ast.Rule) (string, error) {
 
 	var defaultRule *ast.Rule
 	var ruleLoc *location.Location
-
-	// We sort rules by ref length, to ensure that when merged, we can detect conflicts when one
-	// rule attempts to override values (deep and shallow) defined by another rule.
-	sort.Slice(rules, func(i, j int) bool {
-		return len(rules[i].Ref()) > len(rules[j].Ref())
-	})
 
 	// Generate function blocks for rules.
 	for i := range rules {
@@ -637,11 +642,11 @@ func (p *Planner) planQuery(q ast.Body, index int, iter planiter) error {
 func (p *Planner) planExpr(e *ast.Expr, iter planiter) error {
 
 	switch {
-	case e.Negated:
-		return p.planNot(e, iter)
-
 	case len(e.With) > 0:
 		return p.planWith(e, iter)
+
+	case e.IsNegated():
+		return p.planNot(e, iter)
 
 	case e.IsCall():
 		return p.planExprCall(e, iter)
@@ -661,8 +666,27 @@ func (p *Planner) planNot(e *ast.Expr, iter planiter) error {
 	prev := p.curr
 	p.curr = not.Block
 
-	if err := p.planExpr(e.Complement(), func() error { return nil }); err != nil {
-		return err
+	if n, ok := e.Terms.(*ast.Not); ok {
+		cond := p.newLocal() // success condition
+
+		err := p.planQuery(n.Body, 0, func() error {
+			p.appendStmt(&ir.AssignVarStmt{
+				Source: op(ir.Bool(true)),
+				Target: cond,
+			})
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+
+		p.appendStmt(&ir.IsDefinedStmt{
+			Source: cond,
+		})
+	} else {
+		if err := p.planExpr(e.Complement(), func() error { return nil }); err != nil {
+			return err
+		}
 	}
 
 	p.curr = prev
@@ -2070,7 +2094,7 @@ func (p *Planner) planRefDataExtent(virtual *ruletrie, base *baseptr, iter plani
 			}
 		}
 		if anyKeyNonGround {
-			var rules []*ast.Rule
+			rules := make([]*ast.Rule, 0, len(virtual.Children()))
 			for _, key := range virtual.Children() {
 				// TODO(sr): skip functions
 				rules = append(rules, virtual.Get(key).Rules()...)

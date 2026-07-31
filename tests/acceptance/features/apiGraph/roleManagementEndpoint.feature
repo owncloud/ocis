@@ -296,10 +296,10 @@ Feature: permissions role definitions
                   "const": 0
                 },
                 "description": {
-                  "const": "View, download, upload, edit, add, show all versions and delete."
+                  "const": "View, download, upload, edit, add, delete, show all versions and restore from trash bin."
                 },
                 "displayName": {
-                  "const": "Can edit with versions and trashbin"
+                  "const": "Can edit with versions and trash bin"
                 },
                 "id": {
                   "const": "58c63c02-1d89-4572-916a-870abc5a1b7d"
@@ -491,7 +491,7 @@ Feature: permissions role definitions
                   "const": 0
                 },
                 "description": {
-                  "const": "View, download, upload, edit, add, show all versions, delete and manage members."
+                  "const": "View, download, upload, edit, add, delete, show all versions, restore from trash bin, empty the trash bin and manage members."
                 },
                 "displayName": {
                   "const": "Can manage"

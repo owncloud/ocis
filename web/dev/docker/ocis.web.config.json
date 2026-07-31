@@ -1,0 +1,29 @@
+{
+  "server": "https://host.docker.internal:9200",
+  "theme": "https://host.docker.internal:9200/themes/owncloud/theme.json",
+  "openIdConnect": {
+    "metadata_url": "https://host.docker.internal:9200/.well-known/openid-configuration",
+    "authority": "https://host.docker.internal:9200",
+    "client_id": "web",
+    "response_type": "code",
+    "scope": "openid profile email acr"
+  },
+  "options": {
+    "contextHelpersReadMore": true
+  },
+  "apps": [
+    "files",
+    "text-editor",
+    "pdf-viewer",
+    "search",
+    "external",
+    "admin-settings",
+    "ocm",
+    "webfinger",
+    "epub-reader",
+    "app-store",
+    "activities",
+    "preview",
+    "password-protected-folders"
+  ]
+}

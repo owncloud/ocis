@@ -178,6 +178,28 @@ var _ = Describe("FileConnector", func() {
 				Expect(response.Headers).To(BeNil())
 			})
 
+			It("Read-only view mode returns 200 without locking", func() {
+				gatewaySelector.EXPECT().Next().Unset()
+				readOnlyCtx := wopiCtx
+				readOnlyCtx.ViewMode = appproviderv1beta1.ViewMode_VIEW_MODE_READ_ONLY
+				ctx := middleware.WopiContextToCtx(context.Background(), readOnlyCtx)
+
+				response, err := fc.Lock(ctx, "abcdef123", "")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(response.Status).To(Equal(200))
+			})
+
+			It("View-only mode returns 200 without locking", func() {
+				gatewaySelector.EXPECT().Next().Unset()
+				viewOnlyCtx := wopiCtx
+				viewOnlyCtx.ViewMode = appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY
+				ctx := middleware.WopiContextToCtx(context.Background(), viewOnlyCtx)
+
+				response, err := fc.Lock(ctx, "abcdef123", "")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(response.Status).To(Equal(200))
+			})
+
 			It("Set lock failed", func() {
 				ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 
@@ -2166,5 +2188,6 @@ var _ = Describe("FileConnector", func() {
 			// so we can't compare the whole url
 			Expect(templateSource).To(HavePrefix(expectedTemplateSource))
 		})
+
 	})
 })

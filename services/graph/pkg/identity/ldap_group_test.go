@@ -455,20 +455,31 @@ func TestUpdateGroupName(t *testing.T) {
 
 func TestGroupToLDAPAttrValuesUsesConfiguredObjectClass(t *testing.T) {
 	tests := []struct {
-		name             string
-		groupObjectClass string
+		name                         string
+		groupObjectClass             string
+		groupAdditionalObjectClasses []string
+		expectedObjectClasses        []string
 	}{
 		{
-			name:             "default groupOfNames",
-			groupObjectClass: "groupOfNames",
+			name:                  "default groupOfNames",
+			groupObjectClass:      "groupOfNames",
+			expectedObjectClasses: []string{"groupOfNames", "top", "owncloud"},
 		},
 		{
-			name:             "custom groupOfUniqueNames",
-			groupObjectClass: "groupOfUniqueNames",
+			name:                  "custom groupOfUniqueNames",
+			groupObjectClass:      "groupOfUniqueNames",
+			expectedObjectClasses: []string{"groupOfUniqueNames", "top", "owncloud"},
 		},
 		{
-			name:             "custom posixGroup",
-			groupObjectClass: "posixGroup",
+			name:                  "custom posixGroup",
+			groupObjectClass:      "posixGroup",
+			expectedObjectClasses: []string{"posixGroup", "top", "owncloud"},
+		},
+		{
+			name:                         "additional objectClasses",
+			groupObjectClass:             "groupOfNames",
+			groupAdditionalObjectClasses: []string{"posixGroup", "extensibleObject"},
+			expectedObjectClasses:        []string{"groupOfNames", "top", "posixGroup", "extensibleObject", "owncloud"},
 		},
 	}
 
@@ -477,6 +488,7 @@ func TestGroupToLDAPAttrValuesUsesConfiguredObjectClass(t *testing.T) {
 			// Setup config with custom groupObjectClass
 			testConfig := lconfig
 			testConfig.GroupObjectClass = tt.groupObjectClass
+			testConfig.GroupAdditionalObjectClasses = tt.groupAdditionalObjectClasses
 
 			lm := &mocks.Client{}
 			b, err := getMockedBackend(lm, testConfig, &logger)
@@ -500,14 +512,17 @@ func TestGroupToLDAPAttrValuesUsesConfiguredObjectClass(t *testing.T) {
 				t.Fatal("Expected objectClass attribute to be present")
 			}
 
-			// Check objectClass has exactly 3 elements
-			if len(objectClasses) != 3 {
-				t.Errorf("Expected objectClass to have exactly 3 elements, got %d: %v", len(objectClasses), objectClasses)
+			if len(objectClasses) != len(tt.expectedObjectClasses) {
+				t.Errorf("Expected objectClass to have %d elements, got %d: %v", len(tt.expectedObjectClasses), len(objectClasses), objectClasses)
 			}
 
-			// Check first element is the configured groupObjectClass (exact match)
-			if objectClasses[0] != tt.groupObjectClass {
-				t.Errorf("Expected first objectClass to be '%s', got '%s'", tt.groupObjectClass, objectClasses[0])
+			for i, expected := range tt.expectedObjectClasses {
+				if i >= len(objectClasses) {
+					break
+				}
+				if objectClasses[i] != expected {
+					t.Errorf("Expected objectClass[%d] to be '%s', got '%s'", i, expected, objectClasses[i])
+				}
 			}
 		})
 	}

@@ -37,6 +37,9 @@ type config struct {
 	Prefix                     string `mapstructure:"prefix"`
 	GatewaySvc                 string `mapstructure:"gatewaysvc"                    validate:"required"`
 	ExposeRecipientDisplayName bool   `mapstructure:"expose_recipient_display_name"`
+	ServiceAccountID           string `mapstructure:"service_account_id"`
+	ServiceAccountSecret       string `mapstructure:"service_account_secret"`
+	AllowHTTP                  bool   `mapstructure:"allow_http"`
 }
 
 func (c *config) ApplyDefaults() {

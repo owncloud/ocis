@@ -1,7 +1,6 @@
 package types
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
@@ -95,7 +94,7 @@ func LinkCreated(ev events.LinkCreated) AuditEventShareCreated {
 func ShareUpdated(ev events.ShareUpdated) AuditEventShareUpdated {
 	uid := ev.Sharer.OpaqueId
 	with, typ := extractGrantee(ev.GranteeUserID, ev.GranteeGroupID)
-	base := BasicAuditEvent(uid, formatTime(ev.MTime), MessageShareUpdated(uid, ev.ShareID.OpaqueId, ev.Updated), updateType(ev.Updated))
+	base := BasicAuditEvent(uid, formatTime(ev.MTime), MessageShareUpdated(uid, ev.ShareID.OpaqueId, shareUpdateField(ev.Updated, ev.UpdateMask)), shareUpdateAction(ev.Updated, ev.UpdateMask))
 	return AuditEventShareUpdated{
 		AuditEventSharing: SharingAuditEvent(ev.ShareID.GetOpaqueId(), ev.ItemID.OpaqueId, uid, base),
 		ShareOwner:        uid,
@@ -115,7 +114,7 @@ func ShareUpdated(ev events.ShareUpdated) AuditEventShareUpdated {
 func LinkUpdated(ev events.LinkUpdated) AuditEventShareUpdated {
 	uid := ev.Sharer.OpaqueId
 	with, typ := "", _linktype
-	base := BasicAuditEvent(uid, formatTime(ev.MTime), MessageLinkUpdated(uid, ev.ShareID.GetOpaqueId(), ev.FieldUpdated), updateType(ev.FieldUpdated))
+	base := BasicAuditEvent(uid, formatTime(ev.MTime), MessageLinkUpdated(uid, ev.ShareID.GetOpaqueId(), ev.FieldUpdated), shareUpdateAction(ev.FieldUpdated, nil))
 	return AuditEventShareUpdated{
 		AuditEventSharing: SharingAuditEvent(ev.ShareID.GetOpaqueId(), ev.ItemID.OpaqueId, uid, base),
 		ShareOwner:        uid,
@@ -181,14 +180,21 @@ func ReceivedShareUpdated(ev events.ReceivedShareUpdated) AuditEventReceivedShar
 	with, typ := extractGrantee(ev.GranteeUserID, ev.GranteeGroupID)
 	itemID := ev.ItemID.GetOpaqueId()
 
-	msg, utype := "", ""
+	var msg, utype string
 	switch ev.State {
 	case "SHARE_STATE_ACCEPTED":
 		msg = MessageShareAccepted(with, sid, uid)
 		utype = ActionShareAccepted
-	case "SHARE_STATE_DECLINED":
+	// the CS3 share state enum is SHARE_STATE_REJECTED; "SHARE_STATE_DECLINED"
+	// is not a valid value and never matched, so declines were not audited.
+	case "SHARE_STATE_REJECTED":
 		msg = MessageShareDeclined(with, sid, uid)
 		utype = ActionShareDeclined
+	default:
+		// keep the action non-empty for any other state (e.g. pending) so the
+		// event remains attributable instead of producing an empty record.
+		msg = MessageShareStateChanged(with, sid, uid, ev.State)
+		utype = ActionShareStateChanged
 	}
 	base := BasicAuditEvent(with, formatTime(ev.MTime), msg, utype)
 	return AuditEventReceivedShareUpdated{
@@ -552,24 +558,39 @@ func formatTime(t *types.Timestamp) string {
 	return time.Unix(int64(t.Seconds), int64(t.Nanos)).UTC().Format(time.RFC3339)
 }
 
-func updateType(u string) string {
-	switch u {
-	case "permissions":
-		return ActionSharePermissionUpdated
-	case "displayname":
-		return ActionShareDisplayNameUpdated
-	case "TYPE_PERMISSIONS":
-		return ActionSharePermissionUpdated
-	case "TYPE_DISPLAYNAME":
-		return ActionShareDisplayNameUpdated
-	case "TYPE_PASSWORD":
-		return ActionSharePasswordUpdated
-	case "TYPE_EXPIRATION":
-		return ActionShareExpirationUpdated
-	default:
-		fmt.Println("Unknown update type", u)
-		return ""
+// shareUpdateField resolves the name of the updated field for the audit message.
+// reva deprecated the single Updated field in favour of UpdateMask, so prefer
+// the mask when Updated is empty.
+func shareUpdateField(updated string, updateMask []string) string {
+	if updated != "" {
+		return updated
 	}
+	return strings.Join(updateMask, ", ")
+}
+
+// shareUpdateAction resolves the audit action for a share or link update. It
+// prefers the deprecated Updated field and falls back to the UpdateMask, mapping
+// the first recognized field to its specific action. Unknown or empty updates
+// map to the generic ActionShareUpdated so every update stays attributable
+// (an empty action cannot be counted for telemetry).
+func shareUpdateAction(updated string, updateMask []string) string {
+	candidates := updateMask
+	if updated != "" {
+		candidates = []string{updated}
+	}
+	for _, c := range candidates {
+		switch c {
+		case "permissions", "TYPE_PERMISSIONS":
+			return ActionSharePermissionUpdated
+		case "displayname", "TYPE_DISPLAYNAME":
+			return ActionShareDisplayNameUpdated
+		case "TYPE_PASSWORD":
+			return ActionSharePasswordUpdated
+		case "expiration", "TYPE_EXPIRATION":
+			return ActionShareExpirationUpdated
+		}
+	}
+	return ActionShareUpdated
 }
 
 // normalizeString tries to create a somewhat stable string

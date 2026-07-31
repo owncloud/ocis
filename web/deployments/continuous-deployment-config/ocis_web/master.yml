@@ -1,0 +1,55 @@
+---
+- name: continuous-deployment-ocis-web-master
+  server:
+    server_type: cpx21
+    image: ubuntu-22.04
+    location: nbg1
+    initial_ssh_key_names:
+      - owncloud-web@drone.owncloud.com
+    labels:
+      owner: web-team
+      for: oCIS-continuous-deployment-examples
+    rebuild: $REBUILD
+    rebuild_carry_paths:
+      - /var/lib/docker/volumes/web_certs
+
+  domains:
+    - "*.ocis-web.master.owncloud.works"
+
+  vars:
+    ssh_authorized_keys:
+      - https://github.com/butonic.keys
+      - https://github.com/fschade.keys
+      - https://github.com/kulmann.keys
+      - https://github.com/micbar.keys
+      - https://github.com/wkloucek.keys
+    docker_compose_projects:
+      # web now lives in-tree in the ocis repo (previously a separate
+      # owncloud/web checkout); ops team should confirm this deployment
+      # example is still needed/relevant now that web ships as part of ocis.
+      - name: web
+        git_url: https://github.com/owncloud/ocis.git
+        ref: master
+        docker_compose_path: web/deployments/examples/ocis_web
+        env:
+          INSECURE: "false"
+          TRAEFIK_ACME_MAIL: bkulmann@owncloud.com
+          OCIS_DOCKER_TAG: latest
+          WEB_DOCKER_TAG: latest
+          OCIS_DOMAIN: ocis.ocis-web.master.owncloud.works
+          WOPISERVER_DOMAIN: wopiserver.ocis-web.master.owncloud.works
+          COLLABORA_DOMAIN: collabora.ocis-web.master.owncloud.works
+          INBUCKET_DOMAIN: mail.ocis-web.master.owncloud.works
+          DEMO_USERS: true
+          SHARE_DENIALS: true
+          COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
+      - name: monitoring
+        git_url: https://github.com/owncloud-devops/monitoring-tracing-client.git
+        ref: master
+        env:
+          NETWORK_NAME: ocis-net
+          TELEMETRY_SERVE_DOMAIN: telemetry.ocis-web.master.owncloud.works
+          JAEGER_COLLECTOR: jaeger-collector.infra.owncloud.works:443
+          TELEGRAF_SPECIFIC_CONFIG: ocis_single_container
+          OCIS_URL: ocis.ocis-web.master.owncloud.works
+          OCIS_DEPLOYMENT_ID: continuous-deployment-ocis-web-master

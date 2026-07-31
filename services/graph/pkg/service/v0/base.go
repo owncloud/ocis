@@ -87,7 +87,7 @@ func (g BaseGraphService) CS3ReceivedSharesToDriveItems(ctx context.Context, rec
 	}
 
 	availableRoles := unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...))
-	return cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, receivedShares, availableRoles)
+	return cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, receivedShares, availableRoles, g.config.ReceivedSharesStatTimeout)
 }
 
 func (g BaseGraphService) CS3ReceivedOCMSharesToDriveItems(ctx context.Context, receivedShares []*ocm.ReceivedShare) ([]libregraph.DriveItem, error) {
@@ -435,18 +435,18 @@ func (g BaseGraphService) cs3UserSharesToDriveItems(ctx context.Context, shares 
 			return nil
 		})
 	}
-	// Wait for things to settle down, then close results chan
-	go func() {
-		_ = errg.Wait() // error is checked later
-		close(results)
-	}()
+
+	// Wait for all workers to finish before collecting the results. The workers
+	// read from driveItems, so writing to it below must not overlap with them.
+	// The results channel is buffered with len(shares), which is at least the
+	// number of items the workers can send, so they never block on the handover.
+	if err := errg.Wait(); err != nil {
+		return nil, err
+	}
+	close(results)
 
 	for item := range results {
 		driveItems[item.GetId()] = *item
-	}
-
-	if err := errg.Wait(); err != nil {
-		return nil, err
 	}
 
 	return driveItems, nil
@@ -535,18 +535,18 @@ func (g BaseGraphService) cs3OCMSharesToDriveItems(ctx context.Context, shares [
 			return nil
 		})
 	}
-	// Wait for things to settle down, then close results chan
-	go func() {
-		_ = errg.Wait() // error is checked later
-		close(results)
-	}()
+
+	// Wait for all workers to finish before collecting the results. The workers
+	// read from driveItems, so writing to it below must not overlap with them.
+	// The results channel is buffered with len(shares), which is at least the
+	// number of items the workers can send, so they never block on the handover.
+	if err := errg.Wait(); err != nil {
+		return nil, err
+	}
+	close(results)
 
 	for item := range results {
 		driveItems[item.GetId()] = *item
-	}
-
-	if err := errg.Wait(); err != nil {
-		return nil, err
 	}
 
 	return driveItems, nil
@@ -797,18 +797,18 @@ func (g BaseGraphService) cs3PublicSharesToDriveItems(ctx context.Context, share
 			return nil
 		})
 	}
-	// Wait for things to settle down, then close results chan
-	go func() {
-		_ = errg.Wait() // error is checked later
-		close(results)
-	}()
+
+	// Wait for all workers to finish before collecting the results. The workers
+	// read from driveItems, so writing to it below must not overlap with them.
+	// The results channel is buffered with len(shares), which is at least the
+	// number of items the workers can send, so they never block on the handover.
+	if err := errg.Wait(); err != nil {
+		return nil, err
+	}
+	close(results)
 
 	for item := range results {
 		driveItems[item.GetId()] = *item
-	}
-
-	if err := errg.Wait(); err != nil {
-		return nil, err
 	}
 
 	return driveItems, nil

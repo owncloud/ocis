@@ -9,7 +9,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/utils"
 )
 
-func (s eventsNotifier) handleScienceMeshInviteTokenGenerated(e events.ScienceMeshInviteTokenGenerated) {
+func (s eventsNotifier) handleScienceMeshInviteTokenGenerated(baseCtx context.Context, e events.ScienceMeshInviteTokenGenerated) {
 	logger := s.logger.With().
 		Str("event", "ScienceMeshInviteTokenGenerated").
 		Logger()
@@ -20,7 +20,7 @@ func (s eventsNotifier) handleScienceMeshInviteTokenGenerated(e events.ScienceMe
 		return
 	}
 
-	ctx, err := utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
+	ctx, err := utils.GetServiceUserContextWithContext(baseCtx, gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
 	if err != nil {
 		logger.Error().Err(err).Msg("Could not impersonate service user")
 		return

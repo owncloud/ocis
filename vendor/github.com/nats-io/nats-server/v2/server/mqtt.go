@@ -1,4 +1,4 @@
-// Copyright 2020-2025 The NATS Authors
+// Copyright 2020-2026 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -15,7 +15,6 @@ package server
 
 import (
 	"bytes"
-	"cmp"
 	"crypto/tls"
 	"encoding/binary"
 	"encoding/json"
@@ -33,6 +32,8 @@ import (
 	"unicode/utf8"
 
 	"github.com/nats-io/jwt/v2"
+	"github.com/nats-io/nats-server/v2/server/gsl"
+	"github.com/nats-io/nats-server/v2/server/stree"
 	"github.com/nats-io/nuid"
 )
 
@@ -238,9 +239,10 @@ var (
 	errMQTTEmptyUsername              = errors.New("empty user name not allowed")
 	errMQTTTopicIsEmpty               = errors.New("topic cannot be empty")
 	errMQTTPacketIdentifierIsZero     = errors.New("packet identifier cannot be 0")
-	errMQTTUnsupportedCharacters      = errors.New("character ' ' not supported for MQTT topics")
+	errMQTTUnsupportedCharacters      = errors.New("character not supported for MQTT topics")
 	errMQTTInvalidSession             = errors.New("invalid MQTT session")
 	errMQTTInvalidRetainFlags         = errors.New("invalid retained message flags")
+	errMQTTSessionCollision           = errors.New("stored session does not match client ID")
 )
 
 type srvMQTT struct {
@@ -257,14 +259,13 @@ type mqttSessionManager struct {
 
 type mqttAccountSessionManager struct {
 	mu         sync.RWMutex
-	sessions   map[string]*mqttSession        // key is MQTT client ID
-	sessByHash map[string]*mqttSession        // key is MQTT client ID hash
-	sessLocked map[string]struct{}            // key is MQTT client ID and indicate that a session can not be taken by a new client at this time
-	flappers   map[string]int64               // When connection connects with client ID already in use
-	flapTimer  *time.Timer                    // Timer to perform some cleanup of the flappers map
-	sl         *Sublist                       // sublist allowing to find retained messages for given subscription
-	retmsgs    map[string]*mqttRetainedMsgRef // retained messages
-	rmsCache   *sync.Map                      // map[subject]mqttRetainedMsg
+	sessions   map[string]*mqttSession                // key is MQTT client ID
+	sessByHash map[string]*mqttSession                // key is MQTT client ID hash
+	sessLocked map[string]struct{}                    // key is MQTT client ID and indicate that a session can not be taken by a new client at this time
+	flappers   map[string]time.Time                   // When connection connects with client ID already in use
+	flapTimer  *time.Timer                            // Timer to perform some cleanup of the flappers map
+	retmsgs    *stree.SubjectTree[mqttRetainedMsgRef] // retained message metadata
+	rmsCache   *sync.Map                              // map[subject]mqttRetainedMsg
 	jsa        mqttJSA
 	domainTk   string // Domain (with trailing "."), or possibly empty. This is added to session subject.
 }
@@ -365,7 +366,6 @@ type mqttRetainedMsg struct {
 
 type mqttRetainedMsgRef struct {
 	sseq uint64
-	sub  *subscription
 }
 
 // mqttSub contains fields associated with a MQTT subscription, and is added to
@@ -585,7 +585,7 @@ func (s *Server) createMQTTClient(conn net.Conn, ws *websocket) *client {
 		return c
 	}
 
-	if opts.MaxConn > 0 && len(s.clients) >= opts.MaxConn {
+	if opts.MaxConn < 0 || (opts.MaxConn > 0 && len(s.clients) >= opts.MaxConn) {
 		s.mu.Unlock()
 		c.maxConnExceeded()
 		return nil
@@ -789,9 +789,22 @@ func (c *client) mqttParse(buf []byte) error {
 			}
 			break
 		}
+		if err = mqttCheckFixedHeaderFlags(pt, b&mqttPacketFlagMask); err != nil {
+			break
+		}
 
-		pl, complete, err = r.readPacketLen()
+		maxLen := int32(jwt.NoLimit)
+		if !connected {
+			maxLen = atomic.LoadInt32(&c.mpay)
+		}
+		pl, complete, err = r.readPacketLen(maxLen)
 		if err != nil || !complete {
+			if err == ErrMaxPayload {
+				c.maxPayloadViolation(pl, maxLen)
+			}
+			break
+		}
+		if err = mqttCheckRemainingLength(pt, pl); err != nil {
 			break
 		}
 
@@ -956,6 +969,43 @@ func (c *client) mqttParse(buf []byte) error {
 		r.reader.SetReadDeadline(time.Now().Add(rd))
 	}
 	return err
+}
+
+func mqttCheckFixedHeaderFlags(packetType, flags byte) error {
+	var expected byte
+	switch packetType {
+	case mqttPacketConnect, mqttPacketPubAck, mqttPacketPubRec, mqttPacketPubComp,
+		mqttPacketPing, mqttPacketDisconnect:
+		expected = 0
+	case mqttPacketPubRel, mqttPacketSub, mqttPacketUnsub:
+		expected = 0x2
+	case mqttPacketPub:
+		return nil
+	default:
+		return nil
+	}
+	if flags != expected {
+		return fmt.Errorf("invalid fixed header flags %x for packet type %x", flags, packetType)
+	}
+	return nil
+}
+
+func mqttCheckRemainingLength(packetType byte, pl int) error {
+	var expected int
+	switch packetType {
+	case mqttPacketConnect, mqttPacketPub, mqttPacketSub, mqttPacketUnsub:
+		return nil
+	case mqttPacketPubAck, mqttPacketPubRec, mqttPacketPubRel, mqttPacketPubComp:
+		expected = 2
+	case mqttPacketPing, mqttPacketDisconnect:
+		expected = 0
+	default:
+		return nil
+	}
+	if pl != expected {
+		return fmt.Errorf("invalid remaining length %d for packet type %x", pl, packetType)
+	}
+	return nil
 }
 
 func (c *client) mqttTraceMsg(msg []byte) {
@@ -1174,7 +1224,7 @@ func (s *Server) mqttCreateAccountSessionManager(acc *Account, quitCh chan struc
 		sessions:   make(map[string]*mqttSession),
 		sessByHash: make(map[string]*mqttSession),
 		sessLocked: make(map[string]struct{}),
-		flappers:   make(map[string]int64),
+		flappers:   make(map[string]time.Time),
 		jsa: mqttJSA{
 			id:      id,
 			c:       c,
@@ -1978,10 +2028,14 @@ func (as *mqttAccountSessionManager) processRetainedMsg(_ *subscription, c *clie
 	if err != nil {
 		return
 	}
+	if strings.IndexByte(rm.Subject, 0x7f) >= 0 {
+		c.Warnf("Skipping retained message for subject %q: unsupported character 0x7f", rm.Subject)
+		return
+	}
 	// The as.jsa.id is immutable, so no need to have a rlock here.
 	local := rm.Origin == as.jsa.id
 	// Get the stream sequence for this message.
-	seq, _, _ := ackReplyInfo(reply)
+	seq, _, _, _, _ := ackReplyInfo(reply)
 	if len(m) == 0 {
 		// An empty payload means that we need to remove the retained message.
 		rmSeq := as.removeRetainedMsg(rm.Subject, 0)
@@ -1998,7 +2052,7 @@ func (as *mqttAccountSessionManager) processRetainedMsg(_ *subscription, c *clie
 		// Add this retained message. The `rm.Msg` references some buffer that we
 		// don't own. But addRetainedMsg() will take care of making a copy of
 		// `rm.Msg` it `rm` ends-up being stored in the cache.
-		as.addRetainedMsg(rm.Subject, &mqttRetainedMsgRef{sseq: seq}, rm)
+		as.addRetainedMsg(rm.Subject, seq, rm)
 	}
 }
 
@@ -2090,7 +2144,7 @@ func (as *mqttAccountSessionManager) processSessionPersist(_ *subscription, pc *
 //
 // Lock held on entry.
 func (as *mqttAccountSessionManager) addSessToFlappers(clientID string) {
-	as.flappers[clientID] = time.Now().UnixNano()
+	as.flappers[clientID] = time.Now()
 	if as.flapTimer == nil {
 		as.flapTimer = time.AfterFunc(mqttFlapCleanItvl, func() {
 			as.mu.Lock()
@@ -2099,9 +2153,9 @@ func (as *mqttAccountSessionManager) addSessToFlappers(clientID string) {
 			if as.flapTimer == nil {
 				return
 			}
-			now := time.Now().UnixNano()
+			now := time.Now()
 			for cID, tm := range as.flappers {
-				if now-tm > int64(mqttSessJailDur) {
+				if now.Sub(tm) > mqttSessJailDur {
 					delete(as.flappers, cID)
 				}
 			}
@@ -2266,17 +2320,16 @@ func (as *mqttAccountSessionManager) sendJSAPIrequests(s *Server, c *client, acc
 // If a message for this topic already existed, the existing record is updated
 // with the provided information.
 // Lock not held on entry.
-func (as *mqttAccountSessionManager) addRetainedMsg(key string, rf *mqttRetainedMsgRef, rm *mqttRetainedMsg) {
+func (as *mqttAccountSessionManager) addRetainedMsg(key string, sseq uint64, rm *mqttRetainedMsg) {
 	as.mu.Lock()
 	defer as.mu.Unlock()
 	if as.retmsgs == nil {
-		as.retmsgs = make(map[string]*mqttRetainedMsgRef)
-		as.sl = NewSublistWithCache()
+		as.retmsgs = stree.NewSubjectTree[mqttRetainedMsgRef]()
 	} else {
 		// Check if we already had one retained message. If so, update the existing one.
-		if erf, exists := as.retmsgs[key]; exists {
+		if erf, exists := as.retmsgs.Find(stringToBytes(key)); exists {
 			// Update the stream sequence with the new value.
-			erf.sseq = rf.sseq
+			erf.sseq = sseq
 			// Update the in-memory retained message cache but only for messages
 			// that are already in the cache, i.e. have been (recently) used.
 			// If that is the case, we ask setCachedRetainedMsg() to make a copy
@@ -2285,9 +2338,7 @@ func (as *mqttAccountSessionManager) addRetainedMsg(key string, rf *mqttRetained
 			return
 		}
 	}
-	rf.sub = &subscription{subject: []byte(key)}
-	as.retmsgs[key] = rf
-	as.sl.Insert(rf.sub)
+	as.retmsgs.Insert([]byte(key), mqttRetainedMsgRef{sseq: sseq})
 }
 
 // Remove the retained message stored with the `subject` key from the map/cache.
@@ -2304,15 +2355,13 @@ func (as *mqttAccountSessionManager) addRetainedMsg(key string, rf *mqttRetained
 func (as *mqttAccountSessionManager) removeRetainedMsg(subject string, seq uint64) uint64 {
 	as.mu.Lock()
 	defer as.mu.Unlock()
-	rm, ok := as.retmsgs[subject]
+	rm, ok := as.retmsgs.Find(stringToBytes(subject))
 	if !ok || (seq > 0 && rm.sseq != seq) {
 		return 0
 	}
-	seq = rm.sseq
+	rm, _ = as.retmsgs.Delete(stringToBytes(subject))
 	as.rmsCache.Delete(subject)
-	delete(as.retmsgs, subject)
-	as.sl.Remove(rm.sub)
-	return seq
+	return rm.sseq
 }
 
 // First check if this session's client ID is already in the "locked" map,
@@ -2494,7 +2543,8 @@ func (as *mqttAccountSessionManager) processSubs(sess *mqttSession, c *client,
 		// TODO: (levb: not sure why since one can subscribe to `#` and it'll
 		// include everything; I guess this would discourage? Otherwise another
 		// candidate for DO NOT DELIVER prefix list).
-		if strings.HasPrefix(f.filter, mqttSubPrefix) {
+		if strings.HasPrefix(f.filter, mqttSubPrefix) ||
+			strings.HasPrefix(f.filter, mqttPubRelDeliverySubjectPrefix) {
 			f.qos = mqttSubAckFailure
 			continue
 		}
@@ -2640,27 +2690,29 @@ func (as *mqttAccountSessionManager) processSubs(sess *mqttSession, c *client,
 // Account session manager lock held on entry.
 // Session lock held on entry.
 func (as *mqttAccountSessionManager) serializeRetainedMsgsForSub(rms map[string]*mqttRetainedMsg, sess *mqttSession, c *client, sub *subscription, trace bool) {
-	if len(as.retmsgs) == 0 || len(rms) == 0 {
-		return
-	}
-	result := as.sl.ReverseMatch(string(sub.subject))
-	if len(result.psubs) == 0 {
+	if as.retmsgs.Size() == 0 || len(rms) == 0 {
 		return
 	}
 	toTrace := []mqttPublish{}
-	for _, psub := range result.psubs {
-
-		rm := rms[string(psub.subject)]
+	as.retmsgs.Match(sub.subject, func(subj []byte, _ *mqttRetainedMsgRef) {
+		rm := rms[string(subj)]
 		if rm == nil {
 			// This should not happen since we pre-load messages into rms before
 			// calling serialize.
-			continue
+			return
+		}
+		// A broad wildcard subscription can overlap a subscribe deny clause.
+		c.mu.Lock()
+		denied := c.mperms != nil && c.checkDenySub(string(subj))
+		c.mu.Unlock()
+		if denied {
+			return
 		}
 		var pi uint16
 		qos := min(mqttGetQoS(rm.Flags), sub.mqtt.qos)
 		if c.mqtt.rejectQoS2Pub && qos == 2 {
 			c.Warnf("Rejecting retained message with QoS2 for subscription %q, as configured", sub.subject)
-			continue
+			return
 		}
 		if qos > 0 {
 			pi = sess.trackPublishRetained()
@@ -2687,7 +2739,7 @@ func (as *mqttAccountSessionManager) serializeRetainedMsgsForSub(rms map[string]
 				sz:    len(rm.Msg),
 			})
 		}
-	}
+	})
 	for _, pp := range toTrace {
 		c.traceOutOp("PUBLISH", []byte(mqttPubTrace(&pp)))
 	}
@@ -2699,27 +2751,21 @@ func (as *mqttAccountSessionManager) serializeRetainedMsgsForSub(rms map[string]
 // Account session manager NOT lock held on entry.
 func (as *mqttAccountSessionManager) addRetainedSubjectsForSubject(list map[string]uint64, topSubject string) {
 	as.mu.RLock()
-	if len(as.retmsgs) == 0 {
-		as.mu.RUnlock()
+	defer as.mu.RUnlock()
+
+	if as.retmsgs.Size() == 0 {
 		return
 	}
-	result := as.sl.ReverseMatch(topSubject)
-	as.mu.RUnlock()
 
-	for _, sub := range result.psubs {
-		if _, ok := list[string(sub.subject)]; ok {
-			continue
+	as.retmsgs.Match(stringToBytes(topSubject), func(subj []byte, ret *mqttRetainedMsgRef) {
+		subject := string(subj)
+		if _, ok := list[subject]; ok {
+			return
 		}
-		var seq uint64
-		as.mu.RLock()
-		if rm, ok := as.retmsgs[string(sub.subject)]; ok {
-			seq = rm.sseq
+		if seq := ret.sseq; seq > 0 {
+			list[subject] = seq
 		}
-		as.mu.RUnlock()
-		if seq > 0 {
-			list[string(sub.subject)] = seq
-		}
-	}
+	})
 }
 
 type warner interface {
@@ -2971,16 +3017,12 @@ func mqttDecodeRetainedMessage(subject string, h, m []byte) (*mqttRetainedMsg, e
 // Lock not held on entry, but session is in the locked map.
 func (as *mqttAccountSessionManager) createOrRestoreSession(clientID string, opts *Options) (*mqttSession, bool, error) {
 	jsa := &as.jsa
-	formatError := func(errTxt string, err error) (*mqttSession, bool, error) {
-		accName := jsa.c.acc.GetName()
-		return nil, false, fmt.Errorf("%s for account %q, session %q: %v", errTxt, accName, clientID, err)
-	}
 
 	hash := getHash(clientID)
 	smsg, err := jsa.loadSessionMsg(as.domainTk, hash)
 	if err != nil {
 		if isErrorOtherThan(err, JSNoMessageFoundErr) {
-			return formatError("loading session record", err)
+			return nil, false, fmt.Errorf("loading session record: %w", err)
 		}
 		// Message not found, so reate the session...
 		// Create a session and indicate that this session did not exist.
@@ -2991,7 +3033,10 @@ func (as *mqttAccountSessionManager) createOrRestoreSession(clientID string, opt
 	// We need to recover the existing record now.
 	ps := &mqttPersistedSession{}
 	if err := json.Unmarshal(smsg.Data, ps); err != nil {
-		return formatError(fmt.Sprintf("unmarshal of session record at sequence %v", smsg.Sequence), err)
+		return nil, false, fmt.Errorf("unmarshal of session record at sequence %v: %w", smsg.Sequence, err)
+	}
+	if ps.ID != clientID {
+		return nil, false, errMQTTSessionCollision
 	}
 
 	// Restore this session (even if we don't own it), the caller will do the right thing.
@@ -3414,7 +3459,7 @@ func (sess *mqttSession) trackPublish(jsDur, jsAckSubject string) (uint16, bool)
 	}
 
 	// Get the stream sequence and duplicate flag from the ack reply subject.
-	sseq, _, dcount := ackReplyInfo(jsAckSubject)
+	sseq, _, dcount, _, _ := ackReplyInfo(jsAckSubject)
 	if dcount > 1 {
 		dup = true
 	}
@@ -3518,7 +3563,7 @@ func (sess *mqttSession) trackAsPubRel(pi uint16, jsAckSubject string) {
 		return
 	}
 
-	sseq, _, _ := ackReplyInfo(jsAckSubject)
+	sseq, _, _, _, _ := ackReplyInfo(jsAckSubject)
 
 	if sess.cpending == nil {
 		sess.cpending = make(map[string]map[uint64]uint16)
@@ -3673,8 +3718,12 @@ func (c *client) mqttParseConnect(r *mqttReader, hasMappings bool) (byte, *mqttC
 		c.mqtt.cid = nuid.Next()
 	}
 	// Spec [MQTT-3.1.3-4] and [MQTT-3.1.3-9]
-	if !utf8.ValidString(c.mqtt.cid) {
-		return mqttConnAckRCIdentifierRejected, nil, fmt.Errorf("invalid utf8 for client ID: %q", c.mqtt.cid)
+	if err := mqttValidateString(c.mqtt.cid, "client ID"); err != nil {
+		return mqttConnAckRCIdentifierRejected, nil, err
+	} else if !isValidName(c.mqtt.cid) {
+		// Should not contain characters that make it an invalid name for NATS subjects, etc.
+		err = fmt.Errorf("invalid character in %s %q", "client ID", c.mqtt.cid)
+		return mqttConnAckRCIdentifierRejected, nil, err
 	}
 
 	if hasWill {
@@ -3692,8 +3741,8 @@ func (c *client) mqttParseConnect(r *mqttReader, hasMappings bool) (byte, *mqttC
 		if len(topic) == 0 {
 			return 0, nil, errMQTTEmptyWillTopic
 		}
-		if !utf8.Valid(topic) {
-			return 0, nil, fmt.Errorf("invalid utf8 for Will topic %q", topic)
+		if err := mqttValidateTopic(topic, "Will topic"); err != nil {
+			return 0, nil, err
 		}
 		// Convert MQTT topic to NATS subject
 		cp.will.subject, err = mqttTopicToNATSPubSubject(topic)
@@ -3734,8 +3783,8 @@ func (c *client) mqttParseConnect(r *mqttReader, hasMappings bool) (byte, *mqttC
 			return mqttConnAckRCBadUserOrPassword, nil, errMQTTEmptyUsername
 		}
 		// Spec [MQTT-3.1.3-11]
-		if !utf8.ValidString(c.opts.Username) {
-			return mqttConnAckRCBadUserOrPassword, nil, fmt.Errorf("invalid utf8 for user name %q", c.opts.Username)
+		if err := mqttValidateString(c.opts.Username, "user name"); err != nil {
+			return mqttConnAckRCBadUserOrPassword, nil, err
 		}
 	}
 
@@ -3745,7 +3794,6 @@ func (c *client) mqttParseConnect(r *mqttReader, hasMappings bool) (byte, *mqttC
 			return 0, nil, err
 		}
 		c.opts.Token = c.opts.Password
-		c.opts.JWT = c.opts.Password
 	}
 	return 0, cp, nil
 }
@@ -3835,7 +3883,7 @@ CHECK:
 	if tm, ok := asm.flappers[cid]; ok {
 		// If the last time it tried to connect was more than 1 sec ago,
 		// then accept and remove from flappers map.
-		if time.Now().UnixNano()-tm > int64(mqttSessJailDur) {
+		if time.Since(tm) > mqttSessJailDur {
 			asm.removeSessFromFlappers(cid)
 		} else {
 			// Will hold this client for a second and then close it. We
@@ -3883,13 +3931,19 @@ CHECK:
 	// Do we have an existing session for this client ID
 	es, exists := asm.sessions[cid]
 	asm.mu.Unlock()
+	formatError := func(err error) error {
+		return fmt.Errorf("%v for account %q, session %q", err, c.acc.GetName(), cid)
+	}
 
 	// The session is not in the map, but may be on disk, so try to recover
 	// or create the stream if not.
 	if !exists {
 		es, exists, err = asm.createOrRestoreSession(cid, s.getOpts())
 		if err != nil {
-			return err
+			if err == errMQTTSessionCollision {
+				sendConnAck(mqttConnAckRCIdentifierRejected, false)
+			}
+			return formatError(err)
 		}
 	}
 	if exists {
@@ -4041,6 +4095,9 @@ func (c *client) mqttParsePub(r *mqttReader, pl int, pp *mqttPublish, hasMapping
 	if len(pp.topic) == 0 {
 		return errMQTTTopicIsEmpty
 	}
+	if err := mqttValidateTopic(pp.topic, "topic"); err != nil {
+		return err
+	}
 	// Convert the topic to a NATS subject. This call will also check that
 	// there is no MQTT wildcards (Spec [MQTT-3.3.2-2] and [MQTT-4.7.1-1])
 	// Note that this may not result in a copy if there is no conversion.
@@ -4082,13 +4139,37 @@ func (c *client) mqttParsePub(r *mqttReader, pl int, pp *mqttPublish, hasMapping
 
 	// The message payload will be the total packet length minus
 	// what we have consumed for the variable header
-	pp.sz = pl - (r.pos - start)
+	payloadSize := pl - (r.pos - start)
+	if payloadSize < 0 {
+		return fmt.Errorf("invalid remaining length %d for PUBLISH packet", pl)
+	}
+	pp.sz = payloadSize
 	if pp.sz > 0 {
 		start = r.pos
 		r.pos += pp.sz
 		pp.msg = r.buf[start:r.pos]
 	} else {
 		pp.msg = nil
+	}
+	return nil
+}
+
+func mqttValidateTopic(topic []byte, field string) error {
+	if !utf8.Valid(topic) {
+		return fmt.Errorf("invalid utf8 for %s %q", field, topic)
+	}
+	if bytes.IndexByte(topic, 0) >= 0 {
+		return fmt.Errorf("invalid null character in %s %q", field, topic)
+	}
+	return nil
+}
+
+func mqttValidateString(value string, field string) error {
+	if !utf8.ValidString(value) {
+		return fmt.Errorf("invalid utf8 for %s %q", field, value)
+	}
+	if strings.IndexByte(value, 0) >= 0 {
+		return fmt.Errorf("invalid null character in %s %q", field, value)
 	}
 	return nil
 }
@@ -4493,13 +4574,8 @@ func (s *Server) mqttCheckPubRetainedPerms() {
 	}
 	sm.mu.RUnlock()
 
-	type retainedMsg struct {
-		subj string
-		rmsg *mqttRetainedMsgRef
-	}
-
 	// For each session we will obtain a list of retained messages.
-	var _rms [128]retainedMsg
+	var _rms [128]uint64
 	rms := _rms[:0]
 	for _, asm := range asms {
 		// Get all of the retained messages. Then we will sort them so
@@ -4507,19 +4583,20 @@ func (s *Server) mqttCheckPubRetainedPerms() {
 		// store to not have to load out-of-order blocks so often.
 		asm.mu.RLock()
 		rms = rms[:0] // reuse slice
-		for subj, rf := range asm.retmsgs {
-			rms = append(rms, retainedMsg{
-				subj: subj,
-				rmsg: rf,
-			})
-		}
+		// Copy the sequence out of the tree. The tree entry itself can be
+		// updated concurrently by addRetainedMsg() after we release the lock,
+		// so keeping a pointer here would race with the later sort.
+		asm.retmsgs.IterOrdered(func(_ []byte, rm *mqttRetainedMsgRef) bool {
+			rms = append(rms, rm.sseq)
+			return true
+		})
 		jsaID := asm.jsa.id
 		asm.mu.RUnlock()
-		slices.SortFunc(rms, func(i, j retainedMsg) int { return cmp.Compare(i.rmsg.sseq, j.rmsg.sseq) })
+		slices.Sort(rms)
 
-		perms := map[string]*perm{}
+		perms := map[string]*mqttPerm{}
 		for _, rf := range rms {
-			jsm, err := asm.jsa.loadMsg(mqttRetainedMsgsStreamName, rf.rmsg.sseq)
+			jsm, err := asm.jsa.loadMsg(mqttRetainedMsgsStreamName, rf)
 			if err != nil || jsm == nil {
 				continue
 			}
@@ -4542,7 +4619,7 @@ func (s *Server) mqttCheckPubRetainedPerms() {
 				}
 				// If there is permission and no longer allowed to publish in
 				// the subject, remove the publish retained message from the map.
-				if p != nil && !pubAllowed(p, rf.subj) {
+				if p != nil && !pubAllowed(p, rm.Subject) {
 					u = nil
 				}
 			}
@@ -4561,7 +4638,12 @@ func (s *Server) mqttCheckPubRetainedPerms() {
 }
 
 // Helper to generate only pub permissions from a Permissions object
-func generatePubPerms(perms *Permissions) *perm {
+type mqttPerm struct {
+	allow *gsl.SimpleSublist
+	deny  *gsl.SimpleSublist
+}
+
+func generatePubPerms(perms *Permissions) *mqttPerm {
 	// If given permissions is `nil`, then it means that permissions block
 	// has been removed (so the user is now allowed to publish on everything)
 	// or was never there in the first place. Returning `nil` will let the
@@ -4569,39 +4651,38 @@ func generatePubPerms(perms *Permissions) *perm {
 	if perms == nil {
 		return nil
 	}
-	var p *perm
+	var p *mqttPerm
 	if perms.Publish.Allow != nil {
-		p = &perm{}
-		p.allow = NewSublistWithCache()
+		p = &mqttPerm{}
+		p.allow = gsl.NewSimpleSublist()
 		for _, pubSubject := range perms.Publish.Allow {
-			sub := &subscription{subject: []byte(pubSubject)}
-			p.allow.Insert(sub)
+			_ = p.allow.Insert(pubSubject, struct{}{})
 		}
 	}
 	if len(perms.Publish.Deny) > 0 {
 		if p == nil {
-			p = &perm{}
+			p = &mqttPerm{}
 		}
-		p.deny = NewSublistWithCache()
+		p.deny = gsl.NewSimpleSublist()
 		for _, pubSubject := range perms.Publish.Deny {
-			sub := &subscription{subject: []byte(pubSubject)}
-			p.deny.Insert(sub)
+			_ = p.deny.Insert(pubSubject, struct{}{})
 		}
 	}
 	return p
 }
 
 // Helper that checks if given `perms` allow to publish on the given `subject`
-func pubAllowed(perms *perm, subject string) bool {
+func pubAllowed(perms *mqttPerm, subject string) bool {
+	if perms == nil {
+		return true
+	}
 	allowed := true
 	if perms.allow != nil {
-		np, _ := perms.allow.NumInterest(subject)
-		allowed = np != 0
+		allowed = perms.allow.HasInterest(subject)
 	}
 	// If we have a deny list and are currently allowed, check that as well.
 	if allowed && perms.deny != nil {
-		np, _ := perms.deny.NumInterest(subject)
-		allowed = np == 0
+		allowed = !perms.deny.HasInterest(subject)
 	}
 	return allowed
 }
@@ -4774,9 +4855,9 @@ func (c *client) mqttParseSubsOrUnsubs(r *mqttReader, b byte, pl int, sub bool) 
 	if rf := b & 0xf; rf != expectedFlag {
 		return 0, nil, fmt.Errorf("wrong %ssubscribe reserved flags: %x", action, rf)
 	}
-	pi, err := r.readUint16("packet identifier")
+	pi, err := mqttParsePIPacket(r)
 	if err != nil {
-		return 0, nil, fmt.Errorf("reading packet identifier: %v", err)
+		return 0, nil, err
 	}
 	end := r.pos + (pl - 2)
 	var filters []*mqttFilter
@@ -4791,8 +4872,8 @@ func (c *client) mqttParseSubsOrUnsubs(r *mqttReader, b byte, pl int, sub bool) 
 			return 0, nil, errMQTTTopicFilterCannotBeEmpty
 		}
 		// Spec [MQTT-3.8.3-1], [MQTT-3.10.3-1]
-		if !utf8.Valid(topic) {
-			return 0, nil, fmt.Errorf("invalid utf8 for topic filter %q", topic)
+		if err := mqttValidateTopic(topic, "topic filter"); err != nil {
+			return 0, nil, err
 		}
 		var qos byte
 		// We are going to report if we had an error during the conversion,
@@ -4982,6 +5063,16 @@ func mqttDeliverMsgCbQoS12(sub *subscription, pc *client, _ *Account, subject, r
 	// remove the message, and do nothing else.
 	strippedSubj := subject[len(mqttStreamSubjectPrefix):]
 	if mqttMustIgnoreForReservedSub(sub, strippedSubj) {
+		sess.mu.Unlock()
+		sess.jsa.sendAck(reply)
+		return
+	}
+
+	// A broad wildcard subscription can overlap a subscribe deny clause.
+	cc.mu.Lock()
+	denied := cc.mperms != nil && cc.checkDenySub(strippedSubj)
+	cc.mu.Unlock()
+	if denied {
 		sess.mu.Unlock()
 		sess.jsa.sendAck(reply)
 		return
@@ -5651,8 +5742,17 @@ func mqttToNATSSubjectConversion(mt []byte, wcOk bool) ([]byte, error) {
 				}
 				res = append(res, btsep)
 			}
-		case ' ':
-			// As of now, we cannot support ' ' in the MQTT topic/filter.
+		case ' ', '\t', '\n', '\r', '\f':
+			// We cannot support whitespace in the MQTT topic/filter — these
+			// characters would also corrupt the NATS wire protocol when the
+			// subject is forwarded to other connection types (e.g. leaf
+			// nodes) where the resulting control line could be split.
+			return nil, errMQTTUnsupportedCharacters
+		case 0x7f:
+			// SubjectTree uses DEL as an internal pivot marker, so retained
+			// subjects containing it cannot be indexed safely, including
+			// legacy retained messages recovered from the retained-message
+			// stream.
 			return nil, errMQTTUnsupportedCharacters
 		case btsep:
 			if !cp {
@@ -5770,11 +5870,27 @@ func (r *mqttReader) readByte(field string) (byte, error) {
 	return b, nil
 }
 
-func (r *mqttReader) readPacketLen() (int, bool, error) {
-	return r.readPacketLenWithCheck(true)
+func (r *mqttReader) readPacketLen(maxLen int32) (int, bool, error) {
+	v, complete, err := r.readVarInt()
+	if err != nil {
+		return 0, false, err
+	}
+	if complete {
+		packetEnd := r.pos + v
+		packetLen := packetEnd - r.pstart
+		if maxLen != jwt.NoLimit && int64(packetLen) > int64(maxLen) {
+			return packetLen, false, ErrMaxPayload
+		}
+		if packetEnd <= len(r.buf) {
+			return v, true, nil
+		}
+	}
+	r.pbuf = make([]byte, len(r.buf)-r.pstart)
+	copy(r.pbuf, r.buf[r.pstart:])
+	return 0, false, nil
 }
 
-func (r *mqttReader) readPacketLenWithCheck(check bool) (int, bool, error) {
+func (r *mqttReader) readVarInt() (int, bool, error) {
 	m := 1
 	v := 0
 	for {
@@ -5787,9 +5903,6 @@ func (r *mqttReader) readPacketLenWithCheck(check bool) (int, bool, error) {
 		}
 		v += int(b&0x7f) * m
 		if (b & 0x80) == 0 {
-			if check && r.pos+v > len(r.buf) {
-				break
-			}
 			return v, true, nil
 		}
 		m *= 0x80
@@ -5797,8 +5910,6 @@ func (r *mqttReader) readPacketLenWithCheck(check bool) (int, bool, error) {
 			return 0, false, errMQTTMalformedVarInt
 		}
 	}
-	r.pbuf = make([]byte, len(r.buf)-r.pstart)
-	copy(r.pbuf, r.buf[r.pstart:])
 	return 0, false, nil
 }
 

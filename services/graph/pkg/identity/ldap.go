@@ -17,6 +17,7 @@ import (
 	"github.com/libregraph/idm/pkg/ldapdn"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
+	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
@@ -66,8 +67,9 @@ type LDAP struct {
 	groupBaseDN          string
 	groupCreateBaseDN    string
 	groupFilter          string
-	groupObjectClass     string
-	groupIDisOctetString bool
+	groupObjectClass                string
+	groupAdditionalObjectClasses    []string
+	groupIDisOctetString            bool
 	groupScope           int
 	groupAttributeMap    groupAttributeMap
 
@@ -80,6 +82,7 @@ type LDAP struct {
 
 	// multi instance only
 	instanceID                     string
+	masterID                       string
 	preciseSearchAttribute         string
 	instanceMapperEnabled          bool
 	instanceMapperBaseDN           string
@@ -122,7 +125,7 @@ func ParseDisableMechanismType(disableMechanism string) (DisableUserMechanismTyp
 	return t, nil
 }
 
-func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, instanceID string) (*LDAP, error) {
+func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, instanceID string, masterID string) (*LDAP, error) {
 	if config.UserDisplayNameAttribute == "" || config.UserIDAttribute == "" ||
 		config.UserEmailAttribute == "" || config.UserNameAttribute == "" {
 		return nil, errors.New("invalid user attribute mappings")
@@ -202,6 +205,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		groupCreateBaseDN:              config.GroupCreateBaseDN,
 		groupFilter:                    config.GroupFilter,
 		groupObjectClass:               config.GroupObjectClass,
+		groupAdditionalObjectClasses:   config.GroupAdditionalObjectClasses,
 		groupIDisOctetString:           config.GroupIDIsOctetString,
 		groupScope:                     groupScope,
 		groupAttributeMap:              gam,
@@ -214,6 +218,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		refintEnabled:                  config.RefintEnabled,
 		useExternalID:                  config.RequireExternalID,
 		instanceID:                     instanceID,
+		masterID:                       masterID,
 		preciseSearchAttribute:         config.PreciseSearchAttribute,
 		instanceMapperEnabled:          config.InstanceMapperEnabled,
 		instanceMapperBaseDN:           config.InstanceMapperBaseDN,
@@ -611,7 +616,8 @@ func (i *LDAP) getPreciseLDAPUser(uniqueID string, instanceID string) (*ldap.Ent
 }
 
 func (i *LDAP) getLDAPUserByFilter(filter string, userFilter string) (*ldap.Entry, error) {
-	filter = fmt.Sprintf("(&%s(objectClass=%s)%s)", userFilter, i.userObjectClass, filter)
+	enhancedUserFilter := ocisldap.EnhanceFilterWithMasterID(userFilter, i.masterID, i.userAttributeMap.userMemberAttribute, i.userAttributeMap.userGuestAttribute)
+	filter = fmt.Sprintf("(&%s(objectClass=%s)%s)", enhancedUserFilter, i.userObjectClass, filter)
 	return i.searchLDAPEntryByFilter(i.userBaseDN, i.getUserAttrTypesForSearch(), filter)
 }
 
@@ -1059,7 +1065,6 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 		"objectClass":                  {"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"},
 		"cn":                           {user.GetOnPremisesSamAccountName()},
 		i.userAttributeMap.userType:    {user.GetUserType()},
-		i.userAttributeMap.externalID:  {user.GetExternalID()},
 	}
 
 	if identities, ok := user.GetIdentitiesOk(); ok {
@@ -1098,6 +1103,11 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 	// When we get a givenName, we set the attribute.
 	if givenName := user.GetGivenName(); givenName != "" {
 		attrs[i.userAttributeMap.givenName] = []string{givenName}
+	}
+
+	// Only set externalID when it's not empty.
+	if externalID := user.GetExternalID(); externalID != "" {
+		attrs[i.userAttributeMap.externalID] = []string{externalID}
 	}
 
 	if !i.usePwModifyExOp && user.PasswordProfile != nil && user.PasswordProfile.Password != nil {
@@ -1306,8 +1316,9 @@ func replaceDN(fullDN *ldap.DN, newDN string) (string, error) {
 func (i *LDAP) CreateLDAPGroupByDN(dn string) error {
 	ar := ldap.NewAddRequest(dn, nil)
 
+	objectClasses := append([]string{i.groupObjectClass, "top"}, i.groupAdditionalObjectClasses...)
 	attrs := map[string][]string{
-		"objectClass": {i.groupObjectClass, "top"},
+		"objectClass": objectClasses,
 		"member":      {""},
 	}
 

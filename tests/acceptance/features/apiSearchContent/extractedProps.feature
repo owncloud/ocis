@@ -42,6 +42,12 @@ Feature: propfind extracted props
       | oc:photo/oc:camera-model         | COOLPIX P6000        |
       | oc:photo/oc:f-number             | 4.5                  |
       | oc:photo/oc:focal-length         | 6                    |
+      | oc:photo/oc:iso                  | 64                   |
+      | oc:photo/oc:orientation          | 1                    |
+      | oc:photo/oc:exposure-numerator   | 1                    |
+      | oc:photo/oc:exposure-denominator | 178                  |
+      | oc:photo/oc:taken-date-time      | 2008-10-22T16:29:49Z |
+      | oc:location/oc:altitude          | 100                  |
 
 
   Scenario: check extracted properties of a file from personal space
@@ -75,6 +81,12 @@ Feature: propfind extracted props
       | oc:photo/oc:camera-model         | COOLPIX P6000        |
       | oc:photo/oc:f-number             | 4.5                  |
       | oc:photo/oc:focal-length         | 6                    |
+      | oc:photo/oc:iso                  | 64                   |
+      | oc:photo/oc:orientation          | 1                    |
+      | oc:photo/oc:exposure-numerator   | 1                    |
+      | oc:photo/oc:exposure-denominator | 178                  |
+      | oc:photo/oc:taken-date-time      | 2008-10-22T16:29:49Z |
+      | oc:location/oc:altitude          | 100                  |
 
 
   Scenario: check extracted properties of a file by sharee from shares space
@@ -125,6 +137,12 @@ Feature: propfind extracted props
       | oc:photo/oc:camera-model         | COOLPIX P6000        |
       | oc:photo/oc:f-number             | 4.5                  |
       | oc:photo/oc:focal-length         | 6                    |
+      | oc:photo/oc:iso                  | 64                   |
+      | oc:photo/oc:orientation          | 1                    |
+      | oc:photo/oc:exposure-numerator   | 1                    |
+      | oc:photo/oc:exposure-denominator | 178                  |
+      | oc:photo/oc:taken-date-time      | 2008-10-22T16:29:49Z |
+      | oc:location/oc:altitude          | 100                  |
 
 
   Scenario: GET extracted properties of an audio file (Personal space)
@@ -203,13 +221,16 @@ Feature: propfind extracted props
             },
             "location": {
               "type": "object",
-              "required": [ "latitude", "longitude" ],
+              "required": [ "latitude", "longitude", "altitude" ],
               "properties": {
                 "latitude": {
                   "const": 43.467157
                 },
                 "longitude": {
                   "const": 11.885395
+                },
+                "altitude": {
+                  "const": 100
                 }
               }
             },
@@ -337,13 +358,16 @@ Feature: propfind extracted props
             },
             "location": {
               "type": "object",
-              "required": [ "latitude", "longitude" ],
+              "required": [ "latitude", "longitude", "altitude" ],
               "properties": {
                 "latitude": {
                   "const": 43.467157
                 },
                 "longitude": {
                   "const": 11.885395
+                },
+                "altitude": {
+                  "const": 100
                 }
               }
             },
@@ -483,13 +507,16 @@ Feature: propfind extracted props
             },
             "location": {
               "type": "object",
-              "required": [ "latitude", "longitude" ],
+              "required": [ "latitude", "longitude", "altitude" ],
               "properties": {
                 "latitude": {
                   "const": 43.467157
                 },
                 "longitude": {
                   "const": 11.885395
+                },
+                "altitude": {
+                  "const": 100
                 }
               }
             },

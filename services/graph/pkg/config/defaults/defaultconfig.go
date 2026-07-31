@@ -19,6 +19,7 @@ var (
 		unifiedrole.UnifiedRoleSecureViewerID,
 		unifiedrole.UnifiedRoleSpaceEditorWithoutVersionsID,
 		unifiedrole.UnifiedRoleSpaceEditorWithoutTrashbinID,
+		unifiedrole.UnifiedRoleSpaceEditorWithoutVersionsWithoutTrashbinID,
 		unifiedrole.UnifiedRoleViewerListGrantsID,
 		unifiedrole.UnifiedRoleEditorListGrantsID,
 		unifiedrole.UnifiedRoleEditorListGrantsWithVersionsID,
@@ -68,10 +69,11 @@ func DefaultConfig() *config.Config {
 		},
 		Reva: shared.DefaultRevaConfig(),
 		Spaces: config.Spaces{
-			StorageUsersAddress: "com.owncloud.api.storage-users",
-			WebDavBase:          "https://localhost:9200",
-			WebDavPath:          "/dav/spaces/",
-			DefaultQuota:        "1000000000",
+			StorageUsersAddress:      "com.owncloud.api.storage-users",
+			StorageUsersVaultAddress: "com.owncloud.api.storage-users-vault",
+			WebDavBase:               "https://localhost:9200",
+			WebDavPath:               "/dav/spaces/",
+			DefaultQuota:             "1000000000",
 			// 1 minute
 			ExtendedSpacePropertiesCacheTTL: 60,
 			// 1 minute
@@ -89,6 +91,7 @@ func DefaultConfig() *config.Config {
 				UseServerUUID:            false,
 				UsePasswordModExOp:       true,
 				WriteEnabled:             true,
+				UpdateUserLastSignInDate: true,
 				UserBaseDN:               "ou=users,o=libregraph-idm",
 				UserSearchScope:          "sub",
 				UserFilter:               "",
@@ -125,7 +128,9 @@ func DefaultConfig() *config.Config {
 			Cluster:   "ocis-cluster",
 			EnableTLS: false,
 		},
-		MaxConcurrency: 20,
+		MaxConcurrency:            20,
+		ReceivedSharesStatTimeout: 10 * time.Second,
+		EnableUserSharing:         true,
 		UnifiedRoles: config.UnifiedRoles{
 			AvailableRoles: nil, // will be populated with defaults in EnsureDefaults
 		},

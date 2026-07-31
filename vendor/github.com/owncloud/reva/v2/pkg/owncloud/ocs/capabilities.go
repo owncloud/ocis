@@ -62,6 +62,7 @@ type Capabilities struct {
 	Theme          *CapabilitiesTheme          `json:"theme,omitempty" xml:"theme,omitempty" mapstructure:"theme"`
 	Notifications  *CapabilitiesNotifications  `json:"notifications,omitempty" xml:"notifications,omitempty"`
 	Auth           *CapabilitiesAuth           `json:"auth,omitempty" xml:"auth,omitempty"`
+	Vault          *CapabilitiesVault          `json:"vault,omitempty" xml:"vault,omitempty" mapstructure:"vault"`
 }
 
 // CapabilitiesSearch holds the search capabilities
@@ -100,8 +101,9 @@ type CapabilitiesAuth struct {
 
 // CapabilitiesMFA holds mfa capabilities
 type CapabilitiesMFA struct {
-	Enabled    bool     `json:"enabled,omitempty" xml:"enabled,omitempty" mapstructure:"enabled"`
-	LevelNames []string `json:"levelnames,omitempty" xml:"levelnames,omitempty" mapstructure:"levelnames"`
+	Enabled         bool     `json:"enabled,omitempty" xml:"enabled,omitempty" mapstructure:"enabled"`
+	LevelNames      []string `json:"levelnames,omitempty" xml:"levelnames,omitempty" mapstructure:"levelnames"`
+	SessionDuration int      `json:"session_duration,omitempty" xml:"session_duration,omitempty" mapstructure:"session_duration"`
 }
 
 // Spaces lets a service configure its advertised options related to Storage Spaces.
@@ -281,6 +283,7 @@ type CapabilitiesFilesSharingPublicExpireDate struct {
 
 // CapabilitiesFilesSharingUser TODO document
 type CapabilitiesFilesSharingUser struct {
+	Enabled        ocsBool                                   `json:"enabled" xml:"enabled"`
 	SendMail       ocsBool                                   `json:"send_mail" xml:"send_mail" mapstructure:"send_mail"`
 	ProfilePicture ocsBool                                   `json:"profile_picture" xml:"profile_picture" mapstructure:"profile_picture"`
 	Settings       []*CapabilitiesUserSettings               `json:"settings" xml:"settings" mapstructure:"settings"`
@@ -331,4 +334,10 @@ type Version struct {
 	Edition        string `json:"edition" xml:"edition"`
 	Product        string `json:"product" xml:"product"`
 	ProductVersion string `json:"productversion" xml:"productversion"`
+}
+
+// CapabilitiesVault holds vault capabilities
+type CapabilitiesVault struct {
+	Enabled              ocsBool `json:"enabled" xml:"enabled" mapstructure:"enabled"`
+	VaultStorageProvider string  `json:"vault_storage_provider" xml:"vault_storage_provider" mapstructure:"vault_storage_provider"`
 }

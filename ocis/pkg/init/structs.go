@@ -185,7 +185,7 @@ type Search struct {
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
 	ServiceAccountID     string `yaml:"service_account_id"`
-	ServiceAccountSecret string `yaml:"service_account_secret"`
+	ServiceAccountSecret string `yaml:"service_account_secret" mask:"password"`
 }
 
 // ServiceUserPasswordsSettings is the configuration for service user passwords

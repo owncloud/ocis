@@ -549,7 +549,7 @@ From the `Run and Debug` panel of VSCode, select `Fed oCIS Server` and start the
 source tests/config/local/.env-federation && ocis/bin/ocis init
 
 # run oCIS
-ocis/bin/ocis server
+source tests/config/local/.env-federation && ocis/bin/ocis server
 ```
 
 The second oCIS instance should be available at: <https://localhost:10200/>
@@ -567,7 +567,7 @@ Run the acceptance test with the following command:
 ```bash
 TEST_SERVER_URL="https://localhost:9200" \
 TEST_SERVER_FED_URL="https://localhost:10200" \
-BEHAT_FEATURE="tests/acceptance/features/apiOcm/ocm.feature" \
+BEHAT_SUITE=apiOcm \
 make test-acceptance-api
 ```
 
@@ -581,11 +581,11 @@ THUMBNAILS_TXT_FONTMAP_FILE="/path/to/fontsMap.json"
 ocis/bin/ocis server
 ```
 
-The sample `fontsMap.json` file is located in `tests/config/drone/fontsMap.json`.
+The sample `fontsMap.json` file is located in `tests/config/ci/fontsMap.json`.
 
 ```json
 {
-  "defaultFont": "/path/to/ocis/tests/config/drone/NotoSans.ttf"
+  "defaultFont": "/path/to/ocis/tests/config/ci/NotoSans.ttf"
 }
 ```
 

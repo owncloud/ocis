@@ -24,6 +24,7 @@ import (
 	"github.com/owncloud/reva/v2/internal/http/services/owncloud/ocs/config"
 	"github.com/owncloud/reva/v2/internal/http/services/owncloud/ocs/response"
 	"github.com/owncloud/reva/v2/pkg/owncloud/ocs"
+	"github.com/owncloud/reva/v2/pkg/utils"
 )
 
 // Handler renders the capability endpoint
@@ -140,7 +141,6 @@ func (h *Handler) Init(c *config.Config) {
 	}
 
 	// h.c.Capabilities.FilesSharing.IsPublic.Enabled is boolean
-	h.c.Capabilities.FilesSharing.Public.Enabled = true
 
 	if h.c.Capabilities.FilesSharing.Public.Password == nil {
 		h.c.Capabilities.FilesSharing.Public.Password = &ocs.CapabilitiesFilesSharingPublicPassword{}
@@ -234,5 +234,32 @@ func (h *Handler) Init(c *config.Config) {
 // Handler renders the capabilities
 func (h *Handler) GetCapabilities(w http.ResponseWriter, r *http.Request) {
 	c := h.getCapabilitiesForUserAgent(r.UserAgent())
+	if r.URL.Query().Get("vault") == "true" && c.Capabilities != nil && c.Capabilities.Vault != nil && bool(c.Capabilities.Vault.Enabled) {
+		c = h.vaultCapabilities(c)
+	}
 	response.WriteOCSSuccess(w, r, c)
+}
+
+// vaultCapabilities returns a copy of the capabilities with public sharing and federation disabled.
+func (h *Handler) vaultCapabilities(c ocs.CapabilitiesData) ocs.CapabilitiesData {
+	if c.Capabilities == nil || c.Capabilities.FilesSharing == nil {
+		return c
+	}
+	sharing := *c.Capabilities.FilesSharing
+	if sharing.Public != nil {
+		pub := *sharing.Public
+		pub.Enabled = false
+		sharing.Public = &pub
+	}
+	if sharing.Federation != nil {
+		fed := *sharing.Federation
+		fed.Outgoing = false
+		fed.Incoming = false
+		sharing.Federation = &fed
+	}
+	caps := *c.Capabilities
+	caps.FilesSharing = &sharing
+	c.Capabilities = &caps
+	c.Capabilities.Vault.VaultStorageProvider = utils.VaultStorageProviderID
+	return c
 }

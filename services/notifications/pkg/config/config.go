@@ -22,7 +22,7 @@ type Config struct {
 
 	Notifications  Notifications        `yaml:"notifications"`
 	GRPCClientTLS  shared.GRPCClientTLS `yaml:"grpc_client_tls"`
-	ServiceAccount ServiceAccount       `yaml:"service_account"`
+	ServiceAccount ServiceAccount       `yaml:"service_account" mask:"struct"`
 
 	Context context.Context `yaml:"-"`
 
@@ -66,7 +66,7 @@ type Events struct {
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
 	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;NOTIFICATIONS_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
-	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;NOTIFICATIONS_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;NOTIFICATIONS_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0" mask:"password"`
 }
 
 // Store configures the store to use

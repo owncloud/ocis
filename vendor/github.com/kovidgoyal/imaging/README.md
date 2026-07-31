@@ -151,6 +151,6 @@ Original image                     | Hue = 60                                   
 
 ## Acknowledgements
 
-This is a fork of the un-maintained distraction/imaging project. The color
+This is a fork of the un-maintained disintegration/imaging project. The color
 management code was started out from mandykoh/prism and used some code from
 go-andiamo/iccarus but it was almost completely re-written from scratch.

@@ -1,0 +1,6 @@
+# Trivy vulnerability ignore file
+# Add CVE IDs or file paths here to suppress known/accepted findings.
+# See: https://aquasecurity.github.io/trivy/latest/docs/configuration/filtering/#trivyignore
+
+CVE-2026-32284  # github.com/shamaton/msgpack/v2 v2.4.0 — no fix available upstream
+vendor/github.com/crewjam/saml/xmlenc/fuzz.go  # test RSA key used in fuzz corpus, not a real secret

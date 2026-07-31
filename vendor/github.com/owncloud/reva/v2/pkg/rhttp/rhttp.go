@@ -32,6 +32,7 @@ import (
 	"github.com/owncloud/reva/v2/internal/http/interceptors/auth"
 	"github.com/owncloud/reva/v2/internal/http/interceptors/log"
 	"github.com/owncloud/reva/v2/internal/http/interceptors/providerauthorizer"
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	"github.com/owncloud/reva/v2/pkg/rhttp/global"
 	"github.com/owncloud/reva/v2/pkg/rhttp/router"
 	rtrace "github.com/owncloud/reva/v2/pkg/trace"
@@ -285,6 +286,7 @@ func (s *Server) getHandler() (http.Handler, error) {
 	// add always the logctx middleware as most priority, this middleware is internal
 	// and cannot be configured from the configuration.
 	coreMiddlewares := []*middlewareTriple{}
+	coreMiddlewares = append(coreMiddlewares, &middlewareTriple{Middleware: autoprop.NewHttpHandler(), Name: "autoprop"})
 
 	providerAuthMiddle, err := addProviderAuthMiddleware(s.conf, s.unprotected)
 	if err != nil {

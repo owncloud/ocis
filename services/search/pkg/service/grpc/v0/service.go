@@ -30,8 +30,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
-	bleveEngine "github.com/owncloud/ocis/v2/services/search/pkg/engine/bleve"
-	"github.com/owncloud/ocis/v2/services/search/pkg/query/bleve"
 	"github.com/owncloud/ocis/v2/services/search/pkg/search"
 )
 
@@ -43,29 +41,12 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 	cfg := options.Config
 
 	// initialize search engine
-	var eng engine.Engine
-	switch cfg.Engine.Type {
-	case "bleve":
-		bleveMapping, err := engine.BuildBleveMapping()
-		if err != nil {
-			return nil, teardown, err
-		}
-
-		var indexGetter bleveEngine.IndexGetter
-		indexGetter = bleveEngine.NewIndexGetterPersistent(cfg.Engine.Bleve.Datapath, bleveMapping)
-		if cfg.Engine.Bleve.Scale {
-			indexGetter = bleveEngine.NewIndexGetterPersistentScale(cfg.Engine.Bleve.Datapath, bleveMapping)
-		}
-
-		bleveEngine := engine.NewBleveEngine(indexGetter, bleve.DefaultCreator)
-
-		teardown = func() {
-			_ = bleveEngine.Close()
-		}
-		eng = bleveEngine
-
-	default:
-		return nil, teardown, fmt.Errorf("unknown search engine: %s", cfg.Engine.Type)
+	eng, engCloser, err := engine.NewEngineFromConfig(cfg)
+	if err != nil {
+		return nil, teardown, err
+	}
+	teardown = func() {
+		_ = engCloser.Close()
 	}
 
 	// initialize gateway
@@ -162,7 +143,7 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 	}
 	ctx = revactx.ContextSetUser(ctx, u)
 
-	key := cacheKey(in.Query, in.PageSize, in.Ref, u)
+	key := cacheKey(in.Query, in.PageSize, in.Ref, u, revactx.HasMFA(ctx))
 	res, ok := s.FromCache(key)
 	if !ok {
 		var err error
@@ -190,9 +171,9 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 }
 
 // IndexSpace (re)indexes all resources of a given space.
-func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, _ *searchsvc.IndexSpaceResponse) error {
+func (s Service) IndexSpace(ctx context.Context, in *searchsvc.IndexSpaceRequest, _ *searchsvc.IndexSpaceResponse) error {
 	if in.GetSpaceId() != "" {
-		return s.searcher.IndexSpace(&provider.StorageSpaceId{OpaqueId: in.GetSpaceId()})
+		return s.searcher.IndexSpace(ctx, &provider.StorageSpaceId{OpaqueId: in.GetSpaceId()})
 	}
 
 	// index all spaces instead
@@ -201,12 +182,12 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 		return err
 	}
 
-	ctx, err := utils.GetServiceUserContext(s.cfg.ServiceAccount.ServiceAccountID, gwc, s.cfg.ServiceAccount.ServiceAccountSecret)
+	ownerCtx, err := utils.GetServiceUserContextWithContext(ctx, gwc, s.cfg.ServiceAccount.ServiceAccountID, s.cfg.ServiceAccount.ServiceAccountSecret)
 	if err != nil {
 		return err
 	}
 
-	resp, err := gwc.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{})
+	resp, err := gwc.ListStorageSpaces(ownerCtx, &provider.ListStorageSpacesRequest{})
 	if err != nil {
 		return err
 	}
@@ -216,7 +197,7 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 	}
 
 	for _, space := range resp.GetStorageSpaces() {
-		if err := s.searcher.IndexSpace(space.GetId()); err != nil {
+		if err := s.searcher.IndexSpace(ownerCtx, space.GetId()); err != nil {
 			return err
 		}
 	}
@@ -241,6 +222,9 @@ func (s Service) Cache(key string, res *searchsvc.SearchResponse) {
 	_ = s.cache.Set(key, res)
 }
 
-func cacheKey(query string, pagesize int32, ref *v0.Reference, user *user.User) string {
-	return fmt.Sprintf("%s|%d|%s$%s!%s/%s|%s", query, pagesize, ref.GetResourceId().GetStorageId(), ref.GetResourceId().GetSpaceId(), ref.GetResourceId().GetOpaqueId(), ref.GetPath(), user.GetId().GetOpaqueId())
+func cacheKey(query string, pagesize int32, ref *v0.Reference, user *user.User, isVault bool) string {
+	return fmt.Sprintf("%s|%d|%s$%s!%s/%s|%s|%v", query, pagesize, ref.GetResourceId().GetStorageId(), ref.GetResourceId().GetSpaceId(), ref.GetResourceId().GetOpaqueId(), ref.GetPath(), user.GetId().GetOpaqueId(), isVault)
 }
+
+// ExportedCacheKey is exported for testing only.
+var ExportedCacheKey = cacheKey

@@ -155,8 +155,11 @@ func (hw *HashWheel) expireTasks(ts int64, callback func(seq uint64, expires int
 		slotLowest := int64(math.MaxInt64)
 		for seq, expires := range s.entries {
 			if expires <= ts && callback(seq, expires) {
-				delete(s.entries, seq)
-				hw.count--
+				// Only remove if not done so already by the callback.
+				if _, ok := s.entries[seq]; ok {
+					delete(s.entries, seq)
+					hw.count--
+				}
 				continue
 			}
 			if expires < slotLowest {
@@ -227,11 +230,11 @@ func (hw *HashWheel) Decode(b []byte) (uint64, error) {
 	b = b[headerLen:]
 	for i := uint64(0); i < count; i++ {
 		ts, tn := binary.Varint(b)
-		if tn < 0 {
+		if tn <= 0 {
 			return 0, io.ErrUnexpectedEOF
 		}
 		v, vn := binary.Uvarint(b[tn:])
-		if vn < 0 {
+		if vn <= 0 {
 			return 0, io.ErrUnexpectedEOF
 		}
 		hw.Add(v, ts)

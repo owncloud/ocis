@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -118,6 +119,24 @@ var _ = Describe("Utils", func() {
 			StorageId: "123",
 			SpaceId:   "123",
 		}, false),
+	)
+
+	DescribeTable("IsVaultResource",
+		func(resourceID *provider.ResourceId, isVault bool) {
+			Expect(service.IsVaultResource(resourceID)).To(Equal(isVault))
+		},
+		Entry("valid: vault resource", &provider.ResourceId{
+			StorageId: utils.VaultStorageProviderID,
+			SpaceId:   "2",
+			OpaqueId:  "3",
+		}, true),
+		Entry("invalid: non-vault storageId", &provider.ResourceId{
+			StorageId: "123",
+			SpaceId:   "2",
+			OpaqueId:  "3",
+		}, false),
+		Entry("invalid: empty resourceId", &provider.ResourceId{}, false),
+		Entry("invalid: nil resourceId", nil, false),
 	)
 
 	DescribeTable("_cs3ReceivedShareToLibreGraphPermissions",
@@ -247,6 +266,7 @@ var _ = Describe("Utils", func() {
 				identityCache,
 				receivedShares,
 				unifiedrole.GetRoles(unifiedrole.RoleFilterAll()),
+				10*time.Second,
 			)
 
 			Expect(err).ToNot(HaveOccurred())

@@ -28,10 +28,11 @@ COPY --from=generate /ocis /ocis
 WORKDIR /ocis/ocis
 RUN make ci-go-generate build ENABLE_VIPS=true
 
-FROM alpine:3.23.3
+FROM alpine:3.24.1
 
-RUN apk add --no-cache attr ca-certificates curl mailcap tree vips && \
-	echo 'hosts: files dns' >| /etc/nsswitch.conf
+RUN apk add --no-cache attr ca-certificates curl mailcap tree \
+    && apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community "vips=8.18.2-r0" \
+    && echo 'hosts: files dns' >| /etc/nsswitch.conf
 
 LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
 	org.label-schema.name="ownCloud Infinite Scale" \

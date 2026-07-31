@@ -26,20 +26,30 @@ var _ = Describe("Authenticating requests", Label("PublicShareAuthenticator"), f
 				"com.owncloud.api.gateway",
 				func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
 					return mockGatewayClient{
-						AuthenticateFunc: func(authType, clientID, clientSecret string) (string, rpcv1beta1.Code) {
+						AuthenticateFunc: func(authType, clientID, clientSecret string) *gateway.AuthenticateResponse {
 							if authType != "publicshares" {
-								return "", rpcv1beta1.Code_CODE_NOT_FOUND
+								return &gateway.AuthenticateResponse{
+									Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_NOT_FOUND},
+								}
 							}
 
 							if clientID == "sharetoken" && (clientSecret == "password|examples3cr3t" || clientSecret == "signature|examplesignature|exampleexpiration") {
-								return "exampletoken", rpcv1beta1.Code_CODE_OK
+								return &gateway.AuthenticateResponse{
+									Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_OK},
+									Token:  "exampletoken",
+								}
 							}
 
 							if clientID == "sharetoken" && clientSecret == "password|" {
-								return "otherexampletoken", rpcv1beta1.Code_CODE_OK
+								return &gateway.AuthenticateResponse{
+									Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_OK},
+									Token:  "otherexampletoken",
+								}
 							}
 
-							return "", rpcv1beta1.Code_CODE_NOT_FOUND
+							return &gateway.AuthenticateResponse{
+								Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_NOT_FOUND},
+							}
 						},
 					}
 				},
@@ -102,13 +112,10 @@ var _ = Describe("Authenticating requests", Label("PublicShareAuthenticator"), f
 
 type mockGatewayClient struct {
 	gatewayv1beta1.GatewayAPIClient
-	AuthenticateFunc func(authType, clientID, clientSecret string) (string, rpcv1beta1.Code)
+	AuthenticateFunc func(authType, clientID, clientSecret string) *gatewayv1beta1.AuthenticateResponse
 }
 
 func (c mockGatewayClient) Authenticate(ctx context.Context, in *gatewayv1beta1.AuthenticateRequest, opts ...grpc.CallOption) (*gatewayv1beta1.AuthenticateResponse, error) {
-	token, code := c.AuthenticateFunc(in.GetType(), in.GetClientId(), in.GetClientSecret())
-	return &gatewayv1beta1.AuthenticateResponse{
-		Status: &rpcv1beta1.Status{Code: code},
-		Token:  token,
-	}, nil
+	response := c.AuthenticateFunc(in.GetType(), in.GetClientId(), in.GetClientSecret())
+	return response, nil
 }

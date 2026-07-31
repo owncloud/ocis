@@ -13,6 +13,7 @@ import (
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
@@ -126,6 +127,7 @@ func (s *Service) OpenInApp(
 		ViewOnlyToken: utils.ReadPlainFromOpaque(req.GetOpaque(), "viewOnlyToken"),
 		FileReference: &providerFileRef,
 		ViewMode:      req.GetViewMode(),
+		HasMFA:        revactx.HasMFA(ctx),
 	}
 
 	if templateID := utils.ReadPlainFromOpaque(req.GetOpaque(), "template"); templateID != "" {

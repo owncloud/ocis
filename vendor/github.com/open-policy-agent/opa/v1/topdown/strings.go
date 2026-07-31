@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
-	"sort"
 	"strconv"
 	"strings"
 	"unicode"
@@ -136,6 +135,11 @@ func builtinFormatInt(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Ter
 	case ast.Number("8"):
 		format = "%o"
 	case ast.Number("10"):
+		// Fast path: for numbers whose decimal string is already interned (e.g.
+		// "0"–"100"), we can skip strconv.ParseInt entirely.
+		if term := ast.InternedStringTermFromNumber(input); term != nil {
+			return iter(term)
+		}
 		if i, ok := input.Int(); ok {
 			return iter(ast.InternedIntegerString(i))
 		}
@@ -573,30 +577,29 @@ func builtinReplaceN(bctx BuiltinContext, operands []*ast.Term, iter func(*ast.T
 	if err != nil {
 		return err
 	}
-	keys := patterns.Keys()
-	sort.Slice(keys, func(i, j int) bool { return ast.Compare(keys[i].Value, keys[j].Value) < 0 })
 
 	s, err := builtins.StringOperand(operands[1].Value, 2)
 	if err != nil {
 		return err
 	}
 
-	oldnewArr := make([]string, 0, len(keys)*2)
+	keys := util.SortedFunc(patterns.Keys(), ast.TermValueCompare)
+	pairs := make([]string, 0, len(keys)*2)
+
 	for _, k := range keys {
 		keyVal, ok := k.Value.(ast.String)
 		if !ok {
 			return builtins.NewOperandErr(1, "non-string key found in pattern object")
 		}
-		val := patterns.Get(k) // cannot be nil
-		strVal, ok := val.Value.(ast.String)
+		strVal, ok := patterns.Get(k).Value.(ast.String)
 		if !ok {
 			return builtins.NewOperandErr(1, "non-string value found in pattern object")
 		}
-		oldnewArr = append(oldnewArr, string(keyVal), string(strVal))
+		pairs = append(pairs, string(keyVal), string(strVal))
 	}
 
 	sink := newSink(ast.ReplaceN.Name, len(s), bctx.Cancel)
-	replacer := strings.NewReplacer(oldnewArr...)
+	replacer := strings.NewReplacer(pairs...)
 	if _, err := replacer.WriteString(sink, string(s)); err != nil {
 		return err
 	}
@@ -614,12 +617,13 @@ func builtinTrim(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) er
 		return err
 	}
 
-	trimmed := strings.Trim(string(s), string(c))
-	if trimmed == string(s) {
+	str := string(s)
+	trimmed := strings.Trim(str, string(c))
+	if trimmed == str {
 		return iter(operands[0])
 	}
 
-	return iter(ast.InternedTerm(strings.Trim(string(s), string(c))))
+	return iter(ast.InternedTerm(trimmed))
 }
 
 func builtinTrimLeft(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) error) error {

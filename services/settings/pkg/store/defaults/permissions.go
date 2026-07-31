@@ -622,6 +622,25 @@ func SpaceAbilityPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Se
 	}
 }
 
+// VaultModePermission is the permission to see and toggle the vault mode switcher
+func VaultModePermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
+	return &settingsmsg.Setting{
+		Id:          "cc29df49-f86a-4d23-be72-f873f6f1e55d",
+		Name:        "VaultMode.ReadWriteEnabled",
+		DisplayName: "Vault mode",
+		Description: "This permission allows seeing the vault mode switcher.",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SYSTEM,
+		},
+		Value: &settingsmsg.Setting_PermissionValue{
+			PermissionValue: &settingsmsg.Permission{
+				Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+				Constraint: c,
+			},
+		},
+	}
+}
+
 // WriteFavoritesPermission is the permission to mark/unmark files as favorites
 func WriteFavoritesPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
 	return &settingsmsg.Setting{

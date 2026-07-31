@@ -203,9 +203,15 @@ func validateMime(incipit []byte) bool {
 	return false
 }
 
+// escapeStringMap returns a new map holding the HTML-escaped values of vars.
+// It must not mutate its input: callers (e.g. the per-recipient render loop)
+// reuse the same vars map across multiple renders, and the unescaped values are
+// also consumed by the plain-text template. Escaping in place would corrupt the
+// text body and add one extra layer of HTML escaping to every subsequent render.
 func escapeStringMap(vars map[string]string) map[string]string {
-	for k := range vars {
-		vars[k] = html.EscapeString(vars[k])
+	escaped := make(map[string]string, len(vars))
+	for k, v := range vars {
+		escaped[k] = html.EscapeString(v)
 	}
-	return vars
+	return escaped
 }

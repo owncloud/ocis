@@ -2,8 +2,10 @@ package grpc
 
 import (
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	svc "github.com/owncloud/ocis/v2/services/collaboration/pkg/service/grpc/v0"
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 )
@@ -13,6 +15,18 @@ import (
 func Server(opts ...Option) (*grpc.Server, func(), error) {
 	options := newOptions(opts...)
 
+	// unary interceptors
+	unaryInterceptors := []grpc.UnaryServerInterceptor{
+		autoprop.GetGoGRPCUnaryServerInterceptor(),
+	}
+	unaryChain := grpc_middleware.ChainUnaryServer(unaryInterceptors...)
+
+	// stream interceptors
+	streamInterceptors := []grpc.StreamServerInterceptor{
+		autoprop.GetGoGRPCStreamServerInterceptor(),
+	}
+	streamChain := grpc_middleware.ChainStreamServer(streamInterceptors...)
+
 	grpcOpts := []grpc.ServerOption{
 		grpc.StatsHandler(
 			otelgrpc.NewServerHandler(
@@ -20,6 +34,8 @@ func Server(opts ...Option) (*grpc.Server, func(), error) {
 				otelgrpc.WithPropagators(tracing.GetPropagator()),
 			),
 		),
+		grpc.UnaryInterceptor(unaryChain),
+		grpc.StreamInterceptor(streamChain),
 	}
 	grpcServer := grpc.NewServer(grpcOpts...)
 

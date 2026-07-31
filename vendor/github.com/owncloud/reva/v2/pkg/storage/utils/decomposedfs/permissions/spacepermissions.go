@@ -7,6 +7,7 @@ import (
 	cs3permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/owncloud/reva/v2/pkg/conversions"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/node"
@@ -144,19 +145,26 @@ func (p Permissions) checkPermission(ctx context.Context, perm string, ref *prov
 	return checkRes.Status.Code == v1beta11.Code_CODE_OK
 }
 
-// IsManager returns true if the given resource permissions evaluate the user as "manager"
-func IsManager(rp *provider.ResourcePermissions) bool {
-	return rp.RemoveGrant
+// editorPerms is the smallest space-editor bitmap; every richer space-editor variant and
+// the manager role are supersets of it, while viewers are not.
+var editorPerms = conversions.NewSpaceEditorWithoutVersionsWithoutTrashbinRole().CS3ResourcePermissions()
+
+// IsSpaceManager returns true if the given resource permissions evaluate the user as "Space manager".
+// A manager holds the full grant-management triad; a single grant-management bit is not enough.
+// DenyGrant is not required, so legitimate manager/coowner grants that predate it still classify correctly.
+func IsSpaceManager(rp *provider.ResourcePermissions) bool {
+	return rp.GetAddGrant() && rp.GetUpdateGrant() && rp.GetRemoveGrant()
 }
 
-// IsEditor returns true if the given resource permissions evaluate the user as "editor"
-func IsEditor(rp *provider.ResourcePermissions) bool {
-	return rp.InitiateFileUpload
+// IsSpaceEditor returns true if the given resource permissions evaluate the user as "Space editor"
+func IsSpaceEditor(rp *provider.ResourcePermissions) bool {
+	return conversions.SufficientCS3Permissions(rp, editorPerms)
 }
 
-// IsViewer returns true if the given resource permissions evaluate the user as "viewer"
-func IsViewer(rp *provider.ResourcePermissions) bool {
-	return rp.Stat
+// IsSpaceViewer returns true if the given resource permissions evaluate the user as "Space viewer"
+// We couldn't use NewSpaceViewerRole because it carries ListRecycle, which the WithoutTrashbin space editors lack.
+func IsSpaceViewer(rp *provider.ResourcePermissions) bool {
+	return rp.GetStat() && rp.GetGetPath() && rp.GetListGrants()
 }
 
 func spaceRef(spaceid string) *provider.Reference {

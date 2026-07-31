@@ -1,0 +1,11 @@
+{
+  "extends": "@ownclouders/tsconfig",
+
+  // necessary for building web-pkg standalone, otherwise we get errors with inferred types
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@vue/shared": ["node_modules/@vue/shared/"]
+    },
+  }
+}
