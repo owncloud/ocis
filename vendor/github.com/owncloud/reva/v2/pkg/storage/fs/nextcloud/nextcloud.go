@@ -21,7 +21,6 @@ package nextcloud
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -274,7 +273,33 @@ func (nc *StorageDriver) CreateDir(ctx context.Context, ref *provider.Reference)
 
 // TouchFile as defined in the storage.FS interface
 func (nc *StorageDriver) TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool, mtime string) (*storage.TouchFileResult, error) {
-	return nil, fmt.Errorf("unimplemented: TouchFile")
+	type paramsObj struct {
+		Ref            *provider.Reference `json:"ref"`
+		MarkProcessing bool                `json:"markprocessing"`
+		MTime          string              `json:"mtime"`
+	}
+	bodyStr, err := json.Marshal(&paramsObj{Ref: ref, MarkProcessing: markprocessing, MTime: mtime})
+	if err != nil {
+		return nil, err
+	}
+	log := appctx.GetLogger(ctx)
+	log.Info().Msgf("TouchFile %s", bodyStr)
+
+	if _, _, err := nc.do(ctx, Action{"TouchFile", string(bodyStr)}); err != nil {
+		return nil, err
+	}
+
+	// The upload coordinator needs the id of the node that was just created, and
+	// the touch call itself answers with an empty body, so read it back.
+	md, err := nc.GetMD(ctx, ref, []string{}, []string{})
+	if err != nil {
+		return nil, err
+	}
+	return &storage.TouchFileResult{
+		ResourceID: md.GetId(),
+		SpaceID:    md.GetId().GetSpaceId(),
+		SpaceOwner: md.GetOwner(),
+	}, nil
 }
 
 // Delete as defined in the storage.FS interface
@@ -409,14 +434,26 @@ func (nc *StorageDriver) InitiateUpload(ctx context.Context, ref *provider.Refer
 	return respMap, err
 }
 
-// MarkProcessing as defined in the storage.FS interface
-func (nc *StorageDriver) MarkProcessing(ctx context.Context, ref *provider.Reference, processing bool, sessionID string) error {
-	return errtypes.NotSupported("nextcloud: mark processing not supported")
+// MarkProcessing as defined in the storage.FS interface.
+//
+// The flag advertises an upload that has been announced but not yet committed, so
+// that a stat of the file can say so. Nextcloud owns its own metadata and has
+// nowhere to record it, and it does not postprocess uploads, so there is no window
+// to report: this is a no-op rather than an error, which would fail the upload.
+func (nc *StorageDriver) MarkProcessing(_ context.Context, _ *provider.Reference, _ bool, _ string) error {
+	return nil
 }
 
-// CommitUpload as defined in the storage.FS interface
-func (nc *StorageDriver) CommitUpload(_ context.Context, _ *provider.Reference, _ string, _ storage.UploadSource) error {
-	return errtypes.NotSupported("nextcloud: commit upload not supported")
+// CommitUpload as defined in the storage.FS interface.
+//
+// The caller owns source.Body and closes it, so this must not.
+func (nc *StorageDriver) CommitUpload(ctx context.Context, ref *provider.Reference, _ string, source storage.UploadSource) error {
+	if source.Body == nil {
+		return errtypes.BadRequest("nextcloud: source body is nil")
+	}
+	// The remote records the scan verdict itself if it scans at all, so
+	// source.ScanResult/ScanDate have nowhere to go here.
+	return nc.doUpload(ctx, ref.GetPath(), source.Body)
 }
 
 func (nc *StorageDriver) PrepareUpload(_ context.Context, _ *provider.Reference, _ string, info storage.UploadInfo) (*storage.PrepareUploadResult, error) {

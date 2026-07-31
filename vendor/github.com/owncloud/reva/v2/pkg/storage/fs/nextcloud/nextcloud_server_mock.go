@@ -25,6 +25,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"regexp"
 	"strings"
 )
 
@@ -51,6 +52,11 @@ const serverStateReference = "REFERENCE"
 const serverStateMetadata = "METADATA"
 
 var serverState = serverStateEmpty
+
+// TouchFile carries the wall-clock mtime the upload was initiated with, so the
+// request body differs on every run. Responses are keyed on the exact body, so
+// the value is folded to a placeholder before lookup.
+var mtimeRe = regexp.MustCompile(`"mtime":"[^"]*"`)
 
 var responses = map[string]Response{
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/AddGrant {"ref":{"path":"/subdir"},"g":{"grantee":{"type":1,"Id":{"UserId":{"opaque_id":"4c510ada-c86b-4815-8820-42cdf82c3d51"}}},"permissions":{"delete":true,"initiate_file_download":true,"move":true,"stat":true}}} EMPTY`: {200, ``, serverStateGrantAdded},
@@ -111,7 +117,20 @@ var responses = map[string]Response{
 
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetPathByID {"storage_id":"00000000-0000-0000-0000-000000000000","opaque_id":"fileid-/some/path"} EMPTY`: {200, "/subdir", serverStateEmpty},
 
-	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetMD {"ref":{"path":"/file"},"mdKeys":null}`:                                                                                                        {404, ``, serverStateEmpty},
+	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetMD {"ref":{"path":"/file"},"mdKeys":null}`: {404, ``, serverStateEmpty},
+	// Initiating an upload now runs through the upload coordinator, which stats the
+	// target, checks the quota and stats the parent before it reaches the driver.
+	// The driver used to be called straight away, so none of these had an entry.
+	// They keep whichever state they matched: this mock selects responses by server
+	// state, and clearing it would strand the requests that follow.
+	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetMD {"ref":{"path":"/file"},"mdKeys":[]} EMPTY`: {404, ``, serverStateEmpty},
+	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetQuota  EMPTY`:                                  {200, `{"totalBytes":456,"usedBytes":123}`, serverStateEmpty},
+	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetMD {"ref":{"path":"/"},"mdKeys":[]} EMPTY`:     {200, `{"opaque":{},"type":2,"id":{"opaque_id":"fileid-/"},"checksum":{},"etag":"deadbeef","mime_type":"httpd/unix-directory","mtime":{"seconds":1234567890},"path":"/","permission_set":{"initiate_file_upload":true,"stat":true},"size":12345,"canonical_metadata":{},"arbitrary_metadata":{"metadata":{}}}`, serverStateEmpty},
+	// A zero-length upload has no bytes to append, so it finishes inside
+	// InitiateUpload: the coordinator creates the node and stats it back for the id
+	// the touch minted.
+	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/TouchFile {"ref":{"resource_id":{"opaque_id":"fileid-/"},"path":"file"},"markprocessing":false,"mtime":"MTIME"} EMPTY`:                               {200, ``, serverStateEmpty},
+	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetMD {"ref":{"resource_id":{"opaque_id":"fileid-/"},"path":"file"},"mdKeys":[]} EMPTY`:                                                              {200, `{"opaque":{},"type":1,"id":{"opaque_id":"fileid-/file"},"checksum":{},"etag":"deadbeef","mime_type":"text/plain","mtime":{"seconds":1234567890},"path":"/file","permission_set":{"initiate_file_upload":true,"stat":true},"size":0,"canonical_metadata":{},"arbitrary_metadata":{"metadata":{}}}`, serverStateEmpty},
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/InitiateUpload {"ref":{"path":"/file"},"uploadLength":0,"metadata":{"providerID":""}}`:                                                               {200, `{"simple": "yes","tus": "yes"}`, serverStateEmpty},
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/InitiateUpload {"ref":{"resource_id":{"storage_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"path":"/versionedFile"},"uploadLength":1,"metadata":{}}`: {200, `{"simple": "yes","tus": "yes"}`, serverStateEmpty},
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/InitiateUpload {"ref":{"resource_id":{"storage_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"path":"/versionedFile"},"uploadLength":2,"metadata":{}}`: {200, `{"simple": "yes","tus": "yes"}`, serverStateEmpty},
@@ -194,15 +213,16 @@ func GetNextcloudServerMock(called *[]string) http.Handler {
 		if err != nil {
 			panic("Error reading response into buffer")
 		}
-		var key = fmt.Sprintf("%s %s %s", r.Method, r.URL, buf.String())
+		body := mtimeRe.ReplaceAllString(buf.String(), `"mtime":"MTIME"`)
+		var key = fmt.Sprintf("%s %s %s", r.Method, r.URL, body)
 		*called = append(*called, key)
 		response := responses[key]
 		if (response == Response{}) {
-			key = fmt.Sprintf("%s %s %s %s", r.Method, r.URL, buf.String(), serverState)
+			key = fmt.Sprintf("%s %s %s %s", r.Method, r.URL, body, serverState)
 			response = responses[key]
 		}
 		if (response == Response{}) {
-			fmt.Printf("%s %s %s %s\n", r.Method, r.URL, buf.String(), serverState)
+			fmt.Printf("%s %s %s %s\n", r.Method, r.URL, body, serverState)
 			response = Response{500, fmt.Sprintf("response not defined! %s", key), serverStateEmpty}
 		}
 		serverState = responses[key].newServerState
