@@ -168,7 +168,6 @@ jobs:
           if-no-files-found: error
 
   local-api-tests:
-    if: false
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -282,7 +281,6 @@ jobs:
         run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
 
   cli-tests:
-    if: false
     needs: [build-and-test]
     name: ${{ matrix.suite }}
     runs-on: ubuntu-latest
@@ -353,7 +351,6 @@ jobs:
         run: BEHAT_SUITES="${{ matrix.suite }}" OCIS_LDAP_POOL_ENABLED=true python3 tests/acceptance/run-github.py
 
   core-api-tests:
-    if: false
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -552,8 +549,6 @@ jobs:
           sed -e 's|https://ocis-server:9200|https://127.0.0.1:9200|g' \
               -e 's|https://localhost:9200|https://127.0.0.1:9200|g' \
             "$REALM_FILE" > /tmp/ocis-realm.json
-          echo "Generated web client configuration:"
-          grep -A 20 '"clientId": "web"' /tmp/ocis-realm.json
           docker run -d --name keycloak --network host \
             -e OCIS_DOMAIN=https://127.0.0.1:9200 \
             -e KC_HOSTNAME=localhost \
@@ -644,7 +639,6 @@ jobs:
           retention-days: 7
 
   litmus:
-    if: false
     name: litmus
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -669,7 +663,6 @@ jobs:
         run: python3 tests/acceptance/run-litmus.py
 
   cs3api:
-    if: false
     name: cs3api
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -694,7 +687,6 @@ jobs:
         run: python3 tests/acceptance/run-cs3api.py
 
   wopi-builtin:
-    if: false
     name: wopi-builtin
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -719,7 +711,6 @@ jobs:
         run: python3 tests/acceptance/run-wopi.py --type builtin
 
   wopi-cs3:
-    if: false
     name: wopi-cs3
     needs: [build-and-test]
     runs-on: ubuntu-latest

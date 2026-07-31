@@ -307,27 +307,26 @@ def main() -> int:
 
     if keycloak_needed:
         server_env.update({
-        "OCIS_EXCLUDE_RUN_SERVICES": "idp",
-        "PROXY_AUTOPROVISION_ACCOUNTS": "true",
-        # Group sync is opt-in and does not create groups by default; the group
-        # sync e2e test relies on both being enabled so Keycloak groups appear.
-        "PROXY_AUTOPROVISION_CLAIM_GROUPS": "groups",
-        "PROXY_AUTOPROVISION_GROUP_CREATE": "true",
-        "PROXY_ROLE_ASSIGNMENT_DRIVER": "oidc",
-        "OCIS_OIDC_ISSUER": "https://localhost:8443/realms/oCIS",
-        "PROXY_OIDC_REWRITE_WELLKNOWN": "true",
-        "WEB_OIDC_CLIENT_ID": "web",
-        "WEB_OIDC_SCOPE": "openid profile email acr",
-        "PROXY_USER_OIDC_CLAIM": "preferred_username",
-        "PROXY_USER_CS3_CLAIM": "username",
-        "OCIS_ADMIN_USER_ID": "",
-        "GRAPH_ASSIGN_DEFAULT_USER_ROLE": "false",
-        "GRAPH_USERNAME_MATCH": "none",
-        "IDM_CREATE_DEMO_USERS": "false",
-        "PROXY_CSP_CONFIG_FILE_LOCATION": str(
-            repo_root / "tests/config/ci/csp.yaml"
-        ),
-        "KEYCLOAK_DOMAIN": "localhost:8443",
+            "OCIS_EXCLUDE_RUN_SERVICES": "idp",
+            "PROXY_AUTOPROVISION_ACCOUNTS": "true",
+            # Group sync is opt-in and does not create groups by default; the group
+            # sync e2e test relies on both being enabled so Keycloak groups appear.
+            "PROXY_AUTOPROVISION_CLAIM_GROUPS": "groups",
+            "PROXY_AUTOPROVISION_GROUP_CREATE": "true",
+            "PROXY_ROLE_ASSIGNMENT_DRIVER": "oidc",
+            "OCIS_OIDC_ISSUER": "https://localhost:8443/realms/oCIS",
+            "PROXY_OIDC_REWRITE_WELLKNOWN": "true",
+            "WEB_OIDC_CLIENT_ID": "web",
+            "PROXY_USER_OIDC_CLAIM": "preferred_username",
+            "PROXY_USER_CS3_CLAIM": "username",
+            "OCIS_ADMIN_USER_ID": "",
+            "GRAPH_ASSIGN_DEFAULT_USER_ROLE": "false",
+            "GRAPH_USERNAME_MATCH": "none",
+            "IDM_CREATE_DEMO_USERS": "false",
+            "PROXY_CSP_CONFIG_FILE_LOCATION": str(
+                repo_root / "tests/config/ci/csp.yaml"
+            ),
+            "KEYCLOAK_DOMAIN": "localhost:8443",
         })
 
     if mfa_needed:
@@ -408,18 +407,6 @@ def main() -> int:
 
     procs = []
 
-    print("========== OCIS CONFIG ==========")
-    print(f"OCIS_URL: {ocis_url}")
-    print(f"WEB_UI_CONFIG_FILE: {gha_web_cfg_path}")
-
-    if gha_web_cfg_path.exists():
-        print("========== WEB UI CONFIG ==========")
-        print(gha_web_cfg_path.read_text())
-        print("====================================")
-
-    print(f"OCIS_OIDC_ISSUER: {server_env.get('OCIS_OIDC_ISSUER')}")
-    print(f"KEYCLOAK_DOMAIN: {server_env.get('KEYCLOAK_DOMAIN')}")
-    print("====================================")
     print("Starting ocis...")
     if keycloak_needed:
         # external IdP: run ocis server directly (no ociswrapper)
@@ -452,37 +439,8 @@ def main() -> int:
 
     try:
         wait_for(lambda: ocis_healthy(ocis_url, use_basic_auth=not keycloak_needed), 300, "ocis")
-        print(f"Web UI config: {gha_web_cfg_path}")
 
-        if gha_web_cfg_path.exists():
-            print(gha_web_cfg_path.read_text())
         print("ocis ready.")
-
-        print("========== OIDC DISCOVERY ==========")
-
-        subprocess.run(
-            [
-                "curl",
-                "-k",
-                "-sS",
-                f"{ocis_url}/.well-known/openid-configuration",
-            ],
-            check=False,
-        )
-
-        print("\n========== KEYCLOAK OIDC ==========")
-
-        subprocess.run(
-            [
-                "curl",
-                "-k",
-                "-sS",
-                "https://localhost:8443/realms/oCIS/.well-known/openid-configuration",
-            ],
-            check=False,
-        )
-
-        print("\n====================================")
 
         if tika_needed:
             wait_for(lambda: tika_warm(tika_url), 60, "tika warm-up")
