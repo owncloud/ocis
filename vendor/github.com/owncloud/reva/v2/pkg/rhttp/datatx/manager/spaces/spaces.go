@@ -118,7 +118,7 @@ func (m *manager) Handler(coord pkgupload.Coordinator, driver storage.FS) (http.
 				Path:       fn,
 			}
 			var info *provider.ResourceInfo
-			info, err = driver.Upload(ctx, storage.UploadRequest{
+			info, err = coord.Upload(ctx, storage.UploadRequest{
 				Ref:    ref,
 				Body:   r.Body,
 				Length: r.ContentLength,

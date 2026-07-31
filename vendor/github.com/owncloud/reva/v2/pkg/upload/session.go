@@ -1,21 +1,3 @@
-// Copyright 2018-2024 CERN
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-// In applying this license, CERN does not waive the privileges and immunities
-// granted to it by virtue of its status as an Intergovernmental Organization
-// or submit itself to any jurisdiction.
-
 package upload
 
 import (
@@ -30,6 +12,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -86,6 +69,10 @@ type Session interface {
 	SetScanData(result string, date time.Time)
 	Checksums() storage.UploadChecksums
 	SetChecksums(sha1, md5, adler32 []byte)
+	SizeDiff() int64
+	SetSizeDiff(d int64)
+	VersionCreated() bool
+	SetVersionCreated(v bool)
 	Metadata() map[string]string
 	Persist(ctx context.Context) error
 	Cleanup(cleanBin, cleanInfo bool)
@@ -260,15 +247,43 @@ func (s *FileSession) Checksums() storage.UploadChecksums {
 	}
 }
 
-// Metadata returns the upload metadata map passed to CommitUpload.
+// Metadata returns the upload metadata the coordinator passes to the driver.
 func (s *FileSession) Metadata() map[string]string {
 	return map[string]string{
-		"providerID":   s.info.MetaData["providerID"],
-		"mtime":        s.info.MetaData["mtime"],
-		"nodeExists":   s.info.Storage["NodeExists"],
-		"versionsPath": s.info.MetaData["versionsPath"],
-		"sessionID":    s.info.ID,
+		"providerID":          s.info.MetaData["providerID"],
+		"mtime":               s.info.MetaData["mtime"],
+		"nodeExists":          s.info.Storage["NodeExists"],
+		"sessionID":           s.info.ID,
+		"if-match":            s.info.MetaData["if-match"],
+		"if-none-match":       s.info.MetaData["if-none-match"],
+		"if-unmodified-since": s.info.MetaData["if-unmodified-since"],
 	}
+}
+
+// SizeDiff returns the tree size change PrepareUpload propagated optimistically.
+// Rolling an upload back has to undo exactly that amount.
+func (s *FileSession) SizeDiff() int64 {
+	d, _ := strconv.ParseInt(s.info.MetaData["sizeDiff"], 10, 64)
+	return d
+}
+
+// SetSizeDiff records the size change PrepareUpload reported. It is persisted
+// because the async path prepares and commits in different processes, so the
+// value cannot be held in memory between the two.
+func (s *FileSession) SetSizeDiff(d int64) {
+	s.info.MetaData["sizeDiff"] = strconv.FormatInt(d, 10)
+}
+
+// VersionCreated reports whether this upload superseded existing content, which
+// UploadReady consumers use to tell an overwrite from a new file.
+func (s *FileSession) VersionCreated() bool {
+	return s.info.MetaData["versionCreated"] == "true"
+}
+
+// SetVersionCreated records what PrepareUpload reported. Persisted for the same
+// reason as the size diff: on the async path the commit runs in another process.
+func (s *FileSession) SetVersionCreated(v bool) {
+	s.info.MetaData["versionCreated"] = strconv.FormatBool(v)
 }
 
 // SetScanData stores AV scan results on the session.

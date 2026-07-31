@@ -200,6 +200,10 @@ func New(m map[string]interface{}, ss *grpc.Server, log *zerolog.Logger) (rgrpc.
 	if err := store.Setup(); err != nil {
 		return nil, fmt.Errorf("storageprovider: upload directory setup failed: %w", err)
 	}
+	// Deliberately no StartPostprocessing here: this service initiates uploads but
+	// never receives the bytes, so it has nothing to hand to postprocessing or to
+	// commit afterwards. That belongs to the data provider, which owns the PUT and
+	// TUS paths.
 	coordinator := upload.NewCoordinator(fs, store, filepath.Join(store.Root(), "uploads"), evstream)
 
 	// parse data server url
@@ -475,6 +479,8 @@ func (s *Service) InitiateFileUpload(ctx context.Context, req *provider.Initiate
 			st = status.NewFailedPrecondition(ctx, err, "failed precondition")
 		case errtypes.Locked:
 			st = status.NewLocked(ctx, "locked")
+		case errtypes.IsTooEarly:
+			st = status.NewTooEarly(ctx, err.Error())
 		default:
 			st = status.NewInternal(ctx, "error getting upload id: "+err.Error())
 		}

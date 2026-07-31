@@ -118,6 +118,15 @@ func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) 
 	}
 	coord := pkgupload.NewCoordinator(fs, store, filepath.Join(store.Root(), "uploads"), evstream)
 
+	// This is the service that receives the bytes, so it is the one that hands them
+	// to postprocessing and commits them once the verdict comes back. Without this
+	// the coordinator commits inline and uploads are never scanned.
+	if ac := pkgupload.AsyncConfFromDriverConf(conf.Drivers[conf.Driver]); ac.Enabled {
+		if err := coord.StartPostprocessing(evstream, ac.ConsumerGroup, ac.MountID, ac.NumConsumers); err != nil {
+			return nil, fmt.Errorf("dataprovider: could not start postprocessing: %w", err)
+		}
+	}
+
 	dataTXs, err := getDataTXs(conf, coord, fs, evstream, log)
 	if err != nil {
 		return nil, err

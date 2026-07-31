@@ -1,21 +1,3 @@
-// Copyright 2018-2024 CERN
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-// In applying this license, CERN does not waive the privileges and immunities
-// granted to it by virtue of its status as an Intergovernmental Organization
-// or submit itself to any jurisdiction.
-
 package upload
 
 import (
@@ -104,9 +86,62 @@ func FileStoreFromDriverConf(driverConf map[string]interface{}, log *zerolog.Log
 // Returns nil only when neither source resolves to a non-empty path.
 func NewFileStoreFromConfig(uploadDir string, driverConf map[string]interface{}, log *zerolog.Logger) *FileStore {
 	if uploadDir != "" {
-		return NewFileStore(uploadDir, TokenOptions{}, log)
+		// Still take the tokens from the driver config: they sign the transfer URL
+		// that postprocessing downloads the staged bytes from, and a service-level
+		// upload directory says nothing about them.
+		return newFileStoreWithTokens(uploadDir, driverConf, log)
 	}
 	return FileStoreFromDriverConf(driverConf, log)
+}
+
+// AsyncConf is how a service asks for async uploads: whether they are enabled,
+// and the consumer subscription to use if they are.
+type AsyncConf struct {
+	Enabled       bool
+	ConsumerGroup string
+	NumConsumers  int
+	// MountID is the storage id this provider answers for, used to drop
+	// postprocessing events belonging to other storages.
+	MountID string
+}
+
+// AsyncConfFromDriverConf reads the postprocessing settings off the driver config
+// map the services already hand us.
+//
+// The keys are decomposedfs's (options.go: `asyncfileuploads`, `events`). Reading
+// the driver's own keys rather than introducing service-level ones keeps a single
+// source of truth: if the coordinator and the driver disagreed, uploads would
+// either commit twice or never get scanned.
+//
+// The consumer group matters most. It is what makes retiring the driver's
+// consumer a move rather than an addition: two consumers in one group take turns
+// stealing each other's events, two in different groups both act and commit the
+// same upload twice.
+func AsyncConfFromDriverConf(driverConf map[string]interface{}) AsyncConf {
+	if driverConf == nil {
+		return AsyncConf{}
+	}
+	var ac struct {
+		AsyncFileUploads bool   `mapstructure:"asyncfileuploads"`
+		MountID          string `mapstructure:"mount_id"`
+		Events           struct {
+			NumConsumers  int    `mapstructure:"numconsumers"`
+			ConsumerGroup string `mapstructure:"consumer_group"`
+		} `mapstructure:"events"`
+	}
+	_ = mapstructure.Decode(driverConf, &ac)
+	group := ac.Events.ConsumerGroup
+	if group == "" {
+		// decomposedfs's default (options.go:177). The coordinator takes over the
+		// driver's subscription, so it must land in the same group.
+		group = "dcfs"
+	}
+	return AsyncConf{
+		Enabled:       ac.AsyncFileUploads,
+		ConsumerGroup: group,
+		NumConsumers:  ac.Events.NumConsumers,
+		MountID:       ac.MountID,
+	}
 }
 
 func newFileStoreWithTokens(root string, driverConf map[string]interface{}, log *zerolog.Logger) *FileStore {
@@ -152,7 +187,7 @@ func (fs *FileStore) New(_ context.Context) Session {
 		info: tusd.FileInfo{
 			ID: uuid.New().String(),
 			Storage: map[string]string{
-				"Type": "FileStore",
+				"Type": "OCISStore",
 			},
 			MetaData: tusd.MetaData{},
 		},

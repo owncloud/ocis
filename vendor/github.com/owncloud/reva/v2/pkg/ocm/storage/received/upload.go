@@ -85,10 +85,10 @@ func (d *driver) MarkProcessing(ctx context.Context, ref *provider.Reference, pr
 }
 
 // CommitUpload streams the staged bytes to the remote instance over WebDAV.
-func (d *driver) CommitUpload(ctx context.Context, ref *provider.Reference, source storage.UploadSource) (*provider.ResourceInfo, error) {
-	client, share, rel, err := d.serviceWebdavClient(ctx, ref)
+func (d *driver) CommitUpload(ctx context.Context, ref *provider.Reference, sessionID string, source storage.UploadSource) error {
+	client, _, rel, err := d.serviceWebdavClient(ctx, ref)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	client.SetInterceptor(func(method string, rq *http.Request) {
@@ -102,16 +102,7 @@ func (d *driver) CommitUpload(ctx context.Context, ref *provider.Reference, sour
 	})
 
 	lockToken, _ := ctxpkg.ContextGetLockID(ctx)
-	if err := client.WriteStream(rel, source.Body, 0, lockToken); err != nil {
-		return nil, err
-	}
-
-	// The remote instance owns etag and mtime, so read them back rather than guessing.
-	stat, err := client.StatWithProps(rel, []string{})
-	if err != nil {
-		return nil, err
-	}
-	return convertStatToResourceInfo(ref, stat, share)
+	return client.WriteStream(rel, source.Body, 0, lockToken)
 }
 
 // serviceWebdavClient builds a webdav client for the upload finish path. That path
