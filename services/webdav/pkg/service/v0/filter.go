@@ -18,14 +18,24 @@ import (
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/net"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/prop"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/propfind"
-	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/conversions"
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/permission"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
 )
 
 const propOcFavorite = "http://owncloud.org/ns/favorite"
+
+// maxFavoriteContainers bounds how many ListContainer calls a single filter-files REPORT
+// will make (across all spaces and pagination pages) before giving up on collecting further
+// favorites. Without this, a user with a very large or deeply nested tree could turn a single
+// "list my favorites" request into an unbounded number of backend round-trips. Hitting the
+// limit returns whatever favorites were already found rather than failing the request.
+//
+// A var, not a const, so tests can lower it temporarily to exercise the cutoff without
+// needing to construct thousands of fake containers.
+var maxFavoriteContainers = 5000
 
 // favoriteInfo holds a ResourceInfo and the resolved path for href construction.
 type favoriteInfo struct {
@@ -88,26 +98,38 @@ func (g Webdav) handleFilterFiles(w http.ResponseWriter, r *http.Request, ff *re
 		return
 	}
 
-	// List user's storage spaces
-	spacesResp, err := gwClient.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{
-		Filters: []*provider.ListStorageSpacesRequest_Filter{
-			{
-				Type: provider.ListStorageSpacesRequest_Filter_TYPE_USER,
-				Term: &provider.ListStorageSpacesRequest_Filter_Owner{
-					Owner: whoAmI.User.Id,
+	// List user's storage spaces. ListStorageSpaces is paginated, so keep fetching pages
+	// until the server reports no more are available — otherwise spaces beyond the first
+	// page would be silently skipped.
+	var storageSpaces []*provider.StorageSpace
+	pageToken := ""
+	for {
+		spacesResp, err := gwClient.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{
+			Filters: []*provider.ListStorageSpacesRequest_Filter{
+				{
+					Type: provider.ListStorageSpacesRequest_Filter_TYPE_USER,
+					Term: &provider.ListStorageSpacesRequest_Filter_Owner{
+						Owner: whoAmI.User.Id,
+					},
 				},
 			},
-		},
-	})
-	if err != nil {
-		logger.Error().Err(err).Msg("error listing storage spaces")
-		renderError(w, r, errInternalError("could not list storage spaces"))
-		return
-	}
-	if spacesResp.Status.Code != rpcv1beta1.Code_CODE_OK {
-		logger.Error().Str("status", spacesResp.Status.Message).Msg("could not list storage spaces")
-		renderError(w, r, errInternalError("could not list storage spaces"))
-		return
+			PageToken: pageToken,
+		})
+		if err != nil {
+			logger.Error().Err(err).Msg("error listing storage spaces")
+			renderError(w, r, errInternalError("could not list storage spaces"))
+			return
+		}
+		if spacesResp.Status.Code != rpcv1beta1.Code_CODE_OK {
+			logger.Error().Str("status", spacesResp.Status.Message).Msg("could not list storage spaces")
+			renderError(w, r, errInternalError("could not list storage spaces"))
+			return
+		}
+		storageSpaces = append(storageSpaces, spacesResp.StorageSpaces...)
+		if spacesResp.NextPageToken == "" {
+			break
+		}
+		pageToken = spacesResp.NextPageToken
 	}
 
 	// Build the /dav/files/<user> href prefix.
@@ -119,9 +141,12 @@ func (g Webdav) handleFilterFiles(w http.ResponseWriter, r *http.Request, ff *re
 		filesPrefix = path.Join("/remote.php/dav/files", username)
 	}
 
-	// Collect favorites across personal and share spaces
+	// Collect favorites across personal and share spaces. visited is a shared budget of
+	// remaining ListContainer calls (see maxFavoriteContainers) spent across every space,
+	// not per space, so one space with a huge tree can't starve the others.
 	var favorites []favoriteInfo
-	for _, space := range spacesResp.StorageSpaces {
+	visited := 0
+	for _, space := range storageSpaces {
 		if space.Root == nil {
 			continue
 		}
@@ -143,14 +168,17 @@ func (g Webdav) handleFilterFiles(w http.ResponseWriter, r *http.Request, ff *re
 			continue
 		}
 
-		g.collectFavorites(ctx, gwClient, &provider.Reference{ResourceId: space.Root}, pathPrefix, filesPrefix, &favorites)
+		g.collectFavorites(ctx, gwClient, &provider.Reference{ResourceId: space.Root}, pathPrefix, filesPrefix, &favorites, &visited)
 	}
 
 	g.sendFavoritesResponse(favorites, w, r)
 }
 
-// collectFavorites recursively walks a storage space, collecting resources
-// that have the oc:favorite metadata set.
+// collectFavorites recursively walks a storage space, collecting resources that have the
+// oc:favorite metadata set. visited tracks how many ListContainer calls have been made so
+// far against the shared maxFavoriteContainers budget (see that const's doc comment); it's
+// checked before every call, including subsequent pages of the same container, since those
+// are just as costly on the backend as a fresh container.
 func (g Webdav) collectFavorites(
 	ctx context.Context,
 	client gatewayv1beta1.GatewayAPIClient,
@@ -158,38 +186,54 @@ func (g Webdav) collectFavorites(
 	pathPrefix string,
 	hrefPrefix string,
 	results *[]favoriteInfo,
+	visited *int,
 ) {
-	resp, err := client.ListContainer(ctx, &provider.ListContainerRequest{
-		Ref:                   ref,
-		ArbitraryMetadataKeys: []string{propOcFavorite},
-	})
-	if err != nil {
-		g.log.Error().Err(err).Msg("error listing container for favorites")
-		return
-	}
-	if resp.Status.Code != rpcv1beta1.Code_CODE_OK {
-		// Skip spaces/directories we cannot access
-		return
-	}
+	pageToken := ""
+	for {
+		if *visited >= maxFavoriteContainers {
+			g.log.Warn().Int("limit", maxFavoriteContainers).Msg("favorites collection hit its container-visit limit; returning partial results")
+			return
+		}
+		*visited++
 
-	for _, info := range resp.Infos {
-		childPath := path.Join(pathPrefix, info.GetName())
+		resp, err := client.ListContainer(ctx, &provider.ListContainerRequest{
+			Ref:                   ref,
+			ArbitraryMetadataKeys: []string{propOcFavorite},
+			PageToken:             pageToken,
+		})
+		if err != nil {
+			g.log.Error().Err(err).Msg("error listing container for favorites")
+			return
+		}
+		if resp.Status.Code != rpcv1beta1.Code_CODE_OK {
+			// Skip spaces/directories we cannot access
+			return
+		}
 
-		// Check if this resource is favorited
-		if md := info.GetArbitraryMetadata().GetMetadata(); md != nil {
-			if fav, ok := md[propOcFavorite]; ok && fav != "" && fav != "0" {
-				*results = append(*results, favoriteInfo{
-					info:         info,
-					relativePath: childPath,
-					hrefPrefix:   hrefPrefix,
-				})
+		for _, info := range resp.Infos {
+			childPath := path.Join(pathPrefix, info.GetName())
+
+			// Check if this resource is favorited
+			if md := info.GetArbitraryMetadata().GetMetadata(); md != nil {
+				if fav, ok := md[propOcFavorite]; ok && fav != "" && fav != "0" {
+					*results = append(*results, favoriteInfo{
+						info:         info,
+						relativePath: childPath,
+						hrefPrefix:   hrefPrefix,
+					})
+				}
+			}
+
+			// Recurse into directories
+			if info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+				g.collectFavorites(ctx, client, &provider.Reference{ResourceId: info.Id}, childPath, hrefPrefix, results, visited)
 			}
 		}
 
-		// Recurse into directories
-		if info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
-			g.collectFavorites(ctx, client, &provider.Reference{ResourceId: info.Id}, childPath, hrefPrefix, results)
+		if resp.NextPageToken == "" {
+			break
 		}
+		pageToken = resp.NextPageToken
 	}
 }
 
