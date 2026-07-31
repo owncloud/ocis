@@ -44,15 +44,8 @@ export class VaultPage {
 
   public async waitForVaultMode(): Promise<void> {
     const vaultUrl = `${config.baseUrl}/vault`
-
-    await this.page.waitForURL((url) => url.href.startsWith(vaultUrl), {
-      timeout: 60000,
-      waitUntil: 'domcontentloaded'
-    })
-    await this.vaultBreadcrumb.waitFor({
-      state: 'visible',
-      timeout: 60000
-    })
+    await this.page.waitForURL((url) => url.href.startsWith(vaultUrl))
+    await this.vaultBreadcrumb.waitFor()
   }
 
   public async userEntersDriveMode(): Promise<void> {
