@@ -32,12 +32,18 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "invitations",
 		},
+		Backend: "keycloak",
 		Keycloak: config.Keycloak{
 			BasePath:     "",
 			ClientID:     "",
 			ClientSecret: "",
 			ClientRealm:  "",
 			UserRealm:    "",
+		},
+		LDAP: config.LDAP{
+			URI:        "ldaps://localhost:9235",
+			BindDN:     "uid=libregraph,ou=sysusers,o=libregraph-idm",
+			UserBaseDN: "ou=users,o=libregraph-idm",
 		},
 	}
 }
