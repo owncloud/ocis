@@ -21,6 +21,7 @@
         class="oc-width-auto"
         mode="click"
         close-on-click
+        focus-on-open
         padding-size="small"
       >
         <oc-list id="create-list" :class="areFileExtensionsShown ? 'expanded-list' : null">
@@ -121,6 +122,7 @@
       mode="click"
       class="oc-width-auto"
       close-on-click
+      focus-on-open
       padding-size="small"
       @show-drop="showDrop"
     >
