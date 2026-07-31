@@ -1,6 +1,6 @@
 # Table of Contents
 
-* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 8.0.7](#changelog-for-807-2026-07-31)
 * [Changelog for 8.0.6](#changelog-for-806-2026-07-15)
 * [Changelog for 8.0.5](#changelog-for-805-2026-06-18)
 * [Changelog for 8.0.4](#changelog-for-804-2026-05-22)
@@ -66,18 +66,19 @@
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
 
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [8.0.7] (2026-07-31)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 8.0.7.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v8.0.6...master
+[8.0.7]: https://github.com/owncloud/ocis/compare/v8.0.6...v8.0.7
 
 ## Summary
 
 * Bugfix - Return correct issuerAssignedId on /me: [#12635](https://github.com/owncloud/ocis/pull/12635)
 * Bugfix - Log unmapped thumbnail errors and always report a sabredav exception: [#12663](https://github.com/owncloud/ocis/pull/12663)
-* Bugfix - Return metadata client init errors from the settings store: [#12677](https://github.com/owncloud/ocis/pull/12677)
 * Enhancement - Eliminate redundant LDAP read-after-write on create and update: [#12618](https://github.com/owncloud/ocis/pull/12618)
+* Enhancement - Add an opt-in bounded LDAP connection pool: [#12660](https://github.com/owncloud/ocis/pull/12660)
+* Enhancement - Retry LDAP operations against a lagging replica: [#12672](https://github.com/owncloud/ocis/pull/12672)
 
 ## Details
 
@@ -113,22 +114,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/12663
 
-* Bugfix - Return metadata client init errors from the settings store: [#12677](https://github.com/owncloud/ocis/pull/12677)
-
-   The settings metadata store initialized its metadata client lazily. When
-   initialization failed, for example because the settings metadata space was owned
-   by a different user than the configured system user, `Store.Init()` logged the
-   error but left the client nil and returned normally. Every subsequent store call
-   then dereferenced the nil client and panicked with a nil pointer dereference,
-   which masked the real cause and surfaced as opaque proxy 500s during login.
-
-   `Store.Init()` now returns the underlying initialization error and every public
-   store method short-circuits on it, so callers receive a specific, actionable
-   error instead of a panic. The client is left nil on failure so the next call
-   retries initialization.
-
-   https://github.com/owncloud/ocis/pull/12677
-
 * Enhancement - Eliminate redundant LDAP read-after-write on create and update: [#12618](https://github.com/owncloud/ocis/pull/12618)
 
    The graph LDAP backend no longer re-reads an entry immediately after writing it
@@ -143,6 +128,43 @@ The following sections list the changes for unreleased.
    the existing read-back, since the generated ID cannot otherwise be recovered.
 
    https://github.com/owncloud/ocis/pull/12618
+
+* Enhancement - Add an opt-in bounded LDAP connection pool: [#12660](https://github.com/owncloud/ocis/pull/12660)
+
+   The auth-basic, users, groups and graph services can now be switched from a
+   single long-lived reconnecting LDAP connection to a bounded pool of connections,
+   so concurrent requests no longer serialize on one socket. Connections are dialed
+   and bound lazily on checkout, unhealthy connections are discarded and lazily
+   re-dialed rather than eagerly reconnected, and checkout blocks with a
+   configurable timeout once the pool is exhausted.
+
+   Pooling is off by default and fully backwards compatible. Enable it per service
+   via 'OCIS_LDAP_POOL_ENABLED' (or the service-specific
+   '<SERVICE>_LDAP_POOL_ENABLED' override), and tune it with 'OCIS_LDAP_POOL_SIZE'
+   (default 5) and 'OCIS_LDAP_POOL_CHECKOUT_TIMEOUT' (default 30s).
+
+   The graph service's identity backend now shares the same LDAP client
+   implementation used by the reva auth/user/group managers instead of maintaining
+   its own separate reconnecting client.
+
+   https://github.com/owncloud/ocis/pull/12660
+
+* Enhancement - Retry LDAP operations against a lagging replica: [#12672](https://github.com/owncloud/ocis/pull/12672)
+
+   The graph LDAP backend can now retry operations against a replicated directory
+   where a write to the primary is followed by a read that lands on a replica which
+   has not yet caught up. This covers the read-back that recovers a
+   directory-assigned ID after a create (GRAPH_LDAP_SERVER_UUID enabled), which is
+   retried until the entry becomes visible. The retry count and backoff are tunable
+   through `GRAPH_LDAP_RETRY_MAX_COUNT`, `GRAPH_LDAP_RETRY_BASE_DELAY` and
+   `GRAPH_LDAP_RETRY_MAX_DELAY`; the defaults keep the previous behaviour (a single
+   immediate retry with no delay), so existing deployments are unaffected.
+
+   Retries now distinguish reads from writes: a write is no longer retried on a
+   network error, which can surface after the request was already sent and would
+   otherwise apply the mutation twice.
+
+   https://github.com/owncloud/ocis/pull/12672
 
 # Changelog for [8.0.6] (2026-07-15)
 
