@@ -220,7 +220,7 @@ def main() -> int:
     # - mfa flow needs `acr` so Keycloak emits the LoA claim used for step-up.
     if oidc_needed:
         gha_web_cfg["openIdConnect"]["scope"] = "openid profile email offline_access"
-    if mfa_needed:
+    if mfa_needed or vault_storage_needed:
         gha_web_cfg["openIdConnect"]["scope"] = "openid profile email acr"
 
     gha_web_cfg_path = ocis_config_dir / "web-ui-config.json"
