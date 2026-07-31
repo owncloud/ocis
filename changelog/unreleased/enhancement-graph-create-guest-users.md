@@ -9,4 +9,9 @@ Backwards compatible: omitting `userType` still defaults to `Member`, so existin
 API consumers are unaffected. An unknown `userType` is rejected with a 400. Creating
 users remains gated by the admin requirement on the route.
 
+A `Guest` created this way is assigned the lightweight guest role at creation time,
+matching the role a `Guest` would otherwise only receive from the proxy on first
+login. A `userType` is also normalized to its canonical `Member`/`Guest` casing
+before being stored, regardless of how it was cased in the request.
+
 https://github.com/owncloud/ocis/pull/12471

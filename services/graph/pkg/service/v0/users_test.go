@@ -35,6 +35,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
+	ocissettingssvc "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
 )
 
 type userList struct {
@@ -969,8 +970,10 @@ var _ = Describe("Users", func() {
 				assertHandleBadAttributes(user)
 			})
 
-			It("honors an explicit valid userType like Guest", func() {
-				roleService.On("AssignRoleToUser", mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{}, nil)
+			It("honors an explicit valid userType like Guest, assigning the lightweight role", func() {
+				roleService.On("AssignRoleToUser", mock.Anything, mock.MatchedBy(func(req *settings.AssignRoleToUserRequest) bool {
+					return req.RoleId == ocissettingssvc.BundleUUIDRoleUserLight
+				})).Return(&settings.AssignRoleToUserResponse{}, nil)
 				identityBackend.On("CreateUser", mock.Anything, mock.Anything).Return(func(ctx context.Context, u libregraph.User) *libregraph.User {
 					u.SetId("/users/guest")
 					return &u
@@ -987,10 +990,41 @@ var _ = Describe("Users", func() {
 				createdUser := libregraph.User{}
 				Expect(json.Unmarshal(rr.Body.Bytes(), &createdUser)).To(Succeed())
 				Expect(createdUser.GetUserType()).To(Equal("Guest"))
+				roleService.AssertExpectations(GinkgoT())
 			})
 
-			It("creates a user", func() {
-				roleService.On("AssignRoleToUser", mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{}, nil)
+			It("normalizes a differently-cased userType before storing and assigns the role for its canonical form", func() {
+				roleService.On("AssignRoleToUser", mock.Anything, mock.MatchedBy(func(req *settings.AssignRoleToUserRequest) bool {
+					return req.RoleId == ocissettingssvc.BundleUUIDRoleUserLight
+				})).Return(&settings.AssignRoleToUserResponse{}, nil)
+				var createdWith libregraph.User
+				identityBackend.On("CreateUser", mock.Anything, mock.Anything).Return(func(ctx context.Context, u libregraph.User) *libregraph.User {
+					createdWith = u
+					u.SetId("/users/guest")
+					return &u
+				}, nil)
+				user.SetUserType("gUeSt")
+				userJson, err := json.Marshal(user)
+				Expect(err).ToNot(HaveOccurred())
+
+				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users", bytes.NewBuffer(userJson))
+				r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+				svc.PostUser(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusCreated))
+				// The backend must have been asked to persist the canonical form, not
+				// the caller's original casing.
+				Expect(createdWith.GetUserType()).To(Equal("Guest"))
+				createdUser := libregraph.User{}
+				Expect(json.Unmarshal(rr.Body.Bytes(), &createdUser)).To(Succeed())
+				Expect(createdUser.GetUserType()).To(Equal("Guest"))
+				roleService.AssertExpectations(GinkgoT())
+			})
+
+			It("creates a user, assigning the full user role", func() {
+				roleService.On("AssignRoleToUser", mock.Anything, mock.MatchedBy(func(req *settings.AssignRoleToUserRequest) bool {
+					return req.RoleId == ocissettingssvc.BundleUUIDRoleUser
+				})).Return(&settings.AssignRoleToUserResponse{}, nil)
 				identityBackend.On("CreateUser", mock.Anything, mock.Anything).Return(func(ctx context.Context, user libregraph.User) *libregraph.User {
 					user.SetId("/users/user")
 					return &user
@@ -1010,6 +1044,7 @@ var _ = Describe("Users", func() {
 				err = json.Unmarshal(data, &createdUser)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(createdUser.GetUserType()).To(Equal("Member"))
+				roleService.AssertExpectations(GinkgoT())
 			})
 
 			It("creates a member user", func() {
