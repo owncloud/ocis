@@ -68,11 +68,12 @@ func K8sUpdateEnv(service string, envMap []string) (bool, string) {
 
 	if !skipWaitForService {
 		_, err = waitForService(service, envSet)
+		
+		if err != nil {
+			return false, "error waiting for service"
+		}
 	}
 
-	if err != nil {
-		return false, "error waiting for service"
-	}
 	return true, "ok"
 }
 
@@ -278,6 +279,7 @@ func checkServiceHealth(service string) (string, error) {
 }
 
 func getPodName(service string) (string, error) {
+	service = strings.ReplaceAll(service, "-", "")
 	cmdString := fmt.Sprintf("kubectl get pods -n %s -l app=%s -o jsonpath=\"{.items[0].metadata.name}\"", config.Get("namespace"), service)
 	cmd := exec.Command("sh", "-c", cmdString)
 	stdout, err := cmd.Output()
@@ -344,10 +346,10 @@ func K8sRollback() (bool, string) {
 
 		if !skipWaitForService {
 			_, err = waitForService(service, envSet)
-		}
-
-		if err != nil {
-			return false, "error waiting for service"
+			
+			if err != nil {
+				return false, "error waiting for service"
+			}
 		}
 	}
 	return true, "ok"
