@@ -328,6 +328,17 @@ endif
 	mkdir -p ocis/dist
 	$(CALENS) --version $(CHANGELOG_VERSION) -o ocis/dist/CHANGELOG.md
 
+.PHONY: changelog-lint
+changelog-lint:
+	@FAILED=0; \
+	while IFS= read -r -d '' f; do \
+	  title=$$(head -1 "$$f"); \
+	  if [ $${#title} -gt 80 ]; then \
+	    echo "$$f: title too long ($${#title}/80)"; FAILED=1; \
+	  fi; \
+	done < <(find changelog -mindepth 2 -name "*.md" -print0); \
+	exit $$FAILED
+
 .PHONY: changelog-csv
 changelog-csv: $(CALENS)
 	mkdir -p ocis/dist

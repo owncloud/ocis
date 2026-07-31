@@ -1,0 +1,77 @@
+[class*="oc-float-"] {
+  max-width: 100%;
+}
+
+.oc-float-left {
+  float: left;
+}
+
+.oc-float-right {
+  float: right;
+}
+
+[class*="oc-position-center-left"],
+[class*="oc-position-center-right"] {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+[class*="oc-position-bottom"],
+[class*="oc-position-center"],
+[class*="oc-position-left"],
+[class*="oc-position-right"],
+[class*="oc-position-top"] {
+  max-width: 100%;
+  position: absolute !important;
+}
+
+.oc-position-absolute {
+  position: absolute !important;
+}
+
+.oc-position-relative {
+  position: relative !important;
+}
+
+.oc-position-medium {
+  margin: 30px 0;
+  max-width: calc(100% - 60px);
+}
+
+.oc-position-bottom-center {
+  bottom: 0;
+  box-sizing: border-box;
+  left: 50%;
+  max-width: 100%;
+  transform: translateX(-50%);
+}
+
+.oc-position-cover {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.oc-position-fixed {
+  position: fixed !important;
+}
+
+.oc-position-center {
+  box-sizing: border-box;
+  left: 50%;
+  max-width: 100%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: max-content;
+}
+
+.oc-position-small {
+  margin: 15px;
+  max-width: calc(100% - 30px);
+}
+
+.oc-position-center-right {
+  right: 0;
+}

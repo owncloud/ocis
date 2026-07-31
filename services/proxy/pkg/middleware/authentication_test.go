@@ -98,20 +98,30 @@ var _ = Describe("Authenticating requests", Label("Authentication"), func() {
 					"com.owncloud.api.gateway",
 					func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
 						return mockGatewayClient{
-							AuthenticateFunc: func(authType, clientID, clientSecret string) (string, rpcv1beta1.Code) {
+							AuthenticateFunc: func(authType, clientID, clientSecret string) *gateway.AuthenticateResponse {
 								if authType != "publicshares" {
-									return "", rpcv1beta1.Code_CODE_NOT_FOUND
+									return &gateway.AuthenticateResponse{
+										Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_NOT_FOUND},
+									}
 								}
 
 								if clientID == "sharetoken" && (clientSecret == "password|examples3cr3t" || clientSecret == "signature|examplesignature|exampleexpiration") {
-									return "exampletoken", rpcv1beta1.Code_CODE_OK
+									return &gateway.AuthenticateResponse{
+										Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_OK},
+										Token:  "exampletoken",
+									}
 								}
 
 								if clientID == "sharetoken" && clientSecret == "password|" {
-									return "otherexampletoken", rpcv1beta1.Code_CODE_OK
+									return &gateway.AuthenticateResponse{
+										Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_OK},
+										Token:  "otherexampletoken",
+									}
 								}
 
-								return "", rpcv1beta1.Code_CODE_NOT_FOUND
+								return &gateway.AuthenticateResponse{
+									Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_NOT_FOUND},
+								}
 							},
 						}
 					},

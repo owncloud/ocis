@@ -1,0 +1,23 @@
+{
+  "name": "epub-reader",
+  "version": "0.0.0",
+  "private": true,
+  "description": "ownCloud Web epub-reader",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test:unit": "NODE_OPTIONS=--unhandled-rejections=throw vitest"
+  },
+  "dependencies": {
+    "@zip.js/zip.js": "2.8.33",
+    "epubjs": "^0.3.93",
+    "focus-trap-vue": "^4.1.0"
+  },
+  "devDependencies": {
+    "@ownclouders/web-test-helpers": "workspace:*"
+  },
+  "peerDependencies": {
+    "@ownclouders/web-client": "workspace:*",
+    "@ownclouders/web-pkg": "workspace:*",
+    "vue3-gettext": "^4.0.1"
+  }
+}

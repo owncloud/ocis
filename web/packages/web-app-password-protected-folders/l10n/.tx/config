@@ -1,0 +1,10 @@
+[main]
+host = https://www.transifex.com
+
+[o:owncloud-org:p:owncloud-web:r:password-protected-folders]
+file_filter = locale/<lang>/app.po
+minimum_perc = 0
+resource_name = web-password-protected-folders
+source_file = template.pot
+source_lang = en
+type = PO

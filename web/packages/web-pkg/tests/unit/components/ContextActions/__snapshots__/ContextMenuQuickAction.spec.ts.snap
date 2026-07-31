@@ -1,0 +1,13 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ContextMenuQuickAction component > renders component 1`] = `
+"<button type="button" aria-label="Show context menu" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw" id="context-menu-trigger-1">
+  <!--v-if-->
+  <!-- @slot Content of the button --> <span class="oc-icon oc-icon-m oc-icon-passive"><!----></span>
+  <div id="context-menu-drop-1" class="oc-drop oc-box-shadow-medium oc-rounded oc-overflow-hidden">
+    <!-- eslint-enable vuejs-accessibility/no-static-element-interactions -->
+    <!-- eslint-enable vuejs-accessibility/click-events-have-key-events -->
+    <div class="oc-card oc-card-body oc-background-secondary oc-p-s"></div>
+  </div>
+</button>"
+`;

@@ -22,7 +22,7 @@ Welcome to our developer documentation. Here you find documentation with focus f
 - [oCIS]({{< ref "./ocis" >}}) server
 - oCIS Services
 - Clients like:
-    - [ownCloud Web](https://github.com/owncloud/web) - the new web frontend for oCIS and ownCloud
+    - [ownCloud Web](https://github.com/owncloud/ocis/tree/master/web) - the new web frontend for oCIS and ownCloud, shipped in-tree as part of oCIS
     - [ownCloud Android app](https://github.com/owncloud/android)
     - [ownCloud iOS app](https://github.com/owncloud/ios-app)
     - [ownCloud Desktop Syncing Client](https://github.com/owncloud/client)
@@ -37,7 +37,7 @@ You can also find all client sources on [GitHub](https://github.com/owncloud/).
 
 ## Join the oCIS Community
 
-The [server repository](https://github.com/owncloud/ocis) on [GitHub](https://www.github.com) is a good entry point to the oCIS project. In addition to that there are also ownCloud projects for clients for [iOS](https://github.com/owncloud/ios-app), [Android](https://github.com/owncloud/android), the major [Desktop](https://github.com/owncloud/desktop) platforms and [ownCloud Web](https://github.com/owncloud/web).
+The [server repository](https://github.com/owncloud/ocis) on [GitHub](https://www.github.com) is a good entry point to the oCIS project -- it also contains the [ownCloud Web](https://github.com/owncloud/ocis/tree/master/web) frontend source in-tree. In addition to that there are also ownCloud projects for clients for [iOS](https://github.com/owncloud/ios-app), [Android](https://github.com/owncloud/android) and the major [Desktop](https://github.com/owncloud/desktop) platforms.
 
 To chat about development, join our public chat on [matrix: ownCloud Infinite Scale](https://matrix.to/#/#ocis:matrix.org).
 

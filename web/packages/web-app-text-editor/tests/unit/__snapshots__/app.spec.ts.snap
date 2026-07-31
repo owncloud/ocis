@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Text editor app > shows the editor 1`] = `
+"<div class="oc-text-editor oc-width-1-1 oc-height-1-1">
+  <!---->
+</div>"
+`;

@@ -1,0 +1,59 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`OcTextInput > password input field > password policy > displays error state if password does not match criteria 1`] = `
+"<div class=""><label class="oc-label" for="oc-textinput-26">label</label>
+  <div class="oc-position-relative">
+    <!--v-if-->
+    <div class="oc-text-input-password-wrapper">
+      <!-- Input label is handled in the OcTextInput component -->
+      <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label --> <input id="oc-textinput-26" aria-describedby="oc-textinput-26-password-policy" aria-invalid="true" class="oc-text-input oc-input oc-rounded" type="password" value="pass"> <button type="button" aria-label="Show password" class="oc-button oc-rounded oc-button-s oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-text-input-show-password-toggle oc-px-s oc-background-default">
+        <!--v-if-->
+        <!-- @slot Content of the button --> <span class="oc-icon oc-icon-s oc-icon-passive"><!----></span>
+      </button> <button type="button" aria-label="Copy password" class="oc-button oc-rounded oc-button-s oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-text-input-copy-password-button oc-px-s oc-background-default">
+        <!--v-if-->
+        <!-- @slot Content of the button --> <span class="oc-icon oc-icon-s oc-icon-passive"><!----></span>
+      </button>
+      <!--v-if-->
+    </div>
+    <portal to="app.design-system.password-policy">
+      <div id="oc-textinput-26-password-policy" class="oc-flex oc-text-small oc-text-input-password-policy-rule-wrapper oc-pt-s" role="status" aria-live="polite" aria-atomic="true"><span class="oc-invisible-sr">Password requirements: 8+ letters</span>
+        <div class="oc-flex oc-flex-middle oc-text-input-password-policy-rule"><span class="oc-icon oc-icon-s oc-icon-danger oc-mr-xs"><!----></span> <span class="oc-text-input-danger">8+ letters</span>
+          <!--v-if-->
+        </div>
+      </div>
+    </portal>
+    <!--v-if-->
+  </div>
+  <!--v-if-->
+  <portal-target name="app.design-system.password-policy"></portal-target>
+</div>"
+`;
+
+exports[`OcTextInput > password input field > password policy > displays success state if password matches criteria 1`] = `
+"<div class=""><label class="oc-label" for="oc-textinput-28">label</label>
+  <div class="oc-position-relative">
+    <!--v-if-->
+    <div class="oc-text-input-password-wrapper">
+      <!-- Input label is handled in the OcTextInput component -->
+      <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label --> <input id="oc-textinput-28" aria-describedby="oc-textinput-28-password-policy" aria-invalid="false" class="oc-text-input oc-input oc-rounded" type="password" value="password123"> <button type="button" aria-label="Show password" class="oc-button oc-rounded oc-button-s oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-text-input-show-password-toggle oc-px-s oc-background-default">
+        <!--v-if-->
+        <!-- @slot Content of the button --> <span class="oc-icon oc-icon-s oc-icon-passive"><!----></span>
+      </button> <button type="button" aria-label="Copy password" class="oc-button oc-rounded oc-button-s oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-text-input-copy-password-button oc-px-s oc-background-default">
+        <!--v-if-->
+        <!-- @slot Content of the button --> <span class="oc-icon oc-icon-s oc-icon-passive"><!----></span>
+      </button>
+      <!--v-if-->
+    </div>
+    <portal to="app.design-system.password-policy">
+      <div id="oc-textinput-28-password-policy" class="oc-flex oc-text-small oc-text-input-password-policy-rule-wrapper oc-pt-s" role="status" aria-live="polite" aria-atomic="true"><span class="oc-invisible-sr">Password meets all requirements</span>
+        <div class="oc-flex oc-flex-middle oc-text-input-password-policy-rule"><span class="oc-icon oc-icon-s oc-icon-success oc-mr-xs"><!----></span> <span class="oc-text-input-success">8+ letters</span>
+          <!--v-if-->
+        </div>
+      </div>
+    </portal>
+    <!--v-if-->
+  </div>
+  <!--v-if-->
+  <portal-target name="app.design-system.password-policy"></portal-target>
+</div>"
+`;

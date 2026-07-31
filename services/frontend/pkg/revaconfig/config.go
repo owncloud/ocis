@@ -182,6 +182,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 					"machine_auth_apikey": cfg.MachineAuthAPIKey,
 					"enable_denials":      cfg.OCS.EnableDenials,
 					"list_ocm_shares":     cfg.OCS.ListOCMShares,
+					"enable_user_sharing": cfg.EnableUserSharing,
 					"cache_warmup_driver": cfg.OCS.CacheWarmupDriver,
 					"cache_warmup_drivers": map[string]interface{}{
 						"cbox": map[string]interface{}{
@@ -254,7 +255,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 								"search_min_length":                 cfg.SearchMinLength,
 								"public": map[string]interface{}{
 									"alias":                      true,
-									"enabled":                    true,
+									"enabled":                    cfg.EnablePublicSharing,
 									"send_mail":                  true,
 									"defaultPublicLinkShareName": "Public link",
 									"social_share":               true,
@@ -277,6 +278,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 									"can_edit": true,
 								},
 								"user": map[string]interface{}{
+									"enabled":         cfg.EnableUserSharing,
 									"send_mail":       true,
 									"profile_picture": false,
 									"settings": []map[string]interface{}{
@@ -290,7 +292,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 									},
 								},
 								"user_enumeration": map[string]interface{}{
-									"enabled":            true,
+									"enabled":            cfg.EnableUserSharing,
 									"group_members_only": true,
 								},
 								"federation": map[string]interface{}{

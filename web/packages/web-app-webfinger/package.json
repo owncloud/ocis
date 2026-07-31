@@ -1,0 +1,15 @@
+{
+  "name": "web-app-webfinger",
+  "version": "0.0.0",
+  "private": true,
+  "description": "ownCloud webfinger resolver",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@ownclouders/web-test-helpers": "workspace:*"
+  },
+  "peerDependencies": {
+    "@ownclouders/design-system": "workspace:^",
+    "@ownclouders/web-client": "workspace:*",
+    "@ownclouders/web-pkg": "workspace:*"
+  }
+}

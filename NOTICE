@@ -1,0 +1,31 @@
+ownCloud Infinite Scale (ocis)
+Copyright 2020-2026 ownCloud GmbH
+
+This product includes software developed by ownCloud GmbH and the
+ownCloud community, licensed under the Apache License, Version 2.0
+(see the LICENSE file in this repository's root directory).
+
+--------------------------------------------------------------------
+Provenance note: the ownCloud Web frontend (web/)
+--------------------------------------------------------------------
+
+The `web/` directory contains the source of the ownCloud Web frontend.
+It was formerly maintained as the independent repository
+https://github.com/owncloud/web and, through its final release
+(tag `v12.5.0`, also tagged `last-agpl-release`, commit
+b16a34fdf5569d2fd63b1ff3c575c1a4ee569ad3), was historically licensed
+under the GNU Affero General Public License, version 3.0 (AGPL-3.0).
+
+All contributors to that repository accepted the ownCloud Contributor
+License Agreement (CLA), which grants ownCloud GmbH the right to
+relicense their contributions. Under that grant, ownCloud GmbH has
+relicensed the source tree at the commit above from AGPL-3.0 to the
+Apache License, Version 2.0 -- the same license that covers the rest
+of this repository -- and merged it into this repository.
+
+The pre-relicense, AGPL-3.0-licensed development history remains
+publicly available in the archived https://github.com/owncloud/web
+repository for historical and attribution purposes. That history is
+not the license under which the code in this repository is
+distributed; this repository's root LICENSE (Apache-2.0) governs the
+entirety of this repository, including web/.

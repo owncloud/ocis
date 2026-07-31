@@ -62,22 +62,22 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var me *libregraph.User
-	// We can just return the user from context unless we need to expand the group memberships
-	if !slices.Contains(exp, "memberOf") {
-		me = identity.CreateUserModelFromCS3(u)
-	} else {
-		var err error
-		logger.Debug().Msg("calling get user on backend")
-		me, err = g.identityBackend.GetUser(r.Context(), u.GetId().GetOpaqueId(), odataReq)
-		if err != nil {
-			logger.Debug().Err(err).Interface("user", u).Msg("could not get user from backend")
-			errorcode.RenderError(w, r, err)
-			return
-		}
-		if me.MemberOf == nil {
-			me.MemberOf = []libregraph.Group{}
-		}
+	// Always resolve the user through the identity backend. The CS3 user from
+	// the request context does not carry the issuer-assigned identity (OIDC
+	// sub), so building the model from it (CreateUserModelFromCS3) would report
+	// the internal user UUID as identities[].issuerAssignedId. The backend reads
+	// the stored external identity and returns the correct value. Group
+	// memberships are only expanded (and thus only queried) when $expand=memberOf
+	// is requested, so the extra cost here is a single user lookup.
+	logger.Debug().Msg("calling get user on backend")
+	me, err := g.identityBackend.GetUser(r.Context(), u.GetId().GetOpaqueId(), odataReq)
+	if err != nil {
+		logger.Debug().Err(err).Interface("user", u).Msg("could not get user from backend")
+		errorcode.RenderError(w, r, err)
+		return
+	}
+	if slices.Contains(exp, "memberOf") && me.MemberOf == nil {
+		me.MemberOf = []libregraph.Group{}
 	}
 
 	// expand appRoleAssignments if requested
@@ -880,6 +880,21 @@ func (g Graph) PatchMe(w http.ResponseWriter, r *http.Request) {
 	if _, ok := changes.GetMailOk(); ok {
 		logger.Info().Interface("user", changes).Msg("could not update user: user is not allowed to change own mail")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user is not allowed to change own mail")
+		return
+	}
+	if changes.HasPasswordProfile() {
+		logger.Info().Interface("user", changes).Msg("could not update user: user is not allowed to change own password via PATCH /me, use POST /me/changePassword")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user is not allowed to change own password via PATCH /me, use POST /me/changePassword")
+		return
+	}
+	if changes.HasAccountEnabled() {
+		logger.Info().Interface("user", changes).Msg("could not update user: user is not allowed to change own accountEnabled")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user is not allowed to change own accountEnabled")
+		return
+	}
+	if changes.HasOnPremisesSamAccountName() {
+		logger.Info().Interface("user", changes).Msg("could not update user: user is not allowed to change own onPremisesSamAccountName")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user is not allowed to change own onPremisesSamAccountName")
 		return
 	}
 	g.patchUser(w, r, userID, changes)

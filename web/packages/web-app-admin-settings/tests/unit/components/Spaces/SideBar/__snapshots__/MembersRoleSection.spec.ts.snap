@@ -1,0 +1,12 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`MembersRoleSection > should render all members accordingly 1`] = `
+"<ul class="oc-list">
+  <li class="oc-flex oc-flex-middle oc-mb-s" data-testid="space-members-list">
+    <oc-avatar-stub src="" username="einstein" accessiblelabel="" width="36" class="oc-mr-s"></oc-avatar-stub> einstein
+  </li>
+  <li class="oc-flex oc-flex-middle oc-mb-s" data-testid="space-members-list">
+    <oc-avatar-item-stub name="group" icon="group" iconcolor="var(--oc-color-text-inverse)" iconfilltype="fill" iconsize="medium" background="var(--oc-color-swatch-passive-default)" accessiblelabel="" width="36" class="oc-mr-s"></oc-avatar-item-stub> physic-lovers
+  </li>
+</ul>"
+`;

@@ -1,0 +1,44 @@
+directives:
+  child-src:
+    - '''self'''
+  connect-src:
+    - '''self'''
+    - 'blob:'
+    - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+  default-src:
+    - '''none'''
+  font-src:
+    - '''self'''
+  frame-ancestors:
+    - '''self'''
+    - 'https://host.docker.internal:9200'
+    - 'https://host.docker.internal:9201'
+  frame-src:
+    - '''self'''
+    - 'blob:'
+    - 'https://embed.diagrams.net/'
+    # In contrast to bash and docker the default is given after the | character
+    - 'https://${ONLYOFFICE_DOMAIN|host.docker.internal:9981}/'
+    - 'https://${COLLABORA_DOMAIN|host.docker.internal:9980}/'
+  img-src:
+    - '''self'''
+    - 'data:'
+    - 'blob:'
+    - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+    # In contrast to bash and docker the default is given after the | character
+    - 'https://${ONLYOFFICE_DOMAIN|host.docker.internal:9981}/'
+    - 'https://${COLLABORA_DOMAIN|host.docker.internal:9980}/'
+  manifest-src:
+    - '''self'''
+  media-src:
+    - '''self'''
+  object-src:
+    - '''self'''
+    - 'blob:'
+  script-src:
+    - '''self'''
+    - '''unsafe-inline'''
+    - 'https://www.gstatic.com/'
+  style-src:
+    - '''self'''
+    - '''unsafe-inline'''

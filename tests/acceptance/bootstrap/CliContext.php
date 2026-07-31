@@ -1154,4 +1154,127 @@ class CliContext implements Context {
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
+
+	/**
+	 * @Given the administrator has configured service account credentials
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorHasConfiguredServiceAccountCredentials(): void {
+		$envs = [
+			"OCIS_SERVICE_ACCOUNT_ID" => "service-account-id",
+			"OCIS_SERVICE_ACCOUNT_SECRET" => "service-account-secret",
+		];
+		$response = OcisConfigHelper::reConfigureOcis($envs);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Failed to configure service account credentials",
+			$response,
+		);
+	}
+
+	/**
+	 * @When the administrator runs clean-orphaned-grants in non-dry-run mode
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRunsCleanOrphanedGrantsInNonDryRunMode(): void {
+		$command = "shares clean-orphaned-grants"
+			. " --service-account-id=service-account-id"
+			. " --service-account-secret=service-account-secret"
+			. " --dry-run=false";
+		$body = ["command" => $command];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator runs clean-orphaned-grants for space :spaceName owned by :user
+	 *
+	 * @param string $spaceName
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRunsCleanOrphanedGrantsForSpaceOwnedBy(
+		string $spaceName,
+		string $user,
+	): void {
+		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
+		$command = "shares clean-orphaned-grants"
+			. " --service-account-id=service-account-id"
+			. " --service-account-secret=service-account-secret"
+			. " --space-id=" . $spaceId
+			. " --dry-run=false";
+		$body = ["command" => $command];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator runs clean-orphaned-grants with force flag
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRunsCleanOrphanedGrantsWithForceFlag(): void {
+		$command = "shares clean-orphaned-grants"
+			. " --service-account-id=service-account-id"
+			. " --service-account-secret=service-account-secret"
+			. " --force --dry-run=false";
+		$body = ["command" => $command];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @Given the share grants for space :spaceName owned by :user have been orphaned
+	 *
+	 * @param string $spaceName
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theShareGrantsForSpaceHaveBeenOrphaned(string $spaceName, string $user): void {
+		$parts = \explode('$', $this->spacesContext->getSpaceIdByName($user, $spaceName));
+		$spaceOpaqueId = $parts[1] ?? '';
+		$deadSpaceId = '00000000-0000-0000-0000-000000000000';
+
+		$blobsRoot = $this->featureContext->getOcisDataPath() . '/storage/metadata/spaces/js';
+		$found = false;
+		foreach (['jsoncs3-share-manager-metadata', 'oncs3-share-manager-metadata'] as $metaSpace) {
+			$blobDir = $blobsRoot . '/' . $metaSpace . '/blobs';
+			if (!\is_dir($blobDir)) {
+				continue;
+			}
+			// walk all blob files recursively (blobs/{hex}/{hex}/{hex}/{hex}/{filename})
+			$dirIterator = new \RecursiveDirectoryIterator($blobDir, \RecursiveDirectoryIterator::SKIP_DOTS);
+			$fileIterator = new \RecursiveIteratorIterator($dirIterator);
+			foreach ($fileIterator as $file) {
+				if (!$file->isFile()) {
+					continue;
+				}
+				$data = \json_decode(\file_get_contents($file->getPathname()), true);
+				if (!isset($data['Shares'])) {
+					continue;
+				}
+				$matched = false;
+				foreach ($data['Shares'] as $key => $share) {
+					if (($share['resource_id']['space_id'] ?? '') !== $spaceOpaqueId) {
+						continue;
+					}
+					$data['Shares'][$key]['resource_id']['space_id'] = $deadSpaceId;
+					$matched = true;
+				}
+				if (!$matched) {
+					continue;
+				}
+				\file_put_contents(
+					$file->getPathname(),
+					\json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+				);
+				$found = true;
+			}
+		}
+
+		Assert::assertTrue($found, "Could not find blob for space $spaceName ($spaceOpaqueId)");
+	}
 }

@@ -5,17 +5,17 @@
 # 
 # Translators:
 # Martin <github@diemattels.at>, 2026
-# guanu244, 2026
 # 許明凱 <yuteson@gmail.com>, 2026
+# 振东 刘, 2026
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-06-03 03:23+0000\n"
+"POT-Creation-Date: 2026-06-19 03:23+0000\n"
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
-"Last-Translator: 許明凱 <yuteson@gmail.com>, 2026\n"
+"Last-Translator: 振东 刘, 2026\n"
 "Language-Team: Chinese (China) (https://app.transifex.com/owncloud-org/teams/6149/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,31 +29,31 @@ msgstr "描述"
 
 #: pkg/service/response.go:43
 msgid "display name"
-msgstr "顯示名稱"
+msgstr "显示名称"
 
 #: pkg/service/response.go:42
 msgid "expiration date"
-msgstr "設置到期日期"
+msgstr "过期日期"
 
 #: pkg/service/response.go:41
 msgid "password"
-msgstr "密碼"
+msgstr "密码"
 
 #: pkg/service/response.go:40
 msgid "permission"
-msgstr "權限"
+msgstr "权限"
 
 #: pkg/service/response.go:45
 msgid "shared-with-me"
-msgstr "與我共享"
+msgstr "已与我共享"
 
 #: pkg/service/response.go:39
 msgid "some field"
-msgstr "部分欄位"
+msgstr "部分字段"
 
 #: pkg/service/response.go:26
 msgid "{resource} was downloaded via public link {token}"
-msgstr "{resource} 透過公開連結{token} 被下載了"
+msgstr "{resource} 已通过公开链接 {token} 下载"
 
 #: pkg/service/response.go:24
 msgid "{user} added {resource} to {folder}"
@@ -97,7 +97,7 @@ msgstr "{user} 通过 {sharee} 共享了 {resource}"
 
 #: pkg/service/response.go:34
 msgid "{user} updated {field} for a link {token} on {resource}"
-msgstr "{user} 更新了 {resource} 連結 {token} 的 {field} 欄位"
+msgstr "{user} 修改了 {resource} 上链接 {token} 的 {field} 属性"
 
 #: pkg/service/response.go:31
 msgid "{user} updated {field} for the {resource}"

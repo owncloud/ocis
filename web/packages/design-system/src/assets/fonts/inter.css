@@ -1,0 +1,6 @@
+@font-face {
+    font-family: Inter;
+    src: url('inter.woff2') format('woff2'), url('inter.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: oblique 0deg 12deg;
+}

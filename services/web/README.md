@@ -1,6 +1,6 @@
 # Web
 
-The web service embeds and serves the static files for the [Infinite Scale Web Client](https://github.com/owncloud/web).
+The web service embeds and serves the static files for the Infinite Scale Web Client, whose source lives in-tree under [`web/`](https://github.com/owncloud/ocis/tree/master/web).
 Note that clients will respond with a connection error if the web service is not available.
 
 The web service also provides a minimal API for branding functionality like changing the logo shown.
@@ -25,7 +25,7 @@ for more details.
 ### Web UI Config File
 
 When defined via the `WEB_UI_CONFIG_FILE` environment variable, the configuration of the web UI can be made
-with a [json based](https://github.com/owncloud/web/tree/master/config) file.
+with a [json based](https://github.com/owncloud/ocis/tree/master/web/config) file.
 
 ### Embedding Web
 

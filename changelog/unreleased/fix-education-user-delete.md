@@ -1,4 +1,4 @@
-Bugfix: DELETE /graph/v1.0/education/users/{id} no longer 404s while leaving the LDAP entry behind
+Bugfix: Education user DELETE no longer 404s while leaving LDAP entry behind
 
 The education user delete handler used `user.GetExternalID()` for the backend
 DELETE, while the regular `/users` handler and the pre-v8.0 code path used

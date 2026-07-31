@@ -1,0 +1,13 @@
+diff --git a/lib/components/date-picker.umd.js b/lib/components/date-picker.umd.js
+index 571ada2a0d82ed79833600b75eca9a5ec670660f..124df53b7b8fe976c5afcc4588783b3c626cd8e2 100644
+--- a/lib/components/date-picker.umd.js
++++ b/lib/components/date-picker.umd.js
+@@ -17351,7 +17351,7 @@ const _yearGroupCount = 12;
+       for (let year = startYear; year < endYear; year += 1) {
+         let enabled = false;
+ 
+-        for (let month = 1; month < 12; month++) {
++        for (let month = 1; month <= 12; month++) {
+           enabled = this.validator({
+             month,
+             year

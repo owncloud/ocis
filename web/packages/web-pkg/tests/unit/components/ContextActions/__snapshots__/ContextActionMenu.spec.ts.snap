@@ -1,0 +1,8 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ContextActionMenu component > renders the menu with actions 1`] = `
+"<div id="oc-files-context-menu">
+  <oc-list-stub raw="false" id="oc-files-context-actions-action 1" class="oc-files-context-actions oc-pb-s oc-files-context-actions-border"></oc-list-stub>
+  <oc-list-stub raw="false" id="oc-files-context-actions-action 2" class="oc-files-context-actions oc-pt-s"></oc-list-stub>
+</div>"
+`;

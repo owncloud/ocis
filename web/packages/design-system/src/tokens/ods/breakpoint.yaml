@@ -1,0 +1,26 @@
+---
+breakpoint:
+  small:
+    default:
+      old: breakpoint-small
+      value: 640px
+    max:
+      old: breakpoint-small-max
+      value: 959px
+  medium:
+    default:
+      old: breakpoint-medium
+      value: 960px
+    max:
+      old: breakpoint-medium-max
+      value: 1199px
+  large:
+    default:
+      value: 1200px
+    max:
+      value: 1599px
+  xlarge:
+    value: 1600px
+  xsmall:
+    max:
+      value: 639px

@@ -1,0 +1,95 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ItemFilter > can use a custom attribute as display name 1`] = `
+"<div class="item-filter oc-flex item-filter-users">
+  <div class="oc-filter-chip oc-flex"><span id="004nym8equapq009bx8gtholfh" class="oc-invisible-sr oc-hidden-announcer" aria-live="polite" aria-atomic="true"></span> <button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-filter-chip-button oc-pill" id="oc-filter-chip-3" aria-pressed="false">
+      <!--v-if-->
+      <!-- @slot Content of the button --> <span class="oc-icon oc-icon-s oc-icon-passive oc-filter-check-icon-inactive"><!----></span> <span class="oc-text-truncate oc-filter-chip-label">Users</span>
+      <!--v-if--> <span class="oc-icon oc-icon-s oc-icon-passive"><!----></span>
+    </button>
+    <div id="oc-drop-4" class="oc-drop oc-box-shadow-medium oc-rounded oc-filter-chip-drop">
+      <!-- eslint-enable vuejs-accessibility/no-static-element-interactions -->
+      <!-- eslint-enable vuejs-accessibility/click-events-have-key-events -->
+      <div class="oc-card oc-card-body oc-background-secondary oc-p-s">
+        <!--v-if-->
+        <div>
+          <ul class="oc-list oc-my-rm oc-mx-rm item-filter-list">
+            <li class="oc-my-xs"><button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-space-between oc-button-gap-m oc-button-passive oc-button-passive-raw item-filter-list-item oc-flex oc-flex-middle oc-width-1-1 oc-p-xs oc-flex-between" data-test-value="Albert Einstein">
+                <!--v-if-->
+                <!-- @slot Content of the button -->
+                <div class="oc-flex oc-flex-middle oc-text-truncate">
+                  <!--v-if-->
+                  <div></div>
+                  <div class="oc-text-truncate oc-ml-s">Albert Einstein</div>
+                </div>
+                <div class="oc-flex">
+                  <!--v-if-->
+                </div>
+              </button></li>
+            <li class="oc-my-xs"><button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-space-between oc-button-gap-m oc-button-passive oc-button-passive-raw item-filter-list-item oc-flex oc-flex-middle oc-width-1-1 oc-p-xs oc-flex-between" data-test-value="Marie Curie">
+                <!--v-if-->
+                <!-- @slot Content of the button -->
+                <div class="oc-flex oc-flex-middle oc-text-truncate">
+                  <!--v-if-->
+                  <div></div>
+                  <div class="oc-text-truncate oc-ml-s">Marie Curie</div>
+                </div>
+                <div class="oc-flex">
+                  <!--v-if-->
+                </div>
+              </button></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!--v-if-->
+  </div>
+</div>"
+`;
+
+exports[`ItemFilter > renders all items 1`] = `
+"<div class="item-filter oc-flex item-filter-users">
+  <div class="oc-filter-chip oc-flex"><span id="004nym8equapq009bx8gtholfh" class="oc-invisible-sr oc-hidden-announcer" aria-live="polite" aria-atomic="true"></span> <button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-filter-chip-button oc-pill" id="oc-filter-chip-1" aria-pressed="false">
+      <!--v-if-->
+      <!-- @slot Content of the button --> <span class="oc-icon oc-icon-s oc-icon-passive oc-filter-check-icon-inactive"><!----></span> <span class="oc-text-truncate oc-filter-chip-label">Users</span>
+      <!--v-if--> <span class="oc-icon oc-icon-s oc-icon-passive"><!----></span>
+    </button>
+    <div id="oc-drop-2" class="oc-drop oc-box-shadow-medium oc-rounded oc-filter-chip-drop">
+      <!-- eslint-enable vuejs-accessibility/no-static-element-interactions -->
+      <!-- eslint-enable vuejs-accessibility/click-events-have-key-events -->
+      <div class="oc-card oc-card-body oc-background-secondary oc-p-s">
+        <!--v-if-->
+        <div>
+          <ul class="oc-list oc-my-rm oc-mx-rm item-filter-list">
+            <li class="oc-my-xs"><button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-space-between oc-button-gap-m oc-button-passive oc-button-passive-raw item-filter-list-item oc-flex oc-flex-middle oc-width-1-1 oc-p-xs oc-flex-between" data-test-value="Albert Einstein">
+                <!--v-if-->
+                <!-- @slot Content of the button -->
+                <div class="oc-flex oc-flex-middle oc-text-truncate">
+                  <!--v-if-->
+                  <div></div>
+                  <div class="oc-text-truncate oc-ml-s">Albert Einstein</div>
+                </div>
+                <div class="oc-flex">
+                  <!--v-if-->
+                </div>
+              </button></li>
+            <li class="oc-my-xs"><button type="button" class="oc-button oc-rounded oc-button-m oc-button-justify-content-space-between oc-button-gap-m oc-button-passive oc-button-passive-raw item-filter-list-item oc-flex oc-flex-middle oc-width-1-1 oc-p-xs oc-flex-between" data-test-value="Marie Curie">
+                <!--v-if-->
+                <!-- @slot Content of the button -->
+                <div class="oc-flex oc-flex-middle oc-text-truncate">
+                  <!--v-if-->
+                  <div></div>
+                  <div class="oc-text-truncate oc-ml-s">Marie Curie</div>
+                </div>
+                <div class="oc-flex">
+                  <!--v-if-->
+                </div>
+              </button></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!--v-if-->
+  </div>
+</div>"
+`;

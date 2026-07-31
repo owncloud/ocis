@@ -9,6 +9,12 @@ import (
 	tAssert "github.com/stretchr/testify/assert"
 )
 
+func nameTermQuery(term string) *query.TermQuery {
+	q := query.NewTermQuery(term)
+	q.SetField("Name")
+	return q
+}
+
 var timeMustParse = func(t *testing.T, ts string) time.Time {
 	tp, err := time.Parse(time.RFC3339Nano, ts)
 	if err != nil {
@@ -59,8 +65,8 @@ func Test_compile(t *testing.T) {
 				},
 			},
 			want: query.NewConjunctionQuery([]query.Query{
-				query.NewQueryStringQuery(`Name:john\ smith`),
-				query.NewQueryStringQuery(`Name:jane`),
+				nameTermQuery("john smith"),
+				nameTermQuery("jane"),
 			}),
 			wantErr: false,
 		},

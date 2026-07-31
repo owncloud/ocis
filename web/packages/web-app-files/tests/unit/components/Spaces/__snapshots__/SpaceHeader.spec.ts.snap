@@ -1,0 +1,126 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SpaceHeader > should add the "squashed"-class when the sidebar is opened 1`] = `
+"<div class="space-header oc-p-m oc-flex space-header-squashed">
+  <div class="space-header-image">
+    <div class="space-header-image-default oc-flex oc-flex-middle oc-flex-center"><span class="oc-icon oc-icon-xxl oc-icon-passive oc-px-m oc-py-m"><!----></span></div>
+  </div>
+  <div class="space-header-infos">
+    <div class="oc-flex oc-mb-s oc-flex-middle oc-flex-between">
+      <div class="oc-flex oc-flex-middle space-header-infos-heading">
+        <h2 class="space-header-name"></h2> <button type="button" aria-label="Show context menu" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-ml-s" id="space-context-btn">
+          <!--v-if-->
+          <!-- @slot Content of the button --> <span class="oc-icon oc-icon-m oc-icon-passive"><!----></span>
+        </button>
+        <div id="space-context-drop" class="oc-drop oc-box-shadow-medium oc-rounded" options="[object Object]">
+          <!-- eslint-enable vuejs-accessibility/no-static-element-interactions -->
+          <!-- eslint-enable vuejs-accessibility/click-events-have-key-events -->
+          <div class="oc-card oc-card-body oc-background-secondary oc-p-s">
+            <space-context-actions-stub actionoptions="[object Object]"></space-context-actions-stub>
+          </div>
+        </div>
+      </div> <button type="button" aria-label="Open context menu and show members" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw">
+        <!--v-if-->
+        <!-- @slot Content of the button --> <span class="oc-icon oc-icon-s oc-icon-passive"><!----></span> <span class="space-header-people-count oc-text-small">21 members</span>
+      </button>
+    </div>
+    <!--v-if-->
+    <!--v-if-->
+    <!--v-if-->
+  </div>
+</div>"
+`;
+
+exports[`SpaceHeader > space description > should show the description 1`] = `
+"<div class="space-header oc-p-m oc-flex">
+  <div class="space-header-image">
+    <div class="space-header-image-default oc-flex oc-flex-middle oc-flex-center"><span class="oc-icon oc-icon-xxl oc-icon-passive oc-px-m oc-py-m"><!----></span></div>
+  </div>
+  <div class="space-header-infos">
+    <div class="oc-flex oc-mb-s oc-flex-middle oc-flex-between">
+      <div class="oc-flex oc-flex-middle space-header-infos-heading">
+        <h2 class="space-header-name"></h2> <button type="button" aria-label="Show context menu" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-ml-s" id="space-context-btn">
+          <!--v-if-->
+          <!-- @slot Content of the button --> <span class="oc-icon oc-icon-m oc-icon-passive"><!----></span>
+        </button>
+        <div id="space-context-drop" class="oc-drop oc-box-shadow-medium oc-rounded" options="[object Object]">
+          <!-- eslint-enable vuejs-accessibility/no-static-element-interactions -->
+          <!-- eslint-enable vuejs-accessibility/click-events-have-key-events -->
+          <div class="oc-card oc-card-body oc-background-secondary oc-p-s">
+            <space-context-actions-stub actionoptions="[object Object]"></space-context-actions-stub>
+          </div>
+        </div>
+      </div> <button type="button" aria-label="Open context menu and show members" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw">
+        <!--v-if-->
+        <!-- @slot Content of the button --> <span class="oc-icon oc-icon-s oc-icon-passive"><!----></span> <span class="space-header-people-count oc-text-small">21 members</span>
+      </button>
+    </div>
+    <!--v-if-->
+    <div class="markdown-container oc-flex oc-flex-middle">
+      <!---->
+      <div class="markdown-container-edit oc-ml-s"><a attrs="[object Object]" size="small" appearance="raw"></a></div>
+    </div>
+    <!--v-if-->
+  </div>
+</div>"
+`;
+
+exports[`SpaceHeader > space image > should show the default image if no other image is set 1`] = `
+"<div class="space-header oc-p-m oc-flex">
+  <div class="space-header-image">
+    <div class="space-header-image-default oc-flex oc-flex-middle oc-flex-center"><span class="oc-icon oc-icon-xxl oc-icon-passive oc-px-m oc-py-m"><!----></span></div>
+  </div>
+  <div class="space-header-infos">
+    <div class="oc-flex oc-mb-s oc-flex-middle oc-flex-between">
+      <div class="oc-flex oc-flex-middle space-header-infos-heading">
+        <h2 class="space-header-name"></h2> <button type="button" aria-label="Show context menu" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-ml-s" id="space-context-btn">
+          <!--v-if-->
+          <!-- @slot Content of the button --> <span class="oc-icon oc-icon-m oc-icon-passive"><!----></span>
+        </button>
+        <div id="space-context-drop" class="oc-drop oc-box-shadow-medium oc-rounded" options="[object Object]">
+          <!-- eslint-enable vuejs-accessibility/no-static-element-interactions -->
+          <!-- eslint-enable vuejs-accessibility/click-events-have-key-events -->
+          <div class="oc-card oc-card-body oc-background-secondary oc-p-s">
+            <space-context-actions-stub actionoptions="[object Object]"></space-context-actions-stub>
+          </div>
+        </div>
+      </div> <button type="button" aria-label="Open context menu and show members" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw">
+        <!--v-if-->
+        <!-- @slot Content of the button --> <span class="oc-icon oc-icon-s oc-icon-passive"><!----></span> <span class="space-header-people-count oc-text-small">21 members</span>
+      </button>
+    </div>
+    <!--v-if-->
+    <!--v-if-->
+    <!--v-if-->
+  </div>
+</div>"
+`;
+
+exports[`SpaceHeader > space image > should show the set image 1`] = `
+"<div class="space-header oc-p-m oc-flex">
+  <div class="space-header-image"><button class="btn-toggle-image"><label class="oc-invisible-sr" for="btn-toggle-image">Expand space image</label> <img alt="" src="blob:image"></button></div>
+  <div class="space-header-infos">
+    <div class="oc-flex oc-mb-s oc-flex-middle oc-flex-between">
+      <div class="oc-flex oc-flex-middle space-header-infos-heading">
+        <h2 class="space-header-name"></h2> <button type="button" aria-label="Show context menu" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw oc-ml-s" id="space-context-btn">
+          <!--v-if-->
+          <!-- @slot Content of the button --> <span class="oc-icon oc-icon-m oc-icon-passive"><!----></span>
+        </button>
+        <div id="space-context-drop" class="oc-drop oc-box-shadow-medium oc-rounded" options="[object Object]">
+          <!-- eslint-enable vuejs-accessibility/no-static-element-interactions -->
+          <!-- eslint-enable vuejs-accessibility/click-events-have-key-events -->
+          <div class="oc-card oc-card-body oc-background-secondary oc-p-s">
+            <space-context-actions-stub actionoptions="[object Object]"></space-context-actions-stub>
+          </div>
+        </div>
+      </div> <button type="button" aria-label="Open context menu and show members" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-raw">
+        <!--v-if-->
+        <!-- @slot Content of the button --> <span class="oc-icon oc-icon-s oc-icon-passive"><!----></span> <span class="space-header-people-count oc-text-small">21 members</span>
+      </button>
+    </div>
+    <!--v-if-->
+    <!--v-if-->
+    <!--v-if-->
+  </div>
+</div>"
+`;

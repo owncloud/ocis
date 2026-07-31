@@ -7,6 +7,7 @@ directives:
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
     # In contrary to bash and docker the default is given after the | character
     - 'https://${KEYCLOAK_DOMAIN|keycloak.owncloud.test}/'
+    - 'https://localhost:8443/'
   default-src:
     - '''none'''
   font-src:
@@ -18,11 +19,17 @@ directives:
     - '''self'''
     - 'blob:'
     - 'https://embed.diagrams.net/'
+    # In contrary to bash and docker the default is given after the | character
+    - 'https://${ONLYOFFICE_DOMAIN|onlyoffice:443}/'
+    - 'https://${COLLABORA_DOMAIN|collabora:9980}/'
   img-src:
     - '''self'''
     - 'data:'
     - 'blob:'
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+    # In contrary to bash and docker the default is given after the | character
+    - 'https://${ONLYOFFICE_DOMAIN|onlyoffice:443}/'
+    - 'https://${COLLABORA_DOMAIN|collabora:9980}/'
   manifest-src:
     - '''self'''
   media-src:

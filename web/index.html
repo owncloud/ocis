@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0" />
+    <meta name="theme-color" content="#375f7E" />
+    <meta http-equiv="x-ua-compatible" content="IE=edge" />
+
+    <title><%= data.title %></title>
+    <link rel="manifest" href="manifest.json" crossorigin="use-credentials" />
+    <% if (data.buildConfig.cdn) { %>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.3.7/require.min.js"></script>
+    <script>
+      if (typeof requirejs === 'undefined') {
+        document.write('<script src="js/require.js?<%= data.compilationTimestamp %>">\x3C/script>')
+      }
+    </script>
+    <% } else { %>
+    <script src="js/require.js?<%= data.compilationTimestamp %>"></script>
+    <% } %>
+    <script type="module" src="./packages/web-runtime/src/index.ts"></script>
+    <script type="module">
+      // Fix Buffer usage in production (!)
+      // If single file downloads work in production after removing this, it can probably be removed permanently
+      import { Buffer } from "buffer";
+      window.Buffer = Buffer;
+    </script>
+    <link rel="stylesheet" href="./packages/design-system/src/styles/stylesWrapper.scss" />
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+      .splash-banner {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 0.5rem;
+        height: 100%;
+      }
+      .splash-hide {
+        display: none;
+      }
+      #loading {
+        display: inline-block;
+        height: 34px;
+        width: 34px;
+        border: 1px solid #4c5f79;
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+        -webkit-animation: spin 1s linear infinite;
+      }
+      #splash-incompatible button {
+        margin: 30px 0;
+      }
+
+      @keyframes spin {
+        to {
+          -webkit-transform: rotate(360deg);
+        }
+      }
+      @-webkit-keyframes spin {
+        to {
+          -webkit-transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="splash-incompatible" class="splash-banner splash-hide">
+      <div class="oc-card oc-border oc-rounded oc-width-large oc-text-center">
+        <div class="oc-card-header">
+          <div class="oc-flex oc-flex-middle oc-flex-center">
+            <span class="oc-mr-s oc-icon oc-icon-m oc-icon-warning">
+              <svg
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <g xmlns="http://www.w3.org/2000/svg">
+                  <path fill="none" d="M0 0h24v24H0z"></path>
+                  <path
+                    d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM11 7h2v2h-2V7zm0 4h2v6h-2v-6z"
+                  ></path>
+                </g>
+              </svg>
+            </span>
+            <h2>Your browser is not supported</h2>
+          </div>
+        </div>
+        <div class="oc-card-body oc-link-resolve-error-message">
+          <p>Your browser version is considered old and might not work correctly.</p>
+          <p>We recommend you update to a newer version.</p>
+        </div>
+      </div>
+      <button
+        class="oc-button oc-button-primary oc-button-primary-filled oc-rounded"
+        onclick="forceOldBrowser()"
+      >
+        I want to continue anyway
+      </button>
+      <% if (data.buildConfig.documentation_url) { %>
+      <p>
+        <a href="<%= data.buildConfig.documentation_url %>" target="_blank"
+          >Click here to know more</a
+        >
+      </p>
+      <% } %>
+    </div>
+    <div id="splash-loading" class="splash-banner splash-hide">
+      <div id="loading"></div>
+    </div>
+    <div id="owncloud"></div>
+    <noscript>
+      <div class="splash-banner"><h3>Please enable JavaScript</h3></div>
+    </noscript>
+    <script>
+      function runtimeLoaded() {}
+
+      var loader = document.getElementById('splash-loading')
+      var browserError = document.getElementById('splash-incompatible')
+
+      var loaderTimer = setTimeout(function () {
+        loader.classList.remove('splash-hide')
+      }, 500);
+
+      function displayError() {
+        loader.classList.remove('splash-hide')
+        loader.innerHTML = "<h3>Oops. Something went wrong.</h3>"
+      }
+
+      function displayBrowserError() {
+        clearTimeout(loaderTimer)
+        removeLoadingSpinner()
+        browserError.classList.remove('splash-hide')
+      }
+
+      function forceOldBrowser() {
+        localStorage.setItem("forceAllowOldBrowser", JSON.stringify({expiry: new Date().getTime() + 30*24*60*60*1000}))
+        browserError.classList.add('splash-hide')
+        init()
+      }
+
+      function removeLoadingSpinner() {
+        if (!loader.classList.contains('splash-hide')) {
+          loader.classList.add('splash-hide')
+        }
+      }
+
+      function init() {
+        if (typeof requirejs === 'undefined') {
+          displayError()
+        } else {
+          window.runtimeLoaded = function(runtime) {
+            clearTimeout(loaderTimer)
+            runtime.bootstrapApp('config.json', removeLoadingSpinner).catch((error) => {
+              removeLoadingSpinner()
+              runtime.bootstrapErrorApp(error)
+            })
+          }
+        }
+      }
+
+      const supportedBrowsers = <%= data.supportedBrowsersRegex %>
+      const forceAllowOldBrowser = localStorage.getItem("forceAllowOldBrowser") || false
+      const validForceAllowOldBrowser = forceAllowOldBrowser && JSON.parse(localStorage.getItem("forceAllowOldBrowser")).expiry > new Date().getTime()
+
+      if (forceAllowOldBrowser && !validForceAllowOldBrowser)
+        localStorage.removeItem("forceAllowOldBrowser")
+
+      if (!validForceAllowOldBrowser && !supportedBrowsers.test(navigator.userAgent)) {
+        displayBrowserError()
+      } else {
+        init()
+      }
+
+      var scriptTags = document.getElementsByTagName('script')
+      for (let i = 0; i < scriptTags.length; i++) {
+        if (scriptTags[i].src) {
+          scriptTags[i].onerror = displayError
+        }
+      }
+    </script>
+  </body>
+</html>

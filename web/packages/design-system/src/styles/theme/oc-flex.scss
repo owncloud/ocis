@@ -1,0 +1,207 @@
+// Ported from UiKit until we change UI frameworks
+
+/* ========================================================================
+   Component: Flex
+ ========================================================================== */
+
+.oc-flex { display: flex; }
+.oc-flex-inline { display: inline-flex; }
+
+/*
+  * Remove pseudo elements created by micro clearfix as precaution
+  */
+
+.oc-flex::before,
+.oc-flex::after,
+.oc-flex-inline::before,
+.oc-flex-inline::after { display: none; }
+
+/* Alignment
+  ========================================================================== */
+
+/*
+  * Align items along the main axis of the current line of the flex container
+  * Row: Horizontal
+  */
+
+// Default
+.oc-flex-left { justify-content: flex-start; }
+.oc-flex-center { justify-content: center; }
+.oc-flex-right { justify-content: flex-end; }
+.oc-flex-between { justify-content: space-between; }
+.oc-flex-around { justify-content: space-around; }
+
+/* Phone landscape and bigger */
+@media (min-width: $oc-breakpoint-small-default) {
+
+  .oc-flex-left\@s { justify-content: flex-start; }
+  .oc-flex-center\@s { justify-content: center; }
+  .oc-flex-right\@s { justify-content: flex-end; }
+  .oc-flex-between\@s { justify-content: space-between; }
+  .oc-flex-around\@s { justify-content: space-around; }
+}
+
+/* Tablet landscape and bigger */
+@media (min-width: $oc-breakpoint-medium-default) {
+
+  .oc-flex-left\@m { justify-content: flex-start; }
+  .oc-flex-center\@m { justify-content: center; }
+  .oc-flex-right\@m { justify-content: flex-end; }
+  .oc-flex-between\@m { justify-content: space-between; }
+  .oc-flex-around\@m { justify-content: space-around; }
+}
+
+/* Desktop and bigger */
+@media (min-width: $oc-breakpoint-large-default) {
+
+  .oc-flex-left\@l { justify-content: flex-start; }
+  .oc-flex-center\@l { justify-content: center; }
+  .oc-flex-right\@l { justify-content: flex-end; }
+  .oc-flex-between\@l { justify-content: space-between; }
+  .oc-flex-around\@l { justify-content: space-around; }
+}
+
+/* Large screen and bigger */
+@media (min-width: $oc-breakpoint-xlarge) {
+
+  .oc-flex-left\@xl { justify-content: flex-start; }
+  .oc-flex-center\@xl { justify-content: center; }
+  .oc-flex-right\@xl { justify-content: flex-end; }
+  .oc-flex-between\@xl { justify-content: space-between; }
+  .oc-flex-around\@xl { justify-content: space-around; }
+}
+
+/*
+  * Align items in the cross axis of the current line of the flex container
+  * Row: Vertical
+  */
+
+// Default
+.oc-flex-stretch { align-items: stretch; }
+.oc-flex-top { align-items: flex-start; }
+.oc-flex-middle { align-items: center; }
+.oc-flex-bottom { align-items: flex-end; }
+
+/* Direction
+  ========================================================================== */
+
+// Default
+.oc-flex-row { flex-direction: row; }
+.oc-flex-row-reverse { flex-direction: row-reverse; }
+.oc-flex-column { flex-direction: column; }
+.oc-flex-column-reverse { flex-direction: column-reverse; }
+
+/* Wrap
+  ========================================================================== */
+
+// Default
+.oc-flex-nowrap { flex-wrap: nowrap; }
+.oc-flex-wrap { flex-wrap: wrap; }
+.oc-flex-wrap-reverse { flex-wrap: wrap-reverse; }
+
+/*
+  * Aligns items within the flex container when there is extra space in the cross-axis
+  * Only works if there is more than one line of flex items
+  */
+
+// Default
+.oc-flex-wrap-stretch { align-content: stretch; }
+.oc-flex-wrap-top { align-content: flex-start; }
+.oc-flex-wrap-middle { align-content: center; }
+.oc-flex-wrap-bottom { align-content: flex-end; }
+.oc-flex-wrap-between { align-content: space-between; }
+.oc-flex-wrap-around { align-content: space-around; }
+
+/* Item ordering
+  ========================================================================== */
+
+/*
+  * Default is 0
+  */
+
+.oc-flex-first { order: -1; }
+.oc-flex-last { order: 99; }
+
+/* Phone landscape and bigger */
+@media (min-width: $oc-breakpoint-small-default) {
+
+  .oc-flex-first\@s { order: -1; }
+  .oc-flex-last\@s { order: 99; }
+}
+
+/* Tablet landscape and bigger */
+@media (min-width: $oc-breakpoint-medium-default) {
+
+  .oc-flex-first\@m { order: -1; }
+  .oc-flex-last\@m { order: 99; }
+}
+
+/* Desktop and bigger */
+@media (min-width: $oc-breakpoint-large-default) {
+
+  .oc-flex-first\@l { order: -1; }
+  .oc-flex-last\@l { order: 99; }
+}
+
+/* Large screen and bigger */
+@media (min-width: $oc-breakpoint-xlarge) {
+
+  .oc-flex-first\@xl { order: -1; }
+  .oc-flex-last\@xl { order: 99; }
+}
+
+/* Item dimensions
+  ========================================================================== */
+
+/*
+  * Initial: 0 1 auto
+  * Content dimensions, but shrinks
+  */
+
+/*
+  * No Flex: 0 0 auto
+  * Content dimensions
+  */
+
+.oc-flex-none { flex: none; }
+
+/*
+  * Relative Flex: 1 1 auto
+  * Space is allocated considering content
+  */
+
+.oc-flex-auto { flex: auto; }
+
+/*
+  * Absolute Flex: 1 1 0%
+  * Space is allocated solely based on flex
+  */
+
+.oc-flex-1 { flex: 1; }
+
+/* Spacing
+  ========================================================================== */
+
+.oc-gap-xs {
+  gap: $oc-space-xsmall;
+}
+
+.oc-gap-s {
+  gap: $oc-space-small;
+}
+
+.oc-gap-m {
+  gap: $oc-space-medium;
+}
+
+.oc-gap-l {
+  gap: $oc-space-large;
+}
+
+.oc-gap-xl {
+  gap: $oc-space-xlarge;
+}
+
+.oc-gap-xxl {
+  gap: $oc-space-xxlarge;
+}

@@ -1,0 +1,15 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SidebarToggle component > should show the "Toggle sidebar"-button with sidebar opened and closed 1`] = `
+"<button type="button" aria-label="Open sidebar to view details" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-brand oc-button-brand-raw-inverse oc-my-s" id="files-toggle-sidebar" issidebaropen="true">
+  <!--v-if-->
+  <!-- @slot Content of the button --> <span class="oc-icon oc-icon-m oc-icon-passive"><!----></span>
+</button>"
+`;
+
+exports[`SidebarToggle component > should show the "Toggle sidebar"-button with sidebar opened and closed 2`] = `
+"<button type="button" aria-label="Open sidebar to view details" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-brand oc-button-brand-raw-inverse oc-my-s" id="files-toggle-sidebar" issidebaropen="false">
+  <!--v-if-->
+  <!-- @slot Content of the button --> <span class="oc-icon oc-icon-m oc-icon-passive"><!----></span>
+</button>"
+`;

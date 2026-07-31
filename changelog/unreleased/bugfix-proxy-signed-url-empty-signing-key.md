@@ -1,4 +1,4 @@
-Bugfix: Prevent panic in presigned URL authentication when the signing key is missing
+Bugfix: Prevent panic in presigned URL auth when signing key is missing
 
 The presigned-URL authenticator read the per-user signing key from a store and
 indexed the first record without checking that the result was non-empty. When
