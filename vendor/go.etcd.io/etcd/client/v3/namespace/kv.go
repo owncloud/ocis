@@ -17,9 +17,6 @@ package namespace
 import (
 	"context"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	pb "go.etcd.io/etcd/api/v3/etcdserverpb"
 	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -65,11 +62,6 @@ func (kv *kvPrefix) Get(ctx context.Context, key string, opts ...clientv3.OpOpti
 	get := r.Get()
 	kv.unprefixGetResponse(get)
 	return get, nil
-}
-
-// GetStream is not supported by kvPrefix.
-func (kv *kvPrefix) GetStream(ctx context.Context, key string, opts ...clientv3.OpOption) (clientv3.GetStreamChan, error) {
-	return nil, status.Error(codes.Unimplemented, "GetStream is not supported by kvPrefix")
 }
 
 func (kv *kvPrefix) Delete(ctx context.Context, key string, opts ...clientv3.OpOption) (*clientv3.DeleteResponse, error) {
@@ -199,11 +191,11 @@ func (kv *kvPrefix) prefixInterval(key, end []byte) (pfxKey []byte, pfxEnd []byt
 func (kv *kvPrefix) prefixCmps(cs []clientv3.Cmp) []clientv3.Cmp {
 	newCmps := make([]clientv3.Cmp, len(cs))
 	for i := range cs {
-		newCmps[i] = cs[i].Clone()
-		pfxKey, endKey := kv.prefixInterval(cs[i].KeyBytes(), cs[i].GetCompare().GetRangeEnd())
+		newCmps[i] = cs[i]
+		pfxKey, endKey := kv.prefixInterval(cs[i].KeyBytes(), cs[i].RangeEnd)
 		newCmps[i].WithKeyBytes(pfxKey)
-		if len(cs[i].GetCompare().GetRangeEnd()) != 0 {
-			newCmps[i].GetCompare().RangeEnd = endKey
+		if len(cs[i].RangeEnd) != 0 {
+			newCmps[i].RangeEnd = endKey
 		}
 	}
 	return newCmps
