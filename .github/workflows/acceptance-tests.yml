@@ -445,13 +445,13 @@ jobs:
       matrix:
         include:
           - suite: part-1
-            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc --run-part 1"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 1"
           - suite: part-2
-            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc --run-part 2"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 2"
           - suite: part-3
-            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc --run-part 3"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 3"
           - suite: part-4
-            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc --run-part 4"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 4"
           - suite: search
             args: "--type playwright --suites search"
             tika: true
