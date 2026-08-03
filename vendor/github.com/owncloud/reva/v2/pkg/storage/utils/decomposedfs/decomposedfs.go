@@ -473,7 +473,7 @@ func (fs *Decomposedfs) processEvent(evCtx context.Context, event events.Event, 
 			return
 		}
 
-		if err := n.RevertCurrentRevision(ctx); err != nil {
+		if err := n.RevertCurrentRevision(ctx, true); err != nil {
 			sublog.Error().Err(err).Msg("Failed to revert revision")
 			return
 		}
