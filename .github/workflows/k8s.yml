@@ -9,18 +9,16 @@ on:
 env:
   PHP_VERSION: "8.4"
   K3D_VERSION: "v5.8.3"
-  KUBECTL_VERSION: v1.36.0
   HELM_VERSION: "v3.18.4"
   TEST_SERVER_URL: https://ocis-server
   STORAGE_DRIVER: ocis
   OCIS_WRAPPER_URL: http://localhost:5200
   K8S: true
-  LIBCURL_VERSION: 8.12.0
 
 jobs:
   api-tests:
     name: ${{ matrix.suite }}-k8s
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
 
     if: >-
       github.event_name == 'schedule' ||
@@ -85,58 +83,6 @@ jobs:
           extensions: curl, xml, mbstring, zip, ldap, gd
           tools: composer
 
-      - name: Cache libcurl ${{ env.LIBCURL_VERSION }}
-        id: cache-libcurl
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
-        with:
-          path: /opt/libcurl
-          key: libcurl-${{ env.LIBCURL_VERSION }}-${{ runner.os }}
-
-      - name: Install libcurl build dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo NEEDRESTART_MODE=a apt-get install -y \
-            libssl-dev \
-            libnghttp2-dev \
-            libpsl-dev \
-            libldap-dev \
-            libssh-dev \
-            zlib1g-dev \
-            libvips-dev
-
-      - name: Compile libcurl
-        if: steps.cache-libcurl.outputs.cache-hit != 'true'
-        run: |
-          cd /tmp
-          curl -sLO https://curl.se/download/curl-${{ env.LIBCURL_VERSION }}.tar.gz
-          tar xzf curl-${{ env.LIBCURL_VERSION }}.tar.gz
-          cd curl-${{ env.LIBCURL_VERSION }}
-          ./configure \
-            --with-ssl \
-            --with-zlib \
-            --with-nghttp2 \
-            --prefix=/opt/libcurl \
-            --enable-versioned-symbols \
-            --silent
-          make -j$(nproc) --silent
-          sudo make install --silent
-
-      - name: Restore libcurl
-        run: |
-          echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
-          sudo ldconfig
-
-          /opt/libcurl/bin/curl --version | head -1
-
-          php -r '
-            $v = curl_version()["version"];
-            echo "PHP curl: $v\n";
-            if (version_compare($v,"${{ env.LIBCURL_VERSION }}","<")) {
-              fwrite(STDERR,"Need >= ${{ env.LIBCURL_VERSION }}\n");
-              exit(1);
-            }
-          '
-
       - name: Download k3d
         run: |
           curl -L \
@@ -146,6 +92,13 @@ jobs:
           chmod +x k3d
           sudo mv k3d /usr/local/bin/
           k3d version
+        
+      - name: Install Helm
+        run: |
+          curl -fsSL -o helm-${{ env.HELM_VERSION }}-linux-amd64.tar.gz https://get.helm.sh/helm-${{ env.HELM_VERSION }}-linux-amd64.tar.gz
+          tar -zxvf helm-${{ env.HELM_VERSION }}-linux-amd64.tar.gz
+          sudo mv linux-amd64/helm /usr/local/bin/helm
+          helm version --short
 
       - name: Prepare hosts
         run: |
@@ -203,7 +156,7 @@ jobs:
       
       - name: Wait for oCIS to be ready
         env:
-          FILE_URL: https://ocis-server/remote.php/dav/files/admin/hello1.txt
+          FILE_URL: ${{ env.TEST_SERVER_URL }}/remote.php/dav/files/admin/hello1.txt
         run: |
           kubectl wait \
             --namespace ocis-server \
@@ -298,7 +251,7 @@ jobs:
           EXPECTED_FAILURES_FILE: tests/acceptance/expected-failures-localAPI-on-OCIS-storage.md
           OCIS_WRAPPER_URL: ${{ env.OCIS_WRAPPER_URL }}
           COLLABORATION_SERVICE_URL: http://ocis-server:9304
-          K8S: "true"
+          K8S: ${{ env.K8S }}
         run: make test-acceptance-api
 
       - name: Run ${{ matrix.suite }} tests
