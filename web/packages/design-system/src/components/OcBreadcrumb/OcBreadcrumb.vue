@@ -12,7 +12,8 @@
         :data-key="index"
         :data-item-id="item.id"
         :aria-hidden="item.isTruncationPlaceholder"
-        :tabindex="item.isTruncationPlaceholder ? -1 : 0"
+        :inert="item.isTruncationPlaceholder || undefined"
+        tabindex="-1"
         :class="[
           'oc-breadcrumb-list-item',
           'oc-flex',
@@ -33,6 +34,7 @@
         <router-link
           v-if="item.to"
           :aria-current="getAriaCurrent(index)"
+          :tabindex="item.isTruncationPlaceholder ? -1 : undefined"
           :to="item.isTruncationPlaceholder ? lastHiddenItem.to : item.to"
         >
           <span class="oc-breadcrumb-item-text oc-breadcrumb-item-navigable">{{ item.text }}</span>

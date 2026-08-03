@@ -4,7 +4,7 @@ exports[`FileShares > collaborators list > renders sharedWithLabel and sharee li
 "<div data-v-89647fdf="" id="oc-files-sharing-sidebar" class="oc-position-relative">
   <div data-v-89647fdf="" class="oc-flex oc-flex-between oc-flex-middle">
     <div data-v-89647fdf="" class="oc-flex">
-      <h4 data-v-89647fdf="" class="oc-text-bold oc-text-medium oc-m-rm" data-msgid="Share with people" data-current-language="en">Share with people</h4>
+      <h4 data-v-89647fdf="" class="oc-text-bold oc-text-medium oc-m-rm">Share with people</h4>
       <oc-contextual-helper-stub data-v-89647fdf="" title="Share with people" text="Use the input field to search for users and groups. Select them to share the item." list="[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]" endtext="" readmorelink="https://doc.owncloud.com/go?to=webui-users-sharing" class="oc-pl-xs"></oc-contextual-helper-stub>
     </div>
     <copy-private-link-stub data-v-89647fdf="" resource="undefined"></copy-private-link-stub>
@@ -41,7 +41,7 @@ exports[`FileShares > current space > loads space members if a space is given an
 "<div data-v-89647fdf="" id="oc-files-sharing-sidebar" class="oc-position-relative">
   <div data-v-89647fdf="" class="oc-flex oc-flex-between oc-flex-middle">
     <div data-v-89647fdf="" class="oc-flex">
-      <h4 data-v-89647fdf="" class="oc-text-bold oc-text-medium oc-m-rm" data-msgid="Share with people" data-current-language="en">Share with people</h4>
+      <h4 data-v-89647fdf="" class="oc-text-bold oc-text-medium oc-m-rm">Share with people</h4>
       <oc-contextual-helper-stub data-v-89647fdf="" title="Share with people" text="Use the input field to search for users and groups. Select them to share the item." list="[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]" endtext="" readmorelink="https://doc.owncloud.com/go?to=webui-users-sharing" class="oc-pl-xs"></oc-contextual-helper-stub>
     </div>
     <copy-private-link-stub data-v-89647fdf="" resource="undefined"></copy-private-link-stub>

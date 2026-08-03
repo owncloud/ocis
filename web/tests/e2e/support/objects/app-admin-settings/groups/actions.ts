@@ -106,7 +106,7 @@ export const deleteGroupUsingContextMenu = async (args: {
   await page.locator(util.format(groupIdSelector, uuid)).click()
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
-    ['tippbBox'],
+    ['tippyBox'],
     'group contex menu'
   )
   await page.locator(deleteBtnContextMenu).click()
@@ -224,7 +224,7 @@ export const openEditPanel = async (args: {
       await page.locator(util.format(groupIdSelector, uuid)).click()
       await objects.a11y.Accessibility.assertNoSevereA11yViolations(
         page,
-        ['tippbBox'],
+        ['tippyBox'],
         'group contex menu'
       )
       await page.locator(editActionBtnContextMenu).click()

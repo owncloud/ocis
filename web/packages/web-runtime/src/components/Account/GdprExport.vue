@@ -1,7 +1,7 @@
 <template>
   <div>
     <span v-if="loading">
-      <oc-spinner />
+      <oc-spinner :aria-label="$gettext('Loading GDPR export status')" />
     </span>
     <span
       v-else-if="exportInProgress"

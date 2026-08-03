@@ -8,7 +8,9 @@
     "test:unit": "NODE_OPTIONS=--unhandled-rejections=throw vitest"
   },
   "dependencies": {
-    "epubjs": "^0.3.93"
+    "@zip.js/zip.js": "2.8.33",
+    "epubjs": "^0.3.93",
+    "focus-trap-vue": "^4.1.0"
   },
   "devDependencies": {
     "@ownclouders/web-test-helpers": "workspace:*"
@@ -16,6 +18,6 @@
   "peerDependencies": {
     "@ownclouders/web-client": "workspace:*",
     "@ownclouders/web-pkg": "workspace:*",
-    "vue3-gettext": "2.4.0"
+    "vue3-gettext": "^4.0.1"
   }
 }

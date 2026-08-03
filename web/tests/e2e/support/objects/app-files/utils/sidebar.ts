@@ -30,8 +30,8 @@ const openForResource = async ({
     )
     await objects.a11y.Accessibility.assertNoSevereA11yViolations(
       page,
-      ['tippyBox'],
-      'account page'
+      [folderModalIframe],
+      'account page tippy box'
     )
     await page
       .frameLocator(folderModalIframe)
@@ -118,9 +118,10 @@ export const open = async ({
   }
 
   resource ? await openForResource({ page, resource, resourceType }) : await openGlobal({ page })
+  // the password-protected-folder sidebar lives inside its own iframe, not #app-sidebar
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
-    [sidebarPanel],
+    [resourceType === 'passwordProtectedFolder' ? folderModalIframe : sidebarPanel],
     'sidebar panel opening'
   )
 }

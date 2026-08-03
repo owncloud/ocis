@@ -70,6 +70,7 @@
       <template #quickActions="{ resource }">
         <oc-button
           v-oc-tooltip="hideShareAction.label({ space: null, resources: [resource] })"
+          :aria-label="hideShareAction.label({ space: null, resources: [resource] })"
           appearance="raw"
           :class="['oc-p-xs', hideShareAction.class]"
           @click.stop="hideShareAction.handler({ space: null, resources: [resource] })"

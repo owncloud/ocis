@@ -56,8 +56,8 @@ export const selectors = {
   createGroupInput: '#create-group-input-display-name',
   actionConfirmButton: '.oc-modal-body-actions-confirm',
   contextMenuContainer: '#oc-files-context-menu',
-  groupList: '.group-list',
-  editPanel: '.sidebar-panel__body-EditPanel:visible',
+  groupList: '#group-list',
+  editPanel: '.sidebar-panel:not([inert]) .sidebar-panel__body-EditPanel',
   breadcrumb: '#files-breadcrumb',
   previewControlBar: '.preview-controls-action-bar',
   uploadInfoSnackBar: '#upload-info-snackbar',
@@ -87,17 +87,21 @@ const a11yRuleTags = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice
 export const analyzeAccessibilityConformityViolations = async (args: {
   page: Page
   include: string
+  disabledRules?: string[]
 }): Promise<AxeResults['violations']> => {
   if (config.skipA11y) {
     return []
   }
 
-  const { page, include } = args
+  const { page, include, disabledRules } = args
 
-  const a11yResult = await new AxeBuilder({ page })
-    .withTags(a11yRuleTags)
-    .include(include)
-    .analyze()
+  const axeBuilder = new AxeBuilder({ page }).withTags(a11yRuleTags).include(include)
+
+  if (disabledRules?.length) {
+    axeBuilder.disableRules(disabledRules)
+  }
+
+  const a11yResult = await axeBuilder.analyze()
 
   if (config.testType === 'playwright') {
     test.info().attach('accessibility-scan', {

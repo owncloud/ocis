@@ -13,12 +13,22 @@ export class Accessibility {
     return po.selectors
   }
 
-  async getAccessibilityConformityViolations(include: string): Promise<AxeResults['violations']> {
-    return await po.analyzeAccessibilityConformityViolations({ page: this.#page, include })
+  async getAccessibilityConformityViolations(
+    include: string,
+    disabledRules?: string[]
+  ): Promise<AxeResults['violations']> {
+    return await po.analyzeAccessibilityConformityViolations({
+      page: this.#page,
+      include,
+      disabledRules
+    })
   }
 
-  async getSevereAccessibilityViolations(include: string): Promise<AxeResults['violations']> {
-    const violations = await this.getAccessibilityConformityViolations(include)
+  async getSevereAccessibilityViolations(
+    include: string,
+    disabledRules?: string[]
+  ): Promise<AxeResults['violations']> {
+    const violations = await this.getAccessibilityConformityViolations(include, disabledRules)
     return violations.filter(
       (violation) => violation.impact === 'critical' || violation.impact === 'serious'
     )
@@ -86,13 +96,14 @@ export class Accessibility {
   static async assertNoSevereA11yViolations(
     page: Page,
     selectors: string[],
-    selectorLabel: string
+    selectorLabel: string,
+    disabledRules?: string[]
   ): Promise<void> {
     const a11yObject = new Accessibility({ page })
     const allViolations: AxeResults['violations'] = []
     for (const selector of selectors) {
       const include = a11yObject.getSelectors()[selector] || selector
-      const violations = await a11yObject.getSevereAccessibilityViolations(include)
+      const violations = await a11yObject.getSevereAccessibilityViolations(include, disabledRules)
       allViolations.push(...violations)
     }
     expect(

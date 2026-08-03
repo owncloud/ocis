@@ -18,7 +18,7 @@
           class="oc-mt-s"
           :to="spacesRoute"
         >
-          <span v-translate>Go to »Spaces Overview«</span>
+          <span>{{ $gettext('Go to »Spaces Overview«') }}</span>
         </oc-button>
       </template>
     </no-content-message>

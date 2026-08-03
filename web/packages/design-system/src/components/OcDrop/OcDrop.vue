@@ -74,6 +74,7 @@ interface Props {
   offset?: string
   sameWidthAsTarget?: boolean
   focusOnOpen?: boolean
+  role?: string | null
 }
 interface Emits {
   (e: 'hideDrop'): void
@@ -98,7 +99,8 @@ const {
   paddingSize = 'medium',
   offset = '',
   sameWidthAsTarget = false,
-  focusOnOpen = false
+  focusOnOpen = false,
+  role = null
 } = defineProps<Props>()
 
 const emit = defineEmits<Emits>()
@@ -297,7 +299,7 @@ function initializeTippy() {
       ]
     },
     content,
-    role: 'listbox'
+    role
   }
 
   if (unref(target)) {

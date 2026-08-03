@@ -15,6 +15,6 @@
     "luxon": "^3.7.2",
     "vue-concurrency": "^5.0.3",
     "vue-router": "^5.0.6",
-    "vue3-gettext": "^2.4.0"
+    "vue3-gettext": "^4.0.1"
   }
 }

@@ -12,6 +12,7 @@
         :max="100"
         size="small"
         :variation="quotaProgressVariant"
+        :aria-label="personalStorageDetailsLabel"
       />
     </div>
   </div>
@@ -53,8 +54,7 @@ export default defineComponent({
             percentage: (unref(quotaUsagePercent) || 0).toString()
           })
         : $gettext('%{used} used', {
-            used: formatFileSize(used, currentLanguage),
-            total: formatFileSize(total, currentLanguage)
+            used: formatFileSize(used, currentLanguage)
           })
     })
 

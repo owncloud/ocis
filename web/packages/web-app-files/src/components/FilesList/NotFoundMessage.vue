@@ -5,11 +5,11 @@
   >
     <oc-icon name="cloud" type="div" size="xxlarge" />
     <div class="oc-text-muted oc-text-xlarge">
-      <span v-translate>Resource not found</span>
+      <span>{{ $gettext('Resource not found') }}</span>
     </div>
     <div class="oc-text-muted">
-      <span v-translate>
-        We went looking everywhere, but were unable to find the selected resource.
+      <span>
+        {{ $gettext('We went looking everywhere, but were unable to find the selected resource.') }}
       </span>
     </div>
     <div class="oc-mt-s">
@@ -20,7 +20,7 @@
         appearance="raw"
         :to="spacesRoute"
       >
-        <span v-translate>Go to »Spaces Overview«</span>
+        <span>{{ $gettext('Go to »Spaces Overview«') }}</span>
       </oc-button>
       <oc-button
         v-if="showHomeButton"
@@ -29,7 +29,7 @@
         appearance="raw"
         :to="homeRoute"
       >
-        <span v-translate>Go to »Personal« page</span>
+        <span>{{ $gettext('Go to »Personal« page') }}</span>
       </oc-button>
       <oc-button
         v-if="showPublicLinkButton"
@@ -38,7 +38,7 @@
         appearance="raw"
         :to="publicLinkRoute"
       >
-        <span v-translate>Reload public link</span>
+        <span>{{ $gettext('Reload public link') }}</span>
       </oc-button>
     </div>
   </div>

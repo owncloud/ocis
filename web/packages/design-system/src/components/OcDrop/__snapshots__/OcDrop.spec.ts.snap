@@ -21,7 +21,6 @@ exports[`OcDrop > tippy > renders tippy 1`] = `
       data-reference-hidden=""
       data-state="visible"
       data-theme="none"
-      role="listbox"
       style="max-width: 416px; transition-duration: 300ms;"
       tabindex="-1"
     >
@@ -73,7 +72,6 @@ exports[`OcDrop > tippy > renders tippy 2`] = `
       data-reference-hidden=""
       data-state="hidden"
       data-theme="none"
-      role="listbox"
       style="max-width: 416px; transition-duration: 250ms;"
       tabindex="-1"
     >
@@ -125,7 +123,6 @@ exports[`OcDrop > tippy > renders tippy 3`] = `
       data-reference-hidden=""
       data-state="visible"
       data-theme="none"
-      role="listbox"
       style="max-width: 416px; transition-duration: 300ms;"
       tabindex="-1"
     >

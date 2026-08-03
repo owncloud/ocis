@@ -71,9 +71,7 @@ export const openSharingPanel = async function (
 }
 
 export type ActionViaType =
-  | typeof fileAction.sideBarPanel
-  | typeof fileAction.quickAction
-  | typeof fileAction.urlNavigation
+  typeof fileAction.sideBarPanel | typeof fileAction.quickAction | typeof fileAction.urlNavigation
 
 export interface createShareArgs extends ShareArgs {
   via: ActionViaType
@@ -94,7 +92,6 @@ export const createShare = async (args: createShareArgs): Promise<void> => {
   const expirationDate = recipients[0].expirationDate
 
   if (expirationDate) {
-    await objects.a11y.Accessibility.assertNoSevereA11yViolations(page, ['tippyBox'], 'app sidebar')
     await page.locator(showMoreOptionsButton).click()
     await objects.a11y.Accessibility.assertNoSevereA11yViolations(page, ['tippyBox'], 'app sidebar')
     await Promise.all([

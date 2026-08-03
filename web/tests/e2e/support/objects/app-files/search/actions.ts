@@ -42,7 +42,11 @@ export const selectTagFilter = async ({
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
     ['tippyBox'],
-    'Text editor Save button is disabled after saving'
+    'Text editor Save button is disabled after saving',
+    // ItemFilter.vue nests a real checkbox inside a button so the row is clickable as a whole
+    // while the checkbox still reports selection state to screen readers; making the checkbox
+    // non-focusable would remove that state announcement, and disabling it changes its visuals
+    ['nested-interactive']
   )
 }
 
@@ -57,7 +61,9 @@ export const selectMediaTypeFilter = async ({
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
     ['tippyBox'],
-    'Media type filter dropdown'
+    'Media type filter dropdown',
+    // see selectTagFilter above: ItemFilter.vue's checkbox-inside-button pattern
+    ['nested-interactive']
   )
   await Promise.all([
     page.waitForResponse(
@@ -72,7 +78,9 @@ export const selectMediaTypeFilter = async ({
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
     ['filesView'],
-    'Files view after selecting media type filter'
+    'Files view after selecting media type filter',
+    // see selectTagFilter above: ItemFilter.vue's checkbox-inside-button pattern
+    ['nested-interactive']
   )
 }
 
@@ -116,7 +124,9 @@ export const clearFilter = async ({
   await a11y.Accessibility.assertNoSevereA11yViolations(
     page,
     ['filesView'],
-    `Files view after clearing ${filter} filter`
+    `Files view after clearing ${filter} filter`,
+    // see selectTagFilter above: ItemFilter.vue's checkbox-inside-button pattern
+    ['nested-interactive']
   )
 }
 

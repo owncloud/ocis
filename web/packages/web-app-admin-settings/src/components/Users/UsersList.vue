@@ -323,7 +323,7 @@ function handleSort(event: { sortBy: string; sortDir: SortDir }) {
   sortDir.value = event.sortDir
 }
 function getSelectUserLabel(user: User) {
-  return $gettext('Select %{ user }', { user: user.displayName }, true)
+  return $gettext('Select %{ user }', { user: user.displayName })
 }
 const allUsersSelected = computed(() => {
   return unref(paginatedItems).length === unref(selectedUsers).length

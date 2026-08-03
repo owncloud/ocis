@@ -33,7 +33,10 @@ export const buildBrowserContextOptions = (options: ActorOptions): BrowserContex
     acceptDownloads: options.context.acceptDownloads,
     permissions: permissions,
     ignoreHTTPSErrors: true,
-    locale: 'en-US'
+    locale: 'en-US',
+    // disable CSS animations so a11y scans don't race mid-transition (e.g. notification fade-in)
+    // and report false color-contrast violations from partially-transparent elements
+    reducedMotion: 'reduce'
   }
 
   if (options.context.reportVideo) {

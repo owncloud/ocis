@@ -4,10 +4,10 @@ exports[`ActivitiesPanel > should render a list of activities when data is prese
 "<div>
   <div class="oc-ml-s">
     <ul class="oc-list oc-my-rm oc-mx-rm timeline">
-      <li><span><strong>Marie Curie</strong> created <strong>new folder</strong>.</span> <span class="oc-text-muted oc-text-small oc-mt-s">Jul 29, 2024, 6:34 PM</span></li>
-      <li><span><strong>Albert Einstein</strong> moved <strong>textfile.txt</strong>.</span> <span class="oc-text-muted oc-text-small oc-mt-s">Jul 29, 2023, 6:34 PM</span></li>
-      <li><span><strong>Robert Oppenheimer</strong> deleted <strong>atom plans.pdf</strong>.</span> <span class="oc-text-muted oc-text-small oc-mt-s">Jul 29, 2022, 6:34 PM</span></li>
-      <li><span><strong>Albert Schweitzer</strong> removed <strong>Selfie.png</strong>.</span> <span class="oc-text-muted oc-text-small oc-mt-s">Jul 29, 2021, 6:34 PM</span></li>
+      <li><span>Marie Curie created <strong>new folder</strong>.</span> <span class="oc-text-muted oc-text-small oc-mt-s">Jul 29, 2024, 6:34 PM</span></li>
+      <li><span>Albert Einstein moved <strong>textfile.txt</strong>.</span> <span class="oc-text-muted oc-text-small oc-mt-s">Jul 29, 2023, 6:34 PM</span></li>
+      <li><span>Robert Oppenheimer deleted <strong>atom plans.pdf</strong>.</span> <span class="oc-text-muted oc-text-small oc-mt-s">Jul 29, 2022, 6:34 PM</span></li>
+      <li><span>Albert Schweitzer removed <strong>Selfie.png</strong>.</span> <span class="oc-text-muted oc-text-small oc-mt-s">Jul 29, 2021, 6:34 PM</span></li>
     </ul>
     <p class="oc-text-muted oc-text-small">Showing 4 activities</p>
   </div>

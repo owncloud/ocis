@@ -15,6 +15,24 @@ const ResizeObserverMock = vi.fn(function () {
 
 vi.stubGlobal('ResizeObserver', ResizeObserverMock)
 
+// jsdom (used via `@vitest-environment jsdom` overrides) doesn't implement matchMedia,
+// unlike the default happy-dom environment
+if (typeof window !== 'undefined' && !window.matchMedia) {
+  vi.stubGlobal(
+    'matchMedia',
+    vi.fn().mockImplementation((query) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn()
+    }))
+  )
+}
+
 vi.stubGlobal('define', vi.fn())
 
 // This is needed for KaTeX to work in the tests

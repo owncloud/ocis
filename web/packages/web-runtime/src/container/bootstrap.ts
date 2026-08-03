@@ -77,7 +77,7 @@ import {
   SseEventWrapperOptions
 } from './sse'
 import { loadAppTranslations } from '../helpers/language'
-import { urlJoin } from '@ownclouders/web-client'
+import { PASSWORD_PROTECTED_FOLDER_VIEW_QUERY, urlJoin } from '@ownclouders/web-client'
 import { supportedLanguages } from '../defaults'
 
 const getEmbedConfigFromQuery = (
@@ -118,12 +118,6 @@ const getEmbedConfigFromQuery = (
 
   if (delegateAuthentication) {
     config.delegateAuthentication = delegateAuthentication === 'true'
-  }
-
-  const delegateAuthenticationOrigin = getQueryParam('embed-delegate-authentication-origin')
-
-  if (delegateAuthentication) {
-    config.delegateAuthenticationOrigin = delegateAuthenticationOrigin
   }
 
   return config
@@ -180,6 +174,7 @@ export const announceConfiguration = async ({
     hideAppSwitcher: getQueryParam('hide-app-switcher') === 'true',
     hideAccountMenu: getQueryParam('hide-account-menu') === 'true',
     hideNavigation: getQueryParam('hide-navigation') === 'true',
+    passwordProtectedFolderView: getQueryParam(PASSWORD_PROTECTED_FOLDER_VIEW_QUERY) === 'true',
     defaultLanguage
   }
 

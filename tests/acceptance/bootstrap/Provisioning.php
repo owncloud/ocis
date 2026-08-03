@@ -29,8 +29,10 @@ use TestHelpers\HttpRequestHelper;
 use TestHelpers\OcisHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\GraphHelper;
+use TestHelpers\KeycloakHelper;
 use Laminas\Ldap\Exception\LdapException;
 use Laminas\Ldap\Ldap;
+use TestHelpers\WebUIHelper;
 
 /**
  * Functions for provisioning of users and groups
@@ -44,6 +46,39 @@ trait Provisioning {
 	private array $startingGroups = [];
 	private array $createdRemoteGroups = [];
 	private array $createdGroups = [];
+	private array $userTokens = [];
+	private array $createdKeycloakUsers = [];
+
+	/**
+	 * @param array $user
+	 * @param mixed $tokenData
+	 *
+	 * @return void
+	 */
+	public function setOcisUserToken(array $user, mixed $tokenData): void {
+		$userId = $user['actualUsername'] ?? null;
+		if (\is_object($tokenData)) {
+			$tokenData = (array) $tokenData;
+		}
+
+		$this->userTokens[$userId] = [
+			'user' => $user,
+			'token' => [
+				'userid' => $userId,
+				'accessToken' => $tokenData['access_token'],
+				'refreshToken' => $tokenData['refresh_token'],
+			],
+		];
+	}
+
+	/**
+	 * @param string $userId
+	 *
+	 * @return array
+	 */
+	public function getOcisUserToken(string $userId): array {
+		return $this->userTokens[$userId];
+	}
 
 	/**
 	 * Check if this is the admin group. That group is always a local group in
@@ -75,6 +110,13 @@ trait Provisioning {
 	 */
 	public function getCreatedUsers(): array {
 		return $this->createdUsers;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getCreatedKeycloakUsers(): array {
+		return $this->createdKeycloakUsers;
 	}
 
 	/**
@@ -525,6 +567,114 @@ trait Provisioning {
 	}
 
 	/**
+	 * @param array $userAttributes
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function createKeycloakUser(array $userAttributes): void {
+		$response = KeycloakHelper::createUser(
+			$userAttributes['userid'],
+			$userAttributes['password'],
+			$userAttributes['email'],
+			$userAttributes['displayName'],
+		);
+		if ($response->getStatusCode() !== 201) {
+			$responseBody = (string)$response->getBody();
+			throw new Exception(
+				__METHOD__ .
+				" Unexpected failure when creating the user in keycloak '" .
+				$userAttributes['userid'] . "'" .
+				"\nHTTP status " . $response->getStatusCode() .
+				"\nKeycloak response " . $responseBody,
+			);
+		}
+		$locationHeader = explode("/", $response->getHeader("Location")[0]);
+		$uuid = end($locationHeader);
+
+		// assign default ocisUser role to newly created user
+		$res = KeycloakHelper::assignRole($uuid, "User");
+		Assert::assertEquals(
+			204,
+			$res->getStatusCode(),
+			__METHOD__ . " failed to assign realm role to user '" .
+			$userAttributes['userid'] . "'" .
+			"\nHTTP status " . $res->getStatusCode() .
+			"\nKeycloak response " . (string)$res->getBody(),
+		);
+
+		$this->addUserToCreatedKeycloakUsersList(
+			$userAttributes['userid'],
+			$userAttributes['password'],
+			$userAttributes['displayName'],
+			$userAttributes['email'],
+			$uuid,
+			"User",
+		);
+	}
+
+	/**
+	 * @BeforeScenario
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function setAccessTokenForAdmin(): void {
+		if (!KeycloakHelper::isTestingWithKeycloak()) {
+			return;
+		}
+		KeycloakHelper::resetAdminAccessToken();
+		$adminUser = [
+			"password" => "admin",
+			"displayname" => "Admin Admin",
+			"email" => "admin@example.org",
+			"actualUsername" => "admin",
+		];
+		$state = WebUIHelper::setUpUser(
+			$this->getBaseUrl(),
+			$adminUser["actualUsername"],
+			$adminUser["password"],
+		);
+		$tokenData = \json_decode($state['origins'][0]['localStorage'][2]['value']);
+		$this->setOcisUserToken($adminUser, $tokenData);
+	}
+
+	/**
+	 * Sets up Keycloak user in oCIS
+	 * User is logged in via web UI and user access token is extracted
+	 *
+	 * @Given user :user has logged in via web UI
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userHasLoggedInViaWebUI(string $user): void {
+		$createdUsers = $this->getCreatedKeycloakUsers();
+		$userAttribute = $createdUsers[strtolower($user)];
+		$state = WebUIHelper::setUpUser(
+			$this->getBaseUrl(),
+			$userAttribute["actualUsername"],
+			$userAttribute["password"],
+		);
+		$stateData = \json_decode($state['origins'][0]['localStorage'][2]['value']);
+		$this->setOcisUserToken($userAttribute, $stateData);
+		$response = $this->graphContext->adminHasRetrievedUserUsingTheGraphApi($user);
+		$userAttribute['id'] = $this->getJsonDecodedResponse($response)['id'];
+		$this->addUserToCreatedUsersList(
+			$user,
+			$userAttribute['password'],
+			$userAttribute['displayName'],
+			$userAttribute['email'],
+			$userAttribute['id'],
+		);
+	}
+
+	/**
 	 * Creates multiple users
 	 *
 	 * This function will allow us to send user creation requests in parallel.
@@ -556,6 +706,8 @@ trait Provisioning {
 		foreach ($users as $userAttributes) {
 			if ($this->isTestingWithLdap()) {
 				$this->createLdapUser($userAttributes);
+			} elseif (KeycloakHelper::isTestingWithKeycloak()) {
+				$this->createKeycloakUser($userAttributes);
 			} else {
 				$attributesToCreateUser['userid'] = $userAttributes['userid'];
 				$attributesToCreateUser['password'] = $userAttributes['password'];
@@ -588,7 +740,7 @@ trait Provisioning {
 		}
 
 		$exceptionToThrow = null;
-		if (!$this->isTestingWithLdap()) {
+		if (!$this->isTestingWithLdap() && !KeycloakHelper::isTestingWithKeycloak()) {
 			$results = HttpRequestHelper::sendBatchRequest($requests, $client);
 			// Check all requests to inspect failures.
 			foreach ($results as $key => $e) {
@@ -611,38 +763,40 @@ trait Provisioning {
 
 		// Create requests for setting displayname and email for the newly created users.
 		// These values cannot be set while creating the user, so we have to edit the newly created user to set these values.
-		foreach ($users as $userAttributes) {
-			if (!$this->isTestingWithLdap()) {
-				// for graph api, we need to save the user id to be able to add it in some group
-				// can be fetched with the "onPremisesSamAccountName" i.e. userid
-				$response = $this->graphContext->adminHasRetrievedUserUsingTheGraphApi($userAttributes['userid']);
-				$userAttributes['id'] = $this->getJsonDecodedResponse($response)['id'];
-			} else {
-				$userAttributes['id'] = null;
+		if (!KeycloakHelper::isTestingWithKeycloak()) {
+			foreach ($users as $userAttributes) {
+				if (!$this->isTestingWithLdap()) {
+					// for graph api, we need to save the user id to be able to add it in some group
+					// can be fetched with the "onPremisesSamAccountName" i.e. userid
+					$response = $this->graphContext->adminHasRetrievedUserUsingTheGraphApi($userAttributes['userid']);
+					$userAttributes['id'] = $this->getJsonDecodedResponse($response)['id'];
+				} else {
+					$userAttributes['id'] = null;
+				}
+				$this->addUserToCreatedUsersList(
+					$userAttributes['userid'],
+					$userAttributes['password'],
+					$userAttributes['displayName'],
+					$userAttributes['email'],
+					$userAttributes['id'],
+				);
 			}
-			$this->addUserToCreatedUsersList(
-				$userAttributes['userid'],
-				$userAttributes['password'],
-				$userAttributes['displayName'],
-				$userAttributes['email'],
-				$userAttributes['id'],
-			);
-		}
 
-		if (isset($exceptionToThrow)) {
-			throw $exceptionToThrow;
-		}
+			if (isset($exceptionToThrow)) {
+				throw $exceptionToThrow;
+			}
 
-		foreach ($users as $user) {
-			Assert::assertTrue(
-				$this->userExists($user["userid"]),
-				"User '" . $user["userid"] . "' should exist but does not exist",
-			);
-		}
-
-		if ($initialize) {
 			foreach ($users as $user) {
-				$this->initializeUser($user['userid'], $user['password']);
+				Assert::assertTrue(
+					$this->userExists($user["userid"]),
+					"User '" . $user["userid"] . "' should exist but does not exist",
+				);
+			}
+
+			if ($initialize) {
+				foreach ($users as $user) {
+					$this->initializeUser($user['userid'], $user['password']);
+				}
 			}
 		}
 	}
@@ -987,6 +1141,37 @@ trait Provisioning {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string $password
+	 * @param string $displayname
+	 * @param string $email
+	 * @param string $userId
+	 * @param string $role
+	 *
+	 * @return void
+	 * @throws JsonException
+	 */
+	public function addUserToCreatedKeycloakUsersList(
+		string $user,
+		string $password,
+		string $displayname,
+		string $email,
+		string $userId,
+		string $role,
+	): void {
+		$user = $this->getActualUsername($user);
+		$normalizedUsername = $this->normalizeUsername($user);
+		$this->createdKeycloakUsers[$normalizedUsername] = [
+			"password" => $password,
+			"displayName" => $displayname,
+			"actualUsername" => $user,
+			"email" => $email,
+			"id" => $userId,
+			"role" => $role,
+		];
+	}
+
+	/**
 	 * remember the password of a user that already exists so that you can use
 	 * ordinary test steps after changing their password.
 	 *
@@ -1098,6 +1283,12 @@ trait Provisioning {
 					__METHOD__ . " cannot create a LDAP user with provided data. Error: $exception",
 				);
 			}
+		} elseif (KeycloakHelper::isTestingWithKeycloak()) {
+			$setting["userid"] = $user;
+			$setting["displayName"] = $displayName;
+			$setting["password"] = $password;
+			$setting["email"] = $email;
+			$this->createKeycloakUser($setting);
 		} else {
 			$reqUser = $byUser ? $this->getActualUsername($byUser) : $this->getAdminUsername();
 			$response = GraphHelper::createUser(
@@ -1118,14 +1309,16 @@ trait Provisioning {
 			$userId = $this->getJsonDecodedResponse($response)['id'];
 		}
 
-		$this->addUserToCreatedUsersList($user, $password, $displayName, $email, $userId);
+		if (!KeycloakHelper::isTestingWithKeycloak()) {
+			$this->addUserToCreatedUsersList($user, $password, $displayName, $email, $userId);
 
-		Assert::assertTrue(
-			$this->userExists($user),
-			"User '$user' should exist but does not exist",
-		);
+			Assert::assertTrue(
+				$this->userExists($user),
+				"User '$user' should exist but does not exist",
+			);
 
-		$this->initializeUser($user, $password);
+			$this->initializeUser($user, $password);
+		}
 	}
 
 	/**
@@ -1944,6 +2137,7 @@ trait Provisioning {
 	 *
 	 * @return void
 	 * @throws Exception
+	 * @throws GuzzleException
 	 */
 	public function cleanupDatabaseUsers(): void {
 		$previousServer = $this->currentServer;
@@ -1961,6 +2155,16 @@ trait Provisioning {
 				$this->userExists($user),
 				"User '$user' should not exist but does exist",
 			);
+		}
+		// delete users from keycloak
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			foreach ($this->createdKeycloakUsers as $userData) {
+				$res = KeycloakHelper::deleteKeycloakUser($userData['id']);
+				$user = $userData['actualUsername'];
+				$this->theHTTPStatusCodeShouldBe(204, "Failed to delete keycloak user '$user'", $res);
+			}
+			// Clean up any existing TOTP credentials for admin user so MFA can be set up fresh in every scenario.
+			KeycloakHelper::deleteUserTotpCredentials('admin');
 		}
 		$this->usingServer($previousServer);
 	}

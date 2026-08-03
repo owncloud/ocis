@@ -1,6 +1,7 @@
 <template>
-  <div
+  <aside
     id="web-nav-sidebar"
+    :aria-label="$gettext('Application navigation')"
     :class="{
       'oc-app-navigation-collapsed': closed,
       'oc-app-navigation-expanded': !closed
@@ -50,7 +51,7 @@
         <span v-text="webVersion" />
       </div>
     </slot>
-  </div>
+  </aside>
 </template>
 
 <script lang="ts">

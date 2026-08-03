@@ -9,6 +9,7 @@ const selectors = {
   downloadButton: '//a[contains(., "%s")]/ancestor::li//button[.//span[text()="Download"]]',
   downloadVersionButton: '//tr[@data-item-id="%s"]//button[.//span[text()="Download"]]',
   appStoreHeadline: '.app-list-headline',
+  appList: '.app-list',
   appTileTitle: '.app-tile-title',
   selectAppTitle: '//a[contains(.,"%s")]',
   appDetailsBack: '.app-details-back',
@@ -149,8 +150,8 @@ export const downloadApp = async (args: { page: Page; app: string }): Promise<Do
   const { page, app } = args
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
-    ['appDetails'],
-    'app details page'
+    [selectors.appList],
+    'app list page'
   )
   const [download] = await Promise.all([
     page.waitForEvent('download'),

@@ -1,5 +1,6 @@
 <template>
-  <div
+  <component
+    :is="rootElement"
     class="oc-link-resolve oc-height-viewport oc-flex oc-flex-column oc-flex-center oc-flex-middle"
   >
     <div class="oc-card oc-text-center oc-width-large">
@@ -52,11 +53,11 @@
           <oc-spinner :aria-hidden="true" />
         </div>
       </template>
-      <div class="oc-card-footer oc-pt-rm">
+      <footer class="oc-card-footer oc-pt-rm">
         <p>{{ footerSlogan }}</p>
-      </div>
+      </footer>
     </div>
-  </div>
+  </component>
 </template>
 
 <script lang="ts" setup>
@@ -101,6 +102,10 @@ const spacesStore = useSpacesStore()
 
 const { currentTheme } = storeToRefs(themeStore)
 const password = ref('')
+
+// the "resolvePublicLink" route already renders inside the Plain layout's own
+// <main>, so avoid nesting a second <main> landmark for that route only
+const rootElement = computed(() => (unref(route).name === 'resolvePublicLink' ? 'div' : 'main'))
 
 const isOcmLink = computed(() => {
   const split = unref(route).path.split('/')?.[1]

@@ -65,7 +65,9 @@ export const createSpace = async (args: createSpaceArgs): Promise<string> => {
     page.locator(actionConfirmButton).click()
   ])
 
-  await objects.a11y.Accessibility.assertNoSevereA11yViolations(page, ['filesView'], 'spaces page')
+  // createSpace runs from both the Files app spaces view (#files-view) and the
+  // admin-settings spaces page (#admin-settings-wrapper), so scan the always-present body
+  await objects.a11y.Accessibility.assertNoSevereA11yViolations(page, ['body'], 'spaces page')
 
   const { id } = await responses.json()
   return id

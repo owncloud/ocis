@@ -519,7 +519,7 @@ onBeforeUnmount(() => {
       &--highlight,
       &--selected {
         background-color: var(--oc-color-background-hover);
-        color: var(--oc-color-swatch-brand-hover);
+        color: var(--oc-color-input-text-default);
       }
     }
 
@@ -569,6 +569,12 @@ onBeforeUnmount(() => {
     .vs__dropdown-toggle {
       border-color: var(--oc-color-swatch-passive-default);
     }
+  }
+
+  // override vue-select's default opacity for the search input while
+  // searching but not yet open, which drops contrast below WCAG AA
+  &.vs--single.vs--searching:not(.vs--open):not(.vs--loading) .vs__search {
+    opacity: 1;
   }
 
   .keyboard-outline {

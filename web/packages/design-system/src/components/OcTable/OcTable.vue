@@ -53,11 +53,10 @@
               v-else
               class="oc-table-thead-content header-text"
               :class="{ 'oc-invisible-sr': !extractFieldTitle(field) }"
-              :aria-hidden="extractFieldTitle(field) ? 'false' : 'true'"
               v-text="
                 hasIconsColumn
                   ? $pgettext('Sets a hidden table header text for screen readers', 'Icons')
-                  : extractFieldTitle(field)
+                  : extractFieldTitle(field) || field.name
               "
             />
           </div>

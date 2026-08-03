@@ -58,6 +58,8 @@ const initOrUpdate = (el: HTMLElement & { tooltip: any }, { value = {} }: any) =
     return
   }
 
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
   const props = merge.all([
     {
       ignoreAttributes: true,
@@ -65,7 +67,10 @@ const initOrUpdate = (el: HTMLElement & { tooltip: any }, { value = {} }: any) =
       aria: {
         content: null,
         expanded: false
-      }
+      },
+      // tippy's fade transition doesn't respect prefers-reduced-motion on its own,
+      // so a11y scans can catch the tooltip mid-fade with a transient low-contrast color
+      ...(prefersReducedMotion && { duration: 0 })
     },
     value
   ])
