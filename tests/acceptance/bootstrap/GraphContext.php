@@ -1010,6 +1010,26 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @When user :user tries to change their password to :new_password with patch request using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $newPassword
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function usertriesToChangesOwnPassword(string $user, string $newPassword): void {
+		$response = GraphHelper::updateUserPasswordUsingPatch(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$newPassword,
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @When user :user gets all the groups using the Graph API
 	 *
 	 * @param string $user

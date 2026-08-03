@@ -1185,6 +1185,37 @@ class GraphHelper {
 	 * @param string $baseUrl
 	 * @param string $user
 	 * @param string $password
+	 * @param string $newPassword
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function updateUserPasswordUsingPatch(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $newPassword,
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'me');
+		$payload = [
+			'passwordProfile' => [
+				'password' => $newPassword,
+			],
+		];
+		return HttpRequestHelper::sendRequest(
+			$url,
+			'PATCH',
+			$user,
+			$password,
+			self::getRequestHeaders(),
+			\json_encode($payload),
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $user
+	 * @param string $password
 	 * @param array $body
 	 * @param array $headers
 	 *
