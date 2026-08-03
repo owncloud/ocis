@@ -186,7 +186,7 @@ func TestCreateUserSynthesizesWhenNotServerUUID(t *testing.T) {
 
 	c := lconfig
 	c.UseServerUUID = false
-	b, err := NewLDAPBackend(l, c, &logger, "")
+	b, err := NewLDAPBackend(l, c, &logger, "", "")
 	assert.Nil(t, err)
 
 	newUser, err := b.CreateUser(context.Background(), *user)
@@ -228,7 +228,7 @@ func TestCreateUserSynthesizedModelEqualsReadBack(t *testing.T) {
 
 	c := lconfig
 	c.UseServerUUID = false
-	b, err := NewLDAPBackend(l, c, &logger, "")
+	b, err := NewLDAPBackend(l, c, &logger, "", "")
 	assert.Nil(t, err)
 
 	synthUser, err := b.CreateUser(context.Background(), *user)
@@ -261,7 +261,7 @@ func TestSynthesizedEntryPopulatesInstancesWithoutSearch(t *testing.T) {
 
 	l := &mocks.Client{}
 	// A non-empty instanceID is required for the instance templates to be parsed.
-	b, err := NewLDAPBackend(l, c, &logger, "instanceA")
+	b, err := NewLDAPBackend(l, c, &logger, "instanceA", "")
 	assert.Nil(t, err)
 
 	// Synthesized entry as attrsFromAddRequest + ldap.NewEntry would produce, carrying a
@@ -302,7 +302,7 @@ func TestCreateGroupSynthesizesWhenNotServerUUID(t *testing.T) {
 		written = args.Get(0).(*ldap.AddRequest)
 	}).Return(nil)
 
-	b, err := NewLDAPBackend(l, c, &logger, "")
+	b, err := NewLDAPBackend(l, c, &logger, "", "")
 	assert.Nil(t, err)
 
 	group := libregraph.NewGroup()
@@ -601,7 +601,7 @@ func TestCreateGroupSynthesizesWithNonDefaultIDAttribute(t *testing.T) {
 		written = args.Get(0).(*ldap.AddRequest)
 	}).Return(nil)
 
-	b, err := NewLDAPBackend(l, c, &logger, "")
+	b, err := NewLDAPBackend(l, c, &logger, "", "")
 	assert.Nil(t, err)
 
 	group := libregraph.NewGroup()
@@ -709,7 +709,7 @@ func TestNewLDAPBackendRejectsOctetStringWithoutServerUUID(t *testing.T) {
 		c := lconfig
 		c.UseServerUUID = false
 		c.UserIDIsOctetString = true
-		_, err := NewLDAPBackend(l, c, &logger, "")
+		_, err := NewLDAPBackend(l, c, &logger, "", "")
 		assert.Error(t, err)
 	})
 
@@ -717,7 +717,7 @@ func TestNewLDAPBackendRejectsOctetStringWithoutServerUUID(t *testing.T) {
 		c := lconfig
 		c.UseServerUUID = false
 		c.GroupIDIsOctetString = true
-		_, err := NewLDAPBackend(l, c, &logger, "")
+		_, err := NewLDAPBackend(l, c, &logger, "", "")
 		assert.Error(t, err)
 	})
 
@@ -726,7 +726,7 @@ func TestNewLDAPBackendRejectsOctetStringWithoutServerUUID(t *testing.T) {
 		c.UseServerUUID = true
 		c.UserIDIsOctetString = true
 		c.GroupIDIsOctetString = true
-		_, err := NewLDAPBackend(l, c, &logger, "")
+		_, err := NewLDAPBackend(l, c, &logger, "", "")
 		assert.NoError(t, err)
 	})
 
@@ -735,7 +735,7 @@ func TestNewLDAPBackendRejectsOctetStringWithoutServerUUID(t *testing.T) {
 		c.UseServerUUID = false
 		c.UserIDIsOctetString = false
 		c.GroupIDIsOctetString = false
-		_, err := NewLDAPBackend(l, c, &logger, "")
+		_, err := NewLDAPBackend(l, c, &logger, "", "")
 		assert.NoError(t, err)
 	})
 }
