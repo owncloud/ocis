@@ -3,6 +3,7 @@ package identity
 import (
 	"context"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -34,9 +35,8 @@ func TestAttrsFromAddRequest(t *testing.T) {
 	assert.Equal(t, []string{"alice@example.org", "a@example.org"}, e.GetEqualFoldAttributeValues("mail"))
 }
 
-// TestAttrsFromAddRequestDoesNotAliasRequest guards against attrsFromAddRequest
-// returning slices that alias ar.Attributes[].Vals: mutating the returned map must
-// never change the AddRequest's own values, and vice versa.
+// TestAttrsFromAddRequestDoesNotAliasRequest checks the returned map does not alias
+// ar.Attributes[].Vals, so mutating one never changes the other.
 func TestAttrsFromAddRequestDoesNotAliasRequest(t *testing.T) {
 	ar := ldap.NewAddRequest("uid=alice,ou=people,dc=test", nil)
 	ar.Attribute("mail", []string{"alice@example.org"})
@@ -161,9 +161,85 @@ func TestApplyModifyToEntry(t *testing.T) {
 	})
 }
 
-// TestCreateUserSynthesizesWhenNotServerUUID asserts that with useServerUUID=false
-// CreateUser builds the response model from the AddRequest instead of reading the
-// entry back — i.e. no Search is issued after the Add.
+// TestCreateUserReadBackRetriedOnStaleReplica checks the useServerUUID=true read-back
+// retries a stale 0-entry result: Search is called twice and CreateUser succeeds.
+func TestCreateUserReadBackRetriedOnStaleReplica(t *testing.T) {
+	logger := log.NewLogger(log.Level("debug"))
+
+	user := libregraph.NewUser("DisplayName", "user")
+	user.SetMail("user@example")
+	user.SetAccountEnabled(true)
+	user.SetUserType("Member")
+
+	var written *ldap.AddRequest
+	var searchCalls int32
+	l := &mocks.Client{}
+	l.On("Add", mock.Anything).Run(func(args mock.Arguments) {
+		written = args.Get(0).(*ldap.AddRequest)
+	}).Return(nil)
+	l.On("Search", mock.MatchedBy(func(sr *ldap.SearchRequest) bool {
+		return sr.Scope == ldap.ScopeBaseObject
+	})).Return(func(sr *ldap.SearchRequest) *ldap.SearchResult {
+		if atomic.AddInt32(&searchCalls, 1) == 1 {
+			return &ldap.SearchResult{Entries: []*ldap.Entry{}} // stale replica: entry not yet replicated
+		}
+		// Once visible, the entry carries the server-assigned UUID (with
+		// useServerUUID the id is not in the AddRequest — the directory generates it).
+		attrs := attrsFromAddRequest(written)
+		attrs["entryUUID"] = []string{"server-assigned-uuid"}
+		return &ldap.SearchResult{Entries: []*ldap.Entry{ldap.NewEntry(written.DN, attrs)}}
+	}, nil)
+
+	c := lconfig
+	c.UseServerUUID = true
+	b, err := NewLDAPBackend(l, c, &logger, "", "")
+	assert.Nil(t, err)
+
+	newUser, err := b.CreateUser(context.Background(), *user)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, newUser)
+	assert.Equal(t, int32(2), atomic.LoadInt32(&searchCalls),
+		"read-back is retried once on the stale 0-entry result, then finds the entry")
+}
+
+// TestReadBackAfterWriteExhaustsRetriesReturnsNotFound checks a permanently stale
+// read-back stops at RetryMaxCount+1 reads (3 for RetryMaxCount=2), not an endless loop.
+func TestReadBackAfterWriteExhaustsRetriesReturnsNotFound(t *testing.T) {
+	logger := log.NewLogger(log.Level("debug"))
+
+	user := libregraph.NewUser("DisplayName", "user")
+	user.SetMail("user@example")
+	user.SetAccountEnabled(true)
+	user.SetUserType("Member")
+
+	var searchCalls int32
+	l := &mocks.Client{}
+	l.On("Add", mock.Anything).Return(nil)
+	// Every read-back sees the stale replica: 0 entries, nil error.
+	l.On("Search", mock.MatchedBy(func(sr *ldap.SearchRequest) bool {
+		return sr.Scope == ldap.ScopeBaseObject
+	})).Return(func(sr *ldap.SearchRequest) *ldap.SearchResult {
+		atomic.AddInt32(&searchCalls, 1)
+		return &ldap.SearchResult{Entries: []*ldap.Entry{}}
+	}, nil)
+
+	c := lconfig
+	c.UseServerUUID = true
+	c.RetryMaxCount = 2 // 1 initial read + 2 retries = 3 reads
+	b, err := NewLDAPBackend(l, c, &logger, "", "")
+	assert.Nil(t, err)
+
+	newUser, err := b.CreateUser(context.Background(), *user)
+
+	assert.Error(t, err)
+	assert.Nil(t, newUser)
+	assert.Equal(t, int32(3), atomic.LoadInt32(&searchCalls),
+		"read-back is bounded at RetryMaxCount+1 attempts, not an unbounded loop")
+}
+
+// TestCreateUserSynthesizesWhenNotServerUUID checks that with useServerUUID=false
+// CreateUser builds the model from the AddRequest and issues no Search after the Add.
 func TestCreateUserSynthesizesWhenNotServerUUID(t *testing.T) {
 	displayName := "DisplayName"
 	mail := "user@example"
@@ -204,11 +280,8 @@ func TestCreateUserSynthesizesWhenNotServerUUID(t *testing.T) {
 	l.AssertNotCalled(t, "Search", mock.Anything)
 }
 
-// TestCreateUserSynthesizedModelEqualsReadBack is the regression guard: the model
-// CreateUser returns from the synthesize path (useServerUUID=false) must equal the
-// model the unchanged builder produces from the entry a read-back would have returned
-// — i.e. the server's echo of exactly what oCIS wrote. Eliminating the read-back must
-// not change the CreateUser response for any populated field.
+// TestCreateUserSynthesizedModelEqualsReadBack checks the synthesized model
+// (useServerUUID=false) equals the model a read-back would have built, field for field.
 func TestCreateUserSynthesizedModelEqualsReadBack(t *testing.T) {
 	logger := log.NewLogger(log.Level("debug"))
 
@@ -219,7 +292,7 @@ func TestCreateUserSynthesizedModelEqualsReadBack(t *testing.T) {
 	user.SetAccountEnabled(true)
 	user.SetUserType("Member")
 
-	// Capture the AddRequest so we can reproduce the entry a read-back would return.
+	// Capture the AddRequest to reproduce the entry a read-back would return.
 	var written *ldap.AddRequest
 	l := &mocks.Client{}
 	l.On("Add", mock.Anything).Run(func(args mock.Arguments) {
@@ -234,22 +307,16 @@ func TestCreateUserSynthesizedModelEqualsReadBack(t *testing.T) {
 	synthUser, err := b.CreateUser(context.Background(), *user)
 	assert.Nil(t, err)
 
-	// Ground truth: what the old read-back path would have built. A base-scoped search
-	// on the DN returns exactly the attributes that were written, so the read-back entry
-	// is ldap.NewEntry over the captured AddRequest.
+	// What the read-back path would have built: ldap.NewEntry over the captured
+	// AddRequest, since a base-scoped search returns the attributes that were written.
 	readBackEntry := ldap.NewEntry(written.DN, attrsFromAddRequest(written))
 	readBackModel := b.createUserModelFromLDAP(readBackEntry)
 
 	assert.Equal(t, readBackModel, synthUser)
 }
 
-// TestSynthesizedEntryPopulatesInstancesWithoutSearch is the regression guard for the
-// attribute-sourced multi-instance fields. With instanceURLTemplate +
-// crossInstanceReferenceTemplate configured and instanceMapperEnabled=false, building a
-// user model from a synthesized entry (as the create/update fold paths do) must populate
-// user.Instances / CrossInstanceReference AND must not issue a live Search — the codepath
-// only searches when instanceMapperEnabled=true, which is mutually exclusive with the
-// "no second LDAP call" guarantee (see the design spec's Testing section).
+// TestSynthesizedEntryPopulatesInstancesWithoutSearch checks that with instance templates
+// set and instanceMapperEnabled=false, a synthesized entry fills them and issues no Search.
 func TestSynthesizedEntryPopulatesInstancesWithoutSearch(t *testing.T) {
 	logger := log.NewLogger(log.Level("debug"))
 
@@ -264,7 +331,7 @@ func TestSynthesizedEntryPopulatesInstancesWithoutSearch(t *testing.T) {
 	b, err := NewLDAPBackend(l, c, &logger, "instanceA", "")
 	assert.Nil(t, err)
 
-	// Synthesized entry as attrsFromAddRequest + ldap.NewEntry would produce, carrying a
+	// Synthesized entry as attrsFromAddRequest + ldap.NewEntry produce, carrying a
 	// member-of-instance value so the Instances loop runs.
 	entry := ldap.NewEntry("uid=user,ou=people,dc=test", map[string][]string{
 		"uid":                {"user"},
@@ -391,9 +458,8 @@ func TestCreateEducationClassSynthesizesWhenNotServerUUID(t *testing.T) {
 	assert.Equal(t, readBackModel, resClass)
 }
 
-// TestCreateEducationSchoolSynthesizesWhenNotServerUUID asserts CreateEducationSchool
-// synthesizes its response (no read-back) when oCIS generated the id itself. The
-// pre-create duplicate-number Search still fires; only the read-back is eliminated.
+// TestCreateEducationSchoolSynthesizesWhenNotServerUUID checks CreateEducationSchool drops
+// the read-back when oCIS generated the id; the duplicate-number Search still fires.
 func TestCreateEducationSchoolSynthesizesWhenNotServerUUID(t *testing.T) {
 	logger := log.NewLogger(log.Level("debug"))
 
@@ -432,9 +498,8 @@ func TestCreateEducationSchoolSynthesizesWhenNotServerUUID(t *testing.T) {
 	assert.Equal(t, readBackModel, resSchool)
 }
 
-// TestUpdateUserFoldsNoReadBack asserts a non-rename UpdateUser does not read the
-// entry back: it pre-reads once, Modifies, and folds the ModifyRequest onto the
-// pre-read entry to build the response.
+// TestUpdateUserFoldsNoReadBack checks a non-rename UpdateUser pre-reads once, Modifies,
+// and folds the ModifyRequest onto the pre-read entry with no read-back.
 func TestUpdateUserFoldsNoReadBack(t *testing.T) {
 	logger := log.NewLogger(log.Level("debug"))
 
@@ -547,9 +612,8 @@ func TestUpdateEducationSchoolFoldsNoReadBack(t *testing.T) {
 	l.AssertNumberOfCalls(t, "Search", 1)
 }
 
-// TestUpdateEducationClassFoldPreservesClassificationAndExternalID guards the Site 9
-// regression: folding must not drop classification/externalID from the response, even
-// on an update that only changes displayName. It also asserts no read-back after Modify.
+// TestUpdateEducationClassFoldPreservesClassificationAndExternalID checks a displayName-only
+// update keeps classification/externalID in the folded response and does no read-back.
 func TestUpdateEducationClassFoldPreservesClassificationAndExternalID(t *testing.T) {
 	logger := log.NewLogger(log.Level("debug"))
 
@@ -584,10 +648,8 @@ func TestUpdateEducationClassFoldPreservesClassificationAndExternalID(t *testing
 	}))
 }
 
-// TestCreateGroupSynthesizesWithNonDefaultIDAttribute guards the fix for the
-// hardcoded "owncloudUUID" id write: the generated id must be stored under the
-// configured GroupIDAttribute, otherwise the synthesized model has no id and
-// createGroupModelFromLDAP returns nil (CreateGroup would return (nil, nil)).
+// TestCreateGroupSynthesizesWithNonDefaultIDAttribute checks the generated id is stored
+// under the configured GroupIDAttribute, not a hardcoded "owncloudUUID".
 func TestCreateGroupSynthesizesWithNonDefaultIDAttribute(t *testing.T) {
 	logger := log.NewLogger(log.Level("debug"))
 
@@ -634,9 +696,8 @@ func TestCreateGroupSynthesizesWithNonDefaultIDAttribute(t *testing.T) {
 	l.AssertNotCalled(t, "Search", mock.Anything)
 }
 
-// TestCreateEducationClassSynthesizesWithNonDefaultIDAttribute guards the same
-// hardcoded-id fix on the education-class create path, which reuses
-// groupToLDAPAttrValues.
+// TestCreateEducationClassSynthesizesWithNonDefaultIDAttribute checks the same non-default
+// id-attribute fix on the education-class create path (reuses groupToLDAPAttrValues).
 func TestCreateEducationClassSynthesizesWithNonDefaultIDAttribute(t *testing.T) {
 	logger := log.NewLogger(log.Level("debug"))
 
@@ -664,13 +725,8 @@ func TestCreateEducationClassSynthesizesWithNonDefaultIDAttribute(t *testing.T) 
 	l.AssertNotCalled(t, "Search", mock.Anything)
 }
 
-// TestGetGroupByNameUsesGroupNameAttribute guards the fix for the name-only lookup
-// branch of getLDAPGroupByNameOrID, which previously filtered by the user name
-// attribute (uid) instead of the group name attribute (cn), so a group could never
-// be found by name. That else-branch is reached when filterEscapeUUID errors, which
-// happens for a non-UUID name when the id attribute is an octet string. The lookup
-// is exercised directly so the assertion isolates the filter, independent of model
-// building.
+// TestGetGroupByNameUsesGroupNameAttribute checks the name-only lookup in
+// getLDAPGroupByNameOrID filters by the group name attribute (cn), not the user's (uid).
 func TestGetGroupByNameUsesGroupNameAttribute(t *testing.T) {
 	logger := log.NewLogger(log.Level("debug"))
 
@@ -697,10 +753,8 @@ func TestGetGroupByNameUsesGroupNameAttribute(t *testing.T) {
 	assert.NotContains(t, groupSearch.Filter, b.userAttributeMap.userName+"=group")
 }
 
-// TestNewLDAPBackendRejectsOctetStringWithoutServerUUID guards the fail-fast check:
-// octet-string ID attributes (server-assigned, e.g. AD objectGUID) are incompatible
-// with UseServerUUID=false, where oCIS generates string UUIDs. The combination must
-// be rejected at startup rather than silently producing corrupt IDs.
+// TestNewLDAPBackendRejectsOctetStringWithoutServerUUID checks startup rejects an
+// octet-string ID attribute combined with UseServerUUID=false (would corrupt IDs).
 func TestNewLDAPBackendRejectsOctetStringWithoutServerUUID(t *testing.T) {
 	logger := log.NewLogger(log.Level("debug"))
 	l := &mocks.Client{}
