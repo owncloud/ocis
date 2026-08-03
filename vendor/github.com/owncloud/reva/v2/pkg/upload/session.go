@@ -59,6 +59,7 @@ type Session interface {
 	// Internal coordinator plumbing.
 	Chunk() string
 	BinPath() string
+	ExecutantUser() *userpb.User
 	ProviderID() string
 	SpaceID() string
 	NodeID() string
@@ -377,7 +378,7 @@ func (s *FileSession) Context(ctx context.Context) context.Context {
 	sub := s.store.log.With().Int("pid", os.Getpid()).Logger()
 	ctx = appctx.WithLogger(ctx, &sub)
 	ctx = ctxpkg.ContextSetLockID(ctx, s.info.MetaData["lockid"])
-	ctx = ctxpkg.ContextSetUser(ctx, s.executantUser())
+	ctx = ctxpkg.ContextSetUser(ctx, s.ExecutantUser())
 	return ctxpkg.ContextSetInitiator(ctx, s.info.MetaData["initiatorid"])
 }
 
@@ -423,7 +424,11 @@ func (s *FileSession) infoPath() string {
 	return fileSessionPath(s.store.root, s.info.ID)
 }
 
-func (s *FileSession) executantUser() *userpb.User {
+// ExecutantUser returns the full identity of the user who initiated the upload.
+// Upload events must carry it rather than the bare id from Executant(): consumers
+// read the display name straight off the event and do not look it up, so an
+// id-only user reaches the activity feed with a blank name.
+func (s *FileSession) ExecutantUser() *userpb.User {
 	var o *typespb.Opaque
 	_ = json.Unmarshal([]byte(s.info.Storage["UserOpaque"]), &o)
 	var groups []string

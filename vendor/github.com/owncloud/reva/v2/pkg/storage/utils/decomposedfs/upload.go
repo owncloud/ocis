@@ -509,15 +509,29 @@ func (fs *Decomposedfs) PrepareUpload(ctx context.Context, ref *provider.Referen
 		}
 	}()
 
+	var (
+		old         *node.Node
+		overwrite   bool
+		oldBlobsize int64
+	)
 	if info.NodeExisted {
-		old, err := node.ReadNode(ctx, fs.lu, n.SpaceID, n.ID, false, nil, false)
+		old, err = node.ReadNode(ctx, fs.lu, n.SpaceID, n.ID, false, nil, false)
 		if err != nil {
 			return nil, errors.Wrap(err, "PrepareUpload: failed to read existing node")
 		}
-		if _, err := node.CheckQuota(ctx, n.SpaceRoot, old.BlobID != "", uint64(old.Blobsize), uint64(info.Size)); err != nil {
-			return nil, err
-		}
+		overwrite = old.BlobID != ""
+		oldBlobsize = old.Blobsize
+	}
 
+	// Unconditional: the coordinator's up-front check fails open when the executant
+	// cannot read the quota (an Uploader on someone else's share), and defers to
+	// this one. Checking only overwrites would let every new file past both gates,
+	// and would skip the disk-space guard CheckQuota also performs.
+	if _, err := node.CheckQuota(ctx, n.SpaceRoot, overwrite, uint64(oldBlobsize), uint64(info.Size)); err != nil {
+		return nil, err
+	}
+
+	if info.NodeExisted {
 		oldMtime, err = old.GetMTime(ctx)
 		if err != nil {
 			return nil, err

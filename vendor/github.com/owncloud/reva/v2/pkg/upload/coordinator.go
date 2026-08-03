@@ -501,15 +501,11 @@ func (c *coordinator) publishBytesReceived(ctx context.Context, session Session)
 		return err
 	}
 
-	executant := session.Executant()
-
 	return events.Publish(ctx, c.pub, events.BytesReceived{
-		UploadID:   session.ID(),
-		URL:        url,
-		SpaceOwner: session.SpaceOwner(),
-		ExecutingUser: &user.User{
-			Id: &executant,
-		},
+		UploadID:      session.ID(),
+		URL:           url,
+		SpaceOwner:    session.SpaceOwner(),
+		ExecutingUser: session.ExecutantUser(),
 		ResourceID: &provider.ResourceId{
 			StorageId: session.ProviderID(),
 			SpaceId:   session.SpaceID(),
@@ -667,6 +663,13 @@ func (c *coordinator) uploadedResourceInfo(ctx context.Context, session Session)
 	ref := session.Reference()
 	ri, err := c.fs.GetMD(ctx, &ref, nil, nil)
 	if err == nil {
+		// Drivers do not know their own mount id; the storageprovider stamps it on
+		// the way out (addMissingStorageProviderID). This path answers from the
+		// dataprovider, which does not, so an unstamped id would reach the client
+		// as a two-part storageid-less string that later lookups cannot resolve.
+		if ri.GetId().GetStorageId() == "" {
+			ri.Id.StorageId = session.ProviderID()
+		}
 		return ri
 	}
 	appctx.GetLogger(ctx).Debug().Err(err).Str("uploadid", session.ID()).Msg("could not stat uploaded resource")
@@ -716,14 +719,11 @@ func (c *coordinator) publishUploadReady(ctx context.Context, session Session, r
 	if c.pub == nil {
 		return
 	}
-	executant := session.Executant()
 	if err := events.Publish(ctx, c.pub, events.UploadReady{
-		UploadID:   session.ID(),
-		Filename:   session.Filename(),
-		SpaceOwner: session.SpaceOwner(),
-		ExecutingUser: &user.User{
-			Id: &executant,
-		},
+		UploadID:          session.ID(),
+		Filename:          session.Filename(),
+		SpaceOwner:        session.SpaceOwner(),
+		ExecutingUser:     session.ExecutantUser(),
 		FileRef:           c.uploadRef(session),
 		ResourceID:        ri.GetId(),
 		Timestamp:         utils.TSNow(),
