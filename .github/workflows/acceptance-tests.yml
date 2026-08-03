@@ -633,8 +633,38 @@ jobs:
       - name: Run external-LDAP smoke
         run: tests/ldap-smoke/run.sh
 
+  external-ldap-distributed-tests:
+    name: external-ldap-distributed-smoke
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "24"
+
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+
+      # web/idp assets must be embedded for `ocis server` to come up (same as run-github.py)
+      - name: Generate assets
+        run: make ci-node-generate
+
+      - name: Build oCIS
+        run: make -C ocis build
+
+      # Distributed LDAP topology (proxy over an async syncrepl replica + write master);
+      # the replication lag exercises the retry / read-after-write path (OCISDEV-1030/1032/1033).
+      - name: Run external-LDAP distributed smoke
+        run: tests/ldap-smoke-distributed/run.sh
+
   all-acceptance-tests:
-    needs: [detect-changes, local-api-tests, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests, ldap-pool-tests, external-ldap-tests]
+    needs: [detect-changes, local-api-tests, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests, ldap-pool-tests, external-ldap-tests, external-ldap-distributed-tests]
     runs-on: ubuntu-latest
     if: always()
     steps:
