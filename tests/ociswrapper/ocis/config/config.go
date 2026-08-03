@@ -47,7 +47,6 @@ var debugPorts = map[string]int{
 	"storage-shares":     9156,
 	"storage-system":     9217,
 	"storage-users":      9159,
-	"storageusers":      9159,
 	"thumbnails":         9189,
 	"userlog":            9214,
 	"users":              9145,
