@@ -750,16 +750,22 @@ func (c *coordinator) uploadRef(session Session) *provider.Reference {
 // rollback undoes a finish that failed before PrepareUpload: it removes the node
 // if this upload created it, unmarks processing, and drops the session files.
 //
-// Removal goes through the driver rather than the public Delete, which is
+// An overwrite is left alone. At this point only touchAndMark has run, so the
+// existing node still holds its own blob and metadata and there is nothing to
+// undo; asking the driver to roll back would revert or purge content this upload
+// never wrote. Only a node this upload brought into existence gets removed, and
+// that goes through the driver rather than the public Delete, which is
 // permission-gated: an Uploader on someone else's share has no Delete permission
 // on the file they just created, so a rejected upload would survive as an empty
 // file. The size diff is zero because nothing was propagated yet.
 func (c *coordinator) rollback(ctx context.Context, session Session) {
 	ref := session.Reference()
-	// Before unmarking: RollbackUpload keys off the processing id to confirm the
-	// node is still this upload's, so unmarking first makes it a no-op.
-	if err := c.fs.RollbackUpload(ctx, &ref, session.ID(), session.NodeExists(), 0); err != nil {
-		appctx.GetLogger(ctx).Error().Err(err).Str("uploadid", session.ID()).Msg("could not roll back upload")
+	if !session.NodeExists() {
+		// Before unmarking: RollbackUpload keys off the processing id to confirm the
+		// node is still this upload's, so unmarking first makes it a no-op.
+		if err := c.fs.RollbackUpload(ctx, &ref, session.ID(), false, 0); err != nil {
+			appctx.GetLogger(ctx).Error().Err(err).Str("uploadid", session.ID()).Msg("could not roll back upload")
+		}
 	}
 	if err := c.fs.MarkProcessing(ctx, &ref, false, session.ID()); err != nil {
 		appctx.GetLogger(ctx).Error().Err(err).Str("uploadid", session.ID()).Msg("could not unmark processing")
