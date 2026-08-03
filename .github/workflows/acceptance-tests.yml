@@ -278,7 +278,20 @@ jobs:
         run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
 
       - name: Run ${{ matrix.suite }}
-        run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
+        env:
+          GOCOVERDIR: ${{ github.workspace }}/reports
+        run: |
+          mkdir -p "$GOCOVERDIR"
+          BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
+
+      - name: Upload raw coverage data
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: api-coverage-raw-${{ matrix.suite }}
+          path: reports
+          retention-days: 1
+          if-no-files-found: warn
 
   cli-tests:
     needs: [build-and-test]
@@ -312,8 +325,25 @@ jobs:
       - name: Restore binary permissions
         run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
 
+      - name: Compute safe artifact name
+        id: safe-name
+        run: echo "name=$(echo '${{ matrix.suite }}' | tr -c 'a-zA-Z0-9._-' '-')" >> "$GITHUB_OUTPUT"
+
       - name: Run ${{ matrix.suite }}
-        run: BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
+        env:
+          GOCOVERDIR: ${{ github.workspace }}/reports
+        run: |
+          mkdir -p "$GOCOVERDIR"
+          BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
+
+      - name: Upload raw coverage data
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: api-coverage-raw-${{ steps.safe-name.outputs.name }}
+          path: reports
+          retention-days: 1
+          if-no-files-found: warn
 
   core-api-tests:
     name: ${{ matrix.suite }}
@@ -391,12 +421,28 @@ jobs:
       - name: Restore binary permissions
         run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
 
+      - name: Compute safe artifact name
+        id: safe-name
+        run: echo "name=$(echo '${{ matrix.suite }}' | tr -c 'a-zA-Z0-9._-' '-')" >> "$GITHUB_OUTPUT"
+
       - name: Run ${{ matrix.suite }}
-        run: >
-          BEHAT_SUITES="${{ matrix.suite }}"
-          ACCEPTANCE_TEST_TYPE=core-api
-          WITH_REMOTE_PHP=true
+        env:
+          GOCOVERDIR: ${{ github.workspace }}/reports
+        run: |
+          mkdir -p "$GOCOVERDIR"
+          BEHAT_SUITES="${{ matrix.suite }}" \
+          ACCEPTANCE_TEST_TYPE=core-api \
+          WITH_REMOTE_PHP=true \
           python3 tests/acceptance/run-github.py
+
+      - name: Upload raw coverage data
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: api-coverage-raw-${{ steps.safe-name.outputs.name }}
+          path: reports
+          retention-days: 1
+          if-no-files-found: warn
 
   e2e-tests:
     name: e2e-${{ matrix.suite }}
@@ -694,6 +740,95 @@ jobs:
 
       - name: Run WOPI validator (cs3)
         run: python3 tests/acceptance/run-wopi.py --type cs3
+
+  sonarcloud-unit:
+    name: sonarcloud-unit
+    needs: [build-and-test]
+    if: always() && needs.build-and-test.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Download unit test coverage
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: unit-test-coverage
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@ad8210318ac8bb816e41990d5af2b304f7a6c213 # v8.2.1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.pullrequest.base=${{ github.event.pull_request.base.ref }}
+            -Dsonar.pullrequest.branch=${{ github.event.pull_request.head.ref }}
+            -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
+
+  acceptance-coverage:
+    name: acceptance-coverage
+    needs: [local-api-tests, cli-tests, core-api-tests]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Download raw coverage data
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: api-coverage-raw-*
+          path: coverage-raw
+
+      - name: Generate coverage report
+        run: |
+          DIRS=$(find coverage-raw -mindepth 1 -maxdepth 1 -type d | paste -sd, -)
+          if [ -z "$DIRS" ]; then
+            echo "::warning::no coverage data was collected by any acceptance test job"
+            exit 0
+          fi
+          go tool covdata percent -i="$DIRS" -o=coverage-acceptance.out
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: api-coverage
+          path: coverage-acceptance.out
+          retention-days: 1
+          if-no-files-found: warn
+
+  sonarcloud-acceptance:
+    name: sonarcloud-acceptance
+    needs: [acceptance-coverage]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Download merged coverage report
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: api-coverage
+
+      - name: Swap in acceptance-test sonar properties
+        run: |
+          mv sonar-project.properties sonar-project.properties.skip
+          mv tests/acceptance/sonar-project.properties sonar-project.properties
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@ad8210318ac8bb816e41990d5af2b304f7a6c213 # v8.2.1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARCLOUD_ACCEPTANCE_TESTS }}
+        with:
+          args: >
+            -Dsonar.pullrequest.base=${{ github.event.pull_request.base.ref }}
+            -Dsonar.pullrequest.branch=${{ github.event.pull_request.head.ref }}
+            -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
 
   all-acceptance-tests:
     needs: [detect-changes, local-api-tests, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests]
