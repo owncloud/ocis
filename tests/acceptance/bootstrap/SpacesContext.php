@@ -459,12 +459,13 @@ class SpacesContext implements Context {
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param string $fileName
+	 * @param bool $isVault
 	 *
 	 * @return string
 	 * @throws GuzzleException
 	 */
-	public function getFileId(string $user, string $spaceName, string $fileName): string {
-		$fileData = $this->getFileData($user, $spaceName, $fileName)->getHeaders();
+	public function getFileId(string $user, string $spaceName, string $fileName, bool $isVault = false): string {
+		$fileData = $this->getFileData($user, $spaceName, $fileName, false, $isVault)->getHeaders();
 		return $fileData["Oc-Fileid"][0];
 	}
 

@@ -217,6 +217,22 @@ class SearchContext implements Context {
 	}
 
 	/**
+	 * @When user :user searches for :pattern in vault using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $pattern
+	 *
+	 * @return void
+	 */
+	public function userSearchesInVaultUsingWebDavAPI(
+		string $user,
+		string $pattern,
+	): void {
+		$response = $this->searchWithRetry($user, $pattern, true);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @Then file/folder :path in the search result of user :user should contain these properties:
 	 *
 	 * @param string $path

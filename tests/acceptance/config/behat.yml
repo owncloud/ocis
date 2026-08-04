@@ -497,6 +497,7 @@ default:
         - OcisConfigContext:
         - CapabilitiesContext:
         - SearchContext:
+        - TagContext:
 
     cliCommands:
       paths:
