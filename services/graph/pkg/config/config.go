@@ -182,7 +182,8 @@ type ServiceAccount struct {
 }
 
 type Validation struct {
-	MaxTagLength int `yaml:"max_tag_length" env:"OCIS_MAX_TAG_LENGTH" desc:"Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags." introductionVersion:"7.2.0"`
+	MaxTagLength     int    `yaml:"max_tag_length" env:"OCIS_MAX_TAG_LENGTH" desc:"Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags." introductionVersion:"7.2.0"`
+	MaxImageFileSize string `yaml:"max_image_file_size" env:"GRAPH_MAX_IMAGE_FILE_SIZE" desc:"The maximum file size of an image which can be set as a space image. Must be less than or equal to 'THUMBNAILS_MAX_INPUT_IMAGE_FILE_SIZE' of the thumbnails service, otherwise images between the two values are accepted but cannot be rendered. Usable common abbreviations: [KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 2GB. Set to 0 to not limit the file size." introductionVersion:"8.2.0"`
 }
 
 // MultiInstanceConfig holds configuration for multi-instance-ocis

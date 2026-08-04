@@ -58,7 +58,33 @@ var (
 
 	// ErrForbiddenCharacter is thrown when the spacename contains an invalid character
 	ErrForbiddenCharacter = fmt.Errorf("spacenames must not contain %v", _invalidSpaceNameCharacters)
+
+	errSpaceImageTooLarge = errors.New("space image is too large")
 )
+
+func (g Graph) checkSpaceImageFileSize(ctx context.Context, gatewayClient gateway.GatewayAPIClient, fileID string) error {
+	if g.maxImageFileSize == 0 {
+		return nil
+	}
+
+	resourceID, err := storagespace.ParseID(fileID)
+	if err != nil {
+		return errorcode.New(errorcode.InvalidRequest, fmt.Sprintf("invalid space image id: %v", err))
+	}
+
+	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{
+		Ref: &storageprovider.Reference{ResourceId: &resourceID},
+	})
+	if err := errorcode.FromStat(statResponse, err); err != nil {
+		return err
+	}
+
+	if size := statResponse.GetInfo().GetSize(); size > g.maxImageFileSize {
+		return fmt.Errorf("%w: %d bytes exceeds the maximum of %d bytes", errSpaceImageTooLarge, size, g.maxImageFileSize)
+	}
+
+	return nil
+}
 
 // GetDrives serves as a factory method that returns the appropriate
 // http.Handler function based on the specified API version.
@@ -560,9 +586,28 @@ func (g Graph) updateDrive(w http.ResponseWriter, r *http.Request, apiVersion AP
 	}
 
 	for _, special := range drive.Special {
-		if special.Id != nil {
-			updateSpaceRequest.StorageSpace.Opaque = utils.AppendPlainToOpaque(updateSpaceRequest.StorageSpace.Opaque, *special.SpecialFolder.Name, *special.Id)
+		if special.Id == nil {
+			continue
 		}
+
+		// A space image which exceeds the thumbnailer's maximum input file size
+		// can be stored but never rendered, and the web UI has no raw-download
+		// fallback, so it would silently stay invisible. Reject it here instead.
+		if special.SpecialFolder.GetName() == SpaceImageSpecialFolderName {
+			if err := g.checkSpaceImageFileSize(r.Context(), gatewayClient, *special.Id); err != nil {
+				logger.Debug().Err(err).Str("fileID", *special.Id).Msg("could not update drive: space image rejected")
+				if errors.Is(err, errSpaceImageTooLarge) {
+					// errorcode.InvalidRequest renders as 400 by default, but the
+					// specific problem here is the size of the payload.
+					errorcode.InvalidRequest.Render(w, r, http.StatusRequestEntityTooLarge, err.Error())
+					return
+				}
+				errorcode.RenderError(w, r, err)
+				return
+			}
+		}
+
+		updateSpaceRequest.StorageSpace.Opaque = utils.AppendPlainToOpaque(updateSpaceRequest.StorageSpace.Opaque, *special.SpecialFolder.Name, *special.Id)
 	}
 
 	if _, ok := drive.GetNameOk(); ok {

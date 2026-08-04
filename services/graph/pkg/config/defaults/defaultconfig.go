@@ -135,7 +135,8 @@ func DefaultConfig() *config.Config {
 			AvailableRoles: nil, // will be populated with defaults in EnsureDefaults
 		},
 		Validation: config.Validation{
-			MaxTagLength: 100,
+			MaxTagLength:     100,
+			MaxImageFileSize: "50MB",
 		},
 	}
 }
