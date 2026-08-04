@@ -355,7 +355,7 @@ func (session *OcisSession) Cleanup(revertNodeMetadata, cleanBin, cleanInfo, unm
 
 		curUpload, err := n.ProcessingID(ctx)
 		if err == nil && curUpload == session.ID() {
-			if err := n.RevertCurrentRevision(ctx); err != nil {
+			if err := n.RevertCurrentRevision(ctx, true); err != nil {
 				appctx.GetLogger(ctx).Error().Err(err).Str("nodepath", n.InternalPath()).Msg("reverting node metadata failed")
 				return
 			}
