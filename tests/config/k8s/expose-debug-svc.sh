@@ -75,9 +75,6 @@ should_expose() {
         collaboration)
             [[ "${ENABLE_WOPI:-false}" == "true" ]]
             ;;
-		collaboration)
-            [[ "${ENABLE_WOPI:-false}" == "true" ]]
-            ;;
         ocm)
             [[ "${ENABLE_OCM:-false}" == "true" ]]
             ;;

@@ -240,7 +240,7 @@ jobs:
               "$EXPECTED_FAILURES_FILE"
           fi
 
-      - name: Run ${{ matrix.suite }} tests
+      - name: Run API ${{ matrix.suite }} tests
         if: startsWith( matrix.suite, 'api' )
         env:
           TEST_SERVER_URL: ${{ env.TEST_SERVER_URL }}
@@ -254,7 +254,7 @@ jobs:
           K8S: ${{ env.K8S }}
         run: make test-acceptance-api
 
-      - name: Run ${{ matrix.suite }} tests
+      - name: Run Core ${{ matrix.suite }} tests
         if: startsWith( matrix.suite, 'core' )
         env:
           TEST_SERVER_URL: ${{ env.TEST_SERVER_URL }}

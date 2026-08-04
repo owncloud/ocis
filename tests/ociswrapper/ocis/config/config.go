@@ -1,4 +1,5 @@
 package config
+import "strings"
 
 var config = map[string]string{
 	"bin":           "/usr/bin/ocis",
@@ -13,14 +14,14 @@ var debugPorts = map[string]int{
 	"ocis":               9250,
 	"activitylog":        9197,
 	"antivirus":          9277,
-	"app-registry":       9243,
-	"app-provider":       9165,
+	"appregistry":        9243,
+	"appprovider":        9165,
 	"audit":              9229,
-	"auth-app":           9245,
-	"auth-basic":         9147,
-	"auth-bearer":        9149,
-	"auth-machine":       9167,
-	"auth-service":       9198,
+	"authapp":            9245,
+	"authbasic":          9147,
+	"authbearer":         9149,
+	"authmachine":        9167,
+	"authservice":        9198,
 	"clientlog":          9260,
 	"collaboration":      9304,
 	"eventhistory":       9270,
@@ -43,10 +44,10 @@ var debugPorts = map[string]int{
 	"settings":           9194,
 	"sharing":            9151,
 	"sse":                9139,
-	"storage-publiclink": 9179,
-	"storage-shares":     9156,
-	"storage-system":     9217,
-	"storage-users":      9159,
+	"storagepubliclink":  9179,
+	"storageshares":      9156,
+	"storagesystem":      9217,
+	"storageusers":       9159,
 	"thumbnails":         9189,
 	"userlog":            9214,
 	"users":              9145,
@@ -57,13 +58,13 @@ var debugPorts = map[string]int{
 
 // only some services have gRPC ports
 var grpcPorts = map[string]int{
-	"app-registry":       9242,
-	"app-provider":       9164,
-	"auth-app":           9246,
-	"auth-basic":         9146,
-	"auth-bearer":        9148,
-	"auth-machine":       9166,
-	"auth-service":       9616, // 9199
+	"appregistry":        9242,
+	"appprovider":        9164,
+	"authapp":            9246,
+	"authbasic":          9146,
+	"authbearer":         9148,
+	"authmachine":        9166,
+	"authservice":        9616, // 9199
 	"collaboration":      9301,
 	"eventhistory":       8080, // 9274
 	"gateway":            9142,
@@ -73,10 +74,9 @@ var grpcPorts = map[string]int{
 	"search":             9220,
 	"settings":           9191,
 	"sharing":            9150,
-	"storage-publiclink": 9178,
-	"storage-shares":     9154,
-	"storage-system":     9215,
-	"storage-users":      9157,
+	"storagepubliclink":  9178,
+	"storageshares":      9154,
+	"storagesystem":      9215,
 	"storageusers":       9157,
 	"thumbnails":         9185,
 	"users":              9144,
@@ -91,17 +91,27 @@ func Get(key string) string {
 }
 
 func SetServiceDebugPort(key string, value int) {
+	key = normalizeServiceName(key)
 	debugPorts[key] = value
 }
 
 func GetServiceDebugPort(key string) int {
+	key = normalizeServiceName(key)
 	return debugPorts[key]
 }
 
 func SetServiceGRPCPort(key string, value int) {
+	key = normalizeServiceName(key)
 	grpcPorts[key] = value
 }
 
 func GetServiceGRPCPort(key string) int {
+	key = normalizeServiceName(key)
 	return grpcPorts[key]
+}
+
+func normalizeServiceName(service string) string {
+	service = strings.ToLower(service)
+	service = strings.ReplaceAll(service, "-", "")
+	return service
 }
