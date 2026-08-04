@@ -500,11 +500,14 @@ func (fs *Decomposedfs) PrepareUpload(ctx context.Context, ref *provider.Referen
 			}
 		}
 		if info.NodeExisted && oldAttrs != nil {
+			// The mtime goes into the same batch as the rest of the attributes: we still
+			// hold the metadata lock here, and SetMTime would try to take it again.
+			// flock is not reentrant, so that would block this goroutine forever.
+			if err := fs.lu.TimeManager().OverrideMtime(ctx, n, &oldAttrs, oldMtime); err != nil {
+				appctx.GetLogger(ctx).Error().Err(err).Str("nodeid", n.ID).Msg("could not restore node mtime during rollback")
+			}
 			if err := n.SetXattrsWithContext(ctx, oldAttrs, false); err != nil {
 				appctx.GetLogger(ctx).Error().Err(err).Str("nodeid", n.ID).Msg("could not restore node xattrs during rollback")
-			}
-			if err := fs.lu.TimeManager().SetMTime(ctx, n, &oldMtime); err != nil {
-				appctx.GetLogger(ctx).Error().Err(err).Str("nodeid", n.ID).Msg("could not restore node mtime during rollback")
 			}
 		}
 	}()
