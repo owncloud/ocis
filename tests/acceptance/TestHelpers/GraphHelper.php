@@ -1237,31 +1237,36 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
 	 * @param string $resourceId
 	 * @param array $tagName
+	 * @param array $headers
+	 * @param bool $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function createTags(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
 		string $resourceId,
 		array $tagName,
+		array $headers = [],
+		bool $isVault = false,
 	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'extensions/org.libregraph/tags');
+		$url = self::getFullUrl($baseUrl, 'extensions/org.libregraph/tags', $isVault);
 		$payload['resourceId'] = $resourceId;
 		$payload['tags'] = $tagName;
 
+		$requestHeaders = array_merge(self::getRequestHeaders(), $headers);
 		return HttpRequestHelper::sendRequest(
 			$url,
 			"PUT",
 			$user,
 			$password,
-			self::getRequestHeaders(),
+			$requestHeaders,
 			\json_encode($payload),
 		);
 	}
