@@ -162,15 +162,17 @@ func (i *LDAP) CreateEducationSchool(ctx context.Context, school libregraph.Educ
 
 	var e *ldap.Entry
 	if i.useServerUUID {
-		// The directory assigns the ID and conn.Add cannot return it, so we must
-		// read the entry back to recover the generated UUID.
-		e, err = i.getSchoolByDN(ar.DN)
+		// The directory assigns the ID; conn.Add does not return it. Read the entry
+		// back to recover the generated UUID.
+		e, err = i.readBackAfterWrite(func() (*ldap.Entry, error) {
+			return i.getSchoolByDN(ar.DN)
+		})
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		// oCIS generated the ID and wrote it into the AddRequest, so synthesize the
-		// entry from data already in hand instead of reading it back.
+		// oCIS generated the ID and wrote it into the AddRequest. Synthesize the entry
+		// from the request instead of reading it back.
 		e = ldap.NewEntry(ar.DN, attrsFromAddRequest(ar))
 	}
 	return i.createSchoolModelFromLDAP(e), nil
@@ -246,10 +248,8 @@ func (i *LDAP) updateDisplayName(ctx context.Context, dn string, providedDisplay
 	return nil
 }
 
-// updateSchoolProperties updates the properties (other that displayName) of a school.
-// It checks if a school number is already taken, before updating the school number
-// updateSchoolProperties applies the ModifyRequest and returns it so the caller can
-// fold the applied changes onto the pre-read entry (avoiding a read-after-write).
+// updateSchoolProperties updates a school's non-displayName properties (rejecting an
+// already-taken number) and returns the ModifyRequest for the caller to fold on.
 func (i *LDAP) updateSchoolProperties(ctx context.Context, dn string, currentSchool, updatedSchool libregraph.EducationSchool) (*ldap.ModifyRequest, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 
@@ -297,10 +297,8 @@ func (i *LDAP) UpdateEducationSchool(ctx context.Context, numberOrID string, sch
 	}
 
 	currentSchool := i.createSchoolModelFromLDAP(e)
-	// Fold the applied changes onto the pre-read entry instead of reading it back.
-	// updateDisplayName mutates the RDN via ModifyDN; the model builder reads displayName
-	// from the attribute, so we model the rename as a displayName attribute replace.
-	// updateSchoolProperties returns the ModifyRequest it applied so we can fold it on.
+	// Fold the applied changes onto the pre-read entry instead of reading it back; the
+	// displayName rename (done via ModifyDN) is modelled as an attribute replace.
 	fold := ldap.NewModifyRequest(e.DN, nil)
 	switch i.updateEducationSchoolOperation(school, *currentSchool) {
 	case tooManyValues:

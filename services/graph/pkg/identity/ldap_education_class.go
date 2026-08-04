@@ -91,15 +91,17 @@ func (i *LDAP) CreateEducationClass(ctx context.Context, class libregraph.Educat
 
 	var e *ldap.Entry
 	if i.useServerUUID {
-		// The directory assigns the ID and conn.Add cannot return it, so we must
-		// read the entry back to recover the generated UUID.
-		e, err = i.getEducationClassByDN(ar.DN)
+		// The directory assigns the ID; conn.Add does not return it. Read the entry
+		// back to recover the generated UUID.
+		e, err = i.readBackAfterWrite(func() (*ldap.Entry, error) {
+			return i.getEducationClassByDN(ar.DN)
+		})
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		// oCIS generated the ID and wrote it into the AddRequest, so synthesize the
-		// entry from data already in hand instead of reading it back.
+		// oCIS generated the ID and wrote it into the AddRequest. Synthesize the entry
+		// from the request instead of reading it back.
 		e = ldap.NewEntry(ar.DN, attrsFromAddRequest(ar))
 	}
 	return i.createEducationClassModelFromLDAP(e), nil
@@ -150,9 +152,8 @@ func (i *LDAP) UpdateEducationClass(ctx context.Context, id string, class libreg
 		return nil, ErrReadOnly
 	}
 
-	// Request the full education-class attribute set (classification, externalID, …),
-	// not just [name, id], so the folded response entry carries everything the model
-	// builder reads — otherwise a displayName-only update would drop classification.
+	// Read the full attribute set, not just [name, id], so the folded response keeps
+	// classification/externalID that a displayName-only update would otherwise drop.
 	g, err := i.getEducationClassByID(id, false)
 	if err != nil {
 		return nil, err
@@ -185,9 +186,8 @@ func (i *LDAP) UpdateEducationClass(ctx context.Context, id string, class libreg
 
 	dn := g.DN
 
-	// The externalID lives in the RDN and is changed via ModifyDN, not the ModifyRequest.
-	// The model builder reads it from the externalID attribute, so we fold it on as an
-	// attribute replace below (deleteOldRDN=true updates the attribute server-side).
+	// The externalID lives in the RDN (changed via ModifyDN), but the model reads it
+	// from the attribute, so fold it on as an attribute replace below.
 	externalIDChanged := false
 	if eID := class.GetExternalId(); eID != "" {
 		if g.GetEqualFoldAttributeValue(i.educationConfig.classAttributeMap.externalID) != eID {
@@ -214,9 +214,8 @@ func (i *LDAP) UpdateEducationClass(ctx context.Context, id string, class libreg
 		}
 	}
 
-	// Fold the applied changes onto the pre-read entry instead of reading it back.
-	// The externalID rename is modelled as an attribute replace so the returned model
-	// reflects the new externalID.
+	// Fold the applied changes onto the pre-read entry instead of reading it back; the
+	// externalID rename is modelled as an attribute replace to reflect the new value.
 	g = applyModifyToEntry(g, &mr)
 	if externalIDChanged {
 		extRename := ldap.ModifyRequest{DN: dn}

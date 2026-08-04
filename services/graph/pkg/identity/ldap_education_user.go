@@ -46,15 +46,17 @@ func (i *LDAP) CreateEducationUser(ctx context.Context, user libregraph.Educatio
 
 	var e *ldap.Entry
 	if i.useServerUUID {
-		// The directory assigns the ID and conn.Add cannot return it, so we must
-		// read the entry back to recover the generated UUID.
-		e, err = i.getEducationUserByDN(ar.DN)
+		// The directory assigns the ID; conn.Add does not return it. Read the entry
+		// back to recover the generated UUID.
+		e, err = i.readBackAfterWrite(func() (*ldap.Entry, error) {
+			return i.getEducationUserByDN(ar.DN)
+		})
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		// oCIS generated the ID and wrote it into the AddRequest, so synthesize the
-		// entry from data already in hand instead of reading it back.
+		// oCIS generated the ID and wrote it into the AddRequest. Synthesize the entry
+		// from the request instead of reading it back.
 		e = ldap.NewEntry(ar.DN, attrsFromAddRequest(ar))
 	}
 	return i.createEducationUserModelFromLDAP(e), nil
@@ -178,10 +180,8 @@ func (i *LDAP) UpdateEducationUser(ctx context.Context, id string, user libregra
 		}
 	}
 
-	// Fold the applied changes onto the pre-read entry instead of reading it back.
-	// The ID is immutable on update (rejected above) and every field the model builder
-	// reads is either already on e or in the ModifyRequest just applied. The rename
-	// branch (changeUserName) is handled above and keeps its own read-back.
+	// Fold the applied changes onto the pre-read entry instead of a read-after-write;
+	// every field the model reads is on e or in the just-applied ModifyRequest.
 	e = applyModifyToEntry(e, &mr)
 
 	returnUser := i.createEducationUserModelFromLDAP(e)

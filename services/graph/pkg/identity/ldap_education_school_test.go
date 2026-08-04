@@ -170,8 +170,8 @@ func TestCreateEducationSchool(t *testing.T) {
 					Entries: []*ldap.Entry{schoolEntry},
 				},
 				nil)
-		// useServerUUID=true keeps the read-back path (the directory assigns the ID),
-		// which is what this test asserts (fixed entry returned with a known id).
+		// useServerUUID=true keeps the read-back path (the directory assigns the ID).
+		// A fixed entry with a known id is returned.
 		c := eduConfig
 		c.UseServerUUID = true
 		b, err := getMockedBackend(lm, c, &logger)

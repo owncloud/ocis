@@ -6,10 +6,8 @@ import (
 	"github.com/go-ldap/ldap/v3"
 )
 
-// attrsFromAddRequest flattens the attributes of an *ldap.AddRequest into the
-// map[string][]string shape that ldap.NewEntry expects. It is used to synthesize
-// the response entry from data already in hand, avoiding a read-after-write when
-// oCIS generated the entry's ID itself (useServerUUID=false).
+// attrsFromAddRequest flattens an *ldap.AddRequest into the map ldap.NewEntry expects,
+// synthesizing the response entry without a read-after-write (useServerUUID=false).
 func attrsFromAddRequest(ar *ldap.AddRequest) map[string][]string {
 	attrs := make(map[string][]string, len(ar.Attributes))
 	for _, a := range ar.Attributes {
@@ -20,13 +18,8 @@ func attrsFromAddRequest(ar *ldap.AddRequest) map[string][]string {
 	return attrs
 }
 
-// applyModifyToEntry returns a copy of base with the changes from mr folded on
-// (Replace / Add / Delete). It never mutates base. Attribute names are matched
-// case-insensitively, consistent with ldap.Entry's GetEqualFold* accessors, so
-// folding never produces a duplicate attribute entry that differs only in case.
-//
-// It is used to synthesize the response entry after an update from the pre-read
-// entry plus the ModifyRequest being persisted, avoiding a read-after-write.
+// applyModifyToEntry synthesizes the post-update entry by folding mr's changes onto a
+// copy of base (case-insensitive names), avoiding a read-after-write. base is unchanged.
 func applyModifyToEntry(base *ldap.Entry, mr *ldap.ModifyRequest) *ldap.Entry {
 	if base == nil {
 		return nil
@@ -34,7 +27,7 @@ func applyModifyToEntry(base *ldap.Entry, mr *ldap.ModifyRequest) *ldap.Entry {
 	if mr == nil {
 		mr = &ldap.ModifyRequest{DN: base.DN}
 	}
-	// Deep-copy base into a name->values map so we never touch the original.
+	// Deep-copy base into a name->values map; base is never mutated.
 	attrs := make(map[string][]string, len(base.Attributes))
 	// order preserves the original attribute order, with new attributes appended.
 	order := make([]string, 0, len(base.Attributes))
