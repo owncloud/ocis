@@ -78,6 +78,9 @@ func ldapConfigFromString(cfg config.LDAPDriver) map[string]interface{} {
 		"user_objectclass":            cfg.UserObjectClass,
 		"group_objectclass":           cfg.GroupObjectClass,
 		"idp":                         cfg.IDP,
+		"pool_enabled":                cfg.PoolEnabled,
+		"pool_size":                   cfg.PoolSize,
+		"pool_checkout_timeout":       cfg.PoolCheckoutTimeout,
 		"user_schema": map[string]interface{}{
 			"id":              cfg.UserSchema.ID,
 			"idIsOctetString": cfg.UserSchema.IDIsOctetString,

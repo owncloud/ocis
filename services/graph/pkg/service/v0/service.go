@@ -2,12 +2,9 @@ package svc
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
@@ -29,7 +26,6 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/identity/ldap"
 	graphm "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
 )
 
@@ -441,53 +437,28 @@ func setIdentityBackends(options Options, svc *Graph) error {
 				GatewaySelector: gatewaySelector,
 			}
 		case "ldap":
-			var err error
-
-			var tlsConf *tls.Config
-			if options.Config.Identity.LDAP.Insecure {
-
-				// When insecure is set to true then we don't need a certificate.
-				options.Config.Identity.LDAP.CACert = ""
-				tlsConf = &tls.Config{
-					MinVersion: tls.VersionTLS12,
-
-					//nolint:gosec // We need the ability to run with "insecure" (dev/testing)
-					InsecureSkipVerify: options.Config.Identity.LDAP.Insecure,
-				}
-			}
-
 			if options.Config.Identity.LDAP.CACert != "" {
 				if err := ocisldap.WaitForCA(options.Logger,
 					options.Config.Identity.LDAP.Insecure,
 					options.Config.Identity.LDAP.CACert); err != nil {
 					options.Logger.Fatal().Err(err).Msg("The configured LDAP CA cert does not exist")
 				}
-				if tlsConf == nil {
-					tlsConf = &tls.Config{
-						MinVersion: tls.VersionTLS12,
-					}
-				}
-				certs := x509.NewCertPool()
-				pemData, err := os.ReadFile(options.Config.Identity.LDAP.CACert)
-				if err != nil {
-					options.Logger.Error().Err(err).Msg("Error initializing LDAP Backend")
-					return err
-				}
-				if !certs.AppendCertsFromPEM(pemData) {
-					options.Logger.Error().Msg("Error initializing LDAP Backend. Adding CA cert failed")
-					return err
-				}
-				tlsConf.RootCAs = certs
 			}
 
-			conn := ldap.NewLDAPWithReconnect(&options.Logger,
-				ldap.Config{
-					URI:          options.Config.Identity.LDAP.URI,
-					BindDN:       options.Config.Identity.LDAP.BindDN,
-					BindPassword: options.Config.Identity.LDAP.BindPassword,
-					TLSConfig:    tlsConf,
-				},
-			)
+			conn, err := utils.GetLDAPClientFromConfig(&utils.LDAPConn{
+				URI:                 options.Config.Identity.LDAP.URI,
+				Insecure:            options.Config.Identity.LDAP.Insecure,
+				CACert:              options.Config.Identity.LDAP.CACert,
+				BindDN:              options.Config.Identity.LDAP.BindDN,
+				BindPassword:        options.Config.Identity.LDAP.BindPassword,
+				PoolEnabled:         options.Config.Identity.LDAP.PoolEnabled,
+				PoolSize:            options.Config.Identity.LDAP.PoolSize,
+				PoolCheckoutTimeout: options.Config.Identity.LDAP.PoolCheckoutTimeout,
+			})
+			if err != nil {
+				options.Logger.Error().Err(err).Msg("Error initializing LDAP Backend")
+				return err
+			}
 			var iid, masterID string
 			if options.Config.MultiInstance.Enabled {
 				iid = options.Config.MultiInstance.InstanceID
