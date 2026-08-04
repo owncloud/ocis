@@ -4,3 +4,9 @@
 
 CVE-2026-32284  # github.com/shamaton/msgpack/v2 v2.4.0 — no fix available upstream
 vendor/github.com/crewjam/saml/xmlenc/fuzz.go  # test RSA key used in fuzz corpus, not a real secret
+
+# web frontend transitive dependencies, both pulled in via the pnpm overrides in
+# web/package.json. Published after the last lockfile refresh, so every branch
+# fails on them. Drop these once the overrides are bumped upstream.
+CVE-2026-69152  # brace-expansion 5.0.8 — fix in 5.0.9
+CVE-2026-18446  # fast-uri 3.1.4 — fix in 3.1.5

@@ -319,7 +319,11 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 				sReq.Ref.Path = uReq.Ref.GetPath()
 				sReq.Ref.ResourceId = nil
 			} else {
-				if resid, err := storagespace.ParseID(httpRes.Header.Get(net.HeaderOCFileID)); err == nil {
+				// A new file has no node id until the upload finishes, which is after the
+				// data server wrote this header, so it may be absent. sReq.Ref then keeps
+				// the path-based reference it was built with, which already names the
+				// file and stats just as well.
+				if resid, err := storagespace.ParseID(httpRes.Header.Get(net.HeaderOCFileID)); err == nil && resid.GetOpaqueId() != "" {
 					sReq.Ref = &provider.Reference{
 						ResourceId: &resid,
 					}

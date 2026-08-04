@@ -35,9 +35,11 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/studio-b12/gowebdav"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	ocmpb "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
@@ -76,12 +78,50 @@ func (d *driver) InitiateUpload(ctx context.Context, ref *provider.Reference, up
 	}, nil
 }
 
+// MarkProcessing is a no-op: the remote instance owns the file, so there is no
+// local node to flag while postprocessing runs.
 func (d *driver) MarkProcessing(ctx context.Context, ref *provider.Reference, processing bool, sessionID string) error {
-	return errtypes.NotSupported("op not supported")
+	return nil
 }
 
-func (d *driver) CommitUpload(ctx context.Context, ref *provider.Reference, source storage.UploadSource) (*provider.ResourceInfo, error) {
-	return nil, errtypes.NotSupported("op not supported")
+// CommitUpload streams the staged bytes to the remote instance over WebDAV.
+func (d *driver) CommitUpload(ctx context.Context, ref *provider.Reference, sessionID string, source storage.UploadSource) error {
+	client, _, rel, err := d.serviceWebdavClient(ctx, ref)
+	if err != nil {
+		return err
+	}
+
+	client.SetInterceptor(func(method string, rq *http.Request) {
+		// Set the content length on the request struct directly instead of the header.
+		// The content-length header gets reset by the golang http library before
+		// sending out the request, resulting in chunked encoding to be used which
+		// breaks the quota checks in ocdav.
+		if method == "PUT" {
+			rq.ContentLength = source.Length
+		}
+	})
+
+	lockToken, _ := ctxpkg.ContextGetLockID(ctx)
+	return client.WriteStream(rel, source.Body, 0, lockToken)
+}
+
+// serviceWebdavClient builds a webdav client for the upload finish path. That path
+// runs under tusd, whose context carries no request auth token, so it authenticates
+// as the service account and resolves the share on behalf of the upload's executant.
+func (d *driver) serviceWebdavClient(ctx context.Context, ref *provider.Reference) (*gowebdav.Client, *ocmpb.ReceivedShare, string, error) {
+	gwc, err := d.gateway.Next()
+	if err != nil {
+		return nil, nil, "", err
+	}
+	serviceUserCtx, err := utils.GetServiceUserContext(d.c.ServiceAccountID, gwc, d.c.ServiceAccountSecret)
+	if err != nil {
+		return nil, nil, "", err
+	}
+	executant, ok := ctxpkg.ContextGetUser(ctx)
+	if !ok {
+		return nil, nil, "", errtypes.BadRequest("ocm: no executant in context")
+	}
+	return d.webdavClient(serviceUserCtx, executant.GetId(), ref)
 }
 
 func (d *driver) Upload(ctx context.Context, req storage.UploadRequest, _ storage.UploadFinishedFunc) (*provider.ResourceInfo, error) {

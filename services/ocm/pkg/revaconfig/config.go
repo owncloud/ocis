@@ -91,8 +91,9 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"service_account_secret":        cfg.ServiceAccount.Secret,
 				},
 				"dataprovider": map[string]interface{}{
-					"prefix": "data",
-					"driver": "ocmreceived",
+					"prefix":           "data",
+					"driver":           "ocmreceived",
+					"upload_directory": cfg.OCMStorageProvider.StorageRoot,
 					"drivers": map[string]interface{}{
 						"ocmreceived": map[string]interface{}{
 							"insecure":               cfg.OCMStorageProvider.Insecure,
@@ -157,9 +158,9 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 							"file": cfg.OCMShareProvider.Drivers.JSON.File,
 						},
 					},
-					"gatewaysvc":      cfg.Reva.Address,
-					"provider_domain": providerDomain,
-					"webdav_endpoint": cfg.Commons.OcisURL,
+					"gatewaysvc":          cfg.Reva.Address,
+					"provider_domain":     providerDomain,
+					"webdav_endpoint":     cfg.Commons.OcisURL,
 					"webapp_template":     cfg.OCMShareProvider.WebappTemplate,
 					"client_insecure":     cfg.OCMShareProvider.Insecure,
 					"enable_user_sharing": cfg.OCMShareProvider.EnableUserSharing,
@@ -181,11 +182,14 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					},
 				},
 				"storageprovider": map[string]interface{}{
-					"driver": "ocmreceived",
+					"driver":           "ocmreceived",
+					"upload_directory": cfg.OCMStorageProvider.StorageRoot,
 					"drivers": map[string]interface{}{
 						"ocmreceived": map[string]interface{}{
-							"insecure":     cfg.OCMStorageProvider.Insecure,
-							"storage_root": cfg.OCMStorageProvider.StorageRoot,
+							"insecure":               cfg.OCMStorageProvider.Insecure,
+							"storage_root":           cfg.OCMStorageProvider.StorageRoot,
+							"service_account_id":     cfg.ServiceAccount.ID,
+							"service_account_secret": cfg.ServiceAccount.Secret,
 						},
 					},
 					"data_server_url": cfg.OCMStorageProvider.DataServerURL,

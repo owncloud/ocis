@@ -364,8 +364,11 @@ func (r *registry) findProvidersForFilter(ctx context.Context, filters []*provid
 	currentUser := ctxpkg.ContextMustGetUser(ctx)
 	providerInfos := []*registrypb.ProviderInfo{}
 	for address, provider := range r.c.Providers {
-		// skip mismatching storageproviders
-		if storageId != "" && storageId != provider.ProviderID {
+		// skip mismatching storageproviders. The shares provider hosts the
+		// mountpoints of vault shares (they grant into the vault provider), so it
+		// must still be queried when the vault storage id is requested.
+		if storageId != "" && storageId != provider.ProviderID &&
+			!(storageId == utils.VaultStorageProviderID && provider.ProviderID == utils.ShareStorageProviderID) {
 			continue
 		}
 		// when a specific space type is requested we may skip this provider altogether if it is not configured for that type
@@ -403,6 +406,15 @@ func (r *registry) findProvidersForFilter(ctx context.Context, filters []*provid
 				// Filter out vault spaces if no storageId is provided
 				if storageId == "" && provider.ProviderID == utils.VaultStorageProviderID {
 					continue
+				}
+				// Shares of vault resources are mountpoints hosted on the shares
+				// provider that grant into the vault provider. Segregate them so
+				// they only appear in the matching (vault / non-vault) drive list.
+				if provider.ProviderID == utils.ShareStorageProviderID && space.SpaceType == "mountpoint" {
+					grantsIntoVault := utils.ReadPlainFromOpaque(space.Opaque, "grantStorageID") == utils.VaultStorageProviderID
+					if grantsIntoVault != (storageId == utils.VaultStorageProviderID) {
+						continue
+					}
 				}
 				spacePath, err = sc.SpacePath(currentUser, space)
 				if err != nil {
