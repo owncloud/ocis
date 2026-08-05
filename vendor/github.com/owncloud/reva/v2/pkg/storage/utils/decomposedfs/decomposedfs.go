@@ -234,6 +234,12 @@ func New(o *options.Options, aspects aspects.Aspects, log *zerolog.Logger) (stor
 		aspects.UserMapper = &usermapper.NullMapper{}
 	}
 
+	// posix has no disable_versioning config key and sets this on the aspects only.
+	// One-directional: a driver that cannot keep revisions overrides the preference.
+	if aspects.DisableVersioning {
+		o.DisableVersioning = true
+	}
+
 	fs := &Decomposedfs{
 		tp:              aspects.Tree,
 		lu:              aspects.Lookup,
