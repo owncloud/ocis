@@ -547,6 +547,7 @@ def main() -> int:
         if vault_storage_needed:
             vault_data_dir = Path.home() / "ocis/storage/users-vault"
             vault_data_dir.mkdir(parents=True, exist_ok=True)
+            playwright_env["VAULT_MODE"] = "true"
 
             vault_env = {
                 **server_env,

@@ -65,7 +65,9 @@ export const test = base.extend<{
           const user = world.usersEnvironment.getUser({ key: config.keycloakAdminUser })
           await api.keycloak.setAccessTokenForKeycloakOcisUser(user)
           await api.keycloak.setAccessTokenForKeycloakUser(user)
-          // await storeKeycloakGroups(user)
+          if (!config.vaultMode) {
+            await storeKeycloakGroups(user)
+          }
         } else {
           const user = world.usersEnvironment.getUser({ key: config.adminUsername })
           await api.token.setAccessAndRefreshToken(user)
