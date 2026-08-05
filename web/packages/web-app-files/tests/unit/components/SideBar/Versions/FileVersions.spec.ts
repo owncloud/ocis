@@ -58,8 +58,16 @@ describe('FileVersions', () => {
         const dateElement = wrapper.findAll(selectors.lastModifiedDate)
 
         expect(dateElement.length).toBe(2)
-        expect(dateElement.at(0).text()).toBe('1 day ago')
-        expect(dateElement.at(1).text()).toBe('7 days ago')
+        expect(dateElement.at(0).find('[aria-hidden="true"]').text()).toBe('1 day ago')
+        expect(dateElement.at(1).find('[aria-hidden="true"]').text()).toBe('7 days ago')
+      })
+      it('should expose the full version date without adding a keyboard stop', () => {
+        const { wrapper } = getMountedWrapper({ mountType: shallowMount })
+        const dateElement = wrapper.findAll(selectors.lastModifiedDate)
+
+        expect(dateElement.at(0).find('[tabindex]').exists()).toBe(false)
+        expect(dateElement.at(0).find('[aria-hidden="true"]').text()).toBe('1 day ago')
+        expect(dateElement.at(0).find('.oc-invisible-sr').text()).toContain('1 day ago')
       })
       it('should show content length of each version', () => {
         const { wrapper } = getMountedWrapper({ mountType: shallowMount })
@@ -70,6 +78,17 @@ describe('FileVersions', () => {
         expect(contentLengthElement.at(1).text()).toBe('11 B')
       })
       describe('row actions', () => {
+        it('should identify the version in action labels', () => {
+          const { wrapper } = getMountedWrapper()
+
+          expect(
+            wrapper.findAll(selectors.revertVersionButton).at(0).attributes('aria-label')
+          ).toContain('Restore version from')
+          expect(
+            wrapper.findAll(selectors.downloadVersionButton).at(0).attributes('aria-label')
+          ).toContain('Download version from')
+        })
+
         describe('reverting to a specific version', () => {
           it('should be possible for a non-share', () => {
             const { wrapper } = getMountedWrapper()
@@ -103,6 +122,30 @@ describe('FileVersions', () => {
 
             expect(updateResourceField).toHaveBeenCalledTimes(2)
           })
+          it('should restore focus to the activated version after the list reloads', async () => {
+            const sidebar = document.createElement('div')
+            sidebar.id = 'app-sidebar'
+            document.body.append(sidebar)
+
+            const initial = getMountedWrapper({ attachTo: sidebar })
+            await initial.wrapper.findAll(selectors.revertVersionButton).at(0).trigger('click')
+
+            expect(sidebar.getAttribute('data-focus-return-version')).toBe(defaultVersions[0].name)
+            expect(sidebar.getAttribute('data-focus-return-index')).toBe('0')
+
+            initial.wrapper.unmount()
+            const reloaded = getMountedWrapper({ attachTo: sidebar })
+            await reloaded.wrapper.vm.$nextTick()
+
+            expect(document.activeElement).toBe(
+              reloaded.wrapper.findAll(selectors.revertVersionButton).at(0).element
+            )
+            expect(sidebar.hasAttribute('data-focus-return-version')).toBe(false)
+            expect(sidebar.hasAttribute('data-focus-return-index')).toBe(false)
+
+            reloaded.wrapper.unmount()
+            sidebar.remove()
+          })
         })
 
         it('should call downloadFile method when download version button is clicked', async () => {
@@ -125,12 +168,14 @@ function getMountedWrapper({
   mountType = mount,
   space = undefined,
   versions = defaultVersions,
-  resource = mock<Resource>({ id: '1', size: 0, mdate: '' })
+  resource = mock<Resource>({ id: '1', size: 0, mdate: '' }),
+  attachTo = undefined
 }: {
   mountType?: typeof mount
   space?: SpaceResource
   versions?: Resource[]
   resource?: Resource
+  attachTo?: HTMLElement
 } = {}) {
   const downloadFile = vi.fn()
   vi.mocked(useDownloadFile).mockReturnValue({ downloadFile })
@@ -142,6 +187,7 @@ function getMountedWrapper({
 
   return {
     wrapper: mountType(FileVersions, {
+      attachTo,
       global: {
         mocks,
         renderStubDefaultSlot: true,

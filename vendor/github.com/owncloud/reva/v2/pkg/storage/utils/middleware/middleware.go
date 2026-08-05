@@ -388,7 +388,7 @@ func (f *FS) MarkProcessing(ctx context.Context, ref *provider.Reference, proces
 	return res
 }
 
-func (f *FS) CommitUpload(ctx context.Context, ref *provider.Reference, source storage.UploadSource) (*provider.ResourceInfo, error) {
+func (f *FS) CommitUpload(ctx context.Context, ref *provider.Reference, sessionID string, source storage.UploadSource) error {
 	var (
 		err     error
 		unhook  UnHook
@@ -397,6 +397,33 @@ func (f *FS) CommitUpload(ctx context.Context, ref *provider.Reference, source s
 	for _, hook := range f.hooks {
 		ctx, unhook, err = hook("CommitUpload", ctx, ref.GetResourceId().GetSpaceId())
 		if err != nil {
+			return err
+		}
+		if unhook != nil {
+			unhooks = append(unhooks, unhook)
+		}
+	}
+
+	err = f.next.CommitUpload(ctx, ref, sessionID, source)
+
+	for _, unhook := range unhooks {
+		if uerr := unhook(); uerr != nil {
+			return uerr
+		}
+	}
+
+	return err
+}
+
+func (f *FS) PrepareUpload(ctx context.Context, ref *provider.Reference, sessionID string, info storage.UploadInfo) (*storage.PrepareUploadResult, error) {
+	var (
+		err     error
+		unhook  UnHook
+		unhooks []UnHook
+	)
+	for _, hook := range f.hooks {
+		ctx, unhook, err = hook("PrepareUpload", ctx, ref.GetResourceId().GetSpaceId())
+		if err != nil {
 			return nil, err
 		}
 		if unhook != nil {
@@ -404,15 +431,19 @@ func (f *FS) CommitUpload(ctx context.Context, ref *provider.Reference, source s
 		}
 	}
 
-	res0, res1 := f.next.CommitUpload(ctx, ref, source)
+	res, err := f.next.PrepareUpload(ctx, ref, sessionID, info)
 
 	for _, unhook := range unhooks {
-		if err := unhook(); err != nil {
-			return nil, err
+		if uerr := unhook(); uerr != nil {
+			return nil, uerr
 		}
 	}
 
-	return res0, res1
+	return res, err
+}
+
+func (f *FS) RollbackUpload(ctx context.Context, ref *provider.Reference, sessionID string, nodeExisted bool, sizeDiff int64) error {
+	return f.next.RollbackUpload(ctx, ref, sessionID, nodeExisted, sizeDiff)
 }
 
 func (f *FS) Download(ctx context.Context, ref *provider.Reference, openReaderFunc func(md *provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {

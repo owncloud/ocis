@@ -6,11 +6,11 @@
         <h2 class="oc-login-card-title" v-text="cardTitle" />
         <p v-text="cardHint" />
       </div>
-      <div class="oc-login-card-footer oc-pt-rm">
+      <footer class="oc-login-card-footer oc-pt-rm">
         <p>
           {{ footerSlogan }}
         </p>
-      </div>
+      </footer>
     </div>
     <oc-button
       id="exitAnchor"

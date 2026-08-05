@@ -52,6 +52,6 @@
     "axios": "^1.18.1",
     "vitest-mock-extended": "3.1.1",
     "vue-router": "5.0.6",
-    "vue3-gettext": "2.4.0"
+    "vue3-gettext": "^4.0.1"
   }
 }

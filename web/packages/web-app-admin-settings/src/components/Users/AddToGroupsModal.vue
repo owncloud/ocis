@@ -82,8 +82,7 @@ const onConfirm = async () => {
             '%{groupAssignmentCount} group assignment was added successfully',
             '%{groupAssignmentCount} group assignments were added successfully',
             succeeded.length,
-            { groupAssignmentCount: succeeded.length.toString() },
-            true
+            { groupAssignmentCount: succeeded.length.toString() }
           )
     showMessage({ title })
   }
@@ -101,8 +100,7 @@ const onConfirm = async () => {
             'Failed to add %{groupAssignmentCount} group assignment',
             'Failed to add %{groupAssignmentCount} group assignments',
             failed.length,
-            { groupAssignmentCount: failed.length.toString() },
-            true
+            { groupAssignmentCount: failed.length.toString() }
           )
     showErrorMessage({
       title,

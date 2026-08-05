@@ -1,7 +1,7 @@
 <template>
   <div class="oc-text-center oc-flex oc-flex-center oc-flex-middle oc-height-1-1">
     <oc-spinner :aria-label="$gettext('Loading app')" size="xlarge" />
-    <p v-translate class="oc-invisible">Loading app</p>
+    <p class="oc-invisible">{{ $gettext('Loading app') }}</p>
   </div>
 </template>
 

@@ -406,10 +406,7 @@ export class AuthService implements AuthServiceInterface {
   }
 
   private handleDelegatedTokenUpdate(event: MessageEvent) {
-    if (
-      this.configStore.options.embed?.delegateAuthenticationOrigin &&
-      event.origin !== this.configStore.options.embed.delegateAuthenticationOrigin
-    ) {
+    if (event.origin !== this.configStore.options.embed?.delegateAuthenticationOrigin) {
       return
     }
 

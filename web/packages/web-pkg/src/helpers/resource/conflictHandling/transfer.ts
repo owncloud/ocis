@@ -59,15 +59,13 @@ export class ResourceTransfer extends ConflictDialog {
               '%{count} item was copied successfully',
               '%{count} items were copied successfully',
               count,
-              { count: count.toString() },
-              true
+              { count: count.toString() }
             )
           : this.$ngettext(
               '%{count} item was moved successfully',
               '%{count} items were moved successfully',
               count,
-              { count: count.toString() },
-              true
+              { count: count.toString() }
             )
       const messageStore = useMessages()
       messageStore.showMessage({ title, status: 'success' })
@@ -75,21 +73,13 @@ export class ResourceTransfer extends ConflictDialog {
     }
     let title =
       transferType === TransferType.COPY
-        ? this.$gettext(
-            'Failed to copy %{count} resources',
-            { count: errors.length.toString() },
-            true
-          )
-        : this.$gettext(
-            'Failed to move %{count} resources',
-            { count: errors.length.toString() },
-            true
-          )
+        ? this.$gettext('Failed to copy %{count} resources', { count: errors.length.toString() })
+        : this.$gettext('Failed to move %{count} resources', { count: errors.length.toString() })
     if (errors.length === 1) {
       title =
         transferType === TransferType.COPY
-          ? this.$gettext('Failed to copy "%{name}"', { name: errors[0]?.resourceName }, true)
-          : this.$gettext('Failed to move "%{name}"', { name: errors[0]?.resourceName }, true)
+          ? this.$gettext('Failed to copy "%{name}"', { name: errors[0]?.resourceName })
+          : this.$gettext('Failed to move "%{name}"', { name: errors[0]?.resourceName })
     }
     let description = ''
     if (errors.some(({ error }) => error instanceof HttpError && error.statusCode === 507)) {

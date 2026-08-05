@@ -12,7 +12,6 @@
       :src="nameWithFillType"
       :transform-source="transformSvgElement"
       :role="accessibleLabel !== '' ? 'img' : null"
-      :tabindex="accessibleLabel ? '0' : null"
       :aria-hidden="accessibleLabel === '' ? 'true' : null"
       :aria-labelledby="accessibleLabel === '' ? null : svgTitleId"
       :focusable="accessibleLabel === '' ? 'false' : null"
@@ -84,14 +83,7 @@ interface Props {
   type?: string
   size?: AvailableSizeType | string
   variation?:
-    | 'passive'
-    | 'primary'
-    | 'danger'
-    | 'success'
-    | 'warning'
-    | 'brand'
-    | 'inherit'
-    | string
+    'passive' | 'primary' | 'danger' | 'success' | 'warning' | 'brand' | 'inherit' | string
   color?: string
 }
 interface Emits {

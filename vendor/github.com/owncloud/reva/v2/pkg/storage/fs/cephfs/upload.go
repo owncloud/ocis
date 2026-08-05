@@ -151,8 +151,16 @@ func (fs *cephfs) MarkProcessing(ctx context.Context, ref *provider.Reference, p
 	return errtypes.NotSupported("op not supported")
 }
 
-func (fs *cephfs) CommitUpload(ctx context.Context, ref *provider.Reference, source storage.UploadSource) (*provider.ResourceInfo, error) {
-	return nil, errtypes.NotSupported("op not supported")
+func (fs *cephfs) CommitUpload(_ context.Context, _ *provider.Reference, _ string, _ storage.UploadSource) error {
+	return errtypes.NotSupported("op not supported")
+}
+
+func (fs *cephfs) PrepareUpload(_ context.Context, _ *provider.Reference, _ string, info storage.UploadInfo) (*storage.PrepareUploadResult, error) {
+	return &storage.PrepareUploadResult{VersionCreated: info.NodeExisted}, nil
+}
+
+func (fs *cephfs) RollbackUpload(_ context.Context, _ *provider.Reference, _ string, _ bool, _ int64) error {
+	return nil
 }
 
 // UseIn tells the tus upload middleware which extensions it supports.

@@ -14,16 +14,16 @@
     <div class="oc-login-form" id="chooseaccount-root">
       <img class="oc-logo" src="{{.LogoURL}}" alt="ownCloud">
       <h1 class="oc-invisible-sr">{{.Headline}}</h1>
-      <p id="oc-chooseaccount-error" class="oc-error-message" hidden></p>
+      <p id="oc-chooseaccount-error" class="oc-error-message" role="alert" aria-live="assertive" hidden></p>
       <div id="chooseaccount-body" hidden>
         <p class="oc-light oc-consent-headline" id="chooseaccount-title">{{.HeadlineSub}}</p>
         <ul class="oc-consent-scopes" id="account-list">
-          <li class="oc-chooseaccount-item" id="item-current">
-            <span class="oc-chooseaccount-avatar" id="avatar-current"></span>
+          <li class="oc-chooseaccount-item" id="item-current" role="button" tabindex="0">
+            <span class="oc-chooseaccount-avatar" id="avatar-current" aria-hidden="true"></span>
             <span class="oc-light oc-chooseaccount-label" id="label-current"></span>
           </li>
-          <li class="oc-chooseaccount-item" id="item-other">
-            <span class="oc-chooseaccount-avatar">?</span>
+          <li class="oc-chooseaccount-item" id="item-other" role="button" tabindex="0">
+            <span class="oc-chooseaccount-avatar" aria-hidden="true">?</span>
             <span class="oc-light oc-chooseaccount-label">{{.UseAnotherLabel}}</span>
           </li>
         </ul>
@@ -77,6 +77,15 @@
     catch (_) { return false; }
   }
 
+  function onKeyActivate(el, handler) {
+    el.addEventListener("keydown", function(e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        handler();
+      }
+    });
+  }
+
   var helloReq = {
     state: qs("state"),
     flow: qs("flow") || "oidc",
@@ -106,7 +115,7 @@
       bodyEl.hidden = false;
 
       // "Continue as current user" — mode=0 logon (cookie re-auth, no password)
-      itemCurrent.addEventListener("click", function() {
+      function activateCurrent() {
         itemCurrent.style.opacity = "0.5";
         itemOther.style.pointerEvents = "none";
         fetchApi("/_/logon", { state: helloReq.state, params: [data.username, "", "0"], hello: helloReq })
@@ -133,14 +142,16 @@
             resetSignInState();
           })
           .catch(resetSignInState);
-      });
+      }
+      itemCurrent.addEventListener("click", activateCurrent);
+      onKeyActivate(itemCurrent, activateCurrent);
     })
     .catch(function() {
       window.location.href = pathPrefix + '/identifier' + window.location.search;
     });
 
   // "Use another account" — invalidate current session then go to login form
-  itemOther.addEventListener("click", function() {
+  function activateOther() {
     var loginParams = new URLSearchParams(window.location.search);
     loginParams.set("prompt", "login");
     loginParams.delete("flow");
@@ -148,7 +159,9 @@
     fetchApi("/_/logoff", { state: helloReq.state }).then(function() {
       window.location.href = target;
     });
-  });
+  }
+  itemOther.addEventListener("click", activateOther);
+  onKeyActivate(itemOther, activateOther);
 })();
   </script>
 </body>

@@ -2,7 +2,7 @@
   <div class="oc-mt-xl">
     <div v-if="noGroups" class="oc-flex group-info oc-text-center">
       <oc-icon name="group-2" size="xxlarge" />
-      <p v-translate>Select a group to view details</p>
+      <p>{{ $gettext('Select a group to view details') }}</p>
     </div>
     <div v-if="multipleGroups" class="oc-flex group-info">
       <oc-icon name="group-2" size="xxlarge" />

@@ -99,7 +99,7 @@ exports[`Users view > list view > renders list initially 1`] = `
                   <div><span class="oc-table-thead-content"><span class="oc-ml-s"><input id="oc-checkbox-1" type="checkbox" name="checkbox" class="oc-checkbox oc-rounded oc-checkbox-l"> <label for="oc-checkbox-1" class="oc-cursor-pointer oc-invisible-sr">Select all users</label></span></span></div>
                 </th>
                 <th class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-shrink oc-text-nowrap oc-th oc-table-header-cell oc-table-header-cell-avatar" style="top: 0px;">
-                  <div><span class="oc-table-thead-content header-text oc-invisible-sr" aria-hidden="true"></span></div>
+                  <div><span class="oc-table-thead-content header-text oc-invisible-sr">avatar</span></div>
                 </th>
                 <th class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-auto oc-text-nowrap oc-th oc-table-header-cell oc-table-header-cell-onPremisesSamAccountName" style="top: 0px;" aria-sort="ascending">
                   <oc-button-stub type="button" disabled="false" size="medium" submit="button" variation="passive" appearance="raw" justifycontent="center" gapsize="medium" showspinner="false" class="oc-button-sort oc-width-1-1"></oc-button-stub>
@@ -117,7 +117,7 @@ exports[`Users view > list view > renders list initially 1`] = `
                   <oc-button-stub type="button" disabled="false" size="medium" submit="button" variation="passive" appearance="raw" justifycontent="center" gapsize="medium" showspinner="false" class="oc-button-sort oc-width-1-1"></oc-button-stub>
                 </th>
                 <th class="oc-table-cell oc-table-cell-align-right oc-table-cell-align-middle oc-table-cell-width-auto oc-text-nowrap oc-th oc-table-header-cell oc-table-header-cell-actions oc-pr-s" style="top: 0px;">
-                  <div><span class="oc-table-thead-content header-text" aria-hidden="false">Actions</span></div>
+                  <div><span class="oc-table-thead-content header-text">Actions</span></div>
                 </th>
               </tr>
             </thead>

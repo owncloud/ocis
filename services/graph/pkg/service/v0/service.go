@@ -18,6 +18,7 @@ import (
 	microstore "go-micro.dev/v4/store"
 
 	"github.com/owncloud/reva/v2/pkg/autoprop"
+	"github.com/owncloud/reva/v2/pkg/bytesize"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/store"
@@ -166,6 +167,14 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		historyClient:            options.EventHistoryClient,
 		traceProvider:            options.TraceProvider,
 		valueService:             options.ValueService,
+	}
+
+	if raw := options.Config.Validation.MaxImageFileSize; raw != "" {
+		maxImageFileSize, err := bytesize.Parse(raw)
+		if err != nil {
+			return svc, fmt.Errorf("could not parse validation.max_image_file_size %q: %w", raw, err)
+		}
+		svc.maxImageFileSize = maxImageFileSize.Bytes()
 	}
 
 	if err := setIdentityBackends(options, &svc); err != nil {

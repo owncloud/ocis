@@ -68,6 +68,7 @@ type Graph struct {
 	keycloakClient           keycloak.Client
 	historyClient            ehsvc.EventHistoryService
 	traceProvider            trace.TracerProvider
+	maxImageFileSize         uint64
 }
 
 // ServeHTTP implements the Service interface.

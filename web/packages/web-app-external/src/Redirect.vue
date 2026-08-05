@@ -2,7 +2,7 @@
   <main
     class="external-redirect oc-height-viewport oc-flex oc-flex-column oc-flex-center oc-flex-middle"
   >
-    <h1 class="oc-invisible-sr" v-text="pageTitle" />
+    <h1 v-if="pageTitle" class="oc-invisible-sr" v-text="pageTitle" />
     <div class="oc-card oc-card-body oc-text-center oc-width-large">
       <template v-if="hasError">
         <h2 key="external-redirect-error">

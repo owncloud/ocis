@@ -71,9 +71,7 @@ export const openSharingPanel = async function (
 }
 
 export type ActionViaType =
-  | typeof fileAction.sideBarPanel
-  | typeof fileAction.quickAction
-  | typeof fileAction.urlNavigation
+  typeof fileAction.sideBarPanel | typeof fileAction.quickAction | typeof fileAction.urlNavigation
 
 export interface createShareArgs extends ShareArgs {
   via: ActionViaType

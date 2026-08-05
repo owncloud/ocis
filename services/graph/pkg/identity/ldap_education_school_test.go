@@ -54,13 +54,6 @@ var schoolEntry1 = ldap.NewEntry("ou=Test School1",
 		"ocEducationSchoolNumber": {"0042"},
 		"owncloudUUID":            {"hijk-defg"},
 	})
-var schoolEntryWithTermination = ldap.NewEntry("ou=Test School",
-	map[string][]string{
-		"ou":                                    {"Test School"},
-		"ocEducationSchoolNumber":               {"0123"},
-		"owncloudUUID":                          {"abcd-defg"},
-		"ocEducationSchoolTerminationTimestamp": {"20420131120000Z"},
-	})
 
 var (
 	filterSchoolSearchByIdExisting        = "(&(objectClass=ocEducationSchool)(|(owncloudUUID=abcd-defg)(ocEducationSchoolNumber=abcd-defg)))"
@@ -177,7 +170,11 @@ func TestCreateEducationSchool(t *testing.T) {
 					Entries: []*ldap.Entry{schoolEntry},
 				},
 				nil)
-		b, err := getMockedBackend(lm, eduConfig, &logger)
+		// useServerUUID=true keeps the read-back path (the directory assigns the ID),
+		// which is what this test asserts (fixed entry returned with a known id).
+		c := eduConfig
+		c.UseServerUUID = true
+		b, err := getMockedBackend(lm, c, &logger)
 		assert.Nil(t, err)
 		assert.NotEqual(t, "", b.educationConfig.schoolObjectClass)
 
@@ -218,17 +215,11 @@ func TestUpdateEducationSchoolTerminationDate(t *testing.T) {
 		return false
 	}
 	lm.On("Modify", mock.MatchedBy(ldapSchoolTerminationRequestMatcher)).Return(nil)
+	// Single pre-read; the termination Replace is folded onto it (no read-back).
 	lm.On("Search", mock.Anything).
 		Return(
 			&ldap.SearchResult{
 				Entries: []*ldap.Entry{schoolEntry},
-			},
-			nil).
-		Once()
-	lm.On("Search", mock.Anything).
-		Return(
-			&ldap.SearchResult{
-				Entries: []*ldap.Entry{schoolEntryWithTermination},
 			},
 			nil).
 		Once()
@@ -240,7 +231,7 @@ func TestUpdateEducationSchoolTerminationDate(t *testing.T) {
 	terminationTime := time.Date(2042, time.January, 31, 12, 0, 0, 0, time.UTC)
 	school.SetTerminationDate(terminationTime)
 	resSchool, err := b.UpdateEducationSchool(context.Background(), "abcd-defg", *school)
-	lm.AssertNumberOfCalls(t, "Search", 2)
+	lm.AssertNumberOfCalls(t, "Search", 1)
 	assert.Nil(t, err)
 	assert.NotNil(t, resSchool)
 	assert.Equal(t, "Test School", resSchool.GetDisplayName())
