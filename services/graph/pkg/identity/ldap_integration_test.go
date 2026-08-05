@@ -142,7 +142,7 @@ func newIDMBackend(t *testing.T, entries ...*gldap.Entry) *LDAP {
 	})
 	conn.SetLogger(&lgr.Logger)
 
-	backend, err := NewLDAPBackend(conn, idmConfig, &lgr, "")
+	backend, err := NewLDAPBackend(conn, idmConfig, &lgr, "", "")
 	require.NoError(t, err)
 	return backend
 }

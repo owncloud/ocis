@@ -197,7 +197,7 @@ func TestCreateUserReadBackRetriedOnStaleReplica(t *testing.T) {
 
 	c := lconfig
 	c.UseServerUUID = true
-	b, err := NewLDAPBackend(l, c, &logger, "")
+	b, err := NewLDAPBackend(l, c, &logger, "", "")
 	assert.Nil(t, err)
 
 	newUser, err := b.CreateUser(context.Background(), *user)
@@ -233,7 +233,7 @@ func TestReadBackAfterWriteExhaustsRetriesReturnsNotFound(t *testing.T) {
 	c := lconfig
 	c.UseServerUUID = true
 	c.RetryMaxCount = 2 // 1 initial read + 2 retries = 3 reads
-	b, err := NewLDAPBackend(l, c, &logger, "")
+	b, err := NewLDAPBackend(l, c, &logger, "", "")
 	assert.Nil(t, err)
 
 	newUser, err := b.CreateUser(context.Background(), *user)
