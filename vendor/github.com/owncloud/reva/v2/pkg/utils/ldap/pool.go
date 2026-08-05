@@ -26,6 +26,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	backoff "github.com/cenkalti/backoff/v5"
 	"github.com/go-ldap/ldap/v3"
 	"github.com/rs/zerolog"
 	"golang.org/x/sync/semaphore"
@@ -36,8 +37,7 @@ const (
 	// sentinel: there is no "unlimited" pool, a non-positive value always falls back to this default.
 	defaultPoolSize = 5
 	// defaultPoolCheckoutTimeout is the checkout timeout used when Config.PoolCheckoutTimeout is <=
-	// 0. Like PoolSize, there is no "wait forever" mode: a non-positive value falls back to this
-	// default rather than disabling the timeout.
+	// 0. There is no "wait forever" mode.
 	defaultPoolCheckoutTimeout = 30 * time.Second
 )
 
@@ -48,23 +48,27 @@ var (
 	errPoolClosed    = errors.New("ldap: connection pool is closed")
 )
 
-// clientFactory dials and authenticates a new LDAP connection for the given config. ConnPool holds
-// it as a field, rather than calling dialLDAP directly, purely so tests can substitute a
-// network-free fake; every production pool uses dialLDAP.
+// clientFactory dials and authenticates a new LDAP connection. Held as a ConnPool field so tests
+// can substitute a network-free fake; production pools use dialLDAP.
 type clientFactory func(Config) (ldap.Client, error)
 
-// ConnPool is a bounded pool of authenticated LDAP connections. Connections are dialed and bound
-// lazily on checkout and reused across requests; connections that fail with a network error are
-// discarded and lazily re-dialed on a later checkout, instead of the pool eagerly reconnecting them.
+// ConnPool is a bounded pool of authenticated LDAP connections, dialed lazily on checkout and
+// reused across requests. Connections that fail with a network error are discarded and re-dialed.
 type ConnPool struct {
 	config  Config
 	timeout time.Duration
 	dial    clientFactory
 	logger  *zerolog.Logger
 
-	// sem bounds the number of connections checked out at once: checkout acquires it (blocking with
-	// p.timeout until a slot is free), release releases it to free the slot. Its weight is the pool
-	// size.
+	// read/write are the retry policies for reads and writes. The pool uses only MaxRetries, the
+	// backoff bounds, and isRetryable; needsReconnect is ignored (release evicts, checkout re-dials).
+	read  RetryPolicy
+	write RetryPolicy
+	// sleepFn backs off between retries; overridable in tests. Defaults to time.Sleep.
+	sleepFn func(time.Duration)
+
+	// sem bounds concurrent checkouts to the pool size: checkout acquires a slot (blocking up to
+	// p.timeout), release frees it.
 	sem *semaphore.Weighted
 	// idle holds connections that are checked in and ready to be reused; it is buffered to the pool
 	// size so release never blocks. checkout drains it first before dialing a new connection.
@@ -93,6 +97,9 @@ func NewLDAPPool(config Config, logger *zerolog.Logger) *ConnPool {
 		timeout: timeout,
 		dial:    dialLDAP,
 		logger:  logger,
+		read:    NewReadPolicy(config.RetryMaxCount, config.RetryBaseDelay, config.RetryMaxDelay),
+		write:   NewWritePolicy(config.RetryMaxCount, config.RetryBaseDelay, config.RetryMaxDelay),
+		sleepFn: time.Sleep,
 		sem:     semaphore.NewWeighted(int64(size)),
 		idle:    make(chan ldap.Client, size),
 	}
@@ -144,10 +151,10 @@ func (p *ConnPool) checkout() (ldap.Client, error) {
 	return conn, nil
 }
 
-// release returns conn to the pool, or closes and discards it if opErr is a network error (or the
-// pool has since been closed), and frees the slot reserved by checkout.
+// release returns conn to the pool and frees its slot, or closes it if opErr marks it unusable
+// (ErrorNetwork or a codeless failed conn.Write) or the pool has closed. See isSendFailedErr.
 func (p *ConnPool) release(conn ldap.Client, opErr error) {
-	if p.IsClosing() || (opErr != nil && ldap.IsErrorWithCode(opErr, ldap.ErrorNetwork)) {
+	if p.IsClosing() || (opErr != nil && (ldap.IsErrorWithCode(opErr, ldap.ErrorNetwork) || isSendFailedErr(opErr))) {
 		if err := conn.Close(); err != nil {
 			p.logger.Error().Err(err).Msg("error closing pooled LDAP connection")
 		}
@@ -157,25 +164,37 @@ func (p *ConnPool) release(conn ldap.Client, opErr error) {
 	p.sem.Release(1)
 }
 
-// do checks out a connection, runs fn, and releases the connection. Checked-out idle connections
-// are not health-checked before use, so a connection that went stale while idle (server-side idle
-// timeout, LB/firewall reaping) is expected to fail the first op after being idle; on a network
-// error, do retries once more with a freshly checked-out connection (the failed one was evicted by
-// release) instead of surfacing the failure to the caller, mirroring ConnWithReconnect's retry.
-func (p *ConnPool) do(fn func(conn ldap.Client) error) error {
+// do checks out a connection, runs fn under policy, and releases it; on a policy.isRetryable error
+// (e.g. a stale idle connection) it retries on a fresh checkout with backoff up to policy.MaxRetries.
+func (p *ConnPool) do(policy RetryPolicy, fn func(conn ldap.Client) error) error {
+	maxRetries := policy.MaxRetries
+	if maxRetries < 1 {
+		maxRetries = 1
+	}
 	var opErr error
-	for try := 0; try <= defaultRetries; try++ {
+	var bo *backoff.ExponentialBackOff
+	for try := 0; ; try++ {
 		conn, err := p.checkout()
 		if err != nil {
 			return err
 		}
 		opErr = fn(conn)
 		p.release(conn, opErr)
-		if opErr == nil || !ldap.IsErrorWithCode(opErr, ldap.ErrorNetwork) {
+		if opErr == nil || !policy.isRetryable(opErr) || try >= maxRetries {
 			return opErr
 		}
+		if policy.BaseDelay > 0 {
+			if bo == nil {
+				bo = backoff.NewExponentialBackOff()
+				bo.InitialInterval = policy.BaseDelay
+				if policy.MaxDelay > 0 {
+					bo.MaxInterval = policy.MaxDelay
+				}
+				bo.Reset()
+			}
+			p.sleepFn(bo.NextBackOff())
+		}
 	}
-	return ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
 // Close closes the pool: currently idle connections are closed immediately, further checkouts are
@@ -200,7 +219,7 @@ func (p *ConnPool) Close() error {
 // Search implements the ldap.Client interface
 func (p *ConnPool) Search(sr *ldap.SearchRequest) (*ldap.SearchResult, error) {
 	var res *ldap.SearchResult
-	err := p.do(func(conn ldap.Client) error {
+	err := p.do(p.read, func(conn ldap.Client) error {
 		var err error
 		res, err = conn.Search(sr)
 		return err
@@ -210,28 +229,28 @@ func (p *ConnPool) Search(sr *ldap.SearchRequest) (*ldap.SearchResult, error) {
 
 // Add implements the ldap.Client interface
 func (p *ConnPool) Add(a *ldap.AddRequest) error {
-	return p.do(func(conn ldap.Client) error {
+	return p.do(p.write, func(conn ldap.Client) error {
 		return conn.Add(a)
 	})
 }
 
 // Del implements the ldap.Client interface
 func (p *ConnPool) Del(d *ldap.DelRequest) error {
-	return p.do(func(conn ldap.Client) error {
+	return p.do(p.write, func(conn ldap.Client) error {
 		return conn.Del(d)
 	})
 }
 
 // Modify implements the ldap.Client interface
 func (p *ConnPool) Modify(m *ldap.ModifyRequest) error {
-	return p.do(func(conn ldap.Client) error {
+	return p.do(p.write, func(conn ldap.Client) error {
 		return conn.Modify(m)
 	})
 }
 
 // ModifyDN implements the ldap.Client interface
 func (p *ConnPool) ModifyDN(m *ldap.ModifyDNRequest) error {
-	return p.do(func(conn ldap.Client) error {
+	return p.do(p.write, func(conn ldap.Client) error {
 		return conn.ModifyDN(m)
 	})
 }
@@ -239,7 +258,7 @@ func (p *ConnPool) ModifyDN(m *ldap.ModifyDNRequest) error {
 // Extended implements the ldap.Client interface
 func (p *ConnPool) Extended(request *ldap.ExtendedRequest) (*ldap.ExtendedResponse, error) {
 	var res *ldap.ExtendedResponse
-	err := p.do(func(conn ldap.Client) error {
+	err := p.do(p.write, func(conn ldap.Client) error {
 		var err error
 		res, err = conn.Extended(request)
 		return err
@@ -304,7 +323,7 @@ func (p *ConnPool) Unbind() error {
 // ModifyWithResult implements the ldap.Client interface
 func (p *ConnPool) ModifyWithResult(m *ldap.ModifyRequest) (*ldap.ModifyResult, error) {
 	var res *ldap.ModifyResult
-	err := p.do(func(conn ldap.Client) error {
+	err := p.do(p.write, func(conn ldap.Client) error {
 		var err error
 		res, err = conn.ModifyWithResult(m)
 		return err
@@ -320,7 +339,7 @@ func (p *ConnPool) Compare(dn, attribute, value string) (bool, error) {
 // PasswordModify implements the ldap.Client interface
 func (p *ConnPool) PasswordModify(m *ldap.PasswordModifyRequest) (*ldap.PasswordModifyResult, error) {
 	var res *ldap.PasswordModifyResult
-	err := p.do(func(conn ldap.Client) error {
+	err := p.do(p.write, func(conn ldap.Client) error {
 		var err error
 		res, err = conn.PasswordModify(m)
 		return err
