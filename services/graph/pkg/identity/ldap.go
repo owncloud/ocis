@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/CiscoM31/godata"
+	backoff "github.com/cenkalti/backoff/v5"
 	"github.com/go-ldap/ldap/v3"
 	"github.com/google/uuid"
 	"github.com/libregraph/idm/pkg/ldapdn"
@@ -53,6 +54,11 @@ type LDAP struct {
 	writeEnabled    bool
 	refintEnabled   bool
 	usePwModifyExOp bool
+
+	// bounds for the read-back retry in readBackAfterWrite
+	retryMaxCount  int
+	retryBaseDelay time.Duration
+	retryMaxDelay  time.Duration
 
 	userBaseDN          string
 	userFilter          string
@@ -204,6 +210,9 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 	return &LDAP{
 		useServerUUID:                  config.UseServerUUID,
 		usePwModifyExOp:                config.UsePasswordModExOp,
+		retryMaxCount:                  config.RetryMaxCount,
+		retryBaseDelay:                 config.RetryBaseDelay,
+		retryMaxDelay:                  config.RetryMaxDelay,
 		userBaseDN:                     config.UserBaseDN,
 		userFilter:                     config.UserFilter,
 		userObjectClass:                config.UserObjectClass,
@@ -279,7 +288,9 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 	if i.useServerUUID {
 		// The directory assigns the ID and conn.Add cannot return it, so we must
 		// read the entry back to recover the generated UUID.
-		e, err = i.getUserByDN(ar.DN, "")
+		e, err = i.readBackAfterWrite(func() (*ldap.Entry, error) {
+			return i.getUserByDN(ar.DN, "")
+		})
 		if err != nil {
 			return nil, err
 		}
@@ -542,6 +553,13 @@ func (i *LDAP) getEntryByDN(dn string, attrs []string, filter string) (*ldap.Ent
 		Msg("getEntryByDN")
 	res, err := i.conn.Search(searchRequest)
 	if err != nil {
+		// A lagging replica returns NoSuchObject(32) for a base search on a
+		// not-yet-replicated DN; a slower one returns success with 0 entries. Both
+		// mean "not there yet", so map to the same ErrNotFound that readBackAfterWrite
+		// retries on.
+		if ldap.IsErrorWithCode(err, ldap.LDAPResultNoSuchObject) {
+			return nil, ErrNotFound
+		}
 		i.logger.Error().Err(err).Str("backend", "ldap").Str("dn", dn).Msg("Search ldap by DN failed")
 		return nil, errorcode.New(errorcode.ItemNotFound, "user lookup failed")
 	}
@@ -552,7 +570,40 @@ func (i *LDAP) getEntryByDN(dn string, attrs []string, filter string) (*ldap.Ent
 	return res.Entries[0], nil
 }
 
+// readBackAfterWrite runs readFn, retrying on ErrNotFound with backoff. A 0-entry
+// read after a successful write means the read hit a replica lagging behind the
+// primary; the connection-level retry only sees error codes, not this empty result,
+// so the retry happens here. Bounds default to one immediate re-read (count=1,
+// delay=0) and are tunable via the shared LDAP retry config.
+func (i *LDAP) readBackAfterWrite(readFn func() (*ldap.Entry, error)) (*ldap.Entry, error) {
+	maxRetries := i.retryMaxCount
+	if maxRetries < 1 {
+		maxRetries = 1
+	}
+
+	var bo *backoff.ExponentialBackOff
+	for try := 0; ; try++ {
+		e, err := readFn()
+		if !errors.Is(err, ErrNotFound) || try >= maxRetries {
+			return e, err
+		}
+
+		if i.retryBaseDelay > 0 {
+			if bo == nil {
+				bo = backoff.NewExponentialBackOff()
+				bo.InitialInterval = i.retryBaseDelay
+				if i.retryMaxDelay > 0 {
+					bo.MaxInterval = i.retryMaxDelay
+				}
+				bo.Reset()
+			}
+			time.Sleep(bo.NextBackOff())
+		}
+	}
+}
+
 func (i *LDAP) searchLDAPEntryByFilter(basedn string, attrs []string, filter string) (*ldap.Entry, error) {
+	i.logger.Debug().Str("backend", "ldap").Msg("searchLDAPEntryByFilter")
 	if filter == "" {
 		filter = "(objectclass=*)"
 	}
@@ -612,6 +663,7 @@ func (i *LDAP) getLDAPUserByID(id string) (*ldap.Entry, error) {
 }
 
 func (i *LDAP) getLDAPUserByNameOrID(nameOrID string) (*ldap.Entry, error) {
+	i.logger.Debug().Str("backend", "ldap").Msg("getLDAPUserByNameOrID")
 	idString, err := filterEscapeUUID(i.userIDisOctetString, nameOrID)
 	// err != nil just means that this is not an uuid, so we can skip the uuid filter part
 	// and just filter by name
@@ -1178,6 +1230,7 @@ func (i *LDAP) getUserLDAPDN(user libregraph.User) string {
 }
 
 func (i *LDAP) userToAddRequest(user libregraph.User) (*ldap.AddRequest, error) {
+	i.logger.Debug().Str("backend", "ldap").Msg("userToAddRequest")
 	ar := ldap.NewAddRequest(i.getUserLDAPDN(user), nil)
 
 	attrMap, err := i.userToLDAPAttrValues(user)

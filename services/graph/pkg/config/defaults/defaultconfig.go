@@ -95,6 +95,7 @@ func DefaultConfig() *config.Config {
 				UsePasswordModExOp:       true,
 				WriteEnabled:             true,
 				UpdateUserLastSignInDate: true,
+				RetryMaxCount:            1,
 				UserBaseDN:               "ou=users,o=libregraph-idm",
 				UserSearchScope:          "sub",
 				UserFilter:               "",
