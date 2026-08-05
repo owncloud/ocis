@@ -102,6 +102,10 @@ the extended attributes will look like this
 
   - w write-data (files) / create-file (directories)
 
+  - m move - rename or move the file/directory. Not an NFSv4 permission. Grants
+    written before this flag existed encoded move in w, so a missing m on a
+    w+r+d grant still means move.
+
   - a append-data (files) / create-subdirectory (directories)
 
   - x execute (files) / change-directory (directories)
@@ -332,9 +336,16 @@ func (e *ACE) grantPermissionSet() *provider.ResourcePermissions {
 	// w
 	if strings.Contains(e.permissions, "w") {
 		p.InitiateFileUpload = true
+		// Grants persisted before "m" existed encoded Move in "w" as well, so for
+		// those the only way to tell the two apart is this heuristic. Newer grants
+		// carry "m" and do not need it.
 		if p.InitiateFileDownload && p.Delete {
 			p.Move = true
 		}
+	}
+	// m
+	if strings.Contains(e.permissions, "m") {
+		p.Move = true
 	}
 	// a
 	if strings.Contains(e.permissions, "a") {
@@ -450,6 +461,9 @@ func getACEPerm(set *provider.ResourcePermissions) string {
 	}
 	if set.InitiateFileUpload || set.Move {
 		b.WriteString("w")
+	}
+	if set.Move {
+		b.WriteString("m")
 	}
 	if set.CreateContainer {
 		b.WriteString("a")
