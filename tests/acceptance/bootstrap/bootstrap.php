@@ -101,3 +101,8 @@ if (!\defined('MAX_REQUEST_RETRY_COUNT')) {
 if (!\defined('STANDARD_REQUEST_POLLING_INTERVAL_SEC')) {
 	\define('STANDARD_REQUEST_POLLING_INTERVAL_SEC', 1);
 }
+
+// Number of times to poll for a service to become ready after a (re)start.
+if (!\defined('SERVICE_READY_RETRY_COUNT')) {
+	\define('SERVICE_READY_RETRY_COUNT', 30);
+}
