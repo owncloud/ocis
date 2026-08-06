@@ -181,6 +181,45 @@ OPTIONS:
    --help, -h       show help
 ```
 
+Note that removing a stale node does not reclaim the quota it consumed. Use the
+Recalculate Treesize command afterwards to correct the reported quota usage of the space.
+
+#### Recalculate Treesize command
+
+The treesize of a directory is maintained as a running counter that is updated on every
+change, so a failed or incomplete update leaves the counter wrong and the reported quota
+usage of a space drifts from the data actually stored on disk. This command walks a space
+bottom up, recalculates the treesize of every directory from the actual size of its
+children and corrects the stored values.
+
+```bash
+    ~/ocis storage-users spaces recalculate-treesize <commandoptions>
+```
+```
+NAME:
+   ocis storage-users spaces recalculate-treesize - Recalculate the treesize of all directories in a space from the actual size of their children. Use this to repair a space whose reported quota usage drifted from the data on disk
+
+USAGE:
+   ocis storage-users spaces recalculate-treesize [command options]
+
+OPTIONS:
+   --space-id value, -s value  Space ID to recalculate (omit to process all spaces)
+   --dry-run                   Only show which treesizes would be corrected without writing them (default: true)
+   --verbose, -v               Enable verbose logging (default: false)
+   --help, -h                  show help
+```
+
+```bash
+# report incorrect treesizes of a single space without changing anything
+ocis storage-users spaces recalculate-treesize --space-id 43972c79-f7ce-441b-9fe0-cf5170e4d61e
+
+# correct them
+ocis storage-users spaces recalculate-treesize --space-id 43972c79-f7ce-441b-9fe0-cf5170e4d61e --dry-run=false
+```
+
+Note: the command reads the metadata of every node in the space, so it is I/O intensive on
+large spaces. Prefer targeting a single space with `--space-id` over processing all spaces.
+
 #### Command Examples
 
 Dry run to see what would be deleted (recommended first step)
