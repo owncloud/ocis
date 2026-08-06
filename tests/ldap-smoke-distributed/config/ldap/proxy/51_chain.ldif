@@ -1,0 +1,36 @@
+# proxy-ldap write path: the chain overlay on the frontend catches the referral
+# emitted by olcUpdateRef (50_syncrepl.ldif) and proxies the write to write-ldap.
+# The chain overlay is compiled into back_ldap.la (no separate chain module); loading
+# back_ldap.la registers both the ldap backend and the chain overlay.
+
+# 1. load back-ldap (registers the chain overlay too)
+dn: cn=module{0},cn=config
+changetype: modify
+add: olcModuleLoad
+olcModuleLoad: back_ldap.la
+
+# 2. chain overlay on the frontend DB. slapd normalizes the RDN to olcOverlay={0}chain
+#    (first overlay on the frontend); the nested DB below must reference that {0} form.
+dn: olcOverlay=chain,olcDatabase={-1}frontend,cn=config
+changetype: add
+objectClass: olcOverlayConfig
+objectClass: olcChainConfig
+# olcChainingBehavior omitted: maps to slapd "chain-chaining" (RFC 4370), rejected by
+# this build. back-ldap chases via olcDbChaseReferrals on the nested DB regardless.
+olcOverlay: chain
+olcChainCacheURI: FALSE
+olcChainMaxReferralDepth: 1
+olcChainReturnError: TRUE
+
+# 3. nested back-ldap DB for the upstream master. Required, else the referral is chased
+#    anonymously and the master rejects the write. oCIS binds as cn=admin (master rootdn);
+#    mode=self self-asserts that identity, so no proxyAuthz rule is needed upstream.
+dn: olcDatabase=ldap,olcOverlay={0}chain,olcDatabase={-1}frontend,cn=config
+changetype: add
+objectClass: olcLDAPConfig
+objectClass: olcChainDatabase
+olcDbStartTLS: none
+olcDbURI: ldap://write-ldap:389
+olcDbChaseReferrals: TRUE
+olcDbIDAssertBind: bindmethod=simple binddn="cn=admin,dc=owncloud,dc=com" credentials="admin" mode=self flags=prescriptive
+olcDbRebindAsUser: TRUE
