@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -260,6 +261,12 @@ func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersi
 		return nil, errorcode.New(errorcode.GeneralException, err.Error())
 	}
 
+	// An unrestricted listing includes other users' personal spaces; drop the
+	// ones the caller may not see (project/shared spaces are unaffected).
+	if unrestricted {
+		spaces = g.filterForeignPersonalSpaces(ctx, spaces)
+	}
+
 	spaces, err = sortSpaces(odataReq, spaces)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get drives: error sorting the spaces list according to query")
@@ -267,6 +274,37 @@ func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersi
 	}
 
 	return spaces, nil
+}
+
+// filterForeignPersonalSpaces drops personal spaces the caller does not own,
+// unless the caller holds full account management permission (OCISDEV-660).
+func (g Graph) filterForeignPersonalSpaces(ctx context.Context, spaces []*libregraph.Drive) []*libregraph.Drive {
+	user, ok := revactx.ContextGetUser(ctx)
+	if !ok {
+		// No caller identity: drop every personal space rather than leak it.
+		return slices.DeleteFunc(slices.Clone(spaces), func(d *libregraph.Drive) bool {
+			return d.GetDriveType() == _spaceTypePersonal
+		})
+	}
+
+	callerID := user.GetId().GetOpaqueId()
+	isForeignPersonal := func(d *libregraph.Drive) bool {
+		if d.GetDriveType() != _spaceTypePersonal {
+			return false
+		}
+		owner := d.GetOwner()
+		ownerUser := owner.GetUser()
+		return ownerUser.GetId() != callerID
+	}
+
+	if !slices.ContainsFunc(spaces, isForeignPersonal) {
+		return spaces
+	}
+	if g.contextUserHasFullAccountPerms(ctx) {
+		return spaces
+	}
+
+	return slices.DeleteFunc(slices.Clone(spaces), isForeignPersonal)
 }
 
 // GetSingleDrive V1 does a lookup of a single space by spaceId
@@ -331,6 +369,9 @@ func (g Graph) getSingleDrive(w http.ResponseWriter, r *http.Request, apiVersion
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
+	// Runs unrestricted, so decomposedfs skips per-node checks; drop a foreign
+	// personal space here so it renders the same 404 as a missing drive below.
+	spaces = g.filterForeignPersonalSpaces(ctx, spaces)
 	switch num := len(spaces); {
 	case num == 0:
 		log.Debug().Msg("could not get drive: no drive returned from storage")
