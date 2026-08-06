@@ -1,0 +1,22 @@
+# proxy-ldap read path: its own syncrepl consumer feed from write-ldap, so reads are
+# served from the proxy's local mdb (kept current by replication). olcUpdateRef turns
+# writes into a referral to write-ldap; the chain overlay (51_chain.ldif) catches that
+# referral and proxies the write.
+
+dn: olcDatabase={1}mdb,cn=config
+changetype: modify
+add: olcSyncrepl
+olcSyncrepl: rid=002
+  provider=ldap://write-ldap:389
+  bindmethod=simple
+  binddn="cn=admin,dc=owncloud,dc=com"
+  credentials="admin"
+  searchbase="dc=owncloud,dc=com"
+  scope=sub
+  schemachecking=on
+  type=refreshAndPersist
+  retry="5 +"
+  interval=00:00:00:10
+-
+add: olcUpdateRef
+olcUpdateRef: ldap://write-ldap:389
