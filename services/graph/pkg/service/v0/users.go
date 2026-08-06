@@ -144,8 +144,10 @@ func (g Graph) GetUserDrive(w http.ResponseWriter, r *http.Request) {
 	logger.Debug().Str("userID", userID).Msg("calling list storage spaces with user and personal filter")
 	ctx := r.Context()
 
+	unrestricted := g.contextUserHasFullAccountPerms(ctx) // only users with full account permissions can have unrestricted access
+
 	filters := []*storageprovider.ListStorageSpacesRequest_Filter{listStorageSpacesTypeFilter("personal"), listStorageSpacesUserFilter(userID)}
-	res, err := g.ListStorageSpacesWithFilters(ctx, filters, true)
+	res, err := g.ListStorageSpacesWithFilters(ctx, filters, unrestricted)
 	switch {
 	case err != nil:
 		logger.Error().Err(err).Msg("could not get drive: transport error")
