@@ -20,9 +20,9 @@
       "defaults": {
         "appBanner": {},
         "logo": {
-          "topbar": "themes/owncloud/assets/logo.svg",
+          "topbar": "themes/owncloud/assets/oc_white.svg",
           "favicon": "themes/owncloud/assets/favicon.jpg",
-          "login": "themes/owncloud/assets/logo.svg"
+          "login": "themes/owncloud/assets/oc_white.svg"
         },
         "loginPage": {
           "backgroundImg": "themes/owncloud/assets/loginBackground.jpg"
@@ -73,11 +73,6 @@
         {
           "isDark": false,
           "name": "Light Theme",
-          "logo": {
-            "topbar": "themes/owncloud/assets/oc_white.svg",
-            "favicon": "themes/owncloud/assets/favicon.jpg",
-            "login": "themes/owncloud/assets/oc_white.svg"
-          },
           "designTokens": {
             "colorPalette": {
               "background-accentuate": "rgba(255, 255, 5, 0.1)",
