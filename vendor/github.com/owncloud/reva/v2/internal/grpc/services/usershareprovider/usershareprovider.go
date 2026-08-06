@@ -661,6 +661,7 @@ func getMountpointAndUnmountedShares(ctx context.Context, receivedShares []*coll
 	mount := base
 	existingMountpoint := ""
 	mountedShares := make([]string, 0, len(receivedShares))
+	newShareInVault := id.GetStorageId() == utils.VaultStorageProviderID
 	var pathExists bool
 	var err error
 
@@ -684,6 +685,14 @@ func getMountpointAndUnmountedShares(ctx context.Context, receivedShares []*coll
 		if resourceIDEqual && s.State != collaboration.ShareState_SHARE_STATE_ACCEPTED {
 			// a share to the resource already exists but is not mounted, collect the unmounted share
 			unmountedShares = append(unmountedShares, s)
+		}
+
+		// vault and non-vault shares are rendered in separate, segregated lists (see
+		// pkg/storage/registry/spaces/spaces.go), so name collisions must only be checked
+		// against mountpoints within the same list, not across both.
+		existingShareInVault := s.GetShare().GetResourceId().GetStorageId() == utils.VaultStorageProviderID
+		if existingShareInVault != newShareInVault {
+			continue
 		}
 
 		if s.State == collaboration.ShareState_SHARE_STATE_ACCEPTED {
