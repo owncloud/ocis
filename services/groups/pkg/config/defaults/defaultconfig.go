@@ -53,6 +53,7 @@ func DefaultConfig() *config.Config {
 				UserObjectClass:          "inetOrgPerson",
 				GroupObjectClass:         "groupOfNames",
 				BindDN:                   "uid=reva,ou=sysusers,o=libregraph-idm",
+				RetryMaxCount:            1,
 				IDP:                      "https://localhost:9200",
 				PoolEnabled:              false,
 				PoolSize:                 5,
