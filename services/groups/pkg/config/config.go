@@ -66,9 +66,9 @@ type LDAPDriver struct {
 	Insecure                 bool            `yaml:"insecure" env:"OCIS_LDAP_INSECURE;GROUPS_LDAP_INSECURE" desc:"Disable TLS certificate validation for the LDAP connections. Do not set this in production environments." introductionVersion:"pre5.0"`
 	BindDN                   string          `yaml:"bind_dn" env:"OCIS_LDAP_BIND_DN;GROUPS_LDAP_BIND_DN" desc:"LDAP DN to use for simple bind authentication with the target LDAP server." introductionVersion:"pre5.0"`
 	BindPassword             string          `yaml:"bind_password" env:"OCIS_LDAP_BIND_PASSWORD;GROUPS_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'." introductionVersion:"pre5.0"`
-	RetryMaxCount            int           `yaml:"retry_max_count"  env:"OCIS_LDAP_RETRY_MAX_COUNT;GROUPS_LDAP_RETRY_MAX_COUNT"   desc:"Maximum number of retries for failed LDAP operations. Applies to both read and write operations (with different retryable error sets). Default 1." introductionVersion:"8.0.7"`
-	RetryBaseDelay           time.Duration `yaml:"retry_base_delay" env:"OCIS_LDAP_RETRY_BASE_DELAY;GROUPS_LDAP_RETRY_BASE_DELAY" desc:"Base delay for exponential backoff between LDAP retries (e.g. '100ms'). Set to 0 to disable backoff." introductionVersion:"8.0.7"`
-	RetryMaxDelay            time.Duration `yaml:"retry_max_delay"  env:"OCIS_LDAP_RETRY_MAX_DELAY;GROUPS_LDAP_RETRY_MAX_DELAY"   desc:"Maximum delay cap for exponential backoff between LDAP retries (e.g. '5s'). 0 (default) uses the library default cap of 60s." introductionVersion:"8.0.7"`
+	RetryMaxCount            int           `yaml:"retry_max_count"  env:"OCIS_LDAP_RETRY_MAX_COUNT;GROUPS_LDAP_RETRY_MAX_COUNT"   desc:"Maximum number of retries for failed LDAP operations. Applies to both read and write operations (with different retryable error sets). Default 1." introductionVersion:"8.2.0"`
+	RetryBaseDelay           time.Duration `yaml:"retry_base_delay" env:"OCIS_LDAP_RETRY_BASE_DELAY;GROUPS_LDAP_RETRY_BASE_DELAY" desc:"Base delay for exponential backoff between LDAP retries (e.g. '100ms'). Set to 0 to disable backoff." introductionVersion:"8.2.0"`
+	RetryMaxDelay            time.Duration `yaml:"retry_max_delay"  env:"OCIS_LDAP_RETRY_MAX_DELAY;GROUPS_LDAP_RETRY_MAX_DELAY"   desc:"Maximum delay cap for exponential backoff between LDAP retries (e.g. '5s'). 0 (default) uses the library default cap of 60s." introductionVersion:"8.2.0"`
 	UserBaseDN               string          `yaml:"user_base_dn" env:"OCIS_LDAP_USER_BASE_DN;GROUPS_LDAP_USER_BASE_DN" desc:"Search base DN for looking up LDAP users." introductionVersion:"pre5.0"`
 	GroupBaseDN              string          `yaml:"group_base_dn" env:"OCIS_LDAP_GROUP_BASE_DN;GROUPS_LDAP_GROUP_BASE_DN" desc:"Search base DN for looking up LDAP groups." introductionVersion:"pre5.0"`
 	UserScope                string          `yaml:"user_scope" env:"OCIS_LDAP_USER_SCOPE;GROUPS_LDAP_USER_SCOPE" desc:"LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'." introductionVersion:"pre5.0"`
@@ -82,9 +82,9 @@ type LDAPDriver struct {
 	UserSchema               LDAPUserSchema  `yaml:"user_schema"`
 	GroupSchema              LDAPGroupSchema `yaml:"group_schema"`
 
-	PoolEnabled         bool          `yaml:"pool_enabled" env:"OCIS_LDAP_POOL_ENABLED;GROUPS_LDAP_POOL_ENABLED" desc:"Enable a bounded pool of LDAP connections instead of a single long-lived reconnecting connection. Concurrent requests then no longer serialize on one connection." introductionVersion:"8.0.7"`
-	PoolSize            int           `yaml:"pool_size" env:"OCIS_LDAP_POOL_SIZE;GROUPS_LDAP_POOL_SIZE" desc:"Maximum number of concurrently open LDAP connections when 'OCIS_LDAP_POOL_ENABLED' is 'true'. Defaults to 5 when unset or <= 0." introductionVersion:"8.0.7"`
-	PoolCheckoutTimeout time.Duration `yaml:"pool_checkout_timeout" env:"OCIS_LDAP_POOL_CHECKOUT_TIMEOUT;GROUPS_LDAP_POOL_CHECKOUT_TIMEOUT" desc:"Maximum time to wait for a pooled LDAP connection to become available once the pool is exhausted. Defaults to 30s when unset or <= 0. See the Environment Variable Types description for more details." introductionVersion:"8.0.7"`
+	PoolEnabled         bool          `yaml:"pool_enabled" env:"OCIS_LDAP_POOL_ENABLED;GROUPS_LDAP_POOL_ENABLED" desc:"Enable a bounded pool of LDAP connections instead of a single long-lived reconnecting connection. Concurrent requests then no longer serialize on one connection." introductionVersion:"8.2.0"`
+	PoolSize            int           `yaml:"pool_size" env:"OCIS_LDAP_POOL_SIZE;GROUPS_LDAP_POOL_SIZE" desc:"Maximum number of concurrently open LDAP connections when 'OCIS_LDAP_POOL_ENABLED' is 'true'. Defaults to 5 when unset or <= 0." introductionVersion:"8.2.0"`
+	PoolCheckoutTimeout time.Duration `yaml:"pool_checkout_timeout" env:"OCIS_LDAP_POOL_CHECKOUT_TIMEOUT;GROUPS_LDAP_POOL_CHECKOUT_TIMEOUT" desc:"Maximum time to wait for a pooled LDAP connection to become available once the pool is exhausted. Defaults to 30s when unset or <= 0. See the Environment Variable Types description for more details." introductionVersion:"8.2.0"`
 }
 
 type LDAPUserSchema struct {
