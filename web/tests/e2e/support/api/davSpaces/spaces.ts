@@ -93,6 +93,22 @@ export const uploadFileInPersonalSpace = async ({
   await createFile({ user, pathToFile, content, webDavEndPathToRoot, mtimeDeltaDays })
 }
 
+export const uploadFileInVaultSpace = async ({
+  user,
+  pathToFile,
+  content,
+  mtimeDeltaDays
+}: {
+  user: User
+  pathToFile: string
+  content: string | Buffer
+  mtimeDeltaDays?: string
+}): Promise<void> => {
+  const webDavEndPathToRoot =
+    'spaces/' + (await getSpaceIdBySpaceName({ user, spaceType: 'personal' }))
+  await createFile({ user, pathToFile, content, webDavEndPathToRoot, mtimeDeltaDays })
+}
+
 export const createFolderInsideSpaceBySpaceName = async ({
   user,
   folder,
