@@ -439,7 +439,6 @@ def main() -> int:
 
     try:
         wait_for(lambda: ocis_healthy(ocis_url, use_basic_auth=not keycloak_needed), 300, "ocis")
-
         print("ocis ready.")
 
         if tika_needed:

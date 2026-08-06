@@ -36,7 +36,7 @@ export class VaultPage {
     return await this.qrImage.screenshot()
   }
 
-  public async userAuthenticatesWithOTP(otp: string): Promise<void> {
+  public async userAuthenticatesWithOTP(otp): Promise<void> {
     await this.oneTimeCodeTextbox.fill(otp)
     await this.otpSubmitButton.click()
     await this.waitForVaultMode()
