@@ -751,6 +751,11 @@ func (fs *Decomposedfs) ListUploadSessions(ctx context.Context, filter storage.U
 				continue
 			}
 		}
+		// evaluated last: unlike the other filters this reads the node metadata
+		// from disk, so it is only done for sessions that passed all other filters
+		if filter.Orphaned != nil && *filter.Orphaned != session.IsOrphaned(ctx) {
+			continue
+		}
 		filteredSessions = append(filteredSessions, session)
 	}
 	return filteredSessions, nil

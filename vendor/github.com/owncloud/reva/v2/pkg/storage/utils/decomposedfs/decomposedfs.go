@@ -314,7 +314,12 @@ func (fs *Decomposedfs) processEvent(evCtx context.Context, event events.Event, 
 
 		n, err := session.Node(ctx)
 		if err != nil {
-			sublog.Error().Err(err).Msg("could not read node")
+			// The node metadata is unreadable, so this upload can never finish:
+			// the destination cannot be resolved. Clean the session up instead of
+			// leaving it behind to be retried forever. Cleanup falls back to the
+			// session metadata to release the quota.
+			sublog.Error().Err(err).Msg("could not read node, cleaning up orphaned session")
+			session.Cleanup(true, true, true, false)
 			return
 		}
 		sublog = log.With().Str("spaceid", session.SpaceID()).Str("nodeid", session.NodeID()).Logger()
