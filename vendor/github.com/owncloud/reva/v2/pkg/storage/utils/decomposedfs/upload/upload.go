@@ -330,9 +330,70 @@ func (session *OcisSession) removeNode(ctx context.Context) {
 	}
 }
 
+// revertNode undoes the node changes made when the upload was initiated. For a
+// readable node this restores the previous revision. When the node metadata can
+// no longer be read the node is orphaned and can never finish postprocessing; in
+// that case the node is removed and the optimistic size propagation is reverted
+// using the parent id recorded in the session, so the space quota is released.
+func (session *OcisSession) revertNode(ctx context.Context) error {
+	n, err := session.Node(ctx)
+	if err == nil {
+		curUpload, perr := n.ProcessingID(ctx)
+		if perr == nil && curUpload == session.ID() {
+			if rerr := n.RevertCurrentRevision(ctx, true); rerr != nil {
+				return rerr
+			}
+		}
+		return nil
+	}
+
+	// The node is unreadable. Fall back to the session metadata, which still
+	// carries the node and parent ids needed to release the quota.
+	log := appctx.GetLogger(ctx)
+	log.Info().Err(err).Str("sessionid", session.ID()).Msg("node unreadable, cleaning up orphaned upload")
+
+	sn, serr := session.syntheticNode(ctx)
+	if serr != nil {
+		return serr
+	}
+
+	if sizeDiff := session.SizeDiff(); sizeDiff != 0 {
+		if perr := session.store.tp.Propagate(ctx, sn, -sizeDiff); perr != nil {
+			// Without the propagation the quota would stay consumed. Stop here
+			// so the session can be retried instead of losing the upload.
+			return perr
+		}
+	}
+
+	// The orphaned node file cannot be resolved by any other means, remove it
+	// together with its metadata files. A missing node is not an error here:
+	// the node may never have been created.
+	nodePath := sn.InternalPath()
+	if rerr := utils.RemoveItem(nodePath); rerr != nil && !errors.Is(rerr, fs.ErrNotExist) {
+		log.Error().Err(rerr).Str("nodepath", nodePath).Msg("removing orphaned node failed")
+	}
+	if perr := session.store.lu.MetadataBackend().Purge(ctx, nodePath); perr != nil && !errors.Is(perr, fs.ErrNotExist) {
+		log.Error().Err(perr).Str("nodepath", nodePath).Msg("purging orphaned node metadata failed")
+	}
+
+	return nil
+}
+
 // cleanup cleans up after the upload is finished
 func (session *OcisSession) Cleanup(revertNodeMetadata, cleanBin, cleanInfo, unmarkPostprocessing bool) {
 	ctx := session.Context(context.Background())
+
+	if revertNodeMetadata {
+		// Revert before removing the bin and info files. Both are needed to
+		// recover from a failure here: the bin file holds the only copy of the
+		// uploaded data as long as the blob has not been written, and the info
+		// file is the only remaining source of the node's parent id once the
+		// node metadata is gone.
+		if err := session.revertNode(ctx); err != nil {
+			appctx.GetLogger(ctx).Error().Err(err).Str("sessionid", session.ID()).Msg("reverting node failed, keeping upload")
+			return
+		}
+	}
 
 	if cleanBin {
 		if err := os.Remove(session.binPath()); err != nil && !errors.Is(err, fs.ErrNotExist) {
@@ -343,22 +404,6 @@ func (session *OcisSession) Cleanup(revertNodeMetadata, cleanBin, cleanInfo, unm
 	if cleanInfo {
 		if err := os.Remove(session.infoPath()); err != nil {
 			appctx.GetLogger(ctx).Error().Err(err).Str("session", session.ID()).Msg("removing upload info failed")
-		}
-	}
-
-	if revertNodeMetadata {
-		n, err := session.Node(ctx)
-		if err != nil {
-			appctx.GetLogger(ctx).Error().Err(err).Str("sessionid", session.ID()).Msg("reading node for session failed")
-			return
-		}
-
-		curUpload, err := n.ProcessingID(ctx)
-		if err == nil && curUpload == session.ID() {
-			if err := n.RevertCurrentRevision(ctx, true); err != nil {
-				appctx.GetLogger(ctx).Error().Err(err).Str("nodepath", n.InternalPath()).Msg("reverting node metadata failed")
-				return
-			}
 		}
 	}
 
