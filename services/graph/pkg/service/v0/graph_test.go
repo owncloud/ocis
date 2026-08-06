@@ -1345,6 +1345,177 @@ var _ = Describe("Graph", func() {
 		})
 	})
 
+	Describe("Foreign personal drive access (OCISDEV-660)", func() {
+		var (
+			callerCtx = func(opaqueID string) context.Context {
+				return revactx.ContextSetUser(context.Background(), &userprovider.User{
+					Id: &userprovider.UserId{Type: userprovider.UserType_USER_TYPE_PRIMARY, OpaqueId: opaqueID},
+				})
+			}
+
+			personalSpace = func(owner string) *provider.StorageSpace {
+				return &provider.StorageSpace{
+					Id:        &provider.StorageSpaceId{OpaqueId: "victimspace"},
+					SpaceType: "personal",
+					Owner:     &userprovider.User{Id: &userprovider.UserId{OpaqueId: owner}},
+					Root: &provider.ResourceId{
+						StorageId: "pro-1",
+						SpaceId:   "victimspace",
+						OpaqueId:  "victimspace",
+					},
+					Name: "victim",
+				}
+			}
+
+			projectSpace = func(owner string) *provider.StorageSpace {
+				return &provider.StorageSpace{
+					Id:        &provider.StorageSpaceId{OpaqueId: "projectspace"},
+					SpaceType: "project",
+					Owner:     &userprovider.User{Id: &userprovider.UserId{OpaqueId: owner}},
+					Root: &provider.ResourceId{
+						StorageId: "pro-1",
+						SpaceId:   "projectspace",
+						OpaqueId:  "projectspace",
+					},
+					Name: "aproject",
+				}
+			}
+
+			mockAccountPerms = func(constraint v0.Permission_Constraint) {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settingssvc.GetPermissionByIDResponse{
+					Permission: &v0.Permission{Constraint: constraint},
+				}, nil)
+			}
+
+			mockSpaceFormatting = func() {
+				gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
+					Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
+				}, nil)
+				gatewayClient.On("InitiateFileDownload", mock.Anything, mock.Anything).Return(&gateway.InitiateFileDownloadResponse{
+					Status: status.NewNotFound(ctx, "not found"),
+				}, nil)
+			}
+		)
+
+		Describe("GetSingleDrive", func() {
+			singleDriveReq := func(userCtx context.Context) *http.Request {
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives/{driveID}/", nil)
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("driveID", "victimspace")
+				return r.WithContext(context.WithValue(userCtx, chi.RouteCtxKey, rctx))
+			}
+
+			It("returns 404 when a non-admin looks up another user's personal drive", func() {
+				mockSpaceFormatting()
+				mockAccountPerms(v0.Permission_CONSTRAINT_OWN)
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+					Status:        status.NewOK(ctx),
+					StorageSpaces: []*provider.StorageSpace{personalSpace("victim")},
+				}, nil)
+
+				svc.GetSingleDrive(rr, singleDriveReq(callerCtx("attacker")))
+				Expect(rr.Code).To(Equal(http.StatusNotFound))
+			})
+
+			It("returns the personal drive to a full-account admin", func() {
+				mockSpaceFormatting()
+				mockAccountPerms(v0.Permission_CONSTRAINT_ALL)
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+					Status:        status.NewOK(ctx),
+					StorageSpaces: []*provider.StorageSpace{personalSpace("victim")},
+				}, nil)
+
+				svc.GetSingleDrive(rr, singleDriveReq(callerCtx("admin")))
+				Expect(rr.Code).To(Equal(http.StatusOK))
+			})
+
+			It("returns the owner's own personal drive", func() {
+				mockSpaceFormatting()
+				mockAccountPerms(v0.Permission_CONSTRAINT_OWN)
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+					Status:        status.NewOK(ctx),
+					StorageSpaces: []*provider.StorageSpace{personalSpace("victim")},
+				}, nil)
+
+				svc.GetSingleDrive(rr, singleDriveReq(callerCtx("victim")))
+				Expect(rr.Code).To(Equal(http.StatusOK))
+			})
+
+			It("returns another user's project drive to a non-admin (unaffected)", func() {
+				mockSpaceFormatting()
+				mockAccountPerms(v0.Permission_CONSTRAINT_OWN)
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+					Status:        status.NewOK(ctx),
+					StorageSpaces: []*provider.StorageSpace{projectSpace("victim")},
+				}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives/{driveID}/", nil)
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("driveID", "projectspace")
+				r = r.WithContext(context.WithValue(callerCtx("attacker"), chi.RouteCtxKey, rctx))
+				svc.GetSingleDrive(rr, r)
+				Expect(rr.Code).To(Equal(http.StatusOK))
+			})
+		})
+
+		Describe("GetAllDrivesV1 (unrestricted listing)", func() {
+			listedDriveIDs := func() []string {
+				var lr struct {
+					Value []map[string]interface{} `json:"value"`
+				}
+				body, _ := io.ReadAll(rr.Body)
+				Expect(json.Unmarshal(body, &lr)).To(Succeed())
+				ids := make([]string, 0, len(lr.Value))
+				for _, d := range lr.Value {
+					ids = append(ids, d["id"].(string))
+				}
+				return ids
+			}
+
+			It("hides other users' personal drives from a non-admin", func() {
+				mockSpaceFormatting()
+				mockAccountPerms(v0.Permission_CONSTRAINT_OWN)
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+					Status:        status.NewOK(ctx),
+					StorageSpaces: []*provider.StorageSpace{personalSpace("victim"), projectSpace("victim")},
+				}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives", nil).WithContext(callerCtx("attacker"))
+				svc.GetAllDrivesV1(rr, r)
+				Expect(rr.Code).To(Equal(http.StatusOK))
+				Expect(listedDriveIDs()).To(ConsistOf("pro-1$projectspace"))
+			})
+
+			It("shows all personal drives to a full-account admin", func() {
+				mockSpaceFormatting()
+				mockAccountPerms(v0.Permission_CONSTRAINT_ALL)
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+					Status:        status.NewOK(ctx),
+					StorageSpaces: []*provider.StorageSpace{personalSpace("victim"), projectSpace("victim")},
+				}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives", nil).WithContext(callerCtx("admin"))
+				svc.GetAllDrivesV1(rr, r)
+				Expect(rr.Code).To(Equal(http.StatusOK))
+				Expect(listedDriveIDs()).To(ConsistOf("pro-1$victimspace", "pro-1$projectspace"))
+			})
+
+			It("keeps the caller's own personal drive", func() {
+				mockSpaceFormatting()
+				mockAccountPerms(v0.Permission_CONSTRAINT_OWN)
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+					Status:        status.NewOK(ctx),
+					StorageSpaces: []*provider.StorageSpace{personalSpace("victim")},
+				}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives", nil).WithContext(callerCtx("victim"))
+				svc.GetAllDrivesV1(rr, r)
+				Expect(rr.Code).To(Equal(http.StatusOK))
+				Expect(listedDriveIDs()).To(ConsistOf("pro-1$victimspace"))
+			})
+		})
+	})
+
 	Describe("Delete a drive", func() {
 		It("fails on invalid drive ids", func() {
 			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/drives/{driveID}/", nil)
