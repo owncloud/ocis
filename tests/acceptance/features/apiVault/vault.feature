@@ -772,7 +772,7 @@ Feature: vault
       | testDriveFolder   |
       | testDriveFile.txt |
 
-
+  @tikaServiceNeeded
   Scenario: search result by content of file should be isolated between vault and drive
     Given user "Alice" has logged in via web UI
     And user "Alice" has uploaded a file inside space "Personal" with content "content of file in drive" to "testDriveFile.txt"
@@ -788,7 +788,7 @@ Feature: vault
     And the search result of user "Alice" should contain only these files:
       | testDriveFile.txt  |
 
-
+  @tikaServiceNeeded
   Scenario: search result by content of file inside project space should be isolated between vault and drive
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has logged in via web UI
@@ -808,7 +808,7 @@ Feature: vault
       | testDriveFile.txt  |
 
 
-  Scenario: search result by tags of resorce should be isolated between vault and drive
+  Scenario: search results by resource tags should be isolated between vault and drive
     Given user "Alice" has logged in via web UI
     And user "Alice" has created a folder "driveFolder" in space "Personal"
     And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
@@ -840,7 +840,7 @@ Feature: vault
       | driveFolder       |
 
 
-  Scenario: search result by tags of resorce inside project space should be isolated between vault and drive
+  Scenario: search results by resource tags inside project space should be isolated between vault and drive
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has logged in via web UI
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
