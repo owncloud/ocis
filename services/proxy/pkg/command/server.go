@@ -98,6 +98,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			oidcHTTPClient := &http.Client{
 				Transport: &http.Transport{
+					Proxy: http.ProxyFromEnvironment,
 					TLSClientConfig: &tls.Config{
 						MinVersion:         tls.VersionTLS12,
 						InsecureSkipVerify: cfg.OIDC.Insecure, //nolint:gosec
@@ -269,6 +270,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 
 	oidcHTTPClient := &http.Client{
 		Transport: &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
 			TLSClientConfig: &tls.Config{
 				MinVersion:         tls.VersionTLS12,
 				InsecureSkipVerify: cfg.OIDC.Insecure, //nolint:gosec
