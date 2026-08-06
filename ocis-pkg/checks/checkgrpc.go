@@ -25,3 +25,20 @@ func NewGRPCCheck(address string) func(context.Context) error {
 		return nil
 	}
 }
+
+// NewGRPCCheckWithTLS checks the reachability of a grpc server using TLS credentials.
+func NewGRPCCheckWithTLS(address string, creds credentials.TransportCredentials) func(context.Context) error {
+	return func(_ context.Context) error {
+		address, err := handlers.FailSaveAddress(address)
+		if err != nil {
+			return err
+		}
+
+		conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(creds))
+		if err != nil {
+			return fmt.Errorf("could not connect to grpc server: %v", err)
+		}
+		_ = conn.Close()
+		return nil
+	}
+}
