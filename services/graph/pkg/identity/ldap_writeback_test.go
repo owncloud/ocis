@@ -3,6 +3,7 @@ package identity
 import (
 	"context"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -159,6 +160,88 @@ func TestApplyModifyToEntry(t *testing.T) {
 		got := applyModifyToEntry(base, mr)
 		assert.Equal(t, []byte("Raw Value"), got.GetEqualFoldRawAttributeValue("displayname"))
 	})
+}
+
+// TestCreateUserReadBackRetriedOnStaleReplica asserts that with useServerUUID=true
+// the server-assigned-UUID read-back is retried when it hits a lagging replica. A
+// stale replica answers the base-scoped Search with a successful 0-entry result
+// (surfaced as ErrNotFound above the connection-level retry layer, which only sees
+// LDAP error codes), so getUserByDN is retried on ErrNotFound. Here the second read
+// finds the entry: Search is called twice and CreateUser succeeds.
+func TestCreateUserReadBackRetriedOnStaleReplica(t *testing.T) {
+	logger := log.NewLogger(log.Level("debug"))
+
+	user := libregraph.NewUser("DisplayName", "user")
+	user.SetMail("user@example")
+	user.SetAccountEnabled(true)
+	user.SetUserType("Member")
+
+	var written *ldap.AddRequest
+	var searchCalls int32
+	l := &mocks.Client{}
+	l.On("Add", mock.Anything).Run(func(args mock.Arguments) {
+		written = args.Get(0).(*ldap.AddRequest)
+	}).Return(nil)
+	l.On("Search", mock.MatchedBy(func(sr *ldap.SearchRequest) bool {
+		return sr.Scope == ldap.ScopeBaseObject
+	})).Return(func(sr *ldap.SearchRequest) *ldap.SearchResult {
+		if atomic.AddInt32(&searchCalls, 1) == 1 {
+			return &ldap.SearchResult{Entries: []*ldap.Entry{}} // stale replica: not yet visible
+		}
+		// Once visible, the entry carries the server-assigned UUID (with
+		// useServerUUID the id is not in the AddRequest — the directory generates it).
+		attrs := attrsFromAddRequest(written)
+		attrs["entryUUID"] = []string{"server-assigned-uuid"}
+		return &ldap.SearchResult{Entries: []*ldap.Entry{ldap.NewEntry(written.DN, attrs)}}
+	}, nil)
+
+	c := lconfig
+	c.UseServerUUID = true
+	b, err := NewLDAPBackend(l, c, &logger, "", "")
+	assert.Nil(t, err)
+
+	newUser, err := b.CreateUser(context.Background(), *user)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, newUser)
+	assert.Equal(t, int32(2), atomic.LoadInt32(&searchCalls),
+		"read-back is retried once on the stale 0-entry result, then finds the entry")
+}
+
+// TestReadBackAfterWriteExhaustsRetriesReturnsNotFound asserts a read-back that
+// stays stale for every attempt surfaces ErrNotFound after exactly RetryMaxCount+1
+// reads rather than looping forever. With RetryMaxCount=2 that is 3 reads.
+func TestReadBackAfterWriteExhaustsRetriesReturnsNotFound(t *testing.T) {
+	logger := log.NewLogger(log.Level("debug"))
+
+	user := libregraph.NewUser("DisplayName", "user")
+	user.SetMail("user@example")
+	user.SetAccountEnabled(true)
+	user.SetUserType("Member")
+
+	var searchCalls int32
+	l := &mocks.Client{}
+	l.On("Add", mock.Anything).Return(nil)
+	// Every read-back sees the stale replica: 0 entries, nil error.
+	l.On("Search", mock.MatchedBy(func(sr *ldap.SearchRequest) bool {
+		return sr.Scope == ldap.ScopeBaseObject
+	})).Return(func(sr *ldap.SearchRequest) *ldap.SearchResult {
+		atomic.AddInt32(&searchCalls, 1)
+		return &ldap.SearchResult{Entries: []*ldap.Entry{}}
+	}, nil)
+
+	c := lconfig
+	c.UseServerUUID = true
+	c.RetryMaxCount = 2 // 1 initial read + 2 retries = 3 reads
+	b, err := NewLDAPBackend(l, c, &logger, "", "")
+	assert.Nil(t, err)
+
+	newUser, err := b.CreateUser(context.Background(), *user)
+
+	assert.Error(t, err)
+	assert.Nil(t, newUser)
+	assert.Equal(t, int32(3), atomic.LoadInt32(&searchCalls),
+		"read-back is bounded at RetryMaxCount+1 attempts, not an unbounded loop")
 }
 
 // TestCreateUserSynthesizesWhenNotServerUUID asserts that with useServerUUID=false
