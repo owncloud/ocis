@@ -414,3 +414,23 @@ Feature: Notification
       | resource   |
       | HelloWorld |
       | text.txt   |
+
+  @issue-11908 @email
+  Scenario: recipient does not get PO file headers in unshare email for translated locale
+    Given user "Brian" has switched the system language to "es" using the Graph API
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile1.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    When user "Alice" removes the access of user "Brian" from resource "textfile1.txt" of space "Personal" using the Graph API
+    Then the HTTP status code should be "204"
+    And user "Brian" should have received an email from user "Alice" that does not contain
+      """
+      Project-Id-Version
+      """
+    And user "Brian" should have received the following email from user "Alice"
+      """
+      Alice Hansen has unshared 'textfile1.txt' with you.
+      """
