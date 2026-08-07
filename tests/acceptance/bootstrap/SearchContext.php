@@ -67,6 +67,7 @@ class SearchContext implements Context {
 	): ResponseInterface {
 		// The search service can lag behind the rest of oCIS after a (re)start and
 		// answers with 5xx until it is ready — poll until it answers HTTP 207 first.
+		// Initial wait 3s, then retry every 2s, up to ~61s total.
 		$response = null;
 		for ($attempt = 0; $attempt < SERVICE_READY_RETRY_COUNT; $attempt++) {
 			\sleep($attempt === 0 ? 3 : 2);
@@ -90,13 +91,20 @@ class SearchContext implements Context {
 			}
 			break;
 		}
-		// Indexing is async — poll until results appear, then let the assertion
-		// steps produce the failure message if the results never show up.
 		for ($attempt = 0; $attempt < STANDARD_RETRY_COUNT; $attempt++) {
 			if ($attempt > 0) {
 				\sleep(2);
 			}
-			$response = $this->searchFiles($user, $pattern, $limit, $scopeType, $scope, $spaceName, $properties);
+			$response = $this->searchFiles(
+				$user,
+				$pattern,
+				$isVault,
+				$limit,
+				$scopeType,
+				$scope,
+				$spaceName,
+				$properties,
+			);
 			if ($this->searchResponseHasResults($response)) {
 				return $response;
 			}
