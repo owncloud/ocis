@@ -1979,23 +1979,28 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
+	 * @param array $headers
+	 * @param boolean $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function getSharesSharedWithMe(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
+		array $headers = [],
+		bool $isVault = false,
 	): ResponseInterface {
-		$url = self::getBetaFullUrl($baseUrl, "me/drive/sharedWithMe");
+		$url = self::getBetaFullUrl($baseUrl, "me/drive/sharedWithMe", $isVault);
+		$requestHeaders = array_merge(self::getRequestHeaders(), $headers);
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders(),
+			$requestHeaders,
 		);
 	}
 
