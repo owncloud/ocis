@@ -610,7 +610,7 @@ Feature: enable disable permissions role
     Examples:
       | resource      | permissions-role | permissions | resource-to-download        | role-id                              |
       | textfile.txt  | Viewer           | S           | textfile.txt                | b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5 |
-      | folderToShare | Uploader         | SCK         | folderToShare/textfile1.txt | 1c996275-f1c9-4e71-abdf-a42f6495e960 |
+      | folderToShare | Uploader         | SNVCK       | folderToShare/textfile1.txt | 1c996275-f1c9-4e71-abdf-a42f6495e960 |
       | folderToShare | Editor           | SDNVCK      | folderToShare/textfile1.txt | fb6c3e19-e378-47e5-b277-9732f9de6e21 |
       | folderToShare | Viewer           | S           | folderToShare/textfile1.txt | b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5 |
 
@@ -669,7 +669,7 @@ Feature: enable disable permissions role
       | resource      | permissions-role | permissions | resource-to-download        | role-id                              |
       | textfile.txt  | File Editor      | SW          | textfile.txt                | 2d00ce52-1fc2-4dbc-8b95-a73b73395f5a |
       | textfile.txt  | Viewer           | S           | textfile.txt                | b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5 |
-      | folderToShare | Uploader         | SCK         | folderToShare/textfile1.txt | 1c996275-f1c9-4e71-abdf-a42f6495e960 |
+      | folderToShare | Uploader         | SNVCK       | folderToShare/textfile1.txt | 1c996275-f1c9-4e71-abdf-a42f6495e960 |
       | folderToShare | Editor           | SDNVCK      | folderToShare/textfile1.txt | fb6c3e19-e378-47e5-b277-9732f9de6e21 |
       | folderToShare | Viewer           | S           | folderToShare/textfile1.txt | b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5 |
 
