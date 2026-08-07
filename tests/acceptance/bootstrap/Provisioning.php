@@ -48,6 +48,7 @@ trait Provisioning {
 	private array $createdGroups = [];
 	private array $userTokens = [];
 	private array $createdKeycloakUsers = [];
+	private ?Ldap $idmLdap = null;
 
 	/**
 	 * @param array $user
@@ -377,6 +378,53 @@ trait Provisioning {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Connects to the LDAP server bundled with oCIS (idm) to allow direct
+	 * inspection of entries that oCIS services write, e.g. the objectClass
+	 * that the graph service sets on group entries. Connection parameters
+	 * match the idm defaults used by the acceptance test environment.
+	 *
+	 * @return void
+	 */
+	private function connectToIdm(): void {
+		if ($this->idmLdap !== null) {
+			return;
+		}
+		\putenv('LDAPTLS_REQCERT=never');
+		$options = [
+			'host' => '127.0.0.1',
+			'port' => 9235,
+			'useSsl' => true,
+			'baseDn' => 'o=libregraph-idm',
+			'bindRequiresDn' => true,
+			'username' => 'uid=admin,ou=users,o=libregraph-idm',
+			'password' => \getenv('IDM_ADMIN_PASSWORD') ?: 'admin',
+		];
+		$this->idmLdap = new Ldap($options);
+		$this->idmLdap->bind();
+	}
+
+	/**
+	 * @Then /^the LDAP entry "([^"]*)" should (not|)\s?have the object class "([^"]*)"$/
+	 *
+	 * @param string $dn
+	 * @param string $not (not|)
+	 * @param string $objectClass
+	 *
+	 * @return void
+	 */
+	public function theLdapEntryShouldHaveObjectClass(string $dn, string $not, string $objectClass): void {
+		$this->connectToIdm();
+		$entry = $this->idmLdap->getEntry($dn);
+		Assert::assertNotNull($entry, "LDAP entry '$dn' does not exist");
+		$objectClasses = \array_map('strtolower', Laminas\Ldap\Attribute::getAttribute($entry, 'objectClass'));
+		$shouldHave = ($not !== "not");
+		Assert::assertTrue(
+			\in_array(\strtolower($objectClass), $objectClasses, true) === $shouldHave,
+			"Expected LDAP entry '$dn' to " . ($shouldHave ? 'have' : 'not have') . " the object class '$objectClass'",
+		);
 	}
 
 	/**
