@@ -28,6 +28,14 @@ permissions 6 (create + write) instead of 4 (create), and reports the WebDAV
 permissions "SNVW" on a shared file and "SNVCK" on a shared folder instead of
 "S" and "SCK".
 
+The same "m" flag also restores Move for any other non-deletable grant that
+carries it. In particular the Uploader share role is affected: like editor-lite
+it is a create grant without delete, so its Move used to be dropped on
+write-back and is now preserved. This is why the previously expected-to-fail
+"sharee moves a file within a shared folder" scenarios for the Uploader role now
+pass, and the matching entries were removed from
+`tests/acceptance/expected-failures-API-on-OCIS-storage.md`.
+
 This fix DOES NOT include a migration of stored grants. Shares created with
 that role before this update keep their old grant on disk, which carries no "m"
 flag. For them, Move stays unset and the WebDAV permissions string stays
