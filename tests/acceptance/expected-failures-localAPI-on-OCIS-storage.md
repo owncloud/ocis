@@ -374,10 +374,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 - [apiActivities/activitiesByFileId.feature:2190](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activitiesByFileId.feature#L2190)
 
-#### Uploaders are not allowed to `MOVE`
-
-- [apiSpacesShares/moveSpaces.feature:377](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L377)
-
 #### [Activities. no event for restoring file](https://github.com/owncloud/ocis/issues/10010)
 
 - [apiActivities/activities.feature:3772](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activities.feature#L3772)
