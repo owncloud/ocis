@@ -55,6 +55,7 @@ class SpacesContext implements Context {
 	 * key is space name and value is the username that created the space
 	 */
 	private array $createdSpaces = [];
+	private array $createdVaultSpaces = [];
 	private string $ocsApiUrl = '/ocs/v2.php/apps/files_sharing/api/v1/shares';
 
 	/**
@@ -89,10 +90,31 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @param string $spaceCreator
+	 * @param object $space
+	 *
+	 * @return void
+	 */
+	public function addToCreatedVaultSpace(string $spaceCreator, object $space): void {
+		$spaceName = $space->name;
+		$this->createdVaultSpaces[$spaceName] = $space;
+		$this->createdVaultSpaces[$spaceName]->spaceCreator = $spaceCreator;
+		$this->createdVaultSpaces[$spaceName]->fileId = $space->id . '!' . $space->owner->user->id;
+		$this->createdVaultSpaces[$spaceName]->serverType = $this->featureContext->getCurrentServer();
+	}
+
+	/**
 	 * @return array
 	 */
 	public function getCreatedSpaces(): array {
 		return $this->createdSpaces;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getCreatedVaultSpaces(): array {
+		return $this->createdVaultSpaces;
 	}
 
 	/**
@@ -199,7 +221,11 @@ class SpacesContext implements Context {
 	 */
 	public function getSpaceByName(string $user, string $spaceName, bool $isVault = false): array {
 		$password = $this->featureContext->getPasswordForUser($user);
-		$createdSpaces = $this->getCreatedSpaces();
+		if ($isVault) {
+			$createdSpaces = $this->getCreatedVaultSpaces();
+		} else {
+			$createdSpaces = $this->getCreatedSpaces();
+		}
 		$personalSpaces = $this->getPersonalSpaces();
 		$allSpaces = \array_merge($createdSpaces, $personalSpaces);
 
@@ -433,12 +459,13 @@ class SpacesContext implements Context {
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param string $fileName
+	 * @param bool $isVault
 	 *
 	 * @return string
 	 * @throws GuzzleException
 	 */
-	public function getFileId(string $user, string $spaceName, string $fileName): string {
-		$fileData = $this->getFileData($user, $spaceName, $fileName)->getHeaders();
+	public function getFileId(string $user, string $spaceName, string $fileName, bool $isVault = false): string {
+		$fileData = $this->getFileData($user, $spaceName, $fileName, false, $isVault)->getHeaders();
 		return $fileData["Oc-Fileid"][0];
 	}
 
@@ -1927,7 +1954,12 @@ class SpacesContext implements Context {
 			$response,
 		);
 		$space = $this->featureContext->getJsonDecodedResponseBodyContent($response);
-		$this->addToCreatedSpace($user, $space);
+
+		if ($isVault) {
+			$this->addToCreatedVaultSpace($user, $space);
+		} else {
+			$this->addToCreatedSpace($user, $space);
+		}
 	}
 
 	/**
