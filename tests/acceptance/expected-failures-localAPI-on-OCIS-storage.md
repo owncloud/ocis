@@ -399,7 +399,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraphUser/editUser.feature:231](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/editUser.feature#L231)
 - [apiGraphUser/editUser.feature:235](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/editUser.feature#L235)
 - [apiGraphUser/getUser.feature:696](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/getUser.feature#L696)
-- [apiGraphUser/getUser.feature:700](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/getUser.feature#L700)
 
 #### [metadata search gives 500](https://github.com/owncloud/ocis/issues/12230)
 - [apiSearchContent/metadataSerch.feature:30](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/metadataSerch.feature#L30)
