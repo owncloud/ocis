@@ -29,6 +29,46 @@ type Collabora struct {
 	UserID string `json:"UserId,omitempty"`
 	// copied from MS WOPI
 	UserFriendlyName string `json:"UserFriendlyName,omitempty"`
+	// copied from MS WOPI
+	Version string `json:"Version,omitempty"`
+	// copied from MS WOPI - required for Collabora conflict detection via X-COOL-WOPI-Timestamp
+	LastModifiedTime string `json:"LastModifiedTime,omitempty"`
+	// copied from MS WOPI
+	ReadOnly bool `json:"ReadOnly"`
+
+	//
+	// PostMessage properties
+	//
+
+	// Specifies if Collabora should send UI_Close PostMessage when the user closes the editor
+	ClosePostMessage bool `json:"ClosePostMessage,omitempty"`
+	// Specifies if Collabora should send UI_Edit PostMessage when the user activates edit mode
+	EditModePostMessage bool `json:"EditModePostMessage,omitempty"`
+	// Specifies if Collabora should send Edit_Notification PostMessage when the user starts editing
+	EditNotificationPostMessage bool `json:"EditNotificationPostMessage,omitempty"`
+	// Specifies if Collabora should send UI_Sharing PostMessage when the user activates the share UI
+	FileSharingPostMessage bool `json:"FileSharingPostMessage,omitempty"`
+	// Specifies if Collabora should send UI_FileVersions PostMessage when the user activates version history
+	FileVersionPostMessage bool `json:"FileVersionPostMessage,omitempty"`
+
+	//
+	// File URL properties
+	//
+
+	// copied from MS WOPI
+	CloseURL string `json:"CloseUrl,omitempty"`
+	// copied from MS WOPI
+	DownloadURL string `json:"DownloadUrl,omitempty"`
+	// copied from MS WOPI
+	FileSharingURL string `json:"FileSharingUrl,omitempty"`
+	// copied from MS WOPI
+	FileVersionURL string `json:"FileVersionUrl,omitempty"`
+	// copied from MS WOPI
+	HostEditURL string `json:"HostEditUrl,omitempty"`
+	// copied from MS WOPI
+	HostViewURL string `json:"HostViewUrl,omitempty"`
+	// copied from MS WOPI
+	SignoutURL string `json:"SignoutUrl,omitempty"`
 
 	//
 	// Extended response properties
@@ -73,11 +113,29 @@ type Collabora struct {
 	// If set to "true", user list on the status bar will be hidden
 	// If set to "mobile" | "tablet" | "desktop", will be hidden on a specified device
 	// (may be joint, delimited by commas eg. "mobile,tablet")
-	HideUserList      string `json:"HideUserList,omitempty"`
-	SupportsLocks     bool   `json:"SupportsLocks"`
-	SupportsRename    bool   `json:"SupportsRename"`
+	HideUserList   string `json:"HideUserList,omitempty"`
+	SupportsLocks  bool   `json:"SupportsLocks"`
+	SupportsRename bool   `json:"SupportsRename"`
+	// copied from MS WOPI
+	SupportsUpdate    bool   `json:"SupportsUpdate"`
 	UserCanRename     bool   `json:"UserCanRename"`
 	BreadcrumbDocName string `json:"BreadcrumbDocName,omitempty"`
+	// copied from MS WOPI
+	IsAnonymousUser bool `json:"IsAnonymousUser,omitempty"`
+	// copied from MS WOPI
+	BreadcrumbBrandName string `json:"BreadcrumbBrandName,omitempty"`
+	// copied from MS WOPI
+	BreadcrumbBrandURL string `json:"BreadcrumbBrandUrl,omitempty"`
+	// copied from MS WOPI
+	BreadcrumbFolderName string `json:"BreadcrumbFolderName,omitempty"`
+	// copied from MS WOPI
+	BreadcrumbFolderURL string `json:"BreadcrumbFolderUrl,omitempty"`
+	// Collabora-specific: when true, Collabora applies the locked_commands configuration
+	// from coolwsd.xml to this user, restricting which UNO commands they can access.
+	IsUserLocked bool `json:"IsUserLocked,omitempty"`
+	// Collabora-specific: when true, Collabora shows the server audit panel to this user.
+	// Only oCIS system administrators should receive this flag.
+	IsAdminUser bool `json:"IsAdminUser,omitempty"`
 }
 
 // SetProperties will set the file properties for the Collabora implementation.
@@ -104,6 +162,38 @@ func (cinfo *Collabora) SetProperties(props map[string]interface{}) {
 			cinfo.UserID = value.(string)
 		case KeyUserFriendlyName:
 			cinfo.UserFriendlyName = value.(string)
+		case KeyVersion:
+			cinfo.Version = value.(string)
+		case KeyLastModifiedTime:
+			cinfo.LastModifiedTime = value.(string)
+		case KeyReadOnly:
+			cinfo.ReadOnly = value.(bool)
+
+		case KeyClosePostMessage:
+			cinfo.ClosePostMessage = value.(bool)
+		case KeyEditModePostMessage:
+			cinfo.EditModePostMessage = value.(bool)
+		case KeyEditNotificationPostMessage:
+			cinfo.EditNotificationPostMessage = value.(bool)
+		case KeyFileSharingPostMessage:
+			cinfo.FileSharingPostMessage = value.(bool)
+		case KeyFileVersionPostMessage:
+			cinfo.FileVersionPostMessage = value.(bool)
+
+		case KeyCloseURL:
+			cinfo.CloseURL = value.(string)
+		case KeyDownloadURL:
+			cinfo.DownloadURL = value.(string)
+		case KeyFileSharingURL:
+			cinfo.FileSharingURL = value.(string)
+		case KeyFileVersionURL:
+			cinfo.FileVersionURL = value.(string)
+		case KeyHostEditURL:
+			cinfo.HostEditURL = value.(string)
+		case KeyHostViewURL:
+			cinfo.HostViewURL = value.(string)
+		case KeySignoutURL:
+			cinfo.SignoutURL = value.(string)
 
 		case KeyEnableInsertRemoteImage:
 			cinfo.EnableInsertRemoteImage = value.(bool)
@@ -140,10 +230,26 @@ func (cinfo *Collabora) SetProperties(props map[string]interface{}) {
 			cinfo.SupportsLocks = value.(bool)
 		case KeySupportsRename:
 			cinfo.SupportsRename = value.(bool)
+		case KeySupportsUpdate:
+			cinfo.SupportsUpdate = value.(bool)
 		case KeyUserCanRename:
 			cinfo.UserCanRename = value.(bool)
 		case KeyBreadcrumbDocName:
 			cinfo.BreadcrumbDocName = value.(string)
+		case KeyIsAnonymousUser:
+			cinfo.IsAnonymousUser = value.(bool)
+		case KeyBreadcrumbBrandName:
+			cinfo.BreadcrumbBrandName = value.(string)
+		case KeyBreadcrumbBrandURL:
+			cinfo.BreadcrumbBrandURL = value.(string)
+		case KeyBreadcrumbFolderName:
+			cinfo.BreadcrumbFolderName = value.(string)
+		case KeyBreadcrumbFolderURL:
+			cinfo.BreadcrumbFolderURL = value.(string)
+		case KeyIsUserLocked:
+			cinfo.IsUserLocked = value.(bool)
+		case KeyIsAdminUser:
+			cinfo.IsAdminUser = value.(bool)
 		}
 	}
 }

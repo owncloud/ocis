@@ -119,6 +119,10 @@ const (
 	KeyEnableShare  = "EnableShare"
 	KeyHideUserList = "HideUserList"
 
+	// Collabora-specific properties (not part of the MS WOPI spec)
+	KeyIsUserLocked = "IsUserLocked"
+	KeyIsAdminUser  = "IsAdminUser"
+
 	// OnlyOffice (non-dupped) properties below
 
 	KeyClosePostMessage            = "ClosePostMessage"

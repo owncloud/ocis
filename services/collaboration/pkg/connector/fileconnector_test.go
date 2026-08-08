@@ -3,6 +3,7 @@ package connector_test
 import (
 	"context"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"net/url"
 	"path"
@@ -27,6 +28,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector/fileinfo"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/status"
 	"github.com/owncloud/reva/v2/pkg/utils"
@@ -1765,12 +1767,24 @@ var _ = Describe("FileConnector", func() {
 				FileVersionURL:             "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
 				HostEditURL:                "https://ocis.example.prv/external-test/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
 				HostViewURL:                "https://ocis.example.prv/external-test/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=view",
+				CloseURL:                   "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
+				DownloadURL:                "", // Remove the hardcoded token since it's dynamically generated
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(200))
-			Expect(response.Body.(*fileinfo.Microsoft)).To(Equal(expectedFileInfo))
+
+			returnedFileInfo := response.Body.(*fileinfo.Microsoft)
+			downloadURL := returnedFileInfo.DownloadURL
+			expectedDownloadURLPrefix := "https://ocis.server.prv/wopi/files/acec9ea008d2e2979556f82e0ec0c4f47c7a906a4cfd84b64bce41db93b64b1a/contents?access_token="
+
+			// take DownloadURL out of the response for easier comparison
+			returnedFileInfo.DownloadURL = ""
+			Expect(returnedFileInfo).To(Equal(expectedFileInfo))
+			// the url is using a generated access token which always has a new ttl
+			// so we can't compare the whole url
+			Expect(downloadURL).To(HavePrefix(expectedDownloadURLPrefix))
 		})
 
 		It("Stat success guests", func() {
@@ -1835,9 +1849,26 @@ var _ = Describe("FileConnector", func() {
 				EnableOwnerTermination:  true,
 				SupportsLocks:           true,
 				SupportsRename:          true,
+				SupportsUpdate:          true,
 				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
+				BreadcrumbFolderName:    "/path/to",
 				PostMessageOrigin:       "https://ocis.example.prv",
+				EditModePostMessage:     true,
+				Version:                 "v162738491234567",
+				LastModifiedTime:        "1970-07-08T08:30:49.0012345Z",
+				ReadOnly:                true,
+				IsAnonymousUser:         true,
+				// no scopes are set in the context for this test, so the parent folder
+				// URL (and therefore CloseURL and BreadcrumbFolderURL) falls back to the
+				// bare oCIS URL
+				CloseURL:            "https://ocis.example.prv",
+				BreadcrumbFolderURL: "https://ocis.example.prv",
+				DownloadURL:         "", // Remove the hardcoded token since it's dynamically generated
+				FileSharingURL:      "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=sharing",
+				FileVersionURL:      "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
+				HostEditURL:         "https://ocis.example.prv/external-collabora/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
+				HostViewURL:         "https://ocis.example.prv/external-collabora/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=view",
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -1852,7 +1883,17 @@ var _ = Describe("FileConnector", func() {
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(200))
-			Expect(response.Body.(*fileinfo.Collabora)).To(Equal(expectedFileInfo))
+
+			returnedFileInfo := response.Body.(*fileinfo.Collabora)
+			downloadURL := returnedFileInfo.DownloadURL
+			expectedDownloadURLPrefix := "https://ocis.server.prv/wopi/files/acec9ea008d2e2979556f82e0ec0c4f47c7a906a4cfd84b64bce41db93b64b1a/contents?access_token="
+
+			// take DownloadURL out of the response for easier comparison
+			returnedFileInfo.DownloadURL = ""
+			Expect(returnedFileInfo).To(Equal(expectedFileInfo))
+			// the url is using a generated access token which always has a new ttl
+			// so we can't compare the whole url
+			Expect(downloadURL).To(HavePrefix(expectedDownloadURLPrefix))
 		})
 
 		It("Stat success guests", func() {
@@ -1943,6 +1984,8 @@ var _ = Describe("FileConnector", func() {
 				FileVersionURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
 				HostEditURL:             "https://ocis.example.prv/external-onlyoffice/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
 				PostMessageOrigin:       "https://ocis.example.prv",
+				ReadOnly:                true,
+				CloseURL:                "https://ocis.example.prv/s/ABC123", // Match share token format
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -2019,16 +2062,146 @@ var _ = Describe("FileConnector", func() {
 				WatermarkText:           "",
 				SupportsLocks:           true,
 				SupportsRename:          true,
+				SupportsUpdate:          true,
 				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
+				BreadcrumbFolderName:    "/path/to",
+				BreadcrumbFolderURL:     "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
 				PostMessageOrigin:       "https://ocis.example.prv",
+				EditModePostMessage:     true,
+				Version:                 "v162738490",
+				LastModifiedTime:        "1970-07-08T08:30:49.0000000Z",
+				ReadOnly:                true,
+				CloseURL:                "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
+				DownloadURL:             "", // Remove the hardcoded token since it's dynamically generated
+				FileSharingURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=sharing",
+				FileVersionURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
+				HostEditURL:             "https://ocis.example.prv/external-collabora/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
+				HostViewURL:             "https://ocis.example.prv/external-collabora/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=view",
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(200))
-			Expect(response.Body.(*fileinfo.Collabora)).To(Equal(expectedFileInfo))
+
+			returnedFileInfo := response.Body.(*fileinfo.Collabora)
+			downloadURL := returnedFileInfo.DownloadURL
+			expectedDownloadURLPrefix := "https://ocis.server.prv/wopi/files/acec9ea008d2e2979556f82e0ec0c4f47c7a906a4cfd84b64bce41db93b64b1a/contents?access_token="
+
+			// take DownloadURL out of the response for easier comparison
+			returnedFileInfo.DownloadURL = ""
+			Expect(returnedFileInfo).To(Equal(expectedFileInfo))
+			// the url is using a generated access token which always has a new ttl
+			// so we can't compare the whole url
+			Expect(downloadURL).To(HavePrefix(expectedDownloadURLPrefix))
+		})
+		It("Collabora IsAnonymousUser is true for anonymous user (public share)", func() {
+			// add user's opaque to include public-share-role
+			u := &userv1beta1.User{}
+			u.Opaque = &typesv1beta1.Opaque{
+				Map: map[string]*typesv1beta1.OpaqueEntry{
+					"public-share-role": {
+						Decoder: "plain",
+						Value:   []byte("viewer"),
+					},
+				},
+			}
+			wopiCtx.ViewMode = appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY
+
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(1234567),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Body.(*fileinfo.Collabora).IsAnonymousUser).To(BeTrue())
+			// Verify UserID is still present for anonymous users
+			Expect(response.Body.(*fileinfo.Collabora).UserID).ToNot(BeEmpty())
+			Expect(response.Body.(*fileinfo.Collabora).UserID).To(HavePrefix(hex.EncodeToString([]byte("guest-"))))
+		})
+		It("Collabora IsAnonymousUser is false for authenticated user", func() {
+			wopiCtx.ViewMode = appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY
+
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "example.com",
+					OpaqueId: "aabbcc",
+					Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+				},
+				DisplayName: "Pet Shaft",
+				Mail:        "shaft@example.com",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+			// IsAnonymousUser should be false (or zero value) for authenticated users
+			Expect(response.Body.(*fileinfo.Collabora).IsAnonymousUser).To(BeFalse())
+			// Verify UserID is present and is the authenticated user's ID
+			Expect(response.Body.(*fileinfo.Collabora).UserID).To(Equal(hex.EncodeToString([]byte("aabbcc@example.com"))))
 		})
 		It("Stat success secure view authenticated user", func() {
 			// change view mode to view only
@@ -2089,18 +2262,455 @@ var _ = Describe("FileConnector", func() {
 				UserFriendlyName:        "Pet Shaft",
 				EnableOwnerTermination:  true,
 				WatermarkText:           "Pet Shaft shaft@example.com",
+				IsUserLocked:            true,
 				SupportsLocks:           true,
 				SupportsRename:          true,
+				SupportsUpdate:          true,
 				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
+				BreadcrumbFolderName:    "/path/to",
+				BreadcrumbFolderURL:     "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
 				PostMessageOrigin:       "https://ocis.example.prv",
+				EditModePostMessage:     true,
+				Version:                 "v162738490",
+				LastModifiedTime:        "1970-07-08T08:30:49.0000000Z",
+				ReadOnly:                true,
+				CloseURL:                "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
+				DownloadURL:             "", // Remove the hardcoded token since it's dynamically generated
+				FileSharingURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=sharing",
+				FileVersionURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
+				HostEditURL:             "https://ocis.example.prv/external-collabora/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
+				HostViewURL:             "https://ocis.example.prv/external-collabora/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=view",
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(200))
-			Expect(response.Body.(*fileinfo.Collabora)).To(Equal(expectedFileInfo))
+
+			returnedFileInfo := response.Body.(*fileinfo.Collabora)
+			downloadURL := returnedFileInfo.DownloadURL
+			expectedDownloadURLPrefix := "https://ocis.server.prv/wopi/files/acec9ea008d2e2979556f82e0ec0c4f47c7a906a4cfd84b64bce41db93b64b1a/contents?access_token="
+
+			// take DownloadURL out of the response for easier comparison
+			returnedFileInfo.DownloadURL = ""
+			Expect(returnedFileInfo).To(Equal(expectedFileInfo))
+			// the url is using a generated access token which always has a new ttl
+			// so we can't compare the whole url
+			Expect(downloadURL).To(HavePrefix(expectedDownloadURLPrefix))
+		})
+		It("Collabora IsUserLocked is true for secure view context", func() {
+			// change view mode to view only with a view-only (secure view) token
+			wopiCtx.ViewMode = appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY
+			wopiCtx.ViewOnlyToken = "ABC123"
+
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "example.com",
+					OpaqueId: "aabbcc",
+					Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+				},
+				DisplayName: "Pet Shaft",
+				Mail:        "shaft@example.com",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Body.(*fileinfo.Collabora).IsUserLocked).To(BeTrue())
+		})
+		It("Collabora IsUserLocked is false for a normal read-write authenticated user", func() {
+			// wopiCtx.ViewMode defaults to VIEW_MODE_READ_WRITE (set in BeforeEach) and
+			// ViewOnlyToken defaults to "", i.e. not a secure-view context.
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "example.com",
+					OpaqueId: "aabbcc",
+					Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+				},
+				DisplayName: "Pet Shaft",
+				Mail:        "shaft@example.com",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Body.(*fileinfo.Collabora).IsUserLocked).To(BeFalse())
+
+			jsonBytes, err := json.Marshal(response.Body)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(jsonBytes)).ToNot(ContainSubstring("IsUserLocked"))
+		})
+		It("Collabora IsAdminUser is true for a user with the admin role", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			rolesJSON, err := json.Marshal([]string{defaults.BundleUUIDRoleAdmin})
+			Expect(err).ToNot(HaveOccurred())
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "example.com",
+					OpaqueId: "aabbcc",
+					Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+				},
+				DisplayName: "Pet Shaft",
+				Mail:        "shaft@example.com",
+				Opaque: &typesv1beta1.Opaque{
+					Map: map[string]*typesv1beta1.OpaqueEntry{
+						"roles": {
+							Decoder: "json",
+							Value:   rolesJSON,
+						},
+					},
+				},
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Body.(*fileinfo.Collabora).IsAdminUser).To(BeTrue())
+		})
+		It("Collabora IsAdminUser is false for a regular user with no roles", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "example.com",
+					OpaqueId: "aabbcc",
+					Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+				},
+				DisplayName: "Pet Shaft",
+				Mail:        "shaft@example.com",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Body.(*fileinfo.Collabora).IsAdminUser).To(BeFalse())
+
+			jsonBytes, err := json.Marshal(response.Body)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(jsonBytes)).ToNot(ContainSubstring("IsAdminUser"))
+		})
+		It("Collabora IsAdminUser is false for a user with only the SpaceAdmin role", func() {
+			// This is the brief's explicit requirement: SpaceAdmin must NOT be treated as
+			// an oCIS system admin, so it must not unlock Collabora's audit panel.
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			rolesJSON, err := json.Marshal([]string{defaults.BundleUUIDRoleSpaceAdmin})
+			Expect(err).ToNot(HaveOccurred())
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "example.com",
+					OpaqueId: "aabbcc",
+					Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+				},
+				DisplayName: "Pet Shaft",
+				Mail:        "shaft@example.com",
+				Opaque: &typesv1beta1.Opaque{
+					Map: map[string]*typesv1beta1.OpaqueEntry{
+						"roles": {
+							Decoder: "json",
+							Value:   rolesJSON,
+						},
+					},
+				},
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Body.(*fileinfo.Collabora).IsAdminUser).To(BeFalse())
+		})
+		It("does not leak IsUserLocked or IsAdminUser into a Microsoft response", func() {
+			// Same secure-view + admin-role conditions as the Collabora tests above, but
+			// with the Microsoft product target: Microsoft's SetProperties has no case for
+			// KeyIsUserLocked/KeyIsAdminUser, so the keys are silently dropped rather than
+			// gated behind a config flag (same pattern as every other Collabora-only
+			// property in this connector).
+			wopiCtx.ViewMode = appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY
+			wopiCtx.ViewOnlyToken = "ABC123"
+
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			rolesJSON, err := json.Marshal([]string{defaults.BundleUUIDRoleAdmin})
+			Expect(err).ToNot(HaveOccurred())
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "example.com",
+					OpaqueId: "aabbcc",
+					Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+				},
+				DisplayName: "Pet Shaft",
+				Mail:        "shaft@example.com",
+				Opaque: &typesv1beta1.Opaque{
+					Map: map[string]*typesv1beta1.OpaqueEntry{
+						"roles": {
+							Decoder: "json",
+							Value:   rolesJSON,
+						},
+					},
+				},
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// cfg defaults to App.Product = "Microsoft" (set in BeforeEach)
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Body).To(BeAssignableToTypeOf(&fileinfo.Microsoft{}))
+
+			jsonBytes, err := json.Marshal(response.Body)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(jsonBytes)).ToNot(ContainSubstring("IsUserLocked"))
+			Expect(string(jsonBytes)).ToNot(ContainSubstring("IsAdminUser"))
+		})
+		It("does not leak IsUserLocked or IsAdminUser into an OnlyOffice response", func() {
+			// Same reasoning as the Microsoft case above, for the OnlyOffice target.
+			wopiCtx.ViewMode = appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY
+			wopiCtx.ViewOnlyToken = "ABC123"
+
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			rolesJSON, err := json.Marshal([]string{defaults.BundleUUIDRoleAdmin})
+			Expect(err).ToNot(HaveOccurred())
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "example.com",
+					OpaqueId: "aabbcc",
+					Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+				},
+				DisplayName: "Pet Shaft",
+				Mail:        "shaft@example.com",
+				Opaque: &typesv1beta1.Opaque{
+					Map: map[string]*typesv1beta1.OpaqueEntry{
+						"roles": {
+							Decoder: "json",
+							Value:   rolesJSON,
+						},
+					},
+				},
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "OnlyOffice"
+			cfg.App.Product = "OnlyOffice"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Body).To(BeAssignableToTypeOf(&fileinfo.OnlyOffice{}))
+
+			jsonBytes, err := json.Marshal(response.Body)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(jsonBytes)).ToNot(ContainSubstring("IsUserLocked"))
+			Expect(string(jsonBytes)).ToNot(ContainSubstring("IsAdminUser"))
 		})
 		It("Stat success with template", func() {
 			wopiCtx.TemplateReference = &providerv1beta1.Reference{
@@ -2166,6 +2776,7 @@ var _ = Describe("FileConnector", func() {
 				HostEditURL:             "https://ocis.example.prv/external-onlyoffice/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
 				PostMessageOrigin:       "https://ocis.example.prv",
 				TemplateSource:          "", // Remove the hardcoded token since it's dynamically generated
+				CloseURL:                "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
 			}
 
 			// change wopi app provider
@@ -2189,5 +2800,1022 @@ var _ = Describe("FileConnector", func() {
 			Expect(templateSource).To(HavePrefix(expectedTemplateSource))
 		})
 
+		It("Collabora CheckFileInfo includes Version", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// change wopi app provider
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			// Verify that the Collabora response includes the Version field
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.Version).To(Equal("v16273849123456789"))
+			// Verify that the Collabora response includes the LastModifiedTime field,
+			// required for Collabora's X-COOL-WOPI-Timestamp conflict detection
+			Expect(collaboraResponse.LastModifiedTime).To(Equal("1970-07-08T08:30:49.1234567Z"))
+		})
+
+		It("Collabora CheckFileInfo returns ReadOnly=true for a read-only view mode", func() {
+			wopiCtx.ViewMode = appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// change wopi app provider
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.ReadOnly).To(BeTrue())
+		})
+
+		It("Collabora CheckFileInfo returns ReadOnly=false for a writable view mode", func() {
+			// wopiCtx.ViewMode defaults to VIEW_MODE_READ_WRITE (set in BeforeEach)
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// change wopi app provider
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.ReadOnly).To(BeFalse())
+		})
+
+		It("Collabora CheckFileInfo includes SupportsUpdate=true", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// change wopi app provider
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.SupportsUpdate).To(BeTrue())
+		})
+
+		It("Collabora CheckFileInfo verifies SupportsUpdate and UserCanNotWriteRelative consistency", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// change wopi app provider
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			// When SupportsUpdate is true, UserCanNotWriteRelative should reflect
+			// the actual capability of the host (in this case, PutRelativeFile is implemented,
+			// so UserCanNotWriteRelative should be false)
+			Expect(collaboraResponse.SupportsUpdate).To(BeTrue())
+			Expect(collaboraResponse.UserCanNotWriteRelative).To(BeFalse())
+		})
+
+		It("CloseURL reuses the exact same parent folder URL as BreadcrumbFolderURL", func() {
+			// Verified against the Microsoft target here; both CloseURL and
+			// BreadcrumbFolderURL are fed from the exact same infoMap entry
+			// (parentFolderURL.String()), so this proves the reuse that also backs
+			// Collabora's CloseURL/BreadcrumbFolderURL (see the Collabora-specific
+			// CheckFileInfo tests above, which assert the same equality).
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Microsoft"
+			cfg.App.Product = "Microsoft"
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			msInfo := response.Body.(*fileinfo.Microsoft)
+			Expect(msInfo.CloseURL).ToNot(BeEmpty())
+			Expect(msInfo.CloseURL).To(Equal(msInfo.BreadcrumbFolderURL))
+		})
+
+		It("Collabora CheckFileInfo includes HostEditURL and HostViewURL as distinct URLs", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.HostEditURL).ToNot(BeEmpty())
+			Expect(collaboraResponse.HostViewURL).ToNot(BeEmpty())
+			Expect(collaboraResponse.HostEditURL).ToNot(Equal(collaboraResponse.HostViewURL))
+		})
+
+		It("Collabora CheckFileInfo DownloadURL matches the WOPI file-content download route", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.DownloadURL).To(MatchRegexp(
+				`^https://ocis\.server\.prv/wopi/files/[0-9a-f]+/contents\?access_token=.+$`,
+			))
+		})
+
+		It("Collabora CheckFileInfo omits DownloadURL when WOPI token generation fails, without failing the whole request", func() {
+			// Force middleware.GenerateWopiToken to fail: enabling ShortTokens requires a
+			// persistent microstore to mint the token, but the FileConnector under test
+			// was constructed with a nil store (see BeforeEach above), so token
+			// generation errors out. DownloadURL should simply be omitted, and the rest
+			// of the CheckFileInfo response should be unaffected.
+			cfg.Wopi.ShortTokens = true
+
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			// the overall CheckFileInfo call must still succeed
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.DownloadURL).To(BeEmpty())
+			// other URL properties, which don't depend on WOPI token generation, are unaffected
+			Expect(collaboraResponse.CloseURL).ToNot(BeEmpty())
+			Expect(collaboraResponse.HostEditURL).ToNot(BeEmpty())
+			Expect(collaboraResponse.HostViewURL).ToNot(BeEmpty())
+		})
+
+		It("Collabora CheckFileInfo populates breadcrumbs for a file in a subfolder", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size:  uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{Seconds: uint64(16273849)},
+					Path:  "/personal/user/Documents/report.docx",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "fileid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "documentsid",
+						SpaceId:   "spaceid",
+					},
+					Space: &providerv1beta1.StorageSpace{
+						Name: "Personal",
+						Root: &providerv1beta1.ResourceId{
+							StorageId: "storageid",
+							OpaqueId:  "rootid",
+							SpaceId:   "spaceid",
+						},
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.BreadcrumbDocName).To(Equal("report.docx"))
+			// BreadcrumbFolderName is derived via path.Dir(), which returns the full parent
+			// path rather than just the leaf folder name; this is pre-existing behavior
+			// (see the "/path/to" expectation in the "Stat success" test above) and is not
+			// something this task changes.
+			Expect(collaboraResponse.BreadcrumbFolderName).To(Equal("/personal/user/Documents"))
+			Expect(collaboraResponse.BreadcrumbFolderURL).To(Equal("https://ocis.example.prv/f/storageid$spaceid%21documentsid"))
+		})
+
+		It("Collabora CheckFileInfo breadcrumb folder name falls back to the space name for a file at the space root", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			rootId := &providerv1beta1.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "rootid",
+				SpaceId:   "spaceid",
+			}
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size:  uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{Seconds: uint64(16273849)},
+					// a file directly at the space root; path.Dir("/file.docx") == "/",
+					// which triggers the existing space-name fallback for the folder name
+					Path:     "/file.docx",
+					Id:       rootId,
+					ParentId: rootId,
+					Space: &providerv1beta1.StorageSpace{
+						Name: "Personal",
+						Root: rootId,
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.BreadcrumbFolderName).To(Equal("Personal"))
+		})
+
+		It("Collabora CheckFileInfo BreadcrumbBrandName/BreadcrumbBrandURL reflect the project space", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size:  uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{Seconds: uint64(16273849)},
+					Path:  "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "projectspaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "projectspaceid",
+					},
+					Space: &providerv1beta1.StorageSpace{
+						Name: "Project Alpha",
+						Root: &providerv1beta1.ResourceId{
+							StorageId: "storageid",
+							OpaqueId:  "rootid",
+							SpaceId:   "projectspaceid",
+						},
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.BreadcrumbBrandName).To(Equal("Project Alpha"))
+			Expect(collaboraResponse.BreadcrumbBrandURL).To(Equal("https://ocis.example.prv/f/storageid$projectspaceid%21rootid"))
+		})
+
+		It("Collabora CheckFileInfo withholds BreadcrumbBrandURL but keeps BreadcrumbBrandName for public link (anonymous) access", func() {
+			ResourceId := &providerv1beta1.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "opaqueid",
+				SpaceId:   "spaceid",
+			}
+
+			// add user's opaque to include public-share-role
+			u := &userv1beta1.User{}
+			u.Opaque = &typesv1beta1.Opaque{
+				Map: map[string]*typesv1beta1.OpaqueEntry{
+					"public-share-role": {
+						Decoder: "plain",
+						Value:   []byte("viewer"),
+					},
+				},
+			}
+			// Create a new "scope share" to only expose the required fields `ResourceId` and `Token` to the scope.
+			scopeShare := &link.PublicShare{ResourceId: ResourceId, Token: "ABC123"}
+			val, err := utils.MarshalProtoV1ToJSON(scopeShare)
+			Expect(err).ToNot(HaveOccurred())
+
+			scopes := map[string]*auth.Scope{
+				"publicshare:ABC123": {
+					Resource: &typesv1beta1.OpaqueEntry{
+						Decoder: "json",
+						Value:   val,
+					},
+					Role: auth.Role(appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY),
+				},
+			}
+			wopiCtx.ViewMode = appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY
+
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+			ctx = ctxpkg.ContextSetScopes(ctx, scopes)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id:   ResourceId,
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+					Space: &providerv1beta1.StorageSpace{
+						Name: "Personal",
+						Root: &providerv1beta1.ResourceId{
+							StorageId: "storageid",
+							OpaqueId:  "rootid",
+							SpaceId:   "spaceid",
+						},
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			// the brand name is just a display string, not a navigable link, so it is not
+			// gated by public-share access
+			Expect(collaboraResponse.BreadcrumbBrandName).To(Equal("Personal"))
+			// the brand URL would expose an internal space/resource id an anonymous user
+			// has no other way to reach, so it must be withheld for public shares (mirrors
+			// how BreadcrumbFolderURL/CloseURL already point at the share token instead of
+			// a "/f/<id>" link for public shares)
+			Expect(collaboraResponse.BreadcrumbBrandURL).To(BeEmpty())
+			Expect(collaboraResponse.BreadcrumbFolderURL).To(Equal("https://ocis.example.prv/s/ABC123"))
+		})
+
+		It("Breadcrumb brand URL is empty when space has no root", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size:  uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{Seconds: uint64(16273849)},
+					Path:  "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "projectspaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "projectspaceid",
+					},
+					Space: &providerv1beta1.StorageSpace{
+						Name: "Some Space Name",
+						// Root is nil/unset
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.BreadcrumbBrandName).To(Equal("Some Space Name"))
+			Expect(collaboraResponse.BreadcrumbBrandURL).To(BeEmpty())
+		})
+
+		It("Collabora CheckFileInfo enables EditModePostMessage but leaves the other PostMessage flags unset", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// change wopi app provider
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			// only EditModePostMessage should be enabled: the oCIS web frontend (the one
+			// generic iframe wrapper used for all WOPI targets) only has a real handler for
+			// UI_Edit today, so sending the other PostMessages would go into the void.
+			Expect(collaboraResponse.EditModePostMessage).To(BeTrue())
+			Expect(collaboraResponse.ClosePostMessage).To(BeFalse())
+			Expect(collaboraResponse.EditNotificationPostMessage).To(BeFalse())
+			Expect(collaboraResponse.FileSharingPostMessage).To(BeFalse())
+			Expect(collaboraResponse.FileVersionPostMessage).To(BeFalse())
+		})
+
+		It("Collabora CheckFileInfo PostMessageOrigin is non-empty whenever EditModePostMessage is true", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// change wopi app provider
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.EditModePostMessage).To(BeTrue())
+			// PostMessageOrigin is the prerequisite for any PostMessage to work: it must be
+			// non-empty whenever a PostMessage flag is enabled.
+			Expect(collaboraResponse.PostMessageOrigin).ToNot(BeEmpty())
+		})
+
+		It("Microsoft CheckFileInfo response never carries Collabora PostMessage properties", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// cfg.App.Product defaults to "Microsoft" (see BeforeEach); Microsoft uses its
+			// own PostMessage-equivalent mechanism and its fileinfo struct has no
+			// PostMessage fields at all, so the gate must not attempt to populate them.
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			jsonBytes, err := json.Marshal(response.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			var jsonMap map[string]interface{}
+			Expect(json.Unmarshal(jsonBytes, &jsonMap)).ToNot(HaveOccurred())
+
+			for _, key := range []string{
+				"ClosePostMessage",
+				"EditModePostMessage",
+				"EditNotificationPostMessage",
+				"FileSharingPostMessage",
+				"FileVersionPostMessage",
+			} {
+				_, ok := jsonMap[key]
+				Expect(ok).To(BeFalse(), "expected %q to be absent from the Microsoft CheckFileInfo response, got: %s", key, string(jsonBytes))
+			}
+		})
+
+		It("OnlyOffice CheckFileInfo response never carries Collabora-only PostMessage properties", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// change wopi app provider
+			cfg.App.Name = "OnlyOffice"
+			cfg.App.Product = "OnlyOffice"
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			// Unlike Microsoft, OnlyOffice's fileinfo struct *does* have matching
+			// SetProperties cases for all 5 PostMessage keys, so this is the test that
+			// would actually catch a missing/inverted Collabora-only gate: if the `if
+			// strings.ToLower(f.cfg.App.Product) == "collabora"` check in CheckFileInfo were
+			// ever removed or broadened, EditModePostMessage: true would leak into this
+			// OnlyOffice response.
+			onlyOfficeResponse := response.Body.(*fileinfo.OnlyOffice)
+			Expect(onlyOfficeResponse.ClosePostMessage).To(BeFalse())
+			Expect(onlyOfficeResponse.EditModePostMessage).To(BeFalse())
+			Expect(onlyOfficeResponse.EditNotificationPostMessage).To(BeFalse())
+			Expect(onlyOfficeResponse.FileSharingPostMessage).To(BeFalse())
+			Expect(onlyOfficeResponse.FileVersionPostMessage).To(BeFalse())
+		})
 	})
 })
