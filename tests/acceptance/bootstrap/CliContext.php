@@ -294,6 +294,19 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @When the administrator optimizes the search index using the CLI
+	 *
+	 * @return void
+	 */
+	public function theAdministratorOptimizesTheSearchIndexUsingTheCli(): void {
+		$command = "search optimize";
+		$body = [
+			"command" => $command,
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
 	 * @When the administrator removes the file versions of space :space using the CLI
 	 *
 	 * @param string $space
