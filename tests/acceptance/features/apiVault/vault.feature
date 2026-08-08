@@ -710,3 +710,166 @@ Feature: vault
       | Space Viewer     |
       | Space Editor     |
       | Manager          |
+
+
+  Scenario: search results for resources in Personal space should be isolated between vault and drive
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "testDriveFolder" in space "Personal"
+    And user "Alice" has created a folder "testVaultFolder" in space "Personal" in vault
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testDriveFile.txt"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testVaultFile.txt" in vault
+    When user "Alice" searches for "*test*" inside space "Personal" in vault using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these entries:
+      | testVaultFolder   |
+      | testVaultFile.txt |
+    When user "Alice" searches for "*test*" inside space "Personal" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these entries:
+      | testDriveFolder   |
+      | testDriveFile.txt |
+
+
+  Scenario: search results for resources inside folder with same name should be isolated between vault and drive
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "newFolder" in space "Personal"
+    And user "Alice" has created a folder "newFolder" in space "Personal" in vault
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "newFolder/testDriveFile.txt"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "newFolder/testVaultFile.txt" in vault
+    When user "Alice" searches for "*test*" inside folder "newFolder" in space "Personal" in vault using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these entries:
+      | newFolder/testVaultFile.txt |
+    When user "Alice" searches for "*test*" inside folder "newFolder" in space "Personal" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these entries:
+      | newFolder/testDriveFile.txt |
+
+
+  Scenario: search result for resources inside project spaces with same name should be isolated between vault and drive
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has logged in via web UI
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    And user "Alice" has created a folder "testDriveFolder" in space "new-space"
+    And user "Alice" has created a folder "testVaultFolder" in space "new-space" in vault
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testDriveFile.txt"
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testVaultFile.txt" in vault
+    When user "Alice" searches for "*test*" inside space "new-space" in vault using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these entries:
+      | testVaultFolder   |
+      | testVaultFile.txt |
+    When user "Alice" searches for "*test*" inside space "new-space" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these entries:
+      | testDriveFolder   |
+      | testDriveFile.txt |
+
+  @tikaServiceNeeded
+  Scenario: search result by content of file should be isolated between vault and drive
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has uploaded a file inside space "Personal" with content "content of file in drive" to "testDriveFile.txt"
+    And user "Alice" has uploaded a file inside space "Personal" with content "content of file in vault" to "testVaultFile.txt" in vault
+    When user "Alice" searches for "Content:content" in vault using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these files:
+      | testVaultFile.txt |
+    When user "Alice" searches for "Content:content" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these files:
+      | testDriveFile.txt  |
+
+  @tikaServiceNeeded
+  Scenario: search result by content of file inside project space should be isolated between vault and drive
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has logged in via web UI
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "content of file in drive" to "testDriveFile.txt"
+    And user "Alice" has uploaded a file inside space "new-space" with content "content of file in vault" to "testVaultFile.txt" in vault
+    When user "Alice" searches for "Content:content" in vault using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these files:
+      | testVaultFile.txt |
+    When user "Alice" searches for "Content:content" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these files:
+      | testDriveFile.txt  |
+
+
+  Scenario: search results by resource tags should be isolated between vault and drive
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "driveFolder" in space "Personal"
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testDriveFile.txt"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testVaultFile.txt" in vault
+    And user "Alice" has tagged the following files of the space "Personal":
+      | path              | tagName |
+      | testDriveFile.txt | tag1    |
+    And user "Alice" has tagged the following folders of the space "Personal":
+      | path        | tagName |
+      | driveFolder | tag1    |
+    And user "Alice" has tagged the following files of the space "Personal" in vault:
+      | path              | tagName |
+      | testVaultFile.txt | tag1    |
+    And user "Alice" has tagged the following folders of the space "Personal" in vault:
+      | path        | tagName |
+      | vaultFolder | tag1    |
+    When user "Alice" searches for "Tags:tag1" in vault using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these files:
+      | testVaultFile.txt |
+      | vaultFolder       |
+    When user "Alice" searches for "Tags:tag1" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these files:
+      | testDriveFile.txt |
+      | driveFolder       |
+
+
+  Scenario: search results by resource tags inside project space should be isolated between vault and drive
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has logged in via web UI
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    And user "Alice" has created a folder "driveFolder" in space "new-space"
+    And user "Alice" has created a folder "vaultFolder" in space "new-space" in vault
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testDriveFile.txt"
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testVaultFile.txt" in vault
+    And user "Alice" has tagged the following files of the space "new-space":
+      | path              | tagName |
+      | testDriveFile.txt | tag1    |
+    And user "Alice" has tagged the following folders of the space "new-space":
+      | path        | tagName |
+      | driveFolder | tag1    |
+    And user "Alice" has tagged the following files of the space "new-space" in vault:
+      | path              | tagName |
+      | testVaultFile.txt | tag1    |
+    And user "Alice" has tagged the following folders of the space "new-space" in vault:
+      | path        | tagName |
+      | vaultFolder | tag1    |
+    When user "Alice" searches for "Tags:tag1" in vault using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these files:
+      | testVaultFile.txt |
+      | vaultFolder       |
+    When user "Alice" searches for "Tags:tag1" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these files:
+      | testDriveFile.txt |
+      | driveFolder       |
