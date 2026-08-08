@@ -272,6 +272,7 @@ func S3(cfg *config.Config) map[string]interface{} {
 // S3NG is the config mapping for the s3ng storage driver
 func S3NG(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
+		"mount_id":         cfg.MountID,
 		"metadata_backend": "messagepack",
 		"propagator":       cfg.Drivers.S3NG.Propagator,
 		"async_propagator_options": map[string]interface{}{
