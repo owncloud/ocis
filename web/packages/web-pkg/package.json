@@ -65,7 +65,7 @@
     "mark.js": "^8.11.1",
     "marked": "^17.0.6",
     "md-editor-v3": "^6.5.0",
-    "mermaid": "^11.12.2",
+    "mermaid": "^11.16.1",
     "oidc-client-ts": "^3.5.0",
     "p-queue": "^9.2.0",
     "password-sheriff": "^2.0.0",
