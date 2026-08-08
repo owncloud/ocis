@@ -1,6 +1,8 @@
 package store
 
 import (
+	"errors"
+
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/util"
@@ -12,8 +14,11 @@ func (s *Store) ListPermissionsByResource(resource *settingsmsg.Resource, roleID
 	for _, roleID := range roleIDs {
 		role, err := s.ReadBundle(roleID)
 		if err != nil {
-			s.Logger.Debug().Str("roleID", roleID).Msg("role not found, skipping")
-			continue
+			if errors.Is(err, settings.ErrNotFound) {
+				s.Logger.Debug().Str("roleID", roleID).Msg("role not found, skipping")
+				continue
+			}
+			return nil, err
 		}
 		records = append(records, extractPermissionsByResource(resource, role)...)
 	}
@@ -25,8 +30,11 @@ func (s *Store) ReadPermissionByID(permissionID string, roleIDs []string) (*sett
 	for _, roleID := range roleIDs {
 		role, err := s.ReadBundle(roleID)
 		if err != nil {
-			s.Logger.Debug().Str("roleID", roleID).Msg("role not found, skipping")
-			continue
+			if errors.Is(err, settings.ErrNotFound) {
+				s.Logger.Debug().Str("roleID", roleID).Msg("role not found, skipping")
+				continue
+			}
+			return nil, err
 		}
 		for _, permission := range role.Settings {
 			if permission.Id == permissionID {
@@ -44,8 +52,11 @@ func (s *Store) ReadPermissionByName(name string, roleIDs []string) (*settingsms
 	for _, roleID := range roleIDs {
 		role, err := s.ReadBundle(roleID)
 		if err != nil {
-			s.Logger.Debug().Str("roleID", roleID).Msg("role not found, skipping")
-			continue
+			if errors.Is(err, settings.ErrNotFound) {
+				s.Logger.Debug().Str("roleID", roleID).Msg("role not found, skipping")
+				continue
+			}
+			return nil, err
 		}
 		for _, permission := range role.Settings {
 			if permission.Name == name {
