@@ -500,12 +500,22 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if u.HasUserType() {
-		logger.Info().Interface("user", u).Msg("could not create user: userType is a read-only attribute")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "userType is a read-only attribute")
+	// A userType may be set explicitly on creation (e.g. "Guest" for an invited
+	// external user). It must be a known type; when omitted it defaults to "Member".
+	// Who may create users at all is already gated by the admin requirement on the route.
+	switch {
+	case !u.HasUserType():
+		u.SetUserType("Member")
+	case !isValidUserType(u.GetUserType()):
+		logger.Info().Interface("user", u).Msg("could not create user: invalid userType")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid userType")
 		return
 	}
-	u.SetUserType("Member")
+	// isValidUserType only checked case-insensitively; canonicalize so the value we
+	// store/echo back and the role we assign below agree regardless of the casing a
+	// caller sent (e.g. "gUeSt"), and so it matches applyFilterEq's exact-case
+	// "Member"/"Guest" comparison for $filter=userType eq '...' queries.
+	u.SetUserType(canonicalUserType(u.GetUserType()))
 
 	logger.Debug().Interface("user", u).Msg("calling create user on backend")
 	if u, err = g.identityBackend.CreateUser(r.Context(), *u); err != nil {
@@ -516,14 +526,23 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 
 	// assign roles if possible
 	if g.roleService != nil && g.config.API.AssignDefaultUserRole {
-		// All users get the user role by default currently.
-		// to all new users for now, as create Account request does not have any role field
+		// New users get a default role, since the create Account request has no role
+		// field: the lightweight "User" role for Guests, and the full "User" role for
+		// everyone else. This has to happen here rather than being left to the proxy's
+		// own defaultRoleAssigner (services/proxy/pkg/userroles/defaultrole.go), since
+		// that only assigns a default role when the user has none yet at login time —
+		// which never fires once one is already assigned here, silently leaving a Guest
+		// with the full User role's privileges instead of the intended lightweight one.
+		roleID := ocissettingssvc.BundleUUIDRoleUser
+		if u.GetUserType() == "Guest" {
+			roleID = ocissettingssvc.BundleUUIDRoleUserLight
+		}
 		if _, err = g.roleService.AssignRoleToUser(r.Context(), &settingssvc.AssignRoleToUserRequest{
 			AccountUuid: *u.Id,
-			RoleId:      ocissettingssvc.BundleUUIDRoleUser,
+			RoleId:      roleID,
 		}); err != nil {
 			// log as error, admin eventually needs to do something
-			logger.Error().Err(err).Str("id", *u.Id).Str("role", ocissettingssvc.BundleUUIDRoleUser).Msg("could not create user: role assignment failed")
+			logger.Error().Err(err).Str("id", *u.Id).Str("role", roleID).Msg("could not create user: role assignment failed")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "role assignment failed")
 			return
 		}
@@ -1156,6 +1175,18 @@ func isValidUserType(userType string) bool {
 	}
 
 	return false
+}
+
+// canonicalUserType maps a userType that has already passed isValidUserType (so it's
+// "member"/"guest" case-insensitively) to the exact-case form ("Member" or "Guest") used
+// elsewhere in this service, e.g. applyFilterEq's userType filter. Anything not
+// recognized as "guest" is treated as "Member" — callers are expected to have already
+// rejected anything isValidUserType doesn't accept.
+func canonicalUserType(userType string) string {
+	if strings.EqualFold(userType, "guest") {
+		return "Guest"
+	}
+	return "Member"
 }
 
 func (g Graph) searchOCMAcceptedUsers(ctx context.Context, odataReq *godata.GoDataRequest) ([]*libregraph.User, error) {
