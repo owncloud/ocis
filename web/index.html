@@ -12,11 +12,11 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.3.7/require.min.js"></script>
     <script>
       if (typeof requirejs === 'undefined') {
-        document.write('<script src="js/require.js?<%= data.compilationTimestamp %>">\x3C/script>')
+        document.write('<script src="js/require.js?<%= data.distTimestamp %>">\x3C/script>')
       }
     </script>
     <% } else { %>
-    <script src="js/require.js?<%= data.compilationTimestamp %>"></script>
+    <script src="js/require.js?<%= data.distTimestamp %>"></script>
     <% } %>
     <script type="module" src="./packages/web-runtime/src/index.ts"></script>
     <script type="module">
