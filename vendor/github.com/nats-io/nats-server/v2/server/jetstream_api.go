@@ -1352,19 +1352,16 @@ func (s *Server) jsonResponse(v any) string {
 // Read lock must be held
 func (jsa *jsAccount) tieredReservation(tier string, cfg *StreamConfig) int64 {
 	var reservation int64
-	for _, sa := range jsa.streams {
+	for _, mset := range jsa.streams {
+		mset.cfgMu.RLock()
+		name, storage, replicas, maxBytes := mset.cfg.Name, mset.cfg.Storage, mset.cfg.Replicas, mset.cfg.MaxBytes
+		mset.cfgMu.RUnlock()
 		// Don't count the stream toward the limit if it already exists.
-		if sa.cfg.Name == cfg.Name {
+		if name == cfg.Name {
 			continue
 		}
-		if (tier == _EMPTY_ || isSameTier(&sa.cfg, cfg)) && sa.cfg.MaxBytes > 0 && sa.cfg.Storage == cfg.Storage {
-			// If tier is empty, all storage is flat and we should adjust for replicas.
-			// Otherwise if tiered, storage replication already taken into consideration.
-			if tier == _EMPTY_ && sa.cfg.Replicas > 1 {
-				reservation = addSaturate(reservation, mulSaturate(int64(sa.cfg.Replicas), sa.cfg.MaxBytes))
-			} else {
-				reservation = addSaturate(reservation, sa.cfg.MaxBytes)
-			}
+		if (tier == _EMPTY_ || isSameTier(replicas, cfg.Replicas)) && maxBytes > 0 && storage == cfg.Storage {
+			reservation = addSaturate(reservation, accountReservation(tier, replicas, maxBytes))
 		}
 	}
 	return reservation
@@ -1699,19 +1696,23 @@ func (s *Server) jsStreamNamesRequest(sub *subscription, c *client, _ *Account, 
 			resp.Streams = resp.Streams[:JSApiNamesLimit]
 		}
 	} else {
+		// Snapshot names once to avoid repeated cfgMu RLocks during sort+append.
 		msets := acc.filteredStreams(filter)
-		// Since we page results order matters.
-		if len(msets) > 1 {
-			slices.SortFunc(msets, func(i, j *stream) int { return cmp.Compare(i.cfg.Name, j.cfg.Name) })
+		names := make([]string, len(msets))
+		for i, mset := range msets {
+			names[i] = mset.getCfgName()
+		}
+		if len(names) > 1 {
+			slices.Sort(names)
 		}
 
-		numStreams = len(msets)
+		numStreams = len(names)
 		if offset > numStreams {
 			offset = numStreams
 		}
 
-		for _, mset := range msets[offset:] {
-			resp.Streams = append(resp.Streams, mset.cfg.Name)
+		for _, name := range names[offset:] {
+			resp.Streams = append(resp.Streams, name)
 			if len(resp.Streams) >= JSApiNamesLimit {
 				break
 			}
@@ -1805,21 +1806,31 @@ func (s *Server) jsStreamListRequest(sub *subscription, c *client, _ *Account, s
 		msets = acc.filteredStreams(filter)
 	}
 
-	slices.SortFunc(msets, func(i, j *stream) int { return cmp.Compare(i.cfg.Name, j.cfg.Name) })
+	// Snapshot names once and sort the parallel slice to avoid repeated cfgMu RLocks.
+	type msetWithName struct {
+		mset *stream
+		name string
+	}
+	named := make([]msetWithName, len(msets))
+	for i, mset := range msets {
+		named[i] = msetWithName{mset, mset.getCfgName()}
+	}
+	slices.SortFunc(named, func(a, b msetWithName) int { return cmp.Compare(a.name, b.name) })
 
-	scnt := len(msets)
+	scnt := len(named)
 	if offset > scnt {
 		offset = scnt
 	}
 
 	var missingNames []string
-	for _, mset := range msets[offset:] {
+	for _, n := range named[offset:] {
+		mset, name := n.mset, n.name
 		if mset.offlineReason != _EMPTY_ {
 			if resp.Offline == nil {
 				resp.Offline = make(map[string]string, 1)
 			}
-			resp.Offline[mset.getCfgName()] = mset.offlineReason
-			missingNames = append(missingNames, mset.getCfgName())
+			resp.Offline[name] = mset.offlineReason
+			missingNames = append(missingNames, name)
 			continue
 		}
 
@@ -2616,18 +2627,15 @@ func (s *Server) jsLeaderServerStreamMoveRequest(sub *subscription, c *client, _
 	cfg := StreamConfig{}
 	currPeers := []string{}
 	currCluster := _EMPTY_
-	js.mu.Lock()
-	streams, ok := cc.streams[accName]
-	if ok {
-		sa, ok := streams[streamName]
-		if ok {
-			cfg = *sa.Config.clone()
-			streamFound = true
-			currPeers = sa.Group.Peers
-			currCluster = sa.Group.Cluster
-		}
+	js.mu.RLock()
+	sa := js.streamAssignmentOrInflight(accName, streamName)
+	if sa != nil {
+		cfg = *sa.Config.clone()
+		streamFound = true
+		currPeers = copyStrings(sa.Group.Peers)
+		currCluster = sa.Group.Cluster
 	}
-	js.mu.Unlock()
+	js.mu.RUnlock()
 
 	if !streamFound {
 		resp.Error = NewJSStreamNotFoundError()
@@ -2767,17 +2775,14 @@ func (s *Server) jsLeaderServerStreamCancelMoveRequest(sub *subscription, c *cli
 	streamFound := false
 	cfg := StreamConfig{}
 	currPeers := []string{}
-	js.mu.Lock()
-	streams, ok := cc.streams[accName]
-	if ok {
-		sa, ok := streams[streamName]
-		if ok {
-			cfg = *sa.Config.clone()
-			streamFound = true
-			currPeers = sa.Group.Peers
-		}
+	js.mu.RLock()
+	sa := js.streamAssignmentOrInflight(accName, streamName)
+	if sa != nil {
+		cfg = *sa.Config.clone()
+		streamFound = true
+		currPeers = copyStrings(sa.Group.Peers)
 	}
-	js.mu.Unlock()
+	js.mu.RUnlock()
 
 	if !streamFound {
 		resp.Error = NewJSStreamNotFoundError()
@@ -2920,12 +2925,22 @@ func (s *Server) jsLeaderAccountPurgeRequest(sub *subscription, c *client, _ *Ac
 	for osa := range js.streamAssignmentsOrInflightSeq(accName) {
 		for oca := range js.consumerAssignmentsOrInflightSeq(accName, osa.Config.Name) {
 			ca := &consumerAssignment{Group: oca.Group, Stream: oca.Stream, Name: oca.Name, Config: oca.Config, Subject: subject, Client: oca.Client, Created: oca.Created}
-			meta.Propose(encodeDeleteConsumerAssignment(ca))
+			if err = meta.Propose(cc.term, encodeDeleteConsumerAssignment(ca)); err != nil {
+				js.mu.Unlock()
+				resp.Error = NewJSStreamGeneralError(err)
+				s.sendAPIErrResponse(ci, acc, subject, reply, string(msg), s.jsonResponse(&resp))
+				return
+			}
 			cc.trackInflightConsumerProposal(accName, osa.Config.Name, ca, true)
 			nc++
 		}
 		sa := &streamAssignment{Group: osa.Group, Config: osa.Config, Subject: subject, Client: osa.Client, Created: osa.Created}
-		meta.Propose(encodeDeleteStreamAssignment(sa))
+		if err = meta.Propose(cc.term, encodeDeleteStreamAssignment(sa)); err != nil {
+			js.mu.Unlock()
+			resp.Error = NewJSStreamGeneralError(err)
+			s.sendAPIErrResponse(ci, acc, subject, reply, string(msg), s.jsonResponse(&resp))
+			return
+		}
 		cc.trackInflightStreamProposal(accName, sa, true)
 		ns++
 	}
@@ -3286,12 +3301,15 @@ func (s *Server) jsMsgDeleteRequest(sub *subscription, c *client, _ *Account, su
 		s.sendAPIErrResponse(ci, acc, subject, reply, string(msg), s.jsonResponse(&resp))
 		return
 	}
-	if mset.cfg.Sealed {
+	mset.cfgMu.RLock()
+	sealed, denyDelete := mset.cfg.Sealed, mset.cfg.DenyDelete
+	mset.cfgMu.RUnlock()
+	if sealed {
 		resp.Error = NewJSStreamSealedError()
 		s.sendAPIErrResponse(ci, acc, subject, reply, string(msg), s.jsonResponse(&resp))
 		return
 	}
-	if mset.cfg.DenyDelete {
+	if denyDelete {
 		resp.Error = NewJSStreamMsgDeleteFailedError(errors.New("message delete not permitted"))
 		s.sendAPIErrResponse(ci, acc, subject, reply, string(msg), s.jsonResponse(&resp))
 		return
@@ -3719,12 +3737,15 @@ func (s *Server) jsStreamPurgeRequest(sub *subscription, c *client, _ *Account, 
 		s.sendAPIErrResponse(ci, acc, subject, reply, string(msg), s.jsonResponse(&resp))
 		return
 	}
-	if mset.cfg.Sealed {
+	mset.cfgMu.RLock()
+	sealed, denyPurge := mset.cfg.Sealed, mset.cfg.DenyPurge
+	mset.cfgMu.RUnlock()
+	if sealed {
 		resp.Error = NewJSStreamSealedError()
 		s.sendAPIErrResponse(ci, acc, subject, reply, string(msg), s.jsonResponse(&resp))
 		return
 	}
-	if mset.cfg.DenyPurge {
+	if denyPurge {
 		resp.Error = NewJSStreamPurgeFailedError(errors.New("stream purge not permitted"))
 		s.sendAPIErrResponse(ci, acc, subject, reply, string(msg), s.jsonResponse(&resp))
 		return
@@ -3762,7 +3783,7 @@ func (acc *Account) jsNonClusteredStreamLimitsCheck(cfg *StreamConfig) *ApiError
 		return NewJSMaximumStreamsLimitError()
 	}
 	reserved := jsa.tieredReservation(tier, cfg)
-	if err := jsa.js.checkAllLimits(selectedLimits, cfg, reserved, 0); err != nil {
+	if err := jsa.js.checkAllLimits(selectedLimits, tier, cfg, reserved, 0); err != nil {
 		return NewJSStreamLimitsError(err, Unless(err))
 	}
 	return nil
@@ -4165,7 +4186,7 @@ func (s *Server) jsStreamSnapshotRequest(sub *subscription, c *client, _ *Accoun
 		s.sendAPIErrResponse(ci, acc, subject, reply, smsg, s.jsonResponse(&resp))
 		return
 	}
-	if !IsValidSubject(req.DeliverSubject) {
+	if !IsValidPublishSubject(req.DeliverSubject) {
 		resp.Error = NewJSSnapshotDeliverSubjectInvalidError()
 		s.sendAPIErrResponse(ci, acc, subject, reply, smsg, s.jsonResponse(&resp))
 		return
@@ -4209,7 +4230,10 @@ func (s *Server) jsStreamSnapshotRequest(sub *subscription, c *client, _ *Accoun
 		})
 
 		// Now do the real streaming.
-		s.streamSnapshot(acc, mset, sr, &req)
+		if err := s.streamSnapshot(acc, mset, sr, &req); err != nil {
+			s.Warnf("Snapshot of stream '%s > %s' failed: %v", mset.jsa.account.Name, mset.name(), err)
+			return
+		}
 
 		end := time.Now().UTC()
 
@@ -4242,7 +4266,7 @@ const defaultSnapshotAckTimeout = 5 * time.Second
 var snapshotAckTimeout = defaultSnapshotAckTimeout
 
 // streamSnapshot will stream out our snapshot to the reply subject.
-func (s *Server) streamSnapshot(acc *Account, mset *stream, sr *SnapshotResult, req *JSApiStreamSnapshotRequest) {
+func (s *Server) streamSnapshot(acc *Account, mset *stream, sr *SnapshotResult, req *JSApiStreamSnapshotRequest) error {
 	chunkSize, wndSize := req.ChunkSize, req.WindowSize
 	if chunkSize == 0 {
 		chunkSize = defaultSnapshotChunkSize
@@ -4267,7 +4291,9 @@ func (s *Server) streamSnapshot(acc *Account, mset *stream, sr *SnapshotResult, 
 
 	// Check interest for the snapshot deliver subject.
 	inch := make(chan bool, 1)
-	acc.sl.RegisterNotification(req.DeliverSubject, inch)
+	if err := acc.sl.RegisterNotification(req.DeliverSubject, inch); err != nil {
+		return fmt.Errorf("could not register snapshot delivery interest for %q: %w", req.DeliverSubject, err)
+	}
 	defer acc.sl.ClearNotification(req.DeliverSubject, inch)
 	hasInterest := <-inch
 	if !hasInterest {
@@ -4297,6 +4323,8 @@ func (s *Server) streamSnapshot(acc *Account, mset *stream, sr *SnapshotResult, 
 
 	var hdr []byte
 	chunk := make([]byte, chunkSize)
+	ackTimer := time.NewTimer(snapshotAckTimeout)
+	defer stopAndClearTimer(&ackTimer)
 	for index := 1; ; index++ {
 		select {
 		case <-slots:
@@ -4309,7 +4337,7 @@ func (s *Server) streamSnapshot(acc *Account, mset *stream, sr *SnapshotResult, 
 			// The snapshotting goroutine has failed for some reason.
 			hdr = []byte(fmt.Sprintf("NATS/1.0 500 %s\r\n\r\n", err))
 			goto done
-		case <-time.After(snapshotAckTimeout):
+		case <-ackTimer.C:
 			// It's taking a very long time for the receiver to send us acks,
 			// they have probably stalled or there is high loss on the link.
 			hdr = []byte("NATS/1.0 408 No Flow Response\r\n\r\n")
@@ -4328,10 +4356,12 @@ func (s *Server) streamSnapshot(acc *Account, mset *stream, sr *SnapshotResult, 
 			hdr = []byte("NATS/1.0 204\r\n\r\n")
 		}
 		mset.outq.send(newJSPubMsg(reply, _EMPTY_, ackReply, nil, chunk, nil, 0))
+		ackTimer.Reset(snapshotAckTimeout)
 	}
 
 done:
 	mset.outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, hdr, nil, nil, 0))
+	return nil
 }
 
 // For determining consumer request type.
@@ -5022,7 +5052,13 @@ func (s *Server) jsConsumerInfoRequest(sub *subscription, c *client, _ *Account,
 				return
 			}
 			// If we are a member and we have a group leader or we had a previous leader consider bailing out.
-			if !node.Leaderless() || node.HadPreviousLeader() || (rg != nil && rg.Preferred != _EMPTY_ && rg.Preferred != ourID) {
+			bail := !node.Leaderless() || node.HadPreviousLeader() || rg == nil
+			if !bail {
+				js.mu.RLock()
+				bail = rg.Preferred != ourID || (rg.node != nil && time.Since(rg.node.Created()) > lostQuorumIntervalDefault)
+				js.mu.RUnlock()
+			}
+			if bail {
 				if leaderNotPartOfGroup {
 					resp.Error = NewJSConsumerOfflineError()
 					s.sendDelayedAPIErrResponse(ci, acc, subject, reply, string(msg), s.jsonResponse(&resp), nil, errRespDelay)
@@ -5212,41 +5248,39 @@ func (s *Server) jsConsumerPauseRequest(sub *subscription, c *client, _ *Account
 	consumer := consumerNameFromSubject(subject)
 
 	if isClustered {
-		js.mu.RLock()
+		js.mu.Lock()
 		sa := js.streamAssignment(acc.Name, stream)
 		if sa == nil {
-			js.mu.RUnlock()
+			js.mu.Unlock()
 			resp.Error = NewJSStreamNotFoundError(Unless(err))
 			s.sendAPIErrResponse(ci, acc, subject, reply, string(msg), s.jsonResponse(&resp))
 			return
 		}
 		if sa.unsupported != nil {
-			js.mu.RUnlock()
+			js.mu.Unlock()
 			// Just let the request time out.
 			return
 		}
 
 		ca, ok := sa.consumers[consumer]
 		if !ok || ca == nil {
-			js.mu.RUnlock()
+			js.mu.Unlock()
 			resp.Error = NewJSConsumerNotFoundError()
 			s.sendAPIErrResponse(ci, acc, subject, reply, string(msg), s.jsonResponse(&resp))
 			return
 		}
 		if ca.unsupported != nil {
-			js.mu.RUnlock()
+			js.mu.Unlock()
 			// Just let the request time out.
 			return
 		}
 
 		nca := ca.clone()
-		// We're only holding the read lock and release below,
-		// we need a copy to prevent concurrent reads/writes.
+		// We need a copy to prevent concurrent reads/writes.
 		ncfg := *ca.Config
 		ncfg.Metadata = maps.Clone(ncfg.Metadata)
 		nca.Config = &ncfg
 		meta := cc.meta
-		js.mu.RUnlock()
 		pauseUTC := req.PauseUntil.UTC()
 		if !pauseUTC.IsZero() {
 			nca.Config.PauseUntil = &pauseUTC
@@ -5259,7 +5293,12 @@ func (s *Server) jsConsumerPauseRequest(sub *subscription, c *client, _ *Account
 		setStaticConsumerMetadata(nca.Config)
 
 		eca := encodeAddConsumerAssignment(nca)
-		meta.Propose(eca)
+		if err = meta.Propose(cc.term, eca); err != nil {
+			js.mu.Unlock()
+			return
+		}
+		cc.trackInflightConsumerProposal(acc.Name, stream, nca, false)
+		js.mu.Unlock()
 
 		resp.PauseUntil = pauseUTC
 		if resp.Paused = time.Now().Before(pauseUTC); resp.Paused {

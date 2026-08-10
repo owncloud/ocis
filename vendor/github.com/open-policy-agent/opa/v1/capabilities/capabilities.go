@@ -2,13 +2,10 @@
 // Use of this source code is governed by an Apache2
 // license that can be found in the LICENSE file.
 
-//go:build go1.16
-// +build go1.16
-
 package capabilities
 
 import (
-	v0 "github.com/open-policy-agent/opa/capabilities"
+	v0 "github.com/open-policy-agent/opa/capabilities" //nolint:staticcheck
 )
 
 // FS contains the embedded capabilities/ directory of the built version,

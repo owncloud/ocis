@@ -154,22 +154,24 @@ func (s *Scorch) introduceSegment(next *segmentIntroduction) error {
 			cachedDocs: root.segment[i].cachedDocs,
 			cachedMeta: root.segment[i].cachedMeta,
 			creator:    root.segment[i].creator,
+			internal:   root.segment[i].internal,
 		}
 
 		// apply new obsoletions
 		if root.segment[i].deleted == nil {
 			newss.deleted = delta
 		} else {
-			if delta.IsEmpty() {
-				newss.deleted = root.segment[i].deleted
-			} else {
-				newss.deleted = roaring.Or(root.segment[i].deleted, delta)
-			}
+			newss.deleted = roaring.Or(root.segment[i].deleted, delta)
 		}
 		if newss.deleted.IsEmpty() {
 			newss.deleted = nil
 		}
 
+		// update the deleted bitmap to include any nested/sub-documents as well
+		// if the segment supports that
+		if ns, ok := newss.segment.(segment.NestedSegment); ok {
+			newss.deleted = ns.AddNestedDocuments(newss.deleted)
+		}
 		// check for live size before copying
 		if newss.LiveSize() > 0 {
 			newSnapshot.segment = append(newSnapshot.segment, newss)
@@ -201,6 +203,7 @@ func (s *Scorch) introduceSegment(next *segmentIntroduction) error {
 			stats:      next.stats,
 			cachedDocs: &cachedDocs{cache: nil},
 			cachedMeta: &cachedMeta{meta: nil},
+			internal:   make(map[string][]byte),
 			creator:    "introduceSegment",
 		}
 		newSnapshot.segment = append(newSnapshot.segment, newSegmentSnapshot)
@@ -210,6 +213,12 @@ func (s *Scorch) introduceSegment(next *segmentIntroduction) error {
 		// queued for persistence.
 		atomic.AddUint64(&s.stats.TotIntroducedItems, newSegmentSnapshot.Count())
 		atomic.AddUint64(&s.stats.TotIntroducedSegmentsBatch, 1)
+
+		// track the internal values of this segment so that when we update the
+		// bolt we keep the internal values in sync with the segments on disk, and
+		// if this segment didn't get persisted we need to undo that info from the
+		// indexSnapshot's internal map as part of the bolt update.
+		newSegmentSnapshot.internal = next.internal
 	}
 	// copy old values
 	for key, oldVal := range root.internal {
@@ -398,6 +407,7 @@ func (s *Scorch) introduceMerge(nextMerge *segmentMerge) {
 				cachedDocs: root.segment[i].cachedDocs,
 				cachedMeta: root.segment[i].cachedMeta,
 				creator:    root.segment[i].creator,
+				internal:   root.segment[i].internal,
 			})
 			root.segment[i].segment.AddRef()
 			newSnapshot.offsets = append(newSnapshot.offsets, running)

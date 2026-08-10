@@ -45,11 +45,16 @@ var defaultChunkFactor uint32 = 1024
 // New creates an in-memory zap-encoded SegmentBase from a set of Documents
 func (z *ZapPlugin) New(results []index.Document) (
 	segment.Segment, uint64, error) {
-	return z.newWithChunkFactor(results, defaultChunkFactor)
+	return z.newWithChunkFactor(results, defaultChunkFactor, nil)
+}
+
+func (z *ZapPlugin) NewUsing(results []index.Document, config map[string]interface{}) (
+	segment.Segment, uint64, error) {
+	return z.newWithChunkFactor(results, defaultChunkFactor, config)
 }
 
 func (*ZapPlugin) newWithChunkFactor(results []index.Document,
-	chunkFactor uint32) (segment.Segment, uint64, error) {
+	chunkFactor uint32, config map[string]interface{}) (segment.Segment, uint64, error) {
 	s := interimPool.Get().(*interim)
 
 	var br bytes.Buffer
@@ -77,7 +82,7 @@ func (*ZapPlugin) newWithChunkFactor(results []index.Document,
 
 	sb, err := InitSegmentBase(br.Bytes(), s.w.Sum32(), chunkFactor,
 		s.FieldsMap, s.FieldsInv, uint64(len(results)),
-		storedIndexOffset, fieldsIndexOffset, fdvIndexOffset, dictOffsets)
+		storedIndexOffset, fieldsIndexOffset, fdvIndexOffset, dictOffsets, config)
 
 	if err == nil && s.reset() == nil {
 		s.lastNumDocs = len(results)

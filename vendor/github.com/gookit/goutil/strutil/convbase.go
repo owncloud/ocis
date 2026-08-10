@@ -1,6 +1,7 @@
 package strutil
 
 import (
+	"math/big"
 	"strconv"
 	"strings"
 
@@ -16,6 +17,7 @@ const (
 	Base16Chars = "0123456789abcdef"
 	Base32Chars = "0123456789abcdefghjkmnpqrstvwxyz"
 	Base36Chars = "0123456789abcdefghijklmnopqrstuvwxyz"
+	Base48Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKL"
 	Base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	Base64Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/"
 )
@@ -33,12 +35,34 @@ func Base10Conv(src string, to int) string { return BaseConv(src, 10, to) }
 //	BaseConv("7b", 16, 10) // Output: "123"
 func BaseConv(src string, from, to int) string {
 	if from > 64 || from < 2 {
-		return ""
+		from = 10
 	}
 	if to > 64 || to < 2 {
-		return ""
+		to = 16
 	}
 	return BaseConvByTpl(src, Base64Chars[:from], Base64Chars[:to])
+}
+
+// BaseConvInt convert base int to new base string.
+//
+// Usage:
+//
+//	BaseConv(123, 16) // Output: "7b"
+func BaseConvInt(src uint64, toBase int) string {
+	if toBase > 64 || toBase < 2 {
+		toBase = 16
+	}
+
+	// bigInt 支持 2-62 进制转换处理 TODO
+	if toBase <= 36 {
+		return strconv.FormatUint(src, toBase)
+	}
+	if toBase <= 62 {
+		bigInt := new(big.Int).SetUint64(src)
+		return bigInt.Text(toBase)
+	}
+
+	return BaseConvIntByTpl(src, Base64Chars[:toBase])
 }
 
 // BaseConvByTpl convert base string by template.
@@ -58,7 +82,7 @@ func BaseConvByTpl(src string, fromBase, toBase string) string {
 		var err error
 		dec, err = strconv.ParseUint(src, 10, 0)
 		if err != nil {
-			basefn.Panicf("input is not a valid decimal number: %s", src)
+			basefn.Panicf("input is not a valid decimal number: %s(%v)", src, err)
 		}
 	} else {
 		fLen := uint64(len(fromBase))
@@ -67,6 +91,12 @@ func BaseConvByTpl(src string, fromBase, toBase string) string {
 		}
 	}
 
+	// convert to new base
+	return BaseConvIntByTpl(dec, toBase)
+}
+
+// BaseConvIntByTpl convert base int to new base string.
+func BaseConvIntByTpl(dec uint64, toBase string) string {
 	// convert to new base
 	var res string
 	toLen := uint64(len(toBase))

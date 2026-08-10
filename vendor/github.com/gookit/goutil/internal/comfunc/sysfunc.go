@@ -50,11 +50,6 @@ func ExecCmd(binName string, args []string, workDir ...string) (string, error) {
 	return string(bs), err
 }
 
-var (
-	cmdList  = []string{"cmd", "cmd.exe"}
-	pwshList = []string{"powershell", "powershell.exe", "pwsh", "pwsh.exe"}
-)
-
 // ShellExec exec command by shell
 // cmdLine e.g. "ls -al"
 func ShellExec(cmdLine string, shells ...string) (string, error) {
@@ -87,19 +82,24 @@ func CurrentShell(onlyName bool, fallbackShell ...string) (binPath string) {
 		// 检查父进程名称
 		parentProcess := os.Getenv("GOPROCESS")
 		if parentProcess != "" {
-			return parentProcess
-		}
-
-		binPath = os.Getenv("SHELL") // 适用于 Unix-like 系统
-		if len(binPath) == 0 {
-			// TODO check on Windows
-			binPath, err = ShellExec("echo $SHELL")
-			if err != nil {
-				return fbShell
+			binPath = parentProcess
+		} else {
+			binPath = os.Getenv("SHELL") // 适用于 Unix-like 系统
+			if len(binPath) == 0 {
+				// TODO check on Windows git bash
+				binPath, err = ShellExec("echo $SHELL")
+				if err != nil {
+					binPath = fbShell
+				}
 			}
+			binPath = strings.TrimSpace(binPath)
 		}
 
-		binPath = strings.TrimSpace(binPath)
+		// fix: 去除 .exe 后缀
+		if pos := strings.IndexByte(binPath, '.'); pos > 0 {
+			binPath = binPath[:pos]
+		}
+
 		// cache result
 		curShellCache = binPath
 	} else {
@@ -112,13 +112,6 @@ func CurrentShell(onlyName bool, fallbackShell ...string) (binPath string) {
 		binPath = fbShell
 	}
 	return
-}
-
-func checkWinCurrentShell() string {
-	// 在 Windows 上，可以检查 COMSPEC 环境变量
-	comSpec := os.Getenv("COMSPEC")
-	// 没法检查 pwsh, 返回的还是 cmd
-	return comSpec
 }
 
 // HasShellEnv has shell env check.

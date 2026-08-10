@@ -103,6 +103,24 @@ func (i *indexAliasImpl) IndexSynonym(id string, collection string, definition *
 	return ErrorSynonymSearchNotSupported
 }
 
+func (i *indexAliasImpl) Train(batch *Batch) error {
+	i.mutex.RLock()
+	defer i.mutex.RUnlock()
+	if !i.open {
+		return ErrorIndexClosed
+	}
+
+	err := i.isAliasToSingleIndex()
+	if err != nil {
+		return err
+	}
+
+	if vi, ok := i.indexes[0].(TrainableIndex); ok {
+		return vi.Train(batch)
+	}
+	return ErrorTrainingNotSupported
+}
+
 func (i *indexAliasImpl) Delete(id string) error {
 	i.mutex.RLock()
 	defer i.mutex.RUnlock()
@@ -985,6 +1003,15 @@ func MultiSearch(ctx context.Context, req *SearchRequest, params *multiSearchPar
 	searchStart := time.Now()
 	asyncResults := make(chan *asyncSearchResult, len(indexes))
 
+	var preSearchData map[string]map[string]interface{}
+	var rescorer *rescorer
+	var fusionKnnHits search.DocumentMatchCollection
+	if params != nil {
+		preSearchData = params.preSearchData
+		rescorer = params.rescorer
+		fusionKnnHits = params.fusionKnnHits
+	}
+
 	var reverseQueryExecution bool
 	if req.SearchBefore != nil {
 		reverseQueryExecution = true
@@ -1006,8 +1033,8 @@ func MultiSearch(ctx context.Context, req *SearchRequest, params *multiSearchPar
 	waitGroup.Add(len(indexes))
 	for _, in := range indexes {
 		var payload map[string]interface{}
-		if params.preSearchData != nil {
-			payload = params.preSearchData[in.Name()]
+		if preSearchData != nil {
+			payload = preSearchData[in.Name()]
 		}
 		go searchChildIndex(in, createChildSearchRequest(req, payload))
 	}
@@ -1047,9 +1074,9 @@ func MultiSearch(ctx context.Context, req *SearchRequest, params *multiSearchPar
 		}
 	}
 
-	if params.rescorer != nil {
-		sr.Hits, sr.Total, sr.MaxScore = params.rescorer.rescore(sr.Hits, params.fusionKnnHits)
-		params.rescorer.restoreSearchRequest()
+	if rescorer != nil {
+		sr.Hits, sr.Total, sr.MaxScore = rescorer.rescore(sr.Hits, fusionKnnHits)
+		rescorer.restoreSearchRequest()
 	}
 
 	sr.Hits = hitsInCurrentPage(req, sr.Hits)

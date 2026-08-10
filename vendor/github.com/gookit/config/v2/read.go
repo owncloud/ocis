@@ -63,21 +63,22 @@ func (c *Config) Exists(key string, findByPath ...bool) (ok bool) {
 			}
 		case []int: // is array(is from Set)
 			i, err := strconv.Atoi(k)
-
-			// check slice index
-			if err != nil || len(typeData) < i {
+			if err != nil || i >= len(typeData) {
 				return false
 			}
+			item = typeData[i]
 		case []string: // is array(is from Set)
 			i, err := strconv.Atoi(k)
-			if err != nil || len(typeData) < i {
+			if err != nil || i >= len(typeData) {
 				return false
 			}
+			item = typeData[i]
 		case []any: // is array(load from file)
 			i, err := strconv.Atoi(k)
-			if err != nil || len(typeData) < i {
+			if err != nil || i >= len(typeData) {
 				return false
 			}
+			item = typeData[i]
 		default: // error
 			return false
 		}
@@ -213,7 +214,7 @@ func (c *Config) GetValue(key string, findByPath ...bool) (value any, ok bool) {
 			i, err := strconv.Atoi(k)
 
 			// check slice index
-			if err != nil || len(typeData) < i {
+			if err != nil || len(typeData) <= i {
 				ok = false
 				c.addError(err)
 				return
@@ -222,7 +223,7 @@ func (c *Config) GetValue(key string, findByPath ...bool) (value any, ok bool) {
 			item = typeData[i]
 		case []string: // is array(is from Set)
 			i, err := strconv.Atoi(k)
-			if err != nil || len(typeData) < i {
+			if err != nil || len(typeData) <= i {
 				ok = false
 				c.addError(err)
 				return
@@ -231,7 +232,7 @@ func (c *Config) GetValue(key string, findByPath ...bool) (value any, ok bool) {
 			item = typeData[i]
 		case []any: // is array(load from file)
 			i, err := strconv.Atoi(k)
-			if err != nil || len(typeData) < i {
+			if err != nil || len(typeData) <= i {
 				ok = false
 				c.addError(err)
 				return
@@ -376,14 +377,33 @@ func (c *Config) tryInt64(key string) (value int64, ok bool) {
 // Duration get a time.Duration type value. if not found return default value
 func Duration(key string, defVal ...time.Duration) time.Duration { return dc.Duration(key, defVal...) }
 
-// Duration get a time.Duration type value. if not found return default value
+// Duration get a time.Duration type value. if not found return default value.
+//
+// The stored value may be a Go duration string (e.g. "300s", "1h30m", "20m").
+// A bare integer is treated as nanoseconds for backwards compatibility.
 func (c *Config) Duration(key string, defVal ...time.Duration) time.Duration {
-	value, exist := c.tryInt64(key)
+	str, exist := c.getString(key)
+	if !exist {
+		if len(defVal) > 0 {
+			return defVal[0]
+		}
+		return 0
+	}
 
-	if !exist && len(defVal) > 0 {
+	// Prefer a Go duration string, e.g. "300s", "1h30m".
+	if dur, err := time.ParseDuration(str); err == nil {
+		return dur
+	}
+
+	// Backwards compatible: a bare integer is nanoseconds.
+	if n, err := strconv.ParseInt(str, 10, 64); err == nil {
+		return time.Duration(n)
+	}
+
+	if len(defVal) > 0 {
 		return defVal[0]
 	}
-	return time.Duration(value)
+	return 0
 }
 
 // Float get a float64 value, if not found return default value

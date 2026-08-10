@@ -216,6 +216,12 @@ func validateLeafNode(o *Options) error {
 			if r.LocalAccount == _EMPTY_ {
 				r.LocalAccount = globalAccountName
 			}
+			if err := checkPermSubjectArray(r.DenyImports, false); err != nil {
+				return fmt.Errorf("invalid deny_imports for remote %s: %w", r.safeName(), err)
+			}
+			if err := checkPermSubjectArray(r.DenyExports, false); err != nil {
+				return fmt.Errorf("invalid deny_exports for remote %s: %w", r.safeName(), err)
+			}
 			rn := r.name()
 			if _, dup := names[rn]; dup {
 				return fmt.Errorf("duplicate remote %s", r.safeName())
@@ -302,6 +308,13 @@ func validateLeafNode(o *Options) error {
 			}
 			if !ok {
 				return fmt.Errorf("remote leaf node configuration cannot have a mix of websocket and non-websocket urls: %q", redactURLList(rcfg.URLs))
+			}
+		}
+		if !wsAllowedFIPS() {
+			for _, u := range rcfg.URLs {
+				if isWSURL(u) {
+					return fmt.Errorf("remote leaf node URL %q cannot be used in FIPS-140 mode when built with this Go version, use Go 1.26 or later", redactURLString(u.String()))
+				}
 			}
 		}
 		// Validate compression settings
@@ -676,6 +689,22 @@ func connectToRemoteLeafNode(s *Server, remote *leafNodeCfg, firstConnect bool) 
 		return false
 	}
 
+	// If this remote is no longer valid by the time we return (e.g. it was
+	// removed or disabled through a configuration reload), we will never
+	// reconnect, so clear any JetStream observer state. Otherwise, the raft
+	// nodes of this account's assets would remain observers.
+	defer func() {
+		if remote.stillValid() {
+			return
+		}
+		s.mu.RLock()
+		shouldMigrate := remote.JetStreamClusterMigrate
+		s.mu.RUnlock()
+		if shouldMigrate {
+			s.clearObserverState(remote)
+		}
+	}()
+
 	opts := s.getOpts()
 	reconnectDelay := opts.LeafNode.ReconnectInterval
 	s.mu.RLock()
@@ -731,6 +760,10 @@ func connectToRemoteLeafNode(s *Server, remote *leafNodeCfg, firstConnect bool) 
 		defer remote.cancelMigrateTimer()
 	}
 
+	reconnectTimer := time.NewTimer(reconnectDelay)
+	reconnectTimer.Stop()
+	defer stopAndClearTimer(&reconnectTimer)
+
 	for s.isRunning() && remote.stillValid() {
 		rURL := remote.pickNextURL()
 		url, err := s.getRandomIP(resolver, rURL.Host, nil)
@@ -782,12 +815,13 @@ func connectToRemoteLeafNode(s *Server, remote *leafNodeCfg, firstConnect bool) 
 				})
 			}
 			remote.Unlock()
+			reconnectTimer.Reset(delay)
 			select {
 			case <-s.quitCh:
 				return false
 			case <-remote.quitCh:
 				return false
-			case <-time.After(delay):
+			case <-reconnectTimer.C:
 				// Check if we should migrate any JetStream assets immediately while this remote is down.
 				// This will be used if JetStreamClusterMigrateDelay was not set
 				if jetstreamMigrateDelay == 0 {
@@ -1300,7 +1334,10 @@ func (s *Server) createLeafNode(conn net.Conn, rURL *url.URL, remote *leafNodeCf
 		info = s.copyLeafNodeInfo()
 		// For tests that want to simulate old servers, do not set the compression
 		// on the INFO protocol if configured with CompressionNotSupported.
-		if cm := opts.LeafNode.Compression.Mode; cm != CompressionNotSupported {
+		// Also suppress it if WebSocket compression is already in use, otherwise
+		// an old soliciting peer would honor the advertised mode, switch to S2,
+		// and then wait forever for a compressed INFO response from us.
+		if cm := opts.LeafNode.Compression.Mode; cm != CompressionNotSupported && (ws == nil || !ws.compress) {
 			info.Compression = cm
 		}
 		// We always send a nonce for LEAF connections. Do not change that without
@@ -1721,6 +1758,15 @@ func (c *client) processLeafnodeInfo(info *Info) {
 }
 
 func (s *Server) negotiateLeafCompression(c *client, didSolicit bool, infoCompression string, co *CompressionOpts) (bool, error) {
+	// If WebSocket compression is already negotiated on this connection then
+	// we shouldn't layer S2 compression on top of it.
+	c.mu.Lock()
+	if c.ws != nil && c.ws.compress {
+		c.leaf.compression = CompressionOff
+		c.mu.Unlock()
+		return false, nil
+	}
+	c.mu.Unlock()
 	// Negotiate the appropriate compression mode (or no compression)
 	cm, err := selectCompressionMode(co.Mode, infoCompression)
 	if err != nil {
@@ -2009,7 +2055,7 @@ func (s *Server) addLeafNodeConnection(c *client, srvName, clusterName string, c
 				meta.setObserver(false, extNotExtended)
 				c.Debugf("Turning JetStream metadata controller Observer Mode off")
 				// Take note that the domain was not extended to avoid this state from startup.
-				writePeerState(js.config.StoreDir, meta.currentPeerState())
+				writePeerState(c.srv.diskIOSemaphore(), js.config.StoreDir, meta.currentPeerState())
 				// Meta controller can't be leader yet.
 				// Yet it is possible that due to observer mode every server already stopped campaigning.
 				// Therefore this server needs to be kicked into campaigning gear explicitly.
@@ -2027,12 +2073,14 @@ func (s *Server) addLeafNodeConnection(c *client, srvName, clusterName string, c
 		// In an extension use case, pin leadership to server remotes connect to.
 		// Therefore, server with a remote that are not already in observer mode, need to be put into it.
 		if solicited && meta != nil && !meta.IsObserver() {
-			meta.setObserver(true, extExtended)
 			c.Debugf("Turning JetStream metadata controller Observer Mode on - System Account Connected")
-			// Take note that the domain was not extended to avoid this state next startup.
-			writePeerState(js.config.StoreDir, meta.currentPeerState())
-			// If this server is the leader already, step down so a new leader can be elected (that is not an observer)
-			meta.StepDown()
+			// Discard any local metagroup state accumulated before the SYS-account
+			// leaf came up (e.g. the wrong-hint case where this server bootstrapped
+			// its own metagroup). The parent's view is now authoritative; without
+			// this reset the two raft logs stay forked because the standalone log's
+			// commit prefix short-circuits the follower's AE handling.
+			meta.setObserver(true, extExtended)
+			meta.Reset()
 		}
 	} else {
 		// This deny is needed in all cases (system account shared or not)
@@ -2242,9 +2290,10 @@ func (c *client) processLeafNodeConnect(s *Server, arg []byte, lang string) erro
 	if !c.isSolicitedLeafNode() && c.perms != nil {
 		sp, pp := c.perms.sub, c.perms.pub
 		c.perms.sub, c.perms.pub = pp, sp
-		if c.opts.Import != nil {
-			c.darray = c.opts.Import.Deny
-		} else {
+		// setPermissions populated darray from the subscribe permissions,
+		// which are the import permissions advertised to the spoke. Keep
+		// those parsed denies after reversing the live permission directions.
+		if c.opts.Import == nil {
 			c.darray = nil
 		}
 	}
@@ -2586,31 +2635,48 @@ func (acc *Account) updateLeafNodesEx(sub *subscription, delta int32, hubOnly bo
 	// Do this once.
 	subject := string(sub.subject)
 
-	// Walk the connected leafnodes.
-	for _, ln := range acc.lleafs {
+	// Walk the connected leafnodes from a random starting point to avoid
+	// concurrent callers all contending over leafs in the same order.
+	nleafs := len(acc.lleafs)
+	start := 0
+	if nleafs > 1 {
+		start = rand.Intn(nleafs)
+	}
+	for i := 0; i < nleafs; i++ {
+		ln := acc.lleafs[(start+i)%nleafs]
 		if ln == sub.client {
 			continue
 		}
-		ln.mu.Lock()
+		ln.mu.RLock()
 		// Don't advertise interest from leafnodes to other isolated leafnodes.
 		if sub.client.kind == LEAF && ln.isIsolatedLeafNode() {
-			ln.mu.Unlock()
+			ln.mu.RUnlock()
 			continue
 		}
 		// If `hubOnly` is true, it means that we want to update only leafnodes
 		// that connect to this server (so isHubLeafNode() would return `true`).
 		if hubOnly && !ln.isHubLeafNode() {
-			ln.mu.Unlock()
+			ln.mu.RUnlock()
 			continue
 		}
 		// Check to make sure this sub does not have an origin cluster that matches the leafnode.
 		// If skipped, make sure that we still let go the "$LDS." subscription that allows
 		// the detection of loops as long as different cluster.
 		clusterDifferent := cluster != ln.remoteCluster()
-		if (isLDS && clusterDifferent) || ((cluster == _EMPTY_ || clusterDifferent) && (delta <= 0 || ln.canSubscribe(subject))) {
-			ln.updateSmap(sub, delta, isLDS)
+		update := (isLDS && clusterDifferent) ||
+			((cluster == _EMPTY_ || clusterDifferent) && (delta <= 0 || ln.canSubscribeInternal(subject)))
+		ln.mu.RUnlock()
+		if update {
+			ln.mu.Lock()
+			// The leaf role, isolation mode, and remote cluster are stable
+			// for the connection. Recheck canSubscribe here since permissions
+			// can change, and to initializes mperms for wildcard subscriptions
+			// that collide with deny rules.
+			if isLDS || delta <= 0 || ln.canSubscribe(subject) {
+				ln.updateSmap(sub, delta, isLDS)
+			}
+			ln.mu.Unlock()
 		}
-		ln.mu.Unlock()
 	}
 }
 
@@ -2900,6 +2966,7 @@ func (c *client) processLeafSub(argo []byte) (err error) {
 			c.Debugf(fmt.Sprintf("Permissions Violation for Subscription to %q", sub.subject))
 			return nil
 		}
+		c.loadMsgDenyFilterIfNeeded(subj, len(sub.queue) > 0)
 	}
 
 	// Check if we have a maximum on the number of subscriptions.
@@ -3299,35 +3366,48 @@ func (c *client) leafMsgAllowed() bool {
 		return true
 	}
 
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
+	c.mu.RLock()
 	if c.isSpokeLeafNode() {
 		// Gateway routed replies are forwarded without
 		// permission checks.
 		if isGW || c.leafReceiveAllowed(subjectToCheck) {
+			c.mu.RUnlock()
 			return true
 		}
 	} else if c.leafSendAllowed(subjectToCheck) {
+		c.mu.RUnlock()
 		return true
 	}
+
+	// If allow_responses is not configured, or there is no tracked reply for
+	// this subject, the answer is "denied" and we can return it while still
+	// holding only the read lock.
+	replySubject := bytesToString(wireSubject)
+	if c.perms == nil || c.perms.resp == nil || c.replies[replySubject] == nil {
+		c.mu.RUnlock()
+		return false
+	}
+	c.mu.RUnlock()
+
 	// Check tracked reply permissions (allow_responses).
 	// Use the pre-strip subject since deliverMsg tracks
 	// replies under the original form, which includes
 	// the GW routing prefix for routed requests.
-	return c.responseAllowed(bytesToString(wireSubject))
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.responseAllowed(replySubject)
 }
 
 // Returns true if the leaf side ACLs allow importing this subject,
 // based on the permissions received over INFO and any local deny_imports.
-// Lock must be held.
+// At least a read lock must be held.
 func (c *client) leafReceiveAllowed(subject []byte) bool {
-	return c.canSubscribe(bytesToString(subject))
+	return c.canSubscribeInternal(bytesToString(subject))
 }
 
 // Returns true if the hub side ACLs allow the remote leaf to send
 // this subject.
-// Lock must be held.
+// At least a read lock must be held.
 func (c *client) leafSendAllowed(bsubject []byte) bool {
 	// Use the original export ACL captured for this accepted leaf.
 	// The live perms also contain additional JetStream denies used by

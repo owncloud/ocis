@@ -7,6 +7,7 @@ import (
 	"math"
 
 	"github.com/kovidgoyal/imaging/nrgb"
+	"github.com/kovidgoyal/imaging/nrgba"
 	"github.com/kovidgoyal/imaging/types"
 )
 
@@ -24,12 +25,12 @@ func ScannerForImage(img image.Image) Scanner {
 		for _, x := range img.Palette {
 			_, _, _, a := x.RGBA()
 			if a < 0xffff {
-				return NewNRGBAScanner(img)
+				return nrgba.NewNRGBAScanner(img)
 			}
 		}
 		return nrgb.NewNRGBScanner(img, NRGBColor{})
 	}
-	return NewNRGBAScanner(img)
+	return nrgba.NewNRGBAScanner(img)
 }
 
 // FlipH flips the image horizontally (from left to right) and returns the transformed image.

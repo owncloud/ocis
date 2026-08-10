@@ -17,6 +17,9 @@ package util
 var (
 	// Bolt keys
 	BoltSnapshotsBucket           = []byte{'s'}
+	BoltTrainerKey                = []byte{'t'}
+	BoltTrainCompleteKey          = []byte{'c'}
+	BoltTrainedSamplesKey         = []byte{'n'}
 	BoltPathKey                   = []byte{'p'}
 	BoltDeletedKey                = []byte{'d'}
 	BoltInternalKey               = []byte{'i'}
@@ -27,6 +30,7 @@ var (
 	BoltStatsKey                  = []byte("stats")
 	BoltUpdatedFieldsKey          = []byte("fields")
 	TotBytesWrittenKey            = []byte("TotBytesWritten")
+	BoltMetaDataFileWriterIDKey   = []byte("fileWriterID")
 
 	MappingInternalKey = []byte("_mapping")
 )

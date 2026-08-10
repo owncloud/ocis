@@ -15,9 +15,12 @@
 package bleve
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -625,9 +628,33 @@ func formatHit(rv *strings.Builder, hit *search.DocumentMatch, hitNumber int) *s
 		}
 	}
 	for otherFieldName, otherFieldValue := range hit.Fields {
+		if otherFieldName == NestedDocumentKey {
+			continue
+		}
 		if _, ok := hit.Fragments[otherFieldName]; !ok {
 			fmt.Fprintf(rv, "\t%s\n", otherFieldName)
 			fmt.Fprintf(rv, "\t\t%v\n", otherFieldValue)
+		}
+	}
+	// nested documents
+	if nested, ok := hit.Fields[NestedDocumentKey]; ok {
+		if list, ok := nested.([]*search.NestedDocumentMatch); ok {
+			fmt.Fprintf(rv, "\t%s (%d nested documents)\n", NestedDocumentKey, len(list))
+			for ni, nd := range list {
+				fmt.Fprintf(rv, "\t\tNested #%d:\n", ni+1)
+				for f, frags := range nd.Fragments {
+					fmt.Fprintf(rv, "\t\t\t%s\n", f)
+					for _, frag := range frags {
+						fmt.Fprintf(rv, "\t\t\t\t%s\n", frag)
+					}
+				}
+				for f, v := range nd.Fields {
+					if _, ok := nd.Fragments[f]; !ok {
+						fmt.Fprintf(rv, "\t\t\t%s\n", f)
+						fmt.Fprintf(rv, "\t\t\t\t%v\n", v)
+					}
+				}
+			}
 		}
 	}
 	if len(hit.DecodedSort) > 0 {
@@ -805,4 +832,23 @@ func ParseParams(r *SearchRequest, input []byte) (*RequestParams, error) {
 	}
 
 	return params, nil
+}
+
+// OptionalRawMessage is a wrapper around json.RawMessage that treats empty or `null` JSON as nil.
+type OptionalRawMessage json.RawMessage
+
+func (n *OptionalRawMessage) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 || bytes.Equal(data, []byte("null")) {
+		*n = nil
+		return nil
+	}
+	*n = slices.Clone(data)
+	return nil
+}
+
+func (n OptionalRawMessage) MarshalJSON() ([]byte, error) {
+	if len(n) == 0 {
+		return []byte("null"), nil
+	}
+	return n, nil
 }

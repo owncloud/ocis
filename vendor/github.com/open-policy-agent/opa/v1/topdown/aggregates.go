@@ -25,6 +25,44 @@ func builtinCount(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) e
 	return builtins.NewOperandTypeErr(1, operands[0].Value, "array", "object", "set", "string")
 }
 
+// termIterable is satisfied by both *ast.Array and ast.Set.
+type termIterable interface {
+	Iter(func(*ast.Term) error) error
+}
+
+// exactIntAccumulate accumulates the numbers in a with op on exact big.Ints, reporting false if
+// any element is not an integer, in which case the caller falls back to the float path.
+//
+// That float path accumulates in a big.Float carrying the default mantissa, so integers needing
+// more significant bits are silently rounded.
+func exactIntAccumulate(a termIterable, init int64, op func(z, x, y *big.Int) *big.Int) (ast.Number, bool) {
+	acc := big.NewInt(init)
+	exact := true
+
+	_ = a.Iter(func(x *ast.Term) error {
+		if !exact {
+			return nil
+		}
+		n, ok := x.Value.(ast.Number)
+		if !ok {
+			exact = false
+			return nil
+		}
+		i, err := builtins.NumberToInt(n)
+		if err != nil {
+			exact = false
+			return nil
+		}
+		op(acc, acc, i)
+		return nil
+	})
+
+	if !exact {
+		return "", false
+	}
+	return builtins.IntToNumber(acc), true
+}
+
 func builtinSum(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) error) error {
 	switch a := operands[0].Value.(type) {
 	case *ast.Array:
@@ -44,13 +82,18 @@ func builtinSum(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) err
 		}
 
 		// Non-integer values found, so we need to sum as floats.
+		if n, ok := exactIntAccumulate(a, 0, (*big.Int).Add); ok {
+			return iter(ast.NewTerm(n))
+		}
+
 		sum := big.NewFloat(0)
+		tmp := new(big.Float)
 		err := a.Iter(func(x *ast.Term) error {
 			n, ok := x.Value.(ast.Number)
 			if !ok {
 				return builtins.NewOperandElementErr(1, a, x.Value, "number")
 			}
-			sum = new(big.Float).Add(sum, builtins.NumberToFloat(n))
+			sum = new(big.Float).Add(sum, builtins.NumberToFloatInto(tmp, n))
 			return nil
 		})
 		if err != nil {
@@ -73,13 +116,18 @@ func builtinSum(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) err
 			return iter(ast.InternedTerm(is))
 		}
 
+		if n, ok := exactIntAccumulate(a, 0, (*big.Int).Add); ok {
+			return iter(ast.NewTerm(n))
+		}
+
 		sum := big.NewFloat(0)
+		tmp := new(big.Float)
 		err := a.Iter(func(x *ast.Term) error {
 			n, ok := x.Value.(ast.Number)
 			if !ok {
 				return builtins.NewOperandElementErr(1, a, x.Value, "number")
 			}
-			sum = new(big.Float).Add(sum, builtins.NumberToFloat(n))
+			sum = new(big.Float).Add(sum, builtins.NumberToFloatInto(tmp, n))
 			return nil
 		})
 		if err != nil {
@@ -93,13 +141,18 @@ func builtinSum(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) err
 func builtinProduct(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) error) error {
 	switch a := operands[0].Value.(type) {
 	case *ast.Array:
+		if n, ok := exactIntAccumulate(a, 1, (*big.Int).Mul); ok {
+			return iter(ast.NewTerm(n))
+		}
+
 		product := big.NewFloat(1)
+		tmp := new(big.Float)
 		err := a.Iter(func(x *ast.Term) error {
 			n, ok := x.Value.(ast.Number)
 			if !ok {
 				return builtins.NewOperandElementErr(1, a, x.Value, "number")
 			}
-			product = new(big.Float).Mul(product, builtins.NumberToFloat(n))
+			product = new(big.Float).Mul(product, builtins.NumberToFloatInto(tmp, n))
 			return nil
 		})
 		if err != nil {
@@ -107,13 +160,18 @@ func builtinProduct(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term)
 		}
 		return iter(ast.NewTerm(builtins.FloatToNumber(product)))
 	case ast.Set:
+		if n, ok := exactIntAccumulate(a, 1, (*big.Int).Mul); ok {
+			return iter(ast.NewTerm(n))
+		}
+
 		product := big.NewFloat(1)
+		tmp := new(big.Float)
 		err := a.Iter(func(x *ast.Term) error {
 			n, ok := x.Value.(ast.Number)
 			if !ok {
 				return builtins.NewOperandElementErr(1, a, x.Value, "number")
 			}
-			product = new(big.Float).Mul(product, builtins.NumberToFloat(n))
+			product = new(big.Float).Mul(product, builtins.NumberToFloatInto(tmp, n))
 			return nil
 		})
 		if err != nil {
@@ -256,34 +314,29 @@ func builtinAny(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) err
 }
 
 func builtinMember(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) error) error {
-	containee := operands[0]
 	switch c := operands[1].Value.(type) {
 	case ast.Set:
-		return iter(ast.InternedTerm(c.Contains(containee)))
+		return iter(ast.InternedTerm(c.Contains(operands[0])))
 	case *ast.Array:
-		for i := range c.Len() {
-			if c.Elem(i).Value.Compare(containee.Value) == 0 {
-				return iter(ast.InternedTerm(true))
-			}
-		}
-		return iter(ast.InternedTerm(false))
+		return iter(ast.InternedTerm(c.Until(operands[0].Equal)))
 	case ast.Object:
 		return iter(ast.InternedTerm(c.Until(func(_, v *ast.Term) bool {
-			return v.Value.Compare(containee.Value) == 0
+			return operands[0].Equal(v)
 		})))
 	}
 	return iter(ast.InternedTerm(false))
 }
 
 func builtinMemberWithKey(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) error) error {
-	key, val := operands[0], operands[1]
-	switch c := operands[2].Value.(type) {
-	case interface{ Get(*ast.Term) *ast.Term }:
-		ret := false
-		if act := c.Get(key); act != nil {
-			ret = act.Value.Compare(val.Value) == 0
-		}
-		return iter(ast.InternedTerm(ret))
+	type getter interface {
+		Get(*ast.Term) *ast.Term
+	}
+	col, key, val := operands[2], operands[0], operands[1]
+	switch c := col.Value.(type) {
+	case ast.Set:
+		return iter(ast.InternedTerm(c.Contains(key) && key.Equal(val)))
+	case getter:
+		return iter(ast.InternedTerm(val.Equal(c.Get(key))))
 	}
 	return iter(ast.InternedTerm(false))
 }

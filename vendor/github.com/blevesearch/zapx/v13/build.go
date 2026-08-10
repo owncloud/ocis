@@ -160,7 +160,7 @@ func persistStoredFieldValues(fieldID int,
 func InitSegmentBase(mem []byte, memCRC uint32, chunkMode uint32,
 	fieldsMap map[string]uint16, fieldsInv []string, numDocs uint64,
 	storedIndexOffset uint64, fieldsIndexOffset uint64, docValueOffset uint64,
-	dictLocs []uint64) (*SegmentBase, error) {
+	dictLocs []uint64, config map[string]interface{}) (*SegmentBase, error) {
 	sb := &SegmentBase{
 		mem:               mem,
 		memCRC:            memCRC,
@@ -174,6 +174,7 @@ func InitSegmentBase(mem []byte, memCRC uint32, chunkMode uint32,
 		dictLocs:          dictLocs,
 		fieldDvReaders:    make(map[uint16]*docValueReader),
 		fieldFSTs:         make(map[uint16]*vellum.FST),
+		config:            config,
 	}
 	sb.updateSize()
 

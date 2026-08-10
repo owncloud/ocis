@@ -67,6 +67,11 @@ type UpdatableSegment interface {
 	SetUpdatedFields(fieldInfo map[string]*index.UpdateFieldInfo)
 }
 
+type SegmentWithCallbacks interface {
+	Segment
+	CallbackId() string
+}
+
 type TermDictionary interface {
 	PostingsList(term []byte, except *roaring.Bitmap, prealloc PostingsList) (PostingsList, error)
 
@@ -182,6 +187,10 @@ type FieldStatsReporter interface {
 	UpdateFieldStats(FieldStats)
 }
 
+type VectorFieldStatsReporter interface {
+	UpdateVectorFieldStats(FieldStats)
+}
+
 type FieldStats interface {
 	Store(statName, fieldName string, value uint64)
 	Aggregate(stats FieldStats)
@@ -242,4 +251,25 @@ type Synonym interface {
 	Term() string
 
 	Size() int
+}
+
+// NestedSegment is an optional interface that a Segment may implement
+// to provide access to nested document relationships within that segment.
+type NestedSegment interface {
+	Segment
+	// Ancestors returns a slice of ancestor IDs for the given document ID.
+	// If the document has no ancestors or if the segment does not support nested documents,
+	// a slice containing only the document ID itself is returned.
+	Ancestors(docID uint64, prealloc []index.AncestorID) []index.AncestorID
+
+	// CountRoot returns the number of root documents in the segment, excluding any documents
+	// that are marked as deleted in the provided bitmap. If the segment does not support nested
+	// documents, it returns the total document count minus the count of deleted documents.
+	// A root document is defined as a document that is not a child of any other document.
+	CountRoot(deleted *roaring.Bitmap) uint64
+
+	// AddNestedDocuments updates the provided bitmap to include all nested documents
+	// associated with documents marked as deleted in the bitmap. This ensures that when
+	// a parent document is deleted, all its nested child documents are also considered deleted.
+	AddNestedDocuments(deleted *roaring.Bitmap) *roaring.Bitmap
 }
