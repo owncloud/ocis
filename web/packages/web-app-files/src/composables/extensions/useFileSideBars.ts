@@ -26,7 +26,7 @@ import {
 import { isProjectSpaceResource, SpaceResource } from '@ownclouders/web-client'
 import { Resource } from '@ownclouders/web-client'
 import { useGettext } from 'vue3-gettext'
-import { unref } from 'vue'
+import { markRaw, unref } from 'vue'
 import { fileSideBarExtensionPoint } from '../../extensionPoints'
 import AudioMetaPanel from '../../components/SideBar/Audio/AudioMetaPanel.vue'
 import { isEmpty } from 'lodash-es'
@@ -49,7 +49,7 @@ export const useSideBarPanels = (): SidebarPanelExtension<SpaceResource, Resourc
         name: 'no-selection',
         icon: 'questionnaire-line',
         title: () => $gettext('Details'),
-        component: NoSelection,
+        component: markRaw(NoSelection),
         isRoot: () => true,
         isVisible: ({ parent, items }) => {
           if (isLocationTrashActive(router, 'files-trash-overview')) {
@@ -76,7 +76,7 @@ export const useSideBarPanels = (): SidebarPanelExtension<SpaceResource, Resourc
         name: 'no-selection',
         icon: 'questionnaire-line',
         title: () => $gettext('Details'),
-        component: TrashNoSelection,
+        component: markRaw(TrashNoSelection),
         isRoot: () => true,
         isVisible: () => {
           return isLocationTrashActive(router, 'files-trash-overview')
@@ -91,7 +91,7 @@ export const useSideBarPanels = (): SidebarPanelExtension<SpaceResource, Resourc
         name: 'details',
         icon: 'questionnaire-line',
         title: () => $gettext('Details'),
-        component: FileDetails,
+        component: markRaw(FileDetails),
         componentAttrs: ({ items }) => ({
           previewEnabled: unref(isFilesAppActive),
           tagsEnabled:
@@ -116,7 +116,7 @@ export const useSideBarPanels = (): SidebarPanelExtension<SpaceResource, Resourc
         name: 'details-multiple',
         icon: 'questionnaire-line',
         title: () => $gettext('Details'),
-        component: FileDetailsMultiple,
+        component: markRaw(FileDetailsMultiple),
         componentAttrs: () => ({
           get showSpaceCount() {
             return (
@@ -144,7 +144,7 @@ export const useSideBarPanels = (): SidebarPanelExtension<SpaceResource, Resourc
         name: 'exif',
         icon: 'image',
         title: () => $gettext('Image Info'),
-        component: ExifPanel,
+        component: markRaw(ExifPanel),
         isVisible: ({ items }) => {
           if (items?.length !== 1) {
             return false
@@ -165,7 +165,7 @@ export const useSideBarPanels = (): SidebarPanelExtension<SpaceResource, Resourc
         name: 'audio-meta',
         icon: 'music',
         title: () => $gettext('Audio Info'),
-        component: AudioMetaPanel,
+        component: markRaw(AudioMetaPanel),
         isVisible: ({ items }) => {
           if (items?.length !== 1) {
             return false
@@ -187,7 +187,7 @@ export const useSideBarPanels = (): SidebarPanelExtension<SpaceResource, Resourc
         icon: 'play-circle',
         iconFillType: 'line',
         title: () => $gettext('Actions'),
-        component: FileActions,
+        component: markRaw(FileActions),
         isRoot: () => false,
         isVisible: ({ items }) => {
           if (items?.length !== 1) {
@@ -211,7 +211,7 @@ export const useSideBarPanels = (): SidebarPanelExtension<SpaceResource, Resourc
         icon: 'user-add',
         iconFillType: 'line',
         title: () => $gettext('Shares'),
-        component: SharesPanel,
+        component: markRaw(SharesPanel),
         componentAttrs: () => ({
           showSpaceMembers: false,
           get showLinks() {
@@ -238,7 +238,7 @@ export const useSideBarPanels = (): SidebarPanelExtension<SpaceResource, Resourc
         name: 'versions',
         icon: 'git-branch',
         title: () => $gettext('Versions'),
-        component: FileVersions,
+        component: markRaw(FileVersions),
         componentAttrs: () => ({
           isReadOnly: !unref(isFilesAppActive)
         }),
@@ -258,7 +258,7 @@ export const useSideBarPanels = (): SidebarPanelExtension<SpaceResource, Resourc
         name: 'no-selection',
         icon: 'questionnaire-line',
         title: () => $gettext('Details'),
-        component: SpaceNoSelection,
+        component: markRaw(SpaceNoSelection),
         isRoot: () => true,
         isVisible: ({ items }) => {
           if (!isLocationSpacesActive(router, 'files-spaces-projects')) {
@@ -277,7 +277,7 @@ export const useSideBarPanels = (): SidebarPanelExtension<SpaceResource, Resourc
         name: 'details-space',
         icon: 'questionnaire-line',
         title: () => $gettext('Details'),
-        component: SpaceDetails,
+        component: markRaw(SpaceDetails),
         isRoot: () => true,
         isVisible: ({ items }) => {
           return items?.length === 1 && isProjectSpaceResource(items[0])
@@ -292,7 +292,7 @@ export const useSideBarPanels = (): SidebarPanelExtension<SpaceResource, Resourc
         name: 'details-space-multiple',
         icon: 'questionnaire-line',
         title: () => $gettext('Details'),
-        component: SpaceDetailsMultiple,
+        component: markRaw(SpaceDetailsMultiple),
         componentAttrs: ({ items }) => ({
           selectedSpaces: items
         }),
@@ -311,7 +311,7 @@ export const useSideBarPanels = (): SidebarPanelExtension<SpaceResource, Resourc
         icon: 'play-circle',
         iconFillType: 'line',
         title: () => $gettext('Actions'),
-        component: SpaceActions,
+        component: markRaw(SpaceActions),
         isVisible: ({ items }) => {
           if (items?.length !== 1) {
             return false
@@ -337,7 +337,7 @@ export const useSideBarPanels = (): SidebarPanelExtension<SpaceResource, Resourc
         name: 'space-share',
         icon: 'group',
         title: () => $gettext('Members'),
-        component: SharesPanel,
+        component: markRaw(SharesPanel),
         componentAttrs: () => ({
           showSpaceMembers: true,
           get showLinks() {
@@ -357,7 +357,7 @@ export const useSideBarPanels = (): SidebarPanelExtension<SpaceResource, Resourc
         name: 'activities',
         icon: 'pulse',
         title: () => $gettext('Activities'),
-        component: ActivitiesPanel,
+        component: markRaw(ActivitiesPanel),
         isVisible: ({ items }) => {
           if (items?.length !== 1) {
             return false

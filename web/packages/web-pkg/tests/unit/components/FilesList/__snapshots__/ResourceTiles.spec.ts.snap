@@ -18,8 +18,7 @@ exports[`ResourceTiles component > renders an array of spaces correctly 1`] = `
   </div>
   <ul class="oc-list oc-my-rm oc-mx-rm oc-tiles">
     <li class="oc-tiles-item has-item-context-menu">
-      <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
-      <div class="oc-tile-card oc-card oc-card-default oc-rounded" data-item-id="1"><a attrs="[object Object]" target="_self" draggable="false" class="oc-resource-link oc-card-media-top oc-flex oc-flex-center oc-flex-middle oc-m-rm" tabindex="-1"></a>
+      <div role="presentation" class="oc-tile-card oc-card oc-card-default oc-rounded" data-item-id="1" draggable="false"><a attrs="[object Object]" target="_self" draggable="false" class="oc-resource-link oc-card-media-top oc-flex oc-flex-center oc-flex-middle oc-m-rm" tabindex="-1"></a>
         <div class="oc-card-body oc-p-s">
           <div class="oc-flex oc-flex-between oc-flex-middle">
             <div class="oc-flex oc-flex-middle oc-text-truncate resource-name-wrapper">
@@ -52,8 +51,7 @@ exports[`ResourceTiles component > renders an array of spaces correctly 1`] = `
       </div>
     </li>
     <li class="oc-tiles-item has-item-context-menu">
-      <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
-      <div class="oc-tile-card oc-card oc-card-default oc-rounded" data-item-id="2"><a attrs="[object Object]" target="_self" draggable="false" class="oc-resource-link oc-card-media-top oc-flex oc-flex-center oc-flex-middle oc-m-rm" tabindex="-1"></a>
+      <div role="presentation" class="oc-tile-card oc-card oc-card-default oc-rounded" data-item-id="2" draggable="false"><a attrs="[object Object]" target="_self" draggable="false" class="oc-resource-link oc-card-media-top oc-flex oc-flex-center oc-flex-middle oc-m-rm" tabindex="-1"></a>
         <div class="oc-card-body oc-p-s">
           <div class="oc-flex oc-flex-between oc-flex-middle">
             <div class="oc-flex oc-flex-middle oc-text-truncate resource-name-wrapper">

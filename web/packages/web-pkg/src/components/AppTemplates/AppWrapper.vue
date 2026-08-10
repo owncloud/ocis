@@ -147,8 +147,8 @@ const url = ref('')
 const loading = ref(!unref(noResourceLoading))
 const loadingError: Ref<Error> = ref()
 const isReadOnly = ref(false)
-const serverContent = ref()
-const currentContent = ref()
+const serverContent = ref('')
+const currentContent = ref('')
 
 const { actions: saveAsActions } = useFileActionsSaveAs({ content: currentContent })
 const { actions: exportAsPdfActions } = useFileActionsExportAsPdf({ content: currentContent })
@@ -685,7 +685,7 @@ const slotAttrs = computed(() => ({
     space.value = unref(unref(currentFileContext).space)
     selectedResources.value = [value]
   },
-  'onUpdate:currentContent': (value: unknown) => {
+  'onUpdate:currentContent': (value: string) => {
     currentContent.value = value
   },
 
