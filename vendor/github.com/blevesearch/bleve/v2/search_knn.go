@@ -27,6 +27,7 @@ import (
 	"github.com/blevesearch/bleve/v2/search"
 	"github.com/blevesearch/bleve/v2/search/collector"
 	"github.com/blevesearch/bleve/v2/search/query"
+	"github.com/blevesearch/bleve/v2/util"
 	index "github.com/blevesearch/bleve_index_api"
 )
 
@@ -42,18 +43,18 @@ type SearchRequest struct {
 	Query            query.Query       `json:"query"`
 	Size             int               `json:"size"`
 	From             int               `json:"from"`
-	Highlight        *HighlightRequest `json:"highlight"`
-	Fields           []string          `json:"fields"`
-	Facets           FacetsRequest     `json:"facets"`
+	Highlight        *HighlightRequest `json:"highlight,omitempty"`
+	Fields           []string          `json:"fields,omitempty"`
+	Facets           FacetsRequest     `json:"facets,omitempty"`
 	Explain          bool              `json:"explain"`
 	Sort             search.SortOrder  `json:"sort"`
 	IncludeLocations bool              `json:"includeLocations"`
 	Score            string            `json:"score,omitempty"`
-	SearchAfter      []string          `json:"search_after"`
-	SearchBefore     []string          `json:"search_before"`
+	SearchAfter      []string          `json:"search_after,omitempty"`
+	SearchBefore     []string          `json:"search_before,omitempty"`
 
-	KNN         []*KNNRequest `json:"knn"`
-	KNNOperator knnOperator   `json:"knn_operator"`
+	KNN         []*KNNRequest `json:"knn,omitempty"`
+	KNNOperator knnOperator   `json:"knn_operator,omitempty"`
 
 	// PreSearchData will be a  map that will be used
 	// in the second phase of any 2-phase search, to provide additional
@@ -125,35 +126,35 @@ func (r *SearchRequest) AddKNNOperator(operator knnOperator) {
 // a SearchRequest
 func (r *SearchRequest) UnmarshalJSON(input []byte) error {
 	type tempKNNReq struct {
-		Field        string          `json:"field"`
-		Vector       []float32       `json:"vector"`
-		VectorBase64 string          `json:"vector_base64"`
-		K            int64           `json:"k"`
-		Boost        *query.Boost    `json:"boost,omitempty"`
-		Params       json.RawMessage `json:"params"`
-		FilterQuery  json.RawMessage `json:"filter,omitempty"`
+		Field        string             `json:"field"`
+		Vector       []float32          `json:"vector"`
+		VectorBase64 string             `json:"vector_base64"`
+		K            int64              `json:"k"`
+		Boost        *query.Boost       `json:"boost,omitempty"`
+		Params       OptionalRawMessage `json:"params"`
+		FilterQuery  OptionalRawMessage `json:"filter,omitempty"`
 	}
 
 	var temp struct {
-		Q                json.RawMessage   `json:"query"`
-		Size             *int              `json:"size"`
-		From             int               `json:"from"`
-		Highlight        *HighlightRequest `json:"highlight"`
-		Fields           []string          `json:"fields"`
-		Facets           FacetsRequest     `json:"facets"`
-		Explain          bool              `json:"explain"`
-		Sort             []json.RawMessage `json:"sort"`
-		IncludeLocations bool              `json:"includeLocations"`
-		Score            string            `json:"score"`
-		SearchAfter      []string          `json:"search_after"`
-		SearchBefore     []string          `json:"search_before"`
-		KNN              []*tempKNNReq     `json:"knn"`
-		KNNOperator      knnOperator       `json:"knn_operator"`
-		PreSearchData    json.RawMessage   `json:"pre_search_data"`
-		Params           json.RawMessage   `json:"params"`
+		Q                json.RawMessage    `json:"query"`
+		Size             *int               `json:"size"`
+		From             int                `json:"from"`
+		Highlight        *HighlightRequest  `json:"highlight"`
+		Fields           []string           `json:"fields"`
+		Facets           FacetsRequest      `json:"facets"`
+		Explain          bool               `json:"explain"`
+		Sort             []json.RawMessage  `json:"sort"`
+		IncludeLocations bool               `json:"includeLocations"`
+		Score            string             `json:"score"`
+		SearchAfter      []string           `json:"search_after"`
+		SearchBefore     []string           `json:"search_before"`
+		KNN              []*tempKNNReq      `json:"knn"`
+		KNNOperator      knnOperator        `json:"knn_operator"`
+		PreSearchData    OptionalRawMessage `json:"pre_search_data"`
+		Params           OptionalRawMessage `json:"params"`
 	}
 
-	err := json.Unmarshal(input, &temp)
+	err := util.UnmarshalJSON(input, &temp)
 	if err != nil {
 		return err
 	}
@@ -216,11 +217,10 @@ func (r *SearchRequest) UnmarshalJSON(input []byte) error {
 		r.KNN[i].VectorBase64 = temp.KNN[i].VectorBase64
 		r.KNN[i].K = temp.KNN[i].K
 		r.KNN[i].Boost = temp.KNN[i].Boost
-		r.KNN[i].Params = temp.KNN[i].Params
-		if len(knnReq.FilterQuery) == 0 {
-			// Setting this to nil to avoid ParseQuery() setting it to a match none
-			r.KNN[i].FilterQuery = nil
-		} else {
+		if len(temp.KNN[i].Params) > 0 {
+			r.KNN[i].Params = json.RawMessage(temp.KNN[i].Params)
+		}
+		if len(temp.KNN[i].FilterQuery) > 0 {
 			r.KNN[i].FilterQuery, err = query.ParseQuery(knnReq.FilterQuery)
 			if err != nil {
 				return err
@@ -377,7 +377,7 @@ func addSortAndFieldsToKNNHits(req *SearchRequest, knnHits []*search.DocumentMat
 			}
 		}
 		req.Sort.Value(hit)
-		err, _ = LoadAndHighlightFields(hit, req, "", reader, nil)
+		err, _ = LoadAndHighlightAllFields(hit, req, "", reader, nil)
 		if err != nil {
 			return err
 		}
@@ -474,17 +474,15 @@ func (i *indexImpl) runKnnCollector(ctx context.Context, req *SearchRequest, rea
 	return knnHits, nil
 }
 
-func setKnnHitsInCollector(knnHits []*search.DocumentMatch, req *SearchRequest, coll *collector.TopNCollector) {
+func setKnnHitsInCollector(knnHits []*search.DocumentMatch, coll *collector.TopNCollector) {
 	if len(knnHits) > 0 {
-		newScoreExplComputer := func(queryMatch *search.DocumentMatch, knnMatch *search.DocumentMatch) (float64, *search.Explanation) {
-			totalScore := queryMatch.Score + knnMatch.Score
-			if !req.Explain {
-				// exit early as we don't need to compute the explanation
-				return totalScore, nil
-			}
-			return totalScore, &search.Explanation{Value: totalScore, Message: "sum of:", Children: []*search.Explanation{queryMatch.Expl, knnMatch.Expl}}
+		mergeFn := func(ftsMatch *search.DocumentMatch, knnMatch *search.DocumentMatch) {
+			// Boost the FTS score using the KNN score
+			ftsMatch.Score += knnMatch.Score
+			// Combine the FTS explanation with the KNN explanation, if present
+			ftsMatch.Expl.MergeWith(knnMatch.Expl)
 		}
-		coll.SetKNNHits(knnHits, search.ScoreExplCorrectionCallbackFunc(newScoreExplComputer))
+		coll.SetKNNHits(knnHits, search.HybridMergeCallbackFn(mergeFn))
 	}
 }
 

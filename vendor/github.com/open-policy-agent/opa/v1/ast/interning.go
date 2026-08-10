@@ -5,6 +5,7 @@
 package ast
 
 import (
+	"iter"
 	"strconv"
 )
 
@@ -19,27 +20,29 @@ type internable interface {
 
 var (
 	InternedNullValue Value = Null{}
-	InternedNullTerm        = &Term{Value: InternedNullValue}
+	InternedNullTerm        = NewTerm(InternedNullValue)
 
 	InternedBooleanTrueValue  Value = Boolean(true)
 	InternedBooleanFalseValue Value = Boolean(false)
-	InternedBooleanTrueTerm         = &Term{Value: InternedBooleanTrueValue}
-	InternedBooleanFalseTerm        = &Term{Value: InternedBooleanFalseValue}
+	InternedEmptyStringValue  Value = String("")
+	InternedEmptyArrayValue   Value = NewArray()
+	InternedEmptyRefValue     Value = Ref{}
+	InternedEmptyObjectValue  Value = NewObject()
+	InternedEmptySetValue     Value = NewSet()
 
-	InternedEmptyString = StringTerm("")
-	InternedEmptyObject = ObjectTerm()
-	InternedEmptyArray  = NewTerm(InternedEmptyArrayValue)
-	InternedEmptySet    = SetTerm()
-
-	InternedEmptyArrayValue = NewArray()
+	InternedBooleanTrue  = NewTerm(InternedBooleanTrueValue)
+	InternedBooleanFalse = NewTerm(InternedBooleanFalseValue)
+	InternedEmptyString  = NewTerm(InternedEmptyStringValue)
+	InternedEmptyObject  = NewTerm(InternedEmptyObjectValue)
+	InternedEmptyArray   = NewTerm(InternedEmptyArrayValue)
+	InternedEmptySet     = NewTerm(InternedEmptySetValue)
 
 	// since this is by far the most common negative number
 	minusOneValue Value = Number("-1")
-	minusOneTerm        = &Term{Value: minusOneValue}
+	minusOneTerm        = NewTerm(minusOneValue)
 
-	internedStringTerms = map[string]*Term{
-		"": InternedEmptyString,
-	}
+	internedStringValues = map[string]Value{"": InternedEmptyStringValue}
+	internedStringTerms  = map[string]*Term{"": InternedEmptyString}
 
 	internedVarValues = map[string]Value{
 		"input":    Var("input"),
@@ -64,11 +67,12 @@ var (
 // interned terms are shared globally, and the underlying map is not thread-safe.
 func InternStringTerm(str ...string) {
 	for _, s := range str {
-		if _, ok := internedStringTerms[s]; ok {
+		if _, ok := internedStringValues[s]; ok {
 			continue
 		}
 
-		internedStringTerms[s] = StringTerm(s)
+		internedStringValues[s] = String(s)
+		internedStringTerms[s] = &Term{Value: internedStringValues[s]}
 	}
 }
 
@@ -121,7 +125,7 @@ func HasInternedValue[T internable](v T) bool {
 // InternedValue returns an interned Value for scalar v, if the value is
 // interned. If the value is not interned, a new Value is returned.
 func InternedValue[T internable](v T) Value {
-	return InternedValueOr(v, internedTermValue)
+	return InternedValueOr(v, newValue)
 }
 
 // InternedVarValue returns an interned Var Value for the given name. If the
@@ -140,6 +144,8 @@ func InternedValueOr[T internable](v T, supplier func(T) Value) Value {
 	switch value := any(v).(type) {
 	case bool:
 		return internedBooleanValue(value)
+	case string:
+		return internedStringValue(value)
 	case int:
 		return internedIntNumberValue(value)
 	case int8:
@@ -162,6 +168,37 @@ func InternedValueOr[T internable](v T, supplier func(T) Value) Value {
 		return internedIntNumberValue(int(value))
 	}
 	return supplier(v)
+}
+
+func newValue[T internable](v T) Value {
+	switch value := any(v).(type) {
+	case bool:
+		return Boolean(value)
+	case string:
+		return String(value)
+	case int:
+		return Number(strconv.Itoa(value))
+	case int8:
+		return Number(strconv.Itoa(int(value)))
+	case int16:
+		return Number(strconv.Itoa(int(value)))
+	case int32:
+		return Number(strconv.Itoa(int(value)))
+	case int64:
+		return Number(strconv.Itoa(int(value)))
+	case uint:
+		return Number(strconv.Itoa(int(value)))
+	case uint8:
+		return Number(strconv.Itoa(int(value)))
+	case uint16:
+		return Number(strconv.Itoa(int(value)))
+	case uint32:
+		return Number(strconv.Itoa(int(value)))
+	case uint64:
+		return Number(strconv.Itoa(int(value)))
+	default:
+		panic("unreachable")
+	}
 }
 
 // Interned returns a possibly interned term for the given scalar value.
@@ -215,10 +252,34 @@ func InternedIntNumberTermFromString(s string) *Term {
 	return nil
 }
 
+// InternedIntRange returns a sequence of interned integer number terms
+// from start (inclusive) to end (exclusive). For values outside of the
+// interned range, non-interned IntNumberTerms are returned.
+func InternedIntRange(start, end int) iter.Seq[*Term] {
+	return func(yield func(*Term) bool) {
+		for i := start; i < end; i++ {
+			if !yield(internedIntNumberTerm(i)) {
+				return
+			}
+		}
+	}
+}
+
 // HasInternedIntNumberTerm returns true if the given integer value maps to an interned
 // term, otherwise false.
 func HasInternedIntNumberTerm(i int) bool {
 	return i >= -1 && i < len(intNumberTerms)
+}
+
+// InternedStringTermFromNumber returns an interned string term whose value is
+// the number's decimal string representation, if that string is interned.
+// Returns nil otherwise.
+//
+// This is an optimisation for the base-10 format_int fast path: for numbers
+// like Number("99") the string we want to output is exactly string(n), so we
+// can skip strconv.ParseInt and look up the result directly.
+func InternedStringTermFromNumber(n Number) *Term {
+	return internedStringTerms[string(n)]
 }
 
 // Returns an interned string term representing the integer value i, if
@@ -250,13 +311,21 @@ func internedBooleanValue(b bool) Value {
 	return InternedBooleanFalseValue
 }
 
+func internedStringValue(s string) Value {
+	if v, ok := internedStringValues[s]; ok {
+		return v
+	}
+
+	return String(s)
+}
+
 // InternedBooleanTerm returns an interned term with the given boolean value.
 func internedBooleanTerm(b bool) *Term {
 	if b {
-		return InternedBooleanTrueTerm
+		return InternedBooleanTrue
 	}
 
-	return InternedBooleanFalseTerm
+	return InternedBooleanFalse
 }
 
 func internedIntNumberValue(i int) Value {
@@ -283,7 +352,7 @@ func internedIntNumberTerm(i int) *Term {
 		return minusOneTerm
 	}
 
-	return &Term{Value: Number(strconv.Itoa(i))}
+	return &Term{Value: internedIntNumberValue(i)}
 }
 
 // InternedStringTerm returns an interned term with the given string value. If the
@@ -295,10 +364,6 @@ func internedStringTerm(s string) *Term {
 	}
 
 	return StringTerm(s)
-}
-
-func internedTermValue[T internable](v T) Value {
-	return InternedTerm(v).Value
 }
 
 func init() {
@@ -323,7 +388,9 @@ func init() {
 		// Various
 		"data", "input", "result", "keywords", "path", "v1", "error", "partial",
 		// HTTP
-		"code", "message", "status_code", "method", "url", "uri",
+		"code", "message", "status_code", "method", "url", "uri", "body", "raw_body", "headers", "query_params",
+		// URI
+		"scheme", "hostname", "port", "raw_path", "raw_query", "fragment",
 		// JWT
 		"enc", "cty", "iss", "exp", "nbf", "aud", "secret", "cert",
 		// Decisions

@@ -18,6 +18,9 @@
 package index
 
 type VectorField interface {
+	// Name of the field
+	Name() string
+	// The vector data
 	Vector() []float32
 	// Dimensionality of the vector
 	Dims() int
@@ -25,6 +28,8 @@ type VectorField interface {
 	Similarity() string
 	// nlist/nprobe config (recall/latency) the index is optimized for
 	IndexOptimizedFor() string
+	// Field indexing options
+	Options() FieldIndexingOptions
 }
 
 // -----------------------------------------------------------------------------
@@ -49,9 +54,12 @@ var SupportedVectorSimilarityMetrics = map[string]struct{}{
 // -----------------------------------------------------------------------------
 
 const (
-	IndexOptimizedForRecall          = "recall"
-	IndexOptimizedForLatency         = "latency"
-	IndexOptimizedForMemoryEfficient = "memory-efficient"
+	IndexOptimizedForRecall          = "recall"           // Flat or IVF,SQ8 indexes
+	IndexOptimizedForLatency         = "latency"          // Flat or IVF,SQ8 indexes; nprobe halved
+	IndexOptimizedForMemoryEfficient = "memory-efficient" // Flat or IVF,SQ4 indexes
+	IndexBIVFWithBackingFlat         = "bivf-flat"        // BFlat or BIVF with Flat backing index
+	IndexBIVFWithBackingSQ8          = "bivf-sq8"         // BFlat or BIVF with SQ8 backing index
+	IndexIVFRaBitQ                   = "ivf,rabitq"       // Flat or IVF,RaBitQ indexes
 )
 
 const DefaultIndexOptimization = IndexOptimizedForRecall
@@ -60,6 +68,9 @@ var SupportedVectorIndexOptimizations = map[string]int{
 	IndexOptimizedForRecall:          0,
 	IndexOptimizedForLatency:         1,
 	IndexOptimizedForMemoryEfficient: 2,
+	IndexBIVFWithBackingFlat:         3,
+	IndexBIVFWithBackingSQ8:          4,
+	IndexIVFRaBitQ:                   5,
 }
 
 // Reverse maps vector index optimizations': int -> string
@@ -67,4 +78,23 @@ var VectorIndexOptimizationsReverseLookup = map[int]string{
 	0: IndexOptimizedForRecall,
 	1: IndexOptimizedForLatency,
 	2: IndexOptimizedForMemoryEfficient,
+	3: IndexBIVFWithBackingFlat,
+	4: IndexBIVFWithBackingSQ8,
+	5: IndexIVFRaBitQ,
 }
+
+func OptimizationRequiresBinaryIndex(optimization string) bool {
+	switch optimization {
+	case IndexBIVFWithBackingFlat, IndexBIVFWithBackingSQ8:
+		return true
+	default:
+		return false
+	}
+}
+
+const TrainedIndexFileName = "trained_index"
+const TrainingKey = "_training"
+
+const TrainedIndexCallback = "_trained_index_callback"
+
+type TrainedIndexCallbackFn func(string) (interface{}, error)

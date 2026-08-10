@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-// Dump turns ast into a stable string format for assertions in tests
-func Dump(i interface{}) string {
+// Dump turns ast into a stable string format for assertions in tests.
+func Dump(i any) string {
 	v := reflect.ValueOf(i)
 
 	d := dumper{Buffer: &bytes.Buffer{}}
@@ -58,7 +58,7 @@ func (d *dumper) dump(v reflect.Value) {
 	case reflect.Array, reflect.Slice:
 		d.dumpArray(v)
 
-	case reflect.Interface, reflect.Ptr:
+	case reflect.Interface, reflect.Pointer:
 		d.dumpPtr(v)
 
 	case reflect.Struct:
@@ -79,7 +79,7 @@ func (d *dumper) nl() {
 }
 
 func typeName(t reflect.Type) string {
-	if t.Kind() == reflect.Ptr {
+	if t.Kind() == reflect.Pointer {
 		return typeName(t.Elem())
 	}
 	return t.Name()
@@ -122,11 +122,10 @@ func (d *dumper) dumpStruct(v reflect.Value) {
 
 func isZero(v reflect.Value) bool {
 	switch v.Kind() {
-	case reflect.Ptr, reflect.Interface:
+	case reflect.Pointer, reflect.Interface:
 		return v.IsNil()
 	case reflect.Func, reflect.Map:
 		return v.IsNil()
-
 	case reflect.Array, reflect.Slice:
 		if v.IsNil() {
 			return true
@@ -144,10 +143,13 @@ func isZero(v reflect.Value) bool {
 		return z
 	case reflect.String:
 		return v.String() == ""
+	case reflect.Bool:
+		// Never consider Bool field as zero value.
+		// Always include them in AST dump.
+		return false
+	default:
+		return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 	}
-
-	// Compare other types directly:
-	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()))
 }
 
 func (d *dumper) dumpPtr(v reflect.Value) {

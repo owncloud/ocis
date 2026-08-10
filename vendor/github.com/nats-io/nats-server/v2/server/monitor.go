@@ -21,6 +21,7 @@ import (
 	"crypto/x509"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"expvar"
 	"fmt"
 	"maps"
@@ -385,16 +386,26 @@ func (s *Server) Connz(opts *ConnzOptions) (*Connz, error) {
 		// Gather all open clients.
 		if state == ConnOpen || state == ConnAll {
 			for _, client := range clist {
+				// Snapshot each under the client lock.
+				client.mu.RLock()
+				var cAccName string
+				if client.acc != nil {
+					cAccName = client.acc.Name
+				}
+				cAuthUser := client.getRawAuthUser()
+				cMQTTID := client.getMQTTClientID()
+				client.mu.RUnlock()
+
 				// If we have an account specified we need to filter.
-				if acc != _EMPTY_ && (client.acc == nil || client.acc.Name != acc) {
+				if acc != _EMPTY_ && cAccName != acc {
 					continue
 				}
 				// Do user filtering second
-				if user != _EMPTY_ && client.getRawAuthUserLock() != user {
+				if user != _EMPTY_ && cAuthUser != user {
 					continue
 				}
 				// Do mqtt client ID filtering next
-				if mqttCID != _EMPTY_ && client.getMQTTClientID() != mqttCID {
+				if mqttCID != _EMPTY_ && cMQTTID != mqttCID {
 					continue
 				}
 				openClients = append(openClients, client)
@@ -458,7 +469,7 @@ func (s *Server) Connz(opts *ConnzOptions) (*Connz, error) {
 	}
 	// Closed Clients
 	var needCopy bool
-	if subs || auth {
+	if subs || subsDet || auth {
 		needCopy = true
 	}
 	for _, cc := range closedClients {
@@ -540,18 +551,10 @@ func (s *Server) Connz(opts *ConnzOptions) (*Connz, error) {
 		sort.Sort(sort.Reverse(SortByRTT{pconns}))
 	}
 
-	minoff := c.Offset
-	maxoff := c.Offset + c.Limit
-
-	maxIndex := totalClients
-
 	// Make sure these are sane.
-	if minoff > maxIndex {
-		minoff = maxIndex
-	}
-	if maxoff > maxIndex {
-		maxoff = maxIndex
-	}
+	maxIndex := totalClients
+	minoff := min(max(c.Offset, 0), maxIndex)
+	maxoff := minoff + min(c.Limit, maxIndex-minoff)
 
 	// Now pare down to the requested size.
 	// TODO(dlc) - for very large number of connections we
@@ -1077,18 +1080,10 @@ func (s *Server) Subsz(opts *SubszOptions) (*Subsz, error) {
 			sub.client.mu.Unlock()
 			i++
 		}
-		minoff := sz.Offset
-		maxoff := sz.Offset + sz.Limit
-
-		maxIndex := i
-
 		// Make sure these are sane.
-		if minoff > maxIndex {
-			minoff = maxIndex
-		}
-		if maxoff > maxIndex {
-			maxoff = maxIndex
-		}
+		maxIndex := i
+		minoff := min(max(sz.Offset, 0), maxIndex)
+		maxoff := minoff + min(sz.Limit, maxIndex-minoff)
 		sz.Subs = details[minoff:maxoff]
 		sz.Total = len(details)
 	} else {
@@ -1296,6 +1291,7 @@ type Varz struct {
 	OCSPResponseCache     *OCSPResponseCacheVarz `json:"ocsp_peer_cache,omitempty"`         // OCSPResponseCache is the state of the OCSP cache
 	SlowConsumersStats    *SlowConsumersStats    `json:"slow_consumer_stats"`               // SlowConsumersStats are statistics about all detected Slow Consumer
 	StaleConnectionStats  *StaleConnectionStats  `json:"stale_connection_stats,omitempty"`  // StaleConnectionStats are statistics about all detected Stale Connections
+	DiskIOWaitStats       *DiskIOWaitStats       `json:"disk_io_wait_stats"`                // DiskIOWaitStats are statistics about disk I/O semaphore contention
 	Proxies               *ProxiesOptsVarz       `json:"proxies,omitempty"`                 // Proxies hold information about network proxy devices
 	TLSCertNotAfter       time.Time              `json:"tls_cert_not_after,omitzero"`       // TLSCertNotAfter is the expiration date of the TLS certificate of this server
 }
@@ -1453,6 +1449,14 @@ type StaleConnectionStats struct {
 	Routes   uint64 `json:"routes"`   // Routes is how many Route connections became stale connections
 	Gateways uint64 `json:"gateways"` // Gateways is how many Gateway connections became stale connections
 	Leafs    uint64 `json:"leafs"`    // Leafs is how many Leafnode connections became stale connections
+}
+
+// DiskIOWaitStats contains information about disk I/O semaphore contention.
+type DiskIOWaitStats struct {
+	Waiters     int64  `json:"waiters"`       // Waiters is the number of goroutines waiting on the dios
+	Waits       uint64 `json:"waits"`         // Waits is the number of dios acquires that had to wait
+	WaitTime    uint64 `json:"wait_time"`     // WaitTime is the cumulative time spent waiting for dios
+	MaxWaitTime uint64 `json:"max_wait_time"` // MaxWaitTime is the longest observed wait
 }
 
 func myUptime(d time.Duration) string {
@@ -1746,34 +1750,40 @@ func (s *Server) createVarz(pcpu float64, rss int64) *Varz {
 		}
 		varz.Gateway.Gateways = rgwa
 	}
-	if l := len(ln.Remotes); l > 0 {
-		rlna := make([]RemoteLeafOptsVarz, l)
-		for i, r := range ln.Remotes {
-			var deny *DenyRules
-			if len(r.DenyImports) > 0 || len(r.DenyExports) > 0 {
-				deny = &DenyRules{
-					Imports: r.DenyImports,
-					Exports: r.DenyExports,
-				}
-			}
-			remoteTlsOCSPPeerVerify := s.ocspPeerVerify && r.tlsConfigOpts != nil && r.tlsConfigOpts.OCSPPeerConfig != nil && r.tlsConfigOpts.OCSPPeerConfig.Verify
-
-			rlna[i] = RemoteLeafOptsVarz{
-				LocalAccount:      r.LocalAccount,
-				URLs:              urlsToStrings(r.URLs),
-				TLSTimeout:        r.TLSTimeout,
-				Deny:              deny,
-				TLSOCSPPeerVerify: remoteTlsOCSPPeerVerify,
-			}
-		}
-		varz.LeafNode.Remotes = rlna
-	}
-
 	// Finish setting it up with fields that can be updated during
 	// configuration reload and runtime.
 	s.updateVarzConfigReloadableFields(varz)
 	s.updateVarzRuntimeFields(varz, true, pcpu, rss)
 	return varz
+}
+
+// Builds the list of remote leafnodes for Varz from the given options.
+// Server lock is held on entry.
+func (s *Server) varzLeafNodeRemotes(opts *Options) []RemoteLeafOptsVarz {
+	l := len(opts.LeafNode.Remotes)
+	if l == 0 {
+		return nil
+	}
+	rlna := make([]RemoteLeafOptsVarz, l)
+	for i, r := range opts.LeafNode.Remotes {
+		var deny *DenyRules
+		if len(r.DenyImports) > 0 || len(r.DenyExports) > 0 {
+			deny = &DenyRules{
+				Imports: r.DenyImports,
+				Exports: r.DenyExports,
+			}
+		}
+		remoteTlsOCSPPeerVerify := s.ocspPeerVerify && r.tlsConfigOpts != nil && r.tlsConfigOpts.OCSPPeerConfig != nil && r.tlsConfigOpts.OCSPPeerConfig.Verify
+
+		rlna[i] = RemoteLeafOptsVarz{
+			LocalAccount:      r.LocalAccount,
+			URLs:              urlsToStrings(r.URLs),
+			TLSTimeout:        r.TLSTimeout,
+			Deny:              deny,
+			TLSOCSPPeerVerify: remoteTlsOCSPPeerVerify,
+		}
+	}
+	return rlna
 }
 
 func urlsToStrings(urls []*url.URL) []string {
@@ -1829,6 +1839,7 @@ func (s *Server) updateVarzConfigReloadableFields(v *Varz) {
 	v.Cluster.TLSCertNotAfter = tlsCertNotAfter(opts.Cluster.TLSConfig)
 	v.Gateway.TLSCertNotAfter = tlsCertNotAfter(opts.Gateway.TLSConfig)
 	v.LeafNode.TLSCertNotAfter = tlsCertNotAfter(opts.LeafNode.TLSConfig)
+	v.LeafNode.Remotes = s.varzLeafNodeRemotes(opts)
 	v.MQTT.TLSCertNotAfter = tlsCertNotAfter(opts.MQTT.TLSConfig)
 	v.Websocket.TLSCertNotAfter = tlsCertNotAfter(opts.Websocket.TLSConfig)
 
@@ -1843,6 +1854,15 @@ func (s *Server) updateVarzConfigReloadableFields(v *Varz) {
 		v.Proxies.Trusted = trusted
 	} else {
 		v.Proxies = nil
+	}
+
+	if cfg := v.JetStream.Config; cfg != nil {
+		if opts.JetStreamMaxMemory > 0 {
+			cfg.MaxMemory = opts.JetStreamMaxMemory
+		}
+		if opts.JetStreamMaxStore > 0 {
+			cfg.MaxStore = opts.JetStreamMaxStore
+		}
 	}
 }
 
@@ -1967,6 +1987,19 @@ func (s *Server) updateVarzRuntimeFields(v *Varz, forceUpdate bool, pcpu float64
 				stats.Unknowns,
 			}
 		}
+	}
+	v.DiskIOWaitStats = diskIOWaitStats(s.dios)
+}
+
+func diskIOWaitStats(d *diskIOSemaphore) *DiskIOWaitStats {
+	if d == nil {
+		return &DiskIOWaitStats{}
+	}
+	return &DiskIOWaitStats{
+		Waiters:     d.waiters.Load(),
+		Waits:       d.waits.Load(),
+		WaitTime:    d.waitNanos.Load(),
+		MaxWaitTime: d.maxWaitNanos.Load(),
 	}
 }
 
@@ -2519,7 +2552,7 @@ func (s *Server) AccountStatz(opts *AccountStatzOptions) (*AccountStatz, error) 
 		s.accounts.Range(func(key, a any) bool {
 			acc := a.(*Account)
 			acc.mu.RLock()
-			if (opts != nil && opts.IncludeUnused) || acc.numLocalConnections() != 0 {
+			if (opts != nil && opts.IncludeUnused) || acc.numLocalConnections() != 0 || acc.numLocalLeafNodes() != 0 {
 				stz.Accounts = append(stz.Accounts, acc.statz())
 			}
 			acc.mu.RUnlock()
@@ -2530,7 +2563,7 @@ func (s *Server) AccountStatz(opts *AccountStatzOptions) (*AccountStatz, error) 
 			if acc, ok := s.accounts.Load(a); ok {
 				acc := acc.(*Account)
 				acc.mu.RLock()
-				if opts.IncludeUnused || acc.numLocalConnections() != 0 {
+				if opts.IncludeUnused || acc.numLocalConnections() != 0 || acc.numLocalLeafNodes() != 0 {
 					stz.Accounts = append(stz.Accounts, acc.statz())
 				}
 				acc.mu.RUnlock()
@@ -2573,21 +2606,11 @@ func ResponseHandler(w http.ResponseWriter, r *http.Request, data []byte) {
 }
 
 // handleResponse handles responses for monitoring routes with a specific HTTP status code.
-func handleResponse(code int, w http.ResponseWriter, r *http.Request, data []byte) {
-	// Get callback from request
-	callback := r.URL.Query().Get("callback")
-	if callback != _EMPTY_ {
-		// Response for JSONP
-		w.Header().Set("Content-Type", "application/javascript")
-		w.WriteHeader(code)
-		fmt.Fprintf(w, "%s(%s)", callback, data)
-	} else {
-		// Otherwise JSON
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.WriteHeader(code)
-		w.Write(data)
-	}
+func handleResponse(code int, w http.ResponseWriter, _ *http.Request, data []byte) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(code)
+	w.Write(data)
 }
 
 func (reason ClosedState) String() string {
@@ -3185,7 +3208,7 @@ func (s *Server) accountDetail(jsa *jsAccount, optStreams, optConsumers, optDire
 						if !optCfg {
 							cInfo.Config = nil
 						}
-						sdet.DirectConsumer = append(sdet.Consumer, cInfo)
+						sdet.DirectConsumer = append(sdet.DirectConsumer, cInfo)
 					}
 				}
 			}
@@ -3700,6 +3723,29 @@ func (s *Server) healthz(opts *HealthzOptions) *HealthStatus {
 				accFound = true
 			}
 			acc, err := s.LookupAccount(fi.Name())
+			// Expired accounts are not a JetStream health problem; skip them when
+			// scanning all accounts. Still surface an error if this account was
+			// explicitly requested — including the err==nil + IsExpired() case.
+			expired := (err != nil && errors.Is(err, ErrAccountExpired)) || (err == nil && acc.IsExpired())
+			if expired {
+				if opts.Account == _EMPTY_ {
+					continue
+				}
+				msg := fmt.Sprintf("JetStream account '%s' is expired", fi.Name())
+				if !details {
+					health.Status = na
+					health.Error = msg
+					return health
+				}
+				health.Errors = append(health.Errors, HealthzError{
+					Type:    HealthzErrorAccount,
+					Account: fi.Name(),
+					Error:   msg,
+				})
+				// Return so later stream/consumer not-found checks do not
+				// replace this with a misleading 404 for assets we skipped.
+				return health
+			}
 			if err != nil {
 				if !details {
 					health.Status = na
@@ -3754,11 +3800,8 @@ func (s *Server) healthz(opts *HealthzOptions) *HealthStatus {
 				if streamFound {
 					// if consumer option is passed, verify that the consumer exists on stream
 					if opts.Consumer != _EMPTY_ {
-						for _, cons := range s.consumers {
-							if cons.name == opts.Consumer {
-								consumerFound = true
-								break
-							}
+						if s.lookupConsumer(opts.Consumer) != nil {
+							consumerFound = true
 						}
 					}
 					break
@@ -3998,6 +4041,28 @@ func (s *Server) healthz(opts *HealthzOptions) *HealthStatus {
 	// Use our copy to traverse so we do not need to hold the js lock.
 	for accName, asa := range streams {
 		acc, err := s.LookupAccount(accName)
+		// Expired accounts are not a JetStream health problem; skip them when
+		// scanning all accounts. Still surface an error if this account was
+		// explicitly requested — including the err==nil + IsExpired() case.
+		expired := (err != nil && errors.Is(err, ErrAccountExpired)) || (err == nil && acc.IsExpired())
+		if expired {
+			if opts.Account == _EMPTY_ {
+				continue
+			}
+			msg := fmt.Sprintf("JetStream account %q is expired", accName)
+			if !details {
+				health.Status = na
+				health.Error = msg
+				return health
+			}
+			health.Errors = append(health.Errors, HealthzError{
+				Type:    HealthzErrorAccount,
+				Account: accName,
+				Error:   msg,
+			})
+			// Return so later health checks do not obscure the expired account.
+			return health
+		}
 		if err != nil && len(asa) > 0 {
 			if !details {
 				health.Status = na
@@ -4257,7 +4322,7 @@ func (s *Server) Raftz(opts *RaftzOptions) *RaftzStatus {
 			PTerm:         n.pterm,
 			PIndex:        n.pindex,
 			SystemAcc:     n.IsSystemAccount(),
-			TrafficAcc:    n.acc.GetName(),
+			TrafficAcc:    n.t.Account().GetName(),
 			IPQPropLen:    n.prop.len(),
 			IPQEntryLen:   n.entry.len(),
 			IPQRespLen:    n.resp.len(),
@@ -4270,9 +4335,10 @@ func (s *Server) Raftz(opts *RaftzOptions) *RaftzStatus {
 			if id == n.id {
 				continue
 			}
+			kp := n.membChange == nil || n.membChange.peer != id
 			peer := RaftzGroupPeer{
 				Name:                s.serverNameForNode(id),
-				Known:               p.kp,
+				Known:               kp,
 				LastReplicatedIndex: p.li,
 			}
 			if !p.ts.IsZero() {

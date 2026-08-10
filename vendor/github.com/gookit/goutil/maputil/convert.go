@@ -86,7 +86,7 @@ func CombineToMap[K comdef.SortedType, V any](keys []K, values []V) map[K]V {
 }
 
 // SliceToSMap convert string k-v pairs slice to map[string]string
-//  - eg: []string{k1,v1,k2,v2} -> map[string]string{k1:v1, k2:v2}
+//   - eg: []string{k1,v1,k2,v2} -> map[string]string{k1:v1, k2:v2}
 func SliceToSMap(kvPairs ...string) map[string]string {
 	ln := len(kvPairs)
 	// check kvPairs length must be even
@@ -231,6 +231,49 @@ func ToString2(mp any) string { return NewFormatter(mp).Format() }
 // FormatIndent format map data to string with newline and indent.
 func FormatIndent(mp any, indent string) string {
 	return NewFormatter(mp).WithIndent(indent).Format()
+}
+
+// StrMapToText 将 map[string]string 转换为多行 key=value 格式文本
+func StrMapToText(m map[string]string) string {
+	if len(m) == 0 {
+		return ""
+	}
+
+	var lines []string
+	for key, value := range m {
+		lines = append(lines, key+"="+value)
+	}
+	return strings.Join(lines, "\n")
+}
+
+// CloneStringMap copy and return a new string map
+func CloneStringMap(items map[string]string) map[string]string {
+	if len(items) == 0 {
+		return nil
+	}
+	cloned := make(map[string]string, len(items))
+	for key, value := range items {
+		cloned[key] = value
+	}
+	return cloned
+}
+
+// CloneAnyMap copy and return a new any map.
+func CloneAnyMap(items map[string]any) map[string]any {
+	return Clone(items)
+}
+
+// Clone copy and return a new map.
+func Clone[M ~map[K]V, K comparable, V any](items M) M {
+	if len(items) == 0 {
+		return nil
+	}
+
+	cloned := make(M, len(items))
+	for key, value := range items {
+		cloned[key] = value
+	}
+	return cloned
 }
 
 /*************************************************************
