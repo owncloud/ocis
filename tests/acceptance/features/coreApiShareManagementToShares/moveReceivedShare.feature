@@ -107,6 +107,7 @@ Feature: sharing
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
     And user "Carol" has a share "sharefile.txt" synced
+    And user "Carol" has a share "sharefile.txt" accessible via WebDAV
     When user "Carol" moves file "Shares/sharefile.txt" to "Shares/renamedsharefile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Carol" file "Shares/renamedsharefile.txt" should exist
@@ -149,6 +150,7 @@ Feature: sharing
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
     And user "Carol" has a share "sharefile.txt" synced
+    And user "Carol" has a share "sharefile.txt" accessible via WebDAV
     When user "Carol" moves file "Shares/sharefile.txt" to "Shares/renamedsharefile.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Carol" file "Shares/renamedsharefile.txt" should exist

@@ -137,7 +137,17 @@ class CollaborationContext implements Context {
 		string $folder,
 		string $space,
 	): void {
-		$parentContainerId = $this->spacesContext->getResourceId($user, $space, $folder);
+		// getResourceId does a single PROPFIND; after a share invite the xattr grant
+		// may not be visible yet, so retry until oc:fileid is non-empty.
+		$retried = 0;
+		do {
+			$parentContainerId = $this->spacesContext->getResourceId($user, $space, $folder);
+			$tryAgain = empty($parentContainerId) && $retried < HttpRequestHelper::maxHTTPRequestRetries();
+			if ($tryAgain) {
+				$retried += 1;
+				\usleep(500 * 1000);
+			}
+		} while ($tryAgain);
 		$this->featureContext->setResponse(
 			CollaborationHelper::createFile(
 				$this->featureContext->getBaseUrl(),

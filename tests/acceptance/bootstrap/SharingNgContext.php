@@ -1740,6 +1740,49 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @Given /^user "([^"]*)" has a share "([^"]*)" accessible via WebDAV$/
+	 *
+	 * Waits until the share mount point is reachable via WebDAV PROPFIND (HTTP 207).
+	 * This is a storage-layer readiness check that complements userHasShareSynced,
+	 * which only checks the JSON share-manager state. The xattr grant written by
+	 * AddGrant may still be propagating when the share-manager state already reads
+	 * ACCEPTED, so resolveAcceptedShare's Stat call can fail transiently without
+	 * this extra gate.
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasShareAccessibleViaWebDAV(string $user, string $resource): void {
+		$resource = \trim($resource, '/');
+		$davPath = WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_NEW, $user);
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$password = $this->featureContext->getPasswordForUser($user);
+
+		$retried = 0;
+		do {
+			$response = HttpRequestHelper::sendRequest(
+				"$baseUrl/$davPath/Shares/$resource",
+				'PROPFIND',
+				$user,
+				$password,
+				['Depth' => '0'],
+			);
+			if ($response->getStatusCode() === 207) {
+				return;
+			}
+			$tryAgain = $retried < HttpRequestHelper::maxHTTPRequestRetries();
+			if ($tryAgain) {
+				$retried += 1;
+				\usleep(500 * 1000);
+			}
+		} while ($tryAgain);
+		Assert::fail("[Timeout] Share '$resource' for user '$user' not accessible via WebDAV after retries");
+	}
+
+	/**
 	 * @Then /^user "([^"]*)" should have sync (enabled|disabled) for share "([^"]*)"$/
 	 *
 	 * @param string $user
