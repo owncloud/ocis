@@ -77,6 +77,7 @@ import { useActiveApp, useRoute, useRouteMeta, useSpacesLoading } from '@ownclou
 import {
   computed,
   defineComponent,
+  markRaw,
   nextTick,
   onBeforeUnmount,
   onMounted,
@@ -253,7 +254,7 @@ export default defineComponent({
       id: progressBarExtensionId,
       type: 'customComponent',
       extensionPointIds: [progressBarExtensionPointId],
-      content: LoadingIndicator,
+      content: markRaw(LoadingIndicator),
       userPreference: {
         optionLabel: $gettext('Default progress bar')
       }
