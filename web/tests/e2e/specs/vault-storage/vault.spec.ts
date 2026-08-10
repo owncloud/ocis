@@ -2,7 +2,7 @@ import { test } from '../../environment/test'
 import * as api from '../../steps/api/api'
 import * as ui from '../../steps/ui/index'
 
-test.describe('Vault Mode Access and Authentication', { tag: '@predefined-users' }, () => {
+test.describe('Vault Mode', { tag: '@predefined-users' }, () => {
   test.beforeEach(async () => {
     await api.usersHaveBeenCreated({
       stepUser: 'Admin',
