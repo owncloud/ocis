@@ -7,4 +7,4 @@ shared space types unaffected. The single-drive and per-user lookups return the
 same `404` as a missing drive, so the response does not depend on the target
 user's existence.
 
-https://github.com/owncloud/ocis/pull/0000
+https://github.com/owncloud/ocis/pull/12742
