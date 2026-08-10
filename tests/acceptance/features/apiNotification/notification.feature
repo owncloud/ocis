@@ -432,5 +432,5 @@ Feature: Notification
       """
     And user "Brian" should have received the following email from user "Alice"
       """
-      Alice Hansen has unshared 'textfile1.txt' with you.
+      Alice Hansen ha eliminado la compartición 'textfile1.txt' con usted.
       """
