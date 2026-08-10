@@ -296,7 +296,7 @@ class EmailContext implements Context {
 			$unexpectedEmailBodyContent,
 			$actualEmailBodyContent,
 			"The email address '$address' should NOT have received an"
-			. "email with the body containing $unexpectedEmailBodyContent
+			. " email with the body containing $unexpectedEmailBodyContent
 			but the received email is $actualEmailBodyContent",
 		);
 	}
