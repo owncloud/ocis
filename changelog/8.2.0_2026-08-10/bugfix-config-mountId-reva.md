@@ -1,4 +1,4 @@
-Bugfix: Fix the empty mount ID for reva config.
+Bugfix: Fix the empty mount ID for reva config
 
 We fixed the empty mount ID for storage-users
 
