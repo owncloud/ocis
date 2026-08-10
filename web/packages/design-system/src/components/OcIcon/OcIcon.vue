@@ -83,14 +83,7 @@ interface Props {
   type?: string
   size?: AvailableSizeType | string
   variation?:
-    | 'passive'
-    | 'primary'
-    | 'danger'
-    | 'success'
-    | 'warning'
-    | 'brand'
-    | 'inherit'
-    | string
+    'passive' | 'primary' | 'danger' | 'success' | 'warning' | 'brand' | 'inherit' | string
   color?: string
 }
 interface Emits {

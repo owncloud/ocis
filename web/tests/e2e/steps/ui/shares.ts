@@ -125,9 +125,7 @@ export async function userSharesResources({
 }: {
   stepUser: string
   actionType:
-    | typeof fileAction.sideBarPanel
-    | typeof fileAction.quickAction
-    | typeof fileAction.urlNavigation
+    typeof fileAction.sideBarPanel | typeof fileAction.quickAction | typeof fileAction.urlNavigation
   shares: {
     resource: string
     recipient: string
