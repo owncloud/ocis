@@ -416,7 +416,7 @@ Feature: Notification
       | text.txt   |
 
   @issue-11908 @email
-  Scenario: recipient does not get PO file headers in unshare email for translated locale
+  Scenario: recipient should not get PO file headers on removing access from resource for translated locale
     Given user "Brian" has switched the system language to "es" using the Graph API
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile1.txt |
@@ -427,7 +427,7 @@ Feature: Notification
     When user "Alice" removes the access of user "Brian" from resource "textfile1.txt" of space "Personal" using the Graph API
     Then the HTTP status code should be "204"
     And user "Brian" should get a notification with subject "Recurso no compartido" and message:
-      | message |
+      | message                                              |
       | Alice Hansen dejó de compartir textfile1.txt contigo |
     And user "Brian" should have received the following email from user "Alice"
       """
