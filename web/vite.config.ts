@@ -103,8 +103,7 @@ const getDistTime = () => {
     if (!isNaN(num) && num > 0) {
       return num * 1000
     }
-  } catch {
-  }
+  } catch {}
   return new Date().getTime()
 }
 
