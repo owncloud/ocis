@@ -426,11 +426,18 @@ Feature: Notification
       | permissionsRole | Viewer        |
     When user "Alice" removes the access of user "Brian" from resource "textfile1.txt" of space "Personal" using the Graph API
     Then the HTTP status code should be "204"
-    And user "Brian" should have received an email from user "Alice" that does not contain
-      """
-      Project-Id-Version
-      """
+    And user "Brian" should get a notification with subject "Recurso no compartido" and message:
+      | message |
+      | Alice Hansen dejó de compartir textfile1.txt contigo |
     And user "Brian" should have received the following email from user "Alice"
       """
+      Hola Brian Murphy,
+
       Alice Hansen ha eliminado la compartición 'textfile1.txt' con usted.
+
+      incluso habiendo eliminado esta compartición, usted podría tener acceso a través de otras comparticiones y/o membresías en spaces.
+
+
+      ---
+      ownCloud - Store. Share. Work.
       """
