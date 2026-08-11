@@ -114,6 +114,7 @@ type Service interface { //nolint:interfacebloat
 	GetSharedByMe(w http.ResponseWriter, r *http.Request)
 	ListSharedWithMe(w http.ResponseWriter, r *http.Request)
 
+	GetUserDrive(w http.ResponseWriter, r *http.Request)
 	GetRootDriveChildren(w http.ResponseWriter, r *http.Request)
 	GetDriveItem(w http.ResponseWriter, r *http.Request)
 	GetDriveItemChildren(w http.ResponseWriter, r *http.Request)

@@ -131,14 +131,23 @@ func (g Graph) GetUserDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if userID == "" {
-		u, ok := revactx.ContextGetUser(r.Context())
-		if !ok {
-			logger.Debug().Msg("could not get user: user not in context")
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "user not in context")
-			return
-		}
+	u, ok := revactx.ContextGetUser(r.Context())
+	if !ok {
+		logger.Debug().Msg("could not get user: user not in context")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "user not in context")
+		return
+	}
+
+	switch {
+	case userID == "":
+		// /me/drive — self access
 		userID = u.GetId().GetOpaqueId()
+	case userID != u.GetId().GetOpaqueId() && !g.contextUserHasFullAccountPerms(r.Context()):
+		// Only the owner or a full-account admin may read another user's drive;
+		// return the same 404 as a missing drive so UUIDs can't be probed.
+		logger.Debug().Str("userID", userID).Msg("could not get drive: access to another user's drive is not permitted")
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "no drive returned from storage")
+		return
 	}
 
 	logger.Debug().Str("userID", userID).Msg("calling list storage spaces with user and personal filter")
