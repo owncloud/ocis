@@ -20,6 +20,9 @@ package store
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"os"
 	"strings"
 	"time"
 
@@ -174,6 +177,10 @@ func defaultNatsOptions(options *microstore.Options) nats.Options {
 		natsOptions.User = auth[0]
 		natsOptions.Password = auth[1]
 	}
+	if tlsOpts, ok := options.Context.Value(tlsContextKey{}).(tlsOptions); ok && tlsOpts.enable {
+		natsOptions.TLSConfig = BuildNatsTLSConfig(tlsOpts.insecure, tlsOpts.rootCACert)
+		natsOptions.Secure = true
+	}
 	natsOptions.DisconnectedErrCB = func(_ *nats.Conn, err error) {
 		logger.Logf(logger.WarnLevel, "reva-store: nats connection disconnected: %v", err)
 	}
@@ -184,4 +191,26 @@ func defaultNatsOptions(options *microstore.Options) nats.Options {
 		logger.Logf(logger.ErrorLevel, "reva-store: nats connection closed")
 	}
 	return natsOptions
+}
+
+// BuildNatsTLSConfig constructs a tls.Config for NATS client connections.
+// insecure skips certificate verification; rootCACert is an optional path to a
+// PEM file whose CA is used to validate the server certificate.
+func BuildNatsTLSConfig(insecure bool, rootCACert string) *tls.Config {
+	tlsConf := &tls.Config{MinVersion: tls.VersionTLS12, InsecureSkipVerify: insecure} //nolint:gosec
+	if rootCACert != "" {
+		b, err := os.ReadFile(rootCACert)
+		if err != nil {
+			logger.Logf(logger.WarnLevel, "reva-store: failed to read TLS root CA cert %q: %v", rootCACert, err)
+		} else {
+			pool := x509.NewCertPool()
+			if pool.AppendCertsFromPEM(b) {
+				tlsConf.RootCAs = pool
+				tlsConf.InsecureSkipVerify = false
+			} else {
+				logger.Logf(logger.WarnLevel, "reva-store: no valid PEM certificates found in %q", rootCACert)
+			}
+		}
+	}
+	return tlsConf
 }

@@ -3,6 +3,7 @@ package natsjsregistry
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -14,6 +15,7 @@ import (
 	natsjskv "github.com/go-micro/plugins/v4/store/nats-js-kv"
 	"github.com/nats-io/nats.go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
+	revastore "github.com/owncloud/reva/v2/pkg/store"
 	"go-micro.dev/v4/registry"
 	"go-micro.dev/v4/server"
 	"go-micro.dev/v4/store"
@@ -21,10 +23,13 @@ import (
 )
 
 var (
-	_registryName        = "nats-js-kv"
-	_registryAddressEnv  = "MICRO_REGISTRY_ADDRESS"
-	_registryUsernameEnv = "MICRO_REGISTRY_AUTH_USERNAME"
-	_registryPasswordEnv = "MICRO_REGISTRY_AUTH_PASSWORD"
+	_registryName           = "nats-js-kv"
+	_registryAddressEnv     = "MICRO_REGISTRY_ADDRESS"
+	_registryUsernameEnv    = "MICRO_REGISTRY_AUTH_USERNAME"
+	_registryPasswordEnv    = "MICRO_REGISTRY_AUTH_PASSWORD"
+	_registryEnableTLSEnv   = "MICRO_REGISTRY_ENABLE_TLS"
+	_registryTLSInsecureEnv = "MICRO_REGISTRY_TLS_INSECURE"
+	_registryTLSRootCAEnv   = "MICRO_REGISTRY_TLS_ROOT_CA_CERTIFICATE"
 
 	_serviceDelimiter = "@"
 )
@@ -211,6 +216,10 @@ func (n *storeregistry) storeOptions(opts registry.Options) []store.Option {
 	natsOptions := nats.GetDefaultOptions()
 	natsOptions.Name = generators.GenerateConnectionName(serviceName, generators.NTypeRegistry)
 	natsOptions.User, natsOptions.Password = getAuth()
+	if tlsConf := getTLS(); tlsConf != nil {
+		natsOptions.TLSConfig = tlsConf
+		natsOptions.Secure = true
+	}
 	natsOptions.ReconnectedCB = func(_ *nats.Conn) {
 		if err := n.Init(); err != nil {
 			fmt.Println("cannot reconnect to nats")
@@ -232,4 +241,21 @@ func (n *storeregistry) storeOptions(opts registry.Options) []store.Option {
 
 func getAuth() (string, string) {
 	return os.Getenv(_registryUsernameEnv), os.Getenv(_registryPasswordEnv)
+}
+
+var (
+	_tlsOnce   sync.Once
+	_tlsConfig *tls.Config
+)
+
+func getTLS() *tls.Config {
+	_tlsOnce.Do(func() {
+		if os.Getenv(_registryEnableTLSEnv) != "true" {
+			return
+		}
+		insecure := os.Getenv(_registryTLSInsecureEnv) == "true"
+		rootCA := os.Getenv(_registryTLSRootCAEnv)
+		_tlsConfig = revastore.BuildNatsTLSConfig(insecure, rootCA)
+	})
+	return _tlsConfig
 }
