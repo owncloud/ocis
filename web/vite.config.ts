@@ -96,7 +96,6 @@ const getDistTime = () => {
   }
   try {
     const stdout = execSync('git log -1 --format=%ct', {
-      cwd: '..',
       stdio: ['ignore', 'pipe', 'ignore'],
       encoding: 'utf-8'
     })
