@@ -1355,15 +1355,15 @@ var _ = Describe("Graph", func() {
 
 			personalSpace = func(owner string) *provider.StorageSpace {
 				return &provider.StorageSpace{
-					Id:        &provider.StorageSpaceId{OpaqueId: "victimspace"},
+					Id:        &provider.StorageSpaceId{OpaqueId: "targetspace"},
 					SpaceType: "personal",
 					Owner:     &userprovider.User{Id: &userprovider.UserId{OpaqueId: owner}},
 					Root: &provider.ResourceId{
 						StorageId: "pro-1",
-						SpaceId:   "victimspace",
-						OpaqueId:  "victimspace",
+						SpaceId:   "targetspace",
+						OpaqueId:  "targetspace",
 					},
-					Name: "victim",
+					Name: "targetuser",
 				}
 			}
 
@@ -1401,7 +1401,7 @@ var _ = Describe("Graph", func() {
 			singleDriveReq := func(userCtx context.Context) *http.Request {
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives/{driveID}/", nil)
 				rctx := chi.NewRouteContext()
-				rctx.URLParams.Add("driveID", "victimspace")
+				rctx.URLParams.Add("driveID", "targetspace")
 				return r.WithContext(context.WithValue(userCtx, chi.RouteCtxKey, rctx))
 			}
 
@@ -1410,10 +1410,10 @@ var _ = Describe("Graph", func() {
 				mockAccountPerms(v0.Permission_CONSTRAINT_OWN)
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
-					StorageSpaces: []*provider.StorageSpace{personalSpace("victim")},
+					StorageSpaces: []*provider.StorageSpace{personalSpace("targetuser")},
 				}, nil)
 
-				svc.GetSingleDrive(rr, singleDriveReq(callerCtx("attacker")))
+				svc.GetSingleDrive(rr, singleDriveReq(callerCtx("otheruser")))
 				Expect(rr.Code).To(Equal(http.StatusNotFound))
 			})
 
@@ -1422,7 +1422,7 @@ var _ = Describe("Graph", func() {
 				mockAccountPerms(v0.Permission_CONSTRAINT_ALL)
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
-					StorageSpaces: []*provider.StorageSpace{personalSpace("victim")},
+					StorageSpaces: []*provider.StorageSpace{personalSpace("targetuser")},
 				}, nil)
 
 				svc.GetSingleDrive(rr, singleDriveReq(callerCtx("admin")))
@@ -1434,10 +1434,10 @@ var _ = Describe("Graph", func() {
 				mockAccountPerms(v0.Permission_CONSTRAINT_OWN)
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
-					StorageSpaces: []*provider.StorageSpace{personalSpace("victim")},
+					StorageSpaces: []*provider.StorageSpace{personalSpace("targetuser")},
 				}, nil)
 
-				svc.GetSingleDrive(rr, singleDriveReq(callerCtx("victim")))
+				svc.GetSingleDrive(rr, singleDriveReq(callerCtx("targetuser")))
 				Expect(rr.Code).To(Equal(http.StatusOK))
 			})
 
@@ -1446,13 +1446,13 @@ var _ = Describe("Graph", func() {
 				mockAccountPerms(v0.Permission_CONSTRAINT_OWN)
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
-					StorageSpaces: []*provider.StorageSpace{projectSpace("victim")},
+					StorageSpaces: []*provider.StorageSpace{projectSpace("targetuser")},
 				}, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives/{driveID}/", nil)
 				rctx := chi.NewRouteContext()
 				rctx.URLParams.Add("driveID", "projectspace")
-				r = r.WithContext(context.WithValue(callerCtx("attacker"), chi.RouteCtxKey, rctx))
+				r = r.WithContext(context.WithValue(callerCtx("otheruser"), chi.RouteCtxKey, rctx))
 				svc.GetSingleDrive(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusOK))
 			})
@@ -1477,10 +1477,10 @@ var _ = Describe("Graph", func() {
 				mockAccountPerms(v0.Permission_CONSTRAINT_OWN)
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
-					StorageSpaces: []*provider.StorageSpace{personalSpace("victim"), projectSpace("victim")},
+					StorageSpaces: []*provider.StorageSpace{personalSpace("targetuser"), projectSpace("targetuser")},
 				}, nil)
 
-				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives", nil).WithContext(callerCtx("attacker"))
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives", nil).WithContext(callerCtx("otheruser"))
 				svc.GetAllDrivesV1(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusOK))
 				Expect(listedDriveIDs()).To(ConsistOf("pro-1$projectspace"))
@@ -1491,13 +1491,13 @@ var _ = Describe("Graph", func() {
 				mockAccountPerms(v0.Permission_CONSTRAINT_ALL)
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
-					StorageSpaces: []*provider.StorageSpace{personalSpace("victim"), projectSpace("victim")},
+					StorageSpaces: []*provider.StorageSpace{personalSpace("targetuser"), projectSpace("targetuser")},
 				}, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives", nil).WithContext(callerCtx("admin"))
 				svc.GetAllDrivesV1(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusOK))
-				Expect(listedDriveIDs()).To(ConsistOf("pro-1$victimspace", "pro-1$projectspace"))
+				Expect(listedDriveIDs()).To(ConsistOf("pro-1$targetspace", "pro-1$projectspace"))
 			})
 
 			It("keeps the caller's own personal drive", func() {
@@ -1505,13 +1505,13 @@ var _ = Describe("Graph", func() {
 				mockAccountPerms(v0.Permission_CONSTRAINT_OWN)
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
-					StorageSpaces: []*provider.StorageSpace{personalSpace("victim")},
+					StorageSpaces: []*provider.StorageSpace{personalSpace("targetuser")},
 				}, nil)
 
-				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives", nil).WithContext(callerCtx("victim"))
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives", nil).WithContext(callerCtx("targetuser"))
 				svc.GetAllDrivesV1(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusOK))
-				Expect(listedDriveIDs()).To(ConsistOf("pro-1$victimspace"))
+				Expect(listedDriveIDs()).To(ConsistOf("pro-1$targetspace"))
 			})
 		})
 	})
