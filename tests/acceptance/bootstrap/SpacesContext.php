@@ -2605,10 +2605,22 @@ class SpacesContext implements Context {
 			);
 		}
 		$fullUrl = "$baseUrl/$sourceDavPath/$fileId";
-		if ($actionType === 'copied') {
-			$response = $this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
-		} else {
-			$response = $this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
+		// Retry the request up to 3 times in case of failure
+		$maxAttempts = 3;
+		for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+			if ($actionType === 'copied') {
+				$response = $this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
+			} else {
+				$response = $this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
+			}
+
+			if ($response->getStatusCode() === 201) {
+				break;
+			}
+
+			if ($attempt < $maxAttempts) {
+				\sleep(1);
+			}
 		}
 		Assert::assertEquals(
 			201,
