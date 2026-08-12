@@ -108,9 +108,9 @@
           "isDark": false,
           "name": "Light Theme",
           "logo": {
-            "topbar": "themes/owncloud/assets/logo_dark.svg",
+            "topbar": "themes/owncloud/assets/logo.svg",
             "favicon": "themes/owncloud/assets/favicon.jpg",
-            "login": "themes/owncloud/assets/logo_dark.svg"
+            "login": "themes/owncloud/assets/logo.svg"
           },
           "designTokens": {
             "colorPalette": {
