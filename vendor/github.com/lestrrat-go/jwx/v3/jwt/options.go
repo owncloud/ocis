@@ -1,7 +1,9 @@
 package jwt
 
 import (
+	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/lestrrat-go/jwx/v3/jwa"
@@ -137,6 +139,14 @@ func toVerifyOptions(options ...Option) ([]jws.VerifyOption, error) {
 				return nil, fmt.Errorf(`failed to decode Base64Encoder: %w`, err)
 			}
 			voptions = append(voptions, jws.WithBase64Encoder(enc))
+		case identContext{}:
+			var ctx context.Context
+			if err := option.Value(&ctx); err != nil {
+				return nil, fmt.Errorf(`failed to decode Context: %w`, err)
+			}
+			voptions = append(voptions, jws.WithContext(ctx))
+		default:
+			return nil, fmt.Errorf(`invalid jws.VerifyOption %q passed`, `With`+strings.TrimPrefix(fmt.Sprintf(`%T`, option.Ident()), `jws.ident`))
 		}
 	}
 	return voptions, nil
@@ -196,9 +206,6 @@ type withKeySet struct {
 // and you do not mind the verification process having to possibly
 // attempt using multiple times before succeeding to verify. See
 // `jws.InferAlgorithmFromKey` option
-//
-// If you have only one key in the set, and are sure you want to
-// use that key, you can use the `jwt.WithDefaultKey` option.
 func WithKeySet(set jwk.Set, options ...any) ParseOption {
 	return &parseOption{option.New(identKeySet{}, &withKeySet{
 		set:     set,
@@ -232,7 +239,10 @@ func WithAudience(s string) ValidateOption {
 	return WithValidator(audienceClaimContainsString(s))
 }
 
-// WithClaimValue specifies the expected value for a given claim
+// WithClaimValue specifies the expected value for a given claim.
+// The stored and expected values are compared with reflect.DeepEqual,
+// so slice-, map-, and struct-valued claims are supported in addition
+// to scalars. See [ClaimValueIs] for edge-case semantics.
 func WithClaimValue(name string, v any) ValidateOption {
 	return WithValidator(ClaimValueIs(name, v))
 }

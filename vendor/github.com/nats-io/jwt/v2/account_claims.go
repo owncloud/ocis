@@ -347,9 +347,11 @@ func NewAccountClaims(subject string) *AccountClaims {
 	c.SigningKeys = make(SigningKeys)
 	// Set to unlimited to start. We do it this way so we get compiler
 	// errors if we add to the OperatorLimits.
+	// JetStream is disabled by default by setting MemoryStorage and DiskStorage to zero, instead of NoLimit.
 	c.Limits = OperatorLimits{
 		NatsLimits{NoLimit, NoLimit, NoLimit},
 		AccountLimits{NoLimit, NoLimit, true, false, NoLimit, NoLimit},
+		// Default zeros implies that JetStream is not enabled by default, see OperatorLimits.IsJSEnabled().
 		JetStreamLimits{0, 0, 0, 0, 0, 0, 0, false},
 		JetStreamTieredLimits{},
 	}

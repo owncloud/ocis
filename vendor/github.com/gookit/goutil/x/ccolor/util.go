@@ -22,6 +22,10 @@ func ColorsToCode(colors ...Color) string {
 	return strings.Join(codes, ";")
 }
 
+func shouldCleanColor() bool {
+	return termenv.NoColor() || !termenv.IsSupportColor()
+}
+
 /*************************************************************
  * render color code
  *************************************************************/
@@ -43,7 +47,7 @@ func RenderCode(code string, args ...any) string {
 	}
 
 	// disabled OR not support color
-	if !termenv.IsSupportColor() {
+	if shouldCleanColor() {
 		return ClearCode(message)
 	}
 
@@ -62,7 +66,7 @@ func RenderString(code string, str string) string {
 	}
 
 	// disabled OR not support color
-	if !termenv.IsSupportColor() {
+	if shouldCleanColor() {
 		return ClearCode(str)
 	}
 
@@ -79,7 +83,7 @@ func RenderWithSpaces(code string, args ...any) string {
 	}
 
 	// disabled OR not support color
-	if !termenv.IsSupportColor() {
+	if shouldCleanColor() {
 		return ClearCode(msg)
 	}
 	return StartSet + code + "m" + msg + ResetSet
@@ -112,7 +116,12 @@ func doPrintTo(w io.Writer, code, str string) {
 
 // new implementation, support render full color code on pwsh.exe, cmd.exe
 func doPrintln(code string, args []any) {
-	_, lastErr = fmt.Fprintln(output, RenderString(code, formatLikePrintln(args)))
+	doPrintlnTo(output, code, args)
+}
+
+// new implementation, support render full color code on pwsh.exe, cmd.exe
+func doPrintlnTo(w io.Writer, code string, args []any) {
+	_, lastErr = fmt.Fprintln(w, RenderString(code, formatLikePrintln(args)))
 }
 
 // use Println, will add spaces for each arg
@@ -128,4 +137,3 @@ func formatLikePrintln(args []any) (message string) {
 	}
 	return
 }
-

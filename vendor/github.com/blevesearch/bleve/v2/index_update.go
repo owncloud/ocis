@@ -180,6 +180,10 @@ func checkUpdatedMapping(ori, upd *mapping.DocumentMapping) error {
 		return nil
 	}
 
+	if ori.Nested != upd.Nested {
+		return fmt.Errorf("nested property cannot be changed")
+	}
+
 	var err error
 	// Recursively go through the child mappings
 	for name, updDMapping := range upd.Properties {
@@ -506,6 +510,9 @@ func compareFieldMapping(original, updated *mapping.FieldMapping) (*index.Update
 		}
 		if original.VectorIndexOptimizedFor != updated.VectorIndexOptimizedFor {
 			return nil, fmt.Errorf("vectorIndexOptimizedFor cannot be updated for vector and vector_base64 fields")
+		}
+		if original.GPU != updated.GPU {
+			return nil, fmt.Errorf("gpu cannot be updated for vector and vector_base64 fields")
 		}
 	}
 	if original.IncludeInAll != updated.IncludeInAll {

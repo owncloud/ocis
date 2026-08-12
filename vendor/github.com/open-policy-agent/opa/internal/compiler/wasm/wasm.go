@@ -32,7 +32,6 @@ const (
 	opaWasmABIMinorVersionVar = "opa_wasm_abi_minor_version"
 )
 
-// nolint: varcheck
 const (
 	opaTypeNull int32 = iota + 1
 	opaTypeBoolean
@@ -90,6 +89,7 @@ var builtinsFunctions = map[string]string{
 	ast.Floor.Name:                      "opa_arith_floor",
 	ast.Rem.Name:                        "opa_arith_rem",
 	ast.ArrayConcat.Name:                "opa_array_concat",
+	ast.ArrayFlatten.Name:               "opa_array_flatten",
 	ast.ArrayReverse.Name:               "opa_array_reverse",
 	ast.ArraySlice.Name:                 "opa_array_slice",
 	ast.SetDiff.Name:                    "opa_set_diff",
@@ -1284,6 +1284,7 @@ func (c *Compiler) compileScan(scan *ir.ScanStmt, result *[]instruction.Instruct
 }
 
 func (c *Compiler) compileScanBlock(scan *ir.ScanStmt) ([]instruction.Instruction, error) {
+	//nolint:prealloc // instruction list is known and fixed, clearer as slice literal
 	instrs := []instruction.Instruction{
 		// Execute iterator.
 		instruction.GetLocal{Index: c.local(scan.Source)},
@@ -1485,7 +1486,7 @@ func (c *Compiler) compileUpsert(local ir.Local, path []int, value ir.Operand, _
 }
 
 func (c *Compiler) compileCallDynamicStmt(stmt *ir.CallDynamicStmt, result *[]instruction.Instruction) error {
-	instrs := []instruction.Instruction{}
+	instrs := make([]instruction.Instruction, 0, 3+3*len(stmt.Path)+len(stmt.Args)+10)
 	larray := c.genLocal()
 	lidx := c.genLocal()
 
@@ -1558,7 +1559,7 @@ func (c *Compiler) compileCallStmt(stmt *ir.CallStmt, result *[]instruction.Inst
 
 func (c *Compiler) compileInternalCall(stmt *ir.CallStmt, index uint32, result *[]instruction.Instruction) error {
 
-	instrs := []instruction.Instruction{}
+	instrs := make([]instruction.Instruction, 0, len(stmt.Args)+4)
 
 	// Prepare function args and call.
 	for _, arg := range stmt.Args {

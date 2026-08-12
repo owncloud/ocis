@@ -18,7 +18,9 @@
 *.out
 *.cov
 .DS_Store
+.xenv.toml
 
 *~
+.claude/
 testdata/
 vendor/
