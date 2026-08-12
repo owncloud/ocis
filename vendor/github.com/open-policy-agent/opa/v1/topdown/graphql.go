@@ -13,14 +13,14 @@ import (
 	gqlast "github.com/vektah/gqlparser/v2/ast"
 	gqlparser "github.com/vektah/gqlparser/v2/parser"
 	gqlvalidator "github.com/vektah/gqlparser/v2/validator"
-
-	// Side-effecting import. Triggers GraphQL library's validation rule init() functions.
-	_ "github.com/vektah/gqlparser/v2/validator/rules"
+	"github.com/vektah/gqlparser/v2/validator/rules"
 
 	"github.com/open-policy-agent/opa/v1/ast"
 	"github.com/open-policy-agent/opa/v1/topdown/builtins"
 	"github.com/open-policy-agent/opa/v1/topdown/cache"
 )
+
+var defaultRules = rules.NewDefaultRules()
 
 // Parses a GraphQL schema, and returns the GraphQL AST for the schema.
 func parseSchema(schema string) (*gqlast.SchemaDocument, error) {
@@ -51,8 +51,7 @@ func parseQuery(query string) (*gqlast.QueryDocument, error) {
 // just the first error message in the list.
 func validateQuery(schema *gqlast.Schema, query *gqlast.QueryDocument) error {
 	// Validate the query against the schema, erroring if there's an issue.
-	err := gqlvalidator.Validate(schema, query)
-	if err != nil {
+	if err := gqlvalidator.ValidateWithRules(schema, query, defaultRules); err != nil {
 		return formatGqlParserError(err)
 	}
 	return nil
@@ -146,7 +145,7 @@ func pruneIrrelevantGraphQLASTNodes(value ast.Value) ast.Value {
 	// extant ast type!
 	switch x := value.(type) {
 	case *ast.Array:
-		result := ast.NewArray()
+		result := ast.NewArrayWithCapacity(x.Len())
 		// Iterate over the array's elements, and do the following:
 		// - Drop any Nulls
 		// - Drop any any empty object/array value (after running the pruner)
@@ -173,7 +172,7 @@ func pruneIrrelevantGraphQLASTNodes(value ast.Value) ast.Value {
 		}
 		return result
 	case ast.Object:
-		result := ast.NewObject()
+		result := ast.NewObjectWithCapacity(x.Len())
 		// Iterate over our object's keys, and do the following:
 		// - Drop "Position".
 		// - Drop any key with a Null value.
@@ -674,7 +673,6 @@ func cacheKeyWithPrefix(bctx BuiltinContext, t *ast.Term, prefix string) (string
 const gqlCacheName = "graphql"
 
 func init() {
-
 	var defaultCacheEntries = 10
 	var graphqlCacheConfig = cache.NamedValueCacheConfig{
 		MaxNumEntries: &defaultCacheEntries,

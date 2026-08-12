@@ -2,7 +2,15 @@ package topdown
 
 import (
 	"bytes"
-	"text/template"
+	"strings"
+
+	// A method-less copy of text/template (see internal/methodlesstemplate). Rego values
+	// decode to map[string]any/[]any/scalars, which have no methods, so eliding
+	// method calls is a no-op here; it keeps text/template's evalField
+	// MethodByName off the reachable graph, which otherwise disables the Go
+	// linker's method-level dead-code elimination binary-wide (golang/go#72895,
+	// #7903).
+	template "github.com/open-policy-agent/opa/internal/methodlesstemplate"
 
 	"github.com/open-policy-agent/opa/v1/ast"
 	"github.com/open-policy-agent/opa/v1/topdown/builtins"
@@ -30,14 +38,13 @@ func renderTemplate(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term)
 		return err
 	}
 
-	// Do not attempt to render if template variable keys are missing
-	tmpl.Option("missingkey=error")
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, templateVariables); err != nil {
 		return err
 	}
 
-	return iter(ast.StringTerm(buf.String()))
+	res := strings.ReplaceAll(buf.String(), "<no value>", "<undefined>")
+	return iter(ast.StringTerm(res))
 }
 
 func init() {

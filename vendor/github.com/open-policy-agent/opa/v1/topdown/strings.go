@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
-	"sort"
 	"strconv"
 	"strings"
 	"unicode"
@@ -130,22 +129,41 @@ func builtinFormatInt(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Ter
 	}
 
 	var format string
+	var radix int
 	switch base {
 	case ast.Number("2"):
 		format = "%b"
+		radix = 2
 	case ast.Number("8"):
 		format = "%o"
+		radix = 8
 	case ast.Number("10"):
+		// Fast path: for numbers whose decimal string is already interned (e.g.
+		// "0"–"100"), we can skip strconv.ParseInt entirely.
+		if term := ast.InternedStringTermFromNumber(input); term != nil {
+			return iter(term)
+		}
 		if i, ok := input.Int(); ok {
 			return iter(ast.InternedIntegerString(i))
 		}
 		format = "%d"
+		radix = 10
 	case ast.Number("16"):
 		format = "%x"
+		radix = 16
 	default:
 		return builtins.NewOperandEnumErr(2, "2", "8", "10", "16")
 	}
 
+	// For integer inputs, format the exact big.Int. Routing integers through a
+	// float (as the fractional path below does) loses precision for values that
+	// need more than a float64's 53-bit mantissa, e.g. 18446744073709551617.
+	if i, ok := new(big.Int).SetString(string(input), 10); ok {
+		return iter(ast.InternedTerm(i.Text(radix)))
+	}
+
+	// Fractional inputs (e.g. 15.9) are truncated toward zero, matching the
+	// historical behaviour: format_int(15.9, 16) == "f", format_int(-15.9, 16) == "-f".
 	f := builtins.NumberToFloat(input)
 	i, _ := f.Int(nil)
 
@@ -539,6 +557,55 @@ func builtinSplit(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) e
 	return iter(ast.ArrayTerm(util.SplitMap(text, delim, ast.InternedTerm)...))
 }
 
+func builtinSplitN(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) error) error {
+	s, err := builtins.StringOperand(operands[0].Value, 1)
+	if err != nil {
+		return err
+	}
+
+	d, err := builtins.StringOperand(operands[1].Value, 2)
+	if err != nil {
+		return err
+	}
+
+	n, err := builtins.IntOperand(operands[2].Value, 3)
+	if err != nil {
+		return err
+	}
+
+	text, delim := string(s), string(d)
+
+	var result []*ast.Term
+	if n >= 0 {
+		// n+1 may overflow for very large n; a negative limit means no limit.
+		limit := n + 1
+		if limit < 0 {
+			limit = -1
+		}
+		parts := strings.SplitN(text, delim, limit)
+		end := n
+		if end > len(parts) {
+			end = len(parts)
+		}
+		result = make([]*ast.Term, end)
+		for i := range result {
+			result[i] = ast.InternedTerm(parts[i])
+		}
+	} else {
+		parts := strings.Split(text, delim)
+		start := len(parts) + n
+		if start < 0 {
+			start = 0
+		}
+		result = make([]*ast.Term, len(parts)-start)
+		for i, p := range parts[start:] {
+			result[i] = ast.InternedTerm(p)
+		}
+	}
+
+	return iter(ast.ArrayTerm(result...))
+}
+
 func builtinReplace(bctx BuiltinContext, operands []*ast.Term, iter func(*ast.Term) error) error {
 	s, err := builtins.StringOperand(operands[0].Value, 1)
 	if err != nil {
@@ -573,30 +640,29 @@ func builtinReplaceN(bctx BuiltinContext, operands []*ast.Term, iter func(*ast.T
 	if err != nil {
 		return err
 	}
-	keys := patterns.Keys()
-	sort.Slice(keys, func(i, j int) bool { return ast.Compare(keys[i].Value, keys[j].Value) < 0 })
 
 	s, err := builtins.StringOperand(operands[1].Value, 2)
 	if err != nil {
 		return err
 	}
 
-	oldnewArr := make([]string, 0, len(keys)*2)
+	keys := util.SortedFunc(patterns.Keys(), ast.TermValueCompare)
+	pairs := make([]string, 0, len(keys)*2)
+
 	for _, k := range keys {
 		keyVal, ok := k.Value.(ast.String)
 		if !ok {
 			return builtins.NewOperandErr(1, "non-string key found in pattern object")
 		}
-		val := patterns.Get(k) // cannot be nil
-		strVal, ok := val.Value.(ast.String)
+		strVal, ok := patterns.Get(k).Value.(ast.String)
 		if !ok {
 			return builtins.NewOperandErr(1, "non-string value found in pattern object")
 		}
-		oldnewArr = append(oldnewArr, string(keyVal), string(strVal))
+		pairs = append(pairs, string(keyVal), string(strVal))
 	}
 
 	sink := newSink(ast.ReplaceN.Name, len(s), bctx.Cancel)
-	replacer := strings.NewReplacer(oldnewArr...)
+	replacer := strings.NewReplacer(pairs...)
 	if _, err := replacer.WriteString(sink, string(s)); err != nil {
 		return err
 	}
@@ -614,12 +680,13 @@ func builtinTrim(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) er
 		return err
 	}
 
-	trimmed := strings.Trim(string(s), string(c))
-	if trimmed == string(s) {
+	str := string(s)
+	trimmed := strings.Trim(str, string(c))
+	if trimmed == str {
 		return iter(operands[0])
 	}
 
-	return iter(ast.InternedTerm(strings.Trim(string(s), string(c))))
+	return iter(ast.InternedTerm(trimmed))
 }
 
 func builtinTrimLeft(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) error) error {
@@ -718,15 +785,15 @@ func builtinSprintf(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term)
 		return err
 	}
 
-	astArr, ok := operands[1].Value.(*ast.Array)
-	if !ok {
-		return builtins.NewOperandTypeErr(2, operands[1].Value, "array")
+	a, err := builtins.ArrayOperand(operands[1].Value, 2)
+	if err != nil {
+		return err
 	}
 
 	// Optimized path for where sprintf is used as a "to_string" function for
 	// a single integer, i.e. sprintf("%d", [x]) where x is an integer.
-	if s == "%d" && astArr.Len() == 1 {
-		if n, ok := astArr.Elem(0).Value.(ast.Number); ok {
+	if s == "%d" && a.Len() == 1 {
+		if n, ok := a.Elem(0).Value.(ast.Number); ok {
 			if i, ok := n.Int(); ok {
 				if interned := ast.InternedIntegerString(i); interned != nil {
 					return iter(interned)
@@ -736,24 +803,35 @@ func builtinSprintf(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term)
 		}
 	}
 
-	args := make([]any, astArr.Len())
+	args := make([]any, a.Len())
 
 	for i := range args {
-		switch v := astArr.Elem(i).Value.(type) {
+		t := a.Elem(i)
+		switch v := t.Value.(type) {
 		case ast.Number:
-			if n, ok := v.Int(); ok {
-				args[i] = n
-			} else if b, ok := new(big.Int).SetString(v.String(), 10); ok {
-				args[i] = b
-			} else if f, ok := v.Float64(); ok {
-				args[i] = f
+			ns := string(v)
+			if x, ok := util.Atoi64(ns); ok {
+				args[i] = x
 			} else {
-				args[i] = v.String()
+				if strings.ContainsRune(ns, '.') {
+					if f, ok := v.Float64(); ok {
+						args[i] = f
+						continue
+					} else {
+						args[i] = ns
+					}
+				} else {
+					if b, ok := new(big.Int).SetString(ns, 10); ok {
+						args[i] = b
+					} else {
+						args[i] = ns
+					}
+				}
 			}
 		case ast.String:
 			args[i] = string(v)
 		default:
-			args[i] = astArr.Elem(i).String()
+			args[i] = t.Value.String()
 		}
 	}
 
@@ -802,6 +880,7 @@ func init() {
 	RegisterBuiltinFunc(ast.Upper.Name, builtinUpper)
 	RegisterBuiltinFunc(ast.Lower.Name, builtinLower)
 	RegisterBuiltinFunc(ast.Split.Name, builtinSplit)
+	RegisterBuiltinFunc(ast.SplitN.Name, builtinSplitN)
 	RegisterBuiltinFunc(ast.Replace.Name, builtinReplace)
 	RegisterBuiltinFunc(ast.ReplaceN.Name, builtinReplaceN)
 	RegisterBuiltinFunc(ast.Trim.Name, builtinTrim)

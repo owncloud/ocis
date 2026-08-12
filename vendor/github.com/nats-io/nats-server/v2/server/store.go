@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/bits"
 	"os"
 	"strings"
 	"time"
@@ -94,6 +95,7 @@ type StreamStore interface {
 	StoreMsg(subject string, hdr, msg []byte, ttl int64) (uint64, int64, error)
 	StoreRawMsg(subject string, hdr, msg []byte, seq uint64, ts int64, ttl int64, discardNewCheck bool) error
 	SkipMsg(seq uint64) (uint64, error)
+	SkipMsgNoInterest(seq uint64) (uint64, error)
 	SkipMsgs(seq uint64, num uint64) error
 	FlushAllPending() error
 	LoadMsg(seq uint64, sm *StoreMsg) (*StoreMsg, error)
@@ -306,6 +308,27 @@ func DecodeStreamState(buf []byte) (*StreamReplicatedState, error) {
 	return ss, nil
 }
 
+// uvarintLen returns the number of bytes binary.PutUvarint/binary.AppendUvarint
+// write for v: ceil(bits/7), with v=0 taking one byte.
+func uvarintLen(v uint64) int {
+	return (bits.Len64(v|1) + 6) / 7
+}
+
+// runLengthEncodeLen returns the encoded size of a run-length delete record,
+// exactly matching what appendRunLength writes.
+func runLengthEncodeLen(first, num uint64) int {
+	return 1 + uvarintLen(first) + uvarintLen(num)
+}
+
+// appendRunLength appends a run-length encoded delete record for num
+// deleted sequences starting at first.
+func appendRunLength(b []byte, first, num uint64) []byte {
+	b = append(b, runLengthMagic)
+	b = binary.AppendUvarint(b, first)
+	b = binary.AppendUvarint(b, num)
+	return b
+}
+
 // DeleteRange is a run length encoded delete range.
 type DeleteRange struct {
 	First uint64
@@ -364,6 +387,7 @@ type ConsumerStore interface {
 	HasState() bool
 	UpdateDelivered(dseq, sseq, dc uint64, ts int64) error
 	UpdateAcks(dseq, sseq uint64) error
+	RemoveRedeliveredBelow(seq uint64)
 	UpdateConfig(cfg *ConsumerConfig) error
 	Update(*ConsumerState) error
 	ForceUpdate(*ConsumerState) error

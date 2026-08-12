@@ -3,7 +3,8 @@
 This is pure Go code that makes working with images actually
 useable on top of the Go stdlib. In addition to the usual PNG/JPEG/WebP/TIFF/BMP/GIF
 formats that have been supported forever, this package adds support for 
-animated PNG, animated WebP and all the netPBM image formats.
+animated PNG, animated WebP, Google's new "jpegli" JPEG variant
+and all the netPBM image formats.
 
 Additionally, this package support color management via ICC profiles and CICP
 metadata. Opening non-sRGB images automatically converts them to sRGB, so you
@@ -150,6 +151,6 @@ Original image                     | Hue = 60                                   
 
 ## Acknowledgements
 
-This is a fork of the un-maintained distraction/imaging project. The color
+This is a fork of the un-maintained disintegration/imaging project. The color
 management code was started out from mandykoh/prism and used some code from
 go-andiamo/iccarus but it was almost completely re-written from scratch.

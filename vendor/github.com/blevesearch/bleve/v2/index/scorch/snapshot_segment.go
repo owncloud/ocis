@@ -26,21 +26,23 @@ import (
 	segment "github.com/blevesearch/scorch_segment_api/v2"
 )
 
-var TermSeparator byte = 0xff
-
-var TermSeparatorSplitSlice = []byte{TermSeparator}
-
 type SegmentSnapshot struct {
 	// this flag is needed to identify whether this
 	// segment was mmaped recently, in which case
 	// we consider the loading cost of the metadata
 	// as part of IO stats.
-	mmaped        uint32
-	id            uint64
-	segment       segment.Segment
-	deleted       *roaring.Bitmap
-	creator       string
-	stats         *fieldStats
+	mmaped  uint32
+	id      uint64
+	segment segment.Segment
+	deleted *roaring.Bitmap
+	creator string
+	stats   *fieldStats
+
+	// if this segment is in-memory then we'll try to undo the internal values
+	// in the indexSnapshot internal map before updating the bolt, since its
+	// supposed to be reflective of the on-disk data.
+	internal map[string][]byte
+
 	updatedFields map[string]*index.UpdateFieldInfo
 
 	cachedMeta *cachedMeta
@@ -109,6 +111,19 @@ func (s *SegmentSnapshot) Count() uint64 {
 	rv := s.segment.Count()
 	if s.deleted != nil {
 		rv -= s.deleted.GetCardinality()
+	}
+	return rv
+}
+
+// this counts the root documents in the segment this differs from Count() in that
+// Count() counts all live documents including nested children, whereas this method
+// counts only root live documents
+func (s *SegmentSnapshot) CountRoot() uint64 {
+	var rv uint64
+	if nsb, ok := s.segment.(segment.NestedSegment); ok {
+		rv = nsb.CountRoot(s.deleted)
+	} else {
+		rv = s.Count()
 	}
 	return rv
 }
@@ -220,7 +235,7 @@ func (cfd *cachedFieldDocs) prepareField(field string, ss *SegmentSnapshot) {
 		for err2 == nil && nextPosting != nil {
 			docNum := nextPosting.Number()
 			cfd.docs[docNum] = append(cfd.docs[docNum], []byte(next.Term)...)
-			cfd.docs[docNum] = append(cfd.docs[docNum], TermSeparator)
+			cfd.docs[docNum] = append(cfd.docs[docNum], index.DocValueTermSeparator)
 			cfd.size += uint64(len(next.Term) + 1) // map value
 			nextPosting, err2 = postingsItr.Next()
 		}
@@ -241,7 +256,7 @@ func (cfd *cachedFieldDocs) prepareField(field string, ss *SegmentSnapshot) {
 
 type cachedDocs struct {
 	size  uint64
-	m     sync.Mutex                  // As the cache is asynchronously prepared, need a lock
+	m     sync.RWMutex                // As the cache is asynchronously prepared, need a lock
 	cache map[string]*cachedFieldDocs // Keyed by field
 }
 
@@ -283,14 +298,14 @@ func (c *cachedDocs) prepareFields(wantedFields []string, ss *SegmentSnapshot) e
 
 // hasFields returns true if the cache has all the given fields
 func (c *cachedDocs) hasFields(fields []string) bool {
-	c.m.Lock()
+	c.m.RLock()
 	for _, field := range fields {
 		if _, exists := c.cache[field]; !exists {
-			c.m.Unlock()
+			c.m.RUnlock()
 			return false // found a field not in cache
 		}
 	}
-	c.m.Unlock()
+	c.m.RUnlock()
 	return true
 }
 
@@ -311,17 +326,17 @@ func (c *cachedDocs) updateSizeLOCKED() {
 
 func (c *cachedDocs) visitDoc(localDocNum uint64,
 	fields []string, visitor index.DocValueVisitor) {
-	c.m.Lock()
+	c.m.RLock()
 
 	for _, field := range fields {
 		if cachedFieldDocs, exists := c.cache[field]; exists {
-			c.m.Unlock()
+			c.m.RUnlock()
 			<-cachedFieldDocs.readyCh
-			c.m.Lock()
+			c.m.RLock()
 
 			if tlist, exists := cachedFieldDocs.docs[localDocNum]; exists {
 				for {
-					i := bytes.Index(tlist, TermSeparatorSplitSlice)
+					i := bytes.IndexByte(tlist, index.DocValueTermSeparator)
 					if i < 0 {
 						break
 					}
@@ -332,7 +347,7 @@ func (c *cachedDocs) visitDoc(localDocNum uint64,
 		}
 	}
 
-	c.m.Unlock()
+	c.m.RUnlock()
 }
 
 // the purpose of the cachedMeta is to simply allow the user of this type to record
@@ -357,7 +372,18 @@ func (c *cachedMeta) updateMeta(field string, val interface{}) {
 
 func (c *cachedMeta) fetchMeta(field string) (rv interface{}) {
 	c.m.RLock()
+	defer c.m.RUnlock()
+	if c.meta == nil {
+		return nil
+	}
 	rv = c.meta[field]
-	c.m.RUnlock()
 	return rv
+}
+
+func (s *SegmentSnapshot) Ancestors(docNum uint64, prealloc []index.AncestorID) []index.AncestorID {
+	nsb, ok := s.segment.(segment.NestedSegment)
+	if !ok {
+		return append(prealloc, index.NewAncestorID(docNum))
+	}
+	return nsb.Ancestors(docNum, prealloc)
 }

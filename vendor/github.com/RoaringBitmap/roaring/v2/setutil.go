@@ -202,10 +202,22 @@ func intersects2by2(
 	set1 []uint16,
 	set2 []uint16,
 ) bool {
-	// could be optimized if one set is much larger than the other one
 	if (len(set1) == 0) || (len(set2) == 0) {
 		return false
 	}
+	if len(set1)*64 < len(set2) {
+		return onesidedgallopingintersect2by2Bool(set1, set2)
+	} else if len(set2)*64 < len(set1) {
+		return onesidedgallopingintersect2by2Bool(set2, set1)
+	} else {
+		return intersects2by2Bool(set1, set2)
+	}
+}
+
+func intersects2by2Bool(
+	set1 []uint16,
+	set2 []uint16,
+) bool {
 	index1 := 0
 	index2 := 0
 	value1 := set1[index1]
@@ -240,6 +252,38 @@ mainwhile:
 			// (set2[k2] == set1[k1])
 			return true
 		}
+	}
+	return false
+}
+
+func onesidedgallopingintersect2by2Bool(
+	smallset []uint16,
+	largeset []uint16,
+) bool {
+	k1 := 0
+	k2 := 0
+	s1 := largeset[k1]
+	s2 := smallset[k2]
+mainwhile:
+	for {
+		if s1 < s2 {
+			k1 = advanceUntil(largeset, k1, len(largeset), s2)
+			if k1 == len(largeset) {
+				break mainwhile
+			}
+			s1 = largeset[k1]
+		}
+		if s2 < s1 {
+			k2++
+			if k2 == len(smallset) {
+				break mainwhile
+			}
+			s2 = smallset[k2]
+		} else {
+			// (set2[k2] == set1[k1])
+			return true
+		}
+
 	}
 	return false
 }

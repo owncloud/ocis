@@ -32,7 +32,7 @@ func ValDecodeHookFunc(parseEnv, parseTime bool) mapstructure.DecodeHookFunc {
 		}
 
 		// feat: support parse time or duration string. eg: 10s
-		if parseTime && str[0] > '0' && str[0] <= '9' {
+		if parseTime && str[0] >= '0' && str[0] <= '9' {
 			return reflects.ToTimeOrDuration(str, t)
 		}
 		return str, nil

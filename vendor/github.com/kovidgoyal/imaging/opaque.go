@@ -1,6 +1,7 @@
 package imaging
 
 import (
+	"bytes"
 	"fmt"
 	"image"
 	"sync/atomic"
@@ -12,14 +13,15 @@ import (
 var _ = fmt.Print
 
 func is_opaque1(pix []uint8, w, h, stride int) bool {
-	is_opaque := true
-	parallel.Run_in_parallel_to_first_result(0, func(start, limit int, keep_going *atomic.Bool) bool {
+	is_opaque := atomic.Bool{}
+	is_opaque.Store(true)
+	if err := parallel.Run_in_parallel_to_first_result(0, func(start, limit int, keep_going *atomic.Bool) bool {
 		pix := pix[stride*start:]
 		for range limit - start {
 			p := pix[0:w:w]
 			for _, x := range p {
 				if x != 0xff {
-					is_opaque = false
+					is_opaque.Store(false)
 					return true
 				}
 			}
@@ -29,14 +31,16 @@ func is_opaque1(pix []uint8, w, h, stride int) bool {
 			pix = pix[stride:]
 		}
 		return false
-	}, 0, h)
-	return is_opaque
+	}, 0, h); err != nil {
+		panic(err)
+	}
+	return is_opaque.Load()
 }
 
 func is_opaque8(pix []uint8, w, h, stride int) bool {
 	is_opaque := atomic.Bool{}
 	is_opaque.Store(true)
-	parallel.Run_in_parallel_to_first_result(0, func(start, limit int, keep_going *atomic.Bool) bool {
+	if err := parallel.Run_in_parallel_to_first_result(0, func(start, limit int, keep_going *atomic.Bool) bool {
 		pix := pix[stride*start:]
 		for range limit - start {
 			p := pix[0 : 4*w : 4*w]
@@ -53,14 +57,16 @@ func is_opaque8(pix []uint8, w, h, stride int) bool {
 			pix = pix[stride:]
 		}
 		return false
-	}, 0, h)
+	}, 0, h); err != nil {
+		panic(err)
+	}
 	return is_opaque.Load()
 }
 
 func is_opaque16(pix []uint8, w, h, stride int) bool {
 	is_opaque := atomic.Bool{}
 	is_opaque.Store(true)
-	parallel.Run_in_parallel_to_first_result(0, func(start, limit int, keep_going *atomic.Bool) bool {
+	if err := parallel.Run_in_parallel_to_first_result(0, func(start, limit int, keep_going *atomic.Bool) bool {
 		pix := pix[stride*start:]
 		for range limit - start {
 			p := pix[0 : 8*w : 8*w]
@@ -77,8 +83,20 @@ func is_opaque16(pix []uint8, w, h, stride int) bool {
 			pix = pix[stride:]
 		}
 		return false
-	}, 0, h)
+	}, 0, h); err != nil {
+		panic(err)
+	}
 	return is_opaque.Load()
+}
+
+func IsOpaqueType(img image.Image) (ans bool) {
+	switch img.(type) {
+	case *nrgb.Image, *image.CMYK, *image.YCbCr, *image.Gray, *image.Gray16:
+		return true
+
+	default:
+		return false
+	}
 }
 
 func IsOpaque(img image.Image) (ans bool) {
@@ -100,13 +118,36 @@ func IsOpaque(img image.Image) (ans bool) {
 	case *image.NYCbCrA:
 		return is_opaque1(img.A, img.Bounds().Dx(), img.Bounds().Dy(), img.AStride)
 	case *image.Paletted:
-		for _, c := range img.Palette {
+		bad_colors := make([]uint8, 0, len(img.Palette))
+		for i, c := range img.Palette {
 			_, _, _, a := c.RGBA()
 			if a != 0xffff {
-				return false
+				bad_colors = append(bad_colors, uint8(i))
 			}
 		}
-		return true
+		switch len(bad_colors) {
+		case 0:
+			return true
+		case len(img.Palette):
+			return false
+		case 1:
+			return bytes.IndexByte(img.Pix, bad_colors[0]) < 0
+		default:
+			is_opaque := atomic.Bool{}
+			is_opaque.Store(true)
+			if err := parallel.Run_in_parallel_to_first_result(0, func(start, limit int, keep_going *atomic.Bool) bool {
+				for i := start; i < limit && keep_going.Load(); i++ {
+					if bytes.IndexByte(img.Pix, bad_colors[i]) > -1 {
+						is_opaque.Store(false)
+						return true
+					}
+				}
+				return false
+			}, 0, len(bad_colors)); err != nil {
+				panic(err)
+			}
+			return is_opaque.Load()
+		}
 	case is_opaque:
 		return img.Opaque()
 	}

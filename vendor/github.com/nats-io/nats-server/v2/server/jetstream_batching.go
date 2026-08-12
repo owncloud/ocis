@@ -17,6 +17,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"math"
 	"math/big"
 	"path/filepath"
@@ -129,8 +130,8 @@ func getBatchStoreDir(storeDir, streamName, batchId string) (string, string) {
 func newBatchStore(mset *stream, batchId string, replicas int, storage StorageType, storeDir, streamName string) (StreamStore, error) {
 	if replicas == 1 && storage == FileStorage {
 		bname, storeDir := getBatchStoreDir(storeDir, streamName, batchId)
-		fcfg := FileStoreConfig{AsyncFlush: true, BlockSize: defaultLargeBlockSize, StoreDir: storeDir}
 		s := mset.srv
+		fcfg := FileStoreConfig{AsyncFlush: true, BlockSize: defaultLargeBlockSize, StoreDir: storeDir, srv: s}
 		prf := s.jsKeyGen(s.getOpts().JetStreamKey, mset.acc.Name)
 		if prf != nil {
 			// We are encrypted here, fill in correct cipher selection.
@@ -421,6 +422,18 @@ type batchExpectedPerSubject struct {
 	clseq uint64 // Clustered proposal sequence.
 }
 
+// copyCounterSources returns a deep copy of the given counter sources.
+func copyCounterSources(src CounterSources) CounterSources {
+	if src == nil {
+		return nil
+	}
+	dst := make(CounterSources, len(src))
+	for stream, subjects := range src {
+		dst[stream] = maps.Clone(subjects)
+	}
+	return dst
+}
+
 func (diff *batchStagedDiff) commit(mset *stream) {
 	if len(diff.msgIds) > 0 {
 		ts := time.Now().UnixNano()
@@ -451,6 +464,7 @@ func (diff *batchStagedDiff) commit(mset *stream) {
 			if c, ok := mset.inflight[subj]; ok {
 				c.bytes += i.bytes
 				c.ops += i.ops
+				c.schedule = i.schedule
 			} else {
 				mset.inflight[subj] = i
 			}
@@ -530,13 +544,20 @@ func checkMsgHeadersPreClusteredProposal(
 	discard DiscardPolicy, discardNewPer bool, maxMsgSize int, maxMsgs int64, maxMsgsPer int64, maxBytes int64,
 ) ([]byte, []byte, uint64, *ApiError, error) {
 	var incr *big.Int
+	var hasSchedule bool
+
+	// Do this before staging any proposal state. All clustered publish paths,
+	// including atomic and fast batches, use this helper.
+	if mset.store.Type() == FileStorage && isFileStoreMsgTooLarge(fileStoreMsgSize(subject, hdr, msg)) {
+		return hdr, msg, 0, NewJSStreamStoreFailedError(ErrMsgTooLarge), ErrMsgTooLarge
+	}
 
 	// Some header checks must be checked pre proposal.
 	if len(hdr) > 0 {
 		// Since we encode header len as u16 make sure we do not exceed.
 		// Again this works if it goes through but better to be pre-emptive.
 		if len(hdr) > math.MaxUint16 {
-			err := fmt.Errorf("JetStream header size exceeds limits for '%s > %s'", jsa.acc().Name, mset.cfg.Name)
+			err := fmt.Errorf("JetStream header size exceeds limits for '%s > %s'", jsa.acc().Name, name)
 			return hdr, msg, 0, NewJSStreamHeaderExceedsMaximumError(), err
 		}
 		// Counter increments.
@@ -629,9 +650,9 @@ func checkMsgHeadersPreClusteredProposal(
 			initial = *counter.total
 			sources = counter.sources
 		} else if counter, ok = mset.clusteredCounterTotal[subject]; ok {
-			initial = *counter.total
-			sources = counter.sources
 			// Make an explicit copy to separate the staged data from what's committed.
+			initial.Set(counter.total)
+			sources = copyCounterSources(counter.sources)
 			// Don't need to initialize all values, they'll be overwritten later.
 			counter = &msgCounterRunningTotal{ops: counter.ops}
 		} else {
@@ -674,7 +695,7 @@ func checkMsgHeadersPreClusteredProposal(
 			if sources == nil {
 				sources = map[string]map[string]string{}
 			}
-			if _, ok = sources[origStream]; !ok {
+			if sources[origStream] == nil {
 				sources[origStream] = map[string]string{}
 			}
 			prevVal := sources[origStream][origSubj]
@@ -743,7 +764,7 @@ func checkMsgHeadersPreClusteredProposal(
 			// Allow override of the subject used for the check.
 			seqSubj := subject
 			if optSubj := getExpectedLastSeqPerSubjectForSubject(hdr); optSubj != _EMPTY_ {
-				seqSubj = optSubj
+				seqSubj = copyString(optSubj)
 			}
 
 			// The subject is already written to in this batch, we can't allow
@@ -810,6 +831,7 @@ func checkMsgHeadersPreClusteredProposal(
 			}
 			return hdr, msg, 0, apiErr, apiErr
 		} else if !schedule.IsZero() {
+			hasSchedule = true
 			if !allowMsgSchedules {
 				apiErr := NewJSMessageSchedulesDisabledError()
 				return hdr, msg, 0, apiErr, apiErr
@@ -877,6 +899,26 @@ func checkMsgHeadersPreClusteredProposal(
 			} else if !allowMsgSchedules {
 				apiErr := NewJSMessageSchedulesDisabledError()
 				return hdr, msg, 0, apiErr, apiErr
+			} else {
+				// Check that the to-be-purged subject is a schedule message.
+				// We still allow this message through if there exists no message for this subject,
+				// to remain backward-compatible. An "expected at sequence" check can still be
+				// performed to make this stricter.
+				schedSubj := bytesToString(scheduler)
+				var invalid bool
+				if i, ok := diff.inflight[schedSubj]; ok {
+					invalid = !i.schedule
+				} else if i, ok = mset.inflight[schedSubj]; ok {
+					invalid = !i.schedule
+				} else {
+					var smv StoreMsg
+					sm, _ := mset.store.LoadLastMsg(schedSubj, &smv)
+					invalid = sm != nil && len(sliceHeader(JSSchedulePattern, sm.hdr)) == 0
+				}
+				if invalid {
+					apiErr := NewJSMessageSchedulesSchedulerInvalidError()
+					return hdr, msg, 0, apiErr, apiErr
+				}
 			}
 		} else if !sourced && len(sliceHeader(JSScheduler, hdr)) > 0 {
 			// Clients may only use Nats-Scheduler alongside Nats-Schedule-Next.
@@ -930,8 +972,9 @@ func checkMsgHeadersPreClusteredProposal(
 	if i, ok = diff.inflight[subject]; ok {
 		i.bytes += sz
 		i.ops++
+		i.schedule = hasSchedule
 	} else {
-		i = &inflightSubjectRunningTotal{bytes: sz, ops: 1}
+		i = &inflightSubjectRunningTotal{bytes: sz, ops: 1, schedule: hasSchedule}
 		diff.inflight[subject] = i
 	}
 
@@ -1034,11 +1077,11 @@ func recalculateClusteredSeq(mset *stream, needStreamLock bool) (lseq uint64) {
 // mset.clMu lock must be held.
 func commitSingleMsg(
 	diff *batchStagedDiff, mset *stream, subject string, reply string, hdr []byte, msg []byte, name string,
-	jsa *jsAccount, mt *msgTrace, node RaftNode, replicas int, lseq uint64,
+	jsa *jsAccount, mt *msgTrace, node RaftNode, term uint64, replicas int, lseq uint64,
 ) error {
 	// Do proposal.
 	esm := encodeStreamMsgAllowCompress(subject, reply, hdr, msg, mset.clseq, time.Now().UnixNano(), false)
-	if err := node.Propose(esm); err != nil {
+	if err := node.Propose(term, esm); err != nil {
 		return err
 	}
 
