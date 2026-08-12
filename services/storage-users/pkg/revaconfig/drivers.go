@@ -214,6 +214,7 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 // OcisNoEvents is the config mapping for the ocis storage driver emitting no events
 func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
+		"mount_id":         cfg.MountID,
 		"metadata_backend": "messagepack",
 		"propagator":       cfg.Drivers.OCIS.Propagator,
 		"async_propagator_options": map[string]interface{}{
@@ -272,6 +273,7 @@ func S3(cfg *config.Config) map[string]interface{} {
 // S3NG is the config mapping for the s3ng storage driver
 func S3NG(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
+		"mount_id":         cfg.MountID,
 		"metadata_backend": "messagepack",
 		"propagator":       cfg.Drivers.S3NG.Propagator,
 		"async_propagator_options": map[string]interface{}{
@@ -338,6 +340,7 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 // S3NGNoEvents is the config mapping for the s3ng storage driver emitting no events
 func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
+		"mount_id":         cfg.MountID,
 		"metadata_backend": "messagepack",
 		"propagator":       cfg.Drivers.S3NG.Propagator,
 		"async_propagator_options": map[string]interface{}{
