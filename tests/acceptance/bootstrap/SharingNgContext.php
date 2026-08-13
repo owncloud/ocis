@@ -71,14 +71,15 @@ class SharingNgContext implements Context {
 	public function createLinkShare(string $user, TableNode $body): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
 		$resource = $bodyRows['resource'] ?? "";
+		$isVault = isset($bodyRows['storage']) && $bodyRows['storage'] === 'vault';
 
-		$space = $this->spacesContext->getSpaceByName($user, $bodyRows['space']);
+		$space = $this->spacesContext->getSpaceByName($user, $bodyRows['space'], $isVault);
 		$spaceId = $space['id'];
 
 		if ($resource === '' && !\in_array($bodyRows['space'], ['Personal', 'Shares'])) {
 			$itemId = $space['fileId'];
 		} else {
-			$itemId = $this->spacesContext->getResourceId($user, $bodyRows['space'], $resource);
+			$itemId = $this->spacesContext->getResourceId($user, $bodyRows['space'], $resource, $isVault);
 		}
 
 		$bodyRows['quickLink'] = $bodyRows['quickLink'] ?? false;
@@ -97,13 +98,25 @@ class SharingNgContext implements Context {
 			'password' => $this->featureContext->getActualPassword($bodyRows['password']),
 		];
 
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$accessToken = $this->featureContext->getOcisUserToken($user)['token']['accessToken'];
+			$headers['Authorization'] = 'Bearer ' . $accessToken;
+			$user = null;
+			$password = null;
+		} else {
+			$password = $this->featureContext->getPasswordForUser($user);
+		}
+
 		$response = GraphHelper::createLinkShare(
 			$this->featureContext->getBaseUrl(),
 			$user,
-			$this->featureContext->getPasswordForUser($user),
+			$password,
 			$spaceId,
 			$itemId,
 			\json_encode($body),
+			$headers,
+			$isVault,
 		);
 
 		if ($response->getStatusCode() == 200) {

@@ -275,6 +275,123 @@ Feature: vault
       | testfile.txt |
 
 
+  Scenario: user tries to create a public link of a folder inside vault
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    When user "Alice" creates the following resource link share using the Graph API:
+      | resource        | vaultFolder |
+      | space           | Personal    |
+      | permissionsRole | View        |
+      | storage         | vault       |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "public links are not allowed for vault resources"
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: user tries to create a public link of a file inside vault
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testfile.txt" in vault
+    When user "Alice" creates the following resource link share using the Graph API:
+      | resource        | testfile.txt |
+      | space           | Personal     |
+      | permissionsRole | View         |
+      | storage         | vault        |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "public links are not allowed for vault resources"
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: user tries to create a public link of a space root inside vault
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has logged in via web UI
+    And user "Alice" has created a space "vault-space" in vault with the default quota using the Graph API
+    When user "Alice" tries to create the following space link share using permissions endpoint of the Graph API:
+      | space           | vault-space |
+      | permissionsRole | View        |
+      | storage         | vault       |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "public links are not allowed for vault resources"
+              }
+            }
+          }
+        }
+      }
+      """
+
+
   Scenario Outline: send share invitation for project space in vault to user with different roles (permissions endpoint)
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has logged in via web UI
