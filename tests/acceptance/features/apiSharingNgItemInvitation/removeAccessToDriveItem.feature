@@ -311,3 +311,67 @@ Feature: Remove access to a drive item
     Then the HTTP status code should be "204"
     And for user "Brian" the space "Shares" should not contain these entries:
       | folderToShare |
+
+
+  Scenario Outline: space viewer and space editor tries to remove the space creator from the project space using the permissions endpoint
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has sent the following space share invitation:
+      | space           | NewSpace           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    When user "Brian" removes the access of user "Alice" from space "NewSpace" using permissions endpoint of the Graph API
+    Then the HTTP status code should be "403"
+    And the user "Alice" should have a space called "NewSpace"
+    And the user "Brian" should have a space called "NewSpace"
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+
+
+  Scenario: space manager can remove the space creator from the project space using the permissions endpoint
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has sent the following space share invitation:
+      | space           | NewSpace           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | Manager            |
+    When user "Brian" removes the access of user "Alice" from space "NewSpace" using permissions endpoint of the Graph API
+    Then the HTTP status code should be "204"
+    And the user "Alice" should not have a space called "NewSpace"
+    And the user "Brian" should have a space called "NewSpace"
+
+
+  Scenario Outline: space viewer and space editor tries to remove themselves from the project space using the permissions endpoint
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has sent the following space share invitation:
+      | space           | NewSpace           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    When user "Brian" removes the access of user "Brian" from space "NewSpace" using permissions endpoint of the Graph API
+    Then the HTTP status code should be "403"
+    And the user "Alice" should have a space called "NewSpace"
+    And the user "Brian" should have a space called "NewSpace"
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+
+
+  Scenario: space manager can remove themselves from the project space using the permissions endpoint
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has sent the following space share invitation:
+      | space           | NewSpace           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | Manager            |
+    When user "Brian" removes the access of user "Brian" from space "NewSpace" using permissions endpoint of the Graph API
+    Then the HTTP status code should be "204"
+    And the user "Brian" should not have a space called "NewSpace"
+    And the user "Alice" should have a space called "NewSpace"
