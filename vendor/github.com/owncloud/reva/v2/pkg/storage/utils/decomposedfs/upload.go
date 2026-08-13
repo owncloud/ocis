@@ -135,6 +135,7 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 	_, span := tracer.Start(ctx, "InitiateUpload")
 	defer span.End()
 	log := appctx.GetLogger(ctx)
+	log.Debug().Interface("ref", ref).Msg("decomposedfs:InitiateUpload:start")
 
 	// remember the path from the reference
 	refpath := ref.GetPath()
@@ -335,6 +336,7 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 		}
 	}
 
+	log.Debug().Str("uploadid", session.ID()).Msg("decomposedfs:InitiateUpload:complete")
 	return map[string]string{
 		"simple": session.ID(),
 		"tus":    session.ID(),
