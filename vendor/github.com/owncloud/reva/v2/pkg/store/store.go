@@ -69,6 +69,12 @@ func Create(opts ...microstore.Option) microstore.Store {
 
 	storeType, _ := options.Context.Value(typeContextKey{}).(string)
 
+	if tlsOpts, ok := options.Context.Value(tlsContextKey{}).(tlsOptions); ok && tlsOpts.enable &&
+		storeType != TypeNatsJS && storeType != TypeNatsJSKV {
+		logger.Logf(logger.WarnLevel,
+			"reva-store: TLS requested but store type %q does not support TLS — settings ignored", storeType)
+	}
+
 	switch storeType {
 	case TypeNoop:
 		return microstore.NewNoopStore(opts...)
