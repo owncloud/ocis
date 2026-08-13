@@ -57,6 +57,10 @@ services:
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
+        if [ -e /keys/proof_key ] && ! openssl rsa -in /keys/proof_key -check -noout >/dev/null 2>&1; then
+          echo "/keys/proof_key is missing, not a regular file, or invalid; regenerating" >&2
+          rm -rf /keys/proof_key
+        fi
         if [ ! -f /keys/proof_key ]; then
           openssl genrsa -out /keys/proof_key 2048
           chmod 644 /keys/proof_key
