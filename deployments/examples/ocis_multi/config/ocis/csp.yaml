@@ -5,6 +5,7 @@ directives:
     - '''self'''
     - 'blob:'
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+    - 'https://marketplace.owncloud.com/'
     # In contrary to bash and docker the default is given after the | character
     - 'https://${KEYCLOAK_DOMAIN|keycloak.owncloud.test}/'
   default-src:
@@ -23,6 +24,7 @@ directives:
     - 'data:'
     - 'blob:'
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+    - 'https://marketplace.owncloud.com/'
   manifest-src:
     - '''self'''
   media-src:

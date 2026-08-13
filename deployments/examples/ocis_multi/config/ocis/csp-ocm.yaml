@@ -5,6 +5,7 @@ directives:
     - '''self'''
     - 'blob:'
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+    - 'https://marketplace.owncloud.com/'
     - 'https://${KEYCLOAK_DOMAIN|keycloak.owncloud.test}/'
   default-src:
     - '''none'''
@@ -24,6 +25,7 @@ directives:
     - 'data:'
     - 'blob:'
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+    - 'https://marketplace.owncloud.com/'
   manifest-src:
     - '''self'''
   media-src:

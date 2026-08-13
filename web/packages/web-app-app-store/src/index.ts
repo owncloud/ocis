@@ -24,7 +24,7 @@ export default defineWebApplication({
     const defaultRepositories: AppStoreRepository[] = [
       {
         name: 'awesome-ocis',
-        url: 'https://raw.githubusercontent.com/owncloud/awesome-ocis/main/webApps/apps.json'
+        url: 'https://marketplace.owncloud.com/api/ocis/v1/apps.json'
       }
     ]
     if (applicationConfig?.repositories) {
