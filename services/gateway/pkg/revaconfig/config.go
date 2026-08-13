@@ -72,8 +72,11 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 						"cache_table":         "provider",
 						"cache_ttl":           cfg.Cache.ProviderCacheTTL,
 						"disable_persistence": cfg.Cache.ProviderCacheDisablePersistence,
-						"cache_auth_username": cfg.Cache.ProviderCacheAuthUsername,
-						"cache_auth_password": cfg.Cache.ProviderCacheAuthPassword,
+						"cache_auth_username":         cfg.Cache.ProviderCacheAuthUsername,
+						"cache_auth_password":         cfg.Cache.ProviderCacheAuthPassword,
+						"cache_enable_tls":            cfg.Cache.ProviderCacheEnableTLS,
+						"cache_tls_insecure":          cfg.Cache.ProviderCacheTLSInsecure,
+						"cache_tls_root_ca_certificate": cfg.Cache.ProviderCacheTLSRootCACertificate,
 					},
 					"create_personal_space_cache_config": map[string]interface{}{
 						"cache_store":               cfg.Cache.CreateHomeCacheStore,

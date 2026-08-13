@@ -183,6 +183,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 			microstore.Table(options.Config.Cache.Table),
 			store.DisablePersistence(options.Config.Cache.DisablePersistence),
 			store.Authentication(options.Config.Cache.AuthUsername, options.Config.Cache.AuthPassword),
+			store.TLS(options.Config.Cache.EnableTLS, options.Config.Cache.TLSInsecure, options.Config.Cache.TLSRootCACertificate),
 		}
 		m := roles.NewManager(
 			roles.StoreOptions(storeOptions),
