@@ -52,8 +52,11 @@ type Store struct {
 	Database     string        `yaml:"database" env:"ACTIVITYLOG_STORE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"pre5.0"`
 	Table        string        `yaml:"table" env:"ACTIVITYLOG_STORE_TABLE" desc:"The database table the store should use." introductionVersion:"pre5.0"`
 	TTL          time.Duration `yaml:"ttl" env:"OCIS_PERSISTENT_STORE_TTL;ACTIVITYLOG_STORE_TTL" desc:"Time to live for events in the store. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
-	AuthUsername string        `yaml:"username" env:"OCIS_PERSISTENT_STORE_AUTH_USERNAME;ACTIVITYLOG_STORE_AUTH_USERNAME" desc:"The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
-	AuthPassword string        `yaml:"password" env:"OCIS_PERSISTENT_STORE_AUTH_PASSWORD;ACTIVITYLOG_STORE_AUTH_PASSWORD" desc:"The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	AuthUsername        string        `yaml:"username" env:"OCIS_PERSISTENT_STORE_AUTH_USERNAME;ACTIVITYLOG_STORE_AUTH_USERNAME" desc:"The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	AuthPassword        string        `yaml:"password" env:"OCIS_PERSISTENT_STORE_AUTH_PASSWORD;ACTIVITYLOG_STORE_AUTH_PASSWORD" desc:"The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	EnableTLS           bool          `yaml:"enable_tls" env:"OCIS_PERSISTENT_STORE_ENABLE_TLS;ACTIVITYLOG_STORE_ENABLE_TLS" desc:"Activate TLS for the connection to the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
+	TLSInsecure         bool          `yaml:"tls_insecure" env:"OCIS_PERSISTENT_STORE_TLS_INSECURE;ACTIVITYLOG_STORE_TLS_INSECURE" desc:"Disable TLS certificate verification for the store connection. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
+	TLSRootCACertificate string       `yaml:"tls_root_ca_certificate" env:"OCIS_PERSISTENT_STORE_TLS_ROOT_CA_CERTIFICATE;ACTIVITYLOG_STORE_TLS_ROOT_CA_CERTIFICATE" desc:"Path to the PEM-encoded root CA certificate for the store TLS connection. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
 }
 
 // ServiceAccount is the configuration for the used service account

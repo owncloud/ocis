@@ -25,6 +25,8 @@ import (
 	"go-micro.dev/v4/store"
 )
 
+type tlsContextKey struct{}
+
 type typeContextKey struct{}
 
 // Store determines the implementation:
@@ -101,5 +103,23 @@ func Authentication(username, password string) store.Option {
 		}
 
 		o.Context = context.WithValue(o.Context, authenticationContextKey{}, []string{username, password})
+	}
+}
+
+type tlsOptions struct {
+	enable     bool
+	insecure   bool
+	rootCACert string
+}
+
+// TLS configures TLS for the nats-js and nats-js-kv store backends.
+// enable activates TLS; insecure skips certificate verification (for self-signed certs);
+// rootCACert is an optional path to a PEM file used to validate the server certificate.
+func TLS(enable bool, insecure bool, rootCACert string) store.Option {
+	return func(o *store.Options) {
+		if o.Context == nil {
+			o.Context = context.Background()
+		}
+		o.Context = context.WithValue(o.Context, tlsContextKey{}, tlsOptions{enable, insecure, rootCACert})
 	}
 }
