@@ -94,6 +94,7 @@ http:
         - "'self'"
         - 'blob:'
         - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+        - 'https://marketplace.owncloud.com/'
       defaultSrc:
         - "'none'"
       fontSrc:
@@ -110,6 +111,7 @@ http:
         - 'data:'
         - 'blob:'
         - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+        - 'https://marketplace.owncloud.com/'
       manifestSrc:
         - "'self'"
       mediaSrc:
