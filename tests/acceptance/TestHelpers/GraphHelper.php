@@ -1794,29 +1794,33 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
 	 * @param string $spaceId
 	 * @param string $itemId
 	 * @param mixed $body
+	 * @param array $headers
+	 * @param boolean $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function createLinkShare(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
 		string $spaceId,
 		string $itemId,
 		$body,
+		array $headers = [],
+		bool $isVault = false,
 	): ResponseInterface {
-		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/createLink");
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/createLink", $isVault);
 		return HttpRequestHelper::post(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders(),
+			array_merge(self::getRequestHeaders(), $headers),
 			$body,
 		);
 	}
