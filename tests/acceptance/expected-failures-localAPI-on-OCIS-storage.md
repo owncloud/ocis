@@ -258,6 +258,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSearch2/tagSearch.feature:207](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch2/tagSearch.feature#L207)
 - [apiSearch2/tagSearch.feature:225](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch2/tagSearch.feature#L225)
 - [apiSearch2/tagSearch.feature:226](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch2/tagSearch.feature#L226)
+- [apiSearch2/tagSearch.feature:293](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch2/tagSearch.feature#L293)
+- [apiSearch2/tagSearch.feature:294](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch2/tagSearch.feature#L294)
 - [apiSearchContent/contentSearch.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L25)
 - [apiSearchContent/contentSearch.feature:26](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L26)
 - [apiSearchContent/contentSearch.feature:49](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L49)
