@@ -90,9 +90,9 @@ Feature: sharing
 
   @issue-8242 @env-config
   Scenario Outline: share receiver renames the shared item (old/new webdav)
-    Given user "Alice" has uploaded file with content "foo" to "/sharefile.txt"
+    Given using <dav-path-version> DAV path
     And the administrator has enabled the permissions role "Secure Viewer"
-    And using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "foo" to "/sharefile.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | sharefile.txt      |
       | space           | Personal           |
@@ -133,8 +133,9 @@ Feature: sharing
 
   @issue-8242 @env-config
   Scenario Outline: share receiver renames the shared item (spaces webdav)
-    Given user "Alice" has uploaded file with content "foo" to "/sharefile.txt"
+    Given using spaces DAV path
     And the administrator has enabled the permissions role "Secure Viewer"
+    And user "Alice" has uploaded file with content "foo" to "/sharefile.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | sharefile.txt      |
       | space           | Personal           |
@@ -154,7 +155,6 @@ Feature: sharing
     And as "Carol" file "Shares/renamedsharefile.txt" should exist
     And as "Brian" file "Shares/sharefile.txt" should exist
     And as "Alice" file "sharefile.txt" should exist
-    And using spaces DAV path
     When user "Carol" sends HTTP method "PROPFIND" to URL "<dav-path>"
     Then the HTTP status code should be "207"
     And as user "Carol" the value of the item "//oc:name" of path "<dav-path>/renamedsharefile.txt" in the response should be "renamedsharefile.txt"
