@@ -13,3 +13,18 @@ msgstr "Click aquí para verlo: {ShareLink}"
 
 msgid "{SpaceSharer} has invited you to join \"{SpaceName}\"."
 msgstr "{SpaceSharer} te ha invitado a unirte a \"{SpaceName}\"."
+
+msgid "Hello {ShareGrantee},"
+msgstr "Hola {ShareGrantee},"
+
+msgid ""
+"{ShareSharer} has unshared '{ShareFolder}' with you.\n"
+"\n"
+"Even though this share has been revoked you still might have access through other shares and/or space memberships."
+msgstr ""
+"{ShareSharer} ha eliminado la compartición '{ShareFolder}' con usted.\n"
+"\n"
+"incluso habiendo eliminado esta compartición, usted podría tener acceso a través de otras comparticiones y/o membresías en spaces."
+
+msgid "{ShareSharer} unshared '{ShareFolder}' with you"
+msgstr "{ShareSharer} ha eliminado la compartición '{ShareFolder}' con usted"

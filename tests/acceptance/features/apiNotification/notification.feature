@@ -414,3 +414,30 @@ Feature: Notification
       | resource   |
       | HelloWorld |
       | text.txt   |
+
+  @issue-11908 @email
+  Scenario: recipient should not get PO file headers on removing access from resource for translated locale
+    Given user "Brian" has switched the system language to "es" using the Graph API
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile1.txt |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    When user "Alice" removes the access of user "Brian" from resource "textfile1.txt" of space "Personal" using the Graph API
+    Then the HTTP status code should be "204"
+    And user "Brian" should get a notification with subject "Recurso no compartido" and message:
+      | message                                              |
+      | Alice Hansen dejó de compartir textfile1.txt contigo |
+    And user "Brian" should have received the following email from user "Alice"
+      """
+      Hola Brian Murphy,
+
+      Alice Hansen ha eliminado la compartición 'textfile1.txt' con usted.
+
+      incluso habiendo eliminado esta compartición, usted podría tener acceso a través de otras comparticiones y/o membresías en spaces.
+
+
+      ---
+      ownCloud - Store. Share. Work.
+      """
