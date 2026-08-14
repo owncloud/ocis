@@ -2606,11 +2606,13 @@ class SpacesContext implements Context {
 		}
 		$fullUrl = "$baseUrl/$sourceDavPath/$fileId";
 		if ($actionType === 'copied') {
-			// Retry the request up to 3 times in case of failure
+			// while performing copy operation,
+			// sometime it will return 500 error.
+			// So we need to retry the copy operation.
 			$maxAttempts = 3;
 			for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
 				$response = $this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
-				if ($response->getStatusCode() === 201) {
+				if ($response->getStatusCode() !== 500) {
 					break;
 				}
 				if ($attempt < $maxAttempts) {
