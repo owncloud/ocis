@@ -1929,11 +1929,12 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has created a space "([^"]*)"(| in vault)? with the default quota using the Graph API$/
+	 * @Given /^user "([^"]*)" has created a space "([^"]*)"(| in vault)?(| with retry) with the default quota using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param string $isVault
+	 * @param string $withRetry
 	 *
 	 * @return void
 	 *
@@ -1944,10 +1945,22 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName,
 		string $isVault,
+		string $withRetry,
 	): void {
 		$space = ["name" => $spaceName];
 		$isVault = trim($isVault) === "in vault";
+		$withRetry = trim($withRetry) === "with retry";
+
+		// The user role may take some time to update
+		// This can cause an unauthorized error
+		// Retry once after 1 second
 		$response = $this->createSpace($user, $space, $isVault);
+
+		if ($withRetry && $response->getStatusCode() === 401) {
+			sleep(1); // Wait 1 second before retrying.
+			$response = $this->createSpace($user, $space, $isVault);
+		}
+
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201 (Created)",
