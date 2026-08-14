@@ -21,6 +21,7 @@ package cache
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -53,6 +54,9 @@ type Config struct {
 	DisablePersistence bool          `mapstructure:"cache_disable_persistence"`
 	AuthUsername       string        `mapstructure:"cache_auth_username"`
 	AuthPassword       string        `mapstructure:"cache_auth_password"`
+	EnableTLS          bool          `mapstructure:"cache_enable_tls"`
+	TLSInsecure        bool          `mapstructure:"cache_tls_insecure"`
+	TLSRootCACert      string        `mapstructure:"cache_tls_root_ca_certificate"`
 }
 
 // Cache handles key value operations on caches
@@ -101,13 +105,19 @@ type FileMetadataCache interface {
 	RemoveMetadata(path string) error
 }
 
+func cacheKey(cfg Config) string {
+	return strings.Join(append(append([]string{cfg.Store}, cfg.Nodes...),
+		cfg.Database, cfg.Table,
+		strconv.FormatBool(cfg.EnableTLS)+":"+strconv.FormatBool(cfg.TLSInsecure)+":"+cfg.TLSRootCACert), ":")
+}
+
 // GetStatCache will return an existing StatCache for the given store, nodes, database and table
 // If it does not exist yet it will be created, different TTLs are ignored
 func GetStatCache(cfg Config) StatCache {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	key := strings.Join(append(append([]string{cfg.Store}, cfg.Nodes...), cfg.Database, cfg.Table), ":")
+	key := cacheKey(cfg)
 	if statCaches[key] == nil {
 		statCaches[key] = NewStatCache(cfg)
 	}
@@ -120,7 +130,7 @@ func GetProviderCache(cfg Config) ProviderCache {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	key := strings.Join(append(append([]string{cfg.Store}, cfg.Nodes...), cfg.Database, cfg.Table), ":")
+	key := cacheKey(cfg)
 	if providerCaches[key] == nil {
 		providerCaches[key] = NewProviderCache(cfg)
 	}
@@ -159,7 +169,7 @@ func GetFileMetadataCache(cfg Config) FileMetadataCache {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	key := strings.Join(append(append([]string{cfg.Store}, cfg.Nodes...), cfg.Database, cfg.Table), ":")
+	key := cacheKey(cfg)
 	if fileMetadataCaches[key] == nil {
 		fileMetadataCaches[key] = NewFileMetadataCache(cfg)
 	}
@@ -243,5 +253,6 @@ func getStore(cfg Config) microstore.Store {
 		store.Size(cfg.Size),
 		store.DisablePersistence(cfg.DisablePersistence),
 		store.Authentication(cfg.AuthUsername, cfg.AuthPassword),
+		store.TLS(cfg.EnableTLS, cfg.TLSInsecure, cfg.TLSRootCACert),
 	)
 }

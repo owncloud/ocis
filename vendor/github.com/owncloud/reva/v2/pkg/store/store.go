@@ -20,6 +20,9 @@ package store
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"os"
 	"strings"
 	"time"
 
@@ -65,6 +68,12 @@ func Create(opts ...microstore.Option) microstore.Store {
 	}
 
 	storeType, _ := options.Context.Value(typeContextKey{}).(string)
+
+	if tlsOpts, ok := options.Context.Value(tlsContextKey{}).(tlsOptions); ok && tlsOpts.enable &&
+		storeType != TypeNatsJS && storeType != TypeNatsJSKV {
+		logger.Logf(logger.WarnLevel,
+			"reva-store: TLS requested but store type %q does not support TLS — settings ignored", storeType)
+	}
 
 	switch storeType {
 	case TypeNoop:
@@ -125,12 +134,7 @@ func Create(opts ...microstore.Option) microstore.Store {
 		// TODO nats needs a DefaultTTL option as it does not support per Write TTL ...
 		// FIXME nats has restrictions on the key, we cannot use slashes AFAICT
 		// host, port, clusterid
-		natsOptions := nats.GetDefaultOptions()
-		natsOptions.Name = "TODO" // we can pass in the service name to allow identifying the client, but that requires adding a custom context option
-		if auth, ok := options.Context.Value(authenticationContextKey{}).([]string); ok && len(auth) == 2 {
-			natsOptions.User = auth[0]
-			natsOptions.Password = auth[1]
-		}
+		natsOptions := defaultNatsOptions(options)
 		return natsjs.NewStore(
 			append(opts,
 				natsjs.NatsOptions(natsOptions), // always pass in properly initialized default nats options
@@ -143,12 +147,7 @@ func Create(opts ...microstore.Option) microstore.Store {
 			opts = append(opts, natsjskv.DefaultMemory())
 		}
 
-		natsOptions := nats.GetDefaultOptions()
-		natsOptions.Name = "TODO" // we can pass in the service name to allow identifying the client, but that requires adding a custom context option
-		if auth, ok := options.Context.Value(authenticationContextKey{}).([]string); ok && len(auth) == 2 {
-			natsOptions.User = auth[0]
-			natsOptions.Password = auth[1]
-		}
+		natsOptions := defaultNatsOptions(options)
 		return natsjskv.NewStore(
 			append(opts,
 				natsjskv.NatsOptions(natsOptions), // always pass in properly initialized default nats options
@@ -165,4 +164,59 @@ func Create(opts ...microstore.Option) microstore.Store {
 		options.Logger.Logf(logger.ErrorLevel, "unknown store type: '%s', falling back to memory", storeType)
 		return microstore.NewMemoryStore(opts...)
 	}
+}
+
+// defaultNatsOptions builds the nats.Options shared by the nats-js and
+// nats-js-kv store backends. It overrides the NATS client defaults so the
+// client never permanently gives up on a closed connection: the default
+// MaxReconnect (60) combined with the default ReconnectWait (2s) means any
+// NATS outage longer than ~2 minutes leaves the client permanently closed,
+// which the store plugins then surface as "nats: connection closed" on every
+// subsequent operation. Reconnecting forever, together with the connection
+// state handlers, keeps the client alive and makes the transitions visible.
+func defaultNatsOptions(options *microstore.Options) nats.Options {
+	natsOptions := nats.GetDefaultOptions()
+	natsOptions.Name = "reva-store"
+	natsOptions.MaxReconnect = -1 // reconnect forever; the default of 60 gives up after ~2 minutes
+	natsOptions.ReconnectWait = 5 * time.Second
+	if auth, ok := options.Context.Value(authenticationContextKey{}).([]string); ok && len(auth) == 2 {
+		natsOptions.User = auth[0]
+		natsOptions.Password = auth[1]
+	}
+	if tlsOpts, ok := options.Context.Value(tlsContextKey{}).(tlsOptions); ok && tlsOpts.enable {
+		natsOptions.TLSConfig = BuildNatsTLSConfig(tlsOpts.insecure, tlsOpts.rootCACert)
+		natsOptions.Secure = true
+	}
+	natsOptions.DisconnectedErrCB = func(_ *nats.Conn, err error) {
+		logger.Logf(logger.WarnLevel, "reva-store: nats connection disconnected: %v", err)
+	}
+	natsOptions.ReconnectedCB = func(c *nats.Conn) {
+		logger.Logf(logger.InfoLevel, "reva-store: nats connection reconnected to %s", c.ConnectedUrl())
+	}
+	natsOptions.ClosedCB = func(_ *nats.Conn) {
+		logger.Logf(logger.ErrorLevel, "reva-store: nats connection closed")
+	}
+	return natsOptions
+}
+
+// BuildNatsTLSConfig constructs a tls.Config for NATS client connections.
+// insecure skips certificate verification; rootCACert is an optional path to a
+// PEM file whose CA is used to validate the server certificate.
+func BuildNatsTLSConfig(insecure bool, rootCACert string) *tls.Config {
+	tlsConf := &tls.Config{MinVersion: tls.VersionTLS12, InsecureSkipVerify: insecure} //nolint:gosec
+	if rootCACert != "" {
+		b, err := os.ReadFile(rootCACert)
+		if err != nil {
+			logger.Logf(logger.WarnLevel, "reva-store: failed to read TLS root CA cert %q: %v", rootCACert, err)
+		} else {
+			pool := x509.NewCertPool()
+			if pool.AppendCertsFromPEM(b) {
+				tlsConf.RootCAs = pool
+				tlsConf.InsecureSkipVerify = false
+			} else {
+				logger.Logf(logger.WarnLevel, "reva-store: no valid PEM certificates found in %q", rootCACert)
+			}
+		}
+	}
+	return tlsConf
 }
