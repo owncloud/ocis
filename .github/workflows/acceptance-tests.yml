@@ -138,7 +138,7 @@ jobs:
           vmstat 2 > /tmp/vmstat-phase2.log & MONITOR_PID=$!
 
           make ci-golangci-lint                          > /tmp/golangci-lint.log      2>&1 & PIDS=($!)
-          ENABLE_VIPS=true make -C ocis build            > /tmp/ocis-build.log         2>&1 & PIDS+=($!)
+          ENABLE_VIPS=true make -C ocis build-debug      > /tmp/ocis-build.log         2>&1 & PIDS+=($!)
           make test                                      > /tmp/unit-tests.log         2>&1 & PIDS+=($!)
           GOWORK=off make -C tests/ociswrapper build     > /tmp/ociswrapper-build.log  2>&1 & PIDS+=($!)
 
@@ -164,7 +164,7 @@ jobs:
         with:
           name: ocis-build-artifacts
           path: |
-            ocis/bin/ocis
+            ocis/bin/ocis-debug
             tests/ociswrapper/bin/ociswrapper
           retention-days: 1
           if-no-files-found: error
@@ -174,6 +174,8 @@ jobs:
     needs: [build-and-test]
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    env:
+      GOCOVERDIR: ${{ github.workspace }}/coverage-reports
     strategy:
       fail-fast: false
       matrix:
@@ -278,16 +280,28 @@ jobs:
           name: ocis-build-artifacts
 
       - name: Restore binary permissions
-        run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
+        run: chmod +x ocis/bin/ocis-debug tests/ociswrapper/bin/ociswrapper
 
       - name: Run ${{ matrix.suite }}
-        run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
+        run: |
+          mkdir -p "$GOCOVERDIR"
+          BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
+
+      - name: Upload raw coverage data
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: api-coverage-${{ matrix.suite }}
+          path: coverage-reports
+          if-no-files-found: error
 
   cli-tests:
     needs: [build-and-test]
     name: ${{ matrix.suite }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    env:
+      GOCOVERDIR: ${{ github.workspace }}/coverage-reports
     strategy:
       fail-fast: false
       matrix:
@@ -314,16 +328,28 @@ jobs:
           name: ocis-build-artifacts
 
       - name: Restore binary permissions
-        run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
+        run: chmod +x ocis/bin/ocis-debug tests/ociswrapper/bin/ociswrapper
 
       - name: Run ${{ matrix.suite }}
-        run: BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
+        run: |
+          mkdir -p "$GOCOVERDIR"
+          BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
+
+      - name: Upload raw coverage data
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: api-coverage-cli-${{ matrix.suite }}
+          path: coverage-reports
+          if-no-files-found: error
 
   ldap-pool-tests:
     needs: [build-and-test]
     name: ldapPool-${{ matrix.suite }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    env:
+      GOCOVERDIR: ${{ github.workspace }}/coverage-reports
     strategy:
       fail-fast: false
       matrix:
@@ -350,16 +376,28 @@ jobs:
           name: ocis-build-artifacts
 
       - name: Restore binary permissions
-        run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
+        run: chmod +x ocis/bin/ocis-debug tests/ociswrapper/bin/ociswrapper
 
       - name: Run ${{ matrix.suite }} with OCIS_LDAP_POOL_ENABLED=true
-        run: BEHAT_SUITES="${{ matrix.suite }}" OCIS_LDAP_POOL_ENABLED=true python3 tests/acceptance/run-github.py
+        run: |
+          mkdir -p "$GOCOVERDIR"
+          BEHAT_SUITES="${{ matrix.suite }}" OCIS_LDAP_POOL_ENABLED=true python3 tests/acceptance/run-github.py
+
+      - name: Upload raw coverage data
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: api-coverage-ldap-pool-${{ matrix.suite }}
+          path: coverage-reports
+          if-no-files-found: error
 
   core-api-tests:
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    env:
+      GOCOVERDIR: ${{ github.workspace }}/coverage-reports
     strategy:
       fail-fast: false
       matrix:
@@ -430,14 +468,23 @@ jobs:
           name: ocis-build-artifacts
 
       - name: Restore binary permissions
-        run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
+        run: chmod +x ocis/bin/ocis-debug tests/ociswrapper/bin/ociswrapper
 
       - name: Run ${{ matrix.suite }}
-        run: >
-          BEHAT_SUITES="${{ matrix.suite }}"
-          ACCEPTANCE_TEST_TYPE=core-api
-          WITH_REMOTE_PHP=true
+        run: |
+          mkdir -p "$GOCOVERDIR"
+          BEHAT_SUITES="${{ matrix.suite }}" \
+          ACCEPTANCE_TEST_TYPE=core-api \
+          WITH_REMOTE_PHP=true \
           python3 tests/acceptance/run-github.py
+
+      - name: Upload raw coverage data
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: api-coverage-core-${{ matrix.suite }}
+          path: coverage-reports
+          if-no-files-found: error
 
   e2e-tests:
     name: e2e-${{ matrix.suite }}
@@ -504,7 +551,7 @@ jobs:
           name: ocis-build-artifacts
 
       - name: Restore binary permissions
-        run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
+        run: chmod +x ocis/bin/ocis-debug tests/ociswrapper/bin/ociswrapper
 
       - name: Cache Playwright Chromium
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -665,7 +712,7 @@ jobs:
           name: ocis-build-artifacts
 
       - name: Restore binary permissions
-        run: chmod +x ocis/bin/ocis
+        run: chmod +x ocis/bin/ocis-debug
 
       - name: Run litmus
         run: python3 tests/acceptance/run-litmus.py
@@ -690,7 +737,7 @@ jobs:
           name: ocis-build-artifacts
 
       - name: Restore binary permissions
-        run: chmod +x ocis/bin/ocis
+        run: chmod +x ocis/bin/ocis-debug
 
       - name: Run cs3api validator
         run: python3 tests/acceptance/run-cs3api.py
@@ -715,7 +762,7 @@ jobs:
           name: ocis-build-artifacts
 
       - name: Restore binary permissions
-        run: chmod +x ocis/bin/ocis
+        run: chmod +x ocis/bin/ocis-debug
 
       - name: Run WOPI validator (builtin)
         run: python3 tests/acceptance/run-wopi.py --type builtin
@@ -740,7 +787,7 @@ jobs:
           name: ocis-build-artifacts
 
       - name: Restore binary permissions
-        run: chmod +x ocis/bin/ocis
+        run: chmod +x ocis/bin/ocis-debug
 
       - name: Run WOPI validator (cs3)
         run: python3 tests/acceptance/run-wopi.py --type cs3
@@ -808,6 +855,45 @@ jobs:
       # the replication lag exercises the retry / read-after-write path (OCISDEV-1030/1032/1033).
       - name: Run external-LDAP distributed smoke
         run: tests/ldap-smoke-distributed/run.sh
+
+  acceptance-coverage:
+    name: acceptance-coverage
+    needs: [local-api-tests, cli-tests, ldap-pool-tests, core-api-tests]
+    if: always() && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Download raw coverage data
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: api-coverage-*
+          path: coverage-reports
+          merge-multiple: true
+
+      - name: Convert coverage counters to profile
+        run: go tool covdata textfmt -i=coverage-reports -o=coverage.out
+
+      - name: Publish coverage summary
+        run: |
+          {
+            echo "## Acceptance test coverage"
+            echo '```'
+            go tool covdata percent -i=coverage-reports
+            echo '```'
+            echo
+            echo "<details>"
+            echo "<summary>Per-function coverage</summary>"
+            echo
+            echo '```'
+            go tool cover -func=coverage.out
+            echo '```'
+            echo "</details>"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   all-acceptance-tests:
     needs: [detect-changes, local-api-tests, cli-tests, ldap-pool-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests, external-ldap-tests, external-ldap-distributed-tests]
