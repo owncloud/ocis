@@ -102,7 +102,7 @@
   },
   "pnpm": {
     "overrides": {
-      "nanoid": "^3.3.17",
+      "nanoid": "^3.3.18",
       "elliptic": "6.6.1",
       "sha.js": "2.4.12",
       "vitest": "4.1.6",
@@ -118,7 +118,7 @@
       "ws": "8.21.0",
       "js-yaml": "4.3.1",
       "postcss": "8.5.18",
-      "nanoid@^3.0.0": "3.3.17",
+      "nanoid@^3.0.0": "3.3.18",
       "nanoid@^5.0.0": "5.1.16"
     },
     "patchedDependencies": {
