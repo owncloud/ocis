@@ -65,6 +65,7 @@ func Server(cfg *config.Config) *cli.Command {
 					microstore.Database(cfg.Store.Database),
 					microstore.Table(cfg.Store.Table),
 					store.Authentication(cfg.Store.AuthUsername, cfg.Store.AuthPassword),
+					store.TLS(cfg.Store.EnableTLS, cfg.Store.TLSInsecure, cfg.Store.TLSRootCACertificate),
 				)
 
 				svc, err := service.NewPostprocessingService(ctx, bus, logger, st, traceProvider, cfg.Postprocessing)

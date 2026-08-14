@@ -42,8 +42,11 @@ type Store struct {
 	Database     string        `yaml:"database" env:"EVENTHISTORY_STORE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"pre5.0"`
 	Table        string        `yaml:"table" env:"EVENTHISTORY_STORE_TABLE" desc:"The database table the store should use." introductionVersion:"pre5.0"`
 	TTL          time.Duration `yaml:"ttl" env:"OCIS_PERSISTENT_STORE_TTL;EVENTHISTORY_STORE_TTL" desc:"Time to live for events in the store. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
-	AuthUsername string        `yaml:"username" env:"OCIS_PERSISTENT_STORE_AUTH_USERNAME;EVENTHISTORY_STORE_AUTH_USERNAME" desc:"The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
-	AuthPassword string        `yaml:"password" env:"OCIS_PERSISTENT_STORE_AUTH_PASSWORD;EVENTHISTORY_STORE_AUTH_PASSWORD" desc:"The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	AuthUsername         string        `yaml:"username" env:"OCIS_PERSISTENT_STORE_AUTH_USERNAME;EVENTHISTORY_STORE_AUTH_USERNAME" desc:"The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	AuthPassword         string        `yaml:"password" env:"OCIS_PERSISTENT_STORE_AUTH_PASSWORD;EVENTHISTORY_STORE_AUTH_PASSWORD" desc:"The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	EnableTLS            bool          `yaml:"enable_tls" env:"OCIS_PERSISTENT_STORE_ENABLE_TLS;EVENTHISTORY_STORE_ENABLE_TLS" desc:"Activate TLS for the connection to the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
+	TLSInsecure          bool          `yaml:"tls_insecure" env:"OCIS_PERSISTENT_STORE_TLS_INSECURE;EVENTHISTORY_STORE_TLS_INSECURE" desc:"Disable TLS certificate verification for the store connection. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
+	TLSRootCACertificate string        `yaml:"tls_root_ca_certificate" env:"OCIS_PERSISTENT_STORE_TLS_ROOT_CA_CERTIFICATE;EVENTHISTORY_STORE_TLS_ROOT_CA_CERTIFICATE" desc:"Path to the PEM-encoded root CA certificate for the store TLS connection. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
 }
 
 // Events combines the configuration options for the event bus.
