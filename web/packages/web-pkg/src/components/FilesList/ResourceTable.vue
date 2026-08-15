@@ -28,6 +28,7 @@
     :grouping-settings="groupingSettings"
     padding-x="medium"
     @highlight="fileClicked"
+    @mousedown="preventShiftTextSelection"
     @row-mounted="rowMounted"
     @contextmenu-clicked="showContextMenu"
     @item-dropped="fileDropped"
@@ -67,7 +68,7 @@
         :disabled="isResourceDisabled(item)"
         :model-value="isResourceSelected(item)"
         :outline="isLatestSelectedItem(item)"
-        @click.stop="toggleSelection(item.id)"
+        @click.stop="toggleSelection(item, $event)"
       />
     </template>
     <template #name="{ item }">
@@ -493,8 +494,25 @@ const emitSelect = (selectedIds: string[]) => {
   emit('update:selectedIds', selectedIds)
 }
 
-const toggleSelection = (resourceId: string) => {
-  resourcesStore.toggleSelection(resourceId)
+// shift+click would otherwise extend the browser's text selection across the rows
+const preventShiftTextSelection = (event: MouseEvent) => {
+  if (event.shiftKey) {
+    event.preventDefault()
+  }
+}
+
+const toggleSelection = (resource: Resource, event?: MouseEvent) => {
+  if (event?.shiftKey) {
+    return eventBus.publish('app.files.list.clicked.shift', {
+      resource,
+      skipTargetSelection: false,
+      extend: event.metaKey || event.ctrlKey
+    })
+  }
+  if (event?.metaKey) {
+    return eventBus.publish('app.files.list.clicked.meta', resource)
+  }
+  resourcesStore.toggleSelection(resource.id)
   emitSelect(resourcesStore.selectedIds)
 }
 
@@ -876,7 +894,7 @@ function addSelectedResource(file: Resource) {
   if (isSelected) {
     return
   }
-  toggleSelection(file.id)
+  toggleSelection(file)
 }
 function showContextMenuOnBtnClick(data: ContextMenuBtnClickEventData, item: Resource) {
   if (unref(isResourceDisabled)(item)) {
@@ -943,11 +961,15 @@ function fileClicked(data: [Resource, MouseEvent, boolean]) {
   if (contextActionClicked) {
     return
   }
+  if (eventData && eventData.shiftKey) {
+    return eventBus.publish('app.files.list.clicked.shift', {
+      resource,
+      skipTargetSelection,
+      extend: eventData.metaKey || eventData.ctrlKey
+    })
+  }
   if (eventData && eventData.metaKey) {
     return eventBus.publish('app.files.list.clicked.meta', resource)
-  }
-  if (eventData && eventData.shiftKey) {
-    return eventBus.publish('app.files.list.clicked.shift', { resource, skipTargetSelection })
   }
   if (isCheckboxClicked) {
     return

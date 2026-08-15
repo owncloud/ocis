@@ -23,10 +23,12 @@ export const useKeyboardTableMouseActions = (
 
   const handleShiftClickAction = ({
     resource,
-    skipTargetSelection
+    skipTargetSelection,
+    extend
   }: {
     resource: Resource
     skipTargetSelection: boolean
+    extend: boolean
   }) => {
     const parent = document.querySelectorAll(`[data-item-id='${resource.id}']`)[0]
     const resourceNodes = Object.values(parent.parentNode.children)
@@ -42,23 +44,32 @@ export const useKeyboardTableMouseActions = (
     const minIndex = Math.min(latestNodeIndex, clickedNodeIndex)
     const maxIndex = Math.max(latestNodeIndex, clickedNodeIndex)
 
+    const rangeIds: string[] = []
     for (let i = minIndex; i <= maxIndex; i++) {
       const nodeId = resourceNodes[i].getAttribute('data-item-id')
       const isDisabled = resourceNodes[i].classList.contains('oc-table-disabled')
       if ((skipTargetSelection && nodeId === resource.id) || isDisabled) {
         continue
       }
-      resourcesStore.addSelection(nodeId)
+      rangeIds.push(nodeId)
+    }
+
+    if (extend) {
+      rangeIds.forEach((id) => resourcesStore.addSelection(id))
+    } else {
+      resourcesStore.setSelection(rangeIds)
     }
     resourcesStore.setLastSelectedId(resource.id)
   }
 
   const handleTilesShiftClickAction = ({
     resource,
-    skipTargetSelection
+    skipTargetSelection,
+    extend
   }: {
     resource: Resource
     skipTargetSelection: boolean
+    extend: boolean
   }) => {
     const tilesListCard = document.querySelectorAll('#tiles-view > ul > li > div')
     const startIndex = findIndex(
@@ -72,6 +83,7 @@ export const useKeyboardTableMouseActions = (
     const minIndex = Math.min(endIndex, startIndex)
     const maxIndex = Math.max(endIndex, startIndex)
 
+    const rangeIds: string[] = []
     for (let i = minIndex; i <= maxIndex; i++) {
       const nodeId = tilesListCard[i].getAttribute('data-item-id')
       const isDisabled = tilesListCard[i].classList.contains('oc-tile-card-disabled')
@@ -79,7 +91,13 @@ export const useKeyboardTableMouseActions = (
       if ((skipTargetSelection && nodeId === resource.id) || isDisabled) {
         continue
       }
-      resourcesStore.addSelection(nodeId)
+      rangeIds.push(nodeId)
+    }
+
+    if (extend) {
+      rangeIds.forEach((id) => resourcesStore.addSelection(id))
+    } else {
+      resourcesStore.setSelection(rangeIds)
     }
     resourcesStore.setLastSelectedId(resource.id)
   }
