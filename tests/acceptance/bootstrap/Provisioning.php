@@ -365,8 +365,7 @@ trait Provisioning {
 			'baseDn' => $this->ldapBaseDN,
 			'username' => $this->ldapAdminUser,
 		];
-		$this->ldap = new Ldap($options);
-		$this->ldap->bind();
+		$this->ldap = $this->bindLdap($options);
 
 		$ldifFile = __DIR__ . $suiteParameters['ldapInitialUserFilePath'];
 		if (!$this->skipImportLdif) {
@@ -393,8 +392,17 @@ trait Provisioning {
 			return;
 		}
 		\putenv('LDAPTLS_REQCERT=never');
+		$idmHost = '';
+		$hostSourceEnvs = ['TEST_SERVER_URL', 'OCIS_WRAPPER_URL'];
+		foreach ($hostSourceEnvs as $envName) {
+			$envValue = \getenv($envName);
+			if ($envValue !== false && $envValue !== '') {
+				$idmHost = \parse_url($envValue, PHP_URL_HOST) ?: $envValue;
+				break;
+			}
+		}
 		$options = [
-			'host' => '127.0.0.1',
+			'host' => $idmHost ?: '127.0.0.1',
 			'port' => 9235,
 			'useSsl' => true,
 			'baseDn' => 'o=libregraph-idm',
@@ -402,8 +410,20 @@ trait Provisioning {
 			'username' => 'uid=admin,ou=users,o=libregraph-idm',
 			'password' => \getenv('IDM_ADMIN_PASSWORD') ?: 'admin',
 		];
-		$this->idmLdap = new Ldap($options);
-		$this->idmLdap->bind();
+		$this->idmLdap = $this->bindLdap($options);
+	}
+
+	/**
+	 * Creates a bound Ldap connection from the given options.
+	 *
+	 * @param array $options
+	 *
+	 * @return Ldap
+	 */
+	private function bindLdap(array $options): Ldap {
+		$ldap = new Ldap($options);
+		$ldap->bind();
+		return $ldap;
 	}
 
 	/**
@@ -423,7 +443,7 @@ trait Provisioning {
 		$shouldHave = ($not !== "not");
 		Assert::assertTrue(
 			\in_array(\strtolower($objectClass), $objectClasses, true) === $shouldHave,
-			"Expected LDAP entry '$dn' to " . ($shouldHave ? 'have' : 'not have') . " the object class '$objectClass'",
+			"Expected LDAP entry '$dn' to " . ($shouldHave ? 'have' : 'not have') . " the object class '$objectClass', but the entry has: " . \implode(', ', $objectClasses),
 		);
 	}
 

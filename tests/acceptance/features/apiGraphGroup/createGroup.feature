@@ -50,7 +50,7 @@ Feature: create group
 
   @env-config @issue-11775
   Scenario: admin creates a group with the configured LDAP group object class
-    Given the config "OCIS_LDAP_GROUP_OBJECTCLASS" has been set to "groupOfUniqueNames"
+    Given the config "OCIS_LDAP_GROUP_OBJECTCLASS" has been set to "groupOfUniqueNames" for "graph" service
     When the administrator creates a group "uniquegroup" using the Graph API
     Then the HTTP status code should be "201"
     And the LDAP entry "cn=uniquegroup,ou=groups,o=libregraph-idm" should have the object class "groupOfUniqueNames"
