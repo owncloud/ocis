@@ -105,7 +105,16 @@ export const analyzeAccessibilityConformityViolations = async (args: {
 
   if (config.testType === 'playwright') {
     test.info().attach('accessibility-scan', {
-      body: JSON.stringify(a11yResult, null, 2),
+      body: JSON.stringify(
+        {
+          url: a11yResult.url,
+          violations: a11yResult.violations,
+          passes: a11yResult.passes?.map((pass) => ({ id: pass.id })),
+          incomplete: a11yResult.incomplete?.map((incomplete) => ({ id: incomplete.id }))
+        },
+        null,
+        2
+      ),
       contentType: 'application/json'
     })
   }
