@@ -369,6 +369,26 @@ describe('ResourceTable', () => {
       expect(wrapper.find('.oc-tbody-tr-in-delete-queue .oc-checkbox').exists()).toBe(false)
       expect(wrapper.find('.oc-tbody-tr-in-delete-queue .oc-spinner').exists()).toBe(true)
     })
+    it('publishes a shift-click event instead of toggling when shift is held on a checkbox', async () => {
+      const { wrapper } = getMountedWrapper()
+      const publishSpy = vi.spyOn(eventBus, 'publish')
+      await wrapper.find('.oc-tbody-tr-documents .oc-checkbox').trigger('click', { shiftKey: true })
+      expect(publishSpy).toHaveBeenCalledWith(
+        'app.files.list.clicked.shift',
+        expect.objectContaining({ resource: expect.objectContaining({ id: 'documents' }) })
+      )
+      expect(wrapper.emitted('update:selectedIds')).toBeUndefined()
+    })
+    it('publishes a meta-click event instead of toggling when meta is held on a checkbox', async () => {
+      const { wrapper } = getMountedWrapper()
+      const publishSpy = vi.spyOn(eventBus, 'publish')
+      await wrapper.find('.oc-tbody-tr-documents .oc-checkbox').trigger('click', { metaKey: true })
+      expect(publishSpy).toHaveBeenCalledWith(
+        'app.files.list.clicked.meta',
+        expect.objectContaining({ id: 'documents' })
+      )
+      expect(wrapper.emitted('update:selectedIds')).toBeUndefined()
+    })
 
     describe('all rows already selected', () => {
       it('de-selects all resources via the select-all checkbox', async () => {

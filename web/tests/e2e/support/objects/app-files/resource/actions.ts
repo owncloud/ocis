@@ -41,6 +41,8 @@ const checkBoxForTrashbin = `//*[@data-test-resource-path="%s"]//ancestor::tr//i
 const filesSelector = '//*[@data-test-resource-name="%s"]'
 export const fileRow =
   '//ancestor::*[(contains(@class, "oc-tile-card") or contains(@class, "oc-tbody-tr"))]'
+// works in both table and tiles view
+const resourceCheckBox = `//*[@data-test-resource-name="%s"]${fileRow}//input`
 export const resourceNameSelector =
   ':is(#files-files-table, .oc-tiles-item, #files-shared-with-me-accepted-section, .files-table) [data-test-resource-name="%s"]'
 // following breadcrumb selectors is passed to buildXpathLiteral function as the content to be inserted might contain quotes
@@ -1024,6 +1026,44 @@ export const selectOrDeselectResources = async (args: selectResourcesArgs): Prom
       await resourceCheckbox.uncheck()
     }
   }
+}
+
+export type clickResourceModifier = 'Shift' | 'ControlOrMeta'
+
+export type clickResourceCheckboxArgs = {
+  page: Page
+  resource: string
+  modifiers?: clickResourceModifier[]
+}
+
+export const clickResourceCheckbox = async (args: clickResourceCheckboxArgs): Promise<void> => {
+  const { page, resource, modifiers = [] } = args
+  await page.locator(util.format(resourceCheckBox, resource)).click({ modifiers })
+}
+
+export type expectResourcesSelectionArgs = {
+  page: Page
+  resources: string[]
+  selected: boolean
+}
+
+export const expectResourcesToBeSelected = async (
+  args: expectResourcesSelectionArgs
+): Promise<void> => {
+  const { page, resources, selected } = args
+  for (const resource of resources) {
+    const checkBox = page.locator(util.format(resourceCheckBox, resource))
+    if (selected) {
+      await expect(checkBox).toBeChecked()
+    } else {
+      await expect(checkBox).not.toBeChecked()
+    }
+  }
+}
+
+export const expectNoTextToBeHighlighted = async ({ page }: { page: Page }): Promise<void> => {
+  const highlightedText = await page.evaluate(() => window.getSelection().toString())
+  expect(highlightedText).toBe('')
 }
 
 /**/

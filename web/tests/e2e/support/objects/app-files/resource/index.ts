@@ -318,6 +318,20 @@ export class Resource {
     await po.expectFileToBeSelected({ ...args, page: this.#page })
   }
 
+  async clickResourceCheckbox(args: Omit<po.clickResourceCheckboxArgs, 'page'>): Promise<void> {
+    await po.clickResourceCheckbox({ ...args, page: this.#page })
+  }
+
+  async expectResourcesToBeSelected(
+    args: Omit<po.expectResourcesSelectionArgs, 'page'>
+  ): Promise<void> {
+    await po.expectResourcesToBeSelected({ ...args, page: this.#page })
+  }
+
+  async expectNoTextToBeHighlighted(): Promise<void> {
+    await po.expectNoTextToBeHighlighted({ page: this.#page })
+  }
+
   async createShotcut(args: Omit<po.shortcutArgs, 'page'>): Promise<void> {
     const startUrl = this.#page.url()
     await po.createShotcut({ ...args, page: this.#page })

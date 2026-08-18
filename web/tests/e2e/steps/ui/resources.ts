@@ -1,6 +1,10 @@
 import { expect } from '@playwright/test'
 import { objects } from '../../support'
-import { createResourceTypes, shortcutType } from '../../support/objects/app-files/resource/actions'
+import {
+  clickResourceModifier,
+  createResourceTypes,
+  shortcutType
+} from '../../support/objects/app-files/resource/actions'
 import { editor } from '../../support/objects/app-files/utils'
 import path from 'path'
 import { Public } from '../../support/objects/app-files/page'
@@ -108,6 +112,58 @@ export async function userSearchesGloballyWithFilter({
     filter: filter,
     pressEnter
   })
+}
+
+export async function userSelectsResource({
+  stepUser,
+  resource,
+  modifiers
+}: {
+  stepUser: string
+  resource: string
+  modifiers?: clickResourceModifier[]
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const resourceObject = new objects.applicationFiles.Resource({ page })
+  await resourceObject.clickResourceCheckbox({ resource, modifiers })
+}
+
+export async function userShouldSeeSelectedResources({
+  stepUser,
+  resources
+}: {
+  stepUser: string
+  resources: string[]
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const resourceObject = new objects.applicationFiles.Resource({ page })
+  await resourceObject.expectResourcesToBeSelected({ resources, selected: true })
+}
+
+export async function userShouldNotSeeSelectedResources({
+  stepUser,
+  resources
+}: {
+  stepUser: string
+  resources: string[]
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const resourceObject = new objects.applicationFiles.Resource({ page })
+  await resourceObject.expectResourcesToBeSelected({ resources, selected: false })
+}
+
+export async function userShouldNotSeeHighlightedText({
+  stepUser
+}: {
+  stepUser: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const resourceObject = new objects.applicationFiles.Resource({ page })
+  await resourceObject.expectNoTextToBeHighlighted()
 }
 
 export async function userSwitchesToTilesViewMode({
