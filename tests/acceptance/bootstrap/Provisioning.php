@@ -48,6 +48,7 @@ trait Provisioning {
 	private array $createdGroups = [];
 	private array $userTokens = [];
 	private array $createdKeycloakUsers = [];
+	private ?Ldap $idmLdap = null;
 
 	/**
 	 * @param array $user
@@ -364,8 +365,7 @@ trait Provisioning {
 			'baseDn' => $this->ldapBaseDN,
 			'username' => $this->ldapAdminUser,
 		];
-		$this->ldap = new Ldap($options);
-		$this->ldap->bind();
+		$this->ldap = $this->bindLdap($options);
 
 		$ldifFile = __DIR__ . $suiteParameters['ldapInitialUserFilePath'];
 		if (!$this->skipImportLdif) {
@@ -377,6 +377,78 @@ trait Provisioning {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Connects to the LDAP server bundled with oCIS (IDM) to allow direct
+	 * inspection of entries that oCIS services write, e.g. the objectClass
+	 * that the graph service sets on group entries. Connection parameters
+	 * match the IDM defaults used by the acceptance test environment.
+	 *
+	 * @return void
+	 */
+	private function connectToIdm(): void {
+		if ($this->idmLdap !== null) {
+			return;
+		}
+		\putenv('LDAPTLS_REQCERT=never');
+		$idmHost = '';
+		$hostSourceEnvs = ['TEST_SERVER_URL', 'OCIS_WRAPPER_URL'];
+		foreach ($hostSourceEnvs as $envName) {
+			$envValue = \getenv($envName);
+			if ($envValue !== false && $envValue !== '') {
+				$idmHost = \parse_url($envValue, PHP_URL_HOST) ?: $envValue;
+				break;
+			}
+		}
+		$options = [
+			'host' => $idmHost ?: '127.0.0.1',
+			'port' => 9235,
+			'useSsl' => true,
+			'baseDn' => 'o=libregraph-idm',
+			'bindRequiresDn' => true,
+			'username' => 'uid=admin,ou=users,o=libregraph-idm',
+			'password' => \getenv('IDM_ADMIN_PASSWORD') ?: 'admin',
+		];
+		$this->idmLdap = $this->bindLdap($options);
+	}
+
+	/**
+	 * Creates a bound Ldap connection from the given options.
+	 *
+	 * @param array $options
+	 *
+	 * @return Ldap
+	 */
+	private function bindLdap(array $options): Ldap {
+		$ldap = new Ldap($options);
+		$ldap->bind();
+		return $ldap;
+	}
+
+	/**
+	 * @Then /^the LDAP entry "([^"]*)" should (not|)\s?have the object class "([^"]*)"$/
+	 *
+	 * @param string $dn
+	 * @param string $shouldOrNot (not|)
+	 * @param string $objectClass
+	 *
+	 * @return void
+	 */
+	public function theLdapEntryShouldHaveObjectClass(string $dn, string $shouldOrNot, string $objectClass): void {
+		$this->connectToIdm();
+		$entry = $this->idmLdap->getEntry($dn);
+		Assert::assertNotNull($entry, "LDAP entry '$dn' does not exist");
+		$objectClasses = \array_map('strtolower', Laminas\Ldap\Attribute::getAttribute($entry, 'objectClass'));
+		$shouldHave = ($shouldOrNot !== "not");
+		$message = "Expected LDAP entry '$dn' to "
+			. ($shouldHave ? 'have' : 'not have')
+			. " the object class '$objectClass', but the entry has: "
+			. \implode(', ', $objectClasses);
+		Assert::assertTrue(
+			\in_array(\strtolower($objectClass), $objectClasses, true) === $shouldHave,
+			$message,
+		);
 	}
 
 	/**
