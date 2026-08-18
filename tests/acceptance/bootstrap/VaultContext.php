@@ -94,7 +94,7 @@ class VaultContext implements Context {
 	}
 
 	/**
-	 * @Then user :user should have acr value :acr
+	 * @Then user :user should have a JWT token with an ACR value :acr
 	 *
 	 * @param string $user
 	 * @param string $acr
@@ -102,7 +102,7 @@ class VaultContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userShouldHaveAcrValue(string $user, string $acr): void {
+	public function userShouldHaveAJwtTokenWithAnAcrValue(string $user, string $acr): void {
 		$accessToken = $this->featureContext->getOcisUserToken($user)['token']['accessToken'];
 
 		// Decode JWT token

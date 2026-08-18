@@ -61,7 +61,7 @@ Feature: vault
     And user "Alice" has logged in via web UI
     When user "Alice" uploads a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault using the WebDAV API
     Then the HTTP status code should be "201"
-    And user "Alice" should have acr value "testing"
+    And user "Alice" should have a JWT token with an ACR value "testing"
 
 
   Scenario: check capabilities endpoint for vault
