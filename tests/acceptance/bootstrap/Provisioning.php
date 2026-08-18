@@ -380,10 +380,10 @@ trait Provisioning {
 	}
 
 	/**
-	 * Connects to the LDAP server bundled with oCIS (idm) to allow direct
+	 * Connects to the LDAP server bundled with oCIS (IDM) to allow direct
 	 * inspection of entries that oCIS services write, e.g. the objectClass
 	 * that the graph service sets on group entries. Connection parameters
-	 * match the idm defaults used by the acceptance test environment.
+	 * match the IDM defaults used by the acceptance test environment.
 	 *
 	 * @return void
 	 */
@@ -430,20 +430,24 @@ trait Provisioning {
 	 * @Then /^the LDAP entry "([^"]*)" should (not|)\s?have the object class "([^"]*)"$/
 	 *
 	 * @param string $dn
-	 * @param string $not (not|)
+	 * @param string $shouldOrNot (not|)
 	 * @param string $objectClass
 	 *
 	 * @return void
 	 */
-	public function theLdapEntryShouldHaveObjectClass(string $dn, string $not, string $objectClass): void {
+	public function theLdapEntryShouldHaveObjectClass(string $dn, string $shouldOrNot, string $objectClass): void {
 		$this->connectToIdm();
 		$entry = $this->idmLdap->getEntry($dn);
 		Assert::assertNotNull($entry, "LDAP entry '$dn' does not exist");
 		$objectClasses = \array_map('strtolower', Laminas\Ldap\Attribute::getAttribute($entry, 'objectClass'));
-		$shouldHave = ($not !== "not");
+		$shouldHave = ($shouldOrNot !== "not");
+		$message = "Expected LDAP entry '$dn' to "
+			. ($shouldHave ? 'have' : 'not have')
+			. " the object class '$objectClass', but the entry has: "
+			. \implode(', ', $objectClasses);
 		Assert::assertTrue(
 			\in_array(\strtolower($objectClass), $objectClasses, true) === $shouldHave,
-			"Expected LDAP entry '$dn' to " . ($shouldHave ? 'have' : 'not have') . " the object class '$objectClass', but the entry has: " . \implode(', ', $objectClasses),
+			$message,
 		);
 	}
 
