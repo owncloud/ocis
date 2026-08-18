@@ -3940,15 +3940,15 @@ Feature: resources shared by user
       """
 
 
-  Scenario: space member sees link shares created by another member in sharedByMe
+  Scenario Outline: space member sees link shares created by another member in sharedByMe
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "TeamSpace" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:
-      | space           | TeamSpace |
-      | sharee          | Brian     |
-      | shareType       | user      |
-      | permissionsRole | Manager   |
+      | space           | TeamSpace     |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <space-role>  |
     And user "Alice" has uploaded a file inside space "TeamSpace" with content "hello" to "shared.txt"
     And user "Alice" has created the following resource link share:
       | resource        | shared.txt |
@@ -3967,11 +3967,15 @@ Feature: resources shared by user
         }
       }
       """
+    Examples:
+      | space-role   |
+      | Manager      |
+      | Space Editor |
+      | Space Viewer |
 
 
   Scenario: non-member does not see link shares of a space in sharedByMe
     Given using spaces DAV path
-    And user "Carol" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "TeamSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "TeamSpace" with content "hello" to "shared.txt"
@@ -3980,7 +3984,7 @@ Feature: resources shared by user
       | space           | TeamSpace  |
       | permissionsRole | View       |
       | password        | %public%   |
-    When user "Carol" lists the shares shared by her using the Graph API
+    When user "Brian" lists the shares shared by him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should not contain resource "shared.txt" with the following data:
       """
@@ -3996,7 +4000,6 @@ Feature: resources shared by user
   @env-config
   Scenario: non-member with ListGrants role on a resource sees link shares created by another user on that resource in sharedByMe
     Given using spaces DAV path
-    And user "Carol" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And the administrator has enabled the following share permissions roles:
       | permissions-role       |
@@ -4011,10 +4014,10 @@ Feature: resources shared by user
     And user "Alice" has sent the following resource share invitation:
       | resource        | shared.txt             |
       | space           | TeamSpace              |
-      | sharee          | Carol                  |
+      | sharee          | Brian                  |
       | shareType       | user                   |
       | permissionsRole | Viewer With ListGrants |
-    When user "Carol" lists the shares shared by her using the Graph API
+    When user "Brian" lists the shares shared by him using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain resource "shared.txt" with the following data:
       """
