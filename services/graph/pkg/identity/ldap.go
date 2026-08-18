@@ -70,14 +70,14 @@ type LDAP struct {
 	disableUserMechanism    DisableUserMechanismType
 	localUserDisableGroupDN string
 
-	groupBaseDN          string
-	groupCreateBaseDN    string
-	groupFilter          string
-	groupObjectClass                string
-	groupAdditionalObjectClasses    []string
-	groupIDisOctetString            bool
-	groupScope           int
-	groupAttributeMap    groupAttributeMap
+	groupBaseDN                  string
+	groupCreateBaseDN            string
+	groupFilter                  string
+	groupObjectClass             string
+	groupAdditionalObjectClasses []string
+	groupIDisOctetString         bool
+	groupScope                   int
+	groupAttributeMap            groupAttributeMap
 
 	educationConfig educationConfig
 
@@ -1346,6 +1346,20 @@ func (i *LDAP) removeEntryByDNAndAttributeFromEntry(entry *ldap.Entry, dn string
 
 // expandLDAPAttributeEntries reads an attribute from a ldap entry and expands to users
 func (i *LDAP) expandLDAPAttributeEntries(ctx context.Context, e *ldap.Entry, attribute, searchTerm string) ([]*ldap.Entry, error) {
+	var result []*ldap.Entry
+	if strings.ToLower(attribute) == "memberuid" {
+		result = i.expandLDAPAttributeEntriesByUsername(ctx, e, attribute, searchTerm)
+	} else {
+		result = i.expandLDAPAttributeEntriesByDN(ctx, e, attribute, searchTerm)
+	}
+
+	return result, nil
+}
+
+// expandLDAPAttributeEntriesByDN will assume the attribute contains DN-like
+// values, and it will expand them appropriately.
+// Attributes such as "member" and "uniqueMember" are candidates.
+func (i *LDAP) expandLDAPAttributeEntriesByDN(ctx context.Context, e *ldap.Entry, attribute, searchTerm string) []*ldap.Entry {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("ExpandLDAPAttributeEntries")
 	result := []*ldap.Entry{}
@@ -1358,13 +1372,55 @@ func (i *LDAP) expandLDAPAttributeEntries(ctx context.Context, e *ldap.Entry, at
 		ue, err := i.getUserByDN(entryDN, searchTerm)
 		if err != nil {
 			// Ignore errors when reading a specific entry fails, just log them and continue
-			logger.Debug().Err(err).Str("entry", entryDN).Msg("error reading attribute member entry")
+			logger.Debug().Err(err).Str("attr", attribute).Str("entry", entryDN).Msg("error reading attribute member entry")
 			continue
 		}
 		result = append(result, ue)
 	}
 
-	return result, nil
+	return result
+}
+
+// expandLDAPAttributeEntriesByDN will assume the attribute contains usernames
+// values, and it will expand them appropriately.
+// Attributes such as "memberUid" are candidates.
+func (i *LDAP) expandLDAPAttributeEntriesByUsername(ctx context.Context, e *ldap.Entry, attribute, searchTerm string) []*ldap.Entry {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("ExpandLDAPAttributeEntries")
+	result := []*ldap.Entry{}
+
+	baseFilter := fmt.Sprintf("(objectClass=%s)", i.userObjectClass)
+
+	searchFilter := ""
+	if searchTerm != "" {
+		searchTerm = ldap.EscapeFilter(searchTerm)
+		searchFilter = fmt.Sprintf(
+			"(|(%s=*%s*)(%s=*%s*)(%s=*%s*))",
+			i.userAttributeMap.userName, searchTerm,
+			i.userAttributeMap.mail, searchTerm,
+			i.userAttributeMap.displayName, searchTerm,
+		)
+	}
+
+	for _, entryUid := range e.GetEqualFoldAttributeValues(attribute) {
+		if entryUid == "" {
+			continue
+		}
+
+		entryFilter := fmt.Sprintf("(%s=%s)", i.userAttributeMap.userName, ldap.EscapeFilter(entryUid))
+
+		finalFilter := fmt.Sprintf("(&%s%s%s)", baseFilter, searchFilter, entryFilter)
+		logger.Debug().Str("entryUid", entryUid).Msg("lookup")
+		ue, err := i.getLDAPUserByFilter(finalFilter, i.userFilter)
+		if err != nil {
+			// Ignore errors when reading a specific entry fails, just log them and continue
+			logger.Debug().Err(err).Str("attr", attribute).Str("entry", entryUid).Msg("error reading attribute member entry")
+			continue
+		}
+		result = append(result, ue)
+	}
+
+	return result
 }
 
 func replaceDN(fullDN *ldap.DN, newDN string) (string, error) {
