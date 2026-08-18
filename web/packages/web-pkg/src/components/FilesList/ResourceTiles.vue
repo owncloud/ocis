@@ -64,7 +64,7 @@
               class="oc-flex-inline oc-p-s"
               :disabled="!isSpaceResource(resource) && isResourceDisabled(resource)"
               :model-value="isResourceSelected(resource)"
-              @click.stop.prevent="toggleTile([resource, $event])"
+              @click.stop="toggleTile([resource, $event])"
             />
           </template>
           <template #imageField>
