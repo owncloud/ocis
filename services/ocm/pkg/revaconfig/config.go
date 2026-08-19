@@ -3,6 +3,7 @@ package revaconfig
 import (
 	"math"
 	"net/url"
+	"path/filepath"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/ocm/pkg/config"
@@ -93,7 +94,7 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 				"dataprovider": map[string]interface{}{
 					"prefix":           "data",
 					"driver":           "ocmreceived",
-					"upload_directory": cfg.OCMStorageProvider.StorageRoot,
+					"upload_directory": filepath.Join(cfg.OCMStorageProvider.StorageRoot, "uploads"),
 					"drivers": map[string]interface{}{
 						"ocmreceived": map[string]interface{}{
 							"insecure":               cfg.OCMStorageProvider.Insecure,
@@ -183,7 +184,7 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 				},
 				"storageprovider": map[string]interface{}{
 					"driver":           "ocmreceived",
-					"upload_directory": cfg.OCMStorageProvider.StorageRoot,
+					"upload_directory": filepath.Join(cfg.OCMStorageProvider.StorageRoot, "uploads"),
 					"drivers": map[string]interface{}{
 						"ocmreceived": map[string]interface{}{
 							"insecure":     cfg.OCMStorageProvider.Insecure,
