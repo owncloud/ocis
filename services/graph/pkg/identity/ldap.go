@@ -15,6 +15,7 @@ import (
 	backoff "github.com/cenkalti/backoff/v5"
 	"github.com/go-ldap/ldap/v3"
 	"github.com/google/uuid"
+	"github.com/jellydator/ttlcache/v3"
 	"github.com/libregraph/idm/pkg/ldapdn"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
@@ -69,14 +70,14 @@ type LDAP struct {
 	disableUserMechanism    DisableUserMechanismType
 	localUserDisableGroupDN string
 
-	groupBaseDN          string
-	groupCreateBaseDN    string
-	groupFilter          string
-	groupObjectClass                string
-	groupAdditionalObjectClasses    []string
-	groupIDisOctetString            bool
-	groupScope           int
-	groupAttributeMap    groupAttributeMap
+	groupBaseDN                  string
+	groupCreateBaseDN            string
+	groupFilter                  string
+	groupObjectClass             string
+	groupAdditionalObjectClasses []string
+	groupIDisOctetString         bool
+	groupScope                   int
+	groupAttributeMap            groupAttributeMap
 
 	educationConfig educationConfig
 
@@ -94,7 +95,18 @@ type LDAP struct {
 	instanceMapperIDAttribute      string
 	crossInstanceReferenceTemplate *template.Template
 	instanceURLTemplate            *template.Template
+	instanceCache                  *ttlcache.Cache[string, string]
 }
+
+// instanceCacheKeySep separates the fields of an instanceCache key. A NUL byte can't
+// appear in an LDAP attribute name or search value, so it can't cause key collisions
+// between different (searchAttribute, resultAttribute, searchValue) triples.
+const instanceCacheKeySep = "\x00"
+
+// instanceCacheNotFound is stored in instanceCache to negatively cache a lookup
+// that resolved to ErrNotFound, so repeatedly requested stale instance references
+// don't cost a fresh LDAP round-trip on every call.
+const instanceCacheNotFound = instanceCacheKeySep + "not-found"
 
 type userAttributeMap struct {
 	displayName         string
@@ -205,6 +217,12 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		}
 	}
 
+	instanceCache := ttlcache.New(
+		ttlcache.WithTTL[string, string](time.Duration(config.InstanceMapperCacheTTL)),
+		ttlcache.WithDisableTouchOnHit[string, string](),
+	)
+	go instanceCache.Start()
+
 	return &LDAP{
 		useServerUUID:                  config.UseServerUUID,
 		usePwModifyExOp:                config.UsePasswordModExOp,
@@ -241,6 +259,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		instanceMapperIDAttribute:      config.InstanceMapperIDAttribute,
 		crossInstanceReferenceTemplate: crossInstanceReferenceTemplate,
 		instanceURLTemplate:            instanceURLTemplate,
+		instanceCache:                  instanceCache,
 	}, nil
 }
 
@@ -1604,6 +1623,14 @@ func (i *LDAP) getInstance(searchValue, searchAttribute, resultAttribute string)
 		return searchValue, nil
 	}
 
+	cacheKey := searchAttribute + instanceCacheKeySep + resultAttribute + instanceCacheKeySep + searchValue
+	if item := i.instanceCache.Get(cacheKey); item != nil {
+		if item.Value() == instanceCacheNotFound {
+			return "", ErrNotFound
+		}
+		return item.Value(), nil
+	}
+
 	searchRequest := ldap.NewSearchRequest(
 		i.instanceMapperBaseDN,
 		ldap.ScopeWholeSubtree,
@@ -1615,23 +1642,30 @@ func (i *LDAP) getInstance(searchValue, searchAttribute, resultAttribute string)
 
 	res, err := i.conn.Search(searchRequest)
 	if err != nil {
+		// Not cached: this is a transient LDAP failure, not a definitive answer.
 		i.logger.Error().Err(err).Str("backend", "ldap").Str("dn", i.instanceMapperBaseDN).Str("searchValue", searchValue).Str("searchAttribute", searchAttribute).Str("resultAttribute", resultAttribute).Msg("Search instance failed")
 		return "", errorcode.New(errorcode.ItemNotFound, "instanceid search failed")
 	}
 	if len(res.Entries) == 0 {
 		// expected behaviour - we log debug in case something is fishy. This log can be removed when the feature proves stable
 		i.logger.Debug().Str("backend", "ldap").Str("dn", i.instanceMapperBaseDN).Str("searchValue", searchValue).Interface("result", res).Msg("Search instance empty")
+		i.instanceCache.Set(cacheKey, instanceCacheNotFound, ttlcache.DefaultTTL)
 		return "", ErrNotFound
 	}
 	if len(res.Entries) > 1 {
+		// Not cached: ambiguous data, don't freeze it in.
 		i.logger.Error().Str("backend", "ldap").Str("dn", i.instanceMapperBaseDN).Str("searchValue", searchValue).Interface("result", res).Msg("Search instance returned multiple responses.")
 		return "", errorcode.New(errorcode.ItemNotFound, "instanceid search returned multiple responses")
 	}
 	if len(res.Entries[0].Attributes) == 0 || len(res.Entries[0].Attributes[0].Values) == 0 {
+		// Not cached: malformed data, don't freeze it in.
 		i.logger.Error().Str("backend", "ldap").Str("dn", i.instanceMapperBaseDN).Str("searchValue", searchValue).Interface("result", res).Msg("Search instance returned malformed response")
 		return "", errorcode.New(errorcode.ItemNotFound, "instanceid search response malformed")
 	}
-	return res.Entries[0].Attributes[0].Values[0], nil
+
+	value := res.Entries[0].Attributes[0].Values[0]
+	i.instanceCache.Set(cacheKey, value, ttlcache.DefaultTTL)
+	return value, nil
 }
 
 func (i *LDAP) getInstanceID(instancename string) (string, error) {
