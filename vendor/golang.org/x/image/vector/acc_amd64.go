@@ -6,9 +6,9 @@
 
 package vector
 
-import "golang.org/x/sys/cpu"
+func haveSSE4_1() bool
 
-var haveAccumulateSIMD = cpu.X86.HasSSE41
+var haveAccumulateSIMD = haveSSE4_1()
 
 //go:noescape
 func fixedAccumulateOpOverSIMD(dst []uint8, src []uint32)

@@ -12,19 +12,17 @@ import (
 // LogFunction For big messages, it can be more efficient to pass a function
 // and only call it if the log level is actually enables rather than
 // generating the log message and then checking if the level is enabled
-type LogFunction func() []any
+type LogFunction func() []interface{}
 
 type Logger struct {
 	// The logs are `io.Copy`'d to this in a mutex. It's common to set this to a
 	// file, or leave it default which is `os.Stderr`. You can also set this to
 	// something more adventurous, such as logging to Kafka.
 	Out io.Writer
-
 	// Hooks for the logger instance. These allow firing events based on logging
 	// levels and log entries. For example, to send errors to an error tracking
 	// service, log to StatsD or dump the core on fatal errors.
 	Hooks LevelHooks
-
 	// All log entries pass through the formatter before logged to Out. The
 	// included formatters are `TextFormatter` and `JSONFormatter` for which
 	// TextFormatter is the default. In development (when a TTY is attached) it
@@ -40,44 +38,37 @@ type Logger struct {
 	// to) `logrus.Info`, which allows Info(), Warn(), Error() and Fatal() to be
 	// logged.
 	Level Level
-
 	// Used to sync writing to the log. Locking is enabled by Default
-	mu mutexWrap
-
+	mu MutexWrap
 	// Reusable empty entry
 	entryPool sync.Pool
-
 	// Function to exit the application, defaults to `os.Exit()`
-	ExitFunc func(int)
-
+	ExitFunc exitFunc
 	// The buffer pool used to format the log. If it is nil, the default global
 	// buffer pool will be used.
 	BufferPool BufferPool
 }
 
-// MutexWrap is the mutex implementation used by [Logger].
-//
-// Deprecated: MutexWrap is an implementation detail of Logger and should not be used directly.
-type MutexWrap = mutexWrap
+type exitFunc func(int)
 
-type mutexWrap struct {
+type MutexWrap struct {
 	lock     sync.Mutex
 	disabled bool
 }
 
-func (mw *mutexWrap) Lock() {
+func (mw *MutexWrap) Lock() {
 	if !mw.disabled {
 		mw.lock.Lock()
 	}
 }
 
-func (mw *mutexWrap) Unlock() {
+func (mw *MutexWrap) Unlock() {
 	if !mw.disabled {
 		mw.lock.Unlock()
 	}
 }
 
-func (mw *mutexWrap) Disable() {
+func (mw *MutexWrap) Disable() {
 	mw.disabled = true
 }
 
@@ -113,7 +104,7 @@ func (logger *Logger) newEntry() *Entry {
 }
 
 func (logger *Logger) releaseEntry(entry *Entry) {
-	entry.Data = map[string]any{}
+	entry.Data = map[string]interface{}{}
 	logger.entryPool.Put(entry)
 }
 
@@ -121,7 +112,7 @@ func (logger *Logger) releaseEntry(entry *Entry) {
 // Debug, Print, Info, Warn, Error, Fatal or Panic must be then applied to
 // this new returned entry.
 // If you want multiple fields, use `WithFields`.
-func (logger *Logger) WithField(key string, value any) *Entry {
+func (logger *Logger) WithField(key string, value interface{}) *Entry {
 	entry := logger.newEntry()
 	defer logger.releaseEntry(entry)
 	return entry.WithField(key, value)
@@ -157,12 +148,7 @@ func (logger *Logger) WithTime(t time.Time) *Entry {
 	return entry.WithTime(t)
 }
 
-// Logf logs a formatted message at the specified level.
-//
-// Using Logf with [PanicLevel] or [FatalLevel] intentionally does not
-// trigger a panic or exit. Logf treats the level as logging severity only;
-// use [Logger.Panicf] or [Logger.Fatalf] when those side effects are desired.
-func (logger *Logger) Logf(level Level, format string, args ...any) {
+func (logger *Logger) Logf(level Level, format string, args ...interface{}) {
 	if logger.IsLevelEnabled(level) {
 		entry := logger.newEntry()
 		entry.Logf(level, format, args...)
@@ -170,55 +156,49 @@ func (logger *Logger) Logf(level Level, format string, args ...any) {
 	}
 }
 
-func (logger *Logger) Tracef(format string, args ...any) {
+func (logger *Logger) Tracef(format string, args ...interface{}) {
 	logger.Logf(TraceLevel, format, args...)
 }
 
-func (logger *Logger) Debugf(format string, args ...any) {
+func (logger *Logger) Debugf(format string, args ...interface{}) {
 	logger.Logf(DebugLevel, format, args...)
 }
 
-func (logger *Logger) Infof(format string, args ...any) {
+func (logger *Logger) Infof(format string, args ...interface{}) {
 	logger.Logf(InfoLevel, format, args...)
 }
 
-func (logger *Logger) Printf(format string, args ...any) {
+func (logger *Logger) Printf(format string, args ...interface{}) {
 	entry := logger.newEntry()
 	entry.Printf(format, args...)
 	logger.releaseEntry(entry)
 }
 
-func (logger *Logger) Warnf(format string, args ...any) {
+func (logger *Logger) Warnf(format string, args ...interface{}) {
 	logger.Logf(WarnLevel, format, args...)
 }
 
-func (logger *Logger) Warningf(format string, args ...any) {
+func (logger *Logger) Warningf(format string, args ...interface{}) {
 	logger.Warnf(format, args...)
 }
 
-func (logger *Logger) Errorf(format string, args ...any) {
+func (logger *Logger) Errorf(format string, args ...interface{}) {
 	logger.Logf(ErrorLevel, format, args...)
 }
 
-func (logger *Logger) Fatalf(format string, args ...any) {
+func (logger *Logger) Fatalf(format string, args ...interface{}) {
 	logger.Logf(FatalLevel, format, args...)
 	logger.Exit(1)
 }
 
-func (logger *Logger) Panicf(format string, args ...any) {
-	if logger.IsLevelEnabled(PanicLevel) {
-		entry := logger.newEntry()
-		defer logger.releaseEntry(entry)
-		entry.Panicf(format, args...)
-	}
+func (logger *Logger) Panicf(format string, args ...interface{}) {
+	logger.Logf(PanicLevel, format, args...)
 }
 
-// Log logs a message at the specified level.
-//
-// Using Log with [PanicLevel] or [FatalLevel] intentionally does not
-// trigger a panic or exit. Log treats the level as logging severity only;
-// use [Logger.Panic] or [Logger.Fatal] when those side effects are desired.
-func (logger *Logger) Log(level Level, args ...any) {
+// Log will log a message at the level given as parameter.
+// Warning: using Log at Panic or Fatal level will not respectively Panic nor Exit.
+// For this behaviour Logger.Panic or Logger.Fatal should be used instead.
+func (logger *Logger) Log(level Level, args ...interface{}) {
 	if logger.IsLevelEnabled(level) {
 		entry := logger.newEntry()
 		entry.Log(level, args...)
@@ -226,11 +206,6 @@ func (logger *Logger) Log(level Level, args ...any) {
 	}
 }
 
-// LogFn logs a message returned by fn at the specified level.
-//
-// Using LogFn with [PanicLevel] or [FatalLevel] intentionally does not
-// trigger a panic or exit. LogFn treats the level as logging severity only;
-// use [Logger.PanicFn] or [Logger.FatalFn] when those side effects are desired.
 func (logger *Logger) LogFn(level Level, fn LogFunction) {
 	if logger.IsLevelEnabled(level) {
 		entry := logger.newEntry()
@@ -239,47 +214,43 @@ func (logger *Logger) LogFn(level Level, fn LogFunction) {
 	}
 }
 
-func (logger *Logger) Trace(args ...any) {
+func (logger *Logger) Trace(args ...interface{}) {
 	logger.Log(TraceLevel, args...)
 }
 
-func (logger *Logger) Debug(args ...any) {
+func (logger *Logger) Debug(args ...interface{}) {
 	logger.Log(DebugLevel, args...)
 }
 
-func (logger *Logger) Info(args ...any) {
+func (logger *Logger) Info(args ...interface{}) {
 	logger.Log(InfoLevel, args...)
 }
 
-func (logger *Logger) Print(args ...any) {
+func (logger *Logger) Print(args ...interface{}) {
 	entry := logger.newEntry()
 	entry.Print(args...)
 	logger.releaseEntry(entry)
 }
 
-func (logger *Logger) Warn(args ...any) {
+func (logger *Logger) Warn(args ...interface{}) {
 	logger.Log(WarnLevel, args...)
 }
 
-func (logger *Logger) Warning(args ...any) {
+func (logger *Logger) Warning(args ...interface{}) {
 	logger.Warn(args...)
 }
 
-func (logger *Logger) Error(args ...any) {
+func (logger *Logger) Error(args ...interface{}) {
 	logger.Log(ErrorLevel, args...)
 }
 
-func (logger *Logger) Fatal(args ...any) {
+func (logger *Logger) Fatal(args ...interface{}) {
 	logger.Log(FatalLevel, args...)
 	logger.Exit(1)
 }
 
-func (logger *Logger) Panic(args ...any) {
-	if logger.IsLevelEnabled(PanicLevel) {
-		entry := logger.newEntry()
-		defer logger.releaseEntry(entry)
-		entry.Panic(args...)
-	}
+func (logger *Logger) Panic(args ...interface{}) {
+	logger.Log(PanicLevel, args...)
 }
 
 func (logger *Logger) TraceFn(fn LogFunction) {
@@ -318,19 +289,10 @@ func (logger *Logger) FatalFn(fn LogFunction) {
 }
 
 func (logger *Logger) PanicFn(fn LogFunction) {
-	if logger.IsLevelEnabled(PanicLevel) {
-		entry := logger.newEntry()
-		defer logger.releaseEntry(entry)
-		entry.Panic(fn()...)
-	}
+	logger.LogFn(PanicLevel, fn)
 }
 
-// Logln logs a message at the specified level with Println-style spacing.
-//
-// Using Logln with [PanicLevel] or [FatalLevel] intentionally does not
-// trigger a panic or exit. Logln treats the level as logging severity only;
-// use [Logger.Panicln] or [Logger.Fatalln] when those side effects are desired.
-func (logger *Logger) Logln(level Level, args ...any) {
+func (logger *Logger) Logln(level Level, args ...interface{}) {
 	if logger.IsLevelEnabled(level) {
 		entry := logger.newEntry()
 		entry.Logln(level, args...)
@@ -338,47 +300,43 @@ func (logger *Logger) Logln(level Level, args ...any) {
 	}
 }
 
-func (logger *Logger) Traceln(args ...any) {
+func (logger *Logger) Traceln(args ...interface{}) {
 	logger.Logln(TraceLevel, args...)
 }
 
-func (logger *Logger) Debugln(args ...any) {
+func (logger *Logger) Debugln(args ...interface{}) {
 	logger.Logln(DebugLevel, args...)
 }
 
-func (logger *Logger) Infoln(args ...any) {
+func (logger *Logger) Infoln(args ...interface{}) {
 	logger.Logln(InfoLevel, args...)
 }
 
-func (logger *Logger) Println(args ...any) {
+func (logger *Logger) Println(args ...interface{}) {
 	entry := logger.newEntry()
 	entry.Println(args...)
 	logger.releaseEntry(entry)
 }
 
-func (logger *Logger) Warnln(args ...any) {
+func (logger *Logger) Warnln(args ...interface{}) {
 	logger.Logln(WarnLevel, args...)
 }
 
-func (logger *Logger) Warningln(args ...any) {
+func (logger *Logger) Warningln(args ...interface{}) {
 	logger.Warnln(args...)
 }
 
-func (logger *Logger) Errorln(args ...any) {
+func (logger *Logger) Errorln(args ...interface{}) {
 	logger.Logln(ErrorLevel, args...)
 }
 
-func (logger *Logger) Fatalln(args ...any) {
+func (logger *Logger) Fatalln(args ...interface{}) {
 	logger.Logln(FatalLevel, args...)
 	logger.Exit(1)
 }
 
-func (logger *Logger) Panicln(args ...any) {
-	if logger.IsLevelEnabled(PanicLevel) {
-		entry := logger.newEntry()
-		defer logger.releaseEntry(entry)
-		entry.Panicln(args...)
-	}
+func (logger *Logger) Panicln(args ...interface{}) {
+	logger.Logln(PanicLevel, args...)
 }
 
 func (logger *Logger) Exit(code int) {
@@ -417,22 +375,7 @@ func (logger *Logger) AddHook(hook Hook) {
 	logger.Hooks.Add(hook)
 }
 
-// hooksForLevel returns a snapshot of the hooks registered for the given level.
-// The returned slice is a shallow copy and may be used without holding logger.mu.
-func (logger *Logger) hooksForLevel(level Level) []Hook {
-	logger.mu.Lock()
-	hooks := logger.Hooks[level]
-	if len(hooks) == 0 {
-		logger.mu.Unlock()
-		return nil
-	}
-	out := make([]Hook, len(hooks))
-	copy(out, hooks)
-	logger.mu.Unlock()
-	return out
-}
-
-// IsLevelEnabled checks if logging for the given level is enabled.
+// IsLevelEnabled checks if the log level of the logger is greater than the level param
 func (logger *Logger) IsLevelEnabled(level Level) bool {
 	return logger.level() >= level
 }
@@ -451,7 +394,6 @@ func (logger *Logger) SetOutput(output io.Writer) {
 	logger.Out = output
 }
 
-// SetReportCaller sets whether the caller stack frame must be logged.
 func (logger *Logger) SetReportCaller(reportCaller bool) {
 	logger.mu.Lock()
 	defer logger.mu.Unlock()
@@ -461,9 +403,9 @@ func (logger *Logger) SetReportCaller(reportCaller bool) {
 // ReplaceHooks replaces the logger hooks and returns the old ones
 func (logger *Logger) ReplaceHooks(hooks LevelHooks) LevelHooks {
 	logger.mu.Lock()
-	defer logger.mu.Unlock()
 	oldHooks := logger.Hooks
 	logger.Hooks = hooks
+	logger.mu.Unlock()
 	return oldHooks
 }
 

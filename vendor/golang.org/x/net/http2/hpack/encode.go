@@ -39,6 +39,7 @@ func NewEncoder(w io.Writer) *Encoder {
 		tableSizeUpdate: false,
 		w:               w,
 	}
+	e.dynTab.table.init()
 	e.dynTab.setMaxSize(initialHeaderTableSize)
 	return e
 }

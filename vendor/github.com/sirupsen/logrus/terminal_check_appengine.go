@@ -1,7 +1,11 @@
-//go:build appengine
+// +build appengine
 
 package logrus
 
-func checkIfTerminal(_ any) bool {
+import (
+	"io"
+)
+
+func checkIfTerminal(w io.Writer) bool {
 	return true
 }

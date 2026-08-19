@@ -5,4 +5,3 @@ profile.out
 .tmp/
 .git-dist/
 .vscode
-build/tools/

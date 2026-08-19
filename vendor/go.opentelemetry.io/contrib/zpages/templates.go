@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-package zpages
+package zpages // import "go.opentelemetry.io/contrib/zpages"
 
 import (
 	"fmt"
