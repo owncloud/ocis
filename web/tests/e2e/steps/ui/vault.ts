@@ -1,6 +1,5 @@
 import { expect } from '@playwright/test'
 import { getWorld } from '../../environment/world'
-import { generateOtpFromScreenshot } from '../../support/utils/mfa'
 import { config } from '../../config'
 import { VaultActions, VaultPage } from '../../support/objects/vault'
 
@@ -27,18 +26,6 @@ export async function userIsRedirectedToAuthenticatorPage({
   const vaultPage = new VaultPage({ page })
   await expect(page).toHaveURL((url) => url.href.startsWith(config.keycloakUrl))
   await expect(vaultPage.authenticatorHeading).toBeVisible()
-}
-
-/**
- * Generate an OTP from the Vault QR code and authenticate the user
- */
-export async function userAuthenticatesToVault({ stepUser }: { stepUser: string }): Promise<void> {
-  const world = getWorld()
-  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
-  const vaultActions = new VaultActions({ page })
-  const qrBuffer = await vaultActions.captureQrCodeScreenshot()
-  const otp = await generateOtpFromScreenshot(qrBuffer)
-  await vaultActions.userAuthenticatesWithOTP({ otp })
 }
 
 /**

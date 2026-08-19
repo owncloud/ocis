@@ -15,19 +15,6 @@ export class VaultActions {
     await po.userEntersVaultMode({ page: this.#page })
   }
 
-  async captureQrCodeScreenshot(): Promise<Buffer> {
-    return await po.captureQrCodeScreenshot({ page: this.#page })
-  }
-
-  async userAuthenticatesWithOTP(
-    args: Omit<po.userAuthenticatesWithOTPArgs, 'page'>
-  ): Promise<void> {
-    await po.userAuthenticatesWithOTP({
-      ...args,
-      page: this.#page
-    })
-  }
-
   async waitForVaultMode(): Promise<void> {
     await po.waitForVaultMode({ page: this.#page })
   }

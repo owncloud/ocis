@@ -322,11 +322,9 @@ def main() -> int:
             "OCIS_ADMIN_USER_ID": "",
             "GRAPH_ASSIGN_DEFAULT_USER_ROLE": "false",
             "GRAPH_USERNAME_MATCH": "none",
-            "IDM_CREATE_DEMO_USERS": "false",
-            "PROXY_CSP_CONFIG_FILE_LOCATION": str(
-                repo_root / "tests/config/ci/csp.yaml"
-            ),
+            "PROXY_CSP_CONFIG_FILE_LOCATION": str(repo_root / "tests/config/ci/csp.yaml"),
             "KEYCLOAK_DOMAIN": "localhost:8443",
+            "IDM_CREATE_DEMO_USERS": "false",
         })
 
     if mfa_needed:
@@ -526,7 +524,6 @@ def main() -> int:
             "REPORT_TRACING": "false",
             "NODE_EXTRA_CA_CERTS": str(ocis_cert),
             "BROWSER": "chromium",
-            "KEYCLOAK_HOST": "localhost:8443",
         }
 
         trusted_certs = [ocis_cert]

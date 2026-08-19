@@ -24,9 +24,7 @@ test.describe('Vault Mode', { tag: '@predefined-users' }, () => {
       stepUser: 'Alice'
     })
 
-    await ui.userAuthenticatesToVault({
-      stepUser: 'Alice'
-    })
+    await ui.userAuthenticatesWithOTP({ stepUser: 'Alice', deviceName: 'test' })
 
     await ui.userIsInVaultMode({
       stepUser: 'Alice'
