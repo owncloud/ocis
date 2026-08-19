@@ -3,9 +3,15 @@ name: k6 Load Test
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-  schedule:
-    - cron: '0 1 * * *'
   workflow_dispatch:
+    inputs:
+      ocis_ref:
+        description: 'oCIS commit or branch to build on the target (must exist in owncloud/ocis)'
+        default: master
+      quick:
+        description: 'Short smoke run instead of the full ramping suite'
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -17,39 +23,78 @@ concurrency:
 jobs:
   k6-load-test:
     name: k6-load-test
-    runs-on: ubuntu-latest
-    timeout-minutes: 120
-    container:
-      image: owncloudci/alpine:latest
+    # The runner lives on the k6 driver itself, so there is no checkout, no
+    # container and no ssh into the driver — only the target is remote.
+    runs-on: [self-hosted, loadtest]
+    timeout-minutes: 360
     if: >-
-      github.event_name == 'schedule' ||
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'pull_request' &&
        contains(github.event.pull_request.title || '', 'k6-test'))
     env:
-      SSH_OCIS_REMOTE: ${{ secrets.SSH_OCIS_REMOTE }}
-      SSH_OCIS_USERNAME: ${{ secrets.SSH_OCIS_USERNAME }}
-      SSH_OCIS_PASSWORD: ${{ secrets.SSH_OCIS_PASSWORD }}
-      TEST_SERVER_URL: ${{ secrets.TEST_SERVER_URL }}
-      SSH_K6_REMOTE: ${{ secrets.SSH_K6_REMOTE }}
-      SSH_K6_USERNAME: ${{ secrets.SSH_K6_USERNAME }}
-      SSH_K6_PASSWORD: ${{ secrets.SSH_K6_PASSWORD }}
-      OCIS_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      OCIS_HOST: ${{ vars.LOADTEST_OCIS_HOST || 'loadtest-ocis.svc.owncloud.host' }}
+      OCIS_COMMIT_ID: ${{ inputs.ocis_ref || github.event.pull_request.head.sha || github.sha }}
+      SSH_OPTS: -o BatchMode=yes -o ServerAliveInterval=60 -o ServerAliveCountMax=10
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Show what will run
+        run: |
+          echo "driver : $(hostname -f)"
+          echo "target : $OCIS_HOST"
+          echo "oCIS   : $OCIS_COMMIT_ID"
+          /usr/local/bin/k6 version
 
-      - name: Install SSH dependencies
-        run: apk add --no-cache openssh-client sshpass
+      - name: Build and start oCIS on the target
+        id: start
+        run: |
+          ssh $SSH_OPTS "loadtest@$OCIS_HOST" \
+            "OCIS_COMMIT_ID='$OCIS_COMMIT_ID' /usr/local/bin/ocis.sh start"
 
-      - name: Run k6 load tests
+      - name: Show the oCIS build log
+        if: failure() && steps.start.outcome == 'failure'
+        run: ssh $SSH_OPTS "loadtest@$OCIS_HOST" 'tail -n 200 /srv/loadtest/ocis-build.log' || true
+
+      # ocis.sh proves readiness from the target's own shell. This proves it from
+      # the driver, which is a different question: firewalld, and whether the
+      # server outlived the ssh session that started it.
+      - name: Check that the target answers from the driver
+        run: |
+          if curl -sk -o /dev/null --max-time 10 \
+              "https://$OCIS_HOST:9200/.well-known/openid-configuration"; then
+            echo "oCIS answers at https://$OCIS_HOST:9200"
+            exit 0
+          fi
+          echo "::error::oCIS is not answering on $OCIS_HOST:9200 from the driver"
+          ssh $SSH_OPTS "loadtest@$OCIS_HOST" \
+            'pgrep -af "bin/ocis server" || echo "no oCIS process on the target"'
+          exit 1
+
+      # No !cancelled() here on purpose: k6 against a target that failed to start
+      # just buries the real error under a TypeScript stack trace.
+      - name: Run the k6 tests
+        run: |
+          if [ "${{ inputs.quick }}" = "true" ]; then
+            export SEED_USERS_TOTAL=10
+            for id in 020 040 050 070 080 090 100 110; do
+              export TEST_KOKO_PLATFORM_${id}_RAMPING_STAGES_VUS=2
+              export TEST_KOKO_PLATFORM_${id}_RAMPING_STAGES_UP_DURATION=10s
+              export TEST_KOKO_PLATFORM_${id}_RAMPING_STAGES_PEAK_DURATION=30s
+              export TEST_KOKO_PLATFORM_${id}_RAMPING_STAGES_DOWN_DURATION=10s
+              export TEST_KOKO_PLATFORM_${id}_RAMPING_SLEEP_AFTER_ITERATION=1s
+            done
+          fi
+          /usr/local/bin/k6-tests.sh
+
+      - name: Retrieve the oCIS log
         if: ${{ !cancelled() }}
-        run: sh tests/config/drone/run_k6_tests.sh
+        run: ssh $SSH_OPTS "loadtest@$OCIS_HOST" '/usr/local/bin/ocis.sh log' || true
 
-      - name: Retrieve OCIS logs
-        if: ${{ !cancelled() }}
-        run: sh tests/config/drone/run_k6_tests.sh --ocis-log
+      # always(), not the old fire-and-forget tail call: a failing k6 run used to
+      # leave oCIS holding port 9200, and the next run then failed to start.
+      - name: Stop oCIS on the target
+        if: always()
+        run: ssh $SSH_OPTS "loadtest@$OCIS_HOST" '/usr/local/bin/ocis.sh stop'
 
       - name: Show Grafana dashboard link
         if: ${{ !cancelled() }}
         run: |
-          echo "Grafana Dashboard: https://grafana.k6.infra.owncloud.works"
+          echo "Grafana: http://$(hostname -f):3000 (office/VPN only)"
