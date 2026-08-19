@@ -8,6 +8,7 @@ jobs:
   detect-changes:
     name: detect-changes
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       docs-only: ${{ steps.check.outputs.docs-only }}
     steps:
@@ -52,6 +53,7 @@ jobs:
     needs: [detect-changes]
     if: needs.detect-changes.outputs.docs-only != 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
@@ -171,6 +173,7 @@ jobs:
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
@@ -284,6 +287,7 @@ jobs:
     needs: [build-and-test]
     name: ${{ matrix.suite }}
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
@@ -319,6 +323,7 @@ jobs:
     needs: [build-and-test]
     name: ldapPool-${{ matrix.suite }}
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
@@ -354,6 +359,7 @@ jobs:
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
@@ -437,6 +443,7 @@ jobs:
     name: e2e-${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
@@ -638,6 +645,7 @@ jobs:
     name: litmus
     needs: [build-and-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
@@ -662,6 +670,7 @@ jobs:
     name: cs3api
     needs: [build-and-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
@@ -686,6 +695,7 @@ jobs:
     name: wopi-builtin
     needs: [build-and-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
@@ -710,6 +720,7 @@ jobs:
     name: wopi-cs3
     needs: [build-and-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
@@ -734,6 +745,7 @@ jobs:
     name: external-ldap-smoke
     needs: [build-and-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
@@ -766,6 +778,7 @@ jobs:
     name: external-ldap-distributed-smoke
     needs: [build-and-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
@@ -795,6 +808,7 @@ jobs:
   all-acceptance-tests:
     needs: [detect-changes, local-api-tests, cli-tests, ldap-pool-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests, external-ldap-tests, external-ldap-distributed-tests]
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     if: always()
     steps:
       - name: Check all jobs passed
