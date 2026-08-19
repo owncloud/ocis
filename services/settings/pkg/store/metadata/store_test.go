@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"strings"
+	"sync"
 	"testing"
 
 	. "github.com/onsi/gomega"
+	olog "github.com/owncloud/ocis/v2/ocis-pkg/log"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config/defaults"
 	rdefaults "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
@@ -107,6 +109,16 @@ func (*MockedMetadataClient) Init(_ context.Context, _ string) error {
 	return nil
 }
 
+// failingInitMetadataClient always fails on Init to simulate a metadata space
+// owner/system-user mismatch.
+type failingInitMetadataClient struct {
+	MockedMetadataClient
+}
+
+func (*failingInitMetadataClient) Init(_ context.Context, id string) error {
+	return errtypes.AlreadyExists("user X does not have access to metadata space " + id + ", but it exists")
+}
+
 // IDExists is a helper to check if an id exists
 func (m *MockedMetadataClient) IDExists(id string) bool {
 	_, ok := m.data[id]
@@ -116,6 +128,78 @@ func (m *MockedMetadataClient) IDExists(id string) bool {
 // IDHasContent returns true if the value stored under id has the given content (converted to string)
 func (m *MockedMetadataClient) IDHasContent(id string, content []byte) bool {
 	return string(m.data[id]) == string(content)
+}
+
+// TestInitFailurePropagates verifies that when the metadata client cannot be
+// initialized (e.g. the settings metadata space is owned by a different user
+// than the configured system user), the store methods return the underlying
+// init error instead of panicking with a nil pointer dereference.
+func TestInitFailurePropagates(t *testing.T) {
+	RegisterTestingT(t)
+	s := &Store{
+		Logger: olog.NewLogger(),
+		cfg:    defaults.DefaultConfig(),
+		l:      &sync.Mutex{},
+		newMDC: func() MetadataClient { return &failingInitMetadataClient{} },
+	}
+
+	// A public store call must not panic; it must return the init error.
+	_, err := s.ListRoleAssignments(accountUUID1)
+	Expect(err).To(HaveOccurred())
+	Expect(err.Error()).To(ContainSubstring("does not have access to metadata space"))
+
+	// mdc must remain nil so a later call retries initialization.
+	Expect(s.mdc).To(BeNil())
+}
+
+// TestInitDefaultsMetadataClientFactory verifies that a Store built via a
+// struct literal (without newMDC set) does not panic when the metadata client
+// is constructed, but falls back to the default factory.
+func TestInitDefaultsMetadataClientFactory(t *testing.T) {
+	RegisterTestingT(t)
+	s := &Store{
+		Logger: olog.NewLogger(),
+		cfg:    defaults.DefaultConfig(),
+		l:      &sync.Mutex{},
+	}
+
+	var mdc MetadataClient
+	Expect(func() { mdc = s.metadataClient() }).ToNot(Panic())
+	Expect(mdc).ToNot(BeNil())
+}
+
+// newFailingInitStore builds a store whose metadata client always fails to
+// initialize.
+func newFailingInitStore() *Store {
+	return &Store{
+		Logger: olog.NewLogger(),
+		cfg:    defaults.DefaultConfig(),
+		l:      &sync.Mutex{},
+		newMDC: func() MetadataClient { return &failingInitMetadataClient{} },
+	}
+}
+
+// TestPermissionsInitFailurePropagates verifies that the permission lookups
+// surface the metadata client init error instead of silently reporting "no
+// permissions found".
+func TestPermissionsInitFailurePropagates(t *testing.T) {
+	RegisterTestingT(t)
+	roleIDs := []string{"f36db5e6-a03c-40df-8413-711c67e40b47"}
+
+	s := newFailingInitStore()
+	_, err := s.ListPermissionsByResource(&settingsmsg.Resource{Type: settingsmsg.Resource_TYPE_BUNDLE}, roleIDs)
+	Expect(err).To(HaveOccurred())
+	Expect(err.Error()).To(ContainSubstring("does not have access to metadata space"))
+
+	s = newFailingInitStore()
+	_, err = s.ReadPermissionByID("readID", roleIDs)
+	Expect(err).To(HaveOccurred())
+	Expect(err.Error()).To(ContainSubstring("does not have access to metadata space"))
+
+	s = newFailingInitStore()
+	_, err = s.ReadPermissionByName("read", roleIDs)
+	Expect(err).To(HaveOccurred())
+	Expect(err.Error()).To(ContainSubstring("does not have access to metadata space"))
 }
 
 // TestAdminUserIDInit test the happy path during initialization

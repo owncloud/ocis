@@ -27,7 +27,9 @@ func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRole
 			}, nil
 		}
 	}
-	s.Init()
+	if err := s.Init(); err != nil {
+		return nil, err
+	}
 	ctx := context.TODO()
 	assIDs, err := s.mdc.ReadDir(ctx, accountPath(accountUUID))
 	switch err.(type) {
@@ -64,7 +66,9 @@ func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRole
 
 // ListRoleAssignmentsByRole returns all role assignmentes matching the give roleID
 func (s *Store) ListRoleAssignmentsByRole(roleID string) ([]*settingsmsg.UserRoleAssignment, error) {
-	s.Init()
+	if err := s.Init(); err != nil {
+		return nil, err
+	}
 	ctx := context.TODO()
 	accountIDs, err := s.mdc.ReadDir(ctx, accountsFolderLocation)
 	switch err.(type) {
@@ -117,7 +121,9 @@ func (s *Store) ListRoleAssignmentsByRole(roleID string) ([]*settingsmsg.UserRol
 
 // WriteRoleAssignment appends the given role assignment to the existing assignments of the respective account.
 func (s *Store) WriteRoleAssignment(accountUUID, roleID string) (*settingsmsg.UserRoleAssignment, error) {
-	s.Init()
+	if err := s.Init(); err != nil {
+		return nil, err
+	}
 	ctx := context.TODO()
 	// as per https://github.com/owncloud/product/issues/103 "Each user can have exactly one role"
 	err := s.mdc.Delete(ctx, accountPath(accountUUID))
@@ -149,7 +155,9 @@ func (s *Store) WriteRoleAssignment(accountUUID, roleID string) (*settingsmsg.Us
 
 // RemoveRoleAssignment deletes the given role assignment from the existing assignments of the respective account.
 func (s *Store) RemoveRoleAssignment(assignmentID string) error {
-	s.Init()
+	if err := s.Init(); err != nil {
+		return err
+	}
 	ctx := context.TODO()
 	accounts, err := s.mdc.ReadDir(ctx, accountsFolderLocation)
 	switch err.(type) {
