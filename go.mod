@@ -67,7 +67,6 @@ require (
 	github.com/open-policy-agent/opa v1.19.0
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245
-	github.com/owncloud/reva/v2 v2.0.0-20260813121157-d386075a0421
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.12
 	github.com/prometheus/client_golang v1.24.1
@@ -155,7 +154,7 @@ require (
 	github.com/blevesearch/zapx/v17 v17.1.2 // indirect
 	github.com/bluele/gcache v0.0.2 // indirect
 	github.com/bombsimon/logrusr/v3 v3.1.0 // indirect
-	github.com/ceph/go-ceph v0.40.0 // indirect
+	github.com/ceph/go-ceph v0.41.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cevaris/ordered_map v0.0.0-20190319150403-3adeae072e73 // indirect
 	github.com/clipperhouse/displaywidth v0.11.0 // indirect
@@ -283,6 +282,7 @@ require (
 	github.com/olekukonko/errors v1.2.0 // indirect
 	github.com/olekukonko/ll v0.1.6 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
+	github.com/owncloud/reva/v2 v2.0.0-20260819114854-b1626ed21a70 // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/pablodz/inotifywaitgo v0.0.12 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
@@ -340,10 +340,10 @@ require (
 	go.uber.org/zap v1.27.1 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
-	golang.org/x/mod v0.38.0 // indirect
+	golang.org/x/mod v0.40.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
-	golang.org/x/tools v0.48.0 // indirect
+	golang.org/x/tools v0.49.0 // indirect
 	google.golang.org/genproto v0.0.0-20260319201613-d00831a3d3e7 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260803160001-6ac0973c030d // indirect
 	gopkg.in/cenkalti/backoff.v1 v1.1.0 // indirect

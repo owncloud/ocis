@@ -279,7 +279,7 @@ func (d *Driver) PrepareUpload(_ context.Context, _ *provider.Reference, _ strin
 	return &storage.PrepareUploadResult{VersionCreated: info.NodeExisted}, nil
 }
 
-func (d *Driver) RollbackUpload(_ context.Context, _ *provider.Reference, _ string, _ bool, _ int64) error {
+func (d *Driver) RollbackUpload(_ context.Context, _ *provider.Reference, _ string, _ storage.RollbackInfo) error {
 	return nil
 }
 

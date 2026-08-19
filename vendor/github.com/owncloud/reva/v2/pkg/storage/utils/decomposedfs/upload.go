@@ -21,6 +21,7 @@ package decomposedfs
 import (
 	"context"
 	"fmt"
+	iofs "io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -648,10 +649,12 @@ func (fs *Decomposedfs) PrepareUpload(ctx context.Context, ref *provider.Referen
 // RollbackUpload reverts the node state written by PrepareUpload after a failed or aborted
 // postprocessing run. It restores the previous revision (or purges the node if versioning is
 // disabled and no prior version exists) and reverts the optimistic size propagation.
-func (fs *Decomposedfs) RollbackUpload(ctx context.Context, ref *provider.Reference, sessionID string, nodeExisted bool, sizeDiff int64) error {
+func (fs *Decomposedfs) RollbackUpload(ctx context.Context, ref *provider.Reference, sessionID string, info storage.RollbackInfo) error {
 	n, err := fs.lu.NodeFromResource(ctx, ref)
 	if err != nil {
-		return fmt.Errorf("RollbackUpload: node lookup failed: %w", err)
+		// The node metadata is unreadable, so the upload can never finish and its
+		// quota would stay consumed forever.
+		return fs.rollbackOrphaned(ctx, ref, sessionID, info, err)
 	}
 	if !n.Exists {
 		return nil // nothing was written yet
@@ -669,7 +672,7 @@ func (fs *Decomposedfs) RollbackUpload(ctx context.Context, ref *provider.Refere
 		return nil
 	}
 
-	if nodeExisted {
+	if info.NodeExisted {
 		if err := n.RevertCurrentRevision(ctx, false); err != nil {
 			return err
 		}
@@ -681,10 +684,58 @@ func (fs *Decomposedfs) RollbackUpload(ctx context.Context, ref *provider.Refere
 		}
 	}
 
-	if sizeDiff != 0 {
-		if err := fs.tp.Propagate(ctx, n, -sizeDiff); err != nil {
+	if info.SizeDiff != 0 {
+		if err := fs.tp.Propagate(ctx, n, -info.SizeDiff); err != nil {
 			appctx.GetLogger(ctx).Error().Err(err).Msg("RollbackUpload: could not revert propagate")
 		}
+	}
+	return nil
+}
+
+// rollbackOrphaned rolls back an upload whose target node can no longer be read,
+// which happens when the node file outlives its metadata: an ancestor trashed
+// mid-upload leaves a node whose ReadNode fails on the missing parent id. The ids
+// recorded on the session are enough to walk up the tree, so the quota is released
+// and the unreachable node removed rather than left consuming space forever.
+//
+// lookupErr is what made the node unreadable, returned when there is nothing on
+// the session to fall back to.
+func (fs *Decomposedfs) rollbackOrphaned(ctx context.Context, ref *provider.Reference, sessionID string, info storage.RollbackInfo, lookupErr error) error {
+	if info.NodeID == "" || info.ParentID == "" {
+		return fmt.Errorf("RollbackUpload: node lookup failed: %w", lookupErr)
+	}
+	spaceID := ref.GetResourceId().GetSpaceId()
+	if spaceID == "" {
+		return fmt.Errorf("RollbackUpload: node lookup failed: %w", lookupErr)
+	}
+	log := appctx.GetLogger(ctx)
+	log.Info().Err(lookupErr).Str("sessionid", sessionID).Str("nodeid", info.NodeID).
+		Msg("node unreadable, rolling back orphaned upload")
+
+	n := node.New(spaceID, info.NodeID, info.ParentID, info.Filename, info.Size, sessionID,
+		provider.ResourceType_RESOURCE_TYPE_FILE, nil, fs.lu)
+	spaceRoot, err := node.ReadNode(ctx, fs.lu, spaceID, spaceID, false, nil, false)
+	if err != nil {
+		return fmt.Errorf("RollbackUpload: space root lookup failed: %w", err)
+	}
+	n.SpaceRoot = spaceRoot
+
+	if info.SizeDiff != 0 {
+		// Stop before removing anything: the caller keeps the session on an error,
+		// so this stays retryable instead of leaking the quota silently.
+		if err := fs.tp.Propagate(ctx, n, -info.SizeDiff); err != nil {
+			return fmt.Errorf("RollbackUpload: could not revert propagate: %w", err)
+		}
+	}
+
+	// Nothing can resolve this node any more, so remove it and its metadata.
+	// Already gone is fine: the node may never have been created.
+	nodePath := n.InternalPath()
+	if err := utils.RemoveItem(nodePath); err != nil && !errors.Is(err, iofs.ErrNotExist) {
+		log.Error().Err(err).Str("nodepath", nodePath).Msg("RollbackUpload: removing orphaned node failed")
+	}
+	if err := fs.lu.MetadataBackend().Purge(ctx, nodePath); err != nil && !errors.Is(err, iofs.ErrNotExist) {
+		log.Error().Err(err).Str("nodepath", nodePath).Msg("RollbackUpload: purging orphaned node metadata failed")
 	}
 	return nil
 }
