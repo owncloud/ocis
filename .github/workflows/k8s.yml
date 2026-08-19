@@ -19,6 +19,7 @@ jobs:
   api-tests:
     name: ${{ matrix.suite }}-k8s
     runs-on: ubuntu-26.04
+    timeout-minutes: 120
 
     if: >-
       github.event_name == 'schedule' ||
