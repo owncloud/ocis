@@ -113,7 +113,8 @@ func (c *CachedMDC) ReadDir(ctx context.Context, id string) ([]string, error) {
 		c.logger.Error().Err(err).Msg("ReadDir: failed to update dirs cache")
 	}
 
-	return s, err
+	// return valid data regardless of cache write failure
+	return s, nil
 }
 
 // MakeDirIfNotExist invalidates the cache
