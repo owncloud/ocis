@@ -15,4 +15,4 @@ download failures from missing signing keys (`ocs`).
 The store plugin now treats a closed connection as no connection, so the next
 operation transparently re-initializes it.
 
-https://github.com/owncloud/ocis/pull/12404
+https://github.com/owncloud/ocis/pull/12401

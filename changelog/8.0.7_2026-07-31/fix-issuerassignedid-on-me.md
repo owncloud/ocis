@@ -9,5 +9,5 @@ the identity backend, which reads the stored external identity and returns the
 correct value. Group memberships are still only expanded when
 `$expand=memberOf` is requested.
 
-https://github.com/owncloud/ocis/pull/12431
-https://github.com/owncloud/ocis/pull/12411
+https://github.com/owncloud/ocis/pull/12635
+

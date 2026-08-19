@@ -6,4 +6,4 @@ DELETE, while the regular `/users` handler and the pre-v8.0 code path used
 looked up the user by name-or-UUID, so the externalID never matched, the LDAP
 entry was never removed, and the response was a 404. This is now fixed.
 
-https://github.com/owncloud/ocis/pull/12405
+https://github.com/owncloud/ocis/pull/12400
