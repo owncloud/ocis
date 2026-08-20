@@ -23,6 +23,24 @@ export async function usersHaveBeenCreated({
   }
 }
 
+// Creates a Keycloak user with no ocis realm role, i.e. one whose token the proxy
+// role_mapping cannot match. Keycloak-only; there is no graph equivalent, because
+// with the graph driver the role is assigned by ocis itself and cannot be absent.
+export async function keycloakUsersWithoutRoleHaveBeenCreated({
+  stepUser,
+  users
+}: {
+  stepUser: string
+  users: Array<string>
+}): Promise<void> {
+  const world = getWorld()
+  const admin = world.usersEnvironment.getUser({ key: stepUser })
+  for (const userToBeCreated of users) {
+    const user = world.usersEnvironment.getUser({ key: userToBeCreated })
+    await api.keycloak.createUserWithoutRealmRole({ user, admin })
+  }
+}
+
 export async function userHasCreatedFolder({
   stepUser,
   folderName
