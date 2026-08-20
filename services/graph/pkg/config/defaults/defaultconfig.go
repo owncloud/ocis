@@ -104,22 +104,22 @@ func DefaultConfig() *config.Config {
 				UserNameAttribute:        "uid",
 				// FIXME: switch this to some more widely available attribute by default
 				//        ideally this needs to	be constant for the lifetime of a users
-				UserIDAttribute:           "owncloudUUID",
-				UserTypeAttribute:         "ownCloudUserType",
-				UserEnabledAttribute:      "ownCloudUserEnabled",
-				ExternalIDAttribute:       "owncloudExternalID",
-				DisableUserMechanism:      "attribute",
-				LdapDisabledUsersGroupDN:  "cn=DisabledUsersGroup,ou=groups,o=libregraph-idm",
-				GroupBaseDN:               "ou=groups,o=libregraph-idm",
-				GroupSearchScope:          "sub",
-				GroupFilter:               "",
-				GroupObjectClass:          "groupOfNames",
-				GroupNameAttribute:        "cn",
-				GroupMemberAttribute:      "member",
-				GroupIDAttribute:          "owncloudUUID",
-				EducationResourcesEnabled: false,
-				// 1 minute
-				InstanceMapperCacheTTL: 60,
+				UserIDAttribute:             "owncloudUUID",
+				UserTypeAttribute:           "ownCloudUserType",
+				UserEnabledAttribute:        "ownCloudUserEnabled",
+				ExternalIDAttribute:         "owncloudExternalID",
+				DisableUserMechanism:        "attribute",
+				LdapDisabledUsersGroupDN:    "cn=DisabledUsersGroup,ou=groups,o=libregraph-idm",
+				GroupBaseDN:                 "ou=groups,o=libregraph-idm",
+				GroupSearchScope:            "sub",
+				GroupFilter:                 "",
+				GroupObjectClass:            "groupOfNames",
+				GroupNameAttribute:          "cn",
+				GroupMemberAttribute:        "member",
+				GroupIDAttribute:            "owncloudUUID",
+				EducationResourcesEnabled:   false,
+				InstanceMapperCacheTTL:      60 * time.Second,
+				InstanceMapperCacheCapacity: 10000,
 			},
 		},
 		Cache: &config.Cache{
@@ -220,5 +220,4 @@ func Sanitize(cfg *config.Config) {
 	cfg.Spaces.ExtendedSpacePropertiesCacheTTL = cfg.Spaces.ExtendedSpacePropertiesCacheTTL * int(time.Second)
 	cfg.Spaces.GroupsCacheTTL = cfg.Spaces.GroupsCacheTTL * int(time.Second)
 	cfg.Spaces.UsersCacheTTL = cfg.Spaces.UsersCacheTTL * int(time.Second)
-	cfg.Identity.LDAP.InstanceMapperCacheTTL = cfg.Identity.LDAP.InstanceMapperCacheTTL * int(time.Second)
 }

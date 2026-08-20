@@ -217,11 +217,26 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		}
 	}
 
-	instanceCache := ttlcache.New(
-		ttlcache.WithTTL[string, string](time.Duration(config.InstanceMapperCacheTTL)),
-		ttlcache.WithDisableTouchOnHit[string, string](),
-	)
-	go instanceCache.Start()
+	// A nil instanceCache means "don't cache", which is what a TTL <= 0 asks for.
+	// ttlcache treats a TTL of 0 as "never expires", so it can't express that itself.
+	// No janitor goroutine is started: it would outlive the backend (which has no
+	// shutdown hook), and Get() already skips expired items on its own. Entries that
+	// expire without ever being read again are reclaimed by the capacity limit.
+	var instanceCache *ttlcache.Cache[string, string]
+	if config.InstanceMapperEnabled && config.InstanceMapperCacheTTL > 0 {
+		// A capacity of 0 lets ttlcache grow without limit. Part of a cache key is the
+		// requested instance name, which a client controls via the '$search' parameter,
+		// so a deployment wants the bounded default from the graph config here.
+		var capacity uint64
+		if config.InstanceMapperCacheCapacity > 0 {
+			capacity = uint64(config.InstanceMapperCacheCapacity)
+		}
+		instanceCache = ttlcache.New(
+			ttlcache.WithTTL[string, string](config.InstanceMapperCacheTTL),
+			ttlcache.WithCapacity[string, string](capacity),
+			ttlcache.WithDisableTouchOnHit[string, string](),
+		)
+	}
 
 	return &LDAP{
 		useServerUUID:                  config.UseServerUUID,
@@ -1624,11 +1639,13 @@ func (i *LDAP) getInstance(searchValue, searchAttribute, resultAttribute string)
 	}
 
 	cacheKey := searchAttribute + instanceCacheKeySep + resultAttribute + instanceCacheKeySep + searchValue
-	if item := i.instanceCache.Get(cacheKey); item != nil {
-		if item.Value() == instanceCacheNotFound {
-			return "", ErrNotFound
+	if i.instanceCache != nil {
+		if item := i.instanceCache.Get(cacheKey); item != nil {
+			if item.Value() == instanceCacheNotFound {
+				return "", ErrNotFound
+			}
+			return item.Value(), nil
 		}
-		return item.Value(), nil
 	}
 
 	searchRequest := ldap.NewSearchRequest(
@@ -1649,7 +1666,7 @@ func (i *LDAP) getInstance(searchValue, searchAttribute, resultAttribute string)
 	if len(res.Entries) == 0 {
 		// expected behaviour - we log debug in case something is fishy. This log can be removed when the feature proves stable
 		i.logger.Debug().Str("backend", "ldap").Str("dn", i.instanceMapperBaseDN).Str("searchValue", searchValue).Interface("result", res).Msg("Search instance empty")
-		i.instanceCache.Set(cacheKey, instanceCacheNotFound, ttlcache.DefaultTTL)
+		i.cacheInstance(cacheKey, instanceCacheNotFound)
 		return "", ErrNotFound
 	}
 	if len(res.Entries) > 1 {
@@ -1664,8 +1681,17 @@ func (i *LDAP) getInstance(searchValue, searchAttribute, resultAttribute string)
 	}
 
 	value := res.Entries[0].Attributes[0].Values[0]
-	i.instanceCache.Set(cacheKey, value, ttlcache.DefaultTTL)
+	i.cacheInstance(cacheKey, value)
 	return value, nil
+}
+
+// cacheInstance stores an instance mapper lookup result, doing nothing when
+// caching is disabled.
+func (i *LDAP) cacheInstance(cacheKey, value string) {
+	if i.instanceCache == nil {
+		return
+	}
+	i.instanceCache.Set(cacheKey, value, ttlcache.DefaultTTL)
 }
 
 func (i *LDAP) getInstanceID(instancename string) (string, error) {
