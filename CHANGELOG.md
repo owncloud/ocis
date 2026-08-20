@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for 8.0.8](#changelog-for-808-2026-08-20)
 * [Changelog for 8.0.7](#changelog-for-807-2026-07-31)
 * [Changelog for 8.0.6](#changelog-for-806-2026-07-15)
 * [Changelog for 8.0.5](#changelog-for-805-2026-06-18)
@@ -65,6 +66,60 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [8.0.8] (2026-08-20)
+
+The following sections list the changes for 8.0.8.
+
+[8.0.8]: https://github.com/owncloud/ocis/compare/v8.0.7...v8.0.8
+
+## Summary
+
+* Security - Bump golang.org/x/image to v0.45.0: [#12808](https://github.com/owncloud/ocis/pull/12808)
+* Bugfix - Cache LDAP instance mapper lookups: [#12823](https://github.com/owncloud/ocis/pull/12823)
+* Bugfix - Fix share metadata corruption during concurrent share operations: [#12621](https://github.com/owncloud/ocis/pull/12621)
+* Enhancement - Add TLS support for NATS store and registry connections: [#12765](https://github.com/owncloud/ocis/pull/12765)
+
+## Details
+
+* Security - Bump golang.org/x/image to v0.45.0: [#12808](https://github.com/owncloud/ocis/pull/12808)
+
+   Upgraded golang.org/x/image from v0.44.0 to v0.45.0 to address
+   GO-2026-6222: excessive memory allocation during VP8L decoding.
+
+   https://github.com/owncloud/ocis/pull/12808
+
+* Bugfix - Cache LDAP instance mapper lookups: [#12823](https://github.com/owncloud/ocis/pull/12823)
+
+   In multi-instance deployments, resolving a user's instance name/ID during
+   `GET /graph/v1.0/users` (and group member expansion) issued a fresh, uncached
+   LDAP search per instance/guest attribute value on every request. Under load
+   this multiplied into large numbers of redundant LDAP round-trips per page of
+   users, saturating the LDAP connection pool and causing request timeouts. The
+   LDAP identity backend now caches instance mapper lookups, including negative
+   (not-found) results, for a configurable TTL
+   (`OCIS_LDAP_INSTANCE_MAPPER_CACHE_TTL`, default 60s).
+
+   https://github.com/owncloud/ocis/pull/12823
+
+* Bugfix - Fix share metadata corruption during concurrent share operations: [#12621](https://github.com/owncloud/ocis/pull/12621)
+
+   When multiple sharing service replicas processed share operations concurrently
+   for the same user, the share metadata could become corrupted with references to
+   missing data, making all shares inaccessible to that user. The received share
+   cache now uses compare-and-swap (etag) validation to detect concurrent writes
+   and retries gracefully, preventing metadata corruption.
+
+   https://github.com/owncloud/ocis/pull/12621
+
+* Enhancement - Add TLS support for NATS store and registry connections: [#12765](https://github.com/owncloud/ocis/pull/12765)
+
+   All `nats-js-kv` store, cache, and service registry connections now support
+   TLS. Configure via `OCIS_CACHE_ENABLE_TLS`, `OCIS_PERSISTENT_STORE_ENABLE_TLS`,
+   and `MICRO_REGISTRY_ENABLE_TLS`, with corresponding `*_TLS_INSECURE` and
+   `*_TLS_ROOT_CA_CERTIFICATE` variants per connection type.
+
+   https://github.com/owncloud/ocis/pull/12765
 
 # Changelog for [8.0.7] (2026-07-31)
 
