@@ -3,7 +3,9 @@ package userroles
 import (
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
+	"sort"
 	"sync"
 	"time"
 
@@ -15,8 +17,15 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/utils"
+	"github.com/rs/zerolog"
 	"go-micro.dev/v4/metadata"
 )
+
+// ErrNoRoleAssigned is returned by UpdateUserRoleAssignment when the user's claims
+// yield no ocis role and no default role is configured. It is a property of the
+// user's account rather than a server-side failure, so callers should report it as
+// such instead of as a generic internal error.
+var ErrNoRoleAssigned = errors.New("no role in claim maps to an ocis role and no default role is configured")
 
 type oidcRoleAssigner struct {
 	Options
@@ -108,16 +117,20 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 
 	roleIDFromClaim := roleNamesToRoleIDs[overwriteRole]
 	if overwriteRole == "" {
+		// A user whose claims yield no usable role fails in one of three places below.
+		// All three are the same situation for the person logging in, so they share a
+		// single exit: fall back to the configured default role, or return
+		// ErrNoRoleAssigned so the caller can report something better than a 500.
 		claimRoles, err := extractRoles(ra.rolesClaim, claims)
-		if err != nil {
-			logger.Error().Err(err).Str("Claim", ra.rolesClaim).Interface("claims", claims).Msg("Error mapping role names to role ids")
-			return nil, err
-		}
-
-		if len(claimRoles) == 0 {
-			err := errors.New("no roles set in claim")
-			logger.Error().Err(err).Msg("")
-			return nil, err
+		switch {
+		case err != nil:
+			// The claim is absent or unusable. This is the common case when users are
+			// federated into the IDP from an external directory and simply have no
+			// role attached.
+			logger.Debug().Err(err).Str("Claim", ra.rolesClaim).Msg("Could not extract roles from claims")
+			claimRoles = nil
+		case len(claimRoles) == 0:
+			logger.Debug().Str("Claim", ra.rolesClaim).Msg("No roles set in claim")
 		}
 
 		// the roleMapping config is supposed to have the role mappings ordered from the highest privileged role
@@ -132,9 +145,10 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 		}
 
 		if roleIDFromClaim == "" {
-			err := errors.New("no role in claim maps to an ocis role")
-			logger.Error().Err(err).Msg("")
-			return nil, err
+			roleIDFromClaim, err = ra.fallbackRoleID(logger, roleNamesToRoleIDs, claimRoles)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -203,6 +217,50 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 
 	user.Opaque = utils.AppendJSONToOpaque(user.Opaque, "roles", []string{roleIDFromClaim})
 	return user, nil
+}
+
+// fallbackRoleID resolves the configured default role for a user whose claims matched
+// no role mapping. It returns ErrNoRoleAssigned when no default role is configured, and
+// a descriptive error when one is configured but does not exist in the settings
+// service - a misconfiguration is worth reporting differently from a user without a
+// role, because only one of the two is fixed by editing the deployment.
+func (ra oidcRoleAssigner) fallbackRoleID(logger zerolog.Logger, roleNamesToRoleIDs map[string]string, claimRoles map[string]struct{}) (string, error) {
+	seen := make([]string, 0, len(claimRoles))
+	for cr := range claimRoles {
+		seen = append(seen, cr)
+	}
+	sort.Strings(seen)
+
+	if ra.defaultRole == "" {
+		logger.Error().
+			Str("claim", ra.rolesClaim).
+			Strs("claimValues", seen).
+			Interface("roleMapping", ra.roleMapping).
+			Msg("No role mapping matched the user's claim and PROXY_ROLE_ASSIGNMENT_OIDC_DEFAULT_ROLE is not set. " +
+				"Add a matching entry to the role mapping, or set a default role to let such users log in.")
+		return "", ErrNoRoleAssigned
+	}
+
+	roleID := roleNamesToRoleIDs[ra.defaultRole]
+	if roleID == "" {
+		known := make([]string, 0, len(roleNamesToRoleIDs))
+		for name := range roleNamesToRoleIDs {
+			known = append(known, name)
+		}
+		sort.Strings(known)
+		err := fmt.Errorf("the configured default role %q does not exist", ra.defaultRole)
+		logger.Error().Err(err).
+			Strs("knownRoles", known).
+			Msg("PROXY_ROLE_ASSIGNMENT_OIDC_DEFAULT_ROLE names a role that the settings service does not know")
+		return "", err
+	}
+
+	logger.Debug().
+		Str("claim", ra.rolesClaim).
+		Strs("claimValues", seen).
+		Str("ocisRole", ra.defaultRole).
+		Msg("No role mapping matched, assigning the configured default role")
+	return roleID, nil
 }
 
 // ApplyUserRole it looks up the user's role in the settings service and adds it

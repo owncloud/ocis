@@ -159,8 +159,9 @@ type RoleAssignment struct {
 
 // OIDCRoleMapper contains the configuration for the "oidc" role assignment driver
 type OIDCRoleMapper struct {
-	RoleClaim string        `yaml:"role_claim" env:"PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM" desc:"The OIDC claim used to create the users role assignment." introductionVersion:"pre5.0"`
-	RolesMap  []RoleMapping `yaml:"role_mapping" desc:"A list of mappings of ocis role names to PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM claim values. This setting can only be configured in the configuration file and not via environment variables."`
+	RoleClaim   string        `yaml:"role_claim" env:"PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM" desc:"The OIDC claim used to create the users role assignment." introductionVersion:"pre5.0"`
+	RolesMap    []RoleMapping `yaml:"role_mapping" desc:"A list of mappings of ocis role names to PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM claim values. This setting can only be configured in the configuration file and not via environment variables."`
+	DefaultRole string        `yaml:"default_role" env:"PROXY_ROLE_ASSIGNMENT_OIDC_DEFAULT_ROLE" desc:"The name of the ocis role to assign when the user's PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM claim is missing or matches no entry in 'role_mapping'. Empty by default, which means such a login is refused. Useful when users are federated into the IDP without a role, e.g. from an external user directory." introductionVersion:"NEXT"`
 }
 
 // RoleMapping defines which ocis role matches a specific claim value
