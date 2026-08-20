@@ -127,8 +127,12 @@ exports[`Users view > list view > renders list initially 1`] = `
                 <td class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-shrink oc-td oc-table-data-cell oc-table-data-cell-avatar">
                   <avatar-image width="32" userid="1" user-name="Admin"></avatar-image>
                 </td>
-                <td class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-auto oc-td oc-table-data-cell oc-table-data-cell-onPremisesSamAccountName"></td>
-                <td class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-auto oc-td oc-table-data-cell oc-table-data-cell-displayName mark-element">Admin</td>
+                <td class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-auto oc-text-truncate oc-td oc-table-data-cell oc-table-data-cell-onPremisesSamAccountName">
+                  <div class="oc-text-truncate"></div>
+                </td>
+                <td class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-auto oc-text-truncate oc-td oc-table-data-cell oc-table-data-cell-displayName mark-element">
+                  <div class="oc-text-truncate">Admin</div>
+                </td>
                 <td class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-auto oc-td oc-table-data-cell oc-table-data-cell-mail">admin@example.org</td>
                 <td class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-auto oc-td oc-table-data-cell oc-table-data-cell-role">Admin</td>
                 <td class="oc-table-cell oc-table-cell-align-left oc-table-cell-align-middle oc-table-cell-width-auto oc-td oc-table-data-cell oc-table-data-cell-accountEnabled"><span class="oc-flex oc-flex-middle"><span class="oc-icon oc-icon-m oc-icon-passive oc-mr-s"><!----></span><span>Allowed</span></span></td>
