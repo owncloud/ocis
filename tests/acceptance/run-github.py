@@ -141,6 +141,7 @@ LOCAL_API_TESTS = {
     "vault": {
         "suites": ["apiVault"],
         "keycloakNeeded": True,
+        "tikaNeeded": True,
         "vaultStorage": True,
         "extraEnvironment": {
             "KEYCLOAK": "true",
@@ -166,7 +167,11 @@ LOCAL_API_TESTS = {
             "GRAPH_USERNAME_MATCH": "none",
             "IDM_CREATE_DEMO_USERS": "false",
             "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
-            "WEB_OIDC_SCOPE": "openid profile email acr"
+            "WEB_OIDC_SCOPE": "openid profile email acr",
+            # tika
+            "SEARCH_EXTRACTOR_TYPE": "tika",
+            "SEARCH_EXTRACTOR_TIKA_TIKA_URL": "http://localhost:9998",
+            "SEARCH_EXTRACTOR_CS3SOURCE_INSECURE": "true",
         }
     },
     "cliCommands": {

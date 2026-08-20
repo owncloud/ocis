@@ -626,6 +626,8 @@ trait Provisioning {
 			return;
 		}
 		KeycloakHelper::resetAdminAccessToken();
+		// Clean up any existing TOTP credentials for admin user so MFA can be set up fresh in every scenario.
+		KeycloakHelper::deleteUserTotpCredentials('admin');
 		$adminUser = [
 			"password" => "admin",
 			"displayname" => "Admin Admin",
