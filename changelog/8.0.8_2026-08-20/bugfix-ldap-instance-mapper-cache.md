@@ -8,3 +8,5 @@ users, saturating the LDAP connection pool and causing request timeouts. The
 LDAP identity backend now caches instance mapper lookups, including negative
 (not-found) results, for a configurable TTL
 (`OCIS_LDAP_INSTANCE_MAPPER_CACHE_TTL`, default 60s).
+
+https://github.com/owncloud/ocis/pull/12823
