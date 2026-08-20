@@ -425,7 +425,7 @@ def main() -> int:
     acceptance_test_type = os.environ.get("ACCEPTANCE_TEST_TYPE", "api")
 
     repo_root = Path(__file__).resolve().parents[2]
-    ocis_bin = repo_root / "ocis/bin/ocis-debug"
+    ocis_bin = repo_root / "ocis/bin/ocis"
     wrapper_bin = repo_root / "tests/ociswrapper/bin/ociswrapper"
     ocis_url = "https://localhost:9200"
     ocis_config_dir = Path.home() / ".ocis/config"
@@ -448,7 +448,10 @@ def main() -> int:
                           capture_output=True).returncode == 0:
             build_env["ENABLE_VIPS"] = "true"
         # build debug for code coverage
-        run(["make", "-C", str(repo_root / "ocis"), "build-debug"], env=build_env)
+        make_target = "build-debug" if os.environ.get("GOCOVERDIR") else "build"
+        run(["make", "-C", str(repo_root / "ocis"), make_target], env=build_env)
+        if make_target == "build-debug":
+            (repo_root / "ocis" / "bin" / "ocis-debug").replace(repo_root / "ocis" / "bin" / "ocis")
 
     if not wrapper_bin.exists():
         run(["make", "-C", str(repo_root / "tests/ociswrapper"), "build"],

@@ -132,7 +132,7 @@ def main() -> int:
     keycloak_needed = keycloak_needed or mfa_needed or vault_storage_needed
 
     repo_root = Path(__file__).resolve().parents[2]
-    ocis_bin = repo_root / "ocis/bin/ocis-debug"
+    ocis_bin = repo_root / "ocis/bin/ocis"
     wrapper_bin = repo_root / "tests/ociswrapper/bin/ociswrapper"
     # The federated suite must address the primary as localhost instead of
     # 127.0.0.1: the ocm invite flow bakes this host into invite codes
