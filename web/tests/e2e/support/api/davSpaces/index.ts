@@ -1,5 +1,6 @@
 export {
   uploadFileInPersonalSpace,
+  uploadFileInVaultSpace,
   createFolderInsideSpaceBySpaceName,
   createFolderInsidePersonalSpace,
   getIdOfFileInsideSpace,
