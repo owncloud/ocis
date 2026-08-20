@@ -259,7 +259,40 @@ to the user. So if e.g. a user's `ocisRoles` claim has the values `myUserRole` a
 appears before `user` in the above sample configuration).
 
 If a user's claim values don't match any of the configured role mappings an error will be logged and
-the user will not be able to login.
+the user will not be able to login. The proxy answers such a request with `403 Forbidden`, and the
+logged error names the claim it read, the values it found and the configured mapping. See
+[Default Role](#default-role) for how to let those users log in instead.
+
+#### Default Role
+
+Users that reach Infinite Scale without any usable role claim cannot log in at all. This is common
+when users are federated into the IDP from an external user directory: they authenticate correctly,
+but no role is attached to them, so no `role_mapping` entry can match. The web UI then shows an
+access denied page, and using its "log in again" button returns to the same page, because the login
+itself succeeded.
+
+Setting `PROXY_ROLE_ASSIGNMENT_OIDC_DEFAULT_ROLE` (or `default_role` in the `oidc_role_mapper`
+section) gives those users a role instead of refusing them:
+
+```yaml
+role_assignment:
+    driver: oidc
+    oidc_role_mapper:
+        role_claim: ocisRoles
+        default_role: user-light
+        role_mapping:
+            - role_name: admin
+              claim_value: myAdminRole
+            - role_name: user
+              claim_value: myUserRole
+```
+
+The default role applies when the role claim is missing entirely, when it cannot be read, and when
+it is present but matches no `role_mapping` entry. A mapping that does match always wins over it.
+
+This setting is empty by default, which keeps the behavior described above: such logins are refused.
+Because the default role is handed to everyone the mappings do not cover, prefer a low-privilege role
+such as `user-light` over `user` or `admin`.
 
 The default `role_claim` (or `PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM`) is `roles`. The default `role_mapping` is:
 

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,6 +12,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend/mocks"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
 	userRoleMocks "github.com/owncloud/ocis/v2/services/proxy/pkg/userroles/mocks"
 	"github.com/owncloud/reva/v2/pkg/auth/scope"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
@@ -471,4 +473,72 @@ func TestResolveUserType(t *testing.T) {
 			assert.Equal(t, tc.expectGuest, isGuest, "isGuest mismatch: %s", tc.description)
 		})
 	}
+}
+
+// newMockAccountResolverWithRoleError builds the same middleware as
+// newMockAccountResolver but lets the role assigner fail, which is the branch these two
+// tests are about. It is a separate constructor rather than an extra parameter on the
+// existing one so the other tests keep reading as they did.
+func newMockAccountResolverWithRoleError(roleErr error) http.Handler {
+	user := &userv1beta1.User{
+		Id:   &userv1beta1.UserId{Idp: "https://idx.example.com", OpaqueId: "123"},
+		Mail: "foo@example.com",
+	}
+
+	tokenManager, _ := jwt.New(map[string]interface{}{
+		"secret":  "change-me",
+		"expires": int64(60),
+	})
+	s, _ := scope.AddOwnerScope(nil)
+	token, _ := tokenManager.MintToken(context.Background(), user, s)
+
+	ub := mocks.UserBackend{}
+	ub.On("GetUserByClaims", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(user, token, nil)
+	ub.On("GetUserRoles", mock.Anything, mock.Anything).Return(user, nil)
+
+	ra := userRoleMocks.UserRoleAssigner{}
+	ra.On("UpdateUserRoleAssignment", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, roleErr)
+
+	return AccountResolver(
+		Logger(log.NewLogger()),
+		UserProvider(&ub),
+		UserRoleAssigner(&ra),
+		SkipUserInfo(false),
+		UserOIDCClaim(oidc.Email),
+		UserCS3Claim("mail"),
+		AutoprovisionAccounts(false),
+	)(mockHandler{})
+}
+
+// TestForbiddenWhenTheUserHasNoRole is the user-visible half of the fix. A user who
+// authenticated but holds no role in this instance used to get a bare 500, which is
+// indistinguishable from a broken deployment and leaves them clicking "log in again"
+// with nothing actionable anywhere.
+func TestForbiddenWhenTheUserHasNoRole(t *testing.T) {
+	sut := newMockAccountResolverWithRoleError(userroles.ErrNoRoleAssigned)
+	req, rw := mockRequest(map[string]interface{}{
+		oidc.Iss:   "https://idx.example.com",
+		oidc.Email: "foo@example.com",
+	})
+
+	sut.ServeHTTP(rw, req)
+
+	assert.Equal(t, http.StatusForbidden, rw.Code)
+	assert.Empty(t, req.Header.Get(revactx.TokenHeader))
+}
+
+// TestInternalServerErrorOnOtherRoleAssignmentErrors is the control. Only
+// ErrNoRoleAssigned changes status; every other failure of the role assigner is still a
+// server error, so the new branch cannot quietly turn real outages into 403s.
+func TestInternalServerErrorOnOtherRoleAssignmentErrors(t *testing.T) {
+	sut := newMockAccountResolverWithRoleError(errors.New("settings service unreachable"))
+	req, rw := mockRequest(map[string]interface{}{
+		oidc.Iss:   "https://idx.example.com",
+		oidc.Email: "foo@example.com",
+	})
+
+	sut.ServeHTTP(rw, req)
+
+	assert.Equal(t, http.StatusInternalServerError, rw.Code)
+	assert.Empty(t, req.Header.Get(revactx.TokenHeader))
 }
