@@ -15,4 +15,4 @@ element. The missing entries for 403, 425 and 429 have been added and any
 remaining unmapped code now falls back to a generic exception name, so clients
 always receive a usable exception.
 
-https://github.com/owncloud/ocis/pull/12668
+https://github.com/owncloud/ocis/pull/12667

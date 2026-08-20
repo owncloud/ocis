@@ -15,4 +15,4 @@ workers have finished, which removes the overlapping access.
 Note that lowering the maximum concurrency did not avoid this, as a single
 worker could still run concurrently with the collecting loop.
 
-https://github.com/owncloud/ocis/pull/12674
+https://github.com/owncloud/ocis/pull/12673

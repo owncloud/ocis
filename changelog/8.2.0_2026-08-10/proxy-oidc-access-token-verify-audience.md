@@ -10,5 +10,4 @@ not accepted by ownCloud Infinite Scale.
 
 The check is disabled by default (empty list) to preserve the existing behavior.
 
-https://github.com/owncloud/ocis/pull/12634
-
+https://github.com/owncloud/ocis/pull/12581

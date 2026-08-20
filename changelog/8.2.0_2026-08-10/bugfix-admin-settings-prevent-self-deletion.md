@@ -11,5 +11,5 @@ selected users are deleted while your own account is left untouched. When your
 own account is part of the selection, the delete confirmation dialog shows a
 hint that it will not be deleted.
 
-https://github.com/owncloud/ocis/pull/12657
+https://github.com/owncloud/ocis/pull/12661
 https://github.com/owncloud/ocis/issues/12582

@@ -16,4 +16,4 @@ The graph service's identity backend now shares the same LDAP client
 implementation used by the reva auth/user/group managers instead of maintaining
 its own separate reconnecting client.
 
-https://github.com/owncloud/ocis/pull/12689
+https://github.com/owncloud/ocis/pull/12688
