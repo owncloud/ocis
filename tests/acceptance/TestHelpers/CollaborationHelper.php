@@ -36,6 +36,7 @@ class CollaborationHelper {
 	 * @param string $password
 	 * @param string $baseUrl
 	 * @param string|null $viewMode
+	 * @param array|null $headers
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -47,6 +48,7 @@ class CollaborationHelper {
 		string $password,
 		string $baseUrl,
 		?string $viewMode = null,
+		?array $headers = null,
 	): ResponseInterface {
 		$url = $baseUrl . "/app/open?app_name=$app&file_id=$fileId";
 		if ($viewMode) {
@@ -57,7 +59,7 @@ class CollaborationHelper {
 			$url,
 			$username,
 			$password,
-			['Content-Type' => 'application/json'],
+			$headers ?? ['Content-Type' => 'application/json'],
 		);
 	}
 
