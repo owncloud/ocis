@@ -72,7 +72,7 @@ export async function logInWithOTP({ stepUser }: { stepUser: string }): Promise<
   const sessionObject = await createNewSession(stepUser)
   const { page } = world.actorsEnvironment.getActor({ key: stepUser })
 
-  const image = await Jimp.read('./qr.png')
+  const image = await Jimp.read(test.info().outputPath('qr.png'))
   const { data, width, height } = image.bitmap
   const errorLocator = page.locator('#input-error-otp')
   for (let attempt = 0; attempt < 2; attempt++) {

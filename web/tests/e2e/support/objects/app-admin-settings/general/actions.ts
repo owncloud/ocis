@@ -1,5 +1,5 @@
 import { basename } from 'path'
-import { Page, expect } from '@playwright/test'
+import { Page, expect, test } from '@playwright/test'
 import { objects } from '../../../index'
 import { getOtpFromImage } from '../../../utils/mfa'
 import { Jimp } from 'jimp'
@@ -67,9 +67,10 @@ export const resetLogo = async (page: Page): Promise<void> => {
 }
 
 export const userAuthenticatesWithOTP = async (page: Page, deviceName: string): Promise<void> => {
-  const qrImage = page.locator('#kc-totp-secret-qr-code')
-  const qrCodeBuffer = await qrImage.screenshot()
-  const image = await Jimp.read(qrCodeBuffer)
+  const element = page.locator('#kc-totp-secret-qr-code')
+  const qrCodePath = test.info().outputPath('qr.png')
+  await element.screenshot({ path: qrCodePath })
+  const image = await Jimp.read(qrCodePath)
   const { data, width, height } = image.bitmap
   const otp = await getOtpFromImage(data, width, height)
   await page.locator('#totp').fill(String(otp))

@@ -31,7 +31,9 @@ export const test = base.extend<{
       if (!config.predefinedUsers && !config.mfa && adminUser) {
         if (config.keycloak) {
           await api.keycloak.refreshAccessTokenForKeycloakUser(adminUser)
-          await api.keycloak.refreshAccessTokenForKeycloakOcisUser(adminUser)
+          // use a new OIDC authorization-code login for the OCIS token instead of refreshing the shared Admin refresh token.
+          // This avoids Keycloak refresh-token rotation races between workers
+          await api.keycloak.setAccessTokenForKeycloakOcisUser(adminUser)
         } else {
           await api.token.refreshAccessToken(adminUser)
         }
