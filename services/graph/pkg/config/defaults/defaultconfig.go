@@ -118,6 +118,8 @@ func DefaultConfig() *config.Config {
 				GroupMemberAttribute:      "member",
 				GroupIDAttribute:          "owncloudUUID",
 				EducationResourcesEnabled: false,
+				// 1 minute
+				InstanceMapperCacheTTL: 60,
 			},
 		},
 		Cache: &config.Cache{
@@ -218,4 +220,5 @@ func Sanitize(cfg *config.Config) {
 	cfg.Spaces.ExtendedSpacePropertiesCacheTTL = cfg.Spaces.ExtendedSpacePropertiesCacheTTL * int(time.Second)
 	cfg.Spaces.GroupsCacheTTL = cfg.Spaces.GroupsCacheTTL * int(time.Second)
 	cfg.Spaces.UsersCacheTTL = cfg.Spaces.UsersCacheTTL * int(time.Second)
+	cfg.Identity.LDAP.InstanceMapperCacheTTL = cfg.Identity.LDAP.InstanceMapperCacheTTL * int(time.Second)
 }
