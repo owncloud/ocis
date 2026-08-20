@@ -25,6 +25,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
+use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\CollaborationHelper;
@@ -309,6 +310,7 @@ class CollaborationContext implements Context {
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			$this->featureContext->getBaseUrl(),
+			$rows['view_mode'] ?? null,
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $appResponse);
 		$this->setLastAppOpenData($appResponse->getBody()->getContents());
@@ -324,7 +326,55 @@ class CollaborationContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userGetsTheInformationOfTheLastOpenedFileUsingWopiEndpoint(string $user): void {
-		$response = json_decode($this->getLastAppOpenData());
+		[$wopiSrc, $accessToken] = $this->getWopiSrcAndAccessTokenFromLastAppOpenData();
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::get(
+				$wopiSrc . "?access_token=$accessToken",
+			),
+		);
+	}
+
+	/**
+	 * @When user :user sends a lock request to the last opened file using wopi endpoint
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userSendsALockRequestToTheLastOpenedFileUsingWopiEndpoint(string $user): void {
+		$this->featureContext->setResponse(
+			$this->sendLockRequestToLastOpenedFile(),
+		);
+	}
+
+	/**
+	 * Send a WOPI LOCK request using the last opened file's endpoint.
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	private function sendLockRequestToLastOpenedFile(): ResponseInterface {
+		[$wopiSrc, $accessToken] = $this->getWopiSrcAndAccessTokenFromLastAppOpenData();
+		return HttpRequestHelper::post(
+			$wopiSrc . "?access_token=$accessToken",
+			null,
+			null,
+			[
+				'X-WOPI-Override' => 'LOCK',
+				'X-WOPI-Lock' => 'abcdef123',
+			],
+		);
+	}
+
+	/**
+	 * Extract the WOPISrc and the access token from the last app-open response.
+	 *
+	 * @return array{0: string, 1: string} the WOPISrc URL and the access token
+	 */
+	private function getWopiSrcAndAccessTokenFromLastAppOpenData(): array {
+		$response = \json_decode($this->getLastAppOpenData());
 		$accessToken = $response->form_parameters->access_token;
 
 		// Extract the WOPISrc from the app_url
@@ -332,10 +382,46 @@ class CollaborationContext implements Context {
 		parse_str($parsedUrl['query'], $queryParams);
 		$wopiSrc = $queryParams['WOPISrc'];
 
+		return [$wopiSrc, $accessToken];
+	}
+
+	/**
+	 * @Given the public has sent the following app-open request:
+	 *
+	 * @param TableNode $properties
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function thePublicHasSentTheFollowingAppOpenRequest(TableNode $properties): void {
+		$rows = $properties->getRowsHash();
+		$token = $this->featureContext->shareNgGetLastCreatedLinkShareToken();
+		$password = $this->featureContext->getActualPassword("%public%");
+
+		$fileId = $this->spacesContext->getFileId($rows['owner'], $rows['space'], $rows['resource']);
+
+		$appResponse = CollaborationHelper::sendPOSTRequestToAppOpen(
+			$fileId,
+			$rows['app'],
+			'public',
+			$password,
+			$this->featureContext->getBaseUrl(),
+			$rows['view_mode'] ?? null,
+			['Public-Token' => $token],
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $appResponse);
+		$this->setLastAppOpenData($appResponse->getBody()->getContents());
+	}
+
+	/**
+	 * @When the public sends a lock request to the last opened file using wopi endpoint
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function thePublicSendsALockRequestToTheLastOpenedFileUsingWopiEndpoint(): void {
 		$this->featureContext->setResponse(
-			HttpRequestHelper::get(
-				$wopiSrc . "?access_token=$accessToken",
-			),
+			$this->sendLockRequestToLastOpenedFile(),
 		);
 	}
 
