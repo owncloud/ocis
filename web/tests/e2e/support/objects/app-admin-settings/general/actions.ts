@@ -67,9 +67,9 @@ export const resetLogo = async (page: Page): Promise<void> => {
 }
 
 export const userAuthenticatesWithOTP = async (page: Page, deviceName: string): Promise<void> => {
-  const element = page.locator('#kc-totp-secret-qr-code')
-  await element.screenshot({ path: 'qr.png' })
-  const image = await Jimp.read('./qr.png')
+  const qrImage = page.locator('#kc-totp-secret-qr-code')
+  const qrCodeBuffer = await qrImage.screenshot()
+  const image = await Jimp.read(qrCodeBuffer)
   const { data, width, height } = image.bitmap
   const otp = await getOtpFromImage(data, width, height)
   await page.locator('#totp').fill(String(otp))

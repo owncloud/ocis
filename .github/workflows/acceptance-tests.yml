@@ -170,7 +170,6 @@ jobs:
           if-no-files-found: error
 
   local-api-tests:
-    if: false
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -285,7 +284,6 @@ jobs:
         run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
 
   cli-tests:
-    if: false
     needs: [build-and-test]
     name: ${{ matrix.suite }}
     runs-on: ubuntu-latest
@@ -322,7 +320,6 @@ jobs:
         run: BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
 
   ldap-pool-tests:
-    if: false
     needs: [build-and-test]
     name: ldapPool-${{ matrix.suite }}
     runs-on: ubuntu-latest
@@ -359,7 +356,6 @@ jobs:
         run: BEHAT_SUITES="${{ matrix.suite }}" OCIS_LDAP_POOL_ENABLED=true python3 tests/acceptance/run-github.py
 
   core-api-tests:
-    if: false
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -650,7 +646,6 @@ jobs:
           retention-days: 7
 
   litmus:
-    if: false
     name: litmus
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -676,7 +671,6 @@ jobs:
         run: python3 tests/acceptance/run-litmus.py
 
   cs3api:
-    if: false
     name: cs3api
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -702,7 +696,6 @@ jobs:
         run: python3 tests/acceptance/run-cs3api.py
 
   wopi-builtin:
-    if: false
     name: wopi-builtin
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -728,7 +721,6 @@ jobs:
         run: python3 tests/acceptance/run-wopi.py --type builtin
 
   wopi-cs3:
-    if: false
     name: wopi-cs3
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -754,7 +746,6 @@ jobs:
         run: python3 tests/acceptance/run-wopi.py --type cs3
 
   external-ldap-tests:
-    if: false
     name: external-ldap-smoke
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -788,7 +779,6 @@ jobs:
         run: tests/ldap-smoke/run.sh
 
   external-ldap-distributed-tests:
-    if: false
     name: external-ldap-distributed-smoke
     needs: [build-and-test]
     runs-on: ubuntu-latest
