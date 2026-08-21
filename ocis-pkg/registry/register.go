@@ -40,7 +40,6 @@ func RegisterService(ctx context.Context, logger log.Logger, service *mRegistry.
 		for {
 			select {
 			case <-t.C:
-				logger.Debug().Interface("service", service).Msg("refreshing external service-registration")
 				err := registry.Register(service, rOpts...)
 				if err != nil {
 					logger.Error().Err(err).Msgf("registration error for external service %v", service.Name)
