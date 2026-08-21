@@ -476,6 +476,12 @@ const isResourceClickable = (resource: Resource) => {
     return false
   }
 
+  // a folder without a target must not fall back to the default action, which would navigate
+  // to the folder itself
+  if (resource.isFolder && !getResourceLink(resource)) {
+    return false
+  }
+
   if (!resource.isFolder && !isPasswordProtectedFolderFileResource(resource.name)) {
     if (!resource.canDownload() && !canBeOpenedWithSecureView(resource)) {
       return false

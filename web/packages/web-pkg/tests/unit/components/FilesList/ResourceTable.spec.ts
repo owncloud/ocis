@@ -540,6 +540,27 @@ describe('ResourceTable', () => {
         wrapper.emitted<{ resources: Resource[] }[]>('fileClick')[0][0].resources[0].name
       ).toMatch('psec-file.psec')
     })
+
+    it('does not link a password-protected folder without a resolvable link', async () => {
+      const resource = mock<OutgoingShareResource>({
+        id: 'secret',
+        name: 'secret',
+        path: '/.PasswordProtectedFolders/projects/Personal/secret',
+        isFolder: true,
+        type: 'folder',
+        getDomSelector: () => extractDomSelector('secret')
+      })
+      resource.outgoing = true
+      resource.sharedWith = []
+      resource.shareLinks = []
+
+      const { wrapper } = getMountedWrapper({ resources: [resource] })
+      const row = wrapper.find('.oc-tbody-tr-secret')
+      await row.find('.oc-resource-name').trigger('click')
+
+      expect(row.find('.oc-resource-link').exists()).toBeFalsy()
+      expect(wrapper.emitted().fileClick).toBeUndefined()
+    })
   })
 
   describe('resource details', () => {

@@ -34,7 +34,13 @@ export interface ShareResource extends Resource {
   outgoing: boolean
   driveId: string
 }
-export interface OutgoingShareResource extends ShareResource {}
+export interface OutgoingShareResource extends ShareResource {
+  /**
+   * The links the resource is shared by. Needed to be able to link to a share via its public
+   * link instead of linking to the resource itself.
+   */
+  shareLinks: LinkShare[]
+}
 
 export interface IncomingShareResource extends ShareResource {
   hidden: boolean
