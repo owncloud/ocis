@@ -77,6 +77,16 @@ class WebUIHelper {
 			$page->waitForSelector(self::$qrCode, ['timeout' => self::$defaultTimeout]);
 			$qrLocator = $page->locator(self::$qrCode);
 
+			// Wait until QR actually finished loading
+			$page->waitForFunction(
+				"(sel) => {\n" .
+				"    const img = document.querySelector(sel);\n" .
+				"    return img && img.complete && img.naturalWidth > 0;\n" .
+				"}",
+				self::$qrCode,
+				['timeout' => self::$defaultTimeout],
+			);
+
 			// setup mfa
 			$qrLocator->screenshot($screenshotPath);
 			if (!file_exists($screenshotPath)) {
