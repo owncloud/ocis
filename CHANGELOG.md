@@ -76,6 +76,7 @@ The following sections list the changes for 8.0.8.
 ## Summary
 
 * Security - Bump golang.org/x/image to v0.45.0: [#12808](https://github.com/owncloud/ocis/pull/12808)
+* Security - Bump Go to 1.25.13: [#12832](https://github.com/owncloud/ocis/pull/12832)
 * Bugfix - Cache LDAP instance mapper lookups: [#12823](https://github.com/owncloud/ocis/pull/12823)
 * Bugfix - Fix share metadata corruption during concurrent share operations: [#12621](https://github.com/owncloud/ocis/pull/12621)
 * Enhancement - Add TLS support for NATS store and registry connections: [#12765](https://github.com/owncloud/ocis/pull/12765)
@@ -88,6 +89,12 @@ The following sections list the changes for 8.0.8.
    GO-2026-6222: excessive memory allocation during VP8L decoding.
 
    https://github.com/owncloud/ocis/pull/12808
+
+* Security - Bump Go to 1.25.13: [#12832](https://github.com/owncloud/ocis/pull/12832)
+
+   Fixes a stdlib CVE vulnerability flagged by the release image scan.
+
+   https://github.com/owncloud/ocis/pull/12832
 
 * Bugfix - Cache LDAP instance mapper lookups: [#12823](https://github.com/owncloud/ocis/pull/12823)
 
