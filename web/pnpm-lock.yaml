@@ -731,6 +731,40 @@ importers:
         specifier: workspace:*
         version: link:../web-test-helpers
 
+  packages/web-app-mermaid-editor:
+    dependencies:
+      '@codemirror/commands':
+        specifier: ^6.8.1
+        version: 6.10.4
+      '@codemirror/language':
+        specifier: ^6.11.3
+        version: 6.12.4
+      '@codemirror/state':
+        specifier: ^6.5.2
+        version: 6.7.1
+      '@codemirror/view':
+        specifier: ^6.38.2
+        version: 6.43.6
+      '@ownclouders/web-client':
+        specifier: workspace:*
+        version: link:../web-client
+      '@ownclouders/web-pkg':
+        specifier: workspace:*
+        version: link:../web-pkg
+      dompurify:
+        specifier: ^3.4.11
+        version: 3.4.12
+      mermaid:
+        specifier: ^11.12.2
+        version: 11.16.0
+      vue3-gettext:
+        specifier: ^4.0.1
+        version: 4.0.1(vue@3.5.29(typescript@5.9.3))
+    devDependencies:
+      '@ownclouders/web-test-helpers':
+        specifier: workspace:*
+        version: link:../web-test-helpers
+
   packages/web-app-ocm:
     dependencies:
       '@ownclouders/design-system':
