@@ -10,7 +10,7 @@ require (
 	github.com/MicahParks/keyfunc/v2 v2.1.0
 	github.com/Nerzal/gocloak/v13 v13.9.0
 	github.com/bbalet/stopwords v1.0.0
-	github.com/beevik/etree v1.7.0
+	github.com/beevik/etree v1.7.1
 	github.com/blevesearch/bleve/v2 v2.6.0
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/cenkalti/backoff/v5 v5.0.3
@@ -22,7 +22,7 @@ require (
 	github.com/egirna/icap-client v0.1.1
 	github.com/gabriel-vasile/mimetype v1.4.15
 	github.com/ggwhite/go-masker v1.1.0
-	github.com/go-chi/chi/v5 v5.3.1
+	github.com/go-chi/chi/v5 v5.3.2
 	github.com/go-chi/httprate v0.16.0
 	github.com/go-chi/render v1.0.3
 	github.com/go-ldap/ldap/v3 v3.4.14
@@ -64,7 +64,7 @@ require (
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/ginkgo/v2 v2.32.1
 	github.com/onsi/gomega v1.42.1
-	github.com/open-policy-agent/opa v1.19.0
+	github.com/open-policy-agent/opa v1.19.1
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245
 	github.com/owncloud/reva/v2 v2.0.0-20260813121157-d386075a0421
@@ -76,10 +76,10 @@ require (
 	github.com/rs/cors v1.11.1
 	github.com/rs/zerolog v1.35.1
 	github.com/shamaton/msgpack/v2 v2.4.1
-	github.com/sirupsen/logrus v1.10.0
+	github.com/sirupsen/logrus v1.10.1
 	github.com/spf13/afero v1.15.0
 	github.com/spf13/cobra v1.10.2
-	github.com/stretchr/testify v1.11.1
+	github.com/stretchr/testify v1.12.0
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.6
 	github.com/tidwall/gjson v1.19.0
@@ -106,7 +106,7 @@ require (
 	golang.org/x/term v0.45.0
 	golang.org/x/text v0.41.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260803160001-6ac0973c030d
-	google.golang.org/grpc v1.83.0
+	google.golang.org/grpc v1.83.1
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools/v3 v3.5.2
@@ -168,7 +168,6 @@ require (
 	github.com/crewjam/httperr v0.2.0 // indirect
 	github.com/crewjam/saml v0.4.14 // indirect
 	github.com/cyphar/filepath-securejoin v0.6.1 // indirect
-	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/deckarep/golang-set v1.8.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.4.1 // indirect
 	github.com/desertbit/timer v1.0.1 // indirect
@@ -290,7 +289,6 @@ require (
 	github.com/philhofer/fwd v1.2.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.26 // indirect
 	github.com/pjbgf/sha1cd v0.6.0 // indirect
-	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/pquerna/cachecontrol v0.2.0 // indirect
 	github.com/prometheus/alertmanager v0.33.1 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
