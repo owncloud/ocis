@@ -160,6 +160,7 @@ const listItems = computed(() => {
     font-weight: bold;
     margin-bottom: var(--oc-space-xsmall);
     margin-top: var(--oc-space-small);
+    overflow-wrap: break-word;
     dt {
       &:first-child {
         margin-top: 0;
