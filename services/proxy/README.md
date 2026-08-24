@@ -299,6 +299,34 @@ This setting is empty by default, which keeps the behavior described above: such
 Because the default role is handed to everyone the mappings do not cover, prefer a low-privilege role
 such as `user-light` over `user` or `admin`.
 
+##### Relation to `GRAPH_ASSIGN_DEFAULT_USER_ROLE`
+
+`GRAPH_ASSIGN_DEFAULT_USER_ROLE` and `PROXY_ROLE_ASSIGNMENT_OIDC_DEFAULT_ROLE` both hand out a role
+when nothing else does, but they act at different moments and on different things:
+
+| | `GRAPH_ASSIGN_DEFAULT_USER_ROLE` | `PROXY_ROLE_ASSIGNMENT_OIDC_DEFAULT_ROLE` |
+|---|---|---|
+| when | once, when a user is **created** through the libregraph users API | on **every login**, after the role claim has been read |
+| which role | always `user`, not configurable | any role name you configure |
+| applies to | every user the graph service creates | only `role_assignment.driver: oidc` |
+| default | `true` | empty, meaning "refuse such logins" |
+
+The two only meet when `PROXY_AUTOPROVISION_ACCOUNTS` is enabled — which additionally requires a
+write-enabled libregraph user backend. A first login then creates the user through the graph service
+and resolves their role in the same request, in that order. **The proxy runs second and its result
+is the one that survives**, so on a login where the role claim is missing or matches no mapping:
+
+* with a default role configured, the user ends up on the default role, replacing whatever the graph
+  service assigned at creation;
+* with no default role configured, the login is refused even though the graph service already
+  assigned the `user` role a moment earlier — `GRAPH_ASSIGN_DEFAULT_USER_ROLE` does not, on its own,
+  let a user without a role claim in.
+
+The same applies to a role assigned by hand through the graph API or the admin UI: with the `oidc`
+driver the claim, or this default role, is re-applied at the next login and overwrites it. That is
+pre-existing behavior of the `oidc` driver and is not changed by this setting; use the `default`
+driver if roles are meant to be managed inside Infinite Scale rather than in the IDP.
+
 The default `role_claim` (or `PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM`) is `roles`. The default `role_mapping` is:
 
 ```yaml

@@ -303,6 +303,16 @@ func newRoleAssignerFixture(t *testing.T, opts Options, knownRoles map[string]st
 		Status: &rpc.Status{Code: rpc.Code_CODE_OK},
 		Token:  "service-token",
 	}, nil)
+	// Only reached when the resolved role differs from the assigned one and the
+	// assignment is therefore rewritten. Tests that keep the role unchanged never
+	// call these.
+	gatewayClient.On("CheckPermission", mock.Anything, mock.Anything).Return(&permissions.CheckPermissionResponse{
+		Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+	}, nil)
+	gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
+		Status:        &rpc.Status{Code: rpc.Code_CODE_OK},
+		StorageSpaces: []*storageprovider.StorageSpace{{Id: &storageprovider.StorageSpaceId{OpaqueId: "personal-space-id"}}},
+	}, nil)
 
 	bundles := make([]*settingsmsg.Bundle, 0, len(knownRoles))
 	for name, id := range knownRoles {
@@ -574,6 +584,53 @@ func TestUpdateUserRoleAssignmentRejectsAnUnreadableRolesClaim(t *testing.T) {
 		}
 		if roles := assignedRoleFromOpaque(t, got); len(roles) != 1 || roles[0] != defaultRoleID {
 			t.Fatalf("expected the default role id %q, got %v", defaultRoleID, roles)
+		}
+	})
+}
+
+// TestUpdateUserRoleAssignmentOverridesTheGraphAssignedDefaultRole pins how this
+// setting relates to GRAPH_ASSIGN_DEFAULT_USER_ROLE, which is the other place a role
+// is handed out when nothing else does. With PROXY_AUTOPROVISION_ACCOUNTS enabled the
+// two run in the same login request: the graph service creates the user and gives them
+// the "user" role, and the proxy resolves their role immediately afterwards. The proxy
+// runs second, so its answer is the one that survives - including when its answer is
+// to refuse the login. Both halves are asserted together so neither can be changed
+// without the other being considered.
+func TestUpdateUserRoleAssignmentOverridesTheGraphAssignedDefaultRole(t *testing.T) {
+	const (
+		graphAssignedRoleID = "graph-user-role-id"
+		defaultRoleID       = "user-light-id"
+	)
+	knownRoles := map[string]string{"user": graphAssignedRoleID, "user-light": defaultRoleID}
+	user := &cs3user.User{Id: &cs3user.UserId{OpaqueId: "user-1"}}
+	// a token that says nothing about roles, i.e. the federated user in the report
+	claims := map[string]interface{}{"sub": "abcd"}
+
+	t.Run("the proxy default role replaces it", func(t *testing.T) {
+		ra := newRoleAssignerFixture(t,
+			Options{rolesClaim: "roles", defaultRole: "user-light"},
+			knownRoles,
+			graphAssignedRoleID,
+		)
+		got, err := ra.UpdateUserRoleAssignment(context.Background(), user, claims, "")
+		if err != nil {
+			t.Fatalf("expected the default role to be applied, got error: %v", err)
+		}
+		if roles := assignedRoleFromOpaque(t, got); len(roles) != 1 || roles[0] != defaultRoleID {
+			t.Fatalf("expected the proxy default role %q to replace the graph assigned %q, got %v",
+				defaultRoleID, graphAssignedRoleID, roles)
+		}
+	})
+
+	t.Run("without one the login is still refused", func(t *testing.T) {
+		ra := newRoleAssignerFixture(t,
+			Options{rolesClaim: "roles", defaultRole: ""},
+			knownRoles,
+			graphAssignedRoleID,
+		)
+		_, err := ra.UpdateUserRoleAssignment(context.Background(), user, claims, "")
+		if !errors.Is(err, ErrNoRoleAssigned) {
+			t.Fatalf("a role assigned by the graph service must not stand in for a role claim, got %v", err)
 		}
 	})
 }
