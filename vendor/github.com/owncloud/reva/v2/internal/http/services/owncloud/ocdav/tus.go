@@ -320,7 +320,7 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 				sReq.Ref.ResourceId = nil
 			} else {
 				// new files have no node id yet; keep the path-based ref instead
-			if resid, err := storagespace.ParseID(httpRes.Header.Get(net.HeaderOCFileID)); err == nil && resid.GetOpaqueId() != "" {
+				if resid, err := storagespace.ParseID(httpRes.Header.Get(net.HeaderOCFileID)); err == nil && resid.GetOpaqueId() != "" {
 					sReq.Ref = &provider.Reference{
 						ResourceId: &resid,
 					}

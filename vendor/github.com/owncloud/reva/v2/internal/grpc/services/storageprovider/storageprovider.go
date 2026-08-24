@@ -212,9 +212,10 @@ func New(m map[string]interface{}, ss *grpc.Server, log *zerolog.Logger) (rgrpc.
 		return nil, err
 	}
 
-	coord, err := getCoordinator(c, fs, evstream, log)
+	// storageprovider only initiates uploads; the data path assembles chunks, so no chunking here.
+	coord, err := upload.NewCoordinatorFromConfig(c.UploadDirectory, c.Drivers[c.Driver], fs, evstream, log, false)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("storageprovider: %w", err)
 	}
 
 	service := &Service{
@@ -226,22 +227,6 @@ func New(m map[string]interface{}, ss *grpc.Server, log *zerolog.Logger) (rgrpc.
 	}
 
 	return service, nil
-}
-
-// getCoordinator builds the coordinator that initiates uploads for the driver
-// this service mounts. It stages sessions in the same directory the dataprovider
-// appends bytes to, so an upload initiated here can be continued there.
-func getCoordinator(c *config, fs storage.FS, publisher events.Publisher, log *zerolog.Logger) (upload.Coordinator, error) {
-	store := upload.NewFileStoreFromConfig(c.UploadDirectory, c.Drivers[c.Driver], log)
-	if store == nil {
-		return nil, fmt.Errorf("storageprovider: cannot determine the upload directory, set upload_directory")
-	}
-	if err := store.Setup(); err != nil {
-		return nil, fmt.Errorf("storageprovider: upload directory setup failed: %w", err)
-	}
-
-	// No chunk folder: only the data path assembles chunks.
-	return upload.NewCoordinator(fs, store, "", publisher), nil
 }
 
 func (s *Service) SetArbitraryMetadata(ctx context.Context, req *provider.SetArbitraryMetadataRequest) (*provider.SetArbitraryMetadataResponse, error) {

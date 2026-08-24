@@ -11,6 +11,7 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/google/uuid"
+	"github.com/rs/zerolog"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
 
 	"github.com/owncloud/reva/v2/pkg/appctx"
@@ -60,6 +61,24 @@ func NewCoordinator(fs storage.FS, store SessionStore, chunkFolder string, pub e
 		c.chunkHandler = chunking.NewChunkHandler(chunkFolder)
 	}
 	return c
+}
+
+// NewCoordinatorFromConfig sets up a coordinator and its file store. Pass
+// withChunking=false when only initiating uploads: chunk assembly happens on the
+// data path, so the storageprovider doesn't need it.
+func NewCoordinatorFromConfig(uploadDir string, driverConf map[string]interface{}, fs storage.FS, pub events.Publisher, log *zerolog.Logger, withChunking bool) (Coordinator, error) {
+	store := NewFileStoreFromConfig(uploadDir, driverConf, log)
+	if store == nil {
+		return nil, fmt.Errorf("cannot determine the upload directory, set upload_directory")
+	}
+	if err := store.Setup(); err != nil {
+		return nil, fmt.Errorf("upload directory setup failed: %w", err)
+	}
+	chunkFolder := ""
+	if withChunking {
+		chunkFolder = store.UploadDir()
+	}
+	return NewCoordinator(fs, store, chunkFolder, pub), nil
 }
 
 // InitiateUpload resolves the target, then creates and persists the session that

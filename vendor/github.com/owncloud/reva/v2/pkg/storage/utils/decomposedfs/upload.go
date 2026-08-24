@@ -692,14 +692,7 @@ func (fs *Decomposedfs) RollbackUpload(ctx context.Context, ref *provider.Refere
 	return nil
 }
 
-// rollbackOrphaned rolls back an upload whose target node can no longer be read,
-// which happens when the node file outlives its metadata: an ancestor trashed
-// mid-upload leaves a node whose ReadNode fails on the missing parent id. The ids
-// recorded on the session are enough to walk up the tree, so the quota is released
-// and the unreachable node removed rather than left consuming space forever.
-//
-// lookupErr is what made the node unreadable, returned when there is nothing on
-// the session to fall back to.
+// node metadata corrupt, use session ids to release quota
 func (fs *Decomposedfs) rollbackOrphaned(ctx context.Context, ref *provider.Reference, sessionID string, info storage.RollbackInfo, lookupErr error) error {
 	if info.NodeID == "" || info.ParentID == "" {
 		return fmt.Errorf("RollbackUpload: node lookup failed: %w", lookupErr)
@@ -708,10 +701,8 @@ func (fs *Decomposedfs) rollbackOrphaned(ctx context.Context, ref *provider.Refe
 	if spaceID == "" {
 		return fmt.Errorf("RollbackUpload: node lookup failed: %w", lookupErr)
 	}
-	log := appctx.GetLogger(ctx)
-	log.Info().Err(lookupErr).Str("sessionid", sessionID).Str("nodeid", info.NodeID).
+	appctx.GetLogger(ctx).Info().Err(lookupErr).Str("sessionid", sessionID).Str("nodeid", info.NodeID).
 		Msg("node unreadable, rolling back orphaned upload")
-
 	n := node.New(spaceID, info.NodeID, info.ParentID, info.Filename, info.Size, sessionID,
 		provider.ResourceType_RESOURCE_TYPE_FILE, nil, fs.lu)
 	spaceRoot, err := node.ReadNode(ctx, fs.lu, spaceID, spaceID, false, nil, false)
@@ -719,23 +710,23 @@ func (fs *Decomposedfs) rollbackOrphaned(ctx context.Context, ref *provider.Refe
 		return fmt.Errorf("RollbackUpload: space root lookup failed: %w", err)
 	}
 	n.SpaceRoot = spaceRoot
-
 	if info.SizeDiff != 0 {
-		// Stop before removing anything: the caller keeps the session on an error,
-		// so this stays retryable instead of leaking the quota silently.
+		// return error so caller keeps session for retry
 		if err := fs.tp.Propagate(ctx, n, -info.SizeDiff); err != nil {
 			return fmt.Errorf("RollbackUpload: could not revert propagate: %w", err)
 		}
 	}
-
-	// Nothing can resolve this node any more, so remove it and its metadata.
-	// Already gone is fine: the node may never have been created.
 	nodePath := n.InternalPath()
 	if err := utils.RemoveItem(nodePath); err != nil && !errors.Is(err, iofs.ErrNotExist) {
-		log.Error().Err(err).Str("nodepath", nodePath).Msg("RollbackUpload: removing orphaned node failed")
+		appctx.GetLogger(ctx).Error().Err(err).Str("nodepath", nodePath).Msg("RollbackUpload: removing orphaned node failed")
 	}
 	if err := fs.lu.MetadataBackend().Purge(ctx, nodePath); err != nil && !errors.Is(err, iofs.ErrNotExist) {
-		log.Error().Err(err).Str("nodepath", nodePath).Msg("RollbackUpload: purging orphaned node metadata failed")
+		appctx.GetLogger(ctx).Error().Err(err).Str("nodepath", nodePath).Msg("RollbackUpload: purging orphaned node metadata failed")
+	}
+	// parent holds a child entry pointing to the now-removed node
+	childEntry := filepath.Join(n.ParentPath(), n.Name)
+	if err := os.Remove(childEntry); err != nil && !errors.Is(err, iofs.ErrNotExist) {
+		appctx.GetLogger(ctx).Error().Err(err).Str("path", childEntry).Msg("RollbackUpload: removing orphaned child entry failed")
 	}
 	return nil
 }

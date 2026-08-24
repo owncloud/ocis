@@ -106,9 +106,10 @@ func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) 
 		return nil, err
 	}
 
-	coord, err := getCoordinator(conf, fs, evstream, log)
+	// the data path assembles chunks, so enable chunking
+	coord, err := upload.NewCoordinatorFromConfig(conf.UploadDirectory, conf.Drivers[conf.Driver], fs, evstream, log, true)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("dataprovider: %w", err)
 	}
 
 	// only the data path consumes postprocessing results: one consumer group gets
@@ -139,19 +140,6 @@ func getFS(c *config, stream events.Stream, log *zerolog.Logger) (storage.FS, er
 		return f(c.Drivers[c.Driver], stream, log)
 	}
 	return nil, fmt.Errorf("driver not found: %s", c.Driver)
-}
-
-// getCoordinator builds the coordinator that owns the upload lifecycle for the
-// driver this service mounts.
-func getCoordinator(c *config, fs storage.FS, publisher events.Publisher, log *zerolog.Logger) (upload.Coordinator, error) {
-	store := upload.NewFileStoreFromConfig(c.UploadDirectory, c.Drivers[c.Driver], log)
-	if store == nil {
-		return nil, fmt.Errorf("dataprovider: cannot determine the upload directory, set upload_directory")
-	}
-	if err := store.Setup(); err != nil {
-		return nil, fmt.Errorf("dataprovider: upload directory setup failed: %w", err)
-	}
-	return upload.NewCoordinator(fs, store, store.UploadDir(), publisher), nil
 }
 
 func getDataTXs(c *config, coord upload.Coordinator, fs storage.FS, publisher events.Publisher, log *zerolog.Logger) (map[string]http.Handler, error) {
