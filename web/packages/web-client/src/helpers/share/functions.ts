@@ -217,6 +217,9 @@ export function buildOutgoingShareResource({
       return { ...(p.grantedToV2.user || p.grantedToV2.group), shareType }
     }),
     shareTypes: driveItem.permissions.map(getShareTypeFromPermission),
+    shareLinks: driveItem.permissions
+      .filter(({ link }) => !!link)
+      .map((graphPermission) => buildLinkShare({ graphPermission, resourceId: driveItem.id })),
     isFolder: !!driveItem.folder,
     type: !!driveItem.folder ? 'folder' : 'file',
     mimeType: driveItem.file?.mimeType || 'httpd/unix-directory',
