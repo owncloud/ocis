@@ -18,5 +18,5 @@ what the files, text editor, app store, admin settings and ScienceMesh apps
 already do. With no menu items left to show, the existing top bar condition
 hides the app drawer on public links by itself.
 
-https://github.com/owncloud/ocis/pull/TODO-PR-NUMBER
+https://github.com/owncloud/ocis/pull/12842
 
