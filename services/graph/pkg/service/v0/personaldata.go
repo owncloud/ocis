@@ -213,7 +213,8 @@ func mustTouchFile(ctx context.Context, ref *provider.Reference, gwc gateway.Gat
 
 func touchFile(ctx context.Context, ref *provider.Reference, gwc gateway.GatewayAPIClient) error {
 	resp, err := gwc.TouchFile(ctx, &provider.TouchFileRequest{
-		Ref: ref,
+		Opaque: utils.AppendPlainToOpaque(nil, "markprocessing", "true"),
+		Ref:    ref,
 	})
 	if err != nil {
 		return err
