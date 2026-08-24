@@ -447,7 +447,11 @@ def main() -> int:
         if subprocess.run(["pkg-config", "--exists", "vips"],
                           capture_output=True).returncode == 0:
             build_env["ENABLE_VIPS"] = "true"
-        run(["make", "-C", str(repo_root / "ocis"), "build"], env=build_env)
+        # build debug for code coverage
+        make_target = "build-debug" if os.environ.get("GOCOVERDIR") else "build"
+        run(["make", "-C", str(repo_root / "ocis"), make_target], env=build_env)
+        if make_target == "build-debug":
+            (repo_root / "ocis" / "bin" / "ocis-debug").replace(repo_root / "ocis" / "bin" / "ocis")
 
     if not wrapper_bin.exists():
         run(["make", "-C", str(repo_root / "tests/ociswrapper"), "build"],

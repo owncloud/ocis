@@ -1,6 +1,7 @@
-import { Resource } from '@ownclouders/web-client'
+import { OutgoingShareResource, Resource } from '@ownclouders/web-client'
 import {
   extractParentFolderName,
+  isOutgoingShareResource,
   isProjectSpaceResource,
   isShareRoot,
   isShareSpaceResource
@@ -36,7 +37,29 @@ export const useFolderLink = (options: ResourceRouteResolverOptions = {}) => {
     return space.name
   }
 
+  /**
+   * A password-protected folder keeps its content in a hidden folder in the owner's personal
+   * space, guarded by an auto-created password-protected link. Linking to that folder directly
+   * would open it via the user's own credentials, without ever asking for the password, so in
+   * share listings we send the user to the public link instead. If the link cannot be determined
+   * we rather render no link at all than one which bypasses the password.
+   */
+  const getPasswordProtectedFolderLink = (resource: OutgoingShareResource) => {
+    const shareLink =
+      resource.shareLinks?.find(({ hasPassword }) => hasPassword) || resource.shareLinks?.[0]
+    const token = shareLink?.webUrl?.split('/').pop()
+
+    return token ? { name: 'resolvePublicLink', params: { token } } : null
+  }
+
   const getFolderLink = (resource: Resource) => {
+    if (
+      isOutgoingShareResource(resource) &&
+      resource.path.startsWith('/.PasswordProtectedFolders/projects/')
+    ) {
+      return getPasswordProtectedFolderLink(resource)
+    }
+
     return createFolderLink({
       path: resource.path,
       fileId: resource.fileId,

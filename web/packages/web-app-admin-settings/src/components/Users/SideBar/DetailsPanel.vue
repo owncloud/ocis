@@ -140,6 +140,8 @@ const loginDisplayValue = computed(() => {
 <style lang="scss">
 .details-table {
   text-align: left;
+  width: 100%;
+  table-layout: fixed;
 
   tr {
     height: 1.5rem;
@@ -147,6 +149,11 @@ const loginDisplayValue = computed(() => {
 
   th {
     font-weight: 600;
+    width: 40%;
+  }
+
+  td {
+    overflow-wrap: break-word;
   }
 }
 </style>

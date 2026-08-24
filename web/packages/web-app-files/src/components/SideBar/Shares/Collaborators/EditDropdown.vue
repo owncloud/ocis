@@ -266,7 +266,7 @@ const isRemoveExpirationPossible = computed(() => {
 .share-access-details-drop {
   dl {
     display: grid;
-    grid-template-columns: max-content auto;
+    grid-template-columns: max-content minmax(0, 1fr);
     column-gap: var(--oc-space-medium);
     row-gap: var(--oc-space-xsmall);
   }
