@@ -8,4 +8,4 @@ value and breaking the layout.
 Long values are now wrapped onto multiple lines so these views stay
 within their bounds regardless of value length.
 
-https://github.com/owncloud/ocis/pull/12839
+https://github.com/owncloud/ocis/pull/12840
