@@ -1381,15 +1381,13 @@ func (i *LDAP) expandLDAPAttributeEntriesByDN(ctx context.Context, e *ldap.Entry
 	return result
 }
 
-// expandLDAPAttributeEntriesByDN will assume the attribute contains usernames
+// expandLDAPAttributeEntriesByUsername will assume the attribute contains usernames
 // values, and it will expand them appropriately.
 // Attributes such as "memberUid" are candidates.
 func (i *LDAP) expandLDAPAttributeEntriesByUsername(ctx context.Context, e *ldap.Entry, attribute, searchTerm string) []*ldap.Entry {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("ExpandLDAPAttributeEntries")
 	result := []*ldap.Entry{}
-
-	baseFilter := fmt.Sprintf("(objectClass=%s)", i.userObjectClass)
 
 	searchFilter := ""
 	if searchTerm != "" {
@@ -1408,8 +1406,9 @@ func (i *LDAP) expandLDAPAttributeEntriesByUsername(ctx context.Context, e *ldap
 		}
 
 		entryFilter := fmt.Sprintf("(%s=%s)", i.userAttributeMap.userName, ldap.EscapeFilter(entryUid))
+		// filter for objectClass is added inside the getLDAPUserByFilter
 
-		finalFilter := fmt.Sprintf("(&%s%s%s)", baseFilter, searchFilter, entryFilter)
+		finalFilter := fmt.Sprintf("(&%s%s)", searchFilter, entryFilter)
 		logger.Debug().Str("entryUid", entryUid).Msg("lookup")
 		ue, err := i.getLDAPUserByFilter(finalFilter, i.userFilter)
 		if err != nil {
