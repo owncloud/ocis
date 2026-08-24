@@ -476,3 +476,104 @@ func TestUpdateUserRoleAssignmentReportsAnUnknownDefaultRole(t *testing.T) {
 		t.Fatalf("the error should name the offending role, got %v", err)
 	}
 }
+
+// TestExtractRolesSeparatesASilentTokenFromAnUnreadableOne pins the distinction the
+// fallback rests on. A token that carries no roles for this user is a normal token
+// from an IDP that federates users in without role information; a token whose roles
+// claim is present but unreadable is a sign that something is misconfigured. Before
+// ErrRolesClaimNotSet existed both shapes came back as a bare "no roles in user
+// claims" error, so the caller could not tell them apart and had to treat every
+// unreadable claim as a user without a role.
+func TestExtractRolesSeparatesASilentTokenFromAnUnreadableOne(t *testing.T) {
+	silent := map[string]map[string]interface{}{
+		"claim absent":               {"sub": "abcd"},
+		"claim present but null":     {"roles": nil},
+		"nested path, parent absent": {"sub": "abcd"},
+		"nested path, leaf absent":   {"resource_access": map[string]interface{}{"ocis": map[string]interface{}{}}},
+	}
+	for name, claims := range silent {
+		t.Run("silent/"+name, func(t *testing.T) {
+			claim := "roles"
+			if strings.HasPrefix(name, "nested") {
+				claim = "resource_access.ocis.roles"
+			}
+			roles, err := extractRoles(claim, claims)
+			if !errors.Is(err, ErrRolesClaimNotSet) {
+				t.Fatalf("expected ErrRolesClaimNotSet, got %v", err)
+			}
+			if len(roles) != 0 {
+				t.Fatalf("expected no roles, got %v", roles)
+			}
+		})
+	}
+
+	unreadable := map[string]struct {
+		claim  string
+		claims map[string]interface{}
+	}{
+		"claim holds a number":           {"roles", map[string]interface{}{"roles": 42}},
+		"claim holds a non-string entry": {"roles", map[string]interface{}{"roles": []interface{}{"a", 7}}},
+		"path runs through a string":     {"resource_access.ocis.roles", map[string]interface{}{"resource_access": "not-an-object"}},
+	}
+	for name, tc := range unreadable {
+		t.Run("unreadable/"+name, func(t *testing.T) {
+			roles, err := extractRoles(tc.claim, tc.claims)
+			if err == nil {
+				t.Fatal("expected an error for an unreadable roles claim")
+			}
+			if errors.Is(err, ErrRolesClaimNotSet) {
+				t.Fatalf("an unreadable claim must not report as a silent token, got %v", err)
+			}
+			if len(roles) != 0 {
+				t.Fatalf("expected no roles, got %v", roles)
+			}
+		})
+	}
+}
+
+// TestUpdateUserRoleAssignmentRejectsAnUnreadableRolesClaim is the behaviour asked for
+// in review: a claim we cannot read must not be quietly rounded down to "this user has
+// no roles" and signed in on the default role. That would hide a broken IDP mapping
+// behind a working login. A token that is merely silent about roles still falls back,
+// which is what #11467 asks for; the two paths are covered together so neither can be
+// changed without the other being considered.
+func TestUpdateUserRoleAssignmentRejectsAnUnreadableRolesClaim(t *testing.T) {
+	const defaultRoleID = "user-light-id"
+
+	newFixture := func(t *testing.T) oidcRoleAssigner {
+		return newRoleAssignerFixture(t,
+			Options{
+				rolesClaim:  "roles",
+				roleMapping: []config.RoleMapping{{RoleName: "admin", ClaimValue: "ocisAdmin"}},
+				defaultRole: "user-light",
+			},
+			map[string]string{"admin": "admin-id", "user-light": defaultRoleID},
+			defaultRoleID,
+		)
+	}
+	user := &cs3user.User{Id: &cs3user.UserId{OpaqueId: "user-1"}}
+
+	t.Run("unreadable claim is reported", func(t *testing.T) {
+		ra := newFixture(t)
+		_, err := ra.UpdateUserRoleAssignment(context.Background(), user,
+			map[string]interface{}{"sub": "abcd", "roles": 42}, "")
+		if err == nil {
+			t.Fatal("expected an unreadable roles claim to be reported, not defaulted")
+		}
+		if errors.Is(err, ErrNoRoleAssigned) {
+			t.Fatalf("an unreadable claim is not a user without a role, got %v", err)
+		}
+	})
+
+	t.Run("silent token still falls back", func(t *testing.T) {
+		ra := newFixture(t)
+		got, err := ra.UpdateUserRoleAssignment(context.Background(), user,
+			map[string]interface{}{"sub": "abcd"}, "")
+		if err != nil {
+			t.Fatalf("expected the default role to be applied, got error: %v", err)
+		}
+		if roles := assignedRoleFromOpaque(t, got); len(roles) != 1 || roles[0] != defaultRoleID {
+			t.Fatalf("expected the default role id %q, got %v", defaultRoleID, roles)
+		}
+	})
+}

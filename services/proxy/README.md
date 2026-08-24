@@ -287,8 +287,13 @@ role_assignment:
               claim_value: myUserRole
 ```
 
-The default role applies when the role claim is missing entirely, when it cannot be read, and when
-it is present but matches no `role_mapping` entry. A mapping that does match always wins over it.
+The default role applies when the role claim is missing entirely and when it is present but matches
+no `role_mapping` entry. A mapping that does match always wins over it.
+
+A role claim that is present but cannot be read — it holds a number, or a list with a non-string in
+it, or `role_claim` points through a value that is not an object — does *not* get the default role.
+That is a fault in the token or in `role_claim` rather than a user without a role, and it is
+reported so it does not hide behind a working login.
 
 This setting is empty by default, which keeps the behavior described above: such logins are refused.
 Because the default role is handed to everyone the mappings do not cover, prefer a low-privilege role
