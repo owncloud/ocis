@@ -65,10 +65,10 @@ func extractRoles(rolesClaim string, claims map[string]interface{}) (map[string]
 	segments := oidc.SplitWithEscaping(rolesClaim, ".", "\\")
 	claim, err := oidc.WalkSegments(segments, claims)
 	if err != nil {
-		// WalkSegments reports a missing intermediate segment and a segment that is
-		// present but is not an object with the same "unsupported type" error. Only
-		// the first is a token that is merely silent about roles.
-		if claimPathAbsent(segments, claims) {
+		// A segment that is simply not in the token means the token is silent about
+		// roles. A segment that is present but cannot be descended into means it says
+		// something about them that we cannot make sense of, which is a real error.
+		if errors.Is(err, oidc.ErrMissingClaim) {
 			return nil, ErrRolesClaimNotSet
 		}
 		return nil, err
@@ -99,36 +99,6 @@ func extractRoles(rolesClaim string, claims map[string]interface{}) (map[string]
 	}
 
 	return claimRoles, nil
-}
-
-// claimPathAbsent reports whether the dotted claim path is simply not present in the
-// token, as opposed to present and holding something we cannot read. Every segment
-// before the last must exist and be an object for the walk to continue: a missing
-// segment means the token is silent about roles, while a segment that exists but is
-// not an object means the token says something about them that we cannot make sense
-// of. It mirrors the traversal in oidc.WalkSegments, which reports both as one error.
-func claimPathAbsent(segments []string, claims map[string]interface{}) bool {
-	for i := 0; i < len(segments)-1; i++ {
-		switch next := claims[segments[i]].(type) {
-		case nil:
-			return true
-		case map[string]interface{}:
-			claims = next
-		case map[interface{}]interface{}:
-			converted := make(map[string]interface{}, len(next))
-			for k, v := range next {
-				s, ok := k.(string)
-				if !ok {
-					return false
-				}
-				converted[s] = v
-			}
-			claims = converted
-		default:
-			return false
-		}
-	}
-	return claims[segments[len(segments)-1]] == nil
 }
 
 // matchesClaimMapping returns true if the provided mapping pattern matches at least
