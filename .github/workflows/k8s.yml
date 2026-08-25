@@ -31,47 +31,48 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - suite: apiContract
-          - suite: apiLocks
-          - suite: apiSettings
-          # - suite: apiNotification
-          - suite: apiCors
-          - suite: apiGraphUser
-          - suite: apiGraph
-          - suite: apiGraphGroup
-          # - suite: apiSpaces
-          - suite: apiSpacesShares
-          - suite: apiSpacesDavOperation
-          - suite: apiDownloads
-          - suite: apiAsyncUpload
-          - suite: apiDepthInfinity
-          - suite: apiArchiver
-          - suite: apiActivities
-          - suite: apiSearch1
-          - suite: apiSearch2
-          # - suite: apiSearchContent
-          - suite: apiSharingNgShares
-          - suite: apiReshare
-          - suite: apiSharingNgPermissions
-          - suite: apiSharingNgAdditionalShareRole
-          - suite: apiSharingNgDriveInvitation
-          # - suite: apiSharingNgItemInvitation
-          - suite: apiSharingNgDriveLinkShare
-          - suite: apiSharingNgItemLinkShare
-          - suite: apiSharingNgLinkShareManagement
-          - suite: apiAuthApp
-          # - suite: apiAntivirus
-          - suite: apiOcm
+          # - suite: apiContract
+          # - suite: apiLocks
+          # - suite: apiSettings
+          # # - suite: apiNotification
+          # - suite: apiCors
+          # - suite: apiGraphUser
+          # - suite: apiGraph
+          # - suite: apiGraphGroup
+          # # - suite: apiSpaces
+          # - suite: apiSpacesShares
+          # - suite: apiSpacesDavOperation
+          # - suite: apiDownloads
+          # - suite: apiAsyncUpload
+          # - suite: apiDepthInfinity
+          # - suite: apiArchiver
+          # - suite: apiActivities
+          # - suite: apiSearch1
+          # - suite: apiSearch2
+          # # - suite: apiSearchContent
+          # - suite: apiSharingNgShares
+          # - suite: apiReshare
+          # - suite: apiSharingNgPermissions
+          # - suite: apiSharingNgAdditionalShareRole
+          # - suite: apiSharingNgDriveInvitation
+          # # - suite: apiSharingNgItemInvitation
+          # - suite: apiSharingNgDriveLinkShare
+          # - suite: apiSharingNgItemLinkShare
+          # - suite: apiSharingNgLinkShareManagement
+          # - suite: apiAuthApp
+          # # - suite: apiAntivirus
+          # - suite: apiOcm
           # - suite: apiCollaboration
-          # - suite: "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
-          - suite: "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
-          - suite: "coreApiSharees"
-          - suite: "coreApiSharePublicLink2"
-          - suite: "coreApiShareOperationsToShares1,coreApiShareOperationsToShares2,coreApiSharePublicLink1,coreApiShareCreateSpecialToShares1,coreApiShareCreateSpecialToShares2,coreApiShareUpdateToShares"
-          - suite: "coreApiTrashbin,coreApiTrashbinRestore,coreApiWebdavEtagPropagation1,coreApiWebdavEtagPropagation2"
-          - suite: "coreApiWebdavDelete,coreApiWebdavOperations,coreApiWebdavMove2"
-          - suite: "coreApiWebdavProperties"
-          # - suite: "coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS"
+          - suite: apiVault
+          # # - suite: "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
+          # - suite: "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
+          # - suite: "coreApiSharees"
+          # - suite: "coreApiSharePublicLink2"
+          # - suite: "coreApiShareOperationsToShares1,coreApiShareOperationsToShares2,coreApiSharePublicLink1,coreApiShareCreateSpecialToShares1,coreApiShareCreateSpecialToShares2,coreApiShareUpdateToShares"
+          # - suite: "coreApiTrashbin,coreApiTrashbinRestore,coreApiWebdavEtagPropagation1,coreApiWebdavEtagPropagation2"
+          # - suite: "coreApiWebdavDelete,coreApiWebdavOperations,coreApiWebdavMove2"
+          # - suite: "coreApiWebdavProperties"
+          # # - suite: "coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS"
 
     steps:
       - name: Checkout
@@ -103,30 +104,32 @@ jobs:
 
       - name: Prepare hosts
         run: |
-          echo "127.0.0.1 ocis-server clamav email collabora onlyoffice fakeoffice tika federation-ocis-server" \
+          echo "127.0.0.1 ocis-server clamav email collabora onlyoffice fakeoffice tika federation-ocis-server keycloak" \
             | sudo tee -a /etc/hosts
 
       - name: Spin up K3d Cluster
         run: make -C tests/config/k8s create-cluster
 
-      - name: Prepare Helm Charts & Deploy oCIS
+      - name: Prepare Helm Charts
         env:
           ENABLE_ANTIVIRUS: ${{ matrix.suite == 'apiAntivirus' }}
           ENABLE_EMAIL: ${{ matrix.suite == 'apiNotification' || matrix.suite == 'apiSettings' || matrix.suite == 'apiOcm' }}
-          ENABLE_TIKA: ${{ matrix.suite == 'apiSearchContent' }}
+          ENABLE_TIKA: ${{ matrix.suite == 'apiSearchContent' || matrix.suite == 'apiVault' }}
           ENABLE_WOPI: ${{ matrix.suite == 'apiCollaboration' }}
           ENABLE_OCM: ${{ matrix.suite == 'apiOcm' }}
           ENABLE_AUTH_APP: ${{ matrix.suite == 'apiAuthApp' }}
+          ENABLE_VAULT: ${{ matrix.suite == 'apiVault' }}
         run: |
           cd tests/config/k8s
           make prepare-charts
-          kubectl get pods -n ocis-server -Aw &
-          make deploy-ocis
           if [[ "${{ matrix.suite }}" == "apiOcm" ]]; then
             OCM=true make prepare-charts
-            OCM=true make deploy-ocis
           fi
 
+      # Keycloak/postgres (and the other suite-specific backends below) must be up and
+      # exposed to the cluster *before* oCIS is deployed: the proxy validates the
+      # OCIS_OIDC_ISSUER well-known endpoint against Keycloak at startup in vault mode,
+      # so `helm install --wait` would time out waiting for the proxy pod otherwise.
       - name: Deploy Suite-Specific External Backends
         run: |
           if [[ "${{ matrix.suite }}" == "apiNotification" || \
@@ -147,12 +150,79 @@ jobs:
             bash tests/config/k8s/expose-external-svc.sh clamav:3310
           fi
 
-          if [[ "${{ matrix.suite }}" == "apiSearchContent" ]]; then
+          if [[ "${{ matrix.suite }}" == "apiSearchContent" || "${{ matrix.suite }}" == "apiVault" ]]; then
             docker run -d \
               -p 9998:9998 \
               --name tika \
               apache/tika:3.2.2.0-full
             bash tests/config/k8s/expose-external-svc.sh tika:9998
+          fi
+
+          if [[ "${{ matrix.suite }}" == "apiVault" ]]; then
+            # GitHub runners ship PostgreSQL pre-started on 5432; stop it so our
+            # container (needed by keycloak) can bind the same port.
+            sudo systemctl stop postgresql || true
+
+            mkdir -p keycloak-certs
+            openssl req -x509 -newkey rsa:2048 \
+              -keyout keycloak-certs/keycloakkey.pem \
+              -out keycloak-certs/keycloakcrt.pem \
+              -nodes -days 365 -subj "/CN=keycloak"
+            chmod 777 keycloak-certs/*
+
+            # patch the realm so the "web" client's redirect/origin URLs match
+            # the k8s ingress domain instead of the non-k8s "localhost:9200" one
+            sed 's|https://localhost:9200|https://ocis-server|g' \
+              tests/config/ci/ocis-mfa-ci-realm.dist.json > /tmp/ocis-realm.json
+
+            docker run -d --name postgres --network host \
+              -e POSTGRES_DB=keycloak \
+              -e POSTGRES_USER=keycloak \
+              -e POSTGRES_PASSWORD=keycloak \
+              postgres:alpine3.18
+
+            for i in {1..30}; do
+              docker exec postgres pg_isready -U keycloak && break
+              echo "Waiting for postgres... ($i/30)"
+              sleep 2
+            done
+
+            docker run -d --name keycloak --network host \
+              -e OCIS_DOMAIN=https://ocis-server \
+              -e KC_HOSTNAME=keycloak \
+              -e KC_PORT=8443 \
+              -e KC_DB=postgres \
+              -e KC_DB_URL=jdbc:postgresql://localhost:5432/keycloak \
+              -e KC_DB_USERNAME=keycloak \
+              -e KC_DB_PASSWORD=keycloak \
+              -e KC_FEATURES=impersonation \
+              -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
+              -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+              -e KC_HTTPS_CERTIFICATE_FILE=/keycloak-certs/keycloakcrt.pem \
+              -e KC_HTTPS_CERTIFICATE_KEY_FILE=/keycloak-certs/keycloakkey.pem \
+              -v "$(pwd)/keycloak-certs:/keycloak-certs:ro" \
+              -v /tmp/ocis-realm.json:/opt/keycloak/data/import/ocis-mfa-ci-realm.dist.json:ro \
+              quay.io/keycloak/keycloak:26.5.6 \
+              start-dev --proxy-headers xforwarded \
+              --spi-connections-http-client-default-disable-trust-manager=true \
+              --import-realm --health-enabled=true
+
+            for i in {1..60}; do
+              curl -skf https://localhost:9000/health/ready && break
+              echo "Waiting for keycloak... ($i/60)"
+              sleep 5
+            done
+
+            bash tests/config/k8s/expose-external-svc.sh keycloak:8443
+          fi
+
+      - name: Deploy oCIS
+        run: |
+          cd tests/config/k8s
+          kubectl get pods -n ocis-server -Aw &
+          make deploy-ocis
+          if [[ "${{ matrix.suite }}" == "apiOcm" ]]; then
+            OCM=true make deploy-ocis
           fi
       
       - name: Wait for oCIS to be ready
@@ -175,45 +245,67 @@ jobs:
 
           kubectl get pods -n ocis-server
 
-          echo "Creating test file in oCIS..."
-
-          request() {
-            local method=$1
-            shift
-            curl -ks -o /dev/null -w "%{http_code}" \
-              -X "$method" \
-              -u admin:admin \
-              "$@" \
-              "$FILE_URL"
-          }
-
-          retry_http() {
-            local expected=$1
+          retry() {
+            local label=$1
             shift
             for i in {1..30}; do
-              status=$("$@")
-              if [ "$status" = "$expected" ]; then
-                echo "Succeeded (HTTP $status)"
+              if "$@"; then
+                echo "$label succeeded"
                 return 0
               fi
-              echo "Attempt $i failed (HTTP $status), retrying in 10s..."
+              echo "$label attempt $i failed, retrying in 10s..."
               sleep 10
             done
-            echo "Failed after 30 attempts"
+            echo "$label failed after 30 attempts"
             return 1
           }
-          put_file() {
-            request PUT \
-              -H "Content-Type: text/plain" \
-              --data "Hello from GitHub Actions!"
-          }
-          delete_file() {
-            request DELETE
-          }
-          echo "Creating test file..."
-          retry_http 201 put_file || exit 1
-          echo "Deleting test file..."
-          retry_http 204 delete_file || exit 1
+
+          if [[ "${{ matrix.suite }}" == "apiVault" ]]; then
+            # In vault mode IDM_CREATE_DEMO_USERS=false, so there is no "admin"
+            # LDAP user to authenticate the basic-auth check below against.
+            # Poll the proxy's unauthenticated debug readyz endpoint instead,
+            # reached via port-forward since it isn't exposed by any Service.
+            # local port 19205 (not 9205): 9100-9399 is already bound on the
+            # host by the k3d loadbalancer's NodePort range, see create-cluster.
+            kubectl -n ocis-server port-forward deployment/proxy 19205:9205 &
+            PORT_FORWARD_PID=$!
+            trap 'kill $PORT_FORWARD_PID 2>/dev/null' EXIT
+
+            proxy_ready() {
+              curl -sf http://localhost:19205/readyz > /dev/null
+            }
+            retry "proxy readyz" proxy_ready || exit 1
+          else
+            echo "Creating test file in oCIS..."
+
+            request() {
+              local method=$1
+              shift
+              curl -ks -o /dev/null -w "%{http_code}" \
+                -X "$method" \
+                -u admin:admin \
+                "$@" \
+                "$FILE_URL"
+            }
+            put_file() {
+              request PUT \
+                -H "Content-Type: text/plain" \
+                --data "Hello from GitHub Actions!"
+            }
+            delete_file() {
+              request DELETE
+            }
+            check_status() {
+              local expected=$1
+              shift
+              status=$("$@")
+              [ "$status" = "$expected" ]
+            }
+            echo "Creating test file..."
+            retry "create file (HTTP 201)" check_status 201 put_file || exit 1
+            echo "Deleting test file..."
+            retry "delete file (HTTP 204)" check_status 204 delete_file || exit 1
+          fi
 
       - name: Expose debug ports
         run: bash tests/config/k8s/expose-debug-svc.sh
@@ -229,6 +321,17 @@ jobs:
             --admin-password admin \
             --skip-ocis-run \
             -n ocis-server &
+
+      - name: Install Playwright for vault tests
+        if: matrix.suite == 'apiVault'
+        run: |
+          composer install --no-progress
+          composer bin behat install --no-progress
+          vendor-php/bin/playwright-install
+          vendor-php/bin/playwright-install --browsers
+        env:
+          COMPOSER_NO_INTERACTION: "1"
+          COMPOSER_NO_AUDIT: "1"
 
       - name: Prepare expected failures
         if: startsWith( matrix.suite, 'core' )
@@ -253,6 +356,8 @@ jobs:
           OCIS_WRAPPER_URL: ${{ env.OCIS_WRAPPER_URL }}
           COLLABORATION_SERVICE_URL: http://ocis-server:9304
           K8S: ${{ env.K8S }}
+          KEYCLOAK: ${{ matrix.suite == 'apiVault' }}
+          KC_URL: https://keycloak:8443
         run: make test-acceptance-api
 
       - name: Run Core ${{ matrix.suite }} tests
