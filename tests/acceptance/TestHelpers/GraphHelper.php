@@ -1004,8 +1004,12 @@ class GraphHelper {
 	): ResponseInterface {
 		$urlArguments = $urlArguments ? "?$urlArguments" : "";
 		$url = self::getFullUrl($baseUrl, "me/drives" . $urlArguments, $isVault);
+		var_dump($url);
 
-		return HttpRequestHelper::get($url, $user, $password, $headers, $body);
+		$response = HttpRequestHelper::get($url, $user, $password, $headers, $body);
+		var_dump($response->getStatusCode());
+		var_dump($response->getBody()->getContents());
+		return $response;
 	}
 
 	/**
