@@ -369,6 +369,26 @@ describe('ResourceTable', () => {
       expect(wrapper.find('.oc-tbody-tr-in-delete-queue .oc-checkbox').exists()).toBe(false)
       expect(wrapper.find('.oc-tbody-tr-in-delete-queue .oc-spinner').exists()).toBe(true)
     })
+    it('publishes a shift-click event instead of toggling when shift is held on a checkbox', async () => {
+      const { wrapper } = getMountedWrapper()
+      const publishSpy = vi.spyOn(eventBus, 'publish')
+      await wrapper.find('.oc-tbody-tr-documents .oc-checkbox').trigger('click', { shiftKey: true })
+      expect(publishSpy).toHaveBeenCalledWith(
+        'app.files.list.clicked.shift',
+        expect.objectContaining({ resource: expect.objectContaining({ id: 'documents' }) })
+      )
+      expect(wrapper.emitted('update:selectedIds')).toBeUndefined()
+    })
+    it('publishes a meta-click event instead of toggling when meta is held on a checkbox', async () => {
+      const { wrapper } = getMountedWrapper()
+      const publishSpy = vi.spyOn(eventBus, 'publish')
+      await wrapper.find('.oc-tbody-tr-documents .oc-checkbox').trigger('click', { metaKey: true })
+      expect(publishSpy).toHaveBeenCalledWith(
+        'app.files.list.clicked.meta',
+        expect.objectContaining({ id: 'documents' })
+      )
+      expect(wrapper.emitted('update:selectedIds')).toBeUndefined()
+    })
 
     describe('all rows already selected', () => {
       it('de-selects all resources via the select-all checkbox', async () => {
@@ -519,6 +539,27 @@ describe('ResourceTable', () => {
       expect(
         wrapper.emitted<{ resources: Resource[] }[]>('fileClick')[0][0].resources[0].name
       ).toMatch('psec-file.psec')
+    })
+
+    it('does not link a password-protected folder without a resolvable link', async () => {
+      const resource = mock<OutgoingShareResource>({
+        id: 'secret',
+        name: 'secret',
+        path: '/.PasswordProtectedFolders/projects/Personal/secret',
+        isFolder: true,
+        type: 'folder',
+        getDomSelector: () => extractDomSelector('secret')
+      })
+      resource.outgoing = true
+      resource.sharedWith = []
+      resource.shareLinks = []
+
+      const { wrapper } = getMountedWrapper({ resources: [resource] })
+      const row = wrapper.find('.oc-tbody-tr-secret')
+      await row.find('.oc-resource-name').trigger('click')
+
+      expect(row.find('.oc-resource-link').exists()).toBeFalsy()
+      expect(wrapper.emitted().fileClick).toBeUndefined()
     })
   })
 

@@ -163,6 +163,7 @@ func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream, l
 		microstore.Table(o.IDCache.Table),
 		store.DisablePersistence(o.IDCache.DisablePersistence),
 		store.Authentication(o.IDCache.AuthUsername, o.IDCache.AuthPassword),
+		store.TLS(o.IDCache.EnableTLS, o.IDCache.TLSInsecure, o.IDCache.TLSRootCACert),
 	), log)
 
 	permissionsSelector, err := pool.PermissionsSelector(o.PermissionsSVC, pool.WithTLSMode(o.PermTLSMode))
@@ -232,6 +233,12 @@ func New(o *options.Options, aspects aspects.Aspects, log *zerolog.Logger) (stor
 	// set a null usermapper if we don't have one
 	if aspects.UserMapper == nil {
 		aspects.UserMapper = &usermapper.NullMapper{}
+	}
+
+	// posix has no disable_versioning config key and sets this on the aspects only.
+	// One-directional: a driver that cannot keep revisions overrides the preference.
+	if aspects.DisableVersioning {
+		o.DisableVersioning = true
 	}
 
 	fs := &Decomposedfs{
@@ -308,7 +315,12 @@ func (fs *Decomposedfs) processEvent(evCtx context.Context, event events.Event, 
 
 		n, err := session.Node(ctx)
 		if err != nil {
-			sublog.Error().Err(err).Msg("could not read node")
+			// The node metadata is unreadable, so this upload can never finish:
+			// the destination cannot be resolved. Clean the session up instead of
+			// leaving it behind to be retried forever. Cleanup falls back to the
+			// session metadata to release the quota.
+			sublog.Error().Err(err).Msg("could not read node, cleaning up orphaned session")
+			session.Cleanup(true, true, true, false)
 			return
 		}
 		sublog = log.With().Str("spaceid", session.SpaceID()).Str("nodeid", session.NodeID()).Logger()
@@ -473,7 +485,7 @@ func (fs *Decomposedfs) processEvent(evCtx context.Context, event events.Event, 
 			return
 		}
 
-		if err := n.RevertCurrentRevision(ctx); err != nil {
+		if err := n.RevertCurrentRevision(ctx, true); err != nil {
 			sublog.Error().Err(err).Msg("Failed to revert revision")
 			return
 		}

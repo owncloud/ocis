@@ -25,7 +25,6 @@ declare(strict_types=1);
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use GuzzleHttp\Exception\GuzzleException;
-use JsonException;
 use PHPUnit\Framework\Assert;
 use TestHelpers\BehatHelper;
 use TestHelpers\KeycloakHelper;
@@ -95,7 +94,7 @@ class VaultContext implements Context {
 	}
 
 	/**
-	 * @Then user :user should have acr value :acr
+	 * @Then user :user should have a JWT token with an ACR value :acr
 	 *
 	 * @param string $user
 	 * @param string $acr
@@ -103,7 +102,7 @@ class VaultContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userShouldHaveAcrValue(string $user, string $acr): void {
+	public function userShouldHaveAJwtTokenWithAnAcrValue(string $user, string $acr): void {
 		$accessToken = $this->featureContext->getOcisUserToken($user)['token']['accessToken'];
 
 		// Decode JWT token

@@ -1,5 +1,5 @@
 <template>
-  <div class="sciencemesh">
+  <main class="sciencemesh">
     <div class="oc-flex oc-flex-column sciencemesh-wrapper">
       <div class="oc-flex sciencemesh-top">
         <div id="sciencemesh-invite" class="oc-width-1-2">
@@ -17,7 +17,7 @@
         />
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <script lang="ts" setup>

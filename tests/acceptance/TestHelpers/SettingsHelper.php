@@ -226,8 +226,8 @@ class SettingsHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
 	 * @param array $headers
 	 *
 	 * @return ResponseInterface
@@ -237,8 +237,8 @@ class SettingsHelper {
 	 */
 	public static function getValuesList(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
 		array $headers = [],
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "values-list");
@@ -254,8 +254,9 @@ class SettingsHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
+	 * @param array $headers
 	 *
 	 * @return bool
 	 *
@@ -264,10 +265,11 @@ class SettingsHelper {
 	 */
 	public static function getAutoAcceptSharesDefaultValue(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
+		array $headers = [],
 	): bool {
-		$response = self::getValuesList($baseUrl, $user, $password);
+		$response = self::getValuesList($baseUrl, $user, $password, $headers);
 		Assert::assertEquals(201, $response->getStatusCode(), "Failed to get values list");
 
 		$valuesList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response);

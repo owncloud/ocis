@@ -253,7 +253,7 @@ func (d *driver) CreateDir(ctx context.Context, ref *provider.Reference) (*stora
 }
 
 func (d *driver) Delete(ctx context.Context, ref *provider.Reference) (*storage.DeleteResult, error) {
-	client, _, rel, err := d.webdavClient(ctx, nil, ref)
+	client, _, rel, err := d.serviceWebdavClient(ctx, ref)
 	if err != nil {
 		return nil, err
 	}
@@ -264,14 +264,24 @@ func (d *driver) Delete(ctx context.Context, ref *provider.Reference) (*storage.
 }
 
 func (d *driver) TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool, mtime string) (*storage.TouchFileResult, error) {
-	client, _, rel, err := d.webdavClient(ctx, nil, ref)
+	client, _, rel, err := d.serviceWebdavClient(ctx, ref)
 	if err != nil {
 		return nil, err
 	}
 	if err := client.Write(rel, []byte{}, 0); err != nil {
 		return nil, err
 	}
-	return &storage.TouchFileResult{}, nil
+	// callers address the touched file by the ids returned here, so encode them the
+	// same way a stat does (convertStatToResourceInfo)
+	shareID, _ := shareInfoFromReference(ref)
+	return &storage.TouchFileResult{
+		SpaceID: shareID.GetOpaqueId(),
+		ResourceID: &provider.ResourceId{
+			StorageId: utils.OCMStorageProviderID,
+			SpaceId:   shareID.GetOpaqueId(),
+			OpaqueId:  base64.StdEncoding.EncodeToString([]byte(filepath.Join("/", rel))),
+		},
+	}, nil
 }
 
 func (d *driver) Move(ctx context.Context, oldRef, newRef *provider.Reference) (*storage.MoveResult, error) {
@@ -345,6 +355,36 @@ func convertStatToResourceInfo(ref *provider.Reference, f fs.FileInfo, share *oc
 	}
 
 	return &ri, nil
+}
+
+// extractLock returns the active lock, or nil if there is none. Props.GetString
+// renders a missing key as "<nil>", so require a parseable activelock with a token.
+func extractLock(props gowebdav.Props) *provider.Lock {
+	raw := props.GetString(xml.Name{Space: "DAV:", Local: "lockdiscovery"})
+
+	// local names only: raw is innerxml, so the d: prefix is unbound and
+	// namespaced tags ("DAV: lockscope") would match nothing.
+	var al struct {
+		LockScope struct {
+			Exclusive *struct{} `xml:"exclusive"`
+			Shared    *struct{} `xml:"shared"`
+		} `xml:"lockscope"`
+		LockToken struct {
+			Href string `xml:"href"`
+		} `xml:"locktoken"`
+	}
+	if err := xml.Unmarshal([]byte(raw), &al); err != nil {
+		return nil
+	}
+	if al.LockToken.Href == "" {
+		return nil
+	}
+
+	lockType := provider.LockType_LOCK_TYPE_EXCL
+	if al.LockScope.Shared != nil && al.LockScope.Exclusive == nil {
+		lockType = provider.LockType_LOCK_TYPE_SHARED
+	}
+	return &provider.Lock{LockId: al.LockToken.Href, Type: lockType}
 }
 
 func extractChecksum(props gowebdav.Props) *provider.ResourceChecksum {
@@ -534,12 +574,24 @@ func (d *driver) GetLock(ctx context.Context, ref *provider.Reference) (*provide
 		return nil, err
 	}
 
-	token, err := client.GetLock(rel)
+	// gowebdav's GetLock stats with a fixed property set that omits lockdiscovery.
+	// getetag keeps the 200 propstat non-empty — unlocked resources report
+	// lockdiscovery in a 404 propstat, which gowebdav discards.
+	info, err := client.StatWithProps(rel, []string{"lockdiscovery", "getetag"})
 	if err != nil {
 		return nil, err
 	}
 
-	return &provider.Lock{LockId: token, Type: provider.LockType_LOCK_TYPE_EXCL}, nil
+	props, ok := info.Sys().(gowebdav.Props)
+	if !ok {
+		return nil, errtypes.InternalError("ocm: unexpected stat result for " + ref.GetPath())
+	}
+
+	lock := extractLock(props)
+	if lock == nil {
+		return nil, errtypes.NotFound("no lock found")
+	}
+	return lock, nil
 }
 
 func (d *driver) RefreshLock(ctx context.Context, ref *provider.Reference, lock *provider.Lock, existingLockID string) error {
@@ -658,4 +710,12 @@ func (d *driver) UpdateStorageSpace(ctx context.Context, req *provider.UpdateSto
 
 func (d *driver) DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorageSpaceRequest) (*storage.DeleteStorageSpaceResult, error) {
 	return nil, errtypes.NotSupported("operation not supported")
+}
+
+func (d *driver) PrepareUpload(_ context.Context, _ *provider.Reference, _ string, info storage.UploadInfo) (*storage.PrepareUploadResult, error) {
+	return &storage.PrepareUploadResult{VersionCreated: info.NodeExisted}, nil
+}
+
+func (d *driver) RollbackUpload(_ context.Context, _ *provider.Reference, _ string, _ bool, _ int64) error {
+	return nil
 }

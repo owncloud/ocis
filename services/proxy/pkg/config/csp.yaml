@@ -5,6 +5,7 @@ directives:
     - '''self'''
     - 'blob:'
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+    - 'https://marketplace.owncloud.com/'
   default-src:
     - '''none'''
   font-src:
@@ -21,6 +22,7 @@ directives:
     - 'data:'
     - 'blob:'
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+    - 'https://marketplace.owncloud.com/'
   manifest-src:
     - '''self'''
   media-src:

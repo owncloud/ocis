@@ -50,6 +50,7 @@ class GraphHelper {
 		'Editor With ListGrants' => 'e8ea8b21-abd4-45d2-b893-8d1546378e9e',
 		'File Editor With ListGrants' => 'c1235aea-d106-42db-8458-7d5610fb0a67',
 		'Space Editor Without Trashbin' => '8f4701d9-c68f-4109-a482-88e22ee32805',
+		'Unified Role Space Editor Without Versions Without Trashbin' => 'a5f73816-4d4b-452d-8973-3b61c3d0bed4',
 	];
 
 	public const SHARING_LINK_TYPE_MAPPINGS = [
@@ -211,12 +212,18 @@ class GraphHelper {
 	/**
 	 * @param string $baseUrl
 	 * @param string $path
+	 * @param boolean $isVault
 	 *
 	 * @return string
 	 */
-	public static function getBetaFullUrl(string $baseUrl, string $path): string {
+	public static function getBetaFullUrl(string $baseUrl, string $path, bool $isVault = false): string {
 		$baseUrl = rtrim($baseUrl, "/");
-		return $baseUrl . '/graph/v1beta1/' . $path;
+		if ($isVault) {
+			$fullUrl = $baseUrl . '/vault/graph/v1beta1/' . $path;
+		} else {
+			$fullUrl = $baseUrl . '/graph/v1beta1/' . $path;
+		}
+		return $fullUrl;
 	}
 
 	/**
@@ -329,36 +336,28 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $adminUser
-	 * @param string $adminPassword
+	 * @param string|null $adminUser
+	 * @param string|null $adminPassword
 	 * @param string $userName
+	 * @param array $headers
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function getUser(
 		string $baseUrl,
-		string $adminUser,
-		string $adminPassword,
+		?string $adminUser,
+		?string $adminPassword,
 		string $userName,
+		array $headers = [],
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users/' . $userName);
-		if (KeycloakHelper::isTestingWithKeycloak()) {
-			return HttpRequestHelper::get(
-				$url,
-				null,
-				null,
-				[
-					'Authorization' => 'Bearer ' . KeycloakHelper::getAdminAccessToken(),
-					'Content-Type' => 'application/json',
-				],
-			);
-		}
+		$requestHeaders = array_merge(self::getRequestHeaders(), $headers);
 		return HttpRequestHelper::get(
 			$url,
 			$adminUser,
 			$adminPassword,
-			self::getRequestHeaders(),
+			$requestHeaders,
 		);
 
 	}
@@ -1069,25 +1068,30 @@ class GraphHelper {
 	/**
 	 *
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
 	 * @param string $spaceId
+	 * @param array $headers
+	 * @param boolean $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function disableSpace(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
 		string $spaceId,
+		array $headers = [],
+		bool $isVault = false,
 	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'drives/' . $spaceId);
+		$url = self::getFullUrl($baseUrl, 'drives/' . $spaceId, $isVault);
 
 		return HttpRequestHelper::delete(
 			$url,
 			$user,
 			$password,
+			$headers,
 		);
 	}
 
@@ -1095,27 +1099,31 @@ class GraphHelper {
 	 * send delete space request
 	 *
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
 	 * @param string $spaceId
+	 * @param array $headers
+	 * @param boolean $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function deleteSpace(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
 		string $spaceId,
+		array $headers = [],
+		bool $isVault = false,
 	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'drives/' . $spaceId);
-		$header = ["Purge" => "T"];
+		$url = self::getFullUrl($baseUrl, 'drives/' . $spaceId, $isVault);
+		$headers["Purge"] = "T";
 
 		return HttpRequestHelper::delete(
 			$url,
 			$user,
 			$password,
-			$header,
+			$headers,
 		);
 	}
 
@@ -1178,6 +1186,37 @@ class GraphHelper {
 	 * @param string $baseUrl
 	 * @param string $user
 	 * @param string $password
+	 * @param string $newPassword
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function updateUserPasswordUsingPatch(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $newPassword,
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'me');
+		$payload = [
+			'passwordProfile' => [
+				'password' => $newPassword,
+			],
+		];
+		return HttpRequestHelper::sendRequest(
+			$url,
+			'PATCH',
+			$user,
+			$password,
+			self::getRequestHeaders(),
+			\json_encode($payload),
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $user
+	 * @param string $password
 	 * @param array $body
 	 * @param array $headers
 	 *
@@ -1198,31 +1237,36 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
 	 * @param string $resourceId
 	 * @param array $tagName
+	 * @param array $headers
+	 * @param bool $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function createTags(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
 		string $resourceId,
 		array $tagName,
+		array $headers = [],
+		bool $isVault = false,
 	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'extensions/org.libregraph/tags');
+		$url = self::getFullUrl($baseUrl, 'extensions/org.libregraph/tags', $isVault);
 		$payload['resourceId'] = $resourceId;
 		$payload['tags'] = $tagName;
 
+		$requestHeaders = array_merge(self::getRequestHeaders(), $headers);
 		return HttpRequestHelper::sendRequest(
 			$url,
 			"PUT",
 			$user,
 			$password,
-			self::getRequestHeaders(),
+			$requestHeaders,
 			\json_encode($payload),
 		);
 	}
@@ -1737,8 +1781,8 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
 	 * @param string $spaceId
 	 * @param string $itemId
 	 * @param array $shareeIds
@@ -1746,6 +1790,8 @@ class GraphHelper {
 	 * @param string|null $permissionsRole
 	 * @param string|null $permissionsAction
 	 * @param string|null $expirationDateTime
+	 * @param array $headers
+	 * @param boolean $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws \JsonException
@@ -1753,8 +1799,8 @@ class GraphHelper {
 	 */
 	public static function sendSharingInvitation(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
 		string $spaceId,
 		string $itemId,
 		array $shareeIds,
@@ -1762,8 +1808,10 @@ class GraphHelper {
 		?string $permissionsRole,
 		?string $permissionsAction,
 		?string $expirationDateTime,
+		array $headers,
+		bool $isVault = false,
 	): ResponseInterface {
-		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/invite");
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/invite", $isVault);
 		$body = self::createShareInviteBody(
 			$shareeIds,
 			$shareTypes,
@@ -1771,40 +1819,45 @@ class GraphHelper {
 			$permissionsAction,
 			$expirationDateTime,
 		);
+		$requestHeaders = array_merge(self::getRequestHeaders(), $headers);
 		return HttpRequestHelper::post(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders(),
+			$requestHeaders,
 			\json_encode($body),
 		);
 	}
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
 	 * @param string $spaceId
 	 * @param string $itemId
 	 * @param mixed $body
+	 * @param array $headers
+	 * @param boolean $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function createLinkShare(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
 		string $spaceId,
 		string $itemId,
 		$body,
+		array $headers = [],
+		bool $isVault = false,
 	): ResponseInterface {
-		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/createLink");
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/createLink", $isVault);
 		return HttpRequestHelper::post(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders(),
+			array_merge(self::getRequestHeaders(), $headers),
 			$body,
 		);
 	}
@@ -1930,23 +1983,28 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
+	 * @param array $headers
+	 * @param boolean $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function getSharesSharedWithMe(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
+		array $headers = [],
+		bool $isVault = false,
 	): ResponseInterface {
-		$url = self::getBetaFullUrl($baseUrl, "me/drive/sharedWithMe");
+		$url = self::getBetaFullUrl($baseUrl, "me/drive/sharedWithMe", $isVault);
+		$requestHeaders = array_merge(self::getRequestHeaders(), $headers);
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders(),
+			$requestHeaders,
 		);
 	}
 
@@ -2136,30 +2194,34 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
 	 * @param string $spaceId
 	 * @param array $shareeIds
 	 * @param array $shareTypes
 	 * @param string|null $permissionsRole
 	 * @param string|null $permissionsAction
 	 * @param string|null $expirationDateTime
+	 * @param array $headers
+	 * @param boolean $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws \Exception|GuzzleException
 	 */
 	public static function sendSharingInvitationForDrive(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
 		string $spaceId,
 		array $shareeIds,
 		array $shareTypes,
 		?string $permissionsRole,
 		?string $permissionsAction,
 		?string $expirationDateTime,
+		array $headers = [],
+		bool $isVault = false,
 	): ResponseInterface {
-		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/invite");
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/invite", $isVault);
 		$body = self::createShareInviteBody(
 			$shareeIds,
 			$shareTypes,
@@ -2168,11 +2230,12 @@ class GraphHelper {
 			$expirationDateTime,
 		);
 
+		$requestHeaders = array_merge(self::getRequestHeaders(), $headers);
 		return HttpRequestHelper::post(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders(),
+			$requestHeaders,
 			\json_encode($body),
 		);
 	}

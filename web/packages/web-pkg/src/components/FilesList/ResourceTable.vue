@@ -28,6 +28,7 @@
     :grouping-settings="groupingSettings"
     padding-x="medium"
     @highlight="fileClicked"
+    @mousedown="preventShiftTextSelection"
     @row-mounted="rowMounted"
     @contextmenu-clicked="showContextMenu"
     @item-dropped="fileDropped"
@@ -67,7 +68,7 @@
         :disabled="isResourceDisabled(item)"
         :model-value="isResourceSelected(item)"
         :outline="isLatestSelectedItem(item)"
-        @click.stop="toggleSelection(item.id)"
+        @click.stop="toggleSelection(item, $event)"
       />
     </template>
     <template #name="{ item }">
@@ -155,11 +156,7 @@
       <slot name="remainingQuota" :resource="item" />
     </template>
     <template #mdate="{ item }">
-      <span
-        v-oc-tooltip="formatDate(item.mdate)"
-        tabindex="0"
-        v-text="formatDateRelative(item.mdate)"
-      />
+      <span v-oc-tooltip="formatDate(item.mdate)" v-text="formatDateRelative(item.mdate)" />
     </template>
     <template #indicators="{ item }">
       <resource-status-indicators
@@ -349,8 +346,7 @@ interface Props {
   isSideBarOpen?: boolean
   dragDrop?: boolean
   viewMode?:
-    | typeof FolderViewModeConstants.name.condensedTable
-    | typeof FolderViewModeConstants.name.table
+    typeof FolderViewModeConstants.name.condensedTable | typeof FolderViewModeConstants.name.table
   hover?: boolean
   sortBy?: string
   sortDir?: SortDir
@@ -480,6 +476,12 @@ const isResourceClickable = (resource: Resource) => {
     return false
   }
 
+  // a folder without a target must not fall back to the default action, which would navigate
+  // to the folder itself
+  if (resource.isFolder && !getResourceLink(resource)) {
+    return false
+  }
+
   if (!resource.isFolder && !isPasswordProtectedFolderFileResource(resource.name)) {
     if (!resource.canDownload() && !canBeOpenedWithSecureView(resource)) {
       return false
@@ -498,8 +500,25 @@ const emitSelect = (selectedIds: string[]) => {
   emit('update:selectedIds', selectedIds)
 }
 
-const toggleSelection = (resourceId: string) => {
-  resourcesStore.toggleSelection(resourceId)
+// shift+click would otherwise extend the browser's text selection across the rows
+const preventShiftTextSelection = (event: MouseEvent) => {
+  if (event.shiftKey) {
+    event.preventDefault()
+  }
+}
+
+const toggleSelection = (resource: Resource, event?: MouseEvent) => {
+  if (event?.shiftKey) {
+    return eventBus.publish('app.files.list.clicked.shift', {
+      resource,
+      skipTargetSelection: false,
+      extend: event.metaKey || event.ctrlKey
+    })
+  }
+  if (event?.metaKey) {
+    return eventBus.publish('app.files.list.clicked.meta', resource)
+  }
+  resourcesStore.toggleSelection(resource.id)
   emitSelect(resourcesStore.selectedIds)
 }
 
@@ -881,7 +900,7 @@ function addSelectedResource(file: Resource) {
   if (isSelected) {
     return
   }
-  toggleSelection(file.id)
+  toggleSelection(file)
 }
 function showContextMenuOnBtnClick(data: ContextMenuBtnClickEventData, item: Resource) {
   if (unref(isResourceDisabled)(item)) {
@@ -948,11 +967,15 @@ function fileClicked(data: [Resource, MouseEvent, boolean]) {
   if (contextActionClicked) {
     return
   }
+  if (eventData && eventData.shiftKey) {
+    return eventBus.publish('app.files.list.clicked.shift', {
+      resource,
+      skipTargetSelection,
+      extend: eventData.metaKey || eventData.ctrlKey
+    })
+  }
   if (eventData && eventData.metaKey) {
     return eventBus.publish('app.files.list.clicked.meta', resource)
-  }
-  if (eventData && eventData.shiftKey) {
-    return eventBus.publish('app.files.list.clicked.shift', { resource, skipTargetSelection })
   }
   if (isCheckboxClicked) {
     return

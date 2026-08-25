@@ -2,7 +2,7 @@
   <div class="oc-mt-xl">
     <div v-if="noUsers" class="oc-flex user-info oc-text-center">
       <oc-icon name="user" size="xxlarge" />
-      <p v-translate data-testid="no-user-selected">Select a user to view details</p>
+      <p data-testid="no-user-selected">{{ $gettext('Select a user to view details') }}</p>
     </div>
     <div v-if="multipleUsers" class="oc-flex group-info">
       <oc-icon name="group" size="xxlarge" />
@@ -140,6 +140,8 @@ const loginDisplayValue = computed(() => {
 <style lang="scss">
 .details-table {
   text-align: left;
+  width: 100%;
+  table-layout: fixed;
 
   tr {
     height: 1.5rem;
@@ -147,6 +149,11 @@ const loginDisplayValue = computed(() => {
 
   th {
     font-weight: 600;
+    width: 40%;
+  }
+
+  td {
+    overflow-wrap: break-word;
   }
 }
 </style>

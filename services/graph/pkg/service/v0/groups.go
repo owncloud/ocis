@@ -262,6 +262,10 @@ func (g Graph) GetGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !g.contextUserHasFullAccountPerms(r.Context()) {
+		group.Members = nil
+	}
+
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, group)
 }

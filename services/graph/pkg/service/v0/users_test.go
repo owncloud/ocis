@@ -115,6 +115,16 @@ var _ = Describe("Users", func() {
 			})
 
 			It("gets the information", func() {
+				user := &libregraph.User{
+					Id: libregraph.PtrString("user"),
+					Identities: []libregraph.ObjectIdentity{
+						{
+							Issuer:           libregraph.PtrString("https://idp.example.com"),
+							IssuerAssignedId: libregraph.PtrString("the-oidc-sub"),
+						},
+					},
+				}
+				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 				valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
 					Return(&settings.GetValueResponse{
 						Value: &settingsmsg.ValueWithIdentifier{
@@ -139,6 +149,19 @@ var _ = Describe("Users", func() {
 				svc.GetMe(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusOK))
+
+				data, err := io.ReadAll(rr.Body)
+				Expect(err).ToNot(HaveOccurred())
+
+				responseUser := &libregraph.User{}
+				err = json.Unmarshal(data, &responseUser)
+				Expect(err).ToNot(HaveOccurred())
+
+				// The identity (issuerAssignedId, the OIDC sub) must come from the
+				// backend, not be fabricated from the internal user UUID. See
+				// OCISDEV-751.
+				Expect(responseUser.GetIdentities()).To(HaveLen(1))
+				Expect(responseUser.GetIdentities()[0].GetIssuerAssignedId()).To(Equal("the-oidc-sub"))
 			})
 
 			It("expands the memberOf", func() {
@@ -193,6 +216,10 @@ var _ = Describe("Users", func() {
 						RoleId:      "some-appRole-ID",
 					},
 				}
+				user := &libregraph.User{
+					Id: libregraph.PtrString("user"),
+				}
+				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 				roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: assignments}, nil)
 				valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
 					Return(&settings.GetValueResponse{
@@ -907,6 +934,88 @@ var _ = Describe("Users", func() {
 				Expect(responseUser.GetAppRoleAssignments()[0].GetAppRoleId()).To(Equal("some-appRole-ID"))
 				Expect(responseUser.GetAppRoleAssignments()[0].GetPrincipalId()).To(Equal("user1"))
 				Expect(responseUser.GetAppRoleAssignments()[0].GetResourceId()).To(Equal("some-application-ID"))
+			})
+		})
+
+		Describe("GetUserDrive", func() {
+			// grantPerms sets the permission constraint returned for every
+			// GetPermissionByID call. CONSTRAINT_ALL makes
+			// contextUserHasFullAccountPerms return true (admin); CONSTRAINT_OWN
+			// makes it return false (non-admin).
+			grantPerms := func(c settingsmsg.Permission_Constraint) {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{Constraint: c},
+				}, nil)
+			}
+			// expectPersonalSpace mocks a successful personal-drive listing owned by ownerID.
+			expectPersonalSpace := func(ownerID string) {
+				gatewayClient.On("GetQuota", mock.Anything, mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
+					Status:     status.NewOK(ctx),
+					TotalBytes: 10,
+				}, nil)
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+					Status: status.NewOK(ctx),
+					StorageSpaces: []*provider.StorageSpace{
+						{
+							Id:        &provider.StorageSpaceId{OpaqueId: "personal"},
+							Owner:     &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: ownerID}},
+							Root:      &provider.ResourceId{SpaceId: "personal", OpaqueId: "personal"},
+							SpaceType: "personal",
+						},
+					},
+				}, nil)
+			}
+
+			doRequest := func(userID string) {
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users/"+userID+"/drive", nil)
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("userID", userID)
+				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+				svc.GetUserDrive(rr, r)
+			}
+
+			It("returns the caller's own drive (self, non-admin)", func() {
+				grantPerms(settingsmsg.Permission_CONSTRAINT_OWN)
+				expectPersonalSpace("user")
+
+				doRequest("user")
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+				data, err := io.ReadAll(rr.Body)
+				Expect(err).ToNot(HaveOccurred())
+				drive := &libregraph.Drive{}
+				Expect(json.Unmarshal(data, drive)).To(Succeed())
+				Expect(drive.GetId()).To(Equal("personal"))
+			})
+
+			It("returns the personal drive for the /me path (empty userID)", func() {
+				grantPerms(settingsmsg.Permission_CONSTRAINT_OWN)
+				expectPersonalSpace("user")
+
+				doRequest("")
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+			})
+
+			It("allows a full-account admin to read another user's drive", func() {
+				grantPerms(settingsmsg.Permission_CONSTRAINT_ALL)
+				expectPersonalSpace("other")
+
+				doRequest("other")
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+			})
+
+			It("denies a non-admin reading another user's drive (IDOR), without listing spaces", func() {
+				grantPerms(settingsmsg.Permission_CONSTRAINT_OWN)
+
+				doRequest("other")
+
+				Expect(rr.Code).To(Equal(http.StatusNotFound))
+				data, err := io.ReadAll(rr.Body)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(data)).To(ContainSubstring("no drive returned from storage"))
+				gatewayClient.AssertNotCalled(GinkgoT(), "ListStorageSpaces", mock.Anything, mock.Anything, mock.Anything)
 			})
 		})
 

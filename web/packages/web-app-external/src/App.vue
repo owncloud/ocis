@@ -1,24 +1,8 @@
 <template>
-  <iframe
-    v-if="appUrl && method === 'GET'"
-    ref="appIframe"
-    :src="appUrl"
-    class="oc-width-1-1 oc-height-1-1"
-    :title="iFrameTitle"
-    allowfullscreen
-    allow="camera; clipboard-read; clipboard-write"
-    @load="onIframeLoad"
-  />
-  <div v-if="appUrl && method === 'POST' && formParameters" class="oc-height-1-1 oc-width-1-1">
-    <form :action="appUrl" target="app-iframe" method="post">
-      <input ref="subm" type="submit" :value="formParameters" class="oc-hidden" />
-      <div v-for="(item, key, index) in formParameters" :key="index">
-        <input :name="key" :value="item" type="hidden" />
-      </div>
-    </form>
+  <div class="oc-width-1-1 oc-height-1-1">
     <iframe
+      v-if="appUrl && method === 'GET'"
       ref="appIframe"
-      name="app-iframe"
       :src="appUrl"
       class="oc-width-1-1 oc-height-1-1"
       :title="iFrameTitle"
@@ -26,6 +10,24 @@
       allow="camera; clipboard-read; clipboard-write"
       @load="onIframeLoad"
     />
+    <div v-if="appUrl && method === 'POST' && formParameters" class="oc-height-1-1 oc-width-1-1">
+      <form :action="appUrl" target="app-iframe" method="post">
+        <input ref="subm" type="submit" :value="formParameters" class="oc-hidden" />
+        <div v-for="(item, key, index) in formParameters" :key="index">
+          <input :name="key" :value="item" type="hidden" />
+        </div>
+      </form>
+      <iframe
+        ref="appIframe"
+        name="app-iframe"
+        :src="appUrl"
+        class="oc-width-1-1 oc-height-1-1"
+        :title="iFrameTitle"
+        allowfullscreen
+        allow="camera; clipboard-read; clipboard-write"
+        @load="onIframeLoad"
+      />
+    </div>
   </div>
 </template>
 

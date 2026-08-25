@@ -18,6 +18,7 @@ jobs:
   k6-load-test:
     name: k6-load-test
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     container:
       image: owncloudci/alpine:latest
     if: >-

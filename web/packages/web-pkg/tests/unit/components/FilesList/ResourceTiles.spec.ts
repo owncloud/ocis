@@ -201,6 +201,15 @@ describe('ResourceTiles component', () => {
       ;(wrapper.vm as any).fileDropped(mock<Resource>(), { dataTransfer: {} } as DragEvent)
       expect(wrapper.emitted('fileDropped')).toBeDefined()
     })
+    it('highlights a folder tile on drag enter via its root element', () => {
+      const folder = { ...resources[0], id: 'folder', type: 'folder', isFolder: true } as Resource
+      const { wrapper } = getWrapper({ props: { resources: [folder] } })
+      ;(wrapper.vm as any).setDropStyling(folder, false, {
+        dataTransfer: { types: [] }
+      } as unknown as DragEvent)
+      const tileEl = (wrapper.vm as any).tileRefs.tiles[folder.id].$el as HTMLElement
+      expect(tileEl.classList.contains('oc-tiles-item-drop-highlight')).toBe(true)
+    })
   })
   describe('context menu', () => {
     it('triggers the positioned dropdown on click', async () => {

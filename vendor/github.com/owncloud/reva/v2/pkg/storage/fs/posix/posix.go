@@ -112,6 +112,7 @@ func New(m map[string]interface{}, stream events.Stream, log *zerolog.Logger) (s
 		microstore.Table(o.IDCache.Table),
 		store.DisablePersistence(o.IDCache.DisablePersistence),
 		store.Authentication(o.IDCache.AuthUsername, o.IDCache.AuthPassword),
+		store.TLS(o.IDCache.EnableTLS, o.IDCache.TLSInsecure, o.IDCache.TLSRootCACert),
 	), log)
 	if err != nil {
 		return nil, err

@@ -49,6 +49,16 @@
         <template #avatar="{ item }">
           <avatar-image :width="32" :userid="item.id" :user-name="item.displayName" />
         </template>
+        <template #onPremisesSamAccountName="{ item }">
+          <div
+            v-oc-tooltip="item.onPremisesSamAccountName"
+            class="oc-text-truncate"
+            v-text="item.onPremisesSamAccountName"
+          />
+        </template>
+        <template #displayName="{ item }">
+          <div v-oc-tooltip="item.displayName" class="oc-text-truncate" v-text="item.displayName" />
+        </template>
         <template #role="{ item }">
           <template v-if="item.appRoleAssignments">{{ getRoleDisplayNameByUser(item) }}</template>
         </template>
@@ -323,7 +333,7 @@ function handleSort(event: { sortBy: string; sortDir: SortDir }) {
   sortDir.value = event.sortDir
 }
 function getSelectUserLabel(user: User) {
-  return $gettext('Select %{ user }', { user: user.displayName }, true)
+  return $gettext('Select %{ user }', { user: user.displayName })
 }
 const allUsersSelected = computed(() => {
   return unref(paginatedItems).length === unref(selectedUsers).length
@@ -351,12 +361,16 @@ const fields = computed(() => {
     {
       name: 'onPremisesSamAccountName',
       title: $gettext('User name'),
-      sortable: true
+      type: 'slot',
+      sortable: true,
+      wrap: 'truncate'
     },
     {
       name: 'displayName',
       title: $gettext('First and last name'),
+      type: 'slot',
       sortable: true,
+      wrap: 'truncate',
       tdClass: 'mark-element'
     },
     {

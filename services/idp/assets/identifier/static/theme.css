@@ -297,8 +297,17 @@ main {
 }
 
 .oc-input:focus {
-  outline: none;
+  outline: 2px solid #00b3f0;
+  outline-offset: 1px;
   border: 1px solid #fff;
+}
+
+.oc-chooseaccount-item:focus-visible,
+.oc-button-primary:focus-visible,
+.oc-button-cancel:focus-visible,
+.oc-button-consent:focus-visible {
+  outline: 2px solid #00b3f0;
+  outline-offset: 2px;
 }
 
 .oc-button-primary {

@@ -229,10 +229,18 @@ type LeafNodeOpts struct {
 	// east-west propagation.
 	IsolateLeafnodeInterest bool `json:"-"`
 
+	// DialTimeout is the amount of time the server will wait for the TCP
+	// connection to a remote server to be established. This is useful on high
+	// latency links where the default (DEFAULT_ROUTE_DIAL, 1 second) is not
+	// enough for the handshake to complete. It applies to all remotes, but can
+	// be overridden on a per-remote basis with RemoteLeafOpts.DialTimeout.
+	// If not set (or <= 0), DEFAULT_ROUTE_DIAL is used.
+	DialTimeout time.Duration `json:"-"`
+
 	// Not exported, for tests.
-	resolver    netResolver
-	dialTimeout time.Duration
-	connDelay   time.Duration
+	resolver  netResolver
+	connDelay time.Duration
+	dialer    leafNodeDialer
 
 	// Snapshot of configured TLS options.
 	tlsConfigOpts *TLSConfigOpts
@@ -263,6 +271,13 @@ type RemoteLeafOpts struct {
 	// initial INFO protocol from the remote server before closing the
 	// connection.
 	FirstInfoTimeout time.Duration `json:"-"`
+
+	// DialTimeout is the amount of time the server will wait for the TCP
+	// connection to this remote server to be established. This is useful on
+	// high latency links where the default is not enough for the handshake to
+	// complete. If not set (or <= 0), the server-wide LeafNodeOpts.DialTimeout
+	// is used, which itself defaults to DEFAULT_ROUTE_DIAL (1 second).
+	DialTimeout time.Duration `json:"-"`
 
 	// Compression options for this remote. Each remote could have a different
 	// setting and also be different from the LeafNode options.
@@ -462,6 +477,7 @@ type Options struct {
 	JetStreamMetaCompact       uint64
 	JetStreamMetaCompactSize   uint64
 	JetStreamMetaCompactSync   bool
+	JetStreamConcurrentIOs     int
 	StreamMaxBufferedMsgs      int               `json:"-"`
 	StreamMaxBufferedSize      int64             `json:"-"`
 	StoreDir                   string            `json:"-"`
@@ -2061,6 +2077,10 @@ func parseCluster(v any, opts *Options, errors *[]error, warnings *[]error) erro
 			opts.Cluster.AuthTimeout = auth.timeout
 
 			if auth.defaultPermissions != nil {
+				if err := checkClusterPermissionSubjects(auth.defaultPermissions); err != nil {
+					*errors = append(*errors, &configErr{tk, err.Error()})
+					continue
+				}
 				err := &configWarningErr{
 					field: mk,
 					configErr: configErr{
@@ -2114,6 +2134,10 @@ func parseCluster(v any, opts *Options, errors *[]error, warnings *[]error) erro
 			if perms.Response != nil {
 				err := &configErr{tk, "Cluster permissions do not support dynamic responses"}
 				*errors = append(*errors, err)
+				continue
+			}
+			if err := checkClusterPermissionSubjects(perms); err != nil {
+				*errors = append(*errors, &configErr{tk, err.Error()})
 				continue
 			}
 			// This will possibly override permissions that were define in auth block
@@ -2762,6 +2786,12 @@ func parseJetStream(v any, opts *Options, errors *[]error, warnings *[]error) er
 				opts.JetStreamMetaCompactSize = uint64(s)
 			case "meta_compact_sync":
 				opts.JetStreamMetaCompactSync = mv.(bool)
+			case "max_concurrent_io":
+				dios, ok := mv.(int64)
+				if !ok || dios < minConcurrentIOs || dios > maxConcurrentIOs {
+					return &configErr{tk, fmt.Sprintf("Expected an absolute size for %q between 4 and 8192, got %v", mk, mv)}
+				}
+				opts.JetStreamConcurrentIOs = int(dios)
 			default:
 				if !tk.IsUsedVariable() {
 					err := &unknownConfigFieldErr{
@@ -2839,6 +2869,8 @@ func parseLeafNodes(v any, opts *Options, errors *[]error, warnings *[]error) er
 			opts.LeafNode.Remotes = remotes
 		case "reconnect", "reconnect_delay", "reconnect_interval":
 			opts.LeafNode.ReconnectInterval = parseDuration("reconnect", tk, mv, errors, warnings)
+		case "dial_timeout":
+			opts.LeafNode.DialTimeout = parseDuration("dial_timeout", tk, mv, errors, warnings)
 		case "tls":
 			tc, err := parseTLS(tk, true)
 			if err != nil {
@@ -3127,14 +3159,14 @@ func parseRemoteLeafNodes(v any, errors *[]error, warnings *[]error) ([]*RemoteL
 			case "hub":
 				remote.Hub = v.(bool)
 			case "deny_imports", "deny_import":
-				subjects, err := parsePermSubjects(tk, errors)
+				subjects, err := parsePermSubjects(tk, errors, false)
 				if err != nil {
 					*errors = append(*errors, err)
 					continue
 				}
 				remote.DenyImports = subjects
 			case "deny_exports", "deny_export":
-				subjects, err := parsePermSubjects(tk, errors)
+				subjects, err := parsePermSubjects(tk, errors, false)
 				if err != nil {
 					*errors = append(*errors, err)
 					continue
@@ -3176,6 +3208,8 @@ func parseRemoteLeafNodes(v any, errors *[]error, warnings *[]error) ([]*RemoteL
 				}
 			case "first_info_timeout":
 				remote.FirstInfoTimeout = parseDuration(k, tk, v, errors, warnings)
+			case "dial_timeout":
+				remote.DialTimeout = parseDuration(k, tk, v, errors, warnings)
 			case "disabled":
 				remote.Disabled = v.(bool)
 			case "proxy":
@@ -3344,6 +3378,29 @@ func setClusterPermissions(opts *ClusterOpts, perms *Permissions) {
 		Import: perms.Publish,
 		Export: perms.Subscribe,
 	}
+}
+
+func checkClusterPermissionSubjects(perms *Permissions) error {
+	if perms == nil {
+		return nil
+	}
+	if perms.Publish != nil {
+		if err := checkPermSubjectArray(perms.Publish.Allow, false); err != nil {
+			return fmt.Errorf("cluster import allow: %w", err)
+		}
+		if err := checkPermSubjectArray(perms.Publish.Deny, false); err != nil {
+			return fmt.Errorf("cluster import deny: %w", err)
+		}
+	}
+	if perms.Subscribe != nil {
+		if err := checkPermSubjectArray(perms.Subscribe.Allow, false); err != nil {
+			return fmt.Errorf("cluster export allow: %w", err)
+		}
+		if err := checkPermSubjectArray(perms.Subscribe.Deny, false); err != nil {
+			return fmt.Errorf("cluster export deny: %w", err)
+		}
+	}
+	return nil
 }
 
 // Temp structures to hold account import and export defintions since they need
@@ -4787,14 +4844,14 @@ func parseUserPermissions(mv any, errors *[]error) (*Permissions, error) {
 		// Import is Publish
 		// Export is Subscribe
 		case "pub", "publish", "import":
-			perms, err := parseVariablePermissions(mv, errors)
+			perms, err := parseVariablePermissions(mv, errors, false)
 			if err != nil {
 				*errors = append(*errors, err)
 				continue
 			}
 			p.Publish = perms
 		case "sub", "subscribe", "export":
-			perms, err := parseVariablePermissions(mv, errors)
+			perms, err := parseVariablePermissions(mv, errors, true)
 			if err != nil {
 				*errors = append(*errors, err)
 				continue
@@ -4834,19 +4891,19 @@ func parseUserPermissions(mv any, errors *[]error) (*Permissions, error) {
 }
 
 // Top level parser for authorization configurations.
-func parseVariablePermissions(v any, errors *[]error) (*SubjectPermission, error) {
+func parseVariablePermissions(v any, errors *[]error, allowQueue bool) (*SubjectPermission, error) {
 	switch vv := v.(type) {
 	case map[string]any:
 		// New style with allow and/or deny properties.
-		return parseSubjectPermission(vv, errors)
+		return parseSubjectPermission(vv, errors, allowQueue)
 	default:
 		// Old style
-		return parseOldPermissionStyle(v, errors)
+		return parseOldPermissionStyle(v, errors, allowQueue)
 	}
 }
 
 // Helper function to parse subject singletons and/or arrays
-func parsePermSubjects(v any, errors *[]error) ([]string, error) {
+func parsePermSubjects(v any, errors *[]error, allowQueue bool) ([]string, error) {
 	var lt token
 	defer convertPanicToErrorList(&lt, errors)
 
@@ -4871,7 +4928,7 @@ func parsePermSubjects(v any, errors *[]error) ([]string, error) {
 	default:
 		return nil, &configErr{tk, fmt.Sprintf("Expected subject permissions to be a subject, or array of subjects, got %T", v)}
 	}
-	if err := checkPermSubjectArray(subjects); err != nil {
+	if err := checkPermSubjectArray(subjects, allowQueue); err != nil {
 		return nil, &configErr{tk, err.Error()}
 	}
 	return subjects, nil
@@ -4936,8 +4993,8 @@ func parseAllowResponses(v any, errors *[]error) *ResponsePermission {
 }
 
 // Helper function to parse old style authorization configs.
-func parseOldPermissionStyle(v any, errors *[]error) (*SubjectPermission, error) {
-	subjects, err := parsePermSubjects(v, errors)
+func parseOldPermissionStyle(v any, errors *[]error, allowQueue bool) (*SubjectPermission, error) {
+	subjects, err := parsePermSubjects(v, errors, allowQueue)
 	if err != nil {
 		return nil, err
 	}
@@ -4945,7 +5002,7 @@ func parseOldPermissionStyle(v any, errors *[]error) (*SubjectPermission, error)
 }
 
 // Helper function to parse new style authorization into a SubjectPermission with Allow and Deny.
-func parseSubjectPermission(v any, errors *[]error) (*SubjectPermission, error) {
+func parseSubjectPermission(v any, errors *[]error, allowQueue bool) (*SubjectPermission, error) {
 	var lt token
 	defer convertPanicToErrorList(&lt, errors)
 
@@ -4958,14 +5015,14 @@ func parseSubjectPermission(v any, errors *[]error) (*SubjectPermission, error) 
 		tk, _ := unwrapValue(v, &lt)
 		switch strings.ToLower(k) {
 		case "allow":
-			subjects, err := parsePermSubjects(tk, errors)
+			subjects, err := parsePermSubjects(tk, errors, allowQueue)
 			if err != nil {
 				*errors = append(*errors, err)
 				continue
 			}
 			p.Allow = subjects
 		case "deny":
-			subjects, err := parsePermSubjects(tk, errors)
+			subjects, err := parsePermSubjects(tk, errors, allowQueue)
 			if err != nil {
 				*errors = append(*errors, err)
 				continue
@@ -4982,15 +5039,20 @@ func parseSubjectPermission(v any, errors *[]error) (*SubjectPermission, error) 
 }
 
 // Helper function to validate permissions subjects.
-func checkPermSubjectArray(sa []string) error {
+func checkPermSubjectArray(sa []string, allowQueue bool) error {
 	for _, s := range sa {
 		if !IsValidSubject(s) {
+			if !allowQueue {
+				return fmt.Errorf("subject %q is not a valid subject", s)
+			}
 			// Check here if this is a queue group qualified subject.
 			elements := strings.Fields(s)
 			if len(elements) != 2 {
 				return fmt.Errorf("subject %q is not a valid subject", s)
 			} else if !IsValidSubject(elements[0]) {
 				return fmt.Errorf("subject %q is not a valid subject", elements[0])
+			} else if !IsValidSubject(elements[1]) {
+				return fmt.Errorf("queue %q is not a valid queue", elements[1])
 			}
 		}
 	}
@@ -6121,6 +6183,9 @@ func setBaselineOptions(opts *Options) {
 	}
 	if opts.JetStreamInfoQueueLimit <= 0 {
 		opts.JetStreamInfoQueueLimit = opts.JetStreamRequestQueueLimit
+	}
+	if opts.JetStreamConcurrentIOs <= 0 {
+		opts.JetStreamConcurrentIOs = defaultConcurrentIOs
 	}
 }
 

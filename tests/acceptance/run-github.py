@@ -141,6 +141,7 @@ LOCAL_API_TESTS = {
     "vault": {
         "suites": ["apiVault"],
         "keycloakNeeded": True,
+        "tikaNeeded": True,
         "vaultStorage": True,
         "extraEnvironment": {
             "KEYCLOAK": "true",
@@ -166,7 +167,11 @@ LOCAL_API_TESTS = {
             "GRAPH_USERNAME_MATCH": "none",
             "IDM_CREATE_DEMO_USERS": "false",
             "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
-            "WEB_OIDC_SCOPE": "openid profile email acr"
+            "WEB_OIDC_SCOPE": "openid profile email acr",
+            # tika
+            "SEARCH_EXTRACTOR_TYPE": "tika",
+            "SEARCH_EXTRACTOR_TIKA_TIKA_URL": "http://localhost:9998",
+            "SEARCH_EXTRACTOR_CS3SOURCE_INSECURE": "true",
         }
     },
     "cliCommands": {
@@ -442,7 +447,11 @@ def main() -> int:
         if subprocess.run(["pkg-config", "--exists", "vips"],
                           capture_output=True).returncode == 0:
             build_env["ENABLE_VIPS"] = "true"
-        run(["make", "-C", str(repo_root / "ocis"), "build"], env=build_env)
+        # build debug for code coverage
+        make_target = "build-debug" if os.environ.get("GOCOVERDIR") else "build"
+        run(["make", "-C", str(repo_root / "ocis"), make_target], env=build_env)
+        if make_target == "build-debug":
+            (repo_root / "ocis" / "bin" / "ocis-debug").replace(repo_root / "ocis" / "bin" / "ocis")
 
     if not wrapper_bin.exists():
         run(["make", "-C", str(repo_root / "tests/ociswrapper"), "build"],

@@ -144,8 +144,25 @@ export const useFileActionsRestore = () => {
           originalRoute.name === unref(router.currentRoute).name &&
           originalRoute.query?.fileId === unref(router.currentRoute).query?.fileId
         ) {
-          resourcesStore.removeResources(successful)
-          resourcesStore.resetSelection()
+          if (isLocationTrashActive(router, 'files-trash-generic')) {
+            resourcesStore.removeResources(successful)
+            resourcesStore.resetSelection()
+          } else {
+            // restored items now live in the currently viewed folder, fetch their fresh info and show them.
+            // a single failing lookup must not abort the whole refresh, so upsert whatever resolves
+            const restoredResources = (
+              await Promise.allSettled(
+                successful.map((resource) =>
+                  clientService.webdav.getFileInfo(space, { path: resource.path })
+                )
+              )
+            )
+              .filter((result) => result.status === 'fulfilled')
+              .map((result) => result.value)
+            if (restoredResources.length) {
+              resourcesStore.upsertResources(restoredResources)
+            }
+          }
         }
 
         // Reload quota
@@ -159,15 +176,12 @@ export const useFileActionsRestore = () => {
       }
 
       if (failed.length) {
-        let translated: string
-        const translateParams: Record<string, string> = {}
-        if (failed.length === 1) {
-          translateParams.resource = failed[0].resource.name
-          translated = $gettext('Failed to restore "%{resource}"', translateParams, true)
-        } else {
-          translateParams.resourceCount = failed.length.toString()
-          translated = $gettext('Failed to restore %{resourceCount} files', translateParams, true)
-        }
+        const translated =
+          failed.length === 1
+            ? $gettext('Failed to restore "%{resource}"', { resource: failed[0].resource.name })
+            : $gettext('Failed to restore %{resourceCount} files', {
+                resourceCount: failed.length.toString()
+              })
         showErrorMessage({ title: translated, errors: failed.map(({ error }) => error) })
       }
     })
@@ -240,6 +254,7 @@ export const useFileActionsRestore = () => {
 
   return {
     actions,
+    handler,
     // HACK: exported for unit tests:
     restoreResources,
     collectConflicts

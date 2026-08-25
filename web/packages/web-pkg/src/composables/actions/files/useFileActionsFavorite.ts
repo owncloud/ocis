@@ -29,11 +29,9 @@ export const useFileActionsFavorite = () => {
         eventBus.publish('app.files.list.removeFromFavorites', resources[0].id)
       }
     } catch (error) {
-      const title = $gettext(
-        'Failed to change favorite state of "%{file}"',
-        { file: resources[0].name },
-        true
-      )
+      const title = $gettext('Failed to change favorite state of "%{file}"', {
+        file: resources[0].name
+      })
       showErrorMessage({ title, errors: [error] })
     }
   }

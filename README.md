@@ -102,7 +102,7 @@ Before starting to set up an instance, we **highly** recommend reading the [Prer
 
 ### Use the Official Documentation
 
-See the [Install Infinite Scale on a Server](https://doc.owncloud.com/ocis/next/depl-examples/ubuntu-compose/ubuntu-compose-prod.html) for a production ready deployment starting with a Raspberry Pi, a single server or VM.
+See the [Install Infinite Scale on a Server](https://doc.owncloud.com/ocis/next/admin/depl-examples/ubuntu-compose/ubuntu-compose-prod.html) for a production ready deployment starting with a Raspberry Pi, a single server or VM.
 
 ### Use the ocis Repo as Source
 

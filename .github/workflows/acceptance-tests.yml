@@ -8,6 +8,7 @@ jobs:
   detect-changes:
     name: detect-changes
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       docs-only: ${{ steps.check.outputs.docs-only }}
     steps:
@@ -52,6 +53,7 @@ jobs:
     needs: [detect-changes]
     if: needs.detect-changes.outputs.docs-only != 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
@@ -136,7 +138,8 @@ jobs:
           vmstat 2 > /tmp/vmstat-phase2.log & MONITOR_PID=$!
 
           make ci-golangci-lint                          > /tmp/golangci-lint.log      2>&1 & PIDS=($!)
-          ENABLE_VIPS=true make -C ocis build            > /tmp/ocis-build.log         2>&1 & PIDS+=($!)
+          ( ENABLE_VIPS=true make -C ocis build-debug \
+           && mv ocis/bin/ocis-debug ocis/bin/ocis )     > /tmp/ocis-build.log 2>&1 & PIDS+=($!)
           make test                                      > /tmp/unit-tests.log         2>&1 & PIDS+=($!)
           GOWORK=off make -C tests/ociswrapper build     > /tmp/ociswrapper-build.log  2>&1 & PIDS+=($!)
 
@@ -171,6 +174,9 @@ jobs:
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GOCOVERDIR: ${{ github.workspace }}/coverage-reports
     strategy:
       fail-fast: false
       matrix:
@@ -278,12 +284,25 @@ jobs:
         run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
 
       - name: Run ${{ matrix.suite }}
-        run: BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
+        run: |
+          mkdir -p "$GOCOVERDIR"
+          BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
+
+      - name: Upload raw coverage data
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: api-coverage-${{ matrix.suite }}
+          path: ${{ env.GOCOVERDIR }}
+          if-no-files-found: error
 
   cli-tests:
     needs: [build-and-test]
     name: ${{ matrix.suite }}
     runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GOCOVERDIR: ${{ github.workspace }}/coverage-reports
     strategy:
       fail-fast: false
       matrix:
@@ -313,12 +332,73 @@ jobs:
         run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
 
       - name: Run ${{ matrix.suite }}
-        run: BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
+        run: |
+          mkdir -p "$GOCOVERDIR"
+          BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
+
+      - name: Upload raw coverage data
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: api-coverage-cli-${{ matrix.suite }}
+          path: ${{ env.GOCOVERDIR }}
+          if-no-files-found: error
+
+  ldap-pool-tests:
+    needs: [build-and-test]
+    name: ldapPool-${{ matrix.suite }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GOCOVERDIR: ${{ github.workspace }}/coverage-reports
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - apiGraphUser,apiGraph,apiGraphGroup
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+
+      - name: Install libvips runtime
+        run: |
+          sudo apt-get update -qq
+          # NEEDRESTART_MODE=a: auto-restart services silently; without this, needrestart can fail with exit code 6
+          sudo NEEDRESTART_MODE=a apt-get install -y libvips42t64
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ocis-build-artifacts
+
+      - name: Restore binary permissions
+        run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
+
+      - name: Run ${{ matrix.suite }} with OCIS_LDAP_POOL_ENABLED=true
+        run: |
+          mkdir -p "$GOCOVERDIR"
+          BEHAT_SUITES="${{ matrix.suite }}" OCIS_LDAP_POOL_ENABLED=true python3 tests/acceptance/run-github.py
+
+      - name: Upload raw coverage data
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: api-coverage-ldap-pool-${{ matrix.suite }}
+          path: ${{ env.GOCOVERDIR }}
+          if-no-files-found: error
 
   core-api-tests:
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GOCOVERDIR: ${{ github.workspace }}/coverage-reports
     strategy:
       fail-fast: false
       matrix:
@@ -392,28 +472,38 @@ jobs:
         run: chmod +x ocis/bin/ocis tests/ociswrapper/bin/ociswrapper
 
       - name: Run ${{ matrix.suite }}
-        run: >
-          BEHAT_SUITES="${{ matrix.suite }}"
-          ACCEPTANCE_TEST_TYPE=core-api
-          WITH_REMOTE_PHP=true
+        run: |
+          mkdir -p "$GOCOVERDIR"
+          BEHAT_SUITES="${{ matrix.suite }}" \
+          ACCEPTANCE_TEST_TYPE=core-api \
+          WITH_REMOTE_PHP=true \
           python3 tests/acceptance/run-github.py
+
+      - name: Upload raw coverage data
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: api-coverage-core-${{ matrix.suite }}
+          path: ${{ env.GOCOVERDIR }}
+          if-no-files-found: error
 
   e2e-tests:
     name: e2e-${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
         include:
           - suite: part-1
-            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc --run-part 1"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 1"
           - suite: part-2
-            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc --run-part 2"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 2"
           - suite: part-3
-            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc --run-part 3"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 3"
           - suite: part-4
-            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc --run-part 4"
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 4"
           - suite: search
             args: "--type playwright --suites search"
             tika: true
@@ -435,6 +525,9 @@ jobs:
           - suite: ocm
             args: "--type playwright --suites ocm"
             federated: true
+          - suite: vault-storage
+            args: "--type playwright --suites vault-storage"
+            vault_storage: true
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
@@ -477,7 +570,7 @@ jobs:
 
       # --- Keycloak (keycloak and mfa suites) ---
       - name: Generate Keycloak certs
-        if: matrix.keycloak == true || matrix.mfa == true
+        if: matrix.keycloak == true || matrix.mfa == true || matrix.vault_storage == true
         run: |
           mkdir -p keycloak-certs
           openssl req -x509 -newkey rsa:2048 \
@@ -488,7 +581,7 @@ jobs:
           chmod -R 777 keycloak-certs
 
       - name: Start Postgres
-        if: matrix.keycloak == true || matrix.mfa == true
+        if: matrix.keycloak == true || matrix.mfa == true || matrix.vault_storage == true
         run: |
           docker run -d --name postgres --network host \
             -e POSTGRES_DB=keycloak \
@@ -498,12 +591,12 @@ jobs:
           timeout 30 bash -c 'until docker exec postgres pg_isready -U keycloak; do sleep 1; done'
 
       - name: Start Keycloak
-        if: matrix.keycloak == true || matrix.mfa == true
+        if: matrix.keycloak == true || matrix.mfa == true || matrix.vault_storage == true
         run: |
           # The mfa suite needs a different realm with TOTP MFA configured.
           # ocis-ci-realm uses ocis-server:9200, ocis-mfa-ci-realm uses localhost:9200;
           # ocis runs on 127.0.0.1:9200 so we rewrite both forms.
-          if [[ "${{ matrix.mfa }}" == "true" ]]; then
+          if [[ "${{ matrix.mfa }}" == "true" || "${{ matrix.vault_storage }}" == "true" ]]; then
             REALM_FILE=tests/config/ci/ocis-mfa-ci-realm.dist.json
           else
             REALM_FILE=tests/config/ci/ocis-ci-realm.dist.json
@@ -582,6 +675,7 @@ jobs:
           OIDC_IFRAME_NEEDED: ${{ matrix.oidc_iframe == true && 'true' || 'false' }}
           COLLABORATION_NEEDED: ${{ matrix.collaboration == true && 'true' || 'false' }}
           FEDERATED_NEEDED: ${{ matrix.federated == true && 'true' || 'false' }}
+          VAULT_STORAGE_NEEDED: ${{ matrix.vault_storage == true && 'true' || 'false' }}
 
       - name: Upload tracing result
         if: failure()
@@ -603,6 +697,7 @@ jobs:
     name: litmus
     needs: [build-and-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
@@ -627,6 +722,7 @@ jobs:
     name: cs3api
     needs: [build-and-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
@@ -651,6 +747,7 @@ jobs:
     name: wopi-builtin
     needs: [build-and-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
@@ -675,6 +772,7 @@ jobs:
     name: wopi-cs3
     needs: [build-and-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
@@ -695,9 +793,115 @@ jobs:
       - name: Run WOPI validator (cs3)
         run: python3 tests/acceptance/run-wopi.py --type cs3
 
-  all-acceptance-tests:
-    needs: [detect-changes, local-api-tests, cli-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests]
+  external-ldap-tests:
+    name: external-ldap-smoke
+    needs: [build-and-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "24"
+
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+
+      # web/idp assets must be embedded for `ocis server` to come up (same as run-github.py)
+      - name: Generate assets
+        run: make ci-node-generate
+
+      - name: Build oCIS
+        run: make -C ocis build
+
+      # Boots an external osixia LDAP + oCIS (embedded idm excluded) and runs the
+      # smoke scope against the graph API — exercises the external-directory
+      # read-after-write / retry path (OCISDEV-1030/1032/1033) that the embedded-idm
+      # acceptance jobs never hit.
+      - name: Run external-LDAP smoke
+        run: tests/ldap-smoke/run.sh
+
+  external-ldap-distributed-tests:
+    name: external-ldap-distributed-smoke
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "24"
+
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+
+      # web/idp assets must be embedded for `ocis server` to come up (same as run-github.py)
+      - name: Generate assets
+        run: make ci-node-generate
+
+      - name: Build oCIS
+        run: make -C ocis build
+
+      # Distributed LDAP topology (proxy over an async syncrepl replica + write master);
+      # the replication lag exercises the retry / read-after-write path (OCISDEV-1030/1032/1033).
+      - name: Run external-LDAP distributed smoke
+        run: tests/ldap-smoke-distributed/run.sh
+
+  acceptance-coverage:
+    name: acceptance-coverage
+    needs: [local-api-tests, cli-tests, ldap-pool-tests, core-api-tests]
+    if: always() && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+      GOCOVERDIR: ${{ github.workspace }}/coverage-reports
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Download raw coverage data
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: api-coverage-*
+          path: ${{ env.GOCOVERDIR }}
+          merge-multiple: true
+
+      - name: Convert coverage counters to profile
+        run: go tool covdata textfmt -i=${{ env.GOCOVERDIR }} -o=coverage.out
+
+      - name: Publish coverage summary
+        run: |
+          {
+            echo "## Acceptance test coverage"
+            echo '```'
+            go tool covdata percent -i=${{ env.GOCOVERDIR }}
+            echo '```'
+            echo
+            echo "<details>"
+            echo "<summary>Per-function coverage</summary>"
+            echo
+            echo '```'
+            go tool cover -func=coverage.out
+            echo '```'
+            echo "</details>"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  all-acceptance-tests:
+    needs: [detect-changes, local-api-tests, cli-tests, ldap-pool-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests, external-ldap-tests, external-ldap-distributed-tests]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
     if: always()
     steps:
       - name: Check all jobs passed

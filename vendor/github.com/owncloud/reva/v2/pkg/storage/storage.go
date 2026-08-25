@@ -22,6 +22,7 @@ import (
 	"context"
 	"io"
 	"net/url"
+	"time"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -66,6 +67,27 @@ type SetLockResult struct {
 type UnlockResult struct {
 	SpaceOwner *userpb.UserId
 	SpaceID    string
+}
+
+type UploadChecksums struct {
+	SHA1    []byte
+	MD5     []byte
+	Adler32 []byte
+}
+
+type UploadInfo struct {
+	NodeExisted       bool // true when the target node existed before the upload started
+	Size              int64
+	MTime             time.Time
+	Checksums         UploadChecksums
+	IfMatch           string
+	IfNoneMatch       string
+	IfUnmodifiedSince time.Time
+}
+
+type PrepareUploadResult struct {
+	VersionCreated bool
+	SizeDiff       int64
 }
 
 // FS is the interface to implement access to the storage.
@@ -117,7 +139,19 @@ type FS interface {
 	// MarkProcessing toggles a processing flag on the resource.
 	MarkProcessing(ctx context.Context, ref *provider.Reference, processing bool, sessionID string) error
 	// CommitUpload writes the staged bytes from source to the resource at ref.
-	CommitUpload(ctx context.Context, ref *provider.Reference, source UploadSource) (*provider.ResourceInfo, error)
+	// Caller owns source.Body and must close it after CommitUpload returns.
+	CommitUpload(ctx context.Context, ref *provider.Reference, sessionID string, source UploadSource) error
+	// PrepareUpload is called after all bytes are received and before postprocessing begins.
+	// Implementations may lock the target node, snapshot the previous version, write new metadata,
+	// and propagate size changes. Drivers that do not require any of these steps may return immediately.
+	PrepareUpload(ctx context.Context, ref *provider.Reference, sessionID string, info UploadInfo) (*PrepareUploadResult, error)
+	// RollbackUpload reverts node state after a failed or aborted postprocessing run.
+	// It is the inverse of PrepareUpload: restores previous metadata and reverts the optimistic
+	// size propagation. The caller (coordinator) is responsible for unmarking the processing flag
+	// and deleting the upload session files. Drivers that performed no work in PrepareUpload may return nil.
+	// nodeExisted indicates whether the target node had a prior version; drivers that have nothing
+	// to undo for new nodes may no-op when nodeExisted is false.
+	RollbackUpload(ctx context.Context, ref *provider.Reference, sessionID string, nodeExisted bool, sizeDiff int64) error
 
 	// Revisions
 
@@ -211,20 +245,15 @@ type DeleteStorageSpaceResult struct {
 	FinalMembers map[string]provider.ResourcePermissions
 }
 
-// UploadChecksums holds pre-computed checksums for a CommitUpload call.
-// All three must be provided; the driver stores them as xattrs without recomputing.
-type UploadChecksums struct {
-	SHA1    []byte
-	MD5     []byte
-	Adler32 []byte
-}
-
 // UploadSource carries the staged bytes for a CommitUpload call.
 type UploadSource struct {
-	Body      io.ReadCloser
-	Length    int64
-	Metadata  map[string]string
-	Checksums UploadChecksums
+	Body   io.ReadCloser
+	Length int64
+
+	// ScanResult is the antivirus verdict: empty means clean.
+	ScanResult string
+	// ScanDate is zero when the upload was not scanned.
+	ScanDate time.Time
 }
 
 // UnscopeFunc is a function that unscopes a user

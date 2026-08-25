@@ -286,7 +286,16 @@ const loadingAccessibleLabelValue = computed(() => {
     border-radius: 25px !important;
     border: none;
     padding: var(--oc-space-medium);
-    color: var(--oc-color-input-text-muted) !important;
+    // Removed !important from `color` here: it was unconditionally forcing the search
+    // input's text to --oc-color-input-text-default, even in web-app-search/SearchBar.vue,
+    // which sets `color` on this same input to a different, higher-specificity token
+    // (--oc-color-search-input-text-default, falling back to --oc-color-input-text-default).
+    // !important ignores selector specificity, so that override was always losing.
+    // This broke "Dark Theme – High Contrast" (vault mode): its search input has a white
+    // background (--oc-color-search-input-bg) and wants black text
+    // (--oc-color-search-input-text-default), but the forced !important color stayed
+    // white (--oc-color-input-text-default), making typed text invisible (white-on-white).
+    color: var(--oc-color-input-text-default);
 
     &:focus {
       background-color: var(--oc-color-input-bg);

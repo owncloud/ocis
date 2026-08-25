@@ -113,7 +113,8 @@ func (c *CachedMDC) ReadDir(ctx context.Context, id string) ([]string, error) {
 		c.logger.Error().Err(err).Msg("ReadDir: failed to update dirs cache")
 	}
 
-	return s, err
+	// return valid data regardless of cache write failure
+	return s, nil
 }
 
 // MakeDirIfNotExist invalidates the cache
@@ -140,6 +141,7 @@ func (c *CachedMDC) Init(ctx context.Context, id string) error {
 		microstore.Table(c.cfg.Metadata.Cache.DirectoryTable),
 		store.DisablePersistence(c.cfg.Metadata.Cache.DisablePersistence),
 		store.Authentication(c.cfg.Metadata.Cache.AuthUsername, c.cfg.Metadata.Cache.AuthPassword),
+		store.TLS(c.cfg.Metadata.Cache.EnableTLS, c.cfg.Metadata.Cache.TLSInsecure, c.cfg.Metadata.Cache.TLSRootCACertificate),
 	)
 	c.filesCache = store.Create(
 		store.Store(c.cfg.Metadata.Cache.Store),
@@ -149,6 +151,7 @@ func (c *CachedMDC) Init(ctx context.Context, id string) error {
 		microstore.Table(c.cfg.Metadata.Cache.FileTable),
 		store.DisablePersistence(c.cfg.Metadata.Cache.DisablePersistence),
 		store.Authentication(c.cfg.Metadata.Cache.AuthUsername, c.cfg.Metadata.Cache.AuthPassword),
+		store.TLS(c.cfg.Metadata.Cache.EnableTLS, c.cfg.Metadata.Cache.TLSInsecure, c.cfg.Metadata.Cache.TLSRootCACertificate),
 	)
 	return c.next.Init(ctx, id)
 }

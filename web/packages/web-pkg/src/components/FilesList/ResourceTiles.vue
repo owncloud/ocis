@@ -7,7 +7,7 @@
         class="oc-ml-s"
         size="large"
         :label="selectAllCheckboxLabel"
-        :label-hidden="true"
+        :label-hidden="false"
         :disabled="resources.length === disabledResourceIds.length"
         :model-value="areAllResourcesSelected"
         @click.stop="toggleSelectionAll"
@@ -46,6 +46,7 @@
             $emit('rowMounted', resource, tileRefs.tiles[resource.id], ImageDimension.Tile)
           "
           @contextmenu="showContextMenu($event, resource, tileRefs.tiles[resource.id])"
+          @mousedown="preventShiftTextSelection"
           @click="emitTileClick(resource)"
           @dragstart="dragStart(resource, $event)"
           @dragenter.prevent="setDropStyling(resource, false, $event)"
@@ -63,7 +64,7 @@
               class="oc-flex-inline oc-p-s"
               :disabled="!isSpaceResource(resource) && isResourceDisabled(resource)"
               :model-value="isResourceSelected(resource)"
-              @click.stop.prevent="toggleTile([resource, $event])"
+              @click.stop="toggleTile([resource, $event])"
             />
           </template>
           <template #imageField>
@@ -389,18 +390,26 @@ const showContextMenu = (
   displayPositionedDropdown(drop._tippy, event, reference)
 }
 
+// shift+click would otherwise extend the browser's text selection across the tiles
+const preventShiftTextSelection = (event: MouseEvent) => {
+  if (event.shiftKey) {
+    event.preventDefault()
+  }
+}
+
 const toggleTile = (data: [Resource, MouseEvent]) => {
   const resource = data[0]
   const eventData = data[1]
 
-  if (eventData && eventData.metaKey) {
-    return eventBus.publish('app.files.list.clicked.meta', resource)
-  }
   if (eventData && eventData.shiftKey) {
     return eventBus.publish('app.files.list.clicked.shift', {
       resource,
-      skipTargetSelection: false
+      skipTargetSelection: false,
+      extend: eventData.metaKey || eventData.ctrlKey
     })
+  }
+  if (eventData && eventData.metaKey) {
+    return eventBus.publish('app.files.list.clicked.meta', resource)
   }
   toggleSelection(resource)
 }

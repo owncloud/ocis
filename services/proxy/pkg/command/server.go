@@ -77,6 +77,7 @@ func Server(cfg *config.Config) *cli.Command {
 				microstore.Table(cfg.OIDC.UserinfoCache.Table),
 				store.DisablePersistence(cfg.OIDC.UserinfoCache.DisablePersistence),
 				store.Authentication(cfg.OIDC.UserinfoCache.AuthUsername, cfg.OIDC.UserinfoCache.AuthPassword),
+				store.TLS(cfg.OIDC.UserinfoCache.EnableTLS, cfg.OIDC.UserinfoCache.TLSInsecure, cfg.OIDC.UserinfoCache.TLSRootCACertificate),
 			)
 
 			signingKeyStore := store.Create(
@@ -86,6 +87,7 @@ func Server(cfg *config.Config) *cli.Command {
 				microstore.Database("proxy"),
 				microstore.Table("signing-keys"),
 				store.Authentication(cfg.PreSignedURL.SigningKeys.AuthUsername, cfg.PreSignedURL.SigningKeys.AuthPassword),
+				store.TLS(cfg.PreSignedURL.SigningKeys.EnableTLS, cfg.PreSignedURL.SigningKeys.TLSInsecure, cfg.PreSignedURL.SigningKeys.TLSRootCACertificate),
 			)
 
 			cfg.GrpcClient, err = grpc.NewClient(
@@ -98,6 +100,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			oidcHTTPClient := &http.Client{
 				Transport: &http.Transport{
+					Proxy: http.ProxyFromEnvironment,
 					TLSClientConfig: &tls.Config{
 						MinVersion:         tls.VersionTLS12,
 						InsecureSkipVerify: cfg.OIDC.Insecure, //nolint:gosec
@@ -109,6 +112,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			oidcClient := oidc.NewOIDCClient(
 				oidc.WithAccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
+				oidc.WithAccessTokenVerifyAudiences(cfg.OIDC.AccessTokenVerifyAud),
 				oidc.WithLogger(logger),
 				oidc.WithHTTPClient(oidcHTTPClient),
 				oidc.WithOidcIssuer(cfg.OIDC.Issuer),
@@ -268,6 +272,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 
 	oidcHTTPClient := &http.Client{
 		Transport: &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
 			TLSClientConfig: &tls.Config{
 				MinVersion:         tls.VersionTLS12,
 				InsecureSkipVerify: cfg.OIDC.Insecure, //nolint:gosec
@@ -301,6 +306,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 		middleware.OIDCIss(cfg.OIDC.Issuer),
 		middleware.OIDCClient(oidc.NewOIDCClient(
 			oidc.WithAccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
+			oidc.WithAccessTokenVerifyAudiences(cfg.OIDC.AccessTokenVerifyAud),
 			oidc.WithLogger(logger),
 			oidc.WithHTTPClient(oidcHTTPClient),
 			oidc.WithOidcIssuer(cfg.OIDC.Issuer),

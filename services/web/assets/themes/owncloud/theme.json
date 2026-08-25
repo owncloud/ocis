@@ -1,8 +1,8 @@
 {
   "common": {
-    "name": "ownCloud",
-    "slogan": "ownCloud – A safe home for all your data",
-    "logo": "themes/owncloud/assets/logo.svg",
+    "name": "ownCloud – a Kiteworks company",
+    "slogan": "Kiteworks Open Source Program Office",
+    "logo": "themes/owncloud/assets/oc_coloured.svg",
     "urls": {
       "accessDeniedHelp": "",
       "imprint": "",
@@ -20,9 +20,9 @@
       "defaults": {
         "appBanner": {},
         "logo": {
-          "topbar": "themes/owncloud/assets/logo.svg",
+          "topbar": "themes/owncloud/assets/oc_white.svg",
           "favicon": "themes/owncloud/assets/favicon.jpg",
-          "login": "themes/owncloud/assets/logo.svg"
+          "login": "themes/owncloud/assets/oc_white.svg"
         },
         "loginPage": {
           "backgroundImg": "themes/owncloud/assets/loginBackground.jpg"
@@ -141,13 +141,13 @@
           "logo": {
             "topbar": "themes/owncloud/assets/logo_dark.svg",
             "favicon": "themes/owncloud/assets/favicon.jpg",
-            "login": "themes/owncloud/assets/logo.svg"
+            "login": "themes/owncloud/assets/oc_white.svg"
           },
           "designTokens": {
             "colorPalette": {
               "background-accentuate": "rgba(255, 255, 5, 0.1)",
               "background-default": "#ffffff",
-              "background-highlight": "#ffffff",
+              "background-highlight": "oklch(87.2% 0.01 258.338)",
               "background-muted": "#ffffff",
               "background-secondary": "#ffffff",
               "background-hover": "oklch(87.2% 0.01 258.338)",
@@ -208,11 +208,16 @@
         {
           "isDark": true,
           "name": "Dark Theme",
+          "logo": {
+            "topbar": "themes/owncloud/assets/logo.svg",
+            "favicon": "themes/owncloud/assets/favicon.jpg",
+            "login": "themes/owncloud/assets/oc_white.svg"
+          },
           "designTokens": {
             "colorPalette": {
               "background-accentuate": "#696969",
               "background-default": "#000000",
-              "background-highlight": "#000000",
+              "background-highlight": "#383838",
               "background-muted": "oklch(21% 0.034 264.665)",
               "background-secondary": "#404040",
               "background-hover": "#383838",
@@ -275,11 +280,16 @@
         {
           "isDark": true,
           "name": "Dark Theme – High Contrast",
+          "logo": {
+            "topbar": "themes/owncloud/assets/logo.svg",
+            "favicon": "themes/owncloud/assets/favicon.jpg",
+            "login": "themes/owncloud/assets/oc_white.svg"
+          },
           "designTokens": {
             "colorPalette": {
               "background-accentuate": "#696969",
               "background-default": "#000000",
-              "background-highlight": "#000000",
+              "background-highlight": "oklch(21% 0.034 264.665)",
               "background-muted": "#000000",
               "background-secondary": "#000000",
               "background-hover": "oklch(21% 0.034 264.665)",
@@ -346,7 +356,7 @@
           "logo": {
             "topbar": "themes/owncloud/assets/logo_dark.svg",
             "favicon": "themes/owncloud/assets/favicon.jpg",
-            "login": "themes/owncloud/assets/logo.svg"
+            "login": "themes/owncloud/assets/oc_white.svg"
           },
           "designTokens": {
             "colorPalette": {
@@ -379,8 +389,8 @@
               "swatch-passive-hover-outline": "#F7D496",
               "swatch-passive-muted": "#99bae0",
               "swatch-passive-contrast": "#000000",
-              "swatch-primary-default": "#F0AA39",
-              "swatch-primary-hover": "#CA912B",
+              "swatch-primary-default": "#9C6B00",
+              "swatch-primary-hover": "#6C4500",
               "swatch-primary-muted": "#F0AA39",
               "swatch-primary-muted-hover": "#CA912B",
               "swatch-primary-gradient": "#F0AA39",
@@ -417,13 +427,13 @@
           "logo": {
             "topbar": "themes/owncloud/assets/logo_dark.svg",
             "favicon": "themes/owncloud/assets/favicon.jpg",
-            "login": "themes/owncloud/assets/logo.svg"
+            "login": "themes/owncloud/assets/oc_white.svg"
           },
           "designTokens": {
             "colorPalette": {
               "background-accentuate": "rgba(255, 255, 5, 0.1)",
               "background-default": "#ffffff",
-              "background-highlight": "#ffffff",
+              "background-highlight": "oklch(87.2% 0.01 258.338)",
               "background-muted": "#ffffff",
               "background-secondary": "#ffffff",
               "background-hover": "oklch(87.2% 0.01 258.338)",
@@ -485,11 +495,16 @@
           "isDark": true,
           "mode": "vault",
           "name": "Dark Theme",
+          "logo": {
+            "topbar": "themes/owncloud/assets/logo.svg",
+            "favicon": "themes/owncloud/assets/favicon.jpg",
+            "login": "themes/owncloud/assets/oc_white.svg"
+          },
           "designTokens": {
             "colorPalette": {
               "background-accentuate": "#696969",
               "background-default": "#000000",
-              "background-highlight": "#000000",
+              "background-highlight": "#383838",
               "background-muted": "oklch(21% 0.034 264.665)",
               "background-secondary": "#404040",
               "background-hover": "#383838",
@@ -500,8 +515,8 @@
               "input-bg": "#000000",
               "input-border": "#ffffff",
               "input-text-default": "#ffffff",
-              "input-text-muted": "#f8f8f8",
-              "search-input-text-muted": "#f8f8f8",
+              "input-text-muted": "#bdbfc3",
+              "search-input-text-muted": "#bdbfc3",
               "swatch-brand-default": "#191A25",
               "swatch-brand-hover": "#ffffff",
               "swatch-brand-contrast": "#F0AA39",
@@ -557,13 +572,13 @@
           "logo": {
             "topbar": "themes/owncloud/assets/logo_dark.svg",
             "favicon": "themes/owncloud/assets/favicon.jpg",
-            "login": "themes/owncloud/assets/logo.svg"
+            "login": "themes/owncloud/assets/oc_white.svg"
           },
           "designTokens": {
             "colorPalette": {
               "background-accentuate": "#696969",
               "background-default": "#000000",
-              "background-highlight": "#000000",
+              "background-highlight": "oklch(21% 0.034 264.665)",
               "background-muted": "#000000",
               "background-secondary": "#000000",
               "background-hover": "oklch(21% 0.034 264.665)",

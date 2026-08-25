@@ -94,8 +94,7 @@ const onConfirm = async () => {
             '%{userCount} user login was edited successfully',
             '%{userCount} users logins edited successfully',
             succeeded.length,
-            { userCount: succeeded.length.toString() },
-            true
+            { userCount: succeeded.length.toString() }
           )
     showMessage({ title })
   }
@@ -117,8 +116,7 @@ const onConfirm = async () => {
             'Failed to edit %{userCount} user login',
             'Failed to edit %{userCount} user logins',
             failed.length,
-            { userCount: failed.length.toString() },
-            true
+            { userCount: failed.length.toString() }
           )
     showErrorMessage({
       title,

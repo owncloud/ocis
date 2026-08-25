@@ -1,7 +1,7 @@
 <template>
-  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <div
     ref="observerTarget"
+    role="presentation"
     class="oc-tile-card oc-card oc-card-default oc-rounded"
     :data-item-id="resource.id"
     :class="{

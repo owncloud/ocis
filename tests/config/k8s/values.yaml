@@ -1,7 +1,7 @@
 ---
 image:
   repository: owncloud/ocis-rolling
-  tag: master
+  tag: latest
 ingress:
   enabled: true
   ingressClassName: traefik
@@ -94,6 +94,7 @@ http:
         - "'self'"
         - 'blob:'
         - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+        - 'https://marketplace.owncloud.com/'
       defaultSrc:
         - "'none'"
       fontSrc:
@@ -110,6 +111,7 @@ http:
         - 'data:'
         - 'blob:'
         - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+        - 'https://marketplace.owncloud.com/'
       manifestSrc:
         - "'self'"
       mediaSrc:

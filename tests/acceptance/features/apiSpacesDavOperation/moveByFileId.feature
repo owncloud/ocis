@@ -57,12 +57,12 @@ Feature: moving/renaming file using file id
     But for user "Alice" folder "folder/sub-folder" of the space "Personal" should not contain these files:
       | textfile.txt |
 
-  @issue-1976
-  Scenario: try to move a file into same folder with same name
+
+  Scenario: move a file into same folder with same name
     And user "Alice" has uploaded file with content "some data" to "textfile.txt"
     And we save it into "FILEID"
     When user "Alice" moves file with id "<<FILEID>>" as "textfile.txt" into folder "/" inside space "Personal"
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "204"
     And as "Alice" file "textfile.txt" should not exist in the trashbin of the space "Personal"
     And for user "Alice" the content of the file "textfile.txt" of the space "Personal" should be "some data"
 
@@ -153,8 +153,8 @@ Feature: moving/renaming file using file id
       | Manager      |
       | Space Editor |
 
-  @issue-1976
-  Scenario Outline: try to move a file within a project space into a folder with same name
+
+  Scenario Outline: move a file within a project space into a folder with same name
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Brian" has been created with default attributes
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
@@ -166,14 +166,13 @@ Feature: moving/renaming file using file id
       | shareType       | user          |
       | permissionsRole | <space-role>  |
     When user "Brian" moves file with id "<<FILEID>>" as "textfile.txt" into folder "/" inside space "project-space"
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "<http-status-code>"
     And as "Alice" file "textfile.txt" should not exist in the trashbin of the space "project-space"
     And for user "Brian" the content of the file "textfile.txt" of the space "project-space" should be "some data"
     Examples:
-      | space-role   |
-      | Manager      |
-      | Space Viewer |
-      | viewer       |
+      | space-role   | http-status-code |
+      | Manager      | 204              |
+      | Space Viewer | 403              |
 
 
   Scenario: try to move a file into a folder inside project space (viewer)
@@ -389,8 +388,8 @@ Feature: moving/renaming file using file id
     And for user "Alice" folder "folder" of the space "Personal" should not contain these files:
       | test.txt |
 
-  @issue-1976
-  Scenario: sharee tries to move a file into same shared folder with same name
+
+  Scenario: sharee moves a file into same shared folder with same name
     Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "folder"
     And user "Alice" has uploaded file with content "some data" to "folder/test.txt"
@@ -403,7 +402,7 @@ Feature: moving/renaming file using file id
       | permissionsRole | Editor   |
     And user "Brian" has a share "/folder" synced
     When user "Brian" moves file with id "<<FILEID>>" as "test.txt" into folder "folder" inside space "Shares"
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "204"
     And as "Alice" file "test.txt" should not exist in the trashbin of the space "Personal"
     And for user "Brian" the content of the file "folder/test.txt" of the space "Shares" should be "some data"
     And for user "Alice" the content of the file "folder/test.txt" of the space "Personal" should be "some data"

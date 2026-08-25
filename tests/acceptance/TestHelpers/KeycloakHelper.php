@@ -96,6 +96,14 @@ class KeycloakHelper {
 	}
 
 	/**
+	 * @return array
+	 * @throws GuzzleException
+	 */
+	private static function getAuthorizationHeader(): array {
+		return [ 'Authorization' => 'Bearer ' . self::getAdminAccessToken() ];
+	}
+
+	/**
 	 * @param string $roleName
 	 *
 	 * @return array
@@ -125,17 +133,16 @@ class KeycloakHelper {
 		?string $email = null,
 		?string $displayName = null,
 	): ResponseInterface {
-		$accessToken = self::getAdminAccessToken();
 		$url = self::getKeycloakUrl() . '/admin/realms/oCIS/users';
 
 		return HttpRequestHelper::post(
 			$url,
 			null,
 			null,
-			[
-				'Authorization' => 'Bearer ' . $accessToken,
-				'Content-Type' => 'application/json',
-			],
+			array_merge(
+				self::getAuthorizationHeader(),
+				[ 'Content-Type' => 'application/json' ],
+			),
 			self::prepareCreateUserPayload($username, $password, $email, $displayName),
 		);
 	}
@@ -163,10 +170,40 @@ class KeycloakHelper {
 			$url,
 			null,
 			null,
-			[
-				"Content-Type" => "application/json",
-				"Authorization" => "Bearer " . self::getAdminAccessToken(),
-			],
+			array_merge(
+				self::getAuthorizationHeader(),
+				[ 'Content-Type' => 'application/json' ],
+			),
+			json_encode($body, JSON_THROW_ON_ERROR),
+		);
+	}
+
+	/**
+	 * @param string $uuid
+	 * @param string $role
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public static function unassignRole(
+		string $uuid,
+		string $role,
+	): ResponseInterface {
+		$url = self::getKeycloakUrl() . "/admin/realms/oCIS/users/" . $uuid . "/role-mappings/realm";
+		$ocisRole = self::OCIS_KEYCLOAK_USER_ROLES[$role]
+			?? throw new InvalidArgumentException("Unknown oCIS role: $role");
+		$body = [
+			self::getRealmRole($ocisRole),
+		];
+		return HttpRequestHelper::delete(
+			$url,
+			null,
+			null,
+			array_merge(
+				self::getAuthorizationHeader(),
+				[ 'Content-Type' => 'application/json' ],
+			),
 			json_encode($body, JSON_THROW_ON_ERROR),
 		);
 	}
@@ -366,9 +403,7 @@ class KeycloakHelper {
 			$url,
 			null,
 			null,
-			[
-				'Authorization' => 'Bearer ' . self::getAdminAccessToken(),
-			],
+			self::getAuthorizationHeader(),
 		);
 		if ($response->getStatusCode() !== 200) {
 			throw new Exception("Failed to get realm roles.");
@@ -393,10 +428,10 @@ class KeycloakHelper {
 			$url,
 			null,
 			null,
-			[
-				'Authorization' => 'Bearer ' . self::getAdminAccessToken(),
-				'Content-Type' => 'application/json',
-			],
+			array_merge(
+				self::getAuthorizationHeader(),
+				[ 'Content-Type' => 'application/json' ],
+			),
 			json_encode(['attributes' => $attributes], JSON_THROW_ON_ERROR),
 		);
 	}
@@ -417,12 +452,76 @@ class KeycloakHelper {
 			$url,
 			null,
 			null,
-			[
-				'Authorization' => 'Bearer ' . self::getAdminAccessToken(),
-				'Content-Type' => 'application/json',
-			],
+			array_merge(
+				self::getAuthorizationHeader(),
+				[ 'Content-Type' => 'application/json' ],
+			),
 			json_encode(['attributes' => $attributes], JSON_THROW_ON_ERROR),
 		);
+	}
+
+	/**
+	 * @param string $username
+	 *
+	 * @return string
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 * @throws Exception
+	 */
+	public static function getUserIdByUsername(string $username): string {
+		$url = self::getKeycloakUrl() . '/admin/realms/oCIS/users?username=' . \urlencode($username) . '&exact=true';
+		$response = HttpRequestHelper::get(
+			$url,
+			null,
+			null,
+			self::getAuthorizationHeader(),
+		);
+		if ($response->getStatusCode() !== 200) {
+			throw new Exception("Failed to look up Keycloak user '$username', status: " . $response->getStatusCode());
+		}
+		$users = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+		if (empty($users)) {
+			throw new Exception("Keycloak user '$username' not found.");
+		}
+		return $users[0]['id'];
+	}
+
+	/**
+	 * Deletes all OTP/TOTP credentials for a Keycloak user, so MFA can be set up fresh.
+	 *
+	 * @param string $username
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 * @throws Exception
+	 */
+	public static function deleteUserTotpCredentials(string $username): void {
+		$uuid = self::getUserIdByUsername($username);
+		$url = self::getKeycloakUrl() . '/admin/realms/oCIS/users/' . $uuid . '/credentials';
+		$response = HttpRequestHelper::get(
+			$url,
+			null,
+			null,
+			self::getAuthorizationHeader(),
+		);
+		if ($response->getStatusCode() !== 200) {
+			throw new Exception("Failed to list credentials for Keycloak user '$username'.");
+		}
+		$credentials = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+		foreach ($credentials as $credential) {
+			if (isset($credential['type']) && \in_array($credential['type'], ['otp', 'totp'], true)) {
+				$deleteUrl = self::getKeycloakUrl()
+					. '/admin/realms/oCIS/users/' . $uuid
+					. '/credentials/' . $credential['id'];
+				HttpRequestHelper::delete(
+					$deleteUrl,
+					null,
+					null,
+					self::getAuthorizationHeader(),
+				);
+			}
+		}
 	}
 
 	/**
@@ -437,9 +536,7 @@ class KeycloakHelper {
 			$url,
 			null,
 			null,
-			[
-				"Authorization" => "Bearer " . self::getAdminAccessToken(),
-			],
+			self::getAuthorizationHeader(),
 		);
 	}
 }

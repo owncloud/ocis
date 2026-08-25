@@ -1,0 +1,63 @@
+import { expect } from '@playwright/test'
+import { getWorld } from '../../environment/world'
+import { config } from '../../config'
+import { VaultActions, VaultPage } from '../../support/objects/vault'
+
+/**
+ * Switch user from Drive → Vault mode
+ */
+export async function userSwitchesToVaultMode({ stepUser }: { stepUser: string }): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const vaultActions = new VaultActions({ page })
+  await vaultActions.userEntersVaultMode()
+}
+
+/**
+ * Assert user is redirected to the MFA authenticator page
+ */
+export async function userIsRedirectedToAuthenticatorPage({
+  stepUser
+}: {
+  stepUser: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const vaultPage = new VaultPage({ page })
+  await expect(page).toHaveURL((url) => url.href.startsWith(config.keycloakUrl))
+  await expect(vaultPage.authenticatorHeading).toBeVisible()
+}
+
+/**
+ * Assert user is in Vault mode
+ */
+export async function userIsInVaultMode({ stepUser }: { stepUser: string }): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const vaultPage = new VaultPage({ page })
+  const vaultPageUrl = `${config.baseUrl}/vault`
+  await expect(page).toHaveURL((url) => url.href.startsWith(vaultPageUrl))
+  await expect(vaultPage.vaultBreadcrumb).toBeVisible()
+}
+
+/**
+ * Switch user from Vault → Drive mode
+ */
+export async function userSwitchesToDriveMode({ stepUser }: { stepUser: string }): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const vaultActions = new VaultActions({ page })
+  await vaultActions.userEntersDriveMode()
+}
+
+/**
+ * Assert user is in Drive mode
+ */
+export async function userIsInDriveMode({ stepUser }: { stepUser: string }): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const vaultPage = new VaultPage({ page })
+  const drivePageUrl = `${config.baseUrl}/files`
+  await expect(page).toHaveURL((url) => url.href.startsWith(drivePageUrl))
+  await expect(vaultPage.driveBreadcrumb).toBeVisible()
+}
