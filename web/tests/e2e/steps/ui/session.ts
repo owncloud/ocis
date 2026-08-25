@@ -153,7 +153,9 @@ export async function userFailsToLogin({ stepUser }: { stepUser: string }): Prom
 
   await page.goto(config.baseUrl)
   await sessionObject.signIn(user.id, user.password)
-  expect(page.locator('#oc-login-error-message')).toBeVisible({ timeout: config.timeout })
+  await expect(page.locator('#oc-login-error-message')).toBeVisible({
+    timeout: config.timeout * 1000
+  })
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
     ['loginErrorMessageLocator'],
