@@ -1007,6 +1007,7 @@ class GraphHelper {
 		var_dump($url);
 
 		$response = HttpRequestHelper::get($url, $user, $password, $headers, $body);
+		var_dump($headers);
 		var_dump($response->getStatusCode());
 		var_dump($response->getBody()->getContents());
 		return $response;

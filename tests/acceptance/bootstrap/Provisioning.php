@@ -96,7 +96,19 @@ trait Provisioning {
 		$localStorage = $state['origins'][0]['localStorage'] ?? [];
 		foreach ($localStorage as $entry) {
 			if (\str_starts_with($entry['name'] ?? '', 'oc_oAuth.user:')) {
-				return \json_decode($entry['value']);
+				$tokenData = \json_decode($entry['value']);
+				// TEMPORARY DEBUG: dump the access token's claims (acr in particular) to
+				// check whether the vault/MFA login flow actually elevates the session.
+				$accessToken = $tokenData->access_token ?? null;
+				if (\is_string($accessToken)) {
+					$segments = \explode('.', $accessToken);
+					if (\count($segments) === 3) {
+						$payload = \strtr($segments[1], '-_', '+/');
+						$payload .= \str_repeat('=', (4 - \strlen($payload) % 4) % 4);
+						echo "DEBUG access token claims: " . \base64_decode($payload) . "\n";
+					}
+				}
+				return $tokenData;
 			}
 		}
 		throw new Exception('Could not find an "oc_oAuth.user:" entry in the browser storage state.');
