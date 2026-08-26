@@ -336,26 +336,32 @@ class CollaborationContext implements Context {
 	}
 
 	/**
-	 * @When user :user sends a lock request to the last opened file using wopi endpoint
+	 * @When user :user sends a lock request with lock id :lockId to the last opened file using wopi endpoint
 	 *
 	 * @param string $user
+	 * @param string $lockId
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userSendsALockRequestToTheLastOpenedFileUsingWopiEndpoint(string $user): void {
+	public function userSendsALockRequestWithLockIdToTheLastOpenedFileUsingWopiEndpoint(
+		string $user,
+		string $lockId,
+	): void {
 		$this->featureContext->setResponse(
-			$this->sendLockRequestToLastOpenedFile(),
+			$this->sendLockRequestToLastOpenedFile($lockId),
 		);
 	}
 
 	/**
 	 * Send a WOPI LOCK request using the last opened file's endpoint.
 	 *
+	 * @param string $lockId
+	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	private function sendLockRequestToLastOpenedFile(): ResponseInterface {
+	private function sendLockRequestToLastOpenedFile(string $lockId): ResponseInterface {
 		[$wopiSrc, $accessToken] = $this->getWopiSrcAndAccessTokenFromLastAppOpenData();
 		return HttpRequestHelper::post(
 			$wopiSrc . "?access_token=$accessToken",
@@ -363,7 +369,7 @@ class CollaborationContext implements Context {
 			null,
 			[
 				'X-WOPI-Override' => 'LOCK',
-				'X-WOPI-Lock' => 'abcdef123',
+				'X-WOPI-Lock' => $lockId,
 			],
 		);
 	}
@@ -414,14 +420,16 @@ class CollaborationContext implements Context {
 	}
 
 	/**
-	 * @When the public sends a lock request to the last opened file using wopi endpoint
+	 * @When the public sends a lock request with lock id :lockId to the last opened file using wopi endpoint
+	 *
+	 * @param string $lockId
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function thePublicSendsALockRequestToTheLastOpenedFileUsingWopiEndpoint(): void {
+	public function thePublicSendsALockRequestWithLockIdToTheLastOpenedFileUsingWopiEndpoint(string $lockId): void {
 		$this->featureContext->setResponse(
-			$this->sendLockRequestToLastOpenedFile(),
+			$this->sendLockRequestToLastOpenedFile($lockId),
 		);
 	}
 
