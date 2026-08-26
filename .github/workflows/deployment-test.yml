@@ -1,12 +1,15 @@
-name: test deployment example
+name: Test Deployment Examples
 
 on:
+  pull_request:
+  
   workflow_dispatch:
   schedule:
     - cron: "0 0 * * *"   # every day at 00:00 UTC
 
 jobs:
   test:
+    name: ${{ matrix.example }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
 
@@ -16,14 +19,16 @@ jobs:
         include:
           - example: ocis_full
             urls: "https://ocis.owncloud.test"
+            runAcceptanceTests: true
           - example: ocis_ldap
             urls: "https://ocis.owncloud.test https://ldap.owncloud.test"
           - example: ocis_multi
             urls: "https://ocis.owncloud.test https://ocis.ocm.owncloud.test"
-          - example: ocis_ocm
-            urls: "https://ocis.owncloud.test https://ocis.ocm.owncloud.test https://ocis.ocm.next.owncloud.test"
           - example: ocis_keycloak
             urls: "https://ocis.owncloud.test https://keycloak.owncloud.test"
+            
+          # - example: ocis_ocm
+            #   urls: "https://ocis.owncloud.test https://ocis.ocm.owncloud.test https://ocis.ocm.next.owncloud.test"
 
     steps:
       - name: Checkout ocis repo
@@ -31,12 +36,27 @@ jobs:
         with:
           repository: owncloud/ocis
 
-      - name: Set up Docker Compose
-        uses: docker/setup-compose-action@16feee727cbdc83b6a014e6cc26fec4a79bcf30c # v2.2.0
-
       - name: Prepare hosts entry
         run: |
           echo "127.0.0.1 ocis.owncloud.test collabora.owncloud.test keycloak.owncloud.test mail.owncloud.test minio.owncloud.test onlyoffice.owncloud.test tika ldap.owncloud.test ocis.ocm.owncloud.test ocis.ocm.next.owncloud.test onlyoffice.owncloud.test" | sudo tee -a /etc/hosts
+
+      - name: Configure ocis_full for acceptance tests
+        if: matrix.runAcceptanceTests
+        working-directory: deployments/examples/${{ matrix.example }}
+        run: |
+          cat > ci-acceptance-overrides.yml <<'YAML'
+          services:
+            ocis:
+              environment:
+                PROXY_ENABLE_APP_AUTH: "true"
+          YAML
+          {
+            echo "CLAMAV=:clamav.yml"
+            echo "MAIL_SERVER=:mailserver.yml"
+            echo "START_ADDITIONAL_SERVICES=notifications,antivirus,auth-app"
+            echo "PROXY_ENABLE_BASIC_AUTH=true"
+            echo "COMPOSE_FILE=docker-compose.yml:ocis.yml:tika.yml:collabora.yml:clamav.yml:mailserver.yml:ci-acceptance-overrides.yml"
+          } >> "$GITHUB_ENV"
 
       - name: Run compose stack
         working-directory: deployments/examples/${{ matrix.example }}
@@ -73,6 +93,39 @@ jobs:
               exit 1
             fi
           done
+
+      - name: Set up PHP
+        if: matrix.runAcceptanceTests
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+
+      - name: Install acceptance test dependencies
+        if: matrix.runAcceptanceTests
+        env:
+          COMPOSER_NO_INTERACTION: "1"
+          COMPOSER_NO_AUDIT: "1"
+        run: |
+          composer install --no-progress
+          composer bin behat install --no-progress
+
+      # apiOcm (needs a second federated ocis instance) 
+      # apiVault (needs Keycloak OIDC + vault storage)
+      # apiCollaboration (calibrated against a "fakeoffice" WOPI stub, not real Collabora) 
+      # so don't fit a single ocis_full stack and are intentionally omitted for now
+      - name: Run acceptance tests
+        if: matrix.runAcceptanceTests
+        env:
+          TEST_SERVER_URL: ${{ matrix.urls }}
+          ADMIN_USERNAME: admin
+          ADMIN_PASSWORD: admin
+          BEHAT_FILTER_TAGS: "~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage&&~@env-config"
+          BEHAT_SUITES: "apiContract,apiLocks,apiSettings,apiNotification,apiCors,apiGraphUser,apiGraph,apiGraphGroup,apiSpaces,apiSpacesShares,apiSpacesDavOperation,apiDownloads,apiAsyncUpload,apiDepthInfinity,apiArchiver,apiActivities,apiSearch1,apiSearch2,apiSearchContent,apiSharingNgShares,apiReshare,apiSharingNgPermissions,apiSharingNgAdditionalShareRole,apiSharingNgDriveInvitation,apiSharingNgItemInvitation,apiSharingNgDriveLinkShare,apiSharingNgItemLinkShare,apiSharingNgLinkShareManagement,apiAuthApp,apiAntivirus"
+        run: |
+          cat tests/acceptance/expected-failures-localAPI-on-OCIS-storage.md tests/acceptance/expected-failures-without-remotephp.md tests/acceptance/expected-failures-ocis_full-deployment-example.md > /tmp/expected-failures.md
+          EXPECTED_FAILURES_FILE=/tmp/expected-failures.md tests/acceptance/run.sh -c tests/acceptance/config/behat.yml
 
       - name: Tear down
         if: always()
