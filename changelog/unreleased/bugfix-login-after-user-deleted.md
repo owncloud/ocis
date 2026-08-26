@@ -12,4 +12,4 @@ The identity provider now detects this stuck authorization loop, expires the
 stale logon session on the server side and restarts a clean login, so the sign-in
 form is shown again and a different user can sign in right away.
 
-https://github.com/owncloud/ocis/pull/TODO
+https://github.com/owncloud/ocis/pull/12851
