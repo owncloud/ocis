@@ -1144,12 +1144,26 @@ Feature: collaboration (wopi)
       | space     | Personal   |
       | app       | FakeOffice |
       | view_mode | <mode>     |
-    When user "Alice" sends a lock request to the last opened file using wopi endpoint
+    When user "Alice" sends a lock request with lock id "abcdef123" to the last opened file using wopi endpoint
     Then the HTTP status code should be "200"
     Examples:
       | mode  |
       | view  |
+      | read  |
       | write |
+
+
+  Scenario: lock request with different lock id on locked file returns conflict
+    Given user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
+    And user "Alice" has sent the following app-open request:
+      | resource  | simple.odt |
+      | space     | Personal   |
+      | app       | FakeOffice |
+      | view_mode | write      |
+    When user "Alice" sends a lock request with lock id "abcdef123" to the last opened file using wopi endpoint
+    Then the HTTP status code should be "200"
+    When user "Alice" sends a lock request with lock id "different-lock-id" to the last opened file using wopi endpoint
+    Then the HTTP status code should be "409"
 
 
   Scenario: viewer sharee sends lock request on shared file
@@ -1164,7 +1178,7 @@ Feature: collaboration (wopi)
       | resource | simple.odt |
       | space    | Shares     |
       | app      | FakeOffice |
-    When user "Brian" sends a lock request to the last opened file using wopi endpoint
+    When user "Brian" sends a lock request with lock id "abcdef123" to the last opened file using wopi endpoint
     Then the HTTP status code should be "200"
 
 
@@ -1183,7 +1197,7 @@ Feature: collaboration (wopi)
       | resource | testFolder/simple.odt |
       | space    | new-space             |
       | app      | FakeOffice            |
-    When user "Brian" sends a lock request to the last opened file using wopi endpoint
+    When user "Brian" sends a lock request with lock id "abcdef123" to the last opened file using wopi endpoint
     Then the HTTP status code should be "200"
 
 
@@ -1199,5 +1213,5 @@ Feature: collaboration (wopi)
       | resource | simple.odt |
       | space    | Personal   |
       | app      | FakeOffice |
-    When the public sends a lock request to the last opened file using wopi endpoint
+    When the public sends a lock request with lock id "abcdef123" to the last opened file using wopi endpoint
     Then the HTTP status code should be "200"
