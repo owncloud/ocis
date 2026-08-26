@@ -307,6 +307,34 @@ jobs:
             retry "delete file (HTTP 204)" check_status 204 delete_file || exit 1
           fi
 
+      - name: Debug storage-users-vault
+        if: always() && matrix.suite == 'apiVault'
+        run: |
+          echo "=== deployment/pods (label app=storageusers-vault) ==="
+          kubectl get deployment,pods -n ocis-server -l app=storageusers-vault -o wide || true
+
+          echo "=== describe deployment storageusers-vault ==="
+          kubectl -n ocis-server describe deployment storageusers-vault || true
+
+          echo "=== service storageusers-vault ==="
+          kubectl get svc storageusers-vault -n ocis-server -o wide || true
+
+          echo "=== kubectl logs (likely empty: OCIS_LOG_FILE redirects to a file, not stdout) ==="
+          kubectl -n ocis-server logs deployment/storageusers-vault --tail=200 || true
+          kubectl -n ocis-server logs deployment/storageusers-vault --previous --tail=200 || true
+
+          echo "=== real logs: every service in this chart writes to the same hostPath-mounted file ==="
+          echo "=== tests/config/k8s/logs/ocis.log (mounted into the k3d node at /logs, see create-cluster) ==="
+          ls -la tests/config/k8s/logs/ || true
+          echo "--- lines mentioning storage-users-vault, panic, fatal, or error ---"
+          grep -iE "storage-users-vault|panic|fatal|error" tests/config/k8s/logs/*.log 2>/dev/null | tail -200 || true
+
+          echo "=== gateway lines mentioning vault ==="
+          grep -i "vault" tests/config/k8s/logs/*.log 2>/dev/null | grep -i gateway | tail -100 || true
+
+          echo "=== features.vault.enabled in the values file actually used to deploy ==="
+          grep -A1 "vault:" tests/config/k8s/values.yaml || true
+
       - name: Expose debug ports
         run: bash tests/config/k8s/expose-debug-svc.sh
       
