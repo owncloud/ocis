@@ -716,7 +716,7 @@ func (s *Server) disableJetStream(deleteState bool) error {
 func (s *Server) enableJetStreamAccounts() error {
 	// Reuse the same task workers across all accounts, so that we don't explode
 	// with a large number of goroutines on multi-account systems.
-	tq := parallelTaskQueue(len(dios))
+	tq := parallelTaskQueue(min(64, s.diskIOSemaphore().cap()))
 	defer close(tq)
 
 	// If we have no configured accounts setup then setup imports on global account.
@@ -2106,7 +2106,7 @@ func (jsa *jsAccount) remoteUpdateUsage(sub *subscription, c *client, _ *Account
 		excessRecordCnt = le.Uint32(msg[minUsageUpdateLen:])
 		length := le.Uint64(msg[minUsageUpdateLen+4:])
 		// Need to protect past this point in case this is wrong.
-		if uint64(len(msg)) < usageMultiTiersLen+length {
+		if length > uint64(len(msg))-usageMultiTiersLen {
 			s.Warnf("Received corrupt remote usage update")
 			return
 		}
@@ -2117,7 +2117,7 @@ func (jsa *jsAccount) remoteUpdateUsage(sub *subscription, c *client, _ *Account
 	for ; excessRecordCnt > 0 && len(msg) >= usageRecordLen; excessRecordCnt-- {
 		memUsed, storeUsed := int64(le.Uint64(msg[0:])), int64(le.Uint64(msg[8:]))
 		length := le.Uint64(msg[16:])
-		if uint64(len(msg)) < usageRecordLen+length {
+		if length > uint64(len(msg))-usageRecordLen {
 			s.Warnf("Received corrupt remote usage update on excess record")
 			return
 		}

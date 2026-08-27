@@ -171,7 +171,6 @@ func (a *authorizer) IsProviderAllowed(ctx context.Context, pi *ocmprovider.Prov
 	} else {
 		providerAuthorized = true
 	}
-
 	switch {
 	case !a.conf.VerifyRequestHostname:
 		log.Info().Msg("VerifyRequestHostname is disabled. any provider is allowed")

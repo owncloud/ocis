@@ -96,6 +96,15 @@ func (h *invitesHandler) AcceptInvite(w http.ResponseWriter, r *http.Request) {
 		reqres.WriteError(w, r, reqres.APIErrorServerError, "error getting gateway client", err)
 		return
 	}
+	infoResp, err := gatewayClient.GetInfoByDomain(ctx, &ocmprovider.GetInfoByDomainRequest{Domain: req.RecipientProvider})
+	if err != nil {
+		reqres.WriteError(w, r, reqres.APIErrorServerError, "error sending a grpc get info by domain request", err)
+		return
+	}
+	if infoResp.Status.Code != rpc.Code_CODE_OK {
+		reqres.WriteError(w, r, reqres.APIErrorUnauthenticated, "provider not authorized", errors.New(infoResp.Status.Message))
+		return
+	}
 	providerAllowedResp, err := gatewayClient.IsProviderAllowed(ctx, &ocmprovider.IsProviderAllowedRequest{
 		Provider: &providerInfo,
 	})

@@ -13,6 +13,7 @@ import (
 	"errors"
 	"io"
 	"iter"
+	"maps"
 	"os"
 	"slices"
 	"strings"
@@ -26,6 +27,10 @@ const (
 
 // ErrXML is returned when XML parsing fails due to incorrect formatting.
 var ErrXML = errors.New("etree: invalid XML format")
+
+// ErrMaxDepth is returned when the depth of the XML tree being read exceeds
+// the maximum depth allowed by ReadSettings.MaxDepth.
+var ErrMaxDepth = errors.New("etree: XML tree exceeds maximum depth")
 
 // cdataPrefix is used to detect CDATA text when ReadSettings.PreserveCData is
 // true.
@@ -76,7 +81,17 @@ type ReadSettings struct {
 	// whether an end element is present. Commonly set to xml.HTMLAutoClose.
 	// Default: nil.
 	AutoClose []string
+
+	// MaxDepth is the maximum depth of the XML tree to parse. If the depth of
+	// the XML tree exceeds this value, all ReadFrom* functions return the
+	// error ErrMaxDepth. If MaxDepth is zero or negative, a depth limit of
+	// 1024 is used. Default: 0 (i.e., a limit of 1024).
+	MaxDepth int
 }
+
+// defaultMaxDepth is the maximum depth of an XML tree parsed by ReadFrom*
+// functions when ReadSettings.MaxDepth is not set to a positive value.
+const defaultMaxDepth = 1024
 
 // defaultCharsetReader is used by the xml decoder when the ReadSettings
 // CharsetReader value is nil. It behaves as a "pass-through", ignoring
@@ -87,18 +102,9 @@ func defaultCharsetReader(charset string, input io.Reader) (io.Reader, error) {
 
 // dup creates a duplicate of the ReadSettings object.
 func (s *ReadSettings) dup() ReadSettings {
-	var entityCopy map[string]string
-	if s.Entity != nil {
-		entityCopy = make(map[string]string)
-		for k, v := range s.Entity {
-			entityCopy[k] = v
-		}
-	}
-	return ReadSettings{
-		CharsetReader: s.CharsetReader,
-		Permissive:    s.Permissive,
-		Entity:        entityCopy,
-	}
+	c := *s
+	c.Entity = maps.Clone(s.Entity)
+	return c
 }
 
 // WriteSettings determine the behavior of the Document's WriteTo* functions.
@@ -629,19 +635,27 @@ func (e *Element) Text() string {
 		return ""
 	}
 
-	text := ""
+	var text string
+	var b strings.Builder
 	for _, ch := range e.Child {
 		if cd, ok := ch.(*CharData); ok {
 			if text == "" {
 				text = cd.Data
 			} else {
-				text += cd.Data
+				if b.Len() == 0 {
+					b.WriteString(text)
+				}
+				b.WriteString(cd.Data)
 			}
 		} else if _, ok := ch.(*Comment); ok {
 			// ignore
 		} else {
 			break
 		}
+	}
+
+	if b.Len() > 0 {
+		return b.String()
 	}
 	return text
 }
@@ -668,17 +682,25 @@ func (e *Element) Tail() string {
 	p := e.Parent()
 	i := e.Index()
 
-	text := ""
+	var text string
+	var b strings.Builder
 	for _, ch := range p.Child[i+1:] {
 		if cd, ok := ch.(*CharData); ok {
 			if text == "" {
 				text = cd.Data
 			} else {
-				text += cd.Data
+				if b.Len() == 0 {
+					b.WriteString(text)
+				}
+				b.WriteString(cd.Data)
 			}
 		} else {
 			break
 		}
+	}
+
+	if b.Len() > 0 {
+		return b.String()
 	}
 	return text
 }
@@ -913,6 +935,11 @@ func (e *Element) readFrom(ri io.Reader, settings ReadSettings) (n int64, err er
 	attrCheck := make(map[xml.Name]int)
 	dec := newDecoder(r, settings)
 
+	maxDepth := settings.MaxDepth
+	if maxDepth <= 0 {
+		maxDepth = defaultMaxDepth
+	}
+
 	var stack stack[*Element]
 	stack.push(e)
 	for {
@@ -942,6 +969,9 @@ func (e *Element) readFrom(ri io.Reader, settings ReadSettings) (n int64, err er
 
 		switch t := t.(type) {
 		case xml.StartElement:
+			if len(stack.data) > maxDepth {
+				return r.Bytes(), ErrMaxDepth
+			}
 			e := newElement(t.Name.Space, t.Name.Local, top)
 			if settings.PreserveDuplicateAttrs || len(t.Attr) < 2 {
 				for _, a := range t.Attr {
@@ -1622,7 +1652,7 @@ func (c *CharData) Index() int {
 func (c *CharData) WriteTo(w Writer, s *WriteSettings) {
 	if c.IsCData() {
 		w.WriteString(`<![CDATA[`)
-		w.WriteString(c.Data)
+		sanitizeCData(w, c.Data)
 		w.WriteString(`]]>`)
 	} else {
 		var m escapeMode
@@ -1704,7 +1734,7 @@ func (c *Comment) Index() int {
 // WriteTo serialies the comment to the writer.
 func (c *Comment) WriteTo(w Writer, s *WriteSettings) {
 	w.WriteString("<!--")
-	w.WriteString(c.Data)
+	sanitizeComment(w, c.Data)
 	w.WriteString("-->")
 }
 
@@ -1769,7 +1799,7 @@ func (d *Directive) Index() int {
 // WriteTo serializes the XML directive to the writer.
 func (d *Directive) WriteTo(w Writer, s *WriteSettings) {
 	w.WriteString("<!")
-	w.WriteString(d.Data)
+	sanitizeDirective(w, d.Data)
 	w.WriteString(">")
 }
 
@@ -1837,10 +1867,10 @@ func (p *ProcInst) Index() int {
 // WriteTo serializes the processing instruction to the writer.
 func (p *ProcInst) WriteTo(w Writer, s *WriteSettings) {
 	w.WriteString("<?")
-	w.WriteString(p.Target)
+	sanitizeProcInst(w, p.Target)
 	if p.Inst != "" {
 		w.WriteByte(' ')
-		w.WriteString(p.Inst)
+		sanitizeProcInst(w, p.Inst)
 	}
 	w.WriteString("?>")
 }

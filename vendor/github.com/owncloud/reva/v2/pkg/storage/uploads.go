@@ -87,4 +87,8 @@ type UploadSessionFilter struct {
 	Processing *bool
 	Expired    *bool
 	HasVirus   *bool
+	// Orphaned filters sessions by whether their target node can still be
+	// resolved. Evaluating it requires reading the node metadata of every
+	// session, so it is only evaluated when set.
+	Orphaned *bool
 }

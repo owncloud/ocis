@@ -1280,7 +1280,7 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 		}
 
 		if k := md.GetArbitraryMetadata().GetMetadata(); k != nil {
-			propstatOK.Prop = append(propstatOK.Prop, prop.Raw("oc:tags", k["tags"]))
+			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:tags", k["tags"]))
 			appendMetadataProp(k, "oc", "audio", "libre.graph.audio", audioKeys)
 			appendMetadataProp(k, "oc", "location", "libre.graph.location", locationKeys)
 			appendMetadataProp(k, "oc", "image", "libre.graph.image", imageKeys)
@@ -1556,7 +1556,7 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 					}
 				case "tags":
 					if k := md.GetArbitraryMetadata().GetMetadata(); k != nil {
-						propstatOK.Prop = append(propstatOK.Prop, prop.Raw("oc:tags", k["tags"]))
+						propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:tags", k["tags"]))
 					}
 				case "audio":
 					if k := md.GetArbitraryMetadata().GetMetadata(); k != nil {
@@ -1776,7 +1776,7 @@ func activeLocks(log *zerolog.Logger, lock *provider.Lock) string {
 
 	if un := utils.ReadPlainFromOpaque(lock.Opaque, "lockownername"); un != "" {
 		activelocks.WriteString("<oc:ownername>")
-		activelocks.WriteString(un)
+		activelocks.WriteString(prop.Escape(un))
 		activelocks.WriteString("</oc:ownername>")
 	}
 	if lt := utils.ReadPlainFromOpaque(lock.Opaque, "locktime"); lt != "" {

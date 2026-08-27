@@ -216,6 +216,12 @@ func validateLeafNode(o *Options) error {
 			if r.LocalAccount == _EMPTY_ {
 				r.LocalAccount = globalAccountName
 			}
+			if err := checkPermSubjectArray(r.DenyImports, false); err != nil {
+				return fmt.Errorf("invalid deny_imports for remote %s: %w", r.safeName(), err)
+			}
+			if err := checkPermSubjectArray(r.DenyExports, false); err != nil {
+				return fmt.Errorf("invalid deny_exports for remote %s: %w", r.safeName(), err)
+			}
 			rn := r.name()
 			if _, dup := names[rn]; dup {
 				return fmt.Errorf("duplicate remote %s", r.safeName())
@@ -583,18 +589,30 @@ func (cfg *leafNodeCfg) setConnectDelay(delay time.Duration) {
 	cfg.Unlock()
 }
 
+// leafNodeDialer establishes the TCP connection to a remote leafnode server.
+// It has the same signature as natsDialTimeout(), which is what is used in
+// production. Tests can substitute their own implementation via
+// LeafNodeOpts.dialer in order to observe the resolved dial timeout, or to
+// simulate a slow/unreachable remote, without needing to manipulate the
+// network stack.
+type leafNodeDialer func(network, address string, timeout time.Duration) (net.Conn, error)
+
 // Ensure that non-exported options (used in tests) have
 // been properly set.
 func (s *Server) setLeafNodeNonExportedOptions() {
 	opts := s.getOpts()
-	s.leafNodeOpts.dialTimeout = opts.LeafNode.dialTimeout
-	if s.leafNodeOpts.dialTimeout == 0 {
+	s.leafNodeOpts.dialTimeout = opts.LeafNode.DialTimeout
+	if s.leafNodeOpts.dialTimeout <= 0 {
 		// Use same timeouts as routes for now.
 		s.leafNodeOpts.dialTimeout = DEFAULT_ROUTE_DIAL
 	}
 	s.leafNodeOpts.resolver = opts.LeafNode.resolver
 	if s.leafNodeOpts.resolver == nil {
 		s.leafNodeOpts.resolver = net.DefaultResolver
+	}
+	s.leafNodeOpts.dialer = opts.LeafNode.dialer
+	if s.leafNodeOpts.dialer == nil {
+		s.leafNodeOpts.dialer = natsDialTimeout
 	}
 }
 
@@ -683,11 +701,28 @@ func connectToRemoteLeafNode(s *Server, remote *leafNodeCfg, firstConnect bool) 
 		return false
 	}
 
+	// If this remote is no longer valid by the time we return (e.g. it was
+	// removed or disabled through a configuration reload), we will never
+	// reconnect, so clear any JetStream observer state. Otherwise, the raft
+	// nodes of this account's assets would remain observers.
+	defer func() {
+		if remote.stillValid() {
+			return
+		}
+		s.mu.RLock()
+		shouldMigrate := remote.JetStreamClusterMigrate
+		s.mu.RUnlock()
+		if shouldMigrate {
+			s.clearObserverState(remote)
+		}
+	}()
+
 	opts := s.getOpts()
 	reconnectDelay := opts.LeafNode.ReconnectInterval
 	s.mu.RLock()
 	dialTimeout := s.leafNodeOpts.dialTimeout
 	resolver := s.leafNodeOpts.resolver
+	dialer := s.leafNodeOpts.dialer
 	var isSysAcc bool
 	if s.eventsEnabled() {
 		isSysAcc = remote.LocalAccount == s.sys.account.Name
@@ -722,6 +757,12 @@ func connectToRemoteLeafNode(s *Server, remote *leafNodeCfg, firstConnect bool) 
 	proxyUsername := remote.Proxy.Username
 	proxyPassword := remote.Proxy.Password
 	proxyTimeout := remote.Proxy.Timeout
+	// A remote can override the server-wide dial timeout. This is useful on
+	// high latency links where the default is too short for the TCP handshake
+	// to complete.
+	if remote.DialTimeout > 0 {
+		dialTimeout = remote.DialTimeout
+	}
 	remote.RUnlock()
 
 	// Set default proxy timeout if not specified
@@ -737,6 +778,10 @@ func connectToRemoteLeafNode(s *Server, remote *leafNodeCfg, firstConnect bool) 
 	if jetstreamMigrateDelay > 0 {
 		defer remote.cancelMigrateTimer()
 	}
+
+	reconnectTimer := time.NewTimer(reconnectDelay)
+	reconnectTimer.Stop()
+	defer stopAndClearTimer(&reconnectTimer)
 
 	for s.isRunning() && remote.stillValid() {
 		rURL := remote.pickNextURL()
@@ -768,7 +813,7 @@ func connectToRemoteLeafNode(s *Server, remote *leafNodeCfg, firstConnect bool) 
 					conn, err = establishHTTPProxyTunnel(proxyURL, targetHost, proxyTimeout, proxyUsername, proxyPassword)
 				} else {
 					// Direct connection
-					conn, err = natsDialTimeout("tcp", url, dialTimeout)
+					conn, err = dialer("tcp", url, dialTimeout)
 				}
 			}
 		}
@@ -789,12 +834,13 @@ func connectToRemoteLeafNode(s *Server, remote *leafNodeCfg, firstConnect bool) 
 				})
 			}
 			remote.Unlock()
+			reconnectTimer.Reset(delay)
 			select {
 			case <-s.quitCh:
 				return false
 			case <-remote.quitCh:
 				return false
-			case <-time.After(delay):
+			case <-reconnectTimer.C:
 				// Check if we should migrate any JetStream assets immediately while this remote is down.
 				// This will be used if JetStreamClusterMigrateDelay was not set
 				if jetstreamMigrateDelay == 0 {
@@ -2028,7 +2074,7 @@ func (s *Server) addLeafNodeConnection(c *client, srvName, clusterName string, c
 				meta.setObserver(false, extNotExtended)
 				c.Debugf("Turning JetStream metadata controller Observer Mode off")
 				// Take note that the domain was not extended to avoid this state from startup.
-				writePeerState(js.config.StoreDir, meta.currentPeerState())
+				writePeerState(c.srv.diskIOSemaphore(), js.config.StoreDir, meta.currentPeerState())
 				// Meta controller can't be leader yet.
 				// Yet it is possible that due to observer mode every server already stopped campaigning.
 				// Therefore this server needs to be kicked into campaigning gear explicitly.
@@ -2263,9 +2309,10 @@ func (c *client) processLeafNodeConnect(s *Server, arg []byte, lang string) erro
 	if !c.isSolicitedLeafNode() && c.perms != nil {
 		sp, pp := c.perms.sub, c.perms.pub
 		c.perms.sub, c.perms.pub = pp, sp
-		if c.opts.Import != nil {
-			c.darray = c.opts.Import.Deny
-		} else {
+		// setPermissions populated darray from the subscribe permissions,
+		// which are the import permissions advertised to the spoke. Keep
+		// those parsed denies after reversing the live permission directions.
+		if c.opts.Import == nil {
 			c.darray = nil
 		}
 	}
@@ -2938,6 +2985,7 @@ func (c *client) processLeafSub(argo []byte) (err error) {
 			c.Debugf(fmt.Sprintf("Permissions Violation for Subscription to %q", sub.subject))
 			return nil
 		}
+		c.loadMsgDenyFilterIfNeeded(subj, len(sub.queue) > 0)
 	}
 
 	// Check if we have a maximum on the number of subscriptions.
