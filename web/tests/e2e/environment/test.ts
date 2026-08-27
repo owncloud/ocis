@@ -212,3 +212,29 @@ const storeKeycloakGroups = async (adminUser: User) => {
     }
   })
 }
+
+test.beforeEach(async () => {
+  if (config.vaultMode || config.mfa) {
+    const adminUser = store.userStore.get(config.keycloakAdminUser.toLowerCase())
+
+    if (adminUser) {
+      await api.keycloak.setAccessTokenForKeycloakUser(adminUser)
+
+      await api.keycloak.deleteUserTotpCredentials({
+        user: adminUser
+      })
+    }
+  }
+})
+
+test.afterEach(async () => {
+  if (config.vaultMode || config.mfa) {
+    const adminUser = store.userStore.get(config.keycloakAdminUser.toLowerCase())
+
+    if (adminUser) {
+      await api.keycloak.deleteUserTotpCredentials({
+        user: adminUser
+      })
+    }
+  }
+})
