@@ -310,7 +310,7 @@ class CollaborationContext implements Context {
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			$this->featureContext->getBaseUrl(),
-			$rows['view_mode'] ?? null,
+			$rows['viewMode'] ?? null,
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $appResponse);
 		$this->setLastAppOpenData($appResponse->getBody()->getContents());
