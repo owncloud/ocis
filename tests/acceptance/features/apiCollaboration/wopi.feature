@@ -1140,33 +1140,38 @@ Feature: collaboration (wopi)
   Scenario Outline: lock request on file opened with different view modes
     Given user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
     And user "Alice" has sent the following app-open request:
-      | resource  | simple.odt |
-      | space     | Personal   |
-      | app       | FakeOffice |
-      | view_mode | <mode>     |
+      | resource  | simple.odt  |
+      | space     | Personal    |
+      | app       | FakeOffice  |
+      | viewMode  | <view-mode> |
     When user "Alice" sends a lock request with lock id "abcdef123" to the last opened file using wopi endpoint
     Then the HTTP status code should be "200"
     Examples:
-      | mode  |
-      | view  |
-      | read  |
-      | write |
+      | view-mode |
+      | view      |
+      | read      |
+      | write     |
 
 
-  Scenario: lock request with different lock id on locked file returns conflict
+  Scenario Outline:  lock request with different lock id on file opened with different view modes
     Given user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
     And user "Alice" has sent the following app-open request:
-      | resource  | simple.odt |
-      | space     | Personal   |
-      | app       | FakeOffice |
-      | view_mode | write      |
+      | resource  | simple.odt  |
+      | space     | Personal    |
+      | app       | FakeOffice  |
+      | viewMode  | <view-mode> |
     When user "Alice" sends a lock request with lock id "abcdef123" to the last opened file using wopi endpoint
     Then the HTTP status code should be "200"
     When user "Alice" sends a lock request with lock id "different-lock-id" to the last opened file using wopi endpoint
-    Then the HTTP status code should be "409"
+    Then the HTTP status code should be "<http-status-code>"
+    Examples:
+      | view-mode | http-status-code |
+      | view      | 200              |
+      | read      | 200              |
+      | write     | 409              |
 
 
-  Scenario: viewer sharee sends lock request on shared file
+  Scenario: sharee with viewer permissions role sends lock request on shared file
     Given user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | simple.odt |
