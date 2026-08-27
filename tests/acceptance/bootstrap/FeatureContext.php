@@ -179,10 +179,20 @@ class FeatureContext extends BehatVariablesContext {
 		if (\array_key_exists($user, $this->autoSyncSettings)) {
 			return $this->autoSyncSettings[$user];
 		}
+		$headers = [];
+		if (\TestHelpers\KeycloakHelper::isTestingWithKeycloak()) {
+			$accessToken = $this->getOcisUserToken($user)['token']['accessToken'];
+			$headers['Authorization'] = 'Bearer ' . $accessToken;
+			$user = null;
+			$password = null;
+		} else {
+			$password = $this->getPasswordForUser($user);
+		}
 		$autoSyncSetting = SettingsHelper::getAutoAcceptSharesDefaultValue(
 			$this->baseUrl,
 			$user,
-			$this->getPasswordForUser($user),
+			$password,
+			$headers,
 		);
 		$this->autoSyncSettings[$user] = $autoSyncSetting;
 

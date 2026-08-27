@@ -1670,16 +1670,28 @@ class SharingNgContext implements Context {
 	/**
 	 * @param string $user
 	 * @param string $resource
+	 * @param boolean $isVault
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function isShareSynced(string $user, string $resource): bool {
+	public function isShareSynced(string $user, string $resource, bool $isVault = false): bool {
 		$resource = \trim($resource, '/');
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$accessToken = $this->featureContext->getOcisUserToken($user)['token']['accessToken'];
+			$headers['Authorization'] = 'Bearer ' . $accessToken;
+			$user = null;
+			$password = null;
+		} else {
+			$password = $this->featureContext->getPasswordForUser($user);
+		}
 		$response = GraphHelper::getSharesSharedWithMe(
 			$this->featureContext->getBaseUrl(),
 			$user,
-			$this->featureContext->getPasswordForUser($user),
+			$password,
+			$headers,
+			$isVault,
 		);
 
 		$shares = $this->featureContext->getJsonDecodedResponse($response)["value"];
@@ -1698,17 +1710,23 @@ class SharingNgContext implements Context {
 	 * @param string $user
 	 * @param string $resource
 	 * @param string $status
+	 * @param boolean $isVault
 	 *
 	 * @return void
 	 * @throws Exception|GuzzleException
 	 */
-	public function waitAndCheckShareSyncStatus(string $user, string $resource, string $status): void {
+	public function waitAndCheckShareSyncStatus(
+		string $user,
+		string $resource,
+		string $status,
+		bool $isVault = false,
+	): void {
 		$expected = $status === "enabled";
 
 		// NOTE: Sharing is async so it might take some time for the share to be available.
 		$retried = 0;
 		do {
-			$shareSynced = $this->isShareSynced($user, $resource);
+			$shareSynced = $this->isShareSynced($user, $resource, $isVault);
 
 			if ($shareSynced === $expected) {
 				return;
@@ -1727,7 +1745,6 @@ class SharingNgContext implements Context {
 
 	/**
 	 * @Given /^user "([^"]*)" has a share "([^"]*)" synced$/
-	 * @Then user :user should have a share :resource synced
 	 *
 	 * @param string $user
 	 * @param string $resource
@@ -1737,6 +1754,21 @@ class SharingNgContext implements Context {
 	 */
 	public function userHasShareSynced(string $user, string $resource): void {
 		$this->waitAndCheckShareSyncStatus($user, $resource, "enabled");
+	}
+
+	/**
+	 * @Then /^user "([^"]*)" should have a share(| in vault)? "([^"]*)" synced$/
+	 *
+	 * @param string $user
+	 * @param string $isVault
+	 * @param string $resource
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function userShouldHaveShareSynced(string $user, string $isVault, string $resource): void {
+		$isVault = trim($isVault) === "in vault";
+		$this->waitAndCheckShareSyncStatus($user, $resource, "enabled", $isVault);
 	}
 
 	/**
@@ -2210,6 +2242,7 @@ class SharingNgContext implements Context {
 	 * @param bool $shouldExist
 	 * @param bool $federatedShare
 	 * @param string $role	compares share role if provided
+	 * @param boolean $isVault
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -2224,9 +2257,19 @@ class SharingNgContext implements Context {
 		bool $shouldExist = true,
 		bool $federatedShare = false,
 		string $role = '',
+		bool $isVault = false,
 	): void {
 		$share = \ltrim($share, "/");
 		$wasOrNot = $shouldExist ? "was not" : "was";
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$accessToken = $this->featureContext->getOcisUserToken($sharee)['token']['accessToken'];
+			$headers["Authorization"] = "Bearer " . $accessToken;
+			$sharee = null;
+			$password = null;
+		} else {
+			$password = $this->featureContext->getPasswordForUser($sharee);
+		}
 		if (!$federatedShare) {
 			if (\strtolower($space) === "personal") {
 				$remoteDriveAlias = "personal/" . \strtolower($sharer);
@@ -2238,8 +2281,11 @@ class SharingNgContext implements Context {
 			$response = GraphHelper::getMySpaces(
 				$this->featureContext->getBaseUrl(),
 				$sharee,
-				$this->featureContext->getPasswordForUser($sharee),
+				$password,
 				"",
+				[],
+				$headers,
+				$isVault,
 			);
 			$driveList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response)->value;
 			$foundShareMountpoint = false;
@@ -2263,6 +2309,8 @@ class SharingNgContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$sharee,
 			$this->featureContext->getPasswordForUser($sharee),
+			$headers,
+			$isVault,
 		);
 		$sharedWithMeList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response)->value;
 		$foundShareInSharedWithMe = false;
@@ -2330,6 +2378,7 @@ class SharingNgContext implements Context {
 		// set default space to personal if not provided
 		$space = $shares[0]['space'] ?? 'personal';
 		foreach ($shares as $share) {
+			$isVault = isset($share['storage']) && $share['storage'] === 'vault';
 			$this->checkIfShareExists(
 				$share["resource"],
 				$sharee,
@@ -2338,6 +2387,7 @@ class SharingNgContext implements Context {
 				true,
 				false,
 				$share["permissionsRole"],
+				$isVault,
 			);
 		}
 	}
