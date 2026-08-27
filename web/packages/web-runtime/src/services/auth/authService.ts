@@ -405,7 +405,7 @@ export class AuthService implements AuthServiceInterface {
     return user?.refresh_token
   }
 
-  private handleDelegatedTokenUpdate(event: MessageEvent) {
+  private handleDelegatedTokenUpdate = (event: MessageEvent) => {
     if (event.origin !== this.configStore.options.embed?.delegateAuthenticationOrigin) {
       return
     }
@@ -414,8 +414,13 @@ export class AuthService implements AuthServiceInterface {
       return
     }
 
+    const accessToken = event.data.data?.access_token
+    if (!accessToken) {
+      return
+    }
+
     console.debug('[authService:handleDelegatedTokenUpdate] - going to update the access_token')
-    return this.userManager.updateContext(event.data, false)
+    return this.userManager.updateContext(accessToken, false)
   }
 
   /**

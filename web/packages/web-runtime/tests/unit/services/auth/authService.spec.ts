@@ -67,6 +67,68 @@ describe('AuthService', () => {
     )
   })
 
+  describe('handleDelegatedTokenUpdate', () => {
+    let authService: AuthService
+
+    const signInDelegated = async () => {
+      authService = new AuthService()
+
+      Object.defineProperty(authService, 'userManager', {
+        value: mock<UserManager>({
+          getUser: vi.fn().mockResolvedValue(null),
+          getAndClearPostLoginRedirectUrl: vi.fn().mockReturnValue('/'),
+          updateContext: mockUpdateContext
+        })
+      })
+
+      const configStore = useConfigStore()
+      configStore.options = {
+        embed: {
+          enabled: true,
+          delegateAuthentication: true,
+          delegateAuthenticationOrigin: 'https://host.example.org'
+        }
+      }
+      initAuthService({ authService, configStore, router: createRouter() })
+
+      await authService.signInCallback('initial-token')
+      mockUpdateContext.mockClear()
+    }
+
+    afterEach(() => {
+      window.removeEventListener(
+        'message',
+        (authService as any).handleDelegatedTokenUpdate as EventListener
+      )
+    })
+
+    it('ignores "owncloud-embed:update-token" messages from unexpected origins', async () => {
+      await signInDelegated()
+
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { name: 'owncloud-embed:update-token', data: { access_token: 'renewed-token' } },
+          origin: 'https://attacker.example.org'
+        })
+      )
+
+      expect(mockUpdateContext).not.toHaveBeenCalled()
+    })
+
+    it('updates the user context with the access token from "owncloud-embed:update-token" messages', async () => {
+      await signInDelegated()
+
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { name: 'owncloud-embed:update-token', data: { access_token: 'renewed-token' } },
+          origin: 'https://host.example.org'
+        })
+      )
+
+      expect(mockUpdateContext).toHaveBeenCalledWith('renewed-token', false)
+    })
+  })
+
   describe('initializeContext', () => {
     it('when embed mode is disabled and access_token is present, should call updateContext', async () => {
       const authService = new AuthService()
