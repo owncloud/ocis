@@ -92,6 +92,23 @@ class WebUIHelper {
 			if (!file_exists($screenshotPath)) {
 				throw new Exception("Failed to save QR code screenshot to: " . $screenshotPath);
 			}
+
+			// DEBUG: print actual screenshot resolution
+			$imageInfo = getimagesize($screenshotPath);
+			if ($imageInfo !== false) {
+				fwrite(
+					STDERR,
+					\sprintf(
+						"[DEBUG] QR screenshot resolution: %dx%d px (file: %s)\n",
+						$imageInfo[0],
+						$imageInfo[1],
+						$screenshotPath,
+					),
+				);
+			} else {
+				fwrite(STDERR, "[DEBUG] Could not read image dimensions for: $screenshotPath\n");
+			}
+
 			$otp = self::extractOtpFromQr($screenshotPath);
 			$page->locator(self::$totpInput)->fill((string)$otp);
 			$page->locator(self::$userLabel)->fill('test');
@@ -101,9 +118,9 @@ class WebUIHelper {
 		} catch (\Exception $e) {
 			throw new Exception("Login failed for user '$username': " . $e->getMessage(), 0, $e);
 		} finally {
-			if (file_exists($screenshotPath)) {
-				unlink($screenshotPath);
-			}
+			//			if (file_exists($screenshotPath)) {
+			//				unlink($screenshotPath);
+			//			}
 			$context->close();
 		}
 	}

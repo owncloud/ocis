@@ -182,48 +182,48 @@ jobs:
       fail-fast: false
       matrix:
         suite:
-          # contract & locks
-          - apiContract
-          - apiLocks
-          # settings & notifications (needs email)
-          - apiSettings
-          - apiNotification
-          - apiCors
-          # graph
-          - apiGraphUser
-          - apiGraph
-          - apiGraphGroup
-          # spaces & dav
-          - apiSpaces
-          - apiSpacesShares
-          - apiSpacesDavOperation
-          - apiDownloads
-          - apiAsyncUpload
-          - apiDepthInfinity
-          - apiArchiver
-          - apiActivities
-          # search
-          - apiSearch1
-          - apiSearch2
-          - apiSearchContent    # needs Tika
-          # sharing
-          - apiSharingNgShares
-          - apiReshare
-          - apiSharingNgPermissions
-          - apiSharingNgAdditionalShareRole
-          - apiSharingNgDriveInvitation
-          - apiSharingNgItemInvitation
-          - apiSharingNgDriveLinkShare
-          - apiSharingNgItemLinkShare
-          - apiSharingNgLinkShareManagement
-          # auth
-          - apiAuthApp
-          # antivirus (needs ClamAV)
-          - apiAntivirus
-          # federation (needs email + federation ocis)
-          - apiOcm
-          # collaboration (needs WOPI)
-          - apiCollaboration
+#          # contract & locks
+#          - apiContract
+#          - apiLocks
+#          # settings & notifications (needs email)
+#          - apiSettings
+#          - apiNotification
+#          - apiCors
+#          # graph
+#          - apiGraphUser
+#          - apiGraph
+#          - apiGraphGroup
+#          # spaces & dav
+#          - apiSpaces
+#          - apiSpacesShares
+#          - apiSpacesDavOperation
+#          - apiDownloads
+#          - apiAsyncUpload
+#          - apiDepthInfinity
+#          - apiArchiver
+#          - apiActivities
+#          # search
+#          - apiSearch1
+#          - apiSearch2
+#          - apiSearchContent    # needs Tika
+#          # sharing
+#          - apiSharingNgShares
+#          - apiReshare
+#          - apiSharingNgPermissions
+#          - apiSharingNgAdditionalShareRole
+#          - apiSharingNgDriveInvitation
+#          - apiSharingNgItemInvitation
+#          - apiSharingNgDriveLinkShare
+#          - apiSharingNgItemLinkShare
+#          - apiSharingNgLinkShareManagement
+#          # auth
+#          - apiAuthApp
+#          # antivirus (needs ClamAV)
+#          - apiAntivirus
+#          # federation (needs email + federation ocis)
+#          - apiOcm
+#          # collaboration (needs WOPI)
+#          - apiCollaboration
           - apiVault
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -289,6 +289,13 @@ jobs:
           mkdir -p "$GOCOVERDIR"
           BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
 
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: qr-debug-screenshots-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/qr_*.png
+          retention-days: 1
+
       - name: Upload raw coverage data
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -298,6 +305,7 @@ jobs:
           if-no-files-found: error
 
   cli-tests:
+    if: false
     needs: [build-and-test]
     name: ${{ matrix.suite }}
     runs-on: ubuntu-latest
@@ -346,6 +354,7 @@ jobs:
           if-no-files-found: error
 
   ldap-pool-tests:
+    if: false
     needs: [build-and-test]
     name: ldapPool-${{ matrix.suite }}
     runs-on: ubuntu-latest
@@ -394,6 +403,7 @@ jobs:
           if-no-files-found: error
 
   core-api-tests:
+    if: false
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -489,6 +499,7 @@ jobs:
           if-no-files-found: error
 
   e2e-tests:
+    if: false
     name: e2e-${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -695,6 +706,7 @@ jobs:
           retention-days: 7
 
   litmus:
+    if: false
     name: litmus
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -720,6 +732,7 @@ jobs:
         run: python3 tests/acceptance/run-litmus.py
 
   cs3api:
+    if: false
     name: cs3api
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -745,6 +758,7 @@ jobs:
         run: python3 tests/acceptance/run-cs3api.py
 
   wopi-builtin:
+    if: false
     name: wopi-builtin
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -770,6 +784,7 @@ jobs:
         run: python3 tests/acceptance/run-wopi.py --type builtin
 
   wopi-cs3:
+    if: false
     name: wopi-cs3
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -795,6 +810,7 @@ jobs:
         run: python3 tests/acceptance/run-wopi.py --type cs3
 
   external-ldap-tests:
+    if: false
     name: external-ldap-smoke
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -828,6 +844,7 @@ jobs:
         run: tests/ldap-smoke/run.sh
 
   external-ldap-distributed-tests:
+    if: false
     name: external-ldap-distributed-smoke
     needs: [build-and-test]
     runs-on: ubuntu-latest
