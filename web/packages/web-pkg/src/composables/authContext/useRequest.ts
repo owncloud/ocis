@@ -1,6 +1,7 @@
 import { useClientService } from '../clientService'
 import type { Router, RouteLocationNormalizedLoaded } from 'vue-router'
-import type { Method, AxiosRequestConfig, AxiosResponse } from 'axios'
+import type { HttpResponse } from '@ownclouders/web-client'
+import type { RequestConfig } from '../../http'
 import { ClientService } from '../../services'
 import { AuthStore, useAuthStore } from '../piniaStores'
 
@@ -12,7 +13,7 @@ interface RequestOptions {
 }
 
 export interface RequestResult {
-  makeRequest(method: Method, url: string, config?: AxiosRequestConfig): Promise<AxiosResponse>
+  makeRequest(method: string, url: string, config?: RequestConfig): Promise<HttpResponse>
 }
 
 export function useRequest(options: RequestOptions = {}): RequestResult {
@@ -20,10 +21,10 @@ export function useRequest(options: RequestOptions = {}): RequestResult {
   const authStore = options.authStore ?? useAuthStore()
 
   const makeRequest = (
-    method: Method,
+    method: string,
     url: string,
-    config: AxiosRequestConfig = {}
-  ): Promise<AxiosResponse> => {
+    config: RequestConfig = {}
+  ): Promise<HttpResponse> => {
     const httpClient = authStore.accessToken
       ? clientService.httpAuthenticated
       : clientService.httpUnAuthenticated
@@ -41,10 +42,7 @@ export function useRequest(options: RequestOptions = {}): RequestResult {
       }
     }
 
-    config.method = method
-    config.url = url
-
-    return httpClient.request(config)
+    return httpClient.request({ ...config, method, url })
   }
 
   return {
