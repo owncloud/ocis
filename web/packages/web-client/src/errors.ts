@@ -6,12 +6,7 @@ export class HttpError extends Error {
   /** parsed response body, read once before the error is thrown */
   public data?: unknown
 
-  constructor(
-    message: string,
-    response: Response,
-    statusCode: number = null,
-    data?: unknown
-  ) {
+  constructor(message: string, response: Response, statusCode: number = null, data?: unknown) {
     super(message)
     this.response = response
     this.statusCode = statusCode

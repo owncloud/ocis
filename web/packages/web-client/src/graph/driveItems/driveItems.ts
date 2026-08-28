@@ -9,10 +9,7 @@ export const DriveItemsFactory = ({ config }: GraphFactoryOptions): GraphDriveIt
 
   return {
     async getDriveItem(driveId, itemId, requestOptions) {
-      return await driveItemApi.getDriveItem(
-        { driveId, itemId },
-        toInitOverrides(requestOptions)
-      )
+      return await driveItemApi.getDriveItem({ driveId, itemId }, toInitOverrides(requestOptions))
     },
 
     async createDriveItem(driveId, data, requestOptions) {

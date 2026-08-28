@@ -84,7 +84,6 @@
   "dependencies": {
     "@casl/ability": "^6.8.1",
     "@microsoft/fetch-event-source": "^2.0.1",
-    "axios": "^1.18.1",
     "fast-xml-parser": "^5.8.0",
     "lodash-es": "^4.18.1",
     "luxon": "^3.7.2",

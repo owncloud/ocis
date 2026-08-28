@@ -6,7 +6,7 @@ import {
   mockHttpResponse,
   shallowMount
 } from '@ownclouders/web-test-helpers'
-import { mock, mockDeep } from 'vitest-mock-extended'
+import { mockDeep } from 'vitest-mock-extended'
 import { CapabilityStore, ClientService } from '@ownclouders/web-pkg'
 import * as LanguageHelpderModule from '../../src/helpers/language'
 

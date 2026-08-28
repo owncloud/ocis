@@ -1,7 +1,7 @@
 import { HttpError, type HttpResponse } from '@ownclouders/web-client'
 
 /**
- * Builds the envelope HttpClient resolves with. Replaces mockAxiosResolve.
+ * Builds the envelope HttpClient resolves with.
  */
 export const mockHttpResponse = <T>(
   data: T = {} as T,
@@ -22,8 +22,8 @@ export const mockHttpResponse = <T>(
 })
 
 /**
- * Builds a rejected promise carrying the HttpError the fetch core throws.
- * Replaces mockAxiosReject. Note callers branch on `statusCode`, never `status`.
+ * Builds a rejected promise carrying the HttpError the fetch core throws. Note that
+ * callers branch on `statusCode`, never `status`.
  */
 export const mockHttpError = (
   status = 500,

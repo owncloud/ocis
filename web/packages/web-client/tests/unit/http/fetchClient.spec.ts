@@ -42,9 +42,7 @@ describe('FetchClient', () => {
     it('sets statusCode, not status', async () => {
       fetchMock.mockResolvedValue(new Response('{}', { status: 423 }))
 
-      const error: HttpError = await new FetchClient()
-        .request('https://host/foo')
-        .catch((e) => e)
+      const error: HttpError = await new FetchClient().request('https://host/foo').catch((e) => e)
 
       expect(error.statusCode).toBe(423)
     })
@@ -54,9 +52,7 @@ describe('FetchClient', () => {
         new Response(JSON.stringify({ error: { message: 'nope' } }), { status: 400 })
       )
 
-      const error: HttpError = await new FetchClient()
-        .request('https://host/foo')
-        .catch((e) => e)
+      const error: HttpError = await new FetchClient().request('https://host/foo').catch((e) => e)
 
       expect(error.data).toEqual({ error: { message: 'nope' } })
     })
@@ -64,9 +60,7 @@ describe('FetchClient', () => {
     it('does not fail the throw path on a non-JSON error body', async () => {
       fetchMock.mockResolvedValue(new Response('<html>gateway</html>', { status: 502 }))
 
-      const error: HttpError = await new FetchClient()
-        .request('https://host/foo')
-        .catch((e) => e)
+      const error: HttpError = await new FetchClient().request('https://host/foo').catch((e) => e)
 
       expect(error.statusCode).toBe(502)
       expect(error.data).toBe('<html>gateway</html>')
@@ -113,9 +107,7 @@ describe('FetchClient', () => {
         .request(relative)
         .catch(() => undefined)
 
-      expect(onResponse).toHaveBeenCalledWith(
-        expect.objectContaining({ requestUrl: relative })
-      )
+      expect(onResponse).toHaveBeenCalledWith(expect.objectContaining({ requestUrl: relative }))
     })
 
     it('trap 5: reports a transport failure as status 500 with a null response, then throws', async () => {
@@ -140,9 +132,9 @@ describe('FetchClient', () => {
       fetchMock.mockRejectedValue(abortError)
       const onResponse = vi.fn()
 
-      await expect(
-        new FetchClient({ onResponse }).request('https://host/foo')
-      ).rejects.toBe(abortError)
+      await expect(new FetchClient({ onResponse }).request('https://host/foo')).rejects.toBe(
+        abortError
+      )
       expect(onResponse).not.toHaveBeenCalled()
     })
   })

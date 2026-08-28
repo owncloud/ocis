@@ -1,10 +1,5 @@
 import { HttpError } from '../errors'
-import type {
-  FetchClientOptions,
-  FetchRequestOptions,
-  HttpResponse,
-  ResponseType
-} from './types'
+import type { FetchClientOptions, FetchRequestOptions, HttpResponse, ResponseType } from './types'
 
 const isBodyInit = (value: unknown): value is BodyInit =>
   typeof value === 'string' ||

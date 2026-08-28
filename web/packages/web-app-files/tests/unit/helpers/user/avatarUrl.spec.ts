@@ -14,7 +14,9 @@ const getDefaultOptions = () => ({
 describe('avatarUrl', () => {
   it('throws an error', async () => {
     const defaultOptions = getDefaultOptions()
-    defaultOptions.clientService.httpAuthenticated.head.mockResolvedValue(mockHttpResponse({}, { status: 200 }))
+    defaultOptions.clientService.httpAuthenticated.head.mockResolvedValue(
+      mockHttpResponse({}, { status: 200 })
+    )
     defaultOptions.clientService.ocs.signUrl.mockRejectedValue(new Error('error'))
     const avatarUrlPromise = avatarUrl(defaultOptions)
     await expect(avatarUrlPromise).rejects.toThrow(new Error('error'))
@@ -24,7 +26,9 @@ describe('avatarUrl', () => {
   })
   it('returns a signed url', async () => {
     const defaultOptions = getDefaultOptions()
-    defaultOptions.clientService.httpAuthenticated.head.mockResolvedValue(mockHttpResponse({}, { status: 200 }))
+    defaultOptions.clientService.httpAuthenticated.head.mockResolvedValue(
+      mockHttpResponse({}, { status: 200 })
+    )
     defaultOptions.clientService.ocs.signUrl.mockImplementation((payload) => {
       return Promise.resolve(`${payload.url}?signed=true`)
     })
@@ -33,7 +37,9 @@ describe('avatarUrl', () => {
   })
   it('handles caching', async () => {
     const defaultOptions = getDefaultOptions()
-    defaultOptions.clientService.httpAuthenticated.head.mockResolvedValue(mockHttpResponse({}, { status: 200 }))
+    defaultOptions.clientService.httpAuthenticated.head.mockResolvedValue(
+      mockHttpResponse({}, { status: 200 })
+    )
     defaultOptions.clientService.ocs.signUrl.mockImplementation((payload) =>
       Promise.resolve(payload.url)
     )

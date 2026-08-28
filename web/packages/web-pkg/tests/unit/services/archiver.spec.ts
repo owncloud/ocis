@@ -14,9 +14,11 @@ const getArchiverServiceInstance = (capabilities: Ref<ArchiverCapability[]>) => 
   const userStore = useUserStore()
 
   const clientServiceMock = mockDeep<ClientService>()
-  clientServiceMock.httpUnAuthenticated.get.mockResolvedValue(mockHttpResponse(new ArrayBuffer(8), {
-    headers: { 'content-disposition': 'filename="download.tar"' }
-  }))
+  clientServiceMock.httpUnAuthenticated.get.mockResolvedValue(
+    mockHttpResponse(new ArrayBuffer(8), {
+      headers: { 'content-disposition': 'filename="download.tar"' }
+    })
+  )
   clientServiceMock.ocs.signUrl.mockImplementation((payload) => Promise.resolve(payload.url))
 
   Object.defineProperty(window, 'open', {

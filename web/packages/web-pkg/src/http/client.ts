@@ -79,10 +79,7 @@ export class HttpClient {
     return this.send<T, S>(url, rest)
   }
 
-  private async send<T, S>(
-    url: string,
-    config: RequestConfig<any, S>
-  ): Promise<Resolved<T, S>> {
+  private async send<T, S>(url: string, config: RequestConfig<any, S>): Promise<Resolved<T, S>> {
     const response = await this.client.request<any>(url, config)
 
     if (config?.schema) {

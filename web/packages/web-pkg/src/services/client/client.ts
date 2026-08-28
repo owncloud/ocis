@@ -179,9 +179,8 @@ export class ClientService {
   }
 
   /**
-   * Replaces the former pair of axios response interceptors. The asymmetry is deliberate
-   * and matches the previous behaviour: only a successful response clears maintenance
-   * mode, and a non-2xx response never clears it.
+   * Called for every response the client receives. The asymmetry is deliberate: only a
+   * successful response clears maintenance mode, and a non-2xx response never clears it.
    *
    * `args.requestUrl` is the caller's URL, not `response.url` — the maintenance
    * allow-list is matched against relative paths. `args.status` is 500 when the transport

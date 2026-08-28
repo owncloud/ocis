@@ -266,7 +266,9 @@ describe('account page', () => {
       const { wrapper, mocks } = getWrapper()
       await blockLoadingState(wrapper)
 
-      mocks.$clientService.httpAuthenticated.post.mockImplementation(() => mockHttpError(500, undefined, 'err'))
+      mocks.$clientService.httpAuthenticated.post.mockImplementation(() =>
+        mockHttpError(500, undefined, 'err')
+      )
       await wrapper.vm.updateDisableEmailNotifications(true)
       const { showErrorMessage } = useMessages()
       expect(showErrorMessage).toHaveBeenCalled()
@@ -412,7 +414,9 @@ describe('account page', () => {
       const { wrapper, mocks } = getWrapper({})
       await blockLoadingState(wrapper)
 
-      mocks.$clientService.httpAuthenticated.post.mockImplementation(() => mockHttpError(500, undefined, 'err'))
+      mocks.$clientService.httpAuthenticated.post.mockImplementation(() =>
+        mockHttpError(500, undefined, 'err')
+      )
       await wrapper.vm.updateMultiChoiceSettingsValue('setting-id', 'setting-key', true)
       const { showErrorMessage } = useMessages()
       expect(showErrorMessage).toHaveBeenCalled()
@@ -443,7 +447,9 @@ describe('account page', () => {
       const { wrapper, mocks } = getWrapper({})
       await blockLoadingState(wrapper)
 
-      mocks.$clientService.httpAuthenticated.post.mockImplementation(() => mockHttpError(500, undefined, 'err'))
+      mocks.$clientService.httpAuthenticated.post.mockImplementation(() =>
+        mockHttpError(500, undefined, 'err')
+      )
       await wrapper.vm.updateSingleChoiceValue('setting-id', {
         displayValue: 'Daily',
         value: { stringValue: 'daily' }
