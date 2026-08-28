@@ -8,7 +8,7 @@ import { ocs } from '../ocs'
 export const GetFileUrlFactory = (
   dav: DAV,
   getFileContentsFactory: ReturnType<typeof GetFileContentsFactory>,
-  { axiosClient, baseUrl }: WebDavOptions
+  { httpClient, baseUrl }: WebDavOptions
 ) => {
   return {
     async getFileUrl(
@@ -42,12 +42,12 @@ export const GetFileUrlFactory = (
           : dav.getFileUrl(resource.webDavPath)
 
         if (username && doHeadRequest) {
-          await axiosClient.head(downloadURL)
+          await httpClient.fetch(downloadURL, { method: 'HEAD' })
         }
 
         // sign url
         if (isUrlSigningEnabled && username) {
-          const ocsClient = ocs(baseUrl, axiosClient)
+          const ocsClient = ocs(baseUrl, httpClient)
           downloadURL = await ocsClient.signUrl({ url: downloadURL, username })
         } else {
           signed = false

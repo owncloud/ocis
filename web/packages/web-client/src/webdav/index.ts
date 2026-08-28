@@ -1,5 +1,5 @@
-import axios from 'axios'
 import { Headers } from 'webdav'
+import { FetchClient } from '../http'
 import { WebDAV } from './types'
 import { CopyFilesFactory } from './copyFiles'
 import { CreateFolderFactory } from './createFolder'
@@ -33,31 +33,18 @@ export const webdav = (
   onSetMaintenance: (value: boolean) => void,
   headers?: () => Headers
 ): WebDAV => {
-  const axiosClient = axios.create()
-  if (headers) {
-    axiosClient.interceptors.request.use((config) => {
-      Object.assign(config.headers, headers())
-      return config
-    })
-  }
-
-  axiosClient.interceptors.response.use(
-    (response) => {
-      onSetMaintenance(false)
-      return response
-    },
-    (error) => {
-      const isInMaintenanceMode = shouldResponseTriggerMaintenance(
-        error.response?.status || 500,
-        error.config.url
-      )
-      onSetMaintenance(isInMaintenanceMode)
-
-      return Promise.reject(error)
+  const httpClient = new FetchClient({
+    ...(headers && { headers }),
+    onResponse: ({ response, status, requestUrl }) => {
+      if (response?.ok) {
+        onSetMaintenance(false)
+        return
+      }
+      onSetMaintenance(shouldResponseTriggerMaintenance(status, requestUrl))
     }
-  )
+  })
 
-  const options = { axiosClient, baseUrl: baseURI, headers }
+  const options = { httpClient, baseUrl: baseURI, headers }
 
   const dav = new DAV({ baseUrl: baseURI, headers, onSetMaintenance })
   const registerExtraProp = (name: string) => {

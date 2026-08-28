@@ -2,7 +2,7 @@ import { SpaceResource } from '../helpers'
 import { WebDavOptions } from './types'
 import { DAV, DAVRequestOptions } from './client'
 import { HttpError } from '../errors'
-import { ResponseType } from 'axios'
+import type { ResponseType } from '../http'
 import { getWebDavPath } from './utils'
 
 export type GetFileContentsResponse = {
@@ -10,7 +10,7 @@ export type GetFileContentsResponse = {
   [key: string]: any
 }
 
-export const GetFileContentsFactory = (dav: DAV, { axiosClient }: WebDavOptions) => {
+export const GetFileContentsFactory = (dav: DAV, { httpClient }: WebDavOptions) => {
   return {
     async getFileContents(
       space: SpaceResource,
@@ -27,7 +27,7 @@ export const GetFileContentsFactory = (dav: DAV, { axiosClient }: WebDavOptions)
     ): Promise<GetFileContentsResponse> {
       try {
         const webDavPath = getWebDavPath(space, { fileId, path })
-        const response = await axiosClient.get(dav.getFileUrl(webDavPath), {
+        const response = await httpClient.request(dav.getFileUrl(webDavPath), {
           responseType,
           headers: {
             ...(noCache && { 'Cache-Control': 'no-cache' }),
@@ -39,14 +39,17 @@ export const GetFileContentsFactory = (dav: DAV, { axiosClient }: WebDavOptions)
           response,
           body: response.data,
           headers: {
-            ETag: response.headers['etag'],
-            'OC-ETag': response.headers['oc-etag'],
-            'OC-FileId': response.headers['oc-fileid']
+            ETag: response.headers.get('etag'),
+            'OC-ETag': response.headers.get('oc-etag'),
+            'OC-FileId': response.headers.get('oc-fileid')
           }
         }
       } catch (error) {
-        const { message, response } = error
-        throw new HttpError(message, response, response.status)
+        // the core already throws an HttpError carrying the response and status
+        if (error instanceof HttpError) {
+          throw error
+        }
+        throw new HttpError(error?.message, error?.response, error?.statusCode)
       }
     }
   }
