@@ -9,11 +9,11 @@ Name | Type
 ------------ | -------------
 `id` | string
 `createdBy` | [IdentitySet](IdentitySet.md)
-`createdDateTime` | Date
+`createdDateTime` | string
 `description` | string
 `eTag` | string
 `lastModifiedBy` | [IdentitySet](IdentitySet.md)
-`lastModifiedDateTime` | Date
+`lastModifiedDateTime` | string
 `name` | string
 `parentReference` | [ItemReference](ItemReference.md)
 `webUrl` | string

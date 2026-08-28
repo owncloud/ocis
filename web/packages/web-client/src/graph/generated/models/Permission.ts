@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
+import { mapValues } from '../runtime';
 import type { SharingInvitation } from './SharingInvitation';
 import {
     SharingInvitationFromJSON,
@@ -70,11 +70,11 @@ export interface Permission {
     /**
      * An optional expiration date which limits the permission in time.
      */
-    expirationDateTime?: Date | null;
+    expirationDateTime?: string | null;
     /**
      * An optional creation date. Libregraph only.
      */
-    createdDateTime?: Date | null;
+    createdDateTime?: string | null;
     /**
      * 
      */
@@ -121,8 +121,8 @@ export function PermissionFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         
         'id': json['id'] == null ? undefined : json['id'],
         'hasPassword': json['hasPassword'] == null ? undefined : json['hasPassword'],
-        'expirationDateTime': json['expirationDateTime'] === undefined ? undefined : json['expirationDateTime'] === null ? null : (parseDateTime(json['expirationDateTime'])),
-        'createdDateTime': json['createdDateTime'] === undefined ? undefined : json['createdDateTime'] === null ? null : (parseDateTime(json['createdDateTime'])),
+        'expirationDateTime': json['expirationDateTime'] === undefined ? undefined : json['expirationDateTime'] === null ? null : json['expirationDateTime'],
+        'createdDateTime': json['createdDateTime'] === undefined ? undefined : json['createdDateTime'] === null ? null : json['createdDateTime'],
         'grantedToV2': json['grantedToV2'] == null ? undefined : SharePointIdentitySetFromJSON(json['grantedToV2']),
         'link': json['link'] == null ? undefined : SharingLinkFromJSON(json['link']),
         'roles': json['roles'] == null ? undefined : json['roles'],
@@ -143,8 +143,8 @@ export function PermissionToJSONTyped(value?: Omit<Permission, 'id'|'hasPassword
 
     return {
         
-        'expirationDateTime': value['expirationDateTime'] == null ? value['expirationDateTime'] : serializeDateTime(value['expirationDateTime']),
-        'createdDateTime': value['createdDateTime'] == null ? value['createdDateTime'] : serializeDateTime(value['createdDateTime']),
+        'expirationDateTime': value['expirationDateTime'],
+        'createdDateTime': value['createdDateTime'],
         'grantedToV2': SharePointIdentitySetToJSON(value['grantedToV2']),
         'link': SharingLinkToJSON(value['link']),
         'roles': value['roles'],

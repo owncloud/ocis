@@ -9,8 +9,8 @@ Name | Type
 ------------ | -------------
 `id` | string
 `hasPassword` | boolean
-`expirationDateTime` | Date
-`createdDateTime` | Date
+`expirationDateTime` | string
+`createdDateTime` | string
 `grantedToV2` | [SharePointIdentitySet](SharePointIdentitySet.md)
 `link` | [SharingLink](SharingLink.md)
 `roles` | Array&lt;string&gt;

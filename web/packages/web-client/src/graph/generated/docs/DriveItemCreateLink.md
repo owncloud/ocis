@@ -7,7 +7,7 @@
 Name | Type
 ------------ | -------------
 `type` | [SharingLinkType](SharingLinkType.md)
-`expirationDateTime` | Date
+`expirationDateTime` | string
 `password` | string
 `displayName` | string
 `atLibreGraphQuickLink` | boolean

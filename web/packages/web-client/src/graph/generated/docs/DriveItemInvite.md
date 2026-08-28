@@ -9,7 +9,7 @@ Name | Type
 `recipients` | [Array&lt;DriveRecipient&gt;](DriveRecipient.md)
 `roles` | Array&lt;string&gt;
 `atLibreGraphPermissionsActions` | Array&lt;string&gt;
-`expirationDateTime` | Date
+`expirationDateTime` | string
 
 ## Example
 

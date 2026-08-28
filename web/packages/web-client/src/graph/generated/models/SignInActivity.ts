@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * Provides the last successful sign-in attempt for a user
  * @export
@@ -22,7 +22,7 @@ export interface SignInActivity {
     /**
      * The date and time of the last successful sign-in for the user.
      */
-    lastSuccessfulSignInDateTime?: Date;
+    lastSuccessfulSignInDateTime?: string;
 }
 
 /**
@@ -42,7 +42,7 @@ export function SignInActivityFromJSONTyped(json: any, ignoreDiscriminator: bool
     }
     return {
         
-        'lastSuccessfulSignInDateTime': json['lastSuccessfulSignInDateTime'] == null ? undefined : (parseDateTime(json['lastSuccessfulSignInDateTime'])),
+        'lastSuccessfulSignInDateTime': json['lastSuccessfulSignInDateTime'] == null ? undefined : json['lastSuccessfulSignInDateTime'],
     };
 }
 
@@ -57,7 +57,7 @@ export function SignInActivityToJSONTyped(value?: SignInActivity | null, ignoreD
 
     return {
         
-        'lastSuccessfulSignInDateTime': value['lastSuccessfulSignInDateTime'] == null ? value['lastSuccessfulSignInDateTime'] : serializeDateTime(value['lastSuccessfulSignInDateTime']),
+        'lastSuccessfulSignInDateTime': value['lastSuccessfulSignInDateTime'],
     };
 }
 

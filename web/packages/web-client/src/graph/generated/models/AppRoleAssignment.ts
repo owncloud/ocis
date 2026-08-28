@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -26,7 +26,7 @@ export interface AppRoleAssignment {
     /**
      * 
      */
-    deletedDateTime?: Date;
+    deletedDateTime?: string;
     /**
      * The identifier (id) for the app role which is assigned to the user. Required on create.
      */
@@ -34,7 +34,7 @@ export interface AppRoleAssignment {
     /**
      * The time when the app role assignment was created. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z. Read-only.
      */
-    createdDateTime?: Date | null;
+    createdDateTime?: string | null;
     /**
      * The display name of the user, group, or service principal that was granted the app role assignment. Read-only.
      */
@@ -78,9 +78,9 @@ export function AppRoleAssignmentFromJSONTyped(json: any, ignoreDiscriminator: b
     return {
         
         'id': json['id'] == null ? undefined : json['id'],
-        'deletedDateTime': json['deletedDateTime'] == null ? undefined : (parseDateTime(json['deletedDateTime'])),
+        'deletedDateTime': json['deletedDateTime'] == null ? undefined : json['deletedDateTime'],
         'appRoleId': json['appRoleId'],
-        'createdDateTime': json['createdDateTime'] === undefined ? undefined : json['createdDateTime'] === null ? null : (parseDateTime(json['createdDateTime'])),
+        'createdDateTime': json['createdDateTime'] === undefined ? undefined : json['createdDateTime'] === null ? null : json['createdDateTime'],
         'principalDisplayName': json['principalDisplayName'] === undefined ? undefined : json['principalDisplayName'] === null ? null : json['principalDisplayName'],
         'principalId': json['principalId'],
         'principalType': json['principalType'] === undefined ? undefined : json['principalType'] === null ? null : json['principalType'],
@@ -100,9 +100,9 @@ export function AppRoleAssignmentToJSONTyped(value?: Omit<AppRoleAssignment, 'id
 
     return {
         
-        'deletedDateTime': value['deletedDateTime'] == null ? value['deletedDateTime'] : serializeDateTime(value['deletedDateTime']),
+        'deletedDateTime': value['deletedDateTime'],
         'appRoleId': value['appRoleId'],
-        'createdDateTime': value['createdDateTime'] == null ? value['createdDateTime'] : serializeDateTime(value['createdDateTime']),
+        'createdDateTime': value['createdDateTime'],
         'principalDisplayName': value['principalDisplayName'],
         'principalId': value['principalId'],
         'principalType': value['principalType'],

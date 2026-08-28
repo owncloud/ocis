@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * The photo resource provides photo and camera properties, for example, EXIF metadata, on a driveItem.
  * 
@@ -55,7 +55,7 @@ export interface Photo {
     /**
      * Represents the date and time the photo was taken. Read-only.
      */
-    takenDateTime?: Date;
+    takenDateTime?: string;
 }
 
 /**
@@ -83,7 +83,7 @@ export function PhotoFromJSONTyped(json: any, ignoreDiscriminator: boolean): Pho
         'focalLength': json['focalLength'] == null ? undefined : json['focalLength'],
         'iso': json['iso'] == null ? undefined : json['iso'],
         'orientation': json['orientation'] == null ? undefined : json['orientation'],
-        'takenDateTime': json['takenDateTime'] == null ? undefined : (parseDateTime(json['takenDateTime'])),
+        'takenDateTime': json['takenDateTime'] == null ? undefined : json['takenDateTime'],
     };
 }
 
@@ -106,7 +106,7 @@ export function PhotoToJSONTyped(value?: Photo | null, ignoreDiscriminator: bool
         'focalLength': value['focalLength'],
         'iso': value['iso'],
         'orientation': value['orientation'],
-        'takenDateTime': value['takenDateTime'] == null ? value['takenDateTime'] : serializeDateTime(value['takenDateTime']),
+        'takenDateTime': value['takenDateTime'],
     };
 }
 

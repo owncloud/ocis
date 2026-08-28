@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ItemReference } from './ItemReference';
 import {
     ItemReferenceFromJSON,
@@ -83,7 +83,7 @@ export interface RemoteItem {
     /**
      * Date and time of item creation. Read-only.
      */
-    createdDateTime?: Date;
+    createdDateTime?: string;
     /**
      * 
      */
@@ -123,7 +123,7 @@ export interface RemoteItem {
     /**
      * Date and time the item was last modified. Read-only.
      */
-    lastModifiedDateTime?: Date;
+    lastModifiedDateTime?: string;
     /**
      * Optional. Filename of the remote item. Read-only.
      */
@@ -184,7 +184,7 @@ export function RemoteItemFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : IdentitySetFromJSON(json['createdBy']),
-        'createdDateTime': json['createdDateTime'] == null ? undefined : (parseDateTime(json['createdDateTime'])),
+        'createdDateTime': json['createdDateTime'] == null ? undefined : json['createdDateTime'],
         'file': json['file'] == null ? undefined : OpenGraphFileFromJSON(json['file']),
         'fileSystemInfo': json['fileSystemInfo'] == null ? undefined : FileSystemInfoFromJSON(json['fileSystemInfo']),
         'folder': json['folder'] == null ? undefined : FolderFromJSON(json['folder']),
@@ -194,7 +194,7 @@ export function RemoteItemFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'id': json['id'] == null ? undefined : json['id'],
         'image': json['image'] == null ? undefined : ImageFromJSON(json['image']),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : IdentitySetFromJSON(json['lastModifiedBy']),
-        'lastModifiedDateTime': json['lastModifiedDateTime'] == null ? undefined : (parseDateTime(json['lastModifiedDateTime'])),
+        'lastModifiedDateTime': json['lastModifiedDateTime'] == null ? undefined : json['lastModifiedDateTime'],
         'name': json['name'] == null ? undefined : json['name'],
         'eTag': json['eTag'] == null ? undefined : json['eTag'],
         'cTag': json['cTag'] == null ? undefined : json['cTag'],
@@ -220,7 +220,7 @@ export function RemoteItemToJSONTyped(value?: Omit<RemoteItem, 'eTag'|'cTag'|'pe
     return {
         
         'createdBy': IdentitySetToJSON(value['createdBy']),
-        'createdDateTime': value['createdDateTime'] == null ? value['createdDateTime'] : serializeDateTime(value['createdDateTime']),
+        'createdDateTime': value['createdDateTime'],
         'file': OpenGraphFileToJSON(value['file']),
         'fileSystemInfo': FileSystemInfoToJSON(value['fileSystemInfo']),
         'folder': FolderToJSON(value['folder']),
@@ -230,7 +230,7 @@ export function RemoteItemToJSONTyped(value?: Omit<RemoteItem, 'eTag'|'cTag'|'pe
         'id': value['id'],
         'image': ImageToJSON(value['image']),
         'lastModifiedBy': IdentitySetToJSON(value['lastModifiedBy']),
-        'lastModifiedDateTime': value['lastModifiedDateTime'] == null ? value['lastModifiedDateTime'] : serializeDateTime(value['lastModifiedDateTime']),
+        'lastModifiedDateTime': value['lastModifiedDateTime'],
         'name': value['name'],
         'parentReference': ItemReferenceToJSON(value['parentReference']),
         'size': value['size'],

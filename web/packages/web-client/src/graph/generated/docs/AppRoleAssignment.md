@@ -7,9 +7,9 @@
 Name | Type
 ------------ | -------------
 `id` | string
-`deletedDateTime` | Date
+`deletedDateTime` | string
 `appRoleId` | string
-`createdDateTime` | Date
+`createdDateTime` | string
 `principalDisplayName` | string
 `principalId` | string
 `principalType` | string

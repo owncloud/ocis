@@ -7,7 +7,7 @@ Provides the last successful sign-in attempt for a user
 
 Name | Type
 ------------ | -------------
-`lastSuccessfulSignInDateTime` | Date
+`lastSuccessfulSignInDateTime` | string
 
 ## Example
 

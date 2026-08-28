@@ -8,7 +8,7 @@ Metadata for trashed drive Items
 Name | Type
 ------------ | -------------
 `trashedBy` | [IdentitySet](IdentitySet.md)
-`trashedDateTime` | Date
+`trashedDateTime` | string
 
 ## Example
 

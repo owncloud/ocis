@@ -15,7 +15,7 @@ Name | Type
 `focalLength` | number
 `iso` | number
 `orientation` | number
-`takenDateTime` | Date
+`takenDateTime` | string
 
 ## Example
 

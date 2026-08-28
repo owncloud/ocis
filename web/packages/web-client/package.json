@@ -75,7 +75,7 @@
     }
   },
   "scripts": {
-    "generate-openapi": "rm -rf src/graph/generated && docker run --rm -v \"${PWD}/src/graph:/local\" openapitools/openapi-generator-cli generate -i https://raw.githubusercontent.com/owncloud/libre-graph-api/main/api/openapi-spec/v1.0.yaml  -g typescript-fetch -o /local/generated",
+    "generate-openapi": "rm -rf src/graph/generated && docker run --rm -v \"${PWD}/src/graph:/local\" openapitools/openapi-generator-cli generate -i https://raw.githubusercontent.com/owncloud/libre-graph-api/main/api/openapi-spec/v1.0.yaml  -g typescript-fetch --type-mappings=DateTime=string -o /local/generated",
     "vite": "vite",
     "prepublishOnly": "rm -rf ./package && clean-publish && rm -rf package/dist/tests && find package && cat package/package.json",
     "postpublish": "rm -rf ./package",

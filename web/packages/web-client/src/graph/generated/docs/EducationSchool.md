@@ -10,7 +10,7 @@ Name | Type
 `id` | string
 `displayName` | string
 `schoolNumber` | string
-`terminationDate` | Date
+`terminationDate` | string
 
 ## Example
 

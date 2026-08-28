@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
+import { mapValues } from '../runtime';
 import type { SharingLinkType } from './SharingLinkType';
 import {
     SharingLinkTypeFromJSON,
@@ -34,7 +34,7 @@ export interface DriveItemCreateLink {
     /**
      * Optional. A String with format of yyyy-MM-ddTHH:mm:ssZ of DateTime indicates the expiration time of the permission.
      */
-    expirationDateTime?: Date;
+    expirationDateTime?: string;
     /**
      * Optional.The password of the sharing link that is set by the creator.
      */
@@ -69,7 +69,7 @@ export function DriveItemCreateLinkFromJSONTyped(json: any, ignoreDiscriminator:
     return {
         
         'type': json['type'] == null ? undefined : SharingLinkTypeFromJSON(json['type']),
-        'expirationDateTime': json['expirationDateTime'] == null ? undefined : (parseDateTime(json['expirationDateTime'])),
+        'expirationDateTime': json['expirationDateTime'] == null ? undefined : json['expirationDateTime'],
         'password': json['password'] == null ? undefined : json['password'],
         'displayName': json['displayName'] == null ? undefined : json['displayName'],
         'atLibreGraphQuickLink': json['@libre.graph.quickLink'] == null ? undefined : json['@libre.graph.quickLink'],
@@ -88,7 +88,7 @@ export function DriveItemCreateLinkToJSONTyped(value?: DriveItemCreateLink | nul
     return {
         
         'type': SharingLinkTypeToJSON(value['type']),
-        'expirationDateTime': value['expirationDateTime'] == null ? value['expirationDateTime'] : serializeDateTime(value['expirationDateTime']),
+        'expirationDateTime': value['expirationDateTime'],
         'password': value['password'],
         'displayName': value['displayName'],
         '@libre.graph.quickLink': value['atLibreGraphQuickLink'],

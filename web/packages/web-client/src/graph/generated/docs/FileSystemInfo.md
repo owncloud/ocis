@@ -7,9 +7,9 @@ File system information on client. Read-write.
 
 Name | Type
 ------------ | -------------
-`createdDateTime` | Date
-`lastAccessedDateTime` | Date
-`lastModifiedDateTime` | Date
+`createdDateTime` | string
+`lastAccessedDateTime` | string
+`lastModifiedDateTime` | string
 
 ## Example
 

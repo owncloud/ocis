@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
+import { mapValues } from '../runtime';
 import type { DriveRecipient } from './DriveRecipient';
 import {
     DriveRecipientFromJSON,
@@ -42,7 +42,7 @@ export interface DriveItemInvite {
     /**
      * Specifies the dateTime after which the permission expires.
      */
-    expirationDateTime?: Date;
+    expirationDateTime?: string;
 }
 
 /**
@@ -65,7 +65,7 @@ export function DriveItemInviteFromJSONTyped(json: any, ignoreDiscriminator: boo
         'recipients': json['recipients'] == null ? undefined : ((json['recipients'] as Array<any>).map(DriveRecipientFromJSON)),
         'roles': json['roles'] == null ? undefined : json['roles'],
         'atLibreGraphPermissionsActions': json['@libre.graph.permissions.actions'] == null ? undefined : json['@libre.graph.permissions.actions'],
-        'expirationDateTime': json['expirationDateTime'] == null ? undefined : (parseDateTime(json['expirationDateTime'])),
+        'expirationDateTime': json['expirationDateTime'] == null ? undefined : json['expirationDateTime'],
     };
 }
 
@@ -83,7 +83,7 @@ export function DriveItemInviteToJSONTyped(value?: DriveItemInvite | null, ignor
         'recipients': value['recipients'] == null ? undefined : ((value['recipients'] as Array<any>).map(DriveRecipientToJSON)),
         'roles': value['roles'],
         '@libre.graph.permissions.actions': value['atLibreGraphPermissionsActions'],
-        'expirationDateTime': value['expirationDateTime'] == null ? value['expirationDateTime'] : serializeDateTime(value['expirationDateTime']),
+        'expirationDateTime': value['expirationDateTime'],
     };
 }
 

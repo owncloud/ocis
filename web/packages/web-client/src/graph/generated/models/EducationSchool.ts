@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * Represents a school
  * @export
@@ -34,7 +34,7 @@ export interface EducationSchool {
     /**
      * Date and time at which the service for this organization is scheduled to be terminated
      */
-    terminationDate?: Date | null;
+    terminationDate?: string | null;
 }
 
 /**
@@ -57,7 +57,7 @@ export function EducationSchoolFromJSONTyped(json: any, ignoreDiscriminator: boo
         'id': json['id'] == null ? undefined : json['id'],
         'displayName': json['displayName'] == null ? undefined : json['displayName'],
         'schoolNumber': json['schoolNumber'] == null ? undefined : json['schoolNumber'],
-        'terminationDate': json['terminationDate'] === undefined ? undefined : json['terminationDate'] === null ? null : (parseDateTime(json['terminationDate'])),
+        'terminationDate': json['terminationDate'] === undefined ? undefined : json['terminationDate'] === null ? null : json['terminationDate'],
     };
 }
 
@@ -74,7 +74,7 @@ export function EducationSchoolToJSONTyped(value?: Omit<EducationSchool, 'id'> |
         
         'displayName': value['displayName'],
         'schoolNumber': value['schoolNumber'],
-        'terminationDate': value['terminationDate'] == null ? value['terminationDate'] : serializeDateTime(value['terminationDate']),
+        'terminationDate': value['terminationDate'],
     };
 }
 

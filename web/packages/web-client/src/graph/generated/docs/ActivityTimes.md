@@ -6,7 +6,7 @@
 
 Name | Type
 ------------ | -------------
-`recordedTime` | Date
+`recordedTime` | string
 
 ## Example
 

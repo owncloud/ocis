@@ -8,7 +8,7 @@ Remote item data, if the item is shared from a drive other than the one being ac
 Name | Type
 ------------ | -------------
 `createdBy` | [IdentitySet](IdentitySet.md)
-`createdDateTime` | Date
+`createdDateTime` | string
 `file` | [OpenGraphFile](OpenGraphFile.md)
 `fileSystemInfo` | [FileSystemInfo](FileSystemInfo.md)
 `folder` | [Folder](Folder.md)
@@ -18,7 +18,7 @@ Name | Type
 `id` | string
 `image` | [Image](Image.md)
 `lastModifiedBy` | [IdentitySet](IdentitySet.md)
-`lastModifiedDateTime` | Date
+`lastModifiedDateTime` | string
 `name` | string
 `eTag` | string
 `cTag` | string

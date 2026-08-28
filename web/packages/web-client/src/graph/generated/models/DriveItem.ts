@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
+import { mapValues } from '../runtime';
 import type { IdentitySet } from './IdentitySet';
 import {
     IdentitySetFromJSON,
@@ -143,7 +143,7 @@ export interface DriveItem {
     /**
      * Date and time of item creation. Read-only.
      */
-    readonly createdDateTime?: Date;
+    readonly createdDateTime?: string;
     /**
      * Provides a user-visible description of the item. Optional.
      */
@@ -159,7 +159,7 @@ export interface DriveItem {
     /**
      * Date and time the item was last modified. Read-only.
      */
-    readonly lastModifiedDateTime?: Date;
+    readonly lastModifiedDateTime?: string;
     /**
      * The name of the item. Read-write.
      */
@@ -281,11 +281,11 @@ export function DriveItemFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         
         'id': json['id'] == null ? undefined : json['id'],
         'createdBy': json['createdBy'] == null ? undefined : IdentitySetFromJSON(json['createdBy']),
-        'createdDateTime': json['createdDateTime'] == null ? undefined : (parseDateTime(json['createdDateTime'])),
+        'createdDateTime': json['createdDateTime'] == null ? undefined : json['createdDateTime'],
         'description': json['description'] == null ? undefined : json['description'],
         'eTag': json['eTag'] == null ? undefined : json['eTag'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : IdentitySetFromJSON(json['lastModifiedBy']),
-        'lastModifiedDateTime': json['lastModifiedDateTime'] == null ? undefined : (parseDateTime(json['lastModifiedDateTime'])),
+        'lastModifiedDateTime': json['lastModifiedDateTime'] == null ? undefined : json['lastModifiedDateTime'],
         'name': json['name'] == null ? undefined : json['name'],
         'parentReference': json['parentReference'] == null ? undefined : ItemReferenceFromJSON(json['parentReference']),
         'webUrl': json['webUrl'] == null ? undefined : json['webUrl'],

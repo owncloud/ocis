@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * File system information on client. Read-write.
  * @export
@@ -22,15 +22,15 @@ export interface FileSystemInfo {
     /**
      * The UTC date and time the file was created on a client.
      */
-    createdDateTime?: Date;
+    createdDateTime?: string;
     /**
      * The UTC date and time the file was last accessed. Available for the recent file list only.
      */
-    lastAccessedDateTime?: Date;
+    lastAccessedDateTime?: string;
     /**
      * The UTC date and time the file was last modified on a client.
      */
-    lastModifiedDateTime?: Date;
+    lastModifiedDateTime?: string;
 }
 
 /**
@@ -50,9 +50,9 @@ export function FileSystemInfoFromJSONTyped(json: any, ignoreDiscriminator: bool
     }
     return {
         
-        'createdDateTime': json['createdDateTime'] == null ? undefined : (parseDateTime(json['createdDateTime'])),
-        'lastAccessedDateTime': json['lastAccessedDateTime'] == null ? undefined : (parseDateTime(json['lastAccessedDateTime'])),
-        'lastModifiedDateTime': json['lastModifiedDateTime'] == null ? undefined : (parseDateTime(json['lastModifiedDateTime'])),
+        'createdDateTime': json['createdDateTime'] == null ? undefined : json['createdDateTime'],
+        'lastAccessedDateTime': json['lastAccessedDateTime'] == null ? undefined : json['lastAccessedDateTime'],
+        'lastModifiedDateTime': json['lastModifiedDateTime'] == null ? undefined : json['lastModifiedDateTime'],
     };
 }
 
@@ -67,9 +67,9 @@ export function FileSystemInfoToJSONTyped(value?: FileSystemInfo | null, ignoreD
 
     return {
         
-        'createdDateTime': value['createdDateTime'] == null ? value['createdDateTime'] : serializeDateTime(value['createdDateTime']),
-        'lastAccessedDateTime': value['lastAccessedDateTime'] == null ? value['lastAccessedDateTime'] : serializeDateTime(value['lastAccessedDateTime']),
-        'lastModifiedDateTime': value['lastModifiedDateTime'] == null ? value['lastModifiedDateTime'] : serializeDateTime(value['lastModifiedDateTime']),
+        'createdDateTime': value['createdDateTime'],
+        'lastAccessedDateTime': value['lastAccessedDateTime'],
+        'lastModifiedDateTime': value['lastModifiedDateTime'],
     };
 }
 

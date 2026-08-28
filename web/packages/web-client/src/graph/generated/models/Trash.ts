@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
+import { mapValues } from '../runtime';
 import type { IdentitySet } from './IdentitySet';
 import {
     IdentitySetFromJSON,
@@ -34,7 +34,7 @@ export interface Trash {
     /**
      * The UTC date and time the folder was marked as trashed.
      */
-    trashedDateTime?: Date;
+    trashedDateTime?: string;
 }
 
 /**
@@ -55,7 +55,7 @@ export function TrashFromJSONTyped(json: any, ignoreDiscriminator: boolean): Tra
     return {
         
         'trashedBy': json['trashedBy'] == null ? undefined : IdentitySetFromJSON(json['trashedBy']),
-        'trashedDateTime': json['trashedDateTime'] == null ? undefined : (parseDateTime(json['trashedDateTime'])),
+        'trashedDateTime': json['trashedDateTime'] == null ? undefined : json['trashedDateTime'],
     };
 }
 
@@ -71,7 +71,7 @@ export function TrashToJSONTyped(value?: Trash | null, ignoreDiscriminator: bool
     return {
         
         'trashedBy': IdentitySetToJSON(value['trashedBy']),
-        'trashedDateTime': value['trashedDateTime'] == null ? value['trashedDateTime'] : serializeDateTime(value['trashedDateTime']),
+        'trashedDateTime': value['trashedDateTime'],
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -22,7 +22,7 @@ export interface ActivityTimes {
     /**
      * Timestamp of the activity.
      */
-    recordedTime: Date;
+    recordedTime: string;
 }
 
 /**
@@ -43,7 +43,7 @@ export function ActivityTimesFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
     return {
         
-        'recordedTime': (json['recordedTime'] == null ? json['recordedTime'] : parseDateTime(json['recordedTime'])),
+        'recordedTime': json['recordedTime'],
     };
 }
 
@@ -58,7 +58,7 @@ export function ActivityTimesToJSONTyped(value?: ActivityTimes | null, ignoreDis
 
     return {
         
-        'recordedTime': value['recordedTime'] == null ? value['recordedTime'] : serializeDateTime(value['recordedTime']),
+        'recordedTime': value['recordedTime'],
     };
 }
 
