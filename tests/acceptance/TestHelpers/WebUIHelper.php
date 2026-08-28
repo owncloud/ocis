@@ -87,29 +87,29 @@ class WebUIHelper {
 				['timeout' => self::$defaultTimeout],
 			);
 
-			// setup mfa
-			$qrLocator->screenshot($screenshotPath);
-			if (!file_exists($screenshotPath)) {
-				throw new Exception("Failed to save QR code screenshot to: " . $screenshotPath);
+			// setup mfa, retry screenshot and decode on failure
+			$maxAttempts = 3;
+			$otp = null;
+			$lastException = null;
+			for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+				try {
+					$qrLocator->screenshot($screenshotPath);
+					if (!file_exists($screenshotPath)) {
+						throw new Exception("Failed to save QR code screenshot to: " . $screenshotPath);
+					}
+					$otp = self::extractOtpFromQr($screenshotPath);
+					break;
+				} catch (Exception $e) {
+					$lastException = $e;
+				}
 			}
-
-			// DEBUG: print actual screenshot resolution
-			$imageInfo = getimagesize($screenshotPath);
-			if ($imageInfo !== false) {
-				fwrite(
-					STDERR,
-					\sprintf(
-						"[DEBUG] QR screenshot resolution: %dx%d px (file: %s)\n",
-						$imageInfo[0],
-						$imageInfo[1],
-						$screenshotPath,
-					),
+			if ($otp === null) {
+				throw new Exception(
+					"Could not decode QR code after $maxAttempts attempts",
+					0,
+					$lastException,
 				);
-			} else {
-				fwrite(STDERR, "[DEBUG] Could not read image dimensions for: $screenshotPath\n");
 			}
-
-			$otp = self::extractOtpFromQr($screenshotPath);
 			$page->locator(self::$totpInput)->fill((string)$otp);
 			$page->locator(self::$userLabel)->fill('test');
 			$page->locator(self::$saveTotpButton)->click();
@@ -118,9 +118,9 @@ class WebUIHelper {
 		} catch (\Exception $e) {
 			throw new Exception("Login failed for user '$username': " . $e->getMessage(), 0, $e);
 		} finally {
-			//			if (file_exists($screenshotPath)) {
-			//				unlink($screenshotPath);
-			//			}
+			if (file_exists($screenshotPath)) {
+				unlink($screenshotPath);
+			}
 			$context->close();
 		}
 	}
