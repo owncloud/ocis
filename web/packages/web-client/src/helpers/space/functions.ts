@@ -20,6 +20,7 @@ import { buildWebDavPublicPath, buildWebDavOcmPath } from '../publicLink'
 import { urlJoin } from '../../utils'
 import { Drive, DriveItem } from '@ownclouders/web-client/graph/generated'
 import { GraphSharePermission, ShareRole } from '../share'
+import { Writeable } from '../writeable'
 
 export function buildWebDavSpacesPath(storageId: string, path?: string) {
   return urlJoin('spaces', storageId, path, {
@@ -139,7 +140,7 @@ export function buildSpace(
   },
   graphRoles: Record<string, ShareRole>
 ): SpaceResource {
-  let spaceImageData: DriveItem, spaceReadmeData: DriveItem
+  let spaceImageData: Writeable<DriveItem>, spaceReadmeData: Writeable<DriveItem>
   if (data.special) {
     spaceImageData = data.special.find((el) => el.specialFolder.name === 'image')
     spaceReadmeData = data.special.find((el) => el.specialFolder.name === 'readme')
@@ -394,15 +395,15 @@ export function getPermissionsForSpaceMember(space: SpaceResource, user: User) {
 }
 
 /**
- * Get array of permissions from a given graph permission object. If it has '@libre.graph.permissions.actions',
+ * Get array of permissions from a given graph permission object. If it has atLibreGraphPermissionsActions,
  * then no role exists for this set of permissions. Otherwise, the role is found in the graphRoles array.
  */
 function getPermissionsFromGraphPermission(
   permission: Permission,
   graphRoles: Record<string, ShareRole>
 ): string[] {
-  if (permission['@libre.graph.permissions.actions']) {
-    return permission['@libre.graph.permissions.actions']
+  if (permission.atLibreGraphPermissionsActions) {
+    return permission.atLibreGraphPermissionsActions
   }
   const role = graphRoles[permission.roles?.[0]]
   if (role) {

@@ -67,7 +67,7 @@ export const getShareResourcePermissions = ({
     // the server lists plain permissions if it doesn't find a corresponding role
     const permissions = driveItem.remoteItem?.permissions.reduce<GraphSharePermission[]>(
       (acc, permission) => {
-        const permissions = permission['@libre.graph.permissions.actions'] as GraphSharePermission[]
+        const permissions = permission.atLibreGraphPermissionsActions as GraphSharePermission[]
         if (permissions) {
           acc.push(...permissions)
         }
@@ -119,7 +119,7 @@ export function buildIncomingShareResource({
   }, [])
 
   let shareTypes = uniq(driveItem.remoteItem.permissions.map(getShareTypeFromPermission))
-  const isExternal = sharedBy.some((s) => s['@libre.graph.userType'] === 'Federated')
+  const isExternal = sharedBy.some((s) => s.atLibreGraphUserType === 'Federated')
   if (isExternal) {
     shareTypes = [ShareTypes.remote.value]
   }
@@ -150,14 +150,14 @@ export function buildIncomingShareResource({
     mdate: driveItem.lastModifiedDateTime
       ? new Date(driveItem.lastModifiedDateTime).toUTCString()
       : undefined,
-    syncEnabled: driveItem['@client.synchronize'],
-    hidden: driveItem['@UI.Hidden'],
+    syncEnabled: driveItem.atClientSynchronize,
+    hidden: driveItem.atUIHidden,
     shareRoles,
     sharePermissions,
     outgoing: false,
     privateLink: urlJoin(serverUrl, 'f', driveItem.remoteItem.id),
     spaceId: driveItem.remoteItem.spaceId,
-    canRename: () => driveItem['@client.synchronize'],
+    canRename: () => driveItem.atClientSynchronize,
     canDownload: () => sharePermissions.includes(GraphSharePermission.readContent),
     canUpload: () => sharePermissions.includes(GraphSharePermission.createUpload),
     canCreate: () => sharePermissions.includes(GraphSharePermission.createChildren),
@@ -209,7 +209,7 @@ export function buildOutgoingShareResource({
       if (p.link) {
         return {
           id: p.id,
-          displayName: p.link['@libre.graph.displayName'],
+          displayName: p.link.atLibreGraphDisplayName,
           shareType: ShareTypes.link.value
         }
       }
@@ -266,8 +266,8 @@ export function buildCollaboratorShare({
     role,
     sharedBy: { id: invitedBy?.id, displayName: invitedBy?.displayName },
     sharedWith: graphPermission.grantedToV2.user || graphPermission.grantedToV2.group,
-    permissions: (graphPermission['@libre.graph.permissions.actions']
-      ? graphPermission['@libre.graph.permissions.actions']
+    permissions: (graphPermission.atLibreGraphPermissionsActions
+      ? graphPermission.atLibreGraphPermissionsActions
       : role.rolePermissions.flatMap((p) => p.allowedResourceActions)) as GraphSharePermission[],
     createdDateTime: graphPermission.createdDateTime,
     expirationDateTime: graphPermission.expirationDateTime
@@ -294,8 +294,8 @@ export function buildLinkShare({
     hasPassword: graphPermission.hasPassword,
     createdDateTime: graphPermission.createdDateTime,
     expirationDateTime: graphPermission.expirationDateTime,
-    displayName: graphPermission.link['@libre.graph.displayName'],
-    isQuickLink: graphPermission.link['@libre.graph.quickLink'],
+    displayName: graphPermission.link.atLibreGraphDisplayName,
+    isQuickLink: graphPermission.link.atLibreGraphQuickLink,
     type: graphPermission.link.type,
     webUrl: graphPermission.link.webUrl,
     preventsDownload: graphPermission.link.preventsDownload
@@ -309,7 +309,7 @@ function getShareTypeFromPermission({ link, grantedToV2 }: Permission) {
   if (grantedToV2?.group) {
     return ShareTypes.group.value
   }
-  if (grantedToV2?.user?.['@libre.graph.userType'] === 'Federated') {
+  if (grantedToV2?.user?.atLibreGraphUserType === 'Federated') {
     return ShareTypes.remote.value
   }
   return ShareTypes.user.value

@@ -190,7 +190,7 @@ const createLinks = () => {
         resource,
         options: {
           type: unref(selectedType),
-          '@libre.graph.quickLink': false,
+          atLibreGraphQuickLink: false,
           password: unref(password).value,
           expirationDateTime: unref(selectedExpiry)?.toISO(),
           displayName: $gettext('Unnamed link')
