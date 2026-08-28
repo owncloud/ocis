@@ -2,46 +2,67 @@
 
 All URIs are relative to *https://ocis.ocis.rolling.owncloud.works/graph*
 
-|Method | HTTP request | Description|
+| Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-|[**listAllDrives**](#listalldrives) | **GET** /v1.0/drives | Get all available drives|
-|[**listAllDrivesBeta**](#listalldrivesbeta) | **GET** /v1beta1/drives | Alias for \&#39;/v1.0/drives\&#39;, the difference is that grantedtoV2 is used and roles contain unified roles instead of cs3 roles|
+| [**listAllDrives**](DrivesGetDrivesApi.md#listalldrives) | **GET** /v1.0/drives | Get all available drives |
+| [**listAllDrivesBeta**](DrivesGetDrivesApi.md#listalldrivesbeta) | **GET** /v1beta1/drives | Alias for \&#39;/v1.0/drives\&#39;, the difference is that grantedtoV2 is used and roles contain unified roles instead of cs3 roles |
 
-# **listAllDrives**
-> CollectionOfDrives1 listAllDrives()
 
+
+## listAllDrives
+
+> CollectionOfDrives1 listAllDrives($orderby, $filter)
+
+Get all available drives
 
 ### Example
 
-```typescript
+```ts
 import {
-    DrivesGetDrivesApi,
-    Configuration
-} from './api';
+  Configuration,
+  DrivesGetDrivesApi,
+} from '';
+import type { ListAllDrivesRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new DrivesGetDrivesApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new DrivesGetDrivesApi(config);
 
-let $orderby: string; //The $orderby system query option allows clients to request resources in either ascending order using asc or descending order using desc. (optional) (default to undefined)
-let $filter: string; //Filter items by property values (optional) (default to undefined)
+  const body = {
+    // string | The $orderby system query option allows clients to request resources in either ascending order using asc or descending order using desc. (optional)
+    $orderby: lastModifiedDateTime desc,
+    // string | Filter items by property values (optional)
+    $filter: driveType eq 'project',
+  } satisfies ListAllDrivesRequest;
 
-const { status, data } = await apiInstance.listAllDrives(
-    $orderby,
-    $filter
-);
+  try {
+    const data = await api.listAllDrives(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **$orderby** | [**string**] | The $orderby system query option allows clients to request resources in either ascending order using asc or descending order using desc. | (optional) defaults to undefined|
-| **$filter** | [**string**] | Filter items by property values | (optional) defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **$orderby** | `string` | The $orderby system query option allows clients to request resources in either ascending order using asc or descending order using desc. | [Optional] [Defaults to `undefined`] |
+| **$filter** | `string` | Filter items by property values | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 
-**CollectionOfDrives1**
+[**CollectionOfDrives1**](CollectionOfDrives1.md)
 
 ### Authorization
 
@@ -49,53 +70,73 @@ const { status, data } = await apiInstance.listAllDrives(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Retrieved spaces |  -  |
-|**0** | error |  -  |
+| **200** | Retrieved spaces |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **listAllDrivesBeta**
-> CollectionOfDrives1 listAllDrivesBeta()
 
+## listAllDrivesBeta
+
+> CollectionOfDrives1 listAllDrivesBeta($orderby, $filter)
+
+Alias for \&#39;/v1.0/drives\&#39;, the difference is that grantedtoV2 is used and roles contain unified roles instead of cs3 roles
 
 ### Example
 
-```typescript
+```ts
 import {
-    DrivesGetDrivesApi,
-    Configuration
-} from './api';
+  Configuration,
+  DrivesGetDrivesApi,
+} from '';
+import type { ListAllDrivesBetaRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new DrivesGetDrivesApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new DrivesGetDrivesApi(config);
 
-let $orderby: string; //The $orderby system query option allows clients to request resources in either ascending order using asc or descending order using desc. (optional) (default to undefined)
-let $filter: string; //Filter items by property values (optional) (default to undefined)
+  const body = {
+    // string | The $orderby system query option allows clients to request resources in either ascending order using asc or descending order using desc. (optional)
+    $orderby: lastModifiedDateTime desc,
+    // string | Filter items by property values (optional)
+    $filter: driveType eq 'project',
+  } satisfies ListAllDrivesBetaRequest;
 
-const { status, data } = await apiInstance.listAllDrivesBeta(
-    $orderby,
-    $filter
-);
+  try {
+    const data = await api.listAllDrivesBeta(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **$orderby** | [**string**] | The $orderby system query option allows clients to request resources in either ascending order using asc or descending order using desc. | (optional) defaults to undefined|
-| **$filter** | [**string**] | Filter items by property values | (optional) defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **$orderby** | `string` | The $orderby system query option allows clients to request resources in either ascending order using asc or descending order using desc. | [Optional] [Defaults to `undefined`] |
+| **$filter** | `string` | Filter items by property values | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 
-**CollectionOfDrives1**
+[**CollectionOfDrives1**](CollectionOfDrives1.md)
 
 ### Authorization
 
@@ -103,15 +144,15 @@ const { status, data } = await apiInstance.listAllDrivesBeta(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Retrieved spaces |  -  |
-|**0** | error |  -  |
+| **200** | Retrieved spaces |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

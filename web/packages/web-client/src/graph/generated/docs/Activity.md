@@ -1,25 +1,39 @@
+
 # Activity
 
 Represents activity.
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**id** | **string** | Activity ID. | [default to undefined]
-**times** | [**ActivityTimes**](ActivityTimes.md) |  | [default to undefined]
-**template** | [**ActivityTemplate**](ActivityTemplate.md) |  | [default to undefined]
+Name | Type
+------------ | -------------
+`id` | string
+`times` | [ActivityTimes](ActivityTimes.md)
+`template` | [ActivityTemplate](ActivityTemplate.md)
 
 ## Example
 
 ```typescript
-import { Activity } from './api';
+import type { Activity } from ''
 
-const instance: Activity = {
-    id,
-    times,
-    template,
-};
+// TODO: Update the object below with actual values
+const example = {
+  "id": null,
+  "times": null,
+  "template": null,
+} satisfies Activity
+
+console.log(example)
+
+// Convert the instance to a JSON string
+const exampleJSON: string = JSON.stringify(example)
+console.log(exampleJSON)
+
+// Parse the JSON string back to an object
+const exampleParsed = JSON.parse(exampleJSON) as Activity
+console.log(exampleParsed)
 ```
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+

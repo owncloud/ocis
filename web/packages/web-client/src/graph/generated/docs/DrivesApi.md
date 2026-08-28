@@ -2,50 +2,70 @@
 
 All URIs are relative to *https://ocis.ocis.rolling.owncloud.works/graph*
 
-|Method | HTTP request | Description|
+| Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-|[**createDrive**](#createdrive) | **POST** /v1.0/drives | Create a new drive of a specific type|
-|[**createDriveBeta**](#createdrivebeta) | **POST** /v1beta1/drives | Create a new drive of a specific type. Alias for \&#39;/v1.0/drives\&#39;, the difference is that grantedtoV2 is used and roles contain unified roles instead of cs3 roles.|
-|[**deleteDrive**](#deletedrive) | **DELETE** /v1.0/drives/{drive-id} | Delete a specific space|
-|[**deleteDriveBeta**](#deletedrivebeta) | **DELETE** /v1beta1/drives/{drive-id} | Delete a specific space. Alias for \&#39;/v1.0/drives\&#39;.|
-|[**getDrive**](#getdrive) | **GET** /v1.0/drives/{drive-id} | Get drive by id|
-|[**getDriveBeta**](#getdrivebeta) | **GET** /v1beta1/drives/{drive-id} | Get drive by id. Alias for \&#39;/v1.0/drives\&#39;, the difference is that grantedtoV2 is used and roles contain unified roles instead of cs3 roles|
-|[**updateDrive**](#updatedrive) | **PATCH** /v1.0/drives/{drive-id} | Update the drive|
-|[**updateDriveBeta**](#updatedrivebeta) | **PATCH** /v1beta1/drives/{drive-id} | Update the drive. Alias for \&#39;/v1.0/drives\&#39;, the difference is that grantedtoV2 is used and roles contain unified roles instead of cs3 roles|
+| [**createDrive**](DrivesApi.md#createdrive) | **POST** /v1.0/drives | Create a new drive of a specific type |
+| [**createDriveBeta**](DrivesApi.md#createdrivebeta) | **POST** /v1beta1/drives | Create a new drive of a specific type. Alias for \&#39;/v1.0/drives\&#39;, the difference is that grantedtoV2 is used and roles contain unified roles instead of cs3 roles. |
+| [**deleteDrive**](DrivesApi.md#deletedrive) | **DELETE** /v1.0/drives/{drive-id} | Delete a specific space |
+| [**deleteDriveBeta**](DrivesApi.md#deletedrivebeta) | **DELETE** /v1beta1/drives/{drive-id} | Delete a specific space. Alias for \&#39;/v1.0/drives\&#39;. |
+| [**getDrive**](DrivesApi.md#getdrive) | **GET** /v1.0/drives/{drive-id} | Get drive by id |
+| [**getDriveBeta**](DrivesApi.md#getdrivebeta) | **GET** /v1beta1/drives/{drive-id} | Get drive by id. Alias for \&#39;/v1.0/drives\&#39;, the difference is that grantedtoV2 is used and roles contain unified roles instead of cs3 roles |
+| [**updateDrive**](DrivesApi.md#updatedrive) | **PATCH** /v1.0/drives/{drive-id} | Update the drive |
+| [**updateDriveBeta**](DrivesApi.md#updatedrivebeta) | **PATCH** /v1beta1/drives/{drive-id} | Update the drive. Alias for \&#39;/v1.0/drives\&#39;, the difference is that grantedtoV2 is used and roles contain unified roles instead of cs3 roles |
 
-# **createDrive**
+
+
+## createDrive
+
 > Drive createDrive(drive)
 
+Create a new drive of a specific type
 
 ### Example
 
-```typescript
+```ts
 import {
-    DrivesApi,
-    Configuration,
-    Drive
-} from './api';
+  Configuration,
+  DrivesApi,
+} from '';
+import type { CreateDriveRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new DrivesApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new DrivesApi(config);
 
-let drive: Drive; //New space property values
+  const body = {
+    // Drive | New space property values
+    drive: {"name":"Mars","quota":{"total":1000000000},"description":"Team space mars project"},
+  } satisfies CreateDriveRequest;
 
-const { status, data } = await apiInstance.createDrive(
-    drive
-);
+  try {
+    const data = await api.createDrive(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **drive** | **Drive**| New space property values | |
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **drive** | [Drive](Drive.md) | New space property values | |
 
 ### Return type
 
-**Drive**
+[**Drive**](Drive.md)
 
 ### Authorization
 
@@ -53,51 +73,70 @@ const { status, data } = await apiInstance.createDrive(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**201** | Created |  -  |
-|**0** | error |  -  |
+| **201** | Created |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **createDriveBeta**
+
+## createDriveBeta
+
 > Drive createDriveBeta(drive)
 
+Create a new drive of a specific type. Alias for \&#39;/v1.0/drives\&#39;, the difference is that grantedtoV2 is used and roles contain unified roles instead of cs3 roles.
 
 ### Example
 
-```typescript
+```ts
 import {
-    DrivesApi,
-    Configuration,
-    Drive
-} from './api';
+  Configuration,
+  DrivesApi,
+} from '';
+import type { CreateDriveBetaRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new DrivesApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new DrivesApi(config);
 
-let drive: Drive; //New space property values
+  const body = {
+    // Drive | New space property values
+    drive: {"name":"Mars","quota":{"total":1000000000},"description":"Team space mars project"},
+  } satisfies CreateDriveBetaRequest;
 
-const { status, data } = await apiInstance.createDriveBeta(
-    drive
-);
+  try {
+    const data = await api.createDriveBeta(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **drive** | **Drive**| New space property values | |
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **drive** | [Drive](Drive.md) | New space property values | |
 
 ### Return type
 
-**Drive**
+[**Drive**](Drive.md)
 
 ### Authorization
 
@@ -105,53 +144,73 @@ const { status, data } = await apiInstance.createDriveBeta(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**201** | Created |  -  |
-|**0** | error |  -  |
+| **201** | Created |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **deleteDrive**
-> deleteDrive()
 
+## deleteDrive
+
+> deleteDrive(driveId, ifMatch)
+
+Delete a specific space
 
 ### Example
 
-```typescript
+```ts
 import {
-    DrivesApi,
-    Configuration
-} from './api';
+  Configuration,
+  DrivesApi,
+} from '';
+import type { DeleteDriveRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new DrivesApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new DrivesApi(config);
 
-let driveId: string; //key: id of drive (default to undefined)
-let ifMatch: string; //ETag (optional) (default to undefined)
+  const body = {
+    // string | key: id of drive
+    driveId: driveId_example,
+    // string | ETag (optional)
+    ifMatch: ifMatch_example,
+  } satisfies DeleteDriveRequest;
 
-const { status, data } = await apiInstance.deleteDrive(
-    driveId,
-    ifMatch
-);
+  try {
+    const data = await api.deleteDrive(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **driveId** | [**string**] | key: id of drive | defaults to undefined|
-| **ifMatch** | [**string**] | ETag | (optional) defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **driveId** | `string` | key: id of drive | [Defaults to `undefined`] |
+| **ifMatch** | `string` | ETag | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -159,53 +218,73 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**204** | Success |  -  |
-|**0** | error |  -  |
+| **204** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **deleteDriveBeta**
-> deleteDriveBeta()
 
+## deleteDriveBeta
+
+> deleteDriveBeta(driveId, ifMatch)
+
+Delete a specific space. Alias for \&#39;/v1.0/drives\&#39;.
 
 ### Example
 
-```typescript
+```ts
 import {
-    DrivesApi,
-    Configuration
-} from './api';
+  Configuration,
+  DrivesApi,
+} from '';
+import type { DeleteDriveBetaRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new DrivesApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new DrivesApi(config);
 
-let driveId: string; //key: id of drive (default to undefined)
-let ifMatch: string; //ETag (optional) (default to undefined)
+  const body = {
+    // string | key: id of drive
+    driveId: driveId_example,
+    // string | ETag (optional)
+    ifMatch: ifMatch_example,
+  } satisfies DeleteDriveBetaRequest;
 
-const { status, data } = await apiInstance.deleteDriveBeta(
-    driveId,
-    ifMatch
-);
+  try {
+    const data = await api.deleteDriveBeta(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **driveId** | [**string**] | key: id of drive | defaults to undefined|
-| **ifMatch** | [**string**] | ETag | (optional) defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **driveId** | `string` | key: id of drive | [Defaults to `undefined`] |
+| **ifMatch** | `string` | ETag | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -213,50 +292,70 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**204** | Success |  -  |
-|**0** | error |  -  |
+| **204** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **getDrive**
-> Drive getDrive()
 
+## getDrive
+
+> Drive getDrive(driveId)
+
+Get drive by id
 
 ### Example
 
-```typescript
+```ts
 import {
-    DrivesApi,
-    Configuration
-} from './api';
+  Configuration,
+  DrivesApi,
+} from '';
+import type { GetDriveRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new DrivesApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new DrivesApi(config);
 
-let driveId: string; //key: id of drive (default to undefined)
+  const body = {
+    // string | key: id of drive
+    driveId: driveId_example,
+  } satisfies GetDriveRequest;
 
-const { status, data } = await apiInstance.getDrive(
-    driveId
-);
+  try {
+    const data = await api.getDrive(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **driveId** | [**string**] | key: id of drive | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **driveId** | `string` | key: id of drive | [Defaults to `undefined`] |
 
 ### Return type
 
-**Drive**
+[**Drive**](Drive.md)
 
 ### Authorization
 
@@ -264,50 +363,70 @@ const { status, data } = await apiInstance.getDrive(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Retrieved drive |  -  |
-|**0** | error |  -  |
+| **200** | Retrieved drive |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **getDriveBeta**
-> Drive getDriveBeta()
 
+## getDriveBeta
+
+> Drive getDriveBeta(driveId)
+
+Get drive by id. Alias for \&#39;/v1.0/drives\&#39;, the difference is that grantedtoV2 is used and roles contain unified roles instead of cs3 roles
 
 ### Example
 
-```typescript
+```ts
 import {
-    DrivesApi,
-    Configuration
-} from './api';
+  Configuration,
+  DrivesApi,
+} from '';
+import type { GetDriveBetaRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new DrivesApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new DrivesApi(config);
 
-let driveId: string; //key: id of drive (default to undefined)
+  const body = {
+    // string | key: id of drive
+    driveId: driveId_example,
+  } satisfies GetDriveBetaRequest;
 
-const { status, data } = await apiInstance.getDriveBeta(
-    driveId
-);
+  try {
+    const data = await api.getDriveBeta(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **driveId** | [**string**] | key: id of drive | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **driveId** | `string` | key: id of drive | [Defaults to `undefined`] |
 
 ### Return type
 
-**Drive**
+[**Drive**](Drive.md)
 
 ### Authorization
 
@@ -315,54 +434,73 @@ const { status, data } = await apiInstance.getDriveBeta(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Retrieved drive |  -  |
-|**0** | error |  -  |
+| **200** | Retrieved drive |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **updateDrive**
-> Drive updateDrive(driveUpdate)
 
+## updateDrive
+
+> Drive updateDrive(driveId, driveUpdate)
+
+Update the drive
 
 ### Example
 
-```typescript
+```ts
 import {
-    DrivesApi,
-    Configuration,
-    DriveUpdate
-} from './api';
+  Configuration,
+  DrivesApi,
+} from '';
+import type { UpdateDriveRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new DrivesApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new DrivesApi(config);
 
-let driveId: string; //key: id of drive (default to undefined)
-let driveUpdate: DriveUpdate; //New space values
+  const body = {
+    // string | key: id of drive
+    driveId: driveId_example,
+    // DriveUpdate | New space values
+    driveUpdate: {"quota":{"total":1000000000}},
+  } satisfies UpdateDriveRequest;
 
-const { status, data } = await apiInstance.updateDrive(
-    driveId,
-    driveUpdate
-);
+  try {
+    const data = await api.updateDrive(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **driveUpdate** | **DriveUpdate**| New space values | |
-| **driveId** | [**string**] | key: id of drive | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **driveId** | `string` | key: id of drive | [Defaults to `undefined`] |
+| **driveUpdate** | [DriveUpdate](DriveUpdate.md) | New space values | |
 
 ### Return type
 
-**Drive**
+[**Drive**](Drive.md)
 
 ### Authorization
 
@@ -370,54 +508,73 @@ const { status, data } = await apiInstance.updateDrive(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Success |  -  |
-|**0** | error |  -  |
+| **200** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **updateDriveBeta**
-> Drive updateDriveBeta(driveUpdate)
 
+## updateDriveBeta
+
+> Drive updateDriveBeta(driveId, driveUpdate)
+
+Update the drive. Alias for \&#39;/v1.0/drives\&#39;, the difference is that grantedtoV2 is used and roles contain unified roles instead of cs3 roles
 
 ### Example
 
-```typescript
+```ts
 import {
-    DrivesApi,
-    Configuration,
-    DriveUpdate
-} from './api';
+  Configuration,
+  DrivesApi,
+} from '';
+import type { UpdateDriveBetaRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new DrivesApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new DrivesApi(config);
 
-let driveId: string; //key: id of drive (default to undefined)
-let driveUpdate: DriveUpdate; //New space values
+  const body = {
+    // string | key: id of drive
+    driveId: driveId_example,
+    // DriveUpdate | New space values
+    driveUpdate: {"quota":{"total":1000000000}},
+  } satisfies UpdateDriveBetaRequest;
 
-const { status, data } = await apiInstance.updateDriveBeta(
-    driveId,
-    driveUpdate
-);
+  try {
+    const data = await api.updateDriveBeta(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **driveUpdate** | **DriveUpdate**| New space values | |
-| **driveId** | [**string**] | key: id of drive | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **driveId** | `string` | key: id of drive | [Defaults to `undefined`] |
+| **driveUpdate** | [DriveUpdate](DriveUpdate.md) | New space values | |
 
 ### Return type
 
-**Drive**
+[**Drive**](Drive.md)
 
 ### Authorization
 
@@ -425,15 +582,15 @@ const { status, data } = await apiInstance.updateDriveBeta(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Success |  -  |
-|**0** | error |  -  |
+| **200** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

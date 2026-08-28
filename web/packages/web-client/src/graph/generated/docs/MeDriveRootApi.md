@@ -2,35 +2,55 @@
 
 All URIs are relative to *https://ocis.ocis.rolling.owncloud.works/graph*
 
-|Method | HTTP request | Description|
+| Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-|[**homeGetRoot**](#homegetroot) | **GET** /v1.0/me/drive/root | Get root from personal space|
+| [**homeGetRoot**](MeDriveRootApi.md#homegetroot) | **GET** /v1.0/me/drive/root | Get root from personal space |
 
-# **homeGetRoot**
+
+
+## homeGetRoot
+
 > DriveItem homeGetRoot()
 
+Get root from personal space
 
 ### Example
 
-```typescript
+```ts
 import {
-    MeDriveRootApi,
-    Configuration
-} from './api';
+  Configuration,
+  MeDriveRootApi,
+} from '';
+import type { HomeGetRootRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new MeDriveRootApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new MeDriveRootApi(config);
 
-const { status, data } = await apiInstance.homeGetRoot();
+  try {
+    const data = await api.homeGetRoot();
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
-This endpoint does not have any parameters.
 
+This endpoint does not need any parameter.
 
 ### Return type
 
-**DriveItem**
+[**DriveItem**](DriveItem.md)
 
 ### Authorization
 
@@ -38,15 +58,15 @@ This endpoint does not have any parameters.
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Retrieved resource |  -  |
-|**0** | error |  -  |
+| **200** | Retrieved resource |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

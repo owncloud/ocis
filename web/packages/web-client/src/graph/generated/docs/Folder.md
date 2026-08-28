@@ -1,23 +1,37 @@
+
 # Folder
 
 Folder metadata, if the item is a folder. Read-only.
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**childCount** | **number** | Number of children contained immediately within this container. | [optional] [default to undefined]
-**view** | [**FolderView**](FolderView.md) |  | [optional] [default to undefined]
+Name | Type
+------------ | -------------
+`childCount` | number
+`view` | [FolderView](FolderView.md)
 
 ## Example
 
 ```typescript
-import { Folder } from './api';
+import type { Folder } from ''
 
-const instance: Folder = {
-    childCount,
-    view,
-};
+// TODO: Update the object below with actual values
+const example = {
+  "childCount": null,
+  "view": null,
+} satisfies Folder
+
+console.log(example)
+
+// Convert the instance to a JSON string
+const exampleJSON: string = JSON.stringify(example)
+console.log(exampleJSON)
+
+// Parse the JSON string back to an object
+const exampleParsed = JSON.parse(exampleJSON) as Folder
+console.log(exampleParsed)
 ```
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+

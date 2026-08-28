@@ -1,28 +1,42 @@
+
 # ItemReference
 
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**driveId** | **string** | Unique identifier of the drive instance that contains the item. Read-only. | [optional] [readonly] [default to undefined]
-**driveType** | **string** | Identifies the type of drive. See [drive][] resource for values. Read-only. | [optional] [readonly] [default to undefined]
-**id** | **string** | Unique identifier of the item in the drive. Read-only. | [optional] [readonly] [default to undefined]
-**name** | **string** | The name of the item being referenced. Read-only. | [optional] [readonly] [default to undefined]
-**path** | **string** | Path that can be used to navigate to the item. Read-only. | [optional] [readonly] [default to undefined]
+Name | Type
+------------ | -------------
+`driveId` | string
+`driveType` | string
+`id` | string
+`name` | string
+`path` | string
 
 ## Example
 
 ```typescript
-import { ItemReference } from './api';
+import type { ItemReference } from ''
 
-const instance: ItemReference = {
-    driveId,
-    driveType,
-    id,
-    name,
-    path,
-};
+// TODO: Update the object below with actual values
+const example = {
+  "driveId": null,
+  "driveType": null,
+  "id": null,
+  "name": null,
+  "path": null,
+} satisfies ItemReference
+
+console.log(example)
+
+// Convert the instance to a JSON string
+const exampleJSON: string = JSON.stringify(example)
+console.log(exampleJSON)
+
+// Parse the JSON string back to an object
+const exampleParsed = JSON.parse(exampleJSON) as ItemReference
+console.log(exampleParsed)
 ```
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+

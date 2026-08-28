@@ -2,43 +2,63 @@
 
 All URIs are relative to *https://ocis.ocis.rolling.owncloud.works/graph*
 
-|Method | HTTP request | Description|
+| Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-|[**changeOwnPassword**](#changeownpassword) | **POST** /v1.0/me/changePassword | Change your own password|
+| [**changeOwnPassword**](MeChangepasswordApi.md#changeownpassword) | **POST** /v1.0/me/changePassword | Change your own password |
 
-# **changeOwnPassword**
+
+
+## changeOwnPassword
+
 > changeOwnPassword(passwordChange)
 
+Change your own password
 
 ### Example
 
-```typescript
+```ts
 import {
-    MeChangepasswordApi,
-    Configuration,
-    PasswordChange
-} from './api';
+  Configuration,
+  MeChangepasswordApi,
+} from '';
+import type { ChangeOwnPasswordRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new MeChangepasswordApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new MeChangepasswordApi(config);
 
-let passwordChange: PasswordChange; //Password change request
+  const body = {
+    // PasswordChange | Password change request
+    passwordChange: ...,
+  } satisfies ChangeOwnPasswordRequest;
 
-const { status, data } = await apiInstance.changeOwnPassword(
-    passwordChange
-);
+  try {
+    const data = await api.changeOwnPassword(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **passwordChange** | **PasswordChange**| Password change request | |
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **passwordChange** | [PasswordChange](PasswordChange.md) | Password change request | |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -46,15 +66,15 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**204** | Success |  -  |
-|**0** | error |  -  |
+| **204** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
