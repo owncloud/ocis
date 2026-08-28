@@ -5,8 +5,8 @@ import { VNodeRef } from 'vue'
 import {
   defaultComponentMocks,
   RouteLocation,
-  mockAxiosResolve,
-  mockAxiosReject,
+  mockHttpResponse,
+  mockHttpError,
   getComposableWrapper
 } from '@ownclouders/web-test-helpers'
 
@@ -23,7 +23,7 @@ describe('uploadImage', () => {
     it('should show message on request success', () => {
       getWrapper({
         setup: async ({ uploadImage }, { clientService, router }) => {
-          clientService.httpAuthenticated.post.mockResolvedValue(mockAxiosResolve())
+          clientService.httpAuthenticated.post.mockResolvedValue(mockHttpResponse())
           await uploadImage({
             currentTarget: {
               files: [{ name: 'image.png', type: 'image/png' }]
@@ -41,7 +41,7 @@ describe('uploadImage', () => {
       vi.spyOn(console, 'error').mockImplementation(() => undefined)
       getWrapper({
         setup: async ({ uploadImage }, { clientService, router }) => {
-          clientService.httpAuthenticated.post.mockRejectedValue(() => mockAxiosReject())
+          clientService.httpAuthenticated.post.mockRejectedValue(() => mockHttpError())
           await uploadImage({
             currentTarget: {
               files: [{ name: 'image.png', type: 'image/png' }]

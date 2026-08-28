@@ -1,9 +1,13 @@
 import App from '../../src/App.vue'
 import { ref } from 'vue'
-import { defaultComponentMocks, defaultPlugins, shallowMount } from '@ownclouders/web-test-helpers'
+import {
+  defaultComponentMocks,
+  defaultPlugins,
+  mockHttpResponse,
+  shallowMount
+} from '@ownclouders/web-test-helpers'
 import { mock, mockDeep } from 'vitest-mock-extended'
 import { CapabilityStore, ClientService } from '@ownclouders/web-pkg'
-import { AxiosResponse } from 'axios'
 import * as LanguageHelpderModule from '../../src/helpers/language'
 
 vi.spyOn(LanguageHelpderModule, 'setCurrentLanguage')
@@ -52,7 +56,7 @@ function getShallowWrapper({
 }) {
   if (!clientService) {
     clientService = mockDeep<ClientService>()
-    clientService.httpAuthenticated.get.mockResolvedValue(mock<AxiosResponse>({ status: 200 }))
+    clientService.httpAuthenticated.get.mockResolvedValue(mockHttpResponse({}, { status: 200 }))
   }
   const mocks = { ...defaultComponentMocks(), $clientService: clientService }
 

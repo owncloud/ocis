@@ -2,7 +2,7 @@ import EditPanel from '../../../../../src/components/Users/SideBar/EditPanel.vue
 import {
   defaultComponentMocks,
   defaultPlugins,
-  mockAxiosReject,
+  mockHttpError,
   shallowMount
 } from '@ownclouders/web-test-helpers'
 import { mock } from 'vitest-mock-extended'
@@ -101,7 +101,7 @@ describe('EditPanel', () => {
     it('should be true when userName is valid', async () => {
       const { wrapper, mocks } = getWrapper()
       const graphMock = mocks.$clientService.graphAuthenticated
-      const getUserStub = graphMock.users.getUser.mockRejectedValue(() => mockAxiosReject())
+      const getUserStub = graphMock.users.getUser.mockRejectedValue(() => mockHttpError())
       ;(wrapper.vm as any).editUser.onPremisesSamAccountName = 'jana'
       expect(await (wrapper.vm as any).validateUserName()).toBeTruthy()
       expect(getUserStub).toHaveBeenCalled()

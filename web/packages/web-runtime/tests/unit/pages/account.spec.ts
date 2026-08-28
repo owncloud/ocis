@@ -2,8 +2,8 @@ import account from '../../../src/pages/account.vue'
 import {
   defaultComponentMocks,
   defaultPlugins,
-  mockAxiosReject,
-  mockAxiosResolve,
+  mockHttpError,
+  mockHttpResponse,
   mount
 } from '@ownclouders/web-test-helpers'
 import { mock } from 'vitest-mock-extended'
@@ -254,7 +254,7 @@ describe('account page', () => {
       await blockLoadingState(wrapper)
 
       mocks.$clientService.httpAuthenticated.post.mockResolvedValueOnce(
-        mockAxiosResolve({ value: { id: 'settings-language' } })
+        mockHttpResponse({ value: { value: { id: 'settings-language' } } })
       )
       await wrapper.vm.updateDisableEmailNotifications(true)
       const { showMessage } = useMessages()
@@ -266,7 +266,7 @@ describe('account page', () => {
       const { wrapper, mocks } = getWrapper()
       await blockLoadingState(wrapper)
 
-      mocks.$clientService.httpAuthenticated.post.mockImplementation(() => mockAxiosReject('err'))
+      mocks.$clientService.httpAuthenticated.post.mockImplementation(() => mockHttpError(500, undefined, 'err'))
       await wrapper.vm.updateDisableEmailNotifications(true)
       const { showErrorMessage } = useMessages()
       expect(showErrorMessage).toHaveBeenCalled()
@@ -397,7 +397,7 @@ describe('account page', () => {
       await blockLoadingState(wrapper)
 
       mocks.$clientService.httpAuthenticated.post.mockResolvedValueOnce(
-        mockAxiosResolve({
+        mockHttpResponse({
           value: { identifier: { setting: 'setting-id' }, value: { id: 'value-id' } }
         })
       )
@@ -412,7 +412,7 @@ describe('account page', () => {
       const { wrapper, mocks } = getWrapper({})
       await blockLoadingState(wrapper)
 
-      mocks.$clientService.httpAuthenticated.post.mockImplementation(() => mockAxiosReject('err'))
+      mocks.$clientService.httpAuthenticated.post.mockImplementation(() => mockHttpError(500, undefined, 'err'))
       await wrapper.vm.updateMultiChoiceSettingsValue('setting-id', 'setting-key', true)
       const { showErrorMessage } = useMessages()
       expect(showErrorMessage).toHaveBeenCalled()
@@ -425,7 +425,7 @@ describe('account page', () => {
       await blockLoadingState(wrapper)
 
       mocks.$clientService.httpAuthenticated.post.mockResolvedValueOnce(
-        mockAxiosResolve({
+        mockHttpResponse({
           value: { identifier: { setting: 'setting-id' }, value: { id: 'value-id' } }
         })
       )
@@ -443,7 +443,7 @@ describe('account page', () => {
       const { wrapper, mocks } = getWrapper({})
       await blockLoadingState(wrapper)
 
-      mocks.$clientService.httpAuthenticated.post.mockImplementation(() => mockAxiosReject('err'))
+      mocks.$clientService.httpAuthenticated.post.mockImplementation(() => mockHttpError(500, undefined, 'err'))
       await wrapper.vm.updateSingleChoiceValue('setting-id', {
         displayValue: 'Daily',
         value: { stringValue: 'daily' }
@@ -530,7 +530,7 @@ function getWrapper({
       response = { values: [mock<SettingsValue>()] }
     }
 
-    return Promise.resolve(mockAxiosResolve(response))
+    return Promise.resolve(mockHttpResponse(response))
   })
   mocks.$clientService.graphAuthenticated.users.getMe.mockResolvedValue(mock<User>({ id: '1' }))
 

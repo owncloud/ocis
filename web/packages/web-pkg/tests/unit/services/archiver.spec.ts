@@ -3,9 +3,8 @@ import { RuntimeError } from '../../../src/errors'
 import { mock, mockDeep } from 'vitest-mock-extended'
 import { ClientService } from '../../../src/services'
 import { unref, ref, Ref } from 'vue'
-import { AxiosResponse } from 'axios'
 import { ArchiverCapability } from '@ownclouders/web-client/ocs'
-import { createTestingPinia } from '@ownclouders/web-test-helpers'
+import { createTestingPinia, mockHttpResponse } from '@ownclouders/web-test-helpers'
 import { useUserStore } from '../../../src/composables/piniaStores'
 import { User } from '@ownclouders/web-client/graph/generated'
 
@@ -15,10 +14,9 @@ const getArchiverServiceInstance = (capabilities: Ref<ArchiverCapability[]>) => 
   const userStore = useUserStore()
 
   const clientServiceMock = mockDeep<ClientService>()
-  clientServiceMock.httpUnAuthenticated.get.mockResolvedValue({
-    data: new ArrayBuffer(8),
+  clientServiceMock.httpUnAuthenticated.get.mockResolvedValue(mockHttpResponse(new ArrayBuffer(8), {
     headers: { 'content-disposition': 'filename="download.tar"' }
-  } as unknown as AxiosResponse)
+  }))
   clientServiceMock.ocs.signUrl.mockImplementation((payload) => Promise.resolve(payload.url))
 
   Object.defineProperty(window, 'open', {

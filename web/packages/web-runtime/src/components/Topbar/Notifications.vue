@@ -93,7 +93,6 @@ import { useGettext } from 'vue3-gettext'
 import { useTask } from 'vue-concurrency'
 import { MESSAGE_TYPE } from '@ownclouders/web-client/sse'
 import { call } from '@ownclouders/web-client'
-import { AxiosHeaders } from 'axios'
 
 const POLLING_INTERVAL = 30000
 
@@ -203,7 +202,7 @@ export default {
           )
         )
 
-        if ((response.headers as AxiosHeaders).get('Content-Length') === '0') {
+        if (response.headers.get('Content-Length') === '0') {
           return
         }
 
