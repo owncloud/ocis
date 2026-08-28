@@ -116,9 +116,10 @@ class WebUIHelper {
 			$page->waitForSelector(self::$filesView, ['timeout' => self::$defaultTimeout]);
 			return $context->storageState();
 		} catch (\Exception $e) {
+			$keepScreenshot = true;
 			throw new Exception("Login failed for user '$username': " . $e->getMessage(), 0, $e);
 		} finally {
-			if (file_exists($screenshotPath)) {
+			if (empty($keepScreenshot) && file_exists($screenshotPath)) {
 				unlink($screenshotPath);
 			}
 			$context->close();
