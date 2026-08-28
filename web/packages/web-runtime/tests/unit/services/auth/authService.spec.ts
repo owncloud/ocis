@@ -160,10 +160,10 @@ describe('AuthService', () => {
   })
 
   describe('handleDelegatedTokenUpdate', () => {
-    const buildMessageEvent = (origin: string) =>
+    const buildMessageEvent = (origin: string, accessToken = 'attacker-token') =>
       mock<MessageEvent>({
         origin,
-        data: { name: 'owncloud-embed:update-token', data: { access_token: 'attacker-token' } }
+        data: { name: 'owncloud-embed:update-token', data: { access_token: accessToken } }
       })
 
     it('when delegateAuthenticationOrigin is not configured, should reject the message regardless of its origin', () => {
@@ -222,9 +222,11 @@ describe('AuthService', () => {
         }
       }
       initAuthService({ authService, configStore })
-      ;(authService as any).handleDelegatedTokenUpdate(buildMessageEvent('https://trusted.example'))
+      ;(authService as any).handleDelegatedTokenUpdate(
+        buildMessageEvent('https://trusted.example', 'renewed-token')
+      )
 
-      expect(mockUpdateContext).toHaveBeenCalled()
+      expect(mockUpdateContext).toHaveBeenCalledWith('renewed-token', false)
     })
 
     describe('when dispatched through the window message listener', () => {

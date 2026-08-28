@@ -1,4 +1,4 @@
-Bugfix: Apply renewed access token in Web embed mode with delegated authentication
+Bugfix: Apply renewed access token in embed mode with delegated authentication
 
 In embed mode with delegated authentication the host application renews the
 access token by posting an "owncloud-embed:update-token" message into the
