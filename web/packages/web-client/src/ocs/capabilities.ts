@@ -1,4 +1,4 @@
-import { AxiosInstance } from 'axios'
+import { FetchClient } from '../http'
 import get from 'lodash-es/get'
 
 export interface AppProviderCapability {
@@ -204,14 +204,14 @@ export interface Capabilities {
   }
 }
 
-export const GetCapabilitiesFactory = (baseURI: string, axios: AxiosInstance) => {
+export const GetCapabilitiesFactory = (baseURI: string, httpClient: FetchClient) => {
   const url = new URL(baseURI)
   url.pathname = [...url.pathname.split('/'), 'cloud', 'capabilities'].filter(Boolean).join('/')
   url.searchParams.append('format', 'json')
   const endpoint = url.href
   return {
     async getCapabilities(): Promise<Capabilities> {
-      const response = await axios.get(endpoint)
+      const response = await httpClient.request(endpoint)
       return get(response, 'data.ocs.data', { capabilities: null, version: null })
     }
   }
