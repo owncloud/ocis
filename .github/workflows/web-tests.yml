@@ -20,13 +20,14 @@ jobs:
 
       - name: Check if web/ changed
         id: check
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           if [[ "${{ github.event_name }}" == "push" ]]; then
             echo "web-changed=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          PR_TITLE="${{ github.event.pull_request.title }}"
           if echo "$PR_TITLE" | grep -qi "\[full-ci\]"; then
             echo "web-changed=true" >> "$GITHUB_OUTPUT"
             exit 0
