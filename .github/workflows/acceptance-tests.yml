@@ -18,6 +18,8 @@ jobs:
 
       - name: Check if changes are docs-only
         id: check
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           # Always run full CI on workflow_dispatch, tags, or when PR title contains [full-ci]
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
@@ -25,7 +27,6 @@ jobs:
             exit 0
           fi
 
-          PR_TITLE="${{ github.event.pull_request.title }}"
           if echo "$PR_TITLE" | grep -qi "\[full-ci\]"; then
             echo "docs-only=false" >> "$GITHUB_OUTPUT"
             exit 0
