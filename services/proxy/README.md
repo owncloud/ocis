@@ -297,7 +297,47 @@ reported so it does not hide behind a working login.
 
 This setting is empty by default, which keeps the behavior described above: such logins are refused.
 Because the default role is handed to everyone the mappings do not cover, prefer a low-privilege role
-such as `user-light` over `user` or `admin`.
+such as `user-light` over `user` or `admin` — but read
+[Which deployments this affects](#which-deployments-this-affects) first, because `user-light` is the
+one built-in role without the `Drives.Create` permission and that has a further consequence.
+
+##### Which deployments this affects
+
+`default_role` is read by the `oidc` role assigner only — the one selected by
+`role_assignment.driver: oidc`, which is what a deployment fronted by Keycloak or another external
+IDP uses.
+
+* **The default deployment, without Keycloak, is not affected.** It uses the `default` role
+  assigner, which never reads `default_role`; users there keep being assigned the `user` role
+  exactly as before. `PROXY_ROLE_ASSIGNMENT_OIDC_DEFAULT_ROLE` is ignored on such a deployment,
+  whether or not it is set.
+* **With an external IDP** the setting behaves as described above: it is consulted after the roles
+  claim has been read, and only for the users that no `role_mapping` entry matched.
+* **The `oidc` assigner in front of the built-in IDP is the combination to be careful with.** The
+  `idp` service has no setting that populates a roles claim, so unless something else adds one every
+  token reaching the assigner is silent about roles. Every account then matches no mapping and takes
+  the same fallback — administrators included. Without `default_role` that setup refuses every
+  login; with it, everyone is signed in on the one configured role and nobody is left holding
+  `admin`.
+
+Two details are worth knowing before picking the role for that last case, both of them pre-existing
+behavior of the `oidc` assigner rather than anything this setting introduces:
+
+* **The assignment overwrites, on every login.** `UpdateUserRoleAssignment` compares the role it
+  resolved against the one the account currently holds and reassigns whenever they differ, so an
+  administrator's `admin` role is replaced rather than preserved.
+* **A demotion to `user-light` also disables the personal space.** After assigning the role the
+  proxy checks `Drives.Create` and, when the account does not have it, calls
+  `DisablePersonalSpace`. Of the four built-in roles only `user-light` lacks that permission
+  (`services/settings/pkg/store/defaults/defaults.go`), so `user-light` is the one value of
+  `default_role` for which this branch is taken. The space is disabled, not deleted, and a later
+  login on a role that has the permission restores it.
+
+Recovering from that state is a matter of assigning a role back to some account, and there is no
+command-line path for it — the `settings` service ships no CLI beyond `health`/`server`/`version`,
+so it takes an account that still holds `Account Management`, or direct access to the settings
+store. Switching `role_assignment.driver` back to `default` does not undo it either: the `default`
+assigner only assigns a role to an account that has none, and a demoted account has one.
 
 ##### Relation to `GRAPH_ASSIGN_DEFAULT_USER_ROLE`
 
