@@ -24,7 +24,6 @@ type KeyValueEnvelope struct {
 	Key      string                 `json:"key"`
 	Data     []byte                 `json:"data"`
 	Metadata map[string]interface{} `json:"metadata"`
-	Expiry   time.Time              `json:"expiry,omitempty"`
 }
 
 type natsStore struct {
@@ -247,16 +246,11 @@ func (n *natsStore) Write(rec *store.Record, opts ...store.WriteOption) error {
 		return err
 	}
 
-	env := KeyValueEnvelope{
+	b, err := json.Marshal(KeyValueEnvelope{
 		Key:      rec.Key,
 		Data:     rec.Value,
 		Metadata: rec.Metadata,
-	}
-	if rec.Expiry > 0 {
-		env.Expiry = time.Now().Add(rec.Expiry)
-	}
-
-	b, err := json.Marshal(env)
+	})
 	if err != nil {
 		return errors.Wrap(err, "Failed to marshal object")
 	}
@@ -501,23 +495,11 @@ func (n *natsStore) getRecord(bucket nats.KeyValue, key string) (*store.Record, 
 		return nil, false, nil
 	}
 
-	// Enforce the per-record Expiry stamped by Write; the bucket MaxAge can
-	// outlive it, so an expired entry is a miss, not stale data.
-	if !kv.Expiry.IsZero() && time.Now().After(kv.Expiry) {
-		_ = bucket.Delete(key)
-		return nil, false, store.ErrNotFound
-	}
-
-	rec := &store.Record{
+	return &store.Record{
 		Key:      kv.Key,
 		Value:    kv.Data,
 		Metadata: kv.Metadata,
-	}
-	if !kv.Expiry.IsZero() {
-		rec.Expiry = time.Until(kv.Expiry)
-	}
-
-	return rec, true, nil
+	}, true, nil
 }
 
 func (n *natsStore) natsKeys(bucket nats.KeyValue, table, key string, prefix, suffix bool) ([]string, error) {
