@@ -1130,3 +1130,59 @@ Feature: vault
       | permissions-role |
       | Viewer           |
       | File Editor      |
+
+
+  Scenario Outline: users with role Admin, Space Admin or User should have access to vault
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
+    When user "Alice" gets the permissions list using the settings API
+    Then the HTTP status code should be "201"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["permissions"],
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "minItems": <permission-count>,
+            "maxItems": <permission-count>,
+            "uniqueItems": true,
+            "contains": {
+              "const": "VaultMode.ReadWriteEnabled.own"
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | user-role   | permission-count |
+      | Admin       | 33               |
+      | Space Admin | 27               |
+      | User        | 20               |
+
+
+  Scenario: user with role User Light should not have access to vault
+    Given the administrator has assigned the role "User Light" to user "Alice" using the Graph API
+    When user "Alice" gets the permissions list using the settings API
+    Then the HTTP status code should be "201"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["permissions"],
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "minItems": 13,
+            "maxItems": 13,
+            "uniqueItems": true,
+            "not": {
+              "contains": {
+                "const": "VaultMode.ReadWriteEnabled.own"
+              }
+            }
+          }
+        }
+      }
+      """
+

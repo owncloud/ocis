@@ -228,6 +228,36 @@ class SettingsHelper {
 	 * @param string $baseUrl
 	 * @param string|null $user
 	 * @param string|null $password
+	 * @param string $accountUuid
+	 * @param array $headers
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public static function getPermissionsList(
+		string $baseUrl,
+		?string $user,
+		?string $password,
+		string $accountUuid,
+		array $headers = [],
+	): ResponseInterface {
+		$fullUrl = self::buildFullUrl($baseUrl, "permissions-list");
+		$body = json_encode(["account_uuid" => $accountUuid], JSON_THROW_ON_ERROR);
+		return HttpRequestHelper::post(
+			$fullUrl,
+			$user,
+			$password,
+			$headers,
+			$body,
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string|null $user
+	 * @param string|null $password
 	 * @param array $headers
 	 *
 	 * @return ResponseInterface
