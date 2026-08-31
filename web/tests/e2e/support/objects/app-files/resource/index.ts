@@ -214,6 +214,10 @@ export class Resource {
     await po.clickResource({ page: this.#page, path: resource })
   }
 
+  async openResourceInNewTab(resource: string): Promise<Page> {
+    return po.openResourceInNewTab({ page: this.#page, path: resource })
+  }
+
   async openFolderViaBreadcrumb(resource: string): Promise<void> {
     await po.clickResourceFromBreadcrumb({ page: this.#page, resource })
   }
