@@ -2,9 +2,10 @@ import { test } from '../../environment/test'
 import * as api from '../../steps/api/api'
 import * as ui from '../../steps/ui/index'
 import { application } from '../../environment/constants'
+import { expect } from '@playwright/test'
 
 test.describe('Different file viewers', { tag: '@predefined-users' }, () => {
-  test('file viewers', async () => {
+  test.beforeEach(async () => {
     // Given "Admin" creates following user using API
     //   | id    |
     //   | Alice |
@@ -12,7 +13,8 @@ test.describe('Different file viewers', { tag: '@predefined-users' }, () => {
 
     // And "Alice" logs in
     await ui.userLogsIn({ stepUser: 'Alice' })
-
+  })
+  test('file viewers', async () => {
     // When "Alice" creates the following resources
     //   | resource  | type    | content   |
     //   | lorem.txt | txtFile | some text |
@@ -204,7 +206,62 @@ test.describe('Different file viewers', { tag: '@predefined-users' }, () => {
 
     // And "Alice" closes the file viewer
     await ui.userClosesFileViewer({ stepUser: 'Alice' })
+  })
 
+  test('opens files with # and ? in their name in a new tab', async () => {
+    const files = [
+      { pathToFile: '#.txt', content: 'file with # in its name' },
+      { pathToFile: '?.txt', content: 'file with ? in its name' },
+      { pathToFile: 'a#b.txt', content: 'file with a#b in its name' },
+      { pathToFile: 'a?b.txt', content: 'file with a?b in its name' },
+      { pathToFile: 'a#b?c.txt', content: 'file with both # and ? in its name' }
+    ]
+    const actions = ['ctrlClick', 'middleClick'] as const
+
+    await api.userHasCreatedFiles({
+      stepUser: 'Alice',
+      files
+    })
+
+    // Verify that files containing # and ? can be opened directly in the file viewer.
+    for (const file of files) {
+      await ui.userOpensResourceInViewer({
+        stepUser: 'Alice',
+        resource: file.pathToFile,
+        viewer: application.textEditor
+      })
+
+      await ui.userShouldBeInFileViewer({
+        stepUser: 'Alice',
+        fileViewerType: application.textEditor
+      })
+      await ui.userClosesFileViewer({
+        stepUser: 'Alice'
+      })
+    }
+
+    // Verify that files containing # and ? can also be opened in a new tab
+    // using both Ctrl+click and middle-click, and that the correct file is opened
+    for (const file of files) {
+      for (const action of actions) {
+        const newPage = await ui.userOpensResourceInNewTab({
+          stepUser: 'Alice',
+          resource: file.pathToFile,
+          action
+        })
+        await newPage.bringToFront()
+        await newPage.waitForLoadState()
+
+        const openedResource = newPage.locator('#app-top-bar-resource [data-test-resource-name]')
+        await expect(openedResource).toBeVisible()
+        await expect(openedResource).toHaveAttribute('data-test-resource-name', file.pathToFile)
+
+        await newPage.close()
+      }
+    }
+  })
+
+  test.afterEach(async () => {
     // And "Alice" logs out
     await ui.userLogsOut({ stepUser: 'Alice' })
   })

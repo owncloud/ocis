@@ -205,6 +205,33 @@ export const clickResource = async ({
   }
 }
 
+export type openInNewTabAction = 'ctrlClick' | 'middleClick'
+
+export const clickResourceInNewTab = async ({
+  page,
+  path,
+  action = 'ctrlClick'
+}: {
+  page: Page
+  path: string
+  action?: openInNewTabAction
+}): Promise<Page> => {
+  const escapedName = path.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+
+  const resource = page.locator(util.format(resourceNameSelector, escapedName))
+
+  const [newPage] = await Promise.all([
+    page.context().waitForEvent('page'),
+    action === 'middleClick'
+      ? resource.click({ button: 'middle' })
+      : resource.click({ modifiers: ['Control'] })
+  ])
+
+  await newPage.waitForLoadState()
+
+  return newPage
+}
+
 export const clickResourceFromBreadcrumb = async ({
   page,
   resource
