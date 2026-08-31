@@ -58,7 +58,16 @@ export const getOfficeDocumentContent = async (page: Page): Promise<string> => {
   // navigator.clipboard calls throw "Document is not focused" unless this page's tab is the
   // OS-focused one - with multiple actors (e.g. Alice + Brian) each owning their own page/tab,
   // the one we're about to read from isn't necessarily the foregrounded one.
-  await page.bringToFront()
+  await expect
+    .poll(
+      async () => {
+        await page.bringToFront()
+        return page.evaluate(() => document.hasFocus())
+      },
+      { timeout: 10000 }
+    )
+    .toBe(true)
+
   // clear the clipboard
   await page.evaluate("navigator.clipboard.writeText('')")
   // copying and getting the value with keyboard requires some time
