@@ -61,7 +61,6 @@ class WebUIHelper {
 				'args' => ['--ignore-certificate-errors', '--no-sandbox'],
 			],
 		);
-		$screenshotPath = '/tmp/qr_' . uniqid() . '.png';
 		try {
 			$page = $context->newPage();
 			$page->goto($ocisUrl, ['waitUntil' => 'networkidle']);
@@ -75,54 +74,75 @@ class WebUIHelper {
 			$page->locator(self::$modeSwitchButton)->click();
 			$page->locator(self::$vaultModeSelector)->click();
 			$page->waitForSelector(self::$qrCode, ['timeout' => self::$defaultTimeout]);
-			$qrLocator = $page->locator(self::$qrCode);
 
-			// Wait until QR actually finished loading
+			// Wait until the QR image's src is populated with actual data
 			$page->waitForFunction(
 				"(sel) => {\n" .
 				"    const img = document.querySelector(sel);\n" .
-				"    return img && img.complete && img.naturalWidth > 0;\n" .
+				"    return img && img.src && img.src.startsWith('data:image');\n" .
 				"}",
 				self::$qrCode,
 				['timeout' => self::$defaultTimeout],
 			);
 
-			// setup mfa, retry screenshot and decode on failure
-			$maxAttempts = 3;
-			$otp = null;
-			$lastException = null;
-			for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
-				try {
-					$qrLocator->screenshot($screenshotPath);
-					if (!file_exists($screenshotPath)) {
-						throw new Exception("Failed to save QR code screenshot to: " . $screenshotPath);
-					}
-					$otp = self::extractOtpFromQr($screenshotPath);
-					break;
-				} catch (Exception $e) {
-					$lastException = $e;
-				}
+			// setup mfa - read QR image data directly from the DOM instead of
+			// taking a screenshot, avoiding rendering/crop/timing flakiness
+			$qrSrc = $page->locator(self::$qrCode)->getAttribute('src');
+			if (empty($qrSrc)) {
+				throw new Exception("QR code image element has no 'src' attribute");
 			}
-			if ($otp === null) {
-				throw new Exception(
-					"Could not decode QR code after $maxAttempts attempts",
-					0,
-					$lastException,
-				);
-			}
+
+			$otp = self::extractOtpFromQrDataUri($qrSrc);
 			$page->locator(self::$totpInput)->fill((string)$otp);
 			$page->locator(self::$userLabel)->fill('test');
 			$page->locator(self::$saveTotpButton)->click();
 			$page->waitForSelector(self::$filesView, ['timeout' => self::$defaultTimeout]);
 			return $context->storageState();
 		} catch (\Exception $e) {
-			$keepScreenshot = true;
 			throw new Exception("Login failed for user '$username': " . $e->getMessage(), 0, $e);
 		} finally {
-			if (empty($keepScreenshot) && file_exists($screenshotPath)) {
-				unlink($screenshotPath);
-			}
 			$context->close();
+		}
+	}
+
+	/**
+	 * Decodes a base64 PNG data URI (as found in the QR <img> src attribute),
+	 * writes it to a temp file, and extracts the current TOTP code from it.
+	 *
+	 * @param string $dataUri e.g. "data:image/png;base64,iVBORw0KG..."
+	 *
+	 * @return string
+	 * @throws Exception
+	 */
+	public static function extractOtpFromQrDataUri(string $dataUri): string {
+		if (!preg_match('/^data:image\/(\w+);base64,\s*(.+)$/', $dataUri, $matches)) {
+			throw new Exception("QR src is not a valid base64 data URI");
+		}
+
+		$imageData = base64_decode($matches[2], true);
+		if ($imageData === false) {
+			throw new Exception("Failed to base64-decode QR image data");
+		}
+
+		$tmpPath = tempnam(sys_get_temp_dir(), 'qr_');
+		if ($tmpPath === false) {
+			throw new Exception("Failed to create temp file for QR image data");
+		}
+		$pngPath = $tmpPath . '.png';
+		if (!rename($tmpPath, $pngPath)) {
+			unlink($tmpPath);
+			throw new Exception("Failed to rename temp file to PNG path");
+		}
+
+		try {
+			if (file_put_contents($tmpPath, $imageData) === false) {
+				throw new Exception("Failed to write QR image data to: " . $tmpPath);
+			}
+			return self::extractOtpFromQr($tmpPath);
+		} finally {
+			if (file_exists($pngPath)) {
+				unlink($pngPath);
+			}
 		}
 	}
 
