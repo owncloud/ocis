@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/pkg/errors"
@@ -66,14 +65,22 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 		m.Logger.Error().Err(err).Msg("could not read from userinfo cache")
 	}
 	if len(record) > 0 {
-		if err = msgpack.UnmarshalAsMap(record[0].Value, &claims); err == nil {
+		if err = msgpack.UnmarshalAsMap(record[0].Value, &claims); err != nil {
+			m.Logger.Error().Err(err).Msg("could not unmarshal userinfo")
+		} else if verifyExpiresAt(claims, m.TimeFunc()) {
 			m.Logger.Debug().Interface("claims", claims).Msg("cache hit for userinfo")
-			if ok := verifyExpiresAt(claims, m.TimeFunc()); !ok {
-				return nil, false, jwt.ErrTokenExpired
-			}
 			return claims, false, nil
+		} else {
+			// The cached claims have expired. Treat this as a cache miss and
+			// re-verify the access token below instead of failing the request.
+			// The cached "exp" can be a fallback cache TTL rather than the real
+			// token expiry (e.g. for opaque access tokens, where extractExpiration
+			// falls back to DefaultTokenCacheTTL), so a token that is still valid
+			// must not be rejected just because its cache entry aged out. A
+			// genuinely expired or invalid token is still rejected by the
+			// VerifyAccessToken/UserInfo re-verification that follows.
+			m.Logger.Debug().Msg("cached userinfo claims expired, re-verifying access token")
 		}
-		m.Logger.Error().Err(err).Msg("could not unmarshal userinfo")
 	}
 
 	aClaims, claims, err := m.oidcClient.VerifyAccessToken(req.Context(), token)
