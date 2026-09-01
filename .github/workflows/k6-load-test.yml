@@ -34,6 +34,9 @@ jobs:
     env:
       OCIS_HOST: ${{ vars.LOADTEST_OCIS_HOST || 'loadtest-ocis.svc.owncloud.host' }}
       OCIS_COMMIT_ID: ${{ inputs.ocis_ref || github.event.pull_request.head.sha || github.sha }}
+      # inputs.* is empty on pull_request, so the workflow_dispatch default does
+      # not apply here — the shell below falls back to a quick run.
+      QUICK: ${{ inputs.quick }}
       SSH_OPTS: -o BatchMode=yes -o ServerAliveInterval=60 -o ServerAliveCountMax=10
     steps:
       - name: Show what will run
@@ -72,7 +75,7 @@ jobs:
       # just buries the real error under a TypeScript stack trace.
       - name: Run the k6 tests
         run: |
-          if [ "${{ inputs.quick }}" = "true" ]; then
+          if [ "${QUICK:-true}" = "true" ]; then
             export SEED_USERS_TOTAL=10
             for id in 020 040 050 070 080 090 100 110; do
               export TEST_KOKO_PLATFORM_${id}_RAMPING_STAGES_VUS=2
