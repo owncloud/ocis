@@ -1,4 +1,4 @@
-name: test deployment example
+name: Test Deployment Examples
 
 on:
   workflow_dispatch:
@@ -7,6 +7,7 @@ on:
 
 jobs:
   test:
+    name: ${{ matrix.example }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
 
@@ -15,13 +16,16 @@ jobs:
       matrix:
         include:
           - example: ocis_full
-            urls: "https://ocis.owncloud.test"
+            urls: "https://ocis.owncloud.test https://collabora.owncloud.test"
+          # - example: ocis_hello
+          #   urls: "https://ocis.owncloud.test"
           - example: ocis_ldap
             urls: "https://ocis.owncloud.test https://ldap.owncloud.test"
           - example: ocis_multi
-            urls: "https://ocis.owncloud.test https://ocis.ocm.owncloud.test"
+            urls: "https://ocis.owncloud.test https://ocis.ocm.owncloud.test https://keycloak.owncloud.test https://ldap.owncloud.test"
           - example: ocis_ocm
-            urls: "https://ocis.owncloud.test https://ocis.ocm.owncloud.test https://ocis.ocm.next.owncloud.test"
+            urls: "https://ocis.owncloud.test https://ocis.ocm.owncloud.test https://ocis.ocm.next.owncloud.test https://collabora.ocm.owncloud.test https://onlyoffice.owncloud.test"
+            composeFiles: "-f docker-compose.yml -f ocis.yml -f ocis-ocm.yml -f ocis-ocm-next.yml -f collabora-ocm.yml -f onlyoffice.yml"
           - example: ocis_keycloak
             urls: "https://ocis.owncloud.test https://keycloak.owncloud.test"
 
@@ -31,19 +35,23 @@ jobs:
         with:
           repository: owncloud/ocis
 
-      - name: Set up Docker Compose
-        uses: docker/setup-compose-action@16feee727cbdc83b6a014e6cc26fec4a79bcf30c # v2.2.0
-
       - name: Prepare hosts entry
         run: |
-          echo "127.0.0.1 ocis.owncloud.test collabora.owncloud.test keycloak.owncloud.test mail.owncloud.test minio.owncloud.test onlyoffice.owncloud.test tika ldap.owncloud.test ocis.ocm.owncloud.test ocis.ocm.next.owncloud.test onlyoffice.owncloud.test" | sudo tee -a /etc/hosts
+          echo "127.0.0.1 ocis.owncloud.test collabora.owncloud.test keycloak.owncloud.test mail.owncloud.test minio.owncloud.test onlyoffice.owncloud.test tika ldap.owncloud.test ocis.ocm.owncloud.test ocis.ocm.next.owncloud.test collabora.ocm.owncloud.test" | sudo tee -a /etc/hosts
 
       - name: Run compose stack
         working-directory: deployments/examples/${{ matrix.example }}
         run: |
           set -e
           echo "=== Running ${{ matrix.example }} ==="
-          docker compose up -d
+          
+          if [ "${{ matrix.example }}" = "ocis_ocm" ]; then
+            export INSECURE=true
+            export COLLABORA_SSL_ENABLE=false
+            export COLLABORA_SSL_VERIFICATION=false
+          fi
+
+          docker compose ${{ matrix.composeFiles }} up -d --wait --wait-timeout 120
 
       - name: Wait for services
         run: |
@@ -77,4 +85,4 @@ jobs:
       - name: Tear down
         if: always()
         working-directory: deployments/examples/${{ matrix.example }}
-        run: docker compose down -v
+        run: docker compose ${{ matrix.composeFiles }} down -v
