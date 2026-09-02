@@ -387,6 +387,31 @@ jobs:
           KEYCLOAK: ${{ matrix.suite == 'apiVault' }}
           KC_URL: https://keycloak:8443
         run: make test-acceptance-api
+      
+      - name: Debug storage-users-vault (post-test)
+        if: always() && matrix.suite == 'apiVault'
+        run: |
+          echo "=== deployment/pods (label app=storageusers-vault) ==="
+          kubectl get deployment,pods -n ocis-server -l app=storageusers-vault -o wide || true
+
+          echo "--- proxy: CreateHome-for-vault-personal outcomes (create_home.go), full/untruncated ---"
+          grep -iE "CreateHome for vault personal|vault personal space creation failed|vault personal space (created|already exists)" tests/config/k8s/logs/*.log 2>/dev/null || true
+
+          echo "--- graph: 'could not create drive' errors (drives.go CreateDrive handler) - did creating the project space itself actually fail server-side despite a 201? ---"
+          grep -iE "could not create drive" tests/config/k8s/logs/*.log 2>/dev/null || true
+
+          echo "--- storage-users-vault: CreateStorageSpace / CreateContainer rgrpc calls with their result code - is the project space create + the later folder create both landing on this instance, and do they succeed? ---"
+          grep -iE '"service":"storage-users-vault".*(CreateStorageSpace|CreateContainer)' tests/config/k8s/logs/*.log 2>/dev/null || true
+
+          echo "--- webdav/ocdav: FAILED_PRECONDITION / intermediate collection does not exist - the actual source of the 409 on folder creation (mkcol.go), distinct from AlreadyExists which maps to 405 ---"
+          grep -iE "FAILED_PRECONDITION|intermediate collection does not exist" tests/config/k8s/logs/*.log 2>/dev/null || true
+
+          echo "--- storage-users-vault: actual on-disk layout at end of run ---"
+          VAULT_POD=$(kubectl -n ocis-server get pods -l app=storageusers-vault -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+          if [[ -n "$VAULT_POD" ]]; then
+            echo "pod: $VAULT_POD"
+            kubectl -n ocis-server exec "$VAULT_POD" -- find /var/lib/ocis -maxdepth 8 2>&1 || true
+          fi
 
       - name: Run Core ${{ matrix.suite }} tests
         if: startsWith( matrix.suite, 'core' )
