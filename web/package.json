@@ -117,7 +117,8 @@
       "brace-expansion": "5.0.9",
       "ws": "8.21.0",
       "js-yaml": "4.3.1",
-      "fast-uri": "3.1.5"
+      "fast-uri": "3.1.5",
+      "browserslist": "4.28.7"
     },
     "patchedDependencies": {
       "caf@15.0.1": "patches/caf@15.0.1.patch",
