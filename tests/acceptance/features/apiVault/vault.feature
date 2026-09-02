@@ -34,34 +34,34 @@ Feature: vault
       | vaultFile.txt |
 
 
-  # Scenario: resources in drive and vault are isolated
-  #   Given user "Alice" has logged in via web UI
-  #   And user "Alice" has created a folder "driveFolder" in space "Personal"
-  #   And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "driveFile.txt"
-  #   And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
-  #   When user "Alice" uploads a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault using the WebDAV API
-  #   Then the HTTP status code should be "201"
-  #   And for user "Alice" the space "Personal" in vault should contain these entries:
-  #     | vaultFolder   |
-  #     | vaultFile.txt |
-  #   And for user "Alice" the space "Personal" should contain these entries:
-  #     | driveFolder   |
-  #     | driveFile.txt |
-  #   And for user "Alice" the space "Personal" in vault should not contain these entries:
-  #     | driveFolder   |
-  #     | driveFile.txt |
-  #   And for user "Alice" the space "Personal" should not contain these entries:
-  #     | vaultFolder   |
-  #     | vaultFile.txt |
+  Scenario: resources in drive and vault are isolated
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "driveFolder" in space "Personal"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "driveFile.txt"
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    When user "Alice" uploads a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" the space "Personal" in vault should contain these entries:
+      | vaultFolder   |
+      | vaultFile.txt |
+    And for user "Alice" the space "Personal" should contain these entries:
+      | driveFolder   |
+      | driveFile.txt |
+    And for user "Alice" the space "Personal" in vault should not contain these entries:
+      | driveFolder   |
+      | driveFile.txt |
+    And for user "Alice" the space "Personal" should not contain these entries:
+      | vaultFolder   |
+      | vaultFile.txt |
 
-  # @env-config @keycloak-config
-  # Scenario: user can set custom auth level names
-  #   Given the administrator has set the Keycloak realm attribute "acr.loa.map" to '{"regular":"1","testing":"2"}'
-  #   And the config "OCIS_MFA_AUTH_LEVEL_NAMES" has been set to "testing"
-  #   And user "Alice" has logged in via web UI
-  #   When user "Alice" uploads a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault using the WebDAV API
-  #   Then the HTTP status code should be "201"
-  #   And user "Alice" should have a JWT token with an ACR value "testing"
+  @env-config @keycloak-config
+  Scenario: user can set custom auth level names
+    Given the administrator has set the Keycloak realm attribute "acr.loa.map" to '{"regular":"1","testing":"2"}'
+    And the config "OCIS_MFA_AUTH_LEVEL_NAMES" has been set to "testing"
+    And user "Alice" has logged in via web UI
+    When user "Alice" uploads a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault using the WebDAV API
+    Then the HTTP status code should be "201"
+    And user "Alice" should have a JWT token with an ACR value "testing"
 
 
   # Scenario: check capabilities endpoint for vault
@@ -184,15 +184,15 @@ Feature: vault
   #     """
 
 
-  # Scenario: user copies folder from drive to vault
-  #   Given user "Alice" has logged in via web UI
-  #   And user "Alice" has created a folder "driveFolder" in space "Personal"
-  #   When user "Alice" copies folder "driveFolder" from space "Personal" to "driveFolder" inside space "Personal" in vault using the WebDAV API
-  #   Then the HTTP status code should be "201"
-  #   And for user "Alice" the space "Personal" in vault should contain these entries:
-  #     | driveFolder |
-  #   And for user "Alice" the space "Personal" should contain these entries:
-  #     | driveFolder |
+  Scenario: user copies folder from drive to vault
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "driveFolder" in space "Personal"
+    When user "Alice" copies folder "driveFolder" from space "Personal" to "driveFolder" inside space "Personal" in vault using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" the space "Personal" in vault should contain these entries:
+      | driveFolder |
+    And for user "Alice" the space "Personal" should contain these entries:
+      | driveFolder |
 
 
   # Scenario: user copies file from drive to vault

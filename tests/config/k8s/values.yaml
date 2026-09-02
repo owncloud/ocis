@@ -8,7 +8,7 @@ ingress:
 externalDomain: ocis-server
 
 logging:
-  level: error
+  level: debug
 insecure:
   oidcIdpInsecure: true
   ocisHttpApiInsecure: true
@@ -17,7 +17,7 @@ features:
   authapp:
     enabled: false
   vault:
-    enabled: false
+    enabled: true
   emailNotifications:
     enabled: false
     smtp:

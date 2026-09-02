@@ -81,6 +81,9 @@ fi
 
 if [[ "$ENABLE_VAULT" == "true" ]]; then
     sed -i '/vault:/{n;s|false|true|}' $CFG_DIR/values.yaml
+    # bump from the default "error" level so the CreateHome-for-vault-personal
+    # and MFA-check Debug/Info log lines (silent at "error") are visible for debugging
+    sed -i '/^logging:/{n;s|level: error|level: debug|}' $CFG_DIR/values.yaml
 fi
 
 # copy custom values file
