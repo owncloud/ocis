@@ -170,27 +170,25 @@ export const getRealmRole = async (role: string, admin: User): Promise<KeycloakR
 }
 
 export const getKeycloakUserId = async ({ user }: { user: User }): Promise<string> => {
+  const username = user.originalId
+
   const response = await request({
     method: 'GET',
-    path: join(realmBasePath, 'users'),
+    path: `${join(realmBasePath, 'users')}?username=${encodeURIComponent(username)}&exact=true`,
     user
   })
   checkResponseStatus(response, 'Failed while finding Keycloak user')
 
-  const users = (await response.json()) as Array<{
+  const keycloakUsers = (await response.json()) as Array<{
     id: string
     username: string
   }>
 
-  const keycloakUser = users.find(
-    (keycloakUser) => keycloakUser.username.toLowerCase() === user.id.toLowerCase()
-  )
-
-  if (!keycloakUser) {
-    throw new Error(`Keycloak user with username '${user.id}' not found`)
+  if (keycloakUsers.length === 0) {
+    throw new Error(`Keycloak user with username '${username}' not found`)
   }
 
-  return keycloakUser.id
+  return keycloakUsers[0].id
 }
 
 export const deleteUserTotpCredentials = async ({ user }: { user: User }): Promise<void> => {
