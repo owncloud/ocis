@@ -17,15 +17,18 @@ jobs:
         include:
           - example: ocis_full
             urls: "https://ocis.owncloud.test https://collabora.owncloud.test"
+            testUploadDownload: true
           # - example: ocis_hello
           #   urls: "https://ocis.owncloud.test"
           - example: ocis_ldap
             urls: "https://ocis.owncloud.test https://ldap.owncloud.test"
+            testUploadDownload: true
           - example: ocis_multi
             urls: "https://ocis.owncloud.test https://ocis.ocm.owncloud.test https://keycloak.owncloud.test https://ldap.owncloud.test"
           - example: ocis_ocm
             urls: "https://ocis.owncloud.test https://ocis.ocm.owncloud.test https://ocis.ocm.next.owncloud.test https://collabora.ocm.owncloud.test https://onlyoffice.owncloud.test"
             composeFiles: "-f docker-compose.yml -f ocis.yml -f ocis-ocm.yml -f ocis-ocm-next.yml -f collabora-ocm.yml -f onlyoffice.yml"
+            testUploadDownload: true
           - example: ocis_keycloak
             urls: "https://ocis.owncloud.test https://keycloak.owncloud.test"
 
@@ -49,6 +52,10 @@ jobs:
             export INSECURE=true
             export COLLABORA_SSL_ENABLE=false
             export COLLABORA_SSL_VERIFICATION=false
+          fi
+
+          if [ "${{ matrix.testUploadDownload }}" = "true" ]; then
+            export PROXY_ENABLE_BASIC_AUTH=true
           fi
 
           docker compose ${{ matrix.composeFiles }} up -d --wait --wait-timeout 120
@@ -81,6 +88,25 @@ jobs:
               exit 1
             fi
           done
+      - name: Basic upload/download test
+        if: matrix.testUploadDownload
+        run: |
+          set -e
+
+          URL="$(echo "${{ matrix.urls }}" | awk '{print $1}')"
+          FILE="upload-test-$$.txt"
+          CONTENT="hello from deployment-test $(date +%s)"
+          echo "$CONTENT" > "$FILE"
+
+          echo "=== Uploading $FILE to $URL ==="
+          curl -kfsS -u admin:admin -T "$FILE" "$URL/remote.php/dav/files/admin/$FILE"
+
+          echo "=== Downloading $FILE back ==="
+          curl -kfsS -u admin:admin "$URL/remote.php/dav/files/admin/$FILE" -o "downloaded-$FILE"
+
+          echo "=== Verifying downloaded content matches what was uploaded ==="
+          diff "$FILE" "downloaded-$FILE"
+          echo "upload/download succeeded"
 
       - name: Tear down
         if: always()
