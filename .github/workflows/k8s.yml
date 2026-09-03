@@ -367,7 +367,7 @@ jobs:
             --admin-username admin \
             --admin-password admin \
             --skip-ocis-run \
-            -n ocis-server &
+            -n ocis-server > /tmp/ociswrapper.log 2>&1 &
 
       - name: Install Playwright for vault tests
         if: matrix.suite == 'apiVault'
@@ -432,6 +432,9 @@ jobs:
             echo "pod: $VAULT_POD"
             kubectl -n ocis-server exec "$VAULT_POD" -- find /var/lib/ocis -maxdepth 8 2>&1 || true
           fi
+
+          echo "--- ociswrapper: full log - shows exactly what happened during each env-config reconfigure/rollback for proxy and frontend, and how long each service actually took to report ready ---"
+          cat /tmp/ociswrapper.log 2>/dev/null || true
 
       - name: Run Core ${{ matrix.suite }} tests
         if: startsWith( matrix.suite, 'core' )
