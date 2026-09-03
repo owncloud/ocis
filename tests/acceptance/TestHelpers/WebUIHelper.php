@@ -99,6 +99,18 @@ class WebUIHelper {
 			$page->waitForSelector(self::$filesView, ['timeout' => self::$defaultTimeout]);
 			return $context->storageState();
 		} catch (\Exception $e) {
+			// TEMPORARY DEBUG: on failure, capture what the browser was actually looking at -
+			// which page/URL it landed on and a snippet of the page content - since the
+			// exception message alone does not say whether it's stuck on a blank page, an OIDC
+			// error page, an unexpected Keycloak required-action page, or something else.
+			try {
+				$debugUrl = isset($page) ? $page->url() : '(no page)';
+				$debugContent = isset($page) ? \substr($page->content(), 0, 2000) : '(no page)';
+				echo "DEBUG login failure for '$username' - current URL: $debugUrl\n";
+				echo "DEBUG login failure for '$username' - page content snippet: $debugContent\n";
+			} catch (\Exception $debugException) {
+				echo "DEBUG login failure for '$username' - could not capture page state: " . $debugException->getMessage() . "\n";
+			}
 			throw new Exception("Login failed for user '$username': " . $e->getMessage(), 0, $e);
 		} finally {
 			$context->close();
