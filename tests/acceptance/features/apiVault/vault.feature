@@ -57,7 +57,13 @@ Feature: vault
   @env-config @keycloak-config
   Scenario: user can set custom auth level names
     Given the administrator has set the Keycloak realm attribute "acr.loa.map" to '{"regular":"1","testing":"2"}'
-    And the config "OCIS_MFA_AUTH_LEVEL_NAMES" has been set to "testing"
+    # OCIS_MFA_AUTH_LEVEL_NAMES is read by both the proxy (mfa.go, gates access) and the
+    # frontend (exposed via the capabilities endpoint, which tells the web app which acr_values
+    # to request during step-up). In k8s each is a separate deployment, so both must be
+    # reconfigured explicitly - unlike the single-binary setup, there is no "just set it
+    # globally" here.
+    And the config "OCIS_MFA_AUTH_LEVEL_NAMES" has been set to "testing" for "proxy" service
+    And the config "OCIS_MFA_AUTH_LEVEL_NAMES" has been set to "testing" for "frontend" service
     And user "Alice" has logged in via web UI
     When user "Alice" uploads a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault using the WebDAV API
     Then the HTTP status code should be "201"
