@@ -46,7 +46,8 @@ import {
   useRouteQuery,
   createLocationSpaces,
   createLocationShares,
-  useClientService
+  useClientService,
+  useCapabilityStore
 } from '@ownclouders/web-pkg'
 import { unref, defineComponent, computed, onMounted, ref, Ref } from 'vue'
 import { dirname } from 'path'
@@ -61,8 +62,10 @@ export default defineComponent({
   setup() {
     const router = useRouter()
     const id = useRouteParam('fileId')
+    const scope = useRouteParam('scope')
     const { $gettext } = useGettext()
     const clientService = useClientService()
+    const capabilityStore = useCapabilityStore()
 
     const resource: Ref<Resource> = ref()
     const sharedParentResource: Ref<Resource> = ref()
@@ -83,6 +86,23 @@ export default defineComponent({
     })
 
     const resolvePrivateLinkTask = useTask(function* (signal, id) {
+      // vault file but non-vault /f/ URL: reload into /vault so the vault clients and MFA
+      // step-up kick in (both are picked from the URL at boot).
+      if (
+        capabilityStore.vaultEnabled &&
+        id?.split('$')[0] === capabilityStore.vaultStorageProvider &&
+        unref(scope) !== 'vault'
+      ) {
+        window.location.replace(
+          router.resolve({
+            name: 'resolvePrivateLink',
+            params: { scope: 'vault', fileId: id },
+            query: router.currentRoute.value.query
+          }).href
+        )
+        return
+      }
+
       if (
         [
           `${SHARE_JAIL_ID}$${SHARE_JAIL_ID}!${SHARE_JAIL_ID}`,
@@ -140,7 +160,7 @@ export default defineComponent({
       const { params, query } = createFileRouteOptions(space, { fileId, path })
       const openWithDefault = unref(openWithDefaultApp) !== 'false' && !unref(details)
 
-      targetLocation.params = params
+      targetLocation.params = { ...params, scope: unref(scope) }
       targetLocation.query = {
         ...query,
         scrollTo: unref(resource).fileId,
