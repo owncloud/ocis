@@ -436,6 +436,22 @@ jobs:
           echo "--- ociswrapper: full log - shows exactly what happened during each env-config reconfigure/rollback for proxy and frontend, and how long each service actually took to report ready ---"
           cat /tmp/ociswrapper.log 2>/dev/null || true
 
+          echo "--- proxy/frontend: actual live OCIS_MFA_AUTH_LEVEL_NAMES on the pod right now (checked directly, not via wrapper's own log which can truncate very long lines around 1KB) ---"
+          kubectl -n ocis-server exec deployment/proxy -- env | grep OCIS_MFA_AUTH_LEVEL_NAMES || echo "(not set on proxy - i.e. reverted to code default)"
+          kubectl -n ocis-server exec deployment/frontend -- env | grep OCIS_MFA_AUTH_LEVEL_NAMES || echo "(not set on frontend - i.e. reverted to code default)"
+
+          echo "--- keycloak: actual current acr.loa.map realm attribute - was VaultContext::restoreKeycloakRealmAttributes() able to restore it? ---"
+          KC_ADMIN_TOKEN=$(curl -sk -X POST "https://keycloak:8443/realms/master/protocol/openid-connect/token" \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            -d "client_id=admin-cli&username=admin&password=admin&grant_type=password" \
+            | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p')
+          if [[ -n "$KC_ADMIN_TOKEN" ]]; then
+            curl -sk "https://keycloak:8443/admin/realms/oCIS" -H "Authorization: Bearer $KC_ADMIN_TOKEN" \
+              | grep -o '"acr\.loa\.map":"[^}]*}"' || echo "(acr.loa.map attribute not found on realm)"
+          else
+            echo "(could not obtain keycloak admin token for this check)"
+          fi
+
       - name: Run Core ${{ matrix.suite }} tests
         if: startsWith( matrix.suite, 'core' )
         env:
