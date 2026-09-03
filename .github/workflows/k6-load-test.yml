@@ -76,7 +76,11 @@ jobs:
       - name: Run the k6 tests
         run: |
           if [ "${QUICK:-true}" = "true" ]; then
-            export SEED_USERS_TOTAL=10
+            # Seed at least one user per VU: each VU logs in as the pool user
+            # matching its own VU number, so seeding fewer users than the 16 VUs
+            # started below leaves those extra VUs with accounts that were never
+            # created, and every request they make fails to authenticate.
+            export SEED_USERS_TOTAL=20
             for id in 020 040 050 070 080 090 100 110; do
               export TEST_KOKO_PLATFORM_${id}_RAMPING_STAGES_VUS=2
               export TEST_KOKO_PLATFORM_${id}_RAMPING_STAGES_UP_DURATION=10s
