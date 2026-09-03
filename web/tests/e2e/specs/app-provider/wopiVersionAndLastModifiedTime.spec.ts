@@ -57,6 +57,12 @@ test.describe(
           stepUser: 'Alice',
           resources: [{ name: suite.file, type: suite.type, content: 'edited content v2' }]
         })
+        await ui.userClosesFileViewer({ stepUser: 'Alice' })
+        await ui.userOpensResourceInViewer({
+          stepUser: 'Alice',
+          resource: suite.file,
+          viewer: suite.viewer
+        })
         await ui.userShouldSeeContentInEditor({
           stepUser: 'Alice',
           expectedContent: 'edited content v2',

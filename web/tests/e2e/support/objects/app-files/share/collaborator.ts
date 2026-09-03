@@ -122,7 +122,7 @@ export default class Collaborator {
       'account page'
     )
     await collaboratorInputLocator.focus()
-    // await page.locator('.vs--open').waitFor()
+    await page.locator('.vs--open').waitFor()
     await page
       .locator(util.format(Collaborator.collaboratorDropdownItem, collaborator.displayName))
       .first() // in CI, resolves to two elements
