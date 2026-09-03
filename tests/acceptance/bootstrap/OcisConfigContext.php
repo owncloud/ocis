@@ -393,6 +393,7 @@ class OcisConfigContext implements Context {
 	private function waitForOcisProxyReady(int $timeoutSeconds = 60): void {
 		$readyzUrl = 'http://localhost:9205/readyz';
 		$deadline = time() + $timeoutSeconds;
+		$lastError = null;
 		while (time() < $deadline) {
 			try {
 				$response = HttpRequestHelper::get($readyzUrl);
@@ -401,12 +402,15 @@ class OcisConfigContext implements Context {
 				}
 				echo "oCIS not ready yet. Retrying in 1s...\n";
 			} catch (\Exception $e) {
-				throw new Exception("oCIS not ready. Error: $e");
+				// connection errors are expected while oCIS is restarting, keep retrying until the deadline
+				$lastError = $e;
+				echo "oCIS not reachable yet ({$e->getMessage()}). Retrying in 1s...\n";
 			}
 			sleep(1);
 		}
+		$errorSuffix = $lastError ? " Last error: {$lastError->getMessage()}" : "";
 		throw new \RuntimeException(
-			"Timed out after {$timeoutSeconds}s waiting for oCIS proxy readyz at {$readyzUrl}",
+			"Timed out after {$timeoutSeconds}s waiting for oCIS proxy readyz at {$readyzUrl}.{$errorSuffix}",
 		);
 	}
 
