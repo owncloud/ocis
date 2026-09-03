@@ -337,7 +337,26 @@ jobs:
 
       - name: Expose debug ports
         run: bash tests/config/k8s/expose-debug-svc.sh
-      
+
+      # env-config scenarios (OcisConfigContext::waitForOcisProxyReady) poll the proxy's
+      # unauthenticated /readyz endpoint after every config-triggered restart. Local port 9205
+      # is unavailable on the runner (k3d's loadbalancer reserves 9100-9399, see create-cluster),
+      # so forward it to 19205 instead, for the whole remainder of the job - unlike the earlier
+      # one-off port-forward in "Wait for oCIS to be ready", this one is intentionally left
+      # running (not killed via trap) since env-config scenarios can restart oCIS at any point
+      # during the test run. Wrapped in a reconnect loop: a config change that restarts the
+      # proxy pod itself would kill a plain `kubectl port-forward` for good, since it targets a
+      # specific pod and doesn't follow a deployment through a rollout.
+      - name: Expose proxy readyz
+        if: matrix.suite == 'apiVault'
+        run: |
+          (
+            while true; do
+              kubectl -n ocis-server port-forward deployment/proxy 19205:9205 >> /tmp/proxy-readyz-portforward.log 2>&1
+              sleep 1
+            done
+          ) &
+
       - name: Build ociswrapper
         run: make -C tests/ociswrapper/
 
@@ -386,6 +405,7 @@ jobs:
           K8S: ${{ env.K8S }}
           KEYCLOAK: ${{ matrix.suite == 'apiVault' }}
           KC_URL: https://keycloak:8443
+          PROXY_READYZ_URL: ${{ matrix.suite == 'apiVault' && 'http://localhost:19205/readyz' || '' }}
         run: make test-acceptance-api
       
       - name: Debug storage-users-vault (post-test)

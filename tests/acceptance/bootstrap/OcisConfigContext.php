@@ -391,9 +391,11 @@ class OcisConfigContext implements Context {
 	 * @throws GuzzleException
 	 */
 	private function waitForOcisProxyReady(int $timeoutSeconds = 60): void {
-		$readyzUrl = 'http://localhost:9205/readyz';
+		// In k8s, port 9205 on the runner's localhost is unavailable (k3d's loadbalancer
+		// reserves that range), so the proxy's debug port is forwarded to a different local
+		// port for the lifetime of the job. See k8s.yml's "Expose proxy readyz" step.
+		$readyzUrl = getenv('PROXY_READYZ_URL') ?: 'http://localhost:9205/readyz';
 		$deadline = time() + $timeoutSeconds;
-		$lastError = null;
 		while (time() < $deadline) {
 			try {
 				$response = HttpRequestHelper::get($readyzUrl);
@@ -402,15 +404,12 @@ class OcisConfigContext implements Context {
 				}
 				echo "oCIS not ready yet. Retrying in 1s...\n";
 			} catch (\Exception $e) {
-				// connection errors are expected while oCIS is restarting, keep retrying until the deadline
-				$lastError = $e;
-				echo "oCIS not reachable yet ({$e->getMessage()}). Retrying in 1s...\n";
+				throw new Exception("oCIS not ready. Error: $e");
 			}
 			sleep(1);
 		}
-		$errorSuffix = $lastError ? " Last error: {$lastError->getMessage()}" : "";
 		throw new \RuntimeException(
-			"Timed out after {$timeoutSeconds}s waiting for oCIS proxy readyz at {$readyzUrl}.{$errorSuffix}",
+			"Timed out after {$timeoutSeconds}s waiting for oCIS proxy readyz at {$readyzUrl}",
 		);
 	}
 
