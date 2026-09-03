@@ -46,6 +46,12 @@ export const test = base.extend<{
         }
       }
 
+      // Runs after each test has finished
+      if (config.keycloak && (config.mfa || config.vaultMode) && adminUser) {
+        await api.keycloak.setAccessTokenForKeycloakUser(adminUser)
+        await api.keycloak.deleteUserTotpCredentials({ user: adminUser })
+      }
+
       await cleanUpUser(store.createdUserStore, adminUser)
       await cleanUpGroup(adminUser)
       await cleanUpSpaces(adminUser)
@@ -80,6 +86,14 @@ export const test = base.extend<{
           }
         }
       }
+
+      // Runs before each test, but after the world has been initialized.
+      const adminUser = world.usersEnvironment.getUser({ key: config.keycloakAdminUser })
+      if (config.keycloak && (config.mfa || config.vaultMode) && adminUser) {
+        await api.keycloak.setAccessTokenForKeycloakUser(adminUser)
+        await api.keycloak.deleteUserTotpCredentials({ user: adminUser })
+      }
+
       await use()
     },
     { auto: true }
