@@ -403,7 +403,10 @@ describe('AuthService', () => {
       const { authService, mockSignInRedirect } = setupVaultTest({ hasVaultEntitlement: false })
 
       await authService.initializeContext(
-        mock<RouteLocation>({ params: { scope: 'vault', driveAliasAndItem: '' }, fullPath: '/vault/foo' })
+        mock<RouteLocation>({
+          params: { scope: 'vault', driveAliasAndItem: '' },
+          fullPath: '/vault/foo'
+        })
       )
 
       expect(mockSignInRedirect).not.toHaveBeenCalled()
@@ -414,7 +417,10 @@ describe('AuthService', () => {
       const { authService, mockSignInRedirect } = setupVaultTest({ hasVaultEntitlement: true })
 
       await authService.initializeContext(
-        mock<RouteLocation>({ params: { scope: 'vault', driveAliasAndItem: '' }, fullPath: '/vault/foo' })
+        mock<RouteLocation>({
+          params: { scope: 'vault', driveAliasAndItem: '' },
+          fullPath: '/vault/foo'
+        })
       )
 
       expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
