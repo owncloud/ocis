@@ -16,6 +16,8 @@ insecure:
 features:
   authapp:
     enabled: false
+  vault:
+    enabled: false
   emailNotifications:
     enabled: false
     smtp:
@@ -95,6 +97,7 @@ http:
         - 'blob:'
         - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
         - 'https://marketplace.owncloud.com/'
+        - 'https://keycloak:8443/'
       defaultSrc:
         - "'none'"
       fontSrc:
@@ -106,6 +109,7 @@ http:
         - "'self'"
         - 'blob:'
         - 'https://embed.diagrams.net/'
+        - 'https://keycloak:8443/'
       imgSrc:
         - "'self'"
         - 'data:'
@@ -147,6 +151,9 @@ services:
       enabled: true
       accessModes:
         - ReadWriteOnce
+  storageusers-vault:
+    persistence:
+      enabled: false
   ocm:
     persistence:
       enabled: true
