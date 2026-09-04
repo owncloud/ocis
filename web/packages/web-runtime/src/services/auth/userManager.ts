@@ -20,6 +20,7 @@ import { SettingsBundle } from '../../helpers/settings'
 import { WebWorkersStore } from '@ownclouders/web-pkg'
 
 const postLoginRedirectUrlKey = 'oc.postLoginRedirectUrl'
+const vaultPermission = 'VaultMode.ReadWriteEnabled.own'
 type UnloadReason = 'authError' | 'logout'
 
 export interface UserManagerOptions {
@@ -302,13 +303,13 @@ export class UserManager extends OidcUserManager {
     return user
   }
 
-  private async fetchPermissions({ user }: { user: OcUser }) {
+  private async fetchPermissions(accountUuid: string) {
     const httpClient = this.clientService.httpAuthenticated
     try {
       const {
         data: { permissions }
       } = await httpClient.post<{ permissions: string[] }>('/api/v0/settings/permissions-list', {
-        account_uuid: user.id
+        account_uuid: accountUuid
       })
       return permissions
     } catch (e) {
@@ -318,8 +319,23 @@ export class UserManager extends OidcUserManager {
   }
 
   private async updateUserAbilities(user: OcUser) {
-    const permissions = await this.fetchPermissions({ user })
+    const permissions = await this.fetchPermissions(user.id)
     const abilities = getAbilities(permissions)
     this.ability.update(abilities)
+  }
+
+  /**
+   * Returns whether the current user holds the vault permission. Fetches the
+   * permissions directly rather than reading the CASL ability, which is only
+   * populated later in `updateContext`.
+   */
+  public async hasVaultEntitlement(): Promise<boolean> {
+    const user = await this.getUser()
+    const accountUuid = user?.profile?.sub
+    if (!accountUuid) {
+      return false
+    }
+    const permissions = await this.fetchPermissions(accountUuid)
+    return permissions.includes(vaultPermission)
   }
 }

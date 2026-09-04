@@ -370,4 +370,55 @@ describe('AuthService', () => {
       expect(mockSignInRedirect).not.toHaveBeenCalled()
     })
   })
+
+  describe('vault scope entitlement', () => {
+    const setupVaultTest = ({ hasVaultEntitlement }: { hasVaultEntitlement: boolean }) => {
+      const authService = new AuthService()
+      const mockSignInRedirect = vi.fn()
+
+      Object.defineProperty(authService, 'userManager', {
+        value: mock<UserManager>({
+          hasVaultEntitlement: vi.fn().mockResolvedValue(hasVaultEntitlement),
+          getUser: vi
+            .fn()
+            .mockResolvedValue(mock<User>({ profile: { acr: 'regular' }, expired: false })),
+          signinRedirect: mockSignInRedirect,
+          setPostLoginRedirectUrl: vi.fn(),
+          getAccessToken: vi.fn().mockResolvedValue(null)
+        }),
+        writable: true
+      })
+
+      initAuthService({ authService })
+
+      Object.defineProperty(authService, 'capabilityStore', {
+        value: { isInitialized: true, authMfaRequiredLevelname: 'advanced' },
+        writable: true
+      })
+
+      return { authService, mockSignInRedirect }
+    }
+
+    it('does not redirect to the IdP and flags an auth error when the user lacks the vault permission', async () => {
+      const { authService, mockSignInRedirect } = setupVaultTest({ hasVaultEntitlement: false })
+
+      await authService.initializeContext(
+        mock<RouteLocation>({ params: { scope: 'vault', driveAliasAndItem: '' }, fullPath: '/vault/foo' })
+      )
+
+      expect(mockSignInRedirect).not.toHaveBeenCalled()
+      expect(authService.hasAuthErrorOccurred).toBe(true)
+    })
+
+    it('redirects to the IdP for the MFA step-up when the user holds the vault permission', async () => {
+      const { authService, mockSignInRedirect } = setupVaultTest({ hasVaultEntitlement: true })
+
+      await authService.initializeContext(
+        mock<RouteLocation>({ params: { scope: 'vault', driveAliasAndItem: '' }, fullPath: '/vault/foo' })
+      )
+
+      expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
+      expect(authService.hasAuthErrorOccurred).toBe(false)
+    })
+  })
 })
