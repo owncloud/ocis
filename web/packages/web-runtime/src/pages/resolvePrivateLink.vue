@@ -86,8 +86,10 @@ export default defineComponent({
     })
 
     const resolvePrivateLinkTask = useTask(function* (signal, id) {
-      // vault file but non-vault /f/ URL: reload into /vault so the vault clients and MFA
-      // step-up kick in (both are picked from the URL at boot).
+      // vault file but non-vault /f/ URL: hard-reload into /vault so the vault client
+      // base URLs are picked up (they are derived from the URL at boot). The MFA
+      // step-up is enforced by the authService guard on the vault scope, which also
+      // fires on a router.push, so it is not the reason for the full reload.
       if (
         capabilityStore.vaultEnabled &&
         id?.split('$')[0] === capabilityStore.vaultStorageProvider &&
@@ -109,7 +111,9 @@ export default defineComponent({
           `${SHARE_JAIL_ID}$${SHARE_JAIL_ID}`
         ].includes(id)
       ) {
-        return router.push(createLocationShares('files-shares-with-me'))
+        return router.push(
+          createLocationShares('files-shares-with-me', { params: { scope: unref(scope) } })
+        )
       }
 
       let result: Awaited<ReturnType<typeof getResourceContext>>
@@ -176,9 +180,10 @@ export default defineComponent({
       return !resolvePrivateLinkTask.last || resolvePrivateLinkTask.isRunning
     })
 
-    const sharedWithMeRoute = computed(() => {
-      return { name: 'files-shares-with-me' }
-    })
+    const sharedWithMeRoute = computed(() => ({
+      name: 'files-shares-with-me',
+      params: { scope: unref(scope) }
+    }))
 
     const openSharedWithMeLabel = computed(() => {
       return $gettext('Open "Shared with me"')
