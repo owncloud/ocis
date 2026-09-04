@@ -443,7 +443,13 @@ jobs:
           echo "--- proxy: actual live PROXY_OIDC_ISSUER on the pod right now - the chart renders this var TWICE (default, then vault override), so this checks how kubectl set env actually handled a pre-existing duplicate key during rollback ---"
           kubectl -n ocis-server exec deployment/proxy -- env | grep PROXY_OIDC_ISSUER || echo "(PROXY_OIDC_ISSUER not set at all on proxy)"
           echo "--- proxy: full deployment spec env list for PROXY_OIDC_ISSUER (shows if there are now 0, 1, or 2 entries in the spec itself, not just what env picks up) ---"
-          kubectl -n ocis-server get deployment proxy -o jsonpath='{.spec.template.spec.containers[0].env}' | grep -o '{"name":"PROXY_OIDC_ISSUER"[^}]*}'
+          kubectl -n ocis-server get deployment proxy -o jsonpath='{.spec.template.spec.containers[0].env}' | grep -o '{"name":"PROXY_OIDC_ISSUER"[^}]*}' || true
+
+          echo "--- proxy: other vault-mode-relevant env vars live on the pod right now, for Alice's access-denied failure ---"
+          kubectl -n ocis-server exec deployment/proxy -- env | grep -E "PROXY_AUTOPROVISION_ACCOUNTS|PROXY_ROLE_ASSIGNMENT_DRIVER|PROXY_USER_OIDC_CLAIM|PROXY_USER_CS3_CLAIM|OCIS_ENABLE_VAULT_MODE|OCIS_MFA_ENABLED" || true
+
+          echo "--- proxy log: lines mentioning role assignment / autoprovision / access denied around Alice's login ---"
+          grep -iE "role assign|autoprovision|access.denied|permission denied" tests/config/k8s/logs/*.log 2>/dev/null | tail -80 || true
 
           echo "--- keycloak: actual current acr.loa.map realm attribute - was VaultContext::restoreKeycloakRealmAttributes() able to restore it? ---"
           KC_ADMIN_TOKEN=$(curl -sk -X POST "https://keycloak:8443/realms/master/protocol/openid-connect/token" \

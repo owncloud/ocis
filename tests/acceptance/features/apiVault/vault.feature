@@ -70,124 +70,124 @@ Feature: vault
     And user "Alice" should have a JWT token with an ACR value "testing"
 
 
-  # Scenario: check capabilities endpoint for vault
-  #   Given using OCS API version "2"
-  #   And user "Alice" has logged in via web UI
-  #   When user "Alice" retrieves the vault mode capabilities using the capabilities API
-  #   Then the OCS status code should be "200"
-  #   And the HTTP status code should be "200"
-  #   And the ocs JSON data of the response should match
-  #     """
-  #     {
-  #       "type": "object",
-  #       "required": [ "capabilities" ],
-  #       "properties": {
-  #         "capabilities": {
-  #           "type": "object",
-  #           "required": [
-  #             "core",
-  #             "files",
-  #             "files_sharing",
-  #             "auth",
-  #             "vault"
-  #           ],
-  #           "properties": {
-  #             "files_sharing": {
-  #               "type": "object",
-  #               "required": [
-  #                 "api_enabled",
-  #                 "default_permissions",
-  #                 "public",
-  #                 "resharing",
-  #                 "federation",
-  #                 "group_sharing",
-  #                 "share_with_group_members_only",
-  #                 "share_with_membership_groups_only",
-  #                 "auto_accept_share",
-  #                 "user_enumeration"
-  #               ],
-  #               "properties": {
-  #                 "federation": {
-  #                   "type": "object",
-  #                   "required": [
-  #                     "outgoing",
-  #                     "incoming"
-  #                   ],
-  #                   "properties": {
-  #                     "outgoing": {
-  #                       "const": false
-  #                     },
-  #                     "incoming": {
-  #                       "const": false
-  #                     }
-  #                   }
-  #                 },
-  #                 "public": {
-  #                   "type": "object",
-  #                   "required": [
-  #                     "enabled",
-  #                     "multiple",
-  #                     "upload",
-  #                     "supports_upload_only",
-  #                     "send_mail",
-  #                     "social_share"
-  #                   ],
-  #                   "properties": {
-  #                     "enabled": {
-  #                       "const": false
-  #                     }
-  #                   }
-  #                 }
-  #               }
-  #             },
-  #             "auth": {
-  #               "type": "object",
-  #               "required": [
-  #                 "mfa"
-  #               ],
-  #               "properties": {
-  #                 "mfa": {
-  #                   "type": "object",
-  #                   "required": [
-  #                     "enabled",
-  #                     "levelnames"
-  #                   ],
-  #                   "properties": {
-  #                     "enabled": {
-  #                       "const": true
-  #                     },
-  #                     "levelnames": {
-  #                       "type": "array",
-  #                       "minItems": 1,
-  #                       "maxItems": 1,
-  #                       "items": {
-  #                         "const": "advanced"
-  #                       }
-  #                     }
-  #                   }
-  #                 }
-  #               }
-  #             },
-  #             "vault": {
-  #               "type": "object",
-  #               "required": [
-  #                 "enabled",
-  #                 "vault_storage_provider"
-  #               ],
-  #               "properties": {
-  #                 "enabled": {
-  #                   "const": true
-  #                 },
-  #                 "vault_storage_provider": {
-  #                   "pattern": "%uuidv4_pattern%"
-  #                 }
-  #               }
-  #             }
-  #           }
-  #         }
-  #       }
-  #     }
-  #     """
+  Scenario: check capabilities endpoint for vault
+    Given using OCS API version "2"
+    And user "Alice" has logged in via web UI
+    When user "Alice" retrieves the vault mode capabilities using the capabilities API
+    Then the OCS status code should be "200"
+    And the HTTP status code should be "200"
+    And the ocs JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [ "capabilities" ],
+        "properties": {
+          "capabilities": {
+            "type": "object",
+            "required": [
+              "core",
+              "files",
+              "files_sharing",
+              "auth",
+              "vault"
+            ],
+            "properties": {
+              "files_sharing": {
+                "type": "object",
+                "required": [
+                  "api_enabled",
+                  "default_permissions",
+                  "public",
+                  "resharing",
+                  "federation",
+                  "group_sharing",
+                  "share_with_group_members_only",
+                  "share_with_membership_groups_only",
+                  "auto_accept_share",
+                  "user_enumeration"
+                ],
+                "properties": {
+                  "federation": {
+                    "type": "object",
+                    "required": [
+                      "outgoing",
+                      "incoming"
+                    ],
+                    "properties": {
+                      "outgoing": {
+                        "const": false
+                      },
+                      "incoming": {
+                        "const": false
+                      }
+                    }
+                  },
+                  "public": {
+                    "type": "object",
+                    "required": [
+                      "enabled",
+                      "multiple",
+                      "upload",
+                      "supports_upload_only",
+                      "send_mail",
+                      "social_share"
+                    ],
+                    "properties": {
+                      "enabled": {
+                        "const": false
+                      }
+                    }
+                  }
+                }
+              },
+              "auth": {
+                "type": "object",
+                "required": [
+                  "mfa"
+                ],
+                "properties": {
+                  "mfa": {
+                    "type": "object",
+                    "required": [
+                      "enabled",
+                      "levelnames"
+                    ],
+                    "properties": {
+                      "enabled": {
+                        "const": true
+                      },
+                      "levelnames": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 1,
+                        "items": {
+                          "const": "advanced"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "vault": {
+                "type": "object",
+                "required": [
+                  "enabled",
+                  "vault_storage_provider"
+                ],
+                "properties": {
+                  "enabled": {
+                    "const": true
+                  },
+                  "vault_storage_provider": {
+                    "pattern": "%uuidv4_pattern%"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
 
 
   Scenario: user copies folder from drive to vault
@@ -201,162 +201,162 @@ Feature: vault
       | driveFolder |
 
 
-  # Scenario: user copies file from drive to vault
-  #   Given user "Alice" has logged in via web UI
-  #   And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testfile.txt"
-  #   When user "Alice" copies file "testfile.txt" from space "Personal" to "testfile.txt" inside space "Personal" in vault using the WebDAV API
-  #   Then the HTTP status code should be "201"
-  #   And for user "Alice" the content of the file "testfile.txt" of the space "Personal" in vault should be "some content"
-  #   And for user "Alice" the space "Personal" should contain these entries:
-  #     | testfile.txt |
+  Scenario: user copies file from drive to vault
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testfile.txt"
+    When user "Alice" copies file "testfile.txt" from space "Personal" to "testfile.txt" inside space "Personal" in vault using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" the content of the file "testfile.txt" of the space "Personal" in vault should be "some content"
+    And for user "Alice" the space "Personal" should contain these entries:
+      | testfile.txt |
 
 
-  # Scenario: user tries to copy folder from vault to drive
-  #   Given user "Alice" has logged in via web UI
-  #   And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
-  #   When user "Alice" copies folder "vaultFolder" from space "Personal" in vault to "vaultFolder" inside space "Personal" using the WebDAV API
-  #   Then the HTTP status code should be "409"
-  #   And for user "Alice" the space "Personal" should not contain these entries:
-  #     | vaultFolder |
-  #   And for user "Alice" the space "Personal" in vault should contain these entries:
-  #     | vaultFolder |
+  Scenario: user tries to copy folder from vault to drive
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    When user "Alice" copies folder "vaultFolder" from space "Personal" in vault to "vaultFolder" inside space "Personal" using the WebDAV API
+    Then the HTTP status code should be "409"
+    And for user "Alice" the space "Personal" should not contain these entries:
+      | vaultFolder |
+    And for user "Alice" the space "Personal" in vault should contain these entries:
+      | vaultFolder |
 
 
-  # Scenario: user tries to copy file from vault to drive
-  #   Given user "Alice" has logged in via web UI
-  #   And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testfile.txt" in vault
-  #   When user "Alice" copies file "testfile.txt" from space "Personal" in vault to "testfile.txt" inside space "Personal" using the WebDAV API
-  #   Then the HTTP status code should be "409"
-  #   And for user "Alice" the space "Personal" should not contain these entries:
-  #     | testfile.txt |
-  #   And for user "Alice" the space "Personal" in vault should contain these entries:
-  #     | testfile.txt |
+  Scenario: user tries to copy file from vault to drive
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testfile.txt" in vault
+    When user "Alice" copies file "testfile.txt" from space "Personal" in vault to "testfile.txt" inside space "Personal" using the WebDAV API
+    Then the HTTP status code should be "409"
+    And for user "Alice" the space "Personal" should not contain these entries:
+      | testfile.txt |
+    And for user "Alice" the space "Personal" in vault should contain these entries:
+      | testfile.txt |
 
 
-  # Scenario: user copies sub-folder from drive to vault
-  #   Given user "Alice" has logged in via web UI
-  #   And user "Alice" has created a folder "driveFolder" in space "Personal"
-  #   And user "Alice" has created a folder "driveFolder/subFolder" in space "Personal"
-  #   When user "Alice" copies folder "driveFolder/subFolder" from space "Personal" to "subFolder" inside space "Personal" in vault using the WebDAV API
-  #   Then the HTTP status code should be "201"
-  #   And for user "Alice" the space "Personal" in vault should contain these entries:
-  #     | subFolder |
-  #   And for user "Alice" folder "driveFolder" of the space "Personal" should contain these entries:
-  #     | subFolder |
+  Scenario: user copies sub-folder from drive to vault
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "driveFolder" in space "Personal"
+    And user "Alice" has created a folder "driveFolder/subFolder" in space "Personal"
+    When user "Alice" copies folder "driveFolder/subFolder" from space "Personal" to "subFolder" inside space "Personal" in vault using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" the space "Personal" in vault should contain these entries:
+      | subFolder |
+    And for user "Alice" folder "driveFolder" of the space "Personal" should contain these entries:
+      | subFolder |
 
 
-  # Scenario: user copies file inside folder from drive to vault
-  #   Given user "Alice" has logged in via web UI
-  #   And user "Alice" has created a folder "driveFolder" in space "Personal"
-  #   And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "driveFolder/testfile.txt"
-  #   When user "Alice" copies file "driveFolder/testfile.txt" from space "Personal" to "testfile.txt" inside space "Personal" in vault using the WebDAV API
-  #   Then the HTTP status code should be "201"
-  #   And for user "Alice" the content of the file "testfile.txt" of the space "Personal" in vault should be "some content"
-  #   And for user "Alice" folder "driveFolder" of the space "Personal" should contain these entries:
-  #     | testfile.txt |
+  Scenario: user copies file inside folder from drive to vault
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "driveFolder" in space "Personal"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "driveFolder/testfile.txt"
+    When user "Alice" copies file "driveFolder/testfile.txt" from space "Personal" to "testfile.txt" inside space "Personal" in vault using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" the content of the file "testfile.txt" of the space "Personal" in vault should be "some content"
+    And for user "Alice" folder "driveFolder" of the space "Personal" should contain these entries:
+      | testfile.txt |
 
 
-  # Scenario: user copies sub-folder from drive to a folder in vault
-  #   Given user "Alice" has logged in via web UI
-  #   And user "Alice" has created a folder "driveFolder" in space "Personal"
-  #   And user "Alice" has created a folder "driveFolder/subFolder" in space "Personal"
-  #   And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
-  #   When user "Alice" copies folder "driveFolder/subFolder" from space "Personal" to "vaultFolder/subFolder" inside space "Personal" in vault using the WebDAV API
-  #   Then the HTTP status code should be "201"
-  #   And for user "Alice" folder "vaultFolder" of the space "Personal" in vault should contain these entries:
-  #     | subFolder |
-  #   And for user "Alice" folder "driveFolder" of the space "Personal" should contain these entries:
-  #     | subFolder |
+  Scenario: user copies sub-folder from drive to a folder in vault
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "driveFolder" in space "Personal"
+    And user "Alice" has created a folder "driveFolder/subFolder" in space "Personal"
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    When user "Alice" copies folder "driveFolder/subFolder" from space "Personal" to "vaultFolder/subFolder" inside space "Personal" in vault using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" folder "vaultFolder" of the space "Personal" in vault should contain these entries:
+      | subFolder |
+    And for user "Alice" folder "driveFolder" of the space "Personal" should contain these entries:
+      | subFolder |
 
 
-  # Scenario: user copies file inside folder from drive to a folder in vault
-  #   Given user "Alice" has logged in via web UI
-  #   And user "Alice" has created a folder "driveFolder" in space "Personal"
-  #   And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "driveFolder/testfile.txt"
-  #   And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
-  #   When user "Alice" copies file "driveFolder/testfile.txt" from space "Personal" to "vaultFolder/testfile.txt" inside space "Personal" in vault using the WebDAV API
-  #   Then the HTTP status code should be "201"
-  #   And for user "Alice" the content of the file "vaultFolder/testfile.txt" of the space "Personal" in vault should be "some content"
-  #   And for user "Alice" folder "driveFolder" of the space "Personal" should contain these entries:
-  #     | testfile.txt |
+  Scenario: user copies file inside folder from drive to a folder in vault
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "driveFolder" in space "Personal"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "driveFolder/testfile.txt"
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    When user "Alice" copies file "driveFolder/testfile.txt" from space "Personal" to "vaultFolder/testfile.txt" inside space "Personal" in vault using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" the content of the file "vaultFolder/testfile.txt" of the space "Personal" in vault should be "some content"
+    And for user "Alice" folder "driveFolder" of the space "Personal" should contain these entries:
+      | testfile.txt |
 
 
-  # Scenario: user tries to create a public link of a folder inside vault
-  #   Given user "Alice" has logged in via web UI
-  #   And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
-  #   When user "Alice" creates the following resource link share using the Graph API:
-  #     | resource        | vaultFolder |
-  #     | space           | Personal    |
-  #     | permissionsRole | View        |
-  #     | storage         | vault       |
-  #   Then the HTTP status code should be "400"
-  #   And the JSON data of the response should match
-  #     """
-  #     {
-  #       "type": "object",
-  #       "required": ["error"],
-  #       "properties": {
-  #         "error": {
-  #           "type": "object",
-  #           "required": ["code", "innererror", "message"],
-  #           "properties": {
-  #             "code": {
-  #               "const": "invalidRequest"
-  #             },
-  #             "innererror": {
-  #               "type": "object",
-  #               "required": [
-  #                 "date",
-  #                 "request-id"
-  #               ]
-  #             },
-  #             "message": {
-  #               "const": "public links are not allowed for vault resources"
-  #             }
-  #           }
-  #         }
-  #       }
-  #     }
-  #     """
+  Scenario: user tries to create a public link of a folder inside vault
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    When user "Alice" creates the following resource link share using the Graph API:
+      | resource        | vaultFolder |
+      | space           | Personal    |
+      | permissionsRole | View        |
+      | storage         | vault       |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "public links are not allowed for vault resources"
+              }
+            }
+          }
+        }
+      }
+      """
 
 
-  # Scenario: user tries to create a public link of a file inside vault
-  #   Given user "Alice" has logged in via web UI
-  #   And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testfile.txt" in vault
-  #   When user "Alice" creates the following resource link share using the Graph API:
-  #     | resource        | testfile.txt |
-  #     | space           | Personal     |
-  #     | permissionsRole | View         |
-  #     | storage         | vault        |
-  #   Then the HTTP status code should be "400"
-  #   And the JSON data of the response should match
-  #     """
-  #     {
-  #       "type": "object",
-  #       "required": ["error"],
-  #       "properties": {
-  #         "error": {
-  #           "type": "object",
-  #           "required": ["code", "innererror", "message"],
-  #           "properties": {
-  #             "code": {
-  #               "const": "invalidRequest"
-  #             },
-  #             "innererror": {
-  #               "type": "object",
-  #               "required": [
-  #                 "date",
-  #                 "request-id"
-  #               ]
-  #             },
-  #             "message": {
-  #               "const": "public links are not allowed for vault resources"
-  #             }
-  #           }
-  #         }
-  #       }
-  #     }
-  #     """
+  Scenario: user tries to create a public link of a file inside vault
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testfile.txt" in vault
+    When user "Alice" creates the following resource link share using the Graph API:
+      | resource        | testfile.txt |
+      | space           | Personal     |
+      | permissionsRole | View         |
+      | storage         | vault        |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "public links are not allowed for vault resources"
+              }
+            }
+          }
+        }
+      }
+      """
 
 
   Scenario: user tries to create a public link of a space root inside vault
@@ -838,42 +838,42 @@ Feature: vault
       | Manager          |
 
 
-  # Scenario: search results for resources in Personal space should be isolated between vault and drive
-  #   Given user "Alice" has logged in via web UI
-  #   And user "Alice" has created a folder "testDriveFolder" in space "Personal"
-  #   And user "Alice" has created a folder "testVaultFolder" in space "Personal" in vault
-  #   And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testDriveFile.txt"
-  #   And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testVaultFile.txt" in vault
-  #   When user "Alice" searches for "*test*" inside space "Personal" in vault using the WebDAV API
-  #   Then the HTTP status code should be "207"
-  #   And the search result should contain "2" entries
-  #   And the search result of user "Alice" should contain only these entries:
-  #     | testVaultFolder   |
-  #     | testVaultFile.txt |
-  #   When user "Alice" searches for "*test*" inside space "Personal" using the WebDAV API
-  #   Then the HTTP status code should be "207"
-  #   And the search result should contain "2" entries
-  #   And the search result of user "Alice" should contain only these entries:
-  #     | testDriveFolder   |
-  #     | testDriveFile.txt |
+  Scenario: search results for resources in Personal space should be isolated between vault and drive
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "testDriveFolder" in space "Personal"
+    And user "Alice" has created a folder "testVaultFolder" in space "Personal" in vault
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testDriveFile.txt"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testVaultFile.txt" in vault
+    When user "Alice" searches for "*test*" inside space "Personal" in vault using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these entries:
+      | testVaultFolder   |
+      | testVaultFile.txt |
+    When user "Alice" searches for "*test*" inside space "Personal" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these entries:
+      | testDriveFolder   |
+      | testDriveFile.txt |
 
 
-  # Scenario: search results for resources inside folder with same name should be isolated between vault and drive
-  #   Given user "Alice" has logged in via web UI
-  #   And user "Alice" has created a folder "newFolder" in space "Personal"
-  #   And user "Alice" has created a folder "newFolder" in space "Personal" in vault
-  #   And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "newFolder/testDriveFile.txt"
-  #   And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "newFolder/testVaultFile.txt" in vault
-  #   When user "Alice" searches for "*test*" inside folder "newFolder" in space "Personal" in vault using the WebDAV API
-  #   Then the HTTP status code should be "207"
-  #   And the search result should contain "1" entries
-  #   And the search result of user "Alice" should contain only these entries:
-  #     | newFolder/testVaultFile.txt |
-  #   When user "Alice" searches for "*test*" inside folder "newFolder" in space "Personal" using the WebDAV API
-  #   Then the HTTP status code should be "207"
-  #   And the search result should contain "1" entries
-  #   And the search result of user "Alice" should contain only these entries:
-  #     | newFolder/testDriveFile.txt |
+  Scenario: search results for resources inside folder with same name should be isolated between vault and drive
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "newFolder" in space "Personal"
+    And user "Alice" has created a folder "newFolder" in space "Personal" in vault
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "newFolder/testDriveFile.txt"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "newFolder/testVaultFile.txt" in vault
+    When user "Alice" searches for "*test*" inside folder "newFolder" in space "Personal" in vault using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these entries:
+      | newFolder/testVaultFile.txt |
+    When user "Alice" searches for "*test*" inside folder "newFolder" in space "Personal" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these entries:
+      | newFolder/testDriveFile.txt |
 
 
   Scenario: search result for resources inside project spaces with same name should be isolated between vault and drive
@@ -897,21 +897,21 @@ Feature: vault
       | testDriveFolder   |
       | testDriveFile.txt |
 
-  # @tikaServiceNeeded
-  # Scenario: search result by content of file should be isolated between vault and drive
-  #   Given user "Alice" has logged in via web UI
-  #   And user "Alice" has uploaded a file inside space "Personal" with content "content of file in drive" to "testDriveFile.txt"
-  #   And user "Alice" has uploaded a file inside space "Personal" with content "content of file in vault" to "testVaultFile.txt" in vault
-  #   When user "Alice" searches for "Content:content" in vault using the WebDAV API
-  #   Then the HTTP status code should be "207"
-  #   And the search result should contain "1" entries
-  #   And the search result of user "Alice" should contain only these files:
-  #     | testVaultFile.txt |
-  #   When user "Alice" searches for "Content:content" using the WebDAV API
-  #   Then the HTTP status code should be "207"
-  #   And the search result should contain "1" entries
-  #   And the search result of user "Alice" should contain only these files:
-  #     | testDriveFile.txt |
+  @tikaServiceNeeded
+  Scenario: search result by content of file should be isolated between vault and drive
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has uploaded a file inside space "Personal" with content "content of file in drive" to "testDriveFile.txt"
+    And user "Alice" has uploaded a file inside space "Personal" with content "content of file in vault" to "testVaultFile.txt" in vault
+    When user "Alice" searches for "Content:content" in vault using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these files:
+      | testVaultFile.txt |
+    When user "Alice" searches for "Content:content" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these files:
+      | testDriveFile.txt |
 
   @tikaServiceNeeded
   Scenario: search result by content of file inside project space should be isolated between vault and drive
@@ -932,36 +932,36 @@ Feature: vault
       | testDriveFile.txt |
 
 
-  # Scenario: search results by resource tags should be isolated between vault and drive
-  #   Given user "Alice" has logged in via web UI
-  #   And user "Alice" has created a folder "driveFolder" in space "Personal"
-  #   And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
-  #   And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testDriveFile.txt"
-  #   And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testVaultFile.txt" in vault
-  #   And user "Alice" has tagged the following files of the space "Personal":
-  #     | path              | tagName |
-  #     | testDriveFile.txt | tag1    |
-  #   And user "Alice" has tagged the following folders of the space "Personal":
-  #     | path        | tagName |
-  #     | driveFolder | tag1    |
-  #   And user "Alice" has tagged the following files of the space "Personal" in vault:
-  #     | path              | tagName |
-  #     | testVaultFile.txt | tag1    |
-  #   And user "Alice" has tagged the following folders of the space "Personal" in vault:
-  #     | path        | tagName |
-  #     | vaultFolder | tag1    |
-  #   When user "Alice" searches for "Tags:tag1" in vault using the WebDAV API
-  #   Then the HTTP status code should be "207"
-  #   And the search result should contain "2" entries
-  #   And the search result of user "Alice" should contain only these files:
-  #     | testVaultFile.txt |
-  #     | vaultFolder       |
-  #   When user "Alice" searches for "Tags:tag1" using the WebDAV API
-  #   Then the HTTP status code should be "207"
-  #   And the search result should contain "2" entries
-  #   And the search result of user "Alice" should contain only these files:
-  #     | testDriveFile.txt |
-  #     | driveFolder       |
+  Scenario: search results by resource tags should be isolated between vault and drive
+    Given user "Alice" has logged in via web UI
+    And user "Alice" has created a folder "driveFolder" in space "Personal"
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testDriveFile.txt"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testVaultFile.txt" in vault
+    And user "Alice" has tagged the following files of the space "Personal":
+      | path              | tagName |
+      | testDriveFile.txt | tag1    |
+    And user "Alice" has tagged the following folders of the space "Personal":
+      | path        | tagName |
+      | driveFolder | tag1    |
+    And user "Alice" has tagged the following files of the space "Personal" in vault:
+      | path              | tagName |
+      | testVaultFile.txt | tag1    |
+    And user "Alice" has tagged the following folders of the space "Personal" in vault:
+      | path        | tagName |
+      | vaultFolder | tag1    |
+    When user "Alice" searches for "Tags:tag1" in vault using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these files:
+      | testVaultFile.txt |
+      | vaultFolder       |
+    When user "Alice" searches for "Tags:tag1" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these files:
+      | testDriveFile.txt |
+      | driveFolder       |
 
 
   Scenario: search results by resource tags inside project space should be isolated between vault and drive
