@@ -46,7 +46,6 @@ class KeycloakHelper {
 		'offline_access' => 'e2145b30-bf6f-49fb-af3f-1b40168bfcef',
 	];
 	private static ?string $adminAccessToken = null;
-	private static ?int $adminAccessTokenExpiry = null;
 
 	/**
 	 * @return bool
@@ -73,7 +72,6 @@ class KeycloakHelper {
 	 */
 	public static function setAdminAccessToken(string $accessToken): void {
 		self::$adminAccessToken = $accessToken;
-		self::$adminAccessTokenExpiry = self::extractExpiry($accessToken);
 	}
 
 	/**
@@ -83,26 +81,6 @@ class KeycloakHelper {
 	 */
 	public static function resetAdminAccessToken(): void {
 		self::$adminAccessToken = null;
-		self::$adminAccessTokenExpiry = null;
-	}
-
-	/**
-	 * Decodes the "exp" claim from a JWT without verifying its signature - this token was just
-	 * issued by Keycloak itself, so it is trusted here purely to know when to refresh it.
-	 *
-	 * @param string $jwt
-	 *
-	 * @return int|null
-	 */
-	private static function extractExpiry(string $jwt): ?int {
-		$segments = \explode('.', $jwt);
-		if (\count($segments) !== 3) {
-			return null;
-		}
-		$payload = \strtr($segments[1], '-_', '+/');
-		$payload .= \str_repeat('=', (4 - \strlen($payload) % 4) % 4);
-		$decoded = \json_decode((string)\base64_decode($payload), true);
-		return \is_array($decoded) && isset($decoded['exp']) ? (int)$decoded['exp'] : null;
 	}
 
 	/**
@@ -110,10 +88,7 @@ class KeycloakHelper {
 	 * @throws GuzzleException
 	 */
 	public static function getAdminAccessToken(): string {
-		// refresh a bit before the actual expiry so a token that's barely valid doesn't get used
-		// for a request that then takes a few seconds to reach the server
-		$expiringSoon = self::$adminAccessTokenExpiry !== null && self::$adminAccessTokenExpiry - 10 < \time();
-		if (self::$adminAccessToken === null || $expiringSoon) {
+		if (self::$adminAccessToken === null) {
 			self::setAdminAccessToken(self::generateAdminAccessToken());
 		}
 

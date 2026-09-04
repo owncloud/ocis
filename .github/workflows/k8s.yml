@@ -31,48 +31,48 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - suite: apiContract
-          # - suite: apiLocks
-          # - suite: apiSettings
-          # # - suite: apiNotification
-          # - suite: apiCors
-          # - suite: apiGraphUser
-          # - suite: apiGraph
-          # - suite: apiGraphGroup
-          # # - suite: apiSpaces
-          # - suite: apiSpacesShares
-          # - suite: apiSpacesDavOperation
-          # - suite: apiDownloads
-          # - suite: apiAsyncUpload
-          # - suite: apiDepthInfinity
-          # - suite: apiArchiver
-          # - suite: apiActivities
-          # - suite: apiSearch1
-          # - suite: apiSearch2
-          # # - suite: apiSearchContent
-          # - suite: apiSharingNgShares
-          # - suite: apiReshare
-          # - suite: apiSharingNgPermissions
-          # - suite: apiSharingNgAdditionalShareRole
-          # - suite: apiSharingNgDriveInvitation
-          # # - suite: apiSharingNgItemInvitation
-          # - suite: apiSharingNgDriveLinkShare
-          # - suite: apiSharingNgItemLinkShare
-          # - suite: apiSharingNgLinkShareManagement
-          # - suite: apiAuthApp
-          # # - suite: apiAntivirus
-          # - suite: apiOcm
-          # - suite: apiCollaboration
+          - suite: apiContract
+          - suite: apiLocks
+          - suite: apiSettings
+          # - suite: apiNotification
+          - suite: apiCors
+          - suite: apiGraphUser
+          - suite: apiGraph
+          - suite: apiGraphGroup
+          # - suite: apiSpaces
+          - suite: apiSpacesShares
+          - suite: apiSpacesDavOperation
+          - suite: apiDownloads
+          - suite: apiAsyncUpload
+          - suite: apiDepthInfinity
+          - suite: apiArchiver
+          - suite: apiActivities
+          - suite: apiSearch1
+          - suite: apiSearch2
+          # - suite: apiSearchContent
+          - suite: apiSharingNgShares
+          - suite: apiReshare
+          - suite: apiSharingNgPermissions
+          - suite: apiSharingNgAdditionalShareRole
+          - suite: apiSharingNgDriveInvitation
+          # - suite: apiSharingNgItemInvitation
+          - suite: apiSharingNgDriveLinkShare
+          - suite: apiSharingNgItemLinkShare
+          - suite: apiSharingNgLinkShareManagement
+          - suite: apiAuthApp
+          # - suite: apiAntivirus
+          - suite: apiOcm
+          - suite: apiCollaboration
           - suite: apiVault
-          # # - suite: "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
-          # - suite: "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
-          # - suite: "coreApiSharees"
-          # - suite: "coreApiSharePublicLink2"
-          # - suite: "coreApiShareOperationsToShares1,coreApiShareOperationsToShares2,coreApiSharePublicLink1,coreApiShareCreateSpecialToShares1,coreApiShareCreateSpecialToShares2,coreApiShareUpdateToShares"
-          # - suite: "coreApiTrashbin,coreApiTrashbinRestore,coreApiWebdavEtagPropagation1,coreApiWebdavEtagPropagation2"
-          # - suite: "coreApiWebdavDelete,coreApiWebdavOperations,coreApiWebdavMove2"
-          # - suite: "coreApiWebdavProperties"
-          # # - suite: "coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS"
+          # - suite: "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
+          - suite: "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
+          - suite: "coreApiSharees"
+          - suite: "coreApiSharePublicLink2"
+          - suite: "coreApiShareOperationsToShares1,coreApiShareOperationsToShares2,coreApiSharePublicLink1,coreApiShareCreateSpecialToShares1,coreApiShareCreateSpecialToShares2,coreApiShareUpdateToShares"
+          - suite: "coreApiTrashbin,coreApiTrashbinRestore,coreApiWebdavEtagPropagation1,coreApiWebdavEtagPropagation2"
+          - suite: "coreApiWebdavDelete,coreApiWebdavOperations,coreApiWebdavMove2"
+          - suite: "coreApiWebdavProperties"
+          # - suite: "coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS"
 
     steps:
       - name: Checkout
@@ -126,8 +126,8 @@ jobs:
             OCM=true make prepare-charts
           fi
 
-      # Keycloak/postgres (and the other suite-specific backends below) must be up and
-      # exposed to the cluster *before* oCIS is deployed: the proxy validates the
+      # Keycloak/postgres (and the other suite-specific backends) must be up and
+      # exposed to the cluster before oCIS is deployed: the proxy validates the
       # OCIS_OIDC_ISSUER well-known endpoint against Keycloak at startup in vault mode,
       # so `helm install --wait` would time out waiting for the proxy pod otherwise.
       - name: Deploy Suite-Specific External Backends
@@ -307,34 +307,6 @@ jobs:
             retry "delete file (HTTP 204)" check_status 204 delete_file || exit 1
           fi
 
-      - name: Debug storage-users-vault
-        if: always() && matrix.suite == 'apiVault'
-        run: |
-          echo "=== deployment/pods (label app=storageusers-vault) ==="
-          kubectl get deployment,pods -n ocis-server -l app=storageusers-vault -o wide || true
-
-          echo "=== describe deployment storageusers-vault ==="
-          kubectl -n ocis-server describe deployment storageusers-vault || true
-
-          echo "=== service storageusers-vault ==="
-          kubectl get svc storageusers-vault -n ocis-server -o wide || true
-
-          echo "=== kubectl logs (likely empty: OCIS_LOG_FILE redirects to a file, not stdout) ==="
-          kubectl -n ocis-server logs deployment/storageusers-vault --tail=200 || true
-          kubectl -n ocis-server logs deployment/storageusers-vault --previous --tail=200 || true
-
-          echo "=== real logs: every service in this chart writes to the same hostPath-mounted file ==="
-          echo "=== tests/config/k8s/logs/ocis.log (mounted into the k3d node at /logs, see create-cluster) ==="
-          ls -la tests/config/k8s/logs/ || true
-          echo "--- lines mentioning storage-users-vault, panic, fatal, or error ---"
-          grep -iE "storage-users-vault|panic|fatal|error" tests/config/k8s/logs/*.log 2>/dev/null | tail -200 || true
-
-          echo "=== gateway lines mentioning vault ==="
-          grep -i "vault" tests/config/k8s/logs/*.log 2>/dev/null | grep -i gateway | tail -100 || true
-
-          echo "=== features.vault.enabled in the values file actually used to deploy ==="
-          grep -A1 "vault:" tests/config/k8s/values.yaml || true
-
       - name: Expose debug ports
         run: bash tests/config/k8s/expose-debug-svc.sh
 
@@ -367,7 +339,7 @@ jobs:
             --admin-username admin \
             --admin-password admin \
             --skip-ocis-run \
-            -n ocis-server > /tmp/ociswrapper.log 2>&1 &
+            -n ocis-server &
 
       - name: Install Playwright for vault tests
         if: matrix.suite == 'apiVault'
@@ -408,72 +380,6 @@ jobs:
           PROXY_READYZ_URL: ${{ matrix.suite == 'apiVault' && 'http://localhost:19205/readyz' || '' }}
         run: make test-acceptance-api
       
-      - name: Debug storage-users-vault (post-test)
-        if: always() && matrix.suite == 'apiVault'
-        run: |
-          echo "=== deployment/pods (label app=storageusers-vault) ==="
-          kubectl get deployment,pods -n ocis-server -l app=storageusers-vault -o wide || true
-
-          echo "--- proxy: CreateHome-for-vault-personal outcomes (create_home.go), full/untruncated ---"
-          grep -iE "CreateHome for vault personal|vault personal space creation failed|vault personal space (created|already exists)" tests/config/k8s/logs/*.log 2>/dev/null || true
-
-          echo "--- graph: 'could not create drive' errors (drives.go CreateDrive handler) - did creating the project space itself actually fail server-side despite a 201? ---"
-          grep -iE "could not create drive" tests/config/k8s/logs/*.log 2>/dev/null || true
-
-          echo "--- storage-users-vault: CreateStorageSpace / CreateContainer rgrpc calls with their result code - is the project space create + the later folder create both landing on this instance, and do they succeed? ---"
-          grep -iE '"service":"storage-users-vault".*(CreateStorageSpace|CreateContainer)' tests/config/k8s/logs/*.log 2>/dev/null || true
-
-          echo "--- webdav/ocdav: FAILED_PRECONDITION / intermediate collection does not exist - the actual source of the 409 on folder creation (mkcol.go), distinct from AlreadyExists which maps to 405 ---"
-          grep -iE "FAILED_PRECONDITION|intermediate collection does not exist" tests/config/k8s/logs/*.log 2>/dev/null || true
-
-          echo "--- storage-users-vault: actual on-disk layout at end of run ---"
-          VAULT_POD=$(kubectl -n ocis-server get pods -l app=storageusers-vault -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
-          if [[ -n "$VAULT_POD" ]]; then
-            echo "pod: $VAULT_POD"
-            kubectl -n ocis-server exec "$VAULT_POD" -- find /var/lib/ocis -maxdepth 8 2>&1 || true
-          fi
-
-          echo "--- ociswrapper: full log - shows exactly what happened during each env-config reconfigure/rollback for proxy and frontend, and how long each service actually took to report ready ---"
-          cat /tmp/ociswrapper.log 2>/dev/null || true
-
-          echo "--- proxy/frontend: actual live OCIS_MFA_AUTH_LEVEL_NAMES on the pod right now (checked directly, not via wrapper's own log which can truncate very long lines around 1KB) ---"
-          kubectl -n ocis-server exec deployment/proxy -- env | grep OCIS_MFA_AUTH_LEVEL_NAMES || echo "(not set on proxy - i.e. reverted to code default)"
-          kubectl -n ocis-server exec deployment/frontend -- env | grep OCIS_MFA_AUTH_LEVEL_NAMES || echo "(not set on frontend - i.e. reverted to code default)"
-
-          echo "--- proxy: actual live PROXY_OIDC_ISSUER on the pod right now - the chart renders this var TWICE (default, then vault override), so this checks how kubectl set env actually handled a pre-existing duplicate key during rollback ---"
-          kubectl -n ocis-server exec deployment/proxy -- env | grep PROXY_OIDC_ISSUER || echo "(PROXY_OIDC_ISSUER not set at all on proxy)"
-          echo "--- proxy: full deployment spec env list for PROXY_OIDC_ISSUER (shows if there are now 0, 1, or 2 entries in the spec itself, not just what env picks up) ---"
-          kubectl -n ocis-server get deployment proxy -o jsonpath='{.spec.template.spec.containers[0].env}' | grep -o '{"name":"PROXY_OIDC_ISSUER"[^}]*}' || true
-
-          echo "--- proxy: other vault-mode-relevant env vars live on the pod right now, for Alice's access-denied failure ---"
-          kubectl -n ocis-server exec deployment/proxy -- env | grep -E "PROXY_AUTOPROVISION_ACCOUNTS|PROXY_ROLE_ASSIGNMENT_DRIVER|PROXY_USER_OIDC_CLAIM|PROXY_USER_CS3_CLAIM|OCIS_ENABLE_VAULT_MODE|OCIS_MFA_ENABLED" || true
-
-          echo "--- proxy log: lines mentioning role assignment / autoprovision / access denied around Alice's login ---"
-          grep -iE "role assign|autoprovision|access.denied|permission denied" tests/config/k8s/logs/*.log 2>/dev/null | tail -80 || true
-
-          echo "--- keycloak: actual current acr.loa.map realm attribute - was VaultContext::restoreKeycloakRealmAttributes() able to restore it? ---"
-          KC_ADMIN_TOKEN=$(curl -sk -X POST "https://keycloak:8443/realms/master/protocol/openid-connect/token" \
-            -H "Content-Type: application/x-www-form-urlencoded" \
-            -d "client_id=admin-cli&username=admin&password=admin&grant_type=password" \
-            | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p')
-          if [[ -n "$KC_ADMIN_TOKEN" ]]; then
-            curl -sk "https://keycloak:8443/admin/realms/oCIS" -H "Authorization: Bearer $KC_ADMIN_TOKEN" \
-              | grep -o '"acr\.loa\.map":"[^}]*}"' || echo "(acr.loa.map attribute not found on realm)"
-          else
-            echo "(could not obtain keycloak admin token for this check)"
-          fi
-
-          echo "--- proxy: rewritten OIDC well-known document (this is what the web app fetches for OIDC discovery, PROXY_OIDC_REWRITE_WELLKNOWN=true) - is it actually serving correctly right now? ---"
-          echo "--- response headers ---"
-          curl -sk -D - -o /dev/null "https://ocis-server/.well-known/openid-configuration" || echo "(request failed outright)"
-          echo "--- response body ---"
-          curl -sk "https://ocis-server/.well-known/openid-configuration"; echo
-          echo "--- keycloak's own (non-rewritten) well-known, for comparison - is keycloak itself healthy? ---"
-          curl -sk -o /dev/null -w "HTTP_STATUS:%{http_code}\n" "https://keycloak:8443/realms/oCIS/.well-known/openid-configuration"
-
-          echo "--- proxy log: error-level lines mentioning well-known / openid / discovery around this time ---"
-          grep -iE "well-known|discovery|openid.config" tests/config/k8s/logs/*.log 2>/dev/null | grep -i '"level":"error"' | tail -50 || true
-
       - name: Run Core ${{ matrix.suite }} tests
         if: startsWith( matrix.suite, 'core' )
         env:

@@ -67,12 +67,8 @@ func K8sUpdateEnv(service string, envMap []string) (bool, string) {
 	// that removes them; kubectl set env is additive and never strips a var it isn't told
 	// about. Mark any such brand-new var for removal now, while we still know it is new, or it
 	// silently survives every future rollback.
-	log.Println(fmt.Sprintf("[%s] DEBUG requested envMap: %s", service, strings.Join(envMap, ", ")))
-	log.Println(fmt.Sprintf("[%s] DEBUG baseline before newlyIntroduced check: %s", service, strings.Join(K8sOcisInitEnv[service].Envs, ", ")))
 	newlyIntroduced := diffEnvs(K8sOcisInitEnv[service].Envs, envMap)
-	log.Println(fmt.Sprintf("[%s] DEBUG newlyIntroduced: %s", service, strings.Join(newlyIntroduced, ", ")))
 	K8sOcisInitEnv[service].Envs = append(K8sOcisInitEnv[service].Envs, newlyIntroduced...)
-	log.Println(fmt.Sprintf("[%s] DEBUG baseline immediately after append, ptr=%p: %s", service, K8sOcisInitEnv[service], strings.Join(K8sOcisInitEnv[service].Envs, ", ")))
 
 	envSet, skipWaitForService, err := setServiceEnv(service, envMap, "Failed to set env")
 	if err != nil {
