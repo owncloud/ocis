@@ -140,6 +140,15 @@ export class AuthService implements AuthServiceInterface {
         this.capabilityStore.setCapabilities(await this.clientService.ocs.getCapabilities())
       }
 
+      // deny users without the vault permission instead of sending them to the
+      // IdP for the MFA step-up. authGuard turns this flag into a redirect to
+      // the accessDenied page (we can't push the route here, see handleAuthError).
+      const hasVaultEntitlement = await this.userManager.hasVaultEntitlement()
+      if (!hasVaultEntitlement) {
+        this.hasAuthErrorOccurred = true
+        return
+      }
+
       const requiredAcr = this.capabilityStore.authMfaRequiredLevelname
       const user = await this.userManager.getUser()
       if (!user || user.expired || user.profile.acr !== requiredAcr) {

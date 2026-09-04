@@ -59,4 +59,9 @@ const (
 	ChangeLogoPermissionID string = "ed83fc10-1f54-4a9e-b5a7-fb517f5f3e01"
 	// ChangeLogoPermissionName is the hardcoded setting name for the change-logo permission
 	ChangeLogoPermissionName string = "change-logo"
+
+	// VaultModePermissionID is the hardcoded setting UUID for the vault mode permission
+	VaultModePermissionID string = "cc29df49-f86a-4d23-be72-f873f6f1e55d"
+	// VaultModePermissionName is the hardcoded setting name for the vault mode permission
+	VaultModePermissionName string = "VaultMode.ReadWriteEnabled"
 )
