@@ -139,7 +139,29 @@ func getInitialEnvs(service string) ([]string, error) {
 			flatEnvVars = append(flatEnvVars, fmt.Sprintf("%s=%s", env.Name, env.Value))
 		}
 	}
-	return flatEnvVars, nil
+	// The chart legitimately renders some vars twice in the pod spec (a default value, then a
+	// later override for the same name - Go's own os.Environ() takes the last one, which is
+	// what the running process actually observes). Deduping here, keeping the last occurrence,
+	// ensures this list is safe to replay through a single `kubectl set env` call later (e.g.
+	// during rollback): passing the same key twice in one invocation against a spec that
+	// already has two entries for it has been observed to drop the variable entirely instead of
+	// converging on one value, rather than raising an error.
+	return dedupeEnvs(flatEnvVars), nil
+}
+
+func dedupeEnvs(envs []string) []string {
+	indexByKey := make(map[string]int, len(envs))
+	deduped := make([]string, 0, len(envs))
+	for _, env := range envs {
+		key := strings.SplitN(env, "=", 2)[0]
+		if idx, ok := indexByKey[key]; ok {
+			deduped[idx] = env
+			continue
+		}
+		indexByKey[key] = len(deduped)
+		deduped = append(deduped, env)
+	}
+	return deduped
 }
 
 func waitForService(service string, waitDeletion bool) (bool, error) {
@@ -198,6 +220,37 @@ func waitForService(service string, waitDeletion bool) (bool, error) {
 }
 
 func setServiceEnv(service string, envMap []string, errMsgPrefix string) (bool, bool, error) {
+	// kubectl set env has been observed to behave unreliably (silently dropping the variable
+	// entirely, or picking an arbitrary one of the existing values) when the target pod spec
+	// already has multiple pre-existing entries for a key being set - which happens here
+	// because the chart legitimately renders some vars twice (a default value, then a later
+	// vault-mode override, relying on the running process's own last-one-wins env handling,
+	// not on kubectl ever reconciling it). Strip any existing entries for every key this call
+	// touches first, in its own invocation, so the actual set below always starts from a clean
+	// (zero-or-one-entry) state instead of leaving kubectl to reconcile a pre-existing
+	// duplicate on its own. Removing a key that isn't set is a no-op, so this is safe to do
+	// unconditionally.
+	removalArgs := []string{}
+	seenKeys := map[string]bool{}
+	for _, env := range envMap {
+		key := strings.TrimSuffix(strings.SplitN(env, "=", 2)[0], "-")
+		if !seenKeys[key] {
+			seenKeys[key] = true
+			removalArgs = append(removalArgs, key+"-")
+		}
+	}
+	if len(removalArgs) > 0 {
+		removeCmdArgs := append([]string{"set", "env", "-n", config.Get("namespace"), "deployment", service}, removalArgs...)
+		if _, err := exec.Command("kubectl", removeCmdArgs...).Output(); err != nil {
+			errMsg := ""
+			if exitErr, ok := err.(*exec.ExitError); ok {
+				errMsg = strings.TrimSpace(string(exitErr.Stderr))
+			}
+			log.Println(fmt.Sprintf("[%s] Failed to pre-remove existing envs before setting them. %s", service, errMsg))
+			return false, true, fmt.Errorf("error removing existing env before set")
+		}
+	}
+
 	cmdArgs := append([]string{"set", "env", "-n", config.Get("namespace"), "deployment", service}, envMap...)
 	cmd := exec.Command("kubectl", cmdArgs...)
 	output, err := cmd.Output()

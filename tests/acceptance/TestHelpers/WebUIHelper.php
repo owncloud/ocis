@@ -64,25 +64,26 @@ class WebUIHelper {
 		try {
 			$page = $context->newPage();
 			$page->goto($ocisUrl, ['waitUntil' => 'networkidle']);
-			// Right after a proxy/frontend pod restart (e.g. an env-config scenario's rollback),
-			// the web app can transiently land on its own /login interstitial instead of
-			// auto-redirecting to the OIDC provider, even though the pod already reports
-			// healthy - the client-side OIDC discovery call can still hit a connection to
-			// Keycloak that isn't fully warm yet. Retry the navigation a few times rather than
-			// failing outright on what is usually a few-second timing gap.
-			$maxAttempts = 3;
-			for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
-				try {
-					$page->waitForSelector(self::$keycloakHeader, ['timeout' => self::$defaultTimeout]);
-					break;
-				} catch (\Exception $e) {
-					if ($attempt === $maxAttempts) {
-						throw $e;
-					}
-					\usleep(1000 * 1000);
-					$page->goto($ocisUrl, ['waitUntil' => 'networkidle']);
-				}
-			}
+			$page->waitForSelector(self::$keycloakHeader, ['timeout' => self::$defaultTimeout]);
+			// // Right after a proxy/frontend pod restart (e.g. an env-config scenario's rollback),
+			// // the web app can transiently land on its own /login interstitial instead of
+			// // auto-redirecting to the OIDC provider, even though the pod already reports
+			// // healthy - the client-side OIDC discovery call can still hit a connection to
+			// // Keycloak that isn't fully warm yet. Retry the navigation a few times rather than
+			// // failing outright on what is usually a few-second timing gap.
+			// $maxAttempts = 3;
+			// for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+			// 	try {
+			// 		$page->waitForSelector(self::$keycloakHeader, ['timeout' => self::$defaultTimeout]);
+			// 		break;
+			// 	} catch (\Exception $e) {
+			// 		if ($attempt === $maxAttempts) {
+			// 			throw $e;
+			// 		}
+			// 		\usleep(1000 * 1000);
+			// 		$page->goto($ocisUrl, ['waitUntil' => 'networkidle']);
+			// 	}
+			// }
 			$page->locator(self::$usernameInput)->fill($username);
 			$page->locator(self::$passwordInput)->fill($password);
 			$page->locator(self::$loginButton)->click();
