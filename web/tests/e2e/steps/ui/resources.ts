@@ -1,5 +1,6 @@
-import { expect } from '@playwright/test'
+import { expect, Page } from '@playwright/test'
 import { objects } from '../../support'
+import * as po from '../../support/objects/app-files/resource/actions'
 import {
   clickResourceModifier,
   createResourceTypes,
@@ -1502,4 +1503,19 @@ export async function userDownloadsPreviousVersionOfResource({
   const resourceObject = new objects.applicationFiles.Resource({ page })
   const fileInfo = world.filesEnvironment.getFile({ name: resource })
   await resourceObject.downloadVersion({ folder: to, files: [fileInfo] })
+}
+
+export async function userOpensResourceInNewTab({
+  stepUser,
+  resource,
+  action
+}: {
+  stepUser: string
+  resource: string
+  action?: po.openInNewTabAction
+}): Promise<Page> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const resourceObject = new objects.applicationFiles.Resource({ page })
+  return resourceObject.openResourceInNewTab({ resource, action })
 }
