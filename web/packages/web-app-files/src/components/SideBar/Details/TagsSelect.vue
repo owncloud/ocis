@@ -16,19 +16,29 @@
     @update:model-value="save"
   >
     <template #selected-option-container="{ option, deselect }">
-      <oc-tag class="tags-select-tag oc-ml-xs" :rounded="true" size="small">
+      <oc-tag
+        class="tags-select-tag oc-ml-xs"
+        size="small"
+        :fill-color="tagColor(option.label)"
+        :label-color="tagLabelColor(option.label)"
+      >
         <component
           :is="type"
           v-bind="getAdditionalAttributes(option.label)"
           class="oc-flex oc-flex-middle"
           @click="onTagClicked"
         >
-          <oc-icon name="price-tag-3" class="oc-mr-xs" size="small" />
           <span class="oc-text-truncate">{{ option.label }}</span>
         </component>
 
         <span class="oc-flex oc-flex-middle oc-mr-xs">
-          <oc-icon v-if="option.readonly" class="vs__deselect-lock" name="lock" size="small" />
+          <oc-icon
+            v-if="option.readonly"
+            class="vs__deselect-lock"
+            name="lock"
+            size="small"
+            variation="inherit"
+          />
           <oc-button
             v-else
             appearance="raw"
@@ -38,7 +48,7 @@
             @mousedown.stop.prevent
             @click="deselect(option)"
           >
-            <oc-icon name="close" size="small" />
+            <oc-icon name="close" size="small" variation="inherit" />
           </oc-button>
         </span>
       </oc-tag>
@@ -46,8 +56,12 @@
     <template #option="{ label, error }">
       <div class="oc-flex test">
         <span class="oc-flex oc-flex-center">
-          <oc-tag class="tags-select-tag oc-ml-xs" :rounded="true" size="small">
-            <oc-icon name="price-tag-3" size="small" />
+          <oc-tag
+            class="tags-select-tag oc-ml-xs"
+            size="small"
+            :fill-color="tagColor(label)"
+            :label-color="tagLabelColor(label)"
+          >
             <span class="oc-text-truncate">{{ label }}</span>
           </oc-tag>
         </span>
@@ -71,7 +85,8 @@ import {
   useClientService,
   useMessages,
   useResourcesStore,
-  useRouter
+  useRouter,
+  useTagColor
 } from '@ownclouders/web-pkg'
 import { useGettext } from 'vue3-gettext'
 import { useTask } from 'vue-concurrency'
@@ -102,6 +117,7 @@ const { showErrorMessage } = useMessages()
 const clientService = useClientService()
 const router = useRouter()
 const { updateResourceField } = useResourcesStore()
+const { tagColor, tagLabelColor } = useTagColor()
 
 const selectOnKeyCodes = [KeyCode.Enter, KeyCode[',']]
 

@@ -7,7 +7,10 @@ import {
   generateHashedColorForString,
   setDesiredContrastRatio,
   cssRgbToHex,
-  getHexFromCssVar
+  getHexFromCssVar,
+  hashString,
+  hashToIndex,
+  tagColorVarFor
 } from './colors'
 
 describe('hexToRgb', () => {
@@ -59,6 +62,75 @@ describe('generateHashedColorForString', () => {
   it('generates a hashed color', () => {
     expect(generateHashedColorForString('owncloud')).toBe('#2F26F')
     expect(generateHashedColorForString('example')).toMatch('#25116A')
+  })
+})
+
+describe('hashString', () => {
+  it('is deterministic', () => {
+    expect(hashString('physics')).toBe(hashString('physics'))
+  })
+  it('does not case-fold, because tags do not', () => {
+    // reva's tags.normalize() trims and splits but never lowercases, so `Invoice` and `invoice`
+    // are two different tags and must get two different colours.
+    expect(hashString('Invoice')).not.toBe(hashString('invoice'))
+  })
+  it('returns 0 for an empty string', () => {
+    expect(hashString('')).toBe(0)
+  })
+  it('can return a negative number', () => {
+    // Guards the `>>> 0` in hashToIndex: `hash << 5` overflows into the sign bit.
+    expect(hashString('physics')).toBeLessThan(0)
+  })
+})
+
+describe('hashToIndex', () => {
+  it('stays within the list', () => {
+    for (const name of ['physics', 'Invoice', 'invoice', 'a', '', 'tag', 'ünïcödé', '🎉']) {
+      const index = hashToIndex(name, 30)
+      expect(index).toBeGreaterThanOrEqual(0)
+      expect(index).toBeLessThan(30)
+      expect(Number.isInteger(index)).toBe(true)
+    }
+  })
+  it('never returns a negative index for a name whose hash is negative', () => {
+    expect(hashString('physics')).toBeLessThan(0)
+    expect(hashToIndex('physics', 30)).toBeGreaterThanOrEqual(0)
+  })
+  it.each([0, -1, 1.5, NaN])('returns -1 for an unusable length of %s', (length) => {
+    expect(hashToIndex('physics', length)).toBe(-1)
+  })
+  it('is stable across calls', () => {
+    expect(hashToIndex('physics', 30)).toBe(hashToIndex('physics', 30))
+  })
+  it('pins known names to known slots', () => {
+    // Pinned deliberately: these values are the cross-device, cross-user guarantee the whole
+    // feature rests on. If a change here is intentional it re-colours every existing tag in
+    // every deployment, so it must be a conscious edit, not a silent regression.
+    expect(hashToIndex('physics', 30)).toBe(13)
+    expect(hashToIndex('invoice', 30)).toBe(7)
+    expect(hashToIndex('Invoice', 30)).toBe(27)
+    expect(hashToIndex('important', 30)).toBe(28)
+  })
+  it('re-colours names when the list grows, which is why growing it is a one-way act', () => {
+    expect(hashToIndex('physics', 30)).not.toBe(hashToIndex('physics', 31))
+  })
+})
+
+describe('tagColorVarFor', () => {
+  it('resolves a name to a zero-based css var', () => {
+    expect(tagColorVarFor('physics', 30)).toBe('var(--oc-color-tag-13)')
+  })
+  it('agrees with hashToIndex', () => {
+    expect(tagColorVarFor('invoice', 30)).toBe(`var(--oc-color-tag-${hashToIndex('invoice', 30)})`)
+  })
+  it('gives different tags on one file different colours', () => {
+    expect(tagColorVarFor('Invoice', 30)).not.toBe(tagColorVarFor('invoice', 30))
+  })
+  it('returns an empty string for an empty list rather than an invalid var', () => {
+    // theme.json ships no tagColorsList until design supplies the values, so this is the
+    // real state of the app today, not a hypothetical.
+    expect(tagColorVarFor('physics', 0)).toBe('')
+    expect(tagColorVarFor('physics', undefined)).toBe('')
   })
 })
 

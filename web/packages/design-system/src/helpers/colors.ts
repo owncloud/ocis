@@ -69,16 +69,64 @@ export function getContrastRatio(rgbColorA: Array<number>, rgbColorB: Array<numb
 }
 
 /**
+ * Hashes a string into an integer, deterministically and with no state.
+ * The same string always yields the same number, in any browser, on any device, for any user.
+ * The result may be negative, and is not guaranteed to fit in 32 bits: `<< 5` truncates to int32
+ * but the following addition does not, so callers must normalise it themselves.
+ * @param {string} value: Can be any string
+ * @return {Number} Returns an integer, possibly negative
+ **/
+export function hashString(value: string): number {
+  let hash = 0
+  for (let i = 0; i < value.length; i++) {
+    hash = value.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  return hash
+}
+
+/**
  * Gives you a random hashed color for a string, e.g. if you give it 'owncloud' it will always return the same color
  * @param {string} name: Can be any string
  * @return {string} Returns a hex color
  **/
 export function generateHashedColorForString(name: string): string {
-  let hash = 0
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  return `#${(hashString(name) & 0x00ffffff).toString(16).toUpperCase()}`
+}
+
+/**
+ * Picks a stable index into a list of `length` entries for the given name.
+ * `>>> 0` reinterprets the possibly-negative hash as unsigned before the modulo, because a
+ * negative dividend in JS yields a negative remainder, which is not a valid index.
+ * @param {string} name: Can be any string
+ * @param {Number} length: Number of entries to spread names across
+ * @return {Number} Returns an index in [0, length), or -1 if there is nothing to index
+ **/
+export function hashToIndex(name: string, length: number): number {
+  if (!Number.isInteger(length) || length <= 0) {
+    return -1
   }
-  return `#${(hash & 0x00ffffff).toString(16).toUpperCase()}`
+  return (hashString(name) >>> 0) % length
+}
+
+/**
+ * Resolves a tag name to the css var holding its colour.
+ *
+ * The colour is *derived*, never stored and never chosen: it is a pure function of the exact tag
+ * string, so the same tag is the same colour for every user on every device with nothing persisted.
+ * Different tags may collide on one colour; that is accepted, because a tag's label is always
+ * rendered beside its chip and the colour is reinforcement, never the identifier.
+ *
+ * `length` is the length of the theme's `tagColorsList` and must be read at runtime, never
+ * hardcoded — the list is extensible in `theme.json`, and every theme carries the same number of
+ * entries so a tag keeps its slot across a theme switch.
+ *
+ * @param {string} name: The exact tag name as stored
+ * @param {Number} length: Number of colours in the theme's tag colour list
+ * @return {string} Returns a css var() reference, or '' if the list is empty
+ **/
+export function tagColorVarFor(name: string, length: number): string {
+  const index = hashToIndex(name, length)
+  return index < 0 ? '' : `var(--oc-color-tag-${index})`
 }
 
 /**

@@ -44,7 +44,14 @@ const DesignTokens = z.object({
   fontFamily: z.string().optional(),
   fontSizes: z.record(z.string(), z.string()).optional(),
   sizes: z.record(z.string(), z.string()).optional(),
-  spacing: z.record(z.string(), z.string()).optional()
+  spacing: z.record(z.string(), z.string()).optional(),
+  /**
+   * Ordered palette a tag's colour is drawn from, emitted as `--oc-color-tag-0 … tag-N-1`.
+   * A list rather than individual palette keys so that its length is a first-class property:
+   * the index of a tag's colour is `hash(tagName) % tagColorsList.length`.
+   * Every theme must supply the same number of entries, or a tag changes hue on theme switch.
+   */
+  tagColorsList: z.array(z.string()).max(512).optional()
 })
 
 const LoginPage = z.object({
@@ -130,7 +137,10 @@ export const useThemeStore = defineStore('theme', () => {
 
   const initializeThemes = (themeConfig: WebThemeConfigType) => {
     themes.value = themeConfig.themes.map((theme) =>
-      merge<WebThemeType>(themeConfig.defaults, theme)
+      // Arrays in a theme override the defaults wholesale instead of being appended to them.
+      // deepmerge concatenates by default, which would turn a `tagColorsList` present in both
+      // `defaults` and a theme into a double-length list and shift every tag's colour.
+      merge<WebThemeType>(themeConfig.defaults, theme, { arrayMerge: (_target, source) => source })
     )
     setThemeFromStorageOrSystem()
   }
@@ -167,12 +177,21 @@ export const useThemeStore = defineStore('theme', () => {
       { name: 'colorPalette', prefix: 'color' },
       { name: 'fontSizes', prefix: 'font-size' },
       { name: 'sizes', prefix: 'size' },
-      { name: 'spacing', prefix: 'spacing' }
+      { name: 'spacing', prefix: 'spacing' },
+      // An array, so `for ... in` below yields its indices: `--oc-color-tag-0`, `-tag-1`, …
+      { name: 'tagColorsList', prefix: 'color-tag' }
     ] as const
+
+    // `tagColorsList` is a string[] while the rest are records; both are indexable by the keys
+    // `for ... in` produces, which is all the loops below need.
+    const tokenValues = (
+      theme: WebThemeType,
+      name: (typeof customizableDesignTokens)[number]['name']
+    ) => (theme.designTokens[name] ?? {}) as unknown as Record<string, string>
 
     if (previousTheme) {
       customizableDesignTokens.forEach((token) => {
-        for (const param in previousTheme.designTokens[token.name]) {
+        for (const param in tokenValues(previousTheme, token.name)) {
           removeCustomProp(`${token.prefix}-${param}`)
         }
       })
@@ -181,11 +200,9 @@ export const useThemeStore = defineStore('theme', () => {
     applyCustomProp('font-family', unref(currentTheme).designTokens.fontFamily)
 
     customizableDesignTokens.forEach((token) => {
-      for (const param in unref(currentTheme).designTokens[token.name]) {
-        applyCustomProp(
-          `${token.prefix}-${param}`,
-          unref(currentTheme).designTokens[token.name][param]
-        )
+      const values = tokenValues(unref(currentTheme), token.name)
+      for (const param in values) {
+        applyCustomProp(`${token.prefix}-${param}`, values[param])
       }
     })
   }

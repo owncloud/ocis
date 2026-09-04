@@ -1,5 +1,5 @@
 <template>
-  <component :is="type" :class="ocTagClass" :to="to" @click="ocTagClick">
+  <component :is="type" :class="ocTagClass" :style="ocTagStyle" :to="to" @click="ocTagClick">
     <!-- @slot Content of the tag -->
     <slot />
   </component>
@@ -18,6 +18,8 @@ import { getSizeClass } from '../../helpers'
  * @prop {string|RouteLocationRaw} [to=null] - Target location for router-link or anchor href
  * @prop {('small'|'medium'|'large')} [size='medium'] - Size of the tag
  * @prop {boolean} [rounded=false] - Whether the tag should have fully rounded corners
+ * @prop {string} [fillColor=undefined] - Background colour of the tag when filled
+ * @prop {string} [labelColor=undefined] - Text colour to pair with `fillColor` for legibility
  *
  * @emits {MouseEvent} click - Emitted when the tag is clicked
  *
@@ -41,6 +43,8 @@ interface Props {
   to?: string | RouteLocationRaw
   size?: 'small' | 'medium' | 'large'
   rounded?: boolean
+  fillColor?: string | null
+  labelColor?: string | null
 }
 
 interface Emits {
@@ -53,7 +57,14 @@ defineOptions({
   release: '2.0.0'
 })
 
-const { type = 'span', to = null, size = 'medium', rounded = false } = defineProps<Props>()
+const {
+  type = 'span',
+  to = null,
+  size = 'medium',
+  rounded = false,
+  fillColor = null,
+  labelColor = null
+} = defineProps<Props>()
 
 const emit = defineEmits<Emits>()
 
@@ -72,7 +83,23 @@ const ocTagClass = computed(() => {
     classes.push('oc-tag-rounded')
   }
 
+  if (fillColor) {
+    classes.push('oc-tag-filled')
+  }
+
   return classes
+})
+
+const ocTagStyle = computed(() => {
+  if (!fillColor) {
+    return undefined
+  }
+  // No guess at the label colour without one: the fills come from the theme, so the legible
+  // pairing differs per fill and per theme. Callers get it from `useTagColor`.
+  return {
+    backgroundColor: fillColor,
+    ...(labelColor && { color: labelColor })
+  }
 })
 </script>
 
@@ -113,6 +140,36 @@ const ocTagClass = computed(() => {
 
   .oc-icon > svg {
     fill: var(--oc-color-text-muted);
+  }
+
+  // On a filled chip the fill decides what is legible, so nothing nested inside may paint
+  // itself: a link would take the global anchor colour (styles/theme/oc-text.scss), a raw
+  // `OcButton` its own swatch, and an `OcIcon` the muted fill set just above. All three ignore
+  // the `color` the chip carries, which is why the label colour has to be forced down as
+  // `inherit`/`currentColor` rather than simply set on the chip. The selectors are deliberately
+  // one step more specific than the rules they beat, since a tie would be decided by the
+  // stylesheet order in the bundle. Hence `&.oc-tag-filled` rather than `&-filled`: the latter
+  // compiles to a single class, tying with `.oc-tag .oc-icon > svg` just above.
+  &.oc-tag-filled {
+    a,
+    a:hover,
+    a:focus,
+    .oc-button,
+    .oc-button:hover:not([disabled]),
+    .oc-button:focus:not([disabled]),
+    &.oc-tag-link:hover,
+    &.oc-tag-link:focus,
+    &.oc-tag-button:hover,
+    &.oc-tag-button:focus {
+      color: inherit;
+    }
+
+    .oc-icon > svg,
+    .oc-button .oc-icon > svg,
+    .oc-button:hover:not([disabled]) .oc-icon > svg,
+    .oc-button:focus:not([disabled]) .oc-icon > svg {
+      fill: currentColor;
+    }
   }
 
   &-link,
