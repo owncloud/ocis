@@ -26,8 +26,12 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
+use Psr\Http\Message\ResponseInterface;
 use TestHelpers\BehatHelper;
+use TestHelpers\GraphHelper;
+use TestHelpers\HttpRequestHelper;
 use TestHelpers\KeycloakHelper;
+use TestHelpers\SettingsHelper;
 
 require_once 'bootstrap.php';
 
@@ -119,5 +123,80 @@ class VaultContext implements Context {
 			$actualAcr,
 			"Expected acr value to be $acr but got $actualAcr",
 		);
+	}
+
+	/**
+	 * @param string $user
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	private function getPermissionsList(string $user): ResponseInterface {
+		$password = $this->featureContext->getPasswordForUser($user);
+		$headers = [];
+		$authUser = $user;
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$this->authenticateKeycloakUserIfNeeded($user);
+			$accessToken = $this->featureContext->getOcisUserToken($user)['token']['accessToken'];
+			$headers['Authorization'] = 'Bearer ' . $accessToken;
+			$authUser = null;
+			$password = null;
+		}
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
+		return SettingsHelper::getPermissionsList(
+			$this->featureContext->getBaseUrl(),
+			$authUser,
+			$password,
+			$userId,
+			$headers,
+		);
+	}
+
+	/**
+	 * Authenticates a Keycloak-backed user directly via the OIDC token endpoint (no browser,
+	 * no MFA/vault-mode UI setup) so that the user's oCIS account (and id) is provisioned even
+	 * for roles that don't have vault UI elements to interact with, e.g. User Light.
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	private function authenticateKeycloakUserIfNeeded(string $user): void {
+		if ($this->featureContext->getAttributeOfCreatedUser($user, 'id')) {
+			return;
+		}
+		$userAttribute = $this->featureContext->getCreatedKeycloakUsers()[strtolower($user)];
+		$tokenData = KeycloakHelper::setAccessTokenForKeycloakOcisUser($userAttribute);
+		$this->featureContext->setOcisUserToken($userAttribute, $tokenData);
+
+		$response = HttpRequestHelper::get(
+			GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'me'),
+			null,
+			null,
+			['Authorization' => 'Bearer ' . $tokenData['access_token']],
+		);
+		$userAttribute['id'] = $this->featureContext->getJsonDecodedResponse($response)['id'];
+		$this->featureContext->addUserToCreatedUsersList(
+			$user,
+			$userAttribute['password'],
+			$userAttribute['displayName'],
+			$userAttribute['email'],
+			$userAttribute['id'],
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" gets the permissions list using the settings API$/
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userGetsPermissionsList(string $user): void {
+		$this->featureContext->setResponse($this->getPermissionsList($user));
 	}
 }
