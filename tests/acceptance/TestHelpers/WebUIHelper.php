@@ -64,7 +64,25 @@ class WebUIHelper {
 		try {
 			$page = $context->newPage();
 			$page->goto($ocisUrl, ['waitUntil' => 'networkidle']);
-			$page->waitForSelector(self::$keycloakHeader, ['timeout' => self::$defaultTimeout]);
+			// Right after a proxy/frontend pod restart (e.g. an env-config scenario's rollback),
+			// the web app can transiently land on its own /login interstitial instead of
+			// auto-redirecting to the OIDC provider, even though the pod already reports
+			// healthy - the client-side OIDC discovery call can still hit a connection to
+			// Keycloak that isn't fully warm yet. Retry the navigation a few times rather than
+			// failing outright on what is usually a few-second timing gap.
+			$maxAttempts = 3;
+			for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+				try {
+					$page->waitForSelector(self::$keycloakHeader, ['timeout' => self::$defaultTimeout]);
+					break;
+				} catch (\Exception $e) {
+					if ($attempt === $maxAttempts) {
+						throw $e;
+					}
+					\usleep(1000 * 1000);
+					$page->goto($ocisUrl, ['waitUntil' => 'networkidle']);
+				}
+			}
 			$page->locator(self::$usernameInput)->fill($username);
 			$page->locator(self::$passwordInput)->fill($password);
 			$page->locator(self::$loginButton)->click();
@@ -105,9 +123,22 @@ class WebUIHelper {
 			// error page, an unexpected Keycloak required-action page, or something else.
 			try {
 				$debugUrl = isset($page) ? $page->url() : '(no page)';
-				$debugContent = isset($page) ? \substr($page->content(), 0, 2000) : '(no page)';
 				echo "DEBUG login failure for '$username' - current URL: $debugUrl\n";
-				echo "DEBUG login failure for '$username' - page content snippet: $debugContent\n";
+				if (isset($page)) {
+					$fullContent = $page->content();
+					// prefer centering the snippet on the actual error message the web app
+					// rendered (e.g. "Something went wrong") over just the raw <body> start,
+					// since that's where the actual OIDC failure detail/reason should be
+					$errorPos = \strpos($fullContent, 'Something went wrong');
+					if ($errorPos !== false) {
+						$start = max(0, $errorPos - 200);
+						$snippet = \substr($fullContent, $start, 6000);
+					} else {
+						$bodyPos = \strpos($fullContent, '<body');
+						$snippet = \substr($fullContent, $bodyPos !== false ? $bodyPos : 0, 6000);
+					}
+					echo "DEBUG login failure for '$username' - page body snippet: $snippet\n";
+				}
 			} catch (\Exception $debugException) {
 				echo "DEBUG login failure for '$username' - could not capture page state: " . $debugException->getMessage() . "\n";
 			}
