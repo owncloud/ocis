@@ -440,6 +440,11 @@ jobs:
           kubectl -n ocis-server exec deployment/proxy -- env | grep OCIS_MFA_AUTH_LEVEL_NAMES || echo "(not set on proxy - i.e. reverted to code default)"
           kubectl -n ocis-server exec deployment/frontend -- env | grep OCIS_MFA_AUTH_LEVEL_NAMES || echo "(not set on frontend - i.e. reverted to code default)"
 
+          echo "--- proxy: actual live PROXY_OIDC_ISSUER on the pod right now - the chart renders this var TWICE (default, then vault override), so this checks how kubectl set env actually handled a pre-existing duplicate key during rollback ---"
+          kubectl -n ocis-server exec deployment/proxy -- env | grep PROXY_OIDC_ISSUER || echo "(PROXY_OIDC_ISSUER not set at all on proxy)"
+          echo "--- proxy: full deployment spec env list for PROXY_OIDC_ISSUER (shows if there are now 0, 1, or 2 entries in the spec itself, not just what env picks up) ---"
+          kubectl -n ocis-server get deployment proxy -o jsonpath='{.spec.template.spec.containers[0].env}' | grep -o '{"name":"PROXY_OIDC_ISSUER"[^}]*}'
+
           echo "--- keycloak: actual current acr.loa.map realm attribute - was VaultContext::restoreKeycloakRealmAttributes() able to restore it? ---"
           KC_ADMIN_TOKEN=$(curl -sk -X POST "https://keycloak:8443/realms/master/protocol/openid-connect/token" \
             -H "Content-Type: application/x-www-form-urlencoded" \
@@ -451,6 +456,17 @@ jobs:
           else
             echo "(could not obtain keycloak admin token for this check)"
           fi
+
+          echo "--- proxy: rewritten OIDC well-known document (this is what the web app fetches for OIDC discovery, PROXY_OIDC_REWRITE_WELLKNOWN=true) - is it actually serving correctly right now? ---"
+          echo "--- response headers ---"
+          curl -sk -D - -o /dev/null "https://ocis-server/.well-known/openid-configuration" || echo "(request failed outright)"
+          echo "--- response body ---"
+          curl -sk "https://ocis-server/.well-known/openid-configuration"; echo
+          echo "--- keycloak's own (non-rewritten) well-known, for comparison - is keycloak itself healthy? ---"
+          curl -sk -o /dev/null -w "HTTP_STATUS:%{http_code}\n" "https://keycloak:8443/realms/oCIS/.well-known/openid-configuration"
+
+          echo "--- proxy log: error-level lines mentioning well-known / openid / discovery around this time ---"
+          grep -iE "well-known|discovery|openid.config" tests/config/k8s/logs/*.log 2>/dev/null | grep -i '"level":"error"' | tail -50 || true
 
       - name: Run Core ${{ matrix.suite }} tests
         if: startsWith( matrix.suite, 'core' )

@@ -335,15 +335,6 @@ class OcisConfigContext implements Context {
 	public function rollback(): void {
 		if (OcisConfigHelper::isK8s()) {
 			$this->rollbackK8sServices();
-			// The wrapper's own readiness check (ociswrapper/ocis/k8s.go waitForService) only
-			// confirms the pod is healthy/ready - it does not confirm the proxy has finished
-			// (re-)fetching Keycloak's OIDC discovery document after a restart. A pod can report
-			// ready while that fetch is still in flight, so the very next scenario's login can
-			// hit a proxy that isn't actually ready to redirect through the OIDC flow yet. Poll
-			// the same unauthenticated readyz endpoint used elsewhere as an extra safety margin.
-			if (KeycloakHelper::isTestingWithKeycloak()) {
-				$this->waitForOcisProxyReady();
-			}
 			return;
 		}
 		$this->rollbackServices();
