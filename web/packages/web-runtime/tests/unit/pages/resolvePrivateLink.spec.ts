@@ -1,7 +1,7 @@
 import resolvePrivateLink from '../../../src/pages/resolvePrivateLink.vue'
 import { defaultPlugins, defaultComponentMocks, shallowMount } from '@ownclouders/web-test-helpers'
 import { mock } from 'vitest-mock-extended'
-import { queryItemAsString, useGetResourceContext } from '@ownclouders/web-pkg'
+import { queryItemAsString, useGetResourceContext, useRouteParam } from '@ownclouders/web-pkg'
 import { Resource, SHARE_JAIL_ID, SpaceResource } from '@ownclouders/web-client'
 
 vi.mock('@ownclouders/web-pkg', async (importOriginal) => ({
@@ -84,6 +84,83 @@ describe('resolvePrivateLink', () => {
       )
     })
   })
+  describe('vault permalinks', () => {
+    const vaultCapabilityState = {
+      capabilities: { vault: { enabled: true, vault_storage_provider: 'vault-provider' } }
+    }
+
+    const originalLocation = window.location
+    afterEach(() => {
+      Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: originalLocation
+      })
+    })
+
+    it('hard-redirects a vault permalink into vault scope instead of resolving it', async () => {
+      const replace = vi.fn()
+      Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: { replace, href: '' }
+      })
+      const { wrapper, mocks } = getWrapper({
+        fileId: 'vault-provider$space!item',
+        capabilityState: vaultCapabilityState
+      })
+      await wrapper.vm.resolvePrivateLinkTask.last
+      expect(replace).toHaveBeenCalledTimes(1)
+      expect(mocks.$router.resolve).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'resolvePrivateLink',
+          params: { scope: 'vault', fileId: 'vault-provider$space!item' }
+        })
+      )
+      expect(mocks.$router.push).not.toHaveBeenCalled()
+    })
+
+    it('resolves normally when the permalink is not a vault resource', async () => {
+      const replace = vi.fn()
+      Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: { replace, href: '' }
+      })
+      const fileId = 'other-provider$space!item'
+      const space = mock<SpaceResource>({ getDriveAliasAndItem: () => 'personal/home' })
+      const resource = mock<Resource>({ fileId })
+      const { wrapper, mocks } = getWrapper({
+        space,
+        resource,
+        fileId,
+        path: '/',
+        capabilityState: vaultCapabilityState
+      })
+      await wrapper.vm.resolvePrivateLinkTask.last
+      expect(replace).not.toHaveBeenCalled()
+      expect(mocks.$router.push).toHaveBeenCalled()
+    })
+
+    it('does not reload when already in vault scope', async () => {
+      const replace = vi.fn()
+      Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: { replace, href: '' }
+      })
+      const fileId = 'vault-provider$space!item'
+      const space = mock<SpaceResource>({ getDriveAliasAndItem: () => 'personal/home' })
+      const resource = mock<Resource>({ fileId })
+      const { wrapper, mocks } = getWrapper({
+        space,
+        resource,
+        fileId,
+        path: '/',
+        scope: 'vault',
+        capabilityState: vaultCapabilityState
+      })
+      await wrapper.vm.resolvePrivateLinkTask.last
+      expect(replace).not.toHaveBeenCalled()
+      expect(mocks.$router.push).toHaveBeenCalled()
+    })
+  })
   it('passes the details query param if given via query', async () => {
     const details = 'sharing'
     const { wrapper, mocks } = getWrapper({ details, path: '/' })
@@ -138,7 +215,9 @@ function getWrapper({
   fileId = '',
   details = '',
   hiddenShare = false,
-  openWithDefaultAppQuery = 'true'
+  openWithDefaultAppQuery = 'true',
+  scope = '',
+  capabilityState = {}
 }: {
   space?: SpaceResource
   resource?: Resource
@@ -147,7 +226,13 @@ function getWrapper({
   details?: string
   hiddenShare?: boolean
   openWithDefaultAppQuery?: string
+  scope?: string
+  capabilityState?: Record<string, unknown>
 } = {}) {
+  vi.mocked(useRouteParam).mockImplementation(
+    (str) => (str === 'scope' && scope ? scope : str) as any
+  )
+
   vi.mocked(queryItemAsString).mockImplementation((str) => {
     if (str === 'fileId') {
       return fileId
@@ -174,7 +259,7 @@ function getWrapper({
     mocks,
     wrapper: shallowMount(resolvePrivateLink, {
       global: {
-        plugins: [...defaultPlugins()],
+        plugins: [...defaultPlugins({ piniaOptions: { capabilityState } })],
         mocks,
         provide: mocks
       }
