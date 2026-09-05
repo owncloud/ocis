@@ -65,11 +65,11 @@ class SearchContext implements Context {
 		?string $spaceName = null,
 		?TableNode $properties = null,
 	): ResponseInterface {
-		// Indexing is async — poll until results appear.
-		// Initial wait 3s, then retry every 2s, up to ~13s total.
-		$maxAttempts = STANDARD_RETRY_COUNT;
+		// The search service can lag behind the rest of oCIS after a (re)start and
+		// answers with 5xx until it is ready — poll until it answers HTTP 207 first.
+		// Initial wait 3s, then retry every 2s, up to ~61s total.
 		$response = null;
-		for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
+		for ($attempt = 0; $attempt < SERVICE_READY_RETRY_COUNT; $attempt++) {
 			\sleep($attempt === 0 ? 3 : 2);
 			$response = $this->searchFiles(
 				$user,
@@ -81,13 +81,46 @@ class SearchContext implements Context {
 				$spaceName,
 				$properties,
 			);
-			$parsed = HttpRequestHelper::parseResponseAsXml($response);
-			if (\is_array($parsed) && isset($parsed["value"]) && !empty($parsed["value"])) {
+			if ($response->getStatusCode() !== 207) {
+				continue;
+			}
+			// Service is up — return immediately if results are already there,
+			// otherwise fall through to the result-polling loop below.
+			if ($this->searchResponseHasResults($response)) {
+				return $response;
+			}
+			break;
+		}
+		for ($attempt = 0; $attempt < STANDARD_RETRY_COUNT; $attempt++) {
+			if ($attempt > 0) {
+				\sleep(2);
+			}
+			$response = $this->searchFiles(
+				$user,
+				$pattern,
+				$isVault,
+				$limit,
+				$scopeType,
+				$scope,
+				$spaceName,
+				$properties,
+			);
+			if ($this->searchResponseHasResults($response)) {
 				return $response;
 			}
 		}
 		// return last response even if empty — let the assertion step produce the failure message
 		return $response;
+	}
+
+	/**
+	 * @param ResponseInterface $response
+	 *
+	 * @return bool
+	 */
+	private function searchResponseHasResults(ResponseInterface $response): bool {
+		$parsed = HttpRequestHelper::parseResponseAsXml($response);
+		return \is_array($parsed) && isset($parsed["value"]) && !empty($parsed["value"]);
 	}
 
 	/**
