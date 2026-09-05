@@ -167,20 +167,16 @@ func (t *Tree) TouchFile(ctx context.Context, n *node.Node, markprocessing bool,
 		return err
 	}
 
-	// link child name to parent if it is new
+	// link child name to parent, create-only so a concurrent upload of the same
+	// new file cannot silently clobber it: the loser gets AlreadyExists and its
+	// CAS loop re-reads and retries instead of losing the update (OCISDEV-855)
 	childNameLink := filepath.Join(n.ParentPath(), n.Name)
-	var link string
-	link, err = os.Readlink(childNameLink)
-	if err == nil && link != "../"+n.ID {
-		if err = os.Remove(childNameLink); err != nil {
-			return errors.Wrap(err, "Decomposedfs: could not remove symlink child entry")
+	relativeNodePath := filepath.Join("../../../../../", lookup.Pathify(n.ID, 4, 2))
+	if err = os.Symlink(relativeNodePath, childNameLink); err != nil {
+		if errors.Is(err, fs.ErrExist) {
+			return errtypes.AlreadyExists(n.Name)
 		}
-	}
-	if errors.Is(err, fs.ErrNotExist) || link != "../"+n.ID {
-		relativeNodePath := filepath.Join("../../../../../", lookup.Pathify(n.ID, 4, 2))
-		if err = os.Symlink(relativeNodePath, childNameLink); err != nil {
-			return errors.Wrap(err, "Decomposedfs: could not symlink child entry")
-		}
+		return errors.Wrap(err, "Decomposedfs: could not symlink child entry")
 	}
 
 	return t.Propagate(ctx, n, 0)

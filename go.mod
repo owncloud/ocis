@@ -67,7 +67,7 @@ require (
 	github.com/open-policy-agent/opa v1.19.0
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245
-	github.com/owncloud/reva/v2 v2.0.0-20260813121157-d386075a0421
+	github.com/owncloud/reva/v2 v2.0.0-20260821144357-79bb0520701d
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.12
 	github.com/prometheus/client_golang v1.24.1
@@ -155,7 +155,7 @@ require (
 	github.com/blevesearch/zapx/v17 v17.1.2 // indirect
 	github.com/bluele/gcache v0.0.2 // indirect
 	github.com/bombsimon/logrusr/v3 v3.1.0 // indirect
-	github.com/ceph/go-ceph v0.40.0 // indirect
+	github.com/ceph/go-ceph v0.41.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cevaris/ordered_map v0.0.0-20190319150403-3adeae072e73 // indirect
 	github.com/clipperhouse/displaywidth v0.11.0 // indirect

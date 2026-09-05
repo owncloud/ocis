@@ -287,7 +287,7 @@ github.com/cenkalti/backoff
 # github.com/cenkalti/backoff/v5 v5.0.3
 ## explicit; go 1.23
 github.com/cenkalti/backoff/v5
-# github.com/ceph/go-ceph v0.40.0
+# github.com/ceph/go-ceph v0.41.0
 ## explicit; go 1.25.0
 github.com/ceph/go-ceph/cephfs
 github.com/ceph/go-ceph/cephfs/admin
@@ -1323,7 +1323,7 @@ github.com/orcaman/concurrent-map
 # github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245
 ## explicit; go 1.18
 github.com/owncloud/libre-graph-api-go
-# github.com/owncloud/reva/v2 v2.0.0-20260813121157-d386075a0421
+# github.com/owncloud/reva/v2 v2.0.0-20260821144357-79bb0520701d
 ## explicit; go 1.26
 github.com/owncloud/reva/v2/cmd/revad/internal/grace
 github.com/owncloud/reva/v2/cmd/revad/runtime
@@ -1686,6 +1686,7 @@ github.com/owncloud/reva/v2/pkg/token/manager/jwt
 github.com/owncloud/reva/v2/pkg/token/manager/loader
 github.com/owncloud/reva/v2/pkg/token/manager/registry
 github.com/owncloud/reva/v2/pkg/trace
+github.com/owncloud/reva/v2/pkg/upload
 github.com/owncloud/reva/v2/pkg/user
 github.com/owncloud/reva/v2/pkg/user/manager/demo
 github.com/owncloud/reva/v2/pkg/user/manager/json
