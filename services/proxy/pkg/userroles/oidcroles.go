@@ -3,7 +3,10 @@ package userroles
 import (
 	"context"
 	"errors"
+	"fmt"
+	"maps"
 	"regexp"
+	"slices"
 	"sync"
 	"time"
 
@@ -15,8 +18,23 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/utils"
+	"github.com/rs/zerolog"
 	"go-micro.dev/v4/metadata"
 )
+
+// ErrNoRoleAssigned is returned by UpdateUserRoleAssignment when the user's claims
+// yield no ocis role and no default role is configured. It is a property of the
+// user's account rather than a server-side failure, so callers should report it as
+// such instead of as a generic internal error.
+var ErrNoRoleAssigned = errors.New("no role in claim maps to an ocis role and no default role is configured")
+
+// ErrRolesClaimNotSet is returned by extractRoles when the token carries no roles for
+// this user at all: the configured claim is absent, or present and null. The token is
+// well formed and simply says nothing about roles, which is the normal shape for users
+// federated into the IDP from an external directory. It is deliberately distinct from
+// the errors returned for a claim that is present and unreadable - only one of the two
+// is a sign that something is wrong.
+var ErrRolesClaimNotSet = errors.New("no roles claim in user claims")
 
 type oidcRoleAssigner struct {
 	Options
@@ -44,12 +62,22 @@ func extractRoles(rolesClaim string, claims map[string]interface{}) (map[string]
 		return claimRoles, nil
 	}
 
-	claim, err := oidc.WalkSegments(oidc.SplitWithEscaping(rolesClaim, ".", "\\"), claims)
+	segments := oidc.SplitWithEscaping(rolesClaim, ".", "\\")
+	claim, err := oidc.WalkSegments(segments, claims)
 	if err != nil {
+		// A segment that is simply not in the token means the token is silent about
+		// roles. A segment that is present but cannot be descended into means it says
+		// something about them that we cannot make sense of, which is a real error.
+		if errors.Is(err, oidc.ErrMissingClaim) {
+			return nil, ErrRolesClaimNotSet
+		}
 		return nil, err
 	}
 
 	switch v := claim.(type) {
+	case nil:
+		// The path resolved, but there is nothing at the end of it.
+		return nil, ErrRolesClaimNotSet
 	case []string:
 		for _, cr := range v {
 			claimRoles[cr] = struct{}{}
@@ -67,7 +95,7 @@ func extractRoles(rolesClaim string, claims map[string]interface{}) (map[string]
 	case string:
 		claimRoles[v] = struct{}{}
 	default:
-		return nil, errors.New("no roles in user claims")
+		return nil, fmt.Errorf("roles claim %q holds an unusable %T", rolesClaim, claim)
 	}
 
 	return claimRoles, nil
@@ -108,16 +136,27 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 
 	roleIDFromClaim := roleNamesToRoleIDs[overwriteRole]
 	if overwriteRole == "" {
+		// A token that says nothing about roles and a token we cannot read are two
+		// different situations and are handled differently: the first falls back to
+		// the configured default role, the second is reported.
 		claimRoles, err := extractRoles(ra.rolesClaim, claims)
-		if err != nil {
-			logger.Error().Err(err).Str("Claim", ra.rolesClaim).Interface("claims", claims).Msg("Error mapping role names to role ids")
+		switch {
+		case errors.Is(err, ErrRolesClaimNotSet):
+			// The token is well formed and carries no roles for this user. This is the
+			// common case when users are federated into the IDP from an external
+			// directory and simply have no role attached, and it is what this login
+			// path exists to serve: fall through to the role mapping and the default
+			// role below.
+			logger.Debug().Str("Claim", ra.rolesClaim).Msg("No roles claim in user claims")
+			claimRoles = nil
+		case err != nil:
+			// The claim is present and unreadable, so something is wrong with the
+			// token or with PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM. Signing the user in on
+			// the default role would paper over it, so report it instead.
+			logger.Error().Err(err).Str("Claim", ra.rolesClaim).Msg("Could not extract roles from claims")
 			return nil, err
-		}
-
-		if len(claimRoles) == 0 {
-			err := errors.New("no roles set in claim")
-			logger.Error().Err(err).Msg("")
-			return nil, err
+		case len(claimRoles) == 0:
+			logger.Debug().Str("Claim", ra.rolesClaim).Msg("No roles set in claim")
 		}
 
 		// the roleMapping config is supposed to have the role mappings ordered from the highest privileged role
@@ -132,9 +171,10 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 		}
 
 		if roleIDFromClaim == "" {
-			err := errors.New("no role in claim maps to an ocis role")
-			logger.Error().Err(err).Msg("")
-			return nil, err
+			roleIDFromClaim, err = ra.fallbackRoleID(logger, roleNamesToRoleIDs, claimRoles)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -203,6 +243,40 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 
 	user.Opaque = utils.AppendJSONToOpaque(user.Opaque, "roles", []string{roleIDFromClaim})
 	return user, nil
+}
+
+// fallbackRoleID resolves the configured default role for a user whose claims matched
+// no role mapping. It returns ErrNoRoleAssigned when no default role is configured, and
+// a descriptive error when one is configured but does not exist in the settings
+// service - a misconfiguration is worth reporting differently from a user without a
+// role, because only one of the two is fixed by editing the deployment.
+func (ra oidcRoleAssigner) fallbackRoleID(logger zerolog.Logger, roleNamesToRoleIDs map[string]string, claimRoles map[string]struct{}) (string, error) {
+	if ra.defaultRole == "" {
+		logger.Error().
+			Str("claim", ra.rolesClaim).
+			Strs("claimValues", slices.Sorted(maps.Keys(claimRoles))).
+			Interface("roleMapping", ra.roleMapping).
+			Msg("No role mapping matched the user's claim and PROXY_ROLE_ASSIGNMENT_OIDC_DEFAULT_ROLE is not set. " +
+				"Add a matching entry to the role mapping, or set a default role to let such users log in.")
+		return "", ErrNoRoleAssigned
+	}
+
+	roleID := roleNamesToRoleIDs[ra.defaultRole]
+	if roleID == "" {
+		err := fmt.Errorf("the configured default role %q does not exist", ra.defaultRole)
+		logger.Error().Err(err).
+			Strs("knownRoles", slices.Sorted(maps.Keys(roleNamesToRoleIDs))).
+			Msg("PROXY_ROLE_ASSIGNMENT_OIDC_DEFAULT_ROLE names a role that the settings service does not know")
+		return "", err
+	}
+
+	logger.Warn().
+		Str("claim", ra.rolesClaim).
+		Strs("claimValues", slices.Sorted(maps.Keys(claimRoles))).
+		Str("ocisRole", ra.defaultRole).
+		Msg("No role mapping matched the user's claim, assigning the configured default role. " +
+			"Add a matching entry to PROXY_ROLE_ASSIGNMENT_OIDC_ROLE_MAPPING if this user should get a different role.")
+	return roleID, nil
 }
 
 // ApplyUserRole it looks up the user's role in the settings service and adds it

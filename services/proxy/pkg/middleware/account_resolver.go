@@ -190,6 +190,17 @@ func (m accountResolver) resolveUserFromClaims(w http.ResponseWriter, req *http.
 		role = m.guestRoleName
 	}
 	user, err = m.userRoleAssigner.UpdateUserRoleAssignment(ctx, user, claims, role)
+	if errors.Is(err, userroles.ErrNoRoleAssigned) {
+		// The user authenticated successfully but has no role in this instance. That is
+		// a property of their account, not a server error, so report it as one: a 500
+		// here is indistinguishable from a broken deployment and leaves the user
+		// clicking "log in again" in a loop with nothing actionable anywhere.
+		m.logger.Error().Err(err).
+			Str("userid", user.GetId().GetOpaqueId()).
+			Msg("User has no role in this instance. Check the proxy role assignment configuration.")
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
 	if err != nil {
 		m.logger.Error().Err(err).Msg("Could not get user roles")
 		w.WriteHeader(http.StatusInternalServerError)
