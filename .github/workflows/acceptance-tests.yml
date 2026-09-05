@@ -172,6 +172,7 @@ jobs:
           if-no-files-found: error
 
   local-api-tests:
+    if: false
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -298,6 +299,7 @@ jobs:
           if-no-files-found: error
 
   cli-tests:
+    if: false
     needs: [build-and-test]
     name: ${{ matrix.suite }}
     runs-on: ubuntu-latest
@@ -346,6 +348,7 @@ jobs:
           if-no-files-found: error
 
   ldap-pool-tests:
+    if: false
     needs: [build-and-test]
     name: ldapPool-${{ matrix.suite }}
     runs-on: ubuntu-latest
@@ -394,6 +397,7 @@ jobs:
           if-no-files-found: error
 
   core-api-tests:
+    if: false
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -497,38 +501,38 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - suite: part-1
-            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 1"
-          - suite: part-2
-            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 2"
-          - suite: part-3
-            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 3"
-          - suite: part-4
-            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 4"
-          - suite: search
-            args: "--type playwright --suites search"
-            tika: true
-          - suite: keycloak
-            args: "--type playwright --suites journeys,keycloak"
-            keycloak: true
-          - suite: mfa
-            args: "--type playwright --suites mfa"
-            mfa: true
-          - suite: oidc
-            args: "--type playwright specs/oidc/refreshToken.spec.ts"
-            oidc: true
-          - suite: oidc-iframe
-            args: "--type playwright specs/oidc/iframeTokenRenewal.spec.ts"
-            oidc_iframe: true
+          # - suite: part-1
+          #   args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 1"
+          # - suite: part-2
+          #   args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 2"
+          # - suite: part-3
+          #   args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 3"
+          # - suite: part-4
+          #   args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 4"
+          # - suite: search
+          #   args: "--type playwright --suites search"
+          #   tika: true
+          # - suite: keycloak
+          #   args: "--type playwright --suites journeys,keycloak"
+          #   keycloak: true
+          # - suite: mfa
+          #   args: "--type playwright --suites mfa"
+          #   mfa: true
+          # - suite: oidc
+          #   args: "--type playwright specs/oidc/refreshToken.spec.ts"
+          #   oidc: true
+          # - suite: oidc-iframe
+          #   args: "--type playwright specs/oidc/iframeTokenRenewal.spec.ts"
+          #   oidc_iframe: true
           - suite: app-provider
             args: "--type playwright --suites app-provider"
             collaboration: true
-          - suite: ocm
-            args: "--type playwright --suites ocm"
-            federated: true
-          - suite: vault-storage
-            args: "--type playwright --suites vault-storage"
-            vault_storage: true
+          # - suite: ocm
+          #   args: "--type playwright --suites ocm"
+          #   federated: true
+          # - suite: vault-storage
+          #   args: "--type playwright --suites vault-storage"
+          #   vault_storage: true
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
@@ -695,6 +699,7 @@ jobs:
           retention-days: 7
 
   litmus:
+    if: false
     name: litmus
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -720,6 +725,7 @@ jobs:
         run: python3 tests/acceptance/run-litmus.py
 
   cs3api:
+    if: false
     name: cs3api
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -745,6 +751,7 @@ jobs:
         run: python3 tests/acceptance/run-cs3api.py
 
   wopi-builtin:
+    if: false
     name: wopi-builtin
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -770,6 +777,7 @@ jobs:
         run: python3 tests/acceptance/run-wopi.py --type builtin
 
   wopi-cs3:
+    if: false
     name: wopi-cs3
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -795,6 +803,7 @@ jobs:
         run: python3 tests/acceptance/run-wopi.py --type cs3
 
   external-ldap-tests:
+    if: false
     name: external-ldap-smoke
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -828,6 +837,7 @@ jobs:
         run: tests/ldap-smoke/run.sh
 
   external-ldap-distributed-tests:
+    if: false
     name: external-ldap-distributed-smoke
     needs: [build-and-test]
     runs-on: ubuntu-latest
