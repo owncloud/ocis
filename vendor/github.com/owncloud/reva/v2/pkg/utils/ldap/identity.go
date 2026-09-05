@@ -23,9 +23,9 @@ import (
 	"strings"
 
 	identityUser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/go-ldap/ldap/v3"
 	"github.com/google/uuid"
+	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 )
@@ -329,8 +329,8 @@ func (i *Identity) IsLDAPUserInDisabledGroup(log *zerolog.Logger, lc ldap.Client
 func (i *Identity) GetLDAPUserGroups(log *zerolog.Logger, lc ldap.Client, userEntry *ldap.Entry) ([]string, error) {
 	var memberValue string
 
-	if strings.ToLower(i.Group.Objectclass) == "posixgroup" {
-		// posixGroup usually means that the member attribute just contains the username
+	if strings.ToLower(i.Group.Schema.Member) == "memberuid" {
+		// memberUid means that the member attribute just contains the username
 		memberValue = userEntry.GetEqualFoldAttributeValue(i.User.Schema.Username)
 	} else {
 		// In all other case we assume the member Attribute to contain full LDAP DNs
@@ -467,7 +467,7 @@ func (i *Identity) GetLDAPGroupMembers(log *zerolog.Logger, lc ldap.Client, grou
 	for _, member := range members {
 		var e *ldap.Entry
 		var err error
-		if strings.ToLower(i.Group.Objectclass) == "posixgroup" {
+		if strings.ToLower(i.Group.Schema.Member) == "memberuid" {
 			e, err = i.GetLDAPUserByAttribute(log, lc, "username", member)
 		} else {
 			e, err = i.GetLDAPUserByDN(log, lc, member)
