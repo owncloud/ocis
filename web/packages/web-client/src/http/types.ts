@@ -1,3 +1,5 @@
+import type { HttpHeaders } from './headers'
+
 export type ResponseType = 'json' | 'text' | 'blob' | 'arraybuffer' | 'none'
 
 export interface OnResponseArgs {
@@ -35,5 +37,5 @@ export interface HttpResponse<T = unknown> {
   data: T
   status: number
   statusText: string
-  headers: Headers
+  headers: HttpHeaders
 }

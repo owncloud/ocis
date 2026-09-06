@@ -19,7 +19,7 @@ describe('FetchClient', () => {
   const lastCall = () => fetchMock.mock.calls[0]
 
   describe('request envelope', () => {
-    it('returns data, status, statusText and native Headers', async () => {
+    it('returns data, status, statusText and headers', async () => {
       fetchMock.mockResolvedValue(jsonResponse({ some: 'value' }, { statusText: 'OK' }))
 
       const result = await new FetchClient().request<{ some: string }>('https://host/foo')
@@ -28,6 +28,15 @@ describe('FetchClient', () => {
       expect(result.status).toBe(200)
       expect(result.statusText).toBe('OK')
       expect(result.headers.get('Content-Type')).toBe('application/json')
+    })
+
+    it('trap 2: headers also answer to bracket access, as axios headers did', async () => {
+      fetchMock.mockResolvedValue(jsonResponse({}, { headers: { 'Lock-Token': '<token>' } }))
+
+      const result = await new FetchClient().request('https://host/foo')
+
+      expect(result.headers['lock-token']).toBe('<token>')
+      expect(result.headers['Lock-Token']).toBe('<token>')
     })
   })
 
@@ -64,6 +73,38 @@ describe('FetchClient', () => {
 
       expect(error.statusCode).toBe(502)
       expect(error.data).toBe('<html>gateway</html>')
+    })
+
+    it('keeps the axios error message, which callers may match on', async () => {
+      fetchMock.mockResolvedValue(new Response('{}', { status: 404, statusText: 'Not Found' }))
+
+      const error: HttpError = await new FetchClient().request('https://host/foo').catch((e) => e)
+
+      expect(error.message).toBe('Request failed with status code 404')
+    })
+
+    it('also exposes the body and headers under their axios names on response', async () => {
+      fetchMock.mockResolvedValue(
+        new Response(JSON.stringify({ error: 'nope' }), {
+          status: 429,
+          headers: { 'Retry-After': '30' }
+        })
+      )
+
+      const error: HttpError = await new FetchClient().request('https://host/foo').catch((e) => e)
+
+      expect((error.response as Response & { data: unknown }).data).toEqual({ error: 'nope' })
+      expect(error.response.headers['retry-after']).toBe('30')
+      expect(error.response.headers.get('retry-after')).toBe('30')
+    })
+
+    it('leaves the error response body unread', async () => {
+      fetchMock.mockResolvedValue(new Response('{"error":"nope"}', { status: 400 }))
+
+      const error: HttpError = await new FetchClient().request('https://host/foo').catch((e) => e)
+
+      expect(error.response.bodyUsed).toBe(false)
+      await expect(error.response.json()).resolves.toEqual({ error: 'nope' })
     })
 
     it('returns the envelope instead of throwing when throwOnError is false', async () => {
@@ -261,6 +302,15 @@ describe('FetchClient', () => {
       const result = await new FetchClient().request('https://host/foo')
 
       expect(result.data).toBeUndefined()
+    })
+
+    it('falls back to the raw body when a default-responseType body is not json', async () => {
+      const multistatus = '<?xml version="1.0"?><d:multistatus xmlns:d="DAV:" />'
+      fetchMock.mockResolvedValue(new Response(multistatus, { status: 207 }))
+
+      const result = await new FetchClient().request('https://host/foo', { method: 'REPORT' })
+
+      expect(result.data).toBe(multistatus)
     })
   })
 

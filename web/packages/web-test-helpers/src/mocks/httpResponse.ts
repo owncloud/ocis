@@ -1,4 +1,4 @@
-import { HttpError, type HttpResponse } from '@ownclouders/web-client'
+import { HttpError, httpHeaders, type HttpResponse } from '@ownclouders/web-client'
 
 /**
  * Builds the envelope HttpClient resolves with.
@@ -18,7 +18,7 @@ export const mockHttpResponse = <T>(
   data,
   status,
   statusText,
-  headers: new Headers(headers)
+  headers: httpHeaders(new Headers(headers))
 })
 
 /**
@@ -31,3 +31,16 @@ export const mockHttpError = (
   message = ''
 ): Promise<never> =>
   Promise.reject(new HttpError(message, new Response(null, { status }), status, data))
+
+/**
+ * @deprecated use {@link mockHttpResponse}. Kept so that suites written against the axios
+ * era keep compiling; the envelope it returns is the same one.
+ */
+export const mockAxiosResolve = <T>(data: T = {} as T): HttpResponse<T> => mockHttpResponse(data)
+
+/**
+ * @deprecated use {@link mockHttpError}, which carries a status and a body. This rejects
+ * with a bare `Error`, exactly as it did before.
+ */
+export const mockAxiosReject = <T = never>(message = ''): Promise<T> =>
+  Promise.reject(new Error(message))

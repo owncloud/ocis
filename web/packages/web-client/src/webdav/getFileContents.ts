@@ -39,9 +39,10 @@ export const GetFileContentsFactory = (dav: DAV, { httpClient }: WebDavOptions) 
           response,
           body: response.data,
           headers: {
-            ETag: response.headers.get('etag'),
-            'OC-ETag': response.headers.get('oc-etag'),
-            'OC-FileId': response.headers.get('oc-fileid')
+            // bracket access, not get(): an absent header stays undefined here rather than null
+            ETag: response.headers['etag'],
+            'OC-ETag': response.headers['oc-etag'],
+            'OC-FileId': response.headers['oc-fileid']
           }
         }
       } catch (error) {

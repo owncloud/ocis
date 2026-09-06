@@ -1,4 +1,5 @@
 import { HttpError } from '../errors'
+import { httpHeaders } from './headers'
 import type { FetchClientOptions, FetchRequestOptions, HttpResponse, ResponseType } from './types'
 
 const isBodyInit = (value: unknown): value is BodyInit =>
@@ -61,7 +62,7 @@ export class FetchClient {
       data: (await this.readBody(response, options.responseType)) as T,
       status: response.status,
       statusText: response.statusText,
-      headers: response.headers
+      headers: httpHeaders(response.headers)
     }
   }
 
@@ -89,8 +90,16 @@ export class FetchClient {
   private async buildError(response: Response): Promise<HttpError> {
     // Clone so that HttpError.response still exposes an unread body to callers.
     const data = await this.readBodySafely(response.clone())
+
+    // `error.data` and `error.statusCode` are this repo's convention, but `error.response`
+    // is reachable from outside it, where `.response.data` and `.response.headers['x']`
+    // were the only spellings. Keep those working too; the `headers` override shadows the
+    // prototype accessor with a superset of it.
+    Object.defineProperty(response, 'data', { value: data })
+    Object.defineProperty(response, 'headers', { value: httpHeaders(response.headers) })
+
     return new HttpError(
-      response.statusText || `Request failed with status ${response.status}`,
+      `Request failed with status code ${response.status}`,
       response,
       response.status,
       data
@@ -99,16 +108,9 @@ export class FetchClient {
 
   private async readBodySafely(response: Response): Promise<unknown> {
     try {
-      const text = await response.text()
-      if (!text) {
-        return undefined
-      }
-      try {
-        return JSON.parse(text)
-      } catch {
-        return text
-      }
+      return await this.readBody(response)
     } catch {
+      // an unreadable body must not replace the HTTP error with a read error
       return undefined
     }
   }
@@ -127,7 +129,17 @@ export class FetchClient {
         return await response.arrayBuffer()
       default: {
         const text = await response.text()
-        return text ? JSON.parse(text) : undefined
+        if (!text) {
+          return undefined
+        }
+        try {
+          return JSON.parse(text)
+        } catch {
+          // A caller that does not set a responseType still expects the raw body for a
+          // non-JSON response — a WebDAV multistatus, say. Axios did the same, and
+          // throwing here would turn a working request into a SyntaxError.
+          return text
+        }
       }
     }
   }
