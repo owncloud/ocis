@@ -1135,3 +1135,88 @@ Feature: collaboration (wopi)
       | app-endpoint                                                                                | template      | target        |
       | /app/open?file_id=<<FILEID>>&app_name=Collabora&view_mode=write&template_id=<<TEMPLATEID>>  | template.ott  | template.odt  |
       | /app/open?file_id=<<FILEID>>&app_name=OnlyOffice&view_mode=write&template_id=<<TEMPLATEID>> | template.dotx | template.docx |
+
+
+  Scenario Outline: lock request on file opened with different view modes
+    Given user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
+    And user "Alice" has sent the following app-open request:
+      | resource  | simple.odt  |
+      | space     | Personal    |
+      | app       | FakeOffice  |
+      | viewMode  | <view-mode> |
+    When user "Alice" sends a lock request with lock id "abcdef123" to the last opened file using wopi endpoint
+    Then the HTTP status code should be "200"
+    Examples:
+      | view-mode |
+      | view      |
+      | read      |
+      | write     |
+
+
+  Scenario Outline:  lock request with different lock id on file opened with different view modes
+    Given user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
+    And user "Alice" has sent the following app-open request:
+      | resource  | simple.odt  |
+      | space     | Personal    |
+      | app       | FakeOffice  |
+      | viewMode  | <view-mode> |
+    When user "Alice" sends a lock request with lock id "abcdef123" to the last opened file using wopi endpoint
+    Then the HTTP status code should be "200"
+    When user "Alice" sends a lock request with lock id "different-lock-id" to the last opened file using wopi endpoint
+    Then the HTTP status code should be "<http-status-code>"
+    Examples:
+      | view-mode | http-status-code |
+      | view      | 200              |
+      | read      | 200              |
+      | write     | 409              |
+
+
+  Scenario: sharee with viewer permissions role sends lock request on shared file
+    Given user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | simple.odt |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    And user "Brian" has sent the following app-open request:
+      | resource | simple.odt |
+      | space    | Shares     |
+      | app      | FakeOffice |
+    When user "Brian" sends a lock request with lock id "abcdef123" to the last opened file using wopi endpoint
+    Then the HTTP status code should be "200"
+
+
+  Scenario: space viewer sends lock request on shared file
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "testFolder" in space "new-space"
+    And user "Alice" creates a file "simple.odt" inside folder "testFolder" in space "new-space" using wopi endpoint
+    And user "Alice" has sent the following space share invitation:
+      | space           | new-space    |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
+    And user "Brian" has sent the following app-open request:
+      | resource | testFolder/simple.odt |
+      | space    | new-space             |
+      | app      | FakeOffice            |
+    When user "Brian" sends a lock request with lock id "abcdef123" to the last opened file using wopi endpoint
+    Then the HTTP status code should be "200"
+
+
+  Scenario: public link viewer sends lock request on shared file
+    Given user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
+    And user "Alice" has created the following resource link share:
+      | resource        | simple.odt |
+      | space           | Personal   |
+      | permissionsRole | View       |
+      | password        | %public%   |
+    And the public has sent the following app-open request:
+      | owner    | Alice      |
+      | resource | simple.odt |
+      | space    | Personal   |
+      | app      | FakeOffice |
+    When the public sends a lock request with lock id "abcdef123" to the last opened file using wopi endpoint
+    Then the HTTP status code should be "200"
