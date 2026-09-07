@@ -122,8 +122,9 @@ Feature: service health check
 
   @env-config @issue-10661
   Scenario: check auth-bearer service health
-    And the administrator has started service "auth-bearer" separately with the following configs:
+    Given the following configs have been set:
       | config                 | value        |
+      | OCIS_ADD_RUN_SERVICES  | auth-bearer  |
       | AUTH_BEARER_DEBUG_ADDR | 0.0.0.0:9149 |
     When a user requests these URLs with "GET" and no authentication
       | endpoint                                | service     |
@@ -132,8 +133,9 @@ Feature: service health check
 
   @env-config @issue-10661
   Scenario: check auth-bearer service readiness
-    And the administrator has started service "auth-bearer" separately with the following configs:
+    Given the following configs have been set:
       | config                 | value        |
+      | OCIS_ADD_RUN_SERVICES  | auth-bearer  |
       | AUTH_BEARER_DEBUG_ADDR | 0.0.0.0:9149 |
     When a user requests these URLs with "GET" and no authentication
       | endpoint                               | service     |
