@@ -46,6 +46,7 @@ class KeycloakHelper {
 		'offline_access' => 'e2145b30-bf6f-49fb-af3f-1b40168bfcef',
 	];
 	private static ?string $adminAccessToken = null;
+	private static ?int $adminAccessTokenExpiry = null;
 
 	/**
 	 * @return bool
@@ -72,6 +73,7 @@ class KeycloakHelper {
 	 */
 	public static function setAdminAccessToken(string $accessToken): void {
 		self::$adminAccessToken = $accessToken;
+		self::$adminAccessTokenExpiry = self::extractExpiry($accessToken);
 	}
 
 	/**
@@ -81,6 +83,26 @@ class KeycloakHelper {
 	 */
 	public static function resetAdminAccessToken(): void {
 		self::$adminAccessToken = null;
+		self::$adminAccessTokenExpiry = null;
+	}
+
+	/**
+	 * Decodes the "exp" claim from a JWT without verifying its signature - this token was just
+	 * issued by Keycloak itself, so it is trusted here purely to know when to refresh it.
+	 *
+	 * @param string $jwt
+	 *
+	 * @return int|null
+	 */
+	private static function extractExpiry(string $jwt): ?int {
+		$segments = \explode('.', $jwt);
+		if (\count($segments) !== 3) {
+			return null;
+		}
+		$payload = \strtr($segments[1], '-_', '+/');
+		$payload .= \str_repeat('=', (4 - \strlen($payload) % 4) % 4);
+		$decoded = \json_decode((string)\base64_decode($payload), true);
+		return \is_array($decoded) && isset($decoded['exp']) ? (int)$decoded['exp'] : null;
 	}
 
 	/**
@@ -88,7 +110,14 @@ class KeycloakHelper {
 	 * @throws GuzzleException
 	 */
 	public static function getAdminAccessToken(): string {
-		if (self::$adminAccessToken === null) {
+		// refresh a bit before the actual expiry so a token that's barely valid doesn't get used
+		// for a request that then takes a few seconds to reach the server. This is only a
+		// first line of defense - the real safety net is the retry-on-401 wrapped around every
+		// admin API call below, since a scenario that restarts oCIS can take an unpredictable
+		// amount of time depending on the environment (a single k8s pod's rolling restart vs. a
+		// full single-binary process restart)
+		$expiringSoon = self::$adminAccessTokenExpiry !== null && self::$adminAccessTokenExpiry - 10 < \time();
+		if (self::$adminAccessToken === null || $expiringSoon) {
 			self::setAdminAccessToken(self::generateAdminAccessToken());
 		}
 
@@ -101,6 +130,27 @@ class KeycloakHelper {
 	 */
 	private static function getAuthorizationHeader(): array {
 		return [ 'Authorization' => 'Bearer ' . self::getAdminAccessToken() ];
+	}
+
+	/**
+	 * Runs an admin API request, retrying once with a freshly-generated token if the first
+	 * attempt comes back 401. This is the real safety net against a stale cached token - the
+	 * proactive expiry check in getAdminAccessToken() is just a first line of defense, since how
+	 * long a config-change scenario takes (and therefore whether the cached token survives it)
+	 * varies by environment in a way that a fixed margin cannot reliably predict.
+	 *
+	 * @param callable(array<string, string>): ResponseInterface $sendRequest
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	private static function sendAdminRequest(callable $sendRequest): ResponseInterface {
+		$response = $sendRequest(self::getAuthorizationHeader());
+		if ($response->getStatusCode() === 401) {
+			self::resetAdminAccessToken();
+			$response = $sendRequest(self::getAuthorizationHeader());
+		}
+		return $response;
 	}
 
 	/**
@@ -134,16 +184,16 @@ class KeycloakHelper {
 		?string $displayName = null,
 	): ResponseInterface {
 		$url = self::getKeycloakUrl() . '/admin/realms/oCIS/users';
+		$body = self::prepareCreateUserPayload($username, $password, $email, $displayName);
 
-		return HttpRequestHelper::post(
-			$url,
-			null,
-			null,
-			array_merge(
-				self::getAuthorizationHeader(),
-				[ 'Content-Type' => 'application/json' ],
+		return self::sendAdminRequest(
+			static fn (array $authHeader): ResponseInterface => HttpRequestHelper::post(
+				$url,
+				null,
+				null,
+				array_merge($authHeader, [ 'Content-Type' => 'application/json' ]),
+				$body,
 			),
-			self::prepareCreateUserPayload($username, $password, $email, $displayName),
 		);
 	}
 
@@ -166,15 +216,15 @@ class KeycloakHelper {
 			self::getRealmRole($ocisRole),
 			self::getRealmRole('offline_access'),
 		];
-		return HttpRequestHelper::post(
-			$url,
-			null,
-			null,
-			array_merge(
-				self::getAuthorizationHeader(),
-				[ 'Content-Type' => 'application/json' ],
+		$encodedBody = json_encode($body, JSON_THROW_ON_ERROR);
+		return self::sendAdminRequest(
+			static fn (array $authHeader): ResponseInterface => HttpRequestHelper::post(
+				$url,
+				null,
+				null,
+				array_merge($authHeader, [ 'Content-Type' => 'application/json' ]),
+				$encodedBody,
 			),
-			json_encode($body, JSON_THROW_ON_ERROR),
 		);
 	}
 
@@ -196,15 +246,15 @@ class KeycloakHelper {
 		$body = [
 			self::getRealmRole($ocisRole),
 		];
-		return HttpRequestHelper::delete(
-			$url,
-			null,
-			null,
-			array_merge(
-				self::getAuthorizationHeader(),
-				[ 'Content-Type' => 'application/json' ],
+		$encodedBody = json_encode($body, JSON_THROW_ON_ERROR);
+		return self::sendAdminRequest(
+			static fn (array $authHeader): ResponseInterface => HttpRequestHelper::delete(
+				$url,
+				null,
+				null,
+				array_merge($authHeader, [ 'Content-Type' => 'application/json' ]),
+				$encodedBody,
 			),
-			json_encode($body, JSON_THROW_ON_ERROR),
 		);
 	}
 
@@ -399,11 +449,8 @@ class KeycloakHelper {
 	 */
 	public static function getRealm(): array {
 		$url = self::getKeycloakUrl() . '/admin/realms/oCIS';
-		$response = HttpRequestHelper::get(
-			$url,
-			null,
-			null,
-			self::getAuthorizationHeader(),
+		$response = self::sendAdminRequest(
+			static fn (array $authHeader): ResponseInterface => HttpRequestHelper::get($url, null, null, $authHeader),
 		);
 		if ($response->getStatusCode() !== 200) {
 			throw new Exception("Failed to get realm roles.");
@@ -424,15 +471,15 @@ class KeycloakHelper {
 		$attributes = $realm['attributes'] ?? [];
 		$attributes[$key] = $value;
 		$url = self::getKeycloakUrl() . '/admin/realms/oCIS';
-		return HttpRequestHelper::put(
-			$url,
-			null,
-			null,
-			array_merge(
-				self::getAuthorizationHeader(),
-				[ 'Content-Type' => 'application/json' ],
+		$body = json_encode(['attributes' => $attributes], JSON_THROW_ON_ERROR);
+		return self::sendAdminRequest(
+			static fn (array $authHeader): ResponseInterface => HttpRequestHelper::put(
+				$url,
+				null,
+				null,
+				array_merge($authHeader, [ 'Content-Type' => 'application/json' ]),
+				$body,
 			),
-			json_encode(['attributes' => $attributes], JSON_THROW_ON_ERROR),
 		);
 	}
 
@@ -448,15 +495,15 @@ class KeycloakHelper {
 		$attributes = $realm['attributes'] ?? [];
 		unset($attributes[$key]);
 		$url = self::getKeycloakUrl() . '/admin/realms/oCIS';
-		return HttpRequestHelper::put(
-			$url,
-			null,
-			null,
-			array_merge(
-				self::getAuthorizationHeader(),
-				[ 'Content-Type' => 'application/json' ],
+		$body = json_encode(['attributes' => $attributes], JSON_THROW_ON_ERROR);
+		return self::sendAdminRequest(
+			static fn (array $authHeader): ResponseInterface => HttpRequestHelper::put(
+				$url,
+				null,
+				null,
+				array_merge($authHeader, [ 'Content-Type' => 'application/json' ]),
+				$body,
 			),
-			json_encode(['attributes' => $attributes], JSON_THROW_ON_ERROR),
 		);
 	}
 
@@ -470,11 +517,8 @@ class KeycloakHelper {
 	 */
 	public static function getUserIdByUsername(string $username): string {
 		$url = self::getKeycloakUrl() . '/admin/realms/oCIS/users?username=' . \urlencode($username) . '&exact=true';
-		$response = HttpRequestHelper::get(
-			$url,
-			null,
-			null,
-			self::getAuthorizationHeader(),
+		$response = self::sendAdminRequest(
+			static fn (array $authHeader): ResponseInterface => HttpRequestHelper::get($url, null, null, $authHeader),
 		);
 		if ($response->getStatusCode() !== 200) {
 			throw new Exception("Failed to look up Keycloak user '$username', status: " . $response->getStatusCode());
@@ -499,11 +543,14 @@ class KeycloakHelper {
 	public static function deleteUserTotpCredentials(string $username): void {
 		$uuid = self::getUserIdByUsername($username);
 		$url = self::getKeycloakUrl() . '/admin/realms/oCIS/users/' . $uuid . '/credentials';
-		$response = HttpRequestHelper::get(
-			$url,
-			null,
-			null,
-			self::getAuthorizationHeader(),
+		$response = self::sendAdminRequest(
+			static fn (array $authHeader): ResponseInterface =>
+			HttpRequestHelper::get(
+				$url,
+				null,
+				null,
+				$authHeader,
+			),
 		);
 		if ($response->getStatusCode() !== 200) {
 			throw new Exception("Failed to list credentials for Keycloak user '$username'.");
@@ -514,11 +561,14 @@ class KeycloakHelper {
 				$deleteUrl = self::getKeycloakUrl()
 					. '/admin/realms/oCIS/users/' . $uuid
 					. '/credentials/' . $credential['id'];
-				HttpRequestHelper::delete(
-					$deleteUrl,
-					null,
-					null,
-					self::getAuthorizationHeader(),
+				self::sendAdminRequest(
+					static fn (array $authHeader): ResponseInterface =>
+					HttpRequestHelper::delete(
+						$deleteUrl,
+						null,
+						null,
+						$authHeader,
+					),
 				);
 			}
 		}
@@ -532,11 +582,14 @@ class KeycloakHelper {
 	 */
 	public static function deleteKeycloakUser(string $uuid): ResponseInterface {
 		$url = self::getKeycloakUrl() . '/admin/realms/oCIS/users/' . $uuid;
-		return HttpRequestHelper::delete(
-			$url,
-			null,
-			null,
-			self::getAuthorizationHeader(),
+		return self::sendAdminRequest(
+			static fn (array $authHeader): ResponseInterface =>
+			HttpRequestHelper::delete(
+				$url,
+				null,
+				null,
+				$authHeader,
+			),
 		);
 	}
 }

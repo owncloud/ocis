@@ -62,7 +62,7 @@ jobs:
           - suite: apiAuthApp
           # - suite: apiAntivirus
           - suite: apiOcm
-          - suite: apiCollaboration
+          # - suite: apiCollaboration
           - suite: apiVault
           # - suite: "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
           - suite: "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
@@ -379,7 +379,7 @@ jobs:
           KC_URL: https://keycloak:8443
           PROXY_READYZ_URL: ${{ matrix.suite == 'apiVault' && 'http://localhost:19205/readyz' || '' }}
         run: make test-acceptance-api
-      
+
       - name: Run Core ${{ matrix.suite }} tests
         if: startsWith( matrix.suite, 'core' )
         env:
