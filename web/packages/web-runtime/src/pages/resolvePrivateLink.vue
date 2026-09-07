@@ -46,7 +46,8 @@ import {
   useRouteQuery,
   createLocationSpaces,
   createLocationShares,
-  useClientService
+  useClientService,
+  useCapabilityStore
 } from '@ownclouders/web-pkg'
 import { unref, defineComponent, computed, onMounted, ref, Ref } from 'vue'
 import { dirname } from 'path'
@@ -61,8 +62,10 @@ export default defineComponent({
   setup() {
     const router = useRouter()
     const id = useRouteParam('fileId')
+    const scope = useRouteParam('scope')
     const { $gettext } = useGettext()
     const clientService = useClientService()
+    const capabilityStore = useCapabilityStore()
 
     const resource: Ref<Resource> = ref()
     const sharedParentResource: Ref<Resource> = ref()
@@ -83,13 +86,34 @@ export default defineComponent({
     })
 
     const resolvePrivateLinkTask = useTask(function* (signal, id) {
+      // vault file but non-vault /f/ URL: hard-reload into /vault so the vault client
+      // base URLs are picked up (they are derived from the URL at boot). The MFA
+      // step-up is enforced by the authService guard on the vault scope, which also
+      // fires on a router.push, so it is not the reason for the full reload.
+      if (
+        capabilityStore.vaultEnabled &&
+        id?.split('$')[0] === capabilityStore.vaultStorageProvider &&
+        unref(scope) !== 'vault'
+      ) {
+        window.location.replace(
+          router.resolve({
+            name: 'resolvePrivateLink',
+            params: { scope: 'vault', fileId: id },
+            query: router.currentRoute.value.query
+          }).href
+        )
+        return
+      }
+
       if (
         [
           `${SHARE_JAIL_ID}$${SHARE_JAIL_ID}!${SHARE_JAIL_ID}`,
           `${SHARE_JAIL_ID}$${SHARE_JAIL_ID}`
         ].includes(id)
       ) {
-        return router.push(createLocationShares('files-shares-with-me'))
+        return router.push(
+          createLocationShares('files-shares-with-me', { params: { scope: unref(scope) } })
+        )
       }
 
       let result: Awaited<ReturnType<typeof getResourceContext>>
@@ -140,7 +164,7 @@ export default defineComponent({
       const { params, query } = createFileRouteOptions(space, { fileId, path })
       const openWithDefault = unref(openWithDefaultApp) !== 'false' && !unref(details)
 
-      targetLocation.params = params
+      targetLocation.params = { ...params, scope: unref(scope) }
       targetLocation.query = {
         ...query,
         scrollTo: unref(resource).fileId,
@@ -156,9 +180,10 @@ export default defineComponent({
       return !resolvePrivateLinkTask.last || resolvePrivateLinkTask.isRunning
     })
 
-    const sharedWithMeRoute = computed(() => {
-      return { name: 'files-shares-with-me' }
-    })
+    const sharedWithMeRoute = computed(() => ({
+      name: 'files-shares-with-me',
+      params: { scope: unref(scope) }
+    }))
 
     const openSharedWithMeLabel = computed(() => {
       return $gettext('Open "Shared with me"')
