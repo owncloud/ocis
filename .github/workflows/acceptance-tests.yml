@@ -174,7 +174,6 @@ jobs:
   local-api-tests:
     name: ${{ matrix.suite }}
     needs: [build-and-test]
-    if: false # skipped — running only cliCommands
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
@@ -309,7 +308,7 @@ jobs:
       fail-fast: false
       matrix:
         suite:
-          - cliCommands
+          - cliCommands,apiServiceAvailability   # grouped: both need ClamAV + email services
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
@@ -351,7 +350,6 @@ jobs:
     name: ldapPool-${{ matrix.suite }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
-    if: false # skipped — running only cliCommands
     env:
       GOCOVERDIR: ${{ github.workspace }}/coverage-reports
     strategy:
@@ -400,7 +398,6 @@ jobs:
     needs: [build-and-test]
     runs-on: ubuntu-latest
     timeout-minutes: 120
-    if: false # skipped — running only cliCommands
     env:
       GOCOVERDIR: ${{ github.workspace }}/coverage-reports
     strategy:
@@ -496,7 +493,6 @@ jobs:
     needs: [build-and-test]
     runs-on: ubuntu-latest
     timeout-minutes: 120
-    if: false # skipped — running only cliCommands
     strategy:
       fail-fast: false
       matrix:
@@ -703,7 +699,6 @@ jobs:
     needs: [build-and-test]
     runs-on: ubuntu-latest
     timeout-minutes: 120
-    if: false # skipped — running only cliCommands
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
@@ -729,7 +724,6 @@ jobs:
     needs: [build-and-test]
     runs-on: ubuntu-latest
     timeout-minutes: 120
-    if: false # skipped — running only cliCommands
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
@@ -755,7 +749,6 @@ jobs:
     needs: [build-and-test]
     runs-on: ubuntu-latest
     timeout-minutes: 120
-    if: false # skipped — running only cliCommands
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
@@ -781,7 +774,6 @@ jobs:
     needs: [build-and-test]
     runs-on: ubuntu-latest
     timeout-minutes: 120
-    if: false # skipped — running only cliCommands
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
@@ -807,7 +799,6 @@ jobs:
     needs: [build-and-test]
     runs-on: ubuntu-latest
     timeout-minutes: 120
-    if: false # skipped — running only cliCommands
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
@@ -841,7 +832,6 @@ jobs:
     needs: [build-and-test]
     runs-on: ubuntu-latest
     timeout-minutes: 120
-    if: false # skipped — running only cliCommands
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
@@ -870,7 +860,7 @@ jobs:
 
   acceptance-coverage:
     name: acceptance-coverage
-    needs: [cli-tests]
+    needs: [local-api-tests, cli-tests, ldap-pool-tests, core-api-tests]
     if: always() && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     env:
@@ -910,7 +900,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   all-acceptance-tests:
-    needs: [detect-changes, cli-tests]
+    needs: [detect-changes, local-api-tests, cli-tests, ldap-pool-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests, external-ldap-tests, external-ldap-distributed-tests]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: always()
