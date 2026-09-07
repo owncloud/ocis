@@ -932,26 +932,15 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return string
 	 */
 	private static function getSystemTimezone(): string {
-		$timezone = '';
-		$envTimezone = \getenv('TZ');
-		if ($envTimezone !== false && $envTimezone !== '') {
-			// a leading colon is valid POSIX (TZ=:Asia/Kathmandu) but is rejected by DateTimeZone
-			$timezone = \ltrim($envTimezone, ':');
-		} else {
-			$localtime = @\readlink('/etc/localtime');
-			if ($localtime !== false && \preg_match('#/zoneinfo/(.+)$#', $localtime, $matches)) {
-				$timezone = $matches[1];
-			} elseif (\is_readable('/etc/timezone')) {
-				// some distributions ship /etc/localtime as a copy instead of a symlink
-				$timezone = \trim((string)\file_get_contents('/etc/timezone'));
-			}
-		}
-		if ($timezone === '') {
-			return 'UTC';
-		}
-		try {
-			new DateTimeZone($timezone);
-		} catch (Throwable $e) {
+		// resolved the same way Go resolves time.Local for the oCIS server: TZ first (a
+		// leading colon is valid POSIX but not for DateTimeZone), then /etc/localtime.
+		$timezone = \ltrim((string)\getenv('TZ'), ':')
+			?: \preg_replace('#^.*/zoneinfo/#', '', (string)@\readlink('/etc/localtime'));
+		if (!@\timezone_open($timezone)) {
+			\error_log(
+				"INFORMATION: could not determine the host timezone from TZ or " .
+				"/etc/localtime ('$timezone'), assuming UTC.",
+			);
 			return 'UTC';
 		}
 		return $timezone;
