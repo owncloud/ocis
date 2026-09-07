@@ -457,7 +457,7 @@ class FeatureContext extends BehatVariablesContext {
 		$this->regularUserPassword = $regularUserPassword;
 		$this->currentServer = 'LOCAL';
 		$this->cookieJar = new CookieJar();
-		$this->expiryDateTime = new DateTime('yesterday');
+		$this->expiryDateTime = new DateTime('yesterday', new DateTimeZone(self::getSystemTimezone()));
 
 		// These passwords are referenced in tests and can be overridden by
 		// setting environment variables.
@@ -916,6 +916,45 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function formatExpiryDateTime(string $format = 'Y-m-d H:i:sP'): string {
 		return $this->getExpiryDateTime()->format($format);
+	}
+
+	/**
+	 * Returns the timezone of the host running the tests.
+	 *
+	 * The oCIS server formats expiry timestamps in its local timezone, but PHP defaults
+	 * to UTC no matter what the host is set to. On a host that is not UTC those two
+	 * disagree, and expected values built from the expiry date no longer match the
+	 * timestamps oCIS renders in notifications and emails. Building the expiry date in
+	 * the host timezone keeps both sides in step. This assumes the tests and the oCIS
+	 * server share a timezone, which holds when they run on the same host and in CI
+	 * where both are UTC.
+	 *
+	 * @return string
+	 */
+	private static function getSystemTimezone(): string {
+		$timezone = '';
+		$envTimezone = \getenv('TZ');
+		if ($envTimezone !== false && $envTimezone !== '') {
+			// a leading colon is valid POSIX (TZ=:Asia/Kathmandu) but is rejected by DateTimeZone
+			$timezone = \ltrim($envTimezone, ':');
+		} else {
+			$localtime = @\readlink('/etc/localtime');
+			if ($localtime !== false && \preg_match('#/zoneinfo/(.+)$#', $localtime, $matches)) {
+				$timezone = $matches[1];
+			} elseif (\is_readable('/etc/timezone')) {
+				// some distributions ship /etc/localtime as a copy instead of a symlink
+				$timezone = \trim((string)\file_get_contents('/etc/timezone'));
+			}
+		}
+		if ($timezone === '') {
+			return 'UTC';
+		}
+		try {
+			new DateTimeZone($timezone);
+		} catch (Throwable $e) {
+			return 'UTC';
+		}
+		return $timezone;
 	}
 
 	/**
