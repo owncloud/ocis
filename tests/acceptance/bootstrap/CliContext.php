@@ -1332,7 +1332,20 @@ class CliContext implements Context {
 	 */
 	private function findNewestBlobPath(): string {
 		$storageRoot = $this->featureContext->getStorageUsersRoot();
-		$blobDirs = \glob($storageRoot . '/spaces/*/*/blobs', GLOB_ONLYDIR) ?: [];
+		// Async postprocessing may not have moved the blob to its final
+		// location yet — poll until the directory appears or we give up.
+		$blobDirs = [];
+		$retried = 0;
+		do {
+			$blobDirs = \glob($storageRoot . '/spaces/*/*/blobs', GLOB_ONLYDIR) ?: [];
+			if (!empty($blobDirs)) {
+				break;
+			}
+			$retried++;
+			echo "Blobstore directories not found under $storageRoot, retrying ($retried)...\n";
+			\usleep(500 * 1000);
+		} while ($retried < STANDARD_RETRY_COUNT);
+
 		Assert::assertNotEmpty($blobDirs, "No blobstore directory found under $storageRoot");
 
 		$newestPath = null;
