@@ -224,8 +224,10 @@ func setServiceEnv(service string, envMap []string, errMsgPrefix string) (bool, 
 	// not on kubectl ever reconciling it). Strip any existing entries for every key this call
 	// touches first, in its own invocation, so the actual set below always starts from a clean
 	// (zero-or-one-entry) state instead of leaving kubectl to reconcile a pre-existing
-	// duplicate on its own. Removing a key that isn't set is a no-op, so this is safe to do
-	// unconditionally.
+	// duplicate on its own. This is best-effort: kubectl errors on `KEY-` when the key isn't
+	// currently set at all (the common case for a var touched here for the first time), which
+	// is already the clean slate this step is trying to achieve, so that failure is expected
+	// and must not block the actual set below.
 	removalArgs := []string{}
 	seenKeys := map[string]bool{}
 	for _, env := range envMap {
@@ -242,8 +244,7 @@ func setServiceEnv(service string, envMap []string, errMsgPrefix string) (bool, 
 			if exitErr, ok := err.(*exec.ExitError); ok {
 				errMsg = strings.TrimSpace(string(exitErr.Stderr))
 			}
-			log.Println(fmt.Sprintf("[%s] Failed to pre-remove existing envs before setting them. %s", service, errMsg))
-			return false, true, fmt.Errorf("error removing existing env before set")
+			log.Println(fmt.Sprintf("[%s] Pre-remove before set found nothing to remove (expected when a key is new): %s", service, errMsg))
 		}
 	}
 
