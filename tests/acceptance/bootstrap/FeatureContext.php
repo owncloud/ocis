@@ -921,19 +921,14 @@ class FeatureContext extends BehatVariablesContext {
 	/**
 	 * Returns the timezone of the host running the tests.
 	 *
-	 * The oCIS server formats expiry timestamps in its local timezone, but PHP defaults
-	 * to UTC no matter what the host is set to. On a host that is not UTC those two
-	 * disagree, and expected values built from the expiry date no longer match the
-	 * timestamps oCIS renders in notifications and emails. Building the expiry date in
-	 * the host timezone keeps both sides in step. This assumes the tests and the oCIS
-	 * server share a timezone, which holds when they run on the same host and in CI
-	 * where both are UTC.
+	 * The oCIS server renders expiry timestamps in its local timezone, but PHP never reads
+	 * the host timezone and falls back to UTC unless date.timezone is set. On a non-UTC
+	 * host the two disagree, so building the expiry in the host timezone keeps them in
+	 * step. This assumes tests and server share a timezone, true on one host and in CI.
 	 *
 	 * @return string
 	 */
 	private static function getSystemTimezone(): string {
-		// resolved the same way Go resolves time.Local for the oCIS server: TZ first (a
-		// leading colon is valid POSIX but not for DateTimeZone), then /etc/localtime.
 		$timezone = \ltrim((string)\getenv('TZ'), ':')
 			?: \preg_replace('#^.*/zoneinfo/#', '', (string)@\readlink('/etc/localtime'));
 		if (!@\timezone_open($timezone)) {
