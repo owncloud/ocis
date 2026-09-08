@@ -125,6 +125,7 @@ Feature: List upload sessions via CLI command
       | antivirus      | ANTIVIRUS_INFECTED_FILE_HANDLING | abort     |
     And user "Alice" has uploaded file "filesForUpload/filesWithVirus/eicar.com" to "/virusFile.txt"
     And the config "POSTPROCESSING_DELAY" has been set to "10s" for "postprocessing" service
+    And the administrator has waited until the file "virusFile.txt" has finished processing
     And user "Alice" has uploaded file with content "upload content" to "/file1.txt"
     When the administrator cleans upload sessions with the following flags:
       | processing=false |
