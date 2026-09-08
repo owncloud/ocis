@@ -90,6 +90,18 @@ type PrepareUploadResult struct {
 	SizeDiff       int64
 }
 
+// RollbackInfo carries what a driver needs to undo PrepareUpload. NodeID and
+// ParentID come from the upload session rather than the node, so a rollback can
+// still release the quota of a node whose own metadata has become unreadable.
+type RollbackInfo struct {
+	NodeExisted bool // true when the target node had a prior version; drivers with nothing to undo for new nodes may no-op
+	SizeDiff    int64
+	NodeID      string
+	ParentID    string
+	Filename    string
+	Size        int64
+}
+
 // FS is the interface to implement access to the storage.
 type FS interface {
 	// Minimal set for a readonly storage driver
@@ -149,9 +161,9 @@ type FS interface {
 	// It is the inverse of PrepareUpload: restores previous metadata and reverts the optimistic
 	// size propagation. The caller (coordinator) is responsible for unmarking the processing flag
 	// and deleting the upload session files. Drivers that performed no work in PrepareUpload may return nil.
-	// nodeExisted indicates whether the target node had a prior version; drivers that have nothing
-	// to undo for new nodes may no-op when nodeExisted is false.
-	RollbackUpload(ctx context.Context, ref *provider.Reference, sessionID string, nodeExisted bool, sizeDiff int64) error
+	// Callers must keep the session on a returned error: the rollback is retryable and info
+	// carries state the driver cannot recover once the session files are gone.
+	RollbackUpload(ctx context.Context, ref *provider.Reference, sessionID string, info RollbackInfo) error
 
 	// Revisions
 

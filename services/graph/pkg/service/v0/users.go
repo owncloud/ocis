@@ -352,7 +352,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	if !hasAcceptableFilter(odataReq.Query) {
 		if !ctxHasFullPerms {
-			// regular users are allowed to filter only by userType
+			// regular users are allowed to filter only by userType or vaultEligible
 			logger.Debug().Interface("query", r.URL.Query()).Msg("forbidden filter for a regular user")
 			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "filter has forbidden elements for regular users")
 			return
