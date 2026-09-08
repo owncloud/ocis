@@ -56,9 +56,7 @@ func RequireAdmin(rm *roles.Manager, logger log.Logger) func(next http.Handler) 
 	}
 }
 
-// RequireVaultPermission middleware requires the user in context to hold the vault mode permission
-// in one of their assigned roles. Users without it are denied outright, before any MFA challenge,
-// so that manipulating the URL to reach vault routes results in a hard 403 rather than an IdP step-up.
+// RequireVaultPermission middleware is used to require the user in context to have the vault mode permission
 func RequireVaultPermission(rm *roles.Manager, logger log.Logger) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		l := logger.With().Str("middleware", "requireVaultPermission").Logger()
@@ -90,7 +88,7 @@ func RequireVaultPermission(rm *roles.Manager, logger log.Logger) func(next http
 				}
 			}
 
-			// check if the vault mode permission is present in the roles of the authenticated account
+			// check if permission is present in roles of the authenticated account
 			if rm.FindPermissionByID(r.Context(), roleIDs, settingsdefaults.VaultModePermission(settingsdefaults.Own).GetId()) != nil {
 				next.ServeHTTP(w, r)
 				return

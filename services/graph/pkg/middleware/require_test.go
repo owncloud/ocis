@@ -19,8 +19,7 @@ import (
 	"go-micro.dev/v4/metadata"
 )
 
-// roleService wraps the generated MockRoleService and fills in the method it is missing,
-// so it satisfies the settingssvc.RoleService interface used by roles.Manager.
+// roleService adds the method the generated MockRoleService lacks, so it satisfies settingssvc.RoleService.
 type roleService struct {
 	settingssvc.MockRoleService
 }
@@ -33,7 +32,6 @@ func TestRequireVaultPermission(t *testing.T) {
 	const roleID = "role-1"
 	vaultPermissionID := settingsdefaults.VaultModePermission(settingsdefaults.Own).GetId()
 
-	// bundleWith returns a role bundle carrying the given permission ids as settings.
 	bundleWith := func(permissionIDs ...string) *settingsmsg.Bundle {
 		settings := make([]*settingsmsg.Setting, 0, len(permissionIDs))
 		for _, id := range permissionIDs {

@@ -131,10 +131,8 @@ export class AuthService implements AuthServiceInterface {
     }
 
     if (to.params.scope === 'vault') {
-      // Deny users whose role does not grant vault access, rather than handing them to the
-      // IdP for MFA step-up. Only enforce once the user context (and thus abilities) is
-      // established; on a cold load abilities aren't loaded here and the backend vault route
-      // guard is the security boundary.
+      // Deny users without vault access instead of handing them to the IdP for MFA. Abilities
+      // are only loaded once the user context is ready; on a cold load the backend guard applies.
       if (this.authStore.userContextReady && !this.ability.can('read-all', 'Vault')) {
         await this.router.push({
           name: 'accessDenied',

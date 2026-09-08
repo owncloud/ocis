@@ -450,9 +450,7 @@ describe('AuthService', () => {
 
       await authService.initializeContext(vaultRoute)
 
-      expect(pushSpy).not.toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'accessDenied' })
-      )
+      expect(pushSpy).not.toHaveBeenCalledWith(expect.objectContaining({ name: 'accessDenied' }))
       expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
     })
 
@@ -465,9 +463,7 @@ describe('AuthService', () => {
 
       await authService.initializeContext(vaultRoute)
 
-      expect(pushSpy).not.toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'accessDenied' })
-      )
+      expect(pushSpy).not.toHaveBeenCalledWith(expect.objectContaining({ name: 'accessDenied' }))
       expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
     })
   })

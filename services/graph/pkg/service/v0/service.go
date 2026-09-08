@@ -423,8 +423,6 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		requireVaultPermission := graphmw.RequireVaultPermission(roleManager, options.Logger)
 		m.Route("/vault/graph", func(r chi.Router) {
 			r.Use(autoprop.NewHttpHandler())
-			// deny users without the vault permission before any MFA challenge, so a role
-			// that must not reach vault gets a hard 403 instead of an IdP step-up
 			r.Use(requireVaultPermission)
 			r.Use(requireMFA)
 			r.Use(graphmw.VaultModeMiddleware())
