@@ -40,9 +40,10 @@ class SearchContext implements Context {
 	private FeatureContext $featureContext;
 
 	/**
-	 * Retry search until results are non-empty or timeout is reached.
-	 * Indexing of newly uploaded files in ocis is async, so a single
-	 * fixed sleep is not reliable — poll instead.
+	 * Search until the results show up.
+	 *
+	 * After a (re)start the search service answers with 5xx until it is ready,
+	 * and indexing of new uploads is async, so poll for both.
 	 *
 	 * @param string $user
 	 * @param string $pattern
@@ -65,51 +66,41 @@ class SearchContext implements Context {
 		?string $spaceName = null,
 		?TableNode $properties = null,
 	): ResponseInterface {
-		// The search service can lag behind the rest of oCIS after a (re)start and
-		// answers with 5xx until it is ready — poll until it answers HTTP 207 first.
-		// Initial wait 3s, then retry every 2s, up to ~61s total.
-		$response = null;
+		$search = fn (): ResponseInterface => $this->searchFiles(
+			$user,
+			$pattern,
+			$isVault,
+			$limit,
+			$scopeType,
+			$scope,
+			$spaceName,
+			$properties,
+		);
+
 		for ($attempt = 0; $attempt < SERVICE_READY_RETRY_COUNT; $attempt++) {
-			\sleep($attempt === 0 ? 3 : 2);
-			$response = $this->searchFiles(
-				$user,
-				$pattern,
-				$isVault,
-				$limit,
-				$scopeType,
-				$scope,
-				$spaceName,
-				$properties,
-			);
-			if ($response->getStatusCode() !== 207) {
-				continue;
+			\sleep($attempt === 0 ? SEARCH_INDEXING_INITIAL_WAIT_SEC : STANDARD_REQUEST_POLLING_INTERVAL_SEC);
+			$response = $search();
+			// 5xx means the service is still starting up
+			if ($response->getStatusCode() < 500) {
+				break;
 			}
-			// Service is up — return immediately if results are already there,
-			// otherwise fall through to the result-polling loop below.
-			if ($this->searchResponseHasResults($response)) {
-				return $response;
-			}
-			break;
 		}
-		for ($attempt = 0; $attempt < STANDARD_RETRY_COUNT; $attempt++) {
-			if ($attempt > 0) {
-				\sleep(2);
-			}
-			$response = $this->searchFiles(
-				$user,
-				$pattern,
-				$isVault,
-				$limit,
-				$scopeType,
-				$scope,
-				$spaceName,
-				$properties,
-			);
+
+		// a client error or an existing result cannot change by polling
+		if ($response->getStatusCode() >= 400 || $this->searchResponseHasResults($response)) {
+			return $response;
+		}
+
+		// indexing is async, so poll for the results
+		for ($attempt = 0; $attempt < MAX_REQUEST_RETRY_COUNT; $attempt++) {
+			\sleep(STANDARD_REQUEST_POLLING_INTERVAL_SEC);
+			$response = $search();
 			if ($this->searchResponseHasResults($response)) {
 				return $response;
 			}
 		}
-		// return last response even if empty — let the assertion step produce the failure message
+
+		// let the assertion step report an empty result
 		return $response;
 	}
 

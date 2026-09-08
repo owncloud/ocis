@@ -13,8 +13,11 @@ Feature: optimize search index via CLI command
     And using spaces DAV path
     And user "Alice" has uploaded file with content "some data" to "textfile.txt"
     When the administrator reindexes all spaces using the CLI
-    And user "Alice" searches for "textfile.txt" using the WebDAV API
+    Then the command should be successful
+    When user "Alice" searches for "textfile.txt" using the WebDAV API
     Then the HTTP status code should be "207"
+    And the search result of user "Alice" should contain only these entries:
+      | /textfile.txt |
     And the administrator has stopped the server
     When the administrator optimizes the search index using the CLI
     Then the command should be successful
