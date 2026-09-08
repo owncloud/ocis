@@ -397,6 +397,7 @@ Feature: vault
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
@@ -475,6 +476,7 @@ Feature: vault
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     And user "Admin" has disabled a space "new-space" in vault
@@ -523,6 +525,7 @@ Feature: vault
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     And user "Admin" has disabled a space "new-space" in vault
@@ -570,6 +573,7 @@ Feature: vault
   Scenario Outline: try to send share invitation for personal space in vault to user with different roles (permissions endpoint)
     Given user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
     When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
       | space           | Personal           |
@@ -616,6 +620,7 @@ Feature: vault
   Scenario Outline: try to share Shares space in vault with a user (permissions endpoint)
     Given user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
     When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
       | space           | Shares             |
@@ -663,6 +668,7 @@ Feature: vault
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     When user "Alice" sends the following space share invitation using root endpoint of the Graph API:
@@ -741,6 +747,7 @@ Feature: vault
   Scenario Outline: try to invite user to personal drive in vault with different roles using root endpoint
     Given user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
     When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space           | Personal           |
@@ -787,6 +794,7 @@ Feature: vault
   Scenario Outline: try to invite user to Shares drive in vault with different roles using root endpoint
     Given user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
     When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space           | Shares             |
