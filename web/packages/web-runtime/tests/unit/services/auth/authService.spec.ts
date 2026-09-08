@@ -1,6 +1,7 @@
-import { ConfigStore, useAuthStore, useConfigStore } from '@ownclouders/web-pkg'
+import { CapabilityStore, ConfigStore, useAuthStore, useConfigStore } from '@ownclouders/web-pkg'
 import { mock } from 'vitest-mock-extended'
 import { Router } from 'vue-router'
+import { Ability } from '@ownclouders/web-client'
 import { AuthService } from '../../../../src/services/auth/authService'
 import { UserManager } from '../../../../src/services/auth/userManager'
 import { RouteLocation, createRouter, createTestingPinia } from '@ownclouders/web-test-helpers'
@@ -368,6 +369,106 @@ describe('AuthService', () => {
 
       await authService.requireAcr('advanced', '/')
       expect(mockSignInRedirect).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('vault scope', () => {
+    const vaultRoute = {
+      params: { scope: 'vault' },
+      fullPath: '/vault'
+    } as unknown as RouteLocation
+
+    const setupVaultAuthService = ({
+      canAccessVault,
+      userContextReady,
+      getUser
+    }: {
+      canAccessVault: boolean
+      userContextReady: boolean
+      getUser: () => Promise<User>
+    }) => {
+      const authService = new AuthService()
+      const mockSignInRedirect = vi.fn()
+
+      Object.defineProperty(authService, 'userManager', {
+        value: mock<UserManager>({
+          getUser: vi.fn().mockImplementation(getUser),
+          signinRedirect: mockSignInRedirect,
+          setPostLoginRedirectUrl: vi.fn()
+        })
+      })
+
+      const ability = { can: vi.fn().mockReturnValue(canAccessVault) } as unknown as Ability
+      const capabilityStore = mock<CapabilityStore>({
+        isInitialized: true,
+        authMfaRequiredLevelname: 'advanced'
+      })
+      const router = createRouter()
+      const pushSpy = vi.spyOn(router, 'push').mockResolvedValue(undefined)
+
+      createTestingPinia()
+      const authStore = useAuthStore()
+      authStore.userContextReady = userContextReady
+      const configStore = useConfigStore()
+      authService.initialize(
+        configStore,
+        null,
+        router,
+        ability,
+        null,
+        null,
+        authStore,
+        capabilityStore,
+        null
+      )
+
+      return { authService, pushSpy, mockSignInRedirect }
+    }
+
+    it('when the user lacks the vault ability, routes to accessDenied instead of the IdP', async () => {
+      const { authService, pushSpy, mockSignInRedirect } = setupVaultAuthService({
+        canAccessVault: false,
+        userContextReady: true,
+        getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'advanced' }, expired: false }))
+      })
+
+      await authService.initializeContext(vaultRoute)
+
+      expect(pushSpy).toHaveBeenCalledWith({
+        name: 'accessDenied',
+        query: { redirectUrl: '/vault' }
+      })
+      expect(mockSignInRedirect).not.toHaveBeenCalled()
+    })
+
+    it('when the user holds the vault ability, does not route to accessDenied and enforces MFA', async () => {
+      const { authService, pushSpy, mockSignInRedirect } = setupVaultAuthService({
+        canAccessVault: true,
+        userContextReady: true,
+        getUser: () => Promise.resolve(null)
+      })
+
+      await authService.initializeContext(vaultRoute)
+
+      expect(pushSpy).not.toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'accessDenied' })
+      )
+      expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
+    })
+
+    it('when the user context is not yet established, does not deny (backend guard is the boundary)', async () => {
+      const { authService, pushSpy, mockSignInRedirect } = setupVaultAuthService({
+        canAccessVault: false,
+        userContextReady: false,
+        getUser: () => Promise.resolve(null)
+      })
+
+      await authService.initializeContext(vaultRoute)
+
+      expect(pushSpy).not.toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'accessDenied' })
+      )
+      expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
     })
   })
 })
