@@ -328,7 +328,15 @@ func waitPodDelete(podName string, timeout int) (string, error) {
 
 func K8sRollback() (bool, string) {
 	for service, config := range K8sOcisInitEnv {
-		envs := config.Envs
+		// A var added by a test (not present in the original baseline) would
+		// otherwise never get unset: `kubectl set env` only sets the vars it's
+		// given, it doesn't remove anything else already on the deployment.
+		currentEnvs, err := getInitialEnvs(service)
+		if err != nil {
+			return false, "error getting current envs"
+		}
+		extraEnvs := diffEnvs(config.Envs, currentEnvs)
+		envs := append(append([]string{}, config.Envs...), extraEnvs...)
 		log.Println(fmt.Sprintf("[%s] Rolling envs: %s", service, strings.Join(envs, ", ")))
 		podName, err := getPodName(service)
 		if err != nil {
