@@ -1174,8 +1174,9 @@ Feature: vault
 
 
   Scenario Outline: users with role User or User Light should not have access to vault
-    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
-    When user "Alice" gets the permissions list using the settings API
+    Given user "Brian" has been created with default attributes
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
+    When user "Brian" gets the permissions list using the settings API
     Then the HTTP status code should be "201"
     And the JSON data of the response should match
       """
