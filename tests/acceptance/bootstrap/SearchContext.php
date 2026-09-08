@@ -40,9 +40,10 @@ class SearchContext implements Context {
 	private FeatureContext $featureContext;
 
 	/**
-	 * Retry search until results are non-empty or timeout is reached.
-	 * Indexing of newly uploaded files in ocis is async, so a single
-	 * fixed sleep is not reliable — poll instead.
+	 * Search until the results show up.
+	 *
+	 * After a (re)start the search service answers with 5xx until it is ready,
+	 * and indexing of new uploads is async, so poll for both.
 	 *
 	 * @param string $user
 	 * @param string $pattern
@@ -65,29 +66,52 @@ class SearchContext implements Context {
 		?string $spaceName = null,
 		?TableNode $properties = null,
 	): ResponseInterface {
-		// Indexing is async — poll until results appear.
-		// Initial wait 3s, then retry every 2s, up to ~13s total.
-		$maxAttempts = STANDARD_RETRY_COUNT;
-		$response = null;
-		for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
-			\sleep($attempt === 0 ? 3 : 2);
-			$response = $this->searchFiles(
-				$user,
-				$pattern,
-				$isVault,
-				$limit,
-				$scopeType,
-				$scope,
-				$spaceName,
-				$properties,
-			);
-			$parsed = HttpRequestHelper::parseResponseAsXml($response);
-			if (\is_array($parsed) && isset($parsed["value"]) && !empty($parsed["value"])) {
+		$search = fn (): ResponseInterface => $this->searchFiles(
+			$user,
+			$pattern,
+			$isVault,
+			$limit,
+			$scopeType,
+			$scope,
+			$spaceName,
+			$properties,
+		);
+
+		for ($attempt = 0; $attempt < SERVICE_READY_RETRY_COUNT; $attempt++) {
+			\sleep($attempt === 0 ? SEARCH_INDEXING_INITIAL_WAIT_SEC : STANDARD_REQUEST_POLLING_INTERVAL_SEC);
+			$response = $search();
+			// 5xx means the service is still starting up
+			if ($response->getStatusCode() < 500) {
+				break;
+			}
+		}
+
+		// a client error or an existing result cannot change by polling
+		if ($response->getStatusCode() >= 400 || $this->searchResponseHasResults($response)) {
+			return $response;
+		}
+
+		// indexing is async, so poll for the results
+		for ($attempt = 0; $attempt < MAX_REQUEST_RETRY_COUNT; $attempt++) {
+			\sleep(STANDARD_REQUEST_POLLING_INTERVAL_SEC);
+			$response = $search();
+			if ($this->searchResponseHasResults($response)) {
 				return $response;
 			}
 		}
-		// return last response even if empty — let the assertion step produce the failure message
+
+		// let the assertion step report an empty result
 		return $response;
+	}
+
+	/**
+	 * @param ResponseInterface $response
+	 *
+	 * @return bool
+	 */
+	private function searchResponseHasResults(ResponseInterface $response): bool {
+		$parsed = HttpRequestHelper::parseResponseAsXml($response);
+		return \is_array($parsed) && isset($parsed["value"]) && !empty($parsed["value"]);
 	}
 
 	/**
