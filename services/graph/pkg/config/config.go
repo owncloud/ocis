@@ -122,6 +122,7 @@ type LDAP struct {
 	InstanceMapperIDAttribute      string `yaml:"instance_mapper_id_attribute" env:"OCIS_LDAP_INSTANCE_MAPPER_ID_ATTRIBUTE" desc:"LDAP Attribute of the instance ID. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
 	CrossInstanceReferenceTemplate string `yaml:"cross_instance_reference_template" env:"OCIS_LDAP_CROSS_INSTANCE_REFERENCE_TEMPLATE" desc:"Template for the users unique reference across oCIS instances. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
 	InstanceURLTemplate            string `yaml:"instance_url_template" env:"OCIS_LDAP_INSTANCE_URL_TEMPLATE" desc:"Template for the instance URL. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	InstanceMapperCacheTTL         int    `yaml:"instance_mapper_cache_ttl" env:"OCIS_LDAP_INSTANCE_MAPPER_CACHE_TTL" desc:"Max TTL in seconds for the LDAP instance mapper cache. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
 }
 
 // LDAPEducationConfig represents the LDAP configuration for education related resources
