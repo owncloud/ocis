@@ -8,6 +8,10 @@ test.describe('Vault Mode', { tag: '@predefined-users' }, () => {
       stepUser: 'Admin',
       users: ['Alice']
     })
+    await api.userHasAssignedRolesToUsers({
+      stepUser: 'Admin',
+      users: [{ id: 'Alice', role: 'Space Admin' }]
+    })
     await ui.userLogsIn({ stepUser: 'Alice' })
   })
 
