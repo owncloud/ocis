@@ -104,7 +104,7 @@ func getEnvKeys(envMap []string) []string {
 	return envKeys
 }
 
-func getInitialEnvs(service string) ([]string, error) {
+func fetchRawEnvVars(service string) ([]EnvVar, error) {
 	filter := "jsonpath=\"{.spec.template.spec.containers[*].env}\""
 	cmdArgs := []string{"get", "-n", config.Get("namespace"), "deployment", service, "-o", filter}
 	cmd := exec.Command("kubectl", cmdArgs...)
@@ -115,25 +115,58 @@ func getInitialEnvs(service string) ([]string, error) {
 			// stderr from the command
 			errMsg = strings.TrimSpace(string(exitErr.Stderr))
 		}
-		log.Println(fmt.Sprintf("[%s] Failed to get initial envs. %s", service, errMsg))
+		log.Println(fmt.Sprintf("[%s] Failed to get envs. %s", service, errMsg))
 		return nil, err
 	}
 	output = bytes.TrimSpace(output)
 	output = bytes.Trim(output, "\"")
 
-	var flatEnvVars []string
 	var allEnvs []EnvVar
 	err = json.Unmarshal(output, &allEnvs)
 	if err != nil {
 		log.Println(fmt.Sprintf("[%s] Failed to parse envs. %s", service, err.Error()))
 		return nil, err
 	}
+	return allEnvs, nil
+}
 
+func fetchRawEnvs(service string) ([]string, error) {
+	allEnvs, err := fetchRawEnvVars(service)
+	if err != nil {
+		return nil, err
+	}
+
+	var flatEnvVars []string
 	for _, env := range allEnvs {
 		// do not include env vars with valueFrom (includes secrets).
 		if env.ValueFrom == nil && env.Value != "" {
 			flatEnvVars = append(flatEnvVars, fmt.Sprintf("%s=%s", env.Name, env.Value))
 		}
+	}
+	return flatEnvVars, nil
+}
+
+// countEnvNames counts every entry the live pod spec has per env var name, including
+// empty-valued and valueFrom entries that fetchRawEnvs filters out for baseline-tracking
+// purposes. A name occupying more than one slot is exactly the situation kubectl set env
+// cannot reliably converge on its own (see setServiceEnv) - filtering by value here would
+// hide a duplicate that happens to have an empty default alongside a real override.
+func countEnvNames(service string) (map[string]int, error) {
+	allEnvs, err := fetchRawEnvVars(service)
+	if err != nil {
+		return nil, err
+	}
+	counts := make(map[string]int, len(allEnvs))
+	for _, env := range allEnvs {
+		counts[env.Name]++
+	}
+	return counts, nil
+}
+
+func getInitialEnvs(service string) ([]string, error) {
+	flatEnvVars, err := fetchRawEnvs(service)
+	if err != nil {
+		return nil, err
 	}
 	// The chart legitimately renders some vars twice in the pod spec (a default value, then a
 	// later override for the same name - Go's own os.Environ() takes the last one, which is
@@ -143,6 +176,21 @@ func getInitialEnvs(service string) ([]string, error) {
 	// already has two entries for it has been observed to drop the variable entirely instead of
 	// converging on one value, rather than raising an error.
 	return dedupeEnvs(flatEnvVars), nil
+}
+
+// duplicatedKeys returns the subset of the given keys that currently occupy more than one
+// slot in the live pod spec (per counts, from countEnvNames). Only these need the
+// pre-removal step in setServiceEnv - most keys have a single entry and removing+re-setting
+// them would trigger two rolling restarts (one from the removal, one from the set) instead
+// of one, for no benefit.
+func duplicatedKeys(counts map[string]int, keys []string) map[string]bool {
+	duplicated := make(map[string]bool)
+	for _, key := range keys {
+		if counts[key] > 1 {
+			duplicated[key] = true
+		}
+	}
+	return duplicated
 }
 
 func dedupeEnvs(envs []string) []string {
@@ -216,26 +264,29 @@ func waitForService(service string, waitDeletion bool) (bool, error) {
 }
 
 func setServiceEnv(service string, envMap []string, errMsgPrefix string) (bool, bool, error) {
-	// kubectl set env has been observed to behave unreliably (silently dropping the variable
-	// entirely, or picking an arbitrary one of the existing values) when the target pod spec
-	// already has multiple pre-existing entries for a key being set - which happens here
-	// because the chart legitimately renders some vars twice (a default value, then a later
-	// vault-mode override, relying on the running process's own last-one-wins env handling,
-	// not on kubectl ever reconciling it). Strip any existing entries for every key this call
-	// touches first, in its own invocation, so the actual set below always starts from a clean
-	// (zero-or-one-entry) state instead of leaving kubectl to reconcile a pre-existing
-	// duplicate on its own. This is best-effort: kubectl errors on `KEY-` when the key isn't
-	// currently set at all (the common case for a var touched here for the first time), which
-	// is already the clean slate this step is trying to achieve, so that failure is expected
-	// and must not block the actual set below.
-	removalArgs := []string{}
+	// kubectl set env can behave unreliably when a key has multiple entries in the pod spec,
+	// which can happen when the chart renders a default and a vault-mode override. Remoce only
+	// confirmed duplicate keys first to avoid unnecessary rolling restarts. Count all entries,
+	// including empty/vauleFrom ones, since kubectl considers them when resolving the key.
+	counts, err := countEnvNames(service)
+	if err != nil {
+		log.Println(fmt.Sprintf("[%s] Could not check for duplicate env entries, proceeding without pre-removal: %s", service, err.Error()))
+	}
+	touchedKeys := []string{}
 	seenKeys := map[string]bool{}
 	for _, env := range envMap {
+		// envMap entries are either "KEY=VALUE" or a "KEY-" removal marker.
 		key := strings.TrimSuffix(strings.SplitN(env, "=", 2)[0], "-")
 		if !seenKeys[key] {
 			seenKeys[key] = true
-			removalArgs = append(removalArgs, key+"-")
+			touchedKeys = append(touchedKeys, key)
 		}
+	}
+	duplicated := duplicatedKeys(counts, touchedKeys)
+
+	removalArgs := []string{}
+	for key := range duplicated {
+		removalArgs = append(removalArgs, key+"-")
 	}
 	if len(removalArgs) > 0 {
 		removeCmdArgs := append([]string{"set", "env", "-n", config.Get("namespace"), "deployment", service}, removalArgs...)
@@ -244,7 +295,7 @@ func setServiceEnv(service string, envMap []string, errMsgPrefix string) (bool, 
 			if exitErr, ok := err.(*exec.ExitError); ok {
 				errMsg = strings.TrimSpace(string(exitErr.Stderr))
 			}
-			log.Println(fmt.Sprintf("[%s] Pre-remove before set found nothing to remove (expected when a key is new): %s", service, errMsg))
+			log.Println(fmt.Sprintf("[%s] Pre-remove of duplicated keys before set failed: %s", service, errMsg))
 		}
 	}
 
