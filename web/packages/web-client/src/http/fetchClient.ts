@@ -78,6 +78,15 @@ export class FetchClient {
     if (body === undefined || body === null) {
       return undefined
     }
+    if (body instanceof FormData) {
+      // Only fetch knows the multipart boundary it is about to generate, so a caller-supplied
+      // `multipart/form-data` header would reach the server without one and make the body
+      // unparseable. Dropping it lets fetch fill in the complete header, as axios did.
+      if (!headers.get('Content-Type')?.includes('boundary=')) {
+        headers.delete('Content-Type')
+      }
+      return body
+    }
     if (isBodyInit(body)) {
       return body
     }

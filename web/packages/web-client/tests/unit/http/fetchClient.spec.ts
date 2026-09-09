@@ -251,6 +251,36 @@ describe('FetchClient', () => {
       expect(init.body).toBe(form)
       expect((init.headers as Headers).get('Content-Type')).toBeNull()
     })
+
+    /**
+     * A `multipart/form-data` header written by hand has no boundary, and fetch would send it
+     * verbatim, leaving the server unable to parse the body. Callers such as the logo upload
+     * relied on axios replacing the header, so it has to be dropped here.
+     */
+    it('drops a boundary-less multipart Content-Type for FormData', async () => {
+      fetchMock.mockResolvedValue(jsonResponse({}))
+
+      await new FetchClient().request('https://host/foo', {
+        method: 'POST',
+        body: new FormData(),
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+
+      expect((lastCall()[1].headers as Headers).get('Content-Type')).toBeNull()
+    })
+
+    it('keeps a multipart Content-Type that already carries a boundary', async () => {
+      fetchMock.mockResolvedValue(jsonResponse({}))
+      const contentType = 'multipart/form-data; boundary=--abc'
+
+      await new FetchClient().request('https://host/foo', {
+        method: 'POST',
+        body: new FormData(),
+        headers: { 'Content-Type': contentType }
+      })
+
+      expect((lastCall()[1].headers as Headers).get('Content-Type')).toBe(contentType)
+    })
   })
 
   describe('responseType', () => {
