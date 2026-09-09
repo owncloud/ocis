@@ -131,6 +131,16 @@ export class AuthService implements AuthServiceInterface {
     }
 
     if (to.params.scope === 'vault') {
+      // Deny users without vault access instead of handing them to the IdP for MFA. Abilities
+      // are only loaded once the user context is ready; on a cold load the backend guard applies.
+      if (this.authStore.userContextReady && !this.ability.can('read-all', 'Vault')) {
+        await this.router.push({
+          name: 'accessDenied',
+          query: { redirectUrl: to.fullPath }
+        })
+        return
+      }
+
       // Capabilities carry the required MFA level name. Fetch them directly (without
       // establishing the user context) so we can enforce the ACR before any vault data
       // is loaded. Establishing the user context here would flip `userContextReady`,

@@ -420,8 +420,10 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 
 	// Initialize the Vault routes
 	if options.Config.EnableVaultMode {
+		requireVaultPermission := graphmw.RequireVaultPermission(roleManager, options.Logger)
 		m.Route("/vault/graph", func(r chi.Router) {
 			r.Use(autoprop.NewHttpHandler())
+			r.Use(requireVaultPermission)
 			r.Use(requireMFA)
 			r.Use(graphmw.VaultModeMiddleware())
 			graphRoutes(r, blankMW)

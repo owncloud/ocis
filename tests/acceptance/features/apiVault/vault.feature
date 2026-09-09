@@ -8,6 +8,7 @@ Feature: vault
     And these users have been created with default attributes:
       | username |
       | Alice    |
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
 
 
   Scenario: user can create folders and files in personal space in vault
@@ -396,6 +397,7 @@ Feature: vault
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
@@ -474,6 +476,7 @@ Feature: vault
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     And user "Admin" has disabled a space "new-space" in vault
@@ -522,6 +525,7 @@ Feature: vault
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     And user "Admin" has disabled a space "new-space" in vault
@@ -569,6 +573,7 @@ Feature: vault
   Scenario Outline: try to send share invitation for personal space in vault to user with different roles (permissions endpoint)
     Given user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
     When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
       | space           | Personal           |
@@ -615,6 +620,7 @@ Feature: vault
   Scenario Outline: try to share Shares space in vault with a user (permissions endpoint)
     Given user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
     When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
       | space           | Shares             |
@@ -662,6 +668,7 @@ Feature: vault
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     When user "Alice" sends the following space share invitation using root endpoint of the Graph API:
@@ -740,6 +747,7 @@ Feature: vault
   Scenario Outline: try to invite user to personal drive in vault with different roles using root endpoint
     Given user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
     When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space           | Personal           |
@@ -786,6 +794,7 @@ Feature: vault
   Scenario Outline: try to invite user to Shares drive in vault with different roles using root endpoint
     Given user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
     When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space           | Shares             |
@@ -994,6 +1003,7 @@ Feature: vault
 
   Scenario Outline: folder share received from vault and drive personal space should be isolated
     Given user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Alice" has logged in via web UI
     And user "Brian" has logged in via web UI
     And user "Alice" has created a folder "driveFolder" in space "Personal"
@@ -1028,6 +1038,7 @@ Feature: vault
 
   Scenario Outline: file share received from vault and drive personal space should be isolated
     Given user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Alice" has logged in via web UI
     And user "Brian" has logged in via web UI
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "driveFile.txt"
@@ -1062,6 +1073,7 @@ Feature: vault
   Scenario Outline: folder share received from vault and drive project space should be isolated
     Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Alice" has logged in via web UI
     And user "Brian" has logged in via web UI
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
@@ -1099,6 +1111,7 @@ Feature: vault
   Scenario Outline: folder share received from vault and drive project space should be isolated
     Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Alice" has logged in via web UI
     And user "Brian" has logged in via web UI
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
@@ -1132,7 +1145,7 @@ Feature: vault
       | File Editor      |
 
 
-  Scenario Outline: users with role Admin, Space Admin or User should have access to vault
+  Scenario Outline: users with role Admin or Space Admin should have access to vault
     Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When user "Alice" gets the permissions list using the settings API
     Then the HTTP status code should be "201"
@@ -1158,12 +1171,12 @@ Feature: vault
       | user-role   | permission-count |
       | Admin       | 33               |
       | Space Admin | 27               |
-      | User        | 20               |
 
 
-  Scenario: user with role User Light should not have access to vault
-    Given the administrator has assigned the role "User Light" to user "Alice" using the Graph API
-    When user "Alice" gets the permissions list using the settings API
+  Scenario Outline: users with role User or User Light should not have access to vault
+    Given user "Brian" has been created with default attributes
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
+    When user "Brian" gets the permissions list using the settings API
     Then the HTTP status code should be "201"
     And the JSON data of the response should match
       """
@@ -1173,8 +1186,8 @@ Feature: vault
         "properties": {
           "permissions": {
             "type": "array",
-            "minItems": 13,
-            "maxItems": 13,
+            "minItems": <permission-count>,
+            "maxItems": <permission-count>,
             "uniqueItems": true,
             "not": {
               "contains": {
@@ -1185,4 +1198,8 @@ Feature: vault
         }
       }
       """
+    Examples:
+      | user-role   | permission-count |
+      | User        | 19               |
+      | User Light  | 13               |
 
