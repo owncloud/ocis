@@ -756,14 +756,21 @@ var _ = Describe("Users", func() {
 			DescribeTable("returns only the users assigned to a role that grants vault mode",
 				func(filter string) {
 					expectRoles()
-					// Only the assignments of the vault granting role may be asked for, and only
-					// the eligible user holds one.
-					roleService.On("ListRoleAssignmentsFiltered", mock.Anything, mock.MatchedBy(
-						func(in *settings.ListRoleAssignmentsFilteredRequest) bool {
-							return in.GetFilters()[0].GetRoleId() == vaultRole
+					// Only the eligible user's assignments carry the vault granting role.
+					roleService.On("ListRoleAssignments", mock.Anything, mock.MatchedBy(
+						func(in *settings.ListRoleAssignmentsRequest) bool {
+							return in.GetAccountUuid() == eligibleUser
 						}), mock.Anything).Return(&settings.ListRoleAssignmentsResponse{
 						Assignments: []*settingsmsg.UserRoleAssignment{
 							{Id: "assignment-ID", AccountUuid: eligibleUser, RoleId: vaultRole},
+						},
+					}, nil)
+					roleService.On("ListRoleAssignments", mock.Anything, mock.MatchedBy(
+						func(in *settings.ListRoleAssignmentsRequest) bool {
+							return in.GetAccountUuid() == otherUser
+						}), mock.Anything).Return(&settings.ListRoleAssignmentsResponse{
+						Assignments: []*settingsmsg.UserRoleAssignment{
+							{Id: "assignment-ID-2", AccountUuid: otherUser, RoleId: vaultLessRole},
 						},
 					}, nil)
 
@@ -804,7 +811,7 @@ var _ = Describe("Users", func() {
 
 			It("fails the request when the role assignments cannot be listed", func() {
 				expectRoles()
-				roleService.On("ListRoleAssignmentsFiltered", mock.Anything, mock.Anything, mock.Anything).
+				roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).
 					Return(nil, errors.New("settings service unavailable"))
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape("vaultEligible eq true"), nil)
@@ -831,7 +838,7 @@ var _ = Describe("Users", func() {
 			// otherwise restricts unprivileged users to 'userType eq ...'.
 			It("is allowed for an unprivileged user", func() {
 				expectRoles()
-				roleService.On("ListRoleAssignmentsFiltered", mock.Anything, mock.Anything, mock.Anything).
+				roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).
 					Return(&settings.ListRoleAssignmentsResponse{
 						Assignments: []*settingsmsg.UserRoleAssignment{
 							{Id: "assignment-ID", AccountUuid: eligibleUser, RoleId: vaultRole},

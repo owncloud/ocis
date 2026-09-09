@@ -264,59 +264,49 @@ func (g Graph) applyFilterVaultEligible(ctx context.Context, req *godata.GoDataR
 		return nil, unsupportedFilterError()
 	}
 
-	users, err := g.identityBackend.GetUsers(ctx, req)
+	users, err := g.identityBackend.GetUsers(ctx, req) // already bounded by $search
 	if err != nil {
 		return nil, err
 	}
 
-	eligible, err := g.vaultEligibleAccountIDs(ctx)
+	vaultRoleIDs, err := g.vaultGrantingRoleIDs(ctx)
 	if err != nil {
 		return nil, err
+	}
+	if len(vaultRoleIDs) == 0 {
+		return []*libregraph.User{}, nil
 	}
 
 	filteredUsers := make([]*libregraph.User, 0, len(users))
 	for _, user := range users {
-		if _, ok := eligible[user.GetId()]; ok {
-			filteredUsers = append(filteredUsers, user)
+		assignments, err := g.roleService.ListRoleAssignments(ctx, &settingssvc.ListRoleAssignmentsRequest{AccountUuid: user.GetId()})
+		if err != nil {
+			return nil, err
+		}
+		for _, assignment := range assignments.GetAssignments() {
+			if _, ok := vaultRoleIDs[assignment.GetRoleId()]; ok {
+				filteredUsers = append(filteredUsers, user)
+				break
+			}
 		}
 	}
 	return filteredUsers, nil
 }
 
-// vaultEligibleAccountIDs returns the accounts holding the vault mode permission, found by
-// inverting the assignments of every role that grants it. That is one call per granting role,
-// rather than one permission check per user the search returned.
-func (g Graph) vaultEligibleAccountIDs(ctx context.Context) (map[string]struct{}, error) {
+// vaultGrantingRoleIDs returns the IDs of the role bundles that carry the vault mode permission.
+func (g Graph) vaultGrantingRoleIDs(ctx context.Context) (map[string]struct{}, error) {
 	roles, err := g.roleService.ListRoles(ctx, &settingssvc.ListBundlesRequest{})
 	if err != nil {
 		return nil, err
 	}
 
-	accounts := make(map[string]struct{})
+	ids := make(map[string]struct{})
 	for _, role := range roles.GetBundles() {
-		if !roleGrantsVaultMode(role) {
-			continue
-		}
-
-		assignments, err := g.roleService.ListRoleAssignmentsFiltered(
-			ctx,
-			&settingssvc.ListRoleAssignmentsFilteredRequest{
-				Filters: []*settingsmsg.UserRoleAssignmentFilter{
-					{
-						Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ROLE,
-						Term: &settingsmsg.UserRoleAssignmentFilter_RoleId{RoleId: role.GetId()},
-					},
-				},
-			},
-		)
-		if err != nil {
-			return nil, err
-		}
-		for _, assignment := range assignments.GetAssignments() {
-			accounts[assignment.GetAccountUuid()] = struct{}{}
+		if roleGrantsVaultMode(role) {
+			ids[role.GetId()] = struct{}{}
 		}
 	}
-	return accounts, nil
+	return ids, nil
 }
 
 // roleGrantsVaultMode reports whether a role bundle carries the vault mode permission.
