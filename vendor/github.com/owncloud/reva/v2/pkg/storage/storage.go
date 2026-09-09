@@ -259,9 +259,8 @@ type DeleteStorageSpaceResult struct {
 
 // UploadSource carries the staged bytes for a CommitUpload call.
 type UploadSource struct {
-	Body        io.ReadCloser
-	Length      int64
-	NodeExisted bool
+	Body   io.ReadCloser
+	Length int64
 
 	// ScanResult is the antivirus verdict: empty means clean.
 	ScanResult string
