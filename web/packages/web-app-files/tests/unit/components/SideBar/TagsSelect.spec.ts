@@ -210,12 +210,12 @@ describe('Tag Select', () => {
     })
   })
 
-  describe('Tag chip icon removal', () => {
-    it('the price-tag-3 icon is no longer rendered in the selected chip template', async () => {
-      const tagName = 'invoice'
-      const resource = mock<Resource>({ tags: [tagName] })
+  describe('Tag chip appearance', () => {
+    it('a dropdown option chip keeps the price-tag-3 icon and its rounded corners', async () => {
+      const tagName = 'project'
+      const resource = mock<Resource>({ tags: [] })
       const clientService = mockDeep<ClientService>()
-      clientService.graphAuthenticated.tags.listTags.mockResolvedValue([])
+      clientService.graphAuthenticated.tags.listTags.mockResolvedValueOnce([tagName])
 
       const mocks = { ...defaultComponentMocks(), $clientService: clientService }
       mocks.$clientService.graphAuthenticated.tags.listTags.mockResolvedValue([])
@@ -231,18 +231,26 @@ describe('Tag Select', () => {
         }
       })
 
-      // Wait for the component to render
+      await (wrapper.vm as any).loadAvailableTagsTask.last
       await wrapper.vm.$nextTick()
 
-      // The selected chip should not contain the price-tag-3 icon
-      const selectedTags = wrapper.findAll('.tags-select-tag')
-      expect(selectedTags.length).toBeGreaterThan(0)
+      await wrapper.find('.oc-select').trigger('click')
+      await wrapper.find('input.vs__search').trigger('focus')
+      await wrapper.vm.$nextTick()
 
-      // Get the HTML of the tag to check for price-tag-3 reference
-      const tagHTML = selectedTags[0].html()
+      const optionTags = wrapper
+        .findAll('.tags-select-tag')
+        .filter((tag) => tag.element.closest('.vs__dropdown-menu') !== null)
+      expect(optionTags.length).toBe(1)
+      expect(optionTags[0].classes()).toContain('oc-tag-rounded')
 
-      // Verify no price-tag-3 icon is rendered
-      expect(tagHTML).not.toContain('price-tag-3')
+      // OcIcon renders the svg through inline-svg, which resolves to nothing in the test
+      // environment, so the icon name is only observable on the component's props.
+      const iconNames = wrapper
+        .findAllComponents({ name: 'OcIcon' })
+        .filter((icon) => icon.element.closest('.vs__dropdown-menu') !== null)
+        .map((icon) => icon.props('name'))
+      expect(iconNames).toContain('price-tag-3')
     })
   })
 })

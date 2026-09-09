@@ -19,6 +19,7 @@
       <oc-tag
         class="tags-select-tag oc-ml-xs"
         size="small"
+        :rounded="true"
         :color-index="tagColorIndex(option.label)"
       >
         <component
@@ -27,6 +28,7 @@
           class="oc-flex oc-flex-middle"
           @click="onTagClicked"
         >
+          <oc-icon name="price-tag-3" class="oc-mr-xs" size="small" />
           <span class="oc-text-truncate">{{ option.label }}</span>
         </component>
 
@@ -55,7 +57,13 @@
     <template #option="{ label, error }">
       <div class="oc-flex test">
         <span class="oc-flex oc-flex-center">
-          <oc-tag class="tags-select-tag oc-ml-xs" size="small" :color-index="tagColorIndex(label)">
+          <oc-tag
+            class="tags-select-tag oc-ml-xs"
+            size="small"
+            :rounded="true"
+            :color-index="tagColorIndex(label)"
+          >
+            <oc-icon name="price-tag-3" size="small" />
             <span class="oc-text-truncate">{{ label }}</span>
           </oc-tag>
         </span>

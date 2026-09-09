@@ -717,6 +717,21 @@ describe('ResourceTable', () => {
 
         expect(cell.find('.resource-table-tag-more').attributes('style')).toBeUndefined()
       })
+
+      it('keeps the price-tag-3 icon and the rounded corners of the chip', () => {
+        const resource = mock<Resource>({ id: '1', tags: ['physics'] })
+        const { wrapper } = getMountedWrapper({ props: { resources: [resource] } })
+        const cell = wrapper.find(`[data-item-id="${resource.id}"] .oc-table-data-cell-tags`)
+
+        expect(cell.find('.resource-table-tag').classes()).toContain('oc-tag-rounded')
+
+        // OcIcon renders the svg through inline-svg, which resolves to nothing in the test
+        // environment, so the icon name is only observable on the component's props.
+        const iconNames = cell
+          .findAllComponents({ name: 'OcIcon' })
+          .map((icon) => icon.props('name'))
+        expect(iconNames).toContain('price-tag-3')
+      })
     })
     describe('"more"-button', () => {
       it.each([

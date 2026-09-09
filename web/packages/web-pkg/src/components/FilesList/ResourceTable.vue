@@ -125,8 +125,10 @@
           v-oc-tooltip="getTagToolTip(tag)"
           class="resource-table-tag oc-ml-xs"
           size="small"
+          :rounded="true"
           :color-index="tagColorIndex(tag)"
         >
+          <oc-icon name="price-tag-3" size="small" />
           <span class="oc-text-truncate">{{ tag }}</span>
         </oc-tag>
       </component>
@@ -163,8 +165,10 @@
             v-oc-tooltip="getTagToolTip(tag)"
             class="resource-table-tag"
             size="small"
+            :rounded="true"
             :color-index="tagColorIndex(tag)"
           >
+            <oc-icon name="price-tag-3" size="small" />
             <span class="oc-text-truncate">{{ tag }}</span>
           </oc-tag>
         </component>

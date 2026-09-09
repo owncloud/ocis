@@ -52,7 +52,8 @@
         >
           <template #image="{ item }">
             <div class="tag-option-wrapper oc-flex oc-flex-middle">
-              <oc-tag size="small" :color-index="tagColorIndex(item.label)">
+              <oc-tag size="small" :rounded="true" :color-index="tagColorIndex(item.label)">
+                <oc-icon name="price-tag-3" size="small" />
                 <span>{{ item.label }}</span>
               </oc-tag>
             </div>
