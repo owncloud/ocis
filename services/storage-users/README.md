@@ -86,6 +86,7 @@ OPTIONS:
    --processing  filter sessions by processing status (default: unset)
    --expired     filter sessions by expired status (default: unset)
    --has-virus   filter sessions by virus scan result (default: unset)
+   --orphaned    filter sessions by whether their node metadata is unreadable (default: unset)
    --json        output as json (default: false)
    --restart     send restart event for all listed sessions (default: false)
    --resume      send resume event for all listed sessions (default: false)
@@ -140,6 +141,23 @@ ocis storage-users uploads sessions --expired=true --clean
 ocis storage-users uploads sessions --processing=true --has-virus=false --resume
 ```
 
+Uploads whose node metadata can no longer be read are orphaned: they can never finish
+postprocessing, because the destination of the upload cannot be resolved. Such uploads stay
+in processing state indefinitely and keep consuming the quota of their space. Use the
+`--orphaned` filter to list them, and `--clean` to remove them and release the quota.
+
+```bash
+# lists all orphaned upload sessions
+ocis storage-users uploads sessions --orphaned=true
+
+# removes them and releases the quota they consume
+ocis storage-users uploads sessions --orphaned=true --clean
+```
+
+Note: `--orphaned` reads the node metadata of every upload session, so it is slower than the
+other filters. Cleaning an orphaned session deletes the uploaded bytes, which are the only
+copy as long as postprocessing has not finished. Run the command without `--clean` first.
+
 
 #### Delete Stale Nodes command
 
@@ -183,6 +201,92 @@ Use `--verbose` to get more information about what is happening
 ocis storage-users uploads delete-stale-nodes --dry-run=false --verbose
 ```
 
+
+### Check and Inspect the Blobstore
+
+The `blobstore` command group provides tools to verify connectivity to the configured blobstore and to inspect individual blobs. Both the `ocis` and `s3ng` storage drivers are supported.
+
+```bash
+ocis storage-users blobstore <command>
+```
+
+```plaintext
+COMMANDS:
+   check  check blobstore connectivity via an upload/download/delete round-trip
+   get    get a blob from the blobstore by ID
+```
+
+#### Check
+
+Verifies that the blobstore is reachable and fully operational by uploading a random blob, downloading and verifying it, then deleting it again. All three steps must succeed.
+
+```bash
+ocis storage-users blobstore check [command options]
+```
+
+```
+OPTIONS:
+   --blob-size value  size of the random blob to upload, e.g. 64, 1KB, 1MB, 4MiB (default: "64")
+   --help, -h         show help
+```
+
+**Examples:**
+
+```bash
+# Basic connectivity check using the default 64-byte payload
+ocis storage-users blobstore check
+
+# Use a larger payload to also stress-test throughput
+ocis storage-users blobstore check --blob-size=4MiB
+```
+
+```plaintext
+Uploading test blob: spaceID=a5c9bd5c-7348-4e9e-a462-d4d9e5287d01 blobID=3f1e5a82-b7e3-4c91-a110-1d5e2f3a4b6c
+Upload: OK
+Download and verify: OK
+Delete: OK
+Blobstore check successful.
+```
+
+#### Get
+
+Downloads a single blob by its ID to verify it exists and is readable. Useful when investigating errors in log lines that contain a blob path such as:
+
+```
+decomposedfs: error download blob '04ba5496-...': blob path: b19ec764-.../61/03/ab/c3/-b08a-...: The specified key does not exist.
+```
+
+The blob can be identified either by passing the raw path from the log line with `--path`, or by supplying `--blob-id` and `--space-id` individually.
+
+```bash
+ocis storage-users blobstore get [command options]
+```
+
+```
+OPTIONS:
+   --path value      blobstore path as it appears in log lines; spaceID and blobID are extracted automatically.
+                     Supports both s3ng format ("<spaceID>/<pathified_blobID>") and ocis format
+                     ("…/spaces/<pathified_spaceID>/blobs/<pathified_blobID>").
+   --blob-id value   blob ID to download (required when --path is not set)
+   --space-id value  space ID the blob belongs to (required when --path is not set)
+   --blob-size value expected blob size in bytes; only needed for the s3ng driver when the size is known
+                     upfront. If omitted or wrong, a size mismatch triggers one automatic retry with the
+                     actual size returned by s3ng. (default: 0)
+   --help, -h        show help
+```
+
+**Examples:**
+
+```bash
+# Identify a blob using the path from a log line (s3ng)
+ocis storage-users blobstore get --path="b19ec764-5398-458a-8ff1-1925bd906999/61/03/ab/c3/-b08a-4556-9937-2bf3065c1202"
+
+# Identify a blob using the full filesystem path from a log line (ocis driver)
+ocis storage-users blobstore get --path="/var/lib/ocis/storage/users/spaces/b1/9ec764-5398-458a-8ff1-1925bd906999/blobs/61/03/ab/c3/-b08a-4556-9937-2bf3065c1202"
+
+# Identify a blob using explicit IDs
+ocis storage-users blobstore get --space-id=b19ec764-5398-458a-8ff1-1925bd906999 --blob-id=6103abc3-b08a-4556-9937-2bf3065c1202
+```
 
 ### Manage Spaces
 
@@ -321,3 +425,106 @@ Store specific notes:
   -   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OCIS_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
   -   When using `nats-js-kv` it is recommended to set `OCIS_CACHE_STORE_NODES` to the same value as `OCIS_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
   -   When using the `nats-js-kv` store, it is possible to set `OCIS_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
+
+## Vault Mode
+
+Vault mode provides a dedicated, separately stored vault storage that can be MFA-protected. Vault resources are isolated from the default user storage and have their own search, shares, and spaces — while public links are explicitly disallowed.
+
+### Architecture
+
+*   A dedicated `storage-users` vault storage instance is configured with a `VaultStorageProviderID` and mounted at `/vault/users` and `/vault/projects`.
+*   The `graph` service API is extended to serve the `/vault` prefix when vault mode is active.
+*   WebDAV access is supported for vault resources.
+*   Search is scoped separately for default and vault files, including their shares and spaces.
+*   Public links are disallowed for vault resources. The capabilities endpoint accepts a `vault=true` query parameter to advertise vault-specific capabilities.
+
+#### The `vault mode` Configuration and Environment Variables
+
+Set\
+`OCIS_MFA_ENABLED: true`\
+`OCIS_ENABLE_VAULT_MODE: true` and\
+to enable the vault mode in a OCIS.\
+Only applicapable if the storage-users-vault service, a special configured storage-users service is configured.
+
+The storage-users-vault configuration:
+```
+STORAGE_USERS_SERVICE_NAME: storage-users-vault
+STORAGE_USERS_GRPC_ADDR: storage-users-vault:9285
+STORAGE_USERS_HTTP_ADDR: storage-users-vault:9286
+STORAGE_USERS_DATA_SERVER_URL: http://storage-users-vault:9286/data
+STORAGE_USERS_DEBUG_ADDR: storage-users-vault:9287
+STORAGE_USERS_OCIS_ROOT: /var/lib/ocis/storage/users-vault
+STORAGE_USERS_EVENTS_CONSUMER_GROUP: vault-dcfs
+```
+
+```
+~/.ocis/storage
+$ tree  users*
+users
+├── indexes
+│   ├── by-group-id
+│   ├── by-type
+│   │   └── personal.mpk
+│   └── by-user-id
+│       └── a032f2bd-fa5c-430b-a163-2c19f54190d0.mpk
+├── spaces
+│   └── a0
+│       └── 32f2bd-fa5c-430b-a163-2c19f54190d0
+│           └── nodes
+│               └── a0
+│                   └── 32
+│                       └── f2
+│                           └── bd
+│                               ├── -fa5c-430b-a163-2c19f54190d0
+│                               ├── -fa5c-430b-a163-2c19f54190d0.mlock
+│                               └── -fa5c-430b-a163-2c19f54190d0.mpk
+└── uploads
+users-vault
+├── indexes
+│   ├── by-group-id
+│   ├── by-type
+│   │   └── personal.mpk
+│   └── by-user-id
+│       └── a032f2bd-fa5c-430b-a163-2c19f54190d0.mpk
+├── spaces
+│   └── a0
+│       └── 32f2bd-fa5c-430b-a163-2c19f54190d0
+│           └── nodes
+│               └── a0
+│                   └── 32
+│                       └── f2
+│                           └── bd
+│                               ├── -fa5c-430b-a163-2c19f54190d0
+│                               ├── -fa5c-430b-a163-2c19f54190d0.mlock
+│                               └── -fa5c-430b-a163-2c19f54190d0.mpk
+└── uploads
+```
+
+### Checking Vault Mode in the Frontend
+
+To check whether vault mode is enabled in the frontend, use the `@ownclouders/web-pkg` package:
+
+```typescript
+import { useAbility } from '@ownclouders/web-pkg'
+import { useCapabilityStore } from '@ownclouders/web-pkg'
+
+const capabilityStore = useCapabilityStore()
+const { can } = useAbility()
+
+const isVaultModeEnabled = capabilityStore.vaultEnabled && can('read-all', 'Vault')
+```
+
+### Running with Docker
+
+To enable vault mode in the `ocis_full` docker-compose stack, edit `deployments/examples/ocis_full/.env` and uncomment the following lines:
+
+```.env
+KEYCLOAK=:keycloak.yml
+VAULT_STORAGE=:vault-storage.yml
+```
+
+Then start the stack:
+
+```bash
+docker compose up -d
+```
