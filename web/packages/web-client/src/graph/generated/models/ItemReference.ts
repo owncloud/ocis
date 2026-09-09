@@ -22,23 +22,23 @@ export interface ItemReference {
     /**
      * Unique identifier of the drive instance that contains the item. Read-only.
      */
-    readonly driveId?: string;
+    driveId?: string;
     /**
      * Identifies the type of drive. See [drive][] resource for values. Read-only.
      */
-    readonly driveType?: string;
+    driveType?: string;
     /**
      * Unique identifier of the item in the drive. Read-only.
      */
-    readonly id?: string;
+    id?: string;
     /**
      * The name of the item being referenced. Read-only.
      */
-    readonly name?: string;
+    name?: string;
     /**
      * Path that can be used to navigate to the item. Read-only.
      */
-    readonly path?: string;
+    path?: string;
 }
 
 /**
@@ -70,13 +70,18 @@ export function ItemReferenceToJSON(json: any): ItemReference {
     return ItemReferenceToJSONTyped(json, false);
 }
 
-export function ItemReferenceToJSONTyped(value?: Omit<ItemReference, 'driveId'|'driveType'|'id'|'name'|'path'> | null, ignoreDiscriminator: boolean = false): any {
+export function ItemReferenceToJSONTyped(value?: ItemReference | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
+        'driveId': value['driveId'],
+        'driveType': value['driveType'],
+        'id': value['id'],
+        'name': value['name'],
+        'path': value['path'],
     };
 }
 

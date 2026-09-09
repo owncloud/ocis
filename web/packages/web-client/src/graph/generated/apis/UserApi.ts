@@ -79,7 +79,7 @@ export interface UpdateUserRequest {
     /**
      * 
      */
-    userUpdate: Omit<UserUpdate, 'id'|'appRoleAssignments'|'drives'|'memberOf'|'userType'>;
+    userUpdate: UserUpdate;
 }
 
 /**

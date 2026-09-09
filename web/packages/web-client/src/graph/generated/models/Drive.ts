@@ -51,7 +51,7 @@ export interface Drive {
     /**
      * The unique identifier for this drive.
      */
-    readonly id?: string;
+    id?: string;
     /**
      * 
      */
@@ -59,7 +59,7 @@ export interface Drive {
     /**
      * Date and time of item creation. Read-only.
      */
-    readonly createdDateTime?: string;
+    createdDateTime?: string;
     /**
      * Provides a user-visible description of the item. Optional.
      */
@@ -67,7 +67,7 @@ export interface Drive {
     /**
      * ETag for the item. Read-only.
      */
-    readonly eTag?: string;
+    eTag?: string;
     /**
      * 
      */
@@ -75,7 +75,7 @@ export interface Drive {
     /**
      * Date and time the item was last modified. Read-only.
      */
-    readonly lastModifiedDateTime?: string;
+    lastModifiedDateTime?: string;
     /**
      * The name of the item. Read-write.
      */
@@ -87,11 +87,11 @@ export interface Drive {
     /**
      * URL that displays the resource in the browser. Read-only.
      */
-    readonly webUrl?: string;
+    webUrl?: string;
     /**
      * Describes the type of drive represented by this resource. Values are "personal" for users home spaces, "project", "virtual" or "share". Read-only.
      */
-    readonly driveType?: string;
+    driveType?: string;
     /**
      * The drive alias can be used in clients to make the urls user friendly. Example: 'personal/einstein'. This will be used to resolve to the correct driveID.
      */
@@ -107,7 +107,7 @@ export interface Drive {
     /**
      * All items contained in the drive. Read-only. Nullable.
      */
-    readonly items?: Array<DriveItem>;
+    items?: Array<DriveItem>;
     /**
      * 
      */
@@ -160,21 +160,28 @@ export function DriveToJSON(json: any): Drive {
     return DriveToJSONTyped(json, false);
 }
 
-export function DriveToJSONTyped(value?: Omit<Drive, 'id'|'createdDateTime'|'eTag'|'lastModifiedDateTime'|'webUrl'|'driveType'|'items'> | null, ignoreDiscriminator: boolean = false): any {
+export function DriveToJSONTyped(value?: Drive | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
+        'id': value['id'],
         'createdBy': IdentitySetToJSON(value['createdBy']),
+        'createdDateTime': value['createdDateTime'],
         'description': value['description'],
+        'eTag': value['eTag'],
         'lastModifiedBy': IdentitySetToJSON(value['lastModifiedBy']),
+        'lastModifiedDateTime': value['lastModifiedDateTime'],
         'name': value['name'],
         'parentReference': ItemReferenceToJSON(value['parentReference']),
+        'webUrl': value['webUrl'],
+        'driveType': value['driveType'],
         'driveAlias': value['driveAlias'],
         'owner': IdentitySetToJSON(value['owner']),
         'quota': QuotaToJSON(value['quota']),
+        'items': value['items'] == null ? undefined : ((value['items'] as Array<any>).map(DriveItemToJSON)),
         'root': DriveItemToJSON(value['root']),
         'special': value['special'] == null ? undefined : ((value['special'] as Array<any>).map(DriveItemToJSON)),
     };

@@ -30,7 +30,7 @@ export interface Application {
     /**
      * The unique identifier for the object. 12345678-9abc-def0-1234-56789abcde. The value of the ID property is often, but not exclusively, in the form of a GUID. The value should be treated as an opaque identifier and not based in being a GUID. Null values are not allowed. Read-only.
      */
-    readonly id: string;
+    id: string;
     /**
      * The collection of roles defined for the application. With app role assignments, these roles can be assigned to users, groups, or service principals associated with other applications. Not nullable.
      */
@@ -69,13 +69,14 @@ export function ApplicationToJSON(json: any): Application {
     return ApplicationToJSONTyped(json, false);
 }
 
-export function ApplicationToJSONTyped(value?: Omit<Application, 'id'> | null, ignoreDiscriminator: boolean = false): any {
+export function ApplicationToJSONTyped(value?: Application | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
+        'id': value['id'],
         'appRoles': value['appRoles'] == null ? undefined : ((value['appRoles'] as Array<any>).map(AppRoleToJSON)),
         'displayName': value['displayName'],
     };

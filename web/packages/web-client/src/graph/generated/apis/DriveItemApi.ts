@@ -58,7 +58,7 @@ export interface UpdateDriveItemRequest {
     /**
      * 
      */
-    driveItem: Omit<DriveItem, 'id'|'createdDateTime'|'eTag'|'lastModifiedDateTime'|'webUrl'|'cTag'|'size'|'webDavUrl'|'children'|'permissions'>;
+    driveItem: DriveItem;
 }
 
 /**

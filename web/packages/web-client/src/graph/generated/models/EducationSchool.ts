@@ -22,7 +22,7 @@ export interface EducationSchool {
     /**
      * The unique identifier for an entity. Read-only.
      */
-    readonly id?: string;
+    id?: string;
     /**
      * The organization name
      */
@@ -65,13 +65,14 @@ export function EducationSchoolToJSON(json: any): EducationSchool {
     return EducationSchoolToJSONTyped(json, false);
 }
 
-export function EducationSchoolToJSONTyped(value?: Omit<EducationSchool, 'id'> | null, ignoreDiscriminator: boolean = false): any {
+export function EducationSchoolToJSONTyped(value?: EducationSchool | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
+        'id': value['id'],
         'displayName': value['displayName'],
         'schoolNumber': value['schoolNumber'],
         'terminationDate': value['terminationDate'],

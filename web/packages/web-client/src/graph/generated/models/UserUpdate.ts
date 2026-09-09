@@ -72,7 +72,7 @@ export interface UserUpdate {
     /**
      * Read-only.
      */
-    readonly id?: string;
+    id?: string;
     /**
      * Set to "true" when the account is enabled.
      */
@@ -80,7 +80,7 @@ export interface UserUpdate {
     /**
      * The apps and app roles which this user has been assigned.
      */
-    readonly appRoleAssignments?: Array<AppRoleAssignment>;
+    appRoleAssignments?: Array<AppRoleAssignment>;
     /**
      * The name displayed in the address book for the user. This value is usually the combination of the user's first name, middle initial, and last name. This property is required when a user is created and it cannot be cleared during updates. Returned by default. Supports $orderby.
      */
@@ -88,7 +88,7 @@ export interface UserUpdate {
     /**
      * A collection of drives available for this user. Read-only.
      */
-    readonly drives?: Array<Drive>;
+    drives?: Array<Drive>;
     /**
      * 
      */
@@ -104,7 +104,7 @@ export interface UserUpdate {
     /**
      * Groups that this user is a member of. HTTP Methods: GET (supported for all groups). Read-only. Nullable. Supports $expand.
      */
-    readonly memberOf?: Array<Group>;
+    memberOf?: Array<Group>;
     /**
      * Contains the on-premises SAM account name synchronized from the on-premises directory.
      */
@@ -124,7 +124,7 @@ export interface UserUpdate {
     /**
      * The user`s type. This can be either "Member" for regular user, "Guest" for guest users or "Federated" for users imported from a federated instance.
      */
-    readonly userType?: string;
+    userType?: string;
     /**
      * Represents the users language setting, ISO-639-1 Code
      */
@@ -190,22 +190,27 @@ export function UserUpdateToJSON(json: any): UserUpdate {
     return UserUpdateToJSONTyped(json, false);
 }
 
-export function UserUpdateToJSONTyped(value?: Omit<UserUpdate, 'id'|'appRoleAssignments'|'drives'|'memberOf'|'userType'> | null, ignoreDiscriminator: boolean = false): any {
+export function UserUpdateToJSONTyped(value?: UserUpdate | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
+        'id': value['id'],
         'accountEnabled': value['accountEnabled'],
+        'appRoleAssignments': value['appRoleAssignments'] == null ? undefined : ((value['appRoleAssignments'] as Array<any>).map(AppRoleAssignmentToJSON)),
         'displayName': value['displayName'],
+        'drives': value['drives'] == null ? undefined : ((value['drives'] as Array<any>).map(DriveToJSON)),
         'drive': DriveToJSON(value['drive']),
         'identities': value['identities'] == null ? undefined : ((value['identities'] as Array<any>).map(ObjectIdentityToJSON)),
         'mail': value['mail'],
+        'memberOf': value['memberOf'] == null ? undefined : ((value['memberOf'] as Array<any>).map(GroupToJSON)),
         'onPremisesSamAccountName': value['onPremisesSamAccountName'],
         'passwordProfile': PasswordProfileToJSON(value['passwordProfile']),
         'surname': value['surname'],
         'givenName': value['givenName'],
+        'userType': value['userType'],
         'preferredLanguage': value['preferredLanguage'],
         'signInActivity': SignInActivityToJSON(value['signInActivity']),
         'externalID': value['externalID'],

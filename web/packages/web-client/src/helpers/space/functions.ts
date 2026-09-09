@@ -20,7 +20,6 @@ import { buildWebDavPublicPath, buildWebDavOcmPath } from '../publicLink'
 import { urlJoin } from '../../utils'
 import { Drive, DriveItem } from '@ownclouders/web-client/graph/generated'
 import { GraphSharePermission, ShareRole } from '../share'
-import { Writeable } from '../writeable'
 
 export function buildWebDavSpacesPath(storageId: string, path?: string) {
   return urlJoin('spaces', storageId, path, {
@@ -140,7 +139,7 @@ export function buildSpace(
   },
   graphRoles: Record<string, ShareRole>
 ): SpaceResource {
-  let spaceImageData: Writeable<DriveItem>, spaceReadmeData: Writeable<DriveItem>
+  let spaceImageData: DriveItem, spaceReadmeData: DriveItem
   if (data.special) {
     spaceImageData = data.special.find((el) => el.specialFolder.name === 'image')
     spaceReadmeData = data.special.find((el) => el.specialFolder.name === 'readme')

@@ -34,7 +34,7 @@ export interface OpenGraphFile {
     /**
      * The MIME type for the file. This is determined by logic on the server and might not be the value provided when the file was uploaded. Read-only.
      */
-    readonly mimeType?: string;
+    mimeType?: string;
     /**
      * 
      */
@@ -68,7 +68,7 @@ export function OpenGraphFileToJSON(json: any): OpenGraphFile {
     return OpenGraphFileToJSONTyped(json, false);
 }
 
-export function OpenGraphFileToJSONTyped(value?: Omit<OpenGraphFile, 'mimeType'> | null, ignoreDiscriminator: boolean = false): any {
+export function OpenGraphFileToJSONTyped(value?: OpenGraphFile | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -76,6 +76,7 @@ export function OpenGraphFileToJSONTyped(value?: Omit<OpenGraphFile, 'mimeType'>
     return {
         
         'hashes': HashesToJSON(value['hashes']),
+        'mimeType': value['mimeType'],
         'processingMetadata': value['processingMetadata'],
     };
 }

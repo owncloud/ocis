@@ -101,7 +101,7 @@ export interface UpdateGroupRequest {
     /**
      * 
      */
-    group: Omit<Group, 'id'>;
+    group: Group;
 }
 
 /**

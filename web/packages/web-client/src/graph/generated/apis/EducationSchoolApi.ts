@@ -75,7 +75,7 @@ export interface CreateSchoolRequest {
     /**
      * 
      */
-    educationSchool: Omit<EducationSchool, 'id'>;
+    educationSchool: EducationSchool;
 }
 
 export interface DeleteClassFromSchoolRequest {
@@ -136,7 +136,7 @@ export interface UpdateSchoolRequest {
     /**
      * 
      */
-    educationSchool: Omit<EducationSchool, 'id'>;
+    educationSchool: EducationSchool;
 }
 
 /**

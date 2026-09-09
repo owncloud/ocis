@@ -87,7 +87,7 @@ export interface UpdateDriveRequest {
     /**
      * 
      */
-    driveUpdate: Omit<DriveUpdate, 'id'|'createdDateTime'|'eTag'|'lastModifiedDateTime'|'webUrl'|'driveType'|'items'>;
+    driveUpdate: DriveUpdate;
 }
 
 export interface UpdateDriveBetaRequest {
@@ -98,7 +98,7 @@ export interface UpdateDriveBetaRequest {
     /**
      * 
      */
-    driveUpdate: Omit<DriveUpdate, 'id'|'createdDateTime'|'eTag'|'lastModifiedDateTime'|'webUrl'|'driveType'|'items'>;
+    driveUpdate: DriveUpdate;
 }
 
 /**

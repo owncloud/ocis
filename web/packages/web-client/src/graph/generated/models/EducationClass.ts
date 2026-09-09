@@ -30,7 +30,7 @@ export interface EducationClass {
     /**
      * Read-only.
      */
-    readonly id?: string;
+    id?: string;
     /**
      * An optional description for the group. Returned by default.
      */
@@ -99,13 +99,14 @@ export function EducationClassToJSON(json: any): EducationClass {
     return EducationClassToJSONTyped(json, false);
 }
 
-export function EducationClassToJSONTyped(value?: Omit<EducationClass, 'id'> | null, ignoreDiscriminator: boolean = false): any {
+export function EducationClassToJSONTyped(value?: EducationClass | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
+        'id': value['id'],
         'description': value['description'],
         'displayName': value['displayName'],
         'members': value['members'] == null ? undefined : ((value['members'] as Array<any>).map(UserToJSON)),

@@ -22,7 +22,7 @@ export interface AppRoleAssignment {
     /**
      * The unique identifier for the object. 12345678-9abc-def0-1234-56789abcde. The value of the ID property is often, but not exclusively, in the form of a GUID. The value should be treated as an opaque identifier and not based in being a GUID. Null values are not allowed. Read-only.
      */
-    readonly id?: string;
+    id?: string;
     /**
      * 
      */
@@ -93,13 +93,14 @@ export function AppRoleAssignmentToJSON(json: any): AppRoleAssignment {
     return AppRoleAssignmentToJSONTyped(json, false);
 }
 
-export function AppRoleAssignmentToJSONTyped(value?: Omit<AppRoleAssignment, 'id'> | null, ignoreDiscriminator: boolean = false): any {
+export function AppRoleAssignmentToJSONTyped(value?: AppRoleAssignment | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
+        'id': value['id'],
         'deletedDateTime': value['deletedDateTime'],
         'appRoleId': value['appRoleId'],
         'createdDateTime': value['createdDateTime'],

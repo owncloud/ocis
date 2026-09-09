@@ -40,7 +40,7 @@ export interface UpdateOwnUserRequest {
     /**
      * 
      */
-    userUpdate?: Omit<UserUpdate, 'id'|'appRoleAssignments'|'drives'|'memberOf'|'userType'>;
+    userUpdate?: UserUpdate;
 }
 
 /**

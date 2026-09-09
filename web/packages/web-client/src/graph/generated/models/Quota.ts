@@ -22,23 +22,23 @@ export interface Quota {
     /**
      * Total space consumed by files in the recycle bin, in bytes. Read-only.
      */
-    readonly deleted?: number;
+    deleted?: number;
     /**
      * Total space remaining before reaching the quota limit, in bytes. Read-only.
      */
-    readonly remaining?: number;
+    remaining?: number;
     /**
      * Enumeration value that indicates the state of the storage space. Either "normal", "nearing", "critical" or "exceeded". Read-only.
      */
-    readonly state?: string;
+    state?: string;
     /**
      * Total allowed storage space, in bytes. Read-only.
      */
-    readonly total?: number;
+    total?: number;
     /**
      * Total space used, in bytes. Read-only.
      */
-    readonly used?: number;
+    used?: number;
 }
 
 /**
@@ -70,13 +70,18 @@ export function QuotaToJSON(json: any): Quota {
     return QuotaToJSONTyped(json, false);
 }
 
-export function QuotaToJSONTyped(value?: Omit<Quota, 'deleted'|'remaining'|'state'|'total'|'used'> | null, ignoreDiscriminator: boolean = false): any {
+export function QuotaToJSONTyped(value?: Quota | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
+        'deleted': value['deleted'],
+        'remaining': value['remaining'],
+        'state': value['state'],
+        'total': value['total'],
+        'used': value['used'],
     };
 }
 

@@ -37,7 +37,7 @@ export interface UserCreateAppRoleAssignmentsRequest {
     /**
      * 
      */
-    appRoleAssignment: Omit<AppRoleAssignment, 'id'>;
+    appRoleAssignment: AppRoleAssignment;
 }
 
 export interface UserDeleteAppRoleAssignmentsRequest {

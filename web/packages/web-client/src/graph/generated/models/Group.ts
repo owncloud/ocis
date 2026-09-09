@@ -30,7 +30,7 @@ export interface Group {
     /**
      * Read-only.
      */
-    readonly id?: string;
+    id?: string;
     /**
      * An optional description for the group. Returned by default.
      */
@@ -83,13 +83,14 @@ export function GroupToJSON(json: any): Group {
     return GroupToJSONTyped(json, false);
 }
 
-export function GroupToJSONTyped(value?: Omit<Group, 'id'> | null, ignoreDiscriminator: boolean = false): any {
+export function GroupToJSONTyped(value?: Group | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
+        'id': value['id'],
         'description': value['description'],
         'displayName': value['displayName'],
         'groupTypes': value['groupTypes'],

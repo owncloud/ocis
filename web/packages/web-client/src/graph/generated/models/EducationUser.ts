@@ -51,7 +51,7 @@ export interface EducationUser {
     /**
      * Read-only.
      */
-    readonly id?: string;
+    id?: string;
     /**
      * Set to "true" when the account is enabled.
      */
@@ -63,7 +63,7 @@ export interface EducationUser {
     /**
      * A collection of drives available for this user. Read-only.
      */
-    readonly drives?: Array<Drive>;
+    drives?: Array<Drive>;
     /**
      * 
      */
@@ -149,15 +149,17 @@ export function EducationUserToJSON(json: any): EducationUser {
     return EducationUserToJSONTyped(json, false);
 }
 
-export function EducationUserToJSONTyped(value?: Omit<EducationUser, 'id'|'drives'> | null, ignoreDiscriminator: boolean = false): any {
+export function EducationUserToJSONTyped(value?: EducationUser | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
+        'id': value['id'],
         'accountEnabled': value['accountEnabled'],
         'displayName': value['displayName'],
+        'drives': value['drives'] == null ? undefined : ((value['drives'] as Array<any>).map(DriveToJSON)),
         'drive': DriveToJSON(value['drive']),
         'identities': value['identities'] == null ? undefined : ((value['identities'] as Array<any>).map(ObjectIdentityToJSON)),
         'mail': value['mail'],

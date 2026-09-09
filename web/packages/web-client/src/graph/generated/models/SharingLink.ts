@@ -37,11 +37,11 @@ export interface SharingLink {
     /**
      * If `true` then the user can only use this link to view the item on the web, and cannot use it to download the contents of the item.
      */
-    readonly preventsDownload?: boolean;
+    preventsDownload?: boolean;
     /**
      * A URL that opens the item in the browser on the website.
      */
-    readonly webUrl?: string;
+    webUrl?: string;
     /**
      * Provides a user-visible display name of the link. Optional. Libregraph only.
      */
@@ -83,7 +83,7 @@ export function SharingLinkToJSON(json: any): SharingLink {
     return SharingLinkToJSONTyped(json, false);
 }
 
-export function SharingLinkToJSONTyped(value?: Omit<SharingLink, 'preventsDownload'|'webUrl'> | null, ignoreDiscriminator: boolean = false): any {
+export function SharingLinkToJSONTyped(value?: SharingLink | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -91,6 +91,8 @@ export function SharingLinkToJSONTyped(value?: Omit<SharingLink, 'preventsDownlo
     return {
         
         'type': SharingLinkTypeToJSON(value['type']),
+        'preventsDownload': value['preventsDownload'],
+        'webUrl': value['webUrl'],
         '@libre.graph.displayName': value['atLibreGraphDisplayName'],
         '@libre.graph.quickLink': value['atLibreGraphQuickLink'],
     };

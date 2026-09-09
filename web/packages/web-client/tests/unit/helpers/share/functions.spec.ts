@@ -25,7 +25,7 @@ import {
   UnifiedRoleDefinition,
   User
 } from '../../../../src/graph/generated'
-import { urlJoin, writeable } from '../../../../src'
+import { urlJoin } from '../../../../src'
 
 describe('share helper functions', () => {
   describe('isShareResource', () => {
@@ -76,7 +76,7 @@ describe('share helper functions', () => {
   describe('getShareResourceRoles', () => {
     it("returns all roles from a drive item's permissions that are also included in the graphRoles", () => {
       const driveItem = mockDeep<DriveItem>()
-      writeable(driveItem.remoteItem).permissions = [{ roles: ['1', '2'] }, { roles: ['1', '3'] }]
+      driveItem.remoteItem.permissions = [{ roles: ['1', '2'] }, { roles: ['1', '3'] }]
       const graphRoles = { '1': mock<ShareRole>({ id: '1' }), '4': mock<ShareRole>({ id: '4' }) }
 
       const result = getShareResourceRoles({ driveItem, graphRoles })
@@ -101,7 +101,7 @@ describe('share helper functions', () => {
     it('returns permissions based on a drive item if no graph share roles given', () => {
       const permissions = ['view', 'edit']
       const driveItem = mockDeep<DriveItem>()
-      writeable(driveItem.remoteItem).permissions = [
+      driveItem.remoteItem.permissions = [
         { atLibreGraphPermissionsActions: [permissions[0]] },
         { atLibreGraphPermissionsActions: [permissions[1]] }
       ]
@@ -116,7 +116,7 @@ describe('share helper functions', () => {
     const driveItem = mockDeep<DriveItem>({ id: 'driveItemId', name: 'driveItemName' })
     const sharedBy = { id: '1', displayName: 'user1' } as Identity
     const sharedWith = { id: '2', displayName: 'user2' } as Identity
-    writeable(driveItem.remoteItem).permissions = [
+    driveItem.remoteItem.permissions = [
       {
         roles: ['1', '2'],
         invitation: { invitedBy: { user: sharedBy } },
@@ -167,10 +167,10 @@ describe('share helper functions', () => {
 
   describe('buildOutgoingShareResource', () => {
     const driveItem = mockDeep<DriveItem>({ id: 'driveItemId', name: 'driveItemName' })
-    writeable(driveItem.parentReference).path = ''
+    driveItem.parentReference.path = ''
     const sharedBy = { id: '1', displayName: 'user1' } as Identity
     const sharedWith = { id: '2', displayName: 'user2' } as Identity
-    writeable(driveItem).permissions = [
+    driveItem.permissions = [
       {
         roles: ['1', '2'],
         invitation: { invitedBy: { user: sharedBy } },

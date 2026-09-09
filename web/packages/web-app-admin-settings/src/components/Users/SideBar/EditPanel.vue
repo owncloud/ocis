@@ -125,7 +125,6 @@ import {
 import GroupSelect from '../GroupSelect.vue'
 import { cloneDeep, isEmpty, isEqual, omit } from 'lodash-es'
 import { AppRole, AppRoleAssignment, Group, User } from '@ownclouders/web-client/graph/generated'
-import { writeable } from '@ownclouders/web-client'
 import { MaybeRef, useClientService } from '@ownclouders/web-pkg'
 import { storeToRefs } from 'pinia'
 import { diff } from 'deep-object-diff'
@@ -167,10 +166,10 @@ const formData = ref({
   }
 })
 function changeSelectedQuotaOption(option: { value: number; displayValue: string }) {
-  writeable(unref(editUser).drive.quota).total = option.value
+  unref(editUser).drive.quota.total = option.value
 }
 function changeSelectedGroupOption(option: Group[]) {
-  writeable(unref(editUser)).memberOf = option
+  unref(editUser).memberOf = option
 }
 async function validateUserName() {
   unref(formData).userName.valid = false

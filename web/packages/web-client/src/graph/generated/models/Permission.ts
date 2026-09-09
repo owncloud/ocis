@@ -60,13 +60,13 @@ export interface Permission {
     /**
      * The unique identifier of the permission among all permissions on the item. Read-only.
      */
-    readonly id?: string;
+    id?: string;
     /**
      * Indicates whether the password is set for this permission. This property only
      * appears in the response. Optional. Read-only.
      * 
      */
-    readonly hasPassword?: boolean;
+    hasPassword?: boolean;
     /**
      * An optional expiration date which limits the permission in time.
      */
@@ -136,13 +136,15 @@ export function PermissionToJSON(json: any): Permission {
     return PermissionToJSONTyped(json, false);
 }
 
-export function PermissionToJSONTyped(value?: Omit<Permission, 'id'|'hasPassword'> | null, ignoreDiscriminator: boolean = false): any {
+export function PermissionToJSONTyped(value?: Permission | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
+        'id': value['id'],
+        'hasPassword': value['hasPassword'],
         'expirationDateTime': value['expirationDateTime'],
         'createdDateTime': value['createdDateTime'],
         'grantedToV2': SharePointIdentitySetToJSON(value['grantedToV2']),
