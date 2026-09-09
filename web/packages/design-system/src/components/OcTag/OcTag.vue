@@ -6,9 +6,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, unref } from 'vue'
 import { RouteLocationRaw } from 'vue-router'
-import { getSizeClass } from '../../helpers'
+import { getSizeClass, tagColorVarsFor } from '../../helpers'
 
 /**
  * @component OcTag
@@ -18,8 +18,9 @@ import { getSizeClass } from '../../helpers'
  * @prop {string|RouteLocationRaw} [to=null] - Target location for router-link or anchor href
  * @prop {('small'|'medium'|'large')} [size='medium'] - Size of the tag
  * @prop {boolean} [rounded=false] - Whether the tag should have fully rounded corners
- * @prop {string} [fillColor=undefined] - Background colour of the tag when filled
- * @prop {string} [labelColor=undefined] - Text colour to pair with `fillColor` for legibility
+ * @prop {number} [colorIndex=undefined] - Index into the theme's tag colour list. Fills the tag
+ *   with that colour and takes the matching label colour with it. A negative index or none at all
+ *   leaves the tag with its default appearance, which is what a theme shipping no tag colours gets.
  *
  * @emits {MouseEvent} click - Emitted when the tag is clicked
  *
@@ -43,8 +44,7 @@ interface Props {
   to?: string | RouteLocationRaw
   size?: 'small' | 'medium' | 'large'
   rounded?: boolean
-  fillColor?: string | null
-  labelColor?: string | null
+  colorIndex?: number | null
 }
 
 interface Emits {
@@ -62,8 +62,7 @@ const {
   to = null,
   size = 'medium',
   rounded = false,
-  fillColor = null,
-  labelColor = null
+  colorIndex = null
 } = defineProps<Props>()
 
 const emit = defineEmits<Emits>()
@@ -71,6 +70,11 @@ const emit = defineEmits<Emits>()
 function ocTagClick(event: MouseEvent) {
   emit('click', event)
 }
+
+// The fill and the label colour that goes with it, or null when the tag is not to be filled.
+// Both are css vars the theme emits, so the tag needs nothing but the index to colour itself: no
+// colours passed in at every call site, and a theme switch repaints without re-rendering.
+const colorVars = computed(() => tagColorVarsFor(colorIndex))
 
 const ocTagClass = computed(() => {
   const classes = ['oc-tag', `oc-tag-${getSizeClass(size)}`]
@@ -83,7 +87,7 @@ const ocTagClass = computed(() => {
     classes.push('oc-tag-rounded')
   }
 
-  if (fillColor) {
+  if (unref(colorVars)) {
     classes.push('oc-tag-filled')
   }
 
@@ -91,14 +95,13 @@ const ocTagClass = computed(() => {
 })
 
 const ocTagStyle = computed(() => {
-  if (!fillColor) {
+  const vars = unref(colorVars)
+  if (!vars) {
     return undefined
   }
-  // No guess at the label colour without one: the fills come from the theme, so the legible
-  // pairing differs per fill and per theme. Callers get it from `useTagColor`.
   return {
-    backgroundColor: fillColor,
-    ...(labelColor && { color: labelColor })
+    backgroundColor: vars.fillColor,
+    color: vars.textColor
   }
 })
 </script>
@@ -220,6 +223,18 @@ Component to display various information.
 </oc-tag>
 </div>
 ```
+## Coloured tags
+A tag can take one of the theme's tag colours by index. The label colour comes with it, so nothing
+has to be worked out at the call site — `useTagColor().tagColorIndex(name)` in web-pkg turns a tag
+name into the index.
+
+```js
+<oc-grid gutter="small" flex="true">
+    <oc-tag class="oc-mr-s" size="small" :color-index="3">physics</oc-tag>
+    <oc-tag class="oc-mr-s" size="small" :color-index="7">invoice</oc-tag>
+</oc-grid>
+```
+
 ## Different types of the tag component
 The tag component can be rendered as a different element if desired. You can specify such element via property `type`.
 

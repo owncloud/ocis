@@ -25,7 +25,7 @@ describe('OcTag', () => {
   })
 
   describe('Tag chip fill color', () => {
-    it('emits no inline style at all when fillColor is not set', () => {
+    it('emits no inline style at all when no colour index is given', () => {
       // OcTag is a generic badge — it also renders the app-store "most recent" pill, the
       // primary/active instance badges and the tag overflow counter. Fill must stay opt-in so
       // none of those pick up a background.
@@ -38,59 +38,50 @@ describe('OcTag', () => {
       expect(wrapper.attributes('style')).toBeUndefined()
     })
 
-    it('applies fillColor to rendered output when fillColor is set', () => {
+    it('fills itself from the theme colour the index points at', () => {
       const wrapper = shallowMount(Tag, {
         props: {
           type: 'button',
-          fillColor: 'var(--oc-color-tag-3)'
+          colorIndex: 3
         }
       })
 
-      const element = wrapper.element as HTMLElement
-      const style = element.getAttribute('style')
-      expect(style).toBeTruthy()
-      expect(style).toContain('var(--oc-color-tag-3)')
+      const style = wrapper.attributes('style')
+      expect(style).toContain('background-color: var(--oc-color-tag-3)')
+      expect(style).toContain('color: var(--oc-color-tag-3-text)')
     })
 
-    it('applies fillColor independently of other props', () => {
+    it('takes the label colour with the fill, so no caller works out contrast', () => {
+      // The `-text` half of the pair is derived once per theme by the theme store, from the
+      // theme's own text colours. A chip only ever names a slot.
+      const wrapper = shallowMount(Tag, { props: { colorIndex: 7 } })
+
+      expect(wrapper.attributes('style')).toContain('color: var(--oc-color-tag-7-text)')
+    })
+
+    it('colours itself independently of other props', () => {
       const wrapper = shallowMount(Tag, {
         props: {
           type: 'span',
           size: 'large',
           rounded: true,
-          fillColor: 'var(--oc-color-tag-5)'
+          colorIndex: 5
         }
       })
 
       const classes = wrapper.classes()
       expect(classes).toContain('oc-tag-l')
       expect(classes).toContain('oc-tag-rounded')
-      expect(wrapper.html()).toContain('var(--oc-color-tag-5)')
+      expect(wrapper.attributes('style')).toContain('var(--oc-color-tag-5)')
     })
 
-    it('applies labelColor as the text colour alongside the fill', () => {
-      const wrapper = shallowMount(Tag, {
-        props: {
-          fillColor: 'var(--oc-color-tag-3)',
-          labelColor: '#000000'
-        }
-      })
+    it('stays unfilled for the -1 a theme without tag colours yields', () => {
+      // `useTagColor` returns -1 when the theme ships no `tagColorsList`, and a chip must then
+      // look exactly like the plain badge rather than reference a var that resolves to nothing.
+      const wrapper = shallowMount(Tag, { props: { colorIndex: -1 } })
 
-      const style = wrapper.attributes('style')
-      expect(style).toContain('background-color: var(--oc-color-tag-3)')
-      expect(style).toContain('color: #000000')
-    })
-
-    it('leaves the text colour inherited when labelColor is not given', () => {
-      // A fill without a label colour must not guess. `--oc-color-text-inverse` is white in the
-      // light theme and black in the dark one, which is backwards for pale light-theme fills.
-      const wrapper = shallowMount(Tag, {
-        props: {
-          fillColor: 'var(--oc-color-tag-3)'
-        }
-      })
-
-      expect(wrapper.attributes('style')).not.toContain('color: var(--oc-color-text-inverse)')
+      expect(wrapper.attributes('style')).toBeUndefined()
+      expect(wrapper.classes()).not.toContain('oc-tag-filled')
     })
 
     it('marks a filled tag, so nested links and icons take the chip colour', () => {
@@ -98,9 +89,7 @@ describe('OcTag', () => {
       // anchor colour (styles/theme/oc-text.scss:21), `.oc-button-raw` paints its own text and
       // icon, and `.oc-tag .oc-icon > svg` pins a muted fill. The class is what the stylesheet
       // hangs the `inherit`/`currentColor` overrides on.
-      const wrapper = shallowMount(Tag, {
-        props: { fillColor: 'var(--oc-color-tag-3)', labelColor: '#ffffff' }
-      })
+      const wrapper = shallowMount(Tag, { props: { colorIndex: 3 } })
 
       expect(wrapper.classes()).toContain('oc-tag-filled')
     })

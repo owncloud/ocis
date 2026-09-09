@@ -125,8 +125,7 @@
           v-oc-tooltip="getTagToolTip(tag)"
           class="resource-table-tag oc-ml-xs"
           size="small"
-          :fill-color="tagColor(tag)"
-          :label-color="tagLabelColor(tag)"
+          :color-index="tagColorIndex(tag)"
         >
           <span class="oc-text-truncate">{{ tag }}</span>
         </oc-tag>
@@ -164,8 +163,7 @@
             v-oc-tooltip="getTagToolTip(tag)"
             class="resource-table-tag"
             size="small"
-            :fill-color="tagColor(tag)"
-            :label-color="tagLabelColor(tag)"
+            :color-index="tagColorIndex(tag)"
           >
             <span class="oc-text-truncate">{{ tag }}</span>
           </oc-tag>
@@ -449,7 +447,7 @@ const {
   fileTypes: embedModeFileTypes
 } = useEmbedMode()
 const { getDefaultAction } = useFileActions()
-const { tagColor, tagLabelColor } = useTagColor()
+const { tagColorIndex } = useTagColor()
 const language = useGettext()
 const { $pgettext, $gettext, $ngettext } = language
 
@@ -1155,10 +1153,21 @@ function getSharedWithAvatarItems(resource: Resource) {
     max-width: 80px;
   }
 
+  // The chips and the `+ N` button are separate inline boxes in the cell, so how they line up is
+  // down to `vertical-align`. Baseline alignment (the default) does not do it: a chip sits inside
+  // an inline wrapper and aligns its own baseline within it, and `text-bottom` on the button lined
+  // it up with the cell text's descender rather than with the chips. Centring every one of them
+  // instead makes them agree, and since they are all `oc-tag-s` with the same padding and font
+  // size, they are the same height and so land pixel-identical.
+  &-tag-wrapper {
+    display: inline-flex;
+    vertical-align: middle;
+  }
+
   &-tag-more {
     cursor: pointer;
     border: 0 !important;
-    vertical-align: text-bottom;
+    vertical-align: middle;
   }
 
   // `OcDrop` is a fixed 300px wide, so the overflow popover stayed that wide however few tags it

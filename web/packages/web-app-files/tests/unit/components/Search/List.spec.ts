@@ -24,15 +24,10 @@ vi.mock('@ownclouders/web-pkg', async (importOriginal) => {
       triggerDefaultAction: vi.fn()
     })),
     useTagColor: vi.fn(() => ({
-      tagColor: vi.fn((name: string) => {
-        const tagColorMap: Record<string, string> = {
-          invoice: 'var(--oc-color-tag-7)',
-          project: 'var(--oc-color-tag-3)',
-          meeting: 'var(--oc-color-tag-5)'
-        }
-        return tagColorMap[name] || ''
-      }),
-      tagLabelColor: vi.fn(() => '#000000')
+      tagColorIndex: vi.fn((name: string) => {
+        const tagColorMap: Record<string, number> = { invoice: 7, project: 3, meeting: 5 }
+        return tagColorMap[name] ?? -1
+      })
     }))
   }
 })

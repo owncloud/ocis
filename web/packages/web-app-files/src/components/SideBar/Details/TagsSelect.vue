@@ -19,8 +19,7 @@
       <oc-tag
         class="tags-select-tag oc-ml-xs"
         size="small"
-        :fill-color="tagColor(option.label)"
-        :label-color="tagLabelColor(option.label)"
+        :color-index="tagColorIndex(option.label)"
       >
         <component
           :is="type"
@@ -56,12 +55,7 @@
     <template #option="{ label, error }">
       <div class="oc-flex test">
         <span class="oc-flex oc-flex-center">
-          <oc-tag
-            class="tags-select-tag oc-ml-xs"
-            size="small"
-            :fill-color="tagColor(label)"
-            :label-color="tagLabelColor(label)"
-          >
+          <oc-tag class="tags-select-tag oc-ml-xs" size="small" :color-index="tagColorIndex(label)">
             <span class="oc-text-truncate">{{ label }}</span>
           </oc-tag>
         </span>
@@ -117,7 +111,7 @@ const { showErrorMessage } = useMessages()
 const clientService = useClientService()
 const router = useRouter()
 const { updateResourceField } = useResourcesStore()
-const { tagColor, tagLabelColor } = useTagColor()
+const { tagColorIndex } = useTagColor()
 
 const selectOnKeyCodes = [KeyCode.Enter, KeyCode[',']]
 

@@ -3,7 +3,12 @@ import { defineStore } from 'pinia'
 import { computed, ref, unref } from 'vue'
 import { useLocalStorage, usePreferredDark } from '@vueuse/core'
 import { z } from 'zod'
-import { applyCustomProp, removeCustomProp } from '@ownclouders/design-system/helpers'
+import {
+  applyCustomProp,
+  hexToRgb,
+  pickReadableTextColor,
+  removeCustomProp
+} from '@ownclouders/design-system/helpers'
 import { ShareRole } from '@ownclouders/web-client'
 import { useVault } from '../vault'
 
@@ -115,6 +120,35 @@ export type WebThemeConfigType = z.infer<typeof WebThemeConfig>
 
 const themeStorageKey = 'oc_currentThemeName'
 
+/**
+ * The label colour to pair with every entry of a theme's `tagColorsList`, keyed by the custom prop
+ * it is emitted as: `--oc-color-tag-3` gets a `--oc-color-tag-3-text` next to it.
+ *
+ * Derived here rather than where a chip is rendered, because this is where a theme's palette is:
+ * the two candidates are the theme's own text colours instead of hardcoded black and white, and a
+ * theme switch re-emits the pairing along with everything else it already re-emits.
+ */
+const tagTextColorProps = (theme: WebThemeType): Record<string, string> => {
+  const palette = theme.designTokens?.colorPalette ?? {}
+
+  // The theme's own text colour and its inverse are the two candidates — which of the pair is the
+  // darker one differs per theme, and it does not matter, only which one contrasts better does.
+  // Both have to be measurable for that comparison to mean anything, and a theme may write any
+  // css colour it likes (the ownCloud light theme states `text-default` in `oklch()`), so a pair
+  // that cannot be read as hex is dropped in favour of plain black and white.
+  const candidates = [palette['text-default'], palette['text-inverse']]
+  const [candidateA, candidateB] = candidates.every((color) => color && hexToRgb(color))
+    ? candidates
+    : ['#000000', '#ffffff']
+
+  return Object.fromEntries(
+    (theme.designTokens?.tagColorsList ?? []).map((fillColor, index) => [
+      `color-tag-${index}-text`,
+      pickReadableTextColor(fillColor, candidateA, candidateB)
+    ])
+  )
+}
+
 export const useThemeStore = defineStore('theme', () => {
   const currentLocalStorageThemeName = useLocalStorage(themeStorageKey, null)
 
@@ -195,6 +229,9 @@ export const useThemeStore = defineStore('theme', () => {
           removeCustomProp(`${token.prefix}-${param}`)
         }
       })
+      for (const param in tagTextColorProps(previousTheme)) {
+        removeCustomProp(param)
+      }
     }
 
     applyCustomProp('font-family', unref(currentTheme).designTokens.fontFamily)
@@ -205,6 +242,11 @@ export const useThemeStore = defineStore('theme', () => {
         applyCustomProp(`${token.prefix}-${param}`, values[param])
       }
     })
+
+    const tagTextColors = tagTextColorProps(unref(currentTheme))
+    for (const param in tagTextColors) {
+      applyCustomProp(param, tagTextColors[param])
+    }
   }
 
   const getRoleIcon = (role: ShareRole) => {

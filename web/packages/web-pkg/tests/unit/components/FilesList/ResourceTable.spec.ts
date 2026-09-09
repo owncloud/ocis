@@ -700,6 +700,23 @@ describe('ResourceTable', () => {
         const resourceRow = wrapper.find(`[data-item-id="${resource.id}"]`)
         expect(resourceRow.find('.resource-table-tag-wrapper').element.tagName).toEqual('SPAN')
       })
+
+      it('fills a chip from the theme slot its tag name hashes to', () => {
+        // The wiring under test is name -> slot -> theme css vars; which slot a name lands on is
+        // pinned in the `hashToIndex` specs, so this only asserts the chip takes both halves of
+        // one slot's pair, and that the overflow counter stays a plain badge.
+        const resource = mock<Resource>({ id: '1', tags: ['physics', 'invoice', 'spare'] })
+        const { wrapper } = getMountedWrapper({ props: { resources: [resource] } })
+        const cell = wrapper.find(`[data-item-id="${resource.id}"] .oc-table-data-cell-tags`)
+
+        const style = cell.find('.resource-table-tag').attributes('style')
+        const slot = /--oc-color-tag-(\d+)\)/.exec(style)?.[1]
+        expect(slot).toBeDefined()
+        expect(style).toContain(`background-color: var(--oc-color-tag-${slot})`)
+        expect(style).toContain(`color: var(--oc-color-tag-${slot}-text)`)
+
+        expect(cell.find('.resource-table-tag-more').attributes('style')).toBeUndefined()
+      })
     })
     describe('"more"-button', () => {
       it.each([

@@ -10,7 +10,8 @@ import {
   getHexFromCssVar,
   hashString,
   hashToIndex,
-  tagColorVarFor
+  pickReadableTextColor,
+  tagColorVarsFor
 } from './colors'
 
 describe('hexToRgb', () => {
@@ -77,9 +78,16 @@ describe('hashString', () => {
   it('returns 0 for an empty string', () => {
     expect(hashString('')).toBe(0)
   })
-  it('can return a negative number', () => {
-    // Guards the `>>> 0` in hashToIndex: `hash << 5` overflows into the sign bit.
-    expect(hashString('physics')).toBeLessThan(0)
+  it('normalises, so callers can use the result as-is', () => {
+    // `hash << 5` overflows into the sign bit, and the addition that follows leaves int32
+    // altogether, so without the normalisation `hashString` returns numbers that are unusable
+    // as an index — negative, or beyond 32 bits.
+    for (const name of ['physics', 'Invoice', 'a', '', '🎉', 'x'.repeat(200)]) {
+      const hash = hashString(name)
+      expect(hash).toBeGreaterThanOrEqual(0)
+      expect(hash).toBeLessThanOrEqual(0xffffffff)
+      expect(Number.isInteger(hash)).toBe(true)
+    }
   })
 })
 
@@ -91,10 +99,6 @@ describe('hashToIndex', () => {
       expect(index).toBeLessThan(30)
       expect(Number.isInteger(index)).toBe(true)
     }
-  })
-  it('never returns a negative index for a name whose hash is negative', () => {
-    expect(hashString('physics')).toBeLessThan(0)
-    expect(hashToIndex('physics', 30)).toBeGreaterThanOrEqual(0)
   })
   it.each([0, -1, 1.5, NaN])('returns -1 for an unusable length of %s', (length) => {
     expect(hashToIndex('physics', length)).toBe(-1)
@@ -116,21 +120,42 @@ describe('hashToIndex', () => {
   })
 })
 
-describe('tagColorVarFor', () => {
-  it('resolves a name to a zero-based css var', () => {
-    expect(tagColorVarFor('physics', 30)).toBe('var(--oc-color-tag-13)')
+describe('tagColorVarsFor', () => {
+  it('names the theme css vars for a slot', () => {
+    expect(tagColorVarsFor(13)).toEqual({
+      fillColor: 'var(--oc-color-tag-13)',
+      textColor: 'var(--oc-color-tag-13-text)'
+    })
   })
-  it('agrees with hashToIndex', () => {
-    expect(tagColorVarFor('invoice', 30)).toBe(`var(--oc-color-tag-${hashToIndex('invoice', 30)})`)
+  it('pairs the fill of a name with the text colour belonging to it', () => {
+    const index = hashToIndex('invoice', 30)
+    expect(tagColorVarsFor(index)).toEqual({
+      fillColor: `var(--oc-color-tag-${index})`,
+      textColor: `var(--oc-color-tag-${index}-text)`
+    })
   })
-  it('gives different tags on one file different colours', () => {
-    expect(tagColorVarFor('Invoice', 30)).not.toBe(tagColorVarFor('invoice', 30))
+  it.each([-1, 1.5, NaN, undefined, null])(
+    'returns null for %s rather than naming a var that cannot exist',
+    (index) => {
+      // -1 is what `hashToIndex` returns when the theme ships no tag colours, which is the state
+      // of any theme that has not opted into coloured tags.
+      expect(tagColorVarsFor(index)).toBeNull()
+    }
+  )
+})
+
+describe('pickReadableTextColor', () => {
+  it('puts light text on a dark fill and dark text on a light fill', () => {
+    expect(pickReadableTextColor('#041e42', '#041e42', '#ffffff')).toBe('#ffffff')
+    expect(pickReadableTextColor('#e3baba', '#041e42', '#ffffff')).toBe('#041e42')
   })
-  it('returns an empty string for an empty list rather than an invalid var', () => {
-    // theme.json ships no tagColorsList until design supplies the values, so this is the
-    // real state of the app today, not a hypothetical.
-    expect(tagColorVarFor('physics', 0)).toBe('')
-    expect(tagColorVarFor('physics', undefined)).toBe('')
+  it('uses the candidates it is given rather than black and white', () => {
+    // A theme decides what its text looks like; the pairing only decides which of the two.
+    expect(pickReadableTextColor('#000000', '#333333', '#eeeeee')).toBe('#eeeeee')
+    expect(pickReadableTextColor('#ffffff', '#333333', '#eeeeee')).toBe('#333333')
+  })
+  it('falls back to the dark candidate when a colour cannot be parsed', () => {
+    expect(pickReadableTextColor('not-a-colour', '#041e42', '#ffffff')).toBe('#041e42')
   })
 })
 

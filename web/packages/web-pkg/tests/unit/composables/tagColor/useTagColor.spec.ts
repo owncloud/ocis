@@ -42,116 +42,68 @@ describe('useTagColor', () => {
     useThemeStore().initializeThemes(themeConfig)
   }
 
-  describe('Tag chip with colors', () => {
-    it('resolves a tag name to a var(--oc-color-tag-N) string when the theme has a tag color list', () => {
+  describe('tagColorIndex', () => {
+    it('resolves a tag name to a slot of the theme list', () => {
       initThemeWithTagColors(['#111111', '#222222', '#333333'])
 
-      const { tagColor } = useTagColor()
-      const result = tagColor('test-tag')
+      const index = useTagColor().tagColorIndex('test-tag')
 
-      expect(result).toMatch(/^var\(--oc-color-tag-\d+\)$/)
+      expect(index).toBeGreaterThanOrEqual(0)
+      expect(index).toBeLessThan(3)
     })
 
-    it('returns the same value when called twice with the same tag name', () => {
+    it('returns the same slot when called twice with the same tag name', () => {
       initThemeWithTagColors(['#111111', '#222222', '#333333'])
 
-      const { tagColor } = useTagColor()
-      const result1 = tagColor('physics')
-      const result2 = tagColor('physics')
+      const { tagColorIndex } = useTagColor()
 
-      expect(result1).toBe(result2)
+      expect(tagColorIndex('physics')).toBe(tagColorIndex('physics'))
     })
 
-    it('returns different values for two different tag names', () => {
+    it('returns different slots for two different tag names', () => {
       initThemeWithTagColors(thirtyColors)
 
-      const { tagColor } = useTagColor()
-      const physicsColor = tagColor('physics')
-      const invoiceColor = tagColor('invoice')
+      const { tagColorIndex } = useTagColor()
 
-      expect(physicsColor).not.toBe(invoiceColor)
+      expect(tagColorIndex('physics')).not.toBe(tagColorIndex('invoice'))
     })
 
-    it('returns different values for "Invoice" and "invoice" (case sensitive)', () => {
+    it('returns different slots for "Invoice" and "invoice" (case sensitive)', () => {
       initThemeWithTagColors(thirtyColors)
 
-      const { tagColor } = useTagColor()
-      const uppercaseColor = tagColor('Invoice')
-      const lowercaseColor = tagColor('invoice')
+      const { tagColorIndex } = useTagColor()
 
-      expect(uppercaseColor).not.toBe(lowercaseColor)
+      expect(tagColorIndex('Invoice')).not.toBe(tagColorIndex('invoice'))
     })
 
-    it('returns an empty string when the theme has no tagColorsList', () => {
+    it('spreads names across the whole list', () => {
+      initThemeWithTagColors(thirtyColors)
+
+      const { tagColorIndex } = useTagColor()
+      const slots = new Set(Array.from({ length: 200 }, (_, i) => tagColorIndex(`tag-${i}`)))
+
+      expect(slots.size).toBeGreaterThan(20)
+    })
+
+    it('returns -1 when the theme has no tagColorsList', () => {
+      // -1 is what tells `OcTag` to stay a plain badge, which is how a theme that has not opted
+      // into coloured tags renders.
       initThemeWithTagColors()
 
-      const { tagColor } = useTagColor()
-      const result = tagColor('test-tag')
-
-      expect(result).toBe('')
+      expect(useTagColor().tagColorIndex('test-tag')).toBe(-1)
     })
 
-    it('returns an empty string when the theme has an empty tagColorsList array', () => {
+    it('returns -1 when the theme has an empty tagColorsList array', () => {
       initThemeWithTagColors([])
 
-      const { tagColor } = useTagColor()
-      const result = tagColor('test-tag')
-
-      expect(result).toBe('')
+      expect(useTagColor().tagColorIndex('test-tag')).toBe(-1)
     })
 
-    it('returns an empty string when no theme has been initialized yet', () => {
+    it('returns -1 when no theme has been initialized yet', () => {
       // currentTheme is `ref<WebThemeType | undefined>()`, so it is undefined until
       // initializeThemes runs. Any component that renders a tag before that — or under a
       // testing pinia that never initializes themes — must not crash.
-      const { tagColor } = useTagColor()
-
-      expect(tagColor('test-tag')).toBe('')
-    })
-  })
-
-  describe('tagLabelColor', () => {
-    // The fill comes from the theme, so the label has to be chosen per fill at runtime: a pale
-    // fill needs a dark label and a dark fill needs a pale one. A single hardcoded token
-    // cannot satisfy both, and `--oc-color-text-inverse` gets it backwards in light mode.
-    it('returns a dark label for a pale fill', () => {
-      // One-colour list, so every tag name lands on --oc-color-tag-0.
-      initThemeWithTagColors(['#fdf5c9'])
-
-      expect(useTagColor().tagLabelColor('physics')).toBe('#000000')
-    })
-
-    it('returns a pale label for a dark fill', () => {
-      initThemeWithTagColors(['#1b365d'])
-
-      expect(useTagColor().tagLabelColor('physics')).toBe('#ffffff')
-    })
-
-    it('reads the fill from the theme, so an unapplied css var cannot flip the label', () => {
-      // Going through `getHexFromCssVar` would be unsafe here: it funnels an unresolvable var
-      // into `cssRgbToHex`, which returns '#000000' for an empty string. A pale fill would then
-      // be read as black and get a white — illegible — label.
-      initThemeWithTagColors(['#fdf5c9'])
-      document.documentElement.style.removeProperty('--oc-color-tag-0')
-
-      expect(useTagColor().tagLabelColor('physics')).toBe('#000000')
-    })
-
-    it('returns an empty string when the theme colour is not a hex value', () => {
-      // Rather than guess a label for a colour it cannot measure.
-      initThemeWithTagColors(['not-a-colour'])
-
-      expect(useTagColor().tagLabelColor('physics')).toBe('')
-    })
-
-    it('returns an empty string when the theme has no tag color list', () => {
-      initThemeWithTagColors([])
-
-      expect(useTagColor().tagLabelColor('physics')).toBe('')
-    })
-
-    it('returns an empty string when no theme has been initialized yet', () => {
-      expect(useTagColor().tagLabelColor('physics')).toBe('')
+      expect(useTagColor().tagColorIndex('test-tag')).toBe(-1)
     })
   })
 })

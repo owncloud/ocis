@@ -52,11 +52,7 @@
         >
           <template #image="{ item }">
             <div class="tag-option-wrapper oc-flex oc-flex-middle">
-              <oc-tag
-                size="small"
-                :fill-color="tagColor(item.label)"
-                :label-color="tagLabelColor(item.label)"
-              >
+              <oc-tag size="small" :color-index="tagColorIndex(item.label)">
                 <span>{{ item.label }}</span>
               </oc-tag>
             </div>
@@ -230,7 +226,7 @@ const { y: fileListHeaderY } = useFileListHeaderPosition()
 const clientService = useClientService()
 const { getMatchingSpace } = useGetMatchingSpace()
 const { buildSearchTerm } = useSearch()
-const { tagColor, tagLabelColor } = useTagColor()
+const { tagColorIndex } = useTagColor()
 
 const resourcesStore = useResourcesStore()
 const { initResourceList, clearResourceList, setAncestorMetaData } = resourcesStore

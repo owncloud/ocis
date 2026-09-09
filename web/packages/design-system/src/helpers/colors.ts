@@ -71,17 +71,19 @@ export function getContrastRatio(rgbColorA: Array<number>, rgbColorB: Array<numb
 /**
  * Hashes a string into an integer, deterministically and with no state.
  * The same string always yields the same number, in any browser, on any device, for any user.
- * The result may be negative, and is not guaranteed to fit in 32 bits: `<< 5` truncates to int32
- * but the following addition does not, so callers must normalise it themselves.
+ * The final `>>> 0` normalises the result so callers never have to: the loop's `<< 5` truncates
+ * to int32 and can land in the sign bit, while the addition that follows can exceed int32
+ * entirely, so without it the return value is neither reliably positive nor reliably 32 bit.
+ * Normalising keeps the low 32 bits the loop produced, so hashes are unchanged.
  * @param {string} value: Can be any string
- * @return {Number} Returns an integer, possibly negative
+ * @return {Number} Returns an unsigned 32 bit integer
  **/
 export function hashString(value: string): number {
   let hash = 0
   for (let i = 0; i < value.length; i++) {
     hash = value.charCodeAt(i) + ((hash << 5) - hash)
   }
-  return hash
+  return hash >>> 0
 }
 
 /**
@@ -95,8 +97,6 @@ export function generateHashedColorForString(name: string): string {
 
 /**
  * Picks a stable index into a list of `length` entries for the given name.
- * `>>> 0` reinterprets the possibly-negative hash as unsigned before the modulo, because a
- * negative dividend in JS yields a negative remainder, which is not a valid index.
  * @param {string} name: Can be any string
  * @param {Number} length: Number of entries to spread names across
  * @return {Number} Returns an index in [0, length), or -1 if there is nothing to index
@@ -105,28 +105,57 @@ export function hashToIndex(name: string, length: number): number {
   if (!Number.isInteger(length) || length <= 0) {
     return -1
   }
-  return (hashString(name) >>> 0) % length
+  return hashString(name) % length
 }
 
 /**
- * Resolves a tag name to the css var holding its colour.
+ * The css vars a themed tag colour is emitted as: the fill, and the text colour paired with it.
  *
- * The colour is *derived*, never stored and never chosen: it is a pure function of the exact tag
- * string, so the same tag is the same colour for every user on every device with nothing persisted.
- * Different tags may collide on one colour; that is accepted, because a tag's label is always
- * rendered beside its chip and the colour is reinforcement, never the identifier.
+ * Both come from the theme (see the theme store, which derives the `-text` half from the fill and
+ * the theme's own text colours), so a component only needs the index to colour a chip legibly —
+ * no contrast maths, and no reading colours back out of the stylesheet.
  *
- * `length` is the length of the theme's `tagColorsList` and must be read at runtime, never
- * hardcoded — the list is extensible in `theme.json`, and every theme carries the same number of
- * entries so a tag keeps its slot across a theme switch.
- *
- * @param {string} name: The exact tag name as stored
- * @param {Number} length: Number of colours in the theme's tag colour list
- * @return {string} Returns a css var() reference, or '' if the list is empty
+ * @param {Number} index: Index into the theme's tag colour list, as returned by `hashToIndex`
+ * @return {Object} Returns the two var() references, or null if the index cannot name a colour
  **/
-export function tagColorVarFor(name: string, length: number): string {
-  const index = hashToIndex(name, length)
-  return index < 0 ? '' : `var(--oc-color-tag-${index})`
+export function tagColorVarsFor(
+  index: number | null | undefined
+): { fillColor: string; textColor: string } | null {
+  if (!Number.isInteger(index) || index < 0) {
+    return null
+  }
+  return {
+    fillColor: `var(--oc-color-tag-${index})`,
+    textColor: `var(--oc-color-tag-${index}-text)`
+  }
+}
+
+/**
+ * Picks whichever of two text colours is more legible on the given background.
+ *
+ * Both candidates are passed in rather than assumed to be black and white, so that a theme decides
+ * what its text looks like. Which of them is the lighter one is not assumed either — only the
+ * contrast decides. Falls back to the first candidate when a colour cannot be measured.
+ *
+ * @param {string} background: The hex background colour the text sits on
+ * @param {string} candidateA: One of the two text colours to choose between
+ * @param {string} candidateB: The other one
+ * @return {string} Returns whichever candidate contrasts more with the background
+ **/
+export function pickReadableTextColor(
+  background: string,
+  candidateA: string,
+  candidateB: string
+): string {
+  const backgroundRgb = hexToRgb(background)
+  const rgbA = hexToRgb(candidateA)
+  const rgbB = hexToRgb(candidateB)
+  if (!backgroundRgb || !rgbA || !rgbB) {
+    return candidateA
+  }
+  return getContrastRatio(backgroundRgb, rgbA) >= getContrastRatio(backgroundRgb, rgbB)
+    ? candidateA
+    : candidateB
 }
 
 /**

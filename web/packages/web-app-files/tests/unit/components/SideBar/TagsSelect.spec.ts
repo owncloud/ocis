@@ -10,14 +10,10 @@ vi.hoisted(() => {
   vi.doMock('@ownclouders/web-pkg', async (importOriginal) => ({
     ...(await importOriginal<any>()),
     useTagColor: vi.fn(() => ({
-      tagColor: vi.fn((name: string) => {
-        const tagColorMap: Record<string, string> = {
-          invoice: 'var(--oc-color-tag-7)',
-          project: 'var(--oc-color-tag-3)'
-        }
-        return tagColorMap[name] || ''
-      }),
-      tagLabelColor: vi.fn(() => '#000000')
+      tagColorIndex: vi.fn((name: string) => {
+        const tagColorMap: Record<string, number> = { invoice: 7, project: 3 }
+        return tagColorMap[name] ?? -1
+      })
     }))
   }))
 })
@@ -164,8 +160,8 @@ describe('Tag Select', () => {
       // Wait for the component to render with the selected tag
       await wrapper.vm.$nextTick()
 
-      // The oc-tag in the selected-option-container should have fill-color
-      // OcTag renders fillColor as an inline style: backgroundColor
+      // OcTag turns the colour index into inline styles: background-color plus the label
+      // colour that goes with it
       const ocTags = wrapper.findAll('.tags-select-tag')
       expect(ocTags.length).toBeGreaterThan(0)
 

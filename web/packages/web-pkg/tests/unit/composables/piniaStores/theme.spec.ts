@@ -172,6 +172,82 @@ describe('useThemeStore', () => {
       expect(rootStyle().getPropertyValue('--oc-color-tag-3')).toBe('')
     })
 
+    it('emits a label colour next to each fill, taken from the theme own text colours', () => {
+      // The pairing is derived here, once per theme, rather than at every chip: this is where the
+      // palette is, so a theme decides what its label colours are instead of a component
+      // hardcoding black and white.
+      const themeConfig = mockDeep<WebThemeConfigType>()
+      themeConfig.defaults = themeDefaults
+      themeConfig.themes = [
+        {
+          name: 'light',
+          isDark: false,
+          designTokens: {
+            colorPalette: { 'text-default': '#041e42', 'text-inverse': '#ffffff' },
+            // A dark fill and a pale one, so the two must not resolve to the same label.
+            tagColorsList: ['#1b365d', '#fdf5c9']
+          }
+        }
+      ]
+
+      useThemeStore().initializeThemes(themeConfig)
+
+      expect(rootStyle().getPropertyValue('--oc-color-tag-0-text')).toBe('#ffffff')
+      expect(rootStyle().getPropertyValue('--oc-color-tag-1-text')).toBe('#041e42')
+      expect(rootStyle().getPropertyValue('--oc-color-tag-2-text')).toBe('')
+    })
+
+    it('falls back to black and white for a theme that names no text colours', () => {
+      const themeConfig = mockDeep<WebThemeConfigType>()
+      themeConfig.defaults = themeDefaults
+      themeConfig.themes = [
+        { name: 'light', isDark: false, designTokens: { tagColorsList: ['#1b365d', '#fdf5c9'] } }
+      ]
+
+      useThemeStore().initializeThemes(themeConfig)
+
+      expect(rootStyle().getPropertyValue('--oc-color-tag-0-text')).toBe('#ffffff')
+      expect(rootStyle().getPropertyValue('--oc-color-tag-1-text')).toBe('#000000')
+    })
+
+    it('falls back to black and white when a theme text colour cannot be measured', () => {
+      // The ownCloud light theme states `text-default` in `oklch()`, which the contrast maths
+      // cannot read. Keeping it would paint every label in it, dark labels on dark fills included.
+      const themeConfig = mockDeep<WebThemeConfigType>()
+      themeConfig.defaults = themeDefaults
+      themeConfig.themes = [
+        {
+          name: 'light',
+          isDark: false,
+          designTokens: {
+            colorPalette: { 'text-default': 'oklch(13% 0.028 261.692)', 'text-inverse': '#ffffff' },
+            tagColorsList: ['#1b365d', '#fdf5c9']
+          }
+        }
+      ]
+
+      useThemeStore().initializeThemes(themeConfig)
+
+      expect(rootStyle().getPropertyValue('--oc-color-tag-0-text')).toBe('#ffffff')
+      expect(rootStyle().getPropertyValue('--oc-color-tag-1-text')).toBe('#000000')
+    })
+
+    it('unsets the label colours of the previous theme on theme switch', () => {
+      const themeConfig = mockDeep<WebThemeConfigType>()
+      themeConfig.defaults = themeDefaults
+      themeConfig.themes = [
+        { name: 'light', isDark: false, designTokens: { tagColorsList: ['#1b365d', '#fdf5c9'] } },
+        { name: 'dark', isDark: true, designTokens: { tagColorsList: ['#fdf5c9'] } }
+      ]
+
+      const store = useThemeStore()
+      store.initializeThemes(themeConfig)
+      store.setAndApplyTheme(store.availableThemes.find((t) => t.isDark))
+
+      expect(rootStyle().getPropertyValue('--oc-color-tag-0-text')).toBe('#000000')
+      expect(rootStyle().getPropertyValue('--oc-color-tag-1-text')).toBe('')
+    })
+
     it('unsets the properties of the previous theme on theme switch', () => {
       const themeConfig = mockDeep<WebThemeConfigType>()
       themeConfig.defaults = themeDefaults
