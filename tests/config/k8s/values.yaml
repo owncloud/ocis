@@ -97,7 +97,6 @@ http:
         - 'blob:'
         - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
         - 'https://marketplace.owncloud.com/'
-        - 'https://keycloak:8443/'
       defaultSrc:
         - "'none'"
       fontSrc:
@@ -109,7 +108,6 @@ http:
         - "'self'"
         - 'blob:'
         - 'https://embed.diagrams.net/'
-        - 'https://keycloak:8443/'
       imgSrc:
         - "'self'"
         - 'data:'
