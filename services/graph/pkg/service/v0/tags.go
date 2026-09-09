@@ -56,7 +56,7 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err := StrictJSONUnmarshal(r.Body, &assignment); err != nil {
-		g.logger.Debug().Err(err).Interface("body", r.Body).Msg("could not decode tag assignment request")
+		g.logger.Debug().Err(err).Msg("could not decode tag assignment request")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid body schema definition")
 		return
 	}
@@ -163,7 +163,7 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err := StrictJSONUnmarshal(r.Body, &unassignment); err != nil {
-		g.logger.Debug().Err(err).Interface("body", r.Body).Msg("could not decode tag assignment request")
+		g.logger.Debug().Err(err).Msg("could not decode tag assignment request")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid body schema definition")
 		return
 	}

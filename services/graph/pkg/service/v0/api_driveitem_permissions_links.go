@@ -173,7 +173,7 @@ func (api DriveItemPermissionsApi) CreateLink(w http.ResponseWriter, r *http.Req
 
 	var createLink libregraph.DriveItemCreateLink
 	if err = StrictJSONUnmarshal(r.Body, &createLink); err != nil {
-		logger.Error().Err(err).Interface("body", r.Body).Msg("could not create link: invalid body schema definition")
+		logger.Error().Err(err).Msg("could not create link: invalid body schema definition")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid body schema definition")
 		return
 	}
@@ -202,7 +202,7 @@ func (api DriveItemPermissionsApi) CreateSpaceRootLink(w http.ResponseWriter, r 
 
 	var createLink libregraph.DriveItemCreateLink
 	if err = StrictJSONUnmarshal(r.Body, &createLink); err != nil {
-		logger.Error().Err(err).Interface("body", r.Body).Msg("could not create link: invalid body schema definition")
+		logger.Error().Err(err).Msg("could not create link: invalid body schema definition")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid body schema definition")
 		return
 	}
