@@ -39,7 +39,17 @@ export const graph = (baseURI: string, httpClient: FetchClient): Graph => {
         signal: init?.signal ?? undefined,
         ...(params && { params })
       })
-    }
+    },
+    // The runtime wraps everything `fetchApi` throws in a `FetchError`, which would bury the
+    // `HttpError` raised above and leave callers without `statusCode` or `data`. Rethrowing
+    // from `onError` escapes that wrap, and an abort stays an `AbortError`.
+    middleware: [
+      {
+        onError: ({ error }) => {
+          throw error
+        }
+      }
+    ]
   })
 
   return <Graph>{
