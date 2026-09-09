@@ -107,7 +107,7 @@
       "sha.js": "2.4.12",
       "vitest": "4.1.6",
       "@types/node": "24.13.2",
-      "@xmldom/xmldom": "0.8.13",
+      "@xmldom/xmldom": "0.8.15",
       "flatted": "3.4.2",
       "form-data": "4.0.6",
       "immutable": "5.1.8",
@@ -116,7 +116,7 @@
       "minimatch": "10.2.5",
       "brace-expansion": "5.0.9",
       "ws": "8.21.0",
-      "js-yaml": "4.3.1",
+      "js-yaml": "4.3.2",
       "fast-uri": "3.1.6",
       "browserslist": "4.28.7"
     },
