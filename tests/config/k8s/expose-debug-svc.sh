@@ -45,6 +45,10 @@ declare -A DEBUG_PORTS=(
     [webfinger]=9279
 )
 
+declare -A LDAPS_PORTS=(
+    [idm]=9235
+)
+
 declare -A GRPC_PORTS=(
     [appregistry]=9242
     [authapp]=9246
@@ -93,6 +97,12 @@ should_expose() {
     esac
 }
 
+# k3d maps host ports 9100-9399 to NodePorts 30100-30399 (see `-p` in ../Makefile),
+# a fixed +21000 offset. A plain ClusterIP Service (kubectl expose's default) is
+# never reachable through that mapping, so these services must be NodePort with a
+# nodePort that lands on the matching offset.
+NODEPORT_OFFSET=21000
+
 expose() {
     local deployment=$1
     local service=$2
@@ -108,10 +118,30 @@ expose() {
         return
     fi
 
-    kubectl -n "$NAMESPACE" expose deployment "$deployment" \
-        --name="$service" \
-        --port="$port" \
-        --target-port="$port"
+    # Only ports in the 9100-9399 band are forwarded by k3d's loadbalancer
+    # (see ../Makefile); anything else can't be reached from outside the
+    # cluster via a nodePort anyway, so leave it as a plain ClusterIP.
+    if (( port >= 9100 && port <= 9399 )); then
+        local node_port=$((port + NODEPORT_OFFSET))
+        # Generate the manifest client-side (still derives the correct
+        # selector from the deployment) and inject the desired nodePort
+        # before the service ever exists, so there is no intermediate
+        # auto-assigned port that could collide with another iteration's
+        # target nodePort.
+        kubectl -n "$NAMESPACE" expose deployment "$deployment" \
+            --name="$service" \
+            --port="$port" \
+            --target-port="$port" \
+            --type=NodePort \
+            --dry-run=client -o json \
+            | jq ".spec.ports[0].nodePort = $node_port" \
+            | kubectl -n "$NAMESPACE" apply -f -
+    else
+        kubectl -n "$NAMESPACE" expose deployment "$deployment" \
+            --name="$service" \
+            --port="$port" \
+            --target-port="$port"
+    fi
 }
 
 for svc in "${!DEBUG_PORTS[@]}"; do
@@ -120,4 +150,8 @@ done
 
 for svc in "${!GRPC_PORTS[@]}"; do
     expose "$svc" "${svc}-grpc" "${GRPC_PORTS[$svc]}"
+done
+
+for svc in "${!LDAPS_PORTS[@]}"; do
+    expose "$svc" "${svc}-ldaps" "${LDAPS_PORTS[$svc]}"
 done
