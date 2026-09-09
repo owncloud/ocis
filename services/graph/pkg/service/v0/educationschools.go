@@ -54,7 +54,7 @@ func (g Graph) PostEducationSchool(w http.ResponseWriter, r *http.Request) {
 	school := libregraph.NewEducationSchool()
 	err := StrictJSONUnmarshal(r.Body, school)
 	if err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not create school: invalid request body")
+		logger.Debug().Err(err).Msg("could not create school: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
 	}
@@ -131,7 +131,7 @@ func (g Graph) PatchEducationSchool(w http.ResponseWriter, r *http.Request) {
 	school := libregraph.NewEducationSchool()
 	err = StrictJSONUnmarshal(r.Body, school)
 	if err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update school: invalid request body")
+		logger.Debug().Err(err).Msg("could not update school: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
 	}
@@ -330,10 +330,7 @@ func (g Graph) PostEducationSchoolUser(w http.ResponseWriter, r *http.Request) {
 	memberRef := libregraph.NewMemberReference()
 	err = StrictJSONUnmarshal(r.Body, memberRef)
 	if err != nil {
-		logger.Debug().
-			Err(err).
-			Interface("body", r.Body).
-			Msg("could not add school user: invalid request body")
+		logger.Debug().Err(err).Msg("could not add school user: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
 	}
@@ -485,10 +482,7 @@ func (g Graph) PostEducationSchoolClass(w http.ResponseWriter, r *http.Request) 
 	memberRef := libregraph.NewMemberReference()
 	err = StrictJSONUnmarshal(r.Body, memberRef)
 	if err != nil {
-		logger.Debug().
-			Err(err).
-			Interface("body", r.Body).
-			Msg("could not add school class: invalid request body")
+		logger.Debug().Err(err).Msg("could not add school class: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
 	}
