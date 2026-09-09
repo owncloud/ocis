@@ -142,10 +142,12 @@ const tagTextColorProps = (theme: WebThemeType): Record<string, string> => {
     : ['#000000', '#ffffff']
 
   return Object.fromEntries(
-    (theme.designTokens?.tagColorsList ?? []).map((fillColor, index) => [
-      `color-tag-${index}-text`,
-      pickReadableTextColor(fillColor, candidateA, candidateB)
-    ])
+    (theme.designTokens?.tagColorsList ?? [])
+      .map((fillColor, index) => [
+        `color-tag-${index}-text`,
+        pickReadableTextColor(fillColor, candidateA, candidateB)
+      ])
+      .filter(([, textColor]) => textColor !== null)
   )
 }
 

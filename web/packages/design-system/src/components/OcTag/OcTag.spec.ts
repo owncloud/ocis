@@ -48,7 +48,7 @@ describe('OcTag', () => {
 
       const style = wrapper.attributes('style')
       expect(style).toContain('background-color: var(--oc-color-tag-3)')
-      expect(style).toContain('color: var(--oc-color-tag-3-text)')
+      expect(style).toContain('color: var(--oc-color-tag-3-text,currentColor)')
     })
 
     it('takes the label colour with the fill, so no caller works out contrast', () => {
@@ -56,7 +56,9 @@ describe('OcTag', () => {
       // theme's own text colours. A chip only ever names a slot.
       const wrapper = shallowMount(Tag, { props: { colorIndex: 7 } })
 
-      expect(wrapper.attributes('style')).toContain('color: var(--oc-color-tag-7-text)')
+      expect(wrapper.attributes('style')).toContain(
+        'color: var(--oc-color-tag-7-text,currentColor)'
+      )
     })
 
     it('colours itself independently of other props', () => {

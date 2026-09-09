@@ -126,7 +126,7 @@ export function tagColorVarsFor(
   }
   return {
     fillColor: `var(--oc-color-tag-${index})`,
-    textColor: `var(--oc-color-tag-${index}-text)`
+    textColor: `var(--oc-color-tag-${index}-text,currentColor)`
   }
 }
 
@@ -135,23 +135,24 @@ export function tagColorVarsFor(
  *
  * Both candidates are passed in rather than assumed to be black and white, so that a theme decides
  * what its text looks like. Which of them is the lighter one is not assumed either — only the
- * contrast decides. Falls back to the first candidate when a colour cannot be measured.
+ * contrast decides.
  *
  * @param {string} background: The hex background colour the text sits on
  * @param {string} candidateA: One of the two text colours to choose between
  * @param {string} candidateB: The other one
- * @return {string} Returns whichever candidate contrasts more with the background
+ * @return {string} Returns whichever candidate contrasts more with the background, or null if any
+ * of the three cannot be measured
  **/
 export function pickReadableTextColor(
   background: string,
   candidateA: string,
   candidateB: string
-): string {
+): string | null {
   const backgroundRgb = hexToRgb(background)
   const rgbA = hexToRgb(candidateA)
   const rgbB = hexToRgb(candidateB)
   if (!backgroundRgb || !rgbA || !rgbB) {
-    return candidateA
+    return null
   }
   return getContrastRatio(backgroundRgb, rgbA) >= getContrastRatio(backgroundRgb, rgbB)
     ? candidateA

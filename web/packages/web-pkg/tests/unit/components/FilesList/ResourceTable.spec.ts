@@ -713,7 +713,7 @@ describe('ResourceTable', () => {
         const slot = /--oc-color-tag-(\d+)\)/.exec(style)?.[1]
         expect(slot).toBeDefined()
         expect(style).toContain(`background-color: var(--oc-color-tag-${slot})`)
-        expect(style).toContain(`color: var(--oc-color-tag-${slot}-text)`)
+        expect(style).toContain(`color: var(--oc-color-tag-${slot}-text,currentColor)`)
 
         expect(cell.find('.resource-table-tag-more').attributes('style')).toBeUndefined()
       })

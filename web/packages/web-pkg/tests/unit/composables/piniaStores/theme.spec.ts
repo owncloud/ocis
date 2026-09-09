@@ -232,6 +232,27 @@ describe('useThemeStore', () => {
       expect(rootStyle().getPropertyValue('--oc-color-tag-1-text')).toBe('#000000')
     })
 
+    it('emits no label colour for a fill it cannot measure, leaving the label to inherit', () => {
+      const themeConfig = mockDeep<WebThemeConfigType>()
+      themeConfig.defaults = themeDefaults
+      themeConfig.themes = [
+        {
+          name: 'light',
+          isDark: false,
+          designTokens: {
+            colorPalette: { 'text-default': '#041e42', 'text-inverse': '#ffffff' },
+            tagColorsList: ['oklch(70% 0.1 200)', '#fdf5c9']
+          }
+        }
+      ]
+
+      useThemeStore().initializeThemes(themeConfig)
+
+      expect(rootStyle().getPropertyValue('--oc-color-tag-0')).toBe('oklch(70% 0.1 200)')
+      expect(rootStyle().getPropertyValue('--oc-color-tag-0-text')).toBe('')
+      expect(rootStyle().getPropertyValue('--oc-color-tag-1-text')).toBe('#041e42')
+    })
+
     it('unsets the label colours of the previous theme on theme switch', () => {
       const themeConfig = mockDeep<WebThemeConfigType>()
       themeConfig.defaults = themeDefaults

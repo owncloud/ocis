@@ -124,14 +124,17 @@ describe('tagColorVarsFor', () => {
   it('names the theme css vars for a slot', () => {
     expect(tagColorVarsFor(13)).toEqual({
       fillColor: 'var(--oc-color-tag-13)',
-      textColor: 'var(--oc-color-tag-13-text)'
+      textColor: 'var(--oc-color-tag-13-text,currentColor)'
     })
+  })
+  it('falls the label back to the inherited colour when the theme emits no pair for a slot', () => {
+    expect(tagColorVarsFor(13).textColor).toContain(',currentColor)')
   })
   it('pairs the fill of a name with the text colour belonging to it', () => {
     const index = hashToIndex('invoice', 30)
     expect(tagColorVarsFor(index)).toEqual({
       fillColor: `var(--oc-color-tag-${index})`,
-      textColor: `var(--oc-color-tag-${index}-text)`
+      textColor: `var(--oc-color-tag-${index}-text,currentColor)`
     })
   })
   it.each([-1, 1.5, NaN, undefined, null])(
@@ -154,8 +157,13 @@ describe('pickReadableTextColor', () => {
     expect(pickReadableTextColor('#000000', '#333333', '#eeeeee')).toBe('#eeeeee')
     expect(pickReadableTextColor('#ffffff', '#333333', '#eeeeee')).toBe('#333333')
   })
-  it('falls back to the dark candidate when a colour cannot be parsed', () => {
-    expect(pickReadableTextColor('not-a-colour', '#041e42', '#ffffff')).toBe('#041e42')
+  it('returns null for a fill it cannot measure, rather than guessing a candidate', () => {
+    expect(pickReadableTextColor('oklch(70% 0.1 200)', '#041e42', '#ffffff')).toBeNull()
+    expect(pickReadableTextColor('not-a-colour', '#041e42', '#ffffff')).toBeNull()
+  })
+  it('returns null when a candidate cannot be measured, rather than preferring the first', () => {
+    expect(pickReadableTextColor('#041e42', 'oklch(13% 0.028 261.692)', '#ffffff')).toBeNull()
+    expect(pickReadableTextColor('#041e42', '#041e42', 'not-a-colour')).toBeNull()
   })
 })
 
