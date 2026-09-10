@@ -38,7 +38,7 @@ describe('FetchClient', () => {
       expect(result.headers.get('Content-Type')).toBe('application/json')
     })
 
-    it('trap 2: headers also answer to bracket access, as axios headers did', async () => {
+    it('headers also answer to bracket access, as axios headers did', async () => {
       fetchMock.mockResolvedValue(jsonResponse({}, { headers: { 'Lock-Token': '<token>' } }))
 
       const result = await new FetchClient().request('https://host/foo')
@@ -48,7 +48,7 @@ describe('FetchClient', () => {
     })
   })
 
-  describe('trap 1: throws on non-2xx', () => {
+  describe('throws on non-2xx', () => {
     it.each([400, 404, 500, 503])('throws HttpError for %i', async (status) => {
       fetchMock.mockResolvedValue(new Response('{}', { status }))
 
@@ -148,7 +148,7 @@ describe('FetchClient', () => {
       expect(onResponse).toHaveBeenCalledWith(expect.objectContaining({ status: 503 }))
     })
 
-    it('trap 4: reports the caller URL, not the resolved response.url', async () => {
+    it('reports the caller URL, not the resolved response.url', async () => {
       const relative = 'ocs/v2.php/apps/notifications/api/v1/notifications/sse'
       fetchMock.mockResolvedValue(new Response('{}', { status: 503 }))
       const onResponse = vi.fn()
@@ -160,7 +160,7 @@ describe('FetchClient', () => {
       expect(onResponse).toHaveBeenCalledWith(expect.objectContaining({ requestUrl: relative }))
     })
 
-    it('trap 5: reports a transport failure as status 500 with a null response, then throws', async () => {
+    it('reports a transport failure as status 500 with a null response, then throws', async () => {
       fetchMock.mockRejectedValue(new TypeError('Failed to fetch'))
       const onResponse = vi.fn()
 

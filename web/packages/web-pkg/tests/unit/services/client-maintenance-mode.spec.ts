@@ -78,7 +78,7 @@ describe('ClientService maintenance mode', () => {
    * master — where the axios error interceptor fell back to `error.response?.status || 500` —
    * that is not a maintenance signal, so the flag is left alone rather than cleared.
    */
-  it('trap 5: leaves maintenance state untouched for a transport failure', () => {
+  it('leaves maintenance state untouched for a transport failure', () => {
     onResponse({ response: null, status: 500, requestUrl: 'some/url' })
 
     expect(configStore.setMaintenanceMode).not.toHaveBeenCalled()
@@ -89,7 +89,7 @@ describe('ClientService maintenance mode', () => {
    * reports the caller's url rather than `response.url`. The notifications SSE endpoint
    * answers 503 by design and must not raise the banner.
    */
-  it('trap 4: exempts an allow-listed endpoint from a 503', () => {
+  it('exempts an allow-listed endpoint from a 503', () => {
     onResponse({
       response: new Response('{}', { status: 503 }),
       status: 503,

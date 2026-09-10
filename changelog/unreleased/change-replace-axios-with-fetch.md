@@ -15,6 +15,12 @@ still exposes response headers as `headers['etag']` as well as
 Per-request `headers` are merged over the client-wide ones case-insensitively, so
 an override replaces the header it names whatever case either side used.
 
+Maintenance mode is now also detected on `clientService.httpAuthenticated`. Before,
+only the unauthenticated, graph and ocs clients watched responses for it, as the
+authenticated client had no response interceptor. Requests through it now raise and
+clear the maintenance flag like any other, and they update
+`lastSuccessfulRequestTime`, which seeds the MFA expiry timer.
+
 Code that touches axios directly has to be adapted:
 
 - `new HttpClient()` takes `{ baseUrl, staticHeaders, headers, onResponse }`
