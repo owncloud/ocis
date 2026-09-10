@@ -23,8 +23,7 @@ Feature: vault
 
 
   Scenario: user can create folders and files in project space in vault
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    Given user "Alice" has logged in via web UI
     And user "Alice" has created a space "vault-space" in vault with the default quota using the Graph API
     When user "Alice" creates a folder "vaultFolder" in space "vault-space" in vault using the WebDav Api
     Then the HTTP status code should be "201"
@@ -355,8 +354,7 @@ Feature: vault
 
 
   Scenario: user tries to create a public link of a space root inside vault
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    Given user "Alice" has logged in via web UI
     And user "Alice" has created a space "vault-space" in vault with the default quota using the Graph API
     When user "Alice" tries to create the following space link share using permissions endpoint of the Graph API:
       | space           | vault-space |
@@ -394,8 +392,7 @@ Feature: vault
 
 
   Scenario Outline: send share invitation for project space in vault to user with different roles (permissions endpoint)
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    Given user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
@@ -473,8 +470,7 @@ Feature: vault
 
 
   Scenario Outline: send share invitation for disabled project space in vault to user with different roles (permissions endpoint)
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    Given user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
@@ -522,8 +518,7 @@ Feature: vault
 
 
   Scenario Outline: send share invitation for deleted project space in vault to user with different roles (permissions endpoint)
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    Given user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
@@ -665,8 +660,7 @@ Feature: vault
 
 
   Scenario Outline: invite user to a project space in vault with different roles using root endpoint
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    Given user "Alice" has logged in via web UI
     And user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has logged in via web UI
@@ -877,8 +871,7 @@ Feature: vault
 
 
   Scenario: search result for resources inside project spaces with same name should be isolated between vault and drive
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    Given user "Alice" has logged in via web UI
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     And user "Alice" has created a folder "testDriveFolder" in space "new-space"
@@ -916,8 +909,7 @@ Feature: vault
 
   @tikaServiceNeeded
   Scenario: search result by content of file inside project space should be isolated between vault and drive
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    Given user "Alice" has logged in via web UI
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "content of file in drive" to "testDriveFile.txt"
@@ -967,8 +959,7 @@ Feature: vault
 
 
   Scenario: search results by resource tags inside project space should be isolated between vault and drive
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    Given user "Alice" has logged in via web UI
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     And user "Alice" has created a folder "driveFolder" in space "new-space"
@@ -1072,7 +1063,6 @@ Feature: vault
 
   Scenario Outline: folder share received from vault and drive project space should be isolated
     Given user "Brian" has been created with default attributes
-    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Alice" has logged in via web UI
     And user "Brian" has logged in via web UI
@@ -1110,7 +1100,6 @@ Feature: vault
 
   Scenario Outline: folder share received from vault and drive project space should be isolated
     Given user "Brian" has been created with default attributes
-    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Alice" has logged in via web UI
     And user "Brian" has logged in via web UI
