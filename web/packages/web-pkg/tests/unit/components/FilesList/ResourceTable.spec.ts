@@ -758,6 +758,44 @@ describe('ResourceTable', () => {
         expect(moreButton.attributes('aria-label')).toBeTruthy()
       })
 
+      it('keeps the visible "+ N" inside the accessible name', () => {
+        const resource = mock<Resource>({ id: '1', tags: ['1', '2', '3', '4'] })
+        const { wrapper } = getMountedWrapper({ props: { resources: [resource] } })
+        const moreButton = wrapper.find(`[data-item-id="${resource.id}"] .resource-table-tag-more`)
+
+        expect(moreButton.text()).toBe('+ 2')
+        expect(moreButton.attributes('aria-label')).toContain('+ 2')
+      })
+
+      it('announces the overflow button as a disclosure and follows the popover state', async () => {
+        const resource = mock<Resource>({ id: '1', tags: ['1', '2', '3'] })
+        const { wrapper } = getMountedWrapper({ props: { resources: [resource] } })
+        const row = wrapper.find(`[data-item-id="${resource.id}"]`)
+        const drop = row.findComponent({ name: 'OcDrop' })
+
+        expect(drop.props('mode')).toBe('click')
+
+        expect(row.find('.resource-table-tag-more').attributes('aria-haspopup')).toBe('true')
+        expect(row.find('.resource-table-tag-more').attributes('aria-expanded')).toBe('false')
+
+        await drop.vm.$emit('showDrop')
+        expect(row.find('.resource-table-tag-more').attributes('aria-expanded')).toBe('true')
+
+        await drop.vm.$emit('hideDrop')
+        expect(row.find('.resource-table-tag-more').attributes('aria-expanded')).toBe('false')
+      })
+
+      it('does not select the row when the overflow button is clicked', async () => {
+        const resource = mock<Resource>({ id: '1', tags: ['1', '2', '3'] })
+        const { wrapper } = getMountedWrapper({ props: { resources: [resource] } })
+
+        await wrapper
+          .find(`[data-item-id="${resource.id}"] .resource-table-tag-more`)
+          .trigger('click')
+
+        expect(wrapper.emitted('update:selectedIds')).toBeUndefined()
+      })
+
       it('marks the overflow popover so it can be sized to the tags it holds', () => {
         // `OcDrop` is a fixed 300px wide, which leaves most of the popover empty when the
         // overflow holds a single short tag. The class is what the stylesheet hangs the

@@ -139,20 +139,19 @@
         size="small"
         class="resource-table-tag-more"
         :aria-label="getTagsOverflowAriaLabel(item)"
+        aria-haspopup="true"
+        :aria-expanded="isTagsOverflowExpanded(item)"
+        @click="keepClickWithinTagsOverflow"
       >
         + {{ item.tags.length - 2 }}
       </oc-tag>
-      <!--
-        `is-nested` is set for its side effect, not its literal meaning: it suppresses the
-        `hideAll` that OcDrop otherwise runs on show. Without it, merely moving the pointer
-        across a row's tag overflow would dismiss an open context menu.
-      -->
       <oc-drop
         v-if="item.tags.length > 2"
         :toggle="`#tags-overflow-${resourceDomSelector(item)}`"
-        mode="hover"
-        :is-nested="true"
+        mode="click"
         class="resource-table-tag-overflow"
+        @show-drop="setTagsOverflowExpanded(item, true)"
+        @hide-drop="setTagsOverflowExpanded(item, false)"
       >
         <component
           :is="userContextReady ? 'router-link' : 'span'"
@@ -486,9 +485,27 @@ const getTagToolTip = (text: string) => (text.length > 7 ? text : '')
 
 const getTagsOverflowAriaLabel = (item: Resource) => {
   const count = item.tags.length - 2
-  return $ngettext('Show %{count} more tag', 'Show %{count} more tags', count, {
-    count: count.toString()
-  })
+  return $ngettext(
+    '+ %{count}, show %{count} more tag',
+    '+ %{count}, show %{count} more tags',
+    count,
+    {
+      count: count.toString()
+    }
+  )
+}
+
+const keepClickWithinTagsOverflow = (event: MouseEvent) => {
+  event.stopPropagation()
+}
+
+const tagsOverflowExpanded = ref<Record<string, boolean>>({})
+
+const isTagsOverflowExpanded = (item: Resource) =>
+  unref(tagsOverflowExpanded)[resourceDomSelector(item)] === true
+
+const setTagsOverflowExpanded = (item: Resource, expanded: boolean) => {
+  tagsOverflowExpanded.value[resourceDomSelector(item)] = expanded
 }
 
 const isResourceDisabled = (resource: Resource) => {

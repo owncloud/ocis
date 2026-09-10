@@ -36,6 +36,16 @@ describe('theme loading and error reporting', () => {
     expect(success).toBeTruthy()
   })
 
+  it('every theme carries a tag colour list of the same length', () => {
+    const lengths = defaultTheme.clients.web.themes.map(
+      (theme) => theme.designTokens.tagColorsList.length
+    )
+
+    expect(lengths.length).toBeGreaterThan(0)
+    expect(new Set(lengths).size).toBe(1)
+    expect(lengths[0]).toBeGreaterThan(0)
+  })
+
   it('should load the default theme if location is empty', async () => {
     const theme = await loadTheme()
     expect(theme).toMatchObject(defaultOwnCloudTheme)
