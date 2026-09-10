@@ -34,7 +34,7 @@ export const graph = (baseURI: string, httpClient: FetchClient): Graph => {
       const params = (init as Record<symbol, Record<string, string>>)?.[undeclaredParams]
       return httpClient.fetch(String(input), {
         method: init?.method,
-        headers: Object.fromEntries(new Headers(init?.headers).entries()),
+        headers: init?.headers,
         body: init?.body,
         signal: init?.signal ?? undefined,
         ...(params && { params })
@@ -53,13 +53,13 @@ export const graph = (baseURI: string, httpClient: FetchClient): Graph => {
   })
 
   return <Graph>{
-    activities: ActivitiesFactory({ httpClient, config }),
-    applications: ApplicationsFactory({ httpClient, config }),
-    tags: TagsFactory({ httpClient, config }),
-    drives: DrivesFactory({ httpClient, config }),
-    driveItems: DriveItemsFactory({ httpClient, config }),
-    users: UsersFactory({ httpClient, config }),
-    groups: GroupsFactory({ httpClient, config }),
-    permissions: PermissionsFactory({ httpClient, config })
+    activities: ActivitiesFactory({ config }),
+    applications: ApplicationsFactory({ config }),
+    tags: TagsFactory({ config }),
+    drives: DrivesFactory({ config }),
+    driveItems: DriveItemsFactory({ config }),
+    users: UsersFactory({ config }),
+    groups: GroupsFactory({ config }),
+    permissions: PermissionsFactory({ config })
   }
 }

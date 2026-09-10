@@ -23,7 +23,8 @@ export interface FetchClientOptions {
 
 export interface FetchRequestOptions {
   method?: string
-  headers?: Record<string, string>
+  /** merged over the client-wide headers, case-insensitively */
+  headers?: HeadersInit
   params?: Record<string, string | number | boolean>
   /** JSON-encoded unless it is already a BodyInit */
   body?: unknown

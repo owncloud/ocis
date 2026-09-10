@@ -18,30 +18,11 @@ export type RequestConfig<D = any, S = unknown> = Omit<FetchRequestOptions, 'bod
 type Resolved<T, S> = HttpResponse<S extends z.Schema ? z.infer<S> : T>
 
 /**
- * Ties a per-request signal to the client-wide one without leaking a listener per request:
- * the caller disposes once the request has settled.
+ * Ties a per-request signal to the client-wide one. `AbortSignal.any` forwards the reason of
+ * whichever fires first and needs no listener bookkeeping of its own.
  */
-const combineSignals = (clientSignal: AbortSignal, requestSignal?: AbortSignal) => {
-  if (!requestSignal) {
-    return { signal: clientSignal, dispose: () => undefined }
-  }
-
-  const controller = new AbortController()
-  const signals = [clientSignal, requestSignal]
-  const abort = (source: AbortSignal) => controller.abort(source.reason)
-  const listeners = signals.map((source) => {
-    const listener = () => abort(source)
-    source.addEventListener('abort', listener)
-    return () => source.removeEventListener('abort', listener)
-  })
-
-  const aborted = signals.find((source) => source.aborted)
-  if (aborted) {
-    abort(aborted)
-  }
-
-  return { signal: controller.signal, dispose: () => listeners.forEach((remove) => remove()) }
-}
+const combineSignals = (clientSignal: AbortSignal, requestSignal?: AbortSignal) =>
+  requestSignal ? AbortSignal.any([clientSignal, requestSignal]) : clientSignal
 
 export class HttpClient {
   private readonly client: FetchClient
@@ -121,22 +102,17 @@ export class HttpClient {
 
   private async send<T, S>(url: string, config: RequestConfig<any, S>): Promise<Resolved<T, S>> {
     const { data, schema, signal, ...rest } = config
-    const { signal: combined, dispose } = combineSignals(this.controller.signal, signal)
 
-    try {
-      const response = await this.client.request<any>(url, {
-        ...rest,
-        body: data,
-        signal: combined
-      })
+    const response = await this.client.request<any>(url, {
+      ...rest,
+      body: data,
+      signal: combineSignals(this.controller.signal, signal)
+    })
 
-      if (schema) {
-        return { ...response, data: schema.parse(response.data) } as Resolved<T, S>
-      }
-
-      return response as Resolved<T, S>
-    } finally {
-      dispose()
+    if (schema) {
+      return { ...response, data: schema.parse(response.data) } as Resolved<T, S>
     }
+
+    return response as Resolved<T, S>
   }
 }

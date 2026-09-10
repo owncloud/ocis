@@ -10,7 +10,7 @@ import { Language } from 'vue3-gettext'
 import { FetchEventSourceInit } from '@microsoft/fetch-event-source'
 import { sse } from '@ownclouders/web-client/sse'
 import { AuthStore, ConfigStore } from '../../composables'
-import { shouldResponseTriggerMaintenance } from '@ownclouders/web-client'
+import { maintenanceResponseHandler } from '@ownclouders/web-client'
 
 const createFetchOptions = (authParams: AuthParameters, language: string): FetchEventSourceInit => {
   return {
@@ -49,6 +49,11 @@ export class ClientService {
     'Initiator-ID': this.initiatorId,
     'X-Requested-With': 'XMLHttpRequest'
   }
+
+  private readonly maintenanceHandler = maintenanceResponseHandler(
+    (value: boolean) => this.configStore.setMaintenanceMode(value),
+    { onSuccess: () => (this.lastSuccessfulRequestTime = Math.floor(Date.now() / 1000)) }
+  )
 
   constructor(options: ClientServiceOptions) {
     this.configStore = options.configStore
@@ -179,22 +184,14 @@ export class ClientService {
   }
 
   /**
-   * Called for every response the client receives. The asymmetry is deliberate: only a
-   * successful response clears maintenance mode, and a non-2xx response never clears it.
+   * Called for every response the client receives. Only a successful response clears
+   * maintenance mode; a non-2xx response can only set it.
    *
    * `args.requestUrl` is the caller's URL, not `response.url` — the maintenance
    * allow-list is matched against relative paths. `args.status` is 500 when the transport
    * failed and there is no response at all.
    */
-  public handleResponse({ response, status, requestUrl }: OnResponseArgs): void {
-    if (response?.ok) {
-      this.configStore.setMaintenanceMode(false)
-      this.lastSuccessfulRequestTime = Math.floor(Date.now() / 1000)
-      return
-    }
-
-    if (shouldResponseTriggerMaintenance(status, requestUrl)) {
-      this.configStore.setMaintenanceMode(true)
-    }
+  public handleResponse(args: OnResponseArgs): void {
+    this.maintenanceHandler(args)
   }
 }

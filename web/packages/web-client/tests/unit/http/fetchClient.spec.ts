@@ -1,3 +1,11 @@
+/**
+ * @vitest-environment node
+ *
+ * Deliberately not happy-dom. Its `Headers` constructor applies a record init with `set`
+ * semantics, whereas the spec — and therefore both browsers and undici — applies it with
+ * `append`. Every header assertion below is about that merge, so running them against a
+ * forgiving implementation would let a real duplicate-header bug pass.
+ */
 import { FetchClient } from '../../../src/http'
 import { HttpError } from '../../../src/errors'
 
@@ -98,13 +106,14 @@ describe('FetchClient', () => {
       expect(error.response.headers.get('retry-after')).toBe('30')
     })
 
-    it('leaves the error response body unread', async () => {
+    it('reads the error body with the responseType the caller asked for', async () => {
       fetchMock.mockResolvedValue(new Response('{"error":"nope"}', { status: 400 }))
 
-      const error: HttpError = await new FetchClient().request('https://host/foo').catch((e) => e)
+      const error: HttpError = await new FetchClient()
+        .request('https://host/foo', { responseType: 'blob' })
+        .catch((e) => e)
 
-      expect(error.response.bodyUsed).toBe(false)
-      await expect(error.response.json()).resolves.toEqual({ error: 'nope' })
+      expect(error.data).toBeInstanceOf(Blob)
     })
 
     it('returns the envelope instead of throwing when throwOnError is false', async () => {
@@ -176,6 +185,26 @@ describe('FetchClient', () => {
       await expect(new FetchClient({ onResponse }).request('https://host/foo')).rejects.toBe(
         abortError
       )
+      expect(onResponse).not.toHaveBeenCalled()
+    })
+
+    /**
+     * `AbortController.abort(reason)` rejects the fetch with that reason verbatim, so an
+     * aborted request is not always identifiable by the error name. Treating one as a
+     * transport failure would report a 500 and could trip maintenance detection.
+     */
+    it('propagates an abort whose reason is not named AbortError', async () => {
+      const controller = new AbortController()
+      const reason = new Error('superseded by a newer request')
+      fetchMock.mockImplementation(() => {
+        controller.abort(reason)
+        return Promise.reject(reason)
+      })
+      const onResponse = vi.fn()
+
+      await expect(
+        new FetchClient({ onResponse }).request('https://host/foo', { signal: controller.signal })
+      ).rejects.toBe(reason)
       expect(onResponse).not.toHaveBeenCalled()
     })
   })
@@ -357,6 +386,53 @@ describe('FetchClient', () => {
       expect(headers.get('X-Static')).toBe('a')
       expect(headers.get('X-Dynamic')).toBe('b')
       expect(headers.get('X-Shared')).toBe('request')
+    })
+
+    /**
+     * Header names are case-insensitive, so a later layer has to replace an earlier one no
+     * matter how either spelled it. The graph bridge lowercases every per-request name, which
+     * makes the mismatch against the canonically-cased client headers the normal case rather
+     * than an edge one — and a spec-compliant `Headers` would join the two values with a comma,
+     * sending `Bearer stale, Bearer fresh` instead of overriding the token.
+     */
+    it.each([
+      ['authorization', 'Authorization'],
+      ['Authorization', 'authorization'],
+      ['X-REQUEST-ID', 'x-request-id']
+    ])('overrides a %s client header with a per-request %s', async (clientName, requestName) => {
+      fetchMock.mockResolvedValue(jsonResponse({}))
+
+      await new FetchClient({ headers: () => ({ [clientName]: 'stale' }) }).request(
+        'https://host/foo',
+        { headers: { [requestName]: 'fresh' } }
+      )
+
+      const headers = lastCall()[1].headers as Headers
+      expect(headers.get(clientName)).toBe('fresh')
+      expect([...headers]).toHaveLength(1)
+    })
+
+    it('overrides a staticHeader whose casing differs from the per-request one', async () => {
+      fetchMock.mockResolvedValue(jsonResponse({}))
+
+      await new FetchClient({ staticHeaders: { 'X-Requested-With': 'XMLHttpRequest' } }).request(
+        'https://host/foo',
+        { headers: { 'x-requested-with': 'fetch' } }
+      )
+
+      const headers = lastCall()[1].headers as Headers
+      expect(headers.get('x-requested-with')).toBe('fetch')
+    })
+
+    it('accepts a Headers instance as per-request headers', async () => {
+      fetchMock.mockResolvedValue(jsonResponse({}))
+
+      await new FetchClient({ headers: () => ({ Authorization: 'stale' }) }).request(
+        'https://host/foo',
+        { headers: new Headers({ authorization: 'fresh' }) }
+      )
+
+      expect((lastCall()[1].headers as Headers).get('authorization')).toBe('fresh')
     })
 
     it('evaluates headers() on every request', async () => {

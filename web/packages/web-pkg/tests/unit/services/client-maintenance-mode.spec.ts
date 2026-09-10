@@ -1,15 +1,18 @@
 import { ClientService, useAuthStore, useConfigStore } from '../../../src/'
 import { Language } from 'vue3-gettext'
 import { createTestingPinia, writable } from '@ownclouders/web-test-helpers'
-import { shouldResponseTriggerMaintenance } from '@ownclouders/web-client'
 import type { OnResponseArgs } from '@ownclouders/web-client'
 
+/**
+ * `shouldResponseTriggerMaintenance` is deliberately left unmocked: the decision it encodes
+ * — which statuses and which endpoints count — is the thing under test here, and stubbing it
+ * would only assert that one function calls another.
+ */
 vi.mock('@ownclouders/web-client', async (importOriginal) => ({
   ...(await importOriginal<any>()),
   graph: vi.fn(),
   ocs: vi.fn(),
-  webdav: vi.fn(),
-  shouldResponseTriggerMaintenance: vi.fn()
+  webdav: vi.fn()
 }))
 
 describe('ClientService maintenance mode', () => {
@@ -18,11 +21,11 @@ describe('ClientService maintenance mode', () => {
 
   let configStore: ReturnType<typeof useConfigStore>
   let authStore: ReturnType<typeof useAuthStore>
+  let service: ClientService
   let onResponse: (args: OnResponseArgs) => void
 
   beforeEach(() => {
     createTestingPinia({ initialState: { auth: { accessToken: 'token' } } })
-    vi.mocked(shouldResponseTriggerMaintenance).mockReset()
     vi.stubGlobal('fetch', vi.fn())
 
     authStore = useAuthStore()
@@ -30,7 +33,7 @@ describe('ClientService maintenance mode', () => {
     writable(configStore).serverUrl = serverUrl
     configStore.setMaintenanceMode = vi.fn()
 
-    const service = new ClientService({
+    service = new ClientService({
       configStore,
       language: language as Language,
       authStore
@@ -47,53 +50,52 @@ describe('ClientService maintenance mode', () => {
     })
 
     expect(configStore.setMaintenanceMode).toHaveBeenCalledWith(false)
+    expect(service.lastSuccessfulRequestTime).not.toBeNull()
   })
 
-  it('sets maintenance mode when shouldResponseTriggerMaintenance returns true', () => {
-    vi.mocked(shouldResponseTriggerMaintenance).mockReturnValue(true)
-
+  it('sets maintenance mode for a 503', () => {
     onResponse({
       response: new Response('{}', { status: 503 }),
       status: 503,
       requestUrl: 'some/url'
     })
 
-    expect(shouldResponseTriggerMaintenance).toHaveBeenCalledWith(503, 'some/url')
     expect(configStore.setMaintenanceMode).toHaveBeenCalledWith(true)
   })
 
   it('leaves maintenance state untouched for a 404', () => {
-    vi.mocked(shouldResponseTriggerMaintenance).mockReturnValue(false)
-
     onResponse({
       response: new Response('{}', { status: 404 }),
       status: 404,
       requestUrl: 'some/url'
     })
 
-    expect(shouldResponseTriggerMaintenance).toHaveBeenCalledWith(404, 'some/url')
     expect(configStore.setMaintenanceMode).not.toHaveBeenCalled()
   })
 
-  it('trap 5: treats a transport failure as 503-eligible via status 500', () => {
-    vi.mocked(shouldResponseTriggerMaintenance).mockReturnValue(true)
-
+  /**
+   * A transport failure has no response to read a status off, so it is reported as 500. As on
+   * master — where the axios error interceptor fell back to `error.response?.status || 500` —
+   * that is not a maintenance signal, so the flag is left alone rather than cleared.
+   */
+  it('trap 5: leaves maintenance state untouched for a transport failure', () => {
     onResponse({ response: null, status: 500, requestUrl: 'some/url' })
 
-    expect(shouldResponseTriggerMaintenance).toHaveBeenCalledWith(500, 'some/url')
-    expect(configStore.setMaintenanceMode).toHaveBeenCalledWith(true)
+    expect(configStore.setMaintenanceMode).not.toHaveBeenCalled()
   })
 
-  it('trap 4: forwards the relative request url to the maintenance check', () => {
-    vi.mocked(shouldResponseTriggerMaintenance).mockReturnValue(false)
-    const sseUrl = 'ocs/v2.php/apps/notifications/api/v1/notifications/sse'
-
+  /**
+   * The allow-list is matched against the relative request url, which is why `onResponse`
+   * reports the caller's url rather than `response.url`. The notifications SSE endpoint
+   * answers 503 by design and must not raise the banner.
+   */
+  it('trap 4: exempts an allow-listed endpoint from a 503', () => {
     onResponse({
       response: new Response('{}', { status: 503 }),
       status: 503,
-      requestUrl: sseUrl
+      requestUrl: 'ocs/v2.php/apps/notifications/api/v1/notifications/sse'
     })
 
-    expect(shouldResponseTriggerMaintenance).toHaveBeenCalledWith(503, sseUrl)
+    expect(configStore.setMaintenanceMode).not.toHaveBeenCalled()
   })
 })

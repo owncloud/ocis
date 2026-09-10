@@ -29,20 +29,24 @@ export function useRequest(options: RequestOptions = {}): RequestResult {
       ? clientService.httpAuthenticated
       : clientService.httpUnAuthenticated
 
-    config.headers = config.headers || {}
+    // A Headers rather than a plain object so that these entries replace a caller's own
+    // spelling of the same name instead of being appended alongside it.
+    const headers = new Headers(config.headers)
 
     if (authStore.publicLinkContextReady) {
       if (authStore.publicLinkPassword) {
-        config.headers.Authorization =
+        headers.set(
+          'Authorization',
           'Basic ' +
-          Buffer.from(['public', authStore.publicLinkPassword].join(':')).toString('base64')
+            Buffer.from(['public', authStore.publicLinkPassword].join(':')).toString('base64')
+        )
       }
       if (authStore.publicLinkToken) {
-        config.headers['public-token'] = authStore.publicLinkToken
+        headers.set('public-token', authStore.publicLinkToken)
       }
     }
 
-    return httpClient.request({ ...config, method, url })
+    return httpClient.request({ ...config, headers, method, url })
   }
 
   return {

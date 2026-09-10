@@ -35,7 +35,11 @@ export class FetchClient {
       })
     } catch (error) {
       // An abort is a caller decision, not a transport failure: propagate it verbatim.
-      if (error?.name === 'AbortError') {
+      // `signal.aborted` and not just the error name, because `AbortController.abort(reason)`
+      // rejects with that reason as-is — it is only a DOMException named `AbortError` when no
+      // reason was given. A caller-supplied reason must not be mistaken for a network failure
+      // and reported as a 500, which would also trip maintenance detection.
+      if (error?.name === 'AbortError' || signal?.aborted) {
         throw error
       }
       // Degrade a transport failure to 500 so maintenance detection still runs.
@@ -46,7 +50,7 @@ export class FetchClient {
     this.options.onResponse?.({ response, status: response.status, requestUrl })
 
     if (!response.ok && throwOnError) {
-      throw await this.buildError(response)
+      throw await this.buildError(response, options.responseType)
     }
 
     return response
@@ -66,12 +70,28 @@ export class FetchClient {
     }
   }
 
-  private buildHeaders(perRequest?: Record<string, string>): Headers {
-    return new Headers({
-      ...(this.options.staticHeaders || {}),
-      ...(this.options.headers?.() || {}),
-      ...(perRequest || {})
-    })
+  /**
+   * Merges the three header layers, later ones replacing earlier ones.
+   *
+   * Deliberately not an object spread into `new Headers()`: header names are
+   * case-insensitive, but object keys are not, so `Authorization` and `authorization` would
+   * both survive the spread — and a record init is applied with `append`, which joins the
+   * two into `Bearer stale, Bearer fresh` instead of overriding. `set()` per entry is
+   * case-insensitive and replaces, which is what a layered merge means.
+   */
+  private buildHeaders(perRequest?: HeadersInit): Headers {
+    const headers = new Headers()
+    const apply = (layer?: HeadersInit) => {
+      if (layer) {
+        new Headers(layer).forEach((value, name) => headers.set(name, value))
+      }
+    }
+
+    apply(this.options.staticHeaders)
+    apply(this.options.headers?.())
+    apply(perRequest)
+
+    return headers
   }
 
   private buildBody(body: unknown, headers: Headers): BodyInit | undefined {
@@ -96,14 +116,16 @@ export class FetchClient {
     return JSON.stringify(body)
   }
 
-  private async buildError(response: Response): Promise<HttpError> {
-    // Clone so that HttpError.response still exposes an unread body to callers.
-    const data = await this.readBodySafely(response.clone())
+  private async buildError(response: Response, responseType?: ResponseType): Promise<HttpError> {
+    // Read as the caller asked for the success body: axios applied `responseType` to error
+    // bodies too, so a `blob` caller keeps getting a Blob on `error.data`.
+    const data = await this.readBodySafely(response, responseType)
 
     // `error.data` and `error.statusCode` are this repo's convention, but `error.response`
     // is reachable from outside it, where `.response.data` and `.response.headers['x']`
     // were the only spellings. Keep those working too; the `headers` override shadows the
-    // prototype accessor with a superset of it.
+    // prototype accessor with a superset of it. The body itself is already consumed —
+    // `error.response.data` is the way to it, not `error.response.json()`.
     Object.defineProperty(response, 'data', { value: data })
     Object.defineProperty(response, 'headers', { value: httpHeaders(response.headers) })
 
@@ -115,9 +137,9 @@ export class FetchClient {
     )
   }
 
-  private async readBodySafely(response: Response): Promise<unknown> {
+  private async readBodySafely(response: Response, responseType?: ResponseType): Promise<unknown> {
     try {
-      return await this.readBody(response)
+      return await this.readBody(response, responseType)
     } catch {
       // an unreadable body must not replace the HTTP error with a read error
       return undefined

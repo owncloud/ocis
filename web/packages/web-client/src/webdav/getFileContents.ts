@@ -46,8 +46,11 @@ export const GetFileContentsFactory = (dav: DAV, { httpClient }: WebDavOptions) 
           }
         }
       } catch (error) {
-        // the core already throws an HttpError carrying the response and status
-        if (error instanceof HttpError) {
+        // The core already throws an HttpError carrying the response and status, and lets an
+        // abort through verbatim. Both have to reach the caller unchanged — wrapping an abort
+        // would hide the `AbortError` name that callers distinguish a cancelled load by, and
+        // turn a restarted load into a visible error.
+        if (error instanceof HttpError || error?.name === 'AbortError' || opts.signal?.aborted) {
           throw error
         }
         throw new HttpError(error?.message, error?.response, error?.statusCode)

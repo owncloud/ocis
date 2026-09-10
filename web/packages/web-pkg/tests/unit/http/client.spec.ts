@@ -252,15 +252,31 @@ describe('HttpClient', () => {
       expect(fetchMock.mock.calls[0][1].signal.aborted).toBe(true)
     })
 
-    test('removes its abort listeners once a request has settled', async () => {
+    test('cancels a request that carries a per-request signal of its own', async () => {
+      neverResolvingFetch()
       const client = new HttpClient()
       const controller = new AbortController()
-      const removeEventListener = vi.spyOn(controller.signal, 'removeEventListener')
 
-      await client.get('https://host/a', { signal: controller.signal })
-      await client.get('https://host/b', { signal: controller.signal })
+      const request = client.get('https://host/url', { signal: controller.signal })
+      client.cancel('gone')
 
-      expect(removeEventListener).toHaveBeenCalledTimes(2)
+      await expect(request).rejects.toMatchObject({ name: 'AbortError', message: 'gone' })
+    })
+
+    /**
+     * `abort(reason)` rejects with that reason verbatim, so a reason that is not a
+     * DOMException named `AbortError` must still reach the caller unchanged rather than be
+     * reported as a transport failure.
+     */
+    test('propagates a per-request abort reason that is not an AbortError', async () => {
+      neverResolvingFetch()
+      const controller = new AbortController()
+      const reason = new Error('superseded')
+
+      const request = new HttpClient().get('https://host/url', { signal: controller.signal })
+      controller.abort(reason)
+
+      await expect(request).rejects.toBe(reason)
     })
   })
 })

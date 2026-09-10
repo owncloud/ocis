@@ -20,7 +20,7 @@ import { DAV } from './client/dav'
 import { ListFileVersionsFactory } from './listFileVersions'
 import { SetFavoriteFactory } from './setFavorite'
 import { ListFavoriteFilesFactory } from './listFavoriteFiles'
-import { shouldResponseTriggerMaintenance } from '../helpers/maintenance'
+import { maintenanceResponseHandler } from '../helpers/maintenance'
 
 export * from './constants'
 export * from './types'
@@ -35,13 +35,7 @@ export const webdav = (
 ): WebDAV => {
   const httpClient = new FetchClient({
     ...(headers && { headers }),
-    onResponse: ({ response, status, requestUrl }) => {
-      if (response?.ok) {
-        onSetMaintenance(false)
-        return
-      }
-      onSetMaintenance(shouldResponseTriggerMaintenance(status, requestUrl))
-    }
+    onResponse: maintenanceResponseHandler(onSetMaintenance, { clearOnUnrelatedError: true })
   })
 
   const options = { httpClient, baseUrl: baseURI, headers }
