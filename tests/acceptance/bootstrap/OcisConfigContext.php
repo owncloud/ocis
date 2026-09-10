@@ -391,7 +391,10 @@ class OcisConfigContext implements Context {
 	 * @throws GuzzleException
 	 */
 	private function waitForOcisProxyReady(int $timeoutSeconds = 60): void {
-		$readyzUrl = 'http://localhost:9205/readyz';
+		// In k8s, port 9205 on the runner's localhost is unavailable (k3d's loadbalancer
+		// reserves that range), so the proxy's debug port is forwarded to a different local
+		// port for the lifetime of the job. See k8s.yml's "Expose proxy readyz" step.
+		$readyzUrl = getenv('PROXY_READYZ_URL') ?: 'http://localhost:9205/readyz';
 		$deadline = time() + $timeoutSeconds;
 		while (time() < $deadline) {
 			try {

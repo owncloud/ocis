@@ -79,5 +79,13 @@ if [[ "$ENABLE_AUTH_APP" == "true" ]]; then
     sed -i '/authapp:/{n;s|false|true|}' $CFG_DIR/values.yaml
 fi
 
+if [[ "$ENABLE_VAULT" == "true" ]]; then
+    sed -i '/vault:/{n;s|false|true|}' $CFG_DIR/values.yaml
+    # baking keycloak url into the base CSP would affect every other suite that
+    # shares this same values.yaml, breaking their fixed CSP header assertions.
+    sed -i "/defaultSrc:/i\\        - 'https://keycloak:8443/'" $CFG_DIR/values.yaml
+    sed -i "/imgSrc:/i\\        - 'https://keycloak:8443/'" $CFG_DIR/values.yaml
+fi
+
 # copy custom values file
 cp $CFG_DIR/values.yaml "$CHT_DIR/ci/deployment-values.yaml"

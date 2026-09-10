@@ -1,0 +1,161 @@
+{{- if .Values.features.vault.enabled }}
+{{- include "ocis.basicServiceTemplates" (dict "scope" . "appName" "appNameStorageUsers" "appNameSuffix" "vault") -}}
+apiVersion: apps/v1
+kind: Deployment
+{{ include "ocis.metadata" . }}
+spec:
+  {{- include "ocis.selector" . | nindent 2 }}
+  {{- if and (not .Values.autoscaling.enabled) (.Values.replicas) }}
+  replicas: {{ .Values.replicas }}
+  {{- end }}
+  {{- include "ocis.deploymentStrategy" . | nindent 2 }}
+  template:
+    {{- include "ocis.templateMetadata" (dict "scope" $ "configCheck" false) | nindent 4 }}
+    spec:
+      {{- include "ocis.affinity" $ | nindent 6 }}
+      {{- include "ocis.securityContextAndtopologySpreadConstraints" . | nindent 6 }}
+      {{- include "ocis.priorityClassName" $.priorityClassName | nindent 6 }}
+      {{- include "ocis.hostAliases" $ | nindent 6 }}
+      nodeSelector: {{ toYaml $.nodeSelector | nindent 8 }}
+      containers:
+        - name: {{ .appName }}
+          {{- include "ocis.image" $ | nindent 10 }}
+          command: ["ocis"]
+          args: ["storage-users", "server"]
+          {{- include "ocis.containerSecurityContext" . | nindent 10 }}
+          env:
+            {{- include "ocis.serviceRegistry" . | nindent 12 }}
+            {{- include "ocis.events" . | nindent 12 }}
+            {{- include "ocis.cacheStore" . | nindent 12 }}
+            {{- include "ocis.cors" . | nindent 12 }}
+
+            # this is a secondary storage-users instance, dedicated to vault storage
+            # see tests/config/k8s/templates/extra.tpl for STORAGE_USERS_ENABLE_VAULT_MODE
+            # and STORAGE_USERS_SERVICE_NAME
+
+            - name: STORAGE_USERS_GATEWAY_GRPC_ADDR
+              value: {{ .appNameGateway }}:9142
+
+            - name: STORAGE_USERS_LOG_COLOR
+              value: {{ .Values.logging.color | quote }}
+            - name: STORAGE_USERS_LOG_LEVEL
+              value: {{ .Values.logging.level | quote }}
+            - name: STORAGE_USERS_LOG_PRETTY
+              value: {{ .Values.logging.pretty | quote }}
+
+            - name: STORAGE_USERS_TRACING_ENABLED
+              value: "{{ .Values.tracing.enabled }}"
+            - name: STORAGE_USERS_TRACING_TYPE
+              value: {{ .Values.tracing.type | quote }}
+            - name: STORAGE_USERS_TRACING_ENDPOINT
+              value: {{ .Values.tracing.endpoint | quote }}
+            - name: STORAGE_USERS_TRACING_COLLECTOR
+              value: {{ .Values.tracing.collector | quote }}
+
+            - name: STORAGE_USERS_DEBUG_PPROF
+              value: {{ .Values.debug.profiling | quote }}
+
+            - name: STORAGE_USERS_GRPC_ADDR
+              value: 0.0.0.0:9157
+            - name: STORAGE_USERS_DEBUG_ADDR
+              value: 0.0.0.0:9159
+
+            - name: STORAGE_USERS_HTTP_ADDR
+              value: 0.0.0.0:9158
+            - name: STORAGE_USERS_DATA_SERVER_URL
+              value: "http://{{ .appName }}:9158/data"
+
+            - name: STORAGE_USERS_DRIVER
+              value: ocis
+            - name: STORAGE_USERS_OCIS_MAX_CONCURRENCY
+              value: {{ .Values.services.storageusers.storageBackend.driverConfig.ocis.maxConcurrency | quote }}
+
+            - name: STORAGE_USERS_UPLOAD_EXPIRATION
+              value: {{ .Values.services.storageusers.maintenance.cleanUpExpiredUploads.uploadExpiration | quote }}
+
+            - name: STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE
+              value: {{ .Values.services.storageusers.maintenance.purgeExpiredTrashBinItems.personalDeleteBefore | quote}}
+            - name: STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE
+              value: {{ .Values.services.storageusers.maintenance.purgeExpiredTrashBinItems.projectDeleteBefore | quote }}
+
+            - name: STORAGE_USERS_SERVICE_ACCOUNT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "config.authService" . }}
+                  key: service-account-id
+            - name: STORAGE_USERS_SERVICE_ACCOUNT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "secrets.serviceAccountSecret" . }}
+                  key: service-account-secret
+
+            - name: STORAGE_USERS_STAT_CACHE_STORE
+              value: noop
+
+            - name: STORAGE_USERS_MOUNT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "config.storageUsers" . }}
+                  key: storage-uuid
+
+            - name: STORAGE_USERS_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "secrets.jwtSecret" . }}
+                  key: jwt-secret
+
+            - name: OCIS_TRANSFER_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "secrets.transferSecret" . }}
+                  key: transfer-secret
+
+            - name: OCIS_ASYNC_UPLOADS
+              value: "true"
+            - name: STORAGE_USERS_EVENTS_NUM_CONSUMERS
+              value: {{ .Values.services.storageusers.events.consumer.concurrency | quote }}
+
+            - name: STORAGE_USERS_DATA_GATEWAY_URL
+              value: "http://{{ .appNameFrontend }}:9140/data/"
+
+            {{- include "ocis.caEnv" $ | nindent 12}}
+            {{- include "ocis.extraEnvs" . | nindent 12}}
+
+          {{- include "ocis.livenessProbe" . | nindent 10 }}
+
+          resources: {{ toYaml .resources | nindent 12 }}
+
+          ports:
+            - name: grpc
+              containerPort: 9157
+            - name: http
+              containerPort: 9158
+            - name: metrics-debug
+              containerPort: 9159
+
+          volumeMounts:
+            - name: tmp-volume
+              mountPath: /tmp
+            - name: messaging-system-ca
+              mountPath: /etc/ocis/messaging-system-ca
+              readOnly: true
+            - name: {{ include "ocis.persistence.dataVolumeName" . }}
+              mountPath: /var/lib/ocis
+            {{- include "ocis.caPath" $ | nindent 12}}
+            {{- include "ocis.extraVolMounts" . | nindent 12}}
+
+      {{- include "ocis.imagePullSecrets" $ | nindent 6 }}
+      volumes:
+        - name: tmp-volume
+          emptyDir: {}
+        - name: messaging-system-ca
+          {{ if and (.Values.messagingSystem.external.enabled) (not .Values.messagingSystem.external.tls.certTrusted) }}
+          secret:
+            secretName: {{ include "secrets.messagingSystemCASecret" . }}
+          {{ else }}
+          emptyDir: {}
+          {{ end }}
+        {{- include "ocis.caVolume" $ | nindent 8}}
+        {{- include "ocis.persistence.dataVolume" . | nindent 8 }}
+        {{- include "ocis.extraVolumes" . | nindent 8}}
+{{- end -}}

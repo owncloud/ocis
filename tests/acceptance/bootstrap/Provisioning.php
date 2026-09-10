@@ -82,6 +82,27 @@ trait Provisioning {
 	}
 
 	/**
+	 * Finds the oidc-client-ts user entry (key "oc_oAuth.user:<authority>:<client_id>")
+	 * in a Playwright browser storage state and decodes its token data.
+	 * The exact position of this entry among the other localStorage keys is not
+	 * guaranteed, so it must be located by name rather than by a fixed index.
+	 *
+	 * @param array $state
+	 *
+	 * @return mixed
+	 * @throws Exception
+	 */
+	public function extractOidcTokenDataFromStorageState(array $state): mixed {
+		$localStorage = $state['origins'][0]['localStorage'] ?? [];
+		foreach ($localStorage as $entry) {
+			if (\str_starts_with($entry['name'] ?? '', 'oc_oAuth.user:')) {
+				return \json_decode($entry['value']);
+			}
+		}
+		throw new Exception('Could not find an "oc_oAuth.user:" entry in the browser storage state.');
+	}
+
+	/**
 	 * Check if this is the admin group. That group is always a local group in
 	 * ownCloud10, even if other groups come from LDAP.
 	 *
@@ -711,7 +732,7 @@ trait Provisioning {
 			$adminUser["actualUsername"],
 			$adminUser["password"],
 		);
-		$tokenData = \json_decode($state['origins'][0]['localStorage'][2]['value']);
+		$tokenData = $this->extractOidcTokenDataFromStorageState($state);
 		$this->setOcisUserToken($adminUser, $tokenData);
 	}
 
@@ -735,7 +756,7 @@ trait Provisioning {
 			$userAttribute["actualUsername"],
 			$userAttribute["password"],
 		);
-		$stateData = \json_decode($state['origins'][0]['localStorage'][2]['value']);
+		$stateData = $this->extractOidcTokenDataFromStorageState($state);
 		$this->setOcisUserToken($userAttribute, $stateData);
 		$response = $this->graphContext->adminHasRetrievedUserUsingTheGraphApi($user);
 		$userAttribute['id'] = $this->getJsonDecodedResponse($response)['id'];

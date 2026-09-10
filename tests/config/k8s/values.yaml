@@ -16,6 +16,8 @@ insecure:
 features:
   authapp:
     enabled: false
+  vault:
+    enabled: false
   emailNotifications:
     enabled: false
     smtp:
@@ -147,6 +149,9 @@ services:
       enabled: true
       accessModes:
         - ReadWriteOnce
+  storageusers-vault:
+    persistence:
+      enabled: false
   ocm:
     persistence:
       enabled: true
