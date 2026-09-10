@@ -391,12 +391,15 @@ describe('AuthService', () => {
       const mockSignInRedirect = vi.fn()
 
       const mockLoadUserAbilities = vi.fn().mockResolvedValue(undefined)
+      const mockUpdateContext = vi.fn().mockResolvedValue(undefined)
       Object.defineProperty(authService, 'userManager', {
         value: mock<UserManager>({
           getUser: vi.fn().mockImplementation(getUser),
+          getAccessToken: vi.fn().mockResolvedValue('access-token'),
           signinRedirect: mockSignInRedirect,
           setPostLoginRedirectUrl: vi.fn(),
-          loadUserAbilities: mockLoadUserAbilities
+          loadUserAbilities: mockLoadUserAbilities,
+          updateContext: mockUpdateContext
         })
       })
 
@@ -424,7 +427,7 @@ describe('AuthService', () => {
         null
       )
 
-      return { authService, pushSpy, mockSignInRedirect, mockLoadUserAbilities }
+      return { authService, pushSpy, mockSignInRedirect, mockLoadUserAbilities, mockUpdateContext }
     }
 
     it('when the user lacks the vault ability, denies (accessDenied) instead of the IdP', async () => {
@@ -496,6 +499,22 @@ describe('AuthService', () => {
       expect(mockLoadUserAbilities).toHaveBeenCalled()
       expect(result).toEqual({ name: 'accessDenied' })
       expect(mockSignInRedirect).not.toHaveBeenCalled()
+    })
+
+    it('on a cold load with a valid MFA session, initializes the user context instead of bouncing to login', async () => {
+      const { authService, mockSignInRedirect, mockUpdateContext } = setupVaultAuthService({
+        canAccessVault: true,
+        userContextReady: false,
+        getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'advanced' }, expired: false }))
+      })
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      // acr already satisfies MFA: no step-up, and the context must still be initialized
+      // (loadUserAbilities pre-set the token, which must not short-circuit updateContext).
+      expect(mockSignInRedirect).not.toHaveBeenCalled()
+      expect(mockUpdateContext).toHaveBeenCalledWith('access-token', true)
+      expect(result).toBeUndefined()
     })
 
     it('on a cold load, lets an authenticated entitled user through to the MFA step-up', async () => {

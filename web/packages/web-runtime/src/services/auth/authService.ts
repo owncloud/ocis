@@ -144,7 +144,7 @@ export class AuthService implements AuthServiceInterface {
       const requiredAcr = this.capabilityStore.authMfaRequiredLevelname
       const user = await this.userManager.getUser()
 
-      // Address-bar navigation: permissions unloaded — load them and deny before MFA (OCISDEV-1207).
+      // Address-bar navigation: permissions unloaded — load them and deny before MFA.
       if (user && !user.expired && !this.authStore.userContextReady) {
         try {
           await this.userManager.loadUserAbilities()

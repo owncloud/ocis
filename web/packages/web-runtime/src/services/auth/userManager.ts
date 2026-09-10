@@ -160,7 +160,8 @@ export class UserManager extends OidcUserManager {
   updateContext(accessToken: string, fetchUserData: boolean) {
     const userKnown = !!this.userStore.user
     const accessTokenChanged = this.authStore.accessToken !== accessToken
-    if (!accessTokenChanged) {
+    // Skip only when a context load already started; loadUserAbilities can set the token first.
+    if (!accessTokenChanged && this.updateAccessTokenPromise) {
       return this.updateAccessTokenPromise
     }
 
