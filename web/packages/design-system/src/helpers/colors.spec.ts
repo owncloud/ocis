@@ -7,7 +7,11 @@ import {
   generateHashedColorForString,
   setDesiredContrastRatio,
   cssRgbToHex,
-  getHexFromCssVar
+  getHexFromCssVar,
+  hashString,
+  hashToIndex,
+  pickReadableTextColor,
+  tagColorVarsFor
 } from './colors'
 
 describe('hexToRgb', () => {
@@ -59,6 +63,107 @@ describe('generateHashedColorForString', () => {
   it('generates a hashed color', () => {
     expect(generateHashedColorForString('owncloud')).toBe('#2F26F')
     expect(generateHashedColorForString('example')).toMatch('#25116A')
+  })
+})
+
+describe('hashString', () => {
+  it('is deterministic', () => {
+    expect(hashString('physics')).toBe(hashString('physics'))
+  })
+  it('does not case-fold, because tags do not', () => {
+    // reva's tags.normalize() trims and splits but never lowercases, so `Invoice` and `invoice`
+    // are two different tags and must get two different colours.
+    expect(hashString('Invoice')).not.toBe(hashString('invoice'))
+  })
+  it('returns 0 for an empty string', () => {
+    expect(hashString('')).toBe(0)
+  })
+  it('normalises, so callers can use the result as-is', () => {
+    // `hash << 5` overflows into the sign bit, and the addition that follows leaves int32
+    // altogether, so without the normalisation `hashString` returns numbers that are unusable
+    // as an index — negative, or beyond 32 bits.
+    for (const name of ['physics', 'Invoice', 'a', '', '🎉', 'x'.repeat(200)]) {
+      const hash = hashString(name)
+      expect(hash).toBeGreaterThanOrEqual(0)
+      expect(hash).toBeLessThanOrEqual(0xffffffff)
+      expect(Number.isInteger(hash)).toBe(true)
+    }
+  })
+})
+
+describe('hashToIndex', () => {
+  it('stays within the list', () => {
+    for (const name of ['physics', 'Invoice', 'invoice', 'a', '', 'tag', 'ünïcödé', '🎉']) {
+      const index = hashToIndex(name, 30)
+      expect(index).toBeGreaterThanOrEqual(0)
+      expect(index).toBeLessThan(30)
+      expect(Number.isInteger(index)).toBe(true)
+    }
+  })
+  it.each([0, -1, 1.5, NaN])('returns -1 for an unusable length of %s', (length) => {
+    expect(hashToIndex('physics', length)).toBe(-1)
+  })
+  it('is stable across calls', () => {
+    expect(hashToIndex('physics', 30)).toBe(hashToIndex('physics', 30))
+  })
+  it('pins known names to known slots', () => {
+    // Pinned deliberately: these values are the cross-device, cross-user guarantee the whole
+    // feature rests on. If a change here is intentional it re-colours every existing tag in
+    // every deployment, so it must be a conscious edit, not a silent regression.
+    expect(hashToIndex('physics', 30)).toBe(13)
+    expect(hashToIndex('invoice', 30)).toBe(7)
+    expect(hashToIndex('Invoice', 30)).toBe(27)
+    expect(hashToIndex('important', 30)).toBe(28)
+  })
+  it('re-colours names when the list grows, which is why growing it is a one-way act', () => {
+    expect(hashToIndex('physics', 30)).not.toBe(hashToIndex('physics', 31))
+  })
+})
+
+describe('tagColorVarsFor', () => {
+  it('names the theme css vars for a slot', () => {
+    expect(tagColorVarsFor(13)).toEqual({
+      fillColor: 'var(--oc-color-tag-13)',
+      textColor: 'var(--oc-color-tag-13-text,currentColor)'
+    })
+  })
+  it('falls the label back to the inherited colour when the theme emits no pair for a slot', () => {
+    expect(tagColorVarsFor(13).textColor).toContain(',currentColor)')
+  })
+  it('pairs the fill of a name with the text colour belonging to it', () => {
+    const index = hashToIndex('invoice', 30)
+    expect(tagColorVarsFor(index)).toEqual({
+      fillColor: `var(--oc-color-tag-${index})`,
+      textColor: `var(--oc-color-tag-${index}-text,currentColor)`
+    })
+  })
+  it.each([-1, 1.5, NaN, undefined, null])(
+    'returns null for %s rather than naming a var that cannot exist',
+    (index) => {
+      // -1 is what `hashToIndex` returns when the theme ships no tag colours, which is the state
+      // of any theme that has not opted into coloured tags.
+      expect(tagColorVarsFor(index)).toBeNull()
+    }
+  )
+})
+
+describe('pickReadableTextColor', () => {
+  it('puts light text on a dark fill and dark text on a light fill', () => {
+    expect(pickReadableTextColor('#041e42', '#041e42', '#ffffff')).toBe('#ffffff')
+    expect(pickReadableTextColor('#e3baba', '#041e42', '#ffffff')).toBe('#041e42')
+  })
+  it('uses the candidates it is given rather than black and white', () => {
+    // A theme decides what its text looks like; the pairing only decides which of the two.
+    expect(pickReadableTextColor('#000000', '#333333', '#eeeeee')).toBe('#eeeeee')
+    expect(pickReadableTextColor('#ffffff', '#333333', '#eeeeee')).toBe('#333333')
+  })
+  it('returns null for a fill it cannot measure, rather than guessing a candidate', () => {
+    expect(pickReadableTextColor('oklch(70% 0.1 200)', '#041e42', '#ffffff')).toBeNull()
+    expect(pickReadableTextColor('not-a-colour', '#041e42', '#ffffff')).toBeNull()
+  })
+  it('returns null when a candidate cannot be measured, rather than preferring the first', () => {
+    expect(pickReadableTextColor('#041e42', 'oklch(13% 0.028 261.692)', '#ffffff')).toBeNull()
+    expect(pickReadableTextColor('#041e42', '#041e42', 'not-a-colour')).toBeNull()
   })
 })
 

@@ -1,14 +1,14 @@
 <template>
-  <component :is="type" :class="ocTagClass" :to="to" @click="ocTagClick">
+  <component :is="type" :class="ocTagClass" :style="ocTagStyle" :to="to" @click="ocTagClick">
     <!-- @slot Content of the tag -->
     <slot />
   </component>
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, unref } from 'vue'
 import { RouteLocationRaw } from 'vue-router'
-import { getSizeClass } from '../../helpers'
+import { getSizeClass, tagColorVarsFor } from '../../helpers'
 
 /**
  * @component OcTag
@@ -18,6 +18,9 @@ import { getSizeClass } from '../../helpers'
  * @prop {string|RouteLocationRaw} [to=null] - Target location for router-link or anchor href
  * @prop {('small'|'medium'|'large')} [size='medium'] - Size of the tag
  * @prop {boolean} [rounded=false] - Whether the tag should have fully rounded corners
+ * @prop {number} [colorIndex=undefined] - Index into the theme's tag colour list. Fills the tag
+ *   with that colour and takes the matching label colour with it. A negative index or none at all
+ *   leaves the tag with its default appearance, which is what a theme shipping no tag colours gets.
  *
  * @emits {MouseEvent} click - Emitted when the tag is clicked
  *
@@ -41,6 +44,7 @@ interface Props {
   to?: string | RouteLocationRaw
   size?: 'small' | 'medium' | 'large'
   rounded?: boolean
+  colorIndex?: number | null
 }
 
 interface Emits {
@@ -53,13 +57,24 @@ defineOptions({
   release: '2.0.0'
 })
 
-const { type = 'span', to = null, size = 'medium', rounded = false } = defineProps<Props>()
+const {
+  type = 'span',
+  to = null,
+  size = 'medium',
+  rounded = false,
+  colorIndex = null
+} = defineProps<Props>()
 
 const emit = defineEmits<Emits>()
 
 function ocTagClick(event: MouseEvent) {
   emit('click', event)
 }
+
+// The fill and the label colour that goes with it, or null when the tag is not to be filled.
+// Both are css vars the theme emits, so the tag needs nothing but the index to colour itself: no
+// colours passed in at every call site, and a theme switch repaints without re-rendering.
+const colorVars = computed(() => tagColorVarsFor(colorIndex))
 
 const ocTagClass = computed(() => {
   const classes = ['oc-tag', `oc-tag-${getSizeClass(size)}`]
@@ -72,7 +87,22 @@ const ocTagClass = computed(() => {
     classes.push('oc-tag-rounded')
   }
 
+  if (unref(colorVars)) {
+    classes.push('oc-tag-filled')
+  }
+
   return classes
+})
+
+const ocTagStyle = computed(() => {
+  const vars = unref(colorVars)
+  if (!vars) {
+    return undefined
+  }
+  return {
+    backgroundColor: vars.fillColor,
+    color: vars.textColor
+  }
 })
 </script>
 
@@ -113,6 +143,36 @@ const ocTagClass = computed(() => {
 
   .oc-icon > svg {
     fill: var(--oc-color-text-muted);
+  }
+
+  // On a filled chip the fill decides what is legible, so nothing nested inside may paint
+  // itself: a link would take the global anchor colour (styles/theme/oc-text.scss), a raw
+  // `OcButton` its own swatch, and an `OcIcon` the muted fill set just above. All three ignore
+  // the `color` the chip carries, which is why the label colour has to be forced down as
+  // `inherit`/`currentColor` rather than simply set on the chip. The selectors are deliberately
+  // one step more specific than the rules they beat, since a tie would be decided by the
+  // stylesheet order in the bundle. Hence `&.oc-tag-filled` rather than `&-filled`: the latter
+  // compiles to a single class, tying with `.oc-tag .oc-icon > svg` just above.
+  &.oc-tag-filled {
+    a,
+    a:hover,
+    a:focus,
+    .oc-button,
+    .oc-button:hover:not([disabled]),
+    .oc-button:focus:not([disabled]),
+    &.oc-tag-link:hover,
+    &.oc-tag-link:focus,
+    &.oc-tag-button:hover,
+    &.oc-tag-button:focus {
+      color: inherit;
+    }
+
+    .oc-icon > svg,
+    .oc-button .oc-icon > svg,
+    .oc-button:hover:not([disabled]) .oc-icon > svg,
+    .oc-button:focus:not([disabled]) .oc-icon > svg {
+      fill: currentColor;
+    }
   }
 
   &-link,
@@ -163,6 +223,18 @@ Component to display various information.
 </oc-tag>
 </div>
 ```
+## Coloured tags
+A tag can take one of the theme's tag colours by index. The label colour comes with it, so nothing
+has to be worked out at the call site — `useTagColor().tagColorIndex(name)` in web-pkg turns a tag
+name into the index.
+
+```js
+<oc-grid gutter="small" flex="true">
+    <oc-tag class="oc-mr-s" size="small" :color-index="3">physics</oc-tag>
+    <oc-tag class="oc-mr-s" size="small" :color-index="7">invoice</oc-tag>
+</oc-grid>
+```
+
 ## Different types of the tag component
 The tag component can be rendered as a different element if desired. You can specify such element via property `type`.
 

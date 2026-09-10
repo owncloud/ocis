@@ -3,7 +3,12 @@ import { defineStore } from 'pinia'
 import { computed, ref, unref } from 'vue'
 import { useLocalStorage, usePreferredDark } from '@vueuse/core'
 import { z } from 'zod'
-import { applyCustomProp, removeCustomProp } from '@ownclouders/design-system/helpers'
+import {
+  applyCustomProp,
+  hexToRgb,
+  pickReadableTextColor,
+  removeCustomProp
+} from '@ownclouders/design-system/helpers'
 import { ShareRole } from '@ownclouders/web-client'
 import { useVault } from '../vault'
 
@@ -44,7 +49,14 @@ const DesignTokens = z.object({
   fontFamily: z.string().optional(),
   fontSizes: z.record(z.string(), z.string()).optional(),
   sizes: z.record(z.string(), z.string()).optional(),
-  spacing: z.record(z.string(), z.string()).optional()
+  spacing: z.record(z.string(), z.string()).optional(),
+  /**
+   * Ordered palette a tag's colour is drawn from, emitted as `--oc-color-tag-0 … tag-N-1`.
+   * A list rather than individual palette keys so that its length is a first-class property:
+   * the index of a tag's colour is `hash(tagName) % tagColorsList.length`.
+   * Every theme must supply the same number of entries, or a tag changes hue on theme switch.
+   */
+  tagColorsList: z.array(z.string()).max(512).optional()
 })
 
 const LoginPage = z.object({
@@ -108,6 +120,37 @@ export type WebThemeConfigType = z.infer<typeof WebThemeConfig>
 
 const themeStorageKey = 'oc_currentThemeName'
 
+/**
+ * The label colour to pair with every entry of a theme's `tagColorsList`, keyed by the custom prop
+ * it is emitted as: `--oc-color-tag-3` gets a `--oc-color-tag-3-text` next to it.
+ *
+ * Derived here rather than where a chip is rendered, because this is where a theme's palette is:
+ * the two candidates are the theme's own text colours instead of hardcoded black and white, and a
+ * theme switch re-emits the pairing along with everything else it already re-emits.
+ */
+const tagTextColorProps = (theme: WebThemeType): Record<string, string> => {
+  const palette = theme.designTokens?.colorPalette ?? {}
+
+  // The theme's own text colour and its inverse are the two candidates — which of the pair is the
+  // darker one differs per theme, and it does not matter, only which one contrasts better does.
+  // Both have to be measurable for that comparison to mean anything, and a theme may write any
+  // css colour it likes (the ownCloud light theme states `text-default` in `oklch()`), so a pair
+  // that cannot be read as hex is dropped in favour of plain black and white.
+  const candidates = [palette['text-default'], palette['text-inverse']]
+  const [candidateA, candidateB] = candidates.every((color) => color && hexToRgb(color))
+    ? candidates
+    : ['#000000', '#ffffff']
+
+  return Object.fromEntries(
+    (theme.designTokens?.tagColorsList ?? [])
+      .map((fillColor, index) => [
+        `color-tag-${index}-text`,
+        pickReadableTextColor(fillColor, candidateA, candidateB)
+      ])
+      .filter(([, textColor]) => textColor !== null)
+  )
+}
+
 export const useThemeStore = defineStore('theme', () => {
   const currentLocalStorageThemeName = useLocalStorage(themeStorageKey, null)
 
@@ -130,7 +173,10 @@ export const useThemeStore = defineStore('theme', () => {
 
   const initializeThemes = (themeConfig: WebThemeConfigType) => {
     themes.value = themeConfig.themes.map((theme) =>
-      merge<WebThemeType>(themeConfig.defaults, theme)
+      // Arrays in a theme override the defaults wholesale instead of being appended to them.
+      // deepmerge concatenates by default, which would turn a `tagColorsList` present in both
+      // `defaults` and a theme into a double-length list and shift every tag's colour.
+      merge<WebThemeType>(themeConfig.defaults, theme, { arrayMerge: (_target, source) => source })
     )
     setThemeFromStorageOrSystem()
   }
@@ -167,27 +213,42 @@ export const useThemeStore = defineStore('theme', () => {
       { name: 'colorPalette', prefix: 'color' },
       { name: 'fontSizes', prefix: 'font-size' },
       { name: 'sizes', prefix: 'size' },
-      { name: 'spacing', prefix: 'spacing' }
+      { name: 'spacing', prefix: 'spacing' },
+      // An array, so `for ... in` below yields its indices: `--oc-color-tag-0`, `-tag-1`, …
+      { name: 'tagColorsList', prefix: 'color-tag' }
     ] as const
+
+    // `tagColorsList` is a string[] while the rest are records; both are indexable by the keys
+    // `for ... in` produces, which is all the loops below need.
+    const tokenValues = (
+      theme: WebThemeType,
+      name: (typeof customizableDesignTokens)[number]['name']
+    ) => (theme.designTokens[name] ?? {}) as unknown as Record<string, string>
 
     if (previousTheme) {
       customizableDesignTokens.forEach((token) => {
-        for (const param in previousTheme.designTokens[token.name]) {
+        for (const param in tokenValues(previousTheme, token.name)) {
           removeCustomProp(`${token.prefix}-${param}`)
         }
       })
+      for (const param in tagTextColorProps(previousTheme)) {
+        removeCustomProp(param)
+      }
     }
 
     applyCustomProp('font-family', unref(currentTheme).designTokens.fontFamily)
 
     customizableDesignTokens.forEach((token) => {
-      for (const param in unref(currentTheme).designTokens[token.name]) {
-        applyCustomProp(
-          `${token.prefix}-${param}`,
-          unref(currentTheme).designTokens[token.name][param]
-        )
+      const values = tokenValues(unref(currentTheme), token.name)
+      for (const param in values) {
+        applyCustomProp(`${token.prefix}-${param}`, values[param])
       }
     })
+
+    const tagTextColors = tagTextColorProps(unref(currentTheme))
+    for (const param in tagTextColors) {
+      applyCustomProp(param, tagTextColors[param])
+    }
   }
 
   const getRoleIcon = (role: ShareRole) => {

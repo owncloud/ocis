@@ -124,8 +124,9 @@
         <oc-tag
           v-oc-tooltip="getTagToolTip(tag)"
           class="resource-table-tag oc-ml-xs"
-          :rounded="true"
           size="small"
+          :rounded="true"
+          :color-index="tagColorIndex(tag)"
         >
           <oc-icon name="price-tag-3" size="small" />
           <span class="oc-text-truncate">{{ tag }}</span>
@@ -133,12 +134,45 @@
       </component>
       <oc-tag
         v-if="item.tags.length > 2"
+        :id="`tags-overflow-${resourceDomSelector(item)}`"
+        type="button"
         size="small"
         class="resource-table-tag-more"
-        @click="openTagsSidebar"
+        :aria-label="getTagsOverflowAriaLabel(item)"
       >
         + {{ item.tags.length - 2 }}
       </oc-tag>
+      <!--
+        `is-nested` is set for its side effect, not its literal meaning: it suppresses the
+        `hideAll` that OcDrop otherwise runs on show. Without it, merely moving the pointer
+        across a row's tag overflow would dismiss an open context menu.
+      -->
+      <oc-drop
+        v-if="item.tags.length > 2"
+        :toggle="`#tags-overflow-${resourceDomSelector(item)}`"
+        mode="hover"
+        :is-nested="true"
+        class="resource-table-tag-overflow"
+      >
+        <component
+          :is="userContextReady ? 'router-link' : 'span'"
+          v-for="tag in item.tags.slice(2)"
+          :key="tag"
+          v-bind="getTagComponentAttrs(tag)"
+          class="resource-table-tag-wrapper oc-pb-xs"
+        >
+          <oc-tag
+            v-oc-tooltip="getTagToolTip(tag)"
+            class="resource-table-tag"
+            size="small"
+            :rounded="true"
+            :color-index="tagColorIndex(tag)"
+          >
+            <oc-icon name="price-tag-3" size="small" />
+            <span class="oc-text-truncate">{{ tag }}</span>
+          </oc-tag>
+        </component>
+      </oc-drop>
     </template>
     <template #manager="{ item }">
       <slot name="manager" :resource="item" />
@@ -278,7 +312,8 @@ import {
   useIsTopBarSticky,
   embedModeFilePickMessageData,
   routeToContextQuery,
-  useSpaceActionsRename
+  useSpaceActionsRename,
+  useTagColor
 } from '../../composables'
 import ResourceListItem from './ResourceListItem.vue'
 import ResourceGhostElement from './ResourceGhostElement.vue'
@@ -416,6 +451,7 @@ const {
   fileTypes: embedModeFileTypes
 } = useEmbedMode()
 const { getDefaultAction } = useFileActions()
+const { tagColorIndex } = useTagColor()
 const language = useGettext()
 const { $pgettext, $gettext, $ngettext } = language
 
@@ -447,6 +483,13 @@ const renameHandler = computed(() => unref(renameActions)[0].handler)
 const renameHandlerSpace = computed(() => unref(renameActionsSpace)[0].handler)
 
 const getTagToolTip = (text: string) => (text.length > 7 ? text : '')
+
+const getTagsOverflowAriaLabel = (item: Resource) => {
+  const count = item.tags.length - 2
+  return $ngettext('Show %{count} more tag', 'Show %{count} more tags', count, {
+    count: count.toString()
+  })
+}
 
 const isResourceDisabled = (resource: Resource) => {
   if (unref(isEmbedModeEnabled) && unref(embedModeFileTypes)?.length) {
@@ -832,9 +875,6 @@ function openRenameDialog(item: Resource) {
     resources: [item]
   })
 }
-function openTagsSidebar() {
-  eventBus.publish(SideBarEventTopics.open)
-}
 function openSharingSidebar(file: Resource) {
   let panelToOpen
   if (file.type === 'space') {
@@ -1117,10 +1157,43 @@ function getSharedWithAvatarItems(resource: Resource) {
     max-width: 80px;
   }
 
+  // The chips and the `+ N` button are separate inline boxes in the cell, so how they line up is
+  // down to `vertical-align`. Baseline alignment (the default) does not do it: a chip sits inside
+  // an inline wrapper and aligns its own baseline within it, and `text-bottom` on the button lined
+  // it up with the cell text's descender rather than with the chips. Centring every one of them
+  // instead makes them agree, and since they are all `oc-tag-s` with the same padding and font
+  // size, they are the same height and so land pixel-identical.
+  &-tag-wrapper {
+    display: inline-flex;
+    vertical-align: middle;
+  }
+
   &-tag-more {
     cursor: pointer;
     border: 0 !important;
-    vertical-align: text-bottom;
+    vertical-align: middle;
+  }
+
+  // `OcDrop` is a fixed 300px wide, so the overflow popover stayed that wide however few tags it
+  // held — with a single chip capped at 80px by `&-tag` above, nearly all of it was empty, and
+  // the right alignment the tags column passes down (`alignH: 'right'`) pushed that chip to the
+  // far edge. Size the box to the chips instead, keeping 300px only as a cap so a long tag
+  // truncates rather than stretching the popover. `&.oc-drop` rather than the class alone: on its
+  // own it merely ties with `.oc-drop`'s own width rule, leaving the winner to the stylesheet
+  // order between two packages.
+  &-tag-overflow.oc-drop {
+    width: max-content;
+    max-width: 300px;
+    text-align: left;
+
+    // One tag per line, and none of the 80px cap the table cell needs — there is room here.
+    .resource-table-tag-wrapper {
+      display: block;
+    }
+
+    .resource-table-tag {
+      max-width: 100%;
+    }
   }
 
   &-edit-name,
