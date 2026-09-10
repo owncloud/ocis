@@ -848,7 +848,7 @@ func (g Graph) PatchMe(w http.ResponseWriter, r *http.Request) {
 	changes := libregraph.NewUserUpdate()
 	err := StrictJSONUnmarshal(r.Body, changes)
 	if err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update user: invalid request body")
+		logger.Debug().Err(err).Msg("could not update user: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
 			fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
@@ -895,7 +895,7 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 	changes := libregraph.NewUserUpdate()
 	err = StrictJSONUnmarshal(r.Body, changes)
 	if err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update user: invalid request body")
+		logger.Debug().Err(err).Msg("could not update user: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
 			fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
@@ -936,7 +936,7 @@ func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string
 	}
 
 	if reflect.ValueOf(*changes).IsZero() {
-		logger.Debug().Interface("body", r.Body).Msg("ignoring empty request body")
+		logger.Debug().Msg("ignoring empty request body")
 		render.Status(r, http.StatusNoContent)
 		render.NoContent(w, r)
 		return
