@@ -126,7 +126,7 @@ const groupsDisplayValue = computed(() => {
     .join(', ')
 })
 const showUserQuota = computed(() => {
-  return 'total' in (user.drive?.quota || {})
+  return user.drive?.quota?.total !== undefined
 })
 const quotaDisplayValue = computed(() => {
   return user.drive.quota.total === 0

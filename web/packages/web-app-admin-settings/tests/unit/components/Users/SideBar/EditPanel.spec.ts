@@ -6,7 +6,8 @@ import {
   shallowMount
 } from '@ownclouders/web-test-helpers'
 import { mock } from 'vitest-mock-extended'
-import { Drive, Group, User } from '@ownclouders/web-client/graph/generated'
+import { isEqual } from 'lodash-es'
+import { Drive, Group, User, UserFromJSON } from '@ownclouders/web-client/graph/generated'
 import { CapabilityStore } from '@ownclouders/web-pkg'
 import GroupSelect from '../../../../../src/components/Users/GroupSelect.vue'
 
@@ -156,6 +157,49 @@ describe('EditPanel', () => {
     })
   })
 
+  /**
+   * A user the server sends without an accountEnabled is allowed to log in. The graph client
+   * materializes every declared field, so such a user still carries the property, holding
+   * `undefined` - the field being there says nothing about what the server sent.
+   */
+  describe('computed method "selectedLoginValue"', () => {
+    const decodedUser = (accountEnabled?: boolean) =>
+      UserFromJSON({
+        id: '2',
+        displayName: 'jan',
+        onPremisesSamAccountName: 'jan',
+        memberOf: [],
+        ...(accountEnabled !== undefined && { accountEnabled })
+      })
+
+    it('should select "Allowed" if the user has no accountEnabled', () => {
+      const { wrapper } = getWrapper({ user: decodedUser() })
+      expect((wrapper.vm as any).selectedLoginValue.value).toBe(true)
+    })
+    it.each([true, false])('should select the option matching an accountEnabled of %s', (value) => {
+      const { wrapper } = getWrapper({ user: decodedUser(value) })
+      expect((wrapper.vm as any).selectedLoginValue.value).toBe(value)
+    })
+
+    it('should not report unsaved changes when login stays allowed for an unset accountEnabled', async () => {
+      const user = decodedUser()
+      const { wrapper } = getWrapper({ user })
+      ;(wrapper.vm as any).editUser.accountEnabled = true
+      await wrapper.vm.$nextTick()
+
+      // the comparison the save dialog makes, which tells an absent key apart from `undefined`
+      expect(isEqual(user, (wrapper.vm as any).editUser)).toBe(true)
+    })
+    it('should report unsaved changes when login gets forbidden for an unset accountEnabled', async () => {
+      const user = decodedUser()
+      const { wrapper } = getWrapper({ user })
+      ;(wrapper.vm as any).editUser.accountEnabled = false
+      await wrapper.vm.$nextTick()
+
+      expect(isEqual(user, (wrapper.vm as any).editUser)).toBe(false)
+    })
+  })
+
   describe('group select', () => {
     it('takes all available groups', () => {
       const { wrapper } = getWrapper()
@@ -177,8 +221,14 @@ describe('EditPanel', () => {
 function getWrapper({
   readOnlyUserAttributes = [],
   selectedGroups = [],
-  groups = availableGroupOptions
-}: { readOnlyUserAttributes?: string[]; selectedGroups?: Group[]; groups?: Group[] } = {}) {
+  groups = availableGroupOptions,
+  user
+}: {
+  readOnlyUserAttributes?: string[]
+  selectedGroups?: Group[]
+  groups?: Group[]
+  user?: User
+} = {}) {
   const mocks = defaultComponentMocks()
   const capabilities = {
     graph: { users: { read_only_attributes: readOnlyUserAttributes }, tags: { max_tag_length: 30 } }
@@ -188,14 +238,16 @@ function getWrapper({
     mocks,
     wrapper: shallowMount(EditPanel, {
       props: {
-        user: {
-          id: '2',
-          displayName: 'jan',
-          mail: 'jan@owncloud.com',
-          passwordProfile: { password: '' },
-          drive: { quota: {} } as Drive,
-          memberOf: selectedGroups
-        } as User,
+        user:
+          user ??
+          ({
+            id: '2',
+            displayName: 'jan',
+            mail: 'jan@owncloud.com',
+            passwordProfile: { password: '' },
+            drive: { quota: {} } as Drive,
+            memberOf: selectedGroups
+          } as User),
         roles: [{ id: '1', displayName: 'admin' }],
         groups,
         applicationId: '1'

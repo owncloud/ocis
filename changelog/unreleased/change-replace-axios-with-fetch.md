@@ -40,6 +40,16 @@ Code that touches axios directly has to be adapted:
   the latter two rename `axiosClient` to `httpClient`. `webdav()` is unchanged.
 - Graph fields with an OData annotation use their generated camelCase names,
   e.g. `atLibreGraphPermissionsActions`. The wire format is unchanged.
+- Graph responses are rebuilt from the fields the spec declares, which is what makes
+  the renaming above possible. A field the spec does not declare is dropped, so the
+  oCIS-only `attributes` on users is added to the spec before generating. A declared
+  field the server omits is present and holds `undefined`, so
+  `'accountEnabled' in user` no longer tells whether the server sent it. Compare
+  against `undefined` instead.
+- `CollaboratorAutoCompleteItem.attributes` is optional, matching the `attributes` on
+  the generated `User`. The field is only there when
+  `OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES` is configured, so read it as
+  `item.attributes?.join(…)`.
 - The generated client loses its `*ApiFactory`, `*ApiFp` and
   `*AxiosParamCreator` exports. The `*Api` classes now take one options object
   per operation and resolve with the payload.

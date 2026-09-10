@@ -145,6 +145,10 @@ export interface User {
      * oCIS instances that the user is either a member or a guest of.
      */
     instances?: Array<Instance>;
+    /**
+     * Attributes of the user as configured via OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES. Not part of the upstream spec, added by oCIS. Read-only.
+     */
+    attributes?: Array<string>;
 }
 
 /**
@@ -185,6 +189,7 @@ export function UserFromJSONTyped(json: any, ignoreDiscriminator: boolean): User
         'externalID': json['externalID'] == null ? undefined : json['externalID'],
         'crossInstanceReference': json['crossInstanceReference'] == null ? undefined : json['crossInstanceReference'],
         'instances': json['instances'] == null ? undefined : ((json['instances'] as Array<any>).map(InstanceFromJSON)),
+        'attributes': json['attributes'] == null ? undefined : json['attributes'],
     };
 }
 
@@ -218,6 +223,7 @@ export function UserToJSONTyped(value?: User | null, ignoreDiscriminator: boolea
         'externalID': value['externalID'],
         'crossInstanceReference': value['crossInstanceReference'],
         'instances': value['instances'] == null ? undefined : ((value['instances'] as Array<any>).map(InstanceToJSON)),
+        'attributes': value['attributes'],
     };
 }
 

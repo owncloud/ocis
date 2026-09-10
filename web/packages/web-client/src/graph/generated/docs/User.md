@@ -26,6 +26,7 @@ Name | Type
 `externalID` | string
 `crossInstanceReference` | string
 `instances` | [Array&lt;Instance&gt;](Instance.md)
+`attributes` | Array&lt;string&gt;
 
 ## Example
 
@@ -53,6 +54,7 @@ const example = {
   "externalID": null,
   "crossInstanceReference": null,
   "instances": null,
+  "attributes": null,
 } satisfies User
 
 console.log(example)
