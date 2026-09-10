@@ -9,8 +9,10 @@ colour being stored anywhere. Themes supply the palette through a new
 `designTokens.tagColorsList`, and the label colour is chosen per fill so it
 stays legible in both the light and dark themes.
 
-The tag overflow indicator on the files list also became a real, keyboard
-reachable button, and it now shows the hidden tags in a popover instead of
-opening the sidebar.
+The tag overflow indicator on the files list also became a disclosure button
+that shows the hidden tags in a popover instead of opening the sidebar. It
+opens on click or on Enter/Space, closes on Escape, and reports its state to
+assistive technology.
 
 https://github.com/owncloud/ocis/pull/12892
+https://github.com/owncloud/ocis/pull/12923

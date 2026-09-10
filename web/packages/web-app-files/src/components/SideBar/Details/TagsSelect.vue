@@ -39,6 +39,7 @@
             name="lock"
             size="small"
             variation="inherit"
+            :accessible-label="$gettext('Read-only tag')"
           />
           <oc-button
             v-else
