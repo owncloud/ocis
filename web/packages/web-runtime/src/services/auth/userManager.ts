@@ -322,4 +322,15 @@ export class UserManager extends OidcUserManager {
     const abilities = getAbilities(permissions)
     this.ability.update(abilities)
   }
+
+  // Load only the user's permissions, without the full context (which would load vault data).
+  public async loadUserAbilities(): Promise<void> {
+    // Token not stored yet on address-bar navigation; set it or the requests below are 401.
+    const accessToken = await this.getAccessToken()
+    if (accessToken) {
+      this.authStore.setAccessToken(accessToken)
+    }
+    const graphUser = await this.clientService.graphAuthenticated.users.getMe()
+    await this.updateUserAbilities(graphUser)
+  }
 }

@@ -24,11 +24,15 @@ export const setupAuthGuard = (router: Router) => {
     }
 
     const authStore = useAuthStore()
-    await authService.initializeContext(to)
+    // A guard-synchronous deny (e.g. the vault route) comes back as a redirect target.
+    const redirect = await authService.initializeContext(to)
+    if (redirect) {
+      return redirect
+    }
 
-    // vue-router currently (4.1.6) does not cancel navigations when a new one is triggered
-    // we need to guard this case to be able to show the access denied page
-    // and not be redirected to the login page
+    // Async oidc events (token expiry, user unloaded) can't return into a guard, so they set
+    // hasAuthErrorOccurred and we catch it on the next navigation. vue-router 4.1.6 does not
+    // cancel navigations when a new one is triggered, so guard against being sent to login.
     if (authService.hasAuthErrorOccurred) {
       return to.name === 'accessDenied' || { name: 'accessDenied' }
     }

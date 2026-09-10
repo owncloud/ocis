@@ -390,11 +390,13 @@ describe('AuthService', () => {
       const authService = new AuthService()
       const mockSignInRedirect = vi.fn()
 
+      const mockLoadUserAbilities = vi.fn().mockResolvedValue(undefined)
       Object.defineProperty(authService, 'userManager', {
         value: mock<UserManager>({
           getUser: vi.fn().mockImplementation(getUser),
           signinRedirect: mockSignInRedirect,
-          setPostLoginRedirectUrl: vi.fn()
+          setPostLoginRedirectUrl: vi.fn(),
+          loadUserAbilities: mockLoadUserAbilities
         })
       })
 
@@ -422,48 +424,91 @@ describe('AuthService', () => {
         null
       )
 
-      return { authService, pushSpy, mockSignInRedirect }
+      return { authService, pushSpy, mockSignInRedirect, mockLoadUserAbilities }
     }
 
-    it('when the user lacks the vault ability, routes to accessDenied instead of the IdP', async () => {
-      const { authService, pushSpy, mockSignInRedirect } = setupVaultAuthService({
+    it('when the user lacks the vault ability, denies (accessDenied) instead of the IdP', async () => {
+      const { authService, mockSignInRedirect } = setupVaultAuthService({
         canAccessVault: false,
         userContextReady: true,
         getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'advanced' }, expired: false }))
       })
 
-      await authService.initializeContext(vaultRoute)
+      const result = await authService.initializeContext(vaultRoute)
 
-      expect(pushSpy).toHaveBeenCalledWith({
-        name: 'accessDenied',
-        query: { redirectUrl: '/vault' }
-      })
+      // initializeContext returns the redirect target; the guard (setupAuthGuard) returns it
+      // so vue-router cancels the navigation to the vault route.
+      expect(result).toEqual({ name: 'accessDenied' })
       expect(mockSignInRedirect).not.toHaveBeenCalled()
     })
 
-    it('when the user holds the vault ability, does not route to accessDenied and enforces MFA', async () => {
-      const { authService, pushSpy, mockSignInRedirect } = setupVaultAuthService({
+    it('when the user holds the vault ability, does not deny and enforces MFA', async () => {
+      const { authService, mockSignInRedirect } = setupVaultAuthService({
         canAccessVault: true,
         userContextReady: true,
         getUser: () => Promise.resolve(null)
       })
 
-      await authService.initializeContext(vaultRoute)
+      const result = await authService.initializeContext(vaultRoute)
 
-      expect(pushSpy).not.toHaveBeenCalledWith(expect.objectContaining({ name: 'accessDenied' }))
+      expect(result).toBeUndefined()
       expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
     })
 
-    it('when the user context is not yet established, does not deny (backend guard is the boundary)', async () => {
-      const { authService, pushSpy, mockSignInRedirect } = setupVaultAuthService({
+    it('when there is no authenticated user (cold load), does not deny and hands off to the IdP for login', async () => {
+      const { authService, mockSignInRedirect, mockLoadUserAbilities } = setupVaultAuthService({
         canAccessVault: false,
         userContextReady: false,
         getUser: () => Promise.resolve(null)
       })
 
-      await authService.initializeContext(vaultRoute)
+      const result = await authService.initializeContext(vaultRoute)
 
-      expect(pushSpy).not.toHaveBeenCalledWith(expect.objectContaining({ name: 'accessDenied' }))
+      expect(mockLoadUserAbilities).not.toHaveBeenCalled()
+      expect(result).toBeUndefined()
+      expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
+    })
+
+    it('on a cold load, denies an authenticated but unentitled user before the IdP hand-off', async () => {
+      const { authService, mockSignInRedirect, mockLoadUserAbilities } = setupVaultAuthService({
+        canAccessVault: false,
+        userContextReady: false,
+        getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: false }))
+      })
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      expect(mockLoadUserAbilities).toHaveBeenCalled()
+      expect(result).toEqual({ name: 'accessDenied' })
+      expect(mockSignInRedirect).not.toHaveBeenCalled()
+    })
+
+    it('on a cold load, fails closed (denies) when loading abilities throws', async () => {
+      const { authService, mockSignInRedirect, mockLoadUserAbilities } = setupVaultAuthService({
+        canAccessVault: true, // even if the ability would allow, a load failure must deny
+        userContextReady: false,
+        getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: false }))
+      })
+      mockLoadUserAbilities.mockRejectedValueOnce(new Error('network error'))
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      expect(mockLoadUserAbilities).toHaveBeenCalled()
+      expect(result).toEqual({ name: 'accessDenied' })
+      expect(mockSignInRedirect).not.toHaveBeenCalled()
+    })
+
+    it('on a cold load, lets an authenticated entitled user through to the MFA step-up', async () => {
+      const { authService, mockSignInRedirect, mockLoadUserAbilities } = setupVaultAuthService({
+        canAccessVault: true,
+        userContextReady: false,
+        getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: false }))
+      })
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      expect(mockLoadUserAbilities).toHaveBeenCalled()
+      expect(result).toBeUndefined()
       expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
     })
   })
