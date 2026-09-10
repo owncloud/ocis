@@ -159,9 +159,17 @@ jobs:
           fi
 
           if [[ "${{ matrix.suite }}" == "apiVault" ]]; then
-            # GitHub runners ship PostgreSQL pre-started on 5432; stop it so our
-            # container (needed by keycloak) can bind the same port.
-            sudo systemctl stop postgresql || true
+            # GitHub runners ship PostgreSQL pre-installed on 5432, but not always
+            # already running - reuse it for keycloak's DB instead of running our
+            # own container for it, once it's up.
+            sudo systemctl start postgresql
+            for i in {1..30}; do
+              sudo -u postgres pg_isready && break
+              echo "Waiting for postgres... ($i/30)"
+              sleep 2
+            done
+            sudo -u postgres psql -c "CREATE USER keycloak WITH PASSWORD 'keycloak';"
+            sudo -u postgres psql -c "CREATE DATABASE keycloak OWNER keycloak;"
 
             mkdir -p keycloak-certs
             openssl req -x509 -newkey rsa:2048 \
@@ -174,18 +182,6 @@ jobs:
             # the k8s ingress domain instead of the non-k8s "localhost:9200" one
             sed 's|https://localhost:9200|https://ocis-server|g' \
               tests/config/ci/ocis-mfa-ci-realm.dist.json > /tmp/ocis-realm.json
-
-            docker run -d --name postgres --network host \
-              -e POSTGRES_DB=keycloak \
-              -e POSTGRES_USER=keycloak \
-              -e POSTGRES_PASSWORD=keycloak \
-              postgres:alpine3.18
-
-            for i in {1..30}; do
-              docker exec postgres pg_isready -U keycloak && break
-              echo "Waiting for postgres... ($i/30)"
-              sleep 2
-            done
 
             docker run -d --name keycloak --network host \
               -e OCIS_DOMAIN=https://ocis-server \
