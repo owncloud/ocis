@@ -39,16 +39,34 @@ func (d defaultRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user 
 			return nil, err
 		}
 
-		if len(roleIDs) == 0 {
-			// This user doesn't have a role assignment yet. Assign a
-			// default user role. At least until proper roles are provided. See
-			// https://github.com/owncloud/ocis/issues/1825 for more context.
-			if user.Id.Type == cs3.UserType_USER_TYPE_PRIMARY || user.Id.Type == cs3.UserType_USER_TYPE_GUEST {
-				roleId := settingsService.BundleUUIDRoleUser
-				if user.Id.Type == cs3.UserType_USER_TYPE_GUEST {
-					roleId = settingsService.BundleUUIDRoleUserLight
+		if user.Id.Type == cs3.UserType_USER_TYPE_PRIMARY || user.Id.Type == cs3.UserType_USER_TYPE_GUEST {
+			roleId := settingsService.BundleUUIDRoleUser
+			// staleRoleIDs are default-ish bundles that belong to the *other* account type.
+			// If the identity provider reclassified this account (e.g. a claim change turned
+			// a regular user into a guest, or vice versa) without an admin explicitly picking
+			// a role, the account is left holding one of these instead of the correct default.
+			staleRoleIDs := map[string]struct{}{settingsService.BundleUUIDRoleUserLight: {}}
+			if user.Id.Type == cs3.UserType_USER_TYPE_GUEST {
+				roleId = settingsService.BundleUUIDRoleUserLight
+				staleRoleIDs = map[string]struct{}{
+					settingsService.BundleUUIDRoleUser:       {},
+					settingsService.BundleUUIDRoleSpaceAdmin: {},
 				}
-				d.logger.Info().Str("userid", user.Id.OpaqueId).Msg("user has no role assigned, assigning default user role")
+			}
+
+			needsDefault := len(roleIDs) == 0
+			if !needsDefault && len(roleIDs) == 1 {
+				if _, stale := staleRoleIDs[roleIDs[0]]; stale {
+					needsDefault = true
+				}
+			}
+
+			if needsDefault {
+				// This user doesn't have a role assignment yet, or is holding a stale one
+				// left over from before its account type changed. Assign the default role
+				// for its current type. At least until proper roles are provided. See
+				// https://github.com/owncloud/ocis/issues/1825 for more context.
+				d.logger.Info().Str("userid", user.Id.OpaqueId).Str("role_id", roleId).Msg("assigning default user role")
 				ctx = metadata.Set(ctx, middleware.AccountID, user.Id.OpaqueId)
 				_, err := d.roleService.AssignRoleToUser(ctx, &settingssvc.AssignRoleToUserRequest{
 					AccountUuid: user.Id.OpaqueId,
@@ -58,7 +76,7 @@ func (d defaultRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user 
 					d.logger.Error().Err(err).Msg("Could not add default role")
 					return nil, err
 				}
-				roleIDs = append(roleIDs, roleId)
+				roleIDs = []string{roleId}
 			}
 		}
 	}
