@@ -205,6 +205,27 @@ export const clickResource = async ({
   }
 }
 
+export const openResourceInNewTab = async ({
+  page,
+  path
+}: {
+  page: Page
+  path: string
+}): Promise<Page> => {
+  const escapedName = path.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+
+  const resource = page.locator(util.format(resourceNameSelector, escapedName))
+
+  const [newPage] = await Promise.all([
+    page.context().waitForEvent('page'),
+    resource.click({ modifiers: ['Control'] })
+  ])
+
+  await newPage.waitForLoadState()
+
+  return newPage
+}
+
 export const clickResourceFromBreadcrumb = async ({
   page,
   resource
@@ -2735,4 +2756,19 @@ export const duplicateMultipleResources = async ({
       break
     }
   }
+}
+
+export interface VerifyTopbarResourceNameArgs {
+  page: Page
+  expectedName: string
+}
+
+export const verifyTopbarResourceName = async ({
+  page,
+  expectedName
+}: VerifyTopbarResourceNameArgs): Promise<void> => {
+  const topbarResourceName = page.locator(topbarFilenameSelector)
+
+  await expect(topbarResourceName).toBeVisible()
+  await expect(topbarResourceName).toHaveAttribute('data-test-resource-name', expectedName)
 }
