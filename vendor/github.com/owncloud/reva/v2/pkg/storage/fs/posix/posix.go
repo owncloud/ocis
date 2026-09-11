@@ -27,6 +27,7 @@ import (
 	"os"
 	"syscall"
 
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/rs/zerolog"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
 	microstore "go-micro.dev/v4/store"
@@ -183,6 +184,11 @@ func New(m map[string]interface{}, stream events.Stream, log *zerolog.Logger) (s
 // ListUploadSessions returns the upload sessions matching the given filter
 func (fs *posixFS) ListUploadSessions(ctx context.Context, filter storage.UploadSessionFilter) ([]storage.UploadSession, error) {
 	return fs.FS.(storage.UploadSessionLister).ListUploadSessions(ctx, filter)
+}
+
+// IsOrphaned reports whether the referenced resource exists but its metadata is unreadable.
+func (fs *posixFS) IsOrphaned(ctx context.Context, ref *provider.Reference) bool {
+	return fs.FS.(storage.OrphanChecker).IsOrphaned(ctx, ref)
 }
 
 // UseIn tells the tus upload middleware which extensions it supports.

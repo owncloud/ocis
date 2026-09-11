@@ -45,6 +45,19 @@ func IsNotExist(err error) bool {
 	return false
 }
 
+// IsErrRange checks for a syscall.ERANGE buried inside an xattr error. listxattr
+// returns ERANGE when the set of attribute names grows between the size-probe call
+// and the read call (a concurrent setxattr landed in between). This is transient and
+// self-clearing once the competing writer finishes its batch.
+func IsErrRange(err error) bool {
+	if xerr, ok := errors.Cause(err).(*xattr.Error); ok {
+		if serr, ok2 := xerr.Err.(syscall.Errno); ok2 {
+			return serr == syscall.ERANGE
+		}
+	}
+	return false
+}
+
 // IsAttrUnset checks the xattr.ENOATTR from the xattr package which redifines it as ENODATA on platforms that do not natively support it (eg. linux)
 // see https://github.com/pkg/xattr/blob/8725d4ccc0fcef59c8d9f0eaf606b3c6f962467a/xattr_linux.go#L19-L22
 func IsAttrUnset(err error) bool {
