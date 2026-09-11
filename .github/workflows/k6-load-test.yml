@@ -64,6 +64,7 @@ jobs:
           if curl -sk -o /dev/null --max-time 10 \
               "https://$OCIS_HOST:9200/.well-known/openid-configuration"; then
             echo "oCIS answers at https://$OCIS_HOST:9200"
+            sleep 15
             exit 0
           fi
           echo "::error::oCIS is not answering on $OCIS_HOST:9200 from the driver"
