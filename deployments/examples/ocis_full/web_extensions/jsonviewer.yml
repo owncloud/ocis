@@ -9,7 +9,7 @@ services:
     image: owncloud/web-extensions:json-viewer-0.4.0
     user: root
     volumes:
-      - ocis-apps:/apps
+      - ./data/ocis-apps:/apps
     entrypoint:
       - /bin/sh
     command: ["-c", "cp -R /var/lib/nginx/html/json-viewer/ /apps"]

@@ -32,9 +32,9 @@ services:
       STORAGE_USERS_OCIS_ROOT: /var/lib/ocis/storage/users-vault
       STORAGE_USERS_EVENTS_CONSUMER_GROUP: vault-dcfs
     volumes:
-      # configure the .env file to use own paths instead of docker internal volumes
-      - ${OCIS_CONFIG_DIR:-ocis-config}:/etc/ocis
-      - ${OCIS_DATA_DIR:-ocis-data}:/var/lib/ocis
+      # configure the .env file to use different host paths if desired
+      - ${OCIS_CONFIG_DIR:-./data/ocis-config}:/etc/ocis
+      - ${OCIS_DATA_DIR:-./data/ocis-data}:/var/lib/ocis
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
