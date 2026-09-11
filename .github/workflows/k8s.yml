@@ -31,49 +31,48 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - suite: apiContract
-          # - suite: apiLocks
-          # - suite: apiSettings
-          # # - suite: apiNotification
-          # - suite: apiCors
-          # - suite: apiGraphUser
-          # - suite: apiGraph
-          # - suite: apiGraphGroup
+          - suite: apiContract
+          - suite: apiLocks
+          - suite: apiSettings
+          # - suite: apiNotification
+          - suite: apiCors
+          - suite: apiGraphUser
+          - suite: apiGraph
+          - suite: apiGraphGroup
           # - suite: apiSpaces
-          # - suite: apiSpacesShares
-          # - suite: apiSpacesDavOperation
-          # - suite: apiDownloads
-          # - suite: apiAsyncUpload
-          # - suite: apiDepthInfinity
-          # - suite: apiArchiver
-          # - suite: apiActivities
-          # - suite: apiSearch1
-          # - suite: apiSearch2
+          - suite: apiSpacesShares
+          - suite: apiSpacesDavOperation
+          - suite: apiDownloads
+          - suite: apiAsyncUpload
+          - suite: apiDepthInfinity
+          - suite: apiArchiver
+          - suite: apiActivities
+          - suite: apiSearch1
+          - suite: apiSearch2
           # - suite: apiSearchContent
-          # - suite: apiSharingNgShares
-          # - suite: apiReshare
-          # - suite: apiSharingNgPermissions
-          # - suite: apiSharingNgAdditionalShareRole
-          # - suite: apiSharingNgDriveInvitation
+          - suite: apiSharingNgShares
+          - suite: apiReshare
+          - suite: apiSharingNgPermissions
+          - suite: apiSharingNgAdditionalShareRole
+          - suite: apiSharingNgDriveInvitation
           # - suite: apiSharingNgItemInvitation
-          # - suite: apiSharingNgDriveLinkShare
-          # - suite: apiSharingNgItemLinkShare
-          # - suite: apiSharingNgLinkShareManagement
-          # - suite: apiAuthApp
+          - suite: apiSharingNgDriveLinkShare
+          - suite: apiSharingNgItemLinkShare
+          - suite: apiSharingNgLinkShareManagement
+          - suite: apiAuthApp
           # - suite: apiAntivirus
-          # - suite: apiOcm
+          - suite: apiOcm
           # - suite: apiCollaboration
-          # - suite: apiVault
+          - suite: apiVault
           # - suite: "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
-          # - suite: "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
-          # - suite: "coreApiSharees"
-          # - suite: "coreApiSharePublicLink2"
-          # - suite: "coreApiShareOperationsToShares1,coreApiShareOperationsToShares2,coreApiSharePublicLink1,coreApiShareCreateSpecialToShares1,coreApiShareCreateSpecialToShares2,coreApiShareUpdateToShares"
-          # - suite: "coreApiTrashbin,coreApiTrashbinRestore,coreApiWebdavEtagPropagation1,coreApiWebdavEtagPropagation2"
-          # - suite: "coreApiWebdavDelete,coreApiWebdavOperations,coreApiWebdavMove2"
-          # - suite: "coreApiWebdavProperties"
+          - suite: "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
+          - suite: "coreApiSharees"
+          - suite: "coreApiSharePublicLink2"
+          - suite: "coreApiShareOperationsToShares1,coreApiShareOperationsToShares2,coreApiSharePublicLink1,coreApiShareCreateSpecialToShares1,coreApiShareCreateSpecialToShares2,coreApiShareUpdateToShares"
+          - suite: "coreApiTrashbin,coreApiTrashbinRestore,coreApiWebdavEtagPropagation1,coreApiWebdavEtagPropagation2"
+          - suite: "coreApiWebdavDelete,coreApiWebdavOperations,coreApiWebdavMove2"
+          - suite: "coreApiWebdavProperties"
           # - suite: "coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS"
-          - suite: "coreApiWebdavUploadTUS"
 
     steps:
       - name: Checkout
