@@ -98,6 +98,17 @@ class VaultContext implements Context {
 	}
 
 	/**
+	 * @Given the acr value :acrValues should be requested during login
+	 *
+	 * @param string $acrValues
+	 *
+	 * @return void
+	 */
+	public function theAcrValueShouldBeRequestedDuringLogin(string $acrValues): void {
+		$this->featureContext->setAcrValuesToRequest($acrValues);
+	}
+
+	/**
 	 * @Then user :user should have a JWT token with an ACR value :acr
 	 *
 	 * @param string $user
@@ -136,7 +147,6 @@ class VaultContext implements Context {
 		$headers = [];
 		$authUser = $user;
 		if (KeycloakHelper::isTestingWithKeycloak()) {
-			$this->authenticateKeycloakUserIfNeeded($user);
 			$accessToken = $this->featureContext->getOcisUserToken($user)['token']['accessToken'];
 			$headers['Authorization'] = 'Bearer ' . $accessToken;
 			$authUser = null;
@@ -149,41 +159,6 @@ class VaultContext implements Context {
 			$password,
 			$userId,
 			$headers,
-		);
-	}
-
-	/**
-	 * Authenticates a Keycloak-backed user directly via the OIDC token endpoint (no browser,
-	 * no MFA/vault-mode UI setup) so that the user's oCIS account (and id) is provisioned even
-	 * for roles that don't have vault UI elements to interact with, e.g. User Light.
-	 *
-	 * @param string $user
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 */
-	private function authenticateKeycloakUserIfNeeded(string $user): void {
-		if ($this->featureContext->getAttributeOfCreatedUser($user, 'id')) {
-			return;
-		}
-		$userAttribute = $this->featureContext->getCreatedKeycloakUsers()[strtolower($user)];
-		$tokenData = KeycloakHelper::setAccessTokenForKeycloakOcisUser($userAttribute);
-		$this->featureContext->setOcisUserToken($userAttribute, $tokenData);
-
-		$response = HttpRequestHelper::get(
-			GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'me'),
-			null,
-			null,
-			['Authorization' => 'Bearer ' . $tokenData['access_token']],
-		);
-		$userAttribute['id'] = $this->featureContext->getJsonDecodedResponse($response)['id'];
-		$this->featureContext->addUserToCreatedUsersList(
-			$user,
-			$userAttribute['password'],
-			$userAttribute['displayName'],
-			$userAttribute['email'],
-			$userAttribute['id'],
 		);
 	}
 

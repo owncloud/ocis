@@ -32,7 +32,6 @@ use TestHelpers\GraphHelper;
 use TestHelpers\KeycloakHelper;
 use Laminas\Ldap\Exception\LdapException;
 use Laminas\Ldap\Ldap;
-use TestHelpers\WebUIHelper;
 
 /**
  * Functions for provisioning of users and groups
@@ -49,6 +48,10 @@ trait Provisioning {
 	private array $userTokens = [];
 	private array $createdKeycloakUsers = [];
 	private ?Ldap $idmLdap = null;
+	// the acr_values requested at Keycloak's authorize endpoint in userHasLoggedInViaWebUI();
+	// override via setAcrValuesToRequest() in scenarios that reconfigure OCIS_MFA_AUTH_LEVEL_NAMES
+	// to something other than the "advanced" default (see VaultContext)
+	private string $acrValuesToRequest = 'advanced';
 
 	/**
 	 * @param array $user
@@ -727,46 +730,69 @@ trait Provisioning {
 			"email" => "admin@example.org",
 			"actualUsername" => "admin",
 		];
-		$state = WebUIHelper::setUpUser(
-			$this->getBaseUrl(),
-			$adminUser["actualUsername"],
-			$adminUser["password"],
-		);
-		$tokenData = $this->extractOidcTokenDataFromStorageState($state);
+        $tokenData= KeycloakHelper::setAccessTokenForKeycloakOcisUser($adminUser, $this->acrValuesToRequest);
 		$this->setOcisUserToken($adminUser, $tokenData);
 	}
 
+    /**
+     * Authenticates a Keycloak-backed user directly via the OIDC token endpoint (no browser,
+     * no MFA/vault-mode UI setup) so that the user's oCIS account (and id) is provisioned even
+     * for roles that don't have vault UI elements to interact with, e.g. User Light.
+     *
+     * @param string $user
+     *
+     * @return void
+     * @throws GuzzleException
+     * @throws JsonException
+     * @throws Exception
+     */
+    private function setUpKeycloakUserInOcis(string $user): void {
+        if ($this->getAttributeOfCreatedUser($user, 'id')) {
+            return;
+        }
+        $userAttribute = $this->getCreatedKeycloakUsers()[strtolower($user)];
+        $tokenData = KeycloakHelper::setAccessTokenForKeycloakOcisUser($userAttribute, $this->acrValuesToRequest);
+        $this->setOcisUserToken($userAttribute, $tokenData);
+
+        $response = HttpRequestHelper::get(
+            GraphHelper::getFullUrl($this->getBaseUrl(), 'me'),
+            null,
+            null,
+            ['Authorization' => 'Bearer ' . $tokenData['access_token']],
+        );
+        $userAttribute['id'] = $this->getJsonDecodedResponse($response)['id'];
+        $this->addUserToCreatedUsersList(
+            $user,
+            $userAttribute['password'],
+            $userAttribute['displayName'],
+            $userAttribute['email'],
+            $userAttribute['id'],
+        );
+    }
+
 	/**
-	 * Sets up Keycloak user in oCIS
-	 * User is logged in via web UI and user access token is extracted
+	 * @param string $acrValues
 	 *
-	 * @Given user :user has logged in via web UI
+	 * @return void
+	 */
+	public function setAcrValuesToRequest(string $acrValues): void {
+		$this->acrValuesToRequest = $acrValues;
+	}
+
+	/**
+	 * Sets up a Keycloak user in oCIS
+	 *
+	 * @Given user :user has been set up in oCIS
 	 *
 	 * @param string $user
 	 *
 	 * @return void
 	 * @throws Exception
 	 * @throws GuzzleException
+	 * @throws JsonException
 	 */
-	public function userHasLoggedInViaWebUI(string $user): void {
-		$createdUsers = $this->getCreatedKeycloakUsers();
-		$userAttribute = $createdUsers[strtolower($user)];
-		$state = WebUIHelper::setUpUser(
-			$this->getBaseUrl(),
-			$userAttribute["actualUsername"],
-			$userAttribute["password"],
-		);
-		$stateData = $this->extractOidcTokenDataFromStorageState($state);
-		$this->setOcisUserToken($userAttribute, $stateData);
-		$response = $this->graphContext->adminHasRetrievedUserUsingTheGraphApi($user);
-		$userAttribute['id'] = $this->getJsonDecodedResponse($response)['id'];
-		$this->addUserToCreatedUsersList(
-			$user,
-			$userAttribute['password'],
-			$userAttribute['displayName'],
-			$userAttribute['email'],
-			$userAttribute['id'],
-		);
+	public function userHasBeenSetUpInOcis(string $user): void {
+        $this->setUpKeycloakUserInOcis($user);
 	}
 
 	/**

@@ -22,10 +22,13 @@
 
 namespace TestHelpers;
 
+require_once __DIR__ . '/../../../vendor-php/autoload.php';
+
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
 use JsonException;
+use OTPHP\TOTP;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -343,10 +346,14 @@ class KeycloakHelper {
 	}
 
 	/**
+	 * @param string|null $acrValues e.g. "advanced" - requests step-up to whatever LoA that
+	 *                               name maps to via the realm's "acr.loa.map" attribute,
+	 *                               which is what triggers Keycloak's OTP form below.
+	 *
 	 * @return array
 	 * @throws GuzzleException
 	 */
-	public static function getAuthorizationEndPoint(): array {
+	public static function getAuthorizationEndPoint(?string $acrValues = null): array {
 		$loginParams = [
 			'client_id' => 'web',
 			'redirect_uri' => OcisHelper::getServerUrl() . '/oidc-callback.html',
@@ -354,6 +361,9 @@ class KeycloakHelper {
 			'response_type' => 'code',
 			'scope' => 'openid profile email acr',
 		];
+		if ($acrValues !== null) {
+			$loginParams['acr_values'] = $acrValues;
+		}
 		$queryString = \http_build_query($loginParams);
 		$authUrl = self::getKeycloakUrl() . "/realms/oCIS/protocol/openid-connect/auth?" . $queryString;
 		$response = HttpRequestHelper::get(
@@ -368,30 +378,182 @@ class KeycloakHelper {
 		return [$authorizationUrl, $cookie];
 	}
 
+    /**
+     * @param array $user
+     * @param string $authorizationUrl
+     * @param string $cookie
+     *
+     * @return string
+     * @throws GuzzleException
+     * @throws Exception
+     */
+    public static function getCode(
+        array $user,
+        string $authorizationUrl,
+        string $cookie,
+    ): string {
+        $response = HttpRequestHelper::post(
+            $authorizationUrl,
+            null,
+            null,
+            [
+                'Cookie' => $cookie,
+            ],
+            [
+                'username' => $user['actualUsername'],
+                'password' => $user['password'],
+            ],
+        );
+
+        // Whatever step-up Keycloak asks for next (first-time "configure TOTP", since this
+        // user has no credential yet, or a login challenge against one that already exists) is
+        // handled here purely over HTTP, mirroring what a browser driving the same flow would do.
+        // Keycloak's required-action flow follows Post/Redirect/Get: after accepting a form
+        // submission it redirects back to its own login-actions endpoint (to be GET-followed)
+        // rather than straight to our redirect_uri, so a Location header alone doesn't mean the
+        // flow is finished - only a redirect that actually targets redirect_uri does.
+        $redirectUriPrefix = OcisHelper::getServerUrl() . '/oidc-callback.html';
+        $knownTotpSecret = null;
+        $stepsTaken = [];
+        for ($i = 0; $i < 8; $i++) {
+            $locationHeader = $response->getHeader('Location');
+            if (!empty($locationHeader)) {
+                $location = $locationHeader[0];
+                if (\str_starts_with($location, $redirectUriPrefix)) {
+                    return self::extractCodeFromLocationHeader($location);
+                }
+                $stepsTaken[] = 'redirect: ' . $location;
+                $cookie = $response->getHeader('Set-Cookie')[0] ?? $cookie;
+                $response = HttpRequestHelper::get($location, null, null, [ 'Cookie' => $cookie ]);
+                continue;
+            }
+
+            $html = $response->getBody()->getContents();
+            // Keycloak may rotate the session cookie at every step of the flow
+            $cookie = $response->getHeader('Set-Cookie')[0] ?? $cookie;
+
+            if (\preg_match('/id="kc-totp-settings-form"/i', $html)) {
+                $stepsTaken[] = 'kc-totp-settings-form';
+                [$formUrl, $fields] = self::parseForm($html, 'kc-totp-settings-form');
+                $rawSecret = $fields['totpSecret'] ?? null;
+                if ($rawSecret === null) {
+                    throw new Exception('Could not find the "totpSecret" hidden field on the TOTP setup form.');
+                }
+                // Keycloak's own secret is an arbitrary ASCII string (not base32) used directly
+                // as the raw HMAC key server-side - the base32 form a real authenticator app
+                // scans off the QR code is a separate encoding of those same raw bytes, built
+                // client-side (hence the "rfc4648" JS import on this page). OTPHP expects base32
+                // input, so encode these raw bytes the same way before handing them over.
+                $knownTotpSecret = self::base32Encode($rawSecret);
+                $fields['totp'] = TOTP::createFromSecret($knownTotpSecret)->now();
+                $fields['userLabel'] = 'test';
+            } elseif (\preg_match('/id="kc-otp-login-form"/i', $html)) {
+                $stepsTaken[] = 'kc-otp-login-form';
+                if ($knownTotpSecret === null) {
+                    throw new Exception(
+                        'Keycloak presented an OTP login challenge for an already-configured '
+                        . 'credential, but no TOTP secret is known for it in this flow.',
+                    );
+                }
+                [$formUrl, $fields] = self::parseForm($html, 'kc-otp-login-form');
+                $fields['otp'] = TOTP::createFromSecret($knownTotpSecret)->now();
+            } else {
+                throw new Exception(
+                    'Unexpected response after username/password submission - no redirect, and '
+                    . 'neither a TOTP setup nor a TOTP login form was found. Status: '
+                    . $response->getStatusCode() . ', body: ' . $html,
+                );
+            }
+
+            $response = HttpRequestHelper::post($formUrl, null, null, [ 'Cookie' => $cookie ], $fields);
+        }
+        throw new Exception(
+            'Too many MFA steps without reaching a redirect to redirect_uri. Steps taken: '
+            . \implode(' -> ', $stepsTaken) . '. Last response status: ' . $response->getStatusCode()
+            . ', body: ' . $response->getBody()->getContents(),
+        );
+    }
+
+    /**
+     * RFC 4648 base32 encoding (unpadded, uppercase alphabet) of raw bytes.
+     *
+     * @param string $data
+     *
+     * @return string
+     */
+    private static function base32Encode(string $data): string {
+        $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+        $bits = '';
+        for ($i = 0, $len = \strlen($data); $i < $len; $i++) {
+            $bits .= \str_pad(\decbin(\ord($data[$i])), 8, '0', STR_PAD_LEFT);
+        }
+        $encoded = '';
+        foreach (\str_split($bits, 5) as $chunk) {
+            $chunk = \str_pad($chunk, 5, '0', STR_PAD_RIGHT);
+            $encoded .= $alphabet[\bindec($chunk)];
+        }
+        return $encoded;
+    }
+
 	/**
-	 * @param array $user
-	 * @param string $authorizationUrl
-	 * @param string $cookie
+	 * Parses the named form out of the given HTML, returning its action url and every field it
+	 * carries (name/value pairs from every <input>/<button>, including hidden ones such as
+	 * "credentialId" or "totpSecret") - a real browser submission sends all of them, and
+	 * Keycloak's authenticators can silently re-render the same form (200, no redirect) if a
+	 * required hidden field is missing from the submission.
+	 *
+	 * @param string $html
+	 * @param string $formId
+	 *
+	 * @return array{0: string, 1: array<string, string>}
+	 * @throws Exception
+	 */
+	private static function parseForm(string $html, string $formId): array {
+		// Capture the opening tag's attributes as one group so "id" and "action" can be pulled
+		// out independent of which order Keycloak's template happens to render them in.
+		if (!preg_match(
+			'/<form\b([^>]*\bid="' . preg_quote($formId, '/') . '"[^>]*)>(.*?)<\/form>/is',
+			$html,
+			$formMatch,
+		)) {
+			throw new Exception("Could not find the \"$formId\" form in the HTML response body.");
+		}
+		$openingTagAttrs = $formMatch[1];
+		$formBody = $formMatch[2];
+
+		if (!preg_match('/\baction="([^"]+)"/i', $openingTagAttrs, $actionMatch)) {
+			throw new Exception("No action url found on the \"$formId\" form.");
+		}
+		$formUrl = \html_entity_decode($actionMatch[1]);
+
+		$fields = [];
+		if (preg_match_all('/<(?:input|button)\b[^>]*>/i', $formBody, $fieldMatches)) {
+			foreach ($fieldMatches[0] as $fieldTag) {
+				if (!preg_match('/\bname="([^"]+)"/i', $fieldTag, $nameMatch)) {
+					continue;
+				}
+				$value = '';
+				if (preg_match('/\bvalue="([^"]*)"/i', $fieldTag, $valueMatch)) {
+					$value = \html_entity_decode($valueMatch[1]);
+				}
+				$fields[$nameMatch[1]] = $value;
+			}
+		}
+		return [$formUrl, $fields];
+	}
+
+	/**
+	 * @param string $location
 	 *
 	 * @return string
-	 * @throws GuzzleException
+	 * @throws Exception
 	 */
-	public static function getCode(array $user, string $authorizationUrl, string $cookie): string {
-		$authCodeResponse = HttpRequestHelper::post(
-			$authorizationUrl,
-			null,
-			null,
-			[
-				'Cookie' => $cookie,
-			],
-			[
-				'username' => $user['actualUsername'],
-				'password' => $user['password'],
-			],
-		);
-		$locationHeader = $authCodeResponse->getHeader('Location');
-		$queryString = parse_url($locationHeader[0], PHP_URL_QUERY);
-		parse_str($queryString, $urlParams);
+	private static function extractCodeFromLocationHeader(string $location): string {
+		$queryString = parse_url($location, PHP_URL_QUERY);
+		parse_str((string)$queryString, $urlParams);
+		if (!isset($urlParams['code'])) {
+			throw new Exception("No 'code' parameter found in redirect location: $location");
+		}
 		return $urlParams['code'];
 	}
 
@@ -429,13 +591,18 @@ class KeycloakHelper {
 
 	/**
 	 * @param array $user
+	 * @param string|null $acrValues e.g. "advanced", to request step-up to a higher LoA
 	 *
 	 * @return array
 	 * @throws GuzzleException
 	 * @throws JsonException
+	 * @throws Exception
 	 */
-	public static function setAccessTokenForKeycloakOcisUser(array $user): array {
-		[$authorizationUrl, $cookie] = self::getAuthorizationEndPoint();
+	public static function setAccessTokenForKeycloakOcisUser(
+		array $user,
+		?string $acrValues = null,
+	): array {
+		[$authorizationUrl, $cookie] = self::getAuthorizationEndPoint($acrValues);
 		$authorizationCode = self::getCode($user, $authorizationUrl, $cookie);
 		$tokenResponse = self::getToken($authorizationCode);
 		return json_decode($tokenResponse->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
