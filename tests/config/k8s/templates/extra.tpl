@@ -8,6 +8,10 @@
   mountPath: /etc/ocis/fontsMap.json
   subPath: fontsMap.json
 {{- end -}}
+{{- if eq .appName "notifications" }}
+- name: ocis-translations
+  mountPath: /etc/ocis/translations
+{{- end -}}
 {{- end -}}
 
 {{- define "ocis.extraVolumes" -}}
@@ -22,6 +26,16 @@
 - name: ocis-fonts-map
   configMap:
     name: ocis-fonts-map
+{{- end -}}
+{{- if eq .appName "notifications" }}
+- name: ocis-translations
+  configMap:
+    name: ocis-translations
+    items:
+      - key: de-LC_MESSAGES-notifications.po
+        path: de/LC_MESSAGES/notifications.po
+      - key: es-LC_MESSAGES-notifications.po
+        path: es/LC_MESSAGES/notifications.po
 {{- end -}}
 {{- end -}}
 
@@ -49,6 +63,10 @@
   value: clamav
 - name: ANTIVIRUS_CLAMAV_SOCKET
   value: "tcp://clamav:3310"
+{{- end -}}
+{{- if eq .appName "notifications" }}
+- name: OCIS_TRANSLATION_PATH
+  value: /etc/ocis/translations
 {{- end -}}
 {{- if .Values.features.vault.enabled }}
 {{- if eq .appName "proxy" }}
