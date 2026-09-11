@@ -72,7 +72,7 @@ jobs:
           - suite: "coreApiTrashbin,coreApiTrashbinRestore,coreApiWebdavEtagPropagation1,coreApiWebdavEtagPropagation2"
           - suite: "coreApiWebdavDelete,coreApiWebdavOperations,coreApiWebdavMove2"
           - suite: "coreApiWebdavProperties"
-          # - suite: "coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS"
+          - suite: "coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS"
 
     steps:
       - name: Checkout
