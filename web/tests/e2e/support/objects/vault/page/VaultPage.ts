@@ -11,6 +11,7 @@ export class VaultPage {
   public readonly otpSubmitButton: Locator
   public readonly driveBreadcrumb: Locator
   public readonly vaultBreadcrumb: Locator
+  public readonly accessDeniedLoginButton: Locator
 
   public constructor({ page }: { page: Page }) {
     this.page = page
@@ -25,5 +26,6 @@ export class VaultPage {
     this.otpSubmitButton = page.getByRole('button', { name: 'Submit' })
     this.driveBreadcrumb = page.getByRole('link', { name: 'Drive' })
     this.vaultBreadcrumb = page.getByRole('link', { name: 'Vault' })
+    this.accessDeniedLoginButton = page.locator('#exitAnchor')
   }
 }
