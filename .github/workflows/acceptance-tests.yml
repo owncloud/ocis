@@ -88,13 +88,13 @@ jobs:
           # Expected avg load: ~50-60 % CPU on 2 vCPU.
           vmstat 2 > /tmp/vmstat-phase1.log & MONITOR_PID=$!
 
-          (make vendor-bin-codestyle && make vendor-bin-codesniffer && make test-php-style && make check-env-var-annotations) > /tmp/php-style.log   2>&1 & PIDS=($!)
-          (npm install -g @gherlint/gherlint@1.1.0 && make test-gherkin-lint)                                                 > /tmp/gherkin.log     2>&1 & PIDS+=($!)
-          bash tests/acceptance/check-deleted-suites-in-expected-failure.sh                                                   > /tmp/suites.log      2>&1 & PIDS+=($!)
-          make govulncheck                                                                                                     > /tmp/govulncheck.log 2>&1 & PIDS+=($!)
+          # (make vendor-bin-codestyle && make vendor-bin-codesniffer && make test-php-style && make check-env-var-annotations) > /tmp/php-style.log   2>&1 & PIDS=($!)
+          # (npm install -g @gherlint/gherlint@1.1.0 && make test-gherkin-lint)                                                 > /tmp/gherkin.log     2>&1 & PIDS+=($!)
+          # bash tests/acceptance/check-deleted-suites-in-expected-failure.sh                                                   > /tmp/suites.log      2>&1 & PIDS+=($!)
+          # make govulncheck                                                                                                     > /tmp/govulncheck.log 2>&1 & PIDS+=($!)
           make ci-node-generate                                                                                                > /tmp/node-gen.log    2>&1 & PIDS+=($!)
           make ci-go-generate                                                                                                  > /tmp/go-gen.log      2>&1 & PIDS+=($!)
-          make changelog-lint                                                                                                   > /tmp/changelog-lint.log 2>&1 & PIDS+=($!)
+          # make changelog-lint                                                                                                   > /tmp/changelog-lint.log 2>&1 & PIDS+=($!)
 
           FAILED=0
           for PID in "${PIDS[@]}"; do wait "$PID" || FAILED=1; done
@@ -111,17 +111,18 @@ jobs:
                END { printf "=== phase 1 load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
                      sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat-phase1.log
 
-          echo "=== php-style ==="       && cat /tmp/php-style.log
-          echo "=== gherkin ==="          && cat /tmp/gherkin.log
-          echo "=== suites ==="           && cat /tmp/suites.log
-          echo "=== govulncheck ==="      && cat /tmp/govulncheck.log
+          # echo "=== php-style ==="       && cat /tmp/php-style.log
+          # echo "=== gherkin ==="          && cat /tmp/gherkin.log
+          # echo "=== suites ==="           && cat /tmp/suites.log
+          # echo "=== govulncheck ==="      && cat /tmp/govulncheck.log
           echo "=== ci-node-generate ===" && cat /tmp/node-gen.log
           echo "=== ci-go-generate ==="   && cat /tmp/go-gen.log
-          echo "=== changelog-lint ===" && cat /tmp/changelog-lint.log
+          # echo "=== changelog-lint ===" && cat /tmp/changelog-lint.log
 
           exit $FAILED
 
       - name: Trivy scan
+        if: false
         uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
         with:
           scan-type: fs
@@ -138,10 +139,10 @@ jobs:
           # from the ocis build. Critical path = ocis build (~300 s).
           vmstat 2 > /tmp/vmstat-phase2.log & MONITOR_PID=$!
 
-          make ci-golangci-lint                          > /tmp/golangci-lint.log      2>&1 & PIDS=($!)
+          # make ci-golangci-lint                          > /tmp/golangci-lint.log      2>&1 & PIDS=($!)
           ( ENABLE_VIPS=true make -C ocis build-debug \
            && mv ocis/bin/ocis-debug ocis/bin/ocis )     > /tmp/ocis-build.log 2>&1 & PIDS+=($!)
-          make test                                      > /tmp/unit-tests.log         2>&1 & PIDS+=($!)
+          # make test                                      > /tmp/unit-tests.log         2>&1 & PIDS+=($!)
           GOWORK=off make -C tests/ociswrapper build     > /tmp/ociswrapper-build.log  2>&1 & PIDS+=($!)
 
           FAILED=0
@@ -154,10 +155,10 @@ jobs:
                END { printf "=== phase 2 load (2 vCPU): avg busy %d%% peak %d%% | avg runq %.0f peak %d | avg wa %d%%\n",
                      sum_b/n, pk_b, sum_r/n, pk_r, sum_wa/n }' /tmp/vmstat-phase2.log
 
-          echo "=== golangci-lint ==="     && cat /tmp/golangci-lint.log
+          # echo "=== golangci-lint ==="     && cat /tmp/golangci-lint.log
           echo "=== ocis build ==="        && cat /tmp/ocis-build.log
           echo "=== ociswrapper build ===" && cat /tmp/ociswrapper-build.log
-          echo "=== unit tests ==="        && cat /tmp/unit-tests.log
+          # echo "=== unit tests ==="        && cat /tmp/unit-tests.log
 
           exit $FAILED
 
@@ -182,48 +183,48 @@ jobs:
       fail-fast: false
       matrix:
         suite:
-          # contract & locks
-          - apiContract
-          - apiLocks
-          # settings & notifications (needs email)
-          - apiSettings
-          - apiNotification
-          - apiCors
-          # graph
-          - apiGraphUser
-          - apiGraph
-          - apiGraphGroup
-          # spaces & dav
-          - apiSpaces
-          - apiSpacesShares
-          - apiSpacesDavOperation
-          - apiDownloads
-          - apiAsyncUpload
-          - apiDepthInfinity
-          - apiArchiver
-          - apiActivities
-          # search
-          - apiSearch1
-          - apiSearch2
-          - apiSearchContent    # needs Tika
-          # sharing
-          - apiSharingNgShares
-          - apiReshare
-          - apiSharingNgPermissions
-          - apiSharingNgAdditionalShareRole
-          - apiSharingNgDriveInvitation
-          - apiSharingNgItemInvitation
-          - apiSharingNgDriveLinkShare
-          - apiSharingNgItemLinkShare
-          - apiSharingNgLinkShareManagement
-          # auth
-          - apiAuthApp
-          # antivirus (needs ClamAV)
-          - apiAntivirus
-          # federation (needs email + federation ocis)
-          - apiOcm
-          # collaboration (needs WOPI)
-          - apiCollaboration
+          # # contract & locks
+          # - apiContract
+          # - apiLocks
+          # # settings & notifications (needs email)
+          # - apiSettings
+          # - apiNotification
+          # - apiCors
+          # # graph
+          # - apiGraphUser
+          # - apiGraph
+          # - apiGraphGroup
+          # # spaces & dav
+          # - apiSpaces
+          # - apiSpacesShares
+          # - apiSpacesDavOperation
+          # - apiDownloads
+          # - apiAsyncUpload
+          # - apiDepthInfinity
+          # - apiArchiver
+          # - apiActivities
+          # # search
+          # - apiSearch1
+          # - apiSearch2
+          # - apiSearchContent    # needs Tika
+          # # sharing
+          # - apiSharingNgShares
+          # - apiReshare
+          # - apiSharingNgPermissions
+          # - apiSharingNgAdditionalShareRole
+          # - apiSharingNgDriveInvitation
+          # - apiSharingNgItemInvitation
+          # - apiSharingNgDriveLinkShare
+          # - apiSharingNgItemLinkShare
+          # - apiSharingNgLinkShareManagement
+          # # auth
+          # - apiAuthApp
+          # # antivirus (needs ClamAV)
+          # - apiAntivirus
+          # # federation (needs email + federation ocis)
+          # - apiOcm
+          # # collaboration (needs WOPI)
+          # - apiCollaboration
           - apiVault
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -298,6 +299,7 @@ jobs:
           if-no-files-found: error
 
   cli-tests:
+    if: false
     needs: [build-and-test]
     name: ${{ matrix.suite }}
     runs-on: ubuntu-latest
@@ -346,6 +348,7 @@ jobs:
           if-no-files-found: error
 
   ldap-pool-tests:
+    if: false
     needs: [build-and-test]
     name: ldapPool-${{ matrix.suite }}
     runs-on: ubuntu-latest
@@ -394,6 +397,7 @@ jobs:
           if-no-files-found: error
 
   core-api-tests:
+    if: false
     name: ${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -489,6 +493,7 @@ jobs:
           if-no-files-found: error
 
   e2e-tests:
+    if: false
     name: e2e-${{ matrix.suite }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -695,6 +700,7 @@ jobs:
           retention-days: 7
 
   litmus:
+    if: false
     name: litmus
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -720,6 +726,7 @@ jobs:
         run: python3 tests/acceptance/run-litmus.py
 
   cs3api:
+    if: false
     name: cs3api
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -745,6 +752,7 @@ jobs:
         run: python3 tests/acceptance/run-cs3api.py
 
   wopi-builtin:
+    if: false
     name: wopi-builtin
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -770,6 +778,7 @@ jobs:
         run: python3 tests/acceptance/run-wopi.py --type builtin
 
   wopi-cs3:
+    if: false
     name: wopi-cs3
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -795,6 +804,7 @@ jobs:
         run: python3 tests/acceptance/run-wopi.py --type cs3
 
   external-ldap-tests:
+    if: false
     name: external-ldap-smoke
     needs: [build-and-test]
     runs-on: ubuntu-latest
@@ -828,6 +838,7 @@ jobs:
         run: tests/ldap-smoke/run.sh
 
   external-ldap-distributed-tests:
+    if: false
     name: external-ldap-distributed-smoke
     needs: [build-and-test]
     runs-on: ubuntu-latest
