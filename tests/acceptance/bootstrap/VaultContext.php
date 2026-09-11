@@ -77,6 +77,10 @@ class VaultContext implements Context {
 			$response->getStatusCode(),
 			"Failed to update Keycloak realm attribute $key. Response: " . $response->getBody()->getContents(),
 		);
+		// Decode the JSON map
+		$acrLoaMap = \json_decode($value, true);
+		$acrValue = array_keys($acrLoaMap, "2");
+		$this->featureContext->setAcrValuesToRequest($acrValue[0]);
 	}
 
 	/**
@@ -136,7 +140,6 @@ class VaultContext implements Context {
 		$headers = [];
 		$authUser = $user;
 		if (KeycloakHelper::isTestingWithKeycloak()) {
-			$this->authenticateKeycloakUserIfNeeded($user);
 			$accessToken = $this->featureContext->getOcisUserToken($user)['token']['accessToken'];
 			$headers['Authorization'] = 'Bearer ' . $accessToken;
 			$authUser = null;
@@ -162,13 +165,17 @@ class VaultContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 * @throws JsonException
+	 * @throws Exception
 	 */
-	private function authenticateKeycloakUserIfNeeded(string $user): void {
+	private function setUpKeycloakUserInOcis(string $user): void {
 		if ($this->featureContext->getAttributeOfCreatedUser($user, 'id')) {
 			return;
 		}
 		$userAttribute = $this->featureContext->getCreatedKeycloakUsers()[strtolower($user)];
-		$tokenData = KeycloakHelper::setAccessTokenForKeycloakOcisUser($userAttribute);
+		$tokenData = KeycloakHelper::setAccessTokenForKeycloakOcisUser(
+			$userAttribute,
+			$this->featureContext->getAcrValuesToRequest(),
+		);
 		$this->featureContext->setOcisUserToken($userAttribute, $tokenData);
 
 		$response = HttpRequestHelper::get(
@@ -185,6 +192,22 @@ class VaultContext implements Context {
 			$userAttribute['email'],
 			$userAttribute['id'],
 		);
+	}
+
+	/**
+	 * Sets up a Keycloak user in oCIS
+	 *
+	 * @Given user :user has been set up in oCIS
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userHasBeenSetUpInOcis(string $user): void {
+		$this->setUpKeycloakUserInOcis($user);
 	}
 
 	/**
