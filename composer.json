@@ -11,8 +11,7 @@
   },
   "require-dev": {
     "ext-simplexml": "*",
-    "bamarni/composer-bin-plugin": "^1.8",
-    "playwright-php/playwright": "^1.2"
+    "bamarni/composer-bin-plugin": "^1.8"
   },
   "extra": {
     "bamarni-bin": {
@@ -20,7 +19,6 @@
     }
   },
   "require": {
-    "khanamiryan/qrcode-detector-decoder": "^2.0",
     "spomky-labs/otphp": "^11.5"
   }
 }

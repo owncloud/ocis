@@ -95,7 +95,7 @@ jobs:
           chmod +x k3d
           sudo mv k3d /usr/local/bin/
           k3d version
-        
+
       - name: Install Helm
         run: |
           curl -fsSL -o helm-${{ env.HELM_VERSION }}-linux-amd64.tar.gz https://get.helm.sh/helm-${{ env.HELM_VERSION }}-linux-amd64.tar.gz
@@ -221,7 +221,7 @@ jobs:
           if [[ "${{ matrix.suite }}" == "apiOcm" ]]; then
             OCM=true make deploy-ocis
           fi
-      
+
       - name: Wait for oCIS to be ready
         env:
           FILE_URL: ${{ env.TEST_SERVER_URL }}/remote.php/dav/files/admin/hello1.txt
@@ -332,17 +332,6 @@ jobs:
             --admin-password admin \
             --skip-ocis-run \
             -n ocis-server &
-
-      - name: Install Playwright for vault tests
-        if: matrix.suite == 'apiVault'
-        run: |
-          composer install --no-progress
-          composer bin behat install --no-progress
-          vendor-php/bin/playwright-install
-          vendor-php/bin/playwright-install --browsers
-        env:
-          COMPOSER_NO_INTERACTION: "1"
-          COMPOSER_NO_AUDIT: "1"
 
       - name: Prepare expected failures
         if: startsWith( matrix.suite, 'core' )
