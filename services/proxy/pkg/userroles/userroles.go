@@ -28,6 +28,7 @@ type Options struct {
 	roleService     settingssvc.RoleService
 	rolesClaim      string
 	roleMapping     []config.RoleMapping
+	defaultRole     string
 	serviceAccount  config.ServiceAccount
 	logger          log.Logger
 }
@@ -60,6 +61,15 @@ func WithRolesClaim(claim string) Option {
 func WithRoleMapping(roleMap []config.RoleMapping) Option {
 	return func(o *Options) {
 		o.roleMapping = roleMap
+	}
+}
+
+// WithDefaultRole configures the ocis role to fall back to when the user's claims
+// yield no role that maps to an ocis role. An empty value keeps the previous
+// behaviour of refusing the login.
+func WithDefaultRole(role string) Option {
+	return func(o *Options) {
+		o.defaultRole = role
 	}
 }
 

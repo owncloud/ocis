@@ -259,7 +259,113 @@ to the user. So if e.g. a user's `ocisRoles` claim has the values `myUserRole` a
 appears before `user` in the above sample configuration).
 
 If a user's claim values don't match any of the configured role mappings an error will be logged and
-the user will not be able to login.
+the user will not be able to login. The proxy answers such a request with `403 Forbidden`, and the
+logged error names the claim it read, the values it found and the configured mapping. See
+[Default Role](#default-role) for how to let those users log in instead.
+
+#### Default Role
+
+Users that reach Infinite Scale without any usable role claim cannot log in at all. This is common
+when users are federated into the IDP from an external user directory: they authenticate correctly,
+but no role is attached to them, so no `role_mapping` entry can match. The web UI then shows an
+access denied page, and using its "log in again" button returns to the same page, because the login
+itself succeeded.
+
+Setting `PROXY_ROLE_ASSIGNMENT_OIDC_DEFAULT_ROLE` (or `default_role` in the `oidc_role_mapper`
+section) gives those users a role instead of refusing them:
+
+```yaml
+role_assignment:
+    driver: oidc
+    oidc_role_mapper:
+        role_claim: ocisRoles
+        default_role: user-light
+        role_mapping:
+            - role_name: admin
+              claim_value: myAdminRole
+            - role_name: user
+              claim_value: myUserRole
+```
+
+The default role applies when the role claim is missing entirely and when it is present but matches
+no `role_mapping` entry. A mapping that does match always wins over it.
+
+A role claim that is present but cannot be read — it holds a number, or a list with a non-string in
+it, or `role_claim` points through a value that is not an object — does *not* get the default role.
+That is a fault in the token or in `role_claim` rather than a user without a role, and it is
+reported so it does not hide behind a working login.
+
+This setting is empty by default, which keeps the behavior described above: such logins are refused.
+Because the default role is handed to everyone the mappings do not cover, prefer a low-privilege role
+such as `user-light` over `user` or `admin` — but read
+[Which deployments this affects](#which-deployments-this-affects) first, because `user-light` is the
+one built-in role without the `Drives.Create` permission and that has a further consequence.
+
+##### Which deployments this affects
+
+`default_role` is read by the `oidc` role assigner only — the one selected by
+`role_assignment.driver: oidc`, which is what a deployment fronted by Keycloak or another external
+IDP uses.
+
+* **The default deployment, without Keycloak, is not affected.** It uses the `default` role
+  assigner, which never reads `default_role`; users there keep being assigned the `user` role
+  exactly as before. `PROXY_ROLE_ASSIGNMENT_OIDC_DEFAULT_ROLE` is ignored on such a deployment,
+  whether or not it is set.
+* **With an external IDP** the setting behaves as described above: it is consulted after the roles
+  claim has been read, and only for the users that no `role_mapping` entry matched.
+* **The `oidc` assigner in front of the built-in IDP is the combination to be careful with.** The
+  `idp` service has no setting that populates a roles claim, so unless something else adds one every
+  token reaching the assigner is silent about roles. Every account then matches no mapping and takes
+  the same fallback — administrators included. Without `default_role` that setup refuses every
+  login; with it, everyone is signed in on the one configured role and nobody is left holding
+  `admin`.
+
+Two details are worth knowing before picking the role for that last case, both of them pre-existing
+behavior of the `oidc` assigner rather than anything this setting introduces:
+
+* **The assignment overwrites, on every login.** `UpdateUserRoleAssignment` compares the role it
+  resolved against the one the account currently holds and reassigns whenever they differ, so an
+  administrator's `admin` role is replaced rather than preserved.
+* **A demotion to `user-light` also disables the personal space.** After assigning the role the
+  proxy checks `Drives.Create` and, when the account does not have it, calls
+  `DisablePersonalSpace`. Of the four built-in roles only `user-light` lacks that permission
+  (`services/settings/pkg/store/defaults/defaults.go`), so `user-light` is the one value of
+  `default_role` for which this branch is taken. The space is disabled, not deleted, and a later
+  login on a role that has the permission restores it.
+
+Recovering from that state is a matter of assigning a role back to some account, and there is no
+command-line path for it — the `settings` service ships no CLI beyond `health`/`server`/`version`,
+so it takes an account that still holds `Account Management`, or direct access to the settings
+store. Switching `role_assignment.driver` back to `default` does not undo it either: the `default`
+assigner only assigns a role to an account that has none, and a demoted account has one.
+
+##### Relation to `GRAPH_ASSIGN_DEFAULT_USER_ROLE`
+
+`GRAPH_ASSIGN_DEFAULT_USER_ROLE` and `PROXY_ROLE_ASSIGNMENT_OIDC_DEFAULT_ROLE` both hand out a role
+when nothing else does, but they act at different moments and on different things:
+
+| | `GRAPH_ASSIGN_DEFAULT_USER_ROLE` | `PROXY_ROLE_ASSIGNMENT_OIDC_DEFAULT_ROLE` |
+|---|---|---|
+| when | once, when a user is **created** through the libregraph users API | on **every login**, after the role claim has been read |
+| which role | always `user`, not configurable | any role name you configure |
+| applies to | every user the graph service creates | only `role_assignment.driver: oidc` |
+| default | `true` | empty, meaning "refuse such logins" |
+
+The two only meet when `PROXY_AUTOPROVISION_ACCOUNTS` is enabled — which additionally requires a
+write-enabled libregraph user backend. A first login then creates the user through the graph service
+and resolves their role in the same request, in that order. **The proxy runs second and its result
+is the one that survives**, so on a login where the role claim is missing or matches no mapping:
+
+* with a default role configured, the user ends up on the default role, replacing whatever the graph
+  service assigned at creation;
+* with no default role configured, the login is refused even though the graph service already
+  assigned the `user` role a moment earlier — `GRAPH_ASSIGN_DEFAULT_USER_ROLE` does not, on its own,
+  let a user without a role claim in.
+
+The same applies to a role assigned by hand through the graph API or the admin UI: with the `oidc`
+driver the claim, or this default role, is re-applied at the next login and overwrites it. That is
+pre-existing behavior of the `oidc` driver and is not changed by this setting; use the `default`
+driver if roles are meant to be managed inside Infinite Scale rather than in the IDP.
 
 The default `role_claim` (or `PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM`) is `roles`. The default `role_mapping` is:
 

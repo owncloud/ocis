@@ -314,6 +314,14 @@ def main() -> int:
             "PROXY_AUTOPROVISION_CLAIM_GROUPS": "groups",
             "PROXY_AUTOPROVISION_GROUP_CREATE": "true",
             "PROXY_ROLE_ASSIGNMENT_DRIVER": "oidc",
+            # Fallback for users whose token matches no role_mapping entry, e.g.
+            # users federated into the realm without an ocis role. Empty by
+            # default; specs/keycloak/defaultRole.spec.ts needs it set. A
+            # matching role_mapping entry still wins, so the other keycloak
+            # specs are unaffected. The value is a settings-service role NAME
+            # ("user"), not a display name ("User") -- see
+            # services/settings/pkg/store/defaults/defaults.go.
+            "PROXY_ROLE_ASSIGNMENT_OIDC_DEFAULT_ROLE": "user",
             "OCIS_OIDC_ISSUER": "https://localhost:8443/realms/oCIS",
             "PROXY_OIDC_REWRITE_WELLKNOWN": "true",
             "WEB_OIDC_CLIENT_ID": "web",
