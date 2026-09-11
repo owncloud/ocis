@@ -14,6 +14,7 @@ import {
   waitForCollaboraEditor
 } from './webOffice'
 import { editor, sidebar } from '../utils'
+import * as mermaidEditor from './mermaidEditor'
 import { environment, objects, utils } from '../../../index'
 import { config } from '../../../../config'
 import { File, Space } from '../../../types'
@@ -55,6 +56,7 @@ const createNewFolderButton = '#new-folder-btn'
 const passwordProtectedFolderButton = '.new-file-btn-psec'
 const createNewTxtFileButton = '.new-file-btn-txt'
 const createNewMdFileButton = '.new-file-btn-md'
+const createNewMmdFileButton = '.new-file-btn-mmd'
 const createNewOfficeDocumentFileButton = '//div[@id="new-file-menu-drop"]//span[text()="%s"]'
 const createNewShortcutButton = '#new-shortcut-btn'
 const shortcutResorceInput = '#create-shortcut-modal-url-input'
@@ -238,7 +240,13 @@ export const clickResourceFromBreadcrumb = async ({
 /**/
 
 export type createResourceTypes =
-  'folder' | 'txtFile' | 'mdFile' | 'OpenDocument' | 'Microsoft Word' | 'Password Protected Folder'
+  | 'folder'
+  | 'txtFile'
+  | 'mdFile'
+  | 'mmdFile'
+  | 'OpenDocument'
+  | 'Microsoft Word'
+  | 'Password Protected Folder'
 
 export interface createResourceArgs {
   page: Page
@@ -480,6 +488,17 @@ export const createNewFileOrFolder = async (args: createResourceArgs): Promise<v
         page.locator(util.format(actionConfirmationButton, 'Create')).click()
       ])
       await editTextDocument({ page, content, name })
+      break
+    }
+    case 'mmdFile': {
+      await page.locator(createNewMmdFileButton).click()
+      await page.locator(resourceNameInput).clear()
+      await page.locator(resourceNameInput).fill(name)
+      await Promise.all([
+        page.waitForResponse((resp) => resp.status() === 201 && resp.request().method() === 'PUT'),
+        page.locator(util.format(actionConfirmationButton, 'Create')).click()
+      ])
+      await mermaidEditor.editMermaidDocument({ page, content })
       break
     }
     case 'OpenDocument': {
@@ -2121,6 +2140,10 @@ export const editResource = async (args: editResourcesArgs): Promise<void> => {
       break
     case 'Microsoft Word':
       await fillDocumentContent({ page, text: content, editor: 'OnlyOffice' })
+      break
+    case 'mmdFile':
+      await page.locator(util.format(resourceNameSelector, resourceName)).click()
+      await mermaidEditor.editMermaidDocument({ page, content })
       break
     default:
       await page.locator(util.format(resourceNameSelector, resourceName)).click()

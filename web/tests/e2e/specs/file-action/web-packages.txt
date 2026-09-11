@@ -9,4 +9,5 @@ web-app-files
 web-app-preview
 web-app-pdf-viewer
 web-app-text-editor
+web-app-mermaid-editor
 web-app-password-protected-folders

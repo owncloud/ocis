@@ -13,6 +13,7 @@
     "search",
     "text-editor",
     "html-editor",
+    "mermaid-editor",
     "epub-reader"
   ],
   "applications" : []

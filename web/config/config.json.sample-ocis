@@ -15,6 +15,7 @@
     "search",
     "text-editor",
     "html-editor",
+    "mermaid-editor",
     "external",
     "admin-settings",
     "epub-reader"
