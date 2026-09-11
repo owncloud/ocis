@@ -7,4 +7,4 @@ so the connection stayed plaintext with no operator toggle to change it. The
 stat cache now honours `OCIS_CACHE_ENABLE_TLS`, `OCIS_CACHE_TLS_INSECURE` and
 `OCIS_CACHE_TLS_ROOT_CA_CERTIFICATE` like every other cache and store.
 
-https://github.com/owncloud/ocis/pull/12777
+https://github.com/owncloud/ocis/pull/12931
