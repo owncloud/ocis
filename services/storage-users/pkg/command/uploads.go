@@ -94,6 +94,11 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 				Usage:       "filter sessions by virus scan result",
 			},
 			&cli.BoolFlag{
+				Name:        "orphaned",
+				DefaultText: "unset",
+				Usage:       "filter sessions by whether their node metadata is unreadable. Such sessions can never finish processing and can be removed with --clean",
+			},
+			&cli.BoolFlag{
 				Name:  "json",
 				Usage: "output as json",
 			},
@@ -259,6 +264,10 @@ func buildFilter(c *cli.Context) storage.UploadSessionFilter {
 		infectedValue := c.Bool("has-virus")
 		filter.HasVirus = &infectedValue
 	}
+	if c.IsSet("orphaned") {
+		orphanedValue := c.Bool("orphaned")
+		filter.Orphaned = &orphanedValue
+	}
 	if c.IsSet("id") {
 		idValue := c.String("id")
 		filter.ID = &idValue
@@ -312,6 +321,24 @@ func buildInfo(filter storage.UploadSessionFilter) string {
 			b.WriteString("Virusinfected")
 		} else {
 			b.WriteString("virusinfected")
+		}
+	}
+
+	if filter.Orphaned != nil {
+		if b.Len() != 0 {
+			b.WriteString(", ")
+		}
+		if !*filter.Orphaned {
+			if b.Len() == 0 {
+				b.WriteString("Not ")
+			} else {
+				b.WriteString("not ")
+			}
+		}
+		if b.Len() == 0 {
+			b.WriteString("Orphaned")
+		} else {
+			b.WriteString("orphaned")
 		}
 	}
 
