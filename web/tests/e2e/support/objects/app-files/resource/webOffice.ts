@@ -55,6 +55,10 @@ export const focusOnlyOfficeEditor = async (page: Page): Promise<void> => {
 }
 
 export const getOfficeDocumentContent = async (page: Page): Promise<string> => {
+  // navigator.clipboard calls throw "Document is not focused" unless this page's tab is the
+  // OS-focused one - with multiple actors (e.g. Alice + Brian) each owning their own page/tab,
+  // the one we're about to read from isn't necessarily the foregrounded one.
+  await page.bringToFront()
   // clear the clipboard
   await page.evaluate("navigator.clipboard.writeText('')")
   // copying and getting the value with keyboard requires some time
@@ -81,11 +85,27 @@ export const fillCollaboraDocumentContent = async (page: Page, content: string):
 export const fillOnlyOfficeDocumentContent = async (page: Page, content: string): Promise<void> => {
   const editorMainFrame = page.frameLocator(externalEditorIframe)
   const innerIframe = editorMainFrame.frameLocator(onlyOfficeInnerFrameSelector)
-  await innerIframe.locator(onlyofficeDocTextAreaSelector).focus()
-  await page.keyboard.press('ControlOrMeta+A')
-  await innerIframe.locator(onlyofficeDocTextAreaSelector).fill(content)
+  const textAreaLocator = innerIframe.locator(onlyofficeDocTextAreaSelector)
   const saveButtonDisabledLocator = innerIframe.locator(onlyOfficeSaveButtonSelector)
-  await expect(saveButtonDisabledLocator).toHaveAttribute('disabled', 'disabled')
+
+  // right after the document opens, the hidden text area can already be focusable even though
+  // OnlyOffice hasn't finished initializing internally yet, so Ctrl+A/paste can be a silent
+  // no-op that leaves the document content unchanged - verify it actually landed and retry if
+  // it didn't, instead of trusting a single attempt.
+  let actualContent = ''
+  for (let attempt = 1; attempt <= 5; attempt++) {
+    await textAreaLocator.focus()
+    await page.keyboard.press('ControlOrMeta+A')
+    await textAreaLocator.fill(content)
+    await expect(saveButtonDisabledLocator).toHaveAttribute('disabled', 'disabled')
+
+    actualContent = (await getOfficeDocumentContent(page)).trim()
+    if (actualContent === content.trim()) {
+      return
+    }
+    await page.waitForTimeout(1000)
+  }
+  expect(actualContent).toBe(content.trim())
 }
 
 export const canEditCollaboraDocument = async (page: Page): Promise<boolean> => {

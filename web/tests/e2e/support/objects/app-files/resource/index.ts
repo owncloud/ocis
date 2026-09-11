@@ -195,6 +195,12 @@ export class Resource {
     return po.reSearchAndGetDisplayedResourcesFromSearch(this.#page)
   }
 
+  // same as reSearchAndGetDisplayedResources, but for global-search results rendered into the
+  // full-page files list (after pressing Enter) rather than the search dropdown
+  reSearchAndGetDisplayedResourcesFromFilesList(): Promise<string[]> {
+    return po.reSearchAndGetDisplayedResourcesFromFilesList(this.#page)
+  }
+
   getDisplayedResources(args: Omit<po.getDisplayedResourcesArgs, 'page'>): Promise<string[]> {
     switch (args.keyword) {
       case resourcePage.filesList:
