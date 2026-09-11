@@ -29,6 +29,8 @@ type Nats struct {
 	TLSKey                  string `yaml:"tls_key" env:"NATS_TLS_KEY" desc:"Path/File name for the TLS certificate key (in PEM format) for the NATS listener. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/nats." introductionVersion:"pre5.0"`
 	TLSSkipVerifyClientCert bool   `yaml:"tls_skip_verify_client_cert" env:"OCIS_INSECURE;NATS_TLS_SKIP_VERIFY_CLIENT_CERT" desc:"Whether the NATS server should skip the client certificate verification during the TLS handshake." introductionVersion:"pre5.0"`
 	EnableTLS               bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;NATS_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"pre5.0"`
+	AuthUsername            string `yaml:"auth_username" env:"OCIS_EVENTS_AUTH_USERNAME;NATS_EVENTS_AUTH_USERNAME" desc:"Username the NATS server requires clients to authenticate with. Must match the username configured on the event-bus clients (OCIS_EVENTS_AUTH_USERNAME). If empty, the server accepts unauthenticated clients." introductionVersion:"7.3.0"`
+	AuthPassword            string `yaml:"auth_password" env:"OCIS_EVENTS_AUTH_PASSWORD;NATS_EVENTS_AUTH_PASSWORD" desc:"Password the NATS server requires clients to authenticate with. Must match the password configured on the event-bus clients (OCIS_EVENTS_AUTH_PASSWORD). If empty, the server accepts unauthenticated clients." introductionVersion:"7.3.0"`
 }
 
 // Tracing is the tracing config

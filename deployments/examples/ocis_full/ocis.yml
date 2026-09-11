@@ -46,6 +46,11 @@ services:
       MICRO_REGISTRY_ADDRESS: 127.0.0.1:9233
       NATS_NATS_HOST: 0.0.0.0
       NATS_NATS_PORT: 9233
+      # the event bus is reachable by every container on this network, so it
+      # must require authentication. Both the broker and all clients read
+      # OCIS_EVENTS_AUTH_*; set EVENTS_AUTH_PASSWORD to a strong random value.
+      OCIS_EVENTS_AUTH_USERNAME: "ocis"
+      OCIS_EVENTS_AUTH_PASSWORD: "${EVENTS_AUTH_PASSWORD:?EVENTS_AUTH_PASSWORD must be set to a strong random value}"
       PROXY_CSP_CONFIG_FILE_LOCATION: /etc/ocis/csp.yaml
       # these three vars are needed to the csp config file to include the web office apps and the importer
       COLLABORA_DOMAIN: ${COLLABORA_DOMAIN:-collabora.owncloud.test}
