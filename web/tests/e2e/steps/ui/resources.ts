@@ -232,6 +232,7 @@ export async function userShouldSeeResources({
   listType:
     | typeof resourcePage.searchList
     | typeof resourcePage.filesList
+    | typeof resourcePage.searchResultsList
     | typeof resourcePage.shares
     | typeof resourcePage.trashbin
   stepUser: string
@@ -241,9 +242,11 @@ export async function userShouldSeeResources({
   const { page } = world.actorsEnvironment.getActor({ key: stepUser })
   const resourceObject = new objects.applicationFiles.Resource({ page })
 
-  // search list waits longer for tika full-text indexing; other lists only need UI render time
+  // both search-derived lists wait longer for tika full-text indexing and re-issue the search
+  // each poll; other lists only need UI render time and read the DOM as-is
   const isSearchList = listType === resourcePage.searchList
-  const timeout = isSearchList ? 30000 : 10000
+  const isSearchResultsList = listType === resourcePage.searchResultsList
+  const timeout = isSearchList || isSearchResultsList ? 30000 : 10000
 
   for (const resource of resources) {
     await expect
@@ -251,10 +254,16 @@ export async function userShouldSeeResources({
         async () => {
           // the global search dropdown is a one-shot query, so for the search list we
           // re-issue the search each poll to pick up resources that finish indexing after
-          // the initial query instead of repeatedly reading a stale result list
-          const actualList = isSearchList
-            ? await resourceObject.reSearchAndGetDisplayedResources()
-            : await resourceObject.getDisplayedResources({ keyword: listType })
+          // files list showing search results (after pressing Enter) has the same problem, so
+          // it re-issues the search too (via reload) rather than reading the plain files list
+          let actualList: string[]
+          if (isSearchList) {
+            actualList = await resourceObject.reSearchAndGetDisplayedResources()
+          } else if (isSearchResultsList) {
+            actualList = await resourceObject.reSearchAndGetDisplayedResourcesFromFilesList()
+          } else {
+            actualList = await resourceObject.getDisplayedResources({ keyword: listType })
+          }
           return actualList.includes(resource)
         },
         {

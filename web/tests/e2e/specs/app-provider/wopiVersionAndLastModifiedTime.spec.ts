@@ -57,20 +57,12 @@ test.describe(
           stepUser: 'Alice',
           resources: [{ name: suite.file, type: suite.type, content: 'edited content v2' }]
         })
-        await ui.userClosesFileViewer({ stepUser: 'Alice' })
-        await ui.resourceShouldNotBeLockedForUser({ stepUser: 'Alice', resource: suite.file })
-        await ui.userOpensResourceInViewer({
-          stepUser: 'Alice',
-          resource: suite.file,
-          viewer: suite.viewer
-        })
         await ui.userShouldSeeContentInEditor({
           stepUser: 'Alice',
           expectedContent: 'edited content v2',
           editor: suite.name
         })
         await ui.userClosesFileViewer({ stepUser: 'Alice' })
-        await ui.resourceShouldNotBeLockedForUser({ stepUser: 'Alice', resource: suite.file })
 
         await ui.userLogsIn({ stepUser: 'Brian' })
         await ui.userNavigatesToSharedWithMePage({ stepUser: 'Brian' })

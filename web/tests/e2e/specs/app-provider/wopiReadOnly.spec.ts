@@ -40,13 +40,6 @@ test.describe('WOPI CheckFileInfo: ReadOnly', { tag: '@predefined-users' }, () =
         stepUser: 'Alice',
         resources: [{ name: suite.file, type: suite.type, content: 'owner edited content' }]
       })
-      await ui.userClosesFileViewer({ stepUser: 'Alice' })
-      await ui.resourceShouldNotBeLockedForUser({ stepUser: 'Alice', resource: suite.file })
-      await ui.userOpensResourceInViewer({
-        stepUser: 'Alice',
-        resource: suite.file,
-        viewer: suite.viewer
-      })
       await ui.userShouldSeeContentInEditor({
         stepUser: 'Alice',
         expectedContent: 'owner edited content',

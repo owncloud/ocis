@@ -1991,6 +1991,19 @@ export const reSearchAndGetDisplayedResourcesFromSearch = async (page: Page): Pr
   return getDisplayedResourcesFromSearch(page)
 }
 
+// The full-page files list rendered after pressing Enter on a global search is populated from
+// the same one-shot backend query as the dropdown, so it's subject to the same tika indexing
+// lag - but nothing here spontaneously re-fetches, so simply waiting/polling longer can never
+// pick up a resource that wasn't indexed yet when the query ran. reload() re-issues the same
+// search against the current (search-results) URL, the same technique searchResourceGlobalSearch
+// already relies on to let indexing catch up before a search is even run.
+export const reSearchAndGetDisplayedResourcesFromFilesList = async (
+  page: Page
+): Promise<string[]> => {
+  await page.reload()
+  return getDisplayedResourcesFromFilesList(page)
+}
+
 export const getDisplayedResourcesFromFilesList = async (page: Page): Promise<string[]> => {
   // wait for tika indexing
   await new Promise((resolve) => setTimeout(resolve, 1000))
