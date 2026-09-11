@@ -442,8 +442,8 @@ func (f *FS) PrepareUpload(ctx context.Context, ref *provider.Reference, session
 	return res, err
 }
 
-func (f *FS) RollbackUpload(ctx context.Context, ref *provider.Reference, sessionID string, nodeExisted bool, sizeDiff int64) error {
-	return f.next.RollbackUpload(ctx, ref, sessionID, nodeExisted, sizeDiff)
+func (f *FS) RollbackUpload(ctx context.Context, ref *provider.Reference, sessionID string, info storage.RollbackInfo) error {
+	return f.next.RollbackUpload(ctx, ref, sessionID, info)
 }
 
 func (f *FS) Download(ctx context.Context, ref *provider.Reference, openReaderFunc func(md *provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {

@@ -98,7 +98,7 @@ func (fs *hellofs) PrepareUpload(_ context.Context, _ *provider.Reference, _ str
 	return &storage.PrepareUploadResult{VersionCreated: info.NodeExisted}, nil
 }
 
-func (fs *hellofs) RollbackUpload(_ context.Context, _ *provider.Reference, _ string, _ bool, _ int64) error {
+func (fs *hellofs) RollbackUpload(_ context.Context, _ *provider.Reference, _ string, _ storage.RollbackInfo) error {
 	return nil
 }
 
