@@ -160,7 +160,8 @@ export class UserManager extends OidcUserManager {
   updateContext(accessToken: string, fetchUserData: boolean) {
     const userKnown = !!this.userStore.user
     const accessTokenChanged = this.authStore.accessToken !== accessToken
-    if (!accessTokenChanged) {
+    // Skip only when a context load already started; loadUserAbilities can set the token first.
+    if (!accessTokenChanged && this.updateAccessTokenPromise) {
       return this.updateAccessTokenPromise
     }
 
@@ -321,5 +322,16 @@ export class UserManager extends OidcUserManager {
     const permissions = await this.fetchPermissions({ user })
     const abilities = getAbilities(permissions)
     this.ability.update(abilities)
+  }
+
+  // Load only the user's permissions, without the full context (which would load vault data).
+  public async loadUserAbilities(): Promise<void> {
+    // Token not stored yet on address-bar navigation; set it or the requests below are 401.
+    const accessToken = await this.getAccessToken()
+    if (accessToken) {
+      this.authStore.setAccessToken(accessToken)
+    }
+    const graphUser = await this.clientService.graphAuthenticated.users.getMe()
+    await this.updateUserAbilities(graphUser)
   }
 }
