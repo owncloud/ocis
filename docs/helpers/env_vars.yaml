@@ -282,6 +282,19 @@ ACTIVITYLOG_TRANSLATION_PATH:
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
+ACTIVITYLOG_WRITE_BUFFER_DURATION:
+  name: ACTIVITYLOG_WRITE_BUFFER_DURATION
+  defaultValue: 10s
+  type: Duration
+  description: The duration for which activity writes to the store are buffered and
+    coalesced before being flushed. Buffering reduces the marshal/unmarshal and write
+    load under bursty event traffic, which is the main cause of the activitylog service
+    falling behind. Set to 0 to write synchronously. Buffered activities that have
+    not been flushed yet are not visible to reads and are lost on an ungraceful shutdown.
+  introductionVersion: NEXT
+  deprecationVersion: ""
+  removalVersion: ""
+  deprecationInfo: ""
 ANTIVIRUS_CLAMAV_SOCKET:
   name: ANTIVIRUS_CLAMAV_SOCKET
   defaultValue: /run/clamav/clamd.ctl
