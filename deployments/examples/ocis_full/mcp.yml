@@ -1,0 +1,29 @@
+---
+services:
+  ocis-mcp-server:
+    image: owncloud/ocis-mcp-server:${OCIS_MCP_DOCKER_TAG:-latest}
+    # release notes: https://github.com/owncloud/ocis-mcp-server/releases
+    networks:
+      ocis-net:
+    depends_on:
+      ocis:
+        condition: service_started
+    environment:
+      OCIS_MCP_OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      OCIS_MCP_TLS_SKIP_VERIFY: "${INSECURE:-true}"
+      OCIS_MCP_TRANSPORT: http
+      OCIS_MCP_HTTP_ADDR: 0.0.0.0:8090
+      OCIS_MCP_HTTP_SECRET: ${OCIS_MCP_HTTP_SECRET:-}
+      OCIS_MCP_APP_TOKEN_USER: ${OCIS_MCP_APP_TOKEN_USER:-}
+      OCIS_MCP_APP_TOKEN_VALUE: ${OCIS_MCP_APP_TOKEN_VALUE:-}
+      OCIS_MCP_LOG_LEVEL: ${LOG_LEVEL:-info}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ocis-mcp-server.entrypoints=https"
+      - "traefik.http.routers.ocis-mcp-server.rule=Host(`${OCIS_MCP_DOMAIN:-mcp.owncloud.test}`)"
+      - "traefik.http.routers.ocis-mcp-server.tls.certresolver=http"
+      - "traefik.http.routers.ocis-mcp-server.service=ocis-mcp-server"
+      - "traefik.http.services.ocis-mcp-server.loadbalancer.server.port=8090"
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
