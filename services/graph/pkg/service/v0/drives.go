@@ -444,7 +444,7 @@ func (g Graph) createDrive(w http.ResponseWriter, r *http.Request, apiVersion AP
 
 	drive := libregraph.Drive{}
 	if err := StrictJSONUnmarshal(r.Body, &drive); err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not create drive: invalid body schema definition")
+		logger.Debug().Err(err).Msg("could not create drive: invalid body schema definition")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid body schema definition")
 		return
 	}
@@ -582,7 +582,7 @@ func (g Graph) updateDrive(w http.ResponseWriter, r *http.Request, apiVersion AP
 
 	drive := libregraph.DriveUpdate{}
 	if err = StrictJSONUnmarshal(r.Body, &drive); err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update drive, invalid request body")
+		logger.Debug().Err(err).Msg("could not update drive, invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: error: %v", err.Error()))
 		return
 	}
