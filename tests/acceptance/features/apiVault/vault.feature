@@ -1144,7 +1144,7 @@ Feature: vault
     Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "User Light" to user "Brian" using the Graph API
     And user "Alice" has logged in via web UI
-    And user "Brian" has logged in via web UI
+    And user "Brian" has logged in without vault mode
     And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault
     When user "Alice" sends the following resource share invitation using the Graph API:
@@ -1196,9 +1196,9 @@ Feature: vault
       | groupname   |
       | vault-group |
     And user "Brian" has been created with default attributes
+    And user "Brian" has logged in without vault mode
     And user "Brian" has been added to group "vault-group"
     And user "Alice" has logged in via web UI
-    And user "Brian" has logged in via web UI
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault
     When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | vaultFile.txt |
@@ -1236,7 +1236,7 @@ Feature: vault
     And user "Brian" has been created with default attributes
     And the administrator has assigned the role "User Light" to user "Brian" using the Graph API
     And user "Alice" has logged in via web UI
-    And user "Brian" has logged in via web UI
+    And user "Brian" has logged in without vault mode
     And user "Alice" has created a space "vault-space" in vault with the default quota using the Graph API
     When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
       | space           | vault-space        |
@@ -1275,6 +1275,7 @@ Feature: vault
 
   Scenario Outline: send share invitation for a resource in vault to a user with the vault mode permission
     Given user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Alice" has logged in via web UI
     And user "Brian" has logged in via web UI
     And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
