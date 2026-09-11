@@ -96,15 +96,6 @@ help:
 	@echo
 	@echo -e "${RED}You also should have a look at other available Makefiles:${RESET}"
 	@echo
-	@echo -e "${GREEN}oCIS:${RESET}\n"
-	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/ocis/build-docs/${RESET}\n"
-	@echo -e "\tsee ./ocis/Makefile"
-	@echo -e "\tor run ${YELLOW}make -C ocis help${RESET}"
-	@echo
-	@echo -e "${GREEN}Documentation:${RESET}\n"
-	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/build-docs/${RESET}\n"
-	@echo -e "\trun ${YELLOW}make list | grep docs-\t\t${BLUE}note: run all docs command via this makefile${RESET}"
-	@echo
 	@echo -e "${GREEN}Testing with test suite in docker:${RESET}\n"
 	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/testing/#testing-with-test-suite-in-docker${RESET}\n"
 	@echo -e "\tsee ./tests/acceptance/docker/Makefile"
@@ -166,61 +157,6 @@ clean:
 	@for mod in $(OCIS_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod clean || exit 1; \
     done
-
-# generate the docs
-# intents and comments are intentional...
-.PHONY: docs-generate          # 1. prepare docs
-docs-generate:
-	@echo 'Empty folders first to only have those files that are generated without remnants.'
-	find docs/services/_includes/ -type f \( -name "*" ! -name ".git*" \) -delete || exit 1
-
-	@echo 'Generate content from services.'
-	@for mod in $(OCIS_MODULES); do \
-		$(MAKE) --no-print-directory -C $$mod docs-generate || exit 1; \
-	done
-
-	@$(MAKE) --no-print-directory -C docs docs-run-helpers || exit 1 
-
-# initialize the docs build environment
-	@$(MAKE) --no-print-directory -C docs docs-init
-
-# copy required resources into hugo/content
-.PHONY: docs-copy              # 2. copy required doc resources
-docs-copy:
-	@$(MAKE) --no-print-directory -C docs docs-copy
-
-# the docs-build|serve commands requires that docs-init was run first for the required data to exists
-# create a docs build
-.PHONY: docs-build             # 3. build prepared docs
-docs-build:
-	@$(MAKE) --no-print-directory -C docs docs-build
-
-# serve built docs with hugo
-.PHONY: docs-serve             # serve the docs build
-docs-serve:
-	@$(MAKE) --no-print-directory -C docs docs-serve
-
-# clean up doc build artifacts 
-.PHONY: docs-clean             # clean all docs artifacts, must be run as sudo
-docs-clean:
-	@$(MAKE) --no-print-directory -C docs docs-clean
-
-# docs-local imitates the 3-step docs build pipeline (generate → copy → build)
-# locally without pushing. docs-hugo-drone-prep creates the ../hugo symlink required by
-# the Hugo Docker image (hugomods/hugo:base-0.129.0).
-# imitate a full docs build run locally without pushing to the web.
-# this can help identify uncaught issues when running `make docs-serve` only.
-.PHONY: docs-local             # run all steps as drone would do it (1, 2, 3)
-docs-local:
-	@$(MAKE) --no-print-directory docs-generate
-	@$(MAKE) --no-print-directory docs-copy
-	@$(MAKE) --no-print-directory docs-build 
-
-# prepare a link from the root to the hugo folder because the image requires it
-# note that on local building, the referenced container of inside the hugo/makefile is used
-.PHONY: docs-hugo-drone-prep   # only used for drone !
-docs-hugo-drone-prep:
-	@$(MAKE) --no-print-directory -C docs docs-hugo-drone-prep
 
 .PHONY: check-env-var-annotations
 check-env-var-annotations:
