@@ -87,6 +87,7 @@ func Local(cfg *config.Config) map[string]interface{} {
 // Posix is the config mapping for the Posix storage driver
 func Posix(cfg *config.Config, enableFSWatch bool) map[string]interface{} {
 	return map[string]interface{}{
+		"mount_id":                   cfg.MountID,
 		"root":                       cfg.Drivers.Posix.Root,
 		"personalspacepath_template": cfg.Drivers.Posix.PersonalSpacePathTemplate,
 		"generalspacepath_template":  cfg.Drivers.Posix.GeneralSpacePathTemplate,
@@ -125,6 +126,67 @@ func Posix(cfg *config.Config, enableFSWatch bool) map[string]interface{} {
 		"watch_type":                 cfg.Drivers.Posix.WatchType,
 		"watch_path":                 cfg.Drivers.Posix.WatchPath,
 		"watch_folder_kafka_brokers": cfg.Drivers.Posix.WatchFolderKafkaBrokers,
+		"events": map[string]interface{}{
+			"numconsumers":   cfg.Events.NumConsumers,
+			"consumer_group": cfg.Events.ConsumerGroup,
+		},
+		"tokens": map[string]interface{}{
+			"transfer_shared_secret": cfg.Commons.TransferSecret,
+			"transfer_expires":       cfg.TransferExpires,
+			"download_endpoint":      cfg.DataServerURL,
+			"datagateway_endpoint":   cfg.DataGatewayURL,
+		},
+	}
+}
+
+// PosixNoEvents is the config mapping for the posix storage driver emitting no events
+func PosixNoEvents(cfg *config.Config, enableFSWatch bool) map[string]interface{} {
+	return map[string]interface{}{
+		"mount_id":                   cfg.MountID,
+		"root":                       cfg.Drivers.Posix.Root,
+		"personalspacepath_template": cfg.Drivers.Posix.PersonalSpacePathTemplate,
+		"generalspacepath_template":  cfg.Drivers.Posix.GeneralSpacePathTemplate,
+		"permissionssvc":             cfg.Drivers.Posix.PermissionsEndpoint,
+		"permissionssvc_tls_mode":    cfg.Commons.GRPCClientTLS.Mode,
+		"treetime_accounting":        true,
+		"treesize_accounting":        true,
+		"asyncfileuploads":           cfg.Drivers.Posix.AsyncUploads,
+		"scan_debounce_delay":        cfg.Drivers.Posix.ScanDebounceDelay,
+		"idcache": map[string]interface{}{
+			"cache_store":               cfg.IDCache.Store,
+			"cache_nodes":               cfg.IDCache.Nodes,
+			"cache_database":            cfg.IDCache.Database,
+			"cache_ttl":                 cfg.IDCache.TTL,
+			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
+			"cache_auth_username":           cfg.IDCache.AuthUsername,
+			"cache_auth_password":           cfg.IDCache.AuthPassword,
+			"cache_enable_tls":              cfg.IDCache.EnableTLS,
+			"cache_tls_insecure":            cfg.IDCache.TLSInsecure,
+			"cache_tls_root_ca_certificate": cfg.IDCache.TLSRootCACertificate,
+		},
+		"filemetadatacache": map[string]interface{}{
+			"cache_store":               cfg.FilemetadataCache.Store,
+			"cache_nodes":               cfg.FilemetadataCache.Nodes,
+			"cache_database":            cfg.FilemetadataCache.Database,
+			"cache_ttl":                 cfg.FilemetadataCache.TTL,
+			"cache_disable_persistence": cfg.FilemetadataCache.DisablePersistence,
+			"cache_auth_username":           cfg.FilemetadataCache.AuthUsername,
+			"cache_auth_password":           cfg.FilemetadataCache.AuthPassword,
+			"cache_enable_tls":              cfg.FilemetadataCache.EnableTLS,
+			"cache_tls_insecure":            cfg.FilemetadataCache.TLSInsecure,
+			"cache_tls_root_ca_certificate": cfg.FilemetadataCache.TLSRootCACertificate,
+		},
+		"use_space_groups":           cfg.Drivers.Posix.UseSpaceGroups,
+		"watch_fs":                   enableFSWatch,
+		"watch_type":                 cfg.Drivers.Posix.WatchType,
+		"watch_path":                 cfg.Drivers.Posix.WatchPath,
+		"watch_folder_kafka_brokers": cfg.Drivers.Posix.WatchFolderKafkaBrokers,
+		"tokens": map[string]interface{}{
+			"transfer_shared_secret": cfg.Commons.TransferSecret,
+			"transfer_expires":       cfg.TransferExpires,
+			"download_endpoint":      cfg.DataServerURL,
+			"datagateway_endpoint":   cfg.DataGatewayURL,
+		},
 	}
 }
 
