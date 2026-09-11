@@ -1,7 +1,0 @@
-Deprecated between Version {{ .StartVersion }} and {{ .EndVersion }}.
-
-| Variable | Description | Deprecation Info |
-| --- | --- |
-{{- range $key, $value := .DeltaFields}}
-| {{$value.Name}} | {{$value.Description}} | {{$value.DeprecationInfo}} |
-{{- end}}
