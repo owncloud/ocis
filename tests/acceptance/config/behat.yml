@@ -498,6 +498,10 @@ default:
         - CapabilitiesContext:
         - SearchContext:
         - TagContext:
+        - GraphContext:
+        - SpacesContext:
+        - SharingNgContext:
+        - OCSContext:
 
     cliCommands:
       paths:

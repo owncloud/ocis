@@ -271,12 +271,22 @@ class GraphContext implements Context {
 		?string $user = null,
 	): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($user);
+		$requestUser = $credentials["username"];
+		$requestPass = $credentials["password"];
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$access_token = $this->featureContext->getOcisUserToken($requestUser)["token"]["accessToken"];
+			$headers['Authorization'] = 'Bearer ' . $access_token;
+			$requestUser = null;
+			$requestPass = null;
+		}
 
 		return GraphHelper::deleteGroup(
 			$this->featureContext->getBaseUrl(),
-			$credentials["username"],
-			$credentials["password"],
+			$requestUser,
+			$requestPass,
 			$groupId,
+			$headers,
 		);
 	}
 
@@ -756,12 +766,22 @@ class GraphContext implements Context {
 		} else {
 			$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
 		}
+		$requestUser = $credentials['username'];
+		$requestPass = $credentials['password'];
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$access_token = $this->featureContext->getOcisUserToken($requestUser)["token"]["accessToken"];
+			$headers['Authorization'] = 'Bearer ' . $access_token;
+			$requestUser = null;
+			$requestPass = null;
+		}
 		return GraphHelper::addUserToGroup(
 			$this->featureContext->getBaseUrl(),
-			$credentials['username'],
-			$credentials['password'],
+			$requestUser,
+			$requestPass,
 			$userId,
 			$groupId,
+			$headers,
 		);
 	}
 
@@ -873,12 +893,22 @@ class GraphContext implements Context {
 	 */
 	public function createGroup(string $group, ?string $user = null): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($user);
+		$requestUser = $credentials["username"];
+		$requestPass = $credentials["password"];
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$access_token = $this->featureContext->getOcisUserToken($requestUser)["token"]["accessToken"];
+			$headers['Authorization'] = 'Bearer ' . $access_token;
+			$requestUser = null;
+			$requestPass = null;
+		}
 
 		return GraphHelper::createGroup(
 			$this->featureContext->getBaseUrl(),
-			$credentials["username"],
-			$credentials["password"],
+			$requestUser,
+			$requestPass,
 			$group,
+			$headers,
 		);
 	}
 

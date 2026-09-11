@@ -1140,6 +1140,164 @@ Feature: vault
       | File Editor      |
 
 
+  Scenario Outline: try to send share invitation for a resource in vault to a user without the vault mode permission
+    Given user "Brian" has been created with default attributes
+    And the administrator has assigned the role "User Light" to user "Brian" using the Graph API
+    And user "Alice" has logged in via web UI
+    And user "Brian" has logged in without vault mode
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | <resource>         |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "403"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "accessDenied"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "grantee is not allowed to access vault resources"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource      | permissions-role |
+      | vaultFolder   | Viewer           |
+      | vaultFolder   | Editor           |
+      | vaultFile.txt | Viewer           |
+      | vaultFile.txt | File Editor      |
+
+
+  Scenario: try to send share invitation for a resource in vault to a group
+    Given these groups have been created:
+      | groupname   |
+      | vault-group |
+    And user "Brian" has been created with default attributes
+    And user "Brian" has logged in without vault mode
+    And user "Brian" has been added to group "vault-group"
+    And user "Alice" has logged in via web UI
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | vaultFile.txt |
+      | space           | Personal      |
+      | sharee          | vault-group   |
+      | shareType       | group         |
+      | permissionsRole | Viewer        |
+      | storage         | vault         |
+    Then the HTTP status code should be "403"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "message"],
+            "properties": {
+              "code": {
+                "const": "accessDenied"
+              },
+              "message": {
+                "const": "grantee is not allowed to access vault resources"
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario Outline: try to send share invitation for a project space in vault to a user without the vault mode permission (permissions endpoint)
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "User Light" to user "Brian" using the Graph API
+    And user "Alice" has logged in via web UI
+    And user "Brian" has logged in without vault mode
+    And user "Alice" has created a space "vault-space" in vault with the default quota using the Graph API
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
+      | space           | vault-space        |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "403"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "message"],
+            "properties": {
+              "code": {
+                "const": "accessDenied"
+              },
+              "message": {
+                "const": "grantee is not allowed to access vault resources"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario Outline: send share invitation for a resource in vault to a user with the vault mode permission
+    Given user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Alice" has logged in via web UI
+    And user "Brian" has logged in via web UI
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | <resource>         |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "200"
+    And user "Brian" should have a share in vault "<resource>" synced
+    And user "Brian" should have the following resource shares:
+      | resource   | permissionsRole    | sharer | space    | storage |
+      | <resource> | <permissions-role> | Alice  | Personal | vault   |
+    Examples:
+      | resource      | permissions-role |
+      | vaultFolder   | Viewer           |
+      | vaultFile.txt | Viewer           |
+
+
   Scenario Outline: users with role Admin or Space Admin should have access to vault
     Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When user "Alice" gets the permissions list using the settings API

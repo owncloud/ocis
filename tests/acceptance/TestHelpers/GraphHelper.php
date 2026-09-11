@@ -551,18 +551,20 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $adminUser
-	 * @param string $adminPassword
+	 * @param string|null $adminUser
+	 * @param string|null $adminPassword
 	 * @param string $groupName
+	 * @param array $headers
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function createGroup(
 		string $baseUrl,
-		string $adminUser,
-		string $adminPassword,
+		?string $adminUser,
+		?string $adminPassword,
 		string $groupName,
+		array $headers = [],
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups');
 		$payload['displayName'] = $groupName;
@@ -571,7 +573,7 @@ class GraphHelper {
 			"POST",
 			$adminUser,
 			$adminPassword,
-			self::getRequestHeaders(),
+			array_merge(self::getRequestHeaders(), $headers),
 			\json_encode($payload),
 		);
 	}
@@ -698,24 +700,27 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $adminUser
-	 * @param string $adminPassword
+	 * @param string|null $adminUser
+	 * @param string|null $adminPassword
 	 * @param string $groupId
+	 * @param array $headers
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function deleteGroup(
 		string $baseUrl,
-		string $adminUser,
-		string $adminPassword,
+		?string $adminUser,
+		?string $adminPassword,
 		string $groupId,
+		array $headers = [],
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId);
 		return HttpRequestHelper::delete(
 			$url,
 			$adminUser,
 			$adminPassword,
+			$headers,
 		);
 	}
 
@@ -755,20 +760,22 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $adminUser
-	 * @param string $adminPassword
+	 * @param string|null $adminUser
+	 * @param string|null $adminPassword
 	 * @param string $userId
 	 * @param string $groupId
+	 * @param array $headers
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function addUserToGroup(
 		string $baseUrl,
-		string $adminUser,
-		string $adminPassword,
+		?string $adminUser,
+		?string $adminPassword,
 		string $userId,
 		string $groupId,
+		array $headers = [],
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId . '/members/$ref');
 		$body = [
@@ -778,7 +785,7 @@ class GraphHelper {
 			$url,
 			$adminUser,
 			$adminPassword,
-			self::getRequestHeaders(),
+			array_merge(self::getRequestHeaders(), $headers),
 			\json_encode($body),
 		);
 	}
