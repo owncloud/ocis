@@ -1,27 +1,41 @@
+
 # Hashes
 
 Hashes of the file\'s binary content, if available. Read-only.
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**crc32Hash** | **string** | The CRC32 value of the file (if available). Read-only. | [optional] [default to undefined]
-**quickXorHash** | **string** | A proprietary hash of the file that can be used to determine if the contents of the file have changed (if available). Read-only. | [optional] [default to undefined]
-**sha1Hash** | **string** | SHA1 hash for the contents of the file (if available). Read-only. | [optional] [default to undefined]
-**sha256Hash** | **string** | SHA256 hash for the contents of the file (if available). Read-only. | [optional] [default to undefined]
+Name | Type
+------------ | -------------
+`crc32Hash` | string
+`quickXorHash` | string
+`sha1Hash` | string
+`sha256Hash` | string
 
 ## Example
 
 ```typescript
-import { Hashes } from './api';
+import type { Hashes } from ''
 
-const instance: Hashes = {
-    crc32Hash,
-    quickXorHash,
-    sha1Hash,
-    sha256Hash,
-};
+// TODO: Update the object below with actual values
+const example = {
+  "crc32Hash": null,
+  "quickXorHash": null,
+  "sha1Hash": null,
+  "sha256Hash": null,
+} satisfies Hashes
+
+console.log(example)
+
+// Convert the instance to a JSON string
+const exampleJSON: string = JSON.stringify(example)
+console.log(exampleJSON)
+
+// Parse the JSON string back to an object
+const exampleParsed = JSON.parse(exampleJSON) as Hashes
+console.log(exampleParsed)
 ```
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+

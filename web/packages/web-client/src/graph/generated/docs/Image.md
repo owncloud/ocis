@@ -1,23 +1,37 @@
+
 # Image
 
 Image metadata, if the item is an image. Read-only.
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**height** | **number** | Optional. Height of the image, in pixels. Read-only. | [optional] [readonly] [default to undefined]
-**width** | **number** | Optional. Width of the image, in pixels. Read-only. | [optional] [readonly] [default to undefined]
+Name | Type
+------------ | -------------
+`height` | number
+`width` | number
 
 ## Example
 
 ```typescript
-import { Image } from './api';
+import type { Image } from ''
 
-const instance: Image = {
-    height,
-    width,
-};
+// TODO: Update the object below with actual values
+const example = {
+  "height": null,
+  "width": null,
+} satisfies Image
+
+console.log(example)
+
+// Convert the instance to a JSON string
+const exampleJSON: string = JSON.stringify(example)
+console.log(exampleJSON)
+
+// Parse the JSON string back to an object
+const exampleParsed = JSON.parse(exampleJSON) as Image
+console.log(exampleParsed)
 ```
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+

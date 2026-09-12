@@ -1,27 +1,41 @@
+
 # EducationSchool
 
 Represents a school
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**id** | **string** | The unique identifier for an entity. Read-only. | [optional] [readonly] [default to undefined]
-**displayName** | **string** | The organization name | [optional] [default to undefined]
-**schoolNumber** | **string** | School number | [optional] [default to undefined]
-**terminationDate** | **string** | Date and time at which the service for this organization is scheduled to be terminated | [optional] [default to undefined]
+Name | Type
+------------ | -------------
+`id` | string
+`displayName` | string
+`schoolNumber` | string
+`terminationDate` | string
 
 ## Example
 
 ```typescript
-import { EducationSchool } from './api';
+import type { EducationSchool } from ''
 
-const instance: EducationSchool = {
-    id,
-    displayName,
-    schoolNumber,
-    terminationDate,
-};
+// TODO: Update the object below with actual values
+const example = {
+  "id": null,
+  "displayName": null,
+  "schoolNumber": null,
+  "terminationDate": null,
+} satisfies EducationSchool
+
+console.log(example)
+
+// Convert the instance to a JSON string
+const exampleJSON: string = JSON.stringify(example)
+console.log(exampleJSON)
+
+// Parse the JSON string back to an object
+const exampleParsed = JSON.parse(exampleJSON) as EducationSchool
+console.log(exampleParsed)
 ```
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+

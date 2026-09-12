@@ -1,10 +1,10 @@
-import { AxiosInstance } from 'axios'
+import { FetchClient } from '../http'
 import { urlJoin } from '../utils'
 import convert from 'xml-js'
 import { pbkdf2Sync } from 'crypto'
 
 export interface UrlSignOptions {
-  axiosClient: AxiosInstance
+  httpClient: FetchClient
   baseURI: string
 }
 
@@ -16,7 +16,7 @@ export type SignUrlPayload = {
 }
 
 export class UrlSign {
-  private axiosClient: AxiosInstance
+  private httpClient: FetchClient
   private baseURI: string
 
   private signingKey: string
@@ -26,8 +26,8 @@ export class UrlSign {
   private HASH_LENGTH = 32
   private ITERATION_COUNT = 10000
 
-  constructor({ axiosClient, baseURI }: UrlSignOptions) {
-    this.axiosClient = axiosClient
+  constructor({ httpClient, baseURI }: UrlSignOptions) {
+    this.httpClient = httpClient
     this.baseURI = baseURI
   }
 
@@ -55,9 +55,11 @@ export class UrlSign {
       return this.signingKey
     }
 
-    const data = await this.axiosClient.get(
+    const data = await this.httpClient.request<string>(
       urlJoin(this.baseURI, 'ocs/v2.php/cloud/user/signing-key'),
       {
+        // the endpoint answers XML, so take the body verbatim instead of parsing it as JSON
+        responseType: 'text',
         params: {
           ...(publicToken && { 'public-token': publicToken })
         },

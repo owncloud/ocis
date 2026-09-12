@@ -72,8 +72,8 @@ const onConfirm = async () => {
     showMessage({ title: $gettext('Link was updated successfully') })
   } catch (e) {
     // Human-readable error message is provided, for example when password is on banned list
-    if (e.response?.status === 400) {
-      const errorMsg = e.response.data.error.message
+    if (e.statusCode === 400) {
+      const errorMsg = (e.data as any).error.message
       errorMessage.value = $gettext(upperFirst(errorMsg))
       return Promise.reject()
     }

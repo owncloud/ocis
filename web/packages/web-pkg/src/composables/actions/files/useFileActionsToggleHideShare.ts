@@ -34,7 +34,7 @@ export const useFileActionsToggleHideShare = () => {
             await clientService.graphAuthenticated.driveItems.updateDriveItem(
               resource.driveId,
               resource.id,
-              { '@UI.Hidden': hidden }
+              { atUIHidden: hidden }
             )
 
             updateResourceField<IncomingShareResource>({

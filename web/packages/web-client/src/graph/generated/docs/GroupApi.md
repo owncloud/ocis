@@ -2,51 +2,71 @@
 
 All URIs are relative to *https://ocis.ocis.rolling.owncloud.works/graph*
 
-|Method | HTTP request | Description|
+| Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-|[**addMember**](#addmember) | **POST** /v1.0/groups/{group-id}/members/$ref | Add a member to a group|
-|[**deleteGroup**](#deletegroup) | **DELETE** /v1.0/groups/{group-id} | Delete entity from groups|
-|[**deleteMember**](#deletemember) | **DELETE** /v1.0/groups/{group-id}/members/{directory-object-id}/$ref | Delete member from a group|
-|[**getGroup**](#getgroup) | **GET** /v1.0/groups/{group-id} | Get entity from groups by key|
-|[**listMembers**](#listmembers) | **GET** /v1.0/groups/{group-id}/members | Get a list of the group\&#39;s direct members|
-|[**updateGroup**](#updategroup) | **PATCH** /v1.0/groups/{group-id} | Update entity in groups|
+| [**addMember**](GroupApi.md#addmember) | **POST** /v1.0/groups/{group-id}/members/$ref | Add a member to a group |
+| [**deleteGroup**](GroupApi.md#deletegroup) | **DELETE** /v1.0/groups/{group-id} | Delete entity from groups |
+| [**deleteMember**](GroupApi.md#deletemember) | **DELETE** /v1.0/groups/{group-id}/members/{directory-object-id}/$ref | Delete member from a group |
+| [**getGroup**](GroupApi.md#getgroup) | **GET** /v1.0/groups/{group-id} | Get entity from groups by key |
+| [**listMembers**](GroupApi.md#listmembers) | **GET** /v1.0/groups/{group-id}/members | Get a list of the group\&#39;s direct members |
+| [**updateGroup**](GroupApi.md#updategroup) | **PATCH** /v1.0/groups/{group-id} | Update entity in groups |
 
-# **addMember**
-> addMember(memberReference)
 
+
+## addMember
+
+> addMember(groupId, memberReference)
+
+Add a member to a group
 
 ### Example
 
-```typescript
+```ts
 import {
-    GroupApi,
-    Configuration,
-    MemberReference
-} from './api';
+  Configuration,
+  GroupApi,
+} from '';
+import type { AddMemberRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new GroupApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new GroupApi(config);
 
-let groupId: string; //key: id of group (default to undefined)
-let memberReference: MemberReference; //Object to be added as member
+  const body = {
+    // string | key: id of group
+    groupId: groupId_example,
+    // MemberReference | Object to be added as member
+    memberReference: ...,
+  } satisfies AddMemberRequest;
 
-const { status, data } = await apiInstance.addMember(
-    groupId,
-    memberReference
-);
+  try {
+    const data = await api.addMember(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **memberReference** | **MemberReference**| Object to be added as member | |
-| **groupId** | [**string**] | key: id of group | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` | key: id of group | [Defaults to `undefined`] |
+| **memberReference** | [MemberReference](MemberReference.md) | Object to be added as member | |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -54,53 +74,73 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**204** | Success |  -  |
-|**0** | error |  -  |
+| **204** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **deleteGroup**
-> deleteGroup()
 
+## deleteGroup
+
+> deleteGroup(groupId, ifMatch)
+
+Delete entity from groups
 
 ### Example
 
-```typescript
+```ts
 import {
-    GroupApi,
-    Configuration
-} from './api';
+  Configuration,
+  GroupApi,
+} from '';
+import type { DeleteGroupRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new GroupApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new GroupApi(config);
 
-let groupId: string; //key: id of group (default to undefined)
-let ifMatch: string; //ETag (optional) (default to undefined)
+  const body = {
+    // string | key: id of group
+    groupId: groupId_example,
+    // string | ETag (optional)
+    ifMatch: ifMatch_example,
+  } satisfies DeleteGroupRequest;
 
-const { status, data } = await apiInstance.deleteGroup(
-    groupId,
-    ifMatch
-);
+  try {
+    const data = await api.deleteGroup(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **groupId** | [**string**] | key: id of group | defaults to undefined|
-| **ifMatch** | [**string**] | ETag | (optional) defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` | key: id of group | [Defaults to `undefined`] |
+| **ifMatch** | `string` | ETag | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -108,56 +148,76 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**204** | Success |  -  |
-|**0** | error |  -  |
+| **204** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **deleteMember**
-> deleteMember()
 
+## deleteMember
+
+> deleteMember(groupId, directoryObjectId, ifMatch)
+
+Delete member from a group
 
 ### Example
 
-```typescript
+```ts
 import {
-    GroupApi,
-    Configuration
-} from './api';
+  Configuration,
+  GroupApi,
+} from '';
+import type { DeleteMemberRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new GroupApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new GroupApi(config);
 
-let groupId: string; //key: id of group (default to undefined)
-let directoryObjectId: string; //key: id of group member to remove (default to undefined)
-let ifMatch: string; //ETag (optional) (default to undefined)
+  const body = {
+    // string | key: id of group
+    groupId: groupId_example,
+    // string | key: id of group member to remove
+    directoryObjectId: directoryObjectId_example,
+    // string | ETag (optional)
+    ifMatch: ifMatch_example,
+  } satisfies DeleteMemberRequest;
 
-const { status, data } = await apiInstance.deleteMember(
-    groupId,
-    directoryObjectId,
-    ifMatch
-);
+  try {
+    const data = await api.deleteMember(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **groupId** | [**string**] | key: id of group | defaults to undefined|
-| **directoryObjectId** | [**string**] | key: id of group member to remove | defaults to undefined|
-| **ifMatch** | [**string**] | ETag | (optional) defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` | key: id of group | [Defaults to `undefined`] |
+| **directoryObjectId** | `string` | key: id of group member to remove | [Defaults to `undefined`] |
+| **ifMatch** | `string` | ETag | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -165,56 +225,76 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**204** | Success |  -  |
-|**0** | error |  -  |
+| **204** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **getGroup**
-> Group getGroup()
 
+## getGroup
+
+> Group getGroup(groupId, $select, $expand)
+
+Get entity from groups by key
 
 ### Example
 
-```typescript
+```ts
 import {
-    GroupApi,
-    Configuration
-} from './api';
+  Configuration,
+  GroupApi,
+} from '';
+import type { GetGroupRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new GroupApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new GroupApi(config);
 
-let groupId: string; //key: id or name of group (default to undefined)
-let $select: Set<'id' | 'description' | 'displayName' | 'members'>; //Select properties to be returned (optional) (default to undefined)
-let $expand: Set<'members'>; //Expand related entities (optional) (default to undefined)
+  const body = {
+    // string | key: id or name of group
+    groupId: groupId_example,
+    // Set<'id' | 'description' | 'displayName' | 'members'> | Select properties to be returned (optional)
+    $select: ...,
+    // Set<'members'> | Expand related entities (optional)
+    $expand: ...,
+  } satisfies GetGroupRequest;
 
-const { status, data } = await apiInstance.getGroup(
-    groupId,
-    $select,
-    $expand
-);
+  try {
+    const data = await api.getGroup(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **groupId** | [**string**] | key: id or name of group | defaults to undefined|
-| **$select** | **Array<&#39;id&#39; &#124; &#39;description&#39; &#124; &#39;displayName&#39; &#124; &#39;members&#39;>** | Select properties to be returned | (optional) defaults to undefined|
-| **$expand** | **Array<&#39;members&#39;>** | Expand related entities | (optional) defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` | key: id or name of group | [Defaults to `undefined`] |
+| **$select** | `id`, `description`, `displayName`, `members` | Select properties to be returned | [Optional] [Enum: id, description, displayName, members] |
+| **$expand** | `members` | Expand related entities | [Optional] [Enum: members] |
 
 ### Return type
 
-**Group**
+[**Group**](Group.md)
 
 ### Authorization
 
@@ -222,50 +302,70 @@ const { status, data } = await apiInstance.getGroup(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Retrieved entity |  -  |
-|**0** | error |  -  |
+| **200** | Retrieved entity |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **listMembers**
-> CollectionOfUsers listMembers()
 
+## listMembers
+
+> CollectionOfUsers listMembers(groupId)
+
+Get a list of the group\&#39;s direct members
 
 ### Example
 
-```typescript
+```ts
 import {
-    GroupApi,
-    Configuration
-} from './api';
+  Configuration,
+  GroupApi,
+} from '';
+import type { ListMembersRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new GroupApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new GroupApi(config);
 
-let groupId: string; //key: id or name of group (default to undefined)
+  const body = {
+    // string | key: id or name of group
+    groupId: 86948e45-96a6-43df-b83d-46e92afd30de,
+  } satisfies ListMembersRequest;
 
-const { status, data } = await apiInstance.listMembers(
-    groupId
-);
+  try {
+    const data = await api.listMembers(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **groupId** | [**string**] | key: id or name of group | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` | key: id or name of group | [Defaults to `undefined`] |
 
 ### Return type
 
-**CollectionOfUsers**
+[**CollectionOfUsers**](CollectionOfUsers.md)
 
 ### Authorization
 
@@ -273,54 +373,73 @@ const { status, data } = await apiInstance.listMembers(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Retrieved group members |  -  |
-|**0** | error |  -  |
+| **200** | Retrieved group members |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **updateGroup**
-> updateGroup(group)
 
+## updateGroup
+
+> updateGroup(groupId, group)
+
+Update entity in groups
 
 ### Example
 
-```typescript
+```ts
 import {
-    GroupApi,
-    Configuration,
-    Group
-} from './api';
+  Configuration,
+  GroupApi,
+} from '';
+import type { UpdateGroupRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new GroupApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new GroupApi(config);
 
-let groupId: string; //key: id of group (default to undefined)
-let group: Group; //New property values
+  const body = {
+    // string | key: id of group
+    groupId: groupId_example,
+    // Group | New property values
+    group: {"displayName":"GroupName"},
+  } satisfies UpdateGroupRequest;
 
-const { status, data } = await apiInstance.updateGroup(
-    groupId,
-    group
-);
+  try {
+    const data = await api.updateGroup(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **group** | **Group**| New property values | |
-| **groupId** | [**string**] | key: id of group | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` | key: id of group | [Defaults to `undefined`] |
+| **group** | [Group](Group.md) | New property values | |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -328,15 +447,15 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**204** | Success |  -  |
-|**0** | error |  -  |
+| **204** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

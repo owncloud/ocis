@@ -1,39 +1,19 @@
 import { ClientService, useAuthStore, useConfigStore } from '../../../src/'
 import { Language } from 'vue3-gettext'
 import { createTestingPinia, writable } from '@ownclouders/web-test-helpers'
-import { AxiosError, AxiosResponse } from 'axios'
-import { shouldResponseTriggerMaintenance } from '@ownclouders/web-client'
-import { mock } from 'vitest-mock-extended'
+import type { OnResponseArgs } from '@ownclouders/web-client'
 
+/**
+ * `shouldResponseTriggerMaintenance` is deliberately left unmocked: the decision it encodes
+ * — which statuses and which endpoints count — is the thing under test here, and stubbing it
+ * would only assert that one function calls another.
+ */
 vi.mock('@ownclouders/web-client', async (importOriginal) => ({
   ...(await importOriginal<any>()),
   graph: vi.fn(),
   ocs: vi.fn(),
-  webdav: vi.fn(),
-  shouldResponseTriggerMaintenance: vi.fn()
+  webdav: vi.fn()
 }))
-
-let responseSuccessInterceptorFn: (response: AxiosResponse) => AxiosResponse
-let responseErrorInterceptorFn: (error: AxiosError) => Promise<AxiosError>
-
-vi.mock('axios', () => {
-  return {
-    default: {
-      create: vi.fn().mockReturnValue({
-        interceptors: {
-          response: {
-            use: vi.fn().mockImplementation((successFn, errorFn) => {
-              responseSuccessInterceptorFn = successFn
-              responseErrorInterceptorFn = errorFn
-            })
-          },
-          request: { use: vi.fn() }
-        }
-      }),
-      CancelToken: { source: vi.fn() }
-    }
-  }
-})
 
 describe('ClientService maintenance mode', () => {
   const language = { current: 'en' }
@@ -41,71 +21,81 @@ describe('ClientService maintenance mode', () => {
 
   let configStore: ReturnType<typeof useConfigStore>
   let authStore: ReturnType<typeof useAuthStore>
+  let service: ClientService
+  let onResponse: (args: OnResponseArgs) => void
 
   beforeEach(() => {
     createTestingPinia({ initialState: { auth: { accessToken: 'token' } } })
-
-    vi.mocked(shouldResponseTriggerMaintenance).mockReset()
+    vi.stubGlobal('fetch', vi.fn())
 
     authStore = useAuthStore()
     configStore = useConfigStore()
     writable(configStore).serverUrl = serverUrl
     configStore.setMaintenanceMode = vi.fn()
 
-    new ClientService({
+    service = new ClientService({
       configStore,
       language: language as Language,
       authStore
     })
+
+    onResponse = service.handleResponse.bind(service)
   })
 
-  describe('handling axios responses', () => {
-    it('should turn off maintenance mode for successful responses', () => {
-      const response = mock<AxiosResponse>({
-        status: 200,
-        data: { some: 'data' }
-      })
-
-      responseSuccessInterceptorFn(response)
-      expect(configStore.setMaintenanceMode).toHaveBeenCalledWith(false)
+  it('clears maintenance mode and records the time for a successful response', () => {
+    onResponse({
+      response: new Response('{}', { status: 200 }),
+      status: 200,
+      requestUrl: 'some/url'
     })
 
-    it('should not turn off maintenance mode for 503 responses', () => {
-      const response = mock<AxiosResponse>({
-        status: 503,
-        data: { error: 'Service Unavailable' }
-      })
-
-      responseSuccessInterceptorFn(response)
-      expect(configStore.setMaintenanceMode).not.toHaveBeenCalledWith(false)
-    })
+    expect(configStore.setMaintenanceMode).toHaveBeenCalledWith(false)
+    expect(service.lastSuccessfulRequestTime).not.toBeNull()
   })
 
-  describe('handling axios errors', () => {
-    it('should turn on maintenance mode when shouldResponseTriggerMaintenance returns true', () => {
-      vi.mocked(shouldResponseTriggerMaintenance).mockReturnValue(true)
-
-      const error = mock<AxiosError>({
-        response: { status: 503 },
-        config: { url: 'some/url' }
-      })
-
-      expect(responseErrorInterceptorFn(error)).rejects.toEqual(error)
-      expect(shouldResponseTriggerMaintenance).toHaveBeenCalledWith(503, 'some/url')
-      expect(configStore.setMaintenanceMode).toHaveBeenCalledWith(true)
+  it('sets maintenance mode for a 503', () => {
+    onResponse({
+      response: new Response('{}', { status: 503 }),
+      status: 503,
+      requestUrl: 'some/url'
     })
 
-    it('should not turn on maintenance mode when shouldResponseTriggerMaintenance returns false', () => {
-      vi.mocked(shouldResponseTriggerMaintenance).mockReturnValue(false)
+    expect(configStore.setMaintenanceMode).toHaveBeenCalledWith(true)
+  })
 
-      const error = mock<AxiosError>({
-        response: { status: 404 },
-        config: { url: 'some/url' }
-      })
-
-      expect(responseErrorInterceptorFn(error)).rejects.toEqual(error)
-      expect(shouldResponseTriggerMaintenance).toHaveBeenCalledWith(404, 'some/url')
-      expect(configStore.setMaintenanceMode).not.toHaveBeenCalled()
+  it('leaves maintenance state untouched for a 404', () => {
+    onResponse({
+      response: new Response('{}', { status: 404 }),
+      status: 404,
+      requestUrl: 'some/url'
     })
+
+    expect(configStore.setMaintenanceMode).not.toHaveBeenCalled()
+  })
+
+  /**
+   * A transport failure has no response to read a status off, so it is reported as 500. As on
+   * master — where the axios error interceptor fell back to `error.response?.status || 500` —
+   * that is not a maintenance signal, so the flag is left alone rather than cleared.
+   */
+  it('leaves maintenance state untouched for a transport failure', () => {
+    onResponse({ response: null, status: 500, requestUrl: 'some/url' })
+
+    expect(configStore.setMaintenanceMode).not.toHaveBeenCalled()
+  })
+
+  /**
+   * The allow-list is matched against the relative request url, which is why `onResponse`
+   * reports the caller's url rather than `response.url`. The notifications SSE endpoint
+   * answers 503 by design and must not raise the banner.
+   */
+  it('exempts an allow-listed endpoint from a 503', () => {
+    onResponse({
+      response: new Response('{}', { status: 503 }),
+      status: 503,
+      requestUrl: 'ocs/v2.php/apps/notifications/api/v1/notifications/sse'
+    })
+
+    expect(configStore.setMaintenanceMode).not.toHaveBeenCalled()
   })
 })

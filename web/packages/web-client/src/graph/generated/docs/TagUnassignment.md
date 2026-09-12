@@ -1,22 +1,36 @@
+
 # TagUnassignment
 
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**resourceId** | **string** |  | [default to undefined]
-**tags** | **Array&lt;string&gt;** |  | [default to undefined]
+Name | Type
+------------ | -------------
+`resourceId` | string
+`tags` | Array&lt;string&gt;
 
 ## Example
 
 ```typescript
-import { TagUnassignment } from './api';
+import type { TagUnassignment } from ''
 
-const instance: TagUnassignment = {
-    resourceId,
-    tags,
-};
+// TODO: Update the object below with actual values
+const example = {
+  "resourceId": null,
+  "tags": null,
+} satisfies TagUnassignment
+
+console.log(example)
+
+// Convert the instance to a JSON string
+const exampleJSON: string = JSON.stringify(example)
+console.log(exampleJSON)
+
+// Parse the JSON string back to an object
+const exampleParsed = JSON.parse(exampleJSON) as TagUnassignment
+console.log(exampleParsed)
 ```
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+

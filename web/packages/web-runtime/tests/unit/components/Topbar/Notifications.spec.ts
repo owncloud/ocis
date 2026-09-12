@@ -1,10 +1,14 @@
 import Notifications from '../../../../src/components/Topbar/Notifications.vue'
 import { Notification } from '../../../../src/helpers/notifications'
 import { mock } from 'vitest-mock-extended'
-import { defaultComponentMocks, defaultPlugins, shallowMount } from '@ownclouders/web-test-helpers'
+import {
+  defaultComponentMocks,
+  defaultPlugins,
+  mockHttpResponse,
+  shallowMount
+} from '@ownclouders/web-test-helpers'
 import { SpaceResource } from '@ownclouders/web-client'
 import { RouterLink, RouteLocationNamedRaw, RouteLocationNormalizedLoaded } from 'vue-router'
-import { AxiosResponse } from 'axios'
 import Avatar from '../../../../src/components/Avatar.vue'
 
 const selectors = {
@@ -321,7 +325,7 @@ function getWrapper({
 } = {}) {
   const localMocks = { ...defaultComponentMocks(), ...mocks }
   localMocks.$clientService.httpAuthenticated.get.mockResolvedValue(
-    mock<AxiosResponse>({ data: { ocs: { data: notifications } }, headers: {} })
+    mockHttpResponse({ ocs: { data: notifications } })
   )
 
   return {

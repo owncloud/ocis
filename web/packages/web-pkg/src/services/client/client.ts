@@ -3,14 +3,14 @@ import { graph, ocs, webdav } from '@ownclouders/web-client'
 import { Graph } from '@ownclouders/web-client/graph'
 import { OCS } from '@ownclouders/web-client/ocs'
 import { AuthParameters } from './auth'
-import axios, { AxiosInstance, AxiosResponse } from 'axios'
+import { FetchClient, type OnResponseArgs } from '@ownclouders/web-client'
 import { v4 as uuidV4 } from 'uuid'
 import { WebDAV } from '@ownclouders/web-client/webdav'
 import { Language } from 'vue3-gettext'
 import { FetchEventSourceInit } from '@microsoft/fetch-event-source'
 import { sse } from '@ownclouders/web-client/sse'
 import { AuthStore, ConfigStore } from '../../composables'
-import { shouldResponseTriggerMaintenance } from '@ownclouders/web-client'
+import { maintenanceResponseHandler } from '@ownclouders/web-client'
 
 const createFetchOptions = (authParams: AuthParameters, language: string): FetchEventSourceInit => {
   return {
@@ -38,7 +38,7 @@ export class ClientService {
   private httpUnAuthenticatedClient: HttpClient
 
   private graphClient: Graph
-  private graphAxiosClient: AxiosInstance
+  private graphHttpClient: FetchClient
   private ocsClient: OCS
   private webDavClient: WebDAV
 
@@ -50,6 +50,11 @@ export class ClientService {
     'X-Requested-With': 'XMLHttpRequest'
   }
 
+  private readonly maintenanceHandler = maintenanceResponseHandler(
+    (value: boolean) => this.configStore.setMaintenanceMode(value),
+    { onSuccess: () => (this.lastSuccessfulRequestTime = Math.floor(Date.now() / 1000)) }
+  )
+
   constructor(options: ClientServiceOptions) {
     this.configStore = options.configStore
     this.language = options.language
@@ -60,19 +65,16 @@ export class ClientService {
     this.initWebDavClient()
 
     this.httpAuthenticatedClient = new HttpClient({
-      config: { baseURL: this.configStore.serverUrl, headers: this.staticHeaders },
-      requestInterceptor: (config) => {
-        Object.assign(config.headers, this.getDynamicHeaders())
-        return config
-      }
+      baseUrl: this.configStore.serverUrl,
+      staticHeaders: this.staticHeaders,
+      headers: () => this.getDynamicHeaders(),
+      onResponse: (args) => this.handleResponse(args)
     })
     this.httpUnAuthenticatedClient = new HttpClient({
-      config: { baseURL: this.configStore.serverUrl, headers: this.staticHeaders },
-      requestInterceptor: (config) => {
-        Object.assign(config.headers, this.getDynamicHeaders({ useAuth: false }))
-        return config
-      },
-      responseInterceptor: [this.#handleAxiosResponse.bind(this), this.#handleAxiosError.bind(this)]
+      baseUrl: this.configStore.serverUrl,
+      staticHeaders: this.staticHeaders,
+      headers: () => this.getDynamicHeaders({ useAuth: false }),
+      onResponse: (args) => this.handleResponse(args)
     })
   }
 
@@ -116,41 +118,31 @@ export class ClientService {
   }
 
   private initGraphClient(isInVault: boolean) {
-    if (!this.graphAxiosClient) {
-      const axiosClient = axios.create({ headers: this.staticHeaders })
-      axiosClient.interceptors.request.use((config) => {
-        Object.assign(config.headers, this.getDynamicHeaders())
-        return config
+    if (!this.graphHttpClient) {
+      this.graphHttpClient = new FetchClient({
+        staticHeaders: this.staticHeaders,
+        headers: () => this.getDynamicHeaders(),
+        onResponse: (args) => this.handleResponse(args)
       })
-      axiosClient.interceptors.response.use(
-        this.#handleAxiosResponse.bind(this),
-        this.#handleAxiosError.bind(this)
-      )
-      this.graphAxiosClient = axiosClient
     }
 
     this.graphClient = graph(
       isInVault ? `${this.configStore.serverUrl}vault` : this.configStore.serverUrl,
-      this.graphAxiosClient
+      this.graphHttpClient
     )
   }
 
   private initOcsClient(isInVault: boolean) {
-    const axiosClient = axios.create({ headers: this.staticHeaders })
-    axiosClient.interceptors.request.use((config) => {
-      Object.assign(config.headers, this.getDynamicHeaders())
-      return config
+    const httpClient = new FetchClient({
+      staticHeaders: this.staticHeaders,
+      headers: () => this.getDynamicHeaders(),
+      onResponse: (args) => this.handleResponse(args)
     })
-
-    axiosClient.interceptors.response.use(
-      this.#handleAxiosResponse.bind(this),
-      this.#handleAxiosError.bind(this)
-    )
 
     const baseUrl = isInVault
       ? `${this.configStore.serverUrl}?vault=true`
       : this.configStore.serverUrl
-    this.ocsClient = ocs(baseUrl, axiosClient)
+    this.ocsClient = ocs(baseUrl, httpClient)
   }
 
   private initWebDavClient() {
@@ -191,21 +183,15 @@ export class ClientService {
     }
   }
 
-  #handleAxiosResponse(response: AxiosResponse<any, any>) {
-    if (response.status !== 503) {
-      this.configStore.setMaintenanceMode(false)
-    }
-
-    this.lastSuccessfulRequestTime = Math.floor(Date.now() / 1000)
-
-    return response
-  }
-
-  #handleAxiosError(error: any) {
-    if (shouldResponseTriggerMaintenance(error.response?.status || 500, error.config.url)) {
-      this.configStore.setMaintenanceMode(true)
-    }
-
-    return Promise.reject(error)
+  /**
+   * Called for every response the client receives. Only a successful response clears
+   * maintenance mode; a non-2xx response can only set it.
+   *
+   * `args.requestUrl` is the caller's URL, not `response.url` — the maintenance
+   * allow-list is matched against relative paths. `args.status` is 500 when the transport
+   * failed and there is no response at all.
+   */
+  public handleResponse(args: OnResponseArgs): void {
+    this.maintenanceHandler(args)
   }
 }

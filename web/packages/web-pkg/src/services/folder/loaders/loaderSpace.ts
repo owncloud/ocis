@@ -154,8 +154,8 @@ export class FolderLoaderSpace implements FolderLoader {
 
     const allPermissions: string[] = []
     permissions.forEach((permission) => {
-      if (permission['@libre.graph.permissions.actions']) {
-        allPermissions.push(...permission['@libre.graph.permissions.actions'])
+      if (permission.atLibreGraphPermissionsActions) {
+        allPermissions.push(...permission.atLibreGraphPermissionsActions)
         return
       }
       const role = sharesStore.graphRoles[permission.roles[0]]

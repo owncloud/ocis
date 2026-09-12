@@ -75,7 +75,7 @@
     }
   },
   "scripts": {
-    "generate-openapi": "rm -rf src/graph/generated && docker run --rm -v \"${PWD}/src/graph:/local\" openapitools/openapi-generator-cli generate -i https://raw.githubusercontent.com/owncloud/libre-graph-api/main/api/openapi-spec/v1.0.yaml  -g typescript-axios -o /local/generated",
+    "generate-openapi": "sh ./scripts/generate-openapi.sh",
     "vite": "vite",
     "prepublishOnly": "rm -rf ./package && clean-publish && rm -rf package/dist/tests && find package && cat package/package.json",
     "postpublish": "rm -rf ./package",
@@ -84,7 +84,6 @@
   "dependencies": {
     "@casl/ability": "^6.8.1",
     "@microsoft/fetch-event-source": "^2.0.1",
-    "axios": "^1.18.1",
     "fast-xml-parser": "^5.8.0",
     "lodash-es": "^4.18.1",
     "luxon": "^3.7.2",

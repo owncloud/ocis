@@ -12,7 +12,7 @@ import { Drive } from '@ownclouders/web-client/graph/generated'
 const spaceMock = mock<Drive>({
   id: '1',
   root: {
-    permissions: [{ '@libre.graph.permissions.actions': [], grantedToV2: { user: { id: '1' } } }]
+    permissions: [{ atLibreGraphPermissionsActions: [], grantedToV2: { user: { id: '1' } } }]
   },
   driveType: 'project',
   special: null

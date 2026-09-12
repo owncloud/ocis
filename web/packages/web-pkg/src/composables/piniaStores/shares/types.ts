@@ -37,7 +37,7 @@ export interface UpdateLinkOptions {
   space: SpaceResource
   resource: Resource
   linkShare: LinkShare
-  options: Omit<DriveItemCreateLink, '@libre.graph.quickLink'>
+  options: Omit<DriveItemCreateLink, 'atLibreGraphQuickLink'>
 }
 
 export interface DeleteLinkOptions {

@@ -1,53 +1,67 @@
+
 # Drive
 
 The drive represents a space on the storage.
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**id** | **string** | The unique identifier for this drive. | [optional] [readonly] [default to undefined]
-**createdBy** | [**IdentitySet**](IdentitySet.md) |  | [optional] [default to undefined]
-**createdDateTime** | **string** | Date and time of item creation. Read-only. | [optional] [readonly] [default to undefined]
-**description** | **string** | Provides a user-visible description of the item. Optional. | [optional] [default to undefined]
-**eTag** | **string** | ETag for the item. Read-only. | [optional] [readonly] [default to undefined]
-**lastModifiedBy** | [**IdentitySet**](IdentitySet.md) |  | [optional] [default to undefined]
-**lastModifiedDateTime** | **string** | Date and time the item was last modified. Read-only. | [optional] [readonly] [default to undefined]
-**name** | **string** | The name of the item. Read-write. | [default to undefined]
-**parentReference** | [**ItemReference**](ItemReference.md) |  | [optional] [default to undefined]
-**webUrl** | **string** | URL that displays the resource in the browser. Read-only. | [optional] [readonly] [default to undefined]
-**driveType** | **string** | Describes the type of drive represented by this resource. Values are \&quot;personal\&quot; for users home spaces, \&quot;project\&quot;, \&quot;virtual\&quot; or \&quot;share\&quot;. Read-only. | [optional] [readonly] [default to undefined]
-**driveAlias** | **string** | The drive alias can be used in clients to make the urls user friendly. Example: \&#39;personal/einstein\&#39;. This will be used to resolve to the correct driveID. | [optional] [default to undefined]
-**owner** | [**IdentitySet**](IdentitySet.md) |  | [optional] [default to undefined]
-**quota** | [**Quota**](Quota.md) |  | [optional] [default to undefined]
-**items** | [**Array&lt;DriveItem&gt;**](DriveItem.md) | All items contained in the drive. Read-only. Nullable. | [optional] [readonly] [default to undefined]
-**root** | [**DriveItem**](DriveItem.md) |  | [optional] [default to undefined]
-**special** | [**Array&lt;DriveItem&gt;**](DriveItem.md) | A collection of special drive resources. | [optional] [default to undefined]
+Name | Type
+------------ | -------------
+`id` | string
+`createdBy` | [IdentitySet](IdentitySet.md)
+`createdDateTime` | string
+`description` | string
+`eTag` | string
+`lastModifiedBy` | [IdentitySet](IdentitySet.md)
+`lastModifiedDateTime` | string
+`name` | string
+`parentReference` | [ItemReference](ItemReference.md)
+`webUrl` | string
+`driveType` | string
+`driveAlias` | string
+`owner` | [IdentitySet](IdentitySet.md)
+`quota` | [Quota](Quota.md)
+`items` | [Array&lt;DriveItem&gt;](DriveItem.md)
+`root` | [DriveItem](DriveItem.md)
+`special` | [Array&lt;DriveItem&gt;](DriveItem.md)
 
 ## Example
 
 ```typescript
-import { Drive } from './api';
+import type { Drive } from ''
 
-const instance: Drive = {
-    id,
-    createdBy,
-    createdDateTime,
-    description,
-    eTag,
-    lastModifiedBy,
-    lastModifiedDateTime,
-    name,
-    parentReference,
-    webUrl,
-    driveType,
-    driveAlias,
-    owner,
-    quota,
-    items,
-    root,
-    special,
-};
+// TODO: Update the object below with actual values
+const example = {
+  "id": null,
+  "createdBy": null,
+  "createdDateTime": null,
+  "description": null,
+  "eTag": null,
+  "lastModifiedBy": null,
+  "lastModifiedDateTime": null,
+  "name": null,
+  "parentReference": null,
+  "webUrl": null,
+  "driveType": null,
+  "driveAlias": null,
+  "owner": null,
+  "quota": null,
+  "items": null,
+  "root": null,
+  "special": null,
+} satisfies Drive
+
+console.log(example)
+
+// Convert the instance to a JSON string
+const exampleJSON: string = JSON.stringify(example)
+console.log(exampleJSON)
+
+// Parse the JSON string back to an object
+const exampleParsed = JSON.parse(exampleJSON) as Drive
+console.log(exampleParsed)
 ```
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
