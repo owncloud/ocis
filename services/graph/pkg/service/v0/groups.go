@@ -99,7 +99,7 @@ func (g Graph) PostGroup(w http.ResponseWriter, r *http.Request) {
 	grp := libregraph.NewGroup()
 	err := StrictJSONUnmarshal(r.Body, grp)
 	if err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not create group: invalid request body")
+		logger.Debug().Err(err).Msg("could not create group: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
 	}
@@ -164,13 +164,13 @@ func (g Graph) PatchGroup(w http.ResponseWriter, r *http.Request) {
 	changes := libregraph.NewGroup()
 	err = StrictJSONUnmarshal(r.Body, changes)
 	if err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not change group: invalid request body")
+		logger.Debug().Err(err).Msg("could not change group: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
 	}
 
 	if reflect.ValueOf(*changes).IsZero() {
-		logger.Debug().Interface("body", r.Body).Msg("ignoring empyt request body")
+		logger.Debug().Msg("ignoring empyt request body")
 		render.Status(r, http.StatusNoContent)
 		render.NoContent(w, r)
 		return
@@ -366,10 +366,7 @@ func (g Graph) PostGroupMember(w http.ResponseWriter, r *http.Request) {
 	memberRef := libregraph.NewMemberReference()
 	err = StrictJSONUnmarshal(r.Body, memberRef)
 	if err != nil {
-		logger.Debug().
-			Err(err).
-			Interface("body", r.Body).
-			Msg("could not add group member: invalid request body")
+		logger.Debug().Err(err).Msg("could not add group member: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
 	}

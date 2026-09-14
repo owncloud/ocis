@@ -52,11 +52,11 @@ func (g Graph) GetEducationUsers(w http.ResponseWriter, r *http.Request) {
 // PostEducationUser implements the Service interface.
 func (g Graph) PostEducationUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Interface("body", r.Body).Msg("calling create education user")
+	logger.Info().Msg("calling create education user")
 	u := libregraph.NewEducationUser()
 	err := StrictJSONUnmarshal(r.Body, u)
 	if err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not create education user: invalid request body")
+		logger.Debug().Err(err).Msg("could not create education user: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %v", err.Error()))
 		return
 	}
@@ -321,7 +321,7 @@ func (g Graph) PatchEducationUser(w http.ResponseWriter, r *http.Request) {
 	changes := libregraph.NewEducationUser()
 	err = StrictJSONUnmarshal(r.Body, changes)
 	if err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update education user: invalid request body")
+		logger.Debug().Err(err).Msg("could not update education user: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
 			fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
