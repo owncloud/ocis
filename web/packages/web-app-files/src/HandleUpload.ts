@@ -237,14 +237,15 @@ export class HandleUpload extends BasePlugin<PluginOpts, OcUppyMeta, OcUppyBody>
         return acc
       }
 
-      matchingMappingRecord.uploadSize = uppyFile.data.size - existingFileSize
+      matchingMappingRecord.uploadSize += uppyFile.data.size - existingFileSize
 
       return acc
     }, [])
 
     const { $gettext } = this.language
     uploadSizeSpaceMapping.forEach(({ space, uploadSize }) => {
-      if (space.spaceQuota.remaining && space.spaceQuota.remaining < uploadSize) {
+      // a full space reports 0, so only an absent remaining means "quota unknown"
+      if (space.spaceQuota.remaining !== undefined && space.spaceQuota.remaining < uploadSize) {
         let spaceName = space.name
 
         if (space.driveType === 'personal') {
