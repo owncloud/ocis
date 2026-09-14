@@ -111,6 +111,6 @@ func (fs *eosfs) PrepareUpload(_ context.Context, _ *provider.Reference, _ strin
 	return &storage.PrepareUploadResult{VersionCreated: info.NodeExisted}, nil
 }
 
-func (fs *eosfs) RollbackUpload(_ context.Context, _ *provider.Reference, _ string, _ bool, _ int64) error {
+func (fs *eosfs) RollbackUpload(_ context.Context, _ *provider.Reference, _ string, _ storage.RollbackInfo) error {
 	return nil
 }
