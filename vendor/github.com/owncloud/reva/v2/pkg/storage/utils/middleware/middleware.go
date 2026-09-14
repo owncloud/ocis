@@ -55,6 +55,11 @@ func (f *FS) ListUploadSessions(ctx context.Context, filter storage.UploadSessio
 	return f.next.(storage.UploadSessionLister).ListUploadSessions(ctx, filter)
 }
 
+// IsOrphaned reports whether the referenced resource exists but its metadata is unreadable.
+func (f *FS) IsOrphaned(ctx context.Context, ref *provider.Reference) bool {
+	return f.next.(storage.OrphanChecker).IsOrphaned(ctx, ref)
+}
+
 // UseIn tells the tus upload middleware which extensions it supports.
 func (f *FS) UseIn(composer *tusd.StoreComposer) {
 	f.next.(storage.ComposableFS).UseIn(composer)
@@ -442,8 +447,8 @@ func (f *FS) PrepareUpload(ctx context.Context, ref *provider.Reference, session
 	return res, err
 }
 
-func (f *FS) RollbackUpload(ctx context.Context, ref *provider.Reference, sessionID string, nodeExisted bool, sizeDiff int64) error {
-	return f.next.RollbackUpload(ctx, ref, sessionID, nodeExisted, sizeDiff)
+func (f *FS) RollbackUpload(ctx context.Context, ref *provider.Reference, sessionID string, info storage.RollbackInfo) error {
+	return f.next.RollbackUpload(ctx, ref, sessionID, info)
 }
 
 func (f *FS) Download(ctx context.Context, ref *provider.Reference, openReaderFunc func(md *provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {

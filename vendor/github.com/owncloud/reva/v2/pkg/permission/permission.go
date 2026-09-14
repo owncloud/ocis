@@ -37,6 +37,8 @@ const (
 	WriteFavorites string = "Favorites.Write"
 	// DeleteReadOnlyPassword is the hardcoded name for the ReadOnlyPublicLinkPassword.Delete permission
 	DeleteReadOnlyPassword string = "ReadOnlyPublicLinkPassword.Delete"
+	// VaultMode is the hardcoded name for the VaultMode.ReadWriteEnabled permission
+	VaultMode string = "VaultMode.ReadWriteEnabled"
 )
 
 // Manager defines the interface for the permission service driver
