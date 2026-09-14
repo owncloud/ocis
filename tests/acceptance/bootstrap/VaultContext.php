@@ -188,6 +188,27 @@ class VaultContext implements Context {
 	}
 
 	/**
+	 * Provisions the user's ocis account without touching the vault mode UI. Use this instead of
+	 * "user :user has logged in via web UI" for users whose role does not grant the vault mode
+	 * permission, e.g. User Light: they have no mode switcher to click, so the web UI login times
+	 * out, but their ocis id is still needed to e.g. resolve them as a sharee.
+	 *
+	 * @Given user :user has logged in without vault mode
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userHasLoggedInWithoutVaultMode(string $user): void {
+		if (!KeycloakHelper::isTestingWithKeycloak()) {
+			return;
+		}
+		$this->authenticateKeycloakUserIfNeeded($user);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" gets the permissions list using the settings API$/
 	 *
 	 * @param string $user

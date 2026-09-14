@@ -113,6 +113,70 @@ describe('InviteCollaboratorForm', () => {
       expect(wrapper.vm.autocompleteResults.length).toBe(1)
     })
   })
+  describe('fetching recipients for a vault resource', () => {
+    const vaultStorageProvider = '1a01c2c4-4309-4483-a845-842fd56d8622'
+    const vaultCapabilities = {
+      files_sharing: { federation: { incoming: true, outgoing: true } },
+      vault: { enabled: true, vault_storage_provider: vaultStorageProvider }
+    }
+
+    it('only asks for users that may access the vault, and for no groups at all', async () => {
+      const { wrapper, mocks } = getWrapper({
+        capabilities: vaultCapabilities,
+        resource: mock<Resource>({ ...folderMock, storageId: vaultStorageProvider })
+      })
+      await wrapper.vm.fetchRecipientsTask.last
+
+      expect(mocks.$clientService.graphAuthenticated.users.listUsers).toHaveBeenCalledWith(
+        expect.objectContaining({ filter: 'vaultEligible eq true' }),
+        expect.anything()
+      )
+      expect(mocks.$clientService.graphAuthenticated.groups.listGroups).not.toHaveBeenCalled()
+    })
+    it('recognizes a vault space resource, which carries the full drive id', async () => {
+      const { wrapper, mocks } = getWrapper({
+        capabilities: vaultCapabilities,
+        resource: mock<SpaceResource>({
+          ...spaceMock,
+          storageId: `${vaultStorageProvider}$some-space-id`
+        })
+      })
+      await wrapper.vm.fetchRecipientsTask.last
+
+      expect(mocks.$clientService.graphAuthenticated.users.listUsers).toHaveBeenCalledWith(
+        expect.objectContaining({ filter: 'vaultEligible eq true' }),
+        expect.anything()
+      )
+    })
+    it('does not filter for a resource outside the vault', async () => {
+      const { wrapper, mocks } = getWrapper({
+        capabilities: vaultCapabilities,
+        resource: mock<Resource>({ ...folderMock, storageId: 'some-other-provider' })
+      })
+      await wrapper.vm.fetchRecipientsTask.last
+
+      expect(mocks.$clientService.graphAuthenticated.users.listUsers).toHaveBeenCalledWith(
+        expect.objectContaining({ filter: undefined }),
+        expect.anything()
+      )
+      expect(mocks.$clientService.graphAuthenticated.groups.listGroups).toHaveBeenCalledTimes(1)
+    })
+    it('does not filter while vault mode is disabled', async () => {
+      const { wrapper, mocks } = getWrapper({
+        capabilities: {
+          ...vaultCapabilities,
+          vault: { enabled: false, vault_storage_provider: vaultStorageProvider }
+        },
+        resource: mock<Resource>({ ...folderMock, storageId: vaultStorageProvider })
+      })
+      await wrapper.vm.fetchRecipientsTask.last
+
+      expect(mocks.$clientService.graphAuthenticated.users.listUsers).toHaveBeenCalledWith(
+        expect.objectContaining({ filter: undefined }),
+        expect.anything()
+      )
+    })
+  })
   describe('share action', () => {
     it('clicking the invite-sharees button calls the "share"-action', async () => {
       const { wrapper } = getWrapper()
@@ -183,7 +247,8 @@ function getWrapper({
   groups = [],
   existingCollaborators = [],
   externalShareRoles = [],
-  user = mock<User>({ id: '1' })
+  user = mock<User>({ id: '1' }),
+  capabilities = { files_sharing: { federation: { incoming: true, outgoing: true } } }
 }: {
   storageId?: string
   resource?: Resource
@@ -192,6 +257,7 @@ function getWrapper({
   existingCollaborators?: CollaboratorShare[]
   externalShareRoles?: ShareRole[]
   user?: User
+  capabilities?: Record<string, unknown>
 } = {}) {
   const mocks = defaultComponentMocks({
     currentRoute: mock<RouteLocation>({ params: { storageId } })
@@ -199,8 +265,6 @@ function getWrapper({
 
   mocks.$clientService.graphAuthenticated.users.listUsers.mockResolvedValue(users)
   mocks.$clientService.graphAuthenticated.groups.listGroups.mockResolvedValue(groups)
-
-  const capabilities = { files_sharing: { federation: { incoming: true, outgoing: true } } }
 
   return {
     mocks,

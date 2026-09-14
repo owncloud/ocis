@@ -8,11 +8,14 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/reva/v2/pkg/permission"
 )
 
 const (
 	appRoleID          = "appRoleId"
 	appRoleAssignments = "appRoleAssignments"
+	// vaultEligible filters for users that may be granted access to vault resources
+	vaultEligible = "vaultEligible"
 )
 
 func invalidFilterError() error {
@@ -226,10 +229,16 @@ func (g Graph) applyFilterLogicalOr(ctx context.Context, req *godata.GoDataReque
 }
 
 func (g Graph) applyFilterEq(ctx context.Context, req *godata.GoDataRequest, operand1 *godata.ParseNode, operand2 *godata.ParseNode) (users []*libregraph.User, err error) {
+	if operand1.Token.Type != godata.ExpressionTokenLiteral {
+		return users, unsupportedFilterError()
+	}
+
+	if operand1.Token.Value == vaultEligible {
+		return g.applyFilterVaultEligible(ctx, req, operand2)
+	}
+
 	// We only support the 'eq' on 'userType' for now
 	switch {
-	case operand1.Token.Type != godata.ExpressionTokenLiteral:
-		fallthrough
 	case operand1.Token.Value != "userType":
 		fallthrough
 	case operand2.Token.Type != godata.ExpressionTokenString:
@@ -245,6 +254,79 @@ func (g Graph) applyFilterEq(ctx context.Context, req *godata.GoDataRequest, ope
 		return g.searchOCMAcceptedUsers(ctx, req)
 	}
 	return users, unsupportedFilterError()
+}
+
+// applyFilterVaultEligible resolves `vaultEligible eq true`, the filter the share recipient
+// picker sends while sharing a vault resource. Only `true` is accepted: enumerating the users
+// who may not enter the vault is not a use case the picker has.
+func (g Graph) applyFilterVaultEligible(ctx context.Context, req *godata.GoDataRequest, operand *godata.ParseNode) ([]*libregraph.User, error) {
+	if operand.Token.Type != godata.ExpressionTokenBoolean || operand.Token.Value != "true" {
+		return nil, unsupportedFilterError()
+	}
+
+	users, err := g.identityBackend.GetUsers(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	eligible, err := g.vaultEligibleAccountIDs(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	filteredUsers := make([]*libregraph.User, 0, len(users))
+	for _, user := range users {
+		if _, ok := eligible[user.GetId()]; ok {
+			filteredUsers = append(filteredUsers, user)
+		}
+	}
+	return filteredUsers, nil
+}
+
+// vaultEligibleAccountIDs returns the accounts holding the vault mode permission, found by
+// inverting the assignments of every role that grants it. That is one call per granting role,
+// rather than one permission check per user the search returned.
+func (g Graph) vaultEligibleAccountIDs(ctx context.Context) (map[string]struct{}, error) {
+	roles, err := g.roleService.ListRoles(ctx, &settingssvc.ListBundlesRequest{})
+	if err != nil {
+		return nil, err
+	}
+
+	accounts := make(map[string]struct{})
+	for _, role := range roles.GetBundles() {
+		if !roleGrantsVaultMode(role) {
+			continue
+		}
+
+		assignments, err := g.roleService.ListRoleAssignmentsFiltered(
+			ctx,
+			&settingssvc.ListRoleAssignmentsFilteredRequest{
+				Filters: []*settingsmsg.UserRoleAssignmentFilter{
+					{
+						Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ROLE,
+						Term: &settingsmsg.UserRoleAssignmentFilter_RoleId{RoleId: role.GetId()},
+					},
+				},
+			},
+		)
+		if err != nil {
+			return nil, err
+		}
+		for _, assignment := range assignments.GetAssignments() {
+			accounts[assignment.GetAccountUuid()] = struct{}{}
+		}
+	}
+	return accounts, nil
+}
+
+// roleGrantsVaultMode reports whether a role bundle carries the vault mode permission.
+func roleGrantsVaultMode(role *settingsmsg.Bundle) bool {
+	for _, setting := range role.GetSettings() {
+		if setting.GetName() == permission.VaultMode && setting.GetPermissionValue() != nil {
+			return true
+		}
+	}
+	return false
 }
 
 func (g Graph) applyFilterLessOrEqual(ctx context.Context, req *godata.GoDataRequest, filterRoot *godata.ParseNode) (users []*libregraph.User, err error) {

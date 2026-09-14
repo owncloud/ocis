@@ -288,6 +288,16 @@ const accountTypes: AccountType[] = [
 ]
 const saveButtonText = computed(() => saveButtonLabel || $gettext('Share'))
 
+// A resource lives in the vault if its storage provider is the vault one. Space resources carry
+// the full drive id in storageId, plain resources only the provider id, hence the split.
+const isVaultResource = computed(() => {
+  const storageId = unref(resource)?.storageId
+  if (!unref(capabilityRefs.vaultEnabled) || typeof storageId !== 'string') {
+    return false
+  }
+  return storageId.split('$')[0] === unref(capabilityRefs.vaultStorageProvider)
+})
+
 const createSharesConcurrentRequests = computed(() => {
   return configStore.options.concurrentRequests.shares.create
 })
@@ -297,6 +307,10 @@ const fetchRecipientsTask = useTask(function* (signal, query: string) {
   if (unref(isExternalShareRoleType)) {
     // filter for external user types only
     filter = `(userType eq 'Federated')`
+  } else if (unref(isVaultResource)) {
+    // users without vault access can never open a vault resource, so they must not be
+    // offered as recipients in the first place
+    filter = `vaultEligible eq true`
   }
 
   const client = clientService.graphAuthenticated
@@ -305,8 +319,9 @@ const fetchRecipientsTask = useTask(function* (signal, query: string) {
   )
 
   let groupData: Group[]
-  if (!unref(isExternalShareRoleType)) {
-    // groups are only available for internal shares
+  if (!unref(isExternalShareRoleType) && !unref(isVaultResource)) {
+    // groups are only available for internal shares, and never for vault resources: the
+    // vault permission is assigned per account, so a group can never hold it
     groupData = yield* call(
       client.groups.listGroups({ orderBy: ['displayName'], search: `"${query}"` }, { signal })
     )

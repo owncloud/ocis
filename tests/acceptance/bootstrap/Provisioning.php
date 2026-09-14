@@ -1816,12 +1816,15 @@ trait Provisioning {
 				}
 				break;
 			case "graph":
-				$newGroup = $this->graphContext->createGroup($group);
-				if ($newGroup->getStatusCode() === 201) {
-					$newGroup = $this->getJsonDecodedResponse($newGroup);
+				$response = $this->graphContext->createGroup($group);
+				if ($response->getStatusCode() !== 201) {
+					throw new Exception(
+						"could not create group '$group'. Expected status code '201' but got '"
+						. $response->getStatusCode() . "'. Response: " . $response->getBody()->getContents(),
+					);
 				}
 				$groupCanBeDeleted = true;
-				$groupId = $newGroup["id"];
+				$groupId = $this->getJsonDecodedResponse($response)["id"];
 				break;
 			default:
 				throw new InvalidArgumentException(

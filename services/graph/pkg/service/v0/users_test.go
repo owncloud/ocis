@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -19,6 +20,7 @@ import (
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/permission"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/status"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
@@ -697,6 +699,155 @@ var _ = Describe("Users", func() {
 				"appRoleAssignments/any(n:n/appRoleId eq 'some-appRoleAssignment-ID') and memberOf/any(n:n/id eq 2713f1d5-6822-42bd-ad56-9f6c55a3a8fa)",
 				http.StatusOK),
 		)
+
+		Describe("the vaultEligible filter", func() {
+			// vaultRole is a role bundle that grants vault mode, vaultLessRole is one that does not.
+			const (
+				vaultRole     = "vault-granting-role-ID"
+				vaultLessRole = "ordinary-role-ID"
+				eligibleUser  = "25cb7bc0-3168-4a0c-adbe-396f478ad494"
+				otherUser     = "2713f1d5-6822-42bd-ad56-9f6c55a3a8fa"
+			)
+
+			// expectRoles makes the settings service report both roles, only one of which
+			// carries the vault mode permission.
+			expectRoles := func() {
+				roleService.On("ListRoles", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListBundlesResponse{
+					Bundles: []*settingsmsg.Bundle{
+						{
+							Id:   vaultRole,
+							Type: settingsmsg.Bundle_TYPE_ROLE,
+							Settings: []*settingsmsg.Setting{
+								{
+									Name:  permission.VaultMode,
+									Value: &settingsmsg.Setting_PermissionValue{PermissionValue: &settingsmsg.Permission{}},
+								},
+							},
+						},
+						{
+							Id:   vaultLessRole,
+							Type: settingsmsg.Bundle_TYPE_ROLE,
+							Settings: []*settingsmsg.Setting{
+								{
+									Name:  "Some.OtherPermission",
+									Value: &settingsmsg.Setting_PermissionValue{PermissionValue: &settingsmsg.Permission{}},
+								},
+							},
+						},
+					},
+				}, nil)
+			}
+
+			BeforeEach(func() {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
+
+				eligible := &libregraph.User{}
+				eligible.SetId(eligibleUser)
+				ineligible := &libregraph.User{}
+				ineligible.SetId(otherUser)
+				identityBackend.On("GetUsers", mock.Anything, mock.Anything).Return([]*libregraph.User{eligible, ineligible}, nil)
+			})
+
+			DescribeTable("returns only the users assigned to a role that grants vault mode",
+				func(filter string) {
+					expectRoles()
+					// Only the assignments of the vault granting role may be asked for, and only
+					// the eligible user holds one.
+					roleService.On("ListRoleAssignmentsFiltered", mock.Anything, mock.MatchedBy(
+						func(in *settings.ListRoleAssignmentsFilteredRequest) bool {
+							return in.GetFilters()[0].GetRoleId() == vaultRole
+						}), mock.Anything).Return(&settings.ListRoleAssignmentsResponse{
+						Assignments: []*settingsmsg.UserRoleAssignment{
+							{Id: "assignment-ID", AccountUuid: eligibleUser, RoleId: vaultRole},
+						},
+					}, nil)
+
+					r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape(filter), nil)
+					r = r.WithContext(revactx.SetMFA(r.Context()))
+					svc.GetUsers(rr, r)
+
+					Expect(rr.Code).To(Equal(http.StatusOK))
+
+					data, err := io.ReadAll(rr.Body)
+					Expect(err).ToNot(HaveOccurred())
+					res := userList{}
+					Expect(json.Unmarshal(data, &res)).To(Succeed())
+					Expect(res.Value).To(HaveLen(1))
+					Expect(res.Value[0].GetId()).To(Equal(eligibleUser))
+				},
+				Entry("plain", "vaultEligible eq true"),
+				Entry("parenthesized", "(vaultEligible eq true)"),
+			)
+
+			It("returns nobody when no role grants vault mode", func() {
+				roleService.On("ListRoles", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListBundlesResponse{
+					Bundles: []*settingsmsg.Bundle{{Id: vaultLessRole, Type: settingsmsg.Bundle_TYPE_ROLE}},
+				}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape("vaultEligible eq true"), nil)
+				r = r.WithContext(revactx.SetMFA(r.Context()))
+				svc.GetUsers(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+
+				data, err := io.ReadAll(rr.Body)
+				Expect(err).ToNot(HaveOccurred())
+				res := userList{}
+				Expect(json.Unmarshal(data, &res)).To(Succeed())
+				Expect(res.Value).To(BeEmpty())
+			})
+
+			It("fails the request when the role assignments cannot be listed", func() {
+				expectRoles()
+				roleService.On("ListRoleAssignmentsFiltered", mock.Anything, mock.Anything, mock.Anything).
+					Return(nil, errors.New("settings service unavailable"))
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape("vaultEligible eq true"), nil)
+				r = r.WithContext(revactx.SetMFA(r.Context()))
+				svc.GetUsers(rr, r)
+
+				Expect(rr.Code).ToNot(Equal(http.StatusOK))
+			})
+
+			DescribeTable("rejects everything but 'eq true'",
+				func(filter string, status int) {
+					r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape(filter), nil)
+					r = r.WithContext(revactx.SetMFA(r.Context()))
+					svc.GetUsers(rr, r)
+
+					Expect(rr.Code).To(Equal(status))
+				},
+				Entry("with 'false'", "vaultEligible eq false", http.StatusNotImplemented),
+				Entry("with a string operand", "vaultEligible eq 'true'", http.StatusNotImplemented),
+				Entry("with a numeric operand", "vaultEligible eq 1", http.StatusNotImplemented),
+			)
+
+			// The picker is used by ordinary users, so the filter has to survive the guard that
+			// otherwise restricts unprivileged users to 'userType eq ...'.
+			It("is allowed for an unprivileged user", func() {
+				expectRoles()
+				roleService.On("ListRoleAssignmentsFiltered", mock.Anything, mock.Anything, mock.Anything).
+					Return(&settings.ListRoleAssignmentsResponse{
+						Assignments: []*settingsmsg.UserRoleAssignment{
+							{Id: "assignment-ID", AccountUuid: eligibleUser, RoleId: vaultRole},
+						},
+					}, nil)
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Unset()
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).
+					Return(&settings.GetPermissionByIDResponse{}, nil)
+
+				r := httptest.NewRequest(http.MethodGet,
+					`/graph/v1.0/users?$search=%22abc%22&$filter=`+url.QueryEscape("vaultEligible eq true"), nil)
+				svc.GetUsers(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+			})
+		})
 
 		Describe("GetUser", func() {
 			It("handles missing userids", func() {
