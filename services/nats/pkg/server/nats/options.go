@@ -50,3 +50,15 @@ func AllowNonTLS(v bool) NatsOption {
 		o.AllowNonTLS = v
 	}
 }
+
+// Auth sets the username and password the nats server requires clients to
+// authenticate with. When both are empty the server stays unauthenticated.
+func Auth(username, password string) NatsOption {
+	return func(o *nserver.Options) {
+		if username == "" && password == "" {
+			return
+		}
+		o.Username = username
+		o.Password = password
+	}
+}
