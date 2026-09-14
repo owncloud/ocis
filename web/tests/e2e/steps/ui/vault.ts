@@ -61,3 +61,27 @@ export async function userIsInDriveMode({ stepUser }: { stepUser: string }): Pro
   await expect(page).toHaveURL((url) => url.href.startsWith(drivePageUrl))
   await expect(vaultPage.driveBreadcrumb).toBeVisible()
 }
+
+/**
+ * Navigate straight to a vault URL, simulating URL manipulation
+ */
+export async function userNavigatesToVaultViaUrl({
+  stepUser
+}: {
+  stepUser: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  await page.goto(`${config.baseUrl}/vault/account`)
+}
+
+/**
+ * Assert user was denied and landed on the access-denied page
+ */
+export async function userIsOnAccessDeniedPage({ stepUser }: { stepUser: string }): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const vaultPage = new VaultPage({ page })
+  await expect(page).toHaveURL((url) => url.pathname.startsWith('/access-denied'))
+  await expect(vaultPage.accessDeniedLoginButton).toBeVisible()
+}
