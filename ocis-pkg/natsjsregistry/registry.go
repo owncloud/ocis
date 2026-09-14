@@ -253,6 +253,8 @@ func getTLS() *tls.Config {
 		if os.Getenv(_registryEnableTLSEnv) != "true" {
 			return
 		}
+		// MICRO_REGISTRY_TLS_INSECURE disables authentication of the NATS server. It must
+		// only be used for testing with self-signed certificates, never in production.
 		insecure := os.Getenv(_registryTLSInsecureEnv) == "true"
 		rootCA := os.Getenv(_registryTLSRootCAEnv)
 		_tlsConfig = revastore.BuildNatsTLSConfig(insecure, rootCA)

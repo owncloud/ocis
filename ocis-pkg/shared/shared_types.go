@@ -65,7 +65,7 @@ type Cache struct {
 	AuthUsername            string        `yaml:"auth_username" env:"OCIS_CACHE_AUTH_USERNAME" desc:"The username to use for authentication. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
 	AuthPassword            string        `yaml:"auth_password" env:"OCIS_CACHE_AUTH_PASSWORD" desc:"The password to use for authentication. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
 	EnableTLS               bool          `yaml:"enable_tls" env:"OCIS_CACHE_ENABLE_TLS" desc:"Activate TLS for the connection to the NATS store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
-	TLSInsecure             bool          `yaml:"tls_insecure" env:"OCIS_CACHE_TLS_INSECURE" desc:"Disable TLS certificate verification for the NATS store connection. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
+	TLSInsecure             bool          `yaml:"tls_insecure" env:"OCIS_CACHE_TLS_INSECURE" desc:"Disable TLS certificate verification for the NATS store connection. Only applies when store type 'nats-js-kv' is configured. Do not enable this in production because it disables authentication of the NATS server. Use it only for testing with self-signed certificates." introductionVersion:"8.3.0"`
 	TLSRootCACertificate    string        `yaml:"tls_root_ca_certificate" env:"OCIS_CACHE_TLS_ROOT_CA_CERTIFICATE" desc:"Path to the PEM-encoded root CA certificate used to validate the NATS store TLS certificate. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
 }
 
