@@ -23,10 +23,14 @@
       :auto-focus="autoFocus"
       :sanitize="sanitize"
       :toolbars-exclude="['save', 'github']"
-      no-upload-img
       @on-change="(value) => $emit('update:currentContent', value)"
+      @on-upload-img="onUploadImg"
     >
       <template #defFooters>
+        <span v-if="validationMessages.length" class="footer-validation-messages" role="alert">
+          <span v-for="(message, index) in validationMessages" :key="index">{{ message }}</span>
+        </span>
+
         <span class="footer-links">
           <a
             href="https://imzbf.github.io/md-editor-v3/en-US/api#%F0%9F%AA%A1%20Shortcut%20keys"
@@ -58,7 +62,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, unref } from 'vue'
+import { computed, nextTick, onMounted, ref, unref } from 'vue'
 import { Resource } from '@ownclouders/web-client'
 import dompurify from 'dompurify'
 
@@ -83,6 +87,7 @@ import { languageUserDefined, languages } from './l18n'
 import { useGettext } from 'vue3-gettext'
 import { AppConfigObject } from '../../apps'
 import { useThemeStore } from '../../composables'
+import { formatFileSize } from '../../helpers'
 
 interface TextEditorProps {
   applicationConfig?: AppConfigObject
@@ -109,10 +114,19 @@ defineEmits<TextEditorEmits>()
 const { current: currentLanguage, $gettext } = useGettext()
 const { currentTheme } = useThemeStore()
 
+// Image size cap: the largest single image the editor will inline, measured on the raw file.
+const defaultMaxImageSize = 2 * 1000 * 1000
+// Document image budget: total encoded size of all inlined images a document may hold.
+const defaultMaxDocumentImageSize = 10 * 1000 * 1000
+
 // Should not be a ref, otherwise functions like setMarkdown won't work
 const editorConfig = computed(() => {
-  const { showPreviewOnlyMd = true }: AppConfigObject = applicationConfig
-  return { showPreviewOnlyMd }
+  const {
+    showPreviewOnlyMd = true,
+    maxImageSize = defaultMaxImageSize,
+    maxDocumentImageSize = defaultMaxDocumentImageSize
+  }: AppConfigObject = applicationConfig
+  return { showPreviewOnlyMd, maxImageSize, maxDocumentImageSize }
 })
 
 const isMarkdown = computed(() => {
@@ -127,6 +141,85 @@ const theme = computed(() => (unref(currentTheme).isDark ? 'dark' : 'light'))
 
 const sanitize = (html) =>
   dompurify.sanitize(html, { ADD_ATTR: ['target'], ADD_TAGS: ['foreignObject'] })
+
+/**
+ * Inlined images: uploaded images are encoded into the document as base64 data URIs instead of
+ * being written to storage as referenced images. See ADR-0030.
+ */
+
+// Matches an inlined image's data URI as it appears in the markdown source. Used to measure how
+// much of the document image budget the document already spends.
+const dataUriRegex = /data:image\/[a-z0-9.+-]+;base64,[A-Za-z0-9+/=]+/gi
+
+const validationMessages = ref<string[]>([])
+
+const formatSize = (size: number) => formatFileSize(size, currentLanguage)
+
+/** Encoded size of the inlined images already present in the document. */
+const usedDocumentImageSize = (markdown: string): number => {
+  const dataUris: string[] = markdown?.match(dataUriRegex) ?? []
+  return dataUris.reduce((total, dataUri) => total + dataUri.length, 0)
+}
+
+const readAsDataUrl = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = () => reject(reader.error)
+    reader.readAsDataURL(file)
+  })
+
+type UploadImgCallBack = (urls: Array<{ url: string; alt: string; title: string }>) => void
+
+const onUploadImg = async (files: Array<File>, callBack: UploadImgCallBack) => {
+  const { maxImageSize, maxDocumentImageSize } = unref(editorConfig)
+  validationMessages.value = []
+
+  // Counts what the document already holds, not just this batch, so a nearly full document
+  // rejects a further image.
+  let usedSize = usedDocumentImageSize(currentContent)
+  const accepted: Array<{ url: string; alt: string; title: string }> = []
+
+  for (const file of files) {
+    // Image size cap, validated against the raw file size the user recognises.
+    if (file.size > maxImageSize) {
+      validationMessages.value.push(
+        $gettext('File is too big (%{ size }). Max file size: %{ limit }.', {
+          size: formatSize(file.size),
+          limit: formatSize(maxImageSize)
+        })
+      )
+      continue
+    }
+
+    let dataUri: string
+    try {
+      dataUri = await readAsDataUrl(file)
+    } catch {
+      validationMessages.value.push($gettext('Could not read "%{ name }".', { name: file.name }))
+      continue
+    }
+
+    // Document image budget, measured on the encoded size.
+    if (usedSize + dataUri.length > maxDocumentImageSize) {
+      const remaining = Math.max(maxDocumentImageSize - usedSize, 0)
+      validationMessages.value.push(
+        $gettext(
+          'Not enough space in this document (%{ remaining } remaining). Remove an image or link the file instead.',
+          { remaining: formatSize(remaining) }
+        )
+      )
+      continue
+    }
+
+    usedSize += dataUri.length
+    // An empty title keeps the inserted markdown as `![alt](data:…)` with no trailing title.
+    accepted.push({ url: dataUri, alt: file.name, title: '' })
+  }
+
+  // Always call back, even with an empty list, so the editor stops waiting.
+  callBack(accepted)
+}
 
 onMounted(async () => {
   if (isReadOnly) {
@@ -229,20 +322,18 @@ config({
     gap: 0.625rem;
   }
 
+  .footer-validation-messages {
+    display: inline-flex;
+    flex-direction: column;
+    color: var(--oc-color-swatch-danger-default);
+    margin-right: 0.625rem;
+  }
+
   #text-editor-component-html-wrapper {
     margin-left: var(--oc-space-xsmall);
   }
   .md-editor-code-head {
     z-index: 0;
-  }
-}
-
-.toastui-editor-tabs {
-  // Fix tab with for long i18n text
-  .tab-item {
-    width: auto;
-    padding-left: var(--oc-space-small);
-    padding-right: var(--oc-space-small);
   }
 }
 
