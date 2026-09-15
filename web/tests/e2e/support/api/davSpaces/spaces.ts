@@ -64,9 +64,14 @@ const createFile = async ({
   mtimeDeltaDays?: string
 }): Promise<void> => {
   const today = new Date()
+  const encodedPathToFile = pathToFile
+    .split('/')
+    .map((part) => encodeURIComponent(part))
+    .join('/')
+
   const response = await request({
     method: 'PUT',
-    path: join('dav', webDavEndPathToRoot, pathToFile),
+    path: join('dav', webDavEndPathToRoot, encodedPathToFile),
     body: content,
     user: user,
     header: mtimeDeltaDays
