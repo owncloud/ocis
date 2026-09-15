@@ -62,7 +62,7 @@ export interface CreateDriveItemRequest {
     /**
      * 
      */
-    driveItem?: DriveItem;
+    driveItem?: Omit<DriveItem, 'id'|'createdDateTime'|'eTag'|'lastModifiedDateTime'|'webUrl'|'cTag'|'size'|'webDavUrl'|'children'|'permissions'>;
 }
 
 export interface CreateLinkSpaceRootRequest {
@@ -158,7 +158,7 @@ export interface UpdatePermissionSpaceRootRequest {
     /**
      * 
      */
-    permission: Permission;
+    permission: Omit<Permission, 'id'|'hasPassword'>;
 }
 
 /**

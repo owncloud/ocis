@@ -1,7 +1,7 @@
 
 # DriveItem
 
-Represents a resource inside a drive. Read-only.
+Represents a resource inside a drive. Most properties are read-only, but the schema is also used as a request body, see the individual properties.
 
 ## Properties
 

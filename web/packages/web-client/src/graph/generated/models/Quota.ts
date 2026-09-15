@@ -14,7 +14,7 @@
 
 import { mapValues } from '../runtime';
 /**
- * Optional. Information about the drive's storage space quota. Read-only.
+ * Optional. Information about the drive's storage space quota. Only `total` is writable, the other properties are computed by the server and read-only.
  * @export
  * @interface Quota
  */
@@ -22,23 +22,23 @@ export interface Quota {
     /**
      * Total space consumed by files in the recycle bin, in bytes. Read-only.
      */
-    deleted?: number;
+    readonly deleted?: number;
     /**
      * Total space remaining before reaching the quota limit, in bytes. Read-only.
      */
-    remaining?: number;
+    readonly remaining?: number;
     /**
      * Enumeration value that indicates the state of the storage space. Either "normal", "nearing", "critical" or "exceeded". Read-only.
      */
-    state?: string;
+    readonly state?: string;
     /**
-     * Total allowed storage space, in bytes. Read-only.
+     * Total allowed storage space, in bytes. Read-write.
      */
     total?: number;
     /**
      * Total space used, in bytes. Read-only.
      */
-    used?: number;
+    readonly used?: number;
 }
 
 /**
@@ -70,18 +70,14 @@ export function QuotaToJSON(json: any): Quota {
     return QuotaToJSONTyped(json, false);
 }
 
-export function QuotaToJSONTyped(value?: Quota | null, ignoreDiscriminator: boolean = false): any {
+export function QuotaToJSONTyped(value?: Omit<Quota, 'deleted'|'remaining'|'state'|'used'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
-        'deleted': value['deleted'],
-        'remaining': value['remaining'],
-        'state': value['state'],
         'total': value['total'],
-        'used': value['used'],
     };
 }
 

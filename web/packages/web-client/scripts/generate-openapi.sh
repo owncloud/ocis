@@ -3,14 +3,13 @@ set -eu
 
 # Regenerates the libre-graph client under src/graph/generated.
 #
-# The spec marks many fields `readOnly: true`, including every field of `Quota` and the
-# `parentReference` identifiers. The typescript-fetch templates take that literally: they
-# emit `readonly` modifiers and, more importantly, omit those fields from the generated
-# `*ToJSON` serializers, so a PATCH body such as `{ quota: { total: 500 } }` would go out
-# as `{ quota: {} }`. oCIS does accept these fields on write, so the annotation is stripped
-# from the spec before generating.
+# `readOnly: true` in the spec is load-bearing here: the typescript-fetch templates omit
+# those fields from the generated `*ToJSON` serializers, so a field that oCIS does accept
+# on write but that the spec marks read-only is silently dropped from the request body.
+# Note that a `readOnly` next to a `$ref` has no effect (OpenAPI 3.0 ignores siblings of
+# `$ref`) — what propagates is the annotation on the referenced schema itself.
 #
-# oCIS also returns a field the spec does not declare: `attributes` on users, added by
+# oCIS returns a field the spec does not declare: `attributes` on users, added by
 # `UserWithAttributes` in services/graph and filled from
 # OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES. The typescript-fetch templates rebuild every
 # response from the declared fields only, so an undeclared field is dropped during decoding.
@@ -31,7 +30,6 @@ trap cleanup EXIT
 
 rm -rf "$GRAPH_DIR/generated"
 curl -sSfL "$SPEC_URL" \
-  | sed '/^ *readOnly: true$/d' \
   | awk -v anchor="$USER_ALL_OF_LINE" '
       { print }
       $0 == anchor {

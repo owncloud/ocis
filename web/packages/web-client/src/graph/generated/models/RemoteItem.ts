@@ -131,11 +131,11 @@ export interface RemoteItem {
     /**
      * ETag for the item. Read-only.
      */
-    eTag?: string;
+    readonly eTag?: string;
     /**
      * An eTag for the content of the item. This eTag is not changed if only the metadata is changed. Note This property is not returned if the item is a folder. Read-only.
      */
-    cTag?: string;
+    readonly cTag?: string;
     /**
      * 
      */
@@ -143,7 +143,7 @@ export interface RemoteItem {
     /**
      * The set of permissions for the item. Read-only. Nullable.
      */
-    permissions?: Array<Permission>;
+    readonly permissions?: Array<Permission>;
     /**
      * Size of the remote item. Read-only.
      */
@@ -212,7 +212,7 @@ export function RemoteItemToJSON(json: any): RemoteItem {
     return RemoteItemToJSONTyped(json, false);
 }
 
-export function RemoteItemToJSONTyped(value?: RemoteItem | null, ignoreDiscriminator: boolean = false): any {
+export function RemoteItemToJSONTyped(value?: Omit<RemoteItem, 'eTag'|'cTag'|'permissions'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -232,10 +232,7 @@ export function RemoteItemToJSONTyped(value?: RemoteItem | null, ignoreDiscrimin
         'lastModifiedBy': IdentitySetToJSON(value['lastModifiedBy']),
         'lastModifiedDateTime': value['lastModifiedDateTime'],
         'name': value['name'],
-        'eTag': value['eTag'],
-        'cTag': value['cTag'],
         'parentReference': ItemReferenceToJSON(value['parentReference']),
-        'permissions': value['permissions'] == null ? undefined : ((value['permissions'] as Array<any>).map(PermissionToJSON)),
         'size': value['size'],
         'specialFolder': SpecialFolderToJSON(value['specialFolder']),
         'webDavUrl': value['webDavUrl'],
