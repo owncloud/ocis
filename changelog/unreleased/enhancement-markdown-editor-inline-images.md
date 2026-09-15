@@ -19,4 +19,5 @@ Both limits are configurable through the text editor's app configuration as
 `maxImageSize` and `maxDocumentImageSize`, given in bytes and defaulting to
 2 MB and 10 MB respectively.
 
+https://github.com/owncloud/ocis/pull/12955
 https://github.com/owncloud/web/issues/12407
