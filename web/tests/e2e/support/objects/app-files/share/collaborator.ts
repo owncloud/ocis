@@ -121,20 +121,19 @@ export default class Collaborator {
       ['appSidebar'],
       'account page'
     )
-    // the a11y scan above can leave enough time for the vue-select dropdown to close again.
-    // OcSelect only reopens it on a genuine focus transition (its dropdownEnabled ref flips
-    // back on the next click, but vue-select's own internal open state needs a real blur->focus
-    // cycle) - clicking an already-focused input is a no-op, so force a blur first each retry.
-    await expect
-      .poll(
-        async () => {
-          await collaboratorInputLocator.evaluate((el: HTMLElement) => el.blur())
-          await collaboratorInputLocator.click()
-          return page.locator('.vs--open').isVisible()
-        },
-        { timeout: 15000 }
-      )
-      .toBe(true)
+    await collaboratorInputLocator.focus()
+    try {
+      await page.locator('.vs--open').waitFor({ timeout: 10000 })
+    } catch {
+      // the a11y scan above can give the vue-select dropdown enough time to close again, and a
+      // bare focus() doesn't reliably reopen it - redo the exact fill that opened it the first
+      // time instead of guessing at a different interaction
+      await Promise.all([
+        page.waitForResponse((resp) => resp.url().includes('users') && resp.status() === 200),
+        collaboratorInputLocator.fill(fillValue)
+      ])
+      await page.locator('.vs--open').waitFor()
+    }
     await page
       .locator(util.format(Collaborator.collaboratorDropdownItem, collaborator.displayName))
       .first() // in CI, resolves to two elements
