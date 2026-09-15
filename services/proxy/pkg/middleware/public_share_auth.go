@@ -75,7 +75,9 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 	}
 
 	var sharePassword string
+	var signatureAuth bool
 	if signature := query.Get(_paramSignature); signature != "" {
+		signatureAuth = true
 		expiration := query.Get(_paramExpiration)
 		if expiration == "" {
 			a.Logger.Warn().Str("signature", signature).Msg("cannot do signature auth without the expiration")
@@ -103,9 +105,17 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 		return nil, false
 	}
 
-	// we just need the reva access token, so we want to skip the brute force
-	// protection in this case
-	ctx := publicshares.MarkSkipAttemptContext(r.Context(), shareToken)
+	// The brute force protection counts failed public link password attempts.
+	// Skip counting here for requests that are re-authenticated downstream (the
+	// public-files DAV paths, which ocdav authenticates again) so the same
+	// attempt is not counted twice, and for signature based auth, which is a
+	// different, non-guessable credential. Password attempts on the paths where
+	// the proxy is the sole authenticator (e.g. /archiver, /app/open) must be
+	// counted, otherwise the throttle would never trip.
+	ctx := r.Context()
+	if signatureAuth || isPublicWithShareToken(r) {
+		ctx = publicshares.MarkSkipAttemptContext(ctx, shareToken)
+	}
 	authResp, err := client.Authenticate(ctx, &gateway.AuthenticateRequest{
 		Type:         authenticationType,
 		ClientId:     shareToken,
