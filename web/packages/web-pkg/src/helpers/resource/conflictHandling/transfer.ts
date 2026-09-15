@@ -71,19 +71,13 @@ export class ResourceTransfer extends ConflictDialog {
       messageStore.showMessage({ title, status: 'success' })
       return
     }
-    let title =
-      transferType === TransferType.COPY
-        ? this.$gettext('Failed to copy %{count} resources', { count: errors.length.toString() })
-        : this.$gettext('Failed to move %{count} resources', { count: errors.length.toString() })
-    if (errors.length === 1) {
-      title =
-        transferType === TransferType.COPY
-          ? this.$gettext('Failed to copy "%{name}"', { name: errors[0]?.resourceName })
-          : this.$gettext('Failed to move "%{name}"', { name: errors[0]?.resourceName })
-    }
+    const title =
+      errors.length === 1
+        ? this.getSingleFailureTitle(errors[0]?.resourceName, transferType)
+        : this.getMultipleFailureTitle(errors.length, transferType)
     let description = ''
     if (errors.some(({ error }) => error instanceof HttpError && error.statusCode === 507)) {
-      description = this.$gettext('Insufficient quota')
+      description = this.getInsufficientQuotaDescription(transferType)
     }
     const messageStore = useMessages()
     messageStore.showErrorMessage({
@@ -91,6 +85,56 @@ export class ResourceTransfer extends ConflictDialog {
       ...(description && { desc: description }),
       errors: errors.map(({ error }) => error)
     })
+  }
+
+  private getSingleFailureTitle(name: string, transferType: TransferType): string {
+    switch (transferType) {
+      case TransferType.COPY:
+        return this.$gettext('Failed to copy "%{name}"', { name })
+      case TransferType.DUPLICATE:
+        return this.$gettext('Failed to duplicate "%{name}"', { name })
+      default:
+        return this.$gettext('Failed to move "%{name}"', { name })
+    }
+  }
+
+  private getMultipleFailureTitle(errorCount: number, transferType: TransferType): string {
+    const params = { count: errorCount.toString() }
+    switch (transferType) {
+      case TransferType.COPY:
+        return this.$gettext('Failed to copy %{count} resources', params)
+      case TransferType.DUPLICATE:
+        return this.$gettext('Failed to duplicate %{count} resources', params)
+      default:
+        return this.$gettext('Failed to move %{count} resources', params)
+    }
+  }
+
+  /**
+   * The client only learns of the failure from the server's 507, so the message names the space
+   * and what to do rather than an amount of remaining space that may already be stale.
+   */
+  private getInsufficientQuotaDescription(transferType: TransferType): string {
+    const spaceName =
+      this.targetSpace.driveType === 'personal' ? this.$gettext('Personal') : this.targetSpace.name
+
+    switch (transferType) {
+      case TransferType.COPY:
+        return this.$gettext(
+          'The file cannot be copied because there is not enough storage left in "%{spaceName}".',
+          { spaceName }
+        )
+      case TransferType.DUPLICATE:
+        return this.$gettext(
+          'The file cannot be duplicated because there is not enough storage left in "%{spaceName}".',
+          { spaceName }
+        )
+      default:
+        return this.$gettext(
+          'The file cannot be moved because there is not enough storage left in "%{spaceName}".',
+          { spaceName }
+        )
+    }
   }
 
   /**
