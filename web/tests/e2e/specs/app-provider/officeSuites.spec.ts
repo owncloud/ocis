@@ -11,10 +11,10 @@ import { fileAction, application, resourcePage } from '../../environment/constan
 test.describe('Integrate with online office suites like Collabora and OnlyOffice', () => {
   test.beforeEach(async () => {
     await api.usersHaveBeenCreated({ stepUser: 'Admin', users: ['Alice', 'Brian'] })
-    await ui.userLogsIn({ stepUser: 'Alice' })
   })
 
   test('create an OpenDocument file with Collabora', { tag: '@predefined-users' }, async () => {
+    await ui.userLogsIn({ stepUser: 'Alice' })
     // Given "Alice" opens the "files" app
     await ui.userOpensApplication({ stepUser: 'Alice', name: 'files' })
 
@@ -254,6 +254,7 @@ test.describe('Integrate with online office suites like Collabora and OnlyOffice
   })
 
   test('create a Microsoft Word file with OnlyOffice', { tag: '@predefined-users' }, async () => {
+    await ui.userLogsIn({ stepUser: 'Alice' })
     // Given "Alice" opens the "files" app
     await ui.userOpensApplication({ stepUser: 'Alice', name: 'files' })
 
@@ -535,6 +536,7 @@ test.describe('Integrate with online office suites like Collabora and OnlyOffice
       spaceName: 'Marketing',
       folders: ['myfolder']
     })
+    await ui.userLogsIn({ stepUser: 'Alice' })
 
     // When "Alice" navigates to the project space "marketing.1"
     await ui.userNavigatesToSpace({ stepUser: 'Alice', space: 'marketing.1' })
@@ -685,6 +687,7 @@ test.describe('Integrate with online office suites like Collabora and OnlyOffice
       spaceName: 'Marketing',
       folders: ['myfolder']
     })
+    await ui.userLogsIn({ stepUser: 'Alice' })
 
     // When "Alice" navigates to the project space "marketing.1"
     await ui.userNavigatesToSpace({ stepUser: 'Alice', space: 'marketing.1' })
@@ -810,6 +813,7 @@ test.describe('Integrate with online office suites like Collabora and OnlyOffice
         { localFile: 'Template.ott', to: 'Template.ott' }
       ]
     })
+    await ui.userLogsIn({ stepUser: 'Alice' })
 
     // And "Alice" opens the "files" app
     await ui.userOpensApplication({ stepUser: 'Alice', name: 'files' })
