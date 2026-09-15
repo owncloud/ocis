@@ -62,7 +62,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, ref, unref } from 'vue'
+import { computed, nextTick, onMounted, ref, unref, watch } from 'vue'
 import { Resource } from '@ownclouders/web-client'
 import dompurify from 'dompurify'
 
@@ -114,9 +114,8 @@ defineEmits<TextEditorEmits>()
 const { current: currentLanguage, $gettext } = useGettext()
 const { currentTheme } = useThemeStore()
 
-// Image size cap: the largest single image the editor will inline, measured on the raw file.
+// Per-image cap uses raw File.size; document budget uses encoded dataUri.length — they differ.
 const defaultMaxImageSize = 2 * 1000 * 1000
-// Document image budget: total encoded size of all inlined images a document may hold.
 const defaultMaxDocumentImageSize = 10 * 1000 * 1000
 
 // Should not be a ref, otherwise functions like setMarkdown won't work
@@ -142,20 +141,13 @@ const theme = computed(() => (unref(currentTheme).isDark ? 'dark' : 'light'))
 const sanitize = (html) =>
   dompurify.sanitize(html, { ADD_ATTR: ['target'], ADD_TAGS: ['foreignObject'] })
 
-/**
- * Inlined images: uploaded images are encoded into the document as base64 data URIs instead of
- * being written to storage as referenced images. See ADR-0030.
- */
-
-// Matches an inlined image's data URI as it appears in the markdown source. Used to measure how
-// much of the document image budget the document already spends.
 const dataUriRegex = /data:image\/[a-z0-9.+-]+;base64,[A-Za-z0-9+/=]+/gi
 
 const validationMessages = ref<string[]>([])
+const skipNextContentClear = ref(false)
 
 const formatSize = (size: number) => formatFileSize(size, currentLanguage)
 
-/** Encoded size of the inlined images already present in the document. */
 const usedDocumentImageSize = (markdown: string): number => {
   const dataUris: string[] = markdown?.match(dataUriRegex) ?? []
   return dataUris.reduce((total, dataUri) => total + dataUri.length, 0)
@@ -172,16 +164,23 @@ const readAsDataUrl = (file: File): Promise<string> =>
 type UploadImgCallBack = (urls: Array<{ url: string; alt: string; title: string }>) => void
 
 const onUploadImg = async (files: Array<File>, callBack: UploadImgCallBack) => {
+  if (!unref(isMarkdown)) {
+    // Always invoke the callback so md-editor-v3 stops waiting.
+    callBack([])
+    return
+  }
+
   const { maxImageSize, maxDocumentImageSize } = unref(editorConfig)
   validationMessages.value = []
 
-  // Counts what the document already holds, not just this batch, so a nearly full document
-  // rejects a further image.
   let usedSize = usedDocumentImageSize(currentContent)
   const accepted: Array<{ url: string; alt: string; title: string }> = []
 
   for (const file of files) {
-    // Image size cap, validated against the raw file size the user recognises.
+    if (!file.type.startsWith('image/')) {
+      continue
+    }
+
     if (file.size > maxImageSize) {
       validationMessages.value.push(
         $gettext('File is too big (%{ size }). Max file size: %{ limit }.', {
@@ -200,7 +199,6 @@ const onUploadImg = async (files: Array<File>, callBack: UploadImgCallBack) => {
       continue
     }
 
-    // Document image budget, measured on the encoded size.
     if (usedSize + dataUri.length > maxDocumentImageSize) {
       const remaining = Math.max(maxDocumentImageSize - usedSize, 0)
       validationMessages.value.push(
@@ -213,13 +211,25 @@ const onUploadImg = async (files: Array<File>, callBack: UploadImgCallBack) => {
     }
 
     usedSize += dataUri.length
-    // An empty title keeps the inserted markdown as `![alt](data:…)` with no trailing title.
     accepted.push({ url: dataUri, alt: file.name, title: '' })
   }
 
-  // Always call back, even with an empty list, so the editor stops waiting.
+  if (accepted.length > 0) {
+    skipNextContentClear.value = true
+  }
   callBack(accepted)
 }
+
+watch(
+  () => currentContent,
+  () => {
+    if (skipNextContentClear.value) {
+      skipNextContentClear.value = false
+      return
+    }
+    validationMessages.value = []
+  }
+)
 
 onMounted(async () => {
   if (isReadOnly) {
