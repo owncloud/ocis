@@ -96,6 +96,17 @@ export const fillOnlyOfficeDocumentContent = async (page: Page, content: string)
   for (let attempt = 1; attempt <= 5; attempt++) {
     await textAreaLocator.focus()
     await page.keyboard.press('ControlOrMeta+A')
+    await page.keyboard.press('Delete')
+
+    // Ctrl+A/Delete can silently no-op the same way paste can - if the document wasn't
+    // actually cleared, pasting next would prepend/append to the leftover content instead
+    // of replacing it, so confirm it's empty before trusting the paste that follows.
+    const clearedContent = (await getOfficeDocumentContent(page)).trim()
+    if (clearedContent !== '') {
+      await page.waitForTimeout(1000)
+      continue
+    }
+
     await textAreaLocator.fill(content)
     await expect(saveButtonDisabledLocator).toHaveAttribute('disabled', 'disabled')
 
