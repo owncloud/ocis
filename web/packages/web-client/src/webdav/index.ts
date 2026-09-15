@@ -1,5 +1,5 @@
-import axios from 'axios'
 import { Headers } from 'webdav'
+import { FetchClient } from '../http'
 import { WebDAV } from './types'
 import { CopyFilesFactory } from './copyFiles'
 import { CreateFolderFactory } from './createFolder'
@@ -20,7 +20,7 @@ import { DAV } from './client/dav'
 import { ListFileVersionsFactory } from './listFileVersions'
 import { SetFavoriteFactory } from './setFavorite'
 import { ListFavoriteFilesFactory } from './listFavoriteFiles'
-import { shouldResponseTriggerMaintenance } from '../helpers/maintenance'
+import { maintenanceResponseHandler } from '../helpers/maintenance'
 
 export * from './constants'
 export * from './types'
@@ -33,31 +33,12 @@ export const webdav = (
   onSetMaintenance: (value: boolean) => void,
   headers?: () => Headers
 ): WebDAV => {
-  const axiosClient = axios.create()
-  if (headers) {
-    axiosClient.interceptors.request.use((config) => {
-      Object.assign(config.headers, headers())
-      return config
-    })
-  }
+  const httpClient = new FetchClient({
+    ...(headers && { headers }),
+    onResponse: maintenanceResponseHandler(onSetMaintenance, { clearOnUnrelatedError: true })
+  })
 
-  axiosClient.interceptors.response.use(
-    (response) => {
-      onSetMaintenance(false)
-      return response
-    },
-    (error) => {
-      const isInMaintenanceMode = shouldResponseTriggerMaintenance(
-        error.response?.status || 500,
-        error.config.url
-      )
-      onSetMaintenance(isInMaintenanceMode)
-
-      return Promise.reject(error)
-    }
-  )
-
-  const options = { axiosClient, baseUrl: baseURI, headers }
+  const options = { httpClient, baseUrl: baseURI, headers }
 
   const dav = new DAV({ baseUrl: baseURI, headers, onSetMaintenance })
   const registerExtraProp = (name: string) => {

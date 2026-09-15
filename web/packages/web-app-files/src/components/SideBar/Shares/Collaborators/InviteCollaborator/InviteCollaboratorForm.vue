@@ -388,7 +388,7 @@ const share = async () => {
               recipients: [
                 {
                   objectId: id,
-                  '@libre.graph.recipient.type': type
+                  atLibreGraphRecipientType: type
                 }
               ]
             }

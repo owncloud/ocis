@@ -1,4 +1,4 @@
-import { User } from '@ownclouders/web-client/graph/generated'
+import { DriveFromJSON, User } from '@ownclouders/web-client/graph/generated'
 import DetailsPanel from '../../../../../src/components/Users/SideBar/DetailsPanel.vue'
 import UserInfoBox from '../../../../../src/components/Users/SideBar/UserInfoBox.vue'
 import { PartialComponentProps, defaultPlugins, shallowMount } from '@ownclouders/web-test-helpers'
@@ -58,6 +58,28 @@ describe('DetailsPanel', () => {
       expect(wrapper.find('[data-testid="no-user-selected"]').exists()).toBeFalsy()
     })
   })
+  describe('computed method "showUserQuota"', () => {
+    /**
+     * The graph client materializes every declared field, so a drive that comes back without a
+     * quota limit still has a `quota` object carrying `total: undefined`. Going by the presence
+     * of the key showed the quota with an unknown size instead of hiding it.
+     */
+    it('should be false if the drive has no quota total', () => {
+      const drive = DriveFromJSON({ id: 'drive', quota: {} })
+      const { wrapper } = getWrapper({
+        props: { user: { ...defaultUser, drive } as User, users: [defaultUser] }
+      })
+      expect((wrapper.vm as any).showUserQuota).toBeFalsy()
+    })
+    it('should be true if the drive has a quota total', () => {
+      const drive = DriveFromJSON({ id: 'drive', quota: { total: 100 } })
+      const { wrapper } = getWrapper({
+        props: { user: { ...defaultUser, drive } as User, users: [defaultUser] }
+      })
+      expect((wrapper.vm as any).showUserQuota).toBeTruthy()
+    })
+  })
+
   describe('computed method "multipleUsers"', () => {
     it('should be false if no users are given', () => {
       const { wrapper } = getWrapper({ props: { user: null, users: [] } })

@@ -58,7 +58,7 @@ loadingService.addTask(async () => {
     }
   } catch (e) {
     console.error(e)
-    if (e.response?.status === 401) {
+    if (e.statusCode === 401) {
       return authService.handleAuthError(unref(route), { forceLogout: true })
     }
     hasError.value = true

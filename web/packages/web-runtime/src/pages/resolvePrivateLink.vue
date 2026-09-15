@@ -143,7 +143,7 @@ export default defineComponent({
           const driveItems = yield clientService.graphAuthenticated.driveItems.listSharedWithMe()
           const share = driveItems.find(({ remoteItem }) => remoteItem.id === resource.id)
 
-          isHiddenShare = share?.['@UI.Hidden']
+          isHiddenShare = share?.atUIHidden
         }
       }
 

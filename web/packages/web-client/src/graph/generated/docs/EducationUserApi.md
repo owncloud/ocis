@@ -2,47 +2,66 @@
 
 All URIs are relative to *https://ocis.ocis.rolling.owncloud.works/graph*
 
-|Method | HTTP request | Description|
+| Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-|[**createEducationUser**](#createeducationuser) | **POST** /v1.0/education/users | Add new education user|
-|[**deleteEducationUser**](#deleteeducationuser) | **DELETE** /v1.0/education/users/{user-id} | Delete educationUser|
-|[**getEducationUser**](#geteducationuser) | **GET** /v1.0/education/users/{user-id} | Get properties of educationUser|
-|[**listEducationUsers**](#listeducationusers) | **GET** /v1.0/education/users | Get entities from education users|
-|[**updateEducationUser**](#updateeducationuser) | **PATCH** /v1.0/education/users/{user-id} | Update properties of educationUser|
+| [**createEducationUser**](EducationUserApi.md#createeducationuser) | **POST** /v1.0/education/users | Add new education user |
+| [**deleteEducationUser**](EducationUserApi.md#deleteeducationuser) | **DELETE** /v1.0/education/users/{user-id} | Delete educationUser |
+| [**getEducationUser**](EducationUserApi.md#geteducationuser) | **GET** /v1.0/education/users/{user-id} | Get properties of educationUser |
+| [**listEducationUsers**](EducationUserApi.md#listeducationusers) | **GET** /v1.0/education/users | Get entities from education users |
+| [**updateEducationUser**](EducationUserApi.md#updateeducationuser) | **PATCH** /v1.0/education/users/{user-id} | Update properties of educationUser |
 
-# **createEducationUser**
+
+
+## createEducationUser
+
 > EducationUser createEducationUser(educationUser)
 
+Add new education user
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationUserApi,
-    Configuration,
-    EducationUser
-} from './api';
+  Configuration,
+  EducationUserApi,
+} from '';
+import type { CreateEducationUserRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationUserApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationUserApi(config);
 
-let educationUser: EducationUser; //New entity
+  const body = {
+    // EducationUser | New entity
+    educationUser: ...,
+  } satisfies CreateEducationUserRequest;
 
-const { status, data } = await apiInstance.createEducationUser(
-    educationUser
-);
+  try {
+    const data = await api.createEducationUser(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **educationUser** | **EducationUser**| New entity | |
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **educationUser** | [EducationUser](EducationUser.md) | New entity | |
 
 ### Return type
 
-**EducationUser**
+[**EducationUser**](EducationUser.md)
 
 ### Authorization
 
@@ -50,50 +69,69 @@ const { status, data } = await apiInstance.createEducationUser(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**201** | Created entity |  -  |
-|**0** | error |  -  |
+| **201** | Created entity |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **deleteEducationUser**
-> deleteEducationUser()
 
+## deleteEducationUser
+
+> deleteEducationUser(userId)
+
+Delete educationUser
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationUserApi,
-    Configuration
-} from './api';
+  Configuration,
+  EducationUserApi,
+} from '';
+import type { DeleteEducationUserRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationUserApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationUserApi(config);
 
-let userId: string; //key: id or username of user (default to undefined)
+  const body = {
+    // string | key: id or username of user
+    userId: 90eedea1-dea1-90ee-a1de-ee90a1deee90,
+  } satisfies DeleteEducationUserRequest;
 
-const { status, data } = await apiInstance.deleteEducationUser(
-    userId
-);
+  try {
+    const data = await api.deleteEducationUser(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **userId** | [**string**] | key: id or username of user | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **userId** | `string` | key: id or username of user | [Defaults to `undefined`] |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -101,53 +139,72 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**204** | Success |  -  |
-|**0** | error |  -  |
+| **204** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **getEducationUser**
-> EducationUser getEducationUser()
 
+## getEducationUser
+
+> EducationUser getEducationUser(userId, $expand)
+
+Get properties of educationUser
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationUserApi,
-    Configuration
-} from './api';
+  Configuration,
+  EducationUserApi,
+} from '';
+import type { GetEducationUserRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationUserApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationUserApi(config);
 
-let userId: string; //key: id or username of user (default to undefined)
-let $expand: Set<'memberOf'>; //Expand related entities (optional) (default to undefined)
+  const body = {
+    // string | key: id or username of user
+    userId: 90eedea1-dea1-90ee-a1de-ee90a1deee90,
+    // Set<'memberOf'> | Expand related entities (optional)
+    $expand: ...,
+  } satisfies GetEducationUserRequest;
 
-const { status, data } = await apiInstance.getEducationUser(
-    userId,
-    $expand
-);
+  try {
+    const data = await api.getEducationUser(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **userId** | [**string**] | key: id or username of user | defaults to undefined|
-| **$expand** | **Array<&#39;memberOf&#39;>** | Expand related entities | (optional) defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **userId** | `string` | key: id or username of user | [Defaults to `undefined`] |
+| **$expand** | `memberOf` | Expand related entities | [Optional] [Enum: memberOf] |
 
 ### Return type
 
-**EducationUser**
+[**EducationUser**](EducationUser.md)
 
 ### Authorization
 
@@ -155,53 +212,72 @@ const { status, data } = await apiInstance.getEducationUser(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Retrieved entity |  -  |
-|**0** | error |  -  |
+| **200** | Retrieved entity |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **listEducationUsers**
-> CollectionOfEducationUser listEducationUsers()
 
+## listEducationUsers
+
+> CollectionOfEducationUser listEducationUsers($orderby, $expand)
+
+Get entities from education users
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationUserApi,
-    Configuration
-} from './api';
+  Configuration,
+  EducationUserApi,
+} from '';
+import type { ListEducationUsersRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationUserApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationUserApi(config);
 
-let $orderby: Set<'displayName' | 'displayName desc' | 'mail' | 'mail desc' | 'onPremisesSamAccountName' | 'onPremisesSamAccountName desc'>; //Order items by property values (optional) (default to undefined)
-let $expand: Set<'memberOf'>; //Expand related entities (optional) (default to undefined)
+  const body = {
+    // Set<'displayName' | 'displayName desc' | 'mail' | 'mail desc' | 'onPremisesSamAccountName' | 'onPremisesSamAccountName desc'> | Order items by property values (optional)
+    $orderby: ...,
+    // Set<'memberOf'> | Expand related entities (optional)
+    $expand: ...,
+  } satisfies ListEducationUsersRequest;
 
-const { status, data } = await apiInstance.listEducationUsers(
-    $orderby,
-    $expand
-);
+  try {
+    const data = await api.listEducationUsers(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **$orderby** | **Array<&#39;displayName&#39; &#124; &#39;displayName desc&#39; &#124; &#39;mail&#39; &#124; &#39;mail desc&#39; &#124; &#39;onPremisesSamAccountName&#39; &#124; &#39;onPremisesSamAccountName desc&#39;>** | Order items by property values | (optional) defaults to undefined|
-| **$expand** | **Array<&#39;memberOf&#39;>** | Expand related entities | (optional) defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **$orderby** | `displayName`, `displayName desc`, `mail`, `mail desc`, `onPremisesSamAccountName`, `onPremisesSamAccountName desc` | Order items by property values | [Optional] [Enum: displayName, displayName desc, mail, mail desc, onPremisesSamAccountName, onPremisesSamAccountName desc] |
+| **$expand** | `memberOf` | Expand related entities | [Optional] [Enum: memberOf] |
 
 ### Return type
 
-**CollectionOfEducationUser**
+[**CollectionOfEducationUser**](CollectionOfEducationUser.md)
 
 ### Authorization
 
@@ -209,54 +285,72 @@ const { status, data } = await apiInstance.listEducationUsers(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Retrieved entities |  -  |
-|**0** | error |  -  |
+| **200** | Retrieved entities |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **updateEducationUser**
-> EducationUser updateEducationUser(educationUser)
 
+## updateEducationUser
+
+> EducationUser updateEducationUser(userId, educationUser)
+
+Update properties of educationUser
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationUserApi,
-    Configuration,
-    EducationUser
-} from './api';
+  Configuration,
+  EducationUserApi,
+} from '';
+import type { UpdateEducationUserRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationUserApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationUserApi(config);
 
-let userId: string; //key: id or username of user (default to undefined)
-let educationUser: EducationUser; //New property values
+  const body = {
+    // string | key: id or username of user
+    userId: 90eedea1-dea1-90ee-a1de-ee90a1deee90,
+    // EducationUser | New property values
+    educationUser: {"mail":"max.mustermann@new.domain"},
+  } satisfies UpdateEducationUserRequest;
 
-const { status, data } = await apiInstance.updateEducationUser(
-    userId,
-    educationUser
-);
+  try {
+    const data = await api.updateEducationUser(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **educationUser** | **EducationUser**| New property values | |
-| **userId** | [**string**] | key: id or username of user | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **userId** | `string` | key: id or username of user | [Defaults to `undefined`] |
+| **educationUser** | [EducationUser](EducationUser.md) | New property values | |
 
 ### Return type
 
-**EducationUser**
+[**EducationUser**](EducationUser.md)
 
 ### Authorization
 
@@ -264,16 +358,16 @@ const { status, data } = await apiInstance.updateEducationUser(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Success |  -  |
-|**204** | Success |  -  |
-|**0** | error |  -  |
+| **200** | Success |  -  |
+| **204** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

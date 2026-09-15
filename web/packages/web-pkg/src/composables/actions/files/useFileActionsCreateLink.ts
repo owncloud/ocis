@@ -107,7 +107,7 @@ export const useFileActionsCreateLink = ({
         space,
         resource,
         options: {
-          '@libre.graph.quickLink': false,
+          atLibreGraphQuickLink: false,
           displayName: $gettext('Unnamed link'),
           type: unref(defaultLinkType)
         }

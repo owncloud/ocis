@@ -3,6 +3,7 @@ import { ocs } from './ocs'
 import { webdav } from './webdav'
 
 export * from './errors'
+export * from './http'
 export * from './helpers'
 export * from './utils'
 export * from './constants'

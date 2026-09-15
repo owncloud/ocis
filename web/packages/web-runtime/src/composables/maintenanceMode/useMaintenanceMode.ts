@@ -8,7 +8,7 @@ export function useMaintenanceMode() {
   /**
    * Starts a timer that checks for maintenance mode every minute.
    * Since the maintenance mode is asserted by a request that returns a 503 status code, we can just call any endpoint.
-   * Response is parsed in the axios response interceptor.
+   * The response is inspected by ClientService.handleResponse, the fetch core's onResponse hook.
    */
   const startCheckingMaintenanceMode = async () => {
     try {

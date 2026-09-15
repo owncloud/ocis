@@ -299,7 +299,7 @@ const loadResourceTask = useTask(function* (signal) {
       return authService.handleAuthError(unref(router.currentRoute))
     }
 
-    if (e?.response?.status === 404 && e?.message === 'Unknown error') {
+    if (e?.statusCode === 404 && e?.message === 'Unknown error') {
       console.error(e)
       loadingError.value = new Error(
         $gettext('The resource could not be located, it may not exist anymore.')

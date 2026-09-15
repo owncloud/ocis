@@ -274,8 +274,8 @@ const orderBy = (list: User[], prop: string, desc: boolean) => {
         b = getRoleDisplayNameByUser(user2)
         break
       case 'accountEnabled':
-        a = ('accountEnabled' in user1 ? user1.accountEnabled : true).toString()
-        b = ('accountEnabled' in user2 ? user2.accountEnabled : true).toString()
+        a = (user1.accountEnabled ?? true).toString()
+        b = (user2.accountEnabled ?? true).toString()
         break
       default:
         a = user1[prop as keyof User].toString() || ''

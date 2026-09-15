@@ -2,43 +2,64 @@
 
 All URIs are relative to *https://ocis.ocis.rolling.owncloud.works/graph*
 
-|Method | HTTP request | Description|
+| Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-|[**getApplication**](#getapplication) | **GET** /v1.0/applications/{application-id} | Get application by id|
-|[**listApplications**](#listapplications) | **GET** /v1.0/applications | Get all applications|
+| [**getApplication**](ApplicationsApi.md#getapplication) | **GET** /v1.0/applications/{application-id} | Get application by id |
+| [**listApplications**](ApplicationsApi.md#listapplications) | **GET** /v1.0/applications | Get all applications |
 
-# **getApplication**
-> Application getApplication()
 
+
+## getApplication
+
+> Application getApplication(applicationId)
+
+Get application by id
 
 ### Example
 
-```typescript
+```ts
 import {
-    ApplicationsApi,
-    Configuration
-} from './api';
+  Configuration,
+  ApplicationsApi,
+} from '';
+import type { GetApplicationRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new ApplicationsApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new ApplicationsApi(config);
 
-let applicationId: string; //key: id of application (default to undefined)
+  const body = {
+    // string | key: id of application
+    applicationId: applicationId_example,
+  } satisfies GetApplicationRequest;
 
-const { status, data } = await apiInstance.getApplication(
-    applicationId
-);
+  try {
+    const data = await api.getApplication(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **applicationId** | [**string**] | key: id of application | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **applicationId** | `string` | key: id of application | [Defaults to `undefined`] |
 
 ### Return type
 
-**Application**
+[**Application**](Application.md)
 
 ### Authorization
 
@@ -46,43 +67,62 @@ const { status, data } = await apiInstance.getApplication(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | OK |  -  |
-|**0** | error |  -  |
+| **200** | OK |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **listApplications**
+
+## listApplications
+
 > CollectionOfApplications listApplications()
 
+Get all applications
 
 ### Example
 
-```typescript
+```ts
 import {
-    ApplicationsApi,
-    Configuration
-} from './api';
+  Configuration,
+  ApplicationsApi,
+} from '';
+import type { ListApplicationsRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new ApplicationsApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new ApplicationsApi(config);
 
-const { status, data } = await apiInstance.listApplications();
+  try {
+    const data = await api.listApplications();
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
-This endpoint does not have any parameters.
 
+This endpoint does not need any parameter.
 
 ### Return type
 
-**CollectionOfApplications**
+[**CollectionOfApplications**](CollectionOfApplications.md)
 
 ### Authorization
 
@@ -90,15 +130,15 @@ This endpoint does not have any parameters.
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Retrieved entities |  -  |
-|**0** | error |  -  |
+| **200** | Retrieved entities |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
