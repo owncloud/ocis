@@ -237,14 +237,15 @@ export class HandleUpload extends BasePlugin<PluginOpts, OcUppyMeta, OcUppyBody>
         return acc
       }
 
-      matchingMappingRecord.uploadSize = uppyFile.data.size - existingFileSize
+      matchingMappingRecord.uploadSize += uppyFile.data.size - existingFileSize
 
       return acc
     }, [])
 
     const { $gettext } = this.language
     uploadSizeSpaceMapping.forEach(({ space, uploadSize }) => {
-      if (space.spaceQuota.remaining && space.spaceQuota.remaining < uploadSize) {
+      // a full space reports 0, so only an absent remaining means "quota unknown"
+      if (space.spaceQuota.remaining !== undefined && space.spaceQuota.remaining < uploadSize) {
         let spaceName = space.name
 
         if (space.driveType === 'personal') {
@@ -252,15 +253,14 @@ export class HandleUpload extends BasePlugin<PluginOpts, OcUppyMeta, OcUppyBody>
         }
 
         this.messageStore.showErrorMessage({
-          title: $gettext('Insufficient quota'),
+          title: $gettext('Not enough space'),
           desc: $gettext(
-            'Insufficient quota on %{spaceName}. You need additional %{missingSpace} to upload these files',
+            'The upload needs %{uploadSize}, but "%{spaceName}" has only %{remainingSpace} left of its %{totalSpace} limit. Delete existing files or upload a smaller file.',
             {
               spaceName,
-              missingSpace: formatFileSize(
-                (space.spaceQuota.remaining - uploadSize) * -1,
-                this.language.current
-              )
+              remainingSpace: formatFileSize(space.spaceQuota.remaining, this.language.current),
+              totalSpace: formatFileSize(space.spaceQuota.total, this.language.current),
+              uploadSize: formatFileSize(uploadSize, this.language.current)
             }
           )
         })
