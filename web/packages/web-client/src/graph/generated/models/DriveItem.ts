@@ -127,7 +127,7 @@ import {
 } from './SpecialFolder';
 
 /**
- * Represents a resource inside a drive. Read-only.
+ * Represents a resource inside a drive. Most properties are read-only, but the schema is also used as a request body, see the individual properties.
  * @export
  * @interface DriveItem
  */
@@ -135,7 +135,7 @@ export interface DriveItem {
     /**
      * Read-only.
      */
-    id?: string;
+    readonly id?: string;
     /**
      * 
      */
@@ -143,7 +143,7 @@ export interface DriveItem {
     /**
      * Date and time of item creation. Read-only.
      */
-    createdDateTime?: string;
+    readonly createdDateTime?: string;
     /**
      * Provides a user-visible description of the item. Optional.
      */
@@ -151,7 +151,7 @@ export interface DriveItem {
     /**
      * ETag for the item. Read-only.
      */
-    eTag?: string;
+    readonly eTag?: string;
     /**
      * 
      */
@@ -159,7 +159,7 @@ export interface DriveItem {
     /**
      * Date and time the item was last modified. Read-only.
      */
-    lastModifiedDateTime?: string;
+    readonly lastModifiedDateTime?: string;
     /**
      * The name of the item. Read-write.
      */
@@ -171,7 +171,7 @@ export interface DriveItem {
     /**
      * URL that displays the resource in the browser. Read-only.
      */
-    webUrl?: string;
+    readonly webUrl?: string;
     /**
      * The content stream, if the item represents a file.
      */
@@ -179,7 +179,7 @@ export interface DriveItem {
     /**
      * An eTag for the content of the item. This eTag is not changed if only the metadata is changed. Note This property is not returned if the item is a folder. Read-only.
      */
-    cTag?: string;
+    readonly cTag?: string;
     /**
      * 
      */
@@ -231,19 +231,19 @@ export interface DriveItem {
     /**
      * Size of the item in bytes. Read-only.
      */
-    size?: number;
+    readonly size?: number;
     /**
      * WebDAV compatible URL for the item. Read-only.
      */
-    webDavUrl?: string;
+    readonly webDavUrl?: string;
     /**
      * Collection containing Item objects for the immediate children of Item. Only items representing folders have children. Read-only. Nullable.
      */
-    children?: Array<DriveItem>;
+    readonly children?: Array<DriveItem>;
     /**
      * The set of permissions for the item. Read-only. Nullable.
      */
-    permissions?: Array<Permission>;
+    readonly permissions?: Array<Permission>;
     /**
      * 
      */
@@ -318,25 +318,19 @@ export function DriveItemToJSON(json: any): DriveItem {
     return DriveItemToJSONTyped(json, false);
 }
 
-export function DriveItemToJSONTyped(value?: DriveItem | null, ignoreDiscriminator: boolean = false): any {
+export function DriveItemToJSONTyped(value?: Omit<DriveItem, 'id'|'createdDateTime'|'eTag'|'lastModifiedDateTime'|'webUrl'|'cTag'|'size'|'webDavUrl'|'children'|'permissions'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
-        'id': value['id'],
         'createdBy': IdentitySetToJSON(value['createdBy']),
-        'createdDateTime': value['createdDateTime'],
         'description': value['description'],
-        'eTag': value['eTag'],
         'lastModifiedBy': IdentitySetToJSON(value['lastModifiedBy']),
-        'lastModifiedDateTime': value['lastModifiedDateTime'],
         'name': value['name'],
         'parentReference': ItemReferenceToJSON(value['parentReference']),
-        'webUrl': value['webUrl'],
         'content': value['content'],
-        'cTag': value['cTag'],
         'deleted': DeletedToJSON(value['deleted']),
         'file': OpenGraphFileToJSON(value['file']),
         'fileSystemInfo': FileSystemInfoToJSON(value['fileSystemInfo']),
@@ -349,10 +343,6 @@ export function DriveItemToJSONTyped(value?: DriveItem | null, ignoreDiscriminat
         'trash': TrashToJSON(value['trash']),
         'specialFolder': SpecialFolderToJSON(value['specialFolder']),
         'remoteItem': RemoteItemToJSON(value['remoteItem']),
-        'size': value['size'],
-        'webDavUrl': value['webDavUrl'],
-        'children': value['children'] == null ? undefined : ((value['children'] as Array<any>).map(DriveItemToJSON)),
-        'permissions': value['permissions'] == null ? undefined : ((value['permissions'] as Array<any>).map(PermissionToJSON)),
         'audio': AudioToJSON(value['audio']),
         'video': VideoToJSON(value['video']),
         '@client.synchronize': value['atClientSynchronize'],

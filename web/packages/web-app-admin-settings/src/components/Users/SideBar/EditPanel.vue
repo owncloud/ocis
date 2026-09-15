@@ -150,7 +150,12 @@ const eventBus = useEventBus()
 const { showErrorMessage } = useMessages()
 const { $gettext } = useGettext()
 
-let editUser: MaybeRef<User> = ref()
+// A local draft of the user the form edits. Properties the graph API only ever returns,
+// such as `memberOf`, are still editable here: the dialog diffs the draft against the
+// user on confirm and applies those changes through their own endpoints.
+type UserDraft = { -readonly [K in keyof User]: User[K] }
+
+let editUser: MaybeRef<UserDraft> = ref()
 const formData = ref({
   displayName: {
     errorMessage: '',

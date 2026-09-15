@@ -33,7 +33,7 @@ export interface CreateGroupRequest {
     /**
      * 
      */
-    group: Group;
+    group: Omit<Group, 'id'>;
 }
 
 export interface ListGroupsRequest {
