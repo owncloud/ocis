@@ -34,7 +34,7 @@ jobs:
           - suite: apiContract
           - suite: apiLocks
           - suite: apiSettings
-          # - suite: apiNotification
+          - suite: apiNotification
           - suite: apiCors
           - suite: apiGraphUser
           - suite: apiGraph
