@@ -33,7 +33,7 @@ export interface CreateEducationUserRequest {
     /**
      * 
      */
-    educationUser: EducationUser;
+    educationUser: Omit<EducationUser, 'id'|'drives'>;
 }
 
 export interface DeleteEducationUserRequest {
@@ -73,7 +73,7 @@ export interface UpdateEducationUserRequest {
     /**
      * 
      */
-    educationUser: EducationUser;
+    educationUser: Omit<EducationUser, 'id'|'drives'>;
 }
 
 /**

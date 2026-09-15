@@ -1,7 +1,7 @@
 
 # Quota
 
-Optional. Information about the drive\'s storage space quota. Read-only.
+Optional. Information about the drive\'s storage space quota. Only `total` is writable, the other properties are computed by the server and read-only.
 
 ## Properties
 
