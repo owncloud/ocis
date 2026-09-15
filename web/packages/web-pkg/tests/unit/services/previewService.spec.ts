@@ -1,8 +1,7 @@
 import { ClientService, PreviewService } from '../../../src/services'
 import { mock, mockDeep } from 'vitest-mock-extended'
-import { createTestingPinia } from '@ownclouders/web-test-helpers'
-import { Resource, SpaceResource } from '@ownclouders/web-client'
-import { AxiosResponse } from 'axios'
+import { createTestingPinia, mockHttpResponse } from '@ownclouders/web-test-helpers'
+import { HttpError, Resource, SpaceResource } from '@ownclouders/web-client'
 import {
   useAuthStore,
   useUserStore,
@@ -94,10 +93,13 @@ describe('PreviewService', () => {
         version: '1'
       })
 
-      clientService.httpAuthenticated.get.mockRejectedValueOnce({
-        response: { headers: { 'retry-after': 0.1 } },
-        status: status
-      })
+      clientService.httpAuthenticated.get.mockRejectedValueOnce(
+        new HttpError(
+          'too many requests',
+          new Response(null, { status, headers: { 'retry-after': '0.1' } }),
+          status
+        )
+      )
       clientService.httpAuthenticated.get.mockResolvedValueOnce(undefined)
 
       await previewService.loadPreview({
@@ -189,11 +191,8 @@ const getWrapper = ({
   accessToken = 'token'
 } = {}) => {
   const clientService = mockDeep<ClientService>()
-  clientService.httpAuthenticated.get.mockResolvedValue({ data: {}, status: 200 } as AxiosResponse)
-  clientService.httpUnAuthenticated.head.mockResolvedValue({
-    data: {},
-    status: 200
-  } as AxiosResponse)
+  clientService.httpAuthenticated.get.mockResolvedValue(mockHttpResponse({}))
+  clientService.httpUnAuthenticated.head.mockResolvedValue(mockHttpResponse({}))
 
   createTestingPinia({ initialState: { user: { user: mock<User>() }, auth: { accessToken } } })
   const userStore = useUserStore()

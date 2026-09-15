@@ -16,11 +16,11 @@ import { SearchFactory } from './search'
 import { GetPathForFileIdFactory } from './getPathForFileId'
 import { SetFavoriteFactory } from './setFavorite'
 import { ListFavoriteFilesFactory } from './listFavoriteFiles'
-import { AxiosInstance } from 'axios'
 import { Headers } from 'webdav'
+import { FetchClient } from '../http'
 
 export interface WebDavOptions {
-  axiosClient: AxiosInstance
+  httpClient: FetchClient
   baseUrl: string
   headers?: () => Headers
 }

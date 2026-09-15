@@ -252,7 +252,7 @@ function getWrapper({
 
   const mocks = { ...defaultComponentMocks() }
   mocks.$clientService.graphAuthenticated.driveItems.listSharedWithMe.mockResolvedValue([
-    { remoteItem: { id: '1' }, '@UI.Hidden': hiddenShare }
+    { remoteItem: { id: '1' }, atUIHidden: hiddenShare }
   ])
 
   return {

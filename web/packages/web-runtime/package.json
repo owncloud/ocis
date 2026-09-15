@@ -22,7 +22,6 @@
     "@uppy/xhr-upload": "5.2.0",
     "@vueuse/core": "14.3.0",
     "@vueuse/head": "2.0.0",
-    "axios": "^1.18.1",
     "deepmerge": "4.3.1",
     "email-validator": "2.0.4",
     "dompurify": "^3.4.13",

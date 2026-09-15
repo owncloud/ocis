@@ -1,37 +1,51 @@
+
 # Photo
 
 The photo resource provides photo and camera properties, for example, EXIF metadata, on a driveItem. 
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**cameraMake** | **string** | Camera manufacturer. Read-only. | [optional] [default to undefined]
-**cameraModel** | **string** | Camera model. Read-only. | [optional] [default to undefined]
-**exposureDenominator** | **number** | The denominator for the exposure time fraction from the camera. Read-only. | [optional] [default to undefined]
-**exposureNumerator** | **number** | The numerator for the exposure time fraction from the camera. Read-only. | [optional] [default to undefined]
-**fNumber** | **number** | The F-stop value from the camera. Read-only. | [optional] [default to undefined]
-**focalLength** | **number** | The focal length from the camera. Read-only. | [optional] [default to undefined]
-**iso** | **number** | The ISO value from the camera. Read-only. | [optional] [default to undefined]
-**orientation** | **number** | The orientation value from the camera. Read-only. | [optional] [default to undefined]
-**takenDateTime** | **string** | Represents the date and time the photo was taken. Read-only. | [optional] [default to undefined]
+Name | Type
+------------ | -------------
+`cameraMake` | string
+`cameraModel` | string
+`exposureDenominator` | number
+`exposureNumerator` | number
+`fNumber` | number
+`focalLength` | number
+`iso` | number
+`orientation` | number
+`takenDateTime` | string
 
 ## Example
 
 ```typescript
-import { Photo } from './api';
+import type { Photo } from ''
 
-const instance: Photo = {
-    cameraMake,
-    cameraModel,
-    exposureDenominator,
-    exposureNumerator,
-    fNumber,
-    focalLength,
-    iso,
-    orientation,
-    takenDateTime,
-};
+// TODO: Update the object below with actual values
+const example = {
+  "cameraMake": null,
+  "cameraModel": null,
+  "exposureDenominator": null,
+  "exposureNumerator": null,
+  "fNumber": null,
+  "focalLength": null,
+  "iso": null,
+  "orientation": null,
+  "takenDateTime": null,
+} satisfies Photo
+
+console.log(example)
+
+// Convert the instance to a JSON string
+const exampleJSON: string = JSON.stringify(example)
+console.log(exampleJSON)
+
+// Parse the JSON string back to an object
+const exampleParsed = JSON.parse(exampleJSON) as Photo
+console.log(exampleParsed)
 ```
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+

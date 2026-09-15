@@ -292,7 +292,7 @@ const loadAppUrl = useTask(function* (signal, viewMode: string) {
 
     const url = `${baseUrl}?${query}`
     const response = yield makeRequest('POST', url, {
-      validateStatus: () => true,
+      throwOnError: false,
       signal
     })
 

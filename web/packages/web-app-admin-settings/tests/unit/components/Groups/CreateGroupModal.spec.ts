@@ -2,8 +2,8 @@ import CreateGroupModal from '../../../../src/components/Groups/CreateGroupModal
 import {
   defaultComponentMocks,
   defaultPlugins,
-  mockAxiosReject,
-  mockAxiosResolve,
+  mockHttpError,
+  mockHttpResponse,
   shallowMount
 } from '@ownclouders/web-test-helpers'
 import { mock } from 'vitest-mock-extended'
@@ -50,7 +50,7 @@ describe('CreateGroupModal', () => {
     it('should be true when displayName is valid', async () => {
       const { wrapper, mocks } = getWrapper()
       const graphMock = mocks.$clientService.graphAuthenticated
-      const getGroupSub = graphMock.groups.getGroup.mockRejectedValue(() => mockAxiosReject())
+      const getGroupSub = graphMock.groups.getGroup.mockRejectedValue(() => mockHttpError())
       wrapper.vm.group.displayName = 'users'
       expect(await wrapper.vm.validateDisplayName()).toBeTruthy()
       expect(getGroupSub).toHaveBeenCalled()
@@ -99,7 +99,7 @@ describe('CreateGroupModal', () => {
       await wrapper.vm.validateDisplayName()
 
       mocks.$clientService.graphAuthenticated.groups.createGroup.mockRejectedValue(
-        mockAxiosResolve({ id: 'e3515ffb-d264-4dfc-8506-6c239f6673b5' })
+        mockHttpResponse({ id: 'e3515ffb-d264-4dfc-8506-6c239f6673b5' })
       )
       await wrapper.vm.onConfirm()
 
