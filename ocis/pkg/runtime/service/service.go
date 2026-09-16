@@ -48,6 +48,7 @@ import (
 	idm "github.com/owncloud/ocis/v2/services/idm/pkg/command"
 	idp "github.com/owncloud/ocis/v2/services/idp/pkg/command"
 	invitations "github.com/owncloud/ocis/v2/services/invitations/pkg/command"
+	llm "github.com/owncloud/ocis/v2/services/llm/pkg/command"
 	nats "github.com/owncloud/ocis/v2/services/nats/pkg/command"
 	ocdav "github.com/owncloud/ocis/v2/services/ocdav/pkg/command"
 	ocm "github.com/owncloud/ocis/v2/services/ocm/pkg/command"
@@ -160,6 +161,11 @@ func NewService(ctx context.Context, options ...Option) (*Service, error) {
 		cfg.Activitylog.Context = ctx
 		cfg.Activitylog.Commons = cfg.Commons
 		return runServerCommand(ctx, activitylog.Server(cfg.Activitylog))
+	})
+	reg(3, opts.Config.LLM.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.LLM.Context = ctx
+		cfg.LLM.Commons = cfg.Commons
+		return runServerCommand(ctx, llm.Server(cfg.LLM))
 	})
 	reg(3, opts.Config.AppProvider.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
 		cfg.AppProvider.Context = ctx
