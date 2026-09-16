@@ -133,9 +133,9 @@ import {
  */
 export interface DriveItem {
     /**
-     * The unique identifier for the item. Server-assigned, but writable where the schema is used to reference an item that already exists, such as the entries of `drive.special`.
+     * Read-only.
      */
-    id?: string;
+    readonly id?: string;
     /**
      * 
      */
@@ -318,14 +318,13 @@ export function DriveItemToJSON(json: any): DriveItem {
     return DriveItemToJSONTyped(json, false);
 }
 
-export function DriveItemToJSONTyped(value?: Omit<DriveItem, 'createdDateTime'|'eTag'|'lastModifiedDateTime'|'webUrl'|'cTag'|'size'|'webDavUrl'|'children'|'permissions'> | null, ignoreDiscriminator: boolean = false): any {
+export function DriveItemToJSONTyped(value?: Omit<DriveItem, 'id'|'createdDateTime'|'eTag'|'lastModifiedDateTime'|'webUrl'|'cTag'|'size'|'webDavUrl'|'children'|'permissions'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
-        'id': value['id'],
         'createdBy': IdentitySetToJSON(value['createdBy']),
         'description': value['description'],
         'lastModifiedBy': IdentitySetToJSON(value['lastModifiedBy']),

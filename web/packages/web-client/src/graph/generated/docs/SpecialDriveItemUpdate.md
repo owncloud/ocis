@@ -1,23 +1,25 @@
 
-# SpecialFolder
+# SpecialDriveItemUpdate
 
-If the current item is also available as a special folder, this facet is returned.
+References an existing item inside a drive to be assigned as one of the drive\'s special resources, such as its image or readme.
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`name` | string
+`id` | string
+`specialFolder` | [SpecialFolder](SpecialFolder.md)
 
 ## Example
 
 ```typescript
-import type { SpecialFolder } from ''
+import type { SpecialDriveItemUpdate } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "name": null,
-} satisfies SpecialFolder
+  "id": null,
+  "specialFolder": null,
+} satisfies SpecialDriveItemUpdate
 
 console.log(example)
 
@@ -26,7 +28,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as SpecialFolder
+const exampleParsed = JSON.parse(exampleJSON) as SpecialDriveItemUpdate
 console.log(exampleParsed)
 ```
 

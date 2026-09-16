@@ -20,6 +20,13 @@ import {
     ItemReferenceToJSON,
     ItemReferenceToJSONTyped,
 } from './ItemReference';
+import type { SpecialDriveItemUpdate } from './SpecialDriveItemUpdate';
+import {
+    SpecialDriveItemUpdateFromJSON,
+    SpecialDriveItemUpdateFromJSONTyped,
+    SpecialDriveItemUpdateToJSON,
+    SpecialDriveItemUpdateToJSONTyped,
+} from './SpecialDriveItemUpdate';
 import type { DriveItem } from './DriveItem';
 import {
     DriveItemFromJSON,
@@ -113,9 +120,9 @@ export interface DriveUpdate {
      */
     root?: DriveItem;
     /**
-     * A collection of special drive resources.
+     * A collection of special drive resources. See the `drive` schema for the resources returned by the server.
      */
-    special?: Array<DriveItem>;
+    special?: Array<SpecialDriveItemUpdate>;
 }
 
 /**
@@ -151,7 +158,7 @@ export function DriveUpdateFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'quota': json['quota'] == null ? undefined : QuotaFromJSON(json['quota']),
         'items': json['items'] == null ? undefined : ((json['items'] as Array<any>).map(DriveItemFromJSON)),
         'root': json['root'] == null ? undefined : DriveItemFromJSON(json['root']),
-        'special': json['special'] == null ? undefined : ((json['special'] as Array<any>).map(DriveItemFromJSON)),
+        'special': json['special'] == null ? undefined : ((json['special'] as Array<any>).map(SpecialDriveItemUpdateFromJSON)),
     };
 }
 
@@ -175,7 +182,7 @@ export function DriveUpdateToJSONTyped(value?: Omit<DriveUpdate, 'id'|'createdDa
         'owner': IdentitySetToJSON(value['owner']),
         'quota': QuotaToJSON(value['quota']),
         'root': DriveItemToJSON(value['root']),
-        'special': value['special'] == null ? undefined : ((value['special'] as Array<any>).map(DriveItemToJSON)),
+        'special': value['special'] == null ? undefined : ((value['special'] as Array<any>).map(SpecialDriveItemUpdateToJSON)),
     };
 }
 

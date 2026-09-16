@@ -113,9 +113,9 @@ export interface Drive {
      */
     root?: DriveItem;
     /**
-     * A collection of special drive resources.
+     * A collection of special drive resources. Read-only, see the `driveUpdate` schema for assigning them.
      */
-    special?: Array<DriveItem>;
+    readonly special?: Array<DriveItem>;
 }
 
 /**
@@ -160,7 +160,7 @@ export function DriveToJSON(json: any): Drive {
     return DriveToJSONTyped(json, false);
 }
 
-export function DriveToJSONTyped(value?: Omit<Drive, 'id'|'createdDateTime'|'eTag'|'lastModifiedDateTime'|'webUrl'|'items'> | null, ignoreDiscriminator: boolean = false): any {
+export function DriveToJSONTyped(value?: Omit<Drive, 'id'|'createdDateTime'|'eTag'|'lastModifiedDateTime'|'webUrl'|'items'|'special'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -177,7 +177,6 @@ export function DriveToJSONTyped(value?: Omit<Drive, 'id'|'createdDateTime'|'eTa
         'owner': IdentitySetToJSON(value['owner']),
         'quota': QuotaToJSON(value['quota']),
         'root': DriveItemToJSON(value['root']),
-        'special': value['special'] == null ? undefined : ((value['special'] as Array<any>).map(DriveItemToJSON)),
     };
 }
 

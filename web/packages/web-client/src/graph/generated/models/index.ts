@@ -68,6 +68,7 @@ export * from './SharingLink';
 export * from './SharingLinkPassword';
 export * from './SharingLinkType';
 export * from './SignInActivity';
+export * from './SpecialDriveItemUpdate';
 export * from './SpecialFolder';
 export * from './TagAssignment';
 export * from './TagUnassignment';
