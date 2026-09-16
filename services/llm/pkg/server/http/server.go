@@ -34,7 +34,7 @@ func Server(opts ...Option) (ohttp.Service, error) {
 		return ohttp.Service{}, err
 	}
 
-	svc := service.New(options.Config, options.Limiter)
+	svc := service.New(options.Config, options.Limiter, options.Logger)
 
 	mux := chi.NewMux()
 	mux.Use(

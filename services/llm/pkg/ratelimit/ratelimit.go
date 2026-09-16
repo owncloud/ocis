@@ -37,6 +37,9 @@ func New(store microstore.Store, window time.Duration, maxRequests int) *Limiter
 // Allow registers a request for key and reports whether it is within the
 // configured limit. Expired timestamps are pruned on every call.
 func (l *Limiter) Allow(key string) (bool, error) {
+	if l == nil {
+		return true, nil
+	}
 	if l.window <= 0 || l.maxRequests <= 0 {
 		return true, nil
 	}
