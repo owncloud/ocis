@@ -263,6 +263,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			userroles.WithLogger(logger),
 			userroles.WithRolesClaim(cfg.RoleAssignment.OIDCRoleMapper.RoleClaim),
 			userroles.WithRoleMapping(cfg.RoleAssignment.OIDCRoleMapper.RolesMap),
+			userroles.WithDefaultRole(cfg.RoleAssignment.OIDCRoleMapper.DefaultRole),
 			userroles.WithRevaGatewaySelector(gatewaySelector),
 			userroles.WithServiceAccount(cfg.ServiceAccount),
 		)

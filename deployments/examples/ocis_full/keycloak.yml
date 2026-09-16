@@ -11,6 +11,12 @@ services:
       # Keycloak IDP specific configuration
       PROXY_AUTOPROVISION_ACCOUNTS: "true"
       PROXY_ROLE_ASSIGNMENT_DRIVER: "oidc"
+      # With the "oidc" driver a user needs a role claim that matches one of the
+      # configured role mappings, otherwise the login is refused with 403. The users
+      # this example creates have one. Users federated into Keycloak from an external
+      # user directory usually do not, so uncomment the line below to give them a
+      # low-privilege role instead of refusing them.
+      # PROXY_ROLE_ASSIGNMENT_OIDC_DEFAULT_ROLE: "user-light"
       OCIS_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/realms/${KEYCLOAK_REALM:-oCIS}
       PROXY_OIDC_REWRITE_WELLKNOWN: "true"
       WEB_OIDC_CLIENT_ID: ${OCIS_OIDC_CLIENT_ID:-web}
