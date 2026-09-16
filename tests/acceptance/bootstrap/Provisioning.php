@@ -32,7 +32,6 @@ use TestHelpers\GraphHelper;
 use TestHelpers\KeycloakHelper;
 use Laminas\Ldap\Exception\LdapException;
 use Laminas\Ldap\Ldap;
-use TestHelpers\WebUIHelper;
 
 /**
  * Functions for provisioning of users and groups
@@ -49,6 +48,10 @@ trait Provisioning {
 	private array $userTokens = [];
 	private array $createdKeycloakUsers = [];
 	private ?Ldap $idmLdap = null;
+	// the acr_values requested at Keycloak's authorize endpoint in userHasLoggedInViaWebUI();
+	// override via setAcrValuesToRequest() in scenarios that reconfigure OCIS_MFA_AUTH_LEVEL_NAMES
+	// to something other than the "advanced" default (see VaultContext)
+	private string $acrValuesToRequest = 'advanced';
 
 	/**
 	 * @param array $user
@@ -727,46 +730,24 @@ trait Provisioning {
 			"email" => "admin@example.org",
 			"actualUsername" => "admin",
 		];
-		$state = WebUIHelper::setUpUser(
-			$this->getBaseUrl(),
-			$adminUser["actualUsername"],
-			$adminUser["password"],
-		);
-		$tokenData = $this->extractOidcTokenDataFromStorageState($state);
+		$tokenData = KeycloakHelper::setAccessTokenForKeycloakOcisUser($adminUser, $this->acrValuesToRequest);
 		$this->setOcisUserToken($adminUser, $tokenData);
 	}
 
 	/**
-	 * Sets up Keycloak user in oCIS
-	 * User is logged in via web UI and user access token is extracted
-	 *
-	 * @Given user :user has logged in via web UI
-	 *
-	 * @param string $user
+	 * @param string $acrValues
 	 *
 	 * @return void
-	 * @throws Exception
-	 * @throws GuzzleException
 	 */
-	public function userHasLoggedInViaWebUI(string $user): void {
-		$createdUsers = $this->getCreatedKeycloakUsers();
-		$userAttribute = $createdUsers[strtolower($user)];
-		$state = WebUIHelper::setUpUser(
-			$this->getBaseUrl(),
-			$userAttribute["actualUsername"],
-			$userAttribute["password"],
-		);
-		$stateData = $this->extractOidcTokenDataFromStorageState($state);
-		$this->setOcisUserToken($userAttribute, $stateData);
-		$response = $this->graphContext->adminHasRetrievedUserUsingTheGraphApi($user);
-		$userAttribute['id'] = $this->getJsonDecodedResponse($response)['id'];
-		$this->addUserToCreatedUsersList(
-			$user,
-			$userAttribute['password'],
-			$userAttribute['displayName'],
-			$userAttribute['email'],
-			$userAttribute['id'],
-		);
+	public function setAcrValuesToRequest(string $acrValues): void {
+		$this->acrValuesToRequest = $acrValues;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAcrValuesToRequest(): string {
+		return $this->acrValuesToRequest;
 	}
 
 	/**
