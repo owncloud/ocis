@@ -3,7 +3,7 @@ name: Test Deployment Examples
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 * * *"   # every day at 00:00 UTC
+    - cron: "0 1 * * *"
 
 jobs:
   test:
