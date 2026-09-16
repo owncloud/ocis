@@ -271,6 +271,10 @@ func DefaultPolicies() []config.Policy {
 					Service:  "com.owncloud.web.invitations",
 				},
 				{
+					Endpoint: "/graph/v1beta1/extensions/org.libregraph/llm/",
+					Service:  "com.owncloud.web.llm",
+				},
+				{
 					Endpoint: "/graph/",
 					Service:  "com.owncloud.web.graph",
 				},
@@ -285,10 +289,6 @@ func DefaultPolicies() []config.Policy {
 				{
 					Endpoint: "/auth-app/tokens",
 					Service:  "com.owncloud.web.auth-app",
-				},
-				{
-					Endpoint: "/graph/v1beta1/extensions/org.libregraph/llm/",
-					Service:  "com.owncloud.web.llm",
 				},
 			},
 		},

@@ -162,11 +162,6 @@ func NewService(ctx context.Context, options ...Option) (*Service, error) {
 		cfg.Activitylog.Commons = cfg.Commons
 		return runServerCommand(ctx, activitylog.Server(cfg.Activitylog))
 	})
-	reg(3, opts.Config.LLM.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
-		cfg.LLM.Context = ctx
-		cfg.LLM.Commons = cfg.Commons
-		return runServerCommand(ctx, llm.Server(cfg.LLM))
-	})
 	reg(3, opts.Config.AppProvider.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
 		cfg.AppProvider.Context = ctx
 		cfg.AppProvider.Commons = cfg.Commons
@@ -360,6 +355,11 @@ func NewService(ctx context.Context, options ...Option) (*Service, error) {
 		cfg.Notifications.Context = ctx
 		cfg.Notifications.Commons = cfg.Commons
 		return runServerCommand(ctx, notifications.Server(cfg.Notifications))
+	})
+	areg(opts.Config.LLM.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+		cfg.LLM.Context = ctx
+		cfg.LLM.Commons = cfg.Commons
+		return runServerCommand(ctx, llm.Server(cfg.LLM))
 	})
 
 	return s, nil
