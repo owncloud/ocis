@@ -14,6 +14,7 @@ import (
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	microstore "go-micro.dev/v4/store"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/llm/pkg/config"
 	"github.com/owncloud/ocis/v2/services/llm/pkg/ratelimit"
 )
@@ -33,7 +34,7 @@ func newTestService(t *testing.T, llmServerURL string, maxRequests int) *Service
 		},
 	}
 	limiter := ratelimit.New(microstore.NewMemoryStore(), time.Minute, maxRequests)
-	return New(cfg, limiter)
+	return New(cfg, limiter, log.NewLogger(log.Level("error")))
 }
 
 func requestWithUser(body []byte, userID string) *http.Request {
@@ -115,9 +116,11 @@ func TestHandleChatCompletions_MissingMessages_Returns400(t *testing.T) {
 func TestHandleChatCompletions_HappyPath_RelaysUpstreamResponse(t *testing.T) {
 	var receivedPath string
 	var receivedAuth string
+	var receivedBody []byte
 	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		receivedPath = r.URL.Path
 		receivedAuth = r.Header.Get("Authorization")
+		receivedBody, _ = io.ReadAll(r.Body)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`{"choices":[{"message":{"content":"hi"}}]}`))
@@ -127,7 +130,7 @@ func TestHandleChatCompletions_HappyPath_RelaysUpstreamResponse(t *testing.T) {
 	svc := newTestService(t, upstream.URL, 20)
 	svc.cfg.LLM.APIKey = "test-key"
 
-	req := requestWithUser([]byte(`{"model":"m","messages":[{"role":"user","content":"hi"}]}`), "user-1")
+	req := requestWithUser([]byte(`{"model":"m","messages":[{"role":"user","content":"hi"}],"max_tokens":999999,"some_unknown_field":"should be dropped"}`), "user-1")
 	rec := httptest.NewRecorder()
 
 	svc.HandleChatCompletions(rec, req)
@@ -145,6 +148,52 @@ func TestHandleChatCompletions_HappyPath_RelaysUpstreamResponse(t *testing.T) {
 	var got map[string]interface{}
 	if err := json.Unmarshal(rec.Body.Bytes(), &got); err != nil {
 		t.Fatalf("expected valid JSON relayed back, got error: %v, body: %s", err, rec.Body.String())
+	}
+
+	var forwarded map[string]interface{}
+	if err := json.Unmarshal(receivedBody, &forwarded); err != nil {
+		t.Fatalf("expected valid JSON forwarded to upstream, got error: %v, body: %s", err, receivedBody)
+	}
+	if _, present := forwarded["some_unknown_field"]; present {
+		t.Fatalf("expected unknown field to be dropped from forwarded body, got: %s", receivedBody)
+	}
+	maxTokens, ok := forwarded["max_tokens"].(float64)
+	if !ok {
+		t.Fatalf("expected max_tokens to be forwarded, got: %s", receivedBody)
+	}
+	if int(maxTokens) != svc.cfg.LLM.MaxTokensLimit {
+		t.Fatalf("expected max_tokens clamped to %d, got %v", svc.cfg.LLM.MaxTokensLimit, maxTokens)
+	}
+}
+
+func TestHandleChatCompletions_ModelOverride_ReplacesClientModel(t *testing.T) {
+	var receivedBody []byte
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		receivedBody, _ = io.ReadAll(r.Body)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"choices":[{"message":{"content":"hi"}}]}`))
+	}))
+	defer upstream.Close()
+
+	svc := newTestService(t, upstream.URL, 20)
+	svc.cfg.LLM.Model = "forced-model"
+
+	req := requestWithUser([]byte(`{"model":"client-requested-model","messages":[{"role":"user","content":"hi"}]}`), "user-1")
+	rec := httptest.NewRecorder()
+
+	svc.HandleChatCompletions(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d, body: %s", rec.Code, rec.Body.String())
+	}
+
+	var forwarded map[string]interface{}
+	if err := json.Unmarshal(receivedBody, &forwarded); err != nil {
+		t.Fatalf("expected valid JSON forwarded to upstream, got error: %v, body: %s", err, receivedBody)
+	}
+	if forwarded["model"] != "forced-model" {
+		t.Fatalf("expected forwarded model to be overridden to %q, got %v", "forced-model", forwarded["model"])
 	}
 }
 
