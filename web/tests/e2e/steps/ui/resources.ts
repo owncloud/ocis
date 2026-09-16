@@ -482,6 +482,97 @@ export async function userClosesFileViewer({ stepUser }: { stepUser: string }): 
   await editor.close(page)
 }
 
+export async function userPicksImageInMarkdownEditor({
+  stepUser,
+  image
+}: {
+  stepUser: string
+  image: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  await editor.waitForMarkdownEditor(page)
+  await editor.pickMarkdownImage(page, world.filesEnvironment.getFile({ name: image }).path)
+}
+
+export async function userPicksOversizedImageInMarkdownEditor({
+  stepUser,
+  sizeInBytes
+}: {
+  stepUser: string
+  sizeInBytes: number
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  await editor.waitForMarkdownEditor(page)
+  // Only file.type and file.size decide the rejection, so an in-memory payload avoids
+  // committing a multi-megabyte fixture.
+  await editor.pickMarkdownImage(page, {
+    name: 'oversized.png',
+    mimeType: 'image/png',
+    buffer: Buffer.alloc(sizeInBytes)
+  })
+}
+
+export async function userShouldSeeInlinedImageInMarkdownEditor({
+  stepUser
+}: {
+  stepUser: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  // The markdown source only exposes the data URI through the shortener's title attribute.
+  await expect(editor.markdownShortenedTokenLocator(page)).toHaveAttribute(
+    'title',
+    /^data:image\/png;base64,/
+  )
+  await expect(editor.markdownPreviewImageLocator(page)).toBeVisible()
+}
+
+export async function userShouldNotSeeInlinedImageInMarkdownEditor({
+  stepUser
+}: {
+  stepUser: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  await expect(editor.markdownPreviewImageLocator(page)).toHaveCount(0)
+  await expect(editor.markdownShortenedTokenLocator(page)).toHaveCount(0)
+}
+
+export async function userShouldSeeImageRejectionInMarkdownEditor({
+  stepUser,
+  size,
+  limit
+}: {
+  stepUser: string
+  size: string
+  limit: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const messages = editor.markdownValidationMessagesLocator(page)
+  await expect(messages).toBeVisible()
+  await expect(messages).toContainText(`File is too big (${size}). Max file size: ${limit}.`)
+}
+
+export async function userShouldNotSeeCropOptionInMarkdownEditor({
+  stepUser
+}: {
+  stepUser: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  await editor.openMarkdownImageMenu(page)
+
+  // md-editor-v3 always renders three image entries; TextEditor.vue hides the third
+  // ("Crop And Upload") with `.md-editor-menu-item-image:nth-child(3):last-child`.
+  const items = editor.markdownImageMenuItemsLocator(page)
+  await expect(items).toHaveCount(3)
+  await expect(items.filter({ visible: true })).toHaveCount(2)
+  await expect(items.filter({ visible: true, hasText: /crop/i })).toHaveCount(0)
+}
+
 export async function userDeletesResources({
   stepUser,
   actionType = fileAction.sideBarPanel,
