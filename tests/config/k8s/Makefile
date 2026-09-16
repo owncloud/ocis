@@ -18,7 +18,8 @@ create-cluster:
 		-p '80:80@loadbalancer' -p '443:443@loadbalancer' -p '9100-9399:30100-30399@loadbalancer' \
 		--k3s-arg '--tls-san=k3d@server:*' --k3s-arg '--disable=metrics-server@server:*' \
 		--host-alias $(HOST_IP):ocis-server --host-alias $(HOST_IP):federation-ocis-server \
-		-v $(LOGS_DIR):/logs
+		-v $(LOGS_DIR):/logs \
+		-v $(abspath ./traefik-config.yaml):/var/lib/rancher/k3s/server/manifests/traefik-config.yaml
 
 .PHONY: prepare-charts
 prepare-charts:
