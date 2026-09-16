@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-NAMESPACE="${NAMESPACE:-ocis-server}"
+NAMESPACE="${TEST_SERVER_DOMAIN:-ocis-server}"
 
 declare -A DEBUG_PORTS=(
     [activitylog]=9197

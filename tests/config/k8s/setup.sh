@@ -69,6 +69,11 @@ if [[ "$ENABLE_WOPI" == "true" ]]; then
     # patch collaboration service
     #  - allow dynamic wopi src
     sed -i -E "s|value: http://.*:9300|value: {{ \$officeSuite.wopiSrc }}|" $TPL_DIR/collaboration/deployment.yaml
+    sed -i \
+      -e 's/{{- include "ocis.extraEnvs" \. | nindent 12 }}/{{- include "ocis.extraEnvs" $ | nindent 12 }}/' \
+      -e 's/{{- include "ocis.extraVolMounts" \. | nindent 12 }}/{{- include "ocis.extraVolMounts" $ | nindent 12 }}/' \
+      -e 's/{{- include "ocis.extraVolumes" \. | nindent 8 }}/{{- include "ocis.extraVolumes" $ | nindent 8 }}/' \
+      $TPL_DIR/collaboration/deployment.yaml
 fi
 
 if [[ "$ENABLE_OCM" == "true" ]]; then

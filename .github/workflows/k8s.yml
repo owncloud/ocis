@@ -10,7 +10,10 @@ env:
   PHP_VERSION: "8.4"
   K3D_VERSION: "v5.8.3"
   HELM_VERSION: "v3.18.4"
+  TEST_SERVER_DOMAIN: ocis-server
+  FED_SERVER_DOMAIN: federation-ocis-server
   TEST_SERVER_URL: https://ocis-server
+  FED_SERVER_URL: https://federation-ocis-server
   STORAGE_DRIVER: ocis
   OCIS_WRAPPER_URL: http://localhost:5200
   K8S: true
@@ -62,7 +65,7 @@ jobs:
           - suite: apiAuthApp
           - suite: apiAntivirus
           - suite: apiOcm
-          # - suite: apiCollaboration
+          - suite: apiCollaboration
           - suite: apiVault
           - suite: "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
           - suite: "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
@@ -105,7 +108,7 @@ jobs:
 
       - name: Prepare hosts
         run: |
-          echo "127.0.0.1 ocis-server clamav email collabora onlyoffice fakeoffice tika federation-ocis-server keycloak" \
+          echo "127.0.0.1 $TEST_SERVER_DOMAIN clamav email collabora onlyoffice fakeoffice tika $FED_SERVER_DOMAIN keycloak" \
             | sudo tee -a /etc/hosts
 
       - name: Spin up K3d Cluster
@@ -181,11 +184,11 @@ jobs:
 
             # patch the realm so the "web" client's redirect/origin URLs match
             # the k8s ingress domain instead of the non-k8s "localhost:9200" one
-            sed 's|https://localhost:9200|https://ocis-server|g' \
+            sed "s|https://localhost:9200|${TEST_SERVER_URL}|g" \
               tests/config/ci/ocis-mfa-ci-realm.dist.json > /tmp/ocis-realm.json
 
             docker run -d --name keycloak --network host \
-              -e OCIS_DOMAIN=https://ocis-server \
+              -e OCIS_DOMAIN="$TEST_SERVER_URL" \
               -e KC_HOSTNAME=keycloak \
               -e KC_PORT=8443 \
               -e KC_DB=postgres \
@@ -213,34 +216,99 @@ jobs:
             bash tests/config/k8s/expose-external-svc.sh keycloak:8443
           fi
 
+          if [[ "${{ matrix.suite }}" == "apiCollaboration" ]]; then
+            # Start Collabora
+            docker run -d \
+              --name collabora \
+              --network host \
+              --entrypoint bash \
+              -e DONT_GEN_SSL_CERT=set \
+              -e "extra_params=--o:ssl.enable=true --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=https://127.0.0.1:9200" \
+              collabora/code:25.04.7.3.1 \
+              -c "coolconfig generate-proof-key && bash /start-collabora-online.sh"
+            timeout 150 bash -c 'until curl -kfsSL https://localhost:9980/hosting/discovery > /dev/null; do sleep 5; done'
+            echo "collabora ready."
+
+            # Start OnlyOffice
+            docker run -d \
+              --name onlyoffice \
+              -p 7443:443 \
+              -e WOPI_ENABLED=true \
+              -e USE_UNAUTHORIZED_STORAGE=true \
+              -v "$(pwd)/tests/config/ci/only-office.json:/tmp/local.json:ro" \
+              --entrypoint /bin/sh \
+              onlyoffice/documentserver:9.2.1 \
+              -c "set -e
+            cp /tmp/local.json /etc/onlyoffice/documentserver/local.json
+            openssl req -x509 -newkey rsa:4096 -keyout onlyoffice.key -out onlyoffice.crt -sha256 -days 365 -batch -nodes
+            mkdir -p /var/www/onlyoffice/Data/certs
+            cp onlyoffice.key /var/www/onlyoffice/Data/certs/
+            cp onlyoffice.crt /var/www/onlyoffice/Data/certs/
+            chmod 400 /var/www/onlyoffice/Data/certs/onlyoffice.key
+            /app/ds/run-document-server.sh"
+            timeout 150 bash -c 'until curl -kfsSL https://localhost:7443/hosting/discovery > /dev/null; do sleep 5; done'
+            echo "onlyoffice ready."
+
+            #Start FakeOffice
+            docker run -d --name fakeoffice --network host \
+              -v "$(pwd):/ocis:ro" \
+              python:3-alpine \
+              python3 -c "
+            import http.server, pathlib
+            body = pathlib.Path('/ocis/tests/config/ci/hosting-discovery.xml').read_bytes()
+            class H(http.server.BaseHTTPRequestHandler):
+                def do_GET(self):
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'text/xml')
+                    self.end_headers()
+                    self.wfile.write(body)
+                def log_message(self, *a): pass
+            http.server.HTTPServer(('', 8080), H).serve_forever()
+            "
+            timeout 60 bash -c 'until curl -fsSL http://localhost:8080/hosting/discovery > /dev/null; do sleep 5; done'
+            echo "fakeoffice ready."
+
+            bash tests/config/k8s/expose-external-svc.sh collabora:9980
+            bash tests/config/k8s/expose-external-svc.sh onlyoffice:7443
+            bash tests/config/k8s/expose-external-svc.sh fakeoffice:8080
+          fi
+
       - name: Deploy oCIS
         run: |
           cd tests/config/k8s
-          kubectl get pods -n ocis-server -Aw &
+          kubectl get pods -n "$TEST_SERVER_DOMAIN" -Aw &
           make deploy-ocis
           if [[ "${{ matrix.suite }}" == "apiOcm" ]]; then
             OCM=true make deploy-ocis
           fi
+
+      - name: Expose node ports
+        if: ${{ matrix.suite == 'apiCollaboration' }}
+        run: |
+          bash tests/config/k8s/expose-nodeports.sh collaboration-collabora 9300 30300
+          bash tests/config/k8s/expose-nodeports.sh collaboration-fakeoffice 9300 30301
+          bash tests/config/k8s/expose-nodeports.sh collaboration-onlyoffice 9300 30302
+          bash tests/config/k8s/expose-nodeports.sh collaboration-fakeoffice 9304 30304
 
       - name: Wait for oCIS to be ready
         env:
           FILE_URL: ${{ env.TEST_SERVER_URL }}/remote.php/dav/files/admin/hello1.txt
         run: |
           kubectl wait \
-            --namespace ocis-server \
+            --namespace "$TEST_SERVER_DOMAIN" \
             --for=condition=Available \
             deployment \
             --all \
             --timeout=10m
 
           kubectl wait \
-            --namespace ocis-server \
+            --namespace "$TEST_SERVER_DOMAIN" \
             --for=condition=Ready \
             pod \
             --all \
             --timeout=10m
 
-          kubectl get pods -n ocis-server
+          kubectl get pods -n "$TEST_SERVER_DOMAIN"
 
           retry() {
             local label=$1
@@ -264,7 +332,7 @@ jobs:
             # reached via port-forward since it isn't exposed by any Service.
             # local port 19205 (not 9205): 9100-9399 is already bound on the
             # host by the k3d loadbalancer's NodePort range, see create-cluster.
-            kubectl -n ocis-server port-forward deployment/proxy 19205:9205 &
+            kubectl -n "$TEST_SERVER_DOMAIN" port-forward deployment/proxy 19205:9205 &
             PORT_FORWARD_PID=$!
             trap 'kill $PORT_FORWARD_PID 2>/dev/null' EXIT
 
@@ -316,7 +384,7 @@ jobs:
         run: |
           (
             while true; do
-              kubectl -n ocis-server port-forward deployment/proxy 19205:9205 >> /tmp/proxy-readyz-portforward.log 2>&1
+              kubectl -n "$TEST_SERVER_DOMAIN" port-forward deployment/proxy 19205:9205 >> /tmp/proxy-readyz-portforward.log 2>&1
               sleep 1
             done
           ) &
@@ -331,7 +399,7 @@ jobs:
             --admin-username admin \
             --admin-password admin \
             --skip-ocis-run \
-            -n ocis-server &
+            -n "$TEST_SERVER_DOMAIN" &
 
       - name: Prepare expected failures
         if: startsWith( matrix.suite, 'core' )
@@ -348,7 +416,7 @@ jobs:
         if: startsWith( matrix.suite, 'api' )
         env:
           TEST_SERVER_URL: ${{ env.TEST_SERVER_URL }}
-          TEST_SERVER_FED_URL: https://federation-ocis-server
+          TEST_SERVER_FED_URL: ${{ env.FED_SERVER_URL }}
           STORAGE_DRIVER: ${{ env.STORAGE_DRIVER }}
           BEHAT_SUITES: ${{ matrix.suite }}
           BEHAT_FILTER_TAGS: "~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage"
