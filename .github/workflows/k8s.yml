@@ -64,7 +64,7 @@ jobs:
           - suite: apiOcm
           # - suite: apiCollaboration
           - suite: apiVault
-          # - suite: "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
+          - suite: "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
           - suite: "coreApiShareManagementBasicToShares,coreApiShareManagementToShares"
           - suite: "coreApiSharees"
           - suite: "coreApiSharePublicLink2"
