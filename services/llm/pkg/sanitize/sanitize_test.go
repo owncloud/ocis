@@ -117,8 +117,8 @@ func TestBody_TemperatureOmittedWhenAbsent(t *testing.T) {
 
 func TestBody_DropsUnknownFields(t *testing.T) {
 	req, err := Body(map[string]interface{}{
-		"model":            "m",
-		"messages":         []interface{}{"hi"},
+		"model":             "m",
+		"messages":          []interface{}{"hi"},
 		"some_random_field": "should be dropped",
 	}, "", 4096)
 	if err != nil {
