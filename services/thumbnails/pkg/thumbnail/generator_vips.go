@@ -3,13 +3,11 @@
 package thumbnail
 
 import (
-	"bytes"
 	"image"
 	"strings"
 
 	"github.com/davidbyttow/govips/v2/vips"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
-	"golang.org/x/image/bmp"
 )
 
 // SimpleGenerator is the default image generator and is used for all image types expect gif.
@@ -43,12 +41,8 @@ func (g SimpleGenerator) Generate(size image.Rectangle, img interface{}) (interf
 	var err error
 	switch img.(type) {
 	case *image.RGBA:
-		// This comes from the txt preprocessor
-		var buf bytes.Buffer
-		if err = bmp.Encode(&buf, img.(*image.RGBA)); err != nil {
-			return nil, err
-		}
-		m, err = vips.NewImageFromReader(&buf)
+		// Direct import: BMP needs the ImageMagick loader, missing on minimal runtimes.
+		m, err = vips.NewImageFromGoImage(img.(*image.RGBA))
 		if err != nil {
 			return nil, err
 		}
