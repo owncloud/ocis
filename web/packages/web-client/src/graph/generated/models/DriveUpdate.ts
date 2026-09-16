@@ -89,9 +89,9 @@ export interface DriveUpdate {
      */
     readonly webUrl?: string;
     /**
-     * Describes the type of drive represented by this resource. Values are "personal" for users home spaces, "project", "virtual" or "share". Can be set when creating a drive, read-only afterwards.
+     * Describes the type of drive represented by this resource. Values are "personal" for users home spaces, "project", "virtual" or "share". Read-only, see the `drive` schema for creating a drive.
      */
-    driveType?: string;
+    readonly driveType?: string;
     /**
      * The drive alias can be used in clients to make the urls user friendly. Example: 'personal/einstein'. This will be used to resolve to the correct driveID.
      */
@@ -159,7 +159,7 @@ export function DriveUpdateToJSON(json: any): DriveUpdate {
     return DriveUpdateToJSONTyped(json, false);
 }
 
-export function DriveUpdateToJSONTyped(value?: Omit<DriveUpdate, 'id'|'createdDateTime'|'eTag'|'lastModifiedDateTime'|'webUrl'|'items'> | null, ignoreDiscriminator: boolean = false): any {
+export function DriveUpdateToJSONTyped(value?: Omit<DriveUpdate, 'id'|'createdDateTime'|'eTag'|'lastModifiedDateTime'|'webUrl'|'driveType'|'items'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -171,7 +171,6 @@ export function DriveUpdateToJSONTyped(value?: Omit<DriveUpdate, 'id'|'createdDa
         'lastModifiedBy': IdentitySetToJSON(value['lastModifiedBy']),
         'name': value['name'],
         'parentReference': ItemReferenceToJSON(value['parentReference']),
-        'driveType': value['driveType'],
         'driveAlias': value['driveAlias'],
         'owner': IdentitySetToJSON(value['owner']),
         'quota': QuotaToJSON(value['quota']),

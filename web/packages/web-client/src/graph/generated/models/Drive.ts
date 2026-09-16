@@ -89,7 +89,7 @@ export interface Drive {
      */
     readonly webUrl?: string;
     /**
-     * Describes the type of drive represented by this resource. Values are "personal" for users home spaces, "project", "virtual" or "share". Can be set when creating a drive, read-only afterwards.
+     * Describes the type of drive represented by this resource. Values are "personal" for users home spaces, "project", "virtual" or "share". Read-write on create, read-only afterwards, see the `driveUpdate` schema.
      */
     driveType?: string;
     /**
