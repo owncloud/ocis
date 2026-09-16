@@ -23,10 +23,14 @@
       :auto-focus="autoFocus"
       :sanitize="sanitize"
       :toolbars-exclude="['save', 'github']"
-      no-upload-img
       @on-change="(value) => $emit('update:currentContent', value)"
+      @on-upload-img="onUploadImg"
     >
       <template #defFooters>
+        <span v-if="validationMessages.length" class="footer-validation-messages" role="alert">
+          <span v-for="(message, index) in validationMessages" :key="index">{{ message }}</span>
+        </span>
+
         <span class="footer-links">
           <a
             href="https://imzbf.github.io/md-editor-v3/en-US/api#%F0%9F%AA%A1%20Shortcut%20keys"
@@ -58,7 +62,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, unref } from 'vue'
+import { computed, nextTick, onMounted, ref, unref, watch } from 'vue'
 import { Resource } from '@ownclouders/web-client'
 import dompurify from 'dompurify'
 
@@ -83,6 +87,7 @@ import { languageUserDefined, languages } from './l18n'
 import { useGettext } from 'vue3-gettext'
 import { AppConfigObject } from '../../apps'
 import { useThemeStore } from '../../composables'
+import { formatFileSize } from '../../helpers'
 
 interface TextEditorProps {
   applicationConfig?: AppConfigObject
@@ -109,10 +114,18 @@ defineEmits<TextEditorEmits>()
 const { current: currentLanguage, $gettext } = useGettext()
 const { currentTheme } = useThemeStore()
 
+// Per-image cap uses raw File.size; document budget uses encoded dataUri.length — they differ.
+const defaultMaxImageSize = 2 * 1000 * 1000
+const defaultMaxDocumentImageSize = 10 * 1000 * 1000
+
 // Should not be a ref, otherwise functions like setMarkdown won't work
 const editorConfig = computed(() => {
-  const { showPreviewOnlyMd = true }: AppConfigObject = applicationConfig
-  return { showPreviewOnlyMd }
+  const {
+    showPreviewOnlyMd = true,
+    maxImageSize = defaultMaxImageSize,
+    maxDocumentImageSize = defaultMaxDocumentImageSize
+  }: AppConfigObject = applicationConfig
+  return { showPreviewOnlyMd, maxImageSize, maxDocumentImageSize }
 })
 
 const isMarkdown = computed(() => {
@@ -127,6 +140,96 @@ const theme = computed(() => (unref(currentTheme).isDark ? 'dark' : 'light'))
 
 const sanitize = (html) =>
   dompurify.sanitize(html, { ADD_ATTR: ['target'], ADD_TAGS: ['foreignObject'] })
+
+const dataUriRegex = /data:image\/[a-z0-9.+-]+;base64,[A-Za-z0-9+/=]+/gi
+
+const validationMessages = ref<string[]>([])
+const skipNextContentClear = ref(false)
+
+const formatSize = (size: number) => formatFileSize(size, currentLanguage)
+
+const usedDocumentImageSize = (markdown: string): number => {
+  const dataUris: string[] = markdown?.match(dataUriRegex) ?? []
+  return dataUris.reduce((total, dataUri) => total + dataUri.length, 0)
+}
+
+const readAsDataUrl = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = () => reject(reader.error)
+    reader.readAsDataURL(file)
+  })
+
+type UploadImgCallBack = (urls: Array<{ url: string; alt: string; title: string }>) => void
+
+const onUploadImg = async (files: Array<File>, callBack: UploadImgCallBack) => {
+  if (!unref(isMarkdown)) {
+    // Always invoke the callback so md-editor-v3 stops waiting.
+    callBack([])
+    return
+  }
+
+  const { maxImageSize, maxDocumentImageSize } = unref(editorConfig)
+  validationMessages.value = []
+
+  let usedSize = usedDocumentImageSize(currentContent)
+  const accepted: Array<{ url: string; alt: string; title: string }> = []
+
+  for (const file of files) {
+    if (!file.type.startsWith('image/')) {
+      continue
+    }
+
+    if (file.size > maxImageSize) {
+      validationMessages.value.push(
+        $gettext('File is too big (%{ size }). Max file size: %{ limit }.', {
+          size: formatSize(file.size),
+          limit: formatSize(maxImageSize)
+        })
+      )
+      continue
+    }
+
+    let dataUri: string
+    try {
+      dataUri = await readAsDataUrl(file)
+    } catch {
+      validationMessages.value.push($gettext('Could not read "%{ name }".', { name: file.name }))
+      continue
+    }
+
+    if (usedSize + dataUri.length > maxDocumentImageSize) {
+      const remaining = Math.max(maxDocumentImageSize - usedSize, 0)
+      validationMessages.value.push(
+        $gettext(
+          'Not enough space in this document (%{ remaining } remaining). Remove an image or link the file instead.',
+          { remaining: formatSize(remaining) }
+        )
+      )
+      continue
+    }
+
+    usedSize += dataUri.length
+    accepted.push({ url: dataUri, alt: file.name, title: '' })
+  }
+
+  if (accepted.length > 0) {
+    skipNextContentClear.value = true
+  }
+  callBack(accepted)
+}
+
+watch(
+  () => currentContent,
+  () => {
+    if (skipNextContentClear.value) {
+      skipNextContentClear.value = false
+      return
+    }
+    validationMessages.value = []
+  }
+)
 
 onMounted(async () => {
   if (isReadOnly) {
@@ -160,6 +263,12 @@ config({
     },
     mermaid: {
       instance: mermaid
+    },
+    // The crop entry is hidden (see the CSS below), so Cropper is never constructed.
+    // md-editor-v3 CDN-injects cropperjs from unpkg unless an instance is registered
+    // (composition.ts: noCropperScript) — this stub keeps that request from being made.
+    cropper: {
+      instance: class {} as never
     }
   },
   markdownItConfig(md) {
@@ -229,11 +338,27 @@ config({
     gap: 0.625rem;
   }
 
+  .footer-validation-messages {
+    display: inline-flex;
+    flex-direction: column;
+    color: var(--oc-color-swatch-danger-default);
+    margin-right: 0.625rem;
+  }
+
   #text-editor-component-html-wrapper {
     margin-left: var(--oc-space-xsmall);
   }
   .md-editor-code-head {
     z-index: 0;
+  }
+
+  // Hides the "Crop And Upload" entry: cropping is dropped until users ask for it.
+  // md-editor-v3 hardcodes the three image-dropdown entries with identical classes and
+  // exposes no prop to hide one (still true in v7), so position is the only handle.
+  // Requiring :nth-child(3) and :last-child together means an upstream reorder stops the
+  // selector matching, showing all entries rather than hiding the wrong one.
+  .md-editor-menu-item-image:nth-child(3):last-child {
+    display: none;
   }
 }
 
