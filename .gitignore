@@ -26,6 +26,9 @@ ocis/cmd/ocis/config/
 /hugo
 /docs/services/*/_index.md
 
+# deployment example runtime data (bind-mounted volumes)
+/deployments/examples/ocis_full/data/
+
 # IDEs
 .idea
 

@@ -5,12 +5,35 @@ services:
       ocis-net:
         aliases:
           - ${OCIS_DOMAIN:-ocis.owncloud.test}
+  # chowns the host-mounted config/data dirs to the oCIS container's non-root
+  # user (uid/gid 1000) before oCIS itself starts, since bind mounts default
+  # to being owned by whoever created them on the host. Skips the recursive
+  # chown on subsequent startups (marker file) so it doesn't re-walk the
+  # whole data dir, which can grow big, on every restart.
+  ocis-data-init:
+    image: alpine:latest
+    user: root
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        for d in /etc/ocis /var/lib/ocis; do
+        mkdir -p "$$d";
+        m="$$d/.ocis-data-init-done";
+        [ -f "$$m" ] || { chown -R 1000:1000 "$$d"; touch "$$m"; };
+        done
+    volumes:
+      - ${OCIS_CONFIG_DIR:-./data/ocis-config}:/etc/ocis
+      - ${OCIS_DATA_DIR:-./data/ocis-data}:/var/lib/ocis
+
   ocis:
     image: ${OCIS_DOCKER_IMAGE}:${OCIS_DOCKER_TAG}
     # changelog: https://github.com/owncloud/ocis/tree/master/changelog
     # release notes: https://doc.owncloud.com/ocis_release_notes.html
     networks:
       ocis-net:
+    depends_on:
+      ocis-data-init:
+        condition: service_completed_successfully
     entrypoint:
       - /bin/sh
     # run ocis init to initialize a configuration file with random secrets
@@ -57,9 +80,9 @@ services:
       - ./config/ocis/app-registry.yaml:/etc/ocis/app-registry.yaml
       - ./config/ocis/csp.yaml:/etc/ocis/csp.yaml
       - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
-      # configure the .env file to use own paths instead of docker internal volumes
-      - ${OCIS_CONFIG_DIR:-ocis-config}:/etc/ocis
-      - ${OCIS_DATA_DIR:-ocis-data}:/var/lib/ocis
+      # configure the .env file to use different host paths if desired
+      - ${OCIS_CONFIG_DIR:-./data/ocis-config}:/etc/ocis
+      - ${OCIS_DATA_DIR:-./data/ocis-data}:/var/lib/ocis
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=https"
@@ -70,7 +93,3 @@ services:
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
-
-volumes:
-  ocis-config:
-  ocis-data:
