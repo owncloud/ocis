@@ -27,34 +27,36 @@
       @on-upload-img="onUploadImg"
     >
       <template #defFooters>
-        <span v-if="validationMessages.length" class="footer-validation-messages" role="alert">
-          <span v-for="(message, index) in validationMessages" :key="index">{{ message }}</span>
-        </span>
+        <span class="footer-slot">
+          <span v-if="isAddingImages" class="footer-image-progress" role="status">
+            {{ $gettext('Adding image…') }}
+          </span>
 
-        <span class="footer-links">
-          <a
-            href="https://imzbf.github.io/md-editor-v3/en-US/api#%F0%9F%AA%A1%20Shortcut%20keys"
-            target="_blank"
-            rel="noopener noreferrer"
-            >{{
-              $pgettext(
-                'A link to a list of keyboard shortcuts that can be used in the markdown editor.',
-                'Keyboard shortcuts'
-              )
-            }}</a
-          >
+          <span class="footer-links">
+            <a
+              href="https://imzbf.github.io/md-editor-v3/en-US/api#%F0%9F%AA%A1%20Shortcut%20keys"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{{
+                $pgettext(
+                  'A link to a list of keyboard shortcuts that can be used in the markdown editor.',
+                  'Keyboard shortcuts'
+                )
+              }}</a
+            >
 
-          <a
-            href="https://highlightjs.readthedocs.io/en/latest/supported-languages.html"
-            target="_blank"
-            rel="noopener noreferrer"
-            >{{
-              $pgettext(
-                'A link to a list of supported programming languages that can be used in the markdown editor.',
-                'Supported programming languages'
-              )
-            }}</a
-          >
+            <a
+              href="https://highlightjs.readthedocs.io/en/latest/supported-languages.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{{
+                $pgettext(
+                  'A link to a list of supported programming languages that can be used in the markdown editor.',
+                  'Supported programming languages'
+                )
+              }}</a
+            >
+          </span>
         </span>
       </template>
     </md-editor>
@@ -86,7 +88,8 @@ import { languageUserDefined, languages } from './l18n'
 
 import { useGettext } from 'vue3-gettext'
 import { AppConfigObject } from '../../apps'
-import { useThemeStore } from '../../composables'
+import { useMessages, useThemeStore } from '../../composables'
+import { DEFAULT_MAX_DOCUMENT_IMAGE_SIZE, DEFAULT_MAX_IMAGE_SIZE } from '../../constants'
 import { formatFileSize } from '../../helpers'
 
 interface TextEditorProps {
@@ -111,19 +114,16 @@ const {
 
 defineEmits<TextEditorEmits>()
 
-const { current: currentLanguage, $gettext } = useGettext()
+const { current: currentLanguage, $gettext, $ngettext } = useGettext()
 const { currentTheme } = useThemeStore()
-
-// Per-image cap uses raw File.size; document budget uses encoded dataUri.length — they differ.
-const defaultMaxImageSize = 2 * 1000 * 1000
-const defaultMaxDocumentImageSize = 10 * 1000 * 1000
+const { showErrorMessage } = useMessages()
 
 // Should not be a ref, otherwise functions like setMarkdown won't work
 const editorConfig = computed(() => {
   const {
     showPreviewOnlyMd = true,
-    maxImageSize = defaultMaxImageSize,
-    maxDocumentImageSize = defaultMaxDocumentImageSize
+    maxImageSize = DEFAULT_MAX_IMAGE_SIZE,
+    maxDocumentImageSize = DEFAULT_MAX_DOCUMENT_IMAGE_SIZE
   }: AppConfigObject = applicationConfig
   return { showPreviewOnlyMd, maxImageSize, maxDocumentImageSize }
 })
@@ -143,10 +143,23 @@ const sanitize = (html) =>
 
 const dataUriRegex = /data:image\/[a-z0-9.+-]+;base64,[A-Za-z0-9+/=]+/gi
 
-const validationMessages = ref<string[]>([])
-const skipNextContentClear = ref(false)
+const isAddingImages = ref(false)
+const pendingImageSize = ref(0)
 
 const formatSize = (size: number) => formatFileSize(size, currentLanguage)
+
+const MAX_LISTED_FILE_NAMES = 3
+
+const formatFileNames = (names: Array<string>): string => {
+  const listed = names.slice(0, MAX_LISTED_FILE_NAMES).join(', ')
+  if (names.length <= MAX_LISTED_FILE_NAMES) {
+    return listed
+  }
+  return $gettext('%{ files } and %{ count } more', {
+    files: listed,
+    count: (names.length - MAX_LISTED_FILE_NAMES).toString()
+  })
+}
 
 const usedDocumentImageSize = (markdown: string): number => {
   const dataUris: string[] = markdown?.match(dataUriRegex) ?? []
@@ -165,16 +178,29 @@ type UploadImgCallBack = (urls: Array<{ url: string; alt: string; title: string 
 
 const onUploadImg = async (files: Array<File>, callBack: UploadImgCallBack) => {
   if (!unref(isMarkdown)) {
-    // Always invoke the callback so md-editor-v3 stops waiting.
     callBack([])
     return
   }
 
   const { maxImageSize, maxDocumentImageSize } = unref(editorConfig)
-  validationMessages.value = []
+  isAddingImages.value = true
+  try {
+    callBack(await pickImages(files, maxImageSize, maxDocumentImageSize))
+  } finally {
+    isAddingImages.value = false
+  }
+}
 
-  let usedSize = usedDocumentImageSize(currentContent)
+const pickImages = async (
+  files: Array<File>,
+  maxImageSize: number,
+  maxDocumentImageSize: number
+): Promise<Array<{ url: string; alt: string; title: string }>> => {
+  let usedSize = usedDocumentImageSize(currentContent) + unref(pendingImageSize)
   const accepted: Array<{ url: string; alt: string; title: string }> = []
+  const tooBig: Array<string> = []
+  const unreadable: Array<string> = []
+  const doesNotFit: Array<string> = []
 
   for (const file of files) {
     if (!file.type.startsWith('image/')) {
@@ -182,12 +208,7 @@ const onUploadImg = async (files: Array<File>, callBack: UploadImgCallBack) => {
     }
 
     if (file.size > maxImageSize) {
-      validationMessages.value.push(
-        $gettext('File is too big (%{ size }). Max file size: %{ limit }.', {
-          size: formatSize(file.size),
-          limit: formatSize(maxImageSize)
-        })
-      )
+      tooBig.push(file.name)
       continue
     }
 
@@ -195,39 +216,63 @@ const onUploadImg = async (files: Array<File>, callBack: UploadImgCallBack) => {
     try {
       dataUri = await readAsDataUrl(file)
     } catch {
-      validationMessages.value.push($gettext('Could not read "%{ name }".', { name: file.name }))
+      unreadable.push(file.name)
       continue
     }
 
     if (usedSize + dataUri.length > maxDocumentImageSize) {
-      const remaining = Math.max(maxDocumentImageSize - usedSize, 0)
-      validationMessages.value.push(
-        $gettext(
-          'Not enough space in this document (%{ remaining } remaining). Remove an image or link the file instead.',
-          { remaining: formatSize(remaining) }
-        )
-      )
+      doesNotFit.push(file.name)
       continue
     }
 
     usedSize += dataUri.length
+    pendingImageSize.value += dataUri.length
     accepted.push({ url: dataUri, alt: file.name, title: '' })
   }
 
-  if (accepted.length > 0) {
-    skipNextContentClear.value = true
+  if (tooBig.length) {
+    showErrorMessage({
+      title: $ngettext('Image is too big', 'Images are too big', tooBig.length),
+      desc: $gettext('%{ files }. Max image size: %{ limit }.', {
+        files: formatFileNames(tooBig),
+        limit: formatSize(maxImageSize)
+      })
+    })
   }
-  callBack(accepted)
+
+  if (doesNotFit.length) {
+    showErrorMessage({
+      title: $ngettext(
+        'Image does not fit in this document',
+        'Images do not fit in this document',
+        doesNotFit.length
+      ),
+      desc: $ngettext(
+        '%{ files }. Only %{ remaining } left - remove an image or link the file instead.',
+        '%{ files }. Only %{ remaining } left - remove an image or link the files instead.',
+        doesNotFit.length,
+        {
+          files: formatFileNames(doesNotFit),
+          remaining: formatSize(Math.max(maxDocumentImageSize - usedSize, 0))
+        }
+      )
+    })
+  }
+
+  if (unreadable.length) {
+    showErrorMessage({
+      title: $ngettext('Image could not be read', 'Images could not be read', unreadable.length),
+      desc: formatFileNames(unreadable)
+    })
+  }
+
+  return accepted
 }
 
 watch(
   () => currentContent,
   () => {
-    if (skipNextContentClear.value) {
-      skipNextContentClear.value = false
-      return
-    }
-    validationMessages.value = []
+    pendingImageSize.value = 0
   }
 )
 
@@ -333,16 +378,17 @@ config({
     }
   }
 
+  .footer-slot {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    vertical-align: middle;
+    padding-inline-start: 10px;
+  }
+
   .footer-links {
     display: inline-flex;
     gap: 0.625rem;
-  }
-
-  .footer-validation-messages {
-    display: inline-flex;
-    flex-direction: column;
-    color: var(--oc-color-swatch-danger-default);
-    margin-right: 0.625rem;
   }
 
   #text-editor-component-html-wrapper {
