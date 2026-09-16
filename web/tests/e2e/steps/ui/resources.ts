@@ -542,18 +542,23 @@ export async function userShouldNotSeeInlinedImageInMarkdownEditor({
 
 export async function userShouldSeeImageRejectionInMarkdownEditor({
   stepUser,
-  size,
+  image,
   limit
 }: {
   stepUser: string
-  size: string
+  image: string
   limit: string
 }): Promise<void> {
   const world = getWorld()
   const { page } = world.actorsEnvironment.getActor({ key: stepUser })
-  const messages = editor.markdownValidationMessagesLocator(page)
-  await expect(messages).toBeVisible()
-  await expect(messages).toContainText(`File is too big (${size}). Max file size: ${limit}.`)
+  const notification = editor.imageRejectionNotificationLocator(page)
+  await expect(notification).toBeVisible()
+  await expect(notification.locator('.oc-notification-message-title')).toHaveText(
+    'Image is too big'
+  )
+  await expect(notification.locator('.oc-notification-message-content')).toHaveText(
+    `${image}. Max image size: ${limit}.`
+  )
 }
 
 export async function userShouldNotSeeCropOptionInMarkdownEditor({

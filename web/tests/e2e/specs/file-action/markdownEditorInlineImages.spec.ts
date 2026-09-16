@@ -50,11 +50,11 @@ test.describe('Markdown editor inlines images as base64', { tag: '@predefined-us
     await ui.userPicksOversizedImageInMarkdownEditor({ stepUser: 'Alice', sizeInBytes: 2500000 })
 
     // Then "Alice" should see the image rejected in the markdown editor
-    //   | size   | limit |
-    //   | 2.5 MB | 2 MB  |
+    //   | image         | limit |
+    //   | oversized.png | 2 MB  |
     await ui.userShouldSeeImageRejectionInMarkdownEditor({
       stepUser: 'Alice',
-      size: '2.5 MB',
+      image: 'oversized.png',
       limit: '2 MB'
     })
 

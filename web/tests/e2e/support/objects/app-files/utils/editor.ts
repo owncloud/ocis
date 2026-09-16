@@ -18,7 +18,9 @@ const markdownImageMenuItem = `${markdownEditor} .md-editor-menu-item-image`
 // keeping the original in the title attribute - so an inlined data URI never appears as text.
 const markdownShortenedToken = `${markdownEditor} .cm-short-text`
 const markdownPreviewImage = `${markdownEditor} .md-editor-preview img[src^="data:"]`
-const markdownValidationMessages = `${markdownEditor} span.footer-validation-messages`
+// Image rejections are reported through the app's notification store, so they render in the
+// global notification stack rather than inside the editor.
+const imageRejectionNotification = 'div.oc-notification .oc-notification-message-danger'
 
 export const close = async (page: Page): Promise<void> => {
   await Promise.all([
@@ -74,8 +76,8 @@ export const markdownShortenedTokenLocator = (page: Page): Locator =>
 export const markdownPreviewImageLocator = (page: Page): Locator =>
   page.locator(markdownPreviewImage)
 
-export const markdownValidationMessagesLocator = (page: Page): Locator =>
-  page.locator(markdownValidationMessages)
+export const imageRejectionNotificationLocator = (page: Page): Locator =>
+  page.locator(imageRejectionNotification)
 
 export const fileViewerLocator = ({
   page,
