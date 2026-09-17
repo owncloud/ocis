@@ -259,8 +259,9 @@ type DeleteStorageSpaceResult struct {
 
 // UploadSource carries the staged bytes for a CommitUpload call.
 type UploadSource struct {
-	Body   io.ReadCloser
-	Length int64
+	Body        io.ReadCloser
+	Length      int64
+	NodeExisted bool
 
 	// ScanResult is the antivirus verdict: empty means clean.
 	ScanResult string
@@ -275,6 +276,46 @@ type UnscopeFunc func()
 // to be composable, so that it can support the TUS methods
 type ComposableFS interface {
 	UseIn(composer *tusd.StoreComposer)
+}
+
+// CapabilitiesOpaqueKey is the StorageSpace/ProviderInfo Opaque key under which
+// a provider's Capabilities are carried as JSON up to the OCS capabilities handler.
+const CapabilitiesOpaqueKey = "storage-capabilities"
+
+// Capabilities is a storage driver's self-declaration of the write-shaped
+// actions it supports. A false key means unsupported: no merge, no inheritance.
+type Capabilities struct {
+	Upload            bool
+	CreateContainer   bool
+	Delete            bool
+	Move              bool
+	Versioning        bool
+	Trash             bool
+	Locking           bool
+	Sharing           bool
+	ArbitraryMetadata bool
+}
+
+// FullCapabilities is the default for drivers that do not implement
+// CapabilityProvider, so existing drivers keep their current behavior.
+func FullCapabilities() Capabilities {
+	return Capabilities{
+		Upload:            true,
+		CreateContainer:   true,
+		Delete:            true,
+		Move:              true,
+		Versioning:        true,
+		Trash:             true,
+		Locking:           true,
+		Sharing:           true,
+		ArbitraryMetadata: true,
+	}
+}
+
+// CapabilityProvider is an optional interface a storage.FS may implement to
+// declare its capabilities.
+type CapabilityProvider interface {
+	Capabilities(ctx context.Context) Capabilities
 }
 
 // Registry is the interface that storage registries implement
