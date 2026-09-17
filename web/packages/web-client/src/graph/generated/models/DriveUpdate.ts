@@ -20,6 +20,13 @@ import {
     ItemReferenceToJSON,
     ItemReferenceToJSONTyped,
 } from './ItemReference';
+import type { SpecialDriveItemUpdate } from './SpecialDriveItemUpdate';
+import {
+    SpecialDriveItemUpdateFromJSON,
+    SpecialDriveItemUpdateFromJSONTyped,
+    SpecialDriveItemUpdateToJSON,
+    SpecialDriveItemUpdateToJSONTyped,
+} from './SpecialDriveItemUpdate';
 import type { DriveItem } from './DriveItem';
 import {
     DriveItemFromJSON,
@@ -51,7 +58,7 @@ export interface DriveUpdate {
     /**
      * The unique identifier for this drive.
      */
-    id?: string;
+    readonly id?: string;
     /**
      * 
      */
@@ -59,7 +66,7 @@ export interface DriveUpdate {
     /**
      * Date and time of item creation. Read-only.
      */
-    createdDateTime?: string;
+    readonly createdDateTime?: string;
     /**
      * Provides a user-visible description of the item. Optional.
      */
@@ -67,7 +74,7 @@ export interface DriveUpdate {
     /**
      * ETag for the item. Read-only.
      */
-    eTag?: string;
+    readonly eTag?: string;
     /**
      * 
      */
@@ -75,7 +82,7 @@ export interface DriveUpdate {
     /**
      * Date and time the item was last modified. Read-only.
      */
-    lastModifiedDateTime?: string;
+    readonly lastModifiedDateTime?: string;
     /**
      * The name of the item. Read-write.
      */
@@ -87,11 +94,11 @@ export interface DriveUpdate {
     /**
      * URL that displays the resource in the browser. Read-only.
      */
-    webUrl?: string;
+    readonly webUrl?: string;
     /**
-     * Describes the type of drive represented by this resource. Values are "personal" for users home spaces, "project", "virtual" or "share". Read-only.
+     * Describes the type of drive represented by this resource. Values are "personal" for users home spaces, "project", "virtual" or "share". Read-only, see the `drive` schema for creating a drive.
      */
-    driveType?: string;
+    readonly driveType?: string;
     /**
      * The drive alias can be used in clients to make the urls user friendly. Example: 'personal/einstein'. This will be used to resolve to the correct driveID.
      */
@@ -107,15 +114,15 @@ export interface DriveUpdate {
     /**
      * All items contained in the drive. Read-only. Nullable.
      */
-    items?: Array<DriveItem>;
+    readonly items?: Array<DriveItem>;
     /**
      * 
      */
     root?: DriveItem;
     /**
-     * A collection of special drive resources.
+     * A collection of special drive resources. See the `drive` schema for the resources returned by the server.
      */
-    special?: Array<DriveItem>;
+    special?: Array<SpecialDriveItemUpdate>;
 }
 
 /**
@@ -151,7 +158,7 @@ export function DriveUpdateFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'quota': json['quota'] == null ? undefined : QuotaFromJSON(json['quota']),
         'items': json['items'] == null ? undefined : ((json['items'] as Array<any>).map(DriveItemFromJSON)),
         'root': json['root'] == null ? undefined : DriveItemFromJSON(json['root']),
-        'special': json['special'] == null ? undefined : ((json['special'] as Array<any>).map(DriveItemFromJSON)),
+        'special': json['special'] == null ? undefined : ((json['special'] as Array<any>).map(SpecialDriveItemUpdateFromJSON)),
     };
 }
 
@@ -159,30 +166,23 @@ export function DriveUpdateToJSON(json: any): DriveUpdate {
     return DriveUpdateToJSONTyped(json, false);
 }
 
-export function DriveUpdateToJSONTyped(value?: DriveUpdate | null, ignoreDiscriminator: boolean = false): any {
+export function DriveUpdateToJSONTyped(value?: Omit<DriveUpdate, 'id'|'createdDateTime'|'eTag'|'lastModifiedDateTime'|'webUrl'|'driveType'|'items'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
-        'id': value['id'],
         'createdBy': IdentitySetToJSON(value['createdBy']),
-        'createdDateTime': value['createdDateTime'],
         'description': value['description'],
-        'eTag': value['eTag'],
         'lastModifiedBy': IdentitySetToJSON(value['lastModifiedBy']),
-        'lastModifiedDateTime': value['lastModifiedDateTime'],
         'name': value['name'],
         'parentReference': ItemReferenceToJSON(value['parentReference']),
-        'webUrl': value['webUrl'],
-        'driveType': value['driveType'],
         'driveAlias': value['driveAlias'],
         'owner': IdentitySetToJSON(value['owner']),
         'quota': QuotaToJSON(value['quota']),
-        'items': value['items'] == null ? undefined : ((value['items'] as Array<any>).map(DriveItemToJSON)),
         'root': DriveItemToJSON(value['root']),
-        'special': value['special'] == null ? undefined : ((value['special'] as Array<any>).map(DriveItemToJSON)),
+        'special': value['special'] == null ? undefined : ((value['special'] as Array<any>).map(SpecialDriveItemUpdateToJSON)),
     };
 }
 

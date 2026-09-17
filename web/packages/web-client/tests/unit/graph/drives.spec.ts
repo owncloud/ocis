@@ -23,9 +23,10 @@ describe('graph drives', () => {
 
   describe('updateDrive', () => {
     /**
-     * The spec marks every `Quota` field read-only, which the generator honours by omitting
-     * them from its serializers. Without stripping the annotation before generating, the
-     * quota would silently leave as `{}` and the drive would keep its old limit.
+     * A `readOnly: true` in the spec makes the generator omit the field from its serializers,
+     * so a field oCIS does read on write but that the spec marks read-only leaves as `{}` or
+     * disappears entirely — the request still succeeds, it just does nothing. Type checking
+     * cannot catch that, hence these tests assert on the serialized body.
      */
     it('sends the quota in the request body', async () => {
       await graph('https://host', new FetchClient()).drives.updateDrive(
@@ -36,6 +37,17 @@ describe('graph drives', () => {
 
       const body = JSON.parse(fetchMock.mock.calls[0][1].body)
       expect(body.quota).toEqual({ total: 500 })
+    })
+
+    it.each(['image', 'readme'])('sends the id of the %s special folder', async (name) => {
+      await graph('https://host', new FetchClient()).drives.updateDrive(
+        drive.id,
+        { name: drive.name, special: [{ specialFolder: { name }, id: 'file-id' }] },
+        {}
+      )
+
+      const body = JSON.parse(fetchMock.mock.calls[0][1].body)
+      expect(body.special).toEqual([{ specialFolder: { name }, id: 'file-id' }])
     })
 
     it('returns the updated quota on the space', async () => {

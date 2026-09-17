@@ -112,6 +112,7 @@ docs/SharingLink.md
 docs/SharingLinkPassword.md
 docs/SharingLinkType.md
 docs/SignInActivity.md
+docs/SpecialDriveItemUpdate.md
 docs/SpecialFolder.md
 docs/TagAssignment.md
 docs/TagUnassignment.md
@@ -196,6 +197,7 @@ models/SharingLink.ts
 models/SharingLinkPassword.ts
 models/SharingLinkType.ts
 models/SignInActivity.ts
+models/SpecialDriveItemUpdate.ts
 models/SpecialFolder.ts
 models/TagAssignment.ts
 models/TagUnassignment.ts

@@ -22,11 +22,11 @@ export interface Image {
     /**
      * Optional. Height of the image, in pixels. Read-only.
      */
-    height?: number;
+    readonly height?: number;
     /**
      * Optional. Width of the image, in pixels. Read-only.
      */
-    width?: number;
+    readonly width?: number;
 }
 
 /**
@@ -55,15 +55,13 @@ export function ImageToJSON(json: any): Image {
     return ImageToJSONTyped(json, false);
 }
 
-export function ImageToJSONTyped(value?: Image | null, ignoreDiscriminator: boolean = false): any {
+export function ImageToJSONTyped(value?: Omit<Image, 'height'|'width'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
-        'height': value['height'],
-        'width': value['width'],
     };
 }
 
