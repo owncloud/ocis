@@ -748,7 +748,7 @@ importers:
         version: 3.4.12
       mermaid:
         specifier: ^11.12.2
-        version: 11.16.0
+        version: 11.16.1
       vue3-gettext:
         specifier: ^4.0.1
         version: 4.0.1(vue@3.5.29(typescript@5.9.3))
