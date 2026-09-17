@@ -860,8 +860,8 @@ jobs:
 
   acceptance-coverage:
     name: acceptance-coverage
-    needs: [local-api-tests, cli-tests, ldap-pool-tests, core-api-tests]
-    if: always() && github.event_name == 'pull_request'
+    needs: [detect-changes, local-api-tests, cli-tests, ldap-pool-tests, core-api-tests]
+    if: always() && github.event_name == 'pull_request' && needs.detect-changes.outputs.docs-only != 'true'
     runs-on: ubuntu-latest
     env:
       GOCOVERDIR: ${{ github.workspace }}/coverage-reports
