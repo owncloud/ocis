@@ -74,6 +74,11 @@ var responses = map[string]Response{
 
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/EmptyRecycle `: {200, ``, serverStateEmpty},
 
+	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetQuota `: {200, `{"totalBytes":456,"usedBytes":123}`, serverStateEmpty},
+
+	// the parent of an upload target, stated for its permissions and its id
+	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetMD {"ref":{"path":"/"},"mdKeys":[]} EMPTY`: {200, `{"opaque":{},"type":2,"id":{"opaque_id":"fileid-/"},"checksum":{},"etag":"deadbeef","mime_type":"httpd/unix-directory","mtime":{"seconds":1234567890},"path":"/","permission_set":{"initiate_file_upload":true,"stat":true,"list_container":true},"size":12345,"canonical_metadata":{},"arbitrary_metadata":{"metadata":{}}}`, serverStateEmpty},
+
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetMD {"ref":{"path":"/"},"mdKeys":null} EMPTY`: {404, ``, serverStateEmpty},
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetMD {"ref":{"path":"/"},"mdKeys":null} HOME`:  {200, `{"opaque":{},"type":1,"id":{"opaque_id":"fileid-/some/path"},"checksum":{},"etag":"deadbeef","mime_type":"text/plain","mtime":{"seconds":1234567890},"path":"/","permission_set":{},"size":12345,"canonical_metadata":{},"arbitrary_metadata":{"metadata":{"da":"ta","some":"arbi","trary":"meta"}}}`, serverStateHome},
 
@@ -111,7 +116,13 @@ var responses = map[string]Response{
 
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetPathByID {"storage_id":"00000000-0000-0000-0000-000000000000","opaque_id":"fileid-/some/path"} EMPTY`: {200, "/subdir", serverStateEmpty},
 
-	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetMD {"ref":{"path":"/file"},"mdKeys":null}`:                                                                                                        {404, ``, serverStateEmpty},
+	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetMD {"ref":{"path":"/file"},"mdKeys":null}`: {404, ``, serverStateEmpty},
+	// the coordinator resolves the upload target itself: the file does not exist yet,
+	// so it stats the parent for the permissions and the parent id
+	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetMD {"ref":{"path":"/file"},"mdKeys":[]}`: {404, ``, serverStateEmpty},
+	// a zero-length upload finishes at once, so the node is created and read back here
+	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/TouchFile {"ref":{"resource_id":{"opaque_id":"fileid-/"},"path":"file"},"markprocessing":false,"mtime":"1234567890"}`:                                {200, ``, serverStateEmpty},
+	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetMD {"ref":{"resource_id":{"opaque_id":"fileid-/"},"path":"file"},"mdKeys":[]}`:                                                                    {200, `{"opaque":{},"type":1,"id":{"opaque_id":"fileid-/file"},"checksum":{},"etag":"deadbeef","mime_type":"text/plain","mtime":{"seconds":1234567890},"path":"/file","permission_set":{},"size":0,"canonical_metadata":{},"arbitrary_metadata":{"metadata":{}}}`, serverStateEmpty},
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/InitiateUpload {"ref":{"path":"/file"},"uploadLength":0,"metadata":{"providerID":""}}`:                                                               {200, `{"simple": "yes","tus": "yes"}`, serverStateEmpty},
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/InitiateUpload {"ref":{"resource_id":{"storage_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"path":"/versionedFile"},"uploadLength":1,"metadata":{}}`: {200, `{"simple": "yes","tus": "yes"}`, serverStateEmpty},
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/InitiateUpload {"ref":{"resource_id":{"storage_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"path":"/versionedFile"},"uploadLength":2,"metadata":{}}`: {200, `{"simple": "yes","tus": "yes"}`, serverStateEmpty},

@@ -1339,6 +1339,15 @@ var CheckQuota = func(ctx context.Context, spaceRoot *Node, overwrite bool, oldS
 	return true, nil
 }
 
+// CheckDiskSpace returns an error if the underlying filesystem has insufficient
+// free space for newSize bytes. Does not enforce space-level quota.
+var CheckDiskSpace = func(_ context.Context, spaceRoot *Node, newSize uint64) error {
+	if !enoughDiskSpace(spaceRoot.InternalPath(), newSize) {
+		return errtypes.InsufficientStorage("disk full")
+	}
+	return nil
+}
+
 func enoughDiskSpace(path string, fileSize uint64) bool {
 	avalB, err := GetAvailableSize(path)
 	if err != nil {
