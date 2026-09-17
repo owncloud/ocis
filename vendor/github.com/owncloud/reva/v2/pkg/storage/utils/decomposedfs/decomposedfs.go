@@ -41,6 +41,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
+	"golang.org/x/sync/semaphore"
 
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/autoprop"
@@ -77,6 +78,8 @@ type CtxKey int
 const (
 	CtxKeySpaceGID CtxKey = iota
 )
+
+const maxCommitRetryBackoff = 2 * time.Minute
 
 var (
 	tracer trace.Tracer
@@ -129,6 +132,9 @@ type Decomposedfs struct {
 	userSpaceIndex  *spaceidindex.Index
 	groupSpaceIndex *spaceidindex.Index
 	spaceTypeIndex  *spaceidindex.Index
+
+	// commitLimiter caps concurrent async blob commits at NumConsumers.
+	commitLimiter *semaphore.Weighted
 
 	log *zerolog.Logger
 }
@@ -276,6 +282,8 @@ func New(o *options.Options, aspects aspects.Aspects, log *zerolog.Logger) (stor
 			o.Events.NumConsumers = 1
 		}
 
+		fs.commitLimiter = semaphore.NewWeighted(int64(o.Events.NumConsumers))
+
 		for i := 0; i < o.Events.NumConsumers; i++ {
 			go fs.Postprocessing(ch)
 		}
@@ -290,6 +298,110 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 	for event := range ch {
 		evCtx := context.Background()
 		fs.processEvent(evCtx, event, log)
+	}
+}
+
+// finalizeWithRetry commits the staged bytes, retrying blobstore failures with
+// capped exponential backoff.
+func (fs *Decomposedfs) finalizeWithRetry(ctx context.Context, session *upload.OcisSession, log *zerolog.Logger) error {
+	maxAttempts := fs.o.Events.CommitMaxRetries + 1
+	backoff := fs.o.Events.CommitRetryBackoff
+	var err error
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		if err = session.Finalize(ctx); err == nil {
+			return nil
+		}
+		ev := log.Warn().Err(err).
+			Int("attempt", attempt).Int("maxAttempts", maxAttempts).
+			Str("spaceid", session.SpaceID()).Str("nodeid", session.NodeID())
+		if attempt == maxAttempts {
+			ev.Msg("blob commit failed, giving up")
+			break
+		}
+		// clamp before use: this bounds backoff to maxCommitRetryBackoff every
+		// iteration, so the backoff *= 2 below can never grow past 2*max and
+		// cannot overflow the int64 duration.
+		backoff = min(backoff, maxCommitRetryBackoff)
+		ev.Dur("backoff", backoff).Msg("blob commit failed, retrying after backoff")
+		timer := time.NewTimer(backoff)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return ctx.Err()
+		case <-timer.C:
+			// backoff elapsed, fall through to the next attempt
+		}
+		backoff *= 2
+	}
+	return err
+}
+
+// completePostprocessing reverts (failed) or finalizes the node, unmarks
+// processing, and publishes UploadReady. keepUpload keeps the staged bytes. May
+// run detached, so it touches no consumer-loop state.
+func (fs *Decomposedfs) completePostprocessing(ctx context.Context, session *upload.OcisSession, n *node.Node, ev events.PostprocessingFinished, failed, keepUpload bool, sublog zerolog.Logger) {
+	now := time.Now()
+	if failed {
+		// if no other upload session is in progress (processing id != session id) or has finished (processing id == "")
+		latestSession, err := n.ProcessingID(ctx)
+		if err != nil {
+			sublog.Error().Err(err).Msg("reading node for session failed")
+		}
+		if latestSession == session.ID() {
+			// propagate reverted sizeDiff after failed postprocessing
+			if err := fs.tp.Propagate(ctx, n, -session.SizeDiff()); err != nil {
+				sublog.Error().Err(err).Msg("could not propagate tree size change")
+			}
+		}
+	} else if p, err := n.Parent(ctx); err != nil {
+		sublog.Error().Err(err).Msg("could not read parent")
+	} else if p != nil {
+		// update parent tmtime to propagate etag change after successful postprocessing
+		_ = p.SetTMTime(ctx, &now)
+		if err := fs.tp.Propagate(ctx, p, 0); err != nil {
+			sublog.Error().Err(err).Msg("could not propagate etag change")
+		}
+	}
+
+	// unmark processing; a leftover marker keeps downloads at 425
+	session.Cleanup(failed, !keepUpload, !keepUpload, true)
+
+	var isVersion bool
+	if session.NodeExists() {
+		info, err := session.GetInfo(ctx)
+		if err == nil && info.MetaData["versionsPath"] != "" {
+			isVersion = true
+		}
+	}
+
+	if err := events.Publish(
+		ctx,
+		fs.stream,
+		events.UploadReady{
+			UploadID:      ev.UploadID,
+			Failed:        failed,
+			ExecutingUser: ev.ExecutingUser,
+			Filename:      ev.Filename,
+			FileRef: &provider.Reference{
+				ResourceId: &provider.ResourceId{
+					StorageId: session.ProviderID(),
+					SpaceId:   session.SpaceID(),
+					OpaqueId:  session.SpaceID(),
+				},
+				Path: utils.MakeRelativePath(filepath.Join(session.Dir(), session.Filename())),
+			},
+			ResourceID: &provider.ResourceId{
+				StorageId: session.ProviderID(),
+				SpaceId:   session.SpaceID(),
+				OpaqueId:  session.NodeID(),
+			},
+			Timestamp:         utils.TimeToTS(now),
+			SpaceOwner:        n.SpaceOwnerOrManager(ctx),
+			IsVersion:         isVersion,
+			ImpersonatingUser: ev.ImpersonatingUser,
+		},
+	); err != nil {
+		sublog.Error().Err(err).Msg("Failed to publish UploadReady event")
 	}
 }
 
@@ -330,107 +442,36 @@ func (fs *Decomposedfs) processEvent(evCtx context.Context, event events.Event, 
 			return
 		}
 
-		var (
-			failed             bool
-			revertNodeMetadata bool
-			keepUpload         bool
-		)
-		unmarkPostprocessing := true
-
 		switch ev.Outcome {
 		default:
 			sublog.Error().Str("outcome", string(ev.Outcome)).Msg("unknown postprocessing outcome - aborting")
 			fallthrough
 		case events.PPOutcomeAbort:
-			failed = true
-			revertNodeMetadata = true
-			keepUpload = true
 			metrics.UploadSessionsAborted.Inc()
+			fs.completePostprocessing(ctx, session, n, ev, true, true, sublog)
 		case events.PPOutcomeContinue:
-			if err := session.Finalize(ctx); err != nil {
-				sublog.Error().Err(err).Msg("could not finalize upload")
-				failed = true
-				revertNodeMetadata = false
-				keepUpload = true
-				// keep postprocessing status so the upload is not deleted during housekeeping
-				unmarkPostprocessing = false
-			} else {
-				metrics.UploadSessionsFinalized.Inc()
-			}
-		case events.PPOutcomeDelete:
-			failed = true
-			revertNodeMetadata = true
-			metrics.UploadSessionsDeleted.Inc()
-		}
-
-		getParent := func() *node.Node {
-			p, err := n.Parent(ctx)
-			if err != nil {
-				sublog.Error().Err(err).Msg("could not read parent")
-				return nil
-			}
-			return p
-		}
-
-		now := time.Now()
-		if failed {
-			// if no other upload session is in progress (processing id != session id) or has finished (processing id == "")
-			latestSession, err := n.ProcessingID(ctx)
-			if err != nil {
-				sublog.Error().Err(err).Msg("reading node for session failed")
-			}
-			if latestSession == session.ID() {
-				// propagate reverted sizeDiff after failed postprocessing
-				if err := fs.tp.Propagate(ctx, n, -session.SizeDiff()); err != nil {
-					sublog.Error().Err(err).Msg("could not propagate tree size change")
+			// commit re-uploads the whole file and can block for the retry window;
+			// run it detached (bounded by commitLimiter) to not stall the consumer
+			go func() {
+				if err := fs.commitLimiter.Acquire(ctx, 1); err != nil {
+					sublog.Error().Err(err).Msg("could not acquire commit slot")
+					return
 				}
-			}
-		} else if p := getParent(); p != nil {
-			// update parent tmtime to propagate etag change after successful postprocessing
-			_ = p.SetTMTime(ctx, &now)
-			if err := fs.tp.Propagate(ctx, p, 0); err != nil {
-				sublog.Error().Err(err).Msg("could not propagate etag change")
-			}
-		}
+				defer fs.commitLimiter.Release(1)
 
-		session.Cleanup(revertNodeMetadata, !keepUpload, !keepUpload, unmarkPostprocessing)
-
-		var isVersion bool
-		if session.NodeExists() {
-			info, err := session.GetInfo(ctx)
-			if err == nil && info.MetaData["versionsPath"] != "" {
-				isVersion = true
-			}
-		}
-
-		if err := events.Publish(
-			ctx,
-			fs.stream,
-			events.UploadReady{
-				UploadID:      ev.UploadID,
-				Failed:        failed,
-				ExecutingUser: ev.ExecutingUser,
-				Filename:      ev.Filename,
-				FileRef: &provider.Reference{
-					ResourceId: &provider.ResourceId{
-						StorageId: session.ProviderID(),
-						SpaceId:   session.SpaceID(),
-						OpaqueId:  session.SpaceID(),
-					},
-					Path: utils.MakeRelativePath(filepath.Join(session.Dir(), session.Filename())),
-				},
-				ResourceID: &provider.ResourceId{
-					StorageId: session.ProviderID(),
-					SpaceId:   session.SpaceID(),
-					OpaqueId:  session.NodeID(),
-				},
-				Timestamp:         utils.TimeToTS(now),
-				SpaceOwner:        n.SpaceOwnerOrManager(ctx),
-				IsVersion:         isVersion,
-				ImpersonatingUser: ev.ImpersonatingUser,
-			},
-		); err != nil {
-			sublog.Error().Err(err).Msg("Failed to publish UploadReady event")
+				if err := fs.finalizeWithRetry(ctx, session, &sublog); err != nil {
+					sublog.Error().Err(err).Msg("could not finalize upload after retries, reverting to a recoverable failed state")
+					// revert like an abort: clears the 425 marker, frees quota, keeps bytes
+					metrics.UploadSessionsCommitFailed.Inc()
+					fs.completePostprocessing(ctx, session, n, ev, true, true, sublog)
+					return
+				}
+				metrics.UploadSessionsFinalized.Inc()
+				fs.completePostprocessing(ctx, session, n, ev, false, false, sublog)
+			}()
+		case events.PPOutcomeDelete:
+			metrics.UploadSessionsDeleted.Inc()
+			fs.completePostprocessing(ctx, session, n, ev, true, false, sublog)
 		}
 	case events.RestartPostprocessing:
 		sublog := log.With().Str("event", "RestartPostprocessing").Str("uploadid", ev.UploadID).Logger()
