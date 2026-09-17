@@ -33,6 +33,7 @@ func Spaces(cfg *config.Config) *cli.Command {
 		Usage: "manage spaces",
 		Subcommands: []*cli.Command{
 			PurgeDisabledSpaces(cfg),
+			RecalculateTreesize(cfg),
 		},
 	}
 }

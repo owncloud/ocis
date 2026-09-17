@@ -1,11 +1,24 @@
 import { defaultComponentMocks, mount, defaultPlugins } from '@ownclouders/web-test-helpers'
-import TagsSelect from '../../../../src/components/SideBar/Details/TagsSelect.vue'
 import { mock, mockDeep } from 'vitest-mock-extended'
 import { Resource } from '@ownclouders/web-client'
 import { ClientService, eventBus, useCapabilityStore, useMessages } from '@ownclouders/web-pkg'
 import { OcSelect } from '@ownclouders/design-system/components'
 import { storeToRefs } from 'pinia'
 import { unref } from 'vue'
+
+vi.hoisted(() => {
+  vi.doMock('@ownclouders/web-pkg', async (importOriginal) => ({
+    ...(await importOriginal<any>()),
+    useTagColor: vi.fn(() => ({
+      tagColorIndex: vi.fn((name: string) => {
+        const tagColorMap: Record<string, number> = { invoice: 7, project: 3 }
+        return tagColorMap[name] ?? -1
+      })
+    }))
+  }))
+})
+
+import TagsSelect from '../../../../src/components/SideBar/Details/TagsSelect.vue'
 
 describe('Tag Select', () => {
   it('show tags input form if loaded successfully', () => {
@@ -132,6 +145,113 @@ describe('Tag Select', () => {
 
     expect(option.error).toBeDefined()
     expect(option.selectable).toBeFalsy()
+  })
+
+  describe('Tag chip colours', () => {
+    it('a selected chip receives the fill colour for its tag name', async () => {
+      const tagName = 'invoice'
+      const expectedColour = 'var(--oc-color-tag-7)'
+      const resource = mock<Resource>({ tags: [tagName] })
+      const clientService = mockDeep<ClientService>()
+      clientService.graphAuthenticated.tags.listTags.mockResolvedValue([])
+
+      const { wrapper } = createWrapper(resource, clientService, false) // Don't stub VueSelect
+
+      // Wait for the component to render with the selected tag
+      await wrapper.vm.$nextTick()
+
+      // OcTag turns the colour index into inline styles: background-color plus the label
+      // colour that goes with it
+      const ocTags = wrapper.findAll('.tags-select-tag')
+      expect(ocTags.length).toBeGreaterThan(0)
+
+      // The fill colour is applied to the tag's background-color style
+      const tagElement = ocTags[0]
+      const styleAttribute = tagElement.attributes('style') || ''
+      expect(styleAttribute).toContain(`background-color: ${expectedColour}`)
+    })
+
+    it('a dropdown option chip receives the fill colour for its label', async () => {
+      const tagName = 'project'
+      const expectedColour = 'var(--oc-color-tag-3)'
+      const resource = mock<Resource>({ tags: [] })
+      const clientService = mockDeep<ClientService>()
+      clientService.graphAuthenticated.tags.listTags.mockResolvedValueOnce([tagName])
+
+      const mocks = { ...defaultComponentMocks(), $clientService: clientService }
+      mocks.$clientService.graphAuthenticated.tags.listTags.mockResolvedValue([])
+      const wrapper = mount(TagsSelect, {
+        global: {
+          plugins: [...defaultPlugins()],
+          mocks,
+          provide: { ...mocks },
+          stubs: { CompareSaveDialog: true } // Don't stub VueSelect so it renders the option template
+        },
+        props: {
+          resource
+        }
+      })
+
+      // Wait for available tags to load
+      await (wrapper.vm as any).loadAvailableTagsTask.last
+      await wrapper.vm.$nextTick()
+
+      // vue-select only renders the #option slot while its dropdown is open, and OcSelect
+      // additionally gates that on a click of the select itself (see `dropdownEnabled`).
+      await wrapper.find('.oc-select').trigger('click')
+      await wrapper.find('input.vs__search').trigger('focus')
+      await wrapper.vm.$nextTick()
+
+      const optionTags = wrapper
+        .findAll('.tags-select-tag')
+        .filter((tag) => tag.element.closest('.vs__dropdown-menu') !== null)
+      expect(optionTags.length).toBe(1)
+      expect(optionTags[0].attributes('style')).toContain(`background-color: ${expectedColour}`)
+    })
+  })
+
+  describe('Tag chip appearance', () => {
+    it('a dropdown option chip keeps the price-tag-3 icon and its rounded corners', async () => {
+      const tagName = 'project'
+      const resource = mock<Resource>({ tags: [] })
+      const clientService = mockDeep<ClientService>()
+      clientService.graphAuthenticated.tags.listTags.mockResolvedValueOnce([tagName])
+
+      const mocks = { ...defaultComponentMocks(), $clientService: clientService }
+      mocks.$clientService.graphAuthenticated.tags.listTags.mockResolvedValue([])
+      const wrapper = mount(TagsSelect, {
+        global: {
+          plugins: [...defaultPlugins()],
+          mocks,
+          provide: { ...mocks },
+          stubs: { CompareSaveDialog: true }
+        },
+        props: {
+          resource
+        }
+      })
+
+      await (wrapper.vm as any).loadAvailableTagsTask.last
+      await wrapper.vm.$nextTick()
+
+      await wrapper.find('.oc-select').trigger('click')
+      await wrapper.find('input.vs__search').trigger('focus')
+      await wrapper.vm.$nextTick()
+
+      const optionTags = wrapper
+        .findAll('.tags-select-tag')
+        .filter((tag) => tag.element.closest('.vs__dropdown-menu') !== null)
+      expect(optionTags.length).toBe(1)
+      expect(optionTags[0].classes()).toContain('oc-tag-rounded')
+
+      // OcIcon renders the svg through inline-svg, which resolves to nothing in the test
+      // environment, so the icon name is only observable on the component's props.
+      const iconNames = wrapper
+        .findAllComponents({ name: 'OcIcon' })
+        .filter((icon) => icon.element.closest('.vs__dropdown-menu') !== null)
+        .map((icon) => icon.props('name'))
+      expect(iconNames).toContain('price-tag-3')
+    })
   })
 })
 

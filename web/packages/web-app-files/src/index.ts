@@ -14,7 +14,8 @@ import {
   useCapabilityStore,
   useEmbedMode,
   useSpacesStore,
-  useUserStore
+  useUserStore,
+  useVault
 } from '@ownclouders/web-pkg'
 import { extensions } from './extensions'
 import { buildRoutes } from '@ownclouders/web-pkg'
@@ -40,8 +41,7 @@ const appInfo: ApplicationInformation = {
 }
 
 export const navItems = (context: ComponentCustomProperties): AppNavigationItem[] => {
-  const currentPath = window.location.pathname
-  const isVault = currentPath.startsWith('/vault')
+  const { isInVault } = useVault()
   const spacesStores = useSpacesStore()
   const userStore = useUserStore()
   const capabilityStore = useCapabilityStore()
@@ -50,7 +50,7 @@ export const navItems = (context: ComponentCustomProperties): AppNavigationItem[
   return [
     {
       name() {
-        return isVault ? $gettext('Safe-Personal') : $gettext('Personal')
+        return isInVault ? $gettext('Safe-Personal') : $gettext('Personal')
       },
       icon: appInfo.icon,
       route: {
@@ -103,7 +103,7 @@ export const navItems = (context: ComponentCustomProperties): AppNavigationItem[
       priority: 30
     },
     {
-      name: isVault ? $gettext('Safe-Spaces') : $gettext('Spaces'),
+      name: isInVault ? $gettext('Safe-Spaces') : $gettext('Spaces'),
       icon: 'layout-grid',
       route: {
         path: `/${appInfo.id}/spaces/projects`

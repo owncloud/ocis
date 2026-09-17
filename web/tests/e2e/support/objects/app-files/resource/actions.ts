@@ -42,6 +42,8 @@ const checkBoxForTrashbin = `//*[@data-test-resource-path="%s"]//ancestor::tr//i
 const filesSelector = '//*[@data-test-resource-name="%s"]'
 export const fileRow =
   '//ancestor::*[(contains(@class, "oc-tile-card") or contains(@class, "oc-tbody-tr"))]'
+// works in both table and tiles view
+const resourceCheckBox = `//*[@data-test-resource-name="%s"]${fileRow}//input`
 export const resourceNameSelector =
   ':is(#files-files-table, .oc-tiles-item, #files-shared-with-me-accepted-section, .files-table) [data-test-resource-name="%s"]'
 // following breadcrumb selectors is passed to buildXpathLiteral function as the content to be inserted might contain quotes
@@ -1045,6 +1047,44 @@ export const selectOrDeselectResources = async (args: selectResourcesArgs): Prom
   }
 }
 
+export type clickResourceModifier = 'Shift' | 'ControlOrMeta'
+
+export type clickResourceCheckboxArgs = {
+  page: Page
+  resource: string
+  modifiers?: clickResourceModifier[]
+}
+
+export const clickResourceCheckbox = async (args: clickResourceCheckboxArgs): Promise<void> => {
+  const { page, resource, modifiers = [] } = args
+  await page.locator(util.format(resourceCheckBox, resource)).click({ modifiers })
+}
+
+export type expectResourcesSelectionArgs = {
+  page: Page
+  resources: string[]
+  selected: boolean
+}
+
+export const expectResourcesToBeSelected = async (
+  args: expectResourcesSelectionArgs
+): Promise<void> => {
+  const { page, resources, selected } = args
+  for (const resource of resources) {
+    const checkBox = page.locator(util.format(resourceCheckBox, resource))
+    if (selected) {
+      await expect(checkBox).toBeChecked()
+    } else {
+      await expect(checkBox).not.toBeChecked()
+    }
+  }
+}
+
+export const expectNoTextToBeHighlighted = async ({ page }: { page: Page }): Promise<void> => {
+  const highlightedText = await page.evaluate(() => window.getSelection().toString())
+  expect(highlightedText).toBe('')
+}
+
 /**/
 
 export interface moveOrCopyResourceArgs {
@@ -1968,6 +2008,19 @@ export const reSearchAndGetDisplayedResourcesFromSearch = async (page: Page): Pr
     await expect(page.locator(loadingSpinner)).not.toBeVisible()
   }
   return getDisplayedResourcesFromSearch(page)
+}
+
+// The full-page files list rendered after pressing Enter on a global search is populated from
+// the same one-shot backend query as the dropdown, so it's subject to the same tika indexing
+// lag - but nothing here spontaneously re-fetches, so simply waiting/polling longer can never
+// pick up a resource that wasn't indexed yet when the query ran. reload() re-issues the same
+// search against the current (search-results) URL, the same technique searchResourceGlobalSearch
+// already relies on to let indexing catch up before a search is even run.
+export const reSearchAndGetDisplayedResourcesFromFilesList = async (
+  page: Page
+): Promise<string[]> => {
+  await page.reload()
+  return getDisplayedResourcesFromFilesList(page)
 }
 
 export const getDisplayedResourcesFromFilesList = async (page: Page): Promise<string[]> => {

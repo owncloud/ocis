@@ -127,6 +127,8 @@ services:
     volumes:
       - "./config/keycloak/docker-entrypoint-override.sh:/opt/keycloak/bin/docker-entrypoint-override.sh"
       - "./config/keycloak/ocis-realm.dist.json:/opt/keycloak/data/import-dist/ocis-realm.json"
+      # custom ownCloud branded login theme, enabled via "loginTheme": "owncloud" in the realm import
+      - "./themes/owncloud:/opt/keycloak/themes/owncloud:ro"
     environment:
       OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
       KC_HOSTNAME: ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}

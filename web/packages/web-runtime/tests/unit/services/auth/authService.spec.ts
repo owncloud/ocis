@@ -1,6 +1,7 @@
-import { ConfigStore, useAuthStore, useConfigStore } from '@ownclouders/web-pkg'
+import { CapabilityStore, ConfigStore, useAuthStore, useConfigStore } from '@ownclouders/web-pkg'
 import { mock } from 'vitest-mock-extended'
 import { Router } from 'vue-router'
+import { Ability } from '@ownclouders/web-client'
 import { AuthService } from '../../../../src/services/auth/authService'
 import { UserManager } from '../../../../src/services/auth/userManager'
 import { RouteLocation, createRouter, createTestingPinia } from '@ownclouders/web-test-helpers'
@@ -160,10 +161,10 @@ describe('AuthService', () => {
   })
 
   describe('handleDelegatedTokenUpdate', () => {
-    const buildMessageEvent = (origin: string) =>
+    const buildMessageEvent = (origin: string, accessToken = 'attacker-token') =>
       mock<MessageEvent>({
         origin,
-        data: { name: 'owncloud-embed:update-token', data: { access_token: 'attacker-token' } }
+        data: { name: 'owncloud-embed:update-token', data: { access_token: accessToken } }
       })
 
     it('when delegateAuthenticationOrigin is not configured, should reject the message regardless of its origin', () => {
@@ -222,9 +223,86 @@ describe('AuthService', () => {
         }
       }
       initAuthService({ authService, configStore })
-      ;(authService as any).handleDelegatedTokenUpdate(buildMessageEvent('https://trusted.example'))
+      ;(authService as any).handleDelegatedTokenUpdate(
+        buildMessageEvent('https://trusted.example', 'renewed-token')
+      )
 
-      expect(mockUpdateContext).toHaveBeenCalled()
+      expect(mockUpdateContext).toHaveBeenCalledWith('renewed-token', false)
+    })
+
+    describe('when dispatched through the window message listener', () => {
+      let authService: AuthService
+
+      const signInDelegated = async () => {
+        authService = new AuthService()
+
+        Object.defineProperty(authService, 'userManager', {
+          value: mock<UserManager>({
+            getUser: vi.fn().mockResolvedValue(null),
+            getAndClearPostLoginRedirectUrl: vi.fn().mockReturnValue('/'),
+            updateContext: mockUpdateContext
+          })
+        })
+
+        const configStore = useConfigStore()
+        configStore.options = {
+          embed: {
+            enabled: true,
+            delegateAuthentication: true,
+            delegateAuthenticationOrigin: 'https://host.example.org'
+          }
+        }
+        initAuthService({ authService, configStore, router: createRouter() })
+
+        await authService.signInCallback('initial-token')
+        mockUpdateContext.mockClear()
+      }
+
+      afterEach(() => {
+        window.removeEventListener(
+          'message',
+          (authService as any).handleDelegatedTokenUpdate as EventListener
+        )
+      })
+
+      it('ignores "owncloud-embed:update-token" messages from unexpected origins', async () => {
+        await signInDelegated()
+
+        window.dispatchEvent(
+          new MessageEvent('message', {
+            data: { name: 'owncloud-embed:update-token', data: { access_token: 'renewed-token' } },
+            origin: 'https://attacker.example.org'
+          })
+        )
+
+        expect(mockUpdateContext).not.toHaveBeenCalled()
+      })
+
+      it('ignores "owncloud-embed:update-token" messages without an access token', async () => {
+        await signInDelegated()
+
+        window.dispatchEvent(
+          new MessageEvent('message', {
+            data: { name: 'owncloud-embed:update-token', data: {} },
+            origin: 'https://host.example.org'
+          })
+        )
+
+        expect(mockUpdateContext).not.toHaveBeenCalled()
+      })
+
+      it('updates the user context with the access token from "owncloud-embed:update-token" messages', async () => {
+        await signInDelegated()
+
+        window.dispatchEvent(
+          new MessageEvent('message', {
+            data: { name: 'owncloud-embed:update-token', data: { access_token: 'renewed-token' } },
+            origin: 'https://host.example.org'
+          })
+        )
+
+        expect(mockUpdateContext).toHaveBeenCalledWith('renewed-token', false)
+      })
     })
   })
 
@@ -291,6 +369,166 @@ describe('AuthService', () => {
 
       await authService.requireAcr('advanced', '/')
       expect(mockSignInRedirect).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('vault scope', () => {
+    const vaultRoute = {
+      params: { scope: 'vault' },
+      fullPath: '/vault'
+    } as unknown as RouteLocation
+
+    const setupVaultAuthService = ({
+      canAccessVault,
+      userContextReady,
+      getUser
+    }: {
+      canAccessVault: boolean
+      userContextReady: boolean
+      getUser: () => Promise<User>
+    }) => {
+      const authService = new AuthService()
+      const mockSignInRedirect = vi.fn()
+
+      const mockLoadUserAbilities = vi.fn().mockResolvedValue(undefined)
+      const mockUpdateContext = vi.fn().mockResolvedValue(undefined)
+      Object.defineProperty(authService, 'userManager', {
+        value: mock<UserManager>({
+          getUser: vi.fn().mockImplementation(getUser),
+          getAccessToken: vi.fn().mockResolvedValue('access-token'),
+          signinRedirect: mockSignInRedirect,
+          setPostLoginRedirectUrl: vi.fn(),
+          loadUserAbilities: mockLoadUserAbilities,
+          updateContext: mockUpdateContext
+        })
+      })
+
+      const ability = { can: vi.fn().mockReturnValue(canAccessVault) } as unknown as Ability
+      const capabilityStore = mock<CapabilityStore>({
+        isInitialized: true,
+        authMfaRequiredLevelname: 'advanced'
+      })
+      const router = createRouter()
+      const pushSpy = vi.spyOn(router, 'push').mockResolvedValue(undefined)
+
+      createTestingPinia()
+      const authStore = useAuthStore()
+      authStore.userContextReady = userContextReady
+      const configStore = useConfigStore()
+      authService.initialize(
+        configStore,
+        null,
+        router,
+        ability,
+        null,
+        null,
+        authStore,
+        capabilityStore,
+        null
+      )
+
+      return { authService, pushSpy, mockSignInRedirect, mockLoadUserAbilities, mockUpdateContext }
+    }
+
+    it('when the user lacks the vault ability, denies (accessDenied) instead of the IdP', async () => {
+      const { authService, mockSignInRedirect } = setupVaultAuthService({
+        canAccessVault: false,
+        userContextReady: true,
+        getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'advanced' }, expired: false }))
+      })
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      // initializeContext returns the redirect target; the guard (setupAuthGuard) returns it
+      // so vue-router cancels the navigation to the vault route.
+      expect(result).toEqual({ name: 'accessDenied' })
+      expect(mockSignInRedirect).not.toHaveBeenCalled()
+    })
+
+    it('when the user holds the vault ability, does not deny and enforces MFA', async () => {
+      const { authService, mockSignInRedirect } = setupVaultAuthService({
+        canAccessVault: true,
+        userContextReady: true,
+        getUser: () => Promise.resolve(null)
+      })
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      expect(result).toBeUndefined()
+      expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
+    })
+
+    it('when there is no authenticated user (cold load), does not deny and hands off to the IdP for login', async () => {
+      const { authService, mockSignInRedirect, mockLoadUserAbilities } = setupVaultAuthService({
+        canAccessVault: false,
+        userContextReady: false,
+        getUser: () => Promise.resolve(null)
+      })
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      expect(mockLoadUserAbilities).not.toHaveBeenCalled()
+      expect(result).toBeUndefined()
+      expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
+    })
+
+    it('on a cold load, denies an authenticated but unentitled user before the IdP hand-off', async () => {
+      const { authService, mockSignInRedirect, mockLoadUserAbilities } = setupVaultAuthService({
+        canAccessVault: false,
+        userContextReady: false,
+        getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: false }))
+      })
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      expect(mockLoadUserAbilities).toHaveBeenCalled()
+      expect(result).toEqual({ name: 'accessDenied' })
+      expect(mockSignInRedirect).not.toHaveBeenCalled()
+    })
+
+    it('on a cold load, fails closed (denies) when loading abilities throws', async () => {
+      const { authService, mockSignInRedirect, mockLoadUserAbilities } = setupVaultAuthService({
+        canAccessVault: true, // even if the ability would allow, a load failure must deny
+        userContextReady: false,
+        getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: false }))
+      })
+      mockLoadUserAbilities.mockRejectedValueOnce(new Error('network error'))
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      expect(mockLoadUserAbilities).toHaveBeenCalled()
+      expect(result).toEqual({ name: 'accessDenied' })
+      expect(mockSignInRedirect).not.toHaveBeenCalled()
+    })
+
+    it('on a cold load with a valid MFA session, initializes the user context instead of bouncing to login', async () => {
+      const { authService, mockSignInRedirect, mockUpdateContext } = setupVaultAuthService({
+        canAccessVault: true,
+        userContextReady: false,
+        getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'advanced' }, expired: false }))
+      })
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      // acr already satisfies MFA: no step-up, and the context must still be initialized
+      // (loadUserAbilities pre-set the token, which must not short-circuit updateContext).
+      expect(mockSignInRedirect).not.toHaveBeenCalled()
+      expect(mockUpdateContext).toHaveBeenCalledWith('access-token', true)
+      expect(result).toBeUndefined()
+    })
+
+    it('on a cold load, lets an authenticated entitled user through to the MFA step-up', async () => {
+      const { authService, mockSignInRedirect, mockLoadUserAbilities } = setupVaultAuthService({
+        canAccessVault: true,
+        userContextReady: false,
+        getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: false }))
+      })
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      expect(mockLoadUserAbilities).toHaveBeenCalled()
+      expect(result).toBeUndefined()
+      expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
     })
   })
 })

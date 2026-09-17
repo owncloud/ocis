@@ -1,7 +1,7 @@
 <template>
   <div id="oc-space-details-sidebar">
     <div class="oc-space-details-sidebar-image oc-text-center">
-      <oc-spinner v-if="previewsLoading" />
+      <oc-spinner v-if="previewsLoading" :aria-label="$gettext('Loading space image')" />
       <div v-else-if="spaceImage" class="oc-position-relative">
         <img :src="spaceImage" alt="" class="oc-mb-s" />
       </div>

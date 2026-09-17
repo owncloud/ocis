@@ -26,6 +26,7 @@ use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
+use TestHelpers\KeycloakHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\BehatHelper;
@@ -39,12 +40,14 @@ class SearchContext implements Context {
 	private FeatureContext $featureContext;
 
 	/**
-	 * Retry search until results are non-empty or timeout is reached.
-	 * Indexing of newly uploaded files in ocis is async, so a single
-	 * fixed sleep is not reliable — poll instead.
+	 * Search until the results show up.
+	 *
+	 * After a (re)start the search service answers with 5xx until it is ready,
+	 * and indexing of new uploads is async, so poll for both.
 	 *
 	 * @param string $user
 	 * @param string $pattern
+	 * @param bool $isVault
 	 * @param string|null $limit
 	 * @param string|null $scopeType
 	 * @param string|null $scope
@@ -56,31 +59,65 @@ class SearchContext implements Context {
 	private function searchWithRetry(
 		string $user,
 		string $pattern,
+		bool $isVault = false,
 		?string $limit = null,
 		?string $scopeType = null,
 		?string $scope = null,
 		?string $spaceName = null,
 		?TableNode $properties = null,
 	): ResponseInterface {
-		// Indexing is async — poll until results appear.
-		// Initial wait 3s, then retry every 2s, up to ~13s total.
-		$maxAttempts = STANDARD_RETRY_COUNT;
-		$response = null;
-		for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
-			\sleep($attempt === 0 ? 3 : 2);
-			$response = $this->searchFiles($user, $pattern, $limit, $scopeType, $scope, $spaceName, $properties);
-			$parsed = HttpRequestHelper::parseResponseAsXml($response);
-			if (\is_array($parsed) && isset($parsed["value"]) && !empty($parsed["value"])) {
+		$search = fn (): ResponseInterface => $this->searchFiles(
+			$user,
+			$pattern,
+			$isVault,
+			$limit,
+			$scopeType,
+			$scope,
+			$spaceName,
+			$properties,
+		);
+
+		for ($attempt = 0; $attempt < SERVICE_READY_RETRY_COUNT; $attempt++) {
+			\sleep($attempt === 0 ? SEARCH_INDEXING_INITIAL_WAIT_SEC : STANDARD_REQUEST_POLLING_INTERVAL_SEC);
+			$response = $search();
+			// 5xx means the service is still starting up
+			if ($response->getStatusCode() < 500) {
+				break;
+			}
+		}
+
+		// a client error or an existing result cannot change by polling
+		if ($response->getStatusCode() >= 400 || $this->searchResponseHasResults($response)) {
+			return $response;
+		}
+
+		// indexing is async, so poll for the results
+		for ($attempt = 0; $attempt < MAX_REQUEST_RETRY_COUNT; $attempt++) {
+			\sleep(STANDARD_REQUEST_POLLING_INTERVAL_SEC);
+			$response = $search();
+			if ($this->searchResponseHasResults($response)) {
 				return $response;
 			}
 		}
-		// return last response even if empty — let the assertion step produce the failure message
+
+		// let the assertion step report an empty result
 		return $response;
+	}
+
+	/**
+	 * @param ResponseInterface $response
+	 *
+	 * @return bool
+	 */
+	private function searchResponseHasResults(ResponseInterface $response): bool {
+		$parsed = HttpRequestHelper::parseResponseAsXml($response);
+		return \is_array($parsed) && isset($parsed["value"]) && !empty($parsed["value"]);
 	}
 
 	/**
 	 * @param string $user
 	 * @param string $pattern
+	 * @param bool $isVault
 	 * @param string|null $limit
 	 * @param string|null $scopeType
 	 * @param string|null $scope
@@ -93,6 +130,7 @@ class SearchContext implements Context {
 	private function searchFiles(
 		string $user,
 		string $pattern,
+		bool $isVault = false,
 		?string $limit = null,
 		?string $scopeType = null,
 		?string $scope = null,
@@ -121,16 +159,21 @@ class SearchContext implements Context {
 			"		<oc:search>\n";
 		if ($scope !== null) {
 			if ($scopeType === "space") {
-				$spaceId = $this->featureContext->spacesContext->getSpaceIdByName($user, $scope);
+				$spaceId = $this->featureContext->spacesContext->getSpaceIdByName($user, $scope, $isVault);
 				$pattern .= " scope:$spaceId";
 			} else {
 				$resourceID = $this->featureContext->spacesContext->getResourceId(
 					$user,
 					$spaceName ?? "Personal",
 					$scope,
+					$isVault,
 				);
 				$pattern .= " scope:$resourceID";
 			}
+		}
+		// Search inside vault uses 'vault:true' query token
+		if ($isVault) {
+			$pattern .= " AND vault:true";
 		}
 		$body .= "<oc:pattern>$pattern</oc:pattern>\n";
 		if ($limit !== null) {
@@ -156,12 +199,19 @@ class SearchContext implements Context {
 		$davPath = WebDavHelper::getDavPath($davPathVersionToUse);
 		$fullUrl = WebDavHelper::sanitizeUrl("$baseUrl/$davPath");
 
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$accessToken = $this->featureContext->getOcisUserToken($user)['token']['accessToken'];
+			$headers['Authorization'] = 'Bearer ' . $accessToken;
+			$user = null;
+			$password = null;
+		}
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
 			'REPORT',
 			$user,
 			$password,
-			null,
+			$headers,
 			$body,
 		);
 	}
@@ -186,7 +236,23 @@ class SearchContext implements Context {
 		?string $limit = null,
 		?TableNode $properties = null,
 	): void {
-		$response = $this->searchWithRetry($user, $pattern, $limit, null, null, null, $properties);
+		$response = $this->searchWithRetry($user, $pattern, false, $limit, null, null, null, $properties);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When user :user searches for :pattern in vault using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $pattern
+	 *
+	 * @return void
+	 */
+	public function userSearchesInVaultUsingWebDavAPI(
+		string $user,
+		string $pattern,
+	): void {
+		$response = $this->searchWithRetry($user, $pattern, true);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -287,14 +353,13 @@ class SearchContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" searches for "([^"]*)" inside (folder|space) "([^"]*)" using the WebDAV API$/
-	 * @When /^user "([^"]*)" searches for "([^"]*)" inside (folder) "([^"]*)" in space "([^"]*)" using the WebDAV API$/
+	 * @When /^user "([^"]*)" searches for "([^"]*)" inside (folder|space) "([^"]*)"(| in vault)? using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param string $pattern
 	 * @param string $scopeType
 	 * @param string $scope
-	 * @param string|null $spaceName
+	 * @param string $isVault
 	 *
 	 * @return void
 	 * @throws Exception|GuzzleException
@@ -304,9 +369,36 @@ class SearchContext implements Context {
 		string $pattern,
 		string $scopeType,
 		string $scope,
-		?string $spaceName = null,
+		string $isVault,
 	): void {
-		$response = $this->searchWithRetry($user, $pattern, null, $scopeType, $scope, $spaceName);
+		$isVault = trim($isVault) === 'in vault';
+		$response = $this->searchWithRetry($user, $pattern, $isVault, null, $scopeType, $scope);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" searches for "([^"]*)" inside (folder) "([^"]*)" in space "([^"]*)"(| in vault)? using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $pattern
+	 * @param string $scopeType
+	 * @param string $scope
+	 * @param string $spaceName
+	 * @param string $isVault
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function userSearchesInsideFolderInSpaceUsingWebDavAPI(
+		string $user,
+		string $pattern,
+		string $scopeType,
+		string $scope,
+		string $spaceName,
+		string $isVault,
+	): void {
+		$isVault = trim($isVault) === 'in vault';
+		$response = $this->searchWithRetry($user, $pattern, $isVault, null, $scopeType, $scope, $spaceName);
 		$this->featureContext->setResponse($response);
 	}
 }

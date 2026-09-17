@@ -68,6 +68,7 @@ type Graph struct {
 	keycloakClient           keycloak.Client
 	historyClient            ehsvc.EventHistoryService
 	traceProvider            trace.TracerProvider
+	maxImageFileSize         uint64
 }
 
 // ServeHTTP implements the Service interface.
@@ -169,7 +170,7 @@ func hasAcceptableSearch(query *godata.GoDataQuery, minSearchLength int) bool {
 	return len(query.Search.RawValue) >= minSearchLength
 }
 
-// regular users can only filter by userType
+// regular users can only filter by userType or vaultEligible
 func hasAcceptableFilter(query *godata.GoDataQuery) bool {
 	switch {
 	case query == nil || query.Filter == nil:
@@ -178,7 +179,8 @@ func hasAcceptableFilter(query *godata.GoDataQuery) bool {
 		return false
 	case query.Filter.Tree.Token.Value != "eq":
 		return false
-	case query.Filter.Tree.Children[0].Token.Value != "userType":
+	case query.Filter.Tree.Children[0].Token.Value != "userType" &&
+		query.Filter.Tree.Children[0].Token.Value != vaultEligible:
 		return false
 	}
 

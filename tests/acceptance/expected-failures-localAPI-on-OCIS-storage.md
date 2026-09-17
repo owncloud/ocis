@@ -203,19 +203,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [sharee (editor role) MOVE a file by file-id into shared sub-folder returns 502](https://github.com/owncloud/ocis/issues/7617)
 
-- [apiSpacesDavOperation/moveByFileId.feature:368](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L368)
-- [apiSpacesDavOperation/moveByFileId.feature:591](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L591)
-
-#### [MOVE a file into same folder with same name returns 404 instead of 403](https://github.com/owncloud/ocis/issues/1976)
-
-- [apiSpacesShares/moveSpaces.feature:69](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L69)
-- [apiSpacesShares/moveSpaces.feature:70](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L70)
-- [apiSpacesShares/moveSpaces.feature:416](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L416)
-- [apiSpacesDavOperation/moveByFileId.feature:61](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L61)
-- [apiSpacesDavOperation/moveByFileId.feature:174](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L174)
-- [apiSpacesDavOperation/moveByFileId.feature:175](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L175)
-- [apiSpacesDavOperation/moveByFileId.feature:176](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L176)
-- [apiSpacesDavOperation/moveByFileId.feature:393](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L393)
+- [apiSpacesDavOperation/moveByFileId.feature:367](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L367)
+- [apiSpacesDavOperation/moveByFileId.feature:590](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesDavOperation/moveByFileId.feature#L590)
 
 #### [OCM. admin cannot get federated users if he hasn't connection with them ](https://github.com/owncloud/ocis/issues/9829)
 
@@ -269,6 +258,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSearch2/tagSearch.feature:207](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch2/tagSearch.feature#L207)
 - [apiSearch2/tagSearch.feature:225](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch2/tagSearch.feature#L225)
 - [apiSearch2/tagSearch.feature:226](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch2/tagSearch.feature#L226)
+- [apiSearch2/tagSearch.feature:293](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch2/tagSearch.feature#L293)
+- [apiSearch2/tagSearch.feature:294](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch2/tagSearch.feature#L294)
 - [apiSearchContent/contentSearch.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L25)
 - [apiSearchContent/contentSearch.feature:26](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L26)
 - [apiSearchContent/contentSearch.feature:49](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L49)
@@ -399,7 +390,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraphUser/editUser.feature:231](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/editUser.feature#L231)
 - [apiGraphUser/editUser.feature:235](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/editUser.feature#L235)
 - [apiGraphUser/getUser.feature:696](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/getUser.feature#L696)
-- [apiGraphUser/getUser.feature:700](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/getUser.feature#L700)
 
 #### [metadata search gives 500](https://github.com/owncloud/ocis/issues/12230)
 - [apiSearchContent/metadataSerch.feature:30](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/metadataSerch.feature#L30)

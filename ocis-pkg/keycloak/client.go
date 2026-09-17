@@ -213,7 +213,7 @@ func (c *ConcreteClient) getKeyCloakID(u *libregraph.User) (string, error) {
 func convertUserActions(userActions []UserAction) *[]string {
 	stringActions := make([]string, len(userActions))
 	for i, a := range userActions {
-		stringActions[i] = userActionsToString[a]
+		stringActions[i] = string(a)
 	}
 	return &stringActions
 }

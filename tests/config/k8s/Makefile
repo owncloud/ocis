@@ -18,7 +18,8 @@ create-cluster:
 		-p '80:80@loadbalancer' -p '443:443@loadbalancer' -p '9100-9399:30100-30399@loadbalancer' \
 		--k3s-arg '--tls-san=k3d@server:*' --k3s-arg '--disable=metrics-server@server:*' \
 		--host-alias $(HOST_IP):ocis-server --host-alias $(HOST_IP):federation-ocis-server \
-		-v $(LOGS_DIR):/logs
+		-v $(LOGS_DIR):/logs \
+		-v $(abspath ./traefik-config.yaml):/var/lib/rancher/k3s/server/manifests/traefik-config.yaml
 
 .PHONY: prepare-charts
 prepare-charts:
@@ -26,6 +27,9 @@ prepare-charts:
 	bash setup.sh $(CHART_REPO)
 	kubectl create namespace $(DOMAIN) || true
 	kubectl create configmap -n $(DOMAIN) ocis-fonts-ttf --from-file=../ci/NotoSans.ttf || true
+	kubectl create configmap -n $(DOMAIN) ocis-translations \
+		--from-file=de_LC_MESSAGES_notifications.po=../translations/de/LC_MESSAGES/notifications.po \
+		--from-file=es_LC_MESSAGES_notifications.po=../translations/es/LC_MESSAGES/notifications.po || true
 
 .PHONY: deploy-ocis
 deploy-ocis:

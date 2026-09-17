@@ -1,23 +1,20 @@
-import { ApplicationsApiFactory } from './../generated'
-import type { GraphFactoryOptions } from './../types'
+import { ApplicationsApi } from './../generated'
+import { toInitOverrides, type GraphFactoryOptions } from './../types'
 import type { GraphApplications } from './types'
 
-export const ApplicationsFactory = ({
-  axiosClient,
-  config
-}: GraphFactoryOptions): GraphApplications => {
-  const applicationsApiFactory = ApplicationsApiFactory(config, config.basePath, axiosClient)
+export const ApplicationsFactory = ({ config }: GraphFactoryOptions): GraphApplications => {
+  const applicationsApi = new ApplicationsApi(config)
 
   return {
     async getApplication(id, requestOptions) {
-      const { data } = await applicationsApiFactory.getApplication(id, requestOptions)
-      return data
+      return await applicationsApi.getApplication(
+        { applicationId: id },
+        toInitOverrides(requestOptions)
+      )
     },
 
     async listApplications(requestOptions) {
-      const {
-        data: { value }
-      } = await applicationsApiFactory.listApplications(requestOptions)
+      const { value } = await applicationsApi.listApplications(toInitOverrides(requestOptions))
       return value || []
     }
   }

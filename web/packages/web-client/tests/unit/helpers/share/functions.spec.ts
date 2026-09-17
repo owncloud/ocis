@@ -76,7 +76,9 @@ describe('share helper functions', () => {
   describe('getShareResourceRoles', () => {
     it("returns all roles from a drive item's permissions that are also included in the graphRoles", () => {
       const driveItem = mockDeep<DriveItem>()
-      driveItem.remoteItem.permissions = [{ roles: ['1', '2'] }, { roles: ['1', '3'] }]
+      Object.assign(driveItem.remoteItem, {
+        permissions: [{ roles: ['1', '2'] }, { roles: ['1', '3'] }]
+      })
       const graphRoles = { '1': mock<ShareRole>({ id: '1' }), '4': mock<ShareRole>({ id: '4' }) }
 
       const result = getShareResourceRoles({ driveItem, graphRoles })
@@ -101,10 +103,12 @@ describe('share helper functions', () => {
     it('returns permissions based on a drive item if no graph share roles given', () => {
       const permissions = ['view', 'edit']
       const driveItem = mockDeep<DriveItem>()
-      driveItem.remoteItem.permissions = [
-        { '@libre.graph.permissions.actions': [permissions[0]] },
-        { '@libre.graph.permissions.actions': [permissions[1]] }
-      ]
+      Object.assign(driveItem.remoteItem, {
+        permissions: [
+          { atLibreGraphPermissionsActions: [permissions[0]] },
+          { atLibreGraphPermissionsActions: [permissions[1]] }
+        ]
+      })
 
       const result = getShareResourcePermissions({ driveItem, shareRoles: [] })
 
@@ -116,13 +120,15 @@ describe('share helper functions', () => {
     const driveItem = mockDeep<DriveItem>({ id: 'driveItemId', name: 'driveItemName' })
     const sharedBy = { id: '1', displayName: 'user1' } as Identity
     const sharedWith = { id: '2', displayName: 'user2' } as Identity
-    driveItem.remoteItem.permissions = [
-      {
-        roles: ['1', '2'],
-        invitation: { invitedBy: { user: sharedBy } },
-        grantedToV2: { user: sharedWith }
-      }
-    ]
+    Object.assign(driveItem.remoteItem, {
+      permissions: [
+        {
+          roles: ['1', '2'],
+          invitation: { invitedBy: { user: sharedBy } },
+          grantedToV2: { user: sharedWith }
+        }
+      ]
+    })
 
     const graphRoles = {
       '1': mock<ShareRole>({ id: '1', rolePermissions: [{ allowedResourceActions: ['view'] }] }),
@@ -167,16 +173,18 @@ describe('share helper functions', () => {
 
   describe('buildOutgoingShareResource', () => {
     const driveItem = mockDeep<DriveItem>({ id: 'driveItemId', name: 'driveItemName' })
-    driveItem.parentReference.path = ''
+    Object.assign(driveItem.parentReference, { path: '' })
     const sharedBy = { id: '1', displayName: 'user1' } as Identity
     const sharedWith = { id: '2', displayName: 'user2' } as Identity
-    driveItem.permissions = [
-      {
-        roles: ['1', '2'],
-        invitation: { invitedBy: { user: sharedBy } },
-        grantedToV2: { user: sharedWith }
-      }
-    ]
+    Object.assign(driveItem, {
+      permissions: [
+        {
+          roles: ['1', '2'],
+          invitation: { invitedBy: { user: sharedBy } },
+          grantedToV2: { user: sharedWith }
+        }
+      ]
+    })
     const user = { id: '1', displayName: 'user1' } as User
 
     it('sets ids based on the drive item, its first permission and parent reference', () => {
@@ -219,7 +227,7 @@ describe('share helper functions', () => {
     const resourceId = '1'
 
     it('sets ids based on the permission and the given resource id', () => {
-      const graphPermission = mock<Permission>({ '@libre.graph.permissions.actions': [] })
+      const graphPermission = mock<Permission>({ atLibreGraphPermissionsActions: [] })
 
       const result = buildCollaboratorShare({
         graphPermission,
@@ -233,7 +241,7 @@ describe('share helper functions', () => {
     describe('share type', () => {
       it('is user type if grantedToV2 includes a user', () => {
         const graphPermission = mock<Permission>({
-          '@libre.graph.permissions.actions': [],
+          atLibreGraphPermissionsActions: [],
           grantedToV2: { user: {}, group: undefined },
           link: undefined
         })
@@ -248,7 +256,7 @@ describe('share helper functions', () => {
       })
       it('is group type if grantedToV2 includes a group', () => {
         const graphPermission = mock<Permission>({
-          '@libre.graph.permissions.actions': [],
+          atLibreGraphPermissionsActions: [],
           grantedToV2: { user: undefined, group: {} },
           link: undefined
         })
@@ -263,8 +271,8 @@ describe('share helper functions', () => {
       })
       it('is external type if grantedToV2 includes a user that is external', () => {
         const graphPermission = mock<Permission>({
-          '@libre.graph.permissions.actions': [],
-          grantedToV2: { user: { '@libre.graph.userType': 'Federated' }, group: undefined },
+          atLibreGraphPermissionsActions: [],
+          grantedToV2: { user: { atLibreGraphUserType: 'Federated' }, group: undefined },
           link: undefined
         })
 
@@ -281,7 +289,7 @@ describe('share helper functions', () => {
       it('sets permissions if given directly via property', () => {
         const permissions = ['view', 'edit']
         const graphPermission = mock<Permission>({
-          '@libre.graph.permissions.actions': permissions
+          atLibreGraphPermissionsActions: permissions
         })
 
         const result = buildCollaboratorShare({
@@ -294,7 +302,7 @@ describe('share helper functions', () => {
       })
       it('sets permissions from the graph roles as fallback', () => {
         const graphPermission = mock<Permission>({
-          '@libre.graph.permissions.actions': undefined,
+          atLibreGraphPermissionsActions: undefined,
           roles: [graphRoles['1'].id]
         })
 
@@ -317,14 +325,14 @@ describe('share helper functions', () => {
     const resourceId = '1'
 
     it('sets ids based on the permission and the given resource id', () => {
-      const graphPermission = mock<Permission>({ '@libre.graph.permissions.actions': [] })
+      const graphPermission = mock<Permission>({ atLibreGraphPermissionsActions: [] })
       const result = buildLinkShare({ graphPermission, resourceId })
 
       expect(result.id).toEqual(graphPermission.id)
       expect(result.resourceId).toEqual(resourceId)
     })
     it('sets the sharing link type', () => {
-      const graphPermission = mock<Permission>({ '@libre.graph.permissions.actions': [] })
+      const graphPermission = mock<Permission>({ atLibreGraphPermissionsActions: [] })
       const result = buildLinkShare({ graphPermission, resourceId })
 
       expect(result.shareType).toEqual(ShareTypes.link.value)

@@ -231,6 +231,11 @@ test.describe('link', () => {
     'public link for folder and file (by authenticated user)',
     { tag: '@predefined-users' },
     async () => {
+      // This journey opens/authenticates/views/downloads 6 public links for each of
+      // 3 users (Brian, Carol, Anonymous), each cycling a11y scans
+      // it consistently runs beyond the default 180s budget.
+      test.slow()
+
       // Given "Admin" creates following user using API
       //   | id    |
       //   | Brian |

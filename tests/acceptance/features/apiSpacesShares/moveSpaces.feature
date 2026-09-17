@@ -50,8 +50,8 @@ Feature: move (rename) file
     But for user "Alice" the space "Project" should contain these entries:
       | insideSpace.txt |
 
-  @issue-1976
-  Scenario Outline: try to move a file within a project space into a folder with same name
+
+  Scenario Outline: move a file within a project space into a folder with same name
     Given the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has created a space "Project" with the default quota using the Graph API
     And user "Brian" has uploaded a file inside space "Project" with content "some content" to "insideSpace.txt"
@@ -61,14 +61,14 @@ Feature: move (rename) file
       | shareType       | user         |
       | permissionsRole | <space-role> |
     When user "Alice" moves file "insideSpace.txt" from space "Project" to "insideSpace.txt" inside space "Project" using the WebDAV API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "<http-status-code>"
     And as "Brian" file "insideSpace.txt" should not exist in the trashbin of the space "Project"
     And for user "Alice" the content of the file "insideSpace.txt" of the space "Project" should be "some content"
     Examples:
-      | space-role   |
-      | Manager      |
-      | Space Editor |
-      | Space Viewer |
+      | space-role   | http-status-code |
+      | Manager      | 204              |
+      | Space Editor | 204              |
+      | Space Viewer | 403              |
 
   @issue-8116
   Scenario Outline: user moves a file from a space project with different a role to a space project with different role
@@ -395,8 +395,8 @@ Feature: move (rename) file
     But for user "Alice" folder "testshare" of the space "Shares" should contain these entries:
       | testfile.txt |
 
-  @issue-1976
-  Scenario Outline: sharee tries to move a file into same shared folder with same name
+
+  Scenario Outline: sharee moves a file into same shared folder with same name
     Given user "Brian" has created folder "testshare"
     And user "Brian" has uploaded file with content "test file content" to "testshare/testfile.txt"
     And user "Brian" has sent the following resource share invitation:
@@ -407,15 +407,15 @@ Feature: move (rename) file
       | permissionsRole | <permissions-role> |
     And user "Alice" has a share "testshare" synced
     When user "Alice" moves file "testshare/testfile.txt" from space "Shares" to "testshare/testfile.txt" inside space "Shares" using the WebDAV API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "<http-status-code>"
     And as "Brian" file "testfile.txt" should not exist in the trashbin of the space "Personal"
     And for user "Alice" the content of the file "testshare/testfile.txt" of the space "Shares" should be "test file content"
     And for user "Brian" the content of the file "testshare/testfile.txt" of the space "Personal" should be "test file content"
     Examples:
-      | permissions-role |
-      | Editor           |
-      | Uploader         |
-      | Viewer           |
+      | permissions-role | http-status-code |
+      | Editor           | 204              |
+      | Uploader         | 403              |
+      | Viewer           | 403              |
 
 
   Scenario: overwrite a file while moving in project space

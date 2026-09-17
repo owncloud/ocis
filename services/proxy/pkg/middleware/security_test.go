@@ -20,7 +20,7 @@ directives:
     - 'https://${COLLABORA_DOMAIN|collabora.owncloud.test}/'
 `
 
-	config, err := loadCSPConfig([]byte(yaml))
+	config, err := loadCSPConfig("proxy", []byte(yaml))
 	if err != nil {
 		t.Error(err)
 	}

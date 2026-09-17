@@ -2,7 +2,7 @@ import EditPanel from '../../../../../src/components/Groups/SideBar/EditPanel.vu
 import {
   defaultComponentMocks,
   defaultPlugins,
-  mockAxiosReject,
+  mockHttpError,
   mount
 } from '@ownclouders/web-test-helpers'
 import { mock } from 'vitest-mock-extended'
@@ -37,7 +37,7 @@ describe('EditPanel', () => {
       const { wrapper, mocks } = getWrapper()
       ;(wrapper.vm as any).editGroup.displayName = 'users'
       const graphMock = mocks.$clientService.graphAuthenticated
-      const getGroupStub = graphMock.groups.getGroup.mockRejectedValue(() => mockAxiosReject())
+      const getGroupStub = graphMock.groups.getGroup.mockRejectedValue(() => mockHttpError())
       expect(await (wrapper.vm as any).validateDisplayName()).toBeTruthy()
       expect(getGroupStub).toHaveBeenCalled()
     })

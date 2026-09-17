@@ -88,10 +88,14 @@ func DefaultConfig() *config.Config {
 				Insecure:                 false,
 				CACert:                   path.Join(defaults.BaseDataPath(), "idm", "ldap.crt"),
 				BindDN:                   "uid=libregraph,ou=sysusers,o=libregraph-idm",
+				PoolEnabled:              false,
+				PoolSize:                 5,
+				PoolCheckoutTimeout:      30 * time.Second,
 				UseServerUUID:            false,
 				UsePasswordModExOp:       true,
 				WriteEnabled:             true,
 				UpdateUserLastSignInDate: true,
+				RetryMaxCount:            1,
 				UserBaseDN:               "ou=users,o=libregraph-idm",
 				UserSearchScope:          "sub",
 				UserFilter:               "",
@@ -115,6 +119,8 @@ func DefaultConfig() *config.Config {
 				GroupMemberAttribute:      "member",
 				GroupIDAttribute:          "owncloudUUID",
 				EducationResourcesEnabled: false,
+				// 1 minute
+				InstanceMapperCacheTTL: 60,
 			},
 		},
 		Cache: &config.Cache{
@@ -135,7 +141,8 @@ func DefaultConfig() *config.Config {
 			AvailableRoles: nil, // will be populated with defaults in EnsureDefaults
 		},
 		Validation: config.Validation{
-			MaxTagLength: 100,
+			MaxTagLength:     100,
+			MaxImageFileSize: "50MB",
 		},
 	}
 }
@@ -217,4 +224,5 @@ func Sanitize(cfg *config.Config) {
 	cfg.Spaces.ExtendedSpacePropertiesCacheTTL = cfg.Spaces.ExtendedSpacePropertiesCacheTTL * int(time.Second)
 	cfg.Spaces.GroupsCacheTTL = cfg.Spaces.GroupsCacheTTL * int(time.Second)
 	cfg.Spaces.UsersCacheTTL = cfg.Spaces.UsersCacheTTL * int(time.Second)
+	cfg.Identity.LDAP.InstanceMapperCacheTTL = cfg.Identity.LDAP.InstanceMapperCacheTTL * int(time.Second)
 }

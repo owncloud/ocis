@@ -1,6 +1,6 @@
 import { defaultComponentMocks, getComposableWrapper } from '@ownclouders/web-test-helpers'
 import { CapabilityStore, useFolderLink } from '../../../../src/composables'
-import { Resource, SpaceResource } from '@ownclouders/web-client'
+import { OutgoingShareResource, Resource, SpaceResource } from '@ownclouders/web-client'
 
 describe('useFolderLink', () => {
   it('getFolderLink should return the correct folder link', () => {
@@ -18,6 +18,52 @@ describe('useFolderLink', () => {
       name: 'files-spaces-generic',
       params: { driveAliasAndItem: 'personal/admin' },
       query: { fileId: '2' }
+    })
+  })
+
+  describe('getFolderLink for a password-protected folder shared via link', () => {
+    const passwordProtectedFolder = {
+      path: '/.PasswordProtectedFolders/projects/Personal/secret',
+      id: '2',
+      fileId: '2',
+      storageId: '1',
+      spaceId: '1',
+      outgoing: true,
+      sharedWith: [],
+      shareLinks: [{ hasPassword: true, webUrl: 'https://ocis.test/s/sHareToken' }]
+    } as unknown as OutgoingShareResource
+
+    it('should point at the public link so that the password is enforced', () => {
+      const wrapper = createWrapper()
+
+      expect(wrapper.vm.getFolderLink(passwordProtectedFolder)).toEqual({
+        name: 'resolvePublicLink',
+        params: { token: 'sHareToken' }
+      })
+    })
+
+    it('should return no link at all if the public link cannot be determined', () => {
+      const wrapper = createWrapper()
+
+      const withoutShareLinks: OutgoingShareResource = {
+        ...passwordProtectedFolder,
+        shareLinks: []
+      }
+
+      expect(wrapper.vm.getFolderLink(withoutShareLinks)).toBeNull()
+    })
+
+    it('should keep linking to the folder itself outside of a share listing', () => {
+      const wrapper = createWrapper()
+      const { path, id, fileId, storageId, spaceId } = passwordProtectedFolder
+
+      expect(
+        wrapper.vm.getFolderLink({ path, id, fileId, storageId, spaceId } as Resource)
+      ).toEqual({
+        name: 'files-spaces-generic',
+        params: { driveAliasAndItem: 'personal/admin' },
+        query: { fileId: '2' }
+      })
     })
   })
 

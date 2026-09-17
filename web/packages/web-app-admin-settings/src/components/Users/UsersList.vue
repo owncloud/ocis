@@ -49,6 +49,16 @@
         <template #avatar="{ item }">
           <avatar-image :width="32" :userid="item.id" :user-name="item.displayName" />
         </template>
+        <template #onPremisesSamAccountName="{ item }">
+          <div
+            v-oc-tooltip="item.onPremisesSamAccountName"
+            class="oc-text-truncate"
+            v-text="item.onPremisesSamAccountName"
+          />
+        </template>
+        <template #displayName="{ item }">
+          <div v-oc-tooltip="item.displayName" class="oc-text-truncate" v-text="item.displayName" />
+        </template>
         <template #role="{ item }">
           <template v-if="item.appRoleAssignments">{{ getRoleDisplayNameByUser(item) }}</template>
         </template>
@@ -264,8 +274,8 @@ const orderBy = (list: User[], prop: string, desc: boolean) => {
         b = getRoleDisplayNameByUser(user2)
         break
       case 'accountEnabled':
-        a = ('accountEnabled' in user1 ? user1.accountEnabled : true).toString()
-        b = ('accountEnabled' in user2 ? user2.accountEnabled : true).toString()
+        a = (user1.accountEnabled ?? true).toString()
+        b = (user2.accountEnabled ?? true).toString()
         break
       default:
         a = user1[prop as keyof User].toString() || ''
@@ -351,12 +361,16 @@ const fields = computed(() => {
     {
       name: 'onPremisesSamAccountName',
       title: $gettext('User name'),
-      sortable: true
+      type: 'slot',
+      sortable: true,
+      wrap: 'truncate'
     },
     {
       name: 'displayName',
       title: $gettext('First and last name'),
+      type: 'slot',
       sortable: true,
+      wrap: 'truncate',
       tdClass: 'mark-element'
     },
     {

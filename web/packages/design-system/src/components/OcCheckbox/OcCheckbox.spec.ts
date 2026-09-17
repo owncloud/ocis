@@ -66,6 +66,18 @@ describe('OcCheckbox', () => {
       expect(checkbox.element.checked).toBeFalsy()
       await checkbox.setValue(true)
       expect(wrapper.emitted('update:modelValue')).toBeTruthy()
+      // the model is owned by the parent, the native state follows it
+      await wrapper.setProps({ modelValue: true })
+      expect(checkbox.element.checked).toBeTruthy()
+    })
+    it('restores the native checked state if the model does not follow the input', async () => {
+      const wrapper = getWrapperWithProps({ modelValue: true })
+      const checkbox = wrapper.find<HTMLInputElement>(checkboxSelector)
+      expect(checkbox.element.checked).toBeTruthy()
+      // the browser toggles the native state on click, the parent keeps the model as it is
+      await checkbox.setValue(false)
+      expect(wrapper.emitted('update:modelValue')).toEqual([[false]])
+      await wrapper.vm.$nextTick()
       expect(checkbox.element.checked).toBeTruthy()
     })
   })

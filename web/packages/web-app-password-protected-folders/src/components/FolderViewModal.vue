@@ -17,6 +17,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
+import { PASSWORD_PROTECTED_FOLDER_VIEW_QUERY } from '@ownclouders/web-client'
 import { Modal, useThemeStore } from '@ownclouders/web-pkg/src/composables'
 import AppLoadingSpinner from '@ownclouders/web-pkg/src/components/AppLoadingSpinner.vue'
 import { unref } from 'vue'
@@ -46,6 +47,9 @@ iframeUrl.searchParams.append('hide-app-switcher', 'true')
 iframeUrl.searchParams.append('hide-account-menu', 'true')
 iframeUrl.searchParams.append('hide-navigation', 'true')
 iframeUrl.searchParams.append('lang', current)
+// signals the framed app that it runs inside this modal, so it notifies us when the
+// shared folder is renamed and we can keep the `.psec` pointer file in sync
+iframeUrl.searchParams.append(PASSWORD_PROTECTED_FOLDER_VIEW_QUERY, 'true')
 
 const onLoad = () => {
   isLoading.value = false

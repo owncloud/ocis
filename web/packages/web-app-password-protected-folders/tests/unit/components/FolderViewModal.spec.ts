@@ -15,7 +15,7 @@ describe('FolderViewModal', () => {
     const iframe = wrapper.find(SELECTORS.iframe)
 
     expect(iframe.attributes('src')).toEqual(
-      'https://example.org/public-link?hide-logo=true&hide-app-switcher=true&hide-account-menu=true&hide-navigation=true&lang=en'
+      'https://example.org/public-link?hide-logo=true&hide-app-switcher=true&hide-account-menu=true&hide-navigation=true&lang=en&password-protected-folder-view=true'
     )
   })
 

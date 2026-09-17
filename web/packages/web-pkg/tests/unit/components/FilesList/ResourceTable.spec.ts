@@ -9,11 +9,14 @@ import {
   SpaceResource
 } from '@ownclouders/web-client'
 import { defaultPlugins, mount, PartialComponentProps } from '@ownclouders/web-test-helpers'
-import { CapabilityStore, useResourcesStore } from '../../../../src/composables/piniaStores'
+import {
+  CapabilityStore,
+  useResourcesStore,
+  WebThemeType
+} from '../../../../src/composables/piniaStores'
 import { useCanBeOpenedWithSecureView } from '../../../../src/composables/resources'
 import { displayPositionedDropdown } from '../../../../src/helpers/contextMenuDropdown'
 import { eventBus } from '../../../../src/services/eventBus'
-import { SideBarEventTopics } from '../../../../src/composables/sideBar'
 import { mock } from 'vitest-mock-extended'
 import { computed } from 'vue'
 import { Identity } from '@ownclouders/web-client/graph/generated'
@@ -70,6 +73,11 @@ const router = {
 const getCurrentDate = () => {
   return DateTime.fromJSDate(new Date()).minus({ days: 1 }).toFormat('EEE, dd MMM yyyy HH:mm:ss')
 }
+
+const tagColorsList = Array.from(
+  { length: 30 },
+  (_, i) => `#${i.toString(16).padStart(2, '0').repeat(3)}`
+)
 
 const fields = ['name', 'size', 'mdate', 'sdate', 'ddate', 'actions', 'sharedBy', 'sharedWith']
 
@@ -369,6 +377,26 @@ describe('ResourceTable', () => {
       expect(wrapper.find('.oc-tbody-tr-in-delete-queue .oc-checkbox').exists()).toBe(false)
       expect(wrapper.find('.oc-tbody-tr-in-delete-queue .oc-spinner').exists()).toBe(true)
     })
+    it('publishes a shift-click event instead of toggling when shift is held on a checkbox', async () => {
+      const { wrapper } = getMountedWrapper()
+      const publishSpy = vi.spyOn(eventBus, 'publish')
+      await wrapper.find('.oc-tbody-tr-documents .oc-checkbox').trigger('click', { shiftKey: true })
+      expect(publishSpy).toHaveBeenCalledWith(
+        'app.files.list.clicked.shift',
+        expect.objectContaining({ resource: expect.objectContaining({ id: 'documents' }) })
+      )
+      expect(wrapper.emitted('update:selectedIds')).toBeUndefined()
+    })
+    it('publishes a meta-click event instead of toggling when meta is held on a checkbox', async () => {
+      const { wrapper } = getMountedWrapper()
+      const publishSpy = vi.spyOn(eventBus, 'publish')
+      await wrapper.find('.oc-tbody-tr-documents .oc-checkbox').trigger('click', { metaKey: true })
+      expect(publishSpy).toHaveBeenCalledWith(
+        'app.files.list.clicked.meta',
+        expect.objectContaining({ id: 'documents' })
+      )
+      expect(wrapper.emitted('update:selectedIds')).toBeUndefined()
+    })
 
     describe('all rows already selected', () => {
       it('de-selects all resources via the select-all checkbox', async () => {
@@ -520,6 +548,27 @@ describe('ResourceTable', () => {
         wrapper.emitted<{ resources: Resource[] }[]>('fileClick')[0][0].resources[0].name
       ).toMatch('psec-file.psec')
     })
+
+    it('does not link a password-protected folder without a resolvable link', async () => {
+      const resource = mock<OutgoingShareResource>({
+        id: 'secret',
+        name: 'secret',
+        path: '/.PasswordProtectedFolders/projects/Personal/secret',
+        isFolder: true,
+        type: 'folder',
+        getDomSelector: () => extractDomSelector('secret')
+      })
+      resource.outgoing = true
+      resource.sharedWith = []
+      resource.shareLinks = []
+
+      const { wrapper } = getMountedWrapper({ resources: [resource] })
+      const row = wrapper.find('.oc-tbody-tr-secret')
+      await row.find('.oc-resource-name').trigger('click')
+
+      expect(row.find('.oc-resource-link').exists()).toBeFalsy()
+      expect(wrapper.emitted().fileClick).toBeUndefined()
+    })
   })
 
   describe('resource details', () => {
@@ -628,7 +677,11 @@ describe('ResourceTable', () => {
         const resource = mock<Resource>({ id: '1', tags })
         const { wrapper } = getMountedWrapper({ props: { resources: [resource] } })
         const resourceRow = wrapper.find(`[data-item-id="${resource.id}"]`)
-        expect(resourceRow.findAll('.resource-table-tag').length).toBe(tagCount)
+        // Count visible tags: iterate through tag wrappers and skip those inside oc-drop
+        const cell = resourceRow.find('.oc-table-data-cell-tags')
+        const allWrappers = cell.findAll('.resource-table-tag-wrapper')
+        const visibleWrappers = allWrappers.filter((w) => !w.element.closest('.oc-drop'))
+        expect(visibleWrappers.length).toBe(tagCount)
       })
       it('render router link if user is authenticated', () => {
         const resource = mock<Resource>({ id: '1', tags: ['1'] })
@@ -647,6 +700,38 @@ describe('ResourceTable', () => {
         const resourceRow = wrapper.find(`[data-item-id="${resource.id}"]`)
         expect(resourceRow.find('.resource-table-tag-wrapper').element.tagName).toEqual('SPAN')
       })
+
+      it('fills a chip from the theme slot its tag name hashes to', () => {
+        // The wiring under test is name -> slot -> theme css vars; which slot a name lands on is
+        // pinned in the `hashToIndex` specs, so this only asserts the chip takes both halves of
+        // one slot's pair, and that the overflow counter stays a plain badge.
+        const resource = mock<Resource>({ id: '1', tags: ['physics', 'invoice', 'spare'] })
+        const { wrapper } = getMountedWrapper({ props: { resources: [resource] } })
+        const cell = wrapper.find(`[data-item-id="${resource.id}"] .oc-table-data-cell-tags`)
+
+        const style = cell.find('.resource-table-tag').attributes('style')
+        const slot = /--oc-color-tag-(\d+)\)/.exec(style)?.[1]
+        expect(slot).toBeDefined()
+        expect(style).toContain(`background-color: var(--oc-color-tag-${slot})`)
+        expect(style).toContain(`color: var(--oc-color-tag-${slot}-text,currentColor)`)
+
+        expect(cell.find('.resource-table-tag-more').attributes('style')).toBeUndefined()
+      })
+
+      it('keeps the price-tag-3 icon and the rounded corners of the chip', () => {
+        const resource = mock<Resource>({ id: '1', tags: ['physics'] })
+        const { wrapper } = getMountedWrapper({ props: { resources: [resource] } })
+        const cell = wrapper.find(`[data-item-id="${resource.id}"] .oc-table-data-cell-tags`)
+
+        expect(cell.find('.resource-table-tag').classes()).toContain('oc-tag-rounded')
+
+        // OcIcon renders the svg through inline-svg, which resolves to nothing in the test
+        // environment, so the icon name is only observable on the component's props.
+        const iconNames = cell
+          .findAllComponents({ name: 'OcIcon' })
+          .map((icon) => icon.props('name'))
+        expect(iconNames).toContain('price-tag-3')
+      })
     })
     describe('"more"-button', () => {
       it.each([
@@ -662,13 +747,65 @@ describe('ResourceTable', () => {
         const resourceRow = wrapper.find(`[data-item-id="${resource.id}"]`)
         expect(resourceRow.find('.resource-table-tag-more').exists()).toBe(renderButton)
       })
-      it('opens sidebar on click', async () => {
-        const spyBus = vi.spyOn(eventBus, 'publish')
+      it('renders the more button as a focusable button', () => {
         const resource = mock<Resource>({ id: '1', tags: ['1', '2', '3'] })
         const { wrapper } = getMountedWrapper({ props: { resources: [resource] } })
         const resourceRow = wrapper.find(`[data-item-id="${resource.id}"]`)
-        await resourceRow.find('.resource-table-tag-more').trigger('click')
-        expect(spyBus).toHaveBeenCalledWith(SideBarEventTopics.open)
+        const moreButton = resourceRow.find('.resource-table-tag-more')
+        expect(moreButton.exists()).toBe(true)
+        // OcTag renders as a button element when type='button' is set
+        expect(moreButton.element.tagName).toBe('BUTTON')
+        expect(moreButton.attributes('aria-label')).toBeTruthy()
+      })
+
+      it('keeps the visible "+ N" inside the accessible name', () => {
+        const resource = mock<Resource>({ id: '1', tags: ['1', '2', '3', '4'] })
+        const { wrapper } = getMountedWrapper({ props: { resources: [resource] } })
+        const moreButton = wrapper.find(`[data-item-id="${resource.id}"] .resource-table-tag-more`)
+
+        expect(moreButton.text()).toBe('+ 2')
+        expect(moreButton.attributes('aria-label')).toContain('+ 2')
+      })
+
+      it('announces the overflow button as a disclosure and follows the popover state', async () => {
+        const resource = mock<Resource>({ id: '1', tags: ['1', '2', '3'] })
+        const { wrapper } = getMountedWrapper({ props: { resources: [resource] } })
+        const row = wrapper.find(`[data-item-id="${resource.id}"]`)
+        const drop = row.findComponent({ name: 'OcDrop' })
+
+        expect(drop.props('mode')).toBe('click')
+
+        expect(row.find('.resource-table-tag-more').attributes('aria-haspopup')).toBe('true')
+        expect(row.find('.resource-table-tag-more').attributes('aria-expanded')).toBe('false')
+
+        await drop.vm.$emit('showDrop')
+        expect(row.find('.resource-table-tag-more').attributes('aria-expanded')).toBe('true')
+
+        await drop.vm.$emit('hideDrop')
+        expect(row.find('.resource-table-tag-more').attributes('aria-expanded')).toBe('false')
+      })
+
+      it('does not select the row when the overflow button is clicked', async () => {
+        const resource = mock<Resource>({ id: '1', tags: ['1', '2', '3'] })
+        const { wrapper } = getMountedWrapper({ props: { resources: [resource] } })
+
+        await wrapper
+          .find(`[data-item-id="${resource.id}"] .resource-table-tag-more`)
+          .trigger('click')
+
+        expect(wrapper.emitted('update:selectedIds')).toBeUndefined()
+      })
+
+      it('marks the overflow popover so it can be sized to the tags it holds', () => {
+        // `OcDrop` is a fixed 300px wide, which leaves most of the popover empty when the
+        // overflow holds a single short tag. The class is what the stylesheet hangs the
+        // content-sized width and the left alignment on — jsdom computes no layout, so the
+        // class is all a unit test can observe.
+        const resource = mock<Resource>({ id: '1', tags: ['1', '2', '3'] })
+        const { wrapper } = getMountedWrapper({ props: { resources: [resource] } })
+        const drop = wrapper.find(`[data-item-id="${resource.id}"] .oc-drop`)
+        expect(drop.exists()).toBe(true)
+        expect(drop.classes()).toContain('resource-table-tag-overflow')
       })
     })
   })
@@ -806,7 +943,16 @@ function getMountedWrapper({
             piniaOptions: {
               authState: { userContextReady },
               capabilityState: { capabilities },
-              resourcesStore: { deleteQueue: ['in-delete-queue=='] }
+              resourcesStore: { deleteQueue: ['in-delete-queue=='] },
+              themeState: {
+                currentTheme: mock<WebThemeType>({
+                  // 30 distinct colours, matching the count the theme is specced to ship, so
+                  // hashed slots spread the way they will in production.
+                  designTokens: {
+                    tagColorsList: tagColorsList
+                  }
+                })
+              }
             }
           })
         ],

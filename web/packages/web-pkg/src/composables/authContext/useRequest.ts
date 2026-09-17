@@ -1,6 +1,7 @@
 import { useClientService } from '../clientService'
 import type { Router, RouteLocationNormalizedLoaded } from 'vue-router'
-import type { Method, AxiosRequestConfig, AxiosResponse } from 'axios'
+import type { HttpResponse } from '@ownclouders/web-client'
+import type { RequestConfig } from '../../http'
 import { ClientService } from '../../services'
 import { AuthStore, useAuthStore } from '../piniaStores'
 
@@ -12,7 +13,7 @@ interface RequestOptions {
 }
 
 export interface RequestResult {
-  makeRequest(method: Method, url: string, config?: AxiosRequestConfig): Promise<AxiosResponse>
+  makeRequest(method: string, url: string, config?: RequestConfig): Promise<HttpResponse>
 }
 
 export function useRequest(options: RequestOptions = {}): RequestResult {
@@ -20,31 +21,32 @@ export function useRequest(options: RequestOptions = {}): RequestResult {
   const authStore = options.authStore ?? useAuthStore()
 
   const makeRequest = (
-    method: Method,
+    method: string,
     url: string,
-    config: AxiosRequestConfig = {}
-  ): Promise<AxiosResponse> => {
+    config: RequestConfig = {}
+  ): Promise<HttpResponse> => {
     const httpClient = authStore.accessToken
       ? clientService.httpAuthenticated
       : clientService.httpUnAuthenticated
 
-    config.headers = config.headers || {}
+    // A Headers rather than a plain object so that these entries replace a caller's own
+    // spelling of the same name instead of being appended alongside it.
+    const headers = new Headers(config.headers)
 
     if (authStore.publicLinkContextReady) {
       if (authStore.publicLinkPassword) {
-        config.headers.Authorization =
+        headers.set(
+          'Authorization',
           'Basic ' +
-          Buffer.from(['public', authStore.publicLinkPassword].join(':')).toString('base64')
+            Buffer.from(['public', authStore.publicLinkPassword].join(':')).toString('base64')
+        )
       }
       if (authStore.publicLinkToken) {
-        config.headers['public-token'] = authStore.publicLinkToken
+        headers.set('public-token', authStore.publicLinkToken)
       }
     }
 
-    config.method = method
-    config.url = url
-
-    return httpClient.request(config)
+    return httpClient.request({ ...config, headers, method, url })
   }
 
   return {

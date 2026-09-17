@@ -19,7 +19,7 @@ export const buildStaticAppMenuItems = (
           'Apps menu: link label; opens the software license information page.',
           'Software License Information'
         ),
-      icon: 'scales',
+      icon: 'file-shield',
       priority: 900,
       url: softwareLicenseUrl
     })

@@ -205,8 +205,7 @@ export const useFileActions = () => {
   }) => {
     const remoteItemId = isShareSpaceResource(space) ? space.id : undefined
     const routeName = appFileExtension.routeName || appFileExtension.app
-    const routeOpts = getEditorRouteOpts(routeName, space, resource, mode, remoteItemId)
-    return router.resolve(routeOpts)
+    return getEditorRouteOpts(routeName, space, resource, mode, remoteItemId)
   }
   const getEditorRouteOpts = (
     routeName: RouteRecordName,

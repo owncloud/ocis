@@ -9,6 +9,7 @@ jobs:
   detect-web-changes:
     name: detect-web-changes
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       web-changed: ${{ steps.check.outputs.web-changed }}
     steps:
@@ -19,13 +20,14 @@ jobs:
 
       - name: Check if web/ changed
         id: check
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           if [[ "${{ github.event_name }}" == "push" ]]; then
             echo "web-changed=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          PR_TITLE="${{ github.event.pull_request.title }}"
           if echo "$PR_TITLE" | grep -qi "\[full-ci\]"; then
             echo "web-changed=true" >> "$GITHUB_OUTPUT"
             exit 0
@@ -49,6 +51,7 @@ jobs:
     needs: [detect-web-changes]
     if: needs.detect-web-changes.outputs.web-changed == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     defaults:
       run:
         working-directory: web
@@ -96,6 +99,7 @@ jobs:
     name: web-tests-passed
     needs: [detect-web-changes, web-build-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     if: always()
     steps:
       - name: Check web-build-test passed or was skipped

@@ -169,8 +169,11 @@ func metadataDrivers(localEndpoint string, cfg *config.Config) map[string]interf
 				"cache_database":            cfg.FileMetadataCache.Database,
 				"cache_ttl":                 cfg.FileMetadataCache.TTL,
 				"cache_disable_persistence": cfg.FileMetadataCache.DisablePersistence,
-				"cache_auth_username":       cfg.FileMetadataCache.AuthUsername,
-				"cache_auth_password":       cfg.FileMetadataCache.AuthPassword,
+				"cache_auth_username":           cfg.FileMetadataCache.AuthUsername,
+				"cache_auth_password":           cfg.FileMetadataCache.AuthPassword,
+				"cache_enable_tls":              cfg.FileMetadataCache.EnableTLS,
+				"cache_tls_insecure":            cfg.FileMetadataCache.TLSInsecure,
+				"cache_tls_root_ca_certificate": cfg.FileMetadataCache.TLSRootCACertificate,
 			},
 		},
 	}

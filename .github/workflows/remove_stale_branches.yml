@@ -16,6 +16,7 @@ jobs:
   remove-stale-branches:
     name: Remove Stale Branches
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: fpicalausa/remove-stale-branches@9b829bc2975ade0c61e64e9613def53ec0732440 # v2.6.1
         with:

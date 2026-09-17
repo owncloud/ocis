@@ -3938,3 +3938,94 @@ Feature: resources shared by user
         }
       }
       """
+
+
+  Scenario Outline: space member sees link shares created by another member in sharedByMe
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "TeamSpace" with the default quota using the Graph API
+    And user "Alice" has sent the following space share invitation:
+      | space           | TeamSpace     |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | <space-role>  |
+    And user "Alice" has uploaded a file inside space "TeamSpace" with content "hello" to "shared.txt"
+    And user "Alice" has created the following resource link share:
+      | resource        | shared.txt |
+      | space           | TeamSpace  |
+      | permissionsRole | View       |
+      | password        | %public%   |
+    When user "Brian" lists the shares shared by him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should contain resource "shared.txt" with the following data:
+      """
+      {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "const": "shared.txt" }
+        }
+      }
+      """
+    Examples:
+      | space-role   |
+      | Manager      |
+      | Space Editor |
+      | Space Viewer |
+
+
+  Scenario: non-member does not see link shares of a space in sharedByMe
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "TeamSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "TeamSpace" with content "hello" to "shared.txt"
+    And user "Alice" has created the following resource link share:
+      | resource        | shared.txt |
+      | space           | TeamSpace  |
+      | permissionsRole | View       |
+      | password        | %public%   |
+    When user "Brian" lists the shares shared by him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should not contain resource "shared.txt" with the following data:
+      """
+      {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "const": "shared.txt" }
+        }
+      }
+      """
+
+  @env-config
+  Scenario: non-member with ListGrants role on a resource sees link shares created by another user on that resource in sharedByMe
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And the administrator has enabled the following share permissions roles:
+      | permissions-role       |
+      | Viewer With ListGrants |
+    And user "Alice" has created a space "TeamSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "TeamSpace" with content "hello" to "shared.txt"
+    And user "Alice" has created the following resource link share:
+      | resource        | shared.txt |
+      | space           | TeamSpace  |
+      | permissionsRole | View       |
+      | password        | %public%   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | shared.txt             |
+      | space           | TeamSpace              |
+      | sharee          | Brian                  |
+      | shareType       | user                   |
+      | permissionsRole | Viewer With ListGrants |
+    When user "Brian" lists the shares shared by him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should contain resource "shared.txt" with the following data:
+      """
+      {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "const": "shared.txt" }
+        }
+      }
+      """

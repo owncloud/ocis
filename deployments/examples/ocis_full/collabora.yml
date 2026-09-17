@@ -48,10 +48,33 @@ services:
       driver: ${LOG_DRIVER:-local}
     restart: always
 
+  # Since collabora/code 26.x, the image ships without a shell (no /bin/bash, no /bin/sh) and
+  # without the "coolconfig" helper that used to generate the WOPI proof key on startup.
+  # This one-shot container generates and persists that key on the host before "collabora" starts.
+  collabora-proof-key-init:
+    image: alpine/openssl:latest
+    user: root
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        if [ -e /keys/proof_key ] && ! openssl rsa -in /keys/proof_key -check -noout >/dev/null 2>&1; then
+          echo "/keys/proof_key is missing, not a regular file, or invalid; regenerating" >&2
+          rm -rf /keys/proof_key
+        fi
+        if [ ! -f /keys/proof_key ]; then
+          openssl genrsa -out /keys/proof_key 2048
+          chmod 644 /keys/proof_key
+        fi
+    volumes:
+      - ${COLLABORA_CONFIG_DIR:-./config/collabora}:/keys
+
   collabora:
     image: collabora/code:${COLLABORA_DOCKER_TAG}
     networks:
       ocis-net:
+    depends_on:
+      collabora-proof-key-init:
+        condition: service_completed_successfully
     environment:
       DONT_GEN_SSL_CERT: "YES"
       extra_params: |
@@ -62,6 +85,8 @@ services:
         --o:net.frame_ancestors=${OCIS_DOMAIN:-ocis.owncloud.test}
       username: ${COLLABORA_ADMIN_USER:-admin}
       password: ${COLLABORA_ADMIN_PASSWORD:-admin}
+    volumes:
+      - ${COLLABORA_CONFIG_DIR:-./config/collabora}/proof_key:/etc/coolwsd/proof_key:ro
     cap_add:
       - MKNOD
     labels:
@@ -74,7 +99,5 @@ services:
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
-    entrypoint: ['/bin/bash', '-c']
-    command: ['coolconfig generate-proof-key && /start-collabora-online.sh']
     healthcheck:
-      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/9980 && echo -e 'GET /hosting/discovery HTTP/1.1\r\nHost: localhost:9980\r\n\r\n' >&3 && head -n 1 <&3 | grep '200 OK'"]
+      test: ["CMD", "/usr/bin/coolwsd", "--probe"]

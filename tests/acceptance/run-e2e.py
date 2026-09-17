@@ -127,8 +127,9 @@ def main() -> int:
     oidc_iframe_needed = os.environ.get("OIDC_IFRAME_NEEDED", "").lower() == "true"
     collaboration_needed = os.environ.get("COLLABORATION_NEEDED", "").lower() == "true"
     federated_needed = os.environ.get("FEDERATED_NEEDED", "").lower() == "true"
+    vault_storage_needed = os.environ.get("VAULT_STORAGE_NEEDED", "").lower() == "true"
     # MFA mode runs ocis behind keycloak with TOTP enforced
-    keycloak_needed = keycloak_needed or mfa_needed
+    keycloak_needed = keycloak_needed or mfa_needed or vault_storage_needed
 
     repo_root = Path(__file__).resolve().parents[2]
     ocis_bin = repo_root / "ocis/bin/ocis"
@@ -219,7 +220,7 @@ def main() -> int:
     # - mfa flow needs `acr` so Keycloak emits the LoA claim used for step-up.
     if oidc_needed:
         gha_web_cfg["openIdConnect"]["scope"] = "openid profile email offline_access"
-    if mfa_needed:
+    if mfa_needed or vault_storage_needed:
         gha_web_cfg["openIdConnect"]["scope"] = "openid profile email acr"
 
     gha_web_cfg_path = ocis_config_dir / "web-ui-config.json"
@@ -328,6 +329,14 @@ def main() -> int:
 
     if mfa_needed:
         server_env.update({
+            "OCIS_MFA_ENABLED": "true",
+            "WEB_OIDC_SCOPE": "openid profile email acr",
+        })
+
+    if vault_storage_needed:
+        server_env.update({
+            "OCIS_ENABLE_VAULT_MODE": "true",
+            "FRONTEND_ENABLE_VAULT_MODE": "true",
             "OCIS_MFA_ENABLED": "true",
             "WEB_OIDC_SCOPE": "openid profile email acr",
         })
@@ -530,6 +539,43 @@ def main() -> int:
 
         if mfa_needed:
             playwright_env["MFA"] = "true"
+
+        if vault_storage_needed:
+            vault_data_dir = Path.home() / "ocis/storage/users-vault"
+            vault_data_dir.mkdir(parents=True, exist_ok=True)
+            playwright_env["VAULT_MODE"] = "true"
+
+            vault_env = {
+                **server_env,
+                "STORAGE_USERS_ENABLE_VAULT_MODE": "true",
+                "STORAGE_USERS_SERVICE_NAME": "storage-users-vault",
+                "STORAGE_USERS_GRPC_ADDR": "127.0.0.1:19285",
+                "STORAGE_USERS_HTTP_ADDR": "127.0.0.1:19286",
+                "STORAGE_USERS_DATA_SERVER_URL": "http://127.0.0.1:19286/data",
+                "STORAGE_USERS_DEBUG_ADDR": "127.0.0.1:19287",
+                "STORAGE_USERS_OCIS_ROOT": str(vault_data_dir),
+                "STORAGE_USERS_EVENTS_CONSUMER_GROUP": "vault-dcfs",
+                "PROXY_CSP_CONFIG_FILE_LOCATION": str(repo_root / "tests/config/ci/csp.yaml")
+            }
+
+            print("Starting storage-users-vault...")
+
+            vault_proc = subprocess.Popen(
+                [str(ocis_bin), "storage-users", "server"],
+                env=vault_env,
+            )
+            procs.append(vault_proc)
+
+            wait_for(
+                lambda: subprocess.run(
+                    ["curl", "-sf", "http://127.0.0.1:19287/healthz"],
+                    capture_output=True,
+                ).returncode == 0,
+                120,
+                "storage-users-vault",
+            )
+
+            print("vault ready.")
 
         if federated_needed:
             playwright_env["FEDERATED_BASE_URL_OCIS"] = "localhost:10200"

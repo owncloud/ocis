@@ -2,48 +2,69 @@
 
 All URIs are relative to *https://ocis.ocis.rolling.owncloud.works/graph*
 
-|Method | HTTP request | Description|
+| Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-|[**deleteUser**](#deleteuser) | **DELETE** /v1.0/users/{user-id} | Delete entity from users|
-|[**exportPersonalData**](#exportpersonaldata) | **POST** /v1.0/users/{user-id}/exportPersonalData | export personal data of a user|
-|[**getUser**](#getuser) | **GET** /v1.0/users/{user-id} | Get entity from users by key|
-|[**updateUser**](#updateuser) | **PATCH** /v1.0/users/{user-id} | Update entity in users|
+| [**deleteUser**](UserApi.md#deleteuser) | **DELETE** /v1.0/users/{user-id} | Delete entity from users |
+| [**exportPersonalData**](UserApi.md#exportpersonaldataoperation) | **POST** /v1.0/users/{user-id}/exportPersonalData | export personal data of a user |
+| [**getUser**](UserApi.md#getuser) | **GET** /v1.0/users/{user-id} | Get entity from users by key |
+| [**updateUser**](UserApi.md#updateuser) | **PATCH** /v1.0/users/{user-id} | Update entity in users |
 
-# **deleteUser**
-> deleteUser()
 
+
+## deleteUser
+
+> deleteUser(userId, ifMatch)
+
+Delete entity from users
 
 ### Example
 
-```typescript
+```ts
 import {
-    UserApi,
-    Configuration
-} from './api';
+  Configuration,
+  UserApi,
+} from '';
+import type { DeleteUserRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new UserApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new UserApi(config);
 
-let userId: string; //key: id or name of user (default to undefined)
-let ifMatch: string; //ETag (optional) (default to undefined)
+  const body = {
+    // string | key: id or name of user
+    userId: userId_example,
+    // string | ETag (optional)
+    ifMatch: ifMatch_example,
+  } satisfies DeleteUserRequest;
 
-const { status, data } = await apiInstance.deleteUser(
-    userId,
-    ifMatch
-);
+  try {
+    const data = await api.deleteUser(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **userId** | [**string**] | key: id or name of user | defaults to undefined|
-| **ifMatch** | [**string**] | ETag | (optional) defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **userId** | `string` | key: id or name of user | [Defaults to `undefined`] |
+| **ifMatch** | `string` | ETag | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -51,54 +72,73 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**204** | Success |  -  |
-|**0** | error |  -  |
+| **204** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **exportPersonalData**
-> exportPersonalData()
 
+## exportPersonalData
+
+> exportPersonalData(userId, exportPersonalDataRequest)
+
+export personal data of a user
 
 ### Example
 
-```typescript
+```ts
 import {
-    UserApi,
-    Configuration,
-    ExportPersonalDataRequest
-} from './api';
+  Configuration,
+  UserApi,
+} from '';
+import type { ExportPersonalDataOperationRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new UserApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new UserApi(config);
 
-let userId: string; //key: id or name of user (default to undefined)
-let exportPersonalDataRequest: ExportPersonalDataRequest; //destination the file should be created at (optional)
+  const body = {
+    // string | key: id or name of user
+    userId: userId_example,
+    // ExportPersonalDataRequest | destination the file should be created at (optional)
+    exportPersonalDataRequest: ...,
+  } satisfies ExportPersonalDataOperationRequest;
 
-const { status, data } = await apiInstance.exportPersonalData(
-    userId,
-    exportPersonalDataRequest
-);
+  try {
+    const data = await api.exportPersonalData(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **exportPersonalDataRequest** | **ExportPersonalDataRequest**| destination the file should be created at | |
-| **userId** | [**string**] | key: id or name of user | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **userId** | `string` | key: id or name of user | [Defaults to `undefined`] |
+| **exportPersonalDataRequest** | [ExportPersonalDataRequest](ExportPersonalDataRequest.md) | destination the file should be created at | [Optional] |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -106,56 +146,76 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**202** | success |  -  |
-|**0** | error |  -  |
+| **202** | success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **getUser**
-> User getUser()
 
+## getUser
+
+> User getUser(userId, $select, $expand)
+
+Get entity from users by key
 
 ### Example
 
-```typescript
+```ts
 import {
-    UserApi,
-    Configuration
-} from './api';
+  Configuration,
+  UserApi,
+} from '';
+import type { GetUserRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new UserApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new UserApi(config);
 
-let userId: string; //key: id or name of user (default to undefined)
-let $select: Set<'id' | 'displayName' | 'drive' | 'drives' | 'mail' | 'memberOf' | 'onPremisesSamAccountName' | 'surname'>; //Select properties to be returned (optional) (default to undefined)
-let $expand: Set<'drive' | 'drives' | 'memberOf' | 'appRoleAssignments'>; //Expand related entities (optional) (default to undefined)
+  const body = {
+    // string | key: id or name of user
+    userId: userId_example,
+    // Set<'id' | 'displayName' | 'drive' | 'drives' | 'mail' | 'memberOf' | 'onPremisesSamAccountName' | 'surname'> | Select properties to be returned (optional)
+    $select: ...,
+    // Set<'drive' | 'drives' | 'memberOf' | 'appRoleAssignments'> | Expand related entities (optional)
+    $expand: ...,
+  } satisfies GetUserRequest;
 
-const { status, data } = await apiInstance.getUser(
-    userId,
-    $select,
-    $expand
-);
+  try {
+    const data = await api.getUser(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **userId** | [**string**] | key: id or name of user | defaults to undefined|
-| **$select** | **Array<&#39;id&#39; &#124; &#39;displayName&#39; &#124; &#39;drive&#39; &#124; &#39;drives&#39; &#124; &#39;mail&#39; &#124; &#39;memberOf&#39; &#124; &#39;onPremisesSamAccountName&#39; &#124; &#39;surname&#39;>** | Select properties to be returned | (optional) defaults to undefined|
-| **$expand** | **Array<&#39;drive&#39; &#124; &#39;drives&#39; &#124; &#39;memberOf&#39; &#124; &#39;appRoleAssignments&#39;>** | Expand related entities | (optional) defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **userId** | `string` | key: id or name of user | [Defaults to `undefined`] |
+| **$select** | `id`, `displayName`, `drive`, `drives`, `mail`, `memberOf`, `onPremisesSamAccountName`, `surname` | Select properties to be returned | [Optional] [Enum: id, displayName, drive, drives, mail, memberOf, onPremisesSamAccountName, surname] |
+| **$expand** | `drive`, `drives`, `memberOf`, `appRoleAssignments` | Expand related entities | [Optional] [Enum: drive, drives, memberOf, appRoleAssignments] |
 
 ### Return type
 
-**User**
+[**User**](User.md)
 
 ### Authorization
 
@@ -163,54 +223,73 @@ const { status, data } = await apiInstance.getUser(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Retrieved entity |  -  |
-|**0** | error |  -  |
+| **200** | Retrieved entity |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **updateUser**
-> User updateUser(userUpdate)
 
+## updateUser
+
+> User updateUser(userId, userUpdate)
+
+Update entity in users
 
 ### Example
 
-```typescript
+```ts
 import {
-    UserApi,
-    Configuration,
-    UserUpdate
-} from './api';
+  Configuration,
+  UserApi,
+} from '';
+import type { UpdateUserRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new UserApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new UserApi(config);
 
-let userId: string; //key: id of user (default to undefined)
-let userUpdate: UserUpdate; //New property values
+  const body = {
+    // string | key: id of user
+    userId: userId_example,
+    // UserUpdate | New property values
+    userUpdate: {"displayName":"Marie Skłodowska Curie"},
+  } satisfies UpdateUserRequest;
 
-const { status, data } = await apiInstance.updateUser(
-    userId,
-    userUpdate
-);
+  try {
+    const data = await api.updateUser(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **userUpdate** | **UserUpdate**| New property values | |
-| **userId** | [**string**] | key: id of user | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **userId** | `string` | key: id of user | [Defaults to `undefined`] |
+| **userUpdate** | [UserUpdate](UserUpdate.md) | New property values | |
 
 ### Return type
 
-**User**
+[**User**](User.md)
 
 ### Authorization
 
@@ -218,15 +297,15 @@ const { status, data } = await apiInstance.updateUser(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Success |  -  |
-|**0** | error |  -  |
+| **200** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

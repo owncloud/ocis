@@ -1,7 +1,7 @@
 ---
 image:
   repository: owncloud/ocis-rolling
-  tag: master
+  tag: latest
 ingress:
   enabled: true
   ingressClassName: traefik
@@ -15,6 +15,8 @@ insecure:
   ocmInsecure: true
 features:
   authapp:
+    enabled: false
+  vault:
     enabled: false
   emailNotifications:
     enabled: false
@@ -94,6 +96,7 @@ http:
         - "'self'"
         - 'blob:'
         - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+        - 'https://marketplace.owncloud.com/'
       defaultSrc:
         - "'none'"
       fontSrc:
@@ -110,6 +113,7 @@ http:
         - 'data:'
         - 'blob:'
         - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+        - 'https://marketplace.owncloud.com/'
       manifestSrc:
         - "'self'"
       mediaSrc:
@@ -145,6 +149,9 @@ services:
       enabled: true
       accessModes:
         - ReadWriteOnce
+  storageusers-vault:
+    persistence:
+      enabled: false
   ocm:
     persistence:
       enabled: true

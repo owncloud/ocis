@@ -315,6 +315,7 @@ func (idp *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handl
 
 	idp.mux.Group(func(r chi.Router) {
 		// routes handled by lico
+		r.Use(middleware.RecoverStaleSession(options.Config, options.Logger))
 		r.Use(middleware.CheckRedirect(options.Config, options.Logger))
 		r.Mount("/", gm)
 	})

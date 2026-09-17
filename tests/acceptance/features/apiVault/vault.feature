@@ -8,10 +8,11 @@ Feature: vault
     And these users have been created with default attributes:
       | username |
       | Alice    |
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
 
 
   Scenario: user can create folders and files in personal space in vault
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     When user "Alice" creates a folder "vaultFolder" in space "Personal" in vault using the WebDav Api
     Then the HTTP status code should be "201"
     When user "Alice" uploads a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault using the WebDAV API
@@ -22,8 +23,7 @@ Feature: vault
 
 
   Scenario: user can create folders and files in project space in vault
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a space "vault-space" in vault with the default quota using the Graph API
     When user "Alice" creates a folder "vaultFolder" in space "vault-space" in vault using the WebDav Api
     Then the HTTP status code should be "201"
@@ -35,7 +35,7 @@ Feature: vault
 
 
   Scenario: resources in drive and vault are isolated
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "driveFolder" in space "Personal"
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "driveFile.txt"
     And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
@@ -57,16 +57,22 @@ Feature: vault
   @env-config @keycloak-config
   Scenario: user can set custom auth level names
     Given the administrator has set the Keycloak realm attribute "acr.loa.map" to '{"regular":"1","testing":"2"}'
-    And the config "OCIS_MFA_AUTH_LEVEL_NAMES" has been set to "testing"
-    And user "Alice" has logged in via web UI
+    # OCIS_MFA_AUTH_LEVEL_NAMES is read by both the proxy (mfa.go, gates access) and the
+    # frontend (exposed via the capabilities endpoint, which tells the web app which acr_values
+    # to request during step-up). In k8s each is a separate deployment, so both must be
+    # reconfigured explicitly - unlike the single-binary setup, there is no "just set it
+    # globally" here.
+    And the config "OCIS_MFA_AUTH_LEVEL_NAMES" has been set to "testing" for "proxy" service
+    And the config "OCIS_MFA_AUTH_LEVEL_NAMES" has been set to "testing" for "frontend" service
+    And user "Alice" has been set up in oCIS
     When user "Alice" uploads a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault using the WebDAV API
     Then the HTTP status code should be "201"
-    And user "Alice" should have acr value "testing"
+    And user "Alice" should have a JWT token with an ACR value "testing"
 
 
   Scenario: check capabilities endpoint for vault
     Given using OCS API version "2"
-    And user "Alice" has logged in via web UI
+    And user "Alice" has been set up in oCIS
     When user "Alice" retrieves the vault mode capabilities using the capabilities API
     Then the OCS status code should be "200"
     And the HTTP status code should be "200"
@@ -185,7 +191,7 @@ Feature: vault
 
 
   Scenario: user copies folder from drive to vault
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "driveFolder" in space "Personal"
     When user "Alice" copies folder "driveFolder" from space "Personal" to "driveFolder" inside space "Personal" in vault using the WebDAV API
     Then the HTTP status code should be "201"
@@ -196,7 +202,7 @@ Feature: vault
 
 
   Scenario: user copies file from drive to vault
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testfile.txt"
     When user "Alice" copies file "testfile.txt" from space "Personal" to "testfile.txt" inside space "Personal" in vault using the WebDAV API
     Then the HTTP status code should be "201"
@@ -206,7 +212,7 @@ Feature: vault
 
 
   Scenario: user tries to copy folder from vault to drive
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
     When user "Alice" copies folder "vaultFolder" from space "Personal" in vault to "vaultFolder" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "409"
@@ -217,7 +223,7 @@ Feature: vault
 
 
   Scenario: user tries to copy file from vault to drive
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testfile.txt" in vault
     When user "Alice" copies file "testfile.txt" from space "Personal" in vault to "testfile.txt" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "409"
@@ -228,7 +234,7 @@ Feature: vault
 
 
   Scenario: user copies sub-folder from drive to vault
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "driveFolder" in space "Personal"
     And user "Alice" has created a folder "driveFolder/subFolder" in space "Personal"
     When user "Alice" copies folder "driveFolder/subFolder" from space "Personal" to "subFolder" inside space "Personal" in vault using the WebDAV API
@@ -240,7 +246,7 @@ Feature: vault
 
 
   Scenario: user copies file inside folder from drive to vault
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "driveFolder" in space "Personal"
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "driveFolder/testfile.txt"
     When user "Alice" copies file "driveFolder/testfile.txt" from space "Personal" to "testfile.txt" inside space "Personal" in vault using the WebDAV API
@@ -251,7 +257,7 @@ Feature: vault
 
 
   Scenario: user copies sub-folder from drive to a folder in vault
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "driveFolder" in space "Personal"
     And user "Alice" has created a folder "driveFolder/subFolder" in space "Personal"
     And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
@@ -264,7 +270,7 @@ Feature: vault
 
 
   Scenario: user copies file inside folder from drive to a folder in vault
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "driveFolder" in space "Personal"
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "driveFolder/testfile.txt"
     And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
@@ -273,3 +279,1082 @@ Feature: vault
     And for user "Alice" the content of the file "vaultFolder/testfile.txt" of the space "Personal" in vault should be "some content"
     And for user "Alice" folder "driveFolder" of the space "Personal" should contain these entries:
       | testfile.txt |
+
+
+  Scenario: user tries to create a public link of a folder inside vault
+    Given user "Alice" has been set up in oCIS
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    When user "Alice" creates the following resource link share using the Graph API:
+      | resource        | vaultFolder |
+      | space           | Personal    |
+      | permissionsRole | View        |
+      | storage         | vault       |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "public links are not allowed for vault resources"
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: user tries to create a public link of a file inside vault
+    Given user "Alice" has been set up in oCIS
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testfile.txt" in vault
+    When user "Alice" creates the following resource link share using the Graph API:
+      | resource        | testfile.txt |
+      | space           | Personal     |
+      | permissionsRole | View         |
+      | storage         | vault        |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "public links are not allowed for vault resources"
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: user tries to create a public link of a space root inside vault
+    Given user "Alice" has been set up in oCIS
+    And user "Alice" has created a space "vault-space" in vault with the default quota using the Graph API
+    When user "Alice" tries to create the following space link share using permissions endpoint of the Graph API:
+      | space           | vault-space |
+      | permissionsRole | View        |
+      | storage         | vault       |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "public links are not allowed for vault resources"
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario Outline: send share invitation for project space in vault to user with different roles (permissions endpoint)
+    Given user "Alice" has been set up in oCIS
+    And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Brian" has been set up in oCIS
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "displayName": {
+                          "const": "Brian Murphy"
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        }
+                      }
+                    }
+                  }
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario Outline: send share invitation for disabled project space in vault to user with different roles (permissions endpoint)
+    Given user "Alice" has been set up in oCIS
+    And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Brian" has been set up in oCIS
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    And user "Admin" has disabled a space "new-space" in vault
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "const": "itemNotFound"
+              },
+              "message": {
+                "type": "string",
+                "pattern": "^stat: error: not found: %user_id_pattern%$"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario Outline: send share invitation for deleted project space in vault to user with different roles (permissions endpoint)
+    Given user "Alice" has been set up in oCIS
+    And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Brian" has been set up in oCIS
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    And user "Admin" has disabled a space "new-space" in vault
+    And user "Admin" has deleted a space "new-space" in vault
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "const": "itemNotFound"
+              },
+              "message": {
+                "const": "stat: error: not found: "
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario Outline: try to send share invitation for personal space in vault to user with different roles (permissions endpoint)
+    Given user "Alice" has been set up in oCIS
+    And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Brian" has been set up in oCIS
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "space type is not eligible for sharing"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario Outline: try to share Shares space in vault with a user (permissions endpoint)
+    Given user "Alice" has been set up in oCIS
+    And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Brian" has been set up in oCIS
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
+      | space           | Shares             |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "<error-message>"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role | error-message                        |
+      | Space Viewer     | role not applicable to this resource |
+      | Space Editor     | role not applicable to this resource |
+      | Manager          | role not applicable to this resource |
+
+
+  Scenario Outline: invite user to a project space in vault with different roles using root endpoint
+    Given user "Alice" has been set up in oCIS
+    And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Brian" has been set up in oCIS
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    When user "Alice" sends the following space share invitation using root endpoint of the Graph API:
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "displayName": {
+                          "type": "string",
+                          "const": "Brian Murphy"
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        }
+                      }
+                    }
+                  }
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario Outline: try to invite user to personal drive in vault with different roles using root endpoint
+    Given user "Alice" has been set up in oCIS
+    And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Brian" has been set up in oCIS
+    When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "unsupported space type"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario Outline: try to invite user to Shares drive in vault with different roles using root endpoint
+    Given user "Alice" has been set up in oCIS
+    And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Brian" has been set up in oCIS
+    When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
+      | space           | Shares             |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "unsupported space type"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario: search results for resources in Personal space should be isolated between vault and drive
+    Given user "Alice" has been set up in oCIS
+    And user "Alice" has created a folder "testDriveFolder" in space "Personal"
+    And user "Alice" has created a folder "testVaultFolder" in space "Personal" in vault
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testDriveFile.txt"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testVaultFile.txt" in vault
+    When user "Alice" searches for "*test*" inside space "Personal" in vault using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these entries:
+      | testVaultFolder   |
+      | testVaultFile.txt |
+    When user "Alice" searches for "*test*" inside space "Personal" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these entries:
+      | testDriveFolder   |
+      | testDriveFile.txt |
+
+
+  Scenario: search results for resources inside folder with same name should be isolated between vault and drive
+    Given user "Alice" has been set up in oCIS
+    And user "Alice" has created a folder "newFolder" in space "Personal"
+    And user "Alice" has created a folder "newFolder" in space "Personal" in vault
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "newFolder/testDriveFile.txt"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "newFolder/testVaultFile.txt" in vault
+    When user "Alice" searches for "*test*" inside folder "newFolder" in space "Personal" in vault using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these entries:
+      | newFolder/testVaultFile.txt |
+    When user "Alice" searches for "*test*" inside folder "newFolder" in space "Personal" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these entries:
+      | newFolder/testDriveFile.txt |
+
+
+  Scenario: search result for resources inside project spaces with same name should be isolated between vault and drive
+    Given user "Alice" has been set up in oCIS
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    And user "Alice" has created a folder "testDriveFolder" in space "new-space"
+    And user "Alice" has created a folder "testVaultFolder" in space "new-space" in vault
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testDriveFile.txt"
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testVaultFile.txt" in vault
+    When user "Alice" searches for "*test*" inside space "new-space" in vault using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these entries:
+      | testVaultFolder   |
+      | testVaultFile.txt |
+    When user "Alice" searches for "*test*" inside space "new-space" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these entries:
+      | testDriveFolder   |
+      | testDriveFile.txt |
+
+  @tikaServiceNeeded
+  Scenario: search result by content of file should be isolated between vault and drive
+    Given user "Alice" has been set up in oCIS
+    And user "Alice" has uploaded a file inside space "Personal" with content "content of file in drive" to "testDriveFile.txt"
+    And user "Alice" has uploaded a file inside space "Personal" with content "content of file in vault" to "testVaultFile.txt" in vault
+    When user "Alice" searches for "Content:content" in vault using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these files:
+      | testVaultFile.txt |
+    When user "Alice" searches for "Content:content" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these files:
+      | testDriveFile.txt |
+
+  @tikaServiceNeeded
+  Scenario: search result by content of file inside project space should be isolated between vault and drive
+    Given user "Alice" has been set up in oCIS
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "content of file in drive" to "testDriveFile.txt"
+    And user "Alice" has uploaded a file inside space "new-space" with content "content of file in vault" to "testVaultFile.txt" in vault
+    When user "Alice" searches for "Content:content" in vault using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these files:
+      | testVaultFile.txt |
+    When user "Alice" searches for "Content:content" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain only these files:
+      | testDriveFile.txt |
+
+
+  Scenario: search results by resource tags should be isolated between vault and drive
+    Given user "Alice" has been set up in oCIS
+    And user "Alice" has created a folder "driveFolder" in space "Personal"
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testDriveFile.txt"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testVaultFile.txt" in vault
+    And user "Alice" has tagged the following files of the space "Personal":
+      | path              | tagName |
+      | testDriveFile.txt | tag1    |
+    And user "Alice" has tagged the following folders of the space "Personal":
+      | path        | tagName |
+      | driveFolder | tag1    |
+    And user "Alice" has tagged the following files of the space "Personal" in vault:
+      | path              | tagName |
+      | testVaultFile.txt | tag1    |
+    And user "Alice" has tagged the following folders of the space "Personal" in vault:
+      | path        | tagName |
+      | vaultFolder | tag1    |
+    When user "Alice" searches for "Tags:tag1" in vault using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these files:
+      | testVaultFile.txt |
+      | vaultFolder       |
+    When user "Alice" searches for "Tags:tag1" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these files:
+      | testDriveFile.txt |
+      | driveFolder       |
+
+
+  Scenario: search results by resource tags inside project space should be isolated between vault and drive
+    Given user "Alice" has been set up in oCIS
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    And user "Alice" has created a folder "driveFolder" in space "new-space"
+    And user "Alice" has created a folder "vaultFolder" in space "new-space" in vault
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testDriveFile.txt"
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testVaultFile.txt" in vault
+    And user "Alice" has tagged the following files of the space "new-space":
+      | path              | tagName |
+      | testDriveFile.txt | tag1    |
+    And user "Alice" has tagged the following folders of the space "new-space":
+      | path        | tagName |
+      | driveFolder | tag1    |
+    And user "Alice" has tagged the following files of the space "new-space" in vault:
+      | path              | tagName |
+      | testVaultFile.txt | tag1    |
+    And user "Alice" has tagged the following folders of the space "new-space" in vault:
+      | path        | tagName |
+      | vaultFolder | tag1    |
+    When user "Alice" searches for "Tags:tag1" in vault using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these files:
+      | testVaultFile.txt |
+      | vaultFolder       |
+    When user "Alice" searches for "Tags:tag1" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "2" entries
+    And the search result of user "Alice" should contain only these files:
+      | testDriveFile.txt |
+      | driveFolder       |
+
+
+  Scenario Outline: folder share received from vault and drive personal space should be isolated
+    Given user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Alice" has been set up in oCIS
+    And user "Brian" has been set up in oCIS
+    And user "Alice" has created a folder "driveFolder" in space "Personal"
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | driveFolder        |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | vaultFolder        |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "200"
+    And user "Brian" should have a share in vault "vaultFolder" synced
+    And user "Brian" should have the following resource shares:
+      | resource    | permissionsRole    | sharer | space    | storage |
+      | vaultFolder | <permissions-role> | Alice  | Personal | vault   |
+    And user "Brian" should have the following resource shares:
+      | resource    | permissionsRole    | sharer | space    |
+      | driveFolder | <permissions-role> | Alice  | Personal |
+    Examples:
+      | permissions-role |
+      | Viewer           |
+      | Editor           |
+      | Uploader         |
+
+
+  Scenario Outline: file share received from vault and drive personal space should be isolated
+    Given user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Alice" has been set up in oCIS
+    And user "Brian" has been set up in oCIS
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "driveFile.txt"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | driveFile.txt      |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | vaultFile.txt      |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "200"
+    And user "Brian" should have a share in vault "vaultFile.txt" synced
+    And user "Brian" should have the following resource shares:
+      | resource      | permissionsRole    | sharer | space    | storage |
+      | vaultFile.txt | <permissions-role> | Alice  | Personal | vault   |
+    And user "Brian" should have the following resource shares:
+      | resource      | permissionsRole    | sharer | space    |
+      | driveFile.txt | <permissions-role> | Alice  | Personal |
+    Examples:
+      | permissions-role |
+      | Viewer           |
+      | File Editor      |
+
+
+  Scenario Outline: folder share received from vault and drive project space should be isolated
+    Given user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Alice" has been set up in oCIS
+    And user "Brian" has been set up in oCIS
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    And user "Alice" has created a folder "driveFolder" in space "new-space"
+    And user "Alice" has created a folder "vaultFolder" in space "new-space" in vault
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | driveFolder        |
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | vaultFolder        |
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "200"
+    And user "Brian" should have a share in vault "vaultFolder" synced
+    And user "Brian" should have the following resource shares:
+      | resource    | permissionsRole    | sharer | space     | storage |
+      | vaultFolder | <permissions-role> | Alice  | new-space | vault   |
+    And user "Brian" should have the following resource shares:
+      | resource    | permissionsRole    | sharer | space     |
+      | driveFolder | <permissions-role> | Alice  | new-space |
+    Examples:
+      | permissions-role |
+      | Viewer           |
+      | Editor           |
+      | Uploader         |
+
+
+  Scenario Outline: folder share received from vault and drive project space should be isolated
+    Given user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Alice" has been set up in oCIS
+    And user "Brian" has been set up in oCIS
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "driveFile.txt"
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "vaultFile.txt" in vault
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | driveFile.txt      |
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | vaultFile.txt      |
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "200"
+    And user "Brian" should have a share in vault "vaultFile.txt" synced
+    And user "Brian" should have the following resource shares:
+      | resource      | permissionsRole    | sharer | space     | storage |
+      | vaultFile.txt | <permissions-role> | Alice  | new-space | vault   |
+    And user "Brian" should have the following resource shares:
+      | resource      | permissionsRole    | sharer | space     |
+      | driveFile.txt | <permissions-role> | Alice  | new-space |
+    Examples:
+      | permissions-role |
+      | Viewer           |
+      | File Editor      |
+
+
+  Scenario Outline: try to send share invitation for a resource in vault to a user without the vault mode permission
+    Given user "Brian" has been created with default attributes
+    And the administrator has assigned the role "User Light" to user "Brian" using the Graph API
+    And user "Alice" has been set up in oCIS
+    And user "Brian" has been set up in oCIS
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | <resource>         |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "403"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "accessDenied"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "grantee is not allowed to access vault resources"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource      | permissions-role |
+      | vaultFolder   | Viewer           |
+      | vaultFolder   | Editor           |
+      | vaultFile.txt | Viewer           |
+      | vaultFile.txt | File Editor      |
+
+
+  Scenario: try to send share invitation for a resource in vault to a group
+    Given these groups have been created:
+      | groupname   |
+      | vault-group |
+    And user "Brian" has been created with default attributes
+    And user "Brian" has been set up in oCIS
+    And user "Brian" has been added to group "vault-group"
+    And user "Alice" has been set up in oCIS
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | vaultFile.txt |
+      | space           | Personal      |
+      | sharee          | vault-group   |
+      | shareType       | group         |
+      | permissionsRole | Viewer        |
+      | storage         | vault         |
+    Then the HTTP status code should be "403"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "message"],
+            "properties": {
+              "code": {
+                "const": "accessDenied"
+              },
+              "message": {
+                "const": "grantee is not allowed to access vault resources"
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario Outline: try to send share invitation for a project space in vault to a user without the vault mode permission (permissions endpoint)
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "User Light" to user "Brian" using the Graph API
+    And user "Alice" has been set up in oCIS
+    And user "Brian" has been set up in oCIS
+    And user "Alice" has created a space "vault-space" in vault with the default quota using the Graph API
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
+      | space           | vault-space        |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "403"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "message"],
+            "properties": {
+              "code": {
+                "const": "accessDenied"
+              },
+              "message": {
+                "const": "grantee is not allowed to access vault resources"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
+
+
+  Scenario Outline: send share invitation for a resource in vault to a user with the vault mode permission
+    Given user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Alice" has been set up in oCIS
+    And user "Brian" has been set up in oCIS
+    And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | <resource>         |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "200"
+    And user "Brian" should have a share in vault "<resource>" synced
+    And user "Brian" should have the following resource shares:
+      | resource   | permissionsRole    | sharer | space    | storage |
+      | <resource> | <permissions-role> | Alice  | Personal | vault   |
+    Examples:
+      | resource      | permissions-role |
+      | vaultFolder   | Viewer           |
+      | vaultFile.txt | Viewer           |
+
+
+  Scenario Outline: users with role Admin or Space Admin should have access to vault
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
+    And user "Alice" has been set up in oCIS
+    When user "Alice" gets the permissions list using the settings API
+    Then the HTTP status code should be "201"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["permissions"],
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "minItems": <permission-count>,
+            "maxItems": <permission-count>,
+            "uniqueItems": true,
+            "contains": {
+              "const": "VaultMode.ReadWriteEnabled.own"
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | user-role   | permission-count |
+      | Admin       | 33               |
+      | Space Admin | 27               |
+
+
+  Scenario Outline: users with role User or User Light should not have access to vault
+    Given user "Brian" has been created with default attributes
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
+    And user "Brian" has been set up in oCIS
+    When user "Brian" gets the permissions list using the settings API
+    Then the HTTP status code should be "201"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["permissions"],
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "minItems": <permission-count>,
+            "maxItems": <permission-count>,
+            "uniqueItems": true,
+            "not": {
+              "contains": {
+                "const": "VaultMode.ReadWriteEnabled.own"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | user-role   | permission-count |
+      | User        | 19               |
+      | User Light  | 13               |
+

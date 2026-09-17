@@ -522,13 +522,35 @@ func (m *Manager) Unshare(ctx context.Context, ref *collaboration.ShareReference
 	if err != nil {
 		return err
 	}
-	// TODO allow manager to unshare shares in a space created by other users
-	if !share.IsCreatedByUser(s, user) {
+	// The requesting user is allowed to unshare if they created the share or
+	// if they have the RemoveGrant permission on the shared resource (e.g. a
+	// space manager removing a share created by another user).
+	if !share.IsCreatedByUser(s, user) && !m.userHasRemoveGrantPermission(ctx, s) {
 		// TODO why not permission denied?
 		return errtypes.NotFound(ref.String())
 	}
 
 	return m.removeShare(ctx, s, false)
+}
+
+// userHasRemoveGrantPermission checks whether the user in the context has the
+// RemoveGrant permission on the resource the given share points to. This allows
+// e.g. space managers to remove shares created by other users.
+func (m *Manager) userHasRemoveGrantPermission(ctx context.Context, s *collaboration.Share) bool {
+	req := &provider.StatRequest{
+		Ref: &provider.Reference{ResourceId: s.ResourceId},
+		FieldMask: &fieldmaskpb.FieldMask{
+			Paths: []string{"permissions"},
+		},
+	}
+	client, err := m.gatewaySelector.Next()
+	if err != nil {
+		return false
+	}
+	res, err := client.Stat(ctx, req)
+	return err == nil &&
+		res.Status.Code == rpcv1beta1.Code_CODE_OK &&
+		res.Info.PermissionSet.RemoveGrant
 }
 
 // UpdateShare updates the mode of the given share.

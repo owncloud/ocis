@@ -195,6 +195,12 @@ export class Resource {
     return po.reSearchAndGetDisplayedResourcesFromSearch(this.#page)
   }
 
+  // same as reSearchAndGetDisplayedResources, but for global-search results rendered into the
+  // full-page files list (after pressing Enter) rather than the search dropdown
+  reSearchAndGetDisplayedResourcesFromFilesList(): Promise<string[]> {
+    return po.reSearchAndGetDisplayedResourcesFromFilesList(this.#page)
+  }
+
   getDisplayedResources(args: Omit<po.getDisplayedResourcesArgs, 'page'>): Promise<string[]> {
     switch (args.keyword) {
       case resourcePage.filesList:
@@ -316,6 +322,20 @@ export class Resource {
 
   async expectFileToBeSelected(args: Omit<po.expectFileToBeSelectedArgs, 'page'>): Promise<void> {
     await po.expectFileToBeSelected({ ...args, page: this.#page })
+  }
+
+  async clickResourceCheckbox(args: Omit<po.clickResourceCheckboxArgs, 'page'>): Promise<void> {
+    await po.clickResourceCheckbox({ ...args, page: this.#page })
+  }
+
+  async expectResourcesToBeSelected(
+    args: Omit<po.expectResourcesSelectionArgs, 'page'>
+  ): Promise<void> {
+    await po.expectResourcesToBeSelected({ ...args, page: this.#page })
+  }
+
+  async expectNoTextToBeHighlighted(): Promise<void> {
+    await po.expectNoTextToBeHighlighted({ page: this.#page })
   }
 
   async createShotcut(args: Omit<po.shortcutArgs, 'page'>): Promise<void> {

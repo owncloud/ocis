@@ -5,6 +5,7 @@ directives:
     - '''self'''
     - 'blob:'
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+    - 'https://marketplace.owncloud.com/'
   default-src:
     - '''none'''
   font-src:
@@ -25,6 +26,7 @@ directives:
     - 'data:'
     - 'blob:'
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+    - 'https://marketplace.owncloud.com/'
     # In contrast to bash and docker the default is given after the | character
     - 'https://${ONLYOFFICE_DOMAIN|host.docker.internal:9981}/'
     - 'https://${COLLABORA_DOMAIN|host.docker.internal:9980}/'

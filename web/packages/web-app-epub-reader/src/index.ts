@@ -1,11 +1,17 @@
 import { computed } from 'vue'
 import { useGettext } from 'vue3-gettext'
 import translations from '../l10n/translations.json'
-import { AppMenuItemExtension, AppWrapperRoute, defineWebApplication } from '@ownclouders/web-pkg'
+import {
+  AppMenuItemExtension,
+  AppWrapperRoute,
+  defineWebApplication,
+  useUserStore
+} from '@ownclouders/web-pkg'
 
 export default defineWebApplication({
   setup() {
     const { $gettext } = useGettext()
+    const userStore = useUserStore()
 
     const appId = 'epub-reader'
 
@@ -53,17 +59,21 @@ export default defineWebApplication({
       ]
     }
 
-    const extensions = computed<AppMenuItemExtension[]>(() => [
-      {
-        id: `app.${appId}.menuItem`,
-        type: 'appMenuItem',
-        label: () => $gettext('Library'),
-        color: appInfo.color,
-        icon: 'book',
-        priority: 50,
-        path: `/${appId}`
-      }
-    ])
+    const extensions = computed<AppMenuItemExtension[]>(() =>
+      userStore.user
+        ? [
+            {
+              id: `app.${appId}.menuItem`,
+              type: 'appMenuItem',
+              label: () => $gettext('Library'),
+              color: appInfo.color,
+              icon: 'book',
+              priority: 50,
+              path: `/${appId}`
+            }
+          ]
+        : []
+    )
 
     return {
       appInfo,

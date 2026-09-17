@@ -82,6 +82,9 @@ func (s Service) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// an admin-uploaded logo must always win over a theme's own per-variant logo
+	applyLogoOverride(mergedTheme, brandingTheme)
+
 	b, err := json.Marshal(mergedTheme)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -143,11 +146,11 @@ func (s Service) LogoUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = UpdateKV(s.themeFS, filepathx.JailJoin(_brandingRoot, _themeFileName), KV{
-		"common.logo":                      filepathx.JailJoin("themes", fp),
-		"clients.web.defaults.logo.topbar": filepathx.JailJoin("themes", fp),
-		"clients.web.defaults.logo.login":  filepathx.JailJoin("themes", fp),
-	})
+	values := KV{"common.logo": filepathx.JailJoin("themes", fp)}
+	for _, key := range _brandingLogoKeys {
+		values["clients.web.defaults.logo."+key] = filepathx.JailJoin("themes", fp)
+	}
+	err = UpdateKV(s.themeFS, filepathx.JailJoin(_brandingRoot, _themeFileName), values)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -183,11 +186,11 @@ func (s Service) LogoReset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = UpdateKV(s.themeFS, filepathx.JailJoin(_brandingRoot, _themeFileName), KV{
-		"common.logo":                      nil,
-		"clients.web.defaults.logo.topbar": nil,
-		"clients.web.defaults.logo.login":  nil,
-	})
+	values := KV{"common.logo": nil}
+	for _, key := range _brandingLogoKeys {
+		values["clients.web.defaults.logo."+key] = nil
+	}
+	err = UpdateKV(s.themeFS, filepathx.JailJoin(_brandingRoot, _themeFileName), values)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

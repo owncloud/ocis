@@ -1,56 +1,64 @@
 import { buildSpace } from '../../helpers'
-import { Drive, DrivesApiFactory, DrivesGetDrivesApi, MeDrivesApi } from './../generated'
-import type { GraphFactoryOptions } from './../types'
+import { Drive, DrivesApi, DrivesGetDrivesApi, MeDrivesApi } from './../generated'
+import { toInitOverrides, type GraphFactoryOptions } from './../types'
 import type { GraphDrives } from './types'
 
 const getServerUrlFromDrive = (drive: Drive) => new URL(drive.webUrl).origin
 
-export const DrivesFactory = ({ axiosClient, config }: GraphFactoryOptions): GraphDrives => {
-  const drivesApiFactory = DrivesApiFactory(config, config.basePath, axiosClient)
-  const meDrivesApi = new MeDrivesApi(config, config.basePath, axiosClient)
-  const allDrivesApi = new DrivesGetDrivesApi(config, config.basePath, axiosClient)
+export const DrivesFactory = ({ config }: GraphFactoryOptions): GraphDrives => {
+  const drivesApi = new DrivesApi(config)
+  const meDrivesApi = new MeDrivesApi(config)
+  const allDrivesApi = new DrivesGetDrivesApi(config)
 
   return {
     async getDrive(id, graphRoles, requestOptions) {
-      const { data: drive } = await drivesApiFactory.getDriveBeta(id, requestOptions)
+      const drive = await drivesApi.getDriveBeta({ driveId: id }, toInitOverrides(requestOptions))
       return buildSpace({ ...drive, serverUrl: getServerUrlFromDrive(drive) }, graphRoles)
     },
 
     async createDrive(data, graphRoles, requestOptions) {
-      const { data: drive } = await drivesApiFactory.createDriveBeta(data, requestOptions)
+      const drive = await drivesApi.createDriveBeta(
+        { drive: data },
+        toInitOverrides(requestOptions)
+      )
       return buildSpace({ ...drive, serverUrl: getServerUrlFromDrive(drive) }, graphRoles)
     },
 
     async updateDrive(id, data, graphRoles, requestOptions) {
-      const { data: drive } = await drivesApiFactory.updateDriveBeta(id, data, requestOptions)
+      const drive = await drivesApi.updateDriveBeta(
+        { driveId: id, driveUpdate: data },
+        toInitOverrides(requestOptions)
+      )
       return buildSpace({ ...drive, serverUrl: getServerUrlFromDrive(drive) }, graphRoles)
     },
 
     async disableDrive(id, ifMatch, requestOptions) {
-      await drivesApiFactory.deleteDriveBeta(id, ifMatch, requestOptions)
+      await drivesApi.deleteDriveBeta({ driveId: id, ifMatch }, toInitOverrides(requestOptions))
     },
 
     async deleteDrive(id, ifMatch, requestOptions) {
-      await drivesApiFactory.deleteDriveBeta(id, ifMatch, {
-        headers: {
-          ...((requestOptions?.headers && requestOptions.headers) || {}),
-          Purge: 'T'
-        },
-        ...((requestOptions && { requestOptions }) || {})
-      })
+      await drivesApi.deleteDriveBeta(
+        { driveId: id, ifMatch },
+        toInitOverrides({
+          ...requestOptions,
+          headers: { ...(requestOptions?.headers || {}), Purge: 'T' }
+        })
+      )
     },
 
     async listMyDrives(graphRoles, options, requestOptions) {
-      const {
-        data: { value }
-      } = await meDrivesApi.listMyDrivesBeta(options?.orderBy, options?.filter, requestOptions)
+      const { value } = await meDrivesApi.listMyDrivesBeta(
+        { $orderby: options?.orderBy, $filter: options?.filter },
+        toInitOverrides(requestOptions)
+      )
       return value.map((d) => buildSpace({ ...d, serverUrl: getServerUrlFromDrive(d) }, graphRoles))
     },
 
     async listAllDrives(graphRoles, options, requestOptions) {
-      const {
-        data: { value }
-      } = await allDrivesApi.listAllDrivesBeta(options?.orderBy, options?.filter, requestOptions)
+      const { value } = await allDrivesApi.listAllDrivesBeta(
+        { $orderby: options?.orderBy, $filter: options?.filter },
+        toInitOverrides(requestOptions)
+      )
       return value.map((d) => buildSpace({ ...d, serverUrl: getServerUrlFromDrive(d) }, graphRoles))
     }
   }

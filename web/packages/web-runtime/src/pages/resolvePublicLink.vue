@@ -128,6 +128,19 @@ const item = computed(() => queryItemAsString(unref(route)?.params?.driveAliasAn
 const detailsQuery = useRouteQuery('details')
 const details = computed(() => queryItemAsString(unref(detailsQuery)))
 
+const publicLinkErrorMessage = (err: DavHttpError): string => {
+  if (err.statusCode === 429) {
+    return $gettext(
+      'Too many failed password attempts for this link. It has been temporarily blocked, please try again later.'
+    )
+  }
+  if (err.statusCode === 404) {
+    return $gettext('The resource could not be located, it may not exist anymore.')
+  }
+  const serverMessage = err.statusCode && err.message !== 'Unknown error' ? err.message : ''
+  return serverMessage || $gettext('An unexpected error occurred, please try again later.')
+}
+
 const loadedSpace = ref<PublicSpaceResource>()
 const isPasswordRequired = ref(false)
 const isInternalLink = ref(false)
@@ -153,30 +166,16 @@ const loadPublicSpaceTask = useTask(function* (signal) {
 
       return
     }
-    if (err.statusCode === 404) {
-      throw new Error($gettext('The resource could not be located, it may not exist anymore.'))
-    }
     throw err
   }
 })
 
 const verifyPasswordTask = useTask(function* (signal) {
-  try {
-    loadedSpace.value = yield clientService.webdav.getFileInfo(
-      unref(publicLinkSpace),
-      {},
-      { signal }
-    )
-    if (!isPublicSpaceResource(unref(loadedSpace))) {
-      const e: any = new Error($gettext('The resource is not a public link.'))
-      e.resource = unref(loadedSpace)
-      throw e
-    }
-  } catch (e) {
-    if (e.statusCode === 401) {
-      throw e
-    }
-    throw new Error($gettext('The resource could not be located, it may not exist anymore.'))
+  loadedSpace.value = yield clientService.webdav.getFileInfo(unref(publicLinkSpace), {}, { signal })
+  if (!isPublicSpaceResource(unref(loadedSpace))) {
+    const e: any = new Error($gettext('The resource is not a public link.'))
+    e.resource = unref(loadedSpace)
+    throw e
   }
 })
 const wrongPassword = computed(() => {
@@ -262,11 +261,11 @@ const resolvePublicLinkTask = useTask(function* (signal, passwordRequired: boole
 
 const errorMessage = computed<string>(() => {
   if (resolvePublicLinkTask.isError && resolvePublicLinkTask.last.error.statusCode !== 401) {
-    return resolvePublicLinkTask.last.error.message
+    return publicLinkErrorMessage(resolvePublicLinkTask.last.error)
   }
 
   if (loadPublicSpaceTask.isError) {
-    return loadPublicSpaceTask.last.error.message
+    return publicLinkErrorMessage(loadPublicSpaceTask.last.error)
   }
   return null
 })

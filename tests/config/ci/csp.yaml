@@ -5,6 +5,7 @@ directives:
     - '''self'''
     - 'blob:'
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+    - 'https://marketplace.owncloud.com/'
     # In contrary to bash and docker the default is given after the | character
     - 'https://${KEYCLOAK_DOMAIN|keycloak.owncloud.test}/'
     - 'https://localhost:8443/'
@@ -27,6 +28,7 @@ directives:
     - 'data:'
     - 'blob:'
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+    - 'https://marketplace.owncloud.com/'
     # In contrary to bash and docker the default is given after the | character
     - 'https://${ONLYOFFICE_DOMAIN|onlyoffice:443}/'
     - 'https://${COLLABORA_DOMAIN|collabora:9980}/'

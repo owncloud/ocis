@@ -86,6 +86,7 @@ OPTIONS:
    --processing  filter sessions by processing status (default: unset)
    --expired     filter sessions by expired status (default: unset)
    --has-virus   filter sessions by virus scan result (default: unset)
+   --orphaned    filter sessions by whether their node metadata is unreadable (default: unset)
    --json        output as json (default: false)
    --restart     send restart event for all listed sessions (default: false)
    --resume      send resume event for all listed sessions (default: false)
@@ -140,6 +141,23 @@ ocis storage-users uploads sessions --expired=true --clean
 ocis storage-users uploads sessions --processing=true --has-virus=false --resume
 ```
 
+Uploads whose node metadata can no longer be read are orphaned: they can never finish
+postprocessing, because the destination of the upload cannot be resolved. Such uploads stay
+in processing state indefinitely and keep consuming the quota of their space. Use the
+`--orphaned` filter to list them, and `--clean` to remove them and release the quota.
+
+```bash
+# lists all orphaned upload sessions
+ocis storage-users uploads sessions --orphaned=true
+
+# removes them and releases the quota they consume
+ocis storage-users uploads sessions --orphaned=true --clean
+```
+
+Note: `--orphaned` reads the node metadata of every upload session, so it is slower than the
+other filters. Cleaning an orphaned session deletes the uploaded bytes, which are the only
+copy as long as postprocessing has not finished. Run the command without `--clean` first.
+
 
 #### Delete Stale Nodes command
 
@@ -162,6 +180,45 @@ OPTIONS:
    --verbose        Enable verbose logging (default: false)
    --help, -h       show help
 ```
+
+Note that removing a stale node does not reclaim the quota it consumed. Use the
+Recalculate Treesize command afterwards to correct the reported quota usage of the space.
+
+#### Recalculate Treesize command
+
+The treesize of a directory is maintained as a running counter that is updated on every
+change, so a failed or incomplete update leaves the counter wrong and the reported quota
+usage of a space drifts from the data actually stored on disk. This command walks a space
+bottom up, recalculates the treesize of every directory from the actual size of its
+children and corrects the stored values.
+
+```bash
+    ~/ocis storage-users spaces recalculate-treesize <commandoptions>
+```
+```
+NAME:
+   ocis storage-users spaces recalculate-treesize - Recalculate the treesize of all directories in a space from the actual size of their children. Use this to repair a space whose reported quota usage drifted from the data on disk
+
+USAGE:
+   ocis storage-users spaces recalculate-treesize [command options]
+
+OPTIONS:
+   --space-id value, -s value  Space ID to recalculate (omit to process all spaces)
+   --dry-run                   Only show which treesizes would be corrected without writing them (default: true)
+   --verbose, -v               Enable verbose logging (default: false)
+   --help, -h                  show help
+```
+
+```bash
+# report incorrect treesizes of a single space without changing anything
+ocis storage-users spaces recalculate-treesize --space-id 43972c79-f7ce-441b-9fe0-cf5170e4d61e
+
+# correct them
+ocis storage-users spaces recalculate-treesize --space-id 43972c79-f7ce-441b-9fe0-cf5170e4d61e --dry-run=false
+```
+
+Note: the command reads the metadata of every node in the space, so it is I/O intensive on
+large spaces. Prefer targeting a single space with `--space-id` over processing all spaces.
 
 #### Command Examples
 

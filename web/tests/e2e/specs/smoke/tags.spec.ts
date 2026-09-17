@@ -10,9 +10,6 @@ test.describe('Users can use web to organize tags', () => {
     //   | Alice |
     //   | Brian |
     await api.usersHaveBeenCreated({ stepUser: 'Admin', users: ['Alice', 'Brian'] })
-
-    // Given "Alice" logs in
-    await ui.userLogsIn({ stepUser: 'Alice' })
   })
 
   test('Tag management', { tag: '@predefined-users' }, async () => {
@@ -23,6 +20,7 @@ test.describe('Users can use web to organize tags', () => {
       stepUser: 'Alice',
       files: [{ pathToFile: 'lorem.txt', content: 'lorem ipsum' }]
     })
+    await ui.userLogsIn({ stepUser: 'Alice' })
     // And "Alice" adds the following tags for the following resources using the sidebar panel
     //   | resource  | tags         |
     //   | lorem.txt | tag 1, tag 2 |
@@ -77,6 +75,7 @@ test.describe('Users can use web to organize tags', () => {
       stepUser: 'Alice',
       files: [{ pathToFile: 'lorem.txt', content: 'lorem ipsum' }]
     })
+    await ui.userLogsIn({ stepUser: 'Alice' })
     // When "Alice" tries to add the following tag for the following resources using the sidebar panel
     //   | resource  | tags                                                                                                       |
     //   | lorem.txt | Loremipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore |
@@ -115,6 +114,7 @@ test.describe('Users can use web to organize tags', () => {
         { pathToFile: 'textfile.txt', content: 'test file' }
       ]
     })
+    await ui.userLogsIn({ stepUser: 'Alice' })
     // And "Alice" adds the following tags for the following resources using the sidebar panel
     //   | resource  | tags       |
     //   | lorem.txt | tag1, tag2 |
@@ -161,6 +161,7 @@ test.describe('Users can use web to organize tags', () => {
       stepUser: 'Alice',
       files: [{ pathToFile: 'folder_to_shared/lorem.txt', content: 'lorem ipsum' }]
     })
+    await ui.userLogsIn({ stepUser: 'Alice' })
     // And "Alice" adds the following tags for the following resources using the sidebar panel
     //   | resource                   | tags         |
     //   | folder_to_shared/lorem.txt | tag 1, tag 2 |

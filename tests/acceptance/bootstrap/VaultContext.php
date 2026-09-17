@@ -25,10 +25,13 @@ declare(strict_types=1);
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use GuzzleHttp\Exception\GuzzleException;
-use JsonException;
 use PHPUnit\Framework\Assert;
+use Psr\Http\Message\ResponseInterface;
 use TestHelpers\BehatHelper;
+use TestHelpers\GraphHelper;
+use TestHelpers\HttpRequestHelper;
 use TestHelpers\KeycloakHelper;
+use TestHelpers\SettingsHelper;
 
 require_once 'bootstrap.php';
 
@@ -74,6 +77,10 @@ class VaultContext implements Context {
 			$response->getStatusCode(),
 			"Failed to update Keycloak realm attribute $key. Response: " . $response->getBody()->getContents(),
 		);
+		// Decode the JSON map
+		$acrLoaMap = \json_decode($value, true);
+		$acrValue = array_keys($acrLoaMap, "2");
+		$this->featureContext->setAcrValuesToRequest($acrValue[0]);
 	}
 
 	/**
@@ -95,7 +102,7 @@ class VaultContext implements Context {
 	}
 
 	/**
-	 * @Then user :user should have acr value :acr
+	 * @Then user :user should have a JWT token with an ACR value :acr
 	 *
 	 * @param string $user
 	 * @param string $acr
@@ -103,7 +110,7 @@ class VaultContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userShouldHaveAcrValue(string $user, string $acr): void {
+	public function userShouldHaveAJwtTokenWithAnAcrValue(string $user, string $acr): void {
 		$accessToken = $this->featureContext->getOcisUserToken($user)['token']['accessToken'];
 
 		// Decode JWT token
@@ -120,5 +127,99 @@ class VaultContext implements Context {
 			$actualAcr,
 			"Expected acr value to be $acr but got $actualAcr",
 		);
+	}
+
+	/**
+	 * @param string $user
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	private function getPermissionsList(string $user): ResponseInterface {
+		$password = $this->featureContext->getPasswordForUser($user);
+		$headers = [];
+		$authUser = $user;
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$accessToken = $this->featureContext->getOcisUserToken($user)['token']['accessToken'];
+			$headers['Authorization'] = 'Bearer ' . $accessToken;
+			$authUser = null;
+			$password = null;
+		}
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
+		return SettingsHelper::getPermissionsList(
+			$this->featureContext->getBaseUrl(),
+			$authUser,
+			$password,
+			$userId,
+			$headers,
+		);
+	}
+
+	/**
+	 * Authenticates a Keycloak-backed user directly via the OIDC token endpoint (no browser,
+	 * no MFA/vault-mode UI setup) so that the user's oCIS account (and id) is provisioned even
+	 * for roles that don't have vault UI elements to interact with, e.g. User Light.
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 * @throws Exception
+	 */
+	private function setUpKeycloakUserInOcis(string $user): void {
+		if ($this->featureContext->getAttributeOfCreatedUser($user, 'id')) {
+			return;
+		}
+		$userAttribute = $this->featureContext->getCreatedKeycloakUsers()[strtolower($user)];
+		$tokenData = KeycloakHelper::setAccessTokenForKeycloakOcisUser(
+			$userAttribute,
+			$this->featureContext->getAcrValuesToRequest(),
+		);
+		$this->featureContext->setOcisUserToken($userAttribute, $tokenData);
+
+		$response = HttpRequestHelper::get(
+			GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'me'),
+			null,
+			null,
+			['Authorization' => 'Bearer ' . $tokenData['access_token']],
+		);
+		$userAttribute['id'] = $this->featureContext->getJsonDecodedResponse($response)['id'];
+		$this->featureContext->addUserToCreatedUsersList(
+			$user,
+			$userAttribute['password'],
+			$userAttribute['displayName'],
+			$userAttribute['email'],
+			$userAttribute['id'],
+		);
+	}
+
+	/**
+	 * Sets up a Keycloak user in oCIS
+	 *
+	 * @Given user :user has been set up in oCIS
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userHasBeenSetUpInOcis(string $user): void {
+		$this->setUpKeycloakUserInOcis($user);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" gets the permissions list using the settings API$/
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userGetsPermissionsList(string $user): void {
+		$this->featureContext->setResponse($this->getPermissionsList($user));
 	}
 }

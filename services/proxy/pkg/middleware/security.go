@@ -13,27 +13,30 @@ import (
 
 // LoadCSPConfig loads CSP header configuration from a yaml file.
 func LoadCSPConfig(proxyCfg *config.Config) (*config.CSP, error) {
+	serviceName := proxyCfg.Service.Name
 	yamlContent, err := loadCSPYaml(proxyCfg)
 	if err != nil {
 		return nil, err
 	}
-	return loadCSPConfig(yamlContent)
+	return loadCSPConfig(serviceName, yamlContent)
 }
 
 // LoadCSPConfig loads CSP header configuration from a yaml file.
-func loadCSPConfig(yamlContent []byte) (*config.CSP, error) {
+func loadCSPConfig(svcName string, yamlContent []byte) (*config.CSP, error) {
+	// The LoadCSPConfig (public) is expected to be called once, so
+	// creating a new gookit config instance each time here is fine.
 	// substitute env vars and load to struct
-	gofig.WithOptions(gofig.ParseEnv)
-	gofig.AddDriver(yaml.Driver)
+	cfg := gofig.NewWithOptions(svcName, gofig.ParseEnv)
+	cfg.AddDriver(yaml.Driver)
 
-	err := gofig.LoadSources("yaml", yamlContent)
+	err := cfg.LoadSources("yaml", yamlContent)
 	if err != nil {
 		return nil, err
 	}
 
 	// read yaml
 	cspConfig := config.CSP{}
-	err = gofig.BindStruct("", &cspConfig)
+	err = cfg.BindStruct("", &cspConfig)
 	if err != nil {
 		return nil, err
 	}

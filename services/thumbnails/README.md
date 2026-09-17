@@ -86,6 +86,12 @@ As of now, there is no automated thumbnail deletion. This is especially true whe
 Since source files need to be loaded into memory when generating thumbnails, large source files could potentially crash this service if there is insufficient memory available. For bigger instances when using container orchestration deployment methods, this service can be dedicated to its own server(s) with more memory.
 To have more control over memory (and CPU) consumption the maximum number of concurrent requests can be limited by setting the environment variable `THUMBNAILS_MAX_CONCURRENT_REQUESTS`. The default value is 0 which does not apply any restrictions to the number of concurrent requests. As soon as the number of concurrent requests is reached any further request will be responded with `429/Too Many Requests` and the client can retry at a later point in time.
 
+## Maximum Input Image File Size
+
+The maximum file size of an image that will be processed is limited by `THUMBNAILS_MAX_INPUT_IMAGE_FILE_SIZE`, defaulting to `50MB`. A request for a thumbnail of a larger image is responded with `403/Forbidden`.
+
+This value is the upper bound for what can be displayed anywhere in the instance. The `graph` service has its own, independent limit for space images, `GRAPH_MAX_IMAGE_FILE_SIZE`, which must be less than or equal to this one. See the `graph` service documentation for details.
+
 ## Thumbnails and SecureView
 
 If a resource is shared using SecureView, the share receiver will get a 403 (forbidden) response when requesting a thumbnail. The requesting client needs to decide what to show and usually a placeholder thumbnail is used.

@@ -51,6 +51,12 @@ type UploadSessionLister interface {
 	ListUploadSessions(ctx context.Context, filter UploadSessionFilter) ([]UploadSession, error)
 }
 
+// OrphanChecker defines the interface for FS implementations that can resolve a resource's metadata.
+type OrphanChecker interface {
+	// IsOrphaned reports whether the referenced resource exists but its metadata is unreadable.
+	IsOrphaned(ctx context.Context, ref *provider.Reference) bool
+}
+
 // UploadSession is the interface that storage drivers need to return whan listing upload sessions.
 type UploadSession interface {
 	// ID returns the upload id
@@ -87,4 +93,8 @@ type UploadSessionFilter struct {
 	Processing *bool
 	Expired    *bool
 	HasVirus   *bool
+	// Orphaned filters sessions by whether their target node can still be
+	// resolved. Evaluating it requires reading the node metadata of every
+	// session, so it is only evaluated when set.
+	Orphaned *bool
 }

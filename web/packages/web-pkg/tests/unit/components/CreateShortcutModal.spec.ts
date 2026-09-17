@@ -2,7 +2,7 @@ import CreateShortcutModal from '../../../src/components/CreateShortcutModal.vue
 import {
   defaultComponentMocks,
   defaultPlugins,
-  mockAxiosReject,
+  mockHttpError,
   RouteLocation,
   shallowMount
 } from '@ownclouders/web-test-helpers'
@@ -57,13 +57,13 @@ function getWrapper({ rejectPutFileContents = false, rejectSearch = false } = {}
   }
 
   if (rejectPutFileContents) {
-    mocks.$clientService.webdav.putFileContents.mockRejectedValue(() => mockAxiosReject())
+    mocks.$clientService.webdav.putFileContents.mockRejectedValue(() => mockHttpError())
   } else {
     mocks.$clientService.webdav.putFileContents.mockResolvedValue(mock<FileResource>())
   }
 
   if (rejectSearch) {
-    mocks.$clientService.webdav.search.mockRejectedValue(() => mockAxiosReject())
+    mocks.$clientService.webdav.search.mockRejectedValue(() => mockHttpError())
   } else {
     mocks.$clientService.webdav.search.mockResolvedValue({
       resources: [

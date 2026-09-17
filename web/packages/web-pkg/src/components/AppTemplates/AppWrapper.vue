@@ -147,8 +147,8 @@ const url = ref('')
 const loading = ref(!unref(noResourceLoading))
 const loadingError: Ref<Error> = ref()
 const isReadOnly = ref(false)
-const serverContent = ref()
-const currentContent = ref()
+const serverContent = ref('')
+const currentContent = ref('')
 
 const { actions: saveAsActions } = useFileActionsSaveAs({ content: currentContent })
 const { actions: exportAsPdfActions } = useFileActionsExportAsPdf({ content: currentContent })
@@ -299,7 +299,7 @@ const loadResourceTask = useTask(function* (signal) {
       return authService.handleAuthError(unref(router.currentRoute))
     }
 
-    if (e?.response?.status === 404 && e?.message === 'Unknown error') {
+    if (e?.statusCode === 404 && e?.message === 'Unknown error') {
       console.error(e)
       loadingError.value = new Error(
         $gettext('The resource could not be located, it may not exist anymore.')
@@ -685,7 +685,7 @@ const slotAttrs = computed(() => ({
     space.value = unref(unref(currentFileContext).space)
     selectedResources.value = [value]
   },
-  'onUpdate:currentContent': (value: unknown) => {
+  'onUpdate:currentContent': (value: string) => {
     currentContent.value = value
   },
 

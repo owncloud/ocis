@@ -22,6 +22,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/antithesishq/antithesis-sdk-go/assert"
 	"github.com/nats-io/nats-server/v2/server/ats"
 	"github.com/nats-io/nats-server/v2/server/avl"
 	"github.com/nats-io/nats-server/v2/server/gsl"
@@ -824,6 +825,9 @@ func (ms *memStore) allLastSeqsLocked() ([]uint64, error) {
 // Most clients send in subjects even if they match the stream's ingest subjects.
 // Lock should be held.
 func (ms *memStore) filterIsAll(filters []string) bool {
+	if len(filters) == 1 && filters[0] == fwcs {
+		return true
+	}
 	if len(filters) != len(ms.cfg.Subjects) {
 		return false
 	}
@@ -844,7 +848,11 @@ func (ms *memStore) filterIsAll(filters []string) bool {
 func (ms *memStore) MultiLastSeqs(filters []string, maxSeq uint64, maxAllowed int) ([]uint64, error) {
 	ms.mu.Lock()
 	defer ms.mu.Unlock()
+	return ms.multiLastSeqsLocked(filters, maxSeq, maxAllowed)
+}
 
+// Write lock should be held, for recalculateForSubj.
+func (ms *memStore) multiLastSeqsLocked(filters []string, maxSeq uint64, maxAllowed int) ([]uint64, error) {
 	if len(ms.msgs) == 0 {
 		return nil, nil
 	}
@@ -894,6 +902,39 @@ func (ms *memStore) MultiLastSeqs(filters []string, maxSeq uint64, maxAllowed in
 	}
 	slices.Sort(seqs)
 	return seqs, nil
+}
+
+// MultiLastMsgs delivers the last message per subject matching the filters,
+// up to maxSeq and skipping sequences below minSeq, in ascending sequence
+// order through cb, all within a single read section so the batch is a
+// point-in-time snapshot of the store.
+func (ms *memStore) MultiLastMsgs(filters []string, minSeq, maxSeq uint64, maxAllowed int, cb func(sm *StoreMsg, np uint64) bool) (uint64, uint64, error) {
+	ms.mu.Lock()
+	defer ms.mu.Unlock()
+
+	seqs, err := ms.multiLastSeqsLocked(filters, maxSeq, maxAllowed)
+	if err != nil || len(seqs) == 0 {
+		return 0, 0, err
+	}
+	total := uint64(len(seqs))
+	np := total
+	for _, seq := range seqs {
+		if np > 0 {
+			np--
+		}
+		if seq < minSeq {
+			continue
+		}
+		var svp StoreMsg
+		sm, err := ms.loadMsgLocked(seq, &svp, false)
+		if err != nil {
+			return total, np, err
+		}
+		if !cb(sm, np) {
+			break
+		}
+	}
+	return total, np, nil
 }
 
 // SubjectsTotals return message totals per subject.
@@ -2395,24 +2436,42 @@ func (ms *memStore) EncodedStreamState(failed uint64) ([]byte, error) {
 		numDeleted = 0
 	}
 
-	// Encoded is Msgs, Bytes, FirstSeq, LastSeq, Failed, NumDeleted and optional DeletedBlocks
-	var buf [1024]byte
-	buf[0], buf[1] = streamStateMagic, streamStateVersion
-	n := hdrLen
-	n += binary.PutUvarint(buf[n:], ms.state.Msgs)
-	n += binary.PutUvarint(buf[n:], ms.state.Bytes)
-	n += binary.PutUvarint(buf[n:], ms.state.FirstSeq)
-	n += binary.PutUvarint(buf[n:], ms.state.LastSeq)
-	n += binary.PutUvarint(buf[n:], failed)
-	n += binary.PutUvarint(buf[n:], uint64(numDeleted))
-
-	b := buf[0:n]
+	// Encoded is Msgs, Bytes, FirstSeq, LastSeq, Failed, NumDeleted and optional DeletedBlocks.
+	// Calculate the exact encoded size up front so the buffer is allocated once.
+	total := hdrLen + uvarintLen(ms.state.Msgs) + uvarintLen(ms.state.Bytes) +
+		uvarintLen(ms.state.FirstSeq) + uvarintLen(ms.state.LastSeq) +
+		uvarintLen(failed) + uvarintLen(uint64(numDeleted))
 
 	if numDeleted > 0 {
-		buf := ms.dmap.Encode(nil)
-		b = append(b, buf...)
+		total += ms.dmap.EncodeLen()
 	}
 
+	b := make([]byte, 0, total)
+	b = append(b, streamStateMagic, streamStateVersion)
+	b = binary.AppendUvarint(b, ms.state.Msgs)
+	b = binary.AppendUvarint(b, ms.state.Bytes)
+	b = binary.AppendUvarint(b, ms.state.FirstSeq)
+	b = binary.AppendUvarint(b, ms.state.LastSeq)
+	b = binary.AppendUvarint(b, failed)
+	b = binary.AppendUvarint(b, uint64(numDeleted))
+
+	if numDeleted > 0 {
+		enc := ms.dmap.Encode(b[len(b):])
+		if n := len(b) + len(enc); n <= cap(b) {
+			b = b[:n]
+		} else {
+			// Fallback if the buffer didn't have spare capacity.
+			b = append(b, enc...)
+		}
+	}
+
+	if len(b) != total {
+		assert.Unreachable("Memstore EncodedStreamState size accounting mismatch", map[string]any{
+			"name":   ms.cfg.Name,
+			"total":  total,
+			"length": len(b),
+		})
+	}
 	return b, nil
 }
 

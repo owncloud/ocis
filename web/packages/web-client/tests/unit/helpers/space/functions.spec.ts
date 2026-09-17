@@ -51,7 +51,7 @@ describe('buildSpace', () => {
             {
               roles: role ? [role.id] : [],
               grantedToV2: { user: { id } },
-              ...(permissions.length && { '@libre.graph.permissions.actions': permissions })
+              ...(permissions.length && { atLibreGraphPermissionsActions: permissions })
             }
           ]
         }

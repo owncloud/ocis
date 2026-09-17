@@ -28,6 +28,7 @@
     :grouping-settings="groupingSettings"
     padding-x="medium"
     @highlight="fileClicked"
+    @mousedown="preventShiftTextSelection"
     @row-mounted="rowMounted"
     @contextmenu-clicked="showContextMenu"
     @item-dropped="fileDropped"
@@ -67,7 +68,7 @@
         :disabled="isResourceDisabled(item)"
         :model-value="isResourceSelected(item)"
         :outline="isLatestSelectedItem(item)"
-        @click.stop="toggleSelection(item.id)"
+        @click.stop="toggleSelection(item, $event)"
       />
     </template>
     <template #name="{ item }">
@@ -123,8 +124,9 @@
         <oc-tag
           v-oc-tooltip="getTagToolTip(tag)"
           class="resource-table-tag oc-ml-xs"
-          :rounded="true"
           size="small"
+          :rounded="true"
+          :color-index="tagColorIndex(tag)"
         >
           <oc-icon name="price-tag-3" size="small" />
           <span class="oc-text-truncate">{{ tag }}</span>
@@ -132,12 +134,44 @@
       </component>
       <oc-tag
         v-if="item.tags.length > 2"
+        :id="`tags-overflow-${resourceDomSelector(item)}`"
+        type="button"
         size="small"
         class="resource-table-tag-more"
-        @click="openTagsSidebar"
+        :aria-label="getTagsOverflowAriaLabel(item)"
+        aria-haspopup="true"
+        :aria-expanded="isTagsOverflowExpanded(item)"
+        @click="keepClickWithinTagsOverflow"
       >
         + {{ item.tags.length - 2 }}
       </oc-tag>
+      <oc-drop
+        v-if="item.tags.length > 2"
+        :toggle="`#tags-overflow-${resourceDomSelector(item)}`"
+        mode="click"
+        class="resource-table-tag-overflow"
+        @show-drop="setTagsOverflowExpanded(item, true)"
+        @hide-drop="setTagsOverflowExpanded(item, false)"
+      >
+        <component
+          :is="userContextReady ? 'router-link' : 'span'"
+          v-for="tag in item.tags.slice(2)"
+          :key="tag"
+          v-bind="getTagComponentAttrs(tag)"
+          class="resource-table-tag-wrapper oc-pb-xs"
+        >
+          <oc-tag
+            v-oc-tooltip="getTagToolTip(tag)"
+            class="resource-table-tag"
+            size="small"
+            :rounded="true"
+            :color-index="tagColorIndex(tag)"
+          >
+            <oc-icon name="price-tag-3" size="small" />
+            <span class="oc-text-truncate">{{ tag }}</span>
+          </oc-tag>
+        </component>
+      </oc-drop>
     </template>
     <template #manager="{ item }">
       <slot name="manager" :resource="item" />
@@ -277,7 +311,8 @@ import {
   useIsTopBarSticky,
   embedModeFilePickMessageData,
   routeToContextQuery,
-  useSpaceActionsRename
+  useSpaceActionsRename,
+  useTagColor
 } from '../../composables'
 import ResourceListItem from './ResourceListItem.vue'
 import ResourceGhostElement from './ResourceGhostElement.vue'
@@ -415,6 +450,7 @@ const {
   fileTypes: embedModeFileTypes
 } = useEmbedMode()
 const { getDefaultAction } = useFileActions()
+const { tagColorIndex } = useTagColor()
 const language = useGettext()
 const { $pgettext, $gettext, $ngettext } = language
 
@@ -447,6 +483,31 @@ const renameHandlerSpace = computed(() => unref(renameActionsSpace)[0].handler)
 
 const getTagToolTip = (text: string) => (text.length > 7 ? text : '')
 
+const getTagsOverflowAriaLabel = (item: Resource) => {
+  const count = item.tags.length - 2
+  return $ngettext(
+    '+ %{count}, show %{count} more tag',
+    '+ %{count}, show %{count} more tags',
+    count,
+    {
+      count: count.toString()
+    }
+  )
+}
+
+const keepClickWithinTagsOverflow = (event: MouseEvent) => {
+  event.stopPropagation()
+}
+
+const tagsOverflowExpanded = ref<Record<string, boolean>>({})
+
+const isTagsOverflowExpanded = (item: Resource) =>
+  unref(tagsOverflowExpanded)[resourceDomSelector(item)] === true
+
+const setTagsOverflowExpanded = (item: Resource, expanded: boolean) => {
+  tagsOverflowExpanded.value[resourceDomSelector(item)] = expanded
+}
+
 const isResourceDisabled = (resource: Resource) => {
   if (unref(isEmbedModeEnabled) && unref(embedModeFileTypes)?.length) {
     return (
@@ -475,6 +536,12 @@ const isResourceClickable = (resource: Resource) => {
     return false
   }
 
+  // a folder without a target must not fall back to the default action, which would navigate
+  // to the folder itself
+  if (resource.isFolder && !getResourceLink(resource)) {
+    return false
+  }
+
   if (!resource.isFolder && !isPasswordProtectedFolderFileResource(resource.name)) {
     if (!resource.canDownload() && !canBeOpenedWithSecureView(resource)) {
       return false
@@ -493,8 +560,25 @@ const emitSelect = (selectedIds: string[]) => {
   emit('update:selectedIds', selectedIds)
 }
 
-const toggleSelection = (resourceId: string) => {
-  resourcesStore.toggleSelection(resourceId)
+// shift+click would otherwise extend the browser's text selection across the rows
+const preventShiftTextSelection = (event: MouseEvent) => {
+  if (event.shiftKey) {
+    event.preventDefault()
+  }
+}
+
+const toggleSelection = (resource: Resource, event?: MouseEvent) => {
+  if (event?.shiftKey) {
+    return eventBus.publish('app.files.list.clicked.shift', {
+      resource,
+      skipTargetSelection: false,
+      extend: event.metaKey || event.ctrlKey
+    })
+  }
+  if (event?.metaKey) {
+    return eventBus.publish('app.files.list.clicked.meta', resource)
+  }
+  resourcesStore.toggleSelection(resource.id)
   emitSelect(resourcesStore.selectedIds)
 }
 
@@ -808,9 +892,6 @@ function openRenameDialog(item: Resource) {
     resources: [item]
   })
 }
-function openTagsSidebar() {
-  eventBus.publish(SideBarEventTopics.open)
-}
 function openSharingSidebar(file: Resource) {
   let panelToOpen
   if (file.type === 'space') {
@@ -876,7 +957,7 @@ function addSelectedResource(file: Resource) {
   if (isSelected) {
     return
   }
-  toggleSelection(file.id)
+  toggleSelection(file)
 }
 function showContextMenuOnBtnClick(data: ContextMenuBtnClickEventData, item: Resource) {
   if (unref(isResourceDisabled)(item)) {
@@ -943,11 +1024,15 @@ function fileClicked(data: [Resource, MouseEvent, boolean]) {
   if (contextActionClicked) {
     return
   }
+  if (eventData && eventData.shiftKey) {
+    return eventBus.publish('app.files.list.clicked.shift', {
+      resource,
+      skipTargetSelection,
+      extend: eventData.metaKey || eventData.ctrlKey
+    })
+  }
   if (eventData && eventData.metaKey) {
     return eventBus.publish('app.files.list.clicked.meta', resource)
-  }
-  if (eventData && eventData.shiftKey) {
-    return eventBus.publish('app.files.list.clicked.shift', { resource, skipTargetSelection })
   }
   if (isCheckboxClicked) {
     return
@@ -1089,10 +1174,43 @@ function getSharedWithAvatarItems(resource: Resource) {
     max-width: 80px;
   }
 
+  // The chips and the `+ N` button are separate inline boxes in the cell, so how they line up is
+  // down to `vertical-align`. Baseline alignment (the default) does not do it: a chip sits inside
+  // an inline wrapper and aligns its own baseline within it, and `text-bottom` on the button lined
+  // it up with the cell text's descender rather than with the chips. Centring every one of them
+  // instead makes them agree, and since they are all `oc-tag-s` with the same padding and font
+  // size, they are the same height and so land pixel-identical.
+  &-tag-wrapper {
+    display: inline-flex;
+    vertical-align: middle;
+  }
+
   &-tag-more {
     cursor: pointer;
     border: 0 !important;
-    vertical-align: text-bottom;
+    vertical-align: middle;
+  }
+
+  // `OcDrop` is a fixed 300px wide, so the overflow popover stayed that wide however few tags it
+  // held — with a single chip capped at 80px by `&-tag` above, nearly all of it was empty, and
+  // the right alignment the tags column passes down (`alignH: 'right'`) pushed that chip to the
+  // far edge. Size the box to the chips instead, keeping 300px only as a cap so a long tag
+  // truncates rather than stretching the popover. `&.oc-drop` rather than the class alone: on its
+  // own it merely ties with `.oc-drop`'s own width rule, leaving the winner to the stylesheet
+  // order between two packages.
+  &-tag-overflow.oc-drop {
+    width: max-content;
+    max-width: 300px;
+    text-align: left;
+
+    // One tag per line, and none of the 80px cap the table cell needs — there is room here.
+    .resource-table-tag-wrapper {
+      display: block;
+    }
+
+    .resource-table-tag {
+      max-width: 100%;
+    }
   }
 
   &-edit-name,

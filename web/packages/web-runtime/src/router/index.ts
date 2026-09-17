@@ -54,7 +54,7 @@ const routes = [
     meta: { title: $gettext('Oidc redirect'), authContext: 'anonymous' }
   },
   {
-    path: '/f/:fileId',
+    path: '/:scope(vault)?/f/:fileId',
     name: 'resolvePrivateLink',
     component: ResolvePrivateLinkPage,
     meta: { title: $gettext('Private link'), authContext: 'user' }

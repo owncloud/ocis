@@ -6,7 +6,7 @@ import { Graph } from '@ownclouders/web-client/graph'
 import { OCS } from '@ownclouders/web-client/ocs'
 import { WebDAV } from '@ownclouders/web-client/webdav'
 import { createTestingPinia, writable } from '@ownclouders/web-test-helpers'
-import axios from 'axios'
+import { FetchClient } from '@ownclouders/web-client'
 import { mock } from 'vitest-mock-extended'
 
 const language = { current: 'en' }
@@ -41,18 +41,16 @@ describe('ClientService', () => {
       const clientService = getClientServiceMock()
       expect(clientService.httpAuthenticated).toBeInstanceOf(HttpClient)
     })
-    it('initializes the http client with baseURL and static headers', () => {
+    it('initializes the http client with baseUrl and static headers', () => {
       vi.mock('../../../src/http')
       const mocky = vi.mocked(HttpClient)
       getClientServiceMock()
 
       expect(mocky).toHaveBeenCalledWith({
-        config: {
-          baseURL: serverUrl,
-          headers: { 'Initiator-ID': v4uuid, 'X-Requested-With': 'XMLHttpRequest' }
-        },
-        requestInterceptor: expect.anything(),
-        responseInterceptor: expect.anything()
+        baseUrl: serverUrl,
+        staticHeaders: { 'Initiator-ID': v4uuid, 'X-Requested-With': 'XMLHttpRequest' },
+        headers: expect.any(Function),
+        onResponse: expect.any(Function)
       })
     })
   })
@@ -61,44 +59,36 @@ describe('ClientService', () => {
       const clientService = getClientServiceMock()
       expect(clientService.httpUnAuthenticated).toBeInstanceOf(HttpClient)
     })
-    it('initializes the http client with baseURL and static headers', () => {
+    it('initializes the http client with baseUrl and static headers', () => {
       vi.mock('../../../src/http')
       const mocky = vi.mocked(HttpClient)
       getClientServiceMock()
 
       expect(mocky).toHaveBeenCalledWith({
-        config: {
-          baseURL: serverUrl,
-          headers: { 'Initiator-ID': v4uuid, 'X-Requested-With': 'XMLHttpRequest' }
-        },
-        requestInterceptor: expect.anything(),
-        responseInterceptor: expect.anything()
+        baseUrl: serverUrl,
+        staticHeaders: { 'Initiator-ID': v4uuid, 'X-Requested-With': 'XMLHttpRequest' },
+        headers: expect.any(Function),
+        onResponse: expect.any(Function)
       })
     })
   })
   describe('graph', () => {
-    it('initializes an axios client with static headers', () => {
+    it('initializes a fetch client with static headers', () => {
       const graphMock = mock<Graph>()
       const graphSpy = vi.mocked(graph).mockReturnValue(graphMock)
-      const createSpy = vi.spyOn(axios, 'create')
       const clientService = getClientServiceMock()
-      expect(createSpy).toHaveBeenCalledWith({
-        headers: { 'Initiator-ID': v4uuid, 'X-Requested-With': 'XMLHttpRequest' }
-      })
-      expect(graphSpy).toHaveBeenCalledWith(serverUrl, expect.anything())
+
+      expect(graphSpy).toHaveBeenCalledWith(serverUrl, expect.any(FetchClient))
       expect(clientService.graphAuthenticated).toEqual(graphMock)
     })
   })
   describe('ocs', () => {
-    it('initializes an axios client with static headers', () => {
+    it('initializes a fetch client with static headers', () => {
       const ocsMock = mock<OCS>()
       const ocsSpy = vi.mocked(ocs).mockReturnValue(ocsMock)
-      const createSpy = vi.spyOn(axios, 'create')
       const clientService = getClientServiceMock()
-      expect(createSpy).toHaveBeenCalledWith({
-        headers: { 'Initiator-ID': v4uuid, 'X-Requested-With': 'XMLHttpRequest' }
-      })
-      expect(ocsSpy).toHaveBeenCalledWith(serverUrl, expect.anything())
+
+      expect(ocsSpy).toHaveBeenCalledWith(serverUrl, expect.any(FetchClient))
       expect(clientService.ocs).toEqual(ocsMock)
     })
   })

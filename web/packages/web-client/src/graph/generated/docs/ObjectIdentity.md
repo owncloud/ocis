@@ -1,23 +1,37 @@
+
 # ObjectIdentity
 
 Represents an identity used to sign in to a user account
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**issuer** | **string** | domain of the Provider issuing the identity | [optional] [default to undefined]
-**issuerAssignedId** | **string** | The unique id assigned by the issuer to the account | [optional] [default to undefined]
+Name | Type
+------------ | -------------
+`issuer` | string
+`issuerAssignedId` | string
 
 ## Example
 
 ```typescript
-import { ObjectIdentity } from './api';
+import type { ObjectIdentity } from ''
 
-const instance: ObjectIdentity = {
-    issuer,
-    issuerAssignedId,
-};
+// TODO: Update the object below with actual values
+const example = {
+  "issuer": null,
+  "issuerAssignedId": null,
+} satisfies ObjectIdentity
+
+console.log(example)
+
+// Convert the instance to a JSON string
+const exampleJSON: string = JSON.stringify(example)
+console.log(exampleJSON)
+
+// Parse the JSON string back to an object
+const exampleParsed = JSON.parse(exampleJSON) as ObjectIdentity
+console.log(exampleParsed)
 ```
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+

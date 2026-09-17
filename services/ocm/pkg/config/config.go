@@ -139,7 +139,7 @@ type OCMShareProvider struct {
 	Drivers           OCMShareProviderDrivers `yaml:"drivers"`
 	Insecure          bool                    `yaml:"insecure" env:"OCM_OCM_SHARE_PROVIDER_INSECURE" desc:"Disable TLS certificate validation for the OCM connections. Do not set this in production environments." introductionVersion:"5.0"`
 	WebappTemplate    string                  `yaml:"webapp_template" env:"OCM_WEBAPP_TEMPLATE" desc:"Template for the webapp url." introductionVersion:"5.0"`
-	EnableUserSharing bool                    `yaml:"enable_user_sharing" env:"OCIS_ENABLE_USER_SHARING" desc:"Enables direct sharing with users and groups. When disabled, creating new federated user shares is rejected. Public link sharing is not affected." introductionVersion:"%%NEXT_PRODUCTION_VERSION%%"`
+	EnableUserSharing bool                    `yaml:"enable_user_sharing" env:"OCIS_ENABLE_USER_SHARING" desc:"Enables direct sharing with users and groups. When disabled, creating new federated user shares is rejected. Public link sharing is not affected." introductionVersion:"8.2.0"`
 }
 
 type OCMShareProviderDrivers struct {

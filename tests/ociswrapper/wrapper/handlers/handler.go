@@ -126,6 +126,7 @@ func K8sSetEnvHandler(res http.ResponseWriter, req *http.Request) {
 		for env, value := range envs.(map[string]any) {
 			envMap = append(envMap, fmt.Sprintf("%s=%v", env, value))
 		}
+		service = strings.ReplaceAll(service, "-", "")
 		success, _ := ocis.K8sUpdateEnv(service, envMap)
 		if !success {
 			message = "Failed to restart oCIS with new configuration"

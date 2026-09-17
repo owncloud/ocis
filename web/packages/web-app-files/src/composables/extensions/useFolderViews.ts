@@ -1,5 +1,6 @@
 import { FolderViewExtension, ResourceTable, ResourceTiles } from '@ownclouders/web-pkg'
 import { useGettext } from 'vue3-gettext'
+import { markRaw } from 'vue'
 import {
   folderViewsFavoritesExtensionPoint,
   folderViewsFolderExtensionPoint,
@@ -25,7 +26,7 @@ export const useFolderViews = (): FolderViewExtension[] => {
           name: 'menu-line',
           fillType: 'none'
         },
-        component: ResourceTable
+        component: markRaw(ResourceTable)
       }
     },
     {
@@ -39,7 +40,7 @@ export const useFolderViews = (): FolderViewExtension[] => {
           name: 'menu-line-condensed',
           fillType: 'none'
         },
-        component: ResourceTable
+        component: markRaw(ResourceTable)
       }
     },
     {
@@ -57,7 +58,7 @@ export const useFolderViews = (): FolderViewExtension[] => {
           name: 'apps-2',
           fillType: 'line'
         },
-        component: ResourceTiles
+        component: markRaw(ResourceTiles)
       }
     }
   ]

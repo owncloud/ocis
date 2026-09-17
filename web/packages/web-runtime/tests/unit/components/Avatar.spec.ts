@@ -1,8 +1,12 @@
 import Avatar from '../../../src/components/Avatar.vue'
-import { defaultComponentMocks, defaultPlugins, shallowMount } from '@ownclouders/web-test-helpers'
-import { mock, mockDeep } from 'vitest-mock-extended'
+import {
+  defaultComponentMocks,
+  defaultPlugins,
+  mockHttpResponse,
+  shallowMount
+} from '@ownclouders/web-test-helpers'
+import { mockDeep } from 'vitest-mock-extended'
 import { CapabilityStore, ClientService } from '@ownclouders/web-pkg'
-import { AxiosResponse } from 'axios'
 import { nextTick } from 'vue'
 import { OcAvatar } from '@ownclouders/design-system/components'
 
@@ -70,10 +74,7 @@ describe('Avatar component', () => {
         global.URL.createObjectURL = vi.fn(() => blob)
         const clientService = mockDeep<ClientService>()
         clientService.httpAuthenticated.get.mockResolvedValue(
-          mock<AxiosResponse>({
-            status: 200,
-            data: blob
-          })
+          mockHttpResponse(blob, { status: 200 })
         )
         const { wrapper } = getShallowWrapper(false, clientService)
         await nextTick()
@@ -94,7 +95,7 @@ function getShallowWrapper(
 ) {
   if (!clientService) {
     clientService = mockDeep<ClientService>()
-    clientService.httpAuthenticated.get.mockResolvedValue(mock<AxiosResponse>({ status: 200 }))
+    clientService.httpAuthenticated.get.mockResolvedValue(mockHttpResponse({}, { status: 200 }))
   }
   const mocks = { ...defaultComponentMocks(), $clientService: clientService }
 

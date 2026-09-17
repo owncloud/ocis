@@ -72,7 +72,7 @@ export async function logInWithOTP({ stepUser }: { stepUser: string }): Promise<
   const sessionObject = await createNewSession(stepUser)
   const { page } = world.actorsEnvironment.getActor({ key: stepUser })
 
-  const image = await Jimp.read('./qr.png')
+  const image = await Jimp.read(test.info().outputPath('qr.png'))
   const { data, width, height } = image.bitmap
   const errorLocator = page.locator('#input-error-otp')
   for (let attempt = 0; attempt < 2; attempt++) {
@@ -153,7 +153,9 @@ export async function userFailsToLogin({ stepUser }: { stepUser: string }): Prom
 
   await page.goto(config.baseUrl)
   await sessionObject.signIn(user.id, user.password)
-  expect(page.locator('#oc-login-error-message')).toBeVisible({ timeout: config.timeout })
+  await expect(page.locator('#oc-login-error-message')).toBeVisible({
+    timeout: config.timeout * 1000
+  })
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
     ['loginErrorMessageLocator'],

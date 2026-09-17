@@ -103,6 +103,75 @@ describe('resolvePublicLink', () => {
         'The resource could not be located, it may not exist anymore.'
       )
     })
+    it('should display the blocked message if the link is temporarily blocked', async () => {
+      console.error = vi.fn()
+      const { wrapper } = getWrapper({ getFileInfoErrorStatusCode: 429 })
+
+      try {
+        await (wrapper.vm as any).loadPublicSpaceTask.last
+      } catch {}
+
+      expect(wrapper.find('.oc-link-resolve-error-message').text()).toContain(
+        'Too many failed password attempts for this link. It has been temporarily blocked, please try again later.'
+      )
+    })
+    it('should display the blocked message and no password form if blocked after entering password', async () => {
+      console.error = vi.fn()
+      const { wrapper } = getWrapper({
+        passwordRequired: true,
+        getFileInfoErrorStatusCode: 429
+      }) as any
+      await wrapper.vm.loadPublicSpaceTask.last
+      await expect(wrapper.vm.resolvePublicLinkTask.perform(true)).rejects.toThrow()
+
+      expect(wrapper.find('.oc-link-resolve-error-message').text()).toContain(
+        'Too many failed password attempts for this link. It has been temporarily blocked, please try again later.'
+      )
+      expect(wrapper.find('form').exists()).toBe(false)
+    })
+    it('should display the server message for an unknown failure after entering password', async () => {
+      console.error = vi.fn()
+      const { wrapper } = getWrapper({
+        passwordRequired: true,
+        getFileInfoErrorStatusCode: 500,
+        getFileInfoErrorMessage: 'Internal server error'
+      }) as any
+      await wrapper.vm.loadPublicSpaceTask.last
+      await expect(wrapper.vm.resolvePublicLinkTask.perform(true)).rejects.toThrow()
+
+      const message = wrapper.find('.oc-link-resolve-error-message').text()
+      expect(message).toContain('Internal server error')
+      expect(message).not.toContain('The resource could not be located, it may not exist anymore.')
+    })
+    it('should display a neutral message if the server sent no message', async () => {
+      console.error = vi.fn()
+      const { wrapper } = getWrapper({
+        getFileInfoErrorStatusCode: 502,
+        getFileInfoErrorMessage: 'Unknown error'
+      })
+
+      try {
+        await (wrapper.vm as any).loadPublicSpaceTask.last
+      } catch {}
+
+      const message = wrapper.find('.oc-link-resolve-error-message').text()
+      expect(message).toContain('An unexpected error occurred, please try again later.')
+      expect(message).not.toContain('Unknown error')
+    })
+    it('should display a neutral message if the request failed without a status', async () => {
+      console.error = vi.fn()
+      const { wrapper } = getWrapper({
+        getFileInfoError: new TypeError("Cannot read properties of undefined (reading 'status')")
+      })
+
+      try {
+        await (wrapper.vm as any).loadPublicSpaceTask.last
+      } catch {}
+
+      const message = wrapper.find('.oc-link-resolve-error-message').text()
+      expect(message).toContain('An unexpected error occurred, please try again later.')
+      expect(message).not.toContain('Cannot read properties of undefined')
+    })
   })
   describe('internal link', () => {
     it('redirects the user to the login page', async () => {
@@ -120,11 +189,15 @@ describe('resolvePublicLink', () => {
 function getWrapper({
   passwordRequired = false,
   isInternalLink = false,
-  getFileInfoErrorStatusCode = null
+  getFileInfoErrorStatusCode = null,
+  getFileInfoErrorMessage = '',
+  getFileInfoError = null
 }: {
   passwordRequired?: boolean
   isInternalLink?: boolean
   getFileInfoErrorStatusCode?: number
+  getFileInfoErrorMessage?: string
+  getFileInfoError?: Error
 } = {}) {
   const $clientService = mockDeep<ClientService>()
   const spaceResource = mockDeep<SpaceResource>({ driveType: 'public' })
@@ -140,9 +213,16 @@ function getWrapper({
     )
   }
 
-  if (getFileInfoErrorStatusCode) {
+  if (getFileInfoError) {
+    $clientService.webdav.getFileInfo.mockRejectedValueOnce(getFileInfoError)
+  } else if (getFileInfoErrorStatusCode) {
     $clientService.webdav.getFileInfo.mockRejectedValueOnce(
-      new DavHttpError('', 'ERR_UNKNOWN' as DavErrorCode, undefined, getFileInfoErrorStatusCode)
+      new DavHttpError(
+        getFileInfoErrorMessage,
+        'ERR_UNKNOWN' as DavErrorCode,
+        undefined,
+        getFileInfoErrorStatusCode
+      )
     )
   } else {
     $clientService.webdav.getFileInfo.mockResolvedValueOnce(spaceResource)

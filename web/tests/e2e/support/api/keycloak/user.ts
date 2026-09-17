@@ -168,3 +168,57 @@ export const getRealmRole = async (role: string, admin: User): Promise<KeycloakR
 
   throw new Error(`Role '${role}' not found in the keycloak realm`)
 }
+
+export const getKeycloakUserId = async ({ user }: { user: User }): Promise<string> => {
+  const username = user.originalId
+
+  const response = await request({
+    method: 'GET',
+    path: `${join(realmBasePath, 'users')}?username=${encodeURIComponent(username)}&exact=true`,
+    user
+  })
+  checkResponseStatus(response, 'Failed while finding Keycloak user')
+
+  const keycloakUsers = (await response.json()) as Array<{
+    id: string
+    username: string
+  }>
+
+  if (keycloakUsers.length === 0) {
+    throw new Error(`Keycloak user with username '${username}' not found`)
+  }
+
+  return keycloakUsers[0].id
+}
+
+export const deleteUserTotpCredentials = async ({ user }: { user: User }): Promise<void> => {
+  const keycloakUserId = await getKeycloakUserId({ user })
+
+  const response = await request({
+    method: 'GET',
+    path: join(realmBasePath, 'users', keycloakUserId, 'credentials'),
+    user
+  })
+  checkResponseStatus(response, 'Failed while listing Keycloak user credentials')
+
+  const credentials = (await response.json()) as Array<{
+    id: string
+    type: string
+  }>
+
+  for (const credential of credentials) {
+    if (['otp', 'totp'].includes(credential.type)) {
+      const deleteResponse = await request({
+        method: 'DELETE',
+        path: join(realmBasePath, 'users', keycloakUserId, 'credentials', credential.id),
+        user
+      })
+
+      if (deleteResponse.status !== 204) {
+        throw new Error(
+          `Failed to delete OTP/TOTP credential for user: ${user.id}, Status: ${deleteResponse.status}`
+        )
+      }
+    }
+  }
+}

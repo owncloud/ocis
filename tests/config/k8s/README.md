@@ -57,6 +57,7 @@
    > - `ENABLE_WOPI=true`: WOPI test suites
    > - `ENABLE_OCM=true`: OCM test suites
    > - `ENABLE_AUTH_APP=true`: auth-app test suites
+   > - `ENABLE_VAULT=true`: Vault test suites (needs `ENABLE_TIKA=true` too)
    >
    > ⚠️ When using the above environment variables,
    > make sure you run the necessary external services and expose them to the cluster.
@@ -215,6 +216,55 @@ in a separate namespace on the same cluster, alongside the ocis server:
    TEST_SERVER_FED_URL=https://federation-ocis-server \
    K8S=true \
    BEHAT_FEATURE=<test-suites-path>/apiOcm/share.feature \
+   make test-acceptance-api
+   ```
+
+### Run Vault tests
+
+Vault mode requires Keycloak (as an external OIDC provider that can assert MFA/acr
+claims) backed by postgres, plus Tika for full text search:
+
+1. Check if setup [step 3](#deploy-ocis-in-k8s) is done correctly. (`ENABLE_VAULT=true ENABLE_TIKA=true`)
+2. Start postgres and Keycloak (self-signed cert, `CN=keycloak`, importing
+   `tests/config/ci/ocis-mfa-ci-realm.dist.json` with `https://localhost:9200`
+   replaced by `https://ocis-server`), and start tika:
+
+   ```bash
+   docker run -d --name postgres --network host \
+     -e POSTGRES_DB=keycloak -e POSTGRES_USER=keycloak -e POSTGRES_PASSWORD=keycloak \
+     postgres:alpine3.18
+
+   docker run -d --name keycloak --network host \
+     -e OCIS_DOMAIN=https://ocis-server -e KC_HOSTNAME=keycloak -e KC_PORT=8443 \
+     -e KC_DB=postgres -e KC_DB_URL=jdbc:postgresql://localhost:5432/keycloak \
+     -e KC_DB_USERNAME=keycloak -e KC_DB_PASSWORD=keycloak \
+     -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+     -e KC_HTTPS_CERTIFICATE_FILE=/keycloak-certs/keycloakcrt.pem \
+     -e KC_HTTPS_CERTIFICATE_KEY_FILE=/keycloak-certs/keycloakkey.pem \
+     -v "$(pwd)/keycloak-certs:/keycloak-certs:ro" \
+     -v /tmp/ocis-realm.json:/opt/keycloak/data/import/ocis-mfa-ci-realm.dist.json:ro \
+     quay.io/keycloak/keycloak:26.5.6 \
+     start-dev --import-realm --health-enabled=true
+
+   docker run -d -p 9998:9998 --name tika apache/tika:3.2.2.0-full
+   ```
+
+3. Expose them to the cluster
+
+   ```bash
+   bash tests/config/k8s/expose-external-svc.sh keycloak:8443
+   bash tests/config/k8s/expose-external-svc.sh tika:9998
+   ```
+
+4. Run the tests (Playwright is required for the `@javascript`/web-UI-login
+   scenarios; run `vendor-php/bin/playwright-install --browsers` once first)
+
+   ```bash
+   TEST_SERVER_URL=https://ocis-server \
+   K8S=true \
+   KEYCLOAK=true \
+   KC_URL=https://keycloak:8443 \
+   BEHAT_FEATURE=<test-suites-path>/apiVault/vault.feature \
    make test-acceptance-api
    ```
 

@@ -15,6 +15,7 @@ jobs:
   generate-report:
     name: Generate Pipeline Report
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     container: golang:1.25-alpine
     steps:
       - name: Checkout code

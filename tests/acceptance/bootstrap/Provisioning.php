@@ -32,7 +32,6 @@ use TestHelpers\GraphHelper;
 use TestHelpers\KeycloakHelper;
 use Laminas\Ldap\Exception\LdapException;
 use Laminas\Ldap\Ldap;
-use TestHelpers\WebUIHelper;
 
 /**
  * Functions for provisioning of users and groups
@@ -47,6 +46,12 @@ trait Provisioning {
 	private array $createdRemoteGroups = [];
 	private array $createdGroups = [];
 	private array $userTokens = [];
+	private array $createdKeycloakUsers = [];
+	private ?Ldap $idmLdap = null;
+	// the acr_values requested at Keycloak's authorize endpoint in userHasLoggedInViaWebUI();
+	// override via setAcrValuesToRequest() in scenarios that reconfigure OCIS_MFA_AUTH_LEVEL_NAMES
+	// to something other than the "advanced" default (see VaultContext)
+	private string $acrValuesToRequest = 'advanced';
 
 	/**
 	 * @param array $user
@@ -80,6 +85,27 @@ trait Provisioning {
 	}
 
 	/**
+	 * Finds the oidc-client-ts user entry (key "oc_oAuth.user:<authority>:<client_id>")
+	 * in a Playwright browser storage state and decodes its token data.
+	 * The exact position of this entry among the other localStorage keys is not
+	 * guaranteed, so it must be located by name rather than by a fixed index.
+	 *
+	 * @param array $state
+	 *
+	 * @return mixed
+	 * @throws Exception
+	 */
+	public function extractOidcTokenDataFromStorageState(array $state): mixed {
+		$localStorage = $state['origins'][0]['localStorage'] ?? [];
+		foreach ($localStorage as $entry) {
+			if (\str_starts_with($entry['name'] ?? '', 'oc_oAuth.user:')) {
+				return \json_decode($entry['value']);
+			}
+		}
+		throw new Exception('Could not find an "oc_oAuth.user:" entry in the browser storage state.');
+	}
+
+	/**
 	 * Check if this is the admin group. That group is always a local group in
 	 * ownCloud10, even if other groups come from LDAP.
 	 *
@@ -109,6 +135,13 @@ trait Provisioning {
 	 */
 	public function getCreatedUsers(): array {
 		return $this->createdUsers;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getCreatedKeycloakUsers(): array {
+		return $this->createdKeycloakUsers;
 	}
 
 	/**
@@ -356,8 +389,7 @@ trait Provisioning {
 			'baseDn' => $this->ldapBaseDN,
 			'username' => $this->ldapAdminUser,
 		];
-		$this->ldap = new Ldap($options);
-		$this->ldap->bind();
+		$this->ldap = $this->bindLdap($options);
 
 		$ldifFile = __DIR__ . $suiteParameters['ldapInitialUserFilePath'];
 		if (!$this->skipImportLdif) {
@@ -369,6 +401,78 @@ trait Provisioning {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Connects to the LDAP server bundled with oCIS (IDM) to allow direct
+	 * inspection of entries that oCIS services write, e.g. the objectClass
+	 * that the graph service sets on group entries. Connection parameters
+	 * match the IDM defaults used by the acceptance test environment.
+	 *
+	 * @return void
+	 */
+	private function connectToIdm(): void {
+		if ($this->idmLdap !== null) {
+			return;
+		}
+		\putenv('LDAPTLS_REQCERT=never');
+		$idmHost = '';
+		$hostSourceEnvs = ['TEST_SERVER_URL', 'OCIS_WRAPPER_URL'];
+		foreach ($hostSourceEnvs as $envName) {
+			$envValue = \getenv($envName);
+			if ($envValue !== false && $envValue !== '') {
+				$idmHost = \parse_url($envValue, PHP_URL_HOST) ?: $envValue;
+				break;
+			}
+		}
+		$options = [
+			'host' => $idmHost ?: '127.0.0.1',
+			'port' => 9235,
+			'useSsl' => true,
+			'baseDn' => 'o=libregraph-idm',
+			'bindRequiresDn' => true,
+			'username' => 'uid=admin,ou=users,o=libregraph-idm',
+			'password' => \getenv('IDM_ADMIN_PASSWORD') ?: 'admin',
+		];
+		$this->idmLdap = $this->bindLdap($options);
+	}
+
+	/**
+	 * Creates a bound Ldap connection from the given options.
+	 *
+	 * @param array $options
+	 *
+	 * @return Ldap
+	 */
+	private function bindLdap(array $options): Ldap {
+		$ldap = new Ldap($options);
+		$ldap->bind();
+		return $ldap;
+	}
+
+	/**
+	 * @Then /^the LDAP entry "([^"]*)" should (not|)\s?have the object class "([^"]*)"$/
+	 *
+	 * @param string $dn
+	 * @param string $shouldOrNot (not|)
+	 * @param string $objectClass
+	 *
+	 * @return void
+	 */
+	public function theLdapEntryShouldHaveObjectClass(string $dn, string $shouldOrNot, string $objectClass): void {
+		$this->connectToIdm();
+		$entry = $this->idmLdap->getEntry($dn);
+		Assert::assertNotNull($entry, "LDAP entry '$dn' does not exist");
+		$objectClasses = \array_map('strtolower', Laminas\Ldap\Attribute::getAttribute($entry, 'objectClass'));
+		$shouldHave = ($shouldOrNot !== "not");
+		$message = "Expected LDAP entry '$dn' to "
+			. ($shouldHave ? 'have' : 'not have')
+			. " the object class '$objectClass', but the entry has: "
+			. \implode(', ', $objectClasses);
+		Assert::assertTrue(
+			\in_array(\strtolower($objectClass), $objectClasses, true) === $shouldHave,
+			$message,
+		);
 	}
 
 	/**
@@ -584,13 +688,6 @@ trait Provisioning {
 		}
 		$locationHeader = explode("/", $response->getHeader("Location")[0]);
 		$uuid = end($locationHeader);
-		$this->addUserToCreatedUsersList(
-			$userAttributes['userid'],
-			$userAttributes['password'],
-			$userAttributes['displayName'],
-			$userAttributes['email'],
-			$uuid,
-		);
 
 		// assign default ocisUser role to newly created user
 		$res = KeycloakHelper::assignRole($uuid, "User");
@@ -601,6 +698,15 @@ trait Provisioning {
 			$userAttributes['userid'] . "'" .
 			"\nHTTP status " . $res->getStatusCode() .
 			"\nKeycloak response " . (string)$res->getBody(),
+		);
+
+		$this->addUserToCreatedKeycloakUsersList(
+			$userAttributes['userid'],
+			$userAttributes['password'],
+			$userAttributes['displayName'],
+			$userAttributes['email'],
+			$uuid,
+			"User",
 		);
 	}
 
@@ -616,37 +722,32 @@ trait Provisioning {
 			return;
 		}
 		KeycloakHelper::resetAdminAccessToken();
+		// Clean up any existing TOTP credentials for admin user so MFA can be set up fresh in every scenario.
+		KeycloakHelper::deleteUserTotpCredentials('admin');
 		$adminUser = [
 			"password" => "admin",
 			"displayname" => "Admin Admin",
 			"email" => "admin@example.org",
 			"actualUsername" => "admin",
 		];
-		$tokenData = KeycloakHelper::setAccessTokenForKeycloakOcisUser($adminUser);
+		$tokenData = KeycloakHelper::setAccessTokenForKeycloakOcisUser($adminUser, $this->acrValuesToRequest);
 		$this->setOcisUserToken($adminUser, $tokenData);
 	}
 
 	/**
-	 * Sets up Keycloak user in oCIS
-	 * User is logged in via web UI and user access token is extracted
-	 *
-	 * @Given user :user has logged in via web UI
-	 *
-	 * @param string $user
+	 * @param string $acrValues
 	 *
 	 * @return void
-	 * @throws Exception
 	 */
-	public function userHasLoggedInViaWebUI(string $user): void {
-		$createdUsers = $this->getCreatedUsers();
-		$user = $createdUsers[strtolower($user)];
-		$state = WebUIHelper::setUpUser(
-			$this->getBaseUrl(),
-			$user["actualUsername"],
-			$user["password"],
-		);
-		$stateData = \json_decode($state['origins'][0]['localStorage'][2]['value']);
-		$this->setOcisUserToken($user, $stateData);
+	public function setAcrValuesToRequest(string $acrValues): void {
+		$this->acrValuesToRequest = $acrValues;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAcrValuesToRequest(): string {
+		return $this->acrValuesToRequest;
 	}
 
 	/**
@@ -1116,6 +1217,37 @@ trait Provisioning {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string $password
+	 * @param string $displayname
+	 * @param string $email
+	 * @param string $userId
+	 * @param string $role
+	 *
+	 * @return void
+	 * @throws JsonException
+	 */
+	public function addUserToCreatedKeycloakUsersList(
+		string $user,
+		string $password,
+		string $displayname,
+		string $email,
+		string $userId,
+		string $role,
+	): void {
+		$user = $this->getActualUsername($user);
+		$normalizedUsername = $this->normalizeUsername($user);
+		$this->createdKeycloakUsers[$normalizedUsername] = [
+			"password" => $password,
+			"displayName" => $displayname,
+			"actualUsername" => $user,
+			"email" => $email,
+			"id" => $userId,
+			"role" => $role,
+		];
+	}
+
+	/**
 	 * remember the password of a user that already exists so that you can use
 	 * ordinary test steps after changing their password.
 	 *
@@ -1227,6 +1359,12 @@ trait Provisioning {
 					__METHOD__ . " cannot create a LDAP user with provided data. Error: $exception",
 				);
 			}
+		} elseif (KeycloakHelper::isTestingWithKeycloak()) {
+			$setting["userid"] = $user;
+			$setting["displayName"] = $displayName;
+			$setting["password"] = $password;
+			$setting["email"] = $email;
+			$this->createKeycloakUser($setting);
 		} else {
 			$reqUser = $byUser ? $this->getActualUsername($byUser) : $this->getAdminUsername();
 			$response = GraphHelper::createUser(
@@ -1247,14 +1385,16 @@ trait Provisioning {
 			$userId = $this->getJsonDecodedResponse($response)['id'];
 		}
 
-		$this->addUserToCreatedUsersList($user, $password, $displayName, $email, $userId);
+		if (!KeycloakHelper::isTestingWithKeycloak()) {
+			$this->addUserToCreatedUsersList($user, $password, $displayName, $email, $userId);
 
-		Assert::assertTrue(
-			$this->userExists($user),
-			"User '$user' should exist but does not exist",
-		);
+			Assert::assertTrue(
+				$this->userExists($user),
+				"User '$user' should exist but does not exist",
+			);
 
-		$this->initializeUser($user, $password);
+			$this->initializeUser($user, $password);
+		}
 	}
 
 	/**
@@ -1657,12 +1797,15 @@ trait Provisioning {
 				}
 				break;
 			case "graph":
-				$newGroup = $this->graphContext->createGroup($group);
-				if ($newGroup->getStatusCode() === 201) {
-					$newGroup = $this->getJsonDecodedResponse($newGroup);
+				$response = $this->graphContext->createGroup($group);
+				if ($response->getStatusCode() !== 201) {
+					throw new Exception(
+						"could not create group '$group'. Expected status code '201' but got '"
+						. $response->getStatusCode() . "'. Response: " . $response->getBody()->getContents(),
+					);
 				}
 				$groupCanBeDeleted = true;
-				$groupId = $newGroup["id"];
+				$groupId = $this->getJsonDecodedResponse($response)["id"];
 				break;
 			default:
 				throw new InvalidArgumentException(
@@ -2091,12 +2234,16 @@ trait Provisioning {
 				$this->userExists($user),
 				"User '$user' should not exist but does exist",
 			);
-
-			// delete user from keycloak
-			if (KeycloakHelper::isTestingWithKeycloak()) {
+		}
+		// delete users from keycloak
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			foreach ($this->createdKeycloakUsers as $userData) {
 				$res = KeycloakHelper::deleteKeycloakUser($userData['id']);
+				$user = $userData['actualUsername'];
 				$this->theHTTPStatusCodeShouldBe(204, "Failed to delete keycloak user '$user'", $res);
 			}
+			// Clean up any existing TOTP credentials for admin user so MFA can be set up fresh in every scenario.
+			KeycloakHelper::deleteUserTotpCredentials('admin');
 		}
 		$this->usingServer($previousServer);
 	}

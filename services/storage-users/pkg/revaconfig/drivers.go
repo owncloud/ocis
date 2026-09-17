@@ -102,8 +102,11 @@ func Posix(cfg *config.Config, enableFSWatch bool) map[string]interface{} {
 			"cache_database":            cfg.IDCache.Database,
 			"cache_ttl":                 cfg.IDCache.TTL,
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
-			"cache_auth_username":       cfg.IDCache.AuthUsername,
-			"cache_auth_password":       cfg.IDCache.AuthPassword,
+			"cache_auth_username":           cfg.IDCache.AuthUsername,
+			"cache_auth_password":           cfg.IDCache.AuthPassword,
+			"cache_enable_tls":              cfg.IDCache.EnableTLS,
+			"cache_tls_insecure":            cfg.IDCache.TLSInsecure,
+			"cache_tls_root_ca_certificate": cfg.IDCache.TLSRootCACertificate,
 		},
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":               cfg.FilemetadataCache.Store,
@@ -111,8 +114,11 @@ func Posix(cfg *config.Config, enableFSWatch bool) map[string]interface{} {
 			"cache_database":            cfg.FilemetadataCache.Database,
 			"cache_ttl":                 cfg.FilemetadataCache.TTL,
 			"cache_disable_persistence": cfg.FilemetadataCache.DisablePersistence,
-			"cache_auth_username":       cfg.FilemetadataCache.AuthUsername,
-			"cache_auth_password":       cfg.FilemetadataCache.AuthPassword,
+			"cache_auth_username":           cfg.FilemetadataCache.AuthUsername,
+			"cache_auth_password":           cfg.FilemetadataCache.AuthPassword,
+			"cache_enable_tls":              cfg.FilemetadataCache.EnableTLS,
+			"cache_tls_insecure":            cfg.FilemetadataCache.TLSInsecure,
+			"cache_tls_root_ca_certificate": cfg.FilemetadataCache.TLSRootCACertificate,
 		},
 		"use_space_groups":           cfg.Drivers.Posix.UseSpaceGroups,
 		"watch_fs":                   enableFSWatch,
@@ -186,8 +192,11 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 			"cache_database":            cfg.FilemetadataCache.Database,
 			"cache_ttl":                 cfg.FilemetadataCache.TTL,
 			"cache_disable_persistence": cfg.FilemetadataCache.DisablePersistence,
-			"cache_auth_username":       cfg.FilemetadataCache.AuthUsername,
-			"cache_auth_password":       cfg.FilemetadataCache.AuthPassword,
+			"cache_auth_username":           cfg.FilemetadataCache.AuthUsername,
+			"cache_auth_password":           cfg.FilemetadataCache.AuthPassword,
+			"cache_enable_tls":              cfg.FilemetadataCache.EnableTLS,
+			"cache_tls_insecure":            cfg.FilemetadataCache.TLSInsecure,
+			"cache_tls_root_ca_certificate": cfg.FilemetadataCache.TLSRootCACertificate,
 		},
 		"idcache": map[string]interface{}{
 			"cache_store":               cfg.IDCache.Store,
@@ -195,8 +204,11 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 			"cache_database":            cfg.IDCache.Database,
 			"cache_ttl":                 cfg.IDCache.TTL,
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
-			"cache_auth_username":       cfg.IDCache.AuthUsername,
-			"cache_auth_password":       cfg.IDCache.AuthPassword,
+			"cache_auth_username":           cfg.IDCache.AuthUsername,
+			"cache_auth_password":           cfg.IDCache.AuthPassword,
+			"cache_enable_tls":              cfg.IDCache.EnableTLS,
+			"cache_tls_insecure":            cfg.IDCache.TLSInsecure,
+			"cache_tls_root_ca_certificate": cfg.IDCache.TLSRootCACertificate,
 		},
 		"events": map[string]interface{}{
 			"numconsumers":   cfg.Events.NumConsumers,
@@ -214,6 +226,7 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 // OcisNoEvents is the config mapping for the ocis storage driver emitting no events
 func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
+		"mount_id":         cfg.MountID,
 		"metadata_backend": "messagepack",
 		"propagator":       cfg.Drivers.OCIS.Propagator,
 		"async_propagator_options": map[string]interface{}{
@@ -241,8 +254,11 @@ func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_database":            cfg.FilemetadataCache.Database,
 			"cache_ttl":                 cfg.FilemetadataCache.TTL,
 			"cache_disable_persistence": cfg.FilemetadataCache.DisablePersistence,
-			"cache_auth_username":       cfg.FilemetadataCache.AuthUsername,
-			"cache_auth_password":       cfg.FilemetadataCache.AuthPassword,
+			"cache_auth_username":           cfg.FilemetadataCache.AuthUsername,
+			"cache_auth_password":           cfg.FilemetadataCache.AuthPassword,
+			"cache_enable_tls":              cfg.FilemetadataCache.EnableTLS,
+			"cache_tls_insecure":            cfg.FilemetadataCache.TLSInsecure,
+			"cache_tls_root_ca_certificate": cfg.FilemetadataCache.TLSRootCACertificate,
 		},
 		"idcache": map[string]interface{}{
 			"cache_store":               cfg.IDCache.Store,
@@ -250,8 +266,11 @@ func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_database":            cfg.IDCache.Database,
 			"cache_ttl":                 cfg.IDCache.TTL,
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
-			"cache_auth_username":       cfg.IDCache.AuthUsername,
-			"cache_auth_password":       cfg.IDCache.AuthPassword,
+			"cache_auth_username":           cfg.IDCache.AuthUsername,
+			"cache_auth_password":           cfg.IDCache.AuthPassword,
+			"cache_enable_tls":              cfg.IDCache.EnableTLS,
+			"cache_tls_insecure":            cfg.IDCache.TLSInsecure,
+			"cache_tls_root_ca_certificate": cfg.IDCache.TLSRootCACertificate,
 		},
 	}
 }
@@ -272,6 +291,7 @@ func S3(cfg *config.Config) map[string]interface{} {
 // S3NG is the config mapping for the s3ng storage driver
 func S3NG(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
+		"mount_id":         cfg.MountID,
 		"metadata_backend": "messagepack",
 		"propagator":       cfg.Drivers.S3NG.Propagator,
 		"async_propagator_options": map[string]interface{}{
@@ -310,8 +330,11 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 			"cache_database":            cfg.FilemetadataCache.Database,
 			"cache_ttl":                 cfg.FilemetadataCache.TTL,
 			"cache_disable_persistence": cfg.FilemetadataCache.DisablePersistence,
-			"cache_auth_username":       cfg.FilemetadataCache.AuthUsername,
-			"cache_auth_password":       cfg.FilemetadataCache.AuthPassword,
+			"cache_auth_username":           cfg.FilemetadataCache.AuthUsername,
+			"cache_auth_password":           cfg.FilemetadataCache.AuthPassword,
+			"cache_enable_tls":              cfg.FilemetadataCache.EnableTLS,
+			"cache_tls_insecure":            cfg.FilemetadataCache.TLSInsecure,
+			"cache_tls_root_ca_certificate": cfg.FilemetadataCache.TLSRootCACertificate,
 		},
 		"idcache": map[string]interface{}{
 			"cache_store":               cfg.IDCache.Store,
@@ -319,8 +342,11 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 			"cache_database":            cfg.IDCache.Database,
 			"cache_ttl":                 cfg.IDCache.TTL,
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
-			"cache_auth_username":       cfg.IDCache.AuthUsername,
-			"cache_auth_password":       cfg.IDCache.AuthPassword,
+			"cache_auth_username":           cfg.IDCache.AuthUsername,
+			"cache_auth_password":           cfg.IDCache.AuthPassword,
+			"cache_enable_tls":              cfg.IDCache.EnableTLS,
+			"cache_tls_insecure":            cfg.IDCache.TLSInsecure,
+			"cache_tls_root_ca_certificate": cfg.IDCache.TLSRootCACertificate,
 		},
 		"events": map[string]interface{}{
 			"numconsumers":   cfg.Events.NumConsumers,
@@ -338,6 +364,7 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 // S3NGNoEvents is the config mapping for the s3ng storage driver emitting no events
 func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
+		"mount_id":         cfg.MountID,
 		"metadata_backend": "messagepack",
 		"propagator":       cfg.Drivers.S3NG.Propagator,
 		"async_propagator_options": map[string]interface{}{
@@ -369,8 +396,11 @@ func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_database":            cfg.FilemetadataCache.Database,
 			"cache_ttl":                 cfg.FilemetadataCache.TTL,
 			"cache_disable_persistence": cfg.FilemetadataCache.DisablePersistence,
-			"cache_auth_username":       cfg.FilemetadataCache.AuthUsername,
-			"cache_auth_password":       cfg.FilemetadataCache.AuthPassword,
+			"cache_auth_username":           cfg.FilemetadataCache.AuthUsername,
+			"cache_auth_password":           cfg.FilemetadataCache.AuthPassword,
+			"cache_enable_tls":              cfg.FilemetadataCache.EnableTLS,
+			"cache_tls_insecure":            cfg.FilemetadataCache.TLSInsecure,
+			"cache_tls_root_ca_certificate": cfg.FilemetadataCache.TLSRootCACertificate,
 		},
 		"idcache": map[string]interface{}{
 			"cache_store":               cfg.IDCache.Store,
@@ -378,8 +408,11 @@ func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_database":            cfg.IDCache.Database,
 			"cache_ttl":                 cfg.IDCache.TTL,
 			"cache_disable_persistence": cfg.IDCache.DisablePersistence,
-			"cache_auth_username":       cfg.IDCache.AuthUsername,
-			"cache_auth_password":       cfg.IDCache.AuthPassword,
+			"cache_auth_username":           cfg.IDCache.AuthUsername,
+			"cache_auth_password":           cfg.IDCache.AuthPassword,
+			"cache_enable_tls":              cfg.IDCache.EnableTLS,
+			"cache_tls_insecure":            cfg.IDCache.TLSInsecure,
+			"cache_tls_root_ca_certificate": cfg.IDCache.TLSRootCACertificate,
 		},
 	}
 }

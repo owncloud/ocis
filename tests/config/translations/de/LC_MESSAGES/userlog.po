@@ -23,3 +23,9 @@ msgstr "Neue Freigabe"
 
 msgid "{user} shared {resource} with you"
 msgstr "{user} hat {resource} mit Ihnen geteilt"
+
+msgid "Resource unshared"
+msgstr "Freigabe entfernt"
+
+msgid "{user} unshared {resource} with you"
+msgstr "{user} hat die Freigabe auf {resource} für Sie aufgehoben"

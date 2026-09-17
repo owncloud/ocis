@@ -49,10 +49,10 @@ Feature: Space management
     And the json response should not contain a space with name "Alice Hansen"
 
 
-  Scenario: space admin user can see another personal spaces
+  Scenario: space admin user cannot see another user's personal space
     When user "Brian" lists all spaces via the Graph API with query "$filter=driveType eq 'personal'"
     Then the HTTP status code should be "200"
-    And the JSON response should contain space called "Alice Hansen" and match
+    And the JSON response should contain space called "Brian Murphy" and match
       """
       {
         "type": "object",
@@ -64,7 +64,7 @@ Feature: Space management
         "properties": {
           "name": {
             "type": "string",
-            "enum": ["Alice Hansen"]
+            "enum": ["Brian Murphy"]
           },
           "driveType": {
             "type": "string",
@@ -77,6 +77,7 @@ Feature: Space management
         }
       }
       """
+    And the json response should not contain a space with name "Alice Hansen"
     And the json response should not contain a space with name "Project"
 
 

@@ -11,7 +11,7 @@ import {
   useModals,
   AuthServiceInterface
 } from '@ownclouders/web-pkg'
-import { RouteLocation, Router } from 'vue-router'
+import { RouteLocation, RouteLocationRaw, Router } from 'vue-router'
 import {
   extractPublicLinkToken,
   isAnonymousContext,
@@ -86,7 +86,7 @@ export class AuthService implements AuthServiceInterface {
    *
    * @param to {Route}
    */
-  public async initializeContext(to: RouteLocation) {
+  public async initializeContext(to: RouteLocation): Promise<RouteLocationRaw | void> {
     if (!this.publicLinkManager) {
       this.publicLinkManager = new PublicLinkManager({
         clientService: this.clientService,
@@ -131,17 +131,33 @@ export class AuthService implements AuthServiceInterface {
     }
 
     if (to.params.scope === 'vault') {
-      // Capabilities carry the required MFA level name. Fetch them directly (without
-      // establishing the user context) so we can enforce the ACR before any vault data
-      // is loaded. Establishing the user context here would flip `userContextReady`,
-      // triggering the bootstrap watcher to load spaces against the vault endpoint with
-      // a non-MFA token, which fails and crashes the app.
+      // Permissions known: send an unentitled user to accessDenied instead of the IdP.
+      if (this.authStore.userContextReady && !this.ability.can('read-all', 'Vault')) {
+        return { name: 'accessDenied' }
+      }
+
+      // Capabilities only — the full context loads vault spaces, which 401 without MFA and crash.
       if (!this.capabilityStore.isInitialized) {
         this.capabilityStore.setCapabilities(await this.clientService.ocs.getCapabilities())
       }
 
       const requiredAcr = this.capabilityStore.authMfaRequiredLevelname
       const user = await this.userManager.getUser()
+
+      // Address-bar navigation: permissions unloaded — load them and deny before MFA.
+      if (user && !user.expired && !this.authStore.userContextReady) {
+        try {
+          await this.userManager.loadUserAbilities()
+        } catch (e) {
+          // Can't confirm access: deny, don't hand off to MFA or leave a blank page.
+          console.error('failed to load vault abilities on cold load, denying access:', e)
+          return { name: 'accessDenied' }
+        }
+        if (!this.ability.can('read-all', 'Vault')) {
+          return { name: 'accessDenied' }
+        }
+      }
+
       if (!user || user.expired || user.profile.acr !== requiredAcr) {
         this.userManager.setPostLoginRedirectUrl(to.fullPath)
         await this.userManager.signinRedirect({ acr_values: requiredAcr })
@@ -405,7 +421,7 @@ export class AuthService implements AuthServiceInterface {
     return user?.refresh_token
   }
 
-  private handleDelegatedTokenUpdate(event: MessageEvent) {
+  private handleDelegatedTokenUpdate = (event: MessageEvent) => {
     if (event.origin !== this.configStore.options.embed?.delegateAuthenticationOrigin) {
       return
     }
@@ -414,8 +430,13 @@ export class AuthService implements AuthServiceInterface {
       return
     }
 
+    const accessToken = event.data.data?.access_token
+    if (!accessToken) {
+      return
+    }
+
     console.debug('[authService:handleDelegatedTokenUpdate] - going to update the access_token')
-    return this.userManager.updateContext(event.data, false)
+    return this.userManager.updateContext(accessToken, false)
   }
 
   /**

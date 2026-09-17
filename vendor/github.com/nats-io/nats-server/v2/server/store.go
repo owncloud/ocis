@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/bits"
 	"os"
 	"strings"
 	"time"
@@ -115,6 +116,7 @@ type StreamStore interface {
 	SubjectsTotals(filterSubject string) map[string]uint64
 	AllLastSeqs() ([]uint64, error)
 	MultiLastSeqs(filters []string, maxSeq uint64, maxAllowed int) ([]uint64, error)
+	MultiLastMsgs(filters []string, minSeq, maxSeq uint64, maxAllowed int, cb func(sm *StoreMsg, np uint64) bool) (uint64, uint64, error)
 	SubjectForSeq(seq uint64) (string, error)
 	NumPending(sseq uint64, filter string, lastPerSubject bool) (total, validThrough uint64, err error)
 	NumPendingMulti(sseq uint64, sl *gsl.SimpleSublist, lastPerSubject bool) (total, validThrough uint64, err error)
@@ -305,6 +307,27 @@ func DecodeStreamState(buf []byte) (*StreamReplicatedState, error) {
 	}
 
 	return ss, nil
+}
+
+// uvarintLen returns the number of bytes binary.PutUvarint/binary.AppendUvarint
+// write for v: ceil(bits/7), with v=0 taking one byte.
+func uvarintLen(v uint64) int {
+	return (bits.Len64(v|1) + 6) / 7
+}
+
+// runLengthEncodeLen returns the encoded size of a run-length delete record,
+// exactly matching what appendRunLength writes.
+func runLengthEncodeLen(first, num uint64) int {
+	return 1 + uvarintLen(first) + uvarintLen(num)
+}
+
+// appendRunLength appends a run-length encoded delete record for num
+// deleted sequences starting at first.
+func appendRunLength(b []byte, first, num uint64) []byte {
+	b = append(b, runLengthMagic)
+	b = binary.AppendUvarint(b, first)
+	b = binary.AppendUvarint(b, num)
+	return b
 }
 
 // DeleteRange is a run length encoded delete range.

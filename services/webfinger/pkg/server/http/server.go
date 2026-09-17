@@ -63,6 +63,7 @@ func Server(opts ...Option) (ohttp.Service, error) {
 
 	var oidcHTTPClient = &http.Client{
 		Transport: &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
 			TLSClientConfig: &tls.Config{
 				MinVersion:         tls.VersionTLS12,
 				InsecureSkipVerify: options.Config.Insecure, //nolint:gosec

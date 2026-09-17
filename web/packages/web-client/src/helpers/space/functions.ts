@@ -145,11 +145,11 @@ export function buildSpace(
     spaceReadmeData = data.special.find((el) => el.specialFolder.name === 'readme')
 
     if (spaceImageData) {
-      spaceImageData.webDavUrl = decodeURI(spaceImageData.webDavUrl)
+      spaceImageData = { ...spaceImageData, webDavUrl: decodeURI(spaceImageData.webDavUrl) }
     }
 
     if (spaceReadmeData) {
-      spaceReadmeData.webDavUrl = decodeURI(spaceReadmeData.webDavUrl)
+      spaceReadmeData = { ...spaceReadmeData, webDavUrl: decodeURI(spaceReadmeData.webDavUrl) }
     }
   }
 
@@ -394,15 +394,15 @@ export function getPermissionsForSpaceMember(space: SpaceResource, user: User) {
 }
 
 /**
- * Get array of permissions from a given graph permission object. If it has '@libre.graph.permissions.actions',
+ * Get array of permissions from a given graph permission object. If it has atLibreGraphPermissionsActions,
  * then no role exists for this set of permissions. Otherwise, the role is found in the graphRoles array.
  */
 function getPermissionsFromGraphPermission(
   permission: Permission,
   graphRoles: Record<string, ShareRole>
 ): string[] {
-  if (permission['@libre.graph.permissions.actions']) {
-    return permission['@libre.graph.permissions.actions']
+  if (permission.atLibreGraphPermissionsActions) {
+    return permission.atLibreGraphPermissionsActions
   }
   const role = graphRoles[permission.roles?.[0]]
   if (role) {

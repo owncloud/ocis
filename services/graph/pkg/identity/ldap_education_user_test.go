@@ -97,7 +97,11 @@ var sr3 *ldap.SearchRequest = &ldap.SearchRequest{
 
 func TestCreateEducationUser(t *testing.T) {
 	lm := &mocks.Client{}
-	b, err := getMockedBackend(lm, eduConfig, &logger)
+	// useServerUUID=true keeps the read-back path (the directory assigns the ID),
+	// which is what this test asserts (Search called once, fixed entry returned).
+	c := eduConfig
+	c.UseServerUUID = true
+	b, err := getMockedBackend(lm, c, &logger)
 	assert.Nil(t, err)
 	//assert.NotEqual(t, "", b.educationConfig.schoolObjectClass)
 	lm.On("Add", mock.Anything).Return(nil)

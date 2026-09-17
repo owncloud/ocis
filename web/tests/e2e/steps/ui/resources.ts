@@ -1,6 +1,10 @@
 import { expect } from '@playwright/test'
 import { objects } from '../../support'
-import { createResourceTypes, shortcutType } from '../../support/objects/app-files/resource/actions'
+import {
+  clickResourceModifier,
+  createResourceTypes,
+  shortcutType
+} from '../../support/objects/app-files/resource/actions'
 import { editor } from '../../support/objects/app-files/utils'
 import path from 'path'
 import { Public } from '../../support/objects/app-files/page'
@@ -110,6 +114,58 @@ export async function userSearchesGloballyWithFilter({
   })
 }
 
+export async function userSelectsResource({
+  stepUser,
+  resource,
+  modifiers
+}: {
+  stepUser: string
+  resource: string
+  modifiers?: clickResourceModifier[]
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const resourceObject = new objects.applicationFiles.Resource({ page })
+  await resourceObject.clickResourceCheckbox({ resource, modifiers })
+}
+
+export async function userShouldSeeSelectedResources({
+  stepUser,
+  resources
+}: {
+  stepUser: string
+  resources: string[]
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const resourceObject = new objects.applicationFiles.Resource({ page })
+  await resourceObject.expectResourcesToBeSelected({ resources, selected: true })
+}
+
+export async function userShouldNotSeeSelectedResources({
+  stepUser,
+  resources
+}: {
+  stepUser: string
+  resources: string[]
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const resourceObject = new objects.applicationFiles.Resource({ page })
+  await resourceObject.expectResourcesToBeSelected({ resources, selected: false })
+}
+
+export async function userShouldNotSeeHighlightedText({
+  stepUser
+}: {
+  stepUser: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const resourceObject = new objects.applicationFiles.Resource({ page })
+  await resourceObject.expectNoTextToBeHighlighted()
+}
+
 export async function userSwitchesToTilesViewMode({
   stepUser
 }: {
@@ -176,6 +232,7 @@ export async function userShouldSeeResources({
   listType:
     | typeof resourcePage.searchList
     | typeof resourcePage.filesList
+    | typeof resourcePage.searchResultsList
     | typeof resourcePage.shares
     | typeof resourcePage.trashbin
   stepUser: string
@@ -185,9 +242,11 @@ export async function userShouldSeeResources({
   const { page } = world.actorsEnvironment.getActor({ key: stepUser })
   const resourceObject = new objects.applicationFiles.Resource({ page })
 
-  // search list waits longer for tika full-text indexing; other lists only need UI render time
+  // both search-derived lists wait longer for tika full-text indexing and re-issue the search
+  // each poll; other lists only need UI render time and read the DOM as-is
   const isSearchList = listType === resourcePage.searchList
-  const timeout = isSearchList ? 30000 : 10000
+  const isSearchResultsList = listType === resourcePage.searchResultsList
+  const timeout = isSearchList || isSearchResultsList ? 30000 : 10000
 
   for (const resource of resources) {
     await expect
@@ -195,10 +254,16 @@ export async function userShouldSeeResources({
         async () => {
           // the global search dropdown is a one-shot query, so for the search list we
           // re-issue the search each poll to pick up resources that finish indexing after
-          // the initial query instead of repeatedly reading a stale result list
-          const actualList = isSearchList
-            ? await resourceObject.reSearchAndGetDisplayedResources()
-            : await resourceObject.getDisplayedResources({ keyword: listType })
+          // files list showing search results (after pressing Enter) has the same problem, so
+          // it re-issues the search too (via reload) rather than reading the plain files list
+          let actualList: string[]
+          if (isSearchList) {
+            actualList = await resourceObject.reSearchAndGetDisplayedResources()
+          } else if (isSearchResultsList) {
+            actualList = await resourceObject.reSearchAndGetDisplayedResourcesFromFilesList()
+          } else {
+            actualList = await resourceObject.getDisplayedResources({ keyword: listType })
+          }
           return actualList.includes(resource)
         },
         {
@@ -415,6 +480,102 @@ export async function userClosesFileViewer({ stepUser }: { stepUser: string }): 
   const world = getWorld()
   const { page } = world.actorsEnvironment.getActor({ key: stepUser })
   await editor.close(page)
+}
+
+export async function userPicksImageInMarkdownEditor({
+  stepUser,
+  image
+}: {
+  stepUser: string
+  image: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  await editor.waitForMarkdownEditor(page)
+  await editor.pickMarkdownImage(page, world.filesEnvironment.getFile({ name: image }).path)
+}
+
+export async function userPicksOversizedImageInMarkdownEditor({
+  stepUser,
+  sizeInBytes
+}: {
+  stepUser: string
+  sizeInBytes: number
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  await editor.waitForMarkdownEditor(page)
+  // Only file.type and file.size decide the rejection, so an in-memory payload avoids
+  // committing a multi-megabyte fixture.
+  await editor.pickMarkdownImage(page, {
+    name: 'oversized.png',
+    mimeType: 'image/png',
+    buffer: Buffer.alloc(sizeInBytes)
+  })
+}
+
+export async function userShouldSeeInlinedImageInMarkdownEditor({
+  stepUser
+}: {
+  stepUser: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  // The markdown source only exposes the data URI through the shortener's title attribute.
+  await expect(editor.markdownShortenedTokenLocator(page)).toHaveAttribute(
+    'title',
+    /^data:image\/png;base64,/
+  )
+  await expect(editor.markdownPreviewImageLocator(page)).toBeVisible()
+}
+
+export async function userShouldNotSeeInlinedImageInMarkdownEditor({
+  stepUser
+}: {
+  stepUser: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  await expect(editor.markdownPreviewImageLocator(page)).toHaveCount(0)
+  await expect(editor.markdownShortenedTokenLocator(page)).toHaveCount(0)
+}
+
+export async function userShouldSeeImageRejectionInMarkdownEditor({
+  stepUser,
+  image,
+  limit
+}: {
+  stepUser: string
+  image: string
+  limit: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const notification = editor.imageRejectionNotificationLocator(page)
+  await expect(notification).toBeVisible()
+  await expect(notification.locator('.oc-notification-message-title')).toHaveText(
+    'Image is too big'
+  )
+  await expect(notification.locator('.oc-notification-message-content')).toHaveText(
+    `${image}. Max image size: ${limit}.`
+  )
+}
+
+export async function userShouldNotSeeCropOptionInMarkdownEditor({
+  stepUser
+}: {
+  stepUser: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  await editor.openMarkdownImageMenu(page)
+
+  // md-editor-v3 always renders three image entries; TextEditor.vue hides the third
+  // ("Crop And Upload") with `.md-editor-menu-item-image:nth-child(3):last-child`.
+  const items = editor.markdownImageMenuItemsLocator(page)
+  await expect(items).toHaveCount(3)
+  await expect(items.filter({ visible: true })).toHaveCount(2)
+  await expect(items.filter({ visible: true, hasText: /crop/i })).toHaveCount(0)
 }
 
 export async function userDeletesResources({

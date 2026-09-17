@@ -60,6 +60,9 @@ go.work
 go.work.sum
 .env
 .envrc
+
+# generated secrets for deployment examples (e.g. Collabora WOPI proof key)
+deployments/examples/*/config/collabora/
 CLAUDE.md
 .claude/
 GEMINI.md

@@ -148,6 +148,69 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 		errors.HandleWebdavError(&log, w, b, err)
 		return
 	}
+	client, err := s.gatewaySelector.Next()
+	if err != nil {
+		log.Error().Err(err).Msg("error selecting next client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// check src exists
+	srcStatReq := &provider.StatRequest{Ref: src}
+	srcStatRes, err := client.Stat(ctx, srcStatReq)
+	if err != nil {
+		log.Error().Err(err).Msg("error sending grpc stat request")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if srcStatRes.Status.Code != rpc.Code_CODE_OK {
+		if srcStatRes.Status.Code == rpc.Code_CODE_NOT_FOUND {
+			w.WriteHeader(http.StatusNotFound)
+			m := fmt.Sprintf("Resource %v not found", srcStatReq.Ref.Path)
+			b, err := errors.Marshal(http.StatusNotFound, m, "", "")
+			errors.HandleWebdavError(&log, w, b, err)
+		}
+		errors.HandleErrorStatus(&log, w, srcStatRes.Status)
+		return
+	}
+	if utils.IsSpaceRoot(srcStatRes.GetInfo()) {
+		log.Error().Msg("the source is disallowed")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// check dst exists
+	dstStatReq := &provider.StatRequest{Ref: dst}
+	dstStatRes, err := client.Stat(ctx, dstStatReq)
+	if err != nil {
+		log.Error().Err(err).Msg("error sending grpc stat request")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if dstStatRes.Status.Code != rpc.Code_CODE_OK && dstStatRes.Status.Code != rpc.Code_CODE_NOT_FOUND {
+		errors.HandleErrorStatus(&log, w, dstStatRes.Status)
+		return
+	}
+
+	if dstStatRes.Status.Code == rpc.Code_CODE_OK && srcStatRes.GetInfo().GetId() != nil &&
+		utils.ResourceIDEqual(srcStatRes.GetInfo().GetId(), dstStatRes.GetInfo().GetId()) {
+		// a user without move permission must not be told the rename succeeded
+		if !srcStatRes.GetInfo().GetPermissionSet().GetMove() {
+			w.WriteHeader(http.StatusForbidden)
+			b, err := errors.Marshal(http.StatusForbidden, "permission denied", "", "")
+			errors.HandleWebdavError(&log, w, b, err)
+			return
+		}
+		log.Debug().Msg("move: source and destination are the same resource, nothing to do")
+		info := dstStatRes.GetInfo()
+		w.Header().Set(net.HeaderContentType, info.GetMimeType())
+		w.Header().Set(net.HeaderETag, info.GetEtag())
+		w.Header().Set(net.HeaderOCFileID, storagespace.FormatResourceID(info.GetId()))
+		w.Header().Set(net.HeaderOCETag, info.GetEtag())
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
 	isChild, err := s.referenceIsChildOf(ctx, s.gatewaySelector, dst, src)
 	if err != nil {
 		switch err.(type) {
@@ -198,50 +261,6 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 	overwrite, err := net.ParseOverwrite(oh)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	client, err := s.gatewaySelector.Next()
-	if err != nil {
-		log.Error().Err(err).Msg("error selecting next client")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	// check src exists
-	srcStatReq := &provider.StatRequest{Ref: src}
-	srcStatRes, err := client.Stat(ctx, srcStatReq)
-	if err != nil {
-		log.Error().Err(err).Msg("error sending grpc stat request")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if srcStatRes.Status.Code != rpc.Code_CODE_OK {
-		if srcStatRes.Status.Code == rpc.Code_CODE_NOT_FOUND {
-			w.WriteHeader(http.StatusNotFound)
-			m := fmt.Sprintf("Resource %v not found", srcStatReq.Ref.Path)
-			b, err := errors.Marshal(http.StatusNotFound, m, "", "")
-			errors.HandleWebdavError(&log, w, b, err)
-		}
-		errors.HandleErrorStatus(&log, w, srcStatRes.Status)
-		return
-	}
-	if utils.IsSpaceRoot(srcStatRes.GetInfo()) {
-		log.Error().Msg("the source is disallowed")
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	// check dst exists
-	dstStatReq := &provider.StatRequest{Ref: dst}
-	dstStatRes, err := client.Stat(ctx, dstStatReq)
-	if err != nil {
-		log.Error().Err(err).Msg("error sending grpc stat request")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if dstStatRes.Status.Code != rpc.Code_CODE_OK && dstStatRes.Status.Code != rpc.Code_CODE_NOT_FOUND {
-		errors.HandleErrorStatus(&log, w, dstStatRes.Status)
 		return
 	}
 

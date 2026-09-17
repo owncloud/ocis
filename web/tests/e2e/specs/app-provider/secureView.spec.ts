@@ -3,7 +3,7 @@
 import { test } from '../../environment/test'
 import * as api from '../../steps/api/api'
 import * as ui from '../../steps/ui/index'
-import { searchScope, application, fileAction } from '../../environment/constants'
+import { searchScope, application, fileAction, resourcePage } from '../../environment/constants'
 
 test.describe('Secure view', { tag: '@predefined-users' }, () => {
   test.beforeEach(async () => {
@@ -362,7 +362,7 @@ test.describe('Secure view', { tag: '@predefined-users' }, () => {
     //   | secure.pdf         |
     //   | secureDocument.odt |
     await ui.userShouldSeeResources({
-      listType: 'files list',
+      listType: resourcePage.searchResultsList,
       stepUser: 'Brian',
       resources: ['secureFile.txt', 'securePhoto.jpeg', 'secure.pdf', 'secureDocument.odt']
     })

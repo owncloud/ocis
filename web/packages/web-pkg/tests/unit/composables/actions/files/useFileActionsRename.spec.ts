@@ -1,5 +1,7 @@
 import { useFileActionsRename } from '../../../../../src/composables/actions'
+import { useResolvePasswordProtectedFolderCounterpart } from '../../../../../src/composables/actions/helpers/useResolvePasswordProtectedFolderCounterpart'
 import {
+  useConfigStore,
   useMessages,
   useModals,
   useResourcesStore
@@ -8,6 +10,10 @@ import { mock, mockDeep } from 'vitest-mock-extended'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 import { defaultComponentMocks, getComposableWrapper } from '@ownclouders/web-test-helpers'
 import { unref } from 'vue'
+
+vi.mock(
+  '../../../../../src/composables/actions/helpers/useResolvePasswordProtectedFolderCounterpart'
+)
 
 const currentFolder = {
   id: '1',
@@ -163,11 +169,221 @@ describe('rename', () => {
         }
       })
     })
+
+    describe('password protected folder sync', () => {
+      const passwordProtectedFolder = {
+        id: 'ppf',
+        isFolder: true,
+        name: 'test',
+        path: '/.PasswordProtectedFolders/projects/Personal/test',
+        spaceId: '1'
+      } as Resource
+
+      it('renames the .psec counterpart when the real folder is renamed', () => {
+        const psecSpace = mockDeep<SpaceResource>({ webDavPath: 'irrelevant' })
+        const psecFile = mock<Resource>({ id: 'psec', name: 'test.psec', path: '/test.psec' })
+        const getPsecFile = vi.fn().mockResolvedValue({ psecFile, space: psecSpace })
+
+        getWrapper({
+          getPsecFile,
+          setup: async ({ renameResource }, { space, clientService }) => {
+            await renameResource(space, passwordProtectedFolder, 'something')
+
+            expect(getPsecFile).toHaveBeenCalledWith(passwordProtectedFolder)
+            // both the folder itself and the .psec counterpart get moved
+            expect(clientService.webdav.moveFiles).toHaveBeenCalledWith(
+              psecSpace,
+              psecFile,
+              psecSpace,
+              { path: '/something.psec' }
+            )
+            // the renamed folder + the renamed .psec file both get upserted
+            const { upsertResource } = useResourcesStore()
+            expect(upsertResource).toHaveBeenCalledTimes(2)
+          }
+        })
+      })
+
+      it('resolves the .psec counterpart before moving the folder (uses the old name)', () => {
+        const psecSpace = mockDeep<SpaceResource>({ webDavPath: 'irrelevant' })
+        const psecFile = mock<Resource>({ id: 'psec', name: 'test.psec', path: '/test.psec' })
+        const getPsecFile = vi.fn().mockResolvedValue({ psecFile, space: psecSpace })
+
+        getWrapper({
+          getPsecFile,
+          setup: async ({ renameResource }, { space, clientService }) => {
+            const callOrder: string[] = []
+            getPsecFile.mockImplementation(() => {
+              callOrder.push('getPsecFile')
+              return Promise.resolve({ psecFile, space: psecSpace })
+            })
+            clientService.webdav.moveFiles.mockImplementation(() => {
+              callOrder.push('moveFiles')
+              return Promise.resolve(undefined)
+            })
+
+            await renameResource(space, passwordProtectedFolder, 'something')
+
+            // getPsecFile must run before any move so it can derive the path from the old folder name
+            expect(callOrder[0]).toBe('getPsecFile')
+          }
+        })
+      })
+
+      it('does not resolve a .psec counterpart for a regular (non-ppf) rename', () => {
+        const getPsecFile = vi.fn().mockResolvedValue(null)
+
+        getWrapper({
+          getPsecFile,
+          setup: async ({ renameResource }, { space }) => {
+            const resource = {
+              id: '2',
+              isFolder: true,
+              name: 'folder',
+              path: '/folder',
+              spaceId: '1'
+            } as Resource
+            await renameResource(space, resource, 'new name')
+
+            expect(getPsecFile).not.toHaveBeenCalled()
+          }
+        })
+      })
+
+      it('does not resolve a .psec counterpart when the name is unchanged', () => {
+        const getPsecFile = vi.fn().mockResolvedValue(null)
+
+        getWrapper({
+          getPsecFile,
+          setup: async ({ renameResource }, { space }) => {
+            await renameResource(space, passwordProtectedFolder, passwordProtectedFolder.name)
+
+            expect(getPsecFile).not.toHaveBeenCalled()
+          }
+        })
+      })
+
+      it('renames the folder normally when no .psec counterpart is found', () => {
+        const getPsecFile = vi.fn().mockResolvedValue(null)
+
+        getWrapper({
+          getPsecFile,
+          setup: async ({ renameResource }, { space, clientService }) => {
+            await renameResource(space, passwordProtectedFolder, 'something')
+
+            expect(getPsecFile).toHaveBeenCalledWith(passwordProtectedFolder)
+            // only the folder itself is moved, no counterpart move
+            expect(clientService.webdav.moveFiles).toHaveBeenCalledTimes(1)
+            const { upsertResource } = useResourcesStore()
+            expect(upsertResource).toHaveBeenCalledTimes(1)
+          }
+        })
+      })
+    })
+
+    // When this app instance runs framed inside the password-protected-folder view modal, a
+    // rename of the shared folder (the public link root) is posted to the parent window so it
+    // can keep the owner's `.psec` pointer file in sync.
+    describe('password protected folder view modal notification', () => {
+      const publicSpace = mockDeep<SpaceResource>({
+        driveType: 'public',
+        webDavPath: 'irrelevant',
+        fileId: 'root-file-id'
+      })
+      const rootFolder = mock<Resource>({
+        fileId: 'root-file-id',
+        isFolder: true,
+        name: 'shared',
+        path: '/shared'
+      })
+
+      let parentSpy: ReturnType<typeof vi.spyOn>
+      let originalParent: Window
+
+      beforeEach(() => {
+        originalParent = window.parent
+        // jsdom sets window.parent === window; simulate being framed
+        Object.defineProperty(window, 'parent', {
+          value: { postMessage: vi.fn() },
+          configurable: true
+        })
+        parentSpy = vi.spyOn(window.parent, 'postMessage')
+      })
+
+      afterEach(() => {
+        Object.defineProperty(window, 'parent', { value: originalParent, configurable: true })
+      })
+
+      it('notifies the parent window when the shared folder is renamed', () => {
+        getWrapper({
+          passwordProtectedFolderView: true,
+          setup: async ({ renameResource }) => {
+            await renameResource(publicSpace, rootFolder, 'renamed')
+
+            expect(parentSpy).toHaveBeenCalledWith(
+              {
+                name: 'owncloud-password-protected-folder:renamed',
+                data: { newName: 'renamed' }
+              },
+              window.location.origin
+            )
+          }
+        })
+      })
+
+      it('does not notify for a child resource inside the shared folder', () => {
+        const childResource = mock<Resource>({
+          fileId: 'child-file-id',
+          isFolder: true,
+          name: 'child',
+          path: '/child'
+        })
+
+        getWrapper({
+          passwordProtectedFolderView: true,
+          setup: async ({ renameResource }) => {
+            await renameResource(publicSpace, childResource, 'renamed')
+
+            expect(parentSpy).not.toHaveBeenCalled()
+          }
+        })
+      })
+
+      it('does not notify when not running inside the folder view modal', () => {
+        getWrapper({
+          passwordProtectedFolderView: false,
+          setup: async ({ renameResource }) => {
+            await renameResource(publicSpace, rootFolder, 'renamed')
+
+            expect(parentSpy).not.toHaveBeenCalled()
+          }
+        })
+      })
+
+      it('does not notify for a non-public space', () => {
+        const personalSpace = mockDeep<SpaceResource>({
+          driveType: 'personal',
+          webDavPath: 'irrelevant',
+          fileId: 'root-file-id'
+        })
+
+        getWrapper({
+          passwordProtectedFolderView: true,
+          setup: async ({ renameResource }) => {
+            await renameResource(personalSpace, rootFolder, 'renamed')
+
+            expect(parentSpy).not.toHaveBeenCalled()
+          }
+        })
+      })
+    })
   })
 })
 
 function getWrapper({
-  setup
+  setup,
+  getPsecFile = vi.fn().mockResolvedValue(null),
+  passwordProtectedFolderView = false
 }: {
   setup: (
     instance: ReturnType<typeof useFileActionsRename>,
@@ -179,7 +395,14 @@ function getWrapper({
       clientService: ReturnType<typeof defaultComponentMocks>['$clientService']
     }
   ) => void
+  getPsecFile?: ReturnType<typeof vi.fn>
+  passwordProtectedFolderView?: boolean
 }) {
+  vi.mocked(useResolvePasswordProtectedFolderCounterpart).mockReturnValue({
+    getPasswordProtectedFolder: vi.fn().mockResolvedValue(null),
+    getPsecFile
+  } as unknown as ReturnType<typeof useResolvePasswordProtectedFolderCounterpart>)
+
   const mocks = {
     ...defaultComponentMocks(),
     space: mockDeep<SpaceResource>({
@@ -191,6 +414,8 @@ function getWrapper({
     mocks,
     wrapper: getComposableWrapper(
       () => {
+        const configStore = useConfigStore()
+        configStore.options = { ...configStore.options, passwordProtectedFolderView }
         const instance = useFileActionsRename()
         setup(instance, { space: mocks.space, clientService: mocks.$clientService })
       },

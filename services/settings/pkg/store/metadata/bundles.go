@@ -16,7 +16,9 @@ import (
 
 // ListBundles returns all bundles in the dataPath folder that match the given type.
 func (s *Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []string) ([]*settingsmsg.Bundle, error) {
-	s.Init()
+	if err := s.Init(); err != nil {
+		return nil, err
+	}
 	ctx := context.TODO()
 
 	if len(bundleIDs) == 0 {
@@ -69,7 +71,9 @@ func (s *Store) ReadBundle(bundleID string) (*settingsmsg.Bundle, error) {
 		return defaults.ServiceAccountBundle(), nil
 	}
 
-	s.Init()
+	if err := s.Init(); err != nil {
+		return nil, err
+	}
 	ctx := context.TODO()
 	b, err := s.mdc.SimpleDownload(ctx, bundlePath(bundleID))
 	switch err.(type) {
@@ -87,7 +91,9 @@ func (s *Store) ReadBundle(bundleID string) (*settingsmsg.Bundle, error) {
 
 // ReadSetting tries to find a setting by the given id from the metadata service
 func (s *Store) ReadSetting(settingID string) (*settingsmsg.Setting, error) {
-	s.Init()
+	if err := s.Init(); err != nil {
+		return nil, err
+	}
 	ctx := context.TODO()
 
 	ids, err := s.mdc.ReadDir(ctx, bundleFolderLocation)
@@ -122,7 +128,9 @@ func (s *Store) ReadSetting(settingID string) (*settingsmsg.Setting, error) {
 
 // WriteBundle sends the givens record to the metadataclient. returns `record` for legacy reasons
 func (s *Store) WriteBundle(record *settingsmsg.Bundle) (*settingsmsg.Bundle, error) {
-	s.Init()
+	if err := s.Init(); err != nil {
+		return nil, err
+	}
 	ctx := context.TODO()
 
 	b, err := json.Marshal(record)
@@ -134,7 +142,9 @@ func (s *Store) WriteBundle(record *settingsmsg.Bundle) (*settingsmsg.Bundle, er
 
 // AddSettingToBundle adds the given setting to the bundle with the given bundleID.
 func (s *Store) AddSettingToBundle(bundleID string, setting *settingsmsg.Setting) (*settingsmsg.Setting, error) {
-	s.Init()
+	if err := s.Init(); err != nil {
+		return nil, err
+	}
 	b, err := s.ReadBundle(bundleID)
 	if err != nil {
 		if !errors.Is(err, settings.ErrNotFound) {

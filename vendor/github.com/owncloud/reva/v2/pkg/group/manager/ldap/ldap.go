@@ -74,7 +74,7 @@ func New(m map[string]interface{}) (group.Manager, error) {
 		return nil, err
 	}
 
-	mgr.ldapClient, err = utils.GetLDAPClientWithReconnect(&mgr.c.LDAPConn)
+	mgr.ldapClient, err = utils.GetLDAPClientFromConfig(&mgr.c.LDAPConn)
 	if err != nil {
 		return nil, err
 	}

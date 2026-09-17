@@ -52,8 +52,10 @@
         >
           <template #image="{ item }">
             <div class="tag-option-wrapper oc-flex oc-flex-middle">
-              <oc-icon name="price-tag-3" size="small" />
-              <span class="oc-ml-s">{{ item.label }}</span>
+              <oc-tag size="small" :rounded="true" :color-index="tagColorIndex(item.label)">
+                <oc-icon name="price-tag-3" size="small" />
+                <span>{{ item.label }}</span>
+              </oc-tag>
             </div>
           </template>
         </item-filter>
@@ -155,7 +157,8 @@ import {
   SearchResult,
   useCapabilityStore,
   useResourcesStore,
-  useSearch
+  useSearch,
+  useTagColor
 } from '@ownclouders/web-pkg'
 import { NoContentMessage } from '@ownclouders/web-pkg'
 import { ResourceTable } from '@ownclouders/web-pkg'
@@ -224,6 +227,7 @@ const { y: fileListHeaderY } = useFileListHeaderPosition()
 const clientService = useClientService()
 const { getMatchingSpace } = useGetMatchingSpace()
 const { buildSearchTerm } = useSearch()
+const { tagColorIndex } = useTagColor()
 
 const resourcesStore = useResourcesStore()
 const { initResourceList, clearResourceList, setAncestorMetaData } = resourcesStore

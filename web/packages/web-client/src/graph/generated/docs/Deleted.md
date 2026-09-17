@@ -1,21 +1,35 @@
+
 # Deleted
 
 Information about the deleted state of the item. Read-only.
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**state** | **string** | Represents the state of the deleted item. | [optional] [default to undefined]
+Name | Type
+------------ | -------------
+`state` | string
 
 ## Example
 
 ```typescript
-import { Deleted } from './api';
+import type { Deleted } from ''
 
-const instance: Deleted = {
-    state,
-};
+// TODO: Update the object below with actual values
+const example = {
+  "state": null,
+} satisfies Deleted
+
+console.log(example)
+
+// Convert the instance to a JSON string
+const exampleJSON: string = JSON.stringify(example)
+console.log(exampleJSON)
+
+// Parse the JSON string back to an object
+const exampleParsed = JSON.parse(exampleJSON) as Deleted
+console.log(exampleParsed)
 ```
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
