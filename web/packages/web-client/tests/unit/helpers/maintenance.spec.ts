@@ -1,4 +1,7 @@
-import { maintenanceResponseHandler, shouldResponseTriggerMaintenance } from '../../../src/helpers/maintenance'
+import {
+  maintenanceResponseHandler,
+  shouldResponseTriggerMaintenance
+} from '../../../src/helpers/maintenance'
 import type { OnResponseArgs } from '../../../src/http'
 
 describe('shouldResponseTriggerMaintenance', () => {
@@ -8,7 +11,10 @@ describe('shouldResponseTriggerMaintenance', () => {
 
   it('is false for a 503 on an excluded endpoint', () => {
     expect(
-      shouldResponseTriggerMaintenance(503, 'ocs/v2.php/apps/notifications/api/v1/notifications/sse')
+      shouldResponseTriggerMaintenance(
+        503,
+        'ocs/v2.php/apps/notifications/api/v1/notifications/sse'
+      )
     ).toBe(false)
   })
 

@@ -11,4 +11,4 @@ Both clients now clear the maintenance banner only on an actual successful respo
 so an unrelated error no longer hides the banner while the server is still in
 maintenance.
 
-https://github.com/owncloud/ocis/pull/TODO
+https://github.com/owncloud/ocis/pull/12966
