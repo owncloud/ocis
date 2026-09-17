@@ -1,31 +1,25 @@
 
-# Quota
+# SpecialDriveItemUpdate
 
-Optional. Information about the drive\'s storage space quota. Only `total` is writable, the other properties are computed by the server and read-only.
+References an existing item inside a drive to be assigned as one of the drive\'s special resources, such as its image or readme.
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`deleted` | number
-`remaining` | number
-`state` | string
-`total` | number
-`used` | number
+`id` | string
+`specialFolder` | [SpecialFolder](SpecialFolder.md)
 
 ## Example
 
 ```typescript
-import type { Quota } from ''
+import type { SpecialDriveItemUpdate } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "deleted": null,
-  "remaining": null,
-  "state": null,
-  "total": null,
-  "used": null,
-} satisfies Quota
+  "id": null,
+  "specialFolder": null,
+} satisfies SpecialDriveItemUpdate
 
 console.log(example)
 
@@ -34,7 +28,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as Quota
+const exampleParsed = JSON.parse(exampleJSON) as SpecialDriveItemUpdate
 console.log(exampleParsed)
 ```
 

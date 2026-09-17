@@ -51,7 +51,7 @@ export interface Drive {
     /**
      * The unique identifier for this drive.
      */
-    id?: string;
+    readonly id?: string;
     /**
      * 
      */
@@ -59,7 +59,7 @@ export interface Drive {
     /**
      * Date and time of item creation. Read-only.
      */
-    createdDateTime?: string;
+    readonly createdDateTime?: string;
     /**
      * Provides a user-visible description of the item. Optional.
      */
@@ -67,7 +67,7 @@ export interface Drive {
     /**
      * ETag for the item. Read-only.
      */
-    eTag?: string;
+    readonly eTag?: string;
     /**
      * 
      */
@@ -75,7 +75,7 @@ export interface Drive {
     /**
      * Date and time the item was last modified. Read-only.
      */
-    lastModifiedDateTime?: string;
+    readonly lastModifiedDateTime?: string;
     /**
      * The name of the item. Read-write.
      */
@@ -87,9 +87,9 @@ export interface Drive {
     /**
      * URL that displays the resource in the browser. Read-only.
      */
-    webUrl?: string;
+    readonly webUrl?: string;
     /**
-     * Describes the type of drive represented by this resource. Values are "personal" for users home spaces, "project", "virtual" or "share". Read-only.
+     * Describes the type of drive represented by this resource. Values are "personal" for users home spaces, "project", "virtual" or "share". Read-write on create, read-only afterwards, see the `driveUpdate` schema.
      */
     driveType?: string;
     /**
@@ -107,15 +107,15 @@ export interface Drive {
     /**
      * All items contained in the drive. Read-only. Nullable.
      */
-    items?: Array<DriveItem>;
+    readonly items?: Array<DriveItem>;
     /**
      * 
      */
     root?: DriveItem;
     /**
-     * A collection of special drive resources.
+     * A collection of special drive resources. Read-only, see the `driveUpdate` schema for assigning them.
      */
-    special?: Array<DriveItem>;
+    readonly special?: Array<DriveItem>;
 }
 
 /**
@@ -160,30 +160,23 @@ export function DriveToJSON(json: any): Drive {
     return DriveToJSONTyped(json, false);
 }
 
-export function DriveToJSONTyped(value?: Drive | null, ignoreDiscriminator: boolean = false): any {
+export function DriveToJSONTyped(value?: Omit<Drive, 'id'|'createdDateTime'|'eTag'|'lastModifiedDateTime'|'webUrl'|'items'|'special'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
-        'id': value['id'],
         'createdBy': IdentitySetToJSON(value['createdBy']),
-        'createdDateTime': value['createdDateTime'],
         'description': value['description'],
-        'eTag': value['eTag'],
         'lastModifiedBy': IdentitySetToJSON(value['lastModifiedBy']),
-        'lastModifiedDateTime': value['lastModifiedDateTime'],
         'name': value['name'],
         'parentReference': ItemReferenceToJSON(value['parentReference']),
-        'webUrl': value['webUrl'],
         'driveType': value['driveType'],
         'driveAlias': value['driveAlias'],
         'owner': IdentitySetToJSON(value['owner']),
         'quota': QuotaToJSON(value['quota']),
-        'items': value['items'] == null ? undefined : ((value['items'] as Array<any>).map(DriveItemToJSON)),
         'root': DriveItemToJSON(value['root']),
-        'special': value['special'] == null ? undefined : ((value['special'] as Array<any>).map(DriveItemToJSON)),
     };
 }
 

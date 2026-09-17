@@ -163,7 +163,7 @@ export interface UpdatePermissionRequest {
     /**
      * 
      */
-    permission: Permission;
+    permission: Omit<Permission, 'id'|'hasPassword'>;
 }
 
 /**

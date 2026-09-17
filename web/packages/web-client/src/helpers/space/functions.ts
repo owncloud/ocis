@@ -145,11 +145,11 @@ export function buildSpace(
     spaceReadmeData = data.special.find((el) => el.specialFolder.name === 'readme')
 
     if (spaceImageData) {
-      spaceImageData.webDavUrl = decodeURI(spaceImageData.webDavUrl)
+      spaceImageData = { ...spaceImageData, webDavUrl: decodeURI(spaceImageData.webDavUrl) }
     }
 
     if (spaceReadmeData) {
-      spaceReadmeData.webDavUrl = decodeURI(spaceReadmeData.webDavUrl)
+      spaceReadmeData = { ...spaceReadmeData, webDavUrl: decodeURI(spaceReadmeData.webDavUrl) }
     }
   }
 

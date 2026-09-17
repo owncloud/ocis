@@ -14,7 +14,7 @@
 
 import { mapValues } from '../runtime';
 /**
- * If the current item is also available as a special folder, this facet is returned. Read-only
+ * If the current item is also available as a special folder, this facet is returned.
  * @export
  * @interface SpecialFolder
  */

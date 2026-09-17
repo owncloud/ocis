@@ -76,7 +76,9 @@ describe('share helper functions', () => {
   describe('getShareResourceRoles', () => {
     it("returns all roles from a drive item's permissions that are also included in the graphRoles", () => {
       const driveItem = mockDeep<DriveItem>()
-      driveItem.remoteItem.permissions = [{ roles: ['1', '2'] }, { roles: ['1', '3'] }]
+      Object.assign(driveItem.remoteItem, {
+        permissions: [{ roles: ['1', '2'] }, { roles: ['1', '3'] }]
+      })
       const graphRoles = { '1': mock<ShareRole>({ id: '1' }), '4': mock<ShareRole>({ id: '4' }) }
 
       const result = getShareResourceRoles({ driveItem, graphRoles })
@@ -101,10 +103,12 @@ describe('share helper functions', () => {
     it('returns permissions based on a drive item if no graph share roles given', () => {
       const permissions = ['view', 'edit']
       const driveItem = mockDeep<DriveItem>()
-      driveItem.remoteItem.permissions = [
-        { atLibreGraphPermissionsActions: [permissions[0]] },
-        { atLibreGraphPermissionsActions: [permissions[1]] }
-      ]
+      Object.assign(driveItem.remoteItem, {
+        permissions: [
+          { atLibreGraphPermissionsActions: [permissions[0]] },
+          { atLibreGraphPermissionsActions: [permissions[1]] }
+        ]
+      })
 
       const result = getShareResourcePermissions({ driveItem, shareRoles: [] })
 
@@ -116,13 +120,15 @@ describe('share helper functions', () => {
     const driveItem = mockDeep<DriveItem>({ id: 'driveItemId', name: 'driveItemName' })
     const sharedBy = { id: '1', displayName: 'user1' } as Identity
     const sharedWith = { id: '2', displayName: 'user2' } as Identity
-    driveItem.remoteItem.permissions = [
-      {
-        roles: ['1', '2'],
-        invitation: { invitedBy: { user: sharedBy } },
-        grantedToV2: { user: sharedWith }
-      }
-    ]
+    Object.assign(driveItem.remoteItem, {
+      permissions: [
+        {
+          roles: ['1', '2'],
+          invitation: { invitedBy: { user: sharedBy } },
+          grantedToV2: { user: sharedWith }
+        }
+      ]
+    })
 
     const graphRoles = {
       '1': mock<ShareRole>({ id: '1', rolePermissions: [{ allowedResourceActions: ['view'] }] }),
@@ -167,16 +173,18 @@ describe('share helper functions', () => {
 
   describe('buildOutgoingShareResource', () => {
     const driveItem = mockDeep<DriveItem>({ id: 'driveItemId', name: 'driveItemName' })
-    driveItem.parentReference.path = ''
+    Object.assign(driveItem.parentReference, { path: '' })
     const sharedBy = { id: '1', displayName: 'user1' } as Identity
     const sharedWith = { id: '2', displayName: 'user2' } as Identity
-    driveItem.permissions = [
-      {
-        roles: ['1', '2'],
-        invitation: { invitedBy: { user: sharedBy } },
-        grantedToV2: { user: sharedWith }
-      }
-    ]
+    Object.assign(driveItem, {
+      permissions: [
+        {
+          roles: ['1', '2'],
+          invitation: { invitedBy: { user: sharedBy } },
+          grantedToV2: { user: sharedWith }
+        }
+      ]
+    })
     const user = { id: '1', displayName: 'user1' } as User
 
     it('sets ids based on the drive item, its first permission and parent reference', () => {

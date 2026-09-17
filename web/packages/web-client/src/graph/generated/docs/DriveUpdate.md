@@ -23,7 +23,7 @@ Name | Type
 `quota` | [Quota](Quota.md)
 `items` | [Array&lt;DriveItem&gt;](DriveItem.md)
 `root` | [DriveItem](DriveItem.md)
-`special` | [Array&lt;DriveItem&gt;](DriveItem.md)
+`special` | [Array&lt;SpecialDriveItemUpdate&gt;](SpecialDriveItemUpdate.md)
 
 ## Example
 
