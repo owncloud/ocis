@@ -14,28 +14,18 @@ export function shouldResponseTriggerMaintenance(responseStatus: number, request
 }
 
 export interface MaintenanceHandlerOptions {
-  /**
-   * Whether a non-2xx response that is *not* a maintenance signal clears maintenance mode.
-   *
-   * The two clients have always disagreed here, and both behaviours are kept as they were.
-   * The webdav client clears (its axios error interceptor called
-   * `onSetMaintenance(shouldResponseTriggerMaintenance(...))` unconditionally, so any non-503
-   * error reset the flag); `ClientService` does not (its `#handleAxiosError` only ever set the
-   * flag to `true`). The inconsistency predates the fetch migration — unifying it would change
-   * when the maintenance banner disappears, which is a product decision, not a refactor.
-   */
-  clearOnUnrelatedError?: boolean
   /** extra bookkeeping on success, such as recording the last successful request time */
   onSuccess?: () => void
 }
 
 /**
  * Builds the `onResponse` handler that keeps maintenance mode in sync with what the server
- * answers. Only a successful response clears maintenance mode unconditionally.
+ * answers. Only a successful response clears maintenance mode; an unrelated error (a 404, a
+ * transient 500, ...) isn't evidence the server is healthy again, so it leaves the flag as is.
  */
 export function maintenanceResponseHandler(
   onSetMaintenance: (value: boolean) => void,
-  { clearOnUnrelatedError = false, onSuccess }: MaintenanceHandlerOptions = {}
+  { onSuccess }: MaintenanceHandlerOptions = {}
 ) {
   return ({ response, status, requestUrl }: OnResponseArgs): void => {
     if (response?.ok) {
@@ -44,9 +34,8 @@ export function maintenanceResponseHandler(
       return
     }
 
-    const isMaintenance = shouldResponseTriggerMaintenance(status, requestUrl)
-    if (isMaintenance || clearOnUnrelatedError) {
-      onSetMaintenance(isMaintenance)
+    if (shouldResponseTriggerMaintenance(status, requestUrl)) {
+      onSetMaintenance(true)
     }
   }
 }
