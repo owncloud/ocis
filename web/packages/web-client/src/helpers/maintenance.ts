@@ -14,39 +14,33 @@ export function shouldResponseTriggerMaintenance(responseStatus: number, request
 }
 
 export interface MaintenanceHandlerOptions {
-  /**
-   * Whether a non-2xx response that is *not* a maintenance signal clears maintenance mode.
-   *
-   * The two clients have always disagreed here, and both behaviours are kept as they were.
-   * The webdav client clears (its axios error interceptor called
-   * `onSetMaintenance(shouldResponseTriggerMaintenance(...))` unconditionally, so any non-503
-   * error reset the flag); `ClientService` does not (its `#handleAxiosError` only ever set the
-   * flag to `true`). The inconsistency predates the fetch migration — unifying it would change
-   * when the maintenance banner disappears, which is a product decision, not a refactor.
-   */
-  clearOnUnrelatedError?: boolean
   /** extra bookkeeping on success, such as recording the last successful request time */
   onSuccess?: () => void
 }
 
 /**
  * Builds the `onResponse` handler that keeps maintenance mode in sync with what the server
- * answers. Only a successful response clears maintenance mode unconditionally.
+ * answers. Maintenance is the explicit 503 signal, not general unhealthiness, so any other real
+ * response (2xx, 4xx, or a 5xx that isn't the signal) clears it. Only a transport-level failure
+ * (no response at all) is left untouched, since that's not evidence either way.
  */
 export function maintenanceResponseHandler(
   onSetMaintenance: (value: boolean) => void,
-  { clearOnUnrelatedError = false, onSuccess }: MaintenanceHandlerOptions = {}
+  { onSuccess }: MaintenanceHandlerOptions = {}
 ) {
   return ({ response, status, requestUrl }: OnResponseArgs): void => {
-    if (response?.ok) {
-      onSetMaintenance(false)
-      onSuccess?.()
+    if (!response) {
       return
     }
 
-    const isMaintenance = shouldResponseTriggerMaintenance(status, requestUrl)
-    if (isMaintenance || clearOnUnrelatedError) {
-      onSetMaintenance(isMaintenance)
+    if (shouldResponseTriggerMaintenance(status, requestUrl)) {
+      onSetMaintenance(true)
+      return
+    }
+
+    onSetMaintenance(false)
+    if (response.ok) {
+      onSuccess?.()
     }
   }
 }

@@ -63,14 +63,14 @@ describe('ClientService maintenance mode', () => {
     expect(configStore.setMaintenanceMode).toHaveBeenCalledWith(true)
   })
 
-  it('leaves maintenance state untouched for a 404', () => {
+  it('clears maintenance mode for a 404, since the server did answer', () => {
     onResponse({
       response: new Response('{}', { status: 404 }),
       status: 404,
       requestUrl: 'some/url'
     })
 
-    expect(configStore.setMaintenanceMode).not.toHaveBeenCalled()
+    expect(configStore.setMaintenanceMode).toHaveBeenCalledWith(false)
   })
 
   /**
@@ -87,7 +87,8 @@ describe('ClientService maintenance mode', () => {
   /**
    * The allow-list is matched against the relative request url, which is why `onResponse`
    * reports the caller's url rather than `response.url`. The notifications SSE endpoint
-   * answers 503 by design and must not raise the banner.
+   * answers 503 by design and must not raise the banner, so it is treated like any other
+   * non-maintenance response and clears the flag.
    */
   it('exempts an allow-listed endpoint from a 503', () => {
     onResponse({
@@ -96,6 +97,6 @@ describe('ClientService maintenance mode', () => {
       requestUrl: 'ocs/v2.php/apps/notifications/api/v1/notifications/sse'
     })
 
-    expect(configStore.setMaintenanceMode).not.toHaveBeenCalled()
+    expect(configStore.setMaintenanceMode).toHaveBeenCalledWith(false)
   })
 })
