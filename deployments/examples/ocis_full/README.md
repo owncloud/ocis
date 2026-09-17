@@ -23,3 +23,14 @@ Keycloak can be optionally enabled by uncommenting the corresponding variables i
 - `KEYCLOAK=:keycloak.yml`
 
 Note that Keycloak requires the default `ocis` Identity Provider to be disabled, which is automatically handled when the `keycloak.yml` configuration is used.
+
+### oCIS Workflows
+
+[oCIS Workflows](https://github.com/owncloud/ocis-workflows) is an AI-powered file workflow automation extension. It can be optionally enabled by uncommenting the corresponding variables in the `.env` file:
+- `WORKFLOWS=:workflows.yml`
+
+Note that Workflows requires the `ocis-apps` volume provided by the web extensions configuration, so `EXTENSIONS=:web_extensions/extensions.yml` must also be enabled. You also need to set `WORKFLOWS_ENCRYPTION_KEY` (e.g. via `openssl rand -base64 32`) and point `WORKFLOWS_LLM_ENDPOINT` / `WORKFLOWS_LLM_MODEL` / `WORKFLOWS_LLM_API_KEY` at an OpenAI-compatible LLM backend.
+
+To use Workflows *automations* (scheduled or event-triggered runs, rather than only manual "Run now"), the backend mints oCIS app-passwords on the user's behalf, which requires oCIS's `auth-app` service. App-password support (`PROXY_ENABLE_APP_AUTH`) and the `auth-app` service are both off by default, since they widen the oCIS instance's authentication surface, so you must explicitly:
+- Set `PROXY_ENABLE_APP_AUTH=true` in the `.env` file.
+- Add `auth-app` to `START_ADDITIONAL_SERVICES` in the `.env` file, e.g. `START_ADDITIONAL_SERVICES="notifications,auth-app"`.

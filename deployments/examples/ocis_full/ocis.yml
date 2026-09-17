@@ -32,6 +32,8 @@ services:
       OCIS_INSECURE: "${INSECURE:-false}"
       # basic auth (not recommended, but needed for eg. WebDav clients that do not support OpenID Connect)
       PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
+      # app-passwords (needed e.g. for Workflows automations, see workflows.yml)
+      PROXY_ENABLE_APP_AUTH: "${PROXY_ENABLE_APP_AUTH:-false}"
       # admin user password
       IDM_ADMIN_PASSWORD: "${ADMIN_PASSWORD:-admin}" # this overrides the admin password from the configuration file
       # demo users
