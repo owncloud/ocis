@@ -21,6 +21,7 @@ import {
   syntaxHighlighting
 } from '@codemirror/language'
 import { useThemeStore } from '@ownclouders/web-pkg'
+import { useGettext } from 'vue3-gettext'
 
 interface Props {
   modelValue: string
@@ -31,6 +32,8 @@ interface Emits {
 }
 const { modelValue, isReadOnly = false } = defineProps<Props>()
 const emit = defineEmits<Emits>()
+
+const { $gettext } = useGettext()
 
 // The active theme drives the editor's dark/light chrome. `currentTheme` is a ref
 // the dark-mode watch below tracks, so the editor reconfigures on a theme switch.
@@ -95,6 +98,7 @@ onMounted(() => {
         // level, and CodeMirror's default keymap leaves Ctrl+S free so the
         // keystroke propagates to it.
         keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
+        EditorView.contentAttributes.of({ 'aria-label': $gettext('Mermaid diagram source') }),
         themeCompartment.of(buildTheme()),
         readOnlyCompartment.of(buildReadOnly()),
         EditorView.updateListener.of((update) => {

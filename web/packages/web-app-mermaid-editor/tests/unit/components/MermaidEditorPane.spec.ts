@@ -1,4 +1,4 @@
-import { mount } from '@ownclouders/web-test-helpers'
+import { defaultPlugins, mount } from '@ownclouders/web-test-helpers'
 import { nextTick, type Ref } from 'vue'
 import { useThemeStore } from '@ownclouders/web-pkg'
 import MermaidEditorPane from '../../../src/components/MermaidEditorPane.vue'
@@ -60,7 +60,8 @@ function getWrapper(modelValue: string) {
   return {
     wrapper: mount(MermaidEditorPane, {
       props: { modelValue, isReadOnly: false },
-      attachTo: document.body
+      attachTo: document.body,
+      global: { plugins: [...defaultPlugins()] }
     })
   }
 }
