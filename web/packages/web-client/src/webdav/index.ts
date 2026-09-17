@@ -35,7 +35,7 @@ export const webdav = (
 ): WebDAV => {
   const httpClient = new FetchClient({
     ...(headers && { headers }),
-    onResponse: maintenanceResponseHandler(onSetMaintenance, { clearOnUnrelatedError: true })
+    onResponse: maintenanceResponseHandler(onSetMaintenance)
   })
 
   const options = { httpClient, baseUrl: baseURI, headers }
