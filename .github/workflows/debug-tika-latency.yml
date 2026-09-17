@@ -2,6 +2,7 @@ name: Debug Tika Network Latency (k8s)
 
 on:
   workflow_dispatch:
+  pull_request:
 
 env:
   K3D_VERSION: "v5.8.3"
@@ -70,6 +71,7 @@ jobs:
 
       - name: Measure Tika latency (host vs. in-cluster pod)
         run: |
+          set +e
           SEARCH_POD=$(kubectl -n ocis-server get pods -o name | grep '^pod/search-' | head -1 | sed 's#pod/##')
           echo "search pod: $SEARCH_POD"
 
@@ -80,13 +82,13 @@ jobs:
             echo '```'
             echo "-- simple GET /tika x5 --"
             for i in 1 2 3 4 5; do
-              curl -s -o /dev/null -w "attempt $i: total=%{time_total}s connect=%{time_connect}s starttransfer=%{time_starttransfer}s\n" \
-                http://localhost:9998/tika
+              curl -s -S -o /dev/null -w "attempt $i: total=%{time_total}s connect=%{time_connect}s starttransfer=%{time_starttransfer}s\n" \
+                http://localhost:9998/tika || echo "attempt $i FAILED (exit $?)"
             done
             echo "-- PUT sample.txt for extraction x5 --"
             for i in 1 2 3 4 5; do
-              curl -s -o /dev/null -w "attempt $i: total=%{time_total}s connect=%{time_connect}s starttransfer=%{time_starttransfer}s\n" \
-                -T /tmp/sample.txt -H "Accept: text/plain" http://localhost:9998/tika
+              curl -s -S -o /dev/null -w "attempt $i: total=%{time_total}s connect=%{time_connect}s starttransfer=%{time_starttransfer}s\n" \
+                -T /tmp/sample.txt -H "Accept: text/plain" http://localhost:9998/tika || echo "attempt $i FAILED (exit $?)"
             done
             echo '```'
             echo
@@ -95,15 +97,14 @@ jobs:
             echo "-- simple GET /tika x5 --"
             for i in 1 2 3 4 5; do
               kubectl -n ocis-server exec "$SEARCH_POD" -- \
-                curl -s -o /dev/null -w "attempt $i: total=%{time_total}s connect=%{time_connect}s starttransfer=%{time_starttransfer}s\n" \
-                http://tika:9998/tika
+                curl -s -S -o /dev/null -w "attempt $i: total=%{time_total}s connect=%{time_connect}s starttransfer=%{time_starttransfer}s\n" \
+                http://tika:9998/tika || echo "attempt $i FAILED (exit $?)"
             done
-            echo "-- PUT sample.txt for extraction x5 --"
-            kubectl -n ocis-server exec "$SEARCH_POD" -- sh -c "echo 'sample file' > /tmp/sample.txt"
+            echo "-- PUT sample.txt for extraction x5 (streamed via stdin, no file written in-pod) --"
             for i in 1 2 3 4 5; do
-              kubectl -n ocis-server exec "$SEARCH_POD" -- \
-                curl -s -o /dev/null -w "attempt $i: total=%{time_total}s connect=%{time_connect}s starttransfer=%{time_starttransfer}s\n" \
-                -T /tmp/sample.txt -H "Accept: text/plain" http://tika:9998/tika
+              cat /tmp/sample.txt | kubectl -n ocis-server exec -i "$SEARCH_POD" -- \
+                curl -s -S -o /dev/null -w "attempt $i: total=%{time_total}s connect=%{time_connect}s starttransfer=%{time_starttransfer}s\n" \
+                -T - -H "Accept: text/plain" http://tika:9998/tika || echo "attempt $i FAILED (exit $?)"
             done
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
