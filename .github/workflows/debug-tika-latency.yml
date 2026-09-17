@@ -1,0 +1,113 @@
+name: Debug Tika Network Latency (k8s)
+
+on:
+  workflow_dispatch:
+
+env:
+  K3D_VERSION: "v5.8.3"
+  HELM_VERSION: "v3.18.4"
+
+jobs:
+  tika-latency:
+    name: tika-latency-debug
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Download k3d
+        run: |
+          curl -L \
+            -o k3d \
+            https://github.com/k3d-io/k3d/releases/download/${{ env.K3D_VERSION }}/k3d-linux-amd64
+          echo "dbaa79a76ace7f4ca230a1ff41dc7d8a5036a8ad0309e9c54f9bf3836dbe853e k3d" | sha256sum --check
+          chmod +x k3d
+          sudo mv k3d /usr/local/bin/
+          k3d version
+
+      - name: Install Helm
+        run: |
+          curl -fsSL -o helm-${{ env.HELM_VERSION }}-linux-amd64.tar.gz https://get.helm.sh/helm-${{ env.HELM_VERSION }}-linux-amd64.tar.gz
+          tar -zxvf helm-${{ env.HELM_VERSION }}-linux-amd64.tar.gz
+          sudo mv linux-amd64/helm /usr/local/bin/helm
+          helm version --short
+
+      - name: Prepare hosts
+        run: echo "127.0.0.1 ocis-server tika" | sudo tee -a /etc/hosts
+
+      - name: Spin up K3d Cluster
+        run: make -C tests/config/k8s create-cluster
+
+      - name: Prepare Helm Charts (Tika enabled)
+        env:
+          ENABLE_TIKA: "true"
+        run: |
+          cd tests/config/k8s
+          make prepare-charts
+
+      - name: Start Tika + expose into cluster
+        run: |
+          docker run -d \
+            -p 9998:9998 \
+            --name tika \
+            apache/tika:3.2.2.0-full
+          bash tests/config/k8s/expose-external-svc.sh tika:9998
+          # give Tika a moment to finish booting before we start timing it
+          for i in {1..30}; do
+            curl -sf http://localhost:9998/tika > /dev/null && break
+            sleep 2
+          done
+
+      - name: Deploy oCIS
+        run: make -C tests/config/k8s deploy-ocis
+
+      - name: Wait for search deployment
+        run: |
+          kubectl -n ocis-server wait --for=condition=Available deployment/search --timeout=5m
+          kubectl -n ocis-server get pods -l app=search -o wide || true
+
+      - name: Measure Tika latency (host vs. in-cluster pod)
+        run: |
+          SEARCH_POD=$(kubectl -n ocis-server get pods -o name | grep '^pod/search-' | head -1 | sed 's#pod/##')
+          echo "search pod: $SEARCH_POD"
+
+          echo "sample file" > /tmp/sample.txt
+
+          {
+            echo "### Baseline: runner host -> Tika (no cluster hop, localhost:9998)"
+            echo '```'
+            echo "-- simple GET /tika x5 --"
+            for i in 1 2 3 4 5; do
+              curl -s -o /dev/null -w "attempt $i: total=%{time_total}s connect=%{time_connect}s starttransfer=%{time_starttransfer}s\n" \
+                http://localhost:9998/tika
+            done
+            echo "-- PUT sample.txt for extraction x5 --"
+            for i in 1 2 3 4 5; do
+              curl -s -o /dev/null -w "attempt $i: total=%{time_total}s connect=%{time_connect}s starttransfer=%{time_starttransfer}s\n" \
+                -T /tmp/sample.txt -H "Accept: text/plain" http://localhost:9998/tika
+            done
+            echo '```'
+            echo
+            echo "### In-cluster: search pod -> Tika (via expose-external-svc.sh path, tika:9998)"
+            echo '```'
+            echo "-- simple GET /tika x5 --"
+            for i in 1 2 3 4 5; do
+              kubectl -n ocis-server exec "$SEARCH_POD" -- \
+                curl -s -o /dev/null -w "attempt $i: total=%{time_total}s connect=%{time_connect}s starttransfer=%{time_starttransfer}s\n" \
+                http://tika:9998/tika
+            done
+            echo "-- PUT sample.txt for extraction x5 --"
+            kubectl -n ocis-server exec "$SEARCH_POD" -- sh -c "echo 'sample file' > /tmp/sample.txt"
+            for i in 1 2 3 4 5; do
+              kubectl -n ocis-server exec "$SEARCH_POD" -- \
+                curl -s -o /dev/null -w "attempt $i: total=%{time_total}s connect=%{time_connect}s starttransfer=%{time_starttransfer}s\n" \
+                -T /tmp/sample.txt -H "Accept: text/plain" http://tika:9998/tika
+            done
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Cleanup
+        if: always()
+        run: make -C tests/config/k8s cleanup
