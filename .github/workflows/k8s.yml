@@ -60,7 +60,7 @@ jobs:
           - suite: apiSharingNgItemLinkShare
           - suite: apiSharingNgLinkShareManagement
           - suite: apiAuthApp
-          # - suite: apiAntivirus
+          - suite: apiAntivirus
           - suite: apiOcm
           # - suite: apiCollaboration
           - suite: apiVault
