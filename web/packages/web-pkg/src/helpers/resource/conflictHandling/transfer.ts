@@ -102,11 +102,26 @@ export class ResourceTransfer extends ConflictDialog {
     const params = { count: errorCount.toString() }
     switch (transferType) {
       case TransferType.COPY:
-        return this.$gettext('Failed to copy %{count} resources', params)
+        return this.$ngettext(
+          'Failed to copy %{count} resource',
+          'Failed to copy %{count} resources',
+          errorCount,
+          params
+        )
       case TransferType.DUPLICATE:
-        return this.$gettext('Failed to duplicate %{count} resources', params)
+        return this.$ngettext(
+          'Failed to duplicate %{count} resource',
+          'Failed to duplicate %{count} resources',
+          errorCount,
+          params
+        )
       default:
-        return this.$gettext('Failed to move %{count} resources', params)
+        return this.$ngettext(
+          'Failed to move %{count} resource',
+          'Failed to move %{count} resources',
+          errorCount,
+          params
+        )
     }
   }
 

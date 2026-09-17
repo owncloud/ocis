@@ -23,6 +23,14 @@ const interpolate = (msgid: string, params: Record<string, unknown> = {}) =>
     msgid
   )
 
+/** Picks the form English asks for, so assertions read like the English messages do. */
+const interpolatePlural = (
+  singular: string,
+  plural: string,
+  count: number,
+  params: Record<string, unknown> = {}
+) => interpolate(count === 1 ? singular : plural, params)
+
 const clientServiceMock = mockDeep<ClientService>()
 let resourcesToMove: Resource[]
 let sourceSpace: SpaceResource
@@ -157,7 +165,7 @@ describe('resourcesTransfer', () => {
         computed(() => mock<Resource>()),
         clientServiceMock,
         interpolate,
-        vi.fn()
+        interpolatePlural
       )
 
     const projectSpace = () =>
