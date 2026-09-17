@@ -62,11 +62,38 @@ describe('maintenanceResponseHandler', () => {
     expect(onSetMaintenance).toHaveBeenCalledWith(true)
   })
 
-  it('leaves maintenance mode untouched on an unrelated error', () => {
+  it('clears maintenance mode on an unrelated error, since the server did answer', () => {
     const onSetMaintenance = vi.fn()
     const handler = maintenanceResponseHandler(onSetMaintenance)
 
     handler(args({ response: { ok: false } as Response, status: 404 }))
+    expect(onSetMaintenance).toHaveBeenCalledWith(false)
+
+    onSetMaintenance.mockClear()
+    handler(args({ response: { ok: false } as Response, status: 500 }))
+    expect(onSetMaintenance).toHaveBeenCalledWith(false)
+  })
+
+  it('clears maintenance mode for a 503 on an excluded endpoint', () => {
+    const onSetMaintenance = vi.fn()
+    const handler = maintenanceResponseHandler(onSetMaintenance)
+
+    handler(
+      args({
+        response: { ok: false } as Response,
+        status: 503,
+        requestUrl: 'ocs/v2.php/apps/notifications/api/v1/notifications/sse'
+      })
+    )
+
+    expect(onSetMaintenance).toHaveBeenCalledWith(false)
+  })
+
+  it('leaves maintenance mode untouched on a transport failure', () => {
+    const onSetMaintenance = vi.fn()
+    const handler = maintenanceResponseHandler(onSetMaintenance)
+
+    handler(args({ response: null, status: 500 }))
 
     expect(onSetMaintenance).not.toHaveBeenCalled()
   })

@@ -20,22 +20,27 @@ export interface MaintenanceHandlerOptions {
 
 /**
  * Builds the `onResponse` handler that keeps maintenance mode in sync with what the server
- * answers. Only a successful response clears maintenance mode; an unrelated error (a 404, a
- * transient 500, ...) isn't evidence the server is healthy again, so it leaves the flag as is.
+ * answers. Maintenance is the explicit 503 signal, not general unhealthiness, so any other real
+ * response (2xx, 4xx, or a 5xx that isn't the signal) clears it. Only a transport-level failure
+ * (no response at all) is left untouched, since that's not evidence either way.
  */
 export function maintenanceResponseHandler(
   onSetMaintenance: (value: boolean) => void,
   { onSuccess }: MaintenanceHandlerOptions = {}
 ) {
   return ({ response, status, requestUrl }: OnResponseArgs): void => {
-    if (response?.ok) {
-      onSetMaintenance(false)
-      onSuccess?.()
+    if (!response) {
       return
     }
 
     if (shouldResponseTriggerMaintenance(status, requestUrl)) {
       onSetMaintenance(true)
+      return
+    }
+
+    onSetMaintenance(false)
+    if (response.ok) {
+      onSuccess?.()
     }
   }
 }

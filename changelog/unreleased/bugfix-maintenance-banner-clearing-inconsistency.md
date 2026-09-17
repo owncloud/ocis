@@ -7,8 +7,9 @@ while the other client only cleared it on a genuine successful response. Whether
 banner disappeared during real maintenance could therefore depend on which request
 happened to run last.
 
-Both clients now clear the maintenance banner only on an actual successful response,
-so an unrelated error no longer hides the banner while the server is still in
-maintenance.
+Both clients now agree: the maintenance banner is only raised by the explicit
+maintenance response, and any other real response from the server clears it, since
+that is not the same as general unhealthiness. Only a transport-level failure, where
+no response is received at all, leaves the banner state untouched.
 
 https://github.com/owncloud/ocis/pull/12966
