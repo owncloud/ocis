@@ -13,7 +13,7 @@ images and needs no further permissions. Because the image bytes are now part
 of the document, two limits keep documents small enough to stay fully
 searchable: a maximum size per image, and a budget for the total size of all
 images in one document. An image that exceeds either limit is rejected with a
-message naming the actual size and the limit, instead of failing silently.
+notification naming the image and the limit, instead of failing silently.
 
 Both limits are configurable through the text editor's app configuration as
 `maxImageSize` and `maxDocumentImageSize`, given in bytes and defaulting to
@@ -23,5 +23,5 @@ The editor's "Crop And Upload" entry is no longer offered. Cropping was not part
 of the reported problem, so it stays out until users ask for it, and images are
 inlined exactly as they were picked.
 
-https://github.com/owncloud/ocis/pull/12955
+https://github.com/owncloud/ocis/pull/12967
 https://github.com/owncloud/web/issues/12407
