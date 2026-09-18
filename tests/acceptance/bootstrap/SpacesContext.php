@@ -2822,8 +2822,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $memberUser,
 	): void {
-		$dateTime = new DateTime('yesterday');
-		$rows['expireDate'] = $dateTime->format('Y-m-d\\TH:i:sP');
+		$rows['expireDate'] = $this->featureContext->formatExpiryDateTime('Y-m-d\\TH:i:sP');
 		$rows['shareWith'] = $memberUser;
 		$rows['shareType'] = ($shareType === 'user') ? 7 : 8;
 		$this->featureContext->setResponse($this->shareSpace($user, $spaceName, $rows));
@@ -5055,9 +5054,16 @@ class SpacesContext implements Context {
 			) {
 				$foundRoleInResponse = true;
 				if ($expirationDate !== null && isset($permission['expirationDateTime'])) {
+					// oCIS serialises the expiration in the server's local timezone, so the date
+					// part of the raw string is the server's calendar day and can differ from the
+					// day that was sent. Normalise to UTC first: the features expect the UTC date
+					// of the value they sent, and a fixed zone makes this server-independent.
+					$actualExpirationDate = (new DateTime($permission['expirationDateTime']))
+						->setTimezone(new DateTimeZone('UTC'))
+						->format('Y-m-d');
 					Assert::assertEquals(
 						$expirationDate,
-						(preg_split("/[\sT]+/", $permission['expirationDateTime']))[0],
+						$actualExpirationDate,
 						"$expirationDate is different in the response",
 					);
 				}
