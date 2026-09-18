@@ -141,7 +141,9 @@ jobs:
           make ci-golangci-lint                          > /tmp/golangci-lint.log      2>&1 & PIDS=($!)
           ( ENABLE_VIPS=true make -C ocis build-debug \
            && mv ocis/bin/ocis-debug ocis/bin/ocis )     > /tmp/ocis-build.log 2>&1 & PIDS+=($!)
-          make test                                      > /tmp/unit-tests.log         2>&1 & PIDS+=($!)
+           make test                                      > /tmp/unit-tests.log         2>&1 & PIDS+=($!)
+          # vips-tagged files live only under thumbnails; scoped run, no coverprofile.
+          go test -v -tags 'enable_vips' ./services/thumbnails/... > /tmp/unit-tests-vips.log 2>&1 & PIDS+=($!)
           GOWORK=off make -C tests/ociswrapper build     > /tmp/ociswrapper-build.log  2>&1 & PIDS+=($!)
 
           FAILED=0
@@ -158,6 +160,7 @@ jobs:
           echo "=== ocis build ==="        && cat /tmp/ocis-build.log
           echo "=== ociswrapper build ===" && cat /tmp/ociswrapper-build.log
           echo "=== unit tests ==="        && cat /tmp/unit-tests.log
+          echo "=== vips unit tests ==="   && cat /tmp/unit-tests-vips.log
 
           exit $FAILED
 
