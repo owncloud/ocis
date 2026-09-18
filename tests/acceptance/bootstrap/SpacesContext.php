@@ -2270,7 +2270,20 @@ class SpacesContext implements Context {
 		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
 		$fullUrl = "$baseUrl/$davPath/$encodedName";
 
-		$this->featureContext->setResponse($this->copyFilesAndFoldersRequest($user, $fullUrl, $headers));
+		// With OCIS_ASYNC_UPLOADS=true in CI, file may still be in postprocessing while copying it.
+		// And the copy operation just returns 500 status code
+		// So retrying the copy operation
+		$retried = 0;
+		do {
+			$response = $this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
+			if ($response->getStatusCode() !== 500) {
+				break;
+			}
+			$retried++;
+			\sleep(1);
+		} while ($retried < STANDARD_RETRY_COUNT);
+
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
