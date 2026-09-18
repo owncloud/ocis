@@ -85,7 +85,13 @@ func New(m map[string]interface{}, stream events.Stream, log *zerolog.Logger) (s
 		return nil, fmt.Errorf("unknown metadata backend %s, only 'messagepack' or 'xattrs' (default) supported", o.MetadataBackend)
 	}
 
-	trashbin, err := trashbin.New(o, lu, log)
+	permissionsSelector, err := pool.PermissionsSelector(o.PermissionsSVC, pool.WithTLSMode(o.PermTLSMode))
+	if err != nil {
+		return nil, err
+	}
+	p := permissions.NewPermissions(node.NewPermissions(lu), permissionsSelector)
+
+	trashbin, err := trashbin.New(o, p, lu, log)
 	if err != nil {
 		return nil, err
 	}
@@ -118,13 +124,6 @@ func New(m map[string]interface{}, stream events.Stream, log *zerolog.Logger) (s
 	if err != nil {
 		return nil, err
 	}
-
-	permissionsSelector, err := pool.PermissionsSelector(o.PermissionsSVC, pool.WithTLSMode(o.PermTLSMode))
-	if err != nil {
-		return nil, err
-	}
-
-	p := permissions.NewPermissions(node.NewPermissions(lu), permissionsSelector)
 
 	aspects := aspects.Aspects{
 		Lookup:            lu,
