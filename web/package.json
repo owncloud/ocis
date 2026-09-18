@@ -39,6 +39,7 @@
     "@babel/preset-env": "7.28.5",
     "@babel/register": "7.28.3",
     "@noble/hashes": "2.0.1",
+    "@nx/vitest": "23.2.1",
     "@ownclouders/babel-preset": "workspace:*",
     "@ownclouders/eslint-config": "workspace:*",
     "@ownclouders/prettier-config": "workspace:*",
