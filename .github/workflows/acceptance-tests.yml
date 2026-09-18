@@ -880,7 +880,9 @@ jobs:
           merge-multiple: true
 
       - name: Convert coverage counters to profile
-        run: go tool covdata textfmt -i=${{ env.GOCOVERDIR }} -o=coverage.out
+        run: |
+          mkdir -p "$GOCOVERDIR"
+          go tool covdata textfmt -i=${{ env.GOCOVERDIR }} -o=coverage.out
 
       - name: Publish coverage summary
         run: |
