@@ -12,6 +12,21 @@
       "options": {
         "testMode": "run"
       }
+    },
+    "@nx/eslint/plugin",
+    {
+      "plugin": "@nx/vite/plugin",
+      "exclude": ["vite.config.ts", "vite.config.common.ts", "vite.cern.config.ts"],
+      "options": {
+        "buildTargetName": "nx-vite-build-unused",
+        "serveTargetName": "nx-vite-serve-unused",
+        "devTargetName": "nx-vite-dev-unused",
+        "previewTargetName": "nx-vite-preview-unused",
+        "serveStaticTargetName": "nx-vite-serve-static-unused",
+        "watchDepsTargetName": "nx-vite-watch-deps-unused",
+        "buildDepsTargetName": "nx-vite-build-deps-unused",
+        "typecheckTargetName": "typecheck"
+      }
     }
   ],
   "targetDefaults": {
