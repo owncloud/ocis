@@ -22,7 +22,6 @@
   "main": "src/index.ts",
   "private": false,
   "scripts": {
-    "lint": "lint:stylelint",
     "lint:stylelint": "stylelint './src/styles/**/*.scss' --cache",
     "tokens": "node build/build-tokens.js",
     "tokens:w": "onchange -i \"./src/tokens/**/*.json\" -- npm run tokens",
