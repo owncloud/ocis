@@ -39,7 +39,7 @@ jobs:
           - suite: apiGraphUser
           - suite: apiGraph
           - suite: apiGraphGroup
-          # - suite: apiSpaces
+          - suite: apiSpaces
           - suite: apiSpacesShares
           - suite: apiSpacesDavOperation
           - suite: apiDownloads
