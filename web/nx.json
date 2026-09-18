@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "sharedGlobals": []
+  },
+  "targetDefaults": {
+    "test:unit": {
+      "cache": true,
+      "inputs": ["default", "^default"],
+      "outputs": []
+    }
+  }
+}
