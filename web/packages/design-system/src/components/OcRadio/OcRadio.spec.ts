@@ -1,5 +1,5 @@
 import OcRadio from './OcRadio.vue'
-import { PartialComponentProps, mount } from '@ownclouders/web-test-helpers'
+import { PartialComponentProps, mount } from '@ownclouders/web-test-helpers-core'
 import { AvailableSizeType } from '../../helpers'
 
 describe('OcRadio', () => {

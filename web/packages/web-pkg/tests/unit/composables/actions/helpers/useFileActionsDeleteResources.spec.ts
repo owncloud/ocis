@@ -1,11 +1,8 @@
 import { useFileActionsDeleteResources } from '../../../../../src/composables/actions'
 import { mock, mockDeep } from 'vitest-mock-extended'
 import { FolderResource, Resource, SpaceResource, TrashResource } from '@ownclouders/web-client'
-import {
-  defaultComponentMocks,
-  getComposableWrapper,
-  useGetMatchingSpaceMock
-} from '@ownclouders/web-test-helpers'
+import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
+import { defaultComponentMocks, useGetMatchingSpaceMock } from '../../../../../src/testing'
 import { useDeleteWorker } from '../../../../../src/composables/webWorkers/deleteWorker'
 import { useRestoreWorker } from '../../../../../src/composables/webWorkers/restoreWorker'
 import { useGetMatchingSpace } from '../../../../../src/composables/spaces/useGetMatchingSpace'

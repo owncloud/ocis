@@ -1,4 +1,4 @@
-import { shallowMount, mount } from '@ownclouders/web-test-helpers'
+import { shallowMount, mount } from '@ownclouders/web-test-helpers-core'
 import Drop from './OcDrop.vue'
 import { getSizeClass } from '../../helpers'
 

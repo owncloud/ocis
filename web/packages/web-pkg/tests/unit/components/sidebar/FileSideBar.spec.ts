@@ -1,12 +1,8 @@
 import FileSideBar from '../../../../src/components/SideBar/FileSideBar.vue'
 import { CollaboratorShare, LinkShare, Resource, SpaceResource } from '@ownclouders/web-client'
 import { mock } from 'vitest-mock-extended'
-import {
-  defaultComponentMocks,
-  defaultPlugins,
-  RouteLocation,
-  shallowMount
-} from '@ownclouders/web-test-helpers'
+import { RouteLocation, shallowMount } from '@ownclouders/web-test-helpers-core'
+import { defaultComponentMocks, defaultPlugins } from '../../../../src/testing'
 import { defineComponent, ref } from 'vue'
 import { useSelectedResources } from '../../../../src/composables/selection'
 import {

@@ -2,12 +2,12 @@ import { mock } from 'vitest-mock-extended'
 import { ResourcePreview, SearchResultValue } from '../../../../src/components'
 import { SpaceResource } from '@ownclouders/web-client'
 import { useGetMatchingSpace } from '../../../../src/composables/spaces/useGetMatchingSpace'
+import { mount } from '@ownclouders/web-test-helpers-core'
 import {
   defaultComponentMocks,
   defaultPlugins,
-  mount,
   useGetMatchingSpaceMock
-} from '@ownclouders/web-test-helpers'
+} from '../../../../src/testing'
 import { useFileActions } from '../../../../src/composables/actions'
 import { CapabilityStore } from '../../../../src/composables/piniaStores'
 import ResourceListItem from '../../../../src/components/FilesList/ResourceListItem.vue'

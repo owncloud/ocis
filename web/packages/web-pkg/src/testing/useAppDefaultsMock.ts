@@ -1,6 +1,6 @@
 import { mock } from 'vitest-mock-extended'
 import { ref } from 'vue'
-import { FileContext, useAppDefaults, AppConfigObject } from '@ownclouders/web-pkg'
+import { FileContext, useAppDefaults, AppConfigObject } from '../index'
 import { FileResource, Resource } from '@ownclouders/web-client'
 import { GetFileContentsResponse } from '@ownclouders/web-client/webdav'
 

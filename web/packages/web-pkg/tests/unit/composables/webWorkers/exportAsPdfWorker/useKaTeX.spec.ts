@@ -1,4 +1,4 @@
-import { getComposableWrapper } from '@ownclouders/web-test-helpers'
+import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import katex from 'katex'
 import { useKaTeX } from '../../../../../src/composables/webWorkers/exportAsPdfWorker/useKaTeX'
 import html2canvas from 'html2canvas'

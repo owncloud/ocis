@@ -1,4 +1,4 @@
-import { getComposableWrapper } from '@ownclouders/web-test-helpers'
+import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import { useMessages } from '../../../../src/composables/piniaStores'
 import { createPinia, setActivePinia } from 'pinia'
 

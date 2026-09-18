@@ -1,11 +1,7 @@
 import ItemFilterInline from '../../../../src/components/Filters/ItemFilterInline.vue'
 import { InlineFilterOption } from '../../../../src/components/Filters/types'
-import {
-  defaultComponentMocks,
-  defaultPlugins,
-  mount,
-  PartialComponentProps
-} from '@ownclouders/web-test-helpers'
+import { mount, PartialComponentProps } from '@ownclouders/web-test-helpers-core'
+import { defaultComponentMocks, defaultPlugins } from '../../../../src/testing'
 import { queryItemAsString } from '../../../../src/composables/appDefaults'
 import { mock } from 'vitest-mock-extended'
 

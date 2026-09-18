@@ -1,10 +1,7 @@
 import { useFileActionsRestore } from '../../../../../src/composables/actions'
 import { mock } from 'vitest-mock-extended'
-import {
-  defaultComponentMocks,
-  getComposableWrapper,
-  RouteLocation
-} from '@ownclouders/web-test-helpers'
+import { getComposableWrapper, RouteLocation } from '@ownclouders/web-test-helpers-core'
+import { defaultComponentMocks } from '../../../../../src/testing'
 import { useMessages, useResourcesStore } from '../../../../../src/composables/piniaStores'
 import { unref } from 'vue'
 import { HttpError, Resource, TrashResource } from '@ownclouders/web-client'

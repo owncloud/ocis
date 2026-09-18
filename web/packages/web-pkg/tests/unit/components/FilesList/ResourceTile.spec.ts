@@ -1,4 +1,5 @@
-import { defaultPlugins, shallowMount } from '@ownclouders/web-test-helpers'
+import { shallowMount } from '@ownclouders/web-test-helpers-core'
+import { defaultPlugins } from '../../../../src/testing'
 import { RouteLocationRaw } from 'vue-router'
 import { SpaceResource, Resource } from '@ownclouders/web-client'
 import ResourceTile from '../../../../src/components/FilesList/ResourceTile.vue'

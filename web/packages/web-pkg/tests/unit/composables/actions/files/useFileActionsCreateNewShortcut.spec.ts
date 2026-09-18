@@ -1,10 +1,7 @@
 import { mock } from 'vitest-mock-extended'
 import { ref, unref } from 'vue'
-import {
-  defaultComponentMocks,
-  RouteLocation,
-  getComposableWrapper
-} from '@ownclouders/web-test-helpers'
+import { RouteLocation, getComposableWrapper } from '@ownclouders/web-test-helpers-core'
+import { defaultComponentMocks } from '../../../../../src/testing'
 import { useFileActionsCreateNewShortcut, useModals } from '../../../../../src/composables'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 

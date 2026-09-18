@@ -1,4 +1,4 @@
-import { getComposableWrapper } from '@ownclouders/web-test-helpers'
+import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import { useCapabilityStore } from '../../../../src/composables/piniaStores'
 import { createPinia, setActivePinia } from 'pinia'
 import { Capabilities } from '@ownclouders/web-client/ocs'

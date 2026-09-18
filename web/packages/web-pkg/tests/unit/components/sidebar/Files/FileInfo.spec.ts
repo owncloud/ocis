@@ -1,10 +1,6 @@
 import FileInfo from '../../../../../src/components/SideBar/Files/FileInfo.vue'
-import {
-  defaultComponentMocks,
-  defaultPlugins,
-  shallowMount,
-  RouteLocation
-} from '@ownclouders/web-test-helpers'
+import { shallowMount, RouteLocation } from '@ownclouders/web-test-helpers-core'
+import { defaultComponentMocks, defaultPlugins } from '../../../../../src/testing'
 import { mock } from 'vitest-mock-extended'
 import { Resource } from '@ownclouders/web-client'
 

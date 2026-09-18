@@ -1,28 +1,29 @@
-import DesignSystem from '@ownclouders/design-system'
 import { createGettext } from 'vue3-gettext'
 import { App, Plugin, h } from 'vue'
 import { abilitiesPlugin } from '@casl/vue'
 import { createMongoAbility } from '@casl/ability'
 import { AbilityRule } from '@ownclouders/web-client'
-import { PiniaMockOptions, createMockStore } from './mocks'
+import { getDesignSystemPlugin, getMockStoreFactory } from './registry'
 
-export interface DefaultPluginsOptions {
+// Generic over the pinia mock-store options type so this package never has to name
+// `PiniaMockOptions` (defined in @ownclouders/web-pkg) - see registry.ts for why.
+export interface DefaultPluginsOptions<TPiniaOptions = Record<string, unknown>> {
   abilities?: AbilityRule[]
   designSystem?: boolean
   gettext?: boolean
   pinia?: boolean
-  piniaOptions?: PiniaMockOptions
+  piniaOptions?: TPiniaOptions
   getTextDefaultLanguage?: string
 }
 
-export const defaultPlugins = ({
+export const defaultPlugins = <TPiniaOptions = Record<string, unknown>>({
   abilities = [],
   designSystem = true,
   gettext = true,
   pinia = true,
-  piniaOptions = {},
+  piniaOptions = {} as TPiniaOptions,
   getTextDefaultLanguage = 'en'
-}: DefaultPluginsOptions = {}): Plugin[] => {
+}: DefaultPluginsOptions<TPiniaOptions> = {}): Plugin[] => {
   const plugins = []
 
   plugins.push({
@@ -32,7 +33,7 @@ export const defaultPlugins = ({
   })
 
   if (designSystem) {
-    plugins.push(DesignSystem as unknown as Plugin)
+    plugins.push(getDesignSystemPlugin())
   }
 
   if (gettext) {
@@ -42,7 +43,7 @@ export const defaultPlugins = ({
   }
 
   if (pinia) {
-    plugins.push(createMockStore(piniaOptions))
+    plugins.push(getMockStoreFactory()(piniaOptions))
   }
 
   plugins.push({

@@ -10,7 +10,7 @@ import {
   Modal,
   OptionsConfig,
   WebThemeType
-} from '@ownclouders/web-pkg'
+} from '../index'
 import {
   CollaboratorShare,
   LinkShare,

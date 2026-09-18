@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { getComposableWrapper } from '@ownclouders/web-test-helpers'
+import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import { mock } from 'vitest-mock-extended'
 import { buildSpaceImageResource, Resource, SpaceResource } from '@ownclouders/web-client'
 import { useLoadPreview } from '../../../../src/composables/resources'

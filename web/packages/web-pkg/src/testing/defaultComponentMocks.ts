@@ -6,10 +6,10 @@ import {
   PasswordPolicyService,
   PreviewService,
   UppyService
-} from '@ownclouders/web-pkg'
+} from '../index'
 import { Router, RouteLocationNormalizedLoaded, RouteLocationRaw } from 'vue-router'
 import { computed } from 'vue'
-import { writable } from '../helpers'
+import { writable } from '@ownclouders/web-test-helpers-core'
 
 export interface ComponentMocksOptions {
   currentRoute?: RouteLocationNormalizedLoaded

@@ -1,5 +1,5 @@
 import OcLoader from './OcLoader.vue'
-import { mount } from '@ownclouders/web-test-helpers'
+import { mount } from '@ownclouders/web-test-helpers-core'
 
 const selectors = {
   label: '[data-testid="oc-loader-label"]'

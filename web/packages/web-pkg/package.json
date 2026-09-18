@@ -25,6 +25,11 @@
         "import": "./dist/web-pkg.js",
         "require": "./dist/web-pkg.umd.cjs",
         "types": "./dist/types/index.d.ts"
+      },
+      "./src/testing": {
+        "import": "./dist/web-pkg-testing.js",
+        "require": "./dist/web-pkg-testing.umd.cjs",
+        "types": "./dist/types/testing/index.d.ts"
       }
     }
   },
@@ -41,7 +46,9 @@
     "@microsoft/fetch-event-source": "^2.0.1",
     "@ownclouders/design-system": "workspace:^",
     "@ownclouders/web-client": "workspace:^",
+    "@ownclouders/web-test-helpers-core": "workspace:^",
     "@pdf-lib/fontkit": "^1.1.1",
+    "@pinia/testing": "^1.0.3",
     "@sentry/vue": "10.51.0",
     "@uppy/core": "5.2.0",
     "@uppy/drop-target": "4.1.0",
@@ -76,13 +83,13 @@
     "qs": "^6.15.2",
     "screenfull": "^6.0.2",
     "uuid": "^14.0.0",
+    "vitest-mock-extended": "3.1.1",
     "vue-concurrency": "^5.0.3",
     "vue-router": "^5.0.6",
     "vue3-gettext": "^4.0.1",
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@ownclouders/web-test-helpers": "workspace:^",
     "@types/lodash-es": "4.17.12",
     "@vitest/web-worker": "4.1.5",
     "clean-publish": "6.0.1",

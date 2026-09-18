@@ -1,10 +1,6 @@
 import SaveAsModal from '../../../../src/components/Modals/SaveAsModal.vue'
-import {
-  defaultComponentMocks,
-  defaultPlugins,
-  nextTicks,
-  shallowMount
-} from '@ownclouders/web-test-helpers'
+import { nextTicks, shallowMount } from '@ownclouders/web-test-helpers-core'
+import { defaultComponentMocks, defaultPlugins } from '../../../../src/testing'
 import { mock, mockDeep } from 'vitest-mock-extended'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 import { ListFilesResult } from '@ownclouders/web-client/webdav'

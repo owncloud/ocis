@@ -1,5 +1,6 @@
 import NoContentMessage from '../../../src/components/NoContentMessage.vue'
-import { defaultPlugins, shallowMount } from '@ownclouders/web-test-helpers'
+import { shallowMount } from '@ownclouders/web-test-helpers-core'
+import { defaultPlugins } from '../../../src/testing'
 
 describe('NoContentMessage', () => {
   describe('icon prop', () => {

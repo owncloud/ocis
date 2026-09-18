@@ -1,4 +1,4 @@
-import { shallowMount } from '@ownclouders/web-test-helpers'
+import { shallowMount } from '@ownclouders/web-test-helpers-core'
 
 import PageSize from './OcPageSize.vue'
 

@@ -1,5 +1,5 @@
 import { Key, Modifier, useKeyboardActions } from '../../../../src/composables/keyboardActions'
-import { getComposableWrapper } from '@ownclouders/web-test-helpers'
+import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import { ref } from 'vue'
 
 describe('useKeyboardActions', () => {

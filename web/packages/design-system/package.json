@@ -108,7 +108,7 @@
     "@babel/plugin-transform-runtime": "7.28.5",
     "@babel/preset-env": "7.28.5",
     "@babel/runtime": "7.28.4",
-    "@ownclouders/web-test-helpers": "workspace:*",
+    "@ownclouders/web-test-helpers-core": "workspace:*",
     "@vitejs/plugin-vue": "6.0.1",
     "autoprefixer": "10.4.22",
     "babel-core": "7.0.0-bridge.0",

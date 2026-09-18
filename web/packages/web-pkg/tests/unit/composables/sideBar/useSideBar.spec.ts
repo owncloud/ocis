@@ -1,7 +1,7 @@
 import { EventBus } from '../../../../src/services/eventBus'
 import { SideBarEventTopics, useSideBar } from '../../../../src/composables/sideBar'
 import { unref, ref } from 'vue'
-import { getComposableWrapper } from '@ownclouders/web-test-helpers'
+import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import * as localStorage from '../../../../src/composables/localStorage'
 
 const localStorageSpy = vi

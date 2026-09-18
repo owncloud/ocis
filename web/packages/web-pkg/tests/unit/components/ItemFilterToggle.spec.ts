@@ -1,5 +1,6 @@
 import ItemFilterToggle from '../../../src/components/ItemFilterToggle.vue'
-import { defaultComponentMocks, defaultPlugins, mount } from '@ownclouders/web-test-helpers'
+import { mount } from '@ownclouders/web-test-helpers-core'
+import { defaultComponentMocks, defaultPlugins } from '../../../src/testing'
 import { queryItemAsString } from '../../../src/composables/appDefaults'
 
 vi.mock('../../../src/composables/appDefaults', () => ({

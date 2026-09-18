@@ -1,5 +1,5 @@
 import OcCheckbox from './OcCheckbox.vue'
-import { PartialComponentProps, mount } from '@ownclouders/web-test-helpers'
+import { PartialComponentProps, mount } from '@ownclouders/web-test-helpers-core'
 
 describe('OcCheckbox', () => {
   function getWrapperWithProps(props: PartialComponentProps<typeof OcCheckbox>) {

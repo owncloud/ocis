@@ -1,10 +1,7 @@
 import { useSpaceActionsNavigateToTrash } from '../../../../../src'
 import { mock } from 'vitest-mock-extended'
-import {
-  defaultComponentMocks,
-  RouteLocation,
-  getComposableWrapper
-} from '@ownclouders/web-test-helpers'
+import { RouteLocation, getComposableWrapper } from '@ownclouders/web-test-helpers-core'
+import { defaultComponentMocks } from '../../../../../src/testing'
 import { unref } from 'vue'
 import { SpaceResource } from '@ownclouders/web-client'
 

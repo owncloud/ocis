@@ -1,4 +1,4 @@
-import { PartialComponentProps, mount } from '@ownclouders/web-test-helpers'
+import { PartialComponentProps, mount } from '@ownclouders/web-test-helpers-core'
 import OcAvatar from './OcAvatar.vue'
 import { extractInitials } from './extractInitials'
 

@@ -1,6 +1,7 @@
 import { ClientService, useAuthStore, useConfigStore } from '../../../src/'
 import { Language } from 'vue3-gettext'
-import { createTestingPinia, writable } from '@ownclouders/web-test-helpers'
+import { writable } from '@ownclouders/web-test-helpers-core'
+import { createTestingPinia } from '../../../src/testing'
 import type { OnResponseArgs } from '@ownclouders/web-client'
 
 /**

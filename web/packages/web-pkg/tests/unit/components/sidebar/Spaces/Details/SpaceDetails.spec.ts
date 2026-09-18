@@ -8,7 +8,8 @@ import {
   GraphSharePermission
 } from '@ownclouders/web-client'
 import { mock } from 'vitest-mock-extended'
-import { defaultComponentMocks, defaultPlugins, shallowMount } from '@ownclouders/web-test-helpers'
+import { shallowMount } from '@ownclouders/web-test-helpers-core'
+import { defaultComponentMocks, defaultPlugins } from '../../../../../../src/testing'
 import { RouteLocation } from 'vue-router'
 import { User } from '@ownclouders/web-client/graph/generated'
 

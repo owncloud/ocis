@@ -3,7 +3,7 @@ import {
   useSpaceActionsEditReadmeContent
 } from '../../../../../src/composables/actions'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
-import { getComposableWrapper } from '@ownclouders/web-test-helpers'
+import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import { unref } from 'vue'
 import { mock, mockDeep } from 'vitest-mock-extended'
 import { User } from '@ownclouders/web-client/graph/generated'

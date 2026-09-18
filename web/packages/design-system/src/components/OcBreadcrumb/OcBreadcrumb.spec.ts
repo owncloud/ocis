@@ -1,4 +1,4 @@
-import { defaultPlugins, shallowMount } from '@ownclouders/web-test-helpers'
+import { defaultPlugins, shallowMount } from '@ownclouders/web-test-helpers-core'
 import Breadcrumb from './OcBreadcrumb.vue'
 
 const items = [

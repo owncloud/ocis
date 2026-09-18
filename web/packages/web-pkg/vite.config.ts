@@ -27,9 +27,15 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
+      entry: {
+        index: resolve(__dirname, 'src/index.ts'),
+        testing: resolve(__dirname, 'src/testing/index.ts')
+      },
       name: 'web-pkg',
-      fileName: 'web-pkg'
+      fileName: (format, entryName) => {
+        const base = entryName === 'index' ? 'web-pkg' : `web-pkg-${entryName}`
+        return format === 'es' ? `${base}.js` : `${base}.umd.cjs`
+      }
     },
     rollupOptions: {
       external

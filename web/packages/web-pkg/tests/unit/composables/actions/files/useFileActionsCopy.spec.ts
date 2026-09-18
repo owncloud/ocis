@@ -1,11 +1,8 @@
 import { mock } from 'vitest-mock-extended'
 import { unref } from 'vue'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
-import {
-  defaultComponentMocks,
-  RouteLocation,
-  getComposableWrapper
-} from '@ownclouders/web-test-helpers'
+import { RouteLocation, getComposableWrapper } from '@ownclouders/web-test-helpers-core'
+import { defaultComponentMocks } from '../../../../../src/testing'
 import { useFileActionsCopy } from '../../../../../src/composables/actions/files'
 import { useClipboardStore } from '../../../../../src/composables/piniaStores'
 import { describe } from 'vitest'

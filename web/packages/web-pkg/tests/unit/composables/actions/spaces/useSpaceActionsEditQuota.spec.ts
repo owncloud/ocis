@@ -1,7 +1,8 @@
 import { useSpaceActionsEditQuota } from '../../../../../src/composables/actions'
 import { useModals } from '../../../../../src/composables/piniaStores'
 import { SpaceResource } from '@ownclouders/web-client'
-import { defaultComponentMocks, getComposableWrapper } from '@ownclouders/web-test-helpers'
+import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
+import { defaultComponentMocks } from '../../../../../src/testing'
 import { unref } from 'vue'
 import { mock } from 'vitest-mock-extended'
 

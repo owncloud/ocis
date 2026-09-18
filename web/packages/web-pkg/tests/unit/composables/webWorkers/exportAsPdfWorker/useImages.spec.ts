@@ -1,4 +1,4 @@
-import { getComposableWrapper } from '@ownclouders/web-test-helpers'
+import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import { useImages } from '../../../../../src/composables/webWorkers/exportAsPdfWorker/useImages'
 
 const mockCanvas = {

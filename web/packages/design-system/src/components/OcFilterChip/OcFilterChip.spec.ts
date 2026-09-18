@@ -1,4 +1,4 @@
-import { defaultPlugins, mount } from '@ownclouders/web-test-helpers'
+import { defaultPlugins, mount } from '@ownclouders/web-test-helpers-core'
 import OcFilterChip from './OcFilterChip.vue'
 
 const selectors = {

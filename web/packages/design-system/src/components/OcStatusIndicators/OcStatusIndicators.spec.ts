@@ -1,5 +1,5 @@
 import StatusIndicators from './OcStatusIndicators.vue'
-import { defaultPlugins, mount } from '@ownclouders/web-test-helpers'
+import { defaultPlugins, mount } from '@ownclouders/web-test-helpers-core'
 
 const fileResource = {
   name: 'forest.jpg',

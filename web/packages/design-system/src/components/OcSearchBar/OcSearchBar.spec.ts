@@ -1,4 +1,4 @@
-import { defaultPlugins, mount, shallowMount } from '@ownclouders/web-test-helpers'
+import { defaultPlugins, mount, shallowMount } from '@ownclouders/web-test-helpers-core'
 import OcSearchBar from './OcSearchBar.vue'
 
 describe('OcSearchBar', () => {

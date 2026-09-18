@@ -1,11 +1,8 @@
 import { useFileActionsEmptyTrashBin } from '../../../../../src/composables/actions'
 import { useMessages, useModals } from '../../../../../src/composables/piniaStores'
 import { mock } from 'vitest-mock-extended'
-import {
-  getComposableWrapper,
-  defaultComponentMocks,
-  RouteLocation
-} from '@ownclouders/web-test-helpers'
+import { getComposableWrapper, RouteLocation } from '@ownclouders/web-test-helpers-core'
+import { defaultComponentMocks } from '../../../../../src/testing'
 import { unref } from 'vue'
 import { ProjectSpaceResource, TrashResource } from '@ownclouders/web-client'
 import { FileActionOptions } from '../../../../../src/composables/actions'

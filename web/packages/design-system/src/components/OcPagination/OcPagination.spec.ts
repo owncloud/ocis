@@ -1,4 +1,4 @@
-import { defaultPlugins, shallowMount, RouteLocation } from '@ownclouders/web-test-helpers'
+import { defaultPlugins, shallowMount, RouteLocation } from '@ownclouders/web-test-helpers-core'
 import { mock } from 'vitest-mock-extended'
 import { RouteLocationPathRaw, RouterLink } from 'vue-router'
 import Pagination from './OcPagination.vue'

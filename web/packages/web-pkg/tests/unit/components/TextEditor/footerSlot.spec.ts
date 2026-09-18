@@ -1,6 +1,7 @@
 import { flushPromises } from '@vue/test-utils'
 import { nextTick } from 'vue'
-import { defaultPlugins, mount } from '@ownclouders/web-test-helpers'
+import { mount } from '@ownclouders/web-test-helpers-core'
+import { defaultPlugins } from '../../../../src/testing'
 import TextEditor from '../../../../src/components/TextEditor/TextEditor.vue'
 
 // Mounts the real md-editor-v3 rather than the stub used by TextEditor.spec.ts: the `footers`

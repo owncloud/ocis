@@ -1,6 +1,5 @@
 export * from './defaultComponentMocks'
-export * from './defaultStubs'
-export * from './httpResponse'
+export * from './defaultPlugins'
 export * from './pinia'
 export * from './useAppDefaultsMock'
 export * from './useGetMatchingSpaceMock'

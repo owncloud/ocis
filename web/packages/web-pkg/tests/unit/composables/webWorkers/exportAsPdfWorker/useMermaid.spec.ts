@@ -1,4 +1,4 @@
-import { getComposableWrapper } from '@ownclouders/web-test-helpers'
+import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import mermaid from 'mermaid'
 import html2canvas from 'html2canvas'
 import { useMermaid } from '../../../../../src/composables/webWorkers/exportAsPdfWorker/useMermaid'

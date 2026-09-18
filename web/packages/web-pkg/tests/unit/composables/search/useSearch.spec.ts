@@ -1,4 +1,5 @@
-import { defaultComponentMocks, getComposableWrapper } from '@ownclouders/web-test-helpers'
+import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
+import { defaultComponentMocks } from '../../../../src/testing'
 import { CapabilityStore, useSearch } from '../../../../src/composables'
 import { SearchResource, SpaceResource } from '@ownclouders/web-client'
 

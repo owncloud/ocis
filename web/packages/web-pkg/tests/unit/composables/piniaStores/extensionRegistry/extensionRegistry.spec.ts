@@ -7,7 +7,7 @@ import {
   SidebarPanelExtension,
   useExtensionRegistry
 } from '../../../../../src'
-import { getComposableWrapper } from '@ownclouders/web-test-helpers'
+import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import { createPinia, setActivePinia } from 'pinia'
 import { computed, ref, unref } from 'vue'
 import { mock } from 'vitest-mock-extended'

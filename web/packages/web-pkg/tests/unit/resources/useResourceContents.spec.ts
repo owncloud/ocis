@@ -1,10 +1,7 @@
 import { useResourceContents } from '../../../src/composables/resources/useResourceContents'
 import { mock } from 'vitest-mock-extended'
-import {
-  defaultComponentMocks,
-  getComposableWrapper,
-  RouteLocation
-} from '@ownclouders/web-test-helpers'
+import { getComposableWrapper, RouteLocation } from '@ownclouders/web-test-helpers-core'
+import { defaultComponentMocks } from '../../../src/testing'
 import { unref } from 'vue'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 import { describe } from 'vitest'

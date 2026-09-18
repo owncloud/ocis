@@ -1,4 +1,4 @@
-import { defaultPlugins, mount, PartialComponentProps } from '@ownclouders/web-test-helpers'
+import { defaultPlugins, mount, PartialComponentProps } from '@ownclouders/web-test-helpers-core'
 import OcSelect from './OcSelect.vue'
 
 const selectors = {

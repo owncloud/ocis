@@ -1,4 +1,4 @@
-import { defaultPlugins, mount, shallowMount } from '@ownclouders/web-test-helpers'
+import { defaultPlugins, mount, shallowMount } from '@ownclouders/web-test-helpers-core'
 import { FocusTrap } from 'focus-trap-vue'
 import Modal from './OcModal.vue'
 import OcButton from './../OcButton/OcButton.vue'
