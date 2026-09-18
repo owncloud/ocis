@@ -40,9 +40,10 @@ func (g SimpleGenerator) Generate(size image.Rectangle, img interface{}) (interf
 	var m *vips.ImageRef
 	var err error
 	switch img.(type) {
-	case *image.RGBA:
-		// Direct import: BMP needs the ImageMagick loader, missing on minimal runtimes.
-		m, err = vips.NewImageFromGoImage(img.(*image.RGBA))
+	case image.Image:
+		// Direct import: encoded BMP bytes need the ImageMagick loader,
+		// missing on minimal runtimes. Covers the txt render and BMP sources.
+		m, err = vips.NewImageFromGoImage(img.(image.Image))
 		if err != nil {
 			return nil, err
 		}
@@ -66,8 +67,8 @@ func (g SimpleGenerator) Generate(size image.Rectangle, img interface{}) (interf
 
 func (g SimpleGenerator) Dimensions(img interface{}) (image.Rectangle, error) {
 	switch img.(type) {
-	case *image.RGBA:
-		m := img.(*image.RGBA)
+	case image.Image:
+		m := img.(image.Image)
 		return m.Bounds(), nil
 	case *vips.ImageRef:
 		m := img.(*vips.ImageRef)
