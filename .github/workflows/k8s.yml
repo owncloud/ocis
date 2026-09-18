@@ -49,7 +49,7 @@ jobs:
           - suite: apiActivities
           - suite: apiSearch1
           - suite: apiSearch2
-          # - suite: apiSearchContent
+          - suite: apiSearchContent
           - suite: apiSharingNgShares
           - suite: apiReshare
           - suite: apiSharingNgPermissions
