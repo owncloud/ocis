@@ -14,7 +14,7 @@
     "test:e2e:playwright": "NODE_TLS_REJECT_UNAUTHORIZED=0 npx playwright test --config=tests/e2e/",
     "docs:screenshots": "NODE_TLS_REJECT_UNAUTHORIZED=0 npx playwright test --config=tests/e2e/docs/playwright.config.ts",
     "test:unit": "NODE_OPTIONS=--unhandled-rejections=throw vitest",
-    "licenses:check": "license-checker-rseidelsohn --summary --relativeLicensePath --onlyAllow 'Python-2.0;Apache*;Apache License, Version 2.0;Apache-2.0;Apache 2.0;Artistic-2.0;BSD;BSD-3-Clause;CC-BY-3.0;CC-BY-4.0;CC0-1.0;ISC;MIT;MPL-2.0;Public Domain;Unicode-TOU;Unlicense;WTFPL;BlueOak-1.0.0' --excludePackages '@ownclouders/babel-preset;@ownclouders/eslint-config;@ownclouders/prettier-config;@ownclouders/tsconfig;@ownclouders/web-client;@ownclouders/web-pkg;external;web-app-files;text-editor;preview;web-app-ocm;@ownclouders/design-system;pdf-viewer;web-app-search;admin-settings;webfinger;web-runtime;@ownclouders/web-test-helpers'",
+    "licenses:check": "license-checker-rseidelsohn --summary --relativeLicensePath --onlyAllow 'Python-2.0;Apache*;Apache License, Version 2.0;Apache-2.0;Apache 2.0;Artistic-2.0;BSD;BSD-3-Clause;CC-BY-3.0;CC-BY-4.0;CC0-1.0;ISC;MIT;MPL-2.0;Public Domain;Unicode-TOU;Unlicense;WTFPL;BlueOak-1.0.0' --excludePackages '@ownclouders/babel-preset;@ownclouders/eslint-config;@ownclouders/prettier-config;@ownclouders/tsconfig;@ownclouders/web-client;@ownclouders/web-pkg;external;web-app-files;text-editor;preview;web-app-ocm;@ownclouders/design-system;pdf-viewer;web-app-search;admin-settings;webfinger;web-runtime;@ownclouders/web-test-helpers;@ownclouders/web-test-helpers-core'",
     "licenses:csv": "license-checker-rseidelsohn --relativeLicensePath --csv --out ./third-party-licenses/third-party-licenses.csv",
     "licenses:save": "license-checker-rseidelsohn --relativeLicensePath --out /dev/null --files ./third-party-licenses/third-party-licenses",
     "vite": "vue-demi-fix && vite",
@@ -106,6 +106,7 @@
   },
   "pnpm": {
     "overrides": {
+      "typescript": "5.9.3",
       "nanoid": "^3.3.17",
       "elliptic": "6.6.1",
       "sha.js": "2.4.12",

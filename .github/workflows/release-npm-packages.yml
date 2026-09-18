@@ -12,6 +12,7 @@ on:
       - "web-client-v*"
       - "web-pkg-v*"
       - "web-test-helpers-v*"
+      - "web-test-helpers-core-v*"
 
 jobs:
   release-npm:
@@ -44,7 +45,7 @@ jobs:
         id: package
         run: |
           TAG="${{ github.ref_name }}"
-          PACKAGES="babel-preset design-system eslint-config extension-sdk prettier-config tsconfig web-client web-pkg web-test-helpers"
+          PACKAGES="babel-preset design-system eslint-config extension-sdk prettier-config tsconfig web-client web-pkg web-test-helpers-core web-test-helpers"
           for pkg in $PACKAGES; do
             if [[ "$TAG" == "${pkg}-v"* ]]; then
               echo "name=$pkg" >> "$GITHUB_OUTPUT"
@@ -73,7 +74,7 @@ jobs:
         run: |
           PKG="${{ steps.package.outputs.name }}"
           case "$PKG" in
-            design-system|web-client|web-pkg|web-test-helpers)
+            design-system|web-client|web-pkg|web-test-helpers-core|web-test-helpers)
               pnpm --filter "@ownclouders/${PKG}" vite build
               ;;
           esac

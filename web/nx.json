@@ -3,7 +3,16 @@
   "defaultBase": "master",
   "namedInputs": {
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
-    "sharedGlobals": []
+    "sharedGlobals": [
+      "{workspaceRoot}/nx.json",
+      "{workspaceRoot}/pnpm-lock.yaml",
+      "{workspaceRoot}/pnpm-workspace.yaml",
+      "{workspaceRoot}/tsconfig.json",
+      "{workspaceRoot}/eslint.config.js",
+      "{workspaceRoot}/vite.config.common.ts",
+      "{workspaceRoot}/vitest.config.ts",
+      "{workspaceRoot}/tests/unit/**/*"
+    ]
   },
   "plugins": [
     {
@@ -30,7 +39,7 @@
     }
   ],
   "targetDefaults": {
-    "test:unit": {
+    "test": {
       "cache": true,
       "inputs": ["default", "^default"],
       "outputs": []
