@@ -69,12 +69,14 @@ Use as URL `localhost:9200` and the user/password printed.
 
 Infinite Scale allows the following ownCloud clients:
 
-*   [web](https://github.com/owncloud/web),
+*   Web (bundled in this repository under [`web/`](web/)),
 *   [Android](https://github.com/owncloud/android),
 *   [iOS](https://github.com/owncloud/ios-app) and
 *   [Desktop](https://github.com/owncloud/client/)
 
 to synchronize and share file spaces with a scalable server backend based on [reva](https://reva.link/) using open and well-defined APIs like [WebDAV](http://www.webdav.org/) and [CS3](https://github.com/cs3org/cs3apis/).
+
+The Web client used to live in the separate [owncloud/web](https://github.com/owncloud/web) repository; it is now developed in-tree here under [`web/`](web/) as part of a single-repo product (backend + web frontend). `owncloud/web` is archived and kept only as the historical record up to its final release; file web-related issues and contributions in this repository instead.
 
 ### Web Office Applications
 
@@ -166,5 +168,5 @@ Some builds of stable ownCloud Infinite Scale releases provided by ownCloud GmbH
 ## Copyright
 
 ```console
-Copyright (c) 2020-2023 ownCloud GmbH <https://owncloud.com>
+Copyright (c) 2020-2026 ownCloud GmbH <https://owncloud.com>
 ```
