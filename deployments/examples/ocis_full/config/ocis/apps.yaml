@@ -1,3 +1,6 @@
+workflows:
+  config:
+    backendUrl: https://${OCIS_DOMAIN|ocis.owncloud.test}/workflows/api/v1beta1
 importer:
   config:
     companionUrl: https://${COMPANION_DOMAIN|companion.owncloud.test}

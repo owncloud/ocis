@@ -1,0 +1,58 @@
+---
+services:
+  ocis:
+    volumes:
+      - ./config/ocis/apps.yaml:/etc/ocis/apps.yaml
+    depends_on:
+      workflows-init:
+        condition: service_completed_successfully
+
+  workflows-init:
+    image: owncloud/ocis-workflows:${WORKFLOWS_DOCKER_TAG:-latest}
+    user: root
+    entrypoint:
+      - /bin/sh
+    command: ["-c", "cp -R /web/apps/workflows /apps"]
+    volumes:
+      - ocis-apps:/apps
+    logging:
+      driver: ${LOG_DRIVER:-local}
+
+  workflows:
+    image: owncloud/ocis-workflows:${WORKFLOWS_DOCKER_TAG:-latest}
+    networks:
+      ocis-net:
+    depends_on:
+      ocis:
+        condition: service_started
+    environment:
+      WORKFLOWS_OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      WORKFLOWS_OCIS_INSECURE: "${INSECURE:-false}"
+      WORKFLOWS_ALLOWED_ORIGIN: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      WORKFLOWS_LOG_LEVEL: ${LOG_LEVEL:-info}
+      WORKFLOWS_HTTP_ADDR: 0.0.0.0:9105
+      WORKFLOWS_DEBUG_ADDR: 0.0.0.0:9109
+      WORKFLOWS_DB_PATH: /data/workflows.db
+      WORKFLOWS_LLM_ENDPOINT: ${WORKFLOWS_LLM_ENDPOINT}
+      WORKFLOWS_LLM_MODEL: ${WORKFLOWS_LLM_MODEL}
+      WORKFLOWS_LLM_API_KEY: ${WORKFLOWS_LLM_API_KEY}
+      WORKFLOWS_ENCRYPTION_KEY: ${WORKFLOWS_ENCRYPTION_KEY}
+    volumes:
+      - workflows-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9109/healthz"]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.workflows.entrypoints=https"
+      - "traefik.http.routers.workflows.rule=Host(`${OCIS_DOMAIN:-ocis.owncloud.test}`) && PathPrefix(`/workflows/api`)"
+      - "traefik.http.routers.workflows.tls.certresolver=http"
+      - "traefik.http.routers.workflows.service=workflows"
+      - "traefik.http.routers.workflows.middlewares=workflows-stripprefix"
+      - "traefik.http.middlewares.workflows-stripprefix.stripprefix.prefixes=/workflows"
+      - "traefik.http.services.workflows.loadbalancer.server.port=9105"
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+
+volumes:
+  workflows-data:
