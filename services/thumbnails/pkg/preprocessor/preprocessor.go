@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"golang.org/x/image/bmp"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 	"golang.org/x/image/math/fixed"
@@ -178,6 +179,19 @@ Scan: // Label for the scanner loop, so we can break it easily
 	return img, scanner.Err()
 }
 
+// BmpDecoder is a converter for bmp files. BMP bytes must not go through
+// libvips, which loads them via ImageMagick, missing on minimal runtimes.
+type BmpDecoder struct{}
+
+// Convert reads the bmp file and returns the decoded image
+func (b BmpDecoder) Convert(r io.Reader) (interface{}, error) {
+	img, err := bmp.Decode(r)
+	if err != nil {
+		return nil, errors.Wrap(err, `could not decode the bmp image`)
+	}
+	return img, nil
+}
+
 // GGPStruct is the layout of a ggp file (which is basically json)
 type GGPStruct struct {
 	Sections []struct {
@@ -321,6 +335,10 @@ func ForType(mimeType string, opts map[string]interface{}) FileConverter {
 		fallthrough
 	case "audio/ogg":
 		return AudioDecoder{}
+	case "image/bmp":
+		fallthrough
+	case "image/x-ms-bmp":
+		return BmpDecoder{}
 	default:
 		return ImageDecoder{}
 	}

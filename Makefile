@@ -181,6 +181,17 @@ go-mod-tidy:
         $(MAKE) --no-print-directory -C $$mod go-mod-tidy || exit 1; \
     done
 
+# Opt in to vips-tagged sources: `ENABLE_VIPS=true
+# make test` compiles files behind `//go:build enable_vips` (e.g. thumbnails).
+TAGS ?=
+ifdef ENABLE_VIPS
+ifeq ($(strip $(TAGS)),)
+TAGS := enable_vips
+else
+TAGS := $(TAGS),enable_vips
+endif
+endif
+
 .PHONY: test
 test:
 	@go test -v -tags '$(TAGS)' -coverprofile coverage.out ./...

@@ -151,6 +151,25 @@ var _ = Describe("ImageDecoder", func() {
 		})
 	})
 
+	Describe("should decode bmp", func() {
+		It("should decode a bmp", func() {
+			fileContent, err := os.ReadFile("test_assets/bmp_test.bmp")
+			if err != nil {
+				panic(err)
+			}
+			decoder := BmpDecoder{}
+			img, err := decoder.Convert(bytes.NewReader(fileContent))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(img).ToNot(BeNil())
+		})
+		It("should return an error if the bmp is invalid", func() {
+			decoder := BmpDecoder{}
+			img, err := decoder.Convert(bytes.NewReader([]byte("not a bmp")))
+			Expect(err).To(HaveOccurred())
+			Expect(img).To(BeNil())
+		})
+	})
+
 	Describe("test ForType", func() {
 		It("should return an ImageDecoder for image types", func() {
 			decoder := ForType("image/png", nil)
@@ -176,6 +195,16 @@ var _ = Describe("ImageDecoder", func() {
 		It("should return an TxtToImageConverter for text types", func() {
 			decoder := ForType("text/plain", nil)
 			Expect(decoder).To(BeAssignableToTypeOf(TxtToImageConverter{}))
+		})
+
+		It("should return a BmpDecoder for bmp types", func() {
+			decoder := ForType("image/bmp", nil)
+			Expect(decoder).To(BeAssignableToTypeOf(BmpDecoder{}))
+		})
+
+		It("should return a BmpDecoder for x-ms-bmp types", func() {
+			decoder := ForType("image/x-ms-bmp", nil)
+			Expect(decoder).To(BeAssignableToTypeOf(BmpDecoder{}))
 		})
 
 		It("should return an ImageDecoder for unknown types", func() {
