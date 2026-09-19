@@ -22,6 +22,7 @@ import (
 	idm "github.com/owncloud/ocis/v2/services/idm/pkg/config"
 	idp "github.com/owncloud/ocis/v2/services/idp/pkg/config"
 	invitations "github.com/owncloud/ocis/v2/services/invitations/pkg/config"
+	llm "github.com/owncloud/ocis/v2/services/llm/pkg/config"
 	nats "github.com/owncloud/ocis/v2/services/nats/pkg/config"
 	notifications "github.com/owncloud/ocis/v2/services/notifications/pkg/config"
 	ocdav "github.com/owncloud/ocis/v2/services/ocdav/pkg/config"
@@ -102,6 +103,7 @@ type Config struct {
 	IDM               *idm.Config            `yaml:"idm"`
 	IDP               *idp.Config            `yaml:"idp"`
 	Invitations       *invitations.Config    `yaml:"invitations"`
+	LLM               *llm.Config            `yaml:"llm"`
 	Nats              *nats.Config           `yaml:"nats"`
 	Notifications     *notifications.Config  `yaml:"notifications"`
 	OCDav             *ocdav.Config          `yaml:"ocdav"`
