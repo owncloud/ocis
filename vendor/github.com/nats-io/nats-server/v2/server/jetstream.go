@@ -132,6 +132,15 @@ type jetStream struct {
 	// System level request to purge a stream move
 	accountPurge *subscription
 
+	// Debounced reconcile of assignments for peers that became selectable.
+	// Has its own lock so signaling is cheap and never contends on the JS lock.
+	prMu    sync.Mutex
+	prPeers map[string]struct{}
+	// Meta peers that were just added but that we can't place on yet, because
+	// we have no STATSZ for them. Their first STATSZ moves them into prPeers.
+	prNewPeers map[string]struct{}
+	prRunning  bool
+
 	// Some bools regarding general state.
 	metaRecovering bool
 	standAlone     bool
@@ -628,8 +637,19 @@ func (s *Server) checkJetStreamExports() {
 
 func (s *Server) setupJetStreamExports() {
 	// Setup our internal system export.
-	if err := s.SystemAccount().AddServiceExport(jsAllAPI, nil); err != nil {
+	sacc := s.SystemAccount()
+	if err := sacc.AddServiceExport(jsAllAPI, nil); err != nil {
 		s.Warnf("Error setting up jetstream service exports: %v", err)
+	}
+	// Map the domain prefixed API too, so an isolated JetStream is addressable by
+	// domain like an account is. Unprefixed always means this server's own JetStream.
+	if domain := s.getOpts().JetStreamDomain; domain != _EMPTY_ {
+		src, dest := fmt.Sprintf(jsDomainAPI, domain), jsAllAPI
+		if err := sacc.AddMapping(src, dest); err != nil {
+			s.Errorf("Error adding JetStream domain mapping to system account: %v", err)
+		} else {
+			s.Debugf("Adding JetStream Domain Mapping %q -> %s to system account", src, dest)
+		}
 	}
 }
 
@@ -1086,6 +1106,10 @@ func (s *Server) shutdownJetStream() {
 			cc.qch, cc.stopped = nil, nil
 		}
 		js.stopUpdatesSub()
+		if cc.metaRescue != nil {
+			s.sysUnsubscribe(cc.metaRescue)
+			cc.metaRescue = nil
+		}
 		if cc.c != nil {
 			cc.c.closeConnection(ClientClosed)
 			cc.c = nil
@@ -2083,12 +2107,28 @@ func (a *Account) JetStreamEnabled() bool {
 	return enabled
 }
 
+func (jsa *jsAccount) removeRemoteUsage(rnode string) {
+	jsa.usageMu.Lock()
+	defer jsa.usageMu.Unlock()
+
+	rUsage := jsa.rusage[rnode]
+	if rUsage == nil {
+		return
+	}
+	for tierName, usage := range rUsage.tiers {
+		if total := jsa.usage[tierName]; total != nil {
+			total.total.mem -= usage.mem
+			total.total.store -= usage.store
+		}
+	}
+	jsa.apiTotal -= rUsage.api
+	jsa.apiErrors -= rUsage.err
+	delete(jsa.rusage, rnode)
+}
+
 func (jsa *jsAccount) remoteUpdateUsage(sub *subscription, c *client, _ *Account, subject, _ string, msg []byte) {
 	// jsa.js.srv is immutable and guaranteed to no be nil, so no lock needed.
 	s := jsa.js.srv
-
-	jsa.usageMu.Lock()
-	defer jsa.usageMu.Unlock()
 
 	if len(msg) < minUsageUpdateLen {
 		s.Warnf("Ignoring remote usage update with size too short")
@@ -2102,8 +2142,29 @@ func (jsa *jsAccount) remoteUpdateUsage(sub *subscription, c *client, _ *Account
 		s.Warnf("Received remote usage update with no remote node")
 		return
 	}
+
+	// Capture the meta group before the usage lock so we do not invert lock ordering.
+	meta := jsa.js.getMetaGroup()
+	jsa.usageMu.Lock()
+	defer jsa.usageMu.Unlock()
+
 	rUsage, ok := jsa.rusage[rnode]
 	if !ok {
+		// Once a server has been removed from the meta group, a usage update that
+		// was already in flight must not recreate its remote usage entry. Only do
+		// the membership check for new entries; steady-state updates avoid it.
+		if meta != nil {
+			var current bool
+			for _, peer := range meta.VotingPeerNames() {
+				if peer == rnode {
+					current = true
+					break
+				}
+			}
+			if !current {
+				return
+			}
+		}
 		if jsa.rusage == nil {
 			jsa.rusage = make(map[string]*remoteUsage)
 		}
