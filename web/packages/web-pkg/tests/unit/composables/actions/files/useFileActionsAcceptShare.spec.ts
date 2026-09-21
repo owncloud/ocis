@@ -2,9 +2,11 @@ import { mock } from 'vitest-mock-extended'
 import { unref } from 'vue'
 import { useFileActionsEnableSync } from '../../../../../src/composables/actions/files/useFileActionsEnableSync'
 import { IncomingShareResource } from '@ownclouders/web-client'
-import { getComposableWrapper, RouteLocation } from '@ownclouders/web-test-helpers-core'
-import { defaultComponentMocks } from '../../../../../src/testing'
-
+import {
+  defaultComponentMocks,
+  getComposableWrapper,
+  RouteLocation
+} from '../../../../../src/testing'
 const sharesWithMeLocation = 'files-shares-with-me'
 const sharesWithOthersLocation = 'files-shares-with-others'
 

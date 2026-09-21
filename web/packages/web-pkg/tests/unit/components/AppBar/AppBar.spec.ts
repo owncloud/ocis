@@ -3,11 +3,12 @@ import AppBar from '../../../../src/components/AppBar/AppBar.vue'
 import { mock } from 'vitest-mock-extended'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 import {
-  shallowMount,
+  defaultComponentMocks,
+  defaultPlugins,
+  PartialComponentProps,
   RouteLocation,
-  PartialComponentProps
-} from '@ownclouders/web-test-helpers-core'
-import { defaultComponentMocks, defaultPlugins } from '../../../../src/testing'
+  shallowMount
+} from '../../../../src/testing'
 import { ArchiverService } from '../../../../src/services'
 import { FolderView } from '../../../../src/ui/types'
 import { useExtensionRegistry, ViewOptions } from '../../../../src'

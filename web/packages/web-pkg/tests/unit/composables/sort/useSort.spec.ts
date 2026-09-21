@@ -1,8 +1,7 @@
 import { ref, unref } from 'vue'
 import { SortDir, SortOptions, useSort } from '../../../../src/composables'
 import { Resource } from '@ownclouders/web-client'
-import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
-
+import { getComposableWrapper } from '../../../../src/testing'
 describe('useSort', () => {
   it('should be valid', () => {
     expect(useSort).toBeDefined()

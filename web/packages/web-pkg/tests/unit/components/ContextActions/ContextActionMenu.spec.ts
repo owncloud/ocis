@@ -1,8 +1,6 @@
 import ContextActionMenu from '../../../../src/components/ContextActions/ContextActionMenu.vue'
 import { Action } from '../../../../src/composables/actions'
-import { shallowMount } from '@ownclouders/web-test-helpers-core'
-import { defaultPlugins } from '../../../../src/testing'
-
+import { defaultPlugins, shallowMount } from '../../../../src/testing'
 describe('ContextActionMenu component', () => {
   it('renders the menu with actions', () => {
     const menuSections = [

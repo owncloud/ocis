@@ -1,9 +1,9 @@
 import { mock } from 'vitest-mock-extended'
 import { SpaceResource } from '@ownclouders/web-client'
-import { RouteLocation, getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import { useBreadcrumbsFromPath } from '../../../../src/composables/breadcrumbs'
 import { ref } from 'vue'
 import { AncestorMetaData } from '../../../../src/types'
+import { RouteLocation, getComposableWrapper } from '../../../../src/testing'
 
 describe('useBreadcrumbsFromPath', () => {
   describe('builds an array of breadcrumbitems', () => {

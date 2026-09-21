@@ -1,6 +1,9 @@
 import { Resource, SpaceResource } from '@ownclouders/web-client'
-import { getComposableWrapper, RouteLocation } from '@ownclouders/web-test-helpers-core'
-import { defaultComponentMocks } from '../../../../../src/testing'
+import {
+  defaultComponentMocks,
+  getComposableWrapper,
+  RouteLocation
+} from '../../../../../src/testing'
 import { useFileActionsDuplicate } from '../../../../../src/composables/actions'
 import { mock } from 'vitest-mock-extended'
 import { unref } from 'vue'

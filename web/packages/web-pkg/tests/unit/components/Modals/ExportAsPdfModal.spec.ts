@@ -1,6 +1,5 @@
 import ExportAsPdfModal from '../../../../src/components/Modals/ExportAsPdfModal.vue'
-import { shallowMount } from '@ownclouders/web-test-helpers-core'
-import { defaultComponentMocks, defaultPlugins } from '../../../../src/testing'
+import { defaultComponentMocks, defaultPlugins, shallowMount } from '../../../../src/testing'
 import { mock } from 'vitest-mock-extended'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 import { Modal, useMessages, useModals } from '../../../../src/composables/piniaStores'

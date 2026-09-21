@@ -1,7 +1,6 @@
 import { mock } from 'vitest-mock-extended'
 import { Resource, SpaceResource, TrashResource } from '@ownclouders/web-client'
-import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
-import { defaultComponentMocks } from '../../../../../src/testing'
+import { defaultComponentMocks, getComposableWrapper } from '../../../../../src/testing'
 import { useUserStore } from '../../../../../src/composables/piniaStores'
 import { useResolveRestorableResources } from '../../../../../src/composables/actions/helpers/useResolveRestorableResources'
 

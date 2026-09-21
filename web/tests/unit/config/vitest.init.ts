@@ -1,19 +1,6 @@
-import { Plugin } from 'vue'
-import DesignSystem from '@ownclouders/design-system'
-import { registerTestingPlugins } from '@ownclouders/web-test-helpers-core'
-import { createMockStore } from '@ownclouders/web-pkg/src/testing'
-
-// `@ownclouders/design-system` and `@ownclouders/web-pkg` both depend on
-// `@ownclouders/web-test-helpers-core` for their own tests, so `defaultPlugins` there can't
-// import either directly without recreating that cycle - see core's registry.ts. Consumers
-// going through the published `@ownclouders/web-test-helpers` facade get this registration
-// automatically (as an import side effect of the facade itself); design-system's and
-// web-pkg's own specs import straight from core/`../testing` instead, so they need it done
-// here, in the one shared setup file that isn't part of the package dependency graph.
-registerTestingPlugins({
-  designSystem: DesignSystem as unknown as Plugin,
-  mockStore: createMockStore
-})
+// Component specs mount deliberately incomplete components, so Vue's runtime warnings are
+// expected noise rather than a signal.
+vi.spyOn(console, 'warn').mockImplementation(() => undefined)
 
 const IntersectionObserverMock = vi.fn(function () {
   return {

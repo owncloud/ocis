@@ -1,4 +1,3 @@
-import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import { mock } from 'vitest-mock-extended'
 import {
   IncomingShareResource,
@@ -7,6 +6,7 @@ import {
   TrashResource
 } from '@ownclouders/web-client'
 import { useCanListVersions } from '../../../../src/composables/resources'
+import { getComposableWrapper } from '../../../../src/testing'
 
 describe('useCanListVersions', () => {
   describe('canListVersions', () => {

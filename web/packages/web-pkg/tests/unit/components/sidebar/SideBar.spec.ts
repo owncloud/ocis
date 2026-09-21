@@ -1,6 +1,5 @@
 import { defineComponent, nextTick } from 'vue'
-import { mount } from '@ownclouders/web-test-helpers-core'
-import { defaultPlugins } from '../../../../src/testing'
+import { defaultPlugins, mount } from '../../../../src/testing'
 import SideBar from '../../../../src/components/SideBar/SideBar.vue'
 import { SideBarPanel } from '../../../../src/components/SideBar/types'
 

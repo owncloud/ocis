@@ -1,15 +1,34 @@
-import { Plugin } from 'vue'
+import { App, Plugin } from 'vue'
+import { abilitiesPlugin } from '@casl/vue'
+import { createMongoAbility } from '@casl/ability'
+import { AbilityRule } from '@ownclouders/web-client'
 import {
-  defaultPlugins as baseDefaultPlugins,
-  DefaultPluginsOptions as BaseDefaultPluginsOptions
-} from '@ownclouders/web-test-helpers-core'
-import { PiniaMockOptions } from './pinia'
+  defaultPlugins as designSystemPlugins,
+  DesignSystemPluginsOptions
+} from '@ownclouders/design-system/testing'
+import { createMockStore, PiniaMockOptions } from './pinia'
 
-// Retypes the generic `defaultPlugins` from `@ownclouders/web-test-helpers-core` so that
-// `piniaOptions` here is `PiniaMockOptions` (defined in this package) rather than
-// `Record<string, unknown>`. Core can't name `PiniaMockOptions` itself - see its
-// `defaultPlugins.ts` for why.
-export type DefaultPluginsOptions = BaseDefaultPluginsOptions<PiniaMockOptions>
+// Extends the design system's mount plugins (design system itself + gettext + a `<router-link>`
+// stub) with what web-pkg's own components need on top: casl abilities and mocked pinia stores.
+// The design system half is defined once, in `@ownclouders/design-system/testing`, because that
+// package needs it for its own specs and cannot depend on this one.
+export interface DefaultPluginsOptions extends DesignSystemPluginsOptions {
+  abilities?: AbilityRule[]
+  pinia?: boolean
+  piniaOptions?: PiniaMockOptions
+}
 
-export const defaultPlugins = (options: DefaultPluginsOptions = {}): Plugin[] =>
-  baseDefaultPlugins<PiniaMockOptions>(options)
+export const defaultPlugins = ({
+  abilities = [],
+  pinia = true,
+  piniaOptions = {},
+  ...designSystemOptions
+}: DefaultPluginsOptions = {}): Plugin[] => [
+  {
+    install(app: App) {
+      app.use(abilitiesPlugin, createMongoAbility(abilities))
+    }
+  },
+  ...designSystemPlugins(designSystemOptions),
+  ...(pinia ? [createMockStore(piniaOptions)] : [])
+]

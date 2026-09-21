@@ -1,6 +1,5 @@
-import { shallowMount } from '@ownclouders/web-test-helpers-core'
-
 import Name from '../../../../src/components/FilesList/ResourceName.vue'
+import { shallowMount } from '../../../../src/testing'
 
 const fullPath = 'images/nature/forest.jpg'
 const name = 'forest.jpg'

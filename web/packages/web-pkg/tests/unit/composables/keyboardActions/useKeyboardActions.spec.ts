@@ -1,6 +1,6 @@
 import { Key, Modifier, useKeyboardActions } from '../../../../src/composables/keyboardActions'
-import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import { ref } from 'vue'
+import { getComposableWrapper } from '../../../../src/testing'
 
 describe('useKeyboardActions', () => {
   it('should be valid', () => {

@@ -1,5 +1,5 @@
-import { shallowMount } from '@ownclouders/web-test-helpers-core'
 import Cell from './OcTableCell.vue'
+import { shallowMount } from '../../testing'
 
 describe('OcTableCell', () => {
   it('Uses correct element', () => {

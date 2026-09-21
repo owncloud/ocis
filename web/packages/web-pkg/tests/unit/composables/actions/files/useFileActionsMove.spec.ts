@@ -2,9 +2,11 @@ import { mock, mockDeep } from 'vitest-mock-extended'
 import { unref } from 'vue'
 import { useFileActionsMove } from '../../../../../src/composables/actions'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
-import { RouteLocation, getComposableWrapper } from '@ownclouders/web-test-helpers-core'
-import { defaultComponentMocks } from '../../../../../src/testing'
-
+import {
+  defaultComponentMocks,
+  getComposableWrapper,
+  RouteLocation
+} from '../../../../../src/testing'
 describe('move', () => {
   describe('computed property "actions"', () => {
     describe('move isVisible property of returned element', () => {

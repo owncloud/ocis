@@ -1,8 +1,6 @@
 import ActionMenuItem from '../../../../src/components/ContextActions/ActionMenuItem.vue'
 import { FileAction } from '../../../../src/composables/actions'
-import { mount, shallowMount } from '@ownclouders/web-test-helpers-core'
-import { defaultPlugins } from '../../../../src/testing'
-
+import { defaultPlugins, mount, shallowMount } from '../../../../src/testing'
 const selectors = {
   handler: '[data-testid="action-handler"]',
   icon: '[data-testid="action-icon"]',

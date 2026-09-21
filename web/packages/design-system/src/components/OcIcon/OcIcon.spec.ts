@@ -1,7 +1,7 @@
-import { mount } from '@ownclouders/web-test-helpers-core'
 import OcIcon from './OcIcon.vue'
 import { glob } from 'glob'
 import path from 'path'
+import { mount } from '../../testing'
 
 describe('OcIcon', () => {
   test('render and update', async () => {

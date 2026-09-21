@@ -30,7 +30,8 @@ export default defineConfig({
         'design-system': resolve(__dirname, 'src/index.ts'),
         'design-system/components': resolve(__dirname, 'src/components/index.ts'),
         'design-system/composables': resolve(__dirname, 'src/composables/index.ts'),
-        'design-system/helpers': resolve(__dirname, 'src/helpers/index.ts')
+        'design-system/helpers': resolve(__dirname, 'src/helpers/index.ts'),
+        'design-system/testing': resolve(__dirname, 'src/testing/index.ts')
       }
     },
     rollupOptions: {

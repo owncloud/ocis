@@ -1,5 +1,5 @@
-import { defaultPlugins, mount } from '@ownclouders/web-test-helpers-core'
 import Table from './OcTable.vue'
+import { defaultPlugins, mount } from '../../testing'
 
 const ASC = 'ascending'
 const DESC = 'descending'

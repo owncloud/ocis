@@ -1,6 +1,6 @@
-import { shallowMount, mount } from '@ownclouders/web-test-helpers-core'
 import Drop from './OcDrop.vue'
 import { getSizeClass } from '../../helpers'
+import { shallowMount, mount } from '../../testing'
 
 const dom = ({ position = 'auto', mode = 'click', paddingSize = 'medium' } = {}) => {
   document.body.innerHTML = ''

@@ -1,7 +1,6 @@
 import { useRouteQuery } from '../../../src/composables/router/useRouteQuery'
 import SearchBarFilter from '../../../src/components/SearchBarFilter.vue'
-import { shallowMount } from '@ownclouders/web-test-helpers-core'
-import { defaultComponentMocks, defaultPlugins } from '../../../src/testing'
+import { defaultComponentMocks, defaultPlugins, shallowMount } from '../../../src/testing'
 import { OcFilterChip } from '@ownclouders/design-system/components'
 import { ref } from 'vue'
 

@@ -1,5 +1,4 @@
-import { mount } from '@ownclouders/web-test-helpers-core'
-import { defaultComponentMocks, defaultPlugins } from '../../../../src/testing'
+import { defaultComponentMocks, defaultPlugins, mount } from '../../../../src/testing'
 import ResourceListItem from '../../../../src/components/FilesList/ResourceListItem.vue'
 import { HIDDEN_FILE_EXTENSIONS, Resource } from '@ownclouders/web-client'
 import { mock } from 'vitest-mock-extended'

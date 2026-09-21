@@ -1,8 +1,9 @@
 import { mock } from 'vitest-mock-extended'
-import { RouteLocation, shallowMount } from '@ownclouders/web-test-helpers-core'
 import {
   defaultComponentMocks,
   defaultPlugins,
+  RouteLocation,
+  shallowMount,
   useGetMatchingSpaceMock
 } from '../../../src/testing'
 import { Resource, SpaceResource } from '@ownclouders/web-client'

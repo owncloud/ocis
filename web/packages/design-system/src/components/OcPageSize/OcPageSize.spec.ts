@@ -1,6 +1,5 @@
-import { shallowMount } from '@ownclouders/web-test-helpers-core'
-
 import PageSize from './OcPageSize.vue'
+import { shallowMount } from '../../testing'
 
 const defaultProps = {
   options: [100, 500, 1000, 'All'],

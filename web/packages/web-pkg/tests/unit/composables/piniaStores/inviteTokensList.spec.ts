@@ -1,6 +1,6 @@
 import { createPinia, setActivePinia } from 'pinia'
+import { getComposableWrapper } from '../../../../src/testing'
 
-import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import { useInviteTokensListStore } from '../../../../src/composables/piniaStores'
 
 describe('useInviteTokensList', () => {

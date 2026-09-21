@@ -1,8 +1,8 @@
-import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import { mock } from 'vitest-mock-extended'
 import { Resource } from '@ownclouders/web-client'
 import { useCanBeOpenedWithSecureView } from '../../../../src/composables/resources'
 import { ApplicationFileExtension } from '../../../../src/apps/types'
+import { getComposableWrapper } from '../../../../src/testing'
 
 describe('canBeOpenedWithSecureView', () => {
   describe('resource', () => {

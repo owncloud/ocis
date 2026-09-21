@@ -1,6 +1,11 @@
 import { ref, unref } from 'vue'
-import { mount, RouteLocation, PartialComponentProps } from '@ownclouders/web-test-helpers-core'
-import { defaultPlugins, defaultComponentMocks } from '../../../src/testing'
+import {
+  defaultComponentMocks,
+  defaultPlugins,
+  mount,
+  PartialComponentProps,
+  RouteLocation
+} from '../../../src/testing'
 import { mock } from 'vitest-mock-extended'
 import ViewOptions from '../../../src/components/ViewOptions.vue'
 import {

@@ -8,8 +8,7 @@ import {
   ShareTypes,
   SpaceResource
 } from '@ownclouders/web-client'
-import { mount, PartialComponentProps } from '@ownclouders/web-test-helpers-core'
-import { defaultPlugins } from '../../../../src/testing'
+import { defaultPlugins, mount, PartialComponentProps } from '../../../../src/testing'
 import {
   CapabilityStore,
   useResourcesStore,

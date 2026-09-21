@@ -1,5 +1,5 @@
-import { shallowMount, mount, defaultPlugins } from '@ownclouders/web-test-helpers-core'
 import Table from './OcTable.vue'
+import { shallowMount, mount, defaultPlugins } from '../../testing'
 
 const fields = [
   {

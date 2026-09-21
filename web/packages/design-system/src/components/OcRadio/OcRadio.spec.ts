@@ -1,6 +1,6 @@
 import OcRadio from './OcRadio.vue'
-import { PartialComponentProps, mount } from '@ownclouders/web-test-helpers-core'
 import { AvailableSizeType } from '../../helpers'
+import { PartialComponentProps, mount } from '../../testing'
 
 describe('OcRadio', () => {
   function getWrapper(props: PartialComponentProps<typeof OcRadio> = {}) {

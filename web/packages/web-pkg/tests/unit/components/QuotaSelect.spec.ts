@@ -1,7 +1,5 @@
 import QuotaSelect from '../../../src/components/QuotaSelect.vue'
-import { shallowMount } from '@ownclouders/web-test-helpers-core'
-import { defaultPlugins } from '../../../src/testing'
-
+import { defaultPlugins, shallowMount } from '../../../src/testing'
 describe('QuotaSelect', () => {
   describe('method "optionSelectable"', () => {
     it('should return true while option selectable property is not false', () => {

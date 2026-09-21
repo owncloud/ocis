@@ -1,4 +1,3 @@
-import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import { mock } from 'vitest-mock-extended'
 import {
   type WebWorker,
@@ -8,6 +7,7 @@ import {
 } from '../../../../../src/composables'
 import type { TransferData } from '../../../../../src/helpers/resource/conflictHandling'
 import type { ClientService, LoadingService } from '../../../../../src/services'
+import { getComposableWrapper } from '../../../../../src/testing'
 
 describe('usePasteWorker', () => {
   describe('method "startWorker"', () => {

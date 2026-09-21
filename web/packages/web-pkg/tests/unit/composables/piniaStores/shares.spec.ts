@@ -1,5 +1,4 @@
-import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
-import { createTestingPinia } from '../../../../src/testing'
+import { createTestingPinia, getComposableWrapper } from '../../../../src/testing'
 import {
   AddLinkOptions,
   AddShareOptions,

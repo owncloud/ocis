@@ -1,8 +1,8 @@
-import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import mermaid from 'mermaid'
 import html2canvas from 'html2canvas'
 import { useMermaid } from '../../../../../src/composables/webWorkers/exportAsPdfWorker/useMermaid'
 import { mock } from 'vitest-mock-extended'
+import { getComposableWrapper } from '../../../../../src/testing'
 
 vi.mock('mermaid')
 vi.mock('html2canvas')

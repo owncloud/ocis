@@ -1,5 +1,5 @@
-import { shallowMount } from '@ownclouders/web-test-helpers-core'
 import Tag from './OcTag.vue'
+import { shallowMount } from '../../testing'
 
 describe('OcTag', () => {
   it('uses correct component when type is specified', () => {

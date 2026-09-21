@@ -1,4 +1,3 @@
-import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import { mock } from 'vitest-mock-extended'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 import {
@@ -7,6 +6,7 @@ import {
   useOpenWithDefaultApp,
   FileAction
 } from '../../../../src/composables'
+import { getComposableWrapper } from '../../../../src/testing'
 
 vi.mock('../../../../src/composables/actions/files', async (importOriginal) => ({
   ...(await importOriginal<any>()),

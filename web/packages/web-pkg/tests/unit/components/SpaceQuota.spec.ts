@@ -1,7 +1,6 @@
 import { OcProgress } from '@ownclouders/design-system/components'
 import { SpaceQuota } from '../../../src/components'
-import { shallowMount } from '@ownclouders/web-test-helpers-core'
-import { defaultPlugins } from '../../../src/testing'
+import { defaultPlugins, shallowMount } from '../../../src/testing'
 import { Quota } from '@ownclouders/web-client/graph/generated'
 
 describe('SpaceQuota component', () => {

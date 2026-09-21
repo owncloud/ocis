@@ -9,8 +9,7 @@ import {
 } from '../index'
 import { Router, RouteLocationNormalizedLoaded, RouteLocationRaw } from 'vue-router'
 import { computed } from 'vue'
-import { writable } from '@ownclouders/web-test-helpers-core'
-
+import { writable } from '.'
 export interface ComponentMocksOptions {
   currentRoute?: RouteLocationNormalizedLoaded
 }

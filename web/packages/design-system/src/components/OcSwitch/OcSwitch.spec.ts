@@ -1,6 +1,5 @@
-import { shallowMount } from '@ownclouders/web-test-helpers-core'
-
 import Switch from './OcSwitch.vue'
+import { shallowMount } from '../../testing'
 
 const defaultProps = {
   label: 'Test label'

@@ -1,7 +1,6 @@
 import { ClientService, PreviewService } from '../../../src/services'
 import { mock, mockDeep } from 'vitest-mock-extended'
-import { mockHttpResponse } from '@ownclouders/web-test-helpers-core'
-import { createTestingPinia } from '../../../src/testing'
+import { createTestingPinia, mockHttpResponse } from '../../../src/testing'
 import { HttpError, Resource, SpaceResource } from '@ownclouders/web-client'
 import {
   useAuthStore,

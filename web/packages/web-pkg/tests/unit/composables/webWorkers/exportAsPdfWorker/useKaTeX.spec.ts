@@ -1,8 +1,8 @@
-import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import katex from 'katex'
 import { useKaTeX } from '../../../../../src/composables/webWorkers/exportAsPdfWorker/useKaTeX'
 import html2canvas from 'html2canvas'
 import { mock } from 'vitest-mock-extended'
+import { getComposableWrapper } from '../../../../../src/testing'
 
 vi.mock('katex')
 vi.mock('html2canvas')

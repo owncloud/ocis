@@ -1,5 +1,5 @@
-import { shallowMount } from '@ownclouders/web-test-helpers-core'
 import OcTextarea from './OcTextarea.vue'
+import { shallowMount } from '../../testing'
 
 const defaultProps = {
   label: 'label'

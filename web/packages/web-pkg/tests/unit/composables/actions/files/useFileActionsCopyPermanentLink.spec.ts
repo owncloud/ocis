@@ -1,7 +1,6 @@
 import { unref } from 'vue'
 import { useFileActionsCopyPermanentLink } from '../../../../../src/composables/actions/files'
-import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
-import { defaultComponentMocks } from '../../../../../src/testing'
+import { defaultComponentMocks, getComposableWrapper } from '../../../../../src/testing'
 import { mock } from 'vitest-mock-extended'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 import { useClipboard } from '../../../../../src/composables/clipboard'

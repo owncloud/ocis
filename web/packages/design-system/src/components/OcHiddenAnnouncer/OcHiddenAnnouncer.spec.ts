@@ -1,6 +1,5 @@
 import OcHiddenAnnouncer from './OcHiddenAnnouncer.vue'
-import { mount } from '@ownclouders/web-test-helpers-core'
-
+import { mount } from '../../testing'
 describe('OcHiddenAnnouncer', () => {
   function getWrapper(props = {}) {
     return mount(OcHiddenAnnouncer, {

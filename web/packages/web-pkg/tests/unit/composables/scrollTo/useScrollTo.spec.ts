@@ -2,9 +2,7 @@ import { mock } from 'vitest-mock-extended'
 import { useScrollTo } from '../../../../src/composables/scrollTo'
 import { Resource } from '@ownclouders/web-client'
 import { eventBus } from '../../../../src/services'
-import { getComposableWrapper, RouteLocation } from '@ownclouders/web-test-helpers-core'
-import { defaultComponentMocks } from '../../../../src/testing'
-
+import { defaultComponentMocks, getComposableWrapper, RouteLocation } from '../../../../src/testing'
 const mockResourceId = 'fakeResourceId'
 const mockFilesTopBar = {
   offsetHeight: 75

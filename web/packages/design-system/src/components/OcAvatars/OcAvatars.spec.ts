@@ -1,5 +1,5 @@
-import { shallowMount } from '@ownclouders/web-test-helpers-core'
 import Avatars from './OcAvatars.vue'
+import { shallowMount } from '../../testing'
 
 const items = [
   {

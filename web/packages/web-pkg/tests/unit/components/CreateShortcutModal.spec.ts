@@ -1,6 +1,11 @@
 import CreateShortcutModal from '../../../src/components/CreateShortcutModal.vue'
-import { mockHttpError, RouteLocation, shallowMount } from '@ownclouders/web-test-helpers-core'
-import { defaultComponentMocks, defaultPlugins } from '../../../src/testing'
+import {
+  defaultComponentMocks,
+  defaultPlugins,
+  mockHttpError,
+  RouteLocation,
+  shallowMount
+} from '../../../src/testing'
 import { SpaceResource } from '@ownclouders/web-client'
 import { mock } from 'vitest-mock-extended'
 import { FileResource } from '@ownclouders/web-client'

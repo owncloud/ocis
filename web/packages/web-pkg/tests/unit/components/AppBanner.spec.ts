@@ -1,5 +1,4 @@
-import { shallowMount } from '@ownclouders/web-test-helpers-core'
-import { defaultComponentMocks, defaultPlugins } from '../../../src/testing'
+import { defaultComponentMocks, defaultPlugins, shallowMount } from '../../../src/testing'
 import AppBanner from '../../../src/components/AppBanner.vue'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import { useLocalStorage, useSessionStorage } from '@vueuse/core'

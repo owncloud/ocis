@@ -6,8 +6,11 @@ import { SpaceResource } from '@ownclouders/web-client'
 import { Resource } from '@ownclouders/web-client'
 import { FileActionOptions } from '../../../../../src/composables/actions'
 import { useFileActions } from '../../../../../src/composables/actions/files/useFileActions'
-import { RouteLocation, getComposableWrapper } from '@ownclouders/web-test-helpers-core'
-import { defaultComponentMocks } from '../../../../../src/testing'
+import {
+  defaultComponentMocks,
+  getComposableWrapper,
+  RouteLocation
+} from '../../../../../src/testing'
 import { ApplicationFileExtension } from '../../../../../types'
 import { useResourcesStore } from '../../../../../src/composables/piniaStores'
 

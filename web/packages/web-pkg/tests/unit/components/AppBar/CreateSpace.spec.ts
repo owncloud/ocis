@@ -1,8 +1,7 @@
 import CreateSpace from '../../../../src/components/AppBar/CreateSpace.vue'
 import { mockDeep } from 'vitest-mock-extended'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
-import { mount } from '@ownclouders/web-test-helpers-core'
-import { defaultPlugins, defaultComponentMocks } from '../../../../src/testing'
+import { defaultComponentMocks, defaultPlugins, mount } from '../../../../src/testing'
 import { useMessages, useModals, useSpacesStore } from '../../../../src/composables'
 import { unref } from 'vue'
 

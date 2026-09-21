@@ -1,5 +1,4 @@
-import { shallowMount } from '@ownclouders/web-test-helpers-core'
-import { defaultPlugins } from '../../../../src/testing'
+import { defaultPlugins, shallowMount } from '../../../../src/testing'
 import ResourceStatusIndicators from '../../../../src/components/FilesList/ResourceStatusIndicators.vue'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 import { mock } from 'vitest-mock-extended'

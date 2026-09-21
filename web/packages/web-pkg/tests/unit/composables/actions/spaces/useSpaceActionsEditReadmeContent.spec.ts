@@ -3,12 +3,12 @@ import {
   useSpaceActionsEditReadmeContent
 } from '../../../../../src/composables/actions'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
-import { getComposableWrapper } from '@ownclouders/web-test-helpers-core'
 import { unref } from 'vue'
 import { mock, mockDeep } from 'vitest-mock-extended'
 import { User } from '@ownclouders/web-client/graph/generated'
 import { ClientService } from '../../../../../src/services'
 import { useSpaceHelpers } from '../../../../../src/composables/spaces/useSpaceHelpers'
+import { getComposableWrapper } from '../../../../../src/testing'
 
 vi.mock('../../../../../src/composables/actions/useOpenWithDefaultApp', () => ({
   useOpenWithDefaultApp: vi.fn()
