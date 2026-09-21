@@ -210,7 +210,7 @@ func (b *CS3Backend) DestroySession(_ context.Context, sessionRef *string) error
 // for the user specified by the userID.
 func (b *CS3Backend) UserClaims(_ string, _ map[string]bool) map[string]interface{} {
 	return nil
-	// TODO should we return the "ownclouduuid" as a claim? there is also "LibgreGraph.UUID" / lico.ScopeUniqueUserID
+	// TODO should we return the "ownCloudUUID" as a claim? there is also "LibgreGraph.UUID" / lico.ScopeUniqueUserID
 }
 
 // ScopesSupported implements the Backend interface, providing supported scopes

@@ -105,7 +105,7 @@ func newSchoolAttributeMap() schoolAttributeMap {
 	return schoolAttributeMap{
 		displayName:     "ou",
 		schoolNumber:    "ocEducationSchoolNumber",
-		id:              "owncloudUUID",
+		id:              "ownCloudUUID",
 		terminationDate: "ocEducationSchoolTerminationTimestamp",
 	}
 }

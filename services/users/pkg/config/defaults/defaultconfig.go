@@ -62,14 +62,14 @@ func DefaultConfig() *config.Config {
 				PoolSize:                 5,
 				PoolCheckoutTimeout:      30 * time.Second,
 				UserSchema: config.LDAPUserSchema{
-					ID:          "ownclouduuid",
+					ID:          "ownCloudUUID",
 					Mail:        "mail",
 					DisplayName: "displayname",
 					Username:    "uid",
 					Enabled:     "ownCloudUserEnabled",
 				},
 				GroupSchema: config.LDAPGroupSchema{
-					ID:          "ownclouduuid",
+					ID:          "ownCloudUUID",
 					Mail:        "mail",
 					DisplayName: "cn",
 					Groupname:   "cn",
