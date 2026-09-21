@@ -71,10 +71,7 @@ export class ResourceTransfer extends ConflictDialog {
       messageStore.showMessage({ title, status: 'success' })
       return
     }
-    const title =
-      errors.length === 1
-        ? this.getSingleFailureTitle(errors[0]?.resourceName, transferType)
-        : this.getMultipleFailureTitle(errors.length, transferType)
+    const title = this.getFailureTitle(errors, transferType)
     let description = ''
     if (errors.some(({ error }) => error instanceof HttpError && error.statusCode === 507)) {
       description = this.getInsufficientQuotaDescription(transferType)
@@ -87,48 +84,36 @@ export class ResourceTransfer extends ConflictDialog {
     })
   }
 
-  private getSingleFailureTitle(name: string, transferType: TransferType): string {
-    switch (transferType) {
-      case TransferType.COPY:
-        return this.$gettext('Failed to copy "%{name}"', { name })
-      case TransferType.DUPLICATE:
-        return this.$gettext('Failed to duplicate "%{name}"', { name })
-      default:
-        return this.$gettext('Failed to move "%{name}"', { name })
-    }
-  }
-
-  private getMultipleFailureTitle(errorCount: number, transferType: TransferType): string {
-    const params = { count: errorCount.toString() }
+  private getFailureTitle(
+    errors: { resourceName: string; error: Error }[],
+    transferType: TransferType
+  ): string {
+    const errorCount = errors.length
+    const params = { name: errors[0]?.resourceName, count: errorCount.toString() }
     switch (transferType) {
       case TransferType.COPY:
         return this.$ngettext(
-          'Failed to copy %{count} resource',
+          'Failed to copy "%{name}"',
           'Failed to copy %{count} resources',
           errorCount,
           params
         )
       case TransferType.DUPLICATE:
         return this.$ngettext(
-          'Failed to duplicate %{count} resource',
+          'Failed to duplicate "%{name}"',
           'Failed to duplicate %{count} resources',
           errorCount,
           params
         )
       default:
         return this.$ngettext(
-          'Failed to move %{count} resource',
+          'Failed to move "%{name}"',
           'Failed to move %{count} resources',
           errorCount,
           params
         )
     }
   }
-
-  /**
-   * The client only learns of the failure from the server's 507, so the message names the space
-   * and what to do rather than an amount of remaining space that may already be stale.
-   */
   private getInsufficientQuotaDescription(transferType: TransferType): string {
     const spaceName =
       this.targetSpace.driveType === 'personal' ? this.$gettext('Personal') : this.targetSpace.name
