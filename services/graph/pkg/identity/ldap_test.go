@@ -31,7 +31,7 @@ var lconfig = config.LDAP{
 	UserObjectClass:          "inetOrgPerson",
 	UserSearchScope:          "sub",
 	UserFilter:               "",
-	UserDisplayNameAttribute: "displayname",
+	UserDisplayNameAttribute: "displayName",
 	UserIDAttribute:          "entryUUID",
 	UserEmailAttribute:       "mail",
 	UserNameAttribute:        "uid",
@@ -55,7 +55,7 @@ var lconfig = config.LDAP{
 var userEntry = ldap.NewEntry("uid=user",
 	map[string][]string{
 		"uid":                  {"user"},
-		"displayname":          {"DisplayName"},
+		"displayName":          {"DisplayName"},
 		"mail":                 {"user@example"},
 		"entryuuid":            {"abcd-defg"},
 		"sn":                   {"surname"},
@@ -67,14 +67,14 @@ var userEntry = ldap.NewEntry("uid=user",
 var invalidUserEntry = ldap.NewEntry("uid=user",
 	map[string][]string{
 		"uid":         {"invalid"},
-		"displayname": {"DisplayName"},
+		"displayName": {"DisplayName"},
 		"mail":        {"user@example"},
 	})
 
 var logger = log.NewLogger(log.Level("debug"))
 
 var ldapUserAttributes = []string{
-	"displayname",
+	"displayName",
 	"entryUUID",
 	"mail",
 	"uid",
@@ -340,7 +340,7 @@ func TestGetUsersSearch(t *testing.T) {
 	// only match if the filter contains the search term unquoted
 	lm.On("Search", mock.MatchedBy(
 		func(req *ldap.SearchRequest) bool {
-			return req.Filter == "(&(objectClass=inetOrgPerson)(|(uid=*term*)(mail=*term*)(displayname=*term*)))"
+			return req.Filter == "(&(objectClass=inetOrgPerson)(|(uid=*term*)(mail=*term*)(displayName=*term*)))"
 		})).
 		Return(&ldap.SearchResult{}, nil)
 	b, _ := getMockedBackend(lm, lconfig, &logger)
@@ -913,7 +913,7 @@ func TestUpdateUser(t *testing.T) {
 											Values: []string{"testUser"},
 										},
 										{
-											Name:   "displayname",
+											Name:   "displayName",
 											Values: []string{"testUser"},
 										},
 										{
@@ -1032,7 +1032,7 @@ func TestUpdateUser(t *testing.T) {
 											Values: []string{"testUser"},
 										},
 										{
-											Name:   "displayname",
+											Name:   "displayName",
 											Values: []string{"testUser"},
 										},
 										{
@@ -1150,7 +1150,7 @@ func TestUpdateUser(t *testing.T) {
 											Values: []string{"testUser"},
 										},
 										{
-											Name:   "displayname",
+											Name:   "displayName",
 											Values: []string{"testUser"},
 										},
 										{

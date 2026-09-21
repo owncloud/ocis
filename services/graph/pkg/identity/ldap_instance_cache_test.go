@@ -14,7 +14,7 @@ var instanceMapperConfig = config.LDAP{
 	UserBaseDN:               "ou=people,dc=test",
 	UserObjectClass:          "inetOrgPerson",
 	UserSearchScope:          "sub",
-	UserDisplayNameAttribute: "displayname",
+	UserDisplayNameAttribute: "displayName",
 	UserIDAttribute:          "entryUUID",
 	UserEmailAttribute:       "mail",
 	UserNameAttribute:        "uid",

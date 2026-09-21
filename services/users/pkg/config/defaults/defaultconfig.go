@@ -64,7 +64,7 @@ func DefaultConfig() *config.Config {
 				UserSchema: config.LDAPUserSchema{
 					ID:          "ownCloudUUID",
 					Mail:        "mail",
-					DisplayName: "displayname",
+					DisplayName: "displayName",
 					Username:    "uid",
 					Enabled:     "ownCloudUserEnabled",
 				},
