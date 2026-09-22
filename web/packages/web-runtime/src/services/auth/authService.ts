@@ -9,6 +9,7 @@ import {
   useTokenTimerWorker,
   useMfaExpiryWorker,
   useModals,
+  useMessages,
   AuthServiceInterface
 } from '@ownclouders/web-pkg'
 import { RouteLocation, RouteLocationRaw, Router } from 'vue-router'
@@ -25,6 +26,12 @@ import { Language } from 'vue3-gettext'
 import { PublicLinkType } from '@ownclouders/web-client'
 import { WebWorkersStore } from '@ownclouders/web-pkg'
 import { isSilentRedirectRoute } from '../../helpers/silentRedirect'
+
+// Marks a pending vault MFA step-up so the redirect back from the IdP can be recognized.
+// sessionStorage: survives the IdP round trip, scoped to the tab.
+export const vaultStepUpAttemptKey = 'oc_vaultMfaStepUpAttempt'
+// An attempt older than this is treated as abandoned (e.g. the user left the IdP page).
+const vaultStepUpAttemptTtlMs = 5 * 60 * 1000
 
 export class AuthService implements AuthServiceInterface {
   private clientService: ClientService
@@ -159,11 +166,25 @@ export class AuthService implements AuthServiceInterface {
       }
 
       if (!user || user.expired || user.profile.acr !== requiredAcr) {
+        // `acr_values` is a voluntary claim: an IdP that can't reach the required level
+        // (no second factor available/enrolled) returns a lower `acr` instead of an error.
+        // Redirecting again would loop forever, so give up after one attempt per navigation.
+        if (user && !user.expired && this.consumeVaultStepUpAttempt()) {
+          console.warn(
+            `[authService:initializeContext] - MFA step-up returned acr "${user.profile.acr}", required "${requiredAcr}". Not retrying.`
+          )
+          this.showVaultStepUpFailedMessage()
+          return { path: '/' }
+        }
+
+        this.markVaultStepUpAttempt()
         this.userManager.setPostLoginRedirectUrl(to.fullPath)
         await this.userManager.signinRedirect({ acr_values: requiredAcr })
         // redirecting to the IdP, don't establish the user context below
         return
       }
+
+      this.clearVaultStepUpAttempt()
     }
 
     if (isPublicLinkContextRequired(this.router, to)) {
@@ -461,6 +482,46 @@ export class AuthService implements AuthServiceInterface {
 
     this.userManager.setPostLoginRedirectUrl(redirectUrl)
     return this.userManager.signinRedirect({ acr_values: acrValue })
+  }
+
+  private markVaultStepUpAttempt() {
+    try {
+      sessionStorage.setItem(vaultStepUpAttemptKey, Date.now().toString())
+    } catch (e) {
+      console.error('failed to persist vault MFA step-up attempt:', e)
+    }
+  }
+
+  /**
+   * Returns true if a recent step-up attempt is pending, and clears it.
+   */
+  private consumeVaultStepUpAttempt(): boolean {
+    let startedAt: number
+    try {
+      startedAt = parseInt(sessionStorage.getItem(vaultStepUpAttemptKey), 10)
+      sessionStorage.removeItem(vaultStepUpAttemptKey)
+    } catch {
+      return false
+    }
+    return !Number.isNaN(startedAt) && Date.now() - startedAt < vaultStepUpAttemptTtlMs
+  }
+
+  private clearVaultStepUpAttempt() {
+    try {
+      sessionStorage.removeItem(vaultStepUpAttemptKey)
+    } catch {
+      // storage unavailable, nothing to clear
+    }
+  }
+
+  private showVaultStepUpFailedMessage() {
+    const { $gettext } = this.language
+    useMessages().showErrorMessage({
+      title: $gettext('Multi-factor authentication required'),
+      desc: $gettext(
+        'The vault requires multi-factor authentication, which could not be completed. Please set up a second factor or contact your administrator.'
+      )
+    })
   }
 
   private updateMfaExpiryTimer() {
