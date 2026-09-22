@@ -2,6 +2,8 @@
 package revaconfig
 
 import (
+	"strings"
+
 	"github.com/owncloud/ocis/v2/services/app-provider/pkg/config"
 )
 
@@ -38,7 +40,7 @@ func AppProviderConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"iop_secret":                    cfg.Drivers.WOPI.IopSecret,
 							"jwt_secret":                    cfg.TokenManager.JWTSecret,
 							"wopi_url":                      cfg.Drivers.WOPI.WopiURL,
-							"wopi_folder_url_base_url":      cfg.Drivers.WOPI.WopiFolderURLBaseURL,
+							"wopi_folder_url_base_url":      strings.TrimRight(cfg.Drivers.WOPI.WopiFolderURLBaseURL, "/") + "/", // ensure it ends with "/"
 							"wopi_folder_url_path_template": cfg.Drivers.WOPI.WopiFolderURLPathTemplate,
 						},
 					},
