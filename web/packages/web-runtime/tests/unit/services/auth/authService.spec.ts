@@ -1,11 +1,18 @@
-import { CapabilityStore, ConfigStore, useAuthStore, useConfigStore } from '@ownclouders/web-pkg'
+import {
+  CapabilityStore,
+  ConfigStore,
+  useAuthStore,
+  useConfigStore,
+  useMessages
+} from '@ownclouders/web-pkg'
 import { mock } from 'vitest-mock-extended'
 import { Router } from 'vue-router'
 import { Ability } from '@ownclouders/web-client'
-import { AuthService } from '../../../../src/services/auth/authService'
+import { AuthService, vaultStepUpAttemptKey } from '../../../../src/services/auth/authService'
 import { UserManager } from '../../../../src/services/auth/userManager'
 import { RouteLocation, createRouter, createTestingPinia } from '@ownclouders/web-test-helpers'
 import { User } from 'oidc-client-ts'
+import { Language } from 'vue3-gettext'
 
 const mockUpdateContext = vi.fn()
 console.debug = vi.fn()
@@ -420,7 +427,7 @@ describe('AuthService', () => {
         null,
         router,
         ability,
-        null,
+        { $gettext: (msg: string) => msg } as unknown as Language,
         null,
         authStore,
         capabilityStore,
@@ -429,6 +436,10 @@ describe('AuthService', () => {
 
       return { authService, pushSpy, mockSignInRedirect, mockLoadUserAbilities, mockUpdateContext }
     }
+
+    beforeEach(() => {
+      sessionStorage.clear()
+    })
 
     it('when the user lacks the vault ability, denies (accessDenied) instead of the IdP', async () => {
       const { authService, mockSignInRedirect } = setupVaultAuthService({
@@ -529,6 +540,69 @@ describe('AuthService', () => {
       expect(mockLoadUserAbilities).toHaveBeenCalled()
       expect(result).toBeUndefined()
       expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
+    })
+
+    describe('MFA step-up loop protection', () => {
+      const regularUser = () =>
+        Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: false }))
+
+      it('marks the step-up attempt before redirecting to the IdP', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: true,
+          getUser: regularUser
+        })
+
+        await authService.initializeContext(vaultRoute)
+
+        expect(sessionStorage.getItem(vaultStepUpAttemptKey)).not.toBeNull()
+        expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
+      })
+
+      it('does not redirect again when the IdP returned without the required acr', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: true,
+          getUser: regularUser
+        })
+        sessionStorage.setItem(vaultStepUpAttemptKey, Date.now().toString())
+
+        const result = await authService.initializeContext(vaultRoute)
+
+        expect(result).toEqual({ path: '/' })
+        expect(mockSignInRedirect).not.toHaveBeenCalled()
+        expect(sessionStorage.getItem(vaultStepUpAttemptKey)).toBeNull()
+        expect(useMessages().showErrorMessage).toHaveBeenCalled()
+      })
+
+      it('retries the step-up when the previous attempt is stale', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: true,
+          getUser: regularUser
+        })
+        sessionStorage.setItem(vaultStepUpAttemptKey, (Date.now() - 10 * 60 * 1000).toString())
+
+        const result = await authService.initializeContext(vaultRoute)
+
+        expect(result).toBeUndefined()
+        expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
+      })
+
+      it('clears the attempt marker once the required acr is present', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: true,
+          getUser: () =>
+            Promise.resolve(mock<User>({ profile: { acr: 'advanced' }, expired: false }))
+        })
+        sessionStorage.setItem(vaultStepUpAttemptKey, Date.now().toString())
+
+        await authService.initializeContext(vaultRoute)
+
+        expect(mockSignInRedirect).not.toHaveBeenCalled()
+        expect(sessionStorage.getItem(vaultStepUpAttemptKey)).toBeNull()
+      })
     })
   })
 })
