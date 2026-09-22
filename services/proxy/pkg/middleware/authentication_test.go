@@ -160,7 +160,7 @@ var _ = Describe("Authenticating requests", Label("Authentication"), func() {
 			testHandler := handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				Expect(oidc.FromContext(r.Context())).To(Equal(map[string]interface{}{
 					"email":              "testuser@example.com",
-					"ownCloudUUID":       "OpaqueId",
+					"ownclouduuid":       "OpaqueId",
 					"iss":                "IdpId",
 					"preferred_username": "testuser",
 				}))
