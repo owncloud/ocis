@@ -21,6 +21,7 @@ require_once 'bootstrap.php';
  * Defines application features from the specific context.
  */
 class EmailContext implements Context {
+	private ?DateTimeZone $lastEmailTimezone = null;
 	private FeatureContext $featureContext;
 	private SpacesContext $spacesContext;
 
@@ -77,10 +78,11 @@ class EmailContext implements Context {
 				'',
 			),
 		);
-		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
+		$this->assertEmailContains(
+			$user,
 			$rawExpectedEmailBodyContent,
+			false,
 			$sender,
-			[],
 			[
 				[
 					"code" => "%space_id%",
@@ -90,7 +92,6 @@ class EmailContext implements Context {
 				],
 			],
 		);
-		$this->assertEmailContains($user, $expectedEmailBodyContent);
 	}
 
 	/**
@@ -109,11 +110,7 @@ class EmailContext implements Context {
 		PyStringNode $content,
 	): void {
 		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
-		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
-			$rawExpectedEmailBodyContent,
-			$sender,
-		);
-		$this->assertEmailContains($user, $expectedEmailBodyContent);
+		$this->assertEmailContains($user, $rawExpectedEmailBodyContent, false, $sender);
 	}
 
 	/**
@@ -162,28 +159,47 @@ class EmailContext implements Context {
 		PyStringNode $content,
 	): void {
 		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
-		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
-			$rawExpectedEmailBodyContent,
-			$sender,
-		);
-		$this->assertEmailContains($user, $expectedEmailBodyContent, true);
+		$this->assertEmailContains($user, $rawExpectedEmailBodyContent, true, $sender);
 	}
 
 	/***
 	 * @param string $user
-	 * @param string $expectedEmailBodyContent
+	 * @param string $rawExpectedEmailBodyContent
 	 * @param bool $ignoreWhiteSpace
+	 * @param string|null $sender
+	 * @param array $additionalSubstitutions
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function assertEmailContains(
 		string $user,
-		string $expectedEmailBodyContent,
+		string $rawExpectedEmailBodyContent,
 		$ignoreWhiteSpace = false,
+		?string $sender = null,
+		array $additionalSubstitutions = [],
 	): void {
 		$address = $this->featureContext->getEmailAddressForUser($user);
 		$actualEmailBodyContent = $this->getBodyOfLastEmail($address);
+		// %expiry_date_in_mail% is resolved here rather than in the step, because the
+		// mail body holds a wall clock printed by the server and the expected value has
+		// to be rendered on the same clock. That timezone comes from the mail's Date
+		// header, so it is only known once the mail has been fetched.
+		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
+			$rawExpectedEmailBodyContent,
+			$sender,
+			[],
+			\array_merge(
+				$additionalSubstitutions,
+				[
+					[
+						"code" => "%expiry_date_in_mail%",
+						"function" => [$this, "getExpiryDateTimeInEmailTimezone"],
+						"parameter" => [],
+					],
+				],
+			),
+		);
 		if ($ignoreWhiteSpace) {
 			$expectedEmailBodyContent = preg_replace('/\s+/', '', $expectedEmailBodyContent);
 			$actualEmailBodyContent = preg_replace('/\s+/', '', $actualEmailBodyContent);
@@ -195,6 +211,19 @@ class EmailContext implements Context {
 			. " email with the body containing $expectedEmailBodyContent
 			but the received email is $actualEmailBodyContent",
 		);
+	}
+
+	/**
+	 * Formats the expiry date on the timezone the server used when it sent the mail.
+	 *
+	 * @param string $format
+	 *
+	 * @return string
+	 */
+	public function getExpiryDateTimeInEmailTimezone(string $format = 'Y-m-d H:i:s'): string {
+		return $this->featureContext->getExpiryDateTime()
+			->setTimezone($this->lastEmailTimezone ?? new DateTimeZone('UTC'))
+			->format($format);
 	}
 
 	/**
@@ -223,6 +252,10 @@ class EmailContext implements Context {
 				$lastEmail = $this->featureContext->getJsonDecodedResponse(
 					EmailHelper::getEmailById("latest", $query),
 				);
+				// the Date header carries the timezone the server rendered the mail in
+				$this->lastEmailTimezone = isset($lastEmail["Date"])
+					? (new DateTimeImmutable($lastEmail["Date"]))->getTimezone()
+					: new DateTimeZone('UTC');
 				$body = \str_replace(
 					"\r\n",
 					"\n",
@@ -250,9 +283,6 @@ class EmailContext implements Context {
 		PyStringNode $content,
 	): void {
 		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
-		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
-			$rawExpectedEmailBodyContent,
-		);
-		$this->assertEmailContains($user, $expectedEmailBodyContent);
+		$this->assertEmailContains($user, $rawExpectedEmailBodyContent);
 	}
 }

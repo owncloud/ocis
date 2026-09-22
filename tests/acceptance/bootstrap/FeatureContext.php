@@ -78,7 +78,7 @@ class FeatureContext extends BehatVariablesContext {
 	private string $adminUsername;
 	private string $adminPassword;
 	private string $originalAdminPassword;
-	private DateTime $expiryDateTime;
+	private DateTimeImmutable $expiryDateTime;
 
 	/**
 	 * An array of values of replacement values of user attributes.
@@ -457,7 +457,7 @@ class FeatureContext extends BehatVariablesContext {
 		$this->regularUserPassword = $regularUserPassword;
 		$this->currentServer = 'LOCAL';
 		$this->cookieJar = new CookieJar();
-		$this->expiryDateTime = new DateTime('yesterday', new DateTimeZone(self::getSystemTimezone()));
+		$this->expiryDateTime = new DateTimeImmutable('yesterday', new DateTimeZone('UTC'));
 
 		// These passwords are referenced in tests and can be overridden by
 		// setting environment variables.
@@ -903,9 +903,9 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @return DateTime
+	 * @return DateTimeImmutable
 	 */
-	public function getExpiryDateTime(): DateTime {
+	public function getExpiryDateTime(): DateTimeImmutable {
 		return $this->expiryDateTime;
 	}
 
@@ -919,26 +919,25 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * Returns the timezone of the host running the tests.
+	 * Normalise a server datetime to UTC, then format it.
 	 *
-	 * The oCIS server renders expiry timestamps in its local timezone, but PHP never reads
-	 * the host timezone and falls back to UTC unless date.timezone is set. On a non-UTC
-	 * host the two disagree, so building the expiry in the host timezone keeps them in
-	 * step. This assumes tests and server share a timezone, true on one host and in CI.
+	 * The server serialises expiry timestamps in its local timezone, so the date
+	 * part of the raw string can differ from the UTC day that was sent.
+	 * Normalising to UTC keeps assertions independent of the server timezone.
+	 *
+	 * @param string $serverDateTime
+	 * @param string $format
 	 *
 	 * @return string
 	 */
-	private static function getSystemTimezone(): string {
-		$timezone = \ltrim((string)\getenv('TZ'), ':')
-			?: \preg_replace('#^.*/zoneinfo/#', '', (string)@\readlink('/etc/localtime'));
-		if (!@\timezone_open($timezone)) {
-			\error_log(
-				"INFORMATION: could not determine the host timezone from TZ or " .
-				"/etc/localtime ('$timezone'), assuming UTC.",
-			);
-			return 'UTC';
+	public function normalizeServerDateTimeToUtc(string $serverDateTime, string $format = 'Y-m-d'): string {
+		try {
+			$dateTime = new DateTimeImmutable($serverDateTime);
+		} catch (Exception $e) {
+			Assert::fail("Invalid server datetime '$serverDateTime': " . $e->getMessage());
+			throw $e;
 		}
-		return $timezone;
+		return $dateTime->setTimezone(new DateTimeZone('UTC'))->format($format);
 	}
 
 	/**
@@ -2526,13 +2525,6 @@ class FeatureContext extends BehatVariablesContext {
 					"getXRequestIdRegex",
 				],
 				"parameter" => [],
-			],
-			[
-				"code" => "%expiry_date_in_mail%",
-				"function" => [
-					$this, "formatExpiryDateTime",
-				],
-				"parameter" => ['Y-m-d H:i:s'],
 			],
 		];
 		if ($user !== null) {

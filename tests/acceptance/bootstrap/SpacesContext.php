@@ -5067,13 +5067,10 @@ class SpacesContext implements Context {
 			) {
 				$foundRoleInResponse = true;
 				if ($expirationDate !== null && isset($permission['expirationDateTime'])) {
-					// oCIS serialises the expiration in the server's local timezone, so the date
-					// part of the raw string is the server's calendar day and can differ from the
-					// day that was sent. Normalise to UTC first: the features expect the UTC date
-					// of the value they sent, and a fixed zone makes this server-independent.
-					$actualExpirationDate = (new DateTime($permission['expirationDateTime']))
-						->setTimezone(new DateTimeZone('UTC'))
-						->format('Y-m-d');
+					$actualExpirationDate = $this->featureContext->normalizeServerDateTimeToUtc(
+						$permission['expirationDateTime'],
+						'Y-m-d',
+					);
 					Assert::assertEquals(
 						$expirationDate,
 						$actualExpirationDate,
