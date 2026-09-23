@@ -181,10 +181,6 @@ class EmailContext implements Context {
 	): void {
 		$address = $this->featureContext->getEmailAddressForUser($user);
 		$actualEmailBodyContent = $this->getBodyOfLastEmail($address);
-		// %expiry_date_in_mail% is resolved here rather than in the step, because the
-		// mail body holds a wall clock printed by the server and the expected value has
-		// to be rendered on the same clock. That timezone comes from the mail's Date
-		// header, so it is only known once the mail has been fetched.
 		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
 			$rawExpectedEmailBodyContent,
 			$sender,
