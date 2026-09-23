@@ -27,6 +27,8 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
 use TestHelpers\BehatHelper;
+use TestHelpers\GraphHelper;
+use TestHelpers\HttpRequestHelper;
 use TestHelpers\KeycloakHelper;
 
 require_once 'bootstrap.php';
@@ -73,6 +75,10 @@ class VaultContext implements Context {
 			$response->getStatusCode(),
 			"Failed to update Keycloak realm attribute $key. Response: " . $response->getBody()->getContents(),
 		);
+		// Decode the JSON map
+		$acrLoaMap = \json_decode($value, true);
+		$acrValue = array_keys($acrLoaMap, "2");
+		$this->featureContext->setAcrValuesToRequest($acrValue[0]);
 	}
 
 	/**
@@ -119,5 +125,59 @@ class VaultContext implements Context {
 			$actualAcr,
 			"Expected acr value to be $acr but got $actualAcr",
 		);
+	}
+
+	/**
+	 * Authenticates a Keycloak-backed user directly via the OIDC token endpoint (no browser,
+	 *  no MFA/vault-mode UI setup) so that the user's oCIS account (and id) is provisioned even
+	 *  for roles that don't have vault UI elements to interact with, e.g. User Light.
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 * @throws Exception
+	 */
+	private function setUpKeycloakUserInOcis(string $user): void {
+		if ($this->featureContext->getAttributeOfCreatedUser($user, 'id')) {
+			return;
+		}
+		$userAttribute = $this->featureContext->getCreatedKeycloakUsers()[strtolower($user)];
+		$tokenData = KeycloakHelper::setAccessTokenForKeycloakOcisUser(
+			$userAttribute,
+			$this->featureContext->getAcrValuesToRequest(),
+		);
+		$this->featureContext->setOcisUserToken($userAttribute, $tokenData);
+
+		$response = HttpRequestHelper::get(
+			GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'me'),
+			null,
+			null,
+			['Authorization' => 'Bearer ' . $tokenData['access_token']],
+		);
+		$userAttribute['id'] = $this->featureContext->getJsonDecodedResponse($response)['id'];
+		$this->featureContext->addUserToCreatedUsersList(
+			$user,
+			$userAttribute['password'],
+			$userAttribute['displayName'],
+			$userAttribute['email'],
+			$userAttribute['id'],
+		);
+	}
+
+	/**
+	 * Sets up a Keycloak user in oCIS
+	 *
+	 * @Given user :user has been set up in oCIS
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userHasBeenSetUpInOcis(string $user): void {
+		$this->setUpKeycloakUserInOcis($user);
 	}
 }
