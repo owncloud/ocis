@@ -119,10 +119,10 @@ export default defineComponent({
 
   &:hover:not(.active) {
     background-color: var(--oc-color-swatch-primary-hover) !important;
-    color: var(--oc-color-swatch-primary-contrast) !important;
+    color: var(--oc-color-text-inverse) !important;
 
     .oc-icon > svg {
-      fill: var(--oc-color-swatch-primary-contrast);
+      fill: var(--oc-color-text-inverse);
     }
   }
 
