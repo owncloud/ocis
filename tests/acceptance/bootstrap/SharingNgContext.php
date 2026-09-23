@@ -2501,6 +2501,35 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @Then /^the last share invitation should have an expiration date approximately "([^"]*)" days from now$/
+	 *
+	 * @param string $days
+	 *
+	 * @return void
+	 */
+	public function theLastShareInvitationShouldHaveAnExpirationDateApproximatelyDaysFromNow(
+		string $days,
+	): void {
+		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent();
+		Assert::assertTrue(
+			isset($responseBody->value[0]->expirationDateTime),
+			"Expected the created share to have an 'expirationDateTime' but none was returned:\n"
+			. print_r($responseBody, true),
+		);
+		$actual = new DateTime($responseBody->value[0]->expirationDateTime);
+		$expected = (new DateTime())->modify("+" . (int)$days . " days");
+		$diffSeconds = \abs($actual->getTimestamp() - $expected->getTimestamp());
+		// allow a 1-day tolerance to absorb any end-of-day rounding of the expiration
+		Assert::assertLessThanOrEqual(
+			86400,
+			$diffSeconds,
+			"Expected an expiration date approximately $days days from now ("
+			. $expected->format(DATE_ATOM) . "), but got " . $actual->format(DATE_ATOM)
+			. " (difference of {$diffSeconds}s)",
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" lists permissions with following filters for (?:folder|file) "([^"]*)" of the space "([^"]*)" using the Graph API:$/
 	 *
 	 * @param string $user
