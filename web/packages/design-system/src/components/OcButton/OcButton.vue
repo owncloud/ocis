@@ -422,8 +422,8 @@ const handlers = computed(() => {
       var(--oc-color-swatch-danger-contrast)
     );
 
-    &-filled:hover,
-    &-filled:focus {
+    &-filled:hover:not([disabled]),
+    &-filled:focus:not([disabled]) {
       color: var(--oc-color-swatch-danger-default) !important;
       span > svg {
         fill: var(--oc-color-swatch-danger-default) !important;
@@ -434,6 +434,10 @@ const handlers = computed(() => {
   &:disabled {
     cursor: default;
     opacity: 0.6;
+  }
+
+  &-danger:disabled {
+    opacity: 1;
   }
 
   &-group {
