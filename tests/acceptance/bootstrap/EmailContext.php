@@ -212,14 +212,12 @@ class EmailContext implements Context {
 	/**
 	 * Formats the expiry date on the timezone the server used when it sent the mail.
 	 *
-	 * @param string $format
-	 *
 	 * @return string
 	 */
-	public function getExpiryDateTimeInEmailTimezone(string $format = 'Y-m-d H:i:s'): string {
+	public function getExpiryDateTimeInEmailTimezone(): string {
 		return $this->featureContext->getExpiryDateTime()
 			->setTimezone($this->lastEmailTimezone ?? new DateTimeZone('UTC'))
-			->format($format);
+			->format('Y-m-d H:i:s');
 	}
 
 	/**
@@ -251,7 +249,7 @@ class EmailContext implements Context {
 				// the Date header carries the timezone the server rendered the mail in
 				$this->lastEmailTimezone = isset($lastEmail["Date"])
 					? (new DateTimeImmutable($lastEmail["Date"]))->getTimezone()
-					: new DateTimeZone('UTC');
+					: null;
 				$body = \str_replace(
 					"\r\n",
 					"\n",
