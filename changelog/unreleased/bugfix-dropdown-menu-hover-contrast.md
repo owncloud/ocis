@@ -9,4 +9,4 @@ Hovered menu items now keep the same text color already used before
 hovering, which reads correctly against the hover background in
 every theme.
 
-https://github.com/owncloud/ocis/pull/TODO
+https://github.com/owncloud/ocis/pull/12994
