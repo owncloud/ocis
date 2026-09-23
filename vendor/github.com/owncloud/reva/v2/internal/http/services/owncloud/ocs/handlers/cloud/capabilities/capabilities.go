@@ -202,6 +202,17 @@ func (h *Handler) Init(c *config.Config) {
 		h.c.Capabilities.FilesSharing.SearchMinLength = 2
 	}
 
+	// vault
+
+	// The vault storage provider id is a fixed constant, not a deployment secret. It is
+	// announced on every capabilities response, not only on `?vault=true`, because clients
+	// running outside the vault need it to recognize vault resources, e.g. to redirect a
+	// vault private link into the vault scope or to filter vault notifications out of the
+	// regular view.
+	if h.c.Capabilities.Vault != nil && bool(h.c.Capabilities.Vault.Enabled) {
+		h.c.Capabilities.Vault.VaultStorageProvider = utils.VaultStorageProviderID
+	}
+
 	// notifications
 
 	// if h.c.Capabilities.Notifications == nil {
@@ -260,6 +271,5 @@ func (h *Handler) vaultCapabilities(c ocs.CapabilitiesData) ocs.CapabilitiesData
 	caps := *c.Capabilities
 	caps.FilesSharing = &sharing
 	c.Capabilities = &caps
-	c.Capabilities.Vault.VaultStorageProvider = utils.VaultStorageProviderID
 	return c
 }

@@ -190,6 +190,67 @@ Feature: vault
       """
 
 
+  Scenario: check capabilities endpoint outside of vault mode
+    Given using OCS API version "2"
+    And user "Alice" has been set up in oCIS
+    When user "Alice" retrieves the capabilities using the capabilities API
+    Then the OCS status code should be "200"
+    And the HTTP status code should be "200"
+    And the ocs JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [ "capabilities" ],
+        "properties": {
+          "capabilities": {
+            "type": "object",
+            "required": [
+              "files_sharing",
+              "vault"
+            ],
+            "properties": {
+              "files_sharing": {
+                "type": "object",
+                "required": [
+                  "public",
+                  "federation"
+                ],
+                "properties": {
+                  "public": {
+                    "type": "object",
+                    "required": [
+                      "enabled"
+                    ],
+                    "properties": {
+                      "enabled": {
+                        "const": true
+                      }
+                    }
+                  }
+                }
+              },
+              "vault": {
+                "type": "object",
+                "required": [
+                  "enabled",
+                  "vault_storage_provider"
+                ],
+                "properties": {
+                  "enabled": {
+                    "const": true
+                  },
+                  "vault_storage_provider": {
+                    "pattern": "%uuidv4_pattern%"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+
+
   Scenario: user copies folder from drive to vault
     Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "driveFolder" in space "Personal"
