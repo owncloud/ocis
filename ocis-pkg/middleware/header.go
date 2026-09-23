@@ -28,7 +28,7 @@ func Cors(opts ...cors.Option) func(http.Handler) http.Handler {
 
 	allowCredentials := options.AllowCredentials
 	// A wildcard origin must not be combined with credentials.
-	if allowCredentials && allowsAllOrigins(options.AllowedOrigins) {
+	if allowCredentials && cors.AllowsAnyOrigin(options.AllowedOrigins) {
 		logger.Warn().
 			Strs("allowed_origins", options.AllowedOrigins).
 			Msg("cors: refusing to allow credentials together with a wildcard origin, disabling allow_credentials")
@@ -48,18 +48,4 @@ func Cors(opts ...cors.Option) func(http.Handler) http.Handler {
 		AllowCredentials: allowCredentials,
 	})
 	return c.Handler
-}
-
-// allowsAllOrigins reports whether the configured origins permit every origin.
-// rs/cors treats both an empty list and a list containing "*" as "allow all".
-func allowsAllOrigins(origins []string) bool {
-	if len(origins) == 0 {
-		return true
-	}
-	for _, o := range origins {
-		if strings.TrimSpace(o) == "*" {
-			return true
-		}
-	}
-	return false
 }

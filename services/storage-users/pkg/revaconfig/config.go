@@ -5,12 +5,19 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 )
 
 // StorageUsersConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
 func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
+	// Credentials must not be combined with a wildcard origin.
+	corsAllowCredentials := cfg.HTTP.CORS.AllowCredentials
+	if corsAllowCredentials && cors.AllowsAnyOrigin(cfg.HTTP.CORS.AllowedOrigins) {
+		corsAllowCredentials = false
+	}
+
 	rcfg := map[string]interface{}{
 		"core": map[string]interface{}{
 			"graceful_shutdown_timeout": cfg.GracefulShutdownTimeout,
@@ -105,7 +112,7 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"cors_enabled":   true,
 							// allow_origin is configured as a regex in tusd, so we concatenate the configured values into a regex
 							"cors_allow_origin":      "(" + strings.ReplaceAll(strings.Join(cfg.HTTP.CORS.AllowedOrigins, "|"), "*", ".*") + ")",
-							"cors_allow_credentials": cfg.HTTP.CORS.AllowCredentials,
+							"cors_allow_credentials": corsAllowCredentials,
 							"cors_allow_methods":     strings.Join(cfg.HTTP.CORS.AllowedMethods, ","),
 							"cors_allow_headers":     strings.Join(cfg.HTTP.CORS.AllowedHeaders, ","),
 							"cors_max_age":           strconv.FormatUint(uint64(cfg.HTTP.CORS.MaxAge), 10),

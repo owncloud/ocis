@@ -1,6 +1,8 @@
 package cors
 
 import (
+	"strings"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
@@ -65,4 +67,19 @@ func AllowCredentials(allow bool) Option {
 	return func(o *Options) {
 		o.AllowCredentials = allow
 	}
+}
+
+// AllowsAnyOrigin reports whether the origins permit any origin: an empty list,
+// a bare "*", or any wildcard-pattern entry (e.g. "https://*"). Such origins must
+// not be combined with credentials. Matching is lower-cased and trimmed.
+func AllowsAnyOrigin(origins []string) bool {
+	if len(origins) == 0 {
+		return true
+	}
+	for _, o := range origins {
+		if strings.Contains(strings.ToLower(strings.TrimSpace(o)), "*") {
+			return true
+		}
+	}
+	return false
 }
