@@ -5067,10 +5067,9 @@ class SpacesContext implements Context {
 			) {
 				$foundRoleInResponse = true;
 				if ($expirationDate !== null && isset($permission['expirationDateTime'])) {
-					$actualExpirationDate = $this->featureContext->normalizeServerDateTimeToUtc(
-						$permission['expirationDateTime'],
-						'Y-m-d',
-					);
+					$actualExpirationDate = (new DateTimeImmutable($permission['expirationDateTime']))
+						->setTimezone(new DateTimeZone('UTC'))
+						->format('Y-m-d');
 					Assert::assertEquals(
 						$expirationDate,
 						$actualExpirationDate,

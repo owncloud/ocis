@@ -919,28 +919,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * Normalise a server datetime to UTC, then format it.
-	 *
-	 * The server serialises expiry timestamps in its local timezone, so the date
-	 * part of the raw string can differ from the UTC day that was sent.
-	 * Normalising to UTC keeps assertions independent of the server timezone.
-	 *
-	 * @param string $serverDateTime
-	 * @param string $format
-	 *
-	 * @return string
-	 */
-	public function normalizeServerDateTimeToUtc(string $serverDateTime, string $format = 'Y-m-d'): string {
-		try {
-			$dateTime = new DateTimeImmutable($serverDateTime);
-		} catch (Exception $e) {
-			Assert::fail("Invalid server datetime '$serverDateTime': " . $e->getMessage());
-			throw $e;
-		}
-		return $dateTime->setTimezone(new DateTimeZone('UTC'))->format($format);
-	}
-
-	/**
 	 * @Given using SharingNG
 	 *
 	 * @return void
