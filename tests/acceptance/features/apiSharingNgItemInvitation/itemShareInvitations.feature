@@ -760,6 +760,54 @@ Feature: Send a sharing invitations
       | Editor           | FolderToShare  |
       | Uploader         | FolderToShare  |
 
+
+  Scenario Outline: server sets a default 30-day expiration when a user share is created without one
+    Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
+    And user "Alice" has created folder "FolderToShare"
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | <resource>         |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "roles",
+                "grantedToV2",
+                "expirationDateTime"
+              ],
+              "properties": {
+                "expirationDateTime": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    And the last share invitation should have an expiration date approximately "30" days from now
+    Examples:
+      | permissions-role | resource       |
+      | Viewer           | /textfile1.txt |
+      | Viewer           | FolderToShare  |
+
   @issue-7962
   Scenario Outline: send share invitation to disabled user
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
