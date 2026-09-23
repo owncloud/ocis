@@ -20,7 +20,7 @@ var eduConfig = config.LDAP{
 	UserObjectClass:          "inetOrgPerson",
 	UserSearchScope:          "sub",
 	UserFilter:               "",
-	UserDisplayNameAttribute: "displayName",
+	UserDisplayNameAttribute: "displayname",
 	UserIDAttribute:          "entryUUID",
 	UserEmailAttribute:       "mail",
 	UserNameAttribute:        "uid",

@@ -18,13 +18,13 @@ import (
 func TestAttrsFromAddRequest(t *testing.T) {
 	ar := ldap.NewAddRequest("uid=alice,ou=people,dc=test", nil)
 	ar.Attribute("uid", []string{"alice"})
-	ar.Attribute("displayName", []string{"Alice Example"})
+	ar.Attribute("displayname", []string{"Alice Example"})
 	ar.Attribute("mail", []string{"alice@example.org", "a@example.org"})
 
 	attrs := attrsFromAddRequest(ar)
 
 	assert.Equal(t, []string{"alice"}, attrs["uid"])
-	assert.Equal(t, []string{"Alice Example"}, attrs["displayName"])
+	assert.Equal(t, []string{"Alice Example"}, attrs["displayname"])
 	assert.Equal(t, []string{"alice@example.org", "a@example.org"}, attrs["mail"])
 
 	// round-trips through ldap.NewEntry with case-insensitive lookup
@@ -51,17 +51,17 @@ func TestAttrsFromAddRequestDoesNotAliasRequest(t *testing.T) {
 func TestApplyModifyToEntry(t *testing.T) {
 	base := ldap.NewEntry("uid=alice,ou=people,dc=test", map[string][]string{
 		"uid":         {"alice"},
-		"displayName": {"Alice Example"},
+		"displayname": {"Alice Example"},
 		"mail":        {"alice@example.org"},
 		"member":      {"cn=a", "cn=b"},
 	})
 
 	t.Run("Replace overwrites existing attribute", func(t *testing.T) {
 		mr := &ldap.ModifyRequest{DN: base.DN}
-		mr.Replace("displayName", []string{"Alice New"})
+		mr.Replace("displayname", []string{"Alice New"})
 
 		got := applyModifyToEntry(base, mr)
-		assert.Equal(t, "Alice New", got.GetEqualFoldAttributeValue("displayName"))
+		assert.Equal(t, "Alice New", got.GetEqualFoldAttributeValue("displayname"))
 	})
 
 	t.Run("Replace adds a not-yet-present attribute", func(t *testing.T) {
@@ -113,13 +113,13 @@ func TestApplyModifyToEntry(t *testing.T) {
 	t.Run("nil ModifyRequest returns base unchanged", func(t *testing.T) {
 		got := applyModifyToEntry(base, nil)
 		assert.Equal(t, base.DN, got.DN)
-		assert.Equal(t, "Alice Example", got.GetEqualFoldAttributeValue("displayName"))
+		assert.Equal(t, "Alice Example", got.GetEqualFoldAttributeValue("displayname"))
 		assert.Equal(t, []string{"cn=a", "cn=b"}, got.GetEqualFoldAttributeValues("member"))
 	})
 
 	t.Run("nil base returns nil", func(t *testing.T) {
 		mr := &ldap.ModifyRequest{DN: "uid=alice,ou=people,dc=test"}
-		mr.Replace("displayName", []string{"Alice New"})
+		mr.Replace("displayname", []string{"Alice New"})
 
 		got := applyModifyToEntry(nil, mr)
 		assert.Nil(t, got)
@@ -130,11 +130,11 @@ func TestApplyModifyToEntry(t *testing.T) {
 		mr.Replace("DisplayName", []string{"Alice Caps"})
 
 		got := applyModifyToEntry(base, mr)
-		assert.Equal(t, "Alice Caps", got.GetEqualFoldAttributeValue("displayName"))
+		assert.Equal(t, "Alice Caps", got.GetEqualFoldAttributeValue("displayname"))
 		// exactly one attribute entry whose name folds to displayname
 		count := 0
 		for _, a := range got.Attributes {
-			if strings.EqualFold(a.Name, "displayName") {
+			if strings.EqualFold(a.Name, "displayname") {
 				count++
 			}
 		}
@@ -143,22 +143,22 @@ func TestApplyModifyToEntry(t *testing.T) {
 
 	t.Run("base is never mutated", func(t *testing.T) {
 		mr := &ldap.ModifyRequest{DN: base.DN}
-		mr.Replace("displayName", []string{"Mutated"})
+		mr.Replace("displayname", []string{"Mutated"})
 		mr.Add("member", []string{"cn=z"})
 		mr.Delete("mail", []string{})
 
 		_ = applyModifyToEntry(base, mr)
-		assert.Equal(t, "Alice Example", base.GetEqualFoldAttributeValue("displayName"))
+		assert.Equal(t, "Alice Example", base.GetEqualFoldAttributeValue("displayname"))
 		assert.Equal(t, []string{"cn=a", "cn=b"}, base.GetEqualFoldAttributeValues("member"))
 		assert.Equal(t, "alice@example.org", base.GetEqualFoldAttributeValue("mail"))
 	})
 
 	t.Run("Replace populates ByteValues for raw accessors", func(t *testing.T) {
 		mr := &ldap.ModifyRequest{DN: base.DN}
-		mr.Replace("displayName", []string{"Raw Value"})
+		mr.Replace("displayname", []string{"Raw Value"})
 
 		got := applyModifyToEntry(base, mr)
-		assert.Equal(t, []byte("Raw Value"), got.GetEqualFoldRawAttributeValue("displayName"))
+		assert.Equal(t, []byte("Raw Value"), got.GetEqualFoldRawAttributeValue("displayname"))
 	})
 }
 
@@ -351,7 +351,7 @@ func TestSynthesizedEntryPopulatesInstancesWithoutSearch(t *testing.T) {
 	// member-of-instance value so the Instances loop runs.
 	entry := ldap.NewEntry("uid=user,ou=people,dc=test", map[string][]string{
 		"uid":                {"user"},
-		"displayName":        {"DisplayName"},
+		"displayname":        {"DisplayName"},
 		"mail":               {"user@example"},
 		"entryUUID":          {"abcd-defg"},
 		"ocMemberOfInstance": {"instanceA"},
@@ -523,7 +523,7 @@ func TestUpdateUserFoldsNoReadBack(t *testing.T) {
 
 	preRead := ldap.NewEntry("uid=user,ou=people,dc=test", map[string][]string{
 		"uid":               {"user"},
-		"displayName":       {"Old Name"},
+		"displayname":       {"Old Name"},
 		"mail":              {"old@example.org"},
 		"entryUUID":         {"abcd-defg"},
 		"userTypeAttribute": {"Member"},
@@ -563,7 +563,7 @@ func TestUpdateEducationUserFoldsNoReadBack(t *testing.T) {
 
 	preRead := ldap.NewEntry("uid=testuser,ou=people,dc=test", map[string][]string{
 		"uid":               {"testuser"},
-		"displayName":       {"Test User"},
+		"displayname":       {"Test User"},
 		"mail":              {"old@example.org"},
 		"entryUUID":         {"abcd-defg"},
 		"userClass":         {"student"},
