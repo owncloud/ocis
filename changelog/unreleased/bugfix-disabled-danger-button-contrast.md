@@ -9,4 +9,4 @@ been darkened, and the fading effect applied to disabled buttons no longer
 washes out the danger button background, restoring readable contrast
 between the label and the background.
 
-https://github.com/owncloud/ocis/pull/TODO
+https://github.com/owncloud/ocis/pull/12992
