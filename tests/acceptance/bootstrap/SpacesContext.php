@@ -5067,13 +5067,16 @@ class SpacesContext implements Context {
 			) {
 				$foundRoleInResponse = true;
 				if ($expirationDate !== null && isset($permission['expirationDateTime'])) {
+					$expectedExpirationDate = (new DateTimeImmutable($expirationDate))
+						->setTimezone($this->featureContext->getTestTimezone())
+						->format('Y-m-d');
 					$actualExpirationDate = (new DateTimeImmutable($permission['expirationDateTime']))
-						->setTimezone(new DateTimeZone('UTC'))
+						->setTimezone($this->featureContext->getTestTimezone())
 						->format('Y-m-d');
 					Assert::assertEquals(
-						$expirationDate,
+						$expectedExpirationDate,
 						$actualExpirationDate,
-						"$expirationDate is different in the response",
+						"Expiration date mismatch",
 					);
 				}
 				break;

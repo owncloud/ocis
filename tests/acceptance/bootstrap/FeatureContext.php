@@ -457,7 +457,7 @@ class FeatureContext extends BehatVariablesContext {
 		$this->regularUserPassword = $regularUserPassword;
 		$this->currentServer = 'LOCAL';
 		$this->cookieJar = new CookieJar();
-		$this->expiryDateTime = new DateTimeImmutable('yesterday', new DateTimeZone('UTC'));
+		$this->expiryDateTime = new DateTimeImmutable('yesterday', $this->getTestTimezone());
 
 		// These passwords are referenced in tests and can be overridden by
 		// setting environment variables.
@@ -3067,5 +3067,12 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function theSystemWaitsForSeconds(string $seconds): void {
 		\sleep((int)$seconds);
+	}
+
+	/**
+	 * @return DateTimeZone
+	 */
+	public function getTestTimezone(): DateTimeZone {
+		return new DateTimeZone(\date_default_timezone_get());
 	}
 }

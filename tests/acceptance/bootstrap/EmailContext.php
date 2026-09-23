@@ -12,6 +12,7 @@ use Behat\Gherkin\Node\PyStringNode;
 use PHPUnit\Framework\Assert;
 use GuzzleHttp\Exception\GuzzleException;
 use TestHelpers\EmailHelper;
+use TestHelpers\HttpRequestHelper;
 use TestHelpers\GraphHelper;
 use TestHelpers\BehatHelper;
 
@@ -21,7 +22,6 @@ require_once 'bootstrap.php';
  * Defines application features from the specific context.
  */
 class EmailContext implements Context {
-	private ?DateTimeZone $lastEmailTimezone = null;
 	private FeatureContext $featureContext;
 	private SpacesContext $spacesContext;
 
@@ -212,14 +212,12 @@ class EmailContext implements Context {
 	/**
 	 * Formats the expiry date on the timezone the server used when it sent the mail.
 	 *
-	 * @param string $format
-	 *
 	 * @return string
 	 */
-	public function getExpiryDateTimeInEmailTimezone(string $format = 'Y-m-d H:i:s'): string {
+	public function getExpiryDateTimeInEmailTimezone(): string {
 		return $this->featureContext->getExpiryDateTime()
-			->setTimezone($this->lastEmailTimezone ?? new DateTimeZone('UTC'))
-			->format($format);
+			->setTimezone(HttpRequestHelper::getEmailServerTimezone())
+			->format('Y-m-d H:i:s');
 	}
 
 	/**
@@ -248,10 +246,6 @@ class EmailContext implements Context {
 				$lastEmail = $this->featureContext->getJsonDecodedResponse(
 					EmailHelper::getEmailById("latest", $query),
 				);
-				// the Date header carries the timezone the server rendered the mail in
-				$this->lastEmailTimezone = isset($lastEmail["Date"])
-					? (new DateTimeImmutable($lastEmail["Date"]))->getTimezone()
-					: new DateTimeZone('UTC');
 				$body = \str_replace(
 					"\r\n",
 					"\n",
