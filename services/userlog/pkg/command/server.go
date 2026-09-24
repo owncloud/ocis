@@ -33,6 +33,7 @@ import (
 var _registeredEvents = []events.Unmarshaller{
 	// file related
 	events.PostprocessingStepFinished{},
+	events.UploadReady{},
 
 	// space related
 	events.SpaceDisabled{},

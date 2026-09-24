@@ -1,5 +1,12 @@
 package service
 
+type PostprocessingOutcome string
+
+const (
+	OutcomeSuccess PostprocessingOutcome = ""
+	OutcomeFailed  PostprocessingOutcome = "failed"
+)
+
 // FileEvent is emitted when a file is uploaded/renamed/deleted/...
 type FileEvent struct {
 	ParentItemID string `json:"parentitemid"`
@@ -7,6 +14,8 @@ type FileEvent struct {
 	SpaceID      string `json:"spaceid"`
 	InitiatorID  string `json:"initiatorid"`
 	Etag         string `json:"etag"`
+
+	Outcome PostprocessingOutcome `json:"outcome,omitempty"`
 
 	// Only in case of sharing (refactor this into separate struct when more fields are needed)
 	AffectedUserIDs []string `json:"affecteduserids"`
