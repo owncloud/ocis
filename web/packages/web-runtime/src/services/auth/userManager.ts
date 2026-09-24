@@ -11,6 +11,7 @@ import { getAbilities } from './abilities'
 import { AuthStore, UserStore, CapabilityStore, ConfigStore } from '@ownclouders/web-pkg'
 import { ClientService } from '@ownclouders/web-pkg'
 import { Ability } from '@ownclouders/web-client'
+import { retryOnTransientError } from './transientRetry'
 import { Language } from 'vue3-gettext'
 import { loadAppTranslations, setCurrentLanguage } from '../../helpers/language'
 import { router } from '../../router'
@@ -192,7 +193,10 @@ export class UserManager extends OidcUserManager {
     await this.fetchCapabilities()
 
     const graphClient = this.clientService.graphAuthenticated
-    const [graphUser, roles] = await Promise.all([graphClient.users.getMe(), this.fetchRoles()])
+    const [graphUser, roles] = await Promise.all([
+      retryOnTransientError(() => graphClient.users.getMe()),
+      this.fetchRoles()
+    ])
     const role = await this.fetchRole({ graphUser, roles })
 
     this.userStore.setUser({
@@ -228,7 +232,9 @@ export class UserManager extends OidcUserManager {
     try {
       const {
         data: { bundles: roles }
-      } = await httpClient.post<{ bundles: SettingsBundle[] }>('/api/v0/settings/roles-list', {})
+      } = await retryOnTransientError(() =>
+        httpClient.post<{ bundles: SettingsBundle[] }>('/api/v0/settings/roles-list', {})
+      )
       return roles
     } catch (e) {
       console.error(e)

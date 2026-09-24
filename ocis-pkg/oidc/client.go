@@ -219,7 +219,7 @@ func (u *UserInfo) Claims(v interface{}) error {
 // UserInfo retrieves the userinfo from a Token
 func (c *oidcClient) UserInfo(ctx context.Context, tokenSource oauth2.TokenSource) (*UserInfo, error) {
 	if err := c.lookupWellKnownOpenidConfiguration(ctx); err != nil {
-		return nil, err
+		return nil, classifyTransport(err)
 	}
 
 	if c.provider.UserinfoEndpoint == "" {
@@ -239,15 +239,19 @@ func (c *oidcClient) UserInfo(ctx context.Context, tokenSource oauth2.TokenSourc
 
 	resp, err := c.httpClient.Do(req.WithContext(ctx))
 	if err != nil {
-		return nil, err
+		return nil, classifyTransport(err)
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, classifyTransport(err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("%s: %s", resp.Status, body)
+		err := fmt.Errorf("%s: %s", resp.Status, body)
+		if statusIsTransient(resp.StatusCode) {
+			return nil, errors.Join(ErrTemporarilyUnavailable, err)
+		}
+		return nil, err
 	}
 
 	ct := resp.Header.Get("Content-Type")
