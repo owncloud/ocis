@@ -11,7 +11,7 @@ Feature: vault
 
 
   Scenario: user can create folders and files in personal space in vault
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     When user "Alice" creates a folder "vaultFolder" in space "Personal" in vault using the WebDav Api
     Then the HTTP status code should be "201"
     When user "Alice" uploads a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault using the WebDAV API
@@ -23,7 +23,7 @@ Feature: vault
 
   Scenario: user can create folders and files in project space in vault
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    And user "Alice" has been set up in oCIS
     And user "Alice" has created a space "vault-space" in vault with the default quota using the Graph API
     When user "Alice" creates a folder "vaultFolder" in space "vault-space" in vault using the WebDav Api
     Then the HTTP status code should be "201"
@@ -35,7 +35,7 @@ Feature: vault
 
 
   Scenario: resources in drive and vault are isolated
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "driveFolder" in space "Personal"
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "driveFile.txt"
     And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
@@ -58,7 +58,7 @@ Feature: vault
   Scenario: user can set custom auth level names
     Given the administrator has set the Keycloak realm attribute "acr.loa.map" to '{"regular":"1","testing":"2"}'
     And the config "OCIS_MFA_AUTH_LEVEL_NAMES" has been set to "testing"
-    And user "Alice" has logged in via web UI
+    And user "Alice" has been set up in oCIS
     When user "Alice" uploads a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should have a JWT token with an ACR value "testing"
@@ -66,7 +66,7 @@ Feature: vault
 
   Scenario: check capabilities endpoint for vault
     Given using OCS API version "2"
-    And user "Alice" has logged in via web UI
+    And user "Alice" has been set up in oCIS
     When user "Alice" retrieves the vault mode capabilities using the capabilities API
     Then the OCS status code should be "200"
     And the HTTP status code should be "200"
@@ -185,7 +185,7 @@ Feature: vault
 
 
   Scenario: user copies folder from drive to vault
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "driveFolder" in space "Personal"
     When user "Alice" copies folder "driveFolder" from space "Personal" to "driveFolder" inside space "Personal" in vault using the WebDAV API
     Then the HTTP status code should be "201"
@@ -196,7 +196,7 @@ Feature: vault
 
 
   Scenario: user copies file from drive to vault
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testfile.txt"
     When user "Alice" copies file "testfile.txt" from space "Personal" to "testfile.txt" inside space "Personal" in vault using the WebDAV API
     Then the HTTP status code should be "201"
@@ -206,7 +206,7 @@ Feature: vault
 
 
   Scenario: user tries to copy folder from vault to drive
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
     When user "Alice" copies folder "vaultFolder" from space "Personal" in vault to "vaultFolder" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "409"
@@ -217,7 +217,7 @@ Feature: vault
 
 
   Scenario: user tries to copy file from vault to drive
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testfile.txt" in vault
     When user "Alice" copies file "testfile.txt" from space "Personal" in vault to "testfile.txt" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "409"
@@ -228,7 +228,7 @@ Feature: vault
 
 
   Scenario: user copies sub-folder from drive to vault
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "driveFolder" in space "Personal"
     And user "Alice" has created a folder "driveFolder/subFolder" in space "Personal"
     When user "Alice" copies folder "driveFolder/subFolder" from space "Personal" to "subFolder" inside space "Personal" in vault using the WebDAV API
@@ -240,7 +240,7 @@ Feature: vault
 
 
   Scenario: user copies file inside folder from drive to vault
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "driveFolder" in space "Personal"
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "driveFolder/testfile.txt"
     When user "Alice" copies file "driveFolder/testfile.txt" from space "Personal" to "testfile.txt" inside space "Personal" in vault using the WebDAV API
@@ -251,7 +251,7 @@ Feature: vault
 
 
   Scenario: user copies sub-folder from drive to a folder in vault
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "driveFolder" in space "Personal"
     And user "Alice" has created a folder "driveFolder/subFolder" in space "Personal"
     And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
@@ -264,7 +264,7 @@ Feature: vault
 
 
   Scenario: user copies file inside folder from drive to a folder in vault
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "driveFolder" in space "Personal"
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "driveFolder/testfile.txt"
     And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
@@ -276,7 +276,7 @@ Feature: vault
 
 
   Scenario: user tries to create a public link of a folder inside vault
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
     When user "Alice" creates the following resource link share using the Graph API:
       | resource        | vaultFolder |
@@ -315,7 +315,7 @@ Feature: vault
 
 
   Scenario: user tries to create a public link of a file inside vault
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testfile.txt" in vault
     When user "Alice" creates the following resource link share using the Graph API:
       | resource        | testfile.txt |
@@ -355,7 +355,7 @@ Feature: vault
 
   Scenario: user tries to create a public link of a space root inside vault
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    And user "Alice" has been set up in oCIS
     And user "Alice" has created a space "vault-space" in vault with the default quota using the Graph API
     When user "Alice" tries to create the following space link share using permissions endpoint of the Graph API:
       | space           | vault-space |
@@ -394,9 +394,9 @@ Feature: vault
 
   Scenario Outline: send share invitation for project space in vault to user with different roles (permissions endpoint)
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    And user "Alice" has been set up in oCIS
     And user "Brian" has been created with default attributes
-    And user "Brian" has logged in via web UI
+    And user "Brian" has been set up in oCIS
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
       | space           | new-space          |
@@ -472,9 +472,9 @@ Feature: vault
 
   Scenario Outline: send share invitation for disabled project space in vault to user with different roles (permissions endpoint)
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    And user "Alice" has been set up in oCIS
     And user "Brian" has been created with default attributes
-    And user "Brian" has logged in via web UI
+    And user "Brian" has been set up in oCIS
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     And user "Admin" has disabled a space "new-space" in vault
     When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
@@ -520,9 +520,9 @@ Feature: vault
 
   Scenario Outline: send share invitation for deleted project space in vault to user with different roles (permissions endpoint)
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    And user "Alice" has been set up in oCIS
     And user "Brian" has been created with default attributes
-    And user "Brian" has logged in via web UI
+    And user "Brian" has been set up in oCIS
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     And user "Admin" has disabled a space "new-space" in vault
     And user "Admin" has deleted a space "new-space" in vault
@@ -567,9 +567,9 @@ Feature: vault
 
 
   Scenario Outline: try to send share invitation for personal space in vault to user with different roles (permissions endpoint)
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Brian" has been created with default attributes
-    And user "Brian" has logged in via web UI
+    And user "Brian" has been set up in oCIS
     When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
       | space           | Personal           |
       | sharee          | Brian              |
@@ -613,9 +613,9 @@ Feature: vault
 
 
   Scenario Outline: try to share Shares space in vault with a user (permissions endpoint)
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Brian" has been created with default attributes
-    And user "Brian" has logged in via web UI
+    And user "Brian" has been set up in oCIS
     When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
       | space           | Shares             |
       | sharee          | Brian              |
@@ -660,9 +660,9 @@ Feature: vault
 
   Scenario Outline: invite user to a project space in vault with different roles using root endpoint
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    And user "Alice" has been set up in oCIS
     And user "Brian" has been created with default attributes
-    And user "Brian" has logged in via web UI
+    And user "Brian" has been set up in oCIS
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     When user "Alice" sends the following space share invitation using root endpoint of the Graph API:
       | space           | new-space          |
@@ -738,9 +738,9 @@ Feature: vault
 
 
   Scenario Outline: try to invite user to personal drive in vault with different roles using root endpoint
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Brian" has been created with default attributes
-    And user "Brian" has logged in via web UI
+    And user "Brian" has been set up in oCIS
     When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space           | Personal           |
       | sharee          | Brian              |
@@ -784,9 +784,9 @@ Feature: vault
 
 
   Scenario Outline: try to invite user to Shares drive in vault with different roles using root endpoint
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Brian" has been created with default attributes
-    And user "Brian" has logged in via web UI
+    And user "Brian" has been set up in oCIS
     When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
       | space           | Shares             |
       | sharee          | Brian              |
@@ -830,7 +830,7 @@ Feature: vault
 
 
   Scenario: search results for resources in Personal space should be isolated between vault and drive
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "testDriveFolder" in space "Personal"
     And user "Alice" has created a folder "testVaultFolder" in space "Personal" in vault
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testDriveFile.txt"
@@ -850,7 +850,7 @@ Feature: vault
 
 
   Scenario: search results for resources inside folder with same name should be isolated between vault and drive
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "newFolder" in space "Personal"
     And user "Alice" has created a folder "newFolder" in space "Personal" in vault
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "newFolder/testDriveFile.txt"
@@ -869,7 +869,7 @@ Feature: vault
 
   Scenario: search result for resources inside project spaces with same name should be isolated between vault and drive
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    And user "Alice" has been set up in oCIS
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     And user "Alice" has created a folder "testDriveFolder" in space "new-space"
@@ -891,7 +891,7 @@ Feature: vault
 
   @tikaServiceNeeded
   Scenario: search result by content of file should be isolated between vault and drive
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has uploaded a file inside space "Personal" with content "content of file in drive" to "testDriveFile.txt"
     And user "Alice" has uploaded a file inside space "Personal" with content "content of file in vault" to "testVaultFile.txt" in vault
     When user "Alice" searches for "Content:content" in vault using the WebDAV API
@@ -908,7 +908,7 @@ Feature: vault
   @tikaServiceNeeded
   Scenario: search result by content of file inside project space should be isolated between vault and drive
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    And user "Alice" has been set up in oCIS
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "content of file in drive" to "testDriveFile.txt"
@@ -926,7 +926,7 @@ Feature: vault
 
 
   Scenario: search results by resource tags should be isolated between vault and drive
-    Given user "Alice" has logged in via web UI
+    Given user "Alice" has been set up in oCIS
     And user "Alice" has created a folder "driveFolder" in space "Personal"
     And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "testDriveFile.txt"
@@ -959,7 +959,7 @@ Feature: vault
 
   Scenario: search results by resource tags inside project space should be isolated between vault and drive
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
+    And user "Alice" has been set up in oCIS
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     And user "Alice" has created a folder "driveFolder" in space "new-space"
@@ -994,8 +994,8 @@ Feature: vault
 
   Scenario Outline: folder share received from vault and drive personal space should be isolated
     Given user "Brian" has been created with default attributes
-    And user "Alice" has logged in via web UI
-    And user "Brian" has logged in via web UI
+    And user "Alice" has been set up in oCIS
+    And user "Brian" has been set up in oCIS
     And user "Alice" has created a folder "driveFolder" in space "Personal"
     And user "Alice" has created a folder "vaultFolder" in space "Personal" in vault
     And user "Alice" has sent the following resource share invitation:
@@ -1028,8 +1028,8 @@ Feature: vault
 
   Scenario Outline: file share received from vault and drive personal space should be isolated
     Given user "Brian" has been created with default attributes
-    And user "Alice" has logged in via web UI
-    And user "Brian" has logged in via web UI
+    And user "Alice" has been set up in oCIS
+    And user "Brian" has been set up in oCIS
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "driveFile.txt"
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault
     And user "Alice" has sent the following resource share invitation:
@@ -1062,8 +1062,8 @@ Feature: vault
   Scenario Outline: folder share received from vault and drive project space should be isolated
     Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
-    And user "Brian" has logged in via web UI
+    And user "Alice" has been set up in oCIS
+    And user "Brian" has been set up in oCIS
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     And user "Alice" has created a folder "driveFolder" in space "new-space"
@@ -1099,8 +1099,8 @@ Feature: vault
   Scenario Outline: folder share received from vault and drive project space should be isolated
     Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has logged in via web UI
-    And user "Brian" has logged in via web UI
+    And user "Alice" has been set up in oCIS
+    And user "Brian" has been set up in oCIS
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "driveFile.txt"
