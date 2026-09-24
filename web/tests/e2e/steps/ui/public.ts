@@ -65,10 +65,12 @@ export async function anonymousUserOpensPublicLink({
 
 export async function userUnlocksPublicLink({
   password,
-  stepUser
+  stepUser,
+  expectToSucceed = true
 }: {
   password: string
   stepUser: string
+  expectToSucceed?: boolean
 }): Promise<void> {
   const world = getWorld()
   const { page } = world.actorsEnvironment.getActor({ key: stepUser })
@@ -79,7 +81,7 @@ export async function userUnlocksPublicLink({
   } else {
     password = substitute(password)
   }
-  await pageObject.authenticate({ password })
+  await pageObject.authenticate({ password, expectToSucceed })
 }
 
 export async function userUploadsResourcesInPublicLink({
@@ -226,4 +228,17 @@ export async function userRenamesPublicLinkResources({
   for (const resource of resources) {
     await pageObject.rename({ resource: resource.resource, newName: resource.newName })
   }
+}
+
+export async function publicLinkShouldBeBlocked({ stepUser }: { stepUser: string }): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+
+  const blockedMessage =
+    'Too many failed password attempts for this link. It has been temporarily blocked, please try again later.'
+
+  await page
+    .locator('.oc-link-resolve-error-message')
+    .getByText(blockedMessage)
+    .waitFor({ state: 'visible' })
 }
