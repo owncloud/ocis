@@ -53,7 +53,12 @@ import { unref, defineComponent, computed, onMounted, ref, Ref } from 'vue'
 import { dirname } from 'path'
 import { createFileRouteOptions, useGetResourceContext } from '@ownclouders/web-pkg'
 import { useTask } from 'vue-concurrency'
-import { isShareSpaceResource, Resource, SHARE_JAIL_ID } from '@ownclouders/web-client'
+import {
+  isShareSpaceResource,
+  Resource,
+  SHARE_JAIL_ID,
+  VAULT_STORAGE_PROVIDER_ID
+} from '@ownclouders/web-client'
 import { RouteLocationNamedRaw } from 'vue-router'
 import { useGettext } from 'vue3-gettext'
 
@@ -92,7 +97,7 @@ export default defineComponent({
       // fires on a router.push, so it is not the reason for the full reload.
       if (
         capabilityStore.vaultEnabled &&
-        id?.split('$')[0] === capabilityStore.vaultStorageProvider &&
+        id?.split('$')[0] === VAULT_STORAGE_PROVIDER_ID &&
         unref(scope) !== 'vault'
       ) {
         window.location.replace(
