@@ -440,6 +440,13 @@ const handlers = computed(() => {
         fill: var(--oc-color-swatch-danger-default) !important;
       }
     }
+
+    &-filled:disabled {
+      color: #ffffff !important;
+      span > svg {
+        fill: #ffffff !important;
+      }
+    }
   }
 
   &:disabled {
