@@ -93,7 +93,7 @@ import { Notification } from '../../helpers/notifications'
 import { useGettext } from 'vue3-gettext'
 import { useTask } from 'vue-concurrency'
 import { MESSAGE_TYPE } from '@ownclouders/web-client/sse'
-import { call } from '@ownclouders/web-client'
+import { call, VAULT_STORAGE_PROVIDER_ID } from '@ownclouders/web-client'
 
 const POLLING_INTERVAL = 30000
 
@@ -112,7 +112,7 @@ export default {
     const { isInVault } = useVault()
 
     const isVaultNotification = (notification: Notification) =>
-      notification.object_id?.split('$')[0] === capabilityStore.vaultStorageProvider
+      notification.object_id?.split('$')[0] === VAULT_STORAGE_PROVIDER_ID
 
     const notifications = computed(() => {
       if (!capabilityStore.vaultEnabled) {
