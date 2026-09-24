@@ -6,6 +6,7 @@
       drop-id="notifications-dropdown"
       toggle="#oc-notifications-bell"
       mode="click"
+      focus-on-open
       :options="{ pos: 'bottom-right', delayHide: 0 }"
       class="oc-overflow-auto"
     >
