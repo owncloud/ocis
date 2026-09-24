@@ -55,17 +55,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraphUser/getUser.feature:389](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/getUser.feature#L389)
 - [apiGraphUser/getUser.feature:390](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/getUser.feature#L390)
 
-#### [Normal user can get expanded members information of a group](https://github.com/owncloud/ocis/issues/5604)
-
-- [apiGraphGroup/getGroup.feature:399](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphGroup/getGroup.feature#L399)
-- [apiGraphGroup/getGroup.feature:400](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphGroup/getGroup.feature#L400)
-- [apiGraphGroup/getGroup.feature:401](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphGroup/getGroup.feature#L401)
-- [apiGraphGroup/getGroup.feature:460](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphGroup/getGroup.feature#L460)
-- [apiGraphGroup/getGroup.feature:461](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphGroup/getGroup.feature#L461)
-- [apiGraphGroup/getGroup.feature:462](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphGroup/getGroup.feature#L462)
-- [apiGraphGroup/getGroup.feature:508](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphGroup/getGroup.feature#L508)
-- [apiGraphGroup/getGroup.feature:509](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphGroup/getGroup.feature#L509)
-- [apiGraphGroup/getGroup.feature:510](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphGroup/getGroup.feature#L510)
 
 #### [Same users can be added in a group multiple time](https://github.com/owncloud/ocis/issues/5702)
 
