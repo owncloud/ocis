@@ -80,8 +80,8 @@ export default {
 
     font-weight: 300;
     font-size: 11px;
-    background: rgb(249, 54, 54);
-    color: white;
+    background: var(--oc-color-swatch-danger-default);
+    color: var(--oc-color-swatch-danger-contrast);
     box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.5);
   }
 }
