@@ -58,7 +58,7 @@ jobs:
           - suite: apiSharingNgPermissions
           - suite: apiSharingNgAdditionalShareRole
           - suite: apiSharingNgDriveInvitation
-          # - suite: apiSharingNgItemInvitation
+          - suite: apiSharingNgItemInvitation
           - suite: apiSharingNgDriveLinkShare
           - suite: apiSharingNgItemLinkShare
           - suite: apiSharingNgLinkShareManagement
