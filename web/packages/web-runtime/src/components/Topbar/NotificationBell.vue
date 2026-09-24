@@ -33,9 +33,19 @@ export default {
     }
   },
   setup(props) {
-    const { $gettext } = useGettext()
+    const { $gettext, $ngettext } = useGettext()
     const animate = ref(false)
-    const notificationsLabel = computed(() => $gettext('Notifications'))
+    const notificationsLabel = computed(() => {
+      if (!props.notificationCount) {
+        return $gettext('Notifications')
+      }
+      return $ngettext(
+        'Notifications, %{count} unread notification',
+        'Notifications, %{count} unread notifications',
+        props.notificationCount,
+        { count: props.notificationCount.toString() }
+      )
+    })
     const notificationCountLabel = computed(() => {
       if (props.notificationCount > 99) {
         return '99+'
