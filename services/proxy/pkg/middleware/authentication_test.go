@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"time"
@@ -212,6 +213,60 @@ var _ = Describe("Authenticating requests", Label("Authentication"), func() {
 			rr := httptest.NewRecorder()
 			testHandler.ServeHTTP(rr, req)
 			Expect(rr).To(HaveHTTPStatus(http.StatusOK))
+		})
+	})
+
+	When("the userinfo call to the IdP times out", func() {
+		It("returns a retryable status, not 401, for a transient backend failure", func() {
+			logger := log.NewLogger()
+
+			timingOutClient := oidcmocks.OIDCClient{}
+			timingOutClient.On("VerifyAccessToken", mock.Anything, mock.Anything).Return(
+				oidc.RegClaimsWithSID{
+					SessionID: "a-session-id",
+					RegisteredClaims: jwt.RegisteredClaims{
+						ExpiresAt: jwt.NewNumericDate(time.Unix(1147483647, 0)),
+					},
+				}, jwt.MapClaims{
+					"sid": "a-session-id",
+					"exp": 1147483647,
+				},
+				nil,
+			)
+			// Mirrors the production log from OCISDEV-1411 / SE-1042:
+			// `context deadline exceeded (Client.Timeout exceeded while awaiting headers)`.
+			timingOutClient.On("UserInfo", mock.Anything, mock.Anything).Return(
+				(*oidc.UserInfo)(nil),
+				fmt.Errorf("Get \"http://idp.example.com/userinfo\": %w", context.DeadlineExceeded),
+			)
+
+			authenticators := []Authenticator{
+				&OIDCAuthenticator{
+					OIDCIss:       "http://idp.example.com",
+					Logger:        logger,
+					oidcClient:    &timingOutClient,
+					userInfoCache: store.NewMemoryStore(),
+					skipUserInfo:  false,
+				},
+			}
+
+			req := httptest.NewRequest(http.MethodGet, "http://example.com/graph/v1.0/me/drives", http.NoBody)
+			req = req.WithContext(router.SetRoutingInfo(context.Background(), router.RoutingInfo{}))
+			req.Header.Set(_headerAuthorization, "Bearer jwt.token.sig")
+
+			handler := Authentication(authenticators,
+				EnableBasicAuth(false),
+			)
+			testHandler := handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				Fail("next handler must not be reached when userinfo times out")
+			}))
+			rr := httptest.NewRecorder()
+			testHandler.ServeHTTP(rr, req)
+
+			// OCISDEV-1411: a transient userinfo timeout is currently mapped to 401,
+			// which makes desktop clients treat the session as invalid and log out.
+			// A transient backend failure must be a retryable 503, not 401.
+			Expect(rr).To(HaveHTTPStatus(http.StatusServiceUnavailable))
 		})
 	})
 })
