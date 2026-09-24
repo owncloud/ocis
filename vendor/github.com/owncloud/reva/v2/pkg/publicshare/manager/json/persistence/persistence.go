@@ -29,3 +29,26 @@ type Persistence interface {
 	Read(context.Context) (PublicShares, error)
 	Write(context.Context, PublicShares) error
 }
+
+// Copy returns a copy of db that shares no mutable state with it: a fresh
+// top-level map plus a fresh copy of each share's own map. Implementations
+// of Read whose result aliases their internal storage (e.g. returning a
+// cached map by reference) must return Copy(their internal map) instead, so
+// that a caller which keeps reading the result after releasing its lock
+// cannot race a writer that later mutates an existing share's fields in
+// place (see manager.UpdatePublicShare).
+func Copy(db PublicShares) PublicShares {
+	out := make(PublicShares, len(db))
+	for k, v := range db {
+		if entry, ok := v.(map[string]interface{}); ok {
+			entryCopy := make(map[string]interface{}, len(entry))
+			for ek, ev := range entry {
+				entryCopy[ek] = ev
+			}
+			out[k] = entryCopy
+			continue
+		}
+		out[k] = v
+	}
+	return out
+}

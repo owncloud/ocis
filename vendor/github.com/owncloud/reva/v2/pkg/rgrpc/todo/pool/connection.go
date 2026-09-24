@@ -87,6 +87,7 @@ func NewConn(target string, opts ...Option) (*grpc.ClientConn, error) {
 	conn, err := grpc.NewClient(
 		target,
 		grpc.WithTransportCredentials(cred),
+		grpc.WithKeepaliveParams(GetClientKeepaliveParams()),
 		grpc.WithDefaultCallOptions(
 			grpc.MaxCallRecvMsgSize(maxRcvMsgSize),
 		),

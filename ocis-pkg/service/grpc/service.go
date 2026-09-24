@@ -24,6 +24,12 @@ import (
 	ocismetadata "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc/handler/metadata"
 )
 
+// _minKeepalivePingInterval is the shortest keepalive ping interval we accept
+// from a client. Clients cannot ping more often than every ten seconds, so this
+// leaves headroom below that; grpc's own default would GOAWAY anything more
+// frequent than every five minutes.
+const _minKeepalivePingInterval = 5 * time.Second
+
 // Service simply wraps the go-micro grpc service.
 type Service struct {
 	micro.Service
@@ -33,8 +39,11 @@ type Service struct {
 func NewServiceWithClient(client client.Client, opts ...Option) (Service, error) {
 	var mServer server.Server
 	sopts := newOptions(opts...)
-	keepaliveParams := grpc.KeepaliveParams(keepalive.ServerParameters{
-		MaxConnectionAge: GetMaxConnectionAge(), // this forces clients to reconnect after 30 seconds, triggering a new DNS lookup to pick up new IPs
+	// accept the keepalive pings clients send while an rpc is in flight, so that
+	// they can tell a peer that stopped answering from one that is merely slow
+	keepaliveParams := grpc.KeepaliveEnforcementPolicy(keepalive.EnforcementPolicy{
+		MinTime:             _minKeepalivePingInterval,
+		PermitWithoutStream: true,
 	})
 	tlsConfig := &tls.Config{}
 

@@ -44,7 +44,7 @@ func (p *memory) Read(_ context.Context) (persistence.PublicShares, error) {
 	if p.db == nil {
 		return nil, fmt.Errorf("not initialized")
 	}
-	return p.db, nil
+	return persistence.Copy(p.db), nil
 }
 func (p *memory) Write(_ context.Context, db persistence.PublicShares) error {
 	if p.db == nil {

@@ -56,17 +56,17 @@ type HTTPServiceTLS struct {
 }
 
 type Cache struct {
-	Store              string        `yaml:"store" env:"OCIS_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details." introductionVersion:"pre5.0"`
-	Nodes              []string      `yaml:"nodes" env:"OCIS_CACHE_STORE_NODES" desc:"A comma separated list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store." introductionVersion:"pre5.0"`
-	Database           string        `yaml:"database" env:"OCIS_CACHE_STORE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"pre5.0"`
-	Table              string        `yaml:"table" env:"OCIS_CACHE_STORE_TABLE" desc:"The database table the store should use." introductionVersion:"pre5.0"`
-	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL" desc:"Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h." introductionVersion:"pre5.0"`
-	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"5.0"`
-	AuthUsername            string        `yaml:"auth_username" env:"OCIS_CACHE_AUTH_USERNAME" desc:"The username to use for authentication. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
-	AuthPassword            string        `yaml:"auth_password" env:"OCIS_CACHE_AUTH_PASSWORD" desc:"The password to use for authentication. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
-	EnableTLS               bool          `yaml:"enable_tls" env:"OCIS_CACHE_ENABLE_TLS" desc:"Activate TLS for the connection to the NATS store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
-	TLSInsecure             bool          `yaml:"tls_insecure" env:"OCIS_CACHE_TLS_INSECURE" desc:"Disable TLS certificate verification for the NATS store connection. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
-	TLSRootCACertificate    string        `yaml:"tls_root_ca_certificate" env:"OCIS_CACHE_TLS_ROOT_CA_CERTIFICATE" desc:"Path to the PEM-encoded root CA certificate used to validate the NATS store TLS certificate. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
+	Store                string        `yaml:"store" env:"OCIS_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details." introductionVersion:"pre5.0"`
+	Nodes                []string      `yaml:"nodes" env:"OCIS_CACHE_STORE_NODES" desc:"A comma separated list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store." introductionVersion:"pre5.0"`
+	Database             string        `yaml:"database" env:"OCIS_CACHE_STORE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"pre5.0"`
+	Table                string        `yaml:"table" env:"OCIS_CACHE_STORE_TABLE" desc:"The database table the store should use." introductionVersion:"pre5.0"`
+	TTL                  time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL" desc:"Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h." introductionVersion:"pre5.0"`
+	DisablePersistence   bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"5.0"`
+	AuthUsername         string        `yaml:"auth_username" env:"OCIS_CACHE_AUTH_USERNAME" desc:"The username to use for authentication. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
+	AuthPassword         string        `yaml:"auth_password" env:"OCIS_CACHE_AUTH_PASSWORD" desc:"The password to use for authentication. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
+	EnableTLS            bool          `yaml:"enable_tls" env:"OCIS_CACHE_ENABLE_TLS" desc:"Activate TLS for the connection to the NATS store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
+	TLSInsecure          bool          `yaml:"tls_insecure" env:"OCIS_CACHE_TLS_INSECURE" desc:"Disable TLS certificate verification for the NATS store connection. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
+	TLSRootCACertificate string        `yaml:"tls_root_ca_certificate" env:"OCIS_CACHE_TLS_ROOT_CA_CERTIFICATE" desc:"Path to the PEM-encoded root CA certificate used to validate the NATS store TLS certificate. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
 }
 
 // Commons holds configuration that are common to all extensions. Each extension can then decide whether
@@ -90,4 +90,9 @@ type Commons struct {
 	// NOTE: you will not fing GRPCMaxReceivedMessageSize size being used in the code. The envvar is actually extracted in revas `pool` package: https://github.com/cs3org/reva/blob/edge/pkg/rgrpc/todo/pool/connection.go
 	// It is mentioned here again so it is documented
 	GRPCMaxReceivedMessageSize int `env:"OCIS_GRPC_MAX_RECEIVED_MESSAGE_SIZE" desc:"The maximum body size for grpc requests. Defaults to '10240000' bytes (10MB). Note that large values can potentially hide errors but may lead to network timeouts. Should only be changed temporarily to regain access for large folders with 25.000+ files to copy out data." introductionVersion:"pre5.0"`
+
+	// The same applies to the two keepalive settings below, they are extracted in revas `pool` package as well:
+	// https://github.com/owncloud/reva/blob/master/pkg/rgrpc/todo/pool/keepalive.go
+	GRPCClientKeepaliveTime    time.Duration `env:"GRPC_CLIENT_KEEPALIVE_TIME" desc:"How long a grpc client connection with an ongoing request may stay silent before the server is pinged to check whether it is still answering. Unset means grpc's own default applies (no pings). Set a duration like '20s' to enable detection of unresponsive peers; invalid values fall back to '20s'. Values below '10s' are raised to '10s' by grpc." introductionVersion:"8.3.0"`
+	GRPCClientKeepaliveTimeout time.Duration `env:"GRPC_CLIENT_KEEPALIVE_TIMEOUT" desc:"How long a grpc client waits for the answer to a keepalive ping before it considers the connection dead and fails all requests on it. Unset means grpc's own default of '20s' applies; invalid values fall back to '10s'. See GRPC_CLIENT_KEEPALIVE_TIME." introductionVersion:"8.3.0"`
 }
