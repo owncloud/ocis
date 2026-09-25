@@ -9,4 +9,4 @@ failure and returns a retryable 503 (with Retry-After) for the former, so client
 retry and keep their session. A genuinely invalid or expired token still returns
 401.
 
-https://kiteworks.atlassian.net/browse/OCISDEV-1411
+https://github.com/owncloud/ocis/pull/12999

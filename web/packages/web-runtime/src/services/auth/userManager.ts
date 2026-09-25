@@ -11,7 +11,7 @@ import { getAbilities } from './abilities'
 import { AuthStore, UserStore, CapabilityStore, ConfigStore } from '@ownclouders/web-pkg'
 import { ClientService } from '@ownclouders/web-pkg'
 import { Ability } from '@ownclouders/web-client'
-import { retryOnTransientError } from './transientRetry'
+import { isTransientError, retryOnTransientError } from './transientRetry'
 import { Language } from 'vue3-gettext'
 import { loadAppTranslations, setCurrentLanguage } from '../../helpers/language'
 import { router } from '../../router'
@@ -190,41 +190,42 @@ export class UserManager extends OidcUserManager {
   }
 
   private async fetchUserInfo() {
-    await this.fetchCapabilities()
+    // Any of these bootstrap calls can hit a transient IdP 503/429; retry the whole
+    // sequence so a blip shows the maintenance banner instead of logging out (#12999).
+    await retryOnTransientError(async () => {
+      await this.fetchCapabilities()
 
-    const graphClient = this.clientService.graphAuthenticated
-    const [graphUser, roles] = await Promise.all([
-      retryOnTransientError(() => graphClient.users.getMe()),
-      this.fetchRoles()
-    ])
-    const role = await this.fetchRole({ graphUser, roles })
+      const graphClient = this.clientService.graphAuthenticated
+      const [graphUser, roles] = await Promise.all([graphClient.users.getMe(), this.fetchRoles()])
+      const role = await this.fetchRole({ graphUser, roles })
 
-    this.userStore.setUser({
-      id: graphUser.id,
-      onPremisesSamAccountName: graphUser.onPremisesSamAccountName,
-      displayName: graphUser.displayName,
-      mail: graphUser.mail,
-      memberOf: graphUser.memberOf,
-      appRoleAssignments: role ? [role as any] : [], // FIXME
-      preferredLanguage: graphUser.preferredLanguage || '',
-      crossInstanceReference: graphUser.crossInstanceReference || '',
-      instances: graphUser.instances || []
+      this.userStore.setUser({
+        id: graphUser.id,
+        onPremisesSamAccountName: graphUser.onPremisesSamAccountName,
+        displayName: graphUser.displayName,
+        mail: graphUser.mail,
+        memberOf: graphUser.memberOf,
+        appRoleAssignments: role ? [role as any] : [], // FIXME
+        preferredLanguage: graphUser.preferredLanguage || '',
+        crossInstanceReference: graphUser.crossInstanceReference || '',
+        instances: graphUser.instances || []
+      })
+
+      if (graphUser.preferredLanguage) {
+        const appsStore = useAppsStore()
+
+        loadAppTranslations({
+          apps: appsStore.apps,
+          gettext: this.language,
+          lang: graphUser.preferredLanguage
+        })
+
+        setCurrentLanguage({
+          language: this.language,
+          languageSetting: graphUser.preferredLanguage
+        })
+      }
     })
-
-    if (graphUser.preferredLanguage) {
-      const appsStore = useAppsStore()
-
-      loadAppTranslations({
-        apps: appsStore.apps,
-        gettext: this.language,
-        lang: graphUser.preferredLanguage
-      })
-
-      setCurrentLanguage({
-        language: this.language,
-        languageSetting: graphUser.preferredLanguage
-      })
-    }
   }
 
   private async fetchRoles() {
@@ -232,11 +233,14 @@ export class UserManager extends OidcUserManager {
     try {
       const {
         data: { bundles: roles }
-      } = await retryOnTransientError(() =>
-        httpClient.post<{ bundles: SettingsBundle[] }>('/api/v0/settings/roles-list', {})
-      )
+      } = await httpClient.post<{ bundles: SettingsBundle[] }>('/api/v0/settings/roles-list', {})
       return roles
     } catch (e) {
+      // Let a transient failure reach the outer retry in fetchUserInfo; only
+      // genuine failures are tolerated as empty roles.
+      if (isTransientError(e)) {
+        throw e
+      }
       console.error(e)
       return []
     }
