@@ -4,12 +4,16 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
+	"errors"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/MicahParks/keyfunc/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	"golang.org/x/oauth2"
 )
 
 type signingKey struct {
@@ -298,6 +302,68 @@ func TestVerifyAccessTokenAudience(t *testing.T) {
 				t.Errorf("expected no error, got %v", err)
 			}
 		})
+	}
+}
+
+// A userinfo call that returns a transient status (429/5xx) must be classified as
+// temporarily unavailable so the proxy answers 503, not 401 (#12999). A genuine
+// auth status (401/403) must stay a plain error that maps to 401.
+func TestUserInfoStatusClassification(t *testing.T) {
+	tests := []struct {
+		status    int
+		transient bool
+	}{
+		{http.StatusUnauthorized, false},
+		{http.StatusForbidden, false},
+		{http.StatusInternalServerError, true},
+		{http.StatusBadGateway, true},
+		{http.StatusServiceUnavailable, true},
+		{http.StatusTooManyRequests, true},
+	}
+	for _, tt := range tests {
+		t.Run(http.StatusText(tt.status), func(t *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tt.status)
+			}))
+			defer srv.Close()
+
+			c := oidc.NewOIDCClient(
+				oidc.WithProviderMetadata(&oidc.ProviderMetadata{UserinfoEndpoint: srv.URL}),
+				oidc.WithHTTPClient(srv.Client()),
+			)
+
+			_, err := c.UserInfo(context.Background(),
+				oauth2.StaticTokenSource(&oauth2.Token{AccessToken: "t"}))
+			if err == nil {
+				t.Fatalf("expected an error for status %d", tt.status)
+			}
+			if got := errors.Is(err, oidc.ErrTemporarilyUnavailable); got != tt.transient {
+				t.Fatalf("status %d: transient = %v, want %v (err=%v)", tt.status, got, tt.transient, err)
+			}
+		})
+	}
+}
+
+// A transient failure while discovering the IdP (well-known/JWKS) during access-token
+// verification must be classified as temporarily unavailable, not surfaced as a 401 (#12999).
+func TestVerifyAccessTokenTransientDiscovery(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusServiceUnavailable)
+	}))
+	defer srv.Close()
+
+	c := oidc.NewOIDCClient(
+		oidc.WithOidcIssuer(srv.URL),
+		oidc.WithHTTPClient(srv.Client()),
+		oidc.WithAccessTokenVerifyMethod(config.AccessTokenVerificationJWT),
+	)
+
+	_, _, err := c.VerifyAccessToken(context.Background(), "any.token.here")
+	if err == nil {
+		t.Fatal("expected an error for a 503 during discovery")
+	}
+	if !errors.Is(err, oidc.ErrTemporarilyUnavailable) {
+		t.Fatalf("discovery 503 must be transient, got %v", err)
 	}
 }
 

@@ -115,17 +115,21 @@ func (c *oidcClient) lookupWellKnownOpenidConfiguration(ctx context.Context) err
 		}
 		resp, err := c.httpClient.Do(req.WithContext(ctx))
 		if err != nil {
-			return err
+			return classifyTransport(err)
 		}
 		defer resp.Body.Close()
 
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return fmt.Errorf("unable to read response body: %v", err)
+			return classifyTransport(err)
 		}
 
 		if resp.StatusCode != http.StatusOK {
-			return fmt.Errorf("%s: %s", resp.Status, body)
+			err := fmt.Errorf("%s: %s", resp.Status, body)
+			if statusIsTransient(resp.StatusCode) {
+				return errors.Join(ErrTemporarilyUnavailable, err)
+			}
+			return err
 		}
 
 		var p ProviderMetadata
@@ -219,7 +223,7 @@ func (u *UserInfo) Claims(v interface{}) error {
 // UserInfo retrieves the userinfo from a Token
 func (c *oidcClient) UserInfo(ctx context.Context, tokenSource oauth2.TokenSource) (*UserInfo, error) {
 	if err := c.lookupWellKnownOpenidConfiguration(ctx); err != nil {
-		return nil, err
+		return nil, classifyTransport(err)
 	}
 
 	if c.provider.UserinfoEndpoint == "" {
@@ -239,15 +243,19 @@ func (c *oidcClient) UserInfo(ctx context.Context, tokenSource oauth2.TokenSourc
 
 	resp, err := c.httpClient.Do(req.WithContext(ctx))
 	if err != nil {
-		return nil, err
+		return nil, classifyTransport(err)
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, classifyTransport(err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("%s: %s", resp.Status, body)
+		err := fmt.Errorf("%s: %s", resp.Status, body)
+		if statusIsTransient(resp.StatusCode) {
+			return nil, errors.Join(ErrTemporarilyUnavailable, err)
+		}
+		return nil, err
 	}
 
 	ct := resp.Header.Get("Content-Type")
@@ -307,7 +315,8 @@ func (c *oidcClient) verifyAccessTokenJWT(token string) (RegClaimsWithSID, jwt.M
 
 	_, err := jwt.ParseWithClaims(token, &claims, jwks.Keyfunc, jwt.WithIssuer(issuer))
 	if err != nil {
-		return claims, mapClaims, err
+		// A JWKS fetch timeout/network error is transient (503), not a bad token (401).
+		return claims, mapClaims, classifyTransport(err)
 	}
 	_, _, err = new(jwt.Parser).ParseUnverified(token, mapClaims)
 	// TODO: decode mapClaims to sth readable

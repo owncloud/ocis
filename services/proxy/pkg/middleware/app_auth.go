@@ -18,21 +18,21 @@ type AppAuthAuthenticator struct {
 }
 
 // Authenticate implements the authenticator interface to authenticate requests via app auth.
-func (m AppAuthAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
+func (m AppAuthAuthenticator) Authenticate(r *http.Request) (*http.Request, error) {
 	if isPublicPath(r.URL.Path) {
 		// The authentication of public path requests is handled by another authenticator.
 		// Since we can't guarantee the order of execution of the authenticators, we better
 		// implement an early return here for paths we can't authenticate in this authenticator.
-		return nil, false
+		return nil, ErrAuthenticationFailed
 	}
 
 	username, password, ok := r.BasicAuth()
 	if !ok {
-		return nil, false
+		return nil, ErrAuthenticationFailed
 	}
 	next, err := m.RevaGatewaySelector.Next()
 	if err != nil {
-		return nil, false
+		return nil, ErrAuthenticationFailed
 	}
 
 	authenticateResponse, err := next.Authenticate(r.Context(), &gateway.AuthenticateRequest{
@@ -41,11 +41,11 @@ func (m AppAuthAuthenticator) Authenticate(r *http.Request) (*http.Request, bool
 		ClientSecret: password,
 	})
 	if err != nil {
-		return nil, false
+		return nil, ErrAuthenticationFailed
 	}
 	if authenticateResponse.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
 		// TODO: log???
-		return nil, false
+		return nil, ErrAuthenticationFailed
 	}
 
 	r.Header.Set(revactx.TokenHeader, authenticateResponse.GetToken())
@@ -60,5 +60,5 @@ func (m AppAuthAuthenticator) Authenticate(r *http.Request) (*http.Request, bool
 	}
 	r = r.WithContext(oidc.NewContext(r.Context(), claims))
 
-	return r, true
+	return r, nil
 }
