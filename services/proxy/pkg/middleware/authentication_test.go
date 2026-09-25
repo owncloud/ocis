@@ -234,9 +234,7 @@ var _ = Describe("Authenticating requests", Label("Authentication"), func() {
 				},
 				nil,
 			)
-			// Mirrors the production log from OCISDEV-1411 / SE-1042 and the error the
-			// oidc client now returns for a userinfo timeout: a transient failure joined
-			// with oidc.ErrTemporarilyUnavailable.
+			// what the oidc client returns for a userinfo timeout
 			timingOutClient.On("UserInfo", mock.Anything, mock.Anything).Return(
 				(*oidc.UserInfo)(nil),
 				errors.Join(oidc.ErrTemporarilyUnavailable,
@@ -266,9 +264,6 @@ var _ = Describe("Authenticating requests", Label("Authentication"), func() {
 			rr := httptest.NewRecorder()
 			testHandler.ServeHTTP(rr, req)
 
-			// OCISDEV-1411: a transient userinfo timeout is currently mapped to 401,
-			// which makes desktop clients treat the session as invalid and log out.
-			// A transient backend failure must be a retryable 503, not 401.
 			Expect(rr).To(HaveHTTPStatus(http.StatusServiceUnavailable))
 		})
 
@@ -305,6 +300,38 @@ var _ = Describe("Authenticating requests", Label("Authentication"), func() {
 			handler := Authentication(authenticators, EnableBasicAuth(false))
 			testHandler := handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				Fail("next handler must not be reached for a failed authentication")
+			}))
+			rr := httptest.NewRecorder()
+			testHandler.ServeHTTP(rr, req)
+
+			Expect(rr).To(HaveHTTPStatus(http.StatusUnauthorized))
+		})
+
+		It("returns 401 for an invalid/malformed token", func() {
+			logger := log.NewLogger()
+
+			invalidTokenClient := oidcmocks.OIDCClient{}
+			invalidTokenClient.On("VerifyAccessToken", mock.Anything, mock.Anything).Return(
+				oidc.RegClaimsWithSID{}, jwt.MapClaims{}, jwt.ErrTokenMalformed,
+			)
+
+			authenticators := []Authenticator{
+				&OIDCAuthenticator{
+					OIDCIss:       "http://idp.example.com",
+					Logger:        logger,
+					oidcClient:    &invalidTokenClient,
+					userInfoCache: store.NewMemoryStore(),
+					skipUserInfo:  true,
+				},
+			}
+
+			req := httptest.NewRequest(http.MethodGet, "http://example.com/graph/v1.0/me/drives", http.NoBody)
+			req = req.WithContext(router.SetRoutingInfo(context.Background(), router.RoutingInfo{}))
+			req.Header.Set(_headerAuthorization, "Bearer invalid.token.sig")
+
+			handler := Authentication(authenticators, EnableBasicAuth(false))
+			testHandler := handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				Fail("next handler must not be reached for an invalid token")
 			}))
 			rr := httptest.NewRecorder()
 			testHandler.ServeHTTP(rr, req)
