@@ -75,6 +75,53 @@ export const createUser = async ({ user, admin }: { user: User; admin: User }): 
   return user
 }
 
+// Creates a Keycloak user that is given NO ocis realm role at all, which is the
+// normal state for users federated into the realm from an external user directory.
+// Their token carries no value the proxy role_mapping can match, so the proxy has
+// to fall back to PROXY_ROLE_ASSIGNMENT_OIDC_DEFAULT_ROLE.
+//
+// Unlike createUser() this deliberately does not call initializeUser(): that first
+// login IS what the test exercises, and until it happens the user does not exist in
+// oCIS at all, so there is no graph id to read either. The user is stored without a
+// uuid so the login step can find its credentials; the cleanup hook deletes the oCIS
+// user by name and tolerates a 404.
+export const createUserWithoutRealmRole = async ({
+  user,
+  admin
+}: {
+  user: User
+  admin: User
+}): Promise<User> => {
+  const fullName = user.displayName.split(' ')
+  const body = JSON.stringify({
+    username: user.id,
+    credentials: [{ value: user.password, type: 'password' }],
+    firstName: fullName[0],
+    lastName: fullName[1] ?? '',
+    email: user.email,
+    emailVerified: true,
+    enabled: true
+  })
+
+  const creationRes = await request({
+    method: 'POST',
+    path: join(realmBasePath, 'users'),
+    body,
+    user: admin,
+    header: { 'Content-Type': 'application/json' }
+  })
+  checkResponseStatus(creationRes, 'Failed while creating user without realm role')
+
+  const keycloakUUID = getUserIdFromResponse(creationRes)
+
+  const usersEnvironment = new UsersEnvironment()
+  usersEnvironment.storeCreatedKeycloakUser({ user: { ...user, uuid: keycloakUUID } })
+
+  const ocisUserKey = user.originalId || user.id
+  usersEnvironment.storeCreatedUser(ocisUserKey, { ...user })
+  return user
+}
+
 export const assignRole = async ({
   admin,
   uuid,

@@ -24,6 +24,24 @@ export async function userNavigatesToSpacesPage({ stepUser }: { stepUser: string
   await pageObject.navigate()
 }
 
+export async function userShouldSeeEmptyPersonalSpace({
+  stepUser
+}: {
+  stepUser: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const pageObject = new objects.applicationFiles.page.spaces.Personal({ page })
+  await pageObject.expectToBeEmpty()
+}
+
+export async function userShouldSeeNoSpaces({ stepUser }: { stepUser: string }): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const pageObject = new objects.applicationFiles.page.spaces.Projects({ page })
+  await pageObject.expectToBeEmpty()
+}
+
 export async function userNavigatesToSpace({
   stepUser,
   space
