@@ -41,6 +41,7 @@ OCIS_MODULES = \
 	services/idm \
 	services/idp \
 	services/invitations \
+	services/llm \
 	services/nats \
 	services/notifications \
 	services/ocdav \
