@@ -25,6 +25,17 @@ func classifyTransport(err error) error {
 	return err
 }
 
+// statusIsTransient lists the retryable statuses explicitly so a permanent 5xx
+// (501, 505) fails fast instead of being retried forever.
 func statusIsTransient(status int) bool {
-	return status == http.StatusTooManyRequests || status >= http.StatusInternalServerError
+	switch status {
+	case http.StatusTooManyRequests,
+		http.StatusInternalServerError,
+		http.StatusBadGateway,
+		http.StatusServiceUnavailable,
+		http.StatusGatewayTimeout:
+		return true
+	default:
+		return false
+	}
 }

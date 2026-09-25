@@ -344,6 +344,29 @@ func TestUserInfoStatusClassification(t *testing.T) {
 	}
 }
 
+// A transient failure while discovering the IdP (well-known/JWKS) during access-token
+// verification must be classified as temporarily unavailable, not surfaced as a 401 (#12999).
+func TestVerifyAccessTokenTransientDiscovery(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusServiceUnavailable)
+	}))
+	defer srv.Close()
+
+	c := oidc.NewOIDCClient(
+		oidc.WithOidcIssuer(srv.URL),
+		oidc.WithHTTPClient(srv.Client()),
+		oidc.WithAccessTokenVerifyMethod(config.AccessTokenVerificationJWT),
+	)
+
+	_, _, err := c.VerifyAccessToken(context.Background(), "any.token.here")
+	if err == nil {
+		t.Fatal("expected an error for a 503 during discovery")
+	}
+	if !errors.Is(err, oidc.ErrTemporarilyUnavailable) {
+		t.Fatalf("discovery 503 must be transient, got %v", err)
+	}
+}
+
 func newRSAKey(t testing.TB) *signingKey {
 	priv, err := rsa.GenerateKey(rand.Reader, 1028)
 	if err != nil {

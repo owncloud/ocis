@@ -49,6 +49,25 @@ describe('retryOnTransientError', () => {
     expect(fn).toHaveBeenCalledTimes(1)
   })
 
+  it('gives up after the attempt cap and rethrows the last transient error', async () => {
+    const err = httpError(503)
+    const fn = vi.fn().mockRejectedValue(err)
+    await expect(retryOnTransientError(fn, { ...noSleep, attempts: 3 })).rejects.toBe(err)
+    expect(fn).toHaveBeenCalledTimes(3)
+  })
+
+  it('parses the HTTP-date form of Retry-After', async () => {
+    const sleep = vi.fn().mockResolvedValue(undefined)
+    vi.spyOn(Date, 'now').mockReturnValue(Date.parse('Wed, 21 Oct 2025 07:28:00 GMT'))
+    const fn = vi
+      .fn()
+      .mockRejectedValueOnce(httpError(503, 'Wed, 21 Oct 2025 07:28:05 GMT'))
+      .mockResolvedValue('ok')
+    await expect(retryOnTransientError(fn, { sleep })).resolves.toBe('ok')
+    expect(sleep).toHaveBeenCalledWith(5000)
+    vi.restoreAllMocks()
+  })
+
   it('honors the Retry-After header for the wait duration', async () => {
     const sleep = vi.fn().mockResolvedValue(undefined)
     const fn = vi.fn().mockRejectedValueOnce(httpError(503, '2')).mockResolvedValue('ok')
