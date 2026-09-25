@@ -377,7 +377,7 @@ func TestCreateGroupSynthesizesWhenNotServerUUID(t *testing.T) {
 	// synthesized entry must carry the id under that attribute for the model builder.
 	c := lconfig
 	c.UseServerUUID = false
-	c.GroupIDAttribute = "owncloudUUID"
+	c.GroupIDAttribute = "ownCloudUUID"
 
 	var written *ldap.AddRequest
 	l := &mocks.Client{}
@@ -446,7 +446,7 @@ func TestCreateEducationClassSynthesizesWhenNotServerUUID(t *testing.T) {
 
 	c := eduConfig
 	c.UseServerUUID = false
-	c.GroupIDAttribute = "owncloudUUID"
+	c.GroupIDAttribute = "ownCloudUUID"
 
 	var written *ldap.AddRequest
 	l := &mocks.Client{}
@@ -603,7 +603,7 @@ func TestUpdateEducationSchoolFoldsNoReadBack(t *testing.T) {
 	preRead := ldap.NewEntry("ou=Test School", map[string][]string{
 		"ou":                      {"Test School"},
 		"ocEducationSchoolNumber": {"0123"},
-		"owncloudUUID":            {"abcd-defg"},
+		"ownCloudUUID":            {"abcd-defg"},
 	})
 
 	l := &mocks.Client{}
@@ -668,7 +668,7 @@ func TestUpdateEducationClassFoldPreservesClassificationAndExternalID(t *testing
 }
 
 // TestCreateGroupSynthesizesWithNonDefaultIDAttribute guards the fix for the
-// hardcoded "owncloudUUID" id write: the generated id must be stored under the
+// hardcoded "ownCloudUUID" id write: the generated id must be stored under the
 // configured GroupIDAttribute, otherwise the synthesized model has no id and
 // createGroupModelFromLDAP returns nil (CreateGroup would return (nil, nil)).
 func TestCreateGroupSynthesizesWithNonDefaultIDAttribute(t *testing.T) {
@@ -676,7 +676,7 @@ func TestCreateGroupSynthesizesWithNonDefaultIDAttribute(t *testing.T) {
 
 	c := lconfig
 	c.UseServerUUID = false
-	c.GroupIDAttribute = "entryUUID" // non-default: previously the id was written to owncloudUUID only
+	c.GroupIDAttribute = "entryUUID" // non-default: previously the id was written to ownCloudUUID only
 
 	var written *ldap.AddRequest
 	l := &mocks.Client{}
@@ -697,7 +697,7 @@ func TestCreateGroupSynthesizesWithNonDefaultIDAttribute(t *testing.T) {
 	// the id was written under the configured attribute and survives synthesis
 	assert.NotEmpty(t, newGroup.GetId())
 	assert.NotEmpty(t, written.Attributes)
-	// the AddRequest carries the id under the configured attribute, not "owncloudUUID"
+	// the AddRequest carries the id under the configured attribute, not "ownCloudUUID"
 	var idFromConfigured, idFromHardcoded string
 	for _, a := range written.Attributes {
 		switch a.Type {
@@ -705,14 +705,14 @@ func TestCreateGroupSynthesizesWithNonDefaultIDAttribute(t *testing.T) {
 			if len(a.Vals) > 0 {
 				idFromConfigured = a.Vals[0]
 			}
-		case "owncloudUUID":
+		case "ownCloudUUID":
 			if len(a.Vals) > 0 {
 				idFromHardcoded = a.Vals[0]
 			}
 		}
 	}
 	assert.NotEmpty(t, idFromConfigured, "id must be written under the configured GroupIDAttribute")
-	assert.Empty(t, idFromHardcoded, "id must not be written under a hardcoded owncloudUUID")
+	assert.Empty(t, idFromHardcoded, "id must not be written under a hardcoded ownCloudUUID")
 	assert.Equal(t, idFromConfigured, newGroup.GetId())
 	l.AssertNotCalled(t, "Search", mock.Anything)
 }
