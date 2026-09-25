@@ -469,6 +469,7 @@ default:
         - SharingNgContext:
         - CollaborationContext:
         - TrashbinContext:
+        - OcisConfigContext:
 
     apiServiceAvailability:
       paths:

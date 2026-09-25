@@ -1220,3 +1220,24 @@ Feature: collaboration (wopi)
       | app      | FakeOffice |
     When the public sends a lock request with lock id "abcdef123" to the last opened file using wopi endpoint
     Then the HTTP status code should be "200"
+
+  @env-config
+  Scenario: brute-force protection must apply to failed app-open attempts of a password protected public link
+    Given the config "STORAGE_PUBLICLINK_BRUTEFORCE_MAXATTEMPTS" has been set to "2" for "storage-publiclink" service
+    And user "Alice" has uploaded file with content "some content" to "testfile.odt"
+    And we save it into "FILEID"
+    And user "Alice" has created the following resource link share:
+      | resource        | testfile.odt |
+      | space           | Personal     |
+      | permissionsRole | View         |
+      | password        | %public%     |
+    When the public sends HTTP method "POST" to URL "/app/open?file_id=<<FILEID>>" with password "%public%"
+    Then the HTTP status code should be "200"
+    When the public sends HTTP method "POST" to URL "/app/open?file_id=<<FILEID>>" with password "wrong-pw"
+    Then the HTTP status code should be "401"
+    When the public sends HTTP method "POST" to URL "/app/open?file_id=<<FILEID>>" with password "wrong-pw"
+    Then the HTTP status code should be "401"
+    When the public sends HTTP method "POST" to URL "/app/open?file_id=<<FILEID>>" with password "wrong-pw"
+    Then the HTTP status code should be "401"
+    When the public sends HTTP method "POST" to URL "/app/open?file_id=<<FILEID>>" with password "%public%"
+    Then the HTTP status code should be "401"
