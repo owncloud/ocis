@@ -1428,3 +1428,21 @@ Feature: Send a drive invitations
         }
       }
       """
+
+  @env-config
+  Scenario: user has access to a space shared with LDAP group using posixGroup objectclass with uniqueMember schema
+    Given the following configs have been set:
+      | service | config                        | value        |
+      | graph   | OCIS_LDAP_GROUP_OBJECTCLASS   | posixGroup   |
+      | graph   | OCIS_LDAP_GROUP_SCHEMA_MEMBER | uniqueMember |
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And the administrator has created a group "grp1" using the Graph API
+    And the administrator has added a user "Brian" to the group "grp1" using the Graph API
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
+      | space           | NewSpace     |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Space Viewer |
+    Then the HTTP status code should be "200"
+    And the user "Brian" should have a space called "NewSpace" granted to group "grp1" with role "viewer"
