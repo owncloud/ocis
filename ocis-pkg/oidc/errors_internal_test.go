@@ -50,13 +50,16 @@ func TestClassifyTransport(t *testing.T) {
 
 func TestStatusIsTransient(t *testing.T) {
 	tests := map[int]bool{
-		http.StatusUnauthorized:        false,
-		http.StatusForbidden:           false,
-		http.StatusNotFound:            false,
-		http.StatusTooManyRequests:     true,
-		http.StatusInternalServerError: true,
-		http.StatusBadGateway:          true,
-		http.StatusServiceUnavailable:  true,
+		http.StatusUnauthorized:            false,
+		http.StatusForbidden:               false,
+		http.StatusNotFound:                false,
+		http.StatusTooManyRequests:         true,
+		http.StatusInternalServerError:     true,
+		http.StatusBadGateway:              true,
+		http.StatusServiceUnavailable:      true,
+		http.StatusGatewayTimeout:          true,
+		http.StatusNotImplemented:          false, // permanent 5xx must fail fast
+		http.StatusHTTPVersionNotSupported: false,
 	}
 	for status, want := range tests {
 		if got := statusIsTransient(status); got != want {

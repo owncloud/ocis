@@ -323,13 +323,18 @@ export class UserManager extends OidcUserManager {
       })
       return permissions
     } catch (e) {
+      // Let a transient failure reach the retry wrapper; only genuine failures
+      // are tolerated as empty permissions.
+      if (isTransientError(e)) {
+        throw e
+      }
       console.error(e)
       return []
     }
   }
 
   private async updateUserAbilities(user: OcUser) {
-    const permissions = await this.fetchPermissions({ user })
+    const permissions = await retryOnTransientError(() => this.fetchPermissions({ user }))
     const abilities = getAbilities(permissions)
     this.ability.update(abilities)
   }

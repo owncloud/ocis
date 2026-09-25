@@ -115,17 +115,21 @@ func (c *oidcClient) lookupWellKnownOpenidConfiguration(ctx context.Context) err
 		}
 		resp, err := c.httpClient.Do(req.WithContext(ctx))
 		if err != nil {
-			return err
+			return classifyTransport(err)
 		}
 		defer resp.Body.Close()
 
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return fmt.Errorf("unable to read response body: %v", err)
+			return classifyTransport(err)
 		}
 
 		if resp.StatusCode != http.StatusOK {
-			return fmt.Errorf("%s: %s", resp.Status, body)
+			err := fmt.Errorf("%s: %s", resp.Status, body)
+			if statusIsTransient(resp.StatusCode) {
+				return errors.Join(ErrTemporarilyUnavailable, err)
+			}
+			return err
 		}
 
 		var p ProviderMetadata
@@ -311,7 +315,8 @@ func (c *oidcClient) verifyAccessTokenJWT(token string) (RegClaimsWithSID, jwt.M
 
 	_, err := jwt.ParseWithClaims(token, &claims, jwks.Keyfunc, jwt.WithIssuer(issuer))
 	if err != nil {
-		return claims, mapClaims, err
+		// A JWKS fetch timeout/network error is transient (503), not a bad token (401).
+		return claims, mapClaims, classifyTransport(err)
 	}
 	_, _, err = new(jwt.Parser).ParseUnverified(token, mapClaims)
 	// TODO: decode mapClaims to sth readable
