@@ -49,29 +49,35 @@ export class Public {
   async authenticate({
     password,
     passwordProtectedFolder = false,
-    expectToSucceed = true
+    expectToSucceed = true,
+    skipA11yCheck = false
   }: {
     password: string
     passwordProtectedFolder?: boolean
     expectToSucceed?: boolean
+    skipA11yCheck?: boolean
   }): Promise<void> {
     let page: Page | FrameLocator = this.#page
     if (passwordProtectedFolder) {
       page = this.#page.frameLocator(folderModalIframe)
-      await objects.a11y.Accessibility.assertNoSevereA11yViolations(
-        this.#page,
-        ['folderViewModal'],
-        'password protected folder modal'
-      )
+      if (!skipA11yCheck) {
+        await objects.a11y.Accessibility.assertNoSevereA11yViolations(
+          this.#page,
+          ['folderViewModal'],
+          'password protected folder modal'
+        )
+      }
     } else {
-      await objects.a11y.Accessibility.assertNoSevereA11yViolations(
-        this.#page,
-        ['body'],
-        'public link authenticate page'
-      )
+      if (!skipA11yCheck) {
+        await objects.a11y.Accessibility.assertNoSevereA11yViolations(
+          this.#page,
+          ['body'],
+          'public link authenticate page'
+        )
+      }
     }
     await page.locator(passwordInput).fill(password)
-    await page.locator(publicLinkAuthorizeButton).click()
+    await page.locator(`${publicLinkAuthorizeButton}:not([disabled])`).click()
     if (expectToSucceed) {
       await page.locator('#web-content').waitFor()
     }

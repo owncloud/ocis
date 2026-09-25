@@ -65,10 +65,14 @@ export async function anonymousUserOpensPublicLink({
 
 export async function userUnlocksPublicLink({
   password,
-  stepUser
+  stepUser,
+  expectToSucceed = true,
+  skipA11yCheck = false
 }: {
   password: string
   stepUser: string
+  expectToSucceed?: boolean
+  skipA11yCheck?: boolean
 }): Promise<void> {
   const world = getWorld()
   const { page } = world.actorsEnvironment.getActor({ key: stepUser })
@@ -79,7 +83,7 @@ export async function userUnlocksPublicLink({
   } else {
     password = substitute(password)
   }
-  await pageObject.authenticate({ password })
+  await pageObject.authenticate({ password, expectToSucceed, skipA11yCheck })
 }
 
 export async function userUploadsResourcesInPublicLink({

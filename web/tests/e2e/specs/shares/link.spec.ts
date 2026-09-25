@@ -2,6 +2,7 @@ import { test } from '../../environment/test'
 import * as api from '../../steps/api/api'
 import * as ui from '../../steps/ui/index'
 import { fileAction, resourcePage, application } from '../../environment/constants'
+import { getWorld } from '../../environment/world'
 
 test.describe('link', () => {
   test.beforeEach(async () => {
@@ -881,6 +882,52 @@ test.describe('link', () => {
     })
 
     // And "Alice" logs out
+    await ui.userLogsOut({ stepUser: 'Alice' })
+  })
+
+  test('shows an error when a public link is blocked after too many failed password attempts', async () => {
+    await ui.userLogsIn({ stepUser: 'Alice' })
+
+    await ui.userCreatesResources({
+      stepUser: 'Alice',
+      resources: [{ name: 'test.txt', type: 'txtFile', content: 'some content' }]
+    })
+
+    await ui.userCreatesPublicLink({
+      stepUser: 'Alice',
+      resource: 'test.txt',
+      password: '%public%'
+    })
+
+    await ui.userOpensPublicLink({ stepUser: 'Anonymous', name: 'Unnamed link' })
+
+    const world = getWorld()
+    const { page: anonymousPage } = world.actorsEnvironment.getActor({ key: 'Anonymous' })
+
+    const randomPassword = () => Math.random().toString(36).slice(2, 12)
+
+    const blockedMessage =
+      'Too many failed password attempts for this link. It has been temporarily blocked, please try again later.'
+
+    const errorMessage = anonymousPage
+      .locator('.oc-link-resolve-error-message')
+      .getByText(blockedMessage)
+
+    for (let attempt = 0; attempt < 6; attempt++) {
+      await ui.userUnlocksPublicLink({
+        password: randomPassword(),
+        stepUser: 'Anonymous',
+        expectToSucceed: false,
+        skipA11yCheck: true
+      })
+    }
+    await errorMessage.waitFor({ state: 'visible' })
+    const text = await errorMessage.textContent()
+
+    if (text !== blockedMessage) {
+      throw new Error(`Expected "${blockedMessage}", but got "${text}"`)
+    }
+
     await ui.userLogsOut({ stepUser: 'Alice' })
   })
 })
