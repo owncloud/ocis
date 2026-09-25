@@ -1220,3 +1220,26 @@ Feature: collaboration (wopi)
       | app      | FakeOffice |
     When the public sends a lock request with lock id "abcdef123" to the last opened file using wopi endpoint
     Then the HTTP status code should be "200"
+
+
+  Scenario: brute-force protection must apply to max failed attempt on /app/open
+    And user "Alice" has uploaded file "filesForUpload/simple.odt" to "simple.odt"
+    And we save it into "FILEID"
+    And user "Alice" has created the following resource link share:
+      | resource        | simple.odt |
+      | space           | Personal   |
+      | permissionsRole | View       |
+      | password        | %public%   |
+    When the public sends HTTP method "POST" to URL "/app/open?file_id=<<FILEID>>" with password "%public%"
+    Then the HTTP status code should be "200"
+    # For this test using the default STORAGE_PUBLICLINK_BRUTEFORCE_MAXATTEMPTS (5)
+    # instead of lowering it via an env-config restart: a restart wipes oCIS's in-memory,
+    # non-persistent app registry, and the FakeOffice/Collabora/OnlyOffice app providers this
+    # suite depends on only ever register once, at their own startup - they never
+    # re-register - so losing that registration here would permanently break every other
+    # scenario in this file for the rest of the test run
+    # After the exceeding max attempts the public request to /app/open with correct password should return 401
+    When the public sends HTTP method "POST" to URL "/app/open?file_id=<<FILEID>>" with password "wrong-pw" for 6 times
+    Then the HTTP status code of responses on each endpoint should be "401, 401, 401, 401, 401, 401" respectively
+    When the public sends HTTP method "POST" to URL "/app/open?file_id=<<FILEID>>" with password "%public%"
+    Then the HTTP status code should be "401"

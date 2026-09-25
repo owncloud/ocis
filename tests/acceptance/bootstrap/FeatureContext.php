@@ -1329,6 +1329,30 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
+	 * @param string $method
+	 * @param string $url
+	 * @param string $password
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	private function sendHttpMethodToUrlWithPassword(string $method, string $url, string $password): ResponseInterface {
+		$password = $this->getActualPassword($password);
+		$token = $this->shareNgGetLastCreatedLinkShareToken();
+		$fullUrl = $this->getBaseUrl() . $url;
+		$headers = [
+			'Public-Token' => $token,
+		];
+		return HttpRequestHelper::sendRequest(
+			$fullUrl,
+			$method,
+			"public",
+			$password,
+			$headers,
+		);
+	}
+
+	/**
 	 * @When the public sends HTTP method :method to URL :url with password :password
 	 *
 	 * @param string $method
@@ -1336,23 +1360,33 @@ class FeatureContext extends BehatVariablesContext {
 	 * @param string $password
 	 *
 	 * @return void
+	 * @throws GuzzleException
 	 */
 	public function thePublicSendsHttpMethodToUrlWithPassword(string $method, string $url, string $password): void {
-		$password = $this->getActualPassword($password);
-		$token = $this->shareNgGetLastCreatedLinkShareToken();
-		$fullUrl = $this->getBaseUrl() . $url;
-		$headers = [
-			'Public-Token' => $token,
-		];
-		$this->setResponse(
-			HttpRequestHelper::sendRequest(
-				$fullUrl,
-				$method,
-				"public",
-				$password,
-				$headers,
-			),
-		);
+		$this->setResponse($this->sendHttpMethodToUrlWithPassword($method, $url, $password));
+	}
+
+	/**
+	 * @When the public sends HTTP method :method to URL :url with password :password for :attempts times
+	 *
+	 * @param string $method
+	 * @param string $url
+	 * @param string $password
+	 * @param int $attempts
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function thePublicSendsHttpMethodToUrlWithPasswordForTimes(
+		string $method,
+		string $url,
+		string $password,
+		int $attempts,
+	): void {
+		for ($i = 0; $i < $attempts; $i++) {
+			$this->setResponse($this->sendHttpMethodToUrlWithPassword($method, $url, $password));
+			$this->pushToLastHttpStatusCodesArray();
+		}
 	}
 
 	/**
