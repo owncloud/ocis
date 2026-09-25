@@ -23,6 +23,9 @@
 
 use Composer\Autoload\ClassLoader;
 
+// Acceptance tests use UTC for consistent date/time handling.
+date_default_timezone_set('UTC');
+
 $classLoader = new ClassLoader();
 
 $classLoader->addPsr4("TestHelpers\\", __DIR__ . "/../TestHelpers", true);
