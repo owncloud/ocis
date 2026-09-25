@@ -42,21 +42,24 @@
 </template>
 
 <script lang="ts" setup>
-import { isLocationSharesActive, RouteShareTypes } from '@ownclouders/web-pkg'
 import {
+  isLocationSharesActive,
   locationSharesViaLink,
   locationSharesWithMe,
-  locationSharesWithOthers
+  locationSharesWithOthers,
+  RouteShareTypes,
+  useActiveLocation,
+  useCapabilityStore,
+  useRouter
 } from '@ownclouders/web-pkg'
 
 import { computed, unref } from 'vue'
-import { useRouter } from '@ownclouders/web-pkg'
-import { useActiveLocation } from '@ownclouders/web-pkg'
 import { useGettext } from 'vue3-gettext'
 import { RouteLocationRaw } from 'vue-router'
 
 const { $gettext } = useGettext()
 const router = useRouter()
+const capabilityStore = useCapabilityStore()
 
 const resolveScopeTemplatePath = (path: string, scopePrefix: string) =>
   path.replace(/^\/:scope\(vault\)\?/, scopePrefix)
@@ -119,15 +122,21 @@ const navItems = computed(() => [
     text: $gettext('Shared with others'),
     active: unref(sharesWithOthersActive)
   },
-  {
-    id: locationSharesViaLink.name as string,
-    icon: 'link',
-    to: locationToPath(locationSharesViaLink),
-    text: $gettext('Shared via link'),
-    active: unref(sharesViaLinkActive)
-  }
+  ...(capabilityStore.sharingPublicEnabled
+    ? [
+        {
+          id: locationSharesViaLink.name as string,
+          icon: 'link',
+          to: locationToPath(locationSharesViaLink),
+          text: $gettext('Shared via link'),
+          active: unref(sharesViaLinkActive)
+        }
+      ]
+    : [])
 ])
-const currentNavItem = computed(() => unref(navItems).find((navItem) => navItem.active))
+const currentNavItem = computed(
+  () => unref(navItems).find((navItem) => navItem.active) ?? unref(navItems)[0]
+)
 </script>
 <style lang="scss" scoped>
 #shares-navigation {
