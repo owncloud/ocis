@@ -1,4 +1,3 @@
-import { getComposableWrapper } from '@ownclouders/web-test-helpers'
 import { mock } from 'vitest-mock-extended'
 import {
   type WebWorker,
@@ -8,6 +7,7 @@ import {
 } from '../../../../../src/composables'
 import type { ClientService, LoadingService } from '../../../../../src/services'
 import type { Resource, SpaceResource } from '@ownclouders/web-client'
+import { getComposableWrapper } from '../../../../../src/testing'
 
 describe('useDeleteWorker', () => {
   describe('method "startWorker"', () => {

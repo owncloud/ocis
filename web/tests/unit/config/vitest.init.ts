@@ -1,3 +1,7 @@
+// Component specs mount deliberately incomplete components, so Vue's runtime warnings are
+// expected noise rather than a signal.
+vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+
 const IntersectionObserverMock = vi.fn(function () {
   return {
     disconnect: vi.fn(),

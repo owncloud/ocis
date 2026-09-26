@@ -1,5 +1,5 @@
-import { defaultPlugins, mount } from '@ownclouders/web-test-helpers'
 import OcFilterChip from './OcFilterChip.vue'
+import { defaultPlugins, mount } from '../../testing'
 
 const selectors = {
   filterChipBtn: '.oc-filter-chip-button',

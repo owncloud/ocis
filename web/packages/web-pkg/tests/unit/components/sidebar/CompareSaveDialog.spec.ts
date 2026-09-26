@@ -1,6 +1,5 @@
 import CompareSaveDialog from '../../../../src/components/SideBar/CompareSaveDialog.vue'
-import { defaultPlugins, shallowMount } from '@ownclouders/web-test-helpers'
-
+import { defaultPlugins, shallowMount } from '../../../../src/testing'
 describe('CompareSaveDialog', () => {
   describe('computed method "unsavedChanges"', () => {
     it('should be false if objects are equal', () => {

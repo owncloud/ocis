@@ -1,6 +1,6 @@
 import { mock, mockDeep } from 'vitest-mock-extended'
 import { MountPointSpaceResource, SpaceResource } from '@ownclouders/web-client'
-import { createTestingPinia } from '@ownclouders/web-test-helpers'
+import { createTestingPinia } from '../../../../src/testing'
 import { DriveItem } from '@ownclouders/web-client/graph/generated'
 import { getSharedDriveItem } from '../../../../src/helpers/share'
 import { ClientService } from '../../../../src/services'
