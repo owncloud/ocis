@@ -1,10 +1,25 @@
-import { mount, VueWrapper } from '@vue/test-utils'
 import { defineComponent, nextTick } from 'vue'
 import { createRouter as _createRouter, createMemoryHistory, RouterOptions } from 'vue-router'
+import {
+  mount,
+  shallowMount,
+  flushPromises,
+  VueWrapper,
+  RouterLinkStub,
+  routerLinkStubPlugin
+} from '@ownclouders/design-system/testing'
+import type {
+  RouteLocation,
+  ComponentProps,
+  PartialComponentProps
+} from '@ownclouders/design-system/testing'
 import { defaultPlugins, DefaultPluginsOptions } from './defaultPlugins'
-export { mount, shallowMount, flushPromises, VueWrapper } from '@vue/test-utils'
 
-vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+// Generic mount helpers and prop types live in `@ownclouders/design-system/testing`, since that
+// package sits below this one and cannot import from it. Re-exported here so consumers get the
+// full set from a single entrypoint.
+export { mount, shallowMount, flushPromises, VueWrapper, RouterLinkStub, routerLinkStubPlugin }
+export type { RouteLocation, ComponentProps, PartialComponentProps }
 
 export const getComposableWrapper = <T>(
   setup: (...args: any[]) => T,
@@ -53,8 +68,6 @@ export const getOcSelectOptions = async (
   return optionElements
 }
 
-export type { RouteLocation } from 'vue-router'
-export { RouterLinkStub } from '@vue/test-utils'
 export const createRouter = (options?: Partial<RouterOptions>) =>
   _createRouter({
     history: createMemoryHistory(),
@@ -76,7 +89,3 @@ export const nextTicks = async (amount: number) => {
     await nextTick()
   }
 }
-
-type DefinedComponent = new (...args: any[]) => any
-export type ComponentProps<T extends DefinedComponent> = InstanceType<T>['$props']
-export type PartialComponentProps<T extends DefinedComponent> = Partial<ComponentProps<T>>

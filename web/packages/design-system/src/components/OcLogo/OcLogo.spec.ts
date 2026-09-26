@@ -1,6 +1,6 @@
 import OcLogo from './OcLogo.vue'
-import { shallowMount, mount } from '@ownclouders/web-test-helpers'
 import OcImage from '../OcImage/OcImage.vue'
+import { shallowMount, mount } from '../../testing'
 
 describe('OcLogo', () => {
   const requiredProps = {

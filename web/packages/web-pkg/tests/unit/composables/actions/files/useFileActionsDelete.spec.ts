@@ -7,9 +7,9 @@ import {
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 import {
   defaultComponentMocks,
-  RouteLocation,
-  getComposableWrapper
-} from '@ownclouders/web-test-helpers'
+  getComposableWrapper,
+  RouteLocation
+} from '../../../../../src/testing'
 import { CapabilityStore } from '../../../../../src/composables/piniaStores'
 
 vi.mock('../../../../../src/composables/actions/helpers/useFileActionsDeleteResources')

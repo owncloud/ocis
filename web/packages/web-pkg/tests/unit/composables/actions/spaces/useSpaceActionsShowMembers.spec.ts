@@ -1,8 +1,7 @@
 import { unref } from 'vue'
 import { SpaceResource } from '@ownclouders/web-client'
 import { useSpaceActionsShowMembers } from '../../../../../src/composables/actions'
-import { getComposableWrapper } from '@ownclouders/web-test-helpers'
-
+import { getComposableWrapper } from '../../../../../src/testing'
 describe('showMembers', () => {
   describe('isVisible property', () => {
     it('should be false when no resource given', () => {

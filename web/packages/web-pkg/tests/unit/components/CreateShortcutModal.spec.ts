@@ -5,7 +5,7 @@ import {
   mockHttpError,
   RouteLocation,
   shallowMount
-} from '@ownclouders/web-test-helpers'
+} from '../../../src/testing'
 import { SpaceResource } from '@ownclouders/web-client'
 import { mock } from 'vitest-mock-extended'
 import { FileResource } from '@ownclouders/web-client'

@@ -5,10 +5,10 @@ import { Resource, SpaceResource } from '@ownclouders/web-client'
 import {
   defaultComponentMocks,
   defaultPlugins,
-  shallowMount,
+  PartialComponentProps,
   RouteLocation,
-  PartialComponentProps
-} from '@ownclouders/web-test-helpers'
+  shallowMount
+} from '../../../../src/testing'
 import { ArchiverService } from '../../../../src/services'
 import { FolderView } from '../../../../src/ui/types'
 import { useExtensionRegistry, ViewOptions } from '../../../../src'

@@ -1,6 +1,5 @@
 import { useSpaceHelpers } from '../../../../src/composables/spaces'
-import { defaultComponentMocks, getComposableWrapper } from '@ownclouders/web-test-helpers'
-
+import { defaultComponentMocks, getComposableWrapper } from '../../../../src/testing'
 describe('useSpaceHelpers', () => {
   it('should be valid', () => {
     expect(useSpaceHelpers).toBeDefined()

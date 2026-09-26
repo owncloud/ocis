@@ -7,10 +7,10 @@ import {
   SidebarPanelExtension,
   useExtensionRegistry
 } from '../../../../../src'
-import { getComposableWrapper } from '@ownclouders/web-test-helpers'
 import { createPinia, setActivePinia } from 'pinia'
 import { computed, ref, unref } from 'vue'
 import { mock } from 'vitest-mock-extended'
+import { getComposableWrapper } from '../../../../../src/testing'
 
 describe('useExtensionRegistry', () => {
   beforeEach(() => {

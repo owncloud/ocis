@@ -66,6 +66,11 @@
         "default": "./dist/design-system/helpers.js",
         "require": "./dist/design-system/helpers.cjs",
         "types": "./dist/types/helpers/index.d.ts"
+      },
+      "./testing": {
+        "default": "./dist/design-system/testing.js",
+        "require": "./dist/design-system/testing.cjs",
+        "types": "./dist/types/testing/index.d.ts"
       }
     }
   },
@@ -84,6 +89,9 @@
     },
     "./l10n": {
       "default": "./l10n/translations.json"
+    },
+    "./testing": {
+      "default": "./src/testing/index.ts"
     }
   },
   "dependencies": {
@@ -108,8 +116,8 @@
     "@babel/plugin-transform-runtime": "7.28.5",
     "@babel/preset-env": "7.28.5",
     "@babel/runtime": "7.28.4",
-    "@ownclouders/web-test-helpers": "workspace:*",
     "@vitejs/plugin-vue": "6.0.1",
+    "@vue/test-utils": "2.4.6",
     "autoprefixer": "10.4.22",
     "babel-core": "7.0.0-bridge.0",
     "babel-loader": "^10.0.0",
@@ -141,6 +149,12 @@
     "yaml": "^2.8.1"
   },
   "peerDependencies": {
+    "@vue/test-utils": "^2.4.6",
     "vue": "^3.5.29"
+  },
+  "peerDependenciesMeta": {
+    "@vue/test-utils": {
+      "optional": true
+    }
   }
 }
