@@ -1,5 +1,5 @@
 import LinkRoleDropdown from '../../../src/components/LinkRoleDropdown.vue'
-import { defaultComponentMocks, defaultPlugins, mount } from '@ownclouders/web-test-helpers'
+import { defaultComponentMocks, defaultPlugins, mount } from '../../../src/testing'
 import { mock } from 'vitest-mock-extended'
 import { ShareRole } from '@ownclouders/web-client'
 import { SharingLinkType } from '@ownclouders/web-client/graph/generated'

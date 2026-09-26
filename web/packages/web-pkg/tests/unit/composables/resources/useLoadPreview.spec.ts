@@ -1,11 +1,11 @@
 import { ref } from 'vue'
-import { getComposableWrapper } from '@ownclouders/web-test-helpers'
 import { mock } from 'vitest-mock-extended'
 import { buildSpaceImageResource, Resource, SpaceResource } from '@ownclouders/web-client'
 import { useLoadPreview } from '../../../../src/composables/resources'
 import { usePreviewService } from '../../../../src/composables/previewService'
 import { PreviewService, ProcessorType } from '../../../../src/services'
 import { FolderViewModeConstants, ImageDimension } from '../../../../src'
+import { getComposableWrapper } from '../../../../src/testing'
 
 vi.mock('../../../../src/composables/previewService/usePreviewService')
 vi.mock('@ownclouders/web-client', async (importOriginal) => ({

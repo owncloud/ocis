@@ -1,4 +1,3 @@
-import { getComposableWrapper } from '@ownclouders/web-test-helpers'
 import {
   useSpacesStore,
   sortSpaceMembers,
@@ -8,6 +7,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { mock, mockDeep } from 'vitest-mock-extended'
 import { CollaboratorShare, GraphSharePermission, SpaceResource } from '@ownclouders/web-client'
 import { Graph } from '@ownclouders/web-client/graph'
+import { getComposableWrapper } from '../../../../src/testing'
 
 describe('spaces', () => {
   beforeEach(() => {

@@ -1,6 +1,5 @@
 import ErrorScreen from '../../../../src/components/AppTemplates/PartialViews/ErrorScreen.vue'
-import { defaultPlugins, mount } from '@ownclouders/web-test-helpers'
-
+import { defaultPlugins, mount } from '../../../../src/testing'
 describe('The external app error screen component', () => {
   test('displays an icon and a paragraph', () => {
     const wrapper = mount(ErrorScreen, {

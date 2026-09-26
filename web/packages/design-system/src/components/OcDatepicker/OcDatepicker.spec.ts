@@ -1,7 +1,7 @@
 import Datepicker from './OcDatepicker.vue'
-import { ComponentProps, defaultPlugins, shallowMount } from '@ownclouders/web-test-helpers'
 import { DateTime } from 'luxon'
 import { nextTick } from 'vue'
+import { ComponentProps, defaultPlugins, shallowMount } from '../../testing'
 
 describe('OcDatePicker', () => {
   it('renders', () => {

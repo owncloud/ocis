@@ -7,7 +7,7 @@ import {
   defaultPlugins,
   mount,
   useGetMatchingSpaceMock
-} from '@ownclouders/web-test-helpers'
+} from '../../../../src/testing'
 import { useFileActions } from '../../../../src/composables/actions'
 import { CapabilityStore } from '../../../../src/composables/piniaStores'
 import ResourceListItem from '../../../../src/components/FilesList/ResourceListItem.vue'

@@ -1,5 +1,5 @@
 import { defineComponent, nextTick } from 'vue'
-import { defaultPlugins, mount } from '@ownclouders/web-test-helpers'
+import { defaultPlugins, mount } from '../../../../src/testing'
 import { flushPromises } from '@vue/test-utils'
 import { config } from 'md-editor-v3'
 import { useMessages } from '../../../../src/composables'

@@ -1,5 +1,5 @@
 import OcAvatarItem from './OcAvatarItem.vue'
-import { mount } from '@ownclouders/web-test-helpers'
+import { mount } from '../../testing'
 describe('OcAvatarItem', () => {
   function getWrapperWithProps(props = {}) {
     return mount(OcAvatarItem, {

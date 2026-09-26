@@ -1,11 +1,11 @@
 import { mock } from 'vitest-mock-extended'
 import {
-  RouteLocation,
   defaultComponentMocks,
   defaultPlugins,
+  RouteLocation,
   shallowMount,
   useGetMatchingSpaceMock
-} from '@ownclouders/web-test-helpers'
+} from '../../../src/testing'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 import AppTopBar from '../../../src/components/AppTopBar.vue'
 import { Action } from '../../../src/composables/actions'

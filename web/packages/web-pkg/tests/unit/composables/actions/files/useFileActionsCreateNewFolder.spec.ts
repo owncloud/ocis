@@ -9,10 +9,10 @@ import {
 import { ShareSpaceResource, SpaceResource } from '@ownclouders/web-client'
 import { FolderResource, Resource } from '@ownclouders/web-client'
 import {
-  RouteLocation,
   defaultComponentMocks,
-  getComposableWrapper
-} from '@ownclouders/web-test-helpers'
+  getComposableWrapper,
+  RouteLocation
+} from '../../../../../src/testing'
 import { useScrollToMock } from '../../../../mocks/useScrollToMock'
 import { useScrollTo } from '../../../../../src/composables/scrollTo'
 

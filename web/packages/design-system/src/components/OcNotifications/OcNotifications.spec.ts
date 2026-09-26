@@ -1,6 +1,5 @@
 import OcNotifications from './OcNotifications.vue'
-import { shallowMount } from '@ownclouders/web-test-helpers'
-
+import { shallowMount } from '../../testing'
 describe('OcNotifications', () => {
   function getWrapper(options = {}) {
     return shallowMount(OcNotifications, options)

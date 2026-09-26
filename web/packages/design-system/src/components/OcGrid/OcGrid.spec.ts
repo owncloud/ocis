@@ -1,6 +1,5 @@
 import OcGrid from './OcGrid.vue'
-import { mount } from '@ownclouders/web-test-helpers'
-
+import { mount } from '../../testing'
 describe('OcGrid', () => {
   function getWrapper(props = {}) {
     return mount(OcGrid, {

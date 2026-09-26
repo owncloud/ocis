@@ -1,4 +1,3 @@
-import { shallowMount } from '@ownclouders/web-test-helpers'
 import { AVAILABLE_SIZES } from '@ownclouders/design-system/helpers'
 import ResourceIcon from '../../../../src/components/FilesList/ResourceIcon.vue'
 import {
@@ -6,6 +5,7 @@ import {
   resourceIconMappingInjectionKey
 } from '../../../../src/helpers/resource'
 import { Resource } from '@ownclouders/web-client'
+import { shallowMount } from '../../../../src/testing'
 
 const resourceIconMapping: ResourceIconMapping = {
   extension: {

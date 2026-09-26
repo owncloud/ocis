@@ -1,6 +1,6 @@
 import { unref } from 'vue'
 import { useLinkTypes } from '../../../../src/composables/links/useLinkTypes'
-import { defaultComponentMocks, getComposableWrapper } from '@ownclouders/web-test-helpers'
+import { defaultComponentMocks, getComposableWrapper } from '../../../../src/testing'
 import { SharingLinkType } from '@ownclouders/web-client/graph/generated'
 import { AbilityRule } from '@ownclouders/web-client'
 import { Capabilities } from '@ownclouders/web-client/ocs'
