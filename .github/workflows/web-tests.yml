@@ -12,6 +12,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       web-changed: ${{ steps.check.outputs.web-changed }}
+      full-run: ${{ steps.check.outputs.full-run }}
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -23,15 +24,23 @@ jobs:
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
+          # full-run: push to master/stable-* or an explicit [full-ci] request always run
+          # everything, unscoped - same as before Nx. A normal PR gets the affected-scoped
+          # path instead (see web-build-test), since only those two cases actually need every
+          # project checked.
           if [[ "${{ github.event_name }}" == "push" ]]; then
             echo "web-changed=true" >> "$GITHUB_OUTPUT"
+            echo "full-run=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           if echo "$PR_TITLE" | grep -qi "\[full-ci\]"; then
             echo "web-changed=true" >> "$GITHUB_OUTPUT"
+            echo "full-run=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+
+          echo "full-run=false" >> "$GITHUB_OUTPUT"
 
           CHANGED_FILES=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" 2>/dev/null || git diff --name-only HEAD~1)
 
@@ -58,6 +67,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          # nx affected --base=<pr-base-sha> (used below) needs that commit present locally
+          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
@@ -81,16 +93,34 @@ jobs:
         run: pnpm licenses:csv && pnpm licenses:save
 
       - name: Check types
+        # Whole-repo, unconditional: only 5/27 projects have a per-project typecheck target
+        # (nx/vite's typecheck inference needs a project's own vite.config.ts, which most
+        # web-app-* packages don't have - see docs/superpowers/specs), so `nx affected
+        # -t typecheck` can't safely stand in for this yet.
         run: pnpm check:types
 
       - name: Check format
         run: pnpm check:format
 
       - name: Lint
-        run: pnpm lint
+        env:
+          FULL_RUN: ${{ needs.detect-web-changes.outputs.full-run }}
+        run: |
+          if [[ "$FULL_RUN" == "true" ]]; then
+            pnpm lint
+          else
+            pnpm exec nx affected -t lint --base="${{ github.event.pull_request.base.sha }}"
+          fi
 
       - name: Run unit tests
-        run: pnpm test:unit --coverage
+        env:
+          FULL_RUN: ${{ needs.detect-web-changes.outputs.full-run }}
+        run: |
+          if [[ "$FULL_RUN" == "true" ]]; then
+            pnpm test:unit --coverage
+          else
+            pnpm exec nx affected -t test --base="${{ github.event.pull_request.base.sha }}"
+          fi
 
       - name: Build
         run: pnpm build
