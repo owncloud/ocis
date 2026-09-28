@@ -24,7 +24,7 @@ func TestClassifyTransport(t *testing.T) {
 	}{
 		{"nil", nil, false},
 		{"deadline exceeded", context.DeadlineExceeded, true},
-		{"canceled", context.Canceled, true},
+		{"canceled", context.Canceled, false},
 		{"wrapped deadline", errors.Join(errors.New("get userinfo"), context.DeadlineExceeded), true},
 		{"net error", timeoutErr{}, true},
 		{"plain error", errors.New("token revoked"), false},
@@ -58,7 +58,7 @@ func TestStatusIsTransient(t *testing.T) {
 		http.StatusBadGateway:              true,
 		http.StatusServiceUnavailable:      true,
 		http.StatusGatewayTimeout:          true,
-		http.StatusNotImplemented:          false, // permanent 5xx must fail fast
+		http.StatusNotImplemented:          false,
 		http.StatusHTTPVersionNotSupported: false,
 	}
 	for status, want := range tests {

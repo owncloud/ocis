@@ -16,10 +16,9 @@ func classifyTransport(err error) error {
 	if err == nil {
 		return nil
 	}
+	// context.Canceled means the caller hung up or the server is shutting down, not an IdP outage.
 	var netErr net.Error
-	if errors.Is(err, context.DeadlineExceeded) ||
-		errors.Is(err, context.Canceled) ||
-		errors.As(err, &netErr) {
+	if errors.Is(err, context.DeadlineExceeded) || errors.As(err, &netErr) {
 		return errors.Join(ErrTemporarilyUnavailable, err)
 	}
 	return err

@@ -1,8 +1,8 @@
 import { HttpError } from '@ownclouders/web-client'
 
 const maxBackoffMs = 10_000
-// Cap attempts so a sustained outage surfaces a 503 (maintenance banner) instead of hanging login.
-const maxAttempts = 60
+// Bound total retry time so a sustained outage surfaces a 503 (maintenance banner) rather than spinning forever.
+const maxElapsedMs = 60_000
 
 export const isTransientError = (e: unknown): e is HttpError =>
   e instanceof HttpError && (e.statusCode === 503 || e.statusCode === 429)
@@ -29,13 +29,18 @@ const defaultSleep = (ms: number) => new Promise((resolve) => setTimeout(resolve
 // capped backoff; any other error (e.g. a genuine 401) propagates.
 export const retryOnTransientError = async <T>(
   fn: () => Promise<T>,
-  { sleep = defaultSleep, attempts = maxAttempts }: { sleep?: (ms: number) => Promise<unknown>; attempts?: number } = {}
+  {
+    sleep = defaultSleep,
+    budgetMs = maxElapsedMs,
+    now = Date.now
+  }: { sleep?: (ms: number) => Promise<unknown>; budgetMs?: number; now?: () => number } = {}
 ): Promise<T> => {
+  const start = now()
   for (let attempt = 0; ; attempt++) {
     try {
       return await fn()
     } catch (e) {
-      if (!isTransientError(e) || attempt >= attempts - 1) {
+      if (!isTransientError(e) || now() - start >= budgetMs) {
         throw e
       }
       const backoff = Math.min(maxBackoffMs, 1000 * 2 ** attempt)

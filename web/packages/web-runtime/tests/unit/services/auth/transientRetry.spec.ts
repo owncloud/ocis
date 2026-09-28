@@ -49,11 +49,18 @@ describe('retryOnTransientError', () => {
     expect(fn).toHaveBeenCalledTimes(1)
   })
 
-  it('gives up after the attempt cap and rethrows the last transient error', async () => {
+  it('gives up after the time budget and rethrows the last transient error', async () => {
     const err = httpError(503)
-    const fn = vi.fn().mockRejectedValue(err)
-    await expect(retryOnTransientError(fn, { ...noSleep, attempts: 3 })).rejects.toBe(err)
-    expect(fn).toHaveBeenCalledTimes(3)
+    let clock = 0
+    // each attempt advances the clock 3s; budget of 5s allows a retry then gives up
+    const fn = vi.fn().mockImplementation(() => {
+      clock += 3000
+      return Promise.reject(err)
+    })
+    await expect(
+      retryOnTransientError(fn, { ...noSleep, budgetMs: 5000, now: () => clock })
+    ).rejects.toBe(err)
+    expect(fn).toHaveBeenCalledTimes(2)
   })
 
   it('parses the HTTP-date form of Retry-After', async () => {
