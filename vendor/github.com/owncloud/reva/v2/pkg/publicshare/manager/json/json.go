@@ -612,6 +612,12 @@ func (m *manager) ListPublicShares(ctx context.Context, u *user.User, filters []
 }
 
 func (m *manager) cleanupExpiredShares() error {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	// Another goroutine may hold the lock for a while; once we get it, skip the work if Close already asked us to stop.
+	if err := m.janitorCtx.Err(); err != nil {
+		return err
+	}
 	// Deriving from m.janitorCtx (not context.Background()) means Close
 	// cancels an in-flight run immediately instead of leaving it to run out its full timeout.
 	ctx, cancel := context.WithTimeout(m.janitorCtx, 60*time.Second)
@@ -620,9 +626,6 @@ func (m *manager) cleanupExpiredShares() error {
 	if err := m.init(ctx); err != nil {
 		return err
 	}
-
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
 
 	db, err := m.persistence.Read(ctx)
 	if err != nil {
