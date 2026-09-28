@@ -9,12 +9,12 @@ const httpError = (statusCode: number, retryAfter?: string) =>
   )
 
 describe('retryOnTransientError', () => {
-  // inject a no-op sleep so the retry loop doesn't wait in tests
-  const noSleep = { sleep: vi.fn().mockResolvedValue(undefined) }
+  // inject a no-op delay so the retry loop doesn't wait in tests
+  const noDelay = { delay: vi.fn().mockResolvedValue(undefined) }
 
   it('returns the result without retrying on success', async () => {
     const fn = vi.fn().mockResolvedValue('ok')
-    await expect(retryOnTransientError(fn, noSleep)).resolves.toBe('ok')
+    await expect(retryOnTransientError(fn, noDelay)).resolves.toBe('ok')
     expect(fn).toHaveBeenCalledTimes(1)
   })
 
@@ -25,27 +25,27 @@ describe('retryOnTransientError', () => {
       .mockRejectedValueOnce(httpError(503))
       .mockRejectedValueOnce(httpError(503))
       .mockResolvedValue('ok')
-    await expect(retryOnTransientError(fn, noSleep)).resolves.toBe('ok')
+    await expect(retryOnTransientError(fn, noDelay)).resolves.toBe('ok')
     expect(fn).toHaveBeenCalledTimes(4)
   })
 
   it('retries on a 429', async () => {
     const fn = vi.fn().mockRejectedValueOnce(httpError(429)).mockResolvedValue('ok')
-    await expect(retryOnTransientError(fn, noSleep)).resolves.toBe('ok')
+    await expect(retryOnTransientError(fn, noDelay)).resolves.toBe('ok')
     expect(fn).toHaveBeenCalledTimes(2)
   })
 
   it('does not retry a 401 and rethrows immediately', async () => {
     const err = httpError(401)
     const fn = vi.fn().mockRejectedValue(err)
-    await expect(retryOnTransientError(fn, noSleep)).rejects.toBe(err)
+    await expect(retryOnTransientError(fn, noDelay)).rejects.toBe(err)
     expect(fn).toHaveBeenCalledTimes(1)
   })
 
   it('rethrows a non-HttpError immediately', async () => {
     const err = new Error('boom')
     const fn = vi.fn().mockRejectedValue(err)
-    await expect(retryOnTransientError(fn, noSleep)).rejects.toBe(err)
+    await expect(retryOnTransientError(fn, noDelay)).rejects.toBe(err)
     expect(fn).toHaveBeenCalledTimes(1)
   })
 
@@ -58,40 +58,40 @@ describe('retryOnTransientError', () => {
       return Promise.reject(err)
     })
     await expect(
-      retryOnTransientError(fn, { ...noSleep, budgetMs: 5000, now: () => clock })
+      retryOnTransientError(fn, { ...noDelay, budgetMs: 5000, now: () => clock })
     ).rejects.toBe(err)
     expect(fn).toHaveBeenCalledTimes(2)
   })
 
   it('parses the HTTP-date form of Retry-After', async () => {
-    const sleep = vi.fn().mockResolvedValue(undefined)
+    const delay = vi.fn().mockResolvedValue(undefined)
     vi.spyOn(Date, 'now').mockReturnValue(Date.parse('Wed, 21 Oct 2025 07:28:00 GMT'))
     const fn = vi
       .fn()
       .mockRejectedValueOnce(httpError(503, 'Wed, 21 Oct 2025 07:28:05 GMT'))
       .mockResolvedValue('ok')
-    await expect(retryOnTransientError(fn, { sleep })).resolves.toBe('ok')
-    expect(sleep).toHaveBeenCalledWith(5000)
+    await expect(retryOnTransientError(fn, { delay })).resolves.toBe('ok')
+    expect(delay).toHaveBeenCalledWith(5000)
     vi.restoreAllMocks()
   })
 
   it('honors the Retry-After header for the wait duration', async () => {
-    const sleep = vi.fn().mockResolvedValue(undefined)
+    const delay = vi.fn().mockResolvedValue(undefined)
     const fn = vi.fn().mockRejectedValueOnce(httpError(503, '2')).mockResolvedValue('ok')
-    await expect(retryOnTransientError(fn, { sleep })).resolves.toBe('ok')
-    expect(sleep).toHaveBeenCalledWith(2000)
+    await expect(retryOnTransientError(fn, { delay })).resolves.toBe('ok')
+    expect(delay).toHaveBeenCalledWith(2000)
   })
 
   it('falls back to capped backoff when Retry-After is absent', async () => {
-    const sleep = vi.fn().mockResolvedValue(undefined)
+    const delay = vi.fn().mockResolvedValue(undefined)
     const fn = vi
       .fn()
       .mockRejectedValueOnce(httpError(503))
       .mockRejectedValueOnce(httpError(503))
       .mockResolvedValue('ok')
-    await expect(retryOnTransientError(fn, { sleep })).resolves.toBe('ok')
+    await expect(retryOnTransientError(fn, { delay })).resolves.toBe('ok')
     // attempt 0 -> 1000ms, attempt 1 -> 2000ms
-    expect(sleep).toHaveBeenNthCalledWith(1, 1000)
-    expect(sleep).toHaveBeenNthCalledWith(2, 2000)
+    expect(delay).toHaveBeenNthCalledWith(1, 1000)
+    expect(delay).toHaveBeenNthCalledWith(2, 2000)
   })
 })

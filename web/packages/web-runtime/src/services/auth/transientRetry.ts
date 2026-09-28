@@ -23,17 +23,17 @@ const parseRetryAfter = (header: string | null | undefined): number | undefined 
 const retryAfterMs = (e: HttpError, fallbackMs: number): number =>
   parseRetryAfter(e.response?.headers?.get('retry-after')) ?? fallbackMs
 
-const defaultSleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+const defaultDelay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 // Retry a transient 503/429 (IdP failure, #12999) honoring Retry-After with
 // capped backoff; any other error (e.g. a genuine 401) propagates.
 export const retryOnTransientError = async <T>(
   fn: () => Promise<T>,
   {
-    sleep = defaultSleep,
+    delay = defaultDelay,
     budgetMs = maxElapsedMs,
     now = Date.now
-  }: { sleep?: (ms: number) => Promise<unknown>; budgetMs?: number; now?: () => number } = {}
+  }: { delay?: (ms: number) => Promise<unknown>; budgetMs?: number; now?: () => number } = {}
 ): Promise<T> => {
   const start = now()
   for (let attempt = 0; ; attempt++) {
@@ -44,7 +44,7 @@ export const retryOnTransientError = async <T>(
         throw e
       }
       const backoff = Math.min(maxBackoffMs, 1000 * 2 ** attempt)
-      await sleep(retryAfterMs(e, backoff))
+      await delay(retryAfterMs(e, backoff))
     }
   }
 }
