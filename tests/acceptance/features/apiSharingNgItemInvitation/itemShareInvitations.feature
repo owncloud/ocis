@@ -1661,6 +1661,8 @@ Feature: Send a sharing invitations
       | shareType       | group              |
       | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
+    And user "Brian" should have a share "<resource>" synced
+    And user "Carol" should have a share "<resource>" synced
     And user "Brian" should have a share "<resource>" shared by user "Alice" from space "NewSpace"
     And user "Carol" should have a share "<resource>" shared by user "Alice" from space "NewSpace"
     And the JSON data of the response should match
