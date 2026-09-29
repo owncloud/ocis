@@ -2377,6 +2377,27 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @Then /^user "([^"]*)" should have a share "([^"]*)" with permissions role "([^"]*)" shared by user "([^"]*)" from space "([^"]*)"$/
+	 *
+	 * @param string $sharee
+	 * @param string $share
+	 * @param string $role
+	 * @param string $sharer
+	 * @param string $space
+	 *
+	 * @return void
+	 */
+	public function userShouldHaveShareWithPermissionsRole(
+		string $sharee,
+		string $share,
+		string $role,
+		string $sharer,
+		string $space,
+	): void {
+		$this->checkIfShareExists($share, $sharee, $sharer, $space, true, false, $role);
+	}
+
+	/**
 	 * @Then user :sharee should have the following resource shares:
 	 *
 	 * @param string $sharee
