@@ -34,6 +34,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
+	"github.com/owncloud/reva/v2/pkg/storage"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/metadata"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
@@ -180,6 +181,9 @@ func (t *Tree) TouchFile(ctx context.Context, n *node.Node, markprocessing bool,
 		return errors.Wrap(err, "Decomposedfs: could not symlink child entry")
 	}
 
+	if storage.SkipTouchPropagation(ctx) {
+		return nil
+	}
 	return t.Propagate(ctx, n, 0)
 }
 

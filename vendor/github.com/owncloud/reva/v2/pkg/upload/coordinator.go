@@ -320,7 +320,8 @@ func (c *coordinator) touchNode(ctx context.Context, session Session) error {
 		Path: session.Filename(),
 	}
 	// MarkProcessing is the coordinator's own call, hence false here.
-	result, err := c.fs.TouchFile(ctx, pathRef, false, session.Metadata()["mtime"])
+	// PrepareUpload propagates the node, so TouchFile need not.
+	result, err := c.fs.TouchFile(storage.ContextSkipTouchPropagation(ctx), pathRef, false, session.Metadata()["mtime"])
 	if err != nil {
 		session.Cleanup(ctx, true, true)
 		if _, ok := err.(errtypes.IsNotFound); ok {
@@ -566,10 +567,11 @@ func (c *coordinator) commit(ctx context.Context, session Session) (*provider.Re
 
 	// CommitUpload does not own the body; we opened it, so we close it.
 	err = c.fs.CommitUpload(ctx, &ref, session.ID(), storage.UploadSource{
-		Body:       f,
-		Length:     session.Size(),
-		ScanResult: scanResult,
-		ScanDate:   scanDate,
+		Body:        f,
+		Length:      session.Size(),
+		NodeExisted: session.NodeExists(),
+		ScanResult:  scanResult,
+		ScanDate:    scanDate,
 	})
 	f.Close()
 	if err != nil {

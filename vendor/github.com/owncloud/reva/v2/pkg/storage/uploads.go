@@ -31,6 +31,19 @@ import (
 // UploadFinishedFunc is a callback function used in storage drivers to indicate that an upload has finished
 type UploadFinishedFunc func(spaceOwner, executant *userpb.UserId, ref *provider.Reference)
 
+type skipTouchPropagationKey struct{}
+
+// ContextSkipTouchPropagation tells TouchFile not to propagate.
+func ContextSkipTouchPropagation(ctx context.Context) context.Context {
+	return context.WithValue(ctx, skipTouchPropagationKey{}, true)
+}
+
+// SkipTouchPropagation reports whether TouchFile should skip propagation.
+func SkipTouchPropagation(ctx context.Context) bool {
+	skip, _ := ctx.Value(skipTouchPropagationKey{}).(bool)
+	return skip
+}
+
 // UploadRequest us used in FS.Upload() to carry required upload metadata
 type UploadRequest struct {
 	Ref    *provider.Reference
