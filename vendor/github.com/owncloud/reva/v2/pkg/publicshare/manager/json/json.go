@@ -123,8 +123,6 @@ func New(gwAddr string, pwHashCost, janitorRunInterval int, enableCleanup bool, 
 	return m, nil
 }
 
-var _ publicshare.ClosableManager = (*manager)(nil)
-
 type commonConfig struct {
 	GatewayAddr                string `mapstructure:"gateway_addr"`
 	SharePasswordHashCost      int    `mapstructure:"password_hash_cost"`
@@ -152,7 +150,7 @@ func (c *commonConfig) init() {
 		c.SharePasswordHashCost = 11
 	}
 	if c.JanitorRunInterval == 0 {
-		c.JanitorRunInterval = 600
+		c.JanitorRunInterval = 3600 // 1 hour
 	}
 }
 
@@ -173,6 +171,8 @@ type manager struct {
 	janitorCancel context.CancelFunc
 	janitorDone   chan struct{}
 }
+
+var _ publicshare.ClosableManager = (*manager)(nil)
 
 // init is called at the top of every public method to lazily initialize the
 // persistence layer. It must not take m.mutex: persistence.Init is already
@@ -262,6 +262,7 @@ func (m *manager) Load(ctx context.Context, shareChan <-chan *publicshare.WithPa
 	if err != nil {
 		return err
 	}
+	dbCopy := persistence.Copy(db)
 
 	for ps := range shareChan {
 		encShare, err := utils.MarshalProtoV1ToJSON(&ps.PublicShare)
@@ -269,12 +270,12 @@ func (m *manager) Load(ctx context.Context, shareChan <-chan *publicshare.WithPa
 			return err
 		}
 
-		db[ps.PublicShare.Id.GetOpaqueId()] = map[string]interface{}{
+		dbCopy[ps.PublicShare.Id.GetOpaqueId()] = map[string]interface{}{
 			"share":    string(encShare),
 			"password": ps.Password,
 		}
 	}
-	return m.persistence.Write(ctx, db)
+	return m.persistence.Write(ctx, dbCopy)
 }
 
 // CreatePublicShare adds a new entry to manager.shares
@@ -345,9 +346,10 @@ func (m *manager) CreatePublicShare(ctx context.Context, u *user.User, rInfo *pr
 	if err != nil {
 		return nil, err
 	}
+	dbCopy := persistence.Copy(db)
 
-	if _, ok := db[s.Id.GetOpaqueId()]; !ok {
-		db[s.Id.GetOpaqueId()] = map[string]interface{}{
+	if _, ok := dbCopy[s.Id.GetOpaqueId()]; !ok {
+		dbCopy[s.Id.GetOpaqueId()] = map[string]interface{}{
 			"share":    string(encShare),
 			"password": ps.Password,
 		}
@@ -355,7 +357,7 @@ func (m *manager) CreatePublicShare(ctx context.Context, u *user.User, rInfo *pr
 		return nil, errors.New("key already exists")
 	}
 
-	err = m.persistence.Write(ctx, db)
+	err = m.persistence.Write(ctx, dbCopy)
 	if err != nil {
 		return nil, err
 	}
@@ -433,13 +435,14 @@ func (m *manager) UpdatePublicShare(ctx context.Context, u *user.User, req *link
 	if err != nil {
 		return nil, err
 	}
+	dbCopy := persistence.Copy(db)
 
 	encShare, err := utils.MarshalProtoV1ToJSON(share)
 	if err != nil {
 		return nil, err
 	}
 
-	data, ok := db[share.Id.OpaqueId].(map[string]interface{})
+	data, ok := dbCopy[share.Id.OpaqueId].(map[string]interface{})
 	if !ok {
 		data = map[string]interface{}{}
 	}
@@ -449,9 +452,9 @@ func (m *manager) UpdatePublicShare(ctx context.Context, u *user.User, req *link
 	}
 	data["share"] = string(encShare)
 
-	db[share.Id.OpaqueId] = data
+	dbCopy[share.Id.OpaqueId] = data
 
-	err = m.persistence.Write(ctx, db)
+	err = m.persistence.Write(ctx, dbCopy)
 	if err != nil {
 		return nil, err
 	}
@@ -522,10 +525,9 @@ func (m *manager) ListPublicShares(ctx context.Context, u *user.User, filters []
 
 	m.mutex.RLock()
 
-	// Read returns a copy that shares no mutable state with the persistence
-	// backend (see persistence.Copy), so it's safe to keep using db after
-	// the lock is released below - a concurrent writer can no longer race
-	// what we do with it.
+	// Ranging over db below happens after the lock is released, which is safe
+	// because we never mutate it: writers copy before they mutate, and the
+	// persistence layer publishes a new map instead of changing this one.
 	db, err := m.persistence.Read(ctx)
 	if err != nil {
 		m.mutex.RUnlock()
@@ -627,10 +629,11 @@ func (m *manager) cleanupExpiredShares() error {
 		return err
 	}
 
-	db, err := m.persistence.Read(ctx)
+	read, err := m.persistence.Read(ctx)
 	if err != nil {
 		return err
 	}
+	db := persistence.Copy(read)
 
 	var changed bool
 	for id, v := range db {
@@ -642,9 +645,6 @@ func (m *manager) cleanupExpiredShares() error {
 		}
 
 		if publicshare.IsExpired(&ps) {
-			// db is our own copy (see persistence.Copy), so deleting the
-			// current entry while ranging over it is safe: single goroutine,
-			// no aliasing with the persistence backend's internal state.
 			delete(db, id)
 			changed = true
 		}
@@ -671,10 +671,11 @@ func (m *manager) RevokePublicShare(ctx context.Context, _ *user.User, ref *link
 
 // revokePublicShare doesn't have a lock inside, ensure a lock before call
 func (m *manager) revokePublicShare(ctx context.Context, ref *link.PublicShareReference) error {
-	db, err := m.persistence.Read(ctx)
+	read, err := m.persistence.Read(ctx)
 	if err != nil {
 		return err
 	}
+	db := persistence.Copy(read)
 
 	switch {
 	case ref.GetId() != nil && ref.GetId().OpaqueId != "":

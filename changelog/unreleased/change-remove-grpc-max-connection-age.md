@@ -10,4 +10,4 @@ GRPC_MAX_CONNECTION_AGE has been removed. It only closed healthy connections on
 a timer, never ended a request that was already in flight, and silently did
 nothing when its value had no unit suffix.
 
-https://github.com/owncloud/ocis/pull/13005
+https://github.com/owncloud/ocis/pull/13020

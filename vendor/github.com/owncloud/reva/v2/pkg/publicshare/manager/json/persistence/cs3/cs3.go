@@ -101,7 +101,7 @@ func (p *cs3) Read(ctx context.Context) (persistence.PublicShares, error) {
 	info, err := p.s.Stat(ctx, "publicshares.json")
 	if err != nil {
 		if _, ok := err.(errtypes.NotFound); ok {
-			return persistence.Copy(p.db.publicShares), nil // Nothing to sync against
+			return p.db.publicShares, nil
 		}
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func (p *cs3) Read(ctx context.Context) (persistence.PublicShares, error) {
 		}
 		p.db.mtime = utils.TSToTime(info.Mtime)
 	}
-	return persistence.Copy(p.db.publicShares), nil
+	return p.db.publicShares, nil
 }
 
 func (p *cs3) Write(ctx context.Context, db persistence.PublicShares) error {
@@ -142,17 +142,9 @@ func (p *cs3) Write(ctx context.Context, db persistence.PublicShares) error {
 		return err
 	}
 
-	// Keep the cache in sync with what was just persisted. This used to
-	// happen implicitly, because Read() handed out a reference to
-	// p.db.publicShares itself and callers mutated it in place before
-	// calling Write() with that same map. Now that Read() returns an
-	// independent copy (see persistence.Copy), it has to be done explicitly
-	// here, or the cache would only pick up our own write once some later
-	// external write advances the remote mtime past our stale one.
-	if info, statErr := p.s.Stat(ctx, "publicshares.json"); statErr == nil {
-		p.db.mtime = utils.TSToTime(info.Mtime)
-	}
-	p.db.publicShares = persistence.Copy(db)
+	// Invalidate the cache to minimize the risk of inconsistency.
+	p.db.mtime = time.Time{}
+	p.db.publicShares = persistence.PublicShares{}
 
 	return nil
 }

@@ -456,7 +456,12 @@ func (p *Handler) propfindResponse(ctx context.Context, w http.ResponseWriter, r
 
 	var linkshares map[string]struct{}
 	if !p.c.DisablePropfindPublicLinkResolution {
-		linkshares = p.resolveLinkshares(ctx, w, namespace, pf, resourceInfos, log)
+		var err error
+		linkshares, err = p.resolveLinkshares(ctx, namespace, pf, resourceInfos, log)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	}
 	prefer := net.ParsePrefer(r.Header.Get(net.HeaderPrefer))
 	returnMinimal := prefer[net.HeaderPreferReturn] == "minimal"
@@ -491,7 +496,7 @@ func (p *Handler) propfindResponse(ctx context.Context, w http.ResponseWriter, r
 }
 
 // resolveLinkshares resolves the link shares for the given resource infos
-func (p *Handler) resolveLinkshares(ctx context.Context, w http.ResponseWriter, namespace string, pf XML, resourceInfos []*provider.ResourceInfo, log zerolog.Logger) map[string]struct{} {
+func (p *Handler) resolveLinkshares(ctx context.Context, namespace string, pf XML, resourceInfos []*provider.ResourceInfo, log zerolog.Logger) (map[string]struct{}, error) {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "resolveLinkshares")
 	defer span.End()
 	var linkshares map[string]struct{}
@@ -522,10 +527,9 @@ func (p *Handler) resolveLinkshares(ctx context.Context, w http.ResponseWriter, 
 				client, err := p.selector.Next()
 				if err != nil {
 					log.Error().Err(err).Msg("error getting grpc client")
-					w.WriteHeader(http.StatusInternalServerError)
-					return nil
+					return nil, err
 				}
-				listResp, err := client.ListPublicShares(ctx, &link.ListPublicSharesRequest{Filters: filters})
+				listResp, err := client.ListPublicShares(localCtx, &link.ListPublicSharesRequest{Filters: filters})
 				if err == nil {
 					linkshares = make(map[string]struct{}, len(listResp.Share))
 					for i := range listResp.Share {
@@ -539,7 +543,7 @@ func (p *Handler) resolveLinkshares(ctx context.Context, w http.ResponseWriter, 
 			}
 		}
 	}
-	return linkshares
+	return linkshares, nil
 }
 
 // TODO this is just a stat -> rename

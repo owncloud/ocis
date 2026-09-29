@@ -7,4 +7,4 @@ condition has been fixed and the toggle is now exposed as
 OCDAV_DISABLE_PROPFIND_PUBLIC_LINK_RESOLUTION, which can be set to reduce load
 on services for large collections.
 
-https://github.com/owncloud/ocis/pull/13706
+https://github.com/owncloud/ocis/pull/13020
