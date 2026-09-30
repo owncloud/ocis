@@ -26,7 +26,8 @@ export const setupAuthGuard = (router: Router) => {
     const authStore = useAuthStore()
     // A guard-synchronous deny (e.g. the vault route) comes back as a redirect target.
     const redirect = await authService.initializeContext(to)
-    if (redirect) {
+    // `false` cancels the navigation (e.g. the page is being reloaded outside the vault)
+    if (redirect === false || redirect) {
       return redirect
     }
 

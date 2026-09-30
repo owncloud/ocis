@@ -8,7 +8,11 @@ import {
 import { mock } from 'vitest-mock-extended'
 import { Router } from 'vue-router'
 import { Ability } from '@ownclouders/web-client'
-import { AuthService, vaultStepUpAttemptKey } from '../../../../src/services/auth/authService'
+import {
+  AuthService,
+  vaultStepUpAttemptKey,
+  vaultStepUpFailedKey
+} from '../../../../src/services/auth/authService'
 import { UserManager } from '../../../../src/services/auth/userManager'
 import { RouteLocation, createRouter, createTestingPinia } from '@ownclouders/web-test-helpers'
 import { User } from 'oidc-client-ts'
@@ -427,7 +431,10 @@ describe('AuthService', () => {
         null,
         router,
         ability,
-        { $gettext: (msg: string) => msg } as unknown as Language,
+        {
+          $gettext: (msg: string) => msg,
+          $pgettext: (_context: string, msg: string) => msg
+        } as unknown as Language,
         null,
         authStore,
         capabilityStore,
@@ -559,20 +566,61 @@ describe('AuthService', () => {
         expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
       })
 
-      it('does not redirect again when the IdP returned without the required acr', async () => {
+      it('leaves the vault with a full page load when the IdP returned without the required acr', async () => {
         const { authService, mockSignInRedirect } = setupVaultAuthService({
           canAccessVault: true,
           userContextReady: true,
           getUser: regularUser
         })
+        const navigateSpy = vi
+          .spyOn(authService as any, 'navigateOutsideVault')
+          .mockImplementation(() => undefined)
         sessionStorage.setItem(vaultStepUpAttemptKey, Date.now().toString())
 
         const result = await authService.initializeContext(vaultRoute)
 
-        expect(result).toEqual({ path: '/' })
+        // navigation is cancelled, no in-app redirect that would keep the vault clients
+        expect(result).toBe(false)
+        expect(navigateSpy).toHaveBeenCalledTimes(1)
+        expect(navigateSpy.mock.calls[0][0]).not.toMatch(/vault/)
         expect(mockSignInRedirect).not.toHaveBeenCalled()
         expect(sessionStorage.getItem(vaultStepUpAttemptKey)).toBeNull()
-        expect(useMessages().showErrorMessage).toHaveBeenCalled()
+        expect(sessionStorage.getItem(vaultStepUpFailedKey)).toBe('true')
+      })
+
+      it('shows the step-up failure message after the reload and only once', async () => {
+        const { authService } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: true,
+          getUser: () =>
+            Promise.resolve(mock<User>({ profile: { acr: 'advanced' }, expired: false }))
+        })
+        sessionStorage.setItem(vaultStepUpFailedKey, 'true')
+
+        await authService.initializeContext(vaultRoute)
+        await authService.initializeContext(vaultRoute)
+
+        expect(useMessages().showErrorMessage).toHaveBeenCalledTimes(1)
+        expect(sessionStorage.getItem(vaultStepUpFailedKey)).toBeNull()
+      })
+
+      it('redirects an expired user to the IdP even with a fresh attempt marker', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: true,
+          getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: true }))
+        })
+        const navigateSpy = vi
+          .spyOn(authService as any, 'navigateOutsideVault')
+          .mockImplementation(() => undefined)
+        sessionStorage.setItem(vaultStepUpAttemptKey, Date.now().toString())
+
+        const result = await authService.initializeContext(vaultRoute)
+
+        expect(result).toBeUndefined()
+        expect(navigateSpy).not.toHaveBeenCalled()
+        expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
+        expect(sessionStorage.getItem(vaultStepUpAttemptKey)).not.toBeNull()
       })
 
       it('retries the step-up when the previous attempt is stale', async () => {
