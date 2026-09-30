@@ -22,6 +22,7 @@ import (
 	"context"
 	"encoding/json"
 	"encoding/xml"
+	stderr "errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -454,42 +455,9 @@ func (p *Handler) propfindResponse(ctx context.Context, w http.ResponseWriter, r
 	defer span.End()
 
 	var linkshares map[string]struct{}
-	// public link access does not show share-types
-	// oc:share-type is not part of an allprops response
-	if namespace != "/public" {
-		// only fetch this if property was queried
-		for _, prop := range pf.Prop {
-			if prop.Space == net.NsOwncloud && (prop.Local == "share-types" || prop.Local == "permissions") {
-				filters := make([]*link.ListPublicSharesRequest_Filter, 0, len(resourceInfos))
-				for i := range resourceInfos {
-					// FIXME this is expensive
-					// the filters array grow by one for every file in a folder
-					// TODO store public links as grants on the storage, reassembling them here is too costly
-					// we can then add the filter if the file has share-types=3 in the opaque,
-					// same as user / group shares for share indicators
-					filters = append(filters, publicshare.ResourceIDFilter(resourceInfos[i].Id))
-				}
-				client, err := p.selector.Next()
-				if err != nil {
-					log.Error().Err(err).Msg("error getting grpc client")
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				listResp, err := client.ListPublicShares(ctx, &link.ListPublicSharesRequest{Filters: filters})
-				if err == nil {
-					linkshares = make(map[string]struct{}, len(listResp.Share))
-					for i := range listResp.Share {
-						linkshares[listResp.Share[i].ResourceId.OpaqueId] = struct{}{}
-					}
-				} else {
-					log.Error().Err(err).Msg("propfindResponse: couldn't list public shares")
-					span.SetStatus(codes.Error, err.Error())
-				}
-				break
-			}
-		}
+	if !p.c.DisablePropfindPublicLinkResolution {
+		linkshares = p.resolveLinkshares(ctx, w, namespace, pf, resourceInfos, log)
 	}
-
 	prefer := net.ParsePrefer(r.Header.Get(net.HeaderPrefer))
 	returnMinimal := prefer[net.HeaderPreferReturn] == "minimal"
 
@@ -520,6 +488,58 @@ func (p *Handler) propfindResponse(ctx context.Context, w http.ResponseWriter, r
 	if _, err := w.Write(propRes); err != nil {
 		log.Err(err).Msg("error writing response")
 	}
+}
+
+// resolveLinkshares resolves the link shares for the given resource infos
+func (p *Handler) resolveLinkshares(ctx context.Context, w http.ResponseWriter, namespace string, pf XML, resourceInfos []*provider.ResourceInfo, log zerolog.Logger) map[string]struct{} {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "resolveLinkshares")
+	defer span.End()
+	var linkshares map[string]struct{}
+	// public link access does not show share-types
+	// oc:share-type is not part of an allprops response
+	if namespace != "/public" {
+		localCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+		// only fetch this if property was queried
+		for _, prop := range pf.Prop {
+			if err := localCtx.Err(); err != nil {
+				if stderr.Is(err, context.DeadlineExceeded) {
+					log.Info().Err(err).Msg("resolveLinkshares: deadline exceeded")
+					span.SetStatus(codes.Error, err.Error())
+				}
+				break
+			}
+			if prop.Space == net.NsOwncloud && (prop.Local == "share-types" || prop.Local == "permissions") {
+				filters := make([]*link.ListPublicSharesRequest_Filter, 0, len(resourceInfos))
+				for i := range resourceInfos {
+					// FIXME this is expensive
+					// the filters array grow by one for every file in a folder
+					// TODO store public links as grants on the storage, reassembling them here is too costly
+					// we can then add the filter if the file has share-types=3 in the opaque,
+					// same as user / group shares for share indicators
+					filters = append(filters, publicshare.ResourceIDFilter(resourceInfos[i].Id))
+				}
+				client, err := p.selector.Next()
+				if err != nil {
+					log.Error().Err(err).Msg("error getting grpc client")
+					w.WriteHeader(http.StatusInternalServerError)
+					return nil
+				}
+				listResp, err := client.ListPublicShares(ctx, &link.ListPublicSharesRequest{Filters: filters})
+				if err == nil {
+					linkshares = make(map[string]struct{}, len(listResp.Share))
+					for i := range listResp.Share {
+						linkshares[listResp.Share[i].ResourceId.OpaqueId] = struct{}{}
+					}
+				} else {
+					log.Error().Err(err).Msg("propfindResponse: couldn't list public shares")
+					span.SetStatus(codes.Error, err.Error())
+				}
+				break
+			}
+		}
+	}
+	return linkshares
 }
 
 // TODO this is just a stat -> rename
