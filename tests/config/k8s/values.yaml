@@ -74,7 +74,7 @@ features:
           ingress:
             enabled: false
         - name: 'OnlyOffice'
-          uri: 'https://onlyoffice'
+          uri: 'https://onlyoffice:7443'
           wopiSrc: 'http://ocis-server:9302'
           product: 'OnlyOffice'
           enabled: true

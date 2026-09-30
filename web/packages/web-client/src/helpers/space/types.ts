@@ -14,9 +14,6 @@ import {
 } from '@ownclouders/web-client/graph/generated'
 import { Ability, Resource } from '../resource'
 
-export const SHARE_JAIL_ID = 'a0ca6a90-a365-4782-871e-d44447bbc668'
-export const OCM_PROVIDER_ID = '89f37a33-858b-45fa-8890-a1f2b27d90e1'
-
 export type SpaceMember = {
   grantedTo: SharePointIdentitySet
   permissions: string[]

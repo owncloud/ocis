@@ -60,11 +60,14 @@
         </span>
       </template>
     </md-editor>
+    <span v-if="!isReadOnly" id="text-editor-focus-out-hint" class="oc-invisible-sr">
+      {{ $gettext('Press Control+M to move focus out of the text area to the toolbar.') }}
+    </span>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, ref, unref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, unref, watch } from 'vue'
 import { Resource } from '@ownclouders/web-client'
 import dompurify from 'dompurify'
 
@@ -276,6 +279,29 @@ watch(
   }
 )
 
+// CodeMirror (used internally by md-editor-v3) binds Tab to indent instead of moving
+// focus, which is correct for editing but leaves keyboard users with no way to reach
+// the toolbar without leaving the editor entirely. CodeMirror's own escape hatch for
+// this (Ctrl-M, or Shift-Alt-M on Mac) can't actually be triggered on a standard Mac
+// keyboard layout, since Option+Shift+M is consumed by macOS as a dead-key/diacritic
+// combo before it reaches the page. Ctrl-M (no Alt/Option involved) works identically
+// on every platform, so it's handled here instead, ahead of CodeMirror's own listener.
+const onFocusOutShortcut = (event: KeyboardEvent) => {
+  if (event.key.toLowerCase() !== 'm' || !event.ctrlKey || event.altKey || event.metaKey) {
+    return
+  }
+  const target = document.querySelector<HTMLElement>(
+    '#text-editor-component .md-editor-toolbar-item:not([disabled])'
+  )
+  event.preventDefault()
+  event.stopPropagation()
+  if (target) {
+    target.focus()
+    return
+  }
+  document.querySelector<HTMLElement>('#text-editor-component .cm-content')?.blur()
+}
+
 onMounted(async () => {
   if (isReadOnly) {
     return
@@ -286,6 +312,18 @@ onMounted(async () => {
   document
     .querySelector('#text-editor-component .cm-content')
     ?.setAttribute('aria-label', $gettext('Text editor'))
+  document
+    .querySelector('#text-editor-component .cm-content')
+    ?.setAttribute('aria-describedby', 'text-editor-focus-out-hint')
+  document
+    .getElementById('text-editor-container')
+    ?.addEventListener('keydown', onFocusOutShortcut, { capture: true })
+})
+
+onBeforeUnmount(() => {
+  document
+    .getElementById('text-editor-container')
+    ?.removeEventListener('keydown', onFocusOutShortcut, { capture: true })
 })
 
 config({

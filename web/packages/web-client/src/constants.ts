@@ -21,3 +21,12 @@ export const PASSWORD_PROTECTED_FOLDER_RENAMED_MESSAGE =
  * Hiding the extension currently leads to hiding all actions except delete.
  */
 export const HIDDEN_FILE_EXTENSIONS = [PASSWORD_PROTECTED_FOLDER_FILE_EXTENSION]
+
+/**
+ * Fixed storage provider ids of reva's special storages, mirroring `ShareStorageProviderID`,
+ * `OCMStorageProviderID` and `VaultStorageProviderID` in reva's `pkg/utils`. They are the
+ * same in every deployment.
+ */
+export const SHARE_JAIL_ID = 'a0ca6a90-a365-4782-871e-d44447bbc668'
+export const OCM_PROVIDER_ID = '89f37a33-858b-45fa-8890-a1f2b27d90e1'
+export const VAULT_STORAGE_PROVIDER_ID = '1a01c2c4-4309-4483-a845-842fd56d8622'

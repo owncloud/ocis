@@ -33,9 +33,19 @@ export default {
     }
   },
   setup(props) {
-    const { $gettext } = useGettext()
+    const { $gettext, $ngettext } = useGettext()
     const animate = ref(false)
-    const notificationsLabel = computed(() => $gettext('Notifications'))
+    const notificationsLabel = computed(() => {
+      if (!props.notificationCount) {
+        return $gettext('Notifications')
+      }
+      return $ngettext(
+        'Notifications, %{count} unread notification',
+        'Notifications, %{count} unread notifications',
+        props.notificationCount,
+        { count: props.notificationCount.toString() }
+      )
+    })
     const notificationCountLabel = computed(() => {
       if (props.notificationCount > 99) {
         return '99+'
@@ -80,8 +90,8 @@ export default {
 
     font-weight: 300;
     font-size: 11px;
-    background: rgb(249, 54, 54);
-    color: white;
+    background: var(--oc-color-swatch-danger-default);
+    color: var(--oc-color-swatch-danger-contrast);
     box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.5);
   }
 }

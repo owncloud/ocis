@@ -2,7 +2,7 @@ import SharedViaLink from '../../../../src/views/shares/SharedViaLink.vue'
 import { useResourcesViewDefaults } from '../../../../src/composables'
 import { useResourcesViewDefaultsMock } from '../../../../tests/mocks/useResourcesViewDefaultsMock'
 import { ref } from 'vue'
-import { AppBar, ResourceTable } from '@ownclouders/web-pkg'
+import { AppBar, CapabilityStore, ResourceTable } from '@ownclouders/web-pkg'
 import { mock, mockDeep } from 'vitest-mock-extended'
 import { OutgoingShareResource } from '@ownclouders/web-client'
 import {
@@ -64,35 +64,85 @@ describe('SharedViaLink view', () => {
       ).toEqual(mockedFiles.length)
     })
   })
+
+  describe('when public sharing is disabled', () => {
+    it('redirects to the "Shared with me" route, preserving the current scope, and does not load resources', () => {
+      const { mocks, resourcesViewDefaults } = getMountedWrapper({
+        sharingPublicEnabled: false,
+        routeParams: { scope: 'vault' }
+      })
+      expect(mocks.$router.replace).toHaveBeenCalledWith({
+        name: 'files-shares-with-me',
+        params: { scope: 'vault' }
+      })
+      expect(resourcesViewDefaults.loadResourcesTask.perform).not.toHaveBeenCalled()
+    })
+
+    it('does not render its body while redirecting', () => {
+      const { wrapper } = getMountedWrapper({
+        sharingPublicEnabled: false,
+        routeParams: { scope: 'vault' }
+      })
+      expect(wrapper.find('app-bar-stub').exists()).toBeFalsy()
+      expect(wrapper.find('file-side-bar-stub').exists()).toBeFalsy()
+    })
+  })
+
+  describe('when public sharing is enabled', () => {
+    it('does not redirect and proceeds to load resources', () => {
+      const { mocks, resourcesViewDefaults } = getMountedWrapper({ sharingPublicEnabled: true })
+      expect(mocks.$router.replace).not.toHaveBeenCalled()
+      expect(resourcesViewDefaults.loadResourcesTask.perform).toHaveBeenCalled()
+    })
+  })
 })
 
 function getMountedWrapper({
   mocks = {},
   files = [],
-  loading = false
-}: { mocks?: Record<string, unknown>; files?: OutgoingShareResource[]; loading?: boolean } = {}) {
-  vi.mocked(useResourcesViewDefaults).mockImplementation(() =>
-    useResourcesViewDefaultsMock({
-      paginatedResources: ref(files),
-      areResourcesLoading: ref(loading)
-    })
-  )
+  loading = false,
+  sharingPublicEnabled = true,
+  routeParams = {}
+}: {
+  mocks?: Record<string, unknown>
+  files?: OutgoingShareResource[]
+  loading?: boolean
+  sharingPublicEnabled?: boolean
+  routeParams?: Record<string, unknown>
+} = {}) {
+  const resourcesViewDefaults = useResourcesViewDefaultsMock({
+    paginatedResources: ref(files),
+    areResourcesLoading: ref(loading)
+  })
+  vi.mocked(useResourcesViewDefaults).mockImplementation(() => resourcesViewDefaults)
   const defaultMocks = {
     ...defaultComponentMocks({
-      currentRoute: mock<RouteLocation>({ name: 'files-shares-via-link' })
+      currentRoute: mock<RouteLocation>({
+        name: 'files-shares-via-link',
+        params: routeParams as Record<string, string | string[]>
+      })
     }),
     ...(mocks && mocks)
   }
 
+  const capabilities = {
+    files_sharing: { public: { enabled: sharingPublicEnabled } }
+  } satisfies Partial<CapabilityStore['capabilities']>
+
   return {
     mocks: defaultMocks,
+    resourcesViewDefaults,
     wrapper: mount(SharedViaLink, {
       global: {
         components: {
           AppBar,
           ResourceTable
         },
-        plugins: [...defaultPlugins()],
+        plugins: [
+          ...defaultPlugins({
+            piniaOptions: { capabilityState: { capabilities } }
+          })
+        ],
         mocks: defaultMocks,
         provide: defaultMocks,
         stubs: defaultStubs

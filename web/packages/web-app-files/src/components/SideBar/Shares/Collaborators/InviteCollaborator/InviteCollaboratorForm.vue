@@ -170,7 +170,7 @@ import {
 } from '@ownclouders/web-pkg'
 
 import { computed, inject, ref, unref, watch, onMounted, nextTick, Ref, useTemplateRef } from 'vue'
-import { Resource, SpaceResource } from '@ownclouders/web-client'
+import { Resource, SpaceResource, VAULT_STORAGE_PROVIDER_ID } from '@ownclouders/web-client'
 import { DateTime } from 'luxon'
 import { OcDrop } from '@ownclouders/design-system/components'
 import { useTask } from 'vue-concurrency'
@@ -295,7 +295,7 @@ const isVaultResource = computed(() => {
   if (!unref(capabilityRefs.vaultEnabled) || typeof storageId !== 'string') {
     return false
   }
-  return storageId.split('$')[0] === unref(capabilityRefs.vaultStorageProvider)
+  return storageId.split('$')[0] === VAULT_STORAGE_PROVIDER_ID
 })
 
 const createSharesConcurrentRequests = computed(() => {

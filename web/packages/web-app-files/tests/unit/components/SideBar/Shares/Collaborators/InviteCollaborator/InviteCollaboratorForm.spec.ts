@@ -7,7 +7,7 @@ import {
   shallowMount,
   VueWrapper
 } from '@ownclouders/web-test-helpers'
-import { Resource, SpaceResource } from '@ownclouders/web-client'
+import { Resource, SpaceResource, VAULT_STORAGE_PROVIDER_ID } from '@ownclouders/web-client'
 import { useSharesStore } from '@ownclouders/web-pkg'
 import { CollaboratorAutoCompleteItem, CollaboratorShare, ShareRole } from '@ownclouders/web-client'
 import { Group, User } from '@ownclouders/web-client/graph/generated'
@@ -114,16 +114,17 @@ describe('InviteCollaboratorForm', () => {
     })
   })
   describe('fetching recipients for a vault resource', () => {
-    const vaultStorageProvider = '1a01c2c4-4309-4483-a845-842fd56d8622'
+    // vault resources are recognized by the fixed vault storage provider id, not by the
+    // `vault_storage_provider` capability, which a drive-mode session receives empty
     const vaultCapabilities = {
       files_sharing: { federation: { incoming: true, outgoing: true } },
-      vault: { enabled: true, vault_storage_provider: vaultStorageProvider }
+      vault: { enabled: true, vault_storage_provider: '' }
     }
 
     it('only asks for users that may access the vault, and for no groups at all', async () => {
       const { wrapper, mocks } = getWrapper({
         capabilities: vaultCapabilities,
-        resource: mock<Resource>({ ...folderMock, storageId: vaultStorageProvider })
+        resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
       })
       await wrapper.vm.fetchRecipientsTask.last
 
@@ -138,7 +139,7 @@ describe('InviteCollaboratorForm', () => {
         capabilities: vaultCapabilities,
         resource: mock<SpaceResource>({
           ...spaceMock,
-          storageId: `${vaultStorageProvider}$some-space-id`
+          storageId: `${VAULT_STORAGE_PROVIDER_ID}$some-space-id`
         })
       })
       await wrapper.vm.fetchRecipientsTask.last
@@ -165,9 +166,9 @@ describe('InviteCollaboratorForm', () => {
       const { wrapper, mocks } = getWrapper({
         capabilities: {
           ...vaultCapabilities,
-          vault: { enabled: false, vault_storage_provider: vaultStorageProvider }
+          vault: { enabled: false }
         },
-        resource: mock<Resource>({ ...folderMock, storageId: vaultStorageProvider })
+        resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
       })
       await wrapper.vm.fetchRecipientsTask.last
 

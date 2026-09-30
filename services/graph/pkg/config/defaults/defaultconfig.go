@@ -105,7 +105,7 @@ func DefaultConfig() *config.Config {
 				UserNameAttribute:        "uid",
 				// FIXME: switch this to some more widely available attribute by default
 				//        ideally this needs to	be constant for the lifetime of a users
-				UserIDAttribute:           "owncloudUUID",
+				UserIDAttribute:           "ownCloudUUID",
 				UserTypeAttribute:         "ownCloudUserType",
 				UserEnabledAttribute:      "ownCloudUserEnabled",
 				ExternalIDAttribute:       "owncloudExternalID",
@@ -117,7 +117,7 @@ func DefaultConfig() *config.Config {
 				GroupObjectClass:          "groupOfNames",
 				GroupNameAttribute:        "cn",
 				GroupMemberAttribute:      "member",
-				GroupIDAttribute:          "owncloudUUID",
+				GroupIDAttribute:          "ownCloudUUID",
 				EducationResourcesEnabled: false,
 				// 1 minute
 				InstanceMapperCacheTTL: 60,

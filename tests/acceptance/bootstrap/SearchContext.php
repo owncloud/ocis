@@ -213,6 +213,9 @@ class SearchContext implements Context {
 			$password,
 			$headers,
 			$body,
+			// this method's own caller (searchWithRetry) already retries on 5xx,
+			// so the generic k8s 5xx-retry here would just double up the wait
+			retryOn5xxForK8s: false,
 		);
 	}
 

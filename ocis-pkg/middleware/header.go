@@ -25,17 +25,27 @@ func NoCache(next http.Handler) http.Handler {
 func Cors(opts ...cors.Option) func(http.Handler) http.Handler {
 	options := cors.NewOptions(opts...)
 	logger := options.Logger
+
+	allowCredentials := options.AllowCredentials
+	// A wildcard origin must not be combined with credentials.
+	if allowCredentials && cors.AllowsAnyOrigin(options.AllowedOrigins) {
+		logger.Warn().
+			Strs("allowed_origins", options.AllowedOrigins).
+			Msg("cors: refusing to allow credentials together with a wildcard origin, disabling allow_credentials")
+		allowCredentials = false
+	}
+
 	logger.Debug().
 		Str("allowed_origins", strings.Join(options.AllowedOrigins, ", ")).
 		Str("allowed_methods", strings.Join(options.AllowedMethods, ", ")).
 		Str("allowed_headers", strings.Join(options.AllowedHeaders, ", ")).
-		Bool("allow_credentials", options.AllowCredentials).
+		Bool("allow_credentials", allowCredentials).
 		Msg("setup cors middleware")
 	c := rscors.New(rscors.Options{
 		AllowedOrigins:   options.AllowedOrigins,
 		AllowedMethods:   options.AllowedMethods,
 		AllowedHeaders:   options.AllowedHeaders,
-		AllowCredentials: options.AllowCredentials,
+		AllowCredentials: allowCredentials,
 	})
 	return c.Handler
 }

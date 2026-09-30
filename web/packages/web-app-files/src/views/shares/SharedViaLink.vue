@@ -1,5 +1,5 @@
 <template>
-  <div class="oc-flex">
+  <div v-if="!isRedirecting" class="oc-flex">
     <files-view-wrapper>
       <app-bar :is-side-bar-open="isSideBarOpen">
         <template #navigation>
@@ -56,9 +56,13 @@
 <script lang="ts" setup>
 import {
   FileSideBar,
+  locationSharesWithMe,
+  useCapabilityStore,
   useFileActions,
   useLoadPreview,
-  useResourcesStore
+  useResourcesStore,
+  useRoute,
+  useRouter
 } from '@ownclouders/web-pkg'
 import { AppLoadingSpinner } from '@ownclouders/web-pkg'
 import { NoContentMessage } from '@ownclouders/web-pkg'
@@ -79,6 +83,9 @@ const { getMatchingSpace } = useGetMatchingSpace()
 
 const resourcesStore = useResourcesStore()
 const { triggerDefaultAction } = useFileActions()
+const capabilityStore = useCapabilityStore()
+const router = useRouter()
+const route = useRoute()
 
 const {
   loadResourcesTask,
@@ -125,7 +132,18 @@ resourcesStore.$onAction((action) => {
 const isEmpty = computed(() => {
   return unref(paginatedResources).length < 1
 })
+// capabilities are loaded before routes render and don't change without a reload
+const isRedirecting = !capabilityStore.sharingPublicEnabled
 async function created() {
+  if (isRedirecting) {
+    const scope = unref(route).params?.scope
+    await router.replace({
+      name: locationSharesWithMe.name,
+      params: { ...(scope && { scope }) }
+    })
+    return
+  }
+
   await unref(loadResourcesTask).perform()
   scrollToResourceFromRoute(unref(paginatedResources), 'files-app-bar')
 }

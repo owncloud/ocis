@@ -17,17 +17,17 @@ type BasicAuthenticator struct {
 }
 
 // Authenticate implements the authenticator interface to authenticate requests via basic auth.
-func (m BasicAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
+func (m BasicAuthenticator) Authenticate(r *http.Request) (*http.Request, error) {
 	if isPublicPath(r.URL.Path) && isPublicWithShareToken(r) {
 		// The authentication of public path requests is handled by another authenticator.
 		// Since we can't guarantee the order of execution of the authenticators, we better
 		// implement an early return here for paths we can't authenticate in this authenticator.
-		return nil, false
+		return nil, ErrAuthenticationFailed
 	}
 
 	login, password, ok := r.BasicAuth()
 	if !ok {
-		return nil, false
+		return nil, ErrAuthenticationFailed
 	}
 
 	user, _, err := m.UserProvider.Authenticate(r.Context(), login, password)
@@ -37,7 +37,7 @@ func (m BasicAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) 
 			Str("authenticator", "basic").
 			Str("path", r.URL.Path).
 			Msg("failed to authenticate request")
-		return nil, false
+		return nil, ErrAuthenticationFailed
 	}
 
 	// fake oidc claims
@@ -58,5 +58,5 @@ func (m BasicAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) 
 		Str("authenticator", "basic").
 		Str("path", r.URL.Path).
 		Msg("successfully authenticated request")
-	return r.WithContext(oidc.NewContext(r.Context(), claims)), true
+	return r.WithContext(oidc.NewContext(r.Context(), claims)), nil
 }

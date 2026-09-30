@@ -204,6 +204,10 @@ class HttpRequestHelper {
 	 * @param int|null $timeout
 	 * @param Client|null $client
 	 * @param bool|null $isGivenStep
+	 * @param bool $retryOn5xxForK8s Set to false when the caller already has its own
+	 *                               retry-on-5xx loop (e.g. SearchContext::searchWithRetry),
+	 *                               so this generic layer doesn't redundantly burn extra
+	 *                               time retrying inside every one of the caller's attempts.
 	 *
 	 * @return ResponseInterface
 	 *
@@ -223,6 +227,7 @@ class HttpRequestHelper {
 		?int $timeout = 0,
 		?Client $client = null,
 		?bool $isGivenStep = false,
+		bool $retryOn5xxForK8s = true,
 	): ResponseInterface {
 		if ((\getenv('DEBUG_ACCEPTANCE_RESPONSES') !== false) || (\getenv('DEBUG_ACCEPTANCE_API_CALLS') !== false)) {
 			$debugResponses = true;
@@ -270,7 +275,7 @@ class HttpRequestHelper {
 			$loopAgain = !$sendExceptionHappened && ($response->getStatusCode() === self::HTTP_TOO_EARLY ||
 						($response->getStatusCode() === self::HTTP_CONFLICT && $isGivenStep)) &&
 						$sendCount <= $sendRetryLimit;
-			if (OcisConfigHelper::isK8s()) {
+			if ($retryOn5xxForK8s && OcisConfigHelper::isK8s()) {
 				$loopAgain = $loopAgain || ($response->getStatusCode() >= HttpResponse::HTTP_INTERNAL_SERVER_ERROR &&
 							$sendCount <= $sendRetryLimit
 							&& $response->getStatusCode() !== HttpResponse::HTTP_INSUFFICIENT_STORAGE);

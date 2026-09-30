@@ -4,6 +4,7 @@ import (
 	"math"
 	"net/url"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/ocm/pkg/config"
 )
@@ -23,6 +24,14 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 		providerDomain = u.Host
 	}
 
+	corsAllowCredentials := cfg.HTTP.CORS.AllowCredentials
+	if corsAllowCredentials && cors.AllowsAnyOrigin(cfg.HTTP.CORS.AllowedOrigins) {
+		logger.Warn().
+			Strs("allowed_origins", cfg.HTTP.CORS.AllowedOrigins).
+			Msg("cors: refusing to allow credentials together with a wildcard origin, disabling allow_credentials")
+		corsAllowCredentials = false
+	}
+
 	return map[string]interface{}{
 		"shared": map[string]interface{}{
 			"jwt_secret":          cfg.TokenManager.JWTSecret,
@@ -37,7 +46,7 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"allowed_origins":   cfg.HTTP.CORS.AllowedOrigins,
 					"allowed_methods":   cfg.HTTP.CORS.AllowedMethods,
 					"allowed_headers":   cfg.HTTP.CORS.AllowedHeaders,
-					"allow_credentials": cfg.HTTP.CORS.AllowCredentials,
+					"allow_credentials": corsAllowCredentials,
 					// currently unused
 					//"options_passthrough": ,
 					//"debug": ,

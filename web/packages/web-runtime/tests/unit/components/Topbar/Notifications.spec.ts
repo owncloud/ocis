@@ -7,7 +7,7 @@ import {
   mockHttpResponse,
   shallowMount
 } from '@ownclouders/web-test-helpers'
-import { SpaceResource } from '@ownclouders/web-client'
+import { SpaceResource, VAULT_STORAGE_PROVIDER_ID } from '@ownclouders/web-client'
 import { RouterLink, RouteLocationNamedRaw, RouteLocationNormalizedLoaded } from 'vue-router'
 import Avatar from '../../../../src/components/Avatar.vue'
 
@@ -268,7 +268,7 @@ describe('Notification component', () => {
       messageRich: undefined,
       computedMessage: undefined,
       computedLink: undefined,
-      object_id: 'vault-provider$resource-20',
+      object_id: `${VAULT_STORAGE_PROVIDER_ID}$resource-20`,
       datetime: '2024-01-01T00:00:00Z'
     })
     const driveNotification = mock<Notification>({
@@ -278,8 +278,13 @@ describe('Notification component', () => {
       object_id: 'other-provider$resource-22',
       datetime: '2024-01-01T00:00:01Z'
     })
+    // a vault session fetches capabilities with `?vault=true` and gets the provider id,
+    // a drive-mode session fetches them without it and gets an empty value
     const vaultCapabilityState = {
-      capabilities: { vault: { enabled: true, vault_storage_provider: 'vault-provider' } }
+      capabilities: { vault: { enabled: true, vault_storage_provider: VAULT_STORAGE_PROVIDER_ID } }
+    }
+    const driveCapabilityState = {
+      capabilities: { vault: { enabled: true, vault_storage_provider: '' } }
     }
 
     it('shows only vault notifications when in vault mode', async () => {
@@ -295,7 +300,7 @@ describe('Notification component', () => {
       vi.mocked(useVault).mockReturnValue({ isInVault: false })
       const { wrapper } = getWrapper({
         notifications: [vaultNotification, driveNotification],
-        capabilityState: vaultCapabilityState
+        capabilityState: driveCapabilityState
       })
       await wrapper.vm.fetchNotificationsTask.last
       expect(wrapper.findAll(selectors.notificationItem).length).toBe(1)

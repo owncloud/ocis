@@ -2,7 +2,12 @@ import resolvePrivateLink from '../../../src/pages/resolvePrivateLink.vue'
 import { defaultPlugins, defaultComponentMocks, shallowMount } from '@ownclouders/web-test-helpers'
 import { mock } from 'vitest-mock-extended'
 import { queryItemAsString, useGetResourceContext, useRouteParam } from '@ownclouders/web-pkg'
-import { Resource, SHARE_JAIL_ID, SpaceResource } from '@ownclouders/web-client'
+import {
+  Resource,
+  SHARE_JAIL_ID,
+  SpaceResource,
+  VAULT_STORAGE_PROVIDER_ID
+} from '@ownclouders/web-client'
 
 vi.mock('@ownclouders/web-pkg', async (importOriginal) => ({
   ...(await importOriginal<any>()),
@@ -85,9 +90,11 @@ describe('resolvePrivateLink', () => {
     })
   })
   describe('vault permalinks', () => {
-    const vaultCapabilityState = {
-      capabilities: { vault: { enabled: true, vault_storage_provider: 'vault-provider' } }
+    // a drive-mode session fetches capabilities without `?vault=true` and gets no provider id
+    const driveCapabilityState = {
+      capabilities: { vault: { enabled: true, vault_storage_provider: '' } }
     }
+    const vaultFileId = `${VAULT_STORAGE_PROVIDER_ID}$space!item`
 
     const originalLocation = window.location
     afterEach(() => {
@@ -104,15 +111,15 @@ describe('resolvePrivateLink', () => {
         value: { replace, href: '' }
       })
       const { wrapper, mocks } = getWrapper({
-        fileId: 'vault-provider$space!item',
-        capabilityState: vaultCapabilityState
+        fileId: vaultFileId,
+        capabilityState: driveCapabilityState
       })
       await wrapper.vm.resolvePrivateLinkTask.last
       expect(replace).toHaveBeenCalledTimes(1)
       expect(mocks.$router.resolve).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'resolvePrivateLink',
-          params: { scope: 'vault', fileId: 'vault-provider$space!item' }
+          params: { scope: 'vault', fileId: vaultFileId }
         })
       )
       expect(mocks.$router.push).not.toHaveBeenCalled()
@@ -132,7 +139,27 @@ describe('resolvePrivateLink', () => {
         resource,
         fileId,
         path: '/',
-        capabilityState: vaultCapabilityState
+        capabilityState: driveCapabilityState
+      })
+      await wrapper.vm.resolvePrivateLinkTask.last
+      expect(replace).not.toHaveBeenCalled()
+      expect(mocks.$router.push).toHaveBeenCalled()
+    })
+
+    it('does not redirect a vault permalink when vault mode is disabled', async () => {
+      const replace = vi.fn()
+      Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: { replace, href: '' }
+      })
+      const space = mock<SpaceResource>({ getDriveAliasAndItem: () => 'personal/home' })
+      const resource = mock<Resource>({ fileId: vaultFileId })
+      const { wrapper, mocks } = getWrapper({
+        space,
+        resource,
+        fileId: vaultFileId,
+        path: '/',
+        capabilityState: { capabilities: { vault: { enabled: false } } }
       })
       await wrapper.vm.resolvePrivateLinkTask.last
       expect(replace).not.toHaveBeenCalled()
@@ -145,7 +172,7 @@ describe('resolvePrivateLink', () => {
         configurable: true,
         value: { replace, href: '' }
       })
-      const fileId = 'vault-provider$space!item'
+      const fileId = vaultFileId
       const space = mock<SpaceResource>({ getDriveAliasAndItem: () => 'personal/home' })
       const resource = mock<Resource>({ fileId })
       const { wrapper, mocks } = getWrapper({
@@ -154,7 +181,7 @@ describe('resolvePrivateLink', () => {
         fileId,
         path: '/',
         scope: 'vault',
-        capabilityState: vaultCapabilityState
+        capabilityState: driveCapabilityState
       })
       await wrapper.vm.resolvePrivateLinkTask.last
       expect(replace).not.toHaveBeenCalled()

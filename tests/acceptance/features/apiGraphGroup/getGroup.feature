@@ -370,27 +370,26 @@ Feature: get groups and their members
     And user "Alice" has been added to group "tea-lover"
     And user "Brian" has been added to group "tea-lover"
     When user "Brian" gets all the members information of group "tea-lover" using the Graph API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
       {
         "type": "object",
         "required": [
-          "error"
+          "displayName",
+          "id"
         ],
         "properties": {
-          "error": {
-            "type": "object",
-            "required": [
-              "message"
-            ],
-            "properties": {
-              "message": {
-                "type": "string",
-                "enum": ["Forbidden"]
-              }
-            }
+          "displayName": {
+            "const": "tea-lover"
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^%group_id_pattern%$"
           }
+        },
+        "not": {
+          "required": ["members"]
         }
       }
       """
@@ -431,27 +430,26 @@ Feature: get groups and their members
     Given group "tea-lover" has been created
     And the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When user "Alice" gets details of the group "tea-lover" using the Graph API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
       {
         "type": "object",
         "required": [
-          "error"
+          "displayName",
+          "id"
         ],
         "properties": {
-          "error": {
-            "type": "object",
-            "required": [
-              "message"
-            ],
-            "properties": {
-              "message": {
-                "type": "string",
-                "enum": ["Forbidden"]
-              }
-            }
+          "displayName": {
+            "const": "tea-lover"
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^%group_id_pattern%$"
           }
+        },
+        "not": {
+          "required": ["members"]
         }
       }
       """
@@ -502,7 +500,7 @@ Feature: get groups and their members
   Scenario Outline: non-admin user tries to get group information of non-existing group
     Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When user "Alice" gets details of the group "non-existing" using the Graph API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "404"
     Examples:
       | user-role   |
       | Space Admin |

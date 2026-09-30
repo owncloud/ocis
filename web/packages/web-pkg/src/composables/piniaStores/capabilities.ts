@@ -163,7 +163,6 @@ export const useCapabilityStore = defineStore('capabilities', () => {
   const authMfaSessionDuration = computed(() => unref(capabilities).auth.mfa.session_duration)
 
   const vaultEnabled = computed(() => unref(capabilities).vault?.enabled)
-  const vaultStorageProvider = computed(() => unref(capabilities).vault?.vault_storage_provider)
 
   return {
     isInitialized,
@@ -216,8 +215,7 @@ export const useCapabilityStore = defineStore('capabilities', () => {
     authMfaEnabled,
     authMfaRequiredLevelname,
     authMfaSessionDuration,
-    vaultEnabled,
-    vaultStorageProvider
+    vaultEnabled
   }
 })
 
