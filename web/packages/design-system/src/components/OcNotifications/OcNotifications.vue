@@ -13,7 +13,7 @@ import { computed } from 'vue'
  * for displaying notifications on the screen.
  *
  * Notifications for screen reader users
- * This component uses so called live regions in order to announce its content to screen readers once the notification appeared (this is not the normal modus operandi for screen readers, since their reading order is usually the DOM order – when the user does not take shortcuts). There are two types of live regions: `aria-live="polite"` (equivalent to `role="status"`) and `aria-live="assertive"` (equivalent to `role="alert"`). The latter directly interrupts the current output of the screen reader, the former waits until the current output is finished and reads the announcement afterwards. Since 'assertive' should be used sparingly, only `<oc-notfication-message>`'s "danger" status prop value uses `aria-live="assertive"` (and `role="alert"`). Using `aria-live` and `role="assertive|status"` simultaneously is for compatibility reasons regarding different browser and assistive technology pairings.
+ * Neither this component nor `<oc-notification-message>` is a live region: screen readers do not reliably announce live regions that are inserted together with their content. Consumers must announce messages through a live region that is already present in the DOM (see web-runtime's MessageBar).
  *
  * @component
  * @name OcNotifications

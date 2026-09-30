@@ -52,23 +52,15 @@ describe('OcNotificationMessage', () => {
       expect(iconElement.attributes('variation')).toBe('primary')
     })
 
-    describe('role and aria live of message content wrapper', () => {
-      it("should set role as 'status' and aria-live as 'polite' if status is not danger", () => {
-        const wrapper = getWrapper({})
-        const messageContentEl = wrapper.find(selectors.messageWrapper)
+    it.each(['passive', 'danger'])(
+      'should not be a live region itself for status %s',
+      (status: 'passive' | 'danger') => {
+        const wrapper = getWrapper({ status })
 
-        expect(messageContentEl.attributes('role')).toBe('status')
-        expect(messageContentEl.attributes('aria-live')).toBe('polite')
-      })
-
-      it("should set role as 'alert' and aria-live as 'assertive' if status is danger", () => {
-        const wrapper = getWrapper({ status: 'danger' })
-        const messageContentEl = wrapper.find(selectors.messageWrapper)
-
-        expect(messageContentEl.attributes('role')).toBe('alert')
-        expect(messageContentEl.attributes('aria-live')).toBe('assertive')
-      })
-    })
+        expect(wrapper.find('[aria-live]').exists()).toBe(false)
+        expect(wrapper.find('[role="status"], [role="alert"]').exists()).toBe(false)
+      }
+    )
   })
 
   describe('errorLogContent prop', () => {
@@ -209,7 +201,6 @@ describe('OcNotificationMessage', () => {
   const selectors = {
     messageTitle: '.oc-notification-message-title',
     messageContent: '.oc-notification-message-content',
-    messageWrapper: '.oc-notification-message div',
     interactiveWrapper: '.oc-notification-message-interactive',
     errorLog: '.oc-error-log',
     errorLogToggleButton: '.oc-notification-message-error-log-toggle-button',

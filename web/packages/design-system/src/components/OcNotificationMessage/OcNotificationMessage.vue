@@ -3,7 +3,7 @@
     class="oc-fade-in oc-flex oc-flex-wrap oc-notification-message oc-box-shadow-medium oc-rounded oc-p-m"
     :class="classes"
   >
-    <div class="oc-flex oc-flex-wrap oc-flex-middle oc-flex-1" :role="role" :aria-live="ariaLive">
+    <div class="oc-flex oc-flex-wrap oc-flex-middle oc-flex-1">
       <div class="oc-flex oc-flex-middle oc-width-1-1">
         <oc-icon :variation="iconVariation" name="information" fill-type="line" class="oc-mr-s" />
         <div class="oc-notification-message-title oc-flex-1">
@@ -154,15 +154,6 @@ const classes = computed(() => {
 })
 const iconVariation = computed(() => {
   return status
-})
-const isStatusDanger = computed(() => {
-  return status === 'danger'
-})
-const role = computed(() => {
-  return isStatusDanger.value ? 'alert' : 'status'
-})
-const ariaLive = computed(() => {
-  return isStatusDanger.value ? 'assertive' : 'polite'
 })
 
 let remainingTime = timeout * 1000

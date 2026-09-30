@@ -38,11 +38,6 @@
       <portal-target name="app.runtime.footer" />
     </div>
     <div class="snackbars">
-      <div class="oc-invisible-sr" aria-live="polite" aria-atomic="true">
-        <div v-for="message in allMessages" :key="message.id">
-          {{ message.desc ? `${message.title}. ${message.desc}` : message.title }}
-        </div>
-      </div>
       <message-bar />
       <upload-bar v-if="!isUploadSnackbarHidden" id="upload-info-snackbar" />
     </div>
@@ -123,8 +118,6 @@ export default defineComponent({
       messageStore.triggerLatestAction()
     })
 
-    const allMessages = ref<{ id: string; title: string; desc?: string }[]>([])
-
     watch(
       () => route.value.params?.scope,
       () => {
@@ -133,20 +126,6 @@ export default defineComponent({
       {
         immediate: true
       }
-    )
-
-    watch(
-      () => messageStore.messages,
-      (messages) => {
-        if (messages && messages.length > 0) {
-          allMessages.value = messages.map((msg) => ({
-            id: msg.id,
-            title: msg.title,
-            desc: msg.desc
-          }))
-        }
-      },
-      { deep: true, immediate: true }
     )
 
     const appsStore = useAppsStore()
@@ -301,8 +280,7 @@ export default defineComponent({
       navBarClosed,
       hideNavigation,
       isUploadSnackbarHidden,
-      setNavBarClosed,
-      allMessages
+      setNavBarClosed
     }
   },
   computed: {
