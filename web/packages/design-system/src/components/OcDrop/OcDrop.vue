@@ -171,7 +171,12 @@ const onClick = () => {
   const hadFocus = unref(drop)?.contains(document.activeElement)
   hide()
   if (hadFocus) {
-    ;(unref(triggerEl) as HTMLElement)?.focus()
+    const trigger = unref(triggerEl) as (HTMLElement & { tooltip?: { hide: () => void } }) | null
+    trigger?.focus()
+    // tippy's default trigger includes "focus", so restoring focus here would
+    // otherwise pop the trigger's own tooltip (e.g. "Show context menu") right
+    // back open, covering the button it's anchored to
+    trigger?.tooltip?.hide()
   }
 }
 

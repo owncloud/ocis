@@ -146,5 +146,21 @@ describe('OcDrop', () => {
 
       expect(document.activeElement).toBe(document.getElementById('elsewhere'))
     })
+
+    it("hides the trigger's own tooltip instead of leaving it open when refocused", async () => {
+      const { open } = mountCloseOnClick()
+      await open()
+      const trigger = document.getElementById('trigger') as HTMLElement & {
+        tooltip?: { hide: () => void }
+      }
+      const hide = vi.fn()
+      trigger.tooltip = { hide }
+
+      const item = document.getElementById('item')
+      item.focus()
+      item.click()
+
+      expect(hide).toHaveBeenCalled()
+    })
   })
 })
