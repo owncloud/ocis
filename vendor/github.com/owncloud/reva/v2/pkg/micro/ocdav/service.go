@@ -22,6 +22,10 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	httpServer "github.com/go-micro/plugins/v4/server/http"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/reva/v2/internal/http/interceptors/appctx"
 	"github.com/owncloud/reva/v2/internal/http/interceptors/auth"
 	cors2 "github.com/owncloud/reva/v2/internal/http/interceptors/cors"
@@ -31,10 +35,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rhttp/global"
 	"github.com/owncloud/reva/v2/pkg/storage/favorite/memory"
 	rtrace "github.com/owncloud/reva/v2/pkg/trace"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	httpServer "github.com/go-micro/plugins/v4/server/http"
-	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -154,6 +154,7 @@ func setDefaults(sopts *Options) error {
 	}
 
 	sopts.config.AllowPropfindDepthInfinitiy = sopts.AllowDepthInfinity
+	sopts.config.DisablePropfindPublicLinkResolution = sopts.DisablePropfindPublicLinkResolution
 
 	return nil
 }
