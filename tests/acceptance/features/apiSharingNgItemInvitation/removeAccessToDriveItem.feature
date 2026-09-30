@@ -375,3 +375,32 @@ Feature: Remove access to a drive item
     Then the HTTP status code should be "204"
     And the user "Brian" should not have a space called "NewSpace"
     And the user "Alice" should have a space called "NewSpace"
+
+
+  Scenario Outline: space members with the manager role can only remove a user's access to a share created by another user
+    Given user "Carol" has been created with default attributes
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "some content" to "textfile.txt"
+    And user "Alice" has sent the following space share invitation:
+      | space           | NewSpace           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt |
+      | space           | NewSpace     |
+      | sharee          | Carol        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    When user "Brian" removes the access of user "Carol" from resource "textfile.txt" of space "NewSpace" using the Graph API
+    Then the HTTP status code should be "<status-code>"
+    And for user "Carol" the space "Shares" <shouldOrNot> contain these entries:
+      | textfile.txt |
+
+    Examples:
+      | permissions-role | status-code | shouldOrNot |
+      | Space Viewer     | 403         | should      |
+      | Space Editor     | 403         | should      |
+      | Manager          | 204         | should not  |
