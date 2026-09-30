@@ -1432,9 +1432,15 @@ Feature: Send a drive invitations
   @env-config
   Scenario: user has access to a space shared with LDAP group using posixGroup objectclass with uniqueMember schema
     Given the following configs have been set:
-      | service | config                        | value        |
-      | graph   | OCIS_LDAP_GROUP_OBJECTCLASS   | posixGroup   |
-      | graph   | OCIS_LDAP_GROUP_SCHEMA_MEMBER | uniqueMember |
+      | service    | config                        | value        |
+      | graph      | OCIS_LDAP_GROUP_OBJECTCLASS   | posixGroup   |
+      | graph      | OCIS_LDAP_GROUP_SCHEMA_MEMBER | uniqueMember |
+      | groups     | OCIS_LDAP_GROUP_OBJECTCLASS   | posixGroup   |
+      | groups     | OCIS_LDAP_GROUP_SCHEMA_MEMBER | uniqueMember |
+      | users      | OCIS_LDAP_GROUP_OBJECTCLASS   | posixGroup   |
+      | users      | OCIS_LDAP_GROUP_SCHEMA_MEMBER | uniqueMember |
+      | auth-basic | OCIS_LDAP_GROUP_OBJECTCLASS   | posixGroup   |
+      | auth-basic | OCIS_LDAP_GROUP_SCHEMA_MEMBER | uniqueMember |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And the administrator has created a group "grp1" using the Graph API
