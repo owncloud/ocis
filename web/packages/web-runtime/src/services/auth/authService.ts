@@ -14,6 +14,7 @@ import {
 } from '@ownclouders/web-pkg'
 import { RouteLocation, RouteLocationRaw, Router } from 'vue-router'
 import {
+  base,
   extractPublicLinkToken,
   isAnonymousContext,
   isIdpContextRequired,
@@ -26,10 +27,9 @@ import { Language } from 'vue3-gettext'
 import { PublicLinkType } from '@ownclouders/web-client'
 import { WebWorkersStore } from '@ownclouders/web-pkg'
 import { isSilentRedirectRoute } from '../../helpers/silentRedirect'
+import { vaultStepUpAttemptKey, vaultStepUpFailedKey } from '../../helpers/vaultStepUp'
 
-// Marks a pending vault MFA step-up so the redirect back from the IdP can be recognized.
-// sessionStorage: survives the IdP round trip, scoped to the tab.
-export const vaultStepUpAttemptKey = 'oc_vaultMfaStepUpAttempt'
+export { vaultStepUpAttemptKey, vaultStepUpFailedKey }
 // An attempt older than this is treated as abandoned (e.g. the user left the IdP page).
 const vaultStepUpAttemptTtlMs = 5 * 60 * 1000
 
@@ -93,7 +93,9 @@ export class AuthService implements AuthServiceInterface {
    *
    * @param to {Route}
    */
-  public async initializeContext(to: RouteLocation): Promise<RouteLocationRaw | void> {
+  public async initializeContext(to: RouteLocation): Promise<RouteLocationRaw | false | void> {
+    this.showPendingVaultStepUpFailure()
+
     if (!this.publicLinkManager) {
       this.publicLinkManager = new PublicLinkManager({
         clientService: this.clientService,
@@ -173,8 +175,9 @@ export class AuthService implements AuthServiceInterface {
           console.warn(
             `[authService:initializeContext] - MFA step-up returned acr "${user.profile.acr}", required "${requiredAcr}". Not retrying.`
           )
-          this.showVaultStepUpFailedMessage()
-          return { path: '/' }
+          this.leaveVaultAfterFailedStepUp()
+          // cancel the vault navigation, the page reloads outside the vault
+          return false
         }
 
         this.markVaultStepUpAttempt()
@@ -514,11 +517,45 @@ export class AuthService implements AuthServiceInterface {
     }
   }
 
+  /**
+   * Vault mode is fixed for the lifetime of the page (see `useVault`), so leaving it
+   * requires a full page load. An in-app navigation would keep the vault clients and
+   * load vault spaces with a non-MFA token.
+   */
+  private leaveVaultAfterFailedStepUp() {
+    try {
+      sessionStorage.setItem(vaultStepUpFailedKey, 'true')
+    } catch {
+      // message can't be shown after the reload, leaving the vault still has to happen
+    }
+    this.navigateOutsideVault(base?.href || `${window.location.origin}/`)
+  }
+
+  private navigateOutsideVault(url: string) {
+    window.location.assign(url)
+  }
+
+  private showPendingVaultStepUpFailure() {
+    try {
+      if (!sessionStorage.getItem(vaultStepUpFailedKey)) {
+        return
+      }
+      sessionStorage.removeItem(vaultStepUpFailedKey)
+    } catch {
+      return
+    }
+    this.showVaultStepUpFailedMessage()
+  }
+
   private showVaultStepUpFailedMessage() {
-    const { $gettext } = this.language
+    const { $pgettext } = this.language
     useMessages().showErrorMessage({
-      title: $gettext('Multi-factor authentication required'),
-      desc: $gettext(
+      title: $pgettext(
+        'Error message title shown when the multi-factor authentication step-up required to open the vault failed',
+        'Multi-factor authentication required'
+      ),
+      desc: $pgettext(
+        'Error message shown when the multi-factor authentication step-up required to open the vault failed, e.g. because the user has no second factor at hand',
         'The vault requires multi-factor authentication, which could not be completed. Please set up a second factor or contact your administrator.'
       )
     })

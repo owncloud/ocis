@@ -47,6 +47,7 @@ import Avatar from './components/Avatar.vue'
 import focusMixin from './mixins/focusMixin'
 import { extensionPoints } from './extensionPoints'
 import { isSilentRedirectRoute } from './helpers/silentRedirect'
+import { isLeavingVaultAfterFailedStepUp } from './helpers/vaultStepUp'
 import { captureException } from '@sentry/vue'
 import { CRASH_CODES } from '@ownclouders/web-pkg/src/errors/codes'
 
@@ -262,6 +263,10 @@ export const bootstrapApp = async (configurationPath: string, appsReadyCallback:
           })
         }
       } catch (error) {
+        if (isLeavingVaultAfterFailedStepUp()) {
+          // vault spaces can't load without MFA, the page is already reloading outside the vault
+          return
+        }
         console.error(error)
         captureException(error)
         router.push({ name: 'crash', query: { code: CRASH_CODES.RUNTIME_BOOTSTRAP_SPACES_LOAD } })

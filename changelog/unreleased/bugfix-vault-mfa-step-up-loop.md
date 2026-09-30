@@ -5,7 +5,8 @@ IdPs like Keycloak return a token with a lower `acr` instead of an error when th
 user can't complete the second factor (none enrolled, device not at hand). Web
 then started the step-up again on every return, trapping the user in a redirect
 loop. We now remember a pending step-up for the current tab and, if the IdP
-returns without the required `acr`, stop retrying, send the user back to the
-default view and show an error message.
+returns without the required `acr`, stop retrying, reload the page outside the
+vault and show an error message there. Leaving the vault needs a full page load,
+because vault mode is fixed for the lifetime of the page.
 
-https://github.com/owncloud/ocis/issue/12984
+https://github.com/owncloud/ocis/pull/12985
