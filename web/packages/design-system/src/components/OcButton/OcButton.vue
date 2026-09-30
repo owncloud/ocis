@@ -6,7 +6,13 @@
     :class="ocButton_buttonClass"
     v-on="handlers"
   >
-    <oc-spinner v-if="showSpinner" size="small" class="spinner" />
+    <oc-spinner
+      v-if="showSpinner"
+      :aria-label="$gettext('Loading')"
+      aria-live="polite"
+      size="small"
+      class="spinner"
+    />
     <!-- @slot Content of the button -->
     <slot />
   </component>
@@ -15,6 +21,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { RouteLocationRaw } from 'vue-router'
+import { useGettext } from 'vue3-gettext'
 import { getSizeClass } from '../../helpers'
 
 /**
@@ -36,7 +43,8 @@ import { getSizeClass } from '../../helpers'
  *   - raw-inverse: text-only button with contrasting text
  * @prop {'left' | 'center' | 'right' | 'space-around' | 'space-between' | 'space-evenly'} [justifyContent='center'] - How to align content within the button.
  * @prop {'none' | 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge'} [gapSize='medium'] - Spacing between child elements.
- * @prop {boolean} [showSpinner=false] - Whether to show a loading spinner.
+ * @prop {boolean} [showSpinner=false] - Whether to show a loading spinner. Announced to screen
+ *   readers as a "Loading" status via a live region while true.
  *
  * @slot default - Content of the button.
  *
@@ -102,6 +110,8 @@ const {
   gapSize = 'medium',
   showSpinner = false
 } = defineProps<Props>()
+
+const { $gettext } = useGettext()
 
 const emit = defineEmits<Emits>()
 

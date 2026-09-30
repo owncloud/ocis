@@ -43,7 +43,7 @@ exports[`OcModal > displays loading state 1`] = `
         <div class="oc-modal-body-actions-grid"><button type="button" disabled="" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-passive oc-button-passive-outline oc-modal-body-actions-cancel">
             <!--v-if-->
             <!-- @slot Content of the button --> Cancel
-          </button> <button type="button" disabled="" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-primary oc-button-primary-outline oc-modal-body-actions-confirm oc-ml-s"><span class="oc-spinner oc-spinner-s spinner" aria-label="" tabindex="-1" role="img"></span> <!-- @slot Content of the button --> Confirm</button></div>
+          </button> <button type="button" disabled="" class="oc-button oc-rounded oc-button-m oc-button-justify-content-center oc-button-gap-m oc-button-primary oc-button-primary-outline oc-modal-body-actions-confirm oc-ml-s"><span class="oc-spinner oc-spinner-s spinner" aria-label="Loading" tabindex="-1" role="img" aria-live="polite"></span> <!-- @slot Content of the button --> Confirm</button></div>
       </div>
     </div>
   </focus-trap-stub> <!-- eslint-enable vuejs-accessibility/no-static-element-interactions -->
