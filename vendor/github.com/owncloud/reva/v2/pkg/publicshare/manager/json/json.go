@@ -51,10 +51,30 @@ import (
 	"github.com/pkg/errors"
 )
 
+// shareField and passwordField are the keys used to store a share's encoded
+// proto and its bcrypt-hashed password in a db entry.
+const (
+	shareField    = "share"
+	passwordField = "password"
+)
+
 func init() {
 	registry.Register("json", NewFile)
 	registry.Register("jsoncs3", NewCS3)
 	registry.Register("jsonmemory", NewMemory)
+}
+
+// dbEntryString safely reads the string value stored under key in a db entry.
+// Entries are read back from persistence as interface{} (map[string]interface{}
+// with string values), so a corrupted or legacy record can hold an unexpected
+// type; this reports that via ok instead of panicking.
+func dbEntryString(v interface{}, key string) (string, bool) {
+	m, ok := v.(map[string]interface{})
+	if !ok {
+		return "", false
+	}
+	s, ok := m[key].(string)
+	return s, ok
 }
 
 // NewFile returns a new filesystem public shares manager.
@@ -239,10 +259,16 @@ func (m *manager) Dump(ctx context.Context, shareChan chan<- *publicshare.WithPa
 
 	for _, v := range db {
 		var local publicshare.WithPassword
-		if err := utils.UnmarshalJSONToProtoV1([]byte(v.(map[string]interface{})["share"].(string)), &local.PublicShare); err != nil {
-			log.Error().Err(err).Msg("error unmarshalling share")
+		if share, ok := dbEntryString(v, shareField); ok {
+			if err := utils.UnmarshalJSONToProtoV1([]byte(share), &local.PublicShare); err != nil {
+				log.Error().Err(err).Msg("error unmarshalling share")
+			}
+		} else {
+			log.Error().Msg("error reading share entry: missing or invalid \"share\" field")
 		}
-		local.Password = v.(map[string]interface{})["password"].(string)
+		// password is optional: shares without password protection have no
+		// password field, so a missing/invalid entry just means "no password".
+		local.Password, _ = dbEntryString(v, passwordField)
 		shareChan <- &local
 	}
 
@@ -271,8 +297,8 @@ func (m *manager) Load(ctx context.Context, shareChan <-chan *publicshare.WithPa
 		}
 
 		dbCopy[ps.PublicShare.Id.GetOpaqueId()] = map[string]interface{}{
-			"share":    string(encShare),
-			"password": ps.Password,
+			shareField:    string(encShare),
+			passwordField: ps.Password,
 		}
 	}
 	return m.persistence.Write(ctx, dbCopy)
@@ -350,8 +376,8 @@ func (m *manager) CreatePublicShare(ctx context.Context, u *user.User, rInfo *pr
 
 	if _, ok := dbCopy[s.Id.GetOpaqueId()]; !ok {
 		dbCopy[s.Id.GetOpaqueId()] = map[string]interface{}{
-			"share":    string(encShare),
-			"password": ps.Password,
+			shareField:    string(encShare),
+			passwordField: ps.Password,
 		}
 	} else {
 		return nil, errors.New("key already exists")
@@ -448,9 +474,9 @@ func (m *manager) UpdatePublicShare(ctx context.Context, u *user.User, req *link
 	}
 
 	if ok && passwordChanged {
-		data["password"] = newPasswordEncoded
+		data[passwordField] = newPasswordEncoded
 	}
-	data["share"] = string(encShare)
+	data[shareField] = string(encShare)
 
 	dbCopy[share.Id.OpaqueId] = data
 
@@ -491,11 +517,14 @@ func (m *manager) GetPublicShare(ctx context.Context, u *user.User, ref *link.Pu
 	}
 
 	for _, v := range db {
-		d := v.(map[string]interface{})["share"]
-		passDB := v.(map[string]interface{})["password"].(string)
+		share, ok := dbEntryString(v, shareField)
+		if !ok {
+			continue
+		}
+		passDB, _ := dbEntryString(v, passwordField)
 
 		var ps link.PublicShare
-		if err := utils.UnmarshalJSONToProtoV1([]byte(d.(string)), &ps); err != nil {
+		if err := utils.UnmarshalJSONToProtoV1([]byte(share), &ps); err != nil {
 			return nil, err
 		}
 
@@ -547,7 +576,12 @@ func (m *manager) ListPublicShares(ctx context.Context, u *user.User, filters []
 	shares := []*link.PublicShare{}
 	for _, v := range db {
 		var local publicShare
-		if err := utils.UnmarshalJSONToProtoV1([]byte(v.(map[string]interface{})["share"].(string)), &local.PublicShare); err != nil {
+		share, ok := dbEntryString(v, shareField)
+		if !ok {
+			log.Warn().Interface("entry", v).Msg("ListPublicShares: skipping entry with missing or invalid \"share\" field")
+			continue
+		}
+		if err := utils.UnmarshalJSONToProtoV1([]byte(share), &local.PublicShare); err != nil {
 			return nil, err
 		}
 
@@ -637,10 +671,13 @@ func (m *manager) cleanupExpiredShares() error {
 
 	var changed bool
 	for id, v := range db {
-		d := v.(map[string]interface{})["share"]
+		share, ok := dbEntryString(v, shareField)
+		if !ok {
+			continue
+		}
 
 		var ps link.PublicShare
-		if err := utils.UnmarshalJSONToProtoV1([]byte(d.(string)), &ps); err != nil {
+		if err := utils.UnmarshalJSONToProtoV1([]byte(share), &ps); err != nil {
 			continue
 		}
 
@@ -705,13 +742,18 @@ func (m *manager) getByToken(ctx context.Context, token string) (*link.PublicSha
 	}
 
 	for _, v := range db {
+		share, ok := dbEntryString(v, shareField)
+		if !ok {
+			continue
+		}
+
 		var local link.PublicShare
-		if err := utils.UnmarshalJSONToProtoV1([]byte(v.(map[string]interface{})["share"].(string)), &local); err != nil {
+		if err := utils.UnmarshalJSONToProtoV1([]byte(share), &local); err != nil {
 			return nil, "", err
 		}
 
 		if local.Token == token {
-			passDB := v.(map[string]interface{})["password"].(string)
+			passDB, _ := dbEntryString(v, passwordField)
 			return &local, passDB, nil
 		}
 	}
@@ -734,9 +776,14 @@ func (m *manager) GetPublicShareByToken(ctx context.Context, token string, auth 
 	}
 
 	for _, v := range db {
-		passDB := v.(map[string]interface{})["password"].(string)
+		share, ok := dbEntryString(v, shareField)
+		if !ok {
+			continue
+		}
+
+		passDB, _ := dbEntryString(v, passwordField)
 		var local link.PublicShare
-		if err := utils.UnmarshalJSONToProtoV1([]byte(v.(map[string]interface{})["share"].(string)), &local); err != nil {
+		if err := utils.UnmarshalJSONToProtoV1([]byte(share), &local); err != nil {
 			return nil, err
 		}
 
