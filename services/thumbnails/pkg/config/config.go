@@ -21,8 +21,9 @@ type Config struct {
 	GRPC GRPCConfig `yaml:"grpc"`
 	HTTP HTTP       `yaml:"http"`
 
-	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
-	GrpcClient    client.Client         `yaml:"-"`
+	GRPCClientTLS     *shared.GRPCClientTLS     `yaml:"grpc_client_tls"`
+	GRPCClientOptions *shared.GRPCClientOptions `yaml:"grpc_client_options"`
+	GrpcClient        client.Client             `yaml:"-"`
 
 	Thumbnail Thumbnail `yaml:"thumbnail"`
 

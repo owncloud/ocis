@@ -42,6 +42,22 @@ type GRPCClientTLS struct {
 	CACert string `yaml:"cacert" env:"OCIS_GRPC_CLIENT_TLS_CACERT" desc:"Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services." introductionVersion:"pre5.0"`
 }
 
+// GRPCClientOptions holds settings that apply to the grpc clients of all services, both the
+// reva CS3 clients and the go-micro based ones.
+type GRPCClientOptions struct {
+	// NOTE: you will not find GRPCMaxReceivedMessageSize being used in the code. The envvar is actually extracted in revas `pool` package: https://github.com/cs3org/reva/blob/edge/pkg/rgrpc/todo/pool/connection.go
+	// It is mentioned here again so it is documented
+	GRPCMaxReceivedMessageSize int `yaml:"grpc_max_received_message_size" env:"OCIS_GRPC_MAX_RECEIVED_MESSAGE_SIZE" desc:"The maximum body size for grpc requests. Defaults to '10240000' bytes (10MB). Note that large values can potentially hide errors but may lead to network timeouts. Should only be changed temporarily to regain access for large folders with 25.000+ files to copy out data." introductionVersion:"pre5.0"`
+	// The two keepalive settings below apply to both the reva CS3 clients (revas `pool` package:
+	// https://github.com/owncloud/reva/blob/master/pkg/rgrpc/todo/pool/keepalive.go) and the
+	// go-micro based clients (GetClientKeepaliveParams in ocis-pkg/service/grpc/keepalive.go),
+	// which read them independently of each other but apply the same rules, so both behave
+	// identically for every input. Keepalive is off unless the time is set to a duration that
+	// parses; a value without a unit suffix leaves the clients without pings.
+	GRPCClientKeepaliveTime    time.Duration `yaml:"grpc_client_keepalive_time" env:"GRPC_CLIENT_KEEPALIVE_TIME" desc:"How long a grpc client connection with an ongoing request may stay silent before the server is pinged to check whether it is still answering. Set a duration like '20s' to enable detection of unresponsive peers. Leaving it unset, or at '0', sends no pings at all, which is grpc's own default. Values below '10s' are raised to '10s' by grpc. Make sure to include the unit suffix, a bare number is not a valid duration." introductionVersion:"8.3.0"`
+	GRPCClientKeepaliveTimeout time.Duration `yaml:"grpc_client_keepalive_timeout" env:"GRPC_CLIENT_KEEPALIVE_TIMEOUT" desc:"How long a grpc client waits for the answer to a keepalive ping before it considers the connection dead and fails all requests on it. Defaults to '10s'. Has no effect unless GRPC_CLIENT_KEEPALIVE_TIME is set. See GRPC_CLIENT_KEEPALIVE_TIME." introductionVersion:"8.3.0"`
+}
+
 type GRPCServiceTLS struct {
 	Enabled bool   `yaml:"enabled" env:"OCIS_GRPC_TLS_ENABLED" desc:"Activates TLS for the grpc based services using the server certifcate and key configured via OCIS_GRPC_TLS_CERTIFICATE and OCIS_GRPC_TLS_KEY. If OCIS_GRPC_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with OCIS_GRPC_CLIENT_TLS_MODE=insecure." introductionVersion:"pre5.0"`
 	Cert    string `yaml:"cert" env:"OCIS_GRPC_TLS_CERTIFICATE" desc:"Path/File name of the TLS server certificate (in PEM format) for the grpc services." introductionVersion:"pre5.0"`
@@ -72,27 +88,19 @@ type Cache struct {
 // Commons holds configuration that are common to all extensions. Each extension can then decide whether
 // to overwrite its values.
 type Commons struct {
-	Log               *Log            `yaml:"log"`
-	Tracing           *Tracing        `yaml:"tracing"`
-	Cache             *Cache          `yaml:"cache"`
-	GRPCClientTLS     *GRPCClientTLS  `yaml:"grpc_client_tls"`
-	GRPCServiceTLS    *GRPCServiceTLS `yaml:"grpc_service_tls"`
-	HTTPServiceTLS    HTTPServiceTLS  `yaml:"http_service_tls"`
-	OcisURL           string          `yaml:"ocis_url" env:"OCIS_URL" desc:"URL, where oCIS is reachable for users." introductionVersion:"pre5.0"`
-	TokenManager      *TokenManager   `mask:"struct" yaml:"token_manager"`
-	Reva              *Reva           `yaml:"reva"`
-	MachineAuthAPIKey string          `mask:"password" yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services." introductionVersion:"pre5.0"`
-	TransferSecret    string          `mask:"password" yaml:"transfer_secret,omitempty" env:"REVA_TRANSFER_SECRET" desc:"The secret used for signing the requests towards the data gateway for up- and downloads." introductionVersion:"pre5.0"`
-	SystemUserID      string          `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID" desc:"ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format." introductionVersion:"pre5.0"`
-	SystemUserAPIKey  string          `mask:"password" yaml:"system_user_api_key" env:"SYSTEM_USER_API_KEY" desc:"API key for all system users." introductionVersion:"pre5.0"`
-	AdminUserID       string          `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID" desc:"ID of a user, that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand." introductionVersion:"pre5.0"`
-
-	// NOTE: you will not fing GRPCMaxReceivedMessageSize size being used in the code. The envvar is actually extracted in revas `pool` package: https://github.com/cs3org/reva/blob/edge/pkg/rgrpc/todo/pool/connection.go
-	// It is mentioned here again so it is documented
-	GRPCMaxReceivedMessageSize int `env:"OCIS_GRPC_MAX_RECEIVED_MESSAGE_SIZE" desc:"The maximum body size for grpc requests. Defaults to '10240000' bytes (10MB). Note that large values can potentially hide errors but may lead to network timeouts. Should only be changed temporarily to regain access for large folders with 25.000+ files to copy out data." introductionVersion:"pre5.0"`
-
-	// The same applies to the two keepalive settings below, they are extracted in revas `pool` package as well:
-	// https://github.com/owncloud/reva/blob/master/pkg/rgrpc/todo/pool/keepalive.go
-	GRPCClientKeepaliveTime    time.Duration `env:"GRPC_CLIENT_KEEPALIVE_TIME" desc:"How long a grpc client connection with an ongoing request may stay silent before the server is pinged to check whether it is still answering. Unset means grpc's own default applies (no pings). Set a duration like '20s' to enable detection of unresponsive peers; invalid values fall back to '20s'. Values below '10s' are raised to '10s' by grpc." introductionVersion:"8.3.0"`
-	GRPCClientKeepaliveTimeout time.Duration `env:"GRPC_CLIENT_KEEPALIVE_TIMEOUT" desc:"How long a grpc client waits for the answer to a keepalive ping before it considers the connection dead and fails all requests on it. Unset means grpc's own default of '20s' applies; invalid values fall back to '10s'. See GRPC_CLIENT_KEEPALIVE_TIME." introductionVersion:"8.3.0"`
+	Log               *Log               `yaml:"log"`
+	Tracing           *Tracing           `yaml:"tracing"`
+	Cache             *Cache             `yaml:"cache"`
+	GRPCClientTLS     *GRPCClientTLS     `yaml:"grpc_client_tls"`
+	GRPCClientOptions *GRPCClientOptions `yaml:"grpc_client_options"`
+	GRPCServiceTLS    *GRPCServiceTLS    `yaml:"grpc_service_tls"`
+	HTTPServiceTLS    HTTPServiceTLS     `yaml:"http_service_tls"`
+	OcisURL           string             `yaml:"ocis_url" env:"OCIS_URL" desc:"URL, where oCIS is reachable for users." introductionVersion:"pre5.0"`
+	TokenManager      *TokenManager      `mask:"struct" yaml:"token_manager"`
+	Reva              *Reva              `yaml:"reva"`
+	MachineAuthAPIKey string             `mask:"password" yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services." introductionVersion:"pre5.0"`
+	TransferSecret    string             `mask:"password" yaml:"transfer_secret,omitempty" env:"REVA_TRANSFER_SECRET" desc:"The secret used for signing the requests towards the data gateway for up- and downloads." introductionVersion:"pre5.0"`
+	SystemUserID      string             `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID" desc:"ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format." introductionVersion:"pre5.0"`
+	SystemUserAPIKey  string             `mask:"password" yaml:"system_user_api_key" env:"SYSTEM_USER_API_KEY" desc:"API key for all system users." introductionVersion:"pre5.0"`
+	AdminUserID       string             `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID" desc:"ID of a user, that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand." introductionVersion:"pre5.0"`
 }

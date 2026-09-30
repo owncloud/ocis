@@ -52,10 +52,11 @@ type Config struct {
 
 	Middleware Middleware `yaml:"middleware"`
 
-	Events           Events                `yaml:"events"`
-	GRPCClientTLS    *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
-	AutoAcceptShares bool                  `yaml:"auto_accept_shares" env:"FRONTEND_AUTO_ACCEPT_SHARES" desc:"Defines if shares should be auto accepted by default. Users can change this setting individually in their profile." introductionVersion:"5.0"`
-	ServiceAccount   ServiceAccount        `yaml:"service_account"`
+	Events            Events                    `yaml:"events"`
+	GRPCClientTLS     *shared.GRPCClientTLS     `yaml:"grpc_client_tls"`
+	GRPCClientOptions *shared.GRPCClientOptions `yaml:"grpc_client_options"`
+	AutoAcceptShares  bool                      `yaml:"auto_accept_shares" env:"FRONTEND_AUTO_ACCEPT_SHARES" desc:"Defines if shares should be auto accepted by default. Users can change this setting individually in their profile." introductionVersion:"5.0"`
+	ServiceAccount    ServiceAccount            `yaml:"service_account"`
 
 	PasswordPolicy PasswordPolicy `yaml:"password_policy"`
 	Validation     Validation     `yaml:"validation"`

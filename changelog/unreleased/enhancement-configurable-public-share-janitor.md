@@ -9,6 +9,6 @@ Both settings are now exposed as environment variables:
 OCIS_SHARING_ENABLE_EXPIRED_SHARES_CLEANUP toggles the cleanup (default:
 enabled, expired shares stay hidden from listings even when disabled), and
 the new OCIS_SHARING_JANITOR_RUN_INTERVAL sets the interval in seconds
-between janitor runs (default: 600).
+between janitor runs (default: 3600).
 
-https://github.com/owncloud/ocis/pull/13707
+https://github.com/owncloud/ocis/pull/13020
