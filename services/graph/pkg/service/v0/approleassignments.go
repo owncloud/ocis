@@ -149,7 +149,7 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 // DeleteAppRoleAssignment implements the Service interface.
 func (g Graph) DeleteAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Interface("body", r.Body).Msg("calling delete appRoleAssignment")
+	logger.Info().Msg("calling delete appRoleAssignment")
 
 	userID := chi.URLParam(r, "userID")
 
