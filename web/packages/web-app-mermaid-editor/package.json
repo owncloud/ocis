@@ -12,7 +12,7 @@
     "@codemirror/language": "^6.11.3",
     "@codemirror/state": "^6.5.2",
     "@codemirror/view": "^6.38.2",
-    "dompurify": "^3.4.11",
+    "dompurify": "^3.4.16",
     "mermaid": "^11.12.2"
   },
   "devDependencies": {
