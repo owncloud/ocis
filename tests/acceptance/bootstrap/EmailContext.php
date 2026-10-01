@@ -12,6 +12,7 @@ use Behat\Gherkin\Node\PyStringNode;
 use PHPUnit\Framework\Assert;
 use GuzzleHttp\Exception\GuzzleException;
 use TestHelpers\EmailHelper;
+use TestHelpers\HttpRequestHelper;
 use TestHelpers\GraphHelper;
 use TestHelpers\BehatHelper;
 
@@ -77,10 +78,11 @@ class EmailContext implements Context {
 				'',
 			),
 		);
-		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
+		$this->assertEmailContains(
+			$user,
 			$rawExpectedEmailBodyContent,
+			false,
 			$sender,
-			[],
 			[
 				[
 					"code" => "%space_id%",
@@ -90,7 +92,6 @@ class EmailContext implements Context {
 				],
 			],
 		);
-		$this->assertEmailContains($user, $expectedEmailBodyContent);
 	}
 
 	/**
@@ -109,11 +110,7 @@ class EmailContext implements Context {
 		PyStringNode $content,
 	): void {
 		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
-		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
-			$rawExpectedEmailBodyContent,
-			$sender,
-		);
-		$this->assertEmailContains($user, $expectedEmailBodyContent);
+		$this->assertEmailContains($user, $rawExpectedEmailBodyContent, false, $sender);
 	}
 
 	/**
@@ -162,28 +159,43 @@ class EmailContext implements Context {
 		PyStringNode $content,
 	): void {
 		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
-		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
-			$rawExpectedEmailBodyContent,
-			$sender,
-		);
-		$this->assertEmailContains($user, $expectedEmailBodyContent, true);
+		$this->assertEmailContains($user, $rawExpectedEmailBodyContent, true, $sender);
 	}
 
 	/***
 	 * @param string $user
-	 * @param string $expectedEmailBodyContent
+	 * @param string $rawExpectedEmailBodyContent
 	 * @param bool $ignoreWhiteSpace
+	 * @param string|null $sender
+	 * @param array $additionalSubstitutions
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function assertEmailContains(
 		string $user,
-		string $expectedEmailBodyContent,
+		string $rawExpectedEmailBodyContent,
 		$ignoreWhiteSpace = false,
+		?string $sender = null,
+		array $additionalSubstitutions = [],
 	): void {
 		$address = $this->featureContext->getEmailAddressForUser($user);
 		$actualEmailBodyContent = $this->getBodyOfLastEmail($address);
+		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
+			$rawExpectedEmailBodyContent,
+			$sender,
+			[],
+			\array_merge(
+				$additionalSubstitutions,
+				[
+					[
+						"code" => "%expiry_date_in_mail%",
+						"function" => [$this, "getExpiryDateTimeInEmailTimezone"],
+						"parameter" => [],
+					],
+				],
+			),
+		);
 		if ($ignoreWhiteSpace) {
 			$expectedEmailBodyContent = preg_replace('/\s+/', '', $expectedEmailBodyContent);
 			$actualEmailBodyContent = preg_replace('/\s+/', '', $actualEmailBodyContent);
@@ -195,6 +207,17 @@ class EmailContext implements Context {
 			. " email with the body containing $expectedEmailBodyContent
 			but the received email is $actualEmailBodyContent",
 		);
+	}
+
+	/**
+	 * Formats the expiry date on the timezone the server used when it sent the mail.
+	 *
+	 * @return string
+	 */
+	public function getExpiryDateTimeInEmailTimezone(): string {
+		return $this->featureContext->getExpiryDateTime()
+			->setTimezone(HttpRequestHelper::getEmailServerTimezone())
+			->format('Y-m-d H:i:s');
 	}
 
 	/**
@@ -250,9 +273,6 @@ class EmailContext implements Context {
 		PyStringNode $content,
 	): void {
 		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
-		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
-			$rawExpectedEmailBodyContent,
-		);
-		$this->assertEmailContains($user, $expectedEmailBodyContent);
+		$this->assertEmailContains($user, $rawExpectedEmailBodyContent);
 	}
 }

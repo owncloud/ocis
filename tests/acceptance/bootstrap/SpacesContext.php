@@ -2835,8 +2835,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $memberUser,
 	): void {
-		$dateTime = new DateTime('yesterday');
-		$rows['expireDate'] = $dateTime->format('Y-m-d\\TH:i:sP');
+		$rows['expireDate'] = $this->featureContext->formatExpiryDateTime('Y-m-d\\TH:i:sP');
 		$rows['shareWith'] = $memberUser;
 		$rows['shareType'] = ($shareType === 'user') ? 7 : 8;
 		$this->featureContext->setResponse($this->shareSpace($user, $spaceName, $rows));
@@ -5068,10 +5067,16 @@ class SpacesContext implements Context {
 			) {
 				$foundRoleInResponse = true;
 				if ($expirationDate !== null && isset($permission['expirationDateTime'])) {
+					$expectedExpirationDate = (new DateTimeImmutable($expirationDate))
+						->setTimezone($this->featureContext->getTestTimezone())
+						->format('Y-m-d');
+					$actualExpirationDate = (new DateTimeImmutable($permission['expirationDateTime']))
+						->setTimezone($this->featureContext->getTestTimezone())
+						->format('Y-m-d');
 					Assert::assertEquals(
-						$expirationDate,
-						(preg_split("/[\sT]+/", $permission['expirationDateTime']))[0],
-						"$expirationDate is different in the response",
+						$expectedExpirationDate,
+						$actualExpirationDate,
+						"Expiration date mismatch",
 					);
 				}
 				break;

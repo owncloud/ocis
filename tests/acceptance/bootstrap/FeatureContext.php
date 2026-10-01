@@ -78,7 +78,7 @@ class FeatureContext extends BehatVariablesContext {
 	private string $adminUsername;
 	private string $adminPassword;
 	private string $originalAdminPassword;
-	private DateTime $expiryDateTime;
+	private DateTimeImmutable $expiryDateTime;
 
 	/**
 	 * An array of values of replacement values of user attributes.
@@ -457,7 +457,7 @@ class FeatureContext extends BehatVariablesContext {
 		$this->regularUserPassword = $regularUserPassword;
 		$this->currentServer = 'LOCAL';
 		$this->cookieJar = new CookieJar();
-		$this->expiryDateTime = new DateTime('yesterday');
+		$this->expiryDateTime = new DateTimeImmutable('yesterday', $this->getTestTimezone());
 
 		// These passwords are referenced in tests and can be overridden by
 		// setting environment variables.
@@ -903,9 +903,9 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @return DateTime
+	 * @return DateTimeImmutable
 	 */
-	public function getExpiryDateTime(): DateTime {
+	public function getExpiryDateTime(): DateTimeImmutable {
 		return $this->expiryDateTime;
 	}
 
@@ -2538,13 +2538,6 @@ class FeatureContext extends BehatVariablesContext {
 				],
 				"parameter" => [],
 			],
-			[
-				"code" => "%expiry_date_in_mail%",
-				"function" => [
-					$this, "formatExpiryDateTime",
-				],
-				"parameter" => ['Y-m-d H:i:s'],
-			],
 		];
 		if ($user !== null) {
 			array_push(
@@ -3074,5 +3067,12 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function theSystemWaitsForSeconds(string $seconds): void {
 		\sleep((int)$seconds);
+	}
+
+	/**
+	 * @return DateTimeZone
+	 */
+	public function getTestTimezone(): DateTimeZone {
+		return new DateTimeZone(\date_default_timezone_get());
 	}
 }

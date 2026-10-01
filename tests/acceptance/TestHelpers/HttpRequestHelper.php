@@ -36,6 +36,8 @@ use Sabre\Xml\LibXMLException;
 use Sabre\Xml\Reader;
 use GuzzleHttp\Pool;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
+use DateTimeImmutable;
+use DateTimeZone;
 
 /**
  * Helper for HTTP requests
@@ -49,6 +51,12 @@ class HttpRequestHelper {
 	 *
 	 */
 	private static string $currentScenarioRef = '';
+
+	/**
+	 * Stores the timezone of the Date of the last mail fetched from the mail server
+	 *
+	 */
+	private static string $emailServerTimezone = '';
 
 	/**
 	 * Set the current scenario reference
@@ -182,6 +190,17 @@ class HttpRequestHelper {
 			// if the response was null for some reason do not return it but re-throw
 			if ($response === null) {
 				throw $ex;
+			}
+		}
+
+		// Get the email server timezone from the Date header of the last email fetched from the mail server
+		if (\str_starts_with((string)$url, EmailHelper::getEmailAPIUrl('message/'))
+			&& self::$emailServerTimezone === ''
+		) {
+			$body = self::getJsonDecodedResponseBodyContent($response);
+			if (property_exists($body, 'Date')) {
+				$emailDate = new DateTimeImmutable($body->Date);
+				self::$emailServerTimezone = $emailDate->getTimezone()->getName();
 			}
 		}
 
@@ -723,5 +742,18 @@ class HttpRequestHelper {
 	 */
 	public static function getXRequestIdRegex(): string {
 		return '/^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/';
+	}
+
+	/**
+	 * Returns the timezone of the email server.
+	 *
+	 * @return DateTimeZone
+	 * @throws Exception
+	 */
+	public static function getEmailServerTimezone(): DateTimeZone {
+		if (self::$emailServerTimezone === '') {
+			throw new Exception(__METHOD__ . " could not read the email server timezone");
+		}
+		return new DateTimeZone(self::$emailServerTimezone);
 	}
 }

@@ -48,6 +48,7 @@ Feature: get grouped email notification
       | permissionsRole    | Space Viewer             |
       | expirationDateTime | 2042-03-25T23:59:59.000Z |
     And user "Alice" has expired the membership of user "Brian" from space "New-Space"
+    And the user "Brian" should not have a space called "New-Space"
     When the administrator triggers "daily" email notifications using the CLI
     Then the command should be successful
     And the command output should contain "successfully sent SendEmailsEvent"
@@ -119,6 +120,7 @@ Feature: get grouped email notification
       | permissionsRole    | Space Viewer             |
       | expirationDateTime | 2042-03-25T23:59:59.000Z |
     And user "Alice" has expired the membership of user "Brian" from space "New-Space"
+    And the user "Brian" should not have a space called "New-Space"
     When the administrator triggers "weekly" email notifications using the CLI
     Then the command should be successful
     And the command output should contain "successfully sent SendEmailsEvent"
