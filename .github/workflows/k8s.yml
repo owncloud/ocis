@@ -443,3 +443,172 @@ jobs:
           WITH_REMOTE_PHP: "false"
           K8S: ${{ env.K8S }}
         run: make test-acceptance-api
+
+  e2e-tests:
+    name: e2e-${{ matrix.suite }}-k8s
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    if: >-
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' &&
+       contains(github.event.pull_request.title || '', 'k8s'))
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: smoke
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          # 24.16.0 breaks playwright install (yauzl zip extraction hangs); pin to last known good.
+          # https://github.com/microsoft/playwright/issues/40724
+          node-version: "24.15.0"
+
+      - name: Enable pnpm
+        run: |
+          corepack enable && corepack prepare pnpm@10.33.3 --activate
+          pnpm config set store-dir ./.pnpm-store
+
+      - name: Cache Playwright Chromium
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ hashFiles('web/pnpm-lock.yaml') }}
+
+      - name: Download k3d
+        run: |
+          curl -L \
+            -o k3d \
+            https://github.com/k3d-io/k3d/releases/download/${{ env.K3D_VERSION }}/k3d-linux-amd64
+          echo "dbaa79a76ace7f4ca230a1ff41dc7d8a5036a8ad0309e9c54f9bf3836dbe853e k3d" | sha256sum --check
+          chmod +x k3d
+          sudo mv k3d /usr/local/bin/
+          k3d version
+
+      - name: Install Helm
+        run: |
+          curl -fsSL -o helm-${{ env.HELM_VERSION }}-linux-amd64.tar.gz https://get.helm.sh/helm-${{ env.HELM_VERSION }}-linux-amd64.tar.gz
+          tar -zxvf helm-${{ env.HELM_VERSION }}-linux-amd64.tar.gz
+          sudo mv linux-amd64/helm /usr/local/bin/helm
+          helm version --short
+
+      - name: Prepare hosts
+        run: |
+          echo "127.0.0.1 $TEST_SERVER_DOMAIN clamav email collabora onlyoffice fakeoffice tika $FED_SERVER_DOMAIN keycloak" \
+            | sudo tee -a /etc/hosts
+
+      - name: Spin up K3d Cluster
+        run: make -C tests/config/k8s create-cluster
+
+      - name: Prepare Helm Charts
+        run: make -C tests/config/k8s prepare-charts
+
+      - name: Deploy oCIS
+        run: |
+          cd tests/config/k8s
+          kubectl get pods -n "$TEST_SERVER_DOMAIN" -Aw &
+          make deploy-ocis
+
+      - name: Wait for oCIS to be ready
+        env:
+          FILE_URL: ${{ env.TEST_SERVER_URL }}/remote.php/dav/files/admin/hello1.txt
+        run: |
+          kubectl wait \
+            --namespace "$TEST_SERVER_DOMAIN" \
+            --for=condition=Available \
+            deployment \
+            --all \
+            --timeout=10m
+
+          kubectl wait \
+            --namespace "$TEST_SERVER_DOMAIN" \
+            --for=condition=Ready \
+            pod \
+            --all \
+            --timeout=10m
+
+          kubectl get pods -n "$TEST_SERVER_DOMAIN"
+
+          retry() {
+            local label=$1
+            shift
+            for i in {1..30}; do
+              if "$@"; then
+                echo "$label succeeded"
+                return 0
+              fi
+              echo "$label attempt $i failed, retrying in 10s..."
+              sleep 10
+            done
+            echo "$label failed after 30 attempts"
+            return 1
+          }
+
+          echo "Creating test file in oCIS..."
+
+          request() {
+            local method=$1
+            shift
+            curl -ks -o /dev/null -w "%{http_code}" \
+              -X "$method" \
+              -u admin:admin \
+              "$@" \
+              "$FILE_URL"
+          }
+          put_file() {
+            request PUT \
+              -H "Content-Type: text/plain" \
+              --data "Hello from GitHub Actions!"
+          }
+          delete_file() {
+            request DELETE
+          }
+          check_status() {
+            local expected=$1
+            shift
+            status=$("$@")
+            [ "$status" = "$expected" ]
+          }
+          echo "Creating test file..."
+          retry "create file (HTTP 201)" check_status 201 put_file || exit 1
+          echo "Deleting test file..."
+          retry "delete file (HTTP 204)" check_status 204 delete_file || exit 1
+
+      - name: Run e2e ${{ matrix.suite }} tests
+        env:
+          E2E_ARGS: "--suites ${{ matrix.suite }}"
+          K8S: ${{ env.K8S }}
+          TEST_SERVER_URL: ${{ env.TEST_SERVER_URL }}
+        run: python3 tests/acceptance/run-e2e.py
+
+      - name: Upload Playwright traces
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: playwright-traces-${{ matrix.suite }}-k8s-${{ github.run_attempt }}
+          path: web/reports/e2e
+          retention-days: 7
+
+      - name: Upload a11y result
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: playwright-a11y-result-${{ matrix.suite }}-k8s-${{ github.run_attempt }}
+          path: web/reports/e2e/a11y-report.json
+          retention-days: 7
+
+      - name: Upload oCIS logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ocis-logs-${{ matrix.suite }}-k8s-${{ github.run_attempt }}
+          path: tests/config/k8s/logs
+          retention-days: 7

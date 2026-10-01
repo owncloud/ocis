@@ -4,6 +4,9 @@ Run Playwright e2e tests against a local OCIS instance.
 
 Usage: E2E_ARGS='--run-part 1' python3 tests/acceptance/run-e2e.py
 Optional: TIKA_NEEDED=true, KEYCLOAK_NEEDED=true
+Optional: K8S=true, TEST_SERVER_URL=<url> - run against an already-deployed
+k8s OCIS instance (see .github/workflows/k8s.yml) instead of starting one
+locally. All other *_NEEDED flags are ignored in this mode.
 """
 
 import json
@@ -120,6 +123,43 @@ def main() -> int:
               file=sys.stderr)
         return 1
 
+    repo_root = Path(__file__).resolve().parents[2]
+    web_dir = repo_root / "web"
+
+    if not (web_dir / "node_modules").exists():
+        pkg_manager = json.loads((web_dir / "package.json").read_text()).get("packageManager", "pnpm")
+        run(["npm", "install", "--silent", "--global", "--force", pkg_manager])
+        subprocess.run(["pnpm", "config", "set", "store-dir", "./.pnpm-store"],
+                       cwd=web_dir, check=True)
+        subprocess.run(["pnpm", "install"], cwd=web_dir, check=True)
+        subprocess.run(["pnpm", "exec", "playwright", "install", "--with-deps", "chromium"],
+                       cwd=web_dir, check=True)
+
+    if os.environ.get("K8S", "").lower() == "true":
+        # oCIS is already running as a Helm-deployed k8s cluster (see
+        # .github/workflows/k8s.yml) -- unlike the flow below, there's no local
+        # binary to build, init, or start. Just confirm it's up and point
+        # Playwright straight at it.
+        ocis_url = os.environ["TEST_SERVER_URL"]
+        wait_for(lambda: ocis_healthy(ocis_url), 120, "ocis")
+        print("ocis ready.")
+
+        playwright_env = {
+            **os.environ,
+            "BASE_URL_OCIS": ocis_url,
+            "HEADLESS": "true",
+            "RETRY": "3",
+            "REPORT_TRACING": "false",
+            "BROWSER": "chromium",
+        }
+        print(f"Running e2e: {e2e_args}")
+        result = subprocess.run(
+            ["bash", "run-e2e.sh"] + shlex.split(e2e_args),
+            cwd=web_dir / "tests/e2e",
+            env=playwright_env,
+        )
+        return result.returncode
+
     tika_needed = os.environ.get("TIKA_NEEDED", "").lower() == "true"
     keycloak_needed = os.environ.get("KEYCLOAK_NEEDED", "").lower() == "true"
     mfa_needed = os.environ.get("MFA_NEEDED", "").lower() == "true"
@@ -131,7 +171,6 @@ def main() -> int:
     # MFA mode runs ocis behind keycloak with TOTP enforced
     keycloak_needed = keycloak_needed or mfa_needed or vault_storage_needed
 
-    repo_root = Path(__file__).resolve().parents[2]
     ocis_bin = repo_root / "ocis/bin/ocis"
     wrapper_bin = repo_root / "tests/ociswrapper/bin/ociswrapper"
     # The federated suite must address the primary as localhost instead of
@@ -141,7 +180,6 @@ def main() -> int:
     # suite), which only lists localhost:9200.
     ocis_url = "https://localhost:9200" if federated_needed else "https://127.0.0.1:9200"
     ocis_config_dir = Path.home() / ".ocis/config"
-    web_dir = repo_root / "web"
 
     # build ocis + ociswrapper only if not already provided (e.g. via artifact)
     if not ocis_bin.exists():
@@ -149,15 +187,6 @@ def main() -> int:
     if not wrapper_bin.exists():
         run(["make", "-C", str(repo_root / "tests/ociswrapper"), "build"],
             env={"GOWORK": "off"})
-
-    if not (web_dir / "node_modules").exists():
-        pkg_manager = json.loads((web_dir / "package.json").read_text()).get("packageManager", "pnpm")
-        run(["npm", "install", "--silent", "--global", "--force", pkg_manager])
-        subprocess.run(["pnpm", "config", "set", "store-dir", "./.pnpm-store"],
-                       cwd=web_dir, check=True)
-        subprocess.run(["pnpm", "install"], cwd=web_dir, check=True)
-        subprocess.run(["pnpm", "exec", "playwright", "install", "--with-deps", "chromium"],
-                       cwd=web_dir, check=True)
 
     # init ocis
     run([str(ocis_bin), "init", "--insecure", "true"])
