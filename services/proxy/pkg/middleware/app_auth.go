@@ -57,6 +57,7 @@ func (m AppAuthAuthenticator) Authenticate(r *http.Request) (*http.Request, erro
 		oidc.PreferredUsername: user.GetUsername(),
 		oidc.Email:             user.GetMail(),
 		oidc.OwncloudUUID:      user.GetId().GetOpaqueId(),
+		oidc.Name:              user.GetDisplayName(),
 	}
 	r = r.WithContext(oidc.NewContext(r.Context(), claims))
 

@@ -42,10 +42,11 @@ func (m BasicAuthenticator) Authenticate(r *http.Request) (*http.Request, error)
 
 	// fake oidc claims
 	claims := map[string]interface{}{
-		oidc.Iss:               user.Id.Idp,
-		oidc.PreferredUsername: user.Username,
-		oidc.Email:             user.Mail,
-		oidc.OwncloudUUID:      user.Id.OpaqueId,
+		oidc.Iss:               user.GetId().GetIdp(),
+		oidc.PreferredUsername: user.GetUsername(),
+		oidc.Email:             user.GetMail(),
+		oidc.OwncloudUUID:      user.GetId().GetOpaqueId(),
+		oidc.Name:              user.GetDisplayName(),
 	}
 
 	if m.UserCS3Claim == "userid" {
