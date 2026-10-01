@@ -190,6 +190,13 @@ func (fs *posixFS) IsOrphaned(ctx context.Context, ref *provider.Reference) bool
 	return fs.FS.(storage.OrphanChecker).IsOrphaned(ctx, ref)
 }
 
+// PrepareCreatesNode reports whether the wrapped driver's PrepareUpload creates a
+// new file's node.
+func (fs *posixFS) PrepareCreatesNode() bool {
+	nc, ok := fs.FS.(storage.NodeCreator)
+	return ok && nc.PrepareCreatesNode()
+}
+
 // UseIn tells the tus upload middleware which extensions it supports.
 func (fs *posixFS) UseIn(composer *tusd.StoreComposer) {
 	fs.FS.(storage.ComposableFS).UseIn(composer)

@@ -70,6 +70,14 @@ type OrphanChecker interface {
 	IsOrphaned(ctx context.Context, ref *provider.Reference) bool
 }
 
+// NodeCreator defines the interface for FS implementations whose PrepareUpload
+// creates a new file's node from UploadInfo.ParentID and Name, so an upload need
+// not TouchFile it first.
+type NodeCreator interface {
+	// PrepareCreatesNode reports whether PrepareUpload creates a missing node.
+	PrepareCreatesNode() bool
+}
+
 // UploadSession is the interface that storage drivers need to return whan listing upload sessions.
 type UploadSession interface {
 	// ID returns the upload id

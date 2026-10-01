@@ -434,8 +434,9 @@ func (fs *Decomposedfs) CommitUpload(ctx context.Context, ref *provider.Referenc
 	return nil
 }
 
-// PrepareUpload finalizes node metadata after bytes are received, before postprocessing.
-// CommitUpload is called after postprocessing completes.
+// PrepareUpload finalizes node metadata after bytes are received, before postprocessing,
+// and marks the node as processing for sessionID. CommitUpload is called after
+// postprocessing completes.
 func (fs *Decomposedfs) PrepareUpload(ctx context.Context, ref *provider.Reference, sessionID string, info storage.UploadInfo) (*storage.PrepareUploadResult, error) {
 	ctx, span := tracer.Start(ctx, "PrepareUpload")
 	defer span.End()
@@ -445,16 +446,47 @@ func (fs *Decomposedfs) PrepareUpload(ctx context.Context, ref *provider.Referen
 		appctx.GetLogger(ctx).Error().Err(err).Msg("PrepareUpload: unexpected NodeFromResource failure")
 		return nil, errtypes.InternalError("PrepareUpload: node lookup failed unexpectedly")
 	}
-	if !n.Exists {
+	// A new file nobody has created yet: PrepareUpload creates it, under the id the
+	// ref already carries.
+	create := !n.Exists && !info.NodeExisted && info.ParentID != "" && info.Name != ""
+	if !n.Exists && !create {
 		return nil, errtypes.NotFound(ref.String())
 	}
+	if create {
+		if err := fs.checkNewFileParent(ctx, n.SpaceID, info); err != nil {
+			return nil, err
+		}
+		n.ParentID = info.ParentID
+		n.Name = info.Name
+	}
+
+	committed := false
+	// Only a node this upload created is purged, and one it is creating only once the
+	// name is its own: Purge removes the name link by name.
+	purge := !info.NodeExisted && !create
+	// This upload created the node, so a failure must not leave it behind as an
+	// empty file. Purge, not trash: it never had content, and Purge needs no
+	// Delete permission. Registered before the lock is taken, so it runs after the
+	// lock is released: Purge removes the lock file too.
+	defer func() {
+		if committed || !purge {
+			return
+		}
+		if err := n.Purge(ctx); err != nil {
+			appctx.GetLogger(ctx).Error().Err(err).Str("nodeid", n.ID).Msg("could not purge new node after failed prepare")
+		}
+	}()
+
 	n.SpaceRoot, err = node.ReadNode(ctx, fs.lu, n.SpaceID, n.SpaceID, false, nil, false)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := n.CheckLock(ctx); err != nil {
-		return nil, err
+	// A node still to be created has no path yet on posix, so it is checked once created.
+	if !create {
+		if err := n.CheckLock(ctx); err != nil {
+			return nil, err
+		}
 	}
 
 	// scope to space owner GID for posix deployments; no-op with NullMapper
@@ -468,17 +500,38 @@ func (fs *Decomposedfs) PrepareUpload(ctx context.Context, ref *provider.Referen
 		}
 	}
 
-	targetPath := n.InternalPath()
-	f, err := lockedfile.OpenFile(fs.lu.MetadataBackend().LockfilePath(targetPath), os.O_RDWR|os.O_CREATE, 0600)
-	if err != nil {
-		return nil, err
+	var (
+		f      *lockedfile.File
+		unlock func() error
+	)
+	if create {
+		// InitNewNode refuses a name already taken, checks the quota, and on failure
+		// removes what it made and releases its lock. Its lock is the one PrepareUpload
+		// would take, so it is kept rather than taken again.
+		unlock, err = fs.tp.InitNewNode(ctx, n, uint64(info.Size))
+		if err != nil {
+			return nil, err
+		}
+		purge = true
+	} else {
+		f, err = lockedfile.OpenFile(fs.lu.MetadataBackend().LockfilePath(n.InternalPath()), os.O_RDWR|os.O_CREATE, 0600)
+		if err != nil {
+			return nil, err
+		}
+		unlock = func() error { return f.Close() }
 	}
-	unlock := func() error { return f.Close() }
+	targetPath := n.InternalPath()
 	defer func() {
 		if err := unlock(); err != nil {
 			appctx.GetLogger(ctx).Error().Err(err).Str("nodeid", n.ID).Msg("could not close lock")
 		}
 	}()
+
+	if create {
+		if err := n.CheckLock(ctx); err != nil {
+			return nil, err
+		}
+	}
 
 	var (
 		sizeDiff       int64
@@ -486,7 +539,6 @@ func (fs *Decomposedfs) PrepareUpload(ctx context.Context, ref *provider.Referen
 		versionPath    string
 		oldAttrs       node.Attributes
 		oldMtime       time.Time
-		committed      bool
 	)
 
 	defer func() {
@@ -525,9 +577,12 @@ func (fs *Decomposedfs) PrepareUpload(ctx context.Context, ref *provider.Referen
 	}
 
 	// also for new files: the coordinator's check fails open without GetQuota
-	// permission, and CheckQuota guards disk space too
-	if _, err := node.CheckQuota(ctx, n.SpaceRoot, overwrite, uint64(oldBlobsize), uint64(info.Size)); err != nil {
-		return nil, err
+	// permission, and CheckQuota guards disk space too. InitNewNode has checked a
+	// node it created.
+	if !create {
+		if _, err := node.CheckQuota(ctx, n.SpaceRoot, overwrite, uint64(oldBlobsize), uint64(info.Size)); err != nil {
+			return nil, err
+		}
 	}
 
 	if info.NodeExisted {
@@ -607,7 +662,8 @@ func (fs *Decomposedfs) PrepareUpload(ctx context.Context, ref *provider.Referen
 
 		sizeDiff = info.Size - old.Blobsize
 	} else {
-		if c, ok := fs.lu.(node.IDCacher); ok {
+		// InitNewNode has cached a node it created
+		if c, ok := fs.lu.(node.IDCacher); ok && !create {
 			if err := c.CacheID(ctx, n.SpaceID, n.ID, filepath.Join(n.ParentPath(), n.Name)); err != nil {
 				appctx.GetLogger(ctx).Error().Err(err).Msg("failed to cache id")
 			}
@@ -625,6 +681,8 @@ func (fs *Decomposedfs) PrepareUpload(ctx context.Context, ref *provider.Referen
 	attrs[prefixes.ChecksumPrefix+"sha1"] = info.Checksums.SHA1
 	attrs[prefixes.ChecksumPrefix+"md5"] = info.Checksums.MD5
 	attrs[prefixes.ChecksumPrefix+"adler32"] = info.Checksums.Adler32
+	// in the same batch, so marking the node costs no write of its own
+	attrs.SetString(prefixes.StatusPrefix, node.ProcessingStatus+sessionID)
 
 	mtime := time.Now()
 	if !info.MTime.IsZero() {
@@ -643,7 +701,40 @@ func (fs *Decomposedfs) PrepareUpload(ctx context.Context, ref *provider.Referen
 	}
 	committed = true
 
-	return &storage.PrepareUploadResult{VersionCreated: versionCreated, SizeDiff: sizeDiff}, nil
+	result := &storage.PrepareUploadResult{VersionCreated: versionCreated, SizeDiff: sizeDiff}
+	if !info.NodeExisted {
+		// Read off the disk, not through ListGrants: an uploader who cannot see the
+		// space root still needs the manager of a project space reported.
+		result.SpaceOwner = n.SpaceOwnerOrManager(ctx)
+	}
+	return result, nil
+}
+
+// checkNewFileParent re-checks, for a file PrepareUpload is about to create, what
+// TouchFile checked: the parent still exists, and the user may still upload into it.
+// Either may have changed while the bytes were in flight.
+func (fs *Decomposedfs) checkNewFileParent(ctx context.Context, spaceID string, info storage.UploadInfo) error {
+	parentID := &provider.ResourceId{SpaceId: spaceID, OpaqueId: info.ParentID}
+	parent, err := fs.lu.NodeFromID(ctx, parentID)
+	if err != nil {
+		return errtypes.InternalError(err.Error())
+	}
+	f, _ := storagespace.FormatReference(&provider.Reference{ResourceId: parentID, Path: info.Name})
+	if !parent.Exists {
+		return errtypes.NotFound(f)
+	}
+
+	rp, err := fs.p.AssemblePermissions(ctx, parent)
+	switch {
+	case err != nil:
+		return err
+	case !rp.InitiateFileUpload:
+		if rp.Stat {
+			return errtypes.PermissionDenied(f)
+		}
+		return errtypes.NotFound(f)
+	}
+	return nil
 }
 
 // RollbackUpload reverts the node state written by PrepareUpload after a failed or aborted
