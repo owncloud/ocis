@@ -9,7 +9,13 @@ import (
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/reva/v2/pkg/permission"
+	"golang.org/x/sync/errgroup"
 )
+
+// maxConcurrentVaultEligibilityChecks bounds how many per-user role assignment lookups
+// applyFilterVaultEligible runs at once, so a large search result doesn't fan out into an
+// unbounded number of concurrent settings service calls.
+const maxConcurrentVaultEligibilityChecks = 10
 
 const (
 	appRoleID          = "appRoleId"
@@ -259,64 +265,76 @@ func (g Graph) applyFilterEq(ctx context.Context, req *godata.GoDataRequest, ope
 // applyFilterVaultEligible resolves `vaultEligible eq true`, the filter the share recipient
 // picker sends while sharing a vault resource. Only `true` is accepted: enumerating the users
 // who may not enter the vault is not a use case the picker has.
+//
+// Eligibility is checked only for the users the directory search actually returned, not for
+// every account in the system: the search runs first, and a per-user role assignment lookup
+// follows only for the (usually few) users it matched. This keeps the cost proportional to the
+// search result instead of the number of accounts in the whole deployment.
 func (g Graph) applyFilterVaultEligible(ctx context.Context, req *godata.GoDataRequest, operand *godata.ParseNode) ([]*libregraph.User, error) {
 	if operand.Token.Type != godata.ExpressionTokenBoolean || operand.Token.Value != "true" {
 		return nil, unsupportedFilterError()
 	}
 
+	// This is the share recipient search, and clients only send it once a few characters have
+	// been typed (FRONTEND_SEARCH_MIN_LENGTH). We therefore expect a handful of matching users here,
+	// not the whole directory, which is what makes checking each of them individually below cheap.
 	users, err := g.identityBackend.GetUsers(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-
-	eligible, err := g.vaultEligibleAccountIDs(ctx)
-	if err != nil {
-		return nil, err
+	if len(users) == 0 {
+		return users, nil
 	}
 
-	filteredUsers := make([]*libregraph.User, 0, len(users))
-	for _, user := range users {
-		if _, ok := eligible[user.GetId()]; ok {
-			filteredUsers = append(filteredUsers, user)
-		}
-	}
-	return filteredUsers, nil
-}
-
-// vaultEligibleAccountIDs returns the accounts holding the vault mode permission, found by
-// inverting the assignments of every role that grants it. That is one call per granting role,
-// rather than one permission check per user the search returned.
-func (g Graph) vaultEligibleAccountIDs(ctx context.Context) (map[string]struct{}, error) {
 	roles, err := g.roleService.ListRoles(ctx, &settingssvc.ListBundlesRequest{})
 	if err != nil {
 		return nil, err
 	}
 
-	accounts := make(map[string]struct{})
+	vaultGrantingRoles := make(map[string]struct{})
 	for _, role := range roles.GetBundles() {
-		if !roleGrantsVaultMode(role) {
-			continue
-		}
-
-		assignments, err := g.roleService.ListRoleAssignmentsFiltered(
-			ctx,
-			&settingssvc.ListRoleAssignmentsFilteredRequest{
-				Filters: []*settingsmsg.UserRoleAssignmentFilter{
-					{
-						Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ROLE,
-						Term: &settingsmsg.UserRoleAssignmentFilter_RoleId{RoleId: role.GetId()},
-					},
-				},
-			},
-		)
-		if err != nil {
-			return nil, err
-		}
-		for _, assignment := range assignments.GetAssignments() {
-			accounts[assignment.GetAccountUuid()] = struct{}{}
+		if roleGrantsVaultMode(role) {
+			vaultGrantingRoles[role.GetId()] = struct{}{}
 		}
 	}
-	return accounts, nil
+	if len(vaultGrantingRoles) == 0 {
+		return []*libregraph.User{}, nil
+	}
+
+	// eligible preserves the directory search's order: each slot is written at most once, by
+	// the goroutine checking that same index, so concurrent execution cannot reorder the result.
+	eligible := make([]bool, len(users))
+
+	eg, egCtx := errgroup.WithContext(ctx)
+	eg.SetLimit(maxConcurrentVaultEligibilityChecks)
+	for i, user := range users {
+		eg.Go(func() error {
+			assignments, err := g.roleService.ListRoleAssignments(egCtx, &settingssvc.ListRoleAssignmentsRequest{
+				AccountUuid: user.GetId(),
+			})
+			if err != nil {
+				return err
+			}
+			for _, assignment := range assignments.GetAssignments() {
+				if _, ok := vaultGrantingRoles[assignment.GetRoleId()]; ok {
+					eligible[i] = true
+					break
+				}
+			}
+			return nil
+		})
+	}
+	if err := eg.Wait(); err != nil {
+		return nil, err
+	}
+
+	filteredUsers := make([]*libregraph.User, 0, len(users))
+	for i, user := range users {
+		if eligible[i] {
+			filteredUsers = append(filteredUsers, user)
+		}
+	}
+	return filteredUsers, nil
 }
 
 // roleGrantsVaultMode reports whether a role bundle carries the vault mode permission.

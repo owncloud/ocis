@@ -707,6 +707,7 @@ var _ = Describe("Users", func() {
 				vaultLessRole = "ordinary-role-ID"
 				eligibleUser  = "25cb7bc0-3168-4a0c-adbe-396f478ad494"
 				otherUser     = "2713f1d5-6822-42bd-ad56-9f6c55a3a8fa"
+				thirdUser     = "3a6e6e0e-3f8b-4e3e-9f8b-1a2b3c4d5e6f"
 			)
 
 			// expectRoles makes the settings service report both roles, only one of which
@@ -738,6 +739,32 @@ var _ = Describe("Users", func() {
 				}, nil)
 			}
 
+			// expectAssignments stubs ListRoleAssignments (the per-account assignment lookup)
+			// for a single account.
+			expectAssignments := func(accountUUID string, assignments []*settingsmsg.UserRoleAssignment, err error) {
+				roleService.On("ListRoleAssignments", mock.Anything, mock.MatchedBy(
+					func(in *settings.ListRoleAssignmentsRequest) bool {
+						return in.GetAccountUuid() == accountUUID
+					}), mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: assignments}, err)
+			}
+
+			// requestVaultEligibleUsers builds a GetUsers request for filter, executes it against
+			// svc, and unmarshals a successful response body into a userList. It fails the test
+			// if the response isn't 200.
+			requestVaultEligibleUsers := func(filter string) userList {
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape(filter), nil)
+				r = r.WithContext(revactx.SetMFA(r.Context()))
+				svc.GetUsers(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+
+				data, err := io.ReadAll(rr.Body)
+				Expect(err).ToNot(HaveOccurred())
+				res := userList{}
+				Expect(json.Unmarshal(data, &res)).To(Succeed())
+				return res
+			}
+
 			BeforeEach(func() {
 				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
 					Permission: &settingsmsg.Permission{
@@ -756,55 +783,63 @@ var _ = Describe("Users", func() {
 			DescribeTable("returns only the users assigned to a role that grants vault mode",
 				func(filter string) {
 					expectRoles()
-					// Only the assignments of the vault granting role may be asked for, and only
-					// the eligible user holds one.
-					roleService.On("ListRoleAssignmentsFiltered", mock.Anything, mock.MatchedBy(
-						func(in *settings.ListRoleAssignmentsFilteredRequest) bool {
-							return in.GetFilters()[0].GetRoleId() == vaultRole
-						}), mock.Anything).Return(&settings.ListRoleAssignmentsResponse{
-						Assignments: []*settingsmsg.UserRoleAssignment{
-							{Id: "assignment-ID", AccountUuid: eligibleUser, RoleId: vaultRole},
-						},
+					// Only the eligible user's own assignments hold the vault-granting role;
+					// the other user holds a role that doesn't grant it.
+					expectAssignments(eligibleUser, []*settingsmsg.UserRoleAssignment{
+						{Id: "assignment-ID", AccountUuid: eligibleUser, RoleId: vaultRole},
+					}, nil)
+					expectAssignments(otherUser, []*settingsmsg.UserRoleAssignment{
+						{Id: "other-assignment-ID", AccountUuid: otherUser, RoleId: vaultLessRole},
 					}, nil)
 
-					r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape(filter), nil)
-					r = r.WithContext(revactx.SetMFA(r.Context()))
-					svc.GetUsers(rr, r)
-
-					Expect(rr.Code).To(Equal(http.StatusOK))
-
-					data, err := io.ReadAll(rr.Body)
-					Expect(err).ToNot(HaveOccurred())
-					res := userList{}
-					Expect(json.Unmarshal(data, &res)).To(Succeed())
+					res := requestVaultEligibleUsers(filter)
 					Expect(res.Value).To(HaveLen(1))
 					Expect(res.Value[0].GetId()).To(Equal(eligibleUser))
+
+					roleService.AssertNotCalled(GinkgoT(), "ListRoleAssignmentsFiltered", mock.Anything, mock.Anything, mock.Anything)
 				},
 				Entry("plain", "vaultEligible eq true"),
 				Entry("parenthesized", "(vaultEligible eq true)"),
 			)
 
-			It("returns nobody when no role grants vault mode", func() {
+			It("drops a user with no role assignments at all, as a normal (non-error) outcome", func() {
+				expectRoles()
+				expectAssignments(eligibleUser, []*settingsmsg.UserRoleAssignment{
+					{Id: "assignment-ID", AccountUuid: eligibleUser, RoleId: vaultRole},
+				}, nil)
+				expectAssignments(otherUser, nil, nil)
+
+				res := requestVaultEligibleUsers("vaultEligible eq true")
+				Expect(res.Value).To(HaveLen(1))
+				Expect(res.Value[0].GetId()).To(Equal(eligibleUser))
+			})
+
+			It("returns nobody when no role grants vault mode, without listing anyone's assignments", func() {
 				roleService.On("ListRoles", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListBundlesResponse{
 					Bundles: []*settingsmsg.Bundle{{Id: vaultLessRole, Type: settingsmsg.Bundle_TYPE_ROLE}},
 				}, nil)
 
-				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape("vaultEligible eq true"), nil)
-				r = r.WithContext(revactx.SetMFA(r.Context()))
-				svc.GetUsers(rr, r)
-
-				Expect(rr.Code).To(Equal(http.StatusOK))
-
-				data, err := io.ReadAll(rr.Body)
-				Expect(err).ToNot(HaveOccurred())
-				res := userList{}
-				Expect(json.Unmarshal(data, &res)).To(Succeed())
+				res := requestVaultEligibleUsers("vaultEligible eq true")
 				Expect(res.Value).To(BeEmpty())
+
+				roleService.AssertNotCalled(GinkgoT(), "ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything)
+				roleService.AssertNotCalled(GinkgoT(), "ListRoleAssignmentsFiltered", mock.Anything, mock.Anything, mock.Anything)
 			})
 
-			It("fails the request when the role assignments cannot be listed", func() {
-				expectRoles()
-				roleService.On("ListRoleAssignmentsFiltered", mock.Anything, mock.Anything, mock.Anything).
+			It("makes no calls to the role service when the directory search returns no users", func() {
+				identityBackend.On("GetUsers", mock.Anything, mock.Anything).Unset()
+				identityBackend.On("GetUsers", mock.Anything, mock.Anything).Return([]*libregraph.User{}, nil)
+
+				res := requestVaultEligibleUsers("vaultEligible eq true")
+				Expect(res.Value).To(BeEmpty())
+
+				roleService.AssertNotCalled(GinkgoT(), "ListRoles", mock.Anything, mock.Anything, mock.Anything)
+				roleService.AssertNotCalled(GinkgoT(), "ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything)
+				roleService.AssertNotCalled(GinkgoT(), "ListRoleAssignmentsFiltered", mock.Anything, mock.Anything, mock.Anything)
+			})
+
+			It("fails the request when the role list cannot be fetched", func() {
+				roleService.On("ListRoles", mock.Anything, mock.Anything, mock.Anything).
 					Return(nil, errors.New("settings service unavailable"))
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape("vaultEligible eq true"), nil)
@@ -812,6 +847,71 @@ var _ = Describe("Users", func() {
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).ToNot(Equal(http.StatusOK))
+			})
+
+			It("fails the request when a per-user role assignment check fails", func() {
+				expectRoles()
+				expectAssignments(eligibleUser, []*settingsmsg.UserRoleAssignment{
+					{Id: "assignment-ID", AccountUuid: eligibleUser, RoleId: vaultRole},
+				}, nil)
+				expectAssignments(otherUser, nil, errors.New("settings service unavailable"))
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape("vaultEligible eq true"), nil)
+				r = r.WithContext(revactx.SetMFA(r.Context()))
+				svc.GetUsers(rr, r)
+
+				Expect(rr.Code).ToNot(Equal(http.StatusOK))
+			})
+
+			It("preserves the directory search's original order under concurrent completion, dropping a middle ineligible user", func() {
+				identityBackend.On("GetUsers", mock.Anything, mock.Anything).Unset()
+				first := &libregraph.User{}
+				first.SetId(thirdUser)
+				second := &libregraph.User{}
+				second.SetId(eligibleUser)
+				third := &libregraph.User{}
+				third.SetId(otherUser)
+				// Deliberately not alphabetical/sorted, so that a concurrency bug that
+				// reorders results would be caught.
+				identityBackend.On("GetUsers", mock.Anything, mock.Anything).Return([]*libregraph.User{first, second, third}, nil)
+
+				expectRoles()
+
+				// Force the first user's lookup to finish last: it blocks on lastDone, which the
+				// last user's lookup closes only after it has already returned. Since SetLimit
+				// is 10, all three per-user goroutines run concurrently (the middle and last
+				// lookups aren't blocked waiting on the first), so this reliably makes completion
+				// order (third, second, first) the reverse of directory order (first, second,
+				// third) without any sleeps.
+				lastDone := make(chan struct{})
+				roleService.On("ListRoleAssignments", mock.Anything, mock.MatchedBy(
+					func(in *settings.ListRoleAssignmentsRequest) bool {
+						return in.GetAccountUuid() == thirdUser
+					}), mock.Anything).Run(func(mock.Arguments) {
+					<-lastDone
+				}).Return(&settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{
+					{Id: "assignment-1", AccountUuid: thirdUser, RoleId: vaultRole},
+				}}, nil)
+
+				// The middle user holds no vault-granting role, so it must be dropped from the
+				// result rather than just reordered.
+				expectAssignments(eligibleUser, []*settingsmsg.UserRoleAssignment{
+					{Id: "assignment-2", AccountUuid: eligibleUser, RoleId: vaultLessRole},
+				}, nil)
+
+				roleService.On("ListRoleAssignments", mock.Anything, mock.MatchedBy(
+					func(in *settings.ListRoleAssignmentsRequest) bool {
+						return in.GetAccountUuid() == otherUser
+					}), mock.Anything).Run(func(mock.Arguments) {
+					close(lastDone)
+				}).Return(&settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{
+					{Id: "assignment-3", AccountUuid: otherUser, RoleId: vaultRole},
+				}}, nil)
+
+				res := requestVaultEligibleUsers("vaultEligible eq true")
+				Expect(res.Value).To(HaveLen(2))
+				Expect(res.Value[0].GetId()).To(Equal(thirdUser))
+				Expect(res.Value[1].GetId()).To(Equal(otherUser))
 			})
 
 			DescribeTable("rejects everything but 'eq true'",
@@ -831,12 +931,10 @@ var _ = Describe("Users", func() {
 			// otherwise restricts unprivileged users to 'userType eq ...'.
 			It("is allowed for an unprivileged user", func() {
 				expectRoles()
-				roleService.On("ListRoleAssignmentsFiltered", mock.Anything, mock.Anything, mock.Anything).
-					Return(&settings.ListRoleAssignmentsResponse{
-						Assignments: []*settingsmsg.UserRoleAssignment{
-							{Id: "assignment-ID", AccountUuid: eligibleUser, RoleId: vaultRole},
-						},
-					}, nil)
+				expectAssignments(eligibleUser, []*settingsmsg.UserRoleAssignment{
+					{Id: "assignment-ID", AccountUuid: eligibleUser, RoleId: vaultRole},
+				}, nil)
+				expectAssignments(otherUser, nil, nil)
 				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Unset()
 				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).
 					Return(&settings.GetPermissionByIDResponse{}, nil)
