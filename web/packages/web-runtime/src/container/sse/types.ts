@@ -19,7 +19,8 @@ export const eventSchema = z.object({
   spaceid: z.string().optional(),
   initiatorid: z.string().optional(),
   etag: z.string().optional(),
-  affecteduserids: z.array(z.string()).optional().nullable()
+  affecteduserids: z.array(z.string()).optional().nullable(),
+  outcome: z.enum(['failed']).optional()
 })
 
 export type EventSchemaType = z.infer<typeof eventSchema>
