@@ -29,10 +29,11 @@
         <input
           class="vs__search"
           v-bind="attributes"
+          :aria-labelledby="undefined"
           role="combobox"
           :aria-expanded="dropdownOpen ? 'true' : 'false'"
           aria-haspopup="listbox"
-          :aria-controls="listboxId"
+          :aria-controls="attributes['aria-controls']"
           :aria-label="label"
           @input="userInput"
           v-on="events"
@@ -245,7 +246,6 @@ const emit = defineEmits<Emits>()
 const { $gettext } = useGettext()
 const select: VNodeRef = ref()
 const attrs = useAttrs()
-const listboxId = computed(() => `${id}-listbox`)
 
 const userInput = (event: Event) => {
   /**
