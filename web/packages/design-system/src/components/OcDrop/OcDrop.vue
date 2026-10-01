@@ -163,8 +163,20 @@ const hide = (duration?: number) => {
 }
 
 const onClick = () => {
-  if (closeOnClick) {
-    hide()
+  if (!closeOnClick) {
+    return
+  }
+  // hiding removes the focused item, which would drop focus to <body> and make
+  // screen readers re-read the page over any status message the action triggered
+  const hadFocus = unref(drop)?.contains(document.activeElement)
+  hide()
+  if (hadFocus) {
+    const trigger = unref(triggerEl) as (HTMLElement & { tooltip?: { hide: () => void } }) | null
+    trigger?.focus()
+    // tippy's default trigger includes "focus", so restoring focus here would
+    // otherwise pop the trigger's own tooltip (e.g. "Show context menu") right
+    // back open, covering the button it's anchored to
+    trigger?.tooltip?.hide()
   }
 }
 

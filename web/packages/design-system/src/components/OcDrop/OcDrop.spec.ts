@@ -97,4 +97,70 @@ describe('OcDrop', () => {
       expect(wrapper.element).toMatchSnapshot()
     })
   })
+
+  describe('focus on close via item click', () => {
+    const mountCloseOnClick = () => {
+      document.body.innerHTML = ''
+      const wrapper = mount(
+        {
+          template: `<div>
+            <button id="trigger">trigger</button>
+            <input id="elsewhere" />
+            <oc-drop toggle="#trigger" close-on-click>
+              <button id="item">item</button>
+              <button id="moves-focus" @click="moveFocus">moves focus</button>
+            </oc-drop>
+          </div>`,
+          components: { 'oc-drop': Drop },
+          methods: {
+            moveFocus() {
+              document.getElementById('elsewhere').focus()
+            }
+          }
+        },
+        { attachTo: document.body }
+      )
+      const open = async () => {
+        await wrapper.find('#trigger').trigger('click')
+        await new Promise((resolve) => setTimeout(resolve, 100))
+      }
+      return { wrapper, open }
+    }
+
+    it('returns focus to the trigger so it does not fall back to the page', async () => {
+      const { open } = mountCloseOnClick()
+      await open()
+      const item = document.getElementById('item')
+      item.focus()
+      item.click()
+
+      expect(document.activeElement).toBe(document.getElementById('trigger'))
+    })
+
+    it('keeps focus where the item handler moved it', async () => {
+      const { open } = mountCloseOnClick()
+      await open()
+      const item = document.getElementById('moves-focus')
+      item.focus()
+      item.click()
+
+      expect(document.activeElement).toBe(document.getElementById('elsewhere'))
+    })
+
+    it("hides the trigger's own tooltip instead of leaving it open when refocused", async () => {
+      const { open } = mountCloseOnClick()
+      await open()
+      const trigger = document.getElementById('trigger') as HTMLElement & {
+        tooltip?: { hide: () => void }
+      }
+      const hide = vi.fn()
+      trigger.tooltip = { hide }
+
+      const item = document.getElementById('item')
+      item.focus()
+      item.click()
+
+      expect(hide).toHaveBeenCalled()
+    })
+  })
 })
