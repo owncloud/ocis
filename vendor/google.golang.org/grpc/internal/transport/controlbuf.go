@@ -219,6 +219,17 @@ type outFlowControlSizeRequest struct {
 	resp chan uint32
 }
 
+// outStreamRequestForTesting is used by tests to retrieve a pointer to an outStream
+// safely inside the loopyWriter goroutine without racing on loopyWriter.estdStreams.
+// By holding the *outStream pointer while streams and transports close down, tests
+// can inspect settled accounting values (such as bytesOutStanding) after loopyWriter
+// has run to completion without any data races.
+type outStreamRequestForTesting struct {
+	throttledItem
+	streamID uint32
+	resp     chan *outStream
+}
+
 // closeConnection is an instruction to tell the loopy writer to flush the
 // framer and exit, which will cause the transport's connection to be closed
 // (by the client or server).  The transport itself will close after the reader
@@ -305,8 +316,9 @@ func (l *outStreamList) dequeue() *outStream {
 // shouldn't be confused with an HTTP2 frame, although some of the control
 // frames like dataFrame and headerFrame do go out on wire as HTTP2 frames.
 type controlBuffer struct {
-	wakeupCh chan struct{}   // Unblocks readers waiting for something to read.
-	done     <-chan struct{} // Closed when the transport is done.
+	wakeupCh         chan struct{}   // Unblocks readers waiting for something to read.
+	done             <-chan struct{} // Closed when the transport is done.
+	enableThrottling bool            // Indicates if throttling is enabled.
 
 	// Mutex guards all the fields below, except trfChan which can be read
 	// atomically without holding mu.
@@ -316,19 +328,21 @@ type controlBuffer struct {
 	list            *itemList // List of queued control frames.
 
 	// transportResponseFrames counts the number of queued items that represent
-	// the response of an action initiated by the peer.  trfChan is created
-	// when transportResponseFrames >= maxQueuedTransportResponseFrames and is
-	// closed and nilled when transportResponseFrames drops below the
-	// threshold.  Both fields are protected by mu.
+	// the response of an action initiated by the peer. When enableThrottling is
+	// true, trfChan is created when transportResponseFrames >=
+	// maxQueuedControlBufferItems and is closed and nilled when
+	// transportResponseFrames drops below the threshold. Both fields are
+	// protected by mu.
 	transportResponseFrames int
 	trfChan                 atomic.Pointer[chan struct{}]
 }
 
-func newControlBuffer(done <-chan struct{}) *controlBuffer {
+func newControlBuffer(done <-chan struct{}, enableThrottling bool) *controlBuffer {
 	return &controlBuffer{
-		wakeupCh: make(chan struct{}, 1),
-		list:     &itemList{},
-		done:     done,
+		wakeupCh:         make(chan struct{}, 1),
+		list:             &itemList{},
+		done:             done,
+		enableThrottling: enableThrottling,
 	}
 }
 
@@ -379,7 +393,7 @@ func (c *controlBuffer) executeAndPut(f func() bool, it cbItem) (bool, error) {
 		c.consumerWaiting = false
 	}
 	c.list.enqueue(it)
-	if it.isThrottled() {
+	if c.enableThrottling && it.isThrottled() {
 		c.transportResponseFrames++
 		if c.transportResponseFrames == maxQueuedControlBufferItems {
 			// We are adding the frame that puts us over the threshold; create
@@ -436,7 +450,7 @@ func (c *controlBuffer) getOnceLocked() (any, error) {
 		return nil, nil
 	}
 	h := c.list.dequeue().(cbItem)
-	if h.isThrottled() {
+	if c.enableThrottling && h.isThrottled() {
 		if c.transportResponseFrames == maxQueuedControlBufferItems {
 			// We are removing the frame that put us over the
 			// threshold; close and clear the throttling channel.
@@ -799,6 +813,10 @@ func (l *loopyWriter) outFlowControlSizeRequestHandler(o *outFlowControlSizeRequ
 	o.resp <- l.sendQuota
 }
 
+func (l *loopyWriter) outStreamRequestHandler(o *outStreamRequestForTesting) {
+	o.resp <- l.estdStreams[o.streamID]
+}
+
 func (l *loopyWriter) cleanupStreamHandler(c *cleanupStream) error {
 	c.onWrite()
 	if str, ok := l.estdStreams[c.streamID]; ok {
@@ -896,6 +914,8 @@ func (l *loopyWriter) handle(i any) error {
 		return l.goAwayHandler(i)
 	case *outFlowControlSizeRequest:
 		l.outFlowControlSizeRequestHandler(i)
+	case *outStreamRequestForTesting:
+		l.outStreamRequestHandler(i)
 	case closeConnection:
 		// Just return a non-I/O error and run() will flush and close the
 		// connection.
