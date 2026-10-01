@@ -22,13 +22,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand/v2"
 	"os"
 	"path"
 	"path/filepath"
 	"sync"
 	"time"
 
+	backoff "github.com/cenkalti/backoff/v5"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/owncloud/reva/v2/pkg/appctx"
@@ -37,6 +37,8 @@ import (
 	"github.com/owncloud/reva/v2/pkg/storage/utils/metadata"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
+	grpccodes "google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // name is the Tracer name used to identify this instrumentation library.
@@ -95,12 +97,12 @@ func (c *Cache) lockUser(userID string) func() {
 func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaboration.ReceivedShare) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
 	unlock := c.lockUser(userID)
-	span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))
+	span.End()
 	defer unlock()
 
 	if _, ok := c.ReceivedSpaces.Load(userID); !ok {
-		err := c.syncIfStale(ctx, userID)
+		err := c.syncWithRetry(ctx, userID)
 		if err != nil {
 			return err
 		}
@@ -139,11 +141,11 @@ func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaborati
 func (c *Cache) Get(ctx context.Context, userID, spaceID, shareID string) (*State, error) {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
 	unlock := c.lockUser(userID)
-	span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))
+	span.End()
 	defer unlock()
 
-	err := c.syncIfStale(ctx, userID)
+	err := c.syncWithRetry(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -158,8 +160,8 @@ func (c *Cache) Get(ctx context.Context, userID, spaceID, shareID string) (*Stat
 func (c *Cache) Remove(ctx context.Context, userID, spaceID, shareID string) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
 	unlock := c.lockUser(userID)
-	span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))
+	span.End()
 	defer unlock()
 
 	ctx, span = appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Remove")
@@ -200,7 +202,7 @@ func (c *Cache) List(ctx context.Context, userID string) (map[string]*Space, err
 	unlock := c.lockUser(userID)
 	defer unlock()
 
-	err := c.syncIfStale(ctx, userID)
+	err := c.syncWithRetry(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -226,7 +228,21 @@ func (c *Cache) List(ctx context.Context, userID string) (map[string]*Space, err
 func isSyncTransient(err error) bool {
 	_, isTooEarly := err.(errtypes.IsTooEarly)
 	_, isInternal := err.(errtypes.IsInternalError)
-	return isTooEarly || isInternal
+	return isTooEarly || isInternal || isTransientGRPCStatus(err)
+}
+
+// isTransientGRPCStatus catches raw gRPC transport errors that metadata.CS3 never wraps in errtypes.
+func isTransientGRPCStatus(err error) bool {
+	st, ok := status.FromError(err)
+	if !ok {
+		return false
+	}
+	switch st.Code() {
+	case grpccodes.Unavailable, grpccodes.DeadlineExceeded, grpccodes.Canceled, grpccodes.ResourceExhausted:
+		return true
+	default:
+		return false
+	}
 }
 
 func (c *Cache) retryPersist(ctx context.Context, userID, spaceID string, persistFunc func() error) error {
@@ -235,6 +251,102 @@ func (c *Cache) retryPersist(ctx context.Context, userID, spaceID string, persis
 		Str("userID", userID).
 		Str("spaceID", spaceID).Logger()
 
+	bo := backoff.NewExponentialBackOff()
+	bo.InitialInterval = 500 * time.Microsecond
+	bo.Multiplier = 2.0
+	bo.RandomizationFactor = 1.0
+	bo.MaxInterval = 50 * time.Millisecond
+
+	const maxPersistAttempts = 20
+	const maxIterations = 2 * maxPersistAttempts
+
+	var err error
+	needsResync := false
+	persistAttempts := 0
+	for iter := 0; iter < maxIterations && persistAttempts < maxPersistAttempts; iter++ {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+
+		if needsResync {
+			// a previous persist attempt failed and the re-read to pick up fresh state
+			// was itself transient; keep retrying the re-read instead of hammering
+			// persistFunc again with the same stale in-memory rss/etag
+			serr := c.sync(ctx, userID)
+			if serr == nil {
+				needsResync = false
+				continue // fresh state is in memory; retry persistFunc next attempt, no need to wait
+			}
+			// keep err at its last real (persist or resync) failure; never let a
+			// budget-exhausting resync success clobber it into a false nil return
+			err = serr
+			if !isSyncTransient(serr) {
+				log.Error().Int("attempt", iter).Err(serr).Msg("lost update: re-read failed, aborting")
+				return serr
+			}
+			log.Warn().Int("attempt", iter).Err(serr).Msg("lost update: re-read before retry")
+		} else {
+			persistAttempts++
+			err = persistFunc()
+			switch {
+			case err == nil:
+				return nil
+			case isTransientGRPCStatus(err):
+				log.Debug().Int("attempt", iter).Err(err).Msg("persist failed: transient gRPC error, retrying")
+			default:
+				switch err.(type) {
+				case errtypes.Aborted:
+					// expected when the if-match etag check fails; on some branches TooEarly also surfaces as Aborted
+					// continue with sync below
+					log.Debug().Int("attempt", iter).Msg("CAS failed: Aborted (etag changed or upload in progress), retrying")
+				case errtypes.PreconditionFailed:
+					// actually, this is the wrong status code and we treat it like errtypes.Aborted because of inconsistencies on the server side
+					// continue with sync below
+					log.Debug().Int("attempt", iter).Msg("CAS failed: PreconditionFailed (etag changed), retrying")
+				case errtypes.AlreadyExists:
+					// CS3 uses an already exists error instead of precondition failed when using an If-None-Match=* header / IfExists flag in the InitiateFileUpload call.
+					// Thas happens when the cache thinks there is no file.
+					// continue with sync below
+					log.Debug().Int("attempt", iter).Msg("CAS failed: AlreadyExists (file created concurrently), retrying")
+				case errtypes.TooEarly:
+					// storage-system has an upload in progress for this node; wait for it to finish
+					// continue with sync below
+					log.Debug().Int("attempt", iter).Msg("CAS failed: TooEarly (upload in progress), retrying")
+				case errtypes.InternalError:
+					// transient backend error (e.g. disk.go's flock contention under write fan-in);
+					// CAS conflicts no longer masquerade as this since storageprovider.go's Aborted/
+					// AlreadyExists mapping fix (b1a5804ec)
+					log.Debug().Int("attempt", iter).Err(err).Msg("persist failed: InternalError (transient), retrying")
+				default:
+					log.Error().Int("attempt", iter).Err(err).Msg("persisting received share failed, giving up")
+					return err
+				}
+			}
+			needsResync = true
+		}
+
+		timer := time.NewTimer(bo.NextBackOff())
+		select {
+		case <-timer.C:
+		case <-ctx.Done():
+			timer.Stop()
+			return ctx.Err()
+		}
+	}
+	return err
+}
+
+// syncWithRetry retries sync's cold-start read on transient errors, since
+// Add/Get/List call it directly with no other retry wrapper around it.
+func (c *Cache) syncWithRetry(ctx context.Context, userID string) error {
+	bo := backoff.NewExponentialBackOff()
+	bo.InitialInterval = 500 * time.Microsecond
+	bo.Multiplier = 2.0
+	bo.RandomizationFactor = 1.0
+	bo.MaxInterval = 50 * time.Millisecond
+
 	var err error
 	for attempt := 0; attempt < 20; attempt++ {
 		select {
@@ -242,52 +354,27 @@ func (c *Cache) retryPersist(ctx context.Context, userID, spaceID string, persis
 			return ctx.Err()
 		default:
 		}
-		err = persistFunc()
-		switch err.(type) {
-		case nil:
+		err = c.sync(ctx, userID)
+		if err == nil {
 			return nil
-		case errtypes.Aborted:
-			// this is the expected status code from the server when the if-match etag check fails
-			// continue with sync below
-			log.Debug().Int("attempt", attempt).Msg("CAS failed: Aborted (etag changed), retrying")
-		case errtypes.PreconditionFailed:
-			// actually, this is the wrong status code and we treat it like errtypes.Aborted because of inconsistencies on the server side
-			// continue with sync below
-			log.Debug().Int("attempt", attempt).Msg("CAS failed: PreconditionFailed (etag changed), retrying")
-		case errtypes.AlreadyExists:
-			// CS3 uses an already exists error instead of precondition failed when using an If-None-Match=* header / IfExists flag in the InitiateFileUpload call.
-			// Thas happens when the cache thinks there is no file.
-			// continue with sync below
-			log.Debug().Int("attempt", attempt).Msg("CAS failed: AlreadyExists (file created concurrently), retrying")
-		case errtypes.TooEarly:
-			// storage-system has an upload in progress for this node; wait for it to finish
-			// continue with sync below
-			log.Debug().Int("attempt", attempt).Msg("CAS failed: TooEarly (upload in progress), retrying")
-		default:
-			log.Error().Int("attempt", attempt).Err(err).Msg("persisting received share failed, giving up")
+		}
+		if !isSyncTransient(err) {
 			return err
 		}
-		timer := time.NewTimer(expBackoff(attempt))
+		timer := time.NewTimer(bo.NextBackOff())
 		select {
 		case <-timer.C:
 		case <-ctx.Done():
 			timer.Stop()
 			return ctx.Err()
 		}
-		if serr := c.syncIfStale(ctx, userID); serr != nil {
-			if !isSyncTransient(serr) {
-				log.Error().Int("attempt", attempt).Err(serr).Msg("lost update: re-read failed, aborting")
-				return serr
-			}
-			log.Warn().Int("attempt", attempt).Err(serr).Msg("lost update: re-read before retry")
-		}
 	}
 	return err
 }
 
-// syncIfStale pulls the authoritative state from storage when the local replica is stale; caller must hold the user lock.
-func (c *Cache) syncIfStale(ctx context.Context, userID string) error {
-	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "SyncIfStale")
+// sync pulls the authoritative state from storage; caller must hold the user lock.
+func (c *Cache) sync(ctx context.Context, userID string) error {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Sync")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))
 
@@ -308,9 +395,6 @@ func (c *Cache) syncIfStale(ctx context.Context, userID string) error {
 		span.AddEvent("updating local cache")
 	case errtypes.NotFound:
 		span.SetStatus(codes.Ok, "")
-		if err := c.persist(ctx, userID); err != nil {
-			log.Warn().Err(err).Msg("failed to create empty received share cache file")
-		}
 		return nil
 	case errtypes.NotModified:
 		span.SetStatus(codes.Ok, "")
@@ -384,17 +468,6 @@ func (c *Cache) persist(ctx context.Context, userID string) error {
 	rss.etag = res.Etag
 	span.SetStatus(codes.Ok, "")
 	return nil
-}
-
-// expBackoff returns full-jitter delay: rand(0, min(100ms, 2^attempt ms)).
-// attempt:  0    1    2    3    4    5    6    7+
-// max ms:   1    2    4    8   16   32   64  100
-func expBackoff(attempt int) time.Duration {
-	base := time.Duration(1<<uint(attempt)) * time.Millisecond
-	if base > 100*time.Millisecond {
-		base = 100 * time.Millisecond
-	}
-	return time.Duration(rand.Int64N(int64(base) + 1))
 }
 
 func userJSONPath(userID string) string {

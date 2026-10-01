@@ -523,6 +523,14 @@ func (m *manager) ListPublicShares(ctx context.Context, u *user.User, filters []
 			continue
 		}
 
+		if local.ResourceId == nil {
+			log.Warn().
+				Str("share_id", local.PublicShare.GetId().GetOpaqueId()).
+				Str("share_token", local.Token).
+				Msg("ListPublicShares: skipping share with nil resource_id")
+			continue
+		}
+
 		key := strings.Join([]string{local.ResourceId.StorageId, local.ResourceId.OpaqueId}, "!")
 		if _, hit := cache[key]; !hit && !publicshare.IsCreatedByUser(&local.PublicShare, u) {
 			sRes, err := client.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: local.ResourceId}})

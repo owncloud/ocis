@@ -30,7 +30,9 @@ import (
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/google/renameio/v2"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
+	"github.com/owncloud/reva/v2/pkg/storage/utils/filelocks"
 )
 
 // Disk represents a disk metadata storage
@@ -91,8 +93,22 @@ func (disk *Disk) SimpleUpload(ctx context.Context, uploadpath string, content [
 }
 
 // Upload stores a file on disk
-func (disk *Disk) Upload(_ context.Context, req UploadRequest) (*UploadResponse, error) {
+func (disk *Disk) Upload(_ context.Context, req UploadRequest) (res *UploadResponse, err error) {
 	p := disk.targetPath(req.Path)
+
+	// Serialize check+write across processes to eliminate the TOCTOU race.
+	lock, err := filelocks.AcquireWriteLock(p)
+	if err != nil {
+		// transient under high write fan-in; classify so callers retry instead of aborting
+		return nil, errtypes.InternalError(fmt.Sprintf("acquiring write lock: %s", err))
+	}
+	defer func() {
+		rerr := filelocks.ReleaseLock(lock)
+		if err == nil {
+			err = rerr
+		}
+	}()
+
 	if req.IfMatchEtag != "" {
 		info, err := os.Stat(p)
 		if err != nil && !errors.Is(err, os.ErrNotExist) {
@@ -107,6 +123,14 @@ func (disk *Disk) Upload(_ context.Context, req UploadRequest) (*UploadResponse,
 			}
 		}
 	}
+	for _, v := range req.IfNoneMatch {
+		if v == "*" {
+			if _, err := os.Stat(p); err == nil {
+				return nil, errtypes.AlreadyExists(p)
+			}
+			break
+		}
+	}
 	if req.IfUnmodifiedSince != (time.Time{}) {
 		info, err := os.Stat(p)
 		if err != nil && !errors.Is(err, os.ErrNotExist) {
@@ -117,8 +141,7 @@ func (disk *Disk) Upload(_ context.Context, req UploadRequest) (*UploadResponse,
 			}
 		}
 	}
-	err := os.WriteFile(p, req.Content, 0644)
-	if err != nil {
+	if err := renameio.WriteFile(p, req.Content, 0644); err != nil {
 		return nil, err
 	}
 
@@ -126,7 +149,7 @@ func (disk *Disk) Upload(_ context.Context, req UploadRequest) (*UploadResponse,
 	if err != nil {
 		return nil, err
 	}
-	res := &UploadResponse{}
+	res = &UploadResponse{}
 	res.Etag, err = calcEtag(info.ModTime(), info.Size())
 	if err != nil {
 		return nil, err
@@ -158,6 +181,12 @@ func (disk *Disk) Download(_ context.Context, req DownloadRequest) (*DownloadRes
 	res.Etag, err = calcEtag(info.ModTime(), info.Size())
 	if err != nil {
 		return nil, err
+	}
+
+	for _, etag := range req.IfNoneMatch {
+		if etag == res.Etag {
+			return nil, errtypes.NotModified(req.Path)
+		}
 	}
 
 	res.Content, err = io.ReadAll(f)

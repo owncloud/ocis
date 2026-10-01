@@ -127,10 +127,15 @@ func acquireLock(file string, write bool) (*flock.Flock, error) {
 	}
 
 	if !ok {
-		err = ErrAcquireLockFailed
+		// never actually acquired the OS-level lock; release the local
+		// bookkeeping entry too, or every future call for this path is
+		// permanently wedged regardless of whether the real lock clears
+		releaseMutexedFlock(n)
+		return nil, ErrAcquireLockFailed
 	}
 
 	if err != nil {
+		releaseMutexedFlock(n)
 		return nil, err
 	}
 	return flock, nil
