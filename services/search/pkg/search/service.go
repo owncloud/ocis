@@ -75,9 +75,18 @@ type Service struct {
 
 	serviceAccountID     string
 	serviceAccountSecret string
+
+	// maxConsecutiveFailures aborts an IndexSpace walk after this many
+	// consecutive extraction failures. 0 disables the abort.
+	maxConsecutiveFailures int
 }
 
 var errSkipSpace error
+
+// errResolveResourceInfo marks a file the walker listed but that cannot be
+// stat'ed or resolved by path afterwards (an inconsistent or stale node). It is
+// not an extractor failure and must not count towards the abort threshold.
+var errResolveResourceInfo = errors.New("could not resolve resource info")
 
 // NewService creates a new Provider instance.
 func NewService(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], eng engine.Engine, extractor content.Extractor, logger log.Logger, cfg *config.Config) *Service {
@@ -89,6 +98,8 @@ func NewService(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], eng e
 
 		serviceAccountID:     cfg.ServiceAccount.ServiceAccountID,
 		serviceAccountSecret: cfg.ServiceAccount.ServiceAccountSecret,
+
+		maxConsecutiveFailures: cfg.Extractor.MaxConsecutiveFailures,
 	}
 
 	return s
@@ -459,7 +470,6 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 const (
 	_extractionRetries    = 5               // max retry attempts per file
 	_extractionRetryDelay = 1 * time.Second // delay between retries
-	_consecutiveAbort     = 5               // abort walk after this many consecutive file failures
 )
 
 // IndexSpace (re)indexes all resources of a given space.
@@ -529,13 +539,23 @@ func (s *Service) IndexSpace(ctx context.Context, spaceID *provider.StorageSpace
 		}
 
 		if err := s.upsertItem(ownerCtx, ref, _extractionRetries); err != nil {
+			if errors.Is(err, errResolveResourceInfo) {
+				// The node is inconsistent (e.g. its name attribute no longer
+				// matches its directory entry). That says nothing about the
+				// extractor, so it must not push the walk towards aborting.
+				s.logger.Warn().Err(err).
+					Str("path", ref.GetPath()).
+					Msg("skipping resource that cannot be resolved")
+				return nil
+			}
+
 			failures++
 			s.logger.Warn().Err(err).
 				Int("failures", failures).
 				Str("path", ref.Path).
 				Msg("extraction failed after retries")
 
-			if failures >= _consecutiveAbort {
+			if s.maxConsecutiveFailures > 0 && failures >= s.maxConsecutiveFailures {
 				return fmt.Errorf("aborting index walk: %d consecutive extraction failures, last error: %w", failures, err)
 			}
 			return nil
@@ -574,7 +594,7 @@ func (s *Service) UpsertItem(ctx context.Context, ref *provider.Reference) {
 func (s *Service) upsertItem(ctx context.Context, ref *provider.Reference, retries int) error {
 	ctx2, stat, path := s.resInfo(ctx, ref)
 	if ctx2 == nil || stat == nil || path == "" {
-		return fmt.Errorf("could not resolve resource info for %s", ref.GetPath())
+		return fmt.Errorf("%w for %s", errResolveResourceInfo, ref.GetPath())
 	}
 
 	if slices.Contains(_skipPathNames, path) || slices.Contains(_skipPathDirs, path) {
