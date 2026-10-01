@@ -3,7 +3,7 @@ import {
   defaultComponentMocks,
   getComposableWrapper,
   RouteLocation
-} from '@ownclouders/web-test-helpers'
+} from '../../../../../src/testing'
 import { useFileActionsDuplicate } from '../../../../../src/composables/actions'
 import { mock } from 'vitest-mock-extended'
 import { unref } from 'vue'

@@ -1,6 +1,5 @@
-import { shallowMount } from '@ownclouders/web-test-helpers'
-
 import Table from './OcTableSimple.vue'
+import { shallowMount } from '../../testing'
 
 describe('OcTableSimple', () => {
   it('adds hover', () => {

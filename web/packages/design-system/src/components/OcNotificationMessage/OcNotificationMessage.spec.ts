@@ -1,6 +1,5 @@
 import OcNotificationMessage from './OcNotificationMessage.vue'
-import { defaultPlugins, mount } from '@ownclouders/web-test-helpers'
-
+import { defaultPlugins, mount } from '../../testing'
 describe('OcNotificationMessage', () => {
   beforeEach(() => {
     vi.useFakeTimers()

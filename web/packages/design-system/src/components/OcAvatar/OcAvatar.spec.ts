@@ -1,6 +1,6 @@
-import { PartialComponentProps, mount } from '@ownclouders/web-test-helpers'
 import OcAvatar from './OcAvatar.vue'
 import { extractInitials } from './extractInitials'
+import { PartialComponentProps, mount } from '../../testing'
 
 describe('extractInitials', () => {
   describe('should allow alphanumeric characters', () => {

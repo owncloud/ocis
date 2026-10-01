@@ -2,10 +2,10 @@ import { useFileActionsEmptyTrashBin } from '../../../../../src/composables/acti
 import { useMessages, useModals } from '../../../../../src/composables/piniaStores'
 import { mock } from 'vitest-mock-extended'
 import {
-  getComposableWrapper,
   defaultComponentMocks,
+  getComposableWrapper,
   RouteLocation
-} from '@ownclouders/web-test-helpers'
+} from '../../../../../src/testing'
 import { unref } from 'vue'
 import { ProjectSpaceResource, TrashResource } from '@ownclouders/web-client'
 import { FileActionOptions } from '../../../../../src/composables/actions'

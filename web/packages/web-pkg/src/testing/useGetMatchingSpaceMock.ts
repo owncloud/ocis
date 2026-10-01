@@ -1,5 +1,5 @@
 import { mock } from 'vitest-mock-extended'
-import { useGetMatchingSpace } from '@ownclouders/web-pkg'
+import { useGetMatchingSpace } from '../index'
 import { SpaceResource } from '@ownclouders/web-client'
 
 export const useGetMatchingSpaceMock = (
