@@ -7,15 +7,16 @@
 # Martin <github@diemattels.at>, 2026
 # Rocio Chen, 2026
 # 振东 刘, 2026
+# DWXXX, 2026
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-07-31 03:12+0000\n"
+"POT-Creation-Date: 2026-09-19 02:25+0000\n"
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
-"Last-Translator: 振东 刘, 2026\n"
+"Last-Translator: DWXXX, 2026\n"
 "Language-Team: Chinese (Taiwan) (https://app.transifex.com/owncloud-org/teams/6149/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -46,7 +47,7 @@ msgstr "文件被拒绝"
 #. translation for the 'instant' email interval option
 #: pkg/store/defaults/templates.go:48
 msgid "Instant"
-msgstr ""
+msgstr "立刻"
 
 #. translation for the 'never' email interval option
 #: pkg/store/defaults/templates.go:54
@@ -108,7 +109,7 @@ msgstr "被移除空间成员身份"
 #. description of the notification option 'Email Interval'
 #: pkg/store/defaults/templates.go:46
 msgid "Selected value:"
-msgstr ""
+msgstr "选择数值："
 
 #. name of the notification option 'Share Expired'
 #: pkg/store/defaults/templates.go:16
