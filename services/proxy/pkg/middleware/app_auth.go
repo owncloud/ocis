@@ -1,12 +1,15 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 )
@@ -15,6 +18,8 @@ import (
 type AppAuthAuthenticator struct {
 	Logger              log.Logger
 	RevaGatewaySelector pool.Selectable[gateway.GatewayAPIClient]
+	RoleManager         roles.Manager
+	RoleAssignment      config.RoleAssignment
 }
 
 // Authenticate implements the authenticator interface to authenticate requests via app auth.
@@ -52,13 +57,40 @@ func (m AppAuthAuthenticator) Authenticate(r *http.Request) (*http.Request, erro
 
 	user := authenticateResponse.GetUser()
 	// fake oidc claims for the account resolver
+	roleClaimValues, err := m.findCurrentUserRolesAsClaims(r.Context(), user.GetId().GetOpaqueId())
+	if err != nil {
+		return nil, ErrAuthenticationFailed
+	}
+
+	roleClaim := m.RoleAssignment.OIDCRoleMapper.RoleClaim
 	claims := map[string]interface{}{
 		oidc.Iss:               user.GetId().GetIdp(),
 		oidc.PreferredUsername: user.GetUsername(),
 		oidc.Email:             user.GetMail(),
 		oidc.OwncloudUUID:      user.GetId().GetOpaqueId(),
+		oidc.Name:              user.GetDisplayName(),
+		roleClaim:              roleClaimValues,
 	}
 	r = r.WithContext(oidc.NewContext(r.Context(), claims))
 
 	return r, nil
+}
+
+func (m AppAuthAuthenticator) findCurrentUserRolesAsClaims(ctx context.Context, userID string) ([]string, error) {
+	roleIDs, err := m.RoleManager.FindRoleIDsForUser(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	roles := m.RoleManager.List(ctx, roleIDs)
+	claimRoles := make([]string, 0, len(roles)) // append in case role isn't mapped
+	for _, role := range roles {
+		roleName := role.Name
+		for _, item := range m.RoleAssignment.OIDCRoleMapper.RolesMap {
+			if item.RoleName == roleName {
+				claimRoles = append(claimRoles, item.ClaimValue)
+			}
+		}
+	}
+	return claimRoles, nil
 }
