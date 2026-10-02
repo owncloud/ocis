@@ -74,6 +74,7 @@ func ListenForEvents(ctx context.Context, cfg *config.Config, l log.Logger) erro
 	grpcClient, err := grpc.NewClient(
 		append(
 			grpc.GetClientOptions(cfg.GRPCClientTLS),
+			grpc.WithKeepaliveParams(cfg.GRPCClientOptions),
 			grpc.WithTraceProvider(traceProvider),
 		)...,
 	)

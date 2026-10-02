@@ -21,17 +21,18 @@ type Config struct {
 	Timeout         int64  `mapstructure:"timeout"`
 	Insecure        bool   `mapstructure:"insecure"`
 	// If true, HTTP COPY will expect the HTTP-TPC (third-party copy) headers
-	EnableHTTPTpc               bool                              `mapstructure:"enable_http_tpc"`
-	PublicURL                   string                            `mapstructure:"public_url"`
-	FavoriteStorageDriver       string                            `mapstructure:"favorite_storage_driver"`
-	FavoriteStorageDrivers      map[string]map[string]interface{} `mapstructure:"favorite_storage_drivers"`
-	Version                     string                            `mapstructure:"version"`
-	VersionString               string                            `mapstructure:"version_string"`
-	Edition                     string                            `mapstructure:"edition"`
-	Product                     string                            `mapstructure:"product"`
-	ProductName                 string                            `mapstructure:"product_name"`
-	ProductVersion              string                            `mapstructure:"product_version"`
-	AllowPropfindDepthInfinitiy bool                              `mapstructure:"allow_depth_infinity"`
+	EnableHTTPTpc                       bool                              `mapstructure:"enable_http_tpc"`
+	PublicURL                           string                            `mapstructure:"public_url"`
+	FavoriteStorageDriver               string                            `mapstructure:"favorite_storage_driver"`
+	FavoriteStorageDrivers              map[string]map[string]interface{} `mapstructure:"favorite_storage_drivers"`
+	Version                             string                            `mapstructure:"version"`
+	VersionString                       string                            `mapstructure:"version_string"`
+	Edition                             string                            `mapstructure:"edition"`
+	Product                             string                            `mapstructure:"product"`
+	ProductName                         string                            `mapstructure:"product_name"`
+	ProductVersion                      string                            `mapstructure:"product_version"`
+	AllowPropfindDepthInfinitiy         bool                              `mapstructure:"allow_depth_infinity"`
+	DisablePropfindPublicLinkResolution bool                              `mapstructure:"disable_propfind_public_link_resolution"`
 
 	TransferSharedSecret string `mapstructure:"transfer_shared_secret"`
 

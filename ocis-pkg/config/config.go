@@ -61,13 +61,14 @@ type Runtime struct {
 type Config struct {
 	*shared.Commons `yaml:"shared"`
 
-	Tracing        *shared.Tracing        `yaml:"tracing"`
-	Log            *shared.Log            `yaml:"log"`
-	Cache          *shared.Cache          `yaml:"cache"`
-	GRPCClientTLS  *shared.GRPCClientTLS  `yaml:"grpc_client_tls"`
-	GRPCServiceTLS *shared.GRPCServiceTLS `yaml:"grpc_service_tls"`
-	HTTPServiceTLS shared.HTTPServiceTLS  `yaml:"http_service_tls"`
-	Reva           *shared.Reva           `yaml:"reva"`
+	Tracing           *shared.Tracing           `yaml:"tracing"`
+	Log               *shared.Log               `yaml:"log"`
+	Cache             *shared.Cache             `yaml:"cache"`
+	GRPCClientTLS     *shared.GRPCClientTLS     `yaml:"grpc_client_tls"`
+	GRPCClientOptions *shared.GRPCClientOptions `yaml:"grpc_client_options"`
+	GRPCServiceTLS    *shared.GRPCServiceTLS    `yaml:"grpc_service_tls"`
+	HTTPServiceTLS    shared.HTTPServiceTLS     `yaml:"http_service_tls"`
+	Reva              *shared.Reva              `yaml:"reva"`
 
 	Mode    Mode // DEPRECATED
 	File    string

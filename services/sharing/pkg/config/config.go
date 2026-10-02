@@ -27,7 +27,8 @@ type Config struct {
 	PublicSharingDrivers           PublicSharingDrivers `yaml:"public_sharing_drivers"`
 	WriteableShareMustHavePassword bool                 `yaml:"public_sharing_writeableshare_must_have_password" env:"OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD;SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares." introductionVersion:"5.0"`
 	PublicShareMustHavePassword    bool                 `yaml:"public_sharing_share_must_have_password" env:"OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD;SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords on all public shares." introductionVersion:"5.0"`
-	EnableExpiredSharesCleanup     bool                 `yaml:"enable_expired_shares_cleanup"`
+	EnableExpiredSharesCleanup     bool                 `yaml:"enable_expired_shares_cleanup" env:"OCIS_SHARING_ENABLE_EXPIRED_SHARES_CLEANUP;SHARING_ENABLE_EXPIRED_SHARES_CLEANUP" desc:"Enable the periodic removal of expired public shares. When disabled, expired shares are still hidden from listings but never actually deleted." introductionVersion:"8.3.0"`
+	JanitorRunInterval             int                  `yaml:"janitor_run_interval" env:"OCIS_SHARING_JANITOR_RUN_INTERVAL;SHARING_JANITOR_RUN_INTERVAL" desc:"Interval in seconds between two runs of the janitor that permanently deletes expired public shares. Defaults to '3600' (1 hour). Only relevant when OCIS_SHARING_ENABLE_EXPIRED_SHARES_CLEANUP is enabled." introductionVersion:"8.3.0"`
 	PasswordPolicy                 PasswordPolicy       `yaml:"password_policy"`
 
 	Context context.Context `yaml:"-"`
