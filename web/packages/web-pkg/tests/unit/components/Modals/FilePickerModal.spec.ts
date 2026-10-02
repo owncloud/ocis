@@ -1,5 +1,5 @@
 import FilePickerModal from '../../../../src/components/Modals/FilePickerModal.vue'
-import { defaultComponentMocks, defaultPlugins, shallowMount } from '@ownclouders/web-test-helpers'
+import { defaultComponentMocks, defaultPlugins, shallowMount } from '../../../../src/testing'
 import { mock } from 'vitest-mock-extended'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 import { Modal, useModals } from '../../../../src/composables/piniaStores'

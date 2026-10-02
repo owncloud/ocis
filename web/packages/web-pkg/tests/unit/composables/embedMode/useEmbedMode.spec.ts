@@ -1,5 +1,5 @@
 import { useEmbedMode } from '../../../../src/composables/embedMode'
-import { defaultComponentMocks, getComposableWrapper } from '@ownclouders/web-test-helpers'
+import { defaultComponentMocks, getComposableWrapper } from '../../../../src/testing'
 import { unref } from 'vue'
 
 describe('useEmbedMode', () => {

@@ -30,7 +30,8 @@ describe('Resource Upload Component', () => {
     it('should call "triggerUpload"', async () => {
       const { wrapper } = getWrapper()
 
-      const spyTriggerUpload = vi.spyOn(wrapper.vm, 'triggerUpload')
+      // triggerUpload is a <script setup> binding, not part of the public instance type
+      const spyTriggerUpload = vi.spyOn(wrapper.vm as any, 'triggerUpload')
       const uploadButton = wrapper.find('button')
       const fileUploadInput = wrapper.find('#files-file-upload-input')
 

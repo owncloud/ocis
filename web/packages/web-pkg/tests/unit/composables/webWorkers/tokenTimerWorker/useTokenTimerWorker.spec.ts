@@ -1,5 +1,4 @@
 import { unref } from 'vue'
-import { getComposableWrapper } from '@ownclouders/web-test-helpers'
 import { mock } from 'vitest-mock-extended'
 import {
   AuthServiceInterface,
@@ -8,6 +7,7 @@ import {
   useTokenTimerWorker,
   useWebWorkersStore
 } from '../../../../../src/composables'
+import { getComposableWrapper } from '../../../../../src/testing'
 
 describe('useTokenTimerWorker', () => {
   describe('method "startWorker"', () => {
