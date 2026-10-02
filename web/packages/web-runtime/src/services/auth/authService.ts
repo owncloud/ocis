@@ -27,11 +27,19 @@ import { Language } from 'vue3-gettext'
 import { PublicLinkType } from '@ownclouders/web-client'
 import { WebWorkersStore } from '@ownclouders/web-pkg'
 import { isSilentRedirectRoute } from '../../helpers/silentRedirect'
-import { vaultStepUpAttemptKey, vaultStepUpFailedKey } from '../../helpers/vaultStepUp'
+import { vaultStepUpFailedKey } from '../../helpers/vaultStepUp'
 
-export { vaultStepUpAttemptKey, vaultStepUpFailedKey }
-// An attempt older than this is treated as abandoned (e.g. the user left the IdP page).
-const vaultStepUpAttemptTtlMs = 5 * 60 * 1000
+/**
+ * Custom OIDC state sent with an MFA step-up request. oidc-client-ts stores it with the
+ * request and returns it from the sign-in callback, so a step-up is only treated as answered
+ * when the IdP actually redirected back for it.
+ */
+interface MfaStepUpState {
+  mfaStepUpTarget: string
+}
+
+const isMfaStepUpState = (state: unknown): state is MfaStepUpState =>
+  typeof (state as MfaStepUpState)?.mfaStepUpTarget === 'string'
 
 export class AuthService implements AuthServiceInterface {
   private clientService: ClientService
@@ -56,6 +64,11 @@ export class AuthService implements AuthServiceInterface {
 
   // number of seconds before an access token is to expire to raise the accessTokenExpiring event
   private accessTokenExpiryThreshold = 10
+
+  // Target of an MFA step-up the IdP just answered (set in `signInCallback`) ...
+  private pendingStepUpReturnTarget: string | null = null
+  // ... and moved here for exactly the navigation that follows the callback.
+  private stepUpReturnTarget: string | null = null
 
   public hasAuthErrorOccurred: boolean
 
@@ -94,6 +107,10 @@ export class AuthService implements AuthServiceInterface {
    * @param to {Route}
    */
   public async initializeContext(to: RouteLocation): Promise<RouteLocationRaw | false | void> {
+    // A step-up answer is only valid for the navigation right after the callback.
+    this.stepUpReturnTarget = this.pendingStepUpReturnTarget
+    this.pendingStepUpReturnTarget = null
+
     this.showPendingVaultStepUpFailure()
 
     if (!this.publicLinkManager) {
@@ -170,8 +187,8 @@ export class AuthService implements AuthServiceInterface {
       if (!user || user.expired || user.profile.acr !== requiredAcr) {
         // `acr_values` is a voluntary claim: an IdP that can't reach the required level
         // (no second factor available/enrolled) returns a lower `acr` instead of an error.
-        // Redirecting again would loop forever, so give up after one attempt per navigation.
-        if (user && !user.expired && this.consumeVaultStepUpAttempt()) {
+        // Redirecting again would loop forever, so give up once the IdP answered the step-up.
+        if (user && !user.expired && this.isStepUpReturn(to.fullPath)) {
           console.warn(
             `[authService:initializeContext] - MFA step-up returned acr "${user.profile.acr}", required "${requiredAcr}". Not retrying.`
           )
@@ -180,14 +197,11 @@ export class AuthService implements AuthServiceInterface {
           return false
         }
 
-        this.markVaultStepUpAttempt()
         this.userManager.setPostLoginRedirectUrl(to.fullPath)
-        await this.userManager.signinRedirect({ acr_values: requiredAcr })
+        await this.signinRedirectForStepUp(requiredAcr, to.fullPath)
         // redirecting to the IdP, don't establish the user context below
         return
       }
-
-      this.clearVaultStepUpAttempt()
     }
 
     if (isPublicLinkContextRequired(this.router, to)) {
@@ -331,7 +345,12 @@ export class AuthService implements AuthServiceInterface {
         console.debug('[authService:signInCallback] - adding listener to update-token event')
         window.addEventListener('message', this.handleDelegatedTokenUpdate)
       } else {
-        await this.userManager.signinRedirectCallback(this.buildSignInCallbackUrl())
+        const callbackUser = await this.userManager.signinRedirectCallback(
+          this.buildSignInCallbackUrl()
+        )
+        if (isMfaStepUpState(callbackUser?.state)) {
+          this.pendingStepUpReturnTarget = callbackUser.state.mfaStepUpTarget
+        }
       }
 
       const user = await this.userManager.getUser()
@@ -487,34 +506,16 @@ export class AuthService implements AuthServiceInterface {
     return this.userManager.signinRedirect({ acr_values: acrValue })
   }
 
-  private markVaultStepUpAttempt() {
-    try {
-      sessionStorage.setItem(vaultStepUpAttemptKey, Date.now().toString())
-    } catch (e) {
-      console.error('failed to persist vault MFA step-up attempt:', e)
-    }
+  private signinRedirectForStepUp(acrValue: string, target: string) {
+    const state: MfaStepUpState = { mfaStepUpTarget: target }
+    return this.userManager.signinRedirect({ acr_values: acrValue, state })
   }
 
   /**
-   * Returns true if a recent step-up attempt is pending, and clears it.
+   * Whether the current navigation is the one right after the IdP answered a step-up for `target`.
    */
-  private consumeVaultStepUpAttempt(): boolean {
-    let startedAt: number
-    try {
-      startedAt = parseInt(sessionStorage.getItem(vaultStepUpAttemptKey), 10)
-      sessionStorage.removeItem(vaultStepUpAttemptKey)
-    } catch {
-      return false
-    }
-    return !Number.isNaN(startedAt) && Date.now() - startedAt < vaultStepUpAttemptTtlMs
-  }
-
-  private clearVaultStepUpAttempt() {
-    try {
-      sessionStorage.removeItem(vaultStepUpAttemptKey)
-    } catch {
-      // storage unavailable, nothing to clear
-    }
+  private isStepUpReturn(target: string): boolean {
+    return this.stepUpReturnTarget !== null && this.stepUpReturnTarget === target
   }
 
   /**
