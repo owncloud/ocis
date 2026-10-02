@@ -64,7 +64,11 @@ func NewTranslatorFromCommonConfig(defaultLocale string, domain string, path str
 
 // Translate translates a string to the locale
 func (t Translator) Translate(str, locale string) string {
-	return t.Locale(locale).Get(str)
+	// str is a translation lookup key, not a printf format string; go vet's
+	// non-constant format string check can't trace through a func value, so
+	// assign Get to a local before calling it to avoid a false positive.
+	get := t.Locale(locale).Get
+	return get(str)
 }
 
 // Locale returns the gotext.Locale, use `.Get` method to translate strings
