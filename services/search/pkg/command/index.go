@@ -17,7 +17,12 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/config/parser"
 )
 
-// Index is the entrypoint for the server command.
+// _noTimeout stands in for "no limit" when --timeout is 0: go-micro treats a
+// zero RequestTimeout as an immediately expired deadline, so a far-off one is
+// used instead.
+const _noTimeout = 100 * 365 * 24 * time.Hour
+
+// Index is the entrypoint for the index command.
 func Index(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "index",
@@ -33,6 +38,11 @@ func Index(cfg *config.Config) *cli.Command {
 			&cli.BoolFlag{
 				Name:  "all-spaces",
 				Usage: "index all spaces instead. This or --space is required.",
+			},
+			&cli.DurationFlag{
+				Name:  "timeout",
+				Usage: "how long to wait for the indexing to finish before giving up, e.g. 2h. The walk is cancelled when the timeout expires. 0 waits indefinitely.",
+				Value: 10 * time.Minute,
 			},
 		},
 		Before: func(_ *cli.Context) error {
@@ -56,10 +66,18 @@ func Index(cfg *config.Config) *cli.Command {
 				return err
 			}
 
+			// The service walks the whole space inside this request, so the
+			// request timeout bounds the walk: when it expires the walk is
+			// cancelled and everything after that point stays unindexed.
+			timeout := ctx.Duration("timeout")
+			if timeout <= 0 {
+				timeout = _noTimeout
+			}
+
 			c := searchsvc.NewSearchProviderService("com.owncloud.api.search", grpcClient)
 			_, err = c.IndexSpace(context.Background(), &searchsvc.IndexSpaceRequest{
 				SpaceId: ctx.String("space"),
-			}, func(opts *client.CallOptions) { opts.RequestTimeout = 10 * time.Minute })
+			}, func(opts *client.CallOptions) { opts.RequestTimeout = timeout })
 			if err != nil {
 				fmt.Println("failed to index space: " + err.Error())
 				return err
