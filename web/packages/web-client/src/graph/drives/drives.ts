@@ -34,7 +34,9 @@ export const DrivesFactory = ({ axiosClient, config }: GraphFactoryOptions): Gra
       await drivesApiFactory.deleteDriveBeta(id, ifMatch, {
         headers: {
           ...((requestOptions?.headers && requestOptions.headers) || {}),
-          Purge: 'T'
+          // axios >=1.20.0 strips a header literally named "purge" (reserved
+          // internal bucket name); server also accepts this X- alias.
+          'X-Purge': 'T'
         },
         ...((requestOptions && { requestOptions }) || {})
       })

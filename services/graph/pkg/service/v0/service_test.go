@@ -27,4 +27,11 @@ func TestParsePurgeHeader(t *testing.T) {
 	if h := make(http.Header); parsePurgeHeader(h) {
 		t.Error("parsePurgeHeader without Purge header set got true expected false")
 	}
+
+	// X-Purge alias (see HeaderPurgeX) must work the same as Purge.
+	hx := make(http.Header)
+	hx.Add(HeaderPurgeX, "T")
+	if !parsePurgeHeader(hx) {
+		t.Error("parsePurgeHeader with X-Purge header set got false expected true")
+	}
 }

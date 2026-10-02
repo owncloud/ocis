@@ -4,13 +4,3 @@
 
 CVE-2026-32284  # github.com/shamaton/msgpack/v2 v2.4.0 — no fix available upstream
 vendor/github.com/crewjam/saml/xmlenc/fuzz.go  # test RSA key used in fuzz corpus, not a real secret
-
-# DIAGNOSTIC ONLY: testing whether axios 1.20.0 causes the e2e-part-4 regression on PR #13049.
-# axios pinned back to 1.18.1 below. To be reverted once the test completes.
-CVE-2026-101898
-CVE-2026-101901
-CVE-2026-101903
-CVE-2026-101905
-CVE-2026-101906
-CVE-2026-101907
-CVE-2026-101909

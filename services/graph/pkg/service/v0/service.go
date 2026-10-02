@@ -33,7 +33,10 @@ import (
 
 const (
 	// HeaderPurge defines the header name for the purge header.
-	HeaderPurge     = "Purge"
+	HeaderPurge = "Purge"
+	// HeaderPurgeX: axios >=1.20.0 strips any header named "purge" (reserved
+	// internal bucket name); clients on that version must send this instead.
+	HeaderPurgeX    = "X-Purge"
 	displayNameAttr = "displayName"
 
 	// Rate limit per exportPersonalDataWindow endpoint path carries the userID, so effectively per user.
@@ -575,11 +578,15 @@ func (g *Graph) StartListenForLogonEvents(ctx context.Context, l log.Logger) err
 	return nil
 }
 
-// parseHeaderPurge parses the 'Purge' header.
+// parseHeaderPurge parses the 'Purge' header, falling back to its 'X-Purge'
+// alias (see HeaderPurgeX) if 'Purge' is absent.
 // '1', 't', 'T', 'TRUE', 'true', 'True' are parsed as true
 // all other values are false.
 func parsePurgeHeader(h http.Header) bool {
 	val := h.Get(HeaderPurge)
+	if val == "" {
+		val = h.Get(HeaderPurgeX)
+	}
 
 	if b, err := strconv.ParseBool(val); err == nil {
 		return b
