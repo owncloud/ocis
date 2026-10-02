@@ -1,17 +1,22 @@
 package middleware
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"regexp"
 	"strings"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/webdav"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
+
+// ErrAuthenticationFailed maps to an HTTP 401 challenge.
+var ErrAuthenticationFailed = errors.New("authentication failed")
 
 var (
 	// SupportedAuthStrategies stores configured challenges.
@@ -42,10 +47,10 @@ const (
 
 // Authenticator is the common interface implemented by all request authenticators.
 type Authenticator interface {
-	// Authenticate is used to authenticate incoming HTTP requests.
-	// The Authenticator may augment the request with user info or anything related to the
-	// authentication and return the augmented request.
-	Authenticate(*http.Request) (*http.Request, bool)
+	// Authenticate authenticates incoming HTTP requests, returning the augmented request.
+	// nil error means authenticated; ErrAuthenticationFailed (or an unhandled request) maps
+	// to 401; an error wrapping oidc.ErrTemporarilyUnavailable maps to a retryable 503.
+	Authenticate(*http.Request) (*http.Request, error)
 }
 
 // Authentication is a higher order authentication middleware.
@@ -65,12 +70,24 @@ func Authentication(auths []Authenticator, opts ...Option) func(next http.Handle
 				return
 			}
 
+			var temporarilyUnavailable bool
 			for _, a := range auths {
-				if req, ok := a.Authenticate(r); ok {
+				req, err := a.Authenticate(r)
+				if err == nil {
 					next.ServeHTTP(w, req)
 					return
 				}
+				if errors.Is(err, oidc.ErrTemporarilyUnavailable) {
+					temporarilyUnavailable = true
+				}
 			}
+
+			if temporarilyUnavailable {
+				w.Header().Set("Retry-After", "3")
+				w.WriteHeader(http.StatusServiceUnavailable)
+				return
+			}
+
 			if !isPublicPath(r.URL.Path) {
 				// Failed basic authentication attempts receive the Www-Authenticate header in the response
 				var touch bool
