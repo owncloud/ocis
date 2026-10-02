@@ -170,6 +170,8 @@ ocis search index --all-spaces
 
 Note that either `--space $SPACE_ID` or `--all-spaces` must be set.
 
+The command waits for the service to walk the space and gives up after 10 minutes by default. The walk is cancelled when that happens, so a large space, or one where the content extractor is slow on a few files, may need a longer limit: `--timeout 2h` (a Go duration; `0` waits indefinitely).
+
 ## Notes
 
 The indexing process tries to be self-healing in some situations.
