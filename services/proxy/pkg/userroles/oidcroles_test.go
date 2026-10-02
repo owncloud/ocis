@@ -3,6 +3,8 @@ package userroles
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -269,4 +271,366 @@ func TestUpdateUserRoleAssignmentFailsClosedOnInconclusivePermission(t *testing.
 	roleService.AssertCalled(t, "AssignRoleToUser", mock.Anything, mock.MatchedBy(func(req *settingssvc.AssignRoleToUserRequest) bool {
 		return req.GetRoleId() == oldRoleID
 	}), mock.Anything)
+}
+
+// newRoleAssignerFixture builds an oidcRoleAssigner whose settings service knows the
+// roles in knownRoles and reports the user as already holding assignedRoleID. Holding
+// the role the assigner is about to pick short-circuits the re-assignment branch, which
+// keeps these tests on the claim-to-role resolution they are about rather than on the
+// personal-space reconciliation that follows it.
+func newRoleAssignerFixture(t *testing.T, opts Options, knownRoles map[string]string, assignedRoleID string) oidcRoleAssigner {
+	t.Helper()
+
+	// the role-name cache is a package global with a 5 minute TTL; reset it so tests
+	// cannot leak role maps into one another
+	roleNameToID.lock.Lock()
+	roleNameToID.roleNameToID = nil
+	roleNameToID.lastRead = time.Time{}
+	roleNameToID.lock.Unlock()
+
+	gatewayClient := &cs3mocks.GatewayAPIClient{}
+	selectorName := "GatewaySelector" + t.Name()
+	gatewaySelector := pool.GetSelector[gateway.GatewayAPIClient](
+		selectorName,
+		"com.owncloud.api.gateway",
+		func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
+			return gatewayClient
+		},
+	)
+	t.Cleanup(func() { pool.RemoveSelector(selectorName + "com.owncloud.api.gateway") })
+
+	gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{
+		Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+		Token:  "service-token",
+	}, nil)
+	// Only reached when the resolved role differs from the assigned one and the
+	// assignment is therefore rewritten. Tests that keep the role unchanged never
+	// call these.
+	gatewayClient.On("CheckPermission", mock.Anything, mock.Anything).Return(&permissions.CheckPermissionResponse{
+		Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+	}, nil)
+	gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
+		Status:        &rpc.Status{Code: rpc.Code_CODE_OK},
+		StorageSpaces: []*storageprovider.StorageSpace{{Id: &storageprovider.StorageSpaceId{OpaqueId: "personal-space-id"}}},
+	}, nil)
+
+	bundles := make([]*settingsmsg.Bundle, 0, len(knownRoles))
+	for name, id := range knownRoles {
+		bundles = append(bundles, &settingsmsg.Bundle{Id: id, Name: name})
+	}
+	roleService := &graphmocks.RoleService{}
+	roleService.On("ListRoles", mock.Anything, mock.Anything, mock.Anything).Return(
+		&settingssvc.ListBundlesResponse{Bundles: bundles}, nil)
+	roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(
+		&settingssvc.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{
+			{Id: "assignment-id", AccountUuid: "user-1", RoleId: assignedRoleID},
+		}}, nil)
+	// Mocked so that an unexpected re-assignment shows up as a failed assertion rather
+	// than as a panic in an unrelated place.
+	roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(
+		&settingssvc.AssignRoleToUserResponse{Assignment: &settingsmsg.UserRoleAssignment{
+			Id: "assignment-id", AccountUuid: "user-1", RoleId: assignedRoleID,
+		}}, nil)
+
+	opts.logger = log.NopLogger()
+	opts.gatewaySelector = gatewaySelector
+	opts.roleService = roleService
+	opts.serviceAccount = config.ServiceAccount{ServiceAccountID: "service-account", ServiceAccountSecret: "secret"}
+	return oidcRoleAssigner{Options: opts}
+}
+
+func assignedRoleFromOpaque(t *testing.T, user *cs3user.User) []string {
+	t.Helper()
+	entry := user.GetOpaque().GetMap()["roles"]
+	if entry == nil {
+		t.Fatal("the user's opaque data carries no roles entry")
+	}
+	var got []string
+	if err := json.Unmarshal(entry.GetValue(), &got); err != nil {
+		t.Fatalf("could not decode the roles opaque entry: %v", err)
+	}
+	return got
+}
+
+// TestUpdateUserRoleAssignmentFallsBackToDefaultRoleOnUnmatchedClaim covers the case the
+// issue names directly: the claim is present but its value matches no role mapping.
+func TestUpdateUserRoleAssignmentFallsBackToDefaultRoleOnUnmatchedClaim(t *testing.T) {
+	const defaultRoleID = "user-light-id"
+
+	ra := newRoleAssignerFixture(t,
+		Options{
+			rolesClaim:  "roles",
+			roleMapping: []config.RoleMapping{{RoleName: "admin", ClaimValue: "ocisAdmin"}},
+			defaultRole: "user-light",
+		},
+		map[string]string{"admin": "admin-id", "user-light": defaultRoleID},
+		defaultRoleID,
+	)
+
+	user := &cs3user.User{Id: &cs3user.UserId{OpaqueId: "user-1"}}
+	got, err := ra.UpdateUserRoleAssignment(context.Background(), user, map[string]interface{}{"roles": "somethingElse"}, "")
+	if err != nil {
+		t.Fatalf("expected the default role to be applied, got error: %v", err)
+	}
+	if roles := assignedRoleFromOpaque(t, got); len(roles) != 1 || roles[0] != defaultRoleID {
+		t.Fatalf("expected the default role id %q, got %v", defaultRoleID, roles)
+	}
+}
+
+// TestUpdateUserRoleAssignmentFallsBackToDefaultRoleWithoutAnyClaim is the case that
+// actually reproduces the reported bug. Users federated into the IDP from an external
+// directory have no role claim at all, so extractRoles fails outright - a fallback that
+// only covered "claim present but unmatched" would not fix the report.
+func TestUpdateUserRoleAssignmentFallsBackToDefaultRoleWithoutAnyClaim(t *testing.T) {
+	const defaultRoleID = "user-light-id"
+
+	ra := newRoleAssignerFixture(t,
+		Options{
+			rolesClaim:  "roles",
+			roleMapping: []config.RoleMapping{{RoleName: "admin", ClaimValue: "ocisAdmin"}},
+			defaultRole: "user-light",
+		},
+		map[string]string{"admin": "admin-id", "user-light": defaultRoleID},
+		defaultRoleID,
+	)
+
+	// no "roles" key whatsoever
+	claims := map[string]interface{}{"sub": "abcd", "email": "federated@example.org"}
+
+	user := &cs3user.User{Id: &cs3user.UserId{OpaqueId: "user-1"}}
+	got, err := ra.UpdateUserRoleAssignment(context.Background(), user, claims, "")
+	if err != nil {
+		t.Fatalf("expected the default role to be applied, got error: %v", err)
+	}
+	if roles := assignedRoleFromOpaque(t, got); len(roles) != 1 || roles[0] != defaultRoleID {
+		t.Fatalf("expected the default role id %q, got %v", defaultRoleID, roles)
+	}
+}
+
+// TestUpdateUserRoleAssignmentPrefersAMatchingMappingOverTheDefaultRole guards the
+// fallback against swallowing normal operation.
+func TestUpdateUserRoleAssignmentPrefersAMatchingMappingOverTheDefaultRole(t *testing.T) {
+	const adminRoleID = "admin-id"
+
+	ra := newRoleAssignerFixture(t,
+		Options{
+			rolesClaim:  "roles",
+			roleMapping: []config.RoleMapping{{RoleName: "admin", ClaimValue: "ocisAdmin"}},
+			defaultRole: "user-light",
+		},
+		map[string]string{"admin": adminRoleID, "user-light": "user-light-id"},
+		adminRoleID,
+	)
+
+	user := &cs3user.User{Id: &cs3user.UserId{OpaqueId: "user-1"}}
+	got, err := ra.UpdateUserRoleAssignment(context.Background(), user, map[string]interface{}{"roles": "ocisAdmin"}, "")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if roles := assignedRoleFromOpaque(t, got); len(roles) != 1 || roles[0] != adminRoleID {
+		t.Fatalf("expected the mapped role id %q, got %v", adminRoleID, roles)
+	}
+}
+
+// TestUpdateUserRoleAssignmentWithoutDefaultRoleReturnsErrNoRoleAssigned pins the
+// behaviour when no default role is configured. It must stay an error - this change does
+// not hand out a role to anybody who was previously refused - but it must be one the
+// caller can recognise, which is what turns the opaque 500 into a 403.
+func TestUpdateUserRoleAssignmentWithoutDefaultRoleReturnsErrNoRoleAssigned(t *testing.T) {
+	ra := newRoleAssignerFixture(t,
+		Options{
+			rolesClaim:  "roles",
+			roleMapping: []config.RoleMapping{{RoleName: "admin", ClaimValue: "ocisAdmin"}},
+		},
+		map[string]string{"admin": "admin-id"},
+		"admin-id",
+	)
+
+	user := &cs3user.User{Id: &cs3user.UserId{OpaqueId: "user-1"}}
+	for name, claims := range map[string]map[string]interface{}{
+		"unmatched claim": {"roles": "somethingElse"},
+		"no claim at all": {"sub": "abcd"},
+	} {
+		t.Run(name, func(t *testing.T) {
+			_, err := ra.UpdateUserRoleAssignment(context.Background(), user, claims, "")
+			if !errors.Is(err, ErrNoRoleAssigned) {
+				t.Fatalf("expected ErrNoRoleAssigned, got %v", err)
+			}
+		})
+	}
+}
+
+// TestUpdateUserRoleAssignmentReportsAnUnknownDefaultRole separates a deployment
+// mistake from a user without a role: only one of the two is fixed by editing the
+// configuration, so they must not return the same error.
+func TestUpdateUserRoleAssignmentReportsAnUnknownDefaultRole(t *testing.T) {
+	ra := newRoleAssignerFixture(t,
+		Options{
+			rolesClaim:  "roles",
+			roleMapping: []config.RoleMapping{{RoleName: "admin", ClaimValue: "ocisAdmin"}},
+			defaultRole: "no-such-role",
+		},
+		map[string]string{"admin": "admin-id"},
+		"admin-id",
+	)
+
+	user := &cs3user.User{Id: &cs3user.UserId{OpaqueId: "user-1"}}
+	_, err := ra.UpdateUserRoleAssignment(context.Background(), user, map[string]interface{}{"roles": "somethingElse"}, "")
+	if err == nil {
+		t.Fatal("expected an error for a default role that does not exist")
+	}
+	if errors.Is(err, ErrNoRoleAssigned) {
+		t.Fatalf("a misconfigured default role must not be reported as ErrNoRoleAssigned, got %v", err)
+	}
+	if !strings.Contains(err.Error(), "no-such-role") {
+		t.Fatalf("the error should name the offending role, got %v", err)
+	}
+}
+
+// TestExtractRolesSeparatesASilentTokenFromAnUnreadableOne pins the distinction the
+// fallback rests on. A token that carries no roles for this user is a normal token
+// from an IDP that federates users in without role information; a token whose roles
+// claim is present but unreadable is a sign that something is misconfigured. Before
+// ErrRolesClaimNotSet existed both shapes came back as a bare "no roles in user
+// claims" error, so the caller could not tell them apart and had to treat every
+// unreadable claim as a user without a role.
+func TestExtractRolesSeparatesASilentTokenFromAnUnreadableOne(t *testing.T) {
+	silent := map[string]map[string]interface{}{
+		"claim absent":               {"sub": "abcd"},
+		"claim present but null":     {"roles": nil},
+		"nested path, parent absent": {"sub": "abcd"},
+		"nested path, leaf absent":   {"resource_access": map[string]interface{}{"ocis": map[string]interface{}{}}},
+	}
+	for name, claims := range silent {
+		t.Run("silent/"+name, func(t *testing.T) {
+			claim := "roles"
+			if strings.HasPrefix(name, "nested") {
+				claim = "resource_access.ocis.roles"
+			}
+			roles, err := extractRoles(claim, claims)
+			if !errors.Is(err, ErrRolesClaimNotSet) {
+				t.Fatalf("expected ErrRolesClaimNotSet, got %v", err)
+			}
+			if len(roles) != 0 {
+				t.Fatalf("expected no roles, got %v", roles)
+			}
+		})
+	}
+
+	unreadable := map[string]struct {
+		claim  string
+		claims map[string]interface{}
+	}{
+		"claim holds a number":           {"roles", map[string]interface{}{"roles": 42}},
+		"claim holds a non-string entry": {"roles", map[string]interface{}{"roles": []interface{}{"a", 7}}},
+		"path runs through a string":     {"resource_access.ocis.roles", map[string]interface{}{"resource_access": "not-an-object"}},
+	}
+	for name, tc := range unreadable {
+		t.Run("unreadable/"+name, func(t *testing.T) {
+			roles, err := extractRoles(tc.claim, tc.claims)
+			if err == nil {
+				t.Fatal("expected an error for an unreadable roles claim")
+			}
+			if errors.Is(err, ErrRolesClaimNotSet) {
+				t.Fatalf("an unreadable claim must not report as a silent token, got %v", err)
+			}
+			if len(roles) != 0 {
+				t.Fatalf("expected no roles, got %v", roles)
+			}
+		})
+	}
+}
+
+// TestUpdateUserRoleAssignmentRejectsAnUnreadableRolesClaim is the behaviour asked for
+// in review: a claim we cannot read must not be quietly rounded down to "this user has
+// no roles" and signed in on the default role. That would hide a broken IDP mapping
+// behind a working login. A token that is merely silent about roles still falls back,
+// which is what #11467 asks for; the two paths are covered together so neither can be
+// changed without the other being considered.
+func TestUpdateUserRoleAssignmentRejectsAnUnreadableRolesClaim(t *testing.T) {
+	const defaultRoleID = "user-light-id"
+
+	newFixture := func(t *testing.T) oidcRoleAssigner {
+		return newRoleAssignerFixture(t,
+			Options{
+				rolesClaim:  "roles",
+				roleMapping: []config.RoleMapping{{RoleName: "admin", ClaimValue: "ocisAdmin"}},
+				defaultRole: "user-light",
+			},
+			map[string]string{"admin": "admin-id", "user-light": defaultRoleID},
+			defaultRoleID,
+		)
+	}
+	user := &cs3user.User{Id: &cs3user.UserId{OpaqueId: "user-1"}}
+
+	t.Run("unreadable claim is reported", func(t *testing.T) {
+		ra := newFixture(t)
+		_, err := ra.UpdateUserRoleAssignment(context.Background(), user,
+			map[string]interface{}{"sub": "abcd", "roles": 42}, "")
+		if err == nil {
+			t.Fatal("expected an unreadable roles claim to be reported, not defaulted")
+		}
+		if errors.Is(err, ErrNoRoleAssigned) {
+			t.Fatalf("an unreadable claim is not a user without a role, got %v", err)
+		}
+	})
+
+	t.Run("silent token still falls back", func(t *testing.T) {
+		ra := newFixture(t)
+		got, err := ra.UpdateUserRoleAssignment(context.Background(), user,
+			map[string]interface{}{"sub": "abcd"}, "")
+		if err != nil {
+			t.Fatalf("expected the default role to be applied, got error: %v", err)
+		}
+		if roles := assignedRoleFromOpaque(t, got); len(roles) != 1 || roles[0] != defaultRoleID {
+			t.Fatalf("expected the default role id %q, got %v", defaultRoleID, roles)
+		}
+	})
+}
+
+// TestUpdateUserRoleAssignmentOverridesTheGraphAssignedDefaultRole pins how this
+// setting relates to GRAPH_ASSIGN_DEFAULT_USER_ROLE, which is the other place a role
+// is handed out when nothing else does. With PROXY_AUTOPROVISION_ACCOUNTS enabled the
+// two run in the same login request: the graph service creates the user and gives them
+// the "user" role, and the proxy resolves their role immediately afterwards. The proxy
+// runs second, so its answer is the one that survives - including when its answer is
+// to refuse the login. Both halves are asserted together so neither can be changed
+// without the other being considered.
+func TestUpdateUserRoleAssignmentOverridesTheGraphAssignedDefaultRole(t *testing.T) {
+	const (
+		graphAssignedRoleID = "graph-user-role-id"
+		defaultRoleID       = "user-light-id"
+	)
+	knownRoles := map[string]string{"user": graphAssignedRoleID, "user-light": defaultRoleID}
+	user := &cs3user.User{Id: &cs3user.UserId{OpaqueId: "user-1"}}
+	// a token that says nothing about roles, i.e. the federated user in the report
+	claims := map[string]interface{}{"sub": "abcd"}
+
+	t.Run("the proxy default role replaces it", func(t *testing.T) {
+		ra := newRoleAssignerFixture(t,
+			Options{rolesClaim: "roles", defaultRole: "user-light"},
+			knownRoles,
+			graphAssignedRoleID,
+		)
+		got, err := ra.UpdateUserRoleAssignment(context.Background(), user, claims, "")
+		if err != nil {
+			t.Fatalf("expected the default role to be applied, got error: %v", err)
+		}
+		if roles := assignedRoleFromOpaque(t, got); len(roles) != 1 || roles[0] != defaultRoleID {
+			t.Fatalf("expected the proxy default role %q to replace the graph assigned %q, got %v",
+				defaultRoleID, graphAssignedRoleID, roles)
+		}
+	})
+
+	t.Run("without one the login is still refused", func(t *testing.T) {
+		ra := newRoleAssignerFixture(t,
+			Options{rolesClaim: "roles", defaultRole: ""},
+			knownRoles,
+			graphAssignedRoleID,
+		)
+		_, err := ra.UpdateUserRoleAssignment(context.Background(), user, claims, "")
+		if !errors.Is(err, ErrNoRoleAssigned) {
+			t.Fatalf("a role assigned by the graph service must not stand in for a role claim, got %v", err)
+		}
+	})
 }
