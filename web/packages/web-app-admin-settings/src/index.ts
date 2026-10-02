@@ -44,14 +44,17 @@ function getNextAvailableRoute(ability: Ability) {
   throw Error('Insufficient permissions')
 }
 
-async function requireAcr(redirectUrl: string) {
+/**
+ * @returns false if MFA is required but could not be completed
+ */
+async function requireAcr(redirectUrl: string): Promise<boolean> {
   const capabilityStore = useCapabilityStore()
   if (!capabilityStore.authMfaEnabled) {
-    return
+    return true
   }
 
   const authService = useAuthService()
-  await authService.requireAcr(capabilityStore.authMfaRequiredLevelname, redirectUrl)
+  return await authService.requireAcr(capabilityStore.authMfaRequiredLevelname, redirectUrl)
 }
 
 export const routes = ({ $ability }: { $ability: Ability }): RouteRecordRaw[] => [
@@ -70,7 +73,10 @@ export const routes = ({ $ability }: { $ability: Ability }): RouteRecordRaw[] =>
         return next(getNextAvailableRoute($ability))
       }
 
-      await requireAcr(to.fullPath)
+      if (!(await requireAcr(to.fullPath))) {
+        // MFA step-up failed, leave admin settings instead of redirecting to the IdP again
+        return next({ path: '/' })
+      }
 
       next()
     },
@@ -88,7 +94,10 @@ export const routes = ({ $ability }: { $ability: Ability }): RouteRecordRaw[] =>
         return next(getNextAvailableRoute($ability))
       }
 
-      await requireAcr(to.fullPath)
+      if (!(await requireAcr(to.fullPath))) {
+        // MFA step-up failed, leave admin settings instead of redirecting to the IdP again
+        return next({ path: '/' })
+      }
 
       next()
     },
@@ -106,7 +115,10 @@ export const routes = ({ $ability }: { $ability: Ability }): RouteRecordRaw[] =>
         return next(getNextAvailableRoute($ability))
       }
 
-      await requireAcr(to.fullPath)
+      if (!(await requireAcr(to.fullPath))) {
+        // MFA step-up failed, leave admin settings instead of redirecting to the IdP again
+        return next({ path: '/' })
+      }
 
       next()
     },
@@ -124,7 +136,10 @@ export const routes = ({ $ability }: { $ability: Ability }): RouteRecordRaw[] =>
         return next(getNextAvailableRoute($ability))
       }
 
-      await requireAcr(to.fullPath)
+      if (!(await requireAcr(to.fullPath))) {
+        // MFA step-up failed, leave admin settings instead of redirecting to the IdP again
+        return next({ path: '/' })
+      }
 
       next()
     },
