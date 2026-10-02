@@ -149,6 +149,20 @@ type AuditEventFileRestored struct {
 	OldPath string
 }
 
+// AuditEventTagsAdded is the event logged when tags are added to a file or folder
+type AuditEventTagsAdded struct {
+	AuditEventFiles
+
+	Tags string // the tags that were added, comma separated
+}
+
+// AuditEventTagsRemoved is the event logged when tags are removed from a file or folder
+type AuditEventTagsRemoved struct {
+	AuditEventFiles
+
+	Tags string // the tags that were removed, comma separated
+}
+
 // AuditEventFileVersionRestored is the event logged when a file version is restored
 type AuditEventFileVersionRestored struct {
 	AuditEventFiles

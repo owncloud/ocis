@@ -32,6 +32,8 @@ const (
 	ActionFilePurged          = "file_trash_delete"
 	ActionFileRestored        = "file_trash_restore"
 	ActionFileVersionRestored = "file_version_restore"
+	ActionTagsAdded           = "file_tags_add"
+	ActionTagsRemoved         = "file_tags_remove"
 
 	// Spaces
 	ActionSpaceCreated  = "space_created"
@@ -125,6 +127,17 @@ func MessageFileRead(executant, item string) string {
 }
 
 // MessageFileTrashed returns the human-readable string that describes the action
+// MessageTagsAdded returns a human readable string that describes the action
+func MessageTagsAdded(executant, tags, item string) string {
+	return fmt.Sprintf("user '%s' added tags '%s' to file '%s'", executant, tags, item)
+}
+
+// MessageTagsRemoved returns a human readable string that describes the action
+func MessageTagsRemoved(executant, tags, item string) string {
+	return fmt.Sprintf("user '%s' removed tags '%s' from file '%s'", executant, tags, item)
+}
+
+// MessageFileTrashed returns a human readable string that describes the action
 func MessageFileTrashed(executant, item string) string {
 	return fmt.Sprintf("user '%s' trashed file '%s'", executant, item)
 }
