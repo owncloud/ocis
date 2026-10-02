@@ -1,5 +1,5 @@
-import { defaultPlugins, shallowMount } from '@ownclouders/web-test-helpers'
 import Breadcrumb from './OcBreadcrumb.vue'
+import { defaultPlugins, shallowMount } from '../../testing'
 
 const items = [
   { text: 'First folder', to: { path: 'folder' } },

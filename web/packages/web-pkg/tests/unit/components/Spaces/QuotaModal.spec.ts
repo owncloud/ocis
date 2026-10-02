@@ -1,10 +1,5 @@
 import QuotaModal from '../../../../src/components/Spaces/QuotaModal.vue'
-import {
-  defaultComponentMocks,
-  defaultPlugins,
-  defaultStubs,
-  mount
-} from '@ownclouders/web-test-helpers'
+import { defaultComponentMocks, defaultPlugins, defaultStubs, mount } from '../../../../src/testing'
 import { useMessages, useSpacesStore } from '../../../../src/composables/piniaStores'
 import { SpaceResource } from '@ownclouders/web-client'
 import { mock } from 'vitest-mock-extended'

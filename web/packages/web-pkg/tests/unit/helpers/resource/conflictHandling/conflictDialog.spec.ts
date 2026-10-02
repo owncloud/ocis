@@ -3,7 +3,7 @@ import { Resource } from '@ownclouders/web-client'
 import { ConflictDialog, ResolveConflict } from '../../../../../src/helpers/resource'
 import { useModals } from '../../../../../src/composables/piniaStores'
 import { setActivePinia } from 'pinia'
-import { createMockStore } from '@ownclouders/web-test-helpers'
+import { createMockStore } from '../../../../../src/testing'
 
 const getConflictDialogInstance = () => {
   return new ConflictDialog(vi.fn(), vi.fn())

@@ -4,7 +4,7 @@ import {
   defaultPlugins,
   nextTicks,
   shallowMount
-} from '@ownclouders/web-test-helpers'
+} from '../../../../src/testing'
 import { mock, mockDeep } from 'vitest-mock-extended'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 import { ListFilesResult } from '@ownclouders/web-client/webdav'

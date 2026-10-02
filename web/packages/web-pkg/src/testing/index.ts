@@ -1,5 +1,7 @@
 export * from './defaultComponentMocks'
+export * from './defaultPlugins'
 export * from './defaultStubs'
+export * from './helpers'
 export * from './httpResponse'
 export * from './pinia'
 export * from './useAppDefaultsMock'

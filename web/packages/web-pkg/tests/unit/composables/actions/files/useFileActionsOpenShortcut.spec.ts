@@ -2,9 +2,9 @@ import { mock } from 'vitest-mock-extended'
 import { computed, unref } from 'vue'
 import {
   defaultComponentMocks,
-  RouteLocation,
-  getComposableWrapper
-} from '@ownclouders/web-test-helpers'
+  getComposableWrapper,
+  RouteLocation
+} from '../../../../../src/testing'
 import { useFileActionsOpenShortcut, useRoute } from '../../../../../src'
 import { Resource } from '@ownclouders/web-client'
 import { GetFileContentsResponse } from '@ownclouders/web-client/webdav'
