@@ -18,6 +18,7 @@ import (
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
+	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/ocis-pkg/runner"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
@@ -295,6 +296,8 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 		authenticators = append(authenticators, middleware.AppAuthAuthenticator{
 			Logger:              logger,
 			RevaGatewaySelector: gatewaySelector,
+			RoleManager:         roles.NewManager(roles.Logger(logger), roles.RoleService(rolesClient)),
+			RoleAssignment:      cfg.RoleAssignment,
 		})
 	}
 
