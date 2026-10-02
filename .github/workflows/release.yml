@@ -94,10 +94,12 @@ jobs:
             !.git
           retention-days: 1
 
-  # Builds the release image locally and runs the Trivy security gate against it.
-  # Image publishing to Docker Hub happens in a separate repository; this job only
-  # builds (load, no push) so the vulnerability gate still blocks a bad release.
+  # Disabled, like on stable-8.1, stable-8.2 and master. Image building, scanning
+  # and publishing happen in the owncloud-docker/ocis repository, which keeps a
+  # per-minor .trivyignore. Kept here (not deleted) to stay in sync with the
+  # newer branches.
   docker-build:
+    if: false
     name: docker-build (${{ matrix.arch }})
     runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     needs: [determine-release-type, generate-code, security-scan-trivy]
@@ -253,7 +255,7 @@ jobs:
 
   create-github-release:
     runs-on: ubuntu-latest
-    needs: [determine-release-type, build-binaries, license-check, generate-changelog, security-scan-trivy, docker-build]
+    needs: [determine-release-type, build-binaries, license-check, generate-changelog, security-scan-trivy]
     steps:
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
@@ -284,7 +286,6 @@ jobs:
     needs:
       - determine-release-type
       - generate-code
-      - docker-build
       - build-binaries
       - security-scan-trivy
       - license-check
@@ -318,7 +319,6 @@ jobs:
     needs:
       - determine-release-type
       - generate-code
-      - docker-build
       - build-binaries
       - security-scan-trivy
       - license-check
