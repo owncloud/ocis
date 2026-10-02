@@ -247,7 +247,7 @@ func FilesAuditEvent(base AuditEvent, itemid, owner, path string) AuditEventFile
 // ContainerCreated converts a ContainerCreated event to an AuditEventContainerCreated
 func ContainerCreated(ev events.ContainerCreated) AuditEventContainerCreated {
 	iid, path, uid := extractFileDetails(ev.Ref, ev.Owner)
-	base := BasicAuditEvent(uid, formatTime(ev.Timestamp), MessageContainerCreated(ev.Executant.GetOpaqueId(), iid), ActionContainerCreated)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), MessageContainerCreated(ev.Executant.GetOpaqueId(), iid), ActionContainerCreated)
 	return AuditEventContainerCreated{
 		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
 	}
@@ -256,7 +256,7 @@ func ContainerCreated(ev events.ContainerCreated) AuditEventContainerCreated {
 // FileUploaded converts a FileUploaded event to an AuditEventFileCreated
 func FileUploaded(ev events.FileUploaded) AuditEventFileCreated {
 	iid, path, uid := extractFileDetails(ev.Ref, ev.Owner)
-	base := BasicAuditEvent(uid, formatTime(ev.Timestamp), MessageFileCreated(ev.Executant.GetOpaqueId(), iid), ActionFileCreated)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), MessageFileCreated(ev.Executant.GetOpaqueId(), iid), ActionFileCreated)
 	return AuditEventFileCreated{
 		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
 	}
@@ -265,7 +265,7 @@ func FileUploaded(ev events.FileUploaded) AuditEventFileCreated {
 // FileDownloaded converts a FileDownloaded event to an AuditEventFileRead
 func FileDownloaded(ev events.FileDownloaded) AuditEventFileRead {
 	iid, path, uid := extractFileDetails(ev.Ref, ev.Owner)
-	base := BasicAuditEvent(uid, formatTime(ev.Timestamp), MessageFileRead(ev.Executant.GetOpaqueId(), iid), ActionFileRead)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), MessageFileRead(ev.Executant.GetOpaqueId(), iid), ActionFileRead)
 	return AuditEventFileRead{
 		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
 	}
@@ -280,7 +280,7 @@ func ItemMoved(ev events.ItemMoved) AuditEventFileRenamed {
 		oldpath = ev.OldReference.GetPath()
 	}
 
-	base := BasicAuditEvent(uid, formatTime(ev.Timestamp), MessageFileRenamed(ev.Executant.GetOpaqueId(), iid, oldpath, path), ActionFileRenamed)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), MessageFileRenamed(ev.Executant.GetOpaqueId(), iid, oldpath, path), ActionFileRenamed)
 	return AuditEventFileRenamed{
 		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
 		OldPath:         oldpath,
@@ -290,7 +290,7 @@ func ItemMoved(ev events.ItemMoved) AuditEventFileRenamed {
 // ItemTrashed converts a ItemTrashed event to an AuditEventFileDeleted
 func ItemTrashed(ev events.ItemTrashed) AuditEventFileDeleted {
 	iid, path, uid := extractFileDetails(ev.Ref, ev.Owner)
-	base := BasicAuditEvent(uid, formatTime(ev.Timestamp), MessageFileTrashed(ev.Executant.GetOpaqueId(), iid), ActionFileTrashed)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), MessageFileTrashed(ev.Executant.GetOpaqueId(), iid), ActionFileTrashed)
 	return AuditEventFileDeleted{
 		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
 	}
@@ -299,7 +299,7 @@ func ItemTrashed(ev events.ItemTrashed) AuditEventFileDeleted {
 // ItemPurged converts a ItemPurged event to an AuditEventFilePurged
 func ItemPurged(ev events.ItemPurged) AuditEventFilePurged {
 	iid, path, uid := extractFileDetails(ev.Ref, ev.Owner)
-	base := BasicAuditEvent(uid, formatTime(ev.Timestamp), MessageFilePurged(ev.Executant.GetOpaqueId(), iid), ActionFilePurged)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), MessageFilePurged(ev.Executant.GetOpaqueId(), iid), ActionFilePurged)
 	return AuditEventFilePurged{
 		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
 	}
@@ -314,7 +314,7 @@ func ItemRestored(ev events.ItemRestored) AuditEventFileRestored {
 		oldpath = ev.OldReference.GetPath()
 	}
 
-	base := BasicAuditEvent(uid, formatTime(ev.Timestamp), MessageFileRestored(ev.Executant.GetOpaqueId(), iid, path), ActionFileRestored)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), MessageFileRestored(ev.Executant.GetOpaqueId(), iid, path), ActionFileRestored)
 	return AuditEventFileRestored{
 		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
 		OldPath:         oldpath,
@@ -324,7 +324,7 @@ func ItemRestored(ev events.ItemRestored) AuditEventFileRestored {
 // FileVersionRestored converts a FileVersionRestored event to an AuditEventFileVersionRestored
 func FileVersionRestored(ev events.FileVersionRestored) AuditEventFileVersionRestored {
 	iid, path, uid := extractFileDetails(ev.Ref, ev.Owner)
-	base := BasicAuditEvent(uid, formatTime(ev.Timestamp), MessageFileVersionRestored(ev.Executant.GetOpaqueId(), iid, ev.Key), ActionFileVersionRestored)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), MessageFileVersionRestored(ev.Executant.GetOpaqueId(), iid, ev.Key), ActionFileVersionRestored)
 	return AuditEventFileVersionRestored{
 		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
 		Key:             ev.Key,
@@ -343,7 +343,7 @@ func SpacesAuditEvent(base AuditEvent, spaceID string) AuditEventSpaces {
 func SpaceCreated(ev events.SpaceCreated) AuditEventSpaceCreated {
 	sid := ev.ID.GetOpaqueId()
 	iid, _, owner := extractFileDetails(&provider.Reference{ResourceId: ev.Root}, ev.Owner)
-	base := BasicAuditEvent("", formatTime(ev.MTime), MessageSpaceCreated(ev.Executant.GetOpaqueId(), sid, ev.Name), ActionSpaceCreated)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.MTime), MessageSpaceCreated(ev.Executant.GetOpaqueId(), sid, ev.Name), ActionSpaceCreated)
 	return AuditEventSpaceCreated{
 		AuditEventSpaces: SpacesAuditEvent(base, sid),
 		Owner:            owner,
@@ -356,7 +356,7 @@ func SpaceCreated(ev events.SpaceCreated) AuditEventSpaceCreated {
 // SpaceRenamed converts a SpaceRenamed event to an AuditEventSpaceRenamed
 func SpaceRenamed(ev events.SpaceRenamed) AuditEventSpaceRenamed {
 	sid := ev.ID.GetOpaqueId()
-	base := BasicAuditEvent("", formatTime(ev.Timestamp), MessageSpaceRenamed(ev.Executant.GetOpaqueId(), sid, ev.Name), ActionSpaceRenamed)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), MessageSpaceRenamed(ev.Executant.GetOpaqueId(), sid, ev.Name), ActionSpaceRenamed)
 	return AuditEventSpaceRenamed{
 		AuditEventSpaces: SpacesAuditEvent(base, sid),
 		NewName:          ev.Name,
@@ -366,7 +366,7 @@ func SpaceRenamed(ev events.SpaceRenamed) AuditEventSpaceRenamed {
 // SpaceDisabled converts a SpaceDisabled event to an AuditEventSpaceDisabled
 func SpaceDisabled(ev events.SpaceDisabled) AuditEventSpaceDisabled {
 	sid := ev.ID.GetOpaqueId()
-	base := BasicAuditEvent("", formatTime(utils.TimeToTS(ev.Timestamp)), MessageSpaceDisabled(ev.Executant.GetOpaqueId(), sid), ActionSpaceDisabled)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(utils.TimeToTS(ev.Timestamp)), MessageSpaceDisabled(ev.Executant.GetOpaqueId(), sid), ActionSpaceDisabled)
 	return AuditEventSpaceDisabled{
 		AuditEventSpaces: SpacesAuditEvent(base, sid),
 	}
@@ -375,7 +375,7 @@ func SpaceDisabled(ev events.SpaceDisabled) AuditEventSpaceDisabled {
 // SpaceEnabled converts a SpaceEnabled event to an AuditEventSpaceEnabled
 func SpaceEnabled(ev events.SpaceEnabled) AuditEventSpaceEnabled {
 	sid := ev.ID.GetOpaqueId()
-	base := BasicAuditEvent("", formatTime(ev.Timestamp), MessageSpaceEnabled(ev.Executant.GetOpaqueId(), sid), ActionSpaceEnabled)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), MessageSpaceEnabled(ev.Executant.GetOpaqueId(), sid), ActionSpaceEnabled)
 	return AuditEventSpaceEnabled{
 		AuditEventSpaces: SpacesAuditEvent(base, sid),
 	}
@@ -384,7 +384,7 @@ func SpaceEnabled(ev events.SpaceEnabled) AuditEventSpaceEnabled {
 // SpaceDeleted converts a SpaceDeleted event to an AuditEventSpaceDeleted
 func SpaceDeleted(ev events.SpaceDeleted) AuditEventSpaceDeleted {
 	sid := ev.ID.GetOpaqueId()
-	base := BasicAuditEvent("", formatTime(utils.TimeToTS(ev.Timestamp)), MessageSpaceDeleted(ev.Executant.GetOpaqueId(), sid, ev.SpaceName), ActionSpaceDeleted)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(utils.TimeToTS(ev.Timestamp)), MessageSpaceDeleted(ev.Executant.GetOpaqueId(), sid, ev.SpaceName), ActionSpaceDeleted)
 	return AuditEventSpaceDeleted{
 		AuditEventSpaces: SpacesAuditEvent(base, sid),
 	}
@@ -403,7 +403,7 @@ func SpaceShared(ev events.SpaceShared) AuditEventSpaceShared {
 		sse.GranteeGroupID = ev.GranteeGroupID.OpaqueId
 		grantee = "group:" + ev.GranteeGroupID.OpaqueId
 	}
-	base := BasicAuditEvent("", "", MessageSpaceShared(ev.Executant.GetOpaqueId(), sid, grantee), ActionSpaceShared)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), "", MessageSpaceShared(ev.Executant.GetOpaqueId(), sid, grantee), ActionSpaceShared)
 	sse.AuditEventSpaces = SpacesAuditEvent(base, sid)
 
 	return sse
@@ -422,7 +422,7 @@ func SpaceUnshared(ev events.SpaceUnshared) AuditEventSpaceUnshared {
 		sue.GranteeGroupID = ev.GranteeGroupID.OpaqueId
 		grantee = "group:" + ev.GranteeGroupID.OpaqueId
 	}
-	base := BasicAuditEvent("", formatTime(utils.TimeToTS(ev.Timestamp)), MessageSpaceUnshared(ev.Executant.GetOpaqueId(), sid, grantee), ActionSpaceUnshared)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(utils.TimeToTS(ev.Timestamp)), MessageSpaceUnshared(ev.Executant.GetOpaqueId(), sid, grantee), ActionSpaceUnshared)
 	sue.AuditEventSpaces = SpacesAuditEvent(base, sid)
 
 	return sue
@@ -437,7 +437,7 @@ func SpaceUpdated(ev events.SpaceUpdated) AuditEventSpaceUpdated {
 		Opaque: opaqueMap,
 	}
 
-	base := BasicAuditEvent("", formatTime(ev.Timestamp), MessageSpaceUpdated(ev.Executant.GetOpaqueId(), sid, ev.Space.Name, ev.Space.Quota.QuotaMaxBytes, opaqueMap), ActionSpaceUpdated)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), MessageSpaceUpdated(ev.Executant.GetOpaqueId(), sid, ev.Space.Name, ev.Space.Quota.QuotaMaxBytes, opaqueMap), ActionSpaceUpdated)
 	sue.AuditEventSpaces = SpacesAuditEvent(base, sid)
 
 	return sue
@@ -445,7 +445,7 @@ func SpaceUpdated(ev events.SpaceUpdated) AuditEventSpaceUpdated {
 
 // UserCreated converts a UserCreated event to an AuditEventUserCreated
 func UserCreated(ev events.UserCreated) AuditEventUserCreated {
-	base := BasicAuditEvent("", formatTime(ev.Timestamp), MessageUserCreated(ev.Executant.GetOpaqueId(), ev.UserID), ActionUserCreated)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), MessageUserCreated(ev.Executant.GetOpaqueId(), ev.UserID), ActionUserCreated)
 	return AuditEventUserCreated{
 		AuditEvent: base,
 		UserID:     ev.UserID,
@@ -454,7 +454,7 @@ func UserCreated(ev events.UserCreated) AuditEventUserCreated {
 
 // UserDeleted converts a UserDeleted event to an AuditEventUserDeleted
 func UserDeleted(ev events.UserDeleted) AuditEventUserDeleted {
-	base := BasicAuditEvent("", formatTime(ev.Timestamp), MessageUserDeleted(ev.Executant.GetOpaqueId(), ev.UserID), ActionUserDeleted)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), MessageUserDeleted(ev.Executant.GetOpaqueId(), ev.UserID), ActionUserDeleted)
 	return AuditEventUserDeleted{
 		AuditEvent: base,
 		UserID:     ev.UserID,
@@ -464,7 +464,7 @@ func UserDeleted(ev events.UserDeleted) AuditEventUserDeleted {
 // UserFeatureChanged converts a UserFeatureChanged event to an AuditEventUserFeatureChanged
 func UserFeatureChanged(ev events.UserFeatureChanged) AuditEventUserFeatureChanged {
 	msg := MessageUserFeatureChanged(ev.Executant.GetOpaqueId(), ev.UserID, ev.Features)
-	base := BasicAuditEvent("", formatTime(ev.Timestamp), msg, ActionUserFeatureChanged)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), msg, ActionUserFeatureChanged)
 	return AuditEventUserFeatureChanged{
 		AuditEvent: base,
 		UserID:     ev.UserID,
@@ -474,7 +474,7 @@ func UserFeatureChanged(ev events.UserFeatureChanged) AuditEventUserFeatureChang
 
 // GroupCreated converts a GroupCreated event to an AuditEventGroupCreated
 func GroupCreated(ev events.GroupCreated) AuditEventGroupCreated {
-	base := BasicAuditEvent("", formatTime(ev.Timestamp), MessageGroupCreated(ev.Executant.GetOpaqueId(), ev.GroupID), ActionGroupCreated)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), MessageGroupCreated(ev.Executant.GetOpaqueId(), ev.GroupID), ActionGroupCreated)
 	return AuditEventGroupCreated{
 		AuditEvent: base,
 		GroupID:    ev.GroupID,
@@ -483,7 +483,7 @@ func GroupCreated(ev events.GroupCreated) AuditEventGroupCreated {
 
 // GroupDeleted converts a GroupDeleted event to an AuditEventGroupDeleted
 func GroupDeleted(ev events.GroupDeleted) AuditEventGroupDeleted {
-	base := BasicAuditEvent("", formatTime(ev.Timestamp), MessageGroupDeleted(ev.Executant.GetOpaqueId(), ev.GroupID), ActionGroupDeleted)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), MessageGroupDeleted(ev.Executant.GetOpaqueId(), ev.GroupID), ActionGroupDeleted)
 	return AuditEventGroupDeleted{
 		AuditEvent: base,
 		GroupID:    ev.GroupID,
@@ -492,8 +492,8 @@ func GroupDeleted(ev events.GroupDeleted) AuditEventGroupDeleted {
 
 // GroupMemberAdded converts a GroupMemberAdded event to an AuditEventGroupMemberAdded
 func GroupMemberAdded(ev events.GroupMemberAdded) AuditEventGroupMemberAdded {
-	msg := MessageGroupMemberAdded(ev.Executant.GetOpaqueId(), ev.GroupID, ev.UserID)
-	base := BasicAuditEvent("", formatTime(ev.Timestamp), msg, ActionGroupMemberAdded)
+	msg := MessageGroupMemberAdded(ev.Executant.GetOpaqueId(), ev.UserID, ev.GroupID)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), msg, ActionGroupMemberAdded)
 	return AuditEventGroupMemberAdded{
 		AuditEvent: base,
 		GroupID:    ev.GroupID,
@@ -503,8 +503,8 @@ func GroupMemberAdded(ev events.GroupMemberAdded) AuditEventGroupMemberAdded {
 
 // GroupMemberRemoved converts a GroupMemberRemoved event to an AuditEventGroupMemberRemove
 func GroupMemberRemoved(ev events.GroupMemberRemoved) AuditEventGroupMemberRemoved {
-	msg := MessageGroupMemberRemoved(ev.Executant.GetOpaqueId(), ev.GroupID, ev.UserID)
-	base := BasicAuditEvent("", formatTime(ev.Timestamp), msg, ActionGroupMemberRemoved)
+	msg := MessageGroupMemberRemoved(ev.Executant.GetOpaqueId(), ev.UserID, ev.GroupID)
+	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), msg, ActionGroupMemberRemoved)
 	return AuditEventGroupMemberRemoved{
 		AuditEvent: base,
 		GroupID:    ev.GroupID,

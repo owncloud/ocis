@@ -325,7 +325,7 @@ var testCases = []struct {
 			Event: events.FileUploaded{
 				Executant: userID("uid-123"),
 				Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
-				Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
+				Owner:     userID("uid-owner"),
 			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
@@ -335,7 +335,7 @@ var testCases = []struct {
 			// AuditEvent fields
 			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' created file 'pro-1$sto-123!iid-123/item'", "file_create")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-owner", "./item")
 		},
 	}, {
 		Alias: "File read",
@@ -343,7 +343,7 @@ var testCases = []struct {
 			Event: events.FileDownloaded{
 				Executant: userID("uid-123"),
 				Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
-				Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
+				Owner:     userID("uid-owner"),
 			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
@@ -353,7 +353,7 @@ var testCases = []struct {
 			// AuditEvent fields
 			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' read file 'pro-1$sto-123!iid-123/item'", "file_read")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-owner", "./item")
 		},
 	}, {
 		Alias: "File trashed",
@@ -361,7 +361,7 @@ var testCases = []struct {
 			Event: events.ItemTrashed{
 				Executant: userID("uid-123"),
 				Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
-				Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
+				Owner:     userID("uid-owner"),
 			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
@@ -371,7 +371,7 @@ var testCases = []struct {
 			// AuditEvent fields
 			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' trashed file 'pro-1$sto-123!iid-123/item'", "file_delete")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-owner", "./item")
 		},
 	}, {
 		Alias: "File renamed",
@@ -380,7 +380,7 @@ var testCases = []struct {
 				Executant:    userID("uid-123"),
 				Ref:          reference("pro-1", "sto-123", "iid-123", "./item"),
 				OldReference: reference("pro-1", "sto-123", "iid-123", "./anotheritem"),
-				Owner:        userID("uid-123"), // NOTE: owner not yet implemented in reva
+				Owner:        userID("uid-owner"),
 			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
@@ -390,7 +390,7 @@ var testCases = []struct {
 			// AuditEvent fields
 			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' moved file 'pro-1$sto-123!iid-123/item' from './anotheritem' to './item'", "file_rename")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-owner", "./item")
 			// AuditEventFileRenamed fields
 			require.Equal(t, "./anotheritem", ev.OldPath)
 
@@ -401,7 +401,7 @@ var testCases = []struct {
 			Event: events.ItemPurged{
 				Executant: userID("uid-123"),
 				Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
-				Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
+				Owner:     userID("uid-owner"),
 			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
@@ -411,7 +411,7 @@ var testCases = []struct {
 			// AuditEvent fields
 			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' removed file 'pro-1$sto-123!iid-123/item' from trashbin", "file_trash_delete")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-owner", "./item")
 		},
 	}, {
 		Alias: "File restored",
@@ -419,7 +419,7 @@ var testCases = []struct {
 			Event: events.ItemRestored{
 				Executant:    userID("uid-123"),
 				Ref:          reference("pro-1", "sto-123", "iid-123", "./item"),
-				Owner:        userID("uid-123"), // NOTE: owner not yet implemented in reva
+				Owner:        userID("uid-owner"),
 				OldReference: reference("pro-1", "sto-123", "sto-123!iid-123/item", "./oldpath"),
 				Key:          "",
 			},
@@ -431,7 +431,7 @@ var testCases = []struct {
 			// AuditEvent fields
 			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' restored file 'pro-1$sto-123!iid-123/item' from trashbin to './item'", "file_trash_restore")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-owner", "./item")
 			// AuditEventFileRestored fields
 			require.Equal(t, "./oldpath", ev.OldPath)
 
@@ -442,7 +442,7 @@ var testCases = []struct {
 			Event: events.FileVersionRestored{
 				Executant: userID("uid-123"),
 				Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
-				Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
+				Owner:     userID("uid-owner"),
 				Key:       "v1",
 			},
 		},
@@ -453,7 +453,7 @@ var testCases = []struct {
 			// AuditEvent fields
 			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' restored file 'pro-1$sto-123!iid-123/item' in version 'v1'", "file_version_restore")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-owner", "./item")
 			// AuditEventFileRestored fields
 			require.Equal(t, "v1", ev.Key)
 
@@ -464,7 +464,7 @@ var testCases = []struct {
 			Event: events.SpaceCreated{
 				Executant: userID("uid-123"),
 				ID:        &provider.StorageSpaceId{OpaqueId: "storage-1$space-123"},
-				Owner:     userID("uid-123"),
+				Owner:     userID("uid-owner"),
 				Root:      resourceID("pro-1", "sto-123", "iid-123"),
 				Name:      "test-space",
 				Type:      "project",
@@ -477,11 +477,11 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "", "2286-11-20T17:46:40Z", "user 'uid-123' created a space 'space-123' with name 'test-space' (storage: 'storage-1')", "space_created")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "2286-11-20T17:46:40Z", "user 'uid-123' created a space 'space-123' with name 'test-space' (storage: 'storage-1')", "space_created")
 			// AuditEventSpaces fields
 			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "storage-1$space-123")
 			// AuditEventFileRestored fields
-			require.Equal(t, "uid-123", ev.Owner)
+			require.Equal(t, "uid-owner", ev.Owner)
 			require.Equal(t, "pro-1$sto-123!iid-123", ev.RootItem)
 			require.Equal(t, "test-space", ev.Name)
 			require.Equal(t, "project", ev.Type)
@@ -492,7 +492,7 @@ var testCases = []struct {
 			Event: events.SpaceRenamed{
 				Executant: userID("uid-123"),
 				ID:        &provider.StorageSpaceId{OpaqueId: "storage-1$space-123"},
-				Owner:     userID("uid-123"),
+				Owner:     userID("uid-owner"),
 				Name:      "new-name",
 			},
 		},
@@ -501,7 +501,7 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "user 'uid-123' renamed space 'space-123' to 'new-name' (storage: 'storage-1')", "space_renamed")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' renamed space 'space-123' to 'new-name' (storage: 'storage-1')", "space_renamed")
 			// AuditEventSpaces fields
 			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "storage-1$space-123")
 			// AuditEventSpaceRenamed fields
@@ -520,7 +520,7 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "", "0001-01-01T00:00:00Z", "user 'uid-123' disabled the space 'space-123' (storage: 'storage-1')", "space_disabled")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "0001-01-01T00:00:00Z", "user 'uid-123' disabled the space 'space-123' (storage: 'storage-1')", "space_disabled")
 			// AuditEventSpaces fields
 			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "storage-1$space-123")
 		},
@@ -537,7 +537,7 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "user 'uid-123' (re-) enabled the space 'space-123' (storage: 'storage-1')", "space_enabled")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' (re-) enabled the space 'space-123' (storage: 'storage-1')", "space_enabled")
 			// AuditEventSpaces fields
 			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "storage-1$space-123")
 		},
@@ -555,7 +555,7 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "", "0001-01-01T00:00:00Z", "user 'uid-123' deleted the space 'space-123' with name 'test-space' (storage: 'storage-1')", "space_deleted")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "0001-01-01T00:00:00Z", "user 'uid-123' deleted the space 'space-123' with name 'test-space' (storage: 'storage-1')", "space_deleted")
 			// AuditEventSpaces fields
 			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "storage-1$space-123")
 		},
@@ -585,6 +585,46 @@ var testCases = []struct {
 			require.Equal(t, "some-description", ev.Description)
 			require.Equal(t, uint64(10e8), ev.Expiration)
 			require.Equal(t, "http://ocis.test/invite", ev.InviteLink)
+		},
+	},
+	{
+		Alias: "User created",
+		SystemEvent: events.Event{
+			Event: events.UserCreated{
+				Executant: userID("uid-admin"),
+				UserID:    "uid-new",
+				Timestamp: timestamp(10e8),
+			},
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventUserCreated{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields: User is the actor, not the affected user
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-admin", "2001-09-09T01:46:40Z", "user 'uid-admin' created the user 'uid-new'", "user_created")
+			// AuditEventUserCreated fields
+			require.Equal(t, "uid-new", ev.UserID)
+		},
+	},
+	{
+		Alias: "Group member added",
+		SystemEvent: events.Event{
+			Event: events.GroupMemberAdded{
+				Executant: userID("uid-admin"),
+				GroupID:   "gid-123",
+				UserID:    "uid-member",
+				Timestamp: timestamp(10e8),
+			},
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventGroupMemberAdded{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields: User is the actor, not the member
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-admin", "2001-09-09T01:46:40Z", "user 'uid-admin' added user 'uid-member' was added to group 'gid-123'", "group_member_added")
+			// AuditEventGroupMemberAdded fields
+			require.Equal(t, "gid-123", ev.GroupID)
+			require.Equal(t, "uid-member", ev.UserID)
 		},
 	},
 }
