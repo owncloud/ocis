@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for 8.0.9](#changelog-for-809-2026-10-02)
 * [Changelog for 8.0.8](#changelog-for-808-2026-08-20)
 * [Changelog for 8.0.7](#changelog-for-807-2026-07-31)
 * [Changelog for 8.0.6](#changelog-for-806-2026-07-15)
@@ -66,6 +67,192 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [8.0.9] (2026-10-02)
+
+The following sections list the changes for 8.0.9.
+
+[8.0.9]: https://github.com/owncloud/ocis/compare/v8.0.8...v8.0.9
+
+## Summary
+
+* Security - Bump grpc-go dependency: [#13020](https://github.com/owncloud/ocis/pull/13020)
+* Security - Bump axios to 1.20.0: [#13056](https://github.com/owncloud/ocis/pull/13056)
+* Bugfix - Keep shares visible in sharedWithMe when a resource cannot be statted: [#12430](https://github.com/owncloud/ocis/pull/12430)
+* Bugfix - Release the quota of upload sessions with unreadable node metadata: [#12739](https://github.com/owncloud/ocis/pull/12739)
+* Bugfix - Remove the unmarshalable request body field from graph log messages: [#12918](https://github.com/owncloud/ocis/pull/12918)
+* Bugfix - Correct introduction version for OCIS_LDAP_INSTANCE_MAPPER_CACHE_TTL: [#12949](https://github.com/owncloud/ocis/pull/12949)
+* Bugfix - Return a retryable 503 when the OIDC userinfo call fails transiently: [#13047](https://github.com/owncloud/ocis/pull/13047)
+* Change - Replace GRPC_MAX_CONNECTION_AGE with client keepalive: [#13020](https://github.com/owncloud/ocis/pull/13020)
+* Enhancement - Add TLS support for the frontend stat cache store connection: [#12777](https://github.com/owncloud/ocis/pull/12777)
+* Enhancement - Make the public share expiry janitor configurable: [#13020](https://github.com/owncloud/ocis/pull/13020)
+* Enhancement - The public link resolution flag added to PROPFIND: [#13020](https://github.com/owncloud/ocis/pull/13020)
+
+## Details
+
+* Security - Bump grpc-go dependency: [#13020](https://github.com/owncloud/ocis/pull/13020)
+
+   We've updated the google.golang.org/grpc dependency to fix a reported
+   denial-of-service vulnerability related to gRPC server handling of requests
+   missing authority or Host headers. As no tagged release containing the fix was
+   available yet, we pulled in a pre-release snapshot of grpc-go that includes it,
+   which also required bumping the minimum Go version to 1.26.8.
+
+   https://github.com/owncloud/ocis/pull/13020
+
+* Security - Bump axios to 1.20.0: [#13056](https://github.com/owncloud/ocis/pull/13056)
+
+   We've updated the axios dependency of the idp service to 1.20.0. This fixes
+   several denial-of-service, request-smuggling and server-side request forgery
+   vulnerabilities flagged by the release filesystem scan.
+
+   https://github.com/owncloud/ocis/pull/13056
+
+* Bugfix - Keep shares visible in sharedWithMe when a resource cannot be statted: [#12430](https://github.com/owncloud/ocis/pull/12430)
+
+   The graph `sharedWithMe` handler resolves each received share by fanning out a
+   per-resource `Stat` call with a concurrency limit, all sharing the request
+   context. When a `Stat` failed for any reason (slow or stuck downstream, deleted
+   space, gateway error, deadline exceeded) the worker logged at debug and returned
+   without emitting a drive item, so the share was silently omitted from the
+   response and the handler still returned `200 OK` with a partial,
+   non-deterministic list. A single chronically-slow share could therefore make
+   other, recently-accepted shares intermittently invisible, and repeated calls
+   returned different subsets of the user's shares.
+
+   The handler now:
+
+   - bounds each per-share `Stat` with its own timeout derived from the request
+   context, so one slow resource can no longer consume the deadline shared by all
+   the other shares. The bound is configurable via
+   `GRAPH_RECEIVED_SHARES_STAT_TIMEOUT` (default `10s`); - returns a degraded drive
+   item built from the data already present in the share record (ids, permissions,
+   grantees, timestamps, mountpoint name) when the resource cannot be statted due
+   to a transient or indeterminate failure (timeout, slow or unavailable
+   downstream), so the share stays visible instead of intermittently disappearing.
+   A genuinely missing resource or revoked access (for example after the sharer was
+   deleted) still drops the share, as before; - logs the dropped/degraded shares at
+   warning level with a per-request count for operator visibility.
+
+   https://github.com/owncloud/ocis/pull/12430
+
+* Bugfix - Release the quota of upload sessions with unreadable node metadata: [#12739](https://github.com/owncloud/ocis/pull/12739)
+
+   When an upload's target node lost its metadata, e.g. because an ancestor was
+   moved to the trash while the upload was still in flight, the upload could never
+   finish processing. It stayed in "Processing" forever, could not be downloaded or
+   deleted, and kept consuming the space quota.
+
+   Cleaning such a session up with `ocis storage-users uploads sessions --clean`
+   did not help either: it removed the uploaded bytes and the session info file
+   before failing to revert the node, so it destroyed the only copy of the data
+   without releasing any quota.
+
+   Cleanup now reverts the node before removing anything irreversible and falls
+   back to the session metadata when the node cannot be read, so the quota is
+   released and the orphaned node is removed. If the quota cannot be released the
+   upload is kept so it can be retried instead of being lost.
+
+   A new `--orphaned` filter lists the affected sessions:
+
+   ```
+   ocis storage-users uploads sessions --orphaned
+   ocis storage-users uploads sessions --orphaned --clean
+   ```
+
+   Note that evaluating the filter reads the node metadata of every session, so it
+   is only done when the flag is set.
+
+   https://github.com/owncloud/ocis/pull/12739
+
+* Bugfix - Remove the unmarshalable request body field from graph log messages: [#12918](https://github.com/owncloud/ocis/pull/12918)
+
+   We've removed the `body` field from the log messages of the graph service's HTTP
+   handlers. The field was set from `http.Request.Body`, an `io.ReadCloser`, which
+   can never be serialized into a useful log value.
+
+   The tracing middleware replaces the request body with a wrapper that carries an
+   exported function field, so serializing it failed outright and the log line was
+   emitted with `"body": "marshaling error: json: unsupported type: func(int64)"`
+   instead of the payload. Without the tracing middleware the field serialized to
+   an empty object. In both cases the intended payload was never logged.
+
+   https://github.com/owncloud/ocis/pull/12918
+
+* Bugfix - Correct introduction version for OCIS_LDAP_INSTANCE_MAPPER_CACHE_TTL: [#12949](https://github.com/owncloud/ocis/pull/12949)
+
+   We changed the documented introduction version of the
+   OCIS_LDAP_INSTANCE_MAPPER_CACHE_TTL from 8.0.0 to 8.3.0.
+
+   https://github.com/owncloud/ocis/pull/12949
+
+* Bugfix - Return a retryable 503 when the OIDC userinfo call fails transiently: [#13047](https://github.com/owncloud/ocis/pull/13047)
+
+   A transient failure of the OIDC userinfo call (a timeout, a network error or a
+   5xx/429 from the IdP) was mapped to HTTP 401. Clients read the 401 as an invalid
+   session and logged the user out on a brief IdP slowdown.
+
+   The proxy now distinguishes a transient IdP failure from an authentication
+   failure and returns a retryable 503 (with Retry-After) for the former, so
+   clients retry and keep their session. A genuinely invalid or expired token still
+   returns 401.
+
+   https://github.com/owncloud/ocis/pull/13047
+
+* Change - Replace GRPC_MAX_CONNECTION_AGE with client keepalive: [#13020](https://github.com/owncloud/ocis/pull/13020)
+
+   The grpc clients now send a keepalive ping while a request is in flight and fail
+   the requests on a connection whose peer stops answering, instead of waiting for
+   as long as the caller allows. This covers both the reva CS3 clients (gateway,
+   storage-users, storage-shares, ...) and the go-micro based clients used for
+   inter-service calls between the other oCIS services. Set
+   GRPC_CLIENT_KEEPALIVE_TIME and GRPC_CLIENT_KEEPALIVE_TIMEOUT to enable and tune
+   this; leave them unset to keep grpc's own default (no pings).
+
+   GRPC_MAX_CONNECTION_AGE has been removed. It only closed healthy connections on
+   a timer, never ended a request that was already in flight, and silently did
+   nothing when its value had no unit suffix.
+
+   https://github.com/owncloud/ocis/pull/13020
+
+* Enhancement - Add TLS support for the frontend stat cache store connection: [#12777](https://github.com/owncloud/ocis/pull/12777)
+
+   The frontend service was the only remaining place where a `nats-js-kv` store
+   connection could not be secured. Its OCS stat cache forwarded the store type,
+   nodes, database, table, TTL and credentials to reva, but not the TLS settings,
+   so the connection stayed plaintext with no operator toggle to change it. The
+   stat cache now honours `OCIS_CACHE_ENABLE_TLS`, `OCIS_CACHE_TLS_INSECURE` and
+   `OCIS_CACHE_TLS_ROOT_CA_CERTIFICATE` like every other cache and store.
+
+   https://github.com/owncloud/ocis/pull/12777
+
+* Enhancement - Make the public share expiry janitor configurable: [#13020](https://github.com/owncloud/ocis/pull/13020)
+
+   The sharing service runs a background janitor that permanently deletes expired
+   public shares. Whether that cleanup runs at all could previously only be set in
+   the sharing service's yaml config, and how often it ran was fixed internally
+   with no way to tune it.
+
+   Both settings are now exposed as environment variables:
+   OCIS_SHARING_ENABLE_EXPIRED_SHARES_CLEANUP toggles the cleanup (default:
+   enabled, expired shares stay hidden from listings even when disabled), and the
+   new OCIS_SHARING_JANITOR_RUN_INTERVAL sets the interval in seconds between
+   janitor runs (default: 3600).
+
+   https://github.com/owncloud/ocis/pull/13020
+
+* Enhancement - The public link resolution flag added to PROPFIND: [#13020](https://github.com/owncloud/ocis/pull/13020)
+
+   The public link resolution flag and the context timeout added to PROPFIND
+   request The ocdav PROPFIND handler resolves public link shares to populate the
+   oc:share-type property. A new toggle for skipping that lookup. The toggle is now
+   exposed as OCDAV_DISABLE_PROPFIND_PUBLIC_LINK_RESOLUTION, which can be set to
+   reduce load on services for large collections. Also, the bounded context was
+   added for least public share request. Since this property is needed only to
+   display an icon next to files in the list, indicating that a public link exists,
+   it can be omitted if the ListPublicShares request is slow.
+
+   https://github.com/owncloud/ocis/pull/13020
 
 # Changelog for [8.0.8] (2026-08-20)
 
