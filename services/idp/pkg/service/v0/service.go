@@ -368,10 +368,14 @@ func (idp *IDP) basePage(r *http.Request, title, headline string) (basePageData,
 	})
 	lang := detectLocale(r)
 	t := idp.translator.Locale(lang)
+	// title and headline are translation lookup keys, not printf format strings;
+	// go vet's non-constant format string check can't trace through a func value,
+	// so assign Get to a local before calling it to avoid a false positive.
+	get := t.Get
 	return basePageData{
 		Lang:       lang,
-		Title:      t.Get(title),
-		Headline:   t.Get(headline),
+		Title:      get(title),
+		Headline:   get(headline),
 		Nonce:      rndm.GenerateRandomString(32),
 		PathPrefix: "/signin/v1",
 		BgImgURL:   idp.bgImgURL,

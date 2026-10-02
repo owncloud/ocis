@@ -17,8 +17,9 @@ type Config struct {
 	Log     *Log     `yaml:"log"`
 	Debug   Debug    `yaml:"debug"`
 
-	HTTP          HTTP                  `yaml:"http"`
-	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
+	HTTP              HTTP                      `yaml:"http"`
+	GRPCClientTLS     *shared.GRPCClientTLS     `yaml:"grpc_client_tls"`
+	GRPCClientOptions *shared.GRPCClientOptions `yaml:"grpc_client_options"`
 
 	TokenManager *TokenManager `yaml:"token_manager"`
 
@@ -40,11 +41,11 @@ type Config struct {
 
 // Persistence configures the store to use
 type Persistence struct {
-	Store        string        `yaml:"store" env:"OCIS_PERSISTENT_STORE;USERLOG_STORE" desc:"The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details." introductionVersion:"pre5.0"`
-	Nodes        []string      `yaml:"nodes" env:"OCIS_PERSISTENT_STORE_NODES;USERLOG_STORE_NODES" desc:"A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
-	Database     string        `yaml:"database" env:"USERLOG_STORE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"pre5.0"`
-	Table        string        `yaml:"table" env:"USERLOG_STORE_TABLE" desc:"The database table the store should use." introductionVersion:"pre5.0"`
-	TTL          time.Duration `yaml:"ttl" env:"OCIS_PERSISTENT_STORE_TTL;USERLOG_STORE_TTL" desc:"Time to live for events in the store. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
+	Store                string        `yaml:"store" env:"OCIS_PERSISTENT_STORE;USERLOG_STORE" desc:"The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details." introductionVersion:"pre5.0"`
+	Nodes                []string      `yaml:"nodes" env:"OCIS_PERSISTENT_STORE_NODES;USERLOG_STORE_NODES" desc:"A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
+	Database             string        `yaml:"database" env:"USERLOG_STORE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"pre5.0"`
+	Table                string        `yaml:"table" env:"USERLOG_STORE_TABLE" desc:"The database table the store should use." introductionVersion:"pre5.0"`
+	TTL                  time.Duration `yaml:"ttl" env:"OCIS_PERSISTENT_STORE_TTL;USERLOG_STORE_TTL" desc:"Time to live for events in the store. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
 	AuthUsername         string        `yaml:"username" env:"OCIS_PERSISTENT_STORE_AUTH_USERNAME;USERLOG_STORE_AUTH_USERNAME" desc:"The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
 	AuthPassword         string        `yaml:"password" env:"OCIS_PERSISTENT_STORE_AUTH_PASSWORD;USERLOG_STORE_AUTH_PASSWORD" desc:"The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
 	EnableTLS            bool          `yaml:"enable_tls" env:"OCIS_PERSISTENT_STORE_ENABLE_TLS;USERLOG_STORE_ENABLE_TLS" desc:"Activate TLS for the connection to the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`

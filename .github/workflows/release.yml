@@ -19,6 +19,7 @@ env:
   DOCKER_REPO_PRODUCTION: owncloud/ocis
   NODE_VERSION: '24'
   PNPM_VERSION: '10.28.1'
+  GOLANG_BUILD_IMAGE: 'golang:1.26.8-alpine3.23@sha256:a8fa79c5bd40d880b52bd3b6d7669ecdcfd00e85facdd427d279efb5ddd79cb1'
 
 jobs:
   determine-release-type:

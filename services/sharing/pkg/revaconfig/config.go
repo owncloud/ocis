@@ -125,6 +125,7 @@ func SharingConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string]
 							"service_user_idp":              cfg.PublicSharingDrivers.JSONCS3.SystemUserIDP,
 							"machine_auth_apikey":           cfg.PublicSharingDrivers.JSONCS3.SystemUserAPIKey,
 							"enable_expired_shares_cleanup": cfg.EnableExpiredSharesCleanup,
+							"janitor_run_interval":          cfg.JanitorRunInterval,
 						},
 					},
 				},

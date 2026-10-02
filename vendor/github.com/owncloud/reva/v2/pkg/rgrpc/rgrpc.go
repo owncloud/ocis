@@ -24,6 +24,7 @@ import (
 	"io"
 	"net"
 	"sort"
+	"time"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/mitchellh/mapstructure"
@@ -50,6 +51,12 @@ import (
 const (
 	// Prefix used to auto-propagate GRPC metadata across reva services
 	AutoPropPrefix = "autoprop-"
+
+	// _minKeepalivePingInterval is the shortest keepalive ping interval we
+	// accept from a client. Clients cannot ping more often than every ten
+	// seconds, so this leaves headroom below that; grpc's own default would
+	// GOAWAY anything more frequent than every five minutes.
+	_minKeepalivePingInterval = 5 * time.Second
 )
 
 // UnaryInterceptors is a map of registered unary grpc interceptors.
@@ -252,8 +259,12 @@ func (s *Server) registerServices() error {
 	if s.conf.TLSSettings.tlsConfig != nil {
 		opts = append(opts, grpc.Creds(credentials.NewTLS(s.conf.TLSSettings.tlsConfig)))
 	}
-	opts = append(opts, grpc.KeepaliveParams(keepalive.ServerParameters{
-		MaxConnectionAge: GetMaxConnectionAge(), // this forces clients to reconnect after 30 seconds, triggering a new DNS lookup to pick up new IPs
+	// accept the keepalive pings our clients send while an rpc is in flight, so
+	// that they can tell a peer that stopped answering from one that is merely
+	// slow
+	opts = append(opts, grpc.KeepaliveEnforcementPolicy(keepalive.EnforcementPolicy{
+		MinTime:             _minKeepalivePingInterval,
+		PermitWithoutStream: true,
 	}))
 
 	grpcServer := grpc.NewServer(opts...)

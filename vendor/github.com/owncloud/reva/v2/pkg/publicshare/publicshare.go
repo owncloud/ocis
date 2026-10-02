@@ -66,6 +66,12 @@ type LoadableManager interface {
 	Load(ctx context.Context, shareChan <-chan *WithPassword) error
 }
 
+// ClosableManager defines a share manager that owns background work (e.g. a
+// janitor) which must be stopped and awaited on shutdown
+type ClosableManager interface {
+	Close(ctx context.Context) error
+}
+
 // CreateSignature calculates a signature for a public share.
 func CreateSignature(token, pw string, expiration time.Time) (string, error) {
 	h := sha256.New()
