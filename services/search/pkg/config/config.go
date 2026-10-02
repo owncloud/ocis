@@ -22,12 +22,13 @@ type Config struct {
 
 	TokenManager *TokenManager `yaml:"token_manager"`
 
-	Reva                       *shared.Reva          `yaml:"reva"`
-	GRPCClientTLS              *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
-	Events                     Events                `yaml:"events"`
-	Engine                     Engine                `yaml:"engine"`
-	Extractor                  Extractor             `yaml:"extractor"`
-	ContentExtractionSizeLimit uint64                `yaml:"content_extraction_size_limit" env:"SEARCH_CONTENT_EXTRACTION_SIZE_LIMIT" desc:"Maximum file size in bytes that is allowed for content extraction." introductionVersion:"pre5.0"`
+	Reva                       *shared.Reva              `yaml:"reva"`
+	GRPCClientTLS              *shared.GRPCClientTLS     `yaml:"grpc_client_tls"`
+	GRPCClientOptions          *shared.GRPCClientOptions `yaml:"grpc_client_options"`
+	Events                     Events                    `yaml:"events"`
+	Engine                     Engine                    `yaml:"engine"`
+	Extractor                  Extractor                 `yaml:"extractor"`
+	ContentExtractionSizeLimit uint64                    `yaml:"content_extraction_size_limit" env:"SEARCH_CONTENT_EXTRACTION_SIZE_LIMIT" desc:"Maximum file size in bytes that is allowed for content extraction." introductionVersion:"pre5.0"`
 
 	ServiceAccount ServiceAccount `yaml:"service_account" mask:"struct"`
 

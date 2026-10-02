@@ -354,6 +354,16 @@ func (t *Tree) assimilate(item scanItem) error {
 	var id []byte
 	var err error
 
+	// only assimilate directories and regular files, Lstat so symlinks are not followed
+	fi, err := os.Lstat(item.Path)
+	if err != nil {
+		return err
+	}
+	if !fi.IsDir() && !fi.Mode().IsRegular() {
+		t.log.Debug().Str("path", item.Path).Msg("skipping non-regular file")
+		return nil
+	}
+
 	// First find the space id
 	spaceID, spaceAttrs, err := t.findSpaceId(item.Path)
 	if err != nil {
@@ -633,6 +643,11 @@ func (t *Tree) WarmupIDCache(root string, assimilate, onlyDirty bool) error {
 
 		if err != nil {
 			return err
+		}
+
+		// skip non-regular files, they are not assimilated and cannot hold metadata
+		if !info.IsDir() && !info.Mode().IsRegular() {
+			return nil
 		}
 
 		// calculate tree sizes

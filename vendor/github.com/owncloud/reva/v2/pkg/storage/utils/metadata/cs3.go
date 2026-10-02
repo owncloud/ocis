@@ -52,6 +52,12 @@ func init() {
 	tracer = otel.Tracer("github.com/owncloud/reva/pkg/storage/utils/metadata")
 }
 
+// defaultAuthRPCTimeout bounds the machine auth Authenticate call made for
+// every metadata operation. It only has to cover a token mint, so it is
+// generous - its purpose is to turn a stalled gateway into an error instead of
+// a goroutine that waits for the lifetime of the process.
+const defaultAuthRPCTimeout = 10 * time.Second
+
 // CS3 represents a metadata storage with a cs3 storage backend
 type CS3 struct {
 	SpaceRoot *provider.ResourceId
@@ -61,6 +67,7 @@ type CS3 struct {
 	useSystemUser     bool
 	serviceUser       *user.User
 	machineAuthAPIKey string
+	authRPCTimeout    time.Duration
 
 	dataGatewayClient *http.Client
 }
@@ -71,6 +78,7 @@ func NewCS3(gwAddr, providerAddr string) (s *CS3) {
 	return &CS3{
 		providerAddr:      providerAddr,
 		gatewayAddr:       gwAddr,
+		authRPCTimeout:    defaultAuthRPCTimeout,
 		dataGatewayClient: http.DefaultClient,
 	}
 }
@@ -573,12 +581,30 @@ func (cs3 *CS3) getAuthContext(ctx context.Context) (context.Context, error) {
 	}
 
 	authCtx = ctxpkg.ContextSetUser(authCtx, cs3.serviceUser)
-	authRes, err := client.Authenticate(authCtx, &gateway.AuthenticateRequest{
+
+	// The Authenticate call gets a context of its own: a gateway that is stuck
+	// on a downstream storage provider accepts the connection and then never
+	// answers, and there is nothing else that would ever end the wait. The
+	// deadline cannot live on authCtx, because the caller runs its own RPC on
+	// the context we return here.
+	timeout := cs3.authRPCTimeout
+	if timeout <= 0 {
+		timeout = defaultAuthRPCTimeout
+	}
+	rpcCtx, cancel := context.WithTimeout(authCtx, timeout)
+	defer cancel()
+
+	start := time.Now()
+	authRes, err := client.Authenticate(rpcCtx, &gateway.AuthenticateRequest{
 		Type:         "machine",
 		ClientId:     "userid:" + cs3.serviceUser.Id.OpaqueId,
 		ClientSecret: cs3.machineAuthAPIKey,
 	})
 	if err != nil {
+		// this used to fail silently by never returning at all, so make sure
+		// an exhausted deadline is visible at production log level
+		appctx.GetLogger(ctx).Warn().Err(err).Str("gateway_addr", cs3.gatewayAddr).
+			Dur("elapsed", time.Since(start)).Dur("timeout", timeout).Msg("cs3: machine authentication failed")
 		return nil, err
 	}
 	if authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {

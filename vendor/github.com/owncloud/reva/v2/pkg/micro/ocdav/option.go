@@ -64,13 +64,14 @@ type Options struct {
 	MetricsSubsystem string
 
 	// ocdav.* is internal so we need to set config options individually
-	config             config.Config
-	lockSystem         ocdav.LockSystem
-	AllowCredentials   bool
-	AllowedOrigins     []string
-	AllowedHeaders     []string
-	AllowedMethods     []string
-	AllowDepthInfinity bool
+	config                              config.Config
+	lockSystem                          ocdav.LockSystem
+	AllowCredentials                    bool
+	AllowedOrigins                      []string
+	AllowedHeaders                      []string
+	AllowedMethods                      []string
+	AllowDepthInfinity                  bool
+	DisablePropfindPublicLinkResolution bool
 
 	RegisterTTL      time.Duration
 	RegisterInterval time.Duration
@@ -111,6 +112,13 @@ func Address(val string) Option {
 func AllowDepthInfinity(val bool) Option {
 	return func(o *Options) {
 		o.AllowDepthInfinity = val
+	}
+}
+
+// DisablePropfindPublicLinkResolution provides a function to set the DisablePropfindPublicLinkResolution option.
+func DisablePropfindPublicLinkResolution(val bool) Option {
+	return func(o *Options) {
+		o.DisablePropfindPublicLinkResolution = val
 	}
 }
 

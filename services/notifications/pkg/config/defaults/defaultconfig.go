@@ -80,6 +80,10 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.Notifications.GRPCClientTLS == nil && cfg.Commons != nil {
 		cfg.Notifications.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
 	}
+
+	if cfg.GRPCClientOptions == (shared.GRPCClientOptions{}) && cfg.Commons != nil && cfg.Commons.GRPCClientOptions != nil {
+		cfg.GRPCClientOptions = *cfg.Commons.GRPCClientOptions
+	}
 }
 
 // Sanitize sanitizes the configuration
