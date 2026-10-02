@@ -1,4 +1,4 @@
-Bugfix: Don't let unresolvable files abort a space reindex, and make the abort threshold configurable
+Bugfix: Reindex no longer aborts on unresolvable files; threshold configurable
 
 `IndexSpace` aborts the walk after 5 consecutive files fail, on the assumption
 that the content extractor is down. Two things made that fire on healthy
