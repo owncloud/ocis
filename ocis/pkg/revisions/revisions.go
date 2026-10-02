@@ -18,7 +18,13 @@ var (
 	// 9113a718-8285-4b32-9042-f930f1a58ac2.REV.2024-05-22T07:32:53.89969726Z
 	// 9113a718-8285-4b32-9042-f930f1a58ac2.REV.2024-05-22T07:32:53.89969726Z.mpk
 	// 9113a718-8285-4b32-9042-f930f1a58ac2.REV.2024-05-22T07:32:53.89969726Z.mlock
-	_versionRegex = regexp.MustCompile(`\.REV\.[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+Z*`)
+	// 9113a718-8285-4b32-9042-f930f1a58ac2.REV.2024-05-22T07:32:53Z
+	// 9113a718-8285-4b32-9042-f930f1a58ac2.REV.1601-01-01T00:00:00Z
+	//
+	// Fractional seconds are optional because decomposedfs formats the revision
+	// id with time.RFC3339Nano, which drops them when the mtime is a whole
+	// second. The pattern stays unanchored so .mpk and .mlock companions match.
+	_versionRegex = regexp.MustCompile(`\.REV\.[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?Z*`)
 )
 
 // DelBlobstore is the interface for a blobstore that can delete blobs.
