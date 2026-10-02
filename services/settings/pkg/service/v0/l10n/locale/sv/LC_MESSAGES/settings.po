@@ -1,0 +1,147 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# Martin <github@diemattels.at>, 2026
+# Daniel Nylander <po@danielnylander.se>, 2026
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: EMAIL\n"
+"POT-Creation-Date: 2026-09-22 02:26+0000\n"
+"PO-Revision-Date: 2026-01-02 10:10+0000\n"
+"Last-Translator: Daniel Nylander <po@danielnylander.se>, 2026\n"
+"Language-Team: Swedish (https://app.transifex.com/owncloud-org/teams/6149/sv/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sv\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. name of the notification option 'Space Shared'
+#: pkg/store/defaults/templates.go:20
+msgid "Added as space member"
+msgstr "Tillagd som medlem i utrymmet"
+
+#. translation for the 'daily' email interval option
+#: pkg/store/defaults/templates.go:50
+msgid "Daily"
+msgstr "Dagligen"
+
+#. name of the notification option 'Email Interval'
+#: pkg/store/defaults/templates.go:44
+msgid "Email sending interval"
+msgstr "Intervall för e-postutskick"
+
+#. name of the notification option 'File Rejected'
+#: pkg/store/defaults/templates.go:40
+msgid "File rejected"
+msgstr "Filen avvisades"
+
+#. translation for the 'instant' email interval option
+#: pkg/store/defaults/templates.go:48
+msgid "Instant"
+msgstr "Omedelbart"
+
+#. translation for the 'never' email interval option
+#: pkg/store/defaults/templates.go:54
+msgid "Never"
+msgstr "Aldrig"
+
+#. description of the notification option 'Space Shared'
+#: pkg/store/defaults/templates.go:22
+msgid "Notify when I have been added as a member to a space"
+msgstr "Meddela när jag har lagts till som medlem i ett utrymme"
+
+#. description of the notification option 'Space Unshared'
+#: pkg/store/defaults/templates.go:26
+msgid "Notify when I have been removed as member from a space"
+msgstr "Meddela när jag har tagits bort som medlem från ett utrymme"
+
+#. description of the notification option 'Share Received'
+#: pkg/store/defaults/templates.go:10
+msgid "Notify when I have received a share"
+msgstr "Meddela när jag har fått en delning"
+
+#. description of the notification option 'File Rejected'
+#: pkg/store/defaults/templates.go:42
+msgid ""
+"Notify when a file I uploaded was rejected because of a virus infection or "
+"policy violation"
+msgstr ""
+"Meddela när en fil som jag har laddat upp avvisades på grund av "
+"virusinfektion eller policyöverträdelse"
+
+#. description of the notification option 'Share Removed'
+#: pkg/store/defaults/templates.go:14
+msgid "Notify when a received share has been removed"
+msgstr "Meddela när en mottagen delning har tagits bort"
+
+#. description of the notification option 'Share Expired'
+#: pkg/store/defaults/templates.go:18
+msgid "Notify when a received share has expired"
+msgstr "Meddela när en mottagen delning har upphört att gälla"
+
+#. description of the notification option 'Space Deleted'
+#: pkg/store/defaults/templates.go:38
+msgid "Notify when a space I am member of has been deleted"
+msgstr "Meddela när ett utrymme där jag är medlem har tagits bort"
+
+#. description of the notification option 'Space Disabled'
+#: pkg/store/defaults/templates.go:34
+msgid "Notify when a space I am member of has been disabled"
+msgstr "Meddela när ett utrymme där jag är medlem har inaktiverats"
+
+#. description of the notification option 'Space Membership Expired'
+#: pkg/store/defaults/templates.go:30
+msgid "Notify when a space membership has expired"
+msgstr "Meddela när ett medlemskap i ett utrymme har upphört att gälla"
+
+#. name of the notification option 'Space Unshared'
+#: pkg/store/defaults/templates.go:24
+msgid "Removed as space member"
+msgstr "Borttagen som medlem från utrymmet"
+
+#. description of the notification option 'Email Interval'
+#: pkg/store/defaults/templates.go:46
+msgid "Selected value:"
+msgstr "Valt värde:"
+
+#. name of the notification option 'Share Expired'
+#: pkg/store/defaults/templates.go:16
+msgid "Share Expired"
+msgstr "Delning har upphört att gälla"
+
+#. name of the notification option 'Share Received'
+#: pkg/store/defaults/templates.go:8
+msgid "Share Received"
+msgstr "Delning mottagen"
+
+#. name of the notification option 'Share Removed'
+#: pkg/store/defaults/templates.go:12
+msgid "Share Removed"
+msgstr "Delning borttagen"
+
+#. name of the notification option 'Space Deleted'
+#: pkg/store/defaults/templates.go:36
+msgid "Space deleted"
+msgstr "Utrymmet har tagits bort"
+
+#. name of the notification option 'Space Disabled'
+#: pkg/store/defaults/templates.go:32
+msgid "Space disabled"
+msgstr "Utrymmet har inaktiverats"
+
+#. name of the notification option 'Space Membership Expired'
+#: pkg/store/defaults/templates.go:28
+msgid "Space membership expired"
+msgstr "Medlemskapet i utrymmet har upphört att gälla"
+
+#. translation for the 'weekly' email interval option
+#: pkg/store/defaults/templates.go:52
+msgid "Weekly"
+msgstr "Varje vecka"
