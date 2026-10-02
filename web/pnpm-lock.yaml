@@ -32,7 +32,7 @@ patchedDependencies:
     hash: ce486dc8fb49b1e3f9b160bfede1dfeb31a492b7e1ea6dc8d10bbee39174cdcb
     path: patches/portal-vue@3.0.0.patch
   vue-select@4.0.0-beta.6:
-    hash: 3cffa7f2dfdb75bd1f98edbf4df29a19c6c0bcb7979a6dfe8610db0175c9e1ef
+    hash: d22b3956d7e7d2f91be144008f2c2f4925a728734b17913542fa6b640df22526
     path: patches/vue-select@4.0.0-beta.6.patch
 
 importers:
@@ -291,7 +291,7 @@ importers:
         version: 5.0.6(@vue/compiler-sfc@3.5.29)(esbuild@0.27.7)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.29(typescript@5.9.3)))(rollup@4.62.2)(vite@7.3.5(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))(vue@3.5.29(typescript@5.9.3))(webpack@5.108.4(esbuild@0.27.7)(postcss@8.5.21))
       vue-select:
         specifier: 4.0.0-beta.6
-        version: 4.0.0-beta.6(patch_hash=3cffa7f2dfdb75bd1f98edbf4df29a19c6c0bcb7979a6dfe8610db0175c9e1ef)(vue@3.5.29(typescript@5.9.3))
+        version: 4.0.0-beta.6(patch_hash=d22b3956d7e7d2f91be144008f2c2f4925a728734b17913542fa6b640df22526)(vue@3.5.29(typescript@5.9.3))
       vue3-gettext:
         specifier: ^4.0.1
         version: 4.0.1(vue@3.5.29(typescript@5.9.3))
@@ -15340,7 +15340,7 @@ snapshots:
       - vite
       - webpack
 
-  vue-select@4.0.0-beta.6(patch_hash=3cffa7f2dfdb75bd1f98edbf4df29a19c6c0bcb7979a6dfe8610db0175c9e1ef)(vue@3.5.29(typescript@5.9.3)):
+  vue-select@4.0.0-beta.6(patch_hash=d22b3956d7e7d2f91be144008f2c2f4925a728734b17913542fa6b640df22526)(vue@3.5.29(typescript@5.9.3)):
     dependencies:
       vue: 3.5.29(typescript@5.9.3)
 

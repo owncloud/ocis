@@ -11,7 +11,8 @@ const selectors = {
   ocSpinner: '.oc-spinner',
   warningMessage: '.oc-text-input-warning',
   errorMessage: '.oc-text-input-danger',
-  descriptionMessage: '.oc-text-input-description'
+  descriptionMessage: '.oc-text-input-description',
+  dropdownToggle: '.vs__dropdown-toggle'
 }
 
 describe('OcSelect', () => {
@@ -80,6 +81,30 @@ describe('OcSelect', () => {
       const wrapper = getWrapper({ options, modelValue: options[0], multiple: true })
       expect(wrapper.find(selectors.deselectBtn).exists()).toBeFalsy()
       expect(wrapper.find(selectors.deselectLockIcon).exists()).toBeTruthy()
+    })
+  })
+  describe('accessibility', () => {
+    it('sets the combobox role and an accessible name on the focusable search input', () => {
+      const wrapper = getWrapper({ label: 'Language' })
+      const search = wrapper.find(selectors.searchInput)
+      expect(search.attributes('role')).toBe('combobox')
+      expect(search.attributes('aria-label')).toBe('Language')
+      expect(search.attributes('aria-labelledby')).toBeUndefined()
+    })
+    it('points aria-controls at the rendered listbox', () => {
+      const wrapper = getWrapper()
+      const listbox = wrapper.find('[role="listbox"]')
+      expect(listbox.exists()).toBeTruthy()
+      expect(wrapper.find(selectors.searchInput).attributes('aria-controls')).toBe(
+        listbox.attributes('id')
+      )
+    })
+    it('does not put combobox semantics on the non-focusable dropdown toggle', () => {
+      const wrapper = getWrapper()
+      const toggle = wrapper.find(selectors.dropdownToggle)
+      expect(toggle.attributes('role')).toBeUndefined()
+      expect(toggle.attributes('aria-expanded')).toBeUndefined()
+      expect(toggle.attributes('aria-label')).toBeUndefined()
     })
   })
   describe('message', () => {

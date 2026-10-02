@@ -18,9 +18,6 @@
         <oc-icon v-if="$attrs['read-only']" name="lock" class="oc-mr-xs" size="small" />
         <span v-text="displayValue" />
       </template>
-      <template #search="{ attributes, events }">
-        <input class="vs__search" v-bind="attributes" v-on="events" />
-      </template>
       <template #option="{ displayValue, error }">
         <div class="oc-flex oc-flex-between">
           <span v-text="displayValue" />
