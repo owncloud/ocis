@@ -127,7 +127,7 @@
       "nanoid@^5.0.0": "5.1.16",
       "browserslist": "4.28.7",
       "fast-uri": "3.1.7",
-      "axios": "1.20.0"
+      "axios": "1.18.1"
     },
     "patchedDependencies": {
       "caf@15.0.1": "patches/caf@15.0.1.patch",
