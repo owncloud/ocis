@@ -1,11 +1,19 @@
-import { CapabilityStore, ConfigStore, useAuthStore, useConfigStore } from '@ownclouders/web-pkg'
+import {
+  CapabilityStore,
+  ConfigStore,
+  useAuthStore,
+  useConfigStore,
+  useMessages
+} from '@ownclouders/web-pkg'
 import { mock } from 'vitest-mock-extended'
 import { Router } from 'vue-router'
 import { Ability } from '@ownclouders/web-client'
 import { AuthService } from '../../../../src/services/auth/authService'
+import { vaultStepUpFailedKey } from '../../../../src/helpers/vaultStepUp'
 import { UserManager } from '../../../../src/services/auth/userManager'
 import { RouteLocation, createRouter, createTestingPinia } from '@ownclouders/web-test-helpers'
 import { User } from 'oidc-client-ts'
+import { Language } from 'vue3-gettext'
 
 const mockUpdateContext = vi.fn()
 console.debug = vi.fn()
@@ -27,6 +35,11 @@ const initAuthService = ({
 
   authService.initialize(configStore, null, router, null, null, null, authStore, null, null)
 }
+
+const stepUpRequest = (target: string) => ({
+  acr_values: 'advanced',
+  state: { mfaStepUpTarget: target }
+})
 
 describe('AuthService', () => {
   describe('signInCallback', () => {
@@ -420,7 +433,10 @@ describe('AuthService', () => {
         null,
         router,
         ability,
-        null,
+        {
+          $gettext: (msg: string) => msg,
+          $pgettext: (_context: string, msg: string) => msg
+        } as unknown as Language,
         null,
         authStore,
         capabilityStore,
@@ -429,6 +445,10 @@ describe('AuthService', () => {
 
       return { authService, pushSpy, mockSignInRedirect, mockLoadUserAbilities, mockUpdateContext }
     }
+
+    beforeEach(() => {
+      sessionStorage.clear()
+    })
 
     it('when the user lacks the vault ability, denies (accessDenied) instead of the IdP', async () => {
       const { authService, mockSignInRedirect } = setupVaultAuthService({
@@ -455,7 +475,9 @@ describe('AuthService', () => {
       const result = await authService.initializeContext(vaultRoute)
 
       expect(result).toBeUndefined()
-      expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
+      expect(mockSignInRedirect).toHaveBeenCalledWith(
+        expect.objectContaining({ acr_values: 'advanced' })
+      )
     })
 
     it('when there is no authenticated user (cold load), does not deny and hands off to the IdP for login', async () => {
@@ -469,7 +491,9 @@ describe('AuthService', () => {
 
       expect(mockLoadUserAbilities).not.toHaveBeenCalled()
       expect(result).toBeUndefined()
-      expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
+      expect(mockSignInRedirect).toHaveBeenCalledWith(
+        expect.objectContaining({ acr_values: 'advanced' })
+      )
     })
 
     it('on a cold load, denies an authenticated but unentitled user before the IdP hand-off', async () => {
@@ -528,7 +552,125 @@ describe('AuthService', () => {
 
       expect(mockLoadUserAbilities).toHaveBeenCalled()
       expect(result).toBeUndefined()
-      expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
+      expect(mockSignInRedirect).toHaveBeenCalledWith(
+        expect.objectContaining({ acr_values: 'advanced' })
+      )
+    })
+
+    describe('MFA step-up loop protection', () => {
+      const regularUser = () =>
+        Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: false }))
+
+      // Runs the real sign-in callback for a step-up the IdP answered for `target`.
+      const returnFromIdp = async (authService: AuthService, target: string) => {
+        const userManager = (authService as any).userManager
+        userManager.signinRedirectCallback.mockResolvedValue(
+          mock<User>({ state: { mfaStepUpTarget: target } })
+        )
+        userManager.getAndClearPostLoginRedirectUrl.mockReturnValue(target)
+        vi.spyOn((authService as any).router, 'replace').mockResolvedValue(undefined)
+        await authService.signInCallback()
+      }
+
+      const spyNavigateOutsideVault = (authService: AuthService) =>
+        vi.spyOn(authService as any, 'navigateOutsideVault').mockImplementation(() => undefined)
+
+      it('requests the step-up with the target as OIDC state', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: true,
+          getUser: regularUser
+        })
+
+        await authService.initializeContext(vaultRoute)
+
+        expect(mockSignInRedirect).toHaveBeenCalledWith(stepUpRequest('/vault'))
+      })
+
+      it('leaves the vault with a full page load when the IdP answered without the required acr', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: true,
+          getUser: regularUser
+        })
+        const navigateSpy = spyNavigateOutsideVault(authService)
+        await returnFromIdp(authService, '/vault')
+
+        const result = await authService.initializeContext(vaultRoute)
+
+        // navigation is cancelled, no in-app redirect that would keep the vault clients
+        expect(result).toBe(false)
+        expect(navigateSpy).toHaveBeenCalledTimes(1)
+        expect(navigateSpy.mock.calls[0][0]).not.toMatch(/vault/)
+        expect(mockSignInRedirect).not.toHaveBeenCalled()
+        expect(sessionStorage.getItem(vaultStepUpFailedKey)).toBe('true')
+      })
+
+      it('redirects again when the user came back without the IdP answering (e.g. browser back)', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: true,
+          getUser: regularUser
+        })
+        const navigateSpy = spyNavigateOutsideVault(authService)
+
+        await authService.initializeContext(vaultRoute)
+        const result = await authService.initializeContext(vaultRoute)
+
+        expect(result).toBeUndefined()
+        expect(mockSignInRedirect).toHaveBeenCalledTimes(2)
+        expect(navigateSpy).not.toHaveBeenCalled()
+      })
+
+      it('only treats the navigation right after the callback as the answer', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: true,
+          getUser: regularUser
+        })
+        const navigateSpy = spyNavigateOutsideVault(authService)
+        await returnFromIdp(authService, '/vault')
+
+        // the callback lands somewhere else first, a later vault navigation must ask the IdP again
+        await authService.initializeContext({ params: {}, fullPath: '/files' } as any)
+        const result = await authService.initializeContext(vaultRoute)
+
+        expect(result).toBeUndefined()
+        expect(navigateSpy).not.toHaveBeenCalled()
+        expect(mockSignInRedirect).toHaveBeenCalledWith(stepUpRequest('/vault'))
+      })
+
+      it('redirects an expired user to the IdP even when the IdP just answered', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: true,
+          getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: true }))
+        })
+        const navigateSpy = spyNavigateOutsideVault(authService)
+        await returnFromIdp(authService, '/vault')
+
+        const result = await authService.initializeContext(vaultRoute)
+
+        expect(result).toBeUndefined()
+        expect(navigateSpy).not.toHaveBeenCalled()
+        expect(mockSignInRedirect).toHaveBeenCalledWith(stepUpRequest('/vault'))
+      })
+
+      it('shows the step-up failure message after the reload and only once', async () => {
+        const { authService } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: true,
+          getUser: () =>
+            Promise.resolve(mock<User>({ profile: { acr: 'advanced' }, expired: false }))
+        })
+        sessionStorage.setItem(vaultStepUpFailedKey, 'true')
+
+        await authService.initializeContext(vaultRoute)
+        await authService.initializeContext(vaultRoute)
+
+        expect(useMessages().showErrorMessage).toHaveBeenCalledTimes(1)
+        expect(sessionStorage.getItem(vaultStepUpFailedKey)).toBeNull()
+      })
     })
   })
 })

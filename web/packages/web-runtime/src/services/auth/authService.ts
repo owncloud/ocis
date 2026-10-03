@@ -9,10 +9,12 @@ import {
   useTokenTimerWorker,
   useMfaExpiryWorker,
   useModals,
+  useMessages,
   AuthServiceInterface
 } from '@ownclouders/web-pkg'
 import { RouteLocation, RouteLocationRaw, Router } from 'vue-router'
 import {
+  base,
   extractPublicLinkToken,
   isAnonymousContext,
   isIdpContextRequired,
@@ -25,6 +27,19 @@ import { Language } from 'vue3-gettext'
 import { PublicLinkType } from '@ownclouders/web-client'
 import { WebWorkersStore } from '@ownclouders/web-pkg'
 import { isSilentRedirectRoute } from '../../helpers/silentRedirect'
+import { vaultStepUpFailedKey } from '../../helpers/vaultStepUp'
+
+/**
+ * Custom OIDC state sent with an MFA step-up request. oidc-client-ts stores it with the
+ * request and returns it from the sign-in callback, so a step-up is only treated as answered
+ * when the IdP actually redirected back for it.
+ */
+interface MfaStepUpState {
+  mfaStepUpTarget: string
+}
+
+const isMfaStepUpState = (state: unknown): state is MfaStepUpState =>
+  typeof (state as MfaStepUpState)?.mfaStepUpTarget === 'string'
 
 export class AuthService implements AuthServiceInterface {
   private clientService: ClientService
@@ -49,6 +64,11 @@ export class AuthService implements AuthServiceInterface {
 
   // number of seconds before an access token is to expire to raise the accessTokenExpiring event
   private accessTokenExpiryThreshold = 10
+
+  // Target of an MFA step-up the IdP just answered (set in `signInCallback`) ...
+  private pendingStepUpReturnTarget: string | null = null
+  // ... and moved here for exactly the navigation that follows the callback.
+  private stepUpReturnTarget: string | null = null
 
   public hasAuthErrorOccurred: boolean
 
@@ -86,7 +106,13 @@ export class AuthService implements AuthServiceInterface {
    *
    * @param to {Route}
    */
-  public async initializeContext(to: RouteLocation): Promise<RouteLocationRaw | void> {
+  public async initializeContext(to: RouteLocation): Promise<RouteLocationRaw | false | void> {
+    // A step-up answer is only valid for the navigation right after the callback.
+    this.stepUpReturnTarget = this.pendingStepUpReturnTarget
+    this.pendingStepUpReturnTarget = null
+
+    this.showPendingVaultStepUpFailure()
+
     if (!this.publicLinkManager) {
       this.publicLinkManager = new PublicLinkManager({
         clientService: this.clientService,
@@ -159,8 +185,20 @@ export class AuthService implements AuthServiceInterface {
       }
 
       if (!user || user.expired || user.profile.acr !== requiredAcr) {
+        // `acr_values` is a voluntary claim: an IdP that can't reach the required level
+        // (no second factor available/enrolled) returns a lower `acr` instead of an error.
+        // Redirecting again would loop forever, so give up once the IdP answered the step-up.
+        if (user && !user.expired && this.isStepUpReturn(to.fullPath)) {
+          console.warn(
+            `[authService:initializeContext] - MFA step-up returned acr "${user.profile.acr}", required "${requiredAcr}". Not retrying.`
+          )
+          this.leaveVaultAfterFailedStepUp()
+          // cancel the vault navigation, the page reloads outside the vault
+          return false
+        }
+
         this.userManager.setPostLoginRedirectUrl(to.fullPath)
-        await this.userManager.signinRedirect({ acr_values: requiredAcr })
+        await this.signinRedirectForStepUp(requiredAcr, to.fullPath)
         // redirecting to the IdP, don't establish the user context below
         return
       }
@@ -307,7 +345,12 @@ export class AuthService implements AuthServiceInterface {
         console.debug('[authService:signInCallback] - adding listener to update-token event')
         window.addEventListener('message', this.handleDelegatedTokenUpdate)
       } else {
-        await this.userManager.signinRedirectCallback(this.buildSignInCallbackUrl())
+        const callbackUser = await this.userManager.signinRedirectCallback(
+          this.buildSignInCallbackUrl()
+        )
+        if (isMfaStepUpState(callbackUser?.state)) {
+          this.pendingStepUpReturnTarget = callbackUser.state.mfaStepUpTarget
+        }
       }
 
       const user = await this.userManager.getUser()
@@ -461,6 +504,62 @@ export class AuthService implements AuthServiceInterface {
 
     this.userManager.setPostLoginRedirectUrl(redirectUrl)
     return this.userManager.signinRedirect({ acr_values: acrValue })
+  }
+
+  private signinRedirectForStepUp(acrValue: string, target: string) {
+    const state: MfaStepUpState = { mfaStepUpTarget: target }
+    return this.userManager.signinRedirect({ acr_values: acrValue, state })
+  }
+
+  /**
+   * Whether the current navigation is the one right after the IdP answered a step-up for `target`.
+   */
+  private isStepUpReturn(target: string): boolean {
+    return this.stepUpReturnTarget !== null && this.stepUpReturnTarget === target
+  }
+
+  /**
+   * Vault mode is fixed for the lifetime of the page (see `useVault`), so leaving it
+   * requires a full page load. An in-app navigation would keep the vault clients and
+   * load vault spaces with a non-MFA token.
+   */
+  private leaveVaultAfterFailedStepUp() {
+    try {
+      sessionStorage.setItem(vaultStepUpFailedKey, 'true')
+    } catch {
+      // message can't be shown after the reload, leaving the vault still has to happen
+    }
+    this.navigateOutsideVault(base?.href || `${window.location.origin}/`)
+  }
+
+  private navigateOutsideVault(url: string) {
+    window.location.assign(url)
+  }
+
+  private showPendingVaultStepUpFailure() {
+    try {
+      if (!sessionStorage.getItem(vaultStepUpFailedKey)) {
+        return
+      }
+      sessionStorage.removeItem(vaultStepUpFailedKey)
+    } catch {
+      return
+    }
+    this.showVaultStepUpFailedMessage()
+  }
+
+  private showVaultStepUpFailedMessage() {
+    const { $pgettext } = this.language
+    useMessages().showErrorMessage({
+      title: $pgettext(
+        'Error message title shown when the multi-factor authentication step-up required to open the vault failed',
+        'Multi-factor authentication required'
+      ),
+      desc: $pgettext(
+        'Error message shown when the multi-factor authentication step-up required to open the vault failed, e.g. because the user has no second factor at hand',
+        'The vault requires multi-factor authentication, which could not be completed. Please set up a second factor or contact your administrator.'
+      )
+    })
   }
 
   private updateMfaExpiryTimer() {
