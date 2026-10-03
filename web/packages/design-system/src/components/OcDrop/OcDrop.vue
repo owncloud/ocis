@@ -185,7 +185,11 @@ const onFocusOut = (event: FocusEvent) => {
   if (!tippyBox) {
     return
   }
-  const focusLeft = event.relatedTarget && !tippyBox.contains(event.relatedTarget as Node)
+  const relatedTarget = event.relatedTarget as Node | null
+  // focus moving to the trigger means it's being clicked, which toggles the drop
+  // itself. Hiding here too would make that click reopen it instead of closing it
+  const focusMovedToTrigger = relatedTarget && unref(triggerEl)?.contains(relatedTarget)
+  const focusLeft = relatedTarget && !tippyBox.contains(relatedTarget) && !focusMovedToTrigger
   if (focusLeft) {
     hide()
   }
