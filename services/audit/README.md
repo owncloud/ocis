@@ -2,6 +2,8 @@
 
 The audit service logs all events of the system as an audit log. Per default, it will be logged to standard out, but can also be configured to a file output. Supported log formats are json or a minimal human-readable format.
 
+Besides shares, links, files, spaces, users and groups, tag changes are recorded: adding tags to a file or folder is logged as `file_tags_add` and removing them as `file_tags_remove`, each with the acting user, the file id and the tags concerned.
+
 With audit logs, you are able to prove compliance with corporate guidelines as well as to enable reporting and auditing of operations. The audit service takes note of actions conducted by users and administrators.
 
 Example minimal format:

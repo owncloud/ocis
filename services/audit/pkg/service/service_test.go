@@ -587,6 +587,52 @@ var testCases = []struct {
 			require.Equal(t, "http://ocis.test/invite", ev.InviteLink)
 		},
 	},
+	{
+		Alias: "Tags added",
+		SystemEvent: events.Event{
+			Event: events.TagsAdded{
+				Executant:  userID("uid-123"),
+				SpaceOwner: userID("uid-owner"),
+				Ref:        reference("pro-1", "sto-123", "iid-123", "./item"),
+				Tags:       "holiday,family",
+				Timestamp:  timestamp(10e8),
+			},
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventTagsAdded{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields: User is the actor, Owner the space owner
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "2001-09-09T01:46:40Z", "user 'uid-123' added tags 'holiday,family' to file 'pro-1$sto-123!iid-123/item'", "file_tags_add")
+			// AuditEventFiles fields
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-owner", "./item")
+			// AuditEventTagsAdded fields
+			require.Equal(t, "holiday,family", ev.Tags)
+		},
+	},
+	{
+		Alias: "Tags removed",
+		SystemEvent: events.Event{
+			Event: events.TagsRemoved{
+				Executant:  userID("uid-123"),
+				SpaceOwner: userID("uid-owner"),
+				Ref:        reference("pro-1", "sto-123", "iid-123", "./item"),
+				Tags:       "holiday",
+				Timestamp:  timestamp(10e8),
+			},
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventTagsRemoved{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields: User is the actor, Owner the space owner
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "2001-09-09T01:46:40Z", "user 'uid-123' removed tags 'holiday' from file 'pro-1$sto-123!iid-123/item'", "file_tags_remove")
+			// AuditEventFiles fields
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-owner", "./item")
+			// AuditEventTagsRemoved fields
+			require.Equal(t, "holiday", ev.Tags)
+		},
+	},
 }
 
 func TestAuditLogging(t *testing.T) {

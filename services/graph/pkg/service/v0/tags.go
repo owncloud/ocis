@@ -16,6 +16,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/tags"
+	"github.com/owncloud/reva/v2/pkg/utils"
 	"go-micro.dev/v4/metadata"
 )
 
@@ -148,6 +149,7 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 			},
 			SpaceOwner: sres.Info.Owner,
 			Executant:  revaCtx.ContextMustGetUser(r.Context()).Id,
+			Timestamp:  utils.TSNow(),
 		}
 		if err := events.Publish(r.Context(), g.eventsPublisher, ev); err != nil {
 			g.logger.Error().Err(err).Msg("Failed to publish TagsAdded event")
@@ -246,6 +248,7 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 		},
 		SpaceOwner: sres.Info.Owner,
 		Executant:  revaCtx.ContextMustGetUser(ctx).Id,
+		Timestamp:  utils.TSNow(),
 	}
 	if g.publishTagsRemoved(ctx, client, ev, tagsChanged, currentTags) != nil {
 		w.WriteHeader(http.StatusInternalServerError)

@@ -83,6 +83,10 @@ func StartAuditLogger(ctx context.Context, ch <-chan events.Event, log log.Logge
 				auditEvent = types.ItemRestored(ev)
 			case events.FileVersionRestored:
 				auditEvent = types.FileVersionRestored(ev)
+			case events.TagsAdded:
+				auditEvent = types.TagsAdded(ev)
+			case events.TagsRemoved:
+				auditEvent = types.TagsRemoved(ev)
 			case events.SpaceCreated:
 				auditEvent = types.SpaceCreated(ev)
 			case events.SpaceRenamed:
