@@ -2416,7 +2416,7 @@ google.golang.org/genproto/googleapis/api/httpbody
 ## explicit; go 1.25.0
 google.golang.org/genproto/googleapis/rpc/errdetails
 google.golang.org/genproto/googleapis/rpc/status
-# google.golang.org/grpc v1.84.0
+# google.golang.org/grpc v1.85.0-dev.0.20260825072537-93e31b48545e
 ## explicit; go 1.25.0
 google.golang.org/grpc
 google.golang.org/grpc/attributes

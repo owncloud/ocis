@@ -28,7 +28,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"google.golang.org/grpc/balancer"
@@ -153,18 +152,7 @@ type ClientStream interface {
 // RecvMsg parities based on the nature of stream.
 type clientStreamWrapper struct {
 	ClientStream
-	desc            *StreamDesc
-	closeSendCalled atomic.Bool
-}
-
-// CloseSend closes the send direction of the stream. The implementation ensures
-// that CloseSend is only called once on the underlying ClientStream, even if
-// CloseSend is called multiple times on the wrapper.
-func (w *clientStreamWrapper) CloseSend() error {
-	if w.closeSendCalled.Swap(true) {
-		return nil
-	}
-	return w.ClientStream.CloseSend()
+	desc *StreamDesc
 }
 
 // SendMsg sends message m across the stream. For RPCs where client can call
@@ -188,13 +176,11 @@ func (w *clientStreamWrapper) SendMsg(m any) error {
 	if err != nil {
 		return err
 	}
-	// In some scenarios (e.g., xDS), the same interceptors process both unary and
-	// streaming RPCs, relying on CloseSend to signal that no more messages are on
-	// the way. Although protobuf-generated stubs already invoke CloseSend for
-	// server-streaming RPCs, it is explicitly called here to ensure downstream
-	// interceptors are also notified when callers interact with the ClientStream
-	// API directly.
-	if err := w.CloseSend(); err != nil && err != io.EOF {
+	// CloseSend is needed because in some scenarios (e.g., xDS), the same
+	// interceptors are used to process both unary and streaming RPCs. Calling
+	// CloseSend signals to those interceptors that no more messages are on the
+	// way.
+	if err := w.ClientStream.CloseSend(); err != nil && err != io.EOF {
 		return err
 	}
 	return nil
@@ -632,7 +618,12 @@ func (a *csAttempt) getTransport() error {
 
 func (a *csAttempt) newStream() error {
 	cs := a.cs
-	cs.callHdr.PreviousAttempts = cs.numRetries
+	// The header is copied because the fields set below, notably the authority
+	// override taken from the pick result, describe the endpoint picked for
+	// this attempt only. Mutating the clientStream's header would carry them
+	// into a later attempt.
+	callHdr := *cs.callHdr
+	callHdr.PreviousAttempts = cs.numRetries
 
 	// Merge metadata stored in PickResult, if any, with existing call metadata.
 	// It is safe to overwrite the csAttempt's context here, since all state
@@ -659,11 +650,11 @@ func (a *csAttempt) newStream() error {
 		// apply it, as specified in gRFC A81.
 		if cs.callInfo.authority == "" {
 			if authMD := a.pickResult.Metadata.Get(":authority"); len(authMD) > 0 {
-				cs.callHdr.Authority = authMD[0]
+				callHdr.Authority = authMD[0]
 			}
 		}
 	}
-	s, err := a.transport.NewStream(a.ctx, cs.callHdr, a.statsHandler)
+	s, err := a.transport.NewStream(a.ctx, &callHdr, a.statsHandler)
 	if err != nil {
 		nse, ok := err.(*transport.NewStreamError)
 		if !ok {
@@ -698,10 +689,6 @@ type clientStream struct {
 
 	cancel context.CancelFunc // cancels all attempts
 
-	sentLast bool // sent an end stream
-
-	receivedFirstMsg bool // set after the first message is received
-
 	methodConfig *MethodConfig
 
 	ctx context.Context // the application's context, wrapped by stats/tracing
@@ -709,19 +696,10 @@ type clientStream struct {
 	retryThrottler *retryThrottler // The throttler active when the RPC began.
 
 	binlogs []binarylog.MethodLogger
-	// serverHeaderBinlogged is a boolean for whether server header has been
-	// logged. Server header will be logged when the first time one of those
-	// happens: stream.Header(), stream.Recv().
-	//
-	// It's only read and used by Recv() and Header(), so it doesn't need to be
-	// synchronized.
-	serverHeaderBinlogged bool
 
 	mu                      sync.Mutex
-	firstAttempt            bool // if true, transparent retry is valid
-	numRetries              int  // exclusive of transparent retry attempt(s)
-	numRetriesSincePushback int  // retries since pushback; to reset backoff
-	finished                bool // TODO: replace with atomic cmpxchg or sync.Once?
+	numRetries              int // exclusive of transparent retry attempt(s)
+	numRetriesSincePushback int // retries since pushback; to reset backoff
 	// attempt is the active client stream attempt.
 	// The only place where it is written is the newAttemptLocked method and this method never writes nil.
 	// So, attempt can be nil only inside newClientStream function when clientStream is first created.
@@ -731,13 +709,33 @@ type clientStream struct {
 	// place where we need to check if the attempt is nil.
 	attempt *csAttempt
 	// TODO(hedging): hedging will have multiple attempts simultaneously.
-	committed        bool // active attempt committed for retry?
 	onCommit         func()
 	replayBuffer     []replayOp // operations to replay on retry
 	replayBufferSize int        // current size of replayBuffer
+
+	// Bool fields are grouped at the tail to eliminate the alignment padding
+	// that would otherwise follow each bool when the next field is pointer- or
+	// int-sized. See https://github.com/grpc/grpc-go/issues/9280 for benchmarks.
+	// Add new bool fields here, not inline above.
+
+	// Not guarded by mu.
+	sentLast         bool // sent an end stream
+	receivedFirstMsg bool // set after the first message is received
+	// serverHeaderBinlogged is a boolean for whether server header has been
+	// logged. Server header will be logged when the first time one of those
+	// happens: stream.Header(), stream.Recv().
+	//
+	// It's only read and used by Recv() and Header(), so it doesn't need to be
+	// synchronized.
+	serverHeaderBinlogged bool
 	// nameResolutionDelay indicates if there was a delay in the name resolution.
 	// This field is only valid on client side, it's always false on server side.
 	nameResolutionDelay bool
+
+	// Guarded by mu.
+	firstAttempt bool // if true, transparent retry is valid
+	finished     bool // TODO: replace with atomic cmpxchg or sync.Once?
+	committed    bool // active attempt committed for retry?
 }
 
 type replayOp struct {
@@ -1745,8 +1743,6 @@ type serverStream struct {
 	// synchronized.
 	serverHeaderBinlogged bool
 
-	statusWritten atomic.Bool // True if status has been written to the transport.
-
 	mu sync.Mutex // protects trInfo.tr after the service handler runs.
 }
 
@@ -1795,16 +1791,6 @@ func (ss *serverStream) SetTrailer(md metadata.MD) {
 	ss.s.SetTrailer(md)
 }
 
-// writeStatus sends the status of a stream to the client. It uses an atomic
-// CAS to guarantee that the status is written to the transport exactly once,
-// even if called concurrently.
-func (ss *serverStream) writeStatus(st *status.Status) error {
-	if !ss.statusWritten.CompareAndSwap(false, true) {
-		return nil
-	}
-	return ss.s.WriteStatus(st)
-}
-
 func (ss *serverStream) SendMsg(m any) (err error) {
 	defer func() {
 		if ss.trInfo != nil {
@@ -1821,7 +1807,7 @@ func (ss *serverStream) SendMsg(m any) (err error) {
 		}
 		if err != nil && err != io.EOF {
 			st, _ := status.FromError(toRPCErr(err))
-			ss.writeStatus(st)
+			ss.s.WriteStatus(st)
 			// Non-user specified status was sent out. This should be an error
 			// case (as a server side Cancel maybe).
 			//
@@ -1904,7 +1890,7 @@ func (ss *serverStream) RecvMsg(m any) (err error) {
 		}
 		if err != nil && err != io.EOF {
 			st, _ := status.FromError(toRPCErr(err))
-			ss.writeStatus(st)
+			ss.s.WriteStatus(st)
 			// Non-user specified status was sent out. This should be an error
 			// case (as a server side Cancel maybe).
 			//
