@@ -9,17 +9,18 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	Commons        *shared.Commons       `yaml:"-"` // don't use this directly as configuration for a service
-	GRPC           GRPC                  `yaml:"grpc"`
-	Service        Service               `yaml:"-"`
-	Debug          Debug                 `yaml:"debug"`
-	Events         Events                `yaml:"events"`
-	GRPCClientTLS  *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
-	Context        context.Context       `yaml:"-"`
-	Log            *Log                  `yaml:"log"`
-	Engine         Engine                `yaml:"engine"`
-	Postprocessing Postprocessing        `yaml:"postprocessing"`
-	Tracing        *Tracing              `yaml:"tracing"`
+	Commons           *shared.Commons           `yaml:"-"` // don't use this directly as configuration for a service
+	GRPC              GRPC                      `yaml:"grpc"`
+	Service           Service                   `yaml:"-"`
+	Debug             Debug                     `yaml:"debug"`
+	Events            Events                    `yaml:"events"`
+	GRPCClientTLS     *shared.GRPCClientTLS     `yaml:"grpc_client_tls"`
+	GRPCClientOptions *shared.GRPCClientOptions `yaml:"grpc_client_options"`
+	Context           context.Context           `yaml:"-"`
+	Log               *Log                      `yaml:"log"`
+	Engine            Engine                    `yaml:"engine"`
+	Postprocessing    Postprocessing            `yaml:"postprocessing"`
+	Tracing           *Tracing                  `yaml:"tracing"`
 }
 
 // Service defines the available service configuration.
