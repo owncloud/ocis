@@ -471,7 +471,11 @@ func composeMessage(nt NotificationTemplate, locale, defaultLocale, path string,
 
 func loadTemplates(nt NotificationTemplate, locale, defaultLocale, path string) (string, string) {
 	t := l10n.NewTranslatorFromCommonConfig(defaultLocale, _domain, path, _translationFS, "l10n/locale").Locale(locale)
-	return t.Get(nt.Subject), t.Get(nt.Message)
+	// nt.Subject and nt.Message are translation lookup keys, not printf format strings;
+	// go vet's non-constant format string check can't trace through a func value, so
+	// assign Get to a local before calling it to avoid a false positive.
+	get := t.Get
+	return get(nt.Subject), get(nt.Message)
 }
 
 func executeTemplate(raw string, vars map[string]interface{}) (string, error) {
