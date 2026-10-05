@@ -139,7 +139,7 @@ LOCAL_API_TESTS = {
         },
     },
     "vault": {
-        "suites": ["apiVault"],
+        "suites": ["apiVault", "apiOidcAuth"],
         "keycloakNeeded": True,
         "tikaNeeded": True,
         "vaultStorage": True,
