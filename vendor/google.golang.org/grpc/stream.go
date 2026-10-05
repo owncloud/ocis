@@ -28,6 +28,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"google.golang.org/grpc/balancer"
@@ -152,7 +153,18 @@ type ClientStream interface {
 // RecvMsg parities based on the nature of stream.
 type clientStreamWrapper struct {
 	ClientStream
-	desc *StreamDesc
+	desc            *StreamDesc
+	closeSendCalled atomic.Bool
+}
+
+// CloseSend closes the send direction of the stream. The implementation ensures
+// that CloseSend is only called once on the underlying ClientStream, even if
+// CloseSend is called multiple times on the wrapper.
+func (w *clientStreamWrapper) CloseSend() error {
+	if w.closeSendCalled.Swap(true) {
+		return nil
+	}
+	return w.ClientStream.CloseSend()
 }
 
 // SendMsg sends message m across the stream. For RPCs where client can call
@@ -176,20 +188,22 @@ func (w *clientStreamWrapper) SendMsg(m any) error {
 	if err != nil {
 		return err
 	}
-	// CloseSend is needed because in some scenarios (e.g., xDS), the same
-	// interceptors are used to process both unary and streaming RPCs. Calling
-	// CloseSend signals to those interceptors that no more messages are on the
-	// way.
-	if err := w.ClientStream.CloseSend(); err != nil && err != io.EOF {
+	// In some scenarios (e.g., xDS), the same interceptors process both unary and
+	// streaming RPCs, relying on CloseSend to signal that no more messages are on
+	// the way. Although protobuf-generated stubs already invoke CloseSend for
+	// server-streaming RPCs, it is explicitly called here to ensure downstream
+	// interceptors are also notified when callers interact with the ClientStream
+	// API directly.
+	if err := w.CloseSend(); err != nil && err != io.EOF {
 		return err
 	}
 	return nil
 
 }
 
-// RecvMsg receives message m from the stream. For RPCs that call RecvMsg only
-// once i.e. only client streaming RPCs, it calls the underlying RecvMsg a
-// second time after receiving the first message to get the trailers.
+// RecvMsg receives message m from the stream. For non-server-streaming RPCs
+// (unary and client-streaming), it calls the underlying RecvMsg a second time
+// after receiving the first message to get the trailers.
 func (w *clientStreamWrapper) RecvMsg(m any) error {
 	err := w.ClientStream.RecvMsg(m)
 	if err != nil {
@@ -208,19 +222,6 @@ func (w *clientStreamWrapper) RecvMsg(m any) error {
 		return status.Error(codes.Internal, "cardinality violation: expected <EOF> for non server-streaming RPCs, but received another message")
 	}
 	return err
-}
-
-// defaultStreamInterceptor is a StreamClientInterceptor which wraps the
-// ClientStream and is always invoked as the first interceptor. It consolidates
-// behavior for different RPC types at the level closest to the application,
-// which simplifies the underlying stream implementation and other interceptors
-// by avoiding duplicate or scattered handling.
-func defaultStreamInterceptor(ctx context.Context, desc *StreamDesc, cc *ClientConn, method string, streamer Streamer, opts ...CallOption) (ClientStream, error) {
-	cs, err := streamer(ctx, desc, cc, method, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &clientStreamWrapper{ClientStream: cs, desc: desc}, nil
 }
 
 // NewStream creates a new Stream for the client side. This is typically
@@ -378,7 +379,11 @@ func newClientStream(ctx context.Context, desc *StreamDesc, cc *ClientConn, meth
 		}
 	}
 
-	return newStream(ctx, opts...)
+	cs, err := newStream(ctx, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &clientStreamWrapper{ClientStream: cs, desc: desc}, nil
 }
 
 func newClientStreamWithParams(ctx context.Context, desc *StreamDesc, cc *ClientConn, method string, mc *serviceconfig.MethodConfig, onCommit func(), nameResolutionDelayed bool, opts ...CallOption) (_ ClientStream, err error) {
@@ -753,10 +758,8 @@ type csAttempt struct {
 	parser          parser
 	pickResult      balancer.PickResult
 
-	finished        bool
-	decompressorV0  Decompressor
-	decompressorV1  encoding.Compressor
-	decompressorSet bool
+	decompressorV0 Decompressor
+	decompressorV1 encoding.Compressor
 
 	mu sync.Mutex // guards trInfo.tr
 	// trInfo may be nil (if EnableTracing is false).
@@ -767,10 +770,18 @@ type csAttempt struct {
 	statsHandler stats.Handler
 	beginTime    time.Time
 
-	// set for newStream errors that may be transparently retried
-	allowTransparentRetry bool
-	// set for pick errors that are returned as a status
-	drop bool
+	// Bool fields are grouped at the tail to eliminate the alignment padding
+	// that would otherwise follow each bool when the next field is pointer- or
+	// int-sized. See https://github.com/grpc/grpc-go/issues/9347 for benchmarks.
+	// Add new bool fields here, not inline above.
+
+	// Not guarded by mu.
+	decompressorSet       bool
+	allowTransparentRetry bool // set for newStream errors that may be transparently retried
+	drop                  bool // set for pick errors that are returned as a status
+
+	// Guarded by mu.
+	finished bool
 }
 
 func (cs *clientStream) commitAttemptLocked() {
@@ -1498,20 +1509,28 @@ type addrConnStream struct {
 	callInfo         *callInfo
 	transport        transport.ClientTransport
 	ctx              context.Context
-	sentLast         bool
-	receivedFirstMsg bool
 	desc             *StreamDesc
 	codec            baseCodec
 	sendCompressorV0 Compressor
 	sendCompressorV1 encoding.Compressor
-	decompressorSet  bool
 	decompressorV0   Decompressor
 	decompressorV1   encoding.Compressor
-	parser           parser
 
 	// mu guards finished and is held for the entire finish method.
-	mu       sync.Mutex
-	finished bool
+	mu     sync.Mutex
+	parser parser
+
+	// Bool fields are grouped at the tail to eliminate the alignment padding
+	// that would otherwise follow each bool when the next field is pointer- or
+	// int-sized. See https://github.com/grpc/grpc-go/issues/9348 for benchmarks.
+	// Add new bool fields here, not inline above.
+
+	// Not guarded by mu.
+	sentLast         bool
+	receivedFirstMsg bool
+	decompressorSet  bool
+
+	finished bool // guarded by mu
 }
 
 func (as *addrConnStream) Header() (metadata.MD, error) {
@@ -1726,15 +1745,23 @@ type serverStream struct {
 
 	sendCompressorName string
 
-	recvFirstMsg bool // set after the first message is received
-
 	maxReceiveMessageSize int
 	maxSendMessageSize    int
-	trInfo                *traceInfo
+
+	// mu guards trInfo.tr after the service handler runs.
+	mu     sync.Mutex
+	trInfo *traceInfo
 
 	statsHandler stats.Handler
 
 	binlogs []binarylog.MethodLogger
+
+	// Bool fields are grouped at the tail to eliminate the alignment padding
+	// that would otherwise follow each bool when the next field is pointer- or
+	// int-sized. See https://github.com/grpc/grpc-go/issues/9349 for benchmarks.
+	// Add new bool fields here, not inline above.
+
+	recvFirstMsg bool // set after the first message is received
 	// serverHeaderBinlogged indicates whether server header has been logged. It
 	// will happen when one of the following two happens: stream.SendHeader(),
 	// stream.Send().
@@ -1742,8 +1769,6 @@ type serverStream struct {
 	// It's only checked in send and sendHeader, doesn't need to be
 	// synchronized.
 	serverHeaderBinlogged bool
-
-	mu sync.Mutex // protects trInfo.tr after the service handler runs.
 }
 
 func (ss *serverStream) Context() context.Context {
