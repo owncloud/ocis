@@ -1,3 +1,4 @@
+import { nextTick } from 'vue'
 import OcSelect from './OcSelect.vue'
 import { defaultPlugins, mount, PartialComponentProps } from '../../testing'
 
@@ -83,6 +84,28 @@ describe('OcSelect', () => {
       expect(wrapper.find(selectors.deselectLockIcon).exists()).toBeTruthy()
     })
   })
+  describe('focus', () => {
+    it('restores focus to the search input after selecting an option', async () => {
+      const options = [{ label: 'label1' }, { label: 'label2' }]
+      const wrapper = getWrapper({ options }, { attachTo: document.body })
+      wrapper.findComponent({ name: 'VueSelect' }).vm.$emit('option:selected', options[0])
+      await nextTick()
+      expect(document.activeElement).toBe(wrapper.find(selectors.searchInput).element)
+      wrapper.unmount()
+    })
+    it('does not focus the search input when deselecting via the remove button', async () => {
+      const options = [{ label: 'label1' }, { label: 'label2' }]
+      const wrapper = getWrapper(
+        { options, modelValue: options[0], multiple: true },
+        { attachTo: document.body }
+      )
+      await wrapper.find(selectors.deselectBtn).trigger('click')
+      await nextTick()
+      expect(wrapper.emitted('update:modelValue')).toBeTruthy()
+      expect(document.activeElement).not.toBe(wrapper.find(selectors.searchInput).element)
+      wrapper.unmount()
+    })
+  })
   describe('accessibility', () => {
     it('sets the combobox role and an accessible name on the focusable search input', () => {
       const wrapper = getWrapper({ label: 'Language' })
@@ -130,9 +153,11 @@ function getWrapper<T>(
       getOptionLabel: (o: T) => string
       modelValue: T
     }
-  > = {}
+  > = {},
+  { attachTo }: { attachTo?: HTMLElement } = {}
 ) {
   return mount(OcSelect, {
+    attachTo,
     props: {
       label: 'Select label',
       ...props

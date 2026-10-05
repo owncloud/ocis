@@ -166,6 +166,7 @@
           <oc-td data-testid="language">
             <oc-select
               v-if="languageOptions"
+              ref="languageSelectRef"
               :model-value="selectedLanguageValue"
               :label="$gettext('Language')"
               :label-hidden="true"
@@ -354,7 +355,7 @@
 import { storeToRefs } from 'pinia'
 import EditPasswordModal from '../components/EditPasswordModal.vue'
 import { SettingsBundle, LanguageOption, SettingsValue } from '../helpers/settings'
-import { computed, defineComponent, onMounted, onBeforeUnmount, unref, ref } from 'vue'
+import { computed, defineComponent, onMounted, onBeforeUnmount, unref, ref, nextTick } from 'vue'
 import {
   useAppsStore,
   useAuthStore,
@@ -415,6 +416,7 @@ export default defineComponent({
     const graphUser = ref<User>()
     const accountBundle = ref<SettingsBundle>()
     const selectedLanguageValue = ref<LanguageOption>()
+    const languageSelectRef = ref<{ focus: () => void }>()
     const disableEmailNotificationsValue = ref<boolean>()
     const viewOptionWebDavDetailsValue = ref<boolean>(resourcesStore.areWebDavDetailsShown)
     const { dispatchModal } = useModals()
@@ -647,7 +649,23 @@ export default defineComponent({
           loadAccountBundleTask.cancelAll()
         }
 
-        loadAccountBundleTask.perform()
+        // await it instead of firing and forgetting: it reactively replaces
+        // accountBundle, and we need that re-render to be done before we try
+        // to restore focus below, not racing it.
+        await loadAccountBundleTask.perform()
+        await nextTick()
+
+        /*
+         * Reloading translations and switching language.current above
+         * re-render most of the page, which can leave the select's own
+         * focus-restore targeting a stale, already-replaced search input.
+         * Refocus explicitly now that everything has settled, before
+         * announcing the save, so the announcement isn't cancelled by a
+         * focus change right after it. Don't touch focus again after this,
+         * even defensively: a focus change right as the announcement below
+         * is about to be read is exactly what cancels it.
+         */
+        unref(languageSelectRef)?.focus()
         showMessage({ title: $gettext('Preference saved.') })
       } catch (e) {
         console.error(e)
@@ -855,6 +873,7 @@ export default defineComponent({
       languageOptions,
       extensionPointsWithUserPreferences,
       selectedLanguageValue,
+      languageSelectRef,
       updateSelectedLanguage,
       updateDisableEmailNotifications,
       updateViewOptionsWebDavDetails,

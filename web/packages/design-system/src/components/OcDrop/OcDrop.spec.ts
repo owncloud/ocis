@@ -163,4 +163,52 @@ describe('OcDrop', () => {
       expect(hide).toHaveBeenCalled()
     })
   })
+
+  describe('focus leaving the drop', () => {
+    const mountWithFocusableItem = () => {
+      document.body.innerHTML = ''
+      const wrapper = mount(
+        {
+          template: `<div>
+            <button id="trigger">trigger</button>
+            <input id="elsewhere" />
+            <oc-drop toggle="#trigger">
+              <button id="item">item</button>
+            </oc-drop>
+          </div>`,
+          components: { 'oc-drop': Drop }
+        },
+        { attachTo: document.body }
+      )
+      const tippy = wrapper.findComponent({ name: 'oc-drop' }).vm.tippyInstance
+      const wait = () => new Promise((resolve) => setTimeout(resolve, 100))
+      const open = async () => {
+        await wrapper.find('#trigger').trigger('click')
+        await wait()
+      }
+      return { wrapper, tippy, open, wait }
+    }
+
+    it('hides when focus moves outside of the drop', async () => {
+      const { tippy, open } = mountWithFocusableItem()
+      await open()
+      document.getElementById('item').focus()
+      document.getElementById('elsewhere').focus()
+
+      expect(tippy.state.isVisible).toBe(false)
+    })
+
+    it('closes instead of reopening when the trigger is clicked while focus is inside', async () => {
+      const { wrapper, tippy, open, wait } = mountWithFocusableItem()
+      await open()
+      document.getElementById('item').focus()
+
+      // clicking the trigger focuses it before the click toggles the drop
+      document.getElementById('trigger').focus()
+      await wrapper.find('#trigger').trigger('click')
+      await wait()
+
+      expect(tippy.state.isVisible).toBe(false)
+    })
+  })
 })
