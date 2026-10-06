@@ -80,6 +80,7 @@ func Server(cfg *config.Config) *cli.Command {
 				ocdav.WebdavNamespace(cfg.WebdavNamespace),
 				ocdav.OCMNamespace(cfg.OCMNamespace),
 				ocdav.AllowDepthInfinity(cfg.AllowPropfindDepthInfinity),
+				ocdav.DisablePropfindPublicLinkResolution(cfg.DisablePropfindPublicLinkResolution),
 				ocdav.SharesNamespace(cfg.SharesNamespace),
 				ocdav.Timeout(cfg.Timeout),
 				ocdav.Insecure(cfg.Insecure),

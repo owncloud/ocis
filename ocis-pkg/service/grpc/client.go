@@ -14,6 +14,8 @@ import (
 	"go-micro.dev/v4/client"
 	"go.opentelemetry.io/otel/trace"
 	"go.opentelemetry.io/otel/trace/noop"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
 )
 
 // ClientOptions represent options (e.g. tls settings) for the grpc clients
@@ -21,6 +23,7 @@ type ClientOptions struct {
 	tlsMode string
 	caCert  string
 	tp      trace.TracerProvider
+	kp      keepalive.ClientParameters
 }
 
 // Option is used to pass client options
@@ -51,6 +54,18 @@ func WithTraceProvider(tp trace.TracerProvider) ClientOption {
 	}
 }
 
+// WithKeepaliveParams allows setting the grpc keepalive params for grpc clients, derived from
+// co.GRPCClientKeepaliveTime/-Timeout. Without a configured keepalive time this is a no-op and the
+// clients keep grpc's own behavior, see GetClientKeepaliveParams.
+func WithKeepaliveParams(co *shared.GRPCClientOptions) ClientOption {
+	return func(o *ClientOptions) {
+		if co == nil {
+			return
+		}
+		o.kp = GetClientKeepaliveParams(co.GRPCClientKeepaliveTime, co.GRPCClientKeepaliveTimeout)
+	}
+}
+
 func GetClientOptions(t *shared.GRPCClientTLS) []ClientOption {
 	opts := []ClientOption{
 		WithTLSMode(t.Mode),
@@ -74,6 +89,13 @@ func NewClient(opts ...ClientOption) (client.Client, error) {
 		)),
 		client.Wrap(autoprop.NewGoMicroClientWrapper()),
 	}
+
+	if options.kp != (keepalive.ClientParameters{}) {
+		// same mechanism the reva pool uses in grpc.NewConn (pkg/rgrpc/todo/pool/connection.go),
+		// so that a black-holed peer is detected here as well instead of hanging for the caller's full timeout
+		cOpts = append(cOpts, withDefaultCallOptions(mgrpcc.DialOptions(grpc.WithKeepaliveParams(options.kp))))
+	}
+
 	switch options.tlsMode {
 	case "insecure":
 		if os.Getenv("OCIS_INSECURE") != "true" {
@@ -105,4 +127,16 @@ func NewClient(opts ...ClientOption) (client.Client, error) {
 	}
 
 	return mgrpcc.NewClient(cOpts...), nil
+}
+
+// withDefaultCallOptions applies client.CallOptions (e.g. mgrpcc.DialOptions) to the client's
+// default CallOptions. The go-micro grpc plugin only reads dial options back out of the default
+// CallOptions.Context set at construction time (not per-call CallOptions), so this is the only
+// way to make them apply to every dial the client makes.
+func withDefaultCallOptions(callOpts ...client.CallOption) client.Option {
+	return func(o *client.Options) {
+		for _, co := range callOpts {
+			co(&o.CallOptions)
+		}
+	}
 }

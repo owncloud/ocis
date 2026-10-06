@@ -22,9 +22,10 @@ type Config struct {
 
 	API API `yaml:"api"`
 
-	Reva          *shared.Reva          `yaml:"reva"`
-	TokenManager  *TokenManager         `yaml:"token_manager"`
-	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
+	Reva              *shared.Reva              `yaml:"reva"`
+	TokenManager      *TokenManager             `yaml:"token_manager"`
+	GRPCClientTLS     *shared.GRPCClientTLS     `yaml:"grpc_client_tls"`
+	GRPCClientOptions *shared.GRPCClientOptions `yaml:"grpc_client_options"`
 
 	Application       Application  `yaml:"application"`
 	Spaces            Spaces       `yaml:"spaces"`

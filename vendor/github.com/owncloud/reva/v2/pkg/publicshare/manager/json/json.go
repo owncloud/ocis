@@ -22,11 +22,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
-	"os/signal"
 	"strconv"
 	"sync"
-	"syscall"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -57,10 +54,30 @@ import (
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
+// shareField and passwordField are the keys used to store a share's encoded
+// proto and its bcrypt-hashed password in a db entry.
+const (
+	shareField    = "share"
+	passwordField = "password"
+)
+
 func init() {
 	registry.Register("json", NewFile)
 	registry.Register("jsoncs3", NewCS3)
 	registry.Register("jsonmemory", NewMemory)
+}
+
+// dbEntryString safely reads the string value stored under key in a db entry.
+// Entries are read back from persistence as interface{} (map[string]interface{}
+// with string values), so a corrupted or legacy record can hold an unexpected
+// type; this reports that via ok instead of panicking.
+func dbEntryString(v interface{}, key string) (string, bool) {
+	m, ok := v.(map[string]interface{})
+	if !ok {
+		return "", false
+	}
+	s, ok := m[key].(string)
+	return s, ok
 }
 
 // NewFile returns a new filesystem public shares manager.
@@ -121,14 +138,18 @@ const defaultStatConcurrency = 5
 
 // New returns a new public share manager instance
 func New(gwAddr string, pwHashCost, janitorRunInterval int, enableCleanup bool, p persistence.Persistence) (publicshare.Manager, error) {
+	janitorCtx, janitorCancel := context.WithCancel(context.Background())
 	m := &manager{
 		gatewayAddr:                gwAddr,
-		mutex:                      &sync.Mutex{},
+		mutex:                      &sync.RWMutex{},
 		passwordHashCost:           pwHashCost,
 		janitorRunInterval:         janitorRunInterval,
 		enableExpiredSharesCleanup: enableCleanup,
 		persistence:                p,
 		maxConcurrency:             defaultStatConcurrency,
+		janitorCtx:                 janitorCtx,
+		janitorCancel:              janitorCancel,
+		janitorDone:                make(chan struct{}),
 	}
 
 	go m.startJanitorRun()
@@ -162,13 +183,13 @@ func (c *commonConfig) init() {
 		c.SharePasswordHashCost = 11
 	}
 	if c.JanitorRunInterval == 0 {
-		c.JanitorRunInterval = 60
+		c.JanitorRunInterval = 3600 // 1 hour
 	}
 }
 
 type manager struct {
 	gatewayAddr string
-	mutex       *sync.Mutex
+	mutex       *sync.RWMutex
 	persistence persistence.Persistence
 
 	passwordHashCost           int
@@ -178,28 +199,62 @@ type manager struct {
 	// maxConcurrency bounds how many Stat RPCs ListPublicShares may have in
 	// flight at once while checking ListGrants on distinct foreign resources.
 	maxConcurrency int
+
+	// janitorCtx/janitorCancel let Close ask startJanitorRun's goroutine to
+	// stop - including cancelling a cleanupExpiredShares run it may be in
+	// the middle of - and janitorDone lets Close wait until that goroutine
+	// has actually returned, instead of racing it on shutdown.
+	janitorCtx    context.Context
+	janitorCancel context.CancelFunc
+	janitorDone   chan struct{}
 }
 
-func (m *manager) init() error {
-	return m.persistence.Init(context.Background())
+var _ publicshare.ClosableManager = (*manager)(nil)
+
+// init is called at the top of every public method to lazily initialize the
+// persistence layer. It must not take m.mutex: persistence.Init is already
+// idempotent and self-synchronized (it returns immediately once the
+// persistence layer reports itself initialized), so wrapping it in the
+// manager's write lock added nothing but contention - and because a pending
+// sync.RWMutex writer blocks new readers, that contention serialized every
+// concurrent call through this single point regardless of whether it needed
+// a read or a write lock.
+func (m *manager) init(ctx context.Context) error {
+	return m.persistence.Init(ctx)
 }
 
 func (m *manager) startJanitorRun() {
+	defer close(m.janitorDone)
+
 	if !m.enableExpiredSharesCleanup {
 		return
 	}
 
 	ticker := time.NewTicker(time.Duration(m.janitorRunInterval) * time.Second)
-	work := make(chan os.Signal, 1)
-	signal.Notify(work, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT)
+	defer ticker.Stop()
 
 	for {
 		select {
-		case <-work:
+		case <-m.janitorCtx.Done():
 			return
 		case <-ticker.C:
-			m.cleanupExpiredShares()
+			if err := m.cleanupExpiredShares(); err != nil {
+				log.Err(err).Msg("publicShareJSONManager: error cleaning up expired shares")
+			}
 		}
+	}
+}
+
+// Close stops the janitor and waits for any in-flight cleanupExpiredShares
+// run to finish, bounded by ctx. It satisfies publicshare.ClosableManager.
+func (m *manager) Close(ctx context.Context) error {
+	m.janitorCancel()
+
+	select {
+	case <-m.janitorDone:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
 	}
 }
 
@@ -207,12 +262,12 @@ func (m *manager) startJanitorRun() {
 func (m *manager) Dump(ctx context.Context, shareChan chan<- *publicshare.WithPassword) error {
 	log := appctx.GetLogger(ctx)
 
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
-
-	if err := m.init(); err != nil {
+	if err := m.init(ctx); err != nil {
 		return err
 	}
+
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
 
 	db, err := m.persistence.Read(ctx)
 	if err != nil {
@@ -221,10 +276,16 @@ func (m *manager) Dump(ctx context.Context, shareChan chan<- *publicshare.WithPa
 
 	for _, v := range db {
 		var local publicshare.WithPassword
-		if err := utils.UnmarshalJSONToProtoV1([]byte(v.(map[string]interface{})["share"].(string)), &local.PublicShare); err != nil {
-			log.Error().Err(err).Msg("error unmarshalling share")
+		if share, ok := dbEntryString(v, shareField); ok {
+			if err := utils.UnmarshalJSONToProtoV1([]byte(share), &local.PublicShare); err != nil {
+				log.Error().Err(err).Msg("error unmarshalling share")
+			}
+		} else {
+			log.Error().Msg("error reading share entry: missing or invalid \"share\" field")
 		}
-		local.Password = v.(map[string]interface{})["password"].(string)
+		// password is optional: shares without password protection have no
+		// password field, so a missing/invalid entry just means "no password".
+		local.Password, _ = dbEntryString(v, passwordField)
 		shareChan <- &local
 	}
 
@@ -233,17 +294,18 @@ func (m *manager) Dump(ctx context.Context, shareChan chan<- *publicshare.WithPa
 
 // Load imports public shares and received shares from channels (e.g. during migration)
 func (m *manager) Load(ctx context.Context, shareChan <-chan *publicshare.WithPassword) error {
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
-
-	if err := m.init(); err != nil {
+	if err := m.init(ctx); err != nil {
 		return err
 	}
+
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 
 	db, err := m.persistence.Read(ctx)
 	if err != nil {
 		return err
 	}
+	dbCopy := persistence.Copy(db)
 
 	for ps := range shareChan {
 		encShare, err := utils.MarshalProtoV1ToJSON(&ps.PublicShare)
@@ -251,16 +313,20 @@ func (m *manager) Load(ctx context.Context, shareChan <-chan *publicshare.WithPa
 			return err
 		}
 
-		db[ps.PublicShare.Id.GetOpaqueId()] = map[string]interface{}{
-			"share":    string(encShare),
-			"password": ps.Password,
+		dbCopy[ps.PublicShare.Id.GetOpaqueId()] = map[string]interface{}{
+			shareField:    string(encShare),
+			passwordField: ps.Password,
 		}
 	}
-	return m.persistence.Write(ctx, db)
+	return m.persistence.Write(ctx, dbCopy)
 }
 
 // CreatePublicShare adds a new entry to manager.shares
 func (m *manager) CreatePublicShare(ctx context.Context, u *user.User, rInfo *provider.ResourceInfo, g *link.Grant) (*link.PublicShare, error) {
+	if rInfo.GetId() == nil || rInfo.GetId().GetStorageId() == "" {
+		return nil, errtypes.BadRequest("resource id is required to create a public share")
+	}
+
 	id := &link.PublicShareId{
 		OpaqueId: utils.RandString(15),
 	}
@@ -311,33 +377,34 @@ func (m *manager) CreatePublicShare(ctx context.Context, u *user.User, rInfo *pr
 	}
 	proto.Merge(&ps.PublicShare, s)
 
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
-
-	if err := m.init(); err != nil {
-		return nil, err
-	}
-
 	encShare, err := utils.MarshalProtoV1ToJSON(&ps.PublicShare)
 	if err != nil {
 		return nil, err
 	}
 
+	if err := m.init(ctx); err != nil {
+		return nil, err
+	}
+
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
 	db, err := m.persistence.Read(ctx)
 	if err != nil {
 		return nil, err
 	}
+	dbCopy := persistence.Copy(db)
 
-	if _, ok := db[s.Id.GetOpaqueId()]; !ok {
-		db[s.Id.GetOpaqueId()] = map[string]interface{}{
-			"share":    string(encShare),
-			"password": ps.Password,
+	if _, ok := dbCopy[s.Id.GetOpaqueId()]; !ok {
+		dbCopy[s.Id.GetOpaqueId()] = map[string]interface{}{
+			shareField:    string(encShare),
+			passwordField: ps.Password,
 		}
 	} else {
 		return nil, errors.New("key already exists")
 	}
 
-	err = m.persistence.Write(ctx, db)
+	err = m.persistence.Write(ctx, dbCopy)
 	if err != nil {
 		return nil, err
 	}
@@ -404,36 +471,37 @@ func (m *manager) UpdatePublicShare(ctx context.Context, u *user.User, req *link
 		Nanos:   uint32(now % int64(time.Second)),
 	}
 
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
-
-	if err := m.init(); err != nil {
+	if err := m.init(ctx); err != nil {
 		return nil, err
 	}
+
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 
 	db, err := m.persistence.Read(ctx)
 	if err != nil {
 		return nil, err
 	}
+	dbCopy := persistence.Copy(db)
 
 	encShare, err := utils.MarshalProtoV1ToJSON(share)
 	if err != nil {
 		return nil, err
 	}
 
-	data, ok := db[share.Id.OpaqueId].(map[string]interface{})
+	data, ok := dbCopy[share.Id.OpaqueId].(map[string]interface{})
 	if !ok {
 		data = map[string]interface{}{}
 	}
 
 	if ok && passwordChanged {
-		data["password"] = newPasswordEncoded
+		data[passwordField] = newPasswordEncoded
 	}
-	data["share"] = string(encShare)
+	data[shareField] = string(encShare)
 
-	db[share.Id.OpaqueId] = data
+	dbCopy[share.Id.OpaqueId] = data
 
-	err = m.persistence.Write(ctx, db)
+	err = m.persistence.Write(ctx, dbCopy)
 	if err != nil {
 		return nil, err
 	}
@@ -443,12 +511,12 @@ func (m *manager) UpdatePublicShare(ctx context.Context, u *user.User, req *link
 
 // GetPublicShare gets a public share either by ID or Token.
 func (m *manager) GetPublicShare(ctx context.Context, u *user.User, ref *link.PublicShareReference, sign bool) (*link.PublicShare, error) {
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
-
-	if err := m.init(); err != nil {
+	if err := m.init(ctx); err != nil {
 		return nil, err
 	}
+
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
 
 	if ref.GetToken() != "" {
 		ps, pw, err := m.getByToken(ctx, ref.GetToken())
@@ -470,19 +538,20 @@ func (m *manager) GetPublicShare(ctx context.Context, u *user.User, ref *link.Pu
 	}
 
 	for _, v := range db {
-		d := v.(map[string]interface{})["share"]
-		passDB := v.(map[string]interface{})["password"].(string)
+		share, ok := dbEntryString(v, shareField)
+		if !ok {
+			continue
+		}
+		passDB, _ := dbEntryString(v, passwordField)
 
 		var ps link.PublicShare
-		if err := utils.UnmarshalJSONToProtoV1([]byte(d.(string)), &ps); err != nil {
+		if err := utils.UnmarshalJSONToProtoV1([]byte(share), &ps); err != nil {
 			return nil, err
 		}
 
 		if ref.GetId().GetOpaqueId() == ps.Id.OpaqueId {
 			if publicshare.IsExpired(&ps) {
-				if err := m.revokeExpiredPublicShare(ctx, &ps); err != nil {
-					return nil, err
-				}
+				// actual deletion is left to the janitor (cleanupExpiredShares)
 				return nil, errtypes.NotFound("no shares found by id:" + ref.GetId().String())
 			}
 			if ps.PasswordProtected && sign {
@@ -517,19 +586,24 @@ func (m *manager) GetPublicShare(ctx context.Context, u *user.User, ref *link.Pu
 // supplies no deadline, the stat fan-out is unbounded, matching pre-existing
 // behaviour.
 func (m *manager) ListPublicShares(ctx context.Context, u *user.User, filters []*link.ListPublicSharesRequest_Filter, sign bool) ([]*link.PublicShare, error) {
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
-
-	if err := m.init(); err != nil {
+	if err := m.init(ctx); err != nil {
 		return nil, err
 	}
 
-	log := appctx.GetLogger(ctx)
+	m.mutex.RLock()
 
+	// Ranging over db below happens after the lock is released, which is safe
+	// because we never mutate it: writers copy before they mutate, and the
+	// persistence layer publishes a new map instead of changing this one.
 	db, err := m.persistence.Read(ctx)
 	if err != nil {
+		m.mutex.RUnlock()
 		return nil, err
 	}
+
+	m.mutex.RUnlock()
+
+	log := appctx.GetLogger(ctx)
 
 	// Pass 1 (in-memory, no RPCs): decode every persisted share once, handle
 	// expiry and filters exactly as before, and split the survivors into
@@ -544,16 +618,17 @@ func (m *manager) ListPublicShares(ctx context.Context, u *user.User, filters []
 
 	for _, v := range db {
 		var local publicShare
-		if err := utils.UnmarshalJSONToProtoV1([]byte(v.(map[string]interface{})["share"].(string)), &local.PublicShare); err != nil {
+		share, ok := dbEntryString(v, shareField)
+		if !ok {
+			log.Warn().Interface("entry", v).Msg("ListPublicShares: skipping entry with missing or invalid \"share\" field")
+			continue
+		}
+		if err := utils.UnmarshalJSONToProtoV1([]byte(share), &local.PublicShare); err != nil {
 			return nil, err
 		}
 
 		if publicshare.IsExpired(&local.PublicShare) {
-			if err := m.revokeExpiredPublicShare(ctx, &local.PublicShare); err != nil {
-				log.Error().Err(err).
-					Str("share_token", local.Token).
-					Msg("failed to revoke expired public share")
-			}
+			// actual deletion is left to the janitor (cleanupExpiredShares)
 			continue
 		}
 
@@ -784,67 +859,72 @@ func (m *manager) userCanListGrants(ctx context.Context, client gateway.GatewayA
 	return allowed
 }
 
-func (m *manager) cleanupExpiredShares() {
+func (m *manager) cleanupExpiredShares() error {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-
-	if err := m.init(); err != nil {
-		return
+	// Another goroutine may hold the lock for a while; once we get it, skip the work if Close already asked us to stop.
+	if err := m.janitorCtx.Err(); err != nil {
+		return err
 	}
+	// Deriving from m.janitorCtx (not context.Background()) means Close
+	// cancels an in-flight run immediately instead of leaving it to run out its full timeout.
+	ctx, cancel := context.WithTimeout(m.janitorCtx, 60*time.Second)
+	defer cancel()
 
-	db, _ := m.persistence.Read(context.Background())
-
-	for _, v := range db {
-		d := v.(map[string]interface{})["share"]
-
-		var ps link.PublicShare
-		_ = utils.UnmarshalJSONToProtoV1([]byte(d.(string)), &ps)
-
-		if publicshare.IsExpired(&ps) {
-			_ = m.revokeExpiredPublicShare(context.Background(), &ps)
-		}
-	}
-}
-
-// revokeExpiredPublicShare doesn't have a lock inside, ensure a lock before call
-func (m *manager) revokeExpiredPublicShare(ctx context.Context, s *link.PublicShare) error {
-	if !m.enableExpiredSharesCleanup {
-		return nil
-	}
-
-	err := m.revokePublicShare(ctx, &link.PublicShareReference{
-		Spec: &link.PublicShareReference_Id{
-			Id: &link.PublicShareId{
-				OpaqueId: s.Id.OpaqueId,
-			},
-		},
-	})
-	if err != nil {
-		log.Err(err).Msg(fmt.Sprintf("publicShareJSONManager: error deleting public share with opaqueId: %s", s.Id.OpaqueId))
+	if err := m.init(ctx); err != nil {
 		return err
 	}
 
-	return nil
+	read, err := m.persistence.Read(ctx)
+	if err != nil {
+		return err
+	}
+	db := persistence.Copy(read)
+
+	var changed bool
+	for id, v := range db {
+		share, ok := dbEntryString(v, shareField)
+		if !ok {
+			continue
+		}
+
+		var ps link.PublicShare
+		if err := utils.UnmarshalJSONToProtoV1([]byte(share), &ps); err != nil {
+			continue
+		}
+
+		if publicshare.IsExpired(&ps) {
+			delete(db, id)
+			changed = true
+		}
+	}
+
+	if !changed {
+		return nil
+	}
+
+	return m.persistence.Write(ctx, db)
 }
 
 // RevokePublicShare undocumented.
 func (m *manager) RevokePublicShare(ctx context.Context, _ *user.User, ref *link.PublicShareReference) error {
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
-
-	if err := m.init(); err != nil {
+	if err := m.init(ctx); err != nil {
 		return err
 	}
+
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 
 	return m.revokePublicShare(ctx, ref)
 }
 
 // revokePublicShare doesn't have a lock inside, ensure a lock before call
 func (m *manager) revokePublicShare(ctx context.Context, ref *link.PublicShareReference) error {
-	db, err := m.persistence.Read(ctx)
+	read, err := m.persistence.Read(ctx)
 	if err != nil {
 		return err
 	}
+	db := persistence.Copy(read)
 
 	switch {
 	case ref.GetId() != nil && ref.GetId().OpaqueId != "":
@@ -874,13 +954,18 @@ func (m *manager) getByToken(ctx context.Context, token string) (*link.PublicSha
 	}
 
 	for _, v := range db {
+		share, ok := dbEntryString(v, shareField)
+		if !ok {
+			continue
+		}
+
 		var local link.PublicShare
-		if err := utils.UnmarshalJSONToProtoV1([]byte(v.(map[string]interface{})["share"].(string)), &local); err != nil {
+		if err := utils.UnmarshalJSONToProtoV1([]byte(share), &local); err != nil {
 			return nil, "", err
 		}
 
 		if local.Token == token {
-			passDB := v.(map[string]interface{})["password"].(string)
+			passDB, _ := dbEntryString(v, passwordField)
 			return &local, passDB, nil
 		}
 	}
@@ -890,12 +975,12 @@ func (m *manager) getByToken(ctx context.Context, token string) (*link.PublicSha
 
 // GetPublicShareByToken gets a public share by its opaque token.
 func (m *manager) GetPublicShareByToken(ctx context.Context, token string, auth *link.PublicShareAuthentication, sign bool) (*link.PublicShare, error) {
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
-
-	if err := m.init(); err != nil {
+	if err := m.init(ctx); err != nil {
 		return nil, err
 	}
+
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
 
 	db, err := m.persistence.Read(ctx)
 	if err != nil {
@@ -903,17 +988,20 @@ func (m *manager) GetPublicShareByToken(ctx context.Context, token string, auth 
 	}
 
 	for _, v := range db {
-		passDB := v.(map[string]interface{})["password"].(string)
+		share, ok := dbEntryString(v, shareField)
+		if !ok {
+			continue
+		}
+
+		passDB, _ := dbEntryString(v, passwordField)
 		var local link.PublicShare
-		if err := utils.UnmarshalJSONToProtoV1([]byte(v.(map[string]interface{})["share"].(string)), &local); err != nil {
+		if err := utils.UnmarshalJSONToProtoV1([]byte(share), &local); err != nil {
 			return nil, err
 		}
 
 		if local.Token == token {
 			if publicshare.IsExpired(&local) {
-				if err := m.revokeExpiredPublicShare(ctx, &local); err != nil {
-					return nil, err
-				}
+				// actual deletion is left to the janitor (cleanupExpiredShares)
 				break
 			}
 

@@ -100,10 +100,18 @@ func getShareManager(c *config) (publicshare.Manager, error) {
 	return nil, errtypes.NotFound("driver not found: " + c.Driver)
 }
 
-// TODO(labkode): add ctx to Close.
 func (s *service) Close() error {
-	return nil
+	cm, ok := s.sm.(publicshare.ClosableManager)
+	if !ok {
+		return nil
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	return cm.Close(ctx)
 }
+
 func (s *service) UnprotectedEndpoints() []string {
 	return []string{"/cs3.sharing.link.v1beta1.LinkAPI/GetPublicShareByToken"}
 }
@@ -227,6 +235,11 @@ func (s *service) CreatePublicShare(ctx context.Context, req *link.CreatePublicS
 			Status: status.NewInternal(ctx, "failed to stat resource to share"),
 		}, err
 	}
+	if sRes.Status.Code != rpc.Code_CODE_OK {
+		return &link.CreatePublicShareResponse{
+			Status: sRes.GetStatus(),
+		}, nil
+	}
 
 	// all users can create internal links
 	if !isInternalLink {
@@ -333,7 +346,11 @@ func (s *service) CreatePublicShare(ctx context.Context, req *link.CreatePublicS
 
 	user := ctxpkg.ContextMustGetUser(ctx)
 	res := &link.CreatePublicShareResponse{}
-	share, err := s.sm.CreatePublicShare(ctx, user, req.GetResourceInfo(), req.GetGrant())
+	resourceInfo := req.GetResourceInfo()
+	if resourceInfo != nil {
+		resourceInfo.Id = sRes.GetInfo().GetId()
+	}
+	share, err := s.sm.CreatePublicShare(ctx, user, resourceInfo, req.GetGrant())
 	switch {
 	case err != nil:
 		log.Error().Err(err).Interface("request", req).Msg("could not write public share")
