@@ -331,7 +331,10 @@ func FileVersionRestored(ev events.FileVersionRestored) AuditEventFileVersionRes
 	}
 }
 
-// TagsAdded converts a TagsAdded event to an AuditEventTagsAdded
+// TagsAdded converts a TagsAdded event to an AuditEventTagsAdded.
+// Unlike the other file events, User is the executant (who changed the tags), not the
+// space owner: tags are usually changed by someone other than the owner, and the
+// owner is still recorded in the Owner field.
 func TagsAdded(ev events.TagsAdded) AuditEventTagsAdded {
 	iid, path, owner := extractFileDetails(ev.Ref, ev.SpaceOwner)
 	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), MessageTagsAdded(ev.Executant.GetOpaqueId(), ev.Tags, iid), ActionTagsAdded)
@@ -341,7 +344,8 @@ func TagsAdded(ev events.TagsAdded) AuditEventTagsAdded {
 	}
 }
 
-// TagsRemoved converts a TagsRemoved event to an AuditEventTagsRemoved
+// TagsRemoved converts a TagsRemoved event to an AuditEventTagsRemoved.
+// User is the executant, as in TagsAdded.
 func TagsRemoved(ev events.TagsRemoved) AuditEventTagsRemoved {
 	iid, path, owner := extractFileDetails(ev.Ref, ev.SpaceOwner)
 	base := BasicAuditEvent(ev.Executant.GetOpaqueId(), formatTime(ev.Timestamp), MessageTagsRemoved(ev.Executant.GetOpaqueId(), ev.Tags, iid), ActionTagsRemoved)

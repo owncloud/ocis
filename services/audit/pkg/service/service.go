@@ -84,8 +84,14 @@ func StartAuditLogger(ctx context.Context, ch <-chan events.Event, log log.Logge
 			case events.FileVersionRestored:
 				auditEvent = types.FileVersionRestored(ev)
 			case events.TagsAdded:
+				if ev.Tags == "" {
+					continue // nothing was added: no audit entry
+				}
 				auditEvent = types.TagsAdded(ev)
 			case events.TagsRemoved:
+				if ev.Tags == "" {
+					continue // graph publishes TagsRemoved for search even when no tag was present: no audit entry
+				}
 				auditEvent = types.TagsRemoved(ev)
 			case events.SpaceCreated:
 				auditEvent = types.SpaceCreated(ev)

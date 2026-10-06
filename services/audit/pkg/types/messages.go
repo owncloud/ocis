@@ -126,7 +126,6 @@ func MessageFileRead(executant, item string) string {
 	return fmt.Sprintf("user '%s' read file '%s'", executant, item)
 }
 
-// MessageFileTrashed returns the human-readable string that describes the action
 // MessageTagsAdded returns a human readable string that describes the action
 func MessageTagsAdded(executant, tags, item string) string {
 	return fmt.Sprintf("user '%s' added tags '%s' to file '%s'", executant, tags, item)

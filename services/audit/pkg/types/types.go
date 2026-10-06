@@ -153,14 +153,14 @@ type AuditEventFileRestored struct {
 type AuditEventTagsAdded struct {
 	AuditEventFiles
 
-	Tags string // the tags that were added, comma separated
+	Tags string // the tags that were added, as carried by the event (ev.Tags)
 }
 
 // AuditEventTagsRemoved is the event logged when tags are removed from a file or folder
 type AuditEventTagsRemoved struct {
 	AuditEventFiles
 
-	Tags string // the tags that were removed, comma separated
+	Tags string // the tags that were removed, as carried by the event (ev.Tags)
 }
 
 // AuditEventFileVersionRestored is the event logged when a file version is restored
