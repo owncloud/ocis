@@ -204,6 +204,11 @@ func (c *coordinator) Upload(ctx context.Context, req storage.UploadRequest, uff
 	if err != nil {
 		return nil, err
 	}
+	// Its bytes already arrived, and an async finish keeps the session for
+	// postprocessing: a repeated PUT would append to them and finish it again.
+	if session.Offset() > 0 {
+		return nil, errtypes.Aborted("coordinator: upload " + session.ID() + " was already received")
+	}
 
 	// Behind the data gateway the request carries a transfer token, not the user.
 	ctx = session.Context(ctx)

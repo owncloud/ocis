@@ -737,7 +737,8 @@ func (t *Tree) InitNewNode(ctx context.Context, n *node.Node, fsize uint64) (met
 		// The file is not ours: leave it, and its cache entry, alone.
 		releaseNewNodeLock(ctx, n, unlock)
 		if os.IsExist(err) {
-			return nil, errtypes.AlreadyExists(nodePath)
+			// The name only: the message reaches the client, the path is the server's.
+			return nil, errtypes.AlreadyExists(n.Name)
 		}
 		return nil, err
 	}
