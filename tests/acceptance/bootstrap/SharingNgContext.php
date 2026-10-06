@@ -2540,9 +2540,10 @@ class SharingNgContext implements Context {
 		$actual = new DateTime($responseBody->value[0]->expirationDateTime);
 		$expected = (new DateTime())->modify("+" . (int)$days . " days");
 		$diffSeconds = \abs($actual->getTimestamp() - $expected->getTimestamp());
-		// allow a 1-day tolerance to absorb any end-of-day rounding of the expiration
+		// allow a 1-minute tolerance to absorb request/processing latency, matching the
+		// backend unit test's own tolerance (BeTemporally("~", expectedDefault, time.Minute))
 		Assert::assertLessThanOrEqual(
-			86400,
+			60,
 			$diffSeconds,
 			"Expected an expiration date approximately $days days from now ("
 			. $expected->format(DATE_ATOM) . "), but got " . $actual->format(DATE_ATOM)

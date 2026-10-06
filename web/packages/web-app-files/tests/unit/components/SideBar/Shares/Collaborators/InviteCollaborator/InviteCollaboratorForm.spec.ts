@@ -1,4 +1,5 @@
 import { mock } from 'vitest-mock-extended'
+import { DateTime } from 'luxon'
 import InviteCollaboratorForm from '../../../../../../../src/components/SideBar/Shares/Collaborators/InviteCollaborator/InviteCollaboratorForm.vue'
 import {
   defaultComponentMocks,
@@ -181,7 +182,7 @@ describe('InviteCollaboratorForm', () => {
   describe('vault default expiration notice', () => {
     const vaultCapabilities = {
       files_sharing: { federation: { incoming: true, outgoing: true } },
-      vault: { enabled: true, vault_storage_provider: '' }
+      vault: { enabled: true, vault_storage_provider: '', default_share_expiration_days: 30 }
     }
 
     it('shows for a vault resource without an explicit expiration', () => {
@@ -199,6 +200,22 @@ describe('InviteCollaboratorForm', () => {
 
       expect(wrapper.find('[data-testid="vault-default-expiration-notice"]').exists()).toBeFalsy()
     })
+    it('does not show or suggest a date when the server omits the capability', () => {
+      const { wrapper } = getWrapper({
+        capabilities: {
+          ...vaultCapabilities,
+          vault: {
+            enabled: true,
+            vault_storage_provider: '',
+            default_share_expiration_days: undefined
+          }
+        },
+        resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
+      })
+
+      expect(wrapper.find('[data-testid="vault-default-expiration-notice"]').exists()).toBeFalsy()
+      expect(wrapper.vm.suggestedExpirationDate()).toBeUndefined()
+    })
     it('hides once an explicit expiration date is set', async () => {
       const { wrapper } = getWrapper({
         capabilities: vaultCapabilities,
@@ -209,6 +226,20 @@ describe('InviteCollaboratorForm', () => {
       await wrapper.vm.$nextTick()
 
       expect(wrapper.find('[data-testid="vault-default-expiration-notice"]').exists()).toBeFalsy()
+    })
+    it('renders the expiration days reported by the vault capability', () => {
+      const { wrapper } = getWrapper({
+        capabilities: {
+          ...vaultCapabilities,
+          vault: { ...vaultCapabilities.vault, default_share_expiration_days: 7 }
+        },
+        resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
+      })
+
+      expect(wrapper.find('[data-testid="vault-default-expiration-notice"]').text()).toContain('7')
+      expect(
+        wrapper.vm.suggestedExpirationDate().diff(DateTime.now(), 'days').days
+      ).toBeCloseTo(7, 0)
     })
   })
   describe('share action', () => {

@@ -466,7 +466,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		})
 		It("does not apply a default expiration to a space membership created without one", func() {
 			root := &provider.ResourceId{
-				StorageId: "1",
+				StorageId: utils.VaultStorageProviderID,
 				SpaceId:   "2",
 				OpaqueId:  "2", // space root: OpaqueId == SpaceId
 			}

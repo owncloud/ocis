@@ -63,14 +63,13 @@ const dateCurrent = customRef<DateTime>((track, trigger) => {
 })
 
 const showDatePickerModal = () => {
+  const resolvedCurrentDate = unref(dateCurrent) ?? suggestedDate
+  const resolvedMinDate = DateTime.now()
   dispatchModal({
     title: language.$gettext('Set expiration date'),
     hideActions: true,
     customComponent: DatePickerModal,
-    customComponentAttrs: () => ({
-      currentDate: unref(dateCurrent) ?? suggestedDate,
-      minDate: DateTime.now()
-    }),
+    customComponentAttrs: () => ({ currentDate: resolvedCurrentDate, minDate: resolvedMinDate }),
     onConfirm: (expirationDateTime: DateTime) => {
       dateCurrent.value = expirationDateTime
     }

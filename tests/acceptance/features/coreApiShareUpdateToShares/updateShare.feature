@@ -184,6 +184,7 @@ Feature: sharing
       | permissions                | all                  |
       | stime                      | A_NUMBER             |
       | parent                     |                      |
+      | expiration                 |                      |
       | token                      |                      |
       | uid_file_owner             | %username%           |
       | displayname_file_owner     | %displayname%        |

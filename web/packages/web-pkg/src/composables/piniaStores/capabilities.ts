@@ -163,6 +163,9 @@ export const useCapabilityStore = defineStore('capabilities', () => {
   const authMfaSessionDuration = computed(() => unref(capabilities).auth.mfa.session_duration)
 
   const vaultEnabled = computed(() => unref(capabilities).vault?.enabled)
+  const vaultDefaultShareExpirationDays = computed(
+    () => unref(capabilities).vault?.default_share_expiration_days
+  )
 
   return {
     isInitialized,
@@ -215,7 +218,8 @@ export const useCapabilityStore = defineStore('capabilities', () => {
     authMfaEnabled,
     authMfaRequiredLevelname,
     authMfaSessionDuration,
-    vaultEnabled
+    vaultEnabled,
+    vaultDefaultShareExpirationDays
   }
 })
 

@@ -71,6 +71,8 @@ type Config struct {
 
 	EnableVaultMode bool `yaml:"enable_vault_mode" env:"OCIS_ENABLE_VAULT_MODE;FRONTEND_ENABLE_VAULT_MODE" desc:"Enable vault mode. When enabled, the capabilities endpoint will report vault as enabled and the capabilities?vault=true endpoint will return capabilities with public sharing and federation disabled." introductionVersion:"8.1.0"`
 
+	DefaultVaultShareExpirationDays int `yaml:"default_vault_share_expiration_days" env:"OCIS_DEFAULT_VAULT_SHARE_EXPIRATION_DAYS;FRONTEND_DEFAULT_VAULT_SHARE_EXPIRATION_DAYS" desc:"The default expiration, in days, applied to a vault user or group share created without an explicit expiration date. Reported via the vault capability so clients can reflect the admin-configured value. Must match the graph service's GRAPH_DEFAULT_VAULT_SHARE_EXPIRATION_DAYS." introductionVersion:"8.3.0"`
+
 	Context context.Context `yaml:"-"`
 }
 

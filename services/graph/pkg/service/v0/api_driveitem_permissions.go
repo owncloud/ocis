@@ -181,11 +181,12 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 
 	// use the client-supplied expiration, else default vault shares to DefaultVaultShareExpirationDays;
 	// space memberships and non-vault shares are exempt
+	resourceID := statResponse.GetInfo().GetId()
 	var shareExpiration *types.Timestamp
 	switch {
 	case invite.ExpirationDateTime != nil:
 		shareExpiration = utils.TimeToTS(*invite.ExpirationDateTime)
-	case !IsSpaceRoot(statResponse.GetInfo().GetId()) && IsVaultResource(statResponse.GetInfo().GetId()):
+	case !IsSpaceRoot(resourceID) && IsVaultResource(resourceID):
 		shareExpiration = utils.TimeToTS(time.Now().UTC().AddDate(0, 0, s.config.DefaultVaultShareExpirationDays))
 	}
 
@@ -258,8 +259,8 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 			}
 
 			createShareRequest := createShareRequestToFederatedUser(user, statResponse.GetInfo().GetId(), providerInfoResp.ProviderInfo, cs3ResourcePermissions)
-			if invite.ExpirationDateTime != nil {
-				createShareRequest.Expiration = utils.TimeToTS(*invite.ExpirationDateTime)
+			if shareExpiration != nil {
+				createShareRequest.Expiration = shareExpiration
 			}
 			createShareResponse, err := gatewayClient.CreateOCMShare(ctx, createShareRequest)
 			if err := errorcode.FromCS3Status(createShareResponse.GetStatus(), err); err != nil {

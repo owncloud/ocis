@@ -83,12 +83,18 @@
       </oc-select>
     </div>
     <div
-      v-if="isVaultResource && !expirationDate"
+      v-if="isVaultResource && vaultDefaultExpirationDays && !expirationDate"
       class="oc-flex oc-flex-middle oc-gap-s oc-background-muted oc-rounded oc-p-s oc-mb-s oc-text-small"
       data-testid="vault-default-expiration-notice"
     >
       <oc-icon name="information" size="small" />
-      <span v-text="$gettext('Expires in 30 days by default — adjust via the ⋮ menu')" />
+      <span
+        v-text="
+          $gettext('Expires in %{days} days by default — adjust via the ⋮ menu', {
+            days: String(vaultDefaultExpirationDays)
+          })
+        "
+      />
     </div>
     <div class="oc-flex oc-flex-between oc-flex-middle oc-mb-l oc-mt-s">
       <role-dropdown
@@ -126,7 +132,7 @@
               <li class="oc-rounded oc-menu-item-hover">
                 <expiration-datepicker
                   v-if="!saving"
-                  :suggested-date="isVaultResource ? DateTime.now().plus({ days: 30 }) : undefined"
+                  :suggested-date="suggestedExpirationDate()"
                   @option-change="collaboratorExpiryChanged"
                 />
               </li>
@@ -309,6 +315,14 @@ const isVaultResource = computed(() => {
   }
   return storageId.split('$')[0] === VAULT_STORAGE_PROVIDER_ID
 })
+
+// no local fallback: the default lives only in the server's vault config
+const vaultDefaultExpirationDays = capabilityRefs.vaultDefaultShareExpirationDays
+
+const suggestedExpirationDate = () =>
+  unref(isVaultResource) && unref(vaultDefaultExpirationDays)
+    ? DateTime.now().plus({ days: unref(vaultDefaultExpirationDays) })
+    : undefined
 
 const createSharesConcurrentRequests = computed(() => {
   return configStore.options.concurrentRequests.shares.create
