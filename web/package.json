@@ -123,7 +123,7 @@
       "brace-expansion": "5.0.12",
       "ws": "8.21.0",
       "js-yaml": "4.3.2",
-      "fast-uri": "3.1.7",
+      "fast-uri": "3.1.8",
       "browserslist": "4.28.7",
       "axios": "1.20.0",
       "smol-toml": "1.9.0",
@@ -132,7 +132,9 @@
       "colord": "2.9.4",
       "unhead": "2.1.13",
       "markdown-it": "14.3.1",
-      "esbuild": "0.28.1"
+      "esbuild": "0.28.1",
+      "dompurify": "3.4.16",
+      "qs": "6.16.0"
     },
     "patchedDependencies": {
       "caf@15.0.1": "patches/caf@15.0.1.patch",
