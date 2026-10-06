@@ -49,10 +49,33 @@ features:
     max: '0'
   appsIntegration:
     enabled: false
+    mimetypes:
+      - mime_type: application/vnd.oasis.opendocument.text
+        extension: odt
+        name: OpenDocument
+        description: OpenDocument text document
+        icon: ""
+        default_app: Collabora
+        allow_creation: true
+      - mime_type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+        extension: docx
+        name: Microsoft Word
+        description: Microsoft Word document
+        icon: ""
+        default_app: OnlyOffice
+        allow_creation: true
+      - mime_type: text/plain
+        extension: txt
+        name: Plain text
+        description: Plain text file
+        icon: ""
+        default_app: FakeOffice
+        allow_creation: true
     wopiIntegration:
       officeSuites:
         - name: 'Collabora'
           uri: 'https://collabora:9980'
+          iconURI: 'https://collabora:9980/favicon.ico'
           wopiSrc: 'http://ocis-server:9300'
           product: 'Collabora'
           enabled: true
@@ -64,6 +87,7 @@ features:
             enabled: false
         - name: 'FakeOffice'
           uri: 'http://fakeoffice:8080'
+          iconURI: 'http://fakeoffice:8080/favicon.ico'
           wopiSrc: 'http://ocis-server:9301'
           product: 'FakeOffice'
           enabled: true
@@ -75,6 +99,7 @@ features:
             enabled: false
         - name: 'OnlyOffice'
           uri: 'https://onlyoffice:7443'
+          iconURI: 'https://onlyoffice:7443/web-apps/apps/documenteditor/main/resources/img/favicon.ico'
           wopiSrc: 'http://ocis-server:9302'
           product: 'OnlyOffice'
           enabled: true
