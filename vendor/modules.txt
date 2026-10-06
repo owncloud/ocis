@@ -605,7 +605,7 @@ github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus
 # github.com/go-micro/plugins/v4/wrapper/trace/opentelemetry v1.2.0
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/wrapper/trace/opentelemetry
-# github.com/go-playground/locales v0.14.1
+# github.com/go-playground/locales v0.14.2
 ## explicit; go 1.17
 github.com/go-playground/locales
 github.com/go-playground/locales/currency
@@ -805,7 +805,7 @@ github.com/hashicorp/go-plugin/runner
 # github.com/hashicorp/yamux v0.1.2
 ## explicit; go 1.20
 github.com/hashicorp/yamux
-# github.com/huandu/xstrings v1.6.1
+# github.com/huandu/xstrings v1.6.2
 ## explicit; go 1.12
 github.com/huandu/xstrings
 # github.com/iancoleman/strcase v0.3.0
@@ -1321,7 +1321,7 @@ github.com/orcaman/concurrent-map
 # github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245
 ## explicit; go 1.18
 github.com/owncloud/libre-graph-api-go
-# github.com/owncloud/reva/v2 v2.0.0-20261005091647-373f9509a363
+# github.com/owncloud/reva/v2 v2.0.0-20261006170644-bac0e1ee144a
 ## explicit; go 1.26.0
 github.com/owncloud/reva/v2/cmd/revad/internal/grace
 github.com/owncloud/reva/v2/cmd/revad/runtime

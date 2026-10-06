@@ -67,7 +67,7 @@ require (
 	github.com/open-policy-agent/opa v1.21.1
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245
-	github.com/owncloud/reva/v2 v2.0.0-20261005091647-373f9509a363
+	github.com/owncloud/reva/v2 v2.0.0-20261006170644-bac0e1ee144a
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.12
 	github.com/prometheus/client_golang v1.24.1
@@ -198,7 +198,7 @@ require (
 	github.com/go-micro/plugins/v4/events/natsjs v1.2.2 // indirect
 	github.com/go-micro/plugins/v4/store/nats-js v1.2.1 // indirect
 	github.com/go-micro/plugins/v4/store/redis v1.2.1 // indirect
-	github.com/go-playground/locales v0.14.1 // indirect
+	github.com/go-playground/locales v0.14.2 // indirect
 	github.com/go-playground/universal-translator v0.18.2 // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/go-resty/resty/v2 v2.17.2 // indirect
@@ -228,7 +228,7 @@ require (
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
 	github.com/hashicorp/go-plugin v1.8.0 // indirect
 	github.com/hashicorp/yamux v0.1.2 // indirect
-	github.com/huandu/xstrings v1.6.1 // indirect
+	github.com/huandu/xstrings v1.6.2 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/imdario/mergo v0.3.15 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
