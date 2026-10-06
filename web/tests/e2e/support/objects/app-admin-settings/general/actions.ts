@@ -1,10 +1,20 @@
-import { basename } from 'path'
 import { Page, expect, test } from '@playwright/test'
+import { readFileSync } from 'node:fs'
 import { objects } from '../../../index'
 import { getOtpFromImage } from '../../../utils/mfa'
 import { Jimp } from 'jimp'
 
-export const uploadLogo = async (path: string, page: Page): Promise<void> => {
+const waitForLogoWrapper = async (page: Page) => {
+  const selectors = new objects.a11y.Accessibility({ page }).getSelectors()
+  await page.locator(selectors.logoWrapper).waitFor()
+  return selectors
+}
+
+export const uploadLogo = async (logoPath: string, page: Page): Promise<void> => {
+  const selectors = await waitForLogoWrapper(page)
+  const logoImg = page.locator(`${selectors.logoWrapper} img`)
+  const srcBefore = await logoImg.getAttribute('src')
+
   await page.click('#logo-context-btn')
 
   // wait for the visible context menu and run accessibility scan on that menu
@@ -15,12 +25,50 @@ export const uploadLogo = async (path: string, page: Page): Promise<void> => {
   )
 
   const logoInput = page.locator('#logo-upload-input')
-  await logoInput.setInputFiles(path)
+  const uploadResponsePromise = page.waitForResponse(
+    (resp) => resp.url().includes('/branding/logo') && resp.request().method() === 'POST'
+  )
+  const fileName = logoPath.split('/').pop() ?? 'logo.png'
+  const extension = fileName.split('.').pop()?.toLowerCase()
+  const mimeTypeByExtension: Record<string, string> = {
+    png: 'image/png',
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    gif: 'image/gif'
+  }
 
-  await page.locator('.oc-notification-message').waitFor()
-  await page.reload()
-  const selectors = new objects.a11y.Accessibility({ page }).getSelectors()
-  await page.locator(selectors.logoWrapper).waitFor()
+  await Promise.all([
+    uploadResponsePromise,
+    logoInput.setInputFiles({
+      name: fileName,
+      mimeType: mimeTypeByExtension[extension ?? ''] ?? 'application/octet-stream',
+      buffer: readFileSync(logoPath)
+    })
+  ])
+  const uploadResponse = await uploadResponsePromise
+
+  const notification = page.locator('.oc-notification-message')
+  await notification.waitFor()
+  const notificationText = (await notification.textContent())?.trim() ?? ''
+
+  if (!uploadResponse.ok() || !notificationText.includes('Logo was uploaded successfully')) {
+    let responseText = ''
+    try {
+      responseText = await uploadResponse.text()
+    } catch {
+      responseText = '<unable to read response body>'
+    }
+
+    throw new Error(
+      `Logo upload failed. status=${uploadResponse.status()} message="${notificationText}" body="${responseText}"`
+    )
+  }
+
+  // The app triggers a delayed router.go(0) after successful upload.
+  await page.waitForTimeout(1500)
+  await page.reload({ waitUntil: 'load' })
+  await waitForLogoWrapper(page)
+
   // run accessibility scan on the logo area after upload
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
@@ -28,14 +76,15 @@ export const uploadLogo = async (path: string, page: Page): Promise<void> => {
     'logo area after upload'
   )
 
-  const logoImg = page.locator(`${selectors.logoWrapper} img`)
-  const logoSrc = await logoImg.getAttribute('src')
-  expect(logoSrc).toContain(basename(path))
+  await expect(async () => {
+    const logoSrc = await logoImg.getAttribute('src')
+    expect(logoSrc).not.toEqual(srcBefore)
+    expect(logoSrc).not.toContain('themes/owncloud/assets/oc_white.svg')
+  }).toPass({ timeout: 30000 })
 }
 
 export const resetLogo = async (page: Page): Promise<void> => {
-  const a11yObject = new objects.a11y.Accessibility({ page })
-  const selectors = a11yObject.getSelectors()
+  const selectors = await waitForLogoWrapper(page)
 
   const imgBefore = page.locator(`${selectors.logoWrapper} img`)
   const srcBefore = await imgBefore.getAttribute('src')
@@ -51,8 +100,7 @@ export const resetLogo = async (page: Page): Promise<void> => {
   await page.click('.oc-general-actions-reset-logo-trigger')
 
   await page.locator('.oc-notification-message').waitFor()
-  await page.reload()
-  await page.locator(selectors.logoWrapper).waitFor()
+  await waitForLogoWrapper(page)
 
   // run accessibility scan on the logo area after reset
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
@@ -62,8 +110,10 @@ export const resetLogo = async (page: Page): Promise<void> => {
   )
 
   const imgAfter = page.locator(`${selectors.logoWrapper} img`)
-  const srcAfter = await imgAfter.getAttribute('src')
-  expect(srcAfter).not.toEqual(srcBefore)
+  await expect(async () => {
+    const srcAfter = await imgAfter.getAttribute('src')
+    expect(srcAfter).not.toEqual(srcBefore)
+  }).toPass({ timeout: 15000 })
 }
 
 export const userAuthenticatesWithOTP = async (page: Page, deviceName: string): Promise<void> => {

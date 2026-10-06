@@ -163,8 +163,23 @@ services:
       accessModes:
         - ReadWriteOnce
   web:
+    additionalInitContainers:
+      - name: init-web-themes-dir
+        image: busybox:stable
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsNonRoot: false
+          runAsUser: 0
+        command:
+          - sh
+          - -c
+          - mkdir -p /var/lib/ocis/web/assets/themes/_branding && chown -R 1000:1000 /var/lib/ocis/web/assets/themes
+        volumeMounts:
+          - name: web-data
+            mountPath: /var/lib/ocis
     persistence:
       enabled: true
+      chownInitContainer: true
       accessModes:
         - ReadWriteOnce
   antivirus:
