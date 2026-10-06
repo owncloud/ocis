@@ -322,6 +322,10 @@ describe('AuthService', () => {
   describe('acr', () => {
     const mockSignInRedirect = vi.fn()
 
+    beforeEach(() => {
+      sessionStorage.clear()
+    })
+
     it('when user is not authenticated, should redirect to login page', async () => {
       const authService = new AuthService()
 
@@ -333,7 +337,9 @@ describe('AuthService', () => {
       })
 
       await authService.requireAcr('advanced', '/')
-      expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
+      expect(mockSignInRedirect).toHaveBeenCalledWith(
+        expect.objectContaining({ acr_values: 'advanced' })
+      )
     })
 
     it('when user is authenticated and acr is not the one required, should redirect to login page', async () => {
@@ -349,7 +355,9 @@ describe('AuthService', () => {
       })
 
       await authService.requireAcr('advanced', '/')
-      expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
+      expect(mockSignInRedirect).toHaveBeenCalledWith(
+        expect.objectContaining({ acr_values: 'advanced' })
+      )
     })
 
     it('when user is authenticated and acr is the one required but access token is expired, should redirect to login page', async () => {
@@ -365,7 +373,9 @@ describe('AuthService', () => {
       })
 
       await authService.requireAcr('advanced', '/')
-      expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
+      expect(mockSignInRedirect).toHaveBeenCalledWith(
+        expect.objectContaining({ acr_values: 'advanced' })
+      )
     })
 
     it('when user is authenticated and acr is the one required, should not redirect to login page', async () => {
@@ -382,6 +392,90 @@ describe('AuthService', () => {
 
       await authService.requireAcr('advanced', '/')
       expect(mockSignInRedirect).not.toHaveBeenCalled()
+    })
+
+    describe('MFA step-up loop protection', () => {
+      const adminRoute = '/admin-settings/users'
+
+      const setupRequireAcr = (user: User) => {
+        const signinRedirect = vi.fn()
+        const authService = new AuthService()
+        Object.defineProperty(authService, 'userManager', {
+          value: mock<UserManager>({
+            getUser: vi.fn().mockResolvedValue(user),
+            signinRedirect,
+            setPostLoginRedirectUrl: vi.fn()
+          })
+        })
+        Object.defineProperty(authService, 'language', {
+          value: {
+            $gettext: (msg: string) => msg,
+            $pgettext: (_context: string, msg: string) => msg
+          }
+        })
+        return { authService, signinRedirect }
+      }
+
+      // the route guard runs `initializeContext` before `requireAcr`, which marks the
+      // navigation right after the sign-in callback as the IdP's answer for `target`
+      const answeredStepUpFor = (authService: AuthService, target: string) => {
+        ;(authService as any).stepUpReturnTarget = target
+      }
+
+      const regularUser = () => mock<User>({ profile: { acr: 'regular' }, expired: false })
+
+      it('requests the step-up with the target as OIDC state', async () => {
+        const { authService, signinRedirect } = setupRequireAcr(regularUser())
+
+        const result = await authService.requireAcr('advanced', adminRoute)
+
+        expect(result).toBe(true)
+        expect(signinRedirect).toHaveBeenCalledWith(stepUpRequest(adminRoute))
+      })
+
+      it('denies access when the IdP answered the step-up without the required acr', async () => {
+        const { authService, signinRedirect } = setupRequireAcr(regularUser())
+        answeredStepUpFor(authService, adminRoute)
+
+        const result = await authService.requireAcr('advanced', adminRoute)
+
+        expect(result).toBe(false)
+        expect(signinRedirect).not.toHaveBeenCalled()
+        expect(useMessages().showErrorMessage).toHaveBeenCalled()
+      })
+
+      it('redirects again when the user came back without the IdP answering (e.g. browser back)', async () => {
+        const { authService, signinRedirect } = setupRequireAcr(regularUser())
+
+        await authService.requireAcr('advanced', adminRoute)
+        const result = await authService.requireAcr('advanced', adminRoute)
+
+        expect(result).toBe(true)
+        expect(signinRedirect).toHaveBeenCalledTimes(2)
+        expect(useMessages().showErrorMessage).not.toHaveBeenCalled()
+      })
+
+      it('redirects when the IdP answered a step-up for another target', async () => {
+        const { authService, signinRedirect } = setupRequireAcr(regularUser())
+        answeredStepUpFor(authService, '/vault')
+
+        const result = await authService.requireAcr('advanced', adminRoute)
+
+        expect(result).toBe(true)
+        expect(signinRedirect).toHaveBeenCalledWith(stepUpRequest(adminRoute))
+      })
+
+      it('redirects an expired user even when the IdP just answered', async () => {
+        const { authService, signinRedirect } = setupRequireAcr(
+          mock<User>({ profile: { acr: 'regular' }, expired: true })
+        )
+        answeredStepUpFor(authService, adminRoute)
+
+        const result = await authService.requireAcr('advanced', adminRoute)
+
+        expect(result).toBe(true)
+        expect(signinRedirect).toHaveBeenCalledWith(stepUpRequest(adminRoute))
+      })
     })
   })
 

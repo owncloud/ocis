@@ -483,27 +483,35 @@ export class AuthService implements AuthServiceInterface {
   }
 
   /**
-   * Redirects to the login page if the user is not authenticated or if the ACR value is not the one required.
+   * Ensures the current user has authenticated with the given `acr` (e.g. MFA), redirecting
+   * to the IdP for a step-up if needed.
    *
    * @param acrValue - The ACR value to require.
    * @param redirectUrl - The URL to redirect to after login.
    *
-   * @throws {Error} In cases of wrong authentication.
+   * @returns false if the IdP just answered a step-up for `redirectUrl` without the required
+   * `acr`. The caller must not grant access and should navigate elsewhere.
    */
-  public async requireAcr(acrValue: string, redirectUrl: string) {
+  public async requireAcr(acrValue: string, redirectUrl: string): Promise<boolean> {
     const user = await this.userManager.getUser()
-    if (!user || user.expired) {
-      this.userManager.setPostLoginRedirectUrl(redirectUrl)
-      return this.userManager.signinRedirect({ acr_values: acrValue })
+    const isAuthenticated = user && !user.expired
+
+    if (isAuthenticated && user.profile.acr === acrValue) {
+      return true
     }
 
-    const { acr } = user.profile
-    if (acr === acrValue) {
-      return
+    // `acr_values` is a voluntary claim, see `initializeContext`: don't redirect again
+    if (isAuthenticated && this.isStepUpReturn(redirectUrl)) {
+      console.warn(
+        `[authService:requireAcr] - MFA step-up returned acr "${user.profile.acr}", required "${acrValue}". Not retrying.`
+      )
+      this.showStepUpFailedMessage()
+      return false
     }
 
     this.userManager.setPostLoginRedirectUrl(redirectUrl)
-    return this.userManager.signinRedirect({ acr_values: acrValue })
+    await this.signinRedirectForStepUp(acrValue, redirectUrl)
+    return true
   }
 
   private signinRedirectForStepUp(acrValue: string, target: string) {
@@ -558,6 +566,20 @@ export class AuthService implements AuthServiceInterface {
       desc: $pgettext(
         'Error message shown when the multi-factor authentication step-up required to open the vault failed, e.g. because the user has no second factor at hand',
         'The vault requires multi-factor authentication, which could not be completed. Please set up a second factor or contact your administrator.'
+      )
+    })
+  }
+
+  private showStepUpFailedMessage() {
+    const { $pgettext } = this.language
+    useMessages().showErrorMessage({
+      title: $pgettext(
+        'Error message title shown when the multi-factor authentication step-up required to open a page (e.g. admin settings) failed',
+        'Multi-factor authentication required'
+      ),
+      desc: $pgettext(
+        'Error message shown when the multi-factor authentication step-up required to open a page (e.g. admin settings) failed, e.g. because the user has no second factor at hand',
+        'This page requires multi-factor authentication, which could not be completed. Please set up a second factor or contact your administrator.'
       )
     })
   }
