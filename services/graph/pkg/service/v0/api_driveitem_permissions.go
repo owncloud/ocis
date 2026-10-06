@@ -47,9 +47,6 @@ import (
 const (
 	invalidIdMsg       = "invalid driveID or itemID"
 	parseDriveIDErrMsg = "could not parse driveID"
-
-	// default expiration for user/group shares created without one; space memberships are exempt
-	defaultShareExpirationDays = 30
 )
 
 // DriveItemPermissionsProvider contains the methods related to handling permissions on drive items
@@ -182,13 +179,14 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 	var expiration *types.Timestamp
 	var cTime *types.Timestamp
 
-	// use the client-supplied expiration, else default non-space shares to defaultShareExpirationDays
+	// use the client-supplied expiration, else default vault shares to DefaultVaultShareExpirationDays;
+	// space memberships and non-vault shares are exempt
 	var shareExpiration *types.Timestamp
 	switch {
 	case invite.ExpirationDateTime != nil:
 		shareExpiration = utils.TimeToTS(*invite.ExpirationDateTime)
-	case !IsSpaceRoot(statResponse.GetInfo().GetId()):
-		shareExpiration = utils.TimeToTS(time.Now().UTC().AddDate(0, 0, defaultShareExpirationDays))
+	case !IsSpaceRoot(statResponse.GetInfo().GetId()) && IsVaultResource(statResponse.GetInfo().GetId()):
+		shareExpiration = utils.TimeToTS(time.Now().UTC().AddDate(0, 0, s.config.DefaultVaultShareExpirationDays))
 	}
 
 	switch driveRecipient.GetLibreGraphRecipientType() {

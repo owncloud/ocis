@@ -178,6 +178,39 @@ describe('InviteCollaboratorForm', () => {
       )
     })
   })
+  describe('vault default expiration notice', () => {
+    const vaultCapabilities = {
+      files_sharing: { federation: { incoming: true, outgoing: true } },
+      vault: { enabled: true, vault_storage_provider: '' }
+    }
+
+    it('shows for a vault resource without an explicit expiration', () => {
+      const { wrapper } = getWrapper({
+        capabilities: vaultCapabilities,
+        resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
+      })
+
+      expect(wrapper.find('[data-testid="vault-default-expiration-notice"]').exists()).toBeTruthy()
+    })
+    it('does not show for a resource outside the vault', () => {
+      const { wrapper } = getWrapper({
+        resource: mock<Resource>({ ...folderMock, storageId: 'some-other-provider' })
+      })
+
+      expect(wrapper.find('[data-testid="vault-default-expiration-notice"]').exists()).toBeFalsy()
+    })
+    it('hides once an explicit expiration date is set', async () => {
+      const { wrapper } = getWrapper({
+        capabilities: vaultCapabilities,
+        resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
+      })
+
+      wrapper.vm.expirationDate = '2026-01-01'
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-testid="vault-default-expiration-notice"]').exists()).toBeFalsy()
+    })
+  })
   describe('share action', () => {
     it('clicking the invite-sharees button calls the "share"-action', async () => {
       const { wrapper } = getWrapper()

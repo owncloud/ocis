@@ -82,6 +82,14 @@
         </template>
       </oc-select>
     </div>
+    <div
+      v-if="isVaultResource && !expirationDate"
+      class="oc-flex oc-flex-middle oc-gap-s oc-background-muted oc-rounded oc-p-s oc-mb-s oc-text-small"
+      data-testid="vault-default-expiration-notice"
+    >
+      <oc-icon name="information" size="small" />
+      <span v-text="$gettext('Expires in 30 days by default — adjust via the ⋮ menu')" />
+    </div>
     <div class="oc-flex oc-flex-between oc-flex-middle oc-mb-l oc-mt-s">
       <role-dropdown
         mode="create"
@@ -116,7 +124,11 @@
               :aria-label="'shareEditOptions'"
             >
               <li class="oc-rounded oc-menu-item-hover">
-                <expiration-datepicker v-if="!saving" @option-change="collaboratorExpiryChanged" />
+                <expiration-datepicker
+                  v-if="!saving"
+                  :suggested-date="isVaultResource ? DateTime.now().plus({ days: 30 }) : undefined"
+                  @option-change="collaboratorExpiryChanged"
+                />
               </li>
             </oc-list>
           </oc-drop>

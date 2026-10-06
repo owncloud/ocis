@@ -174,7 +174,12 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(permission.GrantedToV2.Group.GetId()).To(Equal("2"))
 		})
 
-		It("applies a default 30-day expiration to a user share created without one", func() {
+		It("applies a default 30-day expiration to a vault user share created without one", func() {
+			statResponse.Info.Id = &provider.ResourceId{
+				StorageId: utils.VaultStorageProviderID,
+				SpaceId:   driveItemId.SpaceId,
+				OpaqueId:  driveItemId.OpaqueId,
+			}
 			var capturedReq *collaboration.CreateShareRequest
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).
@@ -196,7 +201,12 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(utils.TSToTime(capturedReq.GetGrant().GetExpiration())).To(BeTemporally("~", expectedDefault, time.Minute))
 		})
 
-		It("applies a default 30-day expiration to a group share created without one", func() {
+		It("applies a default 30-day expiration to a vault group share created without one", func() {
+			statResponse.Info.Id = &provider.ResourceId{
+				StorageId: utils.VaultStorageProviderID,
+				SpaceId:   driveItemId.SpaceId,
+				OpaqueId:  driveItemId.OpaqueId,
+			}
 			var capturedReq *collaboration.CreateShareRequest
 			gatewayClient.On("GetGroup", mock.Anything, mock.Anything).Return(getGroupResponse, nil)
 			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).
@@ -216,6 +226,46 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(capturedReq.GetGrant().GetExpiration()).ToNot(BeNil())
 			Expect(utils.TSToTime(capturedReq.GetGrant().GetExpiration())).To(BeTemporally("~", expectedDefault, time.Minute))
+		})
+
+		It("does not apply a default expiration to a non-vault user share created without one", func() {
+			var capturedReq *collaboration.CreateShareRequest
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).
+				Run(func(args mock.Arguments) {
+					capturedReq = args.Get(1).(*collaboration.CreateShareRequest)
+				}).Return(createShareResponse, nil)
+			driveItemInvite.Recipients = []libregraph.DriveRecipient{
+				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+			}
+			driveItemInvite.ExpirationDateTime = nil
+			createShareResponse.Share = &collaboration.Share{
+				Id: &collaboration.ShareId{OpaqueId: "123"},
+			}
+
+			_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(capturedReq.GetGrant().GetExpiration()).To(BeNil())
+		})
+
+		It("does not apply a default expiration to a non-vault group share created without one", func() {
+			var capturedReq *collaboration.CreateShareRequest
+			gatewayClient.On("GetGroup", mock.Anything, mock.Anything).Return(getGroupResponse, nil)
+			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).
+				Run(func(args mock.Arguments) {
+					capturedReq = args.Get(1).(*collaboration.CreateShareRequest)
+				}).Return(createShareResponse, nil)
+			driveItemInvite.Recipients = []libregraph.DriveRecipient{
+				{ObjectId: libregraph.PtrString("2"), LibreGraphRecipientType: libregraph.PtrString("group")},
+			}
+			driveItemInvite.ExpirationDateTime = nil
+			createShareResponse.Share = &collaboration.Share{
+				Id: &collaboration.ShareId{OpaqueId: "123"},
+			}
+
+			_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(capturedReq.GetGrant().GetExpiration()).To(BeNil())
 		})
 
 		It("keeps a client-provided expiration instead of the default", func() {
