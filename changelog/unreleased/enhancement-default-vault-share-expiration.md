@@ -1,4 +1,4 @@
-Change: Default 30-day expiration for vault shares
+Enhancement: Default 30-day expiration for vault shares
 
 When a user or group share of a vault file or folder is created without an
 expiration date, the server now preconfigures a default expiration (30 days
