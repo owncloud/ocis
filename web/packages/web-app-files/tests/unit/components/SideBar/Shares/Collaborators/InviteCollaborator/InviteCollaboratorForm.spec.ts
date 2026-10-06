@@ -237,9 +237,10 @@ describe('InviteCollaboratorForm', () => {
       })
 
       expect(wrapper.find('[data-testid="vault-default-expiration-notice"]').text()).toContain('7')
-      expect(
-        wrapper.vm.suggestedExpirationDate().diff(DateTime.now(), 'days').days
-      ).toBeCloseTo(7, 0)
+      expect(wrapper.vm.suggestedExpirationDate().diff(DateTime.now(), 'days').days).toBeCloseTo(
+        7,
+        0
+      )
     })
   })
   describe('share action', () => {
