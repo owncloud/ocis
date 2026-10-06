@@ -90,9 +90,11 @@
       <oc-icon name="information" size="small" />
       <span
         v-text="
-          $gettext('Expires in %{days} days by default — adjust via the ⋮ menu', {
-            days: String(vaultDefaultExpirationDays)
-          })
+          $pgettext(
+            'Notice shown when sharing a resource inside the vault, telling the sharer the share will expire automatically unless they open the \'more actions\' (⋮) menu next to the share button and set a different date',
+            'Expires in %{days} days by default — adjust via the ⋮ menu',
+            { days: String(vaultDefaultExpirationDays) }
+          )
         "
       />
     </div>
