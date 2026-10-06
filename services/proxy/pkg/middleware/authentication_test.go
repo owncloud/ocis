@@ -20,6 +20,8 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend/mocks"
+	userRoleMocks "github.com/owncloud/ocis/v2/services/proxy/pkg/userroles/mocks"
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/stretchr/testify/mock"
 	"go-micro.dev/v4/store"
@@ -81,10 +83,17 @@ var _ = Describe("Authenticating requests", Label("Authentication"), func() {
 		pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
 
 		logger := log.NewLogger()
+
+		roleAssigner := &userRoleMocks.UserRoleAssigner{}
+		roleAssigner.EXPECT().ApplyUserRole(mock.Anything, mock.Anything).RunAndReturn(
+			func(ctx context.Context, user *userv1beta1.User) (*userv1beta1.User, error) { return user, nil },
+		).Maybe()
+
 		authenticators = []Authenticator{
 			BasicAuthenticator{
-				Logger:       logger,
-				UserProvider: &ub,
+				Logger:           logger,
+				UserProvider:     &ub,
+				UserRoleAssigner: roleAssigner,
 			},
 			&OIDCAuthenticator{
 				OIDCIss:       "http://idp.example.com",
@@ -151,7 +160,7 @@ var _ = Describe("Authenticating requests", Label("Authentication"), func() {
 			testHandler.ServeHTTP(rr, req)
 			Expect(rr).To(HaveHTTPStatus(http.StatusOK))
 		})
-		It("ensures the context oidc data when user the Basic authentication is successful", func() {
+		It("ensures the authenticated user is in the context when the Basic authentication is successful", func() {
 			req := httptest.NewRequest("PROPFIND", "http://example.com/remote.php/dav/public-files/", http.NoBody)
 			req = req.WithContext(router.SetRoutingInfo(context.Background(), router.RoutingInfo{}))
 			req.SetBasicAuth("testuser", "testpassword")
@@ -160,12 +169,12 @@ var _ = Describe("Authenticating requests", Label("Authentication"), func() {
 				EnableBasicAuth(true),
 			)
 			testHandler := handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				Expect(oidc.FromContext(r.Context())).To(Equal(map[string]interface{}{
-					"email":              "testuser@example.com",
-					"ownclouduuid":       "OpaqueId",
-					"iss":                "IdpId",
-					"preferred_username": "testuser",
-				}))
+				user, ok := revactx.ContextGetUser(r.Context())
+				Expect(ok).To(Equal(true))
+				Expect(user.GetId().GetIdp()).To(Equal("IdpId"))
+				Expect(user.GetId().GetOpaqueId()).To(Equal("OpaqueId"))
+				Expect(user.GetUsername()).To(Equal("testuser"))
+				Expect(user.GetMail()).To(Equal("testuser@example.com"))
 			}))
 			rr := httptest.NewRecorder()
 			testHandler.ServeHTTP(rr, req)
