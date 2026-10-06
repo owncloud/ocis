@@ -5,15 +5,19 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 )
 
 // BasicAuthenticator is the authenticator responsible for HTTP Basic authentication.
 type BasicAuthenticator struct {
-	Logger        log.Logger
-	UserProvider  backend.UserBackend
-	UserCS3Claim  string
-	UserOIDCClaim string
+	Logger         log.Logger
+	UserProvider   backend.UserBackend
+	UserCS3Claim   string
+	UserOIDCClaim  string
+	RoleManager    roles.Manager
+	RoleAssignment config.RoleAssignment
 }
 
 // Authenticate implements the authenticator interface to authenticate requests via basic auth.
@@ -40,6 +44,17 @@ func (m BasicAuthenticator) Authenticate(r *http.Request) (*http.Request, error)
 		return nil, ErrAuthenticationFailed
 	}
 
+	roleClaimValues, err := FindCurrentUserRolesAsClaims(
+		r.Context(),
+		m.RoleManager,
+		m.RoleAssignment.OIDCRoleMapper.RolesMap,
+		user.GetId().GetOpaqueId(),
+	)
+	if err != nil {
+		return nil, ErrAuthenticationFailed
+	}
+
+	roleClaim := m.RoleAssignment.OIDCRoleMapper.RoleClaim
 	// fake oidc claims
 	claims := map[string]interface{}{
 		oidc.Iss:               user.GetId().GetIdp(),
@@ -47,6 +62,7 @@ func (m BasicAuthenticator) Authenticate(r *http.Request) (*http.Request, error)
 		oidc.Email:             user.GetMail(),
 		oidc.OwncloudUUID:      user.GetId().GetOpaqueId(),
 		oidc.Name:              user.GetDisplayName(),
+		roleClaim:              roleClaimValues,
 	}
 
 	if m.UserCS3Claim == "userid" {

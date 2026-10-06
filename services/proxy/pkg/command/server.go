@@ -287,8 +287,10 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 	if cfg.EnableBasicAuth {
 		logger.Warn().Msg("basic auth enabled, use only for testing or development")
 		authenticators = append(authenticators, middleware.BasicAuthenticator{
-			Logger:       logger,
-			UserProvider: userProvider,
+			Logger:         logger,
+			UserProvider:   userProvider,
+			RoleManager:    roles.NewManager(roles.Logger(logger), roles.RoleService(rolesClient)),
+			RoleAssignment: cfg.RoleAssignment,
 		})
 	}
 

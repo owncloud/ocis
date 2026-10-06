@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"context"
 	"net/http"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -57,7 +56,12 @@ func (m AppAuthAuthenticator) Authenticate(r *http.Request) (*http.Request, erro
 
 	user := authenticateResponse.GetUser()
 	// fake oidc claims for the account resolver
-	roleClaimValues, err := m.findCurrentUserRolesAsClaims(r.Context(), user.GetId().GetOpaqueId())
+	roleClaimValues, err := FindCurrentUserRolesAsClaims(
+		r.Context(),
+		m.RoleManager,
+		m.RoleAssignment.OIDCRoleMapper.RolesMap,
+		user.GetId().GetOpaqueId(),
+	)
 	if err != nil {
 		return nil, ErrAuthenticationFailed
 	}
@@ -74,23 +78,4 @@ func (m AppAuthAuthenticator) Authenticate(r *http.Request) (*http.Request, erro
 	r = r.WithContext(oidc.NewContext(r.Context(), claims))
 
 	return r, nil
-}
-
-func (m AppAuthAuthenticator) findCurrentUserRolesAsClaims(ctx context.Context, userID string) ([]string, error) {
-	roleIDs, err := m.RoleManager.FindRoleIDsForUser(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-
-	roles := m.RoleManager.List(ctx, roleIDs)
-	claimRoles := make([]string, 0, len(roles)) // append in case role isn't mapped
-	for _, role := range roles {
-		roleName := role.Name
-		for _, item := range m.RoleAssignment.OIDCRoleMapper.RolesMap {
-			if item.RoleName == roleName {
-				claimRoles = append(claimRoles, item.ClaimValue)
-			}
-		}
-	}
-	return claimRoles, nil
 }
