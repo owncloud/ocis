@@ -84,6 +84,8 @@
     </div>
     <div
       v-if="isVaultResource && vaultDefaultExpirationDays && !expirationDate"
+      role="status"
+      aria-live="polite"
       class="oc-flex oc-flex-middle oc-gap-s oc-background-muted oc-rounded oc-p-s oc-mb-s oc-text-small"
       data-testid="vault-default-expiration-notice"
     >
