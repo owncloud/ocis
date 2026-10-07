@@ -766,8 +766,6 @@ Feature: Send a sharing invitations
   Scenario Outline: server sets a default 30-day expiration when a user share is created without one
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
-    And user "Alice" has been set up in oCIS
-    And user "Brian" has been set up in oCIS
     And user "Alice" has uploaded a file inside space "Personal" with content "to share" to "textfile1.txt" in vault
     And user "Alice" has created a folder "FolderToShare" in space "Personal" in vault
     When user "Alice" sends the following resource share invitation using the Graph API:

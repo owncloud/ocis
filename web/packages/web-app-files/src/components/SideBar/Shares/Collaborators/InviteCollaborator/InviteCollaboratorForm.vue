@@ -139,10 +139,7 @@
             mode="click"
             padding-size="small"
           >
-            <oc-list
-              class="collaborator-edit-dropdown-options-list"
-              aria-label="shareEditOptions"
-            >
+            <oc-list class="collaborator-edit-dropdown-options-list" aria-label="shareEditOptions">
               <li class="oc-rounded oc-menu-item-hover">
                 <expiration-datepicker
                   v-if="!saving"
