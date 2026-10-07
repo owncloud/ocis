@@ -762,7 +762,6 @@ Feature: Send a sharing invitations
       | Editor           | FolderToShare  |
       | Uploader         | FolderToShare  |
 
-
   @issue-7962
   Scenario Outline: send share invitation to disabled user
     Given user "Alice" has uploaded file with content "to share" to "/textfile1.txt"
