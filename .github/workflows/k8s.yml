@@ -563,6 +563,7 @@ jobs:
             docker run -d \
               --name onlyoffice \
               -p 7443:443 \
+              --add-host "$TEST_SERVER_DOMAIN:host-gateway" \
               -e WOPI_ENABLED=true \
               -e USE_UNAUTHORIZED_STORAGE=true \
               -v "$(pwd)/tests/config/ci/only-office.json:/tmp/local.json:ro" \
