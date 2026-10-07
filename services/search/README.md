@@ -170,6 +170,8 @@ ocis search index --all-spaces
 
 Note that either `--space $SPACE_ID` or `--all-spaces` must be set.
 
+The command does not open the index itself: it asks the running search service to do the indexing over gRPC. The search service must therefore be running, and the command works with the default `SEARCH_ENGINE_BLEVE_SCALE=false` (see [Scaling](#scaling)); the service's exclusive lock on the index does not block it.
+
 The command waits for the service to walk the space and gives up after 10 minutes by default. The walk is cancelled when that happens, so a large space, or one where the content extractor is slow on a few files, may need a longer limit: `--timeout 2h` (a Go duration; `0` waits indefinitely).
 
 ## Notes
