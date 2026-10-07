@@ -41,6 +41,10 @@ def parse_json_stream(path):
         objects.append(obj)
     return objects
 
+ACKNOWLEDGED = {
+    "GO-2026-6443",
+}
+
 objects = parse_json_stream(sys.argv[1])
 
 # Collect OSV details
@@ -73,7 +77,9 @@ for vid, entries in sorted(by_vuln.items()):
     module = trace[0].get('module', '') if trace else ''
 
     # Determine category
-    if not is_called:
+    if vid in ACKNOWLEDGED:
+        category = "ACKNOWLEDGED"
+    elif not is_called:
         category = "IMPORTED"
     elif not fixed_version:
         category = "NO_FIX"
@@ -106,6 +112,7 @@ if warn_vulns:
             'NO_FIX': 'no upstream fix available',
             'STDLIB': f'needs Go toolchain upgrade to {v["fixed_version"]}',
             'IMPORTED': 'code does not call vulnerable function',
+            'ACKNOWLEDGED': f'explicitly acknowledged, fix pending (bump to {v["fixed_version"]})',
         }.get(v['category'], v['category'])
         print(f"  {v['id']}: {v['summary']}")
         print(f"    module={v['module']} ({reason})")
