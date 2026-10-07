@@ -15,7 +15,24 @@ const (
 )
 
 const (
-	DownloadPermission = "download"
+	PermDownload       = "download"
+	PermView           = "view"
+	PermPropertiesView = "properties_view"
+	PermUserView       = "user_view"
+	PermUserAdd        = "user_add"
+	PermUserEdit       = "user_edit"
+	PermUserRemove     = "user_remove"
+	PermRename         = "rename"
+	PermFolderAdd      = "folder_add"
+	PermFileAdd        = "file_add"
+	PermFolderDelete   = "folder_delete"
+	PermFolderMove     = "folder_move"
+	PermVersionView    = "version_view"
+	PermVersionCreate  = "version_create"
+	PermVersionPromote = "version_promote"
+	PermVersionDelete  = "version_delete"
+	PermFileDelete     = "file_delete"
+	PermFileMove       = "file_move"
 )
 
 type FileSearch struct {
@@ -69,6 +86,8 @@ type FileInfo struct {
 	PermaLink      string           `json:"permalink"`
 	Permissions    []Permission     `json:"permissions"`
 	Creator        User             `json:"creator"`
+	Locked         bool             `json:"locked"`
+	LockUser       *User            `json:"lockUser"`
 }
 
 type FileFingerPrints []FileFingerPrint
@@ -143,13 +162,15 @@ func (fi *FileInfo) IsSyncAble() bool {
 	return *fi.SyncAble
 }
 
-func (fi *FileInfo) HasDownloadPermission() bool {
+// HasPermission returns true if the named permission is present and allowed.
+// Absent permissions are treated as denied.
+func (fi *FileInfo) HasPermission(name string) bool {
 	if fi == nil {
 		return false
 	}
 	for i := range fi.Permissions {
-		if fi.Permissions[i].Name == DownloadPermission {
-			return true
+		if fi.Permissions[i].Name == name {
+			return fi.Permissions[i].Allowed
 		}
 	}
 	return false
@@ -188,9 +209,12 @@ type UploadResult struct {
 	TotalSize int64  `json:"totalSize"`
 }
 
-type QuotaInfo struct {
-	FolderQuotaAllowed int64 `json:"folder_quota_allowed"`
-	FolderQuotaUsed    int64 `json:"folder_quota_used"`
+// FolderQuota is the response of GET /rest/folders/{id}/quota.
+// StorageQuota is 0 when no quota is applied to the folder.
+type FolderQuota struct {
+	StorageQuota     int64 `json:"storage_quota"`
+	StorageUsed      int64 `json:"storage_used"`
+	StorageAvailable int64 `json:"storage_available"`
 }
 
 type User struct {
@@ -223,4 +247,20 @@ type FileUpdateRequest struct {
 
 type FolderUpdatePutRequest struct {
 	Name string `json:"name,omitempty"`
+}
+
+type MoveFolderRequest struct {
+	DestinationFolderID string `json:"destinationFolderId"`
+}
+
+// Version represents a single version entry from GET /rest/files/{id}/versions.
+type Version struct {
+	ID            string `json:"id"`
+	VersionNumber int    `json:"versionNumber"`
+	Size          int64  `json:"size"`
+	Created       Time   `json:"created"`
+}
+
+type VersionList struct {
+	Data []Version `json:"data"`
 }

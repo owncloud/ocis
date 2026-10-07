@@ -345,6 +345,9 @@ func (c *Cache) persist(ctx context.Context, userID string) error {
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))
 
+	log := appctx.GetLogger(ctx)
+	log.Debug().Str("user", userID).Msg("receivedsharecache.persist.start")
+
 	rss, ok := c.ReceivedSpaces.Load(userID)
 	if !ok {
 		span.SetStatus(codes.Ok, "no received shares")
@@ -375,6 +378,7 @@ func (c *Cache) persist(ctx context.Context, userID string) error {
 		ur.IfNoneMatch = []string{"*"}
 	}
 
+	log.Debug().Str("user", userID).Str("path", jsonPath).Str("etag", ur.IfMatchEtag).Msg("receivedsharecache.persist.upload")
 	res, err := c.storage.Upload(ctx, ur)
 	if err != nil {
 		span.RecordError(err)
@@ -382,6 +386,8 @@ func (c *Cache) persist(ctx context.Context, userID string) error {
 		return err
 	}
 	rss.etag = res.Etag
+
+	log.Debug().Str("user", userID).Str("etag", res.Etag).Msg("receivedsharecache.persist.done")
 	span.SetStatus(codes.Ok, "")
 	return nil
 }

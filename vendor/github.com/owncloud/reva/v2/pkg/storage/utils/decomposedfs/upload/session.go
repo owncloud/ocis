@@ -34,6 +34,7 @@ import (
 	typespb "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/owncloud/reva/v2/pkg/utils"
 )
@@ -164,6 +165,43 @@ func (s *OcisSession) HeaderIfUnmodifiedSince() string {
 // Node returns the node for the session
 func (s *OcisSession) Node(ctx context.Context) (*node.Node, error) {
 	return node.ReadNode(ctx, s.store.lu, s.SpaceID(), s.info.Storage["NodeId"], false, nil, true)
+}
+
+// IsOrphaned returns true if the session's target node can no longer be
+// resolved. This happens when the node file still exists but its metadata is
+// gone, e.g. because an ancestor was moved to the trash while the upload was in
+// flight. Such a session can never finish postprocessing: reading the node
+// fails before the destination can be determined.
+func (s *OcisSession) IsOrphaned(ctx context.Context) bool {
+	_, err := s.Node(ctx)
+	return err != nil
+}
+
+// syntheticNode builds a node from the session metadata alone, without reading
+// the node from disk. It is used to clean up sessions whose node metadata is
+// unreadable: the parent id is still recorded in the session, which is all that
+// is needed to walk up the tree and revert the size propagation.
+func (s *OcisSession) syntheticNode(ctx context.Context) (*node.Node, error) {
+	if s.NodeID() == "" || s.NodeParentID() == "" {
+		return nil, errtypes.InternalError("session has no node and parent id")
+	}
+	n := node.New(
+		s.SpaceID(),
+		s.NodeID(),
+		s.NodeParentID(),
+		s.Filename(),
+		s.Size(),
+		s.ID(),
+		provider.ResourceType_RESOURCE_TYPE_FILE,
+		nil,
+		s.store.lu,
+	)
+	spaceRoot, err := node.ReadNode(ctx, s.store.lu, s.SpaceID(), s.SpaceID(), false, nil, false)
+	if err != nil {
+		return nil, err
+	}
+	n.SpaceRoot = spaceRoot
+	return n, nil
 }
 
 // ID returns the upload session id

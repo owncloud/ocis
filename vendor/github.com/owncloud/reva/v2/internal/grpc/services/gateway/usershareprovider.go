@@ -23,6 +23,7 @@ import (
 	"slices"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -31,6 +32,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/conversions"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
+	"github.com/owncloud/reva/v2/pkg/permission"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/status"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/grants"
@@ -48,11 +50,69 @@ func hasGrantManagementBits(p *provider.ResourcePermissions) bool {
 
 // TODO(labkode): add multi-phase commit logic when commit share or commit ref is enabled.
 func (s *svc) CreateShare(ctx context.Context, req *collaboration.CreateShareRequest) (*collaboration.CreateShareResponse, error) {
+	// Vault resources must only be shared with grantees that may use vault mode.
+	if req.GetResourceInfo().GetId().GetStorageId() == utils.VaultStorageProviderID {
+		allowed, err := s.granteeMayAccessVault(ctx, req.GetGrant().GetGrantee())
+		if err != nil {
+			appctx.GetLogger(ctx).Error().Err(err).
+				Interface("grantee", req.GetGrant().GetGrantee()).
+				Msg("could not determine whether the grantee may access vault resources")
+			return &collaboration.CreateShareResponse{
+				Status: status.NewInternal(ctx, "error checking grantee vault permission"),
+			}, nil
+		}
+		if !allowed {
+			return &collaboration.CreateShareResponse{
+				Status: status.NewPermissionDenied(ctx, nil, "grantee is not allowed to access vault resources"),
+			}, nil
+		}
+	}
+
 	// Don't use the share manager when sharing a space root
 	if !s.c.UseCommonSpaceRootShareLogic && refIsSpaceRoot(req.ResourceInfo.Id) {
 		return s.addSpaceShare(ctx, req)
 	}
 	return s.addShare(ctx, req)
+}
+
+// granteeMayAccessVault reports whether the grantee may be granted access to a vault resource.
+// A non-nil error means undetermined, never denied, so callers must fail closed.
+func (s *svc) granteeMayAccessVault(ctx context.Context, g *provider.Grantee) (bool, error) {
+	ref := vaultPermissionSubject(g)
+	if ref == nil {
+		return false, nil
+	}
+
+	res, err := s.CheckPermission(ctx, &permissions.CheckPermissionRequest{
+		SubjectRef: ref,
+		Permission: permission.VaultMode,
+	})
+	if err != nil {
+		return false, err
+	}
+	return vaultPermissionGranted(res.GetStatus())
+}
+
+// vaultPermissionSubject returns the subject to check VaultMode for, or nil for grantees that can never hold it, like groups.
+func vaultPermissionSubject(g *provider.Grantee) *permissions.SubjectReference {
+	if g.GetType() != provider.GranteeType_GRANTEE_TYPE_USER {
+		return nil
+	}
+	return &permissions.SubjectReference{
+		Spec: &permissions.SubjectReference_UserId{UserId: g.GetUserId()},
+	}
+}
+
+// vaultPermissionGranted interprets the status of a VaultMode check, erring on anything but a definitive answer.
+func vaultPermissionGranted(st *rpc.Status) (bool, error) {
+	switch code := st.GetCode(); code {
+	case rpc.Code_CODE_OK:
+		return true, nil
+	case rpc.Code_CODE_PERMISSION_DENIED:
+		return false, nil
+	default:
+		return false, errors.Errorf("vault permission check returned non-authoritative status %q: %s", code, st.GetMessage())
+	}
 }
 
 func (s *svc) RemoveShare(ctx context.Context, req *collaboration.RemoveShareRequest) (*collaboration.RemoveShareResponse, error) {

@@ -1339,6 +1339,15 @@ var CheckQuota = func(ctx context.Context, spaceRoot *Node, overwrite bool, oldS
 	return true, nil
 }
 
+// CheckDiskSpace returns an error if the underlying filesystem has insufficient
+// free space for newSize bytes. Does not enforce space-level quota.
+var CheckDiskSpace = func(_ context.Context, spaceRoot *Node, newSize uint64) error {
+	if !enoughDiskSpace(spaceRoot.InternalPath(), newSize) {
+		return errtypes.InsufficientStorage("disk full")
+	}
+	return nil
+}
+
 func enoughDiskSpace(path string, fileSize uint64) bool {
 	avalB, err := GetAvailableSize(path)
 	if err != nil {
@@ -1400,7 +1409,7 @@ func (n *Node) SetDTime(ctx context.Context, t *time.Time) (err error) {
 }
 
 // RevertCurrentRevision reverts an upload by either deleting the node or restoring the latest version
-func (n *Node) RevertCurrentRevision(ctx context.Context) error {
+func (n *Node) RevertCurrentRevision(ctx context.Context, unmarkProcessing bool) error {
 	versionPath, err := n.getLatestRevision(ctx)
 	if err != nil {
 		return err
@@ -1431,11 +1440,12 @@ func (n *Node) RevertCurrentRevision(ctx context.Context) error {
 		return err
 	}
 
-	// we just reverted an upload - remove processing flag if set
-	if uploadid, err := n.ProcessingID(ctx); err == nil {
-		if err := n.UnmarkProcessing(ctx, uploadid); err != nil {
-			appctx.GetLogger(ctx).Info().Str("path", n.InternalPath()).Err(err).Msg("unmarking processing failed")
-			return err
+	if unmarkProcessing {
+		if uploadid, err := n.ProcessingID(ctx); err == nil {
+			if err := n.UnmarkProcessing(ctx, uploadid); err != nil {
+				appctx.GetLogger(ctx).Info().Str("path", n.InternalPath()).Err(err).Msg("unmarking processing failed")
+				return err
+			}
 		}
 	}
 	return nil
