@@ -472,3 +472,35 @@ func TestResolveUserType(t *testing.T) {
 		})
 	}
 }
+
+// TestVerifyUserUnauthorizedOnUserNotFound covers the verifyUser fast path
+// (user already in context, e.g. via AppAuthAuthenticator/BasicAuthenticator),
+// as opposed to TestUnauthorizedOnUserNotFound which covers the claims-based
+// resolveUserFromClaims path. A disabled account is looked up by username and
+// comes back as ErrAccountNotFound (the identity backend excludes disabled
+// accounts from by-claim lookups), which must map to 401, not 500.
+func TestVerifyUserUnauthorizedOnUserNotFound(t *testing.T) {
+	user := &userv1beta1.User{
+		Id:       &userv1beta1.UserId{Idp: "https://idx.example.com", OpaqueId: "123"},
+		Username: "alice",
+	}
+
+	ub := mocks.UserBackend{}
+	ub.On("GetUserByClaims", mock.Anything, "username", "alice").Return(nil, "", backend.ErrAccountNotFound)
+
+	ra := userRoleMocks.UserRoleAssigner{}
+
+	sut := AccountResolver(
+		Logger(log.NewLogger()),
+		UserProvider(&ub),
+		UserRoleAssigner(&ra),
+	)(mockHandler{})
+
+	req := httptest.NewRequest("GET", "http://example.com/foo", nil)
+	req = req.WithContext(revactx.ContextSetUser(context.Background(), user))
+	rw := httptest.NewRecorder()
+
+	sut.ServeHTTP(rw, req)
+
+	assert.Equal(t, http.StatusUnauthorized, rw.Code)
+}
