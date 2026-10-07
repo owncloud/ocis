@@ -41,7 +41,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/events"
-	"github.com/owncloud/reva/v2/pkg/storage"
 	"github.com/owncloud/reva/v2/pkg/storage/fs/posix/lookup"
 	"github.com/owncloud/reva/v2/pkg/storage/fs/posix/options"
 	"github.com/owncloud/reva/v2/pkg/storage/fs/posix/trashbin"
@@ -248,9 +247,6 @@ func (t *Tree) TouchFile(ctx context.Context, n *node.Node, markprocessing bool,
 		return err
 	}
 
-	if storage.SkipTouchPropagation(ctx) {
-		return nil
-	}
 	return t.Propagate(ctx, n, 0)
 }
 

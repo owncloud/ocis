@@ -173,16 +173,8 @@ func (fs *owncloudsqlfs) MarkProcessing(ctx context.Context, ref *provider.Refer
 	return errtypes.NotSupported("op not supported")
 }
 
-func (fs *owncloudsqlfs) CommitUpload(_ context.Context, _ *provider.Reference, _ string, _ storage.UploadSource) error {
-	return errtypes.NotSupported("op not supported")
-}
-
-func (fs *owncloudsqlfs) PrepareUpload(_ context.Context, _ *provider.Reference, _ string, info storage.UploadInfo) (*storage.PrepareUploadResult, error) {
-	return &storage.PrepareUploadResult{VersionCreated: info.NodeExisted}, nil
-}
-
-func (fs *owncloudsqlfs) RollbackUpload(_ context.Context, _ *provider.Reference, _ string, _ storage.RollbackInfo) error {
-	return nil
+func (fs *owncloudsqlfs) CommitUpload(ctx context.Context, ref *provider.Reference, source storage.UploadSource) (*provider.ResourceInfo, error) {
+	return nil, errtypes.NotSupported("op not supported")
 }
 
 // UseIn tells the tus upload middleware which extensions it supports.

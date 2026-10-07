@@ -63,7 +63,7 @@ const (
 	RoleFileEditorListGrantsWithVersions = "file-editor-list-grants-with-versions"
 	// RoleCoowner grants co-owner permissions on a resource.
 	RoleCoowner = "coowner"
-	// RoleEditorLite grants permission to upload and download to a resource.
+	// RoleEditorLite grants permission to download, upload, rename and change the contents of a resource, but not to delete it or see its versions.
 	RoleEditorLite = "editor-lite"
 	// RoleUploader grants uploader permission to upload onto a resource (no download).
 	RoleUploader = "uploader"
@@ -604,8 +604,14 @@ func RoleFromResourcePermissions(rp *provider.ResourcePermissions, islink bool) 
 		rp.InitiateFileDownload {
 		r.ocsPermissions |= PermissionRead
 	}
+	// Move implies write for the non-deletable roles: a grantee that may rename a
+	// resource may also replace its contents. Without it the editor-lite role
+	// would come back read-only here, and clients would hide rename and overwrite
+	// even though the storage layer accepts both. Deletable grants are excluded
+	// because the persisted ACE format cannot tell "w" (upload) apart from Move,
+	// so every legacy delete+create+read grant would read back as writable too.
 	if rp.InitiateFileUpload &&
-		(rp.RestoreRecycleItem || (rp.Delete && !rp.ListRecycle)) {
+		(rp.RestoreRecycleItem || (rp.Delete && !rp.ListRecycle) || (rp.Move && !rp.Delete)) {
 		r.ocsPermissions |= PermissionWrite
 	}
 	if rp.Stat &&
@@ -645,7 +651,7 @@ func RoleFromResourcePermissions(rp *provider.ResourcePermissions, islink bool) 
 		r.Name = RoleSecureViewer
 		return r
 	}
-	if r.ocsPermissions == PermissionCreate {
+	if r.ocsPermissions == PermissionCreate || r.ocsPermissions == PermissionCreate|PermissionWrite {
 		if rp.GetPath && rp.InitiateFileDownload && rp.ListContainer && rp.Move {
 			r.Name = RoleEditorLite
 			return r

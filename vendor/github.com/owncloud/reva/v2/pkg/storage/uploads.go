@@ -31,19 +31,6 @@ import (
 // UploadFinishedFunc is a callback function used in storage drivers to indicate that an upload has finished
 type UploadFinishedFunc func(spaceOwner, executant *userpb.UserId, ref *provider.Reference)
 
-type skipTouchPropagationKey struct{}
-
-// ContextSkipTouchPropagation tells TouchFile not to propagate.
-func ContextSkipTouchPropagation(ctx context.Context) context.Context {
-	return context.WithValue(ctx, skipTouchPropagationKey{}, true)
-}
-
-// SkipTouchPropagation reports whether TouchFile should skip propagation.
-func SkipTouchPropagation(ctx context.Context) bool {
-	skip, _ := ctx.Value(skipTouchPropagationKey{}).(bool)
-	return skip
-}
-
 // UploadRequest us used in FS.Upload() to carry required upload metadata
 type UploadRequest struct {
 	Ref    *provider.Reference
@@ -62,12 +49,6 @@ type UploadsManager interface {
 type UploadSessionLister interface {
 	// ListUploadSessions returns the upload sessions matching the given filter
 	ListUploadSessions(ctx context.Context, filter UploadSessionFilter) ([]UploadSession, error)
-}
-
-// OrphanChecker defines the interface for FS implementations that can resolve a resource's metadata.
-type OrphanChecker interface {
-	// IsOrphaned reports whether the referenced resource exists but its metadata is unreadable.
-	IsOrphaned(ctx context.Context, ref *provider.Reference) bool
 }
 
 // UploadSession is the interface that storage drivers need to return whan listing upload sessions.
@@ -106,8 +87,4 @@ type UploadSessionFilter struct {
 	Processing *bool
 	Expired    *bool
 	HasVirus   *bool
-	// Orphaned filters sessions by whether their target node can still be
-	// resolved. Evaluating it requires reading the node metadata of every
-	// session, so it is only evaluated when set.
-	Orphaned *bool
 }

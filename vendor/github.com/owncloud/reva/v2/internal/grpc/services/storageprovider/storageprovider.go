@@ -239,11 +239,13 @@ func (s *Service) SetLock(ctx context.Context, req *provider.SetLockRequest) (*p
 			Status: status.NewPermissionDenied(ctx, nil, "no permission to lock the share"),
 		}, nil
 	}
-	// non-decomposedfs drivers may return nil result; set SpaceOwner only when present
-	lockResult, err := s.Storage.SetLock(ctx, req.Ref, req.Lock)
-	if lockResult != nil {
-		storagespace.ContextSetSpaceOwner(ctx, lockResult.SpaceOwner)
+	res, err := s.Storage.SetLock(ctx, req.Ref, req.Lock)
+	if err != nil {
+		return &provider.SetLockResponse{
+			Status: status.NewStatusFromErrType(ctx, "set lock", err),
+		}, nil
 	}
+	storagespace.ContextSetSpaceOwner(ctx, res.SpaceOwner)
 
 	return &provider.SetLockResponse{
 		Status: status.NewStatusFromErrType(ctx, "set lock", err),
@@ -283,11 +285,13 @@ func (s *Service) Unlock(ctx context.Context, req *provider.UnlockRequest) (*pro
 		}, nil
 	}
 
-	// non-decomposedfs drivers may return nil result; set SpaceOwner only when present
-	unlockResult, err := s.Storage.Unlock(ctx, req.Ref, req.Lock)
-	if unlockResult != nil {
-		storagespace.ContextSetSpaceOwner(ctx, unlockResult.SpaceOwner)
+	res, err := s.Storage.Unlock(ctx, req.Ref, req.Lock)
+	if err != nil {
+		return &provider.UnlockResponse{
+			Status: status.NewStatusFromErrType(ctx, "unlock", err),
+		}, nil
 	}
+	storagespace.ContextSetSpaceOwner(ctx, res.SpaceOwner)
 
 	return &provider.UnlockResponse{
 		Status: status.NewStatusFromErrType(ctx, "unlock", err),
@@ -593,10 +597,6 @@ func (s *Service) ListStorageSpaces(ctx context.Context, req *provider.ListStora
 		}, nil
 	}
 
-	caps := storage.FullCapabilities()
-	if cp, ok := s.Storage.(storage.CapabilityProvider); ok {
-		caps = cp.Capabilities(ctx)
-	}
 	for _, sp := range spaces {
 		if sp.Id == nil || sp.Id.OpaqueId == "" {
 			log.Error().Str("service", "storageprovider").Str("driver", s.conf.Driver).Interface("space", sp).Msg("space is missing space id and root id")
@@ -604,7 +604,6 @@ func (s *Service) ListStorageSpaces(ctx context.Context, req *provider.ListStora
 		}
 
 		s.addMissingStorageProviderID(sp.GetRoot(), sp.GetId())
-		sp.Opaque = utils.AppendJSONToOpaque(sp.Opaque, storage.CapabilitiesOpaqueKey, caps)
 	}
 
 	return &provider.ListStorageSpacesResponse{
@@ -628,34 +627,7 @@ func (s *Service) UpdateStorageSpace(ctx context.Context, req *provider.UpdateSt
 }
 
 func (s *Service) DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorageSpaceRequest) (*provider.DeleteStorageSpaceResponse, error) {
-	// pre-fetch spacename+grants before deletion: non-decomposedfs drivers don't populate DeleteStorageSpaceResult
-	idraw, _ := storagespace.ParseID(req.Id.GetOpaqueId())
-	idraw.OpaqueId = idraw.GetSpaceId()
-	id := &provider.StorageSpaceId{OpaqueId: storagespace.FormatResourceID(&idraw)}
-
-	spaces, err := s.Storage.ListStorageSpaces(ctx, []*provider.ListStorageSpacesRequest_Filter{{Type: provider.ListStorageSpacesRequest_Filter_TYPE_ID, Term: &provider.ListStorageSpacesRequest_Filter_Id{Id: id}}}, true)
-	if err != nil {
-		var st *rpc.Status
-		switch err.(type) {
-		case errtypes.IsNotFound:
-			st = status.NewNotFound(ctx, "space not found")
-		case errtypes.PermissionDenied:
-			st = status.NewPermissionDenied(ctx, err, "permission denied")
-		case errtypes.BadRequest:
-			st = status.NewInvalid(ctx, err.Error())
-		default:
-			st = status.NewInternal(ctx, "error deleting space: "+req.Id.String())
-		}
-		return &provider.DeleteStorageSpaceResponse{
-			Status: st,
-		}, nil
-	} else if len(spaces) != 1 {
-		return &provider.DeleteStorageSpaceResponse{
-			Status: status.NewNotFound(ctx, "space not found"),
-		}, nil
-	}
-
-	deleteSpaceResult, err := s.Storage.DeleteStorageSpace(ctx, req)
+	result, err := s.Storage.DeleteStorageSpace(ctx, req)
 	if err != nil {
 		var st *rpc.Status
 		switch err.(type) {
@@ -678,13 +650,14 @@ func (s *Service) DeleteStorageSpace(ctx context.Context, req *provider.DeleteSt
 			Status: st,
 		}, nil
 	}
-	if deleteSpaceResult == nil {
-		// driver didn't populate the result; fill SpaceName from the pre-fetched space so SpaceDeleted event is not empty
-		deleteSpaceResult = &storage.DeleteStorageSpaceResult{SpaceName: spaces[0].GetName()}
-	}
-	storagespace.ContextSetDeleteStorageSpaceResult(ctx, deleteSpaceResult)
 
-	return &provider.DeleteStorageSpaceResponse{Status: status.NewOK(ctx)}, nil
+	if result != nil {
+		storagespace.ContextSetDeleteStorageSpaceResult(ctx, result)
+	}
+
+	return &provider.DeleteStorageSpaceResponse{
+		Status: status.NewOK(ctx),
+	}, nil
 }
 
 func (s *Service) CreateContainer(ctx context.Context, req *provider.CreateContainerRequest) (*provider.CreateContainerResponse, error) {
@@ -695,10 +668,13 @@ func (s *Service) CreateContainer(ctx context.Context, req *provider.CreateConta
 		}
 	}
 
-	createDirResult, err := s.Storage.CreateDir(ctx, req.Ref)
-	if createDirResult != nil { // not all drivers populate the result
-		storagespace.ContextSetSpaceOwner(ctx, createDirResult.SpaceOwner)
+	res, err := s.Storage.CreateDir(ctx, req.Ref)
+	if err != nil {
+		return &provider.CreateContainerResponse{
+			Status: status.NewStatusFromErrType(ctx, "create container", err),
+		}, nil
 	}
+	storagespace.ContextSetSpaceOwner(ctx, res.SpaceOwner)
 
 	return &provider.CreateContainerResponse{
 		Status: status.NewStatusFromErrType(ctx, "create container", err),
@@ -715,10 +691,13 @@ func (s *Service) TouchFile(ctx context.Context, req *provider.TouchFileRequest)
 		mtime = utils.ReadPlainFromOpaque(req.Opaque, "X-OC-Mtime")
 	}
 
-	touchResult, err := s.Storage.TouchFile(ctx, req.Ref, utils.ExistsInOpaque(req.Opaque, "markprocessing"), mtime)
-	if touchResult != nil { // not all drivers populate the result
-		storagespace.ContextSetSpaceOwner(ctx, touchResult.SpaceOwner)
+	res, err := s.Storage.TouchFile(ctx, req.Ref, utils.ExistsInOpaque(req.Opaque, "markprocessing"), mtime)
+	if err != nil {
+		return &provider.TouchFileResponse{
+			Status: status.NewStatusFromErrType(ctx, "touch file", err),
+		}, nil
 	}
+	storagespace.ContextSetSpaceOwner(ctx, res.SpaceOwner)
 
 	return &provider.TouchFileResponse{
 		Status: status.NewStatusFromErrType(ctx, "touch file", err),
@@ -743,47 +722,24 @@ func (s *Service) Delete(ctx context.Context, req *provider.DeleteRequest) (*pro
 		}
 	}
 
-	// Pre-fetch metadata: guard against deleting a mid-processing node, and carry opaque_id in the response for drivers that don't return it from Delete.
-	md, err := s.Storage.GetMD(ctx, req.Ref, []string{}, []string{"id", "status"})
-	if err != nil {
-		return &provider.DeleteResponse{
-			Status: status.NewStatusFromErrType(ctx, "can't stat resource to delete", err),
-		}, nil
-	}
+	result, err := s.Storage.Delete(ctx, req.Ref)
 
-	if utils.ReadPlainFromOpaque(md.GetOpaque(), "status") == "processing" {
-		return &provider.DeleteResponse{
-			Status: &rpc.Status{
-				Code:    rpc.Code_CODE_TOO_EARLY,
-				Message: "file is processing",
-			},
-			Opaque: &typesv1beta1.Opaque{
-				Map: map[string]*typesv1beta1.OpaqueEntry{
-					"status": {Decoder: "plain", Value: []byte("processing")},
-				},
-			},
-		}, nil
+	if err == nil && result != nil {
+		storagespace.ContextSetDeleteResult(ctx, result)
 	}
-
-	deleteResult, err := s.Storage.Delete(ctx, req.Ref)
-	storagespace.ContextSetDeleteResult(ctx, deleteResult)
 
 	return &provider.DeleteResponse{
 		Status: status.NewStatusFromErrType(ctx, "delete", err),
-		Opaque: &typesv1beta1.Opaque{
-			Map: map[string]*typesv1beta1.OpaqueEntry{
-				"opaque_id": {Decoder: "plain", Value: []byte(md.Id.OpaqueId)},
-			},
-		},
 	}, nil
 }
 
 func (s *Service) Move(ctx context.Context, req *provider.MoveRequest) (*provider.MoveResponse, error) {
 	ctx = ctxpkg.ContextSetLockID(ctx, req.LockId)
 
-	moveResult, err := s.Storage.Move(ctx, req.Source, req.Destination)
-	storagespace.ContextSetMoveResult(ctx, moveResult)
-
+	result, err := s.Storage.Move(ctx, req.Source, req.Destination)
+	if err == nil && result != nil {
+		storagespace.ContextSetMoveResult(ctx, result)
+	}
 	return &provider.MoveResponse{
 		Status: status.NewStatusFromErrType(ctx, "move", err),
 	}, nil
@@ -895,10 +851,13 @@ func (s *Service) ListFileVersions(ctx context.Context, req *provider.ListFileVe
 func (s *Service) RestoreFileVersion(ctx context.Context, req *provider.RestoreFileVersionRequest) (*provider.RestoreFileVersionResponse, error) {
 	ctx = ctxpkg.ContextSetLockID(ctx, req.LockId)
 
-	restoreRevResult, err := s.Storage.RestoreRevision(ctx, req.Ref, req.Key)
-	if restoreRevResult != nil {
-		storagespace.ContextSetSpaceOwner(ctx, restoreRevResult.SpaceOwner)
+	res, err := s.Storage.RestoreRevision(ctx, req.Ref, req.Key)
+	if err != nil {
+		return &provider.RestoreFileVersionResponse{
+			Status: status.NewStatusFromErrType(ctx, "restore file version", err),
+		}, nil
 	}
+	storagespace.ContextSetSpaceOwner(ctx, res.SpaceOwner)
 
 	return &provider.RestoreFileVersionResponse{
 		Status: status.NewStatusFromErrType(ctx, "restore file version", err),
@@ -997,15 +956,17 @@ func (s *Service) RestoreRecycleItem(ctx context.Context, req *provider.RestoreR
 
 	// TODO(labkode): CRITICAL: fill recycle info with storage provider.
 	key, relativePath := splitKeyAndPath(req.GetKey())
-	restoreItemResult, err := s.Storage.RestoreRecycleItem(ctx, req.Ref, key, relativePath, req.RestoreRef)
-	if restoreItemResult != nil {
-		storagespace.ContextSetSpaceOwner(ctx, restoreItemResult.SpaceOwner)
+	writeRes, err := s.Storage.RestoreRecycleItem(ctx, req.Ref, key, relativePath, req.RestoreRef)
+	if err != nil {
+		return &provider.RestoreRecycleItemResponse{
+			Status: status.NewStatusFromErrType(ctx, "restore recycle item", err),
+		}, nil
 	}
+	storagespace.ContextSetSpaceOwner(ctx, writeRes.SpaceOwner)
 
-	res := &provider.RestoreRecycleItemResponse{
+	return &provider.RestoreRecycleItemResponse{
 		Status: status.NewStatusFromErrType(ctx, "restore recycle item", err),
-	}
-	return res, nil
+	}, nil
 }
 
 func (s *Service) PurgeRecycle(ctx context.Context, req *provider.PurgeRecycleRequest) (*provider.PurgeRecycleResponse, error) {

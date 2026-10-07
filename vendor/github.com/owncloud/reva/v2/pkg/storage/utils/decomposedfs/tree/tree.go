@@ -34,7 +34,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
-	"github.com/owncloud/reva/v2/pkg/storage"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/metadata"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
@@ -184,9 +183,6 @@ func (t *Tree) TouchFile(ctx context.Context, n *node.Node, markprocessing bool,
 		}
 	}
 
-	if storage.SkipTouchPropagation(ctx) {
-		return nil
-	}
 	return t.Propagate(ctx, n, 0)
 }
 
@@ -511,13 +507,14 @@ func (t *Tree) Delete(ctx context.Context, n *node.Node) (err error) {
 	trashPath := nodePath + node.TrashIDDelimiter + deletionTime
 	err = os.Rename(nodePath, trashPath)
 	if err != nil {
-		_ = os.Remove(trashLink)
+		// To roll back changes
+		// TODO remove symlink
+		// Roll back changes
 		_ = n.RemoveXattr(ctx, prefixes.TrashOriginAttr, true)
 		return
 	}
 	err = t.lookup.MetadataBackend().Rename(nodePath, trashPath)
 	if err != nil {
-		_ = os.Remove(trashLink)
 		_ = n.RemoveXattr(ctx, prefixes.TrashOriginAttr, true)
 		_ = os.Rename(trashPath, nodePath)
 		return
@@ -528,9 +525,10 @@ func (t *Tree) Delete(ctx context.Context, n *node.Node) (err error) {
 
 	// finally remove the entry from the parent dir
 	if err = os.Remove(path); err != nil {
-		_ = t.lookup.MetadataBackend().Rename(trashPath, nodePath)
-		_ = os.Rename(trashPath, nodePath)
-		_ = os.Remove(trashLink)
+		// To roll back changes
+		// TODO revert the rename
+		// TODO remove symlink
+		// Roll back changes
 		_ = n.RemoveXattr(ctx, prefixes.TrashOriginAttr, true)
 		return
 	}

@@ -303,9 +303,7 @@ func (s *Server) Stop() error {
 
 // GracefulStop gracefully stops the server.
 func (s *Server) GracefulStop() error {
-	if s.s != nil {
-		s.s.GracefulStop()
-	}
+	s.s.GracefulStop()
 	s.cleanupServices()
 	return nil
 }

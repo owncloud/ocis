@@ -235,11 +235,6 @@ func (s *service) CreatePublicShare(ctx context.Context, req *link.CreatePublicS
 			Status: status.NewInternal(ctx, "failed to stat resource to share"),
 		}, err
 	}
-	if sRes.Status.Code != rpc.Code_CODE_OK {
-		return &link.CreatePublicShareResponse{
-			Status: sRes.GetStatus(),
-		}, nil
-	}
 
 	// all users can create internal links
 	if !isInternalLink {
@@ -346,11 +341,7 @@ func (s *service) CreatePublicShare(ctx context.Context, req *link.CreatePublicS
 
 	user := ctxpkg.ContextMustGetUser(ctx)
 	res := &link.CreatePublicShareResponse{}
-	resourceInfo := req.GetResourceInfo()
-	if resourceInfo != nil {
-		resourceInfo.Id = sRes.GetInfo().GetId()
-	}
-	share, err := s.sm.CreatePublicShare(ctx, user, resourceInfo, req.GetGrant())
+	share, err := s.sm.CreatePublicShare(ctx, user, req.GetResourceInfo(), req.GetGrant())
 	switch {
 	case err != nil:
 		log.Error().Err(err).Interface("request", req).Msg("could not write public share")

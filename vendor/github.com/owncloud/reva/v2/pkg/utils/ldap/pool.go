@@ -1,21 +1,3 @@
-// Copyright 2022 CERN
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-// In applying this license, CERN does not waive the privileges and immunities
-// granted to it by virtue of its status as an Intergovernmental Organization
-// or submit itself to any jurisdiction.
-
 package ldap
 
 import (
@@ -37,7 +19,8 @@ const (
 	// sentinel: there is no "unlimited" pool, a non-positive value always falls back to this default.
 	defaultPoolSize = 5
 	// defaultPoolCheckoutTimeout is the checkout timeout used when Config.PoolCheckoutTimeout is <=
-	// 0. There is no "wait forever" mode.
+	// 0. Like PoolSize, there is no "wait forever" mode: a non-positive value falls back to this
+	// default rather than disabling the timeout.
 	defaultPoolCheckoutTimeout = 30 * time.Second
 )
 
@@ -48,27 +31,32 @@ var (
 	errPoolClosed    = errors.New("ldap: connection pool is closed")
 )
 
-// clientFactory dials and authenticates a new LDAP connection. Held as a ConnPool field so tests
-// can substitute a network-free fake; production pools use dialLDAP.
+// clientFactory dials and authenticates a new LDAP connection for the given config. ConnPool holds
+// it as a field, rather than calling dialLDAP directly, purely so tests can substitute a
+// network-free fake; every production pool uses dialLDAP.
 type clientFactory func(Config) (ldap.Client, error)
 
-// ConnPool is a bounded pool of authenticated LDAP connections, dialed lazily on checkout and
-// reused across requests. Connections that fail with a network error are discarded and re-dialed.
+// ConnPool is a bounded pool of authenticated LDAP connections. Connections are dialed and bound
+// lazily on checkout and reused across requests; connections that fail with a network error are
+// discarded and lazily re-dialed on a later checkout, instead of the pool eagerly reconnecting them.
 type ConnPool struct {
 	config  Config
 	timeout time.Duration
 	dial    clientFactory
 	logger  *zerolog.Logger
 
-	// read/write are the retry policies for reads and writes. The pool uses only MaxRetries, the
-	// backoff bounds, and isRetryable; needsReconnect is ignored (release evicts, checkout re-dials).
+	// read/write are the retry policies for read and write operations, shared with
+	// ConnWithReconnect: reads retry any ErrorNetwork, writes retry only pre-send network errors.
+	// The pool ignores their needsReconnect (a failed connection is evicted by release and re-dialed
+	// on the next checkout) and uses only MaxRetries, the backoff bounds, and isRetryable.
 	read  RetryPolicy
 	write RetryPolicy
 	// sleepFn backs off between retries; overridable in tests. Defaults to time.Sleep.
 	sleepFn func(time.Duration)
 
-	// sem bounds concurrent checkouts to the pool size: checkout acquires a slot (blocking up to
-	// p.timeout), release frees it.
+	// sem bounds the number of connections checked out at once: checkout acquires it (blocking with
+	// p.timeout until a slot is free), release releases it to free the slot. Its weight is the pool
+	// size.
 	sem *semaphore.Weighted
 	// idle holds connections that are checked in and ready to be reused; it is buffered to the pool
 	// size so release never blocks. checkout drains it first before dialing a new connection.
@@ -151,8 +139,12 @@ func (p *ConnPool) checkout() (ldap.Client, error) {
 	return conn, nil
 }
 
-// release returns conn to the pool and frees its slot, or closes it if opErr marks it unusable
-// (ErrorNetwork or a codeless failed conn.Write) or the pool has closed. See isSendFailedErr.
+// release returns conn to the pool, or closes and discards it if opErr indicates the connection is
+// no longer usable (or the pool has since been closed), and frees the slot reserved by checkout.
+//
+// A failed conn.Write (isSendFailedErr) is evicted as well as ErrorNetwork: it is a plain error
+// carrying no result code, so an IsErrorWithCode check alone would return the dead connection to the
+// idle pool and fail the next checkout that picks it up.
 func (p *ConnPool) release(conn ldap.Client, opErr error) {
 	if p.IsClosing() || (opErr != nil && (ldap.IsErrorWithCode(opErr, ldap.ErrorNetwork) || isSendFailedErr(opErr))) {
 		if err := conn.Close(); err != nil {
@@ -164,8 +156,16 @@ func (p *ConnPool) release(conn ldap.Client, opErr error) {
 	p.sem.Release(1)
 }
 
-// do checks out a connection, runs fn under policy, and releases it; on a policy.isRetryable error
-// (e.g. a stale idle connection) it retries on a fresh checkout with backoff up to policy.MaxRetries.
+// do checks out a connection, runs fn under the given retry policy, and releases the connection.
+// Checked-out idle connections are not health-checked before use, so a connection that went stale
+// while idle (server-side idle timeout, LB/firewall reaping) is expected to fail the first op after
+// being idle; when policy.isRetryable matches, do retries with a freshly checked-out connection (the
+// failed one was evicted by release) instead of surfacing the failure, mirroring ConnWithReconnect.
+//
+// Pass the read policy for reads and the write policy for writes: reads retry any ErrorNetwork,
+// writes retry only pre-send network errors (a drop while reading the response may have applied the
+// write, so it must not be retried). Retries honor policy.MaxRetries and back off between attempts;
+// the failed connection is evicted by release either way.
 func (p *ConnPool) do(policy RetryPolicy, fn func(conn ldap.Client) error) error {
 	maxRetries := policy.MaxRetries
 	if maxRetries < 1 {
