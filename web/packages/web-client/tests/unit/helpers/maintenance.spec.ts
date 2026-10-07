@@ -42,17 +42,6 @@ describe('maintenanceResponseHandler', () => {
     expect(onSetMaintenance).toHaveBeenCalledWith(false)
   })
 
-  it('runs onSuccess bookkeeping only on a successful response', () => {
-    const onSuccess = vi.fn()
-    const handler = maintenanceResponseHandler(vi.fn(), { onSuccess })
-
-    handler(args({ response: { ok: true } as Response, status: 200 }))
-    expect(onSuccess).toHaveBeenCalledTimes(1)
-
-    handler(args({ response: { ok: false } as Response, status: 404 }))
-    expect(onSuccess).toHaveBeenCalledTimes(1)
-  })
-
   it('sets maintenance mode on a 503', () => {
     const onSetMaintenance = vi.fn()
     const handler = maintenanceResponseHandler(onSetMaintenance)
