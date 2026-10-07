@@ -460,6 +460,7 @@ jobs:
       matrix:
         include:
           - suite: smoke
+          - suite: vault-storage
 
     steps:
       - name: Checkout
