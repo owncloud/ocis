@@ -109,6 +109,8 @@ features:
           disableChat: true
           ingress:
             enabled: false
+  roles:
+    availableUnifiedRoles: []
 
 http:
   cors:
