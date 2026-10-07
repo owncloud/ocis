@@ -81,7 +81,7 @@ features:
           enabled: true
           insecure: true
           disableProof: true
-          secureViewEnabled: false
+          secureViewEnabled: true
           disableChat: true
           ingress:
             enabled: false
