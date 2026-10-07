@@ -192,7 +192,8 @@ services:
       OCIS_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
       OCIS_LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
       GRAPH_LDAP_GROUP_CREATE_BASE_DN: "ou=groups-8d24cb5f-6ee6-4b98-86df-c4c268dddb46,ou=groups,dc=owncloud,dc=com"
-      OCIS_LDAP_GROUP_OBJECTCLASS: "owncloudGroup"
+      OCIS_LDAP_GROUP_OBJECTCLASS: "groupOfNames"
+      OCIS_LDAP_GROUP_ADDITIONAL_OBJECTCLASSES: "ownCloudGroup"
       OCIS_LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
       OCIS_LDAP_USER_OBJECTCLASS: "inetOrgPerson"
       LDAP_LOGIN_ATTRIBUTES: "uid"
@@ -272,6 +273,7 @@ services:
       - "./config/keycloak/ocis-realm.dist.json:/opt/keycloak/data/import-dist/ocis-realm.json"
     environment:
       OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
+      OCIS_OCM_DOMAIN: ${OCIS_OCM_DOMAIN:-ocis.ocm.owncloud.test}
       KC_HOSTNAME: ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
       KC_DB: postgres
       KC_DB_URL: "jdbc:postgresql://postgres:5432/keycloak"
