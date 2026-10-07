@@ -111,7 +111,6 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 		currentTags = m["tags"]
 	}
 
-	before := tags.New(currentTags).AsSlice()
 	allTags := tags.New(currentTags)
 	ok, err := allTags.AddValidated(tags.MaxLengthValidator(g.config.Validation.MaxTagLength), assignment.Tags...)
 	if err != nil {
@@ -143,8 +142,8 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 
 	if g.eventsPublisher != nil {
 		ev := events.TagsAdded{
-			// Only the tags that were not on the resource before: requesting an existing tag adds nothing.
-			Tags: strings.Join(tagsDiff(allTags.AsSlice(), before), ","),
+			// The tags as requested, including any that were already present.
+			Tags: strings.Join(assignment.Tags, ","),
 			Ref: &provider.Reference{
 				ResourceId: &rid,
 				Path:       ".",
@@ -222,7 +221,6 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 	}
 
 	allTags := tags.New(currentTags)
-	before := allTags.AsSlice()
 	tagsChanged := allTags.Remove(unassignment.Tags...)
 	if tagsChanged {
 		// Tags were present in metadata — update the file.
@@ -242,10 +240,10 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Always publish the event so the search index gets updated,
-	// even if the tag was already absent from file metadata. Tags lists only
-	// the tags that were actually removed (empty when none were present).
+	// even if the tag was already absent from file metadata.
 	ev := events.TagsRemoved{
-		Tags: strings.Join(tagsDiff(before, allTags.AsSlice()), ","),
+		// The tags as requested, including any that were not present.
+		Tags: strings.Join(unassignment.Tags, ","),
 		Ref: &provider.Reference{
 			ResourceId: &rid,
 			Path:       ".",
@@ -293,19 +291,4 @@ func (g Graph) publishTagsRemoved(ctx context.Context, client gateway.GatewayAPI
 	}
 
 	return nil
-}
-
-// tagsDiff returns the tags in a that are not in b, in a's order.
-func tagsDiff(a, b []string) []string {
-	in := make(map[string]struct{}, len(b))
-	for _, t := range b {
-		in[t] = struct{}{}
-	}
-	out := make([]string, 0, len(a))
-	for _, t := range a {
-		if _, ok := in[t]; !ok {
-			out = append(out, t)
-		}
-	}
-	return out
 }
