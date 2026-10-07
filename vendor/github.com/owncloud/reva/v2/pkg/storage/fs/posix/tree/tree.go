@@ -717,32 +717,63 @@ func (t *Tree) ResolveSpaceIDIndexEntry(spaceid, entry string) (string, string, 
 func (t *Tree) InitNewNode(ctx context.Context, n *node.Node, fsize uint64) (metadata.UnlockFunc, error) {
 	_, span := tracer.Start(ctx, "InitNewNode")
 	defer span.End()
+	// The node is not cached yet, so its path comes from the parent and the name.
+	nodePath := filepath.Join(n.ParentPath(), n.Name)
+
 	// create folder structure (if needed)
-	if err := os.MkdirAll(filepath.Dir(n.InternalPath()), 0700); err != nil {
+	if err := os.MkdirAll(filepath.Dir(nodePath), 0700); err != nil {
 		return nil, err
 	}
 
 	// create and write lock new node metadata
-	unlock, err := t.lookup.MetadataBackend().Lock(n.InternalPath())
+	unlock, err := t.lookup.MetadataBackend().Lock(nodePath)
 	if err != nil {
 		return nil, err
 	}
 
 	// we also need to touch the actual node file here it stores the mtime of the resource
-	h, err := os.OpenFile(n.InternalPath(), os.O_CREATE|os.O_EXCL, 0600)
+	h, err := os.OpenFile(nodePath, os.O_CREATE|os.O_EXCL, 0600)
 	if err != nil {
+		// The file is not ours: leave it, and its cache entry, alone.
+		releaseNewNodeLock(ctx, n, unlock)
 		if os.IsExist(err) {
-			return unlock, errtypes.AlreadyExists(n.InternalPath())
+			// The name only: the message reaches the client, the path is the server's.
+			return nil, errtypes.AlreadyExists(n.Name)
 		}
-		return unlock, err
+		return nil, err
 	}
 	h.Close()
 
+	// From here the file is ours. A failure removes it and our cache entry
+	// before unlocking, so nothing can open the node in between.
+	fail := func(err error) (metadata.UnlockFunc, error) {
+		if rErr := os.Remove(nodePath); rErr != nil {
+			appctx.GetLogger(ctx).Error().Err(rErr).Str("nodeid", n.ID).Msg("could not remove new node file")
+		}
+		if dErr := t.lookup.(*lookup.Lookup).IDCache.Delete(ctx, n.SpaceID, n.ID); dErr != nil {
+			appctx.GetLogger(ctx).Error().Err(dErr).Str("nodeid", n.ID).Msg("could not remove new node from the id cache")
+		}
+		releaseNewNodeLock(ctx, n, unlock)
+		return nil, err
+	}
+
+	// Cached only now that the name is ours, so a losing upload cannot point it at its id.
+	if err := t.lookup.(*lookup.Lookup).CacheID(ctx, n.SpaceID, n.ID, nodePath); err != nil {
+		return fail(err)
+	}
+
 	if _, err := node.CheckQuota(ctx, n.SpaceRoot, false, 0, fsize); err != nil {
-		return unlock, err
+		return fail(err)
 	}
 
 	return unlock, nil
+}
+
+// releaseNewNodeLock releases the lock of a node InitNewNode failed to create.
+func releaseNewNodeLock(ctx context.Context, n *node.Node, unlock metadata.UnlockFunc) {
+	if err := unlock(); err != nil {
+		appctx.GetLogger(ctx).Error().Err(err).Str("nodeid", n.ID).Msg("could not release new node lock")
+	}
 }
 
 // TODO check if node exists?

@@ -204,6 +204,11 @@ func (c *coordinator) Upload(ctx context.Context, req storage.UploadRequest, uff
 	if err != nil {
 		return nil, err
 	}
+	// Its bytes already arrived, and an async finish keeps the session for
+	// postprocessing: a repeated PUT would append to them and finish it again.
+	if session.Offset() > 0 {
+		return nil, errtypes.Aborted("coordinator: upload " + session.ID() + " was already received")
+	}
 
 	// Behind the data gateway the request carries a transfer token, not the user.
 	ctx = session.Context(ctx)
@@ -250,20 +255,28 @@ func (c *coordinator) Upload(ctx context.Context, req storage.UploadRequest, uff
 // finishUpload creates the node, validates the staged bytes and commits them, or
 // hands them to postprocessing.
 func (c *coordinator) finishUpload(ctx context.Context, session Session) (*provider.ResourceInfo, error) {
-	if err := c.touchNode(ctx, session); err != nil {
-		return nil, err
-	}
-	if err := c.markProcessing(ctx, session); err != nil {
-		return nil, err
-	}
+	// Only the staged bytes are read, so a mismatch has no node to undo.
 	if err := verifyAndStoreChecksums(ctx, session); err != nil {
-		c.rollbackMarked(ctx, session)
+		session.Cleanup(ctx, true, true)
+		return nil, err
+	}
+	// Read before the node exists, so bad request metadata has no node to undo either.
+	info, err := uploadInfo(session)
+	if err != nil {
+		session.Cleanup(ctx, true, true)
+		return nil, err
+	}
+	// A driver whose PrepareUpload creates a new file's node is told where it goes,
+	// under the id minted at initiate. Any other is handed one TouchFile created.
+	if !session.NodeExists() && c.prepareCreatesNode() {
+		info.ParentID, info.Name = session.NodeParentID(), session.Filename()
+	} else if err := c.touchNode(ctx, session); err != nil {
 		return nil, err
 	}
 
 	metrics.UploadSessionsBytesReceived.Inc()
 
-	if err := c.prepare(ctx, session); err != nil {
+	if err := c.prepare(ctx, session, info); err != nil {
 		return nil, err
 	}
 
@@ -305,6 +318,13 @@ func (c *coordinator) publishBytesReceived(ctx context.Context, session Session)
 	})
 }
 
+// prepareCreatesNode reports whether the driver's PrepareUpload creates a new
+// file's node, sparing the extra metadata write a TouchFile costs.
+func (c *coordinator) prepareCreatesNode() bool {
+	nc, ok := c.fs.(storage.NodeCreator)
+	return ok && nc.PrepareCreatesNode()
+}
+
 // touchNode creates the node a new file's upload writes to.
 func (c *coordinator) touchNode(ctx context.Context, session Session) error {
 	if session.NodeExists() {
@@ -319,8 +339,7 @@ func (c *coordinator) touchNode(ctx context.Context, session Session) error {
 		},
 		Path: session.Filename(),
 	}
-	// MarkProcessing is the coordinator's own call, hence false here.
-	// PrepareUpload propagates the node, so TouchFile need not.
+	// PrepareUpload marks and propagates the node, so TouchFile need not.
 	result, err := c.fs.TouchFile(storage.ContextSkipTouchPropagation(ctx), pathRef, false, session.Metadata()["mtime"])
 	if err != nil {
 		session.Cleanup(ctx, true, true)
@@ -342,59 +361,34 @@ func (c *coordinator) touchNode(ctx context.Context, session Session) error {
 	return nil
 }
 
-// markProcessing flags the node as being processed, so clients do not read it
-// before its bytes are committed.
-func (c *coordinator) markProcessing(ctx context.Context, session Session) error {
+// prepare has the driver write the node metadata, mark it as processing so clients
+// do not read it before its bytes are committed, and snapshot the previous version,
+// ahead of the commit that writes the bytes.
+func (c *coordinator) prepare(ctx context.Context, session Session, info storage.UploadInfo) error {
 	ref := session.Reference()
-	if err := c.fs.MarkProcessing(ctx, &ref, true, session.ID()); err != nil {
-		// Never marked, so there is nothing to unmark.
+
+	// A failed PrepareUpload has already undone its own writes, a new file's node
+	// included, and marks the node only on success: there is nothing to unmark.
+	prepared, err := c.fs.PrepareUpload(ctx, &ref, session.ID(), info)
+	if err != nil {
 		session.Cleanup(ctx, true, true)
-		c.deleteTouchedNode(ctx, session, &ref)
+		if _, ok := err.(errtypes.IsNotFound); ok && info.ParentID != "" {
+			// The parent went away, or the share was revoked, while bytes were in flight.
+			return errtypes.PreconditionFailed(err.Error())
+		}
 		return err
 	}
 	metrics.UploadProcessing.Inc()
 
-	// The real node id from touchNode must reach the commit, which may run in
-	// another process.
-	if err := session.Persist(ctx); err != nil {
-		c.rollbackMarked(ctx, session)
-		return err
-	}
-	return nil
-}
-
-// deleteTouchedNode removes a node this upload created, for the one path where the
-// mark itself failed so RollbackUpload has no processing id to key off.
-func (c *coordinator) deleteTouchedNode(ctx context.Context, session Session, ref *provider.Reference) {
-	if session.NodeExists() {
-		return
-	}
-	// Delete is permission-gated, so an Uploader-only role may leave the empty file behind.
-	if _, err := c.fs.Delete(ctx, ref); err != nil {
-		appctx.GetLogger(ctx).Error().Err(err).Str("uploadid", session.ID()).Msg("could not delete node after failed upload")
-	}
-}
-
-// prepare has the driver write the node metadata and snapshot the previous
-// version, ahead of the commit that writes the bytes.
-func (c *coordinator) prepare(ctx context.Context, session Session) error {
-	ref := session.Reference()
-
-	info, err := uploadInfo(session)
-	if err != nil {
-		c.rollbackMarked(ctx, session)
-		return err
-	}
-
-	// A failed PrepareUpload has already undone its own writes.
-	prepared, err := c.fs.PrepareUpload(ctx, &ref, session.ID(), info)
-	if err != nil {
-		c.rollbackMarked(ctx, session)
-		return err
-	}
-
 	// Persisted, not just held: the commit may run in another process, which can
-	// only learn these by reading them back.
+	// only learn these, and the real node id from touchNode, by reading them back.
+	// Saved once, here: a failure now finds the node marked, so the rollback can
+	// purge it.
+	if prepared.SpaceOwner != nil {
+		session.SetStorageValue("SpaceOwnerOrManager", prepared.SpaceOwner.GetOpaqueId())
+		session.SetStorageValue("SpaceOwnerIdp", prepared.SpaceOwner.GetIdp())
+		session.SetStorageValue("SpaceOwnerType", utils.UserTypeToString(prepared.SpaceOwner.GetType()))
+	}
 	session.SetSizeDiff(prepared.SizeDiff)
 	session.SetVersionCreated(prepared.VersionCreated)
 	if err := session.Persist(ctx); err != nil {
@@ -415,21 +409,6 @@ func rollbackInfo(session Session, sizeDiff int64) storage.RollbackInfo {
 		Filename:    session.Filename(),
 		Size:        session.Size(),
 	}
-}
-
-// rollbackMarked undoes a finish that failed before PrepareUpload ran, so there is
-// no revision to revert and nothing was propagated.
-func (c *coordinator) rollbackMarked(ctx context.Context, session Session) {
-	ref := session.Reference()
-	if !session.NodeExists() {
-		// Before unmarking: RollbackUpload keys off the processing id.
-		if err := c.fs.RollbackUpload(ctx, &ref, session.ID(), rollbackInfo(session, 0)); err != nil {
-			appctx.GetLogger(ctx).Error().Err(err).Str("uploadid", session.ID()).Msg("could not roll back upload")
-		}
-	}
-	c.unmarkProcessing(ctx, session, &ref)
-	metrics.UploadProcessing.Dec()
-	session.Cleanup(ctx, true, true)
 }
 
 // rollbackPrepared undoes a finish that failed after PrepareUpload succeeded.
