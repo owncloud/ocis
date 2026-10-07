@@ -9,11 +9,11 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 )
 
-// FullDefaultConfig returns a fully initialized default configuration
 // defaultMaxConsecutiveFailures is the number of consecutive extraction
 // failures after which a space (re)index walk gives up on the extractor.
 const defaultMaxConsecutiveFailures = 5
 
+// FullDefaultConfig returns a fully initialized default configuration
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
 
