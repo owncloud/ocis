@@ -191,7 +191,40 @@ describe('InviteCollaboratorForm', () => {
         resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
       })
 
-      expect(wrapper.find('[data-testid="vault-default-expiration-notice"]').exists()).toBeTruthy()
+      const notice = wrapper.find('[data-testid="vault-default-expiration-notice"]')
+      expect(notice.exists()).toBeTruthy()
+      expect(notice.attributes('tabindex')).toBeUndefined()
+      expect(notice.find('oc-icon-stub').attributes('aria-hidden')).toBe('true')
+    })
+    it('keeps the status region mounted so screen readers pick up the announcement', () => {
+      // role="status" must stay mounted; a freshly-inserted one isn't reliably announced
+      const { wrapper } = getWrapper({
+        resource: mock<Resource>({ ...folderMock, storageId: 'some-other-provider' })
+      })
+
+      const statusRegion = wrapper.find('#vault-default-expiration-notice-status')
+      expect(statusRegion.exists()).toBeTruthy()
+      expect(statusRegion.attributes('role')).toBe('status')
+      expect(wrapper.find('[data-testid="vault-default-expiration-notice"]').exists()).toBeFalsy()
+    })
+    it('describes the "Show more actions" toggle only while the notice applies', () => {
+      const { wrapper } = getWrapper({
+        capabilities: vaultCapabilities,
+        resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
+      })
+
+      expect(wrapper.find('#show-more-share-options-btn').attributes('aria-describedby')).toBe(
+        'vault-default-expiration-notice-status'
+      )
+    })
+    it('does not describe the "Show more actions" toggle for a resource outside the vault', () => {
+      const { wrapper } = getWrapper({
+        resource: mock<Resource>({ ...folderMock, storageId: 'some-other-provider' })
+      })
+
+      expect(
+        wrapper.find('#show-more-share-options-btn').attributes('aria-describedby')
+      ).toBeUndefined()
     })
     it('does not show for a resource outside the vault', () => {
       const { wrapper } = getWrapper({

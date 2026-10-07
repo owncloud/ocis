@@ -82,23 +82,28 @@
         </template>
       </oc-select>
     </div>
-    <div
-      v-if="isVaultResource && vaultDefaultExpirationDays && !expirationDate"
-      role="status"
-      aria-live="polite"
-      class="oc-flex oc-flex-middle oc-gap-s oc-background-muted oc-rounded oc-p-s oc-mb-s oc-text-small"
-      data-testid="vault-default-expiration-notice"
-    >
-      <oc-icon name="information" size="small" />
-      <span
-        v-text="
-          $pgettext(
-            'Notice shown when sharing a resource inside the vault, telling the sharer the share will expire automatically unless they open the \'more actions\' (⋮) menu next to the share button and set a different date',
-            'Expires in %{days} days by default — adjust via the ⋮ menu',
-            { days: String(vaultDefaultExpirationDays) }
-          )
-        "
-      />
+    <!--
+      This status region stays mounted even when the notice has nothing to say: a role="status"
+      element only reliably announces to screen readers when its content changes while the region
+      already exists in the DOM, not when the whole region is freshly inserted via v-if.
+    -->
+    <div id="vault-default-expiration-notice-status" role="status">
+      <div
+        v-if="isVaultResource && vaultDefaultExpirationDays && !expirationDate"
+        class="oc-flex oc-flex-middle oc-gap-s oc-background-muted oc-rounded oc-p-s oc-mb-s oc-text-small"
+        data-testid="vault-default-expiration-notice"
+      >
+        <oc-icon name="information" size="small" aria-hidden="true" />
+        <span
+          v-text="
+            $pgettext(
+              'Notice shown when sharing a resource inside the vault, telling the sharer the share will expire automatically unless they open &quot;Show more actions&quot; next to the share button and set a different date',
+              'Expires in %{days} days by default — change it under &quot;Show more actions&quot;',
+              { days: String(vaultDefaultExpirationDays) }
+            )
+          "
+        />
+      </div>
     </div>
     <div class="oc-flex oc-flex-between oc-flex-middle oc-mb-l oc-mt-s">
       <role-dropdown
@@ -119,6 +124,11 @@
           id="show-more-share-options-btn"
           class="oc-mx-s"
           :aria-label="$gettext('Show more actions')"
+          :aria-describedby="
+            isVaultResource && vaultDefaultExpirationDays && !expirationDate
+              ? 'vault-default-expiration-notice-status'
+              : undefined
+          "
           appearance="raw"
         >
           <oc-icon name="more-2" />
@@ -131,7 +141,7 @@
           >
             <oc-list
               class="collaborator-edit-dropdown-options-list"
-              :aria-label="'shareEditOptions'"
+              aria-label="shareEditOptions"
             >
               <li class="oc-rounded oc-menu-item-hover">
                 <expiration-datepicker
