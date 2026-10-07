@@ -147,6 +147,7 @@ func DefaultConfig() *config.Config {
 			AuthLevelNames:  []string{"advanced"},
 			SessionDuration: 3600,
 		},
+		DefaultVaultShareExpirationDays: 30,
 	}
 }
 

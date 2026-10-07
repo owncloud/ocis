@@ -82,6 +82,29 @@
         </template>
       </oc-select>
     </div>
+    <!--
+      This status region stays mounted even when the notice has nothing to say: a role="status"
+      element only reliably announces to screen readers when its content changes while the region
+      already exists in the DOM, not when the whole region is freshly inserted via v-if.
+    -->
+    <div id="vault-default-expiration-notice-status" role="status">
+      <div
+        v-if="isVaultResource && vaultDefaultExpirationDays && !expirationDate"
+        class="oc-flex oc-flex-middle oc-gap-s oc-background-muted oc-rounded oc-p-s oc-mb-s oc-text-small"
+        data-testid="vault-default-expiration-notice"
+      >
+        <oc-icon name="information" size="small" aria-hidden="true" />
+        <span
+          v-text="
+            $pgettext(
+              'Notice shown when sharing a resource inside the vault, telling the sharer the share will expire automatically unless they open &quot;Show more actions&quot; next to the share button and set a different date',
+              'Expires in %{days} days by default — change it under &quot;Show more actions&quot;',
+              { days: String(vaultDefaultExpirationDays) }
+            )
+          "
+        />
+      </div>
+    </div>
     <div class="oc-flex oc-flex-between oc-flex-middle oc-mb-l oc-mt-s">
       <role-dropdown
         mode="create"
@@ -101,6 +124,11 @@
           id="show-more-share-options-btn"
           class="oc-mx-s"
           :aria-label="$gettext('Show more actions')"
+          :aria-describedby="
+            isVaultResource && vaultDefaultExpirationDays && !expirationDate
+              ? 'vault-default-expiration-notice-status'
+              : undefined
+          "
           appearance="raw"
         >
           <oc-icon name="more-2" />
@@ -111,12 +139,13 @@
             mode="click"
             padding-size="small"
           >
-            <oc-list
-              class="collaborator-edit-dropdown-options-list"
-              :aria-label="'shareEditOptions'"
-            >
+            <oc-list class="collaborator-edit-dropdown-options-list" aria-label="shareEditOptions">
               <li class="oc-rounded oc-menu-item-hover">
-                <expiration-datepicker v-if="!saving" @option-change="collaboratorExpiryChanged" />
+                <expiration-datepicker
+                  v-if="!saving"
+                  :suggested-date="suggestedExpirationDate()"
+                  @option-change="collaboratorExpiryChanged"
+                />
               </li>
             </oc-list>
           </oc-drop>
@@ -297,6 +326,14 @@ const isVaultResource = computed(() => {
   }
   return storageId.split('$')[0] === VAULT_STORAGE_PROVIDER_ID
 })
+
+// no local fallback: the default lives only in the server's vault config
+const vaultDefaultExpirationDays = capabilityRefs.vaultDefaultShareExpirationDays
+
+const suggestedExpirationDate = () =>
+  unref(isVaultResource) && unref(vaultDefaultExpirationDays)
+    ? DateTime.now().plus({ days: unref(vaultDefaultExpirationDays) })
+    : undefined
 
 const createSharesConcurrentRequests = computed(() => {
   return configStore.options.concurrentRequests.shares.create

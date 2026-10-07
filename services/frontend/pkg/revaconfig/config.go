@@ -367,7 +367,8 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 								},
 							},
 							"vault": map[string]interface{}{
-								"enabled": cfg.EnableVaultMode,
+								"enabled":                       cfg.EnableVaultMode,
+								"default_share_expiration_days": cfg.DefaultVaultShareExpirationDays,
 							},
 						},
 						"version": map[string]interface{}{

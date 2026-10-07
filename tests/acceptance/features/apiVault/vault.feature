@@ -1231,6 +1231,59 @@ Feature: vault
       """
 
 
+  Scenario Outline: server sets a default 30-day expiration when a user share is created without one
+    Given user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
+    And user "Alice" has been set up in oCIS
+    And user "Brian" has been set up in oCIS
+    And user "Alice" has uploaded a file inside space "Personal" with content "to share" to "textfile1.txt" in vault
+    And user "Alice" has created a folder "FolderToShare" in space "Personal" in vault
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | <resource>         |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "roles",
+                "grantedToV2",
+                "expirationDateTime"
+              ],
+              "properties": {
+                "expirationDateTime": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    And the last share invitation should have an expiration date approximately "30" days from now
+    Examples:
+      | permissions-role | resource      |
+      | Viewer           | textfile1.txt |
+      | Viewer           | FolderToShare |
+
+
   Scenario Outline: try to send share invitation for a project space in vault to a user without the vault mode permission (permissions endpoint)
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Brian" has been created with default attributes

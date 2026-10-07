@@ -134,9 +134,10 @@ func DefaultConfig() *config.Config {
 			Cluster:   "ocis-cluster",
 			EnableTLS: false,
 		},
-		MaxConcurrency:            20,
-		ReceivedSharesStatTimeout: 10 * time.Second,
-		EnableUserSharing:         true,
+		MaxConcurrency:                  20,
+		ReceivedSharesStatTimeout:       10 * time.Second,
+		EnableUserSharing:               true,
+		DefaultVaultShareExpirationDays: 30,
 		UnifiedRoles: config.UnifiedRoles{
 			AvailableRoles: nil, // will be populated with defaults in EnsureDefaults
 		},

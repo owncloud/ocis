@@ -352,6 +352,12 @@ config({
     // (composition.ts: noCropperScript) — this stub keeps that request from being made.
     cropper: {
       instance: class {} as never
+    },
+    // The toolbar has no chart-insertion entry and no echarts dependency is installed;
+    // md-editor-v3 still CDN-injects echarts from unpkg unless an instance is registered,
+    // so this stub keeps that request from being made (same approach as cropper above).
+    echarts: {
+      instance: class {} as never
     }
   },
   markdownItConfig(md) {
