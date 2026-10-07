@@ -488,9 +488,9 @@ jobs:
           - suite: ocm
             args: "--type playwright --suites ocm"
             federated: true
-          # - suite: vault-storage
-          #   args: "--type playwright --suites vault-storage"
-          #   vault_storage: true
+          - suite: vault-storage
+            args: "--type playwright --suites vault-storage"
+            vault_storage: true
 
     steps:
       - name: Checkout
