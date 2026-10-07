@@ -328,6 +328,11 @@ func (fs *Decomposedfs) Capabilities(_ context.Context) storage.Capabilities {
 	return storage.FullCapabilities()
 }
 
+// PrepareCreatesNode reports that PrepareUpload creates a new file's node.
+func (fs *Decomposedfs) PrepareCreatesNode() bool {
+	return true
+}
+
 // GetQuota returns the quota available
 // TODO Document in the cs3 should we return quota or free space?
 func (fs *Decomposedfs) GetQuota(ctx context.Context, ref *provider.Reference) (total uint64, inUse uint64, remaining uint64, err error) {
