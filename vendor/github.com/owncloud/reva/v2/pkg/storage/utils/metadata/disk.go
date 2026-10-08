@@ -178,6 +178,12 @@ func (disk *Disk) Delete(_ context.Context, path string) error {
 	return os.Remove(disk.targetPath(path))
 }
 
+// WasRecentlyDeleted always reports false: Disk has no trash/recycle bin, so
+// a NotFound here stays ambiguous between "removed" and "never existed".
+func (disk *Disk) WasRecentlyDeleted(_ context.Context, _ string) (bool, error) {
+	return false, nil
+}
+
 // ReadDir returns the resource infos in a given directory
 func (disk *Disk) ReadDir(_ context.Context, p string) ([]string, error) {
 	infos, err := os.ReadDir(disk.targetPath(p))
