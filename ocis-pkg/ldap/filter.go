@@ -8,22 +8,12 @@ import (
 )
 
 // EnhanceFilterWithMasterID adds master-ID match clauses to the given LDAP filter with OR.
-// The function returns the filter without a change in three cases.
-// The first case is an empty masterID. The second case is two empty attributes.
-// The third case is an empty filter.
-// An empty filter means "no restriction".
-// Do not OR an empty filter with a master-ID clause.
+// An empty filter means "no restriction". Do not OR an empty filter with a master-ID clause.
 // This action would restrict an unrestricted search to the master ID only.
+// The function returns the filter without a change when masterID is empty, when both
+// attributes are empty, or when filter is empty.
 func EnhanceFilterWithMasterID(filter, masterID, memberAttr, guestAttr string) string {
-	if masterID == "" {
-		return filter
-	}
-
-	if memberAttr == "" && guestAttr == "" {
-		return filter
-	}
-
-	if filter == "" {
+	if masterID == "" || (memberAttr == "" && guestAttr == "") || filter == "" {
 		return filter
 	}
 

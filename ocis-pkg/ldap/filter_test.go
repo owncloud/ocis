@@ -54,10 +54,6 @@ func TestEnhanceFilterWithMasterID(t *testing.T) {
 			expectedFilter: "(|(ownCloudGuestOf=instance-1)(ownCloudGuestOf=0000-0000-000-0000))",
 		},
 		{
-			// An empty filter means "no restriction". The filter matches every user.
-			// Some callers combine the result with AND, for example getLDAPUserByFilter.
-			// Do not OR the empty filter with a master-ID clause.
-			// This action would restrict an unrestricted search to master-ID users only.
 			name:           "empty existing filter stays unrestricted",
 			filter:         "",
 			masterID:       "0000-0000-000-0000",
