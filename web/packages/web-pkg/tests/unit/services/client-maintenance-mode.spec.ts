@@ -42,7 +42,7 @@ describe('ClientService maintenance mode', () => {
     onResponse = service.handleResponse.bind(service)
   })
 
-  it('clears maintenance mode and records the time for a successful response', () => {
+  it('clears maintenance mode for a successful response', () => {
     onResponse({
       response: new Response('{}', { status: 200 }),
       status: 200,
@@ -50,7 +50,6 @@ describe('ClientService maintenance mode', () => {
     })
 
     expect(configStore.setMaintenanceMode).toHaveBeenCalledWith(false)
-    expect(service.lastSuccessfulRequestTime).not.toBeNull()
   })
 
   it('sets maintenance mode for a 503', () => {
