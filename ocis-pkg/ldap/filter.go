@@ -7,14 +7,23 @@ import (
 	"github.com/go-ldap/ldap/v3"
 )
 
-// EnhanceFilterWithMasterID OR's the given LDAP filter with master-id match clauses.
-// Returns filter unchanged when masterID is empty or both attributes are empty.
+// EnhanceFilterWithMasterID adds master-ID match clauses to the given LDAP filter with OR.
+// The function returns the filter without a change in three cases.
+// The first case is an empty masterID. The second case is two empty attributes.
+// The third case is an empty filter.
+// An empty filter means "no restriction".
+// Do not OR an empty filter with a master-ID clause.
+// This action would restrict an unrestricted search to the master ID only.
 func EnhanceFilterWithMasterID(filter, masterID, memberAttr, guestAttr string) string {
 	if masterID == "" {
 		return filter
 	}
 
 	if memberAttr == "" && guestAttr == "" {
+		return filter
+	}
+
+	if filter == "" {
 		return filter
 	}
 
@@ -33,10 +42,6 @@ func EnhanceFilterWithMasterID(filter, masterID, memberAttr, guestAttr string) s
 		masterIDFilter = masterIDParts[0]
 	} else if len(masterIDParts) > 1 {
 		masterIDFilter = fmt.Sprintf("(|%s)", strings.Join(masterIDParts, ""))
-	}
-
-	if filter == "" {
-		return masterIDFilter
 	}
 
 	return fmt.Sprintf("(|%s%s)", filter, masterIDFilter)
