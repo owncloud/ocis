@@ -606,10 +606,7 @@ export class AuthService implements AuthServiceInterface {
     }
 
     const baseTime = this.clientService.lastSuccessfulRequestTime ?? Math.floor(Date.now() / 1000)
-    const expiresAt = baseTime + sessionDuration
-    this.mfaExpiresAt = expiresAt
-
-    this.mfaExpiryWorker.setMfaTimer({ expiresAt })
+    this.armMfaTimer(baseTime + sessionDuration)
   }
 
   private showMfaExpiryWarning() {
@@ -636,21 +633,20 @@ export class AuthService implements AuthServiceInterface {
       onCancel: () => {
         this.mfaExpiryModalId = null
         this.mfaExpiryBroadcastChannel?.postMessage({ action: 'dismissed' })
-        this.scheduleMfaExpiryLogout()
       }
     })
     this.mfaExpiryModalId = modal.id
   }
 
-  // Forces logout once the MFA session elapses, even if the warning was dismissed.
-  private scheduleMfaExpiryLogout() {
-    if (this.mfaExpiryLogoutTimer) {
-      clearTimeout(this.mfaExpiryLogoutTimer)
-    }
+  // Single source of truth for the MFA deadline: stores it, re-arms the warning worker, and
+  // (re)schedules the hard logout for that same timestamp, regardless of modal interaction.
+  private armMfaTimer(expiresAt: number) {
+    this.mfaExpiresAt = expiresAt
+    this.mfaExpiryWorker?.setMfaTimer({ expiresAt })
 
+    this.clearMfaExpiryLogout()
     const now = Math.floor(Date.now() / 1000)
-    const delaySeconds = Math.max(0, (this.mfaExpiresAt ?? now) - now)
-
+    const delaySeconds = Math.max(0, expiresAt - now)
     this.mfaExpiryLogoutTimer = setTimeout(() => {
       this.mfaExpiryLogoutTimer = null
       this.logoutUser()
@@ -671,10 +667,7 @@ export class AuthService implements AuthServiceInterface {
     }
 
     this.mfaExpiryModalDismissed = false
-    this.clearMfaExpiryLogout()
-    const expiresAt = Math.floor(Date.now() / 1000) + sessionDuration
-    this.mfaExpiresAt = expiresAt
-    this.mfaExpiryWorker?.setMfaTimer({ expiresAt })
+    this.armMfaTimer(Math.floor(Date.now() / 1000) + sessionDuration)
   }
 
   private initMfaExpiryBroadcastChannel() {
@@ -696,7 +689,6 @@ export class AuthService implements AuthServiceInterface {
           modalStore.removeModal(this.mfaExpiryModalId)
           this.mfaExpiryModalId = null
         }
-        this.scheduleMfaExpiryLogout()
       }
     }
   }
