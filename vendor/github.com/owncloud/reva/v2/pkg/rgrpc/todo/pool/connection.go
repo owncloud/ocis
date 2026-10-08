@@ -29,6 +29,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/keepalive"
 )
 
 var (
@@ -84,42 +85,54 @@ func NewConn(target string, opts ...Option) (*grpc.ClientConn, error) {
 		maxRcvMsgSize = s
 	}
 
+	opt := []grpc.DialOption{}
+
+	// only dial with keepalive params once they are actually configured, so that an unconfigured
+	// deployment keeps grpc's own behavior. Where they are set, a black-holed peer fails the rpcs
+	// on its connection instead of hanging for the caller's full timeout, see
+	// GetClientKeepaliveParams in pkg/rgrpc/todo/pool/keepalive.go.
+	if kp := GetClientKeepaliveParams(); kp != (keepalive.ClientParameters{}) {
+		opt = append(opt, grpc.WithKeepaliveParams(kp))
+	}
+
 	conn, err := grpc.NewClient(
 		target,
-		grpc.WithTransportCredentials(cred),
-		grpc.WithDefaultCallOptions(
-			grpc.MaxCallRecvMsgSize(maxRcvMsgSize),
-		),
-		grpc.WithDefaultServiceConfig(`{
+		append(opt,
+			grpc.WithTransportCredentials(cred),
+			grpc.WithDefaultCallOptions(
+				grpc.MaxCallRecvMsgSize(maxRcvMsgSize),
+			),
+			grpc.WithDefaultServiceConfig(`{
 			"loadBalancingPolicy":"round_robin"
 		}`),
-		/* we may want to retry more often than the default transparent retry, see https://grpc.io/docs/guides/retry/#retry-configuration
-		grpc.WithDefaultServiceConfig(`{
-			"loadBalancingPolicy":"round_robin"
-			"methodConfig": [
-				{
-					"name": [
-						{ "service": "grpc.examples.echo.Echo" }
-					],
-					"retryPolicy": {
-						"maxAttempts": 3,
-						"initialBackoff": "0.1s",
-						"maxBackoff": "1s",
-						"backoffMultiplier": 2,
-						"retryableStatusCodes": ["UNAVAILABLE", "CANCELLED", "RESOURCE_EXHAUSTED", "DEADLINE_EXCEEDED"]
+			/* we may want to retry more often than the default transparent retry, see https://grpc.io/docs/guides/retry/#retry-configuration
+			grpc.WithDefaultServiceConfig(`{
+				"loadBalancingPolicy":"round_robin"
+				"methodConfig": [
+					{
+						"name": [
+							{ "service": "grpc.examples.echo.Echo" }
+						],
+						"retryPolicy": {
+							"maxAttempts": 3,
+							"initialBackoff": "0.1s",
+							"maxBackoff": "1s",
+							"backoffMultiplier": 2,
+							"retryableStatusCodes": ["UNAVAILABLE", "CANCELLED", "RESOURCE_EXHAUSTED", "DEADLINE_EXCEEDED"]
+						}
 					}
-				}
-			]
-		}`),
-		*/
-		grpc.WithStatsHandler(otelgrpc.NewClientHandler(
-			otelgrpc.WithTracerProvider(
-				options.tracerProvider,
-			),
-			otelgrpc.WithPropagators(
-				rtrace.Propagator,
-			),
-		)),
+				]
+			}`),
+			*/
+			grpc.WithStatsHandler(otelgrpc.NewClientHandler(
+				otelgrpc.WithTracerProvider(
+					options.tracerProvider,
+				),
+				otelgrpc.WithPropagators(
+					rtrace.Propagator,
+				),
+			)),
+		)...,
 	)
 	if err != nil {
 		return nil, err
