@@ -141,7 +141,22 @@ def main() -> int:
         # binary to build, init, or start. Just confirm it's up and point
         # Playwright straight at it.
         ocis_url = os.environ["TEST_SERVER_URL"]
-        wait_for(lambda: ocis_healthy(ocis_url), 120, "ocis")
+        proxy_readyz_url = os.environ.get("PROXY_READYZ_URL", "")
+        if proxy_readyz_url:
+            wait_for(
+                lambda: subprocess.run(
+                    ["curl", "-sf", proxy_readyz_url], capture_output=True
+                ).returncode == 0,
+                120,
+                "ocis proxy",
+            )
+        else:
+            keycloak_enabled = os.environ.get("KEYCLOAK", "").lower() == "true"
+            wait_for(
+                lambda: ocis_healthy(ocis_url, use_basic_auth=not keycloak_enabled),
+                120,
+                "ocis",
+            )
         print("ocis ready.")
 
         playwright_env = {
