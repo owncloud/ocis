@@ -22,4 +22,4 @@ not only master-ID users. Each of these services now rejects startup when
 `OCIS_MULTI_INSTANCE_MASTER_ID` is set and its own user filter is empty.
 Set an explicit `OCIS_LDAP_USER_FILTER` for every multi-instance deployment.
 
-https://github.com/owncloud/ocis/pull/13096
+https://github.com/owncloud/ocis/pull/13100
