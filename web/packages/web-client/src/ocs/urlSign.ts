@@ -1,5 +1,4 @@
 import { FetchClient } from '../http'
-import { urlJoin } from '../utils'
 import convert from 'xml-js'
 import { pbkdf2Sync } from 'crypto'
 
@@ -55,22 +54,32 @@ export class UrlSign {
       return this.signingKey
     }
 
-    const data = await this.httpClient.request<string>(
-      urlJoin(this.baseURI, 'ocs/v2.php/cloud/user/signing-key'),
-      {
-        // the endpoint answers XML, so take the body verbatim instead of parsing it as JSON
-        responseType: 'text',
-        params: {
-          ...(publicToken && { 'public-token': publicToken })
-        },
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          ...(publicLinkPassword && {
-            Authorization: `Basic ${Buffer.from(['public', publicLinkPassword].join(':')).toString('base64')}`
-          })
-        }
+    // the base URI can carry a query (e.g. `?vault=true`), so only extend its path
+    const signingKeyUrl = new URL(this.baseURI)
+    signingKeyUrl.pathname = [
+      ...signingKeyUrl.pathname.split('/'),
+      'ocs',
+      'v2.php',
+      'cloud',
+      'user',
+      'signing-key'
+    ]
+      .filter(Boolean)
+      .join('/')
+
+    const data = await this.httpClient.request<string>(signingKeyUrl.href, {
+      // the endpoint answers XML, so take the body verbatim instead of parsing it as JSON
+      responseType: 'text',
+      params: {
+        ...(publicToken && { 'public-token': publicToken })
+      },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        ...(publicLinkPassword && {
+          Authorization: `Basic ${Buffer.from(['public', publicLinkPassword].join(':')).toString('base64')}`
+        })
       }
-    )
+    })
 
     const parsedXML = convert.xml2js(data.data, { compact: true }) as any
     this.signingKey = parsedXML.ocs.data['signing-key']._text
