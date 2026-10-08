@@ -61,6 +61,8 @@ export class AuthService implements AuthServiceInterface {
   private mfaExpiryModalDismissed = false
   private mfaExpiryModalId: string | null = null
   private mfaExpiryBroadcastChannel: BroadcastChannel
+  private mfaExpiresAt: number | null = null
+  private mfaExpiryLogoutTimer: ReturnType<typeof setTimeout> | null = null
 
   // number of seconds before an access token is to expire to raise the accessTokenExpiring event
   private accessTokenExpiryThreshold = 10
@@ -256,6 +258,7 @@ export class AuthService implements AuthServiceInterface {
           console.log('user unloaded…')
           this.tokenTimerWorker?.resetTokenTimer()
           this.mfaExpiryWorker?.resetMfaTimer()
+          this.clearMfaExpiryLogout()
           this.resetStateAfterUserLogout()
 
           if (this.userManager.unloadReason === 'authError') {
@@ -604,6 +607,7 @@ export class AuthService implements AuthServiceInterface {
 
     const baseTime = this.clientService.lastSuccessfulRequestTime ?? Math.floor(Date.now() / 1000)
     const expiresAt = baseTime + sessionDuration
+    this.mfaExpiresAt = expiresAt
 
     this.mfaExpiryWorker.setMfaTimer({ expiresAt })
   }
@@ -632,9 +636,32 @@ export class AuthService implements AuthServiceInterface {
       onCancel: () => {
         this.mfaExpiryModalId = null
         this.mfaExpiryBroadcastChannel?.postMessage({ action: 'dismissed' })
+        this.scheduleMfaExpiryLogout()
       }
     })
     this.mfaExpiryModalId = modal.id
+  }
+
+  // Forces logout once the MFA session elapses, even if the warning was dismissed.
+  private scheduleMfaExpiryLogout() {
+    if (this.mfaExpiryLogoutTimer) {
+      clearTimeout(this.mfaExpiryLogoutTimer)
+    }
+
+    const now = Math.floor(Date.now() / 1000)
+    const delaySeconds = Math.max(0, (this.mfaExpiresAt ?? now) - now)
+
+    this.mfaExpiryLogoutTimer = setTimeout(() => {
+      this.mfaExpiryLogoutTimer = null
+      this.logoutUser()
+    }, delaySeconds * 1000)
+  }
+
+  private clearMfaExpiryLogout() {
+    if (this.mfaExpiryLogoutTimer) {
+      clearTimeout(this.mfaExpiryLogoutTimer)
+      this.mfaExpiryLogoutTimer = null
+    }
   }
 
   private prolongMfaSession() {
@@ -644,7 +671,9 @@ export class AuthService implements AuthServiceInterface {
     }
 
     this.mfaExpiryModalDismissed = false
+    this.clearMfaExpiryLogout()
     const expiresAt = Math.floor(Date.now() / 1000) + sessionDuration
+    this.mfaExpiresAt = expiresAt
     this.mfaExpiryWorker?.setMfaTimer({ expiresAt })
   }
 
@@ -667,6 +696,7 @@ export class AuthService implements AuthServiceInterface {
           modalStore.removeModal(this.mfaExpiryModalId)
           this.mfaExpiryModalId = null
         }
+        this.scheduleMfaExpiryLogout()
       }
     }
   }
