@@ -33,6 +33,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
 	"github.com/stretchr/testify/mock"
@@ -80,6 +81,11 @@ var _ = Describe("Notifications", func() {
 		gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&user.GetUserResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, User: sharer}, nil).Once()
 		gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&user.GetUserResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, User: sharee}, nil).Once()
 		gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, User: sharer}, nil)
+		// Registered before the catch-all below: testify/mock matches expectations in
+		// registration order, so the more specific vault matcher must come first.
+		gatewayClient.On("Stat", mock.Anything, mock.MatchedBy(func(r *provider.StatRequest) bool {
+			return r.GetRef().GetResourceId().GetStorageId() == utils.VaultStorageProviderID
+		})).Return(&provider.StatResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, Info: &provider.ResourceInfo{Name: "report.pdf", Space: &provider.StorageSpace{Name: "vault space"}}}, nil)
 		gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, Info: &provider.ResourceInfo{Name: "secrets of the board", Space: &provider.StorageSpace{Name: "secret space"}}}, nil)
 		vs = &settingssvc.MockValueService{}
 		vs.GetValueByUniqueIdentifiersFunc = func(ctx context.Context, req *settingssvc.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settingssvc.GetValueResponse, error) {
@@ -269,6 +275,95 @@ https://owncloud.com
 				ExpiredAt:     time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC),
 			},
 		}),
+	)
+
+	vaultResourceID := &provider.ResourceId{
+		StorageId: utils.VaultStorageProviderID,
+		SpaceId:   "spaceid",
+		OpaqueId:  "itemid",
+	}
+	vaultSpaceID := &provider.StorageSpaceId{
+		OpaqueId: storagespace.FormatResourceID(&provider.ResourceId{
+			StorageId: utils.VaultStorageProviderID,
+			SpaceId:   "vaultspaceid",
+			OpaqueId:  "vaultspaceid",
+		}),
+	}
+
+	DescribeTable("Vault resources are redacted in notifications",
+		func(ev events.Event, mustNotContain string) {
+			received := make(chan *channels.Message, 1)
+			ch := make(chan events.Event)
+			evts := NewEventsNotifier(trace.NewNoopTracerProvider(), ch, capturingChannel{out: received}, log.NewLogger(), gatewaySelector, vs, "",
+				"", "", "", "", "", "",
+				store.Create(), nil, nil)
+			go evts.Run()
+
+			ch <- ev
+
+			var msg *channels.Message
+			select {
+			case msg = <-received:
+			case <-time.Tick(3 * time.Second):
+				Fail("timeout waiting for notification")
+			}
+
+			Expect(msg.Subject).NotTo(ContainSubstring(mustNotContain))
+			Expect(msg.TextBody).NotTo(ContainSubstring(mustNotContain))
+		},
+
+		Entry("Share Created", events.Event{
+			Event: events.ShareCreated{
+				Sharer:        sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				CTime:         utils.TimeToTS(time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC)),
+				ItemID:        vaultResourceID,
+			},
+		}, "report.pdf"),
+
+		Entry("Share Expired", events.Event{
+			Event: events.ShareExpired{
+				ShareOwner:    sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				ExpiredAt:     time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC),
+				ItemID:        vaultResourceID,
+			},
+		}, "report.pdf"),
+
+		Entry("Share Removed", events.Event{
+			Event: events.ShareRemoved{
+				Executant:     sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				ItemID:        vaultResourceID,
+			},
+		}, "report.pdf"),
+
+		Entry("Added to Space", events.Event{
+			Event: events.SpaceShared{
+				Executant:     sharer.GetId(),
+				Creator:       sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				ID:            vaultSpaceID,
+			},
+		}, "vault space"),
+
+		Entry("Removed from Space", events.Event{
+			Event: events.SpaceUnshared{
+				Executant:     sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				ID:            vaultSpaceID,
+			},
+		}, "vault space"),
+
+		Entry("Space Expired", events.Event{
+			Event: events.SpaceMembershipExpired{
+				SpaceOwner:    sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				SpaceID:       vaultSpaceID,
+				SpaceName:     "vault space",
+				ExpiredAt:     time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC),
+			},
+		}, "vault space"),
 	)
 })
 
@@ -1276,6 +1371,17 @@ type testChannel struct {
 	expectedHTMLBody    string
 	expectedSender      string
 	done                chan struct{}
+}
+
+// capturingChannel hands the sent message to the caller instead of asserting on it itself,
+// for tests that need to inspect the message rather than match it exactly.
+type capturingChannel struct {
+	out chan *channels.Message
+}
+
+func (c capturingChannel) SendMessage(_ context.Context, m *channels.Message) error {
+	c.out <- m
+	return nil
 }
 
 func (tc testChannel) SendMessage(_ context.Context, m *channels.Message) error {
