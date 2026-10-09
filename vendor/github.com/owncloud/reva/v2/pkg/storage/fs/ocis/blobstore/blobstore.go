@@ -26,6 +26,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/owncloud/reva/v2/pkg/utils"
@@ -112,6 +113,9 @@ func (bs *Blobstore) Download(node *node.Node) (io.ReadCloser, error) {
 	dest := bs.Path(node)
 	file, err := os.Open(dest)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, errtypes.NotFound(dest)
+		}
 		return nil, errors.Wrapf(err, "could not read blob '%s'", dest)
 	}
 	return file, nil
