@@ -42,5 +42,9 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingLDAPBindPassword(cfg.Service.Name)
 	}
 
+	if cfg.AuthProvider == "ldap" && cfg.AuthProviders.LDAP.MasterID != "" && cfg.AuthProviders.LDAP.UserFilter == "" {
+		return shared.MissingLDAPUserFilterForMasterID(cfg.Service.Name)
+	}
+
 	return nil
 }
