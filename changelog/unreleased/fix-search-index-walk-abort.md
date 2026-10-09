@@ -21,5 +21,5 @@ rest of the space. The threshold became configurable with
 `SEARCH_EXTRACTOR_MAX_CONSECUTIVE_FAILURES` (default 5, unchanged; 0 never
 aborts; negative values are rejected).
 
-https://github.com/owncloud/ocis/issues/13033
 https://github.com/owncloud/ocis/pull/13034
+https://github.com/owncloud/ocis/issues/13033
