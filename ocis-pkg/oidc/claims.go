@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -17,6 +18,13 @@ const (
 	OwncloudUUID      = "ownclouduuid"
 	OcisRoutingPolicy = "ocis.routing.policy"
 )
+
+// ErrMissingClaim is wrapped by WalkSegments when an intermediate segment of the
+// path is not present in the claims at all, as opposed to being present and
+// holding something the walk cannot descend into. Callers that need to tell "the
+// token is silent about this" apart from "the token says something here that we
+// cannot read" can check for it with errors.Is.
+var ErrMissingClaim = errors.New("claim path segment not present")
 
 // SplitWithEscaping splits s into segments using separator which can be escaped using the escape string
 // See https://codereview.stackexchange.com/a/280193
@@ -37,6 +45,8 @@ func WalkSegments(segments []string, claims map[string]interface{}) (interface{}
 	i := 0
 	for ; i < len(segments)-1; i++ {
 		switch castedClaims := claims[segments[i]].(type) {
+		case nil:
+			return nil, fmt.Errorf("%w: %q", ErrMissingClaim, segments[i])
 		case map[string]interface{}:
 			claims = castedClaims
 		case map[interface{}]interface{}:
