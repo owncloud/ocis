@@ -482,9 +482,9 @@ jobs:
           # - suite: oidc-iframe
           #   args: "--type playwright specs/oidc/iframeTokenRenewal.spec.ts"
           #   oidc_iframe: true
-          # - suite: app-provider
-          #   args: "--type playwright --suites app-provider"
-          #   collaboration: true
+          - suite: app-provider
+            args: "--type playwright --suites app-provider"
+            collaboration: true
           # - suite: ocm
           #   args: "--type playwright --suites ocm"
           #   federated: true
@@ -540,13 +540,83 @@ jobs:
         run: make -C tests/config/k8s create-cluster
 
       - name: Prepare Helm Charts
+        env:
+          ENABLE_WOPI: ${{ matrix.suite == 'app-provider' }}
         run: make -C tests/config/k8s prepare-charts
+
+      - name: Deploy Suite-Specific External Backends
+        run: |
+          if [[ "${{ matrix.suite }}" == "app-provider" ]]; then
+            # Start Collabora
+            docker run -d \
+              --name collabora \
+              --network host \
+              --entrypoint bash \
+              -e DONT_GEN_SSL_CERT=set \
+              -e "extra_params=--o:ssl.enable=true --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=https://127.0.0.1:9200" \
+              collabora/code:25.04.7.3.1 \
+              -c "coolconfig generate-proof-key && bash /start-collabora-online.sh"
+            timeout 150 bash -c 'until curl -kfsSL https://localhost:9980/hosting/discovery > /dev/null; do sleep 5; done'
+            echo "collabora ready."
+
+            # Start OnlyOffice
+            docker run -d \
+              --name onlyoffice \
+              -p 7443:443 \
+              --add-host "$TEST_SERVER_DOMAIN:host-gateway" \
+              -e WOPI_ENABLED=true \
+              -e USE_UNAUTHORIZED_STORAGE=true \
+              -v "$(pwd)/tests/config/ci/only-office.json:/tmp/local.json:ro" \
+              --entrypoint /bin/sh \
+              onlyoffice/documentserver:9.2.1 \
+              -c "set -e
+            cp /tmp/local.json /etc/onlyoffice/documentserver/local.json
+            openssl req -x509 -newkey rsa:4096 -keyout onlyoffice.key -out onlyoffice.crt -sha256 -days 365 -batch -nodes
+            mkdir -p /var/www/onlyoffice/Data/certs
+            cp onlyoffice.key /var/www/onlyoffice/Data/certs/
+            cp onlyoffice.crt /var/www/onlyoffice/Data/certs/
+            chmod 400 /var/www/onlyoffice/Data/certs/onlyoffice.key
+            /app/ds/run-document-server.sh"
+            timeout 150 bash -c 'until curl -kfsSL https://localhost:7443/hosting/discovery > /dev/null; do sleep 5; done'
+            echo "onlyoffice ready."
+
+            #Start FakeOffice
+            docker run -d --name fakeoffice --network host \
+              -v "$(pwd):/ocis:ro" \
+              python:3-alpine \
+              python3 -c "
+            import http.server, pathlib
+            body = pathlib.Path('/ocis/tests/config/ci/hosting-discovery.xml').read_bytes()
+            class H(http.server.BaseHTTPRequestHandler):
+                def do_GET(self):
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'text/xml')
+                    self.end_headers()
+                    self.wfile.write(body)
+                def log_message(self, *a): pass
+            http.server.HTTPServer(('', 8080), H).serve_forever()
+            "
+            timeout 60 bash -c 'until curl -fsSL http://localhost:8080/hosting/discovery > /dev/null; do sleep 5; done'
+            echo "fakeoffice ready."
+
+            bash tests/config/k8s/expose-external-svc.sh collabora:9980
+            bash tests/config/k8s/expose-external-svc.sh onlyoffice:7443
+            bash tests/config/k8s/expose-external-svc.sh fakeoffice:8080
+          fi
 
       - name: Deploy oCIS
         run: |
           cd tests/config/k8s
           kubectl get pods -n "$TEST_SERVER_DOMAIN" -Aw &
           make deploy-ocis
+
+      - name: Expose node ports
+        if: ${{ matrix.suite == 'app-provider' }}
+        run: |
+          bash tests/config/k8s/expose-nodeports.sh collaboration-collabora 9300 30300
+          bash tests/config/k8s/expose-nodeports.sh collaboration-fakeoffice 9300 30301
+          bash tests/config/k8s/expose-nodeports.sh collaboration-onlyoffice 9300 30302
+          bash tests/config/k8s/expose-nodeports.sh collaboration-fakeoffice 9304 30304
 
       - name: Wait for oCIS to be ready
         env:
@@ -618,6 +688,7 @@ jobs:
           E2E_ARGS: "${{ matrix.args }}"
           K8S: ${{ env.K8S }}
           TEST_SERVER_URL: ${{ env.TEST_SERVER_URL }}
+          COLLABORATION_NEEDED: ${{ matrix.collaboration == true && 'true' || 'false' }}
         run: python3 tests/acceptance/run-e2e.py
 
       - name: Upload Playwright traces
