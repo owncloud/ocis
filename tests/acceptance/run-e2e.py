@@ -152,6 +152,11 @@ def main() -> int:
             "REPORT_TRACING": "false",
             "BROWSER": "chromium",
         }
+        if os.environ.get("FEDERATED_NEEDED", "").lower() == "true":
+            federated_url = os.environ["FED_SERVER_URL"]
+            wait_for(lambda: ocis_healthy(federated_url), 120, "ocis-federated")
+            print("ocis-federated ready.")
+            playwright_env["FEDERATED_BASE_URL_OCIS"] = federated_url
         print(f"Running e2e: {e2e_args}")
         result = subprocess.run(
             ["bash", "run-e2e.sh"] + shlex.split(e2e_args),

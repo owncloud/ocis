@@ -78,6 +78,32 @@ fi
 
 if [[ "$ENABLE_OCM" == "true" ]]; then
     sed -i '/ocm:/{n;s|false|true|}' $CFG_DIR/values.yaml
+    # enabling the ocm backend service does NOT make the web UI show the
+    # "open-cloud-mesh" app -- that's gated by services.web.config.apps, which
+    # the chart leaves unset by default so it falls back to the ocis binary's
+    # own default list (services/web/pkg/config/defaults/defaultconfig.go),
+    # and that list doesn't include "ocm". Since Helm's `with` fully replaces
+    # the array rather than merging, we must repeat the full default list here
+    # (see run-e2e.py's equivalent gha_web_cfg["apps"].append("ocm") for the
+    # non-k8s path).
+    sed -i '/^  web:/a\
+    config:\
+      apps:\
+        - files\
+        - search\
+        - text-editor\
+        - mermaid-editor\
+        - pdf-viewer\
+        - external\
+        - admin-settings\
+        - epub-reader\
+        - preview\
+        - app-store\
+        - ocm' $CFG_DIR/values.yaml
+fi
+
+if [[ "$ENABLE_OCM" == "true" ]]; then
+    sed -i '/ocm:/{n;s|false|true|}' $CFG_DIR/values.yaml
 fi
 
 if [[ "$ENABLE_AUTH_APP" == "true" ]]; then

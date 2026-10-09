@@ -485,9 +485,9 @@ jobs:
           # - suite: app-provider
           #   args: "--type playwright --suites app-provider"
           #   collaboration: true
-          # - suite: ocm
-          #   args: "--type playwright --suites ocm"
-          #   federated: true
+          - suite: ocm
+            args: "--type playwright --suites ocm"
+            federated: true
           # - suite: vault-storage
           #   args: "--type playwright --suites vault-storage"
           #   vault_storage: true
@@ -540,13 +540,23 @@ jobs:
         run: make -C tests/config/k8s create-cluster
 
       - name: Prepare Helm Charts
-        run: make -C tests/config/k8s prepare-charts
+        env:
+          ENABLE_OCM: ${{ matrix.suite == 'ocm' }}
+        run: |
+          cd tests/config/k8s
+          make prepare-charts
+          if [[ "${{ matrix.suite }}" == "ocm" ]]; then
+            OCM=true make prepare-charts
+          fi
 
       - name: Deploy oCIS
         run: |
           cd tests/config/k8s
           kubectl get pods -n "$TEST_SERVER_DOMAIN" -Aw &
           make deploy-ocis
+          if [[ "${{ matrix.suite }}"  == "ocm" ]]; then
+            OCM=true make deploy-ocis
+          fi
 
       - name: Wait for oCIS to be ready
         env:
@@ -618,6 +628,8 @@ jobs:
           E2E_ARGS: "${{ matrix.args }}"
           K8S: ${{ env.K8S }}
           TEST_SERVER_URL: ${{ env.TEST_SERVER_URL }}
+          FED_SERVER_URL: ${{ env.FED_SERVER_URL }}
+          FEDERATED_NEEDED: ${{ matrix.federated == true && 'true' || 'false' }}
         run: python3 tests/acceptance/run-e2e.py
 
       - name: Upload Playwright traces
