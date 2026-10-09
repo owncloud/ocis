@@ -38,6 +38,7 @@ import { computed, defineComponent, unref } from 'vue'
 import { useGettext } from 'vue3-gettext'
 import { storeToRefs } from 'pinia'
 import {
+  createLocationSpaces,
   queryItemAsString,
   useConfigStore,
   useRouteQuery,
@@ -51,6 +52,7 @@ export default defineComponent({
     const { currentTheme } = storeToRefs(themeStore)
     const configStore = useConfigStore()
     const redirectUrlQuery = useRouteQuery('redirectUrl')
+    const reasonQuery = useRouteQuery('reason')
 
     const { $gettext } = useGettext()
 
@@ -58,18 +60,32 @@ export default defineComponent({
     const footerSlogan = computed(() => currentTheme.value.common.slogan)
     const logoImg = computed(() => currentTheme.value.logo.login)
 
+    // "forbidden" means the user is still logged in but lacks permission for this area
+    // (e.g. no Vault access) — distinct from an actual session/logout problem.
+    const isForbidden = computed(() => queryItemAsString(unref(reasonQuery)) === 'forbidden')
+
     const cardTitle = computed(() => {
-      return $gettext('Not logged in')
+      return isForbidden.value ? $gettext('Access denied') : $gettext('Not logged in')
     })
     const cardHint = computed(() => {
-      return $gettext(
-        'This could be because of a routine safety log out, or because your account is either inactive or not yet authorized for use. Please try logging in after a while or seek help from your Administrator.'
-      )
+      return isForbidden.value
+        ? $gettext('You do not have permission to access this area. You are still logged in.')
+        : $gettext(
+            'This could be because of a routine safety log out, or because your account is either inactive or not yet authorized for use. Please try logging in after a while or seek help from your Administrator.'
+          )
     })
     const navigateToLoginText = computed(() => {
-      return $gettext('Log in again')
+      return isForbidden.value ? $gettext('Go back') : $gettext('Log in again')
     })
     const logoutButtonsAttrs = computed(() => {
+      // Still logged in — send back into the app, not through the login flow.
+      if (isForbidden.value) {
+        return {
+          type: 'router-link',
+          to: createLocationSpaces('files-spaces-generic')
+        }
+      }
+
       const redirectUrl = queryItemAsString(unref(redirectUrlQuery))
       if (configStore.options.loginUrl) {
         const configLoginURL = new URL(encodeURI(configStore.options.loginUrl))
