@@ -22,9 +22,10 @@ type Config struct {
 
 	API API `yaml:"api"`
 
-	Reva          *shared.Reva          `yaml:"reva"`
-	TokenManager  *TokenManager         `yaml:"token_manager"`
-	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
+	Reva              *shared.Reva              `yaml:"reva"`
+	TokenManager      *TokenManager             `yaml:"token_manager"`
+	GRPCClientTLS     *shared.GRPCClientTLS     `yaml:"grpc_client_tls"`
+	GRPCClientOptions *shared.GRPCClientOptions `yaml:"grpc_client_options"`
 
 	Application       Application  `yaml:"application"`
 	Spaces            Spaces       `yaml:"spaces"`
@@ -43,6 +44,8 @@ type Config struct {
 	Validation Validation `yaml:"validation"`
 
 	EnableVaultMode bool `yaml:"enable_vault_mode" env:"OCIS_ENABLE_VAULT_MODE;GRAPH_ENABLE_VAULT_MODE" desc:"Enable vault mode in addition to the regular graph service. This only applies when the additional storage-users-vault service is running, which is a special configured storage-users service." introductionVersion:"8.1.0"`
+
+	DefaultVaultShareExpirationDays int `yaml:"default_vault_share_expiration_days" env:"OCIS_DEFAULT_VAULT_SHARE_EXPIRATION_DAYS;GRAPH_DEFAULT_VAULT_SHARE_EXPIRATION_DAYS" desc:"The default expiration, in days, applied to a vault user or group share created without an explicit expiration date. Space memberships are exempt." introductionVersion:"9.0.0"`
 
 	EnableUserSharing bool `yaml:"enable_user_sharing" env:"OCIS_ENABLE_USER_SHARING" desc:"Enables direct sharing with users and groups. When disabled, creating new user, group or federated shares via the drive item invite endpoints is rejected. Public link sharing and space membership are not affected." introductionVersion:"8.2.0"`
 
@@ -122,7 +125,7 @@ type LDAP struct {
 	InstanceMapperIDAttribute      string `yaml:"instance_mapper_id_attribute" env:"OCIS_LDAP_INSTANCE_MAPPER_ID_ATTRIBUTE" desc:"LDAP Attribute of the instance ID. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
 	CrossInstanceReferenceTemplate string `yaml:"cross_instance_reference_template" env:"OCIS_LDAP_CROSS_INSTANCE_REFERENCE_TEMPLATE" desc:"Template for the users unique reference across oCIS instances. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
 	InstanceURLTemplate            string `yaml:"instance_url_template" env:"OCIS_LDAP_INSTANCE_URL_TEMPLATE" desc:"Template for the instance URL. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
-	InstanceMapperCacheTTL         int    `yaml:"instance_mapper_cache_ttl" env:"OCIS_LDAP_INSTANCE_MAPPER_CACHE_TTL" desc:"Max TTL in seconds for the LDAP instance mapper cache. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.3.0"`
+	InstanceMapperCacheTTL         int    `yaml:"instance_mapper_cache_ttl" env:"OCIS_LDAP_INSTANCE_MAPPER_CACHE_TTL" desc:"Max TTL in seconds for the LDAP instance mapper cache. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"9.0.0"`
 }
 
 // LDAPEducationConfig represents the LDAP configuration for education related resources
@@ -191,7 +194,7 @@ type ServiceAccount struct {
 
 type Validation struct {
 	MaxTagLength     int    `yaml:"max_tag_length" env:"OCIS_MAX_TAG_LENGTH" desc:"Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags." introductionVersion:"7.2.0"`
-	MaxImageFileSize string `yaml:"max_image_file_size" env:"GRAPH_MAX_IMAGE_FILE_SIZE" desc:"The maximum file size of an image which can be set as a space image. Must be less than or equal to 'THUMBNAILS_MAX_INPUT_IMAGE_FILE_SIZE' of the thumbnails service, otherwise images between the two values are accepted but cannot be rendered. Usable common abbreviations: [KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 2GB. Set to 0 to not limit the file size." introductionVersion:"8.3.0"`
+	MaxImageFileSize string `yaml:"max_image_file_size" env:"GRAPH_MAX_IMAGE_FILE_SIZE" desc:"The maximum file size of an image which can be set as a space image. Must be less than or equal to 'THUMBNAILS_MAX_INPUT_IMAGE_FILE_SIZE' of the thumbnails service, otherwise images between the two values are accepted but cannot be rendered. Usable common abbreviations: [KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 2GB. Set to 0 to not limit the file size." introductionVersion:"9.0.0"`
 }
 
 // MultiInstanceConfig holds configuration for multi-instance-ocis

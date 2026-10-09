@@ -17,7 +17,8 @@ type Config struct {
 	GRPC GRPCConfig `yaml:"grpc"`
 	HTTP HTTP       `yaml:"http"`
 
-	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
+	GRPCClientTLS     *shared.GRPCClientTLS     `yaml:"grpc_client_tls"`
+	GRPCClientOptions *shared.GRPCClientOptions `yaml:"grpc_client_options"`
 
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *shared.Reva  `yaml:"reva"`

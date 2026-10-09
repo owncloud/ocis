@@ -2377,6 +2377,27 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @Then /^user "([^"]*)" should have a share "([^"]*)" with permissions role "([^"]*)" shared by user "([^"]*)" from space "([^"]*)"$/
+	 *
+	 * @param string $sharee
+	 * @param string $share
+	 * @param string $role
+	 * @param string $sharer
+	 * @param string $space
+	 *
+	 * @return void
+	 */
+	public function userShouldHaveShareWithPermissionsRole(
+		string $sharee,
+		string $share,
+		string $role,
+		string $sharer,
+		string $space,
+	): void {
+		$this->checkIfShareExists($share, $sharee, $sharer, $space, true, false, $role);
+	}
+
+	/**
 	 * @Then user :sharee should have the following resource shares:
 	 *
 	 * @param string $sharee
@@ -2498,6 +2519,36 @@ class SharingNgContext implements Context {
 				);
 			}
 		}
+	}
+
+	/**
+	 * @Then /^the last share invitation should have an expiration date approximately "([^"]*)" days from now$/
+	 *
+	 * @param string $days
+	 *
+	 * @return void
+	 */
+	public function theLastShareInvitationShouldHaveAnExpirationDateApproximatelyDaysFromNow(
+		string $days,
+	): void {
+		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent();
+		Assert::assertTrue(
+			isset($responseBody->value[0]->expirationDateTime),
+			"Expected the created share to have an 'expirationDateTime' but none was returned:\n"
+			. print_r($responseBody, true),
+		);
+		$actual = new DateTime($responseBody->value[0]->expirationDateTime);
+		$expected = (new DateTime())->modify("+" . (int)$days . " days");
+		$diffSeconds = \abs($actual->getTimestamp() - $expected->getTimestamp());
+		// allow a 1-minute tolerance to absorb request/processing latency, matching the
+		// backend unit test's own tolerance (BeTemporally("~", expectedDefault, time.Minute))
+		Assert::assertLessThanOrEqual(
+			60,
+			$diffSeconds,
+			"Expected an expiration date approximately $days days from now ("
+			. $expected->format(DATE_ATOM) . "), but got " . $actual->format(DATE_ATOM)
+			. " (difference of {$diffSeconds}s)",
+		);
 	}
 
 	/**

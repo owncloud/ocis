@@ -54,10 +54,11 @@ type Config struct {
 
 	Middleware Middleware `yaml:"middleware"`
 
-	Events           Events                `yaml:"events"`
-	GRPCClientTLS    *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
-	AutoAcceptShares bool                  `yaml:"auto_accept_shares" env:"FRONTEND_AUTO_ACCEPT_SHARES" desc:"Defines if shares should be auto accepted by default. Users can change this setting individually in their profile." introductionVersion:"5.0"`
-	ServiceAccount   ServiceAccount        `yaml:"service_account" mask:"struct"`
+	Events            Events                    `yaml:"events"`
+	GRPCClientTLS     *shared.GRPCClientTLS     `yaml:"grpc_client_tls"`
+	GRPCClientOptions *shared.GRPCClientOptions `yaml:"grpc_client_options"`
+	AutoAcceptShares  bool                      `yaml:"auto_accept_shares" env:"FRONTEND_AUTO_ACCEPT_SHARES" desc:"Defines if shares should be auto accepted by default. Users can change this setting individually in their profile." introductionVersion:"5.0"`
+	ServiceAccount    ServiceAccount            `yaml:"service_account" mask:"struct"`
 
 	PasswordPolicy PasswordPolicy `yaml:"password_policy"`
 	Validation     Validation     `yaml:"validation"`
@@ -69,6 +70,8 @@ type Config struct {
 	MultiFactorAuthentication MFAConfig `yaml:"mfa"`
 
 	EnableVaultMode bool `yaml:"enable_vault_mode" env:"OCIS_ENABLE_VAULT_MODE;FRONTEND_ENABLE_VAULT_MODE" desc:"Enable vault mode. When enabled, the capabilities endpoint will report vault as enabled and the capabilities?vault=true endpoint will return capabilities with public sharing and federation disabled." introductionVersion:"8.1.0"`
+
+	DefaultVaultShareExpirationDays int `yaml:"default_vault_share_expiration_days" env:"OCIS_DEFAULT_VAULT_SHARE_EXPIRATION_DAYS;FRONTEND_DEFAULT_VAULT_SHARE_EXPIRATION_DAYS" desc:"The default expiration, in days, applied to a vault user or group share created without an explicit expiration date. Reported via the vault capability so clients can reflect the admin-configured value. Must match the graph service's GRAPH_DEFAULT_VAULT_SHARE_EXPIRATION_DAYS." introductionVersion:"9.0.0"`
 
 	Context context.Context `yaml:"-"`
 }
@@ -147,9 +150,9 @@ type OCS struct {
 	StatCacheDisablePersistence   bool          `yaml:"stat_cache_disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE" desc:"Disable persistence of the cache. Only applies when using the 'nats-js-kv' store type. Defaults to false." introductionVersion:"5.0" deprecationVersion:"7.0.0" removalVersion:"%%NEXT_PRODUCTION_VERSION%%" deprecationInfo:"The use of OCIS_CACHE_DISABLE_PERSISTENCE in the frontend service is deprecated because the OCS API is deprecated" deprecationReplacement:""`
 	StatCacheAuthUsername         string        `yaml:"stat_cache_auth_username" env:"OCIS_CACHE_AUTH_USERNAME" desc:"The username to use for authentication. Only applies when using the 'nats-js-kv' store type." introductionVersion:"5.0" deprecationVersion:"7.0.0" removalVersion:"%%NEXT_PRODUCTION_VERSION%%" deprecationInfo:"The use of OCIS_CACHE_AUTH_USERNAME in the frontend service is deprecated because the OCS API is deprecated OCS API is deprecated" deprecationReplacement:""`
 	StatCacheAuthPassword         string        `yaml:"stat_cache_auth_password" env:"OCIS_CACHE_AUTH_PASSWORD" desc:"The password to use for authentication. Only applies when using the 'nats-js-kv' store type." introductionVersion:"5.0" deprecationVersion:"7.0.0" removalVersion:"%%NEXT_PRODUCTION_VERSION%%" deprecationInfo:"The use of OCIS_CACHE_AUTH_PASSWORD in the frontend service is deprecated because the OCS API is deprecated OCS API is deprecated" deprecationReplacement:""`
-	StatCacheEnableTLS            bool          `yaml:"stat_cache_enable_tls" env:"OCIS_CACHE_ENABLE_TLS" desc:"Activate TLS for the connection to the stat cache store. Only applies when using the 'nats-js-kv' store type." introductionVersion:"8.3.0"`
-	StatCacheTLSInsecure          bool          `yaml:"stat_cache_tls_insecure" env:"OCIS_CACHE_TLS_INSECURE" desc:"Disable TLS certificate verification for the stat cache store connection. Only applies when using the 'nats-js-kv' store type. Do not enable this in production because it disables authentication of the NATS server. Use it only for testing with self-signed certificates." introductionVersion:"8.3.0"`
-	StatCacheTLSRootCACertificate string        `yaml:"stat_cache_tls_root_ca_certificate" env:"OCIS_CACHE_TLS_ROOT_CA_CERTIFICATE" desc:"Path to the PEM-encoded root CA certificate for the stat cache store TLS connection. Only applies when using the 'nats-js-kv' store type." introductionVersion:"8.3.0"`
+	StatCacheEnableTLS            bool          `yaml:"stat_cache_enable_tls" env:"OCIS_CACHE_ENABLE_TLS" desc:"Activate TLS for the connection to the stat cache store. Only applies when using the 'nats-js-kv' store type." introductionVersion:"9.0.0"`
+	StatCacheTLSInsecure          bool          `yaml:"stat_cache_tls_insecure" env:"OCIS_CACHE_TLS_INSECURE" desc:"Disable TLS certificate verification for the stat cache store connection. Only applies when using the 'nats-js-kv' store type. Do not enable this in production because it disables authentication of the NATS server. Use it only for testing with self-signed certificates." introductionVersion:"9.0.0"`
+	StatCacheTLSRootCACertificate string        `yaml:"stat_cache_tls_root_ca_certificate" env:"OCIS_CACHE_TLS_ROOT_CA_CERTIFICATE" desc:"Path to the PEM-encoded root CA certificate for the stat cache store TLS connection. Only applies when using the 'nats-js-kv' store type." introductionVersion:"9.0.0"`
 
 	CacheWarmupDriver                    string             `yaml:"cache_warmup_driver,omitempty"`  // not supported by the oCIS product, therefore not part of docs
 	CacheWarmupDrivers                   CacheWarmupDrivers `yaml:"cache_warmup_drivers,omitempty"` // not supported by the oCIS product, therefore not part of docs
@@ -212,7 +215,6 @@ type Validation struct {
 
 // MFAConfig configures multi factor multifactor authentication
 type MFAConfig struct {
-	Enabled         bool     `yaml:"enabled" env:"OCIS_MFA_ENABLED" desc:"Set to true to enable multi factor authentication. See the documentation for more details." introductionVersion:"7.3.0"`
-	AuthLevelNames  []string `yaml:"auth_level_names" env:"OCIS_MFA_AUTH_LEVEL_NAMES" desc:"This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA)." introductionVersion:"7.3.0"`
-	SessionDuration int      `yaml:"session_duration" env:"OCIS_MFA_SESSION_DURATION" desc:"The duration in seconds that a multi-factor authentication session is valid. After this time the user will be prompted to re-authenticate. Defaults to 3600 (1 hour)." introductionVersion:"8.1.0"`
+	Enabled        bool     `yaml:"enabled" env:"OCIS_MFA_ENABLED" desc:"Set to true to enable multi factor authentication. See the documentation for more details." introductionVersion:"7.3.0"`
+	AuthLevelNames []string `yaml:"auth_level_names" env:"OCIS_MFA_AUTH_LEVEL_NAMES" desc:"This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA)." introductionVersion:"7.3.0"`
 }

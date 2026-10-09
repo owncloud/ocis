@@ -361,13 +361,13 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 							},
 							"auth": map[string]interface{}{
 								"mfa": map[string]interface{}{
-									"enabled":          cfg.MultiFactorAuthentication.Enabled,
-									"levelnames":       cfg.MultiFactorAuthentication.AuthLevelNames,
-									"session_duration": cfg.MultiFactorAuthentication.SessionDuration,
+									"enabled":    cfg.MultiFactorAuthentication.Enabled,
+									"levelnames": cfg.MultiFactorAuthentication.AuthLevelNames,
 								},
 							},
 							"vault": map[string]interface{}{
-								"enabled": cfg.EnableVaultMode,
+								"enabled":                       cfg.EnableVaultMode,
+								"default_share_expiration_days": cfg.DefaultVaultShareExpirationDays,
 							},
 						},
 						"version": map[string]interface{}{

@@ -55,6 +55,9 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.GRPCClientTLS == nil {
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 	}
+	if cfg.GRPCClientOptions == nil {
+		cfg.GRPCClientOptions = &shared.GRPCClientOptions{}
+	}
 	if cfg.GRPCServiceTLS == nil {
 		cfg.GRPCServiceTLS = &shared.GRPCServiceTLS{}
 	}
@@ -76,6 +79,10 @@ func EnsureCommons(cfg *config.Config) {
 
 	if cfg.GRPCClientTLS != nil {
 		cfg.Commons.GRPCClientTLS = cfg.GRPCClientTLS
+	}
+
+	if cfg.GRPCClientOptions != nil {
+		cfg.Commons.GRPCClientOptions = cfg.GRPCClientOptions
 	}
 
 	if cfg.GRPCServiceTLS != nil {

@@ -883,4 +883,32 @@ test.describe('link', () => {
     // And "Alice" logs out
     await ui.userLogsOut({ stepUser: 'Alice' })
   })
+
+  test('shows an error when a public link is blocked after too many failed password attempts', async () => {
+    await ui.userLogsIn({ stepUser: 'Alice' })
+
+    await ui.userCreatesResources({
+      stepUser: 'Alice',
+      resources: [{ name: 'test.txt', type: 'txtFile', content: 'some content' }]
+    })
+
+    await ui.userCreatesPublicLink({
+      stepUser: 'Alice',
+      resource: 'test.txt',
+      password: '%public%'
+    })
+
+    await ui.userOpensPublicLink({ stepUser: 'Anonymous', name: 'Unnamed link' })
+
+    for (let attempt = 0; attempt < 6; attempt++) {
+      await ui.userUnlocksPublicLink({
+        password: 'wrong-pw',
+        stepUser: 'Anonymous',
+        expectToSucceed: false
+      })
+    }
+    await ui.publicLinkShouldBeBlocked({ stepUser: 'Anonymous' })
+
+    await ui.userLogsOut({ stepUser: 'Alice' })
+  })
 })

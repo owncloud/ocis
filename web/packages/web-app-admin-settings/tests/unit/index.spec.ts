@@ -5,7 +5,7 @@ import { mock } from 'vitest-mock-extended'
 import * as pkg from '@ownclouders/web-pkg'
 import { AuthService } from '../../../web-runtime/src/services/auth/authService'
 
-const mockRequireAcr = vi.fn()
+const mockRequireAcr = vi.fn().mockResolvedValue(true)
 vi.spyOn(pkg, 'useAuthService').mockReturnValue(mock<AuthService>({ requireAcr: mockRequireAcr }))
 
 const getAbilityMock = (hasPermission: boolean) => mock<Ability>({ can: () => hasPermission })
@@ -168,6 +168,30 @@ describe('admin settings index', () => {
           const route = routes({ $ability: ability }).find((n) => n.path === path)
           await (route.beforeEnter as any)({ fullPath: path }, {}, vi.fn())
           expect(mockRequireAcr).toHaveBeenCalledWith('advanced', path)
+        }
+      )
+
+      it.each(['/general', '/users', '/groups', '/spaces'])(
+        'should leave admin settings if the MFA step-up failed when path is %s',
+        async (path) => {
+          mockRequireAcr.mockResolvedValueOnce(false)
+          const ability = mock<Ability>({ can: vi.fn(() => true) })
+          const route = routes({ $ability: ability }).find((n) => n.path === path)
+          const nextMock = vi.fn()
+          await (route.beforeEnter as any)({ fullPath: path }, {}, nextMock)
+          expect(nextMock).toHaveBeenCalledTimes(1)
+          expect(nextMock).toHaveBeenCalledWith({ path: '/' })
+        }
+      )
+
+      it.each(['/general', '/users', '/groups', '/spaces'])(
+        'should grant access if MFA is satisfied when path is %s',
+        async (path) => {
+          const ability = mock<Ability>({ can: vi.fn(() => true) })
+          const route = routes({ $ability: ability }).find((n) => n.path === path)
+          const nextMock = vi.fn()
+          await (route.beforeEnter as any)({ fullPath: path }, {}, nextMock)
+          expect(nextMock).toHaveBeenCalledWith()
         }
       )
     })

@@ -38,6 +38,8 @@ type Config struct {
 	Status  Status          `yaml:"-"`
 
 	AllowPropfindDepthInfinity bool `yaml:"allow_propfind_depth_infinity" env:"OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY" desc:"Allow the use of depth infinity in PROPFINDS. When enabled, a propfind will traverse through all subfolders. If many subfolders are expected, depth infinity can cause heavy server load and/or delayed response times." introductionVersion:"pre5.0"`
+
+	DisablePropfindPublicLinkResolution bool `yaml:"disable_propfind_public_link_resolution" env:"OCDAV_DISABLE_PROPFIND_PUBLIC_LINK_RESOLUTION" desc:"Disable the resolution of public link shares when answering PROPFIND requests. When disabled, the oc:share-type property will not be populated with public link share information, which can reduce load on services for large collections." introductionVersion:"9.0.0"`
 }
 
 type Log struct {

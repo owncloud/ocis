@@ -77,6 +77,7 @@ func DefaultConfig() *config.Config {
 			EnableTLS: false,
 		},
 		EnableExpiredSharesCleanup:  true,
+		JanitorRunInterval:          3600,
 		PublicShareMustHavePassword: true,
 		EnableUserSharing:           true,
 		EnablePublicSharing:         true,

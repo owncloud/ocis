@@ -43,16 +43,14 @@ export class ClientService {
   private webDavClient: WebDAV
 
   public initiatorId = uuidV4()
-  public lastSuccessfulRequestTime: number | null = null
 
   private staticHeaders: Record<string, string> = {
     'Initiator-ID': this.initiatorId,
     'X-Requested-With': 'XMLHttpRequest'
   }
 
-  private readonly maintenanceHandler = maintenanceResponseHandler(
-    (value: boolean) => this.configStore.setMaintenanceMode(value),
-    { onSuccess: () => (this.lastSuccessfulRequestTime = Math.floor(Date.now() / 1000)) }
+  private readonly maintenanceHandler = maintenanceResponseHandler((value: boolean) =>
+    this.configStore.setMaintenanceMode(value)
   )
 
   constructor(options: ClientServiceOptions) {

@@ -134,9 +134,10 @@ func DefaultConfig() *config.Config {
 			Cluster:   "ocis-cluster",
 			EnableTLS: false,
 		},
-		MaxConcurrency:            20,
-		ReceivedSharesStatTimeout: 10 * time.Second,
-		EnableUserSharing:         true,
+		MaxConcurrency:                  20,
+		ReceivedSharesStatTimeout:       10 * time.Second,
+		EnableUserSharing:               true,
+		DefaultVaultShareExpirationDays: 30,
 		UnifiedRoles: config.UnifiedRoles{
 			AvailableRoles: nil, // will be populated with defaults in EnsureDefaults
 		},
@@ -191,6 +192,9 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.GRPCClientTLS == nil && cfg.Commons != nil {
 		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
+	}
+	if cfg.GRPCClientOptions == nil && cfg.Commons != nil {
+		cfg.GRPCClientOptions = structs.CopyOrZeroValue(cfg.Commons.GRPCClientOptions)
 	}
 
 	if cfg.Commons != nil {

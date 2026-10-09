@@ -149,7 +149,7 @@
   },
   "peerDependencies": {
     "@vue/test-utils": "^2.4.6",
-    "vue": "^3.5.29"
+    "vue": "^3.5.43"
   },
   "peerDependenciesMeta": {
     "@vue/test-utils": {

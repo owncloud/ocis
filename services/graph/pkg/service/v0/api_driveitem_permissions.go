@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"slices"
 	"strings"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
@@ -177,6 +178,18 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 	var shareid string
 	var expiration *types.Timestamp
 	var cTime *types.Timestamp
+
+	// use the client-supplied expiration, else default vault shares to DefaultVaultShareExpirationDays;
+	// space memberships and non-vault shares are exempt
+	resourceID := statResponse.GetInfo().GetId()
+	var shareExpiration *types.Timestamp
+	switch {
+	case invite.ExpirationDateTime != nil:
+		shareExpiration = utils.TimeToTS(*invite.ExpirationDateTime)
+	case !IsSpaceRoot(resourceID) && IsVaultResource(resourceID):
+		shareExpiration = utils.TimeToTS(time.Now().UTC().AddDate(0, 0, s.config.DefaultVaultShareExpirationDays))
+	}
+
 	switch driveRecipient.GetLibreGraphRecipientType() {
 	case "group":
 		group, err := s.identityCache.GetGroup(ctx, objectID)
@@ -192,8 +205,8 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 			},
 		}
 		createShareRequest := createShareRequestToGroup(group, statResponse.GetInfo(), cs3ResourcePermissions)
-		if invite.ExpirationDateTime != nil {
-			createShareRequest.GetGrant().Expiration = utils.TimeToTS(*invite.ExpirationDateTime)
+		if shareExpiration != nil {
+			createShareRequest.GetGrant().Expiration = shareExpiration
 		}
 		createShareResponse, err := gatewayClient.CreateShare(ctx, createShareRequest)
 		if err := errorcode.FromCS3Status(createShareResponse.GetStatus(), err); err != nil {
@@ -246,8 +259,8 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 			}
 
 			createShareRequest := createShareRequestToFederatedUser(user, statResponse.GetInfo().GetId(), providerInfoResp.ProviderInfo, cs3ResourcePermissions)
-			if invite.ExpirationDateTime != nil {
-				createShareRequest.Expiration = utils.TimeToTS(*invite.ExpirationDateTime)
+			if shareExpiration != nil {
+				createShareRequest.Expiration = shareExpiration
 			}
 			createShareResponse, err := gatewayClient.CreateOCMShare(ctx, createShareRequest)
 			if err := errorcode.FromCS3Status(createShareResponse.GetStatus(), err); err != nil {
@@ -259,8 +272,8 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 			expiration = createShareResponse.GetShare().GetExpiration()
 		} else {
 			createShareRequest := createShareRequestToUser(user, statResponse.GetInfo(), cs3ResourcePermissions)
-			if invite.ExpirationDateTime != nil {
-				createShareRequest.GetGrant().Expiration = utils.TimeToTS(*invite.ExpirationDateTime)
+			if shareExpiration != nil {
+				createShareRequest.GetGrant().Expiration = shareExpiration
 			}
 			createShareResponse, err := gatewayClient.CreateShare(ctx, createShareRequest)
 			if err := errorcode.FromCS3Status(createShareResponse.GetStatus(), err); err != nil {

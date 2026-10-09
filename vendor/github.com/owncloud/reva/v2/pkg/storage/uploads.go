@@ -31,6 +31,19 @@ import (
 // UploadFinishedFunc is a callback function used in storage drivers to indicate that an upload has finished
 type UploadFinishedFunc func(spaceOwner, executant *userpb.UserId, ref *provider.Reference)
 
+type skipTouchPropagationKey struct{}
+
+// ContextSkipTouchPropagation tells TouchFile not to propagate.
+func ContextSkipTouchPropagation(ctx context.Context) context.Context {
+	return context.WithValue(ctx, skipTouchPropagationKey{}, true)
+}
+
+// SkipTouchPropagation reports whether TouchFile should skip propagation.
+func SkipTouchPropagation(ctx context.Context) bool {
+	skip, _ := ctx.Value(skipTouchPropagationKey{}).(bool)
+	return skip
+}
+
 // UploadRequest us used in FS.Upload() to carry required upload metadata
 type UploadRequest struct {
 	Ref    *provider.Reference
@@ -55,6 +68,14 @@ type UploadSessionLister interface {
 type OrphanChecker interface {
 	// IsOrphaned reports whether the referenced resource exists but its metadata is unreadable.
 	IsOrphaned(ctx context.Context, ref *provider.Reference) bool
+}
+
+// NodeCreator defines the interface for FS implementations whose PrepareUpload
+// creates a new file's node from UploadInfo.ParentID and Name, so an upload need
+// not TouchFile it first.
+type NodeCreator interface {
+	// PrepareCreatesNode reports whether PrepareUpload creates a missing node.
+	PrepareCreatesNode() bool
 }
 
 // UploadSession is the interface that storage drivers need to return whan listing upload sessions.

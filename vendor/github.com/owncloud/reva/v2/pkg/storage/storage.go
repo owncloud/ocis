@@ -83,11 +83,16 @@ type UploadInfo struct {
 	IfMatch           string
 	IfNoneMatch       string
 	IfUnmodifiedSince time.Time
+	// Where a new file goes, for a driver whose PrepareUpload creates it. Empty
+	// leaves a missing node NotFound.
+	ParentID string
+	Name     string
 }
 
 type PrepareUploadResult struct {
 	VersionCreated bool
 	SizeDiff       int64
+	SpaceOwner     *userpb.UserId // the space owner or a manager, for a new node; nil keeps the one already known
 }
 
 // RollbackInfo carries what a driver needs to undo PrepareUpload. NodeID and
@@ -135,7 +140,7 @@ type FS interface {
 	// CreateDir creates a resource of type container
 	CreateDir(ctx context.Context, ref *provider.Reference) (*CreateDirResult, error)
 	// TouchFile sets the mtime of a resource, creating an empty file if it does not exist
-	// FIXME(OCISDEV-900) remove markprocessing bool: coordinator calls MarkProcessing(true) explicitly after TouchFile
+	// FIXME(OCISDEV-900) remove markprocessing bool: PrepareUpload marks the node the coordinator touched
 	// FIXME the mtime should either be a time.Time or a CS3 Timestamp, not a string
 	TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool, mtime string) (*TouchFileResult, error)
 	// Delete deletes a resource.
@@ -155,7 +160,8 @@ type FS interface {
 	CommitUpload(ctx context.Context, ref *provider.Reference, sessionID string, source UploadSource) error
 	// PrepareUpload is called after all bytes are received and before postprocessing begins.
 	// Implementations may lock the target node, snapshot the previous version, write new metadata,
-	// and propagate size changes. Drivers that do not require any of these steps may return immediately.
+	// mark the node as processing for sessionID, and propagate size changes. Drivers that do not
+	// require any of these steps may return immediately.
 	PrepareUpload(ctx context.Context, ref *provider.Reference, sessionID string, info UploadInfo) (*PrepareUploadResult, error)
 	// RollbackUpload reverts node state after a failed or aborted postprocessing run.
 	// It is the inverse of PrepareUpload: restores previous metadata and reverts the optimistic

@@ -22,8 +22,9 @@ type Config struct {
 	HTTP HTTP       `yaml:"http"`
 	GRPC GRPCConfig `yaml:"grpc"`
 
-	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
-	GrpcClient    client.Client         `yaml:"-"`
+	GRPCClientTLS     *shared.GRPCClientTLS     `yaml:"grpc_client_tls"`
+	GRPCClientOptions *shared.GRPCClientOptions `yaml:"grpc_client_options"`
+	GrpcClient        client.Client             `yaml:"-"`
 
 	Metadata    Metadata              `yaml:"metadata_config"`
 	BundlesPath string                `yaml:"bundles_path" env:"SETTINGS_BUNDLES_PATH" desc:"The path to a JSON file with a list of bundles. If not defined, the default bundles will be loaded." introductionVersion:"pre5.0"`
@@ -56,16 +57,16 @@ type Metadata struct {
 
 // Cache configures the cache of the Metadata store
 type Cache struct {
-	Store              string        `yaml:"store" env:"OCIS_CACHE_STORE;SETTINGS_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details." introductionVersion:"pre5.0"`
-	Nodes              []string      `yaml:"addresses" env:"OCIS_CACHE_STORE_NODES;SETTINGS_CACHE_STORE_NODES" desc:"A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
-	Database           string        `yaml:"database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"pre5.0"`
-	FileTable          string        `yaml:"files_table" env:"SETTINGS_FILE_CACHE_TABLE" desc:"The database table the store should use for the file cache." introductionVersion:"pre5.0"`
-	DirectoryTable     string        `yaml:"directories_table" env:"SETTINGS_DIRECTORY_CACHE_TABLE" desc:"The database table the store should use for the directory cache." introductionVersion:"pre5.0"`
-	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;SETTINGS_CACHE_TTL" desc:"Default time to live for entries in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
-	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;SETTINGS_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"5.0"`
-	AuthUsername            string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;SETTINGS_CACHE_AUTH_USERNAME" desc:"The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
-	AuthPassword            string        `yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;SETTINGS_CACHE_AUTH_PASSWORD" desc:"The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
-	EnableTLS               bool          `yaml:"enable_tls" env:"OCIS_CACHE_ENABLE_TLS;SETTINGS_CACHE_ENABLE_TLS" desc:"Activate TLS for the connection to the cache store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
-	TLSInsecure             bool          `yaml:"tls_insecure" env:"OCIS_CACHE_TLS_INSECURE;SETTINGS_CACHE_TLS_INSECURE" desc:"Disable TLS certificate verification for the cache store connection. Only applies when store type 'nats-js-kv' is configured. Do not enable this in production because it disables authentication of the NATS server. Use it only for testing with self-signed certificates." introductionVersion:"8.3.0"`
-	TLSRootCACertificate    string        `yaml:"tls_root_ca_certificate" env:"OCIS_CACHE_TLS_ROOT_CA_CERTIFICATE;SETTINGS_CACHE_TLS_ROOT_CA_CERTIFICATE" desc:"Path to the PEM-encoded root CA certificate for the cache store TLS connection. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
+	Store                string        `yaml:"store" env:"OCIS_CACHE_STORE;SETTINGS_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details." introductionVersion:"pre5.0"`
+	Nodes                []string      `yaml:"addresses" env:"OCIS_CACHE_STORE_NODES;SETTINGS_CACHE_STORE_NODES" desc:"A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
+	Database             string        `yaml:"database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"pre5.0"`
+	FileTable            string        `yaml:"files_table" env:"SETTINGS_FILE_CACHE_TABLE" desc:"The database table the store should use for the file cache." introductionVersion:"pre5.0"`
+	DirectoryTable       string        `yaml:"directories_table" env:"SETTINGS_DIRECTORY_CACHE_TABLE" desc:"The database table the store should use for the directory cache." introductionVersion:"pre5.0"`
+	TTL                  time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;SETTINGS_CACHE_TTL" desc:"Default time to live for entries in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
+	DisablePersistence   bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;SETTINGS_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"5.0"`
+	AuthUsername         string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;SETTINGS_CACHE_AUTH_USERNAME" desc:"The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	AuthPassword         string        `yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;SETTINGS_CACHE_AUTH_PASSWORD" desc:"The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	EnableTLS            bool          `yaml:"enable_tls" env:"OCIS_CACHE_ENABLE_TLS;SETTINGS_CACHE_ENABLE_TLS" desc:"Activate TLS for the connection to the cache store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"9.0.0"`
+	TLSInsecure          bool          `yaml:"tls_insecure" env:"OCIS_CACHE_TLS_INSECURE;SETTINGS_CACHE_TLS_INSECURE" desc:"Disable TLS certificate verification for the cache store connection. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"9.0.0"`
+	TLSRootCACertificate string        `yaml:"tls_root_ca_certificate" env:"OCIS_CACHE_TLS_ROOT_CA_CERTIFICATE;SETTINGS_CACHE_TLS_ROOT_CA_CERTIFICATE" desc:"Path to the PEM-encoded root CA certificate for the cache store TLS connection. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"9.0.0"`
 }
