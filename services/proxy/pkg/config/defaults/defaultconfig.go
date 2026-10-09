@@ -275,6 +275,14 @@ func DefaultPolicies() []config.Policy {
 					Service:  "com.owncloud.web.graph",
 				},
 				{
+					Endpoint: "/vault/graph/v1beta1/extensions/org.libregraph/activities",
+					Service:  "com.owncloud.web.activitylog",
+				},
+				{
+					Endpoint: "/vault/graph/v1.0/invitations",
+					Service:  "com.owncloud.web.invitations",
+				},
+				{
 					Endpoint: "/vault/graph/",
 					Service:  "com.owncloud.web.graph",
 				},
