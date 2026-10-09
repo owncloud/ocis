@@ -105,6 +105,15 @@ func (m accountResolver) verifyUser(w http.ResponseWriter, req *http.Request, us
 		return
 	}
 
+	if errors.Is(err, backend.ErrAccountNotFound) {
+		// the identity backend excludes disabled accounts from by-claim
+		// lookups, so a disabled account also ends up here, not just a
+		// genuinely unknown username.
+		m.logger.Debug().Interface("user", user).Msg("Not found")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	if err != nil {
 		m.logger.Error().Err(err).Msg("Could not get user by claim")
 		w.WriteHeader(http.StatusInternalServerError)
