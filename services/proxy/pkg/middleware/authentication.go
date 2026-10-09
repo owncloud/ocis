@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -9,6 +10,8 @@ import (
 	"strings"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/webdav"
 	"golang.org/x/text/cases"
@@ -211,4 +214,23 @@ func evalRequestURI(l userAgentLocker, r regexp.Regexp) {
 			return
 		}
 	}
+}
+
+func FindCurrentUserRolesAsClaims(ctx context.Context, roleManager roles.Manager, rolesMap []config.RoleMapping, userID string) ([]string, error) {
+	roleIDs, err := roleManager.FindRoleIDsForUser(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	roles := roleManager.List(ctx, roleIDs)
+	claimRoles := make([]string, 0, len(roles)) // append in case role isn't mapped
+	for _, role := range roles {
+		roleName := role.Name
+		for _, item := range rolesMap {
+			if item.RoleName == roleName {
+				claimRoles = append(claimRoles, item.ClaimValue)
+			}
+		}
+	}
+	return claimRoles, nil
 }

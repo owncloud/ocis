@@ -18,6 +18,7 @@ import (
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
+	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/ocis-pkg/runner"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
@@ -287,8 +288,10 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 	if cfg.EnableBasicAuth {
 		logger.Warn().Msg("basic auth enabled, use only for testing or development")
 		authenticators = append(authenticators, middleware.BasicAuthenticator{
-			Logger:       logger,
-			UserProvider: userProvider,
+			Logger:         logger,
+			UserProvider:   userProvider,
+			RoleManager:    roles.NewManager(roles.Logger(logger), roles.RoleService(rolesClient)),
+			RoleAssignment: cfg.RoleAssignment,
 		})
 	}
 
@@ -296,6 +299,8 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 		authenticators = append(authenticators, middleware.AppAuthAuthenticator{
 			Logger:              logger,
 			RevaGatewaySelector: gatewaySelector,
+			RoleManager:         roles.NewManager(roles.Logger(logger), roles.RoleService(rolesClient)),
+			RoleAssignment:      cfg.RoleAssignment,
 		})
 	}
 
