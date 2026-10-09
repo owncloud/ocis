@@ -22,12 +22,14 @@ import (
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/event"
+	"github.com/owncloud/ocis/v2/services/storage-users/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/revaconfig"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/storage"
 	"github.com/owncloud/reva/v2/pkg/storage/fs/registry"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/node"
+	"github.com/owncloud/reva/v2/pkg/upload"
 	"github.com/owncloud/reva/v2/pkg/utils"
 )
 
@@ -125,15 +127,21 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 				os.Exit(1)
 			}
 			drivers := revaconfig.StorageProviderDrivers(cfg)
-			fs, err := f(drivers[cfg.Driver].(map[string]interface{}), nil, nil)
+			driverConf, ok := drivers[cfg.Driver].(map[string]interface{})
+			if !ok {
+				fmt.Fprintf(os.Stderr, "No configuration found for filesystem driver '%s'\n", cfg.Driver)
+				os.Exit(1)
+			}
+			fs, err := f(driverConf, nil, nil)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Failed to initialize filesystem driver '%s'\n", cfg.Driver)
 				return err
 			}
 
-			managingFS, ok := fs.(storage.UploadSessionLister)
-			if !ok {
-				fmt.Fprintf(os.Stderr, "'%s' storage does not support listing upload sessions\n", cfg.Driver)
+			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			coord, err := upload.NewCoordinatorFromConfig("", driverConf, fs, nil, &logger.Logger, false)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Failed to initialize the upload coordinator: %v\n", err)
 				os.Exit(1)
 			}
 
@@ -147,7 +155,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 			}
 
 			filter := buildFilter(c)
-			uploads, err := managingFS.ListUploadSessions(c.Context, filter)
+			uploads, err := coord.ListUploadSessions(c.Context, filter)
 			if err != nil {
 				return err
 			}
