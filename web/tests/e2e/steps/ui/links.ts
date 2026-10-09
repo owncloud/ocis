@@ -281,3 +281,25 @@ export async function userChangesThePasswordOfPublicLink({
   const linkObject = new objects.applicationFiles.Link({ page })
   await linkObject.addPassword({ resource, linkName, newPassword })
 }
+
+export const userCopiesResourcePermanentLink = async ({ stepUser, resource }) => {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+
+  const resourceRow = page.getByRole('row', { name: resource })
+  await resourceRow.getByRole('button', { name: 'Show context menu' }).click()
+  await page.getByRole('button', { name: 'Copy permanent link' }).click()
+  await page
+    .getByRole('status')
+    .filter({ hasText: 'The link has been copied to your clipboard.' })
+    .waitFor()
+
+  return await page.evaluate(() => navigator.clipboard.readText())
+}
+
+export const userOpensPermanentLink = async ({ stepUser, permanentLink }) => {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+
+  await page.goto(permanentLink)
+}
