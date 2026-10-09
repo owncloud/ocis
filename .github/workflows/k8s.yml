@@ -447,7 +447,7 @@ jobs:
   e2e-tests:
     name: e2e-${{ matrix.suite }}-k8s
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
 
     if: >-
       github.event_name == 'schedule' ||
@@ -459,7 +459,38 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - suite: smoke
+          # - suite: part-1
+          #   args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 1"
+          - suite: part-2
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 2"
+          # - suite: part-3
+          #   args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 3"
+          # - suite: part-4
+          #   args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 4"
+          # - suite: search
+          #   args: "--type playwright --suites search"
+          #   tika: true
+          # - suite: keycloak
+          #   args: "--type playwright --suites journeys,keycloak"
+          #   keycloak: true
+          # - suite: mfa
+          #   args: "--type playwright --suites mfa"
+          #   mfa: true
+          # - suite: oidc
+          #   args: "--type playwright specs/oidc/refreshToken.spec.ts"
+          #   oidc: true
+          # - suite: oidc-iframe
+          #   args: "--type playwright specs/oidc/iframeTokenRenewal.spec.ts"
+          #   oidc_iframe: true
+          # - suite: app-provider
+          #   args: "--type playwright --suites app-provider"
+          #   collaboration: true
+          # - suite: ocm
+          #   args: "--type playwright --suites ocm"
+          #   federated: true
+          # - suite: vault-storage
+          #   args: "--type playwright --suites vault-storage"
+          #   vault_storage: true
 
     steps:
       - name: Checkout
@@ -584,7 +615,7 @@ jobs:
 
       - name: Run e2e ${{ matrix.suite }} tests
         env:
-          E2E_ARGS: "--suites ${{ matrix.suite }}"
+          E2E_ARGS: "${{ matrix.args }}"
           K8S: ${{ env.K8S }}
           TEST_SERVER_URL: ${{ env.TEST_SERVER_URL }}
         run: python3 tests/acceptance/run-e2e.py
