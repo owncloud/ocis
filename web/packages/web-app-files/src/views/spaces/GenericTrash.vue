@@ -11,13 +11,13 @@
       <template v-else>
         <no-content-message
           v-if="isEmpty"
-          id="files-trashbin-empty"
+          :id="loadFailed ? 'files-trashbin-forbidden' : 'files-trashbin-empty'"
           class="files-empty"
           icon="delete-bin-7"
           icon-fill-type="line"
         >
           <template #message>
-            <span>{{ emptyTrashMessage }}</span>
+            <span>{{ loadFailed ? loadFailedMessage : emptyTrashMessage }}</span>
           </template>
         </no-content-message>
         <resource-table
@@ -55,7 +55,13 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia'
 
-import { AppBar, ContextActions, FileSideBar, useUserStore } from '@ownclouders/web-pkg'
+import {
+  AppBar,
+  ContextActions,
+  FileSideBar,
+  useResourcesStore,
+  useUserStore
+} from '@ownclouders/web-pkg'
 import FilesViewWrapper from '../../components/FilesViewWrapper.vue'
 import ListInfo from '../../components/FilesList/ListInfo.vue'
 import { ResourceTable } from '@ownclouders/web-pkg'
@@ -79,6 +85,8 @@ const { space = null } = defineProps<Props>()
 const { $gettext } = useGettext()
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
+const resourcesStore = useResourcesStore()
+const { currentFolder } = storeToRefs(resourcesStore)
 
 let loadResourcesEventToken: string
 const emptyTrashMessage = computed(() => {
@@ -86,6 +94,12 @@ const emptyTrashMessage = computed(() => {
     ? $gettext('You have no deleted files')
     : $gettext('Space has no deleted files')
 })
+
+// the trash root is only set when listing succeeded, e.g. it stays unset on a 403
+const loadFailed = computed(() => !unref(areResourcesLoading) && !unref(currentFolder))
+const loadFailedMessage = computed(() =>
+  $gettext('Unable to load deleted files. You may not have permission to view them.')
+)
 
 const titleSegments = computed(() => {
   const segments = [$gettext('Deleted files')]
