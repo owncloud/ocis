@@ -1,6 +1,7 @@
 package storage_test
 
 import (
+	"context"
 	"image"
 	"testing"
 
@@ -58,7 +59,7 @@ func TestFileSystem_BuildKey(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run("", func(t *testing.T) {
-			assert.Equal(s.BuildKey(tt.r), tt.want)
+			assert.Equal(s.BuildKey(context.Background(), tt.r), tt.want)
 		})
 	}
 

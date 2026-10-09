@@ -117,7 +117,7 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumb
 	return nil
 }
 
-func (g Thumbnail) checkThumbnail(req *thumbnailssvc.GetThumbnailRequest, sRes *provider.StatResponse) (string, thumbnail.Request, error) {
+func (g Thumbnail) checkThumbnail(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest, sRes *provider.StatResponse) (string, thumbnail.Request, error) {
 	tr := thumbnail.Request{}
 	if !sRes.GetInfo().GetPermissionSet().GetInitiateFileDownload() {
 		return "", tr, merrors.Forbidden(g.serviceID, "no download permission")
@@ -132,7 +132,7 @@ func (g Thumbnail) checkThumbnail(req *thumbnailssvc.GetThumbnailRequest, sRes *
 		return "", tr, merrors.BadRequest(g.serviceID, "%s", err.Error())
 	}
 
-	if key, exists := g.manager.CheckThumbnail(tr); exists {
+	if key, exists := g.manager.CheckThumbnail(ctx, tr); exists {
 		return key, tr, nil
 	}
 	return "", tr, nil
@@ -145,7 +145,7 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetTh
 		return "", err
 	}
 
-	key, tr, err := g.checkThumbnail(req, sRes)
+	key, tr, err := g.checkThumbnail(ctx, req, sRes)
 	switch {
 	case err != nil:
 		return "", err
@@ -168,12 +168,12 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetTh
 		"fontFileMap": g.preprocessorOpts.TxtFontFileMap,
 	}
 	pp := preprocessor.ForType(sRes.GetInfo().GetMimeType(), ppOpts)
-	img, err := pp.Convert(r)
+	img, err := pp.Convert(ctx, r)
 	if img == nil || err != nil {
 		return "", merrors.InternalServerError(g.serviceID, "could not get image")
 	}
 
-	key, err = g.manager.Generate(tr, img)
+	key, err = g.manager.Generate(ctx, tr, img)
 	if errors.Is(err, terrors.ErrImageTooLarge) {
 		return "", merrors.Forbidden(g.serviceID, "%s", err.Error())
 	}
@@ -228,7 +228,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 		return "", err
 	}
 
-	key, tr, err := g.checkThumbnail(req, sRes)
+	key, tr, err := g.checkThumbnail(ctx, req, sRes)
 	switch {
 	case err != nil:
 		return "", err
@@ -260,12 +260,12 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 		"fontFileMap": g.preprocessorOpts.TxtFontFileMap,
 	}
 	pp := preprocessor.ForType(sRes.GetInfo().GetMimeType(), ppOpts)
-	img, err := pp.Convert(r)
+	img, err := pp.Convert(ctx, r)
 	if img == nil || err != nil {
 		return "", merrors.InternalServerError(g.serviceID, "could not get image")
 	}
 
-	key, err = g.manager.Generate(tr, img)
+	key, err = g.manager.Generate(ctx, tr, img)
 	if errors.Is(err, terrors.ErrImageTooLarge) {
 		return "", merrors.Forbidden(g.serviceID, "%s", err.Error())
 	}

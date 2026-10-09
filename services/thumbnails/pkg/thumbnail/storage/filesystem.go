@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"context"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -8,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
@@ -32,7 +35,17 @@ type FileSystem struct {
 }
 
 // Stat returns if a file for the given key exists on the filesystem
-func (s FileSystem) Stat(key string) bool {
+func (s FileSystem) Stat(ctx context.Context, key string) bool {
+	span := trace.SpanFromContext(ctx)
+	_, newSpan := span.TracerProvider().Tracer(tracerName).Start(
+		ctx, spanNameStat,
+		trace.WithSpanKind(trace.SpanKindInternal),
+		trace.WithAttributes(
+			attribute.String("ocis.thumbnails.storage.type", "FileSystem"),
+		),
+	)
+	defer newSpan.End()
+
 	img := filepath.Join(s.root, filesDir, key)
 	if _, err := os.Stat(img); err != nil {
 		return false
@@ -41,7 +54,17 @@ func (s FileSystem) Stat(key string) bool {
 }
 
 // Get returns the file content for the given key
-func (s FileSystem) Get(key string) ([]byte, error) {
+func (s FileSystem) Get(ctx context.Context, key string) ([]byte, error) {
+	span := trace.SpanFromContext(ctx)
+	_, newSpan := span.TracerProvider().Tracer(tracerName).Start(
+		ctx, spanNameGet,
+		trace.WithSpanKind(trace.SpanKindInternal),
+		trace.WithAttributes(
+			attribute.String("ocis.thumbnails.storage.type", "FileSystem"),
+		),
+	)
+	defer newSpan.End()
+
 	img := filepath.Join(s.root, filesDir, key)
 	content, err := os.ReadFile(img)
 	if err != nil {
@@ -54,7 +77,17 @@ func (s FileSystem) Get(key string) ([]byte, error) {
 }
 
 // Put stores image data in the file system for the given key
-func (s FileSystem) Put(key string, img []byte) error {
+func (s FileSystem) Put(ctx context.Context, key string, img []byte) error {
+	span := trace.SpanFromContext(ctx)
+	_, newSpan := span.TracerProvider().Tracer(tracerName).Start(
+		ctx, spanNamePut,
+		trace.WithSpanKind(trace.SpanKindInternal),
+		trace.WithAttributes(
+			attribute.String("ocis.thumbnails.storage.type", "FileSystem"),
+		),
+	)
+	defer newSpan.End()
+
 	imgPath := filepath.Join(s.root, filesDir, key)
 	dir := filepath.Dir(imgPath)
 	if err := os.MkdirAll(dir, 0700); err != nil {
@@ -102,7 +135,17 @@ func (s FileSystem) Put(key string, img []byte) error {
 // e.g. 97/9f/4c8db98f7b82e768ef478d3c8612/500x300.png
 //
 // The key also represents the path to the thumbnail in the filesystem under the configured root directory.
-func (s FileSystem) BuildKey(r Request) string {
+func (s FileSystem) BuildKey(ctx context.Context, r Request) string {
+	span := trace.SpanFromContext(ctx)
+	_, newSpan := span.TracerProvider().Tracer(tracerName).Start(
+		ctx, spanNameBuildKey,
+		trace.WithSpanKind(trace.SpanKindInternal),
+		trace.WithAttributes(
+			attribute.String("ocis.thumbnails.storage.type", "FileSystem"),
+		),
+	)
+	defer newSpan.End()
+
 	checksum := r.Checksum
 	filetype := r.Types[0]
 
