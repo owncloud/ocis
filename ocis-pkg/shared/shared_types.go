@@ -54,8 +54,8 @@ type GRPCClientOptions struct {
 	// which read them independently of each other but apply the same rules, so both behave
 	// identically for every input. Keepalive is off unless the time is set to a duration that
 	// parses; a value without a unit suffix leaves the clients without pings.
-	GRPCClientKeepaliveTime    time.Duration `yaml:"grpc_client_keepalive_time" env:"GRPC_CLIENT_KEEPALIVE_TIME" desc:"How long a grpc client connection with an ongoing request may stay silent before the server is pinged to check whether it is still answering. Set a duration like '20s' to enable detection of unresponsive peers. Leaving it unset, or at '0', sends no pings at all, which is grpc's own default. Values below '10s' are raised to '10s' by grpc. Make sure to include the unit suffix, a bare number is not a valid duration." introductionVersion:"8.3.0"`
-	GRPCClientKeepaliveTimeout time.Duration `yaml:"grpc_client_keepalive_timeout" env:"GRPC_CLIENT_KEEPALIVE_TIMEOUT" desc:"How long a grpc client waits for the answer to a keepalive ping before it considers the connection dead and fails all requests on it. Defaults to '10s'. Has no effect unless GRPC_CLIENT_KEEPALIVE_TIME is set. See GRPC_CLIENT_KEEPALIVE_TIME." introductionVersion:"8.3.0"`
+	GRPCClientKeepaliveTime    time.Duration `yaml:"grpc_client_keepalive_time" env:"GRPC_CLIENT_KEEPALIVE_TIME" desc:"How long a grpc client connection with an ongoing request may stay silent before the server is pinged to check whether it is still answering. Set a duration like '20s' to enable detection of unresponsive peers. Leaving it unset, or at '0', sends no pings at all, which is grpc's own default. Values below '10s' are raised to '10s' by grpc. Make sure to include the unit suffix, a bare number is not a valid duration." introductionVersion:"9.0.0"`
+	GRPCClientKeepaliveTimeout time.Duration `yaml:"grpc_client_keepalive_timeout" env:"GRPC_CLIENT_KEEPALIVE_TIMEOUT" desc:"How long a grpc client waits for the answer to a keepalive ping before it considers the connection dead and fails all requests on it. Defaults to '10s'. Has no effect unless GRPC_CLIENT_KEEPALIVE_TIME is set. See GRPC_CLIENT_KEEPALIVE_TIME." introductionVersion:"9.0.0"`
 }
 
 type GRPCServiceTLS struct {
@@ -80,9 +80,9 @@ type Cache struct {
 	DisablePersistence   bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"5.0"`
 	AuthUsername         string        `yaml:"auth_username" env:"OCIS_CACHE_AUTH_USERNAME" desc:"The username to use for authentication. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
 	AuthPassword         string        `yaml:"auth_password" env:"OCIS_CACHE_AUTH_PASSWORD" desc:"The password to use for authentication. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
-	EnableTLS            bool          `yaml:"enable_tls" env:"OCIS_CACHE_ENABLE_TLS" desc:"Activate TLS for the connection to the NATS store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
-	TLSInsecure          bool          `yaml:"tls_insecure" env:"OCIS_CACHE_TLS_INSECURE" desc:"Disable TLS certificate verification for the NATS store connection. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
-	TLSRootCACertificate string        `yaml:"tls_root_ca_certificate" env:"OCIS_CACHE_TLS_ROOT_CA_CERTIFICATE" desc:"Path to the PEM-encoded root CA certificate used to validate the NATS store TLS certificate. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
+	EnableTLS            bool          `yaml:"enable_tls" env:"OCIS_CACHE_ENABLE_TLS" desc:"Activate TLS for the connection to the NATS store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"9.0.0"`
+	TLSInsecure          bool          `yaml:"tls_insecure" env:"OCIS_CACHE_TLS_INSECURE" desc:"Disable TLS certificate verification for the NATS store connection. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"9.0.0"`
+	TLSRootCACertificate string        `yaml:"tls_root_ca_certificate" env:"OCIS_CACHE_TLS_ROOT_CA_CERTIFICATE" desc:"Path to the PEM-encoded root CA certificate used to validate the NATS store TLS certificate. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"9.0.0"`
 }
 
 // Commons holds configuration that are common to all extensions. Each extension can then decide whether
