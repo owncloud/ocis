@@ -2,6 +2,9 @@ package preprocessor
 
 import (
 	"bytes"
+	"image"
+	"image/color"
+	"image/gif"
 	"io"
 	"os"
 	"testing"
@@ -12,6 +15,17 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
+
+type singleByteReader struct {
+	reader *bytes.Reader
+}
+
+func (r *singleByteReader) Read(p []byte) (int, error) {
+	if len(p) > 1 {
+		p = p[:1]
+	}
+	return r.reader.Read(p)
+}
 
 func TestImageDecoder(t *testing.T) {
 
@@ -62,9 +76,58 @@ var _ = Describe("ImageDecoder", func() {
 			Expect(img).ToNot(BeNil())
 		})
 
+		It("should decode only the first frame of an animated gif", func() {
+			palette := color.Palette{color.Black, color.White}
+			first := image.NewPaletted(image.Rect(0, 0, 2, 2), palette)
+			second := image.NewPaletted(image.Rect(0, 0, 2, 2), palette)
+			second.SetColorIndex(0, 0, 1)
+
+			var encoded bytes.Buffer
+			err := gif.EncodeAll(&encoded, &gif.GIF{
+				Image:           []*image.Paletted{first, second},
+				Delay:           []int{0, 0},
+				BackgroundIndex: 1,
+				Config: image.Config{
+					ColorModel: palette,
+					Width:      2,
+					Height:     2,
+				},
+			})
+			Expect(err).ToNot(HaveOccurred())
+
+			reader := &singleByteReader{reader: bytes.NewReader(encoded.Bytes())}
+			decoder := GifDecoder{}
+			img, err := decoder.Convert(reader)
+			Expect(err).ToNot(HaveOccurred())
+
+			decoded, ok := img.(*gif.GIF)
+			Expect(ok).To(BeTrue())
+			Expect(decoded.Image).To(HaveLen(1))
+			Expect(decoded.Image[0].ColorIndexAt(0, 0)).To(Equal(uint8(0)))
+			Expect(decoded.Config.Width).To(Equal(2))
+			Expect(decoded.Config.Height).To(Equal(2))
+			Expect(decoded.LoopCount).To(Equal(-1))
+			Expect(decoded.BackgroundIndex).To(Equal(uint8(1)))
+			Expect(reader.reader.Len()).To(BeNumerically(">", 0))
+
+			var thumbnail bytes.Buffer
+			Expect(gif.EncodeAll(&thumbnail, decoded)).To(Succeed())
+			encodedThumbnail, err := gif.DecodeAll(&thumbnail)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(encodedThumbnail.Image).To(HaveLen(1))
+		})
+
 		It("should return an error if the gif is invalid", func() {
 			decoder := GifDecoder{}
 			img, err := decoder.Convert(bytes.NewReader([]byte("not a gif")))
+			Expect(err).To(HaveOccurred())
+			Expect(img).To(BeNil())
+		})
+
+		It("should return an error if the first frame is invalid", func() {
+			decoder := GifDecoder{}
+			validHeaderWithoutFrame := []byte("GIF89a\x01\x00\x01\x00\x00\x00\x00")
+			img, err := decoder.Convert(bytes.NewReader(validHeaderWithoutFrame))
 			Expect(err).To(HaveOccurred())
 			Expect(img).To(BeNil())
 		})

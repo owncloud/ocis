@@ -32,13 +32,31 @@ type FileConverter interface {
 // GifDecoder is a converter for the gif file
 type GifDecoder struct{}
 
-// Convert reads the gif file and returns the thumbnail image
+// Convert reads the first frame of the gif file and returns the thumbnail image
 func (i GifDecoder) Convert(r io.Reader) (interface{}, error) {
-	img, err := gif.DecodeAll(r)
+	var header bytes.Buffer
+	config, err := gif.DecodeConfig(io.TeeReader(r, &header))
 	if err != nil {
 		return nil, errors.Wrap(err, `could not decode the image`)
 	}
-	return img, nil
+
+	img, err := gif.Decode(io.MultiReader(bytes.NewReader(header.Bytes()), r))
+	if err != nil {
+		return nil, errors.Wrap(err, `could not decode the image`)
+	}
+
+	frame, ok := img.(*image.Paletted)
+	if !ok {
+		return nil, errors.New(`could not decode the image as a paletted GIF`)
+	}
+
+	return &gif.GIF{
+		Image:           []*image.Paletted{frame},
+		Delay:           []int{0},
+		LoopCount:       -1,
+		Config:          config,
+		BackgroundIndex: header.Bytes()[11],
+	}, nil
 }
 
 // GgsDecoder is a converter for the geogebra slides file
