@@ -84,7 +84,7 @@ func (s eventsNotifier) prepareSpaceShared(baseCtx context.Context, logger zerol
 			Msg("could not get space info")
 		return executant, spaceName, shareLink, ctx, err
 	}
-	spaceName = resourceInfo.GetSpace().GetName()
+	spaceName = vaultRedactedName(resourceID.GetStorageId(), resourceInfo.GetSpace().GetName())
 
 	shareLink, err = urlJoinPath(s.ocisURL, "f", e.ID.OpaqueId)
 	if err != nil {
@@ -169,7 +169,7 @@ func (s eventsNotifier) prepareSpaceUnshared(baseCtx context.Context, logger zer
 			Msg("could not get space info")
 		return executant, spaceName, shareLink, ctx, err
 	}
-	spaceName = resourceInfo.GetSpace().GetName()
+	spaceName = vaultRedactedName(resourceID.GetStorageId(), resourceInfo.GetSpace().GetName())
 
 	shareLink, err = urlJoinPath(s.ocisURL, "f", e.ID.OpaqueId)
 	if err != nil {
@@ -220,10 +220,17 @@ func (s eventsNotifier) handleSpaceMembershipExpired(baseCtx context.Context, e 
 		return
 	}
 
+	spaceName := e.SpaceName
+	if resourceID, err := storagespace.ParseID(e.SpaceID.GetOpaqueId()); err == nil {
+		spaceName = vaultRedactedName(resourceID.GetStorageId(), spaceName)
+	} else {
+		logger.Error().Err(err).Msg("could not parse resourceid from SpaceID, skipping vault redaction check")
+	}
+
 	emails, err := s.render(ctx, email.MembershipExpired,
 		"SpaceGrantee",
 		map[string]string{
-			"SpaceName": e.SpaceName,
+			"SpaceName": spaceName,
 			"ExpiredAt": e.ExpiredAt.Format("2006-01-02 15:04:05"),
 		}, recipientsInstant, owner.GetDisplayName())
 	if err != nil {
