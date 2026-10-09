@@ -152,7 +152,7 @@ export class AuthService implements AuthServiceInterface {
     if (to.params.scope === 'vault') {
       // Permissions known: send an unentitled user to accessDenied instead of the IdP.
       if (this.authStore.userContextReady && !this.ability.can('read-all', 'Vault')) {
-        return { name: 'accessDenied' }
+        return { name: 'accessDenied', query: { reason: 'forbidden' } }
       }
 
       // Capabilities only — the full context loads vault spaces, which 401 without MFA and crash.
@@ -170,10 +170,10 @@ export class AuthService implements AuthServiceInterface {
         } catch (e) {
           // Can't confirm access: deny, don't hand off to MFA or leave a blank page.
           console.error('failed to load vault abilities on cold load, denying access:', e)
-          return { name: 'accessDenied' }
+          return { name: 'accessDenied', query: { reason: 'forbidden' } }
         }
         if (!this.ability.can('read-all', 'Vault')) {
-          return { name: 'accessDenied' }
+          return { name: 'accessDenied', query: { reason: 'forbidden' } }
         }
       }
 

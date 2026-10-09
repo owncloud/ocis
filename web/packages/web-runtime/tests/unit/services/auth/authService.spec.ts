@@ -555,7 +555,7 @@ describe('AuthService', () => {
 
       // initializeContext returns the redirect target; the guard (setupAuthGuard) returns it
       // so vue-router cancels the navigation to the vault route.
-      expect(result).toEqual({ name: 'accessDenied' })
+      expect(result).toEqual({ name: 'accessDenied', query: { reason: 'forbidden' } })
       expect(mockSignInRedirect).not.toHaveBeenCalled()
     })
 
@@ -600,7 +600,7 @@ describe('AuthService', () => {
       const result = await authService.initializeContext(vaultRoute)
 
       expect(mockLoadUserAbilities).toHaveBeenCalled()
-      expect(result).toEqual({ name: 'accessDenied' })
+      expect(result).toEqual({ name: 'accessDenied', query: { reason: 'forbidden' } })
       expect(mockSignInRedirect).not.toHaveBeenCalled()
     })
 
@@ -615,7 +615,7 @@ describe('AuthService', () => {
       const result = await authService.initializeContext(vaultRoute)
 
       expect(mockLoadUserAbilities).toHaveBeenCalled()
-      expect(result).toEqual({ name: 'accessDenied' })
+      expect(result).toEqual({ name: 'accessDenied', query: { reason: 'forbidden' } })
       expect(mockSignInRedirect).not.toHaveBeenCalled()
     })
 
