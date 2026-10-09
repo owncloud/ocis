@@ -1,0 +1,8 @@
+name: ocis-observability
+
+include:
+  - docker-compose.yml
+  - ocis.yml
+  - collabora.yml
+  - monitoring_tracing/monitoring.yml
+  - monitoring_tracing/signoz/deploy/docker/docker-compose.yaml
