@@ -322,6 +322,41 @@ func TestNoInlineJSTranslations(t *testing.T) {
 	}
 }
 
+func TestLoginErrorMessagesAreDistinct(t *testing.T) {
+	_, srv := newTestService(t, nil)
+
+	_, body, _ := getPage(t, srv, "/signin/v1/identifier", "")
+
+	attr := func(name string) string {
+		m := regexp.MustCompile(name + `="([^"]*)"`).FindStringSubmatch(body)
+		if m == nil {
+			t.Fatalf("missing %s on form element", name)
+		}
+		return m[1]
+	}
+	invalid := attr("data-msg-invalid")
+	failed := attr("data-msg-failed")
+	def := attr("data-msg-default")
+
+	// A connection that never reaches the IdP (network error, timeout, firewall)
+	// must not be reported as wrong credentials, or users keep retrying a correct password.
+	if failed == invalid {
+		t.Errorf("data-msg-failed equals data-msg-invalid (%q): network failures would read as wrong credentials", failed)
+	}
+	if def == invalid {
+		t.Errorf("data-msg-default equals data-msg-invalid (%q): server errors would read as wrong credentials", def)
+	}
+
+	// The client must give up on a request that gets no answer, and must not map
+	// an aborted request to the wrong-credentials message.
+	if !strings.Contains(body, "AbortController") {
+		t.Error("logon requests have no timeout (no AbortController)")
+	}
+	if regexp.MustCompile(`AbortError"\)\s*\{\s*showError\(MSG_INVALID\)`).MatchString(body) {
+		t.Error("an aborted request is reported as wrong credentials")
+	}
+}
+
 func TestQuotesInTranslationsEscaped(t *testing.T) {
 	// html/template auto-escapes in attribute contexts. Verify that
 	// rendered pages do not contain unescaped quotes that could break
