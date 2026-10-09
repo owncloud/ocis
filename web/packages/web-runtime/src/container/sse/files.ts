@@ -76,6 +76,15 @@ export const onSSEProcessingFinishedEvent = async ({
   resourceQueue,
   previewService
 }: SSEEventOptions) => {
+  // finalize failed, node reverted: drop the optimistic row (incl. on the initiator).
+  if (sseData.outcome === 'failed') {
+    const failedResource = resourcesStore.resources.find((f) => f.id === sseData.itemid)
+    if (failedResource) {
+      resourcesStore.removeResources([failedResource])
+    }
+    return
+  }
+
   if (!isItemInCurrentFolder({ resourcesStore, parentFolderId: sseData.parentitemid })) {
     return false
   }

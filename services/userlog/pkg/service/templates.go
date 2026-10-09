@@ -14,6 +14,11 @@ var (
 		Message: l10n.Template("File {resource} was deleted because it violates the policies"),
 	}
 
+	UploadFailed = NotificationTemplate{
+		Subject: l10n.Template("Upload failed"),
+		Message: l10n.Template("The upload of {resource} could not be finalized. Please try again."),
+	}
+
 	SpaceShared = NotificationTemplate{
 		Subject: l10n.Template("Space shared"),
 		Message: l10n.Template("{user} added you to Space {space}"),

@@ -97,6 +97,8 @@ func (c *Converter) ConvertEvent(eventid string, event interface{}) (OC10Notific
 		default:
 			return OC10Notification{}, fmt.Errorf("unknown postprocessing step: %s", ev.FinishedStep)
 		}
+	case events.UploadReady:
+		return c.uploadFailedMessage(eventid, UploadFailed, ev.ExecutingUser, ev.ResourceID, ev.Filename, utils.TSToTime(ev.Timestamp))
 
 	// space related
 	case events.SpaceDisabled:
@@ -381,6 +383,36 @@ func (c *Converter) policiesMessage(eventid string, nt NotificationTemplate, exe
 		Service:        c.serviceName,
 		UserName:       executant.GetUsername(),
 		Timestamp:      ts.Format(time.RFC3339Nano),
+		ResourceType:   _resourceTypeResource,
+		Subject:        subj,
+		SubjectRaw:     subjraw,
+		Message:        msg,
+		MessageRaw:     msgraw,
+		MessageDetails: dets,
+	}, nil
+}
+
+func (c *Converter) uploadFailedMessage(eventid string, nt NotificationTemplate, executant *user.User, rid *storageprovider.ResourceId, filename string, ts time.Time) (OC10Notification, error) {
+	// node reverted: compose from the event's filename, not a gateway lookup.
+	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, c.defaultLanguage, c.translationPath, map[string]interface{}{
+		"resourcename": filename,
+	})
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	dets := map[string]interface{}{
+		"resource": map[string]string{
+			"name": filename,
+		},
+	}
+
+	return OC10Notification{
+		EventID:        eventid,
+		Service:        c.serviceName,
+		UserName:       executant.GetUsername(),
+		Timestamp:      ts.Format(time.RFC3339Nano),
+		ResourceID:     storagespace.FormatResourceID(rid),
 		ResourceType:   _resourceTypeResource,
 		Subject:        subj,
 		SubjectRaw:     subjraw,
