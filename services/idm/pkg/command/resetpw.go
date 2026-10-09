@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path"
 	"syscall"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/libregraph/idm/pkg/ldbbolt"
 	"github.com/libregraph/idm/server"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	ocisdefaults "github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/idm/pkg/config"
 	"github.com/owncloud/ocis/v2/services/idm/pkg/config/parser"
@@ -19,6 +21,12 @@ import (
 	"github.com/urfave/cli/v2"
 	bolt "go.etcd.io/bbolt"
 	"golang.org/x/term"
+)
+
+// User account types accepted by the --user-type flag.
+const (
+	userTypeUser    = "user"
+	userTypeService = "service"
 )
 
 // ResetPassword is the entrypoint for the resetpassword command
@@ -37,7 +45,7 @@ func ResetPassword(cfg *config.Config) *cli.Command {
 			&cli.StringFlag{
 				Name:  "user-type",
 				Usage: "Type of user account: 'user' (ou=users) or 'service' (ou=sysusers)",
-				Value: "user",
+				Value: userTypeUser,
 			},
 		},
 		Before: func(_ *cli.Context) error {
@@ -50,8 +58,8 @@ func ResetPassword(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			userType := c.String("user-type")
-			if userType != "user" && userType != "service" {
-				return fmt.Errorf("invalid --user-type %q: must be 'user' or 'service'", userType)
+			if userType != userTypeUser && userType != userTypeService {
+				return fmt.Errorf("invalid --user-type %q: must be %q or %q", userType, userTypeUser, userTypeService)
 			}
 
 			return resetPassword(ctx, logger, cfg, c.String("user-name"), userType)
@@ -69,7 +77,7 @@ func resetPassword(_ context.Context, logger log.Logger, cfg *config.Config, use
 	}
 
 	ou := "users"
-	if userType == "service" {
+	if userType == userTypeService {
 		ou = "sysusers"
 	}
 	userDN := fmt.Sprintf("uid=%s,ou=%s,%s", userName, ou, servercfg.LDAPBaseDN)
@@ -105,7 +113,64 @@ func resetPassword(_ context.Context, logger log.Logger, cfg *config.Config, use
 		fmt.Fprintf(os.Stderr, "Failed to update user password: %v\n", err)
 	}
 	fmt.Printf("Password for user '%s' updated.\n", userDN)
+
+	if userType == userTypeService {
+		syncServiceUserBindConfig(userName, newPw)
+	}
 	return nil
+}
+
+// syncServiceUserBindConfig keeps ocis.yaml in sync after a service user's
+// password was changed in the IDM database. Services bind to LDAP as the
+// service users (e.g. uid=reva,ou=sysusers) using the bind_password from their
+// config; if only the directory entry is changed those binds start failing on
+// the next restart, which manifests as admin login returning 401. It rewrites
+// the matching keys in ocis.yaml when present and always prints the env vars
+// the operator must ensure carry the new value (covering env-var and
+// distributed deployments this tool cannot rewrite).
+func syncServiceUserBindConfig(userName, newPassword string) {
+	if _, known := serviceUserConfigKeys[userName]; !known {
+		return
+	}
+
+	configFile := path.Join(ocisdefaults.BaseConfigPath(), "ocis.yaml")
+	if data, err := os.ReadFile(configFile); err == nil {
+		out, updated, err := syncServiceUserPasswordInConfig(data, userName, newPassword)
+		switch {
+		case err != nil:
+			fmt.Fprintf(os.Stderr, "Warning: could not update bind passwords in %q: %v\n", configFile, err)
+		case len(updated) > 0:
+			if err := os.WriteFile(configFile, out, configFilePerm); err != nil {
+				fmt.Fprintf(os.Stderr, "Warning: could not write updated config %q: %v\n", configFile, err)
+			} else {
+				fmt.Printf("Updated bind passwords in %q:\n", configFile)
+				for _, key := range updated {
+					fmt.Printf("  - %s\n", key)
+				}
+			}
+		}
+	} else if !errors.Is(err, os.ErrNotExist) {
+		fmt.Fprintf(os.Stderr, "Warning: could not read config %q: %v\n", configFile, err)
+	}
+
+	fmt.Printf("\nIMPORTANT: the '%s' service user is used by oCIS services to bind to LDAP.\n", userName)
+	fmt.Printf("Make sure the following environment variable(s) are set to the new password\n")
+	fmt.Printf("wherever they are configured (env, secrets, per-service yaml), then restart oCIS:\n")
+	fmt.Printf("  - OCIS_LDAP_BIND_PASSWORD (shared) or the per-service variables below\n")
+	for _, env := range serviceUserBindEnvVars[userName] {
+		fmt.Printf("  - %s\n", env)
+	}
+}
+
+// serviceUserBindEnvVars lists the per-service bind_password environment
+// variables that carry the given service user's password, for the operator
+// guidance message. OCIS_LDAP_BIND_PASSWORD is a single shared variable used by
+// all of these services, so it is noted separately by the caller rather than
+// per user.
+var serviceUserBindEnvVars = map[string][]string{
+	"reva":       {"AUTH_BASIC_LDAP_BIND_PASSWORD", "USERS_LDAP_BIND_PASSWORD", "GROUPS_LDAP_BIND_PASSWORD", "IDM_REVASVC_PASSWORD"},
+	"libregraph": {"GRAPH_LDAP_BIND_PASSWORD", "IDM_SVC_PASSWORD"},
+	"idp":        {"IDP_LDAP_BIND_PASSWORD", "IDM_IDPSVC_PASSWORD"},
 }
 
 func getPassword() (string, error) {
