@@ -115,7 +115,7 @@ func (m *manager) Handler(coord upload.Coordinator, driver storage.FS) (http.Han
 				ctx = ctxpkg.ContextSetLockID(ctx, lockID)
 			}
 
-			info, err := coord.Upload(ctx, storage.UploadRequest{
+			info, err := coord.Upload(ctx, upload.Request{
 				Ref:    ref,
 				Body:   r.Body,
 				Length: r.ContentLength,

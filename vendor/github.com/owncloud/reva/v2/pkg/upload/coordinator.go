@@ -3,6 +3,7 @@ package upload
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -24,6 +25,17 @@ import (
 	"github.com/owncloud/reva/v2/pkg/utils"
 )
 
+// Request carries the metadata of a non-resumable (PUT) upload.
+type Request struct {
+	Ref    *provider.Reference
+	Body   io.ReadCloser
+	Length int64
+}
+
+// FinishedFunc is called once an upload has finished, so that the caller can
+// publish a FileUploaded event through its own publisher.
+type FinishedFunc func(spaceOwner, executant *user.UserId, ref *provider.Reference)
+
 // Coordinator owns the upload lifecycle: initiation, data transfer and listing.
 type Coordinator interface {
 	// InitiateUpload returns the protocols and ids that bytes can be appended to.
@@ -35,7 +47,7 @@ type Coordinator interface {
 	// ListUploadSessions returns the upload sessions matching the given filter.
 	ListUploadSessions(ctx context.Context, filter storage.UploadSessionFilter) ([]storage.UploadSession, error)
 	// Upload writes the whole body of a non-resumable (PUT) upload and finishes it.
-	Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (*provider.ResourceInfo, error)
+	Upload(ctx context.Context, req Request, uff FinishedFunc) (*provider.ResourceInfo, error)
 	// StartPostprocessing subscribes to postprocessing results and enables async
 	// uploads. Call once, before serving requests.
 	StartPostprocessing(stream events.Consumer, group, mountID string, numConsumers int) error
@@ -198,7 +210,7 @@ func (c *coordinator) applyRequestMetadata(session Session, metadata map[string]
 
 // Upload writes the whole body of a non-resumable (PUT) upload and finishes it.
 // req.Ref.Path carries the session id minted by InitiateUpload.
-func (c *coordinator) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (*provider.ResourceInfo, error) {
+func (c *coordinator) Upload(ctx context.Context, req Request, uff FinishedFunc) (*provider.ResourceInfo, error) {
 	// The request path arrives rooted, while session ids are stored unrooted.
 	session, err := c.store.Get(ctx, strings.TrimPrefix(req.Ref.GetPath(), "/"))
 	if err != nil {

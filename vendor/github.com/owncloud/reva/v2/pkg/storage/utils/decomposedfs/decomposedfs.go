@@ -34,7 +34,6 @@ import (
 	"github.com/jellydator/ttlcache/v2"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
-	tusd "github.com/tus/tusd/v2/pkg/handler"
 	microstore "go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
@@ -48,7 +47,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/logger"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/storage"
-	"github.com/owncloud/reva/v2/pkg/storage/utils/chunking"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/aspects"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/metadata"
@@ -60,7 +58,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/timemanager"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/trashbin"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/tree"
-	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/upload"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/usermapper"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/filelocks"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/templates"
@@ -89,36 +86,15 @@ func init() {
 	tracer = otel.Tracer("github.com/owncloud/reva/pkg/storage/utils/decomposedfs")
 }
 
-// Session is the interface that OcisSession implements. By combining tus.Upload,
-// storage.UploadSession and custom functions we can reuse the same struct throughout
-// the whole upload lifecycle.
-//
-// Some functions that are only used by decomposedfs are not yet part of this interface.
-// They might be added after more refactoring.
-type Session interface {
-	tusd.Upload
-	storage.UploadSession
-	upload.Session
-	LockID() string
-}
-
-type SessionStore interface {
-	New(ctx context.Context) *upload.OcisSession
-	List(ctx context.Context) ([]*upload.OcisSession, error)
-	Get(ctx context.Context, id string) (*upload.OcisSession, error)
-}
-
 // Decomposedfs provides the base for decomposed filesystem implementations
 type Decomposedfs struct {
-	lu           node.PathLookup
-	tp           node.Tree
-	trashbin     trashbin.Trashbin
-	o            *options.Options
-	p            permissions.Permissions
-	um           usermapper.Mapper
-	chunkHandler *chunking.ChunkHandler
-	stream       events.Stream
-	sessionStore SessionStore
+	lu       node.PathLookup
+	tp       node.Tree
+	trashbin trashbin.Trashbin
+	o        *options.Options
+	p        permissions.Permissions
+	um       usermapper.Mapper
+	stream   events.Stream
 
 	UserCache       *ttlcache.Cache
 	userSpaceIndex  *spaceidindex.Index
@@ -243,7 +219,6 @@ func New(o *options.Options, aspects aspects.Aspects, log *zerolog.Logger) (stor
 		o:               o,
 		p:               aspects.Permissions,
 		um:              aspects.UserMapper,
-		chunkHandler:    chunking.NewChunkHandler(filepath.Join(o.Root, "uploads")),
 		stream:          aspects.EventStream,
 		UserCache:       ttlcache.NewCache(),
 		userSpaceIndex:  userSpaceIndex,
@@ -251,7 +226,6 @@ func New(o *options.Options, aspects aspects.Aspects, log *zerolog.Logger) (stor
 		spaceTypeIndex:  spaceTypeIndex,
 		log:             log,
 	}
-	fs.sessionStore = upload.NewSessionStore(fs, aspects, o.Root, o.AsyncFileUploads, o.Tokens, log)
 	if err = fs.trashbin.Setup(fs); err != nil {
 		return nil, err
 	}

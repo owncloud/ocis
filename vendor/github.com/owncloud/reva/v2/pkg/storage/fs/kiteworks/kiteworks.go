@@ -590,14 +590,6 @@ func (d *Driver) Move(ctx context.Context, src, dst *provider.Reference) (*stora
 	}, nil
 }
 
-func (d *Driver) InitiateUpload(_ context.Context, _ *provider.Reference, _ int64, _ map[string]string) (map[string]string, error) {
-	return nil, errtypes.NotSupported("kiteworks: read-only driver")
-}
-
-func (d *Driver) Upload(_ context.Context, _ storage.UploadRequest, _ storage.UploadFinishedFunc) (*provider.ResourceInfo, error) {
-	return nil, errtypes.NotSupported("kiteworks: read-only driver")
-}
-
 // MarkProcessing is a no-op: KW controls its own file metadata so there is no
 // reliable way to mark a node as "in-flight" without abusing the checkout-lock
 // API (which would block concurrent uploads and leave orphaned locks on crash).
