@@ -26,6 +26,7 @@ import (
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/status"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
 	"github.com/stretchr/testify/mock"
@@ -379,6 +380,161 @@ var _ = Describe("Searchprovider", func() {
 			indexClient.AssertNotCalled(GinkgoT(), "Lookup", mock.Anything)
 			indexClient.AssertNotCalled(GinkgoT(), "Upsert", mock.Anything, mock.Anything)
 			extractor.AssertNotCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
+		})
+	})
+
+	Describe("IndexSpace abort threshold", func() {
+		// A root container listing three files. Stat by path answers per the
+		// resolvable set; Lookup never finds anything, so every file is attempted.
+		var (
+			rootInfo   *sprovider.ResourceInfo
+			fileInfos  []*sprovider.ResourceInfo
+			resolvable map[string]bool
+			statBroken map[string]bool // Stat answers with an internal error, not NOT_FOUND
+			indexed    map[string]bool // already indexed and unchanged
+			newService = func(maxConsecutiveFailures int) search.Searcher {
+				cfg := &config.Config{}
+				cfg.Extractor.MaxConsecutiveFailures = maxConsecutiveFailures
+				return search.NewService(gatewaySelector, indexClient, extractor, logger, cfg)
+			}
+		)
+
+		BeforeEach(func() {
+			DeferCleanup(search.SetExtractionRetryDelay(time.Millisecond))
+			statBroken = map[string]bool{}
+			indexed = map[string]bool{}
+			gatewayClient.On("GetUserByClaim", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserByClaimResponse{
+				Status: status.NewOK(context.Background()),
+				User:   user,
+			}, nil)
+
+			rootInfo = &sprovider.ResourceInfo{
+				Id:    &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "spaceid"},
+				Type:  sprovider.ResourceType_RESOURCE_TYPE_CONTAINER,
+				Path:  ".",
+				Mtime: &typesv1beta1.Timestamp{Seconds: 5000},
+			}
+			fileInfos = make([]*sprovider.ResourceInfo, 3)
+			resolvable = map[string]bool{}
+			for i := range fileInfos {
+				fileInfos[i] = &sprovider.ResourceInfo{
+					Id:       &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: fmt.Sprintf("file-%d", i)},
+					ParentId: &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "spaceid"},
+					Type:     sprovider.ResourceType_RESOURCE_TYPE_FILE,
+					Path:     fmt.Sprintf("file-%d.pdf", i),
+					Size:     1024,
+					Mtime:    &typesv1beta1.Timestamp{Seconds: 5000},
+				}
+				resolvable["./"+fileInfos[i].Path] = true
+			}
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(
+				func(_ context.Context, sreq *sprovider.StatRequest, _ ...grpc.CallOption) *sprovider.StatResponse {
+					if sreq.Ref.Path == "." || sreq.Ref.Path == "" {
+						return &sprovider.StatResponse{Status: status.NewOK(context.Background()), Info: rootInfo}
+					}
+					if statBroken[sreq.Ref.Path] {
+						return &sprovider.StatResponse{Status: status.NewInternal(context.Background(), "storage unavailable")}
+					}
+					if !resolvable[sreq.Ref.Path] {
+						// The node the walker listed cannot be stat'ed by its
+						// path any more (stale or inconsistent metadata).
+						return &sprovider.StatResponse{Status: status.NewNotFound(context.Background(), sreq.Ref.Path)}
+					}
+					for _, fi := range fileInfos {
+						if "./"+fi.Path == sreq.Ref.Path {
+							return &sprovider.StatResponse{Status: status.NewOK(context.Background()), Info: fi}
+						}
+					}
+					return &sprovider.StatResponse{Status: status.NewNotFound(context.Background(), sreq.Ref.Path)}
+				},
+				func(_ context.Context, _ *sprovider.StatRequest, _ ...grpc.CallOption) error { return nil },
+			)
+			gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(&sprovider.ListContainerResponse{
+				Status: status.NewOK(context.Background()),
+				Infos:  fileInfos,
+			}, nil)
+			indexClient.On("Lookup", mock.Anything).Return(
+				func(id string) *engine.Resource {
+					if indexed[id] {
+						return &engine.Resource{ID: id, Extracted: true, Document: content.Document{Mtime: time.Unix(6000, 0).UTC().Format(time.RFC3339Nano)}}
+					}
+					return nil
+				},
+				func(id string) error {
+					if indexed[id] {
+						return nil
+					}
+					return engine.ErrResourceNotFound
+				},
+			)
+			indexClient.On("Upsert", mock.Anything, mock.Anything).Return(nil)
+		})
+
+		It("does not count unresolvable files towards the abort threshold", func() {
+			for k := range resolvable {
+				resolvable[k] = false
+			}
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
+
+			err := newService(1).IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			Expect(err).ShouldNot(HaveOccurred(), "files that cannot be resolved are skipped, never counted")
+			extractor.AssertNotCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
+			indexClient.AssertNotCalled(GinkgoT(), "Upsert", mock.Anything, mock.Anything)
+		})
+
+		It("aborts after the configured number of consecutive extraction failures", func() {
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, errors.New("extractor down"))
+
+			err := newService(2).IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("aborting index walk: 2 consecutive extraction failures"))
+			indexClient.AssertNotCalled(GinkgoT(), "Upsert", mock.Anything, mock.Anything)
+		})
+
+		It("never aborts when the threshold is 0", func() {
+			var extractCalls atomic.Int32
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Run(func(_ mock.Arguments) {
+				extractCalls.Add(1)
+			}).Return(content.Document{}, errors.New("extractor down"))
+
+			err := newService(0).IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			Expect(err).ShouldNot(HaveOccurred(), "with the abort disabled the walk finishes despite failures")
+			Expect(int(extractCalls.Load())).To(Equal(len(fileInfos)*6), "every file was attempted, each with all retries")
+		})
+
+		It("counts a Stat failure other than not-found towards the abort threshold", func() {
+			for k := range resolvable {
+				statBroken[k] = true
+			}
+
+			err := newService(2).IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			Expect(err).Should(HaveOccurred(), "a storage or auth outage must not look like a stale node")
+			Expect(err.Error()).To(ContainSubstring("aborting index walk: 2 consecutive extraction failures"))
+			extractor.AssertNotCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
+		})
+
+		It("stops with an error when the walk's context ends, instead of skipping the rest", func() {
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			var extractCalls atomic.Int32
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Run(func(_ mock.Arguments) {
+				extractCalls.Add(1)
+				cancel() // e.g. the index command's request timeout fires during the walk
+			}).Return(content.Document{}, nil)
+
+			err := newService(0).IndexSpace(ctx, &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("index walk stopped"))
+			Expect(int(extractCalls.Load())).To(Equal(1), "no file after the cancellation was attempted")
+		})
+
+		It("resets the counter on an already indexed, unchanged file", func() {
+			indexed[storagespace.FormatResourceID(fileInfos[1].Id)] = true
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, errors.New("cannot extract"))
+
+			err := newService(2).IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			Expect(err).ShouldNot(HaveOccurred(), "two failures separated by a healthy file are not consecutive")
 		})
 	})
 
