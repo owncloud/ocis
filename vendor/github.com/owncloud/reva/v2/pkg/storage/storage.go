@@ -28,7 +28,6 @@ import (
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	registry "github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1"
-	tusd "github.com/tus/tusd/v2/pkg/handler"
 )
 
 type MoveResult struct {
@@ -149,10 +148,6 @@ type FS interface {
 	Delete(ctx context.Context, ref *provider.Reference) (*DeleteResult, error)
 	// Move changes the path of a resource
 	Move(ctx context.Context, oldRef, newRef *provider.Reference) (*MoveResult, error)
-	// InitiateUpload returns a list of protocols with urls that can be used to append bytes to a new upload session
-	InitiateUpload(ctx context.Context, ref *provider.Reference, uploadLength int64, metadata map[string]string) (map[string]string, error)
-	// Upload creates or updates a resource of type file with a new revision
-	Upload(ctx context.Context, req UploadRequest, uploadFunc UploadFinishedFunc) (*provider.ResourceInfo, error)
 	// MarkProcessing toggles a processing flag on the resource.
 	MarkProcessing(ctx context.Context, ref *provider.Reference, processing bool, sessionID string) error
 	// CommitUpload writes the staged bytes from source to the resource at ref.
@@ -277,12 +272,6 @@ type UploadSource struct {
 
 // UnscopeFunc is a function that unscopes a user
 type UnscopeFunc func()
-
-// Composable is the interface that a struct needs to implement
-// to be composable, so that it can support the TUS methods
-type ComposableFS interface {
-	UseIn(composer *tusd.StoreComposer)
-}
 
 // CapabilitiesOpaqueKey is the StorageSpace/ProviderInfo Opaque key under which
 // a provider's Capabilities are carried as JSON up to the OCS capabilities handler.

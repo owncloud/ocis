@@ -24,10 +24,8 @@ import (
 	"net/url"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	tusd "github.com/tus/tusd/v2/pkg/handler"
 
 	"github.com/owncloud/reva/v2/pkg/storage"
-	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/upload"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 )
 
@@ -50,11 +48,6 @@ func NewFS(next storage.FS, hooks ...Hook) *FS {
 	}
 }
 
-// ListUploadSessions returns the upload sessions matching the given filter
-func (f *FS) ListUploadSessions(ctx context.Context, filter storage.UploadSessionFilter) ([]storage.UploadSession, error) {
-	return f.next.(storage.UploadSessionLister).ListUploadSessions(ctx, filter)
-}
-
 // IsOrphaned reports whether the referenced resource exists but its metadata is unreadable.
 func (f *FS) IsOrphaned(ctx context.Context, ref *provider.Reference) bool {
 	return f.next.(storage.OrphanChecker).IsOrphaned(ctx, ref)
@@ -66,43 +59,6 @@ func (f *FS) PrepareCreatesNode() bool {
 	nc, ok := f.next.(storage.NodeCreator)
 	return ok && nc.PrepareCreatesNode()
 }
-
-// UseIn tells the tus upload middleware which extensions it supports.
-func (f *FS) UseIn(composer *tusd.StoreComposer) {
-	f.next.(storage.ComposableFS).UseIn(composer)
-}
-
-// NewUpload returns a new tus Upload instance
-func (f *FS) NewUpload(ctx context.Context, info tusd.FileInfo) (upload tusd.Upload, err error) {
-	return f.next.(tusd.DataStore).NewUpload(ctx, info)
-}
-
-// NewUpload returns a new tus Upload instance
-func (f *FS) GetUpload(ctx context.Context, id string) (upload tusd.Upload, err error) {
-	return f.next.(tusd.DataStore).GetUpload(ctx, id)
-}
-
-// AsTerminatableUpload returns a TerminatableUpload
-// To implement the termination extension as specified in https://tus.io/protocols/resumable-upload.html#termination
-// the storage needs to implement AsTerminatableUpload
-func (f *FS) AsTerminatableUpload(up tusd.Upload) tusd.TerminatableUpload {
-	return up.(*upload.OcisSession)
-}
-
-// AsLengthDeclarableUpload returns a LengthDeclarableUpload
-// To implement the creation-defer-length extension as specified in https://tus.io/protocols/resumable-upload.html#creation
-// the storage needs to implement AsLengthDeclarableUpload
-func (f *FS) AsLengthDeclarableUpload(up tusd.Upload) tusd.LengthDeclarableUpload {
-	return up.(*upload.OcisSession)
-}
-
-// AsConcatableUpload returns a ConcatableUpload
-// To implement the concatenation extension as specified in https://tus.io/protocols/resumable-upload.html#concatenation
-// the storage needs to implement AsConcatableUpload
-func (f *FS) AsConcatableUpload(up tusd.Upload) tusd.ConcatableUpload {
-	return up.(*upload.OcisSession)
-}
-
 func (f *FS) GetHome(ctx context.Context) (string, error) {
 	var (
 		err     error
@@ -313,60 +269,6 @@ func (f *FS) ListFolder(ctx context.Context, ref *provider.Reference, mdKeys, fi
 	for _, unhook := range unhooks {
 		if err := unhook(); err != nil {
 			return nil, err
-		}
-	}
-
-	return res0, res1
-}
-
-func (f *FS) InitiateUpload(ctx context.Context, ref *provider.Reference, uploadLength int64, metadata map[string]string) (map[string]string, error) {
-	var (
-		err     error
-		unhook  UnHook
-		unhooks []UnHook
-	)
-	for _, hook := range f.hooks {
-		ctx, unhook, err = hook("InitiateUpload", ctx, ref.GetResourceId().GetSpaceId())
-		if err != nil {
-			return nil, err
-		}
-		if unhook != nil {
-			unhooks = append(unhooks, unhook)
-		}
-	}
-
-	res0, res1 := f.next.InitiateUpload(ctx, ref, uploadLength, metadata)
-
-	for _, unhook := range unhooks {
-		if err := unhook(); err != nil {
-			return nil, err
-		}
-	}
-
-	return res0, res1
-}
-
-func (f *FS) Upload(ctx context.Context, req storage.UploadRequest, uploadFunc storage.UploadFinishedFunc) (*provider.ResourceInfo, error) {
-	var (
-		err     error
-		unhook  UnHook
-		unhooks []UnHook
-	)
-	for _, hook := range f.hooks {
-		ctx, unhook, err = hook("Upload", ctx, req.Ref.GetResourceId().GetSpaceId())
-		if err != nil {
-			return &provider.ResourceInfo{}, err
-		}
-		if unhook != nil {
-			unhooks = append(unhooks, unhook)
-		}
-	}
-
-	res0, res1 := f.next.Upload(ctx, req, uploadFunc)
-
-	for _, unhook := range unhooks {
-		if err := unhook(); err != nil {
-			return &provider.ResourceInfo{}, err
 		}
 	}
 

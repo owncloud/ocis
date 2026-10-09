@@ -20,16 +20,11 @@ package storage
 
 import (
 	"context"
-	"io"
 	"time"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	tusd "github.com/tus/tusd/v2/pkg/handler"
 )
-
-// UploadFinishedFunc is a callback function used in storage drivers to indicate that an upload has finished
-type UploadFinishedFunc func(spaceOwner, executant *userpb.UserId, ref *provider.Reference)
 
 type skipTouchPropagationKey struct{}
 
@@ -42,26 +37,6 @@ func ContextSkipTouchPropagation(ctx context.Context) context.Context {
 func SkipTouchPropagation(ctx context.Context) bool {
 	skip, _ := ctx.Value(skipTouchPropagationKey{}).(bool)
 	return skip
-}
-
-// UploadRequest us used in FS.Upload() to carry required upload metadata
-type UploadRequest struct {
-	Ref    *provider.Reference
-	Body   io.ReadCloser
-	Length int64
-}
-
-// UploadsManager defines the interface for storage drivers that allow for managing uploads
-// Deprecated: No longer used. Storage drivers should implement the UploadSessionLister.
-type UploadsManager interface {
-	ListUploads() ([]tusd.FileInfo, error)
-	PurgeExpiredUploads(chan<- tusd.FileInfo) error
-}
-
-// UploadSessionLister defines the interface for FS implementations that allow listing and purging upload sessions
-type UploadSessionLister interface {
-	// ListUploadSessions returns the upload sessions matching the given filter
-	ListUploadSessions(ctx context.Context, filter UploadSessionFilter) ([]UploadSession, error)
 }
 
 // OrphanChecker defines the interface for FS implementations that can resolve a resource's metadata.

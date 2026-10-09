@@ -114,6 +114,12 @@ var responses = map[string]Response{
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetMD {"ref":{"path":"/versionedFile"},"mdKeys":null} EMPTY`:         {200, `{"opaque":{},"type":1,"id":{"opaque_id":"fileid-/some/path"},"checksum":{},"etag":"deadbeef","mime_type":"text/plain","mtime":{"seconds":1234567890},"path":"/versionedFile","permission_set":{},"size":2,"canonical_metadata":{},"arbitrary_metadata":{"metadata":{"da":"ta","some":"arbi","trary":"meta"}}}`, serverStateEmpty},
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetMD {"ref":{"path":"/versionedFile"},"mdKeys":null} FILE-RESTORED`: {200, `{"opaque":{},"type":1,"id":{"opaque_id":"fileid-/some/path"},"checksum":{},"etag":"deadbeef","mime_type":"text/plain","mtime":{"seconds":1234567890},"path":"/versionedFile","permission_set":{},"size":1,"canonical_metadata":{},"arbitrary_metadata":{"metadata":{"da":"ta","some":"arbi","trary":"meta"}}}`, serverStateFileRestored},
 
+	// The coordinator resolves the upload target itself, so it stats the file with the
+	// full reference before every upload. Reporting the file as existing keeps it on the
+	// overwrite path, which needs neither a parent stat nor a TouchFile (whose mtime is
+	// wall-clock derived and could never match this table's exact-body keys).
+	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetMD {"ref":{"resource_id":{"storage_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"path":"/versionedFile"},"mdKeys":[]}`: {200, `{"opaque":{},"type":1,"id":{"storage_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c","opaque_id":"fileid-/versionedFile"},"parent_id":{"opaque_id":"fileid-/"},"name":"versionedFile","checksum":{},"etag":"deadbeef","mime_type":"text/plain","mtime":{"seconds":1234567890},"path":"/versionedFile","permission_set":{"initiate_file_upload":true,"stat":true,"list_container":true,"list_file_versions":true,"restore_file_version":true},"size":1,"canonical_metadata":{},"arbitrary_metadata":{"metadata":{}}}`, serverStateEmpty},
+
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetPathByID {"storage_id":"00000000-0000-0000-0000-000000000000","opaque_id":"fileid-/some/path"} EMPTY`: {200, "/subdir", serverStateEmpty},
 
 	`POST /apps/sciencemesh/~f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c/api/storage/GetMD {"ref":{"path":"/file"},"mdKeys":null}`: {404, ``, serverStateEmpty},
