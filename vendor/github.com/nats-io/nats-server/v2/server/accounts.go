@@ -1128,6 +1128,7 @@ func (a *Account) removeLeafNode(c *client) {
 	for i, l := range a.lleafs {
 		if l == c {
 			a.lleafs[i] = a.lleafs[ll-1]
+			a.lleafs[ll-1] = nil
 			if ll == 1 {
 				a.lleafs = nil
 			} else {
@@ -2530,14 +2531,16 @@ func (a *Account) newServiceReply(tracking bool) []byte {
 	reply = append(reply, replyPre...)
 	reply = append(reply, b[:]...)
 
-	if tracking && s.sys != nil {
-		// Add in our tracking identifier. This allows the metrics to get back to only
-		// this server without needless SUBS/UNSUBS.
-		reply = append(reply, '.')
-		reply = append(reply, s.sys.shash...)
-		reply = append(reply, '.', 'T')
-	}
+	if tracking {
+		if shash := s.Node(); shash != _EMPTY_ {
+			// Add in our tracking identifier. This allows the metrics to get back to only
+			// this server without needless SUBS/UNSUBS.
+			reply = append(reply, '.')
+			reply = append(reply, shash...)
+			reply = append(reply, '.', 'T')
 
+		}
+	}
 	return reply
 }
 
@@ -2667,12 +2670,15 @@ func (a *Account) SetServiceExportAllowTrace(export string, allowTrace bool) err
 func (a *Account) addRespServiceImport(dest *Account, to string, osi *serviceImport, tracking bool, header http.Header, mt *msgTrace) *serviceImport {
 	nrr := string(osi.acc.newServiceReply(tracking))
 
+	dest.mu.Lock()
+	osiSe, osiLat, osiRT, osiShare := osi.se, osi.latency, osi.rt, osi.share
+	dest.mu.Unlock()
+
 	a.mu.Lock()
-	rt := osi.rt
 
 	// dest is the requestor's account. a is the service responder with the export.
 	// Marked as internal here, that is how we distinguish.
-	si := &serviceImport{dest, nil, osi.se, nil, nrr, to, nil, 0, rt, nil, nil, nil, mt, false, true, false, osi.share, false, false, false, nil}
+	si := &serviceImport{dest, nil, osiSe, nil, nrr, to, nil, 0, osiRT, nil, nil, nil, mt, false, true, false, osiShare, false, false, false, nil}
 
 	if a.exports.responses == nil {
 		a.exports.responses = make(map[string]*serviceImport)
@@ -2681,12 +2687,12 @@ func (a *Account) addRespServiceImport(dest *Account, to string, osi *serviceImp
 
 	// Always grab time and make sure response threshold timer is running.
 	si.ts = time.Now().UnixNano()
-	if osi.se != nil {
-		osi.se.setResponseThresholdTimer()
+	if osiSe != nil {
+		osiSe.setResponseThresholdTimer()
 	}
 
-	if rt == Singleton && tracking {
-		si.latency = osi.latency
+	if osiRT == Singleton && tracking {
+		si.latency = osiLat
 		si.tracking = true
 		si.trackingHdr = header
 	}
@@ -3418,21 +3424,14 @@ func (a *Account) hasExternalAuth() bool {
 	return a.extAuth != nil
 }
 
-// Deterimine if this is an external auth user.
+// Determine if this is an external auth user.
 func (a *Account) isExternalAuthUser(userID string) bool {
 	if a == nil {
 		return false
 	}
 	a.mu.RLock()
 	defer a.mu.RUnlock()
-	if a.extAuth != nil {
-		for _, u := range a.extAuth.AuthUsers {
-			if userID == u {
-				return true
-			}
-		}
-	}
-	return false
+	return a.extAuth != nil && slices.Contains(a.extAuth.AuthUsers, userID)
 }
 
 // Return the external authorization xkey if external authorization is enabled and the xkey is set.
@@ -3581,6 +3580,7 @@ func (s *Server) updateAccountClaimsWithRefresh(a *Account, ac *jwt.AccountClaim
 	}
 	a.mu.Unlock()
 
+	mappingFailed := false
 	for sub, wm := range ac.Mappings {
 		mappings := make([]*MapDest, len(wm))
 		for i, m := range wm {
@@ -3591,11 +3591,18 @@ func (s *Server) updateAccountClaimsWithRefresh(a *Account, ac *jwt.AccountClaim
 			}
 		}
 		// This will overwrite existing entries
-		a.AddWeightedMappings(string(sub), mappings...)
+		if err := a.AddWeightedMappings(string(sub), mappings...); err != nil {
+			// Do not remove existing mappings when a replacement fails to install;
+			// otherwise a rejected dest can leave the account with no mapping.
+			s.Errorf("Error adding subject mapping %q for account [%s]: %v", sub, tl, err)
+			mappingFailed = true
+		}
 	}
-	// remove mappings
-	for _, rmMapping := range removeList {
-		a.RemoveMapping(rmMapping)
+	// remove mappings only after all replacements installed cleanly
+	if !mappingFailed {
+		for _, rmMapping := range removeList {
+			a.RemoveMapping(rmMapping)
+		}
 	}
 
 	// Re-register system exports/imports.
@@ -4450,6 +4457,49 @@ func claimValidate(claim *jwt.AccountClaims) error {
 	claim.Validate(vr)
 	if vr.IsBlocking(false) {
 		return fmt.Errorf("validation errors: %v", vr.Errors())
+	}
+	// Align with Account.AddWeightedMappings so JWT pushes that would be
+	// silently discarded at install time are rejected up front instead.
+	if err := validateAccountClaimMappings(claim); err != nil {
+		return err
+	}
+	return nil
+}
+
+// validateAccountClaimMappings applies the same destination checks used by
+// Account.AddWeightedMappings (duplicates, weight totals, ValidateMapping,
+// NewSubjectTransform). jwt.Mapping.Validate is intentionally weaker.
+func validateAccountClaimMappings(claim *jwt.AccountClaims) error {
+	if claim == nil {
+		return nil
+	}
+	for src, wms := range claim.Mappings {
+		if !IsValidSubject(string(src)) {
+			return fmt.Errorf("mapping %q: %w", src, ErrBadSubject)
+		}
+		seen := make(map[string]struct{})
+		tw := make(map[string]uint8)
+		for _, m := range wms {
+			dest := string(m.Subject)
+			if _, ok := seen[dest]; ok {
+				return fmt.Errorf("mapping %q: duplicate entry for %q", src, dest)
+			}
+			seen[dest] = struct{}{}
+			weight := m.GetWeight()
+			if weight > 100 {
+				return fmt.Errorf("mapping %q: individual weights need to be <= 100", src)
+			}
+			tw[m.Cluster] += weight
+			if tw[m.Cluster] > 100 {
+				return fmt.Errorf("mapping %q: total weight needs to be <= 100", src)
+			}
+			if err := ValidateMapping(string(src), dest); err != nil {
+				return fmt.Errorf("mapping %q -> %q: %v", src, dest, err)
+			}
+			if _, err := NewSubjectTransform(string(src), dest); err != nil {
+				return fmt.Errorf("mapping %q -> %q: %v", src, dest, err)
+			}
+		}
 	}
 	return nil
 }

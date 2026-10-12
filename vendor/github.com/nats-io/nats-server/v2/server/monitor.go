@@ -313,7 +313,7 @@ func (s *Server) Connz(opts *ConnzOptions) (*Connz, error) {
 	c.ID = s.info.ID
 	// select client by CID
 	if cid > 0 {
-		cidClient = s.clients[cid]
+		cidClient = clist[cid]
 	}
 	s.mu.RUnlock()
 
@@ -373,8 +373,16 @@ func (s *Server) Connz(opts *ConnzOptions) (*Connz, error) {
 		// and look for opened connections.
 		if state == ConnOpen || state == ConnAll {
 			if cidClient != nil {
-				openClients = append(openClients, cidClient)
-				closedClients = nil
+				// The account filter was already applied by scoping clist,
+				// but user and MQTT client ID filters still need to be applied.
+				cidClient.mu.RLock()
+				cAuthUser := cidClient.getRawAuthUser()
+				cMQTTID := cidClient.getMQTTClientID()
+				cidClient.mu.RUnlock()
+				if (user == _EMPTY_ || cAuthUser == user) && (mqttCID == _EMPTY_ || cMQTTID == mqttCID) {
+					openClients = append(openClients, cidClient)
+					closedClients = nil
+				}
 			}
 		}
 		// If we did not find, and the user selected for ConnClosed or ConnAll,
@@ -2451,6 +2459,7 @@ type LeafInfo struct {
 	NumSubs     uint32     `json:"subscriptions"`
 	Subs        []string   `json:"subscriptions_list,omitempty"`
 	Compression string     `json:"compression,omitempty"`
+	Websocket   bool       `json:"websocket,omitempty"`
 	Proxy       *ProxyInfo `json:"proxy,omitempty"`
 }
 
@@ -2495,6 +2504,7 @@ func (s *Server) Leafz(opts *LeafzOptions) (*Leafz, error) {
 				OutBytes:    ln.outBytes,
 				NumSubs:     uint32(len(ln.subs)),
 				Compression: ln.leaf.compression,
+				Websocket:   ln.isWebsocket(),
 				Proxy:       createProxyInfo(ln),
 			}
 			if opts != nil && opts.Subscriptions {
