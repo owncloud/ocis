@@ -42,17 +42,9 @@
 {{- define "ocis.extraEnvs" -}}
 - name: OCIS_LOG_FILE
   value: /logs/ocis.log
-{{- if eq .appName "idm" }}
-- name: IDM_ADMIN_PASSWORD
-  value: admin
-{{- end -}}
 {{- if eq .appName "proxy" }}
 - name: PROXY_ENABLE_BASIC_AUTH
   value: "true"
-{{- end -}}
-{{- if eq .appName "audit" }}
-- name: AUDIT_LOG_TO_CONSOLE
-  value: "false"
 {{- end -}}
 {{- if eq .appName "thumbnails" }}
 - name: THUMBNAILS_TXT_FONTMAP_FILE
