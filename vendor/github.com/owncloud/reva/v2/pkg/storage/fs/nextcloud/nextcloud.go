@@ -405,34 +405,6 @@ func (nc *StorageDriver) ListFolder(ctx context.Context, ref *provider.Reference
 	return pointers, err
 }
 
-// InitiateUpload as defined in the storage.FS interface
-func (nc *StorageDriver) InitiateUpload(ctx context.Context, ref *provider.Reference, uploadLength int64, metadata map[string]string) (map[string]string, error) {
-	type paramsObj struct {
-		Ref          *provider.Reference `json:"ref"`
-		UploadLength int64               `json:"uploadLength"`
-		Metadata     map[string]string   `json:"metadata"`
-	}
-	bodyObj := &paramsObj{
-		Ref:          ref,
-		UploadLength: uploadLength,
-		Metadata:     metadata,
-	}
-	bodyStr, _ := json.Marshal(bodyObj)
-	log := appctx.GetLogger(ctx)
-	log.Info().Msgf("InitiateUpload %s", bodyStr)
-
-	_, respBody, err := nc.do(ctx, Action{"InitiateUpload", string(bodyStr)})
-	if err != nil {
-		return nil, err
-	}
-	respMap := make(map[string]string)
-	err = json.Unmarshal(respBody, &respMap)
-	if err != nil {
-		return nil, err
-	}
-	return respMap, err
-}
-
 // MarkProcessing as defined in the storage.FS interface.
 // No sciencemesh endpoint toggles the flag alone. A no-op, not NotSupported:
 // the coordinator treats a failed mark as fatal.
@@ -455,22 +427,6 @@ func (nc *StorageDriver) PrepareUpload(_ context.Context, _ *provider.Reference,
 
 func (nc *StorageDriver) RollbackUpload(_ context.Context, _ *provider.Reference, _ string, _ storage.RollbackInfo) error {
 	return nil
-}
-
-// Upload as defined in the storage.FS interface
-func (nc *StorageDriver) Upload(ctx context.Context, req storage.UploadRequest, _ storage.UploadFinishedFunc) (*provider.ResourceInfo, error) {
-	err := nc.doUpload(ctx, req.Ref.Path, req.Body)
-	if err != nil {
-		return &provider.ResourceInfo{}, err
-	}
-
-	// return id, etag and mtime
-	ri, err := nc.GetMD(ctx, req.Ref, []string{}, []string{"id", "etag", "mtime"})
-	if err != nil {
-		return &provider.ResourceInfo{}, err
-	}
-
-	return ri, nil
 }
 
 // Download as defined in the storage.FS interface
