@@ -292,7 +292,7 @@ type RemoteLeafOpts struct {
 		NoMasking   bool `json:"-"`
 	}
 
-	// HTTP Proxy configuration for WebSocket connections
+	// HTTP proxy configuration, used for all remote URLs
 	Proxy struct {
 		// URL of the HTTP proxy server (e.g., "http://proxy.example.com:8080")
 		URL string `json:"-"`
@@ -302,6 +302,10 @@ type RemoteLeafOpts struct {
 		Password string `json:"-"`
 		// Timeout for proxy connection
 		Timeout time.Duration `json:"-"`
+		// TLSConfig for the connection to an https proxy, nil uses system roots
+		TLSConfig *tls.Config `json:"-"`
+		// TLSTimeout for the TLS handshake with an https proxy, in seconds, defaults to DEFAULT_LEAF_TLS_TIMEOUT
+		TLSTimeout float64 `json:"-"`
 	}
 
 	tlsConfigOpts *TLSConfigOpts
@@ -375,7 +379,7 @@ func generateRemoteLeafOptsName(r *RemoteLeafOpts, redacted bool) string {
 type JSLimitOpts struct {
 	MaxRequestBatch           int           `json:"max_request_batch,omitempty"`             // MaxRequestBatch is the maximum amount of updates that can be sent in a batch
 	MaxAckPending             int           `json:"max_ack_pending,omitempty"`               // MaxAckPending is the server limit for maximum amount of outstanding Acks
-	MaxHAAssets               int           `json:"max_ha_assets,omitempty"`                 // MaxHAAssets is the maximum of Streams and Consumers that may have more than 1 replica
+	MaxHAAssets               int           `json:"max_ha_assets,omitempty"`                 // MaxHAAssets is the maximum number of Streams and Consumers that may have more than 1 replica, per server, enforced by the meta leader
 	Duplicates                time.Duration `json:"max_duplicate_window,omitempty"`          // Duplicates is the maximum value for duplicate tracking on Streams
 	MaxBatchInflightPerStream int           `json:"max_batch_inflight_per_stream,omitempty"` // MaxBatchInflightPerStream is the maximum amount of open batches per stream
 	MaxBatchInflightTotal     int           `json:"max_batch_inflight_total,omitempty"`      // MaxBatchInflightTotal is the maximum amount of total open batches per server
@@ -3079,6 +3083,26 @@ func parseLeafUsers(mv any, errors *[]error) ([]*User, error) {
 	return users, nil
 }
 
+// proxyTLSSupportedKeys are the TLS options that apply to the client connection to a proxy.
+var proxyTLSSupportedKeys = map[string]struct{}{
+	"cert_file":                    {},
+	"key_file":                     {},
+	"ca_file":                      {},
+	"insecure":                     {},
+	"cipher_suites":                {},
+	"allow_insecure_cipher_suites": {},
+	"curve_preferences":            {},
+	"min_version":                  {},
+	"timeout":                      {},
+	"cert_store":                   {},
+	"cert_match_by":                {},
+	"cert_match":                   {},
+	"cert_match_skip_invalid":      {},
+	"ca_certs_match":               {},
+	"certs":                        {},
+	"certificates":                 {},
+}
+
 func parseRemoteLeafNodes(v any, errors *[]error, warnings *[]error) ([]*RemoteLeafOpts, error) {
 	var lt token
 	defer convertPanicToErrorList(&lt, errors)
@@ -3246,6 +3270,33 @@ func parseRemoteLeafNodes(v any, errors *[]error, warnings *[]error) ([]*RemoteL
 						remote.Proxy.Password = pv.(string)
 					case "timeout":
 						remote.Proxy.Timeout = parseDuration("proxy timeout", tk, pv, errors, warnings)
+					case "tls":
+						var unsupported bool
+						tlsMap, _ := pv.(map[string]any)
+						for tlsKey, tlsValue := range tlsMap {
+							ttk, _ := unwrapValue(tlsValue, &lt)
+							if _, ok := proxyTLSSupportedKeys[strings.ToLower(tlsKey)]; !ok {
+								*errors = append(*errors, &configErr{ttk, fmt.Sprintf("%q is not supported for proxy TLS", tlsKey)})
+								unsupported = true
+							}
+						}
+						if unsupported {
+							continue
+						}
+						tc, err := parseTLS(tk, true)
+						if err != nil {
+							*errors = append(*errors, err)
+							continue
+						}
+						tlsConfig, err := GenTLSConfig(tc)
+						if err != nil {
+							*errors = append(*errors, &configErr{tk, err.Error()})
+							continue
+						}
+						// Used as a client, so ca_file must populate RootCAs.
+						tlsConfig.RootCAs = tlsConfig.ClientCAs
+						remote.Proxy.TLSConfig = tlsConfig
+						remote.Proxy.TLSTimeout = tc.Timeout
 					default:
 						if !tk.IsUsedVariable() {
 							err := &unknownConfigFieldErr{

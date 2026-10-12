@@ -305,15 +305,6 @@ func (ms *memStore) storeRawMsg(subj string, hdr, msg []byte, seq uint64, ts, tt
 		ms.state.FirstTime = now
 	}
 
-	// Make copies
-	// TODO(dlc) - Maybe be smarter here.
-	if len(msg) > 0 {
-		msg = copyBytes(msg)
-	}
-	if len(hdr) > 0 {
-		hdr = copyBytes(hdr)
-	}
-
 	// FIXME(dlc) - Could pool at this level?
 	sm := &StoreMsg{subj, nil, nil, make([]byte, 0, len(hdr)+len(msg)), seq, ts}
 	sm.buf = append(sm.buf, hdr...)
@@ -1439,7 +1430,12 @@ func (ms *memStore) expireMsgs() {
 	// Remove messages collected by THW.
 	if !sdmEnabled {
 		for _, rm := range rmSeqs {
-			ms.removeMsg(rm.Seq, false)
+			// The message may already be gone, removed out of band by a path that
+			// does not consult the THW. Drop the entry in that case, otherwise it is
+			// collected again on every pass forever.
+			if !ms.removeMsg(rm.Seq, false) {
+				ms.ttls.Remove(rm.Seq, rm.Expires)
+			}
 		}
 	} else {
 		// THW is unordered, so must sort by sequence and must not be holding the lock.

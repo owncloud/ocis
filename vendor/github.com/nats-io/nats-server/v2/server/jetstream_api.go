@@ -402,6 +402,15 @@ func generateJSMappingTable(domain string) map[string]string {
 // JSMaxDescription is the maximum description length for streams and consumers.
 const JSMaxDescriptionLen = 4 * 1024
 
+const (
+	// S2 framing constants, mirrored from github.com/klauspost/compress/s2 where they are unexported.
+	s2MagicChunk      = "\xff\x06\x00\x00S2sTwO"
+	s2ChunkHeaderSize = 4
+	s2MaxChunkSize    = 1<<24 - 1
+	// jsRestoreFormatDetectLimit bounds bytes buffered while detecting the snapshot format: the S2 stream identifier plus one maximum-sized S2 chunk.
+	jsRestoreFormatDetectLimit = len(s2MagicChunk) + s2ChunkHeaderSize + s2MaxChunkSize
+)
+
 // JSMaxMetadataLen is the maximum length for streams and consumers metadata map.
 // It's calculated by summing length of all keys and values.
 const JSMaxMetadataLen = 128 * 1024
@@ -2395,6 +2404,10 @@ func (s *Server) jsConsumerLeaderStepDownRequest(sub *subscription, c *client, _
 
 	js.mu.RLock()
 	isLeader, sa := cc.isLeader(), js.streamAssignment(acc.Name, stream)
+	var ca *consumerAssignment
+	if sa != nil {
+		ca = sa.consumers[consumer]
+	}
 	js.mu.RUnlock()
 
 	if isLeader && sa == nil {
@@ -2411,10 +2424,6 @@ func (s *Server) jsConsumerLeaderStepDownRequest(sub *subscription, c *client, _
 		return
 	}
 
-	var ca *consumerAssignment
-	if sa.consumers != nil {
-		ca = sa.consumers[consumer]
-	}
 	if ca == nil {
 		resp.Error = NewJSConsumerNotFoundError()
 		s.sendAPIErrResponse(ci, acc, subject, reply, string(msg), s.jsonResponse(&resp))
@@ -3277,7 +3286,8 @@ func (s *Server) jsLeaderServerStreamMoveRequest(sub *subscription, c *client, _
 	// we need to expand into another one below.
 	newCluster := currCluster
 
-	peers, e := cc.selectPeerGroup(cfg.Replicas+1, currCluster, &cfg, currPeers, 1, nil)
+	haCost := cc.streamHACost(accName, &cfg)
+	peers, e := cc.selectPeerGroup(cfg.Replicas+1, currCluster, &cfg, currPeers, 1, nil, haCost, nil)
 	if len(peers) <= cfg.Replicas {
 		// since expanding in the same cluster did not yield a result, try in different cluster
 		peers = nil
@@ -3292,7 +3302,7 @@ func (s *Server) jsLeaderServerStreamMoveRequest(sub *subscription, c *client, _
 		errs := &selectPeerError{}
 		errs.accumulate(e)
 		for cluster := range clusters {
-			newPeers, e := cc.selectPeerGroup(cfg.Replicas, cluster, &cfg, nil, 0, nil)
+			newPeers, e := cc.selectPeerGroup(cfg.Replicas, cluster, &cfg, nil, 0, nil, haCost, nil)
 			if len(newPeers) >= cfg.Replicas {
 				peers = append([]string{}, currPeers...)
 				peers = append(peers, newPeers[:cfg.Replicas]...)
@@ -4491,10 +4501,12 @@ func (s *Server) processStreamRestore(ci *ClientInfo, acc *Account, cfg *StreamC
 
 		// Determine the snapshot format.
 		var consumed bytes.Buffer
-		tee := io.TeeReader(pr, &consumed)
+		tee := io.TeeReader(io.LimitReader(pr, int64(jsRestoreFormatDetectLimit)), &consumed)
 		sr := s2.NewReader(tee)
 		var preamble [8]byte
-		if _, err = io.ReadFull(sr, preamble[:]); err == nil {
+		if _, err = io.ReadFull(sr, preamble[:]); err != nil && consumed.Len() >= jsRestoreFormatDetectLimit {
+			err = errors.New("snapshot format not detected within size limit")
+		} else if err == nil {
 			replay := io.MultiReader(&consumed, pr)
 			if bytes.Equal(preamble[:], []byte(archive.MagicBytes)) {
 				mset, err = acc.RestoreStreamV2(cfg, replay)

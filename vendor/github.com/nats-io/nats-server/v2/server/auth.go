@@ -352,8 +352,8 @@ func (s *Server) configureAuthorization() {
 		}
 		for _, u := range opts.AuthCallout.AuthUsers {
 			// Check for user in users and nkeys since this is server config.
-			var found bool
-			if len(s.users) > 0 {
+			found := u != _EMPTY_ && (u == opts.Username || u == opts.Websocket.Username || u == opts.MQTT.Username)
+			if !found && len(s.users) > 0 {
 				_, found = s.users[u]
 			}
 			if !found && len(s.nkeys) > 0 {
@@ -661,6 +661,11 @@ func (s *Server) processClientOrLeafAuthentication(c *client, opts *Options) (au
 		ok   bool
 		err  error
 		ao   bool // auth override
+		// Set if account registration failed, the connection is already closed.
+		regErr error
+
+		username string
+		token    string
 	)
 
 	// Little helper that will log the error as a debug statement, set the auth error in
@@ -682,6 +687,10 @@ func (s *Server) processClientOrLeafAuthentication(c *client, opts *Options) (au
 	var proxyRequired bool
 	// Check if we have auth callouts enabled at the server level or in the bound account.
 	defer func() {
+		// Not an auth failure, skip the auth error event and auth callout.
+		if regErr != nil {
+			return
+		}
 		authErr := c.getAuthError()
 		if authErr == nil {
 			authErr = ErrAuthentication
@@ -731,16 +740,20 @@ func (s *Server) processClientOrLeafAuthentication(c *client, opts *Options) (au
 		// We have auth callout set here.
 		var skip bool
 		// Check if we are on the list of auth_users.
-		userID := c.getRawAuthUser()
 		if juc != nil {
-			skip = acc.isExternalAuthUser(userID)
+			skip = acc.isExternalAuthUser(juc.Subject)
 		} else {
-			for _, u := range opts.AuthCallout.AuthUsers {
-				if userID == u {
-					skip = true
-					break
-				}
+			var userID string
+			switch {
+			case nkey != nil:
+				userID = nkey.Nkey
+			case user != nil:
+				userID = user.Username
+			case token == _EMPTY_ && username != _EMPTY_ && c.opts.Username == username:
+				// Single user, or websocket/MQTT auth override.
+				userID = username
 			}
+			skip = userID != _EMPTY_ && slices.Contains(opts.AuthCallout.AuthUsers, userID)
 		}
 
 		// If we are here we have an auth callout defined and we have failed auth so far
@@ -795,9 +808,7 @@ func (s *Server) processClientOrLeafAuthentication(c *client, opts *Options) (au
 		return true
 	}
 	var (
-		username      string
 		password      string
-		token         string
 		noAuthUser    string
 		pinnedAcounts map[string]struct{}
 	)
@@ -1042,6 +1053,10 @@ func (s *Server) processClientOrLeafAuthentication(c *client, opts *Options) (au
 				c.Debugf("User JWT generated invalid permissions")
 				return false
 			}
+			// The scoped template may have introduced a proxy requirement.
+			if proxyRequired = juc.ProxyRequired; proxyRequired && !trustedProxy {
+				return setProxyAuthError(ErrAuthProxyRequired)
+			}
 		}
 		if acc.IsExpired() {
 			c.Debugf("Account JWT has expired")
@@ -1202,7 +1217,7 @@ func (s *Server) processClientOrLeafAuthentication(c *client, opts *Options) (au
 				return false
 			}
 		}
-		if err := c.RegisterNkeyUser(nkey); err != nil {
+		if regErr = c.RegisterNkeyUser(nkey); regErr != nil {
 			return false
 		}
 		return true
@@ -1222,7 +1237,9 @@ func (s *Server) processClientOrLeafAuthentication(c *client, opts *Options) (au
 		// If we are authorized, register the user which will properly setup any permissions
 		// for pub/sub authorizations.
 		if ok {
-			c.RegisterUser(user)
+			if regErr = c.registerUser(user); regErr != nil {
+				return false
+			}
 		}
 		return ok
 	}

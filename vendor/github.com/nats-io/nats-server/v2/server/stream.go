@@ -301,12 +301,14 @@ func (ack BatchFlowAck) MarshalJSON() ([]byte, error) {
 }
 
 // BatchFlowGap is used for reporting gaps when fast batch publishing into a stream.
+// A forward gap means messages were lost, a backward gap means a message was duplicated or reordered.
 // This message is purely informational and could technically be lost without the client receiving it.
 type BatchFlowGap struct {
 	// Type: "gap"
 	Type string `json:"type"`
 	// ExpectedLastSequence is the sequence expected to be received next.
-	// Messages starting from ExpectedLastSequence up to (but not including) CurrentSequence were lost.
+	// If CurrentSequence is higher, messages starting from ExpectedLastSequence up to (but not including) CurrentSequence were lost.
+	// If CurrentSequence is lower or equal, it's a backward gap and the batch is ended, the PubAck confirms what was persisted.
 	ExpectedLastSequence uint64 `json:"last_seq"`
 	// CurrentSequence is the sequence of the message that just came in and detected the gap.
 	CurrentSequence uint64 `json:"seq"`
@@ -713,6 +715,8 @@ type sourceInfo struct {
 	lag   uint64              // 0 or number of messages pending (as last reported by the consumer) - 1.
 	err   *ApiError           // The API error that caused the last consumer setup to fail.
 	fails int                 // The number of times trying to setup the consumer failed.
+	fcid  string              // The last flow control reply subject the consumer reported being stalled on.
+	fcsc  int                 // Consecutive heartbeats reporting the same stalled flow control reply subject.
 	last  atomic.Int64        // Time the consumer was created or of last message it received.
 	lreq  time.Time           // The last time setupMirrorConsumer/setupSourceConsumer was called.
 	qch   chan struct{}       // Quit channel.
@@ -1254,6 +1258,21 @@ func (ssi *StreamSource) composeIName() string {
 // Sets the index name.
 func (ssi *StreamSource) setIndexName() {
 	ssi.iname = ssi.composeIName()
+}
+
+// matchSourceIndexNames sets the index names on cfg's sources only if they are also set on ocfg's sources.
+// The index name is not encoded, so this ensures a DeepEqual of both configs can succeed.
+func matchSourceIndexNames(cfg *StreamConfig, ocfg *StreamConfig) {
+	currentIName := make(map[string]struct{}, len(ocfg.Sources))
+	for _, s := range ocfg.Sources {
+		currentIName[s.iname] = struct{}{}
+	}
+	for _, s := range cfg.Sources {
+		s.setIndexName()
+		if _, ok := currentIName[s.iname]; !ok {
+			s.iname = _EMPTY_
+		}
+	}
 }
 
 // Composes the consumer index name. Contains the stream name and consumer name used for durable sourcing (if any).
@@ -3498,7 +3517,9 @@ func (mset *stream) processInboundMirrorMsg(m *inMsg) bool {
 				needsRetry = true
 			} else if fcReply := sliceHeader(JSConsumerStalled, m.hdr); len(fcReply) > 0 {
 				// Other side thinks we are stalled, so send flow control reply.
-				mset.outq.sendMsg(string(fcReply), nil)
+				mset.processStalledFlowControl(mset.mirror, string(fcReply))
+			} else {
+				mset.clearStalledFlowControl(mset.mirror)
 			}
 		}
 		mset.mu.Unlock()
@@ -3555,6 +3576,8 @@ func (mset *stream) processInboundMirrorMsg(m *inMsg) bool {
 	} else {
 		mset.mirror.lag = pending - 1
 	}
+	// Receiving messages means we are not stalled on flow control.
+	mset.clearStalledFlowControl(mset.mirror)
 
 	// Check if we allow mirror direct here. If so check they we have mostly caught up.
 	// The reason we do not require 0 is if the source is active we may always be slightly behind.
@@ -4125,6 +4148,7 @@ func (mset *stream) setupMirrorConsumer() error {
 			// Capture consumer name.
 			mirror.cname = ccr.ConsumerInfo.Name
 			mirror.dseq = 0
+			mirror.fcid, mirror.fcsc = _EMPTY_, 0
 			mirror.sseq = max(ccr.ConsumerInfo.Delivered.Stream, state.LastSeq)
 			mirror.qch = make(chan struct{})
 			mirror.wg.Add(1)
@@ -4636,6 +4660,7 @@ func (mset *stream) trySetupSourceConsumer(iname string, seq uint64, startTime t
 
 				// Do not set si.sseq to seq here. si.sseq will be set in processInboundSourceMsg
 				si.dseq = 0
+				si.fcid, si.fcsc = _EMPTY_, 0
 				si.qch = make(chan struct{})
 				// Set the last seen as now so that we don't fail at the first check.
 				si.last.Store(time.Now().UnixNano())
@@ -4798,6 +4823,43 @@ func (mset *stream) handleFlowControl(m *inMsg, dseq, sseq uint64) {
 	}
 }
 
+// Number of consecutive heartbeats reporting the same stalled flow control reply
+// before we consider our replies to not be reaching the consumer.
+const sourceFCStalledThreshold = 3
+
+// processStalledFlowControl sends the flow control reply the consumer reports being stalled on.
+// If it keeps reporting the same one, our replies are not reaching it, so report an error.
+// Lock should be held.
+func (mset *stream) processStalledFlowControl(si *sourceInfo, fcReply string) {
+	if fcReply != si.fcid {
+		si.fcid, si.fcsc = fcReply, 0
+	}
+	si.fcsc++
+	// Warn exactly once per stall.
+	if si.fcsc == sourceFCStalledThreshold {
+		si.err = NewJSSourceConsumerFlowControlStalledError()
+		kind := "source"
+		if si == mset.mirror {
+			kind = "mirror"
+		}
+		mset.srv.Warnf("JetStream stream '%s > %s' %s '%s' is stalled on flow control, replies are not reaching the consumer",
+			mset.acc.Name, mset.cfg.Name, kind, si.name)
+	}
+	mset.outq.sendMsg(fcReply, nil)
+}
+
+// clearStalledFlowControl resets stalled flow control tracking once the consumer is no longer stalled.
+// Lock should be held.
+func (mset *stream) clearStalledFlowControl(si *sourceInfo) {
+	if si.fcid == _EMPTY_ {
+		return
+	}
+	si.fcid, si.fcsc = _EMPTY_, 0
+	if si.err != nil && si.err.ErrCode == uint16(JSSourceConsumerFlowControlStalledErr) {
+		si.err = nil
+	}
+}
+
 // processInboundSourceMsg handles processing other stream messages bound for this stream.
 func (mset *stream) processInboundSourceMsg(si *sourceInfo, m *inMsg) bool {
 	mset.mu.Lock()
@@ -4830,7 +4892,9 @@ func (mset *stream) processInboundSourceMsg(si *sourceInfo, m *inMsg) bool {
 				mset.retrySourceConsumerAtSeq(si.iname, si.sseq+1)
 			} else if fcReply := sliceHeader(JSConsumerStalled, m.hdr); len(fcReply) > 0 {
 				// Other side thinks we are stalled, so send flow control reply.
-				mset.outq.sendMsg(string(fcReply), nil)
+				mset.processStalledFlowControl(si, string(fcReply))
+			} else {
+				mset.clearStalledFlowControl(si)
 			}
 		}
 		mset.mu.Unlock()
@@ -4876,6 +4940,8 @@ func (mset *stream) processInboundSourceMsg(si *sourceInfo, m *inMsg) bool {
 	} else {
 		si.lag = pending - 1
 	}
+	// Receiving messages means we are not stalled on flow control.
+	mset.clearStalledFlowControl(si)
 	node, ident := mset.node, si.ident
 	mset.mu.Unlock()
 
@@ -8080,7 +8146,8 @@ func (mset *stream) processJetStreamFastBatchMsg(batch *FastBatch, subject, repl
 	// Get batch.
 	b, ok := batches.fast[batch.id]
 	if !ok {
-		if batch.seq != 1 {
+		// A new batch can only be started at sequence 1 and not by a ping.
+		if batch.seq != 1 || batch.ping {
 			batches.mu.Unlock()
 			mset.mu.Unlock()
 			return respondError(NewJSBatchPublishUnknownBatchIDError())
@@ -8172,8 +8239,8 @@ func (mset *stream) processJetStreamFastBatchMsg(batch *FastBatch, subject, repl
 	// Detect gaps.
 	b.lseq++
 	if b.lseq != batch.seq || cleanup {
-		// If a forward gap is detected, we always report about it.
-		if batch.seq > b.lseq {
+		// If a forward or backward gap is detected, we always report about it.
+		if batch.seq != b.lseq {
 			buf, _ := BatchFlowGap{ExpectedLastSequence: b.lseq, CurrentSequence: batch.seq}.MarshalJSON()
 			outq.sendMsg(reply, buf)
 		}
@@ -8970,8 +9037,9 @@ func (mset *stream) checkInterestState() {
 	rp := mset.cfg.Retention
 	mset.cfgMu.RUnlock()
 	// Remove as many messages from the "head" of the stream if there's no interest anymore.
+	// Only compact up to the current stream state, consumers may be ahead while replaying.
 	if rp == InterestPolicy && asflr != math.MaxUint64 {
-		mset.store.Compact(asflr)
+		mset.store.Compact(min(asflr, ss.LastSeq+1))
 	}
 }
 
