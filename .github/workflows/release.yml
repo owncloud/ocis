@@ -14,9 +14,6 @@ on:
         default: ''
 
 env:
-  PRODUCTION_RELEASE_TAGS: '5.0,7,8'
-  DOCKER_REPO_ROLLING: owncloud/ocis-rolling
-  DOCKER_REPO_PRODUCTION: owncloud/ocis
   NODE_VERSION: '24'
   PNPM_VERSION: '10.28.1'
   GOLANG_BUILD_IMAGE: 'golang:1.26.8-alpine3.23@sha256:a8fa79c5bd40d880b52bd3b6d7669ecdcfd00e85facdd427d279efb5ddd79cb1'
@@ -27,9 +24,7 @@ jobs:
     timeout-minutes: 10
     outputs:
       version:       ${{ steps.info.outputs.version }}
-      is_production: ${{ steps.info.outputs.is_production }}
       is_prerelease: ${{ steps.info.outputs.is_prerelease }}
-      docker_repos:  ${{ steps.info.outputs.docker_repos }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         if: ${{ github.ref_type == 'branch' || (github.event_name == 'workflow_dispatch' && inputs.version_override == '') }}
@@ -75,23 +70,10 @@ jobs:
             exit 1
           fi
 
-          IS_PRODUCTION=false
-          for TAG in ${PRODUCTION_RELEASE_TAGS//,/ }; do
-            [[ "$VERSION" == "$TAG"* ]] && IS_PRODUCTION=true && break
-          done
-
           [[ "$VERSION" == *"-"* ]] && IS_PRERELEASE=true || IS_PRERELEASE=false
 
-          if [[ "$IS_PRODUCTION" == "true" && "$IS_PRERELEASE" == "false" ]]; then
-            REPOS=[\"$DOCKER_REPO_ROLLING\",\"$DOCKER_REPO_PRODUCTION\"]
-          else
-            REPOS=[\"$DOCKER_REPO_ROLLING\"]
-          fi
-
           echo "version=$VERSION"             >> $GITHUB_OUTPUT
-          echo "is_production=$IS_PRODUCTION" >> $GITHUB_OUTPUT
           echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
-          echo "docker_repos=$REPOS"          >> $GITHUB_OUTPUT
 
   generate-code:
     runs-on: ubuntu-latest
@@ -127,159 +109,6 @@ jobs:
             !.git
             !web
           retention-days: 1
-
-  docker-build:
-    if: false
-    name: docker-build (${{ matrix.arch }}, ${{ matrix.repo }})
-    runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
-    timeout-minutes: 120
-    needs: [determine-release-type, generate-code, security-scan-trivy]
-    strategy:
-      matrix:
-        arch: [amd64, arm64]
-        repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          name: generated-code
-          path: .
-      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
-      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - id: goversion
-        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
-        with:
-          go-version-file: go.mod
-      - run: |
-          ALPINE_VERSION=$(grep '^FROM.*alpine:' ocis/docker/Dockerfile.linux.${{ matrix.arch }} | grep -o 'alpine:[0-9.]*' | cut -d: -f2 | cut -d. -f1,2)
-          docker run --rm \
-            -v "${{ github.workspace }}:/workspace" \
-            -w /workspace \
-            "golang:${{ steps.goversion.outputs.go-version }}-alpine${ALPINE_VERSION}" \
-            sh -c "apk add --no-cache bash gcc musl-dev vips-dev make git && \
-                   git config --global --add safe.directory /workspace && \
-                   CGO_ENABLED=1 ENABLE_VIPS=true VERSION=${{ needs.determine-release-type.outputs.version }} \
-                   make -C ocis release-linux-docker-${{ matrix.arch }}"
-      - id: tags
-        run: |
-          VERSION="${{ needs.determine-release-type.outputs.version }}"
-          REPO="${{ matrix.repo }}"
-          ARCH="${{ matrix.arch }}"
-          printf "tags<<EOF\n%s\nEOF\n" \
-            "${REPO}:${VERSION}-linux-${ARCH}" >> $GITHUB_OUTPUT
-      - id: build
-        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
-        with:
-          context: ocis
-          file: ocis/docker/Dockerfile.linux.${{ matrix.arch }}
-          platforms: linux/${{ matrix.arch }}
-          load: true
-          push: false
-          provenance: false
-          build-args: |
-            REVISION=${{ github.sha }}
-            VERSION=${{ needs.determine-release-type.outputs.version }}
-          tags: ${{ steps.tags.outputs.tags }}
-      - id: trivy
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
-        continue-on-error: true
-        with:
-          image-ref: ${{ steps.tags.outputs.tags }}
-          format: table
-          exit-code: 1
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          skip-files: /usr/bin/gomplate,/usr/bin/wait-for
-          hide-progress: true
-        env:
-          TRIVY_IGNOREFILE: .trivyignore
-      - name: Block on vulnerabilities
-        if: steps.trivy.outcome == 'failure'
-        run: |
-          echo "::error title=Security scan blocked release::Image ${{ steps.tags.outputs.tags }} has HIGH or CRITICAL vulnerabilities (see Trivy report above). Fix all findings before releasing."
-          exit 1
-      - name: push
-        if: steps.trivy.outcome == 'success'
-        run: docker push ${{ steps.tags.outputs.tags }}
-
-  docker-scan:
-    name: docker-scan (${{ matrix.arch }}, ${{ matrix.repo }})
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    needs: [determine-release-type, docker-build]
-    strategy:
-      matrix:
-        arch: [amd64]
-        repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
-        id: trivy
-        continue-on-error: true
-        with:
-          image-ref: ${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-${{ matrix.arch }}
-          format: table
-          exit-code: 1
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          skip-files: /usr/bin/gomplate,/usr/bin/wait-for
-          hide-progress: true
-        env:
-          TRIVY_IGNOREFILE: .trivyignore
-
-      - name: Block on vulnerabilities
-        if: steps.trivy.outcome == 'failure'
-        run: |
-          echo "::error title=Security scan blocked release::Image ${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-${{ matrix.arch }} has HIGH or CRITICAL vulnerabilities (see Trivy report above). Fix all findings before releasing."
-          exit 1
-
-  docker-manifest:
-    if: false
-    name: docker-manifest (${{ matrix.repo }})
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: [determine-release-type, docker-build, docker-scan]
-    strategy:
-      matrix:
-        repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
-    steps:
-      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - if: ${{ contains(matrix.repo, 'rolling') }}
-        run: |
-          docker buildx imagetools create \
-            -t "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}" \
-            "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-amd64" \
-            "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-arm64"
-      - if: ${{ !contains(matrix.repo, 'rolling') }}
-        run: |
-          docker buildx imagetools create \
-            -t "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}" \
-            "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-amd64" \
-            "${{ matrix.repo }}:${{ needs.determine-release-type.outputs.version }}-linux-arm64"
-
-  docker-readme:
-    if: false
-    name: docker-readme (${{ matrix.repo }})
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: [determine-release-type, docker-manifest]
-    strategy:
-      matrix:
-        repo: ${{ fromJSON(needs.determine-release-type.outputs.docker_repos) }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa # v5.0.0
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: ${{ matrix.repo }}
-          readme-filepath: ocis/README.md
 
   build-binaries:
     name: build-binaries (${{ matrix.os }})
