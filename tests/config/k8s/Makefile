@@ -29,6 +29,9 @@ prepare-charts:
 	kubectl create configmap -n $(DOMAIN) ocis-fonts-ttf --from-file=../ci/NotoSans.ttf || true
 	kubectl create secret generic -n $(DOMAIN) ocis-admin-user \
 		--from-literal=user-id=ddc2004c-0977-11eb-9d3f-a793888cd0f8 --from-literal=password=admin || true
+	sed 's|https://ocis-server:9200|https://$(DOMAIN)|g' ../ci/ocis-config.json > $(CHART_REPO)/web-config.json
+	kubectl create configmap -n $(DOMAIN) ocis-web-config \
+		--from-file=web-config.json=$(CHART_REPO)/web-config.json || true
 	kubectl create configmap -n $(DOMAIN) ocis-translations \
 		--from-file=de_LC_MESSAGES_notifications.po=../translations/de/LC_MESSAGES/notifications.po \
 		--from-file=es_LC_MESSAGES_notifications.po=../translations/es/LC_MESSAGES/notifications.po || true
