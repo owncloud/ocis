@@ -165,7 +165,7 @@ jobs:
           exit $FAILED
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ocis-build-artifacts
           path: |
@@ -294,7 +294,7 @@ jobs:
 
       - name: Upload raw coverage data
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-coverage-${{ matrix.suite }}
           path: ${{ env.GOCOVERDIR }}
@@ -342,7 +342,7 @@ jobs:
 
       - name: Upload raw coverage data
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-coverage-cli-${{ matrix.suite }}
           path: ${{ env.GOCOVERDIR }}
@@ -390,7 +390,7 @@ jobs:
 
       - name: Upload raw coverage data
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-coverage-ldap-pool-${{ matrix.suite }}
           path: ${{ env.GOCOVERDIR }}
@@ -485,7 +485,7 @@ jobs:
 
       - name: Upload raw coverage data
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-coverage-core-${{ matrix.suite }}
           path: ${{ env.GOCOVERDIR }}
@@ -683,7 +683,7 @@ jobs:
 
       - name: Upload tracing result
         if: failure()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: playwright-traces-${{ matrix.suite }}-${{ github.run_attempt }}
           path: web/reports/e2e
@@ -691,7 +691,7 @@ jobs:
 
       - name: Upload a11y result
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: playwright-a11y-result-${{ matrix.suite }}-${{ github.run_attempt }}
           path: web/reports/e2e/a11y-report.json
