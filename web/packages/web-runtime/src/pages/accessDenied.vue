@@ -38,7 +38,6 @@ import { computed, defineComponent, unref } from 'vue'
 import { useGettext } from 'vue3-gettext'
 import { storeToRefs } from 'pinia'
 import {
-  createLocationSpaces,
   queryItemAsString,
   useConfigStore,
   useRouteQuery,
@@ -65,24 +64,26 @@ export default defineComponent({
     const isForbidden = computed(() => queryItemAsString(unref(reasonQuery)) === 'forbidden')
 
     const cardTitle = computed(() => {
-      return isForbidden.value ? $gettext('Access denied') : $gettext('Not logged in')
+      return unref(isForbidden) ? $gettext('Access denied') : $gettext('Not logged in')
     })
     const cardHint = computed(() => {
-      return isForbidden.value
+      return unref(isForbidden)
         ? $gettext('You do not have permission to access this area. You are still logged in.')
         : $gettext(
             'This could be because of a routine safety log out, or because your account is either inactive or not yet authorized for use. Please try logging in after a while or seek help from your Administrator.'
           )
     })
     const navigateToLoginText = computed(() => {
-      return isForbidden.value ? $gettext('Go back') : $gettext('Log in again')
+      return unref(isForbidden) ? $gettext('Continue') : $gettext('Log in again')
     })
     const logoutButtonsAttrs = computed(() => {
       // Still logged in — send back into the app, not through the login flow.
-      if (isForbidden.value) {
+      if (unref(isForbidden)) {
+        // Same fallback the login redirect uses: don't target a specific extension's
+        // route, let the app resolve its own default/home view.
         return {
           type: 'router-link',
-          to: createLocationSpaces('files-spaces-generic')
+          to: '/'
         }
       }
 
