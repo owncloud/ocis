@@ -1338,48 +1338,47 @@ class CliContext implements Context {
 	}
 
 	/**
-	 * Finds the most recently written blob in the storage-users blobstore.
-	 * Scoped to the users storage root to avoid picking blobs from metadata storage.
+	 * Finds the most recently committed blob under the users storage root.
+	 *
+	 * Reva stages in-flight uploads as "reva-blobstore-upload-*" temp files in the
+	 * final blobs directory, so the newest file is not always a valid blob yet -
+	 * skip temps and poll until a committed blob shows up.
 	 *
 	 * @return string absolute path to a real blob file
 	 */
 	private function findNewestBlobPath(): string {
 		$storageRoot = $this->featureContext->getStorageUsersRoot();
-		// Async postprocessing may not have moved the blob to its final
-		// location yet — poll until the directory appears or we give up.
-		$blobDirs = [];
+		$newestPath = null;
 		$retried = 0;
 		do {
-			$blobDirs = \glob($storageRoot . '/spaces/*/*/blobs', GLOB_ONLYDIR) ?: [];
-			if (!empty($blobDirs)) {
+			$newestMtime = 0;
+			$newestPath = null;
+			foreach (\glob($storageRoot . '/spaces/*/*/blobs', GLOB_ONLYDIR) ?: [] as $blobsDir) {
+				$iterator = new \RecursiveIteratorIterator(
+					new \RecursiveDirectoryIterator($blobsDir, \RecursiveDirectoryIterator::SKIP_DOTS),
+				);
+				foreach ($iterator as $file) {
+					if (!$file->isFile()
+						|| \str_starts_with($file->getFilename(), 'reva-blobstore-upload-')
+					) {
+						continue;
+					}
+					$mtime = $file->getMTime();
+					if ($mtime > $newestMtime) {
+						$newestMtime = $mtime;
+						$newestPath = $file->getPathname();
+					}
+				}
+			}
+			if ($newestPath !== null) {
 				break;
 			}
 			$retried++;
-			echo "Blobstore directories not found under $storageRoot, retrying ($retried)...\n";
-			\usleep(500 * 1000);
+			echo "Committed blob not found under $storageRoot, retrying ($retried)...\n";
+			\usleep(STANDARD_SLEEP_TIME_MICROSEC * 50);
 		} while ($retried < STANDARD_RETRY_COUNT);
 
-		Assert::assertNotEmpty($blobDirs, "No blobstore directory found under $storageRoot");
-
-		$newestPath = null;
-		$newestMtime = 0;
-		foreach ($blobDirs as $blobsDir) {
-			$iterator = new \RecursiveIteratorIterator(
-				new \RecursiveDirectoryIterator($blobsDir, \RecursiveDirectoryIterator::SKIP_DOTS),
-			);
-			foreach ($iterator as $file) {
-				if (!$file->isFile()) {
-					continue;
-				}
-				$mtime = $file->getMTime();
-				if ($mtime > $newestMtime) {
-					$newestMtime = $mtime;
-					$newestPath = $file->getPathname();
-				}
-			}
-		}
-
-		Assert::assertNotNull($newestPath, "No blob file found under $storageRoot");
+		Assert::assertNotNull($newestPath, "No committed blob file found under $storageRoot");
 		return $newestPath;
 	}
 
