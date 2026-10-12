@@ -27,6 +27,8 @@ prepare-charts:
 	bash setup.sh $(CHART_REPO)
 	kubectl create namespace $(DOMAIN) || true
 	kubectl create configmap -n $(DOMAIN) ocis-fonts-ttf --from-file=../ci/NotoSans.ttf || true
+	kubectl create secret generic -n $(DOMAIN) ocis-admin-user \
+		--from-literal=user-id=ddc2004c-0977-11eb-9d3f-a793888cd0f8 --from-literal=password=admin || true
 	kubectl create configmap -n $(DOMAIN) ocis-translations \
 		--from-file=de_LC_MESSAGES_notifications.po=../translations/de/LC_MESSAGES/notifications.po \
 		--from-file=es_LC_MESSAGES_notifications.po=../translations/es/LC_MESSAGES/notifications.po || true
