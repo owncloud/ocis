@@ -13,6 +13,8 @@ insecure:
   oidcIdpInsecure: true
   ocisHttpApiInsecure: true
   ocmInsecure: true
+shortIdpTokenExpiry:
+  enabled: false
 features:
   authapp:
     enabled: false
@@ -211,6 +213,9 @@ services:
       chownInitContainer: true
       accessModes:
         - ReadWriteOnce
+    config:
+      oidc:
+        webClientScope: 'openid profile email'
   antivirus:
     events:
       consumer:
