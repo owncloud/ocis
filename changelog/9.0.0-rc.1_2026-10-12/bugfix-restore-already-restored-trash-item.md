@@ -7,4 +7,4 @@ sync client retrying a request, look like server errors. The restore
 operation now reports 404 for this case, matching the existing behavior of
 purging an already-purged item.
 
-https://github.com/owncloud/ocis/pull/TODO
+https://github.com/owncloud/ocis/pull/12969
