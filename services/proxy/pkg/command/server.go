@@ -357,7 +357,6 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			middleware.AllowAppAuth(cfg.AuthMiddleware.AllowAppAuth),
 			middleware.TraceProvider(traceProvider),
 		),
-		middleware.MultiFactor(cfg.MultiFactorAuthentication, middleware.Logger(logger), middleware.MFAStore(signingKeyStore)),
 		middleware.AccountResolver(
 			middleware.Logger(logger),
 			middleware.UserProvider(userProvider),
@@ -369,6 +368,8 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			middleware.EventsPublisher(publisher),
 			middleware.MultiInstance(cfg.MultiInstance.Enabled, cfg.MultiInstance.InstanceID, cfg.MultiInstance.MasterID, cfg.MultiInstance.MemberClaim, cfg.MultiInstance.GuestClaim, cfg.MultiInstance.GuestRole),
 		),
+		// needs the user resolved by the AccountResolver
+		middleware.MultiFactor(cfg.MultiFactorAuthentication, middleware.Logger(logger), middleware.MFAStore(signingKeyStore)),
 		middleware.SelectorCookie(
 			middleware.Logger(logger),
 			middleware.PolicySelectorConfig(*cfg.PolicySelector),
