@@ -16,7 +16,10 @@ import {
   onSSEItemMovedEvent,
   onSSEItemRenamedEvent,
   onSSEItemRestoredEvent,
-  onSSEItemTrashedEvent
+  onSSEItemTrashedEvent,
+  onSSEProcessingFinishedEvent,
+  ProcessedItems,
+  refreshStaleProcessingResources
 } from '../../../../src/container/sse'
 import { Router } from 'vue-router'
 import { mock, mockDeep } from 'vitest-mock-extended'
@@ -422,6 +425,74 @@ describe('file events', () => {
       expect(mocks.resourcesStore.upsertResource).not.toHaveBeenCalled()
     })
   })
+  describe('onSSEProcessingFinishedEvent', () => {
+    it('remembers the item when the event arrives before the resource is loaded', async () => {
+      const mocks = getMocks()
+      const sseData = mock<EventSchemaType>({
+        itemid: 'file1',
+        spaceid: 'space1',
+        parentitemid: 'currenFolder!currentFolder',
+        initiatorid: 'local1'
+      })
+      await onSSEProcessingFinishedEvent({ sseData, ...mocks })
+      expect(mocks.processedItems.get('file1')).toEqual(
+        expect.objectContaining({ spaceId: 'space1' })
+      )
+      expect(mocks.clientService.webdav.listFiles).not.toHaveBeenCalled()
+    })
+    it('does not remember the item when it is not in the current folder', async () => {
+      const mocks = getMocks()
+      const sseData = mock<EventSchemaType>({
+        itemid: 'file1',
+        spaceid: 'space1',
+        parentitemid: 'otherFolder!otherFolder',
+        initiatorid: 'local1'
+      })
+      await onSSEProcessingFinishedEvent({ sseData, ...mocks })
+      expect(mocks.processedItems.size).toBe(0)
+    })
+  })
+  describe('refreshStaleProcessingResources', () => {
+    it('refetches a resource that got loaded as processing after its processing had finished', async () => {
+      const staleResource = mock<Resource>({ id: 'file1', storageId: 'space1', processing: true })
+      const mocks = getMocks({ resources: [staleResource] })
+      const updatedResource = mock<Resource>({ id: 'file1', processing: false })
+      mocks.clientService.webdav.getFileInfo.mockResolvedValue(updatedResource)
+      mocks.processedItems.set('file1', { spaceId: 'space1', finishedAt: Date.now() })
+
+      await refreshStaleProcessingResources(mocks)
+
+      expect(mocks.clientService.webdav.getFileInfo).toHaveBeenCalledWith(
+        mocks.spacesStore.spaces[0],
+        {
+          path: '',
+          fileId: 'file1'
+        }
+      )
+      expect(mocks.resourcesStore.upsertResource).toHaveBeenCalledWith(updatedResource)
+      expect(mocks.processedItems.has('file1')).toBe(false)
+    })
+    it('does nothing when the resource is not processing', async () => {
+      const resource = mock<Resource>({ id: 'file1', storageId: 'space1', processing: false })
+      const mocks = getMocks({ resources: [resource] })
+      mocks.processedItems.set('file1', { spaceId: 'space1', finishedAt: Date.now() })
+
+      await refreshStaleProcessingResources(mocks)
+
+      expect(mocks.clientService.webdav.getFileInfo).not.toHaveBeenCalled()
+      expect(mocks.processedItems.has('file1')).toBe(true)
+    })
+    it('drops expired items without refetching', async () => {
+      const staleResource = mock<Resource>({ id: 'file1', storageId: 'space1', processing: true })
+      const mocks = getMocks({ resources: [staleResource] })
+      mocks.processedItems.set('file1', { spaceId: 'space1', finishedAt: Date.now() - 120_000 })
+
+      await refreshStaleProcessingResources(mocks)
+
+      expect(mocks.clientService.webdav.getFileInfo).not.toHaveBeenCalled()
+      expect(mocks.processedItems.has('file1')).toBe(false)
+    })
+  })
 })
 const getMocks = ({
   currentFolder = mockDeep<Resource>({
@@ -449,8 +520,10 @@ const getMocks = ({
     $gettext: vi.fn((m) => m)
   })
   const resourceQueue = mockDeep<PQueue>()
+  const processedItems: ProcessedItems = new Map()
 
   return {
+    processedItems,
     resourcesStore,
     spacesStore,
     router,

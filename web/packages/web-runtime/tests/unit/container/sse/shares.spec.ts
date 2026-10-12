@@ -736,6 +736,7 @@ const getMocks = ({
     clientService,
     previewService,
     resourceQueue,
+    processedItems: new Map(),
     language
   }
 }
