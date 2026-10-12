@@ -476,12 +476,12 @@ jobs:
           # - suite: mfa
           #   args: "--type playwright --suites mfa"
           #   mfa: true
-          # - suite: oidc
-          #   args: "--type playwright specs/oidc/refreshToken.spec.ts"
-          #   oidc: true
-          # - suite: oidc-iframe
-          #   args: "--type playwright specs/oidc/iframeTokenRenewal.spec.ts"
-          #   oidc_iframe: true
+          - suite: oidc
+            args: "--type playwright specs/oidc/refreshToken.spec.ts"
+            oidc: true
+          - suite: oidc-iframe
+            args: "--type playwright specs/oidc/iframeTokenRenewal.spec.ts"
+            oidc_iframe: true
           # - suite: app-provider
           #   args: "--type playwright --suites app-provider"
           #   collaboration: true
@@ -618,6 +618,8 @@ jobs:
           E2E_ARGS: "${{ matrix.args }}"
           K8S: ${{ env.K8S }}
           TEST_SERVER_URL: ${{ env.TEST_SERVER_URL }}
+          OIDC_NEEDED: ${{ matrix.oidc == true && 'true' || 'false' }}
+          OIDC_IFRAME_NEEDED: ${{ matrix.oidc_iframe == true && 'true' || 'false' }}
         run: python3 tests/acceptance/run-e2e.py
 
       - name: Upload Playwright traces
