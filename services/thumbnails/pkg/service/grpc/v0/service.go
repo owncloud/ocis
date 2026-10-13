@@ -52,7 +52,8 @@ func NewService(opts ...Option) decorators.DecoratedService {
 		logger:       logger,
 		selector:     options.GatewaySelector,
 		preprocessorOpts: PreprocessorOpts{
-			TxtFontFileMap: options.Config.Thumbnail.FontMapFile,
+			TxtFontFileMap:    options.Config.Thumbnail.FontMapFile,
+			GifFirstFrameOnly: options.Config.Thumbnail.GifFirstFrameOnly,
 		},
 		dataEndpoint:   options.Config.Thumbnail.DataEndpoint,
 		transferSecret: options.Config.Thumbnail.TransferSecret,
@@ -76,7 +77,8 @@ type Thumbnail struct {
 
 // PreprocessorOpts holds the options for the preprocessor
 type PreprocessorOpts struct {
-	TxtFontFileMap string
+	TxtFontFileMap    string
+	GifFirstFrameOnly bool
 }
 
 // GetThumbnail retrieves a thumbnail for an image
@@ -165,7 +167,8 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetTh
 
 	defer r.Close()
 	ppOpts := map[string]interface{}{
-		"fontFileMap": g.preprocessorOpts.TxtFontFileMap,
+		"fontFileMap":       g.preprocessorOpts.TxtFontFileMap,
+		"gifFirstFrameOnly": g.preprocessorOpts.GifFirstFrameOnly,
 	}
 	pp := preprocessor.ForType(sRes.GetInfo().GetMimeType(), ppOpts)
 	img, err := pp.Convert(r)
@@ -257,7 +260,8 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 	}
 	defer r.Close()
 	ppOpts := map[string]interface{}{
-		"fontFileMap": g.preprocessorOpts.TxtFontFileMap,
+		"fontFileMap":       g.preprocessorOpts.TxtFontFileMap,
+		"gifFirstFrameOnly": g.preprocessorOpts.GifFirstFrameOnly,
 	}
 	pp := preprocessor.ForType(sRes.GetInfo().GetMimeType(), ppOpts)
 	img, err := pp.Convert(r)
