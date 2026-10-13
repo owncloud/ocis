@@ -282,6 +282,21 @@ func (g Graph) applyFilterVaultEligible(ctx context.Context, req *godata.GoDataR
 	if err != nil {
 		return nil, err
 	}
+
+	// a light user invited from elsewhere may only be known via OCM, not the identity backend
+	federatedUsers, err := g.searchOCMAcceptedUsers(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	if len(federatedUsers) > 0 {
+		userSet := userSliceToMap(users)
+		for _, user := range federatedUsers {
+			if _, found := userSet[user.GetId()]; !found {
+				users = append(users, user)
+			}
+		}
+	}
+
 	if len(users) == 0 {
 		return users, nil
 	}

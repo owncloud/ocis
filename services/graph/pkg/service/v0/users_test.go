@@ -1900,5 +1900,74 @@ var _ = Describe("Users", func() {
 				Expect(res.Value[0].GetUserType()).To(Equal("Member"))
 			})
 		})
+
+		Describe("the vaultEligible filter, with a federated OCM sharee", func() {
+			const (
+				vaultRole     = "vault-granting-role-ID"
+				federatedUser = "federated"
+			)
+
+			// A light user invited from another instance is only resolvable through the OCM
+			// accepted-users list (the same lookup 'userType eq Federated' uses), not through
+			// the identity backend's own directory search.
+			It("still finds a federated user who is already an accepted OCM sharee", func() {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
+
+				identityBackend.On("GetUsers", mock.Anything, mock.Anything).Return([]*libregraph.User{}, nil)
+				gatewayClient.On("FindAcceptedUsers", mock.Anything, mock.Anything).Return(&invitepb.FindAcceptedUsersResponse{
+					Status: status.NewOK(ctx),
+					AcceptedUsers: []*userv1beta1.User{
+						{
+							Username: federatedUser,
+							Id: &userv1beta1.UserId{
+								OpaqueId: federatedUser,
+								Type:     userv1beta1.UserType_USER_TYPE_FEDERATED,
+							},
+						},
+					},
+				}, nil)
+
+				roleService.On("ListRoles", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListBundlesResponse{
+					Bundles: []*settingsmsg.Bundle{
+						{
+							Id:   vaultRole,
+							Type: settingsmsg.Bundle_TYPE_ROLE,
+							Settings: []*settingsmsg.Setting{
+								{
+									Name:  permission.VaultMode,
+									Value: &settingsmsg.Setting_PermissionValue{PermissionValue: &settingsmsg.Permission{}},
+								},
+							},
+						},
+					},
+				}, nil)
+				roleService.On("ListRoleAssignments", mock.Anything, mock.MatchedBy(
+					func(in *settings.ListRoleAssignmentsRequest) bool {
+						return in.GetAccountUuid() == federatedUser
+					}), mock.Anything).Return(&settings.ListRoleAssignmentsResponse{
+					Assignments: []*settingsmsg.UserRoleAssignment{
+						{Id: "assignment-ID", AccountUuid: federatedUser, RoleId: vaultRole},
+					},
+				}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape("vaultEligible eq true"), nil)
+				r = r.WithContext(revactx.SetMFA(r.Context()))
+				svc.GetUsers(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+				data, err := io.ReadAll(rr.Body)
+				Expect(err).ToNot(HaveOccurred())
+				res := userList{}
+				Expect(json.Unmarshal(data, &res)).To(Succeed())
+
+				Expect(res.Value).To(HaveLen(1))
+				Expect(res.Value[0].GetId()).To(Equal(federatedUser))
+			})
+		})
 	})
 })
