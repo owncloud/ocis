@@ -28,6 +28,16 @@ describe('useFileActionsCopyPermanentLink', () => {
         }
       })
     })
+    it('should return false for deleted resources', () => {
+      getWrapper({
+        setup: ({ actions }) => {
+          const trashedResource = { id: '1', ddate: '2026-10-01' } as unknown as Resource
+          expect(
+            unref(actions)[0].isVisible({ space: undefined, resources: [trashedResource] })
+          ).toBeFalsy()
+        }
+      })
+    })
     it('should return true if one resource selected', () => {
       getWrapper({
         setup: ({ actions }) => {

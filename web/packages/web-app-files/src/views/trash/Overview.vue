@@ -82,7 +82,8 @@ import {
   useRouter,
   useSideBar,
   useSpacesStore,
-  useUserStore
+  useUserStore,
+  useVault
 } from '@ownclouders/web-pkg'
 import { createLocationTrash } from '@ownclouders/web-pkg'
 import { createFileRouteOptions } from '@ownclouders/web-pkg'
@@ -109,6 +110,7 @@ const resourcesStore = useResourcesStore()
 const { isSideBarOpen, sideBarActivePanel } = useSideBar()
 const { isSticky } = useIsTopBarSticky()
 const route = useRoute()
+const { isInVault } = useVault()
 
 const sortBy = ref<keyof SpaceResource>('name')
 const sortDir = ref<SortDir>(SortDir.Asc)
@@ -199,7 +201,7 @@ const fields = computed((): FieldType[] => [
 
 const getSpaceName = (space: SpaceResource) => {
   if (isPersonalSpaceResource(space)) {
-    return $gettext('Personal')
+    return isInVault ? $gettext('Safe-Personal') : $gettext('Personal')
   }
   if (space.disabled === true) {
     return $gettext('%{spaceName} (disabled)', { spaceName: space.name })
