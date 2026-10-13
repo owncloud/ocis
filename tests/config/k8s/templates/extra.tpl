@@ -165,4 +165,10 @@
   value: "1a01c2c4-4309-4483-a845-842fd56d8622"
 {{- end -}}
 {{- end -}}
+{{- if and (eq .appName "idp") .Values.shortAccessTokenTest.enabled }}
+{{/* Shortens the access token lifetime so the oidc/oidc-iframe e2e tests can actually
+     observe a token renewal within their wait window - see values.yaml. */}}
+- name: IDP_ACCESS_TOKEN_EXPIRATION
+  value: "30"
+{{- end -}}
 {{- end -}}

@@ -93,5 +93,13 @@ if [[ "$ENABLE_VAULT" == "true" ]]; then
     sed -i "/imgSrc:/i\\        - 'https://keycloak:8443/'" $CFG_DIR/values.yaml
 fi
 
+if [[ "$ENABLE_SHORT_ACCESS_TOKEN" == "true" ]]; then
+    sed -i '/shortAccessTokenTest:/{n;s|false|true|}' $CFG_DIR/values.yaml
+fi
+
+if [[ "$ENABLE_OIDC_OFFLINE_ACCESS" == "true" ]]; then
+    sed -i "s|webClientScope: 'openid profile email'|webClientScope: 'openid profile email offline_access'|" $CFG_DIR/values.yaml
+fi
+
 # copy custom values file
 cp $CFG_DIR/values.yaml "$CHT_DIR/ci/deployment-values.yaml"
