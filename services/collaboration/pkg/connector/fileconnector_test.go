@@ -1456,6 +1456,22 @@ var _ = Describe("FileConnector", func() {
 			Expect(response.Headers).To(BeNil())
 		})
 
+		It("Delete retries while the file is processing", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Delete", mock.Anything, mock.Anything).Return(&providerv1beta1.DeleteResponse{
+				Status: status.NewTooEarly(ctx, "file is processing"),
+			}, nil).Twice()
+			gatewayClient.On("Delete", mock.Anything, mock.Anything).Return(&providerv1beta1.DeleteResponse{
+				Status: status.NewOK(ctx),
+			}, nil).Once()
+
+			response, err := fc.DeleteFile(ctx, "newlock")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+			gatewayClient.AssertNumberOfCalls(GinkgoT(), "Delete", 3)
+		})
+
 		It("Delete success", func() {
 			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 
@@ -1621,6 +1637,32 @@ var _ = Describe("FileConnector", func() {
 			Expect(response.Headers).To(BeNil())
 			rBody := response.Body.(map[string]interface{})
 			Expect(rBody["Name"]).To(MatchRegexp(`^[a-zA-Z0-9_-]+ newFile$`))
+		})
+
+		It("Rename retries while the file is processing", func() {
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Lock: &providerv1beta1.Lock{
+						LockId: "zzz999",
+						Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
+					},
+				},
+			}, nil)
+
+			gatewayClient.On("Move", mock.Anything, mock.Anything).Return(&providerv1beta1.MoveResponse{
+				Status: status.NewTooEarly(ctx, "resource is processing"),
+			}, nil).Twice()
+			gatewayClient.On("Move", mock.Anything, mock.Anything).Return(&providerv1beta1.MoveResponse{
+				Status: status.NewOK(ctx),
+			}, nil).Once()
+
+			response, err := fc.RenameFile(ctx, "zzz999", "newFile.doc")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+			gatewayClient.AssertNumberOfCalls(GinkgoT(), "Move", 3)
 		})
 
 		It("Success", func() {
