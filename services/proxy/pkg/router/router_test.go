@@ -165,3 +165,34 @@ func TestRouter(t *testing.T) {
 		}
 	}
 }
+
+// Vault /graph/ sub-routes must reach the same service as their non-vault counterpart.
+func TestRouterVaultGraphSubRoutes(t *testing.T) {
+	cfg := defaults.DefaultConfig()
+	cfg.Policies = defaults.DefaultPolicies()
+
+	reg := registry.GetRegistry()
+	sel := selector.NewSelector(selector.Registry(reg))
+	router := New(sel, cfg.PolicySelector, cfg.Policies, log.NewLogger())
+
+	// Each path must match its own route, not a catch-all.
+	paths := []string{
+		"/graph/v1beta1/extensions/org.libregraph/activities",
+		"/vault/graph/v1beta1/extensions/org.libregraph/activities",
+		"/graph/v1.0/invitations",
+		"/vault/graph/v1.0/invitations",
+	}
+
+	for _, path := range paths {
+		r := httptest.NewRequest("GET", path, nil)
+		ri, ok := router.Route(r)
+		if !ok {
+			t.Errorf("router.Route failed to route %s", path)
+			continue
+		}
+
+		if ri.endpoint != path {
+			t.Errorf("%s matched endpoint %q, want %q — got routed to the generic graph catch-all instead", path, ri.endpoint, path)
+		}
+	}
+}
