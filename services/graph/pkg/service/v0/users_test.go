@@ -35,6 +35,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 )
@@ -710,8 +711,7 @@ var _ = Describe("Users", func() {
 				}, nil)
 			})
 
-			// None of these reach GetPreciseUser: a filter, a non-matching search, no search at
-			// all, or missing permission each independently keep it from firing.
+			// vaultEligible is excluded here; it does reach GetPreciseUser — see "the vaultEligible filter, with a cross-instance match" below
 			DescribeTable("does not resolve via GetPreciseUser",
 				func(search string, filter string, permissionGranted bool, needsMFA bool) {
 					identityBackend.On("GetUsers", mock.Anything, mock.Anything).Return([]*libregraph.User{}, nil)
@@ -744,8 +744,8 @@ var _ = Describe("Users", func() {
 					Expect(rr.Code).To(Equal(http.StatusOK))
 					identityBackend.AssertNotCalled(GinkgoT(), "GetPreciseUser", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
 				},
-				Entry("filter present, even though the search string also matches the cross-instance pattern",
-					`"student@other-instance.example.test"`, "vaultEligible eq true", true, false),
+				Entry("a non-vaultEligible filter is present, even though the search string also matches the cross-instance pattern",
+					`"student@other-instance.example.test"`, "userType eq 'Member'", true, false),
 				Entry("search string doesn't match the cross-instance pattern",
 					`"not-a-cross-instance-string"`, "", true, false),
 				Entry("no $search present at all",
@@ -782,6 +782,9 @@ var _ = Describe("Users", func() {
 				ineligible.SetId(otherUser)
 				identityBackend.On("GetUsers", mock.Anything, mock.Anything).
 					Return([]*libregraph.User{eligible, ineligible}, nil)
+				// no cross-instance account behind this reference; GetPreciseUser finds nothing
+				identityBackend.On("GetPreciseUser", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil, identity.ErrNotFound)
 
 				expectRoles()
 				expectAssignments(eligibleUser, []*settingsmsg.UserRoleAssignment{
@@ -807,7 +810,61 @@ var _ = Describe("Users", func() {
 					ids = append(ids, u.GetId())
 				}
 				Expect(ids).To(ConsistOf(eligibleUser))
-				identityBackend.AssertNotCalled(GinkgoT(), "GetPreciseUser", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+			})
+
+			Describe("the vaultEligible filter, with a cross-instance match", func() {
+				const crossInstanceUser = "cross-instance-user"
+
+				It("includes a cross-instance match that holds the vault-granting role", func() {
+					crossInstance := &libregraph.User{}
+					crossInstance.SetId(crossInstanceUser)
+					identityBackend.On("GetUsers", mock.Anything, mock.Anything).Return([]*libregraph.User{}, nil)
+					identityBackend.On("GetPreciseUser", mock.Anything, "teacher", "school5", mock.Anything).
+						Return(crossInstance, nil)
+
+					expectRoles()
+					expectAssignments(crossInstanceUser, []*settingsmsg.UserRoleAssignment{
+						{Id: "assignment-ID", AccountUuid: crossInstanceUser, RoleId: vaultRole},
+					}, nil)
+
+					r := httptest.NewRequest(http.MethodGet,
+						"/graph/v1.0/users?$search="+url.QueryEscape(`"teacher@school5.example.test"`)+
+							"&$filter="+url.QueryEscape("vaultEligible eq true"), nil)
+					svc.GetUsers(rr, r)
+
+					Expect(rr.Code).To(Equal(http.StatusOK))
+					data, err := io.ReadAll(rr.Body)
+					Expect(err).ToNot(HaveOccurred())
+					res := userList{}
+					Expect(json.Unmarshal(data, &res)).To(Succeed())
+
+					Expect(res.Value).To(HaveLen(1))
+					Expect(res.Value[0].GetId()).To(Equal(crossInstanceUser))
+				})
+
+				It("excludes a cross-instance match that lacks the vault-granting role", func() {
+					crossInstance := &libregraph.User{}
+					crossInstance.SetId(crossInstanceUser)
+					identityBackend.On("GetUsers", mock.Anything, mock.Anything).Return([]*libregraph.User{}, nil)
+					identityBackend.On("GetPreciseUser", mock.Anything, "student", "school5", mock.Anything).
+						Return(crossInstance, nil)
+
+					expectRoles()
+					expectAssignments(crossInstanceUser, nil, nil)
+
+					r := httptest.NewRequest(http.MethodGet,
+						"/graph/v1.0/users?$search="+url.QueryEscape(`"student@school5.example.test"`)+
+							"&$filter="+url.QueryEscape("vaultEligible eq true"), nil)
+					svc.GetUsers(rr, r)
+
+					Expect(rr.Code).To(Equal(http.StatusOK))
+					data, err := io.ReadAll(rr.Body)
+					Expect(err).ToNot(HaveOccurred())
+					res := userList{}
+					Expect(json.Unmarshal(data, &res)).To(Succeed())
+
+					Expect(res.Value).To(BeEmpty())
+				})
 			})
 		})
 

@@ -282,6 +282,24 @@ func (g Graph) applyFilterVaultEligible(ctx context.Context, req *godata.GoDataR
 	if err != nil {
 		return nil, err
 	}
+
+	// unlike other filters, vaultEligible applies its own role check below, so it's safe to look up a cross-instance match here (OCISDEV-1506 only blocks unchecked ones)
+	if username, instancename := g.parseExternalSearch(req); username != "" && instancename != "" &&
+		g.contextUserHasExternalSharePermission(ctx) {
+		if preciseUser, err := g.identityBackend.GetPreciseUser(ctx, username, instancename, req); err == nil {
+			found := false
+			for _, u := range users {
+				if u.GetId() == preciseUser.GetId() {
+					found = true
+					break
+				}
+			}
+			if !found {
+				users = append(users, preciseUser)
+			}
+		}
+	}
+
 	if len(users) == 0 {
 		return users, nil
 	}
