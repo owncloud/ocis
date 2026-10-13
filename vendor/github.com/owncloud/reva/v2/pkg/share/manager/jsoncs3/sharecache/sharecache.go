@@ -144,12 +144,15 @@ func (c *Cache) Add(ctx context.Context, userid, shareID string) error {
 			// CS3 uses an already exists error instead of precondition failed when using an If-None-Match=* header / IfExists flag in the InitiateFileUpload call.
 			// Thas happens when the cache thinks there is no file.
 			// continue with sync below
+		case errtypes.TooEarly:
+			log.Debug().Msg("too early when persisting added share: write-lock contention. retrying...")
+			// continue with sync below
 		default:
 			span.SetStatus(codes.Error, fmt.Sprintf("persisting added share failed. giving up: %s", err.Error()))
 			log.Error().Err(err).Msg("persisting added share failed")
 			return err
 		}
-		if err := c.syncWithLock(ctx, userid); err != nil {
+		if err := c.resyncAfterConflict(ctx, userid); err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
 			log.Error().Err(err).Msg("persisting added share failed. giving up.")
@@ -219,12 +222,15 @@ func (c *Cache) Remove(ctx context.Context, userid, shareID string) error {
 			// CS3 uses an already exists error instead of precondition failed when using an If-None-Match=* header / IfExists flag in the InitiateFileUpload call.
 			// Thas happens when the cache thinks there is no file.
 			// continue with sync below
+		case errtypes.TooEarly:
+			log.Debug().Msg("too early when persisting removed share: write-lock contention. retrying...")
+			// continue with sync below
 		default:
 			span.SetStatus(codes.Error, fmt.Sprintf("persisting removed share failed. giving up: %s", err.Error()))
 			log.Error().Err(err).Msg("persisting removed share failed")
 			return err
 		}
-		if err := c.syncWithLock(ctx, userid); err != nil {
+		if err := c.resyncAfterConflict(ctx, userid); err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
 			return err
@@ -260,6 +266,16 @@ func (c *Cache) List(ctx context.Context, userid string) (map[string]SpaceShareI
 }
 
 func (c *Cache) syncWithLock(ctx context.Context, userID string) error {
+	return c.doSync(ctx, userID, true)
+}
+
+// Unlike syncWithLock, a NotFound here must not reset the cache -- a pending
+// mutation is about to overwrite it, dropping a sibling writer's data.
+func (c *Cache) resyncAfterConflict(ctx context.Context, userID string) error {
+	return c.doSync(ctx, userID, false)
+}
+
+func (c *Cache) doSync(ctx context.Context, userID string, resetOnNotFound bool) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Sync")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))
@@ -274,7 +290,9 @@ func (c *Cache) syncWithLock(ctx context.Context, userID string) error {
 	dlreq := metadata.DownloadRequest{
 		Path: userCreatedPath,
 	}
+	var hadEtag bool
 	if us, ok := c.UserShares.Load(userID); ok && us.Etag != "" {
+		hadEtag = true
 		dlreq.IfNoneMatch = []string{us.Etag}
 	}
 
@@ -283,6 +301,12 @@ func (c *Cache) syncWithLock(ctx context.Context, userID string) error {
 	case nil:
 		span.AddEvent("updating local cache")
 	case errtypes.NotFound:
+		// No prior etag means this is a bootstrap race, not a lost update -- safe to reset.
+		if !resetOnNotFound && hadEtag {
+			span.SetStatus(codes.Error, err.Error())
+			log.Error().Err(err).Msg("lost update: backing file disappeared mid-retry")
+			return err
+		}
 		span.SetStatus(codes.Ok, "")
 		if err := c.Persist(ctx, userID); err != nil {
 			log.Warn().Err(err).Msg("failed to create empty share cache file")

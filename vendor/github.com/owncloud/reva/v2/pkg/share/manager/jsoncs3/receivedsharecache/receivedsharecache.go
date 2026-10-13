@@ -223,10 +223,12 @@ func (c *Cache) List(ctx context.Context, userID string) (map[string]*Space, err
 	return spaces, nil
 }
 
+// isSyncTransient reports whether a resync's Download error is worth retrying.
+// errtypes.InternalError is excluded on purpose -- retrying a permanent failure just burns the budget.
 func isSyncTransient(err error) bool {
 	_, isTooEarly := err.(errtypes.IsTooEarly)
-	_, isInternal := err.(errtypes.IsInternalError)
-	return isTooEarly || isInternal
+	_, isUnavailable := err.(errtypes.IsUnavailable)
+	return isTooEarly || isUnavailable
 }
 
 func (c *Cache) retryPersist(ctx context.Context, userID, spaceID string, persistFunc func() error) error {
@@ -274,12 +276,23 @@ func (c *Cache) retryPersist(ctx context.Context, userID, spaceID string, persis
 			timer.Stop()
 			return ctx.Err()
 		}
-		if serr := c.syncIfStale(ctx, userID); serr != nil {
-			if !isSyncTransient(serr) {
-				log.Error().Int("attempt", attempt).Err(serr).Msg("lost update: re-read failed, aborting")
-				return serr
+		serr := c.resyncAfterConflict(ctx, userID)
+		// Retrying persistFunc now would just repeat the same conflict against stale
+		// state -- keep retrying the resync itself until it refreshes that state.
+		for resyncAttempt := 0; serr != nil && isSyncTransient(serr) && resyncAttempt < 20; resyncAttempt++ {
+			log.Warn().Int("attempt", attempt).Int("resyncAttempt", resyncAttempt).Err(serr).Msg("lost update: re-read before retry")
+			timer := time.NewTimer(expBackoff(resyncAttempt))
+			select {
+			case <-timer.C:
+			case <-ctx.Done():
+				timer.Stop()
+				return ctx.Err()
 			}
-			log.Warn().Int("attempt", attempt).Err(serr).Msg("lost update: re-read before retry")
+			serr = c.resyncAfterConflict(ctx, userID)
+		}
+		if serr != nil {
+			log.Error().Int("attempt", attempt).Err(serr).Msg("lost update: re-read failed, aborting")
+			return serr
 		}
 	}
 	return err
@@ -287,6 +300,16 @@ func (c *Cache) retryPersist(ctx context.Context, userID, spaceID string, persis
 
 // syncIfStale pulls the authoritative state from storage when the local replica is stale; caller must hold the user lock.
 func (c *Cache) syncIfStale(ctx context.Context, userID string) error {
+	return c.doSync(ctx, userID, true)
+}
+
+// Unlike syncIfStale, a NotFound here must not reset the cache -- a pending
+// mutation is about to overwrite it, dropping a sibling writer's data.
+func (c *Cache) resyncAfterConflict(ctx context.Context, userID string) error {
+	return c.doSync(ctx, userID, false)
+}
+
+func (c *Cache) doSync(ctx context.Context, userID string, resetOnNotFound bool) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "SyncIfStale")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))
@@ -299,6 +322,7 @@ func (c *Cache) syncIfStale(ctx context.Context, userID string) error {
 	span.AddEvent("updating cache")
 	//  - update cached list of created shares for the user in memory if changed
 	rss, _ := c.ReceivedSpaces.Load(userID)
+	hadEtag := rss.etag != ""
 	dlres, err := c.storage.Download(ctx, metadata.DownloadRequest{
 		Path:        jsonPath,
 		IfNoneMatch: []string{rss.etag},
@@ -307,6 +331,12 @@ func (c *Cache) syncIfStale(ctx context.Context, userID string) error {
 	case nil:
 		span.AddEvent("updating local cache")
 	case errtypes.NotFound:
+		// No prior etag means this is a bootstrap race, not a lost update -- safe to reset.
+		if !resetOnNotFound && hadEtag {
+			span.SetStatus(codes.Error, err.Error())
+			log.Error().Err(err).Msg("lost update: backing file disappeared mid-retry")
+			return err
+		}
 		span.SetStatus(codes.Ok, "")
 		if err := c.persist(ctx, userID); err != nil {
 			log.Warn().Err(err).Msg("failed to create empty received share cache file")
