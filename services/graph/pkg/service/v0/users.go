@@ -387,7 +387,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	switch {
 	case odataReq.Query.Filter != nil:
-		users, err = g.applyUserFilter(r.Context(), odataReq, nil)
+		users, err = g.applyUserFilter(withOCMAcceptedUsersCache(r.Context()), odataReq, nil)
 	case username != "" && instancename != "" && g.contextUserHasExternalSharePermission(r.Context()):
 		users = make([]*libregraph.User, 1)
 		users[0], err = g.identityBackend.GetPreciseUser(r.Context(), username, instancename, odataReq)
@@ -1168,6 +1168,20 @@ func isValidUserType(userType string) bool {
 }
 
 func (g Graph) searchOCMAcceptedUsers(ctx context.Context, odataReq *godata.GoDataRequest) ([]*libregraph.User, error) {
+	cache, hasCache := ctx.Value(ocmAcceptedUsersCacheKey{}).(*ocmAcceptedUsersCache)
+	if hasCache && cache.done {
+		return cache.users, cache.err
+	}
+
+	users, err := g.searchOCMAcceptedUsersUncached(ctx, odataReq)
+
+	if hasCache {
+		cache.users, cache.err, cache.done = users, err, true
+	}
+	return users, err
+}
+
+func (g Graph) searchOCMAcceptedUsersUncached(ctx context.Context, odataReq *godata.GoDataRequest) ([]*libregraph.User, error) {
 	logger := g.logger.SubloggerWithRequestID(ctx)
 	users := []*libregraph.User{}
 
