@@ -137,13 +137,10 @@
 - name: IDM_CREATE_DEMO_USERS
   value: "false"
 {{- end -}}
-{{- if eq .appName "storageusers-vault" }}
-- name: STORAGE_USERS_ENABLE_VAULT_MODE
-  value: "true"
-- name: STORAGE_USERS_SERVICE_NAME
-  value: storage-users-vault
-- name: STORAGE_USERS_EVENTS_CONSUMER_GROUP
-  value: vault-dcfs
+{{- if eq .appName "storageusersvault" }}
+{{/* ocis-charts added native support for this service upstream (appName "storageusersvault").
+     The native deployment.yaml already sets STORAGE_USERS_ENABLE_VAULT_MODE,
+     STORAGE_USERS_SERVICE_NAME and STORAGE_USERS_EVENTS_CONSUMER_GROUP itself. */}}
 {{/* Without these overrides this instance falls back to the shared OCIS_CACHE_STORE=nats-js-kv
      used by the regular storage-users service. Since personal-space IDs are just the user's
      opaque ID (identical in both instances), the vault instance's existence check on

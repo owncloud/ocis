@@ -18,6 +18,8 @@ features:
     enabled: false
   vault:
     enabled: false
+  mfa:
+    enabled: false
   emailNotifications:
     enabled: false
     smtp:
@@ -149,7 +151,7 @@ services:
       enabled: true
       accessModes:
         - ReadWriteOnce
-  storageusers-vault:
+  storageusersvault:
     persistence:
       enabled: false
   ocm:
