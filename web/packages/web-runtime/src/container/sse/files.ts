@@ -74,7 +74,8 @@ export const onSSEProcessingFinishedEvent = async ({
   spacesStore,
   clientService,
   resourceQueue,
-  previewService
+  previewService,
+  processedItems
 }: SSEEventOptions) => {
   if (!isItemInCurrentFolder({ resourcesStore, parentFolderId: sseData.parentitemid })) {
     return false
@@ -84,6 +85,12 @@ export const onSSEProcessingFinishedEvent = async ({
   if (!space) {
     return
   }
+
+  /**
+   * A request that was sent before processing finished can still land after this event and
+   * add the resource as processing, see refreshStaleProcessingResources.
+   */
+  processedItems.set(sseData.itemid, { spaceId: space.id, finishedAt: Date.now() })
 
   /**
    * If resource is not loaded, it suggests an upload is in progress.
@@ -140,6 +147,55 @@ export const onSSEProcessingFinishedEvent = async ({
       value: preview
     })
   }
+}
+
+const PROCESSED_ITEM_TTL = 60_000
+
+/**
+ * Refetches resources that are marked as processing in the store although their
+ * postprocessing-finished event has already been received. This happens when a request
+ * (e.g. the folder reload after an upload) was answered while processing was still running
+ * but only landed in the store after the event had been handled.
+ */
+export const refreshStaleProcessingResources = async ({
+  resourcesStore,
+  spacesStore,
+  clientService,
+  processedItems
+}: Pick<
+  SSEEventOptions,
+  'resourcesStore' | 'spacesStore' | 'clientService' | 'processedItems'
+>) => {
+  const requests: Promise<void>[] = []
+
+  for (const [id, { spaceId, finishedAt }] of processedItems) {
+    if (Date.now() - finishedAt > PROCESSED_ITEM_TTL) {
+      processedItems.delete(id)
+      continue
+    }
+
+    const resource = resourcesStore.resources.find((r) => r.id === id)
+    const space = spacesStore.spaces.find((s) => s.id === spaceId)
+    if (!resource?.processing || !space) {
+      continue
+    }
+
+    processedItems.delete(id)
+    requests.push(
+      (async () => {
+        const updatedResource = await clientService.webdav.getFileInfo(space, {
+          path: '',
+          fileId: id
+        })
+        // check again in case the user has navigated away in the meantime
+        if (resourcesStore.resources.some((r) => r.id === id)) {
+          resourcesStore.upsertResource(updatedResource)
+        }
+      })()
+    )
+  }
+
+  await Promise.allSettled(requests)
 }
 
 export const onSSEItemTrashedEvent = ({

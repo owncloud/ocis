@@ -24,6 +24,11 @@ export const eventSchema = z.object({
 
 export type EventSchemaType = z.infer<typeof eventSchema>
 
+/**
+ * Items whose postprocessing has finished, keyed by item id.
+ */
+export type ProcessedItems = Map<string, { spaceId: string; finishedAt: number }>
+
 export interface SSEEventOptions {
   resourcesStore: ResourcesStore
   spacesStore: SpacesStore
@@ -36,6 +41,7 @@ export interface SSEEventOptions {
   router: Router
   language: Language
   resourceQueue: PQueue
+  processedItems: ProcessedItems
   sseData: EventSchemaType
 }
 

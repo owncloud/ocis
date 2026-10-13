@@ -74,6 +74,8 @@ import {
   sseEventWrapper,
   onSSELinkUpdatedEvent,
   onSSEBackchannelLogoutEvent,
+  ProcessedItems,
+  refreshStaleProcessingResources,
   SseEventWrapperOptions
 } from './sse'
 import { loadAppTranslations } from '../helpers/language'
@@ -762,6 +764,22 @@ export const registerSSEEventListeners = ({
     }
   )
 
+  const processedItems: ProcessedItems = new Map()
+
+  resourcesStore.$onAction(({ name, after }) => {
+    if (!['initResourceList', 'setResources', 'upsertResource', 'upsertResources'].includes(name)) {
+      return
+    }
+    after(() =>
+      refreshStaleProcessingResources({
+        resourcesStore,
+        spacesStore,
+        clientService,
+        processedItems
+      })
+    )
+  })
+
   const sseEventWrapperOptions = {
     resourcesStore,
     spacesStore,
@@ -773,7 +791,8 @@ export const registerSSEEventListeners = ({
     previewService,
     language,
     router,
-    resourceQueue
+    resourceQueue,
+    processedItems
   } satisfies Partial<SseEventWrapperOptions>
 
   clientService.sseAuthenticated.addEventListener(MESSAGE_TYPE.ITEM_RENAMED, (msg) =>
