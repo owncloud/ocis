@@ -615,8 +615,24 @@ describe('AuthService', () => {
       const result = await authService.initializeContext(vaultRoute)
 
       expect(mockLoadUserAbilities).toHaveBeenCalled()
-      expect(result).toEqual({ name: 'accessDenied', query: { reason: 'forbidden' } })
+      expect(result).toEqual({ name: 'accessDenied' })
       expect(mockSignInRedirect).not.toHaveBeenCalled()
+    })
+
+    it('does not report a load failure as a confirmed permission denial', async () => {
+      const { authService, mockLoadUserAbilities } = setupVaultAuthService({
+        canAccessVault: true,
+        userContextReady: false,
+        getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: false }))
+      })
+      mockLoadUserAbilities.mockRejectedValueOnce(new Error('network error'))
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      expect(mockLoadUserAbilities).toHaveBeenCalled()
+      // reason: 'forbidden' tells accessDenied.vue the ability check ran and failed;
+      // here it never ran, so claiming that is false regardless of the (correct) denial.
+      expect((result as { query?: { reason?: string } })?.query?.reason).not.toBe('forbidden')
     })
 
     it('on a cold load with a valid MFA session, initializes the user context instead of bouncing to login', async () => {

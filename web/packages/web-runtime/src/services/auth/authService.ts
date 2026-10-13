@@ -170,7 +170,7 @@ export class AuthService implements AuthServiceInterface {
         } catch (e) {
           // Can't confirm access: deny, don't hand off to MFA or leave a blank page.
           console.error('failed to load vault abilities on cold load, denying access:', e)
-          return { name: 'accessDenied', query: { reason: 'forbidden' } }
+          return { name: 'accessDenied' }
         }
         if (!this.ability.can('read-all', 'Vault')) {
           return { name: 'accessDenied', query: { reason: 'forbidden' } }
