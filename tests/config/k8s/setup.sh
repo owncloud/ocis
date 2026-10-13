@@ -86,6 +86,7 @@ fi
 
 if [[ "$ENABLE_VAULT" == "true" ]]; then
     sed -i '/vault:/{n;s|false|true|}' $CFG_DIR/values.yaml
+    sed -i '/mfa:/{n;s|false|true|}' $CFG_DIR/values.yaml
     # baking keycloak url into the base CSP would affect every other suite that
     # shares this same values.yaml, breaking their fixed CSP header assertions.
     sed -i "/defaultSrc:/i\\        - 'https://keycloak:8443/'" $CFG_DIR/values.yaml
