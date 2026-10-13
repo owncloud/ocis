@@ -3,7 +3,7 @@ import { useGettext } from 'vue3-gettext'
 import { FileAction } from '../types'
 import { useClipboard } from '../../clipboard'
 import { useMessages } from '../../piniaStores'
-import { isPublicSpaceResource } from '@ownclouders/web-client'
+import { isPublicSpaceResource, isTrashResource } from '@ownclouders/web-client'
 
 export const useFileActionsCopyPermanentLink = () => {
   const { showMessage, showErrorMessage } = useMessages()
@@ -35,6 +35,10 @@ export const useFileActionsCopyPermanentLink = () => {
       },
       isVisible: ({ space, resources }) => {
         if (isPublicSpaceResource(space)) {
+          return false
+        }
+        // deleted items can't be linked to
+        if (resources.some((r) => isTrashResource(r))) {
           return false
         }
         return resources.length === 1

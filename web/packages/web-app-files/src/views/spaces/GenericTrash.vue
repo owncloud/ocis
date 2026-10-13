@@ -60,7 +60,8 @@ import {
   ContextActions,
   FileSideBar,
   useResourcesStore,
-  useUserStore
+  useUserStore,
+  useVault
 } from '@ownclouders/web-pkg'
 import FilesViewWrapper from '../../components/FilesViewWrapper.vue'
 import ListInfo from '../../components/FilesList/ListInfo.vue'
@@ -84,6 +85,7 @@ interface Props {
 const { space = null } = defineProps<Props>()
 const { $gettext } = useGettext()
 const userStore = useUserStore()
+const { isInVault } = useVault()
 const { user } = storeToRefs(userStore)
 const resourcesStore = useResourcesStore()
 const { currentFolder } = storeToRefs(resourcesStore)
@@ -140,7 +142,7 @@ const isEmpty = computed(() => {
 const breadcrumbs = computed(() => {
   let currentNodeName = space?.name
   if (space.driveType === 'personal') {
-    currentNodeName = $gettext('Personal')
+    currentNodeName = isInVault ? $gettext('Safe-Personal') : $gettext('Personal')
   }
   return [
     {
