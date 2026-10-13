@@ -162,6 +162,11 @@ func (ul *UserlogService) processEvent(event events.Event) {
 		default:
 			return
 		}
+	case events.UploadReady:
+		if !e.Failed {
+			return
+		}
+		users = append(users, e.ExecutingUser.GetId().GetOpaqueId())
 
 	// space related // TODO: how to find spaceadmins?
 	case events.SpaceDisabled:

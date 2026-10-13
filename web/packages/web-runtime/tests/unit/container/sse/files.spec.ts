@@ -16,7 +16,8 @@ import {
   onSSEItemMovedEvent,
   onSSEItemRenamedEvent,
   onSSEItemRestoredEvent,
-  onSSEItemTrashedEvent
+  onSSEItemTrashedEvent,
+  onSSEProcessingFinishedEvent
 } from '../../../../src/container/sse'
 import { Router } from 'vue-router'
 import { mock, mockDeep } from 'vitest-mock-extended'
@@ -115,6 +116,50 @@ describe('file events', () => {
       await onSSEFileLockingEvent({ sseData, ...mocks })
       expect(mocks.clientService.webdav.getFileInfo).not.toHaveBeenCalled()
       expect(mocks.resourcesStore.upsertResource).not.toHaveBeenCalled()
+    })
+  })
+  describe('onSSEProcessingFinishedEvent', () => {
+    it('removes the resource when the upload failed to finalize', async () => {
+      const failedResource = mock<Resource>({
+        id: 'file1',
+        storageId: 'space1',
+        parentFolderId: 'currenFolder!currentFolder'
+      })
+      const mocks = getMocks({ resources: [failedResource] })
+      const sseData = mock<EventSchemaType>({
+        itemid: failedResource.id,
+        spaceid: failedResource.storageId,
+        outcome: 'failed'
+      })
+      await onSSEProcessingFinishedEvent({ sseData, ...mocks })
+      expect(mocks.resourcesStore.removeResources).toHaveBeenCalledWith([failedResource])
+      expect(mocks.messageStore.showMessage).not.toHaveBeenCalled()
+    })
+    it('removes the failed resource even when initiated by the current client', async () => {
+      const failedResource = mock<Resource>({
+        id: 'file1',
+        storageId: 'space1',
+        parentFolderId: 'currenFolder!currentFolder'
+      })
+      const mocks = getMocks({ resources: [failedResource] })
+      const sseData = mock<EventSchemaType>({
+        itemid: failedResource.id,
+        spaceid: failedResource.storageId,
+        initiatorid: 'local1',
+        outcome: 'failed'
+      })
+      await onSSEProcessingFinishedEvent({ sseData, ...mocks })
+      expect(mocks.resourcesStore.removeResources).toHaveBeenCalledWith([failedResource])
+    })
+    it('does not remove anything when the failed resource is not in the store', async () => {
+      const mocks = getMocks()
+      const sseData = mock<EventSchemaType>({
+        itemid: 'filesomewhereelse',
+        spaceid: 'space1',
+        outcome: 'failed'
+      })
+      await onSSEProcessingFinishedEvent({ sseData, ...mocks })
+      expect(mocks.resourcesStore.removeResources).not.toHaveBeenCalled()
     })
   })
   describe('onSSEItemTrashedEvent', () => {
