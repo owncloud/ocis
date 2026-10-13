@@ -342,8 +342,10 @@ const createSharesConcurrentRequests = computed(() => {
 const fetchRecipientsTask = useTask(function* (signal, query: string) {
   let filter: string
   if (unref(isExternalShareRoleType)) {
-    // filter for external user types only
-    filter = `(userType eq 'Federated')`
+    // external users only, ANDed with vaultEligible when sharing a vault resource
+    filter = unref(isVaultResource)
+      ? `(userType eq 'Federated') and (vaultEligible eq true)`
+      : `(userType eq 'Federated')`
   } else if (unref(isVaultResource)) {
     // users without vault access can never open a vault resource, so they must not be
     // offered as recipients in the first place

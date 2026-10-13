@@ -178,6 +178,20 @@ describe('InviteCollaboratorForm', () => {
         expect.anything()
       )
     })
+    it('keeps restricting to vault-eligible users after switching to the External tab', async () => {
+      const { wrapper, mocks } = getWrapper({
+        capabilities: vaultCapabilities,
+        resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID }),
+        externalShareRoles: [mock<ShareRole>()]
+      })
+      await wrapper.vm.fetchRecipientsTask.last
+
+      wrapper.vm.currentShareRoleType = mock<ShareRoleType>({ id: '2' })
+      await wrapper.vm.fetchRecipientsTask.perform('teacher')
+
+      const lastCall = mocks.$clientService.graphAuthenticated.users.listUsers.mock.calls.at(-1)
+      expect(lastCall[0].filter).toContain('vaultEligible')
+    })
   })
   describe('vault default expiration notice', () => {
     const vaultCapabilities = {
