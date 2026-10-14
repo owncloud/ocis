@@ -386,11 +386,11 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	username, instancename := g.parseExternalSearch(odataReq)
 
 	switch {
+	case odataReq.Query.Filter != nil:
+		users, err = g.applyUserFilter(r.Context(), odataReq, nil)
 	case username != "" && instancename != "" && g.contextUserHasExternalSharePermission(r.Context()):
 		users = make([]*libregraph.User, 1)
 		users[0], err = g.identityBackend.GetPreciseUser(r.Context(), username, instancename, odataReq)
-	case odataReq.Query.Filter != nil:
-		users, err = g.applyUserFilter(r.Context(), odataReq, nil)
 	default:
 		users, err = g.identityBackend.GetUsers(r.Context(), odataReq)
 	}
