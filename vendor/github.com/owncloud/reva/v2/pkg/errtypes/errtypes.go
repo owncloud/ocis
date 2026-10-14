@@ -24,7 +24,6 @@ package errtypes
 
 import (
 	"net/http"
-	"strconv"
 	"strings"
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -385,7 +384,7 @@ func NewErrtypeFromHTTPStatusCode(code int, message string) error {
 	case StatusChecksumMismatch:
 		return ChecksumMismatch(message)
 	default:
-		return InternalError("http " + strconv.Itoa(code) + ": " + message)
+		return InternalError(message)
 	}
 }
 
