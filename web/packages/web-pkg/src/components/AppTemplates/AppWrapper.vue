@@ -65,7 +65,8 @@ import {
   useFileActionsSaveAs,
   useSharesStore,
   useFileActionsExportAsPdf,
-  useAppStore
+  useAppStore,
+  useDisableRootOverscroll
 } from '../../composables'
 import {
   Action,
@@ -487,6 +488,8 @@ const save = async () => {
 const hasAutoSave = computed(() => {
   return !disableAutoSave
 })
+
+useDisableRootOverscroll()
 
 let autosaveIntervalId: ReturnType<typeof setInterval> = null
 onMounted(() => {
