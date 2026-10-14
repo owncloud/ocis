@@ -182,6 +182,9 @@ func (fs *Decomposedfs) DownloadRevision(ctx context.Context, ref *provider.Refe
 	if openReaderFunc(ri) {
 		reader, err = fs.tp.ReadBlob(&revisionNode)
 		if err != nil {
+			if _, ok := err.(errtypes.IsNotFound); ok {
+				return nil, nil, err
+			}
 			return nil, nil, errors.Wrapf(err, "Decomposedfs: could not download blob of revision '%s' for node '%s'", n.ID, revisionKey)
 		}
 	}

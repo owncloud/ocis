@@ -70,6 +70,9 @@ type Storage interface {
 	SimpleDownload(ctx context.Context, path string) ([]byte, error)
 	Delete(ctx context.Context, path string) error
 	Stat(ctx context.Context, path string) (*provider.ResourceInfo, error)
+	// WasRecentlyDeleted reports whether path was removed vs. never existed.
+	// Backends without trash support always report false (see OCISDEV-855).
+	WasRecentlyDeleted(ctx context.Context, path string) (bool, error)
 
 	ReadDir(ctx context.Context, path string) ([]string, error)
 	ListDir(ctx context.Context, path string) ([]*provider.ResourceInfo, error)

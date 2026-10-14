@@ -704,9 +704,18 @@ func (t *Tree) InitNewNode(ctx context.Context, n *node.Node, fsize uint64) (met
 	h, err := os.OpenFile(n.InternalPath(), os.O_CREATE|os.O_EXCL, 0600)
 	subspan.End()
 	if err != nil {
+		if errors.Is(err, fs.ErrExist) {
+			return unlock, errtypes.AlreadyExists(n.Name)
+		}
 		return unlock, err
 	}
 	h.Close()
+
+	// Mark processing immediately so a reader never sees "not processing";
+	// overwritten later with the full status. acquireLock=false: lock already held.
+	if err := n.SetXattrsWithContext(ctx, map[string][]byte{prefixes.StatusPrefix: []byte(node.ProcessingStatus)}, false); err != nil {
+		return unlock, err
+	}
 
 	_, subspan = tracer.Start(ctx, "node.CheckQuota")
 	_, err = node.CheckQuota(ctx, n.SpaceRoot, false, 0, fsize)

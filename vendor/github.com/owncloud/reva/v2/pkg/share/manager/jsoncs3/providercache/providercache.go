@@ -29,10 +29,12 @@ import (
 	"sync"
 	"time"
 
+	backoff "github.com/cenkalti/backoff/v5"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
+	"github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3/cas"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/mtimesyncedcache"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/metadata"
 	"go.opentelemetry.io/otel"
@@ -166,7 +168,7 @@ func (c *Cache) Add(ctx context.Context, storageID, spaceID, shareID string, sha
 
 	var err error
 	if !c.isSpaceCached(storageID, spaceID) {
-		err = c.syncWithLock(ctx, storageID, spaceID)
+		err = c.syncWithRetry(ctx, storageID, spaceID)
 		if err != nil {
 			return err
 		}
@@ -189,38 +191,22 @@ func (c *Cache) Add(ctx context.Context, storageID, spaceID, shareID string, sha
 		return c.Persist(ctx, storageID, spaceID)
 	}
 
-	for retries := 100; retries > 0; retries-- {
-		err = persistFunc()
-		switch err.(type) {
-		case nil:
-			span.SetStatus(codes.Ok, "")
-			return nil
-		case errtypes.Aborted:
-			log.Debug().Msg("aborted when persisting added provider share: etag changed. retrying...")
-			// this is the expected status code from the server when the if-match etag check fails
-			// continue with sync below
-		case errtypes.PreconditionFailed:
-			log.Debug().Msg("precondition failed when persisting added provider share: etag changed. retrying...")
-			// actually, this is the wrong status code and we treat it like errtypes.Aborted because of inconsistencies on the server side
-			// continue with sync below
-		case errtypes.AlreadyExists:
-			log.Debug().Msg("already exists when persisting added provider share. retrying...")
-			// CS3 uses an already exists error instead of precondition failed when using an If-None-Match=* header / IfExists flag in the InitiateFileUpload call.
-			// Thas happens when the cache thinks there is no file.
-			// continue with sync below
-		default:
+	err = cas.RetryPersist(ctx, 100, persistFunc,
+		func() error { return c.resyncAfterConflict(ctx, storageID, spaceID) },
+		func(err error) { log.Debug().Err(err).Msg("CAS conflict persisting added provider share, retrying...") },
+		func(err error) {
 			span.SetStatus(codes.Error, fmt.Sprintf("persisting added provider share failed. giving up: %s", err.Error()))
 			log.Error().Err(err).Msg("persisting added provider share failed")
-			return err
-		}
-		if err := c.syncWithLock(ctx, storageID, spaceID); err != nil {
+		},
+		func(err error) {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
 			log.Error().Err(err).Msg("persisting added provider share failed. giving up.")
-			return err
-		}
+		},
+	)
+	if err == nil {
+		span.SetStatus(codes.Ok, "")
 	}
-
 	return err
 }
 
@@ -235,7 +221,7 @@ func (c *Cache) Remove(ctx context.Context, storageID, spaceID, shareID string) 
 	span.AddEvent("got lock")
 
 	if !c.isSpaceCached(storageID, spaceID) {
-		err := c.syncWithLock(ctx, storageID, spaceID)
+		err := c.syncWithRetry(ctx, storageID, spaceID)
 		if err != nil {
 			return err
 		}
@@ -261,32 +247,21 @@ func (c *Cache) Remove(ctx context.Context, storageID, spaceID, shareID string) 
 		Str("spaceID", spaceID).
 		Str("shareID", shareID).Logger()
 
-	var err error
-	for retries := 100; retries > 0; retries-- {
-		err = persistFunc()
-		switch err.(type) {
-		case nil:
-			span.SetStatus(codes.Ok, "")
-			return nil
-		case errtypes.Aborted:
-			log.Debug().Msg("aborted when persisting removed provider share: etag changed. retrying...")
-			// this is the expected status code from the server when the if-match etag check fails
-			// continue with sync below
-		case errtypes.PreconditionFailed:
-			log.Debug().Msg("precondition failed when persisting removed provider share: etag changed. retrying...")
-			// actually, this is the wrong status code and we treat it like errtypes.Aborted because of inconsistencies on the server side
-			// continue with sync below
-		default:
+	err := cas.RetryPersist(ctx, 100, persistFunc,
+		func() error { return c.resyncAfterConflict(ctx, storageID, spaceID) },
+		func(err error) { log.Debug().Err(err).Msg("CAS conflict persisting removed provider share, retrying...") },
+		func(err error) {
 			span.SetStatus(codes.Error, fmt.Sprintf("persisting removed provider share failed. giving up: %s", err.Error()))
 			log.Error().Err(err).Msg("persisting removed provider share failed")
-			return err
-		}
-		if err := c.syncWithLock(ctx, storageID, spaceID); err != nil {
+		},
+		func(err error) {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
 			log.Error().Err(err).Msg("persisting removed provider share failed. giving up.")
-			return err
-		}
+		},
+	)
+	if err == nil {
+		span.SetStatus(codes.Ok, "")
 	}
 	return err
 }
@@ -303,7 +278,7 @@ func (c *Cache) Get(ctx context.Context, storageID, spaceID, shareID string, ski
 
 	if !skipSync {
 		// sync cache, maybe our data is outdated
-		err := c.syncWithLock(ctx, storageID, spaceID)
+		err := c.syncWithRetry(ctx, storageID, spaceID)
 		if err != nil {
 			return nil, err
 		}
@@ -340,7 +315,8 @@ func (c *Cache) All(ctx context.Context) (*mtimesyncedcache.Map[string, *Spaces]
 
 			unlock := c.LockSpace(spaceID)
 			span.AddEvent("got lock for space " + spaceID)
-			if err := c.syncWithLock(ctx, storageID, spaceID); err != nil {
+			if err := c.syncWithRetry(ctx, storageID, spaceID); err != nil {
+				unlock()
 				return nil, err
 			}
 			unlock()
@@ -361,7 +337,7 @@ func (c *Cache) ListSpace(ctx context.Context, storageID, spaceID string) (*Shar
 	span.AddEvent("got lock")
 
 	// sync cache, maybe our data is outdated
-	err := c.syncWithLock(ctx, storageID, spaceID)
+	err := c.syncWithRetry(ctx, storageID, spaceID)
 	if err != nil {
 		return nil, err
 	}
@@ -459,7 +435,7 @@ func (c *Cache) PurgeSpace(ctx context.Context, storageID, spaceID string) error
 	span.AddEvent("got lock")
 
 	if !c.isSpaceCached(storageID, spaceID) {
-		err := c.syncWithLock(ctx, storageID, spaceID)
+		err := c.syncWithRetry(ctx, storageID, spaceID)
 		if err != nil {
 			return err
 		}
@@ -478,7 +454,18 @@ func (c *Cache) PurgeSpace(ctx context.Context, storageID, spaceID string) error
 	return c.Persist(ctx, storageID, spaceID)
 }
 
+// syncWithLock treats NotFound as a legitimately empty space (cold-start only).
 func (c *Cache) syncWithLock(ctx context.Context, storageID, spaceID string) error {
+	return c.doSync(ctx, storageID, spaceID, true)
+}
+
+// Unlike syncWithLock, a NotFound here must not reset the cache -- a pending
+// mutation is about to overwrite it, dropping a sibling writer's data.
+func (c *Cache) resyncAfterConflict(ctx context.Context, storageID, spaceID string) error {
+	return c.doSync(ctx, storageID, spaceID, false)
+}
+
+func (c *Cache) doSync(ctx context.Context, storageID, spaceID string, resetOnNotFound bool) error {
 	ctx, span := tracer.Start(ctx, "syncWithLock")
 	defer span.End()
 
@@ -498,10 +485,22 @@ func (c *Cache) syncWithLock(ctx context.Context, storageID, spaceID string) err
 	}
 
 	dlres, err := c.storage.Download(ctx, dlreq)
+
 	switch err.(type) {
 	case nil:
 		span.AddEvent("updating local cache")
 	case errtypes.NotFound:
+		if reset, trashed := cas.DecideNotFoundReset(ctx, c.storage, dlreq.Path, resetOnNotFound, space.Etag != "", log); !reset {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+			if trashed {
+				log.Error().Err(err).Msg("lost update: backing file was recently trashed")
+			} else {
+				log.Error().Err(err).Msg("lost update: backing file disappeared mid-retry")
+			}
+			return err
+		}
+		spaces.Spaces.Store(spaceID, &Shares{Shares: map[string]*collaboration.Share{}})
 		span.SetStatus(codes.Ok, "")
 		return nil
 	case errtypes.NotModified:
@@ -527,6 +526,22 @@ func (c *Cache) syncWithLock(ctx context.Context, storageID, spaceID string) err
 	spaces.Spaces.Store(spaceID, newShares)
 	span.SetStatus(codes.Ok, "")
 	return nil
+}
+
+// syncWithRetry retries syncWithLock's cold-start read on transient errors, since callers have no other retry wrapper.
+func (c *Cache) syncWithRetry(ctx context.Context, storageID, spaceID string) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
+	_, err := backoff.Retry(ctx, func() (struct{}, error) {
+		err := c.syncWithLock(ctx, storageID, spaceID)
+		if err != nil && !cas.IsSyncTransient(err) {
+			return struct{}{}, backoff.Permanent(err)
+		}
+		return struct{}{}, err
+	}, backoff.WithBackOff(cas.NewBackoff()), backoff.WithMaxTries(20))
+	return err
 }
 
 func (c *Cache) initializeIfNeeded(storageID, spaceID string) {
