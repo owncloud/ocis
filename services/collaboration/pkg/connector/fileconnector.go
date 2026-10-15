@@ -939,42 +939,22 @@ func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (*Connect
 		Str("RequestedLockID", lockID).
 		Logger()
 
-	var deleteRes *providerv1beta1.DeleteResponse
 	deleteReq := &providerv1beta1.DeleteRequest{
 		Ref:    wopiContext.FileReference,
 		LockId: lockID,
 	}
 
-	// we'll retry the request after a while if we get a "TOO_EARLY" code
-	for retries := 0; deleteRes == nil || deleteRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_TOO_EARLY; retries++ {
+	// the file might still be processing, so we retry if we get a "TOO_EARLY" code
+	deleteRes, err := retryWhileTooEarly(ctx, logger, "DeleteFile", func() (*providerv1beta1.DeleteResponse, error) {
 		gwc, err := f.gws.Next()
 		if err != nil {
 			return nil, err
 		}
-		deleteRes, err = gwc.Delete(ctx, deleteReq)
-		if err != nil {
-			logger.Error().Err(err).Msg("DeleteFile: stat failed")
-			return nil, err
-		}
-
-		if deleteRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_TOO_EARLY {
-			// starting from 20ms, double the waiting time for each retry
-			// capping at 5 secs
-			var waitingTime time.Duration
-			waitingTime = (20 * time.Millisecond) << retries
-			if waitingTime.Seconds() > 5 {
-				waitingTime = 5 * time.Second
-			}
-
-			logger.Warn().
-				Str("StatusCode", deleteRes.GetStatus().GetCode().String()).
-				Str("StatusMsg", deleteRes.GetStatus().GetMessage()).
-				Dur("WaitingTime", waitingTime).
-				Int("Retries", retries).
-				Msg("DeleteFile: file isn't ready yet. Retrying")
-
-			time.Sleep(waitingTime)
-		}
+		return gwc.Delete(ctx, deleteReq)
+	})
+	if err != nil {
+		logger.Error().Err(err).Msg("DeleteFile: delete failed")
+		return nil, err
 	}
 
 	if deleteRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
@@ -1092,15 +1072,18 @@ func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (
 		// add the new file reference to the log context
 		newLogger := logger.With().Str("NewFileReference", targetFileReference.String()).Logger()
 
-		gwc, err = f.gws.Next()
-		if err != nil {
-			return nil, err
-		}
-		// try to put the file. It mustn't return a 400 or 409
-		moveRes, err := gwc.Move(ctx, &providerv1beta1.MoveRequest{
-			Source:      wopiContext.FileReference,
-			Destination: targetFileReference,
-			LockId:      lockID,
+		// try to move the file. It mustn't return a 400 or 409
+		// the file might still be processing, so we retry if we get a "TOO_EARLY" code
+		moveRes, err := retryWhileTooEarly(ctx, newLogger, "RenameFile", func() (*providerv1beta1.MoveResponse, error) {
+			gwc, err := f.gws.Next()
+			if err != nil {
+				return nil, err
+			}
+			return gwc.Move(ctx, &providerv1beta1.MoveRequest{
+				Source:      wopiContext.FileReference,
+				Destination: targetFileReference,
+				LockId:      lockID,
+			})
 		})
 		if err != nil {
 			newLogger.Error().Err(err).Msg("RenameFile: move failed")

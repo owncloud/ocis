@@ -274,12 +274,15 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 		},
 	}
 
-	gwc, err = c.gws.Next()
-	if err != nil {
-		return nil, err
-	}
-	// Initiate the upload request
-	resp, err := gwc.InitiateFileUpload(ctx, req)
+	// Initiate the upload request. The target file might still be processing,
+	// so we retry if we get a "TOO_EARLY" code
+	resp, err := retryWhileTooEarly(ctx, logger, "PutFile", func() (*gatewayv1beta1.InitiateFileUploadResponse, error) {
+		gwc, err := c.gws.Next()
+		if err != nil {
+			return nil, err
+		}
+		return gwc.InitiateFileUpload(ctx, req)
+	})
 	if err := requestFailed(logger, resp.GetStatus(), false, err, "PutFile: InitiateFileUpload failed"); err != nil {
 		return nil, err
 	}
