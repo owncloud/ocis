@@ -28,8 +28,9 @@ type statusResponse interface {
 // doubles on each retry, capped at 5 seconds.
 //
 // The last response is returned if the resource is still processing after all
-// the retries, so the caller must handle the "TOO_EARLY" code too. Errors and
-// a cancelled context abort the retries immediately.
+// the retries, so the caller must handle the "TOO_EARLY" code too. Errors abort
+// the retries immediately, and so does a cancelled context, in which case the
+// context error is returned.
 func retryWhileTooEarly[T statusResponse](ctx context.Context, logger zerolog.Logger, msg string, request func() (T, error)) (T, error) {
 	for retries := 0; ; retries++ {
 		res, err := request()
@@ -47,8 +48,9 @@ func retryWhileTooEarly[T statusResponse](ctx context.Context, logger zerolog.Lo
 
 		select {
 		case <-ctx.Done():
-			return res, nil
+			return res, ctx.Err()
 		case <-time.After(waitingTime):
+			// nothing to do, the waiting time elapsed so we just retry the request
 		}
 	}
 }

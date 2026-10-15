@@ -1472,6 +1472,20 @@ var _ = Describe("FileConnector", func() {
 			gatewayClient.AssertNumberOfCalls(GinkgoT(), "Delete", 3)
 		})
 
+		It("Delete stops retrying when the context is cancelled", func() {
+			cancelCtx, cancel := context.WithCancel(context.Background())
+			ctx := middleware.WopiContextToCtx(cancelCtx, wopiCtx)
+
+			gatewayClient.On("Delete", mock.Anything, mock.Anything).Return(&providerv1beta1.DeleteResponse{
+				Status: status.NewTooEarly(ctx, "file is processing"),
+			}, nil).Run(func(mock.Arguments) { cancel() }).Once()
+
+			response, err := fc.DeleteFile(ctx, "newlock")
+			Expect(err).To(MatchError(context.Canceled))
+			Expect(response).To(BeNil())
+			gatewayClient.AssertNumberOfCalls(GinkgoT(), "Delete", 1)
+		})
+
 		It("Delete success", func() {
 			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
 
