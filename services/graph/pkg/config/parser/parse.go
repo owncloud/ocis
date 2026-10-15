@@ -98,6 +98,10 @@ func validateLDAPSettings(cfg *config.Config) error {
 		return shared.MissingLDAPBindPassword(cfg.Service.Name)
 	}
 
+	if cfg.MultiInstance.MasterID != "" && cfg.Identity.LDAP.UserFilter == "" {
+		return shared.MissingLDAPUserFilterForMasterID(cfg.Service.Name)
+	}
+
 	// ensure that "GroupBaseDN" is below "GroupBaseDN"
 	if cfg.Identity.LDAP.WriteEnabled && cfg.Identity.LDAP.GroupCreateBaseDN != cfg.Identity.LDAP.GroupBaseDN {
 		baseDN, err := ldap.ParseDN(cfg.Identity.LDAP.GroupBaseDN)

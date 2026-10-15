@@ -4,16 +4,17 @@ import (
 	"net/http"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 )
 
 // BasicAuthenticator is the authenticator responsible for HTTP Basic authentication.
 type BasicAuthenticator struct {
-	Logger        log.Logger
-	UserProvider  backend.UserBackend
-	UserCS3Claim  string
-	UserOIDCClaim string
+	Logger               log.Logger
+	UserProvider         backend.UserBackend
+	UserRoleAssigner     userroles.UserRoleAssigner
+	MultiInstanceEnabled bool
 }
 
 // Authenticate implements the authenticator interface to authenticate requests via basic auth.
@@ -22,6 +23,15 @@ func (m BasicAuthenticator) Authenticate(r *http.Request) (*http.Request, error)
 		// The authentication of public path requests is handled by another authenticator.
 		// Since we can't guarantee the order of execution of the authenticators, we better
 		// implement an early return here for paths we can't authenticate in this authenticator.
+		return nil, ErrAuthenticationFailed
+	}
+
+	if m.MultiInstanceEnabled {
+		// Basic auth credentials carry no OIDC claims, so there is no way to
+		// verify tenant membership (OCIS_MULTI_INSTANCE_MEMBER_CLAIM/GUEST_CLAIM)
+		// for them. Reject rather than let the request bypass the tenant
+		// check in services/proxy/pkg/middleware/account_resolver.go's
+		// resolveUserType.
 		return nil, ErrAuthenticationFailed
 	}
 
@@ -40,23 +50,21 @@ func (m BasicAuthenticator) Authenticate(r *http.Request) (*http.Request, error)
 		return nil, ErrAuthenticationFailed
 	}
 
-	// fake oidc claims
-	claims := map[string]interface{}{
-		oidc.Iss:               user.Id.Idp,
-		oidc.PreferredUsername: user.Username,
-		oidc.Email:             user.Mail,
-		oidc.OwncloudUUID:      user.Id.OpaqueId,
+	user, err = m.UserRoleAssigner.ApplyUserRole(r.Context(), user)
+	if err != nil {
+		m.Logger.Error().
+			Err(err).
+			Str("authenticator", "basic").
+			Str("path", r.URL.Path).
+			Msg("could not apply user role")
+		return nil, ErrAuthenticationFailed
 	}
 
-	if m.UserCS3Claim == "userid" {
-		// set the custom user claim only if users will be looked up by the userid on the CS3api
-		// OpaqueId contains the userid configured in STORAGE_LDAP_USER_SCHEMA_UID
-		claims[m.UserOIDCClaim] = user.Id.OpaqueId
-
-	}
 	m.Logger.Debug().
 		Str("authenticator", "basic").
 		Str("path", r.URL.Path).
 		Msg("successfully authenticated request")
-	return r.WithContext(oidc.NewContext(r.Context(), claims)), nil
+	// the user is already authenticated, put it into the context directly
+	// instead of faking oidc claims for the account resolver to re-resolve.
+	return r.WithContext(revactx.ContextSetUser(r.Context(), user)), nil
 }

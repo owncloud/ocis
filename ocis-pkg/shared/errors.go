@@ -46,6 +46,13 @@ func MissingLDAPBindPassword(service string) error {
 		service, defaults.BaseConfigPath())
 }
 
+func MissingLDAPUserFilterForMasterID(service string) error {
+	return fmt.Errorf("The ldap user_filter has not been set for %s, but OCIS_MULTI_INSTANCE_MASTER_ID is set. "+
+		"Set an explicit user_filter to scope this instance to its own users. "+
+		"Without a user_filter, every user in the shared LDAP directory can access this instance.",
+		service)
+}
+
 func MissingServiceUserPassword(service, serviceUser string) error {
 	return fmt.Errorf("The password of service user %s has not been set properly in your config for %s. "+
 		"Make sure your %s config contains the proper values "+

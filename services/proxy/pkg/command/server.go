@@ -285,15 +285,19 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 	if cfg.EnableBasicAuth {
 		logger.Warn().Msg("basic auth enabled, use only for testing or development")
 		authenticators = append(authenticators, middleware.BasicAuthenticator{
-			Logger:       logger,
-			UserProvider: userProvider,
+			Logger:               logger,
+			UserProvider:         userProvider,
+			UserRoleAssigner:     roleAssigner,
+			MultiInstanceEnabled: cfg.MultiInstance.Enabled,
 		})
 	}
 
 	if cfg.AuthMiddleware.AllowAppAuth {
 		authenticators = append(authenticators, middleware.AppAuthAuthenticator{
-			Logger:              logger,
-			RevaGatewaySelector: gatewaySelector,
+			Logger:               logger,
+			RevaGatewaySelector:  gatewaySelector,
+			UserRoleAssigner:     roleAssigner,
+			MultiInstanceEnabled: cfg.MultiInstance.Enabled,
 		})
 	}
 
