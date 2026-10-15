@@ -61,13 +61,20 @@ describe('Notification component', () => {
     expect(wrapper.find(selectors.notificationsLoading).exists()).toBeTruthy()
   })
   it('marks all notifications as read', async () => {
-    const notifications = [mock<Notification>({ messageRich: undefined, object_id })]
+    const notifications = [
+      mock<Notification>({ messageRich: undefined, object_id, notification_id: 'n1' })
+    ]
     const { wrapper, mocks } = getWrapper({ notifications })
     await wrapper.vm.fetchNotificationsTask.last
     await wrapper.find(selectors.markAll).trigger('click')
     await wrapper.vm.$nextTick()
     expect(wrapper.find(selectors.notificationItem).exists()).toBeFalsy()
     expect(mocks.$clientService.httpAuthenticated.delete).toHaveBeenCalledTimes(1)
+    expect(mocks.$clientService.httpAuthenticated.delete).toHaveBeenCalledWith(
+      expect.any(String),
+      { ids: ['n1'] },
+      expect.anything()
+    )
   })
   describe('avatar', () => {
     it('loads based on the username', async () => {
