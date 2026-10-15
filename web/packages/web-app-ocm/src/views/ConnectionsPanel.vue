@@ -158,7 +158,8 @@ const toSharedWithOthers = () => {
 const deleteConnection = async (user: FederatedConnection) => {
   try {
     await clientService.httpAuthenticated.delete('/sciencemesh/delete-accepted-user', {
-      data: { user_id: user.user_id, idp: user.idp }
+      user_id: user.user_id,
+      idp: user.idp
     })
 
     const updatedConnections = connections.filter(({ id }) => id !== buildConnection(user).id)
