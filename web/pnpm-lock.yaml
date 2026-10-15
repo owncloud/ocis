@@ -812,6 +812,10 @@ importers:
       zod:
         specifier: 4.3.6
         version: 4.3.6
+    devDependencies:
+      '@ownclouders/web-test-helpers':
+        specifier: workspace:*
+        version: link:../web-test-helpers
 
   packages/web-app-password-protected-folders:
     devDependencies:
