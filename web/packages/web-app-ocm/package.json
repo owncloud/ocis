@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "description": "OCM",
   "license": "Apache-2.0",
+  "devDependencies": {
+    "@ownclouders/web-test-helpers": "workspace:*"
+  },
   "peerDependencies": {
     "@ownclouders/design-system": "workspace:*",
     "@ownclouders/web-client": "workspace:*",
