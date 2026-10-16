@@ -10,7 +10,6 @@ protoc-deps: $(BINGO)
 	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l github.com/go-micro/generator/cmd/protoc-gen-micro
 	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l github.com/owncloud/protoc-gen-microweb
 	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2
-	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc
 	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l github.com/favadi/protoc-go-inject-tag
 
 .PHONY: buf-generate
