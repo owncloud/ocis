@@ -135,17 +135,21 @@ def main() -> int:
         subprocess.run(["pnpm", "exec", "playwright", "install", "--with-deps", "chromium"],
                        cwd=web_dir, check=True)
 
+    vault_storage_needed = (
+        os.environ.get("VAULT_STORAGE_NEEDED", "").lower() == "true"
+        or os.environ.get("VAULT_MODE", "").lower() == "true"
+    )
+
     if os.environ.get("K8S", "").lower() == "true":
         # oCIS is already running as a Helm-deployed k8s cluster (see
         # .github/workflows/k8s.yml) -- unlike the flow below, there's no local
         # binary to build, init, or start. Just confirm it's up and point
         # Playwright straight at it.
         ocis_url = os.environ["TEST_SERVER_URL"]
-        proxy_readyz_url = os.environ.get("PROXY_READYZ_URL", "")
-        if proxy_readyz_url:
+        if vault_storage_needed:
             wait_for(
                 lambda: subprocess.run(
-                    ["curl", "-sf", proxy_readyz_url], capture_output=True
+                    ["curl", "-sf", "http://localhost:19205/readyz"], capture_output=True
                 ).returncode == 0,
                 120,
                 "ocis proxy",
@@ -187,7 +191,6 @@ def main() -> int:
     oidc_iframe_needed = os.environ.get("OIDC_IFRAME_NEEDED", "").lower() == "true"
     collaboration_needed = os.environ.get("COLLABORATION_NEEDED", "").lower() == "true"
     federated_needed = os.environ.get("FEDERATED_NEEDED", "").lower() == "true"
-    vault_storage_needed = os.environ.get("VAULT_STORAGE_NEEDED", "").lower() == "true"
     # MFA mode runs ocis behind keycloak with TOTP enforced
     keycloak_needed = keycloak_needed or mfa_needed or vault_storage_needed
 
