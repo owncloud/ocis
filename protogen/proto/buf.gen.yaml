@@ -1,3 +1,5 @@
+# this file should be reviewed, because the referenced files often do not exist
+# such as 'protoc-gen-openapiv2' only 'protoc-gen-openapiv2-v2.13.0' exists...
 version: v1
 plugins:
   - name: go
@@ -30,9 +32,3 @@ plugins:
   - name: openapiv2
     path: ../../.bingo/protoc-gen-openapiv2
     out: ../gen/
-
-  - name: doc
-    path: ../../.bingo/protoc-gen-doc
-    out: ../../docs/apis/grpc_apis
-    opt:
-      - ../docs/GRPC.tmpl,grpc.md,source_relative
