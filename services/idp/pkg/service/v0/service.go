@@ -432,8 +432,8 @@ func (idp *IDP) Index() http.HandlerFunc {
 			ButtonSigningIn:  t.Get("Logging in…"),
 			ErrRequired:      t.Get("Username and password are required."),
 			ErrInvalid:       t.Get("Login failed. Invalid username or password."),
-			ErrFailed:        t.Get("Login failed. Invalid username or password."),
-			ErrDefault:       t.Get("Login failed. Invalid username or password."),
+			ErrFailed:        t.Get("Login failed. The server could not be reached. Please check your connection and try again."),
+			ErrDefault:       t.Get("Login failed. Something went wrong. Please try again."),
 			PasswordResetURI: idp.passwordResetURI,
 			ResetLabel:       t.Get("Reset password"),
 		}
