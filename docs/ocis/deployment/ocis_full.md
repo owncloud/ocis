@@ -74,6 +74,11 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   `cd ocis/deployments/examples/ocis_full`
 
+* Upgrading an existing deployment? Persistent data now lives under `./data/`
+  bind mounts instead of docker-managed named volumes. Run
+  `./migrate-volumes.sh` once, before starting the stack, to copy data from
+  the old named volumes into the new `./data/` directories.
+
 * Open the `.env` file in a text editor.
 
   The file by default looks like this:
@@ -144,7 +149,8 @@ See also [example server setup]({{< ref "preparing_server" >}})
   #
   # Define the oCIS storage location. Set the paths for config and data to a local path.
   # Note that especially the data directory can grow big.
-  # Leaving it default stores data in docker internal volumes.
+  # Leaving it default stores data under ./data/ocis-config and ./data/ocis-data
+  # relative to the compose project directory.
   # For more details see:
   # https://doc.owncloud.com/ocis/next/deployment/general/general-info.html#default-paths
   # OCIS_CONFIG_DIR=/your/local/ocis/config

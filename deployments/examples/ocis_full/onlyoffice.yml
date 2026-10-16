@@ -31,8 +31,8 @@ services:
       COLLABORATION_LOG_LEVEL: ${LOG_LEVEL:-info}
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
     volumes:
-      # configure the .env file to use own paths instead of docker internal volumes
-      - ${OCIS_CONFIG_DIR:-ocis-config}:/etc/ocis
+      # configure the .env file to use different host paths if desired
+      - ${OCIS_CONFIG_DIR:-./data/ocis-config}:/etc/ocis
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.collaboration-oo.entrypoints=http"

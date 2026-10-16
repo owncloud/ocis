@@ -15,6 +15,18 @@ This deployment example is documented in two locations for different audiences:
   Providing details which are more developer focused. This description can also be used when deviating from the default.\
   Note that this examples uses self signed certificates and is intended for testing purposes.
 
+## Data Storage
+
+All persistent runtime data (oCIS config/data, S3 storage, database, virus
+definitions, web app extensions, etc.) is bind-mounted from a `./data/`
+directory next to this compose project, rather than docker-managed named
+volumes. The oCIS config/data paths can be redirected elsewhere via the
+`OCIS_CONFIG_DIR`/`OCIS_DATA_DIR` variables in `.env`.
+
+Upgrading an existing deployment that still has data in the old named
+volumes? Run `./migrate-volumes.sh` once, before starting the stack, to copy
+data from the old volumes into the new `./data/` directories.
+
 ## Optional Services
 
 ### Keycloak

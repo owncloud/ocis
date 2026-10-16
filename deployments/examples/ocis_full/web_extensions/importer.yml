@@ -17,7 +17,7 @@ services:
     image: owncloud/web-extensions:importer-0.4.0
     user: root
     volumes:
-      - ocis-apps:/apps
+      - ./data/ocis-apps:/apps
     entrypoint:
       - /bin/sh
     command: [ "-c", "cp -R /var/lib/nginx/html/importer/ /apps" ]
@@ -38,7 +38,7 @@ services:
       COMPANION_TUS_DEFERRED_UPLOAD_LENGTH: 'false'
       COMPANION_CLIENT_ORIGINS: "https://${OCIS_DOMAIN:-ocis.owncloud.test},https://${COMPANION_DOMAIN:-companion.owncloud.test}"
     volumes:
-      - companion-data:/tmp/companion/
+      - ./data/companion:/tmp/companion/
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.companion.entrypoints=https"
@@ -49,6 +49,3 @@ services:
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
-
-volumes:
-  companion-data:
