@@ -47,6 +47,7 @@ l10n-write:
 .PHONY: l10n-clean
 l10n-clean:
 	rm -f $(TEMPLATE_FILE);
+
 ############ licenses ############
 .PHONY: ci-node-check-licenses
 ci-node-check-licenses:
