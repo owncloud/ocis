@@ -66,6 +66,7 @@ import {
   useSharesStore,
   useFileActionsExportAsPdf,
   useAppStore,
+  AppError,
   useDisableRootOverscroll
 } from '../../composables'
 import {
@@ -376,7 +377,12 @@ watch(
   () => appStore.error,
   () => {
     if (appStore.error) {
-      loadingError.value = new Error(appStore.error.message)
+      const { statusCode, message } = appStore.error as AppError & { statusCode?: number }
+      loadingError.value = new Error(
+        statusCode === 404 && message === 'Unknown error'
+          ? $gettext('The resource could not be located, it may not exist anymore.')
+          : message
+      )
       loading.value = false
       return
     }
