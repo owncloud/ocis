@@ -327,12 +327,12 @@ class OcisConfigContext implements Context {
 	}
 
 	/**
-	 * @When the administrator restores the original config
+	 * @When the administrator rolls back the server to its initial configuration
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function theAdministratorHasRestoredTheOriginalConfig(): void {
+	public function theAdministratorRollsBackTheServerToItsInitialConfiguration(): void {
 		$this->rollback();
 	}
 

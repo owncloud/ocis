@@ -491,8 +491,6 @@ default:
     apiVault:
       paths:
         - "%paths.base%/../features/apiVault"
-        # runs with Keycloak (real OIDC tokens), which only the apiVault CI setup provides
-        - "%paths.base%/../features/apiOidcAuth"
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
@@ -505,6 +503,16 @@ default:
         - SpacesContext:
         - SharingNgContext:
         - OCSContext:
+
+    apiOidcAuth:
+      paths:
+        # runs with Keycloak (real OIDC tokens), which only the apiVault CI setup provides
+        - "%paths.base%/../features/apiOidcAuth"
+      context: *common_ldap_suite_context
+      contexts:
+        - FeatureContext: *common_feature_context_params
+        - VaultContext:
+        - OcisConfigContext:
 
     cliCommands:
       paths:
