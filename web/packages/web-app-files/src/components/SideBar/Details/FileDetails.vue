@@ -5,7 +5,7 @@
         v-if="isPreviewLoading || preview"
         key="file-thumbnail"
         :style="{
-          'background-image': isPreviewLoading ? 'none' : `url(${preview})`
+          'background-image': isPreviewLoading ? 'none' : `url('${preview}')`
         }"
         class="details-preview oc-flex oc-flex-middle oc-flex-center oc-mb"
         data-testid="preview"
