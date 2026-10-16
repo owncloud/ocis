@@ -351,18 +351,13 @@ const fetchRecipientsTask = useTask(function* (signal, query: string) {
     // offered as recipients in the first place
     filterClauses.push(`vaultEligible eq true`)
   }
-  const filter = filterClauses.length
-    ? filterClauses.map((c) => `(${c})`).join(' and ')
-    : undefined
+  const filter = filterClauses.length ? filterClauses.map((c) => `(${c})`).join(' and ') : undefined
 
   const client = clientService.graphAuthenticated
   // keeps the hand-managed spinner from sticking if listUsers/listGroups rejects
   try {
     const userData = yield* call(
-      client.users.listUsers(
-        { orderBy: ['displayName'], search: `"${query}"`, filter },
-        { signal }
-      )
+      client.users.listUsers({ orderBy: ['displayName'], search: `"${query}"`, filter }, { signal })
     )
 
     let groupData: Group[]
