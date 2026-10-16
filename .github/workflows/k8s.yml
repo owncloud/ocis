@@ -792,7 +792,6 @@ jobs:
           KEYCLOAK: ${{ matrix.suite == 'vault-storage' }}
           KEYCLOAK_HOST: keycloak:8443
           VAULT_MODE: ${{ matrix.suite == 'vault-storage' }}
-          PROXY_READYZ_URL: ${{ matrix.suite == 'vault-storage' && 'http://localhost:19205/readyz' || '' }}
           COLLABORATION_NEEDED: ${{ matrix.collaboration == true && 'true' || 'false' }}
           FED_SERVER_URL: ${{ env.FED_SERVER_URL }}
           FEDERATED_NEEDED: ${{ matrix.federated == true && 'true' || 'false' }}
