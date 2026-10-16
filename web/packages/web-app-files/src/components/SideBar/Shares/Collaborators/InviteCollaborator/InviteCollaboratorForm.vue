@@ -340,61 +340,68 @@ const createSharesConcurrentRequests = computed(() => {
 })
 
 const fetchRecipientsTask = useTask(function* (signal, query: string) {
-  let filter: string
+  // builds the filter from applicable clauses, avoiding literal duplication across cases
+  const filterClauses: string[] = []
   if (unref(isExternalShareRoleType)) {
-    // filter for external user types only
-    filter = `(userType eq 'Federated')`
-  } else if (unref(isVaultResource)) {
+    // external users only
+    filterClauses.push(`userType eq 'Federated'`)
+  }
+  if (unref(isVaultResource)) {
     // users without vault access can never open a vault resource, so they must not be
     // offered as recipients in the first place
-    filter = `vaultEligible eq true`
+    filterClauses.push(`vaultEligible eq true`)
   }
+  const filter = filterClauses.length ? filterClauses.map((c) => `(${c})`).join(' and ') : undefined
 
   const client = clientService.graphAuthenticated
-  const userData = yield* call(
-    client.users.listUsers({ orderBy: ['displayName'], search: `"${query}"`, filter }, { signal })
-  )
-
-  let groupData: Group[]
-  if (!unref(isExternalShareRoleType) && !unref(isVaultResource)) {
-    // groups are only available for internal shares, and never for vault resources: the
-    // vault permission is assigned per account, so a group can never hold it
-    groupData = yield* call(
-      client.groups.listGroups({ orderBy: ['displayName'], search: `"${query}"` }, { signal })
+  // keeps the hand-managed spinner from sticking if listUsers/listGroups rejects
+  try {
+    const userData = yield* call(
+      client.users.listUsers({ orderBy: ['displayName'], search: `"${query}"`, filter }, { signal })
     )
-  }
 
-  const users = (userData || []).map((u) => ({
-    ...u,
-    shareType: unref(isExternalShareRoleType) ? ShareTypes.remote.value : ShareTypes.user.value
-  })) as CollaboratorAutoCompleteItem[]
-
-  const groups = (groupData || []).map((u) => ({
-    ...u,
-    shareType: ShareTypes.group.value
-  })) as CollaboratorAutoCompleteItem[]
-
-  autocompleteResults.value = [...users, ...groups].filter(
-    (collaborator: CollaboratorAutoCompleteItem) => {
-      if (collaborator.id === userStore.user.id) {
-        // filter current user
-        return false
-      }
-
-      const selected = unref(selectedCollaborators).some(({ id }) => collaborator.id === id)
-      const existingShares = unref(collaboratorShares).filter((c) => !c.indirect)
-      const exists = existingShares.some((s) => s.sharedWith.id === collaborator.id)
-
-      if (selected || exists) {
-        return false
-      }
-
-      announcement.value = $gettext('Person was added')
-
-      return true
+    let groupData: Group[]
+    if (!unref(isExternalShareRoleType) && !unref(isVaultResource)) {
+      // groups are only available for internal shares, and never for vault resources: the
+      // vault permission is assigned per account, so a group can never hold it
+      groupData = yield* call(
+        client.groups.listGroups({ orderBy: ['displayName'], search: `"${query}"` }, { signal })
+      )
     }
-  )
-  searchInProgress.value = false
+
+    const users = (userData || []).map((u) => ({
+      ...u,
+      shareType: u.userType === 'Federated' ? ShareTypes.remote.value : ShareTypes.user.value
+    })) as CollaboratorAutoCompleteItem[]
+
+    const groups = (groupData || []).map((u) => ({
+      ...u,
+      shareType: ShareTypes.group.value
+    })) as CollaboratorAutoCompleteItem[]
+
+    autocompleteResults.value = [...users, ...groups].filter(
+      (collaborator: CollaboratorAutoCompleteItem) => {
+        if (collaborator.id === userStore.user.id) {
+          // filter current user
+          return false
+        }
+
+        const selected = unref(selectedCollaborators).some(({ id }) => collaborator.id === id)
+        const existingShares = unref(collaboratorShares).filter((c) => !c.indirect)
+        const exists = existingShares.some((s) => s.sharedWith.id === collaborator.id)
+
+        if (selected || exists) {
+          return false
+        }
+
+        announcement.value = $gettext('Person was added')
+
+        return true
+      }
+    )
+  } finally {
+    searchInProgress.value = false
+  }
 }).restartable()
 
 let fetchRecipients = async (query: string) => {
