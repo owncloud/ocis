@@ -1,8 +1,11 @@
 import accessDenied from '../../../src/pages/accessDenied.vue'
 import { defaultComponentMocks, defaultPlugins, mount } from '@ownclouders/web-test-helpers'
+import { mock } from 'vitest-mock-extended'
+import { RouteLocationNormalizedLoaded } from 'vue-router'
 
 const selectors = {
-  logInAgainButton: '#exitAnchor'
+  logInAgainButton: '#exitAnchor',
+  cardTitle: '.oc-login-card-title'
 }
 
 describe('access denied page', () => {
@@ -23,11 +26,26 @@ describe('access denied page', () => {
       expect(loginAgainUrl.toString()).toEqual(loginUrl)
     })
   })
+  describe('reason=forbidden (still logged in, lacking permission)', () => {
+    it('does not claim the user was logged out, and sends them back into the app', () => {
+      const { wrapper } = getWrapper({ reason: 'forbidden' })
+
+      expect(wrapper.find(selectors.cardTitle).text()).not.toContain('logged')
+      expect(wrapper.html()).not.toContain('log out')
+
+      const goBackButton = wrapper.find(selectors.logInAgainButton)
+      const destination = Object.values(goBackButton.attributes()).join(' ') + goBackButton.html()
+      expect(destination.toLowerCase()).not.toContain('login')
+    })
+  })
 })
 
-function getWrapper({ loginUrl = '' } = {}) {
+function getWrapper({ loginUrl = '', reason = '' } = {}) {
+  const currentRoute = mock<RouteLocationNormalizedLoaded>({
+    query: { ...(reason && { reason }) }
+  })
   const mocks = {
-    ...defaultComponentMocks()
+    ...defaultComponentMocks({ currentRoute })
   }
 
   return {
