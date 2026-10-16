@@ -77,12 +77,6 @@ $(PIGEON): $(BINGO_DIR)/pigeon.mod
 	@echo "(re)installing $(GOBIN)/pigeon-v1.2.1"
 	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=pigeon.mod -o=$(GOBIN)/pigeon-v1.2.1 "github.com/mna/pigeon"
 
-PROTOC_GEN_DOC := $(GOBIN)/protoc-gen-doc-v1.5.1
-$(PROTOC_GEN_DOC): $(BINGO_DIR)/protoc-gen-doc.mod
-	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/protoc-gen-doc-v1.5.1"
-	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=protoc-gen-doc.mod -o=$(GOBIN)/protoc-gen-doc-v1.5.1 "github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc"
-
 PROTOC_GEN_GO := $(GOBIN)/protoc-gen-go-v1.28.1
 $(PROTOC_GEN_GO): $(BINGO_DIR)/protoc-gen-go.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
