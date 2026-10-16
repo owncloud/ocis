@@ -1094,6 +1094,20 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @When the administrator resumes all the upload session using the post processing command
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorResumesAllUploadSessionUsingPostprocessingCommand(): void {
+		$command = "postprocessing resume";
+		$body = [
+			"command" => $command,
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
 	 * @When the administrator restarts the expired upload sessions using the CLI
 	 *
 	 * @return void
