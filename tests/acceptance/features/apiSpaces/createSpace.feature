@@ -153,3 +153,51 @@ Feature: create space
       | user-role   |
       | Admin       |
       | Space Admin |
+
+  @issue-11235
+  Scenario: admin user creates a space with a caller-supplied id via the Graph API
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    When user "Alice" creates a space "Project Saturn" of type "project" with id "11111111-1111-4111-8111-111111111111" using the Graph API
+    Then the HTTP status code should be "201"
+    And the JSON response should contain space called "Project Saturn" and match
+      """
+      {
+        "type": "object",
+        "required": [
+          "name",
+          "id",
+          "root",
+          "webUrl"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["Project Saturn"]
+          },
+          "driveType": {
+            "type": "string",
+            "enum": ["project"]
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^%user_id_pattern%\\$11111111-1111-4111-8111-111111111111$"
+          },
+          "root": {
+            "type": "object",
+            "required": [
+              "webDavUrl"
+            ],
+            "properties": {
+              "webDavUrl": {
+                "type": "string",
+                "pattern": "^%base_url%/dav/spaces/%user_id_pattern%\\$11111111-1111-4111-8111-111111111111$"
+              }
+            }
+          },
+          "webUrl": {
+            "type": "string",
+            "pattern": "^%base_url%/f/%user_id_pattern%\\$11111111-1111-4111-8111-111111111111$"
+          }
+        }
+      }
+      """
