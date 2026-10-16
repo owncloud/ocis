@@ -148,6 +148,7 @@ const fileIconPreview = '#oc-file-details-sidebar .details-preview'
 const activitySidebarPanel = 'sidebar-panel-activities'
 const activitySidebarPanelBodyContent = '#sidebar-panel-activities .sidebar-panel__body-content'
 const contextMenuAction = '//*[@id="oc-files-context-actions-context"]//span[text()="%s"]'
+const textEditorContentContainer = '#space-description-preview-preview'
 
 export const clickResource = async ({
   page,
@@ -627,16 +628,21 @@ export const getDocumentContent = async ({
   editor: string
 }): Promise<string> => {
   await page.waitForLoadState()
-  await page.waitForURL(/.*\/external-.*/)
   switch (editor) {
     case application.collabora:
+      await page.waitForURL(/.*\/external-.*/)
       await focusCollaboraEditor(page)
       break
     case application.onlyOffice:
+      await page.waitForURL(/.*\/external-.*/)
       await focusOnlyOfficeEditor(page)
       break
+    case application.textEditor:
+      return page.locator(textEditorContentContainer).innerText()
     default:
-      throw new Error("Editor should be either 'Collabora' or 'OnlyOffice' but found " + editor)
+      throw new Error(
+        `Editor should be either '${application.collabora}', '${application.onlyOffice}' or '${application.textEditor}' but found '${editor}'`
+      )
   }
   return getOfficeDocumentContent(page)
 }
