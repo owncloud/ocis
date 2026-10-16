@@ -12,6 +12,10 @@
 - name: ocis-translations
   mountPath: /etc/ocis/translations
 {{- end -}}
+{{- if and (eq .appName "web") (not .Values.features.vault.enabled) }}
+- name: ocis-web-config
+  mountPath: /etc/ocis-web-ui
+{{- end -}}
 {{- end -}}
 
 {{- define "ocis.extraVolumes" -}}
@@ -37,22 +41,19 @@
       - key: es_LC_MESSAGES_notifications.po
         path: es/LC_MESSAGES/notifications.po
 {{- end -}}
+{{- if and (eq .appName "web") (not .Values.features.vault.enabled) }}
+- name: ocis-web-config
+  configMap:
+    name: ocis-web-config
+{{- end -}}
 {{- end -}}
 
 {{- define "ocis.extraEnvs" -}}
 - name: OCIS_LOG_FILE
   value: /logs/ocis.log
-{{- if eq .appName "idm" }}
-- name: IDM_ADMIN_PASSWORD
-  value: admin
-{{- end -}}
 {{- if eq .appName "proxy" }}
 - name: PROXY_ENABLE_BASIC_AUTH
   value: "true"
-{{- end -}}
-{{- if eq .appName "audit" }}
-- name: AUDIT_LOG_TO_CONSOLE
-  value: "false"
 {{- end -}}
 {{- if eq .appName "thumbnails" }}
 - name: THUMBNAILS_TXT_FONTMAP_FILE
@@ -67,6 +68,10 @@
 {{- if eq .appName "notifications" }}
 - name: OCIS_TRANSLATION_PATH
   value: /etc/ocis/translations
+{{- end -}}
+{{- if and (eq .appName "web") (not .Values.features.vault.enabled) }}
+- name: WEB_UI_CONFIG_FILE
+  value: /etc/ocis-web-ui/web-config.json
 {{- end -}}
 {{- if .Values.features.vault.enabled }}
 {{- if eq .appName "proxy" }}
