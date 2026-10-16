@@ -222,7 +222,7 @@ export default {
       try {
         yield clientService.httpAuthenticated.delete(
           'ocs/v2.php/apps/notifications/api/v1/notifications',
-          { data: { ids } },
+          { ids },
           { signal }
         )
       } catch (e) {
