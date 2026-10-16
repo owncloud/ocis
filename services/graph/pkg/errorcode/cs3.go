@@ -45,6 +45,9 @@ func FromCS3Status(status *cs3rpc.Status, inerr error, ignore ...cs3rpc.Code) er
 		err.errorCode = Unauthenticated
 	case code == cs3rpc.Code_CODE_INVALID_ARGUMENT:
 		err.errorCode = InvalidRequest
+		if status.GetMessage() == "no share permission" {
+			err.errorCode = AccessDenied
+		}
 	case code == cs3rpc.Code_CODE_ALREADY_EXISTS:
 		err.errorCode = NameAlreadyExists
 	case code == cs3rpc.Code_CODE_FAILED_PRECONDITION:
