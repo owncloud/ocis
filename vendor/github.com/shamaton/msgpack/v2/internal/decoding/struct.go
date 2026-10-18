@@ -56,10 +56,20 @@ func (d *decoder) setStruct(rv reflect.Value, offset int, k reflect.Kind) (int, 
 		}
 	}
 
-	if d.asArray {
-		return d.setStructFromArray(rv, offset, k)
+	if err := d.enter(); err != nil {
+		return 0, err
 	}
-	return d.setStructFromMap(rv, offset, k)
+	var o int
+	if d.asArray {
+		o, err = d.setStructFromArray(rv, offset, k)
+	} else {
+		o, err = d.setStructFromMap(rv, offset, k)
+	}
+	if err != nil {
+		return 0, err
+	}
+	d.depth--
+	return o, nil
 }
 
 func (d *decoder) setStructFromArray(rv reflect.Value, offset int, k reflect.Kind) (int, error) {

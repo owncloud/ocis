@@ -42,6 +42,10 @@ type Po struct {
 
 	domain *Domain
 	fs     fs.FS
+
+	parseBufferHasID      bool
+	parseBufferHasPlural  bool
+	parseBufferHasContext bool
 }
 
 type parseState int
@@ -52,6 +56,7 @@ const (
 	msgID
 	msgIDPlural
 	msgStr
+	msgStrInvalid
 )
 
 // NewPo should always be used to instantiate a new Po object
@@ -94,7 +99,7 @@ func (po *Po) GetRefs(str string) []string {
 
 // SetPluralResolver sets the plural resolver function
 func (po *Po) SetPluralResolver(f func(int) int) {
-	po.domain.customPluralResolver = f
+	po.domain.SetPluralResolver(f)
 }
 
 // Set translation
@@ -103,12 +108,12 @@ func (po *Po) Set(id, str string) {
 }
 
 // Get translation
-func (po *Po) Get(str string, vars ...interface{}) string {
+func (po *Po) Get(str string, vars ...any) string {
 	return po.domain.Get(str, vars...)
 }
 
 // Append translation
-func (po *Po) Append(b []byte, str string, vars ...interface{}) []byte {
+func (po *Po) Append(b []byte, str string, vars ...any) []byte {
 	return po.domain.Append(b, str, vars...)
 }
 
@@ -118,12 +123,12 @@ func (po *Po) SetN(id, plural string, n int, str string) {
 }
 
 // GetN gets the plural translation
-func (po *Po) GetN(str, plural string, n int, vars ...interface{}) string {
+func (po *Po) GetN(str, plural string, n int, vars ...any) string {
 	return po.domain.GetN(str, plural, n, vars...)
 }
 
 // AppendN appends the plural translation
-func (po *Po) AppendN(b []byte, str, plural string, n int, vars ...interface{}) []byte {
+func (po *Po) AppendN(b []byte, str, plural string, n int, vars ...any) []byte {
 	return po.domain.AppendN(b, str, plural, n, vars...)
 }
 
@@ -133,12 +138,12 @@ func (po *Po) SetC(id, ctx, str string) {
 }
 
 // GetC gets the translation for a given context
-func (po *Po) GetC(str, ctx string, vars ...interface{}) string {
+func (po *Po) GetC(str, ctx string, vars ...any) string {
 	return po.domain.GetC(str, ctx, vars...)
 }
 
 // AppendC appends the translation for a given context
-func (po *Po) AppendC(b []byte, str, ctx string, vars ...interface{}) []byte {
+func (po *Po) AppendC(b []byte, str, ctx string, vars ...any) []byte {
 	return po.domain.AppendC(b, str, ctx, vars...)
 }
 
@@ -148,12 +153,12 @@ func (po *Po) SetNC(id, plural, ctx string, n int, str string) {
 }
 
 // GetNC gets the plural translation for a given context
-func (po *Po) GetNC(str, plural string, n int, ctx string, vars ...interface{}) string {
+func (po *Po) GetNC(str, plural string, n int, ctx string, vars ...any) string {
 	return po.domain.GetNC(str, plural, n, ctx, vars...)
 }
 
 // AppendNC appends the plural translation for a given context
-func (po *Po) AppendNC(b []byte, str, plural string, n int, ctx string, vars ...interface{}) []byte {
+func (po *Po) AppendNC(b []byte, str, plural string, n int, ctx string, vars ...any) []byte {
 	return po.domain.AppendNC(b, str, plural, n, ctx, vars...)
 }
 
@@ -214,16 +219,17 @@ func (po *Po) Parse(buf []byte) {
 	defer po.domain.trMutex.Unlock()
 	defer po.domain.pluralMutex.Unlock()
 
-	// Get lines
-	lines := strings.Split(string(buf), "\n")
-
 	// Init buffer
 	po.domain.trBuffer = NewTranslation()
 	po.domain.ctxBuffer = ""
 	po.domain.refBuffer = ""
+	po.parseBufferHasID = false
+	po.parseBufferHasPlural = false
+	po.parseBufferHasContext = false
 
 	state := head
-	for _, l := range lines {
+	activeMsgStrIndex := 0
+	for l := range strings.Lines(string(buf)) {
 		// Trim spaces
 		l = strings.TrimSpace(l)
 
@@ -233,44 +239,71 @@ func (po *Po) Parse(buf []byte) {
 			continue
 		}
 
-		// Buffer context and continue
-		if strings.HasPrefix(l, "msgctxt") {
-			po.parseContext(l)
-			state = msgCtxt
+		// Multi line strings and headers
+		if strings.HasPrefix(l, "\"") {
+			if !po.parseString(l, state, activeMsgStrIndex) && state != head {
+				state = msgStrInvalid
+			}
 			continue
 		}
 
-		// Buffer msgid and continue
-		if strings.HasPrefix(l, "msgid") && !strings.HasPrefix(l, "msgid_plural") {
-			po.parseID(l)
-			state = msgID
+		// Buffer context and continue
+		if po.hasKeywordBoundary(l, "msgctxt") {
+			if po.parseContext(l) {
+				state = msgCtxt
+			} else {
+				state = msgStrInvalid
+			}
 			continue
 		}
 
 		// Check for plural form
-		if strings.HasPrefix(l, "msgid_plural") {
-			po.parsePluralID(l)
-			po.domain.pluralTranslations[po.domain.trBuffer.PluralID] = po.domain.trBuffer
-			state = msgIDPlural
+		if po.hasKeywordBoundary(l, "msgid_plural") {
+			if state != msgID || !po.parsePluralID(l) {
+				state = msgStrInvalid
+			} else {
+				state = msgIDPlural
+			}
+			continue
+		}
+
+		// Buffer msgid and continue
+		if po.hasKeywordBoundary(l, "msgid") {
+			if po.parseID(l) {
+				state = msgID
+			} else {
+				state = msgStrInvalid
+			}
 			continue
 		}
 
 		// Save Translation
-		if strings.HasPrefix(l, "msgstr") {
-			po.parseMessage(l)
-			state = msgStr
-			continue
-		}
+		if po.hasKeywordBoundary(l, "msgstr") {
+			if state != msgID && state != msgIDPlural && state != msgStr {
+				activeMsgStrIndex = 0
+				state = msgStrInvalid
+				continue
+			}
 
-		// Multi line strings and headers
-		if strings.HasPrefix(l, "\"") && strings.HasSuffix(l, "\"") {
-			po.parseString(l, state)
+			var ok bool
+			activeMsgStrIndex, ok = po.parseMessage(l)
+			if ok {
+				state = msgStr
+			} else {
+				activeMsgStrIndex = 0
+				state = msgStrInvalid
+			}
 			continue
 		}
 	}
 
-	// Save last Translation buffer.
-	po.saveBuffer()
+	// Save last Translation buffer, but do not synthesize an entry after an
+	// invalid directive. Preserve the historical empty-input entry.
+	if po.parseBufferHasID {
+		po.saveBuffer()
+	} else if len(buf) == 0 {
+		po.domain.translations[""] = po.domain.trBuffer
+	}
 
 	// Parse headers
 	po.domain.parseHeaders()
@@ -285,22 +318,30 @@ func (po *Po) Parse(buf []byte) {
 // saveBuffer takes the context and Translation buffers
 // and saves it on the translations collection
 func (po *Po) saveBuffer() {
-	// With no context...
-	if po.domain.ctxBuffer == "" {
-		po.domain.translations[po.domain.trBuffer.ID] = po.domain.trBuffer
-	} else {
-		// With context...
+	if !po.parseBufferHasID {
+		return
+	}
+
+	// Store a completed plural ID after all of its continuation lines have
+	// been decoded.
+	if po.parseBufferHasPlural {
+		po.domain.pluralTranslations[po.domain.trBuffer.PluralID] = po.domain.trBuffer
+	}
+
+	if po.parseBufferHasContext {
 		if _, ok := po.domain.contextTranslations[po.domain.ctxBuffer]; !ok {
 			po.domain.contextTranslations[po.domain.ctxBuffer] = make(map[string]*Translation)
 		}
 		po.domain.contextTranslations[po.domain.ctxBuffer][po.domain.trBuffer.ID] = po.domain.trBuffer
-
-		// Cleanup current context buffer if needed
-		if po.domain.trBuffer.ID != "" {
-			po.domain.ctxBuffer = ""
-		}
+		// Context applies only to the record it prefixes, even when its ID is empty.
+		po.domain.ctxBuffer = ""
+		po.parseBufferHasContext = false
+	} else {
+		po.domain.translations[po.domain.trBuffer.ID] = po.domain.trBuffer
 	}
 
+	po.parseBufferHasID = false
+	po.parseBufferHasPlural = false
 	// Flush Translation buffer
 	if po.domain.refBuffer == "" {
 		po.domain.trBuffer = NewTranslation()
@@ -328,68 +369,106 @@ func (po *Po) parseComment(l string, state parseState) {
 
 // parseContext takes a line starting with "msgctxt",
 // saves the current Translation buffer and creates a new context.
-func (po *Po) parseContext(l string) {
+func (po *Po) parseContext(l string) bool {
+	value, ok := po.parseQuotedDirective(l, "msgctxt")
+	if !ok {
+		return false
+	}
+
 	// Save current Translation buffer.
 	po.saveBuffer()
 
-	// Buffer context
-	po.domain.ctxBuffer, _ = strconv.Unquote(strings.TrimSpace(strings.TrimPrefix(l, "msgctxt")))
+	// Buffer context, including an explicitly empty context.
+	po.domain.ctxBuffer = value
+	po.parseBufferHasContext = true
+	return true
 }
 
 // parseID takes a line starting with "msgid",
 // saves the current Translation and creates a new msgid buffer.
-func (po *Po) parseID(l string) {
+func (po *Po) parseID(l string) bool {
+	value, ok := po.parseQuotedDirective(l, "msgid")
+	if !ok {
+		return false
+	}
+
 	// Save current Translation buffer.
 	po.saveBuffer()
 
 	// Set id
-	po.domain.trBuffer.ID, _ = strconv.Unquote(strings.TrimSpace(strings.TrimPrefix(l, "msgid")))
+	po.domain.trBuffer.ID = value
+	po.parseBufferHasID = true
+	return true
 }
 
 // parsePluralID saves the plural id buffer from a line starting with "msgid_plural"
-func (po *Po) parsePluralID(l string) {
-	po.domain.trBuffer.PluralID, _ = strconv.Unquote(strings.TrimSpace(strings.TrimPrefix(l, "msgid_plural")))
+func (po *Po) parsePluralID(l string) bool {
+	value, ok := po.parseQuotedDirective(l, "msgid_plural")
+	if !ok {
+		return false
+	}
+
+	po.domain.trBuffer.PluralID = value
+	po.parseBufferHasPlural = true
+	return true
 }
 
 // parseMessage takes a line starting with "msgstr" and saves it into the current buffer.
-func (po *Po) parseMessage(l string) {
-	l = strings.TrimSpace(strings.TrimPrefix(l, "msgstr"))
-
+func (po *Po) parseMessage(l string) (int, bool) {
+	if !po.hasKeywordBoundary(l, "msgstr") {
+		return 0, false
+	}
+	l = strings.TrimSpace(l[len("msgstr"):])
 	// Check for indexed Translation forms
 	if strings.HasPrefix(l, "[") {
-		idx := strings.Index(l, "]")
-		if idx == -1 {
+		idx := strings.IndexByte(l, ']')
+		if idx <= 1 || !isASCIIPluralIndex(l[1:idx]) {
 			// Skip wrong index formatting
-			return
+			return 0, false
 		}
 
 		// Parse index
 		i, err := strconv.Atoi(l[1:idx])
 		if err != nil {
 			// Skip wrong index formatting
-			return
+			return 0, false
 		}
 
 		// Parse Translation string
-		po.domain.trBuffer.Trs[i], _ = strconv.Unquote(strings.TrimSpace(l[idx+1:]))
+		clean, ok := decodePOQuotedString(strings.TrimSpace(l[idx+1:]))
+		if !ok {
+			return 0, false
+		}
+		po.domain.trBuffer.Trs[i] = clean
 
-		// Loop
-		return
+		return i, true
 	}
 
 	// Save single Translation form under 0 index
-	po.domain.trBuffer.Trs[0], _ = strconv.Unquote(l)
+	clean, ok := decodePOQuotedString(l)
+	if !ok {
+		return 0, false
+	}
+	po.domain.trBuffer.Trs[0] = clean
+	return 0, true
 }
 
 // parseString takes a well formatted string without prefix
 // and creates headers or attach multi-line strings when corresponding
-func (po *Po) parseString(l string, state parseState) {
-	clean, _ := strconv.Unquote(l)
+func (po *Po) parseString(l string, state parseState, activeMsgStrIndex int) bool {
+	if state == msgStrInvalid {
+		return false
+	}
+
+	clean, ok := decodePOQuotedString(l)
+	if !ok {
+		return false
+	}
 
 	switch state {
 	case msgStr:
-		// Append to last Translation found
-		po.domain.trBuffer.Trs[len(po.domain.trBuffer.Trs)-1] += clean
+		// Append to active Translation form
+		po.domain.trBuffer.Trs[activeMsgStrIndex] += clean
 
 	case msgID:
 		// Multiline msgid - Append to current id
@@ -402,26 +481,174 @@ func (po *Po) parseString(l string, state parseState) {
 	case msgCtxt:
 		// Multiline context - Append to current context
 		po.domain.ctxBuffer += clean
-
 	}
+
+	return true
 }
 
-// isValidLine checks for line prefixes to detect valid syntax.
 func (po *Po) isValidLine(l string) bool {
-	// Check prefix
-	valid := []string{
-		"\"",
-		"msgctxt",
-		"msgid",
-		"msgid_plural",
-		"msgstr",
+	if strings.HasPrefix(l, "\"") {
+		return true
 	}
 
-	for _, v := range valid {
-		if strings.HasPrefix(l, v) {
+	for _, keyword := range []string{
+		"msgctxt",
+		"msgid_plural",
+		"msgid",
+		"msgstr",
+	} {
+		if po.hasKeywordBoundary(l, keyword) {
 			return true
 		}
 	}
 
 	return false
+}
+
+func (po *Po) hasKeywordBoundary(l, keyword string) bool {
+	if !strings.HasPrefix(l, keyword) {
+		return false
+	}
+	if len(l) == len(keyword) {
+		return true
+	}
+
+	next := l[len(keyword)]
+	if keyword == "msgstr" && next == '[' {
+		return true
+	}
+	return next == ' ' || next == '\t'
+}
+
+func (po *Po) parseQuotedDirective(l, keyword string) (string, bool) {
+	if !po.hasKeywordBoundary(l, keyword) {
+		return "", false
+	}
+
+	value, ok := decodePOQuotedString(strings.TrimSpace(l[len(keyword):]))
+	if !ok {
+		return "", false
+	}
+	return value, true
+}
+
+// decodePOQuotedString decodes a GNU PO double-quoted string.
+func decodePOQuotedString(source string) (string, bool) {
+	if len(source) < 2 || source[0] != '"' {
+		return "", false
+	}
+
+	var decoded []byte
+	for i := 1; i < len(source); {
+		switch source[i] {
+		case '"':
+			if i != len(source)-1 {
+				return "", false
+			}
+			if decoded == nil {
+				return source[1:i], true
+			}
+			return string(decoded), true
+
+		case '\\':
+			if decoded == nil {
+				decoded = make([]byte, 0, len(source)-2)
+				decoded = append(decoded, source[1:i]...)
+			}
+			i++
+			if i >= len(source) {
+				return "", false
+			}
+
+			switch source[i] {
+			case 'a':
+				decoded = append(decoded, '\a')
+				i++
+			case 'b':
+				decoded = append(decoded, '\b')
+				i++
+			case 'f':
+				decoded = append(decoded, '\f')
+				i++
+			case 'n':
+				decoded = append(decoded, '\n')
+				i++
+			case 'r':
+				decoded = append(decoded, '\r')
+				i++
+			case 't':
+				decoded = append(decoded, '\t')
+				i++
+			case 'v':
+				decoded = append(decoded, '\v')
+				i++
+			case '\\':
+				decoded = append(decoded, '\\')
+				i++
+			case '"':
+				decoded = append(decoded, '"')
+				i++
+			case '0', '1', '2', '3', '4', '5', '6', '7':
+				var value byte
+				for digits := 0; i < len(source) && digits < 3; digits++ {
+					if source[i] < '0' || source[i] > '7' {
+						break
+					}
+					value = value<<3 | (source[i] - '0')
+					i++
+				}
+				decoded = append(decoded, value)
+			case 'x':
+				i++
+				if i >= len(source) || !isPOHexDigit(source[i]) {
+					return "", false
+				}
+				var value byte
+				for i < len(source) && isPOHexDigit(source[i]) {
+					value = value<<4 | poHexValue(source[i])
+					i++
+				}
+				decoded = append(decoded, value)
+			default:
+				return "", false
+			}
+
+		default:
+			if decoded != nil {
+				decoded = append(decoded, source[i])
+			}
+			i++
+		}
+	}
+
+	return "", false
+}
+
+func isPOHexDigit(c byte) bool {
+	return c >= '0' && c <= '9' ||
+		c >= 'a' && c <= 'f' ||
+		c >= 'A' && c <= 'F'
+}
+
+func poHexValue(c byte) byte {
+	switch {
+	case c >= '0' && c <= '9':
+		return c - '0'
+	case c >= 'a' && c <= 'f':
+		return c - 'a' + 10
+	default:
+		return c - 'A' + 10
+	}
+}
+
+func isASCIIPluralIndex(index string) bool {
+	if index == "" {
+		return false
+	}
+	for i := 0; i < len(index); i++ {
+		if index[i] < '0' || index[i] > '9' {
+			return false
+		}
+	}
+	return true
 }

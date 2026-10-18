@@ -55,51 +55,59 @@ func init() {
 		domain:    "default",
 		languages: []string{FallbackLocale},
 		library:   "/usr/local/share/locale",
-		locales:   nil,
+		locales:   make([]*Locale, 0),
 	}
 
 	// Register Translator types for gob encoding
 	gob.Register(TranslatorEncoding{})
 }
 
-// loadLocales creates a new Locale object for every language (specified using Configure)
-// at package level based on the configuration of global configuration .
-// It is called when trying to use Get or GetD methods.
+// loadLocales ensures package-level locales and their configured domain are loaded.
 func loadLocales(rebuildCache bool) {
 	globalConfig.Lock()
 
 	if globalConfig.locales == nil || rebuildCache {
-		var locales []*Locale
+		locales := make([]*Locale, 0, len(globalConfig.languages))
 		for _, language := range globalConfig.languages {
 			locales = append(locales, NewLocale(globalConfig.library, language))
 		}
 		globalConfig.locales = locales
 	}
 
-	for _, locale := range globalConfig.locales {
-		if _, ok := locale.Domains[globalConfig.domain]; !ok || rebuildCache {
-			locale.AddDomain(globalConfig.domain)
-		}
-		locale.SetDomain(globalConfig.domain)
-	}
-
+	locales := append([]*Locale(nil), globalConfig.locales...)
+	domain := globalConfig.domain
 	globalConfig.Unlock()
+
+	for _, locale := range locales {
+		if locale == nil {
+			continue
+		}
+		if rebuildCache || !locale.hasDomain(domain) {
+			locale.AddDomain(domain)
+		}
+		locale.SetDomain(domain)
+	}
 }
 
 // GetDomain is the domain getter for the package configuration
 func GetDomain() string {
-	var dom string
 	globalConfig.RLock()
-	if globalConfig.locales != nil {
-		// All locales have the same domain
-		dom = globalConfig.locales[0].GetDomain()
-	}
-	if dom == "" {
-		dom = globalConfig.domain
+	domain := globalConfig.domain
+	var locale *Locale
+	for _, candidate := range globalConfig.locales {
+		if candidate != nil {
+			locale = candidate
+			break
+		}
 	}
 	globalConfig.RUnlock()
 
-	return dom
+	if locale != nil {
+		if localeDomain := locale.GetDomain(); localeDomain != "" {
+			return localeDomain
+		}
+	}
+	return domain
 }
 
 // SetDomain sets the name for the domain to be used at package level.
@@ -107,8 +115,8 @@ func GetDomain() string {
 func SetDomain(dom string) {
 	globalConfig.Lock()
 	globalConfig.domain = dom
-	if globalConfig.locales != nil {
-		for _, locale := range globalConfig.locales {
+	for _, locale := range globalConfig.locales {
+		if locale != nil {
 			locale.SetDomain(dom)
 		}
 	}
@@ -131,8 +139,10 @@ func GetLanguage() string {
 // GetLanguages returns all languages that have been supplied.
 func GetLanguages() []string {
 	globalConfig.RLock()
-	defer globalConfig.RUnlock()
-	return globalConfig.languages
+	languages := make([]string, len(globalConfig.languages))
+	copy(languages, globalConfig.languages)
+	globalConfig.RUnlock()
+	return languages
 }
 
 // SetLanguage sets the language code (or colon separated language codes) to be used at package level.
@@ -140,7 +150,7 @@ func GetLanguages() []string {
 func SetLanguage(lang string) {
 	globalConfig.Lock()
 	var languages []string
-	for _, language := range strings.Split(lang, ":") {
+	for language := range strings.SplitSeq(lang, ":") {
 		languages = append(languages, SimplifiedLocale(language))
 	}
 	globalConfig.languages = languages
@@ -171,17 +181,20 @@ func SetLibrary(lib string) {
 // GetLocales returns the locales that have been set for the package configuration.
 func GetLocales() []*Locale {
 	globalConfig.RLock()
-	defer globalConfig.RUnlock()
-	return globalConfig.locales
+	locales := make([]*Locale, len(globalConfig.locales))
+	copy(locales, globalConfig.locales)
+	globalConfig.RUnlock()
+	return locales
 }
 
 // GetStorage is the locale storage getter for the package configuration.
 //
 // Deprecated: Storage has been renamed to Locale for consistency, use GetLocales instead.
 func GetStorage() *Locale {
-	locales := GetLocales()
-	if len(locales) > 0 {
-		return locales[0]
+	for _, locale := range GetLocales() {
+		if locale != nil {
+			return locale
+		}
 	}
 	return nil
 }
@@ -190,24 +203,40 @@ func GetStorage() *Locale {
 // NewLocale(). This makes it possible to attach custom Domain objects from in-memory po/mo.
 // The library, language and domain of the first Locale will set the default global configuration.
 func SetLocales(locales []*Locale) {
+	ownedLocales := make([]*Locale, len(locales))
+	copy(ownedLocales, locales)
+
 	globalConfig.Lock()
-	defer globalConfig.Unlock()
+	globalConfig.locales = ownedLocales
 
-	globalConfig.locales = locales
-	globalConfig.library = locales[0].path
-	globalConfig.domain = locales[0].defaultDomain
+	languages := make([]string, 0, len(ownedLocales))
+	var first *Locale
+	for _, locale := range ownedLocales {
+		if locale == nil {
+			continue
+		}
 
-	var languages []string
-	for _, locale := range locales {
+		locale.RLock()
+		if first == nil {
+			first = locale
+			globalConfig.library = locale.path
+			globalConfig.domain = locale.defaultDomain
+		}
 		languages = append(languages, locale.lang)
+		locale.RUnlock()
 	}
 	globalConfig.languages = languages
+	globalConfig.Unlock()
 }
 
 // SetStorage allows overriding the global Locale object with one built manually with NewLocale().
 //
 // Deprecated: Storage has been renamed to Locale for consistency, use SetLocales instead.
 func SetStorage(locale *Locale) {
+	if locale == nil {
+		SetLocales(nil)
+		return
+	}
 	SetLocales([]*Locale{locale})
 }
 
@@ -219,7 +248,7 @@ func Configure(lib, lang, dom string) {
 	globalConfig.Lock()
 	globalConfig.library = lib
 	var languages []string
-	for _, language := range strings.Split(lang, ":") {
+	for language := range strings.SplitSeq(lang, ":") {
 		languages = append(languages, SimplifiedLocale(language))
 	}
 	globalConfig.languages = languages
@@ -230,114 +259,137 @@ func Configure(lib, lang, dom string) {
 }
 
 // Get uses the default domain globally set to return the corresponding Translation of a given string.
-// Supports optional parameters (vars... interface{}) to be inserted on the formatted string using the fmt.Printf syntax.
-func Get(str string, vars ...interface{}) string {
+// Supports optional parameters (vars... any) to be inserted on the formatted string using the fmt.Printf syntax.
+func Get(str string, vars ...any) string {
 	return GetD(GetDomain(), str, vars...)
 }
 
 // GetN retrieves the (N)th plural form of Translation for the given string in the default domain.
-// Supports optional parameters (vars... interface{}) to be inserted on the formatted string using the fmt.Printf syntax.
-func GetN(str, plural string, n int, vars ...interface{}) string {
+// Supports optional parameters (vars... any) to be inserted on the formatted string using the fmt.Printf syntax.
+func GetN(str, plural string, n int, vars ...any) string {
 	return GetND(GetDomain(), str, plural, n, vars...)
 }
 
 // GetD returns the corresponding Translation in the given domain for a given string.
-// Supports optional parameters (vars... interface{}) to be inserted on the formatted string using the fmt.Printf syntax.
-func GetD(dom, str string, vars ...interface{}) string {
+// Supports optional parameters (vars... any) to be inserted on the formatted string using the fmt.Printf syntax.
+func GetD(dom, str string, vars ...any) string {
 	// Try to load default package Locales
 	loadLocales(false)
 
-	globalConfig.RLock()
-	defer globalConfig.RUnlock()
-
-	var tr string
-	for i, locale := range globalConfig.locales {
-		if _, ok := locale.Domains[dom]; !ok {
-			locale.AddDomain(dom)
-		}
-		if !locale.IsTranslatedD(dom, str) && i < (len(globalConfig.locales)-1) {
+	locales := GetLocales()
+	var fallback *Locale
+	for _, locale := range locales {
+		if locale == nil {
 			continue
 		}
-		tr = locale.GetD(dom, str, vars...)
-		break
+		fallback = locale
+		if !locale.hasDomain(dom) {
+			locale.AddDomain(dom)
+		}
+		if locale.IsTranslatedD(dom, str) {
+			return locale.GetD(dom, str, vars...)
+		}
 	}
-	return tr
+	if fallback != nil {
+		return fallback.GetD(dom, str, vars...)
+	}
+	return FormatString(str, vars...)
 }
 
 // GetND retrieves the (N)th plural form of Translation in the given domain for a given string.
-// Supports optional parameters (vars... interface{}) to be inserted on the formatted string using the fmt.Printf syntax.
-func GetND(dom, str, plural string, n int, vars ...interface{}) string {
+// Supports optional parameters (vars... any) to be inserted on the formatted string using the fmt.Printf syntax.
+func GetND(dom, str, plural string, n int, vars ...any) string {
 	// Try to load default package Locales
 	loadLocales(false)
 
-	globalConfig.RLock()
-	defer globalConfig.RUnlock()
-
-	var tr string
-	for i, locale := range globalConfig.locales {
-		if _, ok := locale.Domains[dom]; !ok {
-			locale.AddDomain(dom)
-		}
-		if !locale.IsTranslatedND(dom, str, n) && i < (len(globalConfig.locales)-1) {
+	locales := GetLocales()
+	var fallback *Locale
+	for _, locale := range locales {
+		if locale == nil {
 			continue
 		}
-		tr = locale.GetND(dom, str, plural, n, vars...)
-		break
+		fallback = locale
+		if !locale.hasDomain(dom) {
+			locale.AddDomain(dom)
+		}
+		if locale.IsTranslatedND(dom, str, n) {
+			return locale.GetND(dom, str, plural, n, vars...)
+		}
 	}
-	return tr
+	if fallback != nil {
+		return fallback.GetND(dom, str, plural, n, vars...)
+	}
+	if n == 1 {
+		return FormatString(str, vars...)
+	}
+	return FormatString(plural, vars...)
 }
 
 // GetC uses the default domain globally set to return the corresponding Translation of the given string in the given context.
-// Supports optional parameters (vars... interface{}) to be inserted on the formatted string using the fmt.Printf syntax.
-func GetC(str, ctx string, vars ...interface{}) string {
+// Supports optional parameters (vars... any) to be inserted on the formatted string using the fmt.Printf syntax.
+func GetC(str, ctx string, vars ...any) string {
 	return GetDC(GetDomain(), str, ctx, vars...)
 }
 
 // GetNC retrieves the (N)th plural form of Translation for the given string in the given context in the default domain.
-// Supports optional parameters (vars... interface{}) to be inserted on the formatted string using the fmt.Printf syntax.
-func GetNC(str, plural string, n int, ctx string, vars ...interface{}) string {
+// Supports optional parameters (vars... any) to be inserted on the formatted string using the fmt.Printf syntax.
+func GetNC(str, plural string, n int, ctx string, vars ...any) string {
 	return GetNDC(GetDomain(), str, plural, n, ctx, vars...)
 }
 
 // GetDC returns the corresponding Translation in the given domain for the given string in the given context.
-// Supports optional parameters (vars... interface{}) to be inserted on the formatted string using the fmt.Printf syntax.
-func GetDC(dom, str, ctx string, vars ...interface{}) string {
+// Supports optional parameters (vars... any) to be inserted on the formatted string using the fmt.Printf syntax.
+func GetDC(dom, str, ctx string, vars ...any) string {
 	// Try to load default package Locales
 	loadLocales(false)
 
-	globalConfig.RLock()
-	defer globalConfig.RUnlock()
-
-	var tr string
-	for i, locale := range globalConfig.locales {
-		if !locale.IsTranslatedDC(dom, str, ctx) && i < (len(globalConfig.locales)-1) {
+	locales := GetLocales()
+	var fallback *Locale
+	for _, locale := range locales {
+		if locale == nil {
 			continue
 		}
-		tr = locale.GetDC(dom, str, ctx, vars...)
-		break
+		fallback = locale
+		if !locale.hasDomain(dom) {
+			locale.AddDomain(dom)
+		}
+		if locale.IsTranslatedDC(dom, str, ctx) {
+			return locale.GetDC(dom, str, ctx, vars...)
+		}
 	}
-	return tr
+	if fallback != nil {
+		return fallback.GetDC(dom, str, ctx, vars...)
+	}
+	return FormatString(str, vars...)
 }
 
 // GetNDC retrieves the (N)th plural form of Translation in the given domain for a given string.
-// Supports optional parameters (vars... interface{}) to be inserted on the formatted string using the fmt.Printf syntax.
-func GetNDC(dom, str, plural string, n int, ctx string, vars ...interface{}) string {
+// Supports optional parameters (vars... any) to be inserted on the formatted string using the fmt.Printf syntax.
+func GetNDC(dom, str, plural string, n int, ctx string, vars ...any) string {
 	// Try to load default package Locales
 	loadLocales(false)
 
-	// Return Translation
-	globalConfig.RLock()
-	defer globalConfig.RUnlock()
-
-	var tr string
-	for i, locale := range globalConfig.locales {
-		if !locale.IsTranslatedNDC(dom, str, n, ctx) && i < (len(globalConfig.locales)-1) {
+	locales := GetLocales()
+	var fallback *Locale
+	for _, locale := range locales {
+		if locale == nil {
 			continue
 		}
-		tr = locale.GetNDC(dom, str, plural, n, ctx, vars...)
-		break
+		fallback = locale
+		if !locale.hasDomain(dom) {
+			locale.AddDomain(dom)
+		}
+		if locale.IsTranslatedNDC(dom, str, n, ctx) {
+			return locale.GetNDC(dom, str, plural, n, ctx, vars...)
+		}
 	}
-	return tr
+	if fallback != nil {
+		return fallback.GetNDC(dom, str, plural, n, ctx, vars...)
+	}
+	if n == 1 {
+		return FormatString(str, vars...)
+	}
+	return FormatString(plural, vars...)
 }
 
 // IsTranslated reports whether a string is translated in given languages.
@@ -366,18 +418,23 @@ func IsTranslatedND(dom, str string, n int, langs ...string) bool {
 	}
 
 	loadLocales(false)
-
-	globalConfig.RLock()
-	defer globalConfig.RUnlock()
-
+	locales := GetLocales()
 	for _, lang := range langs {
 		lang = SimplifiedLocale(lang)
 
-		for _, supportedLocale := range globalConfig.locales {
-			if lang != supportedLocale.GetActualLanguage(dom) {
+		for _, supportedLocale := range locales {
+			if supportedLocale == nil {
 				continue
 			}
-			return supportedLocale.IsTranslatedND(dom, str, n)
+			if lang != supportedLocale.GetLanguage() && lang != supportedLocale.GetActualLanguage(dom) {
+				continue
+			}
+			if !supportedLocale.hasDomain(dom) {
+				supportedLocale.AddDomain(dom)
+			}
+			if supportedLocale.IsTranslatedND(dom, str, n) {
+				return true
+			}
 		}
 	}
 	return false
@@ -398,7 +455,7 @@ func IsTranslatedNC(str string, n int, ctx string, langs ...string) bool {
 // IsTranslatedDC reports whether a domain context string is translated in given languages.
 // When the langs argument is omitted, the output of GetLanguages is used.
 func IsTranslatedDC(dom, str, ctx string, langs ...string) bool {
-	return IsTranslatedNDC(dom, str, 0, ctx, langs...)
+	return IsTranslatedNDC(dom, str, 1, ctx, langs...)
 }
 
 // IsTranslatedNDC reports whether a plural domain context string is translated in any of given languages.
@@ -409,18 +466,23 @@ func IsTranslatedNDC(dom, str string, n int, ctx string, langs ...string) bool {
 	}
 
 	loadLocales(false)
-
-	globalConfig.RLock()
-	defer globalConfig.RUnlock()
-
+	locales := GetLocales()
 	for _, lang := range langs {
 		lang = SimplifiedLocale(lang)
 
-		for _, locale := range globalConfig.locales {
-			if lang != locale.GetActualLanguage(dom) {
+		for _, supportedLocale := range locales {
+			if supportedLocale == nil {
 				continue
 			}
-			return locale.IsTranslatedNDC(dom, str, n, ctx)
+			if lang != supportedLocale.GetLanguage() && lang != supportedLocale.GetActualLanguage(dom) {
+				continue
+			}
+			if !supportedLocale.hasDomain(dom) {
+				supportedLocale.AddDomain(dom)
+			}
+			if supportedLocale.IsTranslatedNDC(dom, str, n, ctx) {
+				return true
+			}
 		}
 	}
 	return false
