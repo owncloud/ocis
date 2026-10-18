@@ -8,9 +8,9 @@ kept retrying it because the page told them it was wrong. An aborted request
 was also mapped to the wrong-credentials message, and a request that got no
 answer left the form waiting with no time limit.
 
-Network failures and timeouts now show "The server could not be reached",
-server errors show a generic "Something went wrong", and only a rejection by
-the IdP (204/401) reports invalid credentials. Login requests now give up
-after 30 seconds without an answer.
+Network failures now show "The server could not be reached", a request with
+no answer within 30 seconds shows "The server did not answer in time", and
+server errors and any other unexpected error show a generic "Something went
+wrong". Only a rejection by the IdP (204/401) reports invalid credentials.
 
 https://github.com/owncloud/ocis/pull/13072

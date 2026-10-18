@@ -342,6 +342,7 @@ type indexData struct {
 	LabelUsername, LabelPassword                   string
 	ButtonSignIn, ButtonSigningIn                  string
 	ErrRequired, ErrInvalid, ErrFailed, ErrDefault string
+	ErrTimeout                                     string
 	PasswordResetURI                               template.URL
 	ResetLabel                                     string
 }
@@ -433,6 +434,7 @@ func (idp *IDP) Index() http.HandlerFunc {
 			ErrRequired:      t.Get("Username and password are required."),
 			ErrInvalid:       t.Get("Login failed. Invalid username or password."),
 			ErrFailed:        t.Get("Login failed. The server could not be reached. Please check your connection and try again."),
+			ErrTimeout:       t.Get("Login failed. The server did not answer in time. Please try again."),
 			ErrDefault:       t.Get("Login failed. Something went wrong. Please try again."),
 			PasswordResetURI: idp.passwordResetURI,
 			ResetLabel:       t.Get("Reset password"),
