@@ -13,13 +13,18 @@ systems:
    time, and nothing after that point was indexed until the files were fixed
    by hand.
 
-Files that Stat no longer finds by their path (CODE_NOT_FOUND) were changed to
-be logged and skipped without counting; auth, gateway, transport and deadline
-failures still count. Already-indexed, unchanged files now reset the counter,
-and a cancelled or timed-out walk stops with an error instead of skipping the
-rest of the space. The threshold became configurable with
+The walk now resolves each file by the ID it listed, not by its path, so such
+a node is indexed. A file that Stat does not find (CODE_NOT_FOUND, deleted
+since it was listed) is skipped without counting; auth, gateway, transport and
+deadline failures still count. Because the gateway also answers NOT_FOUND when
+it cannot reach a storage provider, a walk in which at least 5 files, and more
+than half of the files that needed work, were not found ends with an error
+instead of reporting the space as indexed. Already-indexed, unchanged files
+reset the counter, a cancelled or timed-out walk (including its retry waits)
+stops with an error, and each walk logs a summary of indexed, unchanged, failed
+and not-found files. The threshold became configurable with
 `SEARCH_EXTRACTOR_MAX_CONSECUTIVE_FAILURES` (default 5, unchanged; 0 never
-aborts; negative values are rejected).
+aborts and logs a warning at startup; negative values are rejected).
 
 https://github.com/owncloud/ocis/pull/13034
 https://github.com/owncloud/ocis/issues/13033
