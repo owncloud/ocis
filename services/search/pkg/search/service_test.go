@@ -172,7 +172,7 @@ var _ = Describe("Searchprovider", func() {
 			indexClient.On("Lookup", mock.Anything).Return(nil, engine.ErrResourceNotFound)
 			gatewayClient.On("Stat", mock.Anything, mock.MatchedBy(func(sreq *sprovider.StatRequest) bool {
 				return sreq.Ref.ResourceId.StorageId == "storageid" &&
-					sreq.Ref.ResourceId.OpaqueId == "spaceid" &&
+					(sreq.Ref.ResourceId.OpaqueId == "spaceid" || sreq.Ref.ResourceId.OpaqueId == ri.Id.OpaqueId) &&
 					sreq.Ref.ResourceId.SpaceId == "spaceid"
 			})).Return(&sprovider.StatResponse{
 				Status: status.NewOK(context.Background()),
@@ -180,6 +180,7 @@ var _ = Describe("Searchprovider", func() {
 			}, nil)
 			err := s.IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
 			Expect(err).ShouldNot(HaveOccurred())
+			indexClient.AssertNumberOfCalls(GinkgoT(), "Upsert", 1)
 		})
 
 		It("walks the space skipping .space directory", func() {
@@ -257,11 +258,21 @@ var _ = Describe("Searchprovider", func() {
 				}
 			}
 
-			// Build path-to-fileInfo map for O(1) Stat dispatch.
-			fileInfoByPath := make(map[string]*sprovider.ResourceInfo, numDirs)
+			// Build ID-to-fileInfo and ID-to-path maps for O(1) Stat and GetPath dispatch.
+			fileInfoByID := make(map[string]*sprovider.ResourceInfo, numDirs)
+			filePathByID := make(map[string]string, numDirs)
 			for dirID, fi := range fileInfoByDir {
-				fileInfoByPath["./"+dirID+"/"+fi.Path] = fi
+				fileInfoByID[fi.Id.OpaqueId] = fi
+				filePathByID[fi.Id.OpaqueId] = "/" + dirID + "/" + fi.Path
 			}
+			gatewayClient.On("GetPath", mock.Anything, mock.MatchedBy(func(req *sprovider.GetPathRequest) bool {
+				return fileInfoByID[req.GetResourceId().GetOpaqueId()] != nil
+			})).Return(
+				func(_ context.Context, req *sprovider.GetPathRequest, _ ...grpc.CallOption) *sprovider.GetPathResponse {
+					return &sprovider.GetPathResponse{Status: status.NewOK(context.Background()), Path: filePathByID[req.GetResourceId().GetOpaqueId()]}
+				},
+				func(_ context.Context, _ *sprovider.GetPathRequest, _ ...grpc.CallOption) error { return nil },
+			)
 
 			// Single Stat mock dispatching via map — avoids 10k separate matchers.
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(
@@ -272,7 +283,7 @@ var _ = Describe("Searchprovider", func() {
 							Info:   rootInfo,
 						}
 					}
-					if fi, ok := fileInfoByPath[sreq.Ref.Path]; ok {
+					if fi, ok := fileInfoByID[sreq.Ref.GetResourceId().GetOpaqueId()]; ok {
 						return &sprovider.StatResponse{
 							Status: status.NewOK(context.Background()),
 							Info:   fi,
@@ -384,24 +395,31 @@ var _ = Describe("Searchprovider", func() {
 	})
 
 	Describe("IndexSpace abort threshold", func() {
-		// A root container listing three files. Stat by path answers per the
-		// resolvable set; Lookup never finds anything, so every file is attempted.
+		// A root container listing numFiles files. Stat by ID answers per the
+		// missing/statBroken sets, Stat by path per staleByPath; Lookup finds only
+		// the files in indexed, so every other file is attempted.
+		const numFiles = 6
 		var (
-			rootInfo   *sprovider.ResourceInfo
-			fileInfos  []*sprovider.ResourceInfo
-			resolvable map[string]bool
-			statBroken map[string]bool // Stat answers with an internal error, not NOT_FOUND
-			indexed    map[string]bool // already indexed and unchanged
-			newService = func(maxConsecutiveFailures int) search.Searcher {
+			rootInfo    *sprovider.ResourceInfo
+			fileInfos   []*sprovider.ResourceInfo
+			missing     map[string]bool // Stat answers NOT_FOUND
+			statBroken  map[string]bool // Stat answers with an internal error
+			staleByPath map[string]bool // Stat by path answers NOT_FOUND, Stat by ID works
+			indexed     map[string]bool // already indexed and unchanged
+			newService  = func(maxConsecutiveFailures int) *search.Service {
 				cfg := &config.Config{}
 				cfg.Extractor.MaxConsecutiveFailures = maxConsecutiveFailures
-				return search.NewService(gatewaySelector, indexClient, extractor, logger, cfg)
+				s := search.NewService(gatewaySelector, indexClient, extractor, logger, cfg)
+				s.SetExtractionRetryDelay(time.Millisecond)
+				return s
 			}
+			spaceID = &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"}
 		)
 
 		BeforeEach(func() {
-			DeferCleanup(search.SetExtractionRetryDelay(time.Millisecond))
+			missing = map[string]bool{}
 			statBroken = map[string]bool{}
+			staleByPath = map[string]bool{}
 			indexed = map[string]bool{}
 			gatewayClient.On("GetUserByClaim", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserByClaimResponse{
 				Status: status.NewOK(context.Background()),
@@ -414,8 +432,8 @@ var _ = Describe("Searchprovider", func() {
 				Path:  ".",
 				Mtime: &typesv1beta1.Timestamp{Seconds: 5000},
 			}
-			fileInfos = make([]*sprovider.ResourceInfo, 3)
-			resolvable = map[string]bool{}
+			fileInfos = make([]*sprovider.ResourceInfo, numFiles)
+			byID := map[string]*sprovider.ResourceInfo{}
 			for i := range fileInfos {
 				fileInfos[i] = &sprovider.ResourceInfo{
 					Id:       &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: fmt.Sprintf("file-%d", i)},
@@ -425,30 +443,41 @@ var _ = Describe("Searchprovider", func() {
 					Size:     1024,
 					Mtime:    &typesv1beta1.Timestamp{Seconds: 5000},
 				}
-				resolvable["./"+fileInfos[i].Path] = true
+				byID[fileInfos[i].Id.OpaqueId] = fileInfos[i]
 			}
 
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(
 				func(_ context.Context, sreq *sprovider.StatRequest, _ ...grpc.CallOption) *sprovider.StatResponse {
-					if sreq.Ref.Path == "." || sreq.Ref.Path == "" {
-						return &sprovider.StatResponse{Status: status.NewOK(context.Background()), Info: rootInfo}
-					}
-					if statBroken[sreq.Ref.Path] {
-						return &sprovider.StatResponse{Status: status.NewInternal(context.Background(), "storage unavailable")}
-					}
-					if !resolvable[sreq.Ref.Path] {
-						// The node the walker listed cannot be stat'ed by its
-						// path any more (stale or inconsistent metadata).
-						return &sprovider.StatResponse{Status: status.NewNotFound(context.Background(), sreq.Ref.Path)}
-					}
-					for _, fi := range fileInfos {
-						if "./"+fi.Path == sreq.Ref.Path {
-							return &sprovider.StatResponse{Status: status.NewOK(context.Background()), Info: fi}
+					id := sreq.GetRef().GetResourceId().GetOpaqueId()
+					if p := sreq.GetRef().GetPath(); p != "" && p != "." {
+						// By path, relative to the space root.
+						for _, fi := range fileInfos {
+							if "./"+fi.Path == p && !staleByPath[fi.Id.OpaqueId] {
+								id = fi.Id.OpaqueId
+								break
+							}
+							id = ""
 						}
 					}
-					return &sprovider.StatResponse{Status: status.NewNotFound(context.Background(), sreq.Ref.Path)}
+					switch {
+					case id == "spaceid":
+						return &sprovider.StatResponse{Status: status.NewOK(context.Background()), Info: rootInfo}
+					case statBroken[id]:
+						return &sprovider.StatResponse{Status: status.NewInternal(context.Background(), "storage unavailable")}
+					case missing[id] || byID[id] == nil:
+						return &sprovider.StatResponse{Status: status.NewNotFound(context.Background(), id)}
+					}
+					return &sprovider.StatResponse{Status: status.NewOK(context.Background()), Info: byID[id]}
 				},
 				func(_ context.Context, _ *sprovider.StatRequest, _ ...grpc.CallOption) error { return nil },
+			)
+			gatewayClient.On("GetPath", mock.Anything, mock.MatchedBy(func(req *sprovider.GetPathRequest) bool {
+				return byID[req.GetResourceId().GetOpaqueId()] != nil
+			})).Return(
+				func(_ context.Context, req *sprovider.GetPathRequest, _ ...grpc.CallOption) *sprovider.GetPathResponse {
+					return &sprovider.GetPathResponse{Status: status.NewOK(context.Background()), Path: "/" + byID[req.GetResourceId().GetOpaqueId()].Path}
+				},
+				func(_ context.Context, _ *sprovider.GetPathRequest, _ ...grpc.CallOption) error { return nil },
 			)
 			gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(&sprovider.ListContainerResponse{
 				Status: status.NewOK(context.Background()),
@@ -471,22 +500,43 @@ var _ = Describe("Searchprovider", func() {
 			indexClient.On("Upsert", mock.Anything, mock.Anything).Return(nil)
 		})
 
-		It("does not count unresolvable files towards the abort threshold", func() {
-			for k := range resolvable {
-				resolvable[k] = false
-			}
+		It("does not count a file that no longer exists towards the abort threshold", func() {
+			missing["file-0"] = true
 			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
 
-			err := newService(1).IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
-			Expect(err).ShouldNot(HaveOccurred(), "files that cannot be resolved are skipped, never counted")
+			err := newService(1).IndexSpace(context.Background(), spaceID)
+			Expect(err).ShouldNot(HaveOccurred(), "a file deleted since it was listed is skipped, never counted")
+			indexClient.AssertNumberOfCalls(GinkgoT(), "Upsert", numFiles-1)
+		})
+
+		It("fails the walk when most files are not found, as in a storage provider outage", func() {
+			// The gateway answers NOT_FOUND when it cannot reach the provider.
+			for _, fi := range fileInfos {
+				missing[fi.Id.OpaqueId] = true
+			}
+
+			err := newService(5).IndexSpace(context.Background(), spaceID)
+			Expect(err).Should(HaveOccurred(), "an outage must not report the space as indexed")
+			Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("index walk incomplete: %d of %d files were not found", numFiles, numFiles)))
 			extractor.AssertNotCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
-			indexClient.AssertNotCalled(GinkgoT(), "Upsert", mock.Anything, mock.Anything)
+		})
+
+		It("indexes a stale node that Stat cannot find by its path but can by its ID", func() {
+			staleByPath["file-1"] = true
+			var extracted []string
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+				extracted = append(extracted, args.Get(1).(*sprovider.ResourceInfo).GetId().GetOpaqueId())
+			}).Return(content.Document{}, nil)
+
+			err := newService(5).IndexSpace(context.Background(), spaceID)
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(extracted).To(ConsistOf("file-0", "file-1", "file-2", "file-3", "file-4", "file-5"))
 		})
 
 		It("aborts after the configured number of consecutive extraction failures", func() {
 			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, errors.New("extractor down"))
 
-			err := newService(2).IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			err := newService(2).IndexSpace(context.Background(), spaceID)
 			Expect(err).Should(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("aborting index walk: 2 consecutive extraction failures"))
 			indexClient.AssertNotCalled(GinkgoT(), "Upsert", mock.Anything, mock.Anything)
@@ -498,18 +548,18 @@ var _ = Describe("Searchprovider", func() {
 				extractCalls.Add(1)
 			}).Return(content.Document{}, errors.New("extractor down"))
 
-			err := newService(0).IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			err := newService(0).IndexSpace(context.Background(), spaceID)
 			Expect(err).ShouldNot(HaveOccurred(), "with the abort disabled the walk finishes despite failures")
-			Expect(int(extractCalls.Load())).To(Equal(len(fileInfos)*6), "every file was attempted, each with all retries")
+			Expect(int(extractCalls.Load())).To(Equal(numFiles*6), "every file was attempted, each with all retries")
 		})
 
 		It("counts a Stat failure other than not-found towards the abort threshold", func() {
-			for k := range resolvable {
-				statBroken[k] = true
+			for _, fi := range fileInfos {
+				statBroken[fi.Id.OpaqueId] = true
 			}
 
-			err := newService(2).IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
-			Expect(err).Should(HaveOccurred(), "a storage or auth outage must not look like a stale node")
+			err := newService(2).IndexSpace(context.Background(), spaceID)
+			Expect(err).Should(HaveOccurred(), "a storage or auth error must not look like a deleted file")
 			Expect(err.Error()).To(ContainSubstring("aborting index walk: 2 consecutive extraction failures"))
 			extractor.AssertNotCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
 		})
@@ -523,18 +573,42 @@ var _ = Describe("Searchprovider", func() {
 				cancel() // e.g. the index command's request timeout fires during the walk
 			}).Return(content.Document{}, nil)
 
-			err := newService(0).IndexSpace(ctx, &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			err := newService(0).IndexSpace(ctx, spaceID)
 			Expect(err).Should(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("index walk stopped"))
 			Expect(int(extractCalls.Load())).To(Equal(1), "no file after the cancellation was attempted")
 		})
 
+		It("stops retrying a failed extraction as soon as the context ends", func() {
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			var extractCalls atomic.Int32
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Run(func(_ mock.Arguments) {
+				extractCalls.Add(1)
+				cancel()
+			}).Return(content.Document{}, errors.New("extractor down"))
+
+			s := newService(0)
+			s.SetExtractionRetryDelay(time.Hour)
+			done := make(chan error, 1)
+			go func() { done <- s.IndexSpace(ctx, spaceID) }()
+
+			var err error
+			Eventually(done, 5*time.Second).Should(Receive(&err), "the retry wait must end with the context, not after an hour")
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("index walk stopped"))
+			Expect(int(extractCalls.Load())).To(Equal(1))
+		})
+
 		It("resets the counter on an already indexed, unchanged file", func() {
-			indexed[storagespace.FormatResourceID(fileInfos[1].Id)] = true
+			// Failing files 0, 2 and 4 are each followed by an indexed one.
+			for i := 1; i < numFiles; i += 2 {
+				indexed[storagespace.FormatResourceID(fileInfos[i].Id)] = true
+			}
 			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, errors.New("cannot extract"))
 
-			err := newService(2).IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
-			Expect(err).ShouldNot(HaveOccurred(), "two failures separated by a healthy file are not consecutive")
+			err := newService(2).IndexSpace(context.Background(), spaceID)
+			Expect(err).ShouldNot(HaveOccurred(), "failures separated by a healthy file are not consecutive")
 		})
 	})
 
@@ -583,6 +657,30 @@ var _ = Describe("Searchprovider", func() {
 
 			extractor.AssertNotCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
 			indexClient.AssertNotCalled(GinkgoT(), "Upsert", mock.Anything, mock.Anything)
+		})
+	})
+
+	Describe("UpdateTags when GetPath fails", func() {
+		It("still updates the tags from the Stat result", func() {
+			noPathID := &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "nopath"}
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+				Status: status.NewOK(context.Background()),
+				Info: &sprovider.ResourceInfo{
+					Id:   noPathID,
+					Type: sprovider.ResourceType_RESOURCE_TYPE_FILE,
+					ArbitraryMetadata: &sprovider.ArbitraryMetadata{
+						Metadata: map[string]string{"tags": "important"},
+					},
+				},
+			}, nil)
+			gatewayClient.On("GetPath", mock.Anything, mock.MatchedBy(func(req *sprovider.GetPathRequest) bool {
+				return req.GetResourceId().GetOpaqueId() == "nopath"
+			})).Return(&sprovider.GetPathResponse{Status: status.NewInternal(context.Background(), "no path")}, nil)
+			indexClient.On("Update", "storageid$spaceid!nopath", mock.Anything).Return(nil)
+
+			s.UpdateTags(context.Background(), &sprovider.Reference{ResourceId: noPathID})
+
+			indexClient.AssertCalled(GinkgoT(), "Update", "storageid$spaceid!nopath", mock.Anything)
 		})
 	})
 

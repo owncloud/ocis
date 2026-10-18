@@ -23,6 +23,16 @@ import (
 var scopeRegex = regexp.MustCompile(`scope:\s*([^" "\n\r]*)`)
 var vaultRegex = regexp.MustCompile(`vault:\s*(\S+)`)
 
+// errResourceNotFound is returned by statResource when Stat answers
+// CODE_NOT_FOUND: the resource was deleted or moved since it was listed. The
+// gateway also answers NOT_FOUND when it cannot reach the storage provider, so
+// a run of them can mean an outage (see IndexSpace).
+var errResourceNotFound = errors.New("resource not found")
+
+// errPathNotResolved is returned by ResolveReference when GetPath answers with
+// a non-OK status.
+var errPathNotResolved = errors.New("could not resolve the resource's path")
+
 // ResolveReference makes sure the path is relative to the space root
 func ResolveReference(ctx context.Context, ref *provider.Reference, ri *provider.ResourceInfo, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*provider.Reference, error) {
 	if ref.GetResourceId().GetOpaqueId() == ref.GetResourceId().GetSpaceId() {
@@ -37,8 +47,11 @@ func ResolveReference(ctx context.Context, ref *provider.Reference, ri *provider
 	gpRes, err := gatewayClient.GetPath(ctx, &provider.GetPathRequest{
 		ResourceId: ri.GetId(),
 	})
-	if err != nil || gpRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+	if err != nil {
 		return nil, err
+	}
+	if code := gpRes.GetStatus().GetCode(); code != rpc.Code_CODE_OK {
+		return nil, fmt.Errorf("%w: %s %s", errPathNotResolved, code, gpRes.GetStatus().GetMessage())
 	}
 	return &provider.Reference{
 		ResourceId: &provider.ResourceId{
@@ -80,7 +93,7 @@ func getAuthContext(ctx context.Context, serviceAccountID string, gatewaySelecto
 	return utils.GetServiceUserContextWithContext(ctx, gatewayClient, serviceAccountID, secret)
 }
 
-func statResource(ctx context.Context, ref *provider.Reference, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], logger log.Logger) (*provider.StatResponse, error) {
+func statResource(ctx context.Context, ref *provider.Reference, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*provider.StatResponse, error) {
 	gatewayClient, err := gatewaySelector.Next()
 	if err != nil {
 		return nil, err
@@ -88,19 +101,17 @@ func statResource(ctx context.Context, ref *provider.Reference, gatewaySelector 
 
 	res, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: ref})
 	if err != nil {
-		logger.Error().Err(err).Msg("failed to stat the moved resource")
 		return nil, err
 	}
-	switch res.GetStatus().GetCode() {
+	switch code := res.GetStatus().GetCode(); code {
 	case rpc.Code_CODE_OK:
 		return res, nil
 	case rpc.Code_CODE_NOT_FOUND:
-		// Resource was moved or deleted in the meantime. ignore.
-		return nil, err
+		// Moved or deleted in the meantime, or a backend the gateway could
+		// not reach: the gateway answers NOT_FOUND for both.
+		return nil, errResourceNotFound
 	default:
-		err := errors.New("failed to stat the moved resource")
-		logger.Error().Interface("res", res).Msg(err.Error())
-		return nil, err
+		return nil, fmt.Errorf("stat failed: %s %s", code, res.GetStatus().GetMessage())
 	}
 }
 
