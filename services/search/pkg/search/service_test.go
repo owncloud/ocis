@@ -531,6 +531,16 @@ var _ = Describe("Searchprovider", func() {
 			err := newService(5).IndexSpace(context.Background(), spaceID)
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(extracted).To(ConsistOf("file-0", "file-1", "file-2", "file-3", "file-4", "file-5"))
+			gatewayClient.AssertNumberOfCalls(GinkgoT(), "GetPath", 1) // only the stale node needs the ID fallback
+		})
+
+		It("resolves healthy files by path, without a GetPath call", func() {
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
+
+			err := newService(5).IndexSpace(context.Background(), spaceID)
+			Expect(err).ShouldNot(HaveOccurred())
+			indexClient.AssertNumberOfCalls(GinkgoT(), "Upsert", numFiles)
+			gatewayClient.AssertNotCalled(GinkgoT(), "GetPath", mock.Anything, mock.Anything)
 		})
 
 		It("aborts after the configured number of consecutive extraction failures", func() {

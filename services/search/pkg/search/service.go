@@ -560,10 +560,16 @@ func (s *Service) IndexSpace(ctx context.Context, spaceID *provider.StorageSpace
 			}
 		}
 
-		// Resolve the node by the ID the walker listed, not by its path: a
-		// stale node can fail a Stat by path but still be found by ID.
-		ref := &provider.Reference{ResourceId: info.GetId()}
-		if err := s.upsertItem(ownerCtx, ref, _extractionRetries); err != nil {
+		// Resolve the node by its path. A stale node fails a Stat by path but
+		// the ID the walker listed still finds it. So retry by ID only after
+		// a not-found: a healthy file costs no extra GetPath call.
+		ref := &provider.Reference{Path: relPath, ResourceId: &rootID}
+		err = s.upsertItem(ownerCtx, ref, _extractionRetries)
+		if errors.Is(err, errResourceNotFound) && info.GetId() != nil {
+			s.logger.Debug().Str("path", relPath).Msg("resource not found by path, retrying by ID")
+			err = s.upsertItem(ownerCtx, &provider.Reference{ResourceId: info.GetId()}, _extractionRetries)
+		}
+		if err != nil {
 			if errors.Is(err, errResourceNotFound) {
 				missingCount++
 				s.logger.Debug().Err(err).Str("path", relPath).Msg("skipping resource that no longer exists")

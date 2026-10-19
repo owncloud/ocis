@@ -13,8 +13,9 @@ systems:
    time, and nothing after that point was indexed until the files were fixed
    by hand.
 
-The walk now resolves each file by the ID it listed, not by its path, so such
-a node is indexed. A file that Stat does not find (CODE_NOT_FOUND, deleted
+The walk still resolves each file by its path. When Stat by path does not find
+a file, the walk tries again with the ID it listed, so such a node is indexed.
+A healthy file costs no extra GetPath call. A file that Stat does not find (CODE_NOT_FOUND, deleted
 since it was listed) is skipped without counting; auth, gateway, transport and
 deadline failures still count. Because the gateway also answers NOT_FOUND when
 it cannot reach a storage provider, a walk in which at least 5 files, and more
