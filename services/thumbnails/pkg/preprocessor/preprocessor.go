@@ -32,13 +32,47 @@ type FileConverter interface {
 // GifDecoder is a converter for the gif file
 type GifDecoder struct{}
 
-// Convert reads the gif file and returns the thumbnail image
+// Convert reads all frames of the gif file and preserves its animation.
 func (i GifDecoder) Convert(r io.Reader) (interface{}, error) {
 	img, err := gif.DecodeAll(r)
 	if err != nil {
 		return nil, errors.Wrap(err, `could not decode the image`)
 	}
 	return img, nil
+}
+
+// GifFirstFrameDecoder converts a gif into a static thumbnail image.
+type GifFirstFrameDecoder struct{}
+
+// Convert reads the first frame of the gif file and returns the thumbnail image
+func (i GifFirstFrameDecoder) Convert(r io.Reader) (interface{}, error) {
+	// Decode returns only the frame, whose bounds can be smaller than the logical
+	// screen. Keep the screen configuration and background index for the generator.
+	var header bytes.Buffer
+	config, err := gif.DecodeConfig(io.TeeReader(r, &header))
+	if err != nil {
+		return nil, errors.Wrap(err, `could not decode the image`)
+	}
+
+	img, err := gif.Decode(io.MultiReader(bytes.NewReader(header.Bytes()), r))
+	if err != nil {
+		return nil, errors.Wrap(err, `could not decode the image`)
+	}
+
+	frame, ok := img.(*image.Paletted)
+	if !ok {
+		return nil, errors.New(`could not decode the image as a paletted GIF`)
+	}
+
+	return &gif.GIF{
+		Image: []*image.Paletted{frame},
+		Delay: []int{0},
+		// There is no following frame to dispose for a static thumbnail.
+		Disposal:        []byte{gif.DisposalNone},
+		LoopCount:       -1,
+		Config:          config,
+		BackgroundIndex: header.Bytes()[11],
+	}, nil
 }
 
 // GgsDecoder is a converter for the geogebra slides file
@@ -328,6 +362,9 @@ func ForType(mimeType string, opts map[string]interface{}) FileConverter {
 	case "application/vnd.geogebra.pinboard":
 		return GgpDecoder{}
 	case "image/gif":
+		if firstFrameOnly, _ := opts["gifFirstFrameOnly"].(bool); firstFrameOnly {
+			return GifFirstFrameDecoder{}
+		}
 		return GifDecoder{}
 	case "audio/flac":
 		fallthrough
