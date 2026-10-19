@@ -1,6 +1,6 @@
 {
   "name": "@ownclouders/web-pkg",
-  "version": "12.5.0",
+  "version": "13.0.0",
   "description": "ownCloud web pkg",
   "license": "Apache-2.0",
   "main": "src/index.ts",

@@ -1,6 +1,6 @@
 {
   "name": "@ownclouders/extension-sdk",
-  "version": "12.5.0",
+  "version": "12.5.1",
   "description": "ownCloud Web Extension SDK",
   "license": "Apache-2.0",
   "main": "index.mjs",
