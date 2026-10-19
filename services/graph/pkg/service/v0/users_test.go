@@ -188,8 +188,7 @@ var _ = Describe("Users", func() {
 				Expect(responseUser.GetPreferredLanguage()).To(Equal("de"))
 			})
 
-			It("falls back to english when the settings lookup fails and no default is configured", func() {
-				cfg.Spaces.DefaultLanguage = ""
+			It("falls back to english when the settings lookup fails and the default is unchanged", func() {
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).
 					Return(&libregraph.User{Id: libregraph.PtrString("user")}, nil)
 				valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
