@@ -9,6 +9,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaborationv1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
@@ -520,6 +521,21 @@ var _ = Describe("Searchprovider", func() {
 			indexClient.AssertNumberOfCalls(GinkgoT(), "Upsert", numFiles-1)
 		})
 
+		It("keeps the failure count across a file that no longer exists", func() {
+			// Only file-0 and file-2 fail extraction. file-1 is gone between them.
+			// It neither counts nor resets the counter, so a threshold of 2
+			// aborts at file-2, before the healthy file-3 could reset it.
+			missing["file-1"] = true
+			extractor.On("Extract", mock.Anything, mock.MatchedBy(func(ri *sprovider.ResourceInfo) bool {
+				return ri.GetId().GetOpaqueId() == "file-0" || ri.GetId().GetOpaqueId() == "file-2"
+			}), mock.Anything).Return(content.Document{}, errors.New("extractor down"))
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
+
+			err := newService(2).IndexSpace(context.Background(), spaceID)
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("aborting index walk: 2 consecutive extraction failures"))
+		})
+
 		It("fails the walk when most files are not found, as in a storage provider outage", func() {
 			// The gateway answers NOT_FOUND when it cannot reach the provider.
 			for _, fi := range fileInfos {
@@ -702,27 +718,32 @@ var _ = Describe("Searchprovider", func() {
 	})
 
 	Describe("UpdateTags when GetPath fails", func() {
-		It("still updates the tags from the Stat result", func() {
-			noPathID := &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "nopath"}
-			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
-				Status: status.NewOK(context.Background()),
-				Info: &sprovider.ResourceInfo{
-					Id:   noPathID,
-					Type: sprovider.ResourceType_RESOURCE_TYPE_FILE,
-					ArbitraryMetadata: &sprovider.ArbitraryMetadata{
-						Metadata: map[string]string{"tags": "important"},
+		for name, getPathStatus := range map[string]func() *rpcv1beta1.Status{
+			"with an internal error": func() *rpcv1beta1.Status { return status.NewInternal(context.Background(), "no path") },
+			"with not found":         func() *rpcv1beta1.Status { return status.NewNotFound(context.Background(), "no path") },
+		} {
+			It("still updates the tags from the Stat result, GetPath answering "+name, func() {
+				noPathID := &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "nopath"}
+				gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+					Status: status.NewOK(context.Background()),
+					Info: &sprovider.ResourceInfo{
+						Id:   noPathID,
+						Type: sprovider.ResourceType_RESOURCE_TYPE_FILE,
+						ArbitraryMetadata: &sprovider.ArbitraryMetadata{
+							Metadata: map[string]string{"tags": "important"},
+						},
 					},
-				},
-			}, nil)
-			gatewayClient.On("GetPath", mock.Anything, mock.MatchedBy(func(req *sprovider.GetPathRequest) bool {
-				return req.GetResourceId().GetOpaqueId() == "nopath"
-			})).Return(&sprovider.GetPathResponse{Status: status.NewInternal(context.Background(), "no path")}, nil)
-			indexClient.On("Update", "storageid$spaceid!nopath", mock.Anything).Return(nil)
+				}, nil)
+				gatewayClient.On("GetPath", mock.Anything, mock.MatchedBy(func(req *sprovider.GetPathRequest) bool {
+					return req.GetResourceId().GetOpaqueId() == "nopath"
+				})).Return(&sprovider.GetPathResponse{Status: getPathStatus()}, nil)
+				indexClient.On("Update", "storageid$spaceid!nopath", mock.Anything).Return(nil)
 
-			s.UpdateTags(context.Background(), &sprovider.Reference{ResourceId: noPathID})
+				s.UpdateTags(context.Background(), &sprovider.Reference{ResourceId: noPathID})
 
-			indexClient.AssertCalled(GinkgoT(), "Update", "storageid$spaceid!nopath", mock.Anything)
-		})
+				indexClient.AssertCalled(GinkgoT(), "Update", "storageid$spaceid!nopath", mock.Anything)
+			})
+		}
 	})
 
 	Describe("Search", func() {
