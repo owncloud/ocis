@@ -1,7 +1,7 @@
 import { mock } from 'vitest-mock-extended'
 import { createApp, defineComponent, App } from 'vue'
 import { createRouter, createMemoryHistory } from 'vue-router'
-import { useAppsStore, useConfigStore, ExtensionRegistry } from '@ownclouders/web-pkg'
+import { useAppsStore, useConfigStore, AppsStore, ExtensionRegistry } from '@ownclouders/web-pkg'
 import {
   initializeApplications,
   announceApplicationsReady,
@@ -303,8 +303,7 @@ describe('announceConfiguration', () => {
 describe('announceDefaults', () => {
   const setup = async (path: string) => {
     createTestingPinia()
-    const appsStore = useAppsStore()
-    appsStore.appIds = ['files']
+    const appsStore = { appIds: ['files'] } as AppsStore
     const configStore = useConfigStore()
     const extensionRegistry = {
       requestExtensions: () => [{ navItem: { route: { path: '/files/spaces/personal' } } }]
