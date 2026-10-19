@@ -1,12 +1,14 @@
 import { mock } from 'vitest-mock-extended'
 import { createApp, defineComponent, App } from 'vue'
-import { useAppsStore, useConfigStore } from '@ownclouders/web-pkg'
+import { createRouter, createMemoryHistory } from 'vue-router'
+import { useAppsStore, useConfigStore, ExtensionRegistry } from '@ownclouders/web-pkg'
 import {
   initializeApplications,
   announceApplicationsReady,
   announceCustomScripts,
   announceCustomStyles,
-  announceConfiguration
+  announceConfiguration,
+  announceDefaults
 } from '../../../src/container/bootstrap'
 import { buildApplication } from '../../../src/container/application'
 import { createTestingPinia } from '@ownclouders/web-test-helpers'
@@ -295,5 +297,35 @@ describe('announceConfiguration', () => {
     const configStore = useConfigStore()
     await announceConfiguration({ path: '/config.json', configStore })
     expect(configStore.options.defaultLanguage).toStrictEqual('de')
+  })
+})
+
+describe('announceDefaults', () => {
+  const setup = async (path: string) => {
+    createTestingPinia()
+    const appsStore = useAppsStore()
+    appsStore.appIds = ['files']
+    const configStore = useConfigStore()
+    const extensionRegistry = {
+      requestExtensions: () => [{ navItem: { route: { path: '/files/spaces/personal' } } }]
+    } as unknown as ExtensionRegistry
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [{ path: '/:scope(vault)?/files/spaces/personal', component: { render: () => null } }]
+    })
+    announceDefaults({ appsStore, router, extensionRegistry, configStore })
+    await router.push(path)
+    return router
+  }
+
+  it('redirects / to the default app', async () => {
+    const router = await setup('/')
+    expect(router.currentRoute.value.fullPath).toBe('/files/spaces/personal')
+  })
+
+  it('redirects /vault to the default app within the vault', async () => {
+    const router = await setup('/vault')
+    expect(router.currentRoute.value.fullPath).toBe('/vault/files/spaces/personal')
+    expect(router.currentRoute.value.params.scope).toBe('vault')
   })
 })
