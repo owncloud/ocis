@@ -64,6 +64,7 @@ func DefaultConfig() *config.Config {
 		BundlesPath:       "",
 		Bundles:           nil,
 		ServiceAccountIDs: []string{"service-user-id"},
+		DefaultLanguage:   "en",
 	}
 }
 
