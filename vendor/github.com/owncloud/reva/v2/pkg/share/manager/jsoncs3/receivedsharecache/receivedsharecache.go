@@ -246,6 +246,7 @@ func (c *Cache) retryPersist(ctx context.Context, userID, spaceID string, persis
 		default:
 		}
 		err = persistFunc()
+		stillBusy := false
 		switch err.(type) {
 		case nil:
 			return nil
@@ -265,12 +266,24 @@ func (c *Cache) retryPersist(ctx context.Context, userID, spaceID string, persis
 		case errtypes.TooEarly:
 			// storage-system has an upload in progress for this node; wait for it to finish
 			// continue with sync below
+			stillBusy = true
 			log.Debug().Int("attempt", attempt).Msg("CAS failed: TooEarly (upload in progress), retrying")
 		default:
 			log.Error().Int("attempt", attempt).Err(err).Msg("persisting received share failed, giving up")
 			return err
 		}
-		// The CAS winner already committed, so the first resync needs no delay.
+		// Aborted/PreconditionFailed/AlreadyExists mean the winner already committed,
+		// so the first resync needs no delay. TooEarly means the lock is still held --
+		// retrying it instantly just adds load to a resource that's still busy.
+		if stillBusy {
+			timer := time.NewTimer(expBackoff(attempt))
+			select {
+			case <-timer.C:
+			case <-ctx.Done():
+				timer.Stop()
+				return ctx.Err()
+			}
+		}
 		serr := c.resyncAfterConflict(ctx, userID)
 		if serr != nil && isSyncTransient(serr) {
 			serr = c.retryTransientResync(ctx, userID, attempt, serr, log)
