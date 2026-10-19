@@ -405,6 +405,8 @@ var _ = Describe("Searchprovider", func() {
 			missing     map[string]bool // Stat answers NOT_FOUND
 			statBroken  map[string]bool // Stat answers with an internal error
 			staleByPath map[string]bool // Stat by path answers NOT_FOUND, Stat by ID works
+			pathMissing map[string]bool // GetPath answers NOT_FOUND
+			pathBroken  map[string]bool // GetPath answers with an internal error
 			indexed     map[string]bool // already indexed and unchanged
 			newService  = func(maxConsecutiveFailures int) *search.Service {
 				cfg := &config.Config{}
@@ -420,6 +422,8 @@ var _ = Describe("Searchprovider", func() {
 			missing = map[string]bool{}
 			statBroken = map[string]bool{}
 			staleByPath = map[string]bool{}
+			pathMissing = map[string]bool{}
+			pathBroken = map[string]bool{}
 			indexed = map[string]bool{}
 			gatewayClient.On("GetUserByClaim", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserByClaimResponse{
 				Status: status.NewOK(context.Background()),
@@ -475,7 +479,14 @@ var _ = Describe("Searchprovider", func() {
 				return byID[req.GetResourceId().GetOpaqueId()] != nil
 			})).Return(
 				func(_ context.Context, req *sprovider.GetPathRequest, _ ...grpc.CallOption) *sprovider.GetPathResponse {
-					return &sprovider.GetPathResponse{Status: status.NewOK(context.Background()), Path: "/" + byID[req.GetResourceId().GetOpaqueId()].Path}
+					id := req.GetResourceId().GetOpaqueId()
+					switch {
+					case pathMissing[id]:
+						return &sprovider.GetPathResponse{Status: status.NewNotFound(context.Background(), id)}
+					case pathBroken[id]:
+						return &sprovider.GetPathResponse{Status: status.NewInternal(context.Background(), "storage unavailable")}
+					}
+					return &sprovider.GetPathResponse{Status: status.NewOK(context.Background()), Path: "/" + byID[id].Path}
 				},
 				func(_ context.Context, _ *sprovider.GetPathRequest, _ ...grpc.CallOption) error { return nil },
 			)
@@ -532,6 +543,26 @@ var _ = Describe("Searchprovider", func() {
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(extracted).To(ConsistOf("file-0", "file-1", "file-2", "file-3", "file-4", "file-5"))
 			gatewayClient.AssertNumberOfCalls(GinkgoT(), "GetPath", 1) // only the stale node needs the ID fallback
+		})
+
+		It("does not count a file that is gone between the Stat and the GetPath", func() {
+			staleByPath["file-1"] = true // forces the lookup by ID, which calls GetPath
+			pathMissing["file-1"] = true
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
+
+			err := newService(1).IndexSpace(context.Background(), spaceID)
+			Expect(err).ShouldNot(HaveOccurred(), "a vanished file is not an extraction failure")
+			indexClient.AssertNumberOfCalls(GinkgoT(), "Upsert", numFiles-1)
+		})
+
+		It("counts a GetPath failure other than not-found", func() {
+			staleByPath["file-1"] = true
+			pathBroken["file-1"] = true
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
+
+			err := newService(1).IndexSpace(context.Background(), spaceID)
+			Expect(err).Should(HaveOccurred(), "a storage failure must not look like a deleted file")
+			Expect(err.Error()).To(ContainSubstring("aborting index walk: 1 consecutive extraction failures"))
 		})
 
 		It("resolves healthy files by path, without a GetPath call", func() {

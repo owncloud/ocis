@@ -30,7 +30,8 @@ var vaultRegex = regexp.MustCompile(`vault:\s*(\S+)`)
 var errResourceNotFound = errors.New("resource not found")
 
 // errPathNotResolved is returned by ResolveReference when GetPath answers with
-// a non-OK status.
+// a non-OK status. When the status is CODE_NOT_FOUND, the error also matches
+// errResourceNotFound.
 var errPathNotResolved = errors.New("could not resolve the resource's path")
 
 // ResolveReference makes sure the path is relative to the space root
@@ -51,6 +52,10 @@ func ResolveReference(ctx context.Context, ref *provider.Reference, ri *provider
 		return nil, err
 	}
 	if code := gpRes.GetStatus().GetCode(); code != rpc.Code_CODE_OK {
+		if code == rpc.Code_CODE_NOT_FOUND {
+			// Deleted since the Stat, like a Stat that answers NOT_FOUND.
+			return nil, fmt.Errorf("%w: %w: %s", errPathNotResolved, errResourceNotFound, gpRes.GetStatus().GetMessage())
+		}
 		return nil, fmt.Errorf("%w: %s %s", errPathNotResolved, code, gpRes.GetStatus().GetMessage())
 	}
 	return &provider.Reference{
