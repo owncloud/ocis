@@ -30,9 +30,3 @@ plugins:
   - name: openapiv2
     path: ../../.bingo/protoc-gen-openapiv2
     out: ../gen/
-
-  - name: doc
-    path: ../../.bingo/protoc-gen-doc
-    out: ../../docs/apis/grpc_apis
-    opt:
-      - ../docs/GRPC.tmpl,grpc.md,source_relative
