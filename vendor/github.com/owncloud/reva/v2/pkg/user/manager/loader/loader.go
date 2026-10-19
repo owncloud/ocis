@@ -25,6 +25,5 @@ import (
 	_ "github.com/owncloud/reva/v2/pkg/user/manager/ldap"
 	_ "github.com/owncloud/reva/v2/pkg/user/manager/memory"
 	_ "github.com/owncloud/reva/v2/pkg/user/manager/nextcloud"
-	_ "github.com/owncloud/reva/v2/pkg/user/manager/owncloudsql"
 	// Add your own here
 )
