@@ -87,12 +87,12 @@ type UserSharingSQLDriver struct {
 }
 
 type UserSharingOwnCloudSQLDriver struct {
-	DBUsername         string `yaml:"db_username" env:"SHARING_USER_OWNCLOUDSQL_DB_USERNAME" desc:"Username for the database." introductionVersion:"pre5.0"`
-	DBPassword         string `yaml:"db_password" env:"SHARING_USER_OWNCLOUDSQL_DB_PASSWORD" desc:"Password for the database." introductionVersion:"pre5.0"`
-	DBHost             string `yaml:"db_host" env:"SHARING_USER_OWNCLOUDSQL_DB_HOST" desc:"Hostname or IP of the database server." introductionVersion:"pre5.0"`
-	DBPort             int    `yaml:"db_port" env:"SHARING_USER_OWNCLOUDSQL_DB_PORT" desc:"Port that the database server is listening on." introductionVersion:"pre5.0"`
-	DBName             string `yaml:"db_name" env:"SHARING_USER_OWNCLOUDSQL_DB_NAME" desc:"Name of the database to be used." introductionVersion:"pre5.0"`
-	UserStorageMountID string `yaml:"user_storage_mount_id" env:"SHARING_USER_OWNCLOUDSQL_USER_STORAGE_MOUNT_ID" desc:"Mount ID of the ownCloudSQL users storage for mapping ownCloud 10 shares." introductionVersion:"pre5.0"`
+	DBUsername         string `yaml:"db_username" env:"SHARING_USER_OWNCLOUDSQL_DB_USERNAME" desc:"Username for the database." introductionVersion:"pre5.0" deprecationVersion:"8.2.0" removalVersion:"9.0.0" deprecationInfo:"SHARING_USER_OWNCLOUDSQL_DB_USERNAME is deprecated because the owncloudsql driver is deprecated."`
+	DBPassword         string `yaml:"db_password" env:"SHARING_USER_OWNCLOUDSQL_DB_PASSWORD" desc:"Password for the database." introductionVersion:"pre5.0" deprecationVersion:"8.2.0" removalVersion:"9.0.0" deprecationInfo:"SHARING_USER_OWNCLOUDSQL_DB_PASSWORD is deprecated because the owncloudsql driver is deprecated."`
+	DBHost             string `yaml:"db_host" env:"SHARING_USER_OWNCLOUDSQL_DB_HOST" desc:"Hostname or IP of the database server." introductionVersion:"pre5.0" deprecationVersion:"8.2.0" removalVersion:"9.0.0" deprecationInfo:"SHARING_USER_OWNCLOUDSQL_DB_HOST is deprecated because the owncloudsql driver is deprecated."`
+	DBPort             int    `yaml:"db_port" env:"SHARING_USER_OWNCLOUDSQL_DB_PORT" desc:"Port that the database server is listening on." introductionVersion:"pre5.0" deprecationVersion:"8.2.0" removalVersion:"9.0.0" deprecationInfo:"SHARING_USER_OWNCLOUDSQL_DB_PORT is deprecated because the owncloudsql driver is deprecated."`
+	DBName             string `yaml:"db_name" env:"SHARING_USER_OWNCLOUDSQL_DB_NAME" desc:"Name of the database to be used." introductionVersion:"pre5.0" deprecationVersion:"8.2.0" removalVersion:"9.0.0" deprecationInfo:"SHARING_USER_OWNCLOUDSQL_DB_NAME is deprecated because the owncloudsql driver is deprecated."`
+	UserStorageMountID string `yaml:"user_storage_mount_id" env:"SHARING_USER_OWNCLOUDSQL_USER_STORAGE_MOUNT_ID" desc:"Mount ID of the ownCloudSQL users storage for mapping ownCloud 10 shares." introductionVersion:"pre5.0" deprecationVersion:"8.2.0" removalVersion:"9.0.0" deprecationInfo:"SHARING_USER_OWNCLOUDSQL_USER_STORAGE_MOUNT_ID is deprecated because the owncloudsql driver is deprecated."`
 }
 
 type UserSharingCS3Driver struct {

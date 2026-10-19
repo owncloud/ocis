@@ -114,16 +114,16 @@ type LDAPGroupSchema struct {
 }
 
 type OwnCloudSQLDriver struct {
-	DBUsername         string `yaml:"db_username" env:"USERS_OWNCLOUDSQL_DB_USERNAME" desc:"Database user to use for authenticating with the owncloud database." introductionVersion:"pre5.0"`
-	DBPassword         string `yaml:"db_password" env:"USERS_OWNCLOUDSQL_DB_PASSWORD" desc:"Password for the database user." introductionVersion:"pre5.0"`
-	DBHost             string `yaml:"db_host" env:"USERS_OWNCLOUDSQL_DB_HOST" desc:"Hostname of the database server." introductionVersion:"pre5.0"`
-	DBPort             int    `yaml:"db_port" env:"USERS_OWNCLOUDSQL_DB_PORT" desc:"Network port to use for the database connection." introductionVersion:"pre5.0"`
-	DBName             string `yaml:"db_name" env:"USERS_OWNCLOUDSQL_DB_NAME" desc:"Name of the owncloud database." introductionVersion:"pre5.0"`
-	IDP                string `yaml:"idp" env:"USERS_OWNCLOUDSQL_IDP" desc:"The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider." introductionVersion:"pre5.0"`
-	Nobody             int64  `yaml:"nobody" env:"USERS_OWNCLOUDSQL_NOBODY" desc:"Fallback number if no numeric UID and GID properties are provided." introductionVersion:"pre5.0"`
-	JoinUsername       bool   `yaml:"join_username" env:"USERS_OWNCLOUDSQL_JOIN_USERNAME" desc:"Join the user properties table to read usernames" introductionVersion:"pre5.0"`
-	JoinOwnCloudUUID   bool   `yaml:"join_owncloud_uuid" env:"USERS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID" desc:"Join the user properties table to read user IDs." introductionVersion:"pre5.0"`
-	EnableMedialSearch bool   `yaml:"enable_medial_search" env:"USERS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH" desc:"Allow 'medial search' when searching for users instead of just doing a prefix search. This allows finding 'Alice' when searching for 'lic'." introductionVersion:"pre5.0"`
+	DBUsername         string `yaml:"db_username" env:"USERS_OWNCLOUDSQL_DB_USERNAME" desc:"Database user to use for authenticating with the owncloud database." introductionVersion:"pre5.0" deprecationVersion:"8.2.0" removalVersion:"9.0.0" deprecationInfo:"USERS_OWNCLOUDSQL_DB_USERNAME is deprecated because the owncloudsql driver is deprecated."`
+	DBPassword         string `yaml:"db_password" env:"USERS_OWNCLOUDSQL_DB_PASSWORD" desc:"Password for the database user." introductionVersion:"pre5.0" deprecationVersion:"8.2.0" removalVersion:"9.0.0" deprecationInfo:"USERS_OWNCLOUDSQL_DB_PASSWORD is deprecated because the owncloudsql driver is deprecated."`
+	DBHost             string `yaml:"db_host" env:"USERS_OWNCLOUDSQL_DB_HOST" desc:"Hostname of the database server." introductionVersion:"pre5.0" deprecationVersion:"8.2.0" removalVersion:"9.0.0" deprecationInfo:"USERS_OWNCLOUDSQL_DB_HOST is deprecated because the owncloudsql driver is deprecated."`
+	DBPort             int    `yaml:"db_port" env:"USERS_OWNCLOUDSQL_DB_PORT" desc:"Network port to use for the database connection." introductionVersion:"pre5.0" deprecationVersion:"8.2.0" removalVersion:"9.0.0" deprecationInfo:"USERS_OWNCLOUDSQL_DB_PORT is deprecated because the owncloudsql driver is deprecated."`
+	DBName             string `yaml:"db_name" env:"USERS_OWNCLOUDSQL_DB_NAME" desc:"Name of the owncloud database." introductionVersion:"pre5.0" deprecationVersion:"8.2.0" removalVersion:"9.0.0" deprecationInfo:"USERS_OWNCLOUDSQL_DB_NAME is deprecated because the owncloudsql driver is deprecated."`
+	IDP                string `yaml:"idp" env:"USERS_OWNCLOUDSQL_IDP" desc:"The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider." introductionVersion:"pre5.0" deprecationVersion:"8.2.0" removalVersion:"9.0.0" deprecationInfo:"USERS_OWNCLOUDSQL_IDP is deprecated because the owncloudsql driver is deprecated."`
+	Nobody             int64  `yaml:"nobody" env:"USERS_OWNCLOUDSQL_NOBODY" desc:"Fallback number if no numeric UID and GID properties are provided." introductionVersion:"pre5.0" deprecationVersion:"8.2.0" removalVersion:"9.0.0" deprecationInfo:"USERS_OWNCLOUDSQL_NOBODY is deprecated because the owncloudsql driver is deprecated."`
+	JoinUsername       bool   `yaml:"join_username" env:"USERS_OWNCLOUDSQL_JOIN_USERNAME" desc:"Join the user properties table to read usernames" introductionVersion:"pre5.0" deprecationVersion:"8.2.0" removalVersion:"9.0.0" deprecationInfo:"USERS_OWNCLOUDSQL_JOIN_USERNAME is deprecated because the owncloudsql driver is deprecated."`
+	JoinOwnCloudUUID   bool   `yaml:"join_owncloud_uuid" env:"USERS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID" desc:"Join the user properties table to read user IDs." introductionVersion:"pre5.0" deprecationVersion:"8.2.0" removalVersion:"9.0.0" deprecationInfo:"USERS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID is deprecated because the owncloudsql driver is deprecated."`
+	EnableMedialSearch bool   `yaml:"enable_medial_search" env:"USERS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH" desc:"Allow 'medial search' when searching for users instead of just doing a prefix search. This allows finding 'Alice' when searching for 'lic'." introductionVersion:"pre5.0" deprecationVersion:"8.2.0" removalVersion:"9.0.0" deprecationInfo:"USERS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH is deprecated because the owncloudsql driver is deprecated."`
 }
 type RESTProvider struct {
 	ClientID          string
