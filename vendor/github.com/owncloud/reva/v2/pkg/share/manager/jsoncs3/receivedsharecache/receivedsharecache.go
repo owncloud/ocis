@@ -232,17 +232,31 @@ func isSyncTransient(err error) bool {
 	return isTooEarly || isUnavailable
 }
 
+// persistRetryBudget bounds the whole CAS-conflict retry/resync dance by
+// wall-clock time, so repeated per-attempt backoffs can't accumulate into a
+// large tail for one request even though each attempt is individually capped.
+const persistRetryBudget = 300 * time.Millisecond
+
 func (c *Cache) retryPersist(ctx context.Context, userID, spaceID string, persistFunc func() error) error {
 	log := appctx.GetLogger(ctx).With().
 		Str("hostname", os.Getenv("HOSTNAME")).
 		Str("userID", userID).
 		Str("spaceID", spaceID).Logger()
 
+	persistCtx, cancel := context.WithTimeout(ctx, persistRetryBudget)
+	defer cancel()
+
 	var err error
 	for attempt := 0; attempt < 20; attempt++ {
 		select {
-		case <-ctx.Done():
-			return ctx.Err()
+		case <-persistCtx.Done():
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			if err != nil {
+				return err
+			}
+			return persistCtx.Err()
 		default:
 		}
 		err = persistFunc()
@@ -279,14 +293,17 @@ func (c *Cache) retryPersist(ctx context.Context, userID, spaceID string, persis
 			timer := time.NewTimer(expBackoff(attempt))
 			select {
 			case <-timer.C:
-			case <-ctx.Done():
+			case <-persistCtx.Done():
 				timer.Stop()
-				return ctx.Err()
+				if ctx.Err() != nil {
+					return ctx.Err()
+				}
+				return err
 			}
 		}
 		serr := c.resyncAfterConflict(ctx, userID)
 		if serr != nil && isSyncTransient(serr) {
-			serr = c.retryTransientResync(ctx, userID, attempt, serr, log)
+			serr = c.retryTransientResync(ctx, persistCtx, userID, attempt, serr, log)
 		}
 		if serr != nil {
 			log.Error().Int("attempt", attempt).Err(serr).Msg("lost update: re-read failed, aborting")
@@ -302,8 +319,9 @@ const resyncRetryBudget = 150 * time.Millisecond
 
 // retryTransientResync re-reads state while the resync keeps failing
 // transiently (lock contention or a 502/503/504), until it refreshes or the budget runs out.
-func (c *Cache) retryTransientResync(ctx context.Context, userID string, attempt int, lastErr error, log zerolog.Logger) error {
-	resyncCtx, cancel := context.WithTimeout(ctx, resyncRetryBudget)
+// Its timeout is derived from persistCtx so it can't outlive the caller's own retry budget.
+func (c *Cache) retryTransientResync(ctx, persistCtx context.Context, userID string, attempt int, lastErr error, log zerolog.Logger) error {
+	resyncCtx, cancel := context.WithTimeout(persistCtx, resyncRetryBudget)
 	defer cancel()
 
 	serr := lastErr
