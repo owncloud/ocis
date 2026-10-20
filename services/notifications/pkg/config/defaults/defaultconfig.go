@@ -39,7 +39,8 @@ func DefaultConfig() *config.Config {
 				Cluster:   "ocis-cluster",
 				EnableTLS: false,
 			},
-			RevaGateway: shared.DefaultRevaConfig().Address,
+			RevaGateway:     shared.DefaultRevaConfig().Address,
+			DefaultLanguage: "en",
 		},
 		Store: config.Store{
 			Store:    "nats-js-kv",

@@ -74,6 +74,7 @@ func DefaultConfig() *config.Config {
 			WebDavBase:               "https://localhost:9200",
 			WebDavPath:               "/dav/spaces/",
 			DefaultQuota:             "1000000000",
+			DefaultLanguage:          "en",
 			// 1 minute
 			ExtendedSpacePropertiesCacheTTL: 60,
 			// 1 minute
