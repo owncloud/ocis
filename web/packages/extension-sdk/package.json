@@ -7,11 +7,11 @@
   "type": "module",
   "private": false,
   "author": "ownCloud GmbH <devops@owncloud.com>",
-  "homepage": "https://github.com/owncloud/web/tree/master/packages/extension-sdk",
+  "homepage": "https://github.com/owncloud/ocis/tree/master/web/packages/extension-sdk",
   "repository": {
     "type": "git",
-    "url": "https://github.com/owncloud/web",
-    "directory": "packages/extension-sdk"
+    "url": "https://github.com/owncloud/ocis",
+    "directory": "web/packages/extension-sdk"
   },
   "dependencies": {
     "@vitejs/plugin-vue": "^6.0.6",

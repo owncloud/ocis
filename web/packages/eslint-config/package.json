@@ -6,11 +6,11 @@
   "license": "Apache-2.0",
   "type": "module",
   "author": "ownCloud GmbH <devops@owncloud.com>",
-  "homepage": "https://github.com/owncloud/web/tree/master/packages/eslint-config",
+  "homepage": "https://github.com/owncloud/ocis/tree/master/web/packages/eslint-config",
   "repository": {
     "type": "git",
-    "url": "https://github.com/owncloud/web",
-    "directory": "packages/eslint-config"
+    "url": "https://github.com/owncloud/ocis",
+    "directory": "web/packages/eslint-config"
   },
   "exports": {
     ".": "./index.js"

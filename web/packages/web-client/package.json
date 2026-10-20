@@ -6,11 +6,11 @@
   "private": false,
   "type": "module",
   "author": "ownCloud GmbH <devops@owncloud.com>",
-  "homepage": "https://github.com/owncloud/web/tree/master/packages/web-client",
+  "homepage": "https://github.com/owncloud/ocis/tree/master/web/packages/web-client",
   "repository": {
     "type": "git",
-    "url": "https://github.com/owncloud/web",
-    "directory": "packages/web-client"
+    "url": "https://github.com/owncloud/ocis",
+    "directory": "web/packages/web-client"
   },
   "files": [
     "dist/"

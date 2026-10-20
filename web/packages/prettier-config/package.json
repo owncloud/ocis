@@ -5,11 +5,11 @@
   "main": "index.js",
   "license": "Apache-2.0",
   "author": "ownCloud GmbH <devops@owncloud.com>",
-  "homepage": "https://github.com/owncloud/web/tree/master/packages/prettier-config",
+  "homepage": "https://github.com/owncloud/ocis/tree/master/web/packages/prettier-config",
   "repository": {
     "type": "git",
-    "url": "https://github.com/owncloud/web",
-    "directory": "packages/prettier-config"
+    "url": "https://github.com/owncloud/ocis",
+    "directory": "web/packages/prettier-config"
   },
   "exports": {
     ".": "./index.js"

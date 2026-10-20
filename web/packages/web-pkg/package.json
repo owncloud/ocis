@@ -8,11 +8,11 @@
   "private": false,
   "author": "ownCloud GmbH <devops@owncloud.com>",
   "type": "module",
-  "homepage": "https://github.com/owncloud/web/tree/master/packages/web-pkg",
+  "homepage": "https://github.com/owncloud/ocis/tree/master/web/packages/web-pkg",
   "repository": {
     "type": "git",
-    "url": "https://github.com/owncloud/web",
-    "directory": "packages/web-pkg"
+    "url": "https://github.com/owncloud/ocis",
+    "directory": "web/packages/web-pkg"
   },
   "files": [
     "dist/"

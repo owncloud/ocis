@@ -5,11 +5,11 @@
     "main": "index.js",
     "license": "Apache-2.0",
     "author": "ownCloud GmbH <devops@owncloud.com>",
-    "homepage": "https://github.com/owncloud/web/tree/master/packages/babel-preset",
+    "homepage": "https://github.com/owncloud/ocis/tree/master/web/packages/babel-preset",
     "repository": {
       "type": "git",
-      "url": "https://github.com/owncloud/web",
-      "directory": "packages/babel-preset"
+      "url": "https://github.com/owncloud/ocis",
+      "directory": "web/packages/babel-preset"
     },
     "exports": {
         ".": "./index.js"
