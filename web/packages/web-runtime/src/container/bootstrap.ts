@@ -642,6 +642,14 @@ export const announceDefaults = ({
       path: '/',
       redirect: () => route
     })
+    // the vault has no app of its own, send `/vault` to the default app within the vault scope
+    router.addRoute({
+      path: '/vault',
+      redirect: () => {
+        const { path, query, hash } = router.resolve(route as RouteLocationRaw)
+        return { path: `/vault${path}`, query, hash }
+      }
+    })
   }
 }
 
