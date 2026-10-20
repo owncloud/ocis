@@ -2,7 +2,7 @@
   "name": "@ownclouders/eslint-config",
   "main": "index.js",
   "private": false,
-  "version": "12.5.0",
+  "version": "12.5.1",
   "license": "Apache-2.0",
   "type": "module",
   "author": "ownCloud GmbH <devops@owncloud.com>",
