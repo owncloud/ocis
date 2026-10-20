@@ -74,6 +74,12 @@ jobs:
       # No !cancelled() here on purpose: k6 against a target that failed to start
       # just buries the real error under a TypeScript stack trace.
       - name: Run the k6 tests
+        env:
+          # Raw per-request metrics (incl. per-tag timings for share.createShare /
+          # share.deleteShare) so the blended http_req_duration average can be broken
+          # down later -- k6-tests.sh runs k6 more than once; the main ramping test
+          # runs last, so its data is what's left in the file.
+          K6_OUT: json=/tmp/k6-results.json
         run: |
           if [ "${QUICK:-true}" = "true" ]; then
             # Seed at least one user per VU: each VU logs in as the pool user
@@ -90,6 +96,14 @@ jobs:
             done
           fi
           /usr/local/bin/k6-tests.sh
+
+      - name: Upload raw k6 results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: k6-results-${{ github.run_id }}
+          path: /tmp/k6-results.json
+          if-no-files-found: warn
 
       - name: Retrieve the oCIS log
         if: ${{ !cancelled() }}
