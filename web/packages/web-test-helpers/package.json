@@ -7,11 +7,11 @@
   "type": "module",
   "main": "src/index.ts",
   "author": "ownCloud GmbH <devops@owncloud.com>",
-  "homepage": "https://github.com/owncloud/web/tree/master/packages/web-test-helpers",
+  "homepage": "https://github.com/owncloud/ocis/tree/master/web/packages/web-test-helpers",
   "repository": {
     "type": "git",
-    "url": "https://github.com/owncloud/web",
-    "directory": "packages/web-test-helpers"
+    "url": "https://github.com/owncloud/ocis",
+    "directory": "web/packages/web-test-helpers"
   },
   "files": [
     "dist/"

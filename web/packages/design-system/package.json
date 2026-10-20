@@ -13,8 +13,8 @@
   "homepage": "https://owncloud.design/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/owncloud/web",
-    "directory": "packages/design-system"
+    "url": "https://github.com/owncloud/ocis",
+    "directory": "web/packages/design-system"
   },
   "license": "Apache-2.0",
   "author": "ownClouders",
