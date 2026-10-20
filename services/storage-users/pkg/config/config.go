@@ -103,7 +103,6 @@ type Drivers struct {
 	OCIS        OCISDriver        `yaml:"ocis"`
 	S3NG        S3NGDriver        `yaml:"s3ng"`
 	OwnCloudSQL OwnCloudSQLDriver `yaml:"owncloudsql"`
-	Posix       PosixDriver       `yaml:"posix"`
 
 	S3    S3Driver    `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
 	EOS   EOSDriver   `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
@@ -190,23 +189,6 @@ type OwnCloudSQLDriver struct {
 	DBPort                int    `yaml:"db_port" env:"STORAGE_USERS_OWNCLOUDSQL_DB_PORT" desc:"Port that the database server is listening on." introductionVersion:"pre5.0"`
 	DBName                string `yaml:"db_name" env:"STORAGE_USERS_OWNCLOUDSQL_DB_NAME" desc:"Name of the database to be used." introductionVersion:"pre5.0"`
 	UsersProviderEndpoint string `yaml:"users_provider_endpoint" env:"STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT" desc:"Endpoint of the users provider." introductionVersion:"pre5.0"`
-}
-
-// PosixDriver is the storage driver configuration when using 'posix' storage driver
-type PosixDriver struct {
-	// Root is the absolute path to the location of the data
-	Root                      string        `yaml:"root" env:"STORAGE_USERS_POSIX_ROOT" desc:"The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage/users." introductionVersion:"6.0.0"`
-	PersonalSpacePathTemplate string        `yaml:"personalspacepath_template" env:"STORAGE_USERS_POSIX_PERSONAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the personal space roots." introductionVersion:"6.0.0"`
-	GeneralSpacePathTemplate  string        `yaml:"generalspacepath_template" env:"STORAGE_USERS_POSIX_GENERAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the projects space roots." introductionVersion:"6.0.0"`
-	PermissionsEndpoint       string        `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_POSIX_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'ocis', 'posix' and 's3ng'." introductionVersion:"6.0.0"`
-	AsyncUploads              bool          `yaml:"async_uploads" env:"OCIS_ASYNC_UPLOADS" desc:"Enable asynchronous file uploads." introductionVersion:"pre5.0"`
-	ScanDebounceDelay         time.Duration `yaml:"scan_debounce_delay" env:"STORAGE_USERS_POSIX_SCAN_DEBOUNCE_DELAY" desc:"The time in milliseconds to wait before scanning the filesystem for changes after a change has been detected." introductionVersion:"6.0.0"`
-
-	UseSpaceGroups bool `yaml:"use_space_groups" env:"STORAGE_USERS_POSIX_USE_SPACE_GROUPS" desc:"Use space groups to manage permissions on spaces." introductionVersion:"6.0.0"`
-
-	WatchType               string `yaml:"watch_type" env:"STORAGE_USERS_POSIX_WATCH_TYPE" desc:"Type of the watcher to use for getting notified about changes to the filesystem. Currently available options are 'inotifywait' (default), 'gpfswatchfolder' and 'gpfsfileauditlogging'." introductionVersion:"6.0.0"`
-	WatchPath               string `yaml:"watch_path" env:"STORAGE_USERS_POSIX_WATCH_PATH" desc:"Path to the watch directory/file. Only applies to the 'gpfsfileauditlogging' and 'inotifywait' watcher, in which case it is the path of the file audit log file/base directory to watch." introductionVersion:"6.0.0"`
-	WatchFolderKafkaBrokers string `yaml:"watch_folder_kafka_hosts" env:"STORAGE_USERS_POSIX_WATCH_FOLDER_KAFKA_BROKERS" desc:"Comma-separated list of kafka brokers to read the watchfolder events from." introductionVersion:"6.0.0"`
 }
 
 // Events combines the configuration options for the event bus.

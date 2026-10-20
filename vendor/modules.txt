@@ -853,20 +853,11 @@ github.com/justinas/alice
 github.com/kevinburke/ssh_config
 # github.com/klauspost/compress v1.20.1
 ## explicit; go 1.25
-github.com/klauspost/compress
 github.com/klauspost/compress/flate
-github.com/klauspost/compress/fse
-github.com/klauspost/compress/gzip
-github.com/klauspost/compress/huff0
-github.com/klauspost/compress/internal/cpuinfo
 github.com/klauspost/compress/internal/le
 github.com/klauspost/compress/internal/race
 github.com/klauspost/compress/internal/regmask
-github.com/klauspost/compress/internal/snapref
 github.com/klauspost/compress/s2
-github.com/klauspost/compress/snappy
-github.com/klauspost/compress/zstd
-github.com/klauspost/compress/zstd/internal/xxhash
 # github.com/klauspost/cpuid/v2 v2.4.0
 ## explicit; go 1.24.0
 github.com/klauspost/cpuid/v2
@@ -1321,7 +1312,7 @@ github.com/orcaman/concurrent-map
 # github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245
 ## explicit; go 1.18
 github.com/owncloud/libre-graph-api-go
-# github.com/owncloud/reva/v2 v2.0.0-20261012083840-8b649a4c3899
+# github.com/owncloud/reva/v2 v2.0.0-20261019134904-382e65eb17d4
 ## explicit; go 1.26.0
 github.com/owncloud/reva/v2/cmd/revad/internal/grace
 github.com/owncloud/reva/v2/cmd/revad/runtime
@@ -1623,13 +1614,6 @@ github.com/owncloud/reva/v2/pkg/storage/fs/ocis
 github.com/owncloud/reva/v2/pkg/storage/fs/ocis/blobstore
 github.com/owncloud/reva/v2/pkg/storage/fs/owncloudsql
 github.com/owncloud/reva/v2/pkg/storage/fs/owncloudsql/filecache
-github.com/owncloud/reva/v2/pkg/storage/fs/posix
-github.com/owncloud/reva/v2/pkg/storage/fs/posix/blobstore
-github.com/owncloud/reva/v2/pkg/storage/fs/posix/lookup
-github.com/owncloud/reva/v2/pkg/storage/fs/posix/options
-github.com/owncloud/reva/v2/pkg/storage/fs/posix/timemanager
-github.com/owncloud/reva/v2/pkg/storage/fs/posix/trashbin
-github.com/owncloud/reva/v2/pkg/storage/fs/posix/tree
 github.com/owncloud/reva/v2/pkg/storage/fs/registry
 github.com/owncloud/reva/v2/pkg/storage/fs/s3
 github.com/owncloud/reva/v2/pkg/storage/fs/s3ng
@@ -1667,7 +1651,6 @@ github.com/owncloud/reva/v2/pkg/storage/utils/indexer/index
 github.com/owncloud/reva/v2/pkg/storage/utils/indexer/option
 github.com/owncloud/reva/v2/pkg/storage/utils/localfs
 github.com/owncloud/reva/v2/pkg/storage/utils/metadata
-github.com/owncloud/reva/v2/pkg/storage/utils/middleware
 github.com/owncloud/reva/v2/pkg/storage/utils/sync
 github.com/owncloud/reva/v2/pkg/storage/utils/templates
 github.com/owncloud/reva/v2/pkg/storage/utils/walker
@@ -1702,9 +1685,6 @@ github.com/owncloud/reva/v2/tests/cs3mocks/mocks
 # github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c
 ## explicit; go 1.12
 github.com/oxtoacart/bpool
-# github.com/pablodz/inotifywaitgo v0.0.12
-## explicit; go 1.24.1
-github.com/pablodz/inotifywaitgo/inotifywaitgo
 # github.com/patrickmn/go-cache v2.1.0+incompatible
 ## explicit
 github.com/patrickmn/go-cache
@@ -1714,13 +1694,6 @@ github.com/pbnjay/memory
 # github.com/philhofer/fwd v1.2.0
 ## explicit; go 1.20
 github.com/philhofer/fwd
-# github.com/pierrec/lz4/v4 v4.1.26
-## explicit; go 1.17
-github.com/pierrec/lz4/v4
-github.com/pierrec/lz4/v4/internal/lz4block
-github.com/pierrec/lz4/v4/internal/lz4errors
-github.com/pierrec/lz4/v4/internal/lz4stream
-github.com/pierrec/lz4/v4/internal/xxh32
 # github.com/pjbgf/sha1cd v0.6.0
 ## explicit; go 1.22
 github.com/pjbgf/sha1cd
@@ -1820,57 +1793,6 @@ github.com/segmentio/asm/cpu/arm64
 github.com/segmentio/asm/cpu/cpuid
 github.com/segmentio/asm/cpu/x86
 github.com/segmentio/asm/internal/unsafebytes
-# github.com/segmentio/kafka-go v0.4.51
-## explicit; go 1.23
-github.com/segmentio/kafka-go
-github.com/segmentio/kafka-go/compress
-github.com/segmentio/kafka-go/compress/gzip
-github.com/segmentio/kafka-go/compress/lz4
-github.com/segmentio/kafka-go/compress/snappy
-github.com/segmentio/kafka-go/compress/zstd
-github.com/segmentio/kafka-go/protocol
-github.com/segmentio/kafka-go/protocol/addoffsetstotxn
-github.com/segmentio/kafka-go/protocol/addpartitionstotxn
-github.com/segmentio/kafka-go/protocol/alterclientquotas
-github.com/segmentio/kafka-go/protocol/alterconfigs
-github.com/segmentio/kafka-go/protocol/alterpartitionreassignments
-github.com/segmentio/kafka-go/protocol/alteruserscramcredentials
-github.com/segmentio/kafka-go/protocol/apiversions
-github.com/segmentio/kafka-go/protocol/consumer
-github.com/segmentio/kafka-go/protocol/createacls
-github.com/segmentio/kafka-go/protocol/createpartitions
-github.com/segmentio/kafka-go/protocol/createtopics
-github.com/segmentio/kafka-go/protocol/deleteacls
-github.com/segmentio/kafka-go/protocol/deletegroups
-github.com/segmentio/kafka-go/protocol/deletetopics
-github.com/segmentio/kafka-go/protocol/describeacls
-github.com/segmentio/kafka-go/protocol/describeclientquotas
-github.com/segmentio/kafka-go/protocol/describeconfigs
-github.com/segmentio/kafka-go/protocol/describegroups
-github.com/segmentio/kafka-go/protocol/describeuserscramcredentials
-github.com/segmentio/kafka-go/protocol/electleaders
-github.com/segmentio/kafka-go/protocol/endtxn
-github.com/segmentio/kafka-go/protocol/fetch
-github.com/segmentio/kafka-go/protocol/findcoordinator
-github.com/segmentio/kafka-go/protocol/heartbeat
-github.com/segmentio/kafka-go/protocol/incrementalalterconfigs
-github.com/segmentio/kafka-go/protocol/initproducerid
-github.com/segmentio/kafka-go/protocol/joingroup
-github.com/segmentio/kafka-go/protocol/leavegroup
-github.com/segmentio/kafka-go/protocol/listgroups
-github.com/segmentio/kafka-go/protocol/listoffsets
-github.com/segmentio/kafka-go/protocol/listpartitionreassignments
-github.com/segmentio/kafka-go/protocol/metadata
-github.com/segmentio/kafka-go/protocol/offsetcommit
-github.com/segmentio/kafka-go/protocol/offsetdelete
-github.com/segmentio/kafka-go/protocol/offsetfetch
-github.com/segmentio/kafka-go/protocol/produce
-github.com/segmentio/kafka-go/protocol/rawproduce
-github.com/segmentio/kafka-go/protocol/saslauthenticate
-github.com/segmentio/kafka-go/protocol/saslhandshake
-github.com/segmentio/kafka-go/protocol/syncgroup
-github.com/segmentio/kafka-go/protocol/txnoffsetcommit
-github.com/segmentio/kafka-go/sasl
 # github.com/segmentio/ksuid v1.0.4
 ## explicit; go 1.12
 github.com/segmentio/ksuid

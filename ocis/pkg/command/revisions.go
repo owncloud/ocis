@@ -12,8 +12,8 @@ import (
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
 	"github.com/owncloud/ocis/v2/ocis/pkg/revisions"
 	ocisbs "github.com/owncloud/reva/v2/pkg/storage/fs/ocis/blobstore"
-	"github.com/owncloud/reva/v2/pkg/storage/fs/posix/lookup"
 	s3bs "github.com/owncloud/reva/v2/pkg/storage/fs/s3ng/blobstore"
+	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/urfave/cli/v2"
 )
