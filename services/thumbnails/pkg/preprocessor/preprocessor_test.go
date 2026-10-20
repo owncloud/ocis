@@ -14,7 +14,7 @@ import (
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -159,14 +159,8 @@ var _ = Describe("ImageDecoder", func() {
 			Expect(img).To(BeNil())
 		})
 
-		for name, disposal := range map[string]byte{
-			"unspecified": 0,
-			"none":        gif.DisposalNone,
-			"background":  gif.DisposalBackground,
-			"previous":    gif.DisposalPrevious,
-		} {
-			name, disposal := name, disposal
-			It("should normalize "+name+" disposal for a static thumbnail", func() {
+		DescribeTable("should normalize disposal for a static thumbnail",
+			func(disposal byte) {
 				palette := color.Palette{color.Black, color.White}
 				frame := image.NewPaletted(image.Rect(0, 0, 2, 2), palette)
 				frame.SetColorIndex(0, 0, 1)
@@ -196,8 +190,12 @@ var _ = Describe("ImageDecoder", func() {
 				Expect(result.Image).To(HaveLen(1))
 				Expect(result.Disposal).To(Equal([]byte{gif.DisposalNone}))
 				Expect(result.Image[0].ColorIndexAt(0, 0)).To(Equal(uint8(1)))
-			})
-		}
+			},
+			Entry("unspecified", byte(0)),
+			Entry("none", byte(gif.DisposalNone)),
+			Entry("background", byte(gif.DisposalBackground)),
+			Entry("previous", byte(gif.DisposalPrevious)),
+		)
 
 		It("should preserve the logical screen and frame bounds", func() {
 			palette := color.Palette{color.Black, color.White}
@@ -327,19 +325,8 @@ var _ = Describe("ImageDecoder", func() {
 	})
 
 	Describe("test ForType", func() {
-		for _, test := range []struct {
-			name   string
-			opts   map[string]interface{}
-			frames int
-		}{
-			{name: "by default", frames: 2},
-			{name: "when unset", opts: map[string]interface{}{}, frames: 2},
-			{name: "when disabled", opts: map[string]interface{}{"gifFirstFrameOnly": false}, frames: 2},
-			{name: "when invalid", opts: map[string]interface{}{"gifFirstFrameOnly": "true"}, frames: 2},
-			{name: "when enabled", opts: map[string]interface{}{"gifFirstFrameOnly": true}, frames: 1},
-		} {
-			test := test
-			It("should select the expected gif decoder "+test.name, func() {
+		DescribeTable("should select the expected gif decoder",
+			func(opts map[string]interface{}, frames int) {
 				palette := color.Palette{color.Black, color.White}
 				frame := image.NewPaletted(image.Rect(0, 0, 2, 2), palette)
 				var animatedGIF bytes.Buffer
@@ -349,16 +336,21 @@ var _ = Describe("ImageDecoder", func() {
 					Disposal: []byte{gif.DisposalBackground, gif.DisposalPrevious},
 				})).To(Succeed())
 
-				decoded, err := ForType("image/gif", test.opts).Convert(bytes.NewReader(animatedGIF.Bytes()))
+				decoded, err := ForType("image/gif", opts).Convert(bytes.NewReader(animatedGIF.Bytes()))
 				Expect(err).ToNot(HaveOccurred())
 				result := decoded.(*gif.GIF)
-				Expect(result.Image).To(HaveLen(test.frames))
-				if test.frames == 2 {
+				Expect(result.Image).To(HaveLen(frames))
+				if frames == 2 {
 					Expect(result.Delay).To(Equal([]int{5, 10}))
 					Expect(result.Disposal).To(Equal([]byte{gif.DisposalBackground, gif.DisposalPrevious}))
 				}
-			})
-		}
+			},
+			Entry("by default", map[string]interface{}(nil), 2),
+			Entry("when unset", map[string]interface{}{}, 2),
+			Entry("when disabled", map[string]interface{}{"gifFirstFrameOnly": false}, 2),
+			Entry("when invalid", map[string]interface{}{"gifFirstFrameOnly": "true"}, 2),
+			Entry("when enabled", map[string]interface{}{"gifFirstFrameOnly": true}, 1),
+		)
 
 		It("should return an ImageDecoder for image types", func() {
 			decoder := ForType("image/png", nil)
