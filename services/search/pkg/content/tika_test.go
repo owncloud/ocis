@@ -141,6 +141,31 @@ var _ = Describe("Tika", func() {
 
 		})
 
+		It("adds audio content in the formats tika reports for mp3 files", func() {
+			fullResponse = `[
+				{
+					"xmpDM:trackNumber": "7/12",
+					"xmpDM:discNumber": "1/2",
+					"xmpDM:releaseDate": "2004-05-12",
+					"xmpDM:duration": "225.6211395263672",
+					"Content-Type": "audio/mpeg"
+				}
+			]`
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+
+			audio := doc.Audio
+			Expect(audio).ToNot(BeNil())
+
+			Expect(audio.Disc).To(Equal(libregraph.PtrInt32(1)))
+			Expect(audio.Duration).To(Equal(libregraph.PtrInt64(225621)))
+			Expect(audio.Track).To(Equal(libregraph.PtrInt32(7)))
+			Expect(audio.Year).To(Equal(libregraph.PtrInt32(2004)))
+		})
+
 		It("adds location content", func() {
 			fullResponse = `[
 				{
