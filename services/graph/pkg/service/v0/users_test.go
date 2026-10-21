@@ -166,6 +166,48 @@ var _ = Describe("Users", func() {
 				Expect(responseUser.GetIdentities()[0].GetIssuerAssignedId()).To(Equal("the-oidc-sub"))
 			})
 
+			It("falls back to the default language when the settings lookup fails", func() {
+				cfg.Spaces.DefaultLanguage = "de"
+				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).
+					Return(&libregraph.User{Id: libregraph.PtrString("user")}, nil)
+				valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
+					Return(nil, errors.New(`{"id":"go.micro.client","code":408,"detail":"context deadline exceeded","status":"Request Timeout"}`))
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me", nil)
+				r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+				svc.GetMe(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+
+				data, err := io.ReadAll(rr.Body)
+				Expect(err).ToNot(HaveOccurred())
+				responseUser := &libregraph.User{}
+				Expect(json.Unmarshal(data, &responseUser)).To(Succeed())
+
+				Expect(responseUser.GetId()).To(Equal("user"))
+				Expect(responseUser.GetPreferredLanguage()).To(Equal("de"))
+			})
+
+			It("falls back to english when the settings lookup fails and the default is unchanged", func() {
+				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).
+					Return(&libregraph.User{Id: libregraph.PtrString("user")}, nil)
+				valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
+					Return(nil, errors.New("no language value found"))
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me", nil)
+				r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+				svc.GetMe(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+
+				data, err := io.ReadAll(rr.Body)
+				Expect(err).ToNot(HaveOccurred())
+				responseUser := &libregraph.User{}
+				Expect(json.Unmarshal(data, &responseUser)).To(Succeed())
+
+				Expect(responseUser.GetPreferredLanguage()).To(Equal("en"))
+			})
+
 			It("expands the memberOf", func() {
 				user := &libregraph.User{
 					Id: libregraph.PtrString("user1"),

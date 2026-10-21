@@ -93,9 +93,8 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 
 	preferedLanguage, _, err := getUserLanguage(r.Context(), g.valueService, me.GetId())
 	if err != nil {
-		logger.Error().Err(err).Msg("could not get user language")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not get user language")
-		return
+		logger.Warn().Err(err).Msg("could not get user language, falling back to the default language")
+		preferedLanguage = g.config.Spaces.DefaultLanguage
 	}
 
 	me.PreferredLanguage = &preferedLanguage
