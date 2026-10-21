@@ -1713,6 +1713,17 @@ var _ = Describe("FileConnector", func() {
 	})
 
 	Describe("CheckFileInfo", func() {
+		var parentStatRes *providerv1beta1.StatResponse
+		BeforeEach(func() {
+			// CheckFileInfo stats the parent folder to check whether the user can access it
+			parentStatRes = &providerv1beta1.StatResponse{Status: status.NewOK(context.Background())}
+			gatewayClient.On("Stat", mock.Anything, mock.MatchedBy(func(req *providerv1beta1.StatRequest) bool {
+				return req.GetRef().GetResourceId().GetOpaqueId() != wopiCtx.FileReference.GetResourceId().GetOpaqueId()
+			})).Maybe().Return(func(context.Context, *providerv1beta1.StatRequest, ...grpc.CallOption) (*providerv1beta1.StatResponse, error) {
+				return parentStatRes, nil
+			})
+		})
+
 		It("No valid context", func() {
 			gatewaySelector.EXPECT().Next().Unset()
 			ctx := context.Background()
@@ -3394,6 +3405,64 @@ var _ = Describe("FileConnector", func() {
 			// something this task changes.
 			Expect(collaboraResponse.BreadcrumbFolderName).To(Equal("/personal/user/Documents"))
 			Expect(collaboraResponse.BreadcrumbFolderURL).To(Equal("https://ocis.example.prv/f/storageid$spaceid%21documentsid"))
+		})
+
+		It("Collabora CheckFileInfo omits the folder link if the parent folder isn't accessible", func() {
+			// e.g. a file shared directly with the user, its parent folder belongs to the sharer
+			parentStatRes = &providerv1beta1.StatResponse{Status: status.NewNotFound(context.Background(), "not found")}
+
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "customIdp",
+					OpaqueId: "admin",
+				},
+				DisplayName: "Pet Shaft",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size:  uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{Seconds: uint64(16273849)},
+					Path:  "/personal/user/Documents/report.docx",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "fileid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "documentsid",
+						SpaceId:   "spaceid",
+					},
+					Space: &providerv1beta1.StorageSpace{
+						Name: "Personal",
+						Root: &providerv1beta1.ResourceId{
+							StorageId: "storageid",
+							OpaqueId:  "rootid",
+							SpaceId:   "spaceid",
+						},
+					},
+				},
+			}, nil)
+
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			response, err := fc.CheckFileInfo(ctx)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+
+			collaboraResponse := response.Body.(*fileinfo.Collabora)
+			Expect(collaboraResponse.BreadcrumbFolderURL).To(BeEmpty())
+			Expect(collaboraResponse.CloseURL).To(Equal("https://ocis.example.prv"))
 		})
 
 		It("Collabora CheckFileInfo breadcrumb folder name falls back to the space name for a file at the space root", func() {
