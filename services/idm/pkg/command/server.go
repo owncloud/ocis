@@ -11,14 +11,15 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/alexedwards/argon2id"
 	"github.com/go-ldap/ldif"
 	"github.com/libregraph/idm/pkg/ldbbolt"
 	"github.com/libregraph/idm/server"
 	"github.com/urfave/cli/v2"
+	"golang.org/x/crypto/argon2"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	pkgcrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
+	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/runner"
 	"github.com/owncloud/ocis/v2/services/idm"
@@ -229,17 +230,21 @@ func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) erro
 // from libregraph idm, and changing a global variable could have unexpected
 // consequences.
 func hashPassword(password string) (string, error) {
-	params := &argon2id.Params{
-		Memory:      1024,
-		Iterations:  5,
-		Parallelism: uint8(runtime.NumCPU()),
-		SaltLength:  16,
-		KeyLength:   32,
+	salt, err := generators.GenerateRandomPassword(16)
+	if err != nil {
+		return "", fmt.Errorf("salt generate error: %w", err)
 	}
 
-	hash, hashErr := argon2id.CreateHash(password, params)
-	if hashErr != nil {
-		return "", fmt.Errorf("password hash error: %w", hashErr)
-	}
+	memory := uint32(1024)
+	iterations := uint32(5)
+	keyLength := uint32(32)
+	threads := uint8(runtime.NumCPU())
+
+	key := argon2.IDKey([]byte(password), []byte(salt), iterations, memory, threads, keyLength)
+
+	b64Salt := base64.RawStdEncoding.EncodeToString([]byte(salt))
+	b64Key := base64.RawStdEncoding.EncodeToString(key)
+
+	hash := fmt.Sprintf("$argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s", argon2.Version, memory, iterations, threads, b64Salt, b64Key)
 	return "{ARGON2}" + hash, nil
 }
