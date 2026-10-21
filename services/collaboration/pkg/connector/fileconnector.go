@@ -1258,8 +1258,17 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 	privateLinkURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetId()))
 	parentFolderURL := &url.URL{}
 	*parentFolderURL = *ocisURL
+	breadcrumbFolderURL := ""
 	if !isPublicShare {
-		parentFolderURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetParentId()))
+		// the parent folder isn't always accessible, e.g. for a file shared directly with
+		// the user. Only link to it if it is, closing falls back to the oCIS URL otherwise.
+		parentStatRes, err := gwc.Stat(ctx, &providerv1beta1.StatRequest{
+			Ref: &providerv1beta1.Reference{ResourceId: statRes.GetInfo().GetParentId()},
+		})
+		if err == nil && parentStatRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_OK {
+			parentFolderURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetParentId()))
+			breadcrumbFolderURL = parentFolderURL.String()
+		}
 	} else {
 		if scopes, ok := ctxpkg.ContextGetScopes(ctx); ok {
 			publicShare := &link.PublicShare{}
@@ -1271,6 +1280,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		} else {
 			logger.Error().Err(err).Msg("CheckFileInfo: error getting scopes from the context")
 		}
+		breadcrumbFolderURL = parentFolderURL.String()
 	}
 	// BreadcrumbBrandURL points at the space's root resource, exposing an internal
 	// space/resource id; for public shares an anonymous user has no other way to reach
@@ -1314,11 +1324,11 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		fileinfo.KeyBreadcrumbDocName: path.Base(statRes.GetInfo().GetPath()),
 		// to get the folder we actually need to do a GetPath() request
 		fileinfo.KeyBreadcrumbFolderName: breadcrumbFolderName,
-		fileinfo.KeyBreadcrumbFolderURL:  parentFolderURL.String(),
+		fileinfo.KeyBreadcrumbFolderURL:  breadcrumbFolderURL,
 		fileinfo.KeyBreadcrumbBrandName:  statRes.GetInfo().GetSpace().GetName(),
 		fileinfo.KeyBreadcrumbBrandURL:   breadcrumbBrandURL,
 		// the WOPI client should navigate here when the editor is closed; the folder
-		// containing the file is the same target used for the breadcrumb folder link
+		// containing the file if the user can access it, the oCIS URL otherwise
 		fileinfo.KeyCloseURL: parentFolderURL.String(),
 
 		fileinfo.KeyHostViewURL:    createHostUrl("view", ocisURL, f.cfg.App.Name, statRes.GetInfo()),
