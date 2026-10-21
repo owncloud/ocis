@@ -882,6 +882,9 @@ func (fs *Decomposedfs) Download(ctx context.Context, ref *provider.Reference, o
 	if openReaderFunc(ri) {
 		reader, err = fs.tp.ReadBlob(n)
 		if err != nil {
+			if _, ok := err.(errtypes.IsNotFound); ok {
+				return nil, nil, err
+			}
 			return nil, nil, errors.Wrap(err, "Decomposedfs: error download blob '"+n.ID+"'")
 		}
 	}

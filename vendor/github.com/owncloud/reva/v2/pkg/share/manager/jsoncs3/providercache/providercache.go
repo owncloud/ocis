@@ -208,12 +208,15 @@ func (c *Cache) Add(ctx context.Context, storageID, spaceID, shareID string, sha
 			// CS3 uses an already exists error instead of precondition failed when using an If-None-Match=* header / IfExists flag in the InitiateFileUpload call.
 			// Thas happens when the cache thinks there is no file.
 			// continue with sync below
+		case errtypes.TooEarly:
+			log.Debug().Msg("too early when persisting added provider share: write-lock contention. retrying...")
+			// continue with sync below
 		default:
 			span.SetStatus(codes.Error, fmt.Sprintf("persisting added provider share failed. giving up: %s", err.Error()))
 			log.Error().Err(err).Msg("persisting added provider share failed")
 			return err
 		}
-		if err := c.syncWithLock(ctx, storageID, spaceID); err != nil {
+		if err := c.resyncAfterConflict(ctx, storageID, spaceID); err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
 			log.Error().Err(err).Msg("persisting added provider share failed. giving up.")
@@ -276,12 +279,15 @@ func (c *Cache) Remove(ctx context.Context, storageID, spaceID, shareID string) 
 			log.Debug().Msg("precondition failed when persisting removed provider share: etag changed. retrying...")
 			// actually, this is the wrong status code and we treat it like errtypes.Aborted because of inconsistencies on the server side
 			// continue with sync below
+		case errtypes.TooEarly:
+			log.Debug().Msg("too early when persisting removed provider share: write-lock contention. retrying...")
+			// continue with sync below
 		default:
 			span.SetStatus(codes.Error, fmt.Sprintf("persisting removed provider share failed. giving up: %s", err.Error()))
 			log.Error().Err(err).Msg("persisting removed provider share failed")
 			return err
 		}
-		if err := c.syncWithLock(ctx, storageID, spaceID); err != nil {
+		if err := c.resyncAfterConflict(ctx, storageID, spaceID); err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
 			log.Error().Err(err).Msg("persisting removed provider share failed. giving up.")
@@ -479,6 +485,16 @@ func (c *Cache) PurgeSpace(ctx context.Context, storageID, spaceID string) error
 }
 
 func (c *Cache) syncWithLock(ctx context.Context, storageID, spaceID string) error {
+	return c.doSync(ctx, storageID, spaceID, true)
+}
+
+// Unlike syncWithLock, a NotFound here must not reset the cache -- a pending
+// mutation is about to overwrite it, dropping a sibling writer's data.
+func (c *Cache) resyncAfterConflict(ctx context.Context, storageID, spaceID string) error {
+	return c.doSync(ctx, storageID, spaceID, false)
+}
+
+func (c *Cache) doSync(ctx context.Context, storageID, spaceID string, resetOnNotFound bool) error {
 	ctx, span := tracer.Start(ctx, "syncWithLock")
 	defer span.End()
 
@@ -502,6 +518,13 @@ func (c *Cache) syncWithLock(ctx context.Context, storageID, spaceID string) err
 	case nil:
 		span.AddEvent("updating local cache")
 	case errtypes.NotFound:
+		// No prior etag means this is a bootstrap race, not a lost update -- safe to reset.
+		if !resetOnNotFound && space.Etag != "" {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+			log.Error().Err(err).Msg("lost update: backing file disappeared mid-retry")
+			return err
+		}
 		span.SetStatus(codes.Ok, "")
 		if err := c.Persist(ctx, storageID, spaceID); err != nil {
 			log.Warn().Err(err).Msg("failed to create empty provider cache file")

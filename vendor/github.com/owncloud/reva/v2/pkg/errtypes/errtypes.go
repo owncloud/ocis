@@ -24,6 +24,7 @@ package errtypes
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -213,6 +214,14 @@ func (e TooManyRequests) Error() string { return "error: too many requests: " + 
 // IsTooManyRequests implements the IsTooManyRequests interface
 func (e TooManyRequests) IsTooManyRequests() {}
 
+// Unavailable is the error to use when the upstream is temporarily unable to handle the request (502/503/504).
+type Unavailable string
+
+func (e Unavailable) Error() string { return "error: unavailable: " + string(e) }
+
+// IsUnavailable implements the IsUnavailable interface.
+func (e Unavailable) IsUnavailable() {}
+
 // IsNotFound is the interface to implement
 // to specify that a resource is not found.
 type IsNotFound interface {
@@ -309,6 +318,12 @@ type IsTooManyRequests interface {
 	IsTooManyRequests()
 }
 
+// IsUnavailable is the interface to implement
+// to specify that the upstream is temporarily unavailable.
+type IsUnavailable interface {
+	IsUnavailable()
+}
+
 // ResourceProcessing is the error to use when a resource is currently being processed (e.g. an upload in progress) and the requested operation cannot proceed.
 type ResourceProcessing string
 
@@ -395,8 +410,10 @@ func NewErrtypeFromHTTPStatusCode(code int, message string) error {
 		return TooManyRequests(message)
 	case StatusChecksumMismatch:
 		return ChecksumMismatch(message)
+	case http.StatusBadGateway, http.StatusServiceUnavailable, http.StatusGatewayTimeout:
+		return Unavailable(message)
 	default:
-		return InternalError(message)
+		return InternalError("http " + strconv.Itoa(code) + ": " + message)
 	}
 }
 
@@ -433,6 +450,8 @@ func NewHTTPStatusCodeFromErrtype(err error) int {
 		return http.StatusTooEarly
 	case TooManyRequests:
 		return http.StatusTooManyRequests
+	case Unavailable:
+		return http.StatusServiceUnavailable
 	case ChecksumMismatch:
 		return StatusChecksumMismatch
 	default:

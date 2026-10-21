@@ -35,6 +35,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/mtimesyncedcache"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/metadata"
+	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 )
@@ -223,10 +224,12 @@ func (c *Cache) List(ctx context.Context, userID string) (map[string]*Space, err
 	return spaces, nil
 }
 
+// isSyncTransient reports whether a resync's Download error is worth retrying.
+// errtypes.InternalError is excluded on purpose -- retrying a permanent failure just burns the budget.
 func isSyncTransient(err error) bool {
 	_, isTooEarly := err.(errtypes.IsTooEarly)
-	_, isInternal := err.(errtypes.IsInternalError)
-	return isTooEarly || isInternal
+	_, isUnavailable := err.(errtypes.IsUnavailable)
+	return isTooEarly || isUnavailable
 }
 
 func (c *Cache) retryPersist(ctx context.Context, userID, spaceID string, persistFunc func() error) error {
@@ -243,6 +246,7 @@ func (c *Cache) retryPersist(ctx context.Context, userID, spaceID string, persis
 		default:
 		}
 		err = persistFunc()
+		stillBusy := false
 		switch err.(type) {
 		case nil:
 			return nil
@@ -262,31 +266,76 @@ func (c *Cache) retryPersist(ctx context.Context, userID, spaceID string, persis
 		case errtypes.TooEarly:
 			// storage-system has an upload in progress for this node; wait for it to finish
 			// continue with sync below
+			stillBusy = true
 			log.Debug().Int("attempt", attempt).Msg("CAS failed: TooEarly (upload in progress), retrying")
 		default:
 			log.Error().Int("attempt", attempt).Err(err).Msg("persisting received share failed, giving up")
 			return err
 		}
-		timer := time.NewTimer(expBackoff(attempt))
-		select {
-		case <-timer.C:
-		case <-ctx.Done():
-			timer.Stop()
-			return ctx.Err()
-		}
-		if serr := c.syncIfStale(ctx, userID); serr != nil {
-			if !isSyncTransient(serr) {
-				log.Error().Int("attempt", attempt).Err(serr).Msg("lost update: re-read failed, aborting")
-				return serr
+		// Aborted/PreconditionFailed/AlreadyExists mean the winner already committed,
+		// so the first resync needs no delay. TooEarly means the lock is still held --
+		// retrying it instantly just adds load to a resource that's still busy.
+		if stillBusy {
+			timer := time.NewTimer(expBackoff(attempt))
+			select {
+			case <-timer.C:
+			case <-ctx.Done():
+				timer.Stop()
+				return ctx.Err()
 			}
-			log.Warn().Int("attempt", attempt).Err(serr).Msg("lost update: re-read before retry")
+		}
+		serr := c.resyncAfterConflict(ctx, userID)
+		if serr != nil && isSyncTransient(serr) {
+			serr = c.retryTransientResync(ctx, userID, attempt, serr, log)
+		}
+		if serr != nil {
+			log.Error().Int("attempt", attempt).Err(serr).Msg("lost update: re-read failed, aborting")
+			return serr
 		}
 	}
 	return err
 }
 
+// resyncRetryBudget caps retry time instead of attempt count, so a stuck
+// resync fails fast instead of accumulating seconds of backoff.
+const resyncRetryBudget = 150 * time.Millisecond
+
+// retryTransientResync re-reads state while the resync keeps failing
+// transiently (lock contention or a 502/503/504), until it refreshes or the budget runs out.
+func (c *Cache) retryTransientResync(ctx context.Context, userID string, attempt int, lastErr error, log zerolog.Logger) error {
+	resyncCtx, cancel := context.WithTimeout(ctx, resyncRetryBudget)
+	defer cancel()
+
+	serr := lastErr
+	for resyncAttempt := 0; serr != nil && isSyncTransient(serr); resyncAttempt++ {
+		log.Warn().Int("attempt", attempt).Int("resyncAttempt", resyncAttempt).Err(serr).Msg("lost update: re-read before retry")
+		timer := time.NewTimer(expBackoff(resyncAttempt))
+		select {
+		case <-timer.C:
+		case <-resyncCtx.Done():
+			timer.Stop()
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			return serr
+		}
+		serr = c.resyncAfterConflict(ctx, userID)
+	}
+	return serr
+}
+
 // syncIfStale pulls the authoritative state from storage when the local replica is stale; caller must hold the user lock.
 func (c *Cache) syncIfStale(ctx context.Context, userID string) error {
+	return c.doSync(ctx, userID, true)
+}
+
+// Unlike syncIfStale, a NotFound here must not reset the cache -- a pending
+// mutation is about to overwrite it, dropping a sibling writer's data.
+func (c *Cache) resyncAfterConflict(ctx context.Context, userID string) error {
+	return c.doSync(ctx, userID, false)
+}
+
+func (c *Cache) doSync(ctx context.Context, userID string, resetOnNotFound bool) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "SyncIfStale")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))
@@ -299,6 +348,7 @@ func (c *Cache) syncIfStale(ctx context.Context, userID string) error {
 	span.AddEvent("updating cache")
 	//  - update cached list of created shares for the user in memory if changed
 	rss, _ := c.ReceivedSpaces.Load(userID)
+	hadEtag := rss.etag != ""
 	dlres, err := c.storage.Download(ctx, metadata.DownloadRequest{
 		Path:        jsonPath,
 		IfNoneMatch: []string{rss.etag},
@@ -307,6 +357,12 @@ func (c *Cache) syncIfStale(ctx context.Context, userID string) error {
 	case nil:
 		span.AddEvent("updating local cache")
 	case errtypes.NotFound:
+		// No prior etag means this is a bootstrap race, not a lost update -- safe to reset.
+		if !resetOnNotFound && hadEtag {
+			span.SetStatus(codes.Error, err.Error())
+			log.Error().Err(err).Msg("lost update: backing file disappeared mid-retry")
+			return err
+		}
 		span.SetStatus(codes.Ok, "")
 		if err := c.persist(ctx, userID); err != nil {
 			log.Warn().Err(err).Msg("failed to create empty received share cache file")

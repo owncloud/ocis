@@ -463,6 +463,10 @@ func (s *Service) InitiateFileUpload(ctx context.Context, req *provider.Initiate
 			st = status.NewInsufficientStorage(ctx, err, "insufficient storage")
 		case errtypes.PreconditionFailed:
 			st = status.NewFailedPrecondition(ctx, err, "failed precondition")
+		case errtypes.Aborted:
+			st = status.NewAborted(ctx, err, "response from InitiateUpload")
+		case errtypes.AlreadyExists:
+			st = status.NewAlreadyExists(ctx, err, "response from InitiateUpload")
 		case errtypes.Locked:
 			st = status.NewLocked(ctx, "locked")
 		case errtypes.IsTooEarly:
