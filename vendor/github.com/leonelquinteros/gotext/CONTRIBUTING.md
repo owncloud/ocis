@@ -1,19 +1,9 @@
 # CONTRIBUTING
 
-This open source project welcomes everybody that wants to contribute to it by implementing new features, fixing bugs, testing, creating documentation or simply talk about it. 
+Thank you for considering contributing to `gotext`! All kinds of contributions — features, bug fixes, tests, documentation, or discussions — are welcome.
 
-Most contributions will start by creating a new Issue to discuss what is the contribution about and to agree on the steps to move forward. 
+The canonical contribution guidelines live at [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
-## Issues
+Before contributing, please also read [AGENTS.md](AGENTS.md): it is the source of truth for project architecture, conventions, and development workflows (branching, PR process, coding standards, and the pre-submit checklist).
 
-All issues reports are welcome. Open a new Issue whenever you want to report a bug, request a change or make a proposal.
-
-This should be your start point of contribution. 
-
-
-## Pull Requests
-
-If you have any changes that can be merged, feel free to send a Pull Request. 
-
-Usually, you'd want to create a new Issue to discuss about the change you want to merge and why it's needed or what it solves. 
-
+Start point: open an [Issue](https://github.com/leonelquinteros/gotext/issues) to discuss your idea, then send a Pull Request against `master`.
