@@ -8,10 +8,11 @@ import (
 	"html/template"
 	"os"
 	"os/signal"
+	"runtime"
 	"strings"
 
+	"github.com/alexedwards/argon2id"
 	"github.com/go-ldap/ldif"
-	"github.com/libregraph/idm/pkg/ldappassword"
 	"github.com/libregraph/idm/pkg/ldbbolt"
 	"github.com/libregraph/idm/server"
 	"github.com/urfave/cli/v2"
@@ -175,7 +176,7 @@ func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) erro
 			// password is alread hashed
 			serviceUsers[i].Password = "{ARGON2}" + serviceUsers[i].Password
 		} else {
-			if serviceUsers[i].Password, err = ldappassword.Hash(serviceUsers[i].Password, "{ARGON2}"); err != nil {
+			if serviceUsers[i].Password, err = hashPassword(serviceUsers[i].Password); err != nil {
 				return err
 			}
 		}
@@ -218,4 +219,27 @@ func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) erro
 	}
 
 	return nil
+}
+
+// Hash the password with argon2 and provide a string matching the idm
+// expectation. Check the link for the base implementation.
+// https://github.com/libregraph/idm/blob/v0.5.0/pkg/ldappassword/ldappassword.go
+//
+// Note that we want custom hash parameters that aren't easily accessible
+// from libregraph idm, and changing a global variable could have unexpected
+// consequences.
+func hashPassword(password string) (string, error) {
+	params := &argon2id.Params{
+		Memory:      1024,
+		Iterations:  5,
+		Parallelism: uint8(runtime.NumCPU()),
+		SaltLength:  16,
+		KeyLength:   32,
+	}
+
+	hash, hashErr := argon2id.CreateHash(password, params)
+	if hashErr != nil {
+		return "", fmt.Errorf("password hash error: %w", hashErr)
+	}
+	return "{ARGON2}" + hash, nil
 }
