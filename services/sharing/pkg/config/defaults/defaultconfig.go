@@ -49,12 +49,6 @@ func DefaultConfig() *config.Config {
 				SystemUserIDP:  "internal",
 				MaxConcurrency: 1,
 			},
-			OwnCloudSQL: config.UserSharingOwnCloudSQLDriver{
-				DBUsername: "owncloud",
-				DBHost:     "mysql",
-				DBPort:     3306,
-				DBName:     "owncloud",
-			},
 		},
 		PublicSharingDriver: "jsoncs3",
 		PublicSharingDrivers: config.PublicSharingDrivers{
@@ -69,7 +63,6 @@ func DefaultConfig() *config.Config {
 				ProviderAddr:  "com.owncloud.api.storage-system", // system storage
 				SystemUserIDP: "internal",
 			},
-			// TODO implement and add owncloudsql publicshare driver
 		},
 		Events: config.Events{
 			Addr:      "127.0.0.1:9233",
