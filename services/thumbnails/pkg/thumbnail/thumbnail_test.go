@@ -1,6 +1,7 @@
 package thumbnail
 
 import (
+	"context"
 	"image"
 	"os"
 	"path"
@@ -23,11 +24,11 @@ type NoOpManager struct {
 	storage.Storage
 }
 
-func (m NoOpManager) BuildKey(_ storage.Request) string {
+func (m NoOpManager) BuildKey(_ context.Context, _ storage.Request) string {
 	return ""
 }
 
-func (m NoOpManager) Set(_, _ string, _ []byte) error {
+func (m NoOpManager) Set(_ context.Context, _, _ string, _ []byte) error {
 	return nil
 }
 
@@ -53,7 +54,7 @@ func BenchmarkGet(b *testing.B) {
 	img, ext, _ := image.Decode(f)
 	req.Encoder, _ = EncoderForType(ext)
 	for i := 0; i < b.N; i++ {
-		_, _ = sut.Generate(req, img)
+		_, _ = sut.Generate(context.Background(), req, img)
 	}
 }
 
@@ -157,6 +158,7 @@ func TestPreviewGenerationTooBigImage(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			sut := NewSimpleManager(
 				Resolutions{},
 				NoOpManager{},
@@ -176,7 +178,7 @@ func TestPreviewGenerationTooBigImage(t *testing.T) {
 			defer f.Close()
 
 			preproc := preprocessor.ForType(tt.mimeType, nil)
-			convert, err := preproc.Convert(f)
+			convert, err := preproc.Convert(ctx, f)
 			if err != nil {
 				return
 			}
@@ -187,7 +189,7 @@ func TestPreviewGenerationTooBigImage(t *testing.T) {
 			if err != nil {
 				return
 			}
-			generate, err := sut.Generate(req, convert)
+			generate, err := sut.Generate(ctx, req, convert)
 			if err != nil {
 				return
 			}

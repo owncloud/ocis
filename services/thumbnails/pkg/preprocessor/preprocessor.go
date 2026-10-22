@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"image"
@@ -15,6 +16,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/image/bmp"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
@@ -24,16 +27,32 @@ import (
 	thumbnailerErrors "github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 )
 
+const (
+	tracerName      = "thumbnails"
+	spanNameConvert = "FileConverter.Convert"
+)
+
 // FileConverter is the interface for the file converter
 type FileConverter interface {
-	Convert(r io.Reader) (interface{}, error)
+	Convert(ctx context.Context, r io.Reader) (interface{}, error)
 }
 
 // GifDecoder is a converter for the gif file
 type GifDecoder struct{}
 
 // Convert reads the gif file and returns the thumbnail image
-func (i GifDecoder) Convert(r io.Reader) (interface{}, error) {
+func (i GifDecoder) Convert(ctx context.Context, r io.Reader) (interface{}, error) {
+	span := trace.SpanFromContext(ctx)
+	_, newSpan := span.TracerProvider().Tracer(tracerName).Start(
+		ctx, spanNameConvert,
+		trace.WithSpanKind(trace.SpanKindInternal),
+		trace.WithAttributes(
+			attribute.String("ocis.thumbnails.converter.provider", "go"),
+			attribute.String("ocis.thumbnails.converter.type", "GifDecoder"),
+		),
+	)
+	defer newSpan.End()
+
 	img, err := gif.DecodeAll(r)
 	if err != nil {
 		return nil, errors.Wrap(err, `could not decode the image`)
@@ -45,7 +64,18 @@ func (i GifDecoder) Convert(r io.Reader) (interface{}, error) {
 type GgsDecoder struct{ thumbnailpath string }
 
 // Convert reads the ggs file and returns the thumbnail image
-func (g GgsDecoder) Convert(r io.Reader) (interface{}, error) {
+func (g GgsDecoder) Convert(ctx context.Context, r io.Reader) (interface{}, error) {
+	span := trace.SpanFromContext(ctx)
+	newCtx, newSpan := span.TracerProvider().Tracer(tracerName).Start(
+		ctx, spanNameConvert,
+		trace.WithSpanKind(trace.SpanKindInternal),
+		trace.WithAttributes(
+			attribute.String("ocis.thumbnails.converter.provider", "go"),
+			attribute.String("ocis.thumbnails.converter.type", "GgsDecoder"),
+		),
+	)
+	defer newSpan.End()
+
 	var buf bytes.Buffer
 	_, err := io.Copy(&buf, r)
 	if err != nil {
@@ -65,7 +95,7 @@ func (g GgsDecoder) Convert(r io.Reader) (interface{}, error) {
 			if converter == nil {
 				return nil, thumbnailerErrors.ErrNoConverterForExtractedImageFromGgsFile
 			}
-			img, err := converter.Convert(thumbnail)
+			img, err := converter.Convert(newCtx, thumbnail)
 			if err != nil {
 				return nil, errors.Wrap(err, `could not decode the image`)
 			}
@@ -79,7 +109,18 @@ func (g GgsDecoder) Convert(r io.Reader) (interface{}, error) {
 type AudioDecoder struct{}
 
 // Convert reads the audio file and extracts the thumbnail image from the id3 tag
-func (i AudioDecoder) Convert(r io.Reader) (interface{}, error) {
+func (i AudioDecoder) Convert(ctx context.Context, r io.Reader) (interface{}, error) {
+	span := trace.SpanFromContext(ctx)
+	newCtx, newSpan := span.TracerProvider().Tracer(tracerName).Start(
+		ctx, spanNameConvert,
+		trace.WithSpanKind(trace.SpanKindInternal),
+		trace.WithAttributes(
+			attribute.String("ocis.thumbnails.converter.provider", "go"),
+			attribute.String("ocis.thumbnails.converter.type", "AudioDecoder"),
+		),
+	)
+	defer newSpan.End()
+
 	b, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
@@ -99,7 +140,7 @@ func (i AudioDecoder) Convert(r io.Reader) (interface{}, error) {
 		return nil, thumbnailerErrors.ErrNoConverterForExtractedImageFromAudioFile
 	}
 
-	return converter.Convert(bytes.NewReader(picture.Data))
+	return converter.Convert(newCtx, bytes.NewReader(picture.Data))
 }
 
 // TxtToImageConverter is a converter for the text file
@@ -108,7 +149,18 @@ type TxtToImageConverter struct {
 }
 
 // Convert reads the text file and renders it into a thumbnail image
-func (t TxtToImageConverter) Convert(r io.Reader) (interface{}, error) {
+func (t TxtToImageConverter) Convert(ctx context.Context, r io.Reader) (interface{}, error) {
+	span := trace.SpanFromContext(ctx)
+	_, newSpan := span.TracerProvider().Tracer(tracerName).Start(
+		ctx, spanNameConvert,
+		trace.WithSpanKind(trace.SpanKindInternal),
+		trace.WithAttributes(
+			attribute.String("ocis.thumbnails.converter.provider", "go"),
+			attribute.String("ocis.thumbnails.converter.type", "TxtToImageConverter"),
+		),
+	)
+	defer newSpan.End()
+
 	img := image.NewRGBA(image.Rect(0, 0, 640, 480))
 
 	imgBounds := img.Bounds()
@@ -184,7 +236,18 @@ Scan: // Label for the scanner loop, so we can break it easily
 type BmpDecoder struct{}
 
 // Convert reads the bmp file and returns the decoded image
-func (b BmpDecoder) Convert(r io.Reader) (interface{}, error) {
+func (b BmpDecoder) Convert(ctx context.Context, r io.Reader) (interface{}, error) {
+	span := trace.SpanFromContext(ctx)
+	_, newSpan := span.TracerProvider().Tracer(tracerName).Start(
+		ctx, spanNameConvert,
+		trace.WithSpanKind(trace.SpanKindInternal),
+		trace.WithAttributes(
+			attribute.String("ocis.thumbnails.converter.provider", "go"),
+			attribute.String("ocis.thumbnails.converter.type", "BmpDecoder"),
+		),
+	)
+	defer newSpan.End()
+
 	img, err := bmp.Decode(r)
 	if err != nil {
 		return nil, errors.Wrap(err, `could not decode the bmp image`)
@@ -209,7 +272,18 @@ type GGPStruct struct {
 type GgpDecoder struct{}
 
 // Convert reads the ggp file and returns the first thumbnail image
-func (j GgpDecoder) Convert(r io.Reader) (interface{}, error) {
+func (j GgpDecoder) Convert(ctx context.Context, r io.Reader) (interface{}, error) {
+	span := trace.SpanFromContext(ctx)
+	_, newSpan := span.TracerProvider().Tracer(tracerName).Start(
+		ctx, spanNameConvert,
+		trace.WithSpanKind(trace.SpanKindInternal),
+		trace.WithAttributes(
+			attribute.String("ocis.thumbnails.converter.provider", "go"),
+			attribute.String("ocis.thumbnails.converter.type", "GgpDecoder"),
+		),
+	)
+	defer newSpan.End()
+
 	ggp := &GGPStruct{}
 	err := json.NewDecoder(r).Decode(ggp)
 	if err != nil {
