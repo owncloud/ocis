@@ -9,6 +9,10 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 )
 
+// defaultMaxConsecutiveFailures is the number of consecutive extraction
+// failures after which a space (re)index walk gives up on the extractor.
+const defaultMaxConsecutiveFailures = 5
+
 // FullDefaultConfig returns a fully initialized default configuration
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
@@ -46,6 +50,7 @@ func DefaultConfig() *config.Config {
 				TikaURL:        "http://127.0.0.1:9998",
 				CleanStopWords: true,
 			},
+			MaxConsecutiveFailures: defaultMaxConsecutiveFailures,
 		},
 		Events: config.Events{
 			Endpoint:         "127.0.0.1:9233",

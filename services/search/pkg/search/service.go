@@ -24,6 +24,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/tags"
 	"github.com/owncloud/reva/v2/pkg/utils"
+	"github.com/rs/zerolog"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
@@ -75,6 +76,12 @@ type Service struct {
 
 	serviceAccountID     string
 	serviceAccountSecret string
+
+	// maxConsecutiveFailures aborts an IndexSpace walk after this many
+	// consecutive extraction failures. 0 disables the abort.
+	maxConsecutiveFailures int
+	// extractionRetryDelay is the pause between extraction retries in IndexSpace.
+	extractionRetryDelay time.Duration
 }
 
 var errSkipSpace error
@@ -89,6 +96,13 @@ func NewService(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], eng e
 
 		serviceAccountID:     cfg.ServiceAccount.ServiceAccountID,
 		serviceAccountSecret: cfg.ServiceAccount.ServiceAccountSecret,
+
+		maxConsecutiveFailures: cfg.Extractor.MaxConsecutiveFailures,
+		extractionRetryDelay:   _extractionRetryDelay,
+	}
+
+	if s.maxConsecutiveFailures == 0 {
+		s.logger.Warn().Msg("SEARCH_EXTRACTOR_MAX_CONSECUTIVE_FAILURES is 0: a space reindex never aborts, even when the content extractor is down")
 	}
 
 	return s
@@ -455,11 +469,15 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 	return res, nil
 }
 
-// Retry constants for IndexSpace extraction failure handling.
+// Retry and outage constants for IndexSpace.
 const (
 	_extractionRetries    = 5               // max retry attempts per file
-	_extractionRetryDelay = 1 * time.Second // delay between retries
-	_consecutiveAbort     = 5               // abort walk after this many consecutive file failures
+	_extractionRetryDelay = 1 * time.Second // default delay between retries
+	// A walk in which at least _missingMinCount files were not found, and they
+	// are more than half of the files that needed work, fails at the end: the
+	// gateway answers NOT_FOUND when it cannot reach the storage provider, and
+	// that must not report the space as indexed.
+	_missingMinCount = 5
 )
 
 // IndexSpace (re)indexes all resources of a given space.
@@ -480,7 +498,14 @@ func (s *Service) IndexSpace(ctx context.Context, spaceID *provider.StorageSpace
 	}
 	rootID.OpaqueId = rootID.SpaceId
 
-	failures := 0
+	// failures counts extraction failures in a row. A file that was indexed or
+	// was already indexed and unchanged resets it; a file that is not found
+	// (deleted since it was listed) neither counts nor resets it.
+	var (
+		failures                                  int
+		indexedCount, unchangedCount, failedCount int
+		missingCount                              int
+	)
 
 	w := walker.NewWalker(s.gatewaySelector)
 	err = w.Walk(ownerCtx, &rootID, func(wd string, info *provider.ResourceInfo, err error) error {
@@ -493,17 +518,22 @@ func (s *Service) IndexSpace(ctx context.Context, spaceID *provider.StorageSpace
 			return nil
 		}
 
+		// A cancelled or timed-out walk must stop with an error, not carry on
+		// with failing lookups.
+		if err := ownerCtx.Err(); err != nil {
+			return fmt.Errorf("index walk stopped: %w", err)
+		}
+
 		relPath := utils.MakeRelativePath(filepath.Join(wd, info.Path))
 		if slices.Contains(_skipPathDirs, relPath) {
 			s.logger.Info().Str("path", relPath).Msg("skipping directory from being indexed")
 			return filepath.SkipDir
 		}
-
-		ref := &provider.Reference{
-			Path:       relPath,
-			ResourceId: &rootID,
+		if slices.Contains(_skipPathNames, relPath) {
+			return nil // the space root itself is never indexed
 		}
-		s.logger.Debug().Str("path", ref.Path).Msg("Walking tree")
+
+		s.logger.Debug().Str("path", relPath).Msg("Walking tree")
 		// Skip nodes still in postprocessing — their blob isn't in the
 		// blobstore yet. Their own UploadReady will re-trigger IndexSpace.
 		if utils.ReadPlainFromOpaque(info.Opaque, "status") == "processing" {
@@ -523,30 +553,70 @@ func (s *Service) IndexSpace(ctx context.Context, spaceID *provider.StorageSpace
 					// With O(1) DocID lookups the cost is negligible.
 					return nil
 				}
-				s.logger.Debug().Str("path", ref.Path).Msg("element hasn't changed. Skipping.")
+				s.logger.Debug().Str("path", relPath).Msg("element hasn't changed. Skipping.")
+				unchangedCount++
+				failures = 0
 				return nil
 			}
 		}
 
-		if err := s.upsertItem(ownerCtx, ref, _extractionRetries); err != nil {
+		// Resolve the node by its path. A stale node fails a Stat by path but
+		// the ID the walker listed still finds it. So retry by ID only after
+		// a not-found: a healthy file costs no extra GetPath call.
+		ref := &provider.Reference{Path: relPath, ResourceId: &rootID}
+		err = s.upsertItem(ownerCtx, ref, _extractionRetries)
+		if errors.Is(err, errResourceNotFound) && info.GetId() != nil {
+			s.logger.Debug().Str("path", relPath).Msg("resource not found by path, retrying by ID")
+			err = s.upsertItem(ownerCtx, &provider.Reference{ResourceId: info.GetId()}, _extractionRetries)
+		}
+		if err != nil {
+			if errors.Is(err, errResourceNotFound) {
+				missingCount++
+				s.logger.Debug().Err(err).Str("path", relPath).Msg("skipping resource that no longer exists")
+				return nil
+			}
+
 			failures++
+			failedCount++
 			s.logger.Warn().Err(err).
 				Int("failures", failures).
-				Str("path", ref.Path).
+				Str("path", relPath).
 				Msg("extraction failed after retries")
 
-			if failures >= _consecutiveAbort {
+			if s.maxConsecutiveFailures > 0 && failures >= s.maxConsecutiveFailures {
 				return fmt.Errorf("aborting index walk: %d consecutive extraction failures, last error: %w", failures, err)
 			}
 			return nil
 		}
 
+		indexedCount++
 		failures = 0
 		return nil
 	})
 
+	// The context check comes first: a walk cut short reports that, whatever
+	// the last file's error was.
+	if ctxErr := ownerCtx.Err(); ctxErr != nil {
+		return fmt.Errorf("index walk stopped: %w", ctxErr)
+	}
+
+	level := zerolog.InfoLevel
+	if failedCount > 0 || missingCount > 0 {
+		level = zerolog.WarnLevel
+	}
+	s.logger.WithLevel(level).Str("space", spaceID.GetOpaqueId()).
+		Int("indexed", indexedCount).
+		Int("unchanged", unchangedCount).
+		Int("failed", failedCount).
+		Int("not_found", missingCount).
+		Msg("index walk finished")
+
 	if err != nil {
 		return err
+	}
+
+	if attempted := indexedCount + failedCount + missingCount; missingCount >= _missingMinCount && missingCount*2 > attempted {
+		return fmt.Errorf("index walk incomplete: %d of %d files were not found, which suggests the storage provider was unreachable", missingCount, attempted)
 	}
 
 	logDocCount(s.engine, s.logger)
@@ -564,7 +634,12 @@ func (s *Service) TrashItem(_ context.Context, rID *provider.ResourceId) {
 
 // UpsertItem indexes or stores Resource data fields.
 func (s *Service) UpsertItem(ctx context.Context, ref *provider.Reference) {
-	if err := s.upsertItem(ctx, ref, 0); err != nil {
+	err := s.upsertItem(ctx, ref, 0)
+	switch {
+	case err == nil:
+	case errors.Is(err, errResourceNotFound):
+		s.logger.Debug().Err(err).Msg("resource to upsert no longer exists")
+	default:
 		s.logger.Error().Err(err).Msg("failed to upsert resource")
 	}
 }
@@ -572,9 +647,9 @@ func (s *Service) UpsertItem(ctx context.Context, ref *provider.Reference) {
 // upsertItem is the core extraction-and-index method. When retries > 0,
 // a failed extraction is retried up to that many times with a fixed delay.
 func (s *Service) upsertItem(ctx context.Context, ref *provider.Reference, retries int) error {
-	ctx2, stat, path := s.resInfo(ctx, ref)
-	if ctx2 == nil || stat == nil || path == "" {
-		return fmt.Errorf("could not resolve resource info for %s", ref.GetPath())
+	ctx2, stat, path, err := s.resolve(ctx, ref)
+	if err != nil {
+		return fmt.Errorf("could not resolve resource info for %s: %w", refString(ref), err)
 	}
 
 	if slices.Contains(_skipPathNames, path) || slices.Contains(_skipPathDirs, path) {
@@ -592,7 +667,6 @@ func (s *Service) upsertItem(ctx context.Context, ref *provider.Reference, retri
 	resourceID := storagespace.FormatResourceID(stat.Info.Id)
 
 	var doc content.Document
-	var err error
 	for attempt := range retries + 1 {
 		doc, err = s.extractor.Extract(ctx2, stat.Info)
 		if err == nil {
@@ -601,13 +675,19 @@ func (s *Service) upsertItem(ctx context.Context, ref *provider.Reference, retri
 		if attempt < retries {
 			s.logger.Debug().Err(err).
 				Int("attempt", attempt+1).
-				Str("path", ref.Path).
+				Str("path", path).
 				Msg("extraction attempt failed, retrying")
-			time.Sleep(_extractionRetryDelay)
+			t := time.NewTimer(s.extractionRetryDelay)
+			select {
+			case <-ctx.Done():
+				t.Stop()
+				return fmt.Errorf("extraction for %s stopped: %w", path, ctx.Err())
+			case <-t.C:
+			}
 		}
 	}
 	if err != nil {
-		return fmt.Errorf("extraction failed for %s: %w", ref.Path, err)
+		return fmt.Errorf("extraction failed for %s: %w", path, err)
 	}
 
 	r := engine.Resource{
@@ -629,7 +709,7 @@ func (s *Service) upsertItem(ctx context.Context, ref *provider.Reference, retri
 	}
 
 	if err = s.engine.Upsert(r.ID, r); err != nil {
-		return fmt.Errorf("index upsert for %s: %w", ref.Path, err)
+		return fmt.Errorf("index upsert for %s: %w", path, err)
 	}
 
 	logDocCount(s.engine, s.logger)
@@ -795,21 +875,59 @@ func (s *Service) MoveItem(ctx context.Context, ref *provider.Reference) {
 	}
 }
 
+// resInfo is resolve for the event handlers (UpdateTags, RestoreItem, MoveItem).
+// It logs a failure once and returns nils, except when only the path could not
+// be resolved: then it still returns the Stat result with an empty path, as
+// before, so UpdateTags (which needs only the Stat result) still works.
 func (s *Service) resInfo(ctx context.Context, ref *provider.Reference) (context.Context, *provider.StatResponse, string) {
+	ctx2, stat, path, err := s.resolve(ctx, ref)
+	switch {
+	case err == nil:
+		return ctx2, stat, path
+	case errors.Is(err, errPathNotResolved):
+		s.logger.Debug().Err(err).Str("ref", refString(ref)).Msg("could not resolve the resource's path")
+		return ctx2, stat, ""
+	case errors.Is(err, errResourceNotFound):
+		s.logger.Debug().Err(err).Str("ref", refString(ref)).Msg("resource no longer exists")
+	default:
+		s.logger.Warn().Err(err).Str("ref", refString(ref)).Msg("could not resolve resource info")
+	}
+	return nil, nil, ""
+}
+
+// resolve returns the auth context, Stat response and space-relative path of
+// ref. Stat CODE_NOT_FOUND is errResourceNotFound and a non-OK GetPath is
+// errPathNotResolved (with the Stat result still returned); every other
+// failure (auth, gateway, transport, deadline) is returned as its own error.
+func (s *Service) resolve(ctx context.Context, ref *provider.Reference) (context.Context, *provider.StatResponse, string, error) {
 	ownerCtx, err := getAuthContext(ctx, s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
 	if err != nil {
-		return nil, nil, ""
+		return nil, nil, "", fmt.Errorf("auth context: %w", err)
 	}
 
-	statRes, err := statResource(ownerCtx, ref, s.gatewaySelector, s.logger)
+	statRes, err := statResource(ownerCtx, ref, s.gatewaySelector)
 	if err != nil {
-		return nil, nil, ""
+		return nil, nil, "", err
 	}
 
 	r, err := ResolveReference(ownerCtx, ref, statRes.GetInfo(), s.gatewaySelector)
 	if err != nil {
-		return nil, nil, ""
+		if errors.Is(err, errPathNotResolved) {
+			return ownerCtx, statRes, "", err
+		}
+		return nil, nil, "", fmt.Errorf("get path: %w", err)
+	}
+	if r.GetPath() == "" {
+		return ownerCtx, statRes, "", errPathNotResolved
 	}
 
-	return ownerCtx, statRes, r.GetPath()
+	return ownerCtx, statRes, r.GetPath(), nil
+}
+
+// refString describes ref for logs and errors: its path, or its resource ID.
+func refString(ref *provider.Reference) string {
+	if p := ref.GetPath(); p != "" {
+		return p
+	}
+	return storagespace.FormatResourceID(ref.GetResourceId())
 }
