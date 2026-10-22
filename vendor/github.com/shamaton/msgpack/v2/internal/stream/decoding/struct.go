@@ -48,10 +48,20 @@ func (d *decoder) setStruct(code byte, rv reflect.Value, k reflect.Kind) error {
 		}
 	}
 
-	if d.asArray {
-		return d.setStructFromArray(code, rv, k)
+	if err := d.enter(); err != nil {
+		return err
 	}
-	return d.setStructFromMap(code, rv, k)
+	var err error
+	if d.asArray {
+		err = d.setStructFromArray(code, rv, k)
+	} else {
+		err = d.setStructFromMap(code, rv, k)
+	}
+	if err != nil {
+		return err
+	}
+	d.depth--
+	return nil
 }
 
 func (d *decoder) setStructFromArray(code byte, rv reflect.Value, k reflect.Kind) error {
