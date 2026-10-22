@@ -166,6 +166,33 @@ var _ = Describe("Tika", func() {
 			Expect(audio.Year).To(Equal(libregraph.PtrInt32(2004)))
 		})
 
+		DescribeTable("skips an audio duration that is not a valid number of seconds",
+			func(duration string) {
+				fullResponse = fmt.Sprintf(`[
+					{
+						"xmpDM:genre": "Rock",
+						"xmpDM:duration": %q,
+						"Content-Type": "audio/mpeg"
+					}
+				]`, duration)
+				doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+					Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+					Size: 1,
+				})
+				Expect(err).ToNot(HaveOccurred())
+
+				audio := doc.Audio
+				Expect(audio).ToNot(BeNil())
+				Expect(audio.Genre).To(Equal(libregraph.PtrString("Rock")))
+				Expect(audio.Duration).To(BeNil())
+			},
+			Entry("NaN", "NaN"),
+			Entry("Inf", "Inf"),
+			Entry("-Inf", "-Inf"),
+			Entry("negative", "-1.5"),
+			Entry("too large for int64 milliseconds", "1e300"),
+		)
+
 		It("adds location content", func() {
 			fullResponse = `[
 				{

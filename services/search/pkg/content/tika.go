@@ -283,9 +283,10 @@ func (t Tika) getAudio(meta map[string][]string) *libregraph.Audio {
 
 	//  TODO: audio.DiscCount: not provided by tika
 
-	// tika reports the duration in seconds, usually with a fractional part, e.g. "225.62"
+	// tika reports the duration in seconds, usually with a fractional part, e.g. "225.62".
+	// ParseFloat also accepts NaN, Inf and values that don't fit an int64 in milliseconds, skip those.
 	if v, err := getFirstValue(meta, "xmpDM:duration"); err == nil {
-		if f, err := strconv.ParseFloat(v, 64); err == nil {
+		if f, err := strconv.ParseFloat(v, 64); err == nil && !math.IsNaN(f) && !math.IsInf(f, 0) && f >= 0 && f <= math.MaxInt64/1000 {
 			initAudio()
 			audio.SetDuration(int64(math.Round(f * 1000)))
 		}
