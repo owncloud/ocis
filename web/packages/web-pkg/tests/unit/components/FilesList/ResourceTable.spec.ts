@@ -827,6 +827,15 @@ describe('ResourceTable', () => {
       expect(wrapper.findAll('.resource-table-shared-with .oc-avatar').length).toBe(1)
     })
   })
+  describe('"shared by" field', () => {
+    it('can be sorted, A to Z first', async () => {
+      const { wrapper } = getMountedWrapper()
+
+      await wrapper.find('.oc-table-header-cell-sharedBy .oc-button-sort').trigger('click')
+
+      expect(wrapper.emitted('sort')).toEqual([[{ sortBy: 'sharedBy', sortDir: 'asc' }]])
+    })
+  })
   describe('rename action', () => {
     it('shows if available', () => {
       const { wrapper } = getMountedWrapper()
