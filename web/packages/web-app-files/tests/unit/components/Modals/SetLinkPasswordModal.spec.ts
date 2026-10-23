@@ -10,6 +10,51 @@ describe('SetLinkPasswordModal', () => {
 
     expect(wrapper.find('oc-text-input-stub').exists()).toBeTruthy()
   })
+  describe('confirm disabled state', () => {
+    it('emits update:confirmDisabled with true after mount', () => {
+      const { wrapper } = getWrapper()
+
+      expect(wrapper.emitted('update:confirmDisabled')).toContainEqual([true])
+    })
+    it('re-emits update:confirmDisabled with true when the field is cleared', async () => {
+      const { wrapper } = getWrapper()
+      const input = wrapper.findComponent({ name: 'OcTextInput' })
+
+      await input.vm.$emit('update:modelValue', 'abc')
+      await input.vm.$emit('update:modelValue', '')
+
+      const emissions = wrapper.emitted('update:confirmDisabled')
+      expect(emissions[emissions.length - 1]).toEqual([true])
+    })
+    it('does not emit update:confirmDisabled when a non-empty value is entered', async () => {
+      const { wrapper } = getWrapper()
+      const input = wrapper.findComponent({ name: 'OcTextInput' })
+      const emissionCountAfterMount = wrapper.emitted('update:confirmDisabled').length
+
+      await input.vm.$emit('update:modelValue', 'abc')
+
+      expect(wrapper.emitted('update:confirmDisabled').length).toBe(emissionCountAfterMount)
+    })
+  })
+  describe('pressing Enter in the password field', () => {
+    it('does not emit confirm when the field is untouched/empty', async () => {
+      const { wrapper } = getWrapper()
+      const input = wrapper.findComponent({ name: 'OcTextInput' })
+
+      await input.trigger('keydown.enter')
+
+      expect(wrapper.emitted('confirm')).toBeFalsy()
+    })
+    it('emits confirm after entering a value', async () => {
+      const { wrapper } = getWrapper()
+      const input = wrapper.findComponent({ name: 'OcTextInput' })
+
+      await input.vm.$emit('update:modelValue', 'abc')
+      await input.trigger('keydown.enter')
+
+      expect(wrapper.emitted('confirm')).toBeTruthy()
+    })
+  })
   describe('method "onConfirm"', () => {
     it('updates the link', async () => {
       const { wrapper } = getWrapper()

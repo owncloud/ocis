@@ -10,13 +10,13 @@
     class="oc-modal-body-input"
     @password-challenge-completed="$emit('update:confirmDisabled', false)"
     @password-challenge-failed="$emit('update:confirmDisabled', true)"
-    @keydown.enter.prevent="$emit('confirm')"
+    @keydown.enter.prevent="onEnter"
     @update:model-value="onInput"
   />
 </template>
 
 <script lang="ts" setup>
-import { ref, unref } from 'vue'
+import { onMounted, ref, unref } from 'vue'
 import { useGettext } from 'vue3-gettext'
 import { upperFirst } from 'lodash-es'
 import {
@@ -40,7 +40,7 @@ interface Emits {
 }
 const { space, resource, link, callbackFn = undefined } = defineProps<Props>()
 
-defineEmits<Emits>()
+const emit = defineEmits<Emits>()
 
 const { showMessage, showErrorMessage } = useMessages()
 const clientService = useClientService()
@@ -54,6 +54,21 @@ const errorMessage = ref<string>()
 const onInput = (value: string) => {
   password.value = value
   errorMessage.value = undefined
+  if (value === '') {
+    emit('update:confirmDisabled', true)
+  }
+}
+
+onMounted(() => {
+  // an empty password removes the link's password, so confirm starts disabled
+  emit('update:confirmDisabled', true)
+})
+
+const onEnter = () => {
+  if (unref(password) === '') {
+    return
+  }
+  emit('confirm')
 }
 
 const onConfirm = async () => {
