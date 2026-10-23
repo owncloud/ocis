@@ -18,5 +18,7 @@ func NewStream(cfg *config.Config) (events.Stream, error) {
 		TLSRootCACertificate: cfg.Events.TLSRootCaCertPath,
 		AuthUsername:         cfg.Events.AuthUsername,
 		AuthPassword:         cfg.Events.AuthPassword,
+		CredsFile:            cfg.Events.CredsFile,
+		Creds:                cfg.Events.Creds,
 	})
 }
