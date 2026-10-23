@@ -26,6 +26,8 @@ invalid value.
 
 The NATS health checks of the services now use the same authentication and TLS
 settings as the service connections. Before this change, the health checks
-connected without credentials and without TLS.
+connected without credentials and without TLS. The proxy health check also used
+the events cluster ID as the NATS address. It now uses the events endpoint and
+skips the check when the endpoint is empty.
 
 https://github.com/owncloud/ocis/pull/13219
