@@ -7,6 +7,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	"github.com/owncloud/reva/v2/pkg/events/stream"
 )
 
 // Server initializes the debug service and server.
@@ -18,7 +19,7 @@ func Server(opts ...Option) (*http.Server, error) {
 		WithCheck("web reachability", checks.NewHTTPCheck(options.Config.HTTP.Addr))
 
 	readyHandlerConfiguration := healthHandlerConfiguration.
-		WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Events.Endpoint))
+		WithCheck("nats reachability", checks.NewNatsCheckWithConfig(options.Config.Events.Endpoint, stream.NatsConfig(options.Config.Events)))
 
 	return debug.NewService(
 		debug.Logger(options.Logger),

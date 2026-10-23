@@ -81,6 +81,8 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 						"tlsrootcacertificate": cfg.Events.TLSRootCACertificate,
 						"authusername":         cfg.Events.AuthUsername,
 						"authpassword":         cfg.Events.AuthPassword,
+						"credsfile":            cfg.Events.CredsFile,
+						"creds":                cfg.Events.Creds,
 					},
 				},
 				"ocmd": map[string]interface{}{
@@ -177,6 +179,8 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 						"tlsrootcacertificate": cfg.Events.TLSRootCACertificate,
 						"authusername":         cfg.Events.AuthUsername,
 						"authpassword":         cfg.Events.AuthPassword,
+						"credsfile":            cfg.Events.CredsFile,
+						"creds":                cfg.Events.Creds,
 					},
 				},
 				"storageprovider": map[string]interface{}{

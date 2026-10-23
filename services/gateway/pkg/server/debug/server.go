@@ -8,6 +8,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	"github.com/owncloud/reva/v2/pkg/events/stream"
 )
 
 // Server initializes the debug service and server.
@@ -18,7 +19,16 @@ func Server(opts ...Option) (*http.Server, error) {
 		WithLogger(options.Logger).
 		WithCheck("nats reachability", func(ctx context.Context) error {
 			if options.Config.Cache.ProviderCacheStore == "nats-js-kv" && len(options.Config.Cache.ProviderCacheNodes) > 0 {
-				return checks.NewNatsCheck(options.Config.Cache.ProviderCacheNodes[0])(ctx)
+				c := options.Config.Cache
+				return checks.NewNatsCheckWithConfig(c.ProviderCacheNodes[0], stream.NatsConfig{
+					TLSInsecure:          c.ProviderCacheTLSInsecure,
+					TLSRootCACertificate: c.ProviderCacheTLSRootCACertificate,
+					EnableTLS:            c.ProviderCacheEnableTLS,
+					AuthUsername:         c.ProviderCacheAuthUsername,
+					AuthPassword:         c.ProviderCacheAuthPassword,
+					CredsFile:            c.ProviderCacheCredsFile,
+					Creds:                c.ProviderCacheCreds,
+				})(ctx)
 			}
 			return nil
 		})
