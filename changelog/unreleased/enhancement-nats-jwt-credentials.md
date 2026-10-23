@@ -24,6 +24,10 @@ When JWT credentials are set, oCIS does not send the username and the
 password. oCIS checks the credentials at startup and gives a clear error for an
 invalid value.
 
+The embedded nats service does not support JWT mode. To use JWT
+authentication, run an external NATS cluster in operator mode and do not start
+the embedded nats service, for example with `OCIS_EXCLUDE_RUN_SERVICES=nats`.
+
 The NATS health checks of the services now use the same authentication and TLS
 settings as the service connections. Before this change, the health checks
 connected without credentials and without TLS. The proxy health check also used
