@@ -157,7 +157,7 @@ type Events struct {
 	AuthUsername      string `yaml:"auth_username" env:"OCIS_EVENTS_AUTH_USERNAME;SHARING_EVENTS_AUTH_USERNAME" desc:"Username for the events broker." introductionVersion:"5.0"`
 	AuthPassword      string `yaml:"auth_password" env:"OCIS_EVENTS_AUTH_PASSWORD;SHARING_EVENTS_AUTH_PASSWORD" desc:"Password for the events broker." introductionVersion:"5.0"`
 	CredsFile         string `yaml:"creds_file" env:"OCIS_NATS_CREDS_FILE;SHARING_EVENTS_CREDS_FILE" desc:"Path to a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate with the events broker when NATS runs in JWT (operator) mode. When set, the username and the password are not used. The file is read again on each reconnect." introductionVersion:"8.3.0"`
-	Creds             string `mask:"password" yaml:"creds" env:"OCIS_NATS_CREDS;SHARING_EVENTS_CREDS" desc:"Content of a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate with the events broker when NATS runs in JWT (operator) mode. Takes precedence over the path of a .creds file. When set, the username and the password are not used." introductionVersion:"8.3.0"`
+	Creds             string `mask:"password" yaml:"creds" env:"OCIS_NATS_CREDS;SHARING_EVENTS_CREDS" desc:"Content of a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate with the events broker when NATS runs in JWT (operator) mode. A service-specific variable takes precedence over a global variable. In the same scope, the content takes precedence over the path of a .creds file. When set, the username and the password are not used." introductionVersion:"8.3.0"`
 }
 
 // PasswordPolicy configures reva password policy
