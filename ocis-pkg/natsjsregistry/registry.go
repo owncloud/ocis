@@ -10,10 +10,12 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	natsjskv "github.com/go-micro/plugins/v4/store/nats-js-kv"
 	"github.com/nats-io/nats.go"
+	"github.com/nats-io/nkeys"
 	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/reva/v2/pkg/natsauth"
 	revastore "github.com/owncloud/reva/v2/pkg/store"
@@ -75,6 +77,9 @@ type storeregistry struct {
 	typ        string
 	defaultTTL time.Duration
 	lock       sync.RWMutex
+
+	// credsChecked is true after the first check of the NATS credentials.
+	credsChecked atomic.Bool
 }
 
 // Init inits the registry
@@ -221,7 +226,7 @@ func (n *storeregistry) storeOptions(opts registry.Options) []store.Option {
 	natsOptions := nats.GetDefaultOptions()
 	natsOptions.Name = generators.GenerateConnectionName(serviceName, generators.NTypeRegistry)
 	natsOptions.User, natsOptions.Password = getAuth()
-	credsOpt, err := natsauth.CredentialsOption(getCreds())
+	credsOpt, err := n.credentialsOption()
 	if err != nil {
 		fmt.Println("cannot use the nats credentials of the registry:", err)
 		os.Exit(1)
@@ -255,6 +260,56 @@ func (n *storeregistry) storeOptions(opts registry.Options) []store.Option {
 
 func getAuth() (string, string) {
 	return os.Getenv(_registryUsernameEnv), os.Getenv(_registryPasswordEnv)
+}
+
+// credentialsOption returns the nats.Option for the JWT credentials of the registry.
+//
+// Only the first call checks the credentials, at startup. An invalid value then stops
+// the service. Later calls happen in Init, for example after a reconnect. A rotated
+// .creds file can then be partly written. So later calls do not check the file and do
+// not read it. The connection reads the file on each connect and retries on an error.
+func (n *storeregistry) credentialsOption() (nats.Option, error) {
+	credsFile, creds := getCreds()
+	if !n.credsChecked.Swap(true) {
+		return natsauth.CredentialsOption(credsFile, creds)
+	}
+	switch {
+	case creds != "":
+		// the content cannot change at runtime, it was checked at startup
+		return nats.UserCredentialBytes([]byte(creds)), nil
+	case credsFile != "":
+		return lazyCredsFileOption(credsFile), nil
+	default:
+		return nil, nil
+	}
+}
+
+// lazyCredsFileOption sets the JWT callbacks for a .creds file. Unlike nats.UserCredentials,
+// it does not read the file when the option is applied. The callbacks read the file on
+// each connect.
+func lazyCredsFileOption(credsFile string) nats.Option {
+	return func(o *nats.Options) error {
+		o.UserJWT = func() (string, error) {
+			content, err := os.ReadFile(credsFile)
+			if err != nil {
+				return "", err
+			}
+			return nkeys.ParseDecoratedJWT(content)
+		}
+		o.SignatureCB = func(nonce []byte) ([]byte, error) {
+			content, err := os.ReadFile(credsFile)
+			if err != nil {
+				return nil, err
+			}
+			kp, err := nkeys.ParseDecoratedUserNKey(content)
+			if err != nil {
+				return nil, err
+			}
+			defer kp.Wipe()
+			return kp.Sign(nonce)
+		}
+		return nil
+	}
 }
 
 // getCreds returns the path and the content of the NATS .creds file for the registry.
