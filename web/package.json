@@ -132,7 +132,7 @@
       "colord": "2.9.4",
       "markdown-it": "14.3.3",
       "esbuild": "0.28.1",
-      "dompurify": "3.4.16",
+      "dompurify": "3.4.17",
       "qs": "6.16.0"
     },
     "patchedDependencies": {
