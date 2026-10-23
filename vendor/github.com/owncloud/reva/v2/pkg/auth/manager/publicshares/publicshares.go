@@ -64,6 +64,8 @@ type config struct {
 	StoreEnableTLS        bool          `mapstructure:"store_enable_tls"`
 	StoreTLSInsecure      bool          `mapstructure:"store_tls_insecure"`
 	StoreTLSRootCACert    string        `mapstructure:"store_tls_root_ca_certificate"`
+	StoreCredsFile        string        `mapstructure:"store_creds_file"`
+	StoreCreds            string        `mapstructure:"store_creds"`
 }
 
 func parseConfig(m map[string]interface{}) (*config, error) {
@@ -89,6 +91,7 @@ func New(m map[string]interface{}) (auth.Manager, error) {
 		microstore.Database(mgr.c.StoreDatabase),
 		microstore.Table(mgr.c.StoreTable),
 		store.Authentication(mgr.c.StoreUsername, mgr.c.StorePassword),
+		store.Credentials(mgr.c.StoreCredsFile, mgr.c.StoreCreds),
 		store.TLS(mgr.c.StoreEnableTLS, mgr.c.StoreTLSInsecure, mgr.c.StoreTLSRootCACert),
 	)
 	mgr.bfp = NewBruteForceProtection(revaStore, mgr.c.BruteForceTimeGap, mgr.c.BruteForceMaxAttempts)

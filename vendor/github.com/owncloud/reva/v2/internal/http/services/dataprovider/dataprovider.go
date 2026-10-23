@@ -51,6 +51,8 @@ type config struct {
 	NatsEnableTLS      bool                              `mapstructure:"nats_enable_tls"`
 	NatsUsername       string                            `mapstructure:"nats_username"`
 	NatsPassword       string                            `mapstructure:"nats_password"`
+	NatsCredsFile      string                            `mapstructure:"nats_creds_file"`
+	NatsCreds          string                            `mapstructure:"nats_creds"`
 }
 
 func (c *config) init() {
@@ -91,6 +93,8 @@ func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) 
 			TLSRootCACertificate: conf.NatsRootCACertPath,
 			AuthUsername:         conf.NatsUsername,
 			AuthPassword:         conf.NatsPassword,
+			CredsFile:            conf.NatsCredsFile,
+			Creds:                conf.NatsCreds,
 		})
 		if err != nil {
 			return nil, err

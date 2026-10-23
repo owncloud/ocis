@@ -10,9 +10,10 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff"
+	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/logger"
-	"github.com/go-micro/plugins/v4/events/natsjs"
+	"github.com/owncloud/reva/v2/pkg/natsauth"
 )
 
 // NatsConfig is the configuration needed for a NATS event stream
@@ -24,11 +25,17 @@ type NatsConfig struct {
 	EnableTLS            bool   `mapstructure:"enable-tls"`       // Enable TLS
 	AuthUsername         string `mapstructure:"username"`         // Username for authentication
 	AuthPassword         string `mapstructure:"password"`         // Password for authentication
-
+	CredsFile            string `mapstructure:"creds-file"`       // Path to a NATS .creds file for JWT authentication
+	Creds                string `mapstructure:"creds"`            // Content of a NATS .creds file for JWT authentication. Takes precedence over CredsFile
 }
 
 // NatsFromConfig returns a nats stream from the given config
 func NatsFromConfig(connName string, disableDurability bool, cfg NatsConfig) (events.Stream, error) {
+	credsOpt, err := natsauth.CredentialsOption(cfg.CredsFile, cfg.Creds)
+	if err != nil {
+		return nil, err
+	}
+
 	var tlsConf *tls.Config
 	if cfg.EnableTLS {
 		var rootCAPool *x509.CertPool
@@ -58,7 +65,15 @@ func NatsFromConfig(connName string, disableDurability bool, cfg NatsConfig) (ev
 		natsjs.ClusterID(cfg.Cluster),
 		natsjs.SynchronousPublish(true),
 		natsjs.Name(connName),
-		natsjs.Authenticate(cfg.AuthUsername, cfg.AuthPassword),
+	}
+
+	if credsOpt != nil {
+		if cfg.AuthUsername != "" || cfg.AuthPassword != "" {
+			logger.New().Warn().Str("connection", connName).Msg("nats jwt credentials are configured, ignoring username and password")
+		}
+		opts = append(opts, natsjs.NatsOptions(credsOpt))
+	} else {
+		opts = append(opts, natsjs.Authenticate(cfg.AuthUsername, cfg.AuthPassword))
 	}
 
 	if disableDurability {

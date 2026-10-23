@@ -57,6 +57,8 @@ type Config struct {
 	EnableTLS          bool          `mapstructure:"cache_enable_tls"`
 	TLSInsecure        bool          `mapstructure:"cache_tls_insecure"`
 	TLSRootCACert      string        `mapstructure:"cache_tls_root_ca_certificate"`
+	CredsFile          string        `mapstructure:"cache_creds_file"`
+	Creds              string        `mapstructure:"cache_creds"`
 }
 
 // Cache handles key value operations on caches
@@ -253,6 +255,7 @@ func getStore(cfg Config) microstore.Store {
 		store.Size(cfg.Size),
 		store.DisablePersistence(cfg.DisablePersistence),
 		store.Authentication(cfg.AuthUsername, cfg.AuthPassword),
+		store.Credentials(cfg.CredsFile, cfg.Creds),
 		store.TLS(cfg.EnableTLS, cfg.TLSInsecure, cfg.TLSRootCACert),
 	)
 }
