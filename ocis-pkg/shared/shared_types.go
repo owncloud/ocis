@@ -79,7 +79,7 @@ type Cache struct {
 	TTL                  time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL" desc:"Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h." introductionVersion:"pre5.0"`
 	DisablePersistence   bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"5.0"`
 	AuthUsername         string        `yaml:"auth_username" env:"OCIS_CACHE_AUTH_USERNAME" desc:"The username to use for authentication. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
-	AuthPassword         string        `yaml:"auth_password" env:"OCIS_CACHE_AUTH_PASSWORD" desc:"The password to use for authentication. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
+	AuthPassword         string        `mask:"password" yaml:"auth_password" env:"OCIS_CACHE_AUTH_PASSWORD" desc:"The password to use for authentication. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"pre5.0"`
 	CredsFile            string        `yaml:"creds_file" env:"OCIS_NATS_CREDS_FILE" desc:"Path to a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate with the cache when NATS runs in JWT (operator) mode. When set, the username and the password are not used. The file is read again on each reconnect. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
 	Creds                string        `mask:"password" yaml:"creds" env:"OCIS_NATS_CREDS" desc:"Content of a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate with the cache when NATS runs in JWT (operator) mode. Takes precedence over the path of a .creds file. When set, the username and the password are not used. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
 	EnableTLS            bool          `yaml:"enable_tls" env:"OCIS_CACHE_ENABLE_TLS" desc:"Activate TLS for the connection to the NATS store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"8.3.0"`
@@ -92,7 +92,7 @@ type Cache struct {
 type Commons struct {
 	Log               *Log               `yaml:"log"`
 	Tracing           *Tracing           `yaml:"tracing"`
-	Cache             *Cache             `yaml:"cache"`
+	Cache             *Cache             `mask:"struct" yaml:"cache"`
 	GRPCClientTLS     *GRPCClientTLS     `yaml:"grpc_client_tls"`
 	GRPCClientOptions *GRPCClientOptions `yaml:"grpc_client_options"`
 	GRPCServiceTLS    *GRPCServiceTLS    `yaml:"grpc_service_tls"`
