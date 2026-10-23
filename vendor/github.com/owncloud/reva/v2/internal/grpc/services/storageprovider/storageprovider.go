@@ -81,6 +81,8 @@ type eventconfig struct {
 	EnableTLS            bool   `mapstructure:"nats_enable_tls" docs:"events tls switch"`
 	AuthUsername         string `mapstructure:"nats_username" docs:"event stream username"`
 	AuthPassword         string `mapstructure:"nats_password" docs:"event stream password"`
+	CredsFile            string `mapstructure:"nats_creds_file" docs:"path to a nats .creds file for jwt authentication"`
+	Creds                string `mapstructure:"nats_creds" docs:"content of a nats .creds file for jwt authentication, takes precedence over nats_creds_file"`
 }
 
 func (c *config) init() {
