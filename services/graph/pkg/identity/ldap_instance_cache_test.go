@@ -18,6 +18,7 @@ var instanceMapperConfig = config.LDAP{
 	UserIDAttribute:          "entryUUID",
 	UserEmailAttribute:       "mail",
 	UserNameAttribute:        "uid",
+	UserSurnameAttribute:     "sn",
 
 	GroupBaseDN:          "ou=groups,dc=test",
 	GroupObjectClass:     "groupOfNames",

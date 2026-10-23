@@ -27,7 +27,6 @@ import (
 
 const (
 	givenNameAttribute  = "givenname"
-	surNameAttribute    = "sn"
 	identitiesAttribute = "oCExternalIdentity"
 	lastSignAttribute   = "oCLastSignInTimestamp"
 	ldapDateFormat      = "20060102150405Z0700"
@@ -145,7 +144,8 @@ func ParseDisableMechanismType(disableMechanism string) (DisableUserMechanismTyp
 
 func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, instanceID string, masterID string) (*LDAP, error) {
 	if config.UserDisplayNameAttribute == "" || config.UserIDAttribute == "" ||
-		config.UserEmailAttribute == "" || config.UserNameAttribute == "" {
+		config.UserEmailAttribute == "" || config.UserNameAttribute == "" ||
+		config.UserSurnameAttribute == "" {
 		return nil, errors.New("invalid user attribute mappings")
 	}
 	uam := userAttributeMap{
@@ -155,7 +155,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		userName:            config.UserNameAttribute,
 		accountEnabled:      config.UserEnabledAttribute,
 		givenName:           givenNameAttribute,
-		surname:             surNameAttribute,
+		surname:             config.UserSurnameAttribute,
 		userType:            config.UserTypeAttribute,
 		identities:          identitiesAttribute,
 		lastSignIn:          lastSignAttribute,
@@ -525,6 +525,21 @@ func (i *LDAP) AddUser(ctx context.Context, id string, instanceID string) (libre
 	return *u, nil
 }
 
+// userSearchFilter deliberately excludes mail from the OR-filter: matching on
+// email address would leak which address belongs to which account.
+func (i *LDAP) userSearchFilter(term string) string {
+	if term == "" {
+		return ""
+	}
+	term = ldap.EscapeFilter(term)
+	return fmt.Sprintf(
+		"(|(%s=*%s*)(%s=*%s*)(%s=*%s*))",
+		i.userAttributeMap.userName, term,
+		i.userAttributeMap.displayName, term,
+		i.userAttributeMap.surname, term,
+	)
+}
+
 func (i *LDAP) getUserByDN(dn, searchTerm string) (*ldap.Entry, error) {
 	baseFilter := fmt.Sprintf("(objectClass=%s)", i.userObjectClass)
 
@@ -532,16 +547,7 @@ func (i *LDAP) getUserByDN(dn, searchTerm string) (*ldap.Entry, error) {
 	if i.userFilter != "" {
 		userFilter = fmt.Sprintf("(%s)", i.userFilter)
 	}
-	searchFilter := ""
-	if searchTerm != "" {
-		searchTerm = ldap.EscapeFilter(searchTerm)
-		searchFilter = fmt.Sprintf(
-			"(|(%s=*%s*)(%s=*%s*)(%s=*%s*))",
-			i.userAttributeMap.userName, searchTerm,
-			i.userAttributeMap.mail, searchTerm,
-			i.userAttributeMap.displayName, searchTerm,
-		)
-	}
+	searchFilter := i.userSearchFilter(searchTerm)
 
 	filter := baseFilter
 	if userFilter != "" || searchFilter != "" {
@@ -805,16 +811,7 @@ func (i *LDAP) FilterUsers(ctx context.Context, oreq *godata.GoDataRequest, filt
 		return nil, err
 	}
 
-	var userFilter string
-	if search != "" {
-		search = ldap.EscapeFilter(search)
-		userFilter = fmt.Sprintf(
-			"(|(%s=*%s*)(%s=*%s*)(%s=*%s*))",
-			i.userAttributeMap.userName, search,
-			i.userAttributeMap.mail, search,
-			i.userAttributeMap.displayName, search,
-		)
-	}
+	userFilter := i.userSearchFilter(search)
 	userFilter = fmt.Sprintf("(&%s(objectClass=%s)%s%s)", i.userFilter, i.userObjectClass, queryFilter, userFilter)
 	searchRequest := ldap.NewSearchRequest(
 		i.userBaseDN, i.userScope, ldap.NeverDerefAliases, 0, 0, false,
@@ -1408,16 +1405,7 @@ func (i *LDAP) expandLDAPAttributeEntriesByUsername(ctx context.Context, e *ldap
 	logger.Debug().Str("backend", "ldap").Msg("ExpandLDAPAttributeEntries")
 	result := []*ldap.Entry{}
 
-	searchFilter := ""
-	if searchTerm != "" {
-		searchTerm = ldap.EscapeFilter(searchTerm)
-		searchFilter = fmt.Sprintf(
-			"(|(%s=*%s*)(%s=*%s*)(%s=*%s*))",
-			i.userAttributeMap.userName, searchTerm,
-			i.userAttributeMap.mail, searchTerm,
-			i.userAttributeMap.displayName, searchTerm,
-		)
-	}
+	searchFilter := i.userSearchFilter(searchTerm)
 
 	for _, entryUid := range e.GetEqualFoldAttributeValues(attribute) {
 		if entryUid == "" {

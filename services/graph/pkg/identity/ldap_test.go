@@ -35,6 +35,7 @@ var lconfig = config.LDAP{
 	UserIDAttribute:          "entryUUID",
 	UserEmailAttribute:       "mail",
 	UserNameAttribute:        "uid",
+	UserSurnameAttribute:     "sn",
 	UserEnabledAttribute:     "userEnabledAttribute",
 	UserTypeAttribute:        "userTypeAttribute",
 	ExternalIDAttribute:      "externalID",
@@ -340,7 +341,7 @@ func TestGetUsersSearch(t *testing.T) {
 	// only match if the filter contains the search term unquoted
 	lm.On("Search", mock.MatchedBy(
 		func(req *ldap.SearchRequest) bool {
-			return req.Filter == "(&(objectClass=inetOrgPerson)(|(uid=*term*)(mail=*term*)(displayname=*term*)))"
+			return req.Filter == "(&(objectClass=inetOrgPerson)(|(uid=*term*)(displayname=*term*)(sn=*term*)))"
 		})).
 		Return(&ldap.SearchResult{}, nil)
 	b, _ := getMockedBackend(lm, lconfig, &logger)
