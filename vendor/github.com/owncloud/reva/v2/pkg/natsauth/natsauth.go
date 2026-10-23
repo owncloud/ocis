@@ -46,11 +46,6 @@ func CredentialsOption(credsFile, creds string) (nats.Option, error) {
 	}
 }
 
-// Enabled reports whether JWT credentials are configured.
-func Enabled(credsFile, creds string) bool {
-	return credsFile != "" || creds != ""
-}
-
 // Validate checks that content is a ".creds" file with a user JWT and the
 // matching user NKey seed.
 func Validate(content []byte) error {

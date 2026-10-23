@@ -37,4 +37,10 @@ connected without credentials and without TLS. The proxy health check also used
 the events cluster ID as the NATS address. It now uses the events endpoint and
 skips the check when the endpoint is empty.
 
+The create home cache of the gateway service did not get the TLS settings. It
+now has the variables `GATEWAY_CREATE_HOME_CACHE_ENABLE_TLS`,
+`GATEWAY_CREATE_HOME_CACHE_TLS_INSECURE`, and
+`GATEWAY_CREATE_HOME_CACHE_TLS_ROOT_CA_CERTIFICATE`, and it uses the global
+`OCIS_CACHE_*` TLS variables.
+
 https://github.com/owncloud/ocis/pull/13220
