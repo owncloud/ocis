@@ -84,6 +84,8 @@ func SharingConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string]
 								"tlsrootcacertificate": cfg.Events.TLSRootCaCertPath,
 								"authusername":         cfg.Events.AuthUsername,
 								"authpassword":         cfg.Events.AuthPassword,
+								"credsfile":            cfg.Events.CredsFile,
+								"creds":                cfg.Events.Creds,
 							},
 						},
 					},
@@ -140,6 +142,8 @@ func SharingConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string]
 					"name":             generators.GenerateConnectionName(cfg.Service.Name, generators.NTypeBus),
 					"username":         cfg.Events.AuthUsername,
 					"password":         cfg.Events.AuthPassword,
+					"creds-file":       cfg.Events.CredsFile,
+					"creds":            cfg.Events.Creds,
 				},
 				"prometheus": map[string]interface{}{
 					"namespace": "ocis",

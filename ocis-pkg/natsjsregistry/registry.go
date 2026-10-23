@@ -15,6 +15,7 @@ import (
 	natsjskv "github.com/go-micro/plugins/v4/store/nats-js-kv"
 	"github.com/nats-io/nats.go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
+	"github.com/owncloud/reva/v2/pkg/natsauth"
 	revastore "github.com/owncloud/reva/v2/pkg/store"
 	"go-micro.dev/v4/registry"
 	"go-micro.dev/v4/server"
@@ -27,6 +28,10 @@ var (
 	_registryAddressEnv     = "MICRO_REGISTRY_ADDRESS"
 	_registryUsernameEnv    = "MICRO_REGISTRY_AUTH_USERNAME"
 	_registryPasswordEnv    = "MICRO_REGISTRY_AUTH_PASSWORD"
+	_registryCredsFileEnv   = "MICRO_REGISTRY_AUTH_CREDS_FILE"
+	_registryCredsEnv       = "MICRO_REGISTRY_AUTH_CREDS"
+	_natsCredsFileEnv       = "OCIS_NATS_CREDS_FILE"
+	_natsCredsEnv           = "OCIS_NATS_CREDS"
 	_registryEnableTLSEnv   = "MICRO_REGISTRY_ENABLE_TLS"
 	_registryTLSInsecureEnv = "MICRO_REGISTRY_TLS_INSECURE"
 	_registryTLSRootCAEnv   = "MICRO_REGISTRY_TLS_ROOT_CA_CERTIFICATE"
@@ -216,6 +221,15 @@ func (n *storeregistry) storeOptions(opts registry.Options) []store.Option {
 	natsOptions := nats.GetDefaultOptions()
 	natsOptions.Name = generators.GenerateConnectionName(serviceName, generators.NTypeRegistry)
 	natsOptions.User, natsOptions.Password = getAuth()
+	credsOpt, err := natsauth.CredentialsOption(getCreds())
+	if err != nil {
+		fmt.Println("cannot use the nats credentials of the registry:", err)
+		os.Exit(1)
+	}
+	if credsOpt != nil {
+		natsOptions.User, natsOptions.Password = "", ""
+		_ = credsOpt(&natsOptions)
+	}
 	if tlsConf := getTLS(); tlsConf != nil {
 		natsOptions.TLSConfig = tlsConf
 		natsOptions.Secure = true
@@ -241,6 +255,16 @@ func (n *storeregistry) storeOptions(opts registry.Options) []store.Option {
 
 func getAuth() (string, string) {
 	return os.Getenv(_registryUsernameEnv), os.Getenv(_registryPasswordEnv)
+}
+
+// getCreds returns the path and the content of the NATS .creds file for the registry.
+// The registry variables take precedence. If both are empty, the global OCIS_NATS_* variables are used.
+func getCreds() (string, string) {
+	credsFile, creds := os.Getenv(_registryCredsFileEnv), os.Getenv(_registryCredsEnv)
+	if credsFile == "" && creds == "" {
+		credsFile, creds = os.Getenv(_natsCredsFileEnv), os.Getenv(_natsCredsEnv)
+	}
+	return credsFile, creds
 }
 
 var (

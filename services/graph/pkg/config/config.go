@@ -159,6 +159,8 @@ type Events struct {
 	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;GRAPH_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"pre5.0"`
 	AuthUsername         string `yaml:"username" env:"OCIS_EVENTS_AUTH_USERNAME;GRAPH_EVENTS_AUTH_USERNAME" desc:"The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
 	AuthPassword         string `yaml:"password" env:"OCIS_EVENTS_AUTH_PASSWORD;GRAPH_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
+	CredsFile            string `yaml:"creds_file" env:"OCIS_NATS_CREDS_FILE;GRAPH_EVENTS_CREDS_FILE" desc:"Path to a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate with the events broker when NATS runs in JWT (operator) mode. When set, the username and the password are not used. The file is read again on each reconnect." introductionVersion:"8.3.0"`
+	Creds                string `mask:"password" yaml:"creds" env:"OCIS_NATS_CREDS;GRAPH_EVENTS_CREDS" desc:"Content of a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate with the events broker when NATS runs in JWT (operator) mode. Takes precedence over the path of a .creds file. When set, the username and the password are not used." introductionVersion:"8.3.0"`
 }
 
 // CORS defines the available cors configuration.
