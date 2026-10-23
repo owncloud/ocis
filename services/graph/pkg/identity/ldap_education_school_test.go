@@ -24,6 +24,7 @@ var eduConfig = config.LDAP{
 	UserIDAttribute:          "entryUUID",
 	UserEmailAttribute:       "mail",
 	UserNameAttribute:        "uid",
+	UserSurnameAttribute:     "sn",
 	UserEnabledAttribute:     "userEnabledAttribute",
 	ExternalIDAttribute:      "externalID",
 	DisableUserMechanism:     "attribute",
