@@ -31,11 +31,16 @@ The services can authenticate with an external NATS cluster that runs in operato
 In JWT mode, a client authenticates with a user JWT and an NKey seed. A NATS `.creds` file holds both. Set one of these environment variables:
 
 * `OCIS_NATS_CREDS_FILE`: the path to the `.creds` file. The services read the file again on each reconnect, so a rotated JWT works without a restart.
-* `OCIS_NATS_CREDS`: the content of the `.creds` file. Use this variable when you cannot mount a file. A rotated JWT then needs a restart. This variable takes precedence over `OCIS_NATS_CREDS_FILE`.
+* `OCIS_NATS_CREDS`: the content of the `.creds` file. Use this variable when you cannot mount a file. A rotated JWT then needs a restart.
+
+When you set more than one of these variables, these rules apply:
+
+* A service-specific variable takes precedence over a global variable. Example: you set `OCIS_NATS_CREDS` and `GRAPH_CACHE_CREDS_FILE`. Then the graph cache uses the file of `GRAPH_CACHE_CREDS_FILE`.
+* In the same scope, the content takes precedence over the file. Example: you set `OCIS_NATS_CREDS` and `OCIS_NATS_CREDS_FILE`. Then the services use the content of `OCIS_NATS_CREDS`.
 
 The services use these credentials for the events, the caches, the persistent stores, and the health checks. When the credentials are set, the services do not send a username and a password. Each service also has its own variables, for example `PROXY_EVENTS_CREDS_FILE`. For details, see the environment variable list.
 
-The service registry reads only environment variables. It reads `MICRO_REGISTRY_AUTH_CREDS_FILE` and `MICRO_REGISTRY_AUTH_CREDS`. If these variables are empty, it uses `OCIS_NATS_CREDS_FILE` and `OCIS_NATS_CREDS`. A value in the `ocis.yaml` file does not reach the registry.
+The service registry reads only environment variables. It reads `MICRO_REGISTRY_AUTH_CREDS_FILE` and `MICRO_REGISTRY_AUTH_CREDS`. If these variables are empty, it uses `OCIS_NATS_CREDS_FILE` and `OCIS_NATS_CREDS`. The same rules apply: the registry variables take precedence over the global variables. A value in the `ocis.yaml` file does not reach the registry.
 
 The embedded nats service does not support JWT mode. It has no settings for an operator, accounts, or a resolver. In the default single binary setup, the embedded nats service and all its clients run in the same process, so JWT mode gives no benefit there. To use JWT authentication, do these steps:
 
