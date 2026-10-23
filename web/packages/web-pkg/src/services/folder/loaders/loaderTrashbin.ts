@@ -23,13 +23,18 @@ export class FolderLoaderTrashbin implements FolderLoader {
       resourcesStore.clearResourceList()
       resourcesStore.setAncestorMetaData({})
 
-      const { resource, children } = yield webdav.listFiles(
-        space,
-        {},
-        { depth: 1, davProperties: DavProperties.Trashbin, isTrash: true, signal: signal1 }
-      )
+      try {
+        const { resource, children } = yield webdav.listFiles(
+          space,
+          {},
+          { depth: 1, davProperties: DavProperties.Trashbin, isTrash: true, signal: signal1 }
+        )
 
-      resourcesStore.initResourceList({ currentFolder: resource, resources: children })
+        resourcesStore.initResourceList({ currentFolder: resource, resources: children })
+      } catch (e) {
+        resourcesStore.setCurrentFolderLoadErrorStatus(e?.statusCode)
+        throw e
+      }
     })
   }
 }
