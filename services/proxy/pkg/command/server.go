@@ -77,6 +77,7 @@ func Server(cfg *config.Config) *cli.Command {
 				microstore.Table(cfg.OIDC.UserinfoCache.Table),
 				store.DisablePersistence(cfg.OIDC.UserinfoCache.DisablePersistence),
 				store.Authentication(cfg.OIDC.UserinfoCache.AuthUsername, cfg.OIDC.UserinfoCache.AuthPassword),
+				store.Credentials(cfg.OIDC.UserinfoCache.CredsFile, cfg.OIDC.UserinfoCache.Creds),
 				store.TLS(cfg.OIDC.UserinfoCache.EnableTLS, cfg.OIDC.UserinfoCache.TLSInsecure, cfg.OIDC.UserinfoCache.TLSRootCACertificate),
 			)
 
@@ -87,6 +88,7 @@ func Server(cfg *config.Config) *cli.Command {
 				microstore.Database("proxy"),
 				microstore.Table("signing-keys"),
 				store.Authentication(cfg.PreSignedURL.SigningKeys.AuthUsername, cfg.PreSignedURL.SigningKeys.AuthPassword),
+				store.Credentials(cfg.PreSignedURL.SigningKeys.CredsFile, cfg.PreSignedURL.SigningKeys.Creds),
 				store.TLS(cfg.PreSignedURL.SigningKeys.EnableTLS, cfg.PreSignedURL.SigningKeys.TLSInsecure, cfg.PreSignedURL.SigningKeys.TLSRootCACertificate),
 			)
 

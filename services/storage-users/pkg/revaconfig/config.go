@@ -46,6 +46,8 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 						"nats_enable_tls":  cfg.Events.EnableTLS,
 						"nats_username":    cfg.Events.AuthUsername,
 						"nats_password":    cfg.Events.AuthPassword,
+						"nats_creds_file":  cfg.Events.CredsFile,
+						"nats_creds":       cfg.Events.Creds,
 					},
 				},
 			},
@@ -61,6 +63,8 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"name":             generators.GenerateConnectionName(cfg.Service.Name, generators.NTypeBus),
 					"username":         cfg.Events.AuthUsername,
 					"password":         cfg.Events.AuthPassword,
+					"creds-file":       cfg.Events.CredsFile,
+					"creds":            cfg.Events.Creds,
 				},
 				"prometheus": map[string]interface{}{
 					"namespace": "ocis",
@@ -87,6 +91,8 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"nats_enable_tls":        cfg.Events.EnableTLS,
 					"nats_username":          cfg.Events.AuthUsername,
 					"nats_password":          cfg.Events.AuthPassword,
+					"nats_creds_file":        cfg.Events.CredsFile,
+					"nats_creds":             cfg.Events.Creds,
 					"data_txs": map[string]interface{}{
 						"simple": map[string]interface{}{
 							"cache_store":    "noop",

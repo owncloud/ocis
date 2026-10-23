@@ -210,6 +210,8 @@ func decode(target interface{}, strict bool) (int, error) {
 		}
 	}
 
+	resolveCredsScope(s)
+
 	return setFieldCount, nil
 }
 

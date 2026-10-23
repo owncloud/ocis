@@ -8,6 +8,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	"github.com/owncloud/reva/v2/pkg/events/stream"
 )
 
 // Server initializes the debug service and server.
@@ -21,7 +22,16 @@ func Server(opts ...Option) (*http.Server, error) {
 	readyHandlerConfiguration := healthHandlerConfiguration.
 		WithCheck("nats reachability", func(ctx context.Context) error {
 			if len(options.Config.SigningKeys.Nodes) > 0 {
-				return checks.NewNatsCheck(options.Config.SigningKeys.Nodes[0])(ctx)
+				k := options.Config.SigningKeys
+				return checks.NewNatsCheckWithConfig(k.Nodes[0], stream.NatsConfig{
+					TLSInsecure:          k.TLSInsecure,
+					TLSRootCACertificate: k.TLSRootCACertificate,
+					EnableTLS:            k.EnableTLS,
+					AuthUsername:         k.AuthUsername,
+					AuthPassword:         k.AuthPassword,
+					CredsFile:            k.CredsFile,
+					Creds:                k.Creds,
+				})(ctx)
 			}
 			return nil
 		})

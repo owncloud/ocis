@@ -3,6 +3,7 @@ package natsjs
 import (
 	"crypto/tls"
 
+	nats "github.com/nats-io/nats.go"
 	"go-micro.dev/v4/logger"
 )
 
@@ -19,6 +20,7 @@ type Options struct {
 	DisableDurableStreams bool
 	Username              string
 	Password              string
+	NatsOptions           []nats.Option
 }
 
 // Option is a function which configures options.
@@ -92,5 +94,15 @@ func Authenticate(username, password string) Option {
 	return func(o *Options) {
 		o.Username = username
 		o.Password = password
+	}
+}
+
+// NatsOptions adds nats.Option values to the nats connection.
+// They are applied after all other options, so they take precedence.
+// Use it for connection settings that have no dedicated option, e.g.
+// nats.UserCredentials or nats.UserCredentialBytes for JWT authentication.
+func NatsOptions(opts ...nats.Option) Option {
+	return func(o *Options) {
+		o.NatsOptions = append(o.NatsOptions, opts...)
 	}
 }

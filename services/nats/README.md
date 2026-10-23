@@ -23,3 +23,28 @@ Connections to the nats service (`Publisher`/`Consumer` see above) can be TLS en
 Certificate files can also be set via global variables starting with `OCIS_`, for details see the environment variable list.
 
 Note that using TLS is highly recommended for productive environments, especially when using container orchestration with Kubernetes.
+
+## JWT Authentication With an External NATS Cluster
+
+The services can authenticate with an external NATS cluster that runs in operator (JWT) mode. Use this when several oCIS instances share one NATS cluster. Each instance then uses its own NATS account. An account has its own subjects, its own JetStream data, and its own limits.
+
+In JWT mode, a client authenticates with a user JWT and an NKey seed. A NATS `.creds` file holds both. Set one of these environment variables:
+
+* `OCIS_NATS_CREDS_FILE`: the path to the `.creds` file. The services read the file again on each reconnect, so a rotated JWT works without a restart.
+* `OCIS_NATS_CREDS`: the content of the `.creds` file. Use this variable when you cannot mount a file. A rotated JWT then needs a restart.
+
+When you set more than one of these variables, these rules apply:
+
+* A service-specific variable takes precedence over a global variable. Example: you set `OCIS_NATS_CREDS` and `GRAPH_CACHE_CREDS_FILE`. Then the graph cache uses the file of `GRAPH_CACHE_CREDS_FILE`.
+* In the same scope, the content takes precedence over the file. Example: you set `OCIS_NATS_CREDS` and `OCIS_NATS_CREDS_FILE`. Then the services use the content of `OCIS_NATS_CREDS`.
+
+The services use these credentials for the events, the caches, the persistent stores, and the health checks. When the credentials are set, the services do not send a username and a password. Each service also has its own variables, for example `PROXY_EVENTS_CREDS_FILE`. For details, see the environment variable list.
+
+The service registry reads only environment variables. It reads `MICRO_REGISTRY_AUTH_CREDS_FILE` and `MICRO_REGISTRY_AUTH_CREDS`. If these variables are empty, it uses `OCIS_NATS_CREDS_FILE` and `OCIS_NATS_CREDS`. The same rules apply: the registry variables take precedence over the global variables. A value in the `ocis.yaml` file does not reach the registry.
+
+The embedded nats service does not support JWT mode. It has no settings for an operator, accounts, or a resolver. In the default single binary setup, the embedded nats service and all its clients run in the same process, so JWT mode gives no benefit there. To use JWT authentication, do these steps:
+
+1. Run an external NATS cluster in operator mode. Create the operator, the accounts, and the users with the [nsc](https://docs.nats.io/using-nats/nats-tools/nsc) tool.
+2. Do not start the embedded nats service, for example with `OCIS_EXCLUDE_RUN_SERVICES=nats`.
+3. Set the address of the external cluster in `OCIS_EVENTS_ENDPOINT`, `OCIS_CACHE_STORE_NODES`, `OCIS_PERSISTENT_STORE_NODES`, and `MICRO_REGISTRY_ADDRESS`.
+4. Set `OCIS_NATS_CREDS_FILE` or `OCIS_NATS_CREDS`.

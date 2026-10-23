@@ -1,6 +1,7 @@
 package debug
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	"github.com/owncloud/reva/v2/pkg/events/stream"
 )
 
 // Server initializes the debug service and server.
@@ -22,7 +24,13 @@ func Server(opts ...Option) (*http.Server, error) {
 		WithCheck("web reachability", checks.NewHTTPCheck(options.Config.HTTP.Addr))
 
 	readyHandlerConfiguration := healthHandlerConfiguration.
-		WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Events.Cluster))
+		WithCheck("nats reachability", func(ctx context.Context) error {
+			// The proxy uses NATS only to publish events. An empty endpoint disables the events.
+			if options.Config.Events.Endpoint == "" {
+				return nil
+			}
+			return checks.NewNatsCheckWithConfig(options.Config.Events.Endpoint, stream.NatsConfig(options.Config.Events))(ctx)
+		})
 
 	var configDumpFunc http.HandlerFunc = configDump(options.Config)
 	return debug.NewService(

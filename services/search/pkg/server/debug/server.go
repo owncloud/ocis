@@ -9,6 +9,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	"github.com/owncloud/reva/v2/pkg/events/stream"
 )
 
 // Server initializes the debug service and server.
@@ -20,7 +21,15 @@ func Server(opts ...Option) (*http.Server, error) {
 		WithCheck("grpc reachability", checks.NewGRPCCheck(options.Config.GRPC.Addr))
 
 	readyHandlerConfiguration := healthHandlerConfiguration.
-		WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Events.Endpoint)).
+		WithCheck("nats reachability", checks.NewNatsCheckWithConfig(options.Config.Events.Endpoint, stream.NatsConfig{
+			TLSInsecure:          options.Config.Events.TLSInsecure,
+			TLSRootCACertificate: options.Config.Events.TLSRootCACertificate,
+			EnableTLS:            options.Config.Events.EnableTLS,
+			AuthUsername:         options.Config.Events.AuthUsername,
+			AuthPassword:         options.Config.Events.AuthPassword,
+			CredsFile:            options.Config.Events.CredsFile,
+			Creds:                options.Config.Events.Creds,
+		})).
 		WithCheck("tika-check", func(ctx context.Context) error {
 			if options.Config.Extractor.Type == "tika" {
 				u, err := url.Parse(options.Config.Extractor.Tika.TikaURL)
