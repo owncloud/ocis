@@ -45,12 +45,12 @@ func init() {
 }
 
 // idmEntry builds a gldap.Entry matching idmConfig attribute names.
-func idmEntry(uid, uuid string) *gldap.Entry {
+func idmEntry(uid, uuid, mail string) *gldap.Entry {
 	dn := fmt.Sprintf("uid=%s,%s", uid, idmConfig.UserBaseDN)
 	return gldap.NewEntry(dn, map[string][]string{
 		idmConfig.UserNameAttribute:        {uid},
 		idmConfig.UserDisplayNameAttribute: {"Display " + uid},
-		idmConfig.UserEmailAttribute:       {uid + "@example.com"},
+		idmConfig.UserEmailAttribute:       {mail},
 		idmConfig.UserIDAttribute:          {uuid},
 		"sn":                               {uid},
 		"givenname":                        {uid},
@@ -156,7 +156,7 @@ func odataReq(t *testing.T) *godata.GoDataRequest {
 
 func TestIntegrationGetUser_HappyPath(t *testing.T) {
 	b := newIDMBackend(t,
-		idmEntry("alice", "aaaaaaaa-0000-0000-0000-000000000001"),
+		idmEntry("alice", "aaaaaaaa-0000-0000-0000-000000000001", "alice@example.com"),
 	)
 
 	user, err := b.GetUser(context.Background(), "alice", odataReq(t))
@@ -168,8 +168,8 @@ func TestIntegrationGetUser_HappyPath(t *testing.T) {
 
 func TestIntegrationGetUsers_HappyPath(t *testing.T) {
 	b := newIDMBackend(t,
-		idmEntry("alice", "aaaaaaaa-0000-0000-0000-000000000001"),
-		idmEntry("bob", "bbbbbbbb-0000-0000-0000-000000000002"),
+		idmEntry("alice", "aaaaaaaa-0000-0000-0000-000000000001", "alice@example.com"),
+		idmEntry("bob", "bbbbbbbb-0000-0000-0000-000000000002", "bob@example.com"),
 	)
 
 	users, err := b.GetUsers(context.Background(), odataReq(t))
@@ -181,6 +181,69 @@ func TestIntegrationGetUsers_HappyPath(t *testing.T) {
 	}
 	assert.True(t, names["alice"])
 	assert.True(t, names["bob"])
+}
+
+func TestIntegrationGetUsers_SearchDoesNotMatchEmail(t *testing.T) {
+	// Gunda's mail contains "klaus" but her name, surname, and user-id don't.
+	gunda := idmEntry("ruetten", "cccccccc-0000-0000-0000-000000000003", "klauspeter.eckel@ruth.info")
+	b := newIDMBackend(t, gunda)
+
+	req, err := godata.ParseRequest(context.Background(), "", url.Values{"$search": {`"klaus"`}})
+	require.NoError(t, err)
+
+	users, err := b.GetUsers(context.Background(), req)
+	require.NoError(t, err)
+	assert.Empty(t, users, "search must not match the mail attribute")
+}
+
+func TestIntegrationGetUsers_SearchMatchesAllowedAttributes(t *testing.T) {
+	// alice matches via userName/displayName (idmEntry default); carol only via surname.
+	alice := idmEntry("alice", "aaaaaaaa-0000-0000-0000-000000000001", "alice@example.com")
+	carol := gldap.NewEntry(fmt.Sprintf("uid=%s,%s", "carol", idmConfig.UserBaseDN), map[string][]string{
+		idmConfig.UserNameAttribute:        {"carol"},
+		idmConfig.UserDisplayNameAttribute: {"Display carol"},
+		idmConfig.UserEmailAttribute:       {"carol@example.com"},
+		idmConfig.UserIDAttribute:          {"eeeeeeee-0000-0000-0000-000000000005"},
+		"sn":                               {"Winterbourne"},
+		"givenname":                        {"carol"},
+		idmConfig.UserEnabledAttribute:     {"TRUE"},
+		idmConfig.UserTypeAttribute:        {"Member"},
+		"objectClass":                      {"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"},
+	})
+	b := newIDMBackend(t, alice, carol)
+
+	aliceReq, err := godata.ParseRequest(context.Background(), "", url.Values{"$search": {`"alice"`}})
+	require.NoError(t, err)
+	aliceUsers, err := b.GetUsers(context.Background(), aliceReq)
+	require.NoError(t, err)
+	require.Len(t, aliceUsers, 1, "search must still match userName/displayName")
+	assert.Equal(t, "alice", aliceUsers[0].GetOnPremisesSamAccountName())
+
+	carolReq, err := godata.ParseRequest(context.Background(), "", url.Values{"$search": {`"Winterbourne"`}})
+	require.NoError(t, err)
+	carolUsers, err := b.GetUsers(context.Background(), carolReq)
+	require.NoError(t, err)
+	require.Len(t, carolUsers, 1, "search must still match surname")
+	assert.Equal(t, "carol", carolUsers[0].GetOnPremisesSamAccountName())
+}
+
+func TestIntegrationGetGroupMembers_SearchDoesNotMatchEmail(t *testing.T) {
+	// Same as TestIntegrationGetUsers_SearchDoesNotMatchEmail, via group-member search instead.
+	gunda := idmEntry("ruetten", "cccccccc-0000-0000-0000-000000000003", "klauspeter.eckel@ruth.info")
+	group := gldap.NewEntry(fmt.Sprintf("cn=%s,%s", "teachers", idmConfig.GroupBaseDN), map[string][]string{
+		"cn":          {"teachers"},
+		"entryUUID":   {"dddddddd-0000-0000-0000-000000000004"},
+		"member":      {gunda.DN},
+		"objectClass": {"groupOfNames"},
+	})
+	b := newIDMBackend(t, gunda, group)
+
+	req, err := godata.ParseRequest(context.Background(), "", url.Values{"$search": {`"klaus"`}})
+	require.NoError(t, err)
+
+	members, err := b.GetGroupMembers(context.Background(), "teachers", req)
+	require.NoError(t, err)
+	assert.Empty(t, members, "group member search must not match the mail attribute")
 }
 
 func TestIntegrationCreateUser_HappyPath(t *testing.T) {
@@ -201,7 +264,7 @@ func TestIntegrationCreateUser_HappyPath(t *testing.T) {
 }
 
 func TestIntegrationDeleteUser_HappyPath(t *testing.T) {
-	entry := idmEntry("dave", "dddddddd-0000-0000-0000-000000000004")
+	entry := idmEntry("dave", "dddddddd-0000-0000-0000-000000000004", "dave@example.com")
 	b := newIDMBackend(t, entry)
 
 	// Confirm user exists first.

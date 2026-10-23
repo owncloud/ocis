@@ -317,6 +317,48 @@ func TestGetGroupsSearch(t *testing.T) {
 		t.Errorf("Expected zero length user slice")
 	}
 }
+
+func TestGetGroupMembersSearch_MemberUid(t *testing.T) {
+	memberUidConfig := lconfig
+	memberUidConfig.GroupMemberAttribute = "memberuid"
+
+	req, err := godata.ParseRequest(context.Background(), "",
+		url.Values{
+			"$search": []string{`"term"`},
+		},
+	)
+	if err != nil {
+		t.Errorf("Expected success got '%s'", err.Error())
+	}
+
+	group := ldap.NewEntry("cn=group", map[string][]string{
+		"cn":        {"group"},
+		"entryuuid": {"abcd-defg"},
+		"memberuid": {"user"},
+	})
+
+	lm := &mocks.Client{}
+	lm.On("Search", mock.MatchedBy(
+		func(r *ldap.SearchRequest) bool {
+			return r.Filter == "(&(objectClass=groupOfNames)(|(cn=group)(entryUUID=group)))"
+		})).
+		Return(&ldap.SearchResult{Entries: []*ldap.Entry{group}}, nil)
+	lm.On("Search", mock.MatchedBy(
+		func(r *ldap.SearchRequest) bool {
+			return r.Filter == "(&(objectClass=inetOrgPerson)(&(|(uid=*term*)(displayname=*term*)(sn=*term*))(uid=user)))"
+		})).
+		Return(&ldap.SearchResult{}, nil)
+
+	b, _ := getMockedBackend(lm, memberUidConfig, &logger)
+	members, err := b.GetGroupMembers(context.Background(), "group", req)
+	if err != nil {
+		t.Errorf("Expected success, got '%s'", err.Error())
+	} else if len(members) != 0 {
+		t.Errorf("Expected zero length member slice")
+	}
+	lm.AssertExpectations(t)
+}
+
 func TestUpdateGroupName(t *testing.T) {
 	groupDn := "cn=TheGroup,ou=groups,dc=owncloud,dc=com"
 

@@ -104,6 +104,7 @@ func DefaultConfig() *config.Config {
 				UserEmailAttribute:       "mail",
 				UserDisplayNameAttribute: "displayName",
 				UserNameAttribute:        "uid",
+				UserSurnameAttribute:     "sn",
 				// FIXME: switch this to some more widely available attribute by default
 				//        ideally this needs to	be constant for the lifetime of a users
 				UserIDAttribute:           "ownCloudUUID",

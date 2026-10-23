@@ -67,6 +67,7 @@ var _ = Describe("Users changing their own password", func() {
 			WriteEnabled:             true,
 			UserDisplayNameAttribute: "displayName",
 			UserNameAttribute:        "uid",
+			UserSurnameAttribute:     "sn",
 			UserEmailAttribute:       "mail",
 			UserIDAttribute:          "ownCloudUUID",
 			UserSearchScope:          "sub",
