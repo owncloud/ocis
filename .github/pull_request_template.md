@@ -19,11 +19,19 @@ Please set the following labels:
 ## Description
 <!--- Describe your changes in detail -->
 
+## Release Notes
+<!--- The PR title is the release-notes entry: "type(scope): [TICKET] Title", e.g. "fix(web): [OCISDEV-1234] Fix something". See COMMIT_CONVENTION.md. -->
+<!--- The ticket is optional. -->
+<!--- For a breaking change, add "!" after the type ("feat(graph)!: ...") and describe the upgrade impact below: -->
+<!--- BREAKING CHANGE: ... -->
+<!--- Backport to a stable branch: cherry-pick with "git cherry-pick -x <sha>" and keep the original title, e.g. "[stable-8.2] fix(web): [OCISDEV-1234] Fix something". One original PR per backport PR. -->
+
 ## Related Issue
 <!--- This project only accepts pull requests related to open issues -->
 <!--- If suggesting a new feature or change, please discuss it in an issue first -->
 <!--- If fixing a bug, there should be an issue describing it with steps to reproduce -->
 <!--- Please link to the issue here: -->
+<!--- For a GitHub issue use "Fixes #<number>", it is linked in the release notes -->
 - Fixes <issue_link>
 
 ## Motivation and Context

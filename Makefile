@@ -275,6 +275,28 @@ endif
 	mkdir -p ocis/dist
 	$(CALENS) --version $(CHANGELOG_VERSION) -o ocis/dist/CHANGELOG.md
 
+# Release notes from conventional commits (see cliff.toml and scripts/changelog.sh).
+.PHONY: changelog-generate
+changelog-generate:
+ifndef CHANGELOG_VERSION
+	$(error CHANGELOG_VERSION is undefined)
+endif
+	@scripts/changelog.sh $(CHANGELOG_VERSION)
+
+# Release notes for the GitHub release (body of ocis/dist/CHANGELOG.md).
+.PHONY: changelog-release-notes
+changelog-release-notes:
+	mkdir -p ocis/dist
+	$(MAKE) --no-print-directory -s changelog-generate > ocis/dist/CHANGELOG.md
+
+# Add the new version to the checked-in CHANGELOG.md (TOC entry + section).
+.PHONY: changelog-update
+changelog-update:
+ifndef CHANGELOG_VERSION
+	$(error CHANGELOG_VERSION is undefined)
+endif
+	scripts/changelog.sh $(CHANGELOG_VERSION) --update
+
 .PHONY: changelog-lint
 changelog-lint:
 	@FAILED=0; \

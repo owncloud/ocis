@@ -1,0 +1,118 @@
+# git-cliff configuration: generate release notes from conventional commits.
+# https://git-cliff.org/docs/configuration
+#
+# One line per squash-merge commit, grouped by type, like vuejs/core:
+#   fix(graph): [OCISDEV-1234] Tolerate lookup failures (#1234)
+#   -> * **graph:** Tolerate lookup failures ([#1234](...))
+# Breaking changes ("feat!:" or a "BREAKING CHANGE:" footer) are also listed
+# with their description in a separate section.
+
+[changelog]
+header = ""
+body = """
+{%- macro subject(commit) -%}
+{{ commit.message | split(pat="\n") | first | split(pat=" (#") | first | trim | upper_first }}
+{%- endmacro -%}
+{%- macro pr(commit) -%}
+{%- set subject = commit.message | split(pat="\n") | first -%}
+{%- if subject is containing(" (#") -%}
+{{ subject | split(pat=" (#") | last | trim_end_matches(pat=")") }}
+{%- endif -%}
+{%- endmacro -%}
+{#- "Fixes #12" / "Closes #12" and "BREAKING CHANGE: ..." are searched in the whole
+    message, not only in the footers: the squash commit body is the PR description and
+    the lines are usually not in its last paragraph -#}
+{%- macro issue(commit) -%}
+{%- for keyword in ["Fixes #", "fixes #", "Closes #", "closes #", "Resolves #", "resolves #"] -%}
+{%- if commit.raw_message is containing(keyword) -%}
+{%- set n = commit.raw_message | split(pat=keyword) | nth(n=1) | split(pat="\n") | first | split(pat=" ") | first | trim_end_matches(pat=".") | trim_end_matches(pat=",") -%}
+{%- if n is matching("^[0-9]+$") %}{{ n }}{% break %}{% endif -%}
+{%- endif -%}
+{%- endfor -%}
+{%- endmacro -%}
+{%- macro breaking(commit) -%}
+{%- if commit.raw_message is containing("BREAKING CHANGE: ") -%}
+{{ commit.raw_message | split(pat="BREAKING CHANGE: ") | nth(n=1) | split(pat="\n") | first | trim }}
+{%- elif commit.breaking -%}
+{{ self::subject(commit=commit) }}
+{%- endif -%}
+{%- endmacro -%}
+{%- macro entry(commit) -%}
+{%- set number = self::pr(commit=commit) -%}
+* {% if commit.scope %}**{{ commit.scope }}:** {% endif %}{{ self::subject(commit=commit) }}
+{%- if number %} ([#{{ number }}](https://github.com/owncloud/ocis/pull/{{ number }})){% endif %}
+{%- set issue = self::issue(commit=commit) %}
+{%- if issue %}, closes [#{{ issue }}](https://github.com/owncloud/ocis/issues/{{ issue }}){% endif %}
+{%- endmacro -%}
+
+{#- scripts/changelog.sh passes the previous release, git-cliff only knows it
+    when that tag is part of the range -#}
+{%- set prev = get_env(name="CHANGELOG_PREVIOUS", default="") -%}
+{%- if not prev and previous.version %}{% set prev = previous.version %}{% endif -%}
+{% if version -%}
+{%- set v = version | trim_start_matches(pat="v") -%}
+# Changelog for [{{ v }}] ({{ timestamp | date(format="%Y-%m-%d") }})
+{%- if prev %}
+
+[{{ v }}]: https://github.com/owncloud/ocis/compare/{{ prev }}...{{ version }}
+{%- endif %}
+{%- else -%}
+# Changelog for [unreleased]
+{%- if prev %}
+
+[unreleased]: https://github.com/owncloud/ocis/compare/{{ prev }}...master
+{%- endif %}
+{%- endif %}
+{%- set_global breaking = [] %}
+{%- for commit in commits %}{% if self::breaking(commit=commit) %}{% set_global breaking = breaking | concat(with=commit) %}{% endif %}{% endfor %}
+{%- if breaking | length > 0 %}
+
+### Breaking Changes
+{% for commit in breaking %}
+* {% if commit.scope %}**{{ commit.scope }}:** {% endif %}{{ self::breaking(commit=commit) }}
+{%- endfor %}
+{%- endif %}
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | striptags | trim }}
+{% for commit in commits %}
+{{ self::entry(commit=commit) }}
+{%- endfor %}
+{% endfor %}
+"""
+trim = true
+footer = ""
+
+[git]
+conventional_commits = true
+# Non-conventional commits are kept (not dropped) and land in "Miscellaneous".
+filter_unconventional = false
+split_commits = false
+protect_breaking_commits = true
+filter_commits = false
+# Final releases only: rc/dev tags and the web package tags are not versions.
+tag_pattern = "^v[0-9]+\\.[0-9]+\\.[0-9]+$"
+sort_commits = "oldest"
+
+commit_preprocessors = [
+  # Title: drop CI markers ("[full-ci]", "[stable-8.2]") and ticket keys. Jira
+  # is not public, so tickets stay in the git history but not in the notes.
+  { pattern = '\A([^\n]*?)\s*\[(?:[a-z][a-z0-9. -]*|[A-Za-z][A-Za-z0-9]*-\d+)\]:?', replace = "${1}" },
+  { pattern = '\A([^\n]*?)\s*\[(?:[a-z][a-z0-9. -]*|[A-Za-z][A-Za-z0-9]*-\d+)\]:?', replace = "${1}" },
+  { pattern = '\A([^\n]*?)\s*\[(?:[a-z][a-z0-9. -]*|[A-Za-z][A-Za-z0-9]*-\d+)\]:?', replace = "${1}" },
+  # a ticket key used as scope, "fix(OCISDEV-123): ...", is dropped as well
+  { pattern = '\A(\w+)\([A-Za-z][A-Za-z0-9]*-\d+\)', replace = "${1}" },
+  { pattern = '\A(\w+(\([^)]*\))?!?:)\s*', replace = "${1} " },
+]
+
+# First match wins. The order of the groups is set by the HTML comment prefix.
+commit_parsers = [
+  { message = '^(chore|test|build|ci|docs|style|refactor)(\(.+\))?!?\s*:', skip = true },
+  { message = '^(?i:bump|pump|update)\b', skip = true },
+  { message = '^(fix|feat)(\(.+\))?\s*:.*(^|[^-\w])(tests?|e2e|flaky)($|[^-\w])', skip = true },
+  { message = '^(security|\w+\(security\))', group = "<!-- 1 -->Security" },
+  { message = '^fix', group = "<!-- 2 -->Bug Fixes" },
+  { message = '^feat', group = "<!-- 3 -->Features" },
+  { message = '^perf', group = "<!-- 4 -->Performance" },
+  { message = '^revert', group = "<!-- 5 -->Reverts" },
+  { message = '.*', group = "<!-- 9 -->Miscellaneous" },
+]

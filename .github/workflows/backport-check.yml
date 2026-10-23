@@ -1,0 +1,54 @@
+name: Validate backport
+
+# A PR to a stable branch whose commits were cherry-picked with "git cherry-pick -x"
+# must backport exactly one merged PR and keep its title, so the release notes
+# read the same on both branches. PRs without cherry-picked commits are normal
+# PRs and only need a conventional title (see pr-title.yml).
+on:
+  pull_request_target:
+    branches: [stable-*]
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  validate-backport:
+    name: Validate backport
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.pull_request.number }}
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          shas=$(gh api --paginate "repos/$REPO/pulls/$NUMBER/commits" --jq '.[].commit.message' \
+            | sed -nE 's/^\(cherry picked from commit ([0-9a-f]{7,40})\)$/\1/p' | sort -u)
+          if [[ -z "$shas" ]]; then
+            echo "No cherry-picked commits, not a backport."
+            exit 0
+          fi
+
+          originals=$(for sha in $shas; do
+            gh api "repos/$REPO/commits/$sha/pulls" --jq '.[] | select(.merged_at != null) | .number'
+          done | sort -u)
+          count=$(grep -c . <<< "$originals" || true)
+          if [[ $count -eq 0 ]]; then
+            echo "::error::The cherry-picked commits do not belong to a merged PR: $(echo $shas)"
+            exit 1
+          fi
+          if [[ $count -gt 1 ]]; then
+            echo "::error::A backport must contain a single PR, this one contains #$(echo $originals | sed 's/ /, #/g'). Open one backport PR per original PR."
+            exit 1
+          fi
+
+          # compare without CI markers such as "[stable-8.2]" or "[full-ci]"
+          normalize() { sed -E 's/\[[a-z][a-z0-9. -]*\]//g; s/[[:space:]]+/ /g; s/^ //; s/ $//' <<< "$1"; }
+          original=$(gh api "repos/$REPO/pulls/$originals" --jq .title)
+          if [[ "$(normalize "$TITLE")" != "$(normalize "$original")" ]]; then
+            echo "::error::The title must match the backported PR #$originals, e.g. \"[$GITHUB_BASE_REF] $original\"."
+            exit 1
+          fi
+          echo "Backport of #$originals."
