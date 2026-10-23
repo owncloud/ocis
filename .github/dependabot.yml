@@ -8,6 +8,8 @@ updates:
       time: '22:00'
       timezone: Etc/UTC
     open-pull-requests-limit: 5
+    commit-message:
+      prefix: "build(deps)"
     groups:
       minor-and-patch:
         update-types:
@@ -22,6 +24,8 @@ updates:
       time: '22:00'
       timezone: Etc/UTC
     open-pull-requests-limit: 5
+    commit-message:
+      prefix: "build(deps)"
     groups:
       minor-and-patch:
         update-types:
@@ -36,6 +40,9 @@ updates:
       time: '22:00'
       timezone: Etc/UTC
     open-pull-requests-limit: 5
+    commit-message:
+      prefix: "build(deps)"
+      prefix-development: "build(deps-dev)"
     groups:
       minor-and-patch:
         update-types:
@@ -52,6 +59,8 @@ updates:
       time: '22:00'
       timezone: Etc/UTC
     open-pull-requests-limit: 5
+    commit-message:
+      prefix: "build(deps)"
     groups:
       minor-and-patch:
         update-types:
@@ -68,6 +77,8 @@ updates:
     cooldown:
       default-days: 7
     open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci(deps)"
     groups:
       minor-and-patch:
         update-types:
