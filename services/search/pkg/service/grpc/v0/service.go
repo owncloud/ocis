@@ -98,6 +98,8 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 		TLSRootCACertificate: cfg.Events.TLSRootCACertificate,
 		AuthUsername:         cfg.Events.AuthUsername,
 		AuthPassword:         cfg.Events.AuthPassword,
+		CredsFile:            cfg.Events.CredsFile,
+		Creds:                cfg.Events.Creds,
 	})
 	if err != nil {
 		return nil, teardown, err
