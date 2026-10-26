@@ -34,6 +34,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/auth/manager/registry"
 	"github.com/owncloud/reva/v2/pkg/auth/scope"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
+	"github.com/owncloud/reva/v2/pkg/natsauth"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/grants"
 	"github.com/owncloud/reva/v2/pkg/store"
@@ -83,6 +84,9 @@ func New(m map[string]interface{}) (auth.Manager, error) {
 	err := mgr.Configure(m)
 	if err != nil {
 		return nil, err
+	}
+	if err := natsauth.Check(mgr.c.StoreCredsFile, mgr.c.StoreCreds); err != nil {
+		return nil, errors.Wrap(err, "publicshares store")
 	}
 
 	revaStore := store.Create(

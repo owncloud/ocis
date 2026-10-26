@@ -28,6 +28,7 @@ import (
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/owncloud/reva/v2/pkg/natsauth"
 	"github.com/owncloud/reva/v2/pkg/store"
 	"github.com/shamaton/msgpack/v2"
 	microstore "go-micro.dev/v4/store"
@@ -243,6 +244,12 @@ func (cache cacheStore) Delete(key string, opts ...microstore.DeleteOption) erro
 // Close closes the underlying store
 func (cache cacheStore) Close() error {
 	return cache.s.Close()
+}
+
+// CheckCredentials checks the NATS JWT credentials of the cache. The Get*Cache
+// functions cannot return an error, so call it in the constructor that uses the cache.
+func (cfg Config) CheckCredentials() error {
+	return natsauth.Check(cfg.CredsFile, cfg.Creds)
 }
 
 func getStore(cfg Config) microstore.Store {
