@@ -66,7 +66,7 @@
     "eslint": "9.39.1",
     "git-repo-info": "2.1.1",
     "globals": "^16.5.0",
-    "happy-dom": "20.8.9",
+    "happy-dom": "21.0.4",
     "jimp": "^1.6.0",
     "jsdom": "^27.2.0",
     "jsqr": "^1.4.0",

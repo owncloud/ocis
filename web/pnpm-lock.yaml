@@ -124,7 +124,7 @@ importers:
         version: 4.1.5(vitest@4.1.11)
       '@vitest/web-worker':
         specifier: 4.1.5
-        version: 4.1.5(vitest@4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@20.8.9)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0)))
+        version: 4.1.5(vitest@4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@21.0.4)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0)))
       '@vue/compiler-dom':
         specifier: 3.5.43
         version: 3.5.43
@@ -162,8 +162,8 @@ importers:
         specifier: ^16.5.0
         version: 16.5.0
       happy-dom:
-        specifier: 20.8.9
-        version: 20.8.9
+        specifier: 21.0.4
+        version: 21.0.4
       jimp:
         specifier: ^1.6.0
         version: 1.6.1
@@ -235,10 +235,10 @@ importers:
         version: 0.1.4(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))
       vitest:
         specifier: 4.1.11
-        version: 4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@20.8.9)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@21.0.4)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))
       vitest-mock-extended:
         specifier: 3.1.0
-        version: 3.1.0(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@20.8.9)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0)))
+        version: 3.1.0(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@21.0.4)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0)))
       vue:
         specifier: 3.5.43
         version: 3.5.43(typescript@5.9.3)
@@ -582,8 +582,8 @@ importers:
         specifier: ^4.0.1
         version: 4.0.1(vue@3.5.43(typescript@5.9.3))
       zod:
-        specifier: 4.3.6
-        version: 4.3.6
+        specifier: 4.6.7
+        version: 4.6.7
     devDependencies:
       '@ownclouders/web-test-helpers':
         specifier: workspace:*
@@ -644,8 +644,8 @@ importers:
         specifier: ^4.0.1
         version: 4.0.1(vue@3.5.43(typescript@5.9.3))
       zod:
-        specifier: 4.3.6
-        version: 4.3.6
+        specifier: 4.6.7
+        version: 4.6.7
     devDependencies:
       '@ownclouders/web-test-helpers':
         specifier: workspace:*
@@ -810,8 +810,8 @@ importers:
         specifier: 5.0.6
         version: 5.0.6(@vue/compiler-sfc@3.5.43)(esbuild@0.28.1)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3)))(rollup@4.62.2)(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))(vue@3.5.43(typescript@5.9.3))(webpack@5.108.4(esbuild@0.28.1))
       zod:
-        specifier: 4.3.6
-        version: 4.3.6
+        specifier: 4.6.7
+        version: 4.6.7
     devDependencies:
       '@ownclouders/web-test-helpers':
         specifier: workspace:*
@@ -836,7 +836,7 @@ importers:
         version: 14.0.0
       vitest-mock-extended:
         specifier: 3.1.0
-        version: 3.1.0(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@20.8.9)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0)))
+        version: 3.1.0(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@21.0.4)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0)))
       vue:
         specifier: ^3.5.43
         version: 3.5.43(typescript@5.9.3)
@@ -978,8 +978,8 @@ importers:
         specifier: ^1.6.11
         version: 1.6.11
       zod:
-        specifier: ^4.3.6
-        version: 4.3.6
+        specifier: ^4.6.7
+        version: 4.6.7
     devDependencies:
       '@types/luxon':
         specifier: 3.7.1
@@ -1131,7 +1131,7 @@ importers:
         version: 14.0.0
       vitest-mock-extended:
         specifier: 3.1.1
-        version: 3.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@20.8.9)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0)))
+        version: 3.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@21.0.4)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0)))
       vue-concurrency:
         specifier: ^5.0.3
         version: 5.0.3(vue@3.5.43(typescript@5.9.3))
@@ -1142,15 +1142,15 @@ importers:
         specifier: ^4.0.1
         version: 4.0.1(vue@3.5.43(typescript@5.9.3))
       zod:
-        specifier: ^4.3.6
-        version: 4.3.6
+        specifier: ^4.6.7
+        version: 4.6.7
     devDependencies:
       '@types/lodash-es':
         specifier: 4.17.12
         version: 4.17.12
       '@vitest/web-worker':
         specifier: 4.1.5
-        version: 4.1.5(vitest@4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@20.8.9)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0)))
+        version: 4.1.5(vitest@4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@21.0.4)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0)))
       clean-publish:
         specifier: 6.0.1
         version: 6.0.1
@@ -1282,8 +1282,8 @@ importers:
         specifier: ^1.6.11
         version: 1.6.11
       zod:
-        specifier: 4.3.6
-        version: 4.3.6
+        specifier: 4.6.7
+        version: 4.6.7
     devDependencies:
       '@ownclouders/web-test-helpers':
         specifier: workspace:*
@@ -4195,6 +4195,10 @@ packages:
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
 
+  buffer-image-size@0.6.4:
+    resolution: {integrity: sha512-nEh+kZOPY1w+gcCMobZ6ETUp9WfibndnosbpwB1iJk/8Gt5ZF2bhS6+B6bPYz424KtwsR6Rflc3tCz1/ghX2dQ==}
+    engines: {node: '>=4.0'}
+
   buffer-xor@1.0.3:
     resolution: {integrity: sha512-571s0T7nZWK6vB67HI5dyUF7wXiNcfaPPPTl6zYCNApANjIvYJTg7hlud/+cJpdAhS7dVzqMLmfhfHR3rAcOjQ==}
 
@@ -5364,8 +5368,8 @@ packages:
   hachure-fill@0.5.2:
     resolution: {integrity: sha512-3GKBOn+m2LX9iq+JC1064cSFprJY4jL1jCXTcpnfER5HYE2l/4EfWSGzkPa/ZDBmYI0ZOEj5VHV/eKnPGkHuOg==}
 
-  happy-dom@20.8.9:
-    resolution: {integrity: sha512-Tz23LR9T9jOGVZm2x1EPdXqwA37G/owYMxRwU0E4miurAtFsPMQ1d2Jc2okUaSjZqAFz2oEn3FLXC5a0a+siyA==}
+  happy-dom@21.0.4:
+    resolution: {integrity: sha512-tFm+GaLBgo6o0awHnvHaNoraVo27qJ+2tZEtZ+cIa08hXbeitrxAJajLI05hsUy/2/YTKcUjQYzHe5mCcraLBw==}
     engines: {node: '>=20.0.0'}
 
   has-flag@4.0.0:
@@ -8009,8 +8013,8 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
-  zod@4.3.6:
-    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+  zod@4.6.7:
+    resolution: {integrity: sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg==}
 
 snapshots:
 
@@ -10049,7 +10053,7 @@ snapshots:
     optionalDependencies:
       '@nx/eslint': 23.2.1(@babel/traverse@7.29.7)(@zkochan/js-yaml@0.0.7)(eslint@9.39.1)(nx@23.2.1)
       vite: 7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0)
-      vitest: 4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@20.8.9)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))
+      vitest: 4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@21.0.4)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))
     transitivePeerDependencies:
       - '@babel/traverse'
       - '@swc-node/register'
@@ -10805,7 +10809,7 @@ snapshots:
       obug: 2.1.4
       std-env: 4.2.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@20.8.9)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))
+      vitest: 4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@21.0.4)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))
 
   '@vitest/expect@4.1.11':
     dependencies:
@@ -10858,10 +10862,10 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.1
 
-  '@vitest/web-worker@4.1.5(vitest@4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@20.8.9)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0)))':
+  '@vitest/web-worker@4.1.5(vitest@4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@21.0.4)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0)))':
     dependencies:
       obug: 2.1.4
-      vitest: 4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@20.8.9)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))
+      vitest: 4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@21.0.4)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))
 
   '@volar/language-core@2.4.23':
     dependencies:
@@ -11491,6 +11495,10 @@ snapshots:
       update-browserslist-db: 1.2.3(browserslist@4.28.7)
 
   buffer-from@1.1.2: {}
+
+  buffer-image-size@0.6.4:
+    dependencies:
+      '@types/node': 24.13.2
 
   buffer-xor@1.0.3: {}
 
@@ -12780,11 +12788,12 @@ snapshots:
 
   hachure-fill@0.5.2: {}
 
-  happy-dom@20.8.9:
+  happy-dom@21.0.4:
     dependencies:
       '@types/node': 24.13.2
       '@types/whatwg-mimetype': 3.0.2
       '@types/ws': 8.18.1
+      buffer-image-size: 0.6.4
       entities: 7.0.1
       whatwg-mimetype: 3.0.0
       ws: 8.21.0
@@ -15233,19 +15242,19 @@ snapshots:
       terser: 5.51.2
       yaml: 2.9.0
 
-  vitest-mock-extended@3.1.0(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@20.8.9)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))):
+  vitest-mock-extended@3.1.0(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@21.0.4)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))):
     dependencies:
       ts-essentials: 10.2.1(typescript@5.9.3)
       typescript: 5.9.3
-      vitest: 4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@20.8.9)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))
+      vitest: 4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@21.0.4)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))
 
-  vitest-mock-extended@3.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@20.8.9)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))):
+  vitest-mock-extended@3.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@21.0.4)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))):
     dependencies:
       ts-essentials: 10.2.1(typescript@5.9.3)
       typescript: 5.9.3
-      vitest: 4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@20.8.9)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))
+      vitest: 4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@21.0.4)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))
 
-  vitest@4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@20.8.9)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0)):
+  vitest@4.1.11(@types/node@24.13.2)(@vitest/coverage-v8@4.1.5(vitest@4.1.11))(happy-dom@21.0.4)(jsdom@27.4.0(@noble/hashes@2.0.1))(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0)):
     dependencies:
       '@vitest/expect': 4.1.11
       '@vitest/mocker': 4.1.11(vite@7.3.7(@types/node@24.13.2)(sass@1.94.1)(terser@5.51.2)(yaml@2.9.0))
@@ -15270,7 +15279,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.13.2
       '@vitest/coverage-v8': 4.1.5(vitest@4.1.11)
-      happy-dom: 20.8.9
+      happy-dom: 21.0.4
       jsdom: 27.4.0(@noble/hashes@2.0.1)
     transitivePeerDependencies:
       - msw
@@ -15667,4 +15676,4 @@ snapshots:
 
   zod@3.25.76: {}
 
-  zod@4.3.6: {}
+  zod@4.6.7: {}
