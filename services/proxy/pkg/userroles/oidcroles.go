@@ -15,6 +15,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/utils"
+	"github.com/rs/zerolog"
 	"go-micro.dev/v4/metadata"
 )
 
@@ -104,6 +105,11 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 	if err != nil {
 		logger.Error().Err(err).Msg("Error mapping role names to role ids")
 		return nil, err
+	}
+
+	// the account resolver passes the guest role as overwriteRole for multi-instance guests
+	if overwriteRole != "" && len(ra.guestMapping) > 0 {
+		overwriteRole = ra.mapGuestRole(claims, overwriteRole, roleNamesToRoleIDs, logger)
 	}
 
 	roleIDFromClaim := roleNamesToRoleIDs[overwriteRole]
@@ -203,6 +209,28 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 
 	user.Opaque = utils.AppendJSONToOpaque(user.Opaque, "roles", []string{roleIDFromClaim})
 	return user, nil
+}
+
+// mapGuestRole returns the role of the first guest role mapping that matches a value of the
+// user's roles claim. It falls back to guestRole when nothing matches or when the mapped role
+// does not exist, so a guest never ends up with more than the configured guest role by mistake.
+func (ra oidcRoleAssigner) mapGuestRole(claims map[string]interface{}, guestRole string, roleNamesToRoleIDs map[string]string, logger zerolog.Logger) string {
+	claimRoles, err := extractRoles(ra.rolesClaim, claims)
+	if err != nil || len(claimRoles) == 0 {
+		return guestRole
+	}
+
+	for _, mapping := range ra.guestMapping {
+		if !matchesClaimMapping(mapping.ClaimValue, claimRoles) {
+			continue
+		}
+		if _, ok := roleNamesToRoleIDs[mapping.RoleName]; !ok {
+			logger.Warn().Str("role", mapping.RoleName).Str("guestRole", guestRole).Msg("guest role mapping points to an unknown role, assigning the guest role instead")
+			return guestRole
+		}
+		return mapping.RoleName
+	}
+	return guestRole
 }
 
 // ApplyUserRole it looks up the user's role in the settings service and adds it

@@ -18,6 +18,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -268,5 +269,152 @@ func TestUpdateUserRoleAssignmentFailsClosedOnInconclusivePermission(t *testing.
 	// the role assignment must be reverted back to the previous role
 	roleService.AssertCalled(t, "AssignRoleToUser", mock.Anything, mock.MatchedBy(func(req *settingssvc.AssignRoleToUserRequest) bool {
 		return req.GetRoleId() == oldRoleID
+	}), mock.Anything)
+}
+
+func TestMapGuestRole(t *testing.T) {
+	roleIDs := map[string]string{"user-light": "user-light-id", "guest-teacher": "guest-teacher-id"}
+	teacherMapping := []config.RoleMapping{{ClaimValue: "teacher", RoleName: "guest-teacher"}}
+
+	tests := []struct {
+		name    string
+		mapping []config.RoleMapping
+		roleIDs map[string]string
+		claims  map[string]interface{}
+		want    string
+	}{
+		{
+			name:    "teacher gets the mapped role",
+			mapping: teacherMapping,
+			roleIDs: roleIDs,
+			claims:  map[string]interface{}{"roles": []interface{}{"teacher"}},
+			want:    "guest-teacher",
+		},
+		{
+			name:    "teacher with more claim values gets the mapped role",
+			mapping: teacherMapping,
+			roleIDs: roleIDs,
+			claims:  map[string]interface{}{"roles": []interface{}{"principal", "teacher"}},
+			want:    "guest-teacher",
+		},
+		{
+			name:    "pupil keeps the guest role",
+			mapping: teacherMapping,
+			roleIDs: roleIDs,
+			claims:  map[string]interface{}{"roles": []interface{}{"pupil"}},
+			want:    "user-light",
+		},
+		{
+			name:    "guest without roles claim keeps the guest role",
+			mapping: teacherMapping,
+			roleIDs: roleIDs,
+			claims:  map[string]interface{}{"sub": "someone"},
+			want:    "user-light",
+		},
+		{
+			name:    "mapping to an unknown role falls back to the guest role",
+			mapping: teacherMapping,
+			roleIDs: map[string]string{"user-light": "user-light-id"},
+			claims:  map[string]interface{}{"roles": []interface{}{"teacher"}},
+			want:    "user-light",
+		},
+		{
+			name: "first matching mapping wins",
+			mapping: []config.RoleMapping{
+				{ClaimValue: "teacher", RoleName: "guest-teacher"},
+				{ClaimValue: ".*", RoleName: "user-light"},
+			},
+			roleIDs: roleIDs,
+			claims:  map[string]interface{}{"roles": []interface{}{"teacher"}},
+			want:    "guest-teacher",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ra := oidcRoleAssigner{Options: Options{rolesClaim: "roles", guestMapping: tt.mapping}}
+			if got := ra.mapGuestRole(tt.claims, "user-light", tt.roleIDs, zerolog.Nop()); got != tt.want {
+				t.Fatalf("got role %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+// TestUpdateUserRoleAssignmentMapsGuestRole verifies that a guest who already holds the
+// guest role is moved to the role the guest role mapping picks for their claims, which is
+// how guests invited before the mapping was configured get the new role on their next login.
+func TestUpdateUserRoleAssignmentMapsGuestRole(t *testing.T) {
+	const (
+		guestRoleID   = "user-light-id"
+		teacherRoleID = "guest-teacher-id"
+		userOpaqueID  = "user-1"
+	)
+
+	// reset the package-global role-name cache so this test is deterministic
+	roleNameToID.lock.Lock()
+	roleNameToID.roleNameToID = nil
+	roleNameToID.lastRead = time.Time{}
+	roleNameToID.lock.Unlock()
+
+	gatewayClient := &cs3mocks.GatewayAPIClient{}
+	gatewaySelector := pool.GetSelector[gateway.GatewayAPIClient](
+		"GatewaySelector",
+		"com.owncloud.api.gateway",
+		func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
+			return gatewayClient
+		},
+	)
+	defer pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
+
+	gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{
+		Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+		Token:  "service-token",
+	}, nil)
+	// like the guest role, the mapped role can't create drives, so the assigner disables
+	// the (here non-existent) personal space
+	gatewayClient.On("CheckPermission", mock.Anything, mock.Anything).Return(&permissions.CheckPermissionResponse{
+		Status: &rpc.Status{Code: rpc.Code_CODE_PERMISSION_DENIED},
+	}, nil)
+	gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
+		Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+	}, nil)
+
+	roleService := &graphmocks.RoleService{}
+	roleService.On("ListRoles", mock.Anything, mock.Anything, mock.Anything).Return(
+		&settingssvc.ListBundlesResponse{Bundles: []*settingsmsg.Bundle{
+			{Id: guestRoleID, Name: "user-light"},
+			{Id: teacherRoleID, Name: "guest-teacher"},
+		}}, nil)
+	roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(
+		&settingssvc.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{
+			{Id: "guest-assignment-id", AccountUuid: userOpaqueID, RoleId: guestRoleID},
+		}}, nil)
+	roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(
+		&settingssvc.AssignRoleToUserResponse{Assignment: &settingsmsg.UserRoleAssignment{
+			Id:          "teacher-assignment-id",
+			AccountUuid: userOpaqueID,
+			RoleId:      teacherRoleID,
+		}}, nil)
+
+	ra := oidcRoleAssigner{Options: Options{
+		logger:          log.NopLogger(),
+		gatewaySelector: gatewaySelector,
+		roleService:     roleService,
+		rolesClaim:      "roles",
+		guestMapping:    []config.RoleMapping{{ClaimValue: "teacher", RoleName: "guest-teacher"}},
+		serviceAccount:  config.ServiceAccount{ServiceAccountID: "service-account", ServiceAccountSecret: "secret"},
+	}}
+
+	user := &cs3user.User{Id: &cs3user.UserId{OpaqueId: userOpaqueID}}
+	claims := map[string]interface{}{"roles": []interface{}{"teacher"}}
+
+	if _, err := ra.UpdateUserRoleAssignment(context.Background(), user, claims, "user-light"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	roleService.AssertCalled(t, "AssignRoleToUser", mock.Anything, mock.MatchedBy(func(req *settingssvc.AssignRoleToUserRequest) bool {
+		return req.GetAccountUuid() == userOpaqueID && req.GetRoleId() == teacherRoleID
+	}), mock.Anything)
+	roleService.AssertNotCalled(t, "AssignRoleToUser", mock.Anything, mock.MatchedBy(func(req *settingssvc.AssignRoleToUserRequest) bool {
+		return req.GetRoleId() == guestRoleID
 	}), mock.Anything)
 }

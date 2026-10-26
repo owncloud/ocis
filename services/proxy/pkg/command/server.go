@@ -259,11 +259,14 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			userroles.WithLogger(logger),
 		)
 	case "oidc":
+		// the mapping has already been validated when parsing the config
+		guestRoleMapping, _ := cfg.MultiInstance.GuestRoleMappings()
 		roleAssigner = userroles.NewOIDCRoleAssigner(
 			userroles.WithRoleService(rolesClient),
 			userroles.WithLogger(logger),
 			userroles.WithRolesClaim(cfg.RoleAssignment.OIDCRoleMapper.RoleClaim),
 			userroles.WithRoleMapping(cfg.RoleAssignment.OIDCRoleMapper.RolesMap),
+			userroles.WithGuestRoleMapping(guestRoleMapping),
 			userroles.WithRevaGatewaySelector(gatewaySelector),
 			userroles.WithServiceAccount(cfg.ServiceAccount),
 		)
