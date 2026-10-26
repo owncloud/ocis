@@ -60,9 +60,5 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingServiceAccountSecret(cfg.Service.Name)
 	}
 
-	if _, err := cfg.MultiInstance.GuestRoleMappings(); err != nil {
-		return fmt.Errorf("invalid value for 'guest_role_mapping' in service %s: %w", cfg.Service.Name, err)
-	}
-
 	return nil
 }

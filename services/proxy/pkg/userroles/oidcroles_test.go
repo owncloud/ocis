@@ -3,6 +3,8 @@ package userroles
 import (
 	"context"
 	"encoding/json"
+	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -18,7 +20,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
-	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -282,6 +283,7 @@ func TestMapGuestRole(t *testing.T) {
 		roleIDs map[string]string
 		claims  map[string]interface{}
 		want    string
+		wantErr bool
 	}{
 		{
 			name:    "teacher gets the mapped role",
@@ -312,10 +314,17 @@ func TestMapGuestRole(t *testing.T) {
 			want:    "user-light",
 		},
 		{
-			name:    "mapping to an unknown role falls back to the guest role",
+			name:    "mapping to an unknown role is an error",
 			mapping: teacherMapping,
 			roleIDs: map[string]string{"user-light": "user-light-id"},
 			claims:  map[string]interface{}{"roles": []interface{}{"teacher"}},
+			wantErr: true,
+		},
+		{
+			name:    "unknown role of a non-matching mapping is no error",
+			mapping: teacherMapping,
+			roleIDs: map[string]string{"user-light": "user-light-id"},
+			claims:  map[string]interface{}{"roles": []interface{}{"pupil"}},
 			want:    "user-light",
 		},
 		{
@@ -332,7 +341,17 @@ func TestMapGuestRole(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ra := oidcRoleAssigner{Options: Options{rolesClaim: "roles", guestMapping: tt.mapping}}
-			if got := ra.mapGuestRole(tt.claims, "user-light", tt.roleIDs, zerolog.Nop()); got != tt.want {
+			got, err := ra.mapGuestRole(tt.claims, "user-light", tt.roleIDs)
+			if tt.wantErr {
+				if err == nil {
+					t.Fatalf("expected an error, got role %q", got)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if got != tt.want {
 				t.Fatalf("got role %q, want %q", got, tt.want)
 			}
 		})
@@ -417,4 +436,110 @@ func TestUpdateUserRoleAssignmentMapsGuestRole(t *testing.T) {
 	roleService.AssertNotCalled(t, "AssignRoleToUser", mock.Anything, mock.MatchedBy(func(req *settingssvc.AssignRoleToUserRequest) bool {
 		return req.GetRoleId() == guestRoleID
 	}), mock.Anything)
+}
+
+// TestUpdateUserRoleAssignmentFailsOnUnknownGuestRole verifies that a guest role mapping that
+// points to a role which does not exist fails the role assignment instead of silently assigning
+// the guest role.
+func TestUpdateUserRoleAssignmentFailsOnUnknownGuestRole(t *testing.T) {
+	// reset the package-global role-name cache so this test is deterministic
+	roleNameToID.lock.Lock()
+	roleNameToID.roleNameToID = nil
+	roleNameToID.lastRead = time.Time{}
+	roleNameToID.lock.Unlock()
+
+	gatewayClient := &cs3mocks.GatewayAPIClient{}
+	gatewaySelector := pool.GetSelector[gateway.GatewayAPIClient](
+		"GatewaySelector",
+		"com.owncloud.api.gateway",
+		func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
+			return gatewayClient
+		},
+	)
+	defer pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
+
+	// listing the roles needs a service account context
+	gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{
+		Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+		Token:  "service-token",
+	}, nil)
+
+	roleService := &graphmocks.RoleService{}
+	roleService.On("ListRoles", mock.Anything, mock.Anything, mock.Anything).Return(
+		&settingssvc.ListBundlesResponse{Bundles: []*settingsmsg.Bundle{{Id: "user-light-id", Name: "user-light"}}}, nil)
+
+	ra := oidcRoleAssigner{Options: Options{
+		logger:          log.NopLogger(),
+		gatewaySelector: gatewaySelector,
+		roleService:     roleService,
+		rolesClaim:      "roles",
+		guestMapping:    []config.RoleMapping{{ClaimValue: "teacher", RoleName: "guest-teacher"}},
+		serviceAccount:  config.ServiceAccount{ServiceAccountID: "service-account", ServiceAccountSecret: "secret"},
+	}}
+
+	user := &cs3user.User{Id: &cs3user.UserId{OpaqueId: "user-1"}}
+	claims := map[string]interface{}{"roles": []interface{}{"teacher"}}
+
+	_, err := ra.UpdateUserRoleAssignment(context.Background(), user, claims, "user-light")
+	if err == nil || !strings.Contains(err.Error(), "unknown role 'guest-teacher'") {
+		t.Fatalf("expected an error for the guest role mapping to an unknown role, got %v", err)
+	}
+	roleService.AssertNotCalled(t, "AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything)
+}
+
+func TestGuestRoleMapping(t *testing.T) {
+	tests := []struct {
+		name    string
+		driver  string
+		pairs   []string
+		want    []config.RoleMapping
+		wantErr bool
+	}{
+		{
+			name:   "empty",
+			driver: "default",
+			pairs:  nil,
+			want:   []config.RoleMapping{},
+		},
+		{
+			name:   "pairs keep their order",
+			driver: "oidc",
+			pairs:  []string{"teacher:guest-teacher", "admin:guest-admin"},
+			want: []config.RoleMapping{
+				{ClaimValue: "teacher", RoleName: "guest-teacher"},
+				{ClaimValue: "admin", RoleName: "guest-admin"},
+			},
+		},
+		{
+			name:   "claim value may contain colons",
+			driver: "oidc",
+			pairs:  []string{"urn:school:teacher:guest-teacher"},
+			want:   []config.RoleMapping{{ClaimValue: "urn:school:teacher", RoleName: "guest-teacher"}},
+		},
+		{name: "requires the oidc driver", driver: "default", pairs: []string{"teacher:guest-teacher"}, wantErr: true},
+		{name: "missing colon", driver: "oidc", pairs: []string{"teacher"}, wantErr: true},
+		{name: "missing claim value", driver: "oidc", pairs: []string{":guest-teacher"}, wantErr: true},
+		{name: "missing role name", driver: "oidc", pairs: []string{"teacher:"}, wantErr: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := &config.Config{
+				RoleAssignment: config.RoleAssignment{Driver: tt.driver},
+				MultiInstance:  config.MultiInstanceConfig{GuestRoleMapping: tt.pairs},
+			}
+			got, err := GuestRoleMapping(cfg)
+			if tt.wantErr {
+				if err == nil {
+					t.Fatalf("expected an error for %v", tt.pairs)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Fatalf("got %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

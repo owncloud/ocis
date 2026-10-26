@@ -3,7 +3,9 @@ package userroles
 import (
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
+	"strings"
 	"sync"
 	"time"
 
@@ -13,9 +15,9 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/rs/zerolog"
 	"go-micro.dev/v4/metadata"
 )
 
@@ -109,7 +111,11 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 
 	// the account resolver passes the guest role as overwriteRole for multi-instance guests
 	if overwriteRole != "" && len(ra.guestMapping) > 0 {
-		overwriteRole = ra.mapGuestRole(claims, overwriteRole, roleNamesToRoleIDs, logger)
+		overwriteRole, err = ra.mapGuestRole(claims, overwriteRole, roleNamesToRoleIDs)
+		if err != nil {
+			logger.Error().Err(err).Msg("Error mapping guest role")
+			return nil, err
+		}
 	}
 
 	roleIDFromClaim := roleNamesToRoleIDs[overwriteRole]
@@ -211,13 +217,35 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 	return user, nil
 }
 
+// GuestRoleMapping reads the 'claimvalue:rolename' pairs of OCIS_MULTI_INSTANCE_GUEST_ROLE_MAPPING.
+// A pair is split at its last colon, so the claim value may contain colons but the role name must not.
+// Roles created through the settings service can't contain a colon, their names are restricted to
+// letters, digits, '-' and '_'.
+func GuestRoleMapping(cfg *config.Config) ([]config.RoleMapping, error) {
+	pairs := cfg.MultiInstance.GuestRoleMapping
+	if len(pairs) > 0 && cfg.RoleAssignment.Driver != "oidc" {
+		return nil, fmt.Errorf("the guest role mapping requires the 'oidc' role assignment driver, not '%s'", cfg.RoleAssignment.Driver)
+	}
+
+	mappings := make([]config.RoleMapping, 0, len(pairs))
+	for _, pair := range pairs {
+		i := strings.LastIndex(pair, ":")
+		if i <= 0 || i == len(pair)-1 {
+			return nil, fmt.Errorf("invalid guest role mapping '%s', expected 'claimvalue:rolename'", pair)
+		}
+		mappings = append(mappings, config.RoleMapping{ClaimValue: pair[:i], RoleName: pair[i+1:]})
+	}
+	return mappings, nil
+}
+
 // mapGuestRole returns the role of the first guest role mapping that matches a value of the
-// user's roles claim. It falls back to guestRole when nothing matches or when the mapped role
-// does not exist, so a guest never ends up with more than the configured guest role by mistake.
-func (ra oidcRoleAssigner) mapGuestRole(claims map[string]interface{}, guestRole string, roleNamesToRoleIDs map[string]string, logger zerolog.Logger) string {
+// user's roles claim, or guestRole when nothing matches. A mapping to a role that does not exist
+// is an error: it can only be a misconfiguration, and falling back to guestRole could give the
+// guest more permissions than the mapped role was meant to.
+func (ra oidcRoleAssigner) mapGuestRole(claims map[string]interface{}, guestRole string, roleNamesToRoleIDs map[string]string) (string, error) {
 	claimRoles, err := extractRoles(ra.rolesClaim, claims)
 	if err != nil || len(claimRoles) == 0 {
-		return guestRole
+		return guestRole, nil
 	}
 
 	for _, mapping := range ra.guestMapping {
@@ -225,12 +253,11 @@ func (ra oidcRoleAssigner) mapGuestRole(claims map[string]interface{}, guestRole
 			continue
 		}
 		if _, ok := roleNamesToRoleIDs[mapping.RoleName]; !ok {
-			logger.Warn().Str("role", mapping.RoleName).Str("guestRole", guestRole).Msg("guest role mapping points to an unknown role, assigning the guest role instead")
-			return guestRole
+			return "", fmt.Errorf("guest role mapping '%s' points to the unknown role '%s'", mapping.ClaimValue, mapping.RoleName)
 		}
-		return mapping.RoleName
+		return mapping.RoleName, nil
 	}
-	return guestRole
+	return guestRole, nil
 }
 
 // ApplyUserRole it looks up the user's role in the settings service and adds it

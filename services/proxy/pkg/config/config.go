@@ -2,8 +2,6 @@ package config
 
 import (
 	"context"
-	"fmt"
-	"strings"
 	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -267,19 +265,5 @@ type MultiInstanceConfig struct {
 	MemberClaim      string   `yaml:"member_claim" env:"OCIS_MULTI_INSTANCE_MEMBER_CLAIM" desc:"The claim name for the 'memberOf' property" introductionVersion:"8.0.0"`
 	GuestClaim       string   `yaml:"guest_claim" env:"OCIS_MULTI_INSTANCE_GUEST_CLAIM" desc:"The claim name for the 'guestOf' property" introductionVersion:"8.0.0"`
 	GuestRole        string   `yaml:"guest_role" env:"OCIS_MULTI_INSTANCE_GUEST_ROLE" desc:"The role that should be assigned to a guest user" introductionVersion:"8.0.0"`
-	GuestRoleMapping []string `yaml:"guest_role_mapping" env:"OCIS_MULTI_INSTANCE_GUEST_ROLE_MAPPING" desc:"(Optional) Mapping of PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM values to the role a guest gets instead of OCIS_MULTI_INSTANCE_GUEST_ROLE. Example: 'teacher:guest-teacher'. The first match wins. Only applies to the 'oidc' role assignment driver." introductionVersion:"9.0.0"`
-}
-
-// GuestRoleMappings turns the 'claimvalue:rolename' pairs of OCIS_MULTI_INSTANCE_GUEST_ROLE_MAPPING
-// into role mappings. A pair is split at its last colon, so the claim value may contain colons.
-func (m MultiInstanceConfig) GuestRoleMappings() ([]RoleMapping, error) {
-	mappings := make([]RoleMapping, 0, len(m.GuestRoleMapping))
-	for _, pair := range m.GuestRoleMapping {
-		i := strings.LastIndex(pair, ":")
-		if i <= 0 || i == len(pair)-1 {
-			return nil, fmt.Errorf("invalid guest role mapping '%s', expected 'claimvalue:rolename'", pair)
-		}
-		mappings = append(mappings, RoleMapping{ClaimValue: pair[:i], RoleName: pair[i+1:]})
-	}
-	return mappings, nil
+	GuestRoleMapping []string `yaml:"guest_role_mapping" env:"OCIS_MULTI_INSTANCE_GUEST_ROLE_MAPPING" desc:"(Optional) Mapping of PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM values to the role a guest gets instead of OCIS_MULTI_INSTANCE_GUEST_ROLE. Example: 'teacher:guest-teacher'. The first match wins. Role names must not contain a colon. Only applies to the 'oidc' role assignment driver." introductionVersion:"9.0.0"`
 }
