@@ -4,6 +4,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   detect-changes:
     name: detect-changes
@@ -15,6 +18,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Check if changes are docs-only
         id: check
@@ -57,6 +61,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
@@ -69,7 +75,7 @@ jobs:
       - name: Enable pnpm
         run: corepack enable && corepack prepare pnpm@10.33.3 --activate
 
-      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2.40.0
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: "8.4"
           extensions: curl, xml, mbstring, zip, ldap, gd
@@ -82,6 +88,7 @@ jobs:
           sudo NEEDRESTART_MODE=a apt-get install -y libvips-dev
 
       - name: Pre-checks and generate
+        # zizmor: ignore[adhoc-packages] gherlint is version-pinned (@1.1.0)
         run: |
           # Phase 1 — I/O + light CPU, no contention between tasks.
           # wa (I/O wait) will spike during npm/pnpm downloads.
@@ -230,8 +237,10 @@ jobs:
           - apiVault
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2.40.0
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: "8.4"
           extensions: curl, xml, mbstring, zip, ldap, gd
@@ -314,8 +323,10 @@ jobs:
           - cliCommands,apiServiceAvailability   # grouped: both need ClamAV + email services
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2.40.0
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: "8.4"
           extensions: curl, xml, mbstring, zip, ldap, gd
@@ -362,8 +373,10 @@ jobs:
           - apiGraphUser,apiGraph,apiGraphGroup
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2.40.0
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: "8.4"
           extensions: curl, xml, mbstring, zip, ldap, gd
@@ -418,8 +431,10 @@ jobs:
           - "coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2.40.0
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: "8.4"
           extensions: curl, xml, mbstring, zip, ldap, gd
@@ -534,6 +549,8 @@ jobs:
             vault_storage: true
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           # 24.16.0 breaks playwright install (yauzl zip extraction hangs); pin to last known good.
@@ -704,6 +721,8 @@ jobs:
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install libvips runtime
         run: |
@@ -729,6 +748,8 @@ jobs:
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install libvips runtime
         run: |
@@ -754,6 +775,8 @@ jobs:
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install libvips runtime
         run: |
@@ -779,6 +802,8 @@ jobs:
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install libvips runtime
         run: |
@@ -804,6 +829,8 @@ jobs:
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
@@ -837,6 +864,8 @@ jobs:
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
@@ -870,6 +899,8 @@ jobs:
       GOCOVERDIR: ${{ github.workspace }}/coverage-reports
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
@@ -883,14 +914,14 @@ jobs:
           merge-multiple: true
 
       - name: Convert coverage counters to profile
-        run: go tool covdata textfmt -i=${{ env.GOCOVERDIR }} -o=coverage.out
+        run: go tool covdata textfmt -i=${GOCOVERDIR} -o=coverage.out
 
       - name: Publish coverage summary
         run: |
           {
             echo "## Acceptance test coverage"
             echo '```'
-            go tool covdata percent -i=${{ env.GOCOVERDIR }}
+            go tool covdata percent -i=${GOCOVERDIR}
             echo '```'
             echo
             echo "<details>"
@@ -911,10 +942,12 @@ jobs:
       - name: Check all jobs passed
         run: |
           # If docs-only, all test jobs are expected to be skipped — that's a pass
-          if [[ "${{ needs.detect-changes.outputs.docs-only }}" == "true" ]]; then
+          if [[ "${NEEDS_DETECT_CHANGES_OUTPUTS_DOCS_ONLY}" == "true" ]]; then
             echo "Docs-only change — skipping tests is expected."
             exit 0
           fi
           if [[ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
             exit 1
           fi
+        env:
+          NEEDS_DETECT_CHANGES_OUTPUTS_DOCS_ONLY: ${{ needs.detect-changes.outputs.docs-only }}

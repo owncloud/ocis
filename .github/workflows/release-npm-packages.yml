@@ -27,6 +27,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -44,7 +46,7 @@ jobs:
       - name: Determine package
         id: package
         run: |
-          TAG="${{ github.ref_name }}"
+          TAG="${GITHUB_REF_NAME}"
           PACKAGES="babel-preset design-system eslint-config extension-sdk prettier-config tsconfig web-client web-pkg web-test-helpers"
           for pkg in $PACKAGES; do
             if [[ "$TAG" == "${pkg}-v"* ]]; then
@@ -58,29 +60,36 @@ jobs:
 
       - name: Verify package version
         run: |
-          PKG="${{ steps.package.outputs.name }}"
-          VERSION="${{ steps.package.outputs.version }}"
+          PKG="${STEPS_PACKAGE_OUTPUTS_NAME}"
+          VERSION="${STEPS_PACKAGE_OUTPUTS_VERSION}"
           ACTUAL_VERSION=$(jq -r '.version' < "packages/${PKG}/package.json")
           echo "Build ${PKG} ${VERSION} package.json: ${ACTUAL_VERSION}"
           if [ "${ACTUAL_VERSION}" != "${VERSION}" ]; then
             echo "git tag does not match version in web/packages/${PKG}/package.json"
             exit 1
           fi
+        env:
+          STEPS_PACKAGE_OUTPUTS_NAME: ${{ steps.package.outputs.name }}
+          STEPS_PACKAGE_OUTPUTS_VERSION: ${{ steps.package.outputs.version }}
 
       - name: Build tokens
         run: pnpm build:tokens
 
       - name: Build package
         run: |
-          PKG="${{ steps.package.outputs.name }}"
+          PKG="${STEPS_PACKAGE_OUTPUTS_NAME}"
           case "$PKG" in
             design-system|web-client|web-pkg|web-test-helpers)
               pnpm --filter "@ownclouders/${PKG}" vite build
               ;;
           esac
+        env:
+          STEPS_PACKAGE_OUTPUTS_NAME: ${{ steps.package.outputs.name }}
 
       - name: Publish to NPM
         run: |
           pnpm publish \
-            --no-git-checks --filter "@ownclouders/${{ steps.package.outputs.name }}" \
+            --no-git-checks --filter "@ownclouders/${STEPS_PACKAGE_OUTPUTS_NAME}" \
             --access public --tag latest
+        env:
+          STEPS_PACKAGE_OUTPUTS_NAME: ${{ steps.package.outputs.name }}
