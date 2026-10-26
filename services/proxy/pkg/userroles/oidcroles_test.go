@@ -274,8 +274,8 @@ func TestUpdateUserRoleAssignmentFailsClosedOnInconclusivePermission(t *testing.
 }
 
 func TestMapGuestRole(t *testing.T) {
-	roleIDs := map[string]string{"user-light": "user-light-id", "guest-teacher": "guest-teacher-id"}
-	teacherMapping := []config.RoleMapping{{ClaimValue: "teacher", RoleName: "guest-teacher"}}
+	roleIDs := map[string]string{"user-light": "user-light-id", "user-light-vault": "user-light-vault-id"}
+	teacherMapping := []config.RoleMapping{{ClaimValue: "teacher", RoleName: "user-light-vault"}}
 
 	tests := []struct {
 		name    string
@@ -290,14 +290,14 @@ func TestMapGuestRole(t *testing.T) {
 			mapping: teacherMapping,
 			roleIDs: roleIDs,
 			claims:  map[string]interface{}{"roles": []interface{}{"teacher"}},
-			want:    "guest-teacher",
+			want:    "user-light-vault",
 		},
 		{
 			name:    "teacher with more claim values gets the mapped role",
 			mapping: teacherMapping,
 			roleIDs: roleIDs,
 			claims:  map[string]interface{}{"roles": []interface{}{"principal", "teacher"}},
-			want:    "guest-teacher",
+			want:    "user-light-vault",
 		},
 		{
 			name:    "pupil keeps the guest role",
@@ -330,12 +330,12 @@ func TestMapGuestRole(t *testing.T) {
 		{
 			name: "first matching mapping wins",
 			mapping: []config.RoleMapping{
-				{ClaimValue: "teacher", RoleName: "guest-teacher"},
+				{ClaimValue: "teacher", RoleName: "user-light-vault"},
 				{ClaimValue: ".*", RoleName: "user-light"},
 			},
 			roleIDs: roleIDs,
 			claims:  map[string]interface{}{"roles": []interface{}{"teacher"}},
-			want:    "guest-teacher",
+			want:    "user-light-vault",
 		},
 	}
 	for _, tt := range tests {
@@ -363,9 +363,9 @@ func TestMapGuestRole(t *testing.T) {
 // how guests invited before the mapping was configured get the new role on their next login.
 func TestUpdateUserRoleAssignmentMapsGuestRole(t *testing.T) {
 	const (
-		guestRoleID   = "user-light-id"
-		teacherRoleID = "guest-teacher-id"
-		userOpaqueID  = "user-1"
+		guestRoleID  = "user-light-id"
+		vaultRoleID  = "user-light-vault-id"
+		userOpaqueID = "user-1"
 	)
 
 	// reset the package-global role-name cache so this test is deterministic
@@ -401,7 +401,7 @@ func TestUpdateUserRoleAssignmentMapsGuestRole(t *testing.T) {
 	roleService.On("ListRoles", mock.Anything, mock.Anything, mock.Anything).Return(
 		&settingssvc.ListBundlesResponse{Bundles: []*settingsmsg.Bundle{
 			{Id: guestRoleID, Name: "user-light"},
-			{Id: teacherRoleID, Name: "guest-teacher"},
+			{Id: vaultRoleID, Name: "user-light-vault"},
 		}}, nil)
 	roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(
 		&settingssvc.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{
@@ -411,7 +411,7 @@ func TestUpdateUserRoleAssignmentMapsGuestRole(t *testing.T) {
 		&settingssvc.AssignRoleToUserResponse{Assignment: &settingsmsg.UserRoleAssignment{
 			Id:          "teacher-assignment-id",
 			AccountUuid: userOpaqueID,
-			RoleId:      teacherRoleID,
+			RoleId:      vaultRoleID,
 		}}, nil)
 
 	ra := oidcRoleAssigner{Options: Options{
@@ -419,7 +419,7 @@ func TestUpdateUserRoleAssignmentMapsGuestRole(t *testing.T) {
 		gatewaySelector: gatewaySelector,
 		roleService:     roleService,
 		rolesClaim:      "roles",
-		guestMapping:    []config.RoleMapping{{ClaimValue: "teacher", RoleName: "guest-teacher"}},
+		guestMapping:    []config.RoleMapping{{ClaimValue: "teacher", RoleName: "user-light-vault"}},
 		serviceAccount:  config.ServiceAccount{ServiceAccountID: "service-account", ServiceAccountSecret: "secret"},
 	}}
 
@@ -431,7 +431,7 @@ func TestUpdateUserRoleAssignmentMapsGuestRole(t *testing.T) {
 	}
 
 	roleService.AssertCalled(t, "AssignRoleToUser", mock.Anything, mock.MatchedBy(func(req *settingssvc.AssignRoleToUserRequest) bool {
-		return req.GetAccountUuid() == userOpaqueID && req.GetRoleId() == teacherRoleID
+		return req.GetAccountUuid() == userOpaqueID && req.GetRoleId() == vaultRoleID
 	}), mock.Anything)
 	roleService.AssertNotCalled(t, "AssignRoleToUser", mock.Anything, mock.MatchedBy(func(req *settingssvc.AssignRoleToUserRequest) bool {
 		return req.GetRoleId() == guestRoleID
@@ -473,7 +473,7 @@ func TestUpdateUserRoleAssignmentFailsOnUnknownGuestRole(t *testing.T) {
 		gatewaySelector: gatewaySelector,
 		roleService:     roleService,
 		rolesClaim:      "roles",
-		guestMapping:    []config.RoleMapping{{ClaimValue: "teacher", RoleName: "guest-teacher"}},
+		guestMapping:    []config.RoleMapping{{ClaimValue: "teacher", RoleName: "user-light-vault"}},
 		serviceAccount:  config.ServiceAccount{ServiceAccountID: "service-account", ServiceAccountSecret: "secret"},
 	}}
 
@@ -481,7 +481,7 @@ func TestUpdateUserRoleAssignmentFailsOnUnknownGuestRole(t *testing.T) {
 	claims := map[string]interface{}{"roles": []interface{}{"teacher"}}
 
 	_, err := ra.UpdateUserRoleAssignment(context.Background(), user, claims, "user-light")
-	if err == nil || !strings.Contains(err.Error(), "unknown role 'guest-teacher'") {
+	if err == nil || !strings.Contains(err.Error(), "unknown role 'user-light-vault'") {
 		t.Fatalf("expected an error for the guest role mapping to an unknown role, got %v", err)
 	}
 	roleService.AssertNotCalled(t, "AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything)
@@ -504,21 +504,21 @@ func TestGuestRoleMapping(t *testing.T) {
 		{
 			name:   "pairs keep their order",
 			driver: "oidc",
-			pairs:  []string{"teacher:guest-teacher", "admin:guest-admin"},
+			pairs:  []string{"teacher:user-light-vault", "admin:guest-admin"},
 			want: []config.RoleMapping{
-				{ClaimValue: "teacher", RoleName: "guest-teacher"},
+				{ClaimValue: "teacher", RoleName: "user-light-vault"},
 				{ClaimValue: "admin", RoleName: "guest-admin"},
 			},
 		},
 		{
 			name:   "claim value may contain colons",
 			driver: "oidc",
-			pairs:  []string{"urn:school:teacher:guest-teacher"},
-			want:   []config.RoleMapping{{ClaimValue: "urn:school:teacher", RoleName: "guest-teacher"}},
+			pairs:  []string{"urn:school:teacher:user-light-vault"},
+			want:   []config.RoleMapping{{ClaimValue: "urn:school:teacher", RoleName: "user-light-vault"}},
 		},
-		{name: "requires the oidc driver", driver: "default", pairs: []string{"teacher:guest-teacher"}, wantErr: true},
+		{name: "requires the oidc driver", driver: "default", pairs: []string{"teacher:user-light-vault"}, wantErr: true},
 		{name: "missing colon", driver: "oidc", pairs: []string{"teacher"}, wantErr: true},
-		{name: "missing claim value", driver: "oidc", pairs: []string{":guest-teacher"}, wantErr: true},
+		{name: "missing claim value", driver: "oidc", pairs: []string{":user-light-vault"}, wantErr: true},
 		{name: "missing role name", driver: "oidc", pairs: []string{"teacher:"}, wantErr: true},
 	}
 	for _, tt := range tests {
