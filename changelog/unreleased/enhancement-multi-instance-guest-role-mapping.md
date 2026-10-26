@@ -13,4 +13,4 @@ of the guest role. Guests without a match, or whose mapped role does not exist,
 keep `OCIS_MULTI_INSTANCE_GUEST_ROLE`. The setting is empty by default, which
 keeps the previous behaviour.
 
-https://github.com/owncloud/ocis/pull/XXXXX
+https://github.com/owncloud/ocis/pull/13231
