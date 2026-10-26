@@ -39,7 +39,6 @@ jobs:
       - id: info
         env:
           VERSION_OVERRIDE: ${{ inputs.version_override }}
-          NEEDS_DETERMINE_RELEASE_TYPE_OUTPUTS_VERSION: ${{ needs.determine-release-type.outputs.version }}
         run: |
           next_dev() {
             # If latest tag is already a pre-release (e.g. v8.0.2-dev.1), reuse its base
@@ -64,12 +63,11 @@ jobs:
             VERSION="${GITHUB_REF#refs/tags/v}"
           fi
 
-          # `version` below is read back by nine `run:` blocks in this file (thirteen
-          # interpolations) as ${NEEDS_DETERMINE_RELEASE_TYPE_OUTPUTS_VERSION}, and each
-          # of those is substituted into the script text before bash sees it. Refusing
-          # anything that is not a version token here is what keeps those nine safe, instead
-          # of nine more env: blocks -- and a release version that is not a version token is
-          # a bug in its own right.
+          # `version` below is read back by the later jobs' `run:` blocks through
+          # NEEDS_DETERMINE_RELEASE_TYPE_OUTPUTS_VERSION in their env:, so it is never
+          # substituted into script text. Refusing anything that is not a version token
+          # here is a second safeguard -- and a release version that is not a version
+          # token is a bug in its own right.
           if [[ ! "$VERSION" =~ ^[0-9A-Za-z][0-9A-Za-z.+-]*$ ]]; then
             echo "::error title=Invalid release version::'$VERSION' is not a version string (expected ^[0-9A-Za-z][0-9A-Za-z.+-]*$)"
             exit 1
