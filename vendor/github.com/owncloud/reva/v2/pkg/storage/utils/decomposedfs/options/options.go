@@ -124,6 +124,12 @@ func New(m map[string]interface{}) (*Options, error) {
 
 	o.GatewayAddr = sharedconf.GetGatewaySVC(o.GatewayAddr)
 
+	for name, c := range map[string]cache.Config{"statcache": o.StatCache, "filemetadatacache": o.FileMetadataCache, "idcache": o.IDCache} {
+		if err := c.CheckCredentials(); err != nil {
+			return nil, errors.Wrap(err, name)
+		}
+	}
+
 	if o.MetadataBackend == "" {
 		o.MetadataBackend = "xattrs"
 	}

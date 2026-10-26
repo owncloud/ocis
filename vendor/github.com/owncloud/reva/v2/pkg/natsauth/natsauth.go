@@ -46,6 +46,14 @@ func CredentialsOption(credsFile, creds string) (nats.Option, error) {
 	}
 }
 
+// Check checks the JWT credentials like CredentialsOption. Use it in a constructor
+// that can return an error, so that invalid credentials stop the service at startup.
+// It returns no error when both values are empty.
+func Check(credsFile, creds string) error {
+	_, err := CredentialsOption(credsFile, creds)
+	return err
+}
+
 // Validate checks that content is a ".creds" file with a user JWT and the
 // matching user NKey seed.
 func Validate(content []byte) error {

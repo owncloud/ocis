@@ -146,6 +146,9 @@ func (h *Handler) Init(c *config.Config) error {
 	h.publicPasswordEnforced = publicPwdEnforced(c)
 	h.passwordValidator = passwordPolicies(c)
 
+	if err := c.StatCacheConfig.CheckCredentials(); err != nil {
+		return fmt.Errorf("stat cache: %w", err)
+	}
 	h.statCache = cache.GetStatCache(c.StatCacheConfig)
 	if c.CacheWarmupDriver != "" {
 		cwm, err := getCacheWarmupManager(c)
