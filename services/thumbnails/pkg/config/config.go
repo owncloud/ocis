@@ -43,6 +43,7 @@ type Thumbnail struct {
 	CS3AllowInsecure      bool              `yaml:"cs3_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_CS3SOURCE_INSECURE" desc:"Ignore untrusted SSL certificates when connecting to the CS3 source." introductionVersion:"pre5.0"`
 	RevaGateway           string            `yaml:"reva_gateway" env:"OCIS_REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata" introductionVersion:"pre5.0"`
 	FontMapFile           string            `yaml:"font_map_file" env:"THUMBNAILS_TXT_FONTMAP_FILE" desc:"The path to a font file for txt thumbnails." introductionVersion:"pre5.0"`
+	GifFirstFrameOnly     bool              `yaml:"gif_first_frame_only" env:"THUMBNAILS_GIF_FIRST_FRAME_ONLY" desc:"Generate static GIF thumbnails by decoding only the first frame. Animated GIF thumbnails are preserved by default." introductionVersion:"ghez"`
 	TransferSecret        string            `yaml:"transfer_secret" env:"THUMBNAILS_TRANSFER_TOKEN" desc:"The secret to sign JWT to download the actual thumbnail file." introductionVersion:"pre5.0"`
 	DataEndpoint          string            `yaml:"data_endpoint" env:"THUMBNAILS_DATA_ENDPOINT" desc:"The HTTP endpoint where the actual thumbnail file can be downloaded." introductionVersion:"pre5.0"`
 	MaxInputWidth         int               `yaml:"max_input_width" env:"THUMBNAILS_MAX_INPUT_WIDTH" desc:"The maximum width of an input image which is being processed." introductionVersion:"6.0.0"`
