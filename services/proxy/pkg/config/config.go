@@ -265,5 +265,5 @@ type MultiInstanceConfig struct {
 	MemberClaim      string   `yaml:"member_claim" env:"OCIS_MULTI_INSTANCE_MEMBER_CLAIM" desc:"The claim name for the 'memberOf' property" introductionVersion:"8.0.0"`
 	GuestClaim       string   `yaml:"guest_claim" env:"OCIS_MULTI_INSTANCE_GUEST_CLAIM" desc:"The claim name for the 'guestOf' property" introductionVersion:"8.0.0"`
 	GuestRole        string   `yaml:"guest_role" env:"OCIS_MULTI_INSTANCE_GUEST_ROLE" desc:"The role that should be assigned to a guest user" introductionVersion:"8.0.0"`
-	GuestRoleMapping []string `yaml:"guest_role_mapping" env:"OCIS_MULTI_INSTANCE_GUEST_ROLE_MAPPING" desc:"(Optional) Mapping of PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM values to the role a guest gets instead of OCIS_MULTI_INSTANCE_GUEST_ROLE. Example: 'teacher:user-light-vault'. The first match wins. Role names must not contain a colon. Only applies to the 'oidc' role assignment driver." introductionVersion:"9.0.0"`
+	GuestRoleMapping []string `yaml:"guest_role_mapping" env:"OCIS_MULTI_INSTANCE_GUEST_ROLE_MAPPING" desc:"(Optional) Mapping of PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM values to the role a guest gets instead of OCIS_MULTI_INSTANCE_GUEST_ROLE. Example: 'spaceadmin:user-light-vault'. The first match wins. Role names must not contain a colon. Only applies to the 'oidc' role assignment driver." introductionVersion:"9.0.0"`
 }

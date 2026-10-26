@@ -275,7 +275,7 @@ func TestUpdateUserRoleAssignmentFailsClosedOnInconclusivePermission(t *testing.
 
 func TestMapGuestRole(t *testing.T) {
 	roleIDs := map[string]string{"user-light": "user-light-id", "user-light-vault": "user-light-vault-id"}
-	teacherMapping := []config.RoleMapping{{ClaimValue: "teacher", RoleName: "user-light-vault"}}
+	spaceAdminMapping := []config.RoleMapping{{ClaimValue: "spaceadmin", RoleName: "user-light-vault"}}
 
 	tests := []struct {
 		name    string
@@ -286,55 +286,55 @@ func TestMapGuestRole(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "teacher gets the mapped role",
-			mapping: teacherMapping,
+			name:    "spaceadmin gets the mapped role",
+			mapping: spaceAdminMapping,
 			roleIDs: roleIDs,
-			claims:  map[string]interface{}{"roles": []interface{}{"teacher"}},
+			claims:  map[string]interface{}{"roles": []interface{}{"spaceadmin"}},
 			want:    "user-light-vault",
 		},
 		{
-			name:    "teacher with more claim values gets the mapped role",
-			mapping: teacherMapping,
+			name:    "spaceadmin with more claim values gets the mapped role",
+			mapping: spaceAdminMapping,
 			roleIDs: roleIDs,
-			claims:  map[string]interface{}{"roles": []interface{}{"principal", "teacher"}},
+			claims:  map[string]interface{}{"roles": []interface{}{"user", "spaceadmin"}},
 			want:    "user-light-vault",
 		},
 		{
-			name:    "pupil keeps the guest role",
-			mapping: teacherMapping,
+			name:    "user keeps the guest role",
+			mapping: spaceAdminMapping,
 			roleIDs: roleIDs,
-			claims:  map[string]interface{}{"roles": []interface{}{"pupil"}},
+			claims:  map[string]interface{}{"roles": []interface{}{"user"}},
 			want:    "user-light",
 		},
 		{
 			name:    "guest without roles claim keeps the guest role",
-			mapping: teacherMapping,
+			mapping: spaceAdminMapping,
 			roleIDs: roleIDs,
 			claims:  map[string]interface{}{"sub": "someone"},
 			want:    "user-light",
 		},
 		{
 			name:    "mapping to an unknown role is an error",
-			mapping: teacherMapping,
+			mapping: spaceAdminMapping,
 			roleIDs: map[string]string{"user-light": "user-light-id"},
-			claims:  map[string]interface{}{"roles": []interface{}{"teacher"}},
+			claims:  map[string]interface{}{"roles": []interface{}{"spaceadmin"}},
 			wantErr: true,
 		},
 		{
 			name:    "unknown role of a non-matching mapping is no error",
-			mapping: teacherMapping,
+			mapping: spaceAdminMapping,
 			roleIDs: map[string]string{"user-light": "user-light-id"},
-			claims:  map[string]interface{}{"roles": []interface{}{"pupil"}},
+			claims:  map[string]interface{}{"roles": []interface{}{"user"}},
 			want:    "user-light",
 		},
 		{
 			name: "first matching mapping wins",
 			mapping: []config.RoleMapping{
-				{ClaimValue: "teacher", RoleName: "user-light-vault"},
+				{ClaimValue: "spaceadmin", RoleName: "user-light-vault"},
 				{ClaimValue: ".*", RoleName: "user-light"},
 			},
 			roleIDs: roleIDs,
-			claims:  map[string]interface{}{"roles": []interface{}{"teacher"}},
+			claims:  map[string]interface{}{"roles": []interface{}{"spaceadmin"}},
 			want:    "user-light-vault",
 		},
 	}
@@ -409,7 +409,7 @@ func TestUpdateUserRoleAssignmentMapsGuestRole(t *testing.T) {
 		}}, nil)
 	roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(
 		&settingssvc.AssignRoleToUserResponse{Assignment: &settingsmsg.UserRoleAssignment{
-			Id:          "teacher-assignment-id",
+			Id:          "vault-assignment-id",
 			AccountUuid: userOpaqueID,
 			RoleId:      vaultRoleID,
 		}}, nil)
@@ -419,12 +419,12 @@ func TestUpdateUserRoleAssignmentMapsGuestRole(t *testing.T) {
 		gatewaySelector: gatewaySelector,
 		roleService:     roleService,
 		rolesClaim:      "roles",
-		guestMapping:    []config.RoleMapping{{ClaimValue: "teacher", RoleName: "user-light-vault"}},
+		guestMapping:    []config.RoleMapping{{ClaimValue: "spaceadmin", RoleName: "user-light-vault"}},
 		serviceAccount:  config.ServiceAccount{ServiceAccountID: "service-account", ServiceAccountSecret: "secret"},
 	}}
 
 	user := &cs3user.User{Id: &cs3user.UserId{OpaqueId: userOpaqueID}}
-	claims := map[string]interface{}{"roles": []interface{}{"teacher"}}
+	claims := map[string]interface{}{"roles": []interface{}{"spaceadmin"}}
 
 	if _, err := ra.UpdateUserRoleAssignment(context.Background(), user, claims, "user-light"); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -473,12 +473,12 @@ func TestUpdateUserRoleAssignmentFailsOnUnknownGuestRole(t *testing.T) {
 		gatewaySelector: gatewaySelector,
 		roleService:     roleService,
 		rolesClaim:      "roles",
-		guestMapping:    []config.RoleMapping{{ClaimValue: "teacher", RoleName: "user-light-vault"}},
+		guestMapping:    []config.RoleMapping{{ClaimValue: "spaceadmin", RoleName: "user-light-vault"}},
 		serviceAccount:  config.ServiceAccount{ServiceAccountID: "service-account", ServiceAccountSecret: "secret"},
 	}}
 
 	user := &cs3user.User{Id: &cs3user.UserId{OpaqueId: "user-1"}}
-	claims := map[string]interface{}{"roles": []interface{}{"teacher"}}
+	claims := map[string]interface{}{"roles": []interface{}{"spaceadmin"}}
 
 	_, err := ra.UpdateUserRoleAssignment(context.Background(), user, claims, "user-light")
 	if err == nil || !strings.Contains(err.Error(), "unknown role 'user-light-vault'") {
@@ -504,22 +504,22 @@ func TestGuestRoleMapping(t *testing.T) {
 		{
 			name:   "pairs keep their order",
 			driver: "oidc",
-			pairs:  []string{"teacher:user-light-vault", "admin:guest-admin"},
+			pairs:  []string{"spaceadmin:user-light-vault", "admin:guest-admin"},
 			want: []config.RoleMapping{
-				{ClaimValue: "teacher", RoleName: "user-light-vault"},
+				{ClaimValue: "spaceadmin", RoleName: "user-light-vault"},
 				{ClaimValue: "admin", RoleName: "guest-admin"},
 			},
 		},
 		{
 			name:   "claim value may contain colons",
 			driver: "oidc",
-			pairs:  []string{"urn:school:teacher:user-light-vault"},
-			want:   []config.RoleMapping{{ClaimValue: "urn:school:teacher", RoleName: "user-light-vault"}},
+			pairs:  []string{"urn:ocis:spaceadmin:user-light-vault"},
+			want:   []config.RoleMapping{{ClaimValue: "urn:ocis:spaceadmin", RoleName: "user-light-vault"}},
 		},
-		{name: "requires the oidc driver", driver: "default", pairs: []string{"teacher:user-light-vault"}, wantErr: true},
-		{name: "missing colon", driver: "oidc", pairs: []string{"teacher"}, wantErr: true},
+		{name: "requires the oidc driver", driver: "default", pairs: []string{"spaceadmin:user-light-vault"}, wantErr: true},
+		{name: "missing colon", driver: "oidc", pairs: []string{"spaceadmin"}, wantErr: true},
 		{name: "missing claim value", driver: "oidc", pairs: []string{":user-light-vault"}, wantErr: true},
-		{name: "missing role name", driver: "oidc", pairs: []string{"teacher:"}, wantErr: true},
+		{name: "missing role name", driver: "oidc", pairs: []string{"spaceadmin:"}, wantErr: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
