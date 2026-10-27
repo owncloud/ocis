@@ -20,7 +20,7 @@
     "pinia": "3.0.4",
     "vue-concurrency": "5.0.3",
     "vue-router": "5.0.6",
-    "zod": "4.3.6",
+    "zod": "4.6.7",
     "vue3-gettext": "^4.0.1"
   }
 }
