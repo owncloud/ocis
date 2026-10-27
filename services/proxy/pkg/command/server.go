@@ -251,6 +251,11 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", cfg.GrpcClient)
 	policiesProviderClient := policiessvc.NewPoliciesProviderService("com.owncloud.api.policies", cfg.GrpcClient)
 
+	guestRoleMapping, err := userroles.GuestRoleMapping(cfg)
+	if err != nil {
+		logger.Fatal().Err(err).Msg("Invalid guest role mapping")
+	}
+
 	var roleAssigner userroles.UserRoleAssigner
 	switch cfg.RoleAssignment.Driver {
 	case "default":
@@ -264,6 +269,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			userroles.WithLogger(logger),
 			userroles.WithRolesClaim(cfg.RoleAssignment.OIDCRoleMapper.RoleClaim),
 			userroles.WithRoleMapping(cfg.RoleAssignment.OIDCRoleMapper.RolesMap),
+			userroles.WithGuestRoleMapping(guestRoleMapping),
 			userroles.WithRevaGatewaySelector(gatewaySelector),
 			userroles.WithServiceAccount(cfg.ServiceAccount),
 		)
