@@ -368,6 +368,7 @@ Feature: edit/search user including email
         "properties": {
           "value": {
             "type": "array",
+            "minItems": 0,
             "maxItems": 0
           }
         }
