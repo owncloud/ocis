@@ -168,16 +168,52 @@ describe('restore', () => {
     })
   })
 
-  it('should find conflict within resources', () => {
+  it('should resolve a conflict within resources with a unique name', async () => {
+    const resourceOne = { id: '1', path: '/file.txt', name: 'file.txt' } as TrashResource
+    const resourceTwo = { id: '2', path: '/file.txt', name: 'file.txt' } as TrashResource
+    let result: ReturnType<ReturnType<typeof useFileActionsRestore>['collectConflicts']>
     getWrapper({
-      setup: async ({ collectConflicts }, { space }) => {
-        const resourceOne = { id: '1', path: '1', name: '1' } as TrashResource
-        const resourceTwo = { id: '2', path: '1', name: '1' } as TrashResource
-        const { conflicts } = await collectConflicts(space, [resourceOne, resourceTwo])
-
-        expect(conflicts).toContain(resourceTwo)
+      setup: ({ collectConflicts }, { space }) => {
+        result = collectConflicts(space, [resourceOne, resourceTwo])
       }
     })
+    const { conflicts, resolvedResources } = await result
+
+    expect(conflicts).toHaveLength(0)
+    expect(resolvedResources.map(({ id, name, path }) => ({ id, name, path }))).toEqual([
+      { id: '1', name: 'file.txt', path: '/file.txt' },
+      { id: '2', name: 'file (1).txt', path: '/file (1).txt' }
+    ])
+  })
+
+  it('should find conflict with existing resources in the parent folder', async () => {
+    const resource = { id: '1', path: '/file.txt', name: 'file.txt' } as TrashResource
+    let result: ReturnType<ReturnType<typeof useFileActionsRestore>['collectConflicts']>
+    getWrapper({
+      existingResources: [mock<Resource>({ name: 'file.txt' })],
+      setup: ({ collectConflicts }, { space }) => {
+        result = collectConflicts(space, [resource])
+      }
+    })
+    const { conflicts, resolvedResources } = await result
+
+    expect(conflicts).toEqual([resource])
+    expect(resolvedResources).toHaveLength(0)
+  })
+
+  it('should not pick a name of an existing resource when resolving a conflict within resources', async () => {
+    const resourceOne = { id: '1', path: '/file.txt', name: 'file.txt' } as TrashResource
+    const resourceTwo = { id: '2', path: '/file.txt', name: 'file.txt' } as TrashResource
+    let result: ReturnType<ReturnType<typeof useFileActionsRestore>['collectConflicts']>
+    getWrapper({
+      existingResources: [mock<Resource>({ name: 'file (1).txt' })],
+      setup: ({ collectConflicts }, { space }) => {
+        result = collectConflicts(space, [resourceOne, resourceTwo])
+      }
+    })
+    const { resolvedResources } = await result
+
+    expect(resolvedResources.map(({ path }) => path)).toEqual(['/file.txt', '/file (2).txt'])
   })
 
   it('should add files without conflict to resolved resources', () => {
@@ -198,8 +234,10 @@ function getWrapper({
   restoreResult = { successful: [], failed: [] },
   getFileInfoResult,
   getFileInfoImplementation,
+  existingResources = [],
   setup
 }: {
+  existingResources?: Resource[]
   invalidLocation?: boolean
   driveType?: string
   restoreResult?: {
@@ -235,7 +273,7 @@ function getWrapper({
     space: mock<ProjectSpaceResource>({ driveType })
   }
   mocks.$clientService.webdav.listFiles.mockImplementation(() => {
-    return Promise.resolve({ resource: mock<Resource>(), children: [] })
+    return Promise.resolve({ resource: mock<Resource>(), children: existingResources })
   })
   if (getFileInfoImplementation) {
     mocks.$clientService.webdav.getFileInfo.mockImplementation(getFileInfoImplementation)
