@@ -36,6 +36,7 @@ var lconfig = config.LDAP{
 	UserEmailAttribute:       "mail",
 	UserNameAttribute:        "uid",
 	UserSurnameAttribute:     "sn",
+	UserSearchAttributes:     []string{"onPremisesSamAccountName", "displayName", "mail"},
 	UserEnabledAttribute:     "userEnabledAttribute",
 	UserTypeAttribute:        "userTypeAttribute",
 	ExternalIDAttribute:      "externalID",
@@ -328,7 +329,6 @@ func TestGetUsers(t *testing.T) {
 }
 
 func TestGetUsersSearch(t *testing.T) {
-	lm := &mocks.Client{}
 	odataReqDefault, err := godata.ParseRequest(context.Background(), "",
 		url.Values{
 			"$search": []string{"\"term\""},
@@ -338,19 +338,32 @@ func TestGetUsersSearch(t *testing.T) {
 		t.Errorf("Expected success got '%s'", err.Error())
 	}
 
-	// only match if the filter contains the search term unquoted
-	lm.On("Search", mock.MatchedBy(
-		func(req *ldap.SearchRequest) bool {
-			return req.Filter == "(&(objectClass=inetOrgPerson)(|(uid=*term*)(displayname=*term*)(sn=*term*)))"
-		})).
-		Return(&ldap.SearchResult{}, nil)
-	b, _ := getMockedBackend(lm, lconfig, &logger)
-	g, err := b.GetUsers(context.Background(), odataReqDefault)
-	if err != nil {
-		t.Errorf("Expected success, got '%s'", err.Error())
-	} else if g == nil || len(g) != 0 {
-		t.Errorf("Expected zero length user slice")
+	assertSearchFilter := func(t *testing.T, cfg config.LDAP, wantFilter string) {
+		lm := &mocks.Client{}
+		// only match if the filter contains the search term unquoted
+		lm.On("Search", mock.MatchedBy(
+			func(req *ldap.SearchRequest) bool {
+				return req.Filter == wantFilter
+			})).
+			Return(&ldap.SearchResult{}, nil)
+		b, _ := getMockedBackend(lm, cfg, &logger)
+		g, err := b.GetUsers(context.Background(), odataReqDefault)
+		if err != nil {
+			t.Errorf("Expected success, got '%s'", err.Error())
+		} else if g == nil || len(g) != 0 {
+			t.Errorf("Expected zero length user slice")
+		}
 	}
+
+	t.Run("default config matches userName, displayName and mail", func(t *testing.T) {
+		assertSearchFilter(t, lconfig, "(&(objectClass=inetOrgPerson)(|(uid=*term*)(displayname=*term*)(mail=*term*)))")
+	})
+
+	t.Run("a config excluding mail matches surname instead", func(t *testing.T) {
+		restrictedConfig := lconfig
+		restrictedConfig.UserSearchAttributes = []string{"onPremisesSamAccountName", "displayName", "surname"}
+		assertSearchFilter(t, restrictedConfig, "(&(objectClass=inetOrgPerson)(|(uid=*term*)(displayname=*term*)(sn=*term*)))")
+	})
 }
 
 func TestUpdateUser(t *testing.T) {

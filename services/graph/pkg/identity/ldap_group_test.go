@@ -345,7 +345,7 @@ func TestGetGroupMembersSearch_MemberUid(t *testing.T) {
 		Return(&ldap.SearchResult{Entries: []*ldap.Entry{group}}, nil)
 	lm.On("Search", mock.MatchedBy(
 		func(r *ldap.SearchRequest) bool {
-			return r.Filter == "(&(objectClass=inetOrgPerson)(&(|(uid=*term*)(displayname=*term*)(sn=*term*))(uid=user)))"
+			return r.Filter == "(&(objectClass=inetOrgPerson)(&(|(uid=*term*)(displayname=*term*)(mail=*term*))(uid=user)))"
 		})).
 		Return(&ldap.SearchResult{}, nil)
 

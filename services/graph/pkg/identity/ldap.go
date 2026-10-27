@@ -32,6 +32,10 @@ const (
 	ldapDateFormat      = "20060102150405Z0700"
 )
 
+// userSearchSupportedAttributeNames are the logical (Graph API) attribute names accepted in
+// config.LDAP.UserSearchAttributes, in the order used in resolveUserSearchAttributes' error.
+var userSearchSupportedAttributeNames = []string{"onPremisesSamAccountName", "displayName", "surname", "mail"}
+
 // DisableUserMechanismType is used instead of directly using the string values from the configuration.
 type DisableUserMechanismType int64
 
@@ -60,12 +64,13 @@ type LDAP struct {
 	retryBaseDelay time.Duration
 	retryMaxDelay  time.Duration
 
-	userBaseDN          string
-	userFilter          string
-	userObjectClass     string
-	userIDisOctetString bool
-	userScope           int
-	userAttributeMap    userAttributeMap
+	userBaseDN               string
+	userFilter               string
+	userObjectClass          string
+	userIDisOctetString      bool
+	userScope                int
+	userAttributeMap         userAttributeMap
+	userSearchFilterTemplate string
 
 	disableUserMechanism    DisableUserMechanismType
 	localUserDisableGroupDN string
@@ -163,6 +168,10 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		userMemberAttribute: config.UserMemberAttribute,
 		userGuestAttribute:  config.UserGuestAttribute,
 	}
+	userSearchFilterTemplate, searchAttrErr := userSearchFilterTemplateFor(uam, config.UserSearchAttributes)
+	if searchAttrErr != nil {
+		return nil, searchAttrErr
+	}
 
 	if config.GroupNameAttribute == "" || config.GroupIDAttribute == "" {
 		return nil, errors.New("invalid group attribute mappings")
@@ -237,6 +246,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		userIDisOctetString:            config.UserIDIsOctetString,
 		userScope:                      userScope,
 		userAttributeMap:               uam,
+		userSearchFilterTemplate:       userSearchFilterTemplate,
 		groupBaseDN:                    config.GroupBaseDN,
 		groupCreateBaseDN:              config.GroupCreateBaseDN,
 		groupFilter:                    config.GroupFilter,
@@ -525,19 +535,41 @@ func (i *LDAP) AddUser(ctx context.Context, id string, instanceID string) (libre
 	return *u, nil
 }
 
-// userSearchFilter deliberately excludes mail from the OR-filter: matching on
-// email address would leak which address belongs to which account.
+// %[1]s is reused by every clause so userSearchFilter fills them all with one Sprintf arg.
+// Excluding mail from the configured names keeps search from revealing which address is whose.
+func userSearchFilterTemplateFor(uam userAttributeMap, logicalNames []string) (string, error) {
+	var b strings.Builder
+	b.WriteString("(|")
+	for _, name := range logicalNames {
+		var attr string
+		switch name {
+		case "onPremisesSamAccountName":
+			attr = uam.userName
+		case "displayName":
+			attr = uam.displayName
+		case "surname":
+			attr = uam.surname
+		case "mail":
+			attr = uam.mail
+		default:
+			return "", fmt.Errorf("invalid user search attribute %q: supported values are %s", name, strings.Join(userSearchSupportedAttributeNames, ", "))
+		}
+		b.WriteString("(")
+		b.WriteString(attr)
+		b.WriteString("=*%[1]s*)")
+	}
+	b.WriteString(")")
+	if len(logicalNames) == 0 {
+		return "", nil
+	}
+	return b.String(), nil
+}
+
 func (i *LDAP) userSearchFilter(term string) string {
-	if term == "" {
+	if term == "" || i.userSearchFilterTemplate == "" {
 		return ""
 	}
-	term = ldap.EscapeFilter(term)
-	return fmt.Sprintf(
-		"(|(%s=*%s*)(%s=*%s*)(%s=*%s*))",
-		i.userAttributeMap.userName, term,
-		i.userAttributeMap.displayName, term,
-		i.userAttributeMap.surname, term,
-	)
+	return fmt.Sprintf(i.userSearchFilterTemplate, ldap.EscapeFilter(term))
 }
 
 func (i *LDAP) getUserByDN(dn, searchTerm string) (*ldap.Entry, error) {

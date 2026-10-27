@@ -21,6 +21,7 @@ import (
 	"github.com/libregraph/idm/server/handler/boltdb"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	connldap "github.com/owncloud/reva/v2/pkg/utils/ldap"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -36,12 +37,19 @@ const (
 // idmConfig mirrors lconfig but with base DNs matching the libregraph/idm schema.
 var idmConfig = lconfig
 
+// restrictedSearchConfig narrows idmConfig's search attributes to name/surname/user-id.
+// Populated in init(), since var initializers run first and would copy idmConfig's zero values.
+var restrictedSearchConfig config.LDAP
+
 func init() {
 	idmConfig.UserBaseDN = "ou=users,o=libregraph-idm"
 	idmConfig.GroupBaseDN = "ou=groups,o=libregraph-idm"
 	idmConfig.LdapDisabledUsersGroupDN = "cn=DisabledUsersGroup,ou=groups,o=libregraph-idm"
 	idmConfig.WriteEnabled = true
 	idmConfig.UseServerUUID = false // boltdb does not auto-generate entryUUID; client must supply it
+
+	restrictedSearchConfig = idmConfig
+	restrictedSearchConfig.UserSearchAttributes = []string{"onPremisesSamAccountName", "displayName", "surname"}
 }
 
 // idmEntry builds a gldap.Entry matching idmConfig attribute names.
@@ -102,6 +110,11 @@ func seedIDMDB(t *testing.T, dbfile string, entries ...*gldap.Entry) {
 // newIDMBackend starts the libregraph/idm boltdb LDAP server and returns a wired LDAP identity backend.
 func newIDMBackend(t *testing.T, entries ...*gldap.Entry) *LDAP {
 	t.Helper()
+	return newIDMBackendWithConfig(t, idmConfig, entries...)
+}
+
+func newIDMBackendWithConfig(t *testing.T, cfg config.LDAP, entries ...*gldap.Entry) *LDAP {
+	t.Helper()
 
 	dbfile := filepath.Join(t.TempDir(), "idm.db")
 	seedIDMDB(t, dbfile, entries...)
@@ -142,7 +155,7 @@ func newIDMBackend(t *testing.T, entries ...*gldap.Entry) *LDAP {
 	})
 	conn.SetLogger(&lgr.Logger)
 
-	backend, err := NewLDAPBackend(conn, idmConfig, &lgr, "", "")
+	backend, err := NewLDAPBackend(conn, cfg, &lgr, "", "")
 	require.NoError(t, err)
 	return backend
 }
@@ -186,6 +199,20 @@ func TestIntegrationGetUsers_HappyPath(t *testing.T) {
 func TestIntegrationGetUsers_SearchDoesNotMatchEmail(t *testing.T) {
 	// Gunda's mail contains "klaus" but her name, surname, and user-id don't.
 	gunda := idmEntry("ruetten", "cccccccc-0000-0000-0000-000000000003", "klauspeter.eckel@ruth.info")
+	b := newIDMBackendWithConfig(t, restrictedSearchConfig, gunda)
+
+	req, err := godata.ParseRequest(context.Background(), "", url.Values{"$search": {`"klaus"`}})
+	require.NoError(t, err)
+
+	users, err := b.GetUsers(context.Background(), req)
+	require.NoError(t, err)
+	assert.Empty(t, users, "a search config excluding mail must not match the mail attribute")
+}
+
+func TestIntegrationGetUsers_SearchMatchesEmailByDefault(t *testing.T) {
+	// same fixture as TestIntegrationGetUsers_SearchDoesNotMatchEmail, default config instead:
+	// existing deployments must keep matching by mail unless they opt into the narrower attribute list.
+	gunda := idmEntry("ruetten", "cccccccc-0000-0000-0000-000000000003", "klauspeter.eckel@ruth.info")
 	b := newIDMBackend(t, gunda)
 
 	req, err := godata.ParseRequest(context.Background(), "", url.Values{"$search": {`"klaus"`}})
@@ -193,7 +220,8 @@ func TestIntegrationGetUsers_SearchDoesNotMatchEmail(t *testing.T) {
 
 	users, err := b.GetUsers(context.Background(), req)
 	require.NoError(t, err)
-	assert.Empty(t, users, "search must not match the mail attribute")
+	require.Len(t, users, 1, "the default config must still match the mail attribute")
+	assert.Equal(t, "ruetten", users[0].GetOnPremisesSamAccountName())
 }
 
 func TestIntegrationGetUsers_SearchMatchesAllowedAttributes(t *testing.T) {
@@ -210,7 +238,7 @@ func TestIntegrationGetUsers_SearchMatchesAllowedAttributes(t *testing.T) {
 		idmConfig.UserTypeAttribute:        {"Member"},
 		"objectClass":                      {"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"},
 	})
-	b := newIDMBackend(t, alice, carol)
+	b := newIDMBackendWithConfig(t, restrictedSearchConfig, alice, carol)
 
 	aliceReq, err := godata.ParseRequest(context.Background(), "", url.Values{"$search": {`"alice"`}})
 	require.NoError(t, err)
@@ -223,7 +251,7 @@ func TestIntegrationGetUsers_SearchMatchesAllowedAttributes(t *testing.T) {
 	require.NoError(t, err)
 	carolUsers, err := b.GetUsers(context.Background(), carolReq)
 	require.NoError(t, err)
-	require.Len(t, carolUsers, 1, "search must still match surname")
+	require.Len(t, carolUsers, 1, "a search config including surname must match surname")
 	assert.Equal(t, "carol", carolUsers[0].GetOnPremisesSamAccountName())
 }
 
@@ -236,14 +264,14 @@ func TestIntegrationGetGroupMembers_SearchDoesNotMatchEmail(t *testing.T) {
 		"member":      {gunda.DN},
 		"objectClass": {"groupOfNames"},
 	})
-	b := newIDMBackend(t, gunda, group)
+	b := newIDMBackendWithConfig(t, restrictedSearchConfig, gunda, group)
 
 	req, err := godata.ParseRequest(context.Background(), "", url.Values{"$search": {`"klaus"`}})
 	require.NoError(t, err)
 
 	members, err := b.GetGroupMembers(context.Background(), "teachers", req)
 	require.NoError(t, err)
-	assert.Empty(t, members, "group member search must not match the mail attribute")
+	assert.Empty(t, members, "a search config excluding mail must not match the mail attribute")
 }
 
 func TestIntegrationCreateUser_HappyPath(t *testing.T) {

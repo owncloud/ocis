@@ -356,6 +356,25 @@ Feature: edit/search user including email
       """
 
 
+  Scenario: non-admin user's e-mail search term matches nobody when search is restricted to name, surname and user-id
+    Given the config "OCIS_LDAP_USER_SEARCH_ATTRIBUTES" has been set to "onPremisesSamAccountName,displayName,surname" for "graph" service
+    When user "Brian" searches for user "%22alice@example.org%22" using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "maxItems": 0
+          }
+        }
+      }
+      """
+
+
   Scenario: non-admin user searches for a disabled users
     Given the user "Admin" has disabled user "Alice"
     When user "Brian" searches for user "alice" using Graph API
