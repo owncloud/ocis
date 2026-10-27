@@ -260,6 +260,8 @@ func GuestRoleMapping(cfg *config.Config) ([]config.RoleMapping, error) {
 func (ra oidcRoleAssigner) mapGuestRole(claims map[string]interface{}, guestRole string, roleNamesToRoleIDs map[string]string) (string, error) {
 	claimRoles, err := extractRoles(ra.rolesClaim, claims)
 	if err != nil || len(claimRoles) == 0 {
+		// a guest without roles claim is valid, log at debug level to help find a wrong claim name
+		ra.logger.Debug().Err(err).Str("claim", ra.rolesClaim).Msg("no roles in claim, the guest keeps the guest role")
 		return guestRole, nil
 	}
 
