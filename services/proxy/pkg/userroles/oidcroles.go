@@ -103,15 +103,15 @@ func matchesClaimMapping(mappingValue string, claimRoles map[string]struct{}) bo
 func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *cs3user.User, claims map[string]interface{}, overwriteRole string) (*cs3user.User, error) {
 	userID := user.GetId().GetOpaqueId()
 	logger := ra.logger.SubloggerWithRequestID(ctx).With().Str("userid", userID).Logger()
-	roleNamesToRoleIDs, err := ra.roleNamesToRoleIDs(ctx)
+	roleNamesToRoleIDs, err := ra.roleNamesToRoleIDs(ctx, roleCacheTTL)
 	if err != nil {
 		logger.Error().Err(err).Msg("Error mapping role names to role ids")
 		return nil, err
 	}
 
 	// the account resolver passes the guest role as overwriteRole for multi-instance guests
-	if overwriteRole != "" && len(ra.guestMapping) > 0 {
-		overwriteRole, err = ra.mapGuestRole(claims, overwriteRole, roleNamesToRoleIDs)
+	if overwriteRole != "" {
+		overwriteRole, roleNamesToRoleIDs, err = ra.guestRoleName(ctx, claims, overwriteRole, roleNamesToRoleIDs)
 		if err != nil {
 			logger.Error().Err(err).Msg("Error mapping guest role")
 			return nil, err
@@ -119,12 +119,6 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 	}
 
 	roleIDFromClaim := roleNamesToRoleIDs[overwriteRole]
-	if overwriteRole != "" && roleIDFromClaim == "" {
-		// do not assign an empty role id, an unknown role can only be a misconfiguration
-		err := fmt.Errorf("unknown role '%s'", overwriteRole)
-		logger.Error().Err(err).Msg("Error mapping role name to role id")
-		return nil, err
-	}
 	if overwriteRole == "" {
 		claimRoles, err := extractRoles(ra.rolesClaim, claims)
 		if err != nil {
@@ -253,6 +247,41 @@ func GuestRoleMapping(cfg *config.Config) ([]config.RoleMapping, error) {
 	return mappings, nil
 }
 
+// guestRoleName returns the role name of a multi-instance guest and the role name to role id map
+// that knows this role. A role that the cached map does not know can be a new role, so
+// guestRoleName reads the roles again one time. An unknown role is an error: do not assign an
+// empty role id.
+func (ra oidcRoleAssigner) guestRoleName(ctx context.Context, claims map[string]interface{}, guestRole string, roleNamesToRoleIDs map[string]string) (string, map[string]string, error) {
+	resolve := func(roleNamesToRoleIDs map[string]string) (string, error) {
+		roleName := guestRole
+		if len(ra.guestMapping) > 0 {
+			var err error
+			if roleName, err = ra.mapGuestRole(claims, guestRole, roleNamesToRoleIDs); err != nil {
+				return "", err
+			}
+		}
+		if _, ok := roleNamesToRoleIDs[roleName]; !ok {
+			return "", fmt.Errorf("unknown role '%s'", roleName)
+		}
+		return roleName, nil
+	}
+
+	roleName, err := resolve(roleNamesToRoleIDs)
+	if err == nil {
+		return roleName, roleNamesToRoleIDs, nil
+	}
+	// the minimum age limits the reads for a role that does not exist
+	roleNamesToRoleIDs, rerr := ra.roleNamesToRoleIDs(ctx, roleCacheMinAge)
+	if rerr != nil {
+		return "", nil, rerr
+	}
+	roleName, err = resolve(roleNamesToRoleIDs)
+	if err != nil {
+		return "", nil, err
+	}
+	return roleName, roleNamesToRoleIDs, nil
+}
+
 // mapGuestRole returns the role of the first guest role mapping that matches a value of the
 // user's roles claim, or guestRole when nothing matches. A mapping to a role that does not exist
 // is an error: it can only be a misconfiguration, and falling back to guestRole could give the
@@ -314,11 +343,19 @@ type roleNameToIDCache struct {
 
 var roleNameToID roleNameToIDCache
 
-func (ra oidcRoleAssigner) roleNamesToRoleIDs(ctx context.Context) (map[string]string, error) {
-	cacheTTL := 5 * time.Minute
+const (
+	// roleCacheTTL is the maximum age of the cached role name to role id map
+	roleCacheTTL = 5 * time.Minute
+	// roleCacheMinAge is the age that the cached map must have before a read for an unknown role
+	roleCacheMinAge = 30 * time.Second
+)
+
+// roleNamesToRoleIDs returns the cached role name to role id map. When the map is older than
+// maxAge, roleNamesToRoleIDs reads the roles from the settings service.
+func (ra oidcRoleAssigner) roleNamesToRoleIDs(ctx context.Context, maxAge time.Duration) (map[string]string, error) {
 	roleNameToID.lock.RLock()
 
-	if !roleNameToID.lastRead.IsZero() && time.Since(roleNameToID.lastRead) < cacheTTL {
+	if !roleNameToID.lastRead.IsZero() && time.Since(roleNameToID.lastRead) < maxAge {
 		defer roleNameToID.lock.RUnlock()
 		return roleNameToID.roleNameToID, nil
 	}
@@ -330,7 +367,7 @@ func (ra oidcRoleAssigner) roleNamesToRoleIDs(ctx context.Context) (map[string]s
 	defer roleNameToID.lock.Unlock()
 
 	// check again, another goroutine might have updated while we "upgraded" the lock
-	if !roleNameToID.lastRead.IsZero() && time.Since(roleNameToID.lastRead) < cacheTTL {
+	if !roleNameToID.lastRead.IsZero() && time.Since(roleNameToID.lastRead) < maxAge {
 		return roleNameToID.roleNameToID, nil
 	}
 

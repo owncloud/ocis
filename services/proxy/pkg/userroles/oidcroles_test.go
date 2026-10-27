@@ -566,3 +566,83 @@ func TestGuestRoleMapping(t *testing.T) {
 		})
 	}
 }
+
+// TestGuestRoleNameRefreshesRoles verifies that a role which the cached role map does not know
+// makes the assigner read the roles again, so a new role works before the cache TTL ends. The
+// assigner reads the roles again only when the cached map is older than roleCacheMinAge.
+func TestGuestRoleNameRefreshesRoles(t *testing.T) {
+	gatewayClient := &cs3mocks.GatewayAPIClient{}
+	gatewaySelector := pool.GetSelector[gateway.GatewayAPIClient](
+		"GatewaySelector",
+		"com.owncloud.api.gateway",
+		func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
+			return gatewayClient
+		},
+	)
+	defer pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
+
+	// listing the roles needs a service account context
+	gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{
+		Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+		Token:  "service-token",
+	}, nil)
+
+	claims := map[string]interface{}{"roles": []interface{}{"spaceadmin"}}
+	cached := map[string]string{"user-light": "user-light-id"}
+
+	tests := []struct {
+		name      string
+		cacheAge  time.Duration
+		wantRole  string
+		wantErr   bool
+		wantReads int
+	}{
+		{name: "an old cache is read again", cacheAge: time.Minute, wantRole: "user-light-vault", wantReads: 1},
+		{name: "a fresh cache is not read again", cacheAge: 0, wantErr: true, wantReads: 0},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			roleNameToID.lock.Lock()
+			roleNameToID.roleNameToID = cached
+			roleNameToID.lastRead = time.Now().Add(-tt.cacheAge)
+			roleNameToID.lock.Unlock()
+
+			roleService := &graphmocks.RoleService{}
+			roleService.On("ListRoles", mock.Anything, mock.Anything, mock.Anything).Return(
+				&settingssvc.ListBundlesResponse{Bundles: []*settingsmsg.Bundle{
+					{Id: "user-light-id", Name: "user-light"},
+					{Id: "user-light-vault-id", Name: "user-light-vault"},
+				}}, nil)
+
+			ra := oidcRoleAssigner{Options: Options{
+				logger:          log.NopLogger(),
+				gatewaySelector: gatewaySelector,
+				roleService:     roleService,
+				rolesClaim:      "roles",
+				guestMapping:    []config.RoleMapping{{ClaimValue: "spaceadmin", RoleName: "user-light-vault"}},
+				serviceAccount:  config.ServiceAccount{ServiceAccountID: "service-account", ServiceAccountSecret: "secret"},
+			}}
+
+			got, roleIDs, err := ra.guestRoleName(context.Background(), claims, "user-light", cached)
+			roleService.AssertNumberOfCalls(t, "ListRoles", tt.wantReads)
+			if tt.wantErr {
+				if err == nil || !strings.Contains(err.Error(), "unknown role 'user-light-vault'") {
+					t.Fatalf("expected an unknown role error, got role %q and error %v", got, err)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if got != tt.wantRole || roleIDs[got] != "user-light-vault-id" {
+				t.Fatalf("got role %q with id %q, want %q", got, roleIDs[got], tt.wantRole)
+			}
+		})
+	}
+
+	// reset the package-global role-name cache for the other tests
+	roleNameToID.lock.Lock()
+	roleNameToID.roleNameToID = nil
+	roleNameToID.lastRead = time.Time{}
+	roleNameToID.lock.Unlock()
+}
