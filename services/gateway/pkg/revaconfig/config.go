@@ -71,7 +71,7 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 						"cache_database":                cfg.Cache.ProviderCacheDatabase,
 						"cache_table":                   "provider",
 						"cache_ttl":                     cfg.Cache.ProviderCacheTTL,
-						"disable_persistence":           cfg.Cache.ProviderCacheDisablePersistence,
+						"cache_disable_persistence":     cfg.Cache.ProviderCacheDisablePersistence,
 						"cache_auth_username":           cfg.Cache.ProviderCacheAuthUsername,
 						"cache_auth_password":           cfg.Cache.ProviderCacheAuthPassword,
 						"cache_creds_file":              cfg.Cache.ProviderCacheCredsFile,
