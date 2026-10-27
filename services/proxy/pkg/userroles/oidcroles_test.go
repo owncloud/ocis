@@ -485,6 +485,14 @@ func TestUpdateUserRoleAssignmentFailsOnUnknownGuestRole(t *testing.T) {
 		t.Fatalf("expected an error for the guest role mapping to an unknown role, got %v", err)
 	}
 	roleService.AssertNotCalled(t, "AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything)
+
+	// a guest that no mapping matches gets the guest role, which must exist too
+	claims = map[string]interface{}{"roles": []interface{}{"user"}}
+	_, err = ra.UpdateUserRoleAssignment(context.Background(), user, claims, "no-such-guest-role")
+	if err == nil || !strings.Contains(err.Error(), "unknown role 'no-such-guest-role'") {
+		t.Fatalf("expected an error for an unknown guest role, got %v", err)
+	}
+	roleService.AssertNotCalled(t, "AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything)
 }
 
 func TestGuestRoleMapping(t *testing.T) {
