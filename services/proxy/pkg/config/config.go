@@ -259,10 +259,11 @@ type ClaimSpaceManagement struct {
 
 // MultiInstanceConfig holds configuration for multi-instance-ocis
 type MultiInstanceConfig struct {
-	Enabled     bool   `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enable multiple instances of Infinite Scale." introductionVersion:"8.0.0"`
-	InstanceID  string `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique id of this instance" introductionVersion:"8.0.0"`
-	MasterID    string `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master ID that grants access to all instances. Users with this ID in their memberOf or guestOf claims can access any instance. Leave empty to disable." introductionVersion:"8.1.0"`
-	MemberClaim string `yaml:"member_claim" env:"OCIS_MULTI_INSTANCE_MEMBER_CLAIM" desc:"The claim name for the 'memberOf' property" introductionVersion:"8.0.0"`
-	GuestClaim  string `yaml:"guest_claim" env:"OCIS_MULTI_INSTANCE_GUEST_CLAIM" desc:"The claim name for the 'guestOf' property" introductionVersion:"8.0.0"`
-	GuestRole   string `yaml:"guest_role" env:"OCIS_MULTI_INSTANCE_GUEST_ROLE" desc:"The role that should be assigned to a guest user" introductionVersion:"8.0.0"`
+	Enabled          bool     `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enable multiple instances of Infinite Scale." introductionVersion:"8.0.0"`
+	InstanceID       string   `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique id of this instance" introductionVersion:"8.0.0"`
+	MasterID         string   `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master ID that grants access to all instances. Users with this ID in their memberOf or guestOf claims can access any instance. Leave empty to disable." introductionVersion:"8.1.0"`
+	MemberClaim      string   `yaml:"member_claim" env:"OCIS_MULTI_INSTANCE_MEMBER_CLAIM" desc:"The claim name for the 'memberOf' property" introductionVersion:"8.0.0"`
+	GuestClaim       string   `yaml:"guest_claim" env:"OCIS_MULTI_INSTANCE_GUEST_CLAIM" desc:"The claim name for the 'guestOf' property" introductionVersion:"8.0.0"`
+	GuestRole        string   `yaml:"guest_role" env:"OCIS_MULTI_INSTANCE_GUEST_ROLE" desc:"The role that should be assigned to a guest user" introductionVersion:"8.0.0"`
+	GuestRoleMapping []string `yaml:"guest_role_mapping" env:"OCIS_MULTI_INSTANCE_GUEST_ROLE_MAPPING" desc:"(Optional) Mapping of PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM values to the role a guest gets instead of OCIS_MULTI_INSTANCE_GUEST_ROLE. Example: 'spaceadmin:user-light-vault'. The first match wins. Role names must not contain a colon. Only applies to the 'oidc' role assignment driver." introductionVersion:"9.0.0"`
 }

@@ -3,6 +3,8 @@ package userroles
 import (
 	"context"
 	"encoding/json"
+	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -269,4 +271,275 @@ func TestUpdateUserRoleAssignmentFailsClosedOnInconclusivePermission(t *testing.
 	roleService.AssertCalled(t, "AssignRoleToUser", mock.Anything, mock.MatchedBy(func(req *settingssvc.AssignRoleToUserRequest) bool {
 		return req.GetRoleId() == oldRoleID
 	}), mock.Anything)
+}
+
+func TestMapGuestRole(t *testing.T) {
+	roleIDs := map[string]string{"user-light": "user-light-id", "user-light-vault": "user-light-vault-id"}
+	spaceAdminMapping := []config.RoleMapping{{ClaimValue: "spaceadmin", RoleName: "user-light-vault"}}
+
+	tests := []struct {
+		name    string
+		mapping []config.RoleMapping
+		roleIDs map[string]string
+		claims  map[string]interface{}
+		want    string
+		wantErr bool
+	}{
+		{
+			name:    "spaceadmin gets the mapped role",
+			mapping: spaceAdminMapping,
+			roleIDs: roleIDs,
+			claims:  map[string]interface{}{"roles": []interface{}{"spaceadmin"}},
+			want:    "user-light-vault",
+		},
+		{
+			name:    "spaceadmin with more claim values gets the mapped role",
+			mapping: spaceAdminMapping,
+			roleIDs: roleIDs,
+			claims:  map[string]interface{}{"roles": []interface{}{"user", "spaceadmin"}},
+			want:    "user-light-vault",
+		},
+		{
+			name:    "user keeps the guest role",
+			mapping: spaceAdminMapping,
+			roleIDs: roleIDs,
+			claims:  map[string]interface{}{"roles": []interface{}{"user"}},
+			want:    "user-light",
+		},
+		{
+			name:    "guest without roles claim keeps the guest role",
+			mapping: spaceAdminMapping,
+			roleIDs: roleIDs,
+			claims:  map[string]interface{}{"sub": "someone"},
+			want:    "user-light",
+		},
+		{
+			name:    "mapping to an unknown role is an error",
+			mapping: spaceAdminMapping,
+			roleIDs: map[string]string{"user-light": "user-light-id"},
+			claims:  map[string]interface{}{"roles": []interface{}{"spaceadmin"}},
+			wantErr: true,
+		},
+		{
+			name:    "unknown role of a non-matching mapping is no error",
+			mapping: spaceAdminMapping,
+			roleIDs: map[string]string{"user-light": "user-light-id"},
+			claims:  map[string]interface{}{"roles": []interface{}{"user"}},
+			want:    "user-light",
+		},
+		{
+			name: "first matching mapping wins",
+			mapping: []config.RoleMapping{
+				{ClaimValue: "spaceadmin", RoleName: "user-light-vault"},
+				{ClaimValue: ".*", RoleName: "user-light"},
+			},
+			roleIDs: roleIDs,
+			claims:  map[string]interface{}{"roles": []interface{}{"spaceadmin"}},
+			want:    "user-light-vault",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ra := oidcRoleAssigner{Options: Options{rolesClaim: "roles", guestMapping: tt.mapping}}
+			got, err := ra.mapGuestRole(tt.claims, "user-light", tt.roleIDs)
+			if tt.wantErr {
+				if err == nil {
+					t.Fatalf("expected an error, got role %q", got)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if got != tt.want {
+				t.Fatalf("got role %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+// TestUpdateUserRoleAssignmentMapsGuestRole verifies that a guest who already holds the
+// guest role is moved to the role the guest role mapping picks for their claims, which is
+// how guests invited before the mapping was configured get the new role on their next login.
+func TestUpdateUserRoleAssignmentMapsGuestRole(t *testing.T) {
+	const (
+		guestRoleID  = "user-light-id"
+		vaultRoleID  = "user-light-vault-id"
+		userOpaqueID = "user-1"
+	)
+
+	// reset the package-global role-name cache so this test is deterministic
+	roleNameToID.lock.Lock()
+	roleNameToID.roleNameToID = nil
+	roleNameToID.lastRead = time.Time{}
+	roleNameToID.lock.Unlock()
+
+	gatewayClient := &cs3mocks.GatewayAPIClient{}
+	gatewaySelector := pool.GetSelector[gateway.GatewayAPIClient](
+		"GatewaySelector",
+		"com.owncloud.api.gateway",
+		func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
+			return gatewayClient
+		},
+	)
+	defer pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
+
+	gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{
+		Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+		Token:  "service-token",
+	}, nil)
+	// like the guest role, the mapped role can't create drives, so the assigner disables
+	// the (here non-existent) personal space
+	gatewayClient.On("CheckPermission", mock.Anything, mock.Anything).Return(&permissions.CheckPermissionResponse{
+		Status: &rpc.Status{Code: rpc.Code_CODE_PERMISSION_DENIED},
+	}, nil)
+	gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
+		Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+	}, nil)
+
+	roleService := &graphmocks.RoleService{}
+	roleService.On("ListRoles", mock.Anything, mock.Anything, mock.Anything).Return(
+		&settingssvc.ListBundlesResponse{Bundles: []*settingsmsg.Bundle{
+			{Id: guestRoleID, Name: "user-light"},
+			{Id: vaultRoleID, Name: "user-light-vault"},
+		}}, nil)
+	roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(
+		&settingssvc.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{
+			{Id: "guest-assignment-id", AccountUuid: userOpaqueID, RoleId: guestRoleID},
+		}}, nil)
+	roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(
+		&settingssvc.AssignRoleToUserResponse{Assignment: &settingsmsg.UserRoleAssignment{
+			Id:          "vault-assignment-id",
+			AccountUuid: userOpaqueID,
+			RoleId:      vaultRoleID,
+		}}, nil)
+
+	ra := oidcRoleAssigner{Options: Options{
+		logger:          log.NopLogger(),
+		gatewaySelector: gatewaySelector,
+		roleService:     roleService,
+		rolesClaim:      "roles",
+		guestMapping:    []config.RoleMapping{{ClaimValue: "spaceadmin", RoleName: "user-light-vault"}},
+		serviceAccount:  config.ServiceAccount{ServiceAccountID: "service-account", ServiceAccountSecret: "secret"},
+	}}
+
+	user := &cs3user.User{Id: &cs3user.UserId{OpaqueId: userOpaqueID}}
+	claims := map[string]interface{}{"roles": []interface{}{"spaceadmin"}}
+
+	if _, err := ra.UpdateUserRoleAssignment(context.Background(), user, claims, "user-light"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	roleService.AssertCalled(t, "AssignRoleToUser", mock.Anything, mock.MatchedBy(func(req *settingssvc.AssignRoleToUserRequest) bool {
+		return req.GetAccountUuid() == userOpaqueID && req.GetRoleId() == vaultRoleID
+	}), mock.Anything)
+	roleService.AssertNotCalled(t, "AssignRoleToUser", mock.Anything, mock.MatchedBy(func(req *settingssvc.AssignRoleToUserRequest) bool {
+		return req.GetRoleId() == guestRoleID
+	}), mock.Anything)
+}
+
+// TestUpdateUserRoleAssignmentFailsOnUnknownGuestRole verifies that a guest role mapping that
+// points to a role which does not exist fails the role assignment instead of silently assigning
+// the guest role.
+func TestUpdateUserRoleAssignmentFailsOnUnknownGuestRole(t *testing.T) {
+	// reset the package-global role-name cache so this test is deterministic
+	roleNameToID.lock.Lock()
+	roleNameToID.roleNameToID = nil
+	roleNameToID.lastRead = time.Time{}
+	roleNameToID.lock.Unlock()
+
+	gatewayClient := &cs3mocks.GatewayAPIClient{}
+	gatewaySelector := pool.GetSelector[gateway.GatewayAPIClient](
+		"GatewaySelector",
+		"com.owncloud.api.gateway",
+		func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
+			return gatewayClient
+		},
+	)
+	defer pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
+
+	// listing the roles needs a service account context
+	gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{
+		Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+		Token:  "service-token",
+	}, nil)
+
+	roleService := &graphmocks.RoleService{}
+	roleService.On("ListRoles", mock.Anything, mock.Anything, mock.Anything).Return(
+		&settingssvc.ListBundlesResponse{Bundles: []*settingsmsg.Bundle{{Id: "user-light-id", Name: "user-light"}}}, nil)
+
+	ra := oidcRoleAssigner{Options: Options{
+		logger:          log.NopLogger(),
+		gatewaySelector: gatewaySelector,
+		roleService:     roleService,
+		rolesClaim:      "roles",
+		guestMapping:    []config.RoleMapping{{ClaimValue: "spaceadmin", RoleName: "user-light-vault"}},
+		serviceAccount:  config.ServiceAccount{ServiceAccountID: "service-account", ServiceAccountSecret: "secret"},
+	}}
+
+	user := &cs3user.User{Id: &cs3user.UserId{OpaqueId: "user-1"}}
+	claims := map[string]interface{}{"roles": []interface{}{"spaceadmin"}}
+
+	_, err := ra.UpdateUserRoleAssignment(context.Background(), user, claims, "user-light")
+	if err == nil || !strings.Contains(err.Error(), "unknown role 'user-light-vault'") {
+		t.Fatalf("expected an error for the guest role mapping to an unknown role, got %v", err)
+	}
+	roleService.AssertNotCalled(t, "AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything)
+}
+
+func TestGuestRoleMapping(t *testing.T) {
+	tests := []struct {
+		name    string
+		driver  string
+		pairs   []string
+		want    []config.RoleMapping
+		wantErr bool
+	}{
+		{
+			name:   "empty",
+			driver: "default",
+			pairs:  nil,
+			want:   []config.RoleMapping{},
+		},
+		{
+			name:   "pairs keep their order",
+			driver: "oidc",
+			pairs:  []string{"spaceadmin:user-light-vault", "admin:guest-admin"},
+			want: []config.RoleMapping{
+				{ClaimValue: "spaceadmin", RoleName: "user-light-vault"},
+				{ClaimValue: "admin", RoleName: "guest-admin"},
+			},
+		},
+		{
+			name:   "claim value may contain colons",
+			driver: "oidc",
+			pairs:  []string{"urn:ocis:spaceadmin:user-light-vault"},
+			want:   []config.RoleMapping{{ClaimValue: "urn:ocis:spaceadmin", RoleName: "user-light-vault"}},
+		},
+		{name: "requires the oidc driver", driver: "default", pairs: []string{"spaceadmin:user-light-vault"}, wantErr: true},
+		{name: "missing colon", driver: "oidc", pairs: []string{"spaceadmin"}, wantErr: true},
+		{name: "missing claim value", driver: "oidc", pairs: []string{":user-light-vault"}, wantErr: true},
+		{name: "missing role name", driver: "oidc", pairs: []string{"spaceadmin:"}, wantErr: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := &config.Config{
+				RoleAssignment: config.RoleAssignment{Driver: tt.driver},
+				MultiInstance:  config.MultiInstanceConfig{GuestRoleMapping: tt.pairs},
+			}
+			got, err := GuestRoleMapping(cfg)
+			if tt.wantErr {
+				if err == nil {
+					t.Fatalf("expected an error for %v", tt.pairs)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Fatalf("got %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
