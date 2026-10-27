@@ -74,8 +74,10 @@ x-ocis-server: &ocis-service
     - host.docker.internal:${DOCKER_HOST:-host-gateway}
   restart: unless-stopped
   depends_on:
-    - traefik
-    - tika-service
+    traefik:
+      condition: service_started
+    tika:
+      condition: service_healthy
 
 services:
   ocis:
@@ -340,20 +342,18 @@ services:
       - './dev/docker/traefik/configs:/configs'
       - '/var/run/docker.sock:/var/run/docker.sock:ro'
 
-  tika-service:
-    image: owncloudci/wait-for:latest
-    container_name: web_tika_service
-    depends_on:
-      - tika
-    command:
-      - 'wait-for -it tika:9998 -t 300'
-
   tika:
     image: apache/tika:3.2.3.0
     container_name: web_tika
     platform: linux/amd64
     ports:
       - 9998:9998
+    healthcheck:
+      test: ['CMD', 'bash', '-c', 'exec 3<>/dev/tcp/127.0.0.1/9998']
+      interval: 5s
+      timeout: 3s
+      retries: 60
+      start_period: 5s
     restart: unless-stopped
 
 volumes:
