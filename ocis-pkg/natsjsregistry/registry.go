@@ -15,7 +15,6 @@ import (
 
 	natsjskv "github.com/go-micro/plugins/v4/store/nats-js-kv"
 	"github.com/nats-io/nats.go"
-	"github.com/nats-io/nkeys"
 	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/reva/v2/pkg/natsauth"
 	revastore "github.com/owncloud/reva/v2/pkg/store"
@@ -264,49 +263,23 @@ func getAuth() (string, string) {
 //
 // Only the first call checks the credentials, at startup. An invalid value then stops
 // the service. Later calls happen in Init, for example after a reconnect. A rotated
-// .creds file can then be partly written. So later calls do not check the file and do
-// not read it. The connection reads the file on each connect and retries on an error.
+// .creds file can then be partly written. So later calls do not check the file.
+// nats.UserCredentials does not read the file when the option is applied. The
+// connection reads the file on each connect and retries on an error.
 func (n *storeregistry) credentialsOption() (nats.Option, error) {
 	credsFile, creds := getCreds()
 	if !n.credsChecked.Swap(true) {
-		return natsauth.CredentialsOption(credsFile, creds)
+		if err := natsauth.Check(credsFile, creds); err != nil {
+			return nil, err
+		}
 	}
 	switch {
 	case creds != "":
-		// the content cannot change at runtime, it was checked at startup
 		return nats.UserCredentialBytes([]byte(creds)), nil
 	case credsFile != "":
-		return lazyCredsFileOption(credsFile), nil
+		return nats.UserCredentials(credsFile), nil
 	default:
 		return nil, nil
-	}
-}
-
-// lazyCredsFileOption sets the JWT callbacks for a .creds file. Unlike nats.UserCredentials,
-// it does not read the file when the option is applied. The callbacks read the file on
-// each connect.
-func lazyCredsFileOption(credsFile string) nats.Option {
-	return func(o *nats.Options) error {
-		o.UserJWT = func() (string, error) {
-			content, err := os.ReadFile(credsFile)
-			if err != nil {
-				return "", err
-			}
-			return nkeys.ParseDecoratedJWT(content)
-		}
-		o.SignatureCB = func(nonce []byte) ([]byte, error) {
-			content, err := os.ReadFile(credsFile)
-			if err != nil {
-				return nil, err
-			}
-			kp, err := nkeys.ParseDecoratedUserNKey(content)
-			if err != nil {
-				return nil, err
-			}
-			defer kp.Wipe()
-			return kp.Sign(nonce)
-		}
-		return nil
 	}
 }
 
