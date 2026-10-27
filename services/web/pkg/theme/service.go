@@ -76,7 +76,7 @@ func (s Service) Get(w http.ResponseWriter, r *http.Request) {
 	// baseTheme: contains the base theme from the theme fs, there is no guarantee that it exists
 	// brandingTheme: contains the branding theme from the theme fs, there is no guarantee that it exists
 	// mergedTheme = themeDefaults < baseTheme < brandingTheme
-	mergedTheme, err := MergeKV(themeDefaults, baseTheme, brandingTheme)
+	mergedTheme, err := MergeKV(getThemeDefaults(), baseTheme, brandingTheme)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
