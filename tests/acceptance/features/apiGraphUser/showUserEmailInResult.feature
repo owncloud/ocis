@@ -357,7 +357,7 @@ Feature: edit/search user including email
 
 
   Scenario: non-admin user's e-mail search term matches nobody when search is restricted to name, surname and username
-    Given the config "OCIS_LDAP_USER_SEARCH_ATTRIBUTES" has been set to "onPremisesSamAccountName,displayName,surname" for "graph" service
+    Given the config "GRAPH_LDAP_USER_SEARCH_ATTRIBUTES" has been set to "onPremisesSamAccountName,displayName,surname" for "graph" service
     When user "Brian" searches for user "%22alice@example.org%22" using Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
