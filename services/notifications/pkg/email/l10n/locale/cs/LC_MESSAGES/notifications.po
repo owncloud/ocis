@@ -1,0 +1,191 @@
+#
+# Translators:
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: EMAIL\n"
+"POT-Creation-Date: 2026-06-24 03:20+0000\n"
+"PO-Revision-Date: 2026-01-02 10:10+0000\n"
+"Last-Translator: \n"
+"Language-Team: Czech (https://app.transifex.com/owncloud-org/teams/6149/cs/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: cs\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+
+#. UnsharedSpace email template, resolves via {{ .CallToAction }}
+#: pkg/email/templates.go:78
+msgid "Click here to check it: {ShareLink}"
+msgstr "Zkontrolovat to můžete zde: {ShareLink}"
+
+#. ShareCreated email template, resolves via {{ .CallToAction }}
+#. SharedSpace email template, resolves via {{ .CallToAction }}
+#: pkg/email/templates.go:23 pkg/email/templates.go:63
+msgid "Click here to view it: {ShareLink}"
+msgstr "Zobrazit si to můžete zde: {ShareLink}"
+
+#. ShareCreated email template, resolves via {{ .Greeting }}
+#: pkg/email/templates.go:19
+msgid "Hello {ShareGrantee}"
+msgstr "Dobrý den, {ShareGrantee}"
+
+#. ShareExpired email template, resolves via {{ .Greeting }}
+#. ShareRemoved email template, resolves via {{ .Greeting }}
+#: pkg/email/templates.go:32 pkg/email/templates.go:45
+msgid "Hello {ShareGrantee},"
+msgstr "Dobrý den, {ShareGrantee},"
+
+#. SharedSpace email template, resolves via {{ .Greeting }}
+#. UnsharedSpace email template, resolves via {{ .Greeting }}
+#. MembershipExpired email template, resolves via {{ .Greeting }}
+#: pkg/email/templates.go:59 pkg/email/templates.go:72
+#: pkg/email/templates.go:87
+msgid "Hello {SpaceGrantee},"
+msgstr "Dobrý den, {SpaceGrantee},"
+
+#. Grouped email template, resolves via {{ .Greeting }}
+#: pkg/email/templates.go:131
+msgid "Hi {DisplayName},"
+msgstr "Dobrý den, {DisplayName},"
+
+#. ScienceMeshInviteTokenGenerated email template, resolves via {{ .Greeting
+#. }}
+#. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves
+#. via {{ .Greeting }}
+#: pkg/email/templates.go:100 pkg/email/templates.go:117
+msgid "Hi,"
+msgstr "Dobrý den,"
+
+#. MembershipExpired email template, Subject field (resolves directly)
+#: pkg/email/templates.go:85
+msgid "Membership of '{SpaceName}' expired at {ExpiredAt}"
+msgstr "Členství v prostoru '{SpaceName}' vypršelo {ExpiredAt}"
+
+#. Grouped email template, Subject field (resolves directly)
+#: pkg/email/templates.go:129
+msgid "Report"
+msgstr "Souhrn"
+
+#. ScienceMeshInviteTokenGenerated email template, Subject field (resolves
+#. directly)
+#. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, Subject
+#. field (resolves directly)
+#: pkg/email/templates.go:98 pkg/email/templates.go:115
+msgid "ScienceMesh: {InitiatorName} wants to collaborate with you"
+msgstr "ScienceMesh: {InitiatorName} s vámi chce spolupracovat"
+
+#. ShareExpired email template, Subject field (resolves directly)
+#: pkg/email/templates.go:30
+msgid "Share to '{ShareFolder}' expired at {ExpiredAt}"
+msgstr "Sdílení '{ShareFolder}' vypršelo {ExpiredAt}"
+
+#. MembershipExpired email template, resolves via {{ .MessageBody }}
+#: pkg/email/templates.go:89
+msgid ""
+"Your membership of space {SpaceName} has expired at {ExpiredAt}\n"
+"\n"
+"Even though this membership has expired you still might have access through other shares and/or space memberships"
+msgstr ""
+"Vaše členství v prostoru {SpaceName} vypršelo {ExpiredAt}\n"
+"\n"
+"Přestože toto členství vypršelo, můžete mít stále přístup prostřednictvím jiných sdílení a/nebo členství v prostorech"
+
+#. ShareExpired email template, resolves via {{ .MessageBody }}
+#: pkg/email/templates.go:34
+msgid ""
+"Your share to {ShareFolder} has expired at {ExpiredAt}\n"
+"\n"
+"Even though this share has been revoked you still might have access through other shares and/or space memberships."
+msgstr ""
+"Platnost vašeho sdílení {ShareFolder} vypršela {ExpiredAt}\n"
+"\n"
+"Přestože bylo toto sdílení zrušeno, můžete mít stále přístup prostřednictvím jiných sdílení a/nebo členství v prostorech."
+
+#. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves
+#. via {{ .MessageBody }}
+#: pkg/email/templates.go:119
+msgid ""
+"{ShareSharer} ({ShareSharerMail}) wants to start sharing collaboration resources with you.\n"
+"Please visit your federation settings and use the following details:\n"
+"  Token: {Token}\n"
+"  ProviderDomain: {ProviderDomain}"
+msgstr ""
+"{ShareSharer} ({ShareSharerMail}) s vámi chce začít sdílet prostředky pro spolupráci.\n"
+"Navštivte prosím nastavení federace a použijte následující údaje:\n"
+"  Token: {Token}\n"
+"  ProviderDomain: {ProviderDomain}"
+
+#. ScienceMeshInviteTokenGenerated email template, resolves via {{
+#. .MessageBody }}
+#: pkg/email/templates.go:102
+msgid ""
+"{ShareSharer} ({ShareSharerMail}) wants to start sharing collaboration resources with you.\n"
+"To accept the invite, please visit the following URL:\n"
+"{ShareLink}\n"
+"\n"
+"Alternatively, you can visit your federation settings and use the following details:\n"
+"  Token: {Token}\n"
+"  ProviderDomain: {ProviderDomain}"
+msgstr ""
+"{ShareSharer} ({ShareSharerMail}) s vámi chce začít sdílet prostředky pro spolupráci.\n"
+"Pro přijetí pozvánky navštivte následující adresu URL:\n"
+"{ShareLink}\n"
+"\n"
+"Případně můžete navštívit nastavení federace a použít následující údaje:\n"
+"  Token: {Token}\n"
+"  ProviderDomain: {ProviderDomain}"
+
+#. ShareCreated email template, resolves via {{ .MessageBody }}
+#: pkg/email/templates.go:21
+msgid "{ShareSharer} has shared \"{ShareFolder}\" with you."
+msgstr "{ShareSharer} s vámi sdílí \"{ShareFolder}\"."
+
+#. ShareRemoved email template, resolves via {{ .MessageBody }}
+#: pkg/email/templates.go:47
+msgid ""
+"{ShareSharer} has unshared '{ShareFolder}' with you.\n"
+"\n"
+"Even though this share has been revoked you still might have access through other shares and/or space memberships."
+msgstr ""
+"{ShareSharer} s vámi přestává sdílet '{ShareFolder}'.\n"
+"\n"
+"Přestože bylo toto sdílení zrušeno, můžete mít stále přístup prostřednictvím jiných sdílení a/nebo členství v prostorech."
+
+#. ShareCreated email template, Subject field (resolves directly)
+#: pkg/email/templates.go:17
+msgid "{ShareSharer} shared '{ShareFolder}' with you"
+msgstr "{ShareSharer} s vámi sdílí '{ShareFolder}'"
+
+#. ShareRemoved email template, Subject field (resolves directly)
+#: pkg/email/templates.go:43
+msgid "{ShareSharer} unshared '{ShareFolder}' with you"
+msgstr "{ShareSharer} s vámi přestává sdílet '{ShareFolder}'"
+
+#. SharedSpace email template, resolves via {{ .MessageBody }}
+#: pkg/email/templates.go:61
+msgid "{SpaceSharer} has invited you to join \"{SpaceName}\"."
+msgstr "{SpaceSharer} vás zve do prostoru \"{SpaceName}\"."
+
+#. UnsharedSpace email template, resolves via {{ .MessageBody }}
+#: pkg/email/templates.go:74
+msgid ""
+"{SpaceSharer} has removed you from \"{SpaceName}\".\n"
+"\n"
+"You might still have access through your other groups or direct membership."
+msgstr ""
+"{SpaceSharer} vás odebírá z prostoru \"{SpaceName}\".\n"
+"\n"
+"Stále můžete mít přístup prostřednictvím jiných skupin nebo přímého členství."
+
+#. SharedSpace email template, Subject field (resolves directly)
+#: pkg/email/templates.go:57
+msgid "{SpaceSharer} invited you to join {SpaceName}"
+msgstr "{SpaceSharer} vás zve do prostoru {SpaceName}"
+
+#. UnsharedSpace email template, Subject field (resolves directly)
+#: pkg/email/templates.go:70
+msgid "{SpaceSharer} removed you from {SpaceName}"
+msgstr "{SpaceSharer} vás odebírá z prostoru {SpaceName}"
+
