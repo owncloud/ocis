@@ -119,6 +119,12 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 	}
 
 	roleIDFromClaim := roleNamesToRoleIDs[overwriteRole]
+	if overwriteRole != "" && roleIDFromClaim == "" {
+		// do not assign an empty role id, an unknown role can only be a misconfiguration
+		err := fmt.Errorf("unknown role '%s'", overwriteRole)
+		logger.Error().Err(err).Msg("Error mapping role name to role id")
+		return nil, err
+	}
 	if overwriteRole == "" {
 		claimRoles, err := extractRoles(ra.rolesClaim, claims)
 		if err != nil {
