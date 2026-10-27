@@ -5,3 +5,5 @@ services had none at all. All web packages are now fully translated, existing
 strings were reviewed for consistent terminology, and Czech translations were
 added for the graph, activitylog, settings, notifications, userlog and idp
 services. The idp login pages now also offer Czech.
+
+https://github.com/owncloud/ocis/pull/13248
