@@ -497,11 +497,13 @@ func TestUpdateUserRoleAssignmentFailsOnUnknownGuestRole(t *testing.T) {
 
 func TestGuestRoleMapping(t *testing.T) {
 	tests := []struct {
-		name    string
-		driver  string
-		pairs   []string
-		want    []config.RoleMapping
-		wantErr bool
+		name   string
+		driver string
+		// noGuestRole leaves OCIS_MULTI_INSTANCE_GUEST_ROLE empty
+		noGuestRole bool
+		pairs       []string
+		want        []config.RoleMapping
+		wantErr     bool
 	}{
 		{
 			name:   "empty",
@@ -524,16 +526,29 @@ func TestGuestRoleMapping(t *testing.T) {
 			pairs:  []string{"urn:ocis:spaceadmin:user-light-vault"},
 			want:   []config.RoleMapping{{ClaimValue: "urn:ocis:spaceadmin", RoleName: "user-light-vault"}},
 		},
+		{
+			name:   "spaces around the claim value and the role name are trimmed",
+			driver: "oidc",
+			pairs:  []string{" spaceadmin : user-light-vault "},
+			want:   []config.RoleMapping{{ClaimValue: "spaceadmin", RoleName: "user-light-vault"}},
+		},
 		{name: "requires the oidc driver", driver: "default", pairs: []string{"spaceadmin:user-light-vault"}, wantErr: true},
+		{name: "requires a guest role", driver: "oidc", noGuestRole: true, pairs: []string{"spaceadmin:user-light-vault"}, wantErr: true},
 		{name: "missing colon", driver: "oidc", pairs: []string{"spaceadmin"}, wantErr: true},
 		{name: "missing claim value", driver: "oidc", pairs: []string{":user-light-vault"}, wantErr: true},
 		{name: "missing role name", driver: "oidc", pairs: []string{"spaceadmin:"}, wantErr: true},
+		{name: "blank claim value", driver: "oidc", pairs: []string{" :user-light-vault"}, wantErr: true},
+		{name: "blank role name", driver: "oidc", pairs: []string{"spaceadmin: "}, wantErr: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			guestRole := "user-light"
+			if tt.noGuestRole {
+				guestRole = ""
+			}
 			cfg := &config.Config{
 				RoleAssignment: config.RoleAssignment{Driver: tt.driver},
-				MultiInstance:  config.MultiInstanceConfig{GuestRoleMapping: tt.pairs},
+				MultiInstance:  config.MultiInstanceConfig{GuestRole: guestRole, GuestRoleMapping: tt.pairs},
 			}
 			got, err := GuestRoleMapping(cfg)
 			if tt.wantErr {

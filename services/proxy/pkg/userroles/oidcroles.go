@@ -192,7 +192,7 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 			return nil, err
 		}
 
-        // TODO: check if it's ctx or newctx
+		// TODO: check if it's ctx or newctx
 		canCreateDrives, err := utils.CheckPermission(revactx.ContextSetUser(ctx, user), "Drives.Create", client)
 		if err != nil {
 			// The permission could not be determined. Fail closed: leave the personal
@@ -232,14 +232,23 @@ func GuestRoleMapping(cfg *config.Config) ([]config.RoleMapping, error) {
 	if len(pairs) > 0 && cfg.RoleAssignment.Driver != "oidc" {
 		return nil, fmt.Errorf("the guest role mapping requires the 'oidc' role assignment driver, not '%s'", cfg.RoleAssignment.Driver)
 	}
+	// the role assigner only applies the mapping to users that get the guest role
+	if len(pairs) > 0 && cfg.MultiInstance.GuestRole == "" {
+		return nil, errors.New("the guest role mapping requires OCIS_MULTI_INSTANCE_GUEST_ROLE")
+	}
 
 	mappings := make([]config.RoleMapping, 0, len(pairs))
 	for _, pair := range pairs {
 		i := strings.LastIndex(pair, ":")
-		if i <= 0 || i == len(pair)-1 {
+		// the env var parser trims list elements, the yaml parser does not
+		claimValue, roleName := "", ""
+		if i >= 0 {
+			claimValue, roleName = strings.TrimSpace(pair[:i]), strings.TrimSpace(pair[i+1:])
+		}
+		if claimValue == "" || roleName == "" {
 			return nil, fmt.Errorf("invalid guest role mapping '%s', expected 'claimvalue:rolename'", pair)
 		}
-		mappings = append(mappings, config.RoleMapping{ClaimValue: pair[:i], RoleName: pair[i+1:]})
+		mappings = append(mappings, config.RoleMapping{ClaimValue: claimValue, RoleName: roleName})
 	}
 	return mappings, nil
 }
