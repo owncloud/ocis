@@ -45,7 +45,7 @@ export const useContextualHelpers = () => {
           )
         }
       ],
-      readMoreLink: 'https://doc.owncloud.com/go?to=webui-users-sharing'
+      readMoreLink: 'https://doc.owncloud.com/webui/owncloud_web/web_for_users.html#sharing'
     })
   )
 
@@ -81,7 +81,7 @@ export const useContextualHelpers = () => {
           )
         }
       ],
-      readMoreLink: 'https://doc.owncloud.com/go?to=webui-users-sharing'
+      readMoreLink: 'https://doc.owncloud.com/webui/owncloud_web/web_for_users.html#sharing'
     })
   )
 
@@ -95,7 +95,7 @@ export const useContextualHelpers = () => {
           )
         }
       ],
-      readMoreLink: 'https://doc.owncloud.com/go?to=webui-users-sharing'
+      readMoreLink: 'https://doc.owncloud.com/webui/owncloud_web/web_for_users.html#sharing'
     })
   )
 
@@ -114,7 +114,7 @@ export const useContextualHelpers = () => {
           )
         }
       ],
-      readMoreLink: 'https://doc.owncloud.com/go?to=webui-users-sharing'
+      readMoreLink: 'https://doc.owncloud.com/webui/owncloud_web/web_for_users.html#sharing'
     })
   )
 
