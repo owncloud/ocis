@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 	"strconv"
 	"time"
 
@@ -442,6 +443,11 @@ func setIdentityBackends(options Options, svc *Graph) error {
 	if options.IdentityBackend == nil {
 		switch options.Config.Identity.Backend {
 		case "cs3":
+			// the cs3 backend has no attribute-scoped search filter of its own; this config
+			// only takes effect on the ldap backend
+			if !slices.Contains(options.Config.Identity.LDAP.UserSearchAttributes, "mail") {
+				options.Logger.Warn().Msg("OCIS_LDAP_USER_SEARCH_ATTRIBUTES excludes mail but has no effect with GRAPH_IDENTITY_BACKEND=cs3; user search may still match by mail")
+			}
 			gatewaySelector, err := pool.GatewaySelector(
 				options.Config.Reva.Address,
 				append(

@@ -32,8 +32,8 @@ const (
 	ldapDateFormat      = "20060102150405Z0700"
 )
 
-// userSearchSupportedAttributeNames are the logical (Graph API) attribute names accepted in
-// config.LDAP.UserSearchAttributes, in the order used in resolveUserSearchAttributes' error.
+// Logical names accepted in config.LDAP.UserSearchAttributes; keep in sync with the switch in
+// userSearchFilterTemplateFor and config.go's UserSearchAttributes desc.
 var userSearchSupportedAttributeNames = []string{"onPremisesSamAccountName", "displayName", "surname", "mail"}
 
 // DisableUserMechanismType is used instead of directly using the string values from the configuration.
@@ -148,10 +148,17 @@ func ParseDisableMechanismType(disableMechanism string) (DisableUserMechanismTyp
 }
 
 func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, instanceID string, masterID string) (*LDAP, error) {
-	if config.UserDisplayNameAttribute == "" || config.UserIDAttribute == "" ||
-		config.UserEmailAttribute == "" || config.UserNameAttribute == "" ||
-		config.UserSurnameAttribute == "" {
-		return nil, errors.New("invalid user attribute mappings")
+	requiredUserAttrs := []struct{ name, value string }{
+		{"UserDisplayNameAttribute", config.UserDisplayNameAttribute},
+		{"UserIDAttribute", config.UserIDAttribute},
+		{"UserEmailAttribute", config.UserEmailAttribute},
+		{"UserNameAttribute", config.UserNameAttribute},
+		{"UserSurnameAttribute", config.UserSurnameAttribute},
+	}
+	for _, attr := range requiredUserAttrs {
+		if attr.value == "" {
+			return nil, fmt.Errorf("invalid user attribute mappings: %s must not be empty", attr.name)
+		}
 	}
 	uam := userAttributeMap{
 		displayName:         config.UserDisplayNameAttribute,
@@ -170,7 +177,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 	}
 	userSearchFilterTemplate, searchAttrErr := userSearchFilterTemplateFor(uam, config.UserSearchAttributes)
 	if searchAttrErr != nil {
-		return nil, searchAttrErr
+		return nil, fmt.Errorf("error configuring user search attributes: %w", searchAttrErr)
 	}
 
 	if config.GroupNameAttribute == "" || config.GroupIDAttribute == "" {
@@ -538,6 +545,9 @@ func (i *LDAP) AddUser(ctx context.Context, id string, instanceID string) (libre
 // %[1]s is reused by every clause so userSearchFilter fills them all with one Sprintf arg.
 // Excluding mail from the configured names keeps search from revealing which address is whose.
 func userSearchFilterTemplateFor(uam userAttributeMap, logicalNames []string) (string, error) {
+	if len(logicalNames) == 0 {
+		return "", errors.New("at least one user search attribute must be configured")
+	}
 	var b strings.Builder
 	b.WriteString("(|")
 	for _, name := range logicalNames {
@@ -552,16 +562,16 @@ func userSearchFilterTemplateFor(uam userAttributeMap, logicalNames []string) (s
 		case "mail":
 			attr = uam.mail
 		default:
+			// keep in sync with userSearchSupportedAttributeNames and config.go's UserSearchAttributes desc
 			return "", fmt.Errorf("invalid user search attribute %q: supported values are %s", name, strings.Join(userSearchSupportedAttributeNames, ", "))
 		}
 		b.WriteString("(")
-		b.WriteString(attr)
+		// attr is admin-configured, not user input, but a literal '%' would still corrupt the
+		// Sprintf template below
+		b.WriteString(strings.ReplaceAll(attr, "%", "%%"))
 		b.WriteString("=*%[1]s*)")
 	}
 	b.WriteString(")")
-	if len(logicalNames) == 0 {
-		return "", nil
-	}
 	return b.String(), nil
 }
 
@@ -1209,7 +1219,7 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 		}
 	}
 
-	// inetOrgPerson requires "sn" to be set. Set it to the Username if
+	// inetOrgPerson/person require "sn" to be set. Set it to the Username if
 	// Surname is not set in the Request
 	var sn string
 	if user.Surname != nil && *user.Surname != "" {
@@ -1218,6 +1228,10 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 		sn = user.OnPremisesSamAccountName
 	}
 	attrs[i.userAttributeMap.surname] = []string{sn}
+	if i.userAttributeMap.surname != "sn" {
+		// person's mandatory "sn" is a separate attribute from the configured one above
+		attrs["sn"] = []string{sn}
+	}
 
 	// When we get a givenName, we set the attribute.
 	if givenName := user.GetGivenName(); givenName != "" {
@@ -1266,7 +1280,12 @@ func (i *LDAP) getUserAttrTypesForSearch() []string {
 }
 
 func (i *LDAP) getUserAttrTypes() []string {
-	return append(i.getUserAttrTypesForSearch(), "cn", "userPassword", "objectClass")
+	types := append(i.getUserAttrTypesForSearch(), "cn", "userPassword", "objectClass")
+	if i.userAttributeMap.surname != "sn" {
+		// userToLDAPAttrValues also mirrors surname into the literal "sn" person requires
+		types = append(types, "sn")
+	}
+	return types
 }
 
 func (i *LDAP) getUserLDAPDN(user libregraph.User) string {

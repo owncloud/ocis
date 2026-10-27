@@ -68,6 +68,7 @@ var _ = Describe("Users changing their own password", func() {
 			UserDisplayNameAttribute: "displayName",
 			UserNameAttribute:        "uid",
 			UserSurnameAttribute:     "sn",
+			UserSearchAttributes:     []string{"onPremisesSamAccountName", "displayName", "mail"},
 			UserEmailAttribute:       "mail",
 			UserIDAttribute:          "ownCloudUUID",
 			UserSearchScope:          "sub",

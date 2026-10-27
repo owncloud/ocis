@@ -121,6 +121,18 @@ func TestNewLDAPBackend(t *testing.T) {
 	if _, err := NewLDAPBackend(l, lconfig, &logger, "", ""); err != nil {
 		t.Errorf("Should fail with invalid group search scope")
 	}
+
+	tc = lconfig
+	tc.UserSearchAttributes = nil
+	if _, err := NewLDAPBackend(l, tc, &logger, "", ""); err == nil {
+		t.Error("Should fail with no user search attributes configured")
+	}
+
+	tc = lconfig
+	tc.UserSearchAttributes = []string{"notARealAttribute"}
+	if _, err := NewLDAPBackend(l, tc, &logger, "", ""); err == nil {
+		t.Error("Should fail with an unsupported user search attribute name")
+	}
 }
 
 func TestCreateUser(t *testing.T) {
@@ -363,6 +375,12 @@ func TestGetUsersSearch(t *testing.T) {
 		restrictedConfig := lconfig
 		restrictedConfig.UserSearchAttributes = []string{"onPremisesSamAccountName", "displayName", "surname"}
 		assertSearchFilter(t, restrictedConfig, "(&(objectClass=inetOrgPerson)(|(uid=*term*)(displayname=*term*)(sn=*term*)))")
+	})
+
+	t.Run("a literal '%' in a configured attribute name does not corrupt the filter", func(t *testing.T) {
+		percentConfig := lconfig
+		percentConfig.UserNameAttribute = "uid%"
+		assertSearchFilter(t, percentConfig, "(&(objectClass=inetOrgPerson)(|(uid%=*term*)(displayname=*term*)(mail=*term*)))")
 	})
 }
 
