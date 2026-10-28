@@ -12,7 +12,11 @@ import (
 )
 
 func mfaResponse(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo) (interface{}, error) {
-	const msg = "MFA required to access vault storage"
+	return denyResponse(ctx, req, info, "MFA required to access vault storage")
+}
+
+// denyResponse returns a PERMISSION_DENIED response of the type that matches the request.
+func denyResponse(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, msg string) (interface{}, error) {
 	switch req.(type) {
 	case *provider.StatRequest:
 		return &provider.StatResponse{Status: rstatus.NewPermissionDenied(ctx, nil, msg)}, nil
@@ -67,7 +71,7 @@ func mfaResponse(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 	case *provider.DeleteStorageSpaceRequest:
 		return &provider.DeleteStorageSpaceResponse{Status: rstatus.NewPermissionDenied(ctx, nil, msg)}, nil
 	default:
-		log.Debug().Str("method", info.FullMethod).Msg("mfa: blocking unknown request type")
-		return nil, grpcstatus.Errorf(codes.PermissionDenied, "mfa: %s: %T", msg, req)
+		log.Debug().Str("method", info.FullMethod).Msg("auth: blocking unknown request type")
+		return nil, grpcstatus.Errorf(codes.PermissionDenied, "auth: %s: %T", msg, req)
 	}
 }
