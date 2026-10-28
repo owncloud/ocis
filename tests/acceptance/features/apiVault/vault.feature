@@ -1191,7 +1191,7 @@ Feature: vault
       | vaultFile.txt | File Editor      |
 
 
-  Scenario: try to send share invitation for a resource in vault to a group
+  Scenario: send share invitation for a resource in vault to a group
     Given these groups have been created:
       | groupname   |
       | vault-group |
@@ -1207,28 +1207,11 @@ Feature: vault
       | shareType       | group         |
       | permissionsRole | Viewer        |
       | storage         | vault         |
-    Then the HTTP status code should be "403"
-    And the JSON data of the response should match
-      """
-      {
-        "type": "object",
-        "required": ["error"],
-        "properties": {
-          "error": {
-            "type": "object",
-            "required": ["code", "message"],
-            "properties": {
-              "code": {
-                "const": "accessDenied"
-              },
-              "message": {
-                "const": "grantee is not allowed to access vault resources"
-              }
-            }
-          }
-        }
-      }
-      """
+    Then the HTTP status code should be "200"
+    And user "Brian" should have a share in vault "vaultFile.txt" synced
+    And user "Brian" should have the following resource shares:
+      | resource      | permissionsRole | sharer | space    | storage |
+      | vaultFile.txt | Viewer          | Alice  | Personal | vault   |
 
 
   Scenario Outline: server sets a default 30-day expiration when a user share is created without one

@@ -26,6 +26,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/vault"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/email"
@@ -196,15 +197,47 @@ func (s eventsNotifier) send(ctx context.Context, emails []*channels.Message) {
 	}
 }
 
-func (s eventsNotifier) ensureGranteeList(ctx context.Context, executant, u *user.UserId, g *group.GroupId) []*user.User {
+// ensureGranteeList resolves the grantee to the users who get the notification.
+// For a vault resource it keeps only the users who hold the VaultMode permission.
+func (s eventsNotifier) ensureGranteeList(ctx context.Context, executant, u *user.UserId, g *group.GroupId, inVault bool) []*user.User {
 	granteeList, err := s.getGranteeList(ctx, executant, u, g)
 	if err != nil {
 		s.logger.Error().Err(err).Str("event", "ensureGranteeList").Msg("Could not get grantee list")
 		return nil
-	} else if len(granteeList) == 0 {
+	}
+	if inVault {
+		granteeList = s.filterVaultGrantees(ctx, granteeList)
+	}
+	if len(granteeList) == 0 {
 		return nil
 	}
 	return granteeList
+}
+
+// filterVaultGrantees removes the users who do not hold the VaultMode permission.
+// A group can contain such users, because the gateway does not check the group members.
+func (s eventsNotifier) filterVaultGrantees(ctx context.Context, users []*user.User) []*user.User {
+	if len(users) == 0 {
+		return users
+	}
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		s.logger.Error().Err(err).Str("event", "filterVaultGrantees").Msg("could not select next gateway client")
+		return nil
+	}
+
+	filtered := make([]*user.User, 0, len(users))
+	for _, u := range users {
+		allowed, err := vault.HasVaultMode(ctx, gatewayClient, u.GetId())
+		if err != nil {
+			s.logger.Error().Err(err).Str("event", "filterVaultGrantees").Str("userId", u.GetId().GetOpaqueId()).Msg("could not check vault permission, skipped")
+			continue
+		}
+		if allowed {
+			filtered = append(filtered, u)
+		}
+	}
+	return filtered
 }
 
 func (s eventsNotifier) getGranteeList(ctx context.Context, executant, u *user.UserId, g *group.GroupId) ([]*user.User, error) {
