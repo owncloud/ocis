@@ -122,7 +122,7 @@ describe('InviteCollaboratorForm', () => {
       vault: { enabled: true, vault_storage_provider: '' }
     }
 
-    it('only asks for users that may access the vault, and for no groups at all', async () => {
+    it('asks for users that may access the vault, and for groups', async () => {
       const { wrapper, mocks } = getWrapper({
         capabilities: vaultCapabilities,
         resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
@@ -133,7 +133,7 @@ describe('InviteCollaboratorForm', () => {
         expect.objectContaining({ filter: 'vaultEligible eq true' }),
         expect.anything()
       )
-      expect(mocks.$clientService.graphAuthenticated.groups.listGroups).not.toHaveBeenCalled()
+      expect(mocks.$clientService.graphAuthenticated.groups.listGroups).toHaveBeenCalled()
     })
     it('recognizes a vault space resource, which carries the full drive id', async () => {
       const { wrapper, mocks } = getWrapper({

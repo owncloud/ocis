@@ -21,6 +21,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
+	"github.com/owncloud/ocis/v2/ocis-pkg/vault"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -207,6 +208,9 @@ func (ul *UserlogService) processEvent(event events.Event) {
 
 	// II) filter users who want to receive the event
 	users = ul.filter.execute(ctx, event, executant, users)
+	if isVaultEvent(event) {
+		users = ul.filterVaultUsers(ctx, gwc, users)
+	}
 
 	// III) store the eventID for each user
 	for _, id := range users {
@@ -222,6 +226,43 @@ func (ul *UserlogService) processEvent(event events.Event) {
 			ul.log.Error().Err(err).Str("user_ids", fmt.Sprintf("%v", users)).Str("event_id", event.ID).Msg("cannot create sse event")
 		}
 	}
+}
+
+// isVaultEvent reports whether the event is about a share or a space membership in the vault.
+func isVaultEvent(event events.Event) bool {
+	switch e := event.Event.(type) {
+	case events.ShareCreated:
+		return vault.IsVaultStorage(e.ItemID.GetStorageId())
+	case events.ShareRemoved:
+		return vault.IsVaultStorage(e.ItemID.GetStorageId())
+	case events.ShareExpired:
+		return vault.IsVaultStorage(e.ItemID.GetStorageId())
+	case events.SpaceShared:
+		return vault.IsVaultSpace(e.ID.GetOpaqueId())
+	case events.SpaceUnshared:
+		return vault.IsVaultSpace(e.ID.GetOpaqueId())
+	case events.SpaceMembershipExpired:
+		return vault.IsVaultSpace(e.SpaceID.GetOpaqueId())
+	default:
+		return false
+	}
+}
+
+// filterVaultUsers removes the users who do not hold the VaultMode permission.
+// A group can contain such users, because the gateway does not check the group members.
+func (ul *UserlogService) filterVaultUsers(ctx context.Context, gwc gateway.GatewayAPIClient, users []string) []string {
+	filtered := make([]string, 0, len(users))
+	for _, u := range users {
+		allowed, err := vault.HasVaultMode(ctx, gwc, &user.UserId{OpaqueId: u})
+		if err != nil {
+			ul.log.Error().Err(err).Str("userId", u).Msg("could not check vault permission, skipped")
+			continue
+		}
+		if allowed {
+			filtered = append(filtered, u)
+		}
+	}
+	return filtered
 }
 
 // GetEvents allows retrieving events from the eventhistory by userid

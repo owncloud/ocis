@@ -78,6 +78,13 @@ func (s *svc) CreateShare(ctx context.Context, req *collaboration.CreateShareReq
 // granteeMayAccessVault reports whether the grantee may be granted access to a vault resource.
 // A non-nil error means undetermined, never denied, so callers must fail closed.
 func (s *svc) granteeMayAccessVault(ctx context.Context, g *provider.Grantee) (bool, error) {
+	// Groups are allowed without a VaultMode check. Role assignments belong to single accounts,
+	// and group membership can change after the share exists. The notification services filter
+	// the group members by VaultMode instead, and every member still needs MFA to open the vault.
+	if g.GetType() == provider.GranteeType_GRANTEE_TYPE_GROUP {
+		return g.GetGroupId().GetOpaqueId() != "", nil
+	}
+
 	ref := vaultPermissionSubject(g)
 	if ref == nil {
 		return false, nil
@@ -93,7 +100,8 @@ func (s *svc) granteeMayAccessVault(ctx context.Context, g *provider.Grantee) (b
 	return vaultPermissionGranted(res.GetStatus())
 }
 
-// vaultPermissionSubject returns the subject to check VaultMode for, or nil for grantees that can never hold it, like groups.
+// vaultPermissionSubject returns the subject to check VaultMode for, or nil for grantees that cannot hold it.
+// Groups cannot hold it, because role assignments belong to single accounts.
 func vaultPermissionSubject(g *provider.Grantee) *permissions.SubjectReference {
 	if g.GetType() != provider.GranteeType_GRANTEE_TYPE_USER {
 		return nil
