@@ -248,19 +248,19 @@ func isVaultEvent(event events.Event) bool {
 	}
 }
 
-// filterVaultUsers removes the users who do not hold the VaultMode permission.
-// A group can contain such users, because the gateway does not check the group members.
+// filterVaultUsers keeps only the users who hold the VaultMode permission.
 func (ul *UserlogService) filterVaultUsers(ctx context.Context, gwc gateway.GatewayAPIClient, users []string) []string {
-	filtered := make([]string, 0, len(users))
+	ids := make([]*user.UserId, 0, len(users))
 	for _, u := range users {
-		allowed, err := vault.HasVaultMode(ctx, gwc, &user.UserId{OpaqueId: u})
-		if err != nil {
-			ul.log.Error().Err(err).Str("userId", u).Msg("could not check vault permission, skipped")
-			continue
-		}
-		if allowed {
-			filtered = append(filtered, u)
-		}
+		ids = append(ids, &user.UserId{OpaqueId: u})
+	}
+	allowed := vault.FilterVaultModeUsers(ctx, gwc, ids, func(id *user.UserId, err error) {
+		ul.log.Error().Err(err).Str("userId", id.GetOpaqueId()).Msg("could not check the vault permission, user skipped")
+	})
+
+	filtered := make([]string, 0, len(allowed))
+	for _, id := range allowed {
+		filtered = append(filtered, id.GetOpaqueId())
 	}
 	return filtered
 }
