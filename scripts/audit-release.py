@@ -21,7 +21,6 @@ BINARY_REF = {
     "darwin-amd64": (MACHO_MAGIC, 64, 0x01000007),
     "darwin-arm64": (MACHO_MAGIC, 64, 0x0100000c),
 }
-EULA      = "End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf"
 LICENSES  = "third-party-licenses.tar.gz"
 PROD_TAGS = ("5.0", "7", "8")
 
@@ -34,7 +33,7 @@ def fail(msg):
     global failed; failed += 1; print(f"[FAIL] {msg}", file=sys.stderr)
 
 def expected_files(v):
-    return [f for p in BINARY_PLATFORMS for f in (f"ocis-{v}-{p}", f"ocis-{v}-{p}.sha256")] + [EULA, LICENSES]
+    return [f for p in BINARY_PLATFORMS for f in (f"ocis-{v}-{p}", f"ocis-{v}-{p}.sha256")] + [LICENSES]
 
 def is_production(v):
     return any(v.startswith(t) for t in PROD_TAGS) and "-" not in v
@@ -108,13 +107,6 @@ def check_local(directory, version):
         if magic != b"\x1f\x8b": fail(f"{LICENSES}: not gzip ({magic.hex()})")
         elif size < 100_000:     fail(f"{LICENSES}: too small ({size:,} bytes)")
         else:                    ok(f"{LICENSES}: gzip {size:,} bytes")
-
-    eula = directory / EULA
-    if eula.exists():
-        magic, size = eula.read_bytes()[:4], eula.stat().st_size
-        if magic != b"%PDF":  fail(f"{EULA}: not PDF ({magic})")
-        elif size < 10_000:   fail(f"{EULA}: too small ({size:,} bytes)")
-        else:                 ok(f"{EULA}: PDF {size:,} bytes")
 
 
 def check_github_release(version):
