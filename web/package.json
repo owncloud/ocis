@@ -76,7 +76,7 @@
     "pino": "10.1.0",
     "pino-pretty": "13.1.2",
     "prettier": "^3.6.2",
-    "qs": "6.15.2",
+    "qs": "6.16.1",
     "requirejs": "2.3.7",
     "rollup-plugin-gzip": "^4.1.1",
     "rollup-plugin-visualizer": "6.0.5",
@@ -133,7 +133,7 @@
       "markdown-it": "14.3.3",
       "esbuild": "0.28.1",
       "dompurify": "3.4.17",
-      "qs": "6.16.0"
+      "qs": "6.16.1"
     },
     "patchedDependencies": {
       "caf@15.0.1": "patches/caf@15.0.1.patch",
