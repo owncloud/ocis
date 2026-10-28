@@ -1196,6 +1196,7 @@ Feature: vault
       | groupname   |
       | vault-group |
     And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Brian" has been set up in oCIS
     And user "Brian" has been added to group "vault-group"
     And user "Alice" has been set up in oCIS
@@ -1212,6 +1213,100 @@ Feature: vault
     And user "Brian" should have the following resource shares:
       | resource      | permissionsRole | sharer | space    | storage |
       | vaultFile.txt | Viewer          | Alice  | Personal | vault   |
+
+
+  Scenario Outline: only group members with the vault mode permission get a notification and access for a vault share
+    Given these users have been created with default attributes:
+      | username |
+      | Brian    |
+      | Carol    |
+    And the administrator has assigned the role "<vault-role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<no-vault-role>" to user "Carol" using the Graph API
+    And these groups have been created:
+      | groupname   |
+      | vault-group |
+    And user "Brian" has been added to group "vault-group"
+    And user "Carol" has been added to group "vault-group"
+    And user "Alice" has been set up in oCIS
+    And user "Brian" has been set up in oCIS
+    And user "Carol" has been set up in oCIS
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault
+    And we save it into "FILEID"
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | vaultFile.txt |
+      | space           | Personal      |
+      | sharee          | vault-group   |
+      | shareType       | group         |
+      | permissionsRole | Viewer        |
+      | storage         | vault         |
+    Then the HTTP status code should be "200"
+    And user "Brian" should have a share in vault "vaultFile.txt" synced
+    # Check Brian first. The userlog service filters all group members before it stores the
+    # notification for one of them, so the check for Carol cannot run too early.
+    And user "Brian" should get a notification with subject "Resource shared" and message:
+      | message                                    |
+      | Alice Hansen shared vaultFile.txt with you |
+    And user "Carol" should not have any notification
+    When user "Brian" sends HTTP method "GET" to URL "/dav/spaces/<<FILEID>>"
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "some content"
+    When user "Carol" tries to send HTTP method "GET" to URL "/dav/spaces/<<FILEID>>"
+    Then the HTTP status code should be "403" or "404"
+    And for user "Carol" the space "Shares" should not contain these entries:
+      | vaultFile.txt |
+    Examples:
+      | vault-role  | no-vault-role |
+      | Space Admin | User Light    |
+      | Admin       | User          |
+
+
+  Scenario Outline: only group members with the vault mode permission get a notification and access for a vault space membership
+    Given these users have been created with default attributes:
+      | username |
+      | Brian    |
+      | Carol    |
+    And the administrator has assigned the role "<vault-role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<no-vault-role>" to user "Carol" using the Graph API
+    And these groups have been created:
+      | groupname   |
+      | vault-group |
+    And user "Brian" has been added to group "vault-group"
+    And user "Carol" has been added to group "vault-group"
+    And user "Alice" has been set up in oCIS
+    And user "Brian" has been set up in oCIS
+    And user "Carol" has been set up in oCIS
+    And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "vaultFile.txt" in vault
+    And we save it into "FILEID"
+    When user "Alice" sends the following space share invitation using root endpoint of the Graph API:
+      | space           | new-space          |
+      | sharee          | vault-group        |
+      | shareType       | group              |
+      | permissionsRole | <permissions-role> |
+      | storage         | vault              |
+    Then the HTTP status code should be "200"
+    # Check Brian first. The userlog service filters all group members before it stores the
+    # notification for one of them, so the check for Carol cannot run too early.
+    And user "Brian" should get a notification with subject "Space shared" and message:
+      | message                                   |
+      | Alice Hansen added you to Space new-space |
+    And user "Carol" should not have any notification
+    And for user "Brian" the space "new-space" in vault should contain these entries:
+      | vaultFile.txt |
+    When user "Brian" sends HTTP method "GET" to URL "/dav/spaces/<<FILEID>>"
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "some content"
+    When user "Carol" tries to send HTTP method "GET" to URL "/dav/spaces/<<FILEID>>"
+    Then the HTTP status code should be "403" or "404"
+    When user "Carol" lists all available spaces via the Graph API
+    Then the HTTP status code should be "200"
+    And the json response should not contain a space with name "new-space"
+    Examples:
+      | permissions-role | vault-role  | no-vault-role |
+      | Manager          | Space Admin | User Light    |
+      | Manager          | Admin       | User          |
+      | Space Viewer     | Space Admin | User Light    |
+      | Space Editor     | Admin       | User          |
 
 
   Scenario Outline: server sets a default 30-day expiration when a user share is created without one

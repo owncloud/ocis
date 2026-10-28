@@ -7,5 +7,5 @@ notifications and userlog services now send a vault notification only to the
 group members who have the permission to use the vault. The other group
 members get no email and no in-app notification.
 
-https://github.com/owncloud/ocis/pull/13259
+https://github.com/owncloud/ocis/pull/13260
 https://github.com/owncloud/reva/pull/787
