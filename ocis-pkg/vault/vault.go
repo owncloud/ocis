@@ -12,7 +12,16 @@ import (
 	"github.com/owncloud/reva/v2/pkg/permission"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
+	"golang.org/x/sync/errgroup"
 )
+
+// maxConcurrentChecks bounds how many VaultMode checks run at the same time, so that a large
+// group does not send all its checks to the gateway at once.
+const maxConcurrentChecks = 10
+
+const tracerName = "github.com/owncloud/ocis/v2/ocis-pkg/vault"
 
 // IsVaultStorage reports whether the storage ID belongs to the vault storage provider.
 func IsVaultStorage(storageID string) bool {
@@ -49,4 +58,46 @@ func HasVaultMode(ctx context.Context, gwc gateway.GatewayAPIClient, userID *use
 	default:
 		return false, fmt.Errorf("vault permission check returned status %q: %s", code, res.GetStatus().GetMessage())
 	}
+}
+
+// FilterVaultModeUsers returns the users from userIDs who hold the VaultMode permission, in the
+// same order. A group can contain users without the permission, because the gateway does not
+// check the group members. The checks run in parallel, with a bound. When a check fails, the
+// function calls onError for that user and leaves the user out, so that the caller fails closed.
+func FilterVaultModeUsers(ctx context.Context, gwc gateway.GatewayAPIClient, userIDs []*user.UserId, onError func(*user.UserId, error)) []*user.UserId {
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer(tracerName).Start(ctx, "FilterVaultModeUsers")
+	defer span.End()
+	span.SetAttributes(attribute.Int("vault.users.checked", len(userIDs)))
+
+	allowed := make([]bool, len(userIDs))
+	errs := make([]error, len(userIDs))
+	var eg errgroup.Group
+	eg.SetLimit(maxConcurrentChecks)
+	for i, id := range userIDs {
+		eg.Go(func() error {
+			allowed[i], errs[i] = HasVaultMode(ctx, gwc, id)
+			return nil
+		})
+	}
+	_ = eg.Wait()
+
+	filtered := make([]*user.UserId, 0, len(userIDs))
+	failed := 0
+	for i, id := range userIDs {
+		if errs[i] != nil {
+			failed++
+			if onError != nil {
+				onError(id, errs[i])
+			}
+			continue
+		}
+		if allowed[i] {
+			filtered = append(filtered, id)
+		}
+	}
+	span.SetAttributes(
+		attribute.Int("vault.users.allowed", len(filtered)),
+		attribute.Int("vault.users.failed", failed),
+	)
+	return filtered
 }
