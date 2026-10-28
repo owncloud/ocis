@@ -356,9 +356,9 @@ const fetchRecipientsTask = useTask(function* (signal, query: string) {
   )
 
   let groupData: Group[]
-  if (!unref(isExternalShareRoleType) && !unref(isVaultResource)) {
-    // groups are only available for internal shares, and never for vault resources: the
-    // vault permission is assigned per account, so a group can never hold it
+  if (!unref(isExternalShareRoleType)) {
+    // groups are only available for internal shares. For vault resources the server checks
+    // the vault permission of each group member when it sends the share notifications
     groupData = yield* call(
       client.groups.listGroups({ orderBy: ['displayName'], search: `"${query}"` }, { signal })
     )
