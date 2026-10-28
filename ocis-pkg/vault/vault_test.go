@@ -3,6 +3,8 @@ package vault
 import (
 	"context"
 	"errors"
+	"fmt"
+	"slices"
 	"testing"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -12,6 +14,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/utils"
 	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc"
 )
 
 func TestIsVaultSpace(t *testing.T) {
@@ -63,4 +66,45 @@ func TestHasVaultMode(t *testing.T) {
 			gwc.AssertExpectations(t)
 		})
 	}
+}
+
+func TestFilterVaultModeUsers(t *testing.T) {
+	// alice and every "ok-" user hold the permission, bob does not, and the check for carol fails
+	gwc := &cs3mocks.GatewayAPIClient{}
+	gwc.On("CheckPermission", mock.Anything, mock.Anything).Return(func(_ context.Context, r *permissions.CheckPermissionRequest, _ ...grpc.CallOption) (*permissions.CheckPermissionResponse, error) {
+		switch id := r.GetSubjectRef().GetUserId().GetOpaqueId(); {
+		case id == "carol":
+			return nil, errors.New("unavailable")
+		case id == "bob":
+			return &permissions.CheckPermissionResponse{Status: &rpc.Status{Code: rpc.Code_CODE_PERMISSION_DENIED}}, nil
+		default:
+			return &permissions.CheckPermissionResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil
+		}
+	})
+
+	ids := []*user.UserId{{OpaqueId: "alice"}, {OpaqueId: "bob"}, {OpaqueId: "carol"}}
+	for i := range 50 {
+		ids = append(ids, &user.UserId{OpaqueId: fmt.Sprintf("ok-%02d", i)})
+	}
+
+	var failed []string
+	got := FilterVaultModeUsers(context.Background(), gwc, ids, func(id *user.UserId, err error) {
+		failed = append(failed, id.GetOpaqueId())
+	})
+
+	want := []string{"alice"}
+	for i := range 50 {
+		want = append(want, fmt.Sprintf("ok-%02d", i))
+	}
+	gotIDs := make([]string, 0, len(got))
+	for _, id := range got {
+		gotIDs = append(gotIDs, id.GetOpaqueId())
+	}
+	if !slices.Equal(gotIDs, want) {
+		t.Errorf("FilterVaultModeUsers() = %v, want %v", gotIDs, want)
+	}
+	if !slices.Equal(failed, []string{"carol"}) {
+		t.Errorf("onError called for %v, want [carol]", failed)
+	}
+	gwc.AssertNumberOfCalls(t, "CheckPermission", len(ids))
 }
