@@ -59,5 +59,5 @@ func Validate(cfg *config.Config) error {
 			cfg.Service.Name, ocisdefaults.BaseConfigPath())
 	}
 
-	return shared.CheckNatsCredentials(cfg.Service.Name, cfg.Store.CredsFile, cfg.Store.Creds)
+	return shared.CheckNatsCredentials(cfg.Service.Name, cfg.Store.Store, cfg.Store.CredsFile, cfg.Store.Creds)
 }

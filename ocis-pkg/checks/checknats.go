@@ -3,6 +3,7 @@ package checks
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/nats-io/nats.go"
 	"github.com/owncloud/reva/v2/pkg/events/stream"
@@ -28,13 +29,36 @@ func NewNatsCheck(natsCluster string, options ...nats.Option) func(context.Conte
 // NewNatsCheckWithConfig checks the reachability of the nats server at address.
 // It authenticates and uses TLS like the service connections configured by cfg.
 // The address of cfg is not used.
+//
+// The check keeps one connection and uses it again for each probe. A new connection
+// for each probe reads the .creds file each time. A probe can then read a rotated file
+// before the write is complete. Each connection also counts against the connection
+// limit of the NATS account. The check connects again only after the connection closes.
+// The connection reads the .creds file again on each reconnect.
 func NewNatsCheckWithConfig(address string, cfg stream.NatsConfig) func(context.Context) error {
-	return func(ctx context.Context) error {
-		options, err := NatsOptions(cfg)
-		if err != nil {
-			return fmt.Errorf("could not configure the nats connection: %v", err)
+	var (
+		mu   sync.Mutex
+		conn *nats.Conn
+	)
+	return func(_ context.Context) error {
+		mu.Lock()
+		defer mu.Unlock()
+
+		if conn == nil || conn.IsClosed() {
+			options, err := NatsOptions(cfg)
+			if err != nil {
+				return fmt.Errorf("could not configure the nats connection: %v", err)
+			}
+			c, err := nats.Connect(address, options...)
+			if err != nil {
+				return fmt.Errorf("could not connect to nats server: %v", err)
+			}
+			conn = c
 		}
-		return NewNatsCheck(address, options...)(ctx)
+		if conn.Status() != nats.CONNECTED {
+			return fmt.Errorf("nats server not connected")
+		}
+		return nil
 	}
 }
 

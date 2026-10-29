@@ -17,21 +17,7 @@ func Server(opts ...Option) (*http.Server, error) {
 
 	readyHandlerConfiguration := handlers.NewCheckHandlerConfiguration().
 		WithLogger(options.Logger).
-		WithCheck("nats reachability", func(ctx context.Context) error {
-			if options.Config.Cache.ProviderCacheStore == "nats-js-kv" && len(options.Config.Cache.ProviderCacheNodes) > 0 {
-				c := options.Config.Cache
-				return checks.NewNatsCheckWithConfig(c.ProviderCacheNodes[0], stream.NatsConfig{
-					TLSInsecure:          c.ProviderCacheTLSInsecure,
-					TLSRootCACertificate: c.ProviderCacheTLSRootCACertificate,
-					EnableTLS:            c.ProviderCacheEnableTLS,
-					AuthUsername:         c.ProviderCacheAuthUsername,
-					AuthPassword:         c.ProviderCacheAuthPassword,
-					CredsFile:            c.ProviderCacheCredsFile,
-					Creds:                c.ProviderCacheCreds,
-				})(ctx)
-			}
-			return nil
-		})
+		WithCheck("nats reachability", natsCheck(options))
 
 	return debug.NewService(
 		debug.Logger(options.Logger),
@@ -47,4 +33,22 @@ func Server(opts ...Option) (*http.Server, error) {
 		//debug.CorsAllowedHeaders(options.Config.HTTP.CORS.AllowedHeaders),
 		//debug.CorsAllowCredentials(options.Config.HTTP.CORS.AllowCredentials),
 	), nil
+}
+
+// natsCheck returns the check of the provider cache. When the provider cache does not
+// use NATS, the check always succeeds.
+func natsCheck(options Options) func(context.Context) error {
+	c := options.Config.Cache
+	if c.ProviderCacheStore != "nats-js-kv" || len(c.ProviderCacheNodes) == 0 {
+		return func(context.Context) error { return nil }
+	}
+	return checks.NewNatsCheckWithConfig(c.ProviderCacheNodes[0], stream.NatsConfig{
+		TLSInsecure:          c.ProviderCacheTLSInsecure,
+		TLSRootCACertificate: c.ProviderCacheTLSRootCACertificate,
+		EnableTLS:            c.ProviderCacheEnableTLS,
+		AuthUsername:         c.ProviderCacheAuthUsername,
+		AuthPassword:         c.ProviderCacheAuthPassword,
+		CredsFile:            c.ProviderCacheCredsFile,
+		Creds:                c.ProviderCacheCreds,
+	})
 }

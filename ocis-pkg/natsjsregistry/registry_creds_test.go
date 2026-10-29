@@ -42,6 +42,24 @@ func TestGetCreds(t *testing.T) {
 		require.Empty(t, credsFile)
 		require.Equal(t, "registry", creds)
 	})
+
+	t.Run("registry username and password take precedence over global variables", func(t *testing.T) {
+		t.Setenv(_natsCredsFileEnv, "/global.creds")
+		t.Setenv(_natsCredsEnv, "global")
+		t.Setenv(_registryUsernameEnv, "user")
+		t.Setenv(_registryPasswordEnv, "pass")
+		credsFile, creds := getCreds()
+		require.Empty(t, credsFile)
+		require.Empty(t, creds)
+	})
+
+	t.Run("registry file takes precedence over registry username", func(t *testing.T) {
+		t.Setenv(_registryCredsFileEnv, "/registry.creds")
+		t.Setenv(_registryUsernameEnv, "user")
+		credsFile, creds := getCreds()
+		require.Equal(t, "/registry.creds", credsFile)
+		require.Empty(t, creds)
+	})
 }
 
 func newTestCreds(t *testing.T) []byte {

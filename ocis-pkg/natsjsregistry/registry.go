@@ -287,12 +287,17 @@ func (n *storeregistry) credentialsOption() (nats.Option, error) {
 
 // getCreds returns the path and the content of the NATS .creds file for the registry.
 // The registry variables take precedence. If both are empty, the global OCIS_NATS_* variables are used.
+// The registry username and password are also registry variables. When one of them is set,
+// they take precedence over the global variables, so the global credentials are not used.
 func getCreds() (string, string) {
 	credsFile, creds := os.Getenv(_registryCredsFileEnv), os.Getenv(_registryCredsEnv)
-	if credsFile == "" && creds == "" {
-		credsFile, creds = os.Getenv(_natsCredsFileEnv), os.Getenv(_natsCredsEnv)
+	if credsFile != "" || creds != "" {
+		return credsFile, creds
 	}
-	return credsFile, creds
+	if user, password := getAuth(); user != "" || password != "" {
+		return "", ""
+	}
+	return os.Getenv(_natsCredsFileEnv), os.Getenv(_natsCredsEnv)
 }
 
 var (
