@@ -341,7 +341,8 @@ func (g Graph) applyFilterVaultEligible(ctx context.Context, req *godata.GoDataR
 				return err
 			}
 			// a user of another instance only gets a role here at their first login here. Until
-			// then, check the role that login will give them, if a mapping matches their userClass.
+			// then, check the role the guest role mapping gives their userClass, like
+			// assignGuestVaultRole does when the vault share is created.
 			if len(assignments.GetAssignments()) == 0 && user.GetId() == preciseUserID && len(g.guestRoleMapping) > 0 {
 				// a failed lookup leaves them out, like members, who get their role from the role
 				// mapping of members at login

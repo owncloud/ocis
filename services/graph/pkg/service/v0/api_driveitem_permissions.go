@@ -90,7 +90,7 @@ const (
 type externalSharePermissionChecker func(context.Context) bool
 
 // supposed to create a vault share for the user with createShare, and to give a user who never
-// logged in here the role with vault mode their first login here will give them (multi-instance only)
+// logged in here the role with vault mode the guest role mapping gives them (multi-instance only)
 type vaultShareCreator func(ctx context.Context, userID string, createShare func() error) error
 
 // NewDriveItemPermissionsService creates a new DriveItemPermissionsService
@@ -281,10 +281,6 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 			cTime = createShareResponse.GetShare().GetCtime()
 			expiration = createShareResponse.GetShare().GetExpiration()
 		} else {
-			// the vault share check only reads role assignments, and a user of another instance has
-			// none here before their first login here. Without one the check refuses the share.
-			// Only a sharer who may share the resource gets this far, the role must not be
-			// assignable by someone whose share the storage refuses anyway.
 			createShareRequest := createShareRequestToUser(user, statResponse.GetInfo(), cs3ResourcePermissions)
 			if shareExpiration != nil {
 				createShareRequest.GetGrant().Expiration = shareExpiration

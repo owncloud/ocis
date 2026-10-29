@@ -55,8 +55,8 @@ func guestRoleName(mappings []guestRoleMapping, values []string) string {
 
 // withGuestVaultRole creates a vault share for the user with createShare. The vault share check only
 // reads role assignments, and a user of another instance only gets a role here at their first login
-// here. So if the user has no role yet, withGuestVaultRole first assigns the role that login will give
-// them, if it grants vault mode, and removes it again if the share fails.
+// here. So if the user has no role yet, withGuestVaultRole first assigns the role the guest role
+// mapping gives their userClass, if it grants vault mode, and removes it again if the share fails.
 func (g Graph) withGuestVaultRole(ctx context.Context, userID string, createShare func() error) error {
 	logger := g.logger.SubloggerWithRequestID(ctx)
 	role, err := g.assignGuestVaultRole(ctx, userID)
@@ -84,8 +84,11 @@ type guestVaultRole struct {
 	assignmentID  string
 }
 
-// assignGuestVaultRole assigns a user who has no role here yet the role their first login here will
-// give them, if that role grants vault mode. It returns nil if it assigned no role.
+// assignGuestVaultRole assigns a guest who has no role here yet the role the guest role mapping gives
+// their userClass, if that role grants vault mode. It returns nil if it assigned no role.
+//
+// Only the mapping counts. A guest no mapping matches gets OCIS_MULTI_INSTANCE_GUEST_ROLE at login,
+// which is not assigned here: such a guest can only receive vault shares after their first login.
 func (g Graph) assignGuestVaultRole(ctx context.Context, userID string) (*guestVaultRole, error) {
 	// like the proxy, only for multi-instance guests
 	if !g.config.MultiInstance.Enabled || len(g.guestRoleMapping) == 0 {
