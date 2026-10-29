@@ -32,7 +32,7 @@ overrides:
   markdown-it: 14.3.3
   esbuild: 0.28.1
   dompurify: 3.4.17
-  qs: 6.16.0
+  qs: 6.16.1
 
 patchedDependencies:
   caf@15.0.1:
@@ -192,8 +192,8 @@ importers:
         specifier: ^3.6.2
         version: 3.9.6
       qs:
-        specifier: 6.16.0
-        version: 6.16.0
+        specifier: 6.16.1
+        version: 6.16.1
       requirejs:
         specifier: 2.3.7
         version: 2.3.7
@@ -629,8 +629,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3))
       qs:
-        specifier: 6.16.0
-        version: 6.16.0
+        specifier: 6.16.1
+        version: 6.16.1
       uuid:
         specifier: 14.0.0
         version: 14.0.0
@@ -693,8 +693,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3))
       qs:
-        specifier: 6.16.0
-        version: 6.16.0
+        specifier: 6.16.1
+        version: 6.16.1
       uuid:
         specifier: 14.0.0
         version: 14.0.0
@@ -1121,8 +1121,8 @@ importers:
         specifier: ^1.30.0
         version: 1.30.0
       qs:
-        specifier: 6.16.0
-        version: 6.16.0
+        specifier: 6.16.1
+        version: 6.16.1
       screenfull:
         specifier: ^6.0.2
         version: 6.0.2
@@ -1252,8 +1252,8 @@ importers:
         specifier: ^8.3.0
         version: 8.3.0
       qs:
-        specifier: 6.16.0
-        version: 6.16.0
+        specifier: 6.16.1
+        version: 6.16.1
       semver:
         specifier: 7.7.4
         version: 7.7.4
@@ -3839,11 +3839,6 @@ packages:
 
   acorn@8.17.0:
     resolution: {integrity: sha512-xRQbDb9BnwDafYNn6Vwl839DYVjqXYb1XVGtWAZ1kcDc6iwAL4hg3B1dZlRiuENFeO2H53gFG3in621AdERVAg==}
-    engines: {node: '>=0.4.0'}
-    hasBin: true
-
-  acorn@8.18.0:
-    resolution: {integrity: sha512-lGq+9yr1/GuAWaVYIHRjvvySG5/4VfKIvC8EWxStPdcDh/Ka7FG3twP6v4d5BkravUilhIAsG4Qj83t02LWUPQ==}
     engines: {node: '>=0.4.0'}
     hasBin: true
 
@@ -6706,8 +6701,8 @@ packages:
     resolution: {integrity: sha512-+Owyggi9IxT1ePKGafcI87ubSmxol6smwJ+RAHDQlx9+9cPwFWDiKFFCPuWhr9ignlGpZ9vDQLw67N4dcTVFEA==}
     engines: {node: '>=20'}
 
-  qs@6.16.0:
-    resolution: {integrity: sha512-h6fhOIaRrID2CbEY2fqs+7t+UXZo+MLAnU5gRIq85uFtdiUPCdsApMlHhXogKVM4HM2DVbIjGNTTYH2OcmP1vA==}
+  qs@6.16.1:
+    resolution: {integrity: sha512-5Px6J7rfHBAGUhNQ3es4YzcOdBBw0SDcVtThJml4RdnKw4tKs2epA0kPZ+K8X+WiHktT93RHVcQ/3ym5aTCgtg==}
     engines: {node: '>=0.6'}
 
   quansync@0.2.11:
@@ -11138,17 +11133,15 @@ snapshots:
     dependencies:
       acorn: 8.19.0
 
-  acorn-jsx@5.3.2(acorn@8.18.0):
+  acorn-jsx@5.3.2(acorn@8.19.0):
     dependencies:
-      acorn: 8.18.0
+      acorn: 8.19.0
 
   acorn-walk@8.3.5:
     dependencies:
       acorn: 8.17.0
 
   acorn@8.17.0: {}
-
-  acorn@8.18.0: {}
 
   acorn@8.19.0: {}
 
@@ -12441,14 +12434,14 @@ snapshots:
 
   espree@10.4.0:
     dependencies:
-      acorn: 8.18.0
-      acorn-jsx: 5.3.2(acorn@8.18.0)
+      acorn: 8.19.0
+      acorn-jsx: 5.3.2(acorn@8.19.0)
       eslint-visitor-keys: 4.2.1
 
   espree@11.2.0:
     dependencies:
-      acorn: 8.18.0
-      acorn-jsx: 5.3.2(acorn@8.18.0)
+      acorn: 8.19.0
+      acorn-jsx: 5.3.2(acorn@8.19.0)
       eslint-visitor-keys: 5.0.1
 
   esquery@1.7.0:
@@ -14241,7 +14234,7 @@ snapshots:
     dependencies:
       hookified: 2.2.0
 
-  qs@6.16.0:
+  qs@6.16.1:
     dependencies:
       es-define-property: 1.0.1
       side-channel: 1.1.1
@@ -15144,7 +15137,7 @@ snapshots:
   url@0.11.4:
     dependencies:
       punycode: 1.4.1
-      qs: 6.16.0
+      qs: 6.16.1
 
   utf8@3.0.0: {}
 
