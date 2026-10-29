@@ -2,9 +2,7 @@ package svc
 
 import (
 	"context"
-	"fmt"
-	"regexp"
-	"strings"
+	"slices"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
@@ -13,42 +11,45 @@ import (
 	"go-micro.dev/v4/metadata"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/rolemapping"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 )
 
 // guestRoleMapping maps a value to the role a multi-instance guest gets, see
 // OCIS_MULTI_INSTANCE_GUEST_ROLE_MAPPING. The proxy applies it to the roles claim at login.
 type guestRoleMapping struct {
-	value    string
+	value    rolemapping.Matcher
 	roleName string
 }
 
-// parseGuestRoleMapping parses 'value:rolename' pairs like the proxy does. It splits at the last
-// colon, since role names can't contain one.
+// parseGuestRoleMapping parses the pairs like the proxy does, and compiles their values once.
 func parseGuestRoleMapping(pairs []string) ([]guestRoleMapping, error) {
 	mappings := make([]guestRoleMapping, 0, len(pairs))
 	for _, pair := range pairs {
-		i := strings.LastIndex(pair, ":")
-		value, roleName := "", ""
-		if i >= 0 {
-			value, roleName = strings.TrimSpace(pair[:i]), strings.TrimSpace(pair[i+1:])
+		value, roleName, err := rolemapping.ParsePair(pair)
+		if err != nil {
+			return nil, err
 		}
-		if value == "" || roleName == "" {
-			return nil, fmt.Errorf("invalid guest role mapping '%s', expected 'claimvalue:rolename'", pair)
-		}
-		mappings = append(mappings, guestRoleMapping{value: value, roleName: roleName})
+		mappings = append(mappings, guestRoleMapping{value: rolemapping.NewMatcher(value), roleName: roleName})
 	}
 	return mappings, nil
 }
 
-// guestRoleName returns the role of the first mapping that matches one of the values, like the
-// proxy does at login. It returns "" when no mapping matches.
-func guestRoleName(mappings []guestRoleMapping, values []string) string {
+// guestVaultRoleID returns the id of the role the first mapping that matches the userClass gives,
+// like the proxy picks it at login, if that role grants vault mode. It returns "" otherwise.
+func guestVaultRoleID(mappings []guestRoleMapping, userClass []string, roles []*settingsmsg.Bundle) string {
 	for _, m := range mappings {
-		if matchesGuestRoleValue(m.value, values) {
-			return m.roleName
+		if !slices.ContainsFunc(userClass, m.value.Matches) {
+			continue
 		}
+		for _, role := range roles {
+			if role.GetName() == m.roleName && roleGrantsVaultMode(role) {
+				return role.GetId()
+			}
+		}
+		return ""
 	}
 	return ""
 }
@@ -110,21 +111,11 @@ func (g Graph) assignGuestVaultRole(ctx context.Context, userID string) (*guestV
 	if member {
 		return nil, nil
 	}
-	roleName := guestRoleName(g.guestRoleMapping, userClass)
-	if roleName == "" {
-		return nil, nil
-	}
 	roles, err := g.roleService.ListRoles(ctx, &settingssvc.ListBundlesRequest{})
 	if err != nil {
 		return nil, err
 	}
-	roleID := ""
-	for _, role := range roles.GetBundles() {
-		if role.GetName() == roleName && roleGrantsVaultMode(role) {
-			roleID = role.GetId()
-			break
-		}
-	}
+	roleID := guestVaultRoleID(g.guestRoleMapping, userClass, roles.GetBundles())
 	if roleID == "" {
 		return nil, nil
 	}
@@ -201,16 +192,4 @@ func (r *guestVaultRole) finish(ctx context.Context) error {
 	}
 	r.g.publishEvent(ctx, e)
 	return nil
-}
-
-// matchesGuestRoleValue matches like the proxy's role mapping: the mapping value is an exact value
-// or a regular expression that must match a whole value.
-func matchesGuestRoleValue(mappingValue string, values []string) bool {
-	rx, err := regexp.Compile("^(?:" + mappingValue + ")$")
-	for _, v := range values {
-		if v == mappingValue || (err == nil && rx.MatchString(v)) {
-			return true
-		}
-	}
-	return false
 }

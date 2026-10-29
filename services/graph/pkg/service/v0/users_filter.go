@@ -314,12 +314,9 @@ func (g Graph) applyFilterVaultEligible(ctx context.Context, req *godata.GoDataR
 	}
 
 	vaultGrantingRoles := make(map[string]struct{})
-	// by name, for the guest role mapping
-	vaultGrantingRoleNames := make(map[string]struct{})
 	for _, role := range roles.GetBundles() {
 		if roleGrantsVaultMode(role) {
 			vaultGrantingRoles[role.GetId()] = struct{}{}
-			vaultGrantingRoleNames[role.GetName()] = struct{}{}
 		}
 	}
 	if len(vaultGrantingRoles) == 0 {
@@ -350,9 +347,7 @@ func (g Graph) applyFilterVaultEligible(ctx context.Context, req *godata.GoDataR
 				if err != nil || member {
 					return nil
 				}
-				if roleName := guestRoleName(g.guestRoleMapping, userClass); roleName != "" {
-					_, eligible[i] = vaultGrantingRoleNames[roleName]
-				}
+				eligible[i] = guestVaultRoleID(g.guestRoleMapping, userClass, roles.GetBundles()) != ""
 				return nil
 			}
 			for _, assignment := range assignments.GetAssignments() {

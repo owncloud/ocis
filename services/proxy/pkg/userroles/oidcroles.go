@@ -4,14 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"regexp"
-	"strings"
 	"sync"
 	"time"
 
 	cs3user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/rolemapping"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
@@ -82,16 +81,9 @@ func extractRoles(rolesClaim string, claims map[string]interface{}) (map[string]
 // - regex match when ClaimValue is a regex pattern (e.g. "ocis-user-.*")
 // The regex is matched against the entire claim value, not a substring.
 func matchesClaimMapping(mappingValue string, claimRoles map[string]struct{}) bool {
-	if _, ok := claimRoles[mappingValue]; ok {
-		return true
-	}
-
-	rx, err := regexp.Compile("^(?:" + mappingValue + ")$")
-	if err != nil {
-		return false
-	}
+	m := rolemapping.NewMatcher(mappingValue)
 	for cr := range claimRoles {
-		if rx.MatchString(cr) {
+		if m.Matches(cr) {
 			return true
 		}
 	}
@@ -217,10 +209,8 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 	return user, nil
 }
 
-// GuestRoleMapping reads the 'claimvalue:rolename' pairs of OCIS_MULTI_INSTANCE_GUEST_ROLE_MAPPING.
-// A pair is split at its last colon, so the claim value may contain colons but the role name must not.
-// Roles created through the settings service can't contain a colon, their names are restricted to
-// letters, digits, '-' and '_'.
+// GuestRoleMapping reads the 'claimvalue:rolename' pairs of OCIS_MULTI_INSTANCE_GUEST_ROLE_MAPPING,
+// see rolemapping.ParsePair.
 func GuestRoleMapping(cfg *config.Config) ([]config.RoleMapping, error) {
 	pairs := cfg.MultiInstance.GuestRoleMapping
 	if len(pairs) > 0 && cfg.RoleAssignment.Driver != "oidc" {
@@ -233,14 +223,9 @@ func GuestRoleMapping(cfg *config.Config) ([]config.RoleMapping, error) {
 
 	mappings := make([]config.RoleMapping, 0, len(pairs))
 	for _, pair := range pairs {
-		i := strings.LastIndex(pair, ":")
-		// the env var parser trims list elements, the yaml parser does not
-		claimValue, roleName := "", ""
-		if i >= 0 {
-			claimValue, roleName = strings.TrimSpace(pair[:i]), strings.TrimSpace(pair[i+1:])
-		}
-		if claimValue == "" || roleName == "" {
-			return nil, fmt.Errorf("invalid guest role mapping '%s', expected 'claimvalue:rolename'", pair)
+		claimValue, roleName, err := rolemapping.ParsePair(pair)
+		if err != nil {
+			return nil, err
 		}
 		mappings = append(mappings, config.RoleMapping{ClaimValue: claimValue, RoleName: roleName})
 	}
