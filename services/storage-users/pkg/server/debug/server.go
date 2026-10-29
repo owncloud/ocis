@@ -7,7 +7,6 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
-	"github.com/owncloud/reva/v2/pkg/events/stream"
 )
 
 // Server initializes the debug service and server.
@@ -16,15 +15,7 @@ func Server(opts ...Option) (*http.Server, error) {
 
 	readyHandler := handlers.NewCheckHandler(handlers.NewCheckHandlerConfiguration().
 		WithLogger(options.Logger).
-		WithCheck("nats reachability", checks.NewNatsCheckWithConfig(options.Config.Events.Addr, stream.NatsConfig{
-			TLSInsecure:          options.Config.Events.TLSInsecure,
-			TLSRootCACertificate: options.Config.Events.TLSRootCaCertPath,
-			EnableTLS:            options.Config.Events.EnableTLS,
-			AuthUsername:         options.Config.Events.AuthUsername,
-			AuthPassword:         options.Config.Events.AuthPassword,
-			CredsFile:            options.Config.Events.CredsFile,
-			Creds:                options.Config.Events.Creds,
-		})).
+		WithCheck("nats reachability", checks.NewNatsCheckWithConfig(options.Config.Events.Addr, options.Config.Events.NatsConfig())).
 		WithCheck("grpc reachability", checks.NewGRPCCheck(options.Config.GRPC.Addr)),
 	)
 
