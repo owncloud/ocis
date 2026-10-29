@@ -31,7 +31,6 @@ func CredentialsOption(credsFile, creds string) (nats.Option, error) {
 		if err := Validate([]byte(creds)); err != nil {
 			return nil, fmt.Errorf("invalid nats creds: %w", err)
 		}
-		return nats.UserCredentialBytes([]byte(creds)), nil
 	case credsFile != "":
 		content, err := os.ReadFile(credsFile)
 		if err != nil {
@@ -40,9 +39,56 @@ func CredentialsOption(credsFile, creds string) (nats.Option, error) {
 		if err := Validate(content); err != nil {
 			return nil, fmt.Errorf("invalid nats creds file %s: %w", credsFile, err)
 		}
-		return nats.UserCredentials(credsFile), nil
+	}
+	return Option(credsFile, creds), nil
+}
+
+// Option returns the nats.Option for the JWT credentials like CredentialsOption,
+// but it does not read or check the credentials. Use it when a rotated .creds file
+// can be partly written, for example on a reconnect. Option returns nil when both
+// values are empty.
+//
+// nats.UserCredentials reads the file when a caller applies the option. For a file,
+// Option reads the file only when the connection connects. The connection retries
+// on an error.
+func Option(credsFile, creds string) nats.Option {
+	switch {
+	case creds != "":
+		return nats.UserCredentialBytes([]byte(creds))
+	case credsFile != "":
+		return func(o *nats.Options) error {
+			o.UserJWT = func() (string, error) {
+				content, err := os.ReadFile(credsFile)
+				if err != nil {
+					return "", err
+				}
+				defer wipe(content)
+				return nkeys.ParseDecoratedJWT(content)
+			}
+			o.SignatureCB = func(nonce []byte) ([]byte, error) {
+				content, err := os.ReadFile(credsFile)
+				if err != nil {
+					return nil, err
+				}
+				defer wipe(content)
+				kp, err := nkeys.ParseDecoratedNKey(content)
+				if err != nil {
+					return nil, err
+				}
+				defer kp.Wipe()
+				return kp.Sign(nonce)
+			}
+			return nil
+		}
 	default:
-		return nil, nil
+		return nil
+	}
+}
+
+// wipe overwrites b, so the seed does not stay in memory.
+func wipe(b []byte) {
+	for i := range b {
+		b[i] = 'x'
 	}
 }
 
