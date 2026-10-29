@@ -287,11 +287,10 @@ func (g Graph) applyFilterVaultEligible(ctx context.Context, req *godata.GoDataR
 	// look up a cross-instance match here - the GetUsers switch only blocks a cross-instance
 	// lookup when it would bypass that check entirely.
 	var preciseUserID string
-	var preciseUserClass []string
 	if username, instancename := g.parseExternalSearch(req); username != "" && instancename != "" &&
 		g.contextUserHasExternalSharePermission(ctx) {
-		if preciseUser, userClass, err := g.identityBackend.GetPreciseUser(ctx, username, instancename, req); err == nil {
-			preciseUserID, preciseUserClass = preciseUser.GetId(), userClass
+		if preciseUser, err := g.identityBackend.GetPreciseUser(ctx, username, instancename, req); err == nil {
+			preciseUserID = preciseUser.GetId()
 			found := false
 			for _, u := range users {
 				if u.GetId() == preciseUser.GetId() {
@@ -343,8 +342,14 @@ func (g Graph) applyFilterVaultEligible(ctx context.Context, req *godata.GoDataR
 			}
 			// a user of another instance only gets a role here at their first login here. Until
 			// then, check the role that login will give them, if a mapping matches their userClass.
-			if len(assignments.GetAssignments()) == 0 && user.GetId() == preciseUserID {
-				if roleName := guestRoleName(g.guestRoleMapping, preciseUserClass); roleName != "" {
+			if len(assignments.GetAssignments()) == 0 && user.GetId() == preciseUserID && len(g.guestRoleMapping) > 0 {
+				// a failed lookup leaves them out, like members, who get their role from the role
+				// mapping of members at login
+				userClass, member, err := g.identityBackend.GetUserClass(egCtx, user.GetId())
+				if err != nil || member {
+					return nil
+				}
+				if roleName := guestRoleName(g.guestRoleMapping, userClass); roleName != "" {
 					_, eligible[i] = vaultGrantingRoleNames[roleName]
 				}
 				return nil

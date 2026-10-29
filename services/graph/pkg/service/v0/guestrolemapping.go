@@ -68,10 +68,13 @@ func (g Graph) assignGuestVaultRole(ctx context.Context, userID string) error {
 		return nil
 	}
 
-	// GetPreciseUser looks a user up by id when there is no instance name
-	_, userClass, err := g.identityBackend.GetPreciseUser(ctx, userID, "", nil)
+	userClass, member, err := g.identityBackend.GetUserClass(ctx, userID)
 	if err != nil {
 		return err
+	}
+	// members get their role from the role mapping of members at login, not from the guest mapping
+	if member {
+		return nil
 	}
 	roleName := guestRoleName(g.guestRoleMapping, userClass)
 	if roleName == "" {

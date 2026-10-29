@@ -587,7 +587,7 @@ func (_c *Backend_GetGroups_Call) RunAndReturn(run func(context.Context, *godata
 }
 
 // GetPreciseUser provides a mock function with given fields: ctx, name, instancename, oreq
-func (_m *Backend) GetPreciseUser(ctx context.Context, name string, instancename string, oreq *godata.GoDataRequest) (*libregraph.User, []string, error) {
+func (_m *Backend) GetPreciseUser(ctx context.Context, name string, instancename string, oreq *godata.GoDataRequest) (*libregraph.User, error) {
 	ret := _m.Called(ctx, name, instancename, oreq)
 
 	if len(ret) == 0 {
@@ -595,9 +595,8 @@ func (_m *Backend) GetPreciseUser(ctx context.Context, name string, instancename
 	}
 
 	var r0 *libregraph.User
-	var r1 []string
-	var r2 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, *godata.GoDataRequest) (*libregraph.User, []string, error)); ok {
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, *godata.GoDataRequest) (*libregraph.User, error)); ok {
 		return rf(ctx, name, instancename, oreq)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, string, string, *godata.GoDataRequest) *libregraph.User); ok {
@@ -608,21 +607,13 @@ func (_m *Backend) GetPreciseUser(ctx context.Context, name string, instancename
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string, string, *godata.GoDataRequest) []string); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, *godata.GoDataRequest) error); ok {
 		r1 = rf(ctx, name, instancename, oreq)
 	} else {
-		if ret.Get(1) != nil {
-			r1 = ret.Get(1).([]string)
-		}
+		r1 = ret.Error(1)
 	}
 
-	if rf, ok := ret.Get(2).(func(context.Context, string, string, *godata.GoDataRequest) error); ok {
-		r2 = rf(ctx, name, instancename, oreq)
-	} else {
-		r2 = ret.Error(2)
-	}
-
-	return r0, r1, r2
+	return r0, r1
 }
 
 // Backend_GetPreciseUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPreciseUser'
@@ -646,12 +637,12 @@ func (_c *Backend_GetPreciseUser_Call) Run(run func(ctx context.Context, name st
 	return _c
 }
 
-func (_c *Backend_GetPreciseUser_Call) Return(user *libregraph.User, userClass []string, err error) *Backend_GetPreciseUser_Call {
-	_c.Call.Return(user, userClass, err)
+func (_c *Backend_GetPreciseUser_Call) Return(_a0 *libregraph.User, _a1 error) *Backend_GetPreciseUser_Call {
+	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Backend_GetPreciseUser_Call) RunAndReturn(run func(context.Context, string, string, *godata.GoDataRequest) (*libregraph.User, []string, error)) *Backend_GetPreciseUser_Call {
+func (_c *Backend_GetPreciseUser_Call) RunAndReturn(run func(context.Context, string, string, *godata.GoDataRequest) (*libregraph.User, error)) *Backend_GetPreciseUser_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -712,6 +703,72 @@ func (_c *Backend_GetUser_Call) Return(_a0 *libregraph.User, _a1 error) *Backend
 }
 
 func (_c *Backend_GetUser_Call) RunAndReturn(run func(context.Context, string, *godata.GoDataRequest) (*libregraph.User, error)) *Backend_GetUser_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetUserClass provides a mock function with given fields: ctx, id
+func (_m *Backend) GetUserClass(ctx context.Context, id string) ([]string, bool, error) {
+	ret := _m.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetUserClass")
+	}
+
+	var r0 []string
+	var r1 bool
+	var r2 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) ([]string, bool, error)); ok {
+		return rf(ctx, id)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) []string); ok {
+		r0 = rf(ctx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]string)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) bool); ok {
+		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Get(1).(bool)
+	}
+
+	if rf, ok := ret.Get(2).(func(context.Context, string) error); ok {
+		r2 = rf(ctx, id)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
+// Backend_GetUserClass_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetUserClass'
+type Backend_GetUserClass_Call struct {
+	*mock.Call
+}
+
+// GetUserClass is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id string
+func (_e *Backend_Expecter) GetUserClass(ctx interface{}, id interface{}) *Backend_GetUserClass_Call {
+	return &Backend_GetUserClass_Call{Call: _e.mock.On("GetUserClass", ctx, id)}
+}
+
+func (_c *Backend_GetUserClass_Call) Run(run func(ctx context.Context, id string)) *Backend_GetUserClass_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Backend_GetUserClass_Call) Return(userClass []string, member bool, err error) *Backend_GetUserClass_Call {
+	_c.Call.Return(userClass, member, err)
+	return _c
+}
+
+func (_c *Backend_GetUserClass_Call) RunAndReturn(run func(context.Context, string) ([]string, bool, error)) *Backend_GetUserClass_Call {
 	_c.Call.Return(run)
 	return _c
 }

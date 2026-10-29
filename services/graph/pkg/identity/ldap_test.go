@@ -87,7 +87,6 @@ var ldapUserAttributes = []string{
 	"externalID",
 	"", // UserMemberAttribute
 	"", // UserGuestAttribute
-	"userClass",
 }
 
 func TestNewLDAPBackend(t *testing.T) {
@@ -225,64 +224,56 @@ func TestCreateUserModelFromLDAP(t *testing.T) {
 	}
 }
 
-func TestGetPreciseUser(t *testing.T) {
+func TestGetUserClass(t *testing.T) {
 	cfg := lconfig
 	cfg.UserMemberAttribute = "ocMemberOfSchool"
-	cfg.UserGuestAttribute = "ocGuestOfSchool"
-	cfg.PreciseSearchAttribute = "uid"
 
-	// expectSearch returns the entry for the precise search, which has to ask for the userClass
-	expectSearch := func(lm *mocks.Client, entry *ldap.Entry) {
+	// expectSearch returns an entry for the lookup by id, which ignores the user filter and only
+	// asks for the userClass and the member attribute
+	expectSearch := func(lm *mocks.Client, memberOf ...string) {
+		entry := ldap.NewEntry("uid=teacher", map[string][]string{
+			"userClass":        {"teacher"},
+			"ocMemberOfSchool": memberOf,
+		})
 		lm.On("Search", mock.MatchedBy(func(sr *ldap.SearchRequest) bool {
-			return sr.Filter == "(&(objectClass=inetOrgPerson)(&(uid=teacher)(|(ocMemberOfSchool=school2)(ocGuestOfSchool=school2))))" &&
-				assert.Contains(t, sr.Attributes, "userClass")
+			return sr.Filter == "(&(objectClass=inetOrgPerson)(entryUUID=teacher-id))" &&
+				assert.ObjectsAreEqual([]string{"userClass", "ocMemberOfSchool"}, sr.Attributes)
 		})).Return(&ldap.SearchResult{Entries: []*ldap.Entry{entry}}, nil)
 	}
 
-	t.Run("returns the user and their userClass", func(t *testing.T) {
-		lm := &mocks.Client{}
-		expectSearch(lm, ldap.NewEntry("uid=teacher", map[string][]string{
-			"uid":              {"teacher"},
-			"entryuuid":        {"teacher-id"},
-			"displayname":      {"Teacher"},
-			"ocMemberOfSchool": {"school2"},
-			"userClass":        {"teacher"},
-		}))
-		b, err := NewLDAPBackend(lm, cfg, &logger, "school1", "")
-		assert.NoError(t, err)
+	tests := []struct {
+		name       string
+		masterID   string
+		memberOf   []string
+		wantMember bool
+	}{
+		{name: "a user of another instance", memberOf: []string{"school2"}, wantMember: false},
+		{name: "a member of this instance", memberOf: []string{"school2", "school1"}, wantMember: true},
+		{name: "a member of all instances through the master id", masterID: "master-id", memberOf: []string{"master-id"}, wantMember: true},
+		{name: "a user without instances", memberOf: nil, wantMember: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			lm := &mocks.Client{}
+			expectSearch(lm, tt.memberOf...)
+			b, err := NewLDAPBackend(lm, cfg, &logger, "school1", tt.masterID)
+			assert.NoError(t, err)
 
-		user, userClass, err := b.GetPreciseUser(context.Background(), "teacher", "school2", nil)
-		assert.NoError(t, err)
-		assert.Equal(t, "teacher-id", user.GetId())
-		assert.Equal(t, []string{"teacher"}, userClass)
-	})
+			userClass, member, err := b.GetUserClass(context.Background(), "teacher-id")
+			assert.NoError(t, err)
+			assert.Equal(t, []string{"teacher"}, userClass)
+			assert.Equal(t, tt.wantMember, member)
+		})
+	}
 
-	t.Run("returns no userClass for a user without one", func(t *testing.T) {
-		lm := &mocks.Client{}
-		expectSearch(lm, ldap.NewEntry("uid=teacher", map[string][]string{
-			"uid":              {"teacher"},
-			"entryuuid":        {"teacher-id"},
-			"ocMemberOfSchool": {"school2"},
-		}))
-		b, err := NewLDAPBackend(lm, cfg, &logger, "school1", "")
-		assert.NoError(t, err)
-
-		user, userClass, err := b.GetPreciseUser(context.Background(), "teacher", "school2", nil)
-		assert.NoError(t, err)
-		assert.Equal(t, "teacher-id", user.GetId())
-		assert.Empty(t, userClass)
-	})
-
-	t.Run("returns not found for an unknown user", func(t *testing.T) {
+	t.Run("an unknown user", func(t *testing.T) {
 		lm := &mocks.Client{}
 		lm.On("Search", mock.Anything).Return(&ldap.SearchResult{}, nil)
 		b, err := NewLDAPBackend(lm, cfg, &logger, "school1", "")
 		assert.NoError(t, err)
 
-		user, userClass, err := b.GetPreciseUser(context.Background(), "teacher", "school2", nil)
+		_, _, err = b.GetUserClass(context.Background(), "teacher-id")
 		assert.ErrorIs(t, err, ErrNotFound)
-		assert.Nil(t, user)
-		assert.Nil(t, userClass)
 	})
 }
 

@@ -77,8 +77,13 @@ func (i *CS3) GetUser(ctx context.Context, userID string, _ *godata.GoDataReques
 }
 
 // GetPreciseUser is not implemented
-func (i *CS3) GetPreciseUser(ctx context.Context, name string, instancename string, oreq *godata.GoDataRequest) (*libregraph.User, []string, error) {
-	return nil, nil, errNotImplemented
+func (i *CS3) GetPreciseUser(ctx context.Context, name string, instancename string, oreq *godata.GoDataRequest) (*libregraph.User, error) {
+	return nil, errNotImplemented
+}
+
+// GetUserClass is not implemented
+func (i *CS3) GetUserClass(ctx context.Context, id string) ([]string, bool, error) {
+	return nil, false, errNotImplemented
 }
 
 // GetUsers implements the Backend Interface.

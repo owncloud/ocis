@@ -723,7 +723,7 @@ var _ = Describe("Users", func() {
 					identityBackend.On("GetUsers", mock.Anything, mock.Anything).Return([]*libregraph.User{}, nil)
 					student := &libregraph.User{}
 					student.SetId("precise-student")
-					identityBackend.On("GetPreciseUser", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(student, nil, nil)
+					identityBackend.On("GetPreciseUser", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(student, nil)
 
 					if !permissionGranted {
 						permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Unset()
@@ -764,7 +764,7 @@ var _ = Describe("Users", func() {
 				student := &libregraph.User{}
 				student.SetId("precise-student")
 				identityBackend.On("GetPreciseUser", mock.Anything, "student", "school2", mock.Anything).
-					Return(student, nil, nil)
+					Return(student, nil)
 
 				r := httptest.NewRequest(http.MethodGet,
 					"/graph/v1.0/users?$search="+url.QueryEscape(`"student@school2.example.test"`), nil)
@@ -790,7 +790,7 @@ var _ = Describe("Users", func() {
 					Return([]*libregraph.User{eligible, ineligible}, nil)
 				// no cross-instance account behind this reference; GetPreciseUser finds nothing
 				identityBackend.On("GetPreciseUser", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-					Return(nil, nil, identity.ErrNotFound)
+					Return(nil, identity.ErrNotFound)
 
 				expectRoles()
 				expectAssignments(eligibleUser, []*settingsmsg.UserRoleAssignment{
@@ -826,7 +826,7 @@ var _ = Describe("Users", func() {
 					crossInstance.SetId(crossInstanceUser)
 					identityBackend.On("GetUsers", mock.Anything, mock.Anything).Return([]*libregraph.User{}, nil)
 					identityBackend.On("GetPreciseUser", mock.Anything, "teacher", "school5", mock.Anything).
-						Return(crossInstance, nil, nil)
+						Return(crossInstance, nil)
 
 					expectRoles()
 					expectAssignments(crossInstanceUser, []*settingsmsg.UserRoleAssignment{
@@ -853,7 +853,7 @@ var _ = Describe("Users", func() {
 					crossInstance.SetId(crossInstanceUser)
 					identityBackend.On("GetUsers", mock.Anything, mock.Anything).Return([]*libregraph.User{}, nil)
 					identityBackend.On("GetPreciseUser", mock.Anything, "student", "school5", mock.Anything).
-						Return(crossInstance, nil, nil)
+						Return(crossInstance, nil)
 
 					expectRoles()
 					expectAssignments(crossInstanceUser, nil, nil)
@@ -883,8 +883,8 @@ var _ = Describe("Users", func() {
 				mapping := []string{"lehrer:" + vaultGuestRole, "Nutzerverwalter:" + vaultGuestRole}
 
 				// search runs the vaultEligible search for a cross-instance match with the given
-				// userClass, in a service with the given guest role mapping.
-				search := func(mapping []string, userClass []string, assignments []*settingsmsg.UserRoleAssignment) []string {
+				// userClass and membership, in a service with the given guest role mapping.
+				search := func(mapping []string, userClass []string, member bool, assignments []*settingsmsg.UserRoleAssignment) []string {
 					cfg.MultiInstance.GuestRoleMapping = mapping
 					mappedSvc, err := service.NewService(
 						service.Config(cfg),
@@ -900,7 +900,8 @@ var _ = Describe("Users", func() {
 					crossInstance := &libregraph.User{}
 					crossInstance.SetId(crossInstanceUser)
 					identityBackend.On("GetPreciseUser", mock.Anything, "someone", "school5", mock.Anything).
-						Return(crossInstance, userClass, nil)
+						Return(crossInstance, nil)
+					identityBackend.On("GetUserClass", mock.Anything, crossInstanceUser).Return(userClass, member, nil)
 					expectAssignments(crossInstanceUser, assignments, nil)
 
 					// the mapping names roles, so the bundles need their names
@@ -944,33 +945,36 @@ var _ = Describe("Users", func() {
 				}
 
 				DescribeTable("checks the role their first login here will give them",
-					func(mapping []string, userClass []string, included bool) {
+					func(mapping []string, userClass []string, member bool, included bool) {
 						identityBackend.On("GetUsers", mock.Anything, mock.Anything).Return([]*libregraph.User{}, nil)
 
-						ids := search(mapping, userClass, nil)
+						ids := search(mapping, userClass, member, nil)
 						if included {
 							Expect(ids).To(ConsistOf(crossInstanceUser))
 						} else {
 							Expect(ids).To(BeEmpty())
 						}
 					},
-					Entry("includes a teacher", mapping, []string{"lehrer"}, true),
-					Entry("includes a local admin", mapping, []string{"Nutzerverwalter"}, true),
-					Entry("excludes a student, no mapping matches", mapping, []string{"schueler"}, false),
-					Entry("excludes a user without userClass", mapping, nil, false),
-					Entry("excludes everyone without a mapping", nil, []string{"lehrer"}, false),
-					Entry("matches a regular expression", []string{"lehr.*:" + vaultGuestRole}, []string{"lehrer"}, true),
+					Entry("includes a teacher", mapping, []string{"lehrer"}, false, true),
+					Entry("includes a local admin", mapping, []string{"Nutzerverwalter"}, false, true),
+					Entry("excludes a student, no mapping matches", mapping, []string{"schueler"}, false, false),
+					Entry("excludes a user without userClass", mapping, nil, false, false),
+					Entry("excludes everyone without a mapping", nil, []string{"lehrer"}, false, false),
+					Entry("excludes a member of this instance, who gets the role of members at login",
+						mapping, []string{"lehrer"}, true, false),
+					Entry("matches a regular expression", []string{"lehr.*:" + vaultGuestRole}, []string{"lehrer"}, false, true),
 					Entry("excludes when the first matching mapping gives a role without vault mode",
-						[]string{"lehrer:" + guestRole, "lehrer:" + vaultGuestRole}, []string{"lehrer"}, false),
+						[]string{"lehrer:" + guestRole, "lehrer:" + vaultGuestRole}, []string{"lehrer"}, false, false),
 				)
 
 				It("keeps the role the user got at a login here", func() {
 					identityBackend.On("GetUsers", mock.Anything, mock.Anything).Return([]*libregraph.User{}, nil)
 
-					ids := search(mapping, []string{"lehrer"}, []*settingsmsg.UserRoleAssignment{
+					ids := search(mapping, []string{"lehrer"}, false, []*settingsmsg.UserRoleAssignment{
 						{Id: "assignment-ID", AccountUuid: crossInstanceUser, RoleId: vaultLessRole},
 					})
 					Expect(ids).To(BeEmpty())
+					identityBackend.AssertNotCalled(GinkgoT(), "GetUserClass", mock.Anything, mock.Anything)
 				})
 
 				It("does not apply the mapping to users of this instance without a role", func() {
@@ -979,8 +983,9 @@ var _ = Describe("Users", func() {
 					identityBackend.On("GetUsers", mock.Anything, mock.Anything).Return([]*libregraph.User{local}, nil)
 					expectAssignments(localUser, nil, nil)
 
-					ids := search(mapping, []string{"lehrer"}, nil)
+					ids := search(mapping, []string{"lehrer"}, false, nil)
 					Expect(ids).To(ConsistOf(crossInstanceUser))
+					identityBackend.AssertNotCalled(GinkgoT(), "GetUserClass", mock.Anything, localUser)
 				})
 
 				It("refuses to start with an invalid mapping", func() {
@@ -1026,9 +1031,9 @@ var _ = Describe("Users", func() {
 				)
 				Expect(err).ToNot(HaveOccurred())
 			}
+			// expectUserClass reports the guest as a user of another instance with the given userClass
 			expectUserClass := func(userClass ...string) {
-				identityBackend.On("GetPreciseUser", mock.Anything, guestUser, "", mock.Anything).
-					Return(&libregraph.User{Id: libregraph.PtrString(guestUser)}, userClass, nil)
+				identityBackend.On("GetUserClass", mock.Anything, guestUser).Return(userClass, false, nil)
 			}
 			// the mapping names roles, so the bundles need their names
 			expectNamedRoles := func() {
@@ -1159,7 +1164,7 @@ var _ = Describe("Users", func() {
 				}, nil)
 
 				Expect(guestSvc.AssignGuestVaultRole(sharerCtx(), guestUser)).To(Succeed())
-				identityBackend.AssertNotCalled(GinkgoT(), "GetPreciseUser", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+				identityBackend.AssertNotCalled(GinkgoT(), "GetUserClass", mock.Anything, mock.Anything)
 				roleService.AssertNotCalled(GinkgoT(), "AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything)
 			})
 
@@ -1177,6 +1182,16 @@ var _ = Describe("Users", func() {
 				Entry("to a user without userClass", vaultMapping, nil),
 				Entry("when the mapped role has no vault mode", []string{"lehrer:" + guestRole}, []string{"lehrer"}),
 			)
+
+			It("does not assign a guest role to a member of this instance", func() {
+				newGuestService(vaultMapping)
+				expectAssignments(guestUser, nil, nil)
+				identityBackend.On("GetUserClass", mock.Anything, guestUser).Return([]string{"lehrer"}, true, nil)
+
+				Expect(guestSvc.AssignGuestVaultRole(sharerCtx(), guestUser)).To(Succeed())
+				roleService.AssertNotCalled(GinkgoT(), "AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything)
+				gatewayClient.AssertNotCalled(GinkgoT(), "ListStorageSpaces", mock.Anything, mock.Anything)
+			})
 
 			It("does nothing without a mapping", func() {
 				newGuestService(nil)
