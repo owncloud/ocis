@@ -4,3 +4,4 @@
 
 CVE-2026-32284  # github.com/shamaton/msgpack/v2 v2.4.0 — no fix available upstream
 vendor/github.com/crewjam/saml/xmlenc/fuzz.go  # test RSA key used in fuzz corpus, not a real secret
+CVE-2026-116587  # github.com/go-jose/go-jose/v3 v3.0.5 — no v3 fix exists, only a transitive dependency of libregraph/lico, which parses JWKs only from local files and from configured OIDC authorities; go-jose/v4 is fixed
