@@ -248,7 +248,11 @@ func (cache cacheStore) Close() error {
 
 // CheckCredentials checks the NATS JWT credentials of the cache. The Get*Cache
 // functions cannot return an error, so call it in the constructor that uses the cache.
+// A cache that does not use NATS does not use the credentials, so it is not checked.
 func (cfg Config) CheckCredentials() error {
+	if !store.UsesNats(cfg.Store) {
+		return nil
+	}
 	return natsauth.Check(cfg.CredsFile, cfg.Creds)
 }
 

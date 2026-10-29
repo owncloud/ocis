@@ -59,6 +59,12 @@ const (
 	TypeNatsJSKV = "nats-js-kv"
 )
 
+// UsesNats returns true when a store of the given type connects to NATS.
+// Only these stores use the NATS credentials.
+func UsesNats(storeType string) bool {
+	return storeType == TypeNatsJS || storeType == TypeNatsJSKV
+}
+
 // Create initializes a new store
 func Create(opts ...microstore.Option) microstore.Store {
 	options := &microstore.Options{
@@ -71,7 +77,7 @@ func Create(opts ...microstore.Option) microstore.Store {
 	storeType, _ := options.Context.Value(typeContextKey{}).(string)
 
 	if tlsOpts, ok := options.Context.Value(tlsContextKey{}).(tlsOptions); ok && tlsOpts.enable &&
-		storeType != TypeNatsJS && storeType != TypeNatsJSKV {
+		!UsesNats(storeType) {
 		logger.Logf(logger.WarnLevel,
 			"reva-store: TLS requested but store type %q does not support TLS — settings ignored", storeType)
 	}

@@ -85,8 +85,11 @@ func New(m map[string]interface{}) (auth.Manager, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := natsauth.Check(mgr.c.StoreCredsFile, mgr.c.StoreCreds); err != nil {
-		return nil, errors.Wrap(err, "publicshares store")
+	// Only a NATS store uses the credentials.
+	if store.UsesNats(mgr.c.StoreType) {
+		if err := natsauth.Check(mgr.c.StoreCredsFile, mgr.c.StoreCreds); err != nil {
+			return nil, errors.Wrap(err, "publicshares store")
+		}
 	}
 
 	revaStore := store.Create(
