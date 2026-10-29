@@ -80,7 +80,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		cfg.UnifiedRoles.AvailableRoles = slices.DeleteFunc(cfg.UnifiedRoles.AvailableRoles, func(s string) bool {
 			return s == unifiedrole.UnifiedRoleSecureViewerID
 		})
-		service, err := svc.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg, otel.GetTracerProvider(), nil, nil)
+		service, err := svc.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg, otel.GetTracerProvider(), nil, nil, nil)
 		Expect(err).ToNot(HaveOccurred())
 		driveItemPermissionsService = service
 		ctx = revactx.ContextSetUser(context.Background(), currentUser)
@@ -172,6 +172,68 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(permission.GetExpirationDateTime().Equal(*driveItemInvite.ExpirationDateTime)).To(BeTrue())
 			Expect(permission.GrantedToV2.Group.GetDisplayName()).To(Equal(getGroupResponse.Group.DisplayName))
 			Expect(permission.GrantedToV2.Group.GetId()).To(Equal("2"))
+		})
+
+		Describe("the guest vault role", func() {
+			var (
+				assigned  []string
+				assignErr error
+			)
+
+			BeforeEach(func() {
+				assigned, assignErr = nil, nil
+				service, err := svc.NewDriveItemPermissionsService(log.NewLogger(), gatewaySelector, cache, cfg, otel.GetTracerProvider(), nil, nil,
+					func(_ context.Context, userID string) error {
+						assigned = append(assigned, userID)
+						return assignErr
+					})
+				Expect(err).ToNot(HaveOccurred())
+				driveItemPermissionsService = service
+
+				gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+				driveItemInvite.Recipients = []libregraph.DriveRecipient{
+					{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				}
+				createShareResponse.Share = &collaboration.Share{Id: &collaboration.ShareId{OpaqueId: "123"}}
+			})
+
+			It("is assigned to the recipient before a vault share is created", func() {
+				statResponse.Info.Id = &provider.ResourceId{
+					StorageId: utils.VaultStorageProviderID,
+					SpaceId:   driveItemId.SpaceId,
+					OpaqueId:  driveItemId.OpaqueId,
+				}
+				gatewayClient.On("CreateShare", mock.Anything, mock.Anything).
+					Run(func(mock.Arguments) {
+						Expect(assigned).To(Equal([]string{"1"}))
+					}).Return(createShareResponse, nil)
+
+				_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(assigned).To(Equal([]string{"1"}))
+			})
+
+			It("is not assigned for a share outside the vault", func() {
+				gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
+
+				_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(assigned).To(BeEmpty())
+			})
+
+			It("leaves the decision to the vault share check when it can't be assigned", func() {
+				statResponse.Info.Id = &provider.ResourceId{
+					StorageId: utils.VaultStorageProviderID,
+					SpaceId:   driveItemId.SpaceId,
+					OpaqueId:  driveItemId.OpaqueId,
+				}
+				assignErr = errors.New("settings service unavailable")
+				gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
+
+				_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+				Expect(err).ToNot(HaveOccurred())
+				gatewayClient.AssertCalled(GinkgoT(), "CreateShare", mock.Anything, mock.Anything)
+			})
 		})
 
 		It("applies a default 30-day expiration to a vault user share created without one", func() {
@@ -385,7 +447,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 				// remove SecureViewer from allowed roles for this unit test
 				return s == unifiedrole.UnifiedRoleSecureViewerID
 			})
-			service, err := svc.NewDriveItemPermissionsService(log.NewLogger(), gatewaySelector, cache, cfg, otel.GetTracerProvider(), nil, nil)
+			service, err := svc.NewDriveItemPermissionsService(log.NewLogger(), gatewaySelector, cache, cfg, otel.GetTracerProvider(), nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleViewerID, unifiedrole.UnifiedRoleSecureViewerID}

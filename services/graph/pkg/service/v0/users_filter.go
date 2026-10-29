@@ -286,9 +286,12 @@ func (g Graph) applyFilterVaultEligible(ctx context.Context, req *godata.GoDataR
 	// unlike other filters, vaultEligible applies its own role check below, so it's safe to
 	// look up a cross-instance match here - the GetUsers switch only blocks a cross-instance
 	// lookup when it would bypass that check entirely.
+	var preciseUserID string
+	var preciseUserClass []string
 	if username, instancename := g.parseExternalSearch(req); username != "" && instancename != "" &&
 		g.contextUserHasExternalSharePermission(ctx) {
-		if preciseUser, err := g.identityBackend.GetPreciseUser(ctx, username, instancename, req); err == nil {
+		if preciseUser, userClass, err := g.identityBackend.GetPreciseUser(ctx, username, instancename, req); err == nil {
+			preciseUserID, preciseUserClass = preciseUser.GetId(), userClass
 			found := false
 			for _, u := range users {
 				if u.GetId() == preciseUser.GetId() {
@@ -312,9 +315,12 @@ func (g Graph) applyFilterVaultEligible(ctx context.Context, req *godata.GoDataR
 	}
 
 	vaultGrantingRoles := make(map[string]struct{})
+	// by name, for the guest role mapping
+	vaultGrantingRoleNames := make(map[string]struct{})
 	for _, role := range roles.GetBundles() {
 		if roleGrantsVaultMode(role) {
 			vaultGrantingRoles[role.GetId()] = struct{}{}
+			vaultGrantingRoleNames[role.GetName()] = struct{}{}
 		}
 	}
 	if len(vaultGrantingRoles) == 0 {
@@ -334,6 +340,14 @@ func (g Graph) applyFilterVaultEligible(ctx context.Context, req *godata.GoDataR
 			})
 			if err != nil {
 				return err
+			}
+			// a user of another instance only gets a role here at their first login here. Until
+			// then, check the role that login will give them, if a mapping matches their userClass.
+			if len(assignments.GetAssignments()) == 0 && user.GetId() == preciseUserID {
+				if roleName := guestRoleName(g.guestRoleMapping, preciseUserClass); roleName != "" {
+					_, eligible[i] = vaultGrantingRoleNames[roleName]
+				}
+				return nil
 			}
 			for _, assignment := range assignments.GetAssignments() {
 				if _, ok := vaultGrantingRoles[assignment.GetRoleId()]; ok {

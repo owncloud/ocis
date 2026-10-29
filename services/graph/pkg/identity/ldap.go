@@ -124,6 +124,7 @@ type userAttributeMap struct {
 	externalID          string
 	userMemberAttribute string
 	userGuestAttribute  string
+	userClass           string
 }
 
 type ldapAttributeValues map[string][]string
@@ -162,6 +163,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		externalID:          config.ExternalIDAttribute,
 		userMemberAttribute: config.UserMemberAttribute,
 		userGuestAttribute:  config.UserGuestAttribute,
+		userClass:           newEducationUserAttributeMap().primaryRole,
 	}
 
 	if config.GroupNameAttribute == "" || config.GroupIDAttribute == "" {
@@ -729,27 +731,31 @@ func (i *LDAP) GetUser(ctx context.Context, nameOrID string, oreq *godata.GoData
 }
 
 // GetPreciseUser gets a user using its exact email address or id. The overall user filter will be ignored.
-func (i *LDAP) GetPreciseUser(ctx context.Context, name string, instancename string, oreq *godata.GoDataRequest) (*libregraph.User, error) {
+func (i *LDAP) GetPreciseUser(ctx context.Context, name string, instancename string, oreq *godata.GoDataRequest) (*libregraph.User, []string, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetPreciseUser")
 
 	iid, err := i.getInstanceID(instancename)
 	if err != nil {
 		// error logged in getInstanceID
-		return nil, ErrNotFound
+		return nil, nil, ErrNotFound
 	}
 
 	e, err := i.getPreciseLDAPUser(name, iid)
 	if err != nil {
 		i.logger.Error().Err(err).Str("username", name).Str("instancename", instancename).Str("instanceid", iid).Msg("error getting precise user")
-		return nil, ErrNotFound
+		return nil, nil, ErrNotFound
 	}
 
 	var q *godata.GoDataQuery
 	if oreq != nil {
 		q = oreq.Query
 	}
-	return i.refineUser(e, q)
+	u, err := i.refineUser(e, q)
+	if err != nil {
+		return nil, nil, err
+	}
+	return u, e.GetEqualFoldAttributeValues(i.userAttributeMap.userClass), nil
 }
 
 func (i *LDAP) refineUser(e *ldap.Entry, query *godata.GoDataQuery) (*libregraph.User, error) {
@@ -1233,6 +1239,7 @@ func (i *LDAP) getUserAttrTypesForSearch() []string {
 		i.userAttributeMap.externalID,
 		i.userAttributeMap.userMemberAttribute,
 		i.userAttributeMap.userGuestAttribute,
+		i.userAttributeMap.userClass,
 	}
 }
 

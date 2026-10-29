@@ -199,8 +199,9 @@ type Validation struct {
 
 // MultiInstanceConfig holds configuration for multi-instance-ocis
 type MultiInstanceConfig struct {
-	Enabled     bool   `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enable multiple instances of Infinite Scale." introductionVersion:"8.0.0"`
-	InstanceID  string `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique ID of this instance." introductionVersion:"8.0.0"`
-	MasterID    string `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master ID that grants access to all instances. Users with this ID in their memberOf or guestOf claims can access any instance. Leave empty to disable. Also set 'OCIS_LDAP_USER_FILTER'. Without an explicit user filter, this instance resolves every user in the shared LDAP directory." introductionVersion:"8.1.0"`
-	QueryRegexp string `yaml:"query_regexp" env:"OCIS_MULTI_INSTANCE_QUERY_TEMPLATE" desc:"The regular expression extracting username and instancename from a user provided search." introductionVersion:"8.0.0"`
+	Enabled          bool     `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enable multiple instances of Infinite Scale." introductionVersion:"8.0.0"`
+	InstanceID       string   `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique ID of this instance." introductionVersion:"8.0.0"`
+	MasterID         string   `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master ID that grants access to all instances. Users with this ID in their memberOf or guestOf claims can access any instance. Leave empty to disable. Also set 'OCIS_LDAP_USER_FILTER'. Without an explicit user filter, this instance resolves every user in the shared LDAP directory." introductionVersion:"8.1.0"`
+	QueryRegexp      string   `yaml:"query_regexp" env:"OCIS_MULTI_INSTANCE_QUERY_TEMPLATE" desc:"The regular expression extracting username and instancename from a user provided search." introductionVersion:"8.0.0"`
+	GuestRoleMapping []string `yaml:"guest_role_mapping" env:"OCIS_MULTI_INSTANCE_GUEST_ROLE_MAPPING" desc:"(Optional) Mapping of PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM values to the role a guest gets instead of OCIS_MULTI_INSTANCE_GUEST_ROLE. Example: 'spaceadmin:user-light-vault'. A claim value is an exact string or a regular expression that must match the full claim value, the same as the claim_value of the role mapping. Escape regex metacharacters such as '.' in an exact string. The first match wins. Role names must not contain a colon. Only applies to the 'oidc' role assignment driver. The graph service matches it against the LDAP attribute 'userClass' of a guest who has no role on this instance yet, to decide whether the vault share search shows them." introductionVersion:"9.0.0"`
 }

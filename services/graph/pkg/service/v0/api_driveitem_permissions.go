@@ -73,6 +73,7 @@ type DriveItemPermissionsService struct {
 	tp                         trace.TracerProvider
 	identityBackend            identity.Backend
 	hasExternalSharePermission externalSharePermissionChecker
+	assignGuestVaultRole       guestVaultRoleAssigner
 }
 
 type permissionType int
@@ -88,11 +89,19 @@ const (
 // supposed to return true if the user can share to users from other instances (multi-instance only)
 type externalSharePermissionChecker func(context.Context) bool
 
+// supposed to give a user who never logged in here the role with vault mode their first login here
+// will give them, before a vault resource is shared with them (multi-instance only)
+type guestVaultRoleAssigner func(ctx context.Context, userID string) error
+
 // NewDriveItemPermissionsService creates a new DriveItemPermissionsService
-func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, config *config.Config, tp trace.TracerProvider, be identity.Backend, espc externalSharePermissionChecker) (DriveItemPermissionsService, error) {
+func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, config *config.Config, tp trace.TracerProvider, be identity.Backend, espc externalSharePermissionChecker, gvra guestVaultRoleAssigner) (DriveItemPermissionsService, error) {
 	f := func(context.Context) bool { return false }
 	if espc != nil {
 		f = espc
+	}
+	a := func(context.Context, string) error { return nil }
+	if gvra != nil {
+		a = gvra
 	}
 
 	return DriveItemPermissionsService{
@@ -105,6 +114,7 @@ func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Sele
 		tp:                         tp,
 		identityBackend:            be,
 		hasExternalSharePermission: f,
+		assignGuestVaultRole:       a,
 	}, nil
 }
 
@@ -271,6 +281,14 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 			cTime = createShareResponse.GetShare().GetCtime()
 			expiration = createShareResponse.GetShare().GetExpiration()
 		} else {
+			// the vault share check only reads role assignments, and a user of another instance has
+			// none here before their first login here. Without one the check refuses the share.
+			if IsVaultResource(resourceID) {
+				if err := s.assignGuestVaultRole(ctx, user.GetId()); err != nil {
+					s.logger.Warn().Err(err).Str("resourceId", resourceId.GetStorageId()).Interface("userId", objectID).Msg("could not assign the guest vault role")
+				}
+			}
+
 			createShareRequest := createShareRequestToUser(user, statResponse.GetInfo(), cs3ResourcePermissions)
 			if shareExpiration != nil {
 				createShareRequest.GetGrant().Expiration = shareExpiration

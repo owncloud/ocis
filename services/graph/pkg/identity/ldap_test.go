@@ -87,6 +87,7 @@ var ldapUserAttributes = []string{
 	"externalID",
 	"", // UserMemberAttribute
 	"", // UserGuestAttribute
+	"userClass",
 }
 
 func TestNewLDAPBackend(t *testing.T) {
@@ -222,6 +223,67 @@ func TestCreateUserModelFromLDAP(t *testing.T) {
 			t.Errorf("Error creating msGraph User from LDAP Entry: %s != %s", *user.Id, userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id))
 		}
 	}
+}
+
+func TestGetPreciseUser(t *testing.T) {
+	cfg := lconfig
+	cfg.UserMemberAttribute = "ocMemberOfSchool"
+	cfg.UserGuestAttribute = "ocGuestOfSchool"
+	cfg.PreciseSearchAttribute = "uid"
+
+	// expectSearch returns the entry for the precise search, which has to ask for the userClass
+	expectSearch := func(lm *mocks.Client, entry *ldap.Entry) {
+		lm.On("Search", mock.MatchedBy(func(sr *ldap.SearchRequest) bool {
+			return sr.Filter == "(&(objectClass=inetOrgPerson)(&(uid=teacher)(|(ocMemberOfSchool=school2)(ocGuestOfSchool=school2))))" &&
+				assert.Contains(t, sr.Attributes, "userClass")
+		})).Return(&ldap.SearchResult{Entries: []*ldap.Entry{entry}}, nil)
+	}
+
+	t.Run("returns the user and their userClass", func(t *testing.T) {
+		lm := &mocks.Client{}
+		expectSearch(lm, ldap.NewEntry("uid=teacher", map[string][]string{
+			"uid":              {"teacher"},
+			"entryuuid":        {"teacher-id"},
+			"displayname":      {"Teacher"},
+			"ocMemberOfSchool": {"school2"},
+			"userClass":        {"teacher"},
+		}))
+		b, err := NewLDAPBackend(lm, cfg, &logger, "school1", "")
+		assert.NoError(t, err)
+
+		user, userClass, err := b.GetPreciseUser(context.Background(), "teacher", "school2", nil)
+		assert.NoError(t, err)
+		assert.Equal(t, "teacher-id", user.GetId())
+		assert.Equal(t, []string{"teacher"}, userClass)
+	})
+
+	t.Run("returns no userClass for a user without one", func(t *testing.T) {
+		lm := &mocks.Client{}
+		expectSearch(lm, ldap.NewEntry("uid=teacher", map[string][]string{
+			"uid":              {"teacher"},
+			"entryuuid":        {"teacher-id"},
+			"ocMemberOfSchool": {"school2"},
+		}))
+		b, err := NewLDAPBackend(lm, cfg, &logger, "school1", "")
+		assert.NoError(t, err)
+
+		user, userClass, err := b.GetPreciseUser(context.Background(), "teacher", "school2", nil)
+		assert.NoError(t, err)
+		assert.Equal(t, "teacher-id", user.GetId())
+		assert.Empty(t, userClass)
+	})
+
+	t.Run("returns not found for an unknown user", func(t *testing.T) {
+		lm := &mocks.Client{}
+		lm.On("Search", mock.Anything).Return(&ldap.SearchResult{}, nil)
+		b, err := NewLDAPBackend(lm, cfg, &logger, "school1", "")
+		assert.NoError(t, err)
+
+		user, userClass, err := b.GetPreciseUser(context.Background(), "teacher", "school2", nil)
+		assert.ErrorIs(t, err, ErrNotFound)
+		assert.Nil(t, user)
+		assert.Nil(t, userClass)
+	})
 }
 
 func TestGetUser(t *testing.T) {

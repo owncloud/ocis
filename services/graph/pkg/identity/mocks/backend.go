@@ -587,7 +587,7 @@ func (_c *Backend_GetGroups_Call) RunAndReturn(run func(context.Context, *godata
 }
 
 // GetPreciseUser provides a mock function with given fields: ctx, name, instancename, oreq
-func (_m *Backend) GetPreciseUser(ctx context.Context, name string, instancename string, oreq *godata.GoDataRequest) (*libregraph.User, error) {
+func (_m *Backend) GetPreciseUser(ctx context.Context, name string, instancename string, oreq *godata.GoDataRequest) (*libregraph.User, []string, error) {
 	ret := _m.Called(ctx, name, instancename, oreq)
 
 	if len(ret) == 0 {
@@ -595,8 +595,9 @@ func (_m *Backend) GetPreciseUser(ctx context.Context, name string, instancename
 	}
 
 	var r0 *libregraph.User
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, *godata.GoDataRequest) (*libregraph.User, error)); ok {
+	var r1 []string
+	var r2 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, *godata.GoDataRequest) (*libregraph.User, []string, error)); ok {
 		return rf(ctx, name, instancename, oreq)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, string, string, *godata.GoDataRequest) *libregraph.User); ok {
@@ -607,13 +608,21 @@ func (_m *Backend) GetPreciseUser(ctx context.Context, name string, instancename
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string, string, *godata.GoDataRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, *godata.GoDataRequest) []string); ok {
 		r1 = rf(ctx, name, instancename, oreq)
 	} else {
-		r1 = ret.Error(1)
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).([]string)
+		}
 	}
 
-	return r0, r1
+	if rf, ok := ret.Get(2).(func(context.Context, string, string, *godata.GoDataRequest) error); ok {
+		r2 = rf(ctx, name, instancename, oreq)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
 }
 
 // Backend_GetPreciseUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPreciseUser'
@@ -637,12 +646,12 @@ func (_c *Backend_GetPreciseUser_Call) Run(run func(ctx context.Context, name st
 	return _c
 }
 
-func (_c *Backend_GetPreciseUser_Call) Return(_a0 *libregraph.User, _a1 error) *Backend_GetPreciseUser_Call {
-	_c.Call.Return(_a0, _a1)
+func (_c *Backend_GetPreciseUser_Call) Return(user *libregraph.User, userClass []string, err error) *Backend_GetPreciseUser_Call {
+	_c.Call.Return(user, userClass, err)
 	return _c
 }
 
-func (_c *Backend_GetPreciseUser_Call) RunAndReturn(run func(context.Context, string, string, *godata.GoDataRequest) (*libregraph.User, error)) *Backend_GetPreciseUser_Call {
+func (_c *Backend_GetPreciseUser_Call) RunAndReturn(run func(context.Context, string, string, *godata.GoDataRequest) (*libregraph.User, []string, error)) *Backend_GetPreciseUser_Call {
 	_c.Call.Return(run)
 	return _c
 }
