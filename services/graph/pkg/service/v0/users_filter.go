@@ -341,13 +341,7 @@ func (g Graph) applyFilterVaultEligible(ctx context.Context, req *godata.GoDataR
 			// then, check the role the guest role mapping gives their userClass, like
 			// assignGuestVaultRole does when the vault share is created.
 			if len(assignments.GetAssignments()) == 0 && user.GetId() == preciseUserID && len(g.guestRoleMapping) > 0 {
-				// a failed lookup leaves them out, like members, who get their role from the role
-				// mapping of members at login
-				userClass, member, err := g.identityBackend.GetUserClass(egCtx, user.GetId())
-				if err != nil || member {
-					return nil
-				}
-				eligible[i] = guestVaultRoleID(g.guestRoleMapping, userClass, roles.GetBundles()) != ""
+				eligible[i] = g.guestVaultEligible(egCtx, user.GetId(), roles.GetBundles())
 				return nil
 			}
 			for _, assignment := range assignments.GetAssignments() {

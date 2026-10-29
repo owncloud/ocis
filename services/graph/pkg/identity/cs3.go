@@ -82,7 +82,7 @@ func (i *CS3) GetPreciseUser(ctx context.Context, name string, instancename stri
 }
 
 // GetUserClass is not implemented
-func (i *CS3) GetUserClass(ctx context.Context, id string) ([]string, bool, error) {
+func (i *CS3) GetUserClass(_ context.Context, _ string) ([]string, bool, error) {
 	return nil, false, errNotImplemented
 }
 
