@@ -88,7 +88,7 @@ const userStore = useUserStore()
 const { isInVault } = useVault()
 const { user } = storeToRefs(userStore)
 const resourcesStore = useResourcesStore()
-const { currentFolder } = storeToRefs(resourcesStore)
+const { currentFolder, currentFolderLoadErrorStatus } = storeToRefs(resourcesStore)
 
 let loadResourcesEventToken: string
 const emptyTrashMessage = computed(() => {
@@ -100,7 +100,9 @@ const emptyTrashMessage = computed(() => {
 // the trash root is only set when listing succeeded, e.g. it stays unset on a 403
 const loadFailed = computed(() => !unref(areResourcesLoading) && !unref(currentFolder))
 const loadFailedMessage = computed(() =>
-  $gettext('Unable to load deleted files. You may not have permission to view them.')
+  unref(currentFolderLoadErrorStatus) === 403
+    ? $gettext('Unable to load deleted files. You do not have permission to view them.')
+    : $gettext('Unable to load deleted files.')
 )
 
 const titleSegments = computed(() => {

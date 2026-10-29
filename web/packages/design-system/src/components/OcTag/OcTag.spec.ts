@@ -48,7 +48,7 @@ describe('OcTag', () => {
 
       const style = wrapper.attributes('style')
       expect(style).toContain('background-color: var(--oc-color-tag-3)')
-      expect(style).toContain('color: var(--oc-color-tag-3-text,currentColor)')
+      expect(style).toContain('color: var(--oc-color-tag-3-text, currentColor)')
     })
 
     it('takes the label colour with the fill, so no caller works out contrast', () => {
@@ -57,7 +57,7 @@ describe('OcTag', () => {
       const wrapper = shallowMount(Tag, { props: { colorIndex: 7 } })
 
       expect(wrapper.attributes('style')).toContain(
-        'color: var(--oc-color-tag-7-text,currentColor)'
+        'color: var(--oc-color-tag-7-text, currentColor)'
       )
     })
 

@@ -27,7 +27,6 @@
     - [Development Documentation](#development-documentation)
   - [Security](#security)
   - [Contributing](#contributing)
-  - [End User License Agreement](#end-user-license-agreement)
   - [Copyright](#copyright)
 
 ## Introduction
@@ -160,10 +159,6 @@ Infinite Scale is carefully internationalized so that everyone, no matter what l
  [Transifex for ownCloud web](https://app.transifex.com/owncloud-org/owncloud-web/translate/) and [Transifex for ownCloud](https://app.transifex.com/owncloud-org/owncloud/translate/) (Select the resource by filtering for `ocis-`).
 
 Please always refer to our [Contribution Guidelines](https://github.com/owncloud/ocis/blob/master/CONTRIBUTING.md).
-
-## End User License Agreement
-
-Some builds of stable ownCloud Infinite Scale releases provided by ownCloud GmbH are subject to an [End User License Agreement](https://owncloud.com/license-owncloud-infinite-scale/).
 
 ## Copyright
 
