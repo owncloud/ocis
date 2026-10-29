@@ -110,8 +110,23 @@ func TestResolveCredsScopeUsernameAndPassword(t *testing.T) {
 			wantFile: "",
 		},
 		{
-			name: "service password wins over global content and a global file",
-			env:  map[string]string{"TEST_NATS_CREDS": "global", "TEST_NATS_CREDS_FILE": "/global.creds", "TEST_SVC_EVENTS_AUTH_PASSWORD": "pass"},
+			name: "service username and password win over global content and a global file",
+			env:  map[string]string{"TEST_NATS_CREDS": "global", "TEST_NATS_CREDS_FILE": "/global.creds", "TEST_SVC_EVENTS_AUTH_USERNAME": "user", "TEST_SVC_EVENTS_AUTH_PASSWORD": "pass"},
+		},
+		{
+			name:     "service username and global password win over a global file",
+			env:      map[string]string{"TEST_NATS_CREDS_FILE": "/global.creds", "TEST_SVC_EVENTS_AUTH_USERNAME": "user", "TEST_EVENTS_AUTH_PASSWORD": "pass"},
+			wantFile: "",
+		},
+		{
+			name:      "service password alone does not win over global content",
+			env:       map[string]string{"TEST_NATS_CREDS": "global", "TEST_SVC_EVENTS_AUTH_PASSWORD": "pass"},
+			wantCreds: "global",
+		},
+		{
+			name:     "service username alone does not win over a global file",
+			env:      map[string]string{"TEST_NATS_CREDS_FILE": "/global.creds", "TEST_SVC_EVENTS_AUTH_USERNAME": "user"},
+			wantFile: "/global.creds",
 		},
 		{
 			name:     "global username does not win over a global file",
@@ -135,8 +150,8 @@ func TestResolveCredsScopeUsernameAndPassword(t *testing.T) {
 			wantFile: "/global.creds",
 		},
 		{
-			name:     "service username does not clear a file from the config file",
-			env:      map[string]string{"TEST_SVC_EVENTS_AUTH_USERNAME": "user"},
+			name:     "service username and password do not clear a file from the config file",
+			env:      map[string]string{"TEST_SVC_EVENTS_AUTH_USERNAME": "user", "TEST_SVC_EVENTS_AUTH_PASSWORD": "pass"},
 			preset:   credsScopeAuth{CredsFile: "/yaml.creds"},
 			wantFile: "/yaml.creds",
 		},

@@ -1,7 +1,6 @@
 package debug
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/checks"
@@ -16,7 +15,7 @@ func Server(opts ...Option) (*http.Server, error) {
 
 	readyHandlerConfiguration := handlers.NewCheckHandlerConfiguration().
 		WithLogger(options.Logger).
-		WithCheck("nats reachability", natsCheck(options))
+		WithCheck("nats reachability", checks.NewNatsStoreCheck(options.Config.Cache.ProviderCacheStore, options.Config.Cache.ProviderCacheNodes, options.Config.Cache.ProviderCacheNatsConfig()))
 
 	return debug.NewService(
 		debug.Logger(options.Logger),
@@ -32,14 +31,4 @@ func Server(opts ...Option) (*http.Server, error) {
 		//debug.CorsAllowedHeaders(options.Config.HTTP.CORS.AllowedHeaders),
 		//debug.CorsAllowCredentials(options.Config.HTTP.CORS.AllowCredentials),
 	), nil
-}
-
-// natsCheck returns the check of the provider cache. When the provider cache does not
-// use NATS, the check always succeeds.
-func natsCheck(options Options) func(context.Context) error {
-	c := options.Config.Cache
-	if c.ProviderCacheStore != "nats-js-kv" || len(c.ProviderCacheNodes) == 0 {
-		return func(context.Context) error { return nil }
-	}
-	return checks.NewNatsCheckWithConfig(c.ProviderCacheNodes[0], c.ProviderCacheNatsConfig())
 }

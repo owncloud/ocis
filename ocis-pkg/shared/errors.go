@@ -102,7 +102,7 @@ func MissingWOPISecretError(service string) error {
 // Only the nats-js and nats-js-kv stores use the credentials. For other store types,
 // it does not check the credentials.
 func CheckNatsCredentials(service, store, credsFile, creds string) error {
-	if store != revastore.TypeNatsJS && store != revastore.TypeNatsJSKV {
+	if !revastore.UsesNats(store) {
 		return nil
 	}
 	if err := natsauth.Check(credsFile, creds); err != nil {

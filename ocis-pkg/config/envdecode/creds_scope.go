@@ -26,12 +26,13 @@ const (
 //
 //   - It clears the creds content when the creds file comes from a more specific scope.
 //     Example: OCIS_NATS_CREDS is set globally and GRAPH_CACHE_CREDS_FILE is set for
-//     the service. Then the file is used.
-//   - It clears the creds content and the creds file when the username or the password
-//     comes from a more specific environment variable. Example: OCIS_NATS_CREDS_FILE is
-//     set globally and GRAPH_CACHE_AUTH_USERNAME is set for the service. Then the
-//     username and the password are used. Credentials from a config file or a default
-//     are not cleared, because they have no environment scope to compare.
+//     the service. Then the service uses the file.
+//   - It clears the creds content and the creds file when the username and the password
+//     both have a value and one of them comes from a more specific environment variable.
+//     Example: OCIS_NATS_CREDS_FILE is set globally, and GRAPH_CACHE_AUTH_USERNAME and
+//     GRAPH_CACHE_AUTH_PASSWORD are set for the service. Then the connection uses the
+//     username and the password. The function keeps credentials from a config file or
+//     a default, because these credentials have no environment scope to compare.
 func resolveCredsScope(s reflect.Value) {
 	t := s.Type()
 	for i := 0; i < t.NumField(); i++ {
@@ -53,17 +54,31 @@ func resolveCredsScope(s reflect.Value) {
 		}
 
 		credsScope := max(valueScope(creds, credsField), valueScope(file, fileField))
-		authScope := -1
-		for _, suffix := range []string{authUsernameSuffix, authPasswordSuffix} {
-			if f, ok := stringField(t, prefix+suffix); ok {
-				authScope = max(authScope, valueScope(s.FieldByIndex(f.Index), f))
-			}
-		}
-		if credsScope >= 0 && authScope > credsScope {
+		if credsScope >= 0 && authScope(s, prefix) > credsScope {
 			creds.SetString("")
 			file.SetString("")
 		}
 	}
+}
+
+// authScope returns the scope of the username and the password with the given prefix.
+// It returns -1 when the username or the password is empty. A username or a password
+// alone cannot authenticate, so it does not replace the JWT credentials. Otherwise
+// it returns the more specific scope of the two values.
+func authScope(s reflect.Value, prefix string) int {
+	scope := -1
+	for _, suffix := range []string{authUsernameSuffix, authPasswordSuffix} {
+		f, ok := stringField(s.Type(), prefix+suffix)
+		if !ok {
+			return -1
+		}
+		v := s.FieldByIndex(f.Index)
+		if v.String() == "" {
+			return -1
+		}
+		scope = max(scope, valueScope(v, f))
+	}
+	return scope
 }
 
 // stringField returns the field of t with the given name when it is a string field.

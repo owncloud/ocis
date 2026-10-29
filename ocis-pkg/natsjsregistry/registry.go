@@ -6,7 +6,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 	"strings"
 	"sync"
@@ -16,6 +15,7 @@ import (
 	natsjskv "github.com/go-micro/plugins/v4/store/nats-js-kv"
 	"github.com/nats-io/nats.go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/reva/v2/pkg/natsauth"
 	revastore "github.com/owncloud/reva/v2/pkg/store"
 	"go-micro.dev/v4/registry"
@@ -227,12 +227,13 @@ func (n *storeregistry) storeOptions(opts registry.Options) []store.Option {
 	natsOptions.User, natsOptions.Password = getAuth()
 	credsOpt, err := n.credentialsOption()
 	if err != nil {
-		fmt.Println("cannot use the nats credentials of the registry:", err)
-		os.Exit(1)
+		exit(serviceName, err, "cannot use the nats credentials of the registry")
 	}
 	if credsOpt != nil {
 		natsOptions.User, natsOptions.Password = "", ""
-		_ = credsOpt(&natsOptions)
+		if err := credsOpt(&natsOptions); err != nil {
+			exit(serviceName, err, "cannot use the nats credentials of the registry")
+		}
 	}
 	if tlsConf := getTLS(); tlsConf != nil {
 		natsOptions.TLSConfig = tlsConf
@@ -240,13 +241,11 @@ func (n *storeregistry) storeOptions(opts registry.Options) []store.Option {
 	}
 	natsOptions.ReconnectedCB = func(_ *nats.Conn) {
 		if err := n.Init(); err != nil {
-			fmt.Println("cannot reconnect to nats")
-			os.Exit(1)
+			exit(serviceName, err, "cannot reconnect to nats")
 		}
 	}
 	natsOptions.ClosedCB = func(_ *nats.Conn) {
-		fmt.Println("nats connection closed")
-		os.Exit(1)
+		exit(serviceName, nil, "nats connection closed")
 	}
 	storeoptions = append(storeoptions, natsjskv.NatsOptions(natsOptions))
 
@@ -266,35 +265,35 @@ func getAuth() (string, string) {
 // Only the first call checks the credentials, at startup. An invalid value then stops
 // the service. Later calls happen in Init, for example after a reconnect. A rotated
 // .creds file can then be partly written. So later calls do not check the file.
-// nats.UserCredentials does not read the file when the option is applied. The
-// connection reads the file on each connect and retries on an error.
+// The option of a later call reads the file only when the connection connects.
+// The connection retries on an error.
 func (n *storeregistry) credentialsOption() (nats.Option, error) {
 	credsFile, creds := getCreds()
 	if !n.credsChecked.Swap(true) {
-		if err := natsauth.Check(credsFile, creds); err != nil {
-			return nil, err
-		}
+		return natsauth.CredentialsOption(credsFile, creds)
 	}
-	switch {
-	case creds != "":
-		return nats.UserCredentialBytes([]byte(creds)), nil
-	case credsFile != "":
-		return nats.UserCredentials(credsFile), nil
-	default:
-		return nil, nil
-	}
+	return natsauth.Option(credsFile, creds), nil
+}
+
+// exit logs the error through the oCIS logger and stops the process. The registry
+// constructor cannot return an error, because go-micro defines its signature.
+func exit(serviceName string, err error, msg string) {
+	logger := log.NewLogger(log.Name(serviceName), log.Level("error"))
+	logger.Error().Err(err).Msg(msg)
+	os.Exit(1)
 }
 
 // getCreds returns the path and the content of the NATS .creds file for the registry.
-// The registry variables take precedence. If both are empty, the global OCIS_NATS_* variables are used.
-// The registry username and password are also registry variables. When one of them is set,
-// they take precedence over the global variables, so the global credentials are not used.
+// The registry variables take precedence. If both are empty, the registry uses the global
+// OCIS_NATS_* variables. The registry username and password are also registry variables.
+// When both have a value, they take precedence over the global variables. The registry
+// then does not use the global credentials.
 func getCreds() (string, string) {
 	credsFile, creds := os.Getenv(_registryCredsFileEnv), os.Getenv(_registryCredsEnv)
 	if credsFile != "" || creds != "" {
 		return credsFile, creds
 	}
-	if user, password := getAuth(); user != "" || password != "" {
+	if user, password := getAuth(); user != "" && password != "" {
 		return "", ""
 	}
 	return os.Getenv(_natsCredsFileEnv), os.Getenv(_natsCredsEnv)
