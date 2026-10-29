@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/utils"
@@ -52,37 +53,67 @@ func guestRoleName(mappings []guestRoleMapping, values []string) string {
 	return ""
 }
 
+// withGuestVaultRole creates a vault share for the user with createShare. The vault share check only
+// reads role assignments, and a user of another instance only gets a role here at their first login
+// here. So if the user has no role yet, withGuestVaultRole first assigns the role that login will give
+// them, if it grants vault mode, and removes it again if the share fails.
+func (g Graph) withGuestVaultRole(ctx context.Context, userID string, createShare func() error) error {
+	logger := g.logger.SubloggerWithRequestID(ctx)
+	role, err := g.assignGuestVaultRole(ctx, userID)
+	if err != nil {
+		// without the role the vault share check refuses the share
+		logger.Warn().Err(err).Str("userid", userID).Msg("could not assign the guest vault role")
+	}
+	if err := createShare(); err != nil {
+		role.undo()
+		return err
+	}
+	if err := role.finish(ctx); err != nil {
+		logger.Warn().Err(err).Str("userid", userID).Msg("could not finish the guest vault role, it was removed again")
+	}
+	return nil
+}
+
+// guestVaultRole is a guest vault role assigned for a vault share that is about to be created
+type guestVaultRole struct {
+	g             Graph
+	serviceCtx    context.Context
+	gatewayClient gateway.GatewayAPIClient
+	userID        string
+	roleID        string
+	assignmentID  string
+}
+
 // assignGuestVaultRole assigns a user who has no role here yet the role their first login here will
-// give them, if that role grants vault mode. The vault share check only reads role assignments, so
-// without it a user of another instance can't receive a vault share before logging in here.
-func (g Graph) assignGuestVaultRole(ctx context.Context, userID string) error {
+// give them, if that role grants vault mode. It returns nil if it assigned no role.
+func (g Graph) assignGuestVaultRole(ctx context.Context, userID string) (*guestVaultRole, error) {
 	// like the proxy, only for multi-instance guests
 	if !g.config.MultiInstance.Enabled || len(g.guestRoleMapping) == 0 {
-		return nil
+		return nil, nil
 	}
 	assignments, err := g.roleService.ListRoleAssignments(ctx, &settingssvc.ListRoleAssignmentsRequest{AccountUuid: userID})
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if len(assignments.GetAssignments()) > 0 {
-		return nil
+		return nil, nil
 	}
 
 	userClass, member, err := g.identityBackend.GetUserClass(ctx, userID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	// members get their role from the role mapping of members at login, not from the guest mapping
 	if member {
-		return nil
+		return nil, nil
 	}
 	roleName := guestRoleName(g.guestRoleMapping, userClass)
 	if roleName == "" {
-		return nil
+		return nil, nil
 	}
 	roles, err := g.roleService.ListRoles(ctx, &settingssvc.ListBundlesRequest{})
 	if err != nil {
-		return err
+		return nil, err
 	}
 	roleID := ""
 	for _, role := range roles.GetBundles() {
@@ -92,18 +123,18 @@ func (g Graph) assignGuestVaultRole(ctx context.Context, userID string) error {
 		}
 	}
 	if roleID == "" {
-		return nil
+		return nil, nil
 	}
 
 	// assigning roles needs the role management permission. Start from a new context, the settings
 	// service would check the role ids of the sharing user in the request context instead.
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	serviceCtx, err := utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, g.config.ServiceAccount.ServiceAccountID, g.config.ServiceAccount.ServiceAccountSecret)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	serviceCtx = metadata.Set(serviceCtx, middleware.AccountID, g.config.ServiceAccount.ServiceAccountID)
 	assignment, err := g.roleService.AssignRoleToUser(serviceCtx, &settingssvc.AssignRoleToUserRequest{
@@ -111,32 +142,52 @@ func (g Graph) assignGuestVaultRole(ctx context.Context, userID string) error {
 		RoleId:      roleID,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
+	return &guestVaultRole{
+		g:             g,
+		serviceCtx:    serviceCtx,
+		gatewayClient: gatewayClient,
+		userID:        userID,
+		roleID:        roleID,
+		assignmentID:  assignment.GetAssignment().GetId(),
+	}, nil
+}
 
-	// like the other role assignments, adjust the personal space to the role and announce the
-	// change. The user had no role before.
-	canCreateDrives, err := g.checkUserPermission(serviceCtx, "Drives.Create", userID, gatewayClient)
-	if err != nil {
-		g.revertRoleAssignment(serviceCtx, userID, "", assignment.GetAssignment().GetId())
-		return err
+// undo removes the role, the user had none before
+func (r *guestVaultRole) undo() {
+	if r == nil {
+		return
 	}
-	if canCreateDrives {
-		err = shared.RestorePersonalSpace(serviceCtx, gatewayClient, userID)
-	} else {
-		err = shared.DisablePersonalSpace(serviceCtx, gatewayClient, userID)
+	r.g.revertRoleAssignment(r.serviceCtx, r.userID, "", r.assignmentID)
+}
+
+// finish adjusts the personal space to the role and announces the change, like the other role
+// assignments. If the personal space can't be adjusted, it removes the role again.
+func (r *guestVaultRole) finish(ctx context.Context) error {
+	if r == nil {
+		return nil
+	}
+	canCreateDrives, err := r.g.checkUserPermission(r.serviceCtx, "Drives.Create", r.userID, r.gatewayClient)
+	if err == nil {
+		if canCreateDrives {
+			err = shared.RestorePersonalSpace(r.serviceCtx, r.gatewayClient, r.userID)
+		} else {
+			err = shared.DisablePersonalSpace(r.serviceCtx, r.gatewayClient, r.userID)
+		}
 	}
 	if err != nil {
+		r.undo()
 		return err
 	}
 
 	oldRole := ""
 	e := events.UserFeatureChanged{
-		UserID: userID,
+		UserID: r.userID,
 		Features: []events.UserFeature{
 			{
 				Name:     "roleChanged",
-				Value:    roleID,
+				Value:    r.roleID,
 				OldValue: &oldRole,
 			},
 		},
@@ -145,7 +196,7 @@ func (g Graph) assignGuestVaultRole(ctx context.Context, userID string) error {
 	if currentUser, ok := revactx.ContextGetUser(ctx); ok {
 		e.Executant = currentUser.GetId()
 	}
-	g.publishEvent(ctx, e)
+	r.g.publishEvent(ctx, e)
 	return nil
 }
 

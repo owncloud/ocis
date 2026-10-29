@@ -174,18 +174,19 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(permission.GrantedToV2.Group.GetId()).To(Equal("2"))
 		})
 
-		Describe("the guest vault role", func() {
+		Describe("a vault share with the guest vault role", func() {
 			var (
-				assigned  []string
-				assignErr error
+				// wrapped records the users whose share creation went through the guest vault role
+				wrapped   []string
+				vaultItem *provider.ResourceId
 			)
 
 			BeforeEach(func() {
-				assigned, assignErr = nil, nil
+				wrapped = nil
 				service, err := svc.NewDriveItemPermissionsService(log.NewLogger(), gatewaySelector, cache, cfg, otel.GetTracerProvider(), nil, nil,
-					func(_ context.Context, userID string) error {
-						assigned = append(assigned, userID)
-						return assignErr
+					func(_ context.Context, userID string, createShare func() error) error {
+						wrapped = append(wrapped, userID)
+						return createShare()
 					})
 				Expect(err).ToNot(HaveOccurred())
 				driveItemPermissionsService = service
@@ -197,30 +198,36 @@ var _ = Describe("DriveItemPermissionsService", func() {
 				createShareResponse.Share = &collaboration.Share{Id: &collaboration.ShareId{OpaqueId: "123"}}
 				// the sharer may share the resource
 				statResponse.Info.PermissionSet = &provider.ResourcePermissions{Stat: true, AddGrant: true}
-			})
-
-			It("is assigned to the recipient before a vault share is created", func() {
-				statResponse.Info.Id = &provider.ResourceId{
+				vaultItem = &provider.ResourceId{
 					StorageId: utils.VaultStorageProviderID,
 					SpaceId:   driveItemId.SpaceId,
 					OpaqueId:  driveItemId.OpaqueId,
 				}
-				gatewayClient.On("CreateShare", mock.Anything, mock.Anything).
-					Run(func(mock.Arguments) {
-						Expect(assigned).To(Equal([]string{"1"}))
-					}).Return(createShareResponse, nil)
+			})
+
+			It("is created through it", func() {
+				statResponse.Info.Id = vaultItem
+				gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
+
+				permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(permission.GetId()).To(Equal("123"))
+				Expect(wrapped).To(Equal([]string{"1"}))
+			})
+
+			It("returns the error of the share creation", func() {
+				statResponse.Info.Id = vaultItem
+				gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(&collaboration.CreateShareResponse{
+					Status: status.NewAlreadyExists(ctx, nil, "the share already exists"),
+				}, nil)
 
 				_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(assigned).To(Equal([]string{"1"}))
+				Expect(err).To(HaveOccurred())
+				Expect(wrapped).To(Equal([]string{"1"}))
 			})
 
-			It("is not assigned when the sharer may not share the resource", func() {
-				statResponse.Info.Id = &provider.ResourceId{
-					StorageId: utils.VaultStorageProviderID,
-					SpaceId:   driveItemId.SpaceId,
-					OpaqueId:  driveItemId.OpaqueId,
-				}
+			It("is not used when the sharer may not share the resource", func() {
+				statResponse.Info.Id = vaultItem
 				statResponse.Info.PermissionSet = &provider.ResourcePermissions{Stat: true}
 				gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(&collaboration.CreateShareResponse{
 					Status: status.NewPermissionDenied(ctx, nil, "no permission to share"),
@@ -228,29 +235,16 @@ var _ = Describe("DriveItemPermissionsService", func() {
 
 				_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
 				Expect(err).To(HaveOccurred())
-				Expect(assigned).To(BeEmpty())
-			})
-
-			It("is not assigned for a share outside the vault", func() {
-				gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
-
-				_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(assigned).To(BeEmpty())
-			})
-
-			It("leaves the decision to the vault share check when it can't be assigned", func() {
-				statResponse.Info.Id = &provider.ResourceId{
-					StorageId: utils.VaultStorageProviderID,
-					SpaceId:   driveItemId.SpaceId,
-					OpaqueId:  driveItemId.OpaqueId,
-				}
-				assignErr = errors.New("settings service unavailable")
-				gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
-
-				_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
-				Expect(err).ToNot(HaveOccurred())
+				Expect(wrapped).To(BeEmpty())
 				gatewayClient.AssertCalled(GinkgoT(), "CreateShare", mock.Anything, mock.Anything)
+			})
+
+			It("is not used for a share outside the vault", func() {
+				gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
+
+				_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(wrapped).To(BeEmpty())
 			})
 		})
 

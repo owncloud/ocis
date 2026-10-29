@@ -73,7 +73,7 @@ type DriveItemPermissionsService struct {
 	tp                         trace.TracerProvider
 	identityBackend            identity.Backend
 	hasExternalSharePermission externalSharePermissionChecker
-	assignGuestVaultRole       guestVaultRoleAssigner
+	createVaultShare           vaultShareCreator
 }
 
 type permissionType int
@@ -89,19 +89,19 @@ const (
 // supposed to return true if the user can share to users from other instances (multi-instance only)
 type externalSharePermissionChecker func(context.Context) bool
 
-// supposed to give a user who never logged in here the role with vault mode their first login here
-// will give them, before a vault resource is shared with them (multi-instance only)
-type guestVaultRoleAssigner func(ctx context.Context, userID string) error
+// supposed to create a vault share for the user with createShare, and to give a user who never
+// logged in here the role with vault mode their first login here will give them (multi-instance only)
+type vaultShareCreator func(ctx context.Context, userID string, createShare func() error) error
 
 // NewDriveItemPermissionsService creates a new DriveItemPermissionsService
-func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, config *config.Config, tp trace.TracerProvider, be identity.Backend, espc externalSharePermissionChecker, gvra guestVaultRoleAssigner) (DriveItemPermissionsService, error) {
+func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, config *config.Config, tp trace.TracerProvider, be identity.Backend, espc externalSharePermissionChecker, vsc vaultShareCreator) (DriveItemPermissionsService, error) {
 	f := func(context.Context) bool { return false }
 	if espc != nil {
 		f = espc
 	}
-	a := func(context.Context, string) error { return nil }
-	if gvra != nil {
-		a = gvra
+	c := func(_ context.Context, _ string, createShare func() error) error { return createShare() }
+	if vsc != nil {
+		c = vsc
 	}
 
 	return DriveItemPermissionsService{
@@ -114,7 +114,7 @@ func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Sele
 		tp:                         tp,
 		identityBackend:            be,
 		hasExternalSharePermission: f,
-		assignGuestVaultRole:       a,
+		createVaultShare:           c,
 	}, nil
 }
 
@@ -285,18 +285,24 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 			// none here before their first login here. Without one the check refuses the share.
 			// Only a sharer who may share the resource gets this far, the role must not be
 			// assignable by someone whose share the storage refuses anyway.
-			if IsVaultResource(resourceID) && statResponse.GetInfo().GetPermissionSet().GetAddGrant() {
-				if err := s.assignGuestVaultRole(ctx, user.GetId()); err != nil {
-					s.logger.Warn().Err(err).Str("resourceId", resourceId.GetStorageId()).Interface("userId", objectID).Msg("could not assign the guest vault role")
-				}
-			}
-
 			createShareRequest := createShareRequestToUser(user, statResponse.GetInfo(), cs3ResourcePermissions)
 			if shareExpiration != nil {
 				createShareRequest.GetGrant().Expiration = shareExpiration
 			}
-			createShareResponse, err := gatewayClient.CreateShare(ctx, createShareRequest)
-			if err := errorcode.FromCS3Status(createShareResponse.GetStatus(), err); err != nil {
+			var createShareResponse *collaboration.CreateShareResponse
+			createShare := func() error {
+				var err error
+				createShareResponse, err = gatewayClient.CreateShare(ctx, createShareRequest)
+				return errorcode.FromCS3Status(createShareResponse.GetStatus(), err)
+			}
+			// the vault share check needs a role with vault mode, which a user of another instance only
+			// gets at their first login here. Only a sharer who may share the resource gets it assigned.
+			if IsVaultResource(resourceID) && statResponse.GetInfo().GetPermissionSet().GetAddGrant() {
+				err = s.createVaultShare(ctx, user.GetId(), createShare)
+			} else {
+				err = createShare()
+			}
+			if err != nil {
 				s.logger.Error().Err(err).Str("resourceId", resourceId.GetStorageId()).Interface("userId", objectID).Msg("share creation failed")
 				return libregraph.Permission{}, err
 			}

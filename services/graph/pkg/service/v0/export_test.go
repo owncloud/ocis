@@ -7,7 +7,7 @@ var (
 	Cs3ReceivedSharesToDriveItems           = cs3ReceivedSharesToDriveItems
 )
 
-// AssignGuestVaultRole exposes assignGuestVaultRole to the tests
-func (g Graph) AssignGuestVaultRole(ctx context.Context, userID string) error {
-	return g.assignGuestVaultRole(ctx, userID)
+// WithGuestVaultRole exposes withGuestVaultRole to the tests
+func (g Graph) WithGuestVaultRole(ctx context.Context, userID string, createShare func() error) error {
+	return g.withGuestVaultRole(ctx, userID, createShare)
 }
