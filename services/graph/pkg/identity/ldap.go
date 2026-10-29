@@ -157,10 +157,11 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 			return nil, fmt.Errorf("invalid user attribute mappings: %s must not be empty", name)
 		}
 	}
-	// Normalize to the canonical "sn" spelling so downstream code can do a plain string
+	// Normalize to the canonical "sn" spelling (LDAP attribute names are case-insensitive,
+	// and "surname" is its RFC 4519 schema alias) so downstream code can do a plain string
 	// compare instead of re-checking case/alias on every use.
 	surnameAttribute := config.UserSurnameAttribute
-	if isSNAttribute(surnameAttribute) {
+	if strings.EqualFold(surnameAttribute, "sn") || strings.EqualFold(surnameAttribute, "surname") {
 		surnameAttribute = "sn"
 	}
 	uam := userAttributeMap{
@@ -446,7 +447,7 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 
 	// person's mandatory "sn" is a separate attribute from the configured one above;
 	// keep it in sync like CreateUser does.
-	if sn := user.GetSurname(); sn != "" && i.userAttributeMap.surname != "sn" {
+	if sn := user.GetSurname(); sn != "" && i.mirrorSurnameIntoSN() {
 		if e.GetEqualFoldAttributeValue("sn") != sn {
 			mr.Replace("sn", []string{sn})
 			updateNeeded = true
@@ -1200,12 +1201,6 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 	return user
 }
 
-// isSNAttribute reports whether attr refers to the LDAP "sn" attribute, either by its
-// name or its "surname" schema alias (RFC 4519); LDAP attribute names are case-insensitive.
-func isSNAttribute(attr string) bool {
-	return strings.EqualFold(attr, "sn") || strings.EqualFold(attr, "surname")
-}
-
 func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, error) {
 	attrs := map[string][]string{
 		i.userAttributeMap.displayName: {user.GetDisplayName()},
@@ -1248,7 +1243,7 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 		sn = user.OnPremisesSamAccountName
 	}
 	attrs[i.userAttributeMap.surname] = []string{sn}
-	if i.userAttributeMap.surname != "sn" {
+	if i.mirrorSurnameIntoSN() {
 		// person's mandatory "sn" is a separate attribute from the configured one above
 		attrs["sn"] = []string{sn}
 	}
@@ -1281,6 +1276,12 @@ func (i *LDAP) identityToLDAPAttrValue(identity libregraph.ObjectIdentity) (stri
 	return identityStr, nil
 }
 
+// mirrorSurnameIntoSN reports whether the configured surname attribute is not itself
+// "sn", meaning person's mandatory "sn" must be kept in sync as a separate attribute.
+func (i *LDAP) mirrorSurnameIntoSN() bool {
+	return i.userAttributeMap.surname != "sn"
+}
+
 func (i *LDAP) getUserAttrTypesForSearch() []string {
 	return []string{
 		i.userAttributeMap.displayName,
@@ -1301,7 +1302,7 @@ func (i *LDAP) getUserAttrTypesForSearch() []string {
 
 func (i *LDAP) getUserAttrTypes() []string {
 	types := append(i.getUserAttrTypesForSearch(), "cn", "objectClass")
-	if i.userAttributeMap.surname != "sn" {
+	if i.mirrorSurnameIntoSN() {
 		// userToLDAPAttrValues also mirrors surname into the literal "sn" person requires
 		types = append(types, "sn")
 	}
