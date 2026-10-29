@@ -1321,7 +1321,7 @@ github.com/orcaman/concurrent-map
 # github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245
 ## explicit; go 1.18
 github.com/owncloud/libre-graph-api-go
-# github.com/owncloud/reva/v2 v2.0.0-20261012083840-8b649a4c3899
+# github.com/owncloud/reva/v2 v2.0.0-20261019151321-d079c7843edc
 ## explicit; go 1.26.0
 github.com/owncloud/reva/v2/cmd/revad/internal/grace
 github.com/owncloud/reva/v2/cmd/revad/runtime
@@ -1439,8 +1439,6 @@ github.com/owncloud/reva/v2/pkg/auth/manager/machine
 github.com/owncloud/reva/v2/pkg/auth/manager/nextcloud
 github.com/owncloud/reva/v2/pkg/auth/manager/ocmshares
 github.com/owncloud/reva/v2/pkg/auth/manager/oidc
-github.com/owncloud/reva/v2/pkg/auth/manager/owncloudsql
-github.com/owncloud/reva/v2/pkg/auth/manager/owncloudsql/accounts
 github.com/owncloud/reva/v2/pkg/auth/manager/publicshares
 github.com/owncloud/reva/v2/pkg/auth/manager/registry
 github.com/owncloud/reva/v2/pkg/auth/manager/serviceaccounts
@@ -1546,7 +1544,6 @@ github.com/owncloud/reva/v2/pkg/publicshare/manager/json/persistence/file
 github.com/owncloud/reva/v2/pkg/publicshare/manager/json/persistence/memory
 github.com/owncloud/reva/v2/pkg/publicshare/manager/loader
 github.com/owncloud/reva/v2/pkg/publicshare/manager/memory
-github.com/owncloud/reva/v2/pkg/publicshare/manager/owncloudsql
 github.com/owncloud/reva/v2/pkg/publicshare/manager/registry
 github.com/owncloud/reva/v2/pkg/registry
 github.com/owncloud/reva/v2/pkg/rgrpc
@@ -1578,7 +1575,6 @@ github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3/sharecache
 github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3/shareid
 github.com/owncloud/reva/v2/pkg/share/manager/loader
 github.com/owncloud/reva/v2/pkg/share/manager/memory
-github.com/owncloud/reva/v2/pkg/share/manager/owncloudsql
 github.com/owncloud/reva/v2/pkg/share/manager/registry
 github.com/owncloud/reva/v2/pkg/sharedconf
 github.com/owncloud/reva/v2/pkg/siteacc
@@ -1621,8 +1617,6 @@ github.com/owncloud/reva/v2/pkg/storage/fs/localhome
 github.com/owncloud/reva/v2/pkg/storage/fs/nextcloud
 github.com/owncloud/reva/v2/pkg/storage/fs/ocis
 github.com/owncloud/reva/v2/pkg/storage/fs/ocis/blobstore
-github.com/owncloud/reva/v2/pkg/storage/fs/owncloudsql
-github.com/owncloud/reva/v2/pkg/storage/fs/owncloudsql/filecache
 github.com/owncloud/reva/v2/pkg/storage/fs/posix
 github.com/owncloud/reva/v2/pkg/storage/fs/posix/blobstore
 github.com/owncloud/reva/v2/pkg/storage/fs/posix/lookup
@@ -1691,8 +1685,6 @@ github.com/owncloud/reva/v2/pkg/user/manager/ldap
 github.com/owncloud/reva/v2/pkg/user/manager/loader
 github.com/owncloud/reva/v2/pkg/user/manager/memory
 github.com/owncloud/reva/v2/pkg/user/manager/nextcloud
-github.com/owncloud/reva/v2/pkg/user/manager/owncloudsql
-github.com/owncloud/reva/v2/pkg/user/manager/owncloudsql/accounts
 github.com/owncloud/reva/v2/pkg/user/manager/registry
 github.com/owncloud/reva/v2/pkg/utils
 github.com/owncloud/reva/v2/pkg/utils/cfg
