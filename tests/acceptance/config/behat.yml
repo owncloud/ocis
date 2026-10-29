@@ -503,6 +503,7 @@ default:
         - SpacesContext:
         - SharingNgContext:
         - OCSContext:
+        - NotificationContext:
 
     cliCommands:
       paths:
