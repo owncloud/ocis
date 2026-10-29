@@ -10,6 +10,8 @@ attribute with `OCIS_MULTI_INSTANCE_GUEST_ROLE_MAPPING`, like the proxy does
 with the roles claim at login. If the role grants vault mode, the vault share
 search shows the user, and sharing a vault resource with them assigns the role
 first. Users who already have a role are not affected. The graph service needs
-`OCIS_MULTI_INSTANCE_GUEST_ROLE_MAPPING` set as well.
+`OCIS_MULTI_INSTANCE_GUEST_ROLE_MAPPING` set as well, and `userClass` must hold
+the same values as the `PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM` claim. Otherwise the
+first login replaces the role again.
 
 https://github.com/owncloud/ocis/pull/13273
