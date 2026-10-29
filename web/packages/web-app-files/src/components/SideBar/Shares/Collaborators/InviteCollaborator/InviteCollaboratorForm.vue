@@ -105,6 +105,23 @@
         />
       </div>
     </div>
+    <div id="vault-group-notice-status" role="status">
+      <div
+        v-if="showVaultGroupNotice"
+        class="oc-flex oc-flex-middle oc-gap-s oc-background-muted oc-rounded oc-p-s oc-mb-s oc-text-small"
+        data-testid="vault-group-notice"
+      >
+        <oc-icon name="information" size="small" aria-hidden="true" />
+        <span
+          v-text="
+            $pgettext(
+              'Notice shown when sharing a resource inside the vault with a group',
+              'Group members without vault access will not receive a notification and cannot access the share.'
+            )
+          "
+        />
+      </div>
+    </div>
     <div class="oc-flex oc-flex-between oc-flex-middle oc-mb-l oc-mt-s">
       <role-dropdown
         mode="create"
@@ -199,7 +216,7 @@ import {
 } from '@ownclouders/web-pkg'
 
 import { computed, inject, ref, unref, watch, onMounted, nextTick, Ref, useTemplateRef } from 'vue'
-import { Resource, SpaceResource, VAULT_STORAGE_PROVIDER_ID } from '@ownclouders/web-client'
+import { Resource, SpaceResource } from '@ownclouders/web-client'
 import { DateTime } from 'luxon'
 import { OcDrop } from '@ownclouders/design-system/components'
 import { useTask } from 'vue-concurrency'
@@ -207,6 +224,7 @@ import { useGettext } from 'vue3-gettext'
 import { isProjectSpaceResource } from '@ownclouders/web-client'
 import { Group } from '@ownclouders/web-client/graph/generated'
 import ExpirationDateIndicator from '../../ExpirationDateIndicator.vue'
+import { isVaultResource as isVaultResourceHelper } from '../../../../../helpers/resource/vault'
 
 type AccountType = {
   prefix: string
@@ -317,15 +335,17 @@ const accountTypes: AccountType[] = [
 ]
 const saveButtonText = computed(() => saveButtonLabel || $gettext('Share'))
 
-// A resource lives in the vault if its storage provider is the vault one. Space resources carry
-// the full drive id in storageId, plain resources only the provider id, hence the split.
-const isVaultResource = computed(() => {
-  const storageId = unref(resource)?.storageId
-  if (!unref(capabilityRefs.vaultEnabled) || typeof storageId !== 'string') {
-    return false
-  }
-  return storageId.split('$')[0] === VAULT_STORAGE_PROVIDER_ID
-})
+const isVaultResource = computed(() =>
+  isVaultResourceHelper(unref(resource), unref(capabilityRefs.vaultEnabled))
+)
+
+// group members without vault access are filtered out by the server when it sends the share
+// notifications, and they can't open the resource either
+const showVaultGroupNotice = computed(
+  () =>
+    unref(isVaultResource) &&
+    unref(selectedCollaborators).some(({ shareType }) => shareType === ShareTypes.group.value)
+)
 
 // no local fallback: the default lives only in the server's vault config
 const vaultDefaultExpirationDays = capabilityRefs.vaultDefaultShareExpirationDays
