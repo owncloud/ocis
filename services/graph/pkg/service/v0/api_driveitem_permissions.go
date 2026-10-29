@@ -283,7 +283,9 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 		} else {
 			// the vault share check only reads role assignments, and a user of another instance has
 			// none here before their first login here. Without one the check refuses the share.
-			if IsVaultResource(resourceID) {
+			// Only a sharer who may share the resource gets this far, the role must not be
+			// assignable by someone whose share the storage refuses anyway.
+			if IsVaultResource(resourceID) && statResponse.GetInfo().GetPermissionSet().GetAddGrant() {
 				if err := s.assignGuestVaultRole(ctx, user.GetId()); err != nil {
 					s.logger.Warn().Err(err).Str("resourceId", resourceId.GetStorageId()).Interface("userId", objectID).Msg("could not assign the guest vault role")
 				}

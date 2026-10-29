@@ -6,10 +6,13 @@ import (
 	"regexp"
 	"strings"
 
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"go-micro.dev/v4/metadata"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 )
 
@@ -53,7 +56,8 @@ func guestRoleName(mappings []guestRoleMapping, values []string) string {
 // give them, if that role grants vault mode. The vault share check only reads role assignments, so
 // without it a user of another instance can't receive a vault share before logging in here.
 func (g Graph) assignGuestVaultRole(ctx context.Context, userID string) error {
-	if len(g.guestRoleMapping) == 0 {
+	// like the proxy, only for multi-instance guests
+	if !g.config.MultiInstance.Enabled || len(g.guestRoleMapping) == 0 {
 		return nil
 	}
 	assignments, err := g.roleService.ListRoleAssignments(ctx, &settingssvc.ListRoleAssignmentsRequest{AccountUuid: userID})
@@ -99,11 +103,47 @@ func (g Graph) assignGuestVaultRole(ctx context.Context, userID string) error {
 		return err
 	}
 	serviceCtx = metadata.Set(serviceCtx, middleware.AccountID, g.config.ServiceAccount.ServiceAccountID)
-	_, err = g.roleService.AssignRoleToUser(serviceCtx, &settingssvc.AssignRoleToUserRequest{
+	assignment, err := g.roleService.AssignRoleToUser(serviceCtx, &settingssvc.AssignRoleToUserRequest{
 		AccountUuid: userID,
 		RoleId:      roleID,
 	})
-	return err
+	if err != nil {
+		return err
+	}
+
+	// like the other role assignments, adjust the personal space to the role and announce the
+	// change. The user had no role before.
+	canCreateDrives, err := g.checkUserPermission(serviceCtx, "Drives.Create", userID, gatewayClient)
+	if err != nil {
+		g.revertRoleAssignment(serviceCtx, userID, "", assignment.GetAssignment().GetId())
+		return err
+	}
+	if canCreateDrives {
+		err = shared.RestorePersonalSpace(serviceCtx, gatewayClient, userID)
+	} else {
+		err = shared.DisablePersonalSpace(serviceCtx, gatewayClient, userID)
+	}
+	if err != nil {
+		return err
+	}
+
+	oldRole := ""
+	e := events.UserFeatureChanged{
+		UserID: userID,
+		Features: []events.UserFeature{
+			{
+				Name:     "roleChanged",
+				Value:    roleID,
+				OldValue: &oldRole,
+			},
+		},
+		Timestamp: utils.TSNow(),
+	}
+	if currentUser, ok := revactx.ContextGetUser(ctx); ok {
+		e.Executant = currentUser.GetId()
+	}
+	g.publishEvent(ctx, e)
+	return nil
 }
 
 // matchesGuestRoleValue matches like the proxy's role mapping: the mapping value is an exact value

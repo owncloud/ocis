@@ -195,6 +195,8 @@ var _ = Describe("DriveItemPermissionsService", func() {
 					{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
 				}
 				createShareResponse.Share = &collaboration.Share{Id: &collaboration.ShareId{OpaqueId: "123"}}
+				// the sharer may share the resource
+				statResponse.Info.PermissionSet = &provider.ResourcePermissions{Stat: true, AddGrant: true}
 			})
 
 			It("is assigned to the recipient before a vault share is created", func() {
@@ -211,6 +213,22 @@ var _ = Describe("DriveItemPermissionsService", func() {
 				_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(assigned).To(Equal([]string{"1"}))
+			})
+
+			It("is not assigned when the sharer may not share the resource", func() {
+				statResponse.Info.Id = &provider.ResourceId{
+					StorageId: utils.VaultStorageProviderID,
+					SpaceId:   driveItemId.SpaceId,
+					OpaqueId:  driveItemId.OpaqueId,
+				}
+				statResponse.Info.PermissionSet = &provider.ResourcePermissions{Stat: true}
+				gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(&collaboration.CreateShareResponse{
+					Status: status.NewPermissionDenied(ctx, nil, "no permission to share"),
+				}, nil)
+
+				_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+				Expect(err).To(HaveOccurred())
+				Expect(assigned).To(BeEmpty())
 			})
 
 			It("is not assigned for a share outside the vault", func() {
