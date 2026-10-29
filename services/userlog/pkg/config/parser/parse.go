@@ -46,5 +46,5 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingServiceAccountSecret(cfg.Service.Name)
 	}
 
-	return shared.CheckNatsCredentials(cfg.Service.Name, cfg.Persistence.CredsFile, cfg.Persistence.Creds)
+	return shared.CheckNatsCredentials(cfg.Service.Name, cfg.Persistence.Store, cfg.Persistence.CredsFile, cfg.Persistence.Creds)
 }

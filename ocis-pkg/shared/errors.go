@@ -5,6 +5,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/reva/v2/pkg/natsauth"
+	revastore "github.com/owncloud/reva/v2/pkg/store"
 )
 
 func MissingMachineAuthApiKeyError(service string) error {
@@ -98,7 +99,12 @@ func MissingWOPISecretError(service string) error {
 // CheckNatsCredentials checks the NATS JWT credentials of a store at startup. The reva
 // store cannot return an error for invalid credentials. It only logs the error, and each
 // store operation fails later. It returns no error when both values are empty.
-func CheckNatsCredentials(service, credsFile, creds string) error {
+// Only the nats-js and nats-js-kv stores use the credentials. For other store types,
+// it does not check the credentials.
+func CheckNatsCredentials(service, store, credsFile, creds string) error {
+	if store != revastore.TypeNatsJS && store != revastore.TypeNatsJSKV {
+		return nil
+	}
 	if err := natsauth.Check(credsFile, creds); err != nil {
 		return fmt.Errorf("The NATS credentials for %s are not valid: %w", service, err)
 	}

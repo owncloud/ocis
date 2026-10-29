@@ -53,5 +53,5 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingServiceAccountID(cfg.Service.Name)
 	}
 
-	return shared.CheckNatsCredentials(cfg.Service.Name, cfg.Metadata.Cache.CredsFile, cfg.Metadata.Cache.Creds)
+	return shared.CheckNatsCredentials(cfg.Service.Name, cfg.Metadata.Cache.Store, cfg.Metadata.Cache.CredsFile, cfg.Metadata.Cache.Creds)
 }

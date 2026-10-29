@@ -24,8 +24,14 @@ A service-specific variable takes precedence over a global variable. In the
 same scope, the content takes precedence over the file.
 
 When JWT credentials are set, oCIS does not send the username and the
-password. oCIS checks the credentials at startup and gives a clear error for an
-invalid value.
+password. This rule also uses the scope. Example: `OCIS_NATS_CREDS_FILE` is set
+and `GRAPH_CACHE_AUTH_USERNAME` is set. Then the graph cache uses the username
+and the password. The same applies to `MICRO_REGISTRY_AUTH_USERNAME` and
+`MICRO_REGISTRY_AUTH_PASSWORD` for the service registry.
+
+oCIS checks the credentials at startup and gives a clear error for an invalid
+value. oCIS checks the credentials of a store or a cache only when its type is
+`nats-js` or `nats-js-kv`. Other types do not use the credentials.
 
 The embedded nats service does not support JWT mode. To use JWT
 authentication, run an external NATS cluster in operator mode and do not start
@@ -35,7 +41,8 @@ The NATS health checks of the services now use the same authentication and TLS
 settings as the service connections. Before this change, the health checks
 connected without credentials and without TLS. The proxy health check also used
 the events cluster ID as the NATS address. It now uses the events endpoint and
-skips the check when the endpoint is empty.
+skips the check when the endpoint is empty. Each health check keeps one NATS
+connection and uses it again for each probe.
 
 The create home cache of the gateway service did not get the TLS settings. It
 now has the variables `GATEWAY_CREATE_HOME_CACHE_ENABLE_TLS`,

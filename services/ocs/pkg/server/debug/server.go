@@ -20,21 +20,7 @@ func Server(opts ...Option) (*http.Server, error) {
 		WithCheck("web reachability", checks.NewHTTPCheck(options.Config.HTTP.Addr))
 
 	readyHandlerConfiguration := healthHandlerConfiguration.
-		WithCheck("nats reachability", func(ctx context.Context) error {
-			if len(options.Config.SigningKeys.Nodes) > 0 {
-				k := options.Config.SigningKeys
-				return checks.NewNatsCheckWithConfig(k.Nodes[0], stream.NatsConfig{
-					TLSInsecure:          k.TLSInsecure,
-					TLSRootCACertificate: k.TLSRootCACertificate,
-					EnableTLS:            k.EnableTLS,
-					AuthUsername:         k.AuthUsername,
-					AuthPassword:         k.AuthPassword,
-					CredsFile:            k.CredsFile,
-					Creds:                k.Creds,
-				})(ctx)
-			}
-			return nil
-		})
+		WithCheck("nats reachability", natsCheck(options))
 
 	return debug.NewService(
 		debug.Logger(options.Logger),
@@ -51,4 +37,21 @@ func Server(opts ...Option) (*http.Server, error) {
 		debug.CorsAllowedHeaders(options.Config.HTTP.CORS.AllowedHeaders),
 		debug.CorsAllowCredentials(options.Config.HTTP.CORS.AllowCredentials),
 	), nil
+}
+
+// natsCheck returns the check of the signing keys store. Without nodes, the check always succeeds.
+func natsCheck(options Options) func(context.Context) error {
+	k := options.Config.SigningKeys
+	if len(k.Nodes) == 0 {
+		return func(context.Context) error { return nil }
+	}
+	return checks.NewNatsCheckWithConfig(k.Nodes[0], stream.NatsConfig{
+		TLSInsecure:          k.TLSInsecure,
+		TLSRootCACertificate: k.TLSRootCACertificate,
+		EnableTLS:            k.EnableTLS,
+		AuthUsername:         k.AuthUsername,
+		AuthPassword:         k.AuthPassword,
+		CredsFile:            k.CredsFile,
+		Creds:                k.Creds,
+	})
 }

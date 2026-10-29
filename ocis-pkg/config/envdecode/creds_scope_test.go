@@ -89,6 +89,75 @@ func TestResolveCredsScope(t *testing.T) {
 	}
 }
 
+type credsScopeAuth struct {
+	AuthUsername string `env:"TEST_EVENTS_AUTH_USERNAME;TEST_SVC_EVENTS_AUTH_USERNAME"`
+	AuthPassword string `env:"TEST_EVENTS_AUTH_PASSWORD;TEST_SVC_EVENTS_AUTH_PASSWORD"`
+	CredsFile    string `env:"TEST_NATS_CREDS_FILE;TEST_SVC_EVENTS_CREDS_FILE"`
+	Creds        string `env:"TEST_NATS_CREDS;TEST_SVC_EVENTS_CREDS"`
+}
+
+func TestResolveCredsScopeUsernameAndPassword(t *testing.T) {
+	tests := []struct {
+		name      string
+		env       map[string]string
+		preset    credsScopeAuth // values from a config file
+		wantFile  string
+		wantCreds string
+	}{
+		{
+			name:     "service username and password win over a global file",
+			env:      map[string]string{"TEST_NATS_CREDS_FILE": "/global.creds", "TEST_SVC_EVENTS_AUTH_USERNAME": "user", "TEST_SVC_EVENTS_AUTH_PASSWORD": "pass"},
+			wantFile: "",
+		},
+		{
+			name: "service password wins over global content and a global file",
+			env:  map[string]string{"TEST_NATS_CREDS": "global", "TEST_NATS_CREDS_FILE": "/global.creds", "TEST_SVC_EVENTS_AUTH_PASSWORD": "pass"},
+		},
+		{
+			name:     "global username does not win over a global file",
+			env:      map[string]string{"TEST_NATS_CREDS_FILE": "/global.creds", "TEST_EVENTS_AUTH_USERNAME": "user"},
+			wantFile: "/global.creds",
+		},
+		{
+			name:      "service username does not win over service content",
+			env:       map[string]string{"TEST_SVC_EVENTS_CREDS": "svc", "TEST_SVC_EVENTS_AUTH_USERNAME": "user"},
+			wantCreds: "svc",
+		},
+		{
+			name:     "service file wins over a global username",
+			env:      map[string]string{"TEST_SVC_EVENTS_CREDS_FILE": "/svc.creds", "TEST_EVENTS_AUTH_USERNAME": "user"},
+			wantFile: "/svc.creds",
+		},
+		{
+			name:     "username from the config file does not win over a global file",
+			env:      map[string]string{"TEST_NATS_CREDS_FILE": "/global.creds"},
+			preset:   credsScopeAuth{AuthUsername: "user", AuthPassword: "pass"},
+			wantFile: "/global.creds",
+		},
+		{
+			name:     "service username does not clear a file from the config file",
+			env:      map[string]string{"TEST_SVC_EVENTS_AUTH_USERNAME": "user"},
+			preset:   credsScopeAuth{CredsFile: "/yaml.creds"},
+			wantFile: "/yaml.creds",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			for k, v := range tc.env {
+				t.Setenv(k, v)
+			}
+			cfg := tc.preset
+			if err := Decode(&cfg); err != nil {
+				t.Fatal(err)
+			}
+			if cfg.CredsFile != tc.wantFile || cfg.Creds != tc.wantCreds {
+				t.Errorf("got file %q creds %q, want file %q creds %q", cfg.CredsFile, cfg.Creds, tc.wantFile, tc.wantCreds)
+			}
+		})
+	}
+}
+
 func TestResolveCredsScopePrefixedPointerStruct(t *testing.T) {
 	t.Setenv("TEST_NATS_CREDS", "global")
 	t.Setenv("TEST_SVC_CACHE_CREDS_FILE", "/cache.creds")

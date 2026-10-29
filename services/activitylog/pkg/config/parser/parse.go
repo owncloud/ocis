@@ -35,5 +35,5 @@ func ParseConfig(cfg *config.Config) error {
 
 // Validate validates the config
 func Validate(cfg *config.Config) error {
-	return shared.CheckNatsCredentials(cfg.Service.Name, cfg.Store.CredsFile, cfg.Store.Creds)
+	return shared.CheckNatsCredentials(cfg.Service.Name, cfg.Store.Store, cfg.Store.CredsFile, cfg.Store.Creds)
 }

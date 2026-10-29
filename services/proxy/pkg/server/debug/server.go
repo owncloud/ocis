@@ -24,13 +24,7 @@ func Server(opts ...Option) (*http.Server, error) {
 		WithCheck("web reachability", checks.NewHTTPCheck(options.Config.HTTP.Addr))
 
 	readyHandlerConfiguration := healthHandlerConfiguration.
-		WithCheck("nats reachability", func(ctx context.Context) error {
-			// The proxy uses NATS only to publish events. An empty endpoint disables the events.
-			if options.Config.Events.Endpoint == "" {
-				return nil
-			}
-			return checks.NewNatsCheckWithConfig(options.Config.Events.Endpoint, stream.NatsConfig(options.Config.Events))(ctx)
-		})
+		WithCheck("nats reachability", natsCheck(options))
 
 	var configDumpFunc http.HandlerFunc = configDump(options.Config)
 	return debug.NewService(
@@ -45,6 +39,15 @@ func Server(opts ...Option) (*http.Server, error) {
 		debug.Ready(handlers.NewCheckHandler(readyHandlerConfiguration)),
 		debug.ConfigDump(configDumpFunc),
 	), nil
+}
+
+// natsCheck returns the check of the events broker. The proxy uses NATS only to publish
+// events. An empty endpoint disables the events, so the check then always succeeds.
+func natsCheck(options Options) func(context.Context) error {
+	if options.Config.Events.Endpoint == "" {
+		return func(context.Context) error { return nil }
+	}
+	return checks.NewNatsCheckWithConfig(options.Config.Events.Endpoint, stream.NatsConfig(options.Config.Events))
 }
 
 // configDump implements the config dump

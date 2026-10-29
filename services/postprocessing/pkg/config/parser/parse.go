@@ -48,7 +48,7 @@ func Validate(cfg *config.Config) error {
 			cfg.Postprocessing.Steps = append(cfg.Postprocessing.Steps, string(events.PPStepDelay))
 		}
 	}
-	return shared.CheckNatsCredentials(cfg.Service.Name, cfg.Store.CredsFile, cfg.Store.Creds)
+	return shared.CheckNatsCredentials(cfg.Service.Name, cfg.Store.Store, cfg.Store.CredsFile, cfg.Store.Creds)
 }
 
 func contains(all []string, candidate events.Postprocessingstep) bool {

@@ -101,6 +101,26 @@ func TestNewNatsCheckWithConfig(t *testing.T) {
 		err := checks.NewNatsCheckWithConfig(url, stream.NatsConfig{Creds: "not a creds file"})(context.Background())
 		require.ErrorContains(t, err, "could not configure the nats connection")
 	})
+
+	t.Run("probes use the same connection", func(t *testing.T) {
+		rotatedFile := filepath.Join(t.TempDir(), "user.creds")
+		require.NoError(t, os.WriteFile(rotatedFile, creds, 0o600))
+		check := checks.NewNatsCheckWithConfig(url, stream.NatsConfig{CredsFile: rotatedFile})
+		require.NoError(t, check(context.Background()))
+
+		// A rotation writes the file. The connection is open, so the probe does not read the file.
+		require.NoError(t, os.WriteFile(rotatedFile, creds[:len(creds)/3], 0o600))
+		require.NoError(t, check(context.Background()))
+	})
+
+	t.Run("probe retries invalid creds", func(t *testing.T) {
+		laterFile := filepath.Join(t.TempDir(), "user.creds")
+		check := checks.NewNatsCheckWithConfig(url, stream.NatsConfig{CredsFile: laterFile})
+		require.ErrorContains(t, check(context.Background()), "could not configure the nats connection")
+
+		require.NoError(t, os.WriteFile(laterFile, creds, 0o600))
+		require.NoError(t, check(context.Background()))
+	})
 }
 
 func TestNatsOptions(t *testing.T) {

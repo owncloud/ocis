@@ -28,21 +28,32 @@ func newTestCreds(t *testing.T) string {
 
 func TestCheckNatsCredentials(t *testing.T) {
 	t.Run("no credentials", func(t *testing.T) {
-		require.NoError(t, CheckNatsCredentials("proxy", "", ""))
+		require.NoError(t, CheckNatsCredentials("proxy", "nats-js-kv", "", ""))
 	})
 
 	t.Run("valid content", func(t *testing.T) {
-		require.NoError(t, CheckNatsCredentials("proxy", "", newTestCreds(t)))
+		require.NoError(t, CheckNatsCredentials("proxy", "nats-js-kv", "", newTestCreds(t)))
 	})
 
 	t.Run("partly written content", func(t *testing.T) {
 		creds := newTestCreds(t)
-		err := CheckNatsCredentials("proxy", "", creds[:len(creds)/3])
+		err := CheckNatsCredentials("proxy", "nats-js-kv", "", creds[:len(creds)/3])
 		require.ErrorContains(t, err, "proxy")
 	})
 
 	t.Run("missing file", func(t *testing.T) {
-		err := CheckNatsCredentials("proxy", filepath.Join(t.TempDir(), "missing.creds"), "")
+		err := CheckNatsCredentials("proxy", "nats-js-kv", filepath.Join(t.TempDir(), "missing.creds"), "")
+		require.ErrorContains(t, err, "proxy")
+	})
+
+	t.Run("store without nats", func(t *testing.T) {
+		for _, store := range []string{"memory", "redis-sentinel", "noop", ""} {
+			require.NoError(t, CheckNatsCredentials("proxy", store, filepath.Join(t.TempDir(), "missing.creds"), ""), store)
+		}
+	})
+
+	t.Run("nats-js store", func(t *testing.T) {
+		err := CheckNatsCredentials("proxy", "nats-js", filepath.Join(t.TempDir(), "missing.creds"), "")
 		require.ErrorContains(t, err, "proxy")
 	})
 }
