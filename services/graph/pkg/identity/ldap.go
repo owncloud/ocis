@@ -27,7 +27,6 @@ import (
 
 const (
 	givenNameAttribute  = "givenname"
-	surNameAttribute    = "sn"
 	identitiesAttribute = "oCExternalIdentity"
 	lastSignAttribute   = "oCLastSignInTimestamp"
 	ldapDateFormat      = "20060102150405Z0700"
@@ -61,12 +60,14 @@ type LDAP struct {
 	retryBaseDelay time.Duration
 	retryMaxDelay  time.Duration
 
-	userBaseDN          string
-	userFilter          string
-	userObjectClass     string
-	userIDisOctetString bool
-	userScope           int
-	userAttributeMap    userAttributeMap
+	userBaseDN                  string
+	userFilter                  string
+	userObjectClass             string
+	userAdditionalObjectClasses []string
+	userIDisOctetString         bool
+	userScope                   int
+	userAttributeMap            userAttributeMap
+	userSearchFilterTemplate    string
 
 	disableUserMechanism    DisableUserMechanismType
 	localUserDisableGroupDN string
@@ -144,9 +145,24 @@ func ParseDisableMechanismType(disableMechanism string) (DisableUserMechanismTyp
 }
 
 func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, instanceID string, masterID string) (*LDAP, error) {
-	if config.UserDisplayNameAttribute == "" || config.UserIDAttribute == "" ||
-		config.UserEmailAttribute == "" || config.UserNameAttribute == "" {
-		return nil, errors.New("invalid user attribute mappings")
+	requiredUserAttrs := map[string]string{
+		"UserDisplayNameAttribute": config.UserDisplayNameAttribute,
+		"UserIDAttribute":          config.UserIDAttribute,
+		"UserEmailAttribute":       config.UserEmailAttribute,
+		"UserNameAttribute":        config.UserNameAttribute,
+		"UserSurnameAttribute":     config.UserSurnameAttribute,
+	}
+	for name, value := range requiredUserAttrs {
+		if value == "" {
+			return nil, fmt.Errorf("invalid user attribute mappings: %s must not be empty", name)
+		}
+	}
+	// Normalize to the canonical "sn" spelling (LDAP attribute names are case-insensitive,
+	// and "surname" is its RFC 4519 schema alias) so downstream code can do a plain string
+	// compare instead of re-checking case/alias on every use.
+	surnameAttribute := config.UserSurnameAttribute
+	if strings.EqualFold(surnameAttribute, "sn") || strings.EqualFold(surnameAttribute, "surname") {
+		surnameAttribute = "sn"
 	}
 	uam := userAttributeMap{
 		displayName:         config.UserDisplayNameAttribute,
@@ -155,13 +171,17 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		userName:            config.UserNameAttribute,
 		accountEnabled:      config.UserEnabledAttribute,
 		givenName:           givenNameAttribute,
-		surname:             surNameAttribute,
+		surname:             surnameAttribute,
 		userType:            config.UserTypeAttribute,
 		identities:          identitiesAttribute,
 		lastSignIn:          lastSignAttribute,
 		externalID:          config.ExternalIDAttribute,
 		userMemberAttribute: config.UserMemberAttribute,
 		userGuestAttribute:  config.UserGuestAttribute,
+	}
+	userSearchFilterTemplate, searchAttrErr := userSearchFilterTemplateFor(uam, config.UserSearchAttributes)
+	if searchAttrErr != nil {
+		return nil, fmt.Errorf("error configuring user search attributes: %w", searchAttrErr)
 	}
 
 	if config.GroupNameAttribute == "" || config.GroupIDAttribute == "" {
@@ -234,9 +254,11 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		userBaseDN:                     config.UserBaseDN,
 		userFilter:                     config.UserFilter,
 		userObjectClass:                config.UserObjectClass,
+		userAdditionalObjectClasses:    config.UserAdditionalObjectClasses,
 		userIDisOctetString:            config.UserIDIsOctetString,
 		userScope:                      userScope,
 		userAttributeMap:               uam,
+		userSearchFilterTemplate:       userSearchFilterTemplate,
 		groupBaseDN:                    config.GroupBaseDN,
 		groupCreateBaseDN:              config.GroupCreateBaseDN,
 		groupFilter:                    config.GroupFilter,
@@ -423,6 +445,15 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 		}
 	}
 
+	// person's mandatory "sn" is a separate attribute from the configured one above;
+	// keep it in sync like CreateUser does.
+	if sn := user.GetSurname(); sn != "" && i.mirrorSurnameIntoSN() {
+		if e.GetEqualFoldAttributeValue("sn") != sn {
+			mr.Replace("sn", []string{sn})
+			updateNeeded = true
+		}
+	}
+
 	if user.PasswordProfile != nil && user.PasswordProfile.GetPassword() != "" {
 		if i.usePwModifyExOp {
 			if err := i.updateUserPassword(ctx, e.DN, user.PasswordProfile.GetPassword()); err != nil {
@@ -525,6 +556,47 @@ func (i *LDAP) AddUser(ctx context.Context, id string, instanceID string) (libre
 	return *u, nil
 }
 
+// %[1]s is reused by every clause so userSearchFilter fills them all with one Sprintf arg.
+// Excluding mail from the configured names keeps search from revealing which address is whose.
+func userSearchFilterTemplateFor(uam userAttributeMap, logicalNames []string) (string, error) {
+	if len(logicalNames) == 0 {
+		return "", errors.New("at least one user search attribute must be configured")
+	}
+	var b strings.Builder
+	b.WriteString("(|")
+	for _, name := range logicalNames {
+		var attr string
+		switch {
+		case strings.EqualFold(name, "onPremisesSamAccountName"):
+			attr = uam.userName
+		case strings.EqualFold(name, "displayName"):
+			attr = uam.displayName
+		case strings.EqualFold(name, "surname"):
+			attr = uam.surname
+		case strings.EqualFold(name, "mail"):
+			attr = uam.mail
+		default:
+			// Not one of the known logical names; treat it as a literal LDAP attribute
+			// name so admins can search on attributes graph has no logical name for (e.g. "uid").
+			attr = name
+		}
+		b.WriteString("(")
+		// attr is admin-configured, not user input, but a literal '%' would still corrupt the
+		// Sprintf template below
+		b.WriteString(strings.ReplaceAll(attr, "%", "%%"))
+		b.WriteString("=*%[1]s*)")
+	}
+	b.WriteString(")")
+	return b.String(), nil
+}
+
+func (i *LDAP) userSearchFilter(term string) string {
+	if term == "" || i.userSearchFilterTemplate == "" {
+		return ""
+	}
+	return fmt.Sprintf(i.userSearchFilterTemplate, ldap.EscapeFilter(term))
+}
+
 func (i *LDAP) getUserByDN(dn, searchTerm string) (*ldap.Entry, error) {
 	baseFilter := fmt.Sprintf("(objectClass=%s)", i.userObjectClass)
 
@@ -532,16 +604,7 @@ func (i *LDAP) getUserByDN(dn, searchTerm string) (*ldap.Entry, error) {
 	if i.userFilter != "" {
 		userFilter = fmt.Sprintf("(%s)", i.userFilter)
 	}
-	searchFilter := ""
-	if searchTerm != "" {
-		searchTerm = ldap.EscapeFilter(searchTerm)
-		searchFilter = fmt.Sprintf(
-			"(|(%s=*%s*)(%s=*%s*)(%s=*%s*))",
-			i.userAttributeMap.userName, searchTerm,
-			i.userAttributeMap.mail, searchTerm,
-			i.userAttributeMap.displayName, searchTerm,
-		)
-	}
+	searchFilter := i.userSearchFilter(searchTerm)
 
 	filter := baseFilter
 	if userFilter != "" || searchFilter != "" {
@@ -805,16 +868,7 @@ func (i *LDAP) FilterUsers(ctx context.Context, oreq *godata.GoDataRequest, filt
 		return nil, err
 	}
 
-	var userFilter string
-	if search != "" {
-		search = ldap.EscapeFilter(search)
-		userFilter = fmt.Sprintf(
-			"(|(%s=*%s*)(%s=*%s*)(%s=*%s*))",
-			i.userAttributeMap.userName, search,
-			i.userAttributeMap.mail, search,
-			i.userAttributeMap.displayName, search,
-		)
-	}
+	userFilter := i.userSearchFilter(search)
 	userFilter = fmt.Sprintf("(&%s(objectClass=%s)%s%s)", i.userFilter, i.userObjectClass, queryFilter, userFilter)
 	searchRequest := ldap.NewSearchRequest(
 		i.userBaseDN, i.userScope, ldap.NeverDerefAliases, 0, 0, false,
@@ -1152,7 +1206,7 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 		i.userAttributeMap.displayName: {user.GetDisplayName()},
 		i.userAttributeMap.userName:    {user.GetOnPremisesSamAccountName()},
 		i.userAttributeMap.mail:        {user.GetMail()},
-		"objectClass":                  {"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"},
+		"objectClass":                  append([]string{"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"}, i.userAdditionalObjectClasses...),
 		"cn":                           {user.GetOnPremisesSamAccountName()},
 		i.userAttributeMap.userType:    {user.GetUserType()},
 	}
@@ -1180,7 +1234,7 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 		}
 	}
 
-	// inetOrgPerson requires "sn" to be set. Set it to the Username if
+	// inetOrgPerson/person require "sn" to be set. Set it to the Username if
 	// Surname is not set in the Request
 	var sn string
 	if user.Surname != nil && *user.Surname != "" {
@@ -1189,6 +1243,10 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 		sn = user.OnPremisesSamAccountName
 	}
 	attrs[i.userAttributeMap.surname] = []string{sn}
+	if i.mirrorSurnameIntoSN() {
+		// person's mandatory "sn" is a separate attribute from the configured one above
+		attrs["sn"] = []string{sn}
+	}
 
 	// When we get a givenName, we set the attribute.
 	if givenName := user.GetGivenName(); givenName != "" {
@@ -1218,6 +1276,12 @@ func (i *LDAP) identityToLDAPAttrValue(identity libregraph.ObjectIdentity) (stri
 	return identityStr, nil
 }
 
+// mirrorSurnameIntoSN reports whether the configured surname attribute is not itself
+// "sn", meaning person's mandatory "sn" must be kept in sync as a separate attribute.
+func (i *LDAP) mirrorSurnameIntoSN() bool {
+	return i.userAttributeMap.surname != "sn"
+}
+
 func (i *LDAP) getUserAttrTypesForSearch() []string {
 	return []string{
 		i.userAttributeMap.displayName,
@@ -1237,7 +1301,12 @@ func (i *LDAP) getUserAttrTypesForSearch() []string {
 }
 
 func (i *LDAP) getUserAttrTypes() []string {
-	return append(i.getUserAttrTypesForSearch(), "cn", "userPassword", "objectClass")
+	types := append(i.getUserAttrTypesForSearch(), "cn", "objectClass")
+	if i.mirrorSurnameIntoSN() {
+		// userToLDAPAttrValues also mirrors surname into the literal "sn" person requires
+		types = append(types, "sn")
+	}
+	return types
 }
 
 func (i *LDAP) getUserLDAPDN(user libregraph.User) string {
@@ -1261,6 +1330,9 @@ func (i *LDAP) userToAddRequest(user libregraph.User) (*ldap.AddRequest, error) 
 		if values, ok := attrMap[attrType]; ok {
 			ar.Attribute(attrType, values)
 		}
+	}
+	if values, ok := attrMap["userPassword"]; ok {
+		ar.Attribute("userPassword", values)
 	}
 	return ar, nil
 }
@@ -1408,16 +1480,7 @@ func (i *LDAP) expandLDAPAttributeEntriesByUsername(ctx context.Context, e *ldap
 	logger.Debug().Str("backend", "ldap").Msg("ExpandLDAPAttributeEntries")
 	result := []*ldap.Entry{}
 
-	searchFilter := ""
-	if searchTerm != "" {
-		searchTerm = ldap.EscapeFilter(searchTerm)
-		searchFilter = fmt.Sprintf(
-			"(|(%s=*%s*)(%s=*%s*)(%s=*%s*))",
-			i.userAttributeMap.userName, searchTerm,
-			i.userAttributeMap.mail, searchTerm,
-			i.userAttributeMap.displayName, searchTerm,
-		)
-	}
+	searchFilter := i.userSearchFilter(searchTerm)
 
 	for _, entryUid := range e.GetEqualFoldAttributeValues(attribute) {
 		if entryUid == "" {
