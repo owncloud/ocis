@@ -15,7 +15,7 @@ func Server(opts ...Option) (*http.Server, error) {
 
 	readyHandler := handlers.NewCheckHandler(handlers.NewCheckHandlerConfiguration().
 		WithLogger(options.Logger).
-		WithCheck("nats reachability", checks.NewNatsCheckWithConfig(options.Config.Events.Addr, options.Config.Events.NatsConfig())).
+		WithCheck("nats reachability", checks.NewNatsCheckWithConfig(options.Config.Events.Endpoint, options.Config.Events.NatsConfig())).
 		WithCheck("grpc reachability", checks.NewGRPCCheck(options.Config.GRPC.Addr)),
 	)
 

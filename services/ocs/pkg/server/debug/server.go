@@ -1,7 +1,6 @@
 package debug
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/checks"
@@ -19,7 +18,7 @@ func Server(opts ...Option) (*http.Server, error) {
 		WithCheck("web reachability", checks.NewHTTPCheck(options.Config.HTTP.Addr))
 
 	readyHandlerConfiguration := healthHandlerConfiguration.
-		WithCheck("nats reachability", natsCheck(options))
+		WithCheck("nats reachability", checks.NewNatsStoreCheck(options.Config.SigningKeys.Store, options.Config.SigningKeys.Nodes, options.Config.SigningKeys.NatsConfig()))
 
 	return debug.NewService(
 		debug.Logger(options.Logger),
@@ -36,13 +35,4 @@ func Server(opts ...Option) (*http.Server, error) {
 		debug.CorsAllowedHeaders(options.Config.HTTP.CORS.AllowedHeaders),
 		debug.CorsAllowCredentials(options.Config.HTTP.CORS.AllowCredentials),
 	), nil
-}
-
-// natsCheck returns the check of the signing keys store. Without nodes, the check always succeeds.
-func natsCheck(options Options) func(context.Context) error {
-	k := options.Config.SigningKeys
-	if len(k.Nodes) == 0 {
-		return func(context.Context) error { return nil }
-	}
-	return checks.NewNatsCheckWithConfig(k.Nodes[0], k.NatsConfig())
 }

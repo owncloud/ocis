@@ -5,9 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/nats-io/jwt/v2"
 	"github.com/nats-io/nats.go"
-	"github.com/nats-io/nkeys"
+	"github.com/owncloud/ocis/v2/ocis-pkg/natstest"
 	"github.com/stretchr/testify/require"
 )
 
@@ -53,6 +52,14 @@ func TestGetCreds(t *testing.T) {
 		require.Empty(t, creds)
 	})
 
+	t.Run("registry username alone does not take precedence over global variables", func(t *testing.T) {
+		t.Setenv(_natsCredsFileEnv, "/global.creds")
+		t.Setenv(_registryUsernameEnv, "user")
+		credsFile, creds := getCreds()
+		require.Equal(t, "/global.creds", credsFile)
+		require.Empty(t, creds)
+	})
+
 	t.Run("registry file takes precedence over registry username", func(t *testing.T) {
 		t.Setenv(_registryCredsFileEnv, "/registry.creds")
 		t.Setenv(_registryUsernameEnv, "user")
@@ -62,32 +69,15 @@ func TestGetCreds(t *testing.T) {
 	})
 }
 
-func newTestCreds(t *testing.T) []byte {
-	t.Helper()
-	accountKP, err := nkeys.CreateAccount()
-	require.NoError(t, err)
-	userKP, err := nkeys.CreateUser()
-	require.NoError(t, err)
-	userPub, err := userKP.PublicKey()
-	require.NoError(t, err)
-	userJWT, err := jwt.NewUserClaims(userPub).Encode(accountKP)
-	require.NoError(t, err)
-	seed, err := userKP.Seed()
-	require.NoError(t, err)
-	creds, err := jwt.FormatUserConfig(userJWT, seed)
-	require.NoError(t, err)
-	return creds
-}
-
 func TestCredentialsOptionChecksOnlyOnce(t *testing.T) {
-	creds := newTestCreds(t)
+	creds := natstest.Creds(t)
 	credsFile := filepath.Join(t.TempDir(), "user.creds")
 	require.NoError(t, os.WriteFile(credsFile, creds, 0o600))
 	t.Setenv(_natsCredsFileEnv, credsFile)
 
 	n := &storeregistry{}
 
-	// first call: the file is checked
+	// first call: credentialsOption checks the file
 	opt, err := n.credentialsOption()
 	require.NoError(t, err)
 	require.NotNil(t, opt)
@@ -113,7 +103,7 @@ func TestCredentialsOptionChecksOnlyOnce(t *testing.T) {
 	require.Error(t, err)
 
 	// after the rotation the callbacks use the new file
-	newCreds := newTestCreds(t)
+	newCreds := natstest.Creds(t)
 	require.NoError(t, os.WriteFile(credsFile, newCreds, 0o600))
 	userJWT, err := o.UserJWT()
 	require.NoError(t, err)
@@ -130,7 +120,7 @@ func TestCredentialsOptionFirstCallFails(t *testing.T) {
 }
 
 func TestCredentialsOptionContent(t *testing.T) {
-	t.Setenv(_natsCredsEnv, string(newTestCreds(t)))
+	t.Setenv(_natsCredsEnv, string(natstest.Creds(t)))
 	n := &storeregistry{}
 	for i := 0; i < 2; i++ {
 		opt, err := n.credentialsOption()
