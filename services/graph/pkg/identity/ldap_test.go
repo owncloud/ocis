@@ -130,8 +130,8 @@ func TestNewLDAPBackend(t *testing.T) {
 
 	tc = lconfig
 	tc.UserSearchAttributes = []string{"notARealAttribute"}
-	if _, err := NewLDAPBackend(l, tc, &logger, "", ""); err == nil {
-		t.Error("Should fail with an unsupported user search attribute name")
+	if _, err := NewLDAPBackend(l, tc, &logger, "", ""); err != nil {
+		t.Errorf("Should accept an unrecognized name as a literal LDAP attribute: %v", err)
 	}
 }
 

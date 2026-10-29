@@ -32,10 +32,6 @@ const (
 	ldapDateFormat      = "20060102150405Z0700"
 )
 
-// Logical names accepted in config.LDAP.UserSearchAttributes; keep in sync with the switch in
-// userSearchFilterTemplateFor and config.go's UserSearchAttributes desc.
-const userSearchValidAttributeNames = "onPremisesSamAccountName, displayName, surname, mail"
-
 // DisableUserMechanismType is used instead of directly using the string values from the configuration.
 type DisableUserMechanismType int64
 
@@ -64,13 +60,14 @@ type LDAP struct {
 	retryBaseDelay time.Duration
 	retryMaxDelay  time.Duration
 
-	userBaseDN               string
-	userFilter               string
-	userObjectClass          string
-	userIDisOctetString      bool
-	userScope                int
-	userAttributeMap         userAttributeMap
-	userSearchFilterTemplate string
+	userBaseDN                  string
+	userFilter                  string
+	userObjectClass             string
+	userAdditionalObjectClasses []string
+	userIDisOctetString         bool
+	userScope                   int
+	userAttributeMap            userAttributeMap
+	userSearchFilterTemplate    string
 
 	disableUserMechanism    DisableUserMechanismType
 	localUserDisableGroupDN string
@@ -256,6 +253,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		userBaseDN:                     config.UserBaseDN,
 		userFilter:                     config.UserFilter,
 		userObjectClass:                config.UserObjectClass,
+		userAdditionalObjectClasses:    config.UserAdditionalObjectClasses,
 		userIDisOctetString:            config.UserIDIsOctetString,
 		userScope:                      userScope,
 		userAttributeMap:               uam,
@@ -567,18 +565,19 @@ func userSearchFilterTemplateFor(uam userAttributeMap, logicalNames []string) (s
 	b.WriteString("(|")
 	for _, name := range logicalNames {
 		var attr string
-		switch name {
-		case "onPremisesSamAccountName":
+		switch {
+		case strings.EqualFold(name, "onPremisesSamAccountName"):
 			attr = uam.userName
-		case "displayName":
+		case strings.EqualFold(name, "displayName"):
 			attr = uam.displayName
-		case "surname":
+		case strings.EqualFold(name, "surname"):
 			attr = uam.surname
-		case "mail":
+		case strings.EqualFold(name, "mail"):
 			attr = uam.mail
 		default:
-			// keep in sync with userSearchValidAttributeNames and config.go's UserSearchAttributes desc
-			return "", fmt.Errorf("invalid user search attribute %q: valid values are: %s", name, userSearchValidAttributeNames)
+			// Not one of the known logical names; treat it as a literal LDAP attribute
+			// name so admins can search on attributes graph has no logical name for (e.g. "uid").
+			attr = name
 		}
 		b.WriteString("(")
 		// attr is admin-configured, not user input, but a literal '%' would still corrupt the
@@ -1212,7 +1211,7 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 		i.userAttributeMap.displayName: {user.GetDisplayName()},
 		i.userAttributeMap.userName:    {user.GetOnPremisesSamAccountName()},
 		i.userAttributeMap.mail:        {user.GetMail()},
-		"objectClass":                  {"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"},
+		"objectClass":                  append([]string{"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"}, i.userAdditionalObjectClasses...),
 		"cn":                           {user.GetOnPremisesSamAccountName()},
 		i.userAttributeMap.userType:    {user.GetUserType()},
 	}
