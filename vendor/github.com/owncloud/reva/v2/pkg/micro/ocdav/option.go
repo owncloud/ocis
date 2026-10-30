@@ -72,6 +72,7 @@ type Options struct {
 	AllowedMethods                      []string
 	AllowDepthInfinity                  bool
 	DisablePropfindPublicLinkResolution bool
+	EnableEmptyLegacyWebdavResponse     bool
 
 	RegisterTTL      time.Duration
 	RegisterInterval time.Duration
@@ -119,6 +120,13 @@ func AllowDepthInfinity(val bool) Option {
 func DisablePropfindPublicLinkResolution(val bool) Option {
 	return func(o *Options) {
 		o.DisablePropfindPublicLinkResolution = val
+	}
+}
+
+// EnableEmptyLegacyWebdavResponse enables returning an empty 207 response for PROPFIND on the legacy webdav root.
+func EnableEmptyLegacyWebdavResponse(val bool) Option {
+	return func(o *Options) {
+		o.EnableEmptyLegacyWebdavResponse = val
 	}
 }
 

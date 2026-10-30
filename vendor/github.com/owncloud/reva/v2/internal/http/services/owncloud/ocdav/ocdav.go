@@ -178,6 +178,7 @@ func (s *svc) Handler() http.Handler {
 		base := path.Join("/", s.Prefix())
 
 		var head string
+		var hasRemotePHP bool
 		head, r.URL.Path = router.ShiftPath(r.URL.Path)
 		log.Debug().Str("method", r.Method).Str("head", head).Str("tail", r.URL.Path).Msg("http routing")
 		switch head {
@@ -187,6 +188,7 @@ func (s *svc) Handler() http.Handler {
 		case "remote.php":
 			// skip optional "remote.php"
 			head, r.URL.Path = router.ShiftPath(r.URL.Path)
+			hasRemotePHP = true
 
 			// yet, add it to baseURI
 			base = path.Join(base, "remote.php")
@@ -214,6 +216,17 @@ func (s *svc) Handler() http.Handler {
 			base = path.Join(base, "webdav")
 			ctx := context.WithValue(ctx, net.CtxKeyBaseURI, base)
 			r = r.WithContext(ctx)
+			// The Desktop client issues a PROPFIND with Depth: 0 to /remote.php/webdav/ every 62 seconds
+			// to validate its OIDC token. See ConnectionValidator::checkAuthentication:
+			// https://github.com/owncloud/client/blob/c8a00cbe9e11222839b446b10a28485fc1e2552a/src/gui/connectionvalidator.cpp#L233
+			// When enabled, short-circuit here and return an empty 207 without touching any storage backend.
+			if s.c.EnableEmptyLegacyWebdavResponse && hasRemotePHP && r.Method == MethodPropfind && (r.URL.Path == "/" || r.URL.Path == "") {
+				w.Header().Set("Content-Type", "application/xml; charset=utf-8")
+				w.Header().Set("DAV", "1, 2, 3, extended-mkcol, access-control, owncloud-locking")
+				w.WriteHeader(http.StatusMultiStatus)
+				_, _ = w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?><d:multistatus xmlns:d="DAV:"></d:multistatus>`))
+				return
+			}
 			s.webDavHandler.Handler(s).ServeHTTP(w, r)
 			return
 		case "dav":

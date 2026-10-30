@@ -33,6 +33,7 @@ type Config struct {
 	ProductVersion                      string                            `mapstructure:"product_version"`
 	AllowPropfindDepthInfinitiy         bool                              `mapstructure:"allow_depth_infinity"`
 	DisablePropfindPublicLinkResolution bool                              `mapstructure:"disable_propfind_public_link_resolution"`
+	EnableEmptyLegacyWebdavResponse     bool                              `mapstructure:"enable_empty_legacy_webdav_response"`
 
 	TransferSharedSecret string `mapstructure:"transfer_shared_secret"`
 

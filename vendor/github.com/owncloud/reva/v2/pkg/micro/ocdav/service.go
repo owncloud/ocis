@@ -155,6 +155,7 @@ func setDefaults(sopts *Options) error {
 
 	sopts.config.AllowPropfindDepthInfinitiy = sopts.AllowDepthInfinity
 	sopts.config.DisablePropfindPublicLinkResolution = sopts.DisablePropfindPublicLinkResolution
+	sopts.config.EnableEmptyLegacyWebdavResponse = sopts.EnableEmptyLegacyWebdavResponse
 
 	return nil
 }
