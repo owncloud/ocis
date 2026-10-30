@@ -47,6 +47,10 @@ check keeps one NATS connection and uses it again for each probe. Each probe
 sends a PING to the NATS server, so the check finds a lost server at once. A
 slow NATS server does not block the other probes.
 
+The userlog service had no default node for its store. With
+`OCIS_PERSISTENT_STORE=nats-js-kv` it could not connect to NATS. It now uses
+`127.0.0.1:9233` like the other services.
+
 The create home cache of the gateway service did not get the TLS settings. It
 now has the variables `GATEWAY_CREATE_HOME_CACHE_ENABLE_TLS`,
 `GATEWAY_CREATE_HOME_CACHE_TLS_INSECURE`, and

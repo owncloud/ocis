@@ -37,6 +37,7 @@ func DefaultConfig() *config.Config {
 		MaxConcurrency: 1,
 		Persistence: config.Persistence{
 			Store:    "memory",
+			Nodes:    []string{"127.0.0.1:9233"},
 			Database: "userlog",
 			Table:    "events",
 			TTL:      time.Hour * 336,
