@@ -13,6 +13,8 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	invitepb "github.com/cs3org/go-cs3apis/cs3/ocm/invite/v1beta1"
+	permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
+	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/go-chi/chi/v5"
@@ -20,14 +22,18 @@ import (
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/permission"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/status"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
 	"github.com/stretchr/testify/mock"
 	"go-micro.dev/v4/client"
+	gmmetadata "go-micro.dev/v4/metadata"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -865,6 +871,396 @@ var _ = Describe("Users", func() {
 
 					Expect(res.Value).To(BeEmpty())
 				})
+			})
+
+			Describe("the vaultEligible filter, with a cross-instance match without a role here", func() {
+				const (
+					crossInstanceUser = "cross-instance-user"
+					localUser         = "local-user"
+					guestRole         = "user-light"
+					vaultGuestRole    = "user-light-vault"
+				)
+				mapping := []string{"lehrer:" + vaultGuestRole, "Nutzerverwalter:" + vaultGuestRole}
+
+				// search runs the vaultEligible search for a cross-instance match with the given
+				// userClass and membership, in a service with the given guest role mapping.
+				search := func(mapping []string, userClass []string, member bool, assignments []*settingsmsg.UserRoleAssignment) []string {
+					cfg.MultiInstance.GuestRoleMapping = mapping
+					mappedSvc, err := service.NewService(
+						service.Config(cfg),
+						service.WithGatewaySelector(gatewaySelector),
+						service.EventsPublisher(&eventsPublisher),
+						service.WithIdentityBackend(identityBackend),
+						service.WithRoleService(roleService),
+						service.WithValueService(valueService),
+						service.PermissionService(permissionService),
+					)
+					Expect(err).ToNot(HaveOccurred())
+
+					crossInstance := &libregraph.User{}
+					crossInstance.SetId(crossInstanceUser)
+					identityBackend.On("GetPreciseUser", mock.Anything, "someone", "school5", mock.Anything).
+						Return(crossInstance, nil)
+					identityBackend.On("GetUserClass", mock.Anything, crossInstanceUser).Return(userClass, member, nil)
+					expectAssignments(crossInstanceUser, assignments, nil)
+
+					// the mapping names roles, so the bundles need their names
+					roleService.On("ListRoles", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListBundlesResponse{
+						Bundles: []*settingsmsg.Bundle{
+							{
+								Id:   vaultRole,
+								Name: vaultGuestRole,
+								Type: settingsmsg.Bundle_TYPE_ROLE,
+								Settings: []*settingsmsg.Setting{
+									{
+										Name:  permission.VaultMode,
+										Value: &settingsmsg.Setting_PermissionValue{PermissionValue: &settingsmsg.Permission{}},
+									},
+								},
+							},
+							{
+								Id:   vaultLessRole,
+								Name: guestRole,
+								Type: settingsmsg.Bundle_TYPE_ROLE,
+							},
+						},
+					}, nil)
+
+					r := httptest.NewRequest(http.MethodGet,
+						"/graph/v1.0/users?$search="+url.QueryEscape(`"someone@school5.example.test"`)+
+							"&$filter="+url.QueryEscape("vaultEligible eq true"), nil)
+					mappedSvc.GetUsers(rr, r)
+
+					Expect(rr.Code).To(Equal(http.StatusOK))
+					data, err := io.ReadAll(rr.Body)
+					Expect(err).ToNot(HaveOccurred())
+					res := userList{}
+					Expect(json.Unmarshal(data, &res)).To(Succeed())
+
+					ids := make([]string, 0, len(res.Value))
+					for _, u := range res.Value {
+						ids = append(ids, u.GetId())
+					}
+					return ids
+				}
+
+				DescribeTable("checks the role their first login here will give them",
+					func(mapping []string, userClass []string, member bool, included bool) {
+						identityBackend.On("GetUsers", mock.Anything, mock.Anything).Return([]*libregraph.User{}, nil)
+
+						ids := search(mapping, userClass, member, nil)
+						if included {
+							Expect(ids).To(ConsistOf(crossInstanceUser))
+						} else {
+							Expect(ids).To(BeEmpty())
+						}
+					},
+					Entry("includes a teacher", mapping, []string{"lehrer"}, false, true),
+					Entry("includes a local admin", mapping, []string{"Nutzerverwalter"}, false, true),
+					Entry("excludes a student, no mapping matches", mapping, []string{"schueler"}, false, false),
+					Entry("excludes a user without userClass", mapping, nil, false, false),
+					Entry("excludes everyone without a mapping", nil, []string{"lehrer"}, false, false),
+					Entry("excludes a member of this instance, who gets the role of members at login",
+						mapping, []string{"lehrer"}, true, false),
+					Entry("matches a regular expression", []string{"lehr.*:" + vaultGuestRole}, []string{"lehrer"}, false, true),
+					Entry("excludes when the first matching mapping gives a role without vault mode",
+						[]string{"lehrer:" + guestRole, "lehrer:" + vaultGuestRole}, []string{"lehrer"}, false, false),
+				)
+
+				It("keeps the role the user got at a login here", func() {
+					identityBackend.On("GetUsers", mock.Anything, mock.Anything).Return([]*libregraph.User{}, nil)
+
+					ids := search(mapping, []string{"lehrer"}, false, []*settingsmsg.UserRoleAssignment{
+						{Id: "assignment-ID", AccountUuid: crossInstanceUser, RoleId: vaultLessRole},
+					})
+					Expect(ids).To(BeEmpty())
+					identityBackend.AssertNotCalled(GinkgoT(), "GetUserClass", mock.Anything, mock.Anything)
+				})
+
+				It("does not apply the mapping to users of this instance without a role", func() {
+					local := &libregraph.User{}
+					local.SetId(localUser)
+					identityBackend.On("GetUsers", mock.Anything, mock.Anything).Return([]*libregraph.User{local}, nil)
+					expectAssignments(localUser, nil, nil)
+
+					ids := search(mapping, []string{"lehrer"}, false, nil)
+					Expect(ids).To(ConsistOf(crossInstanceUser))
+					identityBackend.AssertNotCalled(GinkgoT(), "GetUserClass", mock.Anything, localUser)
+				})
+
+				It("refuses to start with an invalid mapping", func() {
+					cfg.MultiInstance.GuestRoleMapping = []string{"lehrer"}
+					_, err := service.NewService(
+						service.Config(cfg),
+						service.WithGatewaySelector(gatewaySelector),
+						service.EventsPublisher(&eventsPublisher),
+						service.WithIdentityBackend(identityBackend),
+						service.WithRoleService(roleService),
+						service.WithValueService(valueService),
+						service.PermissionService(permissionService),
+					)
+					Expect(err).To(HaveOccurred())
+				})
+			})
+		})
+
+		Describe("withGuestVaultRole", func() {
+			const (
+				guestUser      = "guest-user"
+				guestRole      = "user-light"
+				vaultGuestRole = "user-light-vault"
+				serviceAccount = "service-account-ID"
+			)
+			vaultMapping := []string{"lehrer:" + vaultGuestRole}
+			var (
+				guestSvc service.Graph
+				// a publisher of its own: the shared one keeps the events of other tests
+				guestEvents *mocks.Publisher
+			)
+
+			// newGuestService creates a service with the given guest role mapping
+			newGuestService := func(mapping []string) {
+				cfg.MultiInstance.Enabled = true
+				cfg.MultiInstance.GuestRoleMapping = mapping
+				cfg.ServiceAccount.ServiceAccountID = serviceAccount
+				guestEvents = &mocks.Publisher{}
+				guestEvents.On("Publish", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+				var err error
+				guestSvc, err = service.NewService(
+					service.Config(cfg),
+					service.WithGatewaySelector(gatewaySelector),
+					service.EventsPublisher(guestEvents),
+					service.WithIdentityBackend(identityBackend),
+					service.WithRoleService(roleService),
+					service.WithValueService(valueService),
+					service.PermissionService(permissionService),
+				)
+				Expect(err).ToNot(HaveOccurred())
+			}
+			// expectUserClass reports the guest as a user of another instance with the given userClass
+			expectUserClass := func(userClass ...string) {
+				identityBackend.On("GetUserClass", mock.Anything, guestUser).Return(userClass, false, nil)
+			}
+			// the mapping names roles, so the bundles need their names
+			expectNamedRoles := func() {
+				roleService.On("ListRoles", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListBundlesResponse{
+					Bundles: []*settingsmsg.Bundle{
+						{
+							Id:   vaultRole,
+							Name: vaultGuestRole,
+							Type: settingsmsg.Bundle_TYPE_ROLE,
+							Settings: []*settingsmsg.Setting{
+								{
+									Name:  permission.VaultMode,
+									Value: &settingsmsg.Setting_PermissionValue{PermissionValue: &settingsmsg.Permission{}},
+								},
+							},
+						},
+						{
+							Id:   vaultLessRole,
+							Name: guestRole,
+							Type: settingsmsg.Bundle_TYPE_ROLE,
+						},
+					},
+				}, nil)
+			}
+			expectAssignRole := func(err error) {
+				gatewayClient.On("Authenticate", mock.Anything, mock.Anything).
+					Return(&gateway.AuthenticateResponse{Status: status.NewOK(ctx), Token: "service-token"}, nil)
+				roleService.On("AssignRoleToUser",
+					// as the service account, and without the role ids of the sharing user
+					mock.MatchedBy(func(ctx context.Context) bool {
+						accountID, _ := gmmetadata.Get(ctx, middleware.AccountID)
+						_, hasRoleIDs := gmmetadata.Get(ctx, middleware.RoleIDs)
+						return accountID == serviceAccount && !hasRoleIDs
+					}),
+					mock.MatchedBy(func(in *settings.AssignRoleToUserRequest) bool {
+						return in.GetAccountUuid() == guestUser && in.GetRoleId() == vaultRole
+					}),
+					mock.Anything,
+				).Return(&settings.AssignRoleToUserResponse{
+					Assignment: &settingsmsg.UserRoleAssignment{Id: "new-assignment-ID", AccountUuid: guestUser, RoleId: vaultRole},
+				}, err)
+			}
+			// expectPersonalSpace answers the Drives.Create check of the new role and lists the
+			// guest's personal spaces
+			expectPersonalSpace := func(drivesCreate *cs3rpc.Status, spaces ...*provider.StorageSpace) {
+				gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserResponse{
+					Status: status.NewOK(ctx),
+					User:   &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: guestUser}},
+				}, nil)
+				gatewayClient.On("CheckPermission", mock.Anything, mock.MatchedBy(func(in *permissions.CheckPermissionRequest) bool {
+					return in.GetPermission() == "Drives.Create"
+				})).Return(&permissions.CheckPermissionResponse{Status: drivesCreate}, nil)
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+					Status:        status.NewOK(ctx),
+					StorageSpaces: spaces,
+				}, nil)
+			}
+			sharerCtx := func() context.Context {
+				return revactx.ContextSetUser(gmmetadata.Set(ctx, middleware.RoleIDs, `["teacher-role-ID"]`), currentUser)
+			}
+
+			expectRemoveRole := func() {
+				roleService.On("RemoveRoleFromUser", mock.Anything, mock.MatchedBy(func(in *settings.RemoveRoleFromUserRequest) bool {
+					return in.GetId() == "new-assignment-ID"
+				}), mock.Anything).Return(&emptypb.Empty{}, nil)
+			}
+			roleChanged := mock.MatchedBy(func(e events.UserFeatureChanged) bool {
+				return e.UserID == guestUser && e.Executant.GetOpaqueId() == currentUser.GetId().GetOpaqueId() &&
+					len(e.Features) == 1 && e.Features[0].Name == "roleChanged" && e.Features[0].Value == vaultRole
+			})
+			// expectAssignedRole sets up a guest without a role whose userClass maps to the vault role
+			expectAssignedRole := func() {
+				newGuestService(vaultMapping)
+				expectAssignments(guestUser, nil, nil)
+				expectUserClass("lehrer")
+				expectNamedRoles()
+				expectAssignRole(nil)
+			}
+			// shareOK and shareFails stand in for the share creation
+			shareOK := func() error { return nil }
+			shareFails := func() error { return errors.New("the share already exists") }
+
+			It("assigns the role before the share is created and finishes it afterwards", func() {
+				expectAssignedRole()
+				// a guest usually has no personal space here, then there is nothing to disable
+				expectPersonalSpace(status.NewPermissionDenied(ctx, nil, "no Drives.Create"))
+
+				shared := false
+				Expect(guestSvc.WithGuestVaultRole(sharerCtx(), guestUser, func() error {
+					shared = true
+					roleService.AssertNumberOfCalls(GinkgoT(), "AssignRoleToUser", 1)
+					// nothing else happens before the share exists
+					gatewayClient.AssertNotCalled(GinkgoT(), "ListStorageSpaces", mock.Anything, mock.Anything)
+					guestEvents.AssertNotCalled(GinkgoT(), "Publish", mock.Anything, roleChanged, mock.Anything)
+					return nil
+				})).To(Succeed())
+				Expect(shared).To(BeTrue())
+				gatewayClient.AssertNotCalled(GinkgoT(), "DeleteStorageSpace", mock.Anything, mock.Anything)
+				guestEvents.AssertCalled(GinkgoT(), "Publish", mock.Anything, roleChanged, mock.Anything)
+			})
+
+			It("removes the role again when the share fails, and returns its error", func() {
+				expectAssignedRole()
+				expectRemoveRole()
+
+				Expect(guestSvc.WithGuestVaultRole(sharerCtx(), guestUser, shareFails)).To(MatchError("the share already exists"))
+				roleService.AssertNumberOfCalls(GinkgoT(), "RemoveRoleFromUser", 1)
+				gatewayClient.AssertNotCalled(GinkgoT(), "ListStorageSpaces", mock.Anything, mock.Anything)
+				guestEvents.AssertNotCalled(GinkgoT(), "Publish", mock.Anything, roleChanged, mock.Anything)
+			})
+
+			It("disables a personal space the guest role has no Drives.Create for", func() {
+				expectAssignedRole()
+				expectPersonalSpace(status.NewPermissionDenied(ctx, nil, "no Drives.Create"), &provider.StorageSpace{
+					Id:        &provider.StorageSpaceId{OpaqueId: "personal-space-ID"},
+					SpaceType: "personal",
+				})
+				gatewayClient.On("DeleteStorageSpace", mock.Anything, mock.MatchedBy(func(in *provider.DeleteStorageSpaceRequest) bool {
+					return in.GetId().GetOpaqueId() == "personal-space-ID"
+				})).Return(&provider.DeleteStorageSpaceResponse{Status: status.NewOK(ctx)}, nil)
+
+				Expect(guestSvc.WithGuestVaultRole(sharerCtx(), guestUser, shareOK)).To(Succeed())
+				gatewayClient.AssertNumberOfCalls(GinkgoT(), "DeleteStorageSpace", 1)
+			})
+
+			// the share exists in both cases, so the role stays and there is no error
+			It("keeps the role and leaves the personal space as it is when its Drives.Create permission can't be determined", func() {
+				expectAssignedRole()
+				expectPersonalSpace(status.NewInternal(ctx, "settings unavailable"))
+
+				Expect(guestSvc.WithGuestVaultRole(sharerCtx(), guestUser, shareOK)).To(Succeed())
+				roleService.AssertNotCalled(GinkgoT(), "RemoveRoleFromUser", mock.Anything, mock.Anything, mock.Anything)
+				gatewayClient.AssertNotCalled(GinkgoT(), "ListStorageSpaces", mock.Anything, mock.Anything)
+				guestEvents.AssertCalled(GinkgoT(), "Publish", mock.Anything, roleChanged, mock.Anything)
+			})
+
+			It("keeps the role when the personal space can't be adjusted", func() {
+				expectAssignedRole()
+				expectPersonalSpace(status.NewPermissionDenied(ctx, nil, "no Drives.Create"), &provider.StorageSpace{
+					Id:        &provider.StorageSpaceId{OpaqueId: "personal-space-ID"},
+					SpaceType: "personal",
+				})
+				gatewayClient.On("DeleteStorageSpace", mock.Anything, mock.Anything).
+					Return(&provider.DeleteStorageSpaceResponse{Status: status.NewInternal(ctx, "storage unavailable")}, nil)
+
+				Expect(guestSvc.WithGuestVaultRole(sharerCtx(), guestUser, shareOK)).To(Succeed())
+				roleService.AssertNotCalled(GinkgoT(), "RemoveRoleFromUser", mock.Anything, mock.Anything, mock.Anything)
+				guestEvents.AssertCalled(GinkgoT(), "Publish", mock.Anything, roleChanged, mock.Anything)
+			})
+
+			It("still creates the share when the role can't be assigned", func() {
+				newGuestService(vaultMapping)
+				expectAssignments(guestUser, nil, nil)
+				expectUserClass("lehrer")
+				expectNamedRoles()
+				expectAssignRole(errors.New("forbidden"))
+
+				shared := false
+				Expect(guestSvc.WithGuestVaultRole(sharerCtx(), guestUser, func() error {
+					shared = true
+					return nil
+				})).To(Succeed())
+				Expect(shared).To(BeTrue())
+				roleService.AssertNotCalled(GinkgoT(), "RemoveRoleFromUser", mock.Anything, mock.Anything, mock.Anything)
+			})
+
+			// expectNothingAssigned checks that the share is created without assigning, removing or
+			// finishing a role, and that a failing share still returns its error
+			expectNothingAssigned := func() {
+				Expect(guestSvc.WithGuestVaultRole(sharerCtx(), guestUser, shareOK)).To(Succeed())
+				Expect(guestSvc.WithGuestVaultRole(sharerCtx(), guestUser, shareFails)).To(MatchError("the share already exists"))
+				roleService.AssertNotCalled(GinkgoT(), "AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything)
+				roleService.AssertNotCalled(GinkgoT(), "RemoveRoleFromUser", mock.Anything, mock.Anything, mock.Anything)
+				gatewayClient.AssertNotCalled(GinkgoT(), "ListStorageSpaces", mock.Anything, mock.Anything)
+			}
+
+			It("keeps a role the user already has", func() {
+				newGuestService(vaultMapping)
+				expectAssignments(guestUser, []*settingsmsg.UserRoleAssignment{
+					{Id: "assignment-ID", AccountUuid: guestUser, RoleId: vaultLessRole},
+				}, nil)
+
+				expectNothingAssigned()
+				identityBackend.AssertNotCalled(GinkgoT(), "GetUserClass", mock.Anything, mock.Anything)
+			})
+
+			DescribeTable("does not assign a role",
+				func(mapping []string, userClass []string) {
+					newGuestService(mapping)
+					expectAssignments(guestUser, nil, nil)
+					expectUserClass(userClass...)
+					expectNamedRoles()
+
+					expectNothingAssigned()
+				},
+				Entry("to a student, no mapping matches", vaultMapping, []string{"schueler"}),
+				Entry("to a user without userClass", vaultMapping, nil),
+				Entry("when the mapped role has no vault mode", []string{"lehrer:" + guestRole}, []string{"lehrer"}),
+			)
+
+			It("does not assign a guest role to a member of this instance", func() {
+				newGuestService(vaultMapping)
+				expectAssignments(guestUser, nil, nil)
+				identityBackend.On("GetUserClass", mock.Anything, guestUser).Return([]string{"lehrer"}, true, nil)
+
+				expectNothingAssigned()
+			})
+
+			It("does nothing without a mapping", func() {
+				newGuestService(nil)
+
+				expectNothingAssigned()
+				roleService.AssertNotCalled(GinkgoT(), "ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything)
+			})
+
+			It("does nothing without multi-instance", func() {
+				newGuestService(vaultMapping)
+				cfg.MultiInstance.Enabled = false
+
+				expectNothingAssigned()
+				roleService.AssertNotCalled(GinkgoT(), "ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything)
 			})
 		})
 
