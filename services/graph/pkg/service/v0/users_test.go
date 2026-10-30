@@ -1165,19 +1165,18 @@ var _ = Describe("Users", func() {
 				gatewayClient.AssertNumberOfCalls(GinkgoT(), "DeleteStorageSpace", 1)
 			})
 
-			It("removes the role again when its Drives.Create permission can't be determined", func() {
+			// the share exists in both cases, so the role stays and there is no error
+			It("keeps the role and leaves the personal space as it is when its Drives.Create permission can't be determined", func() {
 				expectAssignedRole()
 				expectPersonalSpace(status.NewInternal(ctx, "settings unavailable"))
-				expectRemoveRole()
 
-				// the share exists, so there is no error
 				Expect(guestSvc.WithGuestVaultRole(sharerCtx(), guestUser, shareOK)).To(Succeed())
-				roleService.AssertNumberOfCalls(GinkgoT(), "RemoveRoleFromUser", 1)
+				roleService.AssertNotCalled(GinkgoT(), "RemoveRoleFromUser", mock.Anything, mock.Anything, mock.Anything)
 				gatewayClient.AssertNotCalled(GinkgoT(), "ListStorageSpaces", mock.Anything, mock.Anything)
-				guestEvents.AssertNotCalled(GinkgoT(), "Publish", mock.Anything, roleChanged, mock.Anything)
+				guestEvents.AssertCalled(GinkgoT(), "Publish", mock.Anything, roleChanged, mock.Anything)
 			})
 
-			It("removes the role again when the personal space can't be adjusted", func() {
+			It("keeps the role when the personal space can't be adjusted", func() {
 				expectAssignedRole()
 				expectPersonalSpace(status.NewPermissionDenied(ctx, nil, "no Drives.Create"), &provider.StorageSpace{
 					Id:        &provider.StorageSpaceId{OpaqueId: "personal-space-ID"},
@@ -1185,11 +1184,10 @@ var _ = Describe("Users", func() {
 				})
 				gatewayClient.On("DeleteStorageSpace", mock.Anything, mock.Anything).
 					Return(&provider.DeleteStorageSpaceResponse{Status: status.NewInternal(ctx, "storage unavailable")}, nil)
-				expectRemoveRole()
 
 				Expect(guestSvc.WithGuestVaultRole(sharerCtx(), guestUser, shareOK)).To(Succeed())
-				roleService.AssertNumberOfCalls(GinkgoT(), "RemoveRoleFromUser", 1)
-				guestEvents.AssertNotCalled(GinkgoT(), "Publish", mock.Anything, roleChanged, mock.Anything)
+				roleService.AssertNotCalled(GinkgoT(), "RemoveRoleFromUser", mock.Anything, mock.Anything, mock.Anything)
+				guestEvents.AssertCalled(GinkgoT(), "Publish", mock.Anything, roleChanged, mock.Anything)
 			})
 
 			It("still creates the share when the role can't be assigned", func() {

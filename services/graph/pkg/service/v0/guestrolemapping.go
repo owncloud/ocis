@@ -81,7 +81,7 @@ func (g Graph) withGuestVaultRole(ctx context.Context, userID string, createShar
 		return err
 	}
 	if err := role.finish(ctx); err != nil {
-		logger.Warn().Err(err).Str("userid", userID).Msg("could not finish the guest vault role, it was removed again")
+		logger.Warn().Err(err).Str("userid", userID).Msg("could not adjust the personal space to the guest vault role")
 	}
 	return nil
 }
@@ -169,22 +169,19 @@ func (r guestVaultRole) undo() {
 }
 
 // finish adjusts the personal space to the role and announces the change, like the other role
-// assignments. If the personal space can't be adjusted, it removes the role again.
+// assignments. The share exists, so the role stays even if the personal space can't be adjusted.
 func (r guestVaultRole) finish(ctx context.Context) error {
 	if r.roleID == "" {
 		return nil
 	}
 	canCreateDrives, err := r.g.checkUserPermission(r.serviceCtx, "Drives.Create", r.userID, r.gatewayClient)
-	if err == nil {
-		if canCreateDrives {
-			err = shared.RestorePersonalSpace(r.serviceCtx, r.gatewayClient, r.userID)
-		} else {
-			err = shared.DisablePersonalSpace(r.serviceCtx, r.gatewayClient, r.userID)
-		}
-	}
-	if err != nil {
-		r.undo()
-		return err
+	switch {
+	case err != nil:
+		// leave the personal space as it is when it's unclear what the role allows
+	case canCreateDrives:
+		err = shared.RestorePersonalSpace(r.serviceCtx, r.gatewayClient, r.userID)
+	default:
+		err = shared.DisablePersonalSpace(r.serviceCtx, r.gatewayClient, r.userID)
 	}
 
 	oldRole := ""
@@ -203,5 +200,5 @@ func (r guestVaultRole) finish(ctx context.Context) error {
 		e.Executant = currentUser.GetId()
 	}
 	r.g.publishEvent(ctx, e)
-	return nil
+	return err
 }
