@@ -37,25 +37,24 @@ var RegisteredEvents = []events.Unmarshaller{
 // will arrive to finish it, so there is no way to enable async without a running
 // consumer, and none to run a consumer that never receives work.
 //
-// mountID is the storage id this provider serves. Postprocessing events are
-// broadcast to every provider, so events for other storages must be dropped;
-// pass "" only in tests, where a single provider sees a private stream.
-//
-// numConsumers goroutines share the subscription. Call once, before serving
-// requests. Fails without a publisher: nothing would hand uploads to
-// postprocessing, so every one of them would wait for a verdict that never comes.
-func (c *coordinator) StartPostprocessing(stream events.Consumer, group, mountID string, numConsumers int) error {
+// Call once, before serving requests. Fails without a publisher: nothing would
+// hand uploads to postprocessing, so every one of them would wait for a verdict
+// that never comes.
+func (c *coordinator) StartPostprocessing(stream events.Consumer, ac AsyncConf) error {
 	if c.pub == nil {
 		return errors.New("coordinator: async uploads need an event publisher")
 	}
-	ch, err := events.Consume(stream, group, RegisteredEvents...)
+	ch, err := events.Consume(stream, ac.ConsumerGroup, RegisteredEvents...)
 	if err != nil {
 		return err
 	}
+	numConsumers := ac.NumConsumers
 	if numConsumers <= 0 {
 		numConsumers = 1
 	}
-	c.mountID = mountID
+	c.mountID = ac.MountID
+	c.commitMaxRetries = ac.CommitMaxRetries
+	c.commitRetryBackoff = ac.CommitRetryBackoff
 	c.async = true
 	for i := 0; i < numConsumers; i++ {
 		go c.Postprocessing(ch)
@@ -150,10 +149,12 @@ func (c *coordinator) onPostprocessingFinished(ctx context.Context, ev events.Po
 	switch ev.Outcome {
 	case events.PPOutcomeContinue:
 		if err := c.finishAsync(ctx, session); err != nil {
-			// Deliberately left as it is: the node stays marked and the session on
-			// disk, so this can be retried with RestartPostprocessing or discarded
-			// with CleanUpload rather than silently losing the bytes.
-			log.Error().Err(err).Str("uploadid", ev.UploadID).Msg("could not commit upload after postprocessing")
+			log.Error().Err(err).Str("uploadid", ev.UploadID).Msg("blob commit failed after all retries, reverting node and keeping bytes")
+			metrics.UploadSessionsCommitFailed.Inc()
+			// Keep the staged bytes: the blobstore outage may be transient, so an
+			// admin can retry with RestartPostprocessing rather than lose the upload.
+			c.rollbackNode(ctx, session)
+			metrics.UploadProcessing.Dec()
 			c.publishUploadFailed(ctx, session, ev)
 		}
 		return
