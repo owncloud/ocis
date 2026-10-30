@@ -45,7 +45,8 @@ the events cluster ID as the NATS address. It now uses the events endpoint.
 Each health check skips the check when the NATS address is empty. Each health
 check keeps one NATS connection and uses it again for each probe. Each probe
 sends a PING to the NATS server, so the check finds a lost server at once. A
-slow NATS server does not block the other probes.
+slow NATS server does not block the other probes. The health check of a store
+succeeds when one node of the store is reachable, like the store connection.
 
 The userlog service had no default node for its store. With
 `OCIS_PERSISTENT_STORE=nats-js-kv` it could not connect to NATS. It now uses

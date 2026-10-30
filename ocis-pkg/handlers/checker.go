@@ -43,7 +43,12 @@ func (c CheckHandlerConfiguration) WithLogger(l log.Logger) CheckHandlerConfigur
 }
 
 // WithCheck sets a check for the CheckHandlerConfiguration.
+// A nil check means that nothing needs a check. WithCheck then does not add it.
 func (c CheckHandlerConfiguration) WithCheck(name string, check checker) CheckHandlerConfiguration {
+	if check == nil {
+		return c
+	}
+
 	if _, ok := c.checks[name]; ok {
 		c.logger.Panic().Str("check", name).Msg("check already exists")
 	}

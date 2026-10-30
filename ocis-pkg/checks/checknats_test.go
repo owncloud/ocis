@@ -20,7 +20,7 @@ func TestNewNatsCheckWithConfig(t *testing.T) {
 	url := s.ClientURL()
 
 	t.Run("empty address", func(t *testing.T) {
-		require.NoError(t, checks.NewNatsCheckWithConfig("", stream.NatsConfig{})(context.Background()))
+		require.Nil(t, checks.NewNatsCheckWithConfig("", stream.NatsConfig{}))
 	})
 	credsFile := filepath.Join(t.TempDir(), "user.creds")
 	require.NoError(t, os.WriteFile(credsFile, creds, 0o600))
@@ -136,11 +136,28 @@ func TestNewNatsStoreCheck(t *testing.T) {
 
 	t.Run("other store types", func(t *testing.T) {
 		for _, storeType := range []string{"memory", "redis-sentinel", "noop", ""} {
-			require.NoError(t, checks.NewNatsStoreCheck(storeType, []string{url}, stream.NatsConfig{})(context.Background()), storeType)
+			require.Nil(t, checks.NewNatsStoreCheck(storeType, []string{url}, stream.NatsConfig{}), storeType)
 		}
 	})
 
 	t.Run("no nodes", func(t *testing.T) {
-		require.NoError(t, checks.NewNatsStoreCheck("nats-js-kv", nil, stream.NatsConfig{})(context.Background()))
+		require.Nil(t, checks.NewNatsStoreCheck("nats-js-kv", nil, stream.NatsConfig{}))
+	})
+
+	t.Run("one node is down", func(t *testing.T) {
+		// Nothing listens on the first node.
+		l, err := net.Listen("tcp", "127.0.0.1:0")
+		require.NoError(t, err)
+		down := "nats://" + l.Addr().String()
+		require.NoError(t, l.Close())
+
+		require.NoError(t, checks.NewNatsStoreCheck("nats-js-kv", []string{down, url}, cfg)(context.Background()))
+	})
+
+	t.Run("all nodes are down", func(t *testing.T) {
+		s, creds := natstest.StartOperatorServer(t)
+		check := checks.NewNatsStoreCheck("nats-js-kv", []string{s.ClientURL()}, stream.NatsConfig{Creds: string(creds)})
+		s.Shutdown()
+		require.Error(t, check(context.Background()))
 	})
 }

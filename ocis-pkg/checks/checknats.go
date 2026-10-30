@@ -3,7 +3,7 @@ package checks
 import (
 	"context"
 	"fmt"
-	"sync"
+	"strings"
 	"time"
 
 	"github.com/nats-io/nats.go"
@@ -30,45 +30,47 @@ func NewNatsCheck(natsCluster string, options ...nats.Option) func(context.Conte
 const natsCheckTimeout = 2 * time.Second
 
 // NewNatsCheckWithConfig checks the reachability of the nats server at address.
-// It authenticates and uses TLS like the service connections configured by cfg.
+// The address can contain more than one server, separated by commas.
+// The check authenticates and uses TLS like the service connections configured by cfg.
 // The check uses address and ignores the endpoint of cfg. An empty address means
-// that the service does not use NATS. The check then always succeeds.
+// that the service does not use NATS. The function then returns nil.
 //
 // The check keeps one connection and uses it again for each probe. A new connection
 // for each probe reads the .creds file each time. A probe can then read a rotated file
 // before the write is complete. Each connection also counts against the connection
-// limit of the NATS account. The check connects again only after the connection closes.
-// The connection reads the .creds file again on each reconnect.
+// limit of the NATS account. The nats client reconnects the connection when it loses
+// the server. The connection reads the .creds file again on each reconnect.
 //
 // The connection status stays CONNECTED until the client notices a lost server.
 // Thus each probe sends a PING to the server and waits for the PONG.
 func NewNatsCheckWithConfig(address string, cfg stream.NatsConfig) func(context.Context) error {
 	if address == "" {
-		return func(context.Context) error { return nil }
+		return nil
 	}
-	c := &natsCheck{address: address, cfg: cfg}
+	c := &natsCheck{address: address, cfg: cfg, lock: make(chan struct{}, 1)}
 	return c.check
 }
 
-// NewNatsStoreCheck checks the reachability of the first node of a store.
-// The check always succeeds when the store type is not a NATS type or when the store has no nodes.
+// NewNatsStoreCheck checks the reachability of the nodes of a store.
+// The store connects to any node that it can reach. Thus the check succeeds when
+// one node is reachable. A check of each node fails when one node of a healthy
+// cluster is down.
+// The function returns nil when the store type is not a NATS type or when the store has no nodes.
 func NewNatsStoreCheck(storeType string, nodes []string, cfg stream.NatsConfig) func(context.Context) error {
 	if !revastore.UsesNats(storeType) || len(nodes) == 0 {
-		return func(context.Context) error { return nil }
+		return nil
 	}
-	return NewNatsCheckWithConfig(nodes[0], cfg)
+	return NewNatsCheckWithConfig(strings.Join(nodes, ","), cfg)
 }
 
 type natsCheck struct {
 	address string
 	cfg     stream.NatsConfig
 
-	mu   sync.Mutex
+	// lock holds one token. A probe holds the token while it creates the connection.
+	// A probe that waits for the token stops when its context ends.
+	lock chan struct{}
 	conn *nats.Conn
-	// dial is not nil while a connect is in progress. The connect closes it when it ends.
-	dial chan struct{}
-	// dialErr is the error of the last connect.
-	dialErr error
 }
 
 func (c *natsCheck) check(ctx context.Context) error {
@@ -82,60 +84,49 @@ func (c *natsCheck) check(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	if !conn.IsConnected() {
+		return fmt.Errorf("nats server not connected: status %v, last error %v", conn.Status(), conn.LastError())
+	}
 	if err := conn.FlushWithContext(ctx); err != nil {
 		return fmt.Errorf("nats server not reachable: %v", err)
 	}
 	return nil
 }
 
-// connection returns the open connection. It starts a connect when no connection is open.
-// The connect runs without the lock, so a slow server does not block the other probes.
-// Each probe waits for the connect only until its context ends.
+// connection returns the connection. It creates the connection on the first call.
+// The nats client then connects again by itself, so the connection does not close.
+// A failed configuration does not create a connection. The next probe tries again.
 func (c *natsCheck) connection(ctx context.Context) (*nats.Conn, error) {
-	c.mu.Lock()
-	if c.conn != nil && !c.conn.IsClosed() {
-		conn := c.conn
-		c.mu.Unlock()
-		return conn, nil
-	}
-	if c.dial == nil {
-		c.dial = make(chan struct{})
-		go c.connect(c.dial)
-	}
-	dial := c.dial
-	c.mu.Unlock()
-
 	select {
-	case <-dial:
+	case c.lock <- struct{}{}:
 	case <-ctx.Done():
 		return nil, fmt.Errorf("could not connect to nats server: %v", ctx.Err())
 	}
+	defer func() { <-c.lock }()
 
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	if c.conn == nil || c.conn.IsClosed() {
-		return nil, c.dialErr
+	if c.conn != nil {
+		return c.conn, nil
 	}
-	return c.conn, nil
-}
 
-func (c *natsCheck) connect(done chan struct{}) {
-	conn, err := c.dialNats()
-
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	c.conn, c.dialErr, c.dial = conn, err, nil
-	close(done)
-}
-
-func (c *natsCheck) dialNats() (*nats.Conn, error) {
 	options, err := stream.NatsOptions(c.cfg)
 	if err != nil {
 		return nil, fmt.Errorf("could not configure the nats connection: %v", err)
 	}
+	// The first connect blocks the probe. The timeout keeps the connect in the probe deadline.
+	deadline, _ := ctx.Deadline()
+	timeout := min(time.Until(deadline), natsCheckTimeout)
+	if timeout <= 0 {
+		return nil, fmt.Errorf("could not connect to nats server: %v", context.DeadlineExceeded)
+	}
+	options = append(options,
+		nats.Timeout(timeout),
+		nats.RetryOnFailedConnect(true),
+		nats.MaxReconnects(-1),
+	)
 	conn, err := nats.Connect(c.address, options...)
 	if err != nil {
 		return nil, fmt.Errorf("could not connect to nats server: %v", err)
 	}
+	c.conn = conn
 	return conn, nil
 }
