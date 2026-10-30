@@ -28,6 +28,7 @@ var _ = Describe("Tika", func() {
 			fullResponse string
 			language     string
 			version      string
+			tika4        bool
 			srv          *httptest.Server
 			tika         *content.Tika
 		)
@@ -35,26 +36,46 @@ var _ = Describe("Tika", func() {
 		BeforeEach(func() {
 			body = ""
 			language = ""
-			version = ""
+			version = "Apache Tika 3.2.2"
+			tika4 = false
 			fullResponse = ""
 			srv = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 				out := ""
 				switch req.URL.Path {
 				case "/version":
 					out = version
+				// tika 3.x serves /language/string, tika 4.x only /language
 				case "/language/string":
+					if tika4 {
+						w.WriteHeader(http.StatusNotFound)
+						return
+					}
+					out = language
+				case "/language":
+					if !tika4 {
+						w.WriteHeader(http.StatusNotFound)
+						return
+					}
 					out = language
 				case "/rmeta/text":
+					// tika 4.x renamed X-TIKA:content to tk:content
+					contentKey := "X-TIKA:content"
+					if tika4 {
+						contentKey = "tk:content"
+					}
 					if fullResponse != "" {
 						out = fullResponse
 					} else {
-						out = fmt.Sprintf(`[{"X-TIKA:content":"%s"}]`, body)
+						out = fmt.Sprintf(`[{"%s":"%s"}]`, contentKey, body)
 					}
 				}
 
 				_, _ = w.Write([]byte(out))
 			}))
 
+		})
+
+		JustBeforeEach(func() {
 			cfg := conf.DefaultConfig()
 			cfg.Extractor.Tika.TikaURL = srv.URL
 			cfg.Extractor.Tika.CleanStopWords = true
@@ -161,6 +182,28 @@ var _ = Describe("Tika", func() {
 			Expect(location.Altitude).To(BeNil())
 			Expect(location.Latitude).To(Equal(libregraph.PtrFloat64(49.48675890884328)))
 			Expect(location.Longitude).To(Equal(libregraph.PtrFloat64(11.103870357204285)))
+		})
+
+		It("adds the altitude reported by tika 4.x as geo:alt", func() {
+			fullResponse = `[{"geo:lat": "43.467157", "geo:long": "11.885395", "geo:alt": "100"}]`
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(doc.Location).ToNot(BeNil())
+			Expect(doc.Location.Altitude).To(Equal(libregraph.PtrFloat64(100)))
+		})
+
+		It("adds the altitude reported by tika 3.x as GPS:GPS Altitude", func() {
+			fullResponse = `[{"geo:lat": "43.467157", "geo:long": "11.885395", "GPS:GPS Altitude": "227.4 metres"}]`
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(doc.Location).ToNot(BeNil())
+			Expect(doc.Location.Altitude).To(Equal(libregraph.PtrFloat64(227.4)))
 		})
 
 		It("adds image content", func() {
@@ -276,6 +319,36 @@ var _ = Describe("Tika", func() {
 			})
 			Expect(err).ToNot(HaveOccurred())
 			Expect(doc.Content).To(Equal("body test stop words!!!"))
+		})
+
+		Context("with tika 4.x", func() {
+			BeforeEach(func() {
+				tika4 = true
+				version = "Apache Tika 4.2.0"
+			})
+
+			It("adds content", func() {
+				body = "any body"
+
+				doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+					Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+					Size: 1,
+				})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(doc.Content).To(Equal(body))
+			})
+
+			It("removes stop words", func() {
+				body = "body to test stop words!!! against almost everyone"
+				language = "en"
+
+				doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+					Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+					Size: 1,
+				})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(doc.Content).To(Equal("body test stop words!!!"))
+			})
 		})
 
 		It("keeps stop words", func() {
