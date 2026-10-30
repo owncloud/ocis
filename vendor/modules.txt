@@ -574,7 +574,7 @@ github.com/go-logr/stdr
 # github.com/go-micro/plugins/v4/client/grpc v1.2.1
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/client/grpc
-# github.com/go-micro/plugins/v4/events/natsjs v1.2.2 => github.com/2403905/plugins/v4/events/natsjs v1.2.1-0.20261023115027-38bde25e01c7
+# github.com/go-micro/plugins/v4/events/natsjs v1.2.2 => github.com/kobergj/plugins/v4/events/natsjs v1.2.1-0.20261030085317-811a2ded849b
 ## explicit; go 1.26.10
 github.com/go-micro/plugins/v4/events/natsjs
 # github.com/go-micro/plugins/v4/logger/zerolog v1.2.0
@@ -592,7 +592,7 @@ github.com/go-micro/plugins/v4/server/http
 # github.com/go-micro/plugins/v4/store/nats-js v1.2.1
 ## explicit; go 1.21
 github.com/go-micro/plugins/v4/store/nats-js
-# github.com/go-micro/plugins/v4/store/nats-js-kv v0.0.0-20240726082623-6831adfdcdc4 => github.com/2403905/plugins/v4/store/nats-js-kv v0.0.0-20261023115027-38bde25e01c7
+# github.com/go-micro/plugins/v4/store/nats-js-kv v0.0.0-20240726082623-6831adfdcdc4 => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20261030085317-811a2ded849b
 ## explicit; go 1.26.10
 github.com/go-micro/plugins/v4/store/nats-js-kv
 # github.com/go-micro/plugins/v4/store/redis v1.2.1
@@ -2576,6 +2576,6 @@ stash.kopano.io/kgol/rndm
 # github.com/studio-b12/gowebdav => github.com/kobergj/gowebdav v0.0.0-20251030165916-532350997dde
 # github.com/egirna/icap-client => github.com/kobergj/icap-client v0.0.0-20250116172800-8eaa5022532b
 # github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c
-# github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/2403905/plugins/v4/store/nats-js-kv v0.0.0-20261023115027-38bde25e01c7
-# github.com/go-micro/plugins/v4/events/natsjs => github.com/2403905/plugins/v4/events/natsjs v1.2.1-0.20261023115027-38bde25e01c7
+# github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20261030085317-811a2ded849b
+# github.com/go-micro/plugins/v4/events/natsjs => github.com/kobergj/plugins/v4/events/natsjs v1.2.1-0.20261030085317-811a2ded849b
 # go-micro.dev/v4 => github.com/kobergj/go-micro/v4 v4.0.0-20250610135441-d0b187215699
