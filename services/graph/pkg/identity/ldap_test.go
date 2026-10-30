@@ -224,6 +224,59 @@ func TestCreateUserModelFromLDAP(t *testing.T) {
 	}
 }
 
+func TestGetUserClass(t *testing.T) {
+	cfg := lconfig
+	cfg.UserMemberAttribute = "ocMemberOfSchool"
+
+	// expectSearch returns an entry for the lookup by id, which ignores the user filter and only
+	// asks for the userClass and the member attribute
+	expectSearch := func(lm *mocks.Client, memberOf ...string) {
+		entry := ldap.NewEntry("uid=teacher", map[string][]string{
+			"userClass":        {"teacher"},
+			"ocMemberOfSchool": memberOf,
+		})
+		lm.On("Search", mock.MatchedBy(func(sr *ldap.SearchRequest) bool {
+			return sr.Filter == "(&(objectClass=inetOrgPerson)(entryUUID=teacher-id))" &&
+				assert.ObjectsAreEqual([]string{"userClass", "ocMemberOfSchool"}, sr.Attributes)
+		})).Return(&ldap.SearchResult{Entries: []*ldap.Entry{entry}}, nil)
+	}
+
+	tests := []struct {
+		name       string
+		masterID   string
+		memberOf   []string
+		wantMember bool
+	}{
+		{name: "a user of another instance", memberOf: []string{"school2"}, wantMember: false},
+		{name: "a member of this instance", memberOf: []string{"school2", "school1"}, wantMember: true},
+		{name: "a member of all instances through the master id", masterID: "master-id", memberOf: []string{"master-id"}, wantMember: true},
+		{name: "a user without instances", memberOf: nil, wantMember: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			lm := &mocks.Client{}
+			expectSearch(lm, tt.memberOf...)
+			b, err := NewLDAPBackend(lm, cfg, &logger, "school1", tt.masterID)
+			assert.NoError(t, err)
+
+			userClass, member, err := b.GetUserClass(context.Background(), "teacher-id")
+			assert.NoError(t, err)
+			assert.Equal(t, []string{"teacher"}, userClass)
+			assert.Equal(t, tt.wantMember, member)
+		})
+	}
+
+	t.Run("an unknown user", func(t *testing.T) {
+		lm := &mocks.Client{}
+		lm.On("Search", mock.Anything).Return(&ldap.SearchResult{}, nil)
+		b, err := NewLDAPBackend(lm, cfg, &logger, "school1", "")
+		assert.NoError(t, err)
+
+		_, _, err = b.GetUserClass(context.Background(), "teacher-id")
+		assert.ErrorIs(t, err, ErrNotFound)
+	})
+}
+
 func TestGetUser(t *testing.T) {
 	// Mock a Sizelimit Error
 	lm := &mocks.Client{}

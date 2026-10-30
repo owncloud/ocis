@@ -190,6 +190,12 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 
 	svc.roleService = options.RoleService
 
+	guestRoleMapping, err := parseGuestRoleMapping(options.Config.MultiInstance.GuestRoleMapping)
+	if err != nil {
+		return svc, err
+	}
+	svc.guestRoleMapping = guestRoleMapping
+
 	roleManager := options.RoleManager
 	if roleManager == nil {
 		storeOptions := []microstore.Option{
@@ -227,7 +233,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		return svc, err
 	}
 
-	driveItemPermissionsService, err := NewDriveItemPermissionsService(options.Logger, options.GatewaySelector, identityCache, options.Config, options.TraceProvider, svc.identityBackend, svc.contextUserHasExternalSharePermission)
+	driveItemPermissionsService, err := NewDriveItemPermissionsService(options.Logger, options.GatewaySelector, identityCache, options.Config, options.TraceProvider, svc.identityBackend, svc.contextUserHasExternalSharePermission, svc.withGuestVaultRole)
 	if err != nil {
 		return svc, err
 	}
