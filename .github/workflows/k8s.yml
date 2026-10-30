@@ -18,6 +18,9 @@ env:
   OCIS_WRAPPER_URL: http://localhost:5200
   K8S: true
 
+permissions:
+  contents: read
+
 jobs:
   api-tests:
     name: ${{ matrix.suite }}-k8s
@@ -80,9 +83,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Setup PHP ${{ env.PHP_VERSION }}
-        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2.40.0
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: ${{ env.PHP_VERSION }}
           extensions: curl, xml, mbstring, zip, ldap, gd
@@ -488,13 +493,15 @@ jobs:
           - suite: ocm
             args: "--type playwright --suites ocm"
             federated: true
-          # - suite: vault-storage
-          #   args: "--type playwright --suites vault-storage"
-          #   vault_storage: true
+          - suite: vault-storage
+            args: "--type playwright --suites vault-storage"
+            vault_storage: true
 
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -541,6 +548,8 @@ jobs:
 
       - name: Prepare Helm Charts
         env:
+          ENABLE_TIKA: ${{ matrix.suite == 'vault-storage' }}
+          ENABLE_VAULT: ${{ matrix.suite == 'vault-storage' }}
           ENABLE_WOPI: ${{ matrix.suite == 'app-provider' }}
           ENABLE_OCM: ${{ matrix.suite == 'ocm' }}
         run: |
@@ -552,6 +561,83 @@ jobs:
 
       - name: Deploy Suite-Specific External Backends
         run: |
+          if [[ "${{ matrix.suite }}" == "vault-storage" ]]; then
+            docker run -d \
+              -p 9998:9998 \
+              --name tika \
+              apache/tika:3.2.2.0-full
+            for i in {1..60}; do
+              if curl -sf http://localhost:9998 > /dev/null; then
+                break
+              fi
+              echo "Waiting for tika... ($i/60)"
+              sleep 2
+            done
+            curl -sf http://localhost:9998 > /dev/null
+            bash tests/config/k8s/expose-external-svc.sh tika:9998
+
+            # GitHub runners ship PostgreSQL pre-installed on 5432, but not always
+            # already running - reuse it for keycloak's DB instead of running our
+            # own container for it, once it's up.
+            sudo systemctl start postgresql
+            for i in {1..30}; do
+              sudo -u postgres pg_isready && break
+              echo "Waiting for postgres... ($i/30)"
+              sleep 2
+            done
+            sudo -u postgres pg_isready
+            sudo -u postgres psql -c "CREATE USER keycloak WITH PASSWORD 'keycloak';"
+            sudo -u postgres psql -c "CREATE DATABASE keycloak OWNER keycloak;"
+
+            mkdir -p keycloak-certs
+            openssl req -x509 -newkey rsa:2048 \
+              -keyout keycloak-certs/keycloakkey.pem \
+              -out keycloak-certs/keycloakcrt.pem \
+              -nodes -days 365 -subj "/CN=keycloak"
+            chmod 777 keycloak-certs/*
+
+            # patch the realm so the "web" client's redirect/origin URLs match
+            # the k8s ingress domain instead of the non-k8s "localhost:9200" one
+            sed "s|https://localhost:9200|${TEST_SERVER_URL}|g" \
+              tests/config/ci/ocis-mfa-ci-realm.dist.json > /tmp/ocis-realm.json
+
+            docker run -d --name keycloak --network host \
+              -e OCIS_DOMAIN="$TEST_SERVER_URL" \
+              -e KC_HOSTNAME=keycloak \
+              -e KC_PORT=8443 \
+              -e KC_DB=postgres \
+              -e KC_DB_URL=jdbc:postgresql://localhost:5432/keycloak \
+              -e KC_DB_USERNAME=keycloak \
+              -e KC_DB_PASSWORD=keycloak \
+              -e KC_FEATURES=impersonation \
+              -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
+              -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+              -e KC_HTTPS_CERTIFICATE_FILE=/keycloak-certs/keycloakcrt.pem \
+              -e KC_HTTPS_CERTIFICATE_KEY_FILE=/keycloak-certs/keycloakkey.pem \
+              -v "$(pwd)/keycloak-certs:/keycloak-certs:ro" \
+              -v /tmp/ocis-realm.json:/opt/keycloak/data/import/ocis-mfa-ci-realm.dist.json:ro \
+              quay.io/keycloak/keycloak:26.5.6 \
+              start-dev --proxy-headers xforwarded \
+              --spi-connections-http-client-default-disable-trust-manager=true \
+              --import-realm --health-enabled=true
+
+            keycloak_ready=false
+            for i in {1..60}; do
+              if curl -skf https://localhost:9000/health/ready > /dev/null; then
+                keycloak_ready=true
+                break
+              fi
+              echo "Waiting for keycloak... ($i/60)"
+              sleep 5
+            done
+            if [[ "$keycloak_ready" != "true" ]]; then
+              docker logs keycloak --tail 80
+              exit 1
+            fi
+
+            bash tests/config/k8s/expose-external-svc.sh keycloak:8443
+          fi
+
           if [[ "${{ matrix.suite }}" == "app-provider" ]]; then
             # Start Collabora
             docker run -d \
@@ -627,6 +713,15 @@ jobs:
           bash tests/config/k8s/expose-nodeports.sh collaboration-onlyoffice 9300 30302
           bash tests/config/k8s/expose-nodeports.sh collaboration-fakeoffice 9304 30304
 
+      - name: Expose proxy readyz
+        if: ${{ matrix.suite == 'vault-storage' }}
+        run: |
+          (
+            while true; do
+              kubectl -n "$TEST_SERVER_DOMAIN" port-forward deployment/proxy 19205:9205 >> /tmp/proxy-readyz-portforward.log 2>&1
+              sleep 1
+            done
+          ) &
       - name: Wait for oCIS to be ready
         env:
           FILE_URL: ${{ env.TEST_SERVER_URL }}/remote.php/dav/files/admin/hello1.txt
@@ -662,41 +757,48 @@ jobs:
             return 1
           }
 
-          echo "Creating test file in oCIS..."
+          if [[ "${{ matrix.suite }}" == "vault-storage" ]]; then
+            retry "proxy readyz" curl -sf http://localhost:19205/readyz || exit 1
+            else
+              echo "Creating test file in oCIS..."
 
-          request() {
-            local method=$1
-            shift
-            curl -ks -o /dev/null -w "%{http_code}" \
-              -X "$method" \
-              -u admin:admin \
-              "$@" \
-              "$FILE_URL"
-          }
-          put_file() {
-            request PUT \
-              -H "Content-Type: text/plain" \
-              --data "Hello from GitHub Actions!"
-          }
-          delete_file() {
-            request DELETE
-          }
-          check_status() {
-            local expected=$1
-            shift
-            status=$("$@")
-            [ "$status" = "$expected" ]
-          }
-          echo "Creating test file..."
-          retry "create file (HTTP 201)" check_status 201 put_file || exit 1
-          echo "Deleting test file..."
-          retry "delete file (HTTP 204)" check_status 204 delete_file || exit 1
+            request() {
+              local method=$1
+              shift
+              curl -ks -o /dev/null -w "%{http_code}" \
+                -X "$method" \
+                -u admin:admin \
+                "$@" \
+                "$FILE_URL"
+            }
+            put_file() {
+              request PUT \
+                -H "Content-Type: text/plain" \
+                --data "Hello from GitHub Actions!"
+            }
+            delete_file() {
+              request DELETE
+            }
+            check_status() {
+              local expected=$1
+              shift
+              status=$("$@")
+              [ "$status" = "$expected" ]
+            }
+            echo "Creating test file..."
+            retry "create file (HTTP 201)" check_status 201 put_file || exit 1
+            echo "Deleting test file..."
+            retry "delete file (HTTP 204)" check_status 204 delete_file || exit 1
+          fi
 
       - name: Run e2e ${{ matrix.suite }} tests
         env:
           E2E_ARGS: "${{ matrix.args }}"
           K8S: ${{ env.K8S }}
           TEST_SERVER_URL: ${{ env.TEST_SERVER_URL }}
+          KEYCLOAK: ${{ matrix.suite == 'vault-storage' }}
+          KEYCLOAK_HOST: keycloak:8443
+          VAULT_MODE: ${{ matrix.suite == 'vault-storage' }}
           COLLABORATION_NEEDED: ${{ matrix.collaboration == true && 'true' || 'false' }}
           FED_SERVER_URL: ${{ env.FED_SERVER_URL }}
           FEDERATED_NEEDED: ${{ matrix.federated == true && 'true' || 'false' }}

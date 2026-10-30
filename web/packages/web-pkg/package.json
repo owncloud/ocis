@@ -58,7 +58,7 @@
     "@vue/shared": "^3.5.43",
     "@vueuse/core": "^14.3.0",
     "deepmerge": "^4.3.1",
-    "dompurify": "^3.4.13",
+    "dompurify": "^3.4.17",
     "emoji-regex": "^10.6.0",
     "filesize": "^11.0.17",
     "fuse.js": "^7.3.0",
@@ -86,13 +86,13 @@
     "vue-concurrency": "^5.0.3",
     "vue-router": "^5.0.6",
     "vue3-gettext": "^4.0.1",
-    "zod": "^4.3.6"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/lodash-es": "4.17.12",
     "@vitest/web-worker": "4.1.5",
     "clean-publish": "6.0.1",
-    "vite": "7.3.5",
+    "vite": "7.3.7",
     "vite-plugin-dts": "4.5.4",
     "vite-plugin-node-polyfills": "0.24.0"
   }

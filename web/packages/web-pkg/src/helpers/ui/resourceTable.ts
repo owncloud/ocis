@@ -1,4 +1,4 @@
-import { Resource, ShareResource } from '@ownclouders/web-client'
+import { IncomingShareResource, Resource, ShareResource } from '@ownclouders/web-client'
 import { SortDir, SortField } from '../../composables/sort'
 
 export const determineResourceTableSortFields = (firstResource: Resource): SortField[] => {
@@ -24,8 +24,9 @@ export const determineResourceTableSortFields = (firstResource: Resource): SortF
           // Ensure the sharees are always sorted and that users
           // take precedence over groups. Then return a string with
           // all elements to ensure shares with multiple shares do
-          // not appear mixed within others with a single one
-          return sharedWith
+          // not appear mixed within others with a single one.
+          // Sort a copy so the displayed avatars keep their order.
+          return [...sharedWith]
             .sort((a, b) => {
               if (a.shareType !== b.shareType) {
                 return a.shareType < b.shareType ? -1 : 1
@@ -37,6 +38,17 @@ export const determineResourceTableSortFields = (firstResource: Resource): SortF
         }
         return false
       },
+      sortDir: SortDir.Asc
+    },
+    {
+      name: 'sharedBy',
+      // Like sharedWith: compare all sharers in alphabetical order, since the server
+      // returns them in no fixed order. Sort a copy so the displayed avatars keep their order.
+      sortable: (sharedBy: IncomingShareResource['sharedBy']) =>
+        sharedBy
+          .map(({ displayName }) => displayName || '')
+          .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base', numeric: true }))
+          .join(),
       sortDir: SortDir.Asc
     },
     {

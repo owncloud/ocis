@@ -29,7 +29,6 @@ import (
 	_ "github.com/owncloud/reva/v2/pkg/auth/manager/nextcloud"
 	_ "github.com/owncloud/reva/v2/pkg/auth/manager/ocmshares"
 	_ "github.com/owncloud/reva/v2/pkg/auth/manager/oidc"
-	_ "github.com/owncloud/reva/v2/pkg/auth/manager/owncloudsql"
 	_ "github.com/owncloud/reva/v2/pkg/auth/manager/publicshares"
 	_ "github.com/owncloud/reva/v2/pkg/auth/manager/serviceaccounts"
 	// Add your own here

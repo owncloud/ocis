@@ -76,16 +76,6 @@ func DefaultConfig() *config.Config {
 				},
 			},
 			JSON: config.JSONProvider{},
-			OwnCloudSQL: config.OwnCloudSQLProvider{
-				DBUsername:       "owncloud",
-				DBHost:           "mysql",
-				DBPort:           3306,
-				DBName:           "owncloud",
-				IDP:              "https://localhost:9200",
-				Nobody:           90,
-				JoinUsername:     false,
-				JoinOwnCloudUUID: false,
-			},
 		},
 	}
 }

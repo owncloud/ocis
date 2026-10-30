@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: "0 1 * * *"
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: ${{ matrix.example }}
@@ -37,6 +40,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: owncloud/ocis
+          persist-credentials: false
 
       - name: Prepare hosts entry
         run: |

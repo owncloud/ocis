@@ -713,7 +713,7 @@ describe('ResourceTable', () => {
         const slot = /--oc-color-tag-(\d+)\)/.exec(style)?.[1]
         expect(slot).toBeDefined()
         expect(style).toContain(`background-color: var(--oc-color-tag-${slot})`)
-        expect(style).toContain(`color: var(--oc-color-tag-${slot}-text,currentColor)`)
+        expect(style).toContain(`color: var(--oc-color-tag-${slot}-text, currentColor)`)
 
         expect(cell.find('.resource-table-tag-more').attributes('style')).toBeUndefined()
       })
@@ -825,6 +825,15 @@ describe('ResourceTable', () => {
 
       expect(wrapper.find('.resource-table-shared-with').exists()).toBeTruthy()
       expect(wrapper.findAll('.resource-table-shared-with .oc-avatar').length).toBe(1)
+    })
+  })
+  describe('"shared by" field', () => {
+    it('can be sorted, A to Z first', async () => {
+      const { wrapper } = getMountedWrapper()
+
+      await wrapper.find('.oc-table-header-cell-sharedBy .oc-button-sort').trigger('click')
+
+      expect(wrapper.emitted('sort')).toEqual([[{ sortBy: 'sharedBy', sortDir: 'asc' }]])
     })
   })
   describe('rename action', () => {
