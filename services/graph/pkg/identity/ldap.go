@@ -815,6 +815,33 @@ func (i *LDAP) GetPreciseUser(ctx context.Context, name string, instancename str
 	return i.refineUser(e, q)
 }
 
+// GetUserClass implements the Backend Interface. Like the proxy, it treats users with this
+// instance's id or the master id in their member attribute as members.
+func (i *LDAP) GetUserClass(ctx context.Context, id string) ([]string, bool, error) {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("GetUserClass")
+
+	idString, err := filterEscapeUUID(i.userIDisOctetString, id)
+	if err != nil {
+		return nil, false, fmt.Errorf("invalid User id: %w", err)
+	}
+	userClass := newEducationUserAttributeMap().primaryRole
+	filter := fmt.Sprintf("(&(objectClass=%s)(%s=%s))", i.userObjectClass, i.userAttributeMap.id, idString)
+	e, err := i.searchLDAPEntryByFilter(i.userBaseDN, []string{userClass, i.userAttributeMap.userMemberAttribute}, filter)
+	if err != nil {
+		return nil, false, err
+	}
+
+	member := false
+	for _, iid := range e.GetEqualFoldAttributeValues(i.userAttributeMap.userMemberAttribute) {
+		if iid != "" && (iid == i.instanceID || iid == i.masterID) {
+			member = true
+			break
+		}
+	}
+	return e.GetEqualFoldAttributeValues(userClass), member, nil
+}
+
 func (i *LDAP) refineUser(e *ldap.Entry, query *godata.GoDataQuery) (*libregraph.User, error) {
 	u := i.createUserModelFromLDAP(e)
 	if u == nil {
