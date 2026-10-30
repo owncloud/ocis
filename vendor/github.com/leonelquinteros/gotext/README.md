@@ -9,258 +9,151 @@
 
 [GNU gettext utilities](https://www.gnu.org/software/gettext) for Go.
 
+`gotext` is a native Go implementation of the GNU Gettext utilities. It provides a thread-safe, flexible, and powerful way to handle internationalization (i18n) and localization (l10n) in your Go applications.
 
-# Features
+---
 
-- Implements GNU gettext support in native Go.
-- Complete support for [PO files](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html) including:
-  - Support for multiline strings and headers.
-  - Support for variables inside translation strings using Go's [fmt syntax](https://golang.org/pkg/fmt/).
-  - Support for [pluralization rules](https://www.gnu.org/software/gettext/manual/html_node/Translating-plural-forms.html).
-  - Support for [message contexts](https://www.gnu.org/software/gettext/manual/html_node/Contexts.html).
-- Support for MO files.
-- Thread-safe: This package is safe for concurrent use across multiple goroutines.
-- It works with UTF-8 encoding as it's the default for Go language.
-- Unit tests available.
-- Language codes are automatically simplified from the form `en_UK` to `en` if the first isn't available.
-- Ready to use inside Go templates.
-- Objects are serializable to []byte to store them in cache.
-- Support for Go Modules.
+**📖 [Read the Full Documentation](https://leonelquinteros.github.io/gotext/)**
 
+---
 
-# License
+### Table of Contents
+- [Features](#features)
+- [Installation](#installation)
+- [Getting Started](#getting-started)
+- [CLI Tool (xgotext)](#cli-tool-xgotext)
+- [Advanced Usage](#advanced-usage)
+  - [Locale Object](#using-locale-object)
+  - [Plural Forms](#use-plural-forms-of-translations)
+  - [Dynamic Variables](#using-dynamic-variables-on-translations)
+- [Directory Structure](#locales-directories-structure)
+- [Contributing](#contributing)
+- [License](#license)
 
-[MIT license](LICENSE)
+---
 
+## Features
+- Native Go implementation of Gettext (the core library has no external dependencies).
+- Full support for **PO and MO files**.
+- **Pluralization rules** support via GNU Gettext plural-form expressions.
+- **Message context** support (`msgctxt`).
+- Thread-safe for concurrent use.
+- Works with UTF-8 by default.
+- Integrated CLI tool (`xgotext`) for string extraction.
+- Serializable objects for caching.
+- Plain-string results that plug directly into Go's `text/template` and `html/template` pipelines.
 
-# Documentation
+---
 
-Refer to package documentation at (https://pkg.go.dev/github.com/leonelquinteros/gotext)
-
-
-# Installation
-
-```
+## Installation
+```bash
 go get github.com/leonelquinteros/gotext
 ```
 
-- There are no requirements or dependencies to use this package.
-- No need to install GNU gettext utilities (unless specific needs of CLI tools).
-- No need for environment variables. Some naming conventions are applied but not needed.
+---
 
-
-# Usage examples
-
-## Using package for single language/domain settings
-
-For quick/simple translations you can use the package level functions directly.
+## Getting Started
+For a quick start, use the package-level API:
 
 ```go
+package main
+
 import (
     "fmt"
     "github.com/leonelquinteros/gotext"
 )
 
 func main() {
-    // Configure package
-    gotext.Configure("/path/to/locales/root/dir", "en_UK", "domain-name")
+    // Configure package: locales path, language, and domain
+    gotext.Configure("/path/to/locales", "en_US", "default")
 
-    // Translate text from default domain
-    fmt.Println(gotext.Get("My text on 'domain-name' domain"))
+    // Simple translation
+    fmt.Println(gotext.Get("Hello, world!"))
 
-    // Translate text from a different domain without reconfigure
-    fmt.Println(gotext.GetD("domain2", "Another text on a different domain"))
+    // Translation with variables
+    fmt.Println(gotext.Get("Hello, %s!", "Gopher"))
 }
-
 ```
 
-## Using dynamic variables on translations
+For more details, see the [Getting Started Guide](docs/GETTING_STARTED.md).
 
-All translation strings support dynamic variables to be inserted without translate.
-Use the fmt.Printf syntax (from Go's "fmt" package) to specify how to print the non-translated variable inside the translation string.
+---
+
+## CLI Tool (xgotext)
+`gotext` includes a command-line tool to extract translatable strings from your Go source code.
+
+**Install xgotext:**
+```bash
+go install github.com/leonelquinteros/gotext/cli/xgotext@latest
+```
+
+**Extract strings:**
+```bash
+xgotext -in . -out locales/templates
+```
+The command generates `.pot` templates under `locales/templates`; merge those templates into language-specific `.po` files.
+
+See the [xgotext Documentation](docs/xgotext.md) for full usage details.
+
+---
+
+## Advanced Usage
+
+### Using Locale object
+For managing multiple languages or domains independently:
 
 ```go
-import (
-    "fmt"
-    "github.com/leonelquinteros/gotext"
-)
-
-func main() {
-    // Configure package
-    gotext.Configure("/path/to/locales/root/dir", "en_UK", "domain-name")
-
-    // Set variables
-    name := "John"
-
-    // Translate text with variables
-    fmt.Println(gotext.Get("Hi, my name is %s", name))
-}
-
+l := gotext.NewLocale("/path/to/locales", "es_UY")
+l.AddDomain("default")
+fmt.Println(l.Get("Translate this"))
 ```
 
-
-## Using Locale object
-
-When having multiple languages/domains/libraries at the same time, you can create Locale objects for each variation
-so you can handle each settings on their own.
+### Use plural forms of translations
+`gotext` handles complex pluralization rules defined in PO headers:
 
 ```go
-import (
-    "fmt"
-    "github.com/leonelquinteros/gotext"
-)
-
-func main() {
-    // Create Locale with library path and language code
-    l := gotext.NewLocale("/path/to/locales/root/dir", "es_UY")
-
-    // Load domain '/path/to/locales/root/dir/es_UY/default.po'
-    l.AddDomain("default")
-
-    // Translate text from default domain
-    fmt.Println(l.Get("Translate this"))
-
-    // Load different domain
-    l.AddDomain("translations")
-
-    // Translate text from domain
-    fmt.Println(l.GetD("translations", "Translate this"))
-}
+// GetN(singular, plural, quantity, args...)
+fmt.Println(gotext.GetN("I have one apple.", "I have %d apples.", 5, 5))
 ```
+See the [Plural Forms Guide](docs/PLURALS.md) for more examples.
 
-This is also helpful for using inside templates (from the "text/template" package), where you can pass the Locale object to the template.
-If you set the Locale object as "Loc" in the template, then the template code would look like:
-
-```
-{{ .Loc.Get "Translate this" }}
-```
-
-
-## Using the Po object to handle .po files and PO-formatted strings
-
-For when you need to work with PO files and strings,
-you can directly use the Po object to parse it and access the translations in there in the same way.
-
+### Using dynamic variables on translations
+Supports standard `fmt` package syntax:
 ```go
-import (
-    "fmt"
-    "github.com/leonelquinteros/gotext"
-)
-
-func main() {
-    // Set PO content
-    str := `
-msgid "Translate this"
-msgstr "Translated text"
-
-msgid "Another string"
-msgstr ""
-
-msgid "One with var: %s"
-msgstr "This one sets the var: %s"
-`
-
-    // Create Po object
-    po := gotext.NewPo()
-    po.Parse(str)
-
-    fmt.Println(po.Get("Translate this"))
-}
+name := "John"
+fmt.Println(gotext.Get("Hi, my name is %s", name))
 ```
 
+### More advanced scenarios
+- **Embedded translation files** (`embed.FS`) and named `%(name)s` formatting: see the [Advanced Usage Guide](docs/ADVANCED.md).
+- **Languages fallback**: pass multiple languages to `Configure` as a colon-separated list (`gotext.Configure("/path/to/locales", "es_UY:es:en_US", "default")`).
+- **Serialization/caching** of parsed locales: `Locale.MarshalBinary` / `UnmarshalBinary`.
 
-## Use plural forms of translations
+---
 
-PO format supports defining one or more plural forms for the same translation.
-Relying on the PO file headers, a Plural-Forms formula can be set on the translation file
-as defined in (https://www.gnu.org/savannah-checkouts/gnu/gettext/manual/html_node/Plural-forms.html)
-
-```go
-import (
-    "fmt"
-    "github.com/leonelquinteros/gotext"
-)
-
-func main() {
-    // Set PO content
-    str := `
-msgid ""
-msgstr ""
-
-# Header below
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-msgid "Translate this"
-msgstr "Translated text"
-
-msgid "Another string"
-msgstr ""
-
-msgid "One with var: %s"
-msgid_plural "Several with vars: %s"
-msgstr[0] "This one is the singular: %s"
-msgstr[1] "This one is the plural: %s"
-`
-
-    // Create Po object
-    po := new(gotext.Po)
-    po.Parse(str)
-
-    fmt.Println(po.GetN("One with var: %s", "Several with vars: %s", 54, v))
-    // "This one is the plural: Variable"
-}
-```
-
-
-# Locales directories structure
-
-The package will assume a directories structure starting with a base path that will be provided to the package configuration
-or to object constructors depending on the use, but either will use the same convention to lookup inside the base path.
-
-Inside the base directory where will be the language directories named using the language and country 2-letter codes (en_US, es_AR, ...).
-All package functions can lookup after the simplified version for each language in case the full code isn't present but the more general language code exists.
-So if the language set is `en_UK`, but there is no directory named after that code and there is a directory named `en`,
-all package functions will be able to resolve this generalization and provide translations for the more general library.
-
-The language codes are assumed to be [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) codes (2-letter codes).
-That said, most functions will work with any coding standard as long the directory name matches the language code set on the configuration.
-
-Then, there can be a `LC_MESSAGES` containing all PO files or the PO files themselves.
-A library directory structure can look like:
-
+## Locales directories structure
+The package expects a standard Gettext directory structure:
 ```
 /path/to/locales
-/path/to/locales/en_US
-/path/to/locales/en_US/LC_MESSAGES
-/path/to/locales/en_US/LC_MESSAGES/default.po
-/path/to/locales/en_US/LC_MESSAGES/extras.po
-/path/to/locales/en_UK
-/path/to/locales/en_UK/LC_MESSAGES
-/path/to/locales/en_UK/LC_MESSAGES/default.po
-/path/to/locales/en_UK/LC_MESSAGES/extras.po
-/path/to/locales/en_AU
-/path/to/locales/en_AU/LC_MESSAGES
-/path/to/locales/en_AU/LC_MESSAGES/default.po
-/path/to/locales/en_AU/LC_MESSAGES/extras.po
-/path/to/locales/es
-/path/to/locales/es/default.po
-/path/to/locales/es/extras.po
-/path/to/locales/es_ES
-/path/to/locales/es_ES/default.po
-/path/to/locales/es_ES/extras.po
-/path/to/locales/fr
-/path/to/locales/fr/default.po
-/path/to/locales/fr/extras.po
+  /en_US
+    /LC_MESSAGES
+      default.po
+  /es_ES
+    /LC_MESSAGES
+      default.po
 ```
+Translation files can live either inside an `LC_MESSAGES` subdirectory or directly under the language code (`/es_ES/default.po`); both layouts are supported.
 
-And so on...
+It supports automatic language simplification (e.g., falling back from `en_UK` to `en`).
 
+---
 
-# Contribute
+## Contributing
+We welcome contributions of all kinds! 
+- [Contributing Guidelines](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
 
-- Please, contribute.
-- Use the package on your projects.
-- Report issues on Github.
-- Send pull requests for bugfixes and improvements.
-- Send proposals on Github issues.
+---
 
+## License
+`gotext` is released under the [MIT License](LICENSE).
