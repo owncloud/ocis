@@ -60,5 +60,8 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingServiceAccountSecret(cfg.Service.Name)
 	}
 
-	return nil
+	if err := shared.CheckNatsCredentials(cfg.Service.Name, cfg.OIDC.UserinfoCache.Store, cfg.OIDC.UserinfoCache.CredsFile, cfg.OIDC.UserinfoCache.Creds); err != nil {
+		return err
+	}
+	return shared.CheckNatsCredentials(cfg.Service.Name, cfg.PreSignedURL.SigningKeys.Store, cfg.PreSignedURL.SigningKeys.CredsFile, cfg.PreSignedURL.SigningKeys.Creds)
 }

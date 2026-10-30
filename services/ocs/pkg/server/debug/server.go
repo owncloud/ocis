@@ -1,7 +1,6 @@
 package debug
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/checks"
@@ -19,12 +18,7 @@ func Server(opts ...Option) (*http.Server, error) {
 		WithCheck("web reachability", checks.NewHTTPCheck(options.Config.HTTP.Addr))
 
 	readyHandlerConfiguration := healthHandlerConfiguration.
-		WithCheck("nats reachability", func(ctx context.Context) error {
-			if len(options.Config.SigningKeys.Nodes) > 0 {
-				return checks.NewNatsCheck(options.Config.SigningKeys.Nodes[0])(ctx)
-			}
-			return nil
-		})
+		WithCheck("nats reachability", checks.NewNatsStoreCheck(options.Config.SigningKeys.Store, options.Config.SigningKeys.Nodes, options.Config.SigningKeys.NatsConfig()))
 
 	return debug.NewService(
 		debug.Logger(options.Logger),

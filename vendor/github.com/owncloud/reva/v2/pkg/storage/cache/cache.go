@@ -28,6 +28,7 @@ import (
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/owncloud/reva/v2/pkg/natsauth"
 	"github.com/owncloud/reva/v2/pkg/store"
 	"github.com/shamaton/msgpack/v2"
 	microstore "go-micro.dev/v4/store"
@@ -57,6 +58,8 @@ type Config struct {
 	EnableTLS          bool          `mapstructure:"cache_enable_tls"`
 	TLSInsecure        bool          `mapstructure:"cache_tls_insecure"`
 	TLSRootCACert      string        `mapstructure:"cache_tls_root_ca_certificate"`
+	CredsFile          string        `mapstructure:"cache_creds_file"`
+	Creds              string        `mapstructure:"cache_creds"`
 }
 
 // Cache handles key value operations on caches
@@ -243,6 +246,16 @@ func (cache cacheStore) Close() error {
 	return cache.s.Close()
 }
 
+// CheckCredentials checks the NATS JWT credentials of the cache. The Get*Cache
+// functions cannot return an error, so call it in the constructor that uses the cache.
+// A cache that does not use NATS does not use the credentials, so it is not checked.
+func (cfg Config) CheckCredentials() error {
+	if !store.UsesNats(cfg.Store) {
+		return nil
+	}
+	return natsauth.Check(cfg.CredsFile, cfg.Creds)
+}
+
 func getStore(cfg Config) microstore.Store {
 	return store.Create(
 		store.Store(cfg.Store),
@@ -253,6 +266,7 @@ func getStore(cfg Config) microstore.Store {
 		store.Size(cfg.Size),
 		store.DisablePersistence(cfg.DisablePersistence),
 		store.Authentication(cfg.AuthUsername, cfg.AuthPassword),
+		store.Credentials(cfg.CredsFile, cfg.Creds),
 		store.TLS(cfg.EnableTLS, cfg.TLSInsecure, cfg.TLSRootCACert),
 	)
 }

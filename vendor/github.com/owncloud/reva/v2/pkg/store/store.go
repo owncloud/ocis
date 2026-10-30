@@ -26,13 +26,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/owncloud/reva/v2/pkg/store/etcd"
-	"github.com/owncloud/reva/v2/pkg/store/memory"
 	natsjs "github.com/go-micro/plugins/v4/store/nats-js"
 	natsjskv "github.com/go-micro/plugins/v4/store/nats-js-kv"
 	"github.com/go-micro/plugins/v4/store/redis"
 	redisopts "github.com/go-redis/redis/v8"
 	"github.com/nats-io/nats.go"
+	"github.com/owncloud/reva/v2/pkg/natsauth"
+	"github.com/owncloud/reva/v2/pkg/store/etcd"
+	"github.com/owncloud/reva/v2/pkg/store/memory"
 	"go-micro.dev/v4/logger"
 	microstore "go-micro.dev/v4/store"
 )
@@ -58,6 +59,12 @@ const (
 	TypeNatsJSKV = "nats-js-kv"
 )
 
+// UsesNats returns true when a store of the given type connects to NATS.
+// Only these stores use the NATS credentials.
+func UsesNats(storeType string) bool {
+	return storeType == TypeNatsJS || storeType == TypeNatsJSKV
+}
+
 // Create initializes a new store
 func Create(opts ...microstore.Option) microstore.Store {
 	options := &microstore.Options{
@@ -70,7 +77,7 @@ func Create(opts ...microstore.Option) microstore.Store {
 	storeType, _ := options.Context.Value(typeContextKey{}).(string)
 
 	if tlsOpts, ok := options.Context.Value(tlsContextKey{}).(tlsOptions); ok && tlsOpts.enable &&
-		storeType != TypeNatsJS && storeType != TypeNatsJSKV {
+		!UsesNats(storeType) {
 		logger.Logf(logger.WarnLevel,
 			"reva-store: TLS requested but store type %q does not support TLS — settings ignored", storeType)
 	}
@@ -182,6 +189,26 @@ func defaultNatsOptions(options *microstore.Options) nats.Options {
 	if auth, ok := options.Context.Value(authenticationContextKey{}).([]string); ok && len(auth) == 2 {
 		natsOptions.User = auth[0]
 		natsOptions.Password = auth[1]
+	}
+	if creds, ok := options.Context.Value(credentialsContextKey{}).(credentialsOptions); ok {
+		credsOpt, err := natsauth.CredentialsOption(creds.credsFile, creds.creds)
+		if err != nil {
+			// Create cannot return an error. Make each connect attempt fail with the
+			// real cause instead of an authorization error from the server.
+			logger.Logf(logger.ErrorLevel, "reva-store: %v", err)
+			credsOpt = func(o *nats.Options) error {
+				o.UserJWT = func() (string, error) { return "", err }
+				o.SignatureCB = func([]byte) ([]byte, error) { return nil, err }
+				return nil
+			}
+		}
+		if credsOpt != nil {
+			if natsOptions.User != "" || natsOptions.Password != "" {
+				logger.Logf(logger.WarnLevel, "reva-store: nats jwt credentials are configured, ignoring username and password")
+			}
+			natsOptions.User, natsOptions.Password = "", ""
+			_ = credsOpt(&natsOptions)
+		}
 	}
 	if tlsOpts, ok := options.Context.Value(tlsContextKey{}).(tlsOptions); ok && tlsOpts.enable {
 		natsOptions.TLSConfig = BuildNatsTLSConfig(tlsOpts.insecure, tlsOpts.rootCACert)

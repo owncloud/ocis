@@ -39,5 +39,5 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingJWTTokenError(cfg.Service.Name)
 	}
 
-	return nil
+	return shared.CheckNatsCredentials(cfg.Service.Name, cfg.SigningKeys.Store, cfg.SigningKeys.CredsFile, cfg.SigningKeys.Creds)
 }

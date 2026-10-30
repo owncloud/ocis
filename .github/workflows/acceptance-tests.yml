@@ -591,8 +591,121 @@ jobs:
       - name: Run external-LDAP distributed smoke
         run: tests/ldap-smoke-distributed/run.sh
 
+  # API tests against a stand-alone NATS server in operator (JWT) mode. The embedded nats service
+  # does not support JWT, so oCIS runs with OCIS_EXCLUDE_RUN_SERVICES=nats. The caches and the
+  # userlog store use memory by default; OCIS_CACHE_STORE and OCIS_PERSISTENT_STORE move them to
+  # NATS (nats-js-kv). The other stores use NATS by default.
+  # tests/nats-jwt/verify.sh then checks that every client used the creds.
+  nats-jwt-tests:
+    needs: [build-and-test]
+    name: natsJwt-${{ matrix.name }}-${{ matrix.creds }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # events: postprocessing, storage-users, activitylog, search; stores: postprocessing, activitylog
+          - name: events-stores
+            creds: file
+            suites: apiAsyncUpload,apiActivities,apiSearch1
+          # events: sharing; stores: storage-system (shares), storage-publiclink (password links)
+          - name: sharing
+            creds: content
+            suites: apiSharingNgShares,apiSharingNgItemLinkShare
+          # userlog, eventhistory, and notifications (needs email)
+          - name: notifications
+            creds: file
+            suites: apiNotification
+            extra_consumers: notifications
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "24"
+
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+
+      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+
+      - name: Start NATS in operator mode
+        run: tests/nats-jwt/start-nats.sh
+        env:
+          NATS_JWT_DIR: ${{ runner.temp }}/nats-jwt
+
+      - name: Run ${{ matrix.suites }} with NATS JWT credentials (${{ matrix.creds }})
+        env:
+          NATS_JWT_DIR: ${{ runner.temp }}/nats-jwt
+          CREDS_MODE: ${{ matrix.creds }}
+          BEHAT_SUITES: ${{ matrix.suites }}
+          OCIS_EXCLUDE_RUN_SERVICES: nats
+          OCIS_CACHE_STORE: nats-js-kv
+          OCIS_PERSISTENT_STORE: nats-js-kv
+        run: |
+          if [ "$CREDS_MODE" = "file" ]; then
+            export OCIS_NATS_CREDS_FILE="$NATS_JWT_DIR/user.creds"
+          else
+            OCIS_NATS_CREDS="$(cat "$NATS_JWT_DIR/user.creds")"
+            export OCIS_NATS_CREDS
+          fi
+          python3 tests/acceptance/run-github.py
+
+      # Run the checks also when the tests fail: a client without creds is the first thing to rule out.
+      - name: Verify the NATS JWT account state
+        if: ${{ !cancelled() }}
+        env:
+          NATS_JWT_DIR: ${{ runner.temp }}/nats-jwt
+          NATS_JWT_EXTRA_BUCKETS: ${{ matrix.extra_buckets }}
+          NATS_JWT_EXTRA_CONSUMERS: ${{ matrix.extra_consumers }}
+        run: tests/nats-jwt/verify.sh
+
+      - name: NATS server log
+        if: failure()
+        run: docker logs nats-jwt
+
+  # Starts oCIS with the services that are off by default (audit, policies, antivirus, notifications),
+  # and checks the /readyz endpoints. The readiness checks of the services use the creds.
+  nats-jwt-startup-check:
+    name: natsJwt-startup-check
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "24"
+
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+
+      # web/idp assets must be embedded for `ocis server` to come up (same as run-github.py)
+      - name: Generate assets
+        run: make ci-node-generate
+
+      - name: Build oCIS
+        run: make -C ocis build
+
+      - name: Run the NATS JWT startup check
+        run: tests/nats-jwt/startup-check.sh
+        env:
+          NATS_JWT_DIR: ${{ runner.temp }}/nats-jwt
+
   all-acceptance-tests:
-    needs: [local-api-tests, cli-tests, ldap-pool-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests, external-ldap-tests, external-ldap-distributed-tests]
+    needs: [local-api-tests, cli-tests, ldap-pool-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests, external-ldap-tests, external-ldap-distributed-tests, nats-jwt-tests, nats-jwt-startup-check]
     runs-on: ubuntu-latest
     if: always()
     steps:

@@ -90,7 +90,7 @@ func Validate(cfg *config.Config) error {
 		}
 	}
 
-	return nil
+	return shared.CheckNatsCredentials(cfg.Service.Name, cfg.Cache.Store, cfg.Cache.CredsFile, cfg.Cache.Creds)
 }
 
 func validateLDAPSettings(cfg *config.Config) error {

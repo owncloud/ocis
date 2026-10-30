@@ -1,7 +1,6 @@
 package debug
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/checks"
@@ -16,12 +15,7 @@ func Server(opts ...Option) (*http.Server, error) {
 
 	readyHandlerConfiguration := handlers.NewCheckHandlerConfiguration().
 		WithLogger(options.Logger).
-		WithCheck("nats reachability", func(ctx context.Context) error {
-			if options.Config.Cache.ProviderCacheStore == "nats-js-kv" && len(options.Config.Cache.ProviderCacheNodes) > 0 {
-				return checks.NewNatsCheck(options.Config.Cache.ProviderCacheNodes[0])(ctx)
-			}
-			return nil
-		})
+		WithCheck("nats reachability", checks.NewNatsStoreCheck(options.Config.Cache.ProviderCacheStore, options.Config.Cache.ProviderCacheNodes, options.Config.Cache.ProviderCacheNatsConfig()))
 
 	return debug.NewService(
 		debug.Logger(options.Logger),
