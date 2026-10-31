@@ -274,7 +274,7 @@ func (t Tika) getAudio(meta map[string][]string) *libregraph.Audio {
 	// TODO: audio.Copyright: not provided by tika for audio files?
 
 	if v, err := getFirstValue(meta, "xmpDM:discNumber"); err == nil {
-		if i, err := strconv.ParseInt(v, 10, 32); err == nil {
+		if i, err := strconv.ParseInt(numberOfTotal(v), 10, 32); err == nil {
 			initAudio()
 			audio.SetDisc(int32(i))
 		}
@@ -283,10 +283,12 @@ func (t Tika) getAudio(meta map[string][]string) *libregraph.Audio {
 
 	//  TODO: audio.DiscCount: not provided by tika
 
+	// tika reports the duration in seconds, usually with a fractional part, e.g. "225.62".
+	// ParseFloat also accepts NaN, Inf and values that don't fit an int64 in milliseconds, skip those.
 	if v, err := getFirstValue(meta, "xmpDM:duration"); err == nil {
-		if i, err := strconv.ParseInt(v, 10, 64); err == nil {
+		if f, err := strconv.ParseFloat(v, 64); err == nil && !math.IsNaN(f) && !math.IsInf(f, 0) && f >= 0 && f <= math.MaxInt64/1000 {
 			initAudio()
-			audio.SetDuration(i * 1000)
+			audio.SetDuration(int64(math.Round(f * 1000)))
 		}
 	}
 
@@ -304,7 +306,7 @@ func (t Tika) getAudio(meta map[string][]string) *libregraph.Audio {
 	}
 
 	if v, err := getFirstValue(meta, "xmpDM:trackNumber"); err == nil {
-		if i, err := strconv.ParseInt(v, 10, 32); err == nil {
+		if i, err := strconv.ParseInt(numberOfTotal(v), 10, 32); err == nil {
 			initAudio()
 			audio.SetTrack(int32(i))
 		}
@@ -312,12 +314,21 @@ func (t Tika) getAudio(meta map[string][]string) *libregraph.Audio {
 
 	// TODO: audio.TrackCount: not provided by tika
 
+	// the release date is either a year or a full date, e.g. "2004" or "2004-05-12"
 	if v, err := getFirstValue(meta, "xmpDM:releaseDate"); err == nil {
-		if i, err := strconv.ParseInt(v, 10, 32); err == nil {
+		year, _, _ := strings.Cut(v, "-")
+		if i, err := strconv.ParseInt(year, 10, 32); err == nil {
 			initAudio()
 			audio.SetYear(int32(i))
 		}
 	}
 
 	return audio
+}
+
+// numberOfTotal returns the number from a "number/total" value like "7/12",
+// which is how tika reports the track and disc numbers of mp3 files.
+func numberOfTotal(v string) string {
+	number, _, _ := strings.Cut(v, "/")
+	return number
 }
