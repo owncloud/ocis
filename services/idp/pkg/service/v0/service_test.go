@@ -166,6 +166,7 @@ func TestLocalization(t *testing.T) {
 		{"de", "/signin/v1/identifier", []string{"Benutzername", "Passwort"}, "de"},
 		{"fr", "/signin/v1/identifier", []string{"Utilisateur", "Mot de passe"}, "fr"},
 		{"nl", "/signin/v1/identifier", []string{"Gebruikersnaam", "Wachtwoord"}, "nl"},
+		{"cs", "/signin/v1/identifier", []string{"Uživatelské jméno", "Heslo"}, "cs"},
 		{"de", "/signin/v1/welcome", []string{"Sie sind angemeldet"}, "de"},
 		{"de", "/signin/v1/goodbye", []string{"dieses Fenster"}, "de"},
 		{"ja", "/signin/v1/identifier", []string{"Username", "Password"}, "en"},
