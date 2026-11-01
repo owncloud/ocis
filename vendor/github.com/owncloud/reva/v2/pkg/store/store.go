@@ -192,8 +192,15 @@ func defaultNatsOptions(options *microstore.Options) nats.Options {
 	}
 	if creds, ok := options.Context.Value(credentialsContextKey{}).(credentialsOptions); ok {
 		credsOpt, err := natsauth.CredentialsOption(creds.credsFile, creds.creds)
-		if err != nil {
-			// Create cannot return an error. Make each connect attempt fail with the
+		switch {
+		case err != nil && creds.creds == "":
+			// Create cannot return an error. A .creds file can appear or become
+			// valid later, for example when a secret is mounted after the start.
+			// So each connect attempt reads the file again.
+			logger.Logf(logger.ErrorLevel, "reva-store: %v", err)
+			credsOpt = natsauth.Option(creds.credsFile, "")
+		case err != nil:
+			// The content cannot change. Make each connect attempt fail with the
 			// real cause instead of an authorization error from the server.
 			logger.Logf(logger.ErrorLevel, "reva-store: %v", err)
 			credsOpt = func(o *nats.Options) error {

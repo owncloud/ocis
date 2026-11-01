@@ -124,9 +124,17 @@ func New(m map[string]interface{}) (*Options, error) {
 
 	o.GatewayAddr = sharedconf.GetGatewaySVC(o.GatewayAddr)
 
-	for name, c := range map[string]cache.Config{"statcache": o.StatCache, "filemetadatacache": o.FileMetadataCache, "idcache": o.IDCache} {
-		if err := c.CheckCredentials(); err != nil {
-			return nil, errors.Wrap(err, name)
+	// A slice keeps the order fixed, so the error names the same cache on each start.
+	for _, c := range []struct {
+		name string
+		cfg  cache.Config
+	}{
+		{"statcache", o.StatCache},
+		{"filemetadatacache", o.FileMetadataCache},
+		{"idcache", o.IDCache},
+	} {
+		if err := c.cfg.CheckCredentials(); err != nil {
+			return nil, errors.Wrap(err, c.name)
 		}
 	}
 
