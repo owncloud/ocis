@@ -65,9 +65,9 @@ func HasVaultMode(ctx context.Context, gwc gateway.GatewayAPIClient, userID *use
 // check the group members. The checks run in parallel, with a bound. When a check fails, the
 // function calls onError for that user and leaves the user out, so that the caller fails closed.
 func FilterVaultModeUsers(ctx context.Context, gwc gateway.GatewayAPIClient, userIDs []*user.UserId, onError func(*user.UserId, error)) []*user.UserId {
-	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer(tracerName).Start(ctx, "FilterVaultModeUsers")
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer(tracerName).Start(ctx, "FilterVaultModeUsers",
+		trace.WithAttributes(attribute.Int("vault.users.checked", len(userIDs))))
 	defer span.End()
-	span.SetAttributes(attribute.Int("vault.users.checked", len(userIDs)))
 
 	allowed := make([]bool, len(userIDs))
 	errs := make([]error, len(userIDs))
