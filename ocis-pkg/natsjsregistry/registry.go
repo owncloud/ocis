@@ -89,8 +89,9 @@ func (n *storeregistry) Init(opts ...registry.Option) error {
 	for _, o := range opts {
 		o(&n.opts)
 	}
-	n.store = natsjskv.NewStore(n.storeOptions(n.opts)...)
-	return n.store.Init(n.storeOptions(n.opts)...)
+	storeOptions := n.storeOptions(n.opts)
+	n.store = natsjskv.NewStore(storeOptions...)
+	return n.store.Init(storeOptions...)
 }
 
 // Options returns the configured options
