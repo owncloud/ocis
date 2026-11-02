@@ -8,4 +8,5 @@ tag list and from `tag:` searches.
 The graph service now restores the previous tags and answers 500 in that case,
 as it already does when removing tags.
 
+https://github.com/owncloud/ocis/pull/13295
 https://github.com/owncloud/ocis/issues/13286
