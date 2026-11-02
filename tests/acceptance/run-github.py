@@ -485,7 +485,7 @@ def main() -> int:
     if cfg["tikaNeeded"]:
         print("Starting tika...")
         run(["docker", "run", "-d", "--name", "tika", "--network", "host",
-             "apache/tika:3.2.2.0-full"])
+             os.environ.get("TIKA_IMAGE") or "apache/tika:3.2.2.0-full"])
         wait_for(tika_healthy, 120, "tika")
         print("tika ready.")
 
