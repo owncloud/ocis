@@ -22,7 +22,7 @@ require (
 	github.com/egirna/icap-client v0.1.1
 	github.com/gabriel-vasile/mimetype v1.4.15
 	github.com/ggwhite/go-masker v1.1.0
-	github.com/go-chi/chi/v5 v5.3.2
+	github.com/go-chi/chi/v5 v5.4.0
 	github.com/go-chi/httprate v0.16.1
 	github.com/go-chi/render v1.0.3
 	github.com/go-ldap/ldap/v3 v3.4.15
