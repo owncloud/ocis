@@ -1268,6 +1268,12 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		if err == nil && parentStatRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_OK {
 			parentFolderURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetParentId()))
 			breadcrumbFolderURL = parentFolderURL.String()
+		} else {
+			// parent not accessible: link to the file itself and let the web app resolve the
+			// right location (e.g. the Shares space). openWithDefaultApp=false keeps it from
+			// reopening the file.
+			parentFolderURL.Path = privateLinkURL.Path
+			parentFolderURL.RawQuery = "openWithDefaultApp=false"
 		}
 	} else {
 		if scopes, ok := ctxpkg.ContextGetScopes(ctx); ok {
