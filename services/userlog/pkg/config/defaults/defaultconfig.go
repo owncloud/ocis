@@ -41,7 +41,8 @@ func DefaultConfig() *config.Config {
 			Table:    "events",
 			TTL:      time.Hour * 336,
 		},
-		RevaGateway: shared.DefaultRevaConfig().Address,
+		RevaGateway:     shared.DefaultRevaConfig().Address,
+		DefaultLanguage: "en",
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:9210",
 			Root:      "/",
