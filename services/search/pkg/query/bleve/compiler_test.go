@@ -6,6 +6,7 @@ import (
 
 	"github.com/blevesearch/bleve/v2/search/query"
 	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
+	searchQuery "github.com/owncloud/ocis/v2/services/search/pkg/query"
 	tAssert "github.com/stretchr/testify/assert"
 )
 
@@ -786,4 +787,11 @@ func Test_getField(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Test_compile_uncompilableQuery(t *testing.T) {
+	// an AST holding only an operator has no operand to compile
+	_, err := compile(&ast.Ast{Nodes: []ast.Node{&ast.OperatorNode{Value: "AND"}}})
+	tAssert.Error(t, err)
+	tAssert.True(t, searchQuery.IsValidationError(err))
 }
