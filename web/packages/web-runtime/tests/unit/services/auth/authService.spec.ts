@@ -171,6 +171,61 @@ describe('AuthService', () => {
 
       expect(mockUpdateContext).toHaveBeenCalledWith('access-token', true)
     })
+
+    it('does not log the access_token or refresh_token when a new user is loaded', async () => {
+      const authService = new AuthService()
+      const addUserLoadedMock = vi.fn()
+
+      Object.defineProperty(authService, 'userManager', {
+        value: mock<UserManager>({
+          getAccessToken: vi.fn().mockResolvedValue('access-token'),
+          getUser: vi.fn().mockResolvedValue(mock<User>({ expires_in: 3600 })),
+          updateContext: mockUpdateContext,
+          areEventHandlersRegistered: false,
+          events: mock<UserManager['events']>({
+            addUserLoaded: addUserLoadedMock
+          })
+        })
+      })
+
+      initAuthService({ authService })
+
+      await authService.initializeContext(mock<RouteLocation>({}))
+
+      const userLoadedHandler = addUserLoadedMock.mock.calls[0][0]
+
+      const accessToken = 'distinctive-access-token-value'
+      const refreshToken = 'distinctive-refresh-token-value'
+
+      const consoleSpies = {
+        debug: vi.spyOn(console, 'debug').mockImplementation(() => {}),
+        log: vi.spyOn(console, 'log').mockImplementation(() => {}),
+        info: vi.spyOn(console, 'info').mockImplementation(() => {}),
+        warn: vi.spyOn(console, 'warn').mockImplementation(() => {}),
+        error: vi.spyOn(console, 'error').mockImplementation(() => {})
+      }
+
+      try {
+        await userLoadedHandler(
+          mock<User>({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+            expires_in: 3600
+          })
+        )
+
+        const loggedValues = Object.values(consoleSpies)
+          .flatMap((spy) => spy.mock.calls)
+          .flat()
+
+        loggedValues.forEach((value) => {
+          expect(String(value)).not.toContain(accessToken)
+          expect(String(value)).not.toContain(refreshToken)
+        })
+      } finally {
+        Object.values(consoleSpies).forEach((spy) => spy.mockRestore())
+      }
+    })
   })
 
   describe('handleDelegatedTokenUpdate', () => {

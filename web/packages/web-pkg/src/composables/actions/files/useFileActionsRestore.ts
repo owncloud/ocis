@@ -40,6 +40,25 @@ export const useFileActionsRestore = () => {
   const resourcesStore = useResourcesStore()
   const { startWorker } = useRestoreWorker()
 
+  // restoring multiple resources to the same path concurrently fails on the server,
+  // so a resource colliding with another one of the batch gets a unique name
+  const ensureUniqueInBatch = (
+    resource: Resource,
+    resolvedResources: Resource[],
+    existingResources: Resource[]
+  ): Resource => {
+    const parentPath = dirname(resource.path)
+    const batchSiblings = resolvedResources.filter((r) => dirname(r.path) === parentPath)
+    if (!batchSiblings.some((r) => r.path === resource.path)) {
+      return resource
+    }
+    const name = resolveFileNameDuplicate(resource.name, extractExtensionFromFile(resource), [
+      ...existingResources,
+      ...batchSiblings
+    ])
+    return { ...resource, name, path: urlJoin(parentPath, name) }
+  }
+
   // FIXME: use ConflictDialog class for this
   const collectConflicts = async (space: SpaceResource, sortedResources: Resource[]) => {
     const existingResourcesCache: Record<string, Resource[]> = {}
@@ -64,14 +83,12 @@ export const useFileActionsRestore = () => {
         }
         existingResourcesCache[parentPath] = existingResources
       }
-      // Check for naming conflict in parent folder and between resources batch
-      const hasConflict =
-        existingResources.some((r) => r.name === resource.name) ||
-        resolvedResources.filter((r) => r.id !== resource.id).some((r) => r.path === resource.path)
-      if (hasConflict) {
+      // only a naming conflict in the parent folder needs to be resolved by the user,
+      // a conflict between resources of the batch (e.g. multiple deleted versions of the same file) gets resolved automatically
+      if (existingResources.some((r) => r.name === resource.name)) {
         conflicts.push(resource)
       } else {
-        resolvedResources.push(resource)
+        resolvedResources.push(ensureUniqueInBatch(resource, resolvedResources, existingResources))
       }
     }
     return {
@@ -202,7 +219,11 @@ export const useFileActionsRestore = () => {
     const filesToOverwrite = resolvedConflicts
       .filter((e) => e.strategy === ResolveStrategy.REPLACE)
       .map((e) => e.resource)
-    resolvedResources.push(...filesToOverwrite)
+    // only one resource of the batch can replace an existing one, others get a unique name
+    for (const resource of filesToOverwrite) {
+      const existingResources = existingResourcesByPath[dirname(resource.path)] || []
+      resolvedResources.push(ensureUniqueInBatch(resource, resolvedResources, existingResources))
+    }
     const filesToKeepBoth = resolvedConflicts
       .filter((e) => e.strategy === ResolveStrategy.KEEP_BOTH)
       .map((e) => e.resource)

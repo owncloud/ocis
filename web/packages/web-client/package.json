@@ -90,13 +90,13 @@
     "uuid": "^14.0.0",
     "webdav": "^5.9.0",
     "xml-js": "^1.6.11",
-    "zod": "^4.3.6"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/luxon": "3.7.1",
     "@vitejs/plugin-vue": "6.0.1",
     "clean-publish": "6.0.1",
-    "vite": "7.3.5",
+    "vite": "7.3.7",
     "vite-plugin-dts": "4.5.4",
     "vite-plugin-node-polyfills": "0.24.0"
   }

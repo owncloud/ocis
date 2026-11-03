@@ -21,7 +21,7 @@ type Config struct {
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"SHARING_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token." introductionVersion:"pre5.0"`
 
-	UserSharingDriver              string               `yaml:"user_sharing_driver" env:"SHARING_USER_DRIVER" desc:"Driver to be used to persist shares. Supported values are 'jsoncs3', 'json', 'cs3' (deprecated) and 'owncloudsql'." introductionVersion:"pre5.0"`
+	UserSharingDriver              string               `yaml:"user_sharing_driver" env:"SHARING_USER_DRIVER" desc:"Driver to be used to persist shares. Supported values are 'jsoncs3', 'json' and 'cs3' (deprecated)." introductionVersion:"pre5.0"`
 	UserSharingDrivers             UserSharingDrivers   `yaml:"user_sharing_drivers"`
 	PublicSharingDriver            string               `yaml:"public_sharing_driver" env:"SHARING_PUBLIC_DRIVER" desc:"Driver to be used to persist public shares. Supported values are 'jsoncs3', 'json' and 'cs3' (deprecated)." introductionVersion:"pre5.0"`
 	PublicSharingDrivers           PublicSharingDrivers `yaml:"public_sharing_drivers"`
@@ -62,10 +62,9 @@ type GRPCConfig struct {
 }
 
 type UserSharingDrivers struct {
-	JSONCS3     UserSharingJSONCS3Driver     `yaml:"jsoncs3"`
-	JSON        UserSharingJSONDriver        `yaml:"json"`
-	CS3         UserSharingCS3Driver         `yaml:"cs3"`
-	OwnCloudSQL UserSharingOwnCloudSQLDriver `yaml:"owncloudsql"`
+	JSONCS3 UserSharingJSONCS3Driver `yaml:"jsoncs3"`
+	JSON    UserSharingJSONDriver    `yaml:"json"`
+	CS3     UserSharingCS3Driver     `yaml:"cs3"`
 
 	SQL UserSharingSQLDriver `yaml:"sql,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
@@ -84,15 +83,6 @@ type UserSharingSQLDriver struct {
 	EnableExpiredSharesCleanup bool   `yaml:"enable_expired_shares_cleanup"`
 	JanitorRunInterval         int    `yaml:"janitor_run_interval"`
 	UserStorageMountID         string `yaml:"user_storage_mount_id"`
-}
-
-type UserSharingOwnCloudSQLDriver struct {
-	DBUsername         string `yaml:"db_username" env:"SHARING_USER_OWNCLOUDSQL_DB_USERNAME" desc:"Username for the database." introductionVersion:"pre5.0"`
-	DBPassword         string `yaml:"db_password" env:"SHARING_USER_OWNCLOUDSQL_DB_PASSWORD" desc:"Password for the database." introductionVersion:"pre5.0"`
-	DBHost             string `yaml:"db_host" env:"SHARING_USER_OWNCLOUDSQL_DB_HOST" desc:"Hostname or IP of the database server." introductionVersion:"pre5.0"`
-	DBPort             int    `yaml:"db_port" env:"SHARING_USER_OWNCLOUDSQL_DB_PORT" desc:"Port that the database server is listening on." introductionVersion:"pre5.0"`
-	DBName             string `yaml:"db_name" env:"SHARING_USER_OWNCLOUDSQL_DB_NAME" desc:"Name of the database to be used." introductionVersion:"pre5.0"`
-	UserStorageMountID string `yaml:"user_storage_mount_id" env:"SHARING_USER_OWNCLOUDSQL_USER_STORAGE_MOUNT_ID" desc:"Mount ID of the ownCloudSQL users storage for mapping ownCloud 10 shares." introductionVersion:"pre5.0"`
 }
 
 type UserSharingCS3Driver struct {

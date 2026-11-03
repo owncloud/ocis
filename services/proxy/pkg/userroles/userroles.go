@@ -31,6 +31,7 @@ type Options struct {
 	roleService     settingssvc.RoleService
 	rolesClaim      string
 	roleMapping     []config.RoleMapping
+	guestMapping    []config.RoleMapping
 	serviceAccount  config.ServiceAccount
 	logger          log.Logger
 }
@@ -63,6 +64,13 @@ func WithRolesClaim(claim string) Option {
 func WithRoleMapping(roleMap []config.RoleMapping) Option {
 	return func(o *Options) {
 		o.roleMapping = roleMap
+	}
+}
+
+// WithGuestRoleMapping configures the map of ocis role names to claim values for multi-instance guests
+func WithGuestRoleMapping(roleMap []config.RoleMapping) Option {
+	return func(o *Options) {
+		o.guestMapping = roleMap
 	}
 }
 

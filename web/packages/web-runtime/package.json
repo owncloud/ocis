@@ -46,7 +46,7 @@
     "vue3-gettext": "^4.0.1",
     "webdav": "5.9.0",
     "xml-js": "^1.6.11",
-    "zod": "4.3.6"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@ownclouders/web-test-helpers": "workspace:*"

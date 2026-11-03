@@ -30,6 +30,11 @@ type Politeness = 'polite' | 'assertive'
 // NVDA/JAWS cancel the pending live region update
 const ANNOUNCE_DELAY_MS = 150
 
+// Orca drops a live region insertion whose text equals the previously queued one, and
+// emptying the region in between doesn't reset that. A trailing no-break space on every
+// other announcement keeps consecutive texts distinct; it is stripped before speaking.
+const DISTINCT_SUFFIX = '\u00a0'
+
 export default defineComponent({
   name: 'MessageBar',
   setup() {
@@ -46,6 +51,8 @@ export default defineComponent({
     const announcements = reactive<Record<Politeness, string>>({ polite: '', assertive: '' })
     const pending: Record<Politeness, string[]> = { polite: [], assertive: [] }
     const timers: Partial<Record<Politeness, ReturnType<typeof setTimeout>>> = {}
+    // shared across both regions, Orca tracks the last queued live region text globally
+    let appendSuffix = false
 
     const announce = (politeness: Politeness, text: string) => {
       pending[politeness].push(text)
@@ -55,7 +62,9 @@ export default defineComponent({
       // emptying first makes a repeated identical message a real content change
       announcements[politeness] = ''
       timers[politeness] = setTimeout(() => {
-        announcements[politeness] = pending[politeness].join(' ')
+        const text = pending[politeness].join(' ')
+        announcements[politeness] = appendSuffix ? text + DISTINCT_SUFFIX : text
+        appendSuffix = !appendSuffix
         pending[politeness] = []
         timers[politeness] = undefined
       }, ANNOUNCE_DELAY_MS)

@@ -24,6 +24,5 @@ import (
 	_ "github.com/owncloud/reva/v2/pkg/share/manager/json"
 	_ "github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3"
 	_ "github.com/owncloud/reva/v2/pkg/share/manager/memory"
-	_ "github.com/owncloud/reva/v2/pkg/share/manager/owncloudsql"
 	// Add your own here
 )

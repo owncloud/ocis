@@ -94,18 +94,6 @@ func DefaultConfig() *config.Config {
 		GracefulShutdownTimeout: 30,
 		Driver:                  "ocis",
 		Drivers: config.Drivers{
-			OwnCloudSQL: config.OwnCloudSQLDriver{
-				Root:                  filepath.Join(defaults.BaseDataPath(), "storage", "owncloud"),
-				ShareFolder:           "/Shares",
-				UserLayout:            "{{.Username}}",
-				UploadInfoDir:         filepath.Join(defaults.BaseDataPath(), "storage", "uploadinfo"),
-				DBUsername:            "owncloud",
-				DBPassword:            "owncloud",
-				DBHost:                "",
-				DBPort:                3306,
-				DBName:                "owncloud",
-				UsersProviderEndpoint: "com.owncloud.api.users",
-			},
 			S3NG: config.S3NGDriver{
 				Propagator:                 "sync",
 				Root:                       filepath.Join(defaults.BaseDataPath(), "storage", "users"),

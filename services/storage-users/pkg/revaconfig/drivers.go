@@ -137,29 +137,6 @@ func LocalHome(cfg *config.Config) map[string]interface{} {
 	}
 }
 
-// OwnCloudSQL is the config mapping for the OwnCloudSQL storage driver
-func OwnCloudSQL(cfg *config.Config) map[string]interface{} {
-	return map[string]interface{}{
-		"datadirectory":   cfg.Drivers.OwnCloudSQL.Root,
-		"upload_info_dir": cfg.Drivers.OwnCloudSQL.UploadInfoDir,
-		"share_folder":    cfg.Drivers.OwnCloudSQL.ShareFolder,
-		"user_layout":     cfg.Drivers.OwnCloudSQL.UserLayout,
-		"enable_home":     false,
-		"dbusername":      cfg.Drivers.OwnCloudSQL.DBUsername,
-		"dbpassword":      cfg.Drivers.OwnCloudSQL.DBPassword,
-		"dbhost":          cfg.Drivers.OwnCloudSQL.DBHost,
-		"dbport":          cfg.Drivers.OwnCloudSQL.DBPort,
-		"dbname":          cfg.Drivers.OwnCloudSQL.DBName,
-		"userprovidersvc": cfg.Drivers.OwnCloudSQL.UsersProviderEndpoint,
-		"tokens": map[string]interface{}{
-			"download_endpoint":      cfg.DataServerURL,
-			"datagateway_endpoint":   cfg.DataGatewayURL,
-			"transfer_shared_secret": cfg.Commons.TransferSecret,
-			"transfer_expires":       cfg.TransferExpires,
-		},
-	}
-}
-
 // Ocis is the config mapping for the Ocis storage driver
 func Ocis(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{

@@ -228,6 +228,11 @@ jobs:
           # collaboration (needs WOPI)
           - apiCollaboration
           - apiVault
+        include:
+          # same suite against the Tika 4.x line (the default entry above uses 3.x)
+          - suite: apiSearchContent-tika4
+            behat_suite: apiSearchContent
+            tika_image: apache/tika:4.2.0-full
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -290,7 +295,9 @@ jobs:
       - name: Run ${{ matrix.suite }}
         run: |
           mkdir -p "$GOCOVERDIR"
-          BEHAT_SUITES=${{ matrix.suite }} python3 tests/acceptance/run-github.py
+          BEHAT_SUITES=${{ matrix.behat_suite || matrix.suite }} python3 tests/acceptance/run-github.py
+        env:
+          TIKA_IMAGE: ${{ matrix.tika_image }}
 
       - name: Upload raw coverage data
         if: always()

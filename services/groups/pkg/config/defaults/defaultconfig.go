@@ -72,18 +72,6 @@ func DefaultConfig() *config.Config {
 					Member:      "member",
 				},
 			},
-			OwnCloudSQL: config.OwnCloudSQLDriver{
-				DBUsername:         "owncloud",
-				DBPassword:         "",
-				DBHost:             "mysql",
-				DBPort:             3306,
-				DBName:             "owncloud",
-				IDP:                "https://localhost:9200",
-				Nobody:             90,
-				JoinUsername:       false,
-				JoinOwnCloudUUID:   false,
-				EnableMedialSearch: false,
-			},
 		},
 	}
 }

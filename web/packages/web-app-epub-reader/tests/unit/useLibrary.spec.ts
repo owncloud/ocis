@@ -216,10 +216,25 @@ describe('useLibrary', () => {
       })
     })
 
-    it('reports an error when no private link is available', async () => {
+    it('builds the link from the file id when the resource has no private link', async () => {
       await withLibrary({ searchAvailable: true }, async ({ library }) => {
         const book = {
           resource: epubResource({ privateLink: undefined }),
+          space: personalSpace
+        } as never
+
+        const success = await library.copyBookLink(book)
+
+        expect(success).toBe(true)
+        expect(copyToClipboard).toHaveBeenCalledWith(expect.stringMatching(/\/f\/file-1$/))
+        expect(showErrorMessage).not.toHaveBeenCalled()
+      })
+    })
+
+    it('reports an error when no link can be built', async () => {
+      await withLibrary({ searchAvailable: true }, async ({ library }) => {
+        const book = {
+          resource: epubResource({ privateLink: undefined, fileId: undefined, id: undefined }),
           space: personalSpace
         } as never
 

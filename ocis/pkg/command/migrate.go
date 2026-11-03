@@ -501,15 +501,6 @@ func revaShareConfig(cfg *sharing.Config) map[string]interface{} {
 			"enable_expired_shares_cleanup": cfg.UserSharingDrivers.SQL.EnableExpiredSharesCleanup,
 			"janitor_run_interval":          cfg.UserSharingDrivers.SQL.JanitorRunInterval,
 		},
-		"owncloudsql": map[string]interface{}{
-			"gateway_addr":     cfg.Reva.Address,
-			"storage_mount_id": cfg.UserSharingDrivers.OwnCloudSQL.UserStorageMountID,
-			"db_username":      cfg.UserSharingDrivers.OwnCloudSQL.DBUsername,
-			"db_password":      cfg.UserSharingDrivers.OwnCloudSQL.DBPassword,
-			"db_host":          cfg.UserSharingDrivers.OwnCloudSQL.DBHost,
-			"db_port":          cfg.UserSharingDrivers.OwnCloudSQL.DBPort,
-			"db_name":          cfg.UserSharingDrivers.OwnCloudSQL.DBName,
-		},
 		"cs3": map[string]interface{}{
 			"gateway_addr":        cfg.UserSharingDrivers.CS3.ProviderAddr,
 			"provider_addr":       cfg.UserSharingDrivers.CS3.ProviderAddr,

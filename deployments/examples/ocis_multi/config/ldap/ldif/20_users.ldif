@@ -18,7 +18,7 @@ gidNumber: 30000
 homeDirectory: /home/einstein
 ownCloudUUID: 4c510ada-c86b-4815-8820-42cdf82c3d51
 owncloudMemberOf: ec730a6c-1b63-4b45-b83b-9e2311afdf85
-ownCloudRole: ocisUser
+ownCloudRole: ocisSpaceAdmin
 userPassword:: e1NTSEF9TXJEcXpFNGdKbXZxbVRVTGhvWEZ1VzJBbkV3NWFLK3J3WTIvbHc9PQ==
 
 dn: uid=marie,ou=users,dc=owncloud,dc=com
