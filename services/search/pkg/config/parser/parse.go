@@ -2,6 +2,7 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -43,6 +44,10 @@ func Validate(cfg *config.Config) error {
 	}
 	if cfg.ServiceAccount.ServiceAccountSecret == "" {
 		return shared.MissingServiceAccountSecret(cfg.Service.Name)
+	}
+	if cfg.Extractor.MaxConsecutiveFailures < 0 {
+		return fmt.Errorf("%s: SEARCH_EXTRACTOR_MAX_CONSECUTIVE_FAILURES must be 0 (never abort) or greater, got %d",
+			cfg.Service.Name, cfg.Extractor.MaxConsecutiveFailures)
 	}
 
 	return nil
