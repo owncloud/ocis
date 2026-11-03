@@ -55,6 +55,7 @@ func TestUserlogFilter_execute(t *testing.T) {
 		{"SpaceDisabled enabled", setupMockValueService(true), args{users: []string{"foo"}, event: events.Event{Event: events.SpaceDisabled{}}, ctx: context.TODO()}, []string{"foo"}},
 		{"SpaceDeleted enabled", setupMockValueService(true), args{users: []string{"foo"}, event: events.Event{Event: events.SpaceDeleted{}}, ctx: context.TODO()}, []string{"foo"}},
 		{"PostprocessingStepFinished enabled", setupMockValueService(true), args{users: []string{"foo"}, event: events.Event{Event: events.PostprocessingStepFinished{}}, ctx: context.TODO()}, []string{"foo"}},
+		{"UploadReady enabled", setupMockValueService(true), args{users: []string{"foo"}, event: events.Event{Event: events.UploadReady{}}, ctx: context.TODO()}, []string{"foo"}},
 		{"ShareCreated disabled", setupMockValueService(false), args{users: []string{"foo"}, event: events.Event{Event: events.ShareCreated{}}, ctx: context.TODO()}, []string(nil)},
 		{"ShareRemoved disabled", setupMockValueService(false), args{users: []string{"foo"}, event: events.Event{Event: events.ShareRemoved{}}, ctx: context.TODO()}, []string(nil)},
 		{"ShareExpired disabled", setupMockValueService(false), args{users: []string{"foo"}, event: events.Event{Event: events.ShareExpired{}}, ctx: context.TODO()}, []string(nil)},
@@ -64,6 +65,7 @@ func TestUserlogFilter_execute(t *testing.T) {
 		{"SpaceDisabled disabled", setupMockValueService(false), args{users: []string{"foo"}, event: events.Event{Event: events.SpaceDisabled{}}, ctx: context.TODO()}, []string(nil)},
 		{"SpaceDeleted disabled", setupMockValueService(false), args{users: []string{"foo"}, event: events.Event{Event: events.SpaceDeleted{}}, ctx: context.TODO()}, []string(nil)},
 		{"PostprocessingStepFinished disabled", setupMockValueService(false), args{users: []string{"foo"}, event: events.Event{Event: events.PostprocessingStepFinished{}}, ctx: context.TODO()}, []string(nil)},
+		{"UploadReady disabled", setupMockValueService(false), args{users: []string{"foo"}, event: events.Event{Event: events.UploadReady{}}, ctx: context.TODO()}, []string(nil)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
