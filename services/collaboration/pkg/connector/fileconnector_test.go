@@ -3351,7 +3351,7 @@ var _ = Describe("FileConnector", func() {
 			Expect(collaboraResponse.BreadcrumbFolderURL).To(Equal("https://ocis.example.prv/f/storageid$spaceid%21documentsid"))
 		})
 
-		It("Collabora CheckFileInfo omits the folder link if the parent folder isn't accessible", func() {
+		It("Collabora CheckFileInfo omits the folder link and closes to the file link if the parent folder isn't accessible", func() {
 			// e.g. a file shared directly with the user, its parent folder belongs to the sharer
 			parentStatRes = &providerv1beta1.StatResponse{Status: status.NewNotFound(context.Background(), "not found")}
 
@@ -3406,7 +3406,7 @@ var _ = Describe("FileConnector", func() {
 
 			collaboraResponse := response.Body.(*fileinfo.Collabora)
 			Expect(collaboraResponse.BreadcrumbFolderURL).To(BeEmpty())
-			Expect(collaboraResponse.CloseURL).To(Equal("https://ocis.example.prv"))
+			Expect(collaboraResponse.CloseURL).To(Equal("https://ocis.example.prv/f/storageid$spaceid%21fileid?openWithDefaultApp=false"))
 		})
 
 		It("Collabora CheckFileInfo breadcrumb folder name falls back to the space name for a file at the space root", func() {
