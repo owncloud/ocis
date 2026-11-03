@@ -28,7 +28,7 @@ prepare-charts:
 	kubectl create namespace $(DOMAIN) || true
 	kubectl create configmap -n $(DOMAIN) ocis-fonts-ttf --from-file=../ci/NotoSans.ttf || true
 	kubectl create secret generic -n $(DOMAIN) ocis-admin-user \
-		--from-literal=user-id=ddc2004c-0977-11eb-9d3f-a793888cd0f8 --from-literal=password=admin || true
+		--from-literal=user-id=3c5f1c9e-8a4b-4d2e-9b7a-6f0e1d2c3b4a --from-literal=password=admin || true
 	sed 's|https://ocis-server:9200|https://$(DOMAIN)|g' ../ci/ocis-config.json > $(CHART_REPO)/web-config.json
 	kubectl create configmap -n $(DOMAIN) ocis-web-config \
 		--from-file=web-config.json=$(CHART_REPO)/web-config.json || true
