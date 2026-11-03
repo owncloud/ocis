@@ -288,9 +288,34 @@ const uploadInfoTitle = computed(() => {
   )
 })
 
+const HTTP_STATUS_INSUFFICIENT_STORAGE = 507
+
+//TODO: Remove message parsing as soon as https://github.com/tus/tus-js-client/issues/448 is solved
+const getErrorResponseCode = (error: HttpError): number | null => {
+  if (error.statusCode) {
+    return error.statusCode
+  }
+  const responseCode = error.message?.match(/response code: (\d+)/)?.[1]
+  return responseCode ? parseInt(responseCode) : null
+}
+
 const uploadingLabel = computed(() => {
   if (Object.keys(unref(errors)).length) {
     const count = unref(successful).length + Object.keys(unref(errors)).length
+
+    if (
+      Object.values(unref(errors)).every(
+        (error) => getErrorResponseCode(error) === HTTP_STATUS_INSUFFICIENT_STORAGE
+      )
+    ) {
+      return $npgettext(
+        'The label of the upload overlay displayed when all failed items have failed because the quota has been exceeded.',
+        'Quota exceeded: %{ errors } of %{ uploads } item failed',
+        'Quota exceeded: %{ errors } of %{ uploads } items failed',
+        count,
+        { uploads: count.toString(), errors: Object.keys(unref(errors)).length.toString() }
+      )
+    }
 
     return $npgettext(
       'The label of the upload overlay displayed when at least one item has failed.',
@@ -561,16 +586,13 @@ const getUploadItemMessage = (item: UploadResult) => {
   const formatErrorMessageToObject = (
     errorMessage: string
   ): {
-    responseCode: number | null
     errorCode: string | null
     errorMessage: string | null
   } => {
-    const responseCode = errorMessage.match(/response code: (\d+)/)?.[1]
     const responseText = errorMessage.match(/response text: ([\s\S]+?), request id/)?.[1]
     const errorBody = JSON.parse(responseText?.startsWith('{') ? responseText : '{}')
 
     return {
-      responseCode: responseCode ? parseInt(responseCode) : null,
       errorCode: errorBody?.error?.code,
       errorMessage: errorBody?.error?.message
     }
@@ -585,8 +607,8 @@ const getUploadItemMessage = (item: UploadResult) => {
     )
   }
 
-  switch (errorObject.responseCode) {
-    case 507:
+  switch (getErrorResponseCode(error)) {
+    case HTTP_STATUS_INSUFFICIENT_STORAGE:
       return $pgettext(
         'The message displayed in the upload overlay for a single upload item when the quota has been exceeded',
         'Quota exceeded'
@@ -755,8 +777,9 @@ onMounted(() => {
     uploads.value[file.meta.uploadId].targetRoute = buildRouteFromUppyResource(file)
     uploads.value[file.meta.uploadId].status = 'error'
     errors.value[file.meta.uploadId] = error as HttpError
+    // runningUploads counts batches, not files: it's decremented once per batch on
+    // 'uploadCompleted', which is also published for failed batches
     filesInProgressCount.value -= 1
-    runningUploads.value -= 1
 
     if (file.meta.topLevelFolderId) {
       handleTopLevelFolderUpdate(file, 'error')
