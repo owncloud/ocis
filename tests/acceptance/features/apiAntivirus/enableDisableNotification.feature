@@ -91,6 +91,21 @@ Feature: enable/disable malware related notification
       | spaces           | eicar.com     | virusFile1.txt |
 
 
+  Scenario Outline: user receives exactly one notification for a virus-infected upload when notifications are enabled
+    Given using <dav-path-version> DAV path
+    When user "Brian" has uploaded file "filesForUpload/filesWithVirus/<file-name>" to "<new-file-name>"
+    And user "Brian" lists all notifications
+    Then there should be "1" notifications
+    And user "Brian" should get a notification with subject "Virus found" and message:
+      | message                                              |
+      | Virus found in <new-file-name>. Upload not possible. |
+    Examples:
+      | dav-path-version | file-name | new-file-name  |
+      | old              | eicar.com | virusFile2.txt |
+      | new              | eicar.com | virusFile2.txt |
+      | spaces           | eicar.com | virusFile2.txt |
+
+
   Scenario: disable in-app notification for "File rejected" event (Project space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
