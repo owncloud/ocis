@@ -8,10 +8,10 @@ import (
 	"html/template"
 	"os"
 	"os/signal"
-	"runtime"
 	"strings"
 
 	"github.com/go-ldap/ldif"
+	"github.com/libregraph/idm/pkg/ldappassword"
 	"github.com/libregraph/idm/pkg/ldbbolt"
 	"github.com/libregraph/idm/server"
 	"github.com/urfave/cli/v2"
@@ -177,8 +177,15 @@ func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) erro
 			// password is alread hashed
 			serviceUsers[i].Password = "{ARGON2}" + serviceUsers[i].Password
 		} else {
-			if serviceUsers[i].Password, err = hashPassword(serviceUsers[i].Password); err != nil {
-				return err
+			if serviceUsers[i].Name == "idp" {
+				// custom hash only for the idp to reduce the cost
+				if serviceUsers[i].Password, err = hashPassword(serviceUsers[i].Password); err != nil {
+					return err
+				}
+			} else {
+				if serviceUsers[i].Password, err = ldappassword.Hash(serviceUsers[i].Password, "{ARGON2}"); err != nil {
+					return err
+				}
 			}
 		}
 		// We need to treat the hash as binary in the LDIF template to avoid
@@ -238,11 +245,12 @@ func hashPassword(password string) (string, error) {
 	memory := uint32(1024)
 	iterations := uint32(5)
 	keyLength := uint32(32)
-	threads := uint8(runtime.NumCPU())
+	threads := uint8(4)
+	saltBytes := []byte(salt)
 
-	key := argon2.IDKey([]byte(password), []byte(salt), iterations, memory, threads, keyLength)
+	key := argon2.IDKey([]byte(password), saltBytes, iterations, memory, threads, keyLength)
 
-	b64Salt := base64.RawStdEncoding.EncodeToString([]byte(salt))
+	b64Salt := base64.RawStdEncoding.EncodeToString(saltBytes)
 	b64Key := base64.RawStdEncoding.EncodeToString(key)
 
 	hash := fmt.Sprintf("$argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s", argon2.Version, memory, iterations, threads, b64Salt, b64Key)
