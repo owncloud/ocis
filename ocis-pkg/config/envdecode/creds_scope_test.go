@@ -2,6 +2,8 @@ package envdecode
 
 import (
 	"testing"
+
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
 
 type credsScopeEvents struct {
@@ -170,6 +172,21 @@ func TestResolveCredsScopeUsernameAndPassword(t *testing.T) {
 				t.Errorf("got file %q creds %q, want file %q creds %q", cfg.CredsFile, cfg.Creds, tc.wantFile, tc.wantCreds)
 			}
 		})
+	}
+}
+
+// TestResolveCredsScopeRealStruct pins resolveCredsScope against a real production
+// struct (shared.Cache), not only the synthetic structs above.
+func TestResolveCredsScopeRealStruct(t *testing.T) {
+	t.Setenv("OCIS_NATS_CREDS_FILE", "/global.creds")
+	t.Setenv("OCIS_NATS_CREDS", "global")
+
+	var c shared.Cache
+	if err := Decode(&c); err != nil {
+		t.Fatal(err)
+	}
+	if c.CredsFile != "/global.creds" || c.Creds != "global" {
+		t.Errorf("got file %q creds %q, want file %q creds %q", c.CredsFile, c.Creds, "/global.creds", "global")
 	}
 }
 

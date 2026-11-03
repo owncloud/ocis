@@ -14,6 +14,7 @@ import (
 
 	natsjskv "github.com/go-micro/plugins/v4/store/nats-js-kv"
 	"github.com/nats-io/nats.go"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/reva/v2/pkg/natsauth"
@@ -89,9 +90,10 @@ func (n *storeregistry) Init(opts ...registry.Option) error {
 	for _, o := range opts {
 		o(&n.opts)
 	}
-	storeOptions := n.storeOptions(n.opts)
-	n.store = natsjskv.NewStore(storeOptions...)
-	return n.store.Init(storeOptions...)
+	// NewStore and Init each apply the full option list on their own; giving
+	// NewStore the options too would just apply them twice.
+	n.store = natsjskv.NewStore()
+	return n.store.Init(n.storeOptions(n.opts)...)
 }
 
 // Options returns the configured options
@@ -284,20 +286,21 @@ func exit(serviceName string, err error, msg string) {
 	os.Exit(1)
 }
 
-// getCreds returns the path and the content of the NATS .creds file for the registry.
-// The registry variables take precedence. If both are empty, the registry uses the global
-// OCIS_NATS_* variables. The registry username and password are also registry variables.
-// When both have a value, they take precedence over the global variables. The registry
-// then does not use the global credentials.
+// credsScope lets resolveCredsScope apply the same precedence as other services.
+// The leading empty tag entry puts AuthUsername/AuthPassword at registry-JWT scope.
+type credsScope struct {
+	CredsFile    string `env:"OCIS_NATS_CREDS_FILE;MICRO_REGISTRY_AUTH_CREDS_FILE"`
+	Creds        string `env:"OCIS_NATS_CREDS;MICRO_REGISTRY_AUTH_CREDS"`
+	AuthUsername string `env:";MICRO_REGISTRY_AUTH_USERNAME"`
+	AuthPassword string `env:";MICRO_REGISTRY_AUTH_PASSWORD"`
+}
+
+// getCreds returns the path and the content of the NATS .creds file for the registry,
+// applying the same global/service-specific precedence as every other service config.
 func getCreds() (string, string) {
-	credsFile, creds := os.Getenv(_registryCredsFileEnv), os.Getenv(_registryCredsEnv)
-	if credsFile != "" || creds != "" {
-		return credsFile, creds
-	}
-	if user, password := getAuth(); user != "" && password != "" {
-		return "", ""
-	}
-	return os.Getenv(_natsCredsFileEnv), os.Getenv(_natsCredsEnv)
+	var cfg credsScope
+	_ = envdecode.Decode(&cfg) // the only possible error is "no env var is set"; an empty result is correct then
+	return cfg.CredsFile, cfg.Creds
 }
 
 var (

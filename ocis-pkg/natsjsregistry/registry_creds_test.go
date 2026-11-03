@@ -38,8 +38,27 @@ func TestGetCreds(t *testing.T) {
 		t.Setenv(_natsCredsFileEnv, "/global.creds")
 		t.Setenv(_registryCredsEnv, "registry")
 		credsFile, creds := getCreds()
-		require.Empty(t, credsFile)
+		// Not cleared since it's less specific; natsauth already picks content
+		// over a file when both are set.
+		require.Equal(t, "/global.creds", credsFile)
 		require.Equal(t, "registry", creds)
+	})
+
+	t.Run("registry content takes precedence over registry file in the same scope", func(t *testing.T) {
+		t.Setenv(_registryCredsFileEnv, "/registry.creds")
+		t.Setenv(_registryCredsEnv, "registry")
+		credsFile, creds := getCreds()
+		require.Equal(t, "/registry.creds", credsFile)
+		require.Equal(t, "registry", creds)
+	})
+
+	t.Run("registry username and password do not override registry file in the same scope", func(t *testing.T) {
+		t.Setenv(_registryCredsFileEnv, "/registry.creds")
+		t.Setenv(_registryUsernameEnv, "user")
+		t.Setenv(_registryPasswordEnv, "pass")
+		credsFile, creds := getCreds()
+		require.Equal(t, "/registry.creds", credsFile)
+		require.Empty(t, creds)
 	})
 
 	t.Run("registry username and password take precedence over global variables", func(t *testing.T) {

@@ -1,6 +1,7 @@
 package envdecode
 
 import (
+	"log"
 	"os"
 	"reflect"
 	"strings"
@@ -43,6 +44,9 @@ func resolveCredsScope(s reflect.Value) {
 		prefix := strings.TrimSuffix(credsField.Name, credsSuffix)
 		fileField, ok := stringField(t, prefix+credsFileSuffix)
 		if !ok {
+			// A "...Creds" field always has a sibling "...CredsFile" field; a missing
+			// one is a naming bug, so log it instead of silently doing nothing.
+			log.Printf("envdecode: %s.%s has no matching %q field; NATS creds precedence is not applied to it", t.Name(), credsField.Name, prefix+credsFileSuffix)
 			continue
 		}
 

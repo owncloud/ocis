@@ -171,8 +171,15 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.Cache == nil && cfg.Commons != nil && cfg.Commons.Cache != nil {
 		cfg.Cache = &config.Cache{
-			Store: cfg.Commons.Cache.Store,
-			Nodes: cfg.Commons.Cache.Nodes,
+			Store:                cfg.Commons.Cache.Store,
+			Nodes:                cfg.Commons.Cache.Nodes,
+			AuthUsername:         cfg.Commons.Cache.AuthUsername,
+			AuthPassword:         cfg.Commons.Cache.AuthPassword,
+			CredsFile:            cfg.Commons.Cache.CredsFile,
+			Creds:                cfg.Commons.Cache.Creds,
+			EnableTLS:            cfg.Commons.Cache.EnableTLS,
+			TLSInsecure:          cfg.Commons.Cache.TLSInsecure,
+			TLSRootCACertificate: cfg.Commons.Cache.TLSRootCACertificate,
 		}
 	} else if cfg.Cache == nil {
 		cfg.Cache = &config.Cache{}
