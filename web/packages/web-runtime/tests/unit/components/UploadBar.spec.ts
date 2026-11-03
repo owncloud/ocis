@@ -1,8 +1,9 @@
 import UploadBar from '../../../src/components/UploadBar.vue'
 import { defaultPlugins, shallowMount, defaultComponentMocks } from '@ownclouders/web-test-helpers'
-import { ResourceListItem, OcUppyFile } from '@ownclouders/web-pkg'
+import { ResourceListItem, OcUppyFile, UppyService } from '@ownclouders/web-pkg'
 import { nextTick } from 'vue'
 import { HttpError } from '@ownclouders/web-client'
+import { mockDeep } from 'vitest-mock-extended'
 
 const selectors = {
   overlay: '#upload-bar',
@@ -235,13 +236,90 @@ describe('UploadBar component', () => {
   })
 })
 
+describe('upload events', () => {
+  const quotaError = () =>
+    new HttpError('tus: unexpected response, response code: 507, request id: 1', undefined)
+
+  const file = (uploadId: string) =>
+    ({
+      name: `file${uploadId}`,
+      data: { size: 10 },
+      meta: { uploadId, currentFolder: '/' }
+    }) as unknown as OcUppyFile
+
+  const startBatch = (emit: EmitFn, files: OcUppyFile[]) => {
+    emit('uploadStarted')
+    emit('addedForUpload', files)
+    for (const f of files) {
+      emit('upload-progress', { file: f, progress: { bytesUploaded: 10 } })
+    }
+  }
+
+  it('stops finalizing when all files of a batch fail', async () => {
+    const { wrapper, emit } = getShallowWrapper()
+    const files = [file('1'), file('2')]
+    startBatch(emit, files)
+    expect(wrapper.vm.inFinalization).toBe(true)
+
+    emit('uploadError', { file: files[0], error: quotaError() })
+    emit('uploadError', { file: files[1], error: quotaError() })
+    emit('uploadCompleted', { successful: [], failed: files })
+    await nextTick()
+
+    expect(wrapper.vm.runningUploads).toBe(0)
+    expect(wrapper.vm.inFinalization).toBe(false)
+    expect(wrapper.find(selectors.title).text()).toBe('Upload failed')
+    expect(wrapper.find(selectors.error).text()).toBe('Quota exceeded: 2 of 2 items failed')
+  })
+
+  it('does not drop the running uploads below zero for a partially failed batch', async () => {
+    const { wrapper, emit } = getShallowWrapper()
+    const files = [file('1'), file('2')]
+    startBatch(emit, files)
+
+    emit('uploadSuccess', files[0])
+    emit('uploadError', { file: files[1], error: quotaError() })
+    emit('uploadCompleted', { successful: [files[0]], failed: [files[1]] })
+    await nextTick()
+
+    expect(wrapper.vm.runningUploads).toBe(0)
+    expect(wrapper.find(selectors.title).text()).toBe('Upload failed')
+    expect(wrapper.find(selectors.error).text()).toBe('Quota exceeded: 1 of 2 items failed')
+  })
+
+  it('does not blame the quota when other errors occurred too', async () => {
+    const { wrapper, emit } = getShallowWrapper()
+    const files = [file('1'), file('2')]
+    startBatch(emit, files)
+
+    emit('uploadError', { file: files[0], error: quotaError() })
+    emit('uploadError', { file: files[1], error: new HttpError('', undefined, 412) })
+    emit('uploadCompleted', { successful: [], failed: files })
+    await nextTick()
+
+    expect(wrapper.find(selectors.error).text()).toBe('2 of 2 items failed')
+  })
+})
+
+type EmitFn = (topic: string, data?: unknown) => void
+
 function getShallowWrapper() {
+  const handlers: Record<string, ((data?: unknown) => void)[]> = {}
+  const uppyService = mockDeep<UppyService>()
+  uppyService.subscribe.mockImplementation((topic: string, cb: (data?: unknown) => void) => {
+    ;(handlers[topic] ||= []).push(cb)
+    return topic
+  })
+  const emit: EmitFn = (topic, data) => (handlers[topic] || []).forEach((cb) => cb(data))
+
   const mocks = {
-    ...defaultComponentMocks()
+    ...defaultComponentMocks(),
+    $uppyService: uppyService
   }
 
   return {
     mocks,
+    emit,
     wrapper: shallowMount(UploadBar, {
       global: {
         plugins: defaultPlugins(),
