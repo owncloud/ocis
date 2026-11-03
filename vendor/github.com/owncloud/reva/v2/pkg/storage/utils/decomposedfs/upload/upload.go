@@ -145,6 +145,8 @@ func (session *OcisSession) FinishUploadDecomposed(ctx context.Context) error {
 
 	sha1h, md5h, adler32h, err := node.CalculateChecksums(ctx, session.binPath())
 	if err != nil {
+		// the node was never touched, only the session's bin/info files need cleanup.
+		session.Cleanup(false, true, true, false)
 		return err
 	}
 
@@ -183,11 +185,14 @@ func (session *OcisSession) FinishUploadDecomposed(ctx context.Context) error {
 	if session.store.um != nil && session.info.Storage["SpaceGid"] != "" {
 		gid, err := strconv.Atoi(session.info.Storage["SpaceGid"])
 		if err != nil {
+			// the node was never touched, only the session's bin/info files need cleanup.
+			session.Cleanup(false, true, true, false)
 			return errors.Wrap(err, "failed to parse space gid")
 		}
 
 		unscope, err := session.store.um.ScopeUserByIds(-1, gid)
 		if err != nil {
+			session.Cleanup(false, true, true, false)
 			return errors.Wrap(err, "failed to scope user")
 		}
 		if unscope != nil {
@@ -197,6 +202,9 @@ func (session *OcisSession) FinishUploadDecomposed(ctx context.Context) error {
 
 	n, err := session.store.CreateNodeForUpload(ctx, session, attrs)
 	if err != nil {
+		// e.g. an etag conflict from updateExistingNode: the node was never touched,
+		// only the session's bin/info files need cleanup, as with checksum mismatch above.
+		session.Cleanup(false, true, true, false)
 		return err
 	}
 	// increase the processing counter for every started processing
@@ -208,6 +216,8 @@ func (session *OcisSession) FinishUploadDecomposed(ctx context.Context) error {
 		u, _ := ctxpkg.ContextGetUser(ctx)
 		s, err := session.URL(ctx)
 		if err != nil {
+			// the node was already created/updated: revert it, same as a failed Finalize below.
+			session.Cleanup(true, true, true, true)
 			return err
 		}
 
@@ -215,6 +225,7 @@ func (session *OcisSession) FinishUploadDecomposed(ctx context.Context) error {
 		if utils.ExistsInOpaque(u.Opaque, "impersonating-user") {
 			iu = &userpb.User{}
 			if err := utils.ReadJSONFromOpaque(u.Opaque, "impersonating-user", iu); err != nil {
+				session.Cleanup(true, true, true, true)
 				return err
 			}
 		}
@@ -229,6 +240,7 @@ func (session *OcisSession) FinishUploadDecomposed(ctx context.Context) error {
 			Filesize:          uint64(session.Size()),
 			ImpersonatingUser: iu,
 		}); err != nil {
+			session.Cleanup(true, true, true, true)
 			return err
 		}
 	}
