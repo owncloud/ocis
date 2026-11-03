@@ -24,6 +24,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	. "github.com/onsi/ginkgo/v2"
@@ -292,6 +293,7 @@ https://owncloud.com
 
 	DescribeTable("Vault resources are redacted in notifications",
 		func(ev events.Event, mustNotContain string) {
+			gatewayClient.On("CheckPermission", mock.Anything, mock.Anything).Return(&permissions.CheckPermissionResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
 			received := make(chan *channels.Message, 1)
 			ch := make(chan events.Event)
 			evts := NewEventsNotifier(trace.NewNoopTracerProvider(), ch, capturingChannel{out: received}, log.NewLogger(), gatewaySelector, vs, "",
@@ -364,6 +366,66 @@ https://owncloud.com
 				ExpiredAt:     time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC),
 			},
 		}, "vault space"),
+	)
+
+	DescribeTable("Vault group grantees are filtered by the vault mode permission",
+		func(ev events.Event) {
+			outsider := &user.User{
+				Id:          &user.UserId{OpaqueId: "outsider"},
+				Mail:        "outsider@owncloud.com",
+				DisplayName: "Otto Outsider",
+			}
+			gatewayClient.On("GetGroup", mock.Anything, mock.Anything).Return(&group.GetGroupResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+				Group:  &group.Group{Members: []*user.UserId{sharee.GetId(), outsider.GetId()}},
+			}, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.MatchedBy(func(r *user.GetUserRequest) bool {
+				return r.GetUserId().GetOpaqueId() == outsider.GetId().GetOpaqueId()
+			})).Return(&user.GetUserResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, User: outsider}, nil)
+			gatewayClient.On("CheckPermission", mock.Anything, mock.Anything).Return(func(_ context.Context, r *permissions.CheckPermissionRequest, _ ...grpc.CallOption) (*permissions.CheckPermissionResponse, error) {
+				code := rpc.Code_CODE_PERMISSION_DENIED
+				if r.GetSubjectRef().GetUserId().GetOpaqueId() == sharee.GetId().GetOpaqueId() {
+					code = rpc.Code_CODE_OK
+				}
+				return &permissions.CheckPermissionResponse{Status: &rpc.Status{Code: code}}, nil
+			})
+
+			received := make(chan *channels.Message, 2)
+			ch := make(chan events.Event)
+			evts := NewEventsNotifier(trace.NewNoopTracerProvider(), ch, capturingChannel{out: received}, log.NewLogger(), gatewaySelector, vs, "",
+				"", "", "", "", "", "",
+				store.Create(), nil, nil)
+			go evts.Run()
+
+			ch <- ev
+
+			var msg *channels.Message
+			select {
+			case msg = <-received:
+			case <-time.Tick(3 * time.Second):
+				Fail("timeout waiting for notification")
+			}
+			Expect(msg.Recipient).To(Equal([]string{sharee.GetMail()}))
+			Consistently(received, 200*time.Millisecond).ShouldNot(Receive())
+		},
+
+		Entry("Share Created", events.Event{
+			Event: events.ShareCreated{
+				Sharer:         sharer.GetId(),
+				GranteeGroupID: &group.GroupId{OpaqueId: "vaultgroup"},
+				CTime:          utils.TimeToTS(time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC)),
+				ItemID:         vaultResourceID,
+			},
+		}),
+
+		Entry("Added to Space", events.Event{
+			Event: events.SpaceShared{
+				Executant:      sharer.GetId(),
+				Creator:        sharer.GetId(),
+				GranteeGroupID: &group.GroupId{OpaqueId: "vaultgroup"},
+				ID:             vaultSpaceID,
+			},
+		}),
 	)
 })
 

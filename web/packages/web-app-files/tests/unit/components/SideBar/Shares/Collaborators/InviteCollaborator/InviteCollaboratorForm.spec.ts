@@ -10,7 +10,12 @@ import {
 } from '@ownclouders/web-test-helpers'
 import { Resource, SpaceResource, VAULT_STORAGE_PROVIDER_ID } from '@ownclouders/web-client'
 import { useSharesStore } from '@ownclouders/web-pkg'
-import { CollaboratorAutoCompleteItem, CollaboratorShare, ShareRole } from '@ownclouders/web-client'
+import {
+  CollaboratorAutoCompleteItem,
+  CollaboratorShare,
+  ShareRole,
+  ShareTypes
+} from '@ownclouders/web-client'
 import { Group, User } from '@ownclouders/web-client/graph/generated'
 import { OcButton } from '@ownclouders/design-system/components'
 import RoleDropdown from '../../../../../../../src/components/SideBar/Shares/Collaborators/RoleDropdown.vue'
@@ -122,7 +127,7 @@ describe('InviteCollaboratorForm', () => {
       vault: { enabled: true, vault_storage_provider: '' }
     }
 
-    it('only asks for users that may access the vault, and for no groups at all', async () => {
+    it('asks for users that may access the vault, and for groups', async () => {
       const { wrapper, mocks } = getWrapper({
         capabilities: vaultCapabilities,
         resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
@@ -133,7 +138,7 @@ describe('InviteCollaboratorForm', () => {
         expect.objectContaining({ filter: 'vaultEligible eq true' }),
         expect.anything()
       )
-      expect(mocks.$clientService.graphAuthenticated.groups.listGroups).not.toHaveBeenCalled()
+      expect(mocks.$clientService.graphAuthenticated.groups.listGroups).toHaveBeenCalled()
     })
     it('recognizes a vault space resource, which carries the full drive id', async () => {
       const { wrapper, mocks } = getWrapper({
@@ -177,6 +182,49 @@ describe('InviteCollaboratorForm', () => {
         expect.objectContaining({ filter: undefined }),
         expect.anything()
       )
+    })
+  })
+  describe('vault group notice', () => {
+    const vaultCapabilities = {
+      files_sharing: { federation: { incoming: true, outgoing: true } },
+      vault: { enabled: true, vault_storage_provider: '' }
+    }
+
+    it('shows when a group is selected for a vault resource', async () => {
+      const { wrapper } = getWrapper({
+        capabilities: vaultCapabilities,
+        resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
+      })
+      wrapper.vm.selectedCollaborators = [
+        mock<CollaboratorAutoCompleteItem>({ shareType: ShareTypes.group.value })
+      ]
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-testid="vault-group-notice"]').exists()).toBeTruthy()
+    })
+    it('does not show when only users are selected', async () => {
+      const { wrapper } = getWrapper({
+        capabilities: vaultCapabilities,
+        resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
+      })
+      wrapper.vm.selectedCollaborators = [
+        mock<CollaboratorAutoCompleteItem>({ shareType: ShareTypes.user.value })
+      ]
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-testid="vault-group-notice"]').exists()).toBeFalsy()
+    })
+    it('does not show for a group outside the vault', async () => {
+      const { wrapper } = getWrapper({
+        capabilities: vaultCapabilities,
+        resource: mock<Resource>({ ...folderMock, storageId: 'some-other-provider' })
+      })
+      wrapper.vm.selectedCollaborators = [
+        mock<CollaboratorAutoCompleteItem>({ shareType: ShareTypes.group.value })
+      ]
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-testid="vault-group-notice"]').exists()).toBeFalsy()
     })
   })
   describe('vault default expiration notice', () => {
