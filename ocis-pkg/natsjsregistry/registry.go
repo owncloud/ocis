@@ -289,10 +289,10 @@ func exit(serviceName string, err error, msg string) {
 // credsScope lets resolveCredsScope apply the same precedence as other services.
 // The leading empty tag entry puts AuthUsername/AuthPassword at registry-JWT scope.
 type credsScope struct {
-	CredsFile    string `env:"OCIS_NATS_CREDS_FILE;MICRO_REGISTRY_AUTH_CREDS_FILE"`
-	Creds        string `env:"OCIS_NATS_CREDS;MICRO_REGISTRY_AUTH_CREDS"`
-	AuthUsername string `env:";MICRO_REGISTRY_AUTH_USERNAME"`
-	AuthPassword string `env:";MICRO_REGISTRY_AUTH_PASSWORD"`
+	CredsFile    string `env:"OCIS_NATS_CREDS_FILE;MICRO_REGISTRY_AUTH_CREDS_FILE" desc:"Path to a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate the service registry with the nats cluster when NATS runs in JWT (operator) mode." introductionVersion:"9.0.0"`
+	Creds        string `env:"OCIS_NATS_CREDS;MICRO_REGISTRY_AUTH_CREDS" desc:"Content of a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate the service registry with the nats cluster when NATS runs in JWT (operator) mode. Takes precedence over the path of a .creds file." introductionVersion:"9.0.0"`
+	AuthUsername string `env:";MICRO_REGISTRY_AUTH_USERNAME" desc:"The username to authenticate the service registry with the nats cluster. Optional when using nats to authenticate with the nats cluster." introductionVersion:"5.0"`
+	AuthPassword string `env:";MICRO_REGISTRY_AUTH_PASSWORD" desc:"The password to authenticate the service registry with the nats cluster. Optional when using nats to authenticate with the nats cluster." introductionVersion:"5.0"`
 }
 
 // getCreds returns the path and the content of the NATS .creds file for the registry,
