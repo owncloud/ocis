@@ -1,0 +1,18 @@
+---
+services:
+  ocis:
+    configs:
+      - source: apps_yaml
+        target: /etc/ocis/apps.yaml
+    depends_on:
+      ai-multi-doc-synthesizer-init:
+        condition: service_completed_successfully
+
+  ai-multi-doc-synthesizer-init:
+    image: owncloud/web-extensions:ai-multi-doc-synthesizer-0.1.0
+    user: root
+    volumes:
+      - ./data/ocis-apps:/apps
+    entrypoint:
+      - /bin/sh
+    command: ["-c", "cp -R /usr/share/nginx/html/ai-multi-doc-synthesizer/ /apps"]
