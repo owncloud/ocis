@@ -8,4 +8,4 @@ from libregraph/lico. Lico reads JWKs only from local files and from
 configured OIDC authorities. We've fixed go-jose/v4 and we ignore the go-jose/v3
 finding in the Trivy scan.
 
-https://github.com/owncloud/ocis/pull/13341
+https://github.com/owncloud/ocis/pull/13342
