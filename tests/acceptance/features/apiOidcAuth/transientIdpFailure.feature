@@ -8,7 +8,7 @@ Feature: transient IdP failure
     And these users have been created with default attributes:
       | username |
       | Alice    |
-    And user "Alice" has been set up in oCIS
+    And keycloak user "Alice" has been set up in oCIS
 
   @env-config
   Scenario: valid session gets a retryable 503 while the IdP is unreachable and works again afterwards

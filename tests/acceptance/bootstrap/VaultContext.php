@@ -197,7 +197,7 @@ class VaultContext implements Context {
 	/**
 	 * Sets up a Keycloak user in oCIS
 	 *
-	 * @Given user :user has been set up in oCIS
+	 * @Given keycloak user :user has been set up in oCIS
 	 *
 	 * @param string $user
 	 *
@@ -206,7 +206,7 @@ class VaultContext implements Context {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function userHasBeenSetUpInOcis(string $user): void {
+	public function keycloakUserHasBeenSetUpInOcis(string $user): void {
 		$this->setUpKeycloakUserInOcis($user);
 	}
 
