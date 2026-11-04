@@ -103,7 +103,7 @@ jobs:
       # run-config.txt before the run, so a failed seed still produces an upload.
       - name: Upload the k6 output
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: k6-output-${{ env.TEST_ID }}
           path: /srv/loadtest/k6-output/${{ env.TEST_ID }}/
