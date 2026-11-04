@@ -41,6 +41,12 @@ func TestCheckHandlerConfiguration(t *testing.T) {
 		handlerConfiguration.WithCheck("check-1", nopCheck)
 		require.Equal(t, 3, nopCheckCounter)
 	})
+
+	t.Run("nil check is skipped", func(t *testing.T) {
+		rec := httptest.NewRecorder()
+		handlers.NewCheckHandler(handlerConfiguration.WithCheck("check-nil", nil)).ServeHTTP(rec, httptest.NewRequest("GET", "/", nil))
+		require.Equal(t, http.StatusOK, rec.Code)
+	})
 }
 
 func TestCheckHandler(t *testing.T) {

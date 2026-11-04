@@ -8,6 +8,8 @@ package rados
 import "C"
 
 import (
+	"fmt"
+	"strings"
 	"unsafe"
 )
 
@@ -50,7 +52,13 @@ func (r *ReadOp) operateCompat(ioctx *IOContext, oid string) error {
 	case nil:
 		return nil
 	case OperationError:
-		return err.OpError
+		// If the op failed, return the bare OpError for backwards
+		// compatibility (e.g. ErrNotFound). Otherwise a step failed, so
+		// return the whole OperationError so it is detectable via errors.Is.
+		if err.OpError != nil {
+			return err.OpError
+		}
+		return err
 	default:
 		return err
 	}
@@ -69,9 +77,24 @@ func (r *ReadOp) AssertExists() {
 // as part of a read operation. An GetOmapStep is returned from this
 // function. The GetOmapStep may be used to iterate over the key-value
 // pairs after the Operate call has been performed.
+//
+// Note that startAfter and filterPrefix are passed to librados as
+// NUL-terminated C strings and therefore must not contain a NUL byte. If
+// either argument contains a NUL byte, the resulting Operate call will
+// return an error wrapping ErrNulInString instead of silently truncating
+// the argument.
 func (r *ReadOp) GetOmapValues(startAfter, filterPrefix string, maxReturn uint64) *GetOmapStep {
 	gos := newGetOmapStep()
 	r.steps = append(r.steps, gos)
+
+	if strings.IndexByte(startAfter, 0) >= 0 {
+		gos.err = fmt.Errorf("startAfter: %w", ErrNulInString)
+		return gos
+	}
+	if strings.IndexByte(filterPrefix, 0) >= 0 {
+		gos.err = fmt.Errorf("filterPrefix: %w", ErrNulInString)
+		return gos
+	}
 
 	cStartAfter := C.CString(startAfter)
 	cFilterPrefix := C.CString(filterPrefix)

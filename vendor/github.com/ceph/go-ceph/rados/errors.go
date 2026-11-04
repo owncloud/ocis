@@ -26,6 +26,10 @@ var (
 	// ErrOperationIncomplete is returned from write op or read op steps for
 	// which the operation has not been performed yet.
 	ErrOperationIncomplete = errors.New("Operation has not been performed yet")
+	// ErrNulInString is returned when a string argument that is passed to a
+	// NUL-terminated C string contains a NUL byte, which would otherwise be
+	// silently truncated.
+	ErrNulInString = errors.New("string must not contain a NUL byte")
 
 	// ErrNotFound indicates a missing resource.
 	ErrNotFound = getError(-C.ENOENT)
