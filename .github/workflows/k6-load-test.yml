@@ -41,6 +41,10 @@ jobs:
       # not apply here — the shell below falls back to a quick run.
       QUICK: ${{ inputs.quick }}
       SSH_OPTS: -o BatchMode=yes -o ServerAliveInterval=60 -o ServerAliveCountMax=10
+      # One id for the output directory, the artifact and the Grafana testId tag,
+      # instead of the uuid k6-tests.sh generates for itself. run_attempt is in it
+      # because upload-artifact rejects a name that already exists.
+      TEST_ID: ${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - name: Show what will run
         run: |
@@ -94,6 +98,20 @@ jobs:
           fi
           /usr/local/bin/k6-tests.sh
 
+      # !cancelled(), because a run that breached a threshold is the one whose
+      # per-request data is actually wanted. k6-tests.sh writes the directory's
+      # run-config.txt before the run, so a failed seed still produces an upload.
+      - name: Upload the k6 output
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-output-${{ env.TEST_ID }}
+          path: /srv/loadtest/k6-output/${{ env.TEST_ID }}/
+          retention-days: 14
+          # k6 gzipped the raw stream itself; re-deflating a .gz only costs time.
+          compression-level: 0
+          if-no-files-found: error
+
       - name: Retrieve the oCIS log
         if: ${{ !cancelled() }}
         run: ssh $SSH_OPTS "loadtest@$OCIS_HOST" '/usr/local/bin/ocis.sh log' || true
@@ -108,3 +126,4 @@ jobs:
         if: ${{ !cancelled() }}
         run: |
           echo "Grafana: http://$(hostname -f):3000 (office/VPN only)"
+          echo "testId : $TEST_ID"
