@@ -1,0 +1,15 @@
+---
+services:
+  ocis:
+    depends_on:
+      vim-nav-init:
+        condition: service_completed_successfully
+
+  vim-nav-init:
+    image: owncloud/web-extensions:vim-nav-0.1.0
+    user: root
+    volumes:
+      - ./data/ocis-apps:/apps
+    entrypoint:
+      - /bin/sh
+    command: ["-c", "cp -R /usr/share/nginx/html/vim-nav/ /apps"]
