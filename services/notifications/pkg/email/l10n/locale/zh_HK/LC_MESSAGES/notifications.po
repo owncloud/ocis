@@ -6,15 +6,16 @@
 # Translators:
 # Martin <github@diemattels.at>, 2026
 # DWXXX, 2026
+# feng feng, 2026
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-09-19 02:25+0000\n"
+"POT-Creation-Date: 2026-11-02 02:17+0000\n"
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
-"Last-Translator: DWXXX, 2026\n"
+"Last-Translator: feng feng, 2026\n"
 "Language-Team: Chinese (Hong Kong) (https://app.transifex.com/owncloud-org/teams/6149/zh_HK/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -81,7 +82,7 @@ msgstr "报告"
 #. field (resolves directly)
 #: pkg/email/templates.go:98 pkg/email/templates.go:115
 msgid "ScienceMesh: {InitiatorName} wants to collaborate with you"
-msgstr ""
+msgstr "ScienceMesh：[InitiatorName] 希望与您协作"
 
 #. ShareExpired email template, Subject field (resolves directly)
 #: pkg/email/templates.go:30
@@ -119,6 +120,10 @@ msgid ""
 "  Token: {Token}\n"
 "  ProviderDomain: {ProviderDomain}"
 msgstr ""
+"[ShareSharer]（[ShareSharerMail]）希望与您开始共享协作资源。\n"
+"请访问您的联邦设置并使用以下信息：\n"
+"令牌：[token] \n"
+"提供商域名：[ProviderDomain]"
 
 #. ScienceMeshInviteTokenGenerated email template, resolves via {{
 #. .MessageBody }}
@@ -132,6 +137,12 @@ msgid ""
 "  Token: {Token}\n"
 "  ProviderDomain: {ProviderDomain}"
 msgstr ""
+"{ShareSharer}（{ShareSharerMail}）希望与您开始共享协作资源。\n"
+"要接受邀请，请访问以下网址：\n"
+"{ShareLink}\n"
+"或者，您也可以访问联邦设置并使用以下信息：\n"
+"令牌：{Token}\n"
+"提供商域名：{ProviderDomain}"
 
 #. ShareCreated email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:21
@@ -145,6 +156,8 @@ msgid ""
 "\n"
 "Even though this share has been revoked you still might have access through other shares and/or space memberships."
 msgstr ""
+"{ShareSharer} 已取消与您共享「{ShareFolder}」。\n"
+"即使该共享已被撤销，您仍可能通过其他共享或空间成员身份访问。"
 
 #. ShareCreated email template, Subject field (resolves directly)
 #: pkg/email/templates.go:17
@@ -154,7 +167,7 @@ msgstr "{ShareSharer} 向你共享了“{ShareFolder}”"
 #. ShareRemoved email template, Subject field (resolves directly)
 #: pkg/email/templates.go:43
 msgid "{ShareSharer} unshared '{ShareFolder}' with you"
-msgstr ""
+msgstr "{ShareSharer} 已取消与你共享「{ShareFolder}"
 
 #. SharedSpace email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:61

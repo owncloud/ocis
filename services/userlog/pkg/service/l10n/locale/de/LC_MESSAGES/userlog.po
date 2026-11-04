@@ -5,15 +5,16 @@
 # 
 # Translators:
 # Martin <github@diemattels.at>, 2026
+# Christian Scherm <christian.scherm@owncloud.com>, 2026
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-09-15 02:26+0000\n"
+"POT-Creation-Date: 2026-11-04 02:15+0000\n"
 "PO-Revision-Date: 2026-01-02 10:52+0000\n"
-"Last-Translator: Martin <github@diemattels.at>, 2026\n"
+"Last-Translator: Christian Scherm <christian.scherm@owncloud.com>, 2026\n"
 "Language-Team: German (https://app.transifex.com/owncloud-org/teams/6149/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,15 +22,15 @@ msgstr ""
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: pkg/service/templates.go:39
+#: pkg/service/templates.go:44
 msgid "Access to Space {space} lost"
 msgstr "Ihr Zugriff auf den Space {space} ist abgelaufen"
 
-#: pkg/service/templates.go:54
+#: pkg/service/templates.go:59
 msgid "Access to {resource} expired"
 msgstr "Ihr Zugriff auf {resource} ist abgelaufen"
 
-#: pkg/service/templates.go:59
+#: pkg/service/templates.go:64
 msgid ""
 "Attention! The instance will be shut down and deprovisioned on {date}. "
 "Download all your data before that date as no access past that date is "
@@ -44,11 +45,11 @@ msgid "File {resource} was deleted because it violates the policies"
 msgstr ""
 "Datei {resource} wurde gelöscht, weil sie gegen die Richtlinien verstößt"
 
-#: pkg/service/templates.go:58
+#: pkg/service/templates.go:63
 msgid "Instance will be shut down and deprovisioned"
 msgstr "Instanz wird heruntergefahren und außer Betrieb genommen werden"
 
-#: pkg/service/templates.go:38
+#: pkg/service/templates.go:43
 msgid "Membership expired"
 msgstr "Mitgliedschaft abgelaufen"
 
@@ -56,33 +57,41 @@ msgstr "Mitgliedschaft abgelaufen"
 msgid "Policies enforced"
 msgstr "Verstoß gegen Richtlinien"
 
-#: pkg/service/templates.go:23
+#: pkg/service/templates.go:28
 msgid "Removed from Space"
 msgstr "Sie wurden aus einem Space entfernt"
 
-#: pkg/service/templates.go:43
+#: pkg/service/templates.go:48
 msgid "Resource shared"
 msgstr "Neue Freigabe"
 
-#: pkg/service/templates.go:48
+#: pkg/service/templates.go:53
 msgid "Resource unshared"
 msgstr "Freigabe entfernt"
 
-#: pkg/service/templates.go:53
+#: pkg/service/templates.go:58
 msgid "Share expired"
 msgstr "Freigabe abgelaufen"
 
-#: pkg/service/templates.go:33
+#: pkg/service/templates.go:38
 msgid "Space deleted"
 msgstr "Space gelöscht"
 
-#: pkg/service/templates.go:28
+#: pkg/service/templates.go:33
 msgid "Space disabled"
 msgstr "Space deaktiviert"
 
-#: pkg/service/templates.go:18
+#: pkg/service/templates.go:23
 msgid "Space shared"
 msgstr "Space freigegeben"
+
+#: pkg/service/templates.go:19
+msgid "The upload of {resource} could not be finalized. Please try again."
+msgstr ""
+
+#: pkg/service/templates.go:18
+msgid "Upload failed"
+msgstr "Hochladen fehlgeschlagen"
 
 #: pkg/service/templates.go:8
 msgid "Virus found"
@@ -94,26 +103,26 @@ msgstr ""
 "In {resource} wurde potenziell schädlicher Code gefunden. Das Hochladen wurde abgebrochen.\n"
 "Grund: {virus}"
 
-#: pkg/service/templates.go:19
+#: pkg/service/templates.go:24
 msgid "{user} added you to Space {space}"
 msgstr "{user} hat Sie zu Space {space} hinzugefügt"
 
-#: pkg/service/templates.go:34
+#: pkg/service/templates.go:39
 msgid "{user} deleted Space {space}"
 msgstr "{user} hat Space {space} gelöscht"
 
-#: pkg/service/templates.go:29
+#: pkg/service/templates.go:34
 msgid "{user} disabled Space {space}"
 msgstr "{user} hat Space {space} deaktiviert"
 
-#: pkg/service/templates.go:24
+#: pkg/service/templates.go:29
 msgid "{user} removed you from Space {space}"
 msgstr "{user} hat Sie aus Space {space} entfernt."
 
-#: pkg/service/templates.go:44
+#: pkg/service/templates.go:49
 msgid "{user} shared {resource} with you"
 msgstr "{user} hat {resource} mit Ihnen geteilt"
 
-#: pkg/service/templates.go:49
+#: pkg/service/templates.go:54
 msgid "{user} unshared {resource} with you"
 msgstr "{user} hat die Freigabe auf {resource} für Sie aufgehoben"
