@@ -103,3 +103,40 @@ services:
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
+
+# apps.yaml is defined here (inline, rather than as a plain bind-mounted file)
+# so that Docker Compose's own ${VAR:-default} interpolation resolves the
+# values below. oCIS's own env-var templating in mounted config files does
+# NOT work for these per-app "config:" blocks (they bind to a generic
+# map[string]any in the web service, which bypasses oCIS's env-parsing
+# decode hook) - so this file must never go back to a plain bind mount with
+# ocis-style ${VAR|default} placeholders, those are silently never resolved.
+configs:
+  apps_yaml:
+    content: |
+      importer:
+        config:
+          companionUrl: https://${COMPANION_DOMAIN:-companion.owncloud.test}
+          supportedClouds:
+            - WebdavPublicLink
+            #- OneDrive # needs a client id and secret
+            #- GoogleDrive # needs a client id and secret and an addition to the DNS zone
+      external-sites:
+        config:
+          sites:
+            # For settings see: https://github.com/owncloud/web-extensions/tree/main/packages/web-app-external-sites
+            - name: ownCloud
+              url: "https://owncloud.dev"
+              target: embedded
+              color: "#0D856F"
+              icon: cloud
+              priority: 50
+            - name: Wikipedia
+              url: "https://www.wikipedia.org"
+              target: external
+              color: "#0D856F"
+              icon: book
+              priority: 51
+      workflows:
+        config:
+          backendUrl: https://${OCIS_DOMAIN:-ocis.owncloud.test}/workflows/api/v1beta1
