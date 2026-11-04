@@ -59,6 +59,7 @@ type Graph struct {
 	identityBackend          identity.Backend
 	identityEducationBackend identity.EducationBackend
 	roleService              RoleService
+	guestRoleMapping         []guestRoleMapping
 	permissionsService       Permissions
 	valueService             settingssvc.ValueService
 	specialDriveItemsCache   *ttlcache.Cache[string, interface{}]

@@ -353,7 +353,12 @@ func (s *service) CreatePublicShare(ctx context.Context, req *link.CreatePublicS
 	share, err := s.sm.CreatePublicShare(ctx, user, resourceInfo, req.GetGrant())
 	switch {
 	case err != nil:
-		log.Error().Err(err).Interface("request", req).Msg("could not write public share")
+		// don't log the request: its grant carries the link password in plain text
+		log.Error().Err(err).
+			Interface("resource_id", sRes.GetInfo().GetId()).
+			Interface("permissions", grant.GetPermissions().GetPermissions()).
+			Bool("password_protected", len(setPassword) > 0).
+			Msg("could not write public share")
 		res.Status = status.NewInternal(ctx, "error persisting public share:"+err.Error())
 	default:
 		res.Status = status.NewOK(ctx)

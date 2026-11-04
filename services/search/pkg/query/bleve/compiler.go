@@ -8,6 +8,7 @@ import (
 	bleveQuery "github.com/blevesearch/bleve/v2/search/query"
 	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
 	"github.com/owncloud/ocis/v2/ocis-pkg/kql"
+	"github.com/owncloud/ocis/v2/services/search/pkg/query"
 )
 
 var _fields = map[string]string{
@@ -202,7 +203,7 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 		}
 	}
 	if prev == nil {
-		return nil, 0, fmt.Errorf("can not compile the query")
+		return nil, 0, &query.UncompilableQueryError{}
 	}
 	return prev, offset, nil
 }

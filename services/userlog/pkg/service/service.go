@@ -109,6 +109,44 @@ func (ul *UserlogService) MemorizeEvents(ch <-chan events.Event) {
 	}
 }
 
+const (
+	uploadFailureNotifiedPrefix = "uploadlog-pp-notified-"
+	uploadFailureNotifiedTTL    = 15 * time.Minute
+)
+
+// marks that a specific failure notification (virus/policy) already covered this upload,
+// so the generic "Upload failed" notification for the same UploadID can be suppressed.
+func (ul *UserlogService) markUploadFailureNotified(uploadID string) {
+	if uploadID == "" {
+		return
+	}
+	if err := ul.store.Write(&store.Record{
+		Key:    uploadFailureNotifiedPrefix + uploadID,
+		Value:  []byte("1"),
+		Expiry: uploadFailureNotifiedTTL,
+	}); err != nil {
+		ul.log.Error().Err(err).Str("uploadid", uploadID).Msg("failed to mark upload failure as notified")
+	}
+}
+
+// uploadFailureAlreadyNotified reports whether a specific postprocessing
+// failure notification was already generated for this upload.
+func (ul *UserlogService) uploadFailureAlreadyNotified(uploadID string) bool {
+	if uploadID == "" {
+		return false
+	}
+	_, err := ul.store.Read(uploadFailureNotifiedPrefix + uploadID)
+	switch err {
+	case nil:
+		return true
+	case store.ErrNotFound:
+		return false
+	default:
+		ul.log.Error().Err(err).Str("uploadid", uploadID).Msg("failed to check upload failure notification state")
+		return false // fail open: worst case is an extra duplicate, never a lost notification
+	}
+}
+
 func (ul *UserlogService) processEvent(event events.Event) {
 	// for each event we need to:
 	// I) find users eligible to receive the event
@@ -154,14 +192,25 @@ func (ul *UserlogService) processEvent(event events.Event) {
 
 			// TODO: should space mangers also be informed?
 			users = append(users, e.ExecutingUser.GetId().GetOpaqueId())
+			ul.markUploadFailureNotified(e.UploadID)
 		case events.PPStepPolicies:
 			if e.Outcome == events.PPOutcomeContinue {
 				return
 			}
 			users = append(users, e.ExecutingUser.GetId().GetOpaqueId())
+			ul.markUploadFailureNotified(e.UploadID)
 		default:
 			return
 		}
+	case events.UploadReady:
+		if !e.Failed {
+			return
+		}
+		if ul.uploadFailureAlreadyNotified(e.UploadID) {
+			// a more specific failure notification already covered this upload
+			return
+		}
+		users = append(users, e.ExecutingUser.GetId().GetOpaqueId())
 
 	// space related // TODO: how to find spaceadmins?
 	case events.SpaceDisabled:

@@ -35,6 +35,8 @@ var lconfig = config.LDAP{
 	UserIDAttribute:          "entryUUID",
 	UserEmailAttribute:       "mail",
 	UserNameAttribute:        "uid",
+	UserSurnameAttribute:     "sn",
+	UserSearchAttributes:     []string{"onPremisesSamAccountName", "displayName", "mail"},
 	UserEnabledAttribute:     "userEnabledAttribute",
 	UserTypeAttribute:        "userTypeAttribute",
 	ExternalIDAttribute:      "externalID",
@@ -118,6 +120,18 @@ func TestNewLDAPBackend(t *testing.T) {
 
 	if _, err := NewLDAPBackend(l, lconfig, &logger, "", ""); err != nil {
 		t.Errorf("Should fail with invalid group search scope")
+	}
+
+	tc = lconfig
+	tc.UserSearchAttributes = nil
+	if _, err := NewLDAPBackend(l, tc, &logger, "", ""); err == nil {
+		t.Error("Should fail with no user search attributes configured")
+	}
+
+	tc = lconfig
+	tc.UserSearchAttributes = []string{"notARealAttribute"}
+	if _, err := NewLDAPBackend(l, tc, &logger, "", ""); err != nil {
+		t.Errorf("Should accept an unrecognized name as a literal LDAP attribute: %v", err)
 	}
 }
 
@@ -224,6 +238,59 @@ func TestCreateUserModelFromLDAP(t *testing.T) {
 	}
 }
 
+func TestGetUserClass(t *testing.T) {
+	cfg := lconfig
+	cfg.UserMemberAttribute = "ocMemberOfSchool"
+
+	// expectSearch returns an entry for the lookup by id, which ignores the user filter and only
+	// asks for the userClass and the member attribute
+	expectSearch := func(lm *mocks.Client, memberOf ...string) {
+		entry := ldap.NewEntry("uid=teacher", map[string][]string{
+			"userClass":        {"teacher"},
+			"ocMemberOfSchool": memberOf,
+		})
+		lm.On("Search", mock.MatchedBy(func(sr *ldap.SearchRequest) bool {
+			return sr.Filter == "(&(objectClass=inetOrgPerson)(entryUUID=teacher-id))" &&
+				assert.ObjectsAreEqual([]string{"userClass", "ocMemberOfSchool"}, sr.Attributes)
+		})).Return(&ldap.SearchResult{Entries: []*ldap.Entry{entry}}, nil)
+	}
+
+	tests := []struct {
+		name       string
+		masterID   string
+		memberOf   []string
+		wantMember bool
+	}{
+		{name: "a user of another instance", memberOf: []string{"school2"}, wantMember: false},
+		{name: "a member of this instance", memberOf: []string{"school2", "school1"}, wantMember: true},
+		{name: "a member of all instances through the master id", masterID: "master-id", memberOf: []string{"master-id"}, wantMember: true},
+		{name: "a user without instances", memberOf: nil, wantMember: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			lm := &mocks.Client{}
+			expectSearch(lm, tt.memberOf...)
+			b, err := NewLDAPBackend(lm, cfg, &logger, "school1", tt.masterID)
+			assert.NoError(t, err)
+
+			userClass, member, err := b.GetUserClass(context.Background(), "teacher-id")
+			assert.NoError(t, err)
+			assert.Equal(t, []string{"teacher"}, userClass)
+			assert.Equal(t, tt.wantMember, member)
+		})
+	}
+
+	t.Run("an unknown user", func(t *testing.T) {
+		lm := &mocks.Client{}
+		lm.On("Search", mock.Anything).Return(&ldap.SearchResult{}, nil)
+		b, err := NewLDAPBackend(lm, cfg, &logger, "school1", "")
+		assert.NoError(t, err)
+
+		_, _, err = b.GetUserClass(context.Background(), "teacher-id")
+		assert.ErrorIs(t, err, ErrNotFound)
+	})
+}
+
 func TestGetUser(t *testing.T) {
 	// Mock a Sizelimit Error
 	lm := &mocks.Client{}
@@ -327,7 +394,6 @@ func TestGetUsers(t *testing.T) {
 }
 
 func TestGetUsersSearch(t *testing.T) {
-	lm := &mocks.Client{}
 	odataReqDefault, err := godata.ParseRequest(context.Background(), "",
 		url.Values{
 			"$search": []string{"\"term\""},
@@ -337,19 +403,38 @@ func TestGetUsersSearch(t *testing.T) {
 		t.Errorf("Expected success got '%s'", err.Error())
 	}
 
-	// only match if the filter contains the search term unquoted
-	lm.On("Search", mock.MatchedBy(
-		func(req *ldap.SearchRequest) bool {
-			return req.Filter == "(&(objectClass=inetOrgPerson)(|(uid=*term*)(mail=*term*)(displayname=*term*)))"
-		})).
-		Return(&ldap.SearchResult{}, nil)
-	b, _ := getMockedBackend(lm, lconfig, &logger)
-	g, err := b.GetUsers(context.Background(), odataReqDefault)
-	if err != nil {
-		t.Errorf("Expected success, got '%s'", err.Error())
-	} else if g == nil || len(g) != 0 {
-		t.Errorf("Expected zero length user slice")
+	assertSearchFilter := func(t *testing.T, cfg config.LDAP, wantFilter string) {
+		lm := &mocks.Client{}
+		// only match if the filter contains the search term unquoted
+		lm.On("Search", mock.MatchedBy(
+			func(req *ldap.SearchRequest) bool {
+				return req.Filter == wantFilter
+			})).
+			Return(&ldap.SearchResult{}, nil)
+		b, _ := getMockedBackend(lm, cfg, &logger)
+		g, err := b.GetUsers(context.Background(), odataReqDefault)
+		if err != nil {
+			t.Errorf("Expected success, got '%s'", err.Error())
+		} else if g == nil || len(g) != 0 {
+			t.Errorf("Expected zero length user slice")
+		}
 	}
+
+	t.Run("default config matches userName, displayName and mail", func(t *testing.T) {
+		assertSearchFilter(t, lconfig, "(&(objectClass=inetOrgPerson)(|(uid=*term*)(displayname=*term*)(mail=*term*)))")
+	})
+
+	t.Run("a config excluding mail matches surname instead", func(t *testing.T) {
+		restrictedConfig := lconfig
+		restrictedConfig.UserSearchAttributes = []string{"onPremisesSamAccountName", "displayName", "surname"}
+		assertSearchFilter(t, restrictedConfig, "(&(objectClass=inetOrgPerson)(|(uid=*term*)(displayname=*term*)(sn=*term*)))")
+	})
+
+	t.Run("a literal '%' in a configured attribute name does not corrupt the filter", func(t *testing.T) {
+		percentConfig := lconfig
+		percentConfig.UserNameAttribute = "uid%"
+		assertSearchFilter(t, percentConfig, "(&(objectClass=inetOrgPerson)(|(uid%=*term*)(displayname=*term*)(mail=*term*)))")
+	})
 }
 
 func TestUpdateUser(t *testing.T) {

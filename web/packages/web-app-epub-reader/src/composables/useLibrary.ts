@@ -5,6 +5,7 @@ import {
   useCapabilityStore,
   useClientService,
   useClipboard,
+  useConfigStore,
   useDownloadFile,
   useFolderLink,
   useMessages,
@@ -34,6 +35,7 @@ export function useLibrary() {
   const { showErrorMessage } = useMessages()
   const clientService = useClientService()
   const capabilityStore = useCapabilityStore()
+  const configStore = useConfigStore()
   const spacesStore = useSpacesStore()
   const router = useRouter()
   const { downloadFile } = useDownloadFile()
@@ -253,7 +255,10 @@ export function useLibrary() {
   }
 
   async function copyBookLink(book: LibraryBook): Promise<boolean> {
-    const privateLink = book.resource.privateLink
+    // search REPORT results don't carry oc:privatelink, so build it from the file id
+    const fileId = book.resource.fileId || book.resource.id
+    const privateLink =
+      book.resource.privateLink || (fileId ? `${configStore.serverUrl}f/${fileId}` : '')
     if (!privateLink) {
       showErrorMessage({ title: $gettext('The link could not be copied') })
       return false

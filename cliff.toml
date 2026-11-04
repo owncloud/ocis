@@ -1,0 +1,85 @@
+# git-cliff configuration: generate release notes from conventional commits.
+# https://git-cliff.org/docs/configuration
+#
+# One line per squash-merge commit, grouped by type:
+#   fix(graph): [OCISDEV-1234] return 404 for a deleted space (#1234)
+#   -> * **graph:** return 404 for a deleted space ([#1234](...))
+
+[changelog]
+header = ""
+body = """
+{%- macro subject(commit) -%}
+{{ commit.message | split(pat="\n") | first | split(pat=" (#") | first | trim }}
+{%- endmacro -%}
+{%- macro entry(commit) -%}
+{%- set title = commit.message | split(pat="\n") | first -%}
+* {% if commit.scope %}**{{ commit.scope }}:** {% endif %}{{ self::subject(commit=commit) }}
+{%- if title is containing(" (#") -%}
+{%- set number = title | split(pat=" (#") | last | trim_end_matches(pat=")") %} ([#{{ number }}](https://github.com/owncloud/ocis/pull/{{ number }}))
+{%- endif -%}
+{%- endmacro -%}
+
+{#- scripts/changelog.sh passes the previous release, git-cliff only knows it
+    when that tag is part of the range -#}
+{%- set prev = get_env(name="CHANGELOG_PREVIOUS", default="") -%}
+{%- if not prev and previous.version %}{% set prev = previous.version %}{% endif -%}
+{% if version -%}
+{%- set v = version | trim_start_matches(pat="v") -%}
+# Changelog for [{{ v }}] ({{ timestamp | date(format="%Y-%m-%d") }})
+{%- if prev %}
+
+[{{ v }}]: https://github.com/owncloud/ocis/compare/{{ prev }}...{{ version }}
+{%- endif %}
+{%- else -%}
+# Changelog for [unreleased]
+{%- if prev %}
+
+[unreleased]: https://github.com/owncloud/ocis/compare/{{ prev }}...master
+{%- endif %}
+{%- endif %}
+{%- set breaking = commits | filter(attribute="breaking", value=true) %}
+{%- if breaking | length > 0 %}
+
+### Breaking Changes
+{% for commit in breaking %}
+{{ self::entry(commit=commit) }}
+{%- endfor %}
+{%- endif %}
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | striptags | trim }}
+{% for commit in commits %}
+{{ self::entry(commit=commit) }}
+{%- endfor %}
+{% endfor %}
+"""
+trim = true
+footer = ""
+
+[git]
+conventional_commits = true
+# Non-conventional commits are kept (not dropped) and land in "Miscellaneous".
+filter_unconventional = false
+split_commits = false
+protect_breaking_commits = true
+filter_commits = false
+# Final releases only: rc/dev tags and the web package tags are not versions.
+tag_pattern = "^v[0-9]+\\.[0-9]+\\.[0-9]+$"
+sort_commits = "oldest"
+
+commit_preprocessors = [
+  # drop CI markers ("[full-ci]") and ticket keys ("[OCISDEV-1234]") from the
+  # title, Jira is not public
+  { pattern = '\s*\[(?:[a-z][a-z0-9.-]*|[A-Z][A-Z0-9]*-\d+)\]', replace = "" },
+  { pattern = '\A\s+', replace = "" },
+  { pattern = '\A(\w+(\([^)]*\))?!?:)\s*', replace = "${1} " },
+]
+
+# First match wins. The order of the groups is set by the HTML comment prefix.
+commit_parsers = [
+  { message = '^(chore|test|build|ci|docs|style|refactor)(\(.+\))?!?:', skip = true },
+  { message = '^fix', group = "<!-- 1 -->Bug Fixes" },
+  { message = '^feat', group = "<!-- 2 -->Features" },
+  { message = '^perf', group = "<!-- 3 -->Performance" },
+  { message = '^revert', group = "<!-- 4 -->Reverts" },
+  { message = '.*', group = "<!-- 9 -->Miscellaneous" },
+]

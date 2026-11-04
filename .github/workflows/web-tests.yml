@@ -5,6 +5,9 @@ on:
   push:
     branches: [master, stable-*]
 
+permissions:
+  contents: read
+
 jobs:
   detect-web-changes:
     name: detect-web-changes
@@ -18,6 +21,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Check if web/ changed
         id: check
@@ -70,6 +74,7 @@ jobs:
         with:
           # nx affected --base=<pr-base-sha> (used below) needs that commit present locally
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup pnpm
         uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0

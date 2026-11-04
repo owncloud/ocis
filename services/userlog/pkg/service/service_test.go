@@ -108,6 +108,8 @@ var _ = Describe("UserlogService", func() {
 			service.ValueClient(&vc),
 			service.RegisteredEvents([]events.Unmarshaller{
 				events.SpaceDisabled{},
+				events.PostprocessingStepFinished{},
+				events.UploadReady{},
 			}),
 			service.TraceProvider(trace.NewNoopTracerProvider()),
 		)
@@ -152,10 +154,79 @@ var _ = Describe("UserlogService", func() {
 		Expect(len(evs)).To(Equal(0))
 	})
 
+	It("suppresses the generic Upload failed notification when a specific postprocessing failure notification already fired for the same UploadID", func() {
+		executingUser := &user.User{Id: &user.UserId{OpaqueId: "userid"}}
+		bus.publish(events.PostprocessingStepFinished{
+			UploadID:      "upload1",
+			ExecutingUser: executingUser,
+			FinishedStep:  events.PPStepAntivirus,
+			Result:        events.VirusscanResult{Infected: true},
+		})
+
+		// Wait for the first event's store write so the two don't race on the unsynchronized per-user list.
+		Eventually(func() int { return storedEventCount(sto, "userid") }, "2s", "10ms").Should(Equal(1))
+
+		bus.publish(events.UploadReady{
+			UploadID:      "upload1",
+			ExecutingUser: executingUser,
+			Failed:        true,
+		})
+
+		Consistently(func() int { return storedEventCount(sto, "userid") }, "500ms", "50ms").Should(Equal(1))
+	})
+
+	It("still sends the generic Upload failed notification when no specific failure notification preceded it", func() {
+		executingUser := &user.User{Id: &user.UserId{OpaqueId: "userid"}}
+		bus.publish(events.UploadReady{
+			UploadID:      "upload2",
+			ExecutingUser: executingUser,
+			Failed:        true,
+		})
+
+		Eventually(func() int { return storedEventCount(sto, "userid") }, "2s", "10ms").Should(Equal(1))
+	})
+
+	It("does not dedup across different UploadIDs", func() {
+		executingUser := &user.User{Id: &user.UserId{OpaqueId: "userid"}}
+		bus.publish(events.PostprocessingStepFinished{
+			UploadID:      "upload3",
+			ExecutingUser: executingUser,
+			FinishedStep:  events.PPStepAntivirus,
+			Result:        events.VirusscanResult{Infected: true},
+		})
+
+		Eventually(func() int { return storedEventCount(sto, "userid") }, "2s", "10ms").Should(Equal(1))
+
+		bus.publish(events.UploadReady{
+			UploadID:      "upload4",
+			ExecutingUser: executingUser,
+			Failed:        true,
+		})
+
+		Eventually(func() int { return storedEventCount(sto, "userid") }, "2s", "10ms").Should(Equal(2))
+	})
+
 	AfterEach(func() {
 		close(bus)
 	})
 })
+
+// reads the per-user event-ID list straight from the store, bypassing the mocked history client.
+func storedEventCount(sto microstore.Store, userid string) int {
+	recs, err := sto.Read(userid)
+	if err != nil {
+		if err == microstore.ErrNotFound {
+			return 0
+		}
+		Expect(err).ToNot(HaveOccurred())
+	}
+	if len(recs) == 0 {
+		return 0
+	}
+	var ids []string
+	Expect(json.Unmarshal(recs[0].Value, &ids)).To(Succeed())
+	return len(ids)
+}
 
 type testBus chan events.Event
 

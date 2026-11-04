@@ -115,7 +115,7 @@ func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) 
 	// only the data path consumes postprocessing results: one consumer group gets
 	// one copy of each event, so a second subscriber would take half of them
 	if ac := upload.AsyncConfFromDriverConf(conf.Drivers[conf.Driver]); ac.Enabled {
-		if err := coord.StartPostprocessing(evstream, ac.ConsumerGroup, ac.MountID, ac.NumConsumers); err != nil {
+		if err := coord.StartPostprocessing(evstream, ac); err != nil {
 			return nil, fmt.Errorf("dataprovider: could not start postprocessing: %w", err)
 		}
 	}

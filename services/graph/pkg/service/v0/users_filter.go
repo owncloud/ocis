@@ -286,9 +286,11 @@ func (g Graph) applyFilterVaultEligible(ctx context.Context, req *godata.GoDataR
 	// unlike other filters, vaultEligible applies its own role check below, so it's safe to
 	// look up a cross-instance match here - the GetUsers switch only blocks a cross-instance
 	// lookup when it would bypass that check entirely.
+	var preciseUserID string
 	if username, instancename := g.parseExternalSearch(req); username != "" && instancename != "" &&
 		g.contextUserHasExternalSharePermission(ctx) {
 		if preciseUser, err := g.identityBackend.GetPreciseUser(ctx, username, instancename, req); err == nil {
+			preciseUserID = preciseUser.GetId()
 			found := false
 			for _, u := range users {
 				if u.GetId() == preciseUser.GetId() {
@@ -334,6 +336,13 @@ func (g Graph) applyFilterVaultEligible(ctx context.Context, req *godata.GoDataR
 			})
 			if err != nil {
 				return err
+			}
+			// a user of another instance only gets a role here at their first login here. Until
+			// then, check the role the guest role mapping gives their userClass, like
+			// assignGuestVaultRole does when the vault share is created.
+			if len(assignments.GetAssignments()) == 0 && user.GetId() == preciseUserID && len(g.guestRoleMapping) > 0 {
+				eligible[i] = g.guestVaultEligible(egCtx, user.GetId(), roles.GetBundles())
+				return nil
 			}
 			for _, assignment := range assignments.GetAssignments() {
 				if _, ok := vaultGrantingRoles[assignment.GetRoleId()]; ok {

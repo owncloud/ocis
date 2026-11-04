@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 	"strconv"
 	"time"
 
@@ -190,6 +191,12 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 
 	svc.roleService = options.RoleService
 
+	guestRoleMapping, err := parseGuestRoleMapping(options.Config.MultiInstance.GuestRoleMapping)
+	if err != nil {
+		return svc, err
+	}
+	svc.guestRoleMapping = guestRoleMapping
+
 	roleManager := options.RoleManager
 	if roleManager == nil {
 		storeOptions := []microstore.Option{
@@ -227,7 +234,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		return svc, err
 	}
 
-	driveItemPermissionsService, err := NewDriveItemPermissionsService(options.Logger, options.GatewaySelector, identityCache, options.Config, options.TraceProvider, svc.identityBackend, svc.contextUserHasExternalSharePermission)
+	driveItemPermissionsService, err := NewDriveItemPermissionsService(options.Logger, options.GatewaySelector, identityCache, options.Config, options.TraceProvider, svc.identityBackend, svc.contextUserHasExternalSharePermission, svc.withGuestVaultRole)
 	if err != nil {
 		return svc, err
 	}
@@ -442,6 +449,11 @@ func setIdentityBackends(options Options, svc *Graph) error {
 	if options.IdentityBackend == nil {
 		switch options.Config.Identity.Backend {
 		case "cs3":
+			// the cs3 backend has no attribute-scoped search filter of its own; this config
+			// only takes effect on the ldap backend
+			if !slices.Contains(options.Config.Identity.LDAP.UserSearchAttributes, "mail") {
+				options.Logger.Warn().Msg("GRAPH_LDAP_USER_SEARCH_ATTRIBUTES excludes mail but has no effect with GRAPH_IDENTITY_BACKEND=cs3; user search may still match by mail")
+			}
 			gatewaySelector, err := pool.GatewaySelector(
 				options.Config.Reva.Address,
 				append(

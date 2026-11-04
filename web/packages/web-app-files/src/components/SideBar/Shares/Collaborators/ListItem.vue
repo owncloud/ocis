@@ -272,10 +272,7 @@ const screenreaderShareDisplayName = computed(() => {
 const hasExpirationDate = computed(() => !!share.expirationDateTime)
 
 const expirationDate = computed(() => {
-  return formatDateFromDateTime(
-    DateTime.fromISO(share.expirationDateTime).endOf('day'),
-    language.current
-  )
+  return formatDateFromDateTime(DateTime.fromISO(share.expirationDateTime), language.current)
 })
 
 const shareOwnerDisplayName = computed(() => share.sharedBy.displayName)

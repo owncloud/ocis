@@ -1,6 +1,8 @@
 package upload
 
 import (
+	"time"
+
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -12,7 +14,9 @@ type AsyncConf struct {
 	NumConsumers  int
 	// MountID is the storage id this provider answers for, used to drop
 	// postprocessing events belonging to other storages.
-	MountID string
+	MountID            string
+	CommitMaxRetries   int
+	CommitRetryBackoff time.Duration
 }
 
 // AsyncConfFromDriverConf reads the postprocessing settings off the driver's own
@@ -25,21 +29,31 @@ func AsyncConfFromDriverConf(driverConf map[string]interface{}) AsyncConf {
 		AsyncFileUploads bool   `mapstructure:"asyncfileuploads"`
 		MountID          string `mapstructure:"mount_id"`
 		Events           struct {
-			NumConsumers  int    `mapstructure:"numconsumers"`
-			ConsumerGroup string `mapstructure:"consumer_group"`
+			NumConsumers       int           `mapstructure:"numconsumers"`
+			ConsumerGroup      string        `mapstructure:"consumer_group"`
+			CommitMaxRetries   int           `mapstructure:"commit_max_retries"`
+			CommitRetryBackoff time.Duration `mapstructure:"commit_retry_backoff"`
 		} `mapstructure:"events"`
 	}
 	_ = mapstructure.Decode(driverConf, &ac)
 	group := ac.Events.ConsumerGroup
 	if group == "" {
-		// decomposedfs's default (options.go:177). The coordinator takes over the
-		// driver's subscription, so it must land in the same group.
 		group = "dcfs"
 	}
+	maxRetries := ac.Events.CommitMaxRetries
+	if maxRetries <= 0 {
+		maxRetries = 3
+	}
+	retryBackoff := ac.Events.CommitRetryBackoff
+	if retryBackoff <= 0 {
+		retryBackoff = 5 * time.Second
+	}
 	return AsyncConf{
-		Enabled:       ac.AsyncFileUploads,
-		ConsumerGroup: group,
-		NumConsumers:  ac.Events.NumConsumers,
-		MountID:       ac.MountID,
+		Enabled:            ac.AsyncFileUploads,
+		ConsumerGroup:      group,
+		NumConsumers:       ac.Events.NumConsumers,
+		MountID:            ac.MountID,
+		CommitMaxRetries:   maxRetries,
+		CommitRetryBackoff: retryBackoff,
 	}
 }

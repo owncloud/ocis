@@ -4,6 +4,9 @@ on:
   push:
     branches: [master, stable-*]
 
+permissions:
+  contents: read
+
 jobs:
   license-check:
     runs-on: ubuntu-latest
@@ -11,6 +14,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install REUSE tool
         run: pip install reuse

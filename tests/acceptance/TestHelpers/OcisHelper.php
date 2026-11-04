@@ -51,7 +51,6 @@ class OcisHelper {
 		StorageDriver::EOS,
 		StorageDriver::OWNCLOUD,
 		StorageDriver::S3NG,
-		StorageDriver::POSIX,
 	];
 
 	/**
@@ -129,11 +128,6 @@ class OcisHelper {
 	 */
 	public static function deleteRevaUserData(?array $users = []): void {
 		$deleteCmd = self::getDeleteUserDataCommand();
-
-		if (self::getStorageDriver() === StorageDriver::POSIX) {
-			\exec($deleteCmd);
-			return;
-		}
 
 		foreach ($users as $user) {
 			if (\is_array($user)) {
