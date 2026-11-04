@@ -4,7 +4,7 @@ import { RouteLocationRaw, Router, RouteRecordNormalized } from 'vue-router'
 import { App, computed, watch } from 'vue'
 import { loadTheme } from '../helpers/theme'
 import { createGettext, GetTextOptions, Language, Translations } from 'vue3-gettext'
-import { getBackendVersion, getWebVersion } from '@ownclouders/web-pkg'
+import { getBackendVersion } from '@ownclouders/web-pkg'
 import {
   useModals,
   useThemeStore,
@@ -663,7 +663,7 @@ export const announceVersions = ({
 }: {
   capabilityStore: CapabilityStore
 }): void => {
-  const versions = [getWebVersion(), getBackendVersion({ capabilityStore })].filter(Boolean)
+  const versions = [getBackendVersion({ capabilityStore })].filter(Boolean)
   versions.forEach((version) => {
     console.log(
       `%c ${version} `,
