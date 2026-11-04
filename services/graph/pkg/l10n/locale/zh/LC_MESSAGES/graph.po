@@ -7,15 +7,16 @@
 # Benedikt Kulmann <benedikt@kulmann.biz>, 2026
 # 許明凱 <yuteson@gmail.com>, 2026
 # 振东 刘, 2026
+# feng feng, 2026
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-10-01 02:36+0000\n"
+"POT-Creation-Date: 2026-11-02 02:17+0000\n"
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
-"Last-Translator: 振东 刘, 2026\n"
+"Last-Translator: feng feng, 2026\n"
 "Language-Team: Chinese (https://app.transifex.com/owncloud-org/teams/6149/zh/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -185,14 +186,14 @@ msgstr "查看、下載、上傳、編輯、新增、刪除及顯示所有受邀
 msgid ""
 "View, download, upload, edit, add, delete, show all versions and restore "
 "from trash bin."
-msgstr ""
+msgstr "查看、下载、上传、编辑、新增、删除、显示所有版本并从回收站恢复。"
 
 #. UnifiedRole Manager, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:242
 msgid ""
 "View, download, upload, edit, add, delete, show all versions, restore from "
 "trash bin, empty the trash bin and manage members."
-msgstr ""
+msgstr "查看、下载、上传、编辑、新增、删除、显示所有版本、从回收站恢复、清空回收站和管理成员。"
 
 #. UnifiedRole EditorListGrantsWithVersions, Role Description (resolves
 #. directly)
