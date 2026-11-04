@@ -13,7 +13,6 @@ func StorageProviderDrivers(cfg *config.Config) map[string]interface{} {
 		"ocis":      OcisNoEvents(cfg),
 		"s3":        S3(cfg),
 		"s3ng":      S3NGNoEvents(cfg),
-		"posix":     Posix(cfg, true),
 	}
 }
 
@@ -28,6 +27,5 @@ func DataProviderDrivers(cfg *config.Config) map[string]interface{} {
 		"ocis":      Ocis(cfg),
 		"s3":        S3(cfg),
 		"s3ng":      S3NG(cfg),
-		"posix":     Posix(cfg, false),
 	}
 }
