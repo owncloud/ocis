@@ -1,0 +1,18 @@
+---
+services:
+  ocis:
+    configs:
+      - source: apps_yaml
+        target: /etc/ocis/apps.yaml
+    depends_on:
+      ai-folder-readme-generator-init:
+        condition: service_completed_successfully
+
+  ai-folder-readme-generator-init:
+    image: owncloud/web-extensions:ai-folder-readme-generator-0.1.0
+    user: root
+    volumes:
+      - ./data/ocis-apps:/apps
+    entrypoint:
+      - /bin/sh
+    command: ["-c", "cp -R /usr/share/nginx/html/ai-folder-readme-generator/ /apps"]
