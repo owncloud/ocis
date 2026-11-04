@@ -292,7 +292,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [Readiness check for some services returns 500 status code](https://github.com/owncloud/ocis/issues/10661)
 
-- [apiServiceAvailability/serviceAvailabilityCheck.feature:111](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L111)
 - [apiServiceAvailability/serviceAvailabilityCheck.feature:120](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L120)
 - [apiServiceAvailability/serviceAvailabilityCheck.feature:131](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L131)
 

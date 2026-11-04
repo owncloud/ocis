@@ -90,15 +90,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 	}
 
 	connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTypeBus)
-	bus, err := stream.NatsFromConfig(connName, false, stream.NatsConfig{
-		Endpoint:             cfg.Events.Endpoint,
-		Cluster:              cfg.Events.Cluster,
-		EnableTLS:            cfg.Events.EnableTLS,
-		TLSInsecure:          cfg.Events.TLSInsecure,
-		TLSRootCACertificate: cfg.Events.TLSRootCACertificate,
-		AuthUsername:         cfg.Events.AuthUsername,
-		AuthPassword:         cfg.Events.AuthPassword,
-	})
+	bus, err := stream.NatsFromConfig(connName, false, cfg.Events.NatsConfig())
 	if err != nil {
 		return nil, teardown, err
 	}

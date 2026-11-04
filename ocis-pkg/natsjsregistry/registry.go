@@ -6,15 +6,18 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	natsjskv "github.com/go-micro/plugins/v4/store/nats-js-kv"
 	"github.com/nats-io/nats.go"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/reva/v2/pkg/natsauth"
 	revastore "github.com/owncloud/reva/v2/pkg/store"
 	"go-micro.dev/v4/registry"
 	"go-micro.dev/v4/server"
@@ -27,6 +30,10 @@ var (
 	_registryAddressEnv     = "MICRO_REGISTRY_ADDRESS"
 	_registryUsernameEnv    = "MICRO_REGISTRY_AUTH_USERNAME"
 	_registryPasswordEnv    = "MICRO_REGISTRY_AUTH_PASSWORD"
+	_registryCredsFileEnv   = "MICRO_REGISTRY_AUTH_CREDS_FILE"
+	_registryCredsEnv       = "MICRO_REGISTRY_AUTH_CREDS"
+	_natsCredsFileEnv       = "OCIS_NATS_CREDS_FILE"
+	_natsCredsEnv           = "OCIS_NATS_CREDS"
 	_registryEnableTLSEnv   = "MICRO_REGISTRY_ENABLE_TLS"
 	_registryTLSInsecureEnv = "MICRO_REGISTRY_TLS_INSECURE"
 	_registryTLSRootCAEnv   = "MICRO_REGISTRY_TLS_ROOT_CA_CERTIFICATE"
@@ -70,6 +77,9 @@ type storeregistry struct {
 	typ        string
 	defaultTTL time.Duration
 	lock       sync.RWMutex
+
+	// credsChecked is true after the first check of the NATS credentials.
+	credsChecked atomic.Bool
 }
 
 // Init inits the registry
@@ -80,7 +90,9 @@ func (n *storeregistry) Init(opts ...registry.Option) error {
 	for _, o := range opts {
 		o(&n.opts)
 	}
-	n.store = natsjskv.NewStore(n.storeOptions(n.opts)...)
+	// NewStore and Init each apply the full option list on their own; giving
+	// NewStore the options too would just apply them twice.
+	n.store = natsjskv.NewStore()
 	return n.store.Init(n.storeOptions(n.opts)...)
 }
 
@@ -216,19 +228,27 @@ func (n *storeregistry) storeOptions(opts registry.Options) []store.Option {
 	natsOptions := nats.GetDefaultOptions()
 	natsOptions.Name = generators.GenerateConnectionName(serviceName, generators.NTypeRegistry)
 	natsOptions.User, natsOptions.Password = getAuth()
+	credsOpt, err := n.credentialsOption()
+	if err != nil {
+		exit(serviceName, err, "cannot use the nats credentials of the registry")
+	}
+	if credsOpt != nil {
+		natsOptions.User, natsOptions.Password = "", ""
+		if err := credsOpt(&natsOptions); err != nil {
+			exit(serviceName, err, "cannot use the nats credentials of the registry")
+		}
+	}
 	if tlsConf := getTLS(); tlsConf != nil {
 		natsOptions.TLSConfig = tlsConf
 		natsOptions.Secure = true
 	}
 	natsOptions.ReconnectedCB = func(_ *nats.Conn) {
 		if err := n.Init(); err != nil {
-			fmt.Println("cannot reconnect to nats")
-			os.Exit(1)
+			exit(serviceName, err, "cannot reconnect to nats")
 		}
 	}
 	natsOptions.ClosedCB = func(_ *nats.Conn) {
-		fmt.Println("nats connection closed")
-		os.Exit(1)
+		exit(serviceName, nil, "nats connection closed")
 	}
 	storeoptions = append(storeoptions, natsjskv.NatsOptions(natsOptions))
 
@@ -241,6 +261,46 @@ func (n *storeregistry) storeOptions(opts registry.Options) []store.Option {
 
 func getAuth() (string, string) {
 	return os.Getenv(_registryUsernameEnv), os.Getenv(_registryPasswordEnv)
+}
+
+// credentialsOption returns the nats.Option for the JWT credentials of the registry.
+//
+// Only the first call checks the credentials, at startup. An invalid value then stops
+// the service. Later calls happen in Init, for example after a reconnect. A rotated
+// .creds file can then be partly written. So later calls do not check the file.
+// The option of a later call reads the file only when the connection connects.
+// The connection retries on an error.
+func (n *storeregistry) credentialsOption() (nats.Option, error) {
+	credsFile, creds := getCreds()
+	if !n.credsChecked.Swap(true) {
+		return natsauth.CredentialsOption(credsFile, creds)
+	}
+	return natsauth.Option(credsFile, creds), nil
+}
+
+// exit logs the error through the oCIS logger and stops the process. The registry
+// constructor cannot return an error, because go-micro defines its signature.
+func exit(serviceName string, err error, msg string) {
+	logger := log.NewLogger(log.Name(serviceName), log.Level("error"))
+	logger.Error().Err(err).Msg(msg)
+	os.Exit(1)
+}
+
+// credsScope lets resolveCredsScope apply the same precedence as other services.
+// The leading empty tag entry puts AuthUsername/AuthPassword at registry-JWT scope.
+type credsScope struct {
+	CredsFile    string `env:"OCIS_NATS_CREDS_FILE;MICRO_REGISTRY_AUTH_CREDS_FILE" desc:"Path to a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate the service registry with the nats cluster when NATS runs in JWT (operator) mode." introductionVersion:"9.0.0"`
+	Creds        string `env:"OCIS_NATS_CREDS;MICRO_REGISTRY_AUTH_CREDS" desc:"Content of a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate the service registry with the nats cluster when NATS runs in JWT (operator) mode. Takes precedence over the path of a .creds file." introductionVersion:"9.0.0"`
+	AuthUsername string `env:";MICRO_REGISTRY_AUTH_USERNAME" desc:"The username to authenticate the service registry with the nats cluster. Optional when using nats to authenticate with the nats cluster." introductionVersion:"5.0"`
+	AuthPassword string `env:";MICRO_REGISTRY_AUTH_PASSWORD" desc:"The password to authenticate the service registry with the nats cluster. Optional when using nats to authenticate with the nats cluster." introductionVersion:"5.0"`
+}
+
+// getCreds returns the path and the content of the NATS .creds file for the registry,
+// applying the same global/service-specific precedence as every other service config.
+func getCreds() (string, string) {
+	var cfg credsScope
+	_ = envdecode.Decode(&cfg) // the only possible error is "no env var is set"; an empty result is correct then
+	return cfg.CredsFile, cfg.Creds
 }
 
 var (

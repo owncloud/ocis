@@ -57,6 +57,8 @@ type EventOptions struct {
 	EnableTLS            bool   `mapstructure:"enabletls"`
 	AuthUsername         string `mapstructure:"authusername"`
 	AuthPassword         string `mapstructure:"authpassword"`
+	CredsFile            string `mapstructure:"credsfile"`
+	Creds                string `mapstructure:"creds"`
 }
 
 type config struct {

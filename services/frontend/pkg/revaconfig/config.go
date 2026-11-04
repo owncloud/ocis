@@ -171,6 +171,8 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 						"cache_disable_persistence":     cfg.OCS.StatCacheDisablePersistence,
 						"cache_auth_username":           cfg.OCS.StatCacheAuthUsername,
 						"cache_auth_password":           cfg.OCS.StatCacheAuthPassword,
+						"cache_creds_file":              cfg.OCS.StatCacheCredsFile,
+						"cache_creds":                   cfg.OCS.StatCacheCreds,
 						"cache_enable_tls":              cfg.OCS.StatCacheEnableTLS,
 						"cache_tls_insecure":            cfg.OCS.StatCacheTLSInsecure,
 						"cache_tls_root_ca_certificate": cfg.OCS.StatCacheTLSRootCACertificate,
