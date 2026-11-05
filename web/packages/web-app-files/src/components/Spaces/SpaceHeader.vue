@@ -70,7 +70,7 @@
       >
         <text-editor is-read-only :current-content="markdownContent" />
 
-        <div class="markdown-container-edit oc-ml-s">
+        <div v-if="isEditReadmeVisible" class="markdown-container-edit oc-ml-s">
           <router-link
             v-oc-tooltip="$gettext('Edit description')"
             size="small"
@@ -106,6 +106,7 @@ import {
   useResourcesStore,
   useFileActions,
   useLoadPreview,
+  useSpaceActionsEditReadmeContent,
   TextEditor
 } from '@ownclouders/web-pkg'
 import { ImageDimension } from '@ownclouders/web-pkg'
@@ -128,6 +129,10 @@ const { getFileContents, getFileInfo } = clientService.webdav
 const resourcesStore = useResourcesStore()
 const { getDefaultAction } = useFileActions()
 const { loadPreview } = useLoadPreview()
+const { actions: editReadmeContentActions } = useSpaceActionsEditReadmeContent()
+const isEditReadmeVisible = computed(() =>
+  unref(editReadmeContentActions)[0].isVisible({ resources: [space] })
+)
 
 const markdownContainerRef = ref(null)
 const markdownContent = ref('')
