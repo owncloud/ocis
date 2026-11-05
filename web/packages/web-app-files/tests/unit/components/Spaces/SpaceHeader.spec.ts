@@ -11,8 +11,13 @@ import {
 } from '@ownclouders/web-test-helpers'
 import { mock } from 'vitest-mock-extended'
 
+const isEditReadmeVisible = vi.hoisted(() => vi.fn().mockReturnValue(true))
+
 vi.mock('@ownclouders/web-pkg', async (importOriginal) => ({
   ...(await importOriginal<any>()),
+  useSpaceActionsEditReadmeContent: vi.fn().mockReturnValue({
+    actions: ref([{ isVisible: isEditReadmeVisible }])
+  }),
   useFileActions: vi.fn().mockReturnValue({
     getDefaultAction: vi.fn().mockReturnValue({ handler: vi.fn() })
   }),
@@ -78,6 +83,23 @@ describe('SpaceHeader', () => {
       await flushPromises()
       expect(wrapper.find('.markdown-container').exists()).toBeTruthy()
       expect(wrapper.html()).toMatchSnapshot()
+    })
+    it('should show the edit button if the user is allowed to edit the description', async () => {
+      isEditReadmeVisible.mockReturnValue(true)
+      const wrapper = getWrapper({
+        space: getSpaceMock(undefined, { spaceReadmeData: { name: 'lorem' } })
+      })
+      await flushPromises()
+      expect(wrapper.find('.markdown-container-edit').exists()).toBeTruthy()
+    })
+    it('should not show the edit button if the user is not allowed to edit the description', async () => {
+      isEditReadmeVisible.mockReturnValue(false)
+      const wrapper = getWrapper({
+        space: getSpaceMock(undefined, { spaceReadmeData: { name: 'lorem' } })
+      })
+      await flushPromises()
+      expect(wrapper.find('.markdown-container').exists()).toBeTruthy()
+      expect(wrapper.find('.markdown-container-edit').exists()).toBeFalsy()
     })
   })
 })
