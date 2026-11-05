@@ -20,6 +20,22 @@ describe('emptyTrashBin', () => {
         }
       })
     })
+    it('should be false when the trash bin is empty', () => {
+      getWrapper({
+        resources: [],
+        setup: ({ actions }, { space }) => {
+          expect(unref(actions)[0].isVisible({ space, resources: [] })).toBe(false)
+        }
+      })
+    })
+    it('should be true when the trash bin contains resources', () => {
+      getWrapper({
+        resources: [mock<TrashResource>({ id: '1' })],
+        setup: ({ actions }, { space }) => {
+          expect(unref(actions)[0].isVisible({ space, resources: [] })).toBe(true)
+        }
+      })
+    })
     it('should be false in a space trash bin with insufficient permissions', () => {
       getWrapper({
         driveType: 'project',
@@ -80,8 +96,10 @@ function getWrapper({
   invalidLocation = false,
   resolveClearTrashBin = true,
   driveType = 'personal',
+  resources = [],
   setup
 }: {
+  resources?: TrashResource[]
   invalidLocation?: boolean
   resolveClearTrashBin?: boolean
   driveType?: string
@@ -117,7 +135,8 @@ function getWrapper({
       },
       {
         mocks,
-        provide: mocks
+        provide: mocks,
+        pluginOptions: { piniaOptions: { resourcesStore: { resources } } }
       }
     )
   }
