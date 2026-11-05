@@ -85,7 +85,6 @@
               </template>
             </div>
             <div class="versions mt-5 oc-pb-m oc-pl-m oc-text-xsmall oc-text-muted">
-              <span v-text="getWebVersion()" />
               <span v-text="backendVersion" />
             </div>
           </div>
@@ -118,7 +117,6 @@ import {
   useRouteQuery,
   queryItemAsString,
   useUpload,
-  getWebVersion,
   getBackendVersion,
   useCapabilityStore
 } from '@ownclouders/web-pkg'
