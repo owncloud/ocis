@@ -89,9 +89,9 @@ self.onmessage = async (e: MessageEvent) => {
         console.error(e)
         failed.push({
           resourceName: resource.name,
-          message: e.message,
-          statusCode: e.statusCode,
-          xReqId: e.response.headers?.get('x-request-id')
+          message: e?.message,
+          statusCode: e?.statusCode,
+          xReqId: e?.response?.headers?.get('x-request-id')
         })
       }
     })
