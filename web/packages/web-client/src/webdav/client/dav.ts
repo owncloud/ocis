@@ -225,7 +225,11 @@ export class DAV {
         result
       }
     } catch (error) {
-      const { response } = error
+      const response: Response | undefined = error?.response
+
+      if (!response) {
+        throw error
+      }
 
       if (response.status === 503) {
         this.#onSetMaintenance(true)
