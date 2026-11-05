@@ -28,6 +28,7 @@ func validConfig() *config.Config {
 		LLM: config.LLM{
 			Endpoint:       "https://api.example.com/v1",
 			MaxTokensLimit: 4096,
+			MaxBodyBytes:   6291456,
 		},
 	}
 }
@@ -37,8 +38,15 @@ func TestValidate_RejectsInvalidValues(t *testing.T) {
 		"endpoint without scheme": func(c *config.Config) { c.LLM.Endpoint = "api.example.com/v1" },
 		"endpoint wrong scheme":   func(c *config.Config) { c.LLM.Endpoint = "ftp://api.example.com" },
 		"zero max tokens":         func(c *config.Config) { c.LLM.MaxTokensLimit = 0 },
-		"negative timeout":        func(c *config.Config) { c.LLM.Timeout = -time.Second },
-		"negative window":         func(c *config.Config) { c.RateLimit.Window = -time.Second },
+		"zero max body bytes":     func(c *config.Config) { c.LLM.MaxBodyBytes = 0 },
+		"negative max body bytes": func(c *config.Config) { c.LLM.MaxBodyBytes = -1 },
+		"noop store with rate limit": func(c *config.Config) {
+			c.RateLimit.Window = time.Minute
+			c.RateLimit.MaxRequests = 10
+			c.Store.Store = "noop"
+		},
+		"negative timeout": func(c *config.Config) { c.LLM.Timeout = -time.Second },
+		"negative window":  func(c *config.Config) { c.RateLimit.Window = -time.Second },
 		"store ttl below window": func(c *config.Config) {
 			c.RateLimit.Window = time.Hour
 			c.RateLimit.MaxRequests = 10
@@ -61,6 +69,15 @@ func TestValidate_AcceptsStoreTTLCoveringWindow(t *testing.T) {
 	cfg.RateLimit.Window = time.Minute
 	cfg.RateLimit.MaxRequests = 20
 	cfg.Store.TTL = 10 * time.Minute
+
+	if err := Validate(cfg); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestValidate_AcceptsNoopStoreWhenRateLimitDisabled(t *testing.T) {
+	cfg := validConfig()
+	cfg.Store.Store = "noop"
 
 	if err := Validate(cfg); err != nil {
 		t.Fatalf("unexpected error: %v", err)

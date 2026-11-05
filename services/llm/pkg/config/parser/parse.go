@@ -45,11 +45,18 @@ func Validate(cfg *config.Config) error {
 	if cfg.LLM.MaxTokensLimit <= 0 {
 		return errors.New("llm: LLM_MAX_TOKENS_LIMIT must be greater than 0")
 	}
+	if cfg.LLM.MaxBodyBytes <= 0 {
+		return errors.New("llm: LLM_MAX_BODY_BYTES must be greater than 0")
+	}
 	if cfg.LLM.Timeout < 0 {
 		return errors.New("llm: LLM_TIMEOUT must not be negative")
 	}
 	if cfg.RateLimit.Window < 0 || cfg.RateLimit.MaxRequests < 0 {
 		return errors.New("llm: LLM_RATE_LIMIT_WINDOW and LLM_RATE_LIMIT_MAX_REQUESTS must not be negative")
+	}
+	// The noop store discards every record, so the limiter would admit all requests.
+	if cfg.RateLimit.Window > 0 && cfg.RateLimit.MaxRequests > 0 && cfg.Store.Store == "noop" {
+		return errors.New("llm: LLM_STORE must not be 'noop' while rate limiting is enabled")
 	}
 	// Rate-limit records are expired by the store; a store TTL shorter than
 	// the window would silently shrink the effective window.

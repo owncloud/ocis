@@ -35,7 +35,7 @@ type TokenManager struct {
 
 // Store configures the store used for per-user rate limiting.
 type Store struct {
-	Store                string        `yaml:"store" env:"OCIS_PERSISTENT_STORE;LLM_STORE" desc:"The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details." introductionVersion:"%%NEXT%%"`
+	Store                string        `yaml:"store" env:"OCIS_PERSISTENT_STORE;LLM_STORE" desc:"The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. 'noop' is rejected while rate limiting is enabled, and 'memory' keeps rate limits per replica. See the text description for details." introductionVersion:"%%NEXT%%"`
 	Nodes                []string      `yaml:"nodes" env:"OCIS_PERSISTENT_STORE_NODES;LLM_STORE_NODES" desc:"A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details." introductionVersion:"%%NEXT%%"`
 	Database             string        `yaml:"database" env:"LLM_STORE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"%%NEXT%%"`
 	Table                string        `yaml:"table" env:"LLM_STORE_TABLE" desc:"The database table the store should use." introductionVersion:"%%NEXT%%"`
