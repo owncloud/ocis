@@ -3,6 +3,8 @@ name: k6 Load Test
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  schedule:
+    - cron: '0 1 * * *'
   workflow_dispatch:
     inputs:
       ocis_ref:
@@ -28,6 +30,7 @@ jobs:
     runs-on: [self-hosted, loadtest]
     timeout-minutes: 360
     if: >-
+      github.event_name == 'schedule' ||
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'pull_request' &&
        contains(github.event.pull_request.title || '', 'k6-test'))
