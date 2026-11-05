@@ -12,6 +12,8 @@ export class VaultPage {
   public readonly driveBreadcrumb: Locator
   public readonly vaultBreadcrumb: Locator
   public readonly accessDeniedLoginButton: Locator
+  public readonly accessDeniedCardTitle: Locator
+  public readonly accessDeniedCardHint: Locator
 
   public constructor({ page }: { page: Page }) {
     this.page = page
@@ -27,5 +29,7 @@ export class VaultPage {
     this.driveBreadcrumb = page.getByRole('link', { name: 'Drive' })
     this.vaultBreadcrumb = page.getByRole('link', { name: 'Vault' })
     this.accessDeniedLoginButton = page.locator('#exitAnchor')
+    this.accessDeniedCardTitle = page.locator('.oc-login-card-title')
+    this.accessDeniedCardHint = page.locator('.oc-login-card-body p')
   }
 }

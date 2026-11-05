@@ -14,6 +14,7 @@ test.describe('Vault access enforcement', { tag: '@predefined-users' }, () => {
 
     await ui.userNavigatesToVaultViaUrl({ stepUser: 'Alice' })
     await ui.userIsOnAccessDeniedPage({ stepUser: 'Alice' })
+    await ui.userContinuesFromAccessDeniedPage({ stepUser: 'Alice' })
   })
 
   test('User Light without vault permission is denied when manipulating the URL', async () => {
@@ -26,6 +27,7 @@ test.describe('Vault access enforcement', { tag: '@predefined-users' }, () => {
 
     await ui.userNavigatesToVaultViaUrl({ stepUser: 'Alice' })
     await ui.userIsOnAccessDeniedPage({ stepUser: 'Alice' })
+    await ui.userContinuesFromAccessDeniedPage({ stepUser: 'Alice' })
   })
 
   test('Space Admin manipulating the URL is routed to MFA, not denied', async () => {
