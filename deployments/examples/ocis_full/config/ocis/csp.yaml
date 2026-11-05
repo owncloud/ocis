@@ -27,7 +27,7 @@ directives:
     - 'https://${ONLYOFFICE_DOMAIN|onlyoffice.owncloud.test}/'
     - 'https://${COLLABORA_DOMAIN|collabora.owncloud.test}/'
     # This is needed for the external-sites web extension when embedding sites
-    - 'https://owncloud.dev'
+    - 'https://doc.owncloud.com'
   img-src:
     - '''self'''
     - 'data:'

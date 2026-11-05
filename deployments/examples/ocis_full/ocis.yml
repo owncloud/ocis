@@ -126,7 +126,7 @@ configs:
           sites:
             # For settings see: https://github.com/owncloud/web-extensions/tree/main/packages/web-app-external-sites
             - name: ownCloud
-              url: "https://owncloud.dev"
+              url: "https://doc.owncloud.com"
               target: embedded
               color: "#0D856F"
               icon: cloud
