@@ -1,9 +1,5 @@
 import { CapabilityStore } from '../composables/index'
 
-export const getWebVersion = (): string => {
-  return `ownCloud Web UI ${process.env.PACKAGE_VERSION}`
-}
-
 export const getBackendVersion = ({
   capabilityStore
 }: {
