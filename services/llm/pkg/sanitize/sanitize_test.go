@@ -90,6 +90,20 @@ func TestBody_MaxTokensDefaultsToLimitWhenNotPositive(t *testing.T) {
 	}
 }
 
+func TestBody_FractionalMaxTokensNeverBecomesZero(t *testing.T) {
+	req, err := Body(map[string]interface{}{
+		"model":      "m",
+		"messages":   validMessages,
+		"max_tokens": 0.5,
+	}, "", 4096)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if req.MaxTokens != 1 {
+		t.Fatalf("expected a fractional max_tokens to be clamped to 1, got %d", req.MaxTokens)
+	}
+}
+
 func TestBody_TemperaturePassedThrough(t *testing.T) {
 	req, err := Body(map[string]interface{}{
 		"model":       "m",

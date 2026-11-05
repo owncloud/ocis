@@ -57,6 +57,11 @@ func Body(raw map[string]interface{}, modelOverride string, maxTokensLimit int) 
 	if v, ok := raw["max_tokens"].(float64); ok && v > 0 {
 		maxTokens = int(v)
 	}
+	// A fractional value such as 0.5 truncates to 0, which some providers
+	// treat as "no limit".
+	if maxTokens < 1 {
+		maxTokens = 1
+	}
 	if maxTokens > maxTokensLimit {
 		maxTokens = maxTokensLimit
 	}
