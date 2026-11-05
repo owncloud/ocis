@@ -190,7 +190,7 @@ testSuite: $(OCIS_WRAPPER) build-dev-image clean-docker-container
     if [ "${START_TIKA}" == "true" ]; then \
 			COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
 			COMPOSE_FILE=src/tika.yml \
-			docker-compose run tika-service; \
+			docker-compose up -d --wait tika; \
     fi; \
 	COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
 	COMPOSE_FILE=$(COMPOSE_FILE) \
