@@ -145,3 +145,8 @@ configs:
               color: "#0D856F"
               icon: book
               priority: 51
+      ai-multi-doc-synthesizer:
+        config:
+          llm:
+            endpoint: 'https://${OCIS_DOMAIN:-ocis.owncloud.test}/graph/v1beta1/extensions/org.libregraph/llm'
+            model: '${AI_LLM_MODEL_DEFAULT:-llama3.2}'
