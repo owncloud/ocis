@@ -192,6 +192,70 @@ var _ = Describe("Graph", func() {
 			}
 			`))
 			})
+			// Regression test for SE-807 (FAILS until fixed): a project space whose space-image
+			// node carries a non-finite float in its ArbitraryMetadata (e.g.
+			// photo.exposureDenominator="+Inf", written back by the search/Tika extractor) must
+			// not blow up the whole drive listing. strconv.ParseFloat accepts "+Inf"/"NaN"
+			// (driveitems.go unmarshalStringMap), encoding/json then cannot marshal the value,
+			// and render.JSON silently replies 500 with no body/log. Expected: 200 with the
+			// drive listed and the non-finite facet dropped.
+			It("lists a space whose image node has a non-finite float facet without 500ing", func() {
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Times(1).Return(&provider.ListStorageSpacesResponse{
+					Status: status.NewOK(ctx),
+					StorageSpaces: []*provider.StorageSpace{
+						{
+							Id:        &provider.StorageSpaceId{OpaqueId: "sameID"},
+							SpaceType: "project",
+							Root: &provider.ResourceId{
+								StorageId: "pro-1",
+								SpaceId:   "sameID",
+								OpaqueId:  "sameID",
+							},
+							Name:   "aspacename",
+							Opaque: utils.AppendPlainToOpaque(nil, "image", "pro-1$sameID!imageNode"),
+						},
+					},
+				}, nil)
+				gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
+					Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
+				}, nil)
+				gatewayClient.On("GetPath", mock.Anything, mock.Anything).Return(&provider.GetPathResponse{
+					Status: status.NewOK(ctx),
+					Path:   "/.space/image.png",
+				}, nil)
+				// Stat on the space-image node returns a corrupt (non-finite) photo facet.
+				gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{
+					Status: status.NewOK(ctx),
+					Info: &provider.ResourceInfo{
+						Type:     provider.ResourceType_RESOURCE_TYPE_FILE,
+						Id:       &provider.ResourceId{StorageId: "pro-1", SpaceId: "sameID", OpaqueId: "imageNode"},
+						MimeType: "image/jpeg",
+						ArbitraryMetadata: &provider.ArbitraryMetadata{
+							Metadata: map[string]string{
+								"libre.graph.photo.exposureDenominator": "+Inf",
+							},
+						},
+					},
+				}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
+				r = r.WithContext(ctx)
+				rr := httptest.NewRecorder()
+				svc.GetDrivesV1Beta1(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+
+				body, _ := io.ReadAll(rr.Body)
+				var response map[string][]libregraph.Drive
+				Expect(json.Unmarshal(body, &response)).To(Succeed())
+				Expect(len(response["value"])).To(Equal(1))
+				// the non-finite facet value must be dropped, not surfaced
+				for _, item := range response["value"][0].Special {
+					if item.Photo != nil {
+						Expect(item.Photo.ExposureDenominator).To(BeNil())
+					}
+				}
+			})
 			It("can list a spaces with sort", func() {
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
 					Status: status.NewOK(ctx),
