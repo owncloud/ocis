@@ -88,8 +88,18 @@ func (c *Cache) lockUser(userID string) func() {
 	v, _ := c.lockMap.LoadOrStore(userID, &sync.Mutex{})
 	lock := v.(*sync.Mutex)
 
+	// OCISDEV-1560 debug instrumentation -- traces this exact Lock() call,
+	// not an inference from a wrapper around Add(). Remove before vendoring.
+	debugStart := time.Now()
+	fmt.Fprintf(os.Stderr, "    [lockUser %s] Lock() call start\n", userID)
 	lock.Lock()
-	return func() { lock.Unlock() }
+	fmt.Fprintf(os.Stderr, "    [lockUser %s] Lock() acquired, waited: %.3fs\n", userID, time.Since(debugStart).Seconds())
+
+	return func() {
+		held := time.Since(debugStart)
+		fmt.Fprintf(os.Stderr, "    [lockUser %s] Unlock(), held for: %.3fs\n", userID, held.Seconds())
+		lock.Unlock()
+	}
 }
 
 // Add adds a new entry to the cache
