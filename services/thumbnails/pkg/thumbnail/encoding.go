@@ -1,11 +1,14 @@
 package thumbnail
 
 import (
+	"context"
 	"image/gif"
 	"io"
 	"strings"
 
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 const (
@@ -15,12 +18,15 @@ const (
 	typeGif  = "gif"
 	typeGgs  = "ggs"
 	typeGgp  = "ggp"
+
+	//tracerName       = "thumbnails" // already defined in the thumbnails.go file
+	spanNameEncode = "Encoder.Encode"
 )
 
 // Encoder encodes the thumbnail to a specific format.
 type Encoder interface {
 	// Encode encodes the image to a format.
-	Encode(w io.Writer, img interface{}) error
+	Encode(ctx context.Context, w io.Writer, img interface{}) error
 	// Types returns the formats suffixes.
 	Types() []string
 	// MimeType returns the mimetype used by the encoder.
@@ -31,7 +37,18 @@ type Encoder interface {
 type GifEncoder struct{}
 
 // Encode encodes the image to a gif format
-func (e GifEncoder) Encode(w io.Writer, img interface{}) error {
+func (e GifEncoder) Encode(ctx context.Context, w io.Writer, img interface{}) error {
+	span := trace.SpanFromContext(ctx)
+	_, newSpan := span.TracerProvider().Tracer(tracerName).Start(
+		ctx, spanNameEncode,
+		trace.WithSpanKind(trace.SpanKindInternal),
+		trace.WithAttributes(
+			attribute.String("ocis.thumbnails.encoder.type", "GifEncoder"),
+			attribute.String("ocis.thumbnails.encoder.mime", e.MimeType()),
+		),
+	)
+	defer newSpan.End()
+
 	g, ok := img.(*gif.GIF)
 	if !ok {
 		return errors.ErrInvalidType

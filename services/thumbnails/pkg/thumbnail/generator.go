@@ -1,6 +1,7 @@
 package thumbnail
 
 import (
+	"context"
 	"image"
 	"image/color"
 	"image/draw"
@@ -9,11 +10,18 @@ import (
 
 	"github.com/kovidgoyal/imaging"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
+)
+
+const (
+	// tracerName       = "thumbnails"  // already defined in the thumbnails.go file
+	spanNameGeneratorGenerate = "Generator.Generate"
 )
 
 // Generator generates a web friendly file version.
 type Generator interface {
-	Generate(size image.Rectangle, img interface{}) (interface{}, error)
+	Generate(ctx context.Context, size image.Rectangle, img interface{}) (interface{}, error)
 	Dimensions(img interface{}) (image.Rectangle, error)
 	ProcessorID() string
 }
@@ -38,7 +46,20 @@ func (g GifGenerator) ProcessorID() string {
 }
 
 // Generate generates a alternative gif version.
-func (g GifGenerator) Generate(size image.Rectangle, img interface{}) (interface{}, error) {
+func (g GifGenerator) Generate(ctx context.Context, size image.Rectangle, img interface{}) (interface{}, error) {
+	span := trace.SpanFromContext(ctx)
+	newCtx, newSpan := span.TracerProvider().Tracer(tracerName).Start(
+		ctx, spanNameGeneratorGenerate,
+		trace.WithSpanKind(trace.SpanKindInternal),
+		trace.WithAttributes(
+			attribute.String("ocis.thumbnails.generator.type", "GifGenerator"),
+			attribute.Int("ocis.thumbnails.generator.generate.width", size.Dx()),
+			attribute.Int("ocis.thumbnails.generator.generate.height", size.Dy()),
+			attribute.String("ocis.thumbnails.generator.generate.processor", g.ProcessorID()),
+		),
+	)
+	defer newSpan.End()
+
 	// Code inspired by https://github.com/willnorris/gifresize/blob/db93a7e1dcb1c279f7eeb99cc6d90b9e2e23e871/gifresize.go
 
 	m, ok := img.(*gif.GIF)
@@ -54,7 +75,7 @@ func (g GifGenerator) Generate(size image.Rectangle, img interface{}) (interface
 		bounds := frame.Bounds()
 		prev := tmp
 		draw.Draw(tmp, bounds, frame, bounds.Min, draw.Over)
-		processed := g.processor.Process(tmp, size.Dx(), size.Dy(), imaging.Lanczos)
+		processed := g.processor.Process(newCtx, tmp, size.Dx(), size.Dy(), imaging.Lanczos)
 		m.Image[i] = g.imageToPaletted(processed, frame.Palette)
 
 		switch m.Disposal[i] {

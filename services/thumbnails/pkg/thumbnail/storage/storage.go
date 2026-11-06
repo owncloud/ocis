@@ -1,7 +1,16 @@
 package storage
 
 import (
+	"context"
 	"image"
+)
+
+const (
+	tracerName       = "thumbnails"
+	spanNameStat     = "Storage.Stat"
+	spanNameGet      = "Storage.Get"
+	spanNamePut      = "Storage.Put"
+	spanNameBuildKey = "Storage.BuildKey"
 )
 
 // Request combines different attributes needed for storage operations.
@@ -25,8 +34,8 @@ type Request struct {
 
 // Storage defines the interface for a thumbnail store.
 type Storage interface {
-	Stat(key string) bool
-	Get(key string) ([]byte, error)
-	Put(key string, img []byte) error
-	BuildKey(r Request) string
+	Stat(ctx context.Context, key string) bool
+	Get(ctx context.Context, key string) ([]byte, error)
+	Put(ctx context.Context, key string, img []byte) error
+	BuildKey(ctx context.Context, r Request) string
 }
