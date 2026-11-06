@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-10-05 02:38+0000\n"
+"POT-Creation-Date: 2026-11-04 02:15+0000\n"
 "PO-Revision-Date: 2026-01-02 10:52+0000\n"
 "Last-Translator: BoneNI, 2026\n"
 "Language-Team: Lao (https://app.transifex.com/owncloud-org/teams/6149/lo/)\n"
@@ -22,15 +22,15 @@ msgstr ""
 "Language: lo\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: pkg/service/templates.go:39
+#: pkg/service/templates.go:44
 msgid "Access to Space {space} lost"
 msgstr "ສູນເສຍການເຂົ້າເຖິງພື້ນທີ່ {space}"
 
-#: pkg/service/templates.go:54
+#: pkg/service/templates.go:59
 msgid "Access to {resource} expired"
 msgstr "ການເຂົ້າເຖິງ {resource} ໝົດອາຍຸ"
 
-#: pkg/service/templates.go:59
+#: pkg/service/templates.go:64
 msgid ""
 "Attention! The instance will be shut down and deprovisioned on {date}. "
 "Download all your data before that date as no access past that date is "
@@ -44,11 +44,11 @@ msgstr ""
 msgid "File {resource} was deleted because it violates the policies"
 msgstr "ໄຟລ໌ {resource} ຖືກລຶບຍ້ອນວ່າມັນລະເມີດນະໂຍບາຍ"
 
-#: pkg/service/templates.go:58
+#: pkg/service/templates.go:63
 msgid "Instance will be shut down and deprovisioned"
 msgstr "ອິນສະແຕນຊ໌ (Instance) ຈະຖືກປິດ ແລະ ຖອນການຕິດຕັ້ງ"
 
-#: pkg/service/templates.go:38
+#: pkg/service/templates.go:43
 msgid "Membership expired"
 msgstr "ສະມາຊິກໝົດອາຍຸ"
 
@@ -56,33 +56,41 @@ msgstr "ສະມາຊິກໝົດອາຍຸ"
 msgid "Policies enforced"
 msgstr "ບັງຄັບໃຊ້ນະໂຍບາຍ"
 
-#: pkg/service/templates.go:23
+#: pkg/service/templates.go:28
 msgid "Removed from Space"
 msgstr "ຖືກຖອນອອກຈາກພື້ນທີ່"
 
-#: pkg/service/templates.go:43
+#: pkg/service/templates.go:48
 msgid "Resource shared"
 msgstr "ຊັບພະຍາກອນຖືກແຊຣ໌"
 
-#: pkg/service/templates.go:48
+#: pkg/service/templates.go:53
 msgid "Resource unshared"
 msgstr "ຍົກເລີກການແຊຣ໌ຊັບພະຍາກອນ"
 
-#: pkg/service/templates.go:53
+#: pkg/service/templates.go:58
 msgid "Share expired"
 msgstr "ການແຊຣ໌ໝົດອາຍຸ"
 
-#: pkg/service/templates.go:33
+#: pkg/service/templates.go:38
 msgid "Space deleted"
 msgstr "ພື້ນທີ່ຖືກລຶບ"
 
-#: pkg/service/templates.go:28
+#: pkg/service/templates.go:33
 msgid "Space disabled"
 msgstr "ພື້ນທີ່ຖືກປິດໃຊ້ງານ"
 
-#: pkg/service/templates.go:18
+#: pkg/service/templates.go:23
 msgid "Space shared"
 msgstr "ພື້ນທີ່ຖືກແຊຣ໌"
+
+#: pkg/service/templates.go:19
+msgid "The upload of {resource} could not be finalized. Please try again."
+msgstr ""
+
+#: pkg/service/templates.go:18
+msgid "Upload failed"
+msgstr "ອັບໂຫຼດຫຼົ້ມເຫຼວ"
 
 #: pkg/service/templates.go:8
 msgid "Virus found"
@@ -92,26 +100,26 @@ msgstr "ກວດພົບໄວຣັສ"
 msgid "Virus found in {resource}. Upload not possible. Virus: {virus}"
 msgstr "ກວດພົບໄວຣັສໃນ {resource}. ບໍ່ສາມາດອັບໂຫລດໄດ້. ໄວຣັສ: {virus}"
 
-#: pkg/service/templates.go:19
+#: pkg/service/templates.go:24
 msgid "{user} added you to Space {space}"
 msgstr "{user} ໄດ້ເພີ່ມທ່ານເຂົ້າໃນພື້ນທີ່ {space}"
 
-#: pkg/service/templates.go:34
+#: pkg/service/templates.go:39
 msgid "{user} deleted Space {space}"
 msgstr "{user} ໄດ້ລຶບພື້ນທີ່ {space}"
 
-#: pkg/service/templates.go:29
+#: pkg/service/templates.go:34
 msgid "{user} disabled Space {space}"
 msgstr "{user} ໄດ້ປິດໃຊ້ງານພື້ນທີ່ {space}"
 
-#: pkg/service/templates.go:24
+#: pkg/service/templates.go:29
 msgid "{user} removed you from Space {space}"
 msgstr "{user} ໄດ້ຖອນທ່ານອອກຈາກພື້ນທີ່ {space}"
 
-#: pkg/service/templates.go:44
+#: pkg/service/templates.go:49
 msgid "{user} shared {resource} with you"
 msgstr "{user} ໄດ້ແຊຣ໌ {resource} ກັບທ່ານ"
 
-#: pkg/service/templates.go:49
+#: pkg/service/templates.go:54
 msgid "{user} unshared {resource} with you"
 msgstr "{user} ໄດ້ຍົກເລີກການແຊຣ໌ {resource} ກັບທ່ານ"
