@@ -48,7 +48,7 @@ func NewAntivirus(c *config.Config, l log.Logger, tp trace.TracerProvider) (Anti
 	default:
 		return Antivirus{}, fmt.Errorf("unknown av scanner: '%s'", c.Scanner.Type)
 	case "clamav":
-		scanner = scanners.NewClamAV(c.Scanner.ClamAV.Socket)
+		scanner = scanners.NewClamAV(c.Scanner.ClamAV.Socket, c.Scanner.ClamAV.Timeout)
 	case "icap":
 		scanner, err = scanners.NewICAP(c.Scanner.ICAP.URL, c.Scanner.ICAP.Service, c.Scanner.ICAP.Timeout)
 	}
