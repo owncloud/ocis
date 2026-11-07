@@ -15,19 +15,24 @@ import (
 type encoder struct {
 	w         *bufio.Writer
 	charset   string
+	encoding  headerEncoding
 	usedChars int
+	// quoted is set when the text goes inside a quoted-string, where folding
+	// whitespace becomes part of the value.
+	quoted bool
 }
 
 // newEncoder returns a new mime header encoder that writes to w. The c
 // parameter specifies the name of the character set of the text that will be
 // encoded. The u parameter indicates how many characters have been used
 // already.
-func newEncoder(w io.Writer, c string, u int) *encoder {
-	return &encoder{bufio.NewWriter(w), strings.ToUpper(c), u}
+func newEncoder(w io.Writer, c string, encoding headerEncoding, u int) *encoder {
+	return &encoder{bufio.NewWriter(w), strings.ToUpper(c), encoding, u, false}
 }
 
-// encode encodes p using the "Q" encoding and writes it to the underlying
-// io.Writer. It limits line length to 75 characters.
+// encode encodes p using the encoding scheme specified in e
+// If all chars are printable ascii chars, no encoding is performed.
+// Limits line length to 75 characters and folds lines as necessary.
 func (e *encoder) encode(p []byte) (n int, err error) {
 	var output bytes.Buffer
 	allPrintable := true
@@ -48,7 +53,7 @@ func (e *encoder) encode(p []byte) (n int, err error) {
 	}
 
 	// all characters are printable. just do line folding
-	if allPrintable {
+	if allPrintable || e.encoding == HeaderEncodingNone {
 		text := string(p)
 		words := strings.Split(text, " ")
 
@@ -57,18 +62,15 @@ func (e *encoder) encode(p []byte) (n int, err error) {
 
 		// split the line where necessary
 		for _, word := range words {
-			/*fmt.Println("Current Line:",lineBuffer)
-			fmt.Println("Here: Max:", maxLineLength ,"Buffer Length:", len(lineBuffer), "Used Chars:", e.usedChars, "Length Encoded Char:",len(word))
-			fmt.Println("----------")*/
-
 			newWord := ""
 			if !firstWord {
 				newWord += " "
 			}
 			newWord += word
 
-			// check line length
-			if (e.usedChars+len(lineBuffer)+len(newWord) /*+len(" ")+len(word)*/) > maxLineLength && (lineBuffer != "" || e.usedChars != 0) {
+			// check line length. Inside a quoted-string the first word is not moved to a
+			// new line, as the folding whitespace would be added to the value.
+			if (e.usedChars+len(lineBuffer)+len(newWord)) > maxLineLength && (lineBuffer != "" || (e.usedChars != 0 && !e.quoted)) {
 				output.WriteString(lineBuffer + "\r\n")
 
 				// first word on newline needs a space in front
@@ -78,29 +80,17 @@ func (e *encoder) encode(p []byte) (n int, err error) {
 					lineBuffer = " "
 				}
 
-				//firstLine = false
-				//firstWord = true
 				// reset since not on the first line anymore
 				e.usedChars = 0
 			}
 
-			/*if !firstWord {
-				lineBuffer += " "
-			}*/
-
 			lineBuffer += newWord /*word*/
-
 			firstWord = false
-
-			// reset since not on the first line anymore
-			/*if !firstLine {
-				e.usedChars = 0
-			}*/
 		}
 
 		output.WriteString(lineBuffer)
-
 	} else {
+		// else block can only be HeaderEncodingQ as of now
 		firstLine := true
 
 		// A single encoded word can not be longer than 75 characters
@@ -116,10 +106,6 @@ func (e *encoder) encode(p []byte) (n int, err error) {
 		for i := 0; i < len(p); {
 			// encode the character
 			encodedChar, runeLength := encode(p, i)
-
-			/*fmt.Println("Current Line:",lineBuffer)
-			fmt.Println("Here: Max:", maxLineLength ,"Buffer Length:", len(lineBuffer), "Used Chars:", e.usedChars, "Length Encoded Char:",len(encodedChar))
-			fmt.Println("----------")*/
 
 			// Check line length
 			if len(lineBuffer)+e.usedChars+len(encodedChar) > (maxLineLength - len(wordEnd)) {

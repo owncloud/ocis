@@ -89,6 +89,8 @@ Note 1: by default duplicated recipients throws an error, from `v2.13.0` you can
 
 Note 2: by default Bcc header is not set in email. From `v2.14.0` you can use `email.AddBccToHeader = true` to add this.
 
+Note 3: by default all addresses are validated against RFC5322. Setting `email.UseProvidedAddress = true` skips this validation, but requires you to ensure a valid address is sent.
+
 ## Download
 
 This package uses go modules.
@@ -223,7 +225,7 @@ func main() {
 		email.SetDkim(options)
 	}
 
-	// always check error after send
+	// always check error before send
 	if email.Error != nil{
 		log.Fatal(email.Error)
 	}
@@ -260,7 +262,7 @@ func main() {
 		// add inline
 		email.Attach(&mail.File{FilePath: "/path/to/image.png", Name:"Gopher.png", Inline: true})
 
-		// always check error after send
+		// always check error before send
 		if email.Error != nil{
 			log.Fatal(email.Error)
 		}

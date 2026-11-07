@@ -15,5 +15,8 @@ type mod struct {
 }
 
 func (m mod) calc(n uint32) uint32 {
+	if m.value == 0 {
+		return 0
+	}
 	return n % m.value
 }

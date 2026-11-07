@@ -49,11 +49,8 @@ func (t *Translation) Set(str string) {
 
 // Get returns the string of the translation
 func (t *Translation) Get() string {
-	// Look for Translation index 0
-	if _, ok := t.Trs[0]; ok {
-		if t.Trs[0] != "" {
-			return t.Trs[0]
-		}
+	if tr := t.Trs[0]; tr != "" {
+		return tr
 	}
 
 	// Return untranslated id by default
@@ -68,11 +65,8 @@ func (t *Translation) SetN(n int, str string) {
 
 // GetN returns the string of the plural translation
 func (t *Translation) GetN(n int) string {
-	// Look for Translation index
-	if _, ok := t.Trs[n]; ok {
-		if t.Trs[n] != "" {
-			return t.Trs[n]
-		}
+	if tr := t.Trs[n]; tr != "" {
+		return tr
 	}
 
 	// Return untranslated singular if corresponding
@@ -86,12 +80,10 @@ func (t *Translation) GetN(n int) string {
 
 // IsTranslated reports whether a string is translated
 func (t *Translation) IsTranslated() bool {
-	tr, ok := t.Trs[0]
-	return tr != "" && ok
+	return t.Trs[0] != ""
 }
 
 // IsTranslatedN reports whether a plural string is translated
 func (t *Translation) IsTranslatedN(n int) bool {
-	tr, ok := t.Trs[n]
-	return tr != "" && ok
+	return t.Trs[n] != ""
 }

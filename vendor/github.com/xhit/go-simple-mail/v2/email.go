@@ -18,20 +18,30 @@ import (
 
 // Email represents an email message.
 type Email struct {
-	from                      string
-	sender                    string
-	replyTo                   string
-	returnPath                string
-	recipients                []string
-	headers                   textproto.MIMEHeader
-	parts                     []part
-	attachments               []*File
-	inlines                   []*File
-	Charset                   string
-	Encoding                  encoding
-	Error                     error
-	SMTPServer                *smtpClient
-	DkimMsg                   string
+	from           string
+	sender         string
+	replyTo        string
+	returnPath     string
+	recipients     []string
+	headers        textproto.MIMEHeader
+	parts          []part
+	attachments    []*File
+	inlines        []*File
+	Charset        string
+	Encoding       encoding
+	HeaderEncoding headerEncoding
+	Error          error
+	SMTPServer     *smtpClient
+	DkimMsg        string
+
+	// UseProvidedAddress if set to true will disable any parsing and
+	// validation of addresses and uses the address provided by the user
+	// without any modifications
+	UseProvidedAddress bool
+
+	// AllowEmptyAttachments if enabled, allows you you attach empty
+	// items, a file without any associated data
+	AllowEmptyAttachments     bool
 	AllowDuplicateAddress     bool
 	AddBccToHeader            bool
 	preserveOriginalRecipient bool
@@ -55,6 +65,12 @@ type SMTPServer struct {
 	KeepAlive      bool
 	TLSConfig      *tls.Config
 
+	// RequireSTARTTLS makes Connect fail with ErrSTARTTLSNotSupported when
+	// Encryption is EncryptionSTARTTLS and the server does not advertise the
+	// STARTTLS extension. When false (the default), the connection silently
+	// continues without encryption in that case.
+	RequireSTARTTLS bool
+
 	// use custom dialer
 	CustomConn net.Conn
 }
@@ -65,7 +81,7 @@ type SMTPClient struct {
 	Client                    *smtpClient
 	SendTimeout               time.Duration
 	KeepAlive                 bool
-	hasDSNExt                 bool
+	HasDSNExt                 bool
 	preserveOriginalRecipient bool
 	dsn                       []DSN
 }
@@ -94,12 +110,34 @@ const (
 	EncryptionSTARTTLS
 )
 
+// ErrSTARTTLSNotSupported is returned when STARTTLS encryption is requested
+// with SMTPServer.RequireSTARTTLS but the server does not advertise the
+// STARTTLS extension.
+var ErrSTARTTLSNotSupported = errors.New("server does not support STARTTLS")
+
 // TODO: Remove last two indexes
 var encryptionTypes = [...]string{"None", "SSL/TLS", "STARTTLS", "SSL/TLS", "STARTTLS"}
 
 func (encryption Encryption) String() string {
 	return encryptionTypes[encryption]
 }
+
+type headerEncoding int
+
+const (
+	// HeaderEncodingNone turns off encoding on the message headers
+	// https://www.rfc-editor.org/rfc/rfc6530#section-7.1
+	HeaderEncodingNone headerEncoding = iota
+
+	// TODO: Add Base64 encoding
+	// HeaderEncodingBase64 sets the message header encoding to base64
+	// https://www.rfc-editor.org/rfc/rfc2045#section-6.8
+	// HeaderEncodingBase64
+
+	// HeaderEncodingQ sets the message header encoding to Q encoding
+	// https://www.rfc-editor.org/rfc/rfc2047#section-4.2
+	HeaderEncodingQ
+)
 
 type encoding int
 
@@ -196,9 +234,10 @@ func (dsn DSN) String() string {
 // NewMSG creates a new email. It uses UTF-8 by default. All charsets: http://webcheatsheet.com/HTML/character_sets_list.php
 func NewMSG() *Email {
 	email := &Email{
-		headers:  make(textproto.MIMEHeader),
-		Charset:  "UTF-8",
-		Encoding: EncodingQuotedPrintable,
+		headers:        make(textproto.MIMEHeader),
+		Charset:        "UTF-8",
+		Encoding:       EncodingQuotedPrintable,
+		HeaderEncoding: HeaderEncodingQ,
 	}
 
 	email.AddHeader("MIME-Version", "1.0")
@@ -311,6 +350,8 @@ func (email *Email) AddBcc(addresses ...string) *Email {
 
 // AddAddresses allows you to add addresses to the specified address header.
 func (email *Email) AddAddresses(header string, addresses ...string) *Email {
+	var err error
+
 	if email.Error != nil {
 		return email
 	}
@@ -330,16 +371,20 @@ func (email *Email) AddAddresses(header string, addresses ...string) *Email {
 	}
 
 	// check to see if the addresses are valid
-	for i := range addresses {
-		var address = new(mail.Address)
-		var err error
+	for i, address := range addresses {
+		fullAddress := address
 
-		// ignore parse the address if empty
+		// ignore empty addresses
 		if len(addresses[i]) > 0 {
-			address, err = mail.ParseAddress(addresses[i])
-			if err != nil {
-				email.Error = errors.New("Mail Error: " + err.Error() + "; Header: [" + header + "] Address: [" + addresses[i] + "]")
-				return email
+			if !email.UseProvidedAddress {
+				parsed, err := mail.ParseAddress(addresses[i])
+				if err != nil {
+					email.Error = errors.New("Mail Error: " + err.Error() + "; Header: [" + header + "] Address: [" + addresses[i] + "]")
+					return email
+				}
+
+				address = parsed.Address
+				fullAddress = parsed.String()
 			}
 		} else {
 			continue
@@ -366,16 +411,16 @@ func (email *Email) AddAddresses(header string, addresses ...string) *Email {
 			if len(email.from) > 0 && header == "From" {
 				email.headers.Del("From")
 			}
-			email.from = address.Address
+			email.from = address
 		case "Sender":
-			email.sender = address.Address
+			email.sender = address
 		case "Reply-To":
-			email.replyTo = address.Address
+			email.replyTo = address
 		case "Return-Path":
-			email.returnPath = address.Address
+			email.returnPath = address
 		default:
 			// check that the address was added to the recipients list
-			email.recipients, err = addAddress(email.recipients, address.Address, email.AllowDuplicateAddress)
+			email.recipients, err = addAddress(email.recipients, address, email.AllowDuplicateAddress)
 			if err != nil {
 				email.Error = errors.New("Mail Error: " + err.Error() + "; Header: [" + header + "] Address: [" + addresses[i] + "]")
 				return email
@@ -392,13 +437,13 @@ func (email *Email) AddAddresses(header string, addresses ...string) *Email {
 
 		// add Bcc only if AddBccToHeader is true
 		if header == "Bcc" && email.AddBccToHeader {
-			email.headers.Add(header, address.String())
+			email.headers.Add(header, fullAddress)
 		}
 
 		// add all addresses to the headers except for Bcc and Return-Path
 		if header != "Bcc" && header != "Return-Path" {
 			// add the address to the headers
-			email.headers.Add(header, address.String())
+			email.headers.Add(header, fullAddress)
 		}
 	}
 
@@ -799,7 +844,7 @@ func dial(customConn net.Conn, host string, port string, encryption Encryption, 
 
 // smtpConnect connects to the smtp server and starts TLS and passes auth
 // if necessary
-func smtpConnect(customConn net.Conn, host, port, helo string, encryption Encryption, config *tls.Config) (*smtpClient, error) {
+func smtpConnect(customConn net.Conn, host, port, helo string, encryption Encryption, config *tls.Config, requireSTARTTLS bool) (*smtpClient, error) {
 	// connect to the mail server
 	c, err := dial(customConn, host, port, encryption, config)
 
@@ -825,6 +870,9 @@ func smtpConnect(customConn net.Conn, host, port, helo string, encryption Encryp
 				c.close()
 				return nil, fmt.Errorf("Mail Error on STARTTLS: %w", err)
 			}
+		} else if requireSTARTTLS {
+			c.close()
+			return nil, fmt.Errorf("Mail Error on STARTTLS: %w", ErrSTARTTLSNotSupported)
 		}
 	}
 
@@ -895,7 +943,7 @@ func (server *SMTPServer) Connect() (*SMTPClient, error) {
 	if server.ConnectTimeout != 0 {
 		smtpConnectChannel = make(chan error, 2)
 		go func() {
-			c, err = smtpConnect(server.CustomConn, server.Host, fmt.Sprintf("%d", server.Port), server.Helo, server.Encryption, tlsConfig)
+			c, err = smtpConnect(server.CustomConn, server.Host, fmt.Sprintf("%d", server.Port), server.Helo, server.Encryption, tlsConfig, server.RequireSTARTTLS)
 			// send the result
 			smtpConnectChannel <- err
 		}()
@@ -910,7 +958,7 @@ func (server *SMTPServer) Connect() (*SMTPClient, error) {
 		}
 	} else {
 		// no ConnectTimeout, just fire the connect
-		c, err = smtpConnect(server.CustomConn, server.Host, fmt.Sprintf("%d", server.Port), server.Helo, server.Encryption, tlsConfig)
+		c, err = smtpConnect(server.CustomConn, server.Host, fmt.Sprintf("%d", server.Port), server.Helo, server.Encryption, tlsConfig, server.RequireSTARTTLS)
 		if err != nil {
 			return nil, err
 		}
@@ -922,7 +970,7 @@ func (server *SMTPServer) Connect() (*SMTPClient, error) {
 		Client:      c,
 		KeepAlive:   server.KeepAlive,
 		SendTimeout: server.SendTimeout,
-		hasDSNExt:   hasDSN,
+		HasDSNExt:   hasDSN,
 	}, server.validateAuth(c)
 }
 
@@ -1023,7 +1071,7 @@ func sendMailProcess(from string, to []string, msg string, c *SMTPClient) error 
 	var dsn string
 	var dsnSet bool
 
-	if c.hasDSNExt && len(c.dsn) > 0 {
+	if c.HasDSNExt && len(c.dsn) > 0 {
 		dsn = " NOTIFY="
 		if hasNeverDSN(c.dsn) {
 			dsn += NEVER.String()
