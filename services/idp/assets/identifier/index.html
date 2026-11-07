@@ -18,6 +18,7 @@
         data-msg-required="{{.ErrRequired}}"
         data-msg-invalid="{{.ErrInvalid}}"
         data-msg-failed="{{.ErrFailed}}"
+        data-msg-timeout="{{.ErrTimeout}}"
         data-msg-default="{{.ErrDefault}}"
         data-msg-signing-in="{{.ButtonSigningIn}}"
         data-msg-sign-in="{{.ButtonSignIn}}">
@@ -47,6 +48,7 @@
   var MSG_REQUIRED = form.dataset.msgRequired;
   var MSG_INVALID = form.dataset.msgInvalid;
   var MSG_FAILED = form.dataset.msgFailed;
+  var MSG_TIMEOUT = form.dataset.msgTimeout;
   var MSG_DEFAULT = form.dataset.msgDefault;
   var MSG_SIGNING_IN = form.dataset.msgSigningIn;
   var MSG_SIGN_IN = form.dataset.msgSignIn;
@@ -71,7 +73,17 @@
     };
   }
 
+  // A request that gets no answer (server down, connection dropped by a firewall)
+  // must end in an error message instead of leaving the form waiting forever.
+  var REQUEST_TIMEOUT_MS = 30000;
+
+  // fetchApi rejects only when no answer arrived, with err.kind set to "timeout"
+  // (no answer within REQUEST_TIMEOUT_MS) or "network" (the request never reached
+  // the server). Any other error in the caller's code has no kind.
   function fetchApi(path, body) {
+    var controller = typeof AbortController === "function" ? new AbortController() : null;
+    var timedOut = false;
+    var timer = controller ? setTimeout(function() { timedOut = true; controller.abort(); }, REQUEST_TIMEOUT_MS) : null;
     return fetch(apiBase + path, {
       method: "POST",
       headers: {
@@ -79,7 +91,15 @@
         "Kopano-Konnect-XSRF": xsrf
       },
       body: body ? JSON.stringify(body) : undefined,
-      credentials: "same-origin"
+      credentials: "same-origin",
+      signal: controller?.signal
+    }).catch(function(err) {
+      var e = new Error(timedOut ? "request timed out" : "request failed");
+      e.kind = timedOut ? "timeout" : "network";
+      e.cause = err;
+      throw e;
+    }).finally(function() {
+      if (timer) clearTimeout(timer);
     });
   }
 
@@ -149,7 +169,7 @@
       })
       .then(function(result) {
         setLoading(false);
-        if (result.ok && result.data.success) {
+        if (result.ok && result.data?.success) {
           var hello = result.data.hello;
           if (hello && hello.next === 'consent') {
             var consentParams = new URLSearchParams(window.location.search);
@@ -174,23 +194,25 @@
             return;
           }
         }
+        // 204 and 401 are the IdP's answers for wrong credentials.
         if (result.status === 204 || result.status === 401 || (result.data && !result.data.success)) {
           showError(MSG_INVALID);
           return;
         }
-        showError(MSG_FAILED);
+        // The server answered, but with an error unrelated to the credentials.
+        showError(MSG_DEFAULT);
       })
       .catch(function(err) {
+        // Never report these as a wrong username or password.
         setLoading(false);
-        if (err instanceof DOMException && err.name === "AbortError") {
-          showError(MSG_INVALID);
-          return;
-        }
-        if (err instanceof TypeError) {
+        if (err?.kind === "timeout") {
+          showError(MSG_TIMEOUT);
+        } else if (err?.kind === "network") {
           showError(MSG_FAILED);
-          return;
+        } else {
+          // An error in this page's own code, not in the request.
+          showError(MSG_DEFAULT);
         }
-        showError(MSG_FAILED);
       });
   });
 
