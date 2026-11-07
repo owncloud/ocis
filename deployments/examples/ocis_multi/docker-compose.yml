@@ -169,7 +169,7 @@ services:
       PROXY_USER_OIDC_CLAIM: "preferred_username"
       PROXY_USER_CS3_CLAIM: "username"
       # ??
-      OCIS_INSECURE: "${INSECURE:-true}"
+      OCIS_INSECURE: "${INSECURE:-false}"
       OCIS_EXCLUDE_RUN_SERVICES: "idp,idm"
       GRAPH_ASSIGN_DEFAULT_USER_ROLE: "false"
       GRAPH_USERNAME_MATCH: "none"
@@ -183,6 +183,11 @@ services:
       MICRO_REGISTRY_ADDRESS: 127.0.0.1:9233
       NATS_NATS_HOST: 0.0.0.0
       NATS_NATS_PORT: 9233
+      # the event bus is reachable by every container on this network, so it
+      # must require authentication. Both the broker and all clients read
+      # OCIS_EVENTS_AUTH_*; set EVENTS_AUTH_PASSWORD to a strong random value.
+      OCIS_EVENTS_AUTH_USERNAME: "ocis"
+      OCIS_EVENTS_AUTH_PASSWORD: "${EVENTS_AUTH_PASSWORD:?EVENTS_AUTH_PASSWORD must be set to a strong random value}"
       #keycloak
       WEB_UI_CONFIG_FILE: /etc/ocis/ocis.ocm.web.config.json
       # LDAP
