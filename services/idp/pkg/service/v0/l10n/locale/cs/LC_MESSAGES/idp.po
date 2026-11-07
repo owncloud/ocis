@@ -1,0 +1,102 @@
+# Czech translations for IDP login pages.
+# Copyright (C) 2026 ownCloud GmbH
+# This file is distributed under the same license as the oCIS package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ocis-idp\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-12 00:00+0000\n"
+"PO-Revision-Date: 2026-10-27 00:00+0000\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+msgid "Sign in - ownCloud"
+msgstr "Přihlášení - ownCloud"
+
+msgid "Login"
+msgstr "Přihlášení"
+
+msgid "Username"
+msgstr "Uživatelské jméno"
+
+msgid "Password"
+msgstr "Heslo"
+
+msgid "Log in"
+msgstr "Přihlásit se"
+
+msgid "Logging in…"
+msgstr "Přihlašování…"
+
+msgid "Reset password"
+msgstr "Obnovit heslo"
+
+msgid "Username and password are required."
+msgstr "Zadejte uživatelské jméno a heslo."
+
+msgid "Login failed. Invalid username or password."
+msgstr "Přihlášení se nepodařilo. Neplatné uživatelské jméno nebo heslo."
+
+msgid "Choose an account - ownCloud"
+msgstr "Výběr účtu - ownCloud"
+
+msgid "Choose an account"
+msgstr "Vyberte účet"
+
+msgid "to sign in"
+msgstr "pro přihlášení"
+
+msgid "Use another account"
+msgstr "Použít jiný účet"
+
+msgid "Signed in - ownCloud"
+msgstr "Přihlášeno - ownCloud"
+
+msgid "Signed in"
+msgstr "Přihlášeno"
+
+msgid "You are signed in. You can close this window and return to the application."
+msgstr "Jste přihlášeni. Toto okno můžete zavřít a vrátit se do aplikace."
+
+msgid "Signed out - ownCloud"
+msgstr "Odhlášeno - ownCloud"
+
+msgid "Signed out"
+msgstr "Odhlášeno"
+
+msgid "You are signed out. You can close this window."
+msgstr "Jste odhlášeni. Toto okno můžete zavřít."
+
+msgid "Login Error - ownCloud"
+msgstr "Chyba přihlášení - ownCloud"
+
+msgid "Login Error"
+msgstr "Chyba přihlášení"
+
+msgid "Access denied."
+msgstr "Přístup odepřen."
+
+msgid "Your session has expired."
+msgstr "Platnost vaší relace vypršela."
+
+msgid "Login required."
+msgstr "Je vyžadováno přihlášení."
+
+msgid "Authorize - ownCloud"
+msgstr "Autorizace - ownCloud"
+
+msgid "Authorize"
+msgstr "Autorizace"
+
+msgid "Allow"
+msgstr "Povolit"
+
+msgid "Cancel"
+msgstr "Zrušit"
+
+msgid "By clicking Allow, you allow this app to use your information."
+msgstr "Kliknutím na Povolit umožníte této aplikaci používat vaše údaje."
