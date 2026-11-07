@@ -1,0 +1,15 @@
+---
+services:
+  ocis:
+    depends_on:
+      file-comments-init:
+        condition: service_completed_successfully
+
+  file-comments-init:
+    image: owncloud/web-extensions:file-comments-0.1.0
+    user: root
+    volumes:
+      - ocis-apps:/apps
+    entrypoint:
+      - /bin/sh
+    command: ["-c", "cp -R /var/lib/nginx/html/file-comments/ /apps"]
