@@ -82,7 +82,6 @@ services:
       - MKNOD
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=collabora-ocm-net"
       - "traefik.http.routers.collabora-ocm.entrypoints=https"
       - "traefik.http.routers.collabora-ocm.rule=Host(`${COLLABORA_OCM_DOMAIN:-collabora.ocm.owncloud.test}`)"
       - "traefik.http.routers.collabora-ocm.tls.certresolver=http"
