@@ -1,4 +1,8 @@
 <!-- -*- nxml-child-indent: 4; tab-width: 4; indent-tabs-mode: nil -*- -->
+<!-- Changes compared to the stock coolwsd.xml:
+     - net.post_allow: allow="false", so the listed hosts no longer also count as allowed external data sources.
+     - net.lok_allow: restricted to the WOPI host only (repeated to override the built-in defaults).
+-->
 <config>
 
     <!-- For more detailed documentation on typical configuration options please see:
