@@ -1295,6 +1295,30 @@ export async function userEmptiesTrashbin({ stepUser }: { stepUser: string }): P
   await resourceObject.emptyTrashbin({ page })
 }
 
+export async function userShouldSeeEmptyTrashbinMessage({
+  stepUser,
+  message
+}: {
+  stepUser: string
+  message: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const resourceObject = new objects.applicationFiles.Resource({ page })
+  await resourceObject.expectEmptyTrashbinMessageToBeVisible(message)
+}
+
+export async function userShouldNotSeeEmptyTrashbinButton({
+  stepUser
+}: {
+  stepUser: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const resourceObject = new objects.applicationFiles.Resource({ page })
+  await resourceObject.expectEmptyTrashbinButtonNotToBeVisible()
+}
+
 export async function userRestoresResourcesFromTrashbin({
   stepUser,
   resources,
