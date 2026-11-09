@@ -1,4 +1,10 @@
 <!-- -*- nxml-child-indent: 4; tab-width: 4; indent-tabs-mode: nil -*- -->
+<!-- Differences from the stock coolwsd.xml of the pinned Collabora image (search for "Hardened for the oCIS example deployment"):
+     - net/post_allow: allow="false" so the listed hosts do not also count as allowed external data sources.
+     - net/lok_allow: only the oCIS collaboration service (repeated to override the built-in defaults).
+     - storage/wopi/max_file_size: limited to 524288000 bytes (500 MiB) instead of unlimited.
+     - storage/wopi/alias_groups: only the oCIS collaboration service is accepted as WOPI host.
+-->
 <config>
 
     <!-- For more detailed documentation on typical configuration options please see:
