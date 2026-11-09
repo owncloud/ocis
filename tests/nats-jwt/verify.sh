@@ -18,7 +18,7 @@ cd "$(dirname "$0")"
 : "${NATS_JWT_DIR:?set NATS_JWT_DIR}"
 STREAM="${NATS_JWT_STREAM:-main-queue}"
 # shellcheck disable=SC2206
-BUCKETS=(${NATS_JWT_EXPECT_BUCKETS:-service-registry cache-providers cache-createhome settings-cache storage-system storage-users ids-storage-users postprocessing activitylog} ${NATS_JWT_EXTRA_BUCKETS:-})
+BUCKETS=(${NATS_JWT_EXPECT_BUCKETS:-service-registry cache-providers settings-cache storage-system storage-users ids-storage-users postprocessing activitylog} ${NATS_JWT_EXTRA_BUCKETS:-})
 # shellcheck disable=SC2206
 CONSUMERS=(${NATS_JWT_EXPECT_CONSUMERS:-activitylog clientlog dcfs evhistory frontend graph jsoncs3sharemanager postprocessing search sse storage-users userlog} ${NATS_JWT_EXTRA_CONSUMERS:-})
 
