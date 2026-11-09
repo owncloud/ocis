@@ -120,7 +120,7 @@ func (b *CS3Backend) Logon(ctx context.Context, audience, username, password str
 // GetUser implements the Backend interface, providing user meta data retrieval
 // for the user specified by the userID. Requests are bound to the provided
 // context.
-func (b *CS3Backend) GetUser(ctx context.Context, userEntryID string, sessionRef *string, _ map[string]bool) (backends.UserFromBackend, error) {
+func (b *CS3Backend) GetUser(ctx context.Context, userEntryID string, sessionRef *string, _ map[string]bool, _ *identity.LookupContext) (backends.UserFromBackend, error) {
 
 	var session *cs3Session
 	if s, ok := b.sessions.Get(*sessionRef); ok {
