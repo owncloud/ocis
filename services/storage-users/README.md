@@ -337,7 +337,8 @@ ocis storage-users spaces <command>
 
 ```plaintext
 COMMANDS:
-   purge  Purge disabled spaces that exceed the retention period
+   purge             Purge disabled spaces that exceed the retention period
+   fix-viewer-trash  Remove the trash bin access from "Can view" space members that were added before the role lost it
 ```
 
 #### Purge (delete permanently) Disabled Spaces
@@ -375,6 +376,38 @@ ocis storage-users spaces purge --type=personal --verbose --dry-run=false
 - Only processes spaces that are in 'trashed' state
 - The `--dry-run` flag defaults to `true` to prevent accidental purging
 - Retention period supports human-readable formats (e.g., '336h', '14d', '720h')
+
+#### Remove the Trash Bin Access from Existing "Can view" Members
+
+The "Can view" space role no longer allows listing the trash bin of the space. The permissions of a space member are stored when the member is added, so members that got the "Can view" role before this change can still list the trash bin, and the members list shows them with "Custom permissions". This command removes the trash bin access from these members. Afterwards they have the same permissions as new "Can view" members.
+
+```bash
+ocis storage-users spaces fix-viewer-trash [command options]
+```
+
+**Options:**
+- `--dry-run, -d` - Only show which members would be changed (default: true)
+- `--space-id, -s` - Only check this space (optional, omit to check all project spaces)
+
+**Examples:**
+
+```bash
+# Dry run to see which members would be changed (recommended first step)
+ocis storage-users spaces fix-viewer-trash
+
+# Change the members of one space
+ocis storage-users spaces fix-viewer-trash --space-id='f46bae39-b2e4-48c7-a1bc-26169b1ffc2e$2d274464-0d11-4334-9f66-391cbe38c8a5' --dry-run=false
+
+# Change the members of all project spaces
+ocis storage-users spaces fix-viewer-trash --dry-run=false
+```
+
+**Important Notes:**
+- Run the command after updating to an oCIS version where the "Can view" role has no trash bin access. Older versions refuse to run it without `--dry-run`, because the changed members would lose the download button there.
+- The command only changes members whose permissions are exactly the ones of the old "Can view" role. Who added the member and the expiration date are kept.
+- Read-only members that can still list the trash bin but have other permissions are listed as `check manually` and are not changed.
+- The command works through the running storage-users service, logged in with the service account, so oCIS does not need to be stopped. It only checks the spaces of the storage-users service it is started for. When the vault storage is used, run it for the `storage-users-vault` service as well.
+- Running the command again is safe, members that were already changed are not listed again.
 
 ### Manage Trash-Bin Items
 
