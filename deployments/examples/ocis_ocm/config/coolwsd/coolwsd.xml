@@ -1,8 +1,12 @@
 <!-- -*- nxml-child-indent: 4; tab-width: 4; indent-tabs-mode: nil -*- -->
 <!-- Changes compared to the stock coolwsd.xml:
-     - net.post_allow: allow="false", so the listed hosts no longer also count as allowed external data sources.
-     - net.lok_allow: restricted to the WOPI host only (repeated to override the built-in defaults).
--->
+     - net.post_allow: allow="false" so the listed private/loopback hosts only filter POST/REST
+       clients and no longer count as allowed external data sources.
+     - net.lok_allow: restricted to the oCIS collaboration service (WOPI host), repeated 20 times
+       to override the built-in default ranges.
+     - storage.wopi max_file_size: limited to 524288000 bytes (500 MiB) instead of unlimited.
+     - storage.wopi alias_groups: mode "groups" with the oCIS collaboration service as the only
+       allowed WOPI host. -->
 <config>
 
     <!-- For more detailed documentation on typical configuration options please see:
