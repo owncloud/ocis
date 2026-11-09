@@ -2,7 +2,6 @@ package shared
 
 import (
 	"log/slog"
-	"os"
 	"runtime"
 
 	"github.com/KimMachineGun/automemlimit/memlimit"
@@ -12,12 +11,14 @@ import (
 func init() {
 	slog.SetLogLoggerLevel(slog.LevelError)
 
-	// Enable system memory provider on non-Linux systems to avoid cgroups errors
-	if runtime.GOOS != "linux" {
-		os.Setenv("AUTOMEMLIMIT_EXPERIMENT", "system")
+	opts := []memlimit.Option{
+		memlimit.WithLogger(slog.Default()),
 	}
 
-	_, _ = memlimit.SetGoMemLimitWithOpts(
-		memlimit.WithLogger(slog.Default()),
-	)
+	// Use the system memory provider on non-Linux systems to avoid cgroups errors
+	if runtime.GOOS != "linux" {
+		opts = append(opts, memlimit.WithProvider(memlimit.FromSystem))
+	}
+
+	_, _ = memlimit.Set(opts...)
 }
