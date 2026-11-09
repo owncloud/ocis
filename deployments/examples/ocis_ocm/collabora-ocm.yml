@@ -6,6 +6,10 @@ services:
         aliases:
           - ${COLLABORA_OCM_DOMAIN:-collabora.ocm.owncloud.test}
           - ${WOPISERVER_OCM_DOMAIN:-wopiserver.ocm.owncloud.test}
+      # Collabora reaches the collaboration service through the proxy on its own network
+      collabora-ocm-net:
+        aliases:
+          - ${WOPISERVER_OCM_DOMAIN:-wopiserver.ocm.owncloud.test}
   ocis-ocm:
     environment:
       # make collabora the secure view app
@@ -43,6 +47,7 @@ services:
       - ${OCIS_OCM_CONFIG_DIR:-ocis-ocm-config}:/etc/ocis
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=ocis-net"
       - "traefik.http.routers.collaboration-ocm.entrypoints=https"
       - "traefik.http.routers.collaboration-ocm.rule=Host(`${WOPISERVER_OCM_DOMAIN:-wopiserver.ocm.owncloud.test}`)"
       - "traefik.http.routers.collaboration-ocm.tls.certresolver=http"
@@ -54,8 +59,10 @@ services:
 
   collabora-ocm:
     image: collabora/code:24.04.12.3.1
+    # Collabora only needs to talk to the proxy (which forwards to the collaboration service), so it
+    # lives on a dedicated, internal network and is not attached to the network shared with other services.
     networks:
-      ocis-net:
+      collabora-ocm-net:
     environment:
       aliasgroup1: https://${WOPISERVER_OCM_DOMAIN:-wopiserver.ocm.owncloud.test}:443
       DONT_GEN_SSL_CERT: "YES"
@@ -65,12 +72,17 @@ services:
         --o:ssl.termination=true \
         --o:welcome.enable=false \
         --o:net.frame_ancestors=${OCIS_DOMAIN:-ocis.ocm.owncloud.test}
-      username: ${COLLABORA_ADMIN_USER:-admin}
-      password: ${COLLABORA_ADMIN_PASSWORD:-admin}
+      # the admin console requires explicit credentials
+      username: ${COLLABORA_ADMIN_USER:?COLLABORA_ADMIN_USER must be set}
+      password: ${COLLABORA_ADMIN_PASSWORD:?COLLABORA_ADMIN_PASSWORD must be set}
+    volumes:
+      # hardened configuration, restricts the hosts Collabora is allowed to talk to
+      - ./config/coolwsd/coolwsd.xml:/etc/coolwsd/coolwsd.xml:ro
     cap_add:
       - MKNOD
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=collabora-ocm-net"
       - "traefik.http.routers.collabora-ocm.entrypoints=https"
       - "traefik.http.routers.collabora-ocm.rule=Host(`${COLLABORA_OCM_DOMAIN:-collabora.ocm.owncloud.test}`)"
       - "traefik.http.routers.collabora-ocm.tls.certresolver=http"
@@ -82,3 +94,7 @@ services:
     command: ["bash", "-c", "coolconfig generate-proof-key ; /start-collabora-online.sh"]
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:9980/hosting/discovery" ]
+
+networks:
+  collabora-ocm-net:
+    internal: true

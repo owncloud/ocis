@@ -5,6 +5,7 @@ services:
       ocis-net:
         aliases:
           - ${COLLABORA_DOMAIN:-collabora.owncloud.test}
+      collabora-net:
   ocis:
     environment:
       # make collabora the secure view app
@@ -15,6 +16,7 @@ services:
     image: ${OCIS_DOCKER_IMAGE}:${OCIS_DOCKER_TAG}
     networks:
       ocis-net:
+      collabora-net:
     depends_on:
       ocis:
         condition: service_started
@@ -40,6 +42,7 @@ services:
       - ${OCIS_CONFIG_DIR:-ocis-config}:/etc/ocis
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=ocis-net"
       - "traefik.http.routers.collaboration.entrypoints=http"
       - "traefik.http.routers.collaboration.rule=Host(`collaboration`)"
       - "traefik.http.routers.collaboration.service=collaboration"
@@ -70,27 +73,33 @@ services:
 
   collabora:
     image: collabora/code:${COLLABORA_DOCKER_TAG}
+    # Collabora only needs to talk to the collaboration service and the proxy, so it lives on a
+    # dedicated, internal network and is not attached to the network shared with the other services.
     networks:
-      ocis-net:
+      collabora-net:
     depends_on:
       collabora-proof-key-init:
         condition: service_completed_successfully
     environment:
       DONT_GEN_SSL_CERT: "YES"
       extra_params: |
-        --o:ssl.enable=${COLLABORA_SSL_ENABLE:-true} \
+        --o:ssl.enable=${COLLABORA_SSL_ENABLE:-false} \
         --o:ssl.ssl_verification=${COLLABORA_SSL_VERIFICATION:-true} \
         --o:ssl.termination=true \
         --o:welcome.enable=false \
         --o:net.frame_ancestors=${OCIS_DOMAIN:-ocis.owncloud.test}
-      username: ${COLLABORA_ADMIN_USER:-admin}
-      password: ${COLLABORA_ADMIN_PASSWORD:-admin}
+      # the admin console requires explicit credentials, set them in the .env file
+      username: ${COLLABORA_ADMIN_USER:?COLLABORA_ADMIN_USER must be set}
+      password: ${COLLABORA_ADMIN_PASSWORD:?COLLABORA_ADMIN_PASSWORD must be set}
     volumes:
+      # hardened configuration, restricts the hosts Collabora is allowed to talk to
+      - ./config/coolwsd/coolwsd.xml:/etc/coolwsd/coolwsd.xml:ro
       - ${COLLABORA_CONFIG_DIR:-./config/collabora}/proof_key:/etc/coolwsd/proof_key:ro
     cap_add:
       - MKNOD
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=collabora-net"
       - "traefik.http.routers.collabora.entrypoints=https"
       - "traefik.http.routers.collabora.rule=Host(`${COLLABORA_DOMAIN:-collabora.owncloud.test}`)"
       - "traefik.http.routers.collabora.tls.certresolver=http"
@@ -101,3 +110,7 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "/usr/bin/coolwsd", "--probe"]
+
+networks:
+  collabora-net:
+    internal: true

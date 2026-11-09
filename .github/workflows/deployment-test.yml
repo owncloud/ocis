@@ -48,6 +48,11 @@ jobs:
           set -e
           echo "=== Running ${{ matrix.example }} ==="
           
+          # the Collabora admin console requires explicit credentials
+          export COLLABORA_ADMIN_USER=admin
+          COLLABORA_ADMIN_PASSWORD="$(openssl rand -hex 16)"
+          export COLLABORA_ADMIN_PASSWORD
+
           if [ "${{ matrix.example }}" = "ocis_ocm" ]; then
             export INSECURE=true
             export COLLABORA_SSL_ENABLE=false
