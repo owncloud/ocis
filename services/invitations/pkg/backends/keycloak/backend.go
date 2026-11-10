@@ -4,7 +4,6 @@ package keycloak
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -111,29 +110,43 @@ func (b Backend) CreateUser(ctx context.Context, invitation *invitations.Invitat
 func (b Backend) CanSendMail() bool { return true }
 
 // SendMail sends a mail to the user with details on how to redeem the invitation.
+// Errors that certainly mean no mail was sent are marked with
+// invitations.Rejected, which keeps their message unchanged.
 func (b Backend) SendMail(ctx context.Context, id string) error {
 	err := b.client.SendActionsMail(ctx, b.userRealm, id, b.userActions)
 	if isDefiniteRejection(err) {
-		return fmt.Errorf("%w: %w", invitations.ErrRejected, err)
+		return invitations.Rejected(err)
 	}
 	return err
 }
 
-// isDefiniteRejection reports whether err is an error response from Keycloak
-// that certainly means the request was refused and no mail was sent. Transport
-// errors and cancelled contexts are not, as Keycloak may have sent the mail
-// anyway. The same holds for 502 and 504: they typically come from a reverse
-// proxy in front of Keycloak, which may already have processed the request.
+// isDefiniteRejection reports whether err certainly means that no mail was
+// sent. Only these cases qualify:
+//
+//   - Getting the access token failed: the execute-actions request was never
+//     sent.
+//   - A 4xx response: Keycloak refused the request before sending anything,
+//     e.g. 400 for invalid required actions or a user without email, 401/403
+//     for missing permissions, 404 for an unknown user, 409.
+//   - A 500 response: Keycloak answers "Failed to send execute actions email"
+//     when sending the mail failed.
+//
+// Everything else leaves the outcome unknown, because Keycloak may have sent
+// the mail anyway: other 5xx responses (502, 503 and 504 or the 52x codes of
+// Cloudflare usually come from a proxy in front of Keycloak that may have
+// forwarded the request), transport errors (gocloak reports them with code
+// 0), timeouts and cancelled contexts.
 func isDefiniteRejection(err error) bool {
+	var tokenErr *keycloak.TokenError
+	if errors.As(err, &tokenErr) {
+		return true
+	}
 	var apiErr *gocloak.APIError
-	if !errors.As(err, &apiErr) || apiErr.Code <= 0 {
+	if !errors.As(err, &apiErr) {
 		return false
 	}
-	switch apiErr.Code {
-	case http.StatusBadGateway, http.StatusGatewayTimeout:
-		return false
-	}
-	return true
+	return (apiErr.Code >= http.StatusBadRequest && apiErr.Code < http.StatusInternalServerError) ||
+		apiErr.Code == http.StatusInternalServerError
 }
 
 // DeleteUser deletes the user with the given identifier from the keycloak backend.
