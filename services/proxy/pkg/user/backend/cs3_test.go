@@ -124,7 +124,7 @@ func newGraphServer(t *testing.T, existingGroup string, currentGroups []string, 
 			w.WriteHeader(http.StatusNoContent)
 			return
 		case strings.Contains(rest, "/members/") && r.Method == http.MethodDelete:
-			gid := strings.SplitN(rest, "/members/", 2)[0]
+			gid, _, _ := strings.Cut(rest, "/members/")
 			calls.mu.Lock()
 			calls.delMember = append(calls.delMember, gid)
 			calls.mu.Unlock()
