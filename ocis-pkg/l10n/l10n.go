@@ -266,7 +266,7 @@ func translateEach(tr func(string, ...any) string, value reflect.Value, args ...
 		for i := 0; i < value.Len(); i++ {
 			v := value.Index(i)
 			switch v.Kind() {
-			case reflect.Struct, reflect.Ptr:
+			case reflect.Struct, reflect.Pointer:
 				rangeOverArgs(tr, v, args...)
 			case reflect.String:
 				translateField(tr, v)
@@ -336,7 +336,7 @@ func rangeOverArgs(tr func(string, ...any) string, value reflect.Value, args ...
 
 func translateField(tr func(string, ...any) string, f reflect.Value) {
 	if f.IsValid() {
-		if f.Kind() == reflect.Ptr {
+		if f.Kind() == reflect.Pointer {
 			if f.IsNil() {
 				return
 			}
@@ -359,14 +359,14 @@ func translateField(tr func(string, ...any) string, f reflect.Value) {
 }
 
 func isStruct(r reflect.Value) bool {
-	if r.Kind() == reflect.Ptr {
+	if r.Kind() == reflect.Pointer {
 		r = r.Elem()
 	}
 	return r.Kind() == reflect.Struct
 }
 
 func cleanValue(v reflect.Value) (reflect.Value, bool) {
-	if v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
+	if v.Kind() == reflect.Pointer || v.Kind() == reflect.Interface {
 		if v.IsNil() {
 			return v, false
 		}

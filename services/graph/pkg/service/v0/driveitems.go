@@ -570,7 +570,7 @@ func unmarshalStringMap(logger *log.Logger, out any, flatMap map[string]string, 
 		mapKey := prefix + getFieldName(structField)
 
 		if value, ok := flatMap[mapKey]; ok {
-			if field.Kind() == reflect.Ptr {
+			if field.Kind() == reflect.Pointer {
 				newValue := reflect.New(field.Type().Elem())
 				var tmp any
 				var err error
