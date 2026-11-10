@@ -34,6 +34,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/auth/manager/registry"
 	"github.com/owncloud/reva/v2/pkg/auth/scope"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
+	"github.com/owncloud/reva/v2/pkg/natsauth"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/grants"
 	"github.com/owncloud/reva/v2/pkg/store"
@@ -64,6 +65,8 @@ type config struct {
 	StoreEnableTLS        bool          `mapstructure:"store_enable_tls"`
 	StoreTLSInsecure      bool          `mapstructure:"store_tls_insecure"`
 	StoreTLSRootCACert    string        `mapstructure:"store_tls_root_ca_certificate"`
+	StoreCredsFile        string        `mapstructure:"store_creds_file"`
+	StoreCreds            string        `mapstructure:"store_creds"`
 }
 
 func parseConfig(m map[string]interface{}) (*config, error) {
@@ -82,6 +85,12 @@ func New(m map[string]interface{}) (auth.Manager, error) {
 	if err != nil {
 		return nil, err
 	}
+	// Only a NATS store uses the credentials.
+	if store.UsesNats(mgr.c.StoreType) {
+		if err := natsauth.Check(mgr.c.StoreCredsFile, mgr.c.StoreCreds); err != nil {
+			return nil, errors.Wrap(err, "publicshares store")
+		}
+	}
 
 	revaStore := store.Create(
 		store.Store(mgr.c.StoreType),
@@ -89,6 +98,7 @@ func New(m map[string]interface{}) (auth.Manager, error) {
 		microstore.Database(mgr.c.StoreDatabase),
 		microstore.Table(mgr.c.StoreTable),
 		store.Authentication(mgr.c.StoreUsername, mgr.c.StorePassword),
+		store.Credentials(mgr.c.StoreCredsFile, mgr.c.StoreCreds),
 		store.TLS(mgr.c.StoreEnableTLS, mgr.c.StoreTLSInsecure, mgr.c.StoreTLSRootCACert),
 	)
 	mgr.bfp = NewBruteForceProtection(revaStore, mgr.c.BruteForceTimeGap, mgr.c.BruteForceMaxAttempts)

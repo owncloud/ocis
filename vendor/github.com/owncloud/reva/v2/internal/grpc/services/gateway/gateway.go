@@ -149,6 +149,10 @@ func New(m map[string]interface{}, _ *grpc.Server, _ *zerolog.Logger) (rgrpc.Ser
 
 	c.init()
 
+	if err := c.ProviderCacheConfig.CheckCredentials(); err != nil {
+		return nil, errors.Wrap(err, "provider cache")
+	}
+
 	// ensure DataGatewayEndpoint is a valid URI
 	u, err := url.Parse(c.DataGatewayEndpoint)
 	if err != nil {

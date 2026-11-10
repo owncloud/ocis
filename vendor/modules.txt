@@ -575,8 +575,8 @@ github.com/go-logr/stdr
 # github.com/go-micro/plugins/v4/client/grpc v1.2.1
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/client/grpc
-# github.com/go-micro/plugins/v4/events/natsjs v1.2.2
-## explicit; go 1.17
+# github.com/go-micro/plugins/v4/events/natsjs v1.2.2 => github.com/kobergj/plugins/v4/events/natsjs v1.2.1-0.20261030085317-811a2ded849b
+## explicit; go 1.26.10
 github.com/go-micro/plugins/v4/events/natsjs
 # github.com/go-micro/plugins/v4/logger/zerolog v1.2.0
 ## explicit; go 1.17
@@ -593,8 +593,8 @@ github.com/go-micro/plugins/v4/server/http
 # github.com/go-micro/plugins/v4/store/nats-js v1.2.1
 ## explicit; go 1.21
 github.com/go-micro/plugins/v4/store/nats-js
-# github.com/go-micro/plugins/v4/store/nats-js-kv v0.0.0-20240726082623-6831adfdcdc4 => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20260609111813-fc78af4c9138
-## explicit; go 1.21
+# github.com/go-micro/plugins/v4/store/nats-js-kv v0.0.0-20240726082623-6831adfdcdc4 => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20261030085317-811a2ded849b
+## explicit; go 1.26.10
 github.com/go-micro/plugins/v4/store/nats-js-kv
 # github.com/go-micro/plugins/v4/store/redis v1.2.1
 ## explicit; go 1.17
@@ -1321,8 +1321,8 @@ github.com/orcaman/concurrent-map
 # github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245
 ## explicit; go 1.18
 github.com/owncloud/libre-graph-api-go
-# github.com/owncloud/reva/v2 v2.0.0-20261030090554-61344c6cab7e
-## explicit; go 1.26.0
+# github.com/owncloud/reva/v2 v2.0.0-20261109105849-bb1992677735
+## explicit; go 1.26.10
 github.com/owncloud/reva/v2/cmd/revad/internal/grace
 github.com/owncloud/reva/v2/cmd/revad/runtime
 github.com/owncloud/reva/v2/internal/grpc/interceptors/appctx
@@ -1504,6 +1504,7 @@ github.com/owncloud/reva/v2/pkg/metrics/driver/xcloud
 github.com/owncloud/reva/v2/pkg/metrics/reader
 github.com/owncloud/reva/v2/pkg/micro/ocdav
 github.com/owncloud/reva/v2/pkg/mime
+github.com/owncloud/reva/v2/pkg/natsauth
 github.com/owncloud/reva/v2/pkg/ocm/client
 github.com/owncloud/reva/v2/pkg/ocm/invite
 github.com/owncloud/reva/v2/pkg/ocm/invite/repository/json
@@ -2566,5 +2567,6 @@ stash.kopano.io/kgol/rndm
 # github.com/studio-b12/gowebdav => github.com/kobergj/gowebdav v0.0.0-20251030165916-532350997dde
 # github.com/egirna/icap-client => github.com/kobergj/icap-client v0.0.0-20250116172800-8eaa5022532b
 # github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c
-# github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20260609111813-fc78af4c9138
+# github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20261030085317-811a2ded849b
+# github.com/go-micro/plugins/v4/events/natsjs => github.com/kobergj/plugins/v4/events/natsjs v1.2.1-0.20261030085317-811a2ded849b
 # go-micro.dev/v4 => github.com/kobergj/go-micro/v4 v4.0.0-20250610135441-d0b187215699
