@@ -3,6 +3,7 @@ package parser
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
@@ -52,10 +53,5 @@ func Validate(cfg *config.Config) error {
 }
 
 func contains(all []string, candidate events.Postprocessingstep) bool {
-	for _, s := range all {
-		if s == string(candidate) {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(all, string(candidate))
 }
