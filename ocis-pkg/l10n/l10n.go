@@ -26,10 +26,10 @@ var (
 // Without the interface, go vet will complain about non-constant strings used in gotext printf
 // Alternatives would be to use a different workaround or a different library
 type OcisLocale interface {
-	Get(str string, vars ...interface{}) string
-	GetN(str, plural string, n int, vars ...interface{}) string
-	GetC(str, ctx string, vars ...interface{}) string
-	GetNC(str, plural string, n int, ctx string, vars ...interface{}) string
+	Get(str string, vars ...any) string
+	GetN(str, plural string, n int, vars ...any) string
+	GetC(str, ctx string, vars ...any) string
+	GetNC(str, plural string, n int, ctx string, vars ...any) string
 }
 
 // ocisLocale forwards to gotext.Locale through func fields instead of embedding it directly.
@@ -37,18 +37,18 @@ type OcisLocale interface {
 // every non-constant call to it, even through the OcisLocale interface; routing calls through
 // func fields hides that static trail.
 type ocisLocale struct {
-	get   func(str string, vars ...interface{}) string
-	getN  func(str, plural string, n int, vars ...interface{}) string
-	getC  func(str, ctx string, vars ...interface{}) string
-	getNC func(str, plural string, n int, ctx string, vars ...interface{}) string
+	get   func(str string, vars ...any) string
+	getN  func(str, plural string, n int, vars ...any) string
+	getC  func(str, ctx string, vars ...any) string
+	getNC func(str, plural string, n int, ctx string, vars ...any) string
 }
 
-func (o ocisLocale) Get(str string, vars ...interface{}) string { return o.get(str, vars...) }
-func (o ocisLocale) GetN(str, plural string, n int, vars ...interface{}) string {
+func (o ocisLocale) Get(str string, vars ...any) string { return o.get(str, vars...) }
+func (o ocisLocale) GetN(str, plural string, n int, vars ...any) string {
 	return o.getN(str, plural, n, vars...)
 }
-func (o ocisLocale) GetC(str, ctx string, vars ...interface{}) string { return o.getC(str, ctx, vars...) }
-func (o ocisLocale) GetNC(str, plural string, n int, ctx string, vars ...interface{}) string {
+func (o ocisLocale) GetC(str, ctx string, vars ...any) string { return o.getC(str, ctx, vars...) }
+func (o ocisLocale) GetNC(str, plural string, n int, ctx string, vars ...any) string {
 	return o.getNC(str, plural, n, ctx, vars...)
 }
 

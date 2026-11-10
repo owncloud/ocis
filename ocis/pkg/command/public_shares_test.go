@@ -11,13 +11,13 @@ import (
 
 // encodeEntry builds a persistence entry the same way the reva json public-share
 // manager does: map{"share": <json-encoded PublicShare>, "password": <string>}.
-func encodeEntry(t *testing.T, ps *link.PublicShare) map[string]interface{} {
+func encodeEntry(t *testing.T, ps *link.PublicShare) map[string]any {
 	t.Helper()
 	enc, err := utils.MarshalProtoV1ToJSON(ps)
 	if err != nil {
 		t.Fatalf("failed to marshal public share: %v", err)
 	}
-	return map[string]interface{}{
+	return map[string]any{
 		"share":    string(enc),
 		"password": "",
 	}
@@ -40,7 +40,7 @@ func TestFindCorruptPublicShares(t *testing.T) {
 		ps := validShare("bad-nil", "tok-nil")
 		ps.ResourceId = nil
 		db := persistence.PublicShares{
-			"good":   encodeEntry(t, validShare("good", "tok-good")),
+			"good":    encodeEntry(t, validShare("good", "tok-good")),
 			"bad-nil": encodeEntry(t, ps),
 		}
 
@@ -75,8 +75,8 @@ func TestFindCorruptPublicShares(t *testing.T) {
 	t.Run("undecodable entry is corrupt", func(t *testing.T) {
 		db := persistence.PublicShares{
 			"not-a-record":  "just a string",
-			"missing-share": map[string]interface{}{"password": ""},
-			"bad-json":      map[string]interface{}{"share": "{not json", "password": ""},
+			"missing-share": map[string]any{"password": ""},
+			"bad-json":      map[string]any{"share": "{not json", "password": ""},
 		}
 
 		got := findCorruptPublicShares(db)
@@ -153,13 +153,13 @@ func TestDecodePublicShare(t *testing.T) {
 	})
 
 	t.Run("missing share key fails", func(t *testing.T) {
-		if _, ok := decodePublicShare(map[string]interface{}{"password": ""}); ok {
+		if _, ok := decodePublicShare(map[string]any{"password": ""}); ok {
 			t.Error("expected decode to fail when 'share' key is missing")
 		}
 	})
 
 	t.Run("invalid json fails", func(t *testing.T) {
-		if _, ok := decodePublicShare(map[string]interface{}{"share": "{broken"}); ok {
+		if _, ok := decodePublicShare(map[string]any{"share": "{broken"}); ok {
 			t.Error("expected decode to fail for invalid json")
 		}
 	})

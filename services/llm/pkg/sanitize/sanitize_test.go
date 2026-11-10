@@ -2,10 +2,10 @@ package sanitize
 
 import "testing"
 
-var validMessages = []interface{}{map[string]interface{}{"role": "user", "content": "hi"}}
+var validMessages = []any{map[string]any{"role": "user", "content": "hi"}}
 
 func TestBody_RequiresModel(t *testing.T) {
-	_, err := Body(map[string]interface{}{
+	_, err := Body(map[string]any{
 		"messages": validMessages,
 	}, "", 4096)
 	if err == nil {
@@ -14,7 +14,7 @@ func TestBody_RequiresModel(t *testing.T) {
 }
 
 func TestBody_ModelOverrideWins(t *testing.T) {
-	req, err := Body(map[string]interface{}{
+	req, err := Body(map[string]any{
 		"model":    "client-requested-model",
 		"messages": validMessages,
 	}, "forced-model", 4096)
@@ -27,7 +27,7 @@ func TestBody_ModelOverrideWins(t *testing.T) {
 }
 
 func TestBody_ClientModelUsedWhenNoOverride(t *testing.T) {
-	req, err := Body(map[string]interface{}{
+	req, err := Body(map[string]any{
 		"model":    "client-model",
 		"messages": validMessages,
 	}, "", 4096)
@@ -40,7 +40,7 @@ func TestBody_ClientModelUsedWhenNoOverride(t *testing.T) {
 }
 
 func TestBody_RequiresMessagesArray(t *testing.T) {
-	_, err := Body(map[string]interface{}{
+	_, err := Body(map[string]any{
 		"model":    "m",
 		"messages": "not-an-array",
 	}, "", 4096)
@@ -50,7 +50,7 @@ func TestBody_RequiresMessagesArray(t *testing.T) {
 }
 
 func TestBody_MaxTokensClampedToLimit(t *testing.T) {
-	req, err := Body(map[string]interface{}{
+	req, err := Body(map[string]any{
 		"model":      "m",
 		"messages":   validMessages,
 		"max_tokens": float64(999999),
@@ -64,7 +64,7 @@ func TestBody_MaxTokensClampedToLimit(t *testing.T) {
 }
 
 func TestBody_MaxTokensDefaultsToLimitWhenAbsent(t *testing.T) {
-	req, err := Body(map[string]interface{}{
+	req, err := Body(map[string]any{
 		"model":    "m",
 		"messages": validMessages,
 	}, "", 4096)
@@ -77,7 +77,7 @@ func TestBody_MaxTokensDefaultsToLimitWhenAbsent(t *testing.T) {
 }
 
 func TestBody_MaxTokensDefaultsToLimitWhenNotPositive(t *testing.T) {
-	req, err := Body(map[string]interface{}{
+	req, err := Body(map[string]any{
 		"model":      "m",
 		"messages":   validMessages,
 		"max_tokens": float64(-1),
@@ -91,7 +91,7 @@ func TestBody_MaxTokensDefaultsToLimitWhenNotPositive(t *testing.T) {
 }
 
 func TestBody_FractionalMaxTokensNeverBecomesZero(t *testing.T) {
-	req, err := Body(map[string]interface{}{
+	req, err := Body(map[string]any{
 		"model":      "m",
 		"messages":   validMessages,
 		"max_tokens": 0.5,
@@ -105,7 +105,7 @@ func TestBody_FractionalMaxTokensNeverBecomesZero(t *testing.T) {
 }
 
 func TestBody_TemperaturePassedThrough(t *testing.T) {
-	req, err := Body(map[string]interface{}{
+	req, err := Body(map[string]any{
 		"model":       "m",
 		"messages":    validMessages,
 		"temperature": float64(0.7),
@@ -119,7 +119,7 @@ func TestBody_TemperaturePassedThrough(t *testing.T) {
 }
 
 func TestBody_TemperatureOmittedWhenAbsent(t *testing.T) {
-	req, err := Body(map[string]interface{}{
+	req, err := Body(map[string]any{
 		"model":    "m",
 		"messages": validMessages,
 	}, "", 4096)
@@ -132,7 +132,7 @@ func TestBody_TemperatureOmittedWhenAbsent(t *testing.T) {
 }
 
 func TestBody_DropsUnknownFields(t *testing.T) {
-	req, err := Body(map[string]interface{}{
+	req, err := Body(map[string]any{
 		"model":             "m",
 		"messages":          validMessages,
 		"some_random_field": "should be dropped",
@@ -146,15 +146,15 @@ func TestBody_DropsUnknownFields(t *testing.T) {
 }
 
 func TestBody_RejectsInvalidMessages(t *testing.T) {
-	tests := map[string][]interface{}{
+	tests := map[string][]any{
 		"empty":           {},
 		"non-object":      {"hi"},
-		"missing role":    {map[string]interface{}{"content": "hi"}},
-		"non-string role": {map[string]interface{}{"role": 1}},
+		"missing role":    {map[string]any{"content": "hi"}},
+		"non-string role": {map[string]any{"role": 1}},
 	}
 	for name, messages := range tests {
 		t.Run(name, func(t *testing.T) {
-			_, err := Body(map[string]interface{}{"model": "m", "messages": messages}, "", 4096)
+			_, err := Body(map[string]any{"model": "m", "messages": messages}, "", 4096)
 			if err == nil {
 				t.Fatal("expected an error")
 			}
@@ -164,7 +164,7 @@ func TestBody_RejectsInvalidMessages(t *testing.T) {
 
 func TestBody_RejectsNonPositiveMaxTokensLimit(t *testing.T) {
 	for _, limit := range []int{0, -1} {
-		_, err := Body(map[string]interface{}{"model": "m", "messages": validMessages}, "", limit)
+		_, err := Body(map[string]any{"model": "m", "messages": validMessages}, "", limit)
 		if err == nil {
 			t.Fatalf("expected an error for limit %d", limit)
 		}
@@ -172,14 +172,14 @@ func TestBody_RejectsNonPositiveMaxTokensLimit(t *testing.T) {
 }
 
 func TestBody_RejectsStreaming(t *testing.T) {
-	_, err := Body(map[string]interface{}{"model": "m", "messages": validMessages, "stream": true}, "", 4096)
+	_, err := Body(map[string]any{"model": "m", "messages": validMessages, "stream": true}, "", 4096)
 	if err == nil {
 		t.Fatal("expected an error when stream is true")
 	}
 }
 
 func TestBody_AllowsStreamFalse(t *testing.T) {
-	_, err := Body(map[string]interface{}{"model": "m", "messages": validMessages, "stream": false}, "", 4096)
+	_, err := Body(map[string]any{"model": "m", "messages": validMessages, "stream": false}, "", 4096)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

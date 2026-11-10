@@ -127,7 +127,7 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 	indexMapping.DefaultAnalyzer = keyword.Name
 	indexMapping.DefaultMapping = docMapping
 	err := indexMapping.AddCustomAnalyzer(lowercaseKeywordAnalyzer,
-		map[string]interface{}{
+		map[string]any{
 			"type":      custom.Name,
 			"tokenizer": single.Name,
 			"token_filters": []string{
@@ -140,7 +140,7 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 	}
 
 	err = indexMapping.AddCustomAnalyzer("fulltext",
-		map[string]interface{}{
+		map[string]any{
 			"type":      custom.Name,
 			"tokenizer": unicode.Name,
 			"token_filters": []string{
@@ -506,7 +506,7 @@ func getFieldName(structField reflect.StructField) string {
 	return strings.Split(tag, ",")[0]
 }
 
-func unmarshalInterfaceMap(out any, flatMap map[string]interface{}, prefix string) bool {
+func unmarshalInterfaceMap(out any, flatMap map[string]any, prefix string) bool {
 	nonEmpty := false
 	obj := reflect.ValueOf(out).Elem()
 	for i := 0; i < obj.NumField(); i++ {
@@ -553,7 +553,7 @@ func unmarshalInterfaceMap(out any, flatMap map[string]interface{}, prefix strin
 	return nonEmpty
 }
 
-func getAudioValue[T any](fields map[string]interface{}) *T {
+func getAudioValue[T any](fields map[string]any) *T {
 	if !strings.HasPrefix(getFieldValue[string](fields, "MimeType"), "audio/") {
 		return nil
 	}
@@ -566,7 +566,7 @@ func getAudioValue[T any](fields map[string]interface{}) *T {
 	return nil
 }
 
-func getImageValue[T any](fields map[string]interface{}) *T {
+func getImageValue[T any](fields map[string]any) *T {
 	var image = newPointerOfType[T]()
 	if ok := unmarshalInterfaceMap(image, fields, "image."); ok {
 		return image
@@ -575,7 +575,7 @@ func getImageValue[T any](fields map[string]interface{}) *T {
 	return nil
 }
 
-func getLocationValue[T any](fields map[string]interface{}) *T {
+func getLocationValue[T any](fields map[string]any) *T {
 	var location = newPointerOfType[T]()
 	if ok := unmarshalInterfaceMap(location, fields, "location."); ok {
 		return location
@@ -584,7 +584,7 @@ func getLocationValue[T any](fields map[string]interface{}) *T {
 	return nil
 }
 
-func getPhotoValue[T any](fields map[string]interface{}) *T {
+func getPhotoValue[T any](fields map[string]any) *T {
 	var photo = newPointerOfType[T]()
 
 	if ok := unmarshalInterfaceMap(photo, fields, "photo."); ok {

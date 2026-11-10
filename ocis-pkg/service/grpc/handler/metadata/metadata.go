@@ -20,7 +20,7 @@ const (
 // NewHandlerWrapper propagates the grpc metadata.
 func NewHandlerWrapper() server.HandlerWrapper {
 	return func(h server.HandlerFunc) server.HandlerFunc {
-		return func(ctx context.Context, req server.Request, rsp interface{}) error {
+		return func(ctx context.Context, req server.Request, rsp any) error {
 			md, ok := metadata.FromIncomingContext(ctx)
 			if !ok {
 				md = metadata.MD{}

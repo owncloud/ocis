@@ -5,8 +5,8 @@ import (
 )
 
 // filemetadataCacheOptions returns the reva config map for the filemetadata cache.
-func filemetadataCacheOptions(cfg *config.Config) map[string]interface{} {
-	return map[string]interface{}{
+func filemetadataCacheOptions(cfg *config.Config) map[string]any {
+	return map[string]any{
 		"cache_store":                   cfg.FilemetadataCache.Store,
 		"cache_nodes":                   cfg.FilemetadataCache.Nodes,
 		"cache_database":                cfg.FilemetadataCache.Database,
@@ -23,8 +23,8 @@ func filemetadataCacheOptions(cfg *config.Config) map[string]interface{} {
 }
 
 // idCacheOptions returns the reva config map for the id cache.
-func idCacheOptions(cfg *config.Config) map[string]interface{} {
-	return map[string]interface{}{
+func idCacheOptions(cfg *config.Config) map[string]any {
+	return map[string]any{
 		"cache_store":                   cfg.IDCache.Store,
 		"cache_nodes":                   cfg.IDCache.Nodes,
 		"cache_database":                cfg.IDCache.Database,
@@ -41,8 +41,8 @@ func idCacheOptions(cfg *config.Config) map[string]interface{} {
 }
 
 // EOS is the config mapping for the EOS storage driver
-func EOS(cfg *config.Config) map[string]interface{} {
-	return map[string]interface{}{
+func EOS(cfg *config.Config) map[string]any {
+	return map[string]any{
 		"namespace":              cfg.Drivers.EOS.Root,
 		"shadow_namespace":       cfg.Drivers.EOS.ShadowNamespace,
 		"uploads_namespace":      cfg.Drivers.EOS.UploadsNamespace,
@@ -64,8 +64,8 @@ func EOS(cfg *config.Config) map[string]interface{} {
 }
 
 // EOSHome is the config mapping for the EOSHome storage driver
-func EOSHome(cfg *config.Config) map[string]interface{} {
-	return map[string]interface{}{
+func EOSHome(cfg *config.Config) map[string]any {
+	return map[string]any{
 		"namespace":              cfg.Drivers.EOS.Root,
 		"shadow_namespace":       cfg.Drivers.EOS.ShadowNamespace,
 		"uploads_namespace":      cfg.Drivers.EOS.UploadsNamespace,
@@ -88,8 +88,8 @@ func EOSHome(cfg *config.Config) map[string]interface{} {
 }
 
 // EOSGRPC is the config mapping for the EOSGRPC storage driver
-func EOSGRPC(cfg *config.Config) map[string]interface{} {
-	return map[string]interface{}{
+func EOSGRPC(cfg *config.Config) map[string]any {
+	return map[string]any{
 		"namespace":              cfg.Drivers.EOS.Root,
 		"shadow_namespace":       cfg.Drivers.EOS.ShadowNamespace,
 		"share_folder":           cfg.Drivers.EOS.ShareFolder,
@@ -113,16 +113,16 @@ func EOSGRPC(cfg *config.Config) map[string]interface{} {
 }
 
 // Local is the config mapping for the Local storage driver
-func Local(cfg *config.Config) map[string]interface{} {
-	return map[string]interface{}{
+func Local(cfg *config.Config) map[string]any {
+	return map[string]any{
 		"root":         cfg.Drivers.Local.Root,
 		"share_folder": cfg.Drivers.Local.ShareFolder,
 	}
 }
 
 // LocalHome is the config mapping for the LocalHome storage driver
-func LocalHome(cfg *config.Config) map[string]interface{} {
-	return map[string]interface{}{
+func LocalHome(cfg *config.Config) map[string]any {
+	return map[string]any{
 		"root":         cfg.Drivers.Local.Root,
 		"share_folder": cfg.Drivers.Local.ShareFolder,
 		"user_layout":  cfg.Drivers.Local.UserLayout,
@@ -130,12 +130,12 @@ func LocalHome(cfg *config.Config) map[string]interface{} {
 }
 
 // Ocis is the config mapping for the Ocis storage driver
-func Ocis(cfg *config.Config) map[string]interface{} {
-	return map[string]interface{}{
+func Ocis(cfg *config.Config) map[string]any {
+	return map[string]any{
 		"mount_id":         cfg.MountID,
 		"metadata_backend": "messagepack",
 		"propagator":       cfg.Drivers.OCIS.Propagator,
-		"async_propagator_options": map[string]interface{}{
+		"async_propagator_options": map[string]any{
 			"propagation_delay": cfg.Drivers.OCIS.AsyncPropagatorOptions.PropagationDelay,
 		},
 		"root":                        cfg.Drivers.OCIS.Root,
@@ -157,11 +157,11 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 		"disable_versioning":          cfg.Drivers.OCIS.DisableVersioning,
 		"filemetadatacache":           filemetadataCacheOptions(cfg),
 		"idcache":                     idCacheOptions(cfg),
-		"events": map[string]interface{}{
+		"events": map[string]any{
 			"numconsumers":   cfg.Events.NumConsumers,
 			"consumer_group": cfg.Events.ConsumerGroup,
 		},
-		"tokens": map[string]interface{}{
+		"tokens": map[string]any{
 			"transfer_shared_secret": cfg.Commons.TransferSecret,
 			"transfer_expires":       cfg.TransferExpires,
 			"download_endpoint":      cfg.DataServerURL,
@@ -171,12 +171,12 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 }
 
 // OcisNoEvents is the config mapping for the ocis storage driver emitting no events
-func OcisNoEvents(cfg *config.Config) map[string]interface{} {
-	return map[string]interface{}{
+func OcisNoEvents(cfg *config.Config) map[string]any {
+	return map[string]any{
 		"mount_id":         cfg.MountID,
 		"metadata_backend": "messagepack",
 		"propagator":       cfg.Drivers.OCIS.Propagator,
-		"async_propagator_options": map[string]interface{}{
+		"async_propagator_options": map[string]any{
 			"propagation_delay": cfg.Drivers.OCIS.AsyncPropagatorOptions.PropagationDelay,
 		},
 		"root":                        cfg.Drivers.OCIS.Root,
@@ -201,8 +201,8 @@ func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 }
 
 // S3 is the config mapping for the s3 storage driver
-func S3(cfg *config.Config) map[string]interface{} {
-	return map[string]interface{}{
+func S3(cfg *config.Config) map[string]any {
+	return map[string]any{
 		"enable_home": false,
 		"region":      cfg.Drivers.S3.Region,
 		"access_key":  cfg.Drivers.S3.AccessKey,
@@ -214,12 +214,12 @@ func S3(cfg *config.Config) map[string]interface{} {
 }
 
 // S3NG is the config mapping for the s3ng storage driver
-func S3NG(cfg *config.Config) map[string]interface{} {
-	return map[string]interface{}{
+func S3NG(cfg *config.Config) map[string]any {
+	return map[string]any{
 		"mount_id":         cfg.MountID,
 		"metadata_backend": "messagepack",
 		"propagator":       cfg.Drivers.S3NG.Propagator,
-		"async_propagator_options": map[string]interface{}{
+		"async_propagator_options": map[string]any{
 			"propagation_delay": cfg.Drivers.S3NG.AsyncPropagatorOptions.PropagationDelay,
 		},
 		"root":                        cfg.Drivers.S3NG.Root,
@@ -251,11 +251,11 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 		"asyncfileuploads":            cfg.Drivers.OCIS.AsyncUploads,
 		"filemetadatacache":           filemetadataCacheOptions(cfg),
 		"idcache":                     idCacheOptions(cfg),
-		"events": map[string]interface{}{
+		"events": map[string]any{
 			"numconsumers":   cfg.Events.NumConsumers,
 			"consumer_group": cfg.Events.ConsumerGroup,
 		},
-		"tokens": map[string]interface{}{
+		"tokens": map[string]any{
 			"transfer_shared_secret": cfg.Commons.TransferSecret,
 			"transfer_expires":       cfg.TransferExpires,
 			"download_endpoint":      cfg.DataServerURL,
@@ -265,12 +265,12 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 }
 
 // S3NGNoEvents is the config mapping for the s3ng storage driver emitting no events
-func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
-	return map[string]interface{}{
+func S3NGNoEvents(cfg *config.Config) map[string]any {
+	return map[string]any{
 		"mount_id":         cfg.MountID,
 		"metadata_backend": "messagepack",
 		"propagator":       cfg.Drivers.S3NG.Propagator,
-		"async_propagator_options": map[string]interface{}{
+		"async_propagator_options": map[string]any{
 			"propagation_delay": cfg.Drivers.S3NG.AsyncPropagatorOptions.PropagationDelay,
 		},
 		"root":                        cfg.Drivers.S3NG.Root,

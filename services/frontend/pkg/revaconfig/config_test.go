@@ -23,7 +23,7 @@ func TestStatCacheTLSPlumbing(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	statCache := revaCfg["http"].(map[string]interface{})["services"].(map[string]interface{})["ocs"].(map[string]interface{})["stat_cache_config"].(map[string]interface{})
+	statCache := revaCfg["http"].(map[string]any)["services"].(map[string]any)["ocs"].(map[string]any)["stat_cache_config"].(map[string]any)
 	t.Logf("cache_enable_tls=%v cache_tls_insecure=%v cache_tls_root_ca_certificate=%v",
 		statCache["cache_enable_tls"], statCache["cache_tls_insecure"], statCache["cache_tls_root_ca_certificate"])
 

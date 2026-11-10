@@ -132,7 +132,7 @@ var _ = Describe("Authenticating requests", Label("AppAuthAuthenticator"), func(
 				Id:       &userv1beta1.UserId{Idp: "testIDP", OpaqueId: "abcd-1234"},
 				Username: "alice",
 			}
-			tokenManager, err := jwt.New(map[string]interface{}{"secret": "change-me", "expires": int64(60)})
+			tokenManager, err := jwt.New(map[string]any{"secret": "change-me", "expires": int64(60)})
 			Expect(err).ToNot(HaveOccurred())
 			s, err := scope.AddOwnerScope(nil)
 			Expect(err).ToNot(HaveOccurred())

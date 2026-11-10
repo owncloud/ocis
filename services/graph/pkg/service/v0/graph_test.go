@@ -1461,7 +1461,7 @@ var _ = Describe("Graph", func() {
 		Describe("GetAllDrivesV1 (unrestricted listing)", func() {
 			listedDriveIDs := func() []string {
 				var lr struct {
-					Value []map[string]interface{} `json:"value"`
+					Value []map[string]any `json:"value"`
 				}
 				body, _ := io.ReadAll(rr.Body)
 				Expect(json.Unmarshal(body, &lr)).To(Succeed())
