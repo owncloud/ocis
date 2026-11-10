@@ -44,7 +44,7 @@ export class ResourceTransfer extends ConflictDialog {
   }
 
   showResultMessage(
-    errors: { resourceName: string; error: Error }[],
+    errors: { resourceName: string; isFolder?: boolean; error: Error }[],
     movedResources: Array<Resource>,
     transferType: TransferType
   ) {
@@ -85,7 +85,7 @@ export class ResourceTransfer extends ConflictDialog {
   }
 
   private getFailureTitle(
-    errors: { resourceName: string; error: Error }[],
+    errors: { resourceName: string; isFolder?: boolean; error: Error }[],
     transferType: TransferType
   ): string {
     const errorCount = errors.length
@@ -99,8 +99,9 @@ export class ResourceTransfer extends ConflictDialog {
           params
         )
       case TransferType.DUPLICATE:
-        // a copy that is cut off (e.g. by a timeout) leaves the part copied so far behind
-        if (errors.every(({ error }) => this.endedWithoutAnswer(error))) {
+        // a folder copy that is cut off (e.g. by a timeout) leaves the part copied so far
+        // behind, a file copy leaves nothing
+        if (errors.every(({ isFolder, error }) => isFolder && this.endedWithoutAnswer(error))) {
           return this.$ngettext(
             'Duplication of "%{name}" incomplete',
             'Duplication of %{count} resources incomplete',
