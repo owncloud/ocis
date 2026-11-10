@@ -39,7 +39,6 @@ After Keycloak has been configured, the invitation service needs to be configure
 * `INVITATIONS_KEYCLOAK_CLIENT_REALM`: The realm where the client was added. In the example above, `ocis` is used.
 * `INVITATIONS_KEYCLOAK_USER_REALM`: The realm where to add the users. In the example above, `ocis` is used.
 * `INVITATIONS_KEYCLOAK_INSECURE_SKIP_VERIFY`: If set to true, the verification of the Keycloak HTTPS certificate is skipped. This is not recommended in production environments.
-
 * `INVITATIONS_KEYCLOAK_EXECUTE_ACTIONS`: A comma-separated list of Keycloak required actions that are set on the invited guest and sent in the execute-actions email. Defaults to `UPDATE_PASSWORD,VERIFY_EMAIL`. The values are passed to Keycloak as-is, so each one must be a required action that is registered and enabled in the user realm. Otherwise Keycloak rejects the request and the invitation fails. For example, `CONFIGURE_RECOVERY_AUTHN_CODES` may require the `recovery-codes` feature to be enabled in Keycloak on some versions.
 
 If sending the execute-actions email fails after the guest has been created in Keycloak, the guest is deleted again and the original error is returned. A failed invitation therefore does not leave an orphaned guest behind, and the invitation can be retried after fixing the cause.
@@ -49,7 +48,8 @@ If sending the execute-actions email fails after the guest has been created in K
 The client configured via `INVITATIONS_KEYCLOAK_CLIENT_ID` authenticates with its service account, which needs the following `realm-management` client roles in the user realm:
 
 * `manage-users`: create users, send the execute-actions email and delete users (used for the rollback of failed invitations).
-* `view-users` and `query-users`: look up users, e.g. by username.
+
+The invitations service does not look up or list users, so `view-users` and `query-users` are not needed for it. They are only required if the same client is also used for other purposes, such as the Graph service's personal data export.
 
 ## Bridging Provisioning Delay
 
