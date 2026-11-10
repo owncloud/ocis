@@ -6,8 +6,10 @@ package keycloak_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 
+	"github.com/Nerzal/gocloak/v13"
 	kcpkg "github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/backends/keycloak"
@@ -222,4 +224,28 @@ func TestBackend_DeleteUser(t *testing.T) {
 		b := keycloak.NewWithClient(log.NopLogger(), c, userRealm, nil)
 		assert.EqualError(t, b.DeleteUser(context.Background(), "test-id"), "boom")
 	})
+}
+
+func TestBackend_SendMailClassifiesErrors(t *testing.T) {
+	tests := []struct {
+		name     string
+		err      error
+		rejected bool
+	}{
+		{"keycloak http error is a definite rejection", &gocloak.APIError{Code: 500, Message: "500 Internal Server Error"}, true},
+		{"wrapped keycloak http error", fmt.Errorf("wrapped: %w", &gocloak.APIError{Code: 400, Message: "400"}), true},
+		{"transport error (code 0) is unknown", &gocloak.APIError{Code: 0, Message: "connection reset"}, false},
+		{"context canceled is unknown", context.Canceled, false},
+		{"plain error is unknown", errors.New("boom"), false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &mocks.Client{}
+			c.On("SendActionsMail", mock.Anything, userRealm, "test-id", mock.Anything).Return(tt.err)
+			b := keycloak.NewWithClient(log.NopLogger(), c, userRealm, nil)
+			err := b.SendMail(context.Background(), "test-id")
+			assert.ErrorIs(t, err, tt.err)
+			assert.Equal(t, tt.rejected, errors.Is(err, invitations.ErrRejected))
+		})
+	}
 }
