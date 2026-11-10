@@ -17,32 +17,6 @@ func checkIdentical[T any](t *testing.T, p T, want string) {
 	}
 }
 
-func TestToPointer2(t *testing.T) {
-	checkIdentical(t, conversions.ToPointer("a"), "*string")
-	checkIdentical(t, conversions.ToPointer(1), "*int")
-	checkIdentical(t, conversions.ToPointer(-1), "*int")
-	checkIdentical(t, conversions.ToPointer(float64(1)), "*float64")
-	checkIdentical(t, conversions.ToPointer(float64(-1)), "*float64")
-	checkIdentical(t, conversions.ToPointer(libregraph.UnifiedRoleDefinition{}), "*libregraph.UnifiedRoleDefinition")
-
-	checkIdentical(t, conversions.ToPointer([]string{"a"}), "*[]string")
-	checkIdentical(t, conversions.ToPointer([]int{1}), "*[]int")
-	checkIdentical(t, conversions.ToPointer([]float64{1}), "*[]float64")
-	checkIdentical(t, conversions.ToPointer([]libregraph.UnifiedRoleDefinition{{}}), "*[]libregraph.UnifiedRoleDefinition")
-
-	checkIdentical(t, conversions.ToPointer(conversions.ToPointer("a")), "**string")
-	checkIdentical(t, conversions.ToPointer(conversions.ToPointer(1)), "**int")
-	checkIdentical(t, conversions.ToPointer(conversions.ToPointer(-1)), "**int")
-	checkIdentical(t, conversions.ToPointer(conversions.ToPointer(float64(1))), "**float64")
-	checkIdentical(t, conversions.ToPointer(conversions.ToPointer(float64(-1))), "**float64")
-	checkIdentical(t, conversions.ToPointer(conversions.ToPointer(libregraph.UnifiedRoleDefinition{})), "**libregraph.UnifiedRoleDefinition")
-
-	checkIdentical(t, conversions.ToPointer(conversions.ToPointer([]string{"a"})), "**[]string")
-	checkIdentical(t, conversions.ToPointer(conversions.ToPointer([]int{1})), "**[]int")
-	checkIdentical(t, conversions.ToPointer(conversions.ToPointer([]float64{1})), "**[]float64")
-	checkIdentical(t, conversions.ToPointer(conversions.ToPointer([]libregraph.UnifiedRoleDefinition{{}})), "**[]libregraph.UnifiedRoleDefinition")
-}
-
 func TestToValue(t *testing.T) {
 	checkIdentical(t, conversions.ToValue((*int)(nil)), "int")
 	checkIdentical(t, conversions.ToValue((*string)(nil)), "string")
@@ -51,29 +25,29 @@ func TestToValue(t *testing.T) {
 	checkIdentical(t, conversions.ToValue((*[]string)(nil)), "[]string")
 	checkIdentical(t, conversions.ToValue((*[]libregraph.UnifiedRoleDefinition)(nil)), "[]libregraph.UnifiedRoleDefinition")
 
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer("a")), "string")
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer(1)), "int")
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer(-1)), "int")
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer(float64(1))), "float64")
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer(float64(-1))), "float64")
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer(libregraph.UnifiedRoleDefinition{})), "libregraph.UnifiedRoleDefinition")
+	checkIdentical(t, conversions.ToValue(new("a")), "string")
+	checkIdentical(t, conversions.ToValue(new(1)), "int")
+	checkIdentical(t, conversions.ToValue(new(-1)), "int")
+	checkIdentical(t, conversions.ToValue(new(float64(1))), "float64")
+	checkIdentical(t, conversions.ToValue(new(float64(-1))), "float64")
+	checkIdentical(t, conversions.ToValue(new(libregraph.UnifiedRoleDefinition{})), "libregraph.UnifiedRoleDefinition")
 
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer([]string{"a"})), "[]string")
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer([]int{1})), "[]int")
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer([]float64{1})), "[]float64")
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer([]libregraph.UnifiedRoleDefinition{{}})), "[]libregraph.UnifiedRoleDefinition")
+	checkIdentical(t, conversions.ToValue(new([]string{"a"})), "[]string")
+	checkIdentical(t, conversions.ToValue(new([]int{1})), "[]int")
+	checkIdentical(t, conversions.ToValue(new([]float64{1})), "[]float64")
+	checkIdentical(t, conversions.ToValue(new([]libregraph.UnifiedRoleDefinition{{}})), "[]libregraph.UnifiedRoleDefinition")
 
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer(conversions.ToPointer("a"))), "*string")
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer(conversions.ToPointer(1))), "*int")
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer(conversions.ToPointer(-1))), "*int")
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer(conversions.ToPointer(float64(1)))), "*float64")
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer(conversions.ToPointer(float64(-1)))), "*float64")
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer(conversions.ToPointer(libregraph.UnifiedRoleDefinition{}))), "*libregraph.UnifiedRoleDefinition")
+	checkIdentical(t, conversions.ToValue(new(new("a"))), "*string")
+	checkIdentical(t, conversions.ToValue(new(new(1))), "*int")
+	checkIdentical(t, conversions.ToValue(new(new(-1))), "*int")
+	checkIdentical(t, conversions.ToValue(new(new(float64(1)))), "*float64")
+	checkIdentical(t, conversions.ToValue(new(new(float64(-1)))), "*float64")
+	checkIdentical(t, conversions.ToValue(new(new(libregraph.UnifiedRoleDefinition{}))), "*libregraph.UnifiedRoleDefinition")
 
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer(conversions.ToPointer([]string{"a"}))), "*[]string")
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer(conversions.ToPointer([]int{1}))), "*[]int")
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer(conversions.ToPointer([]float64{1}))), "*[]float64")
-	checkIdentical(t, conversions.ToValue(conversions.ToPointer(conversions.ToPointer([]libregraph.UnifiedRoleDefinition{{}}))), "*[]libregraph.UnifiedRoleDefinition")
+	checkIdentical(t, conversions.ToValue(new(new([]string{"a"}))), "*[]string")
+	checkIdentical(t, conversions.ToValue(new(new([]int{1}))), "*[]int")
+	checkIdentical(t, conversions.ToValue(new(new([]float64{1}))), "*[]float64")
+	checkIdentical(t, conversions.ToValue(new(new([]libregraph.UnifiedRoleDefinition{{}}))), "*[]libregraph.UnifiedRoleDefinition")
 }
 
 func TestToPointerSlice(t *testing.T) {
@@ -85,8 +59,8 @@ func TestToPointerSlice(t *testing.T) {
 	checkIdentical(t, conversions.ToPointerSlice(([]int)(nil)), "[]*int")
 	checkIdentical(t, conversions.ToPointerSlice(([]libregraph.UnifiedRoleDefinition)(nil)), "[]*libregraph.UnifiedRoleDefinition")
 
-	checkIdentical(t, conversions.ToPointerSlice([]*string{conversions.ToPointer("a")}), "[]**string")
-	checkIdentical(t, conversions.ToPointerSlice([]*int{conversions.ToPointer(1)}), "[]**int")
+	checkIdentical(t, conversions.ToPointerSlice([]*string{new("a")}), "[]**string")
+	checkIdentical(t, conversions.ToPointerSlice([]*int{new(1)}), "[]**int")
 	checkIdentical(t, conversions.ToPointerSlice(([]*libregraph.UnifiedRoleDefinition)(nil)), "[]**libregraph.UnifiedRoleDefinition")
 
 	checkIdentical(t, conversions.ToPointerSlice(([]*string)(nil)), "[]**string")
@@ -103,9 +77,9 @@ func TestToValueSlice(t *testing.T) {
 	checkIdentical(t, conversions.ToValueSlice(conversions.ToPointerSlice(([]int)(nil))), "[]int")
 	checkIdentical(t, conversions.ToValueSlice(conversions.ToPointerSlice(([]libregraph.UnifiedRoleDefinition)(nil))), "[]libregraph.UnifiedRoleDefinition")
 
-	checkIdentical(t, conversions.ToValueSlice(conversions.ToPointerSlice([]*string{conversions.ToPointer("a")})), "[]*string")
-	checkIdentical(t, conversions.ToValueSlice(conversions.ToPointerSlice([]*int{conversions.ToPointer(1)})), "[]*int")
-	checkIdentical(t, conversions.ToValueSlice(conversions.ToPointerSlice([]*libregraph.UnifiedRoleDefinition{conversions.ToPointer(libregraph.UnifiedRoleDefinition{})})), "[]*libregraph.UnifiedRoleDefinition")
+	checkIdentical(t, conversions.ToValueSlice(conversions.ToPointerSlice([]*string{new("a")})), "[]*string")
+	checkIdentical(t, conversions.ToValueSlice(conversions.ToPointerSlice([]*int{new(1)})), "[]*int")
+	checkIdentical(t, conversions.ToValueSlice(conversions.ToPointerSlice([]*libregraph.UnifiedRoleDefinition{new(libregraph.UnifiedRoleDefinition{})})), "[]*libregraph.UnifiedRoleDefinition")
 
 	checkIdentical(t, conversions.ToValueSlice(conversions.ToPointerSlice(([]*string)(nil))), "[]*string")
 	checkIdentical(t, conversions.ToValueSlice(conversions.ToPointerSlice(([]*int)(nil))), "[]*int")

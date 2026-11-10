@@ -95,13 +95,3 @@ func TestBuildInfo(t *testing.T) {
 		})
 	}
 }
-
-//go:fix inline
-func boolPtr(b bool) *bool {
-	return new(b)
-}
-
-//go:fix inline
-func strPtr(s string) *string {
-	return new(s)
-}

@@ -1,12 +1,5 @@
 package conversions
 
-// ToPointer converts a value to a pointer
-//
-//go:fix inline
-func ToPointer[T any](val T) *T {
-	return new(val)
-}
-
 // ToValue converts a pointer to a value
 func ToValue[T any](ptr *T) T {
 	if ptr == nil {

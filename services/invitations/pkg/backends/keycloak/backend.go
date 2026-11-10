@@ -131,9 +131,3 @@ func parseUserActions(executeActions []string) []keycloak.UserAction {
 	}
 	return actions
 }
-
-//go:fix inline
-func boolP(b bool) *bool { return new(b) }
-
-//go:fix inline
-func stringP(s string) *string { return new(s) }
