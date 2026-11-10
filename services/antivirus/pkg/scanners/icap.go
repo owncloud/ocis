@@ -2,6 +2,7 @@ package scanners
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -41,21 +42,18 @@ func NewICAP(icapURL string, icapService string, timeout time.Duration) (ICAP, e
 		return &client, nil
 	}
 
-	// fail early on an invalid client configuration
-	if _, err := newClient(); err != nil {
-		return ICAP{}, err
-	}
-
 	return ICAP{NewClient: newClient, URL: endpoint.String()}, nil
 }
 
+// ClientFactory returns the client used for a single scan.
+// Scan is called concurrently, so implementations must not hand out a client
+// which is still in use by another scan.
+type ClientFactory func() (Scanner, error)
+
 // ICAP is responsible for scanning files using an ICAP server
 type ICAP struct {
-	// NewClient returns a fresh client for every scan. It takes precedence over Client.
-	NewClient func() (Scanner, error)
-	// Client is used when NewClient is not set. It must be safe for concurrent use.
-	Client Scanner
-	URL    string
+	NewClient ClientFactory
+	URL       string
 }
 
 // Scan scans a file using the ICAP server
@@ -63,13 +61,13 @@ func (s ICAP) Scan(in Input) (Result, error) {
 	ctx := context.TODO()
 	result := Result{}
 
-	client := s.Client
-	if s.NewClient != nil {
-		var err error
-		client, err = s.NewClient()
-		if err != nil {
-			return result, err
-		}
+	if s.NewClient == nil {
+		return result, errors.New("icap: no client factory configured")
+	}
+
+	client, err := s.NewClient()
+	if err != nil {
+		return result, err
 	}
 
 	optReq, err := ic.NewRequest(ctx, ic.MethodOPTIONS, s.URL, nil, nil)
