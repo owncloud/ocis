@@ -99,6 +99,15 @@ export class ResourceTransfer extends ConflictDialog {
           params
         )
       case TransferType.DUPLICATE:
+        // a copy that is cut off (e.g. by a timeout) leaves the part copied so far behind
+        if (errors.every(({ error }) => this.endedWithoutAnswer(error))) {
+          return this.$ngettext(
+            'Duplication of "%{name}" incomplete',
+            'Duplication of %{count} resources incomplete',
+            errorCount,
+            params
+          )
+        }
         return this.$ngettext(
           'Failed to duplicate "%{name}"',
           'Failed to duplicate %{count} resources',
@@ -114,6 +123,12 @@ export class ResourceTransfer extends ConflictDialog {
         )
     }
   }
+
+  /** The request ended without any answer from the server, so there is no status code. */
+  private endedWithoutAnswer(error: Error): boolean {
+    return error instanceof HttpError && !error.statusCode
+  }
+
   private getInsufficientQuotaDescription(transferType: TransferType): string {
     const spaceName =
       this.targetSpace.driveType === 'personal' ? this.$gettext('Personal') : this.targetSpace.name

@@ -209,6 +209,76 @@ describe('resourcesTransfer', () => {
       expect(showErrorMessage).toHaveBeenCalledWith(expect.objectContaining({ title }))
     })
 
+    // what the paste worker reports for a request that got no answer, e.g. cut off by a timeout
+    const noAnswerError = () =>
+      createHttpError({ message: 'Failed to fetch', statusCode: undefined, xReqId: undefined })
+
+    it.each([
+      { resourceNames: ['a'], title: 'Duplication of "a" incomplete' },
+      { resourceNames: ['a', 'b'], title: 'Duplication of 2 resources incomplete' }
+    ])('says the duplication is incomplete when it got no answer', ({ resourceNames, title }) => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(projectSpace()).showResultMessage(
+        resourceNames.map((resourceName) => ({ resourceName, error: noAnswerError() })),
+        [],
+        TransferType.DUPLICATE
+      )
+
+      expect(showErrorMessage).toHaveBeenCalledWith(expect.objectContaining({ title }))
+    })
+
+    it('says the duplication failed when the server answered with an error', () => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(projectSpace()).showResultMessage(
+        [
+          {
+            resourceName: 'a',
+            error: createHttpError({ message: 'nope', statusCode: 403, xReqId: '1' })
+          }
+        ],
+        [],
+        TransferType.DUPLICATE
+      )
+
+      expect(showErrorMessage).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Failed to duplicate "a"' })
+      )
+    })
+
+    it('says the duplication failed when only some of the resources got no answer', () => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(projectSpace()).showResultMessage(
+        [
+          { resourceName: 'a', error: noAnswerError() },
+          { resourceName: 'b', error: quotaError() }
+        ],
+        [],
+        TransferType.DUPLICATE
+      )
+
+      expect(showErrorMessage).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Failed to duplicate 2 resources' })
+      )
+    })
+
+    it.each([
+      { transferType: TransferType.COPY, title: 'Failed to copy "a"' },
+      { transferType: TransferType.MOVE, title: 'Failed to move "a"' }
+    ])('keeps saying copy and move failed when they got no answer', ({ transferType, title }) => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(projectSpace()).showResultMessage(
+        [{ resourceName: 'a', error: noAnswerError() }],
+        [],
+        transferType
+      )
+
+      expect(showErrorMessage).toHaveBeenCalledWith(expect.objectContaining({ title }))
+    })
+
     it.each([
       {
         transferType: TransferType.DUPLICATE,
