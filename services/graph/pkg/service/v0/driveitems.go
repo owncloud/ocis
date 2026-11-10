@@ -412,12 +412,12 @@ func (g Graph) getRemoteItem(ctx context.Context, root *storageprovider.Resource
 		// TODO read from StorageSpace ... needs Opaque for now
 		// TODO how do we build the url?
 		// for now: read from request
-		item.Name = libregraph.PtrString(res.GetInfo().GetName())
+		item.Name = new(res.GetInfo().GetName())
 		if res.GetInfo().GetSpace().GetRoot() != nil {
 			webDavURL := *baseURL
 			relativePath := res.GetInfo().GetPath()
 			webDavURL.Path = path.Join(webDavURL.Path, storagespace.FormatResourceID(res.GetInfo().GetSpace().GetRoot()), relativePath)
-			item.WebDavUrl = libregraph.PtrString(webDavURL.String())
+			item.WebDavUrl = new(webDavURL.String())
 		}
 	}
 	return item, nil
@@ -445,7 +445,7 @@ func cs3ResourceToDriveItem(logger *log.Logger, res *storageprovider.ResourceInf
 	*size = int64(res.GetSize()) // TODO lurking overflow: make size of libregraph drive item use uint64
 
 	driveItem := &libregraph.DriveItem{
-		Id:   libregraph.PtrString(storagespace.FormatResourceID(res.GetId())),
+		Id:   new(storagespace.FormatResourceID(res.GetId())),
 		Size: size,
 	}
 
@@ -612,12 +612,12 @@ func cs3ResourceToRemoteItem(res *storageprovider.ResourceInfo) (*libregraph.Rem
 	*size = int64(res.GetSize()) // TODO lurking overflow: make size of libregraph drive item use uint64
 
 	remoteItem := &libregraph.RemoteItem{
-		Id:   libregraph.PtrString(storagespace.FormatResourceID(res.GetId())),
+		Id:   new(storagespace.FormatResourceID(res.GetId())),
 		Size: size,
 	}
 
 	if res.GetPath() != "" {
-		remoteItem.Path = libregraph.PtrString(path.Clean(res.GetPath()))
+		remoteItem.Path = new(path.Clean(res.GetPath()))
 	}
 	if res.GetEtag() != "" {
 		remoteItem.ETag = &res.Etag
@@ -636,10 +636,10 @@ func cs3ResourceToRemoteItem(res *storageprovider.ResourceInfo) (*libregraph.Rem
 		remoteItem.Folder = &libregraph.Folder{}
 	}
 	if res.GetSpace() != nil && res.GetSpace().GetRoot() != nil {
-		remoteItem.RootId = libregraph.PtrString(storagespace.FormatResourceID(res.GetSpace().GetRoot()))
+		remoteItem.RootId = new(storagespace.FormatResourceID(res.GetSpace().GetRoot()))
 		grantSpaceAlias := utils.ReadPlainFromOpaque(res.GetSpace().GetOpaque(), "spaceAlias")
 		if grantSpaceAlias != "" {
-			remoteItem.DriveAlias = libregraph.PtrString(grantSpaceAlias)
+			remoteItem.DriveAlias = new(grantSpaceAlias)
 		}
 	}
 	return remoteItem, nil
@@ -763,10 +763,10 @@ func (g Graph) getSpecialDriveItem(ctx context.Context, ref *storageprovider.Ref
 			return nil
 		}
 	}
-	spaceItem.SpecialFolder = &libregraph.SpecialFolder{Name: libregraph.PtrString(itemName)}
+	spaceItem.SpecialFolder = &libregraph.SpecialFolder{Name: new(itemName)}
 	webdavURL := *baseURL
 	webdavURL.Path = path.Join(webdavURL.Path, space.GetId().GetOpaqueId(), itemPath)
-	spaceItem.WebDavUrl = libregraph.PtrString(webdavURL.String())
+	spaceItem.WebDavUrl = new(webdavURL.String())
 
 	return spaceItem
 }

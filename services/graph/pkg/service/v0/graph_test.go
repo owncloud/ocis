@@ -1222,7 +1222,7 @@ var _ = Describe("Graph", func() {
 					drive := libregraph.NewDrive("thename")
 					drive.SetSpecial([]libregraph.DriveItem{{
 						Id:            &imageFileID,
-						SpecialFolder: &libregraph.SpecialFolder{Name: libregraph.PtrString("image")},
+						SpecialFolder: &libregraph.SpecialFolder{Name: new("image")},
 					}})
 					driveJson, err := json.Marshal(drive)
 					Expect(err).ToNot(HaveOccurred())
@@ -1332,7 +1332,7 @@ var _ = Describe("Graph", func() {
 				drive := libregraph.NewDrive("thename")
 				drive.SetSpecial([]libregraph.DriveItem{{
 					Id:            &readmeFileID,
-					SpecialFolder: &libregraph.SpecialFolder{Name: libregraph.PtrString("readme")},
+					SpecialFolder: &libregraph.SpecialFolder{Name: new("readme")},
 				}})
 				driveJson, err := json.Marshal(drive)
 				Expect(err).ToNot(HaveOccurred())

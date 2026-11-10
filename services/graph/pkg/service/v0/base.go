@@ -235,12 +235,12 @@ func (g BaseGraphService) libreGraphPermissionFromCS3PublicShare(createdLink *li
 	}
 	lt, actions := linktype.SharingLinkTypeFromCS3Permissions(createdLink.GetPermissions())
 	perm := libregraph.NewPermission()
-	perm.Id = libregraph.PtrString(createdLink.GetId().GetOpaqueId())
+	perm.Id = new(createdLink.GetId().GetOpaqueId())
 	perm.Link = &libregraph.SharingLink{
 		Type:                  lt,
-		PreventsDownload:      libregraph.PtrBool(false),
-		LibreGraphDisplayName: libregraph.PtrString(createdLink.GetDisplayName()),
-		LibreGraphQuickLink:   libregraph.PtrBool(createdLink.GetQuicklink()),
+		PreventsDownload:      new(false),
+		LibreGraphDisplayName: new(createdLink.GetDisplayName()),
+		LibreGraphQuickLink:   new(createdLink.GetQuicklink()),
 	}
 	perm.LibreGraphPermissionsActions = actions
 	webURL.Path = path.Join(webURL.Path, "s", createdLink.GetToken())

@@ -1,9 +1,5 @@
 package fileinfo
 
-import (
-	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
-)
-
 // OnlyOffice fileInfo properties
 //
 // OnlyOffice WOPI check file info specification:
@@ -145,7 +141,7 @@ func (oinfo *OnlyOffice) SetProperties(props map[string]any) {
 			oinfo.Version = value.(string)
 		case KeySize:
 			if value != nil {
-				oinfo.Size = conversions.ToPointer(value.(int64))
+				oinfo.Size = new(value.(int64))
 			}
 
 		case KeyBreadcrumbBrandName:
