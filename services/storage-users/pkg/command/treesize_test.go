@@ -312,7 +312,7 @@ func TestRecalculateSpacesHardening(t *testing.T) {
 	const good = "aaaaaaaa-0000-0000-0000-000000000001"
 
 	t.Run("rejects ids that escape the spaces directory", func(t *testing.T) {
-		for _, id := range []string{"........x", "..../..x", "......x", "..", "...."} {
+		for _, id := range []string{"........x", "..../..x", "......x", "..", "....", "../.."} {
 			cfg := &config.Config{}
 			cfg.Drivers.OCIS.Root = t.TempDir()
 			var out, errOut bytes.Buffer
@@ -369,4 +369,30 @@ func TestListSpaceIDs(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, []string{"aaaaaaaa-0000-0000-0000-000000000001"}, ids)
 	})
+}
+
+func TestRecalculateNodeInvalidBlobsize(t *testing.T) {
+	for name, attribs := range map[string]map[string][]byte{
+		"missing": {prefixes.TypeAttr: []byte(strconv.FormatUint(uint64(provider.ResourceType_RESOURCE_TYPE_FILE), 10))},
+		"garbage": {
+			prefixes.TypeAttr:     []byte(strconv.FormatUint(uint64(provider.ResourceType_RESOURCE_TYPE_FILE), 10)),
+			prefixes.BlobsizeAttr: []byte("abc"),
+		},
+	} {
+		t.Run(name+" blobsize fails the subtree and nothing is written", func(t *testing.T) {
+			root := t.TempDir()
+			dir := filepath.Join(root, "dir")
+			writeDirNode(t, dir, 999)
+			f := filepath.Join(root, "file")
+			writeNode(t, f, attribs)
+			require.NoError(t, os.WriteFile(f, []byte{}, 0600))
+			linkChild(t, dir, f, "file")
+			var errOut bytes.Buffer
+
+			_, _, err := recalculateNode(nil, "spaceid", dir, false, false, tablewriter.NewTable(io.Discard), &errOut)
+			require.Error(t, err)
+			require.Equal(t, "999", storedTreesize(t, dir))
+			require.Contains(t, errOut.String(), f, "reported even without --verbose")
+		})
+	}
 }

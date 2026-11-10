@@ -97,19 +97,12 @@ func parseTreesizeSpaceID(id string) (string, error) {
 // listSpaceIDs returns the ids of all spaces below the storage root. Finding none is an
 // error, it points to a wrong storage root or an unsupported storage driver.
 func listSpaceIDs(cfg *config.Config) ([]string, error) {
-	root := cfg.Drivers.OCIS.Root
-	dirs, err := fs.Glob(os.DirFS(root), "spaces/*/*/nodes")
+	spaceIDs, err := globSpaceIDs(cfg)
 	if err != nil {
-		return nil, fmt.Errorf("could not scan the spaces root directory %s: %w", root, err)
+		return nil, err
 	}
-	if len(dirs) == 0 {
-		return nil, fmt.Errorf("no spaces found in %s, check STORAGE_USERS_OCIS_ROOT and the storage driver", root)
-	}
-	spaceIDs := make([]string, 0, len(dirs))
-	for _, dir := range dirs {
-		// For dir i.e. spaces/9d/408cec-8f0a-4d33-8715-89df1217a10c/nodes
-		// spaceID is 9d408cec-8f0a-4d33-8715-89df1217a10c
-		spaceIDs = append(spaceIDs, strings.ReplaceAll(strings.TrimSuffix(strings.TrimPrefix(dir, "spaces/"), "/nodes"), "/", ""))
+	if len(spaceIDs) == 0 {
+		return nil, fmt.Errorf("no spaces found in %s, check STORAGE_USERS_OCIS_ROOT and the storage driver", cfg.Drivers.OCIS.Root)
 	}
 	return spaceIDs, nil
 }
@@ -121,7 +114,7 @@ func spaceRootPath(cfg *config.Config, spaceID string) (string, error) {
 	spacesDir := filepath.Join(cfg.Drivers.OCIS.Root, "spaces")
 	root := filepath.Join(spacesDir, lookup.Pathify(spaceID, 1, 2), "nodes", lookup.Pathify(spaceID, 4, 2))
 	rel, err := filepath.Rel(spacesDir, root)
-	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+	if err != nil || rel == "." || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
 		return "", fmt.Errorf("invalid space id %q", spaceID)
 	}
 	return root, nil
@@ -193,11 +186,10 @@ func recalculateNode(cfg *config.Config, spaceID, path string, dryRun, verbose b
 	if string(attribs[prefixes.TypeAttr]) == strconv.FormatUint(uint64(provider.ResourceType_RESOURCE_TYPE_FILE), 10) {
 		size, err := strconv.ParseUint(string(attribs[prefixes.BlobsizeAttr]), 10, 64)
 		if err != nil {
-			// a node without a blobsize contributes nothing, but it is worth reporting
-			if verbose {
-				fmt.Fprintf(errOut, "  Could not read blobsize of %s: %s\n", path, err)
-			}
-			return 0, 0, nil
+			// decomposedfs always sets the blobsize of a file, so this is corruption. Counting
+			// it as 0 would write an undercounted treesize into the parents.
+			fmt.Fprintf(errOut, "  Invalid blobsize of file %s: %s\n", path, err)
+			return 0, 0, fmt.Errorf("invalid blobsize of %s: %w", path, err)
 		}
 		return size, 0, nil
 	}
