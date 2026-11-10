@@ -154,6 +154,21 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 		}
 		if err := events.Publish(r.Context(), g.eventsPublisher, ev); err != nil {
 			g.logger.Error().Err(err).Msg("Failed to publish TagsAdded event")
+
+			// Roll back the metadata change so the search index and the
+			// file metadata do not diverge. Not atomic, see publishTagsRemoved.
+			if _, rollbackErr := client.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
+				Ref: ev.Ref,
+				ArbitraryMetadata: &provider.ArbitraryMetadata{
+					Metadata: map[string]string{
+						"tags": currentTags,
+					},
+				},
+			}); rollbackErr != nil {
+				g.logger.Error().Err(rollbackErr).Msg("failed to rollback tags after publish failure")
+			}
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 	}
 }

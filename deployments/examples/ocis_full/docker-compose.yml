@@ -39,7 +39,7 @@ services:
       - "443:443"
     volumes:
       - "${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock:ro"
-      - "certs:/certs"
+      - "./data/certs:/certs"
     labels:
       - "traefik.enable=${TRAEFIK_DASHBOARD:-false}"
        # defaults to admin:admin
@@ -52,9 +52,6 @@ services:
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
-
-volumes:
-  certs:
 
 networks:
   ocis-net:

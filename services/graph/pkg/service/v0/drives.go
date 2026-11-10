@@ -882,12 +882,12 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 	permissions := g.cs3SpacePermissionsToLibreGraph(ctx, space, apiVersion)
 
 	drive := &libregraph.Drive{
-		Id:   libregraph.PtrString(spaceID),
+		Id:   new(spaceID),
 		Name: space.Name,
 		//"createdDateTime": "string (timestamp)", // TODO read from StorageSpace ... needs Opaque for now
 		DriveType: &space.SpaceType,
 		Root: &libregraph.DriveItem{
-			Id:          libregraph.PtrString(storagespace.FormatResourceID(spaceRid)),
+			Id:          new(storagespace.FormatResourceID(spaceRid)),
 			Permissions: permissions,
 		},
 	}
@@ -912,11 +912,11 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 
 	if space.Opaque != nil {
 		if description, ok := space.Opaque.Map["description"]; ok {
-			drive.Description = libregraph.PtrString(string(description.Value))
+			drive.Description = new(string(description.Value))
 		}
 
 		if alias, ok := space.Opaque.Map["spaceAlias"]; ok {
-			drive.DriveAlias = libregraph.PtrString(string(alias.Value))
+			drive.DriveAlias = new(string(alias.Value))
 		}
 
 		if v, ok := space.Opaque.Map[_spaceStateTrashed]; ok {
@@ -926,14 +926,14 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 		}
 
 		if entry, ok := space.Opaque.Map["etag"]; ok {
-			drive.Root.ETag = libregraph.PtrString(string(entry.Value))
+			drive.Root.ETag = new(string(entry.Value))
 		}
 	}
 
 	if baseURL != nil {
 		webDavURL := *baseURL
 		webDavURL.Path = path.Join(webDavURL.Path, spaceID)
-		drive.Root.WebDavUrl = libregraph.PtrString(webDavURL.String())
+		drive.Root.WebDavUrl = new(webDavURL.String())
 	}
 
 	webURL, err := url.Parse(g.config.Spaces.WebDavBase)
@@ -946,7 +946,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 	}
 
 	webURL.Path = path.Join(webURL.Path, "f", storagespace.FormatResourceID(spaceRid))
-	drive.WebUrl = libregraph.PtrString(webURL.String())
+	drive.WebUrl = new(webURL.String())
 
 	if space.Owner != nil && space.Owner.Id != nil {
 		drive.Owner = &libregraph.IdentitySet{

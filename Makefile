@@ -41,6 +41,7 @@ OCIS_MODULES = \
 	services/idm \
 	services/idp \
 	services/invitations \
+	services/llm \
 	services/nats \
 	services/notifications \
 	services/ocdav \
@@ -274,6 +275,14 @@ ifndef CHANGELOG_VERSION
 endif
 	mkdir -p ocis/dist
 	$(CALENS) --version $(CHANGELOG_VERSION) -o ocis/dist/CHANGELOG.md
+
+# Release notes from conventional commits (see cliff.toml and scripts/changelog.sh).
+.PHONY: changelog-generate
+changelog-generate:
+ifndef CHANGELOG_VERSION
+	$(error CHANGELOG_VERSION is undefined)
+endif
+	@scripts/changelog.sh $(CHANGELOG_VERSION)
 
 .PHONY: changelog-lint
 changelog-lint:

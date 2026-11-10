@@ -33,6 +33,7 @@ import (
 var _registeredEvents = []events.Unmarshaller{
 	// file related
 	events.PostprocessingStepFinished{},
+	events.UploadReady{},
 
 	// space related
 	events.SpaceDisabled{},
@@ -95,6 +96,7 @@ func Server(cfg *config.Config) *cli.Command {
 				microstore.Database(cfg.Persistence.Database),
 				microstore.Table(cfg.Persistence.Table),
 				store.Authentication(cfg.Persistence.AuthUsername, cfg.Persistence.AuthPassword),
+				store.Credentials(cfg.Persistence.CredsFile, cfg.Persistence.Creds),
 				store.TLS(cfg.Persistence.EnableTLS, cfg.Persistence.TLSInsecure, cfg.Persistence.TLSRootCACertificate),
 			)
 

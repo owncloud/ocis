@@ -54,7 +54,7 @@ var _ = Describe("Wopi Context Middleware", func() {
 		})
 		mw = middleware.WopiContextAuthMiddleware(cfg, nil, next)
 
-		tknMngr, err = rjwt.New(map[string]interface{}{
+		tknMngr, err = rjwt.New(map[string]any{
 			"secret":  cfg.TokenManager.JWTSecret,
 			"expires": int64(24 * 60 * 60),
 		})
@@ -205,7 +205,7 @@ var _ = Describe("Wopi Context Middleware", func() {
 		// from the (readable) JWT. Parse the JWT and assert the ViewOnlyToken claim
 		// is present but is ciphertext, not the plaintext value.
 		claims := &middleware.Claims{}
-		_, err = jwt.ParseWithClaims(wopiToken, claims, func(t *jwt.Token) (interface{}, error) {
+		_, err = jwt.ParseWithClaims(wopiToken, claims, func(t *jwt.Token) (any, error) {
 			return []byte(cfg.Wopi.Secret), nil
 		})
 		Expect(err).ToNot(HaveOccurred())

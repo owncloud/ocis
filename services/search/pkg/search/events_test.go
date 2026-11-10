@@ -17,7 +17,7 @@ import (
 )
 
 var _ = DescribeTable("events",
-	func(mcks []string, e interface{}, asyncUploads bool) {
+	func(mcks []string, e any, asyncUploads bool) {
 		var (
 			s     = &searchMocks.Searcher{}
 			calls atomic.Int32

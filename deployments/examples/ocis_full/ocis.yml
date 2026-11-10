@@ -5,12 +5,41 @@ services:
       ocis-net:
         aliases:
           - ${OCIS_DOMAIN:-ocis.owncloud.test}
+  # chowns the host-mounted config/data dirs to the oCIS container's non-root
+  # user (uid/gid 1000) before oCIS itself starts, since bind mounts default
+  # to being owned by whoever created them on the host. Skips the recursive
+  # chown on subsequent startups (marker file) so it doesn't re-walk the
+  # whole data dir, which can grow big, on every restart.
+  # Also pre-creates the placeholder files that the ocis service bind-mounts
+  # into /etc/ocis: docker fails to create these nested mountpoints itself
+  # inside a freshly created host directory on some hosts (Docker Desktop).
+  ocis-data-init:
+    image: alpine:latest
+    user: root
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        for d in /etc/ocis /var/lib/ocis; do
+        mkdir -p "$$d";
+        m="$$d/.ocis-data-init-done";
+        [ -f "$$m" ] || { chown -R 1000:1000 "$$d"; touch "$$m"; };
+        done;
+        for f in app-registry.yaml csp.yaml banned-password-list.txt; do
+        touch "/etc/ocis/$$f";
+        done
+    volumes:
+      - ${OCIS_CONFIG_DIR:-./data/ocis-config}:/etc/ocis
+      - ${OCIS_DATA_DIR:-./data/ocis-data}:/var/lib/ocis
+
   ocis:
     image: ${OCIS_DOCKER_IMAGE}:${OCIS_DOCKER_TAG}
     # changelog: https://github.com/owncloud/ocis/tree/master/changelog
     # release notes: https://doc.owncloud.com/ocis_release_notes.html
     networks:
       ocis-net:
+    depends_on:
+      ocis-data-init:
+        condition: service_completed_successfully
     entrypoint:
       - /bin/sh
     # run ocis init to initialize a configuration file with random secrets
@@ -61,9 +90,9 @@ services:
       - ./config/ocis/app-registry.yaml:/etc/ocis/app-registry.yaml
       - ./config/ocis/csp.yaml:/etc/ocis/csp.yaml
       - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
-      # configure the .env file to use own paths instead of docker internal volumes
-      - ${OCIS_CONFIG_DIR:-ocis-config}:/etc/ocis
-      - ${OCIS_DATA_DIR:-ocis-data}:/var/lib/ocis
+      # configure the .env file to use different host paths if desired
+      - ${OCIS_CONFIG_DIR:-./data/ocis-config}:/etc/ocis
+      - ${OCIS_DATA_DIR:-./data/ocis-data}:/var/lib/ocis
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=https"
@@ -75,6 +104,39 @@ services:
       driver: ${LOG_DRIVER:-local}
     restart: always
 
-volumes:
-  ocis-config:
-  ocis-data:
+# apps.yaml is defined here (inline, rather than as a plain bind-mounted file)
+# so that Docker Compose's own ${VAR:-default} interpolation resolves the
+# values below. oCIS's own env-var templating in mounted config files does
+# NOT work for these per-app "config:" blocks (they bind to a generic
+# map[string]any in the web service, which bypasses oCIS's env-parsing
+# decode hook) - so this file must never go back to a plain bind mount with
+# ocis-style ${VAR|default} placeholders, those are silently never resolved.
+configs:
+  apps_yaml:
+    content: |
+      importer:
+        config:
+          companionUrl: https://${COMPANION_DOMAIN:-companion.owncloud.test}
+          supportedClouds:
+            - WebdavPublicLink
+            #- OneDrive # needs a client id and secret
+            #- GoogleDrive # needs a client id and secret and an addition to the DNS zone
+      external-sites:
+        config:
+          sites:
+            # For settings see: https://github.com/owncloud/web-extensions/tree/main/packages/web-app-external-sites
+            - name: ownCloud
+              url: "https://doc.owncloud.com"
+              target: embedded
+              color: "#0D856F"
+              icon: cloud
+              priority: 50
+            - name: Wikipedia
+              url: "https://www.wikipedia.org"
+              target: external
+              color: "#0D856F"
+              icon: book
+              priority: 51
+      workflows:
+        config:
+          backendUrl: https://${OCIS_DOMAIN:-ocis.owncloud.test}/workflows/api/v1beta1

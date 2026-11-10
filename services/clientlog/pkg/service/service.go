@@ -125,7 +125,7 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 	var (
 		users  []string
 		evType string
-		data   interface{}
+		data   any
 	)
 
 	fileEv := func(typ string, ref *provider.Reference) {
@@ -143,8 +143,16 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 		err = errors.New("unhandled event")
 	case events.UploadReady:
 		if e.Failed {
-			// we don't inform about failed uploads yet
-			return
+			// node reverted, resource gone: build the payload from the event, not the gateway.
+			evType = "postprocessing-finished"
+			users = []string{e.ExecutingUser.GetId().GetOpaqueId()}
+			data = FileEvent{
+				ItemID:      storagespace.FormatResourceID(e.ResourceID),
+				SpaceID:     storagespace.FormatStorageID(e.ResourceID.GetStorageId(), e.ResourceID.GetSpaceId()),
+				InitiatorID: event.InitiatorID,
+				Outcome:     OutcomeFailed,
+			}
+			break
 		}
 		fileEv("postprocessing-finished", e.FileRef)
 	case events.ItemTrashed:
@@ -204,7 +212,7 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 	}
 }
 
-func (cl *ClientlogService) sendSSE(userIDs []string, evType string, data interface{}) error {
+func (cl *ClientlogService) sendSSE(userIDs []string, evType string, data any) error {
 	b, err := json.Marshal(data)
 	if err != nil {
 		return err

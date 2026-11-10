@@ -127,7 +127,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 				os.Exit(1)
 			}
 			drivers := revaconfig.StorageProviderDrivers(cfg)
-			driverConf, ok := drivers[cfg.Driver].(map[string]interface{})
+			driverConf, ok := drivers[cfg.Driver].(map[string]any)
 			if !ok {
 				fmt.Fprintf(os.Stderr, "No configuration found for filesystem driver '%s'\n", cfg.Driver)
 				os.Exit(1)
@@ -507,7 +507,7 @@ func deleteStaleNode(cfg *config.Config, path string, dryRun bool, verbose bool,
 		fmt.Fprintf(os.Stderr, "Error reading file %s: %s\n", path, err)
 		return 0
 	}
-	var mpkData map[string]interface{}
+	var mpkData map[string]any
 	if err := msgpack.Unmarshal(b, &mpkData); err != nil {
 		fmt.Fprintf(os.Stderr, "Error unmarshaling file %s: %s\n", path, err)
 		return 0
@@ -562,7 +562,7 @@ func deleteStaleNode(cfg *config.Config, path string, dryRun bool, verbose bool,
 	return 1
 }
 
-func extractProcessingID(mpkData map[string]interface{}) string {
+func extractProcessingID(mpkData map[string]any) string {
 	processingID := ""
 	for k, v := range mpkData {
 		vStr := string(v.([]byte))

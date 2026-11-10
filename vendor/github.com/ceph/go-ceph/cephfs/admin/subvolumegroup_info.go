@@ -1,5 +1,3 @@
-//go:build ceph_preview
-
 package admin
 
 // SubVolumeGroupInfo reports various informational values about a subvolume group.

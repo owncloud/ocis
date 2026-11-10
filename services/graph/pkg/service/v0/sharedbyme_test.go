@@ -124,7 +124,7 @@ var _ = Describe("sharedbyme", func() {
 		linkType, err := libregraph.NewSharingLinkTypeFromValue("view")
 		Expect(err).To(BeNil())
 		driveItemCreateLink.Type = linkType
-		driveItemCreateLink.ExpirationDateTime = libregraph.PtrTime(time.Now().Add(time.Hour))
+		driveItemCreateLink.ExpirationDateTime = new(time.Now().Add(time.Hour))
 		permissions, err := linktype.CS3ResourcePermissionsFromSharingLink(*driveItemCreateLink, provider.ResourceType_RESOURCE_TYPE_CONTAINER)
 		Expect(err).To(BeNil())
 

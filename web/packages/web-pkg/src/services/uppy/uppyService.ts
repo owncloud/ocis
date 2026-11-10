@@ -284,7 +284,9 @@ export class UppyService {
       this.clearInputs()
     })
     this.uppy.on('complete', (result) => {
-      if (!result || result.successful.length === 0) {
+      // publish for failed batches too, so subscribers know the batch is over. An empty
+      // result means the batch was cancelled, which is handled via 'uploadCancelled'.
+      if (!result || (!result.successful?.length && !result.failed?.length)) {
         return
       }
 

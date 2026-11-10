@@ -464,17 +464,17 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - suite: part-1
-          #   args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 1"
+          - suite: part-1
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 1"
           - suite: part-2
             args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 2"
           # - suite: part-3
           #   args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 3"
           # - suite: part-4
           #   args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 4"
-          # - suite: search
-          #   args: "--type playwright --suites search"
-          #   tika: true
+          - suite: search
+            args: "--type playwright --suites search"
+            tika: true
           # - suite: keycloak
           #   args: "--type playwright --suites journeys,keycloak"
           #   keycloak: true
@@ -548,7 +548,7 @@ jobs:
 
       - name: Prepare Helm Charts
         env:
-          ENABLE_TIKA: ${{ matrix.suite == 'vault-storage' }}
+          ENABLE_TIKA: ${{ matrix.suite == 'vault-storage' || matrix.suite == 'search' }}
           ENABLE_VAULT: ${{ matrix.suite == 'vault-storage' }}
           ENABLE_WOPI: ${{ matrix.suite == 'app-provider' }}
           ENABLE_OCM: ${{ matrix.suite == 'ocm' }}
@@ -561,7 +561,7 @@ jobs:
 
       - name: Deploy Suite-Specific External Backends
         run: |
-          if [[ "${{ matrix.suite }}" == "vault-storage" ]]; then
+          if [[ "${{ matrix.suite }}" == "vault-storage" || "${{ matrix.suite }}" == "search" ]]; then
             docker run -d \
               -p 9998:9998 \
               --name tika \
@@ -575,7 +575,9 @@ jobs:
             done
             curl -sf http://localhost:9998 > /dev/null
             bash tests/config/k8s/expose-external-svc.sh tika:9998
+          fi
 
+          if [[ "${{ matrix.suite }}" == "vault-storage" ]]; then
             # GitHub runners ship PostgreSQL pre-installed on 5432, but not always
             # already running - reuse it for keycloak's DB instead of running our
             # own container for it, once it's up.

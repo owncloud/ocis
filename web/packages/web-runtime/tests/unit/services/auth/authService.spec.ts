@@ -543,11 +543,13 @@ describe('AuthService', () => {
     const setupVaultAuthService = ({
       canAccessVault,
       userContextReady,
-      getUser
+      getUser,
+      isInVault = false
     }: {
       canAccessVault: boolean
       userContextReady: boolean
       getUser: () => Promise<User>
+      isInVault?: boolean
     }) => {
       const authService = new AuthService()
       const mockSignInRedirect = vi.fn()
@@ -570,13 +572,16 @@ describe('AuthService', () => {
         isInitialized: true,
         authMfaRequiredLevelname: 'advanced'
       })
-      const router = createRouter()
+      const router = createRouter({
+        routes: [{ path: '/access-denied', name: 'accessDenied', component: {} }]
+      })
       const pushSpy = vi.spyOn(router, 'push').mockResolvedValue(undefined)
 
       createTestingPinia()
       const authStore = useAuthStore()
       authStore.userContextReady = userContextReady
       const configStore = useConfigStore()
+      configStore.isInVault = isInVault
       authService.initialize(
         configStore,
         null,
@@ -657,6 +662,67 @@ describe('AuthService', () => {
       expect(mockLoadUserAbilities).toHaveBeenCalled()
       expect(result).toEqual({ name: 'accessDenied', query: { reason: 'forbidden' } })
       expect(mockSignInRedirect).not.toHaveBeenCalled()
+    })
+
+    describe('on a page loaded in vault mode', () => {
+      const spyNavigateOutsideVault = (authService: AuthService) =>
+        vi.spyOn(authService as any, 'navigateOutsideVault').mockImplementation(() => undefined)
+
+      it('on a cold load, denies an unentitled user with a full page load outside the vault', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: false,
+          userContextReady: false,
+          getUser: () =>
+            Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: false })),
+          isInVault: true
+        })
+        const navigateSpy = spyNavigateOutsideVault(authService)
+
+        const result = await authService.initializeContext(vaultRoute)
+
+        // an in-app redirect would keep the vault theme and clients for the rest of the page,
+        // so the "Continue" button and the browser back button would show the app as the vault
+        expect(result).toBe(false)
+        expect(navigateSpy).toHaveBeenCalledWith('/access-denied?reason=forbidden', {
+          replace: true
+        })
+        expect(mockSignInRedirect).not.toHaveBeenCalled()
+      })
+
+      it('with known permissions, denies an unentitled user with a full page load outside the vault', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: false,
+          userContextReady: true,
+          getUser: () =>
+            Promise.resolve(mock<User>({ profile: { acr: 'advanced' }, expired: false })),
+          isInVault: true
+        })
+        const navigateSpy = spyNavigateOutsideVault(authService)
+
+        const result = await authService.initializeContext(vaultRoute)
+
+        expect(result).toBe(false)
+        expect(navigateSpy).toHaveBeenCalledWith('/access-denied?reason=forbidden', {
+          replace: true
+        })
+        expect(mockSignInRedirect).not.toHaveBeenCalled()
+      })
+
+      it('does not reload the page for an entitled user', async () => {
+        const { authService } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: false,
+          getUser: () =>
+            Promise.resolve(mock<User>({ profile: { acr: 'advanced' }, expired: false })),
+          isInVault: true
+        })
+        const navigateSpy = spyNavigateOutsideVault(authService)
+
+        const result = await authService.initializeContext(vaultRoute)
+
+        expect(result).toBeUndefined()
+        expect(navigateSpy).not.toHaveBeenCalled()
+      })
     })
 
     it('on a cold load, fails closed (denies) when loading abilities throws', async () => {

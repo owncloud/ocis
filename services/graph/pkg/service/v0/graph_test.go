@@ -1222,7 +1222,7 @@ var _ = Describe("Graph", func() {
 					drive := libregraph.NewDrive("thename")
 					drive.SetSpecial([]libregraph.DriveItem{{
 						Id:            &imageFileID,
-						SpecialFolder: &libregraph.SpecialFolder{Name: libregraph.PtrString("image")},
+						SpecialFolder: &libregraph.SpecialFolder{Name: new("image")},
 					}})
 					driveJson, err := json.Marshal(drive)
 					Expect(err).ToNot(HaveOccurred())
@@ -1332,7 +1332,7 @@ var _ = Describe("Graph", func() {
 				drive := libregraph.NewDrive("thename")
 				drive.SetSpecial([]libregraph.DriveItem{{
 					Id:            &readmeFileID,
-					SpecialFolder: &libregraph.SpecialFolder{Name: libregraph.PtrString("readme")},
+					SpecialFolder: &libregraph.SpecialFolder{Name: new("readme")},
 				}})
 				driveJson, err := json.Marshal(drive)
 				Expect(err).ToNot(HaveOccurred())
@@ -1461,7 +1461,7 @@ var _ = Describe("Graph", func() {
 		Describe("GetAllDrivesV1 (unrestricted listing)", func() {
 			listedDriveIDs := func() []string {
 				var lr struct {
-					Value []map[string]interface{} `json:"value"`
+					Value []map[string]any `json:"value"`
 				}
 				body, _ := io.ReadAll(rr.Body)
 				Expect(json.Unmarshal(body, &lr)).To(Succeed())
@@ -1562,6 +1562,52 @@ var _ = Describe("Graph", func() {
 
 			gatewayClient.AssertCalled(GinkgoT(), "DeleteStorageSpace", mock.Anything, mock.MatchedBy(func(req *provider.DeleteStorageSpaceRequest) bool {
 				return req.Id.OpaqueId == "spaceid" && utils.ExistsInOpaque(req.Opaque, "purge")
+			}))
+		})
+	})
+
+	Describe("Assign tags", func() {
+		var assign func() *httptest.ResponseRecorder
+
+		BeforeEach(func() {
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &provider.ResourceInfo{
+					Id:            &provider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "opaqueid"},
+					PermissionSet: &provider.ResourcePermissions{InitiateFileUpload: true},
+					ArbitraryMetadata: &provider.ArbitraryMetadata{
+						Metadata: map[string]string{"tags": "old"},
+					},
+				},
+			}, nil)
+			gatewayClient.On("SetArbitraryMetadata", mock.Anything, mock.Anything).Return(&provider.SetArbitraryMetadataResponse{
+				Status: status.NewOK(ctx),
+			}, nil)
+
+			assign = func() *httptest.ResponseRecorder {
+				body := `{"resourceId":"storageid$spaceid!opaqueid","tags":["new"]}`
+				r := httptest.NewRequest(http.MethodPut, "/graph/v1.0/extensions/org.libregraph/tags", bytes.NewBufferString(body))
+				r = r.WithContext(ctx)
+				rec := httptest.NewRecorder()
+				svc.AssignTags(rec, r)
+				return rec
+			}
+		})
+
+		It("answers 200 when the event is published", func() {
+			eventsPublisher.On("Publish", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
+			Expect(assign().Code).To(Equal(http.StatusOK))
+			gatewayClient.AssertNumberOfCalls(GinkgoT(), "SetArbitraryMetadata", 1)
+		})
+
+		It("restores the previous tags and answers 500 when publishing the event fails", func() {
+			eventsPublisher.On("Publish", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("nats: maximum messages exceeded"))
+
+			Expect(assign().Code).To(Equal(http.StatusInternalServerError))
+			gatewayClient.AssertNumberOfCalls(GinkgoT(), "SetArbitraryMetadata", 2)
+			gatewayClient.AssertCalled(GinkgoT(), "SetArbitraryMetadata", mock.Anything, mock.MatchedBy(func(req *provider.SetArbitraryMetadataRequest) bool {
+				return req.GetArbitraryMetadata().GetMetadata()["tags"] == "old"
 			}))
 		})
 	})

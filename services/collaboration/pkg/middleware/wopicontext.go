@@ -91,7 +91,7 @@ func WopiContextAuthMiddleware(cfg *config.Config, st microstore.Store, next htt
 		}
 
 		claims := &Claims{}
-		_, err := jwt.ParseWithClaims(accessToken, claims, func(token *jwt.Token) (interface{}, error) {
+		_, err := jwt.ParseWithClaims(accessToken, claims, func(token *jwt.Token) (any, error) {
 			if token.Method != jwt.SigningMethodHS256 {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
@@ -110,7 +110,7 @@ func WopiContextAuthMiddleware(cfg *config.Config, st microstore.Store, next htt
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
-		tokenManager, err := rjwt.New(map[string]interface{}{
+		tokenManager, err := rjwt.New(map[string]any{
 			"secret":  cfg.TokenManager.JWTSecret,
 			"expires": int64(24 * 60 * 60),
 		})
@@ -228,7 +228,7 @@ func GenerateWopiToken(wopiContext WopiContext, cfg *config.Config, st microstor
 	}
 
 	cs3Claims := &jwt.RegisteredClaims{}
-	_, err = jwt.ParseWithClaims(wopiContext.AccessToken, cs3Claims, func(token *jwt.Token) (interface{}, error) {
+	_, err = jwt.ParseWithClaims(wopiContext.AccessToken, cs3Claims, func(token *jwt.Token) (any, error) {
 		if token.Method != jwt.SigningMethodHS256 {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
@@ -278,7 +278,7 @@ func parseWopiFileID(cfg *config.Config, path string) string {
 	}
 	// check if the fileid is a jwt
 	if strings.Contains(s[3], ".") {
-		token, err := jwt.Parse(s[3], func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.Parse(s[3], func(token *jwt.Token) (any, error) {
 			if token.Method != jwt.SigningMethodHS256 {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}

@@ -882,7 +882,7 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 				HeaderWopiLock:              lockID,
 				HeaderWopiLockFailureReason: "Lock Conflict",
 			},
-			Body: map[string]interface{}{
+			Body: map[string]any{
 				"Name":        target,
 				"Url":         wopiSrcURL.String(),
 				"HostViewUrl": createHostUrl("view", webURL, strings.ToLower(f.cfg.App.Name), newInfo),
@@ -1251,6 +1251,12 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		if err == nil && parentStatRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_OK {
 			parentFolderURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetParentId()))
 			breadcrumbFolderURL = parentFolderURL.String()
+		} else {
+			// parent not accessible: link to the file itself and let the web app resolve the
+			// right location (e.g. the Shares space). openWithDefaultApp=false keeps it from
+			// reopening the file.
+			parentFolderURL.Path = privateLinkURL.Path
+			parentFolderURL.RawQuery = "openWithDefaultApp=false"
 		}
 	} else {
 		if scopes, ok := ctxpkg.ContextGetScopes(ctx); ok {
@@ -1282,7 +1288,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		}
 	}
 	// fileinfo map
-	var size interface{}
+	var size any
 	size = int64(statRes.GetInfo().GetSize())
 	// OnlyOffice requires a 0 size of files for "pdf" files, for extensions "docx", "xlsx", "pptx" it is optional
 	// For other extensions like "ods", "odt", "odp" the 0 size should be omitted
@@ -1298,7 +1304,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		lastModifiedTime = time.Unix(int64(statRes.GetInfo().GetMtime().GetSeconds()), int64(statRes.GetInfo().GetMtime().GetNanos())).UTC().Format(timeFormat)
 	}
 
-	infoMap := map[string]interface{}{
+	infoMap := map[string]any{
 		fileinfo.KeyOwnerID:           hexEncodedOwnerId,
 		fileinfo.KeySize:              size,
 		fileinfo.KeyVersion:           getVersion(statRes.GetInfo().GetMtime()),

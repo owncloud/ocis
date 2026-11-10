@@ -125,11 +125,11 @@ var _ = Describe("Users", func() {
 
 			It("gets the information", func() {
 				user := &libregraph.User{
-					Id: libregraph.PtrString("user"),
+					Id: new("user"),
 					Identities: []libregraph.ObjectIdentity{
 						{
-							Issuer:           libregraph.PtrString("https://idp.example.com"),
-							IssuerAssignedId: libregraph.PtrString("the-oidc-sub"),
+							Issuer:           new("https://idp.example.com"),
+							IssuerAssignedId: new("the-oidc-sub"),
 						},
 					},
 				}
@@ -176,7 +176,7 @@ var _ = Describe("Users", func() {
 			It("falls back to the default language when the settings lookup fails", func() {
 				cfg.Spaces.DefaultLanguage = "de"
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).
-					Return(&libregraph.User{Id: libregraph.PtrString("user")}, nil)
+					Return(&libregraph.User{Id: new("user")}, nil)
 				valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
 					Return(nil, errors.New(`{"id":"go.micro.client","code":408,"detail":"context deadline exceeded","status":"Request Timeout"}`))
 
@@ -197,7 +197,7 @@ var _ = Describe("Users", func() {
 
 			It("falls back to english when the settings lookup fails and the default is unchanged", func() {
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).
-					Return(&libregraph.User{Id: libregraph.PtrString("user")}, nil)
+					Return(&libregraph.User{Id: new("user")}, nil)
 				valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
 					Return(nil, errors.New("no language value found"))
 
@@ -217,9 +217,9 @@ var _ = Describe("Users", func() {
 
 			It("expands the memberOf", func() {
 				user := &libregraph.User{
-					Id: libregraph.PtrString("user1"),
+					Id: new("user1"),
 					MemberOf: []libregraph.Group{
-						{DisplayName: libregraph.PtrString("somegroup")},
+						{DisplayName: new("somegroup")},
 					},
 				}
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
@@ -268,7 +268,7 @@ var _ = Describe("Users", func() {
 					},
 				}
 				user := &libregraph.User{
-					Id: libregraph.PtrString("user"),
+					Id: new("user"),
 				}
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 				roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: assignments}, nil)
@@ -397,7 +397,7 @@ var _ = Describe("Users", func() {
 				user.SetId("user1")
 				user.SetPasswordProfile(
 					libregraph.PasswordProfile{
-						Password: libregraph.PtrString("password"),
+						Password: new("password"),
 					},
 				)
 				user.SetUserType("usertype")
@@ -434,7 +434,7 @@ var _ = Describe("Users", func() {
 					user.SetId("user1")
 					user.SetMail("albert.einstein@example.com")
 					user.SetUserType("Member")
-					user.SetPasswordProfile(libregraph.PasswordProfile{Password: libregraph.PtrString("secret")})
+					user.SetPasswordProfile(libregraph.PasswordProfile{Password: new("secret")})
 					users = []*libregraph.User{user}
 
 					identityBackend.On("GetUsers", mock.Anything, mock.Anything, mock.Anything).Return(users, nil)

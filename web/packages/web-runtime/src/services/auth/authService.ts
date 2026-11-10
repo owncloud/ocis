@@ -152,7 +152,7 @@ export class AuthService implements AuthServiceInterface {
     if (to.params.scope === 'vault') {
       // Permissions known: send an unentitled user to accessDenied instead of the IdP.
       if (this.authStore.userContextReady && !this.ability.can('read-all', 'Vault')) {
-        return { name: 'accessDenied', query: { reason: 'forbidden' } }
+        return this.denyVaultAccess()
       }
 
       // Capabilities only — the full context loads vault spaces, which 401 without MFA and crash.
@@ -173,7 +173,7 @@ export class AuthService implements AuthServiceInterface {
           return { name: 'accessDenied' }
         }
         if (!this.ability.can('read-all', 'Vault')) {
-          return { name: 'accessDenied', query: { reason: 'forbidden' } }
+          return this.denyVaultAccess()
         }
       }
 
@@ -522,7 +522,31 @@ export class AuthService implements AuthServiceInterface {
     this.navigateOutsideVault(base?.href || `${window.location.origin}/`)
   }
 
-  private navigateOutsideVault(url: string) {
+  /**
+   * Denies the vault to a user without the vault permission.
+   *
+   * On a page loaded in vault mode (see `useVault`), an in-app redirect would keep the vault
+   * theme and clients. Every later in-app navigation (the "Continue" button, the browser back
+   * button) would then show the regular app as the vault and load vault spaces, which fails.
+   * Such a page shows the denial outside the vault, with a full page load that replaces the
+   * vault URL in the browser history.
+   */
+  private denyVaultAccess(): RouteLocationRaw | false {
+    const accessDenied = { name: 'accessDenied', query: { reason: 'forbidden' } }
+    if (!this.configStore.isInVault) {
+      return accessDenied
+    }
+
+    this.navigateOutsideVault(this.router.resolve(accessDenied).href, { replace: true })
+    // cancel the vault navigation, the page reloads outside the vault
+    return false
+  }
+
+  private navigateOutsideVault(url: string, { replace = false }: { replace?: boolean } = {}) {
+    if (replace) {
+      window.location.replace(url)
+      return
+    }
     window.location.assign(url)
   }
 

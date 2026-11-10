@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"testing"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -37,7 +38,7 @@ func TestService_Get(t *testing.T) {
 	primaryFS := fsx.NewMemMapFs()
 	fallbackFS := fsx.NewFallbackFS(primaryFS, fsx.NewMemMapFs())
 
-	add := func(filename string, content interface{}) {
+	add := func(filename string, content any) {
 		b, err := json.Marshal(content)
 		assert.Nil(t, err)
 
@@ -45,11 +46,11 @@ func TestService_Get(t *testing.T) {
 	}
 
 	// baseTheme
-	add("base/theme.json", map[string]interface{}{
+	add("base/theme.json", map[string]any{
 		"base": "base",
 	})
 	// brandingTheme
-	add("_branding/theme.json", map[string]interface{}{
+	add("_branding/theme.json", map[string]any{
 		"_branding": "_branding",
 	})
 
@@ -58,6 +59,87 @@ func TestService_Get(t *testing.T) {
 			WithThemeFS(fallbackFS).
 			WithGatewaySelector(mocks.NewSelectable[gateway.GatewayAPIClient](t)),
 	)
+	r := httptest.NewRequest(http.MethodGet, "/", nil)
+	r.SetPathValue("id", "base")
+
+	w := httptest.NewRecorder()
+	service.Get(w, r)
+
+	jsonData := gjson.Parse(w.Body.String())
+	// baseTheme
+	assert.Equal(t, jsonData.Get("base").String(), "base")
+	// brandingTheme
+	assert.Equal(t, jsonData.Get("_branding").String(), "_branding")
+	// themeDefaults
+	assert.Equal(t, jsonData.Get("common.shareRoles."+unifiedrole.UnifiedRoleViewerID+".label").String(), "Viewer")
+}
+
+func TestService_GetConcurrent(t *testing.T) {
+	primaryFS := fsx.NewMemMapFs()
+	fallbackFS := fsx.NewFallbackFS(primaryFS, fsx.NewMemMapFs())
+
+	add := func(filename string, content any) {
+		b, err := json.Marshal(content)
+		assert.Nil(t, err)
+
+		assert.Nil(t, afero.WriteFile(primaryFS, filename, b, 0644))
+	}
+
+	// baseTheme
+	add("base/theme.json", map[string]any{
+		"base": "base",
+	})
+	add("base2/theme.json", map[string]any{
+		"base2": "base2",
+		"common": map[string]any{
+			"shareRoles": map[string]any{
+				unifiedrole.UnifiedRoleViewerID: map[string]any{
+					"label": "Observer",
+				},
+			},
+		},
+	})
+	// brandingTheme
+	add("_branding/theme.json", map[string]any{
+		"_branding": "_branding",
+	})
+
+	service, _ := theme.NewService(
+		theme.ServiceOptions{}.
+			WithThemeFS(fallbackFS).
+			WithGatewaySelector(mocks.NewSelectable[gateway.GatewayAPIClient](t)),
+	)
+
+	var wg sync.WaitGroup
+	for i := 0; i < 20; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+
+			r := httptest.NewRequest(http.MethodGet, "/", nil)
+			baseTheme := "base"
+			roleName := "Viewer"
+			if i%2 == 0 {
+				baseTheme = "base2"
+				roleName = "Observer"
+			}
+			r.SetPathValue("id", baseTheme)
+
+			w := httptest.NewRecorder()
+			service.Get(w, r)
+
+			jsonData := gjson.Parse(w.Body.String())
+			// baseTheme
+			assert.Equal(t, jsonData.Get(baseTheme).String(), baseTheme)
+			// brandingTheme
+			assert.Equal(t, jsonData.Get("_branding").String(), "_branding")
+			// themeDefaults
+			assert.Equal(t, jsonData.Get("common.shareRoles."+unifiedrole.UnifiedRoleViewerID+".label").String(), roleName)
+		}()
+	}
+	wg.Wait()
+
+	// check one last run
 	r := httptest.NewRequest(http.MethodGet, "/", nil)
 	r.SetPathValue("id", "base")
 
@@ -83,7 +165,7 @@ func TestService_Get_BrandingLogoOverridesThemeVariants(t *testing.T) {
 	primaryFS := fsx.NewMemMapFs()
 	fallbackFS := fsx.NewFallbackFS(primaryFS, fsx.NewMemMapFs())
 
-	add := func(filename string, content interface{}) {
+	add := func(filename string, content any) {
 		b, err := json.Marshal(content)
 		assert.Nil(t, err)
 
@@ -93,18 +175,18 @@ func TestService_Get_BrandingLogoOverridesThemeVariants(t *testing.T) {
 	// baseTheme: a theme with its own per-variant logo, as set by the theme author.
 	// The first variant has no logo of its own, mirroring the built-in "owncloud"
 	// theme's default variant, which falls back to clients.web.defaults.logo.
-	add("base/theme.json", map[string]interface{}{
-		"clients": map[string]interface{}{
-			"web": map[string]interface{}{
-				"themes": []interface{}{
-					map[string]interface{}{
+	add("base/theme.json", map[string]any{
+		"clients": map[string]any{
+			"web": map[string]any{
+				"themes": []any{
+					map[string]any{
 						"isDark": false,
 						"name":   "Light Theme",
 					},
-					map[string]interface{}{
+					map[string]any{
 						"isDark": true,
 						"name":   "Dark Theme",
-						"logo": map[string]interface{}{
+						"logo": map[string]any{
 							"topbar":  "themes/base/assets/logo.svg",
 							"favicon": "themes/base/assets/favicon.jpg",
 							"login":   "themes/base/assets/login.svg",
@@ -115,14 +197,14 @@ func TestService_Get_BrandingLogoOverridesThemeVariants(t *testing.T) {
 		},
 	})
 	// brandingTheme: an admin-uploaded logo
-	add("_branding/theme.json", map[string]interface{}{
-		"common": map[string]interface{}{
+	add("_branding/theme.json", map[string]any{
+		"common": map[string]any{
 			"logo": "themes/_branding/custom-logo.svg",
 		},
-		"clients": map[string]interface{}{
-			"web": map[string]interface{}{
-				"defaults": map[string]interface{}{
-					"logo": map[string]interface{}{
+		"clients": map[string]any{
+			"web": map[string]any{
+				"defaults": map[string]any{
+					"logo": map[string]any{
 						"topbar": "themes/_branding/custom-logo.svg",
 						"login":  "themes/_branding/custom-logo.svg",
 					},
@@ -160,7 +242,7 @@ func TestService_Get_NoBrandingLogoPreservesThemeVariants(t *testing.T) {
 	primaryFS := fsx.NewMemMapFs()
 	fallbackFS := fsx.NewFallbackFS(primaryFS, fsx.NewMemMapFs())
 
-	add := func(filename string, content interface{}) {
+	add := func(filename string, content any) {
 		b, err := json.Marshal(content)
 		assert.Nil(t, err)
 
@@ -168,14 +250,14 @@ func TestService_Get_NoBrandingLogoPreservesThemeVariants(t *testing.T) {
 	}
 
 	// baseTheme only, no _branding/theme.json at all (admin never uploaded a logo)
-	add("base/theme.json", map[string]interface{}{
-		"clients": map[string]interface{}{
-			"web": map[string]interface{}{
-				"themes": []interface{}{
-					map[string]interface{}{
+	add("base/theme.json", map[string]any{
+		"clients": map[string]any{
+			"web": map[string]any{
+				"themes": []any{
+					map[string]any{
 						"isDark": true,
 						"name":   "Dark Theme",
-						"logo": map[string]interface{}{
+						"logo": map[string]any{
 							"topbar":  "themes/base/assets/logo.svg",
 							"favicon": "themes/base/assets/favicon.jpg",
 							"login":   "themes/base/assets/login.svg",

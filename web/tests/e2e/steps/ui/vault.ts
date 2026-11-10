@@ -84,4 +84,20 @@ export async function userIsOnAccessDeniedPage({ stepUser }: { stepUser: string 
   const vaultPage = new VaultPage({ page })
   await expect(page).toHaveURL((url) => url.pathname.startsWith('/access-denied'))
   await expect(vaultPage.accessDeniedLoginButton).toBeVisible()
+  await expect(vaultPage.accessDeniedCardTitle).toHaveText('Access denied')
+  await expect(vaultPage.accessDeniedCardHint).toHaveText(
+    'You do not have permission to access this area. You are still logged in.'
+  )
+}
+
+export async function userContinuesFromAccessDeniedPage({
+  stepUser
+}: {
+  stepUser: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const vaultPage = new VaultPage({ page })
+  await vaultPage.accessDeniedLoginButton.click()
+  await page.locator('#web-content').waitFor()
 }
