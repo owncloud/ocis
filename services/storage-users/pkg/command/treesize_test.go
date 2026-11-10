@@ -3,6 +3,7 @@ package command
 import (
 	"bytes"
 	"errors"
+	"io"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -74,7 +75,7 @@ func TestRecalculateNode(t *testing.T) {
 		writeFileNode(t, f, 100)
 		linkChild(t, dir, f, "file")
 
-		size, corrected, err := recalculateNode(nil, "spaceid", dir, false, false, tablewriter.NewTable(os.Stdout))
+		size, corrected, err := recalculateNode(nil, "spaceid", dir, false, false, tablewriter.NewTable(os.Stdout), io.Discard)
 		require.NoError(t, err)
 		require.Equal(t, uint64(100), size)
 		require.Equal(t, 1, corrected)
@@ -89,7 +90,7 @@ func TestRecalculateNode(t *testing.T) {
 		writeFileNode(t, f, 100)
 		linkChild(t, dir, f, "file")
 
-		size, corrected, err := recalculateNode(nil, "spaceid", dir, false, false, tablewriter.NewTable(os.Stdout))
+		size, corrected, err := recalculateNode(nil, "spaceid", dir, false, false, tablewriter.NewTable(os.Stdout), io.Discard)
 		require.NoError(t, err)
 		require.Equal(t, uint64(100), size)
 		require.Equal(t, 0, corrected)
@@ -103,7 +104,7 @@ func TestRecalculateNode(t *testing.T) {
 		writeFileNode(t, f, 100)
 		linkChild(t, dir, f, "file")
 
-		size, corrected, err := recalculateNode(nil, "spaceid", dir, true, false, tablewriter.NewTable(os.Stdout))
+		size, corrected, err := recalculateNode(nil, "spaceid", dir, true, false, tablewriter.NewTable(os.Stdout), io.Discard)
 		require.NoError(t, err)
 		require.Equal(t, uint64(100), size)
 		require.Equal(t, 1, corrected)
@@ -125,7 +126,7 @@ func TestRecalculateNode(t *testing.T) {
 		linkChild(t, outer, f1, "f1")
 		linkChild(t, outer, inner, "inner")
 
-		size, corrected, err := recalculateNode(nil, "spaceid", outer, false, false, tablewriter.NewTable(os.Stdout))
+		size, corrected, err := recalculateNode(nil, "spaceid", outer, false, false, tablewriter.NewTable(os.Stdout), io.Discard)
 		require.NoError(t, err)
 		require.Equal(t, uint64(42), size)
 		require.Equal(t, 2, corrected, "both the inner and the outer directory are corrected")
@@ -145,7 +146,7 @@ func TestRecalculateNode(t *testing.T) {
 		writeFileNode(t, f, 64)
 		linkChild(t, spaceRoot, f, "file")
 
-		size, corrected, err := recalculateNode(nil, "spaceid", spaceRoot, false, false, tablewriter.NewTable(os.Stdout))
+		size, corrected, err := recalculateNode(nil, "spaceid", spaceRoot, false, false, tablewriter.NewTable(os.Stdout), io.Discard)
 		require.NoError(t, err)
 		require.Equal(t, uint64(64), size)
 		require.Equal(t, 1, corrected)
@@ -161,7 +162,7 @@ func TestRecalculateNode(t *testing.T) {
 		linkChild(t, dir, f, "file")
 		require.NoError(t, os.Symlink("../gone", filepath.Join(dir, "gone")))
 
-		size, _, err := recalculateNode(nil, "spaceid", dir, false, false, tablewriter.NewTable(os.Stdout))
+		size, _, err := recalculateNode(nil, "spaceid", dir, false, false, tablewriter.NewTable(os.Stdout), io.Discard)
 		require.NoError(t, err)
 		require.Equal(t, uint64(20), size, "the dangling entry contributes nothing")
 	})
@@ -177,7 +178,7 @@ func TestRecalculateNode(t *testing.T) {
 		writeFileNode(t, f, 7)
 		linkChild(t, dir, f, "file")
 
-		_, corrected, err := recalculateNode(nil, "spaceid", dir, false, false, tablewriter.NewTable(os.Stdout))
+		_, corrected, err := recalculateNode(nil, "spaceid", dir, false, false, tablewriter.NewTable(os.Stdout), io.Discard)
 		require.NoError(t, err)
 		require.Equal(t, 1, corrected)
 		require.Equal(t, "7", storedTreesize(t, dir))
@@ -252,7 +253,7 @@ func TestRecalculateSpaces(t *testing.T) {
 
 		err := recalculateSpaces(cfg, []string{good, missing, good2}, false, false, &out, &errOut)
 		require.Error(t, err)
-		require.Contains(t, err.Error(), "1 of 3 spaces failed")
+		require.Contains(t, err.Error(), "1 of 3 spaces could not be processed")
 		require.Equal(t, "5", storedTreesize(t, root))
 		require.Equal(t, "6", storedTreesize(t, root2))
 		require.NotContains(t, out.String(), "All treesizes are correct")
@@ -266,5 +267,106 @@ func TestRecalculateSpaces(t *testing.T) {
 
 		require.NoError(t, recalculateSpaces(cfg, []string{good}, true, false, &out, &errOut))
 		require.Contains(t, out.String(), "All treesizes are correct")
+	})
+}
+
+func TestRecalculateNodeChildErrors(t *testing.T) {
+	setup := func(t *testing.T) (dir, bad string) {
+		root := t.TempDir()
+		dir = filepath.Join(root, "dir")
+		writeDirNode(t, dir, 999)
+		ok := filepath.Join(root, "ok")
+		writeFileNode(t, ok, 10)
+		linkChild(t, dir, ok, "ok")
+		bad = filepath.Join(root, "bad")
+		writeFileNode(t, bad, 10)
+		require.NoError(t, os.WriteFile(bad+metadataExtension, []byte("not msgpack \xff\xff"), 0600))
+		linkChild(t, dir, bad, "bad")
+		return dir, bad
+	}
+
+	t.Run("a failing child fails the subtree and the parent is not written", func(t *testing.T) {
+		dir, bad := setup(t)
+		var errOut bytes.Buffer
+
+		_, _, err := recalculateNode(nil, "spaceid", dir, false, false, tablewriter.NewTable(io.Discard), &errOut)
+		require.Error(t, err)
+		require.Equal(t, "999", storedTreesize(t, dir), "an incomplete sum must not be written")
+		require.Contains(t, errOut.String(), bad)
+	})
+
+	t.Run("a failing child deep in the tree keeps every ancestor untouched", func(t *testing.T) {
+		dir, _ := setup(t)
+		top := filepath.Join(filepath.Dir(dir), "top")
+		writeDirNode(t, top, 888)
+		linkChild(t, top, dir, "dir")
+
+		_, _, err := recalculateNode(nil, "spaceid", top, false, false, tablewriter.NewTable(io.Discard), io.Discard)
+		require.Error(t, err)
+		require.Equal(t, "999", storedTreesize(t, dir))
+		require.Equal(t, "888", storedTreesize(t, top))
+	})
+}
+
+func TestRecalculateSpacesHardening(t *testing.T) {
+	const good = "aaaaaaaa-0000-0000-0000-000000000001"
+
+	t.Run("rejects ids that escape the spaces directory", func(t *testing.T) {
+		for _, id := range []string{"........x", "..../..x", "......x", "..", "...."} {
+			cfg := &config.Config{}
+			cfg.Drivers.OCIS.Root = t.TempDir()
+			var out, errOut bytes.Buffer
+
+			err := recalculateSpaces(cfg, []string{id}, false, false, &out, &errOut)
+			require.Error(t, err, id)
+			require.NotContains(t, out.String(), "All treesizes are correct", id)
+		}
+	})
+
+	t.Run("an unreadable subtree fails the space without writing the root", func(t *testing.T) {
+		cfg := &config.Config{}
+		cfg.Drivers.OCIS.Root = t.TempDir()
+		root := writeSpace(t, cfg.Drivers.OCIS.Root, good, 999, 5)
+		bad := filepath.Join(cfg.Drivers.OCIS.Root, "bad")
+		writeFileNode(t, bad, 10)
+		require.NoError(t, os.WriteFile(bad+metadataExtension, []byte("garbage \xff"), 0600))
+		linkChild(t, root, bad, "bad")
+		var out, errOut bytes.Buffer
+
+		err := recalculateSpaces(cfg, []string{good}, false, false, &out, &errOut)
+		require.Error(t, err)
+		require.Equal(t, "999", storedTreesize(t, root))
+		require.NotContains(t, out.String(), "All treesizes are correct")
+	})
+
+	t.Run("prints the totals of the successful spaces when another fails", func(t *testing.T) {
+		cfg := &config.Config{}
+		cfg.Drivers.OCIS.Root = t.TempDir()
+		writeSpace(t, cfg.Drivers.OCIS.Root, good, 999, 5)
+		var out, errOut bytes.Buffer
+
+		err := recalculateSpaces(cfg, []string{good, "bbbbbbbb-0000-0000-0000-000000000002"}, false, false, &out, &errOut)
+		require.Error(t, err)
+		require.Contains(t, out.String(), "Corrected 1 treesizes")
+		require.NotContains(t, err.Error(), "not verified")
+	})
+}
+
+func TestListSpaceIDs(t *testing.T) {
+	t.Run("fails when no space is found", func(t *testing.T) {
+		cfg := &config.Config{}
+		cfg.Drivers.OCIS.Root = t.TempDir()
+		_, err := listSpaceIDs(cfg)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), cfg.Drivers.OCIS.Root)
+	})
+
+	t.Run("finds spaces", func(t *testing.T) {
+		cfg := &config.Config{}
+		cfg.Drivers.OCIS.Root = t.TempDir()
+		writeSpace(t, cfg.Drivers.OCIS.Root, "aaaaaaaa-0000-0000-0000-000000000001", 0, 0)
+		ids, err := listSpaceIDs(cfg)
+		require.NoError(t, err)
+		require.Equal(t, []string{"aaaaaaaa-0000-0000-0000-000000000001"}, ids)
 	})
 }

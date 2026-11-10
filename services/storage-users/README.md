@@ -223,14 +223,23 @@ for example `storage-users-1$43972c79-f7ce-441b-9fe0-cf5170e4d61e` or the projec
 as well as the bare space id `43972c79-f7ce-441b-9fe0-cf5170e4d61e`.
 
 If a space cannot be processed, for example because it does not exist, the command reports the
-error, still processes the remaining spaces and exits with a non-zero exit code. It prints
-`All treesizes are correct` only if every space was processed successfully.
+error, still processes the remaining spaces and exits with a non-zero exit code. The same
+applies if a node in a space cannot be read: its parents are then not written, as their sum
+would be incomplete. In all-spaces mode the command also fails if it finds no spaces, for example
+because of a wrong `STORAGE_USERS_OCIS_ROOT`. It prints `All treesizes are correct` only if every
+space was processed successfully.
 
 Important: stop the `storage-users` service before running the command with `--dry-run=false`
 and start it again afterwards. The service serves the treesize from the file metadata cache
 (`STORAGE_USERS_FILEMETADATA_CACHE_*`, the default TTL is 24 minutes). A repair done while the
 service is running is therefore not visible until the cache entry expires, and a write to the
 space in that window can overwrite the repaired value.
+
+Restarting the service only clears the cache for the default in-memory store
+(`STORAGE_USERS_FILEMETADATA_CACHE_STORE=memory`). With a persistent or shared store such as
+`nats-js-kv` or `redis-sentinel`, the stale entries survive the restart. In that case clear the
+cache while `storage-users` is stopped, or wait until the TTL (`STORAGE_USERS_FILEMETADATA_CACHE_TTL`)
+has expired, before relying on the repaired values.
 
 Note: the command reads the metadata of every node in the space, so it is I/O intensive on
 large spaces. Prefer targeting a single space with `--space-id` over processing all spaces.
