@@ -203,7 +203,7 @@ USAGE:
    ocis storage-users spaces recalculate-treesize [command options]
 
 OPTIONS:
-   --space-id value, -s value  Space ID to recalculate (omit to process all spaces)
+   --space-id value, -s value  Space ID to recalculate, either <storage-id>$<space-id>!<opaque-id>, <storage-id>$<space-id> or the bare <space-id> (omit to process all spaces)
    --dry-run                   Only show which treesizes would be corrected without writing them (default: true)
    --verbose, -v               Enable verbose logging (default: false)
    --help, -h                  show help
@@ -216,6 +216,21 @@ ocis storage-users spaces recalculate-treesize --space-id 43972c79-f7ce-441b-9fe
 # correct them
 ocis storage-users spaces recalculate-treesize --space-id 43972c79-f7ce-441b-9fe0-cf5170e4d61e --dry-run=false
 ```
+
+The `--space-id` flag accepts the space id as exposed by the graph API, WebDAV and the web UI,
+for example `storage-users-1$43972c79-f7ce-441b-9fe0-cf5170e4d61e` or the project form
+`storage-users-1$43972c79-f7ce-441b-9fe0-cf5170e4d61e!43972c79-f7ce-441b-9fe0-cf5170e4d61e`,
+as well as the bare space id `43972c79-f7ce-441b-9fe0-cf5170e4d61e`.
+
+If a space cannot be processed, for example because it does not exist, the command reports the
+error, still processes the remaining spaces and exits with a non-zero exit code. It prints
+`All treesizes are correct` only if every space was processed successfully.
+
+Important: stop the `storage-users` service before running the command with `--dry-run=false`
+and start it again afterwards. The service serves the treesize from the file metadata cache
+(`STORAGE_USERS_FILEMETADATA_CACHE_*`, the default TTL is 24 minutes). A repair done while the
+service is running is therefore not visible until the cache entry expires, and a write to the
+space in that window can overwrite the repaired value.
 
 Note: the command reads the metadata of every node in the space, so it is I/O intensive on
 large spaces. Prefer targeting a single space with `--space-id` over processing all spaces.

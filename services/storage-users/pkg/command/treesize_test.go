@@ -1,6 +1,8 @@
 package command
 
 import (
+	"bytes"
+	"errors"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -8,9 +10,12 @@ import (
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/olekukonko/tablewriter"
+	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
+	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/shamaton/msgpack/v2"
 	"github.com/test-go/testify/require"
+	"github.com/urfave/cli/v2"
 )
 
 // writeNode creates a node file with the given attributes on disk
@@ -176,5 +181,90 @@ func TestRecalculateNode(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 1, corrected)
 		require.Equal(t, "7", storedTreesize(t, dir))
+	})
+}
+
+func TestParseTreesizeSpaceID(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		want    string
+		wantErr bool
+	}{
+		{"bare space id", "9d408cec-8f0a-4d33-8715-89df1217a10c", "9d408cec-8f0a-4d33-8715-89df1217a10c", false},
+		{"storage id and space id", "storage-users-1$9d408cec-8f0a-4d33-8715-89df1217a10c", "9d408cec-8f0a-4d33-8715-89df1217a10c", false},
+		{"project form with opaque id", "storage-users-1$9d408cec-8f0a-4d33-8715-89df1217a10c!9d408cec-8f0a-4d33-8715-89df1217a10c", "9d408cec-8f0a-4d33-8715-89df1217a10c", false},
+		{"empty", "", "", true},
+		{"storage id only", "storage-users-1$", "", true},
+		{"opaque id only", "!abc", "", true},
+		{"path traversal", "../../etc", "", true},
+		{"path separator", "a/b", "", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := parseTreesizeSpaceID(tt.input)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			require.Equal(t, tt.want, got)
+		})
+	}
+}
+
+// writeSpace creates a space root with one file below the given decomposedfs root
+func writeSpace(t *testing.T, storageRoot, spaceID string, treesize, blobsize int) string {
+	t.Helper()
+	root := filepath.Join(storageRoot, "spaces", lookup.Pathify(spaceID, 1, 2), "nodes", lookup.Pathify(spaceID, 4, 2))
+	writeDirNode(t, root, treesize)
+	f := filepath.Join(storageRoot, "file-"+spaceID)
+	writeFileNode(t, f, blobsize)
+	linkChild(t, root, f, "file")
+	return root
+}
+
+func TestRecalculateSpaces(t *testing.T) {
+	const good = "aaaaaaaa-0000-0000-0000-000000000001"
+	const good2 = "cccccccc-0000-0000-0000-000000000003"
+	const missing = "bbbbbbbb-0000-0000-0000-000000000002"
+
+	t.Run("returns an error and no success message when a space is missing", func(t *testing.T) {
+		cfg := &config.Config{}
+		cfg.Drivers.OCIS.Root = t.TempDir()
+		var out, errOut bytes.Buffer
+
+		err := recalculateSpaces(cfg, []string{missing}, true, false, &out, &errOut)
+		require.Error(t, err)
+		var exitErr cli.ExitCoder
+		require.True(t, errors.As(err, &exitErr))
+		require.NotEqual(t, 0, exitErr.ExitCode())
+		require.NotContains(t, out.String(), "All treesizes are correct")
+		require.Contains(t, errOut.String(), missing)
+	})
+
+	t.Run("processes remaining spaces and reports the failure count", func(t *testing.T) {
+		cfg := &config.Config{}
+		cfg.Drivers.OCIS.Root = t.TempDir()
+		root := writeSpace(t, cfg.Drivers.OCIS.Root, good, 999, 5)
+		root2 := writeSpace(t, cfg.Drivers.OCIS.Root, good2, 999, 6)
+		var out, errOut bytes.Buffer
+
+		err := recalculateSpaces(cfg, []string{good, missing, good2}, false, false, &out, &errOut)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "1 of 3 spaces failed")
+		require.Equal(t, "5", storedTreesize(t, root))
+		require.Equal(t, "6", storedTreesize(t, root2))
+		require.NotContains(t, out.String(), "All treesizes are correct")
+	})
+
+	t.Run("succeeds when every space is fine", func(t *testing.T) {
+		cfg := &config.Config{}
+		cfg.Drivers.OCIS.Root = t.TempDir()
+		writeSpace(t, cfg.Drivers.OCIS.Root, good, 5, 5)
+		var out, errOut bytes.Buffer
+
+		require.NoError(t, recalculateSpaces(cfg, []string{good}, true, false, &out, &errOut))
+		require.Contains(t, out.String(), "All treesizes are correct")
 	})
 }

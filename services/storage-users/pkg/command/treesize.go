@@ -3,6 +3,7 @@ package command
 import (
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -16,6 +17,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config/parser"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
+	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/shamaton/msgpack/v2"
 	"github.com/urfave/cli/v2"
 )
@@ -32,7 +34,7 @@ func RecalculateTreesize(cfg *config.Config) *cli.Command {
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "space-id",
-				Usage:    "Space ID to recalculate (omit to process all spaces)",
+				Usage:    "Space ID to recalculate, either <storage-id>$<space-id>!<opaque-id>, <storage-id>$<space-id> or the bare <space-id> (omit to process all spaces)",
 				Required: false,
 				Aliases:  []string{"s"},
 			},
@@ -57,52 +59,84 @@ func RecalculateTreesize(cfg *config.Config) *cli.Command {
 
 			spaceIDs := []string{}
 			if c.IsSet("space-id") {
-				spaceIDs = append(spaceIDs, c.String("space-id"))
+				spaceID, err := parseTreesizeSpaceID(c.String("space-id"))
+				if err != nil {
+					return cli.Exit(err.Error(), 1)
+				}
+				spaceIDs = append(spaceIDs, spaceID)
 			} else {
 				fmt.Println("Scanning all spaces for incorrect treesizes...")
 				spaceIDs = globSpaceIDs(cfg)
 			}
 
-			if dryRun {
-				fmt.Print("Dry run mode enabled, no treesize will be written\n\n")
-			}
-
-			var (
-				table     *tablewriter.Table
-				corrected int
-			)
-			table = tablewriter.NewTable(os.Stdout)
-			table.Header("Space", "Node", "Stored", "Calculated", "Difference")
-
-			for _, spaceID := range spaceIDs {
-				if verbose {
-					fmt.Printf("Recalculating treesizes for space: %s\n", spaceID)
-				}
-				root := filepath.Join(cfg.Drivers.OCIS.Root, "spaces", lookup.Pathify(spaceID, 1, 2), "nodes", lookup.Pathify(spaceID, 4, 2))
-				_, n, err := recalculateNode(cfg, spaceID, root, dryRun, verbose, table)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error recalculating space %s: %s\n", spaceID, err)
-					continue
-				}
-				corrected += n
-			}
-
-			if corrected > 0 {
-				table.Render()
-			}
-
-			switch {
-			case corrected == 0:
-				fmt.Println("All treesizes are correct")
-			case dryRun:
-				fmt.Printf("Would correct %d treesizes. Run with --dry-run=false to apply\n", corrected)
-			default:
-				fmt.Printf("Corrected %d treesizes\n", corrected)
-			}
-
-			return nil
+			return recalculateSpaces(cfg, spaceIDs, dryRun, verbose, os.Stdout, os.Stderr)
 		},
 	}
+}
+
+// parseTreesizeSpaceID extracts the bare space id from the id forms accepted by the
+// --space-id flag: <storage-id>$<space-id>!<opaque-id>, <storage-id>$<space-id> and
+// <space-id>.
+func parseTreesizeSpaceID(id string) (string, error) {
+	rid, err := storagespace.ParseID(id)
+	if err != nil {
+		return "", fmt.Errorf("invalid space id %q: %w", id, err)
+	}
+	spaceID := rid.GetSpaceId()
+	// the id is used to build a path on disk, so only accept a plain, non empty id
+	if spaceID == "" || strings.ContainsAny(spaceID, `/\!$`) || spaceID == "." || spaceID == ".." {
+		return "", fmt.Errorf("invalid space id %q", id)
+	}
+	return spaceID, nil
+}
+
+// recalculateSpaces recalculates the treesizes of the given spaces. A failing space does
+// not stop the processing of the remaining ones, but makes the command fail.
+func recalculateSpaces(cfg *config.Config, spaceIDs []string, dryRun, verbose bool, out, errOut io.Writer) error {
+	if dryRun {
+		fmt.Fprint(out, "Dry run mode enabled, no treesize will be written\n\n")
+	}
+
+	var (
+		table     *tablewriter.Table
+		corrected int
+		failed    int
+	)
+	table = tablewriter.NewTable(out)
+	table.Header("Space", "Node", "Stored", "Calculated", "Difference")
+
+	for _, spaceID := range spaceIDs {
+		if verbose {
+			fmt.Fprintf(out, "Recalculating treesizes for space: %s\n", spaceID)
+		}
+		root := filepath.Join(cfg.Drivers.OCIS.Root, "spaces", lookup.Pathify(spaceID, 1, 2), "nodes", lookup.Pathify(spaceID, 4, 2))
+		_, n, err := recalculateNode(cfg, spaceID, root, dryRun, verbose, table)
+		if err != nil {
+			fmt.Fprintf(errOut, "Error recalculating space %s: %s\n", spaceID, err)
+			failed++
+			continue
+		}
+		corrected += n
+	}
+
+	if corrected > 0 {
+		table.Render()
+	}
+
+	if failed > 0 {
+		return cli.Exit(fmt.Sprintf("%d of %d spaces failed, their treesizes were not verified", failed, len(spaceIDs)), 1)
+	}
+
+	switch {
+	case corrected == 0:
+		fmt.Fprintln(out, "All treesizes are correct")
+	case dryRun:
+		fmt.Fprintf(out, "Would correct %d treesizes. Run with --dry-run=false to apply\n", corrected)
+	default:
+		fmt.Fprintf(out, "Corrected %d treesizes\n", corrected)
+	}
+
+	return nil
 }
 
 // recalculateNode calculates the size of the node at the given path. For directories it
