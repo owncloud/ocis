@@ -90,6 +90,15 @@ func (c *ConcreteClient) SendActionsMail(ctx context.Context, realm, userID stri
 	return c.keycloak.ExecuteActionsEmail(ctx, token.AccessToken, realm, params)
 }
 
+// DeleteUser deletes the user with the given *keycloak* ID from the realm.
+func (c *ConcreteClient) DeleteUser(ctx context.Context, realm, userID string) error {
+	token, err := c.getToken(ctx)
+	if err != nil {
+		return err
+	}
+	return c.keycloak.DeleteUser(ctx, token.AccessToken, realm, userID)
+}
+
 // getUserByParams looks up a user by the given parameters.
 func (c *ConcreteClient) getUserByParams(ctx context.Context, realm string, params gocloak.GetUsersParams) (*libregraph.User, error) {
 	token, err := c.getToken(ctx)
