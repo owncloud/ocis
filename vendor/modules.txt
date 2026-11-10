@@ -860,7 +860,7 @@ github.com/justinas/alice
 # github.com/kevinburke/ssh_config v1.6.0
 ## explicit; go 1.18
 github.com/kevinburke/ssh_config
-# github.com/klauspost/compress v1.20.0
+# github.com/klauspost/compress v1.20.2
 ## explicit; go 1.25
 github.com/klauspost/compress
 github.com/klauspost/compress/flate
