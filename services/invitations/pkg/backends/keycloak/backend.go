@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/Nerzal/gocloak/v13"
@@ -112,14 +113,27 @@ func (b Backend) CanSendMail() bool { return true }
 // SendMail sends a mail to the user with details on how to redeem the invitation.
 func (b Backend) SendMail(ctx context.Context, id string) error {
 	err := b.client.SendActionsMail(ctx, b.userRealm, id, b.userActions)
-	// An error response from Keycloak (HTTP status code set) means the request
-	// was refused and no mail was sent. Transport errors and cancelled contexts
-	// are not marked, as Keycloak may have sent the mail anyway.
-	var apiErr *gocloak.APIError
-	if errors.As(err, &apiErr) && apiErr.Code > 0 {
+	if isDefiniteRejection(err) {
 		return fmt.Errorf("%w: %w", invitations.ErrRejected, err)
 	}
 	return err
+}
+
+// isDefiniteRejection reports whether err is an error response from Keycloak
+// that certainly means the request was refused and no mail was sent. Transport
+// errors and cancelled contexts are not, as Keycloak may have sent the mail
+// anyway. The same holds for 502 and 504: they typically come from a reverse
+// proxy in front of Keycloak, which may already have processed the request.
+func isDefiniteRejection(err error) bool {
+	var apiErr *gocloak.APIError
+	if !errors.As(err, &apiErr) || apiErr.Code <= 0 {
+		return false
+	}
+	switch apiErr.Code {
+	case http.StatusBadGateway, http.StatusGatewayTimeout:
+		return false
+	}
+	return true
 }
 
 // DeleteUser deletes the user with the given identifier from the keycloak backend.
