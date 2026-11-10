@@ -9,10 +9,10 @@ import "errors"
 
 // Request is the sanitized body forwarded to the upstream LLM.
 type Request struct {
-	Model       string        `json:"model"`
-	Messages    []interface{} `json:"messages"`
-	MaxTokens   int           `json:"max_tokens"`
-	Temperature *float64      `json:"temperature,omitempty"`
+	Model       string   `json:"model"`
+	Messages    []any    `json:"messages"`
+	MaxTokens   int      `json:"max_tokens"`
+	Temperature *float64 `json:"temperature,omitempty"`
 }
 
 // Body validates and sanitizes a client's decoded JSON body.
@@ -20,7 +20,7 @@ type Request struct {
 // modelOverride, when non-empty, replaces whatever model the client sent.
 // maxTokensLimit is a hard ceiling: the client's max_tokens is used only if
 // positive, and is always clamped to this limit, which must itself be positive.
-func Body(raw map[string]interface{}, modelOverride string, maxTokensLimit int) (Request, error) {
+func Body(raw map[string]any, modelOverride string, maxTokensLimit int) (Request, error) {
 	if maxTokensLimit <= 0 {
 		return Request{}, errors.New("max tokens limit must be positive")
 	}
@@ -39,12 +39,12 @@ func Body(raw map[string]interface{}, modelOverride string, maxTokensLimit int) 
 		return Request{}, errors.New("model is required")
 	}
 
-	messages, ok := raw["messages"].([]interface{})
+	messages, ok := raw["messages"].([]any)
 	if !ok || len(messages) == 0 {
 		return Request{}, errors.New("messages must be a non-empty array")
 	}
 	for _, m := range messages {
-		msg, ok := m.(map[string]interface{})
+		msg, ok := m.(map[string]any)
 		if !ok {
 			return Request{}, errors.New("each message must be an object")
 		}

@@ -336,7 +336,7 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 				log.Error().Msg("Unknown share manager type '" + oldDriver + "'")
 				os.Exit(1)
 			}
-			oldMgr, err := f(rcfg[oldDriver].(map[string]interface{}))
+			oldMgr, err := f(rcfg[oldDriver].(map[string]any))
 			if err != nil {
 				log.Error().Err(err).Msg("failed to initiate source share manager")
 				os.Exit(1)
@@ -352,7 +352,7 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 				log.Error().Msg("Unknown share manager type '" + newDriver + "'")
 				os.Exit(1)
 			}
-			newMgr, err := f(rcfg[newDriver].(map[string]interface{}))
+			newMgr, err := f(rcfg[newDriver].(map[string]any))
 			if err != nil {
 				log.Error().Err(err).Msg("failed to initiate destination share manager")
 				os.Exit(1)
@@ -431,7 +431,7 @@ func MigratePublicShares(cfg *config.Config) *cli.Command {
 				log.Error().Msg("Unknown public share manager type '" + oldDriver + "'")
 				os.Exit(1)
 			}
-			oldMgr, err := f(rcfg[oldDriver].(map[string]interface{}))
+			oldMgr, err := f(rcfg[oldDriver].(map[string]any))
 			if err != nil {
 				log.Error().Err(err).Msg("failed to initiate source public share manager")
 				os.Exit(1)
@@ -447,7 +447,7 @@ func MigratePublicShares(cfg *config.Config) *cli.Command {
 				log.Error().Msg("Unknown public share manager type '" + newDriver + "'")
 				os.Exit(1)
 			}
-			newMgr, err := f(rcfg[newDriver].(map[string]interface{}))
+			newMgr, err := f(rcfg[newDriver].(map[string]any))
 			if err != nil {
 				log.Error().Err(err).Msg("failed to initiate destination public share manager")
 				os.Exit(1)
@@ -485,13 +485,13 @@ func MigratePublicShares(cfg *config.Config) *cli.Command {
 	}
 }
 
-func revaShareConfig(cfg *sharing.Config) map[string]interface{} {
-	return map[string]interface{}{
-		"json": map[string]interface{}{
+func revaShareConfig(cfg *sharing.Config) map[string]any {
+	return map[string]any{
+		"json": map[string]any{
 			"file":         cfg.UserSharingDrivers.JSON.File,
 			"gateway_addr": cfg.Reva.Address,
 		},
-		"sql": map[string]interface{}{ // cernbox sql
+		"sql": map[string]any{ // cernbox sql
 			"db_username":                   cfg.UserSharingDrivers.SQL.DBUsername,
 			"db_password":                   cfg.UserSharingDrivers.SQL.DBPassword,
 			"db_host":                       cfg.UserSharingDrivers.SQL.DBHost,
@@ -501,14 +501,14 @@ func revaShareConfig(cfg *sharing.Config) map[string]interface{} {
 			"enable_expired_shares_cleanup": cfg.UserSharingDrivers.SQL.EnableExpiredSharesCleanup,
 			"janitor_run_interval":          cfg.UserSharingDrivers.SQL.JanitorRunInterval,
 		},
-		"cs3": map[string]interface{}{
+		"cs3": map[string]any{
 			"gateway_addr":        cfg.UserSharingDrivers.CS3.ProviderAddr,
 			"provider_addr":       cfg.UserSharingDrivers.CS3.ProviderAddr,
 			"service_user_id":     cfg.UserSharingDrivers.CS3.SystemUserID,
 			"service_user_idp":    cfg.UserSharingDrivers.CS3.SystemUserIDP,
 			"machine_auth_apikey": cfg.UserSharingDrivers.CS3.SystemUserAPIKey,
 		},
-		"jsoncs3": map[string]interface{}{
+		"jsoncs3": map[string]any{
 			"gateway_addr":        cfg.Reva.Address,
 			"provider_addr":       cfg.UserSharingDrivers.JSONCS3.ProviderAddr,
 			"service_user_id":     cfg.UserSharingDrivers.JSONCS3.SystemUserID,
@@ -518,20 +518,20 @@ func revaShareConfig(cfg *sharing.Config) map[string]interface{} {
 	}
 }
 
-func revaPublicShareConfig(cfg *sharing.Config) map[string]interface{} {
-	return map[string]interface{}{
-		"json": map[string]interface{}{
+func revaPublicShareConfig(cfg *sharing.Config) map[string]any {
+	return map[string]any{
+		"json": map[string]any{
 			"file":         cfg.PublicSharingDrivers.JSON.File,
 			"gateway_addr": cfg.Reva.Address,
 		},
-		"jsoncs3": map[string]interface{}{
+		"jsoncs3": map[string]any{
 			"gateway_addr":        cfg.Reva.Address,
 			"provider_addr":       cfg.PublicSharingDrivers.JSONCS3.ProviderAddr,
 			"service_user_id":     cfg.PublicSharingDrivers.JSONCS3.SystemUserID,
 			"service_user_idp":    cfg.PublicSharingDrivers.JSONCS3.SystemUserIDP,
 			"machine_auth_apikey": cfg.PublicSharingDrivers.JSONCS3.SystemUserAPIKey,
 		},
-		"sql": map[string]interface{}{
+		"sql": map[string]any{
 			"db_username":                   cfg.PublicSharingDrivers.SQL.DBUsername,
 			"db_password":                   cfg.PublicSharingDrivers.SQL.DBPassword,
 			"db_host":                       cfg.PublicSharingDrivers.SQL.DBHost,
@@ -541,7 +541,7 @@ func revaPublicShareConfig(cfg *sharing.Config) map[string]interface{} {
 			"enable_expired_shares_cleanup": cfg.PublicSharingDrivers.SQL.EnableExpiredSharesCleanup,
 			"janitor_run_interval":          cfg.PublicSharingDrivers.SQL.JanitorRunInterval,
 		},
-		"cs3": map[string]interface{}{
+		"cs3": map[string]any{
 			"gateway_addr":        cfg.PublicSharingDrivers.CS3.ProviderAddr,
 			"provider_addr":       cfg.PublicSharingDrivers.CS3.ProviderAddr,
 			"service_user_id":     cfg.PublicSharingDrivers.CS3.SystemUserID,

@@ -79,7 +79,7 @@ func TestSelectorCookie(t *testing.T) {
 
 			req := httptest.NewRequest("GET", "https://example.com", nil)
 			if tt.hasOIDCContext {
-				req = req.WithContext(oidc.NewContext(req.Context(), map[string]interface{}{
+				req = req.WithContext(oidc.NewContext(req.Context(), map[string]any{
 					oidc.OcisRoutingPolicy: expectedCookieValue,
 				}))
 			}

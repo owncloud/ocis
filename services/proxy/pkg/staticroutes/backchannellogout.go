@@ -85,7 +85,7 @@ func (s StaticRouteHandler) publishBackchannelLogoutEvent(ctx context.Context, r
 		return fmt.Errorf("userinfo not found")
 	}
 
-	var claims map[string]interface{}
+	var claims map[string]any
 	if err = msgpack.UnmarshalAsMap(urecords[0].Value, &claims); err != nil {
 		return fmt.Errorf("could not unmarshal userinfo: %w", err)
 	}

@@ -163,7 +163,7 @@ func (c *cs3backend) Authenticate(ctx context.Context, username string, password
 // attributes from the provided `claims` map. On success it returns the new
 // user. If the user already exist this is not considered an error and the
 // function will just return the existing user.
-func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string]interface{}) (*cs3.User, error) {
+func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string]any) (*cs3.User, error) {
 	gatewayClient, err := c.gatewaySelector.Next()
 	if err != nil {
 		c.logger.Error().Err(err).Msg("could not select next gateway client")
@@ -235,7 +235,7 @@ func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string
 	return &cs3UserCreated, nil
 }
 
-func (c *cs3backend) UpdateUserIfNeeded(ctx context.Context, user *cs3.User, claims map[string]interface{}) error {
+func (c *cs3backend) UpdateUserIfNeeded(ctx context.Context, user *cs3.User, claims map[string]any) error {
 	newUser, err := c.libregraphUserFromClaims(claims)
 	if err != nil {
 		c.logger.Error().Err(err).Interface("claims", claims).Msg("Error converting claims to user")
@@ -262,13 +262,13 @@ func (c *cs3backend) UpdateUserIfNeeded(ctx context.Context, user *cs3.User, cla
 // groupsClaimPresent reports whether the configured groups claim is present and
 // non-null in the token claims. An absent or null claim must not be treated as
 // an empty group list, otherwise the user would be removed from all groups.
-func groupsClaimPresent(claims map[string]interface{}, claimName string) bool {
+func groupsClaimPresent(claims map[string]any, claimName string) bool {
 	v, ok := claims[claimName]
 	return ok && v != nil
 }
 
 // SyncGroupMemberships maintains a users group memberships based on an OIDC claim
-func (c *cs3backend) SyncGroupMemberships(ctx context.Context, user *cs3.User, claims map[string]interface{}) error {
+func (c *cs3backend) SyncGroupMemberships(ctx context.Context, user *cs3.User, claims map[string]any) error {
 	if c.autoProvisionClaims.Groups == "" {
 		// do not sync groups when claim is not set
 		return nil
@@ -318,7 +318,7 @@ func (c *cs3backend) SyncGroupMemberships(ctx context.Context, user *cs3.User, c
 	}
 
 	newGroupSet := make(map[string]struct{})
-	if groups, ok := claims[c.autoProvisionClaims.Groups].([]interface{}); ok {
+	if groups, ok := claims[c.autoProvisionClaims.Groups].([]any); ok {
 		for _, g := range groups {
 			if group, ok := g.(string); ok {
 				newGroupSet[group] = struct{}{}
@@ -498,7 +498,7 @@ func (c *cs3backend) isAlreadyExists(resp *http.Response) (bool, error) {
 	return false, nil
 }
 
-func (c *cs3backend) libregraphUserFromClaims(claims map[string]interface{}) (libregraph.User, error) {
+func (c *cs3backend) libregraphUserFromClaims(claims map[string]any) (libregraph.User, error) {
 	user := libregraph.User{}
 	if dn, ok := claims[c.autoProvisionClaims.DisplayName].(string); ok {
 		user.SetDisplayName(dn)

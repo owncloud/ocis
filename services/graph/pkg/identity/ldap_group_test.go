@@ -370,8 +370,8 @@ func TestUpdateGroupName(t *testing.T) {
 
 	type mockInputs struct {
 		funcName string
-		args     []interface{}
-		returns  []interface{}
+		args     []any
+		returns  []any
 	}
 
 	tests := []struct {
@@ -386,13 +386,13 @@ func TestUpdateGroupName(t *testing.T) {
 				groupId: "some-uuid-string",
 				newName: "TheGroup",
 			},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 			ldapMocks: []mockInputs{
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						ldap.NewSearchRequest(
 							"ou=groups,dc=test",
 							ldap.ScopeWholeSubtree,
@@ -402,7 +402,7 @@ func TestUpdateGroupName(t *testing.T) {
 							nil,
 						),
 					},
-					returns: []interface{}{
+					returns: []any{
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
@@ -427,13 +427,13 @@ func TestUpdateGroupName(t *testing.T) {
 				groupId: "some-uuid-string",
 				newName: "TheGroupWithShinyNewName",
 			},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 			ldapMocks: []mockInputs{
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						ldap.NewSearchRequest(
 							"ou=groups,dc=test",
 							ldap.ScopeWholeSubtree,
@@ -443,7 +443,7 @@ func TestUpdateGroupName(t *testing.T) {
 							nil,
 						),
 					},
-					returns: []interface{}{
+					returns: []any{
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
@@ -462,7 +462,7 @@ func TestUpdateGroupName(t *testing.T) {
 				},
 				{
 					funcName: "ModifyDN",
-					args: []interface{}{
+					args: []any{
 						&ldap.ModifyDNRequest{
 							DN:           groupDn,
 							NewRDN:       "cn=TheGroupWithShinyNewName",
@@ -471,7 +471,7 @@ func TestUpdateGroupName(t *testing.T) {
 							Controls:     []ldap.Control(nil),
 						},
 					},
-					returns: []interface{}{
+					returns: []any{
 						nil,
 					},
 				},

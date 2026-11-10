@@ -125,7 +125,7 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 	var (
 		users  []string
 		evType string
-		data   interface{}
+		data   any
 	)
 
 	fileEv := func(typ string, ref *provider.Reference) {
@@ -212,7 +212,7 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 	}
 }
 
-func (cl *ClientlogService) sendSSE(userIDs []string, evType string, data interface{}) error {
+func (cl *ClientlogService) sendSSE(userIDs []string, evType string, data any) error {
 	b, err := json.Marshal(data)
 	if err != nil {
 		return err

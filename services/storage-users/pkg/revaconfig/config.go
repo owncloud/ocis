@@ -11,41 +11,41 @@ import (
 )
 
 // StorageUsersConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
-func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
+func StorageUsersConfigFromStruct(cfg *config.Config) map[string]any {
 	// Credentials must not be combined with a wildcard origin.
 	corsAllowCredentials := cfg.HTTP.CORS.AllowCredentials
 	if corsAllowCredentials && cors.AllowsAnyOrigin(cfg.HTTP.CORS.AllowedOrigins) {
 		corsAllowCredentials = false
 	}
 
-	rcfg := map[string]interface{}{
-		"core": map[string]interface{}{
+	rcfg := map[string]any{
+		"core": map[string]any{
 			"graceful_shutdown_timeout": cfg.GracefulShutdownTimeout,
 		},
-		"shared": map[string]interface{}{
+		"shared": map[string]any{
 			"jwt_secret":                cfg.TokenManager.JWTSecret,
 			"gatewaysvc":                cfg.Reva.Address,
 			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 			"grpc_client_options":       cfg.Reva.GetGRPCClientConfig(),
 		},
-		"grpc": map[string]interface{}{
+		"grpc": map[string]any{
 			"network": cfg.GRPC.Protocol,
 			"address": cfg.GRPC.Addr,
-			"tls_settings": map[string]interface{}{
+			"tls_settings": map[string]any{
 				"enabled":     cfg.GRPC.TLS.Enabled,
 				"certificate": cfg.GRPC.TLS.Cert,
 				"key":         cfg.GRPC.TLS.Key,
 			},
 			// TODO build services dynamically
-			"services": map[string]interface{}{
-				"storageprovider": map[string]interface{}{
+			"services": map[string]any{
+				"storageprovider": map[string]any{
 					"driver":             cfg.Driver,
 					"drivers":            StorageProviderDrivers(cfg),
 					"mount_id":           cfg.MountID,
 					"expose_data_server": cfg.ExposeDataServer,
 					"data_server_url":    cfg.DataServerURL,
 					"upload_expiration":  cfg.UploadExpiration,
-					"events": map[string]interface{}{
+					"events": map[string]any{
 						"nats_address":     cfg.Events.Endpoint,
 						"nats_clusterid":   cfg.Events.Cluster,
 						"tls_insecure":     cfg.Events.TLSInsecure,
@@ -58,8 +58,8 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					},
 				},
 			},
-			"interceptors": map[string]interface{}{
-				"eventsmiddleware": map[string]interface{}{
+			"interceptors": map[string]any{
+				"eventsmiddleware": map[string]any{
 					"group":            "sharing",
 					"type":             "nats",
 					"address":          cfg.Events.Endpoint,
@@ -73,21 +73,21 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"creds-file":       cfg.Events.CredsFile,
 					"creds":            cfg.Events.Creds,
 				},
-				"prometheus": map[string]interface{}{
+				"prometheus": map[string]any{
 					"namespace": "ocis",
 					"subsystem": "storage_users",
 				},
 			},
 		},
-		"http": map[string]interface{}{
+		"http": map[string]any{
 			"network": cfg.HTTP.Protocol,
 			"address": cfg.HTTP.Addr,
-			"middlewares": map[string]interface{}{
-				"requestid": map[string]interface{}{},
+			"middlewares": map[string]any{
+				"requestid": map[string]any{},
 			},
 			// TODO build services dynamically
-			"services": map[string]interface{}{
-				"dataprovider": map[string]interface{}{
+			"services": map[string]any{
+				"dataprovider": map[string]any{
 					"prefix":                 cfg.HTTP.Prefix,
 					"driver":                 cfg.Driver,
 					"drivers":                DataProviderDrivers(cfg),
@@ -101,18 +101,18 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"nats_password":          cfg.Events.AuthPassword,
 					"nats_creds_file":        cfg.Events.CredsFile,
 					"nats_creds":             cfg.Events.Creds,
-					"data_txs": map[string]interface{}{
-						"simple": map[string]interface{}{
+					"data_txs": map[string]any{
+						"simple": map[string]any{
 							"cache_store":    "noop",
 							"cache_database": "system",
 							"cache_table":    "stat",
 						},
-						"spaces": map[string]interface{}{
+						"spaces": map[string]any{
 							"cache_store":    "noop",
 							"cache_database": "system",
 							"cache_table":    "stat",
 						},
-						"tus": map[string]interface{}{
+						"tus": map[string]any{
 							"cache_store":    "noop",
 							"cache_database": "system",
 							"cache_table":    "stat",
@@ -130,22 +130,22 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 			},
 		},
 	}
-	gcfg := rcfg["grpc"].(map[string]interface{})
+	gcfg := rcfg["grpc"].(map[string]any)
 	if cfg.ReadOnly {
 		// Replace all interceptors with readonly when the storage is read-only.
 		// eventsmiddleware and prometheus are intentionally dropped in this mode.
-		gcfg["interceptors"] = map[string]interface{}{
-			"readonly": map[string]interface{}{},
+		gcfg["interceptors"] = map[string]any{
+			"readonly": map[string]any{},
 		}
 	}
 	if cfg.EnableVaultMode {
 		// Set mfa_enabled inside the auth interceptor config so that all gRPC
 		// calls to this vault storage-users instance require MFA authentication.
-		interceptors := gcfg["interceptors"].(map[string]interface{})
-		if authCfg, ok := interceptors["auth"].(map[string]interface{}); ok {
+		interceptors := gcfg["interceptors"].(map[string]any)
+		if authCfg, ok := interceptors["auth"].(map[string]any); ok {
 			authCfg["mfa_enabled"] = true
 		} else {
-			interceptors["auth"] = map[string]interface{}{
+			interceptors["auth"] = map[string]any{
 				"mfa_enabled": true,
 			}
 		}

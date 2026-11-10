@@ -79,10 +79,10 @@ func TestClaimsSelector(t *testing.T) {
 
 	var tests = []testCase{
 		{"unauthenticated", context.Background(), nil, "unauthenticated"},
-		{"default", oidc.NewContext(context.Background(), map[string]interface{}{oidc.OcisRoutingPolicy: ""}), nil, "default"},
-		{"claim-value", oidc.NewContext(context.Background(), map[string]interface{}{oidc.OcisRoutingPolicy: "ocis.routing.policy-value"}), nil, "ocis.routing.policy-value"},
+		{"default", oidc.NewContext(context.Background(), map[string]any{oidc.OcisRoutingPolicy: ""}), nil, "default"},
+		{"claim-value", oidc.NewContext(context.Background(), map[string]any{oidc.OcisRoutingPolicy: "ocis.routing.policy-value"}), nil, "ocis.routing.policy-value"},
 		{"cookie-only", context.Background(), &http.Cookie{Name: SelectorCookieName, Value: "cookie"}, "cookie"},
-		{"claim-can-override-cookie", oidc.NewContext(context.Background(), map[string]interface{}{oidc.OcisRoutingPolicy: "ocis.routing.policy-value"}), &http.Cookie{Name: SelectorCookieName, Value: "cookie"}, "ocis.routing.policy-value"},
+		{"claim-can-override-cookie", oidc.NewContext(context.Background(), map[string]any{oidc.OcisRoutingPolicy: "ocis.routing.policy-value"}), &http.Cookie{Name: SelectorCookieName, Value: "cookie"}, "ocis.routing.policy-value"},
 	}
 	for _, tc := range tests {
 		r := httptest.NewRequest("GET", "https://example.com", nil)

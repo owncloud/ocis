@@ -6,30 +6,30 @@ import (
 )
 
 // StorageSharesConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
-func StorageSharesConfigFromStruct(cfg *config.Config) map[string]interface{} {
-	rcfg := map[string]interface{}{
-		"shared": map[string]interface{}{
+func StorageSharesConfigFromStruct(cfg *config.Config) map[string]any {
+	rcfg := map[string]any{
+		"shared": map[string]any{
 			"jwt_secret":                cfg.TokenManager.JWTSecret,
 			"gatewaysvc":                cfg.Reva.Address,
 			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 			"grpc_client_options":       cfg.Reva.GetGRPCClientConfig(),
 		},
-		"grpc": map[string]interface{}{
+		"grpc": map[string]any{
 			"network": cfg.GRPC.Protocol,
 			"address": cfg.GRPC.Addr,
-			"tls_settings": map[string]interface{}{
+			"tls_settings": map[string]any{
 				"enabled":     cfg.GRPC.TLS.Enabled,
 				"certificate": cfg.GRPC.TLS.Cert,
 				"key":         cfg.GRPC.TLS.Key,
 			},
-			"services": map[string]interface{}{
-				"sharesstorageprovider": map[string]interface{}{
+			"services": map[string]any{
+				"sharesstorageprovider": map[string]any{
 					"usershareprovidersvc": cfg.SharesProviderEndpoint,
 					"mount_id":             cfg.MountID,
 				},
 			},
-			"interceptors": map[string]interface{}{
-				"prometheus": map[string]interface{}{
+			"interceptors": map[string]any{
+				"prometheus": map[string]any{
 					"namespace": "ocis",
 					"subsystem": "storage_shares",
 				},
@@ -37,9 +37,9 @@ func StorageSharesConfigFromStruct(cfg *config.Config) map[string]interface{} {
 		},
 	}
 	if cfg.ReadOnly {
-		gcfg := rcfg["grpc"].(map[string]interface{})
-		gcfg["interceptors"] = map[string]interface{}{
-			"readonly": map[string]interface{}{},
+		gcfg := rcfg["grpc"].(map[string]any)
+		gcfg["interceptors"] = map[string]any{
+			"readonly": map[string]any{},
 		}
 	}
 	return rcfg
