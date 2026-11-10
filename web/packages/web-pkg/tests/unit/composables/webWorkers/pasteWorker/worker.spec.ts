@@ -145,7 +145,9 @@ describe('paste worker', () => {
     unref(worker.worker).onmessage = (e: MessageEvent) => {
       const { successful, failed } = JSON.parse(e.data)
       expect(successful.length).toBe(0)
-      expect(failed).toEqual([{ resourceName: resourceMock.name, message: 'Failed to fetch' }])
+      expect(failed).toEqual([
+        { resourceName: resourceMock.name, isFolder: true, message: 'Failed to fetch' }
+      ])
 
       resolveTest(true)
     }
@@ -155,7 +157,13 @@ describe('paste worker', () => {
         topic: 'startProcess',
         data: {
           baseUrl: 'https://example.com',
-          transferData: [{ ...transferDataMock, transferType: TransferType.DUPLICATE }]
+          transferData: [
+            {
+              ...transferDataMock,
+              resource: { ...resourceMock, isFolder: true },
+              transferType: TransferType.DUPLICATE
+            }
+          ]
         }
       })
     )
