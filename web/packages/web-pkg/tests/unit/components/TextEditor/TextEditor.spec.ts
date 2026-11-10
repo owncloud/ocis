@@ -207,4 +207,15 @@ describe('TextEditor — image upload', () => {
     const [{ editorExtensions }] = vi.mocked(config).mock.calls.at(-1)
     expect(editorExtensions.cropper.instance).toBeDefined()
   })
+
+  // Without no-echarts, md-editor-v3 renders ```echarts fences and evaluates their
+  // content with new Function(), and injects echarts from unpkg.com on mount.
+  it.each([
+    { isReadOnly: false, component: 'MdEditor' },
+    { isReadOnly: true, component: 'MdPreview' }
+  ])('disables echarts on $component', ({ isReadOnly, component }) => {
+    const wrapper = getWrapper({ isReadOnly })
+
+    expect(wrapper.findComponent({ name: component }).attributes('no-echarts')).toBeDefined()
+  })
 })
