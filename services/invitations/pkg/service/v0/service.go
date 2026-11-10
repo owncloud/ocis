@@ -42,6 +42,9 @@ type Backend interface {
 	CanSendMail() bool
 	// SendMail sends a mail to the user with details on how to reedeem the invitation.
 	SendMail(ctx context.Context, identifier string) error
+	// DeleteUser deletes a previously created user. It is used to roll back
+	// the creation when the invitation can not be completed.
+	DeleteUser(ctx context.Context, identifier string) error
 }
 
 // New returns a new instance of Service
@@ -93,6 +96,17 @@ func (s svc) Invite(ctx context.Context, invitation *invitations.Invitation) (*i
 	if s.backend.CanSendMail() {
 		err := s.backend.SendMail(ctx, id)
 		if err != nil {
+			// The guest can not redeem the invitation without the mail, and a
+			// leftover user would make every retry fail with a conflict, so
+			// roll the creation back.
+			if delErr := s.backend.DeleteUser(ctx, id); delErr != nil {
+				s.log.Error().
+					Str("userID", id).
+					Str("email", invitation.InvitedUserEmailAddress).
+					Err(delErr).
+					AnErr("mailError", err).
+					Msg("Failed to roll back user after sending the invitation mail failed")
+			}
 			return nil, fmt.Errorf("%w: %s", ErrBackend, err)
 		}
 	}

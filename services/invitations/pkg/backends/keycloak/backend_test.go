@@ -5,6 +5,7 @@ package keycloak_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	kcpkg "github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
@@ -205,4 +206,20 @@ func TestBackend_SendMail(t *testing.T) {
 			tt.assertion(t, b.SendMail(ctx, tt.args.id))
 		})
 	}
+}
+
+func TestBackend_DeleteUser(t *testing.T) {
+	t.Run("deletes the user in the user realm", func(t *testing.T) {
+		c := &mocks.Client{}
+		c.On("DeleteUser", mock.Anything, userRealm, "test-id").Return(nil)
+		b := keycloak.NewWithClient(log.NopLogger(), c, userRealm, nil)
+		assert.NoError(t, b.DeleteUser(context.Background(), "test-id"))
+		c.AssertExpectations(t)
+	})
+	t.Run("returns the client error", func(t *testing.T) {
+		c := &mocks.Client{}
+		c.On("DeleteUser", mock.Anything, userRealm, "test-id").Return(errors.New("boom"))
+		b := keycloak.NewWithClient(log.NopLogger(), c, userRealm, nil)
+		assert.EqualError(t, b.DeleteUser(context.Background(), "test-id"), "boom")
+	})
 }

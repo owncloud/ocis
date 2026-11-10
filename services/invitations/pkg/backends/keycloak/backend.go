@@ -111,6 +111,11 @@ func (b Backend) SendMail(ctx context.Context, id string) error {
 	return b.client.SendActionsMail(ctx, b.userRealm, id, b.userActions)
 }
 
+// DeleteUser deletes the user with the given identifier from the keycloak backend.
+func (b Backend) DeleteUser(ctx context.Context, id string) error {
+	return b.client.DeleteUser(ctx, b.userRealm, id)
+}
+
 // parseUserActions converts the configured Keycloak required-action strings
 // into UserActions. Each non-empty value is passed through to Keycloak as-is
 // (Keycloak validates the actions), so operators can configure any action their
