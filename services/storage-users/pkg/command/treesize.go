@@ -66,7 +66,11 @@ func RecalculateTreesize(cfg *config.Config) *cli.Command {
 				spaceIDs = append(spaceIDs, spaceID)
 			} else {
 				fmt.Println("Scanning all spaces for incorrect treesizes...")
-				spaceIDs = globSpaceIDs(cfg)
+				var err error
+				spaceIDs, err = listSpaceIDs(cfg)
+				if err != nil {
+					return cli.Exit(err.Error(), 1)
+				}
 			}
 
 			return recalculateSpaces(cfg, spaceIDs, dryRun, verbose, os.Stdout, os.Stderr)
@@ -90,6 +94,39 @@ func parseTreesizeSpaceID(id string) (string, error) {
 	return spaceID, nil
 }
 
+// listSpaceIDs returns the ids of all spaces below the storage root. Finding none is an
+// error, it points to a wrong storage root or an unsupported storage driver.
+func listSpaceIDs(cfg *config.Config) ([]string, error) {
+	root := cfg.Drivers.OCIS.Root
+	dirs, err := fs.Glob(os.DirFS(root), "spaces/*/*/nodes")
+	if err != nil {
+		return nil, fmt.Errorf("could not scan the spaces root directory %s: %w", root, err)
+	}
+	if len(dirs) == 0 {
+		return nil, fmt.Errorf("no spaces found in %s, check STORAGE_USERS_OCIS_ROOT and the storage driver", root)
+	}
+	spaceIDs := make([]string, 0, len(dirs))
+	for _, dir := range dirs {
+		// For dir i.e. spaces/9d/408cec-8f0a-4d33-8715-89df1217a10c/nodes
+		// spaceID is 9d408cec-8f0a-4d33-8715-89df1217a10c
+		spaceIDs = append(spaceIDs, strings.ReplaceAll(strings.TrimSuffix(strings.TrimPrefix(dir, "spaces/"), "/nodes"), "/", ""))
+	}
+	return spaceIDs, nil
+}
+
+// spaceRootPath returns the path of the root node of the space. It fails if the path
+// would end up outside of the spaces directory of the storage root, as pathifying an id
+// like "........x" produces ".." path elements.
+func spaceRootPath(cfg *config.Config, spaceID string) (string, error) {
+	spacesDir := filepath.Join(cfg.Drivers.OCIS.Root, "spaces")
+	root := filepath.Join(spacesDir, lookup.Pathify(spaceID, 1, 2), "nodes", lookup.Pathify(spaceID, 4, 2))
+	rel, err := filepath.Rel(spacesDir, root)
+	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return "", fmt.Errorf("invalid space id %q", spaceID)
+	}
+	return root, nil
+}
+
 // recalculateSpaces recalculates the treesizes of the given spaces. A failing space does
 // not stop the processing of the remaining ones, but makes the command fail.
 func recalculateSpaces(cfg *config.Config, spaceIDs []string, dryRun, verbose bool, out, errOut io.Writer) error {
@@ -97,45 +134,45 @@ func recalculateSpaces(cfg *config.Config, spaceIDs []string, dryRun, verbose bo
 		fmt.Fprint(out, "Dry run mode enabled, no treesize will be written\n\n")
 	}
 
-	var (
-		table     *tablewriter.Table
-		corrected int
-		failed    int
-	)
-	table = tablewriter.NewTable(out)
+	table := tablewriter.NewTable(out)
 	table.Header("Space", "Node", "Stored", "Calculated", "Difference")
 
+	var corrected, failed int
 	for _, spaceID := range spaceIDs {
 		if verbose {
 			fmt.Fprintf(out, "Recalculating treesizes for space: %s\n", spaceID)
 		}
-		root := filepath.Join(cfg.Drivers.OCIS.Root, "spaces", lookup.Pathify(spaceID, 1, 2), "nodes", lookup.Pathify(spaceID, 4, 2))
-		_, n, err := recalculateNode(cfg, spaceID, root, dryRun, verbose, table)
+		root, err := spaceRootPath(cfg, spaceID)
 		if err != nil {
 			fmt.Fprintf(errOut, "Error recalculating space %s: %s\n", spaceID, err)
 			failed++
 			continue
 		}
+		_, n, err := recalculateNode(cfg, spaceID, root, dryRun, verbose, table, errOut)
+		// treesizes corrected before the error occurred count as well
 		corrected += n
+		if err != nil {
+			fmt.Fprintf(errOut, "Error recalculating space %s: %s\n", spaceID, err)
+			failed++
+		}
 	}
 
 	if corrected > 0 {
 		table.Render()
 	}
 
-	if failed > 0 {
-		return cli.Exit(fmt.Sprintf("%d of %d spaces failed, their treesizes were not verified", failed, len(spaceIDs)), 1)
-	}
-
 	switch {
-	case corrected == 0:
-		fmt.Fprintln(out, "All treesizes are correct")
-	case dryRun:
+	case corrected > 0 && dryRun:
 		fmt.Fprintf(out, "Would correct %d treesizes. Run with --dry-run=false to apply\n", corrected)
-	default:
+	case corrected > 0:
 		fmt.Fprintf(out, "Corrected %d treesizes\n", corrected)
+	case failed == 0:
+		fmt.Fprintln(out, "All treesizes are correct")
 	}
 
+	if failed > 0 {
+		return cli.Exit(fmt.Sprintf("%d of %d spaces could not be processed completely, their treesizes may still be incorrect", failed, len(spaceIDs)), 1)
+	}
 	return nil
 }
 
@@ -143,7 +180,7 @@ func recalculateSpaces(cfg *config.Config, spaceIDs []string, dryRun, verbose bo
 // recurses into the children first, so the whole subtree is corrected bottom up, and
 // compares the sum against the stored treesize. It returns the calculated size of the
 // node and the number of corrected treesizes in the subtree.
-func recalculateNode(cfg *config.Config, spaceID, path string, dryRun, verbose bool, table *tablewriter.Table) (uint64, int, error) {
+func recalculateNode(cfg *config.Config, spaceID, path string, dryRun, verbose bool, table *tablewriter.Table, errOut io.Writer) (uint64, int, error) {
 	attribs, err := readAttributes(path)
 	if err != nil {
 		return 0, 0, err
@@ -158,7 +195,7 @@ func recalculateNode(cfg *config.Config, spaceID, path string, dryRun, verbose b
 		if err != nil {
 			// a node without a blobsize contributes nothing, but it is worth reporting
 			if verbose {
-				fmt.Fprintf(os.Stderr, "  Could not read blobsize of %s: %s\n", path, err)
+				fmt.Fprintf(errOut, "  Could not read blobsize of %s: %s\n", path, err)
 			}
 			return 0, 0, nil
 		}
@@ -174,27 +211,33 @@ func recalculateNode(cfg *config.Config, spaceID, path string, dryRun, verbose b
 	}
 
 	var (
-		calculated uint64
-		corrected  int
+		calculated     uint64
+		corrected      int
+		failedChildren int
 	)
 	for _, entry := range entries {
 		child, err := filepath.EvalSymlinks(filepath.Join(path, entry.Name()))
 		if err != nil {
 			// dangling child entry, it contributes nothing
 			if verbose {
-				fmt.Fprintf(os.Stderr, "  Could not resolve child %s: %s\n", entry.Name(), err)
+				fmt.Fprintf(errOut, "  Could not resolve child %s: %s\n", entry.Name(), err)
 			}
 			continue
 		}
-		size, n, err := recalculateNode(cfg, spaceID, child, dryRun, verbose, table)
+		size, n, err := recalculateNode(cfg, spaceID, child, dryRun, verbose, table, errOut)
+		corrected += n
 		if err != nil {
-			if verbose {
-				fmt.Fprintf(os.Stderr, "  Could not recalculate child %s: %s\n", child, err)
-			}
+			// the sum is incomplete from here on, so nothing above this node may be written.
+			// The remaining children are still processed.
+			fmt.Fprintf(errOut, "  Could not recalculate child %s: %s\n", child, err)
+			failedChildren++
 			continue
 		}
 		calculated += size
-		corrected += n
+	}
+
+	if failedChildren > 0 {
+		return 0, corrected, fmt.Errorf("%d children of %s could not be recalculated", failedChildren, path)
 	}
 
 	stored, storedErr := strconv.ParseUint(string(attribs[prefixes.TreesizeAttr]), 10, 64)
