@@ -1225,11 +1225,11 @@ Feature: vault
     And these groups have been created:
       | groupname   |
       | vault-group |
-    And user "Brian" has been added to group "vault-group"
-    And user "Carol" has been added to group "vault-group"
     And keycloak user "Alice" has been set up in oCIS
     And keycloak user "Brian" has been set up in oCIS
     And keycloak user "Carol" has been set up in oCIS
+    And user "Brian" has been added to group "vault-group"
+    And user "Carol" has been added to group "vault-group"
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault
     And we save it into "FILEID"
     When user "Alice" sends the following resource share invitation using the Graph API:
@@ -1270,11 +1270,11 @@ Feature: vault
     And these groups have been created:
       | groupname   |
       | vault-group |
-    And user "Brian" has been added to group "vault-group"
-    And user "Carol" has been added to group "vault-group"
     And keycloak user "Alice" has been set up in oCIS
     And keycloak user "Brian" has been set up in oCIS
     And keycloak user "Carol" has been set up in oCIS
+    And user "Brian" has been added to group "vault-group"
+    And user "Carol" has been added to group "vault-group"
     And user "Alice" has created a space "new-space" in vault with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "vaultFile.txt" in vault
     And we save it into "FILEID"
