@@ -20,7 +20,7 @@ func Server(opts ...Option) (*http.Server, error) {
 		WithCheck("grpc reachability", checks.NewGRPCCheck(options.Config.GRPC.Addr))
 
 	readyHandlerConfiguration := healthHandlerConfiguration.
-		WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Events.Endpoint)).
+		WithCheck("nats reachability", checks.NewNatsCheckWithConfig(options.Config.Events.Endpoint, options.Config.Events.NatsConfig())).
 		WithCheck("tika-check", func(ctx context.Context) error {
 			if options.Config.Extractor.Type == "tika" {
 				u, err := url.Parse(options.Config.Extractor.Tika.TikaURL)

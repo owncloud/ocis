@@ -37,6 +37,11 @@ type GetOmapStep struct {
 	// canIterate is only set after the operation is performed and is
 	// intended to prevent premature fetching of data
 	canIterate bool
+
+	// err holds a validation error detected before the operation is
+	// performed. When set, it is surfaced from update() and the step
+	// will not iterate.
+	err error
 }
 
 func newGetOmapStep() *GetOmapStep {
@@ -61,6 +66,10 @@ func (gos *GetOmapStep) free() {
 }
 
 func (gos *GetOmapStep) update() error {
+	if gos.err != nil {
+		gos.canIterate = false
+		return gos.err
+	}
 	err := getError(*gos.rval)
 	gos.canIterate = (err == nil)
 	return err
@@ -143,6 +152,11 @@ func (ioctx *IOContext) ListOmapValues(oid string, startAfter string, filterPref
 // `startAfter`: retrieve only the keys after this specified one
 // `filterPrefix`: retrieve only the keys beginning with this prefix
 // `maxReturn`: retrieve no more than `maxReturn` key/value pairs
+//
+// Note: the returned map is unordered, so the last key needed for `startAfter`
+// based pagination cannot be reliably derived from it. For ordered results
+// suitable for pagination, use ListOmapValues, the GetOmapStep iterator, or
+// GetOmapValuesOrdered.
 func (ioctx *IOContext) GetOmapValues(oid string, startAfter string, filterPrefix string, maxReturn int64) (map[string][]byte, error) {
 	omap := map[string][]byte{}
 
@@ -160,6 +174,9 @@ func (ioctx *IOContext) GetOmapValues(oid string, startAfter string, filterPrefi
 // `startAfter`: retrieve only the keys after this specified one
 // `filterPrefix`: retrieve only the keys beginning with this prefix
 // `iteratorSize`: internal number of keys to fetch during a read operation
+//
+// Note: the returned map is unordered. For ordered results, use
+// GetAllOmapValuesOrdered.
 func (ioctx *IOContext) GetAllOmapValues(oid string, startAfter string, filterPrefix string, iteratorSize int64) (map[string][]byte, error) {
 	omap := map[string][]byte{}
 	omapSize := 0

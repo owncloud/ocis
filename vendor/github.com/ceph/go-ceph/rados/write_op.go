@@ -78,7 +78,13 @@ func (w *WriteOp) operateCompat(ioctx *IOContext, oid string) error {
 	case nil:
 		return nil
 	case OperationError:
-		return err.OpError
+		// If the op failed, return the bare OpError for backwards
+		// compatibility (e.g. ErrNotFound). Otherwise a step failed, so
+		// return the whole OperationError so it is detectable via errors.Is.
+		if err.OpError != nil {
+			return err.OpError
+		}
+		return err
 	default:
 		return err
 	}

@@ -53,6 +53,8 @@ type config struct {
 	NatsUsername       string                            `mapstructure:"nats_username"`
 	NatsPassword       string                            `mapstructure:"nats_password"`
 	UploadDirectory    string                            `mapstructure:"upload_directory" docs:";Local directory for staging upload sessions. Overrides the driver's root. Required for drivers that have no local filesystem root."`
+	NatsCredsFile      string                            `mapstructure:"nats_creds_file"`
+	NatsCreds          string                            `mapstructure:"nats_creds"`
 }
 
 func (c *config) init() {
@@ -93,6 +95,8 @@ func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) 
 			TLSRootCACertificate: conf.NatsRootCACertPath,
 			AuthUsername:         conf.NatsUsername,
 			AuthPassword:         conf.NatsPassword,
+			CredsFile:            conf.NatsCredsFile,
+			Creds:                conf.NatsCreds,
 		})
 		if err != nil {
 			return nil, err
