@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"slices"
 
 	"github.com/gofrs/uuid"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
@@ -16,16 +17,14 @@ import (
 // ListRoleAssignments loads and returns all role assignments matching the given assignment identifier.
 func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRoleAssignment, error) {
 	// shortcut for service accounts
-	for _, serviceAccountID := range s.cfg.ServiceAccountIDs {
-		if accountUUID == serviceAccountID {
-			return []*settingsmsg.UserRoleAssignment{
-				{
-					Id:          uuid.Must(uuid.NewV4()).String(), // should we hardcode this id too?
-					AccountUuid: accountUUID,
-					RoleId:      defaults.BundleUUIDServiceAccount,
-				},
-			}, nil
-		}
+	if slices.Contains(s.cfg.ServiceAccountIDs, accountUUID) {
+		return []*settingsmsg.UserRoleAssignment{
+			{
+				Id:          uuid.Must(uuid.NewV4()).String(), // should we hardcode this id too?
+				AccountUuid: accountUUID,
+				RoleId:      defaults.BundleUUIDServiceAccount,
+			},
+		}, nil
 	}
 	if err := s.Init(); err != nil {
 		return nil, err
@@ -177,12 +176,10 @@ func (s *Store) RemoveRoleAssignment(assignmentID string) error {
 			continue
 		}
 
-		for _, assID := range assIDs {
-			if assID == assignmentID {
-				// as per https://github.com/owncloud/product/issues/103 "Each user can have exactly one role"
-				// we also have to delete the cached dir listing
-				return s.mdc.Delete(ctx, accountPath(accID))
-			}
+		if slices.Contains(assIDs, assignmentID) {
+			// as per https://github.com/owncloud/product/issues/103 "Each user can have exactly one role"
+			// we also have to delete the cached dir listing
+			return s.mdc.Delete(ctx, accountPath(accID))
 		}
 	}
 	return fmt.Errorf("assignmentID '%s' %w", assignmentID, settings.ErrNotFound)

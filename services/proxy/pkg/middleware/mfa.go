@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -152,12 +153,7 @@ func (m MultiFactorAuthentication) writeMFAToStore(ctx context.Context) {
 
 // containsMFA checks if the given value is in the list of authentication level names
 func (m MultiFactorAuthentication) containsMFA(value string) bool {
-	for _, v := range m.authLevelNames {
-		if v == value {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(m.authLevelNames, value)
 }
 
 // mfaUserID returns the id of the user in the context, or "" if there is no user.
