@@ -61,7 +61,6 @@ package registry
 //}
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -143,8 +142,7 @@ func TestRegisterServiceDoesNotLogEveryRefresh(t *testing.T) {
 		}},
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	if err := RegisterService(ctx, logger, svc, strings.TrimPrefix(ready.URL, "http://")); err != nil {
 		t.Fatalf("RegisterService returned an unexpected error: %v", err)
