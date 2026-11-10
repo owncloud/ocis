@@ -379,7 +379,7 @@ ocis storage-users spaces purge --type=personal --verbose --dry-run=false
 
 #### Remove the Trash Bin Access from Existing "Can view" Members
 
-The "Can view" space role no longer allows listing the trash bin of the space. The permissions of a space member are stored when the member is added, so members that got the "Can view" role before this change can still list the trash bin, and the members list shows them with "Custom permissions". This command removes the trash bin access from these members. Afterwards they have the same permissions as new "Can view" members.
+The `Can view` space role has changed and now prevents the listing of the space's trash bin. As the permissions of space members were stored when they were added, members who received the `Can view` role before this change can still list the trash bin. The members list shows these members as having "Custom permissions". This command removes access to the trash bin from affected members. Afterwards, they have the same permissions as new `Can view` members.
 
 ```bash
 ocis storage-users spaces fix-viewer-trash [command options]
@@ -403,10 +403,10 @@ ocis storage-users spaces fix-viewer-trash --dry-run=false
 ```
 
 **Important Notes:**
-- Run the command after updating to an oCIS version where the "Can view" role has no trash bin access. Older versions refuse to run it without `--dry-run`, because the changed members would lose the download button there.
-- The command only changes members whose permissions are exactly the ones of the old "Can view" role. Who added the member and the expiration date are kept.
+- Run the command after updating to an oCIS version where the `Can view` role has no trash bin access. Older versions refuse to run it without `--dry-run`, because the changed members would lose the download button there.
+- The command only changes members whose permissions are exactly the ones of the old `Can view` role. Who added the member and the expiration date are kept.
 - Read-only members that can still list the trash bin but have other permissions are listed as `check manually` and are not changed.
-- The command works through the running storage-users service, logged in with the service account, so oCIS does not need to be stopped. It only checks the spaces of the storage-users service it is started for. When the vault storage is used, run it for the `storage-users-vault` service as well.
+- The command works through the running storage-users service, internally logged in with the service account, so oCIS does not need to be stopped. It only checks the spaces of the storage-users service it is started for. When the vault storage is used, run it for the `storage-users-vault` service as well.
 - Running the command again is safe, members that were already changed are not listed again.
 
 ### Manage Trash-Bin Items
