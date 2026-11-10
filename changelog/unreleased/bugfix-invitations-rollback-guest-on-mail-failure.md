@@ -13,3 +13,4 @@ invitations client needs the `manage-users` role for this, which is now
 documented together with the `INVITATIONS_KEYCLOAK_EXECUTE_ACTIONS` setting.
 
 https://github.com/owncloud/ocis/issues/13253
+https://github.com/owncloud/ocis/pull/13408
