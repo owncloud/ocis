@@ -260,7 +260,7 @@ var _ = Describe("Groups", func() {
 			group.SetMembers(
 				[]libregraph.User{
 					{
-						Id: libregraph.PtrString("userid"),
+						Id: new("userid"),
 					},
 				},
 			)
@@ -333,7 +333,7 @@ var _ = Describe("Groups", func() {
 			group.SetMembers(
 				[]libregraph.User{
 					{
-						Id: libregraph.PtrString("userid"),
+						Id: new("userid"),
 					},
 				},
 			)
@@ -370,7 +370,7 @@ var _ = Describe("Groups", func() {
 			group.SetMembers(
 				[]libregraph.User{
 					{
-						Id: libregraph.PtrString("userid"),
+						Id: new("userid"),
 					},
 				},
 			)

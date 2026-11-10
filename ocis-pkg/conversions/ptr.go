@@ -1,8 +1,10 @@
 package conversions
 
 // ToPointer converts a value to a pointer
+//
+//go:fix inline
 func ToPointer[T any](val T) *T {
-	return &val
+	return new(val)
 }
 
 // ToValue converts a pointer to a value
@@ -20,7 +22,7 @@ func ToPointerSlice[E any](s []E) []*E {
 	rs := make([]*E, len(s))
 
 	for i, v := range s {
-		rs[i] = ToPointer(v)
+		rs[i] = new(v)
 	}
 
 	return rs

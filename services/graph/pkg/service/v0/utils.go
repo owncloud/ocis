@@ -112,7 +112,7 @@ func IsVaultResource(id *storageprovider.ResourceId) bool {
 // as a libregraph.Identity
 func userIdToIdentity(ctx context.Context, cache identity.IdentityCache, userID string) (libregraph.Identity, error) {
 	identity := libregraph.Identity{
-		Id: libregraph.PtrString(userID),
+		Id: new(userID),
 	}
 	user, err := cache.GetUser(ctx, userID)
 	if err == nil {
@@ -126,8 +126,8 @@ func userIdToIdentity(ctx context.Context, cache identity.IdentityCache, userID 
 // as a libregraph.Identity
 func federatedIdToIdentity(ctx context.Context, cache identity.IdentityCache, userID string) (libregraph.Identity, error) {
 	identity := libregraph.Identity{
-		Id:                 libregraph.PtrString(userID),
-		LibreGraphUserType: libregraph.PtrString("Federated"),
+		Id:                 new(userID),
+		LibreGraphUserType: new("Federated"),
 	}
 	user, err := cache.GetAcceptedUser(ctx, userID)
 	if err == nil {
@@ -146,14 +146,14 @@ func cs3UserIdToIdentity(ctx context.Context, cache identity.IdentityCache, cs3U
 	if cs3UserID.GetType() != cs3User.UserType_USER_TYPE_SPACE_OWNER {
 		return userIdToIdentity(ctx, cache, cs3UserID.GetOpaqueId())
 	}
-	return libregraph.Identity{Id: libregraph.PtrString(cs3UserID.GetOpaqueId())}, nil
+	return libregraph.Identity{Id: new(cs3UserID.GetOpaqueId())}, nil
 }
 
 // groupIdToIdentity looks up the group for the supplied cs3 groupid using the cache and returns it
 // as a libregraph.Identity.
 func groupIdToIdentity(ctx context.Context, cache identity.IdentityCache, groupID string) (libregraph.Identity, error) {
 	identity := libregraph.Identity{
-		Id: libregraph.PtrString(groupID),
+		Id: new(groupID),
 	}
 	group, err := cache.GetGroup(ctx, groupID)
 	if err == nil {
@@ -284,7 +284,7 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 			{
 				if id := shareStat.GetInfo().GetId(); id != nil {
 					remoteItem.SetId(storagespace.FormatResourceID(id))
-					remoteItem.SpaceId = libregraph.PtrString(storagespace.FormatStorageID(id.StorageId, id.SpaceId))
+					remoteItem.SpaceId = new(storagespace.FormatStorageID(id.StorageId, id.SpaceId))
 				}
 
 				if name := shareStat.GetInfo().GetName(); name != "" {
@@ -446,7 +446,7 @@ func buildDegradedDriveItemFromReceivedShares(ctx context.Context, logger *log.L
 
 	if rid := receivedShares[0].GetShare().GetResourceId(); rid != nil {
 		driveItem.RemoteItem.SetId(storagespace.FormatResourceID(rid))
-		driveItem.RemoteItem.SpaceId = libregraph.PtrString(storagespace.FormatStorageID(rid.GetStorageId(), rid.GetSpaceId()))
+		driveItem.RemoteItem.SpaceId = new(storagespace.FormatStorageID(rid.GetStorageId(), rid.GetSpaceId()))
 	}
 
 	// fall back to the mountpoint name when the resource name is unknown

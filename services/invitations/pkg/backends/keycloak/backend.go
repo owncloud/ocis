@@ -78,10 +78,10 @@ func (b Backend) CreateUser(ctx context.Context, invitation *invitations.Invitat
 		Msg("Creating new user")
 	user := &libregraph.User{
 		Mail:                     &invitation.InvitedUserEmailAddress,
-		AccountEnabled:           boolP(true),
+		AccountEnabled:           new(true),
 		OnPremisesSamAccountName: invitation.InvitedUserEmailAddress,
-		Id:                       stringP(u.String()),
-		UserType:                 stringP(userType),
+		Id:                       new(u.String()),
+		UserType:                 new(userType),
 	}
 
 	id, err := b.client.CreateUser(ctx, b.userRealm, user, b.userActions)
@@ -132,5 +132,8 @@ func parseUserActions(executeActions []string) []keycloak.UserAction {
 	return actions
 }
 
-func boolP(b bool) *bool       { return &b }
-func stringP(s string) *string { return &s }
+//go:fix inline
+func boolP(b bool) *bool { return new(b) }
+
+//go:fix inline
+func stringP(s string) *string { return new(s) }

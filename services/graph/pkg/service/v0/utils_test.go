@@ -27,7 +27,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"google.golang.org/protobuf/testing/protocmp"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
@@ -46,7 +45,7 @@ var _ = Describe("Utils", func() {
 					WithContext(
 						context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
 					),
-				conversions.ToPointer(log.NopLogger()),
+				new(log.NopLogger()),
 			)
 
 			switch shouldPass {
@@ -261,7 +260,7 @@ var _ = Describe("Utils", func() {
 
 			driveItems, err := service.Cs3ReceivedSharesToDriveItems(
 				context.Background(),
-				conversions.ToPointer(log.NopLogger()),
+				new(log.NopLogger()),
 				gatewayClient,
 				identityCache,
 				receivedShares,

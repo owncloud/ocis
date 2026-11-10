@@ -23,7 +23,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rgrpc/status"
 	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
@@ -720,7 +719,7 @@ var _ = Describe("DrivesDriveItemApi", func() {
 				w = httptest.NewRecorder()
 
 				dJson, err := json.Marshal(libregraph.DriveItem{
-					UIHidden: conversions.ToPointer(true),
+					UIHidden: new(true),
 				})
 				Expect(err).ToNot(HaveOccurred())
 
@@ -790,7 +789,7 @@ var _ = Describe("DrivesDriveItemApi", func() {
 			w := httptest.NewRecorder()
 
 			driveItemJson, err := json.Marshal(libregraph.DriveItem{
-				UIHidden: conversions.ToPointer(true),
+				UIHidden: new(true),
 			})
 			Expect(err).ToNot(HaveOccurred())
 
@@ -926,7 +925,7 @@ var _ = Describe("DrivesDriveItemApi", func() {
 				w = httptest.NewRecorder()
 
 				driveItemJson, _ := json.Marshal(libregraph.DriveItem{
-					UIHidden: conversions.ToPointer(true),
+					UIHidden: new(true),
 				})
 
 				r = httptest.NewRequest(http.MethodGet, "/", bytes.NewBuffer(driveItemJson)).
@@ -986,7 +985,7 @@ var _ = Describe("DrivesDriveItemApi", func() {
 			w := httptest.NewRecorder()
 
 			driveItemJson, _ := json.Marshal(libregraph.DriveItem{
-				UIHidden: conversions.ToPointer(true),
+				UIHidden: new(true),
 			})
 
 			r := httptest.NewRequest(http.MethodGet, "/", bytes.NewBuffer(driveItemJson)).
@@ -1070,7 +1069,7 @@ var _ = Describe("DrivesDriveItemApi", func() {
 
 			driveItemJson, err := json.Marshal(libregraph.DriveItem{
 				RemoteItem: &libregraph.RemoteItem{
-					Id: conversions.ToPointer("123"),
+					Id: new("123"),
 				},
 			})
 			Expect(err).ToNot(HaveOccurred())
@@ -1101,7 +1100,7 @@ var _ = Describe("DrivesDriveItemApi", func() {
 
 			driveItemJson, err := json.Marshal(libregraph.DriveItem{
 				RemoteItem: &libregraph.RemoteItem{
-					Id: conversions.ToPointer("123"),
+					Id: new("123"),
 				},
 			})
 			Expect(err).ToNot(HaveOccurred())
@@ -1155,7 +1154,7 @@ var _ = Describe("DrivesDriveItemApi", func() {
 
 			driveItemJson, err := json.Marshal(libregraph.DriveItem{
 				RemoteItem: &libregraph.RemoteItem{
-					Id: conversions.ToPointer("123"),
+					Id: new("123"),
 				},
 			})
 			Expect(err).ToNot(HaveOccurred())
