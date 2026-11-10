@@ -85,9 +85,12 @@ func (fs *Decomposedfs) Upload(ctx context.Context, req storage.UploadRequest, u
 	} else {
 		size, err := session.WriteChunk(ctx, 0, req.Body)
 		if err != nil {
+			// mirror the chunking-v1 branch above: a dead upload must not leave its session behind.
+			_ = session.Terminate(ctx)
 			return &provider.ResourceInfo{}, errors.Wrap(err, "Decomposedfs: error writing to binary file")
 		}
 		if size != req.Length {
+			_ = session.Terminate(ctx)
 			return &provider.ResourceInfo{}, errtypes.PartialContent("Decomposedfs: unexpected end of stream")
 		}
 	}
@@ -312,6 +315,7 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 
 	log.Debug().Interface("session", session).Msg("Decomposedfs: built session info")
 
+	binTouched := false
 	err = fs.um.RunInBaseScope(func() error {
 		// Create binary file in the upload folder with no content
 		// It will be used when determining the current offset of an upload
@@ -319,10 +323,16 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 		if err != nil {
 			return err
 		}
+		binTouched = true
 
 		return session.Persist(ctx)
 	})
 	if err != nil {
+		if binTouched {
+			// the info file write may or may not have landed; either way the bin
+			// file already exists and would otherwise be orphaned.
+			session.Cleanup(false, true, true, false)
+		}
 		return nil, err
 	}
 	metrics.UploadSessionsInitiated.Inc()

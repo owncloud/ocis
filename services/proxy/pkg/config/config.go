@@ -244,6 +244,8 @@ type Events struct {
 	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;PROXY_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"7.0.0"`
 	AuthUsername         string `yaml:"username" env:"OCIS_EVENTS_AUTH_USERNAME;PROXY_EVENTS_AUTH_USERNAME" desc:"The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"7.0.0"`
 	AuthPassword         string `yaml:"password" env:"OCIS_EVENTS_AUTH_PASSWORD;PROXY_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"7.0.0"`
+	CredsFile            string `yaml:"creds_file" env:"OCIS_EVENTS_CREDS_FILE;PROXY_EVENTS_CREDS_FILE" desc:"Path to a NATS credentials file used for JWT authentication with the events broker." introductionVersion:"8.0.10"`
+	Creds                string `yaml:"creds" env:"OCIS_EVENTS_CREDS;PROXY_EVENTS_CREDS" desc:"Content of a NATS credentials file used for JWT authentication with the events broker. Takes precedence over creds_file." introductionVersion:"8.0.10"`
 }
 
 // ClaimSpaceManagement holds the configuration for claim managed spaces
