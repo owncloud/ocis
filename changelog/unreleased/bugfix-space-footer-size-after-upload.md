@@ -8,3 +8,4 @@ its quota. It now updates the Space size (the used quota) from the same
 response as well.
 
 https://github.com/owncloud/ocis/issues/13259
+https://github.com/owncloud/ocis/pull/13412
