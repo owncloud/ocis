@@ -360,6 +360,8 @@ config({
       instance: class {} as never
     }
   },
+  // mermaid 12 lays out diagrams with ELK by default, keep the dagre layout used so far
+  mermaidConfig: (base) => ({ ...base, layout: 'dagre' }),
   markdownItConfig(md) {
     md.renderer.rules.link_open = function (tokens, idx, options, _, self) {
       const token = tokens[idx]

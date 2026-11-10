@@ -4,7 +4,8 @@ import { useGettext } from 'vue3-gettext'
 
 mermaid.initialize({
   startOnLoad: false,
-  theme: 'default'
+  theme: 'default',
+  layout: 'dagre'
 })
 
 /**
