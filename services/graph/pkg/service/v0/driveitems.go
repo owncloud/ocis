@@ -563,7 +563,7 @@ func getFieldName(structField reflect.StructField) string {
 func unmarshalStringMap(logger *log.Logger, out any, flatMap map[string]string, prefix string) bool {
 	nonEmpty := false
 	obj := reflect.ValueOf(out).Elem()
-	timeKind := reflect.TypeOf(&time.Time{}).Elem().Kind()
+	timeKind := reflect.TypeFor[time.Time]().Kind()
 	for i := 0; i < obj.NumField(); i++ {
 		field := obj.Field(i)
 		structField := obj.Type().Field(i)

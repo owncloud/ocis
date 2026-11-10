@@ -219,7 +219,7 @@ func Test_userEventStore_pop(t *testing.T) {
 		ShareID: &collaboration.ShareId{OpaqueId: "shareid"},
 	})
 	tEvent := &event.Event{
-		Type:  reflect.TypeOf(&events.ShareCreated{}).String(),
+		Type:  reflect.TypeFor[*events.ShareCreated]().String(),
 		Id:    tEventId,
 		Event: b,
 	}
@@ -240,7 +240,7 @@ func Test_userEventStore_pop(t *testing.T) {
 		t.Fatal(err)
 	}
 	tEvent2 := &event.Event{
-		Type:  reflect.TypeOf(&events.ShareRemoved{}).String(),
+		Type:  reflect.TypeFor[*events.ShareRemoved]().String(),
 		Id:    tEventId,
 		Event: b,
 	}

@@ -492,7 +492,7 @@ func (b *Bleve) getResource(bleveIndex bleve.Index, id string) (*Resource, error
 }
 
 func newPointerOfType[T any]() *T {
-	t := reflect.TypeOf((*T)(nil)).Elem()
+	t := reflect.TypeFor[T]()
 	ptr := reflect.New(t).Interface()
 	return ptr.(*T)
 }
@@ -520,7 +520,7 @@ func unmarshalInterfaceMap(out any, flatMap map[string]any, prefix string) bool 
 				elemType := field.Type().Elem()
 
 				// convert time strings from index for search requests
-				if elemType == reflect.TypeOf(timestamppb.Timestamp{}) {
+				if elemType == reflect.TypeFor[timestamppb.Timestamp]() {
 					if strValue, ok := value.(string); ok {
 						if parsedTime, err := time.Parse(time.RFC3339, strValue); err == nil {
 							alloc.Elem().Set(reflect.ValueOf(*timestamppb.New(parsedTime)))
@@ -532,7 +532,7 @@ func unmarshalInterfaceMap(out any, flatMap map[string]any, prefix string) bool 
 				}
 
 				// convert time strings from index for libregraph structs when updating resources
-				if elemType == reflect.TypeOf(time.Time{}) {
+				if elemType == reflect.TypeFor[time.Time]() {
 					if strValue, ok := value.(string); ok {
 						if parsedTime, err := time.Parse(time.RFC3339, strValue); err == nil {
 							alloc.Elem().Set(reflect.ValueOf(parsedTime))
