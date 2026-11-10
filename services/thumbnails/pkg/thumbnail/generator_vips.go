@@ -3,11 +3,14 @@
 package thumbnail
 
 import (
+	"context"
 	"image"
 	"strings"
 
 	"github.com/davidbyttow/govips/v2/vips"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // SimpleGenerator is the default image generator and is used for all image types expect gif.
@@ -36,7 +39,20 @@ func (g SimpleGenerator) ProcessorID() string {
 }
 
 // Generate generates a alternative image version.
-func (g SimpleGenerator) Generate(size image.Rectangle, img interface{}) (interface{}, error) {
+func (g SimpleGenerator) Generate(ctx context.Context, size image.Rectangle, img interface{}) (interface{}, error) {
+	span := trace.SpanFromContext(ctx)
+	_, newSpan := span.TracerProvider().Tracer(tracerName).Start(
+		ctx, spanNameGeneratorGenerate,
+		trace.WithSpanKind(trace.SpanKindInternal),
+		trace.WithAttributes(
+			attribute.String("ocis.thumbnails.generator.type", "SimpleGeneratorVips"),
+			attribute.Int("ocis.thumbnails.generator.generate.width", size.Dx()),
+			attribute.Int("ocis.thumbnails.generator.generate.height", size.Dy()),
+			attribute.String("ocis.thumbnails.generator.generate.processor", g.ProcessorID()),
+		),
+	)
+	defer newSpan.End()
+
 	var m *vips.ImageRef
 	var err error
 	switch img.(type) {

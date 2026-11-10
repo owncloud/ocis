@@ -83,7 +83,7 @@ func (s Thumbnails) GetThumbnail(w http.ResponseWriter, r *http.Request) {
 	logger := s.logger.SubloggerWithRequestID(r.Context())
 	key := r.Context().Value(keyContextKey).(string)
 
-	thumbnailBytes, err := s.manager.GetThumbnail(key)
+	thumbnailBytes, err := s.manager.GetThumbnail(r.Context(), key)
 	if err != nil {
 		logger.Debug().
 			Err(err).
