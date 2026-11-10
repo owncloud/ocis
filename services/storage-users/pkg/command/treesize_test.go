@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"testing"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -200,6 +201,9 @@ func TestParseTreesizeSpaceID(t *testing.T) {
 		{"opaque id only", "!abc", "", true},
 		{"path traversal", "../../etc", "", true},
 		{"path separator", "a/b", "", true},
+		{"dot dot escaping the nodes dir", "ab......X", "", true},
+		{"dot dot inside", "a..b", "", true},
+		{"dot", ".", "", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -311,16 +315,22 @@ func TestRecalculateNodeChildErrors(t *testing.T) {
 func TestRecalculateSpacesHardening(t *testing.T) {
 	const good = "aaaaaaaa-0000-0000-0000-000000000001"
 
-	t.Run("rejects ids that escape the spaces directory", func(t *testing.T) {
-		for _, id := range []string{"........x", "..../..x", "......x", "..", "....", "../.."} {
-			cfg := &config.Config{}
-			cfg.Drivers.OCIS.Root = t.TempDir()
-			var out, errOut bytes.Buffer
-
-			err := recalculateSpaces(cfg, []string{id}, false, false, &out, &errOut)
+	t.Run("spaceRootPath rejects ids that escape the space nodes dir", func(t *testing.T) {
+		cfg := &config.Config{}
+		cfg.Drivers.OCIS.Root = t.TempDir()
+		for _, id := range []string{"........x", "..../..x", "......x", "..", "....", "../..", "ab......X", "."} {
+			_, err := spaceRootPath(cfg, id)
 			require.Error(t, err, id)
-			require.NotContains(t, out.String(), "All treesizes are correct", id)
+			require.Contains(t, err.Error(), "invalid space id", id)
 		}
+	})
+
+	t.Run("spaceRootPath accepts a normal id", func(t *testing.T) {
+		cfg := &config.Config{}
+		cfg.Drivers.OCIS.Root = t.TempDir()
+		root, err := spaceRootPath(cfg, good)
+		require.NoError(t, err)
+		require.Equal(t, filepath.Join(cfg.Drivers.OCIS.Root, "spaces", "aa", "aaaaaa-0000-0000-0000-000000000001", "nodes", "aa", "aa", "aa", "aa", "-0000-0000-0000-000000000001"), root)
 	})
 
 	t.Run("an unreadable subtree fails the space without writing the root", func(t *testing.T) {
@@ -395,4 +405,117 @@ func TestRecalculateNodeInvalidBlobsize(t *testing.T) {
 			require.Contains(t, errOut.String(), f, "reported even without --verbose")
 		})
 	}
+}
+
+// skipIfRoot skips tests that rely on permission errors, root bypasses them
+func skipIfRoot(t *testing.T) {
+	t.Helper()
+	if os.Geteuid() == 0 {
+		t.Skip("permission checks do not apply to root")
+	}
+}
+
+func TestRecalculateNodeRound4(t *testing.T) {
+	t.Run("an unresolvable child link other than a dangling one fails the subtree", func(t *testing.T) {
+		root := t.TempDir()
+		dir := filepath.Join(root, "dir")
+		writeDirNode(t, dir, 999)
+		f := filepath.Join(root, "file")
+		writeFileNode(t, f, 20)
+		linkChild(t, dir, f, "file")
+		// a self referencing link fails with too many links, not with ENOENT
+		loop := filepath.Join(dir, "loop")
+		require.NoError(t, os.Symlink("loop", loop))
+		var errOut bytes.Buffer
+
+		_, _, err := recalculateNode(nil, "spaceid", dir, false, false, tablewriter.NewTable(io.Discard), &errOut)
+		require.Error(t, err)
+		require.Equal(t, "999", storedTreesize(t, dir), "an incomplete sum must not be written")
+		require.Contains(t, errOut.String(), "loop", "reported even without --verbose")
+	})
+
+	t.Run("a failed write is not counted and fails the subtree", func(t *testing.T) {
+		skipIfRoot(t)
+		root := t.TempDir()
+		outer := filepath.Join(root, "outer")
+		writeDirNode(t, outer, 0)
+		inner := filepath.Join(root, "inner")
+		writeDirNode(t, inner, 0)
+		f := filepath.Join(root, "f")
+		writeFileNode(t, f, 32)
+		linkChild(t, inner, f, "f")
+		linkChild(t, outer, inner, "inner")
+		require.NoError(t, os.Chmod(outer+metadataExtension, 0400))
+		var tableOut, errOut bytes.Buffer
+		table := tablewriter.NewTable(&tableOut)
+
+		_, corrected, err := recalculateNode(nil, "spaceid", outer, false, false, table, &errOut)
+		require.Error(t, err)
+		require.Equal(t, 1, corrected, "only the written inner treesize counts")
+		require.Equal(t, "32", storedTreesize(t, inner))
+		require.Equal(t, "0", storedTreesize(t, outer))
+		require.NoError(t, table.Render())
+		require.Contains(t, tableOut.String(), "inner")
+		require.NotContains(t, tableOut.String(), "outer", "a node whose write failed has no table row")
+		require.Contains(t, errOut.String(), outer)
+	})
+
+	t.Run("a child link back to an ancestor is a cycle and fails the subtree", func(t *testing.T) {
+		root := t.TempDir()
+		outer := filepath.Join(root, "outer")
+		writeDirNode(t, outer, 999)
+		inner := filepath.Join(root, "inner")
+		writeDirNode(t, inner, 999)
+		linkChild(t, outer, inner, "inner")
+		linkChild(t, inner, outer, "outer")
+		var errOut bytes.Buffer
+
+		_, _, err := recalculateNode(nil, "spaceid", outer, false, false, tablewriter.NewTable(io.Discard), &errOut)
+		require.Error(t, err)
+		require.Equal(t, "999", storedTreesize(t, outer))
+		require.Equal(t, "999", storedTreesize(t, inner))
+		require.Contains(t, errOut.String(), "cycle")
+	})
+
+	t.Run("a child link to the node itself is a cycle", func(t *testing.T) {
+		root := t.TempDir()
+		dir := filepath.Join(root, "dir")
+		writeDirNode(t, dir, 999)
+		linkChild(t, dir, dir, "self")
+		var errOut bytes.Buffer
+
+		_, _, err := recalculateNode(nil, "spaceid", dir, false, false, tablewriter.NewTable(io.Discard), &errOut)
+		require.Error(t, err)
+		require.Equal(t, "999", storedTreesize(t, dir))
+		require.Contains(t, errOut.String(), "cycle")
+	})
+
+	t.Run("a deep failure is reported once at the leaf", func(t *testing.T) {
+		root := t.TempDir()
+		var parent string
+		var levels []string
+		for i := 0; i < 4; i++ {
+			d := filepath.Join(root, "level"+strconv.Itoa(i))
+			writeDirNode(t, d, 999)
+			if parent != "" {
+				linkChild(t, parent, d, "child")
+			}
+			levels = append(levels, d)
+			parent = d
+		}
+		bad := filepath.Join(root, "bad")
+		writeFileNode(t, bad, 10)
+		require.NoError(t, os.WriteFile(bad+metadataExtension, []byte("garbage \xff"), 0600))
+		linkChild(t, parent, bad, "bad")
+		var errOut bytes.Buffer
+
+		_, _, err := recalculateNode(nil, "spaceid", levels[0], false, false, tablewriter.NewTable(io.Discard), &errOut)
+		require.Error(t, err)
+		lines := strings.Split(strings.TrimSpace(errOut.String()), "\n")
+		require.Len(t, lines, 1, errOut.String())
+		require.Contains(t, lines[0], "bad")
+		for _, l := range levels {
+			require.Equal(t, "999", storedTreesize(t, l))
+		}
+	})
 }

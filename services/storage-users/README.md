@@ -224,8 +224,9 @@ as well as the bare space id `43972c79-f7ce-441b-9fe0-cf5170e4d61e`.
 
 If a space cannot be processed, for example because it does not exist, the command reports the
 error, still processes the remaining spaces and exits with a non-zero exit code. The same
-applies if a node in a space cannot be read: its parents are then not written, as their sum
-would be incomplete. In all-spaces mode the command also fails if it finds no spaces, for example
+applies if a node in a space cannot be read or written, or a child link cannot be resolved or
+points back to one of its ancestors: its parents are then not written, as their sum would be
+incomplete. The error is printed once, naming the affected node. In all-spaces mode the command also fails if it finds no spaces, for example
 because of a wrong `STORAGE_USERS_OCIS_ROOT`. It prints `All treesizes are correct` only if every
 space was processed successfully.
 

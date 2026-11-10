@@ -87,8 +87,10 @@ func parseTreesizeSpaceID(id string) (string, error) {
 		return "", fmt.Errorf("invalid space id %q: %w", id, err)
 	}
 	spaceID := rid.GetSpaceId()
-	// the id is used to build a path on disk, so only accept a plain, non empty id
-	if spaceID == "" || strings.ContainsAny(spaceID, `/\!$`) || spaceID == "." || spaceID == ".." {
+	// the id is used to build a path on disk, so only accept a plain, non empty id.
+	// No legitimate space id contains "..", but pathifying one produces ".." path
+	// elements, e.g. "ab......X" resolves to a sibling of the space.
+	if spaceID == "" || spaceID == "." || strings.ContainsAny(spaceID, `/\!$`) || strings.Contains(spaceID, "..") {
 		return "", fmt.Errorf("invalid space id %q", id)
 	}
 	return spaceID, nil
@@ -108,16 +110,23 @@ func listSpaceIDs(cfg *config.Config) ([]string, error) {
 }
 
 // spaceRootPath returns the path of the root node of the space. It fails if the path
-// would end up outside of the spaces directory of the storage root, as pathifying an id
-// like "........x" produces ".." path elements.
+// would end up outside of the nodes directory of the space, as pathifying an id like
+// "........x" or "ab......X" produces ".." path elements. parseTreesizeSpaceID already
+// rejects such ids, this is defence in depth for ids found on disk.
 func spaceRootPath(cfg *config.Config, spaceID string) (string, error) {
 	spacesDir := filepath.Join(cfg.Drivers.OCIS.Root, "spaces")
-	root := filepath.Join(spacesDir, lookup.Pathify(spaceID, 1, 2), "nodes", lookup.Pathify(spaceID, 4, 2))
-	rel, err := filepath.Rel(spacesDir, root)
-	if err != nil || rel == "." || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+	nodesDir := filepath.Join(spacesDir, lookup.Pathify(spaceID, 1, 2), "nodes")
+	root := filepath.Join(nodesDir, lookup.Pathify(spaceID, 4, 2))
+	if !isBelow(spacesDir, nodesDir) || !isBelow(nodesDir, root) {
 		return "", fmt.Errorf("invalid space id %q", spaceID)
 	}
 	return root, nil
+}
+
+// isBelow reports whether path is strictly below base
+func isBelow(base, path string) bool {
+	rel, err := filepath.Rel(base, path)
+	return err == nil && rel != "." && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator))
 }
 
 // recalculateSpaces recalculates the treesizes of the given spaces. A failing space does
@@ -172,11 +181,53 @@ func recalculateSpaces(cfg *config.Config, spaceIDs []string, dryRun, verbose bo
 // recalculateNode calculates the size of the node at the given path. For directories it
 // recurses into the children first, so the whole subtree is corrected bottom up, and
 // compares the sum against the stored treesize. It returns the calculated size of the
-// node and the number of corrected treesizes in the subtree.
+// node and the number of treesizes in the subtree that were corrected, or that would be
+// in dry-run mode.
+//
+// Any error in the subtree fails it: no node above the failing one is written, as its
+// sum would be incomplete. The error is printed once to errOut where it occurs, naming
+// the exact path, the returned error only tells the caller that the subtree failed.
 func recalculateNode(cfg *config.Config, spaceID, path string, dryRun, verbose bool, table *tablewriter.Table, errOut io.Writer) (uint64, int, error) {
+	// resolve the start node as well, so a child link back to it is detected as a cycle
+	if resolved, err := filepath.EvalSymlinks(path); err == nil {
+		path = resolved
+	}
+	w := &treesizeWalker{spaceID: spaceID, dryRun: dryRun, verbose: verbose, table: table, errOut: errOut, chain: map[string]bool{}}
+	return w.recalculate(path)
+}
+
+// treesizeWalker holds the state of the recalculation of one space
+type treesizeWalker struct {
+	spaceID string
+	dryRun  bool
+	verbose bool
+	table   *tablewriter.Table
+	errOut  io.Writer
+	// chain holds the resolved paths of the nodes currently being recalculated, i.e. the
+	// node and its ancestors, to detect child links that form a cycle
+	chain map[string]bool
+}
+
+// nodeError is the error of the node at path. Its message only names the node, the
+// cause has already been printed where it occurred.
+type nodeError struct {
+	path string
+	err  error
+}
+
+func (e *nodeError) Error() string { return "could not recalculate " + e.path }
+func (e *nodeError) Unwrap() error { return e.err }
+
+// fail prints the error of the node at path and returns it
+func (w *treesizeWalker) fail(path string, err error) error {
+	fmt.Fprintf(w.errOut, "  Could not recalculate %s: %s\n", path, err)
+	return &nodeError{path: path, err: err}
+}
+
+func (w *treesizeWalker) recalculate(path string) (uint64, int, error) {
 	attribs, err := readAttributes(path)
 	if err != nil {
-		return 0, 0, err
+		return 0, 0, w.fail(path, err)
 	}
 
 	// Files simply report their blobsize, there is nothing to recalculate. Only an
@@ -188,8 +239,7 @@ func recalculateNode(cfg *config.Config, spaceID, path string, dryRun, verbose b
 		if err != nil {
 			// decomposedfs always sets the blobsize of a file, so this is corruption. Counting
 			// it as 0 would write an undercounted treesize into the parents.
-			fmt.Fprintf(errOut, "  Invalid blobsize of file %s: %s\n", path, err)
-			return 0, 0, fmt.Errorf("invalid blobsize of %s: %w", path, err)
+			return 0, 0, w.fail(path, fmt.Errorf("invalid blobsize: %w", err))
 		}
 		return size, 0, nil
 	}
@@ -199,8 +249,11 @@ func recalculateNode(cfg *config.Config, spaceID, path string, dryRun, verbose b
 		if errors.Is(err, fs.ErrNotExist) {
 			return 0, 0, nil
 		}
-		return 0, 0, err
+		return 0, 0, w.fail(path, err)
 	}
+
+	w.chain[path] = true
+	defer delete(w.chain, path)
 
 	var (
 		calculated     uint64
@@ -208,20 +261,30 @@ func recalculateNode(cfg *config.Config, spaceID, path string, dryRun, verbose b
 		failedChildren int
 	)
 	for _, entry := range entries {
-		child, err := filepath.EvalSymlinks(filepath.Join(path, entry.Name()))
-		if err != nil {
+		link := filepath.Join(path, entry.Name())
+		child, err := filepath.EvalSymlinks(link)
+		switch {
+		case errors.Is(err, fs.ErrNotExist):
 			// dangling child entry, it contributes nothing
-			if verbose {
-				fmt.Fprintf(errOut, "  Could not resolve child %s: %s\n", entry.Name(), err)
+			if w.verbose {
+				fmt.Fprintf(w.errOut, "  Skipping dangling child %s: %s\n", link, err)
 			}
 			continue
+		case err != nil:
+			// the remaining children are still processed, but the sum is incomplete
+			_ = w.fail(link, err)
+			failedChildren++
+			continue
+		case w.chain[child]:
+			_ = w.fail(link, fmt.Errorf("child link forms a cycle, it resolves to its ancestor %s", child))
+			failedChildren++
+			continue
 		}
-		size, n, err := recalculateNode(cfg, spaceID, child, dryRun, verbose, table, errOut)
+		size, n, err := w.recalculate(child)
+		// treesizes written below the failing node count as well
 		corrected += n
 		if err != nil {
-			// the sum is incomplete from here on, so nothing above this node may be written.
-			// The remaining children are still processed.
-			fmt.Fprintf(errOut, "  Could not recalculate child %s: %s\n", child, err)
+			// already printed where it happened
 			failedChildren++
 			continue
 		}
@@ -237,6 +300,13 @@ func recalculateNode(cfg *config.Config, spaceID, path string, dryRun, verbose b
 		return calculated, corrected, nil
 	}
 
+	if !w.dryRun {
+		if err := writeTreesize(path, attribs, calculated); err != nil {
+			// not counted and no table row, the treesize was not corrected
+			return 0, corrected, w.fail(path, fmt.Errorf("could not write treesize: %w", err))
+		}
+	}
+
 	storedStr := string(attribs[prefixes.TreesizeAttr])
 	if storedStr == "" {
 		storedStr = "unset"
@@ -245,16 +315,9 @@ func recalculateNode(cfg *config.Config, spaceID, path string, dryRun, verbose b
 	if storedErr == nil {
 		diff = fmt.Sprintf("%+d", int64(calculated)-int64(stored))
 	}
-	table.Append([]string{spaceID, nodeIDFromPath(path), storedStr, strconv.FormatUint(calculated, 10), diff})
-	corrected++
+	w.table.Append([]string{w.spaceID, nodeIDFromPath(path), storedStr, strconv.FormatUint(calculated, 10), diff})
 
-	if !dryRun {
-		if err := writeTreesize(path, attribs, calculated); err != nil {
-			return calculated, corrected, fmt.Errorf("could not write treesize of %s: %w", path, err)
-		}
-	}
-
-	return calculated, corrected, nil
+	return calculated, corrected + 1, nil
 }
 
 // readAttributes reads the messagepack metadata of the node at the given path
