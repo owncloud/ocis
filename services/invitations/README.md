@@ -41,7 +41,7 @@ After Keycloak has been configured, the invitation service needs to be configure
 * `INVITATIONS_KEYCLOAK_INSECURE_SKIP_VERIFY`: If set to true, the verification of the Keycloak HTTPS certificate is skipped. This is not recommended in production environments.
 * `INVITATIONS_KEYCLOAK_EXECUTE_ACTIONS`: A comma-separated list of Keycloak required actions that are set on the invited guest and sent in the execute-actions email. Defaults to `UPDATE_PASSWORD,VERIFY_EMAIL`. The values are passed to Keycloak as-is, so each one must be a required action that is registered and enabled in the user realm. Otherwise Keycloak rejects the request and the invitation fails. For example, `CONFIGURE_RECOVERY_AUTHN_CODES` may require the `recovery-codes` feature to be enabled in Keycloak on some versions.
 
-If sending the execute-actions email fails after the guest has been created in Keycloak, the guest is deleted again and the original error is returned. A failed invitation therefore does not leave an orphaned guest behind, and the invitation can be retried after fixing the cause.
+If Keycloak refuses to send the execute-actions email after the guest has been created, the service tries to delete the guest again and returns the original error, so the invitation can be retried after fixing the cause. If that delete fails, the failure is logged with the email address and user id of the guest, and the guest has to be removed manually in Keycloak, because inviting the same address again fails with a conflict as long as the guest exists. If the outcome of sending the email is unknown (for example a timeout), the guest is not deleted, because the email may have been sent. A warning with the email address and user id is logged in that case.
 
 ### Keycloak Service Account Roles
 
@@ -49,7 +49,7 @@ The client configured via `INVITATIONS_KEYCLOAK_CLIENT_ID` authenticates with it
 
 * `manage-users`: create users, send the execute-actions email and delete users (used for the rollback of failed invitations).
 
-The invitations service does not look up or list users, so `view-users` and `query-users` are not needed for it. They are only required if the same client is also used for other purposes, such as the Graph service's personal data export.
+The invitations service itself only needs `manage-users`. The invitations and graph services can share one Keycloak client through the global `OCIS_KEYCLOAK_*` variables. In that case the graph service's personal data export additionally needs `view-users` and `query-users` on the same client, so keep these roles if the client is shared.
 
 ## Bridging Provisioning Delay
 

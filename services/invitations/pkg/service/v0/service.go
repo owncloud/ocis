@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -100,24 +101,53 @@ func (s svc) Invite(ctx context.Context, invitation *invitations.Invitation) (*i
 	if s.backend.CanSendMail() {
 		err := s.backend.SendMail(ctx, id)
 		if err != nil {
-			// The guest can not redeem the invitation without the mail, and a
-			// leftover user would make every retry fail with a conflict, so
-			// roll the creation back.
-			// The request context may be the reason the mail failed, so the
-			// rollback must not inherit its cancellation.
-			delCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), rollbackTimeout)
-			defer cancel()
-			if delErr := s.backend.DeleteUser(delCtx, id); delErr != nil {
-				s.log.Error().
-					Str("userID", id).
-					Str("email", invitation.InvitedUserEmailAddress).
-					Err(delErr).
-					AnErr("mailError", err).
-					Msg("Failed to roll back user after sending the invitation mail failed")
-			}
+			s.rollback(ctx, invitation, id, err)
 			return nil, fmt.Errorf("%w: %s", ErrBackend, err)
 		}
 	}
 
 	return invitation, nil
+}
+
+// rollback deletes the user created for the invitation after sending the
+// invitation mail failed with mailErr. The guest can not redeem the invitation
+// without the mail, and a leftover user would make every retry fail with a
+// conflict. It only deletes if the failure is certain: if the outcome is
+// unknown (e.g. timeout), the mail may have been sent and the invitation is
+// working, so the user is kept.
+func (s svc) rollback(ctx context.Context, invitation *invitations.Invitation, id string, mailErr error) {
+	email := invitation.InvitedUserEmailAddress
+
+	if !errors.Is(mailErr, invitations.ErrRejected) {
+		s.log.Warn().
+			Str("userID", id).
+			Str("email", email).
+			Err(mailErr).
+			Msg("Sending the invitation mail failed with an unknown outcome, the guest may exist in the backend and the mail may or may not have been sent. The guest was not removed")
+		return
+	}
+
+	if id == "" {
+		s.log.Error().
+			Str("email", email).
+			Err(mailErr).
+			Msg("Sending the invitation mail failed, but the backend returned no user id, so the guest can not be removed automatically")
+		return
+	}
+
+	// The request context may be the reason the mail failed, so the rollback
+	// must not inherit its cancellation.
+	delCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), rollbackTimeout)
+	defer cancel()
+	if err := s.backend.DeleteUser(delCtx, id); err != nil {
+		s.log.Error().
+			Str("userID", id).
+			Str("email", email).
+			Err(err).
+			AnErr("mailError", mailErr).
+			Msgf("Sending the invitation mail failed and removing the guest %s (user id %s) failed. Remove the guest manually, otherwise inviting this address again fails", email, id)
+		return
+	}
+	// The invited user no longer exists.
+	invitation.InvitedUser = nil
 }

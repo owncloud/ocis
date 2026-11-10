@@ -3,8 +3,11 @@ package keycloak
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"strings"
 
+	"github.com/Nerzal/gocloak/v13"
 	"github.com/google/uuid"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
@@ -108,7 +111,15 @@ func (b Backend) CanSendMail() bool { return true }
 
 // SendMail sends a mail to the user with details on how to redeem the invitation.
 func (b Backend) SendMail(ctx context.Context, id string) error {
-	return b.client.SendActionsMail(ctx, b.userRealm, id, b.userActions)
+	err := b.client.SendActionsMail(ctx, b.userRealm, id, b.userActions)
+	// An error response from Keycloak (HTTP status code set) means the request
+	// was refused and no mail was sent. Transport errors and cancelled contexts
+	// are not marked, as Keycloak may have sent the mail anyway.
+	var apiErr *gocloak.APIError
+	if errors.As(err, &apiErr) && apiErr.Code > 0 {
+		return fmt.Errorf("%w: %w", invitations.ErrRejected, err)
+	}
+	return err
 }
 
 // DeleteUser deletes the user with the given identifier from the keycloak backend.
