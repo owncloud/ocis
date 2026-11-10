@@ -121,11 +121,11 @@ func TestICAP_ScanIsSafeForConcurrentUse(t *testing.T) {
 
 			var wg sync.WaitGroup
 			errs := make(chan error, workers*scansPerWorker)
-			for i := 0; i < workers; i++ {
+			for range workers {
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					for j := 0; j < scansPerWorker; j++ {
+					for range scansPerWorker {
 						res, err := scanner.Scan(scanners.Input{
 							Url:  "http://example.test/file",
 							Name: "file.txt",

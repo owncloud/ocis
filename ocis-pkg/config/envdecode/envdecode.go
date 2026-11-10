@@ -228,7 +228,7 @@ func decodeSlice(f *reflect.Value, env string) error {
 	valuesCount := len(values)
 	slice := reflect.MakeSlice(f.Type(), valuesCount, valuesCount)
 	if valuesCount > 0 {
-		for i := 0; i < valuesCount; i++ {
+		for i := range valuesCount {
 			e := slice.Index(i)
 			err := decodePrimitiveType(&e, values[i])
 			if err != nil {

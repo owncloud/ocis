@@ -251,7 +251,7 @@ func TestHandleChatCompletions_ClientDisconnect_CancelsUpstreamCall(t *testing.T
 func TestHandleChatCompletions_InvalidRequestDoesNotConsumeQuota(t *testing.T) {
 	svc := newTestService(t, "http://unused.invalid", 1)
 
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		rec := httptest.NewRecorder()
 		svc.HandleChatCompletions(rec, requestWithUser([]byte(`{"model":"m","messages":[]}`), "user-1"))
 		if rec.Code != http.StatusBadRequest {

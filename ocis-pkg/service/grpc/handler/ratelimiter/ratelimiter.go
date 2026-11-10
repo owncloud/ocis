@@ -16,7 +16,7 @@ func NewHandlerWrapper(limit int) server.HandlerWrapper {
 	}
 
 	token := make(chan struct{}, limit)
-	for i := 0; i < limit; i++ {
+	for range limit {
 		token <- struct{}{}
 	}
 

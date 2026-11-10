@@ -94,7 +94,7 @@ func raceTestShares() []*collaboration.Share {
 	editorResourcePermissions := conversions.NewEditorRole().CS3ResourcePermissions()
 
 	shares := make([]*collaboration.Share, 0, numRaceTestResources)
-	for i := 0; i < numRaceTestResources; i++ {
+	for i := range numRaceTestResources {
 		shares = append(shares, &collaboration.Share{
 			Id: &collaboration.ShareId{OpaqueId: fmt.Sprintf("share-id-%d", i)},
 			ResourceId: &storageprovider.ResourceId{
@@ -125,7 +125,7 @@ func TestCS3UserSharesToDriveItemsConcurrentMapAccess(t *testing.T) {
 	// for an already known drive item, and an empty map read is not enough for
 	// the race detector to flag a conflicting access pattern on every run.
 	driveItems := make(driveItemsByResourceID, numRaceTestResources)
-	for i := 0; i < numRaceTestResources; i++ {
+	for i := range numRaceTestResources {
 		driveItems[fmt.Sprintf("storageid$spaceid!seed-%d", i)] = libregraph.DriveItem{}
 	}
 
@@ -147,7 +147,7 @@ func TestCS3UserSharesToDriveItemsConcurrentMapAccess(t *testing.T) {
 // this test failed under -race exactly like the one above.
 func TestCS3UserSharesToDriveItemsConcurrentMapAccessMaxConcurrencyOne(t *testing.T) {
 	driveItems := make(driveItemsByResourceID, numRaceTestResources)
-	for i := 0; i < numRaceTestResources; i++ {
+	for i := range numRaceTestResources {
 		driveItems[fmt.Sprintf("storageid$spaceid!seed-%d", i)] = libregraph.DriveItem{}
 	}
 

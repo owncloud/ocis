@@ -12,7 +12,7 @@ import (
 func TestLimiter_AllowsUpToMax(t *testing.T) {
 	l := New(microstore.NewMemoryStore(), time.Minute, 3)
 
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		allowed, err := l.Allow("user-1")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -26,7 +26,7 @@ func TestLimiter_AllowsUpToMax(t *testing.T) {
 func TestLimiter_DeniesOverMax(t *testing.T) {
 	l := New(microstore.NewMemoryStore(), time.Minute, 2)
 
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		if _, err := l.Allow("user-1"); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -85,7 +85,7 @@ func TestLimiter_WindowExpiryClearsOldEntries(t *testing.T) {
 func TestLimiter_DisabledWhenMaxRequestsIsZero(t *testing.T) {
 	l := New(microstore.NewMemoryStore(), time.Minute, 0)
 
-	for i := 0; i < 50; i++ {
+	for i := range 50 {
 		allowed, err := l.Allow("user-1")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -102,7 +102,7 @@ func TestLimiter_SharedAcrossReplicas(t *testing.T) {
 	a := New(shared, time.Minute, 4)
 	b := New(shared, time.Minute, 4)
 
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		for _, l := range []*Limiter{a, b} {
 			allowed, err := l.Allow("user-1")
 			if err != nil || !allowed {
@@ -128,7 +128,7 @@ func TestLimiter_ConcurrentRequestsNeverExceedMax(t *testing.T) {
 
 	var admitted int32
 	var wg sync.WaitGroup
-	for i := 0; i < 40; i++ {
+	for i := range 40 {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
@@ -156,7 +156,7 @@ func TestLimiter_DeniedRequestsDoNotCount(t *testing.T) {
 	if allowed, _ := l.Allow("user-1"); !allowed {
 		t.Fatal("first request should be allowed")
 	}
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		if allowed, _ := l.Allow("user-1"); allowed {
 			t.Fatal("request should be denied")
 		}
