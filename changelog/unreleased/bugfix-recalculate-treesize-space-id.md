@@ -13,3 +13,4 @@ treesize is never written from an incomplete sum. The documentation now also sta
 serves treesizes from the file metadata cache.
 
 https://github.com/owncloud/ocis/issues/13275
+https://github.com/owncloud/ocis/pull/13409
