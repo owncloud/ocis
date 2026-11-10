@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/backends/keycloak"
@@ -11,6 +12,9 @@ import (
 )
 
 const (
+	// rollbackTimeout bounds the cleanup of a user whose invitation failed.
+	rollbackTimeout = 10 * time.Second
+
 	OwnCloudInstanceRel = "http://invitations.owncloud/rel/server-instance"
 	OpenIDConnectRel    = "http://openid.net/specs/connect/1.0/issuer"
 )
@@ -99,7 +103,11 @@ func (s svc) Invite(ctx context.Context, invitation *invitations.Invitation) (*i
 			// The guest can not redeem the invitation without the mail, and a
 			// leftover user would make every retry fail with a conflict, so
 			// roll the creation back.
-			if delErr := s.backend.DeleteUser(ctx, id); delErr != nil {
+			// The request context may be the reason the mail failed, so the
+			// rollback must not inherit its cancellation.
+			delCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), rollbackTimeout)
+			defer cancel()
+			if delErr := s.backend.DeleteUser(delCtx, id); delErr != nil {
 				s.log.Error().
 					Str("userID", id).
 					Str("email", invitation.InvitedUserEmailAddress).

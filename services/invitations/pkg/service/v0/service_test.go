@@ -77,3 +77,37 @@ func TestInvite_CreateFailureDoesNotDelete(t *testing.T) {
 	assert.Empty(t, b.deletedIDs)
 	assert.Empty(t, b.mailedIDs)
 }
+
+// ctxBackend records the context DeleteUser receives and cancels the request
+// context while the mail is being sent.
+type ctxBackend struct {
+	fakeBackend
+	cancel       context.CancelFunc
+	deleteCalled bool
+	deleteErr    error
+	hasDeadline  bool
+}
+
+func (c *ctxBackend) SendMail(ctx context.Context, id string) error {
+	c.cancel()
+	return context.Canceled
+}
+
+func (c *ctxBackend) DeleteUser(ctx context.Context, id string) error {
+	c.deleteCalled = true
+	c.deleteErr = ctx.Err()
+	_, c.hasDeadline = ctx.Deadline()
+	return ctx.Err()
+}
+
+func TestInvite_RollbackSurvivesCancelledRequestContext(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	b := &ctxBackend{fakeBackend: fakeBackend{canMail: true}, cancel: cancel}
+
+	_, err := newTestSvc(b).Invite(ctx, &invitations.Invitation{InvitedUserEmailAddress: "a@example.org"})
+
+	assert.ErrorIs(t, err, ErrBackend)
+	assert.True(t, b.deleteCalled)
+	assert.NoError(t, b.deleteErr, "rollback must not use the cancelled request context")
+	assert.True(t, b.hasDeadline, "rollback must be bounded by a timeout")
+}
