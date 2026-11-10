@@ -234,6 +234,8 @@ func TestBackend_SendMailClassifiesErrors(t *testing.T) {
 	}{
 		{"keycloak http error is a definite rejection", &gocloak.APIError{Code: 500, Message: "500 Internal Server Error"}, true},
 		{"wrapped keycloak http error", fmt.Errorf("wrapped: %w", &gocloak.APIError{Code: 400, Message: "400"}), true},
+		{"502 from a proxy is unknown", &gocloak.APIError{Code: 502, Message: "502 Bad Gateway"}, false},
+		{"504 from a proxy is unknown", &gocloak.APIError{Code: 504, Message: "504 Gateway Timeout"}, false},
 		{"transport error (code 0) is unknown", &gocloak.APIError{Code: 0, Message: "connection reset"}, false},
 		{"context canceled is unknown", context.Canceled, false},
 		{"plain error is unknown", errors.New("boom"), false},
