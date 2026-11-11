@@ -658,10 +658,7 @@ func (i *LDAP) getEntryByDN(dn string, attrs []string, filter string) (*ldap.Ent
 // so the retry happens here. Bounds default to one immediate re-read (count=1,
 // delay=0) and are tunable via the shared LDAP retry config.
 func (i *LDAP) readBackAfterWrite(readFn func() (*ldap.Entry, error)) (*ldap.Entry, error) {
-	maxRetries := i.retryMaxCount
-	if maxRetries < 1 {
-		maxRetries = 1
-	}
+	maxRetries := max(i.retryMaxCount, 1)
 
 	var bo *backoff.ExponentialBackOff
 	for try := 0; ; try++ {

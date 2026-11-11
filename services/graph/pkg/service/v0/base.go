@@ -382,10 +382,7 @@ func (g BaseGraphService) cs3UserSharesToDriveItems(ctx context.Context, shares 
 	})
 
 	// Spawn workers that'll concurrently work the queue
-	numWorkers := g.config.MaxConcurrency
-	if len(sharesByResource) < numWorkers {
-		numWorkers = len(sharesByResource)
-	}
+	numWorkers := min(len(sharesByResource), g.config.MaxConcurrency)
 	for i := 0; i < numWorkers; i++ {
 		errg.Go(func() error {
 			for sharesByResource := range work {
@@ -484,10 +481,7 @@ func (g BaseGraphService) cs3OCMSharesToDriveItems(ctx context.Context, shares [
 	})
 
 	// Spawn workers that'll concurrently work the queue
-	numWorkers := g.config.MaxConcurrency
-	if len(sharesByResource) < numWorkers {
-		numWorkers = len(sharesByResource)
-	}
+	numWorkers := min(len(sharesByResource), g.config.MaxConcurrency)
 	for i := 0; i < numWorkers; i++ {
 		errg.Go(func() error {
 			for sharesByResource := range work {
@@ -757,10 +751,7 @@ func (g BaseGraphService) cs3PublicSharesToDriveItems(ctx context.Context, share
 	})
 
 	// Spawn workers that'll concurrently work the queue
-	numWorkers := g.config.MaxConcurrency
-	if len(sharesByResource) < numWorkers {
-		numWorkers = len(sharesByResource)
-	}
+	numWorkers := min(len(sharesByResource), g.config.MaxConcurrency)
 	for i := 0; i < numWorkers; i++ {
 		errg.Go(func() error {
 			for sharesByResource := range work {

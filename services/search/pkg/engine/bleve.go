@@ -515,7 +515,7 @@ func unmarshalInterfaceMap(out any, flatMap map[string]any, prefix string) bool 
 		mapKey := prefix + getFieldName(structField)
 
 		if value, ok := flatMap[mapKey]; ok {
-			if field.Kind() == reflect.Ptr {
+			if field.Kind() == reflect.Pointer {
 				alloc := reflect.New(field.Type().Elem())
 				elemType := field.Type().Elem()
 

@@ -766,10 +766,7 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 	})
 
 	// Spawn workers that'll concurrently work the queue
-	numWorkers := 20
-	if len(storageSpaces) < numWorkers {
-		numWorkers = len(storageSpaces)
-	}
+	numWorkers := min(len(storageSpaces), 20)
 	for i := 0; i < numWorkers; i++ {
 		errg.Go(func() error {
 			for storageSpace := range work {

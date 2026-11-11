@@ -92,7 +92,7 @@ func StrictDecode(target any) error {
 
 func decode(target any, strict bool) (int, error) {
 	s := reflect.ValueOf(target)
-	if s.Kind() != reflect.Ptr || s.IsNil() {
+	if s.Kind() != reflect.Pointer || s.IsNil() {
 		return 0, ErrInvalidTarget
 	}
 
@@ -110,7 +110,7 @@ func decode(target any, strict bool) (int, error) {
 		f := s.Field(i)
 
 		switch f.Kind() {
-		case reflect.Ptr:
+		case reflect.Pointer:
 			if f.Elem().Kind() != reflect.Struct {
 				break
 			}
@@ -284,7 +284,7 @@ func decodePrimitiveType(f *reflect.Value, env string) error {
 	case reflect.String:
 		f.SetString(env)
 
-	case reflect.Ptr:
+	case reflect.Pointer:
 		// Handle special case for *url.URL
 		if t := f.Type().Elem(); t.Kind() == reflect.Struct && t.PkgPath() == "net/url" && t.Name() == "URL" {
 			v, err := url.Parse(env)
@@ -353,7 +353,7 @@ func (c ConfigInfoSlice) Swap(i, j int) {
 // Returns a list of final configuration metadata sorted by envvar name
 func Export(target any) ([]*ConfigInfo, error) {
 	s := reflect.ValueOf(target)
-	if s.Kind() != reflect.Ptr || s.IsNil() {
+	if s.Kind() != reflect.Pointer || s.IsNil() {
 		return nil, ErrInvalidTarget
 	}
 
@@ -370,7 +370,7 @@ func Export(target any) ([]*ConfigInfo, error) {
 		fName := t.Field(i).Name
 
 		fElem := f
-		if f.Kind() == reflect.Ptr {
+		if f.Kind() == reflect.Pointer {
 			fElem = f.Elem()
 		}
 		if fElem.Kind() == reflect.Struct {
@@ -407,7 +407,7 @@ func Export(target any) ([]*ConfigInfo, error) {
 			}
 		}
 
-		if f.Kind() == reflect.Ptr && f.IsNil() {
+		if f.Kind() == reflect.Pointer && f.IsNil() {
 			ci.Value = ""
 		} else if stringer, ok := f.Interface().(fmt.Stringer); ok {
 			ci.Value = stringer.String()
