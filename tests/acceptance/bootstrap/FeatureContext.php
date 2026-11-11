@@ -2699,6 +2699,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function before(BeforeScenarioScope $scope): void {
 		$this->scenarioStartTime = \time();
+		OcisConfigHelper::resetPostprocessingReconfigured();
 
 		// Get the environment
 		$environment = $scope->getEnvironment();

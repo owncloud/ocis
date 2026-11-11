@@ -149,6 +149,10 @@ func (p Permissions) checkPermission(ctx context.Context, perm string, ref *prov
 // the manager role are supersets of it, while viewers are not.
 var editorPerms = conversions.NewSpaceEditorWithoutVersionsWithoutTrashbinRole().CS3ResourcePermissions()
 
+// viewerPerms is the smallest space-viewer bitmap; the space editors and the
+// manager role are supersets of it.
+var viewerPerms = conversions.NewSpaceViewerRole().CS3ResourcePermissions()
+
 // IsSpaceManager returns true if the given resource permissions evaluate the user as "Space manager".
 // A manager holds the full grant-management triad; a single grant-management bit is not enough.
 // DenyGrant is not required, so legitimate manager/coowner grants that predate it still classify correctly.
@@ -162,9 +166,8 @@ func IsSpaceEditor(rp *provider.ResourcePermissions) bool {
 }
 
 // IsSpaceViewer returns true if the given resource permissions evaluate the user as "Space viewer"
-// We couldn't use NewSpaceViewerRole because it carries ListRecycle, which the WithoutTrashbin space editors lack.
 func IsSpaceViewer(rp *provider.ResourcePermissions) bool {
-	return rp.GetStat() && rp.GetGetPath() && rp.GetListGrants()
+	return conversions.SufficientCS3Permissions(rp, viewerPerms)
 }
 
 func spaceRef(spaceid string) *provider.Reference {
