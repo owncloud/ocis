@@ -6,15 +6,16 @@
 # Translators:
 # Martin <github@diemattels.at>, 2026
 # David Walter, 2026
+# Yannik Dieker-vonWaaden, 2026
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-10-05 02:38+0000\n"
+"POT-Creation-Date: 2026-11-11 02:14+0000\n"
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
-"Last-Translator: David Walter, 2026\n"
+"Last-Translator: Yannik Dieker-vonWaaden, 2026\n"
 "Language-Team: German (https://app.transifex.com/owncloud-org/teams/6149/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -156,22 +157,23 @@ msgstr ""
 #: pkg/unifiedrole/roles.go:184
 msgid "View, download, upload, edit and show all invited people."
 msgstr ""
-"Anzeigen, herunterladen, hochladen, bearbeiten und alle eingeladenen "
-"Personen anzeigen."
+"Anzeigen, herunterladen, hochladen, bearbeiten und alle eingeladene Benutzer"
+" anzeigen."
 
 #. UnifiedRole Editor, Role Description (resolves directly)
 #. UnifiedRole SpaceEditorWithoutVersionsWithoutTrashbin, Role Description
 #. (resolves directly)
 #: pkg/unifiedrole/roles.go:150 pkg/unifiedrole/roles.go:226
 msgid "View, download, upload, edit, add and delete."
-msgstr "Anzeigen, herunterladen, hochladen, bearbeiten, hinzufügen, löschen."
+msgstr ""
+"Anzeigen, herunterladen, hochladen, bearbeiten, hinzufügen und löschen."
 
 #. UnifiedRole SpaceEditorWithoutTrashbin, Role Description (resolves
 #. directly)
 #: pkg/unifiedrole/roles.go:218
 msgid "View, download, upload, edit, add and show all versions."
 msgstr ""
-"Anzeigen, herunterladen, hochladen, bearbeiten, hinzufügen und alle "
+"Anzeigen, herunterladen, hochladen, bearbeiten, hinzufügen, löschen und "
 "Versionen anzeigen."
 
 #. UnifiedRole SpaceEditorWithoutVersions, Role Description (resolves
@@ -186,8 +188,8 @@ msgstr ""
 #: pkg/unifiedrole/roles.go:158
 msgid "View, download, upload, edit, add, delete and show all invited people."
 msgstr ""
-"Anzeigen, herunterladen, hochladen, bearbeiten, löschen und anzeigen aller "
-"eingeladenen Benutzer."
+"Anzeigen, herunterladen, hochladen, bearbeiten, löschen und alle eingeladene"
+" Benutzer anzeigen."
 
 #. UnifiedRole SpaceEditor, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:234
@@ -215,8 +217,8 @@ msgid ""
 "View, download, upload, edit, delete, show all versions and all invited "
 "people."
 msgstr ""
-"Anzeigen, herunterladen, hochladen, bearbeiten, löschen und alle Versionen "
-"und eingeladenen Personen anzeigen."
+"Anzeigen, herunterladen, hochladen, bearbeiten, löschen, Versionen und alle "
+"eingeladenen Benutzer anzeigen."
 
 #. UnifiedRole FileEditorListGrantsWithVersions, Role Description (resolves
 #. directly)
@@ -224,5 +226,5 @@ msgstr ""
 msgid ""
 "View, download, upload, edit, show all versions and all invited people."
 msgstr ""
-"Anzeigen, herunterladen, hochladen, bearbeiten und alle Versionen und "
-"eingeladenen Personen anzeigen."
+"Anzeigen, herunterladen, hochladen, bearbeiten, Versionen und alle "
+"eingeladene Benutzer anzeigen."
