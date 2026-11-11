@@ -1,4 +1,4 @@
-// Copyright 2012-2025 The NATS Authors
+// Copyright 2012-2026 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -107,6 +107,14 @@ loop:
 		goto loop
 	}
 	return n
+}
+
+// Largest queue weight parseSize accepts on the wire.
+const maxQueueWeight = 999_999_999
+
+// Converts a queue weight total to the weight sent to a route or leaf.
+func queueWeight(n int64) int32 {
+	return int32(min(n, maxQueueWeight))
 }
 
 // parseInt64 expects decimal positive numbers. We
@@ -385,14 +393,16 @@ func parallelTaskQueue(mp int) chan<- func() {
 	return tq
 }
 
-// addSaturate returns a + b, saturating at math.MaxInt64.
-// Both a and b must be non-negative.
-func addSaturate(a, b int64) int64 {
-	sum, carry := bits.Add64(uint64(a), uint64(b), 0)
-	if carry != 0 || sum > uint64(math.MaxInt64) {
-		return math.MaxInt64
+// addSaturate returns a + b, saturating at the maximum value of T.
+// Signed inputs must be non-negative.
+func addSaturate[T ~int64 | ~uint64](a, b T) T {
+	if c := a + b; c >= a {
+		return c
 	}
-	return int64(sum)
+	if ^T(0) < 0 {
+		return T(^uint64(0) >> 1)
+	}
+	return ^T(0)
 }
 
 // mulSaturate returns a * b, saturating at math.MaxInt64.

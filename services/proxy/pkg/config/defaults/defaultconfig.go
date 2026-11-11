@@ -271,8 +271,20 @@ func DefaultPolicies() []config.Policy {
 					Service:  "com.owncloud.web.invitations",
 				},
 				{
+					Endpoint: "/graph/v1beta1/extensions/org.libregraph/llm/",
+					Service:  "com.owncloud.web.llm",
+				},
+				{
 					Endpoint: "/graph/",
 					Service:  "com.owncloud.web.graph",
+				},
+				{
+					Endpoint: "/vault/graph/v1beta1/extensions/org.libregraph/activities",
+					Service:  "com.owncloud.web.activitylog",
+				},
+				{
+					Endpoint: "/vault/graph/v1.0/invitations",
+					Service:  "com.owncloud.web.invitations",
 				},
 				{
 					Endpoint: "/vault/graph/",
@@ -318,8 +330,15 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.OIDC.UserinfoCache == nil && cfg.Commons != nil && cfg.Commons.Cache != nil {
 		cfg.OIDC.UserinfoCache = &config.Cache{
-			Store: cfg.Commons.Cache.Store,
-			Nodes: cfg.Commons.Cache.Nodes,
+			Store:                cfg.Commons.Cache.Store,
+			Nodes:                cfg.Commons.Cache.Nodes,
+			AuthUsername:         cfg.Commons.Cache.AuthUsername,
+			AuthPassword:         cfg.Commons.Cache.AuthPassword,
+			CredsFile:            cfg.Commons.Cache.CredsFile,
+			Creds:                cfg.Commons.Cache.Creds,
+			EnableTLS:            cfg.Commons.Cache.EnableTLS,
+			TLSInsecure:          cfg.Commons.Cache.TLSInsecure,
+			TLSRootCACertificate: cfg.Commons.Cache.TLSRootCACertificate,
 		}
 	} else if cfg.OIDC.UserinfoCache == nil {
 		cfg.OIDC.UserinfoCache = &config.Cache{}
@@ -335,6 +354,9 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.GRPCClientTLS == nil && cfg.Commons != nil {
 		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
+	}
+	if cfg.GRPCClientOptions == nil && cfg.Commons != nil {
+		cfg.GRPCClientOptions = structs.CopyOrZeroValue(cfg.Commons.GRPCClientOptions)
 	}
 }
 

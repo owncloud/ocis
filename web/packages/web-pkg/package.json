@@ -1,6 +1,6 @@
 {
   "name": "@ownclouders/web-pkg",
-  "version": "12.5.0",
+  "version": "13.0.0",
   "description": "ownCloud web pkg",
   "license": "Apache-2.0",
   "main": "src/index.ts",
@@ -8,11 +8,11 @@
   "private": false,
   "author": "ownCloud GmbH <devops@owncloud.com>",
   "type": "module",
-  "homepage": "https://github.com/owncloud/web/tree/master/packages/web-pkg",
+  "homepage": "https://github.com/owncloud/ocis/tree/master/web/packages/web-pkg",
   "repository": {
     "type": "git",
-    "url": "https://github.com/owncloud/web",
-    "directory": "packages/web-pkg"
+    "url": "https://github.com/owncloud/ocis",
+    "directory": "web/packages/web-pkg"
   },
   "files": [
     "dist/"
@@ -25,6 +25,11 @@
         "import": "./dist/web-pkg.js",
         "require": "./dist/web-pkg.umd.cjs",
         "types": "./dist/types/index.d.ts"
+      },
+      "./src/testing": {
+        "import": "./dist/web-pkg-testing.js",
+        "require": "./dist/web-pkg-testing.umd.cjs",
+        "types": "./dist/types/testing/index.d.ts"
       }
     }
   },
@@ -42,6 +47,7 @@
     "@ownclouders/design-system": "workspace:^",
     "@ownclouders/web-client": "workspace:^",
     "@pdf-lib/fontkit": "^1.1.1",
+    "@pinia/testing": "^1.0.3",
     "@sentry/vue": "10.51.0",
     "@uppy/core": "5.2.0",
     "@uppy/drop-target": "4.1.0",
@@ -49,45 +55,44 @@
     "@uppy/utils": "7.2.0",
     "@uppy/xhr-upload": "5.2.0",
     "@vavt/cm-extension": "^1.11.2",
-    "@vue/shared": "^3.5.29",
+    "@vue/shared": "^3.5.43",
     "@vueuse/core": "^14.3.0",
-    "axios": "^1.18.1",
     "deepmerge": "^4.3.1",
-    "dompurify": "^3.4.11",
+    "dompurify": "^3.4.17",
     "emoji-regex": "^10.6.0",
     "filesize": "^11.0.17",
     "fuse.js": "^7.3.0",
     "highlight.js": "^11.11.1",
     "html2canvas": "^1.4.1",
-    "katex": "^0.16.45",
+    "katex": "^0.19.0",
     "lodash-es": "^4.18.1",
     "luxon": "^3.7.2",
     "mark.js": "^8.11.1",
     "marked": "^17.0.6",
     "md-editor-v3": "^6.5.0",
-    "mermaid": "^11.12.2",
+    "mermaid": "^12.3.0",
     "oidc-client-ts": "^3.5.0",
     "p-queue": "^9.2.0",
     "password-sheriff": "^2.0.0",
     "pdf-lib": "^1.17.1",
-    "pinia": "^3.0.4",
+    "pinia": "^4.1.0",
     "portal-vue": "^3.0.0",
     "prettier": "^3.8.1",
     "prismjs": "^1.30.0",
-    "qs": "^6.14.1",
+    "qs": "^6.16.1",
     "screenfull": "^6.0.2",
     "uuid": "^14.0.0",
+    "vitest-mock-extended": "3.1.1",
     "vue-concurrency": "^5.0.3",
     "vue-router": "^5.0.6",
-    "vue3-gettext": "^2.4.0",
-    "zod": "^4.3.6"
+    "vue3-gettext": "^4.0.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@ownclouders/web-test-helpers": "workspace:^",
     "@types/lodash-es": "4.17.12",
     "@vitest/web-worker": "4.1.5",
     "clean-publish": "6.0.1",
-    "vite": "7.3.5",
+    "vite": "7.3.7",
     "vite-plugin-dts": "4.5.4",
     "vite-plugin-node-polyfills": "0.24.0"
   }

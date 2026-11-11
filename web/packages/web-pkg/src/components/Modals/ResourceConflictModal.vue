@@ -71,18 +71,18 @@ const checkboxLabel = computed(() => {
     return ''
   }
   if (!separateSkipHandling) {
-    return $gettext('Apply to all %{count} conflicts', { count: conflictCount.toString() }, true)
+    return $gettext('Apply to all %{count} conflicts', { count: conflictCount.toString() })
   } else if (resource.isFolder) {
-    return $gettext('Apply to all %{count} folders', { count: conflictCount.toString() }, true)
+    return $gettext('Apply to all %{count} folders', { count: conflictCount.toString() })
   } else {
-    return $gettext('Apply to all %{count} files', { count: conflictCount.toString() }, true)
+    return $gettext('Apply to all %{count} files', { count: conflictCount.toString() })
   }
 })
 
 const message = computed(() =>
   resource.isFolder
-    ? $gettext('Folder with name "%{name}" already exists.', { name: resource.name }, true)
-    : $gettext('File with name "%{name}" already exists.', { name: resource.name }, true)
+    ? $gettext('Folder with name "%{name}" already exists.', { name: resource.name })
+    : $gettext('File with name "%{name}" already exists.', { name: resource.name })
 )
 
 const confirmSecondaryText = computed(() => {

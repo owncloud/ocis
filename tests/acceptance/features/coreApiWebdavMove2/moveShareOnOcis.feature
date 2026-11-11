@@ -309,8 +309,8 @@ Feature: move (rename) file
       | new              |
       | spaces           |
 
-  @issue-1976
-  Scenario Outline: sharee tries to move a file into same shared folder with same name
+
+  Scenario Outline: sharee moves a file into same shared folder with same name
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes
     And user "Brian" has created folder "testshare"
@@ -323,18 +323,18 @@ Feature: move (rename) file
       | permissionsRole | <permissions-role> |
     And user "Alice" has a share "testshare" synced
     When user "Alice" moves folder "Shares/testshare/testfile.txt" to "Shares/testshare/testfile.txt" using the WebDAV API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "<http-status-code>"
     And as "Brian" the file with original path "testshare/testfile.txt" should not exist in the trashbin
     And the content of file "Shares/testshare/testfile.txt" for user "Alice" should be "test data"
     And the content of file "testshare/testfile.txt" for user "Brian" should be "test data"
     Examples:
-      | dav-path-version | permissions-role |
-      | old              | Viewer           |
-      | old              | Uploader         |
-      | old              | Editor           |
-      | new              | Viewer           |
-      | new              | Uploader         |
-      | new              | Editor           |
-      | spaces           | Viewer           |
-      | spaces           | Uploader         |
-      | spaces           | Editor           |
+      | dav-path-version | permissions-role | http-status-code |
+      | old              | Viewer           | 403              |
+      | old              | Uploader         | 403              |
+      | old              | Editor           | 204              |
+      | new              | Viewer           | 403              |
+      | new              | Uploader         | 403              |
+      | new              | Editor           | 204              |
+      | spaces           | Viewer           | 403              |
+      | spaces           | Uploader         | 403              |
+      | spaces           | Editor           | 204              |

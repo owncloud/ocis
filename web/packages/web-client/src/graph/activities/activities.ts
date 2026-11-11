@@ -1,18 +1,16 @@
-import { ActivitiesApiFactory } from './../generated'
-import type { GraphFactoryOptions } from './../types'
+import { ActivitiesApi } from './../generated'
+import { toInitOverrides, type GraphFactoryOptions } from './../types'
 import type { GraphActivities } from './types'
 
-export const ActivitiesFactory = ({
-  axiosClient,
-  config
-}: GraphFactoryOptions): GraphActivities => {
-  const activitiesApiFactory = ActivitiesApiFactory(config, config.basePath, axiosClient)
+export const ActivitiesFactory = ({ config }: GraphFactoryOptions): GraphActivities => {
+  const activitiesApi = new ActivitiesApi(config)
 
   return {
     async listActivities(kqlTerm, requestOptions) {
-      const {
-        data: { value }
-      } = await activitiesApiFactory.getActivities(kqlTerm, requestOptions)
+      const { value } = await activitiesApi.getActivities(
+        { kql: kqlTerm },
+        toInitOverrides(requestOptions)
+      )
       return value || []
     }
   }

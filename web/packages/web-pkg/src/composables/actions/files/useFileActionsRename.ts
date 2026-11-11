@@ -1,13 +1,19 @@
 import { isSameResource } from '../../../helpers/resource'
 import { isLocationTrashActive, isLocationSharesActive } from '../../../router'
-import { Resource } from '@ownclouders/web-client'
+import {
+  PASSWORD_PROTECTED_FOLDER_FILE_EXTENSION,
+  PASSWORD_PROTECTED_FOLDER_RENAMED_MESSAGE,
+  Resource
+} from '@ownclouders/web-client'
 import { dirname, join } from 'path'
 import { WebDAV } from '@ownclouders/web-client/webdav'
 import {
   SpaceResource,
+  isPublicSpaceResource,
   isShareSpaceResource,
   extractNameWithoutExtension
 } from '@ownclouders/web-client'
+import { useResolvePasswordProtectedFolderCounterpart } from '../helpers'
 import { createFileRouteOptions } from '../../../helpers/router'
 import { renameResource as _renameResource } from '../../../helpers/resource'
 import { computed } from 'vue'
@@ -38,6 +44,7 @@ export const useFileActionsRename = () => {
 
   const resourcesStore = useResourcesStore()
   const { setCurrentFolder, upsertResource } = resourcesStore
+  const { getPsecFile } = useResolvePasswordProtectedFolderCounterpart()
 
   const getNameErrorMsg = (
     resource: Resource,
@@ -72,7 +79,7 @@ export const useFileActionsRename = () => {
     )
     if (exists) {
       const translated = $gettext('The name "%{name}" is already taken')
-      return $gettext(translated, { name: newName }, true)
+      return $gettext(translated, { name: newName })
     }
 
     if (parentResources) {
@@ -82,7 +89,7 @@ export const useFileActionsRename = () => {
 
       if (exists) {
         const translated = $gettext('The name "%{name}" is already taken')
-        return $gettext(translated, { name: newName }, true)
+        return $gettext(translated, { name: newName })
       }
     }
 
@@ -93,10 +100,55 @@ export const useFileActionsRename = () => {
     let currentFolder = resourcesStore.currentFolder
 
     try {
+      // Renaming the real folder of a password protected folder must keep the `.psec`
+      // pointer file in sync. The pointer is named `<folderName>.psec` and may live in a
+      // different space than the folder (which always lives in the personal space), so it
+      // has to be resolved from the folder's current name *before* the folder is moved.
+      const isPasswordProtectedFolder =
+        resource.isFolder &&
+        resource.path.startsWith('/.PasswordProtectedFolders/projects/') &&
+        resource.name !== newName
+      const psecFilePromise = isPasswordProtectedFolder
+        ? getPsecFile(resource)
+        : Promise.resolve(null)
+
       const newPath = join(dirname(resource.path), newName)
       await (clientService.webdav as WebDAV).moveFiles(space, resource, space, {
         path: newPath
       })
+
+      const resolvedPsecFile = await psecFilePromise
+      if (resolvedPsecFile) {
+        const { psecFile, space: psecSpace } = resolvedPsecFile
+        const newPsecName = `${newName}.${PASSWORD_PROTECTED_FOLDER_FILE_EXTENSION}`
+        const newPsecPath = join(dirname(psecFile.path), newPsecName)
+
+        await (clientService.webdav as WebDAV).moveFiles(psecSpace, psecFile, psecSpace, {
+          path: newPsecPath
+        })
+
+        const updatedPsecFile = { ...psecFile } as Resource
+        _renameResource(psecSpace, updatedPsecFile, newPsecPath)
+        upsertResource(updatedPsecFile)
+      }
+
+      // When this app instance runs framed inside the password-protected-folder view modal,
+      // renaming the shared folder (the public link root) here cannot update the owner's
+      // `.psec` pointer file: it lives in the parent window's session and is coupled only by
+      // name. Notify the parent so it can rename the `.psec` file at the same time. The check
+      // `resource.fileId === space.fileId` guarantees this only fires for the shared folder
+      // itself, never for a child resource renamed inside it.
+      if (
+        window.parent !== window &&
+        configStore.options.passwordProtectedFolderView &&
+        isPublicSpaceResource(space) &&
+        resource.fileId === space.fileId
+      ) {
+        window.parent.postMessage(
+          { name: PASSWORD_PROTECTED_FOLDER_RENAMED_MESSAGE, data: { newName } },
+          window.location.origin
+        )
+      }
 
       const isCurrentFolder = isSameResource(resource, currentFolder)
 
@@ -137,17 +189,15 @@ export const useFileActionsRename = () => {
       upsertResource(fileResource)
     } catch (error) {
       console.error(error)
-      let title = $gettext(
-        'Failed to rename "%{file}" to "%{newName}"',
-        { file: resource.name, newName },
-        true
-      )
+      let title = $gettext('Failed to rename "%{file}" to "%{newName}"', {
+        file: resource.name,
+        newName
+      })
       if (error.statusCode === 423) {
-        title = $gettext(
-          'Failed to rename "%{file}" to "%{newName}" - the file is locked',
-          { file: resource.name, newName },
-          true
-        )
+        title = $gettext('Failed to rename "%{file}" to "%{newName}" - the file is locked', {
+          file: resource.name,
+          newName
+        })
       }
       showErrorMessage({ title, errors: [error] })
     }

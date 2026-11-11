@@ -64,6 +64,7 @@ func Server(cfg *config.Config) *cli.Command {
 				grpcClient, err := grpc.NewClient(
 					append(
 						grpc.GetClientOptions(cfg.GRPCClientTLS),
+						grpc.WithKeepaliveParams(cfg.GRPCClientOptions),
 						grpc.WithTraceProvider(traceProvider),
 					)...,
 				)

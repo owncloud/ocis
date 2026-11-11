@@ -17,6 +17,12 @@ const { user } = defineProps<Props>()
 .user-info {
   align-items: center;
   flex-direction: column;
+
+  span {
+    max-width: 100%;
+    overflow-wrap: break-word;
+    text-align: center;
+  }
 }
 .user-info-display-name {
   font-size: 1.5rem;

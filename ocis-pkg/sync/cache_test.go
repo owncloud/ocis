@@ -12,7 +12,7 @@ func cacheRunner(size int) (*Cache, func(f func(v string))) {
 	c := NewCache(size)
 	run := func(f func(v string)) {
 		wg := sync.WaitGroup{}
-		for i := 0; i < size; i++ {
+		for i := range size {
 			wg.Add(1)
 			go func(v string) {
 				f(v)

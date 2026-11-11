@@ -189,6 +189,7 @@ const tooltipLabelIcon = computed(() => {
   display: inline-flex;
   justify-content: flex-start;
   overflow: visible !important;
+  min-width: 0;
 
   &-no-interaction {
     pointer-events: none;

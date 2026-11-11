@@ -59,6 +59,16 @@ is based on the [OData Specification](https://docs.oasis-open.org/odata/odata/v4
 See the [Libre Graph API](https://owncloud.dev/libre-graph-api/#/users/ListUsers) for examples
 on the filters supported when querying users.
 
+## Space Image File Size
+
+A space can have an image, set by assigning a file in the space's `.space` folder via `PATCH /graph/v1beta1/drives/{drive-id}`. Space images are rendered exclusively as thumbnails and there is no raw download fallback, which means an image that the `thumbnails` service refuses to process cannot be displayed at all.
+
+The graph service therefore rejects an assignment with `413/Request Entity Too Large` if the referenced file exceeds `GRAPH_MAX_IMAGE_FILE_SIZE`, defaulting to `50MB`. Without this check, assigning a too large image would succeed but the image would silently never appear. A previously set space image is left unchanged when an assignment is rejected. Set the value to `0` to not limit the file size.
+
+This limit is independent of `THUMBNAILS_MAX_INPUT_IMAGE_FILE_SIZE` of the `thumbnails` service, which is the upper bound for any image that can be rendered at all. A deployment can set a stricter limit for space images than for thumbnails in general, but `GRAPH_MAX_IMAGE_FILE_SIZE` must be less than or equal to `THUMBNAILS_MAX_INPUT_IMAGE_FILE_SIZE`. Both default to `50MB`. If the graph limit is set higher, images between the two values are accepted as a space image but cannot be rendered.
+
+Only the file size is enforced. The independent dimension limits of the `thumbnails` service, `THUMBNAILS_MAX_INPUT_WIDTH` and `THUMBNAILS_MAX_INPUT_HEIGHT`, are not checked here, because image dimensions cannot be determined without downloading and decoding the image. A small image with very large dimensions can therefore still be accepted and still fail to render.
+
 ## Caching
 
 The `graph` service can use a configured store via `GRAPH_CACHE_STORE`. Possible stores are:

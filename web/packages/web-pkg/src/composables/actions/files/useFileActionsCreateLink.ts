@@ -53,14 +53,10 @@ export const useFileActionsCreateLink = ({
         // Only copy to clipboard if the user tries to create one single link
         try {
           const copyToClipboardText = options.copyPassword
-            ? $gettext(
-                '%{link} Password:%{password}',
-                {
-                  link: succeeded[0].value.webUrl,
-                  password
-                },
-                true
-              )
+            ? $gettext('%{link} Password:%{password}', {
+                link: succeeded[0].value.webUrl,
+                password
+              })
             : succeeded[0].value.webUrl
 
           await copyToClipboard(copyToClipboardText)
@@ -111,7 +107,7 @@ export const useFileActionsCreateLink = ({
         space,
         resource,
         options: {
-          '@libre.graph.quickLink': false,
+          atLibreGraphQuickLink: false,
           displayName: $gettext('Unnamed link'),
           type: unref(defaultLinkType)
         }

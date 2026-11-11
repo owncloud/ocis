@@ -1,10 +1,10 @@
 import ItemFilter from '../../../src/components/ItemFilter.vue'
 import {
-  PartialComponentProps,
   defaultComponentMocks,
   defaultPlugins,
-  mount
-} from '@ownclouders/web-test-helpers'
+  mount,
+  PartialComponentProps
+} from '../../../src/testing'
 import { queryItemAsString } from '../../../src/composables/appDefaults'
 import { OcCheckbox } from '@ownclouders/design-system/components'
 

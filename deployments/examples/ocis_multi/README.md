@@ -38,3 +38,19 @@ In this example, the admin user (configured in `config/ldap/ldif/20_users.ldif` 
 **Security Note:** Master-ID grants member status only (not admin privileges). Regular users require specific instance IDs for access control.
 
 
+
+## Vault Mode
+
+You can enable the vault storage on both instances. The file `vault-storage.yml` adds one extra `storage-users` service to each instance: `storage-users-vault` for `ocis` and `storage-users-vault-ocm` for `ocis-ocm`. It also enables MFA and vault mode on both `ocis` and `ocis-ocm`.
+
+To start the deployment with the vault, add the file `vault-storage.yml` to the compose command:
+
+```bash
+docker compose -f docker-compose.yml -f vault-storage.yml up -d
+```
+
+Alternatively, set the `COMPOSE_FILE` environment variable:
+
+```bash
+COMPOSE_FILE=docker-compose.yml:vault-storage.yml docker compose up -d
+```

@@ -173,6 +173,81 @@ describe('HandleUpload', () => {
           expect(result).toBe(quotaExceeded)
         }
       )
+      it('tells the user what is left, what the upload needs and what to do about it', async () => {
+        const { instance, mocks } = getWrapper({
+          spaces: [
+            quotaSpace({
+              driveType: 'project',
+              name: 'Group Space',
+              remaining: 1000000,
+              total: 5000000
+            })
+          ],
+          language: translatingLanguage()
+        })
+        const showErrorMessageSpy = vi.spyOn(mocks.opts.messageStore, 'showErrorMessage')
+
+        await instance.checkQuotaExceeded([uppyFileOfSize(3000000)])
+
+        expect(showErrorMessageSpy).toHaveBeenCalledWith({
+          title: 'Not enough space',
+          desc:
+            'The upload needs 3 MB, but "Group Space" has only 1 MB left of its 5 MB limit. ' +
+            'Delete existing files or upload a smaller file.'
+        })
+      })
+      it('refers to a personal space as "Personal" rather than by its name', async () => {
+        const { instance, mocks } = getWrapper({
+          spaces: [
+            quotaSpace({ driveType: 'personal', name: 'Admin', remaining: 1000000, total: 5000000 })
+          ],
+          language: translatingLanguage()
+        })
+        const showErrorMessageSpy = vi.spyOn(mocks.opts.messageStore, 'showErrorMessage')
+
+        await instance.checkQuotaExceeded([uppyFileOfSize(3000000)])
+
+        expect(showErrorMessageSpy).toHaveBeenCalledWith({
+          title: 'Not enough space',
+          desc:
+            'The upload needs 3 MB, but "Personal" has only 1 MB left of its 5 MB limit. ' +
+            'Delete existing files or upload a smaller file.'
+        })
+      })
+      it('adds up the sizes of all files going to the same space', async () => {
+        const { instance, mocks } = getWrapper({
+          spaces: [
+            quotaSpace({
+              driveType: 'project',
+              name: 'Group Space',
+              remaining: 1000000,
+              total: 5000000
+            })
+          ],
+          language: translatingLanguage()
+        })
+        const showErrorMessageSpy = vi.spyOn(mocks.opts.messageStore, 'showErrorMessage')
+
+        // the last file on its own would fit, only the sum does not
+        const result = await instance.checkQuotaExceeded([
+          uppyFileOfSize(5000000),
+          uppyFileOfSize(500000)
+        ])
+
+        expect(result).toBe(true)
+        expect(showErrorMessageSpy).toHaveBeenCalledWith(
+          expect.objectContaining({ desc: expect.stringContaining('needs 5.5 MB') })
+        )
+      })
+      it('refuses the upload when the space is exactly full', async () => {
+        const { instance } = getWrapper({
+          spaces: [quotaSpace({ driveType: 'project', remaining: 0, total: 5000000 })]
+        })
+
+        const result = await instance.checkQuotaExceeded([uppyFileOfSize(1000)])
+
+        expect(result).toBe(true)
+      })
       it('does not check quota for share spaces', async () => {
         const size = 100
         const remaining = 90
@@ -258,13 +333,44 @@ describe('HandleUpload', () => {
   })
 })
 
+const quotaSpace = ({ driveType = 'project', name = 'space', remaining = 0, total = 0 } = {}) =>
+  mock<SpaceResource>({
+    driveType,
+    id: '1',
+    name,
+    spaceQuota: { remaining, total },
+    isOwner: () => true
+  })
+
+const uppyFileOfSize = (size: number) =>
+  mock<OcUppyFile>({
+    name: 'name',
+    meta: { spaceId: '1', routeName: locationSpacesGeneric.name as string },
+    data: { size } as Blob
+  })
+
+/**
+ * Unlike the auto mock, this one interpolates the message, so that assertions can be made
+ * on what the user actually reads.
+ */
+const translatingLanguage = () =>
+  mock<Language>({
+    current: 'en',
+    $gettext: (msgid: string, params: Record<string, unknown> = {}) =>
+      Object.entries(params).reduce(
+        (message, [key, value]) => message.replace(`%{${key}}`, String(value)),
+        msgid
+      )
+  })
+
 const getWrapper = ({
   conflictHandlingEnabled = true,
   directoryTreeCreateEnabled = true,
   quotaCheckEnabled = true,
   conflicts = [],
   conflictHandlerResult = [],
-  spaces = []
+  spaces = [],
+  language = mock<Language>({ current: 'en' })
 } = {}) => {
   const resourceConflict = mock<UploadResourceConflict>()
   resourceConflict.getConflicts.mockReturnValue(conflicts)
@@ -289,7 +395,7 @@ const getWrapper = ({
 
   const opts = {
     clientService: mockDeep<ClientService>(),
-    language: mock<Language>({ current: 'en' }),
+    language,
     route: computed(() => route),
     userStore: useUserStore(),
     messageStore: useMessages(),

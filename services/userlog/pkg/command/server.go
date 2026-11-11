@@ -33,6 +33,7 @@ import (
 var _registeredEvents = []events.Unmarshaller{
 	// file related
 	events.PostprocessingStepFinished{},
+	events.UploadReady{},
 
 	// space related
 	events.SpaceDisabled{},
@@ -66,7 +67,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			grpcClient, err := ogrpc.NewClient(
-				append(ogrpc.GetClientOptions(cfg.GRPCClientTLS), ogrpc.WithTraceProvider(tracerProvider))...,
+				append(ogrpc.GetClientOptions(cfg.GRPCClientTLS), ogrpc.WithKeepaliveParams(cfg.GRPCClientOptions), ogrpc.WithTraceProvider(tracerProvider))...,
 			)
 			if err != nil {
 				return err
@@ -95,6 +96,8 @@ func Server(cfg *config.Config) *cli.Command {
 				microstore.Database(cfg.Persistence.Database),
 				microstore.Table(cfg.Persistence.Table),
 				store.Authentication(cfg.Persistence.AuthUsername, cfg.Persistence.AuthPassword),
+				store.Credentials(cfg.Persistence.CredsFile, cfg.Persistence.Creds),
+				store.TLS(cfg.Persistence.EnableTLS, cfg.Persistence.TLSInsecure, cfg.Persistence.TLSRootCACertificate),
 			)
 
 			tm, err := pool.StringToTLSMode(cfg.GRPCClientTLS.Mode)

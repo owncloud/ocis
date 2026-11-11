@@ -19,10 +19,16 @@ export const eventSchema = z.object({
   spaceid: z.string().optional(),
   initiatorid: z.string().optional(),
   etag: z.string().optional(),
-  affecteduserids: z.array(z.string()).optional().nullable()
+  affecteduserids: z.array(z.string()).optional().nullable(),
+  outcome: z.enum(['failed']).optional()
 })
 
 export type EventSchemaType = z.infer<typeof eventSchema>
+
+/**
+ * Items whose postprocessing has finished, keyed by item id.
+ */
+export type ProcessedItems = Map<string, { spaceId: string; finishedAt: number }>
 
 export interface SSEEventOptions {
   resourcesStore: ResourcesStore
@@ -36,6 +42,7 @@ export interface SSEEventOptions {
   router: Router
   language: Language
   resourceQueue: PQueue
+  processedItems: ProcessedItems
   sseData: EventSchemaType
 }
 

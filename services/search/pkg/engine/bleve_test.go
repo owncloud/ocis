@@ -514,19 +514,19 @@ var _ = Describe("Bleve", func() {
 						Name:     "some_song.mp3",
 						MimeType: "audio/mpeg",
 						Audio: &libregraph.Audio{
-							Album:             libregraph.PtrString("Some Album"),
-							AlbumArtist:       libregraph.PtrString("Some AlbumArtist"),
-							Artist:            libregraph.PtrString("Some Artist"),
+							Album:             new("Some Album"),
+							AlbumArtist:       new("Some AlbumArtist"),
+							Artist:            new("Some Artist"),
 							Bitrate:           libregraph.PtrInt64(192),
-							Composers:         libregraph.PtrString("Some Composers"),
-							Copyright:         libregraph.PtrString(""),
+							Composers:         new("Some Composers"),
+							Copyright:         new(""),
 							Disc:              libregraph.PtrInt32(2),
 							DiscCount:         libregraph.PtrInt32(5),
 							Duration:          libregraph.PtrInt64(225000),
-							Genre:             libregraph.PtrString("Some Genre"),
-							HasDrm:            libregraph.PtrBool(false),
-							IsVariableBitrate: libregraph.PtrBool(true),
-							Title:             libregraph.PtrString("Some Title"),
+							Genre:             new("Some Genre"),
+							HasDrm:            new(false),
+							IsVariableBitrate: new(true),
+							Title:             new("Some Title"),
 							Track:             libregraph.PtrInt32(34),
 							TrackCount:        libregraph.PtrInt32(99),
 							Year:              libregraph.PtrInt32(2004),
@@ -543,19 +543,19 @@ var _ = Describe("Bleve", func() {
 
 				Expect(audio).ToNot(BeNil())
 
-				Expect(audio.Album).To(Equal(libregraph.PtrString("Some Album")))
-				Expect(audio.AlbumArtist).To(Equal(libregraph.PtrString("Some AlbumArtist")))
-				Expect(audio.Artist).To(Equal(libregraph.PtrString("Some Artist")))
+				Expect(audio.Album).To(Equal(new("Some Album")))
+				Expect(audio.AlbumArtist).To(Equal(new("Some AlbumArtist")))
+				Expect(audio.Artist).To(Equal(new("Some Artist")))
 				Expect(audio.Bitrate).To(Equal(libregraph.PtrInt64(192)))
-				Expect(audio.Composers).To(Equal(libregraph.PtrString("Some Composers")))
-				Expect(audio.Copyright).To(Equal(libregraph.PtrString("")))
+				Expect(audio.Composers).To(Equal(new("Some Composers")))
+				Expect(audio.Copyright).To(Equal(new("")))
 				Expect(audio.Disc).To(Equal(libregraph.PtrInt32(2)))
 				Expect(audio.DiscCount).To(Equal(libregraph.PtrInt32(5)))
 				Expect(audio.Duration).To(Equal(libregraph.PtrInt64(225000)))
-				Expect(audio.Genre).To(Equal(libregraph.PtrString("Some Genre")))
-				Expect(audio.HasDrm).To(Equal(libregraph.PtrBool(false)))
-				Expect(audio.IsVariableBitrate).To(Equal(libregraph.PtrBool(true)))
-				Expect(audio.Title).To(Equal(libregraph.PtrString("Some Title")))
+				Expect(audio.Genre).To(Equal(new("Some Genre")))
+				Expect(audio.HasDrm).To(Equal(new(false)))
+				Expect(audio.IsVariableBitrate).To(Equal(new(true)))
+				Expect(audio.Title).To(Equal(new("Some Title")))
 				Expect(audio.Track).To(Equal(libregraph.PtrInt32(34)))
 				Expect(audio.TrackCount).To(Equal(libregraph.PtrInt32(99)))
 				Expect(audio.Year).To(Equal(libregraph.PtrInt32(2004)))
@@ -574,9 +574,9 @@ var _ = Describe("Bleve", func() {
 						Name:     "team.jpg",
 						MimeType: "image/jpeg",
 						Location: &libregraph.GeoCoordinates{
-							Altitude:  libregraph.PtrFloat64(1047.7),
-							Latitude:  libregraph.PtrFloat64(49.48675890884328),
-							Longitude: libregraph.PtrFloat64(11.103870357204285),
+							Altitude:  new(1047.7),
+							Latitude:  new(49.48675890884328),
+							Longitude: new(11.103870357204285),
 						},
 					},
 				}
@@ -590,9 +590,9 @@ var _ = Describe("Bleve", func() {
 
 				Expect(location).ToNot(BeNil())
 
-				Expect(location.Altitude).To(Equal(libregraph.PtrFloat64(1047.7)))
-				Expect(location.Latitude).To(Equal(libregraph.PtrFloat64(49.48675890884328)))
-				Expect(location.Longitude).To(Equal(libregraph.PtrFloat64(11.103870357204285)))
+				Expect(location.Altitude).To(Equal(new(1047.7)))
+				Expect(location.Latitude).To(Equal(new(49.48675890884328)))
+				Expect(location.Longitude).To(Equal(new(11.103870357204285)))
 			})
 		})
 	})

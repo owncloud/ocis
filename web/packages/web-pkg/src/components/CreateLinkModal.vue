@@ -190,7 +190,7 @@ const createLinks = () => {
         resource,
         options: {
           type: unref(selectedType),
-          '@libre.graph.quickLink': false,
+          atLibreGraphQuickLink: false,
           password: unref(password).value,
           expirationDateTime: unref(selectedExpiry)?.toISO(),
           displayName: $gettext('Unnamed link')
@@ -249,8 +249,8 @@ const onConfirm = async (options: { copyPassword?: boolean } = {}) => {
         .forEach((e) => {
           console.error(e)
           // Human-readable error message is provided, for example when password is on banned list
-          if (e.response?.status === 400) {
-            const error = e.response.data.error
+          if (e.statusCode === 400) {
+            const error = (e.data as any).error
             error.message = upperFirst(error.message)
             userFacingErrors.push(error)
           }
@@ -269,14 +269,10 @@ const onConfirm = async (options: { copyPassword?: boolean } = {}) => {
 
       if (result.length === 1) {
         clipboardText = options.copyPassword
-          ? $gettext(
-              '%{link} Password:%{password}',
-              {
-                link: succeeded[0].value.webUrl,
-                password: password.value
-              },
-              true
-            )
+          ? $gettext('%{link} Password:%{password}', {
+              link: succeeded[0].value.webUrl,
+              password: password.value
+            })
           : succeeded[0].value.webUrl
 
         successMessage = $gettext('The link has been copied to your clipboard.')

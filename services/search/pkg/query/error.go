@@ -31,16 +31,25 @@ func (e NamedGroupInvalidNodesError) Error() string {
 
 // UnsupportedTimeRangeError records an error and the value that caused it.
 type UnsupportedTimeRangeError struct {
-	Value interface{}
+	Value any
 }
 
 func (e UnsupportedTimeRangeError) Error() string {
 	return fmt.Sprintf("unable to convert '%v' to a time range", e.Value)
 }
 
+// UncompilableQueryError is returned when the query can't be compiled,
+// e.g. because it uses an unsupported operator.
+type UncompilableQueryError struct{}
+
+func (e UncompilableQueryError) Error() string {
+	return "can not compile the query"
+}
+
+// IsValidationError reports whether err was caused by an invalid user query.
 func IsValidationError(err error) bool {
 	switch err.(type) {
-	case *StartsWithBinaryOperatorError, *NamedGroupInvalidNodesError, *UnsupportedTimeRangeError:
+	case *StartsWithBinaryOperatorError, *NamedGroupInvalidNodesError, *UnsupportedTimeRangeError, *UncompilableQueryError:
 		return true
 	}
 	return false

@@ -2,44 +2,66 @@
 
 All URIs are relative to *https://ocis.ocis.rolling.owncloud.works/graph*
 
-|Method | HTTP request | Description|
+| Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-|[**getPermissionRoleDefinition**](#getpermissionroledefinition) | **GET** /v1beta1/roleManagement/permissions/roleDefinitions/{role-id} | Get unifiedRoleDefinition|
-|[**listPermissionRoleDefinitions**](#listpermissionroledefinitions) | **GET** /v1beta1/roleManagement/permissions/roleDefinitions | List roleDefinitions|
+| [**getPermissionRoleDefinition**](RoleManagementApi.md#getpermissionroledefinition) | **GET** /v1beta1/roleManagement/permissions/roleDefinitions/{role-id} | Get unifiedRoleDefinition |
+| [**listPermissionRoleDefinitions**](RoleManagementApi.md#listpermissionroledefinitions) | **GET** /v1beta1/roleManagement/permissions/roleDefinitions | List roleDefinitions |
 
-# **getPermissionRoleDefinition**
-> UnifiedRoleDefinition getPermissionRoleDefinition()
 
-Read the properties and relationships of a `unifiedRoleDefinition` object. 
+
+## getPermissionRoleDefinition
+
+> UnifiedRoleDefinition getPermissionRoleDefinition(roleId)
+
+Get unifiedRoleDefinition
+
+Read the properties and relationships of a &#x60;unifiedRoleDefinition&#x60; object. 
 
 ### Example
 
-```typescript
+```ts
 import {
-    RoleManagementApi,
-    Configuration
-} from './api';
+  Configuration,
+  RoleManagementApi,
+} from '';
+import type { GetPermissionRoleDefinitionRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new RoleManagementApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new RoleManagementApi(config);
 
-let roleId: string; //key: id of roleDefinition (default to undefined)
+  const body = {
+    // string | key: id of roleDefinition
+    roleId: roleId_example,
+  } satisfies GetPermissionRoleDefinitionRequest;
 
-const { status, data } = await apiInstance.getPermissionRoleDefinition(
-    roleId
-);
+  try {
+    const data = await api.getPermissionRoleDefinition(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
+
+| Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **roleId** | [**string**] | key: id of roleDefinition | defaults to undefined|
-
+| **roleId** | `string` | key: id of roleDefinition | [Defaults to `undefined`] |
 
 ### Return type
 
-**UnifiedRoleDefinition**
+[**UnifiedRoleDefinition**](UnifiedRoleDefinition.md)
 
 ### Authorization
 
@@ -47,44 +69,64 @@ const { status, data } = await apiInstance.getPermissionRoleDefinition(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | OK |  -  |
-|**0** | error |  -  |
+| **200** | OK |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **listPermissionRoleDefinitions**
-> UnifiedRoleDefinition listPermissionRoleDefinitions()
 
-Get a list of `unifiedRoleDefinition` objects for the permissions provider. This list determines the roles that can be selected when creating sharing invites. 
+## listPermissionRoleDefinitions
+
+> Array&lt;UnifiedRoleDefinition&gt; listPermissionRoleDefinitions()
+
+List roleDefinitions
+
+Get a list of &#x60;unifiedRoleDefinition&#x60; objects for the permissions provider. This list determines the roles that can be selected when creating sharing invites. 
 
 ### Example
 
-```typescript
+```ts
 import {
-    RoleManagementApi,
-    Configuration
-} from './api';
+  Configuration,
+  RoleManagementApi,
+} from '';
+import type { ListPermissionRoleDefinitionsRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new RoleManagementApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new RoleManagementApi(config);
 
-const { status, data } = await apiInstance.listPermissionRoleDefinitions();
+  try {
+    const data = await api.listPermissionRoleDefinitions();
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
-This endpoint does not have any parameters.
 
+This endpoint does not need any parameter.
 
 ### Return type
 
-**UnifiedRoleDefinition**
+[**Array&lt;UnifiedRoleDefinition&gt;**](UnifiedRoleDefinition.md)
 
 ### Authorization
 
@@ -92,15 +134,15 @@ This endpoint does not have any parameters.
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | A list of permission roles than can be used when sharing with users or groups. |  -  |
-|**0** | error |  -  |
+| **200** | A list of permission roles than can be used when sharing with users or groups. |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

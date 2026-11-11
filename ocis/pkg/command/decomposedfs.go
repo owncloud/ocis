@@ -16,11 +16,11 @@ import (
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/storage/cache"
 	"github.com/owncloud/reva/v2/pkg/storage/fs/ocis/blobstore"
-	"github.com/owncloud/reva/v2/pkg/storage/fs/posix/timemanager"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/metadata"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/options"
+	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/timemanager"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/tree"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/store"
@@ -373,7 +373,7 @@ func printAttribs(attribs map[string][]byte, onlyAttribute string) {
 }
 
 func attribToString(attrib []byte) string {
-	for i := 0; i < len(attrib); i++ {
+	for i := range attrib {
 		if attrib[i] < 32 || attrib[i] >= 127 {
 			return "0s" + base64.StdEncoding.EncodeToString(attrib)
 		}

@@ -12,6 +12,15 @@ import (
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
+// vaultRedactedName replaces a file/space name with a generic placeholder when it belongs to
+// the vault storage provider, so personal data never leaves the vault in a notification email.
+func vaultRedactedName(storageID, name string) string {
+	if storageID == utils.VaultStorageProviderID {
+		return "a shared item"
+	}
+	return name
+}
+
 func (s eventsNotifier) handleShareCreated(baseCtx context.Context, e events.ShareCreated, eventId string) {
 	logger := s.logger.With().
 		Str("event", "ShareCreated").
@@ -69,7 +78,7 @@ func (s eventsNotifier) prepareShareCreated(baseCtx context.Context, logger zero
 			Msg("could not stat resource")
 		return owner, shareFolder, shareLink, ctx, err
 	}
-	shareFolder = resourceInfo.Name
+	shareFolder = vaultRedactedName(e.ItemID.GetStorageId(), resourceInfo.Name)
 
 	shareLink, err = urlJoinPath(s.ocisURL, "files/shares/with-me")
 	if err != nil {
@@ -157,7 +166,7 @@ func (s eventsNotifier) prepareShareExpired(baseCtx context.Context, logger zero
 			Msg("could not stat resource")
 		return shareFolder, ctx, err
 	}
-	shareFolder = resourceInfo.GetName()
+	shareFolder = vaultRedactedName(e.ItemID.GetStorageId(), resourceInfo.GetName())
 
 	return shareFolder, ctx, err
 }
@@ -219,7 +228,7 @@ func (s eventsNotifier) prepareShareRemoved(baseCtx context.Context, logger zero
 			Msg("could not stat resource")
 		return executant, shareFolder, ctx, err
 	}
-	shareFolder = resourceInfo.Name
+	shareFolder = vaultRedactedName(e.ItemID.GetStorageId(), resourceInfo.Name)
 
 	executant, err = utils.GetUserWithContext(ctx, e.Executant, gatewayClient)
 	if err != nil {

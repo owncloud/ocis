@@ -1,8 +1,8 @@
-import { getComposableWrapper } from '@ownclouders/web-test-helpers'
 import { mock } from 'vitest-mock-extended'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 import { useCanShare } from '../../../../src/composables/shares'
 import { useCapabilityStore } from '../../../../src/composables/piniaStores'
+import { getComposableWrapper } from '../../../../src/testing'
 
 describe('useCanShare', () => {
   describe('canShare', () => {

@@ -1,10 +1,10 @@
 import DateFilter from '../../../../src/components/Filters/DateFilter.vue'
 import {
-  PartialComponentProps,
   defaultComponentMocks,
   defaultPlugins,
-  mount
-} from '@ownclouders/web-test-helpers'
+  mount,
+  PartialComponentProps
+} from '../../../../src/testing'
 import { queryItemAsString } from '../../../../src/composables/appDefaults'
 import { DateTime } from 'luxon'
 

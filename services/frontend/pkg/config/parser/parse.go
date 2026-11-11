@@ -51,6 +51,10 @@ func Validate(cfg *config.Config) error {
 		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
 	}
 
+	if cfg.GRPCClientOptions == nil && cfg.Commons != nil {
+		cfg.GRPCClientOptions = structs.CopyOrZeroValue(cfg.Commons.GRPCClientOptions)
+	}
+
 	// Set password enforcement on all public links when config is set
 	if cfg.OCS.PublicShareMustHavePassword {
 		cfg.OCS.WriteablePublicShareMustHavePassword = true

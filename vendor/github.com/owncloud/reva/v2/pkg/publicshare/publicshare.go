@@ -66,6 +66,12 @@ type LoadableManager interface {
 	Load(ctx context.Context, shareChan <-chan *WithPassword) error
 }
 
+// ClosableManager defines a share manager that owns background work (e.g. a
+// janitor) which must be stopped and awaited on shutdown
+type ClosableManager interface {
+	Close(ctx context.Context) error
+}
+
 // CreateSignature calculates a signature for a public share.
 func CreateSignature(token, pw string, expiration time.Time) (string, error) {
 	h := sha256.New()
@@ -136,7 +142,7 @@ func MatchesFilter(share *link.PublicShare, filter *link.ListPublicSharesRequest
 	case link.ListPublicSharesRequest_Filter_TYPE_RESOURCE_ID:
 		return utils.ResourceIDEqual(share.ResourceId, filter.GetResourceId())
 	case StorageIDFilterType:
-		return share.ResourceId.StorageId == filter.GetResourceId().GetStorageId()
+		return share.GetResourceId().GetStorageId() == filter.GetResourceId().GetStorageId()
 	default:
 		return false
 	}

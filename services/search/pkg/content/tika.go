@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -19,12 +21,21 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 )
 
+// tikaMajorVersion matches the major version in the tika server version string, e.g. "Apache Tika 4.2.0".
+var tikaMajorVersion = regexp.MustCompile(`(\d+)\.\d+`)
+
+// Tika 4.x renamed the X-TIKA:content metadata key to tk:content. We accept both
+// so that tika 3.x and 4.x servers can be used.
+var tikaContentKeys = []string{"tk:content", "X-TIKA:content"}
+
 // Tika is used to extract content from a resource,
 // it uses apache tika to retrieve all the data.
 type Tika struct {
 	*Basic
 	Retriever
 	tika                       *tika.Client
+	tikaURL                    string
+	languagePath               string
 	ContentExtractionSizeLimit uint64
 	CleanStopWords             bool
 }
@@ -46,7 +57,9 @@ func NewTikaExtractor(gatewaySelector pool.Selectable[gateway.GatewayAPIClient],
 	return &Tika{
 		Basic:                      basic,
 		Retriever:                  newCS3Retriever(gatewaySelector, logger, cfg.Extractor.CS3AllowInsecure),
-		tika:                       tika.NewClient(nil, cfg.Extractor.Tika.TikaURL),
+		tika:                       tk,
+		tikaURL:                    strings.TrimSuffix(cfg.Extractor.Tika.TikaURL, "/"),
+		languagePath:               tikaLanguagePath(tkv),
 		ContentExtractionSizeLimit: cfg.ContentExtractionSizeLimit,
 		CleanStopWords:             cfg.Extractor.Tika.CleanStopWords,
 	}, nil
@@ -75,10 +88,7 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 
 	var reader io.Reader = data
 	if ri.Size > t.ContentExtractionSizeLimit {
-		limit := t.ContentExtractionSizeLimit
-		if limit > math.MaxInt64 {
-			limit = math.MaxInt64
-		}
+		limit := min(t.ContentExtractionSizeLimit, math.MaxInt64)
 		reader = io.LimitReader(data, int64(limit)) //nolint:gosec // overflow guarded above
 	}
 
@@ -96,8 +106,11 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 			doc.Title = strings.TrimSpace(fmt.Sprintf("%s %s", doc.Title, title))
 		}
 
-		if content, err := getFirstValue(meta, "X-TIKA:content"); err == nil {
-			doc.Content = strings.TrimSpace(fmt.Sprintf("%s %s", doc.Content, content))
+		for _, key := range tikaContentKeys {
+			if content, err := getFirstValue(meta, key); err == nil {
+				doc.Content = strings.TrimSpace(fmt.Sprintf("%s %s", doc.Content, content))
+				break
+			}
 		}
 
 		doc.Location = t.getLocation(meta)
@@ -109,11 +122,46 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 		}
 	}
 
-	if langCode, _ := t.tika.LanguageString(ctx, doc.Content); langCode != "" && t.CleanStopWords {
+	if langCode, _ := t.detectLanguage(ctx, doc.Content); langCode != "" && t.CleanStopWords {
 		doc.Content = CleanString(doc.Content, langCode)
 	}
 
 	return doc, nil
+}
+
+// tikaLanguagePath returns the language detection endpoint of the tika server with the given
+// version. Tika 4.x replaced /language/string with /language, which go-tika doesn't know about.
+func tikaLanguagePath(version string) string {
+	if m := tikaMajorVersion.FindStringSubmatch(version); m != nil {
+		if major, err := strconv.Atoi(m[1]); err == nil && major >= 4 {
+			return "/language"
+		}
+	}
+	return "/language/string"
+}
+
+// detectLanguage returns the language code tika detects for the given text.
+func (t Tika) detectLanguage(ctx context.Context, text string) (string, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPut, t.tikaURL+t.languagePath, strings.NewReader(text))
+	if err != nil {
+		return "", err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("tika language detection failed: %s", resp.Status)
+	}
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
 }
 
 func (t Tika) getImage(meta map[string][]string) *libregraph.Image {
@@ -149,14 +197,20 @@ func (t Tika) getLocation(meta map[string][]string) *libregraph.GeoCoordinates {
 		}
 	}
 
-	// GPS Altitude is returned as "227.4 metres" - extract the numeric portion
-	if v, err := getFirstValue(meta, "GPS:GPS Altitude"); err == nil {
+	// Tika 4.x reports the altitude as geo:alt, tika 3.x as "GPS:GPS Altitude"
+	// which is returned as "227.4 metres" - extract the numeric portion
+	for _, key := range []string{"geo:alt", "GPS:GPS Altitude"} {
+		v, err := getFirstValue(meta, key)
+		if err != nil {
+			continue
+		}
 		// Parse altitude value - remove " metres" suffix if present
 		altStr := strings.TrimSuffix(v, " metres")
 		altStr = strings.TrimSuffix(altStr, " m")
 		if alt, err := strconv.ParseFloat(strings.TrimSpace(altStr), 64); err == nil {
 			initLocation()
 			location.SetAltitude(alt)
+			break
 		}
 	}
 
@@ -274,7 +328,7 @@ func (t Tika) getAudio(meta map[string][]string) *libregraph.Audio {
 	// TODO: audio.Copyright: not provided by tika for audio files?
 
 	if v, err := getFirstValue(meta, "xmpDM:discNumber"); err == nil {
-		if i, err := strconv.ParseInt(v, 10, 32); err == nil {
+		if i, err := strconv.ParseInt(numberOfTotal(v), 10, 32); err == nil {
 			initAudio()
 			audio.SetDisc(int32(i))
 		}
@@ -283,10 +337,12 @@ func (t Tika) getAudio(meta map[string][]string) *libregraph.Audio {
 
 	//  TODO: audio.DiscCount: not provided by tika
 
+	// tika reports the duration in seconds, usually with a fractional part, e.g. "225.62".
+	// ParseFloat also accepts NaN, Inf and values that don't fit an int64 in milliseconds, skip those.
 	if v, err := getFirstValue(meta, "xmpDM:duration"); err == nil {
-		if i, err := strconv.ParseInt(v, 10, 64); err == nil {
+		if f, err := strconv.ParseFloat(v, 64); err == nil && !math.IsNaN(f) && !math.IsInf(f, 0) && f >= 0 && f <= math.MaxInt64/1000 {
 			initAudio()
-			audio.SetDuration(i * 1000)
+			audio.SetDuration(int64(math.Round(f * 1000)))
 		}
 	}
 
@@ -304,7 +360,7 @@ func (t Tika) getAudio(meta map[string][]string) *libregraph.Audio {
 	}
 
 	if v, err := getFirstValue(meta, "xmpDM:trackNumber"); err == nil {
-		if i, err := strconv.ParseInt(v, 10, 32); err == nil {
+		if i, err := strconv.ParseInt(numberOfTotal(v), 10, 32); err == nil {
 			initAudio()
 			audio.SetTrack(int32(i))
 		}
@@ -312,12 +368,21 @@ func (t Tika) getAudio(meta map[string][]string) *libregraph.Audio {
 
 	// TODO: audio.TrackCount: not provided by tika
 
+	// the release date is either a year or a full date, e.g. "2004" or "2004-05-12"
 	if v, err := getFirstValue(meta, "xmpDM:releaseDate"); err == nil {
-		if i, err := strconv.ParseInt(v, 10, 32); err == nil {
+		year, _, _ := strings.Cut(v, "-")
+		if i, err := strconv.ParseInt(year, 10, 32); err == nil {
 			initAudio()
 			audio.SetYear(int32(i))
 		}
 	}
 
 	return audio
+}
+
+// numberOfTotal returns the number from a "number/total" value like "7/12",
+// which is how tika reports the track and disc numbers of mp3 files.
+func numberOfTotal(v string) string {
+	number, _, _ := strings.Cut(v, "/")
+	return number
 }

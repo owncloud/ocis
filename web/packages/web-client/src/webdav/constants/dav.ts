@@ -122,7 +122,9 @@ export const DavProperty = Object.fromEntries(
 }
 
 export type DavFileInfoResponse = {
-  [K in keyof DavPropertyMappingType as DavPropertyMappingType[K]['value']]: DavPropertyMappingType[K]['type']
+  [
+    K in keyof DavPropertyMappingType as DavPropertyMappingType[K]['value']
+  ]: DavPropertyMappingType[K]['type']
 }
 
 export type DavPropertyValue = (typeof DavProperty)[keyof typeof DavProperty]

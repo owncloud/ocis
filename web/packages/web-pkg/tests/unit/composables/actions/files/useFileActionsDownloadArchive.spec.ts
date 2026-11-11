@@ -4,9 +4,9 @@ import { useFileActionsDownloadArchive } from '../../../../../src/composables/ac
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 import {
   defaultComponentMocks,
-  RouteLocation,
-  getComposableWrapper
-} from '@ownclouders/web-test-helpers'
+  getComposableWrapper,
+  RouteLocation
+} from '../../../../../src/testing'
 import { useArchiverService } from '../../../../../src/composables'
 import { ArchiverService } from '../../../../../src'
 

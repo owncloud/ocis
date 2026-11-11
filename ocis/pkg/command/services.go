@@ -28,6 +28,7 @@ import (
 	idm "github.com/owncloud/ocis/v2/services/idm/pkg/command"
 	idp "github.com/owncloud/ocis/v2/services/idp/pkg/command"
 	invitations "github.com/owncloud/ocis/v2/services/invitations/pkg/command"
+	llm "github.com/owncloud/ocis/v2/services/llm/pkg/command"
 	nats "github.com/owncloud/ocis/v2/services/nats/pkg/command"
 	notifications "github.com/owncloud/ocis/v2/services/notifications/pkg/command"
 	ocdav "github.com/owncloud/ocis/v2/services/ocdav/pkg/command"
@@ -56,6 +57,11 @@ var svccmds = []register.Command{
 	func(cfg *config.Config) *cli.Command {
 		return ServiceCommand(cfg, cfg.Activitylog.Service.Name, activitylog.GetCommands(cfg.Activitylog), func(c *config.Config) {
 			cfg.Activitylog.Commons = cfg.Commons
+		})
+	},
+	func(cfg *config.Config) *cli.Command {
+		return ServiceCommand(cfg, cfg.LLM.Service.Name, llm.GetCommands(cfg.LLM), func(c *config.Config) {
+			cfg.LLM.Commons = cfg.Commons
 		})
 	},
 	func(cfg *config.Config) *cli.Command {

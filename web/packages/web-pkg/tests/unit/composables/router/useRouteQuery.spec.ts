@@ -1,7 +1,6 @@
 import { useRouteQuery } from '../../../../src/composables'
 import { Ref, nextTick, computed, ComputedRef, unref } from 'vue'
-import { getComposableWrapper, createRouter } from '@ownclouders/web-test-helpers'
-
+import { getComposableWrapper, createRouter } from '../../../../src/testing'
 describe('useRouteQuery', () => {
   it('is reactive', async () => {
     const router = createRouter({

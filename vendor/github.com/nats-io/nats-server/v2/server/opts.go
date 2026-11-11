@@ -1,4 +1,4 @@
-// Copyright 2012-2025 The NATS Authors
+// Copyright 2012-2026 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -229,10 +229,18 @@ type LeafNodeOpts struct {
 	// east-west propagation.
 	IsolateLeafnodeInterest bool `json:"-"`
 
+	// DialTimeout is the amount of time the server will wait for the TCP
+	// connection to a remote server to be established. This is useful on high
+	// latency links where the default (DEFAULT_ROUTE_DIAL, 1 second) is not
+	// enough for the handshake to complete. It applies to all remotes, but can
+	// be overridden on a per-remote basis with RemoteLeafOpts.DialTimeout.
+	// If not set (or <= 0), DEFAULT_ROUTE_DIAL is used.
+	DialTimeout time.Duration `json:"-"`
+
 	// Not exported, for tests.
-	resolver    netResolver
-	dialTimeout time.Duration
-	connDelay   time.Duration
+	resolver  netResolver
+	connDelay time.Duration
+	dialer    leafNodeDialer
 
 	// Snapshot of configured TLS options.
 	tlsConfigOpts *TLSConfigOpts
@@ -264,6 +272,13 @@ type RemoteLeafOpts struct {
 	// connection.
 	FirstInfoTimeout time.Duration `json:"-"`
 
+	// DialTimeout is the amount of time the server will wait for the TCP
+	// connection to this remote server to be established. This is useful on
+	// high latency links where the default is not enough for the handshake to
+	// complete. If not set (or <= 0), the server-wide LeafNodeOpts.DialTimeout
+	// is used, which itself defaults to DEFAULT_ROUTE_DIAL (1 second).
+	DialTimeout time.Duration `json:"-"`
+
 	// Compression options for this remote. Each remote could have a different
 	// setting and also be different from the LeafNode options.
 	Compression CompressionOpts `json:"-"`
@@ -277,7 +292,7 @@ type RemoteLeafOpts struct {
 		NoMasking   bool `json:"-"`
 	}
 
-	// HTTP Proxy configuration for WebSocket connections
+	// HTTP proxy configuration, used for all remote URLs
 	Proxy struct {
 		// URL of the HTTP proxy server (e.g., "http://proxy.example.com:8080")
 		URL string `json:"-"`
@@ -287,6 +302,10 @@ type RemoteLeafOpts struct {
 		Password string `json:"-"`
 		// Timeout for proxy connection
 		Timeout time.Duration `json:"-"`
+		// TLSConfig for the connection to an https proxy, nil uses system roots
+		TLSConfig *tls.Config `json:"-"`
+		// TLSTimeout for the TLS handshake with an https proxy, in seconds, defaults to DEFAULT_LEAF_TLS_TIMEOUT
+		TLSTimeout float64 `json:"-"`
 	}
 
 	tlsConfigOpts *TLSConfigOpts
@@ -360,12 +379,15 @@ func generateRemoteLeafOptsName(r *RemoteLeafOpts, redacted bool) string {
 type JSLimitOpts struct {
 	MaxRequestBatch           int           `json:"max_request_batch,omitempty"`             // MaxRequestBatch is the maximum amount of updates that can be sent in a batch
 	MaxAckPending             int           `json:"max_ack_pending,omitempty"`               // MaxAckPending is the server limit for maximum amount of outstanding Acks
-	MaxHAAssets               int           `json:"max_ha_assets,omitempty"`                 // MaxHAAssets is the maximum of Streams and Consumers that may have more than 1 replica
+	MaxHAAssets               int           `json:"max_ha_assets,omitempty"`                 // MaxHAAssets is the maximum number of Streams and Consumers that may have more than 1 replica, per server, enforced by the meta leader
 	Duplicates                time.Duration `json:"max_duplicate_window,omitempty"`          // Duplicates is the maximum value for duplicate tracking on Streams
 	MaxBatchInflightPerStream int           `json:"max_batch_inflight_per_stream,omitempty"` // MaxBatchInflightPerStream is the maximum amount of open batches per stream
 	MaxBatchInflightTotal     int           `json:"max_batch_inflight_total,omitempty"`      // MaxBatchInflightTotal is the maximum amount of total open batches per server
 	MaxBatchSize              int           `json:"max_batch_size,omitempty"`                // MaxBatchSize is the maximum amount of messages allowed in a batch publish to a Stream
 	MaxBatchTimeout           time.Duration `json:"max_batch_timeout,omitempty"`             // MaxBatchTimeout is the maximum time to receive the commit message after receiving the first message of a batch
+
+	// Max asset limits
+	DefaultMaxConsumers int `json:"default_max_consumers,omitempty"` // DefaultMaxConsumers is the maximum number of consumers per stream (unless overwritten on the stream or the account) (-1=unlimited)
 }
 
 type JSTpmOpts struct {
@@ -462,6 +484,7 @@ type Options struct {
 	JetStreamMetaCompact       uint64
 	JetStreamMetaCompactSize   uint64
 	JetStreamMetaCompactSync   bool
+	JetStreamConcurrentIOs     int
 	StreamMaxBufferedMsgs      int               `json:"-"`
 	StreamMaxBufferedSize      int64             `json:"-"`
 	StoreDir                   string            `json:"-"`
@@ -2020,6 +2043,11 @@ func parseCluster(v any, opts *Options, errors *[]error, warnings *[]error) erro
 				*errors = append(*errors, err)
 				continue
 			}
+			if cn == leafNoOriginCluster {
+				err := &configErr{tk, ErrClusterNameReserved.Error()}
+				*errors = append(*errors, err)
+				continue
+			}
 			opts.Cluster.Name = cn
 		case "listen":
 			hp, err := parseListen(mv)
@@ -2061,6 +2089,10 @@ func parseCluster(v any, opts *Options, errors *[]error, warnings *[]error) erro
 			opts.Cluster.AuthTimeout = auth.timeout
 
 			if auth.defaultPermissions != nil {
+				if err := checkClusterPermissionSubjects(auth.defaultPermissions); err != nil {
+					*errors = append(*errors, &configErr{tk, err.Error()})
+					continue
+				}
 				err := &configWarningErr{
 					field: mk,
 					configErr: configErr{
@@ -2114,6 +2146,10 @@ func parseCluster(v any, opts *Options, errors *[]error, warnings *[]error) erro
 			if perms.Response != nil {
 				err := &configErr{tk, "Cluster permissions do not support dynamic responses"}
 				*errors = append(*errors, err)
+				continue
+			}
+			if err := checkClusterPermissionSubjects(perms); err != nil {
+				*errors = append(*errors, &configErr{tk, err.Error()})
 				continue
 			}
 			// This will possibly override permissions that were define in auth block
@@ -2259,6 +2295,11 @@ func parseGateway(v any, o *Options, errors *[]error, warnings *[]error) error {
 			gn := mv.(string)
 			if strings.Contains(gn, " ") {
 				err := &configErr{tk, ErrGatewayNameHasSpaces.Error()}
+				*errors = append(*errors, err)
+				continue
+			}
+			if gn == leafNoOriginCluster {
+				err := &configErr{tk, ErrClusterNameReserved.Error()}
 				*errors = append(*errors, err)
 				continue
 			}
@@ -2511,6 +2552,8 @@ func parseJetStreamLimits(v any, opts *Options, errors *[]error) error {
 			opts.JetStreamLimits.MaxHAAssets = int(mv.(int64))
 		case "max_request_batch":
 			opts.JetStreamLimits.MaxRequestBatch = int(mv.(int64))
+		case "default_max_consumers":
+			opts.JetStreamLimits.DefaultMaxConsumers = int(mv.(int64))
 		case "duplicate_window":
 			var err error
 			opts.JetStreamLimits.Duplicates, err = time.ParseDuration(mv.(string))
@@ -2762,6 +2805,12 @@ func parseJetStream(v any, opts *Options, errors *[]error, warnings *[]error) er
 				opts.JetStreamMetaCompactSize = uint64(s)
 			case "meta_compact_sync":
 				opts.JetStreamMetaCompactSync = mv.(bool)
+			case "max_concurrent_io":
+				dios, ok := mv.(int64)
+				if !ok || dios < minConcurrentIOs || dios > maxConcurrentIOs {
+					return &configErr{tk, fmt.Sprintf("Expected an absolute size for %q between 4 and 8192, got %v", mk, mv)}
+				}
+				opts.JetStreamConcurrentIOs = int(dios)
 			default:
 				if !tk.IsUsedVariable() {
 					err := &unknownConfigFieldErr{
@@ -2839,6 +2888,8 @@ func parseLeafNodes(v any, opts *Options, errors *[]error, warnings *[]error) er
 			opts.LeafNode.Remotes = remotes
 		case "reconnect", "reconnect_delay", "reconnect_interval":
 			opts.LeafNode.ReconnectInterval = parseDuration("reconnect", tk, mv, errors, warnings)
+		case "dial_timeout":
+			opts.LeafNode.DialTimeout = parseDuration("dial_timeout", tk, mv, errors, warnings)
 		case "tls":
 			tc, err := parseTLS(tk, true)
 			if err != nil {
@@ -3032,6 +3083,26 @@ func parseLeafUsers(mv any, errors *[]error) ([]*User, error) {
 	return users, nil
 }
 
+// proxyTLSSupportedKeys are the TLS options that apply to the client connection to a proxy.
+var proxyTLSSupportedKeys = map[string]struct{}{
+	"cert_file":                    {},
+	"key_file":                     {},
+	"ca_file":                      {},
+	"insecure":                     {},
+	"cipher_suites":                {},
+	"allow_insecure_cipher_suites": {},
+	"curve_preferences":            {},
+	"min_version":                  {},
+	"timeout":                      {},
+	"cert_store":                   {},
+	"cert_match_by":                {},
+	"cert_match":                   {},
+	"cert_match_skip_invalid":      {},
+	"ca_certs_match":               {},
+	"certs":                        {},
+	"certificates":                 {},
+}
+
 func parseRemoteLeafNodes(v any, errors *[]error, warnings *[]error) ([]*RemoteLeafOpts, error) {
 	var lt token
 	defer convertPanicToErrorList(&lt, errors)
@@ -3127,14 +3198,14 @@ func parseRemoteLeafNodes(v any, errors *[]error, warnings *[]error) ([]*RemoteL
 			case "hub":
 				remote.Hub = v.(bool)
 			case "deny_imports", "deny_import":
-				subjects, err := parsePermSubjects(tk, errors)
+				subjects, err := parsePermSubjects(tk, errors, false)
 				if err != nil {
 					*errors = append(*errors, err)
 					continue
 				}
 				remote.DenyImports = subjects
 			case "deny_exports", "deny_export":
-				subjects, err := parsePermSubjects(tk, errors)
+				subjects, err := parsePermSubjects(tk, errors, false)
 				if err != nil {
 					*errors = append(*errors, err)
 					continue
@@ -3176,6 +3247,8 @@ func parseRemoteLeafNodes(v any, errors *[]error, warnings *[]error) ([]*RemoteL
 				}
 			case "first_info_timeout":
 				remote.FirstInfoTimeout = parseDuration(k, tk, v, errors, warnings)
+			case "dial_timeout":
+				remote.DialTimeout = parseDuration(k, tk, v, errors, warnings)
 			case "disabled":
 				remote.Disabled = v.(bool)
 			case "proxy":
@@ -3197,6 +3270,33 @@ func parseRemoteLeafNodes(v any, errors *[]error, warnings *[]error) ([]*RemoteL
 						remote.Proxy.Password = pv.(string)
 					case "timeout":
 						remote.Proxy.Timeout = parseDuration("proxy timeout", tk, pv, errors, warnings)
+					case "tls":
+						var unsupported bool
+						tlsMap, _ := pv.(map[string]any)
+						for tlsKey, tlsValue := range tlsMap {
+							ttk, _ := unwrapValue(tlsValue, &lt)
+							if _, ok := proxyTLSSupportedKeys[strings.ToLower(tlsKey)]; !ok {
+								*errors = append(*errors, &configErr{ttk, fmt.Sprintf("%q is not supported for proxy TLS", tlsKey)})
+								unsupported = true
+							}
+						}
+						if unsupported {
+							continue
+						}
+						tc, err := parseTLS(tk, true)
+						if err != nil {
+							*errors = append(*errors, err)
+							continue
+						}
+						tlsConfig, err := GenTLSConfig(tc)
+						if err != nil {
+							*errors = append(*errors, &configErr{tk, err.Error()})
+							continue
+						}
+						// Used as a client, so ca_file must populate RootCAs.
+						tlsConfig.RootCAs = tlsConfig.ClientCAs
+						remote.Proxy.TLSConfig = tlsConfig
+						remote.Proxy.TLSTimeout = tc.Timeout
 					default:
 						if !tk.IsUsedVariable() {
 							err := &unknownConfigFieldErr{
@@ -3344,6 +3444,29 @@ func setClusterPermissions(opts *ClusterOpts, perms *Permissions) {
 		Import: perms.Publish,
 		Export: perms.Subscribe,
 	}
+}
+
+func checkClusterPermissionSubjects(perms *Permissions) error {
+	if perms == nil {
+		return nil
+	}
+	if perms.Publish != nil {
+		if err := checkPermSubjectArray(perms.Publish.Allow, false); err != nil {
+			return fmt.Errorf("cluster import allow: %w", err)
+		}
+		if err := checkPermSubjectArray(perms.Publish.Deny, false); err != nil {
+			return fmt.Errorf("cluster import deny: %w", err)
+		}
+	}
+	if perms.Subscribe != nil {
+		if err := checkPermSubjectArray(perms.Subscribe.Allow, false); err != nil {
+			return fmt.Errorf("cluster export allow: %w", err)
+		}
+		if err := checkPermSubjectArray(perms.Subscribe.Deny, false); err != nil {
+			return fmt.Errorf("cluster export deny: %w", err)
+		}
+	}
+	return nil
 }
 
 // Temp structures to hold account import and export defintions since they need
@@ -4787,14 +4910,14 @@ func parseUserPermissions(mv any, errors *[]error) (*Permissions, error) {
 		// Import is Publish
 		// Export is Subscribe
 		case "pub", "publish", "import":
-			perms, err := parseVariablePermissions(mv, errors)
+			perms, err := parseVariablePermissions(mv, errors, false)
 			if err != nil {
 				*errors = append(*errors, err)
 				continue
 			}
 			p.Publish = perms
 		case "sub", "subscribe", "export":
-			perms, err := parseVariablePermissions(mv, errors)
+			perms, err := parseVariablePermissions(mv, errors, true)
 			if err != nil {
 				*errors = append(*errors, err)
 				continue
@@ -4834,19 +4957,19 @@ func parseUserPermissions(mv any, errors *[]error) (*Permissions, error) {
 }
 
 // Top level parser for authorization configurations.
-func parseVariablePermissions(v any, errors *[]error) (*SubjectPermission, error) {
+func parseVariablePermissions(v any, errors *[]error, allowQueue bool) (*SubjectPermission, error) {
 	switch vv := v.(type) {
 	case map[string]any:
 		// New style with allow and/or deny properties.
-		return parseSubjectPermission(vv, errors)
+		return parseSubjectPermission(vv, errors, allowQueue)
 	default:
 		// Old style
-		return parseOldPermissionStyle(v, errors)
+		return parseOldPermissionStyle(v, errors, allowQueue)
 	}
 }
 
 // Helper function to parse subject singletons and/or arrays
-func parsePermSubjects(v any, errors *[]error) ([]string, error) {
+func parsePermSubjects(v any, errors *[]error, allowQueue bool) ([]string, error) {
 	var lt token
 	defer convertPanicToErrorList(&lt, errors)
 
@@ -4871,7 +4994,7 @@ func parsePermSubjects(v any, errors *[]error) ([]string, error) {
 	default:
 		return nil, &configErr{tk, fmt.Sprintf("Expected subject permissions to be a subject, or array of subjects, got %T", v)}
 	}
-	if err := checkPermSubjectArray(subjects); err != nil {
+	if err := checkPermSubjectArray(subjects, allowQueue); err != nil {
 		return nil, &configErr{tk, err.Error()}
 	}
 	return subjects, nil
@@ -4936,8 +5059,8 @@ func parseAllowResponses(v any, errors *[]error) *ResponsePermission {
 }
 
 // Helper function to parse old style authorization configs.
-func parseOldPermissionStyle(v any, errors *[]error) (*SubjectPermission, error) {
-	subjects, err := parsePermSubjects(v, errors)
+func parseOldPermissionStyle(v any, errors *[]error, allowQueue bool) (*SubjectPermission, error) {
+	subjects, err := parsePermSubjects(v, errors, allowQueue)
 	if err != nil {
 		return nil, err
 	}
@@ -4945,7 +5068,7 @@ func parseOldPermissionStyle(v any, errors *[]error) (*SubjectPermission, error)
 }
 
 // Helper function to parse new style authorization into a SubjectPermission with Allow and Deny.
-func parseSubjectPermission(v any, errors *[]error) (*SubjectPermission, error) {
+func parseSubjectPermission(v any, errors *[]error, allowQueue bool) (*SubjectPermission, error) {
 	var lt token
 	defer convertPanicToErrorList(&lt, errors)
 
@@ -4958,14 +5081,14 @@ func parseSubjectPermission(v any, errors *[]error) (*SubjectPermission, error) 
 		tk, _ := unwrapValue(v, &lt)
 		switch strings.ToLower(k) {
 		case "allow":
-			subjects, err := parsePermSubjects(tk, errors)
+			subjects, err := parsePermSubjects(tk, errors, allowQueue)
 			if err != nil {
 				*errors = append(*errors, err)
 				continue
 			}
 			p.Allow = subjects
 		case "deny":
-			subjects, err := parsePermSubjects(tk, errors)
+			subjects, err := parsePermSubjects(tk, errors, allowQueue)
 			if err != nil {
 				*errors = append(*errors, err)
 				continue
@@ -4982,15 +5105,20 @@ func parseSubjectPermission(v any, errors *[]error) (*SubjectPermission, error) 
 }
 
 // Helper function to validate permissions subjects.
-func checkPermSubjectArray(sa []string) error {
+func checkPermSubjectArray(sa []string, allowQueue bool) error {
 	for _, s := range sa {
 		if !IsValidSubject(s) {
+			if !allowQueue {
+				return fmt.Errorf("subject %q is not a valid subject", s)
+			}
 			// Check here if this is a queue group qualified subject.
 			elements := strings.Fields(s)
 			if len(elements) != 2 {
 				return fmt.Errorf("subject %q is not a valid subject", s)
 			} else if !IsValidSubject(elements[0]) {
 				return fmt.Errorf("subject %q is not a valid subject", elements[0])
+			} else if !IsValidSubject(elements[1]) {
+				return fmt.Errorf("queue %q is not a valid queue", elements[1])
 			}
 		}
 	}
@@ -5750,11 +5878,10 @@ func GenTLSConfig(tc *TLSConfigOpts) (*tls.Config, error) {
 	// It will determine the cipher suites that we prefer.
 	// FIXME(dlc) change if ARM based.
 	config := tls.Config{
-		MinVersion:               tls.VersionTLS12,
-		CipherSuites:             tc.Ciphers,
-		PreferServerCipherSuites: true,
-		CurvePreferences:         tc.CurvePreferences,
-		InsecureSkipVerify:       tc.Insecure,
+		MinVersion:         tls.VersionTLS12,
+		CipherSuites:       tc.Ciphers,
+		CurvePreferences:   tc.CurvePreferences,
+		InsecureSkipVerify: tc.Insecure,
 	}
 
 	switch {
@@ -6122,6 +6249,12 @@ func setBaselineOptions(opts *Options) {
 	if opts.JetStreamInfoQueueLimit <= 0 {
 		opts.JetStreamInfoQueueLimit = opts.JetStreamRequestQueueLimit
 	}
+	if opts.JetStreamConcurrentIOs <= 0 {
+		opts.JetStreamConcurrentIOs = defaultConcurrentIOs
+	}
+	if opts.JetStreamLimits.DefaultMaxConsumers == 0 {
+		opts.JetStreamLimits.DefaultMaxConsumers = JSDefaultMaxConsumersPerStream
+	}
 }
 
 func getDefaultAuthTimeout(tls *tls.Config, tlsTimeout float64) float64 {
@@ -6202,7 +6335,7 @@ func ConfigureOptions(fs *flag.FlagSet, args []string, printVersion, printHelp, 
 	fs.StringVar(&opts.Cluster.ListenStr, "cluster", _EMPTY_, "Cluster url from which members can solicit routes.")
 	fs.StringVar(&opts.Cluster.ListenStr, "cluster_listen", _EMPTY_, "Cluster url from which members can solicit routes.")
 	fs.StringVar(&opts.Cluster.Advertise, "cluster_advertise", _EMPTY_, "Cluster URL to advertise to other servers.")
-	fs.BoolVar(&opts.Cluster.NoAdvertise, "no_advertise", false, "Advertise known cluster IPs to clients.")
+	fs.BoolVar(&opts.Cluster.NoAdvertise, "no_advertise", false, "Do not advertise known cluster IPs to clients.")
 	fs.IntVar(&opts.Cluster.ConnectRetries, "connect_retries", 0, "For implicit routes, number of connect retries.")
 	fs.StringVar(&opts.Cluster.Name, "cluster_name", _EMPTY_, "Cluster Name, if not set one will be dynamically generated.")
 	fs.BoolVar(&showTLSHelp, "help_tls", false, "TLS help.")
@@ -6298,9 +6431,8 @@ func ConfigureOptions(fs *flag.FlagSet, args []string, printVersion, printHelp, 
 
 	// Process signal control.
 	if signal != _EMPTY_ {
-		if err := processSignal(signal); err != nil {
-			return nil, err
-		}
+		// processSignal always either returns an error or calls os.Exit(0).
+		return nil, processSignal(signal)
 	}
 
 	// Parse config if given

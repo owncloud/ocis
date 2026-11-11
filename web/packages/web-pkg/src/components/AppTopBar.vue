@@ -7,6 +7,7 @@
             v-if="resource"
             id="app-top-bar-resource"
             :is-thumbnail-displayed="false"
+            :is-resource-clickable="false"
             :is-extension-displayed="areFileExtensionsShown"
             :path-prefix="getPathPrefix(resource)"
             :resource="resource"

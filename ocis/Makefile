@@ -21,14 +21,6 @@ include ../.make/go.mk
 ############ release ############
 include ../.make/release.mk
 
-############ docs generate ############
-CONFIG_DOCS_BASE_PATH := ../docs
-
-include ../.make/docs.mk
-
-.PHONY: docs-generate
-docs-generate: config-docs-generate
-
 ############ dev-docker ############
 .PHONY: dev-docker
 dev-docker:

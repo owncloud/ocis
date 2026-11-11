@@ -1,3 +1,5 @@
+import type { OnResponseArgs } from '../http'
+
 /**
  * List of all API endpoints that should not trigger a maintenance mode warning even when they return 503 status code.
  */
@@ -9,4 +11,25 @@ export function shouldResponseTriggerMaintenance(responseStatus: number, request
   }
 
   return false
+}
+
+/**
+ * Builds the `onResponse` handler that keeps maintenance mode in sync with what the server
+ * answers. Maintenance is the explicit 503 signal, not general unhealthiness, so any other real
+ * response (2xx, 4xx, or a 5xx that isn't the signal) clears it. Only a transport-level failure
+ * (no response at all) is left untouched, since that's not evidence either way.
+ */
+export function maintenanceResponseHandler(onSetMaintenance: (value: boolean) => void) {
+  return ({ response, status, requestUrl }: OnResponseArgs): void => {
+    if (!response) {
+      return
+    }
+
+    if (shouldResponseTriggerMaintenance(status, requestUrl)) {
+      onSetMaintenance(true)
+      return
+    }
+
+    onSetMaintenance(false)
+  }
 }

@@ -65,7 +65,7 @@ This extractor is the most simple one and just uses the resource information pro
 
 ### Tika Extractor
 
-This extractor is more advanced compared to the [Basic extractor](#basic-extractor). The main difference is that this extractor is able to search file contents. However, [Apache Tika](https://tika.apache.org/) is required for this task. Read the [Getting Started with Apache Tika](https://tika.apache.org/3.2.0/gettingstarted.html) guide on how to install and run Tika or use a ready to run [Tika container](https://hub.docker.com/r/apache/tika). See the [Tika container usage document](https://github.com/apache/tika-docker#usage) for a quickstart. Note that at the time of writing, containers are only available for the amd64 platform.
+This extractor is more advanced compared to the [Basic extractor](#basic-extractor). The main difference is that this extractor is able to search file contents. However, [Apache Tika](https://tika.apache.org/) is required for this task. Read the [Apache Tika Server documentation](https://tika.apache.org/docs/4.2.x/using-tika/server/index.html) guide on how to install and run Tika or use a ready to run [Tika container](https://hub.docker.com/r/apache/tika). See the [Tika container usage document](https://github.com/apache/tika-docker#usage) for a quickstart. Note that at the time of writing, containers are only available for the amd64 platform.
 
 As soon as Tika is installed and accessible, the search service must be configured for the use with Tika. The following settings must be set:
 
@@ -169,6 +169,10 @@ ocis search index --all-spaces
 ```
 
 Note that either `--space $SPACE_ID` or `--all-spaces` must be set.
+
+The command does not open the index itself: it asks the running search service to do the indexing over gRPC. The search service must therefore be running, and the command works with the default `SEARCH_ENGINE_BLEVE_SCALE=false` (see [Scaling](#scaling)); the service's exclusive lock on the index does not block it.
+
+The command waits for the service to walk the space and gives up after 10 minutes by default. The walk is cancelled when that happens, so a large space, or one where the content extractor is slow on a few files, may need a longer limit: `--timeout 2h` (a Go duration; `0` waits indefinitely).
 
 ## Notes
 

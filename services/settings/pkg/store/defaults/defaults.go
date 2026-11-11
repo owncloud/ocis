@@ -219,7 +219,6 @@ func generateBundleUserRole() *settingsmsg.Bundle {
 			LanguageManagementPermission(Own),
 			ListFavoritesPermission(Own),
 			SelfManagementPermission(Own),
-			VaultModePermission(Own),
 			WriteFavoritesPermission(Own),
 		},
 	}

@@ -6,7 +6,7 @@ import {
   defaultPlugins,
   RouteLocation,
   shallowMount
-} from '@ownclouders/web-test-helpers'
+} from '../../../../src/testing'
 import { defineComponent, ref } from 'vue'
 import { useSelectedResources } from '../../../../src/composables/selection'
 import {

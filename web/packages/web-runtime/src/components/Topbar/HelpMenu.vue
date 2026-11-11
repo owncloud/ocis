@@ -26,7 +26,7 @@
             rel="noopener noreferrer"
             data-testid="help-menu-software-license-link"
           >
-            <oc-icon name="scales" fill-type="line" />
+            <oc-icon name="file-shield" fill-type="line" />
             <span
               v-text="
                 $pgettext(

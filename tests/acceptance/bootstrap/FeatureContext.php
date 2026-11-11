@@ -78,7 +78,7 @@ class FeatureContext extends BehatVariablesContext {
 	private string $adminUsername;
 	private string $adminPassword;
 	private string $originalAdminPassword;
-	private DateTime $expiryDateTime;
+	private DateTimeImmutable $expiryDateTime;
 
 	/**
 	 * An array of values of replacement values of user attributes.
@@ -179,10 +179,20 @@ class FeatureContext extends BehatVariablesContext {
 		if (\array_key_exists($user, $this->autoSyncSettings)) {
 			return $this->autoSyncSettings[$user];
 		}
+		$headers = [];
+		if (\TestHelpers\KeycloakHelper::isTestingWithKeycloak()) {
+			$accessToken = $this->getOcisUserToken($user)['token']['accessToken'];
+			$headers['Authorization'] = 'Bearer ' . $accessToken;
+			$user = null;
+			$password = null;
+		} else {
+			$password = $this->getPasswordForUser($user);
+		}
 		$autoSyncSetting = SettingsHelper::getAutoAcceptSharesDefaultValue(
 			$this->baseUrl,
 			$user,
-			$this->getPasswordForUser($user),
+			$password,
+			$headers,
 		);
 		$this->autoSyncSettings[$user] = $autoSyncSetting;
 
@@ -447,7 +457,7 @@ class FeatureContext extends BehatVariablesContext {
 		$this->regularUserPassword = $regularUserPassword;
 		$this->currentServer = 'LOCAL';
 		$this->cookieJar = new CookieJar();
-		$this->expiryDateTime = new DateTime('yesterday');
+		$this->expiryDateTime = new DateTimeImmutable('yesterday', $this->getTestTimezone());
 
 		// These passwords are referenced in tests and can be overridden by
 		// setting environment variables.
@@ -893,9 +903,9 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @return DateTime
+	 * @return DateTimeImmutable
 	 */
-	public function getExpiryDateTime(): DateTime {
+	public function getExpiryDateTime(): DateTimeImmutable {
 		return $this->expiryDateTime;
 	}
 
@@ -1319,6 +1329,30 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
+	 * @param string $method
+	 * @param string $url
+	 * @param string $password
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	private function sendHttpMethodToUrlWithPassword(string $method, string $url, string $password): ResponseInterface {
+		$password = $this->getActualPassword($password);
+		$token = $this->shareNgGetLastCreatedLinkShareToken();
+		$fullUrl = $this->getBaseUrl() . $url;
+		$headers = [
+			'Public-Token' => $token,
+		];
+		return HttpRequestHelper::sendRequest(
+			$fullUrl,
+			$method,
+			"public",
+			$password,
+			$headers,
+		);
+	}
+
+	/**
 	 * @When the public sends HTTP method :method to URL :url with password :password
 	 *
 	 * @param string $method
@@ -1326,23 +1360,33 @@ class FeatureContext extends BehatVariablesContext {
 	 * @param string $password
 	 *
 	 * @return void
+	 * @throws GuzzleException
 	 */
 	public function thePublicSendsHttpMethodToUrlWithPassword(string $method, string $url, string $password): void {
-		$password = $this->getActualPassword($password);
-		$token = $this->shareNgGetLastCreatedLinkShareToken();
-		$fullUrl = $this->getBaseUrl() . $url;
-		$headers = [
-			'Public-Token' => $token,
-		];
-		$this->setResponse(
-			HttpRequestHelper::sendRequest(
-				$fullUrl,
-				$method,
-				"public",
-				$password,
-				$headers,
-			),
-		);
+		$this->setResponse($this->sendHttpMethodToUrlWithPassword($method, $url, $password));
+	}
+
+	/**
+	 * @When the public sends HTTP method :method to URL :url with password :password for :attempts times
+	 *
+	 * @param string $method
+	 * @param string $url
+	 * @param string $password
+	 * @param int $attempts
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function thePublicSendsHttpMethodToUrlWithPasswordForTimes(
+		string $method,
+		string $url,
+		string $password,
+		int $attempts,
+	): void {
+		for ($i = 0; $i < $attempts; $i++) {
+			$this->setResponse($this->sendHttpMethodToUrlWithPassword($method, $url, $password));
+			$this->pushToLastHttpStatusCodesArray();
+		}
 	}
 
 	/**
@@ -2494,13 +2538,6 @@ class FeatureContext extends BehatVariablesContext {
 				],
 				"parameter" => [],
 			],
-			[
-				"code" => "%expiry_date_in_mail%",
-				"function" => [
-					$this, "formatExpiryDateTime",
-				],
-				"parameter" => ['Y-m-d H:i:s'],
-			],
 		];
 		if ($user !== null) {
 			array_push(
@@ -3030,5 +3067,12 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function theSystemWaitsForSeconds(string $seconds): void {
 		\sleep((int)$seconds);
+	}
+
+	/**
+	 * @return DateTimeZone
+	 */
+	public function getTestTimezone(): DateTimeZone {
+		return new DateTimeZone(\date_default_timezone_get());
 	}
 }

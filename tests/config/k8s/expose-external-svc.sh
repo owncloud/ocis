@@ -4,7 +4,7 @@ set -e
 
 HOST_IP=$(ip route get 1 | awk '{print $7}')
 
-NAMESPACE="ocis-server"
+NAMESPACE="${TEST_SERVER_DOMAIN:-ocis-server}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in

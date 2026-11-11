@@ -7,12 +7,12 @@ import {
   CapabilityStore,
   ConfigStore,
   useTokenTimerWorker,
-  useMfaExpiryWorker,
-  useModals,
+  useMessages,
   AuthServiceInterface
 } from '@ownclouders/web-pkg'
-import { RouteLocation, Router } from 'vue-router'
+import { RouteLocation, RouteLocationRaw, Router } from 'vue-router'
 import {
+  base,
   extractPublicLinkToken,
   isAnonymousContext,
   isIdpContextRequired,
@@ -25,6 +25,19 @@ import { Language } from 'vue3-gettext'
 import { PublicLinkType } from '@ownclouders/web-client'
 import { WebWorkersStore } from '@ownclouders/web-pkg'
 import { isSilentRedirectRoute } from '../../helpers/silentRedirect'
+import { vaultStepUpFailedKey } from '../../helpers/vaultStepUp'
+
+/**
+ * Custom OIDC state sent with an MFA step-up request. oidc-client-ts stores it with the
+ * request and returns it from the sign-in callback, so a step-up is only treated as answered
+ * when the IdP actually redirected back for it.
+ */
+interface MfaStepUpState {
+  mfaStepUpTarget: string
+}
+
+const isMfaStepUpState = (state: unknown): state is MfaStepUpState =>
+  typeof (state as MfaStepUpState)?.mfaStepUpTarget === 'string'
 
 export class AuthService implements AuthServiceInterface {
   private clientService: ClientService
@@ -42,13 +55,13 @@ export class AuthService implements AuthServiceInterface {
   private tokenTimerWorker: ReturnType<typeof useTokenTimerWorker>
   private tokenTimerInitialized = false
 
-  private mfaExpiryWorker: ReturnType<typeof useMfaExpiryWorker>
-  private mfaExpiryModalDismissed = false
-  private mfaExpiryModalId: string | null = null
-  private mfaExpiryBroadcastChannel: BroadcastChannel
-
   // number of seconds before an access token is to expire to raise the accessTokenExpiring event
   private accessTokenExpiryThreshold = 10
+
+  // Target of an MFA step-up the IdP just answered (set in `signInCallback`) ...
+  private pendingStepUpReturnTarget: string | null = null
+  // ... and moved here for exactly the navigation that follows the callback.
+  private stepUpReturnTarget: string | null = null
 
   public hasAuthErrorOccurred: boolean
 
@@ -86,7 +99,13 @@ export class AuthService implements AuthServiceInterface {
    *
    * @param to {Route}
    */
-  public async initializeContext(to: RouteLocation) {
+  public async initializeContext(to: RouteLocation): Promise<RouteLocationRaw | false | void> {
+    // A step-up answer is only valid for the navigation right after the callback.
+    this.stepUpReturnTarget = this.pendingStepUpReturnTarget
+    this.pendingStepUpReturnTarget = null
+
+    this.showPendingVaultStepUpFailure()
+
     if (!this.publicLinkManager) {
       this.publicLinkManager = new PublicLinkManager({
         clientService: this.clientService,
@@ -131,20 +150,48 @@ export class AuthService implements AuthServiceInterface {
     }
 
     if (to.params.scope === 'vault') {
-      // Capabilities carry the required MFA level name. Fetch them directly (without
-      // establishing the user context) so we can enforce the ACR before any vault data
-      // is loaded. Establishing the user context here would flip `userContextReady`,
-      // triggering the bootstrap watcher to load spaces against the vault endpoint with
-      // a non-MFA token, which fails and crashes the app.
+      // Permissions known: send an unentitled user to accessDenied instead of the IdP.
+      if (this.authStore.userContextReady && !this.ability.can('read-all', 'Vault')) {
+        return this.denyVaultAccess()
+      }
+
+      // Capabilities only — the full context loads vault spaces, which 401 without MFA and crash.
       if (!this.capabilityStore.isInitialized) {
         this.capabilityStore.setCapabilities(await this.clientService.ocs.getCapabilities())
       }
 
       const requiredAcr = this.capabilityStore.authMfaRequiredLevelname
       const user = await this.userManager.getUser()
+
+      // Address-bar navigation: permissions unloaded — load them and deny before MFA.
+      if (user && !user.expired && !this.authStore.userContextReady) {
+        try {
+          await this.userManager.loadUserAbilities()
+        } catch (e) {
+          // Can't confirm access: deny, don't hand off to MFA or leave a blank page.
+          console.error('failed to load vault abilities on cold load, denying access:', e)
+          return { name: 'accessDenied' }
+        }
+        if (!this.ability.can('read-all', 'Vault')) {
+          return this.denyVaultAccess()
+        }
+      }
+
       if (!user || user.expired || user.profile.acr !== requiredAcr) {
+        // `acr_values` is a voluntary claim: an IdP that can't reach the required level
+        // (no second factor available/enrolled) returns a lower `acr` instead of an error.
+        // Redirecting again would loop forever, so give up once the IdP answered the step-up.
+        if (user && !user.expired && this.isStepUpReturn(to.fullPath)) {
+          console.warn(
+            `[authService:initializeContext] - MFA step-up returned acr "${user.profile.acr}", required "${requiredAcr}". Not retrying.`
+          )
+          this.leaveVaultAfterFailedStepUp()
+          // cancel the vault navigation, the page reloads outside the vault
+          return false
+        }
+
         this.userManager.setPostLoginRedirectUrl(to.fullPath)
-        await this.userManager.signinRedirect({ acr_values: requiredAcr })
+        await this.signinRedirectForStepUp(requiredAcr, to.fullPath)
         // redirecting to the IdP, don't establish the user context below
         return
       }
@@ -186,12 +233,9 @@ export class AuthService implements AuthServiceInterface {
             expiryThreshold: this.accessTokenExpiryThreshold
           })
 
-          console.debug(
-            `New User Loaded. access_token： ${user.access_token}, refresh_token: ${user.refresh_token}`
-          )
+          console.debug('[authService:userLoaded] - new user loaded')
           try {
             await this.userManager.updateContext(user.access_token, fetchUserData)
-            this.updateMfaExpiryTimer()
           } catch (e) {
             console.error(e)
             await this.handleAuthError(unref(this.router.currentRoute))
@@ -201,7 +245,6 @@ export class AuthService implements AuthServiceInterface {
         this.userManager.events.addUserUnloaded(() => {
           console.log('user unloaded…')
           this.tokenTimerWorker?.resetTokenTimer()
-          this.mfaExpiryWorker?.resetMfaTimer()
           this.resetStateAfterUserLogout()
 
           if (this.userManager.unloadReason === 'authError') {
@@ -253,8 +296,6 @@ export class AuthService implements AuthServiceInterface {
               expiryThreshold: this.accessTokenExpiryThreshold
             })
 
-            this.updateMfaExpiryTimer()
-
             this.tokenTimerInitialized = true
           }
         } catch (e) {
@@ -291,12 +332,12 @@ export class AuthService implements AuthServiceInterface {
         console.debug('[authService:signInCallback] - adding listener to update-token event')
         window.addEventListener('message', this.handleDelegatedTokenUpdate)
       } else {
-        await this.userManager.signinRedirectCallback(this.buildSignInCallbackUrl())
-      }
-
-      const user = await this.userManager.getUser()
-      if (user) {
-        this.updateMfaExpiryTimer()
+        const callbackUser = await this.userManager.signinRedirectCallback(
+          this.buildSignInCallbackUrl()
+        )
+        if (isMfaStepUpState(callbackUser?.state)) {
+          this.pendingStepUpReturnTarget = callbackUser.state.mfaStepUpTarget
+        }
       }
 
       const redirectRoute = this.router.resolve(this.userManager.getAndClearPostLoginRedirectUrl())
@@ -405,7 +446,7 @@ export class AuthService implements AuthServiceInterface {
     return user?.refresh_token
   }
 
-  private handleDelegatedTokenUpdate(event: MessageEvent) {
+  private handleDelegatedTokenUpdate = (event: MessageEvent) => {
     if (event.origin !== this.configStore.options.embed?.delegateAuthenticationOrigin) {
       return
     }
@@ -414,119 +455,139 @@ export class AuthService implements AuthServiceInterface {
       return
     }
 
+    const accessToken = event.data.data?.access_token
+    if (!accessToken) {
+      return
+    }
+
     console.debug('[authService:handleDelegatedTokenUpdate] - going to update the access_token')
-    return this.userManager.updateContext(event.data, false)
+    return this.userManager.updateContext(accessToken, false)
   }
 
   /**
-   * Redirects to the login page if the user is not authenticated or if the ACR value is not the one required.
+   * Ensures the current user has authenticated with the given `acr` (e.g. MFA), redirecting
+   * to the IdP for a step-up if needed.
    *
    * @param acrValue - The ACR value to require.
    * @param redirectUrl - The URL to redirect to after login.
    *
-   * @throws {Error} In cases of wrong authentication.
+   * @returns false if the IdP just answered a step-up for `redirectUrl` without the required
+   * `acr`. The caller must not grant access and should navigate elsewhere.
    */
-  public async requireAcr(acrValue: string, redirectUrl: string) {
+  public async requireAcr(acrValue: string, redirectUrl: string): Promise<boolean> {
     const user = await this.userManager.getUser()
-    if (!user || user.expired) {
-      this.userManager.setPostLoginRedirectUrl(redirectUrl)
-      return this.userManager.signinRedirect({ acr_values: acrValue })
+    const isAuthenticated = user && !user.expired
+
+    if (isAuthenticated && user.profile.acr === acrValue) {
+      return true
     }
 
-    const { acr } = user.profile
-    if (acr === acrValue) {
-      return
+    // `acr_values` is a voluntary claim, see `initializeContext`: don't redirect again
+    if (isAuthenticated && this.isStepUpReturn(redirectUrl)) {
+      console.warn(
+        `[authService:requireAcr] - MFA step-up returned acr "${user.profile.acr}", required "${acrValue}". Not retrying.`
+      )
+      this.showStepUpFailedMessage()
+      return false
     }
 
     this.userManager.setPostLoginRedirectUrl(redirectUrl)
-    return this.userManager.signinRedirect({ acr_values: acrValue })
+    await this.signinRedirectForStepUp(acrValue, redirectUrl)
+    return true
   }
 
-  private updateMfaExpiryTimer() {
-    if (!this.capabilityStore?.vaultEnabled) {
-      return
-    }
-
-    const sessionDuration = this.capabilityStore.authMfaSessionDuration
-    if (!sessionDuration) {
-      return
-    }
-
-    if (!this.mfaExpiryWorker) {
-      this.mfaExpiryWorker = useMfaExpiryWorker({
-        onExpiring: () => this.showMfaExpiryWarning()
-      })
-      this.mfaExpiryWorker.startWorker()
-      this.initMfaExpiryBroadcastChannel()
-    }
-
-    const baseTime = this.clientService.lastSuccessfulRequestTime ?? Math.floor(Date.now() / 1000)
-    const expiresAt = baseTime + sessionDuration
-
-    this.mfaExpiryWorker.setMfaTimer({ expiresAt })
+  private signinRedirectForStepUp(acrValue: string, target: string) {
+    const state: MfaStepUpState = { mfaStepUpTarget: target }
+    return this.userManager.signinRedirect({ acr_values: acrValue, state })
   }
 
-  private showMfaExpiryWarning() {
-    if (this.mfaExpiryModalDismissed) {
-      return
+  /**
+   * Whether the current navigation is the one right after the IdP answered a step-up for `target`.
+   */
+  private isStepUpReturn(target: string): boolean {
+    return this.stepUpReturnTarget !== null && this.stepUpReturnTarget === target
+  }
+
+  /**
+   * Vault mode is fixed for the lifetime of the page (see `useVault`), so leaving it
+   * requires a full page load. An in-app navigation would keep the vault clients and
+   * load vault spaces with a non-MFA token.
+   */
+  private leaveVaultAfterFailedStepUp() {
+    try {
+      sessionStorage.setItem(vaultStepUpFailedKey, 'true')
+    } catch {
+      // message can't be shown after the reload, leaving the vault still has to happen
+    }
+    this.navigateOutsideVault(base?.href || `${window.location.origin}/`)
+  }
+
+  /**
+   * Denies the vault to a user without the vault permission.
+   *
+   * On a page loaded in vault mode (see `useVault`), an in-app redirect would keep the vault
+   * theme and clients. Every later in-app navigation (the "Continue" button, the browser back
+   * button) would then show the regular app as the vault and load vault spaces, which fails.
+   * Such a page shows the denial outside the vault, with a full page load that replaces the
+   * vault URL in the browser history.
+   */
+  private denyVaultAccess(): RouteLocationRaw | false {
+    const accessDenied = { name: 'accessDenied', query: { reason: 'forbidden' } }
+    if (!this.configStore.isInVault) {
+      return accessDenied
     }
 
-    this.mfaExpiryModalDismissed = true
-    const { $gettext } = this.language
+    this.navigateOutsideVault(this.router.resolve(accessDenied).href, { replace: true })
+    // cancel the vault navigation, the page reloads outside the vault
+    return false
+  }
 
-    const modalStore = useModals()
-    const modal = modalStore.dispatchModal({
-      title: $gettext('Session expiring'),
-      message: $gettext(
-        'Your multi-factor authentication session is about to expire. Would you like to extend it?'
+  private navigateOutsideVault(url: string, { replace = false }: { replace?: boolean } = {}) {
+    if (replace) {
+      window.location.replace(url)
+      return
+    }
+    window.location.assign(url)
+  }
+
+  private showPendingVaultStepUpFailure() {
+    try {
+      if (!sessionStorage.getItem(vaultStepUpFailedKey)) {
+        return
+      }
+      sessionStorage.removeItem(vaultStepUpFailedKey)
+    } catch {
+      return
+    }
+    this.showVaultStepUpFailedMessage()
+  }
+
+  private showVaultStepUpFailedMessage() {
+    const { $pgettext } = this.language
+    useMessages().showErrorMessage({
+      title: $pgettext(
+        'Error message title shown when the multi-factor authentication step-up required to open the vault failed',
+        'Multi-factor authentication required'
       ),
-      confirmText: $gettext('Extend session'),
-      cancelText: $gettext('Dismiss'),
-      onConfirm: () => {
-        this.mfaExpiryModalId = null
-        this.mfaExpiryBroadcastChannel?.postMessage({ action: 'prolonged' })
-        this.prolongMfaSession()
-      },
-      onCancel: () => {
-        this.mfaExpiryModalId = null
-        this.mfaExpiryBroadcastChannel?.postMessage({ action: 'dismissed' })
-      }
+      desc: $pgettext(
+        'Error message shown when the multi-factor authentication step-up required to open the vault failed, e.g. because the user has no second factor at hand',
+        'The vault requires multi-factor authentication, which could not be completed. Please set up a second factor or contact your administrator.'
+      )
     })
-    this.mfaExpiryModalId = modal.id
   }
 
-  private prolongMfaSession() {
-    const sessionDuration = this.capabilityStore.authMfaSessionDuration
-    if (!sessionDuration) {
-      return
-    }
-
-    this.mfaExpiryModalDismissed = false
-    const expiresAt = Math.floor(Date.now() / 1000) + sessionDuration
-    this.mfaExpiryWorker?.setMfaTimer({ expiresAt })
-  }
-
-  private initMfaExpiryBroadcastChannel() {
-    this.mfaExpiryBroadcastChannel = new BroadcastChannel('oc-mfa-expiry')
-    this.mfaExpiryBroadcastChannel.onmessage = (event: MessageEvent) => {
-      const { action } = event.data
-      if (action === 'prolonged') {
-        this.mfaExpiryModalDismissed = true
-        if (this.mfaExpiryModalId) {
-          const modalStore = useModals()
-          modalStore.removeModal(this.mfaExpiryModalId)
-          this.mfaExpiryModalId = null
-        }
-        this.prolongMfaSession()
-      } else if (action === 'dismissed') {
-        this.mfaExpiryModalDismissed = true
-        if (this.mfaExpiryModalId) {
-          const modalStore = useModals()
-          modalStore.removeModal(this.mfaExpiryModalId)
-          this.mfaExpiryModalId = null
-        }
-      }
-    }
+  private showStepUpFailedMessage() {
+    const { $pgettext } = this.language
+    useMessages().showErrorMessage({
+      title: $pgettext(
+        'Error message title shown when the multi-factor authentication step-up required to open a page (e.g. admin settings) failed',
+        'Multi-factor authentication required'
+      ),
+      desc: $pgettext(
+        'Error message shown when the multi-factor authentication step-up required to open a page (e.g. admin settings) failed, e.g. because the user has no second factor at hand',
+        'This page requires multi-factor authentication, which could not be completed. Please set up a second factor or contact your administrator.'
+      )
+    })
   }
 }
 

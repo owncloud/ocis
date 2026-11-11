@@ -557,111 +557,182 @@ func DecodeControl(packet *ber.Packet) (Control, error) {
 		value       *ber.Packet
 	)
 
-	switch len(packet.Children) {
-	case 0:
-		// at least one child is required for control type
-		return nil, fmt.Errorf("at least one child is required for control type")
+	children, err := packetChildCount(packet, 1, 3, "control")
+	if err != nil {
+		return nil, err
+	}
 
-	case 1:
-		// just type, no criticality or value
-		packet.Children[0].Description = "Control Type (" + ControlTypeMap[ControlType] + ")"
-		ControlType = packet.Children[0].Value.(string)
-
-	case 2:
-		packet.Children[0].Description = "Control Type (" + ControlTypeMap[ControlType] + ")"
-		if packet.Children[0].Value != nil {
-			ControlType = packet.Children[0].Value.(string)
-		} else if packet.Children[0].Data != nil {
-			ControlType = packet.Children[0].Data.String()
-		} else {
-			return nil, fmt.Errorf("not found where to get the control type")
+	typeChild, err := packetChild(packet, 0)
+	if err != nil {
+		return nil, err
+	}
+	typeChild.Description = "Control Type (" + ControlTypeMap[ControlType] + ")"
+	if typeChild.Value != nil {
+		ct, err := packetString(typeChild)
+		if err != nil {
+			return nil, fmt.Errorf("control type is not a string: %T: %w", typeChild.Value, err)
 		}
+		ControlType = ct
+	} else if typeChild.Data != nil {
+		ControlType = typeChild.Data.String()
+	} else {
+		return nil, malformedf("not found where to get the control type")
+	}
 
-		// Children[1] could be criticality or value (both are optional)
-		// duck-type on whether this is a boolean
-		if _, ok := packet.Children[1].Value.(bool); ok {
-			packet.Children[1].Description = "Criticality"
-			Criticality = packet.Children[1].Value.(bool)
-		} else {
-			packet.Children[1].Description = "Control Value"
-			value = packet.Children[1]
-		}
-
+	switch len(children) {
 	case 3:
-		packet.Children[0].Description = "Control Type (" + ControlTypeMap[ControlType] + ")"
-		ControlType = packet.Children[0].Value.(string)
+		// criticality and value present
+		criticality, err := packetChild(packet, 1)
+		if err != nil {
+			return nil, err
+		}
+		criticality.Description = "Criticality"
+		crit, err := packetBool(criticality)
+		if err != nil {
+			return nil, fmt.Errorf("criticality is not a bool: %T: %w", criticality.Value, err)
+		}
+		Criticality = crit
 
-		packet.Children[1].Description = "Criticality"
-		Criticality = packet.Children[1].Value.(bool)
-
-		packet.Children[2].Description = "Control Value"
-		value = packet.Children[2]
-
-	default:
-		// more than 3 children is invalid
-		return nil, fmt.Errorf("more than 3 children is invalid for controls")
+		valueChild, err := packetChild(packet, 2)
+		if err != nil {
+			return nil, err
+		}
+		valueChild.Description = "Control Value"
+		value = valueChild
+	case 2:
+		// Children[1] is criticality or value. RFC 4511 declares
+		// Control ::= SEQUENCE { controlType LDAPOID, criticality BOOLEAN
+		// DEFAULT FALSE, controlValue OCTET STRING OPTIONAL }, so identify
+		// it by its ASN.1 tag rather than by the Go type of Value.
+		second, err := packetChild(packet, 1)
+		if err != nil {
+			return nil, err
+		}
+		if second.ClassType == ber.ClassUniversal && second.Tag == ber.TagBoolean {
+			second.Description = "Criticality"
+			crit, err := packetBool(second)
+			if err != nil {
+				return nil, fmt.Errorf("criticality is not a bool: %T: %w", second.Value, err)
+			}
+			Criticality = crit
+		} else {
+			second.Description = "Control Value"
+			value = second
+		}
 	}
 
 	switch ControlType {
 	case ControlTypeManageDsaIT:
 		return NewControlManageDsaIT(Criticality), nil
 	case ControlTypePaging:
+		if value == nil {
+			return nil, malformedf("paging control value is missing")
+		}
 		value.Description += " (Paging)"
 		c := new(ControlPaging)
 		if value.Value != nil {
-			valueChildren, err := ber.DecodePacketErr(value.Data.Bytes())
+			data, err := packetData(value)
 			if err != nil {
-				return nil, fmt.Errorf("failed to decode data bytes: %s", err)
+				return nil, fmt.Errorf("failed to decode data bytes: %w", err)
+			}
+			valueChildren, err := ber.DecodePacketErr(data)
+			if err != nil {
+				return nil, fmt.Errorf("failed to decode data bytes: %w", err)
 			}
 			value.Data.Truncate(0)
 			value.Value = nil
 			value.AppendChild(valueChildren)
 		}
-		value = value.Children[0]
+		first, err := packetChild(value, 0)
+		if err != nil {
+			return nil, err
+		}
+		value = first
 		value.Description = "Search Control Value"
-		value.Children[0].Description = "Paging Size"
-		value.Children[1].Description = "Cookie"
-		c.PagingSize = uint32(value.Children[0].Value.(int64))
-		c.Cookie = value.Children[1].Data.Bytes()
-		value.Children[1].Value = c.Cookie
+		sizeChild, err := packetChild(value, 0)
+		if err != nil {
+			return nil, err
+		}
+		cookieChild, err := packetChild(value, 1)
+		if err != nil {
+			return nil, err
+		}
+		sizeChild.Description = "Paging Size"
+		cookieChild.Description = "Cookie"
+		pagingSize, err := packetInt64(sizeChild)
+		if err != nil {
+			return nil, fmt.Errorf("paging size is not an integer: %T: %w", sizeChild.Value, err)
+		}
+		c.PagingSize = uint32(pagingSize)
+		cookie, err := packetData(cookieChild)
+		if err != nil {
+			return nil, err
+		}
+		c.Cookie = cookie
+		cookieChild.Value = c.Cookie
 		return c, nil
 	case ControlTypeBeheraPasswordPolicy:
+		if value == nil {
+			return nil, fmt.Errorf("invalid value for Control Type ControlTypeBeheraPasswordPolicy: %v", value)
+		}
 		value.Description += " (Password Policy - Behera)"
 		c := NewControlBeheraPasswordPolicy()
 		if value.Value != nil {
-			valueChildren, err := ber.DecodePacketErr(value.Data.Bytes())
+			data, err := packetData(value)
 			if err != nil {
-				return nil, fmt.Errorf("failed to decode data bytes: %s", err)
+				return nil, fmt.Errorf("failed to decode data bytes: %w", err)
+			}
+			valueChildren, err := ber.DecodePacketErr(data)
+			if err != nil {
+				return nil, fmt.Errorf("failed to decode data bytes: %w", err)
 			}
 			value.Data.Truncate(0)
 			value.Value = nil
 			value.AppendChild(valueChildren)
 		}
 
-		sequence := value.Children[0]
+		sequence, err := packetChild(value, 0)
+		if err != nil {
+			return nil, err
+		}
 
 		for _, child := range sequence.Children {
-			if child.Tag == 0 {
+			if child == nil {
+				continue
+			}
+			switch child.Tag {
+			case 0:
 				// Warning
-				warningPacket := child.Children[0]
-				val, err := ber.ParseInt64(warningPacket.Data.Bytes())
+				warningPacket, err := packetChild(child, 0)
 				if err != nil {
-					return nil, fmt.Errorf("failed to decode data bytes: %s", err)
+					return nil, err
 				}
-				if warningPacket.Tag == 0 {
+				data, err := packetData(warningPacket)
+				if err != nil {
+					return nil, fmt.Errorf("failed to decode data bytes: %w", err)
+				}
+				val, err := ber.ParseInt64(data)
+				if err != nil {
+					return nil, fmt.Errorf("failed to decode data bytes: %w", err)
+				}
+				switch warningPacket.Tag {
+				case 0:
 					// timeBeforeExpiration
 					c.Expire = val
 					warningPacket.Value = c.Expire
-				} else if warningPacket.Tag == 1 {
+				case 1:
 					// graceAuthNsRemaining
 					c.Grace = val
 					warningPacket.Value = c.Grace
 				}
-			} else if child.Tag == 1 {
+			case 1:
 				// Error
-				bs := child.Data.Bytes()
+				bs, err := packetData(child)
+				if err != nil {
+					return nil, err
+				}
 				if len(bs) != 1 || bs[0] > 8 {
-					return nil, fmt.Errorf("failed to decode data bytes: %s", "invalid PasswordPolicyResponse enum value")
+					return nil, malformedf("invalid PasswordPolicyResponse enum value")
 				}
 				val := int8(bs[0])
 				c.Error = val
@@ -682,7 +753,7 @@ func DecodeControl(packet *ber.Packet) (Control, error) {
 
 		expire, err := strconv.ParseInt(expireStr, 10, 64)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse value as int: %s", err)
+			return nil, fmt.Errorf("failed to parse value as int: %w", err)
 		}
 		c.Expire = expire
 		value.Value = c.Expire
@@ -697,31 +768,58 @@ func DecodeControl(packet *ber.Packet) (Control, error) {
 	case ControlTypeSubtreeDelete:
 		return NewControlSubtreeDelete(), nil
 	case ControlTypeServerSideSorting:
+		if value == nil {
+			return nil, malformedf("server side sorting control value is missing")
+		}
 		return NewControlServerSideSorting(value)
 	case ControlTypeServerSideSortingResult:
 		return NewControlServerSideSortingResult(value)
 	case ControlTypeDirSync:
+		if value == nil {
+			return nil, malformedf("dirSync control value is missing")
+		}
 		value.Description += " (DirSync)"
 		return NewResponseControlDirSync(value)
 	case ControlTypeSyncState:
+		if value == nil {
+			return nil, malformedf("sync state control value is missing")
+		}
 		value.Description += " (Sync State)"
-		valueChildren, err := ber.DecodePacketErr(value.Data.Bytes())
+		data, err := packetData(value)
 		if err != nil {
-			return nil, fmt.Errorf("failed to decode data bytes: %s", err)
+			return nil, fmt.Errorf("failed to decode data bytes: %w", err)
+		}
+		valueChildren, err := ber.DecodePacketErr(data)
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode data bytes: %w", err)
 		}
 		return NewControlSyncState(valueChildren)
 	case ControlTypeSyncDone:
+		if value == nil {
+			return nil, malformedf("sync done control value is missing")
+		}
 		value.Description += " (Sync Done)"
-		valueChildren, err := ber.DecodePacketErr(value.Data.Bytes())
+		data, err := packetData(value)
 		if err != nil {
-			return nil, fmt.Errorf("failed to decode data bytes: %s", err)
+			return nil, fmt.Errorf("failed to decode data bytes: %w", err)
+		}
+		valueChildren, err := ber.DecodePacketErr(data)
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode data bytes: %w", err)
 		}
 		return NewControlSyncDone(valueChildren)
 	case ControlTypeSyncInfo:
+		if value == nil {
+			return nil, malformedf("sync info control value is missing")
+		}
 		value.Description += " (Sync Info)"
-		valueChildren, err := ber.DecodePacketErr(value.Data.Bytes())
+		data, err := packetData(value)
 		if err != nil {
-			return nil, fmt.Errorf("failed to decode data bytes: %s", err)
+			return nil, fmt.Errorf("failed to decode data bytes: %w", err)
+		}
+		valueChildren, err := ber.DecodePacketErr(data)
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode data bytes: %w", err)
 		}
 		return NewControlSyncInfo(valueChildren)
 	default:
@@ -729,7 +827,16 @@ func DecodeControl(packet *ber.Packet) (Control, error) {
 		c.ControlType = ControlType
 		c.Criticality = Criticality
 		if value != nil {
-			c.ControlValue = value.Value.(string)
+			// A non-conforming or malicious server can send a non-string
+			// (or nil) value here; the previous unchecked cast panicked
+			// the calling goroutine, see #561. Fall back to the raw bytes
+			// when the value isn't a string so we surface an error
+			// instead of crashing.
+			if s, err := packetString(value); err == nil {
+				c.ControlValue = s
+			} else if data, err := packetData(value); err == nil {
+				c.ControlValue = string(data)
+			}
 		}
 		return c, nil
 	}
@@ -822,30 +929,64 @@ func NewRequestControlDirSync(
 
 // NewResponseControlDirSync returns a dir sync control
 func NewResponseControlDirSync(value *ber.Packet) (*ControlDirSync, error) {
+	if value == nil {
+		return nil, malformedf("dirSync control value is missing")
+	}
 	if value.Value != nil {
-		valueChildren, err := ber.DecodePacketErr(value.Data.Bytes())
+		data, err := packetData(value)
 		if err != nil {
-			return nil, fmt.Errorf("failed to decode data bytes: %s", err)
+			return nil, fmt.Errorf("failed to decode data bytes: %w", err)
+		}
+		valueChildren, err := ber.DecodePacketErr(data)
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode data bytes: %w", err)
 		}
 		value.Data.Truncate(0)
 		value.Value = nil
 		value.AppendChild(valueChildren)
 	}
-	child := value.Children[0]
-	if len(child.Children) != 3 { // also on initial creation, Cookie is an empty string
-		return nil, fmt.Errorf("invalid number of children in dirSync control")
+	child, err := packetChild(value, 0)
+	if err != nil {
+		return nil, fmt.Errorf("invalid number of children in dirSync control: %w", err)
+	}
+	// also on initial creation, Cookie is an empty string
+	if _, err := packetChildCount(child, 3, 3, "dirSync control value"); err != nil {
+		return nil, fmt.Errorf("invalid number of children in dirSync control: %w", err)
+	}
+	flagsChild, err := packetChild(child, 0)
+	if err != nil {
+		return nil, fmt.Errorf("invalid number of children in dirSync control: %w", err)
+	}
+	maxAttrChild, err := packetChild(child, 1)
+	if err != nil {
+		return nil, fmt.Errorf("invalid number of children in dirSync control: %w", err)
+	}
+	cookieChild, err := packetChild(child, 2)
+	if err != nil {
+		return nil, fmt.Errorf("invalid number of children in dirSync control: %w", err)
 	}
 	child.Description = "DirSync Control Value"
-	child.Children[0].Description = "Flags"
-	child.Children[1].Description = "MaxAttrCount"
-	child.Children[2].Description = "Cookie"
+	flagsChild.Description = "Flags"
+	maxAttrChild.Description = "MaxAttrCount"
+	cookieChild.Description = "Cookie"
 
-	cookie := child.Children[2].Data.Bytes()
-	child.Children[2].Value = cookie
+	cookie, err := packetData(cookieChild)
+	if err != nil {
+		return nil, err
+	}
+	cookieChild.Value = cookie
+	flags, err := packetInt64(flagsChild)
+	if err != nil {
+		return nil, err
+	}
+	maxAttrCount, err := packetInt64(maxAttrChild)
+	if err != nil {
+		return nil, err
+	}
 	return &ControlDirSync{
 		Criticality:  true,
-		Flags:        child.Children[0].Value.(int64),
-		MaxAttrCount: child.Children[1].Value.(int64),
+		Flags:        flags,
+		MaxAttrCount: maxAttrCount,
 		Cookie:       cookie,
 	}, nil
 }
@@ -921,28 +1062,64 @@ func (c *ControlServerSideSorting) GetControlType() string {
 }
 
 func NewControlServerSideSorting(value *ber.Packet) (*ControlServerSideSorting, error) {
-	sortKeys := []*SortKey{}
-
-	val := value.Children[1].Children
-
-	if len(val) != 1 {
-		return nil, fmt.Errorf("no sequence value in packet")
+	if value == nil {
+		return nil, malformedf("server side sorting control value is missing")
+	}
+	data, err := packetData(value)
+	if err != nil {
+		return nil, fmt.Errorf("decode packet err: %w", err)
+	}
+	val, err := ber.DecodePacketErr(data)
+	if err != nil {
+		return nil, fmt.Errorf("decode packet err: %w", err)
 	}
 
-	sequences := val[0].Children
+	if _, err := packetChildCount(val, 1, -1, "sort key list"); err != nil {
+		return nil, fmt.Errorf("no sequence value in packet: %w", err)
+	}
 
-	for i, sequence := range sequences {
-		sortKey := new(SortKey)
+	var sortKeys []*SortKey
 
-		if len(sequence.Children) < 2 {
-			return nil, fmt.Errorf("attributeType or matchingRule is missing from sequence %d", i)
+	for i, sequence := range val.Children {
+		if sequence == nil {
+			return nil, fmt.Errorf("attributeType is missing from sequence %d", i)
+		}
+		if _, err := packetChildCount(sequence, 1, 3, "sort key sequence"); err != nil {
+			return nil, fmt.Errorf("attributeType is missing from sequence %d: %w", i, err)
 		}
 
-		sortKey.AttributeType = sequence.Children[0].Value.(string)
-		sortKey.MatchingRule = sequence.Children[1].Value.(string)
+		sortKey := new(SortKey)
 
-		if len(sequence.Children) == 3 {
-			sortKey.Reverse = sequence.Children[2].Value.(bool)
+		for _, child := range sequence.Children {
+			if child == nil {
+				continue
+			}
+			switch {
+			case child.ClassType == ber.ClassUniversal && child.Tag == ber.TagOctetString:
+				// A constructed-form OCTET STRING matches this case but leaves
+				// Value nil; guard the assertion so a malformed attributeType is
+				// rejected below rather than panicking.
+				if attrType, err := packetString(child); err == nil {
+					sortKey.AttributeType = attrType
+				}
+
+			case child.ClassType == ber.ClassContext && child.Tag == 0:
+				b, err := packetData(child)
+				if err != nil {
+					return nil, err
+				}
+				sortKey.MatchingRule = string(b)
+
+			case child.ClassType == ber.ClassContext && child.Tag == 1:
+				b, err := packetData(child)
+				if err != nil {
+					return nil, err
+				}
+				sortKey.Reverse = len(b) > 0 && b[0] != 0
+			}
+		}
+		if sortKey.AttributeType == "" {
+			return nil, fmt.Errorf("attributeType is missing from sequence %d", i)
 		}
 
 		sortKeys = append(sortKeys, sortKey)
@@ -959,7 +1136,6 @@ func (c *ControlServerSideSorting) Encode() *ber.Packet {
 	packet := ber.Encode(ber.ClassUniversal, ber.TypeConstructed, ber.TagSequence, nil, "Control")
 	control := ber.NewString(ber.ClassUniversal, ber.TypePrimitive, ber.TagOctetString, c.GetControlType(), "Control Type")
 
-	value := ber.Encode(ber.ClassUniversal, ber.TypePrimitive, ber.TagOctetString, nil, "Control Value")
 	seqs := ber.Encode(ber.ClassUniversal, ber.TypeConstructed, ber.TagSequence, nil, "SortKeyList")
 
 	for _, f := range c.SortKeys {
@@ -968,9 +1144,11 @@ func (c *ControlServerSideSorting) Encode() *ber.Packet {
 		seq.AppendChild(
 			ber.NewString(ber.ClassUniversal, ber.TypePrimitive, ber.TagOctetString, f.AttributeType, "attributeType"),
 		)
-		seq.AppendChild(
-			ber.NewString(ber.ClassContext, ber.TypePrimitive, 0, f.MatchingRule, "orderingRule"),
-		)
+		if f.MatchingRule != "" {
+			seq.AppendChild(
+				ber.NewString(ber.ClassContext, ber.TypePrimitive, 0, f.MatchingRule, "orderingRule"),
+			)
+		}
 		if f.Reverse {
 			seq.AppendChild(
 				ber.NewBoolean(ber.ClassContext, ber.TypePrimitive, 1, f.Reverse, "reverseOrder"),
@@ -980,7 +1158,7 @@ func (c *ControlServerSideSorting) Encode() *ber.Packet {
 		seqs.AppendChild(seq)
 	}
 
-	value.AppendChild(seqs)
+	value := ber.Encode(ber.ClassUniversal, ber.TypePrimitive, ber.TagOctetString, string(seqs.Bytes()), "Control Value")
 
 	packet.AppendChild(control)
 	packet.AppendChild(value)
@@ -1043,7 +1221,7 @@ func (c ControlServerSideSortingCode) Valid() error {
 func NewControlServerSideSortingResult(pkt *ber.Packet) (*ControlServerSideSortingResult, error) {
 	control := new(ControlServerSideSortingResult)
 
-	if pkt == nil || len(pkt.Children) == 0 {
+	if _, err := packetChildCount(pkt, 1, -1, "server side sorting result"); err != nil {
 		// This is currently not compliant with the ServerSideSorting RFC (see https://datatracker.ietf.org/doc/html/rfc2891#section-1.2).
 		// but it's necessary because there seems to be a bug in the implementation of the popular OpenLDAP server.
 		//
@@ -1051,7 +1229,11 @@ func NewControlServerSideSortingResult(pkt *ber.Packet) (*ControlServerSideSorti
 		return control, nil
 	}
 
-	codeInt, err := ber.ParseInt64(pkt.Children[0].Data.Bytes())
+	data, err := packetDataAt(pkt, 0)
+	if err != nil {
+		return nil, err
+	}
+	codeInt, err := ber.ParseInt64(data)
 	if err != nil {
 		return nil, err
 	}
@@ -1059,6 +1241,8 @@ func NewControlServerSideSortingResult(pkt *ber.Packet) (*ControlServerSideSorti
 	if err = ControlServerSideSortingCode(codeInt).Valid(); err != nil {
 		return nil, err
 	}
+
+	control.Result = ControlServerSideSortingCode(codeInt)
 
 	return control, nil
 }
@@ -1072,7 +1256,7 @@ type ControlServerSideSortingResult struct {
 	// AttributeType string
 }
 
-func (control *ControlServerSideSortingResult) GetControlType() string {
+func (c *ControlServerSideSortingResult) GetControlType() string {
 	return ControlTypeServerSideSortingResult
 }
 
@@ -1094,7 +1278,7 @@ func (c *ControlServerSideSortingResult) String() string {
 	)
 }
 
-// Mode for ControlTypeSyncRequest
+// ControlSyncRequestMode is the mode for ControlTypeSyncRequest
 type ControlSyncRequestMode int64
 
 const (
@@ -1168,7 +1352,7 @@ func (c *ControlSyncRequest) String() string {
 	)
 }
 
-// State for ControlSyncState
+// ControlSyncStateState is the state for ControlSyncState
 type ControlSyncStateState int64
 
 const (
@@ -1191,24 +1375,26 @@ func NewControlSyncState(pkt *ber.Packet) (*ControlSyncState, error) {
 		state     ControlSyncStateState
 		entryUUID uuid.UUID
 		cookie    []byte
-		err       error
 	)
-	switch len(pkt.Children) {
-	case 0, 1:
-		return nil, fmt.Errorf("at least two children are required: %d", len(pkt.Children))
-	case 2:
-		state = ControlSyncStateState(pkt.Children[0].Value.(int64))
-		entryUUID, err = uuid.FromBytes(pkt.Children[1].ByteValue)
-		if err != nil {
-			return nil, fmt.Errorf("failed to decode uuid: %w", err)
-		}
-	case 3:
-		state = ControlSyncStateState(pkt.Children[0].Value.(int64))
-		entryUUID, err = uuid.FromBytes(pkt.Children[1].ByteValue)
-		if err != nil {
-			return nil, fmt.Errorf("failed to decode uuid: %w", err)
-		}
-		cookie = pkt.Children[2].ByteValue
+	code, err := packetInt64At(pkt, 0)
+	if err != nil {
+		return nil, err
+	}
+	state = ControlSyncStateState(code)
+	uuidChild, err := packetChild(pkt, 1)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode uuid: %w", err)
+	}
+	entryUUID, err = uuid.FromBytes(uuidChild.ByteValue)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode uuid: %w", err)
+	}
+	cookieChild, ok, err := packetChildIfPresent(pkt, 2)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		cookie = cookieChild.ByteValue
 	}
 	return &ControlSyncState{
 		Criticality: false,
@@ -1248,19 +1434,30 @@ type ControlSyncDone struct {
 	RefreshDeletes bool
 }
 
+// parseSyncMembers identifies the members of an RFC 4533 sync sequence by tag.
+// cookie is OPTIONAL and the flags carry a DEFAULT, so a member's position is not
+// fixed and the count of present members does not identify them.
+func parseSyncMembers(children []*ber.Packet) (cookie []byte, flag *bool, uuidSet *ber.Packet) {
+	for _, child := range children {
+		switch child.Tag {
+		case ber.TagOctetString:
+			cookie = child.ByteValue
+		case ber.TagBoolean:
+			if b, err := packetBool(child); err == nil {
+				flag = &b
+			}
+		case ber.TagSet:
+			uuidSet = child
+		}
+	}
+	return cookie, flag, uuidSet
+}
+
 func NewControlSyncDone(pkt *ber.Packet) (*ControlSyncDone, error) {
-	var (
-		cookie         []byte
-		refreshDeletes bool
-	)
-	switch len(pkt.Children) {
-	case 0:
-		// have nothing to do
-	case 1:
-		cookie = pkt.Children[0].ByteValue
-	case 2:
-		cookie = pkt.Children[0].ByteValue
-		refreshDeletes = pkt.Children[1].Value.(bool)
+	var refreshDeletes bool
+	cookie, flag, _ := parseSyncMembers(pkt.Children)
+	if flag != nil {
+		refreshDeletes = *flag
 	}
 	return &ControlSyncDone{
 		Criticality:    false,
@@ -1291,7 +1488,7 @@ func (c *ControlSyncDone) String() string {
 	)
 }
 
-// Tag For ControlSyncInfo
+// ControlSyncInfoValue is the tag for ControlSyncInfo
 type ControlSyncInfoValue uint64
 
 const (
@@ -1373,13 +1570,12 @@ type ControlSyncInfo struct {
 
 func NewControlSyncInfo(pkt *ber.Packet) (*ControlSyncInfo, error) {
 	var (
-		cookie         []byte
 		refreshDone    = true
 		refreshDeletes bool
 		syncUUIDs      []uuid.UUID
 	)
 	c := &ControlSyncInfo{Criticality: false}
-	switch ControlSyncInfoValue(pkt.Identifier.Tag) {
+	switch ControlSyncInfoValue(pkt.Tag) {
 	case SyncInfoNewcookie:
 		c.Value = SyncInfoNewcookie
 		c.NewCookie = &ControlSyncInfoNewCookie{
@@ -1387,14 +1583,9 @@ func NewControlSyncInfo(pkt *ber.Packet) (*ControlSyncInfo, error) {
 		}
 	case SyncInfoRefreshDelete:
 		c.Value = SyncInfoRefreshDelete
-		switch len(pkt.Children) {
-		case 0:
-			// have nothing to do
-		case 1:
-			cookie = pkt.Children[0].ByteValue
-		case 2:
-			cookie = pkt.Children[0].ByteValue
-			refreshDone = pkt.Children[1].Value.(bool)
+		cookie, flag, _ := parseSyncMembers(pkt.Children)
+		if flag != nil {
+			refreshDone = *flag
 		}
 		c.RefreshDelete = &ControlSyncInfoRefreshDelete{
 			Cookie:      cookie,
@@ -1402,14 +1593,9 @@ func NewControlSyncInfo(pkt *ber.Packet) (*ControlSyncInfo, error) {
 		}
 	case SyncInfoRefreshPresent:
 		c.Value = SyncInfoRefreshPresent
-		switch len(pkt.Children) {
-		case 0:
-			// have nothing to do
-		case 1:
-			cookie = pkt.Children[0].ByteValue
-		case 2:
-			cookie = pkt.Children[0].ByteValue
-			refreshDone = pkt.Children[1].Value.(bool)
+		cookie, flag, _ := parseSyncMembers(pkt.Children)
+		if flag != nil {
+			refreshDone = *flag
 		}
 		c.RefreshPresent = &ControlSyncInfoRefreshPresent{
 			Cookie:      cookie,
@@ -1417,19 +1603,13 @@ func NewControlSyncInfo(pkt *ber.Packet) (*ControlSyncInfo, error) {
 		}
 	case SyncInfoSyncIdSet:
 		c.Value = SyncInfoSyncIdSet
-		switch len(pkt.Children) {
-		case 0:
-			// have nothing to do
-		case 1:
-			cookie = pkt.Children[0].ByteValue
-		case 2:
-			cookie = pkt.Children[0].ByteValue
-			refreshDeletes = pkt.Children[1].Value.(bool)
-		case 3:
-			cookie = pkt.Children[0].ByteValue
-			refreshDeletes = pkt.Children[1].Value.(bool)
-			syncUUIDs = make([]uuid.UUID, 0, len(pkt.Children[2].Children))
-			for _, child := range pkt.Children[2].Children {
+		cookie, flag, uuidSet := parseSyncMembers(pkt.Children)
+		if flag != nil {
+			refreshDeletes = *flag
+		}
+		if uuidSet != nil {
+			syncUUIDs = make([]uuid.UUID, 0, len(uuidSet.Children))
+			for _, child := range uuidSet.Children {
 				u, err := uuid.FromBytes(child.ByteValue)
 				if err != nil {
 					return nil, fmt.Errorf("failed to decode uuid: %w", err)
@@ -1443,7 +1623,7 @@ func NewControlSyncInfo(pkt *ber.Packet) (*ControlSyncInfo, error) {
 			SyncUUIDs:      syncUUIDs,
 		}
 	default:
-		return nil, fmt.Errorf("unknown sync info value: %d", pkt.Identifier.Tag)
+		return nil, fmt.Errorf("unknown sync info value: %d", pkt.Tag)
 	}
 	return c, nil
 }

@@ -113,20 +113,13 @@ func NewConnWithClusterAndUser(clusterName string, userName string) (*Conn, erro
 	return conn, nil
 }
 
-// freeConn releases resources that are allocated while configuring the
-// connection to the cluster. rados_shutdown() should only be needed after a
-// successful call to rados_connect(), however if the connection has been
-// configured with non-default parameters, some of the parameters may be
-// allocated before connecting. rados_shutdown() will free the allocated
-// resources, even if there has not been a connection yet.
-//
-// This function is setup as a destructor/finalizer when rados_create() is
-// called.
+// freeConn is a garbage-collector fallback for callers that did not call
+// Shutdown explicitly.
 func freeConn(conn *Conn) {
-	if conn.cluster != nil {
-		log.Warnf("unreachable Conn object has not been shut down. Cleaning up.")
-		C.rados_shutdown(conn.cluster)
-		// prevent calling rados_shutdown() more than once
-		conn.cluster = nil
+	if conn.cluster == nil {
+		return
 	}
+
+	log.Warnf("unreachable Conn object has not been shut down. Cleaning up.")
+	conn.releaseClusterHandle()
 }

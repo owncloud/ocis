@@ -1,5 +1,11 @@
-#  Documentation
+#  Internal Documentation Space
 
-To contribute to documentation please see also: [Documentation](http://owncloud.dev/ocis/development/build-docs/)
+**IMPORTANT**\
+All the docs including the helpers and their output has been migrated to the [docs.owncloud.com](https://github.com/owncloud/docs.owncloud.com/tree/main/content/ocis) repo and is now part of the [oCIS documentation](https://doc.owncloud.com/) that can be viewed on the web.
 
-Note that when running a helper like `make -C docs docs-generate` locally, you will see the generated output in e.g. docs/services/<service-name>. When merging a PR, the pipeline will generate the output in the master branch but finally moves it into the `docs` branch. You will therefore _not_ see changes in the docs folder of the master branch!
+This folder is intended for any information that is not part of the official developer documentation. Nothing in here will be transferred, either manually or automatically, to the docs repo. It is therefore a place for developers to put things that are not necessarily part of the official developer documentation.
+
+Note that the [acceptance test](.github/workflows/acceptance-tests.yml) workflow omits any CI run on changed files in this folder. This is also true for [code analysis](.codacy.yml).
+
+**IMPORTANT**\
+Although it may exist, you do not need to maintain any `env-vars.yaml` file in any branch. This file is obsolete in ocis, as the process has been moved to the documentation.

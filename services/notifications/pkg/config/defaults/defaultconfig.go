@@ -39,7 +39,8 @@ func DefaultConfig() *config.Config {
 				Cluster:   "ocis-cluster",
 				EnableTLS: false,
 			},
-			RevaGateway: shared.DefaultRevaConfig().Address,
+			RevaGateway:     shared.DefaultRevaConfig().Address,
+			DefaultLanguage: "en",
 		},
 		Store: config.Store{
 			Store:    "nats-js-kv",
@@ -79,6 +80,10 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.Notifications.GRPCClientTLS == nil && cfg.Commons != nil {
 		cfg.Notifications.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
+	}
+
+	if cfg.GRPCClientOptions == (shared.GRPCClientOptions{}) && cfg.Commons != nil && cfg.Commons.GRPCClientOptions != nil {
+		cfg.GRPCClientOptions = *cfg.Commons.GRPCClientOptions
 	}
 }
 

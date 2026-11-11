@@ -64,6 +64,7 @@ func DefaultConfig() *config.Config {
 		BundlesPath:       "",
 		Bundles:           nil,
 		ServiceAccountIDs: []string{"service-user-id"},
+		DefaultLanguage:   "en",
 	}
 }
 
@@ -114,6 +115,9 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.GRPCClientTLS == nil && cfg.Commons != nil {
 		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
+	}
+	if cfg.GRPCClientOptions == nil && cfg.Commons != nil {
+		cfg.GRPCClientOptions = structs.CopyOrZeroValue(cfg.Commons.GRPCClientOptions)
 	}
 	if cfg.GRPC.TLS == nil && cfg.Commons != nil {
 		cfg.GRPC.TLS = structs.CopyOrZeroValue(cfg.Commons.GRPCServiceTLS)

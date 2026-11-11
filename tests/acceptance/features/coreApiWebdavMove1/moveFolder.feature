@@ -205,12 +205,13 @@ Feature: move (rename) folder
       | new              |
       | spaces           |
 
-  @issue-1976
-  Scenario Outline: try to rename folder to same name
+
+  Scenario Outline: rename folder to same name
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "testFolder"
     When user "Alice" moves folder "testFolder" to "testFolder" using the WebDAV API
-    Then the HTTP status code should be "404"
+    Then the HTTP status code should be "204"
+    And as "Alice" folder "testFolder" should exist
     And as "Alice" the folder with original path "testFolder" should not exist in the trashbin
     Examples:
       | dav-path-version |

@@ -428,3 +428,25 @@ Feature: create a public link share
       | ocs-api-version | http-status-code |
       | 1               | 200              |
       | 2               | 404              |
+
+
+  Scenario Outline: user does not see public links created by another user when listing all shares
+    Given using OCS API version "<ocs-api-version>"
+    And user "Brian" has been created with default attributes
+    And user "Alice" has uploaded file with content "alice data" to "/alice.txt"
+    And user "Brian" has uploaded file with content "brian data" to "/brian.txt"
+    And user "Alice" has created a public link share with settings
+      | path     | /alice.txt |
+      | password | %public%   |
+    And user "Brian" has created a public link share with settings
+      | path     | /brian.txt |
+      | password | %public%   |
+    When user "Alice" gets all shares shared by her using the sharing API
+    Then the OCS status code should be "<ocs-status-code>"
+    And the HTTP status code should be "200"
+    And file "/alice.txt" should be included in the response
+    But file "/brian.txt" should not be included in the response
+    Examples:
+      | ocs-api-version | ocs-status-code |
+      | 1               | 100             |
+      | 2               | 200             |

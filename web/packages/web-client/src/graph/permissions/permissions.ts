@@ -7,26 +7,19 @@ import {
 } from '../../helpers'
 import {
   CollectionOfPermissionsWithAllowedValues,
-  DrivesPermissionsApiFactory,
-  DrivesRootApiFactory,
+  DrivesPermissionsApi,
+  DrivesRootApi,
   Permission,
-  RoleManagementApiFactory,
+  RoleManagementApi,
   UnifiedRoleDefinition
 } from './../generated'
-import type { GraphFactoryOptions, GraphRequestOptions } from './../types'
+import { toInitOverrides, type GraphFactoryOptions, type GraphRequestOptions } from './../types'
 import type { GraphPermissions } from './types'
 
-export const PermissionsFactory = ({
-  axiosClient,
-  config
-}: GraphFactoryOptions): GraphPermissions => {
-  const drivesRootApiFactory = DrivesRootApiFactory(config, config.basePath, axiosClient)
-  const roleManagementApiFactory = RoleManagementApiFactory(config, config.basePath, axiosClient)
-  const drivesPermissionsApiFactory = DrivesPermissionsApiFactory(
-    config,
-    config.basePath,
-    axiosClient
-  )
+export const PermissionsFactory = ({ config }: GraphFactoryOptions): GraphPermissions => {
+  const drivesRootApi = new DrivesRootApi(config)
+  const roleManagementApi = new RoleManagementApi(config)
+  const drivesPermissionsApi = new DrivesPermissionsApi(config)
 
   return {
     async getPermission<T extends CollaboratorShare | LinkShare>(
@@ -36,11 +29,9 @@ export const PermissionsFactory = ({
       graphRoles: Record<string, ShareRole>,
       requestOptions: GraphRequestOptions
     ): Promise<T> {
-      const { data: permission } = await drivesPermissionsApiFactory.getPermission(
-        driveId,
-        itemId,
-        permId,
-        requestOptions
+      const permission = await drivesPermissionsApi.getPermission(
+        { driveId, itemId, permId },
+        toInitOverrides(requestOptions)
       )
 
       if (permission.link) {
@@ -58,27 +49,29 @@ export const PermissionsFactory = ({
       let responseData: CollectionOfPermissionsWithAllowedValues
 
       if (driveId === itemId) {
-        const { data } = await drivesRootApiFactory.listPermissionsSpaceRoot(
-          driveId,
-          options?.filter,
-          options?.select ? new Set([...options.select]) : null,
-          requestOptions
+        responseData = await drivesRootApi.listPermissionsSpaceRoot(
+          {
+            driveId,
+            $filter: options?.filter,
+            $select: options?.select ? new Set([...options.select]) : null
+          },
+          toInitOverrides(requestOptions)
         )
-        responseData = data
       } else {
-        const { data } = await drivesPermissionsApiFactory.listPermissions(
-          driveId,
-          itemId,
-          options?.filter,
-          options?.select ? new Set([...options.select]) : null,
-          requestOptions
+        responseData = await drivesPermissionsApi.listPermissions(
+          {
+            driveId,
+            itemId,
+            $filter: options?.filter,
+            $select: options?.select ? new Set([...options.select]) : null
+          },
+          toInitOverrides(requestOptions)
         )
-        responseData = data
       }
 
       const permissions = responseData.value || []
-      const allowedActions = responseData['@libre.graph.permissions.actions.allowedValues']
-      const allowedRoles = responseData['@libre.graph.permissions.roles.allowedValues']
+      const allowedActions = responseData.atLibreGraphPermissionsActionsAllowedValues
+      const allowedRoles = responseData.atLibreGraphPermissionsRolesAllowedValues
 
       const shares = permissions.map((permission) => {
         if (permission.link) {
@@ -106,24 +99,15 @@ export const PermissionsFactory = ({
       let permission: Permission
 
       if (driveId === itemId) {
-        const { data: perm } = await drivesRootApiFactory.updatePermissionSpaceRoot(
-          driveId,
-          permId,
-          data,
-          requestOptions
+        permission = await drivesRootApi.updatePermissionSpaceRoot(
+          { driveId, permId, permission: data },
+          toInitOverrides(requestOptions)
         )
-
-        permission = perm
       } else {
-        const { data: perm } = await drivesPermissionsApiFactory.updatePermission(
-          driveId,
-          itemId,
-          permId,
-          data,
-          requestOptions
+        permission = await drivesPermissionsApi.updatePermission(
+          { driveId, itemId, permId, permission: data },
+          toInitOverrides(requestOptions)
         )
-
-        permission = perm
       }
 
       if (permission.link) {
@@ -139,30 +123,33 @@ export const PermissionsFactory = ({
 
     async deletePermission(driveId, itemId, permId, requestOptions) {
       if (driveId === itemId) {
-        await drivesRootApiFactory.deletePermissionSpaceRoot(driveId, permId, requestOptions)
+        await drivesRootApi.deletePermissionSpaceRoot(
+          { driveId, permId },
+          toInitOverrides(requestOptions)
+        )
         return
       }
 
-      await drivesPermissionsApiFactory.deletePermission(driveId, itemId, permId, requestOptions)
+      await drivesPermissionsApi.deletePermission(
+        { driveId, itemId, permId },
+        toInitOverrides(requestOptions)
+      )
     },
 
     async createInvite(driveId, itemId, data, graphRoles, requestOptions) {
       let permission: Permission | undefined
 
       if (driveId === itemId) {
-        const { data: perm } = await drivesRootApiFactory.inviteSpaceRoot(
-          driveId,
-          data,
-          requestOptions
+        const perm = await drivesRootApi.inviteSpaceRoot(
+          { driveId, driveItemInvite: data },
+          toInitOverrides(requestOptions)
         )
 
         permission = perm.value?.[0]
       } else {
-        const { data: perm } = await drivesPermissionsApiFactory.invite(
-          driveId,
-          itemId,
-          data,
-          requestOptions
+        const perm = await drivesPermissionsApi.invite(
+          { driveId, itemId, driveItemInvite: data },
+          toInitOverrides(requestOptions)
         )
 
         permission = perm.value?.[0]
@@ -183,22 +170,15 @@ export const PermissionsFactory = ({
       let permission: Permission
 
       if (driveId === itemId) {
-        const { data: perm } = await drivesRootApiFactory.createLinkSpaceRoot(
-          driveId,
-          data,
-          requestOptions
+        permission = await drivesRootApi.createLinkSpaceRoot(
+          { driveId, driveItemCreateLink: data },
+          toInitOverrides(requestOptions)
         )
-
-        permission = perm
       } else {
-        const { data: perm } = await drivesPermissionsApiFactory.createLink(
-          driveId,
-          itemId,
-          data,
-          requestOptions
+        permission = await drivesPermissionsApi.createLink(
+          { driveId, itemId, driveItemCreateLink: data },
+          toInitOverrides(requestOptions)
         )
-
-        permission = perm
       }
 
       return buildLinkShare({ graphPermission: permission, resourceId: itemId })
@@ -208,34 +188,27 @@ export const PermissionsFactory = ({
       let permission: Permission
 
       if (driveId === itemId) {
-        const { data: perm } = await drivesRootApiFactory.setPermissionPasswordSpaceRoot(
-          driveId,
-          permId,
-          data,
-          requestOptions
+        permission = await drivesRootApi.setPermissionPasswordSpaceRoot(
+          { driveId, permId, sharingLinkPassword: data },
+          toInitOverrides(requestOptions)
         )
-
-        permission = perm
       } else {
-        const { data: perm } = await drivesPermissionsApiFactory.setPermissionPassword(
-          driveId,
-          itemId,
-          permId,
-          data,
-          requestOptions
+        permission = await drivesPermissionsApi.setPermissionPassword(
+          { driveId, itemId, permId, sharingLinkPassword: data },
+          toInitOverrides(requestOptions)
         )
-
-        permission = perm
       }
 
       return buildLinkShare({ graphPermission: permission, resourceId: itemId })
     },
 
     async listRoleDefinitions(requestOptions) {
-      const { data } = await roleManagementApiFactory.listPermissionRoleDefinitions(requestOptions)
+      const data = await roleManagementApi.listPermissionRoleDefinitions(
+        toInitOverrides(requestOptions)
+      )
 
       // FIXME: graph type is wrong
-      return data as Promise<UnifiedRoleDefinition[]>
+      return data as UnifiedRoleDefinition[]
     }
   }
 }

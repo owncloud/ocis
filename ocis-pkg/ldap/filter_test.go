@@ -54,12 +54,12 @@ func TestEnhanceFilterWithMasterID(t *testing.T) {
 			expectedFilter: "(|(ownCloudGuestOf=instance-1)(ownCloudGuestOf=0000-0000-000-0000))",
 		},
 		{
-			name:           "empty existing filter",
+			name:           "empty existing filter stays unrestricted",
 			filter:         "",
 			masterID:       "0000-0000-000-0000",
 			memberAttr:     "ownCloudMemberOf",
 			guestAttr:      "ownCloudGuestOf",
-			expectedFilter: "(|(ownCloudMemberOf=0000-0000-000-0000)(ownCloudGuestOf=0000-0000-000-0000))",
+			expectedFilter: "",
 		},
 		{
 			name:           "LDAP injection protection",

@@ -1,27 +1,41 @@
+
 # IdentitySet
 
 Optional. User account.
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**application** | [**Identity**](Identity.md) |  | [optional] [default to undefined]
-**device** | [**Identity**](Identity.md) |  | [optional] [default to undefined]
-**user** | [**Identity**](Identity.md) |  | [optional] [default to undefined]
-**group** | [**Identity**](Identity.md) |  | [optional] [default to undefined]
+Name | Type
+------------ | -------------
+`application` | [Identity](Identity.md)
+`device` | [Identity](Identity.md)
+`user` | [Identity](Identity.md)
+`group` | [Identity](Identity.md)
 
 ## Example
 
 ```typescript
-import { IdentitySet } from './api';
+import type { IdentitySet } from ''
 
-const instance: IdentitySet = {
-    application,
-    device,
-    user,
-    group,
-};
+// TODO: Update the object below with actual values
+const example = {
+  "application": null,
+  "device": null,
+  "user": null,
+  "group": null,
+} satisfies IdentitySet
+
+console.log(example)
+
+// Convert the instance to a JSON string
+const exampleJSON: string = JSON.stringify(example)
+console.log(exampleJSON)
+
+// Parse the JSON string back to an object
+const exampleParsed = JSON.parse(exampleJSON) as IdentitySet
+console.log(exampleParsed)
 ```
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+

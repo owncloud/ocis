@@ -1,10 +1,19 @@
-import { ConfigStore, useAuthStore, useConfigStore } from '@ownclouders/web-pkg'
+import {
+  CapabilityStore,
+  ConfigStore,
+  useAuthStore,
+  useConfigStore,
+  useMessages
+} from '@ownclouders/web-pkg'
 import { mock } from 'vitest-mock-extended'
 import { Router } from 'vue-router'
+import { Ability } from '@ownclouders/web-client'
 import { AuthService } from '../../../../src/services/auth/authService'
+import { vaultStepUpFailedKey } from '../../../../src/helpers/vaultStepUp'
 import { UserManager } from '../../../../src/services/auth/userManager'
 import { RouteLocation, createRouter, createTestingPinia } from '@ownclouders/web-test-helpers'
 import { User } from 'oidc-client-ts'
+import { Language } from 'vue3-gettext'
 
 const mockUpdateContext = vi.fn()
 console.debug = vi.fn()
@@ -26,6 +35,11 @@ const initAuthService = ({
 
   authService.initialize(configStore, null, router, null, null, null, authStore, null, null)
 }
+
+const stepUpRequest = (target: string) => ({
+  acr_values: 'advanced',
+  state: { mfaStepUpTarget: target }
+})
 
 describe('AuthService', () => {
   describe('signInCallback', () => {
@@ -157,13 +171,68 @@ describe('AuthService', () => {
 
       expect(mockUpdateContext).toHaveBeenCalledWith('access-token', true)
     })
+
+    it('does not log the access_token or refresh_token when a new user is loaded', async () => {
+      const authService = new AuthService()
+      const addUserLoadedMock = vi.fn()
+
+      Object.defineProperty(authService, 'userManager', {
+        value: mock<UserManager>({
+          getAccessToken: vi.fn().mockResolvedValue('access-token'),
+          getUser: vi.fn().mockResolvedValue(mock<User>({ expires_in: 3600 })),
+          updateContext: mockUpdateContext,
+          areEventHandlersRegistered: false,
+          events: mock<UserManager['events']>({
+            addUserLoaded: addUserLoadedMock
+          })
+        })
+      })
+
+      initAuthService({ authService })
+
+      await authService.initializeContext(mock<RouteLocation>({}))
+
+      const userLoadedHandler = addUserLoadedMock.mock.calls[0][0]
+
+      const accessToken = 'distinctive-access-token-value'
+      const refreshToken = 'distinctive-refresh-token-value'
+
+      const consoleSpies = {
+        debug: vi.spyOn(console, 'debug').mockImplementation(() => {}),
+        log: vi.spyOn(console, 'log').mockImplementation(() => {}),
+        info: vi.spyOn(console, 'info').mockImplementation(() => {}),
+        warn: vi.spyOn(console, 'warn').mockImplementation(() => {}),
+        error: vi.spyOn(console, 'error').mockImplementation(() => {})
+      }
+
+      try {
+        await userLoadedHandler(
+          mock<User>({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+            expires_in: 3600
+          })
+        )
+
+        const loggedValues = Object.values(consoleSpies)
+          .flatMap((spy) => spy.mock.calls)
+          .flat()
+
+        loggedValues.forEach((value) => {
+          expect(String(value)).not.toContain(accessToken)
+          expect(String(value)).not.toContain(refreshToken)
+        })
+      } finally {
+        Object.values(consoleSpies).forEach((spy) => spy.mockRestore())
+      }
+    })
   })
 
   describe('handleDelegatedTokenUpdate', () => {
-    const buildMessageEvent = (origin: string) =>
+    const buildMessageEvent = (origin: string, accessToken = 'attacker-token') =>
       mock<MessageEvent>({
         origin,
-        data: { name: 'owncloud-embed:update-token', data: { access_token: 'attacker-token' } }
+        data: { name: 'owncloud-embed:update-token', data: { access_token: accessToken } }
       })
 
     it('when delegateAuthenticationOrigin is not configured, should reject the message regardless of its origin', () => {
@@ -222,14 +291,95 @@ describe('AuthService', () => {
         }
       }
       initAuthService({ authService, configStore })
-      ;(authService as any).handleDelegatedTokenUpdate(buildMessageEvent('https://trusted.example'))
+      ;(authService as any).handleDelegatedTokenUpdate(
+        buildMessageEvent('https://trusted.example', 'renewed-token')
+      )
 
-      expect(mockUpdateContext).toHaveBeenCalled()
+      expect(mockUpdateContext).toHaveBeenCalledWith('renewed-token', false)
+    })
+
+    describe('when dispatched through the window message listener', () => {
+      let authService: AuthService
+
+      const signInDelegated = async () => {
+        authService = new AuthService()
+
+        Object.defineProperty(authService, 'userManager', {
+          value: mock<UserManager>({
+            getUser: vi.fn().mockResolvedValue(null),
+            getAndClearPostLoginRedirectUrl: vi.fn().mockReturnValue('/'),
+            updateContext: mockUpdateContext
+          })
+        })
+
+        const configStore = useConfigStore()
+        configStore.options = {
+          embed: {
+            enabled: true,
+            delegateAuthentication: true,
+            delegateAuthenticationOrigin: 'https://host.example.org'
+          }
+        }
+        initAuthService({ authService, configStore, router: createRouter() })
+
+        await authService.signInCallback('initial-token')
+        mockUpdateContext.mockClear()
+      }
+
+      afterEach(() => {
+        window.removeEventListener(
+          'message',
+          (authService as any).handleDelegatedTokenUpdate as EventListener
+        )
+      })
+
+      it('ignores "owncloud-embed:update-token" messages from unexpected origins', async () => {
+        await signInDelegated()
+
+        window.dispatchEvent(
+          new MessageEvent('message', {
+            data: { name: 'owncloud-embed:update-token', data: { access_token: 'renewed-token' } },
+            origin: 'https://attacker.example.org'
+          })
+        )
+
+        expect(mockUpdateContext).not.toHaveBeenCalled()
+      })
+
+      it('ignores "owncloud-embed:update-token" messages without an access token', async () => {
+        await signInDelegated()
+
+        window.dispatchEvent(
+          new MessageEvent('message', {
+            data: { name: 'owncloud-embed:update-token', data: {} },
+            origin: 'https://host.example.org'
+          })
+        )
+
+        expect(mockUpdateContext).not.toHaveBeenCalled()
+      })
+
+      it('updates the user context with the access token from "owncloud-embed:update-token" messages', async () => {
+        await signInDelegated()
+
+        window.dispatchEvent(
+          new MessageEvent('message', {
+            data: { name: 'owncloud-embed:update-token', data: { access_token: 'renewed-token' } },
+            origin: 'https://host.example.org'
+          })
+        )
+
+        expect(mockUpdateContext).toHaveBeenCalledWith('renewed-token', false)
+      })
     })
   })
 
   describe('acr', () => {
     const mockSignInRedirect = vi.fn()
+
+    beforeEach(() => {
+      sessionStorage.clear()
+    })
 
     it('when user is not authenticated, should redirect to login page', async () => {
       const authService = new AuthService()
@@ -242,7 +392,9 @@ describe('AuthService', () => {
       })
 
       await authService.requireAcr('advanced', '/')
-      expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
+      expect(mockSignInRedirect).toHaveBeenCalledWith(
+        expect.objectContaining({ acr_values: 'advanced' })
+      )
     })
 
     it('when user is authenticated and acr is not the one required, should redirect to login page', async () => {
@@ -258,7 +410,9 @@ describe('AuthService', () => {
       })
 
       await authService.requireAcr('advanced', '/')
-      expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
+      expect(mockSignInRedirect).toHaveBeenCalledWith(
+        expect.objectContaining({ acr_values: 'advanced' })
+      )
     })
 
     it('when user is authenticated and acr is the one required but access token is expired, should redirect to login page', async () => {
@@ -274,7 +428,9 @@ describe('AuthService', () => {
       })
 
       await authService.requireAcr('advanced', '/')
-      expect(mockSignInRedirect).toHaveBeenCalledWith({ acr_values: 'advanced' })
+      expect(mockSignInRedirect).toHaveBeenCalledWith(
+        expect.objectContaining({ acr_values: 'advanced' })
+      )
     })
 
     it('when user is authenticated and acr is the one required, should not redirect to login page', async () => {
@@ -291,6 +447,461 @@ describe('AuthService', () => {
 
       await authService.requireAcr('advanced', '/')
       expect(mockSignInRedirect).not.toHaveBeenCalled()
+    })
+
+    describe('MFA step-up loop protection', () => {
+      const adminRoute = '/admin-settings/users'
+
+      const setupRequireAcr = (user: User) => {
+        const signinRedirect = vi.fn()
+        const authService = new AuthService()
+        Object.defineProperty(authService, 'userManager', {
+          value: mock<UserManager>({
+            getUser: vi.fn().mockResolvedValue(user),
+            signinRedirect,
+            setPostLoginRedirectUrl: vi.fn()
+          })
+        })
+        Object.defineProperty(authService, 'language', {
+          value: {
+            $gettext: (msg: string) => msg,
+            $pgettext: (_context: string, msg: string) => msg
+          }
+        })
+        return { authService, signinRedirect }
+      }
+
+      // the route guard runs `initializeContext` before `requireAcr`, which marks the
+      // navigation right after the sign-in callback as the IdP's answer for `target`
+      const answeredStepUpFor = (authService: AuthService, target: string) => {
+        ;(authService as any).stepUpReturnTarget = target
+      }
+
+      const regularUser = () => mock<User>({ profile: { acr: 'regular' }, expired: false })
+
+      it('requests the step-up with the target as OIDC state', async () => {
+        const { authService, signinRedirect } = setupRequireAcr(regularUser())
+
+        const result = await authService.requireAcr('advanced', adminRoute)
+
+        expect(result).toBe(true)
+        expect(signinRedirect).toHaveBeenCalledWith(stepUpRequest(adminRoute))
+      })
+
+      it('denies access when the IdP answered the step-up without the required acr', async () => {
+        const { authService, signinRedirect } = setupRequireAcr(regularUser())
+        answeredStepUpFor(authService, adminRoute)
+
+        const result = await authService.requireAcr('advanced', adminRoute)
+
+        expect(result).toBe(false)
+        expect(signinRedirect).not.toHaveBeenCalled()
+        expect(useMessages().showErrorMessage).toHaveBeenCalled()
+      })
+
+      it('redirects again when the user came back without the IdP answering (e.g. browser back)', async () => {
+        const { authService, signinRedirect } = setupRequireAcr(regularUser())
+
+        await authService.requireAcr('advanced', adminRoute)
+        const result = await authService.requireAcr('advanced', adminRoute)
+
+        expect(result).toBe(true)
+        expect(signinRedirect).toHaveBeenCalledTimes(2)
+        expect(useMessages().showErrorMessage).not.toHaveBeenCalled()
+      })
+
+      it('redirects when the IdP answered a step-up for another target', async () => {
+        const { authService, signinRedirect } = setupRequireAcr(regularUser())
+        answeredStepUpFor(authService, '/vault')
+
+        const result = await authService.requireAcr('advanced', adminRoute)
+
+        expect(result).toBe(true)
+        expect(signinRedirect).toHaveBeenCalledWith(stepUpRequest(adminRoute))
+      })
+
+      it('redirects an expired user even when the IdP just answered', async () => {
+        const { authService, signinRedirect } = setupRequireAcr(
+          mock<User>({ profile: { acr: 'regular' }, expired: true })
+        )
+        answeredStepUpFor(authService, adminRoute)
+
+        const result = await authService.requireAcr('advanced', adminRoute)
+
+        expect(result).toBe(true)
+        expect(signinRedirect).toHaveBeenCalledWith(stepUpRequest(adminRoute))
+      })
+    })
+  })
+
+  describe('vault scope', () => {
+    const vaultRoute = {
+      params: { scope: 'vault' },
+      fullPath: '/vault'
+    } as unknown as RouteLocation
+
+    const setupVaultAuthService = ({
+      canAccessVault,
+      userContextReady,
+      getUser,
+      isInVault = false
+    }: {
+      canAccessVault: boolean
+      userContextReady: boolean
+      getUser: () => Promise<User>
+      isInVault?: boolean
+    }) => {
+      const authService = new AuthService()
+      const mockSignInRedirect = vi.fn()
+
+      const mockLoadUserAbilities = vi.fn().mockResolvedValue(undefined)
+      const mockUpdateContext = vi.fn().mockResolvedValue(undefined)
+      Object.defineProperty(authService, 'userManager', {
+        value: mock<UserManager>({
+          getUser: vi.fn().mockImplementation(getUser),
+          getAccessToken: vi.fn().mockResolvedValue('access-token'),
+          signinRedirect: mockSignInRedirect,
+          setPostLoginRedirectUrl: vi.fn(),
+          loadUserAbilities: mockLoadUserAbilities,
+          updateContext: mockUpdateContext
+        })
+      })
+
+      const ability = { can: vi.fn().mockReturnValue(canAccessVault) } as unknown as Ability
+      const capabilityStore = mock<CapabilityStore>({
+        isInitialized: true,
+        authMfaRequiredLevelname: 'advanced'
+      })
+      const router = createRouter({
+        routes: [{ path: '/access-denied', name: 'accessDenied', component: {} }]
+      })
+      const pushSpy = vi.spyOn(router, 'push').mockResolvedValue(undefined)
+
+      createTestingPinia()
+      const authStore = useAuthStore()
+      authStore.userContextReady = userContextReady
+      const configStore = useConfigStore()
+      configStore.isInVault = isInVault
+      authService.initialize(
+        configStore,
+        null,
+        router,
+        ability,
+        {
+          $gettext: (msg: string) => msg,
+          $pgettext: (_context: string, msg: string) => msg
+        } as unknown as Language,
+        null,
+        authStore,
+        capabilityStore,
+        null
+      )
+
+      return { authService, pushSpy, mockSignInRedirect, mockLoadUserAbilities, mockUpdateContext }
+    }
+
+    beforeEach(() => {
+      sessionStorage.clear()
+    })
+
+    it('when the user lacks the vault ability, denies (accessDenied) instead of the IdP', async () => {
+      const { authService, mockSignInRedirect } = setupVaultAuthService({
+        canAccessVault: false,
+        userContextReady: true,
+        getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'advanced' }, expired: false }))
+      })
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      // initializeContext returns the redirect target; the guard (setupAuthGuard) returns it
+      // so vue-router cancels the navigation to the vault route.
+      expect(result).toEqual({ name: 'accessDenied', query: { reason: 'forbidden' } })
+      expect(mockSignInRedirect).not.toHaveBeenCalled()
+    })
+
+    it('when the user holds the vault ability, does not deny and enforces MFA', async () => {
+      const { authService, mockSignInRedirect } = setupVaultAuthService({
+        canAccessVault: true,
+        userContextReady: true,
+        getUser: () => Promise.resolve(null)
+      })
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      expect(result).toBeUndefined()
+      expect(mockSignInRedirect).toHaveBeenCalledWith(
+        expect.objectContaining({ acr_values: 'advanced' })
+      )
+    })
+
+    it('when there is no authenticated user (cold load), does not deny and hands off to the IdP for login', async () => {
+      const { authService, mockSignInRedirect, mockLoadUserAbilities } = setupVaultAuthService({
+        canAccessVault: false,
+        userContextReady: false,
+        getUser: () => Promise.resolve(null)
+      })
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      expect(mockLoadUserAbilities).not.toHaveBeenCalled()
+      expect(result).toBeUndefined()
+      expect(mockSignInRedirect).toHaveBeenCalledWith(
+        expect.objectContaining({ acr_values: 'advanced' })
+      )
+    })
+
+    it('on a cold load, denies an authenticated but unentitled user before the IdP hand-off', async () => {
+      const { authService, mockSignInRedirect, mockLoadUserAbilities } = setupVaultAuthService({
+        canAccessVault: false,
+        userContextReady: false,
+        getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: false }))
+      })
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      expect(mockLoadUserAbilities).toHaveBeenCalled()
+      expect(result).toEqual({ name: 'accessDenied', query: { reason: 'forbidden' } })
+      expect(mockSignInRedirect).not.toHaveBeenCalled()
+    })
+
+    describe('on a page loaded in vault mode', () => {
+      const spyNavigateOutsideVault = (authService: AuthService) =>
+        vi.spyOn(authService as any, 'navigateOutsideVault').mockImplementation(() => undefined)
+
+      it('on a cold load, denies an unentitled user with a full page load outside the vault', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: false,
+          userContextReady: false,
+          getUser: () =>
+            Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: false })),
+          isInVault: true
+        })
+        const navigateSpy = spyNavigateOutsideVault(authService)
+
+        const result = await authService.initializeContext(vaultRoute)
+
+        // an in-app redirect would keep the vault theme and clients for the rest of the page,
+        // so the "Continue" button and the browser back button would show the app as the vault
+        expect(result).toBe(false)
+        expect(navigateSpy).toHaveBeenCalledWith('/access-denied?reason=forbidden', {
+          replace: true
+        })
+        expect(mockSignInRedirect).not.toHaveBeenCalled()
+      })
+
+      it('with known permissions, denies an unentitled user with a full page load outside the vault', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: false,
+          userContextReady: true,
+          getUser: () =>
+            Promise.resolve(mock<User>({ profile: { acr: 'advanced' }, expired: false })),
+          isInVault: true
+        })
+        const navigateSpy = spyNavigateOutsideVault(authService)
+
+        const result = await authService.initializeContext(vaultRoute)
+
+        expect(result).toBe(false)
+        expect(navigateSpy).toHaveBeenCalledWith('/access-denied?reason=forbidden', {
+          replace: true
+        })
+        expect(mockSignInRedirect).not.toHaveBeenCalled()
+      })
+
+      it('does not reload the page for an entitled user', async () => {
+        const { authService } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: false,
+          getUser: () =>
+            Promise.resolve(mock<User>({ profile: { acr: 'advanced' }, expired: false })),
+          isInVault: true
+        })
+        const navigateSpy = spyNavigateOutsideVault(authService)
+
+        const result = await authService.initializeContext(vaultRoute)
+
+        expect(result).toBeUndefined()
+        expect(navigateSpy).not.toHaveBeenCalled()
+      })
+    })
+
+    it('on a cold load, fails closed (denies) when loading abilities throws', async () => {
+      const { authService, mockSignInRedirect, mockLoadUserAbilities } = setupVaultAuthService({
+        canAccessVault: true, // even if the ability would allow, a load failure must deny
+        userContextReady: false,
+        getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: false }))
+      })
+      mockLoadUserAbilities.mockRejectedValueOnce(new Error('network error'))
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      expect(mockLoadUserAbilities).toHaveBeenCalled()
+      expect(result).toEqual({ name: 'accessDenied' })
+      expect(mockSignInRedirect).not.toHaveBeenCalled()
+    })
+
+    it('does not report a load failure as a confirmed permission denial', async () => {
+      const { authService, mockLoadUserAbilities } = setupVaultAuthService({
+        canAccessVault: true,
+        userContextReady: false,
+        getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: false }))
+      })
+      mockLoadUserAbilities.mockRejectedValueOnce(new Error('network error'))
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      expect(mockLoadUserAbilities).toHaveBeenCalled()
+      // reason: 'forbidden' tells accessDenied.vue the ability check ran and failed;
+      // here it never ran, so claiming that is false regardless of the (correct) denial.
+      expect((result as { query?: { reason?: string } })?.query?.reason).not.toBe('forbidden')
+    })
+
+    it('on a cold load with a valid MFA session, initializes the user context instead of bouncing to login', async () => {
+      const { authService, mockSignInRedirect, mockUpdateContext } = setupVaultAuthService({
+        canAccessVault: true,
+        userContextReady: false,
+        getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'advanced' }, expired: false }))
+      })
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      // acr already satisfies MFA: no step-up, and the context must still be initialized
+      // (loadUserAbilities pre-set the token, which must not short-circuit updateContext).
+      expect(mockSignInRedirect).not.toHaveBeenCalled()
+      expect(mockUpdateContext).toHaveBeenCalledWith('access-token', true)
+      expect(result).toBeUndefined()
+    })
+
+    it('on a cold load, lets an authenticated entitled user through to the MFA step-up', async () => {
+      const { authService, mockSignInRedirect, mockLoadUserAbilities } = setupVaultAuthService({
+        canAccessVault: true,
+        userContextReady: false,
+        getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: false }))
+      })
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      expect(mockLoadUserAbilities).toHaveBeenCalled()
+      expect(result).toBeUndefined()
+      expect(mockSignInRedirect).toHaveBeenCalledWith(
+        expect.objectContaining({ acr_values: 'advanced' })
+      )
+    })
+
+    describe('MFA step-up loop protection', () => {
+      const regularUser = () =>
+        Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: false }))
+
+      // Runs the real sign-in callback for a step-up the IdP answered for `target`.
+      const returnFromIdp = async (authService: AuthService, target: string) => {
+        const userManager = (authService as any).userManager
+        userManager.signinRedirectCallback.mockResolvedValue(
+          mock<User>({ state: { mfaStepUpTarget: target } })
+        )
+        userManager.getAndClearPostLoginRedirectUrl.mockReturnValue(target)
+        vi.spyOn((authService as any).router, 'replace').mockResolvedValue(undefined)
+        await authService.signInCallback()
+      }
+
+      const spyNavigateOutsideVault = (authService: AuthService) =>
+        vi.spyOn(authService as any, 'navigateOutsideVault').mockImplementation(() => undefined)
+
+      it('requests the step-up with the target as OIDC state', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: true,
+          getUser: regularUser
+        })
+
+        await authService.initializeContext(vaultRoute)
+
+        expect(mockSignInRedirect).toHaveBeenCalledWith(stepUpRequest('/vault'))
+      })
+
+      it('leaves the vault with a full page load when the IdP answered without the required acr', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: true,
+          getUser: regularUser
+        })
+        const navigateSpy = spyNavigateOutsideVault(authService)
+        await returnFromIdp(authService, '/vault')
+
+        const result = await authService.initializeContext(vaultRoute)
+
+        // navigation is cancelled, no in-app redirect that would keep the vault clients
+        expect(result).toBe(false)
+        expect(navigateSpy).toHaveBeenCalledTimes(1)
+        expect(navigateSpy.mock.calls[0][0]).not.toMatch(/vault/)
+        expect(mockSignInRedirect).not.toHaveBeenCalled()
+        expect(sessionStorage.getItem(vaultStepUpFailedKey)).toBe('true')
+      })
+
+      it('redirects again when the user came back without the IdP answering (e.g. browser back)', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: true,
+          getUser: regularUser
+        })
+        const navigateSpy = spyNavigateOutsideVault(authService)
+
+        await authService.initializeContext(vaultRoute)
+        const result = await authService.initializeContext(vaultRoute)
+
+        expect(result).toBeUndefined()
+        expect(mockSignInRedirect).toHaveBeenCalledTimes(2)
+        expect(navigateSpy).not.toHaveBeenCalled()
+      })
+
+      it('only treats the navigation right after the callback as the answer', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: true,
+          getUser: regularUser
+        })
+        const navigateSpy = spyNavigateOutsideVault(authService)
+        await returnFromIdp(authService, '/vault')
+
+        // the callback lands somewhere else first, a later vault navigation must ask the IdP again
+        await authService.initializeContext({ params: {}, fullPath: '/files' } as any)
+        const result = await authService.initializeContext(vaultRoute)
+
+        expect(result).toBeUndefined()
+        expect(navigateSpy).not.toHaveBeenCalled()
+        expect(mockSignInRedirect).toHaveBeenCalledWith(stepUpRequest('/vault'))
+      })
+
+      it('redirects an expired user to the IdP even when the IdP just answered', async () => {
+        const { authService, mockSignInRedirect } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: true,
+          getUser: () => Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: true }))
+        })
+        const navigateSpy = spyNavigateOutsideVault(authService)
+        await returnFromIdp(authService, '/vault')
+
+        const result = await authService.initializeContext(vaultRoute)
+
+        expect(result).toBeUndefined()
+        expect(navigateSpy).not.toHaveBeenCalled()
+        expect(mockSignInRedirect).toHaveBeenCalledWith(stepUpRequest('/vault'))
+      })
+
+      it('shows the step-up failure message after the reload and only once', async () => {
+        const { authService } = setupVaultAuthService({
+          canAccessVault: true,
+          userContextReady: true,
+          getUser: () =>
+            Promise.resolve(mock<User>({ profile: { acr: 'advanced' }, expired: false }))
+        })
+        sessionStorage.setItem(vaultStepUpFailedKey, 'true')
+
+        await authService.initializeContext(vaultRoute)
+        await authService.initializeContext(vaultRoute)
+
+        expect(useMessages().showErrorMessage).toHaveBeenCalledTimes(1)
+        expect(sessionStorage.getItem(vaultStepUpFailedKey)).toBeNull()
+      })
     })
   })
 })

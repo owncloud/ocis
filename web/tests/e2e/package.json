@@ -3,7 +3,7 @@
   "devDependencies": {
     "@ai-zen/node-fetch-event-source": "^2.1.4",
     "join-path": "1.1.1",
-    "lodash-es": "4.17.21",
+    "lodash-es": "4.18.1",
     "luxon": "3.5.0",
     "xml-js": "^1.6.11"
   }

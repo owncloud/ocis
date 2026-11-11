@@ -150,7 +150,12 @@ const eventBus = useEventBus()
 const { showErrorMessage } = useMessages()
 const { $gettext } = useGettext()
 
-let editUser: MaybeRef<User> = ref()
+// A local draft of the user the form edits. Properties the graph API only ever returns,
+// such as `memberOf`, are still editable here: the dialog diffs the draft against the
+// user on confirm and applies those changes through their own endpoints.
+type UserDraft = { -readonly [K in keyof User]: User[K] }
+
+let editUser: MaybeRef<UserDraft> = ref()
 const formData = ref({
   displayName: {
     errorMessage: '',
@@ -393,11 +398,8 @@ const loginOptions = computed(() => {
   ]
 })
 const selectedLoginValue = computed(() => {
-  return unref(loginOptions).find((option) =>
-    !('accountEnabled' in unref(editUser))
-      ? option.value === true
-      : unref(editUser).accountEnabled === option.value
-  )
+  const accountEnabled = unref(editUser).accountEnabled ?? true
+  return unref(loginOptions).find((option) => option.value === accountEnabled)
 })
 const translatedRoleOptions = computed(() => {
   return roles.map((role) => {
@@ -443,11 +445,14 @@ watch(
   () => {
     /**
      * Property accountEnabled won't be always set, but this still means, that login is allowed.
-     * So we actually don't need to change the property if missing and not set to forbidden in the UI.
+     * So we actually don't need to change the property if unset and not set to forbidden in the UI.
      * This also avoids the compare save dialog from displaying that there are unsaved changes.
+     * The value is reset instead of deleted, so that it keeps matching the unset original: the
+     * graph client materializes every declared field, and the dialog compares with `isEqual`,
+     * which tells an absent key apart from one holding `undefined`.
      */
-    if (unref(editUser).accountEnabled === true && !('accountEnabled' in user)) {
-      delete unref(editUser).accountEnabled
+    if (unref(editUser).accountEnabled === true && user.accountEnabled === undefined) {
+      unref(editUser).accountEnabled = undefined
     }
   },
   {

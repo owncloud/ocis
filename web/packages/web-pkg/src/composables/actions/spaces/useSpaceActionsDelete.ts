@@ -52,8 +52,7 @@ export const useSpaceActionsDelete = () => {
               '%{spaceCount} space was deleted successfully',
               '%{spaceCount} spaces were deleted successfully',
               succeeded.length,
-              { spaceCount: succeeded.length.toString() },
-              true
+              { spaceCount: succeeded.length.toString() }
             )
       showMessage({ title })
     }
@@ -69,8 +68,7 @@ export const useSpaceActionsDelete = () => {
               'Failed to delete %{spaceCount} space',
               'Failed to delete %{spaceCount} spaces',
               failed.length,
-              { spaceCount: failed.length.toString() },
-              true
+              { spaceCount: failed.length.toString() }
             )
       showErrorMessage({
         title,

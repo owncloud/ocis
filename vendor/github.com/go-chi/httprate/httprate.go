@@ -50,7 +50,8 @@ func Key(key string) func(r *http.Request) (string, error) {
 
 // CanonicalizeIP normalizes a client IP string for use as a rate-limit key:
 //
-//   - IPv4 addresses are returned unchanged.
+//   - IPv4 addresses are returned unchanged. IPv4 mapped IPv6 addresses use
+//     their dotted IPv4 form.
 //   - IPv6 addresses are reduced to their /64 prefix. An IPv6 client typically
 //     controls a whole /64 (2^64 addresses via SLAAC), so keying on the full
 //     address would let it rotate within its own /64 to win a fresh bucket per
@@ -93,6 +94,9 @@ func CanonicalizeIP(ip string) string {
 	ipv6 := net.ParseIP(ip)
 	if ipv6 == nil {
 		return ip
+	}
+	if ipv4 := ipv6.To4(); ipv4 != nil {
+		return ipv4.String()
 	}
 
 	return ipv6.Mask(net.CIDRMask(64, 128)).String()

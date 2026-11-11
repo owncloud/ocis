@@ -1,5 +1,5 @@
-import { shallowMount } from '@ownclouders/web-test-helpers'
 import Count from './OcAvatarCount.vue'
+import { shallowMount } from '../../testing'
 
 describe('OcAvatarCount', () => {
   it('dynamically calculates font size', () => {

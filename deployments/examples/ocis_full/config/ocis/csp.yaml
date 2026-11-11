@@ -7,6 +7,7 @@ directives:
     - 'https://${COMPANION_DOMAIN|companion.owncloud.test}/'
     - 'wss://${COMPANION_DOMAIN|companion.owncloud.test}/'
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+    - 'https://marketplace.owncloud.com/'
     # In contrary to bash and docker the default is given after the | character
     - 'https://${KEYCLOAK_DOMAIN|keycloak.owncloud.test}/'
     # Photo-addon: OpenStreetMap tile requests
@@ -26,12 +27,13 @@ directives:
     - 'https://${ONLYOFFICE_DOMAIN|onlyoffice.owncloud.test}/'
     - 'https://${COLLABORA_DOMAIN|collabora.owncloud.test}/'
     # This is needed for the external-sites web extension when embedding sites
-    - 'https://owncloud.dev'
+    - 'https://doc.owncloud.com'
   img-src:
     - '''self'''
     - 'data:'
     - 'blob:'
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+    - 'https://marketplace.owncloud.com/'
     # In contrary to bash and docker the default is given after the | character
     - 'https://${ONLYOFFICE_DOMAIN|onlyoffice.owncloud.test}/'
     - 'https://${COLLABORA_DOMAIN|collabora.owncloud.test}/'

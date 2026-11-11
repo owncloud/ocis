@@ -408,7 +408,7 @@ export default defineComponent({
       this.sortDir = event.sortDir
     },
     getSelectGroupLabel(group: Group) {
-      return this.$gettext('Select %{ group }', { group: group.displayName }, true)
+      return this.$gettext('Select %{ group }', { group: group.displayName })
     }
   }
 })

@@ -41,7 +41,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			cfg.GrpcClient, err = ogrpc.NewClient(
-				append(ogrpc.GetClientOptions(cfg.GRPCClientTLS), ogrpc.WithTraceProvider(traceProvider))...,
+				append(ogrpc.GetClientOptions(cfg.GRPCClientTLS), ogrpc.WithKeepaliveParams(cfg.GRPCClientOptions), ogrpc.WithTraceProvider(traceProvider))...,
 			)
 			if err != nil {
 				return err
@@ -72,6 +72,8 @@ func Server(cfg *config.Config) *cli.Command {
 				microstore.Database(cfg.Store.Database),
 				microstore.Table(cfg.Store.Table),
 				store.Authentication(cfg.Store.AuthUsername, cfg.Store.AuthPassword),
+				store.Credentials(cfg.Store.CredsFile, cfg.Store.Creds),
+				store.TLS(cfg.Store.EnableTLS, cfg.Store.TLSInsecure, cfg.Store.TLSRootCACertificate),
 			)
 
 			service := grpc.NewService(

@@ -40,6 +40,25 @@ export const useFileActionsRestore = () => {
   const resourcesStore = useResourcesStore()
   const { startWorker } = useRestoreWorker()
 
+  // restoring multiple resources to the same path concurrently fails on the server,
+  // so a resource colliding with another one of the batch gets a unique name
+  const ensureUniqueInBatch = (
+    resource: Resource,
+    resolvedResources: Resource[],
+    existingResources: Resource[]
+  ): Resource => {
+    const parentPath = dirname(resource.path)
+    const batchSiblings = resolvedResources.filter((r) => dirname(r.path) === parentPath)
+    if (!batchSiblings.some((r) => r.path === resource.path)) {
+      return resource
+    }
+    const name = resolveFileNameDuplicate(resource.name, extractExtensionFromFile(resource), [
+      ...existingResources,
+      ...batchSiblings
+    ])
+    return { ...resource, name, path: urlJoin(parentPath, name) }
+  }
+
   // FIXME: use ConflictDialog class for this
   const collectConflicts = async (space: SpaceResource, sortedResources: Resource[]) => {
     const existingResourcesCache: Record<string, Resource[]> = {}
@@ -64,14 +83,12 @@ export const useFileActionsRestore = () => {
         }
         existingResourcesCache[parentPath] = existingResources
       }
-      // Check for naming conflict in parent folder and between resources batch
-      const hasConflict =
-        existingResources.some((r) => r.name === resource.name) ||
-        resolvedResources.filter((r) => r.id !== resource.id).some((r) => r.path === resource.path)
-      if (hasConflict) {
+      // only a naming conflict in the parent folder needs to be resolved by the user,
+      // a conflict between resources of the batch (e.g. multiple deleted versions of the same file) gets resolved automatically
+      if (existingResources.some((r) => r.name === resource.name)) {
         conflicts.push(resource)
       } else {
-        resolvedResources.push(resource)
+        resolvedResources.push(ensureUniqueInBatch(resource, resolvedResources, existingResources))
       }
     }
     return {
@@ -144,30 +161,40 @@ export const useFileActionsRestore = () => {
           originalRoute.name === unref(router.currentRoute).name &&
           originalRoute.query?.fileId === unref(router.currentRoute).query?.fileId
         ) {
-          resourcesStore.removeResources(successful)
-          resourcesStore.resetSelection()
+          if (isLocationTrashActive(router, 'files-trash-generic')) {
+            resourcesStore.removeResources(successful)
+            resourcesStore.resetSelection()
+          } else {
+            // restored items now live in the currently viewed folder, fetch their fresh info and show them.
+            // a single failing lookup must not abort the whole refresh, so upsert whatever resolves
+            const restoredResources = (
+              await Promise.allSettled(
+                successful.map((resource) =>
+                  clientService.webdav.getFileInfo(space, { path: resource.path })
+                )
+              )
+            )
+              .filter((result) => result.status === 'fulfilled')
+              .map((result) => result.value)
+            if (restoredResources.length) {
+              resourcesStore.upsertResources(restoredResources)
+            }
+          }
         }
 
         // Reload quota
         const graphClient = clientService.graphAuthenticated
         const updatedSpace = await graphClient.drives.getDrive(space.id, sharesStore.graphRoles)
-        spacesStore.updateSpaceField({
-          id: updatedSpace.id,
-          field: 'spaceQuota',
-          value: updatedSpace.spaceQuota
-        })
+        spacesStore.updateSpaceUsage(updatedSpace)
       }
 
       if (failed.length) {
-        let translated: string
-        const translateParams: Record<string, string> = {}
-        if (failed.length === 1) {
-          translateParams.resource = failed[0].resource.name
-          translated = $gettext('Failed to restore "%{resource}"', translateParams, true)
-        } else {
-          translateParams.resourceCount = failed.length.toString()
-          translated = $gettext('Failed to restore %{resourceCount} files', translateParams, true)
-        }
+        const translated =
+          failed.length === 1
+            ? $gettext('Failed to restore "%{resource}"', { resource: failed[0].resource.name })
+            : $gettext('Failed to restore %{resourceCount} files', {
+                resourceCount: failed.length.toString()
+              })
         showErrorMessage({ title: translated, errors: failed.map(({ error }) => error) })
       }
     })
@@ -188,7 +215,11 @@ export const useFileActionsRestore = () => {
     const filesToOverwrite = resolvedConflicts
       .filter((e) => e.strategy === ResolveStrategy.REPLACE)
       .map((e) => e.resource)
-    resolvedResources.push(...filesToOverwrite)
+    // only one resource of the batch can replace an existing one, others get a unique name
+    for (const resource of filesToOverwrite) {
+      const existingResources = existingResourcesByPath[dirname(resource.path)] || []
+      resolvedResources.push(ensureUniqueInBatch(resource, resolvedResources, existingResources))
+    }
     const filesToKeepBoth = resolvedConflicts
       .filter((e) => e.strategy === ResolveStrategy.KEEP_BOTH)
       .map((e) => e.resource)
@@ -240,6 +271,7 @@ export const useFileActionsRestore = () => {
 
   return {
     actions,
+    handler,
     // HACK: exported for unit tests:
     restoreResources,
     collectConflicts

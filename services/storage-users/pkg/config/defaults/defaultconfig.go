@@ -94,18 +94,6 @@ func DefaultConfig() *config.Config {
 		GracefulShutdownTimeout: 30,
 		Driver:                  "ocis",
 		Drivers: config.Drivers{
-			OwnCloudSQL: config.OwnCloudSQLDriver{
-				Root:                  filepath.Join(defaults.BaseDataPath(), "storage", "owncloud"),
-				ShareFolder:           "/Shares",
-				UserLayout:            "{{.Username}}",
-				UploadInfoDir:         filepath.Join(defaults.BaseDataPath(), "storage", "uploadinfo"),
-				DBUsername:            "owncloud",
-				DBPassword:            "owncloud",
-				DBHost:                "",
-				DBPort:                3306,
-				DBName:                "owncloud",
-				UsersProviderEndpoint: "com.owncloud.api.users",
-			},
 			S3NG: config.S3NGDriver{
 				Propagator:                 "sync",
 				Root:                       filepath.Join(defaults.BaseDataPath(), "storage", "users"),
@@ -140,19 +128,10 @@ func DefaultConfig() *config.Config {
 				LockCycleDurationFactor:    30,
 				AsyncUploads:               true,
 			},
-			Posix: config.PosixDriver{
-				UseSpaceGroups:            false,
-				Root:                      filepath.Join(defaults.BaseDataPath(), "storage", "users"),
-				PersonalSpacePathTemplate: "users/{{.User.Username}}",
-				GeneralSpacePathTemplate:  "projects/{{.SpaceId}}",
-				PermissionsEndpoint:       "com.owncloud.api.settings",
-				AsyncUploads:              true,
-				ScanDebounceDelay:         1 * time.Second,
-			},
 		},
 		Events: config.Events{
-			Addr:      "127.0.0.1:9233",
-			ClusterID: "ocis-cluster",
+			Endpoint:  "127.0.0.1:9233",
+			Cluster:   "ocis-cluster",
 			EnableTLS: false,
 		},
 		FilemetadataCache: config.FilemetadataCache{

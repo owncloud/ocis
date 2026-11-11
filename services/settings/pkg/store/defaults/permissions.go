@@ -622,13 +622,14 @@ func SpaceAbilityPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Se
 	}
 }
 
-// VaultModePermission is the permission to see and toggle the vault mode switcher
+// VaultModePermission is the permission to use the vault, i.e. to see and toggle the
+// vault mode switcher and to be granted access to vault resources
 func VaultModePermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
 	return &settingsmsg.Setting{
 		Id:          "cc29df49-f86a-4d23-be72-f873f6f1e55d",
 		Name:        "VaultMode.ReadWriteEnabled",
 		DisplayName: "Vault mode",
-		Description: "This permission allows seeing the vault mode switcher.",
+		Description: "This permission allows seeing the vault mode switcher and being granted access to vault resources.",
 		Resource: &settingsmsg.Resource{
 			Type: settingsmsg.Resource_TYPE_SYSTEM,
 		},

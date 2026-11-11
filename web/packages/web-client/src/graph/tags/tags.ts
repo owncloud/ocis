@@ -1,24 +1,22 @@
-import { TagsApiFactory } from './../generated'
-import type { GraphFactoryOptions } from './../types'
+import { TagsApi } from './../generated'
+import { toInitOverrides, type GraphFactoryOptions } from './../types'
 import type { GraphTags } from './types'
 
-export const TagsFactory = ({ axiosClient, config }: GraphFactoryOptions): GraphTags => {
-  const tagsApiFactory = TagsApiFactory(config, config.basePath, axiosClient)
+export const TagsFactory = ({ config }: GraphFactoryOptions): GraphTags => {
+  const tagsApi = new TagsApi(config)
 
   return {
     async listTags(requestOptions) {
-      const {
-        data: { value }
-      } = await tagsApiFactory.getTags(requestOptions)
+      const { value } = await tagsApi.getTags(toInitOverrides(requestOptions))
       return value || []
     },
 
     async assignTags(data, requestOptions) {
-      await tagsApiFactory.assignTags(data, requestOptions)
+      await tagsApi.assignTags({ tagAssignment: data }, toInitOverrides(requestOptions))
     },
 
     async unassignTags(data, requestOptions) {
-      await tagsApiFactory.unassignTags(data, requestOptions)
+      await tagsApi.unassignTags({ tagUnassignment: data }, toInitOverrides(requestOptions))
     }
   }
 }

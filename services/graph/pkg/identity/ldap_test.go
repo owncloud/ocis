@@ -35,6 +35,8 @@ var lconfig = config.LDAP{
 	UserIDAttribute:          "entryUUID",
 	UserEmailAttribute:       "mail",
 	UserNameAttribute:        "uid",
+	UserSurnameAttribute:     "sn",
+	UserSearchAttributes:     []string{"onPremisesSamAccountName", "displayName", "mail"},
 	UserEnabledAttribute:     "userEnabledAttribute",
 	UserTypeAttribute:        "userTypeAttribute",
 	ExternalIDAttribute:      "externalID",
@@ -118,6 +120,18 @@ func TestNewLDAPBackend(t *testing.T) {
 
 	if _, err := NewLDAPBackend(l, lconfig, &logger, "", ""); err != nil {
 		t.Errorf("Should fail with invalid group search scope")
+	}
+
+	tc = lconfig
+	tc.UserSearchAttributes = nil
+	if _, err := NewLDAPBackend(l, tc, &logger, "", ""); err == nil {
+		t.Error("Should fail with no user search attributes configured")
+	}
+
+	tc = lconfig
+	tc.UserSearchAttributes = []string{"notARealAttribute"}
+	if _, err := NewLDAPBackend(l, tc, &logger, "", ""); err != nil {
+		t.Errorf("Should accept an unrecognized name as a literal LDAP attribute: %v", err)
 	}
 }
 
@@ -224,6 +238,59 @@ func TestCreateUserModelFromLDAP(t *testing.T) {
 	}
 }
 
+func TestGetUserClass(t *testing.T) {
+	cfg := lconfig
+	cfg.UserMemberAttribute = "ocMemberOfSchool"
+
+	// expectSearch returns an entry for the lookup by id, which ignores the user filter and only
+	// asks for the userClass and the member attribute
+	expectSearch := func(lm *mocks.Client, memberOf ...string) {
+		entry := ldap.NewEntry("uid=teacher", map[string][]string{
+			"userClass":        {"teacher"},
+			"ocMemberOfSchool": memberOf,
+		})
+		lm.On("Search", mock.MatchedBy(func(sr *ldap.SearchRequest) bool {
+			return sr.Filter == "(&(objectClass=inetOrgPerson)(entryUUID=teacher-id))" &&
+				assert.ObjectsAreEqual([]string{"userClass", "ocMemberOfSchool"}, sr.Attributes)
+		})).Return(&ldap.SearchResult{Entries: []*ldap.Entry{entry}}, nil)
+	}
+
+	tests := []struct {
+		name       string
+		masterID   string
+		memberOf   []string
+		wantMember bool
+	}{
+		{name: "a user of another instance", memberOf: []string{"school2"}, wantMember: false},
+		{name: "a member of this instance", memberOf: []string{"school2", "school1"}, wantMember: true},
+		{name: "a member of all instances through the master id", masterID: "master-id", memberOf: []string{"master-id"}, wantMember: true},
+		{name: "a user without instances", memberOf: nil, wantMember: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			lm := &mocks.Client{}
+			expectSearch(lm, tt.memberOf...)
+			b, err := NewLDAPBackend(lm, cfg, &logger, "school1", tt.masterID)
+			assert.NoError(t, err)
+
+			userClass, member, err := b.GetUserClass(context.Background(), "teacher-id")
+			assert.NoError(t, err)
+			assert.Equal(t, []string{"teacher"}, userClass)
+			assert.Equal(t, tt.wantMember, member)
+		})
+	}
+
+	t.Run("an unknown user", func(t *testing.T) {
+		lm := &mocks.Client{}
+		lm.On("Search", mock.Anything).Return(&ldap.SearchResult{}, nil)
+		b, err := NewLDAPBackend(lm, cfg, &logger, "school1", "")
+		assert.NoError(t, err)
+
+		_, _, err = b.GetUserClass(context.Background(), "teacher-id")
+		assert.ErrorIs(t, err, ErrNotFound)
+	})
+}
+
 func TestGetUser(t *testing.T) {
 	// Mock a Sizelimit Error
 	lm := &mocks.Client{}
@@ -327,7 +394,6 @@ func TestGetUsers(t *testing.T) {
 }
 
 func TestGetUsersSearch(t *testing.T) {
-	lm := &mocks.Client{}
 	odataReqDefault, err := godata.ParseRequest(context.Background(), "",
 		url.Values{
 			"$search": []string{"\"term\""},
@@ -337,19 +403,38 @@ func TestGetUsersSearch(t *testing.T) {
 		t.Errorf("Expected success got '%s'", err.Error())
 	}
 
-	// only match if the filter contains the search term unquoted
-	lm.On("Search", mock.MatchedBy(
-		func(req *ldap.SearchRequest) bool {
-			return req.Filter == "(&(objectClass=inetOrgPerson)(|(uid=*term*)(mail=*term*)(displayname=*term*)))"
-		})).
-		Return(&ldap.SearchResult{}, nil)
-	b, _ := getMockedBackend(lm, lconfig, &logger)
-	g, err := b.GetUsers(context.Background(), odataReqDefault)
-	if err != nil {
-		t.Errorf("Expected success, got '%s'", err.Error())
-	} else if g == nil || len(g) != 0 {
-		t.Errorf("Expected zero length user slice")
+	assertSearchFilter := func(t *testing.T, cfg config.LDAP, wantFilter string) {
+		lm := &mocks.Client{}
+		// only match if the filter contains the search term unquoted
+		lm.On("Search", mock.MatchedBy(
+			func(req *ldap.SearchRequest) bool {
+				return req.Filter == wantFilter
+			})).
+			Return(&ldap.SearchResult{}, nil)
+		b, _ := getMockedBackend(lm, cfg, &logger)
+		g, err := b.GetUsers(context.Background(), odataReqDefault)
+		if err != nil {
+			t.Errorf("Expected success, got '%s'", err.Error())
+		} else if g == nil || len(g) != 0 {
+			t.Errorf("Expected zero length user slice")
+		}
 	}
+
+	t.Run("default config matches userName, displayName and mail", func(t *testing.T) {
+		assertSearchFilter(t, lconfig, "(&(objectClass=inetOrgPerson)(|(uid=*term*)(displayname=*term*)(mail=*term*)))")
+	})
+
+	t.Run("a config excluding mail matches surname instead", func(t *testing.T) {
+		restrictedConfig := lconfig
+		restrictedConfig.UserSearchAttributes = []string{"onPremisesSamAccountName", "displayName", "surname"}
+		assertSearchFilter(t, restrictedConfig, "(&(objectClass=inetOrgPerson)(|(uid=*term*)(displayname=*term*)(sn=*term*)))")
+	})
+
+	t.Run("a literal '%' in a configured attribute name does not corrupt the filter", func(t *testing.T) {
+		percentConfig := lconfig
+		percentConfig.UserNameAttribute = "uid%"
+		assertSearchFilter(t, percentConfig, "(&(objectClass=inetOrgPerson)(|(uid%=*term*)(displayname=*term*)(mail=*term*)))")
+	})
 }
 
 func TestUpdateUser(t *testing.T) {
@@ -373,8 +458,8 @@ func TestUpdateUser(t *testing.T) {
 	}
 	type mockInputs struct {
 		funcName string
-		args     []interface{}
-		returns  []interface{}
+		args     []any
+		returns  []any
 	}
 	tests := []struct {
 		name      string
@@ -392,13 +477,13 @@ func TestUpdateUser(t *testing.T) {
 				},
 			},
 			want: nil,
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.NotNil(t, err, args...)
 			},
 			ldapMocks: []mockInputs{
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						ldap.NewSearchRequest(
 							"ou=people,dc=test",
 							ldap.ScopeWholeSubtree,
@@ -408,7 +493,7 @@ func TestUpdateUser(t *testing.T) {
 							nil,
 						),
 					},
-					returns: []interface{}{
+					returns: []any{
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
@@ -437,13 +522,13 @@ func TestUpdateUser(t *testing.T) {
 				accountEnabled:           nil,
 				userType:                 &memberType,
 			},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 			ldapMocks: []mockInputs{
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						ldap.NewSearchRequest(
 							"ou=people,dc=test",
 							ldap.ScopeWholeSubtree,
@@ -453,15 +538,19 @@ func TestUpdateUser(t *testing.T) {
 							nil,
 						),
 					},
-					returns: []interface{}{
+					returns: []any{
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
 									DN: "uid=oldName",
 									Attributes: []*ldap.EntryAttribute{
 										{
-											Name:   "displayname",
-											Values: []string{"oldmail@example.org"},
+											Name:   lconfig.UserDisplayNameAttribute,
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   lconfig.UserNameAttribute,
+											Values: []string{"testUser"},
 										},
 										{
 											Name:   "entryUUID",
@@ -483,56 +572,8 @@ func TestUpdateUser(t *testing.T) {
 					},
 				},
 				{
-					funcName: "Search",
-					args: []interface{}{
-						&ldap.SearchRequest{
-							BaseDN:       "uid=oldName",
-							Scope:        0,
-							DerefAliases: 0,
-							SizeLimit:    1,
-							TimeLimit:    0,
-							TypesOnly:    false,
-							Filter:       "(objectClass=inetOrgPerson)",
-							Attributes:   ldapUserAttributes,
-							Controls:     []ldap.Control(nil),
-						},
-					},
-					returns: []interface{}{
-						&ldap.SearchResult{
-							Entries: []*ldap.Entry{
-								{
-									DN: "uid=oldName",
-									Attributes: []*ldap.EntryAttribute{
-										{
-											Name:   lconfig.UserIDAttribute,
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   lconfig.UserEmailAttribute,
-											Values: []string{"testuser@example.org"},
-										},
-										{
-											Name:   lconfig.UserDisplayNameAttribute,
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   lconfig.UserNameAttribute,
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   lconfig.UserEnabledAttribute,
-											Values: []string{""},
-										},
-									},
-								},
-							},
-						},
-						nil,
-					},
-				},
-				{
 					funcName: "Modify",
-					args: []interface{}{
+					args: []any{
 						&ldap.ModifyRequest{
 							DN: "uid=oldName",
 							Changes: []ldap.Change{
@@ -547,7 +588,7 @@ func TestUpdateUser(t *testing.T) {
 							Controls: []ldap.Control(nil),
 						},
 					},
-					returns: []interface{}{nil},
+					returns: []any{nil},
 				},
 			},
 		},
@@ -567,13 +608,13 @@ func TestUpdateUser(t *testing.T) {
 				accountEnabled:           nil,
 				userType:                 &memberType,
 			},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 			ldapMocks: []mockInputs{
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						ldap.NewSearchRequest(
 							"ou=people,dc=test",
 							ldap.ScopeWholeSubtree,
@@ -583,14 +624,18 @@ func TestUpdateUser(t *testing.T) {
 							nil,
 						),
 					},
-					returns: []interface{}{
+					returns: []any{
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
 									DN: "uid=oldName",
 									Attributes: []*ldap.EntryAttribute{
 										{
-											Name:   "displayname",
+											Name:   lconfig.UserDisplayNameAttribute,
+											Values: []string{"oldName"},
+										},
+										{
+											Name:   lconfig.UserNameAttribute,
 											Values: []string{"testUser"},
 										},
 										{
@@ -613,56 +658,8 @@ func TestUpdateUser(t *testing.T) {
 					},
 				},
 				{
-					funcName: "Search",
-					args: []interface{}{
-						&ldap.SearchRequest{
-							BaseDN:       "uid=oldName",
-							Scope:        0,
-							DerefAliases: 0,
-							SizeLimit:    1,
-							TimeLimit:    0,
-							TypesOnly:    false,
-							Filter:       "(objectClass=inetOrgPerson)",
-							Attributes:   ldapUserAttributes,
-							Controls:     []ldap.Control(nil),
-						},
-					},
-					returns: []interface{}{
-						&ldap.SearchResult{
-							Entries: []*ldap.Entry{
-								{
-									DN: "uid=oldName",
-									Attributes: []*ldap.EntryAttribute{
-										{
-											Name:   lconfig.UserIDAttribute,
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   lconfig.UserEmailAttribute,
-											Values: []string{"testuser@example.org"},
-										},
-										{
-											Name:   lconfig.UserDisplayNameAttribute,
-											Values: []string{"newName"},
-										},
-										{
-											Name:   lconfig.UserNameAttribute,
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   lconfig.UserEnabledAttribute,
-											Values: []string{""},
-										},
-									},
-								},
-							},
-						},
-						nil,
-					},
-				},
-				{
 					funcName: "Modify",
-					args: []interface{}{
+					args: []any{
 						&ldap.ModifyRequest{
 							DN: "uid=oldName",
 							Changes: []ldap.Change{
@@ -677,7 +674,7 @@ func TestUpdateUser(t *testing.T) {
 							Controls: []ldap.Control(nil),
 						},
 					},
-					returns: []interface{}{nil},
+					returns: []any{nil},
 				},
 			},
 		},
@@ -697,13 +694,13 @@ func TestUpdateUser(t *testing.T) {
 				accountEnabled:           nil,
 				userType:                 &memberType,
 			},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 			ldapMocks: []mockInputs{
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						ldap.NewSearchRequest(
 							"ou=people,dc=test",
 							ldap.ScopeWholeSubtree,
@@ -713,7 +710,7 @@ func TestUpdateUser(t *testing.T) {
 							nil,
 						),
 					},
-					returns: []interface{}{
+					returns: []any{
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
@@ -748,7 +745,7 @@ func TestUpdateUser(t *testing.T) {
 				},
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						&ldap.SearchRequest{
 							BaseDN: "ou=groups,dc=test",
 							Scope:  2, DerefAliases: 0, SizeLimit: 0, TimeLimit: 0,
@@ -758,7 +755,7 @@ func TestUpdateUser(t *testing.T) {
 							Controls:   []ldap.Control(nil),
 						},
 					},
-					returns: []interface{}{
+					returns: []any{
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
@@ -781,7 +778,7 @@ func TestUpdateUser(t *testing.T) {
 				},
 				{
 					funcName: "ModifyDN",
-					args: []interface{}{
+					args: []any{
 						&ldap.ModifyDNRequest{
 							DN:           "uid=oldName,ou=people,dc=test,dc=net",
 							NewRDN:       "uid=newName",
@@ -790,13 +787,13 @@ func TestUpdateUser(t *testing.T) {
 							Controls:     []ldap.Control(nil),
 						},
 					},
-					returns: []interface{}{
+					returns: []any{
 						nil,
 					},
 				},
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						&ldap.SearchRequest{
 							BaseDN:       "uid=newName,ou=people,dc=test,dc=net",
 							Scope:        0,
@@ -809,7 +806,7 @@ func TestUpdateUser(t *testing.T) {
 							Controls:     []ldap.Control(nil),
 						},
 					},
-					returns: []interface{}{
+					returns: []any{
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
@@ -844,7 +841,7 @@ func TestUpdateUser(t *testing.T) {
 				},
 				{
 					funcName: "Modify",
-					args: []interface{}{
+					args: []any{
 						&ldap.ModifyRequest{
 							DN: "cn=group1",
 							Changes: []ldap.Change{
@@ -866,7 +863,7 @@ func TestUpdateUser(t *testing.T) {
 							Controls: []ldap.Control(nil),
 						},
 					},
-					returns: []interface{}{nil},
+					returns: []any{nil},
 				},
 			},
 		},
@@ -887,13 +884,13 @@ func TestUpdateUser(t *testing.T) {
 				accountEnabled:           &falseBool,
 				userType:                 &memberType,
 			},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 			ldapMocks: []mockInputs{
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						ldap.NewSearchRequest(
 							"ou=people,dc=test",
 							ldap.ScopeWholeSubtree,
@@ -903,15 +900,19 @@ func TestUpdateUser(t *testing.T) {
 							nil,
 						),
 					},
-					returns: []interface{}{
+					returns: []any{
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
 									DN: "uid=name",
 									Attributes: []*ldap.EntryAttribute{
 										{
-											Name:   "displayname",
-											Values: []string{"testuser@example.org"},
+											Name:   lconfig.UserDisplayNameAttribute,
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   lconfig.UserNameAttribute,
+											Values: []string{"testUser"},
 										},
 										{
 											Name:   "entryUUID",
@@ -933,56 +934,8 @@ func TestUpdateUser(t *testing.T) {
 					},
 				},
 				{
-					funcName: "Search",
-					args: []interface{}{
-						&ldap.SearchRequest{
-							BaseDN:       "uid=name",
-							Scope:        0,
-							DerefAliases: 0,
-							SizeLimit:    1,
-							TimeLimit:    0,
-							TypesOnly:    false,
-							Filter:       "(objectClass=inetOrgPerson)",
-							Attributes:   ldapUserAttributes,
-							Controls:     []ldap.Control(nil),
-						},
-					},
-					returns: []interface{}{
-						&ldap.SearchResult{
-							Entries: []*ldap.Entry{
-								{
-									DN: "uid=name",
-									Attributes: []*ldap.EntryAttribute{
-										{
-											Name:   lconfig.UserIDAttribute,
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   lconfig.UserEmailAttribute,
-											Values: []string{"testuser@example.org"},
-										},
-										{
-											Name:   lconfig.UserDisplayNameAttribute,
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   lconfig.UserNameAttribute,
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   lconfig.UserEnabledAttribute,
-											Values: []string{"FALSE"},
-										},
-									},
-								},
-							},
-						},
-						nil,
-					},
-				},
-				{
 					funcName: "Modify",
-					args: []interface{}{
+					args: []any{
 						&ldap.ModifyRequest{
 							DN: "uid=name",
 							Changes: []ldap.Change{
@@ -997,7 +950,7 @@ func TestUpdateUser(t *testing.T) {
 							Controls: []ldap.Control(nil),
 						},
 					},
-					returns: []interface{}{nil},
+					returns: []any{nil},
 				},
 			},
 		},
@@ -1018,13 +971,13 @@ func TestUpdateUser(t *testing.T) {
 				accountEnabled:           &falseBool,
 				userType:                 &memberType,
 			},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 			ldapMocks: []mockInputs{
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						ldap.NewSearchRequest(
 							"ou=people,dc=test",
 							ldap.ScopeWholeSubtree,
@@ -1034,15 +987,19 @@ func TestUpdateUser(t *testing.T) {
 							nil,
 						),
 					},
-					returns: []interface{}{
+					returns: []any{
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
 									DN: "uid=name",
 									Attributes: []*ldap.EntryAttribute{
 										{
+											Name:   "uid",
+											Values: []string{"testUser"},
+										},
+										{
 											Name:   "displayname",
-											Values: []string{"testuser@example.org"},
+											Values: []string{"testUser"},
 										},
 										{
 											Name:   "entryUUID",
@@ -1065,7 +1022,7 @@ func TestUpdateUser(t *testing.T) {
 				},
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						&ldap.SearchRequest{
 							BaseDN:       disableUsersGroup,
 							Scope:        0,
@@ -1078,7 +1035,7 @@ func TestUpdateUser(t *testing.T) {
 							Controls:     []ldap.Control(nil),
 						},
 					},
-					returns: []interface{}{
+					returns: []any{
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
@@ -1097,7 +1054,7 @@ func TestUpdateUser(t *testing.T) {
 				},
 				{
 					funcName: "Modify",
-					args: []interface{}{
+					args: []any{
 						&ldap.ModifyRequest{
 							DN: "uid=name",
 							Changes: []ldap.Change{
@@ -1112,59 +1069,7 @@ func TestUpdateUser(t *testing.T) {
 							Controls: []ldap.Control(nil),
 						},
 					},
-					returns: []interface{}{nil},
-				},
-				{
-					funcName: "Modify",
-					args: []interface{}{
-						&ldap.ModifyRequest{
-							DN:       "uid=name",
-							Changes:  []ldap.Change(nil),
-							Controls: []ldap.Control(nil),
-						},
-					},
-					returns: []interface{}{nil},
-				},
-				{
-					funcName: "Search",
-					args: []interface{}{
-						ldap.NewSearchRequest(
-							"uid=name",
-							ldap.ScopeBaseObject,
-							ldap.NeverDerefAliases, 1, 0, false,
-							"(objectClass=inetOrgPerson)",
-							ldapUserAttributes,
-							[]ldap.Control(nil),
-						),
-					},
-					returns: []interface{}{
-						&ldap.SearchResult{
-							Entries: []*ldap.Entry{
-								{
-									DN: "uid=name",
-									Attributes: []*ldap.EntryAttribute{
-										{
-											Name:   "uid",
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   "displayname",
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   "entryUUID",
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   "mail",
-											Values: []string{"testuser@example.org"},
-										},
-									},
-								},
-							},
-						},
-						nil,
-					},
+					returns: []any{nil},
 				},
 			},
 		},
@@ -1185,13 +1090,13 @@ func TestUpdateUser(t *testing.T) {
 				accountEnabled:           &trueBool,
 				userType:                 &memberType,
 			},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 			ldapMocks: []mockInputs{
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						ldap.NewSearchRequest(
 							"ou=people,dc=test",
 							ldap.ScopeWholeSubtree,
@@ -1201,15 +1106,19 @@ func TestUpdateUser(t *testing.T) {
 							nil,
 						),
 					},
-					returns: []interface{}{
+					returns: []any{
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
 									DN: "uid=name",
 									Attributes: []*ldap.EntryAttribute{
 										{
+											Name:   "uid",
+											Values: []string{"testUser"},
+										},
+										{
 											Name:   "displayname",
-											Values: []string{"testuser@example.org"},
+											Values: []string{"testUser"},
 										},
 										{
 											Name:   "entryUUID",
@@ -1232,7 +1141,7 @@ func TestUpdateUser(t *testing.T) {
 				},
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						&ldap.SearchRequest{
 							BaseDN:       disableUsersGroup,
 							Scope:        0,
@@ -1245,7 +1154,7 @@ func TestUpdateUser(t *testing.T) {
 							Controls:     []ldap.Control(nil),
 						},
 					},
-					returns: []interface{}{
+					returns: []any{
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
@@ -1264,7 +1173,7 @@ func TestUpdateUser(t *testing.T) {
 				},
 				{
 					funcName: "Modify",
-					args: []interface{}{
+					args: []any{
 						&ldap.ModifyRequest{
 							DN: "uid=name",
 							Changes: []ldap.Change{
@@ -1279,59 +1188,7 @@ func TestUpdateUser(t *testing.T) {
 							Controls: []ldap.Control(nil),
 						},
 					},
-					returns: []interface{}{nil},
-				},
-				{
-					funcName: "Modify",
-					args: []interface{}{
-						&ldap.ModifyRequest{
-							DN:       "uid=name",
-							Changes:  []ldap.Change(nil),
-							Controls: []ldap.Control(nil),
-						},
-					},
-					returns: []interface{}{nil},
-				},
-				{
-					funcName: "Search",
-					args: []interface{}{
-						ldap.NewSearchRequest(
-							"uid=name",
-							ldap.ScopeBaseObject,
-							ldap.NeverDerefAliases, 1, 0, false,
-							"(objectClass=inetOrgPerson)",
-							ldapUserAttributes,
-							[]ldap.Control(nil),
-						),
-					},
-					returns: []interface{}{
-						&ldap.SearchResult{
-							Entries: []*ldap.Entry{
-								{
-									DN: "uid=name",
-									Attributes: []*ldap.EntryAttribute{
-										{
-											Name:   "uid",
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   "displayname",
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   "entryUUID",
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   "mail",
-											Values: []string{"testuser@example.org"},
-										},
-									},
-								},
-							},
-						},
-						nil,
-					},
+					returns: []any{nil},
 				},
 			},
 		},
@@ -1351,13 +1208,13 @@ func TestUpdateUser(t *testing.T) {
 				onPremisesSamAccountName: "testUser",
 				userType:                 &memberType,
 			},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 			ldapMocks: []mockInputs{
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						ldap.NewSearchRequest(
 							"ou=people,dc=test",
 							ldap.ScopeWholeSubtree,
@@ -1367,15 +1224,19 @@ func TestUpdateUser(t *testing.T) {
 							nil,
 						),
 					},
-					returns: []interface{}{
+					returns: []any{
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
 									DN: "uid=name",
 									Attributes: []*ldap.EntryAttribute{
 										{
+											Name:   "uid",
+											Values: []string{"testUser"},
+										},
+										{
 											Name:   "displayname",
-											Values: []string{"testuser@example.org"},
+											Values: []string{"testUser"},
 										},
 										{
 											Name:   "entryUUID",
@@ -1398,7 +1259,7 @@ func TestUpdateUser(t *testing.T) {
 				},
 				{
 					funcName: "Modify",
-					args: []interface{}{
+					args: []any{
 						&ldap.ModifyRequest{
 							DN: "uid=name",
 							Changes: []ldap.Change{
@@ -1413,63 +1274,7 @@ func TestUpdateUser(t *testing.T) {
 							Controls: []ldap.Control(nil),
 						},
 					},
-					returns: []interface{}{nil},
-				},
-				{
-					funcName: "Modify",
-					args: []interface{}{
-						&ldap.ModifyRequest{
-							DN:       "uid=name",
-							Changes:  []ldap.Change(nil),
-							Controls: []ldap.Control(nil),
-						},
-					},
-					returns: []interface{}{nil},
-				},
-				{
-					funcName: "Search",
-					args: []interface{}{
-						ldap.NewSearchRequest(
-							"uid=name",
-							ldap.ScopeBaseObject,
-							ldap.NeverDerefAliases, 1, 0, false,
-							"(objectClass=inetOrgPerson)",
-							ldapUserAttributes,
-							[]ldap.Control(nil),
-						),
-					},
-					returns: []interface{}{
-						&ldap.SearchResult{
-							Entries: []*ldap.Entry{
-								{
-									DN: "uid=name",
-									Attributes: []*ldap.EntryAttribute{
-										{
-											Name:   "uid",
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   "displayname",
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   "entryUUID",
-											Values: []string{"testUser"},
-										},
-										{
-											Name:   "mail",
-											Values: []string{"testuser@example.org"},
-										},
-										{
-											Name:   lconfig.UserTypeAttribute,
-											Values: []string{"Member"},
-										},
-									},
-								},
-							},
-						},
-						nil,
-					},
+					returns: []any{nil},
 				},
 			},
 		},
@@ -1556,8 +1361,8 @@ func TestUsersEnabledState(t *testing.T) {
 	}
 	type mockInputs struct {
 		funcName string
-		args     []interface{}
-		returns  []interface{}
+		args     []any
+		returns  []any
 	}
 	tests := []struct {
 		name      string
@@ -1574,7 +1379,7 @@ func TestUsersEnabledState(t *testing.T) {
 				disableUserMechanism: "attribute",
 			},
 			want: map[string]bool{},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 			ldapMocks: []mockInputs{},
@@ -1587,7 +1392,7 @@ func TestUsersEnabledState(t *testing.T) {
 				disableUserMechanism: "attribute",
 			},
 			want: map[string]bool{"alice": true, "bob": false, "carol": true},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 			ldapMocks: []mockInputs{},
@@ -1600,13 +1405,13 @@ func TestUsersEnabledState(t *testing.T) {
 				disableUserMechanism: "group",
 			},
 			want: map[string]bool{"alice": true, "bob": true, "carol": true},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 			ldapMocks: []mockInputs{
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						ldap.NewSearchRequest(
 							disableUsersGroup,
 							ldap.ScopeBaseObject,
@@ -1616,7 +1421,7 @@ func TestUsersEnabledState(t *testing.T) {
 							[]ldap.Control(nil),
 						),
 					},
-					returns: []interface{}{
+					returns: []any{
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
@@ -1643,13 +1448,13 @@ func TestUsersEnabledState(t *testing.T) {
 				disableUserMechanism: "group",
 			},
 			want: map[string]bool{"alice": false, "bob": true, "carol": false},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 			ldapMocks: []mockInputs{
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						ldap.NewSearchRequest(
 							disableUsersGroup,
 							ldap.ScopeBaseObject,
@@ -1659,7 +1464,7 @@ func TestUsersEnabledState(t *testing.T) {
 							[]ldap.Control(nil),
 						),
 					},
-					returns: []interface{}{
+					returns: []any{
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
@@ -1686,13 +1491,13 @@ func TestUsersEnabledState(t *testing.T) {
 				disableUserMechanism: "group",
 			},
 			want: nil,
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.NotNil(t, err, args...)
 			},
 			ldapMocks: []mockInputs{
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						ldap.NewSearchRequest(
 							disableUsersGroup,
 							ldap.ScopeBaseObject,
@@ -1702,7 +1507,7 @@ func TestUsersEnabledState(t *testing.T) {
 							[]ldap.Control(nil),
 						),
 					},
-					returns: []interface{}{
+					returns: []any{
 						nil,
 						&ldap.Error{
 							Err: fmt.Errorf("very problematic problems"),

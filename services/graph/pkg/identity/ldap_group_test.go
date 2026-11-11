@@ -317,6 +317,48 @@ func TestGetGroupsSearch(t *testing.T) {
 		t.Errorf("Expected zero length user slice")
 	}
 }
+
+func TestGetGroupMembersSearch_MemberUid(t *testing.T) {
+	memberUidConfig := lconfig
+	memberUidConfig.GroupMemberAttribute = "memberuid"
+
+	req, err := godata.ParseRequest(context.Background(), "",
+		url.Values{
+			"$search": []string{`"term"`},
+		},
+	)
+	if err != nil {
+		t.Errorf("Expected success got '%s'", err.Error())
+	}
+
+	group := ldap.NewEntry("cn=group", map[string][]string{
+		"cn":        {"group"},
+		"entryuuid": {"abcd-defg"},
+		"memberuid": {"user"},
+	})
+
+	lm := &mocks.Client{}
+	lm.On("Search", mock.MatchedBy(
+		func(r *ldap.SearchRequest) bool {
+			return r.Filter == "(&(objectClass=groupOfNames)(|(cn=group)(entryUUID=group)))"
+		})).
+		Return(&ldap.SearchResult{Entries: []*ldap.Entry{group}}, nil)
+	lm.On("Search", mock.MatchedBy(
+		func(r *ldap.SearchRequest) bool {
+			return r.Filter == "(&(objectClass=inetOrgPerson)(&(|(uid=*term*)(displayname=*term*)(mail=*term*))(uid=user)))"
+		})).
+		Return(&ldap.SearchResult{}, nil)
+
+	b, _ := getMockedBackend(lm, memberUidConfig, &logger)
+	members, err := b.GetGroupMembers(context.Background(), "group", req)
+	if err != nil {
+		t.Errorf("Expected success, got '%s'", err.Error())
+	} else if len(members) != 0 {
+		t.Errorf("Expected zero length member slice")
+	}
+	lm.AssertExpectations(t)
+}
+
 func TestUpdateGroupName(t *testing.T) {
 	groupDn := "cn=TheGroup,ou=groups,dc=owncloud,dc=com"
 
@@ -328,8 +370,8 @@ func TestUpdateGroupName(t *testing.T) {
 
 	type mockInputs struct {
 		funcName string
-		args     []interface{}
-		returns  []interface{}
+		args     []any
+		returns  []any
 	}
 
 	tests := []struct {
@@ -344,13 +386,13 @@ func TestUpdateGroupName(t *testing.T) {
 				groupId: "some-uuid-string",
 				newName: "TheGroup",
 			},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 			ldapMocks: []mockInputs{
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						ldap.NewSearchRequest(
 							"ou=groups,dc=test",
 							ldap.ScopeWholeSubtree,
@@ -360,7 +402,7 @@ func TestUpdateGroupName(t *testing.T) {
 							nil,
 						),
 					},
-					returns: []interface{}{
+					returns: []any{
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
@@ -385,13 +427,13 @@ func TestUpdateGroupName(t *testing.T) {
 				groupId: "some-uuid-string",
 				newName: "TheGroupWithShinyNewName",
 			},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 			ldapMocks: []mockInputs{
 				{
 					funcName: "Search",
-					args: []interface{}{
+					args: []any{
 						ldap.NewSearchRequest(
 							"ou=groups,dc=test",
 							ldap.ScopeWholeSubtree,
@@ -401,7 +443,7 @@ func TestUpdateGroupName(t *testing.T) {
 							nil,
 						),
 					},
-					returns: []interface{}{
+					returns: []any{
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
@@ -420,7 +462,7 @@ func TestUpdateGroupName(t *testing.T) {
 				},
 				{
 					funcName: "ModifyDN",
-					args: []interface{}{
+					args: []any{
 						&ldap.ModifyDNRequest{
 							DN:           groupDn,
 							NewRDN:       "cn=TheGroupWithShinyNewName",
@@ -429,7 +471,7 @@ func TestUpdateGroupName(t *testing.T) {
 							Controls:     []ldap.Control(nil),
 						},
 					},
-					returns: []interface{}{
+					returns: []any{
 						nil,
 					},
 				},

@@ -1,8 +1,9 @@
 ---
 services:
   ocis:
-    volumes:
-      - ./config/ocis/apps.yaml:/etc/ocis/apps.yaml
+    configs:
+      - source: apps_yaml
+        target: /etc/ocis/apps.yaml
     depends_on:
       externalsites-init:
         condition: service_completed_successfully
@@ -11,7 +12,7 @@ services:
     image: owncloud/web-extensions:external-sites-0.4.0
     user: root
     volumes:
-      - ocis-apps:/apps
+      - ./data/ocis-apps:/apps
     entrypoint:
       - /bin/sh
     command: ["-c", "cp -R /var/lib/nginx/html/external-sites/ /apps"]

@@ -9,6 +9,7 @@
       read-only
       :toolbars="[]"
       :sanitize="sanitize"
+      no-echarts
     />
     <md-editor
       v-else
@@ -23,42 +24,52 @@
       :auto-focus="autoFocus"
       :sanitize="sanitize"
       :toolbars-exclude="['save', 'github']"
-      no-upload-img
+      no-echarts
       @on-change="(value) => $emit('update:currentContent', value)"
+      @on-upload-img="onUploadImg"
     >
       <template #defFooters>
-        <span class="footer-links">
-          <a
-            href="https://imzbf.github.io/md-editor-v3/en-US/api#%F0%9F%AA%A1%20Shortcut%20keys"
-            target="_blank"
-            rel="noopener noreferrer"
-            >{{
-              $pgettext(
-                'A link to a list of keyboard shortcuts that can be used in the markdown editor.',
-                'Keyboard shortcuts'
-              )
-            }}</a
-          >
+        <span class="footer-slot">
+          <span v-if="isAddingImages" class="footer-image-progress" role="status">
+            {{ $gettext('Adding image…') }}
+          </span>
 
-          <a
-            href="https://highlightjs.readthedocs.io/en/latest/supported-languages.html"
-            target="_blank"
-            rel="noopener noreferrer"
-            >{{
-              $pgettext(
-                'A link to a list of supported programming languages that can be used in the markdown editor.',
-                'Supported programming languages'
-              )
-            }}</a
-          >
+          <span class="footer-links">
+            <a
+              href="https://imzbf.github.io/md-editor-v3/en-US/api#%F0%9F%AA%A1%20Shortcut%20keys"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{{
+                $pgettext(
+                  'A link to a list of keyboard shortcuts that can be used in the markdown editor.',
+                  'Keyboard shortcuts'
+                )
+              }}</a
+            >
+
+            <a
+              href="https://highlightjs.readthedocs.io/en/latest/supported-languages.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{{
+                $pgettext(
+                  'A link to a list of supported programming languages that can be used in the markdown editor.',
+                  'Supported programming languages'
+                )
+              }}</a
+            >
+          </span>
         </span>
       </template>
     </md-editor>
+    <span v-if="!isReadOnly" id="text-editor-focus-out-hint" class="oc-invisible-sr">
+      {{ $gettext('Press Control+M to move focus out of the text area to the toolbar.') }}
+    </span>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, unref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, unref, watch } from 'vue'
 import { Resource } from '@ownclouders/web-client'
 import dompurify from 'dompurify'
 
@@ -82,7 +93,9 @@ import { languageUserDefined, languages } from './l18n'
 
 import { useGettext } from 'vue3-gettext'
 import { AppConfigObject } from '../../apps'
-import { useThemeStore } from '../../composables'
+import { useMessages, useThemeStore } from '../../composables'
+import { DEFAULT_MAX_DOCUMENT_IMAGE_SIZE, DEFAULT_MAX_IMAGE_SIZE } from '../../constants'
+import { formatFileSize } from '../../helpers'
 
 interface TextEditorProps {
   applicationConfig?: AppConfigObject
@@ -106,13 +119,18 @@ const {
 
 defineEmits<TextEditorEmits>()
 
-const { current: currentLanguage, $gettext } = useGettext()
+const { current: currentLanguage, $gettext, $ngettext } = useGettext()
 const { currentTheme } = useThemeStore()
+const { showErrorMessage } = useMessages()
 
 // Should not be a ref, otherwise functions like setMarkdown won't work
 const editorConfig = computed(() => {
-  const { showPreviewOnlyMd = true }: AppConfigObject = applicationConfig
-  return { showPreviewOnlyMd }
+  const {
+    showPreviewOnlyMd = true,
+    maxImageSize = DEFAULT_MAX_IMAGE_SIZE,
+    maxDocumentImageSize = DEFAULT_MAX_DOCUMENT_IMAGE_SIZE
+  }: AppConfigObject = applicationConfig
+  return { showPreviewOnlyMd, maxImageSize, maxDocumentImageSize }
 })
 
 const isMarkdown = computed(() => {
@@ -128,6 +146,164 @@ const theme = computed(() => (unref(currentTheme).isDark ? 'dark' : 'light'))
 const sanitize = (html) =>
   dompurify.sanitize(html, { ADD_ATTR: ['target'], ADD_TAGS: ['foreignObject'] })
 
+const dataUriRegex = /data:image\/[a-z0-9.+-]+;base64,[A-Za-z0-9+/=]+/gi
+
+const isAddingImages = ref(false)
+const pendingImageSize = ref(0)
+
+const formatSize = (size: number) => formatFileSize(size, currentLanguage)
+
+const MAX_LISTED_FILE_NAMES = 3
+
+const formatFileNames = (names: Array<string>): string => {
+  const listed = names.slice(0, MAX_LISTED_FILE_NAMES).join(', ')
+  if (names.length <= MAX_LISTED_FILE_NAMES) {
+    return listed
+  }
+  return $gettext('%{ files } and %{ count } more', {
+    files: listed,
+    count: (names.length - MAX_LISTED_FILE_NAMES).toString()
+  })
+}
+
+const usedDocumentImageSize = (markdown: string): number => {
+  const dataUris: string[] = markdown?.match(dataUriRegex) ?? []
+  return dataUris.reduce((total, dataUri) => total + dataUri.length, 0)
+}
+
+const readAsDataUrl = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = () => reject(reader.error)
+    reader.readAsDataURL(file)
+  })
+
+type UploadImgCallBack = (urls: Array<{ url: string; alt: string; title: string }>) => void
+
+const onUploadImg = async (files: Array<File>, callBack: UploadImgCallBack) => {
+  if (!unref(isMarkdown)) {
+    callBack([])
+    return
+  }
+
+  const { maxImageSize, maxDocumentImageSize } = unref(editorConfig)
+  isAddingImages.value = true
+  try {
+    callBack(await pickImages(files, maxImageSize, maxDocumentImageSize))
+  } finally {
+    isAddingImages.value = false
+  }
+}
+
+const pickImages = async (
+  files: Array<File>,
+  maxImageSize: number,
+  maxDocumentImageSize: number
+): Promise<Array<{ url: string; alt: string; title: string }>> => {
+  let usedSize = usedDocumentImageSize(currentContent) + unref(pendingImageSize)
+  const accepted: Array<{ url: string; alt: string; title: string }> = []
+  const tooBig: Array<string> = []
+  const unreadable: Array<string> = []
+  const doesNotFit: Array<string> = []
+
+  for (const file of files) {
+    if (!file.type.startsWith('image/')) {
+      continue
+    }
+
+    if (file.size > maxImageSize) {
+      tooBig.push(file.name)
+      continue
+    }
+
+    let dataUri: string
+    try {
+      dataUri = await readAsDataUrl(file)
+    } catch {
+      unreadable.push(file.name)
+      continue
+    }
+
+    if (usedSize + dataUri.length > maxDocumentImageSize) {
+      doesNotFit.push(file.name)
+      continue
+    }
+
+    usedSize += dataUri.length
+    pendingImageSize.value += dataUri.length
+    accepted.push({ url: dataUri, alt: file.name, title: '' })
+  }
+
+  if (tooBig.length) {
+    showErrorMessage({
+      title: $ngettext('Image is too big', 'Images are too big', tooBig.length),
+      desc: $gettext('%{ files }. Max image size: %{ limit }.', {
+        files: formatFileNames(tooBig),
+        limit: formatSize(maxImageSize)
+      })
+    })
+  }
+
+  if (doesNotFit.length) {
+    showErrorMessage({
+      title: $ngettext(
+        'Image does not fit in this document',
+        'Images do not fit in this document',
+        doesNotFit.length
+      ),
+      desc: $ngettext(
+        '%{ files }. Only %{ remaining } left - remove an image or link the file instead.',
+        '%{ files }. Only %{ remaining } left - remove an image or link the files instead.',
+        doesNotFit.length,
+        {
+          files: formatFileNames(doesNotFit),
+          remaining: formatSize(Math.max(maxDocumentImageSize - usedSize, 0))
+        }
+      )
+    })
+  }
+
+  if (unreadable.length) {
+    showErrorMessage({
+      title: $ngettext('Image could not be read', 'Images could not be read', unreadable.length),
+      desc: formatFileNames(unreadable)
+    })
+  }
+
+  return accepted
+}
+
+watch(
+  () => currentContent,
+  () => {
+    pendingImageSize.value = 0
+  }
+)
+
+// CodeMirror (used internally by md-editor-v3) binds Tab to indent instead of moving
+// focus, which is correct for editing but leaves keyboard users with no way to reach
+// the toolbar without leaving the editor entirely. CodeMirror's own escape hatch for
+// this (Ctrl-M, or Shift-Alt-M on Mac) can't actually be triggered on a standard Mac
+// keyboard layout, since Option+Shift+M is consumed by macOS as a dead-key/diacritic
+// combo before it reaches the page. Ctrl-M (no Alt/Option involved) works identically
+// on every platform, so it's handled here instead, ahead of CodeMirror's own listener.
+const onFocusOutShortcut = (event: KeyboardEvent) => {
+  if (event.key.toLowerCase() !== 'm' || !event.ctrlKey || event.altKey || event.metaKey) {
+    return
+  }
+  const target = document.querySelector<HTMLElement>(
+    '#text-editor-component .md-editor-toolbar-item:not([disabled])'
+  )
+  event.preventDefault()
+  event.stopPropagation()
+  if (target) {
+    target.focus()
+    return
+  }
+  document.querySelector<HTMLElement>('#text-editor-component .cm-content')?.blur()
+}
+
 onMounted(async () => {
   if (isReadOnly) {
     return
@@ -138,6 +314,18 @@ onMounted(async () => {
   document
     .querySelector('#text-editor-component .cm-content')
     ?.setAttribute('aria-label', $gettext('Text editor'))
+  document
+    .querySelector('#text-editor-component .cm-content')
+    ?.setAttribute('aria-describedby', 'text-editor-focus-out-hint')
+  document
+    .getElementById('text-editor-container')
+    ?.addEventListener('keydown', onFocusOutShortcut, { capture: true })
+})
+
+onBeforeUnmount(() => {
+  document
+    .getElementById('text-editor-container')
+    ?.removeEventListener('keydown', onFocusOutShortcut, { capture: true })
 })
 
 config({
@@ -160,8 +348,16 @@ config({
     },
     mermaid: {
       instance: mermaid
+    },
+    // The crop entry is hidden (see the CSS below), so Cropper is never constructed.
+    // md-editor-v3 CDN-injects cropperjs from unpkg unless an instance is registered
+    // (composition.ts: noCropperScript) — this stub keeps that request from being made.
+    cropper: {
+      instance: class {} as never
     }
   },
+  // mermaid 12 lays out diagrams with ELK by default, keep the dagre layout used so far
+  mermaidConfig: (base) => ({ ...base, layout: 'dagre' }),
   markdownItConfig(md) {
     md.renderer.rules.link_open = function (tokens, idx, options, _, self) {
       const token = tokens[idx]
@@ -224,6 +420,14 @@ config({
     }
   }
 
+  .footer-slot {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    vertical-align: middle;
+    padding-inline-start: 10px;
+  }
+
   .footer-links {
     display: inline-flex;
     gap: 0.625rem;
@@ -234,6 +438,15 @@ config({
   }
   .md-editor-code-head {
     z-index: 0;
+  }
+
+  // Hides the "Crop And Upload" entry: cropping is dropped until users ask for it.
+  // md-editor-v3 hardcodes the three image-dropdown entries with identical classes and
+  // exposes no prop to hide one (still true in v7), so position is the only handle.
+  // Requiring :nth-child(3) and :last-child together means an upstream reorder stops the
+  // selector matching, showing all entries rather than hiding the wrong one.
+  .md-editor-menu-item-image:nth-child(3):last-child {
+    display: none;
   }
 }
 

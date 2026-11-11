@@ -20,6 +20,6 @@
   "peerDependencies": {
     "@ownclouders/web-client": "workspace:*",
     "@ownclouders/web-pkg": "workspace:*",
-    "vue3-gettext": "2.4.0"
+    "vue3-gettext": "^4.0.1"
   }
 }

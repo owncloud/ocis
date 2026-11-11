@@ -79,6 +79,8 @@ type Provider struct {
 	// Spaces is a map from space type to space config
 	Spaces     map[string]*spaceConfig `mapstructure:"spaces"`
 	ProviderID string                  `mapstructure:"providerid"`
+	// ReadOnly marks providers that expose existing spaces but reject space creation.
+	ReadOnly bool `mapstructure:"readonly"`
 }
 
 type templateData struct {
@@ -203,6 +205,10 @@ func (r *registry) GetProvider(ctx context.Context, space *providerpb.StorageSpa
 			} else {
 				// Filter out vault spaces if no storageId is provided
 				if provider.ProviderID == utils.VaultStorageProviderID {
+					continue
+				}
+				// Skip read-only providers — they serve existing spaces but cannot create new ones.
+				if provider.ReadOnly {
 					continue
 				}
 			}
@@ -364,8 +370,11 @@ func (r *registry) findProvidersForFilter(ctx context.Context, filters []*provid
 	currentUser := ctxpkg.ContextMustGetUser(ctx)
 	providerInfos := []*registrypb.ProviderInfo{}
 	for address, provider := range r.c.Providers {
-		// skip mismatching storageproviders
-		if storageId != "" && storageId != provider.ProviderID {
+		// skip mismatching storageproviders. The shares provider hosts the
+		// mountpoints of vault shares (they grant into the vault provider), so it
+		// must still be queried when the vault storage id is requested.
+		if storageId != "" && storageId != provider.ProviderID &&
+			!(storageId == utils.VaultStorageProviderID && provider.ProviderID == utils.ShareStorageProviderID) {
 			continue
 		}
 		// when a specific space type is requested we may skip this provider altogether if it is not configured for that type
@@ -403,6 +412,15 @@ func (r *registry) findProvidersForFilter(ctx context.Context, filters []*provid
 				// Filter out vault spaces if no storageId is provided
 				if storageId == "" && provider.ProviderID == utils.VaultStorageProviderID {
 					continue
+				}
+				// Shares of vault resources are mountpoints hosted on the shares
+				// provider that grant into the vault provider. Segregate them so
+				// they only appear in the matching (vault / non-vault) drive list.
+				if provider.ProviderID == utils.ShareStorageProviderID && space.SpaceType == "mountpoint" {
+					grantsIntoVault := utils.ReadPlainFromOpaque(space.Opaque, "grantStorageID") == utils.VaultStorageProviderID
+					if grantsIntoVault != (storageId == utils.VaultStorageProviderID) {
+						continue
+					}
 				}
 				spacePath, err = sc.SpacePath(currentUser, space)
 				if err != nil {

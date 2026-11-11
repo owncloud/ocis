@@ -1,5 +1,5 @@
-import { shallowMount } from '@ownclouders/web-test-helpers'
 import Progress from './OcProgress.vue'
+import { shallowMount } from '../../testing'
 
 describe('OcProgress', () => {
   it('sets correct classes', () => {

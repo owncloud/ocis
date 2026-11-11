@@ -6,10 +6,12 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/url"
 	"path"
+	"slices"
 	"strings"
 	"time"
 
@@ -28,6 +30,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/wopisrc"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
@@ -879,7 +882,7 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 				HeaderWopiLock:              lockID,
 				HeaderWopiLockFailureReason: "Lock Conflict",
 			},
-			Body: map[string]interface{}{
+			Body: map[string]any{
 				"Name":        target,
 				"Url":         wopiSrcURL.String(),
 				"HostViewUrl": createHostUrl("view", webURL, strings.ToLower(f.cfg.App.Name), newInfo),
@@ -936,42 +939,22 @@ func (f *FileConnector) DeleteFile(ctx context.Context, lockID string) (*Connect
 		Str("RequestedLockID", lockID).
 		Logger()
 
-	var deleteRes *providerv1beta1.DeleteResponse
 	deleteReq := &providerv1beta1.DeleteRequest{
 		Ref:    wopiContext.FileReference,
 		LockId: lockID,
 	}
 
-	// we'll retry the request after a while if we get a "TOO_EARLY" code
-	for retries := 0; deleteRes == nil || deleteRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_TOO_EARLY; retries++ {
+	// the file might still be processing, so we retry if we get a "TOO_EARLY" code
+	deleteRes, err := retryWhileTooEarly(ctx, logger, "DeleteFile", func() (*providerv1beta1.DeleteResponse, error) {
 		gwc, err := f.gws.Next()
 		if err != nil {
 			return nil, err
 		}
-		deleteRes, err = gwc.Delete(ctx, deleteReq)
-		if err != nil {
-			logger.Error().Err(err).Msg("DeleteFile: stat failed")
-			return nil, err
-		}
-
-		if deleteRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_TOO_EARLY {
-			// starting from 20ms, double the waiting time for each retry
-			// capping at 5 secs
-			var waitingTime time.Duration
-			waitingTime = (20 * time.Millisecond) << retries
-			if waitingTime.Seconds() > 5 {
-				waitingTime = 5 * time.Second
-			}
-
-			logger.Warn().
-				Str("StatusCode", deleteRes.GetStatus().GetCode().String()).
-				Str("StatusMsg", deleteRes.GetStatus().GetMessage()).
-				Dur("WaitingTime", waitingTime).
-				Int("Retries", retries).
-				Msg("DeleteFile: file isn't ready yet. Retrying")
-
-			time.Sleep(waitingTime)
-		}
+		return gwc.Delete(ctx, deleteReq)
+	})
+	if err != nil {
+		logger.Error().Err(err).Msg("DeleteFile: delete failed")
+		return nil, err
 	}
 
 	if deleteRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
@@ -1089,15 +1072,18 @@ func (f *FileConnector) RenameFile(ctx context.Context, lockID, target string) (
 		// add the new file reference to the log context
 		newLogger := logger.With().Str("NewFileReference", targetFileReference.String()).Logger()
 
-		gwc, err = f.gws.Next()
-		if err != nil {
-			return nil, err
-		}
-		// try to put the file. It mustn't return a 400 or 409
-		moveRes, err := gwc.Move(ctx, &providerv1beta1.MoveRequest{
-			Source:      wopiContext.FileReference,
-			Destination: targetFileReference,
-			LockId:      lockID,
+		// try to move the file. It mustn't return a 400 or 409
+		// the file might still be processing, so we retry if we get a "TOO_EARLY" code
+		moveRes, err := retryWhileTooEarly(ctx, newLogger, "RenameFile", func() (*providerv1beta1.MoveResponse, error) {
+			gwc, err := f.gws.Next()
+			if err != nil {
+				return nil, err
+			}
+			return gwc.Move(ctx, &providerv1beta1.MoveRequest{
+				Source:      wopiContext.FileReference,
+				Destination: targetFileReference,
+				LockId:      lockID,
+			})
 		})
 		if err != nil {
 			newLogger.Error().Err(err).Msg("RenameFile: move failed")
@@ -1225,6 +1211,18 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		}
 	}
 
+	// IsAdminUser is a Collabora-specific property that unlocks the server audit panel.
+	// It must only be set for the built-in oCIS admin role, never for SpaceAdmin or any
+	// other role, so the admin role UUID is compared explicitly rather than checking for
+	// "any elevated role".
+	isAdminUser := false
+	if rolesEntry, ok := user.GetOpaque().GetMap()["roles"]; ok {
+		var roleIDs []string
+		if err := json.Unmarshal(rolesEntry.GetValue(), &roleIDs); err == nil {
+			isAdminUser = slices.Contains(roleIDs, defaults.BundleUUIDRoleAdmin)
+		}
+	}
+
 	breadcrumbFolderName := path.Dir(statRes.GetInfo().GetPath())
 	if breadcrumbFolderName == "." || breadcrumbFolderName == "" || breadcrumbFolderName == "/" {
 		breadcrumbFolderName = statRes.GetInfo().GetSpace().GetName()
@@ -1243,8 +1241,23 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 	privateLinkURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetId()))
 	parentFolderURL := &url.URL{}
 	*parentFolderURL = *ocisURL
+	breadcrumbFolderURL := ""
 	if !isPublicShare {
-		parentFolderURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetParentId()))
+		// the parent folder isn't always accessible, e.g. for a file shared directly with
+		// the user. Only link to it if it is, closing falls back to the oCIS URL otherwise.
+		parentStatRes, err := gwc.Stat(ctx, &providerv1beta1.StatRequest{
+			Ref: &providerv1beta1.Reference{ResourceId: statRes.GetInfo().GetParentId()},
+		})
+		if err == nil && parentStatRes.GetStatus().GetCode() == rpcv1beta1.Code_CODE_OK {
+			parentFolderURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetParentId()))
+			breadcrumbFolderURL = parentFolderURL.String()
+		} else {
+			// parent not accessible: link to the file itself and let the web app resolve the
+			// right location (e.g. the Shares space). openWithDefaultApp=false keeps it from
+			// reopening the file.
+			parentFolderURL.Path = privateLinkURL.Path
+			parentFolderURL.RawQuery = "openWithDefaultApp=false"
+		}
 	} else {
 		if scopes, ok := ctxpkg.ContextGetScopes(ctx); ok {
 			publicShare := &link.PublicShare{}
@@ -1256,9 +1269,26 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		} else {
 			logger.Error().Err(err).Msg("CheckFileInfo: error getting scopes from the context")
 		}
+		breadcrumbFolderURL = parentFolderURL.String()
+	}
+	// BreadcrumbBrandURL points at the space's root resource, exposing an internal
+	// space/resource id; for public shares an anonymous user has no other way to reach
+	// that id, so (like parentFolderURL above) the link is withheld. BreadcrumbBrandName
+	// is just a display string, not a navigable link, so it stays populated either way.
+	// Only build the link when the stat response actually carries space info: without a
+	// root resource id there is nothing to point at, and joining an empty id into the
+	// path would otherwise produce a misleading bare ".../f" URL.
+	breadcrumbBrandURL := ""
+	if !isPublicShare {
+		if spaceRoot := statRes.GetInfo().GetSpace().GetRoot(); spaceRoot != nil {
+			brandURL := &url.URL{}
+			*brandURL = *ocisURL
+			brandURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(spaceRoot))
+			breadcrumbBrandURL = brandURL.String()
+		}
 	}
 	// fileinfo map
-	var size interface{}
+	var size any
 	size = int64(statRes.GetInfo().GetSize())
 	// OnlyOffice requires a 0 size of files for "pdf" files, for extensions "docx", "xlsx", "pptx" it is optional
 	// For other extensions like "ods", "odt", "odp" the 0 size should be omitted
@@ -1274,7 +1304,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		lastModifiedTime = time.Unix(int64(statRes.GetInfo().GetMtime().GetSeconds()), int64(statRes.GetInfo().GetMtime().GetNanos())).UTC().Format(timeFormat)
 	}
 
-	infoMap := map[string]interface{}{
+	infoMap := map[string]any{
 		fileinfo.KeyOwnerID:           hexEncodedOwnerId,
 		fileinfo.KeySize:              size,
 		fileinfo.KeyVersion:           getVersion(statRes.GetInfo().GetMtime()),
@@ -1283,7 +1313,12 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		fileinfo.KeyBreadcrumbDocName: path.Base(statRes.GetInfo().GetPath()),
 		// to get the folder we actually need to do a GetPath() request
 		fileinfo.KeyBreadcrumbFolderName: breadcrumbFolderName,
-		fileinfo.KeyBreadcrumbFolderURL:  parentFolderURL.String(),
+		fileinfo.KeyBreadcrumbFolderURL:  breadcrumbFolderURL,
+		fileinfo.KeyBreadcrumbBrandName:  statRes.GetInfo().GetSpace().GetName(),
+		fileinfo.KeyBreadcrumbBrandURL:   breadcrumbBrandURL,
+		// the WOPI client should navigate here when the editor is closed; the folder
+		// containing the file if the user can access it, the oCIS URL otherwise
+		fileinfo.KeyCloseURL: parentFolderURL.String(),
 
 		fileinfo.KeyHostViewURL:    createHostUrl("view", ocisURL, f.cfg.App.Name, statRes.GetInfo()),
 		fileinfo.KeyHostEditURL:    createHostUrl("write", ocisURL, f.cfg.App.Name, statRes.GetInfo()),
@@ -1301,9 +1336,21 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		fileinfo.KeyIsAnonymousUser:  isAnonymousUser,
 		fileinfo.KeyUserFriendlyName: userFriendlyName,
 		fileinfo.KeyUserID:           userId,
+		fileinfo.KeyIsAdminUser:      isAdminUser, // only for collabora
 
 		fileinfo.KeyPostMessageOrigin:            f.cfg.Commons.OcisURL,
 		fileinfo.KeyLicenseCheckForEditIsEnabled: f.cfg.App.LicenseCheckEnable,
+	}
+
+	infoMap[fileinfo.KeyReadOnly] = wopiContext.ViewMode != appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE
+
+	// Only Collabora currently has a web frontend handler wired up for UI_Edit; the other
+	// PostMessage flags (Close, EditNotification, FileSharing, FileVersion) are left unset
+	// so Collabora falls back to the corresponding URL properties instead of sending
+	// PostMessages nobody listens for. OnlyOffice's SetProperties also implements these
+	// keys, so this must stay an explicit target check rather than an unconditional write.
+	if strings.ToLower(f.cfg.App.Product) == "collabora" {
+		infoMap[fileinfo.KeyEditModePostMessage] = true
 	}
 
 	switch wopiContext.ViewMode {
@@ -1318,8 +1365,16 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		infoMap[fileinfo.KeyDisableExport] = true // only for collabora
 		infoMap[fileinfo.KeyDisableCopy] = true   // only for collabora
 		infoMap[fileinfo.KeyDisablePrint] = true
-		if !isPublicShare && wopiContext.ViewOnlyToken != "" {
-			infoMap[fileinfo.KeyWatermarkText] = f.watermarkText(user) // only for collabora
+		if wopiContext.ViewOnlyToken != "" {
+			// Secure-view access (view-only mode reached via a view-only token) is the
+			// codebase's existing definition of a locked-down session; apply Collabora's
+			// feature-locking on top of the Disable*/watermark restrictions above,
+			// regardless of whether the user is a public-share guest or authenticated.
+			infoMap[fileinfo.KeyIsUserLocked] = true // only for collabora
+
+			if !isPublicShare {
+				infoMap[fileinfo.KeyWatermarkText] = f.watermarkText(user) // only for collabora
+			}
 		}
 	}
 
@@ -1330,10 +1385,42 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		}
 	}
 
+	// a direct download link for the current file; omitted (not a hard failure) if the
+	// wopi access token can't be generated, e.g. due to a token store misconfiguration
+	if du, err := f.createFileDownloadURL(wopiContext, collaborationURL); err == nil {
+		infoMap[fileinfo.KeyDownloadURL] = du
+	} else {
+		logger.Error().Err(err).Msg("CheckFileInfo: failed to create download URL")
+	}
+
 	info.SetProperties(infoMap)
 
 	logger.Debug().Interface("FileInfo", info).Msg("CheckFileInfo: success")
 	return NewResponseSuccessBody(info), nil
+}
+
+// createWopiResourceURL builds a URL pointing at one of the collaboration service's own
+// WOPI routes for the file referenced by wopiContext, hashing the resource id into the
+// path and attaching a freshly generated WOPI access token as the "access_token" query
+// parameter. routePrefix selects the route (e.g. "wopi/files" or "wopi/templates") and
+// pathSuffix is appended after the hashed resource id (e.g. "contents", or "" when the
+// route ends at the hash).
+func (f *FileConnector) createWopiResourceURL(wopiContext middleware.WopiContext, collaborationURL *url.URL, routePrefix string, pathSuffix string) (string, error) {
+	token, _, err := middleware.GenerateWopiToken(wopiContext, f.cfg, f.store)
+	if err != nil {
+		return "", err
+	}
+	resourceURL := *collaborationURL
+	resourceURL.Path = path.Join(
+		collaborationURL.Path,
+		routePrefix,
+		helpers.HashResourceId(wopiContext.FileReference.GetResourceId()),
+		pathSuffix,
+	)
+	q := resourceURL.Query()
+	q.Add("access_token", token)
+	resourceURL.RawQuery = q.Encode()
+	return resourceURL.String(), nil
 }
 
 // createDownloadURL will create a download URL for the template file.
@@ -1344,20 +1431,15 @@ func (f *FileConnector) createDownloadURL(wopiContext middleware.WopiContext, co
 	templateContext.FileReference = wopiContext.TemplateReference
 	templateContext.TemplateReference = nil
 
-	token, _, err := middleware.GenerateWopiToken(templateContext, f.cfg, f.store)
-	if err != nil {
-		return "", err
-	}
-	downloadURL := *collaborationURL
-	downloadURL.Path = path.Join(
-		collaborationURL.Path,
-		"wopi/templates/",
-		helpers.HashResourceId(templateContext.FileReference.GetResourceId()),
-	)
-	q := downloadURL.Query()
-	q.Add("access_token", token)
-	downloadURL.RawQuery = q.Encode()
-	return downloadURL.String(), nil
+	return f.createWopiResourceURL(templateContext, collaborationURL, "wopi/templates", "")
+}
+
+// createFileDownloadURL creates a direct download URL for the current file (as opposed
+// to a template), pointing at the collaboration service's own WOPI file-content route
+// (GET /wopi/files/{fileid}/contents), authenticated via a freshly generated WOPI access
+// token. Used for the WOPI DownloadUrl CheckFileInfo property.
+func (f *FileConnector) createFileDownloadURL(wopiContext middleware.WopiContext, collaborationURL *url.URL) (string, error) {
+	return f.createWopiResourceURL(wopiContext, collaborationURL, "wopi/files", "contents")
 }
 
 func createHostUrl(mode string, ocisUrl *url.URL, appName string, info *providerv1beta1.ResourceInfo) string {

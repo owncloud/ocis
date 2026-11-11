@@ -70,18 +70,18 @@ var _ = Describe("Authenticating requests", Label("OIDCAuthenticator"), func() {
 			req := httptest.NewRequest(http.MethodGet, "http://example.com/example/path", http.NoBody)
 			req.Header.Set(_headerAuthorization, "Bearer jwt.token.sig")
 
-			req2, valid := authenticator.Authenticate(req)
+			req2, err := authenticator.Authenticate(req)
 
-			Expect(valid).To(Equal(true))
+			Expect(err).ToNot(HaveOccurred())
 			Expect(req2).ToNot(BeNil())
 		})
 		It("should successfully authenticate", func() {
 			req := httptest.NewRequest(http.MethodGet, "http://example.com/dav/public-files", http.NoBody)
 			req.Header.Set(_headerAuthorization, "Bearer jwt.token.sig")
 
-			req2, valid := authenticator.Authenticate(req)
+			req2, err := authenticator.Authenticate(req)
 
-			Expect(valid).To(Equal(true))
+			Expect(err).ToNot(HaveOccurred())
 			Expect(req2).ToNot(BeNil())
 		})
 		It("should skip authenticate if the header ShareToken is set", func() {
@@ -89,24 +89,24 @@ var _ = Describe("Authenticating requests", Label("OIDCAuthenticator"), func() {
 			req.Header.Set(_headerAuthorization, "Bearer jwt.token.sig")
 			req.Header.Set(headerShareToken, "sharetoken")
 
-			req2, valid := authenticator.Authenticate(req)
+			req2, err := authenticator.Authenticate(req)
 
 			// TODO Should the authentication of public path requests is handled by another authenticator?
-			//Expect(valid).To(Equal(false))
+			//Expect(err).To(HaveOccurred())
 			//Expect(req2).To(BeNil())
-			Expect(valid).To(Equal(true))
+			Expect(err).ToNot(HaveOccurred())
 			Expect(req2).ToNot(BeNil())
 		})
 		It("should skip authenticate if the 'public-token' is set", func() {
 			req := httptest.NewRequest(http.MethodGet, "http://example.com/dav/public-files/?public-token=sharetoken", http.NoBody)
 			req.Header.Set(_headerAuthorization, "Bearer jwt.token.sig")
 
-			req2, valid := authenticator.Authenticate(req)
+			req2, err := authenticator.Authenticate(req)
 
 			// TODO Should the authentication of public path requests is handled by another authenticator?
-			//Expect(valid).To(Equal(false))
+			//Expect(err).To(HaveOccurred())
 			//Expect(req2).To(BeNil())
-			Expect(valid).To(Equal(true))
+			Expect(err).ToNot(HaveOccurred())
 			Expect(req2).ToNot(BeNil())
 		})
 	})
@@ -124,7 +124,7 @@ var _ = Describe("Authenticating requests", Label("OIDCAuthenticator"), func() {
 			// but keep the store record itself readable (no Expiry) to simulate
 			// the window where the entry has not been evicted yet while its
 			// cached expiry has passed.
-			cachedClaims := map[string]interface{}{
+			cachedClaims := map[string]any{
 				"sub": "cached-subject",
 				"exp": time.Now().Add(-time.Hour).Unix(),
 			}
@@ -161,7 +161,7 @@ var _ = Describe("Authenticating requests", Label("OIDCAuthenticator"), func() {
 			sha3.ShakeSum256(hash, []byte(token))
 			encodedHash := base64.URLEncoding.EncodeToString(hash)
 
-			value, err := msgpack.MarshalAsMap(map[string]interface{}{
+			value, err := msgpack.MarshalAsMap(map[string]any{
 				"sub": "cached-subject",
 				"exp": time.Now().Add(-time.Hour).Unix(),
 			})

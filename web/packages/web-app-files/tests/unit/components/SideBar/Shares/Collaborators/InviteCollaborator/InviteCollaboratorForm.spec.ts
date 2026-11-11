@@ -1,4 +1,5 @@
 import { mock } from 'vitest-mock-extended'
+import { DateTime } from 'luxon'
 import InviteCollaboratorForm from '../../../../../../../src/components/SideBar/Shares/Collaborators/InviteCollaborator/InviteCollaboratorForm.vue'
 import {
   defaultComponentMocks,
@@ -7,7 +8,7 @@ import {
   shallowMount,
   VueWrapper
 } from '@ownclouders/web-test-helpers'
-import { Resource, SpaceResource } from '@ownclouders/web-client'
+import { Resource, SpaceResource, VAULT_STORAGE_PROVIDER_ID } from '@ownclouders/web-client'
 import { useSharesStore } from '@ownclouders/web-pkg'
 import { CollaboratorAutoCompleteItem, CollaboratorShare, ShareRole } from '@ownclouders/web-client'
 import { Group, User } from '@ownclouders/web-client/graph/generated'
@@ -113,6 +114,168 @@ describe('InviteCollaboratorForm', () => {
       expect(wrapper.vm.autocompleteResults.length).toBe(1)
     })
   })
+  describe('fetching recipients for a vault resource', () => {
+    // vault resources are recognized by the fixed vault storage provider id, not by the
+    // `vault_storage_provider` capability, which a drive-mode session receives empty
+    const vaultCapabilities = {
+      files_sharing: { federation: { incoming: true, outgoing: true } },
+      vault: { enabled: true, vault_storage_provider: '' }
+    }
+
+    it('only asks for users that may access the vault, and for no groups at all', async () => {
+      const { wrapper, mocks } = getWrapper({
+        capabilities: vaultCapabilities,
+        resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
+      })
+      await wrapper.vm.fetchRecipientsTask.last
+
+      expect(mocks.$clientService.graphAuthenticated.users.listUsers).toHaveBeenCalledWith(
+        expect.objectContaining({ filter: 'vaultEligible eq true' }),
+        expect.anything()
+      )
+      expect(mocks.$clientService.graphAuthenticated.groups.listGroups).not.toHaveBeenCalled()
+    })
+    it('recognizes a vault space resource, which carries the full drive id', async () => {
+      const { wrapper, mocks } = getWrapper({
+        capabilities: vaultCapabilities,
+        resource: mock<SpaceResource>({
+          ...spaceMock,
+          storageId: `${VAULT_STORAGE_PROVIDER_ID}$some-space-id`
+        })
+      })
+      await wrapper.vm.fetchRecipientsTask.last
+
+      expect(mocks.$clientService.graphAuthenticated.users.listUsers).toHaveBeenCalledWith(
+        expect.objectContaining({ filter: 'vaultEligible eq true' }),
+        expect.anything()
+      )
+    })
+    it('does not filter for a resource outside the vault', async () => {
+      const { wrapper, mocks } = getWrapper({
+        capabilities: vaultCapabilities,
+        resource: mock<Resource>({ ...folderMock, storageId: 'some-other-provider' })
+      })
+      await wrapper.vm.fetchRecipientsTask.last
+
+      expect(mocks.$clientService.graphAuthenticated.users.listUsers).toHaveBeenCalledWith(
+        expect.objectContaining({ filter: undefined }),
+        expect.anything()
+      )
+      expect(mocks.$clientService.graphAuthenticated.groups.listGroups).toHaveBeenCalledTimes(1)
+    })
+    it('does not filter while vault mode is disabled', async () => {
+      const { wrapper, mocks } = getWrapper({
+        capabilities: {
+          ...vaultCapabilities,
+          vault: { enabled: false }
+        },
+        resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
+      })
+      await wrapper.vm.fetchRecipientsTask.last
+
+      expect(mocks.$clientService.graphAuthenticated.users.listUsers).toHaveBeenCalledWith(
+        expect.objectContaining({ filter: undefined }),
+        expect.anything()
+      )
+    })
+  })
+  describe('vault default expiration notice', () => {
+    const vaultCapabilities = {
+      files_sharing: { federation: { incoming: true, outgoing: true } },
+      vault: { enabled: true, vault_storage_provider: '', default_share_expiration_days: 30 }
+    }
+
+    it('shows for a vault resource without an explicit expiration', () => {
+      const { wrapper } = getWrapper({
+        capabilities: vaultCapabilities,
+        resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
+      })
+
+      const notice = wrapper.find('[data-testid="vault-default-expiration-notice"]')
+      expect(notice.exists()).toBeTruthy()
+      expect(notice.attributes('tabindex')).toBeUndefined()
+      expect(notice.find('oc-icon-stub').attributes('aria-hidden')).toBe('true')
+    })
+    it('keeps the status region mounted so screen readers pick up the announcement', () => {
+      // role="status" must stay mounted; a freshly-inserted one isn't reliably announced
+      const { wrapper } = getWrapper({
+        resource: mock<Resource>({ ...folderMock, storageId: 'some-other-provider' })
+      })
+
+      const statusRegion = wrapper.find('#vault-default-expiration-notice-status')
+      expect(statusRegion.exists()).toBeTruthy()
+      expect(statusRegion.attributes('role')).toBe('status')
+      expect(wrapper.find('[data-testid="vault-default-expiration-notice"]').exists()).toBeFalsy()
+    })
+    it('describes the "Show more actions" toggle only while the notice applies', () => {
+      const { wrapper } = getWrapper({
+        capabilities: vaultCapabilities,
+        resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
+      })
+
+      expect(wrapper.find('#show-more-share-options-btn').attributes('aria-describedby')).toBe(
+        'vault-default-expiration-notice-status'
+      )
+    })
+    it('does not describe the "Show more actions" toggle for a resource outside the vault', () => {
+      const { wrapper } = getWrapper({
+        resource: mock<Resource>({ ...folderMock, storageId: 'some-other-provider' })
+      })
+
+      expect(
+        wrapper.find('#show-more-share-options-btn').attributes('aria-describedby')
+      ).toBeUndefined()
+    })
+    it('does not show for a resource outside the vault', () => {
+      const { wrapper } = getWrapper({
+        resource: mock<Resource>({ ...folderMock, storageId: 'some-other-provider' })
+      })
+
+      expect(wrapper.find('[data-testid="vault-default-expiration-notice"]').exists()).toBeFalsy()
+    })
+    it('does not show or suggest a date when the server omits the capability', () => {
+      const { wrapper } = getWrapper({
+        capabilities: {
+          ...vaultCapabilities,
+          vault: {
+            enabled: true,
+            vault_storage_provider: '',
+            default_share_expiration_days: undefined
+          }
+        },
+        resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
+      })
+
+      expect(wrapper.find('[data-testid="vault-default-expiration-notice"]').exists()).toBeFalsy()
+      expect(wrapper.vm.suggestedExpirationDate()).toBeUndefined()
+    })
+    it('hides once an explicit expiration date is set', async () => {
+      const { wrapper } = getWrapper({
+        capabilities: vaultCapabilities,
+        resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
+      })
+
+      wrapper.vm.expirationDate = '2026-01-01'
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-testid="vault-default-expiration-notice"]').exists()).toBeFalsy()
+    })
+    it('renders the expiration days reported by the vault capability', () => {
+      const { wrapper } = getWrapper({
+        capabilities: {
+          ...vaultCapabilities,
+          vault: { ...vaultCapabilities.vault, default_share_expiration_days: 7 }
+        },
+        resource: mock<Resource>({ ...folderMock, storageId: VAULT_STORAGE_PROVIDER_ID })
+      })
+
+      expect(wrapper.find('[data-testid="vault-default-expiration-notice"]').text()).toContain('7')
+      expect(wrapper.vm.suggestedExpirationDate().diff(DateTime.now(), 'days').days).toBeCloseTo(
+        7,
+        0
+      )
+    })
+  })
   describe('share action', () => {
     it('clicking the invite-sharees button calls the "share"-action', async () => {
       const { wrapper } = getWrapper()
@@ -183,7 +346,8 @@ function getWrapper({
   groups = [],
   existingCollaborators = [],
   externalShareRoles = [],
-  user = mock<User>({ id: '1' })
+  user = mock<User>({ id: '1' }),
+  capabilities = { files_sharing: { federation: { incoming: true, outgoing: true } } }
 }: {
   storageId?: string
   resource?: Resource
@@ -192,6 +356,7 @@ function getWrapper({
   existingCollaborators?: CollaboratorShare[]
   externalShareRoles?: ShareRole[]
   user?: User
+  capabilities?: Record<string, unknown>
 } = {}) {
   const mocks = defaultComponentMocks({
     currentRoute: mock<RouteLocation>({ params: { storageId } })
@@ -199,8 +364,6 @@ function getWrapper({
 
   mocks.$clientService.graphAuthenticated.users.listUsers.mockResolvedValue(users)
   mocks.$clientService.graphAuthenticated.groups.listGroups.mockResolvedValue(groups)
-
-  const capabilities = { files_sharing: { federation: { incoming: true, outgoing: true } } }
 
   return {
     mocks,

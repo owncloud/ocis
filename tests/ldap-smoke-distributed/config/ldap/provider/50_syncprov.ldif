@@ -1,0 +1,19 @@
+# syncprov overlay on the data DB so consumers can pull via refreshAndPersist.
+# Applied to cn=config (osixia runs changetype LDIF with ldapmodify -Y EXTERNAL).
+# osixia's 05-index.ldif already indexes entryCSN/entryUUID eq; re-adding them here
+# fails "value already exists" and aborts the file, so no olcDbIndex changes.
+
+# 1. load the syncprov module (back_mdb is preloaded as {0})
+dn: cn=module{0},cn=config
+changetype: modify
+add: olcModuleLoad
+olcModuleLoad: syncprov.la
+
+# 2. syncprov overlay on the data DB (index auto-assigned after memberof/refint)
+dn: olcOverlay=syncprov,olcDatabase={1}mdb,cn=config
+changetype: add
+objectClass: olcOverlayConfig
+objectClass: olcSyncProvConfig
+olcOverlay: syncprov
+olcSpCheckpoint: 100 10
+olcSpSessionLog: 100

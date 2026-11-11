@@ -3,7 +3,7 @@
 <template>
   <main :id="applicationId" class="app-wrapper oc-height-1-1" @keydown.esc="closeApp">
     <!-- eslint-enable vuejs-accessibility/no-static-element-interactions -->
-    <h1 class="oc-invisible-sr" v-text="pageTitle" />
+    <h1 v-if="pageTitle" class="oc-invisible-sr" v-text="pageTitle" />
     <app-top-bar
       v-if="!loading && !loadingError && resource"
       :main-actions="fileActions"
@@ -65,7 +65,9 @@ import {
   useFileActionsSaveAs,
   useSharesStore,
   useFileActionsExportAsPdf,
-  useAppStore
+  useAppStore,
+  AppError,
+  useDisableRootOverscroll
 } from '../../composables'
 import {
   Action,
@@ -147,8 +149,8 @@ const url = ref('')
 const loading = ref(!unref(noResourceLoading))
 const loadingError: Ref<Error> = ref()
 const isReadOnly = ref(false)
-const serverContent = ref()
-const currentContent = ref()
+const serverContent = ref('')
+const currentContent = ref('')
 
 const { actions: saveAsActions } = useFileActionsSaveAs({ content: currentContent })
 const { actions: exportAsPdfActions } = useFileActionsExportAsPdf({ content: currentContent })
@@ -299,7 +301,7 @@ const loadResourceTask = useTask(function* (signal) {
       return authService.handleAuthError(unref(router.currentRoute))
     }
 
-    if (e?.response?.status === 404 && e?.message === 'Unknown error') {
+    if (e?.statusCode === 404 && e?.message === 'Unknown error') {
       console.error(e)
       loadingError.value = new Error(
         $gettext('The resource could not be located, it may not exist anymore.')
@@ -375,7 +377,12 @@ watch(
   () => appStore.error,
   () => {
     if (appStore.error) {
-      loadingError.value = new Error(appStore.error.message)
+      const { statusCode, message } = appStore.error as AppError & { statusCode?: number }
+      loadingError.value = new Error(
+        statusCode === 404 && message === 'Unknown error'
+          ? $gettext('The resource could not be located, it may not exist anymore.')
+          : message
+      )
       loading.value = false
       return
     }
@@ -487,6 +494,8 @@ const save = async () => {
 const hasAutoSave = computed(() => {
   return !disableAutoSave
 })
+
+useDisableRootOverscroll()
 
 let autosaveIntervalId: ReturnType<typeof setInterval> = null
 onMounted(() => {
@@ -685,7 +694,7 @@ const slotAttrs = computed(() => ({
     space.value = unref(unref(currentFileContext).space)
     selectedResources.value = [value]
   },
-  'onUpdate:currentContent': (value: unknown) => {
+  'onUpdate:currentContent': (value: string) => {
     currentContent.value = value
   },
 

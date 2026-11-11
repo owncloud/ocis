@@ -2,56 +2,75 @@
 
 All URIs are relative to *https://ocis.ocis.rolling.owncloud.works/graph*
 
-|Method | HTTP request | Description|
+| Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-|[**addClassToSchool**](#addclasstoschool) | **POST** /v1.0/education/schools/{school-id}/classes/$ref | Assign a class to a school|
-|[**addUserToSchool**](#addusertoschool) | **POST** /v1.0/education/schools/{school-id}/users/$ref | Assign a user to a school|
-|[**createSchool**](#createschool) | **POST** /v1.0/education/schools | Add new school|
-|[**deleteClassFromSchool**](#deleteclassfromschool) | **DELETE** /v1.0/education/schools/{school-id}/classes/{class-id}/$ref | Unassign class from a school|
-|[**deleteSchool**](#deleteschool) | **DELETE** /v1.0/education/schools/{school-id} | Delete school|
-|[**deleteUserFromSchool**](#deleteuserfromschool) | **DELETE** /v1.0/education/schools/{school-id}/users/{user-id}/$ref | Unassign user from a school|
-|[**getSchool**](#getschool) | **GET** /v1.0/education/schools/{school-id} | Get the properties of a specific school|
-|[**listSchoolClasses**](#listschoolclasses) | **GET** /v1.0/education/schools/{school-id}/classes | Get the educationClass resources owned by an educationSchool|
-|[**listSchoolUsers**](#listschoolusers) | **GET** /v1.0/education/schools/{school-id}/users | Get the educationUser resources associated with an educationSchool|
-|[**listSchools**](#listschools) | **GET** /v1.0/education/schools | Get a list of schools and their properties|
-|[**updateSchool**](#updateschool) | **PATCH** /v1.0/education/schools/{school-id} | Update properties of a school|
+| [**addClassToSchool**](EducationSchoolApi.md#addclasstoschool) | **POST** /v1.0/education/schools/{school-id}/classes/$ref | Assign a class to a school |
+| [**addUserToSchool**](EducationSchoolApi.md#addusertoschool) | **POST** /v1.0/education/schools/{school-id}/users/$ref | Assign a user to a school |
+| [**createSchool**](EducationSchoolApi.md#createschool) | **POST** /v1.0/education/schools | Add new school |
+| [**deleteClassFromSchool**](EducationSchoolApi.md#deleteclassfromschool) | **DELETE** /v1.0/education/schools/{school-id}/classes/{class-id}/$ref | Unassign class from a school |
+| [**deleteSchool**](EducationSchoolApi.md#deleteschool) | **DELETE** /v1.0/education/schools/{school-id} | Delete school |
+| [**deleteUserFromSchool**](EducationSchoolApi.md#deleteuserfromschool) | **DELETE** /v1.0/education/schools/{school-id}/users/{user-id}/$ref | Unassign user from a school |
+| [**getSchool**](EducationSchoolApi.md#getschool) | **GET** /v1.0/education/schools/{school-id} | Get the properties of a specific school |
+| [**listSchoolClasses**](EducationSchoolApi.md#listschoolclasses) | **GET** /v1.0/education/schools/{school-id}/classes | Get the educationClass resources owned by an educationSchool |
+| [**listSchoolUsers**](EducationSchoolApi.md#listschoolusers) | **GET** /v1.0/education/schools/{school-id}/users | Get the educationUser resources associated with an educationSchool |
+| [**listSchools**](EducationSchoolApi.md#listschools) | **GET** /v1.0/education/schools | Get a list of schools and their properties |
+| [**updateSchool**](EducationSchoolApi.md#updateschool) | **PATCH** /v1.0/education/schools/{school-id} | Update properties of a school |
 
-# **addClassToSchool**
-> addClassToSchool(classReference)
 
+
+## addClassToSchool
+
+> addClassToSchool(schoolId, classReference)
+
+Assign a class to a school
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationSchoolApi,
-    Configuration,
-    ClassReference
-} from './api';
+  Configuration,
+  EducationSchoolApi,
+} from '';
+import type { AddClassToSchoolRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationSchoolApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationSchoolApi(config);
 
-let schoolId: string; //key: id or schoolNumber of school (default to undefined)
-let classReference: ClassReference; //educationClass to be added as member
+  const body = {
+    // string | key: id or schoolNumber of school
+    schoolId: 43b879c4-14c6-4e0a-9b3f-b1b33c5a4bd4,
+    // ClassReference | educationClass to be added as member
+    classReference: ...,
+  } satisfies AddClassToSchoolRequest;
 
-const { status, data } = await apiInstance.addClassToSchool(
-    schoolId,
-    classReference
-);
+  try {
+    const data = await api.addClassToSchool(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **classReference** | **ClassReference**| educationClass to be added as member | |
-| **schoolId** | [**string**] | key: id or schoolNumber of school | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **schoolId** | `string` | key: id or schoolNumber of school | [Defaults to `undefined`] |
+| **classReference** | [ClassReference](ClassReference.md) | educationClass to be added as member | |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -59,54 +78,72 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**204** | Success |  -  |
-|**0** | error |  -  |
+| **204** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **addUserToSchool**
-> addUserToSchool(educationUserReference)
 
+## addUserToSchool
+
+> addUserToSchool(schoolId, educationUserReference)
+
+Assign a user to a school
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationSchoolApi,
-    Configuration,
-    EducationUserReference
-} from './api';
+  Configuration,
+  EducationSchoolApi,
+} from '';
+import type { AddUserToSchoolRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationSchoolApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationSchoolApi(config);
 
-let schoolId: string; //key: id or schoolNumber of school (default to undefined)
-let educationUserReference: EducationUserReference; //educationUser to be added as member
+  const body = {
+    // string | key: id or schoolNumber of school
+    schoolId: 43b879c4-14c6-4e0a-9b3f-b1b33c5a4bd4,
+    // EducationUserReference | educationUser to be added as member
+    educationUserReference: ...,
+  } satisfies AddUserToSchoolRequest;
 
-const { status, data } = await apiInstance.addUserToSchool(
-    schoolId,
-    educationUserReference
-);
+  try {
+    const data = await api.addUserToSchool(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **educationUserReference** | **EducationUserReference**| educationUser to be added as member | |
-| **schoolId** | [**string**] | key: id or schoolNumber of school | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **schoolId** | `string` | key: id or schoolNumber of school | [Defaults to `undefined`] |
+| **educationUserReference** | [EducationUserReference](EducationUserReference.md) | educationUser to be added as member | |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -114,51 +151,69 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**204** | Success |  -  |
-|**0** | error |  -  |
+| **204** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **createSchool**
+
+## createSchool
+
 > EducationSchool createSchool(educationSchool)
 
+Add new school
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationSchoolApi,
-    Configuration,
-    EducationSchool
-} from './api';
+  Configuration,
+  EducationSchoolApi,
+} from '';
+import type { CreateSchoolRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationSchoolApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationSchoolApi(config);
 
-let educationSchool: EducationSchool; //New school
+  const body = {
+    // EducationSchool | New school
+    educationSchool: ...,
+  } satisfies CreateSchoolRequest;
 
-const { status, data } = await apiInstance.createSchool(
-    educationSchool
-);
+  try {
+    const data = await api.createSchool(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **educationSchool** | **EducationSchool**| New school | |
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **educationSchool** | [EducationSchool](EducationSchool.md) | New school | |
 
 ### Return type
 
-**EducationSchool**
+[**EducationSchool**](EducationSchool.md)
 
 ### Authorization
 
@@ -166,53 +221,72 @@ const { status, data } = await apiInstance.createSchool(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**201** | Created entity |  -  |
-|**0** | error |  -  |
+| **201** | Created entity |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **deleteClassFromSchool**
-> deleteClassFromSchool()
 
+## deleteClassFromSchool
+
+> deleteClassFromSchool(schoolId, classId)
+
+Unassign class from a school
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationSchoolApi,
-    Configuration
-} from './api';
+  Configuration,
+  EducationSchoolApi,
+} from '';
+import type { DeleteClassFromSchoolRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationSchoolApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationSchoolApi(config);
 
-let schoolId: string; //key: id or schoolNumber of school (default to undefined)
-let classId: string; //key: id or externalId of the class to unassign from school (default to undefined)
+  const body = {
+    // string | key: id or schoolNumber of school
+    schoolId: 43b879c4-14c6-4e0a-9b3f-b1b33c5a4bd4,
+    // string | key: id or externalId of the class to unassign from school
+    classId: 7e84a069-f374-479b-817d-71590117d443,
+  } satisfies DeleteClassFromSchoolRequest;
 
-const { status, data } = await apiInstance.deleteClassFromSchool(
-    schoolId,
-    classId
-);
+  try {
+    const data = await api.deleteClassFromSchool(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **schoolId** | [**string**] | key: id or schoolNumber of school | defaults to undefined|
-| **classId** | [**string**] | key: id or externalId of the class to unassign from school | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **schoolId** | `string` | key: id or schoolNumber of school | [Defaults to `undefined`] |
+| **classId** | `string` | key: id or externalId of the class to unassign from school | [Defaults to `undefined`] |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -220,51 +294,71 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**204** | Success |  -  |
-|**0** | error |  -  |
+| **204** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **deleteSchool**
-> deleteSchool()
+
+## deleteSchool
+
+> deleteSchool(schoolId)
+
+Delete school
 
 Deletes a school. A school can only be delete if it has the terminationDate property set. And if that termination Date is in the past.
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationSchoolApi,
-    Configuration
-} from './api';
+  Configuration,
+  EducationSchoolApi,
+} from '';
+import type { DeleteSchoolRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationSchoolApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationSchoolApi(config);
 
-let schoolId: string; //key: id or schoolNumber of school (default to undefined)
+  const body = {
+    // string | key: id or schoolNumber of school
+    schoolId: 43b879c4-14c6-4e0a-9b3f-b1b33c5a4bd4,
+  } satisfies DeleteSchoolRequest;
 
-const { status, data } = await apiInstance.deleteSchool(
-    schoolId
-);
+  try {
+    const data = await api.deleteSchool(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **schoolId** | [**string**] | key: id or schoolNumber of school | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **schoolId** | `string` | key: id or schoolNumber of school | [Defaults to `undefined`] |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -272,53 +366,72 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**204** | Success |  -  |
-|**0** | error |  -  |
+| **204** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **deleteUserFromSchool**
-> deleteUserFromSchool()
 
+## deleteUserFromSchool
+
+> deleteUserFromSchool(schoolId, userId)
+
+Unassign user from a school
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationSchoolApi,
-    Configuration
-} from './api';
+  Configuration,
+  EducationSchoolApi,
+} from '';
+import type { DeleteUserFromSchoolRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationSchoolApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationSchoolApi(config);
 
-let schoolId: string; //key: id or schoolNumber of school (default to undefined)
-let userId: string; //key: id or username of the user to unassign from school (default to undefined)
+  const body = {
+    // string | key: id or schoolNumber of school
+    schoolId: 43b879c4-14c6-4e0a-9b3f-b1b33c5a4bd4,
+    // string | key: id or username of the user to unassign from school
+    userId: 90eedea1-dea1-90ee-a1de-ee90a1deee90,
+  } satisfies DeleteUserFromSchoolRequest;
 
-const { status, data } = await apiInstance.deleteUserFromSchool(
-    schoolId,
-    userId
-);
+  try {
+    const data = await api.deleteUserFromSchool(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **schoolId** | [**string**] | key: id or schoolNumber of school | defaults to undefined|
-| **userId** | [**string**] | key: id or username of the user to unassign from school | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **schoolId** | `string` | key: id or schoolNumber of school | [Defaults to `undefined`] |
+| **userId** | `string` | key: id or username of the user to unassign from school | [Defaults to `undefined`] |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -326,50 +439,69 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**204** | Success |  -  |
-|**0** | error |  -  |
+| **204** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **getSchool**
-> EducationSchool getSchool()
 
+## getSchool
+
+> EducationSchool getSchool(schoolId)
+
+Get the properties of a specific school
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationSchoolApi,
-    Configuration
-} from './api';
+  Configuration,
+  EducationSchoolApi,
+} from '';
+import type { GetSchoolRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationSchoolApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationSchoolApi(config);
 
-let schoolId: string; //key: id or schoolNumber of school (default to undefined)
+  const body = {
+    // string | key: id or schoolNumber of school
+    schoolId: 43b879c4-14c6-4e0a-9b3f-b1b33c5a4bd4,
+  } satisfies GetSchoolRequest;
 
-const { status, data } = await apiInstance.getSchool(
-    schoolId
-);
+  try {
+    const data = await api.getSchool(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **schoolId** | [**string**] | key: id or schoolNumber of school | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **schoolId** | `string` | key: id or schoolNumber of school | [Defaults to `undefined`] |
 
 ### Return type
 
-**EducationSchool**
+[**EducationSchool**](EducationSchool.md)
 
 ### Authorization
 
@@ -377,50 +509,69 @@ const { status, data } = await apiInstance.getSchool(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Retrieved entity |  -  |
-|**0** | error |  -  |
+| **200** | Retrieved entity |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **listSchoolClasses**
-> CollectionOfEducationClass listSchoolClasses()
 
+## listSchoolClasses
+
+> CollectionOfEducationClass listSchoolClasses(schoolId)
+
+Get the educationClass resources owned by an educationSchool
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationSchoolApi,
-    Configuration
-} from './api';
+  Configuration,
+  EducationSchoolApi,
+} from '';
+import type { ListSchoolClassesRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationSchoolApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationSchoolApi(config);
 
-let schoolId: string; //key: id or schoolNumber of school (default to undefined)
+  const body = {
+    // string | key: id or schoolNumber of school
+    schoolId: 43b879c4-14c6-4e0a-9b3f-b1b33c5a4bd4,
+  } satisfies ListSchoolClassesRequest;
 
-const { status, data } = await apiInstance.listSchoolClasses(
-    schoolId
-);
+  try {
+    const data = await api.listSchoolClasses(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **schoolId** | [**string**] | key: id or schoolNumber of school | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **schoolId** | `string` | key: id or schoolNumber of school | [Defaults to `undefined`] |
 
 ### Return type
 
-**CollectionOfEducationClass**
+[**CollectionOfEducationClass**](CollectionOfEducationClass.md)
 
 ### Authorization
 
@@ -428,50 +579,69 @@ const { status, data } = await apiInstance.listSchoolClasses(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Retrieved classes |  -  |
-|**0** | error |  -  |
+| **200** | Retrieved classes |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **listSchoolUsers**
-> CollectionOfEducationUser listSchoolUsers()
 
+## listSchoolUsers
+
+> CollectionOfEducationUser listSchoolUsers(schoolId)
+
+Get the educationUser resources associated with an educationSchool
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationSchoolApi,
-    Configuration
-} from './api';
+  Configuration,
+  EducationSchoolApi,
+} from '';
+import type { ListSchoolUsersRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationSchoolApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationSchoolApi(config);
 
-let schoolId: string; //key: id or schoolNumber of school (default to undefined)
+  const body = {
+    // string | key: id or schoolNumber of school
+    schoolId: 43b879c4-14c6-4e0a-9b3f-b1b33c5a4bd4,
+  } satisfies ListSchoolUsersRequest;
 
-const { status, data } = await apiInstance.listSchoolUsers(
-    schoolId
-);
+  try {
+    const data = await api.listSchoolUsers(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **schoolId** | [**string**] | key: id or schoolNumber of school | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **schoolId** | `string` | key: id or schoolNumber of school | [Defaults to `undefined`] |
 
 ### Return type
 
-**CollectionOfEducationUser**
+[**CollectionOfEducationUser**](CollectionOfEducationUser.md)
 
 ### Authorization
 
@@ -479,43 +649,61 @@ const { status, data } = await apiInstance.listSchoolUsers(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Retrieved educationUser |  -  |
-|**0** | error |  -  |
+| **200** | Retrieved educationUser |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **listSchools**
+
+## listSchools
+
 > CollectionOfSchools listSchools()
 
+Get a list of schools and their properties
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationSchoolApi,
-    Configuration
-} from './api';
+  Configuration,
+  EducationSchoolApi,
+} from '';
+import type { ListSchoolsRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationSchoolApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationSchoolApi(config);
 
-const { status, data } = await apiInstance.listSchools();
+  try {
+    const data = await api.listSchools();
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
-This endpoint does not have any parameters.
 
+This endpoint does not need any parameter.
 
 ### Return type
 
-**CollectionOfSchools**
+[**CollectionOfSchools**](CollectionOfSchools.md)
 
 ### Authorization
 
@@ -523,54 +711,72 @@ This endpoint does not have any parameters.
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Retrieved entities |  -  |
-|**0** | error |  -  |
+| **200** | Retrieved entities |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **updateSchool**
-> EducationSchool updateSchool(educationSchool)
 
+## updateSchool
+
+> EducationSchool updateSchool(schoolId, educationSchool)
+
+Update properties of a school
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationSchoolApi,
-    Configuration,
-    EducationSchool
-} from './api';
+  Configuration,
+  EducationSchoolApi,
+} from '';
+import type { UpdateSchoolRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationSchoolApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationSchoolApi(config);
 
-let schoolId: string; //key: id or schoolNumber of school (default to undefined)
-let educationSchool: EducationSchool; //New property values
+  const body = {
+    // string | key: id or schoolNumber of school
+    schoolId: 43b879c4-14c6-4e0a-9b3f-b1b33c5a4bd4,
+    // EducationSchool | New property values
+    educationSchool: ...,
+  } satisfies UpdateSchoolRequest;
 
-const { status, data } = await apiInstance.updateSchool(
-    schoolId,
-    educationSchool
-);
+  try {
+    const data = await api.updateSchool(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
+
+| Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **educationSchool** | **EducationSchool**| New property values | |
-| **schoolId** | [**string**] | key: id or schoolNumber of school | defaults to undefined|
-
+| **schoolId** | `string` | key: id or schoolNumber of school | [Defaults to `undefined`] |
+| **educationSchool** | [EducationSchool](EducationSchool.md) | New property values | |
 
 ### Return type
 
-**EducationSchool**
+[**EducationSchool**](EducationSchool.md)
 
 ### Authorization
 
@@ -578,15 +784,15 @@ const { status, data } = await apiInstance.updateSchool(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Success |  -  |
-|**0** | error |  -  |
+| **200** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

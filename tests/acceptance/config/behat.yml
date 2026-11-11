@@ -469,6 +469,7 @@ default:
         - SharingNgContext:
         - CollaborationContext:
         - TrashbinContext:
+        - OcisConfigContext:
 
     apiServiceAvailability:
       paths:
@@ -496,6 +497,22 @@ default:
         - VaultContext:
         - OcisConfigContext:
         - CapabilitiesContext:
+        - SearchContext:
+        - TagContext:
+        - GraphContext:
+        - SpacesContext:
+        - SharingNgContext:
+        - OCSContext:
+
+    apiOidcAuth:
+      paths:
+        # runs with Keycloak (real OIDC tokens), which only the apiVault CI setup provides
+        - "%paths.base%/../features/apiOidcAuth"
+      context: *common_ldap_suite_context
+      contexts:
+        - FeatureContext: *common_feature_context_params
+        - VaultContext:
+        - OcisConfigContext:
 
     cliCommands:
       paths:

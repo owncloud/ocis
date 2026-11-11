@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
@@ -51,9 +52,8 @@ type GRPCConfig struct {
 }
 
 type AuthProviders struct {
-	LDAP        LDAPProvider        `yaml:"ldap"`
-	OwnCloudSQL OwnCloudSQLProvider `yaml:"owncloudsql"`
-	JSON        JSONProvider        `yaml:"json,omitempty"` // not supported by the oCIS product, therefore not part of docs
+	LDAP LDAPProvider `yaml:"ldap"`
+	JSON JSONProvider `yaml:"json,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
 
 type JSONProvider struct {
@@ -66,6 +66,9 @@ type LDAPProvider struct {
 	Insecure                 bool            `yaml:"insecure" env:"OCIS_LDAP_INSECURE;AUTH_BASIC_LDAP_INSECURE" desc:"Disable TLS certificate validation for the LDAP connections. Do not set this in production environments." introductionVersion:"pre5.0"`
 	BindDN                   string          `yaml:"bind_dn" env:"OCIS_LDAP_BIND_DN;AUTH_BASIC_LDAP_BIND_DN" desc:"LDAP DN to use for simple bind authentication with the target LDAP server." introductionVersion:"pre5.0"`
 	BindPassword             string          `yaml:"bind_password" env:"OCIS_LDAP_BIND_PASSWORD;AUTH_BASIC_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'." introductionVersion:"pre5.0"`
+	RetryMaxCount            int             `yaml:"retry_max_count"  env:"OCIS_LDAP_RETRY_MAX_COUNT;AUTH_BASIC_LDAP_RETRY_MAX_COUNT"   desc:"Maximum number of retries for failed LDAP operations. Applies to both read and write operations (with different retryable error sets). Default 1." introductionVersion:"8.2.0"`
+	RetryBaseDelay           time.Duration   `yaml:"retry_base_delay" env:"OCIS_LDAP_RETRY_BASE_DELAY;AUTH_BASIC_LDAP_RETRY_BASE_DELAY" desc:"Base delay for exponential backoff between LDAP retries (e.g. '100ms'). Set to 0 to disable backoff." introductionVersion:"8.2.0"`
+	RetryMaxDelay            time.Duration   `yaml:"retry_max_delay"  env:"OCIS_LDAP_RETRY_MAX_DELAY;AUTH_BASIC_LDAP_RETRY_MAX_DELAY"   desc:"Maximum delay cap for exponential backoff between LDAP retries (e.g. '5s'). 0 (default) uses the library default cap of 60s." introductionVersion:"8.2.0"`
 	UserBaseDN               string          `yaml:"user_base_dn" env:"OCIS_LDAP_USER_BASE_DN;AUTH_BASIC_LDAP_USER_BASE_DN" desc:"Search base DN for looking up LDAP users." introductionVersion:"pre5.0"`
 	GroupBaseDN              string          `yaml:"group_base_dn" env:"OCIS_LDAP_GROUP_BASE_DN;AUTH_BASIC_LDAP_GROUP_BASE_DN" desc:"Search base DN for looking up LDAP groups." introductionVersion:"pre5.0"`
 	UserScope                string          `yaml:"user_scope" env:"OCIS_LDAP_USER_SCOPE;AUTH_BASIC_LDAP_USER_SCOPE" desc:"LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'." introductionVersion:"pre5.0"`
@@ -78,11 +81,15 @@ type LDAPProvider struct {
 	IDP                      string          `yaml:"idp" env:"OCIS_URL;OCIS_OIDC_ISSUER;AUTH_BASIC_IDP_URL" desc:"The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider." introductionVersion:"pre5.0"`
 	DisableUserMechanism     string          `yaml:"disable_user_mechanism" env:"OCIS_LDAP_DISABLE_USER_MECHANISM;AUTH_BASIC_DISABLE_USER_MECHANISM" desc:"An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed." introductionVersion:"pre5.0"`
 	LdapDisabledUsersGroupDN string          `yaml:"ldap_disabled_users_group_dn" env:"OCIS_LDAP_DISABLED_USERS_GROUP_DN;AUTH_BASIC_DISABLED_USERS_GROUP_DN" desc:"The distinguished name of the group to which added users will be classified as disabled when 'disable_user_mechanism' is set to 'group'." introductionVersion:"pre5.0"`
-	MasterID                 string          `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master instance ID for multi-instance setups. When set, LDAP user filters are enhanced to also match users belonging to the master instance." introductionVersion:"7.0"`
+	MasterID                 string          `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master instance ID for multi-instance setups. When set, LDAP user filters are enhanced to also match users belonging to the master instance. Also set 'user_filter'. Without an explicit 'user_filter', this instance allows login for every user in the shared LDAP directory." introductionVersion:"7.0"`
 	UserMemberAttribute      string          `yaml:"user_member_attribute" env:"OCIS_LDAP_USER_MEMBER_ATTRIBUTE" desc:"LDAP attribute that marks a user as a member of an instance." introductionVersion:"7.0"`
 	UserGuestAttribute       string          `yaml:"user_guest_attribute" env:"OCIS_LDAP_USER_GUEST_ATTRIBUTE" desc:"LDAP attribute that marks a user as a guest of an instance." introductionVersion:"7.0"`
 	UserSchema               LDAPUserSchema  `yaml:"user_schema"`
 	GroupSchema              LDAPGroupSchema `yaml:"group_schema"`
+
+	PoolEnabled         bool          `yaml:"pool_enabled" env:"OCIS_LDAP_POOL_ENABLED;AUTH_BASIC_LDAP_POOL_ENABLED" desc:"Enable a bounded pool of LDAP connections instead of a single long-lived reconnecting connection. Concurrent requests then no longer serialize on one connection." introductionVersion:"8.2.0"`
+	PoolSize            int           `yaml:"pool_size" env:"OCIS_LDAP_POOL_SIZE;AUTH_BASIC_LDAP_POOL_SIZE" desc:"Maximum number of concurrently open LDAP connections when 'OCIS_LDAP_POOL_ENABLED' is 'true'. Defaults to 5 when unset or <= 0." introductionVersion:"8.2.0"`
+	PoolCheckoutTimeout time.Duration `yaml:"pool_checkout_timeout" env:"OCIS_LDAP_POOL_CHECKOUT_TIMEOUT;AUTH_BASIC_LDAP_POOL_CHECKOUT_TIMEOUT" desc:"Maximum time to wait for a pooled LDAP connection to become available once the pool is exhausted. Defaults to 30s when unset or <= 0. See the Environment Variable Types description for more details." introductionVersion:"8.2.0"`
 }
 
 type LDAPUserSchema struct {
@@ -101,16 +108,4 @@ type LDAPGroupSchema struct {
 	DisplayName     string `yaml:"display_name" env:"OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME;AUTH_BASIC_LDAP_GROUP_SCHEMA_DISPLAYNAME" desc:"LDAP Attribute to use for the displayname of groups (often the same as groupname attribute)." introductionVersion:"pre5.0"`
 	Groupname       string `yaml:"group_name" env:"OCIS_LDAP_GROUP_SCHEMA_GROUPNAME;AUTH_BASIC_LDAP_GROUP_SCHEMA_GROUPNAME" desc:"LDAP Attribute to use for the name of groups." introductionVersion:"pre5.0"`
 	Member          string `yaml:"member" env:"OCIS_LDAP_GROUP_SCHEMA_MEMBER;AUTH_BASIC_LDAP_GROUP_SCHEMA_MEMBER" desc:"LDAP Attribute that is used for group members." introductionVersion:"pre5.0"`
-}
-
-type OwnCloudSQLProvider struct {
-	DBUsername       string `yaml:"db_username" env:"AUTH_BASIC_OWNCLOUDSQL_DB_USERNAME" desc:"Database user to use for authenticating with the owncloud database." introductionVersion:"pre5.0"`
-	DBPassword       string `yaml:"db_password" env:"AUTH_BASIC_OWNCLOUDSQL_DB_PASSWORD" desc:"Password for the database user." introductionVersion:"pre5.0"`
-	DBHost           string `yaml:"db_host" env:"AUTH_BASIC_OWNCLOUDSQL_DB_HOST" desc:"Hostname of the database server." introductionVersion:"pre5.0"`
-	DBPort           int    `yaml:"db_port" env:"AUTH_BASIC_OWNCLOUDSQL_DB_PORT" desc:"Network port to use for the database connection." introductionVersion:"pre5.0"`
-	DBName           string `yaml:"db_name" env:"AUTH_BASIC_OWNCLOUDSQL_DB_NAME" desc:"Name of the owncloud database." introductionVersion:"pre5.0"`
-	IDP              string `yaml:"idp" env:"AUTH_BASIC_OWNCLOUDSQL_IDP" desc:"The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider." introductionVersion:"pre5.0"`
-	Nobody           int64  `yaml:"nobody" env:"AUTH_BASIC_OWNCLOUDSQL_NOBODY" desc:"Fallback number if no numeric UID and GID properties are provided." introductionVersion:"pre5.0"`
-	JoinUsername     bool   `yaml:"join_username" env:"AUTH_BASIC_OWNCLOUDSQL_JOIN_USERNAME" desc:"Join the user properties table to read usernames" introductionVersion:"pre5.0"`
-	JoinOwnCloudUUID bool   `yaml:"join_owncloud_uuid" env:"AUTH_BASIC_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID" desc:"Join the user properties table to read user ID's." introductionVersion:"pre5.0"`
 }

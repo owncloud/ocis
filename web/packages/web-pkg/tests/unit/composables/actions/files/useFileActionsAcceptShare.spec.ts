@@ -6,8 +6,7 @@ import {
   defaultComponentMocks,
   getComposableWrapper,
   RouteLocation
-} from '@ownclouders/web-test-helpers'
-
+} from '../../../../../src/testing'
 const sharesWithMeLocation = 'files-shares-with-me'
 const sharesWithOthersLocation = 'files-shares-with-others'
 

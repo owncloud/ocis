@@ -37,8 +37,7 @@ export const useGroupActionsDelete = () => {
               '%{groupCount} group was deleted successfully',
               '%{groupCount} groups were deleted successfully',
               succeeded.length,
-              { groupCount: succeeded.length.toString() },
-              true
+              { groupCount: succeeded.length.toString() }
             )
       showMessage({ title })
     }
@@ -54,8 +53,7 @@ export const useGroupActionsDelete = () => {
               'Failed to delete %{groupCount} group',
               'Failed to delete %{groupCount} groups',
               failed.length,
-              { groupCount: failed.length.toString() },
-              true
+              { groupCount: failed.length.toString() }
             )
       showErrorMessage({
         title,

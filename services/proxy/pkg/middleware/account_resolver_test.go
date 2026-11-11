@@ -25,7 +25,7 @@ func TestTokenIsAddedWithMailClaim(t *testing.T) {
 		Mail: "foo@example.com",
 	}, nil, oidc.Email, "mail")
 
-	req, rw := mockRequest(map[string]interface{}{
+	req, rw := mockRequest(map[string]any{
 		oidc.Iss:   "https://idx.example.com",
 		oidc.Email: "foo@example.com",
 	})
@@ -43,7 +43,7 @@ func TestTokenIsAddedWithUsernameClaim(t *testing.T) {
 		Mail: "foo@example.com",
 	}, nil, oidc.PreferredUsername, "username")
 
-	req, rw := mockRequest(map[string]interface{}{
+	req, rw := mockRequest(map[string]any{
 		oidc.Iss:               "https://idx.example.com",
 		oidc.PreferredUsername: "foo",
 	})
@@ -63,9 +63,9 @@ func TestTokenIsAddedWithDotUsernamePathClaim(t *testing.T) {
 	}, nil, "li.un", "username")
 
 	// This is how lico adds the username to the access token
-	req, rw := mockRequest(map[string]interface{}{
+	req, rw := mockRequest(map[string]any{
 		oidc.Iss: "https://idx.example.com",
-		"li": map[string]interface{}{
+		"li": map[string]any{
 			"un": "foo",
 		},
 	})
@@ -85,7 +85,7 @@ func TestTokenIsAddedWithDotEscapedUsernameClaim(t *testing.T) {
 	}, nil, "li\\.un", "username")
 
 	// This tests the . escaping of the readUserIDClaim
-	req, rw := mockRequest(map[string]interface{}{
+	req, rw := mockRequest(map[string]any{
 		oidc.Iss: "https://idx.example.com",
 		"li.un":  "foo",
 	})
@@ -105,7 +105,7 @@ func TestTokenIsAddedWithDottedUsernameClaimFallback(t *testing.T) {
 	}, nil, "li.un", "username")
 
 	// This tests the . escaping fallback of the readUserIDClaim
-	req, rw := mockRequest(map[string]interface{}{
+	req, rw := mockRequest(map[string]any{
 		oidc.Iss: "https://idx.example.com",
 		"li.un":  "foo",
 	})
@@ -131,7 +131,7 @@ func TestNSkipOnNoClaims(t *testing.T) {
 
 func TestUnauthorizedOnUserNotFound(t *testing.T) {
 	sut := newMockAccountResolver(nil, backend.ErrAccountNotFound, oidc.PreferredUsername, "username")
-	req, rw := mockRequest(map[string]interface{}{
+	req, rw := mockRequest(map[string]any{
 		oidc.Iss:               "https://idx.example.com",
 		oidc.PreferredUsername: "foo",
 	})
@@ -145,7 +145,7 @@ func TestUnauthorizedOnUserNotFound(t *testing.T) {
 
 func TestUnauthorizedOnUserDisabled(t *testing.T) {
 	sut := newMockAccountResolver(nil, backend.ErrAccountDisabled, oidc.PreferredUsername, "username")
-	req, rw := mockRequest(map[string]interface{}{
+	req, rw := mockRequest(map[string]any{
 		oidc.Iss:               "https://idx.example.com",
 		oidc.PreferredUsername: "foo",
 	})
@@ -159,7 +159,7 @@ func TestUnauthorizedOnUserDisabled(t *testing.T) {
 
 func TestInternalServerErrorOnMissingMailAndUsername(t *testing.T) {
 	sut := newMockAccountResolver(nil, backend.ErrAccountNotFound, oidc.Email, "mail")
-	req, rw := mockRequest(map[string]interface{}{
+	req, rw := mockRequest(map[string]any{
 		oidc.Iss: "https://idx.example.com",
 	})
 
@@ -171,7 +171,7 @@ func TestInternalServerErrorOnMissingMailAndUsername(t *testing.T) {
 }
 
 func newMockAccountResolver(userBackendResult *userv1beta1.User, userBackendErr error, oidcclaim, cs3claim string) http.Handler {
-	tokenManager, _ := jwt.New(map[string]interface{}{
+	tokenManager, _ := jwt.New(map[string]any{
 		"secret":  "change-me",
 		"expires": int64(60),
 	})
@@ -280,7 +280,7 @@ func TestReadClaim(t *testing.T) {
 
 }
 
-func mockRequest(claims map[string]interface{}) (*http.Request, *httptest.ResponseRecorder) {
+func mockRequest(claims map[string]any) (*http.Request, *httptest.ResponseRecorder) {
 	if claims == nil {
 		return httptest.NewRequest("GET", "http://example.com/foo", nil), httptest.NewRecorder()
 	}
@@ -304,16 +304,16 @@ func TestResolveUserType(t *testing.T) {
 	)
 
 	testCases := []struct {
-		name           string
-		multiInstance  bool
-		instanceID     string
-		masterID       string
-		memberClaim    string
-		guestClaim     string
-		claims         map[string]interface{}
-		expectMember   bool
-		expectGuest    bool
-		description    string
+		name          string
+		multiInstance bool
+		instanceID    string
+		masterID      string
+		memberClaim   string
+		guestClaim    string
+		claims        map[string]any
+		expectMember  bool
+		expectGuest   bool
+		description   string
 	}{
 		{
 			name:          "single instance mode - always member",
@@ -322,7 +322,7 @@ func TestResolveUserType(t *testing.T) {
 			masterID:      "",
 			memberClaim:   "owncloudMemberOf",
 			guestClaim:    "owncloudGuestOf",
-			claims:        map[string]interface{}{},
+			claims:        map[string]any{},
 			expectMember:  true,
 			expectGuest:   false,
 			description:   "In single instance mode, any user should be considered a member",
@@ -334,7 +334,7 @@ func TestResolveUserType(t *testing.T) {
 			masterID:      "",
 			memberClaim:   "owncloudMemberOf",
 			guestClaim:    "owncloudGuestOf",
-			claims: map[string]interface{}{
+			claims: map[string]any{
 				"owncloudMemberOf": instanceID1,
 			},
 			expectMember: true,
@@ -348,7 +348,7 @@ func TestResolveUserType(t *testing.T) {
 			masterID:      "",
 			memberClaim:   "owncloudMemberOf",
 			guestClaim:    "owncloudGuestOf",
-			claims: map[string]interface{}{
+			claims: map[string]any{
 				"owncloudGuestOf": instanceID1,
 			},
 			expectMember: false,
@@ -362,7 +362,7 @@ func TestResolveUserType(t *testing.T) {
 			masterID:      "",
 			memberClaim:   "owncloudMemberOf",
 			guestClaim:    "owncloudGuestOf",
-			claims: map[string]interface{}{
+			claims: map[string]any{
 				"owncloudMemberOf": instanceID2,
 			},
 			expectMember: false,
@@ -376,7 +376,7 @@ func TestResolveUserType(t *testing.T) {
 			masterID:      masterID,
 			memberClaim:   "owncloudMemberOf",
 			guestClaim:    "owncloudGuestOf",
-			claims: map[string]interface{}{
+			claims: map[string]any{
 				"owncloudMemberOf": masterID,
 			},
 			expectMember: true,
@@ -390,7 +390,7 @@ func TestResolveUserType(t *testing.T) {
 			masterID:      "", // Empty = disabled
 			memberClaim:   "owncloudMemberOf",
 			guestClaim:    "owncloudGuestOf",
-			claims: map[string]interface{}{
+			claims: map[string]any{
 				"owncloudMemberOf": masterID,
 			},
 			expectMember: false,
@@ -404,7 +404,7 @@ func TestResolveUserType(t *testing.T) {
 			masterID:      masterID,
 			memberClaim:   "owncloudMemberOf",
 			guestClaim:    "owncloudGuestOf",
-			claims: map[string]interface{}{
+			claims: map[string]any{
 				"owncloudMemberOf": []string{masterID, instanceID1},
 			},
 			expectMember: true,
@@ -418,7 +418,7 @@ func TestResolveUserType(t *testing.T) {
 			masterID:      masterID,
 			memberClaim:   "owncloudMemberOf",
 			guestClaim:    "owncloudGuestOf",
-			claims: map[string]interface{}{
+			claims: map[string]any{
 				"owncloudMemberOf": []string{instanceID2, masterID, "other-id"},
 			},
 			expectMember: true,
@@ -432,7 +432,7 @@ func TestResolveUserType(t *testing.T) {
 			masterID:      masterID,
 			memberClaim:   "owncloudMemberOf",
 			guestClaim:    "owncloudGuestOf",
-			claims: map[string]interface{}{
+			claims: map[string]any{
 				"owncloudMemberOf": masterID,
 			},
 			expectMember: true,
@@ -446,7 +446,7 @@ func TestResolveUserType(t *testing.T) {
 			masterID:      masterID,
 			memberClaim:   "owncloudMemberOf",
 			guestClaim:    "owncloudGuestOf",
-			claims: map[string]interface{}{
+			claims: map[string]any{
 				"owncloudMemberOf": "",
 			},
 			expectMember: false,
@@ -471,4 +471,36 @@ func TestResolveUserType(t *testing.T) {
 			assert.Equal(t, tc.expectGuest, isGuest, "isGuest mismatch: %s", tc.description)
 		})
 	}
+}
+
+// TestVerifyUserUnauthorizedOnUserNotFound covers the verifyUser fast path
+// (user already in context, e.g. via AppAuthAuthenticator/BasicAuthenticator),
+// as opposed to TestUnauthorizedOnUserNotFound which covers the claims-based
+// resolveUserFromClaims path. A disabled account is looked up by username and
+// comes back as ErrAccountNotFound (the identity backend excludes disabled
+// accounts from by-claim lookups), which must map to 401, not 500.
+func TestVerifyUserUnauthorizedOnUserNotFound(t *testing.T) {
+	user := &userv1beta1.User{
+		Id:       &userv1beta1.UserId{Idp: "https://idx.example.com", OpaqueId: "123"},
+		Username: "alice",
+	}
+
+	ub := mocks.UserBackend{}
+	ub.On("GetUserByClaims", mock.Anything, "username", "alice").Return(nil, "", backend.ErrAccountNotFound)
+
+	ra := userRoleMocks.UserRoleAssigner{}
+
+	sut := AccountResolver(
+		Logger(log.NewLogger()),
+		UserProvider(&ub),
+		UserRoleAssigner(&ra),
+	)(mockHandler{})
+
+	req := httptest.NewRequest("GET", "http://example.com/foo", nil)
+	req = req.WithContext(revactx.ContextSetUser(context.Background(), user))
+	rw := httptest.NewRecorder()
+
+	sut.ServeHTTP(rw, req)
+
+	assert.Equal(t, http.StatusUnauthorized, rw.Code)
 }

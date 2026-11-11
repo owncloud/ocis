@@ -29,6 +29,8 @@ import {
 import { storeToRefs } from 'pinia'
 import { useDeleteWorker } from '../../webWorkers'
 import { captureException } from '@sentry/vue'
+import { useResolveRestorableResources } from './useResolveRestorableResources'
+import { useFileActionsRestore } from '../files/useFileActionsRestore'
 
 export const useFileActionsDeleteResources = () => {
   const configStore = useConfigStore()
@@ -39,11 +41,13 @@ export const useFileActionsDeleteResources = () => {
   const { $gettext, $ngettext } = language
   const clientService = useClientService()
   const { dispatchModal } = useModals()
-  const { personalSpace, updateSpaceField, getSpacesByName } = useSpacesStore()
+  const { personalSpace, updateSpaceUsage, getSpacesByName } = useSpacesStore()
   const sharesStore = useSharesStore()
   const { startWorker } = useDeleteWorker({
     concurrentRequests: configStore.options.concurrentRequests.resourceBatchActions
   })
+  const { resolveRestorableResources } = useResolveRestorableResources()
+  const { handler: restoreHandler } = useFileActionsRestore()
 
   const resourcesStore = useResourcesStore()
   const { currentFolder } = storeToRefs(resourcesStore)
@@ -71,21 +75,13 @@ export const useFileActionsDeleteResources = () => {
 
     if (currentResources.length === 1) {
       if (isFolder) {
-        title = $gettext(
-          'Permanently delete folder "%{name}"',
-          {
-            name: currentResources[0].name
-          },
-          true
-        )
+        title = $gettext('Permanently delete folder "%{name}"', {
+          name: currentResources[0].name
+        })
       } else {
-        title = $gettext(
-          'Permanently delete file "%{name}"',
-          {
-            name: currentResources[0].name
-          },
-          true
-        )
+        title = $gettext('Permanently delete file "%{name}"', {
+          name: currentResources[0].name
+        })
       }
       return title
     }
@@ -94,8 +90,7 @@ export const useFileActionsDeleteResources = () => {
       'Permanently delete selected resource?',
       'Permanently delete %{amount} selected resources?',
       currentResources.length,
-      { amount: currentResources.length.toString() },
-      false
+      { amount: currentResources.length.toString() }
     )
   })
 
@@ -133,8 +128,7 @@ export const useFileActionsDeleteResources = () => {
                   '%{itemCount} item was deleted successfully',
                   '%{itemCount} items were deleted successfully',
                   successful.length,
-                  { itemCount: successful.length.toString() },
-                  true
+                  { itemCount: successful.length.toString() }
                 )
 
           messageStore.showMessage({ title })
@@ -298,11 +292,35 @@ export const useFileActionsDeleteResources = () => {
                       '%{itemCount} item was moved to trash bin',
                       '%{itemCount} items were moved to trash bin',
                       successful.length,
-                      { itemCount: successful.length.toString() },
-                      true
+                      { itemCount: successful.length.toString() }
                     )
 
-              messageStore.showMessage({ title })
+              const restorableResources = await resolveRestorableResources(
+                spaceForDeletion,
+                successful
+              )
+
+              messageStore.showMessage({
+                title,
+                ...(restorableResources && {
+                  timeout: 5,
+                  actions: [
+                    {
+                      label: $gettext('Undo'),
+                      ariaLabel:
+                        restorableResources.length === 1
+                          ? $gettext('Undo delete of "%{item}"', {
+                              item: restorableResources[0].name
+                            })
+                          : $gettext('Undo delete of %{itemCount} items', {
+                              itemCount: restorableResources.length.toString()
+                            }),
+                      onClick: () =>
+                        restoreHandler({ space: spaceForDeletion, resources: restorableResources })
+                    }
+                  ]
+                })
+              })
             }
 
             resourcesStore.removeResourcesFromDeleteQueue(failed.map(({ resource }) => resource.id))
@@ -341,11 +359,7 @@ export const useFileActionsDeleteResources = () => {
                 unref(resources)[0].storageId,
                 sharesStore.graphRoles
               )
-              updateSpaceField({
-                id: updatedSpace.id,
-                field: 'spaceQuota',
-                value: updatedSpace.spaceQuota
-              })
+              updateSpaceUsage(updatedSpace)
             }
 
             if (

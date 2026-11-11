@@ -131,7 +131,7 @@ func DecompileFilter(packet *ber.Packet) (_ string, err error) {
 		buf.WriteString(childStr)
 
 	case FilterSubstrings:
-		buf.WriteString(ber.DecodeString(packet.Children[0].Data.Bytes()))
+		buf.WriteString(EscapeFilter(ber.DecodeString(packet.Children[0].Data.Bytes())))
 		buf.WriteByte('=')
 		for i, child := range packet.Children[1].Children {
 			if i == 0 && child.Tag != FilterSubstringsInitial {
@@ -143,22 +143,22 @@ func DecompileFilter(packet *ber.Packet) (_ string, err error) {
 			}
 		}
 	case FilterEqualityMatch:
-		buf.WriteString(ber.DecodeString(packet.Children[0].Data.Bytes()))
+		buf.WriteString(EscapeFilter(ber.DecodeString(packet.Children[0].Data.Bytes())))
 		buf.WriteByte('=')
 		buf.WriteString(EscapeFilter(ber.DecodeString(packet.Children[1].Data.Bytes())))
 	case FilterGreaterOrEqual:
-		buf.WriteString(ber.DecodeString(packet.Children[0].Data.Bytes()))
+		buf.WriteString(EscapeFilter(ber.DecodeString(packet.Children[0].Data.Bytes())))
 		buf.WriteString(">=")
 		buf.WriteString(EscapeFilter(ber.DecodeString(packet.Children[1].Data.Bytes())))
 	case FilterLessOrEqual:
-		buf.WriteString(ber.DecodeString(packet.Children[0].Data.Bytes()))
+		buf.WriteString(EscapeFilter(ber.DecodeString(packet.Children[0].Data.Bytes())))
 		buf.WriteString("<=")
 		buf.WriteString(EscapeFilter(ber.DecodeString(packet.Children[1].Data.Bytes())))
 	case FilterPresent:
-		buf.WriteString(ber.DecodeString(packet.Data.Bytes()))
+		buf.WriteString(EscapeFilter(ber.DecodeString(packet.Data.Bytes())))
 		buf.WriteString("=*")
 	case FilterApproxMatch:
-		buf.WriteString(ber.DecodeString(packet.Children[0].Data.Bytes()))
+		buf.WriteString(EscapeFilter(ber.DecodeString(packet.Children[0].Data.Bytes())))
 		buf.WriteString("~=")
 		buf.WriteString(EscapeFilter(ber.DecodeString(packet.Children[1].Data.Bytes())))
 	case FilterExtensibleMatch:
@@ -181,14 +181,14 @@ func DecompileFilter(packet *ber.Packet) (_ string, err error) {
 		}
 
 		if len(attr) > 0 {
-			buf.WriteString(attr)
+			buf.WriteString(EscapeFilter(attr))
 		}
 		if dnAttributes {
 			buf.WriteString(":dn")
 		}
 		if len(matchingRule) > 0 {
 			buf.WriteString(":")
-			buf.WriteString(matchingRule)
+			buf.WriteString(EscapeFilter(matchingRule))
 		}
 		buf.WriteString(":=")
 		buf.WriteString(EscapeFilter(value))
@@ -208,8 +208,11 @@ func compileFilterSet(filter string, pos int, parent *ber.Packet) (int, error) {
 		pos = newPos
 		parent.AppendChild(child)
 	}
-	if pos == len(filter) {
+	if pos >= len(filter) {
 		return pos, NewError(ErrorFilterCompile, errors.New("ldap: unexpected end of filter"))
+	}
+	if filter[pos] != ')' {
+		return pos, NewError(ErrorFilterCompile, fmt.Errorf("ldap: expected ')' at position %d", pos))
 	}
 
 	return pos + 1, nil
@@ -235,8 +238,17 @@ func compileFilter(filter string, pos int) (*ber.Packet, int, error) {
 		return nil, 0, NewError(ErrorFilterCompile, fmt.Errorf("ldap: error reading rune at position %d", newPos))
 	case '(':
 		packet, newPos, err = compileFilter(filter, pos+currentWidth)
+		if err != nil {
+			return nil, newPos, err
+		}
+		if newPos >= len(filter) {
+			return nil, newPos, NewError(ErrorFilterCompile, errors.New("ldap: unexpected end of filter"))
+		}
+		if filter[newPos] != ')' {
+			return nil, newPos, NewError(ErrorFilterCompile, fmt.Errorf("ldap: expected ')' at position %d", newPos))
+		}
 		newPos++
-		return packet, newPos, err
+		return packet, newPos, nil
 	case '&':
 		packet = ber.Encode(ber.ClassContext, ber.TypeConstructed, FilterAnd, nil, FilterMap[FilterAnd])
 		newPos, err = compileFilterSet(filter, pos+currentWidth, packet)
@@ -249,8 +261,11 @@ func compileFilter(filter string, pos int) (*ber.Packet, int, error) {
 		packet = ber.Encode(ber.ClassContext, ber.TypeConstructed, FilterNot, nil, FilterMap[FilterNot])
 		var child *ber.Packet
 		child, newPos, err = compileFilter(filter, pos+currentWidth)
+		if err != nil {
+			return nil, newPos, err
+		}
 		packet.AppendChild(child)
-		return packet, newPos, err
+		return packet, newPos, nil
 	default:
 		const (
 			stateReadingAttr                   = 0

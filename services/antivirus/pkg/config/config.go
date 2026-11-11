@@ -58,6 +58,8 @@ type Events struct {
 	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;ANTIVIRUS_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"pre5.0"`
 	AuthUsername         string `yaml:"username" env:"OCIS_EVENTS_AUTH_USERNAME;ANTIVIRUS_EVENTS_AUTH_USERNAME" desc:"The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
 	AuthPassword         string `yaml:"password" env:"OCIS_EVENTS_AUTH_PASSWORD;ANTIVIRUS_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
+	CredsFile            string `yaml:"creds_file" env:"OCIS_NATS_CREDS_FILE;ANTIVIRUS_EVENTS_CREDS_FILE" desc:"Path to a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate with the events broker when NATS runs in JWT (operator) mode. When set, the service does not use the username and the password. Exception: a service-specific username and password take precedence over the global OCIS_NATS_CREDS and OCIS_NATS_CREDS_FILE variables when both have a value. The service reads the file again on each reconnect." introductionVersion:"9.0.0"`
+	Creds                string `mask:"password" yaml:"creds" env:"OCIS_NATS_CREDS;ANTIVIRUS_EVENTS_CREDS" desc:"Content of a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate with the events broker when NATS runs in JWT (operator) mode. A service-specific variable takes precedence over a global variable. In the same scope, the content takes precedence over the path of a .creds file. When set, the service does not use the username and the password. Exception: a service-specific username and password take precedence over the global OCIS_NATS_CREDS and OCIS_NATS_CREDS_FILE variables when both have a value." introductionVersion:"9.0.0"`
 }
 
 // Scanner provides configuration options for the virus scanner
@@ -70,7 +72,8 @@ type Scanner struct {
 
 // ClamAV provides configuration option for clamav
 type ClamAV struct {
-	Socket string `yaml:"socket" env:"ANTIVIRUS_CLAMAV_SOCKET" desc:"The socket clamav is running on. Note the default value is an example which needs adaption according your OS." introductionVersion:"pre5.0"`
+	Socket  string        `yaml:"socket" env:"ANTIVIRUS_CLAMAV_SOCKET" desc:"The socket clamav is running on. Note the default value is an example which needs adaption according your OS." introductionVersion:"pre5.0"`
+	Timeout time.Duration `yaml:"scan_timeout" env:"ANTIVIRUS_CLAMAV_SCAN_TIMEOUT" desc:"Scan timeout for the ClamAV client. Defaults to '5m' (5 minutes). After the timeout, the scan attempt fails and postprocessing retries it with backoff. See the Environment Variable Types description for more details." introductionVersion:"9.0.0"`
 }
 
 // ICAP provides configuration options for icap

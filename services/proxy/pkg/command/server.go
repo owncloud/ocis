@@ -77,6 +77,8 @@ func Server(cfg *config.Config) *cli.Command {
 				microstore.Table(cfg.OIDC.UserinfoCache.Table),
 				store.DisablePersistence(cfg.OIDC.UserinfoCache.DisablePersistence),
 				store.Authentication(cfg.OIDC.UserinfoCache.AuthUsername, cfg.OIDC.UserinfoCache.AuthPassword),
+				store.Credentials(cfg.OIDC.UserinfoCache.CredsFile, cfg.OIDC.UserinfoCache.Creds),
+				store.TLS(cfg.OIDC.UserinfoCache.EnableTLS, cfg.OIDC.UserinfoCache.TLSInsecure, cfg.OIDC.UserinfoCache.TLSRootCACertificate),
 			)
 
 			signingKeyStore := store.Create(
@@ -86,11 +88,14 @@ func Server(cfg *config.Config) *cli.Command {
 				microstore.Database("proxy"),
 				microstore.Table("signing-keys"),
 				store.Authentication(cfg.PreSignedURL.SigningKeys.AuthUsername, cfg.PreSignedURL.SigningKeys.AuthPassword),
+				store.Credentials(cfg.PreSignedURL.SigningKeys.CredsFile, cfg.PreSignedURL.SigningKeys.Creds),
+				store.TLS(cfg.PreSignedURL.SigningKeys.EnableTLS, cfg.PreSignedURL.SigningKeys.TLSInsecure, cfg.PreSignedURL.SigningKeys.TLSRootCACertificate),
 			)
 
 			cfg.GrpcClient, err = grpc.NewClient(
 				append(
 					grpc.GetClientOptions(cfg.GRPCClientTLS),
+					grpc.WithKeepaliveParams(cfg.GRPCClientOptions),
 					grpc.WithTraceProvider(traceProvider))...)
 			if err != nil {
 				return err
@@ -98,6 +103,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			oidcHTTPClient := &http.Client{
 				Transport: &http.Transport{
+					Proxy: http.ProxyFromEnvironment,
 					TLSClientConfig: &tls.Config{
 						MinVersion:         tls.VersionTLS12,
 						InsecureSkipVerify: cfg.OIDC.Insecure, //nolint:gosec
@@ -109,6 +115,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			oidcClient := oidc.NewOIDCClient(
 				oidc.WithAccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
+				oidc.WithAccessTokenVerifyAudiences(cfg.OIDC.AccessTokenVerifyAud),
 				oidc.WithLogger(logger),
 				oidc.WithHTTPClient(oidcHTTPClient),
 				oidc.WithOidcIssuer(cfg.OIDC.Issuer),
@@ -246,6 +253,11 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", cfg.GrpcClient)
 	policiesProviderClient := policiessvc.NewPoliciesProviderService("com.owncloud.api.policies", cfg.GrpcClient)
 
+	guestRoleMapping, err := userroles.GuestRoleMapping(cfg)
+	if err != nil {
+		logger.Fatal().Err(err).Msg("Invalid guest role mapping")
+	}
+
 	var roleAssigner userroles.UserRoleAssigner
 	switch cfg.RoleAssignment.Driver {
 	case "default":
@@ -259,6 +271,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			userroles.WithLogger(logger),
 			userroles.WithRolesClaim(cfg.RoleAssignment.OIDCRoleMapper.RoleClaim),
 			userroles.WithRoleMapping(cfg.RoleAssignment.OIDCRoleMapper.RolesMap),
+			userroles.WithGuestRoleMapping(guestRoleMapping),
 			userroles.WithRevaGatewaySelector(gatewaySelector),
 			userroles.WithServiceAccount(cfg.ServiceAccount),
 		)
@@ -268,6 +281,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 
 	oidcHTTPClient := &http.Client{
 		Transport: &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
 			TLSClientConfig: &tls.Config{
 				MinVersion:         tls.VersionTLS12,
 				InsecureSkipVerify: cfg.OIDC.Insecure, //nolint:gosec
@@ -281,15 +295,19 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 	if cfg.EnableBasicAuth {
 		logger.Warn().Msg("basic auth enabled, use only for testing or development")
 		authenticators = append(authenticators, middleware.BasicAuthenticator{
-			Logger:       logger,
-			UserProvider: userProvider,
+			Logger:               logger,
+			UserProvider:         userProvider,
+			UserRoleAssigner:     roleAssigner,
+			MultiInstanceEnabled: cfg.MultiInstance.Enabled,
 		})
 	}
 
 	if cfg.AuthMiddleware.AllowAppAuth {
 		authenticators = append(authenticators, middleware.AppAuthAuthenticator{
-			Logger:              logger,
-			RevaGatewaySelector: gatewaySelector,
+			Logger:               logger,
+			RevaGatewaySelector:  gatewaySelector,
+			UserRoleAssigner:     roleAssigner,
+			MultiInstanceEnabled: cfg.MultiInstance.Enabled,
 		})
 	}
 
@@ -301,6 +319,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 		middleware.OIDCIss(cfg.OIDC.Issuer),
 		middleware.OIDCClient(oidc.NewOIDCClient(
 			oidc.WithAccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
+			oidc.WithAccessTokenVerifyAudiences(cfg.OIDC.AccessTokenVerifyAud),
 			oidc.WithLogger(logger),
 			oidc.WithHTTPClient(oidcHTTPClient),
 			oidc.WithOidcIssuer(cfg.OIDC.Issuer),
@@ -346,7 +365,6 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			middleware.AllowAppAuth(cfg.AuthMiddleware.AllowAppAuth),
 			middleware.TraceProvider(traceProvider),
 		),
-		middleware.MultiFactor(cfg.MultiFactorAuthentication, middleware.Logger(logger), middleware.MFAStore(signingKeyStore)),
 		middleware.AccountResolver(
 			middleware.Logger(logger),
 			middleware.UserProvider(userProvider),
@@ -358,6 +376,8 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			middleware.EventsPublisher(publisher),
 			middleware.MultiInstance(cfg.MultiInstance.Enabled, cfg.MultiInstance.InstanceID, cfg.MultiInstance.MasterID, cfg.MultiInstance.MemberClaim, cfg.MultiInstance.GuestClaim, cfg.MultiInstance.GuestRole),
 		),
+		// needs the user resolved by the AccountResolver
+		middleware.MultiFactor(cfg.MultiFactorAuthentication, middleware.Logger(logger), middleware.MFAStore(signingKeyStore)),
 		middleware.SelectorCookie(
 			middleware.Logger(logger),
 			middleware.PolicySelectorConfig(*cfg.PolicySelector),

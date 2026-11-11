@@ -120,7 +120,7 @@ func (b *CS3Backend) Logon(ctx context.Context, audience, username, password str
 // GetUser implements the Backend interface, providing user meta data retrieval
 // for the user specified by the userID. Requests are bound to the provided
 // context.
-func (b *CS3Backend) GetUser(ctx context.Context, userEntryID string, sessionRef *string, _ map[string]bool) (backends.UserFromBackend, error) {
+func (b *CS3Backend) GetUser(ctx context.Context, userEntryID string, sessionRef *string, _ map[string]bool, _ *identity.LookupContext) (backends.UserFromBackend, error) {
 
 	var session *cs3Session
 	if s, ok := b.sessions.Get(*sessionRef); ok {
@@ -196,7 +196,7 @@ func (b *CS3Backend) ResolveUserByUsername(ctx context.Context, username string)
 }
 
 // RefreshSession implements the Backend interface.
-func (b *CS3Backend) RefreshSession(_ context.Context, _ string, _ *string, _ map[string]interface{}) error {
+func (b *CS3Backend) RefreshSession(_ context.Context, _ string, _ *string, _ map[string]any) error {
 	return nil
 }
 
@@ -208,9 +208,9 @@ func (b *CS3Backend) DestroySession(_ context.Context, sessionRef *string) error
 
 // UserClaims implements the Backend interface, providing user specific claims
 // for the user specified by the userID.
-func (b *CS3Backend) UserClaims(_ string, _ map[string]bool) map[string]interface{} {
+func (b *CS3Backend) UserClaims(_ string, _ map[string]bool) map[string]any {
 	return nil
-	// TODO should we return the "ownclouduuid" as a claim? there is also "LibgreGraph.UUID" / lico.ScopeUniqueUserID
+	// TODO should we return the "ownCloudUUID" as a claim? there is also "LibgreGraph.UUID" / lico.ScopeUniqueUserID
 }
 
 // ScopesSupported implements the Backend interface, providing supported scopes

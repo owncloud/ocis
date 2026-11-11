@@ -1,6 +1,7 @@
 <template>
-  <div
+  <aside
     id="web-nav-sidebar"
+    :aria-label="$gettext('Application navigation')"
     :class="{
       'oc-app-navigation-collapsed': closed,
       'oc-app-navigation-expanded': !closed
@@ -47,10 +48,9 @@
     <slot name="bottom">
       <div v-if="!closed" class="versions oc-pb-m oc-pl-m oc-text-xsmall oc-text-muted">
         <span v-text="backendVersion" />
-        <span v-text="webVersion" />
       </div>
     </slot>
-  </div>
+  </aside>
 </template>
 
 <script lang="ts">
@@ -68,7 +68,7 @@ import {
 import { v4 as uuidV4 } from 'uuid'
 import SidebarNavItem from './SidebarNavItem.vue'
 import { NavItem } from '../../helpers/navItems'
-import { useCapabilityStore, getBackendVersion, getWebVersion } from '@ownclouders/web-pkg'
+import { useCapabilityStore, getBackendVersion } from '@ownclouders/web-pkg'
 
 type NavItemRef = InstanceType<typeof SidebarNavItem>
 
@@ -90,7 +90,6 @@ export default defineComponent({
     const highlighterAttrs = ref<Record<string, unknown>>({})
     const capabilityStore = useCapabilityStore()
 
-    const webVersion = computed(() => getWebVersion())
     const backendVersion = computed(() => getBackendVersion({ capabilityStore }))
 
     onMounted(() => {
@@ -139,7 +138,7 @@ export default defineComponent({
       { deep: true, immediate: true }
     )
 
-    return { highlighterAttrs, navItemRefs, backendVersion, webVersion }
+    return { highlighterAttrs, navItemRefs, backendVersion }
   },
   computed: {
     toggleSidebarButtonClass() {

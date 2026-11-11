@@ -6,7 +6,10 @@ export interface AuthServiceInterface {
   signinSilent(): Promise<unknown>
   logoutUser(): Promise<void | NavigationFailure>
   getRefreshToken(): Promise<string>
-  requireAcr(acrValue: string, redirectUrl: string): Promise<void>
+  /**
+   * @returns false if the required `acr` could not be reached, access must not be granted then
+   */
+  requireAcr(acrValue: string, redirectUrl: string): Promise<boolean>
 }
 
 export const useAuthService = (): AuthServiceInterface => {

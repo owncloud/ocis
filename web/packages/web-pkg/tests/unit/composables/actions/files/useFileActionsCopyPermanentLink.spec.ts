@@ -1,6 +1,6 @@
 import { unref } from 'vue'
 import { useFileActionsCopyPermanentLink } from '../../../../../src/composables/actions/files'
-import { defaultComponentMocks, getComposableWrapper } from '@ownclouders/web-test-helpers'
+import { defaultComponentMocks, getComposableWrapper } from '../../../../../src/testing'
 import { mock } from 'vitest-mock-extended'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 import { useClipboard } from '../../../../../src/composables/clipboard'
@@ -24,6 +24,16 @@ describe('useFileActionsCopyPermanentLink', () => {
           const publicSpace = mock<SpaceResource>({ driveType: 'public' })
           expect(
             unref(actions)[0].isVisible({ space: publicSpace, resources: [mock<Resource>()] })
+          ).toBeFalsy()
+        }
+      })
+    })
+    it('should return false for deleted resources', () => {
+      getWrapper({
+        setup: ({ actions }) => {
+          const trashedResource = { id: '1', ddate: '2026-10-01' } as unknown as Resource
+          expect(
+            unref(actions)[0].isVisible({ space: undefined, resources: [trashedResource] })
           ).toBeFalsy()
         }
       })

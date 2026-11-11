@@ -1,3 +1,7 @@
+// Component specs mount deliberately incomplete components, so Vue's runtime warnings are
+// expected noise rather than a signal.
+vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+
 const IntersectionObserverMock = vi.fn(function () {
   return {
     disconnect: vi.fn(),
@@ -35,10 +39,13 @@ if (typeof window !== 'undefined' && !window.matchMedia) {
 
 vi.stubGlobal('define', vi.fn())
 
-// This is needed for KaTeX to work in the tests
-Object.defineProperty(document, 'compatMode', {
-  value: 'CSS1Compat'
-})
+// This is needed for KaTeX to work in the tests. Guarded because specs that assert against
+// platform-native behaviour opt out of the DOM with `@vitest-environment node`.
+if (typeof document !== 'undefined') {
+  Object.defineProperty(document, 'compatMode', {
+    value: 'CSS1Compat'
+  })
+}
 
 // Mock Math.random to return predictable values for tests
 let mathRandomCounter = 0

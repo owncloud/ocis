@@ -80,7 +80,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		cfg.UnifiedRoles.AvailableRoles = slices.DeleteFunc(cfg.UnifiedRoles.AvailableRoles, func(s string) bool {
 			return s == unifiedrole.UnifiedRoleSecureViewerID
 		})
-		service, err := svc.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg, otel.GetTracerProvider(), nil, nil)
+		service, err := svc.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg, otel.GetTracerProvider(), nil, nil, nil)
 		Expect(err).ToNot(HaveOccurred())
 		driveItemPermissionsService = service
 		ctx = revactx.ContextSetUser(context.Background(), currentUser)
@@ -138,9 +138,9 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
-			driveItemInvite.ExpirationDateTime = libregraph.PtrTime(time.Now().Add(time.Hour))
+			driveItemInvite.ExpirationDateTime = new(time.Now().Add(time.Hour))
 			createShareResponse.Share = &collaboration.Share{
 				Id:         &collaboration.ShareId{OpaqueId: "123"},
 				Expiration: utils.TimeToTS(*driveItemInvite.ExpirationDateTime),
@@ -158,9 +158,9 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("GetGroup", mock.Anything, mock.Anything).Return(getGroupResponse, nil)
 			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("2"), LibreGraphRecipientType: libregraph.PtrString("group")},
+				{ObjectId: new("2"), LibreGraphRecipientType: new("group")},
 			}
-			driveItemInvite.ExpirationDateTime = libregraph.PtrTime(time.Now().Add(time.Hour))
+			driveItemInvite.ExpirationDateTime = new(time.Now().Add(time.Hour))
 			createShareResponse.Share = &collaboration.Share{
 				Id:         &collaboration.ShareId{OpaqueId: "123"},
 				Expiration: utils.TimeToTS(*driveItemInvite.ExpirationDateTime),
@@ -174,11 +174,200 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(permission.GrantedToV2.Group.GetId()).To(Equal("2"))
 		})
 
+		Describe("a vault share with the guest vault role", func() {
+			var (
+				// wrapped records the users whose share creation went through the guest vault role
+				wrapped   []string
+				vaultItem *provider.ResourceId
+			)
+
+			BeforeEach(func() {
+				wrapped = nil
+				service, err := svc.NewDriveItemPermissionsService(log.NewLogger(), gatewaySelector, cache, cfg, otel.GetTracerProvider(), nil, nil,
+					func(_ context.Context, userID string, createShare func() error) error {
+						wrapped = append(wrapped, userID)
+						return createShare()
+					})
+				Expect(err).ToNot(HaveOccurred())
+				driveItemPermissionsService = service
+
+				gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+				driveItemInvite.Recipients = []libregraph.DriveRecipient{
+					{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
+				}
+				createShareResponse.Share = &collaboration.Share{Id: &collaboration.ShareId{OpaqueId: "123"}}
+				// the sharer may share the resource
+				statResponse.Info.PermissionSet = &provider.ResourcePermissions{Stat: true, AddGrant: true}
+				vaultItem = &provider.ResourceId{
+					StorageId: utils.VaultStorageProviderID,
+					SpaceId:   driveItemId.SpaceId,
+					OpaqueId:  driveItemId.OpaqueId,
+				}
+			})
+
+			It("is created through it", func() {
+				statResponse.Info.Id = vaultItem
+				gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
+
+				permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(permission.GetId()).To(Equal("123"))
+				Expect(wrapped).To(Equal([]string{"1"}))
+			})
+
+			It("returns the error of the share creation", func() {
+				statResponse.Info.Id = vaultItem
+				gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(&collaboration.CreateShareResponse{
+					Status: status.NewAlreadyExists(ctx, nil, "the share already exists"),
+				}, nil)
+
+				_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+				Expect(err).To(HaveOccurred())
+				Expect(wrapped).To(Equal([]string{"1"}))
+			})
+
+			It("is not used when the sharer may not share the resource", func() {
+				statResponse.Info.Id = vaultItem
+				statResponse.Info.PermissionSet = &provider.ResourcePermissions{Stat: true}
+				gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(&collaboration.CreateShareResponse{
+					Status: status.NewPermissionDenied(ctx, nil, "no permission to share"),
+				}, nil)
+
+				_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+				Expect(err).To(HaveOccurred())
+				Expect(wrapped).To(BeEmpty())
+				gatewayClient.AssertCalled(GinkgoT(), "CreateShare", mock.Anything, mock.Anything)
+			})
+
+			It("is not used for a share outside the vault", func() {
+				gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
+
+				_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(wrapped).To(BeEmpty())
+			})
+		})
+
+		It("applies a default 30-day expiration to a vault user share created without one", func() {
+			statResponse.Info.Id = &provider.ResourceId{
+				StorageId: utils.VaultStorageProviderID,
+				SpaceId:   driveItemId.SpaceId,
+				OpaqueId:  driveItemId.OpaqueId,
+			}
+			var capturedReq *collaboration.CreateShareRequest
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).
+				Run(func(args mock.Arguments) {
+					capturedReq = args.Get(1).(*collaboration.CreateShareRequest)
+				}).Return(createShareResponse, nil)
+			driveItemInvite.Recipients = []libregraph.DriveRecipient{
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
+			}
+			driveItemInvite.ExpirationDateTime = nil
+			createShareResponse.Share = &collaboration.Share{
+				Id: &collaboration.ShareId{OpaqueId: "123"},
+			}
+
+			expectedDefault := time.Now().UTC().AddDate(0, 0, 30)
+			_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(capturedReq.GetGrant().GetExpiration()).ToNot(BeNil())
+			Expect(utils.TSToTime(capturedReq.GetGrant().GetExpiration())).To(BeTemporally("~", expectedDefault, time.Minute))
+		})
+
+		It("applies a default 30-day expiration to a vault group share created without one", func() {
+			statResponse.Info.Id = &provider.ResourceId{
+				StorageId: utils.VaultStorageProviderID,
+				SpaceId:   driveItemId.SpaceId,
+				OpaqueId:  driveItemId.OpaqueId,
+			}
+			var capturedReq *collaboration.CreateShareRequest
+			gatewayClient.On("GetGroup", mock.Anything, mock.Anything).Return(getGroupResponse, nil)
+			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).
+				Run(func(args mock.Arguments) {
+					capturedReq = args.Get(1).(*collaboration.CreateShareRequest)
+				}).Return(createShareResponse, nil)
+			driveItemInvite.Recipients = []libregraph.DriveRecipient{
+				{ObjectId: new("2"), LibreGraphRecipientType: new("group")},
+			}
+			driveItemInvite.ExpirationDateTime = nil
+			createShareResponse.Share = &collaboration.Share{
+				Id: &collaboration.ShareId{OpaqueId: "123"},
+			}
+
+			expectedDefault := time.Now().UTC().AddDate(0, 0, 30)
+			_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(capturedReq.GetGrant().GetExpiration()).ToNot(BeNil())
+			Expect(utils.TSToTime(capturedReq.GetGrant().GetExpiration())).To(BeTemporally("~", expectedDefault, time.Minute))
+		})
+
+		It("does not apply a default expiration to a non-vault user share created without one", func() {
+			var capturedReq *collaboration.CreateShareRequest
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).
+				Run(func(args mock.Arguments) {
+					capturedReq = args.Get(1).(*collaboration.CreateShareRequest)
+				}).Return(createShareResponse, nil)
+			driveItemInvite.Recipients = []libregraph.DriveRecipient{
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
+			}
+			driveItemInvite.ExpirationDateTime = nil
+			createShareResponse.Share = &collaboration.Share{
+				Id: &collaboration.ShareId{OpaqueId: "123"},
+			}
+
+			_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(capturedReq.GetGrant().GetExpiration()).To(BeNil())
+		})
+
+		It("does not apply a default expiration to a non-vault group share created without one", func() {
+			var capturedReq *collaboration.CreateShareRequest
+			gatewayClient.On("GetGroup", mock.Anything, mock.Anything).Return(getGroupResponse, nil)
+			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).
+				Run(func(args mock.Arguments) {
+					capturedReq = args.Get(1).(*collaboration.CreateShareRequest)
+				}).Return(createShareResponse, nil)
+			driveItemInvite.Recipients = []libregraph.DriveRecipient{
+				{ObjectId: new("2"), LibreGraphRecipientType: new("group")},
+			}
+			driveItemInvite.ExpirationDateTime = nil
+			createShareResponse.Share = &collaboration.Share{
+				Id: &collaboration.ShareId{OpaqueId: "123"},
+			}
+
+			_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(capturedReq.GetGrant().GetExpiration()).To(BeNil())
+		})
+
+		It("keeps a client-provided expiration instead of the default", func() {
+			var capturedReq *collaboration.CreateShareRequest
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).
+				Run(func(args mock.Arguments) {
+					capturedReq = args.Get(1).(*collaboration.CreateShareRequest)
+				}).Return(createShareResponse, nil)
+			driveItemInvite.Recipients = []libregraph.DriveRecipient{
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
+			}
+			explicit := time.Now().Add(time.Hour)
+			driveItemInvite.ExpirationDateTime = new(explicit)
+			createShareResponse.Share = &collaboration.Share{
+				Id: &collaboration.ShareId{OpaqueId: "123"},
+			}
+
+			_, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(utils.TSToTime(capturedReq.GetGrant().GetExpiration())).To(BeTemporally("~", explicit, time.Second))
+		})
+
 		It("succeeds with file roles (happy path)", func() {
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
 			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleViewerID}
 
@@ -194,7 +383,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
 			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleEditorID}
 
@@ -207,7 +396,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 
 		It("fails with when trying to set a space role on a file", func() {
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
 			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleManagerID}
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
@@ -218,7 +407,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 
 		It("fails with when trying to set a folder role on a file", func() {
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
 			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleEditorID}
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
@@ -230,7 +419,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		It("fails with when trying to set a file role on a folder", func() {
 			statResponse.Info.Type = provider.ResourceType_RESOURCE_TYPE_CONTAINER
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
 			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleFileEditorID}
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
@@ -243,7 +432,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
 			driveItemInvite.Roles = nil
 			driveItemInvite.LibreGraphPermissionsActions = []string{unifiedrole.DriveItemContentRead}
@@ -270,7 +459,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 				// remove SecureViewer from allowed roles for this unit test
 				return s == unifiedrole.UnifiedRoleSecureViewerID
 			})
-			service, err := svc.NewDriveItemPermissionsService(log.NewLogger(), gatewaySelector, cache, cfg, otel.GetTracerProvider(), nil, nil)
+			service, err := svc.NewDriveItemPermissionsService(log.NewLogger(), gatewaySelector, cache, cfg, otel.GetTracerProvider(), nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleViewerID, unifiedrole.UnifiedRoleSecureViewerID}
@@ -334,9 +523,9 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
-			driveItemInvite.ExpirationDateTime = libregraph.PtrTime(time.Now().Add(time.Hour))
+			driveItemInvite.ExpirationDateTime = new(time.Now().Add(time.Hour))
 			createShareResponse.Share = &collaboration.Share{
 				Id:         &collaboration.ShareId{OpaqueId: "123"},
 				Expiration: utils.TimeToTS(*driveItemInvite.ExpirationDateTime),
@@ -349,12 +538,43 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(permission.GrantedToV2.User.GetDisplayName()).To(Equal(getUserResponse.User.DisplayName))
 			Expect(permission.GrantedToV2.User.GetId()).To(Equal("1"))
 		})
+		It("does not apply a default expiration to a space membership created without one", func() {
+			root := &provider.ResourceId{
+				StorageId: utils.VaultStorageProviderID,
+				SpaceId:   "2",
+				OpaqueId:  "2", // space root: OpaqueId == SpaceId
+			}
+			listSpacesResponse.StorageSpaces[0].SpaceType = "project"
+			listSpacesResponse.StorageSpaces[0].Root = root
+			statResponse.Info.Id = root
+			statResponse.Info.Space = &provider.StorageSpace{Root: root}
+
+			var capturedReq *collaboration.CreateShareRequest
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listSpacesResponse, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
+			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).
+				Run(func(args mock.Arguments) {
+					capturedReq = args.Get(1).(*collaboration.CreateShareRequest)
+				}).Return(createShareResponse, nil)
+			driveItemInvite.Recipients = []libregraph.DriveRecipient{
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
+			}
+			driveItemInvite.ExpirationDateTime = nil
+			createShareResponse.Share = &collaboration.Share{
+				Id: &collaboration.ShareId{OpaqueId: "123"},
+			}
+
+			_, err := driveItemPermissionsService.SpaceRootInvite(context.Background(), driveId, driveItemInvite)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(capturedReq.GetGrant().GetExpiration()).To(BeNil())
+		})
 		It("rejects to add a user to a personal space", func() {
 			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listSpacesResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
-			driveItemInvite.ExpirationDateTime = libregraph.PtrTime(time.Now().Add(time.Hour))
+			driveItemInvite.ExpirationDateTime = new(time.Now().Add(time.Hour))
 			createShareResponse.Share = &collaboration.Share{
 				Id:         &collaboration.ShareId{OpaqueId: "123"},
 				Expiration: utils.TimeToTS(*driveItemInvite.ExpirationDateTime),
@@ -1345,8 +1565,8 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 		invite = libregraph.DriveItemInvite{
 			Recipients: []libregraph.DriveRecipient{
 				{
-					ObjectId:                libregraph.PtrString("1"),
-					LibreGraphRecipientType: libregraph.PtrString("user")},
+					ObjectId:                new("1"),
+					LibreGraphRecipientType: new("user")},
 			},
 			Roles: []string{unifiedrole.UnifiedRoleViewerID},
 		}
@@ -1554,7 +1774,7 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 			expectedPermission.SetRoles([]string{unifiedrole.UnifiedRoleEditorID})
 			expectedPermission.SetGrantedToV2(libregraph.SharePointIdentitySet{
 				User: &libregraph.Identity{
-					Id:          libregraph.PtrString("4c510ada-c86b-4815-8820-42cdf82c3d51"),
+					Id:          new("4c510ada-c86b-4815-8820-42cdf82c3d51"),
 					DisplayName: "Albert Einstein",
 				},
 			})

@@ -1,6 +1,5 @@
 SHELL := bash
 DIST := ${CURDIR}/dist
-HUGO := docs/hugo
 RELEASE := ${CURDIR}/release
 NODE_MODULES := ${CURDIR}/node_modules
 
@@ -32,9 +31,8 @@ help:
 	@echo -e "\tmake\t\t\t${BLUE}run make without target${RESET}"
 	@echo -e "${BLACK}---------------------------------------------------------${RESET}"
 	@echo
-	@echo -e "${GREEN}Documentation:${RESET}\n"
-	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/build-docs/${RESET}\n"
-	@echo -e "\trun ${YELLOW}make list | grep docs-\t\t${BLUE}note: run all docs command via this makefile${RESET}"
+	@echo -e "${GREEN}Any changes for the web developer documentation have to be made at:${RESET}\n"
+	@echo -e "${PURPLE}\thttps://github.com/owncloud/docs.owncloud.com/tree/main/content/ocis/${RESET}\n"
 	@echo
 
 .PHONY: list
@@ -45,7 +43,7 @@ list:
 
 .PHONY: clean
 clean:
-	rm -rf ${DIST} ${HUGO} ${RELEASE} ${NODE_MODULES}
+	rm -rf ${DIST} ${RELEASE} ${NODE_MODULES}
 
 .PHONY: release
 release: clean
@@ -60,51 +58,6 @@ release: clean
 dist:
 	make -f Makefile.release
 
-# note that everything docs related is located in the docs/ folder
-# we keep this original calls for the sake of history and ease of use
-# for drone only, prepare docs, do not run manually
-.PHONY: docs-generate          # 1. prepare docs
-docs-generate:
-# initialize the docs build environment
-	@$(MAKE) --no-print-directory -C docs docs-init
-
-# remind one that web needs prerequisites installed
-	@$(MAKE) --no-print-directory -C docs docs-first-time-message
-
-# copy required resources into hugo/content
-.PHONY: docs-copy              # 2. copy required doc resources
-docs-copy:
-	@$(MAKE) --no-print-directory -C docs docs-copy
-
-# the docs-build|serve commands requires that docs-init was run first for the required data to exists
-# create a docs build
-.PHONY: docs-build             # 3. build prepared docs
-docs-build:
-	@$(MAKE) --no-print-directory -C docs docs-build
-
-# serve built docs with hugo
-.PHONY: docs-serve             # serve the docs build
-docs-serve:
-	@$(MAKE) --no-print-directory -C docs docs-serve
-
-# clean up doc build artifacts 
-.PHONY: docs-clean             # clean all docs artifacts, must be run as sudo
-docs-clean:
-	@$(MAKE) --no-print-directory -C docs docs-clean
-
-# imitate a full drone run locally to build docs without pushing to the web.
-# this can help identify uncaught issues when running `make docs-serve` only.
-.PHONY: docs-local             # run all steps as drone would do it (1, 2, 3)
-docs-local:
-	@$(MAKE) --no-print-directory docs-generate
-	@$(MAKE) --no-print-directory docs-copy
-	@$(MAKE) --no-print-directory docs-build 
-
-# prepare a link from the root to the hugo folder because the image requires it
-# note that on local building, the referenced container of inside the hugo/makefile is used
-.PHONY: docs-hugo-drone-prep   # only used for drone !
-docs-hugo-drone-prep:
-	@$(MAKE) --no-print-directory -C docs docs-hugo-drone-prep
 
 # translation relevant
 .PHONY: l10n-push

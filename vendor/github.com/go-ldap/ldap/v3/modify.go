@@ -121,13 +121,16 @@ func (l *Conn) Modify(modifyRequest *ModifyRequest) error {
 		return err
 	}
 
-	if packet.Children[1].Tag == ApplicationModifyResponse {
-		err := GetLDAPError(packet)
-		if err != nil {
+	protocolOp, err := packetChild(packet, 1)
+	if err != nil {
+		return err
+	}
+	if protocolOp.Tag == ApplicationModifyResponse {
+		if err := GetLDAPError(packet); err != nil {
 			return err
 		}
 	} else {
-		return fmt.Errorf("ldap: unexpected response: %d", packet.Children[1].Tag)
+		return fmt.Errorf("ldap: unexpected response: %d", protocolOp.Tag)
 	}
 
 	return nil
@@ -159,15 +162,22 @@ func (l *Conn) ModifyWithResult(modifyRequest *ModifyRequest) (*ModifyResult, er
 		return nil, err
 	}
 
-	switch packet.Children[1].Tag {
-	case ApplicationModifyResponse:
+	protocolOp, err := packetChild(packet, 1)
+	if err != nil {
+		return nil, err
+	}
+	if protocolOp.Tag == ApplicationModifyResponse {
 		if err = GetLDAPError(packet); err != nil {
 			result.Referral = getReferral(err, packet)
 
 			return result, err
 		}
-		if len(packet.Children) == 3 {
-			for _, child := range packet.Children[2].Children {
+		controls, ok, err := packetChildIfPresent(packet, 2)
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			for _, child := range controls.Children {
 				decodedChild, err := DecodeControl(child)
 				if err != nil {
 					return nil, errors.New("failed to decode child control: " + err.Error())
@@ -175,6 +185,8 @@ func (l *Conn) ModifyWithResult(modifyRequest *ModifyRequest) (*ModifyResult, er
 				result.Controls = append(result.Controls, decodedChild)
 			}
 		}
+	} else {
+		return nil, fmt.Errorf("ldap: unexpected response: %d", protocolOp.Tag)
 	}
 	l.Debug.Printf("%d: returning", msgCtx.id)
 	return result, nil

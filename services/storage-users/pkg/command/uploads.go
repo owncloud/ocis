@@ -22,12 +22,14 @@ import (
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/event"
+	"github.com/owncloud/ocis/v2/services/storage-users/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/revaconfig"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/storage"
 	"github.com/owncloud/reva/v2/pkg/storage/fs/registry"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/node"
+	"github.com/owncloud/reva/v2/pkg/upload"
 	"github.com/owncloud/reva/v2/pkg/utils"
 )
 
@@ -94,6 +96,11 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 				Usage:       "filter sessions by virus scan result",
 			},
 			&cli.BoolFlag{
+				Name:        "orphaned",
+				DefaultText: "unset",
+				Usage:       "filter sessions by whether their node metadata is unreadable. Such sessions can never finish processing and can be removed with --clean",
+			},
+			&cli.BoolFlag{
 				Name:  "json",
 				Usage: "output as json",
 			},
@@ -120,15 +127,21 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 				os.Exit(1)
 			}
 			drivers := revaconfig.StorageProviderDrivers(cfg)
-			fs, err := f(drivers[cfg.Driver].(map[string]interface{}), nil, nil)
+			driverConf, ok := drivers[cfg.Driver].(map[string]any)
+			if !ok {
+				fmt.Fprintf(os.Stderr, "No configuration found for filesystem driver '%s'\n", cfg.Driver)
+				os.Exit(1)
+			}
+			fs, err := f(driverConf, nil, nil)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Failed to initialize filesystem driver '%s'\n", cfg.Driver)
 				return err
 			}
 
-			managingFS, ok := fs.(storage.UploadSessionLister)
-			if !ok {
-				fmt.Fprintf(os.Stderr, "'%s' storage does not support listing upload sessions\n", cfg.Driver)
+			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			coord, err := upload.NewCoordinatorFromConfig("", driverConf, fs, nil, &logger.Logger, false)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Failed to initialize the upload coordinator: %v\n", err)
 				os.Exit(1)
 			}
 
@@ -142,7 +155,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 			}
 
 			filter := buildFilter(c)
-			uploads, err := managingFS.ListUploadSessions(c.Context, filter)
+			uploads, err := coord.ListUploadSessions(c.Context, filter)
 			if err != nil {
 				return err
 			}
@@ -259,6 +272,10 @@ func buildFilter(c *cli.Context) storage.UploadSessionFilter {
 		infectedValue := c.Bool("has-virus")
 		filter.HasVirus = &infectedValue
 	}
+	if c.IsSet("orphaned") {
+		orphanedValue := c.Bool("orphaned")
+		filter.Orphaned = &orphanedValue
+	}
 	if c.IsSet("id") {
 		idValue := c.String("id")
 		filter.ID = &idValue
@@ -312,6 +329,24 @@ func buildInfo(filter storage.UploadSessionFilter) string {
 			b.WriteString("Virusinfected")
 		} else {
 			b.WriteString("virusinfected")
+		}
+	}
+
+	if filter.Orphaned != nil {
+		if b.Len() != 0 {
+			b.WriteString(", ")
+		}
+		if !*filter.Orphaned {
+			if b.Len() == 0 {
+				b.WriteString("Not ")
+			} else {
+				b.WriteString("not ")
+			}
+		}
+		if b.Len() == 0 {
+			b.WriteString("Orphaned")
+		} else {
+			b.WriteString("orphaned")
 		}
 	}
 
@@ -472,7 +507,7 @@ func deleteStaleNode(cfg *config.Config, path string, dryRun bool, verbose bool,
 		fmt.Fprintf(os.Stderr, "Error reading file %s: %s\n", path, err)
 		return 0
 	}
-	var mpkData map[string]interface{}
+	var mpkData map[string]any
 	if err := msgpack.Unmarshal(b, &mpkData); err != nil {
 		fmt.Fprintf(os.Stderr, "Error unmarshaling file %s: %s\n", path, err)
 		return 0
@@ -527,7 +562,7 @@ func deleteStaleNode(cfg *config.Config, path string, dryRun bool, verbose bool,
 	return 1
 }
 
-func extractProcessingID(mpkData map[string]interface{}) string {
+func extractProcessingID(mpkData map[string]any) string {
 	processingID := ""
 	for k, v := range mpkData {
 		vStr := string(v.([]byte))

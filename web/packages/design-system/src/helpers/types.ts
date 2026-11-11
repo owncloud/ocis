@@ -85,10 +85,4 @@ export interface BreadcrumbItem {
 }
 
 export type AvailableSizeType =
-  | 'xsmall'
-  | 'small'
-  | 'medium'
-  | 'large'
-  | 'xlarge'
-  | 'xxlarge'
-  | 'xxxlarge'
+  'xsmall' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge' | 'xxxlarge'

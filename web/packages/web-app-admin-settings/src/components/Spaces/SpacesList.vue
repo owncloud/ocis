@@ -66,11 +66,7 @@
       <template #usedQuota="{ item }"> {{ getUsedQuota(item) }}</template>
       <template #remainingQuota="{ item }"> {{ getRemainingQuota(item) }}</template>
       <template #mdate="{ item }">
-        <span
-          v-oc-tooltip="formatDate(item.mdate)"
-          tabindex="0"
-          v-text="formatDateRelative(item.mdate)"
-        />
+        <span v-oc-tooltip="formatDate(item.mdate)" v-text="formatDateRelative(item.mdate)" />
       </template>
       <template #status="{ item }">
         <oc-icon
@@ -375,7 +371,7 @@ const getMemberCount = (space: SpaceResource) => {
 }
 
 const getSelectSpaceLabel = (space: SpaceResource) => {
-  return $gettext('Select %{ space }', { space: space.name }, true)
+  return $gettext('Select %{ space }', { space: space.name })
 }
 
 onMounted(() => {

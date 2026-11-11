@@ -90,12 +90,16 @@ func Validate(cfg *config.Config) error {
 		}
 	}
 
-	return nil
+	return shared.CheckNatsCredentials(cfg.Service.Name, cfg.Cache.Store, cfg.Cache.CredsFile, cfg.Cache.Creds)
 }
 
 func validateLDAPSettings(cfg *config.Config) error {
 	if cfg.Identity.LDAP.BindPassword == "" {
 		return shared.MissingLDAPBindPassword(cfg.Service.Name)
+	}
+
+	if cfg.MultiInstance.MasterID != "" && cfg.Identity.LDAP.UserFilter == "" {
+		return shared.MissingLDAPUserFilterForMasterID(cfg.Service.Name)
 	}
 
 	// ensure that "GroupBaseDN" is below "GroupBaseDN"

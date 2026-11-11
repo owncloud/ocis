@@ -69,6 +69,38 @@ if [[ "$ENABLE_WOPI" == "true" ]]; then
     # patch collaboration service
     #  - allow dynamic wopi src
     sed -i -E "s|value: http://.*:9300|value: {{ \$officeSuite.wopiSrc }}|" $TPL_DIR/collaboration/deployment.yaml
+    sed -i \
+      -e 's/{{- include "ocis.extraEnvs" \. | nindent 12 }}/{{- include "ocis.extraEnvs" $ | nindent 12 }}/' \
+      -e 's/{{- include "ocis.extraVolMounts" \. | nindent 12 }}/{{- include "ocis.extraVolMounts" $ | nindent 12 }}/' \
+      -e 's/{{- include "ocis.extraVolumes" \. | nindent 8 }}/{{- include "ocis.extraVolumes" $ | nindent 8 }}/' \
+      $TPL_DIR/collaboration/deployment.yaml
+    sed -i "s|availableUnifiedRoles: \[\]|availableUnifiedRoles: ['b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5','a8d5fe5e-96e3-418d-825b-534dbdf22b99','fb6c3e19-e378-47e5-b277-9732f9de6e21','58c63c02-1d89-4572-916a-870abc5a1b7d','2d00ce52-1fc2-4dbc-8b95-a73b73395f5a','1c996275-f1c9-4e71-abdf-a42f6495e960','312c0871-5ef7-4b3a-85b6-0e4074c64049','aa97fe03-7980-45ac-9e50-b325749fd7e6']|" $CFG_DIR/values.yaml
+fi
+
+if [[ "$ENABLE_OCM" == "true" ]]; then
+    sed -i '/ocm:/{n;s|false|true|}' $CFG_DIR/values.yaml
+    # enabling the ocm backend service does NOT make the web UI show the
+    # "open-cloud-mesh" app -- that's gated by services.web.config.apps, which
+    # the chart leaves unset by default so it falls back to the ocis binary's
+    # own default list (services/web/pkg/config/defaults/defaultconfig.go),
+    # and that list doesn't include "ocm". Since Helm's `with` fully replaces
+    # the array rather than merging, we must repeat the full default list here
+    # (see run-e2e.py's equivalent gha_web_cfg["apps"].append("ocm") for the
+    # non-k8s path).
+    sed -i '/^  web:/a\
+    config:\
+      apps:\
+        - files\
+        - search\
+        - text-editor\
+        - mermaid-editor\
+        - pdf-viewer\
+        - external\
+        - admin-settings\
+        - epub-reader\
+        - preview\
+        - app-store\
+        - ocm' $CFG_DIR/values.yaml
 fi
 
 if [[ "$ENABLE_OCM" == "true" ]]; then
@@ -77,6 +109,15 @@ fi
 
 if [[ "$ENABLE_AUTH_APP" == "true" ]]; then
     sed -i '/authapp:/{n;s|false|true|}' $CFG_DIR/values.yaml
+fi
+
+if [[ "$ENABLE_VAULT" == "true" ]]; then
+    sed -i '/vault:/{n;s|false|true|}' $CFG_DIR/values.yaml
+    sed -i '/mfa:/{n;s|false|true|}' $CFG_DIR/values.yaml
+    # baking keycloak url into the base CSP would affect every other suite that
+    # shares this same values.yaml, breaking their fixed CSP header assertions.
+    sed -i "/defaultSrc:/i\\        - 'https://keycloak:8443/'" $CFG_DIR/values.yaml
+    sed -i "/imgSrc:/i\\        - 'https://keycloak:8443/'" $CFG_DIR/values.yaml
 fi
 
 # copy custom values file

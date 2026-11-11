@@ -13,7 +13,7 @@ export const createHttpError = ({
   xReqId: string
 }) => {
   const response = new Response(undefined, {
-    headers: { 'x-request-id': xReqId },
+    headers: xReqId ? { 'x-request-id': xReqId } : {},
     status: statusCode
   })
   return new HttpError(message, response, statusCode)

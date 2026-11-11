@@ -51,6 +51,7 @@ func Server(cfg *config.Config) *cli.Command {
 			grpcClient, err := grpc.NewClient(
 				append(
 					grpc.GetClientOptions(&cfg.GRPCClientTLS),
+					grpc.WithKeepaliveParams(&cfg.GRPCClientOptions),
 					grpc.WithTraceProvider(traceProvider),
 				)...,
 			)
@@ -134,6 +135,8 @@ func Server(cfg *config.Config) *cli.Command {
 				microstore.Database(cfg.Store.Database),
 				microstore.Table(cfg.Store.Table),
 				store.Authentication(cfg.Store.AuthUsername, cfg.Store.AuthPassword),
+				store.Credentials(cfg.Store.CredsFile, cfg.Store.Creds),
+				store.TLS(cfg.Store.EnableTLS, cfg.Store.TLSInsecure, cfg.Store.TLSRootCACertificate),
 			)
 
 			svc := service.NewEventsNotifier(traceProvider, evts, channel, logger, gatewaySelector, valueService,

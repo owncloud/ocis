@@ -22,6 +22,10 @@ test.describe('spaces.personal', () => {
   })
 
   test('unstructured collection of testable space interactions,', async () => {
+    // This journey covers two spaces with public links, shares and drop uploads, each
+    // step cycling a11y scans - it regularly runs close to or beyond the default 180s budget.
+    test.slow()
+
     // When "Alice" opens the "files" app
     await ui.userOpensApplication({ stepUser: 'Alice', name: 'files' })
     // And "Alice" navigates to the projects space page

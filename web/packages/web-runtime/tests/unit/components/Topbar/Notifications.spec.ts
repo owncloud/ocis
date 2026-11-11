@@ -1,10 +1,14 @@
 import Notifications from '../../../../src/components/Topbar/Notifications.vue'
 import { Notification } from '../../../../src/helpers/notifications'
 import { mock } from 'vitest-mock-extended'
-import { defaultComponentMocks, defaultPlugins, shallowMount } from '@ownclouders/web-test-helpers'
-import { SpaceResource } from '@ownclouders/web-client'
+import {
+  defaultComponentMocks,
+  defaultPlugins,
+  mockHttpResponse,
+  shallowMount
+} from '@ownclouders/web-test-helpers'
+import { SpaceResource, VAULT_STORAGE_PROVIDER_ID } from '@ownclouders/web-client'
 import { RouterLink, RouteLocationNamedRaw, RouteLocationNormalizedLoaded } from 'vue-router'
-import { AxiosResponse } from 'axios'
 import Avatar from '../../../../src/components/Avatar.vue'
 
 const selectors = {
@@ -57,13 +61,20 @@ describe('Notification component', () => {
     expect(wrapper.find(selectors.notificationsLoading).exists()).toBeTruthy()
   })
   it('marks all notifications as read', async () => {
-    const notifications = [mock<Notification>({ messageRich: undefined, object_id })]
+    const notifications = [
+      mock<Notification>({ messageRich: undefined, object_id, notification_id: 'n1' })
+    ]
     const { wrapper, mocks } = getWrapper({ notifications })
     await wrapper.vm.fetchNotificationsTask.last
     await wrapper.find(selectors.markAll).trigger('click')
     await wrapper.vm.$nextTick()
     expect(wrapper.find(selectors.notificationItem).exists()).toBeFalsy()
     expect(mocks.$clientService.httpAuthenticated.delete).toHaveBeenCalledTimes(1)
+    expect(mocks.$clientService.httpAuthenticated.delete).toHaveBeenCalledWith(
+      expect.any(String),
+      { ids: ['n1'] },
+      expect.anything()
+    )
   })
   describe('avatar', () => {
     it('loads based on the username', async () => {
@@ -264,7 +275,7 @@ describe('Notification component', () => {
       messageRich: undefined,
       computedMessage: undefined,
       computedLink: undefined,
-      object_id: 'vault-provider$resource-20',
+      object_id: `${VAULT_STORAGE_PROVIDER_ID}$resource-20`,
       datetime: '2024-01-01T00:00:00Z'
     })
     const driveNotification = mock<Notification>({
@@ -274,8 +285,13 @@ describe('Notification component', () => {
       object_id: 'other-provider$resource-22',
       datetime: '2024-01-01T00:00:01Z'
     })
+    // a vault session fetches capabilities with `?vault=true` and gets the provider id,
+    // a drive-mode session fetches them without it and gets an empty value
     const vaultCapabilityState = {
-      capabilities: { vault: { enabled: true, vault_storage_provider: 'vault-provider' } }
+      capabilities: { vault: { enabled: true, vault_storage_provider: VAULT_STORAGE_PROVIDER_ID } }
+    }
+    const driveCapabilityState = {
+      capabilities: { vault: { enabled: true, vault_storage_provider: '' } }
     }
 
     it('shows only vault notifications when in vault mode', async () => {
@@ -291,7 +307,7 @@ describe('Notification component', () => {
       vi.mocked(useVault).mockReturnValue({ isInVault: false })
       const { wrapper } = getWrapper({
         notifications: [vaultNotification, driveNotification],
-        capabilityState: vaultCapabilityState
+        capabilityState: driveCapabilityState
       })
       await wrapper.vm.fetchNotificationsTask.last
       expect(wrapper.findAll(selectors.notificationItem).length).toBe(1)
@@ -321,7 +337,7 @@ function getWrapper({
 } = {}) {
   const localMocks = { ...defaultComponentMocks(), ...mocks }
   localMocks.$clientService.httpAuthenticated.get.mockResolvedValue(
-    mock<AxiosResponse>({ data: { ocs: { data: notifications } }, headers: {} })
+    mockHttpResponse({ ocs: { data: notifications } })
   )
 
   return {

@@ -281,7 +281,11 @@ func (c *compiler) parseSegment(path string) segment {
 			c.err = ErrPath("path has invalid filter [brackets].")
 			break
 		}
-		seg.filters = append(seg.filters, c.parseFilter(fpath[:len(fpath)-1]))
+		filter := c.parseFilter(fpath[:len(fpath)-1])
+		if c.err != ErrPath("") {
+			break
+		}
+		seg.filters = append(seg.filters, filter)
 	}
 	return seg
 }
@@ -320,7 +324,11 @@ func (c *compiler) parseFilter(path string) filter {
 	// Filter contains [@attr='val'], [@attr="val"], [fn()='val'],
 	// [fn()="val"], [tag='val'] or [tag="val"]?
 	eqindex := strings.IndexByte(path, '=')
-	if eqindex >= 0 && eqindex+1 < len(path) {
+	if eqindex == 0 {
+		c.err = ErrPath("path contains a filter expression with no key.")
+		return nil
+	}
+	if eqindex > 0 && eqindex+1 < len(path) {
 		quote := path[eqindex+1]
 		if quote == '\'' || quote == '"' {
 			rindex := nextIndex(path, quote, eqindex+2)
@@ -334,6 +342,10 @@ func (c *compiler) parseFilter(path string) filter {
 
 			switch {
 			case key[0] == '@':
+				if len(key) == 1 {
+					c.err = ErrPath("path contains a filter expression with no key.")
+					return nil
+				}
 				return newFilterAttrVal(key[1:], value)
 			case strings.HasSuffix(key, "()"):
 				name := key[:len(key)-2]
@@ -463,8 +475,8 @@ func (f *filterPos) apply(p *pather) {
 			p.scratch = append(p.scratch, p.candidates[f.index])
 		}
 	} else {
-		if -f.index <= len(p.candidates) {
-			p.scratch = append(p.scratch, p.candidates[len(p.candidates)+f.index])
+		if i := len(p.candidates) + f.index; i >= 0 {
+			p.scratch = append(p.scratch, p.candidates[i])
 		}
 	}
 	p.candidates, p.scratch = p.scratch, p.candidates[0:0]

@@ -5,7 +5,7 @@
     :class="{ 'files-app-bar-squashed': isSideBarOpen, 'files-app-bar-sticky': isSticky }"
   >
     <div class="files-topbar oc-py-s">
-      <h1 class="oc-invisible-sr" v-text="pageTitle" />
+      <h1 v-if="pageTitle" class="oc-invisible-sr" v-text="pageTitle" />
       <oc-hidden-announcer :announcement="selectedResourcesAnnouncement" level="polite" />
       <div
         class="oc-flex oc-flex-middle files-app-bar-controls"

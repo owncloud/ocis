@@ -21,6 +21,7 @@ export const useResourcesStore = defineStore('resources', () => {
 
   const resources = ref<Resource[]>([]) as Ref<Resource[]>
   const currentFolder = ref<Resource>()
+  const currentFolderLoadErrorStatus = ref<number>()
   const ancestorMetaData = ref<AncestorMetaData>({})
   const deleteQueue = ref<string[]>([])
 
@@ -111,7 +112,12 @@ export const useResourcesStore = defineStore('resources', () => {
   const clearResourceList = () => {
     resources.value = []
     currentFolder.value = undefined
+    currentFolderLoadErrorStatus.value = undefined
     selectedIds.value = []
+  }
+
+  const setCurrentFolderLoadErrorStatus = (status: number) => {
+    currentFolderLoadErrorStatus.value = status
   }
 
   const selectedIds = ref<string[]>([])
@@ -335,6 +341,8 @@ export const useResourcesStore = defineStore('resources', () => {
 
     initResourceList,
     clearResourceList,
+    currentFolderLoadErrorStatus,
+    setCurrentFolderLoadErrorStatus,
 
     selectedIds,
     latestSelectedId,

@@ -62,22 +62,22 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var me *libregraph.User
-	// We can just return the user from context unless we need to expand the group memberships
-	if !slices.Contains(exp, "memberOf") {
-		me = identity.CreateUserModelFromCS3(u)
-	} else {
-		var err error
-		logger.Debug().Msg("calling get user on backend")
-		me, err = g.identityBackend.GetUser(r.Context(), u.GetId().GetOpaqueId(), odataReq)
-		if err != nil {
-			logger.Debug().Err(err).Interface("user", u).Msg("could not get user from backend")
-			errorcode.RenderError(w, r, err)
-			return
-		}
-		if me.MemberOf == nil {
-			me.MemberOf = []libregraph.Group{}
-		}
+	// Always resolve the user through the identity backend. The CS3 user from
+	// the request context does not carry the issuer-assigned identity (OIDC
+	// sub), so building the model from it (CreateUserModelFromCS3) would report
+	// the internal user UUID as identities[].issuerAssignedId. The backend reads
+	// the stored external identity and returns the correct value. Group
+	// memberships are only expanded (and thus only queried) when $expand=memberOf
+	// is requested, so the extra cost here is a single user lookup.
+	logger.Debug().Msg("calling get user on backend")
+	me, err := g.identityBackend.GetUser(r.Context(), u.GetId().GetOpaqueId(), odataReq)
+	if err != nil {
+		logger.Debug().Err(err).Interface("user", u).Msg("could not get user from backend")
+		errorcode.RenderError(w, r, err)
+		return
+	}
+	if slices.Contains(exp, "memberOf") && me.MemberOf == nil {
+		me.MemberOf = []libregraph.Group{}
 	}
 
 	// expand appRoleAssignments if requested
@@ -93,9 +93,8 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 
 	preferedLanguage, _, err := getUserLanguage(r.Context(), g.valueService, me.GetId())
 	if err != nil {
-		logger.Error().Err(err).Msg("could not get user language")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not get user language")
-		return
+		logger.Warn().Err(err).Msg("could not get user language, falling back to the default language")
+		preferedLanguage = g.config.Spaces.DefaultLanguage
 	}
 
 	me.PreferredLanguage = &preferedLanguage
@@ -131,14 +130,23 @@ func (g Graph) GetUserDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if userID == "" {
-		u, ok := revactx.ContextGetUser(r.Context())
-		if !ok {
-			logger.Debug().Msg("could not get user: user not in context")
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "user not in context")
-			return
-		}
+	u, ok := revactx.ContextGetUser(r.Context())
+	if !ok {
+		logger.Debug().Msg("could not get user: user not in context")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "user not in context")
+		return
+	}
+
+	switch {
+	case userID == "":
+		// /me/drive — self access
 		userID = u.GetId().GetOpaqueId()
+	case userID != u.GetId().GetOpaqueId() && !g.contextUserHasFullAccountPerms(r.Context()):
+		// Only the owner or a full-account admin may read another user's drive;
+		// return the same 404 as a missing drive so UUIDs can't be probed.
+		logger.Debug().Str("userID", userID).Msg("could not get drive: access to another user's drive is not permitted")
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "no drive returned from storage")
+		return
 	}
 
 	logger.Debug().Str("userID", userID).Msg("calling list storage spaces with user and personal filter")
@@ -343,7 +351,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	if !hasAcceptableFilter(odataReq.Query) {
 		if !ctxHasFullPerms {
-			// regular users are allowed to filter only by userType
+			// regular users are allowed to filter only by userType or vaultEligible
 			logger.Debug().Interface("query", r.URL.Query()).Msg("forbidden filter for a regular user")
 			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "filter has forbidden elements for regular users")
 			return
@@ -377,11 +385,11 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	username, instancename := g.parseExternalSearch(odataReq)
 
 	switch {
+	case odataReq.Query.Filter != nil:
+		users, err = g.applyUserFilter(r.Context(), odataReq, nil)
 	case username != "" && instancename != "" && g.contextUserHasExternalSharePermission(r.Context()):
 		users = make([]*libregraph.User, 1)
 		users[0], err = g.identityBackend.GetPreciseUser(r.Context(), username, instancename, odataReq)
-	case odataReq.Query.Filter != nil:
-		users, err = g.applyUserFilter(r.Context(), odataReq, nil)
 	default:
 		users, err = g.identityBackend.GetUsers(r.Context(), odataReq)
 	}
@@ -848,7 +856,7 @@ func (g Graph) PatchMe(w http.ResponseWriter, r *http.Request) {
 	changes := libregraph.NewUserUpdate()
 	err := StrictJSONUnmarshal(r.Body, changes)
 	if err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update user: invalid request body")
+		logger.Debug().Err(err).Msg("could not update user: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
 			fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
@@ -895,7 +903,7 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 	changes := libregraph.NewUserUpdate()
 	err = StrictJSONUnmarshal(r.Body, changes)
 	if err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update user: invalid request body")
+		logger.Debug().Err(err).Msg("could not update user: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
 			fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
@@ -936,7 +944,7 @@ func (g Graph) patchUser(w http.ResponseWriter, r *http.Request, nameOrID string
 	}
 
 	if reflect.ValueOf(*changes).IsZero() {
-		logger.Debug().Interface("body", r.Body).Msg("ignoring empty request body")
+		logger.Debug().Msg("ignoring empty request body")
 		render.Status(r, http.StatusNoContent)
 		render.NoContent(w, r)
 		return
@@ -1149,13 +1157,7 @@ func sortUsers(req *godata.GoDataRequest, users []*libregraph.User) ([]*libregra
 func isValidUserType(userType string) bool {
 	userType = strings.ToLower(userType)
 
-	for _, value := range []string{"member", "guest"} {
-		if userType == value {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains([]string{"member", "guest"}, userType)
 }
 
 func (g Graph) searchOCMAcceptedUsers(ctx context.Context, odataReq *godata.GoDataRequest) ([]*libregraph.User, error) {

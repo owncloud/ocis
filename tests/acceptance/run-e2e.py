@@ -4,6 +4,9 @@ Run Playwright e2e tests against a local OCIS instance.
 
 Usage: E2E_ARGS='--run-part 1' python3 tests/acceptance/run-e2e.py
 Optional: TIKA_NEEDED=true, KEYCLOAK_NEEDED=true
+Optional: K8S=true, TEST_SERVER_URL=<url> - run against an already-deployed
+k8s OCIS instance (see .github/workflows/k8s.yml) instead of starting one
+locally. All other *_NEEDED flags are ignored in this mode.
 """
 
 import json
@@ -120,34 +123,8 @@ def main() -> int:
               file=sys.stderr)
         return 1
 
-    tika_needed = os.environ.get("TIKA_NEEDED", "").lower() == "true"
-    keycloak_needed = os.environ.get("KEYCLOAK_NEEDED", "").lower() == "true"
-    mfa_needed = os.environ.get("MFA_NEEDED", "").lower() == "true"
-    oidc_needed = os.environ.get("OIDC_NEEDED", "").lower() == "true"
-    oidc_iframe_needed = os.environ.get("OIDC_IFRAME_NEEDED", "").lower() == "true"
-    collaboration_needed = os.environ.get("COLLABORATION_NEEDED", "").lower() == "true"
-    federated_needed = os.environ.get("FEDERATED_NEEDED", "").lower() == "true"
-    # MFA mode runs ocis behind keycloak with TOTP enforced
-    keycloak_needed = keycloak_needed or mfa_needed
-
     repo_root = Path(__file__).resolve().parents[2]
-    ocis_bin = repo_root / "ocis/bin/ocis"
-    wrapper_bin = repo_root / "tests/ociswrapper/bin/ociswrapper"
-    # The federated suite must address the primary as localhost instead of
-    # 127.0.0.1: the ocm invite flow bakes this host into invite codes
-    # (token@host), and the federated instance authorizes it against
-    # tests/config/local/providers.json (shared with run-github.py's apiOcm
-    # suite), which only lists localhost:9200.
-    ocis_url = "https://localhost:9200" if federated_needed else "https://127.0.0.1:9200"
-    ocis_config_dir = Path.home() / ".ocis/config"
     web_dir = repo_root / "web"
-
-    # build ocis + ociswrapper only if not already provided (e.g. via artifact)
-    if not ocis_bin.exists():
-        run(["make", "-C", str(repo_root / "ocis"), "build"])
-    if not wrapper_bin.exists():
-        run(["make", "-C", str(repo_root / "tests/ociswrapper"), "build"],
-            env={"GOWORK": "off"})
 
     if not (web_dir / "node_modules").exists():
         pkg_manager = json.loads((web_dir / "package.json").read_text()).get("packageManager", "pnpm")
@@ -157,6 +134,82 @@ def main() -> int:
         subprocess.run(["pnpm", "install"], cwd=web_dir, check=True)
         subprocess.run(["pnpm", "exec", "playwright", "install", "--with-deps", "chromium"],
                        cwd=web_dir, check=True)
+
+    vault_storage_needed = (
+        os.environ.get("VAULT_STORAGE_NEEDED", "").lower() == "true"
+        or os.environ.get("VAULT_MODE", "").lower() == "true"
+    )
+
+    if os.environ.get("K8S", "").lower() == "true":
+        # oCIS is already running as a Helm-deployed k8s cluster (see
+        # .github/workflows/k8s.yml) -- unlike the flow below, there's no local
+        # binary to build, init, or start. Just confirm it's up and point
+        # Playwright straight at it.
+        ocis_url = os.environ["TEST_SERVER_URL"]
+        if vault_storage_needed:
+            wait_for(
+                lambda: subprocess.run(
+                    ["curl", "-sf", "http://localhost:19205/readyz"], capture_output=True
+                ).returncode == 0,
+                120,
+                "ocis proxy",
+            )
+        else:
+            keycloak_enabled = os.environ.get("KEYCLOAK", "").lower() == "true"
+            wait_for(
+                lambda: ocis_healthy(ocis_url, use_basic_auth=not keycloak_enabled),
+                120,
+                "ocis",
+            )
+        print("ocis ready.")
+
+        playwright_env = {
+            **os.environ,
+            "BASE_URL_OCIS": ocis_url,
+            "HEADLESS": "true",
+            "RETRY": "3",
+            "REPORT_TRACING": "false",
+            "BROWSER": "chromium",
+        }
+        if os.environ.get("FEDERATED_NEEDED", "").lower() == "true":
+            federated_url = os.environ["FED_SERVER_URL"]
+            wait_for(lambda: ocis_healthy(federated_url), 120, "ocis-federated")
+            print("ocis-federated ready.")
+            playwright_env["FEDERATED_BASE_URL_OCIS"] = federated_url
+        print(f"Running e2e: {e2e_args}")
+        result = subprocess.run(
+            ["bash", "run-e2e.sh"] + shlex.split(e2e_args),
+            cwd=web_dir / "tests/e2e",
+            env=playwright_env,
+        )
+        return result.returncode
+
+    tika_needed = os.environ.get("TIKA_NEEDED", "").lower() == "true"
+    keycloak_needed = os.environ.get("KEYCLOAK_NEEDED", "").lower() == "true"
+    mfa_needed = os.environ.get("MFA_NEEDED", "").lower() == "true"
+    oidc_needed = os.environ.get("OIDC_NEEDED", "").lower() == "true"
+    oidc_iframe_needed = os.environ.get("OIDC_IFRAME_NEEDED", "").lower() == "true"
+    collaboration_needed = os.environ.get("COLLABORATION_NEEDED", "").lower() == "true"
+    federated_needed = os.environ.get("FEDERATED_NEEDED", "").lower() == "true"
+    # MFA mode runs ocis behind keycloak with TOTP enforced
+    keycloak_needed = keycloak_needed or mfa_needed or vault_storage_needed
+
+    ocis_bin = repo_root / "ocis/bin/ocis"
+    wrapper_bin = repo_root / "tests/ociswrapper/bin/ociswrapper"
+    # The federated suite must address the primary as localhost instead of
+    # 127.0.0.1: the ocm invite flow bakes this host into invite codes
+    # (token@host), and the federated instance authorizes it against
+    # tests/config/local/providers.json (shared with run-github.py's apiOcm
+    # suite), which only lists localhost:9200.
+    ocis_url = "https://localhost:9200" if federated_needed else "https://127.0.0.1:9200"
+    ocis_config_dir = Path.home() / ".ocis/config"
+
+    # build ocis + ociswrapper only if not already provided (e.g. via artifact)
+    if not ocis_bin.exists():
+        run(["make", "-C", str(repo_root / "ocis"), "build"])
+    if not wrapper_bin.exists():
+        run(["make", "-C", str(repo_root / "tests/ociswrapper"), "build"],
+            env={"GOWORK": "off"})
 
     # init ocis
     run([str(ocis_bin), "init", "--insecure", "true"])
@@ -219,7 +272,7 @@ def main() -> int:
     # - mfa flow needs `acr` so Keycloak emits the LoA claim used for step-up.
     if oidc_needed:
         gha_web_cfg["openIdConnect"]["scope"] = "openid profile email offline_access"
-    if mfa_needed:
+    if mfa_needed or vault_storage_needed:
         gha_web_cfg["openIdConnect"]["scope"] = "openid profile email acr"
 
     gha_web_cfg_path = ocis_config_dir / "web-ui-config.json"
@@ -328,6 +381,14 @@ def main() -> int:
 
     if mfa_needed:
         server_env.update({
+            "OCIS_MFA_ENABLED": "true",
+            "WEB_OIDC_SCOPE": "openid profile email acr",
+        })
+
+    if vault_storage_needed:
+        server_env.update({
+            "OCIS_ENABLE_VAULT_MODE": "true",
+            "FRONTEND_ENABLE_VAULT_MODE": "true",
             "OCIS_MFA_ENABLED": "true",
             "WEB_OIDC_SCOPE": "openid profile email acr",
         })
@@ -530,6 +591,43 @@ def main() -> int:
 
         if mfa_needed:
             playwright_env["MFA"] = "true"
+
+        if vault_storage_needed:
+            vault_data_dir = Path.home() / "ocis/storage/users-vault"
+            vault_data_dir.mkdir(parents=True, exist_ok=True)
+            playwright_env["VAULT_MODE"] = "true"
+
+            vault_env = {
+                **server_env,
+                "STORAGE_USERS_ENABLE_VAULT_MODE": "true",
+                "STORAGE_USERS_SERVICE_NAME": "storage-users-vault",
+                "STORAGE_USERS_GRPC_ADDR": "127.0.0.1:19285",
+                "STORAGE_USERS_HTTP_ADDR": "127.0.0.1:19286",
+                "STORAGE_USERS_DATA_SERVER_URL": "http://127.0.0.1:19286/data",
+                "STORAGE_USERS_DEBUG_ADDR": "127.0.0.1:19287",
+                "STORAGE_USERS_OCIS_ROOT": str(vault_data_dir),
+                "STORAGE_USERS_EVENTS_CONSUMER_GROUP": "vault-dcfs",
+                "PROXY_CSP_CONFIG_FILE_LOCATION": str(repo_root / "tests/config/ci/csp.yaml")
+            }
+
+            print("Starting storage-users-vault...")
+
+            vault_proc = subprocess.Popen(
+                [str(ocis_bin), "storage-users", "server"],
+                env=vault_env,
+            )
+            procs.append(vault_proc)
+
+            wait_for(
+                lambda: subprocess.run(
+                    ["curl", "-sf", "http://127.0.0.1:19287/healthz"],
+                    capture_output=True,
+                ).returncode == 0,
+                120,
+                "storage-users-vault",
+            )
+
+            print("vault ready.")
 
         if federated_needed:
             playwright_env["FEDERATED_BASE_URL_OCIS"] = "localhost:10200"

@@ -11,10 +11,10 @@
     "@ownclouders/design-system": "workspace:^",
     "@ownclouders/web-client": "workspace:*",
     "@ownclouders/web-pkg": "workspace:*",
-    "pinia": "^3.0.4",
+    "pinia": "^4.1.0",
     "luxon": "^3.7.2",
     "vue-concurrency": "^5.0.3",
     "vue-router": "^5.0.6",
-    "vue3-gettext": "^2.4.0"
+    "vue3-gettext": "^4.0.1"
   }
 }

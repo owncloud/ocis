@@ -24,20 +24,19 @@ $ yarn add @ownclouders/web-client
 
 ### Graph
 
-The graph client needs to be instantiated with a base URI corresponding to your oCIS deployment and an axios instance. The axios instance is being used for all requests, which means it needs to include all relevant headers either statically or via interceptor.
+The graph client needs to be instantiated with a base URI corresponding to your oCIS deployment and a `FetchClient`. The `FetchClient` is being used for all requests, which means it needs to include all relevant headers, either statically or via the `headers` callback for values that change over time.
 
 ```
-import axios from axios
-import { graph } from '@ownclouders/web-client'
+import { FetchClient, graph } from '@ownclouders/web-client'
 
 const accessToken = 'some_access_token'
 const baseURI = 'some_base_uri'
 
-const axiosClient = axios.create({
-	headers: { Authorization: accessToken }
+const httpClient = new FetchClient({
+	staticHeaders: { Authorization: accessToken }
 })
 
-const graphClient = graph(baseURI, axiosClient)
+const graphClient = graph(baseURI, httpClient)
 ```
 
 The following example demonstrates how to retrieve all spaces accessible to the user. A `SpaceResource` can then be used to e.g. fetch files and folders (see webdav example down below).
@@ -48,20 +47,19 @@ const mySpaces = await graphClient.drives.listMyDrives()
 
 ### OCS
 
-The ocs client needs to be instantiated with a base URI corresponding to your oCIS deployment and an axios instance. The axios instance is being used for all requests, which means it needs to include all relevant headers either statically or via interceptor.
+The ocs client needs to be instantiated with a base URI corresponding to your oCIS deployment and a `FetchClient`. The `FetchClient` is being used for all requests, which means it needs to include all relevant headers, either statically or via the `headers` callback for values that change over time.
 
 ```
-import axios from axios
-import { ocs } from '@ownclouders/web-client'
+import { FetchClient, ocs } from '@ownclouders/web-client'
 
 const accessToken = 'some_access_token'
 const baseURI = 'some_base_uri'
 
-const axiosClient = axios.create({
-	headers: { Authorization: accessToken }
+const httpClient = new FetchClient({
+	staticHeaders: { Authorization: accessToken }
 })
 
-const ocsClient = ocs(baseURI, axiosClient)
+const ocsClient = ocs(baseURI, httpClient)
 ```
 
 The following examples demonstrate how to fetch capabilities and sign URLs.

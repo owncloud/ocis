@@ -1,5 +1,5 @@
 import type { ShareRole, SpaceResource } from '../../helpers'
-import type { Drive } from '../generated'
+import type { Drive, DriveUpdate } from '../generated'
 import type { GraphRequestOptions } from '../types'
 
 export interface GraphDrives {
@@ -15,7 +15,7 @@ export interface GraphDrives {
   ) => Promise<SpaceResource>
   updateDrive: (
     id: string,
-    data: Drive,
+    data: DriveUpdate,
     graphRoles: Record<string, ShareRole>,
     requestOptions?: GraphRequestOptions
   ) => Promise<SpaceResource>

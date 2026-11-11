@@ -1,12 +1,12 @@
 <template>
-  <div class="oc-login-card oc-position-center">
+  <main class="oc-login-card oc-position-center">
     <img class="oc-login-logo" :src="logoImg" alt="" :aria-hidden="true" />
     <div class="oc-login-card-body">
       <h1 v-text="$gettext('Missing or invalid config')" class="oc-login-card-title" />
       <p v-text="$gettext('Please check if the file config.json exists and is correct.')" />
       <p v-text="$gettext('Also, make sure to check the browser console for more information.')" />
     </div>
-    <div class="oc-login-card-footer">
+    <footer class="oc-login-card-footer">
       <p>
         <span v-text="$gettext('For help visit our')" />
         <a
@@ -20,8 +20,8 @@
       <p>
         {{ footerSlogan }}
       </p>
-    </div>
-  </div>
+    </footer>
+  </main>
 </template>
 
 <script lang="ts">

@@ -4,7 +4,7 @@ import { RouteLocationRaw, Router, RouteRecordNormalized } from 'vue-router'
 import { App, computed, watch } from 'vue'
 import { loadTheme } from '../helpers/theme'
 import { createGettext, GetTextOptions, Language, Translations } from 'vue3-gettext'
-import { getBackendVersion, getWebVersion } from '@ownclouders/web-pkg'
+import { getBackendVersion } from '@ownclouders/web-pkg'
 import {
   useModals,
   useThemeStore,
@@ -74,10 +74,12 @@ import {
   sseEventWrapper,
   onSSELinkUpdatedEvent,
   onSSEBackchannelLogoutEvent,
+  ProcessedItems,
+  refreshStaleProcessingResources,
   SseEventWrapperOptions
 } from './sse'
 import { loadAppTranslations } from '../helpers/language'
-import { urlJoin } from '@ownclouders/web-client'
+import { PASSWORD_PROTECTED_FOLDER_VIEW_QUERY, urlJoin } from '@ownclouders/web-client'
 import { supportedLanguages } from '../defaults'
 
 const getEmbedConfigFromQuery = (
@@ -174,6 +176,7 @@ export const announceConfiguration = async ({
     hideAppSwitcher: getQueryParam('hide-app-switcher') === 'true',
     hideAccountMenu: getQueryParam('hide-account-menu') === 'true',
     hideNavigation: getQueryParam('hide-navigation') === 'true',
+    passwordProtectedFolderView: getQueryParam(PASSWORD_PROTECTED_FOLDER_VIEW_QUERY) === 'true',
     defaultLanguage
   }
 
@@ -639,6 +642,14 @@ export const announceDefaults = ({
       path: '/',
       redirect: () => route
     })
+    // the vault has no app of its own, send `/vault` to the default app within the vault scope
+    router.addRoute({
+      path: '/vault',
+      redirect: () => {
+        const { path, query, hash } = router.resolve(route as RouteLocationRaw)
+        return { path: `/vault${path}`, query, hash }
+      }
+    })
   }
 }
 
@@ -652,7 +663,7 @@ export const announceVersions = ({
 }: {
   capabilityStore: CapabilityStore
 }): void => {
-  const versions = [getWebVersion(), getBackendVersion({ capabilityStore })].filter(Boolean)
+  const versions = [getBackendVersion({ capabilityStore })].filter(Boolean)
   versions.forEach((version) => {
     console.log(
       `%c ${version} `,
@@ -761,6 +772,22 @@ export const registerSSEEventListeners = ({
     }
   )
 
+  const processedItems: ProcessedItems = new Map()
+
+  resourcesStore.$onAction(({ name, after }) => {
+    if (!['initResourceList', 'setResources', 'upsertResource', 'upsertResources'].includes(name)) {
+      return
+    }
+    after(() =>
+      refreshStaleProcessingResources({
+        resourcesStore,
+        spacesStore,
+        clientService,
+        processedItems
+      })
+    )
+  })
+
   const sseEventWrapperOptions = {
     resourcesStore,
     spacesStore,
@@ -772,7 +799,8 @@ export const registerSSEEventListeners = ({
     previewService,
     language,
     router,
-    resourceQueue
+    resourceQueue,
+    processedItems
   } satisfies Partial<SseEventWrapperOptions>
 
   clientService.sseAuthenticated.addEventListener(MESSAGE_TYPE.ITEM_RENAMED, (msg) =>

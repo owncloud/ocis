@@ -6,7 +6,7 @@ import { useAbility } from '../../ability'
 import { useClientService } from '../../clientService'
 import { useLoadingService } from '../../loadingService'
 import { isProjectSpaceResource } from '@ownclouders/web-client'
-import { Drive } from '@ownclouders/web-client/graph/generated'
+import { DriveUpdate } from '@ownclouders/web-client/graph/generated'
 import { resolveFileNameDuplicate } from '../../../helpers/resource/conflictHandling'
 import PQueue from 'p-queue'
 import { useRouter } from '../../router'
@@ -70,7 +70,7 @@ export const useSpaceActionsDuplicate = () => {
       if (existingSpace.spaceReadmeData || existingSpace.spaceImageData) {
         const specialRequestData = {
           special: []
-        } as Drive
+        } as DriveUpdate
 
         if (existingSpace.spaceReadmeData) {
           const newSpaceReadmeFile = await clientService.webdav.getFileInfo(duplicatedSpace, {

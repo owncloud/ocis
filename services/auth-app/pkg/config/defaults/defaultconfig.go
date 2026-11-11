@@ -76,6 +76,9 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.GRPCClientTLS == nil && cfg.Commons != nil {
 		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
 	}
+	if cfg.GRPCClientOptions == nil && cfg.Commons != nil {
+		cfg.GRPCClientOptions = structs.CopyOrZeroValue(cfg.Commons.GRPCClientOptions)
+	}
 
 	if cfg.Reva == nil && cfg.Commons != nil {
 		cfg.Reva = structs.CopyOrZeroValue(cfg.Commons.Reva)

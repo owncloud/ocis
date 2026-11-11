@@ -17,7 +17,7 @@ type FileInfo interface {
 	// implementations with different properties. You can use the same map
 	// for all the implementations knowing that the relevant properties for
 	// each implementation will be set.
-	SetProperties(props map[string]interface{})
+	SetProperties(props map[string]any)
 
 	// GetTarget will return the target implementation (OnlyOffice, Collabora...).
 	// This will help to identify the implementation we're using in an easy way.
@@ -118,6 +118,10 @@ const (
 
 	KeyEnableShare  = "EnableShare"
 	KeyHideUserList = "HideUserList"
+
+	// Collabora-specific properties (not part of the MS WOPI spec)
+	KeyIsUserLocked = "IsUserLocked"
+	KeyIsAdminUser  = "IsAdminUser"
 
 	// OnlyOffice (non-dupped) properties below
 

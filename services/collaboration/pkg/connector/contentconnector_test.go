@@ -410,6 +410,34 @@ var _ = Describe("ContentConnector", func() {
 			Expect(response).To(BeNil())
 		})
 
+		It("InitiateFileUpload retries while the file is processing", func() {
+			reader := strings.NewReader("Content to upload is here!")
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Lock: &providerv1beta1.Lock{
+						LockId: "goodAndValidLock",
+						Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
+					},
+					Size: uint64(123456789),
+				},
+			}, nil)
+
+			gatewayClient.On("InitiateFileUpload", mock.Anything, mock.Anything).Return(&gateway.InitiateFileUploadResponse{
+				Status: status.NewTooEarly(ctx, "resource is processing"),
+			}, nil).Twice()
+			gatewayClient.On("InitiateFileUpload", mock.Anything, mock.Anything).Return(&gateway.InitiateFileUploadResponse{
+				Status: status.NewOK(ctx),
+			}, nil).Once()
+
+			// no upload protocols are returned, so the upload fails after InitiateFileUpload succeeds
+			_, err := cc.PutFile(ctx, reader, reader.Size(), "goodAndValidLock")
+			Expect(err).To(Equal(connector.NewConnectorError(500, "url is missing")))
+			gatewayClient.AssertNumberOfCalls(GinkgoT(), "InitiateFileUpload", 3)
+		})
+
 		It("upload request failed", func() {
 			reader := strings.NewReader("Content to upload is here!")
 			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)

@@ -69,6 +69,9 @@ export const useFileActionsEmptyTrashBin = () => {
         if (!capabilityStore.filesPermanentDeletion) {
           return false
         }
+        if (resourcesStore.activeResources.length === 0) {
+          return false
+        }
 
         if (
           isProjectSpaceResource(space) &&
@@ -78,9 +81,6 @@ export const useFileActionsEmptyTrashBin = () => {
         }
 
         return true
-      },
-      isDisabled: () => {
-        return resourcesStore.activeResources.length === 0
       },
       class: 'oc-files-actions-empty-trash-bin-trigger',
       variation: 'danger',

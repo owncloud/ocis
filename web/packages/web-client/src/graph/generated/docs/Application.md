@@ -1,24 +1,38 @@
+
 # Application
 
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**id** | **string** | The unique identifier for the object. 12345678-9abc-def0-1234-56789abcde. The value of the ID property is often, but not exclusively, in the form of a GUID. The value should be treated as an opaque identifier and not based in being a GUID. Null values are not allowed. Read-only. | [readonly] [default to undefined]
-**appRoles** | [**Array&lt;AppRole&gt;**](AppRole.md) | The collection of roles defined for the application. With app role assignments, these roles can be assigned to users, groups, or service principals associated with other applications. Not nullable. | [optional] [default to undefined]
-**displayName** | **string** | The display name for the application. | [optional] [default to undefined]
+Name | Type
+------------ | -------------
+`id` | string
+`appRoles` | [Array&lt;AppRole&gt;](AppRole.md)
+`displayName` | string
 
 ## Example
 
 ```typescript
-import { Application } from './api';
+import type { Application } from ''
 
-const instance: Application = {
-    id,
-    appRoles,
-    displayName,
-};
+// TODO: Update the object below with actual values
+const example = {
+  "id": null,
+  "appRoles": null,
+  "displayName": null,
+} satisfies Application
+
+console.log(example)
+
+// Convert the instance to a JSON string
+const exampleJSON: string = JSON.stringify(example)
+console.log(exampleJSON)
+
+// Parse the JSON string back to an object
+const exampleParsed = JSON.parse(exampleJSON) as Application
+console.log(exampleParsed)
 ```
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+

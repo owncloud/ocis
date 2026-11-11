@@ -2,7 +2,7 @@
   <main
     class="webfinger-resolve oc-height-viewport oc-flex oc-flex-column oc-flex-center oc-flex-middle"
   >
-    <h1 class="oc-invisible-sr" v-text="pageTitle" />
+    <h1 v-if="pageTitle" class="oc-invisible-sr" v-text="pageTitle" />
     <div class="oc-card oc-card-body oc-text-center oc-width-large">
       <template v-if="hasError">
         <h2 key="webfinger-resolve-error">
@@ -58,7 +58,7 @@ loadingService.addTask(async () => {
     }
   } catch (e) {
     console.error(e)
-    if (e.response?.status === 401) {
+    if (e.statusCode === 401) {
       return authService.handleAuthError(unref(route), { forceLogout: true })
     }
     hasError.value = true

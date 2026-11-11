@@ -1,5 +1,5 @@
-import { PartialComponentProps, defaultPlugins, shallowMount } from '@ownclouders/web-test-helpers'
 import OcButton from './OcButton.vue'
+import { PartialComponentProps, defaultPlugins, shallowMount } from '../../testing'
 
 describe('OcButton', () => {
   it('should display slot html', () => {

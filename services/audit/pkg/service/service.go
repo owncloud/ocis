@@ -16,7 +16,7 @@ import (
 type Log func([]byte)
 
 // Marshaller is used to marshal events
-type Marshaller func(interface{}) ([]byte, error)
+type Marshaller func(any) ([]byte, error)
 
 // AuditLoggerFromConfig will start a new AuditLogger generated from the config
 func AuditLoggerFromConfig(ctx context.Context, cfg config.Auditlog, ch <-chan events.Event, log log.Logger) {
@@ -47,7 +47,7 @@ func StartAuditLogger(ctx context.Context, ch <-chan events.Event, log log.Logge
 				return
 			}
 
-			var auditEvent interface{}
+			var auditEvent any
 			switch ev := i.Event.(type) {
 			case events.ShareCreated:
 				auditEvent = types.ShareCreated(ev)
@@ -83,6 +83,10 @@ func StartAuditLogger(ctx context.Context, ch <-chan events.Event, log log.Logge
 				auditEvent = types.ItemRestored(ev)
 			case events.FileVersionRestored:
 				auditEvent = types.FileVersionRestored(ev)
+			case events.TagsAdded:
+				auditEvent = types.TagsAdded(ev)
+			case events.TagsRemoved:
+				auditEvent = types.TagsRemoved(ev)
 			case events.SpaceCreated:
 				auditEvent = types.SpaceCreated(ev)
 			case events.SpaceRenamed:
@@ -177,13 +181,13 @@ func Marshal(format string, log log.Logger) Marshaller {
 	case "json":
 		return json.Marshal
 	case "minimal":
-		return func(ev interface{}) ([]byte, error) {
+		return func(ev any) ([]byte, error) {
 			b, err := json.Marshal(ev)
 			if err != nil {
 				return nil, err
 			}
 
-			m := make(map[string]interface{})
+			m := make(map[string]any)
 			if err := json.Unmarshal(b, &m); err != nil {
 				return nil, err
 			}

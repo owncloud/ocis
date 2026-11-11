@@ -21,6 +21,7 @@
       :map-keydown="selectMapKeydown"
       v-bind="additionalAttributes"
       @update:model-value="$emit('update:modelValue', $event)"
+      @option:selected="onSelectOptionSelected()"
       @click="onSelectClick()"
       @search:blur="onSelectBlur()"
       @keydown="onSelectKeyDown($event)"
@@ -29,10 +30,11 @@
         <input
           class="vs__search"
           v-bind="attributes"
+          :aria-labelledby="undefined"
           role="combobox"
           :aria-expanded="dropdownOpen ? 'true' : 'false'"
           aria-haspopup="listbox"
-          :aria-controls="listboxId"
+          :aria-controls="attributes['aria-controls']"
           :aria-label="label"
           @input="userInput"
           v-on="events"
@@ -245,7 +247,6 @@ const emit = defineEmits<Emits>()
 const { $gettext } = useGettext()
 const select: VNodeRef = ref()
 const attrs = useAttrs()
-const listboxId = computed(() => `${id}-listbox`)
 
 const userInput = (event: Event) => {
   /**
@@ -279,6 +280,16 @@ const onSelectClick = () => {
 
 const onSelectBlur = () => {
   setDropdownEnabled(false)
+}
+
+const onSelectOptionSelected = async () => {
+  // vue-select blurs the search input itself right after a mouse-click
+  // selection, dropping focus to the page. Restore it once that blur has
+  // run so the combobox keeps focus, as the APG combobox pattern expects.
+  // Deliberately not done on deselect (e.g. a chip's remove button): that
+  // never blurs, and focusing the search input there would pop the dropdown open.
+  await nextTick()
+  unref(select)?.searchEl?.focus()
 }
 
 /**
@@ -424,6 +435,19 @@ onBeforeUnmount(() => {
     window.removeEventListener('resize', setDropdownPosition)
   }
 })
+
+/**
+ * Focuses the combobox's search input. Exposed for consumers whose
+ * update:modelValue handler does enough async/reactive work of its own
+ * (e.g. reloading translations) that it needs to restore focus itself,
+ * once that work has actually settled, instead of relying on OcSelect's
+ * own best-effort refocus racing against it.
+ */
+const focus = () => {
+  unref(select)?.searchEl?.focus()
+}
+
+defineExpose({ focus })
 </script>
 <style lang="scss">
 .vs--disabled {
@@ -519,7 +543,7 @@ onBeforeUnmount(() => {
       &--highlight,
       &--selected {
         background-color: var(--oc-color-background-hover);
-        color: var(--oc-color-swatch-brand-hover);
+        color: var(--oc-color-input-text-default);
       }
     }
 

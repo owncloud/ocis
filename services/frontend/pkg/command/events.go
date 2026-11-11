@@ -75,6 +75,7 @@ func ListenForEvents(ctx context.Context, cfg *config.Config, l log.Logger) erro
 	grpcClient, err := grpc.NewClient(
 		append(
 			grpc.GetClientOptions(cfg.GRPCClientTLS),
+			grpc.WithKeepaliveParams(cfg.GRPCClientOptions),
 			grpc.WithTraceProvider(traceProvider),
 		)...,
 	)
@@ -151,7 +152,7 @@ func AutoAcceptShares(baseCtx context.Context, ev events.ShareCreated, autoAccep
 	}()
 
 	wg := sync.WaitGroup{}
-	for i := 0; i < maxConcurrency; i++ {
+	for range maxConcurrency {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

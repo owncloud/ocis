@@ -12,9 +12,20 @@ Feature: an user changes its own password
       | current-password | new-password | http-status-code |
       | 123456           | validPass    | 204              |
       | 123456           | кириллица    | 204              |
-      | 123456           | 密码           | 204              |
+      | 123456           | 密码           | 204             |
       | 123456           | ?&^%0        | 204              |
       | 123456           |              | 400              |
       | 123456           | 123456       | 400              |
       | wrongPass        | 123456       | 400              |
       |                  | validPass    | 400              |
+
+
+  Scenario Outline: user tries to change password without current password using PATCH
+    Given user "Alice" has been created with default attributes
+    When user "Alice" tries to change their password to "<new-password>" with patch request using the Graph API
+    Then the HTTP status code should be "<http-status-code>"
+    Examples:
+      | new-password     | http-status-code |
+      | 123456           | 400              |
+      | newPass          | 400              |
+      |                  | 400              |

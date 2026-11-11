@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"slices"
 	"strings"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
@@ -72,6 +73,7 @@ type DriveItemPermissionsService struct {
 	tp                         trace.TracerProvider
 	identityBackend            identity.Backend
 	hasExternalSharePermission externalSharePermissionChecker
+	createVaultShare           vaultShareCreator
 }
 
 type permissionType int
@@ -87,11 +89,19 @@ const (
 // supposed to return true if the user can share to users from other instances (multi-instance only)
 type externalSharePermissionChecker func(context.Context) bool
 
+// supposed to create a vault share for the user with createShare, and to give a user who never
+// logged in here the role with vault mode the guest role mapping gives them (multi-instance only)
+type vaultShareCreator func(ctx context.Context, userID string, createShare func() error) error
+
 // NewDriveItemPermissionsService creates a new DriveItemPermissionsService
-func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, config *config.Config, tp trace.TracerProvider, be identity.Backend, espc externalSharePermissionChecker) (DriveItemPermissionsService, error) {
+func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, config *config.Config, tp trace.TracerProvider, be identity.Backend, espc externalSharePermissionChecker, vsc vaultShareCreator) (DriveItemPermissionsService, error) {
 	f := func(context.Context) bool { return false }
 	if espc != nil {
 		f = espc
+	}
+	c := func(_ context.Context, _ string, createShare func() error) error { return createShare() }
+	if vsc != nil {
+		c = vsc
 	}
 
 	return DriveItemPermissionsService{
@@ -104,6 +114,7 @@ func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Sele
 		tp:                         tp,
 		identityBackend:            be,
 		hasExternalSharePermission: f,
+		createVaultShare:           c,
 	}, nil
 }
 
@@ -177,6 +188,18 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 	var shareid string
 	var expiration *types.Timestamp
 	var cTime *types.Timestamp
+
+	// use the client-supplied expiration, else default vault shares to DefaultVaultShareExpirationDays;
+	// space memberships and non-vault shares are exempt
+	resourceID := statResponse.GetInfo().GetId()
+	var shareExpiration *types.Timestamp
+	switch {
+	case invite.ExpirationDateTime != nil:
+		shareExpiration = utils.TimeToTS(*invite.ExpirationDateTime)
+	case !IsSpaceRoot(resourceID) && IsVaultResource(resourceID):
+		shareExpiration = utils.TimeToTS(time.Now().UTC().AddDate(0, 0, s.config.DefaultVaultShareExpirationDays))
+	}
+
 	switch driveRecipient.GetLibreGraphRecipientType() {
 	case "group":
 		group, err := s.identityCache.GetGroup(ctx, objectID)
@@ -188,12 +211,12 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 		permission.GrantedToV2 = &libregraph.SharePointIdentitySet{
 			Group: &libregraph.Identity{
 				DisplayName: group.GetDisplayName(),
-				Id:          conversions.ToPointer(group.GetId()),
+				Id:          new(group.GetId()),
 			},
 		}
 		createShareRequest := createShareRequestToGroup(group, statResponse.GetInfo(), cs3ResourcePermissions)
-		if invite.ExpirationDateTime != nil {
-			createShareRequest.GetGrant().Expiration = utils.TimeToTS(*invite.ExpirationDateTime)
+		if shareExpiration != nil {
+			createShareRequest.GetGrant().Expiration = shareExpiration
 		}
 		createShareResponse, err := gatewayClient.CreateShare(ctx, createShareRequest)
 		if err := errorcode.FromCS3Status(createShareResponse.GetStatus(), err); err != nil {
@@ -226,8 +249,8 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 		permission.GrantedToV2 = &libregraph.SharePointIdentitySet{
 			User: &libregraph.Identity{
 				DisplayName:        user.GetDisplayName(),
-				Id:                 conversions.ToPointer(user.GetId()),
-				LibreGraphUserType: conversions.ToPointer(user.GetUserType()),
+				Id:                 new(user.GetId()),
+				LibreGraphUserType: new(user.GetUserType()),
 			},
 		}
 
@@ -246,8 +269,8 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 			}
 
 			createShareRequest := createShareRequestToFederatedUser(user, statResponse.GetInfo().GetId(), providerInfoResp.ProviderInfo, cs3ResourcePermissions)
-			if invite.ExpirationDateTime != nil {
-				createShareRequest.Expiration = utils.TimeToTS(*invite.ExpirationDateTime)
+			if shareExpiration != nil {
+				createShareRequest.Expiration = shareExpiration
 			}
 			createShareResponse, err := gatewayClient.CreateOCMShare(ctx, createShareRequest)
 			if err := errorcode.FromCS3Status(createShareResponse.GetStatus(), err); err != nil {
@@ -259,11 +282,23 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 			expiration = createShareResponse.GetShare().GetExpiration()
 		} else {
 			createShareRequest := createShareRequestToUser(user, statResponse.GetInfo(), cs3ResourcePermissions)
-			if invite.ExpirationDateTime != nil {
-				createShareRequest.GetGrant().Expiration = utils.TimeToTS(*invite.ExpirationDateTime)
+			if shareExpiration != nil {
+				createShareRequest.GetGrant().Expiration = shareExpiration
 			}
-			createShareResponse, err := gatewayClient.CreateShare(ctx, createShareRequest)
-			if err := errorcode.FromCS3Status(createShareResponse.GetStatus(), err); err != nil {
+			var createShareResponse *collaboration.CreateShareResponse
+			createShare := func() error {
+				var err error
+				createShareResponse, err = gatewayClient.CreateShare(ctx, createShareRequest)
+				return errorcode.FromCS3Status(createShareResponse.GetStatus(), err)
+			}
+			// the vault share check needs a role with vault mode, which a user of another instance only
+			// gets at their first login here. Only a sharer who may share the resource gets it assigned.
+			if IsVaultResource(resourceID) && statResponse.GetInfo().GetPermissionSet().GetAddGrant() {
+				err = s.createVaultShare(ctx, user.GetId(), createShare)
+			} else {
+				err = createShare()
+			}
+			if err != nil {
 				s.logger.Error().Err(err).Str("resourceId", resourceId.GetStorageId()).Interface("userId", objectID).Msg("share creation failed")
 				return libregraph.Permission{}, err
 			}
@@ -275,7 +310,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 	}
 
 	if shareid != "" {
-		permission.Id = conversions.ToPointer(shareid)
+		permission.Id = new(shareid)
 	} else if IsSpaceRoot(statResponse.GetInfo().GetId()) {
 		// permissions on a space root are not handled by a share manager so
 		// they don't get a share-id
@@ -836,7 +871,7 @@ func (api DriveItemPermissionsApi) Invite(w http.ResponseWriter, r *http.Request
 	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, &ListResponse{Value: []interface{}{permission}})
+	render.JSON(w, r, &ListResponse{Value: []any{permission}})
 }
 
 // SpaceRootInvite handles DriveItemInvite requests on a space root
@@ -868,7 +903,7 @@ func (api DriveItemPermissionsApi) SpaceRootInvite(w http.ResponseWriter, r *htt
 	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, &ListResponse{Value: []interface{}{permission}})
+	render.JSON(w, r, &ListResponse{Value: []any{permission}})
 }
 
 // ListPermissions handles ListPermissions requests

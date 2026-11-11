@@ -1,5 +1,5 @@
 <template>
-  <div
+  <main
     class="oc-link-resolve oc-height-viewport oc-flex oc-flex-column oc-flex-center oc-flex-middle"
   >
     <div class="oc-card oc-text-center oc-width-large">
@@ -35,7 +35,7 @@
     >
       <span class="text" v-text="openSharedWithMeLabel" />
     </oc-button>
-  </div>
+  </main>
 </template>
 
 <script lang="ts">
@@ -46,13 +46,19 @@ import {
   useRouteQuery,
   createLocationSpaces,
   createLocationShares,
-  useClientService
+  useClientService,
+  useCapabilityStore
 } from '@ownclouders/web-pkg'
 import { unref, defineComponent, computed, onMounted, ref, Ref } from 'vue'
 import { dirname } from 'path'
 import { createFileRouteOptions, useGetResourceContext } from '@ownclouders/web-pkg'
 import { useTask } from 'vue-concurrency'
-import { isShareSpaceResource, Resource, SHARE_JAIL_ID } from '@ownclouders/web-client'
+import {
+  isShareSpaceResource,
+  Resource,
+  SHARE_JAIL_ID,
+  VAULT_STORAGE_PROVIDER_ID
+} from '@ownclouders/web-client'
 import { RouteLocationNamedRaw } from 'vue-router'
 import { useGettext } from 'vue3-gettext'
 
@@ -61,8 +67,10 @@ export default defineComponent({
   setup() {
     const router = useRouter()
     const id = useRouteParam('fileId')
+    const scope = useRouteParam('scope')
     const { $gettext } = useGettext()
     const clientService = useClientService()
+    const capabilityStore = useCapabilityStore()
 
     const resource: Ref<Resource> = ref()
     const sharedParentResource: Ref<Resource> = ref()
@@ -83,13 +91,34 @@ export default defineComponent({
     })
 
     const resolvePrivateLinkTask = useTask(function* (signal, id) {
+      // vault file but non-vault /f/ URL: hard-reload into /vault so the vault client
+      // base URLs are picked up (they are derived from the URL at boot). The MFA
+      // step-up is enforced by the authService guard on the vault scope, which also
+      // fires on a router.push, so it is not the reason for the full reload.
+      if (
+        capabilityStore.vaultEnabled &&
+        id?.split('$')[0] === VAULT_STORAGE_PROVIDER_ID &&
+        unref(scope) !== 'vault'
+      ) {
+        window.location.replace(
+          router.resolve({
+            name: 'resolvePrivateLink',
+            params: { scope: 'vault', fileId: id },
+            query: router.currentRoute.value.query
+          }).href
+        )
+        return
+      }
+
       if (
         [
           `${SHARE_JAIL_ID}$${SHARE_JAIL_ID}!${SHARE_JAIL_ID}`,
           `${SHARE_JAIL_ID}$${SHARE_JAIL_ID}`
         ].includes(id)
       ) {
-        return router.push(createLocationShares('files-shares-with-me'))
+        return router.push(
+          createLocationShares('files-shares-with-me', { params: { scope: unref(scope) } })
+        )
       }
 
       let result: Awaited<ReturnType<typeof getResourceContext>>
@@ -119,7 +148,7 @@ export default defineComponent({
           const driveItems = yield clientService.graphAuthenticated.driveItems.listSharedWithMe()
           const share = driveItems.find(({ remoteItem }) => remoteItem.id === resource.id)
 
-          isHiddenShare = share?.['@UI.Hidden']
+          isHiddenShare = share?.atUIHidden
         }
       }
 
@@ -140,7 +169,7 @@ export default defineComponent({
       const { params, query } = createFileRouteOptions(space, { fileId, path })
       const openWithDefault = unref(openWithDefaultApp) !== 'false' && !unref(details)
 
-      targetLocation.params = params
+      targetLocation.params = { ...params, scope: unref(scope) }
       targetLocation.query = {
         ...query,
         scrollTo: unref(resource).fileId,
@@ -156,9 +185,10 @@ export default defineComponent({
       return !resolvePrivateLinkTask.last || resolvePrivateLinkTask.isRunning
     })
 
-    const sharedWithMeRoute = computed(() => {
-      return { name: 'files-shares-with-me' }
-    })
+    const sharedWithMeRoute = computed(() => ({
+      name: 'files-shares-with-me',
+      params: { scope: unref(scope) }
+    }))
 
     const openSharedWithMeLabel = computed(() => {
       return $gettext('Open "Shared with me"')

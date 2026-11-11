@@ -3,9 +3,9 @@ import { useMessages, useModals } from '../../../../../src/composables/piniaStor
 import { SpaceResource } from '@ownclouders/web-client'
 import {
   defaultComponentMocks,
-  RouteLocation,
-  getComposableWrapper
-} from '@ownclouders/web-test-helpers'
+  getComposableWrapper,
+  RouteLocation
+} from '../../../../../src/testing'
 import { mock } from 'vitest-mock-extended'
 import { unref } from 'vue'
 import { User } from '@ownclouders/web-client/graph/generated'

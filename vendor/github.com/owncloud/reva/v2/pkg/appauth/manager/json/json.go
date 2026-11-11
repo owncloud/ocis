@@ -24,6 +24,7 @@ import (
 	"io"
 
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -31,14 +32,15 @@ import (
 	authpb "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	typespb "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/pkg/appauth"
 	"github.com/owncloud/reva/v2/pkg/appauth/manager/registry"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/sethvargo/go-password/password"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/protobuf/encoding/prototext"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -77,14 +79,80 @@ func New(m map[string]interface{}) (appauth.Manager, error) {
 
 	manager.config = c
 
-	// Purge expired tokens on startup so they don't accumulate over time.
-	// This runs before the manager is shared, so no lock is needed.
+	if len(manager.passwords) == 0 {
+		return manager, nil
+	}
+	// Both steps run before the manager is shared, so no lock is needed.
+	// Re-key buckets written by older versions under UserId.String(), then
+	// purge expired tokens so they don't accumulate over time.
+	changed := manager.migrateLegacyKeys()
+	
 	if !c.KeepExpiredTokensOnLoad {
 		manager.purgeExpiredTokens()
+		changed = true
+	}
+	if changed {
+		// A failed save is not fatal: the in-memory state is correct and
+		// the next start repeats the migration.
 		_ = manager.save()
 	}
 
 	return manager, nil
+}
+
+// userKey returns the key of the bucket that holds the app passwords of a user.
+// It does not use UserId.String(): that is the protobuf text format, and
+// protobuf-go varies its whitespace between binaries, so the same user gets a
+// different key after a rebuild and loses access to the stored app passwords.
+func userKey(id *userpb.UserId) string {
+	return id.GetIdp() + "|" + id.GetOpaqueId()
+}
+
+// migrateLegacyKeys re-keys the buckets that older versions stored under
+// UserId.String(). It parses each such key back into a user id and moves the
+// bucket under userKey. Buckets of the same user that differ only in whitespace
+// are merged. It reports whether it changed anything.
+// Must be called before the manager is shared (no lock needed).
+func (mgr *jsonManager) migrateLegacyKeys() bool {
+	migrated := make(map[string]map[string]*apppb.AppPassword, len(mgr.passwords))
+	changed := false
+	// Keys that are already stable are copied first, so that on a conflict
+	// their tokens win over the tokens of a legacy bucket.
+	var legacy []string
+	for key, tokens := range mgr.passwords {
+		if isLegacyKey(key) {
+			legacy = append(legacy, key)
+			continue
+		}
+		migrated[key] = tokens
+	}
+	for _, key := range legacy {
+		id := &userpb.UserId{}
+		if err := prototext.Unmarshal([]byte(key), id); err != nil {
+			// Not a user id in text format, keep the bucket as it is.
+			migrated[key] = mgr.passwords[key]
+			continue
+		}
+		newKey := userKey(id)
+		if migrated[newKey] == nil {
+			migrated[newKey] = make(map[string]*apppb.AppPassword, len(mgr.passwords[key]))
+		}
+		for hash, pw := range mgr.passwords[key] {
+			if _, exists := migrated[newKey][hash]; !exists {
+				migrated[newKey][hash] = pw
+			}
+		}
+		changed = true
+	}
+	if changed {
+		mgr.passwords = migrated
+	}
+	return changed
+}
+
+// isLegacyKey reports whether key looks like the text form of a user id.
+func isLegacyKey(key string) bool {
+	return strings.Contains(key, "opaque_id:") || strings.Contains(key, "idp:")
 }
 
 func (c *config) init() {
@@ -153,6 +221,7 @@ func (mgr *jsonManager) GenerateAppPassword(ctx context.Context, scope map[strin
 		return nil, errors.Wrap(err, "error creating new token")
 	}
 	userID := ctxpkg.ContextMustGetUser(ctx).GetId()
+	uKey := userKey(userID)
 	ctime := now()
 
 	password := string(tokenHashed)
@@ -168,14 +237,14 @@ func (mgr *jsonManager) GenerateAppPassword(ctx context.Context, scope map[strin
 	mgr.Lock()
 	defer mgr.Unlock()
 
-	mgr.purgeExpiredUserTokens(userID.String())
+	mgr.purgeExpiredUserTokens(uKey)
 
 	// check if user has some previous password
-	if _, ok := mgr.passwords[userID.String()]; !ok {
-		mgr.passwords[userID.String()] = make(map[string]*apppb.AppPassword)
+	if _, ok := mgr.passwords[uKey]; !ok {
+		mgr.passwords[uKey] = make(map[string]*apppb.AppPassword)
 	}
 
-	mgr.passwords[userID.String()][password] = appPass
+	mgr.passwords[uKey][password] = appPass
 
 	err = mgr.save()
 	if err != nil {
@@ -188,23 +257,23 @@ func (mgr *jsonManager) GenerateAppPassword(ctx context.Context, scope map[strin
 }
 
 func (mgr *jsonManager) ListAppPasswords(ctx context.Context) ([]*apppb.AppPassword, error) {
-	userID := ctxpkg.ContextMustGetUser(ctx).GetId()
+	uKey := userKey(ctxpkg.ContextMustGetUser(ctx).GetId())
 	mgr.RLock()
 	defer mgr.RUnlock()
 	appPasswords := []*apppb.AppPassword{}
-	for _, pw := range mgr.passwords[userID.String()] {
+	for _, pw := range mgr.passwords[uKey] {
 		appPasswords = append(appPasswords, pw)
 	}
 	return appPasswords, nil
 }
 
 func (mgr *jsonManager) InvalidateAppPassword(ctx context.Context, password string) error {
-	userID := ctxpkg.ContextMustGetUser(ctx).GetId()
+	uKey := userKey(ctxpkg.ContextMustGetUser(ctx).GetId())
 	mgr.Lock()
 	defer mgr.Unlock()
 
 	// see if user has a list of passwords
-	appPasswords, ok := mgr.passwords[userID.String()]
+	appPasswords, ok := mgr.passwords[uKey]
 	if !ok || len(appPasswords) == 0 {
 		return errtypes.NotFound("password not found")
 	}
@@ -212,11 +281,11 @@ func (mgr *jsonManager) InvalidateAppPassword(ctx context.Context, password stri
 	if _, ok := appPasswords[password]; !ok {
 		return errtypes.NotFound("password not found")
 	}
-	delete(mgr.passwords[userID.String()], password)
+	delete(mgr.passwords[uKey], password)
 
 	// if user has 0 passwords, delete user key from state map
-	if len(mgr.passwords[userID.String()]) == 0 {
-		delete(mgr.passwords, userID.String())
+	if len(mgr.passwords[uKey]) == 0 {
+		delete(mgr.passwords, uKey)
 	}
 
 	return mgr.save()
@@ -227,8 +296,9 @@ func (mgr *jsonManager) GetAppPassword(ctx context.Context, userID *userpb.UserI
 	// Expired tokens are skipped before the expensive bcrypt comparison so
 	// that accumulated expired tokens do not slow down authentication.
 	// A read lock allows concurrent GetAppPassword calls.
+	uKey := userKey(userID)
 	mgr.RLock()
-	appPasswords, ok := mgr.passwords[userID.String()]
+	appPasswords, ok := mgr.passwords[uKey]
 	if !ok {
 		mgr.RUnlock()
 		return nil, errtypes.NotFound("password not found")
@@ -259,7 +329,7 @@ func (mgr *jsonManager) GetAppPassword(ctx context.Context, userID *userpb.UserI
 	mgr.Lock()
 	defer mgr.Unlock()
 
-	if current, ok := mgr.passwords[userID.String()][matchedHash]; ok {
+	if current, ok := mgr.passwords[uKey][matchedHash]; ok {
 		current.Utime = now()
 		if err := mgr.save(); err != nil {
 			return nil, errors.Wrap(err, "error saving file")

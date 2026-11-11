@@ -2,6 +2,8 @@ package middleware
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"time"
@@ -18,6 +20,8 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend/mocks"
+	userRoleMocks "github.com/owncloud/ocis/v2/services/proxy/pkg/userroles/mocks"
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/stretchr/testify/mock"
 	"go-micro.dev/v4/store"
@@ -79,10 +83,17 @@ var _ = Describe("Authenticating requests", Label("Authentication"), func() {
 		pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
 
 		logger := log.NewLogger()
+
+		roleAssigner := &userRoleMocks.UserRoleAssigner{}
+		roleAssigner.EXPECT().ApplyUserRole(mock.Anything, mock.Anything).RunAndReturn(
+			func(ctx context.Context, user *userv1beta1.User) (*userv1beta1.User, error) { return user, nil },
+		).Maybe()
+
 		authenticators = []Authenticator{
 			BasicAuthenticator{
-				Logger:       logger,
-				UserProvider: &ub,
+				Logger:           logger,
+				UserProvider:     &ub,
+				UserRoleAssigner: roleAssigner,
 			},
 			&OIDCAuthenticator{
 				OIDCIss:       "http://idp.example.com",
@@ -140,7 +151,7 @@ var _ = Describe("Authenticating requests", Label("Authentication"), func() {
 				EnableBasicAuth(true),
 			)
 			testHandler := handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				Expect(oidc.FromContext(r.Context())).To(Equal(map[string]interface{}{
+				Expect(oidc.FromContext(r.Context())).To(Equal(map[string]any{
 					"sid": "a-session-id",
 					"exp": int64(1147483647),
 				}))
@@ -149,7 +160,7 @@ var _ = Describe("Authenticating requests", Label("Authentication"), func() {
 			testHandler.ServeHTTP(rr, req)
 			Expect(rr).To(HaveHTTPStatus(http.StatusOK))
 		})
-		It("ensures the context oidc data when user the Basic authentication is successful", func() {
+		It("ensures the authenticated user is in the context when the Basic authentication is successful", func() {
 			req := httptest.NewRequest("PROPFIND", "http://example.com/remote.php/dav/public-files/", http.NoBody)
 			req = req.WithContext(router.SetRoutingInfo(context.Background(), router.RoutingInfo{}))
 			req.SetBasicAuth("testuser", "testpassword")
@@ -158,12 +169,12 @@ var _ = Describe("Authenticating requests", Label("Authentication"), func() {
 				EnableBasicAuth(true),
 			)
 			testHandler := handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				Expect(oidc.FromContext(r.Context())).To(Equal(map[string]interface{}{
-					"email":              "testuser@example.com",
-					"ownclouduuid":       "OpaqueId",
-					"iss":                "IdpId",
-					"preferred_username": "testuser",
-				}))
+				user, ok := revactx.ContextGetUser(r.Context())
+				Expect(ok).To(Equal(true))
+				Expect(user.GetId().GetIdp()).To(Equal("IdpId"))
+				Expect(user.GetId().GetOpaqueId()).To(Equal("OpaqueId"))
+				Expect(user.GetUsername()).To(Equal("testuser"))
+				Expect(user.GetMail()).To(Equal("testuser@example.com"))
 			}))
 			rr := httptest.NewRecorder()
 			testHandler.ServeHTTP(rr, req)
@@ -212,6 +223,129 @@ var _ = Describe("Authenticating requests", Label("Authentication"), func() {
 			rr := httptest.NewRecorder()
 			testHandler.ServeHTTP(rr, req)
 			Expect(rr).To(HaveHTTPStatus(http.StatusOK))
+		})
+	})
+
+	When("the userinfo call to the IdP times out", func() {
+		It("returns a retryable status, not 401, for a transient backend failure", func() {
+			logger := log.NewLogger()
+
+			timingOutClient := oidcmocks.OIDCClient{}
+			timingOutClient.On("VerifyAccessToken", mock.Anything, mock.Anything).Return(
+				oidc.RegClaimsWithSID{
+					SessionID: "a-session-id",
+					RegisteredClaims: jwt.RegisteredClaims{
+						ExpiresAt: jwt.NewNumericDate(time.Unix(1147483647, 0)),
+					},
+				}, jwt.MapClaims{
+					"sid": "a-session-id",
+					"exp": 1147483647,
+				},
+				nil,
+			)
+			// what the oidc client returns for a userinfo timeout
+			timingOutClient.On("UserInfo", mock.Anything, mock.Anything).Return(
+				(*oidc.UserInfo)(nil),
+				errors.Join(oidc.ErrTemporarilyUnavailable,
+					fmt.Errorf("Get \"http://idp.example.com/userinfo\": %w", context.DeadlineExceeded)),
+			)
+
+			authenticators := []Authenticator{
+				&OIDCAuthenticator{
+					OIDCIss:       "http://idp.example.com",
+					Logger:        logger,
+					oidcClient:    &timingOutClient,
+					userInfoCache: store.NewMemoryStore(),
+					skipUserInfo:  false,
+				},
+			}
+
+			req := httptest.NewRequest(http.MethodGet, "http://example.com/graph/v1.0/me/drives", http.NoBody)
+			req = req.WithContext(router.SetRoutingInfo(context.Background(), router.RoutingInfo{}))
+			req.Header.Set(_headerAuthorization, "Bearer jwt.token.sig")
+
+			handler := Authentication(authenticators,
+				EnableBasicAuth(false),
+			)
+			testHandler := handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				Fail("next handler must not be reached when userinfo times out")
+			}))
+			rr := httptest.NewRecorder()
+			testHandler.ServeHTTP(rr, req)
+
+			Expect(rr).To(HaveHTTPStatus(http.StatusServiceUnavailable))
+		})
+
+		It("still returns 401 when userinfo fails without a transient signal", func() {
+			logger := log.NewLogger()
+
+			failingClient := oidcmocks.OIDCClient{}
+			failingClient.On("VerifyAccessToken", mock.Anything, mock.Anything).Return(
+				oidc.RegClaimsWithSID{
+					RegisteredClaims: jwt.RegisteredClaims{
+						ExpiresAt: jwt.NewNumericDate(time.Unix(1147483647, 0)),
+					},
+				}, jwt.MapClaims{"exp": 1147483647}, nil,
+			)
+			failingClient.On("UserInfo", mock.Anything, mock.Anything).Return(
+				(*oidc.UserInfo)(nil),
+				fmt.Errorf("401 Unauthorized: token revoked"),
+			)
+
+			authenticators := []Authenticator{
+				&OIDCAuthenticator{
+					OIDCIss:       "http://idp.example.com",
+					Logger:        logger,
+					oidcClient:    &failingClient,
+					userInfoCache: store.NewMemoryStore(),
+					skipUserInfo:  false,
+				},
+			}
+
+			req := httptest.NewRequest(http.MethodGet, "http://example.com/graph/v1.0/me/drives", http.NoBody)
+			req = req.WithContext(router.SetRoutingInfo(context.Background(), router.RoutingInfo{}))
+			req.Header.Set(_headerAuthorization, "Bearer jwt.token.sig")
+
+			handler := Authentication(authenticators, EnableBasicAuth(false))
+			testHandler := handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				Fail("next handler must not be reached for a failed authentication")
+			}))
+			rr := httptest.NewRecorder()
+			testHandler.ServeHTTP(rr, req)
+
+			Expect(rr).To(HaveHTTPStatus(http.StatusUnauthorized))
+		})
+
+		It("returns 401 for an invalid/malformed token", func() {
+			logger := log.NewLogger()
+
+			invalidTokenClient := oidcmocks.OIDCClient{}
+			invalidTokenClient.On("VerifyAccessToken", mock.Anything, mock.Anything).Return(
+				oidc.RegClaimsWithSID{}, jwt.MapClaims{}, jwt.ErrTokenMalformed,
+			)
+
+			authenticators := []Authenticator{
+				&OIDCAuthenticator{
+					OIDCIss:       "http://idp.example.com",
+					Logger:        logger,
+					oidcClient:    &invalidTokenClient,
+					userInfoCache: store.NewMemoryStore(),
+					skipUserInfo:  true,
+				},
+			}
+
+			req := httptest.NewRequest(http.MethodGet, "http://example.com/graph/v1.0/me/drives", http.NoBody)
+			req = req.WithContext(router.SetRoutingInfo(context.Background(), router.RoutingInfo{}))
+			req.Header.Set(_headerAuthorization, "Bearer invalid.token.sig")
+
+			handler := Authentication(authenticators, EnableBasicAuth(false))
+			testHandler := handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				Fail("next handler must not be reached for an invalid token")
+			}))
+			rr := httptest.NewRecorder()
+			testHandler.ServeHTTP(rr, req)
+
+			Expect(rr).To(HaveHTTPStatus(http.StatusUnauthorized))
 		})
 	})
 })

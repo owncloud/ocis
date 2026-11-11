@@ -1,97 +1,93 @@
 import {
-  MeChangepasswordApiFactory,
-  MeUserApiFactory,
-  UserApiFactory,
-  UserAppRoleAssignmentApiFactory,
-  UsersApiFactory
+  MeChangepasswordApi,
+  MeUserApi,
+  UserApi,
+  UserAppRoleAssignmentApi,
+  UsersApi
 } from './../generated'
-import type { GraphFactoryOptions } from './../types'
+import { toInitOverrides, type GraphFactoryOptions } from './../types'
 import type { GraphUsers } from './types'
 
-export const UsersFactory = ({ axiosClient, config }: GraphFactoryOptions): GraphUsers => {
-  const userApiFactory = UserApiFactory(config, config.basePath, axiosClient)
-  const usersApiFactory = UsersApiFactory(config, config.basePath, axiosClient)
-  const meUserApiFactory = MeUserApiFactory(config, config.basePath, axiosClient)
-  const meChangepasswordApiFactory = MeChangepasswordApiFactory(
-    config,
-    config.basePath,
-    axiosClient
-  )
-  const userAppRoleAssignmentApiFactory = UserAppRoleAssignmentApiFactory(
-    config,
-    config.basePath,
-    axiosClient
-  )
+export const UsersFactory = ({ config }: GraphFactoryOptions): GraphUsers => {
+  const userApi = new UserApi(config)
+  const usersApi = new UsersApi(config)
+  const meUserApi = new MeUserApi(config)
+  const meChangepasswordApi = new MeChangepasswordApi(config)
+  const userAppRoleAssignmentApi = new UserAppRoleAssignmentApi(config)
 
   return {
     async getUser(id, options, requestOptions) {
-      const { data } = await userApiFactory.getUser(
-        id,
-        options?.select ? new Set([...options.select]) : null,
-        options?.expand
-          ? new Set([...options.expand])
-          : new Set(['drive', 'memberOf', 'appRoleAssignments']),
-        requestOptions
+      return await userApi.getUser(
+        {
+          userId: id,
+          $select: options?.select ? new Set([...options.select]) : null,
+          $expand: options?.expand
+            ? new Set([...options.expand])
+            : new Set(['drive', 'memberOf', 'appRoleAssignments'])
+        },
+        toInitOverrides(requestOptions)
       )
-      return data
     },
 
     async createUser(data, requestOptions) {
-      const { data: user } = await usersApiFactory.createUser(data, requestOptions)
-      return user
+      return await usersApi.createUser({ user: data }, toInitOverrides(requestOptions))
     },
 
     async editUser(id, data, requestOptions) {
-      const { data: user } = await userApiFactory.updateUser(id, data, requestOptions)
-      return user
+      return await userApi.updateUser(
+        { userId: id, userUpdate: data },
+        toInitOverrides(requestOptions)
+      )
     },
 
     async deleteUser(id, ifMatch, requestOptions) {
-      await userApiFactory.deleteUser(id, ifMatch, requestOptions)
+      await userApi.deleteUser({ userId: id, ifMatch }, toInitOverrides(requestOptions))
     },
 
     async listUsers(options, requestOptions) {
-      const {
-        data: { value }
-      } = await usersApiFactory.listUsers(
-        options?.search,
-        options?.filter,
-        options?.orderBy ? new Set([...options.orderBy]) : null,
-        options?.select ? new Set([...options.select]) : null,
-        options?.expand ? new Set([...options.expand]) : null,
-        requestOptions
+      const { value } = await usersApi.listUsers(
+        {
+          $search: options?.search,
+          $filter: options?.filter,
+          $orderby: options?.orderBy ? new Set([...options.orderBy]) : null,
+          $select: options?.select ? new Set([...options.select]) : null,
+          $expand: options?.expand ? new Set([...options.expand]) : null
+        },
+        toInitOverrides(requestOptions)
       )
       return value
     },
 
     async getMe(options, requestOptions) {
-      const { data } = await meUserApiFactory.getOwnUser(
-        options?.expand ? new Set([...options.expand]) : new Set(['memberOf']),
-        requestOptions
+      return await meUserApi.getOwnUser(
+        { $expand: options?.expand ? new Set([...options.expand]) : new Set(['memberOf']) },
+        toInitOverrides(requestOptions)
       )
-      return data
     },
 
     async editMe(user, requestOptions) {
-      const { data } = await meUserApiFactory.updateOwnUser(user, requestOptions)
-      return data
+      return await meUserApi.updateOwnUser({ userUpdate: user }, toInitOverrides(requestOptions))
     },
 
     async changeOwnPassword(change, requestOptions) {
-      await meChangepasswordApiFactory.changeOwnPassword(change, requestOptions)
+      await meChangepasswordApi.changeOwnPassword(
+        { passwordChange: change },
+        toInitOverrides(requestOptions)
+      )
     },
 
     async exportPersonalData(id, destination, requestOptions) {
-      await userApiFactory.exportPersonalData(id, destination, requestOptions)
+      await userApi.exportPersonalData(
+        { userId: id, exportPersonalDataRequest: destination },
+        toInitOverrides(requestOptions)
+      )
     },
 
     async createUserAppRoleAssignment(id, roleAssignment, requestOptions) {
-      const { data } = await userAppRoleAssignmentApiFactory.userCreateAppRoleAssignments(
-        id,
-        roleAssignment,
-        requestOptions
+      return await userAppRoleAssignmentApi.userCreateAppRoleAssignments(
+        { userId: id, appRoleAssignment: roleAssignment },
+        toInitOverrides(requestOptions)
       )
-      return data
     }
   }
 }

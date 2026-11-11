@@ -2,10 +2,10 @@ import { useFileActionsEmptyTrashBin } from '../../../../../src/composables/acti
 import { useMessages, useModals } from '../../../../../src/composables/piniaStores'
 import { mock } from 'vitest-mock-extended'
 import {
-  getComposableWrapper,
   defaultComponentMocks,
+  getComposableWrapper,
   RouteLocation
-} from '@ownclouders/web-test-helpers'
+} from '../../../../../src/testing'
 import { unref } from 'vue'
 import { ProjectSpaceResource, TrashResource } from '@ownclouders/web-client'
 import { FileActionOptions } from '../../../../../src/composables/actions'
@@ -17,6 +17,22 @@ describe('emptyTrashBin', () => {
         invalidLocation: true,
         setup: ({ actions }, { space }) => {
           expect(unref(actions)[0].isVisible({ space, resources: [] })).toBe(false)
+        }
+      })
+    })
+    it('should be false when the trash bin is empty', () => {
+      getWrapper({
+        resources: [],
+        setup: ({ actions }, { space }) => {
+          expect(unref(actions)[0].isVisible({ space, resources: [] })).toBe(false)
+        }
+      })
+    })
+    it('should be true when the trash bin contains resources', () => {
+      getWrapper({
+        resources: [mock<TrashResource>({ id: '1' })],
+        setup: ({ actions }, { space }) => {
+          expect(unref(actions)[0].isVisible({ space, resources: [] })).toBe(true)
         }
       })
     })
@@ -80,8 +96,10 @@ function getWrapper({
   invalidLocation = false,
   resolveClearTrashBin = true,
   driveType = 'personal',
+  resources = [],
   setup
 }: {
+  resources?: TrashResource[]
   invalidLocation?: boolean
   resolveClearTrashBin?: boolean
   driveType?: string
@@ -117,7 +135,8 @@ function getWrapper({
       },
       {
         mocks,
-        provide: mocks
+        provide: mocks,
+        pluginOptions: { piniaOptions: { resourcesStore: { resources } } }
       }
     )
   }

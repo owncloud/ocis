@@ -21,6 +21,7 @@
         class="oc-width-auto"
         mode="click"
         close-on-click
+        focus-on-open
         padding-size="small"
       >
         <oc-list id="create-list" :class="areFileExtensionsShown ? 'expanded-list' : null">
@@ -121,6 +122,7 @@
       mode="click"
       class="oc-width-auto"
       close-on-click
+      focus-on-open
       padding-size="small"
       @show-drop="showDrop"
     >
@@ -359,11 +361,7 @@ const onUploadComplete = async (result: UploadResult) => {
       if (driveType === 'project' || isOwnSpace) {
         const client = clientService.graphAuthenticated
         const updatedSpace = await client.drives.getDrive(spaceId, sharesStore.graphRoles)
-        spacesStore.updateSpaceField({
-          id: updatedSpace.id,
-          field: 'spaceQuota',
-          value: updatedSpace.spaceQuota
-        })
+        spacesStore.updateSpaceUsage(updatedSpace)
       }
     }
 

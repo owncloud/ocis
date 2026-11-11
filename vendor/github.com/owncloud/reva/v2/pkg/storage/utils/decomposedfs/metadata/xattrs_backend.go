@@ -26,6 +26,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/storage/cache"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/filelocks"
@@ -82,10 +83,30 @@ func (b XattrsBackend) List(ctx context.Context, filePath string) (attribs []str
 	return b.list(ctx, filePath, true)
 }
 
+const listMaxRetries = 10
+
 func (b XattrsBackend) list(ctx context.Context, filePath string, acquireLock bool) (attribs []string, err error) {
 	attrs, err := xattr.List(filePath)
 	if err == nil {
 		return attrs, nil
+	}
+
+	// ERANGE means a concurrent writer (e.g. the posix inotify assimilate worker)
+	// mutated the attribute set mid-read. It is transient and self-clearing: retry
+	// until the set stabilises.
+	if IsErrRange(err) {
+		for attempt := 1; attempt <= listMaxRetries; attempt++ {
+			appctx.GetLogger(ctx).Debug().Err(err).Str("path", filePath).Int("attempt", attempt).Msg("xattr.List ERANGE, retrying")
+			attrs, err = xattr.List(filePath)
+			if err == nil {
+				appctx.GetLogger(ctx).Debug().Str("path", filePath).Int("attempt", attempt).Msg("xattr.List ERANGE recovered after retry")
+				return attrs, nil
+			}
+			if !IsErrRange(err) {
+				break
+			}
+		}
+		appctx.GetLogger(ctx).Error().Err(err).Str("path", filePath).Msg("xattr.List still failing after ERANGE retries")
 	}
 
 	// listing xattrs failed, try again, either with lock or without

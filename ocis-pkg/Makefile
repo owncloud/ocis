@@ -14,14 +14,6 @@ include ../.make/go.mk
 ############ release ############
 include ../.make/release.mk
 
-############ docs generate ############
-SKIP_CONFIG_DOCS_GENERATE = 1
-
-include ../.make/docs.mk
-
-.PHONY: docs-generate
-docs-generate:
-
 ############ generate ############
 include ../.make/generate.mk
 

@@ -28,6 +28,7 @@ var _ = Describe("Tika", func() {
 			fullResponse string
 			language     string
 			version      string
+			tika4        bool
 			srv          *httptest.Server
 			tika         *content.Tika
 		)
@@ -35,26 +36,46 @@ var _ = Describe("Tika", func() {
 		BeforeEach(func() {
 			body = ""
 			language = ""
-			version = ""
+			version = "Apache Tika 3.2.2"
+			tika4 = false
 			fullResponse = ""
 			srv = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 				out := ""
 				switch req.URL.Path {
 				case "/version":
 					out = version
+				// tika 3.x serves /language/string, tika 4.x only /language
 				case "/language/string":
+					if tika4 {
+						w.WriteHeader(http.StatusNotFound)
+						return
+					}
+					out = language
+				case "/language":
+					if !tika4 {
+						w.WriteHeader(http.StatusNotFound)
+						return
+					}
 					out = language
 				case "/rmeta/text":
+					// tika 4.x renamed X-TIKA:content to tk:content
+					contentKey := "X-TIKA:content"
+					if tika4 {
+						contentKey = "tk:content"
+					}
 					if fullResponse != "" {
 						out = fullResponse
 					} else {
-						out = fmt.Sprintf(`[{"X-TIKA:content":"%s"}]`, body)
+						out = fmt.Sprintf(`[{"%s":"%s"}]`, contentKey, body)
 					}
 				}
 
 				_, _ = w.Write([]byte(out))
 			}))
 
+		})
+
+		JustBeforeEach(func() {
 			cfg := conf.DefaultConfig()
 			cfg.Extractor.Tika.TikaURL = srv.URL
 			cfg.Extractor.Tika.CleanStopWords = true
@@ -122,24 +143,76 @@ var _ = Describe("Tika", func() {
 			audio := doc.Audio
 			Expect(audio).ToNot(BeNil())
 
-			Expect(audio.Album).To(Equal(libregraph.PtrString("Some Album")))
-			Expect(audio.AlbumArtist).To(Equal(libregraph.PtrString("Some AlbumArtist")))
-			Expect(audio.Artist).To(Equal(libregraph.PtrString("Some Artist")))
+			Expect(audio.Album).To(Equal(new("Some Album")))
+			Expect(audio.AlbumArtist).To(Equal(new("Some AlbumArtist")))
+			Expect(audio.Artist).To(Equal(new("Some Artist")))
 			// Expect(audio.Bitrate).To(Equal(libregraph.PtrInt64(192)))
 			// Expect(audio.Composers).To(Equal(libregraph.PtrString("Some Composers")))
 			// Expect(audio.Copyright).To(Equal(libregraph.PtrString("Some Copyright")))
 			Expect(audio.Disc).To(Equal(libregraph.PtrInt32(4)))
 			// Expect(audio.DiscCount).To(Equal(libregraph.PtrInt32(5)))
 			Expect(audio.Duration).To(Equal(libregraph.PtrInt64(225000)))
-			Expect(audio.Genre).To(Equal(libregraph.PtrString("Some Genre")))
+			Expect(audio.Genre).To(Equal(new("Some Genre")))
 			// Expect(audio.HasDrm).To(Equal(libregraph.PtrBool(false)))
 			// Expect(audio.IsVariableBitrate).To(Equal(libregraph.PtrBool(true)))
-			Expect(audio.Title).To(Equal(libregraph.PtrString("Some Title")))
+			Expect(audio.Title).To(Equal(new("Some Title")))
 			Expect(audio.Track).To(Equal(libregraph.PtrInt32(7)))
 			// Expect(audio.TrackCount).To(Equal(libregraph.PtrInt32(9)))
 			Expect(audio.Year).To(Equal(libregraph.PtrInt32(2004)))
 
 		})
+
+		It("adds audio content in the formats tika reports for mp3 files", func() {
+			fullResponse = `[
+				{
+					"xmpDM:trackNumber": "7/12",
+					"xmpDM:discNumber": "1/2",
+					"xmpDM:releaseDate": "2004-05-12",
+					"xmpDM:duration": "225.6211395263672",
+					"Content-Type": "audio/mpeg"
+				}
+			]`
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+
+			audio := doc.Audio
+			Expect(audio).ToNot(BeNil())
+
+			Expect(audio.Disc).To(Equal(libregraph.PtrInt32(1)))
+			Expect(audio.Duration).To(Equal(libregraph.PtrInt64(225621)))
+			Expect(audio.Track).To(Equal(libregraph.PtrInt32(7)))
+			Expect(audio.Year).To(Equal(libregraph.PtrInt32(2004)))
+		})
+
+		DescribeTable("skips an audio duration that is not a valid number of seconds",
+			func(duration string) {
+				fullResponse = fmt.Sprintf(`[
+					{
+						"xmpDM:genre": "Rock",
+						"xmpDM:duration": %q,
+						"Content-Type": "audio/mpeg"
+					}
+				]`, duration)
+				doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+					Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+					Size: 1,
+				})
+				Expect(err).ToNot(HaveOccurred())
+
+				audio := doc.Audio
+				Expect(audio).ToNot(BeNil())
+				Expect(audio.Genre).To(Equal(new("Rock")))
+				Expect(audio.Duration).To(BeNil())
+			},
+			Entry("NaN", "NaN"),
+			Entry("Inf", "Inf"),
+			Entry("-Inf", "-Inf"),
+			Entry("negative", "-1.5"),
+			Entry("too large for int64 milliseconds", "1e300"),
+		)
 
 		It("adds location content", func() {
 			fullResponse = `[
@@ -159,8 +232,30 @@ var _ = Describe("Tika", func() {
 
 			// TODO: Altitude is not supported right now
 			Expect(location.Altitude).To(BeNil())
-			Expect(location.Latitude).To(Equal(libregraph.PtrFloat64(49.48675890884328)))
-			Expect(location.Longitude).To(Equal(libregraph.PtrFloat64(11.103870357204285)))
+			Expect(location.Latitude).To(Equal(new(49.48675890884328)))
+			Expect(location.Longitude).To(Equal(new(11.103870357204285)))
+		})
+
+		It("adds the altitude reported by tika 4.x as geo:alt", func() {
+			fullResponse = `[{"geo:lat": "43.467157", "geo:long": "11.885395", "geo:alt": "100"}]`
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(doc.Location).ToNot(BeNil())
+			Expect(doc.Location.Altitude).To(Equal(libregraph.PtrFloat64(100)))
+		})
+
+		It("adds the altitude reported by tika 3.x as GPS:GPS Altitude", func() {
+			fullResponse = `[{"geo:lat": "43.467157", "geo:long": "11.885395", "GPS:GPS Altitude": "227.4 metres"}]`
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(doc.Location).ToNot(BeNil())
+			Expect(doc.Location.Altitude).To(Equal(new(227.4)))
 		})
 
 		It("adds image content", func() {
@@ -205,15 +300,15 @@ var _ = Describe("Tika", func() {
 			photo := doc.Photo
 			Expect(photo).ToNot(BeNil())
 
-			Expect(photo.CameraMake).To(Equal(libregraph.PtrString("Canon")))
-			Expect(photo.CameraModel).To(Equal(libregraph.PtrString("Canon EOS 5D")))
+			Expect(photo.CameraMake).To(Equal(new("Canon")))
+			Expect(photo.CameraModel).To(Equal(new("Canon EOS 5D")))
 			Expect(photo.ExposureNumerator).To(Equal(libregraph.PtrFloat64(1)))
 			Expect(photo.ExposureDenominator).To(Equal(libregraph.PtrFloat64(1000)))
-			Expect(photo.FNumber).To(Equal(libregraph.PtrFloat64(1.8)))
+			Expect(photo.FNumber).To(Equal(new(1.8)))
 			Expect(photo.FocalLength).To(Equal(libregraph.PtrFloat64(50)))
 			Expect(photo.Iso).To(Equal(libregraph.PtrInt32(100)))
 			Expect(photo.Orientation).To(Equal(libregraph.PtrInt32(1)))
-			Expect(photo.TakenDateTime).To(Equal(libregraph.PtrTime(time.Date(2018, 1, 1, 12, 34, 56, 0, time.UTC))))
+			Expect(photo.TakenDateTime).To(Equal(new(time.Date(2018, 1, 1, 12, 34, 56, 0, time.UTC))))
 		})
 
 		It("falls back to Base ISO when exif:IsoSpeedRatings is absent", func() {
@@ -257,8 +352,8 @@ var _ = Describe("Tika", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(doc.Photo).ToNot(BeNil())
-			Expect(doc.Photo.CameraMake).To(Equal(libregraph.PtrString("Google")))
-			Expect(doc.Photo.CameraModel).To(Equal(libregraph.PtrString("Pixel 7")))
+			Expect(doc.Photo.CameraMake).To(Equal(new("Google")))
+			Expect(doc.Photo.CameraModel).To(Equal(new("Pixel 7")))
 			Expect(doc.Photo.TakenDateTime).ToNot(BeNil())
 
 			Expect(doc.Image).ToNot(BeNil())
@@ -276,6 +371,36 @@ var _ = Describe("Tika", func() {
 			})
 			Expect(err).ToNot(HaveOccurred())
 			Expect(doc.Content).To(Equal("body test stop words!!!"))
+		})
+
+		Context("with tika 4.x", func() {
+			BeforeEach(func() {
+				tika4 = true
+				version = "Apache Tika 4.2.0"
+			})
+
+			It("adds content", func() {
+				body = "any body"
+
+				doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+					Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+					Size: 1,
+				})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(doc.Content).To(Equal(body))
+			})
+
+			It("removes stop words", func() {
+				body = "body to test stop words!!! against almost everyone"
+				language = "en"
+
+				doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+					Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+					Size: 1,
+				})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(doc.Content).To(Equal("body test stop words!!!"))
+			})
 		})
 
 		It("keeps stop words", func() {

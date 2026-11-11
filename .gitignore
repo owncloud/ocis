@@ -26,6 +26,9 @@ ocis/cmd/ocis/config/
 /hugo
 /docs/services/*/_index.md
 
+# deployment example runtime data (bind-mounted volumes)
+/deployments/examples/ocis_full/data/
+
 # IDEs
 .idea
 
@@ -60,6 +63,9 @@ go.work
 go.work.sum
 .env
 .envrc
+
+# generated secrets for deployment examples (e.g. Collabora WOPI proof key)
+deployments/examples/*/config/collabora/
 CLAUDE.md
 .claude/
 GEMINI.md

@@ -7,7 +7,6 @@ import {
   ViteDevServer
 } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import EnvironmentPlugin from 'vite-plugin-environment'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 import { treatAsCommonjs } from 'vite-plugin-treat-umd-as-commonjs'
 import visualizer from 'rollup-plugin-visualizer'
@@ -18,12 +17,12 @@ import { basename, join } from 'path'
 import { existsSync, readdirSync, readFileSync } from 'fs'
 
 // build config
-import packageJson from './package.json'
 import { compilerOptions } from './vite.config.common'
 import { getUserAgentRegex } from 'browserslist-useragent-regexp'
 import browserslistToEsbuild from 'browserslist-to-esbuild'
 import fetch from 'node-fetch'
 import { Agent } from 'https'
+import { execSync } from 'child_process'
 
 // @ts-ignore
 import ejs from 'ejs'
@@ -40,7 +39,6 @@ const buildConfig = {
 }
 
 const projectRootDir = searchForWorkspaceRoot(process.cwd())
-const { version } = packageJson
 const supportedBrowsersRegex = getUserAgentRegex({ allowHigherVersions: true })
 
 const stripScssMarker = '/* STYLES STRIP IMPORTS MARKER */'
@@ -83,6 +81,27 @@ type ConfigJsonResponseBody = {
 
 const getConfigJson = async (url: string) => {
   return (await getJson(url)) as ConfigJsonResponseBody
+}
+
+const getDistTime = () => {
+  const epoch = process.env.SOURCE_DATE_EPOCH
+  if (epoch) {
+    const num = Number(epoch)
+    if (!isNaN(num) && num > 0) {
+      return num * 1000
+    }
+  }
+  try {
+    const stdout = execSync('git log -1 --format=%ct', {
+      stdio: ['ignore', 'pipe', 'ignore'],
+      encoding: 'utf-8'
+    })
+    const num = parseInt(stdout.trim(), 10)
+    if (!isNaN(num) && num > 0) {
+      return num * 1000
+    }
+  } catch {}
+  return new Date().getTime()
 }
 
 export const historyModePlugins = () =>
@@ -220,9 +239,6 @@ export default defineConfig(({ mode, command }) => {
             }
           }
         },
-        EnvironmentPlugin({
-          PACKAGE_VERSION: version
-        }),
         vue({
           template: {
             compilerOptions
@@ -297,7 +313,7 @@ export default defineConfig(({ mode, command }) => {
                   buildConfig,
 
                   title: process.env.TITLE || 'ownCloud',
-                  compilationTimestamp: new Date().getTime(),
+                  distTimestamp: getDistTime(),
                   supportedBrowsersRegex: supportedBrowsersRegex
                 }
               })

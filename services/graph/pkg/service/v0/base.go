@@ -235,12 +235,12 @@ func (g BaseGraphService) libreGraphPermissionFromCS3PublicShare(createdLink *li
 	}
 	lt, actions := linktype.SharingLinkTypeFromCS3Permissions(createdLink.GetPermissions())
 	perm := libregraph.NewPermission()
-	perm.Id = libregraph.PtrString(createdLink.GetId().GetOpaqueId())
+	perm.Id = new(createdLink.GetId().GetOpaqueId())
 	perm.Link = &libregraph.SharingLink{
 		Type:                  lt,
-		PreventsDownload:      libregraph.PtrBool(false),
-		LibreGraphDisplayName: libregraph.PtrString(createdLink.GetDisplayName()),
-		LibreGraphQuickLink:   libregraph.PtrBool(createdLink.GetQuicklink()),
+		PreventsDownload:      new(false),
+		LibreGraphDisplayName: new(createdLink.GetDisplayName()),
+		LibreGraphQuickLink:   new(createdLink.GetQuicklink()),
 	}
 	perm.LibreGraphPermissionsActions = actions
 	webURL.Path = path.Join(webURL.Path, "s", createdLink.GetToken())
@@ -382,10 +382,7 @@ func (g BaseGraphService) cs3UserSharesToDriveItems(ctx context.Context, shares 
 	})
 
 	// Spawn workers that'll concurrently work the queue
-	numWorkers := g.config.MaxConcurrency
-	if len(sharesByResource) < numWorkers {
-		numWorkers = len(sharesByResource)
-	}
+	numWorkers := min(len(sharesByResource), g.config.MaxConcurrency)
 	for i := 0; i < numWorkers; i++ {
 		errg.Go(func() error {
 			for sharesByResource := range work {
@@ -435,18 +432,18 @@ func (g BaseGraphService) cs3UserSharesToDriveItems(ctx context.Context, shares 
 			return nil
 		})
 	}
-	// Wait for things to settle down, then close results chan
-	go func() {
-		_ = errg.Wait() // error is checked later
-		close(results)
-	}()
+
+	// Wait for all workers to finish before collecting the results. The workers
+	// read from driveItems, so writing to it below must not overlap with them.
+	// The results channel is buffered with len(shares), which is at least the
+	// number of items the workers can send, so they never block on the handover.
+	if err := errg.Wait(); err != nil {
+		return nil, err
+	}
+	close(results)
 
 	for item := range results {
 		driveItems[item.GetId()] = *item
-	}
-
-	if err := errg.Wait(); err != nil {
-		return nil, err
 	}
 
 	return driveItems, nil
@@ -484,10 +481,7 @@ func (g BaseGraphService) cs3OCMSharesToDriveItems(ctx context.Context, shares [
 	})
 
 	// Spawn workers that'll concurrently work the queue
-	numWorkers := g.config.MaxConcurrency
-	if len(sharesByResource) < numWorkers {
-		numWorkers = len(sharesByResource)
-	}
+	numWorkers := min(len(sharesByResource), g.config.MaxConcurrency)
 	for i := 0; i < numWorkers; i++ {
 		errg.Go(func() error {
 			for sharesByResource := range work {
@@ -535,18 +529,18 @@ func (g BaseGraphService) cs3OCMSharesToDriveItems(ctx context.Context, shares [
 			return nil
 		})
 	}
-	// Wait for things to settle down, then close results chan
-	go func() {
-		_ = errg.Wait() // error is checked later
-		close(results)
-	}()
+
+	// Wait for all workers to finish before collecting the results. The workers
+	// read from driveItems, so writing to it below must not overlap with them.
+	// The results channel is buffered with len(shares), which is at least the
+	// number of items the workers can send, so they never block on the handover.
+	if err := errg.Wait(); err != nil {
+		return nil, err
+	}
+	close(results)
 
 	for item := range results {
 		driveItems[item.GetId()] = *item
-	}
-
-	if err := errg.Wait(); err != nil {
-		return nil, err
 	}
 
 	return driveItems, nil
@@ -757,10 +751,7 @@ func (g BaseGraphService) cs3PublicSharesToDriveItems(ctx context.Context, share
 	})
 
 	// Spawn workers that'll concurrently work the queue
-	numWorkers := g.config.MaxConcurrency
-	if len(sharesByResource) < numWorkers {
-		numWorkers = len(sharesByResource)
-	}
+	numWorkers := min(len(sharesByResource), g.config.MaxConcurrency)
 	for i := 0; i < numWorkers; i++ {
 		errg.Go(func() error {
 			for sharesByResource := range work {
@@ -797,18 +788,18 @@ func (g BaseGraphService) cs3PublicSharesToDriveItems(ctx context.Context, share
 			return nil
 		})
 	}
-	// Wait for things to settle down, then close results chan
-	go func() {
-		_ = errg.Wait() // error is checked later
-		close(results)
-	}()
+
+	// Wait for all workers to finish before collecting the results. The workers
+	// read from driveItems, so writing to it below must not overlap with them.
+	// The results channel is buffered with len(shares), which is at least the
+	// number of items the workers can send, so they never block on the handover.
+	if err := errg.Wait(); err != nil {
+		return nil, err
+	}
+	close(results)
 
 	for item := range results {
 		driveItems[item.GetId()] = *item
-	}
-
-	if err := errg.Wait(); err != nil {
-		return nil, err
 	}
 
 	return driveItems, nil

@@ -247,7 +247,7 @@ export const useSharesStore = defineStore('shares', () => {
         link: {
           ...(options.type && { type: options.type }),
           ...(options.displayName && {
-            '@libre.graph.displayName': options.displayName
+            atLibreGraphDisplayName: options.displayName
           })
         },
         ...(Object.hasOwn(options, 'expirationDateTime') && {

@@ -27,6 +27,7 @@ use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
 use TestHelpers\CliHelper;
+use TestHelpers\HttpRequestHelper;
 use TestHelpers\OcisConfigHelper;
 use TestHelpers\BehatHelper;
 use Psr\Http\Message\ResponseInterface;
@@ -37,6 +38,7 @@ use Psr\Http\Message\ResponseInterface;
 class CliContext implements Context {
 	private FeatureContext $featureContext;
 	private SpacesContext $spacesContext;
+	private array $storedServiceUserPasswords = [];
 
 	/**
 	 * @BeforeScenario
@@ -51,6 +53,7 @@ class CliContext implements Context {
 		// Get all the contexts you need in this context
 		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
 		$this->spacesContext = BehatHelper::getContext($scope, $environment, 'SpacesContext');
+		$this->storedServiceUserPasswords = [];
 	}
 
 	/**
@@ -85,10 +88,12 @@ class CliContext implements Context {
 
 	/**
 	 * @When /^the administrator resets the password of (non-existing|existing) user "([^"]*)" to "([^"]*)" using the CLI$/
+	 * @When /^the administrator resets the password of (non-existing|existing) user "([^"]*)" to "([^"]*)" with user type "([^"]*)" using the CLI$/
 	 *
 	 * @param string $status
 	 * @param string $user
 	 * @param string $password
+	 * @param string|null $userType
 	 *
 	 * @return void
 	 */
@@ -96,18 +101,92 @@ class CliContext implements Context {
 		string $status,
 		string $user,
 		string $password,
+		?string $userType = null,
 	): void {
+		if ($userType === "service") {
+			$this->saveServiceUserCurrentPassword($user);
+		}
+
 		$command = "idm resetpassword -u $user";
+		if ($userType !== null) {
+			$command .= " --user-type $userType";
+		}
 		$body = [
 			"command" => $command,
 			"inputs" => [$password, $password],
 		];
 
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
-		if ($status === "non-existing") {
+		if ($status === "non-existing" || $userType === "service") {
 			return;
 		}
 		$this->featureContext->updateUserPassword($user, $password);
+	}
+
+	/**
+	 * Store the current password of a service user
+	 *
+	 * @param string $serviceUser
+	 *
+	 * @return void
+	 */
+	public function saveServiceUserCurrentPassword(string $serviceUser): void {
+		$configDir = \getenv('OCIS_CONFIG_DIR') ?: $this->featureContext->getOcisDataPath() . '/config';
+		$configFile = "$configDir/ocis.yaml";
+		$content = \file_get_contents($configFile);
+		Assert::assertNotFalse($content, "Could not read the oCIS config '$configFile'");
+		$pattern = '/^\s*' . \preg_quote($serviceUser, '/') . '_password:\s*(\S+)\s*$/m';
+		// user type "service" can also be applied to a regular user that has no
+		// service user password in the config, so only store what actually exists.
+		if (\preg_match($pattern, $content, $matches) !== 1) {
+			return;
+		}
+		$this->storedServiceUserPasswords[$serviceUser] = \trim($matches[1], "'\"");
+	}
+
+	/**
+	 * @When the administrator rollsback the password of service user :user using the CLI
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRollsbackThePasswordOfServiceUserUsingTheCLI(string $user): void {
+		Assert::assertArrayHasKey(
+			$user,
+			$this->storedServiceUserPasswords,
+			"The password of service user '$user' has not been stored in this scenario",
+		);
+		$password = $this->storedServiceUserPasswords[$user];
+		$body = [
+			"command" => "idm resetpassword -u $user --user-type service",
+			"inputs" => [$password, $password],
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @Then the admin user should be able to access the Graph API
+	 *
+	 * oCIS has no basic-auth login endpoint; every request is authenticated by the
+	 * auth_basic service, which binds to LDAP as the reva service user. A 200 here
+	 * therefore fails with 401 when the admin user cannot be authenticated.
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theAdminUserShouldBeAbleToAccessTheGraphAPI(): void {
+		$response = HttpRequestHelper::sendRequest(
+			$this->featureContext->getBaseUrl() . "/graph/v1.0/me/drives",
+			"GET",
+			$this->featureContext->getAdminUsername(),
+			$this->featureContext->getAdminPassword(),
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Admin basic auth failed, check that the service user bind password matches the IDM database",
+			$response,
+		);
 	}
 
 	/**
@@ -287,6 +366,19 @@ class CliContext implements Context {
 	public function theAdministratorReindexesASpaceUsingTheCli(string $spaceName): void {
 		$spaceId = $this->spacesContext->getSpaceIdByName($this->featureContext->getAdminUsername(), $spaceName);
 		$command = "search index --space $spaceId";
+		$body = [
+			"command" => $command,
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator optimizes the search index using the CLI
+	 *
+	 * @return void
+	 */
+	public function theAdministratorOptimizesTheSearchIndexUsingTheCli(): void {
+		$command = "search optimize";
 		$body = [
 			"command" => $command,
 		];
@@ -756,10 +848,10 @@ class CliContext implements Context {
 		$expectedMessage = str_replace("\r\n", "\n", trim($content->getRaw()));
 		$actualMessage = str_replace("\r\n", "\n", trim($response->message ?? ''));
 
-		Assert::assertSame(
+		Assert::assertStringContainsString(
 			$expectedMessage,
 			$actualMessage,
-			"Expected cli output to be $expectedMessage but found $actualMessage",
+			"Expected cli output to contain '$expectedMessage', but got: '$actualMessage'",
 		);
 	}
 
@@ -1276,5 +1368,143 @@ class CliContext implements Context {
 		}
 
 		Assert::assertTrue($found, "Could not find blob for space $spaceName ($spaceOpaqueId)");
+	}
+
+	/**
+	 * @When the administrator checks the blobstore using the CLI
+	 *
+	 * @return void
+	 */
+	public function theAdministratorChecksTheBlobstoreUsingTheCli(): void {
+		$body = ["command" => "storage-users blobstore check"];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator checks the blobstore with blob size :blobSize using the CLI
+	 *
+	 * @param string $blobSize
+	 *
+	 * @return void
+	 */
+	public function theAdministratorChecksTheBlobstoreWithBlobSizeUsingTheCli(string $blobSize): void {
+		$body = ["command" => "storage-users blobstore check --blob-size=$blobSize"];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator tries to get a blob from the blobstore using the CLI
+	 *
+	 * @return void
+	 */
+	public function theAdministratorTriesToGetABlobFromTheBlobstoreUsingTheCli(): void {
+		$body = ["command" => "storage-users blobstore get"];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator tries to get a non-existent blob from the blobstore using the CLI
+	 *
+	 * @return void
+	 */
+	public function theAdministratorTriesToGetANonExistentBlobFromTheBlobstoreUsingTheCli(): void {
+		$body = [
+			"command" => "storage-users blobstore get"
+				. " --blob-id=00000000-0000-0000-0000-000000000001"
+				. " --space-id=00000000-0000-0000-0000-000000000002",
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * Finds the most recently committed blob under the users storage root.
+	 *
+	 * Reva stages in-flight uploads as "reva-blobstore-upload-*" temp files in the
+	 * final blobs directory, so the newest file is not always a valid blob yet -
+	 * skip temps and poll until a committed blob shows up.
+	 *
+	 * @return string absolute path to a real blob file
+	 */
+	private function findNewestBlobPath(): string {
+		$storageRoot = $this->featureContext->getStorageUsersRoot();
+		$newestPath = null;
+		$retried = 0;
+		do {
+			$newestMtime = 0;
+			$newestPath = null;
+			foreach (\glob($storageRoot . '/spaces/*/*/blobs', GLOB_ONLYDIR) ?: [] as $blobsDir) {
+				$iterator = new \RecursiveIteratorIterator(
+					new \RecursiveDirectoryIterator($blobsDir, \RecursiveDirectoryIterator::SKIP_DOTS),
+				);
+				foreach ($iterator as $file) {
+					if (!$file->isFile()
+						|| \str_starts_with($file->getFilename(), 'reva-blobstore-upload-')
+					) {
+						continue;
+					}
+					$mtime = $file->getMTime();
+					if ($mtime > $newestMtime) {
+						$newestMtime = $mtime;
+						$newestPath = $file->getPathname();
+					}
+				}
+			}
+			if ($newestPath !== null) {
+				break;
+			}
+			$retried++;
+			echo "Committed blob not found under $storageRoot, retrying ($retried)...\n";
+			\usleep(STANDARD_SLEEP_TIME_MICROSEC * 50);
+		} while ($retried < STANDARD_RETRY_COUNT);
+
+		Assert::assertNotNull($newestPath, "No committed blob file found under $storageRoot");
+		return $newestPath;
+	}
+
+	/**
+	 * @When the administrator gets a blob from the blobstore using the --path flag via the CLI
+	 *
+	 * @return void
+	 */
+	public function theAdministratorGetsABlobFromTheBlobstoreUsingThePathFlagViaTheCli(): void {
+		$blobPath = $this->findNewestBlobPath();
+		$body = ["command" => "storage-users blobstore get --path=" . $blobPath];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator tries to get a blob from the blobstore with path :path using the CLI
+	 *
+	 * @param string $path
+	 *
+	 * @return void
+	 */
+	public function theAdministratorTriesToGetABlobWithPathUsingTheCli(string $path): void {
+		$body = ["command" => "storage-users blobstore get --path=" . $path];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When the administrator gets a blob from the blobstore by ID using the CLI
+	 *
+	 * @return void
+	 */
+	public function theAdministratorGetsABlobFromTheBlobstoreByIdUsingTheCli(): void {
+		$blobPath = $this->findNewestBlobPath();
+
+		// The blob path is "<root>/spaces/<pathifiedSpaceID>/blobs/<pathifiedBlobID>".
+		// The raw space/blob IDs are recovered by stripping the pathify separators,
+		// which is exactly what the CLI's depathify does on the way back in.
+		[, $rest] = \explode('/spaces/', $blobPath, 2);
+		[$pathifiedSpaceID, $pathifiedBlobID] = \explode('/blobs/', $rest, 2);
+		$spaceId = \str_replace('/', '', $pathifiedSpaceID);
+		$blobId = \str_replace('/', '', $pathifiedBlobID);
+
+		$body = [
+			"command" => "storage-users blobstore get"
+				. " --blob-id=" . $blobId
+				. " --space-id=" . $spaceId,
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
 }

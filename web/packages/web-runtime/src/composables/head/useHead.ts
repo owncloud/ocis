@@ -1,11 +1,6 @@
 import { computed, unref } from 'vue'
 import { useHead as _useHead } from '@vueuse/head'
-import {
-  useCapabilityStore,
-  useThemeStore,
-  getBackendVersion,
-  getWebVersion
-} from '@ownclouders/web-pkg'
+import { useCapabilityStore, useThemeStore, getBackendVersion } from '@ownclouders/web-pkg'
 import { storeToRefs } from 'pinia'
 
 export const useHead = () => {
@@ -26,9 +21,7 @@ export const useHead = () => {
         meta: [
           {
             name: 'generator',
-            content: [getWebVersion(), getBackendVersion({ capabilityStore })]
-              .filter(Boolean)
-              .join(', ')
+            content: getBackendVersion({ capabilityStore })
           },
           {
             name: 'theme-color',

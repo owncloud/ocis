@@ -2,6 +2,7 @@ package defaults
 
 import (
 	"path/filepath"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
@@ -52,18 +53,22 @@ func DefaultConfig() *config.Config {
 				UserObjectClass:          "inetOrgPerson",
 				GroupObjectClass:         "groupOfNames",
 				BindDN:                   "uid=reva,ou=sysusers,o=libregraph-idm",
+				RetryMaxCount:            1,
 				DisableUserMechanism:     "attribute",
 				LdapDisabledUsersGroupDN: "cn=DisabledUsersGroup,ou=groups,o=libregraph-idm",
 				IDP:                      "https://localhost:9200",
+				PoolEnabled:              false,
+				PoolSize:                 5,
+				PoolCheckoutTimeout:      30 * time.Second,
 				UserSchema: config.LDAPUserSchema{
-					ID:          "ownclouduuid",
+					ID:          "ownCloudUUID",
 					Mail:        "mail",
-					DisplayName: "displayname",
+					DisplayName: "displayName",
 					Username:    "uid",
 					Enabled:     "ownCloudUserEnabled",
 				},
 				GroupSchema: config.LDAPGroupSchema{
-					ID:          "ownclouduuid",
+					ID:          "ownCloudUUID",
 					Mail:        "mail",
 					DisplayName: "cn",
 					Groupname:   "cn",
@@ -71,16 +76,6 @@ func DefaultConfig() *config.Config {
 				},
 			},
 			JSON: config.JSONProvider{},
-			OwnCloudSQL: config.OwnCloudSQLProvider{
-				DBUsername:       "owncloud",
-				DBHost:           "mysql",
-				DBPort:           3306,
-				DBName:           "owncloud",
-				IDP:              "https://localhost:9200",
-				Nobody:           90,
-				JoinUsername:     false,
-				JoinOwnCloudUUID: false,
-			},
 		},
 	}
 }

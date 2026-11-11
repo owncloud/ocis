@@ -2,45 +2,65 @@
 
 All URIs are relative to *https://ocis.ocis.rolling.owncloud.works/graph*
 
-|Method | HTTP request | Description|
+| Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-|[**assignTags**](#assigntags) | **PUT** /v1.0/extensions/org.libregraph/tags | Assign tags to a resource|
-|[**getTags**](#gettags) | **GET** /v1.0/extensions/org.libregraph/tags | Get all known tags|
-|[**unassignTags**](#unassigntags) | **DELETE** /v1.0/extensions/org.libregraph/tags | Unassign tags from a resource|
+| [**assignTags**](TagsApi.md#assigntags) | **PUT** /v1.0/extensions/org.libregraph/tags | Assign tags to a resource |
+| [**getTags**](TagsApi.md#gettags) | **GET** /v1.0/extensions/org.libregraph/tags | Get all known tags |
+| [**unassignTags**](TagsApi.md#unassigntags) | **DELETE** /v1.0/extensions/org.libregraph/tags | Unassign tags from a resource |
 
-# **assignTags**
-> assignTags()
 
+
+## assignTags
+
+> assignTags(tagAssignment)
+
+Assign tags to a resource
 
 ### Example
 
-```typescript
+```ts
 import {
-    TagsApi,
-    Configuration,
-    TagAssignment
-} from './api';
+  Configuration,
+  TagsApi,
+} from '';
+import type { AssignTagsRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new TagsApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new TagsApi(config);
 
-let tagAssignment: TagAssignment; // (optional)
+  const body = {
+    // TagAssignment (optional)
+    tagAssignment: ...,
+  } satisfies AssignTagsRequest;
 
-const { status, data } = await apiInstance.assignTags(
-    tagAssignment
-);
+  try {
+    const data = await api.assignTags(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **tagAssignment** | **TagAssignment**|  | |
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **tagAssignment** | [TagAssignment](TagAssignment.md) |  | [Optional] |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -48,43 +68,62 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | No content |  -  |
-|**0** | error |  -  |
+| **200** | No content |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **getTags**
+
+## getTags
+
 > CollectionOfTags getTags()
 
+Get all known tags
 
 ### Example
 
-```typescript
+```ts
 import {
-    TagsApi,
-    Configuration
-} from './api';
+  Configuration,
+  TagsApi,
+} from '';
+import type { GetTagsRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new TagsApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new TagsApi(config);
 
-const { status, data } = await apiInstance.getTags();
+  try {
+    const data = await api.getTags();
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
-This endpoint does not have any parameters.
 
+This endpoint does not need any parameter.
 
 ### Return type
 
-**CollectionOfTags**
+[**CollectionOfTags**](CollectionOfTags.md)
 
 ### Authorization
 
@@ -92,51 +131,70 @@ This endpoint does not have any parameters.
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Retrieved tags |  -  |
-|**0** | error |  -  |
+| **200** | Retrieved tags |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **unassignTags**
-> unassignTags()
 
+## unassignTags
+
+> unassignTags(tagUnassignment)
+
+Unassign tags from a resource
 
 ### Example
 
-```typescript
+```ts
 import {
-    TagsApi,
-    Configuration,
-    TagUnassignment
-} from './api';
+  Configuration,
+  TagsApi,
+} from '';
+import type { UnassignTagsRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new TagsApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new TagsApi(config);
 
-let tagUnassignment: TagUnassignment; // (optional)
+  const body = {
+    // TagUnassignment (optional)
+    tagUnassignment: ...,
+  } satisfies UnassignTagsRequest;
 
-const { status, data } = await apiInstance.unassignTags(
-    tagUnassignment
-);
+  try {
+    const data = await api.unassignTags(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
+
+| Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **tagUnassignment** | **TagUnassignment**|  | |
-
+| **tagUnassignment** | [TagUnassignment](TagUnassignment.md) |  | [Optional] |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -144,15 +202,15 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | No content |  -  |
-|**0** | error |  -  |
+| **200** | No content |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

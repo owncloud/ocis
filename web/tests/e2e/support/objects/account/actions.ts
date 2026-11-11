@@ -13,6 +13,8 @@ const languageInput = '[data-testid="language"] .vs__search'
 const languageValueDropDown = `.vs__dropdown-menu :text-is("%s")`
 const languageValue = '[data-testid="language"] .vs__selected'
 const accountPageTitle = '#account-page-title'
+const accountInfoContainer = '#account-info-container'
+const accountContainer = '#account'
 const notificationEventCheckBox =
   '//div[@class="account-table"]//td[text()="%s"]//following-sibling::td//span//input[@aria-label="In-App"]'
 
@@ -42,12 +44,15 @@ export const getUserInfo = async (args: { page: Page; key: string }): Promise<st
 export const openAccountPage = async (args: { page: Page }): Promise<void> => {
   const { page } = args
   await page.locator(accountMenuButton).click()
+  // axe fails with "No elements found for include" if it runs before the content is rendered
+  await page.locator(accountInfoContainer).waitFor()
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(
     page,
     ['accountInfoContainer'],
     'account info modal'
   )
   await page.locator(accountManageButton).click()
+  await page.locator(accountContainer).waitFor()
   await objects.a11y.Accessibility.assertNoSevereA11yViolations(page, ['account'], 'account page')
 }
 

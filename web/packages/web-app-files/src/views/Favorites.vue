@@ -11,7 +11,7 @@
           icon="star"
         >
           <template #message>
-            <span v-translate>There are no resources marked as favorite</span>
+            <span>{{ $gettext('There are no resources marked as favorite') }}</span>
           </template>
         </no-content-message>
         <component

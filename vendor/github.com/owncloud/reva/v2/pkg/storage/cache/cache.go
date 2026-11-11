@@ -21,12 +21,14 @@ package cache
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/owncloud/reva/v2/pkg/natsauth"
 	"github.com/owncloud/reva/v2/pkg/store"
 	"github.com/shamaton/msgpack/v2"
 	microstore "go-micro.dev/v4/store"
@@ -51,6 +53,11 @@ type Config struct {
 	DisablePersistence bool          `mapstructure:"cache_disable_persistence"`
 	AuthUsername       string        `mapstructure:"cache_auth_username"`
 	AuthPassword       string        `mapstructure:"cache_auth_password"`
+	EnableTLS          bool          `mapstructure:"cache_enable_tls"`
+	TLSInsecure        bool          `mapstructure:"cache_tls_insecure"`
+	TLSRootCACert      string        `mapstructure:"cache_tls_root_ca_certificate"`
+	CredsFile          string        `mapstructure:"cache_creds_file"`
+	Creds              string        `mapstructure:"cache_creds"`
 }
 
 // Cache handles key value operations on caches
@@ -86,13 +93,19 @@ type FileMetadataCache interface {
 	RemoveMetadata(path string) error
 }
 
+func cacheKey(cfg Config) string {
+	return strings.Join(append(append([]string{cfg.Store}, cfg.Nodes...),
+		cfg.Database, cfg.Table,
+		strconv.FormatBool(cfg.EnableTLS)+":"+strconv.FormatBool(cfg.TLSInsecure)+":"+cfg.TLSRootCACert), ":")
+}
+
 // GetStatCache will return an existing StatCache for the given store, nodes, database and table
 // If it does not exist yet it will be created, different TTLs are ignored
 func GetStatCache(cfg Config) StatCache {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	key := strings.Join(append(append([]string{cfg.Store}, cfg.Nodes...), cfg.Database, cfg.Table), ":")
+	key := cacheKey(cfg)
 	if statCaches[key] == nil {
 		statCaches[key] = NewStatCache(cfg)
 	}
@@ -105,7 +118,7 @@ func GetProviderCache(cfg Config) ProviderCache {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	key := strings.Join(append(append([]string{cfg.Store}, cfg.Nodes...), cfg.Database, cfg.Table), ":")
+	key := cacheKey(cfg)
 	if providerCaches[key] == nil {
 		providerCaches[key] = NewProviderCache(cfg)
 	}
@@ -118,7 +131,7 @@ func GetFileMetadataCache(cfg Config) FileMetadataCache {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	key := strings.Join(append(append([]string{cfg.Store}, cfg.Nodes...), cfg.Database, cfg.Table), ":")
+	key := cacheKey(cfg)
 	if fileMetadataCaches[key] == nil {
 		fileMetadataCaches[key] = NewFileMetadataCache(cfg)
 	}
@@ -192,6 +205,16 @@ func (cache cacheStore) Close() error {
 	return cache.s.Close()
 }
 
+// CheckCredentials checks the NATS JWT credentials of the cache. The Get*Cache
+// functions cannot return an error, so call it in the constructor that uses the cache.
+// A cache that does not use NATS does not use the credentials, so it is not checked.
+func (cfg Config) CheckCredentials() error {
+	if !store.UsesNats(cfg.Store) {
+		return nil
+	}
+	return natsauth.Check(cfg.CredsFile, cfg.Creds)
+}
+
 func getStore(cfg Config) microstore.Store {
 	return store.Create(
 		store.Store(cfg.Store),
@@ -202,5 +225,7 @@ func getStore(cfg Config) microstore.Store {
 		store.Size(cfg.Size),
 		store.DisablePersistence(cfg.DisablePersistence),
 		store.Authentication(cfg.AuthUsername, cfg.AuthPassword),
+		store.Credentials(cfg.CredsFile, cfg.Creds),
+		store.TLS(cfg.EnableTLS, cfg.TLSInsecure, cfg.TLSRootCACert),
 	)
 }

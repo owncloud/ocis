@@ -82,8 +82,7 @@ const onConfirm = async () => {
             '%{groupAssignmentCount} group assignment was deleted successfully',
             '%{groupAssignmentCount} group assignments were deleted successfully',
             succeeded.length,
-            { groupAssignmentCount: succeeded.length.toString() },
-            true
+            { groupAssignmentCount: succeeded.length.toString() }
           )
     showMessage({ title })
   }
@@ -101,8 +100,7 @@ const onConfirm = async () => {
             'Failed to delete %{groupAssignmentCount} group assignment',
             'Failed to delete %{groupAssignmentCount} group assignments',
             failed.length,
-            { groupAssignmentCount: failed.length.toString() },
-            true
+            { groupAssignmentCount: failed.length.toString() }
           )
     showErrorMessage({
       title,

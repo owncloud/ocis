@@ -6,7 +6,7 @@ import {
   CapabilityStore,
   useSharesStore
 } from '../../../../../src/composables/piniaStores'
-import { defaultComponentMocks, getComposableWrapper } from '@ownclouders/web-test-helpers'
+import { defaultComponentMocks, getComposableWrapper } from '../../../../../src/testing'
 import { mock } from 'vitest-mock-extended'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 import { SharingLinkType } from '@ownclouders/web-client/graph/generated'

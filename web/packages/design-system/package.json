@@ -1,6 +1,6 @@
 {
   "name": "@ownclouders/design-system",
-  "version": "12.5.0",
+  "version": "13.0.0",
   "description": "ownCloud Design System is based on VueDesign Systems and is used to design ownCloud UI components",
   "keywords": [
     "vue design system",
@@ -13,8 +13,8 @@
   "homepage": "https://owncloud.design/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/owncloud/web",
-    "directory": "packages/design-system"
+    "url": "https://github.com/owncloud/ocis",
+    "directory": "web/packages/design-system"
   },
   "license": "Apache-2.0",
   "author": "ownClouders",
@@ -22,7 +22,6 @@
   "main": "src/index.ts",
   "private": false,
   "scripts": {
-    "lint": "lint:stylelint",
     "lint:stylelint": "stylelint './src/styles/**/*.scss' --cache",
     "tokens": "node build/build-tokens.js",
     "tokens:w": "onchange -i \"./src/tokens/**/*.json\" -- npm run tokens",
@@ -66,6 +65,11 @@
         "default": "./dist/design-system/helpers.js",
         "require": "./dist/design-system/helpers.cjs",
         "types": "./dist/types/helpers/index.d.ts"
+      },
+      "./testing": {
+        "default": "./dist/design-system/testing.js",
+        "require": "./dist/design-system/testing.cjs",
+        "types": "./dist/types/testing/index.d.ts"
       }
     }
   },
@@ -84,6 +88,9 @@
     },
     "./l10n": {
       "default": "./l10n/translations.json"
+    },
+    "./testing": {
+      "default": "./src/testing/index.ts"
     }
   },
   "dependencies": {
@@ -100,16 +107,16 @@
     "vue-inline-svg": "^4.0.1",
     "vue-router": "^5.0.6",
     "vue-select": "4.0.0-beta.6",
-    "vue3-gettext": "^2.4.0",
+    "vue3-gettext": "^4.0.1",
     "webfontloader": "^1.6.28"
   },
   "devDependencies": {
-    "@babel/core": "7.28.5",
+    "@babel/core": "7.29.6",
     "@babel/plugin-transform-runtime": "7.28.5",
     "@babel/preset-env": "7.28.5",
     "@babel/runtime": "7.28.4",
-    "@ownclouders/web-test-helpers": "workspace:*",
     "@vitejs/plugin-vue": "6.0.1",
+    "@vue/test-utils": "2.4.6",
     "autoprefixer": "10.4.22",
     "babel-core": "7.0.0-bridge.0",
     "babel-loader": "^10.0.0",
@@ -135,12 +142,18 @@
     "typescript": "5.9.3",
     "url": "^0.11.4",
     "url-loader": "^4.1.1",
-    "vite": "^7.3.5",
+    "vite": "^7.3.7",
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-node-polyfills": "^0.24.0",
     "yaml": "^2.8.1"
   },
   "peerDependencies": {
-    "vue": "^3.5.29"
+    "@vue/test-utils": "^2.4.6",
+    "vue": "^3.5.43"
+  },
+  "peerDependenciesMeta": {
+    "@vue/test-utils": {
+      "optional": true
+    }
   }
 }

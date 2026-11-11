@@ -31,7 +31,9 @@ export const test = base.extend<{
       if (!config.predefinedUsers && !config.mfa && adminUser) {
         if (config.keycloak) {
           await api.keycloak.refreshAccessTokenForKeycloakUser(adminUser)
-          await api.keycloak.refreshAccessTokenForKeycloakOcisUser(adminUser)
+          // use a new OIDC authorization-code login for the OCIS token instead of refreshing the shared Admin refresh token.
+          // This avoids Keycloak refresh-token rotation races between workers
+          await api.keycloak.setAccessTokenForKeycloakOcisUser(adminUser)
         } else {
           await api.token.refreshAccessToken(adminUser)
         }
@@ -42,6 +44,12 @@ export const test = base.extend<{
           await cleanUpUser(store.federatedUserStore, adminUser)
           config.federatedServer = false
         }
+      }
+
+      // Runs after each test has finished
+      if (config.keycloak && (config.mfa || config.vaultMode) && adminUser) {
+        await api.keycloak.setAccessTokenForKeycloakUser(adminUser)
+        await api.keycloak.deleteUserTotpCredentials({ user: adminUser })
       }
 
       await cleanUpUser(store.createdUserStore, adminUser)
@@ -65,7 +73,9 @@ export const test = base.extend<{
           const user = world.usersEnvironment.getUser({ key: config.keycloakAdminUser })
           await api.keycloak.setAccessTokenForKeycloakOcisUser(user)
           await api.keycloak.setAccessTokenForKeycloakUser(user)
-          await storeKeycloakGroups(user)
+          if (!config.vaultMode) {
+            await storeKeycloakGroups(user)
+          }
         } else {
           const user = world.usersEnvironment.getUser({ key: config.adminUsername })
           await api.token.setAccessAndRefreshToken(user)
@@ -76,6 +86,14 @@ export const test = base.extend<{
           }
         }
       }
+
+      // Runs before each test, but after the world has been initialized.
+      const adminUser = world.usersEnvironment.getUser({ key: config.keycloakAdminUser })
+      if (config.keycloak && (config.mfa || config.vaultMode) && adminUser) {
+        await api.keycloak.setAccessTokenForKeycloakUser(adminUser)
+        await api.keycloak.deleteUserTotpCredentials({ user: adminUser })
+      }
+
       await use()
     },
     { auto: true }

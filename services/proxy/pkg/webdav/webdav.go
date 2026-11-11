@@ -1,5 +1,7 @@
 package webdav
 
+import "slices"
+
 import "net/http"
 
 var methods = []string{"PROPFIND", "DELETE", "PROPPATCH", "MKCOL", "COPY", "MOVE", "LOCK", "UNLOCK"}
@@ -9,10 +11,5 @@ var methods = []string{"PROPFIND", "DELETE", "PROPPATCH", "MKCOL", "COPY", "MOVE
 // are valid methods, but this implementation would require a larger effort than we can build upon in this file.
 // This is needed because the proxy might need to create a response with a webdav body; such as unauthorized.
 func IsWebdavRequest(r *http.Request) bool {
-	for i := range methods {
-		if methods[i] == r.Method {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(methods, r.Method)
 }

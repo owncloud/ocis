@@ -12,7 +12,11 @@ const initializeCustomProps = (tokens: string[] = [], prefix: string) => {
 
 export default {
   install(app: App, options: any = {}) {
-    import('./utils/webFontLoader')
+    // Fire-and-forget, so nothing awaits the rejection: webfonts are cosmetic, and failing to
+    // load them must not surface as an unhandled rejection. Under vitest this import can still
+    // be in flight when the test environment is torn down, which rejects with
+    // `EnvironmentTeardownError`.
+    import('./utils/webFontLoader').catch(() => {})
 
     const themeOptions = options.tokens
     initializeCustomProps(themeOptions?.breakpoints, 'breakpoint-')

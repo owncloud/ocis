@@ -60,7 +60,7 @@ export const useFileActionsCreateNewFile = ({ space }: { space?: Ref<SpaceResour
     const exists = unref(resources).find((file) => file.name === fileName)
 
     if (exists) {
-      return $gettext('%{name} already exists', { name: fileName }, true)
+      return $gettext('%{name} already exists', { name: fileName })
     }
 
     return null

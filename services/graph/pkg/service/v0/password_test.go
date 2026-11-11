@@ -67,11 +67,13 @@ var _ = Describe("Users changing their own password", func() {
 			WriteEnabled:             true,
 			UserDisplayNameAttribute: "displayName",
 			UserNameAttribute:        "uid",
+			UserSurnameAttribute:     "sn",
+			UserSearchAttributes:     []string{"onPremisesSamAccountName", "displayName", "mail"},
 			UserEmailAttribute:       "mail",
-			UserIDAttribute:          "ownclouduuid",
+			UserIDAttribute:          "ownCloudUUID",
 			UserSearchScope:          "sub",
 			GroupNameAttribute:       "cn",
-			GroupIDAttribute:         "ownclouduuid",
+			GroupIDAttribute:         "ownCloudUUID",
 			GroupSearchScope:         "sub",
 		}
 		loggger := log.NewLogger()

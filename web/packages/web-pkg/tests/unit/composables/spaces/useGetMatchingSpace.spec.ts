@@ -1,9 +1,5 @@
 import { useGetMatchingSpace } from '../../../../src/composables/spaces'
-import {
-  defaultComponentMocks,
-  getComposableWrapper,
-  RouteLocation
-} from '@ownclouders/web-test-helpers'
+import { defaultComponentMocks, getComposableWrapper, RouteLocation } from '../../../../src/testing'
 import { mock } from 'vitest-mock-extended'
 import { Resource, ShareSpaceResource, SpaceResource } from '@ownclouders/web-client'
 import { useSpacesStore } from '../../../../src/composables/piniaStores'

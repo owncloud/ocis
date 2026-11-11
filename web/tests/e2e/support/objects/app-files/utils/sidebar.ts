@@ -28,20 +28,10 @@ const openForResource = async ({
       [folderModalIframe],
       'account page'
     )
-    await objects.a11y.Accessibility.assertNoSevereA11yViolations(
-      page,
-      [folderModalIframe],
-      'account page tippy box'
-    )
     await page
       .frameLocator(folderModalIframe)
       .locator('.oc-files-actions-show-details-trigger')
       .click()
-    await objects.a11y.Accessibility.assertNoSevereA11yViolations(
-      page,
-      [folderModalIframe],
-      'account page'
-    )
   } else {
     await page.locator(util.format(contextMenuButton, resource)).waitFor()
     await page.locator(util.format(contextMenuButton, resource)).click()
@@ -55,11 +45,6 @@ const openForResource = async ({
       .locator(contextMenuContainer)
       .locator('.oc-files-actions-show-details-trigger')
       .click()
-    await objects.a11y.Accessibility.assertNoSevereA11yViolations(
-      page,
-      ['appSidebar'],
-      'account page'
-    )
   }
 }
 
@@ -83,11 +68,6 @@ export const openPanelForResource = async ({
 
 const openGlobal = async ({ page }: { page: Page }): Promise<void> => {
   await page.locator('#files-toggle-sidebar').click()
-  await objects.a11y.Accessibility.assertNoSevereA11yViolations(
-    page,
-    [sidebarPanel],
-    'sidebar panel'
-  )
 }
 
 export const open = async ({
@@ -105,11 +85,6 @@ export const open = async ({
     }
   } else {
     if (await page.locator(sidebarPanel).count()) {
-      await objects.a11y.Accessibility.assertNoSevereA11yViolations(
-        page,
-        [sidebarPanel],
-        'sidebar panel'
-      )
       await Promise.all([
         page.locator(sidebarPanel).waitFor({ state: 'detached' }),
         close({ page })

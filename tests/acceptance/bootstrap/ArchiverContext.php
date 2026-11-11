@@ -325,6 +325,24 @@ class ArchiverContext implements Context {
 	}
 
 	/**
+	 * @var array
+	 */
+	private array $publicLinkArchiveData = [];
+
+	/**
+	 * @param string $password
+	 *
+	 * @return array
+	 * @throws GuzzleException
+	 */
+	private function getPublicLinkArchiveData(string $password): array {
+		if ($this->publicLinkArchiveData === []) {
+			$this->publicLinkArchiveData = $this->fetchPublicLinkArchiveData($password);
+		}
+		return $this->publicLinkArchiveData;
+	}
+
+	/**
 	 * @When /^the public downloads the archive of the last created public link with password "([^"]*)"$/
 	 *
 	 * @param string $password
@@ -334,7 +352,7 @@ class ArchiverContext implements Context {
 	 * @throws GuzzleException|Exception
 	 */
 	public function publicDownloadsTheArchiveOfTheLastCreatedPublicLink(string $password = ""): void {
-		$data = $this->fetchPublicLinkArchiveData($password);
+		$data = $this->getPublicLinkArchiveData($password);
 		$fileIds = $data['fileIds'];
 		$signature = $data['signature'];
 		$expiration = $data['expiration'];
@@ -357,6 +375,36 @@ class ArchiverContext implements Context {
 
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get($url, 'public', $password),
+		);
+	}
+
+	/**
+	 * @When the public downloads the archive of the last created public link with incorrect password :password
+	 *
+	 * @param string $password
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function publicDownloadsTheArchiveOfTheLastCreatedPublicLinkUsingBasicAuth(string $password): void {
+		$data = $this->getPublicLinkArchiveData('%public%');
+		$fileIds = $data['fileIds'];
+
+		$token = $this->featureContext->isUsingSharingNG()
+			? $this->featureContext->shareNgGetLastCreatedLinkShareToken()
+			: $this->featureContext->getLastCreatedPublicShareToken();
+
+		$queryParts = ['public-token=' . urlencode($token)];
+		foreach ($fileIds as $fileId) {
+			$queryParts[] = "id=" . urlencode($fileId);
+		}
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::get(
+				$this->getArchiverUrl(\implode('&', $queryParts)),
+				'public',
+				$password,
+			),
 		);
 	}
 

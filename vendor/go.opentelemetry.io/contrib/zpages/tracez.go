@@ -15,7 +15,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package zpages // import "go.opentelemetry.io/contrib/zpages"
+package zpages
 
 import (
 	"fmt"
@@ -232,7 +232,7 @@ func spanRows(s sdktrace.ReadOnlySpan) []spanRow {
 		sort.Sort(a)
 		var s []string
 		for i := range a {
-			s = append(s, fmt.Sprintf("%s=%v", a[i].Key, a[i].Value.Emit())) //nolint:staticcheck // Use deprecated method for formatting backward compatibility.
+			s = append(s, fmt.Sprintf("%s=%v", a[i].Key, a[i].Value.String()))
 		}
 		return "Attributes:{" + strings.Join(s, ", ") + "}"
 	}

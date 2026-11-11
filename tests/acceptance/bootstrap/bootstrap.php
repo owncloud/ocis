@@ -23,6 +23,9 @@
 
 use Composer\Autoload\ClassLoader;
 
+// Acceptance tests use UTC for consistent date/time handling.
+date_default_timezone_set('UTC');
+
 $classLoader = new ClassLoader();
 
 $classLoader->addPsr4("TestHelpers\\", __DIR__ . "/../TestHelpers", true);
@@ -100,4 +103,17 @@ if (!\defined('MAX_REQUEST_RETRY_COUNT')) {
 // Standard request polling interval in seconds
 if (!\defined('STANDARD_REQUEST_POLLING_INTERVAL_SEC')) {
 	\define('STANDARD_REQUEST_POLLING_INTERVAL_SEC', 1);
+}
+
+// Seconds to wait before the first search, so that async indexing can complete.
+// Polling alone cannot cover this: a search returns as soon as the first result
+// is indexed, which would assert against a partially indexed result.
+if (!\defined('SEARCH_INDEXING_INITIAL_WAIT_SEC')) {
+	\define('SEARCH_INDEXING_INITIAL_WAIT_SEC', 3);
+}
+
+// Number of times to poll for a service to become ready after a (re)start.
+// Polled at STANDARD_REQUEST_POLLING_INTERVAL_SEC, so this allows about a minute.
+if (!\defined('SERVICE_READY_RETRY_COUNT')) {
+	\define('SERVICE_READY_RETRY_COUNT', 60);
 }

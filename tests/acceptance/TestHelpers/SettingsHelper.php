@@ -226,8 +226,38 @@ class SettingsHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
+	 * @param string $accountUuid
+	 * @param array $headers
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public static function getPermissionsList(
+		string $baseUrl,
+		?string $user,
+		?string $password,
+		string $accountUuid,
+		array $headers = [],
+	): ResponseInterface {
+		$fullUrl = self::buildFullUrl($baseUrl, "permissions-list");
+		$body = json_encode(["account_uuid" => $accountUuid], JSON_THROW_ON_ERROR);
+		return HttpRequestHelper::post(
+			$fullUrl,
+			$user,
+			$password,
+			$headers,
+			$body,
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string|null $user
+	 * @param string|null $password
 	 * @param array $headers
 	 *
 	 * @return ResponseInterface
@@ -237,8 +267,8 @@ class SettingsHelper {
 	 */
 	public static function getValuesList(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
 		array $headers = [],
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "values-list");
@@ -254,8 +284,9 @@ class SettingsHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
+	 * @param array $headers
 	 *
 	 * @return bool
 	 *
@@ -264,10 +295,11 @@ class SettingsHelper {
 	 */
 	public static function getAutoAcceptSharesDefaultValue(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
+		array $headers = [],
 	): bool {
-		$response = self::getValuesList($baseUrl, $user, $password);
+		$response = self::getValuesList($baseUrl, $user, $password, $headers);
 		Assert::assertEquals(201, $response->getStatusCode(), "Failed to get values list");
 
 		$valuesList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response);

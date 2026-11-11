@@ -22,6 +22,7 @@ import (
 	idm "github.com/owncloud/ocis/v2/services/idm/pkg/config"
 	idp "github.com/owncloud/ocis/v2/services/idp/pkg/config"
 	invitations "github.com/owncloud/ocis/v2/services/invitations/pkg/config"
+	llm "github.com/owncloud/ocis/v2/services/llm/pkg/config"
 	nats "github.com/owncloud/ocis/v2/services/nats/pkg/config"
 	notifications "github.com/owncloud/ocis/v2/services/notifications/pkg/config"
 	ocdav "github.com/owncloud/ocis/v2/services/ocdav/pkg/config"
@@ -61,13 +62,14 @@ type Runtime struct {
 type Config struct {
 	*shared.Commons `yaml:"shared"`
 
-	Tracing        *shared.Tracing        `yaml:"tracing"`
-	Log            *shared.Log            `yaml:"log"`
-	Cache          *shared.Cache          `yaml:"cache"`
-	GRPCClientTLS  *shared.GRPCClientTLS  `yaml:"grpc_client_tls"`
-	GRPCServiceTLS *shared.GRPCServiceTLS `yaml:"grpc_service_tls"`
-	HTTPServiceTLS shared.HTTPServiceTLS  `yaml:"http_service_tls"`
-	Reva           *shared.Reva           `yaml:"reva"`
+	Tracing           *shared.Tracing           `yaml:"tracing"`
+	Log               *shared.Log               `yaml:"log"`
+	Cache             *shared.Cache             `yaml:"cache"`
+	GRPCClientTLS     *shared.GRPCClientTLS     `yaml:"grpc_client_tls"`
+	GRPCClientOptions *shared.GRPCClientOptions `yaml:"grpc_client_options"`
+	GRPCServiceTLS    *shared.GRPCServiceTLS    `yaml:"grpc_service_tls"`
+	HTTPServiceTLS    shared.HTTPServiceTLS     `yaml:"http_service_tls"`
+	Reva              *shared.Reva              `yaml:"reva"`
 
 	Mode    Mode // DEPRECATED
 	File    string
@@ -102,6 +104,7 @@ type Config struct {
 	IDM               *idm.Config            `yaml:"idm"`
 	IDP               *idp.Config            `yaml:"idp"`
 	Invitations       *invitations.Config    `yaml:"invitations"`
+	LLM               *llm.Config            `yaml:"llm"`
 	Nats              *nats.Config           `yaml:"nats"`
 	Notifications     *notifications.Config  `yaml:"notifications"`
 	OCDav             *ocdav.Config          `yaml:"ocdav"`

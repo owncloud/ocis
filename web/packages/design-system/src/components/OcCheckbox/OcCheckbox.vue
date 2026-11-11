@@ -2,6 +2,7 @@
   <span>
     <input
       :id="id"
+      ref="input"
       v-model="model"
       type="checkbox"
       name="checkbox"
@@ -10,6 +11,7 @@
       :disabled="disabled"
       :aria-label="labelHidden ? label : null"
       @click="$emit('click', $event)"
+      @change="syncNativeState"
       @keydown.enter="keydownEnter"
     />
     <label v-if="!labelHidden" :for="id" :class="computedLabelClasses" v-text="label" />
@@ -17,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, unref } from 'vue'
+import { computed, nextTick, unref, useTemplateRef } from 'vue'
 import { isEqual } from 'lodash-es'
 import { getSizeClass, uniqueId } from '../../helpers'
 
@@ -100,6 +102,17 @@ const model = computed({
     emit('update:modelValue', value)
   }
 })
+const input = useTemplateRef<HTMLInputElement>('input')
+/**
+ * The browser toggles the native checked property on every click. Whoever owns `modelValue` is free
+ * to ignore that (e.g. a range selection keeps an already selected resource selected), and vue does
+ * not re-patch an unchanged model-value, which would leave the native property out of sync.
+ */
+function syncNativeState() {
+  nextTick(() => {
+    unref(input).checked = Boolean(unref(isChecked))
+  })
+}
 function keydownEnter(event: KeyboardEvent) {
   model.value = !model.value
   emit('click', event)

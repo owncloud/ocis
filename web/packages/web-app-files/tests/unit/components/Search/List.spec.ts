@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils'
+import { mount, shallowMount } from '@vue/test-utils'
 import { merge } from 'lodash-es'
 import { ResourceTable } from '@ownclouders/web-pkg'
 import List from '../../../../src/components/Search/List.vue'
@@ -14,14 +14,23 @@ import { mock } from 'vitest-mock-extended'
 import { Capabilities } from '@ownclouders/web-client/ocs'
 
 vi.mock('../../../../src/composables')
-vi.mock('@ownclouders/web-pkg', async (importOriginal) => ({
-  ...(await importOriginal<any>()),
-  queryItemAsString: vi.fn(),
-  useAppDefaults: vi.fn(),
-  useFileActions: vi.fn(() => ({
-    triggerDefaultAction: vi.fn()
-  }))
-}))
+vi.mock('@ownclouders/web-pkg', async (importOriginal) => {
+  const original = await importOriginal<any>()
+  return {
+    ...original,
+    queryItemAsString: vi.fn(),
+    useAppDefaults: vi.fn(),
+    useFileActions: vi.fn(() => ({
+      triggerDefaultAction: vi.fn()
+    })),
+    useTagColor: vi.fn(() => ({
+      tagColorIndex: vi.fn((name: string) => {
+        const tagColorMap: Record<string, number> = { invoice: 7, project: 3, meeting: 5 }
+        return tagColorMap[name] ?? -1
+      })
+    }))
+  }
+})
 
 const selectors = {
   noContentMessageStub: 'no-content-message-stub',
@@ -205,6 +214,26 @@ describe('List component', () => {
       })
     })
   })
+
+  describe('Tag chip colours in filter list', () => {
+    it('a tag filter chip receives the fill colour for its tag name', async () => {
+      const tagName = 'invoice'
+      const expectedColour = 'var(--oc-color-tag-7)'
+      // ItemFilter must render for real: the chip lives in its `#image` slot, which a
+      // shallowMount stub never invokes.
+      const { wrapper } = getWrapper({
+        availableTags: [tagName],
+        deep: true
+      })
+
+      await (wrapper.vm as any).loadAvailableTagsTask.last
+      await wrapper.vm.$nextTick()
+
+      const chip = wrapper.find(`${selectors.tagFilter} .oc-tag`)
+      expect(chip.exists()).toBe(true)
+      expect(chip.attributes('style')).toContain(`background-color: ${expectedColour}`)
+    })
+  })
 })
 
 function getWrapper({
@@ -216,7 +245,8 @@ function getWrapper({
   fullTextSearchEnabled = true,
   availableLastModifiedValues = {},
   lastModifiedFilterQuery = null,
-  mocks = {}
+  mocks = {},
+  deep = false
 }: {
   availableTags?: string[]
   resources?: Resource[]
@@ -227,6 +257,7 @@ function getWrapper({
   availableLastModifiedValues?: Record<string, string[]>
   lastModifiedFilterQuery?: string
   mocks?: Record<string, unknown>
+  deep?: boolean
 } = {}) {
   vi.mocked(queryItemAsString).mockImplementationOnce(() => searchTerm)
   vi.mocked(queryItemAsString).mockImplementationOnce(() => titleOnlyFilterQuery)
@@ -257,7 +288,7 @@ function getWrapper({
 
   return {
     mocks: localMocks,
-    wrapper: shallowMount(List, {
+    wrapper: (deep ? mount : shallowMount)(List, {
       global: {
         components: {
           ResourceTable,

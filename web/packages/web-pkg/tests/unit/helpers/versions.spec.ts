@@ -1,17 +1,9 @@
 import { useCapabilityStore } from '../../../src/composables/index'
-import { getBackendVersion, getWebVersion } from '../../../src/helpers/versions'
-import { createTestingPinia } from '@ownclouders/web-test-helpers'
+import { getBackendVersion } from '../../../src/helpers/versions'
+import { createTestingPinia } from '../../../src/testing'
 import { Capabilities } from '@ownclouders/web-client/ocs'
 
 describe('collect version information', () => {
-  describe('web version', () => {
-    beforeEach(() => {
-      process.env.PACKAGE_VERSION = '4.7.0'
-    })
-    it('provides the web version with a static string without exceptions', () => {
-      expect(getWebVersion()).toBe('ownCloud Web UI 4.7.0')
-    })
-  })
   describe('backend version', () => {
     it('returns undefined when the backend version object is not available', () => {
       const capabilityStore = versionStore(undefined)

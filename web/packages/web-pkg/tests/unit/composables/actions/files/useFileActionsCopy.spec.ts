@@ -3,9 +3,9 @@ import { unref } from 'vue'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 import {
   defaultComponentMocks,
-  RouteLocation,
-  getComposableWrapper
-} from '@ownclouders/web-test-helpers'
+  getComposableWrapper,
+  RouteLocation
+} from '../../../../../src/testing'
 import { useFileActionsCopy } from '../../../../../src/composables/actions/files'
 import { useClipboardStore } from '../../../../../src/composables/piniaStores'
 import { describe } from 'vitest'

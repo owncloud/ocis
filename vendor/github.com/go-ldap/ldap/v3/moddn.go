@@ -89,13 +89,16 @@ func (l *Conn) ModifyDN(m *ModifyDNRequest) error {
 		return err
 	}
 
-	if packet.Children[1].Tag == ApplicationModifyDNResponse {
-		err := GetLDAPError(packet)
-		if err != nil {
+	protocolOp, err := packetChild(packet, 1)
+	if err != nil {
+		return err
+	}
+	if protocolOp.Tag == ApplicationModifyDNResponse {
+		if err := GetLDAPError(packet); err != nil {
 			return err
 		}
 	} else {
-		return fmt.Errorf("ldap: unexpected response: %d", packet.Children[1].Tag)
+		return fmt.Errorf("ldap: unexpected response: %d", protocolOp.Tag)
 	}
 
 	return nil

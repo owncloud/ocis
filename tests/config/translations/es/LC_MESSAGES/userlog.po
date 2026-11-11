@@ -23,3 +23,9 @@ msgstr "Recurso compartido"
 
 msgid "{user} shared {resource} with you"
 msgstr "{user} compartió {resource} contigo"
+
+msgid "Resource unshared"
+msgstr "Recurso no compartido"
+
+msgid "{user} unshared {resource} with you"
+msgstr "{user} dejó de compartir {resource} contigo"

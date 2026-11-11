@@ -46,7 +46,7 @@ export const useFileActionsCreateNewFolder = ({ space }: { space?: Ref<SpaceReso
     const exists = unref(resources).find((file) => file.name === folderName)
 
     if (exists) {
-      return setError($gettext('%{name} already exists', { name: folderName }, true))
+      return setError($gettext('%{name} already exists', { name: folderName }))
     }
 
     return setError(null)

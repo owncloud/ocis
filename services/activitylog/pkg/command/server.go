@@ -90,6 +90,8 @@ func Server(cfg *config.Config) *cli.Command {
 				microstore.Database(cfg.Store.Database),
 				microstore.Table(cfg.Store.Table),
 				store.Authentication(cfg.Store.AuthUsername, cfg.Store.AuthPassword),
+				store.Credentials(cfg.Store.CredsFile, cfg.Store.Creds),
+				store.TLS(cfg.Store.EnableTLS, cfg.Store.TLSInsecure, cfg.Store.TLSRootCACertificate),
 			)
 
 			tm, err := pool.StringToTLSMode(cfg.GRPCClientTLS.Mode)
@@ -110,7 +112,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			grpcClient, err := ogrpc.NewClient(
-				append(ogrpc.GetClientOptions(cfg.GRPCClientTLS), ogrpc.WithTraceProvider(tracerProvider))...,
+				append(ogrpc.GetClientOptions(cfg.GRPCClientTLS), ogrpc.WithKeepaliveParams(cfg.GRPCClientOptions), ogrpc.WithTraceProvider(tracerProvider))...,
 			)
 			if err != nil {
 				return err

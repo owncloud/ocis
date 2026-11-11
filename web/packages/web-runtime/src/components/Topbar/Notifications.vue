@@ -6,6 +6,7 @@
       drop-id="notifications-dropdown"
       toggle="#oc-notifications-bell"
       mode="click"
+      focus-on-open
       :options="{ pos: 'bottom-right', delayHide: 0 }"
       class="oc-overflow-auto"
     >
@@ -92,8 +93,7 @@ import { Notification } from '../../helpers/notifications'
 import { useGettext } from 'vue3-gettext'
 import { useTask } from 'vue-concurrency'
 import { MESSAGE_TYPE } from '@ownclouders/web-client/sse'
-import { call } from '@ownclouders/web-client'
-import { AxiosHeaders } from 'axios'
+import { call, VAULT_STORAGE_PROVIDER_ID } from '@ownclouders/web-client'
 
 const POLLING_INTERVAL = 30000
 
@@ -112,7 +112,7 @@ export default {
     const { isInVault } = useVault()
 
     const isVaultNotification = (notification: Notification) =>
-      notification.object_id?.split('$')[0] === capabilityStore.vaultStorageProvider
+      notification.object_id?.split('$')[0] === VAULT_STORAGE_PROVIDER_ID
 
     const notifications = computed(() => {
       if (!capabilityStore.vaultEnabled) {
@@ -203,7 +203,7 @@ export default {
           )
         )
 
-        if ((response.headers as AxiosHeaders).get('Content-Length') === '0') {
+        if (response.headers.get('Content-Length') === '0') {
           return
         }
 
@@ -222,7 +222,7 @@ export default {
       try {
         yield clientService.httpAuthenticated.delete(
           'ocs/v2.php/apps/notifications/api/v1/notifications',
-          { data: { ids } },
+          { ids },
           { signal }
         )
       } catch (e) {

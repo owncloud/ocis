@@ -5,48 +5,36 @@ import (
 )
 
 // UsersConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
-func UsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
-	rcfg := map[string]interface{}{
-		"shared": map[string]interface{}{
+func UsersConfigFromStruct(cfg *config.Config) map[string]any {
+	rcfg := map[string]any{
+		"shared": map[string]any{
 			"jwt_secret":                cfg.TokenManager.JWTSecret,
 			"gatewaysvc":                cfg.Reva.Address,
 			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 			"grpc_client_options":       cfg.Reva.GetGRPCClientConfig(),
 		},
-		"grpc": map[string]interface{}{
+		"grpc": map[string]any{
 			"network": cfg.GRPC.Protocol,
 			"address": cfg.GRPC.Addr,
-			"tls_settings": map[string]interface{}{
+			"tls_settings": map[string]any{
 				"enabled":     cfg.GRPC.TLS.Enabled,
 				"certificate": cfg.GRPC.TLS.Cert,
 				"key":         cfg.GRPC.TLS.Key,
 			},
 			// TODO build services dynamically
-			"services": map[string]interface{}{
-				"userprovider": map[string]interface{}{
+			"services": map[string]any{
+				"userprovider": map[string]any{
 					"driver": cfg.Driver,
-					"drivers": map[string]interface{}{
-						"json": map[string]interface{}{
+					"drivers": map[string]any{
+						"json": map[string]any{
 							"users": cfg.Drivers.JSON.File,
 						},
 						"ldap": ldapConfigFromString(cfg.Drivers.LDAP),
-						"owncloudsql": map[string]interface{}{
-							"dbusername":           cfg.Drivers.OwnCloudSQL.DBUsername,
-							"dbpassword":           cfg.Drivers.OwnCloudSQL.DBPassword,
-							"dbhost":               cfg.Drivers.OwnCloudSQL.DBHost,
-							"dbport":               cfg.Drivers.OwnCloudSQL.DBPort,
-							"dbname":               cfg.Drivers.OwnCloudSQL.DBName,
-							"idp":                  cfg.Drivers.OwnCloudSQL.IDP,
-							"nobody":               cfg.Drivers.OwnCloudSQL.Nobody,
-							"join_username":        cfg.Drivers.OwnCloudSQL.JoinUsername,
-							"join_ownclouduuid":    cfg.Drivers.OwnCloudSQL.JoinOwnCloudUUID,
-							"enable_medial_search": cfg.Drivers.OwnCloudSQL.EnableMedialSearch,
-						},
 					},
 				},
 			},
-			"interceptors": map[string]interface{}{
-				"prometheus": map[string]interface{}{
+			"interceptors": map[string]any{
+				"prometheus": map[string]any{
 					"namespace": "ocis",
 					"subsystem": "users",
 				},
@@ -56,13 +44,16 @@ func UsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 	return rcfg
 }
 
-func ldapConfigFromString(cfg config.LDAPDriver) map[string]interface{} {
-	return map[string]interface{}{
+func ldapConfigFromString(cfg config.LDAPDriver) map[string]any {
+	return map[string]any{
 		"uri":                        cfg.URI,
 		"cacert":                     cfg.CACert,
 		"insecure":                   cfg.Insecure,
 		"bind_username":              cfg.BindDN,
 		"bind_password":              cfg.BindPassword,
+		"retry_max_count":            cfg.RetryMaxCount,
+		"retry_base_delay":           cfg.RetryBaseDelay,
+		"retry_max_delay":            cfg.RetryMaxDelay,
 		"user_base_dn":               cfg.UserBaseDN,
 		"group_base_dn":              cfg.GroupBaseDN,
 		"user_scope":                 cfg.UserScope,
@@ -77,14 +68,17 @@ func ldapConfigFromString(cfg config.LDAPDriver) map[string]interface{} {
 		"user_type_property":         cfg.UserTypeAttribute,
 		"group_local_disabled_dn":    cfg.LdapDisabledUsersGroupDN,
 		"idp":                        cfg.IDP,
-		"user_schema": map[string]interface{}{
+		"pool_enabled":               cfg.PoolEnabled,
+		"pool_size":                  cfg.PoolSize,
+		"pool_checkout_timeout":      cfg.PoolCheckoutTimeout,
+		"user_schema": map[string]any{
 			"id":              cfg.UserSchema.ID,
 			"idIsOctetString": cfg.UserSchema.IDIsOctetString,
 			"mail":            cfg.UserSchema.Mail,
 			"displayName":     cfg.UserSchema.DisplayName,
 			"userName":        cfg.UserSchema.Username,
 		},
-		"group_schema": map[string]interface{}{
+		"group_schema": map[string]any{
 			"id":              cfg.GroupSchema.ID,
 			"idIsOctetString": cfg.GroupSchema.IDIsOctetString,
 			"mail":            cfg.GroupSchema.Mail,

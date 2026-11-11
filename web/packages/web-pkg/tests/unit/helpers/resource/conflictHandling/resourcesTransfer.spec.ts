@@ -5,12 +5,31 @@ import {
   resolveFileNameDuplicate
 } from '../../../../../src/helpers/resource/conflictHandling'
 import { mock, mockDeep, mockReset } from 'vitest-mock-extended'
-import { buildSpace, Resource, SpaceResource } from '@ownclouders/web-client'
+import { buildSpace, createHttpError, Resource, SpaceResource } from '@ownclouders/web-client'
 import { ListFilesResult } from '@ownclouders/web-client/webdav'
 import { Drive } from '@ownclouders/web-client/graph/generated'
-import { createTestingPinia } from '@ownclouders/web-test-helpers'
+import { createTestingPinia } from '../../../../../src/testing'
 import { ClientService } from '../../../../../src/services'
+import { useMessages } from '../../../../../src/composables'
 import { computed } from 'vue'
+
+/**
+ * Unlike a plain spy, this interpolates the message, so that assertions can be made on what
+ * the user actually reads.
+ */
+const interpolate = (msgid: string, params: Record<string, unknown> = {}) =>
+  Object.entries(params).reduce(
+    (message, [key, value]) => message.replace(`%{${key}}`, String(value)),
+    msgid
+  )
+
+/** Picks the form English asks for, so assertions read like the English messages do. */
+const interpolatePlural = (
+  singular: string,
+  plural: string,
+  count: number,
+  params: Record<string, unknown> = {}
+) => interpolate(count === 1 ? singular : plural, params)
 
 const clientServiceMock = mockDeep<ClientService>()
 let resourcesToMove: Resource[]
@@ -136,6 +155,228 @@ describe('resourcesTransfer', () => {
 
     expect(resourcesTransfer.resolveFileExists).toHaveBeenCalled()
   })
+  describe('showResultMessage', () => {
+    const buildTransfer = (space: SpaceResource) =>
+      new ResourceTransfer(
+        sourceSpace,
+        resourcesToMove,
+        space,
+        targetFolder,
+        computed(() => mock<Resource>()),
+        clientServiceMock,
+        interpolate,
+        interpolatePlural
+      )
+
+    const projectSpace = () =>
+      mock<SpaceResource>({ id: '1', name: 'Group Space', driveType: 'project' })
+
+    const quotaError = () =>
+      createHttpError({ message: 'Insufficient Storage', statusCode: 507, xReqId: '1' })
+
+    it.each([
+      { transferType: TransferType.DUPLICATE, title: 'Failed to duplicate "a"' },
+      { transferType: TransferType.COPY, title: 'Failed to copy "a"' },
+      { transferType: TransferType.MOVE, title: 'Failed to move "a"' }
+    ])('names the action that failed for a single resource', ({ transferType, title }) => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(projectSpace()).showResultMessage(
+        [{ resourceName: 'a', error: new Error() }],
+        [],
+        transferType
+      )
+
+      expect(showErrorMessage).toHaveBeenCalledWith(expect.objectContaining({ title }))
+    })
+
+    it.each([
+      { transferType: TransferType.DUPLICATE, title: 'Failed to duplicate 2 resources' },
+      { transferType: TransferType.COPY, title: 'Failed to copy 2 resources' },
+      { transferType: TransferType.MOVE, title: 'Failed to move 2 resources' }
+    ])('names the action that failed for several resources', ({ transferType, title }) => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(projectSpace()).showResultMessage(
+        [
+          { resourceName: 'a', error: new Error() },
+          { resourceName: 'b', error: new Error() }
+        ],
+        [],
+        transferType
+      )
+
+      expect(showErrorMessage).toHaveBeenCalledWith(expect.objectContaining({ title }))
+    })
+
+    // what the paste worker reports for a request that got no answer, e.g. cut off by a timeout
+    const noAnswerError = () =>
+      createHttpError({ message: 'Failed to fetch', statusCode: undefined, xReqId: undefined })
+
+    it.each([
+      { resourceNames: ['a'], title: 'Duplication of "a" incomplete' },
+      { resourceNames: ['a', 'b'], title: 'Duplication of 2 resources incomplete' }
+    ])(
+      'says the duplication of a folder is incomplete when it got no answer',
+      ({ resourceNames, title }) => {
+        const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+        buildTransfer(projectSpace()).showResultMessage(
+          resourceNames.map((resourceName) => ({
+            resourceName,
+            isFolder: true,
+            error: noAnswerError()
+          })),
+          [],
+          TransferType.DUPLICATE
+        )
+
+        expect(showErrorMessage).toHaveBeenCalledWith(expect.objectContaining({ title }))
+      }
+    )
+
+    it('says the duplication of a file failed when it got no answer', () => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(projectSpace()).showResultMessage(
+        [{ resourceName: 'a', isFolder: false, error: noAnswerError() }],
+        [],
+        TransferType.DUPLICATE
+      )
+
+      expect(showErrorMessage).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Failed to duplicate "a"' })
+      )
+    })
+
+    it('says the duplication of folders and files failed when none got an answer', () => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(projectSpace()).showResultMessage(
+        [
+          { resourceName: 'a', isFolder: true, error: noAnswerError() },
+          { resourceName: 'b', isFolder: false, error: noAnswerError() }
+        ],
+        [],
+        TransferType.DUPLICATE
+      )
+
+      expect(showErrorMessage).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Failed to duplicate 2 resources' })
+      )
+    })
+
+    it('says the duplication failed when the server answered with an error', () => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(projectSpace()).showResultMessage(
+        [
+          {
+            resourceName: 'a',
+            isFolder: true,
+            error: createHttpError({ message: 'nope', statusCode: 403, xReqId: '1' })
+          }
+        ],
+        [],
+        TransferType.DUPLICATE
+      )
+
+      expect(showErrorMessage).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Failed to duplicate "a"' })
+      )
+    })
+
+    it('says the duplication failed when only some of the resources got no answer', () => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(projectSpace()).showResultMessage(
+        [
+          { resourceName: 'a', isFolder: true, error: noAnswerError() },
+          { resourceName: 'b', isFolder: true, error: quotaError() }
+        ],
+        [],
+        TransferType.DUPLICATE
+      )
+
+      expect(showErrorMessage).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Failed to duplicate 2 resources' })
+      )
+    })
+
+    it.each([
+      { transferType: TransferType.COPY, title: 'Failed to copy "a"' },
+      { transferType: TransferType.MOVE, title: 'Failed to move "a"' }
+    ])('keeps saying copy and move failed when they got no answer', ({ transferType, title }) => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(projectSpace()).showResultMessage(
+        [{ resourceName: 'a', isFolder: true, error: noAnswerError() }],
+        [],
+        transferType
+      )
+
+      expect(showErrorMessage).toHaveBeenCalledWith(expect.objectContaining({ title }))
+    })
+
+    it.each([
+      {
+        transferType: TransferType.DUPLICATE,
+        desc: 'The file cannot be duplicated because there is not enough storage left in "Group Space".'
+      },
+      {
+        transferType: TransferType.COPY,
+        desc: 'The file cannot be copied because there is not enough storage left in "Group Space".'
+      },
+      {
+        transferType: TransferType.MOVE,
+        desc: 'The file cannot be moved because there is not enough storage left in "Group Space".'
+      }
+    ])('says why the action failed', ({ transferType, desc }) => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(projectSpace()).showResultMessage(
+        [{ resourceName: 'a', error: quotaError() }],
+        [],
+        transferType
+      )
+
+      expect(showErrorMessage).toHaveBeenCalledWith(expect.objectContaining({ desc }))
+    })
+
+    it('refers to a personal space as "Personal" rather than by its name', () => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(
+        mock<SpaceResource>({ id: '1', name: 'Admin', driveType: 'personal' })
+      ).showResultMessage([{ resourceName: 'a', error: quotaError() }], [], TransferType.DUPLICATE)
+
+      expect(showErrorMessage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          desc: 'The file cannot be duplicated because there is not enough storage left in "Personal".'
+        })
+      )
+    })
+
+    it('leaves the description out when the failure was not about quota', () => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(projectSpace()).showResultMessage(
+        [
+          {
+            resourceName: 'a',
+            error: createHttpError({ message: 'nope', statusCode: 403, xReqId: '1' })
+          }
+        ],
+        [],
+        TransferType.DUPLICATE
+      )
+
+      expect(showErrorMessage).toHaveBeenCalledWith(
+        expect.not.objectContaining({ desc: expect.anything() })
+      )
+    })
+  })
+
   it('should show error message if trying to overwrite parent', async () => {
     const targetFolderItems = [
       {

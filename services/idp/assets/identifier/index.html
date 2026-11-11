@@ -23,12 +23,12 @@
         data-msg-sign-in="{{.ButtonSignIn}}">
         <div>
           <label class="oc-label" for="oc-login-username">{{.LabelUsername}}</label>
-          <input class="oc-input" type="text" id="oc-login-username" name="username" autocomplete="username" placeholder="{{.LabelUsername}}" required>
+          <input class="oc-input" type="text" id="oc-login-username" name="username" autocomplete="username" placeholder="{{.LabelUsername}}" aria-describedby="oc-login-error-message" required>
         </div>
         <div>
           <label class="oc-label" for="oc-login-password">{{.LabelPassword}}</label>
-          <input class="oc-input" type="password" id="oc-login-password" name="password" autocomplete="current-password" placeholder="{{.LabelPassword}}" required>
-          <p id="oc-login-error-message" class="oc-error-message" hidden></p>
+          <input class="oc-input" type="password" id="oc-login-password" name="password" autocomplete="current-password" placeholder="{{.LabelPassword}}" aria-describedby="oc-login-error-message" required>
+          <p id="oc-login-error-message" class="oc-error-message" role="alert" aria-live="assertive" hidden></p>
         </div>
         <div>
           <button class="oc-button-primary" type="submit" id="submit-btn">{{.ButtonSignIn}}</button>
@@ -103,12 +103,16 @@
     errorEl.hidden = false;
     usernameEl.classList.add("error");
     passwordEl.classList.add("error");
+    usernameEl.setAttribute("aria-invalid", "true");
+    passwordEl.setAttribute("aria-invalid", "true");
   }
 
   function hideError() {
     errorEl.hidden = true;
     usernameEl.classList.remove("error");
     passwordEl.classList.remove("error");
+    usernameEl.removeAttribute("aria-invalid");
+    passwordEl.removeAttribute("aria-invalid");
   }
 
   function setLoading(loading) {

@@ -1,7 +1,12 @@
 import translations from '../l10n/translations.json'
 import { useGettext } from 'vue3-gettext'
 import { computed } from 'vue'
-import { AppMenuItemExtension, defineWebApplication, Extension } from '@ownclouders/web-pkg'
+import {
+  AppMenuItemExtension,
+  defineWebApplication,
+  Extension,
+  useUserStore
+} from '@ownclouders/web-pkg'
 import { urlJoin } from '@ownclouders/web-client'
 import { RouteRecordRaw } from 'vue-router'
 import { APPID } from './appid'
@@ -9,6 +14,7 @@ import { APPID } from './appid'
 export default defineWebApplication({
   setup() {
     const { $gettext } = useGettext()
+    const userStore = useUserStore()
 
     const appInfo = {
       name: $gettext('Activities'),
@@ -52,7 +58,9 @@ export default defineWebApplication({
     const extensions = computed(() => {
       const result: Extension[] = []
 
-      result.push(menuItemExtension)
+      if (userStore.user) {
+        result.push(menuItemExtension)
+      }
 
       return result
     })

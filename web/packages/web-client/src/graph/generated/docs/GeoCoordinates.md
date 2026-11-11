@@ -1,25 +1,39 @@
+
 # GeoCoordinates
 
 The GeoCoordinates resource provides geographic coordinates and elevation of a location based on metadata contained within the file. If a DriveItem has a non-null location facet, the item represents a file with a known location associated with it. 
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**altitude** | **number** | The altitude (height), in feet, above sea level for the item. Read-only. | [optional] [default to undefined]
-**latitude** | **number** | The latitude, in decimal, for the item. Read-only. | [optional] [default to undefined]
-**longitude** | **number** | The longitude, in decimal, for the item. Read-only. | [optional] [default to undefined]
+Name | Type
+------------ | -------------
+`altitude` | number
+`latitude` | number
+`longitude` | number
 
 ## Example
 
 ```typescript
-import { GeoCoordinates } from './api';
+import type { GeoCoordinates } from ''
 
-const instance: GeoCoordinates = {
-    altitude,
-    latitude,
-    longitude,
-};
+// TODO: Update the object below with actual values
+const example = {
+  "altitude": null,
+  "latitude": null,
+  "longitude": null,
+} satisfies GeoCoordinates
+
+console.log(example)
+
+// Convert the instance to a JSON string
+const exampleJSON: string = JSON.stringify(example)
+console.log(exampleJSON)
+
+// Parse the JSON string back to an object
+const exampleParsed = JSON.parse(exampleJSON) as GeoCoordinates
+console.log(exampleParsed)
 ```
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+

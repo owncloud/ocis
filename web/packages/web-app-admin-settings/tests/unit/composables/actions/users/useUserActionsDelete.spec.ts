@@ -1,8 +1,10 @@
 import { useUserActionsDelete } from '../../../../../src/composables/actions/users/useUserActionsDelete'
+import DeleteUserModal from '../../../../../src/components/Users/DeleteUserModal.vue'
 import { mock } from 'vitest-mock-extended'
+import { Mock } from 'vitest'
 import { unref } from 'vue'
 import { User } from '@ownclouders/web-client/graph/generated'
-import { useCapabilityStore } from '@ownclouders/web-pkg'
+import { useCapabilityStore, useModals } from '@ownclouders/web-pkg'
 import {
   defaultComponentMocks,
   getComposableWrapper,
@@ -55,11 +57,58 @@ describe('useUserActionsDelete', () => {
         }
       })
     })
+    it('should not delete the current user when included in the selection', () => {
+      getWrapper({
+        currentUserId: 'self',
+        setup: async ({ deleteUsers }, { clientService }) => {
+          const currentUser = mock<User>({ id: 'self' })
+          const otherUser = mock<User>({ id: 'other' })
+          await deleteUsers([currentUser, otherUser])
+          expect(clientService.graphAuthenticated.users.deleteUser).toHaveBeenCalledWith(
+            otherUser.id
+          )
+          expect(clientService.graphAuthenticated.users.deleteUser).not.toHaveBeenCalledWith(
+            currentUser.id
+          )
+        }
+      })
+    })
+    it('should do nothing when the current user is the only selected user', () => {
+      getWrapper({
+        currentUserId: 'self',
+        setup: async ({ deleteUsers }, { clientService }) => {
+          const currentUser = mock<User>({ id: 'self' })
+          await deleteUsers([currentUser])
+          expect(clientService.graphAuthenticated.users.deleteUser).not.toHaveBeenCalled()
+        }
+      })
+    })
+  })
+  describe('method "handler"', () => {
+    it('dispatches the delete modal with the selected users', () => {
+      getWrapper({
+        setup: ({ actions }) => {
+          const { dispatchModal } = useModals()
+          const resources = [mock<User>({ id: 'self' }), mock<User>({ id: 'other' })]
+          unref(actions)[0].handler({ resources })
+          expect(dispatchModal).toHaveBeenCalledWith(
+            expect.objectContaining({
+              variation: 'danger',
+              customComponent: DeleteUserModal,
+              customComponentAttrs: expect.any(Function)
+            })
+          )
+          const attrs = (dispatchModal as unknown as Mock).mock.calls[0][0].customComponentAttrs()
+          expect(attrs.users).toEqual(resources)
+        }
+      })
+    })
   })
 })
 
 function getWrapper({
-  setup
+  setup,
+  currentUserId = '0'
 }: {
   setup: (
     instance: ReturnType<typeof useUserActionsDelete>,
@@ -69,6 +118,7 @@ function getWrapper({
       clientService: ReturnType<typeof defaultComponentMocks>['$clientService']
     }
   ) => void
+  currentUserId?: string
 }) {
   const mocks = defaultComponentMocks()
   return {
@@ -77,7 +127,15 @@ function getWrapper({
         const instance = useUserActionsDelete()
         setup(instance, { clientService: mocks.$clientService })
       },
-      { mocks, provide: mocks }
+      {
+        mocks,
+        provide: mocks,
+        pluginOptions: {
+          piniaOptions: {
+            userState: { user: { id: currentUserId } as User }
+          }
+        }
+      }
     )
   }
 }

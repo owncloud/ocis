@@ -6,7 +6,14 @@ import vue from '@vitejs/plugin-vue'
 import pkg from './package.json' assert { type: 'json' }
 
 const projectRootDir = searchForWorkspaceRoot(process.cwd())
-const external = [...Object.keys(pkg.dependencies)]
+const external = [
+  ...Object.keys(pkg.dependencies),
+  // Subpaths aren't covered by the exact-match entries above. The testing entry has to keep this
+  // one external: inlining it would ship a second copy of the design system and of
+  // @vue/test-utils, so consumers would get components and wrappers that aren't identity-equal to
+  // the ones from their own `@ownclouders/design-system` / `@vue/test-utils`.
+  '@ownclouders/design-system/testing'
+]
 
 export default defineConfig({
   resolve: {
@@ -27,9 +34,15 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
+      entry: {
+        index: resolve(__dirname, 'src/index.ts'),
+        testing: resolve(__dirname, 'src/testing/index.ts')
+      },
       name: 'web-pkg',
-      fileName: 'web-pkg'
+      fileName: (format, entryName) => {
+        const base = entryName === 'index' ? 'web-pkg' : `web-pkg-${entryName}`
+        return format === 'es' ? `${base}.js` : `${base}.umd.cjs`
+      }
     },
     rollupOptions: {
       external

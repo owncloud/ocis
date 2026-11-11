@@ -33,6 +33,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
 	"github.com/stretchr/testify/mock"
@@ -80,6 +81,11 @@ var _ = Describe("Notifications", func() {
 		gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&user.GetUserResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, User: sharer}, nil).Once()
 		gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&user.GetUserResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, User: sharee}, nil).Once()
 		gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, User: sharer}, nil)
+		// Registered before the catch-all below: testify/mock matches expectations in
+		// registration order, so the more specific vault matcher must come first.
+		gatewayClient.On("Stat", mock.Anything, mock.MatchedBy(func(r *provider.StatRequest) bool {
+			return r.GetRef().GetResourceId().GetStorageId() == utils.VaultStorageProviderID
+		})).Return(&provider.StatResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, Info: &provider.ResourceInfo{Name: "report.pdf", Space: &provider.StorageSpace{Name: "vault space"}}}, nil)
 		gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, Info: &provider.ResourceInfo{Name: "secrets of the board", Space: &provider.StorageSpace{Name: "secret space"}}}, nil)
 		vs = &settingssvc.MockValueService{}
 		vs.GetValueByUniqueIdentifiersFunc = func(ctx context.Context, req *settingssvc.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settingssvc.GetValueResponse, error) {
@@ -269,6 +275,95 @@ https://owncloud.com
 				ExpiredAt:     time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC),
 			},
 		}),
+	)
+
+	vaultResourceID := &provider.ResourceId{
+		StorageId: utils.VaultStorageProviderID,
+		SpaceId:   "spaceid",
+		OpaqueId:  "itemid",
+	}
+	vaultSpaceID := &provider.StorageSpaceId{
+		OpaqueId: storagespace.FormatResourceID(&provider.ResourceId{
+			StorageId: utils.VaultStorageProviderID,
+			SpaceId:   "vaultspaceid",
+			OpaqueId:  "vaultspaceid",
+		}),
+	}
+
+	DescribeTable("Vault resources are redacted in notifications",
+		func(ev events.Event, mustNotContain string) {
+			received := make(chan *channels.Message, 1)
+			ch := make(chan events.Event)
+			evts := NewEventsNotifier(trace.NewNoopTracerProvider(), ch, capturingChannel{out: received}, log.NewLogger(), gatewaySelector, vs, "",
+				"", "", "", "", "", "",
+				store.Create(), nil, nil)
+			go evts.Run()
+
+			ch <- ev
+
+			var msg *channels.Message
+			select {
+			case msg = <-received:
+			case <-time.Tick(3 * time.Second):
+				Fail("timeout waiting for notification")
+			}
+
+			Expect(msg.Subject).NotTo(ContainSubstring(mustNotContain))
+			Expect(msg.TextBody).NotTo(ContainSubstring(mustNotContain))
+		},
+
+		Entry("Share Created", events.Event{
+			Event: events.ShareCreated{
+				Sharer:        sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				CTime:         utils.TimeToTS(time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC)),
+				ItemID:        vaultResourceID,
+			},
+		}, "report.pdf"),
+
+		Entry("Share Expired", events.Event{
+			Event: events.ShareExpired{
+				ShareOwner:    sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				ExpiredAt:     time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC),
+				ItemID:        vaultResourceID,
+			},
+		}, "report.pdf"),
+
+		Entry("Share Removed", events.Event{
+			Event: events.ShareRemoved{
+				Executant:     sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				ItemID:        vaultResourceID,
+			},
+		}, "report.pdf"),
+
+		Entry("Added to Space", events.Event{
+			Event: events.SpaceShared{
+				Executant:     sharer.GetId(),
+				Creator:       sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				ID:            vaultSpaceID,
+			},
+		}, "vault space"),
+
+		Entry("Removed from Space", events.Event{
+			Event: events.SpaceUnshared{
+				Executant:     sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				ID:            vaultSpaceID,
+			},
+		}, "vault space"),
+
+		Entry("Space Expired", events.Event{
+			Event: events.SpaceMembershipExpired{
+				SpaceOwner:    sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				SpaceID:       vaultSpaceID,
+				SpaceName:     "vault space",
+				ExpiredAt:     time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC),
+			},
+		}, "vault space"),
 	)
 })
 
@@ -928,7 +1023,7 @@ var _ = Describe("Notifications grouped send", func() {
 			expectedHTMLBody:    buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`executant has shared "secrets of the board" with you.`}),
 			done:                make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.ShareCreated{}).String(),
+			Type: reflect.TypeFor[events.ShareCreated]().String(),
 			Event: events.ShareCreated{
 				Sharer:        executant.GetId(),
 				GranteeUserID: receiver.GetId(),
@@ -947,7 +1042,7 @@ Even though this share has been revoked you still might have access through othe
 			expectedHTMLBody: buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`Your share to secrets of the board has expired at 2023-04-17 16:42:00<br><br>Even though this share has been revoked you still might have access through other shares and/or space memberships.`}),
 			done:             make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.ShareExpired{}).String(),
+			Type: reflect.TypeFor[events.ShareExpired]().String(),
 			Event: events.ShareExpired{
 				ShareOwner:     executant.GetId(),
 				GranteeGroupID: &group.GroupId{},
@@ -966,7 +1061,7 @@ Even though this share has been revoked you still might have access through othe
 			expectedHTMLBody: buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`executant has unshared 'secrets of the board' with you.<br><br>Even though this share has been revoked you still might have access through other shares and/or space memberships.`}),
 			done:             make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.ShareRemoved{}).String(),
+			Type: reflect.TypeFor[events.ShareRemoved]().String(),
 			Event: events.ShareRemoved{
 				Executant:      executant.GetId(),
 				GranteeGroupID: &group.GroupId{},
@@ -982,7 +1077,7 @@ Even though this share has been revoked you still might have access through othe
 			expectedHTMLBody:    buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`executant has invited you to join "secret space".`}),
 			done:                make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.SpaceShared{}).String(),
+			Type: reflect.TypeFor[events.SpaceShared]().String(),
 			Event: events.SpaceShared{
 				Executant:      executant.GetId(),
 				Creator:        executant.GetId(),
@@ -1001,7 +1096,7 @@ You might still have access through your other groups or direct membership.`}),
 			expectedHTMLBody: buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`executant has removed you from "secret space".<br><br>You might still have access through your other groups or direct membership.`}),
 			done:             make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.SpaceUnshared{}).String(),
+			Type: reflect.TypeFor[events.SpaceUnshared]().String(),
 			Event: events.SpaceUnshared{
 				Executant:      executant.GetId(),
 				GranteeGroupID: &group.GroupId{},
@@ -1019,7 +1114,7 @@ Even though this membership has expired you still might have access through othe
 			expectedHTMLBody: buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`Your membership of space secret space has expired at 2023-04-17 16:42:00<br><br>Even though this membership has expired you still might have access through other shares and/or space memberships`}),
 			done:             make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.SpaceMembershipExpired{}).String(),
+			Type: reflect.TypeFor[events.SpaceMembershipExpired]().String(),
 			Event: events.SpaceMembershipExpired{
 				SpaceOwner:     executant.GetId(),
 				GranteeGroupID: &group.GroupId{},
@@ -1043,7 +1138,7 @@ Even though this membership has expired you still might have access through othe
 			done:             make(chan struct{}),
 		}, []events.Event{
 			{
-				Type: reflect.TypeOf(events.ShareCreated{}).String(),
+				Type: reflect.TypeFor[events.ShareCreated]().String(),
 				Event: events.ShareCreated{
 					Sharer:        executant.GetId(),
 					GranteeUserID: receiver.GetId(),
@@ -1052,7 +1147,7 @@ Even though this membership has expired you still might have access through othe
 				},
 			},
 			{
-				Type: reflect.TypeOf(events.SpaceMembershipExpired{}).String(),
+				Type: reflect.TypeFor[events.SpaceMembershipExpired]().String(),
 				Event: events.SpaceMembershipExpired{
 					SpaceOwner:     executant.GetId(),
 					GranteeGroupID: &group.GroupId{},
@@ -1072,7 +1167,7 @@ Even though this membership has expired you still might have access through othe
 			expectedHTMLBody:    buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`executant has shared "secrets of the board" with you.`}),
 			done:                make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.ShareCreated{}).String(),
+			Type: reflect.TypeFor[events.ShareCreated]().String(),
 			Event: events.ShareCreated{
 				Sharer:        executant.GetId(),
 				GranteeUserID: receiver.GetId(),
@@ -1091,7 +1186,7 @@ Even though this share has been revoked you still might have access through othe
 			expectedHTMLBody: buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`Your share to secrets of the board has expired at 2023-04-17 16:42:00<br><br>Even though this share has been revoked you still might have access through other shares and/or space memberships.`}),
 			done:             make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.ShareExpired{}).String(),
+			Type: reflect.TypeFor[events.ShareExpired]().String(),
 			Event: events.ShareExpired{
 				ShareOwner:     executant.GetId(),
 				GranteeGroupID: &group.GroupId{},
@@ -1110,7 +1205,7 @@ Even though this share has been revoked you still might have access through othe
 			expectedHTMLBody: buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`executant has unshared 'secrets of the board' with you.<br><br>Even though this share has been revoked you still might have access through other shares and/or space memberships.`}),
 			done:             make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.ShareRemoved{}).String(),
+			Type: reflect.TypeFor[events.ShareRemoved]().String(),
 			Event: events.ShareRemoved{
 				Executant:      executant.GetId(),
 				GranteeGroupID: &group.GroupId{},
@@ -1126,7 +1221,7 @@ Even though this share has been revoked you still might have access through othe
 			expectedHTMLBody:    buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`executant has invited you to join "secret space".`}),
 			done:                make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.SpaceShared{}).String(),
+			Type: reflect.TypeFor[events.SpaceShared]().String(),
 			Event: events.SpaceShared{
 				Executant:      executant.GetId(),
 				Creator:        executant.GetId(),
@@ -1145,7 +1240,7 @@ You might still have access through your other groups or direct membership.`}),
 			expectedHTMLBody: buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`executant has removed you from "secret space".<br><br>You might still have access through your other groups or direct membership.`}),
 			done:             make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.SpaceUnshared{}).String(),
+			Type: reflect.TypeFor[events.SpaceUnshared]().String(),
 			Event: events.SpaceUnshared{
 				Executant:      executant.GetId(),
 				GranteeGroupID: &group.GroupId{},
@@ -1163,7 +1258,7 @@ Even though this membership has expired you still might have access through othe
 			expectedHTMLBody: buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`Your membership of space secret space has expired at 2023-04-17 16:42:00<br><br>Even though this membership has expired you still might have access through other shares and/or space memberships`}),
 			done:             make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.SpaceMembershipExpired{}).String(),
+			Type: reflect.TypeFor[events.SpaceMembershipExpired]().String(),
 			Event: events.SpaceMembershipExpired{
 				SpaceOwner:     executant.GetId(),
 				GranteeGroupID: &group.GroupId{},
@@ -1187,7 +1282,7 @@ Even though this membership has expired you still might have access through othe
 			done:             make(chan struct{}),
 		}, []events.Event{
 			{
-				Type: reflect.TypeOf(events.ShareCreated{}).String(),
+				Type: reflect.TypeFor[events.ShareCreated]().String(),
 				Event: events.ShareCreated{
 					Sharer:        executant.GetId(),
 					GranteeUserID: receiver.GetId(),
@@ -1196,7 +1291,7 @@ Even though this membership has expired you still might have access through othe
 				},
 			},
 			{
-				Type: reflect.TypeOf(events.SpaceMembershipExpired{}).String(),
+				Type: reflect.TypeFor[events.SpaceMembershipExpired]().String(),
 				Event: events.SpaceMembershipExpired{
 					SpaceOwner:     executant.GetId(),
 					GranteeGroupID: &group.GroupId{},
@@ -1276,6 +1371,17 @@ type testChannel struct {
 	expectedHTMLBody    string
 	expectedSender      string
 	done                chan struct{}
+}
+
+// capturingChannel hands the sent message to the caller instead of asserting on it itself,
+// for tests that need to inspect the message rather than match it exactly.
+type capturingChannel struct {
+	out chan *channels.Message
+}
+
+func (c capturingChannel) SendMessage(_ context.Context, m *channels.Message) error {
+	c.out <- m
+	return nil
 }
 
 func (tc testChannel) SendMessage(_ context.Context, m *channels.Message) error {

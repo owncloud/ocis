@@ -130,7 +130,7 @@ export const useFileActions = () => {
               }
               return fileExtension.label
             }
-            return $gettext('Open in %{app}', { app: appInfo.name }, true)
+            return $gettext('Open in %{app}', { app: appInfo.name })
           },
           showOpenInNewTabHint: true,
           icon: fileExtension.icon || appInfo.icon,
@@ -205,8 +205,7 @@ export const useFileActions = () => {
   }) => {
     const remoteItemId = isShareSpaceResource(space) ? space.id : undefined
     const routeName = appFileExtension.routeName || appFileExtension.app
-    const routeOpts = getEditorRouteOpts(routeName, space, resource, mode, remoteItemId)
-    return router.resolve(routeOpts)
+    return getEditorRouteOpts(routeName, space, resource, mode, remoteItemId)
   }
   const getEditorRouteOpts = (
     routeName: RouteRecordName,

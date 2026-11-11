@@ -58,7 +58,11 @@ func (m *createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	createHomeReq := &provider.CreateHomeRequest{}
 	u, ok := revactx.ContextGetUser(ctx)
 	if !ok || u == nil {
-		m.logger.Error().Msg("no user in context")
+		// Requests on unprotected routes can carry a reva token without a resolved
+		// user, e.g. the internal download requests to the data gateway (/data), which
+		// reva's HTTP client sends with the caller's token. There is no home to create
+		// for them, so this is expected and not an error.
+		m.logger.Debug().Str("path", req.URL.Path).Msg("no user in context, not creating a home")
 		m.next.ServeHTTP(w, req)
 		return
 	}

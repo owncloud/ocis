@@ -59,15 +59,17 @@ type Graph struct {
 	identityBackend          identity.Backend
 	identityEducationBackend identity.EducationBackend
 	roleService              RoleService
+	guestRoleMapping         []guestRoleMapping
 	permissionsService       Permissions
 	valueService             settingssvc.ValueService
-	specialDriveItemsCache   *ttlcache.Cache[string, interface{}]
+	specialDriveItemsCache   *ttlcache.Cache[string, any]
 	eventsPublisher          events.Publisher
 	eventsConsumer           events.Consumer
 	searchService            searchsvc.SearchProviderService
 	keycloakClient           keycloak.Client
 	historyClient            ehsvc.EventHistoryService
 	traceProvider            trace.TracerProvider
+	maxImageFileSize         uint64
 }
 
 // ServeHTTP implements the Service interface.
@@ -82,7 +84,7 @@ func (g Graph) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g.mux.ServeHTTP(w, r)
 }
 
-func (g Graph) publishEvent(ctx context.Context, ev interface{}) {
+func (g Graph) publishEvent(ctx context.Context, ev any) {
 	if g.eventsPublisher != nil {
 		if err := events.Publish(ctx, g.eventsPublisher, ev); err != nil {
 			g.logger.Error().
@@ -103,7 +105,7 @@ func (g Graph) getWebDavBaseURL() (*url.URL, error) {
 
 // ListResponse is used for proper marshalling of Graph list responses
 type ListResponse struct {
-	Value interface{} `json:"value,omitempty"`
+	Value any `json:"value,omitempty"`
 }
 
 const (
@@ -169,7 +171,7 @@ func hasAcceptableSearch(query *godata.GoDataQuery, minSearchLength int) bool {
 	return len(query.Search.RawValue) >= minSearchLength
 }
 
-// regular users can only filter by userType
+// regular users can only filter by userType or vaultEligible
 func hasAcceptableFilter(query *godata.GoDataQuery) bool {
 	switch {
 	case query == nil || query.Filter == nil:
@@ -178,7 +180,8 @@ func hasAcceptableFilter(query *godata.GoDataQuery) bool {
 		return false
 	case query.Filter.Tree.Token.Value != "eq":
 		return false
-	case query.Filter.Tree.Children[0].Token.Value != "userType":
+	case query.Filter.Tree.Children[0].Token.Value != "userType" &&
+		query.Filter.Tree.Children[0].Token.Value != vaultEligible:
 		return false
 	}
 

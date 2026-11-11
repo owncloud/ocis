@@ -26,6 +26,7 @@ use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\GraphHelper;
 use TestHelpers\BehatHelper;
+use TestHelpers\KeycloakHelper;
 
 require_once 'bootstrap.php';
 
@@ -60,6 +61,7 @@ class TagContext implements Context {
 	 * @param string $resource
 	 * @param string $space
 	 * @param array $tagNameArray
+	 * @param bool $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws \GuzzleHttp\Exception\GuzzleException
@@ -70,19 +72,31 @@ class TagContext implements Context {
 		string $resource,
 		string $space,
 		array $tagNameArray,
+		bool $isVault = false,
 	): ResponseInterface {
 		if ($fileOrFolder === 'folder' || $fileOrFolder === 'folders') {
-			$resourceId = $this->spacesContext->getResourceId($user, $space, $resource);
+			$resourceId = $this->spacesContext->getResourceId($user, $space, $resource, $isVault);
 		} else {
-			$resourceId = $this->spacesContext->getFileId($user, $space, $resource);
+			$resourceId = $this->spacesContext->getFileId($user, $space, $resource, $isVault);
 		}
 
+		$headers = [];
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$accessToken = $this->featureContext->getOcisUserToken($user)['token']['accessToken'];
+			$headers['Authorization'] = 'Bearer ' . $accessToken;
+			$user = null;
+			$password = null;
+		} else {
+			$password = $this->featureContext->getPasswordForUser($user);
+		}
 		return GraphHelper::createTags(
 			$this->featureContext->getBaseUrl(),
 			$user,
-			$this->featureContext->getPasswordForUser($user),
+			$password,
 			$resourceId,
 			$tagNameArray,
+			$headers,
+			$isVault,
 		);
 	}
 
@@ -141,11 +155,12 @@ class TagContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has tagged the following (folders|files) of the space "([^"]*)":$/
+	 * @Given /^user "([^"]*)" has tagged the following (folders|files) of the space "([^"]*)"(| in vault)?:$/
 	 *
 	 * @param string $user
 	 * @param string $filesOrFolders (files|folders)
 	 * @param string $space
+	 * @param string $isVault
 	 * @param TableNode $table
 	 *
 	 * @return void
@@ -155,13 +170,15 @@ class TagContext implements Context {
 		string $user,
 		string $filesOrFolders,
 		string $space,
+		string $isVault,
 		TableNode $table,
 	): void {
+		$isVault = trim($isVault) === 'in vault';
 		$this->featureContext->verifyTableNodeColumns($table, ["path", "tagName"]);
 		$rows = $table->getHash();
 		foreach ($rows as $row) {
 			$tagNameArray = array_map('trim', explode(',', $row['tagName']));
-			$response = $this->createTags($user, $filesOrFolders, $row['path'], $space, $tagNameArray);
+			$response = $this->createTags($user, $filesOrFolders, $row['path'], $space, $tagNameArray, $isVault);
 			$this->featureContext->theHttpStatusCodeShouldBe(200, "", $response);
 		}
 	}

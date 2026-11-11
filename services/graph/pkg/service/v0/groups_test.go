@@ -189,7 +189,7 @@ var _ = Describe("Groups", func() {
 			res := service.ListResponse{}
 			err = json.Unmarshal(data, &res)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(res.Value).To(Equal([]interface{}{}))
+			Expect(res.Value).To(Equal([]any{}))
 		})
 
 		It("renders a list of groups with 2fa", func() {
@@ -260,7 +260,7 @@ var _ = Describe("Groups", func() {
 			group.SetMembers(
 				[]libregraph.User{
 					{
-						Id: libregraph.PtrString("userid"),
+						Id: new("userid"),
 					},
 				},
 			)
@@ -333,7 +333,7 @@ var _ = Describe("Groups", func() {
 			group.SetMembers(
 				[]libregraph.User{
 					{
-						Id: libregraph.PtrString("userid"),
+						Id: new("userid"),
 					},
 				},
 			)
@@ -370,7 +370,7 @@ var _ = Describe("Groups", func() {
 			group.SetMembers(
 				[]libregraph.User{
 					{
-						Id: libregraph.PtrString("userid"),
+						Id: new("userid"),
 					},
 				},
 			)

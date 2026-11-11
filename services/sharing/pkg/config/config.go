@@ -21,15 +21,16 @@ type Config struct {
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"SHARING_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token." introductionVersion:"pre5.0"`
 
-	UserSharingDriver              string               `yaml:"user_sharing_driver" env:"SHARING_USER_DRIVER" desc:"Driver to be used to persist shares. Supported values are 'jsoncs3', 'json', 'cs3' (deprecated) and 'owncloudsql'." introductionVersion:"pre5.0"`
+	UserSharingDriver              string               `yaml:"user_sharing_driver" env:"SHARING_USER_DRIVER" desc:"Driver to be used to persist shares. Supported values are 'jsoncs3', 'json' and 'cs3' (deprecated)." introductionVersion:"pre5.0"`
 	UserSharingDrivers             UserSharingDrivers   `yaml:"user_sharing_drivers"`
 	PublicSharingDriver            string               `yaml:"public_sharing_driver" env:"SHARING_PUBLIC_DRIVER" desc:"Driver to be used to persist public shares. Supported values are 'jsoncs3', 'json' and 'cs3' (deprecated)." introductionVersion:"pre5.0"`
 	PublicSharingDrivers           PublicSharingDrivers `yaml:"public_sharing_drivers"`
 	WriteableShareMustHavePassword bool                 `yaml:"public_sharing_writeableshare_must_have_password" env:"OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD;SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares." introductionVersion:"5.0"`
 	PublicShareMustHavePassword    bool                 `yaml:"public_sharing_share_must_have_password" env:"OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD;SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords on all public shares." introductionVersion:"5.0"`
-	EnableExpiredSharesCleanup     bool                 `yaml:"enable_expired_shares_cleanup"`
-	EnableUserSharing              bool                 `yaml:"enable_user_sharing" env:"OCIS_ENABLE_USER_SHARING" desc:"Enables direct sharing with users and groups. When disabled, creating new user or group shares is rejected. Public link sharing is not affected." introductionVersion:"%%NEXT_PRODUCTION_VERSION%%"`
-	EnablePublicSharing            bool                 `yaml:"enable_public_sharing" env:"OCIS_ENABLE_PUBLIC_SHARING" desc:"Enables public link sharing. When disabled, creating new public links is rejected. Direct sharing with users and groups is not affected." introductionVersion:"%%NEXT_PRODUCTION_VERSION%%"`
+	EnableExpiredSharesCleanup     bool                 `yaml:"enable_expired_shares_cleanup" env:"OCIS_SHARING_ENABLE_EXPIRED_SHARES_CLEANUP;SHARING_ENABLE_EXPIRED_SHARES_CLEANUP" desc:"Enable the periodic removal of expired public shares. When disabled, expired shares are still hidden from listings but never actually deleted." introductionVersion:"9.0.0"`
+	JanitorRunInterval             int                  `yaml:"janitor_run_interval" env:"OCIS_SHARING_JANITOR_RUN_INTERVAL;SHARING_JANITOR_RUN_INTERVAL" desc:"Interval in seconds between two runs of the janitor that permanently deletes expired public shares. Defaults to '3600' (1 hour). Only relevant when OCIS_SHARING_ENABLE_EXPIRED_SHARES_CLEANUP is enabled." introductionVersion:"9.0.0"`
+	EnableUserSharing              bool                 `yaml:"enable_user_sharing" env:"OCIS_ENABLE_USER_SHARING" desc:"Enables direct sharing with users and groups. When disabled, creating new user or group shares is rejected. Public link sharing is not affected." introductionVersion:"8.2.0"`
+	EnablePublicSharing            bool                 `yaml:"enable_public_sharing" env:"OCIS_ENABLE_PUBLIC_SHARING" desc:"Enables public link sharing. When disabled, creating new public links is rejected. Direct sharing with users and groups is not affected." introductionVersion:"8.2.0"`
 	PasswordPolicy                 PasswordPolicy       `yaml:"password_policy"`
 
 	Context context.Context `yaml:"-"`
@@ -61,10 +62,9 @@ type GRPCConfig struct {
 }
 
 type UserSharingDrivers struct {
-	JSONCS3     UserSharingJSONCS3Driver     `yaml:"jsoncs3"`
-	JSON        UserSharingJSONDriver        `yaml:"json"`
-	CS3         UserSharingCS3Driver         `yaml:"cs3"`
-	OwnCloudSQL UserSharingOwnCloudSQLDriver `yaml:"owncloudsql"`
+	JSONCS3 UserSharingJSONCS3Driver `yaml:"jsoncs3"`
+	JSON    UserSharingJSONDriver    `yaml:"json"`
+	CS3     UserSharingCS3Driver     `yaml:"cs3"`
 
 	SQL UserSharingSQLDriver `yaml:"sql,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
@@ -83,15 +83,6 @@ type UserSharingSQLDriver struct {
 	EnableExpiredSharesCleanup bool   `yaml:"enable_expired_shares_cleanup"`
 	JanitorRunInterval         int    `yaml:"janitor_run_interval"`
 	UserStorageMountID         string `yaml:"user_storage_mount_id"`
-}
-
-type UserSharingOwnCloudSQLDriver struct {
-	DBUsername         string `yaml:"db_username" env:"SHARING_USER_OWNCLOUDSQL_DB_USERNAME" desc:"Username for the database." introductionVersion:"pre5.0"`
-	DBPassword         string `yaml:"db_password" env:"SHARING_USER_OWNCLOUDSQL_DB_PASSWORD" desc:"Password for the database." introductionVersion:"pre5.0"`
-	DBHost             string `yaml:"db_host" env:"SHARING_USER_OWNCLOUDSQL_DB_HOST" desc:"Hostname or IP of the database server." introductionVersion:"pre5.0"`
-	DBPort             int    `yaml:"db_port" env:"SHARING_USER_OWNCLOUDSQL_DB_PORT" desc:"Port that the database server is listening on." introductionVersion:"pre5.0"`
-	DBName             string `yaml:"db_name" env:"SHARING_USER_OWNCLOUDSQL_DB_NAME" desc:"Name of the database to be used." introductionVersion:"pre5.0"`
-	UserStorageMountID string `yaml:"user_storage_mount_id" env:"SHARING_USER_OWNCLOUDSQL_USER_STORAGE_MOUNT_ID" desc:"Mount ID of the ownCloudSQL users storage for mapping ownCloud 10 shares." introductionVersion:"pre5.0"`
 }
 
 type UserSharingCS3Driver struct {
@@ -150,13 +141,15 @@ type PublicSharingJSONCS3Driver struct {
 }
 
 type Events struct {
-	Addr              string `yaml:"endpoint" env:"OCIS_EVENTS_ENDPOINT;SHARING_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture." introductionVersion:"pre5.0"`
-	ClusterID         string `yaml:"cluster" env:"OCIS_EVENTS_CLUSTER;SHARING_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system." introductionVersion:"pre5.0"`
-	TLSInsecure       bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;SHARING_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates." introductionVersion:"pre5.0"`
-	TLSRootCaCertPath string `yaml:"tls_root_ca_cert_path" env:"OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided SHARING_EVENTS_TLS_INSECURE will be seen as false." introductionVersion:"pre5.0"`
-	EnableTLS         bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;SHARING_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"pre5.0"`
-	AuthUsername      string `yaml:"auth_username" env:"OCIS_EVENTS_AUTH_USERNAME;SHARING_EVENTS_AUTH_USERNAME" desc:"Username for the events broker." introductionVersion:"5.0"`
-	AuthPassword      string `yaml:"auth_password" env:"OCIS_EVENTS_AUTH_PASSWORD;SHARING_EVENTS_AUTH_PASSWORD" desc:"Password for the events broker." introductionVersion:"5.0"`
+	Endpoint             string `yaml:"endpoint" env:"OCIS_EVENTS_ENDPOINT;SHARING_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture." introductionVersion:"pre5.0"`
+	Cluster              string `yaml:"cluster" env:"OCIS_EVENTS_CLUSTER;SHARING_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system." introductionVersion:"pre5.0"`
+	TLSInsecure          bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;SHARING_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates." introductionVersion:"pre5.0"`
+	TLSRootCACertificate string `yaml:"tls_root_ca_cert_path" env:"OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided SHARING_EVENTS_TLS_INSECURE will be seen as false." introductionVersion:"pre5.0"`
+	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;SHARING_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"pre5.0"`
+	AuthUsername         string `yaml:"auth_username" env:"OCIS_EVENTS_AUTH_USERNAME;SHARING_EVENTS_AUTH_USERNAME" desc:"Username for the events broker." introductionVersion:"5.0"`
+	AuthPassword         string `yaml:"auth_password" env:"OCIS_EVENTS_AUTH_PASSWORD;SHARING_EVENTS_AUTH_PASSWORD" desc:"Password for the events broker." introductionVersion:"5.0"`
+	CredsFile            string `yaml:"creds_file" env:"OCIS_NATS_CREDS_FILE;SHARING_EVENTS_CREDS_FILE" desc:"Path to a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate with the events broker when NATS runs in JWT (operator) mode. When set, the service does not use the username and the password. Exception: a service-specific username and password take precedence over the global OCIS_NATS_CREDS and OCIS_NATS_CREDS_FILE variables when both have a value. The service reads the file again on each reconnect." introductionVersion:"9.0.0"`
+	Creds                string `mask:"password" yaml:"creds" env:"OCIS_NATS_CREDS;SHARING_EVENTS_CREDS" desc:"Content of a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate with the events broker when NATS runs in JWT (operator) mode. A service-specific variable takes precedence over a global variable. In the same scope, the content takes precedence over the path of a .creds file. When set, the service does not use the username and the password. Exception: a service-specific username and password take precedence over the global OCIS_NATS_CREDS and OCIS_NATS_CREDS_FILE variables when both have a value." introductionVersion:"9.0.0"`
 }
 
 // PasswordPolicy configures reva password policy

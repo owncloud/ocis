@@ -39,6 +39,7 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	"github.com/owncloud/reva/v2/internal/http/services/owncloud/ocdav/net"
+	"github.com/owncloud/reva/v2/pkg/appctx"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
@@ -51,6 +52,12 @@ func init() {
 	tracer = otel.Tracer("github.com/owncloud/reva/pkg/storage/utils/metadata")
 }
 
+// defaultAuthRPCTimeout bounds the machine auth Authenticate call made for
+// every metadata operation. It only has to cover a token mint, so it is
+// generous - its purpose is to turn a stalled gateway into an error instead of
+// a goroutine that waits for the lifetime of the process.
+const defaultAuthRPCTimeout = 10 * time.Second
+
 // CS3 represents a metadata storage with a cs3 storage backend
 type CS3 struct {
 	SpaceRoot *provider.ResourceId
@@ -60,15 +67,18 @@ type CS3 struct {
 	useSystemUser     bool
 	serviceUser       *user.User
 	machineAuthAPIKey string
+	authRPCTimeout    time.Duration
 
 	dataGatewayClient *http.Client
 }
+
 
 // NewCS3 returns a new CS3 instance. Use an authenticated context and be sure to define SpaceRoot manually.
 func NewCS3(gwAddr, providerAddr string) (s *CS3) {
 	return &CS3{
 		providerAddr:      providerAddr,
 		gatewayAddr:       gwAddr,
+		authRPCTimeout:    defaultAuthRPCTimeout,
 		dataGatewayClient: http.DefaultClient,
 	}
 }
@@ -162,6 +172,8 @@ func (cs3 *CS3) SimpleUpload(ctx context.Context, uploadpath string, content []b
 	ctx, span := tracer.Start(ctx, "SimpleUpload")
 	defer span.End()
 
+	log := appctx.GetLogger(ctx)
+	log.Debug().Str("path", uploadpath).Msg("cs3.SimpleUpload.start")
 	_, err := cs3.Upload(ctx, UploadRequest{
 		Path:    uploadpath,
 		Content: content,
@@ -173,6 +185,9 @@ func (cs3 *CS3) SimpleUpload(ctx context.Context, uploadpath string, content []b
 func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) (*UploadResponse, error) {
 	ctx, span := tracer.Start(ctx, "Upload")
 	defer span.End()
+
+	log := appctx.GetLogger(ctx)
+	log.Debug().Str("path", req.Path).Msg("cs3.Upload.start")
 
 	client, err := cs3.providerClient()
 	if err != nil {
@@ -238,6 +253,8 @@ func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) (*UploadResponse,
 		return nil, errors.New("metadata storage doesn't support the simple upload protocol")
 	}
 
+	log.Debug().Str("path", req.Path).Str("endpoint", endpoint).Msg("cs3.Upload.initiate_done")
+
 	httpReq, err := http.NewRequest(http.MethodPut, endpoint, bytes.NewReader(req.Content))
 	if err != nil {
 		return nil, err
@@ -253,6 +270,7 @@ func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) (*UploadResponse,
 		return nil, err
 	}
 	defer resp.Body.Close()
+	log.Debug().Str("path", req.Path).Int("status", resp.StatusCode).Msg("cs3.Upload.put_done")
 	if err := errtypes.NewErrtypeFromHTTPStatusCode(resp.StatusCode, httpReq.URL.Path); err != nil {
 		return nil, err
 	}
@@ -260,6 +278,7 @@ func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) (*UploadResponse,
 	if ocEtag := resp.Header.Get("OC-ETag"); ocEtag != "" {
 		etag = ocEtag
 	}
+	log.Debug().Str("path", req.Path).Str("etag", etag).Msg("cs3.Upload.complete")
 	return &UploadResponse{
 		Etag:   etag,
 		FileID: resp.Header.Get("OC-Fileid"),
@@ -562,12 +581,30 @@ func (cs3 *CS3) getAuthContext(ctx context.Context) (context.Context, error) {
 	}
 
 	authCtx = ctxpkg.ContextSetUser(authCtx, cs3.serviceUser)
-	authRes, err := client.Authenticate(authCtx, &gateway.AuthenticateRequest{
+
+	// The Authenticate call gets a context of its own: a gateway that is stuck
+	// on a downstream storage provider accepts the connection and then never
+	// answers, and there is nothing else that would ever end the wait. The
+	// deadline cannot live on authCtx, because the caller runs its own RPC on
+	// the context we return here.
+	timeout := cs3.authRPCTimeout
+	if timeout <= 0 {
+		timeout = defaultAuthRPCTimeout
+	}
+	rpcCtx, cancel := context.WithTimeout(authCtx, timeout)
+	defer cancel()
+
+	start := time.Now()
+	authRes, err := client.Authenticate(rpcCtx, &gateway.AuthenticateRequest{
 		Type:         "machine",
 		ClientId:     "userid:" + cs3.serviceUser.Id.OpaqueId,
 		ClientSecret: cs3.machineAuthAPIKey,
 	})
 	if err != nil {
+		// this used to fail silently by never returning at all, so make sure
+		// an exhausted deadline is visible at production log level
+		appctx.GetLogger(ctx).Warn().Err(err).Str("gateway_addr", cs3.gatewayAddr).
+			Dur("elapsed", time.Since(start)).Dur("timeout", timeout).Msg("cs3: machine authentication failed")
 		return nil, err
 	}
 	if authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {

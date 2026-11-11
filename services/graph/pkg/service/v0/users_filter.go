@@ -8,11 +8,20 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/reva/v2/pkg/permission"
+	"golang.org/x/sync/errgroup"
 )
+
+// maxConcurrentVaultEligibilityChecks bounds how many per-user role assignment lookups
+// applyFilterVaultEligible runs at once, so a large search result doesn't fan out into an
+// unbounded number of concurrent settings service calls.
+const maxConcurrentVaultEligibilityChecks = 10
 
 const (
 	appRoleID          = "appRoleId"
 	appRoleAssignments = "appRoleAssignments"
+	// vaultEligible filters for users that may be granted access to vault resources
+	vaultEligible = "vaultEligible"
 )
 
 func invalidFilterError() error {
@@ -226,10 +235,16 @@ func (g Graph) applyFilterLogicalOr(ctx context.Context, req *godata.GoDataReque
 }
 
 func (g Graph) applyFilterEq(ctx context.Context, req *godata.GoDataRequest, operand1 *godata.ParseNode, operand2 *godata.ParseNode) (users []*libregraph.User, err error) {
+	if operand1.Token.Type != godata.ExpressionTokenLiteral {
+		return users, unsupportedFilterError()
+	}
+
+	if operand1.Token.Value == vaultEligible {
+		return g.applyFilterVaultEligible(ctx, req, operand2)
+	}
+
 	// We only support the 'eq' on 'userType' for now
 	switch {
-	case operand1.Token.Type != godata.ExpressionTokenLiteral:
-		fallthrough
 	case operand1.Token.Value != "userType":
 		fallthrough
 	case operand2.Token.Type != godata.ExpressionTokenString:
@@ -245,6 +260,120 @@ func (g Graph) applyFilterEq(ctx context.Context, req *godata.GoDataRequest, ope
 		return g.searchOCMAcceptedUsers(ctx, req)
 	}
 	return users, unsupportedFilterError()
+}
+
+// applyFilterVaultEligible resolves `vaultEligible eq true`, the filter the share recipient
+// picker sends while sharing a vault resource. Only `true` is accepted: enumerating the users
+// who may not enter the vault is not a use case the picker has.
+//
+// Eligibility is checked only for the users the directory search actually returned, not for
+// every account in the system: the search runs first, and a per-user role assignment lookup
+// follows only for the (usually few) users it matched. This keeps the cost proportional to the
+// search result instead of the number of accounts in the whole deployment.
+func (g Graph) applyFilterVaultEligible(ctx context.Context, req *godata.GoDataRequest, operand *godata.ParseNode) ([]*libregraph.User, error) {
+	if operand.Token.Type != godata.ExpressionTokenBoolean || operand.Token.Value != "true" {
+		return nil, unsupportedFilterError()
+	}
+
+	// This is the share recipient search, and clients only send it once a few characters have
+	// been typed (FRONTEND_SEARCH_MIN_LENGTH). We therefore expect a handful of matching users here,
+	// not the whole directory, which is what makes checking each of them individually below cheap.
+	users, err := g.identityBackend.GetUsers(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	// unlike other filters, vaultEligible applies its own role check below, so it's safe to
+	// look up a cross-instance match here - the GetUsers switch only blocks a cross-instance
+	// lookup when it would bypass that check entirely.
+	var preciseUserID string
+	if username, instancename := g.parseExternalSearch(req); username != "" && instancename != "" &&
+		g.contextUserHasExternalSharePermission(ctx) {
+		if preciseUser, err := g.identityBackend.GetPreciseUser(ctx, username, instancename, req); err == nil {
+			preciseUserID = preciseUser.GetId()
+			found := false
+			for _, u := range users {
+				if u.GetId() == preciseUser.GetId() {
+					found = true
+					break
+				}
+			}
+			if !found {
+				users = append(users, preciseUser)
+			}
+		}
+	}
+
+	if len(users) == 0 {
+		return users, nil
+	}
+
+	roles, err := g.roleService.ListRoles(ctx, &settingssvc.ListBundlesRequest{})
+	if err != nil {
+		return nil, err
+	}
+
+	vaultGrantingRoles := make(map[string]struct{})
+	for _, role := range roles.GetBundles() {
+		if roleGrantsVaultMode(role) {
+			vaultGrantingRoles[role.GetId()] = struct{}{}
+		}
+	}
+	if len(vaultGrantingRoles) == 0 {
+		return []*libregraph.User{}, nil
+	}
+
+	// eligible preserves the directory search's order: each slot is written at most once, by
+	// the goroutine checking that same index, so concurrent execution cannot reorder the result.
+	eligible := make([]bool, len(users))
+
+	eg, egCtx := errgroup.WithContext(ctx)
+	eg.SetLimit(maxConcurrentVaultEligibilityChecks)
+	for i, user := range users {
+		eg.Go(func() error {
+			assignments, err := g.roleService.ListRoleAssignments(egCtx, &settingssvc.ListRoleAssignmentsRequest{
+				AccountUuid: user.GetId(),
+			})
+			if err != nil {
+				return err
+			}
+			// a user of another instance only gets a role here at their first login here. Until
+			// then, check the role the guest role mapping gives their userClass, like
+			// assignGuestVaultRole does when the vault share is created.
+			if len(assignments.GetAssignments()) == 0 && user.GetId() == preciseUserID && len(g.guestRoleMapping) > 0 {
+				eligible[i] = g.guestVaultEligible(egCtx, user.GetId(), roles.GetBundles())
+				return nil
+			}
+			for _, assignment := range assignments.GetAssignments() {
+				if _, ok := vaultGrantingRoles[assignment.GetRoleId()]; ok {
+					eligible[i] = true
+					break
+				}
+			}
+			return nil
+		})
+	}
+	if err := eg.Wait(); err != nil {
+		return nil, err
+	}
+
+	filteredUsers := make([]*libregraph.User, 0, len(users))
+	for i, user := range users {
+		if eligible[i] {
+			filteredUsers = append(filteredUsers, user)
+		}
+	}
+	return filteredUsers, nil
+}
+
+// roleGrantsVaultMode reports whether a role bundle carries the vault mode permission.
+func roleGrantsVaultMode(role *settingsmsg.Bundle) bool {
+	for _, setting := range role.GetSettings() {
+		if setting.GetName() == permission.VaultMode && setting.GetPermissionValue() != nil {
+			return true
+		}
+	}
+	return false
 }
 
 func (g Graph) applyFilterLessOrEqual(ctx context.Context, req *godata.GoDataRequest, filterRoot *godata.ParseNode) (users []*libregraph.User, err error) {

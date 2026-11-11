@@ -4,15 +4,20 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
+	"errors"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/MicahParks/keyfunc/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	"golang.org/x/oauth2"
 )
 
 type signingKey struct {
-	priv interface{}
+	priv any
 	jwks *keyfunc.JWKS
 }
 
@@ -27,7 +32,7 @@ func TestLogoutVerify(t *testing.T) {
 				"iat": 1471566154,
 				"jti": "bWJq",
 				"sid": "08a5019c-17e1-4977-8f42-65a12843ea02",
-				"events": map[string]interface{}{
+				"events": map[string]any{
 					"http://schemas.openid.net/event/backchannel-logout": struct{}{},
 				},
 			}),
@@ -39,7 +44,7 @@ func TestLogoutVerify(t *testing.T) {
 			logoutToken: jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 				"iss": "https://foo1",
 				"sub": "248289761001",
-				"events": map[string]interface{}{
+				"events": map[string]any{
 					"http://schemas.openid.net/event/backchannel-logout": struct{}{},
 				},
 			}),
@@ -55,7 +60,7 @@ func TestLogoutVerify(t *testing.T) {
 				"iat": 1471566154,
 				"jti": "bWJq",
 				"sid": "08a5019c-17e1-4977-8f42-65a12843ea02",
-				"events": map[string]interface{}{
+				"events": map[string]any{
 					"http://schemas.openid.net/event/backchannel-logout": struct{}{},
 				},
 			}),
@@ -70,7 +75,7 @@ func TestLogoutVerify(t *testing.T) {
 				"aud": "s6BhdRkqt3",
 				"iat": 1471566154,
 				"jti": "bWJq",
-				"events": map[string]interface{}{
+				"events": map[string]any{
 					"http://schemas.openid.net/event/backchannel-logout": struct{}{},
 				},
 			}),
@@ -87,7 +92,7 @@ func TestLogoutVerify(t *testing.T) {
 				"jti":   "bWJq",
 				"sid":   "08a5019c-17e1-4977-8f42-65a12843ea02",
 				"nonce": "123",
-				"events": map[string]interface{}{
+				"events": map[string]any{
 					"http://schemas.openid.net/event/backchannel-logout": struct{}{},
 				},
 			}),
@@ -103,7 +108,7 @@ func TestLogoutVerify(t *testing.T) {
 				"iat": 1471566154,
 				"jti": "bWJq",
 				"sid": "08a5019c-17e1-4977-8f42-65a12843ea02",
-				"events": map[string]interface{}{
+				"events": map[string]any{
 					"http://blah.blah.blash/event/backchannel-logout": struct{}{},
 				},
 			}),
@@ -183,6 +188,182 @@ func (l logoutVerificationTest) run(t *testing.T) {
 	}
 	if err == nil && l.wantErr {
 		t.Errorf("expected error")
+	}
+}
+
+func TestVerifyAccessTokenAudience(t *testing.T) {
+	const issuer = "https://foo"
+	key := newRSAKey(t)
+
+	tests := []struct {
+		name string
+		// allowlist configured on the client (empty disables the check)
+		verifyAud []string
+		// claims of the presented access token
+		aud     any
+		azp     string
+		wantErr bool
+	}{
+		{
+			name:      "check disabled accepts foreign audience",
+			verifyAud: nil,
+			aud:       "account",
+			azp:       "evil-app",
+			wantErr:   false,
+		},
+		{
+			name:      "rejects foreign azp with generic aud (keycloak style)",
+			verifyAud: []string{"web"},
+			aud:       "account",
+			azp:       "evil-app",
+			wantErr:   true,
+		},
+		{
+			name:      "accepts matching azp with generic aud (keycloak style)",
+			verifyAud: []string{"web"},
+			aud:       "account",
+			azp:       "web",
+			wantErr:   false,
+		},
+		{
+			name:      "accepts matching aud (builtin idp style)",
+			verifyAud: []string{"web"},
+			aud:       "web",
+			azp:       "",
+			wantErr:   false,
+		},
+		{
+			name:      "accepts when one of multiple audiences matches",
+			verifyAud: []string{"desktop", "web"},
+			aud:       []string{"account", "web"},
+			azp:       "evil-app",
+			wantErr:   false,
+		},
+		{
+			name:      "rejects when neither aud nor azp match",
+			verifyAud: []string{"web", "desktop"},
+			aud:       []string{"account", "other"},
+			azp:       "evil-app",
+			wantErr:   true,
+		},
+		{
+			name:      "rejects when azp is empty and aud does not match",
+			verifyAud: []string{"web", "desktop"},
+			aud:       []string{"account", "other"},
+			azp:       "",
+			wantErr:   true,
+		},
+		{
+			name:      "tolerates whitespace around configured audience",
+			verifyAud: []string{" web ", "desktop"},
+			aud:       "account",
+			azp:       "web",
+			wantErr:   false,
+		},
+		{
+			name:      "blank configured audience does not match missing azp",
+			verifyAud: []string{"  "},
+			aud:       "account",
+			azp:       "",
+			wantErr:   true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			claims := jwt.MapClaims{
+				"iss": issuer,
+				"sub": "einstein",
+				"aud": tc.aud,
+			}
+			if tc.azp != "" {
+				claims["azp"] = tc.azp
+			}
+			tok := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+			tok.Header["kid"] = "1"
+			signed, err := tok.SignedString(key.priv)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			client := oidc.NewOIDCClient(
+				oidc.WithOidcIssuer(issuer),
+				oidc.WithJWKS(key.jwks),
+				oidc.WithProviderMetadata(&oidc.ProviderMetadata{}),
+				oidc.WithAccessTokenVerifyMethod(config.AccessTokenVerificationJWT),
+				oidc.WithAccessTokenVerifyAudiences(tc.verifyAud),
+			)
+
+			_, _, err = client.VerifyAccessToken(context.Background(), signed)
+			if tc.wantErr && err == nil {
+				t.Errorf("expected error, got nil")
+			}
+			if !tc.wantErr && err != nil {
+				t.Errorf("expected no error, got %v", err)
+			}
+		})
+	}
+}
+
+// A userinfo call that returns a transient status (429/5xx) must be classified as
+// temporarily unavailable so the proxy answers 503, not 401 (#12999). A genuine
+// auth status (401/403) must stay a plain error that maps to 401.
+func TestUserInfoStatusClassification(t *testing.T) {
+	tests := []struct {
+		status    int
+		transient bool
+	}{
+		{http.StatusUnauthorized, false},
+		{http.StatusForbidden, false},
+		{http.StatusInternalServerError, true},
+		{http.StatusBadGateway, true},
+		{http.StatusServiceUnavailable, true},
+		{http.StatusTooManyRequests, true},
+	}
+	for _, tt := range tests {
+		t.Run(http.StatusText(tt.status), func(t *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tt.status)
+			}))
+			defer srv.Close()
+
+			c := oidc.NewOIDCClient(
+				oidc.WithProviderMetadata(&oidc.ProviderMetadata{UserinfoEndpoint: srv.URL}),
+				oidc.WithHTTPClient(srv.Client()),
+			)
+
+			_, err := c.UserInfo(context.Background(),
+				oauth2.StaticTokenSource(&oauth2.Token{AccessToken: "t"}))
+			if err == nil {
+				t.Fatalf("expected an error for status %d", tt.status)
+			}
+			if got := errors.Is(err, oidc.ErrTemporarilyUnavailable); got != tt.transient {
+				t.Fatalf("status %d: transient = %v, want %v (err=%v)", tt.status, got, tt.transient, err)
+			}
+		})
+	}
+}
+
+// A transient failure while discovering the IdP (well-known/JWKS) during access-token
+// verification must be classified as temporarily unavailable, not surfaced as a 401 (#12999).
+func TestVerifyAccessTokenTransientDiscovery(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusServiceUnavailable)
+	}))
+	defer srv.Close()
+
+	c := oidc.NewOIDCClient(
+		oidc.WithOidcIssuer(srv.URL),
+		oidc.WithHTTPClient(srv.Client()),
+		oidc.WithAccessTokenVerifyMethod(config.AccessTokenVerificationJWT),
+	)
+
+	_, _, err := c.VerifyAccessToken(context.Background(), "any.token.here")
+	if err == nil {
+		t.Fatal("expected an error for a 503 during discovery")
+	}
+	if !errors.Is(err, oidc.ErrTemporarilyUnavailable) {
+		t.Fatalf("discovery 503 must be transient, got %v", err)
 	}
 }
 

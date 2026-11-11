@@ -687,6 +687,10 @@ func formatPermissionName(setting *settingsmsg.Setting) string {
 }
 
 func translateBundle(bundle *settingsmsg.Bundle, t l10n.OcisLocale) *settingsmsg.Bundle {
+	// the translated values below are translation lookup keys, not printf format
+	// strings; go vet's non-constant format string check can't trace through a
+	// func value, so assign Get to a local before calling it to avoid a false positive.
+	get := t.Get
 	for i, set := range bundle.GetSettings() {
 		switch set.GetId() {
 		default:
@@ -695,7 +699,7 @@ func translateBundle(bundle *settingsmsg.Bundle, t l10n.OcisLocale) *settingsmsg
 			// translate interval names ('Instant', 'Daily', 'Weekly', 'Never')
 			value := set.GetSingleChoiceValue()
 			for i, v := range value.GetOptions() {
-				value.Options[i].DisplayValue = t.Get(v.GetDisplayValue())
+				value.Options[i].DisplayValue = get(v.GetDisplayValue())
 			}
 			set.Value = &settingsmsg.Setting_SingleChoiceValue{SingleChoiceValue: value}
 			fallthrough
@@ -709,9 +713,9 @@ func translateBundle(bundle *settingsmsg.Bundle, t l10n.OcisLocale) *settingsmsg
 			defaults.SettingUUIDProfileEventSpaceDeleted,
 			defaults.SettingUUIDProfileEventPostprocessingStepFinished:
 			// translate event names ('Share Received', 'Share Removed', ...)
-			set.DisplayName = t.Get(set.GetDisplayName())
+			set.DisplayName = get(set.GetDisplayName())
 			// translate event descriptions ('Notify me when I receive a share', ...)
-			set.Description = t.Get(set.GetDescription())
+			set.Description = get(set.GetDescription())
 			bundle.Settings[i] = set
 		}
 	}

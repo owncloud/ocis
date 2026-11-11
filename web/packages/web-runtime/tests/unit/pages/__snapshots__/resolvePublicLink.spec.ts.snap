@@ -13,7 +13,7 @@ exports[`resolvePublicLink > password required form > should display if password
 `;
 
 exports[`resolvePublicLink > should display the configuration theme general slogan as the login card footer 1`] = `
-"<div class="oc-card-footer oc-pt-rm">
+"<footer class="oc-card-footer oc-pt-rm">
   <p>ownCloud – A safe home for all your data</p>
-</div>"
+</footer>"
 `;

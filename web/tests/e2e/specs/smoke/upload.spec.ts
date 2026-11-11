@@ -198,12 +198,12 @@ test.describe('internal link share', () => {
       resources: [{ name: 'simple.pdf', to: '' }]
     })
     // When "Alice" tries to upload the following resource
-    //   | resource      | error              |
-    //   | lorem-big.txt | Insufficient quota |
+    //   | resource      | error            |
+    //   | lorem-big.txt | Not enough space |
     await ui.userTriesToUploadResource({
       stepUser: 'Alice',
       resource: 'lorem-big.txt',
-      error: 'Insufficient quota',
+      error: 'Not enough space',
       to: ''
     })
     // And "Alice" logs out

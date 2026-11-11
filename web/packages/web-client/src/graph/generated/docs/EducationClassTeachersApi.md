@@ -2,48 +2,67 @@
 
 All URIs are relative to *https://ocis.ocis.rolling.owncloud.works/graph*
 
-|Method | HTTP request | Description|
+| Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-|[**addTeacherToClass**](#addteachertoclass) | **POST** /v1.0/education/classes/{class-id}/teachers/$ref | Assign a teacher to a class|
-|[**deleteTeacherFromClass**](#deleteteacherfromclass) | **DELETE** /v1.0/education/classes/{class-id}/teachers/{user-id}/$ref | Unassign user as teacher of a class|
-|[**getTeachers**](#getteachers) | **GET** /v1.0/education/classes/{class-id}/teachers | Get the teachers for a class|
+| [**addTeacherToClass**](EducationClassTeachersApi.md#addteachertoclass) | **POST** /v1.0/education/classes/{class-id}/teachers/$ref | Assign a teacher to a class |
+| [**deleteTeacherFromClass**](EducationClassTeachersApi.md#deleteteacherfromclass) | **DELETE** /v1.0/education/classes/{class-id}/teachers/{user-id}/$ref | Unassign user as teacher of a class |
+| [**getTeachers**](EducationClassTeachersApi.md#getteachers) | **GET** /v1.0/education/classes/{class-id}/teachers | Get the teachers for a class |
 
-# **addTeacherToClass**
-> addTeacherToClass(classTeacherReference)
 
+
+## addTeacherToClass
+
+> addTeacherToClass(classId, classTeacherReference)
+
+Assign a teacher to a class
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationClassTeachersApi,
-    Configuration,
-    ClassTeacherReference
-} from './api';
+  Configuration,
+  EducationClassTeachersApi,
+} from '';
+import type { AddTeacherToClassRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationClassTeachersApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationClassTeachersApi(config);
 
-let classId: string; //key: id or externalId of class (default to undefined)
-let classTeacherReference: ClassTeacherReference; //educationUser to be added as teacher
+  const body = {
+    // string | key: id or externalId of class
+    classId: 86948e45-96a6-43df-b83d-46e92afd30de,
+    // ClassTeacherReference | educationUser to be added as teacher
+    classTeacherReference: ...,
+  } satisfies AddTeacherToClassRequest;
 
-const { status, data } = await apiInstance.addTeacherToClass(
-    classId,
-    classTeacherReference
-);
+  try {
+    const data = await api.addTeacherToClass(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **classTeacherReference** | **ClassTeacherReference**| educationUser to be added as teacher | |
-| **classId** | [**string**] | key: id or externalId of class | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **classId** | `string` | key: id or externalId of class | [Defaults to `undefined`] |
+| **classTeacherReference** | [ClassTeacherReference](ClassTeacherReference.md) | educationUser to be added as teacher | |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -51,53 +70,72 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**204** | Success |  -  |
-|**0** | error |  -  |
+| **204** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **deleteTeacherFromClass**
-> deleteTeacherFromClass()
 
+## deleteTeacherFromClass
+
+> deleteTeacherFromClass(classId, userId)
+
+Unassign user as teacher of a class
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationClassTeachersApi,
-    Configuration
-} from './api';
+  Configuration,
+  EducationClassTeachersApi,
+} from '';
+import type { DeleteTeacherFromClassRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationClassTeachersApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationClassTeachersApi(config);
 
-let classId: string; //key: id or externalId of class (default to undefined)
-let userId: string; //key: id or username of the user to unassign as teacher (default to undefined)
+  const body = {
+    // string | key: id or externalId of class
+    classId: classId_example,
+    // string | key: id or username of the user to unassign as teacher
+    userId: 90eedea1-dea1-90ee-a1de-ee90a1deee90,
+  } satisfies DeleteTeacherFromClassRequest;
 
-const { status, data } = await apiInstance.deleteTeacherFromClass(
-    classId,
-    userId
-);
+  try {
+    const data = await api.deleteTeacherFromClass(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **classId** | [**string**] | key: id or externalId of class | defaults to undefined|
-| **userId** | [**string**] | key: id or username of the user to unassign as teacher | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **classId** | `string` | key: id or externalId of class | [Defaults to `undefined`] |
+| **userId** | `string` | key: id or username of the user to unassign as teacher | [Defaults to `undefined`] |
 
 ### Return type
 
-void (empty response body)
+`void` (Empty response body)
 
 ### Authorization
 
@@ -105,50 +143,69 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**204** | Success |  -  |
-|**0** | error |  -  |
+| **204** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **getTeachers**
-> CollectionOfEducationUser getTeachers()
 
+## getTeachers
+
+> CollectionOfEducationUser getTeachers(classId)
+
+Get the teachers for a class
 
 ### Example
 
-```typescript
+```ts
 import {
-    EducationClassTeachersApi,
-    Configuration
-} from './api';
+  Configuration,
+  EducationClassTeachersApi,
+} from '';
+import type { GetTeachersRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new EducationClassTeachersApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new EducationClassTeachersApi(config);
 
-let classId: string; //key: id or externalId of class (default to undefined)
+  const body = {
+    // string | key: id or externalId of class
+    classId: 86948e45-96a6-43df-b83d-46e92afd30de,
+  } satisfies GetTeachersRequest;
 
-const { status, data } = await apiInstance.getTeachers(
-    classId
-);
+  try {
+    const data = await api.getTeachers(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **classId** | [**string**] | key: id or externalId of class | defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **classId** | `string` | key: id or externalId of class | [Defaults to `undefined`] |
 
 ### Return type
 
-**CollectionOfEducationUser**
+[**CollectionOfEducationUser**](CollectionOfEducationUser.md)
 
 ### Authorization
 
@@ -156,15 +213,15 @@ const { status, data } = await apiInstance.getTeachers(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Retrieved class teachers |  -  |
-|**0** | error |  -  |
+| **200** | Retrieved class teachers |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

@@ -41,6 +41,8 @@ type Backend interface {
 
 	GetUser(ctx context.Context, nameOrID string, oreq *godata.GoDataRequest) (*libregraph.User, error)
 	GetPreciseUser(ctx context.Context, name string, instancename string, oreq *godata.GoDataRequest) (*libregraph.User, error)
+	// GetUserClass returns the userClass of a user and whether they are a member of this instance.
+	GetUserClass(ctx context.Context, id string) (userClass []string, member bool, err error)
 	GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libregraph.User, error)
 	// FilterUsers returns a list of users that match the filter
 	FilterUsers(ctx context.Context, oreq *godata.GoDataRequest, filter *godata.ParseNode) ([]*libregraph.User, error)

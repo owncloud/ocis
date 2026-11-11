@@ -21,15 +21,19 @@ var (
 func NewTextTemplate(mt MessageTemplate, locale, defaultLocale string, translationPath string, vars map[string]string) (MessageTemplate, error) {
 	var err error
 	t := l10n.NewTranslatorFromCommonConfig(defaultLocale, _domain, translationPath, _translationFS, "l10n/locale").Locale(locale)
-	mt.Subject, err = composeMessage(t.Get(mt.Subject), vars)
+	// the translated fields below are translation lookup keys, not printf format
+	// strings; go vet's non-constant format string check can't trace through a
+	// func value, so assign Get to a local before calling it to avoid a false positive.
+	get := t.Get
+	mt.Subject, err = composeMessage(get(mt.Subject), vars)
 	if err != nil {
 		return mt, err
 	}
-	mt.Greeting, err = composeMessage(t.Get(mt.Greeting), vars)
+	mt.Greeting, err = composeMessage(get(mt.Greeting), vars)
 	if err != nil {
 		return mt, err
 	}
-	mt.MessageBody, err = composeMessage(t.Get(mt.MessageBody), vars)
+	mt.MessageBody, err = composeMessage(get(mt.MessageBody), vars)
 	if err != nil {
 		return mt, err
 	}
@@ -37,7 +41,7 @@ func NewTextTemplate(mt MessageTemplate, locale, defaultLocale string, translati
 	if mt.CallToAction != "" {
 		// Some templates have an empty call-to-action. We don't want to translate
 		// an empty key and get an unexpected message.
-		mt.CallToAction, err = composeMessage(t.Get(mt.CallToAction), vars)
+		mt.CallToAction, err = composeMessage(get(mt.CallToAction), vars)
 		if err != nil {
 			return mt, err
 		}
@@ -49,22 +53,26 @@ func NewTextTemplate(mt MessageTemplate, locale, defaultLocale string, translati
 func NewHTMLTemplate(mt MessageTemplate, locale, defaultLocale string, translationPath string, vars map[string]string) (MessageTemplate, error) {
 	var err error
 	t := l10n.NewTranslatorFromCommonConfig(defaultLocale, _domain, translationPath, _translationFS, "l10n/locale").Locale(locale)
-	mt.Subject, err = composeMessage(t.Get(mt.Subject), vars)
+	// the translated fields below are translation lookup keys, not printf format
+	// strings; go vet's non-constant format string check can't trace through a
+	// func value, so assign Get to a local before calling it to avoid a false positive.
+	get := t.Get
+	mt.Subject, err = composeMessage(get(mt.Subject), vars)
 	if err != nil {
 		return mt, err
 	}
-	mt.Greeting, err = composeMessage(newlineToBr(t.Get(mt.Greeting)), vars)
+	mt.Greeting, err = composeMessage(newlineToBr(get(mt.Greeting)), vars)
 	if err != nil {
 		return mt, err
 	}
-	mt.MessageBody, err = composeMessage(newlineToBr(t.Get(mt.MessageBody)), vars)
+	mt.MessageBody, err = composeMessage(newlineToBr(get(mt.MessageBody)), vars)
 	if err != nil {
 		return mt, err
 	}
 	if mt.CallToAction != "" {
 		// Some templates have an empty call-to-action. We don't want to translate
 		// an empty key and get an unexpected message.
-		mt.CallToAction, err = composeMessage(callToActionToHTML(t.Get(mt.CallToAction)), vars)
+		mt.CallToAction, err = composeMessage(callToActionToHTML(get(mt.CallToAction)), vars)
 		if err != nil {
 			return mt, err
 		}
@@ -80,18 +88,22 @@ func NewGroupedTextTemplate(gmt GroupedMessageTemplate, vars map[string]string, 
 
 	var err error
 	t := l10n.NewTranslatorFromCommonConfig(defaultLocale, _domain, translationPath, _translationFS, "l10n/locale").Locale(locale)
-	gmt.Subject, err = composeMessage(t.Get(gmt.Subject), vars)
+	// the translated fields below are translation lookup keys, not printf format
+	// strings; go vet's non-constant format string check can't trace through a
+	// func value, so assign Get to a local before calling it to avoid a false positive.
+	get := t.Get
+	gmt.Subject, err = composeMessage(get(gmt.Subject), vars)
 	if err != nil {
 		return gmt, err
 	}
-	gmt.Greeting, err = composeMessage(t.Get(gmt.Greeting), vars)
+	gmt.Greeting, err = composeMessage(get(gmt.Greeting), vars)
 	if err != nil {
 		return gmt, err
 	}
 
 	bodyParts := make([]string, 0, len(mtsVars))
 	for i, mt := range mts {
-		bodyPart, err := composeMessage(t.Get(mt.MessageBody), mtsVars[i])
+		bodyPart, err := composeMessage(get(mt.MessageBody), mtsVars[i])
 		if err != nil {
 			return gmt, err
 		}
@@ -109,18 +121,22 @@ func NewGroupedHTMLTemplate(gmt GroupedMessageTemplate, vars map[string]string, 
 
 	var err error
 	t := l10n.NewTranslatorFromCommonConfig(defaultLocale, _domain, translationPath, _translationFS, "l10n/locale").Locale(locale)
-	gmt.Subject, err = composeMessage(t.Get(gmt.Subject), vars)
+	// the translated fields below are translation lookup keys, not printf format
+	// strings; go vet's non-constant format string check can't trace through a
+	// func value, so assign Get to a local before calling it to avoid a false positive.
+	get := t.Get
+	gmt.Subject, err = composeMessage(get(gmt.Subject), vars)
 	if err != nil {
 		return gmt, err
 	}
-	gmt.Greeting, err = composeMessage(newlineToBr(t.Get(gmt.Greeting)), vars)
+	gmt.Greeting, err = composeMessage(newlineToBr(get(gmt.Greeting)), vars)
 	if err != nil {
 		return gmt, err
 	}
 
 	bodyParts := make([]string, 0, len(mtsVars))
 	for i, mt := range mts {
-		bodyPart, err := composeMessage(t.Get(mt.MessageBody), mtsVars[i])
+		bodyPart, err := composeMessage(get(mt.MessageBody), mtsVars[i])
 		if err != nil {
 			return gmt, err
 		}

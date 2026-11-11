@@ -5,6 +5,12 @@ import { HttpError } from '@ownclouders/web-client'
 
 type MessageError = Error | HttpError
 
+export interface MessageAction {
+  label: string
+  ariaLabel?: string
+  onClick: () => void
+}
+
 export interface Message {
   id: string
   title: string
@@ -13,6 +19,7 @@ export interface Message {
   errorLogContent?: string
   timeout?: number
   status?: string
+  actions?: MessageAction[]
 }
 
 export const useMessages = defineStore('messages', () => {
@@ -53,11 +60,28 @@ export const useMessages = defineStore('messages', () => {
     messages.value = unref(messages).filter(({ id }) => message.id !== id)
   }
 
+  /**
+   * Runs the first action of the most recent message that has one (e.g. "Undo" on a
+   * delete notification) and dismisses that message. Used by the global Ctrl/Cmd+Z
+   * shortcut. Returns false if there is no message with an action to trigger.
+   */
+  const triggerLatestAction = (): boolean => {
+    const message = [...unref(messages)].reverse().find((m) => m.actions?.length)
+    if (!message) {
+      return false
+    }
+
+    message.actions[0].onClick()
+    removeMessage(message)
+    return true
+  }
+
   return {
     messages,
     showMessage,
     showErrorMessage,
-    removeMessage
+    removeMessage,
+    triggerLatestAction
   }
 })
 

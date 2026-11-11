@@ -137,4 +137,37 @@ describe('paste worker', () => {
 
     await workerPromise
   })
+
+  it('returns a copy that got no HTTP response as failed', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    webDavMock.copyFiles.mockRejectedValue(new TypeError('Failed to fetch'))
+
+    unref(worker.worker).onmessage = (e: MessageEvent) => {
+      const { successful, failed } = JSON.parse(e.data)
+      expect(successful.length).toBe(0)
+      expect(failed).toEqual([
+        { resourceName: resourceMock.name, isFolder: true, message: 'Failed to fetch' }
+      ])
+
+      resolveTest(true)
+    }
+
+    worker.post(
+      JSON.stringify({
+        topic: 'startProcess',
+        data: {
+          baseUrl: 'https://example.com',
+          transferData: [
+            {
+              ...transferDataMock,
+              resource: { ...resourceMock, isFolder: true },
+              transferType: TransferType.DUPLICATE
+            }
+          ]
+        }
+      })
+    )
+
+    await workerPromise
+  })
 })

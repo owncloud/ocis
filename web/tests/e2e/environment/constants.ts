@@ -40,6 +40,7 @@ export const searchFilter = {
 export const resourcePage = {
   searchList: 'search list',
   filesList: 'files list',
+  searchResultsList: 'search results list',
   shares: 'Shares',
   trashbin: 'trashbin'
 } as const

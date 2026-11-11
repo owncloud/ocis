@@ -16,6 +16,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/tags"
+	"github.com/owncloud/reva/v2/pkg/utils"
 	"go-micro.dev/v4/metadata"
 )
 
@@ -56,7 +57,7 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err := StrictJSONUnmarshal(r.Body, &assignment); err != nil {
-		g.logger.Debug().Err(err).Interface("body", r.Body).Msg("could not decode tag assignment request")
+		g.logger.Debug().Err(err).Msg("could not decode tag assignment request")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid body schema definition")
 		return
 	}
@@ -141,6 +142,7 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 
 	if g.eventsPublisher != nil {
 		ev := events.TagsAdded{
+			// The tags as requested, including any that were already present.
 			Tags: strings.Join(assignment.Tags, ","),
 			Ref: &provider.Reference{
 				ResourceId: &rid,
@@ -148,9 +150,25 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 			},
 			SpaceOwner: sres.Info.Owner,
 			Executant:  revaCtx.ContextMustGetUser(r.Context()).Id,
+			Timestamp:  utils.TSNow(),
 		}
 		if err := events.Publish(r.Context(), g.eventsPublisher, ev); err != nil {
 			g.logger.Error().Err(err).Msg("Failed to publish TagsAdded event")
+
+			// Roll back the metadata change so the search index and the
+			// file metadata do not diverge. Not atomic, see publishTagsRemoved.
+			if _, rollbackErr := client.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
+				Ref: ev.Ref,
+				ArbitraryMetadata: &provider.ArbitraryMetadata{
+					Metadata: map[string]string{
+						"tags": currentTags,
+					},
+				},
+			}); rollbackErr != nil {
+				g.logger.Error().Err(rollbackErr).Msg("failed to rollback tags after publish failure")
+			}
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 	}
 }
@@ -163,7 +181,7 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err := StrictJSONUnmarshal(r.Body, &unassignment); err != nil {
-		g.logger.Debug().Err(err).Interface("body", r.Body).Msg("could not decode tag assignment request")
+		g.logger.Debug().Err(err).Msg("could not decode tag assignment request")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid body schema definition")
 		return
 	}
@@ -239,6 +257,7 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 	// Always publish the event so the search index gets updated,
 	// even if the tag was already absent from file metadata.
 	ev := events.TagsRemoved{
+		// The tags as requested, including any that were not present.
 		Tags: strings.Join(unassignment.Tags, ","),
 		Ref: &provider.Reference{
 			ResourceId: &rid,
@@ -246,6 +265,7 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 		},
 		SpaceOwner: sres.Info.Owner,
 		Executant:  revaCtx.ContextMustGetUser(ctx).Id,
+		Timestamp:  utils.TSNow(),
 	}
 	if g.publishTagsRemoved(ctx, client, ev, tagsChanged, currentTags) != nil {
 		w.WriteHeader(http.StatusInternalServerError)

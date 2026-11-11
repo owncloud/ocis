@@ -55,7 +55,7 @@ var _ = Describe("createLinkTests", func() {
 		cache := identity.NewIdentityCache(identity.IdentityCacheWithGatewaySelector(gatewaySelector))
 
 		cfg := defaults.FullDefaultConfig()
-		svc, err = service.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg, otel.GetTracerProvider(), nil, nil)
+		svc, err = service.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg, otel.GetTracerProvider(), nil, nil, nil)
 		Expect(err).ToNot(HaveOccurred())
 		driveItemId = &provider.ResourceId{
 			StorageId: "1",
@@ -93,7 +93,7 @@ var _ = Describe("createLinkTests", func() {
 			linkType, err := libregraph.NewSharingLinkTypeFromValue("view")
 			Expect(err).ToNot(HaveOccurred())
 			driveItemCreateLink.Type = linkType
-			driveItemCreateLink.ExpirationDateTime = libregraph.PtrTime(time.Now().Add(time.Hour))
+			driveItemCreateLink.ExpirationDateTime = new(time.Now().Add(time.Hour))
 			permissions, err := linktype.CS3ResourcePermissionsFromSharingLink(driveItemCreateLink, provider.ResourceType_RESOURCE_TYPE_CONTAINER)
 			Expect(err).ToNot(HaveOccurred())
 			createLinkResponse.Share = &link.PublicShare{
@@ -210,7 +210,7 @@ var _ = Describe("createLinkTests", func() {
 		It("does not alter the provided expiration timestamp", func() {
 			// prepare test timestamp
 			providedExp := time.Date(2025, 5, 12, 7, 37, 0, 0, time.UTC)
-			driveItemCreateLink.ExpirationDateTime = libregraph.PtrTime(providedExp)
+			driveItemCreateLink.ExpirationDateTime = new(providedExp)
 
 			// prepare expected permissions for response
 			permissions, err := linktype.CS3ResourcePermissionsFromSharingLink(driveItemCreateLink, provider.ResourceType_RESOURCE_TYPE_CONTAINER)

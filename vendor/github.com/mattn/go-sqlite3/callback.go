@@ -29,13 +29,12 @@ import (
 	"math"
 	"reflect"
 	"sync"
-	"sync/atomic"
 	"unsafe"
 )
 
 //export callbackTrampoline
-func callbackTrampoline(ctx *C.sqlite3_context, argc int, argv **C.sqlite3_value) {
-	args := (*[(math.MaxInt32 - 1) / unsafe.Sizeof((*C.sqlite3_value)(nil))]*C.sqlite3_value)(unsafe.Pointer(argv))[:argc:argc]
+func callbackTrampoline(ctx *C.sqlite3_context, argc C.int, argv **C.sqlite3_value) {
+	args := (*[(math.MaxInt32 - 1) / unsafe.Sizeof((*C.sqlite3_value)(nil))]*C.sqlite3_value)(unsafe.Pointer(argv))[:int(argc):int(argc)]
 	fi := lookupHandle(C.sqlite3_user_data(ctx)).(*functionInfo)
 	fi.Call(ctx, args)
 }
@@ -60,9 +59,9 @@ func compareTrampoline(handlePtr unsafe.Pointer, la C.int, a *C.char, lb C.int, 
 }
 
 //export commitHookTrampoline
-func commitHookTrampoline(handle unsafe.Pointer) int {
+func commitHookTrampoline(handle unsafe.Pointer) C.int {
 	callback := lookupHandle(handle).(func() int)
-	return callback()
+	return C.int(callback())
 }
 
 //export rollbackHookTrampoline
@@ -72,23 +71,23 @@ func rollbackHookTrampoline(handle unsafe.Pointer) {
 }
 
 //export updateHookTrampoline
-func updateHookTrampoline(handle unsafe.Pointer, op int, db *C.char, table *C.char, rowid int64) {
+func updateHookTrampoline(handle unsafe.Pointer, op C.int, db *C.char, table *C.char, rowid int64) {
 	callback := lookupHandle(handle).(func(int, string, string, int64))
-	callback(op, C.GoString(db), C.GoString(table), rowid)
+	callback(int(op), C.GoString(db), C.GoString(table), rowid)
 }
 
 //export authorizerTrampoline
-func authorizerTrampoline(handle unsafe.Pointer, op int, arg1 *C.char, arg2 *C.char, arg3 *C.char) int {
+func authorizerTrampoline(handle unsafe.Pointer, op C.int, arg1 *C.char, arg2 *C.char, arg3 *C.char) C.int {
 	callback := lookupHandle(handle).(func(int, string, string, string) int)
-	return callback(op, C.GoString(arg1), C.GoString(arg2), C.GoString(arg3))
+	return C.int(callback(int(op), C.GoString(arg1), C.GoString(arg2), C.GoString(arg3)))
 }
 
 //export preUpdateHookTrampoline
-func preUpdateHookTrampoline(handle unsafe.Pointer, dbHandle uintptr, op int, db *C.char, table *C.char, oldrowid int64, newrowid int64) {
+func preUpdateHookTrampoline(handle unsafe.Pointer, dbHandle uintptr, op C.int, db *C.char, table *C.char, oldrowid int64, newrowid int64) {
 	hval := lookupHandleVal(handle)
 	data := SQLitePreUpdateData{
 		Conn:         hval.db,
-		Op:           op,
+		Op:           int(op),
 		DatabaseName: C.GoString(db),
 		TableName:    C.GoString(table),
 		OldRowID:     oldrowid,
@@ -104,64 +103,51 @@ type handleVal struct {
 	val any
 }
 
-var handleLock sync.Mutex
-var handleVals atomic.Value // stores map[unsafe.Pointer]handleVal
+// handleVals maps unsafe.Pointer handles to handleVal. A sync.Map keeps
+// lookups lock-free on the hot callback path while insertion and removal
+// stay O(1); the previous copy-on-write map made every registration copy
+// the whole table, so opening N connections (each registering several
+// functions) was quadratic in time and allocation.
+var handleVals sync.Map
 
 func newHandle(db *SQLiteConn, v any) unsafe.Pointer {
-	val := handleVal{db: db, val: v}
 	var p unsafe.Pointer = C.malloc(C.size_t(1))
 	if p == nil {
 		panic("can't allocate 'cgo-pointer hack index pointer': ptr == nil")
 	}
-
-	handleLock.Lock()
-	defer handleLock.Unlock()
-
-	next := cloneHandleVals(len(loadHandleVals()) + 1)
-	next[p] = val
-	handleVals.Store(next)
+	handleVals.Store(p, handleVal{db: db, val: v})
 	return p
 }
 
 func lookupHandleVal(handle unsafe.Pointer) handleVal {
-	return loadHandleVals()[handle]
+	v, ok := handleVals.Load(handle)
+	if !ok {
+		return handleVal{}
+	}
+	return v.(handleVal)
 }
 
 func lookupHandle(handle unsafe.Pointer) any {
 	return lookupHandleVal(handle).val
 }
 
+// deleteHandle releases a single handle created by newHandle. It is a no-op
+// if the handle is unknown (e.g. already released).
+func deleteHandle(handle unsafe.Pointer) {
+	if _, ok := handleVals.LoadAndDelete(handle); ok {
+		C.free(handle)
+	}
+}
+
 func deleteHandles(db *SQLiteConn) {
-	handleLock.Lock()
-	defer handleLock.Unlock()
-
-	current := loadHandleVals()
-	if len(current) == 0 {
-		return
-	}
-
-	next := make(map[unsafe.Pointer]handleVal, len(current))
-	for handle, val := range current {
-		if val.db == db {
-			C.free(handle)
-			continue
+	handleVals.Range(func(handle, val any) bool {
+		if val.(handleVal).db == db {
+			if _, ok := handleVals.LoadAndDelete(handle); ok {
+				C.free(handle.(unsafe.Pointer))
+			}
 		}
-		next[handle] = val
-	}
-	handleVals.Store(next)
-}
-
-func loadHandleVals() map[unsafe.Pointer]handleVal {
-	m, _ := handleVals.Load().(map[unsafe.Pointer]handleVal)
-	return m
-}
-
-func cloneHandleVals(size int) map[unsafe.Pointer]handleVal {
-	next := make(map[unsafe.Pointer]handleVal, size)
-	for handle, val := range loadHandleVals() {
-		next[handle] = val
-	}
-	return next
+		return true
+	})
 }
 
 // This is only here so that tests can refer to it.
@@ -260,6 +246,16 @@ func callbackArgGeneric(v *C.sqlite3_value) (reflect.Value, error) {
 	}
 }
 
+// callbackArgConvert returns conv as-is when the parameter type is the
+// canonical type conv produces, and wraps it with a cast for named types
+// (e.g. time.Duration), which reflect.Call would otherwise panic on.
+func callbackArgConvert(conv callbackArgConverter, typ, canonical reflect.Type) callbackArgConverter {
+	if typ == canonical {
+		return conv
+	}
+	return callbackArgCast{conv, typ}.Run
+}
+
 func callbackArg(typ reflect.Type) (callbackArgConverter, error) {
 	switch typ.Kind() {
 	case reflect.Interface:
@@ -271,18 +267,18 @@ func callbackArg(typ reflect.Type) (callbackArgConverter, error) {
 		if typ.Elem().Kind() != reflect.Uint8 {
 			return nil, errors.New("the only supported slice type is []byte")
 		}
-		return callbackArgBytes, nil
+		return callbackArgConvert(callbackArgBytes, typ, reflect.TypeOf([]byte(nil))), nil
 	case reflect.String:
-		return callbackArgString, nil
+		return callbackArgConvert(callbackArgString, typ, reflect.TypeOf("")), nil
 	case reflect.Bool:
-		return callbackArgBool, nil
+		return callbackArgConvert(callbackArgBool, typ, reflect.TypeOf(false)), nil
 	case reflect.Int64:
-		return callbackArgInt64, nil
+		return callbackArgConvert(callbackArgInt64, typ, reflect.TypeOf(int64(0))), nil
 	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Int, reflect.Uint:
 		c := callbackArgCast{callbackArgInt64, typ}
 		return c.Run, nil
 	case reflect.Float64:
-		return callbackArgFloat64, nil
+		return callbackArgConvert(callbackArgFloat64, typ, reflect.TypeOf(float64(0))), nil
 	case reflect.Float32:
 		c := callbackArgCast{callbackArgFloat64, typ}
 		return c.Run, nil
@@ -326,8 +322,7 @@ func callbackRetInteger(ctx *C.sqlite3_context, v reflect.Value) error {
 	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Int, reflect.Uint:
 		v = v.Convert(reflect.TypeOf(int64(0)))
 	case reflect.Bool:
-		b := v.Interface().(bool)
-		if b {
+		if v.Bool() {
 			v = reflect.ValueOf(int64(1))
 		} else {
 			v = reflect.ValueOf(int64(0))
@@ -336,7 +331,7 @@ func callbackRetInteger(ctx *C.sqlite3_context, v reflect.Value) error {
 		return fmt.Errorf("cannot convert %s to INTEGER", v.Type())
 	}
 
-	C.sqlite3_result_int64(ctx, C.sqlite3_int64(v.Interface().(int64)))
+	C.sqlite3_result_int64(ctx, C.sqlite3_int64(v.Int()))
 	return nil
 }
 
@@ -349,7 +344,7 @@ func callbackRetFloat(ctx *C.sqlite3_context, v reflect.Value) error {
 		return fmt.Errorf("cannot convert %s to FLOAT", v.Type())
 	}
 
-	C.sqlite3_result_double(ctx, C.double(v.Interface().(float64)))
+	C.sqlite3_result_double(ctx, C.double(v.Float()))
 	return nil
 }
 
@@ -357,11 +352,10 @@ func callbackRetBlob(ctx *C.sqlite3_context, v reflect.Value) error {
 	if v.Type().Kind() != reflect.Slice || v.Type().Elem().Kind() != reflect.Uint8 {
 		return fmt.Errorf("cannot convert %s to BLOB", v.Type())
 	}
-	i := v.Interface()
-	if i == nil || len(i.([]byte)) == 0 {
+	bs := v.Bytes()
+	if len(bs) == 0 {
 		C.sqlite3_result_null(ctx)
 	} else {
-		bs := i.([]byte)
 		if i64 && len(bs) > math.MaxInt32 {
 			C.sqlite3_result_error_toobig(ctx)
 			return nil
@@ -375,7 +369,7 @@ func callbackRetText(ctx *C.sqlite3_context, v reflect.Value) error {
 	if v.Type().Kind() != reflect.String {
 		return fmt.Errorf("cannot convert %s to TEXT", v.Type())
 	}
-	s := v.Interface().(string)
+	s := v.String()
 	if i64 && len(s) > math.MaxInt32 {
 		C.sqlite3_result_error_toobig(ctx)
 		return nil

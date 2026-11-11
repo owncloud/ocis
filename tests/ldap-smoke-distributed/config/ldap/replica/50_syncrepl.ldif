@@ -1,0 +1,21 @@
+# read-ldap (syncrepl consumer). One-way refreshAndPersist feed from write-ldap.
+# olcUpdateRef makes any write received here return a referral to write-ldap (the
+# read node is not itself writable).
+
+dn: olcDatabase={1}mdb,cn=config
+changetype: modify
+add: olcSyncrepl
+olcSyncrepl: rid=001
+  provider=ldap://write-ldap:389
+  bindmethod=simple
+  binddn="cn=admin,dc=owncloud,dc=com"
+  credentials="admin"
+  searchbase="dc=owncloud,dc=com"
+  scope=sub
+  schemachecking=on
+  type=refreshAndPersist
+  retry="5 +"
+  interval=00:00:00:10
+-
+add: olcUpdateRef
+olcUpdateRef: ldap://write-ldap:389

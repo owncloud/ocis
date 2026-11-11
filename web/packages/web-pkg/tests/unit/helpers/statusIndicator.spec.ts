@@ -4,7 +4,7 @@ import { getIndicators } from '../../../src/helpers/statusIndicators'
 import { User } from '@ownclouders/web-client/graph/generated'
 import { AncestorMetaDataValue } from '../../../src/types'
 import { ResourceIndicator } from '../../../src/helpers'
-import { createTestingPinia } from '@ownclouders/web-test-helpers'
+import { createTestingPinia } from '../../../src/testing'
 import {
   ResourceIndicatorExtension,
   useExtensionRegistry

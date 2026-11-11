@@ -8,7 +8,7 @@ import {
 import { displayPositionedDropdown, eventBus, queryItemAsString } from '@ownclouders/web-pkg'
 import { SideBarEventTopics } from '@ownclouders/web-pkg'
 import { useUserSettingsStore } from '../../../../src/composables/stores/userSettings'
-import { User } from '@ownclouders/web-client/graph/generated'
+import { User, UserFromJSON } from '@ownclouders/web-client/graph/generated'
 
 const getUserMocks = () => [{ id: '1', displayName: 'jan' }] as User[]
 vi.mock('@ownclouders/web-pkg', async (importOriginal) => ({
@@ -91,6 +91,28 @@ describe('UsersList', () => {
       ).toEqual([
         { appRoleAssignments: [{ appRoleId: '2' }] },
         { appRoleAssignments: [{ appRoleId: '1' }] }
+      ])
+    })
+
+    /**
+     * A user whose accountEnabled the server does not send still carries the property after
+     * being decoded by the graph client, holding `undefined`. Treating a present key as a sent
+     * value made the sort read `undefined` and throw.
+     */
+    it('should sort a user without an accountEnabled as being allowed to log in', () => {
+      const { wrapper } = getWrapper()
+      const users = [
+        UserFromJSON({ displayName: 'forbidden', accountEnabled: false }),
+        UserFromJSON({ displayName: 'unset' })
+      ] as User[]
+
+      expect((wrapper.vm as any).orderBy(users, 'accountEnabled', false)).toEqual([
+        users[0],
+        users[1]
+      ])
+      expect((wrapper.vm as any).orderBy(users, 'accountEnabled', true)).toEqual([
+        users[1],
+        users[0]
       ])
     })
   })

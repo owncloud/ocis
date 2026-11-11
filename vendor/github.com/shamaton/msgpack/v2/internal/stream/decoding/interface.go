@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/shamaton/msgpack/v2/def"
+	"github.com/shamaton/msgpack/v2/internal/common/decodingutil"
 )
 
 func (d *decoder) asInterface(k reflect.Kind) (interface{}, error) {
@@ -14,6 +15,10 @@ func (d *decoder) asInterface(k reflect.Kind) (interface{}, error) {
 	}
 	return d.asInterfaceWithCode(code, k)
 }
+
+// typeInterfaceValue is the reflect.Type of interface{}; used to size the
+// element budget when pre-allocating []interface{}.
+var typeInterfaceValue = reflect.TypeOf((*interface{})(nil)).Elem()
 
 func (d *decoder) asInterfaceWithCode(code byte, k reflect.Kind) (interface{}, error) {
 	switch {
@@ -110,14 +115,18 @@ func (d *decoder) asInterfaceWithCode(code byte, k reflect.Kind) (interface{}, e
 			return nil, err
 		}
 
-		v := make([]interface{}, l)
+		if err = d.enter(); err != nil {
+			return nil, err
+		}
+		v := make([]interface{}, 0, initialSliceCap(l, typeInterfaceValue))
 		for i := 0; i < l; i++ {
 			vv, err := d.asInterface(k)
 			if err != nil {
 				return nil, err
 			}
-			v[i] = vv
+			v = append(v, vv)
 		}
+		d.depth--
 		return v, nil
 
 	case d.isFixMap(code), code == def.Map16, code == def.Map32:
@@ -126,7 +135,10 @@ func (d *decoder) asInterfaceWithCode(code byte, k reflect.Kind) (interface{}, e
 			return nil, err
 		}
 
-		v := make(map[interface{}]interface{}, l)
+		if err = d.enter(); err != nil {
+			return nil, err
+		}
+		v := make(map[interface{}]interface{}, initialMapCap(l))
 		for i := 0; i < l; i++ {
 			keyCode, err := d.readSize1()
 			if err != nil {
@@ -140,12 +152,18 @@ func (d *decoder) asInterfaceWithCode(code byte, k reflect.Kind) (interface{}, e
 			if err != nil {
 				return nil, err
 			}
+			if decodingutil.IsExtCode(keyCode) {
+				if err := decodingutil.CheckMapKey(key); err != nil {
+					return nil, err
+				}
+			}
 			value, err := d.asInterface(k)
 			if err != nil {
 				return nil, err
 			}
 			v[key] = value
 		}
+		d.depth--
 		return v, nil
 	}
 
@@ -172,6 +190,8 @@ func (d *decoder) canSetAsMapKey(code byte) error {
 		return fmt.Errorf("%w. code: %x", def.ErrCanNotSetSliceAsMapKey, code)
 	case d.isFixMap(code), code == def.Map16, code == def.Map32:
 		return fmt.Errorf("%w. code: %x", def.ErrCanNotSetMapAsMapKey, code)
+	case code == def.Bin8, code == def.Bin16, code == def.Bin32:
+		return fmt.Errorf("%w. code: %x", def.ErrCanNotSetBinAsMapKey, code)
 	}
 	return nil
 }

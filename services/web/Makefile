@@ -15,12 +15,6 @@ include ../../.make/go.mk
 ############ release #########
 include ../../.make/release.mk
 
-############ docs generate ############
-include ../../.make/docs.mk
-
-.PHONY: docs-generate
-docs-generate: config-docs-generate
-
 ############ generate ############
 include ../../.make/generate.mk
 
@@ -34,7 +28,7 @@ ci-node-generate: build-assets
 build-assets:
 	cd $(WEB_DIR) && pnpm install && pnpm check:types && pnpm build
 	cp $(WEB_DIR)/config/config.json.dist $(WEB_DIR)/dist/
-	git clean -xfd assets
+	if ! git status > /dev/null; then echo 'Re-extract the source to a clean directory to avoid leftover files.'; else git clean -xfd assets; fi
 	cp -r $(WEB_DIR)/dist/. assets/core/
 
 ############ licenses ############

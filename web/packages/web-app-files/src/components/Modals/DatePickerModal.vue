@@ -42,8 +42,8 @@ interface Emits {
 }
 defineEmits<Emits>()
 const { currentDate = null, minDate = null, isClearable = true } = defineProps<Props>()
-const dateTime = ref<DateTime>()
-const confirmDisabled = ref(true)
+const dateTime = ref<DateTime>(currentDate)
+const confirmDisabled = ref(!currentDate)
 const onDateChanged = ({ date, error }: { date: DateTime; error: boolean }) => {
   confirmDisabled.value = error || !date
   dateTime.value = date

@@ -1,4 +1,4 @@
-import { getComposableWrapper, useGetMatchingSpaceMock } from '@ownclouders/web-test-helpers'
+import { getComposableWrapper, useGetMatchingSpaceMock } from '../../../../src/testing'
 import { mock } from 'vitest-mock-extended'
 import {
   getPermissionsForSpaceMember,

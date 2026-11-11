@@ -163,8 +163,20 @@ const hide = (duration?: number) => {
 }
 
 const onClick = () => {
-  if (closeOnClick) {
-    hide()
+  if (!closeOnClick) {
+    return
+  }
+  // hiding removes the focused item, which would drop focus to <body> and make
+  // screen readers re-read the page over any status message the action triggered
+  const hadFocus = unref(drop)?.contains(document.activeElement)
+  hide()
+  if (hadFocus) {
+    const trigger = unref(triggerEl) as (HTMLElement & { tooltip?: { hide: () => void } }) | null
+    trigger?.focus()
+    // tippy's default trigger includes "focus", so restoring focus here would
+    // otherwise pop the trigger's own tooltip (e.g. "Show context menu") right
+    // back open, covering the button it's anchored to
+    trigger?.tooltip?.hide()
   }
 }
 
@@ -173,7 +185,11 @@ const onFocusOut = (event: FocusEvent) => {
   if (!tippyBox) {
     return
   }
-  const focusLeft = event.relatedTarget && !tippyBox.contains(event.relatedTarget as Node)
+  const relatedTarget = event.relatedTarget as Node | null
+  // focus moving to the trigger means it's being clicked, which toggles the drop
+  // itself. Hiding here too would make that click reopen it instead of closing it
+  const focusMovedToTrigger = relatedTarget && unref(triggerEl)?.contains(relatedTarget)
+  const focusLeft = relatedTarget && !tippyBox.contains(relatedTarget) && !focusMovedToTrigger
   if (focusLeft) {
     hide()
   }
@@ -357,7 +373,7 @@ defineExpose({ show, hide, tippy: tippyInstance })
       }
 
       &:hover span {
-        color: var(--oc-color-swatch-brand-hover) !important;
+        color: var(--oc-color-swatch-passive-default) !important;
       }
 
       span {

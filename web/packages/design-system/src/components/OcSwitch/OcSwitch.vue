@@ -78,7 +78,7 @@ function toggle() {
   gap: var(--oc-space-small);
 
   &-btn {
-    border: 1px solid var(--oc-color-input-bg);
+    border: 1px solid var(--oc-color-swatch-passive-default);
     border-radius: 20px;
     cursor: pointer;
     display: block;
@@ -90,7 +90,6 @@ function toggle() {
     width: 31px;
 
     &::before {
-      background-color: var(--oc-color-swatch-inverse-hover);
       box-shadow: rgb(0 0 0 / 25%) 0px 0px 2px 1px;
       border-radius: 50%;
       content: '';
@@ -103,9 +102,10 @@ function toggle() {
     }
 
     &[aria-checked='false'] {
-      background-color: var(--oc-color-swatch-inverse-muted);
+      background-color: transparent;
 
       &::before {
+        background-color: var(--oc-color-swatch-passive-default);
         transform: translateX(0);
         left: 2px;
       }
@@ -113,8 +113,10 @@ function toggle() {
 
     &[aria-checked='true'] {
       background-color: var(--oc-color-swatch-primary-default);
+      border-color: var(--oc-color-swatch-primary-default);
 
       &::before {
+        background-color: var(--oc-color-swatch-primary-contrast);
         transform: translateX(calc(100% + 2px));
         left: 1px;
       }

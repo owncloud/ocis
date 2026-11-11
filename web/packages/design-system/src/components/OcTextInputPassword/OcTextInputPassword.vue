@@ -175,11 +175,9 @@ const passwordPolicySummary = computed(() => {
   }
 
   const messages = unmetRequirements.map((rule) => getPasswordPolicyRuleMessage(rule))
-  return $gettext(
-    'Password requirements: %{requirements}',
-    { requirements: messages.join(', ') },
-    true
-  )
+  return $gettext('Password requirements: %{requirements}', {
+    requirements: messages.join(', ')
+  })
 })
 
 const getPasswordPolicyRuleMessage = (rule: PasswordPolicyRule) => {
@@ -189,7 +187,7 @@ const getPasswordPolicyRuleMessage = (rule: PasswordPolicyRule) => {
     paramObj[`param${formatKey + 1}`] = rule.format[formatKey]?.toString()
   }
 
-  return $gettext(rule.message, paramObj, true)
+  return $gettext(rule.message, paramObj)
 }
 
 const copyPasswordToClipboard = () => {

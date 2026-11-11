@@ -1,5 +1,5 @@
 import { PasswordPolicyService } from '../../../src/services'
-import { createTestingPinia } from '@ownclouders/web-test-helpers'
+import { createTestingPinia } from '../../../src/testing'
 import { Language } from 'vue3-gettext'
 import { PasswordPolicyCapability } from '@ownclouders/web-client/ocs'
 import { useCapabilityStore } from '../../../src/composables/piniaStores'

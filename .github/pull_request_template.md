@@ -9,6 +9,8 @@ To make it possible for us to get your change reviewed and merged please careful
 
 Please note that any kind of change needs first be submitted to the master branch which holds the next version of oCIS.
 
+The PR title is used in the release notes, see COMMIT_CONVENTION.md.
+
 Please set the following labels:
 
 - Set label "Status:Needs-Review" for review or "Status:In-Progress" if the PR still has open tasks.

@@ -1,10 +1,11 @@
 import { mock } from 'vitest-mock-extended'
 import { Action, FileActionOptions, useFileActions } from '../../../../../src/composables/actions'
 import {
+  createRouter,
   defaultComponentMocks,
-  RouteLocation,
-  getComposableWrapper
-} from '@ownclouders/web-test-helpers'
+  getComposableWrapper,
+  RouteLocation
+} from '../../../../../src/testing'
 import { computed, unref } from 'vue'
 import { describe } from 'vitest'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
@@ -57,6 +58,27 @@ describe('fileActions', () => {
       })
     })
   })
+  describe('editor action "route"', () => {
+    it.each([
+      ['#.txt', '/personal%2Fadmin%2F%23.txt'],
+      ['a?b.txt', '/personal%2Fadmin%2Fa%3Fb.txt'],
+      ['a#b?c.txt', '/personal%2Fadmin%2Fa%23b%3Fc.txt']
+    ])('percent-encodes "%s" when the router resolves the route', (fileName, expectedPath) => {
+      getWrapper({
+        setup: ({ editorActions }) => {
+          const [textEditor] = unref(editorActions)
+          const route = (textEditor as Action<FileActionOptions>).route({
+            space: mock<SpaceResource>({
+              getDriveAliasAndItem: () => `personal/admin/${fileName}`
+            }),
+            resources: [mock<Resource>({ path: `/${fileName}`, extension: 'txt' })]
+          })
+
+          expect(createTextEditorRouter().resolve(route).path).toEqual(expectedPath)
+        }
+      })
+    })
+  })
   describe('secure view context', () => {
     describe('computed property "editorActions"', () => {
       it('only displays editors that support secure view', () => {
@@ -82,6 +104,14 @@ describe('fileActions', () => {
     })
   })
 })
+
+function createTextEditorRouter() {
+  return createRouter({
+    routes: [
+      { path: '/:driveAliasAndItem(.*)?', name: 'text-editor', component: { template: '<div />' } }
+    ]
+  })
+}
 
 function getWrapper({
   setup,

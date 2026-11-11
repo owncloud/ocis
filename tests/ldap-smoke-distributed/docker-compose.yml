@@ -1,0 +1,76 @@
+# Proxy/write/read LDAP topology (one-way async syncrepl) for the replication smoke test.
+# oCIS is NOT a service here — run.sh starts it as a host binary against proxy-ldap:389.
+# write-ldap = syncrepl provider (only seeded node); read-ldap/proxy-ldap = consumers.
+# Seed + schema reused from deployments/examples/ocis_ldap (../../ paths resolve from here);
+# only the syncrepl/chain overlays are local to this dir.
+services:
+  # write-ldap: syncrepl provider (master); only node seeded with demo data.
+  write-ldap:
+    image: osixia/openldap:1.5.0
+    command: ["--copy-service", "--loglevel", "info"]
+    hostname: write-ldap
+    environment:
+      LDAP_TLS: "false"
+      LDAP_ORGANISATION: owncloud
+      LDAP_DOMAIN: owncloud.com
+      LDAP_ROOT: "dc=owncloud,dc=com"
+      LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      LDAP_SEED_INTERNAL_LDIF_PATH: /ldifs
+      LDAP_SEED_INTERNAL_SCHEMA_PATH: /schemas
+    volumes:
+      # example seed + memberof/refint, then local syncprov overlay.
+      # 00-/10- prefixes order the osixia subdir walk.
+      - ../../deployments/examples/ocis_ldap/config/ldap/ldif:/ldifs/00-data:ro
+      - ./config/ldap/provider:/ldifs/10-provider:ro
+      - ../../deployments/examples/ocis_ldap/config/ldap/schemas:/schemas:ro
+    networks: [ocis-net]
+
+  # read-ldap: syncrepl consumer (replica). No data seed; filled by replication.
+  # Not on oCIS's data path (oCIS reads via proxy-ldap's own feed) — present to model
+  # the write/read/proxy topology shape.
+  read-ldap:
+    image: osixia/openldap:1.5.0
+    command: ["--copy-service", "--loglevel", "info"]
+    hostname: read-ldap
+    depends_on:
+      - write-ldap
+    environment:
+      LDAP_TLS: "false"
+      LDAP_ORGANISATION: owncloud
+      LDAP_DOMAIN: owncloud.com
+      LDAP_ROOT: "dc=owncloud,dc=com"
+      LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      LDAP_SEED_INTERNAL_LDIF_PATH: /ldifs
+      LDAP_SEED_INTERNAL_SCHEMA_PATH: /schemas
+    volumes:
+      # schema must exist locally (syncrepl does not replicate schema) + syncrepl consumer
+      - ./config/ldap/replica:/ldifs/10-replica:ro
+      - ../../deployments/examples/ocis_ldap/config/ldap/schemas:/schemas:ro
+    networks: [ocis-net]
+
+  # proxy-ldap: the endpoint oCIS uses. Local reads (own syncrepl feed), writes chained
+  # to write-ldap. Publishes 389 to the host for the host-built oCIS binary.
+  proxy-ldap:
+    image: osixia/openldap:1.5.0
+    command: ["--copy-service", "--loglevel", "info"]
+    hostname: proxy-ldap
+    depends_on:
+      - write-ldap
+    environment:
+      LDAP_TLS: "false"
+      LDAP_ORGANISATION: owncloud
+      LDAP_DOMAIN: owncloud.com
+      LDAP_ROOT: "dc=owncloud,dc=com"
+      LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      LDAP_SEED_INTERNAL_LDIF_PATH: /ldifs
+      LDAP_SEED_INTERNAL_SCHEMA_PATH: /schemas
+    volumes:
+      # schema + syncrepl consumer feed + chain overlay (write forwarding)
+      - ./config/ldap/proxy:/ldifs/10-proxy:ro
+      - ../../deployments/examples/ocis_ldap/config/ldap/schemas:/schemas:ro
+    ports:
+      - "127.0.0.1:389:389"
+    networks: [ocis-net]
+
+networks:
+  ocis-net:

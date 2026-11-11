@@ -14,14 +14,13 @@
     "@ownclouders/design-system": "workspace:^",
     "@ownclouders/web-client": "workspace:*",
     "@ownclouders/web-pkg": "workspace:*",
-    "axios": "^1.18.1",
     "fuse.js": "7.3.0",
     "lodash-es": "4.18.1",
     "mark.js": "^8.11.1",
-    "pinia": "3.0.4",
+    "pinia": "4.1.0",
     "vue-concurrency": "5.0.3",
     "vue-router": "5.0.6",
-    "zod": "4.3.6",
-    "vue3-gettext": "2.4.0"
+    "zod": "4.6.7",
+    "vue3-gettext": "^4.0.1"
   }
 }

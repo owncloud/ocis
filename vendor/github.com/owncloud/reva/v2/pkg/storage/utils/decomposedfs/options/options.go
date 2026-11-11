@@ -105,6 +105,8 @@ type AsyncPropagatorOptions struct {
 type EventOptions struct {
 	NumConsumers  int    `mapstructure:"numconsumers"`
 	ConsumerGroup string `mapstructure:"consumer_group"`
+	CommitMaxRetries int `mapstructure:"commit_max_retries"`
+	CommitRetryBackoff time.Duration `mapstructure:"commit_retry_backoff"`
 }
 
 // TokenOptions are the configurable option for tokens
@@ -124,6 +126,20 @@ func New(m map[string]interface{}) (*Options, error) {
 	}
 
 	o.GatewayAddr = sharedconf.GetGatewaySVC(o.GatewayAddr)
+
+	// A slice keeps the order fixed, so the error names the same cache on each start.
+	for _, c := range []struct {
+		name string
+		cfg  cache.Config
+	}{
+		{"statcache", o.StatCache},
+		{"filemetadatacache", o.FileMetadataCache},
+		{"idcache", o.IDCache},
+	} {
+		if err := c.cfg.CheckCredentials(); err != nil {
+			return nil, errors.Wrap(err, c.name)
+		}
+	}
 
 	if o.MetadataBackend == "" {
 		o.MetadataBackend = "xattrs"
@@ -175,6 +191,13 @@ func New(m map[string]interface{}) (*Options, error) {
 
 	if o.Events.ConsumerGroup == "" {
 		o.Events.ConsumerGroup = "dcfs"
+	}
+
+	if o.Events.CommitMaxRetries <= 0 {
+		o.Events.CommitMaxRetries = 3
+	}
+	if o.Events.CommitRetryBackoff <= 0 {
+		o.Events.CommitRetryBackoff = 5 * time.Second
 	}
 
 	return o, nil

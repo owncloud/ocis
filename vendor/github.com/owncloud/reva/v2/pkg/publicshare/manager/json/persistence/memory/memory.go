@@ -50,6 +50,6 @@ func (p *memory) Write(_ context.Context, db persistence.PublicShares) error {
 	if p.db == nil {
 		return fmt.Errorf("not initialized")
 	}
-	p.db = db
+	p.db = persistence.Copy(db)
 	return nil
 }

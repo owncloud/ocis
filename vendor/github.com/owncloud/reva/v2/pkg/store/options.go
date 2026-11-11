@@ -25,6 +25,8 @@ import (
 	"go-micro.dev/v4/store"
 )
 
+type tlsContextKey struct{}
+
 type typeContextKey struct{}
 
 // Store determines the implementation:
@@ -101,5 +103,42 @@ func Authentication(username, password string) store.Option {
 		}
 
 		o.Context = context.WithValue(o.Context, authenticationContextKey{}, []string{username, password})
+	}
+}
+
+type credentialsContextKey struct{}
+
+type credentialsOptions struct {
+	credsFile string
+	creds     string
+}
+
+// Credentials configures the JWT credentials for the nats-js and nats-js-kv store backends.
+// credsFile is the path of a NATS ".creds" file; creds is the content of such a file
+// and takes precedence over credsFile. When set, the username and password are not used.
+func Credentials(credsFile, creds string) store.Option {
+	return func(o *store.Options) {
+		if o.Context == nil {
+			o.Context = context.Background()
+		}
+		o.Context = context.WithValue(o.Context, credentialsContextKey{}, credentialsOptions{credsFile, creds})
+	}
+}
+
+type tlsOptions struct {
+	enable     bool
+	insecure   bool
+	rootCACert string
+}
+
+// TLS configures TLS for the nats-js and nats-js-kv store backends.
+// enable activates TLS; insecure skips certificate verification (for self-signed certs);
+// rootCACert is an optional path to a PEM file used to validate the server certificate.
+func TLS(enable bool, insecure bool, rootCACert string) store.Option {
+	return func(o *store.Options) {
+		if o.Context == nil {
+			o.Context = context.Background()
+		}
+		o.Context = context.WithValue(o.Context, tlsContextKey{}, tlsOptions{enable, insecure, rootCACert})
 	}
 }

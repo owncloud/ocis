@@ -144,9 +144,9 @@ func DefaultConfig() *config.Config {
 			MaxTagLength: 100,
 		},
 		MultiFactorAuthentication: config.MFAConfig{
-			AuthLevelNames:  []string{"advanced"},
-			SessionDuration: 3600,
+			AuthLevelNames: []string{"advanced"},
 		},
+		DefaultVaultShareExpirationDays: 30,
 	}
 }
 

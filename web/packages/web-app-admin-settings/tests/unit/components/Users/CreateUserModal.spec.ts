@@ -2,7 +2,7 @@ import CreateUserModal from '../../../../src/components/Users/CreateUserModal.vu
 import {
   defaultComponentMocks,
   defaultPlugins,
-  mockAxiosReject,
+  mockHttpError,
   shallowMount
 } from '@ownclouders/web-test-helpers'
 import { mock } from 'vitest-mock-extended'
@@ -60,7 +60,7 @@ describe('CreateUserModal', () => {
     it('should be true when userName is valid', async () => {
       const { wrapper, mocks } = getWrapper()
       const graphMock = mocks.$clientService.graphAuthenticated
-      const getUserStub = graphMock.users.getUser.mockRejectedValue(() => mockAxiosReject())
+      const getUserStub = graphMock.users.getUser.mockRejectedValue(() => mockHttpError())
       ;(wrapper.vm as any).user.onPremisesSamAccountName = 'jana'
       expect(await (wrapper.vm as any).validateUserName()).toBeTruthy()
       expect(getUserStub).toHaveBeenCalled()
@@ -68,7 +68,7 @@ describe('CreateUserModal', () => {
     it('should be true when userName is an email address', async () => {
       const { wrapper, mocks } = getWrapper()
       const graphMock = mocks.$clientService.graphAuthenticated
-      const getUserStub = graphMock.users.getUser.mockRejectedValue(() => mockAxiosReject())
+      const getUserStub = graphMock.users.getUser.mockRejectedValue(() => mockHttpError())
       ;(wrapper.vm as any).user.onPremisesSamAccountName = 'sk@domain.tld'
       expect(await (wrapper.vm as any).validateUserName()).toBeTruthy()
       expect(getUserStub).toHaveBeenCalled()

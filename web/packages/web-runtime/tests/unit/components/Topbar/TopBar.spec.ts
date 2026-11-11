@@ -8,7 +8,7 @@ import {
 import { mock } from 'vitest-mock-extended'
 import { computed } from 'vue'
 import TopBar from '../../../../src/components/Topbar/TopBar.vue'
-import defaultTheme from '@ownclouders/web-test-helpers/src/mocks/theme.json'
+import defaultTheme from '@ownclouders/web-pkg/src/testing/theme.json'
 import {
   defaultComponentMocks,
   defaultPlugins,

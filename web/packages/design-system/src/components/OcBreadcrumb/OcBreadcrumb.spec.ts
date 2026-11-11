@@ -1,5 +1,5 @@
-import { defaultPlugins, shallowMount } from '@ownclouders/web-test-helpers'
 import Breadcrumb from './OcBreadcrumb.vue'
+import { defaultPlugins, shallowMount } from '../../testing'
 
 const items = [
   { text: 'First folder', to: { path: 'folder' } },
@@ -21,6 +21,13 @@ describe('OcBreadcrumb', () => {
       items.length
     )
     expect(wrapper.html()).toMatchSnapshot()
+  })
+  it('does not make list items focusable to avoid duplicate screen reader announcements', () => {
+    const { wrapper } = getWrapper()
+    const listItems = wrapper.findAll('.oc-breadcrumb-list-item:not(.oc-invisible-sr)')
+    listItems.forEach((li) => {
+      expect(li.attributes('tabindex')).not.toBe('0')
+    })
   })
   it('displays context menu trigger if enabled via property', () => {
     const { wrapper } = getWrapper({ showContextActions: true })

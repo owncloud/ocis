@@ -3,7 +3,10 @@ const withHttp = (url) => (/^https?:\/\//i.test(url) ? url : `https://${url}`)
 export const config = {
   // environment
   assets: './tests/e2e/filesForUpload',
-  tempAssetsPath: './tests/e2e/filesForUpload/temp',
+  // scoped per Playwright worker so that parallel workers never share/clean up each other's temp upload files
+  get tempAssetsPath() {
+    return `./tests/e2e/filesForUpload/temp-${process.env.TEST_WORKER_INDEX ?? '0'}`
+  },
   baseUrlOcis: process.env.BASE_URL_OCIS ?? 'host.docker.internal:9200',
   basicAuth: process.env.BASIC_AUTH === 'true',
   testType: process.env.TEST_TYPE ?? 'playwright',
@@ -55,6 +58,7 @@ export const config = {
   reportHar: process.env.REPORT_HAR === 'true',
   reportTracing: process.env.REPORT_TRACING === 'true',
   failOnUncaughtConsoleError: process.env.FAIL_ON_UNCAUGHT_CONSOLE_ERR === 'true',
-  skipA11y: process.env.SKIP_A11Y_TESTS === 'true',
-  mfa: process.env.MFA === 'true'
+  skipA11y: process.env.SKIP_A11Y_TESTS === 'false',
+  mfa: process.env.MFA === 'true',
+  vaultMode: process.env.VAULT_MODE === 'true'
 }

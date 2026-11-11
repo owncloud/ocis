@@ -16,7 +16,7 @@ const (
 
 func WaitForCA(log log.Logger, insecure bool, caCert string) error {
 	if !insecure && caCert != "" {
-		for i := 0; i < caCheckRetries; i++ {
+		for range caCheckRetries {
 			if _, err := os.Stat(caCert); err != nil && !errors.Is(err, os.ErrNotExist) {
 				return err
 			}

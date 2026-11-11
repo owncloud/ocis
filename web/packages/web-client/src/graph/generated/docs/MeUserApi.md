@@ -2,43 +2,64 @@
 
 All URIs are relative to *https://ocis.ocis.rolling.owncloud.works/graph*
 
-|Method | HTTP request | Description|
+| Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-|[**getOwnUser**](#getownuser) | **GET** /v1.0/me | Get current user|
-|[**updateOwnUser**](#updateownuser) | **PATCH** /v1.0/me | Update the current user|
+| [**getOwnUser**](MeUserApi.md#getownuser) | **GET** /v1.0/me | Get current user |
+| [**updateOwnUser**](MeUserApi.md#updateownuser) | **PATCH** /v1.0/me | Update the current user |
 
-# **getOwnUser**
-> User getOwnUser()
 
+
+## getOwnUser
+
+> User getOwnUser($expand)
+
+Get current user
 
 ### Example
 
-```typescript
+```ts
 import {
-    MeUserApi,
-    Configuration
-} from './api';
+  Configuration,
+  MeUserApi,
+} from '';
+import type { GetOwnUserRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new MeUserApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new MeUserApi(config);
 
-let $expand: Set<'memberOf'>; //Expand related entities (optional) (default to undefined)
+  const body = {
+    // Set<'memberOf'> | Expand related entities (optional)
+    $expand: ...,
+  } satisfies GetOwnUserRequest;
 
-const { status, data } = await apiInstance.getOwnUser(
-    $expand
-);
+  try {
+    const data = await api.getOwnUser(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **$expand** | **Array<&#39;memberOf&#39;>** | Expand related entities | (optional) defaults to undefined|
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **$expand** | `memberOf` | Expand related entities | [Optional] [Enum: memberOf] |
 
 ### Return type
 
-**User**
+[**User**](User.md)
 
 ### Authorization
 
@@ -46,51 +67,70 @@ const { status, data } = await apiInstance.getOwnUser(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Retrieved entity |  -  |
-|**0** | error |  -  |
+| **200** | Retrieved entity |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
-# **updateOwnUser**
-> User updateOwnUser()
 
+## updateOwnUser
+
+> User updateOwnUser(userUpdate)
+
+Update the current user
 
 ### Example
 
-```typescript
+```ts
 import {
-    MeUserApi,
-    Configuration,
-    UserUpdate
-} from './api';
+  Configuration,
+  MeUserApi,
+} from '';
+import type { UpdateOwnUserRequest } from '';
 
-const configuration = new Configuration();
-const apiInstance = new MeUserApi(configuration);
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure HTTP basic authorization: basicAuth
+    username: "YOUR USERNAME",
+    password: "YOUR PASSWORD",
+  });
+  const api = new MeUserApi(config);
 
-let userUpdate: UserUpdate; //New user values (optional)
+  const body = {
+    // UserUpdate | New user values (optional)
+    userUpdate: {"preferredLanguage":"en"},
+  } satisfies UpdateOwnUserRequest;
 
-const { status, data } = await apiInstance.updateOwnUser(
-    userUpdate
-);
+  try {
+    const data = await api.updateOwnUser(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **userUpdate** | **UserUpdate**| New user values | |
 
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **userUpdate** | [UserUpdate](UserUpdate.md) | New user values | [Optional] |
 
 ### Return type
 
-**User**
+[**User**](User.md)
 
 ### Authorization
 
@@ -98,15 +138,15 @@ const { status, data } = await apiInstance.updateOwnUser(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Success |  -  |
-|**0** | error |  -  |
+| **200** | Success |  -  |
+| **0** | error |  -  |
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

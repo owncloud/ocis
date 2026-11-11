@@ -1,13 +1,13 @@
 import { mock } from 'vitest-mock-extended'
 import merge from 'lodash-es/merge'
 import {
+  defaultComponentMocks,
   defaultPlugins,
   mount,
-  shallowMount,
+  RouteLocation,
   RouterLinkStub,
-  defaultComponentMocks,
-  RouteLocation
-} from '@ownclouders/web-test-helpers'
+  shallowMount
+} from '../../../src/testing'
 import Pagination from '../../../src/components/Pagination.vue'
 
 const filesPersonalRoute = { name: 'files-personal', path: '/files/home' }

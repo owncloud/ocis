@@ -34,7 +34,7 @@ Feature: backup consistency
     And user "Alice" uploads a file "filesForUpload/textfile.txt" to "/today.txt" with mtime "today" via TUS inside of the space "Personal" using the WebDAV API
     # Wait for postprocessing to complete before stopping server to avoid race condition where
     # backup consistency check finds metadata referencing blobs that haven't been finalized yet
-    And the administrator waits for "2" seconds
+    And the administrator has waited until the file "today.txt" has finished processing
     And the administrator has stopped the server
     When the administrator checks the backup consistency using the CLI
     Then the command should be successful
@@ -49,6 +49,7 @@ Feature: backup consistency
     Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
     And user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
     And user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
+    And the administrator has waited until the file "textfile0.txt" has finished processing
     And the administrator has stopped the server
     When the administrator checks the backup consistency using the CLI
     Then the command should be successful

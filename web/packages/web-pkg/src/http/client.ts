@@ -1,78 +1,72 @@
-import axios, {
-  AxiosError,
-  AxiosInstance,
-  AxiosRequestConfig,
-  AxiosResponse,
-  CancelTokenSource,
-  InternalAxiosRequestConfig
-} from 'axios'
-import merge from 'lodash-es/merge'
+import {
+  FetchClient,
+  type FetchClientOptions,
+  type FetchRequestOptions,
+  type HttpResponse
+} from '@ownclouders/web-client'
 import { z } from 'zod'
 
-export type RequestConfig<D, S> = AxiosRequestConfig<D> & {
+export type RequestConfig<D = any, S = unknown> = Omit<FetchRequestOptions, 'body'> & {
+  /**
+   * The request body. Named `data` rather than the core's `body` so that the
+   * config this client has always taken keeps working unchanged.
+   */
+  data?: D
   schema?: S extends z.Schema ? S : never
 }
+
+type Resolved<T, S> = HttpResponse<S extends z.Schema ? z.infer<S> : T>
+
+/**
+ * Ties a per-request signal to the client-wide one. `AbortSignal.any` forwards the reason of
+ * whichever fires first and needs no listener bookkeeping of its own.
+ */
+const combineSignals = (clientSignal: AbortSignal, requestSignal?: AbortSignal) =>
+  requestSignal ? AbortSignal.any([clientSignal, requestSignal]) : clientSignal
+
 export class HttpClient {
-  private readonly instance: AxiosInstance
-  private readonly cancelToken: CancelTokenSource
+  private readonly client: FetchClient
+  private readonly controller = new AbortController()
 
-  constructor({
-    config,
-    requestInterceptor,
-    responseInterceptor
-  }: {
-    config?: AxiosRequestConfig
-    requestInterceptor?: (
-      value: InternalAxiosRequestConfig<any>
-    ) => InternalAxiosRequestConfig<any> | Promise<InternalAxiosRequestConfig<any>>
-    responseInterceptor?: [
-      (response: AxiosResponse<any>) => AxiosResponse<any> | Promise<AxiosResponse<any>>,
-      (error: AxiosError<any>) => AxiosResponse<any> | Promise<AxiosError<any>>
-    ]
-  } = {}) {
-    this.cancelToken = axios.CancelToken.source()
-    this.instance = axios.create(config)
-
-    if (requestInterceptor) {
-      this.instance.interceptors.request.use(requestInterceptor)
-    }
-
-    if (responseInterceptor) {
-      this.instance.interceptors.response.use(responseInterceptor[0], responseInterceptor[1])
-    }
+  constructor(options: FetchClientOptions = {}) {
+    this.client = new FetchClient(options)
   }
 
+  /**
+   * Aborts every request this client has in flight. As with the `CancelToken` this
+   * replaces, the client is spent afterwards and rejects immediately.
+   */
   public cancel(msg?: string): void {
-    this.cancelToken.cancel(msg)
+    this.controller.abort(msg ? new DOMException(msg, 'AbortError') : undefined)
   }
 
-  public async delete<T = any, D = any, S extends z.Schema | T = T>(
+  public delete<T = any, D = any, S extends z.Schema | T = T>(
     url: string,
     data?: D,
     config?: RequestConfig<D, S>
   ) {
-    return await this.internalRequestWithData('delete', url, data, config)
+    return this.send<T, S>(url, { ...config, method: 'DELETE', data })
   }
 
   public get<T = unknown, D = any, S extends z.Schema | T = T>(
     url: string,
     config?: RequestConfig<D, S>
   ) {
-    return this.internalRequest('get', url, config)
+    return this.send<T, S>(url, { ...config, method: 'GET' })
   }
 
   public head<T = any, D = any, S extends z.Schema | T = T>(
     url: string,
     config?: RequestConfig<D, S>
   ) {
-    return this.internalRequest('head', url, config)
+    return this.send<T, S>(url, { ...config, method: 'HEAD' })
   }
 
   public options<T = any, D = any, S extends z.Schema | T = T>(
     url: string,
     config?: RequestConfig<D, S>
   ) {
-    return this.internalRequest('options', url, config)
+    return this.send<T, S>(url, { ...config, method: 'OPTIONS' })
   }
 
   public patch<T = any, D = any, S extends z.Schema | T = T>(
@@ -80,7 +74,7 @@ export class HttpClient {
     data?: D,
     config?: RequestConfig<D, S>
   ) {
-    return this.internalRequestWithData('patch', url, data, config)
+    return this.send<T, S>(url, { ...config, method: 'PATCH', data })
   }
 
   public post<T = any, D = any, S extends z.Schema | T = T>(
@@ -88,7 +82,7 @@ export class HttpClient {
     data?: D,
     config?: RequestConfig<D, S>
   ) {
-    return this.internalRequestWithData('post', url, data, config)
+    return this.send<T, S>(url, { ...config, method: 'POST', data })
   }
 
   public put<T = any, D = any, S extends z.Schema | T = T>(
@@ -96,57 +90,29 @@ export class HttpClient {
     data?: D,
     config?: RequestConfig<D, S>
   ) {
-    return this.internalRequestWithData('put', url, data, config)
+    return this.send<T, S>(url, { ...config, method: 'PUT', data })
   }
 
-  public async request<T = any, D = any, S extends z.Schema | T = T>(config: RequestConfig<D, S>) {
-    const response = await this.instance.request<S, AxiosResponse<S>, D>(
-      this.obtainConfig<D>(config)
-    )
-    return this.processResponse(response, config)
+  public request<T = any, D = any, S extends z.Schema | T = T>(
+    config: RequestConfig<D, S> & { url?: string; method?: string }
+  ) {
+    const { url = '', ...rest } = config
+    return this.send<T, S>(url, rest)
   }
 
-  private obtainConfig<D = any>(config?: AxiosRequestConfig): AxiosRequestConfig<D> {
-    return merge({ cancelToken: this.cancelToken.token }, config)
-  }
+  private async send<T, S>(url: string, config: RequestConfig<any, S>): Promise<Resolved<T, S>> {
+    const { data, schema, signal, ...rest } = config
 
-  private processResponse<T, S extends z.Schema | T = T>(
-    response: AxiosResponse<T>,
-    config?: RequestConfig<any, S>
-  ): AxiosResponse<S extends z.Schema ? z.infer<S> : T> {
-    if (config?.schema) {
-      const data = config.schema.parse(response.data)
-      return { ...response, data } as AxiosResponse<S extends z.Schema ? z.infer<S> : T>
+    const response = await this.client.request<any>(url, {
+      ...rest,
+      body: data,
+      signal: combineSignals(this.controller.signal, signal)
+    })
+
+    if (schema) {
+      return { ...response, data: schema.parse(response.data) } as Resolved<T, S>
     }
 
-    return response as AxiosResponse<S extends z.Schema ? z.infer<S> : T>
-  }
-
-  private async internalRequest<T = any, D = any, S extends z.Schema | T = T>(
-    method: 'delete' | 'get' | 'head' | 'options',
-    url: string,
-    config: RequestConfig<D, S>
-  ) {
-    const response = await this.instance[method]<S, AxiosResponse<S>, D>(
-      url,
-      this.obtainConfig<D>(config)
-    )
-
-    return this.processResponse(response, config)
-  }
-
-  private async internalRequestWithData<T = any, D = any, S extends z.Schema | T = T>(
-    method: 'post' | 'put' | 'patch' | 'delete',
-    url: string,
-    data: D,
-    config: RequestConfig<D, S>
-  ) {
-    const response = await this.instance[method]<S, AxiosResponse<S>, D>(
-      url,
-      data,
-      this.obtainConfig<D>(config)
-    )
-
-    return this.processResponse(response, config)
+    return response as Resolved<T, S>
   }
 }

@@ -57,9 +57,9 @@ func isPublicWithShareToken(r *http.Request) bool {
 }
 
 // Authenticate implements the authenticator interface to authenticate requests via public share auth.
-func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
+func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, error) {
 	if !isPublicPath(r.URL.Path) && !isPublicShareArchive(r) && !isPublicShareAppOpen(r) {
-		return nil, false
+		return nil, ErrAuthenticationFailed
 	}
 
 	query := r.URL.Query()
@@ -71,15 +71,17 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 	if shareToken == "" {
 		// If the share token is not set then we don't need to inject the user to
 		// the request context so we can just continue with the request.
-		return r, true
+		return r, nil
 	}
 
 	var sharePassword string
+	var signatureAuth bool
 	if signature := query.Get(_paramSignature); signature != "" {
+		signatureAuth = true
 		expiration := query.Get(_paramExpiration)
 		if expiration == "" {
 			a.Logger.Warn().Str("signature", signature).Msg("cannot do signature auth without the expiration")
-			return nil, false
+			return nil, ErrAuthenticationFailed
 		}
 		sharePassword = strings.Join([]string{"signature", signature, expiration}, "|")
 	} else {
@@ -100,12 +102,20 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 			Str("public_share_token", shareToken).
 			Str("path", r.URL.Path).
 			Msg("could not select next gateway client")
-		return nil, false
+		return nil, ErrAuthenticationFailed
 	}
 
-	// we just need the reva access token, so we want to skip the brute force
-	// protection in this case
-	ctx := publicshares.MarkSkipAttemptContext(r.Context(), shareToken)
+	// The brute force protection counts failed public link password attempts.
+	// Skip counting here for requests that are re-authenticated downstream (the
+	// public-files DAV paths, which ocdav authenticates again) so the same
+	// attempt is not counted twice, and for signature based auth, which is a
+	// different, non-guessable credential. Password attempts on the paths where
+	// the proxy is the sole authenticator (e.g. /archiver, /app/open) must be
+	// counted, otherwise the throttle would never trip.
+	ctx := r.Context()
+	if signatureAuth || isPublicWithShareToken(r) {
+		ctx = publicshares.MarkSkipAttemptContext(ctx, shareToken)
+	}
 	authResp, err := client.Authenticate(ctx, &gateway.AuthenticateRequest{
 		Type:         authenticationType,
 		ClientId:     shareToken,
@@ -119,7 +129,7 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 			Str("public_share_token", shareToken).
 			Str("path", r.URL.Path).
 			Msg("failed to authenticate request")
-		return nil, false
+		return nil, ErrAuthenticationFailed
 	}
 
 	r.Header.Add(_headerRevaAccessToken, authResp.Token)
@@ -128,5 +138,5 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 		Str("authenticator", "public_share").
 		Str("path", r.URL.Path).
 		Msg("successfully authenticated request")
-	return r, true
+	return r, nil
 }

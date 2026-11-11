@@ -1,7 +1,6 @@
 import { HttpClient } from '../../../src/http'
 import { z } from 'zod'
-import { mock, mockDeep } from 'vitest-mock-extended'
-import axios, { AxiosInstance } from 'axios'
+import { mock } from 'vitest-mock-extended'
 
 const schema = z.object({
   someProperty: z.string()
@@ -10,8 +9,18 @@ const schema = z.object({
 type Schema = z.infer<typeof schema>
 
 describe('HttpClient', () => {
-  const mockAxios = mockDeep<AxiosInstance>()
-  vi.spyOn(axios, 'create').mockReturnValue(mockAxios)
+  let fetchMock: ReturnType<typeof vi.fn>
+
+  beforeEach(() => {
+    fetchMock = vi
+      .fn()
+      .mockImplementation(() =>
+        Promise.resolve(
+          new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } })
+        )
+      )
+    vi.stubGlobal('fetch', fetchMock)
+  })
 
   test('types', async () => {
     const fn = vi.fn().mockReturnValue({ data: {} })
@@ -125,17 +134,149 @@ describe('HttpClient', () => {
     }
     expect(true).toBe(true)
   })
-  test.each(['delete', 'get', 'head', 'options', 'patch', 'post', 'put'] as const)('%s', (m) => {
+  test.each([
+    ['delete', 'DELETE'],
+    ['get', 'GET'],
+    ['head', 'HEAD'],
+    ['options', 'OPTIONS'],
+    ['patch', 'PATCH'],
+    ['post', 'POST'],
+    ['put', 'PUT']
+  ] as const)('%s issues a %s request', async (method, verb) => {
     const client = new HttpClient()
-    client[m]('url')
-    mockAxios[m].mockResolvedValue({ data: undefined })
-    expect(mockAxios[m]).toHaveBeenCalledTimes(1)
+    await client[method]('https://host/url')
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(fetchMock.mock.calls[0][1].method).toBe(verb)
   })
 
-  test('request', () => {
-    const client = new HttpClient()
-    client.request({ method: 'get' })
-    mockAxios.get.mockResolvedValue({ data: undefined })
-    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+  test('request takes url and method from the config', async () => {
+    await new HttpClient().request({ url: 'https://host/url', method: 'GET' })
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(fetchMock.mock.calls[0][0]).toBe('https://host/url')
+    expect(fetchMock.mock.calls[0][1].method).toBe('GET')
+  })
+
+  test('request sends the config data as the request body', async () => {
+    await new HttpClient().request({
+      url: 'https://host/url',
+      method: 'REPORT',
+      data: '<?xml version="1.0"?><search />'
+    })
+
+    expect(fetchMock.mock.calls[0][1].body).toBe('<?xml version="1.0"?><search />')
+  })
+
+  test.each(['patch', 'post', 'put'] as const)(
+    '%s sends its positional data as the request body',
+    async (method) => {
+      await new HttpClient()[method]('https://host/url', 'payload')
+
+      expect(fetchMock.mock.calls[0][1].body).toBe('payload')
+    }
+  )
+
+  test('applies a zod schema to the response data', async () => {
+    fetchMock.mockImplementation(() =>
+      Promise.resolve(new Response(JSON.stringify({ someProperty: 'value' }), { status: 200 }))
+    )
+
+    const { data } = await new HttpClient().get('https://host/url', { schema })
+
+    expect(data.someProperty).toBe('value')
+  })
+
+  test('resolves a non-json body as text, the way a WebDAV REPORT answers', async () => {
+    const multistatus = '<?xml version="1.0"?><d:multistatus xmlns:d="DAV:" />'
+    fetchMock.mockImplementation(() => Promise.resolve(new Response(multistatus, { status: 207 })))
+
+    const { data } = await new HttpClient().request({ url: 'https://host/dav', method: 'REPORT' })
+
+    expect(data).toBe(multistatus)
+  })
+
+  test('exposes response headers both by bracket access and through get', async () => {
+    fetchMock.mockImplementation(() =>
+      Promise.resolve(new Response('{}', { status: 200, headers: { 'Lock-Token': '<token>' } }))
+    )
+
+    const { headers } = await new HttpClient().request({ url: 'https://host/dav', method: 'LOCK' })
+
+    expect(headers['lock-token']).toBe('<token>')
+    expect(headers.get('lock-token')).toBe('<token>')
+  })
+
+  test('baseUrl is applied to relative urls', async () => {
+    await new HttpClient({ baseUrl: 'https://host/' }).get('some/path')
+
+    expect(fetchMock.mock.calls[0][0]).toBe('https://host/some/path')
+  })
+
+  describe('cancel', () => {
+    /** leaves the request pending until its signal aborts, as a real fetch would */
+    const neverResolvingFetch = () =>
+      fetchMock.mockImplementation(
+        (_url: string, init: RequestInit) =>
+          new Promise((_resolve, reject) => {
+            init.signal.addEventListener('abort', () => reject(init.signal.reason))
+          })
+      )
+
+    test('aborts a request that is in flight', async () => {
+      neverResolvingFetch()
+      const client = new HttpClient()
+
+      const request = client.get('https://host/url')
+      client.cancel('gone')
+
+      await expect(request).rejects.toMatchObject({ name: 'AbortError', message: 'gone' })
+    })
+
+    test('leaves a per-request signal able to abort on its own', async () => {
+      neverResolvingFetch()
+      const controller = new AbortController()
+
+      const request = new HttpClient().get('https://host/url', { signal: controller.signal })
+      controller.abort(new DOMException('mine', 'AbortError'))
+
+      await expect(request).rejects.toMatchObject({ name: 'AbortError', message: 'mine' })
+    })
+
+    test('passes the aborted signal on to requests issued after the cancel', async () => {
+      const client = new HttpClient()
+      client.cancel()
+
+      await client.get('https://host/url').catch(() => undefined)
+
+      expect(fetchMock.mock.calls[0][1].signal.aborted).toBe(true)
+    })
+
+    test('cancels a request that carries a per-request signal of its own', async () => {
+      neverResolvingFetch()
+      const client = new HttpClient()
+      const controller = new AbortController()
+
+      const request = client.get('https://host/url', { signal: controller.signal })
+      client.cancel('gone')
+
+      await expect(request).rejects.toMatchObject({ name: 'AbortError', message: 'gone' })
+    })
+
+    /**
+     * `abort(reason)` rejects with that reason verbatim, so a reason that is not a
+     * DOMException named `AbortError` must still reach the caller unchanged rather than be
+     * reported as a transport failure.
+     */
+    test('propagates a per-request abort reason that is not an AbortError', async () => {
+      neverResolvingFetch()
+      const controller = new AbortController()
+      const reason = new Error('superseded')
+
+      const request = new HttpClient().get('https://host/url', { signal: controller.signal })
+      controller.abort(reason)
+
+      await expect(request).rejects.toBe(reason)
+    })
   })
 })

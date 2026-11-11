@@ -36,10 +36,14 @@ import { useModals } from '@ownclouders/web-pkg'
 import { useGettext } from 'vue3-gettext'
 import DatePickerModal from '../../../../Modals/DatePickerModal.vue'
 
+interface Props {
+  suggestedDate?: DateTime
+}
 interface Emits {
   (e: 'optionChange', data: { expirationDate: DateTime | null }): void
 }
 
+const { suggestedDate = null } = defineProps<Props>()
 const emit = defineEmits<Emits>()
 const language = useGettext()
 const { dispatchModal } = useModals()
@@ -59,14 +63,13 @@ const dateCurrent = customRef<DateTime>((track, trigger) => {
 })
 
 const showDatePickerModal = () => {
+  const resolvedCurrentDate = unref(dateCurrent) ?? suggestedDate
+  const resolvedMinDate = DateTime.now()
   dispatchModal({
     title: language.$gettext('Set expiration date'),
     hideActions: true,
     customComponent: DatePickerModal,
-    customComponentAttrs: () => ({
-      currentDate: unref(dateCurrent),
-      minDate: DateTime.now()
-    }),
+    customComponentAttrs: () => ({ currentDate: resolvedCurrentDate, minDate: resolvedMinDate }),
     onConfirm: (expirationDateTime: DateTime) => {
       dateCurrent.value = expirationDateTime
     }

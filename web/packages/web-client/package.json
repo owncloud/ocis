@@ -1,16 +1,16 @@
 {
   "name": "@ownclouders/web-client",
-  "version": "12.5.0",
+  "version": "13.0.0",
   "description": "ownCloud web client",
   "license": "Apache-2.0",
   "private": false,
   "type": "module",
   "author": "ownCloud GmbH <devops@owncloud.com>",
-  "homepage": "https://github.com/owncloud/web/tree/master/packages/web-client",
+  "homepage": "https://github.com/owncloud/ocis/tree/master/web/packages/web-client",
   "repository": {
     "type": "git",
-    "url": "https://github.com/owncloud/web",
-    "directory": "packages/web-client"
+    "url": "https://github.com/owncloud/ocis",
+    "directory": "web/packages/web-client"
   },
   "files": [
     "dist/"
@@ -75,7 +75,7 @@
     }
   },
   "scripts": {
-    "generate-openapi": "rm -rf src/graph/generated && docker run --rm -v \"${PWD}/src/graph:/local\" openapitools/openapi-generator-cli generate -i https://raw.githubusercontent.com/owncloud/libre-graph-api/main/api/openapi-spec/v1.0.yaml  -g typescript-axios -o /local/generated",
+    "generate-openapi": "sh ./scripts/generate-openapi.sh",
     "vite": "vite",
     "prepublishOnly": "rm -rf ./package && clean-publish && rm -rf package/dist/tests && find package && cat package/package.json",
     "postpublish": "rm -rf ./package",
@@ -84,20 +84,19 @@
   "dependencies": {
     "@casl/ability": "^6.8.1",
     "@microsoft/fetch-event-source": "^2.0.1",
-    "axios": "^1.18.1",
     "fast-xml-parser": "^5.8.0",
     "lodash-es": "^4.18.1",
     "luxon": "^3.7.2",
     "uuid": "^14.0.0",
     "webdav": "^5.9.0",
     "xml-js": "^1.6.11",
-    "zod": "^4.3.6"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/luxon": "3.7.1",
     "@vitejs/plugin-vue": "6.0.1",
     "clean-publish": "6.0.1",
-    "vite": "7.3.5",
+    "vite": "7.3.7",
     "vite-plugin-dts": "4.5.4",
     "vite-plugin-node-polyfills": "0.24.0"
   }

@@ -37,11 +37,13 @@ func DefaultConfig() *config.Config {
 		MaxConcurrency: 1,
 		Persistence: config.Persistence{
 			Store:    "memory",
+			Nodes:    []string{"127.0.0.1:9233"},
 			Database: "userlog",
 			Table:    "events",
 			TTL:      time.Hour * 336,
 		},
-		RevaGateway: shared.DefaultRevaConfig().Address,
+		RevaGateway:     shared.DefaultRevaConfig().Address,
+		DefaultLanguage: "en",
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:9210",
 			Root:      "/",
@@ -72,6 +74,9 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.GRPCClientTLS == nil && cfg.Commons != nil {
 		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
+	}
+	if cfg.GRPCClientOptions == nil && cfg.Commons != nil {
+		cfg.GRPCClientOptions = structs.CopyOrZeroValue(cfg.Commons.GRPCClientOptions)
 	}
 
 	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {

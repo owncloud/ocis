@@ -1,0 +1,58 @@
+Change: Replace axios with the native fetch API in Web
+
+The Web frontend no longer depends on axios. All HTTP traffic goes through a
+single fetch-based client, and the libre-graph client is generated from the
+`typescript-fetch` template instead of `typescript-axios`.
+
+Sending requests is a drop-in change. `HttpClient` keeps its per-request config
+including `data`, keeps `cancel()`, still resolves a non-JSON body as text, and
+still exposes response headers as `headers['etag']` as well as
+`headers.get('etag')`. Errors still carry the body and status as `error.data` /
+`error.statusCode` and as `error.response.data` / `error.response.status`.
+`mockAxiosResolve` and `mockAxiosReject` still work, deprecated in favour of
+`mockHttpResponse` and `mockHttpError`.
+
+Per-request `headers` are merged over the client-wide ones case-insensitively, so
+an override replaces the header it names whatever case either side used.
+
+Maintenance mode is now also detected on `clientService.httpAuthenticated`. Before,
+only the unauthenticated, graph and ocs clients watched responses for it, as the
+authenticated client had no response interceptor. Requests through it now raise and
+clear the maintenance flag like any other, and they update
+`lastSuccessfulRequestTime`, which seeds the MFA expiry timer.
+
+Code that touches axios directly has to be adapted:
+
+- `new HttpClient()` takes `{ baseUrl, staticHeaders, headers, onResponse }`
+  instead of `{ config, requestInterceptor, responseInterceptor }`. Clients from
+  `ClientService` are unaffected.
+- The per-request config drops `timeout`, `withCredentials`, `onUploadProgress`,
+  `cancelToken`, `paramsSerializer`, `transformRequest` / `transformResponse`,
+  `validateStatus` and `baseURL`; `responseType` drops `document` and `stream`.
+- The per-request `headers` are typed as `HeadersInit`, so a `Headers` is accepted
+  as well as a plain object. Assigning into them after the fact
+  (`config.headers.Authorization = …`) no longer type-checks; build the object
+  first, or use `new Headers()` and `set()`.
+- `error.response` carries the body on `error.response.data`, as it did with
+  axios. Its underlying stream is consumed, so `error.response.json()` is not
+  available.
+- `graph()`, `ocs()`, `UrlSign` and `WebDavOptions` take a `FetchClient`, and
+  the latter two rename `axiosClient` to `httpClient`. `webdav()` is unchanged.
+- Graph fields with an OData annotation use their generated camelCase names,
+  e.g. `atLibreGraphPermissionsActions`. The wire format is unchanged.
+- Graph responses are rebuilt from the fields the spec declares, which is what makes
+  the renaming above possible. A field the spec does not declare is dropped, so the
+  oCIS-only `attributes` on users is added to the spec before generating. A declared
+  field the server omits is present and holds `undefined`, so
+  `'accountEnabled' in user` no longer tells whether the server sent it. Compare
+  against `undefined` instead.
+- `CollaboratorAutoCompleteItem.attributes` is optional, matching the `attributes` on
+  the generated `User`. The field is only there when
+  `OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES` is configured, so read it as
+  `item.attributes?.join(…)`.
+- The generated client loses its `*ApiFactory`, `*ApiFp` and
+  `*AxiosParamCreator` exports. The `*Api` classes now take one options object
+  per operation and resolve with the payload.
+- `@ownclouders/web-test-helpers` no longer has a `mocks/axios` module path.
+
+https://github.com/owncloud/ocis/pull/12910

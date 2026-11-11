@@ -74,6 +74,7 @@ func DefaultConfig() *config.Config {
 			WebDavBase:               "https://localhost:9200",
 			WebDavPath:               "/dav/spaces/",
 			DefaultQuota:             "1000000000",
+			DefaultLanguage:          "en",
 			// 1 minute
 			ExtendedSpacePropertiesCacheTTL: 60,
 			// 1 minute
@@ -88,10 +89,14 @@ func DefaultConfig() *config.Config {
 				Insecure:                 false,
 				CACert:                   path.Join(defaults.BaseDataPath(), "idm", "ldap.crt"),
 				BindDN:                   "uid=libregraph,ou=sysusers,o=libregraph-idm",
+				PoolEnabled:              false,
+				PoolSize:                 5,
+				PoolCheckoutTimeout:      30 * time.Second,
 				UseServerUUID:            false,
 				UsePasswordModExOp:       true,
 				WriteEnabled:             true,
 				UpdateUserLastSignInDate: true,
+				RetryMaxCount:            1,
 				UserBaseDN:               "ou=users,o=libregraph-idm",
 				UserSearchScope:          "sub",
 				UserFilter:               "",
@@ -99,9 +104,11 @@ func DefaultConfig() *config.Config {
 				UserEmailAttribute:       "mail",
 				UserDisplayNameAttribute: "displayName",
 				UserNameAttribute:        "uid",
+				UserSurnameAttribute:     "sn",
+				UserSearchAttributes:     []string{"onPremisesSamAccountName", "displayName", "mail"},
 				// FIXME: switch this to some more widely available attribute by default
 				//        ideally this needs to	be constant for the lifetime of a users
-				UserIDAttribute:           "owncloudUUID",
+				UserIDAttribute:           "ownCloudUUID",
 				UserTypeAttribute:         "ownCloudUserType",
 				UserEnabledAttribute:      "ownCloudUserEnabled",
 				ExternalIDAttribute:       "owncloudExternalID",
@@ -113,8 +120,10 @@ func DefaultConfig() *config.Config {
 				GroupObjectClass:          "groupOfNames",
 				GroupNameAttribute:        "cn",
 				GroupMemberAttribute:      "member",
-				GroupIDAttribute:          "owncloudUUID",
+				GroupIDAttribute:          "ownCloudUUID",
 				EducationResourcesEnabled: false,
+				// 1 minute
+				InstanceMapperCacheTTL: 60,
 			},
 		},
 		Cache: &config.Cache{
@@ -128,14 +137,16 @@ func DefaultConfig() *config.Config {
 			Cluster:   "ocis-cluster",
 			EnableTLS: false,
 		},
-		MaxConcurrency:            20,
-		ReceivedSharesStatTimeout: 10 * time.Second,
-		EnableUserSharing:         true,
+		MaxConcurrency:                  20,
+		ReceivedSharesStatTimeout:       10 * time.Second,
+		EnableUserSharing:               true,
+		DefaultVaultShareExpirationDays: 30,
 		UnifiedRoles: config.UnifiedRoles{
 			AvailableRoles: nil, // will be populated with defaults in EnsureDefaults
 		},
 		Validation: config.Validation{
-			MaxTagLength: 100,
+			MaxTagLength:     100,
+			MaxImageFileSize: "50MB",
 		},
 	}
 }
@@ -167,8 +178,15 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.Cache == nil && cfg.Commons != nil && cfg.Commons.Cache != nil {
 		cfg.Cache = &config.Cache{
-			Store: cfg.Commons.Cache.Store,
-			Nodes: cfg.Commons.Cache.Nodes,
+			Store:                cfg.Commons.Cache.Store,
+			Nodes:                cfg.Commons.Cache.Nodes,
+			AuthUsername:         cfg.Commons.Cache.AuthUsername,
+			AuthPassword:         cfg.Commons.Cache.AuthPassword,
+			CredsFile:            cfg.Commons.Cache.CredsFile,
+			Creds:                cfg.Commons.Cache.Creds,
+			EnableTLS:            cfg.Commons.Cache.EnableTLS,
+			TLSInsecure:          cfg.Commons.Cache.TLSInsecure,
+			TLSRootCACertificate: cfg.Commons.Cache.TLSRootCACertificate,
 		}
 	} else if cfg.Cache == nil {
 		cfg.Cache = &config.Cache{}
@@ -184,6 +202,9 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.GRPCClientTLS == nil && cfg.Commons != nil {
 		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
+	}
+	if cfg.GRPCClientOptions == nil && cfg.Commons != nil {
+		cfg.GRPCClientOptions = structs.CopyOrZeroValue(cfg.Commons.GRPCClientOptions)
 	}
 
 	if cfg.Commons != nil {
@@ -217,4 +238,5 @@ func Sanitize(cfg *config.Config) {
 	cfg.Spaces.ExtendedSpacePropertiesCacheTTL = cfg.Spaces.ExtendedSpacePropertiesCacheTTL * int(time.Second)
 	cfg.Spaces.GroupsCacheTTL = cfg.Spaces.GroupsCacheTTL * int(time.Second)
 	cfg.Spaces.UsersCacheTTL = cfg.Spaces.UsersCacheTTL * int(time.Second)
+	cfg.Identity.LDAP.InstanceMapperCacheTTL = cfg.Identity.LDAP.InstanceMapperCacheTTL * int(time.Second)
 }

@@ -21,6 +21,7 @@
   "apps": [
     "files",
     "text-editor",
+    "mermaid-editor",
     "preview",
     "pdf-viewer",
     "search",

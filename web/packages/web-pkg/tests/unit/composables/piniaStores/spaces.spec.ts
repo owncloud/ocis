@@ -1,4 +1,3 @@
-import { getComposableWrapper } from '@ownclouders/web-test-helpers'
 import {
   useSpacesStore,
   sortSpaceMembers,
@@ -8,6 +7,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { mock, mockDeep } from 'vitest-mock-extended'
 import { CollaboratorShare, GraphSharePermission, SpaceResource } from '@ownclouders/web-client'
 import { Graph } from '@ownclouders/web-client/graph'
+import { getComposableWrapper } from '../../../../src/testing'
 
 describe('spaces', () => {
   beforeEach(() => {
@@ -168,6 +168,55 @@ describe('spaces', () => {
 
           instance.updateSpaceField({ id: space.id, field: 'name', value: 'bar' })
           expect(instance.spaces[0].name).toEqual('bar')
+        }
+      })
+    })
+  })
+  describe('method "updateSpaceUsage"', () => {
+    it('sets quota and size of the space from the fetched drive', () => {
+      getWrapper({
+        setup: (instance) => {
+          const space = mock<SpaceResource>({ id: '1', size: 47000, spaceQuota: { used: 47000 } })
+          instance.addSpaces([space])
+
+          const drive = mock<SpaceResource>({
+            id: '1',
+            size: 104947000,
+            spaceQuota: { used: 104947000, total: 1000000000 }
+          })
+          instance.updateSpaceUsage(drive)
+
+          expect(instance.spaces[0].spaceQuota).toEqual(drive.spaceQuota)
+          expect(instance.spaces[0].size).toBe(104947000)
+        }
+      })
+    })
+    it('keeps the size if the fetched drive has no quota', () => {
+      getWrapper({
+        setup: (instance) => {
+          const space = mock<SpaceResource>({ id: '1', size: 47000, spaceQuota: { used: 47000 } })
+          instance.addSpaces([space])
+
+          instance.updateSpaceUsage({
+            id: '1',
+            size: undefined,
+            spaceQuota: undefined
+          } as SpaceResource)
+
+          expect(instance.spaces[0].spaceQuota).toBeUndefined()
+          expect(instance.spaces[0].size).toBe(47000)
+        }
+      })
+    })
+    it('does nothing if the space is not loaded', () => {
+      getWrapper({
+        setup: (instance) => {
+          const space = mock<SpaceResource>({ id: '1', size: 47000 })
+          instance.addSpaces([space])
+
+          instance.updateSpaceUsage(mock<SpaceResource>({ id: '2', size: 1 }))
+
+          expect(instance.spaces[0].size).toBe(47000)
         }
       })
     })

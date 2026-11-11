@@ -39,7 +39,7 @@
           icon="reply"
         >
           <template #message>
-            <span v-translate> You have not shared any resources with other people. </span>
+            <span>{{ $gettext('You have not shared any resources with other people.') }}</span>
           </template>
         </no-content-message>
         <resource-table

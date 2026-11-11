@@ -364,6 +364,9 @@ func (tb *DecomposedfsTrashbin) RestoreRecycleItem(ctx context.Context, ref *pro
 
 	rn, parent, restoreFunc, err := tb.fs.tp.RestoreRecycleItemFunc(ctx, ref.ResourceId.SpaceId, key, relativePath, targetNode)
 	if err != nil {
+		if errors.Is(err, iofs.ErrNotExist) {
+			return nil, errtypes.NotFound(key)
+		}
 		return nil, err
 	}
 

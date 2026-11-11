@@ -4,9 +4,9 @@ import { Resource, SpaceResource } from '@ownclouders/web-client'
 import { mock } from 'vitest-mock-extended'
 import {
   defaultComponentMocks,
-  RouteLocation,
-  getComposableWrapper
-} from '@ownclouders/web-test-helpers'
+  getComposableWrapper,
+  RouteLocation
+} from '../../../../../src/testing'
 import { unref } from 'vue'
 import { User } from '@ownclouders/web-client/graph/generated'
 import { useSpaceHelpers } from '../../../../../src/composables/spaces/useSpaceHelpers'

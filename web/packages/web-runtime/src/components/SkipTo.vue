@@ -14,16 +14,15 @@ export default defineComponent({
       required: true
     }
   },
-  computed: {
-    targetElement() {
-      return document.getElementById(this.target)
-    }
-  },
   methods: {
     skipToTarget() {
-      this.targetElement.setAttribute('tabindex', '-1')
-      this.targetElement.focus()
-      this.targetElement.scrollIntoView()
+      const targetElement = document.getElementById(this.target)
+      if (!targetElement) {
+        return
+      }
+      targetElement.setAttribute('tabindex', '-1')
+      targetElement.focus()
+      targetElement.scrollIntoView()
     }
   }
 })

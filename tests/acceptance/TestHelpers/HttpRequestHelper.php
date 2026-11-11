@@ -36,6 +36,8 @@ use Sabre\Xml\LibXMLException;
 use Sabre\Xml\Reader;
 use GuzzleHttp\Pool;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
+use DateTimeImmutable;
+use DateTimeZone;
 
 /**
  * Helper for HTTP requests
@@ -49,6 +51,12 @@ class HttpRequestHelper {
 	 *
 	 */
 	private static string $currentScenarioRef = '';
+
+	/**
+	 * Stores the timezone of the Date of the last mail fetched from the mail server
+	 *
+	 */
+	private static string $emailServerTimezone = '';
 
 	/**
 	 * Set the current scenario reference
@@ -185,6 +193,17 @@ class HttpRequestHelper {
 			}
 		}
 
+		// Get the email server timezone from the Date header of the last email fetched from the mail server
+		if (\str_starts_with((string)$url, EmailHelper::getEmailAPIUrl('message/'))
+			&& self::$emailServerTimezone === ''
+		) {
+			$body = self::getJsonDecodedResponseBodyContent($response);
+			if (property_exists($body, 'Date')) {
+				$emailDate = new DateTimeImmutable($body->Date);
+				self::$emailServerTimezone = $emailDate->getTimezone()->getName();
+			}
+		}
+
 		HttpLogger::logResponse($response);
 		return $response;
 	}
@@ -204,6 +223,10 @@ class HttpRequestHelper {
 	 * @param int|null $timeout
 	 * @param Client|null $client
 	 * @param bool|null $isGivenStep
+	 * @param bool $retryOn5xxForK8s Set to false when the caller already has its own
+	 *                               retry-on-5xx loop (e.g. SearchContext::searchWithRetry),
+	 *                               so this generic layer doesn't redundantly burn extra
+	 *                               time retrying inside every one of the caller's attempts.
 	 *
 	 * @return ResponseInterface
 	 *
@@ -223,6 +246,7 @@ class HttpRequestHelper {
 		?int $timeout = 0,
 		?Client $client = null,
 		?bool $isGivenStep = false,
+		bool $retryOn5xxForK8s = true,
 	): ResponseInterface {
 		if ((\getenv('DEBUG_ACCEPTANCE_RESPONSES') !== false) || (\getenv('DEBUG_ACCEPTANCE_API_CALLS') !== false)) {
 			$debugResponses = true;
@@ -270,9 +294,10 @@ class HttpRequestHelper {
 			$loopAgain = !$sendExceptionHappened && ($response->getStatusCode() === self::HTTP_TOO_EARLY ||
 						($response->getStatusCode() === self::HTTP_CONFLICT && $isGivenStep)) &&
 						$sendCount <= $sendRetryLimit;
-			if (OcisConfigHelper::isK8s()) {
+			if ($retryOn5xxForK8s && OcisConfigHelper::isK8s()) {
 				$loopAgain = $loopAgain || ($response->getStatusCode() >= HttpResponse::HTTP_INTERNAL_SERVER_ERROR &&
-							$sendCount <= $sendRetryLimit);
+							$sendCount <= $sendRetryLimit
+							&& $response->getStatusCode() !== HttpResponse::HTTP_INSUFFICIENT_STORAGE);
 				if ($loopAgain && $response->getStatusCode() >= HttpResponse::HTTP_INTERNAL_SERVER_ERROR) {
 					echo "[INFO][K8s] Received " . $response->getStatusCode() . " response. Retrying...\n";
 				}
@@ -717,5 +742,18 @@ class HttpRequestHelper {
 	 */
 	public static function getXRequestIdRegex(): string {
 		return '/^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/';
+	}
+
+	/**
+	 * Returns the timezone of the email server.
+	 *
+	 * @return DateTimeZone
+	 * @throws Exception
+	 */
+	public static function getEmailServerTimezone(): DateTimeZone {
+		if (self::$emailServerTimezone === '') {
+			throw new Exception(__METHOD__ . " could not read the email server timezone");
+		}
+		return new DateTimeZone(self::$emailServerTimezone);
 	}
 }

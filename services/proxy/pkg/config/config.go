@@ -20,18 +20,19 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http"`
 
-	Reva          *shared.Reva          `yaml:"reva"`
-	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
-	GrpcClient    client.Client         `yaml:"-"`
+	Reva              *shared.Reva              `yaml:"reva"`
+	GRPCClientTLS     *shared.GRPCClientTLS     `yaml:"grpc_client_tls"`
+	GRPCClientOptions *shared.GRPCClientOptions `yaml:"grpc_client_options"`
+	GrpcClient        client.Client             `yaml:"-"`
 
 	RoleQuotas                map[string]uint64    `yaml:"role_quotas"`
 	Policies                  []Policy             `yaml:"policies"`
 	AdditionalPolicies        []Policy             `yaml:"additional_policies"`
-	OIDC                      OIDC                 `yaml:"oidc"`
+	OIDC                      OIDC                 `mask:"struct" yaml:"oidc"`
 	ServiceAccount            ServiceAccount       `yaml:"service_account" mask:"struct"`
 	RoleAssignment            RoleAssignment       `yaml:"role_assignment"`
 	PolicySelector            *PolicySelector      `yaml:"policy_selector"`
-	PreSignedURL              PreSignedURL         `yaml:"pre_signed_url"`
+	PreSignedURL              PreSignedURL         `mask:"struct" yaml:"pre_signed_url"`
 	AccountBackend            string               `yaml:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE" desc:"Account backend the PROXY service should use. Currently only 'cs3' is possible here." introductionVersion:"pre5.0"`
 	UserOIDCClaim             string               `yaml:"user_oidc_claim" env:"PROXY_USER_OIDC_CLAIM" desc:"The name of an OpenID Connect claim that is used for resolving users with the account backend. The value of the claim must hold a per user unique, stable and non re-assignable identifier. The availability of claims depends on your Identity Provider. There are common claims available for most Identity providers like 'email' or 'preferred_username' but you can also add your own claim." introductionVersion:"pre5.0"`
 	UserCS3Claim              string               `yaml:"user_cs3_claim" env:"PROXY_USER_CS3_CLAIM" desc:"The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Supported values are 'username', 'mail' and 'userid'." introductionVersion:"pre5.0"`
@@ -44,7 +45,7 @@ type Config struct {
 	AuthMiddleware            AuthMiddleware       `yaml:"auth_middleware"`
 	PoliciesMiddleware        PoliciesMiddleware   `yaml:"policies_middleware"`
 	CSPConfigFileLocation     string               `yaml:"csp_config_file_location" env:"PROXY_CSP_CONFIG_FILE_LOCATION" desc:"The location of the CSP configuration file." introductionVersion:"6.0.0"`
-	Events                    Events               `yaml:"events"`
+	Events                    Events               `mask:"struct" yaml:"events"`
 	ClaimSpaceManagement      ClaimSpaceManagement `yaml:"claim_space_management"`
 	MultiFactorAuthentication MFAConfig            `yaml:"mfa"`
 	MultiInstance             MultiInstanceConfig  `yaml:"multi_instance"`
@@ -113,13 +114,14 @@ const (
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
 // with the configured oidc-provider
 type OIDC struct {
-	Issuer                  string `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;PROXY_OIDC_ISSUER" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP." introductionVersion:"pre5.0"`
-	Insecure                bool   `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments." introductionVersion:"pre5.0"`
-	AccessTokenVerifyMethod string `yaml:"access_token_verify_method" env:"PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD" desc:"Sets how OIDC access tokens should be verified. Possible values are 'none' and 'jwt'. When using 'none', no special validation apart from using it for accessing the IPD's userinfo endpoint will be done. When using 'jwt', it tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'." introductionVersion:"pre5.0"`
-	SkipUserInfo            bool   `yaml:"skip_user_info" env:"PROXY_OIDC_SKIP_USER_INFO" desc:"Do not look up user claims at the userinfo endpoint and directly read them from the access token. Incompatible with 'PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD=none'." introductionVersion:"pre5.0"`
-	UserinfoCache           *Cache `yaml:"user_info_cache"`
-	JWKS                    JWKS   `yaml:"jwks"`
-	RewriteWellKnown        bool   `yaml:"rewrite_well_known" env:"PROXY_OIDC_REWRITE_WELLKNOWN" desc:"Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider." introductionVersion:"pre5.0"`
+	Issuer                  string   `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;PROXY_OIDC_ISSUER" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP." introductionVersion:"pre5.0"`
+	Insecure                bool     `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments." introductionVersion:"pre5.0"`
+	AccessTokenVerifyMethod string   `yaml:"access_token_verify_method" env:"PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD" desc:"Sets how OIDC access tokens should be verified. Possible values are 'none' and 'jwt'. When using 'none', no special validation apart from using it for accessing the IDP's userinfo endpoint will be done. When using 'jwt', it tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'." introductionVersion:"pre5.0"`
+	SkipUserInfo            bool     `yaml:"skip_user_info" env:"PROXY_OIDC_SKIP_USER_INFO" desc:"Do not look up user claims at the userinfo endpoint and directly read them from the access token. Incompatible with 'PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD=none'." introductionVersion:"pre5.0"`
+	UserinfoCache           *Cache   `mask:"struct" yaml:"user_info_cache"`
+	JWKS                    JWKS     `yaml:"jwks"`
+	RewriteWellKnown        bool     `yaml:"rewrite_well_known" env:"PROXY_OIDC_REWRITE_WELLKNOWN" desc:"Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider." introductionVersion:"pre5.0"`
+	AccessTokenVerifyAud    []string `yaml:"access_token_verify_aud" env:"PROXY_OIDC_ACCESS_TOKEN_VERIFY_AUD" desc:"A list of accepted audiences for OIDC access tokens, usually the OIDC client IDs used to access ownCloud (for example the web and desktop client IDs). When set, a JWT access token is only accepted if one of these values is present in its 'aud' claim or matches its 'azp' claim. This prevents tokens issued for other applications of a shared IDP from being accepted. When set via the environment variable, use a comma-separated list. Has no effect when 'PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD' is set to 'none'. Leave empty to disable the check (default)." introductionVersion:"8.2.0"`
 }
 
 type JWKS struct {
@@ -137,14 +139,19 @@ type MFAConfig struct {
 
 // Cache is a TTL cache configuration.
 type Cache struct {
-	Store              string        `yaml:"store" env:"OCIS_CACHE_STORE;PROXY_OIDC_USERINFO_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details." introductionVersion:"pre5.0"`
-	Nodes              []string      `yaml:"addresses" env:"OCIS_CACHE_STORE_NODES;PROXY_OIDC_USERINFO_CACHE_STORE_NODES" desc:"A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
-	Database           string        `yaml:"database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"pre5.0"`
-	Table              string        `yaml:"table" env:"PROXY_OIDC_USERINFO_CACHE_TABLE" desc:"The database table the store should use." introductionVersion:"pre5.0"`
-	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;PROXY_OIDC_USERINFO_CACHE_TTL" desc:"Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
-	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;PROXY_OIDC_USERINFO_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"pre5.0"`
-	AuthUsername       string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;PROXY_OIDC_USERINFO_CACHE_AUTH_USERNAME" desc:"The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
-	AuthPassword       string        `yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;PROXY_OIDC_USERINFO_CACHE_AUTH_PASSWORD" desc:"The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	Store                string        `yaml:"store" env:"OCIS_CACHE_STORE;PROXY_OIDC_USERINFO_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details." introductionVersion:"pre5.0"`
+	Nodes                []string      `yaml:"addresses" env:"OCIS_CACHE_STORE_NODES;PROXY_OIDC_USERINFO_CACHE_STORE_NODES" desc:"A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
+	Database             string        `yaml:"database" env:"OCIS_CACHE_DATABASE;PROXY_OIDC_USERINFO_CACHE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"9.0.0" deprecationInfo:"The global variable OCIS_CACHE_DATABASE is deprecated and will be removed in a future release. Please use local variable PROXY_OIDC_USERINFO_CACHE_DATABASE instead."`
+	Table                string        `yaml:"table" env:"PROXY_OIDC_USERINFO_CACHE_TABLE" desc:"The database table the store should use." introductionVersion:"pre5.0"`
+	TTL                  time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;PROXY_OIDC_USERINFO_CACHE_TTL" desc:"Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
+	DisablePersistence   bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;PROXY_OIDC_USERINFO_CACHE_DISABLE_PERSISTENCE" desc:"Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false." introductionVersion:"pre5.0"`
+	AuthUsername         string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;PROXY_OIDC_USERINFO_CACHE_AUTH_USERNAME" desc:"The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	AuthPassword         string        `mask:"password" yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;PROXY_OIDC_USERINFO_CACHE_AUTH_PASSWORD" desc:"The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	CredsFile            string        `yaml:"creds_file" env:"OCIS_NATS_CREDS_FILE;PROXY_OIDC_USERINFO_CACHE_CREDS_FILE" desc:"Path to a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate with the cache when NATS runs in JWT (operator) mode. When set, the service does not use the username and the password. Exception: a service-specific username and password take precedence over the global OCIS_NATS_CREDS and OCIS_NATS_CREDS_FILE variables when both have a value. The service reads the file again on each reconnect. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"9.0.0"`
+	Creds                string        `mask:"password" yaml:"creds" env:"OCIS_NATS_CREDS;PROXY_OIDC_USERINFO_CACHE_CREDS" desc:"Content of a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate with the cache when NATS runs in JWT (operator) mode. A service-specific variable takes precedence over a global variable. In the same scope, the content takes precedence over the path of a .creds file. When set, the service does not use the username and the password. Exception: a service-specific username and password take precedence over the global OCIS_NATS_CREDS and OCIS_NATS_CREDS_FILE variables when both have a value. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"9.0.0"`
+	EnableTLS            bool          `yaml:"enable_tls" env:"OCIS_CACHE_ENABLE_TLS;PROXY_OIDC_USERINFO_CACHE_ENABLE_TLS" desc:"Activate TLS for the connection to the cache store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"9.0.0"`
+	TLSInsecure          bool          `yaml:"tls_insecure" env:"OCIS_CACHE_TLS_INSECURE;PROXY_OIDC_USERINFO_CACHE_TLS_INSECURE" desc:"Disable TLS certificate verification for the cache store connection. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"9.0.0"`
+	TLSRootCACertificate string        `yaml:"tls_root_ca_certificate" env:"OCIS_CACHE_TLS_ROOT_CA_CERTIFICATE;PROXY_OIDC_USERINFO_CACHE_TLS_ROOT_CA_CERTIFICATE" desc:"Path to the PEM-encoded root CA certificate for the cache store TLS connection. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"9.0.0"`
 }
 
 // RoleAssignment contains the configuration for how to assign roles to users during login
@@ -189,17 +196,22 @@ type StaticSelectorConf struct {
 type PreSignedURL struct {
 	AllowedHTTPMethods []string     `yaml:"allowed_http_methods"`
 	Enabled            bool         `yaml:"enabled" env:"PROXY_ENABLE_PRESIGNEDURLS" desc:"Allow OCS to get a signing key to sign requests." introductionVersion:"pre5.0"`
-	SigningKeys        *SigningKeys `yaml:"signing_keys"`
+	SigningKeys        *SigningKeys `mask:"struct" yaml:"signing_keys"`
 }
 
 // SigningKeys is a store configuration.
 type SigningKeys struct {
-	Store              string        `yaml:"store" env:"OCIS_CACHE_STORE;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE" desc:"The type of the signing key store. Supported values are: 'redis-sentinel' and 'nats-js-kv'. See the text description for details." introductionVersion:"5.0"`
-	Nodes              []string      `yaml:"addresses" env:"OCIS_CACHE_STORE_NODES;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES" desc:"A list of nodes to access the configured store. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details." introductionVersion:"5.0"`
-	TTL                time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_TTL" desc:"Default time to live for signing keys. See the Environment Variable Types description for more details." introductionVersion:"5.0"`
-	DisablePersistence bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_DISABLE_PERSISTENCE" desc:"Disables persistence of the store. Only applies when store type 'nats-js-kv' is configured. Defaults to true." introductionVersion:"5.0"`
-	AuthUsername       string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_USERNAME" desc:"The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
-	AuthPassword       string        `yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_PASSWORD" desc:"The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	Store                string        `yaml:"store" env:"OCIS_CACHE_STORE;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE" desc:"The type of the signing key store. Supported values are: 'redis-sentinel' and 'nats-js-kv'. See the text description for details." introductionVersion:"5.0"`
+	Nodes                []string      `yaml:"addresses" env:"OCIS_CACHE_STORE_NODES;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES" desc:"A list of nodes to access the configured store. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details." introductionVersion:"5.0"`
+	TTL                  time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_TTL" desc:"Default time to live for signing keys. See the Environment Variable Types description for more details." introductionVersion:"5.0"`
+	DisablePersistence   bool          `yaml:"disable_persistence" env:"OCIS_CACHE_DISABLE_PERSISTENCE;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_DISABLE_PERSISTENCE" desc:"Disables persistence of the store. Only applies when store type 'nats-js-kv' is configured. Defaults to true." introductionVersion:"5.0"`
+	AuthUsername         string        `yaml:"username" env:"OCIS_CACHE_AUTH_USERNAME;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_USERNAME" desc:"The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	AuthPassword         string        `mask:"password" yaml:"password" env:"OCIS_CACHE_AUTH_PASSWORD;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_PASSWORD" desc:"The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"5.0"`
+	CredsFile            string        `yaml:"creds_file" env:"OCIS_NATS_CREDS_FILE;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_CREDS_FILE" desc:"Path to a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate with the cache when NATS runs in JWT (operator) mode. When set, the service does not use the username and the password. Exception: a service-specific username and password take precedence over the global OCIS_NATS_CREDS and OCIS_NATS_CREDS_FILE variables when both have a value. The service reads the file again on each reconnect. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"9.0.0"`
+	Creds                string        `mask:"password" yaml:"creds" env:"OCIS_NATS_CREDS;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_CREDS" desc:"Content of a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate with the cache when NATS runs in JWT (operator) mode. A service-specific variable takes precedence over a global variable. In the same scope, the content takes precedence over the path of a .creds file. When set, the service does not use the username and the password. Exception: a service-specific username and password take precedence over the global OCIS_NATS_CREDS and OCIS_NATS_CREDS_FILE variables when both have a value. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"9.0.0"`
+	EnableTLS            bool          `yaml:"enable_tls" env:"OCIS_CACHE_ENABLE_TLS;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_ENABLE_TLS" desc:"Activate TLS for the connection to the signing key store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"9.0.0"`
+	TLSInsecure          bool          `yaml:"tls_insecure" env:"OCIS_CACHE_TLS_INSECURE;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_TLS_INSECURE" desc:"Disable TLS certificate verification for the signing key store connection. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"9.0.0"`
+	TLSRootCACertificate string        `yaml:"tls_root_ca_certificate" env:"OCIS_CACHE_TLS_ROOT_CA_CERTIFICATE;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_TLS_ROOT_CA_CERTIFICATE" desc:"Path to the PEM-encoded root CA certificate for the signing key store TLS connection. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"9.0.0"`
 }
 
 // ClaimsSelectorConf is the config for the claims-selector
@@ -238,7 +250,9 @@ type Events struct {
 	TLSRootCACertificate string `yaml:"tls_root_ca_certificate" env:"OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;PROXY_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided PROXY_EVENTS_TLS_INSECURE will be seen as false." introductionVersion:"7.0.0"`
 	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;PROXY_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"7.0.0"`
 	AuthUsername         string `yaml:"username" env:"OCIS_EVENTS_AUTH_USERNAME;PROXY_EVENTS_AUTH_USERNAME" desc:"The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"7.0.0"`
-	AuthPassword         string `yaml:"password" env:"OCIS_EVENTS_AUTH_PASSWORD;PROXY_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"7.0.0"`
+	AuthPassword         string `mask:"password" yaml:"password" env:"OCIS_EVENTS_AUTH_PASSWORD;PROXY_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"7.0.0"`
+	CredsFile            string `yaml:"creds_file" env:"OCIS_NATS_CREDS_FILE;PROXY_EVENTS_CREDS_FILE" desc:"Path to a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate with the events broker when NATS runs in JWT (operator) mode. When set, the service does not use the username and the password. Exception: a service-specific username and password take precedence over the global OCIS_NATS_CREDS and OCIS_NATS_CREDS_FILE variables when both have a value. The service reads the file again on each reconnect." introductionVersion:"9.0.0"`
+	Creds                string `mask:"password" yaml:"creds" env:"OCIS_NATS_CREDS;PROXY_EVENTS_CREDS" desc:"Content of a NATS .creds file with a user JWT and an NKey seed. Use it to authenticate with the events broker when NATS runs in JWT (operator) mode. A service-specific variable takes precedence over a global variable. In the same scope, the content takes precedence over the path of a .creds file. When set, the service does not use the username and the password. Exception: a service-specific username and password take precedence over the global OCIS_NATS_CREDS and OCIS_NATS_CREDS_FILE variables when both have a value." introductionVersion:"9.0.0"`
 }
 
 // ClaimSpaceManagement holds the configuration for claim managed spaces
@@ -251,10 +265,11 @@ type ClaimSpaceManagement struct {
 
 // MultiInstanceConfig holds configuration for multi-instance-ocis
 type MultiInstanceConfig struct {
-	Enabled     bool   `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enable multiple instances of Infinite Scale." introductionVersion:"8.0.0"`
-	InstanceID  string `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique id of this instance" introductionVersion:"8.0.0"`
-	MasterID    string `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master ID that grants access to all instances. Users with this ID in their memberOf or guestOf claims can access any instance. Leave empty to disable." introductionVersion:"8.1.0"`
-	MemberClaim string `yaml:"member_claim" env:"OCIS_MULTI_INSTANCE_MEMBER_CLAIM" desc:"The claim name for the 'memberOf' property" introductionVersion:"8.0.0"`
-	GuestClaim  string `yaml:"guest_claim" env:"OCIS_MULTI_INSTANCE_GUEST_CLAIM" desc:"The claim name for the 'guestOf' property" introductionVersion:"8.0.0"`
-	GuestRole   string `yaml:"guest_role" env:"OCIS_MULTI_INSTANCE_GUEST_ROLE" desc:"The role that should be assigned to a guest user" introductionVersion:"8.0.0"`
+	Enabled          bool     `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enable multiple instances of Infinite Scale." introductionVersion:"8.0.0"`
+	InstanceID       string   `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique id of this instance" introductionVersion:"8.0.0"`
+	MasterID         string   `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master ID that grants access to all instances. Users with this ID in their memberOf or guestOf claims can access any instance. Leave empty to disable." introductionVersion:"8.1.0"`
+	MemberClaim      string   `yaml:"member_claim" env:"OCIS_MULTI_INSTANCE_MEMBER_CLAIM" desc:"The claim name for the 'memberOf' property" introductionVersion:"8.0.0"`
+	GuestClaim       string   `yaml:"guest_claim" env:"OCIS_MULTI_INSTANCE_GUEST_CLAIM" desc:"The claim name for the 'guestOf' property" introductionVersion:"8.0.0"`
+	GuestRole        string   `yaml:"guest_role" env:"OCIS_MULTI_INSTANCE_GUEST_ROLE" desc:"The role that should be assigned to a guest user" introductionVersion:"8.0.0"`
+	GuestRoleMapping []string `yaml:"guest_role_mapping" env:"OCIS_MULTI_INSTANCE_GUEST_ROLE_MAPPING" desc:"(Optional) Mapping of PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM values to the role a guest gets instead of OCIS_MULTI_INSTANCE_GUEST_ROLE. Example: 'spaceadmin:user-light-vault'. A claim value is an exact string or a regular expression that must match the full claim value, the same as the claim_value of the role mapping. Escape regex metacharacters such as '.' in an exact string. The first match wins. Role names must not contain a colon. Only applies to the 'oidc' role assignment driver." introductionVersion:"9.0.0"`
 }

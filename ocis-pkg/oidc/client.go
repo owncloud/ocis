@@ -8,6 +8,7 @@ import (
 	"io"
 	"mime"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -53,13 +54,14 @@ type oidcClient struct {
 	// Logger to use for logging, must be set
 	Logger log.Logger
 
-	issuer                  string
-	provider                *ProviderMetadata
-	providerLock            *sync.Mutex
-	skipIssuerValidation    bool
-	accessTokenVerifyMethod string
-	remoteKeySet            KeySet
-	algorithms              []string
+	issuer                     string
+	provider                   *ProviderMetadata
+	providerLock               *sync.Mutex
+	skipIssuerValidation       bool
+	accessTokenVerifyMethod    string
+	accessTokenVerifyAudiences []string
+	remoteKeySet               KeySet
+	algorithms                 []string
 
 	JWKSOptions config.JWKS
 	JWKS        *keyfunc.JWKS
@@ -88,16 +90,17 @@ func NewOIDCClient(opts ...Option) OIDCClient {
 	options := newOptions(opts...)
 
 	return &oidcClient{
-		Logger:                  options.Logger,
-		issuer:                  options.OIDCIssuer,
-		httpClient:              options.HTTPClient,
-		accessTokenVerifyMethod: options.AccessTokenVerifyMethod,
-		JWKSOptions:             options.JWKSOptions, // TODO I don't like that we pass down config options ...
-		JWKS:                    options.JWKS,
-		providerLock:            &sync.Mutex{},
-		jwksLock:                &sync.Mutex{},
-		remoteKeySet:            options.KeySet,
-		provider:                options.ProviderMetadata,
+		Logger:                     options.Logger,
+		issuer:                     options.OIDCIssuer,
+		httpClient:                 options.HTTPClient,
+		accessTokenVerifyMethod:    options.AccessTokenVerifyMethod,
+		accessTokenVerifyAudiences: options.AccessTokenVerifyAudiences,
+		JWKSOptions:                options.JWKSOptions, // TODO I don't like that we pass down config options ...
+		JWKS:                       options.JWKS,
+		providerLock:               &sync.Mutex{},
+		jwksLock:                   &sync.Mutex{},
+		remoteKeySet:               options.KeySet,
+		provider:                   options.ProviderMetadata,
 	}
 }
 
@@ -112,17 +115,21 @@ func (c *oidcClient) lookupWellKnownOpenidConfiguration(ctx context.Context) err
 		}
 		resp, err := c.httpClient.Do(req.WithContext(ctx))
 		if err != nil {
-			return err
+			return classifyTransport(err)
 		}
 		defer resp.Body.Close()
 
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return fmt.Errorf("unable to read response body: %v", err)
+			return classifyTransport(err)
 		}
 
 		if resp.StatusCode != http.StatusOK {
-			return fmt.Errorf("%s: %s", resp.Status, body)
+			err := fmt.Errorf("%s: %s", resp.Status, body)
+			if statusIsTransient(resp.StatusCode) {
+				return errors.Join(ErrTemporarilyUnavailable, err)
+			}
+			return err
 		}
 
 		var p ProviderMetadata
@@ -147,7 +154,7 @@ func (c *oidcClient) lookupWellKnownOpenidConfiguration(ctx context.Context) err
 	return nil
 }
 
-func (c *oidcClient) getKeyfunc() *keyfunc.JWKS {
+func (c *oidcClient) getKeyfunc() (*keyfunc.JWKS, error) {
 	c.jwksLock.Lock()
 	defer c.jwksLock.Unlock()
 	if c.JWKS == nil {
@@ -167,10 +174,10 @@ func (c *oidcClient) getKeyfunc() *keyfunc.JWKS {
 		if err != nil {
 			c.JWKS = nil
 			c.Logger.Error().Err(err).Msg("Failed to create JWKS from resource at the given URL.")
-			return nil
+			return nil, err
 		}
 	}
-	return c.JWKS
+	return c.JWKS, nil
 }
 
 type stringAsBool bool
@@ -206,7 +213,7 @@ type userInfoRaw struct {
 }
 
 // Claims unmarshals the raw JSON object claims into the provided object.
-func (u *UserInfo) Claims(v interface{}) error {
+func (u *UserInfo) Claims(v any) error {
 	if u.claims == nil {
 		return errors.New("oidc: claims not set")
 	}
@@ -236,15 +243,19 @@ func (c *oidcClient) UserInfo(ctx context.Context, tokenSource oauth2.TokenSourc
 
 	resp, err := c.httpClient.Do(req.WithContext(ctx))
 	if err != nil {
-		return nil, err
+		return nil, classifyTransport(err)
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, classifyTransport(err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("%s: %s", resp.Status, body)
+		err := fmt.Errorf("%s: %s", resp.Status, body)
+		if statusIsTransient(resp.StatusCode) {
+			return nil, errors.Join(ErrTemporarilyUnavailable, err)
+		}
+		return nil, err
 	}
 
 	ct := resp.Header.Get("Content-Type")
@@ -290,7 +301,11 @@ func (c *oidcClient) VerifyAccessToken(ctx context.Context, token string) (RegCl
 func (c *oidcClient) verifyAccessTokenJWT(token string) (RegClaimsWithSID, jwt.MapClaims, error) {
 	var claims RegClaimsWithSID
 	mapClaims := jwt.MapClaims{}
-	jwks := c.getKeyfunc()
+	jwks, err := c.getKeyfunc()
+	if err != nil {
+		// A JWKS fetch timeout/network error is transient (503), not a bad token (401).
+		return claims, mapClaims, classifyTransport(err)
+	}
 	if jwks == nil {
 		return claims, mapClaims, errors.New("error initializing jwks keyfunc")
 	}
@@ -302,9 +317,9 @@ func (c *oidcClient) verifyAccessTokenJWT(token string) (RegClaimsWithSID, jwt.M
 		issuer = c.provider.AccessTokenIssuer
 	}
 
-	_, err := jwt.ParseWithClaims(token, &claims, jwks.Keyfunc, jwt.WithIssuer(issuer))
+	_, err = jwt.ParseWithClaims(token, &claims, jwks.Keyfunc, jwt.WithIssuer(issuer))
 	if err != nil {
-		return claims, mapClaims, err
+		return claims, mapClaims, classifyTransport(err)
 	}
 	_, _, err = new(jwt.Parser).ParseUnverified(token, mapClaims)
 	// TODO: decode mapClaims to sth readable
@@ -314,7 +329,40 @@ func (c *oidcClient) verifyAccessTokenJWT(token string) (RegClaimsWithSID, jwt.M
 		return claims, mapClaims, err
 	}
 
+	// Verify the token was issued for this instance. Keycloak puts a generic
+	// value (e.g. "account") in "aud" and the real client id in "azp", so we
+	// accept the token when the allowlist matches either claim.
+	if err := c.verifyAudience(claims.Audience, azpFromClaims(mapClaims)); err != nil {
+		c.Logger.Info().Err(err).Msg("Access token rejected: audience not allowed.")
+		return claims, mapClaims, err
+	}
+
 	return claims, mapClaims, nil
+}
+
+// verifyAudience checks that the token's "aud" or "azp" claim matches the
+// configured allowlist. An empty allowlist disables the check.
+func (c *oidcClient) verifyAudience(audiences jwt.ClaimStrings, azp string) error {
+	if len(c.accessTokenVerifyAudiences) == 0 {
+		return nil
+	}
+	for _, allowed := range c.accessTokenVerifyAudiences {
+		allowed = strings.TrimSpace(allowed)
+		if allowed == "" {
+			continue
+		}
+		if allowed == azp || slices.Contains(audiences, allowed) {
+			return nil
+		}
+	}
+	return errors.New("oidc: access token audience is not allowed")
+}
+
+func azpFromClaims(claims jwt.MapClaims) string {
+	if azp, ok := claims["azp"].(string); ok {
+		return azp
+	}
+	return ""
 }
 
 func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawToken string) (*LogoutToken, error) {
@@ -322,7 +370,10 @@ func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawToken string) (*L
 	if err := c.lookupWellKnownOpenidConfiguration(ctx); err != nil {
 		return nil, err
 	}
-	jwks := c.getKeyfunc()
+	jwks, err := c.getKeyfunc()
+	if err != nil {
+		return nil, classifyTransport(err)
+	}
 	if jwks == nil {
 		return nil, errors.New("error initializing jwks keyfunc")
 	}
@@ -337,7 +388,7 @@ func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawToken string) (*L
 		supportedSigAlgs = []string{RS256}
 	}
 
-	_, err := jwt.ParseWithClaims(rawToken, &claims, jwks.Keyfunc, jwt.WithValidMethods(supportedSigAlgs), jwt.WithIssuer(c.issuer))
+	_, err = jwt.ParseWithClaims(rawToken, &claims, jwks.Keyfunc, jwt.WithValidMethods(supportedSigAlgs), jwt.WithIssuer(c.issuer))
 	if err != nil {
 		c.Logger.Debug().Err(err).Msg("Failed to parse logout token")
 		return nil, err
@@ -360,7 +411,7 @@ func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawToken string) (*L
 	return &claims, nil
 }
 
-func unmarshalResp(r *http.Response, body []byte, v interface{}) error {
+func unmarshalResp(r *http.Response, body []byte, v any) error {
 	err := json.Unmarshal(body, &v)
 	if err == nil {
 		return nil

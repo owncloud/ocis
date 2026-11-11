@@ -12,34 +12,34 @@ import (
 )
 
 // GatewayConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
-func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]interface{} {
+func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]any {
 	localEndpoint := pkgconfig.LocalEndpoint(cfg.GRPC.Protocol, cfg.GRPC.Addr)
 
-	rcfg := map[string]interface{}{
-		"core": map[string]interface{}{
+	rcfg := map[string]any{
+		"core": map[string]any{
 			"tracing_enabled":      cfg.Tracing.Enabled,
 			"tracing_exporter":     cfg.Tracing.Type,
 			"tracing_endpoint":     cfg.Tracing.Endpoint,
 			"tracing_collector":    cfg.Tracing.Collector,
 			"tracing_service_name": cfg.Service.Name,
 		},
-		"shared": map[string]interface{}{
+		"shared": map[string]any{
 			"jwt_secret":                cfg.TokenManager.JWTSecret,
 			"gatewaysvc":                cfg.Reva.Address,
 			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 			"grpc_client_options":       cfg.Reva.GetGRPCClientConfig(),
 		},
-		"grpc": map[string]interface{}{
+		"grpc": map[string]any{
 			"network": cfg.GRPC.Protocol,
 			"address": cfg.GRPC.Addr,
-			"tls_settings": map[string]interface{}{
+			"tls_settings": map[string]any{
 				"enabled":     cfg.GRPC.TLS.Enabled,
 				"certificate": cfg.GRPC.TLS.Cert,
 				"key":         cfg.GRPC.TLS.Key,
 			},
 			// TODO build services dynamically
-			"services": map[string]interface{}{
-				"gateway": map[string]interface{}{
+			"services": map[string]any{
+				"gateway": map[string]any{
 					"applicationauthsvc": cfg.AuthAppEndpoint,
 					// registries are located on the gateway
 					"authregistrysvc":    localEndpoint,
@@ -65,22 +65,27 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 					"transfer_shared_secret":         cfg.TransferSecret,
 					"transfer_expires":               cfg.TransferExpires,
 					// cache and TTLs
-					"provider_cache_config": map[string]interface{}{
-						"cache_store":         cfg.Cache.ProviderCacheStore,
-						"cache_nodes":         cfg.Cache.ProviderCacheNodes,
-						"cache_database":      cfg.Cache.ProviderCacheDatabase,
-						"cache_table":         "provider",
-						"cache_ttl":           cfg.Cache.ProviderCacheTTL,
-						"disable_persistence": cfg.Cache.ProviderCacheDisablePersistence,
-						"cache_auth_username": cfg.Cache.ProviderCacheAuthUsername,
-						"cache_auth_password": cfg.Cache.ProviderCacheAuthPassword,
+					"provider_cache_config": map[string]any{
+						"cache_store":                   cfg.Cache.ProviderCacheStore,
+						"cache_nodes":                   cfg.Cache.ProviderCacheNodes,
+						"cache_database":                cfg.Cache.ProviderCacheDatabase,
+						"cache_table":                   "provider",
+						"cache_ttl":                     cfg.Cache.ProviderCacheTTL,
+						"cache_disable_persistence":     cfg.Cache.ProviderCacheDisablePersistence,
+						"cache_auth_username":           cfg.Cache.ProviderCacheAuthUsername,
+						"cache_auth_password":           cfg.Cache.ProviderCacheAuthPassword,
+						"cache_creds_file":              cfg.Cache.ProviderCacheCredsFile,
+						"cache_creds":                   cfg.Cache.ProviderCacheCreds,
+						"cache_enable_tls":              cfg.Cache.ProviderCacheEnableTLS,
+						"cache_tls_insecure":            cfg.Cache.ProviderCacheTLSInsecure,
+						"cache_tls_root_ca_certificate": cfg.Cache.ProviderCacheTLSRootCACertificate,
 					},
 				},
-				"authregistry": map[string]interface{}{
+				"authregistry": map[string]any{
 					"driver": "static",
-					"drivers": map[string]interface{}{
-						"static": map[string]interface{}{
-							"rules": map[string]interface{}{
+					"drivers": map[string]any{
+						"static": map[string]any{
+							"rules": map[string]any{
 								"appauth":         cfg.AuthAppEndpoint,
 								"basic":           cfg.AuthBasicEndpoint,
 								"machine":         cfg.AuthMachineEndpoint,
@@ -91,17 +96,17 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 						},
 					},
 				},
-				"storageregistry": map[string]interface{}{
+				"storageregistry": map[string]any{
 					"driver": cfg.StorageRegistry.Driver,
-					"drivers": map[string]interface{}{
-						"spaces": map[string]interface{}{
+					"drivers": map[string]any{
+						"spaces": map[string]any{
 							"providers": spacesProviders(cfg, logger),
 						},
 					},
 				},
 			},
-			"interceptors": map[string]interface{}{
-				"prometheus": map[string]interface{}{
+			"interceptors": map[string]any{
+				"prometheus": map[string]any{
 					"namespace": "ocis",
 					"subsystem": "gateway",
 				},
@@ -111,14 +116,14 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 	return rcfg
 }
 
-func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[string]interface{} {
+func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[string]any {
 
 	// if a list of rules is given it overrides the generated rules from below
 	if len(cfg.StorageRegistry.Rules) > 0 {
-		rules := map[string]map[string]interface{}{}
+		rules := map[string]map[string]any{}
 		for i := range cfg.StorageRegistry.Rules {
 			parts := strings.SplitN(cfg.StorageRegistry.Rules[i], "=", 2)
-			rules[parts[0]] = map[string]interface{}{"address": parts[1]}
+			rules[parts[0]] = map[string]any{"address": parts[1]}
 		}
 		return rules
 	}
@@ -130,7 +135,7 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 			logger.Error().Err(err).Msg("Failed to read storage registry rules from JSON file: " + cfg.StorageRegistry.JSON)
 			return nil
 		}
-		var rules map[string]map[string]interface{}
+		var rules map[string]map[string]any
 		if err = json.Unmarshal(data, &rules); err != nil {
 			logger.Error().Err(err).Msg("Failed to unmarshal storage registry rules")
 			return nil
@@ -138,15 +143,15 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 		return rules
 	}
 	// generate rules based on default config
-	rules := map[string]map[string]interface{}{
+	rules := map[string]map[string]any{
 		cfg.StorageUsersEndpoint: {
 			"providerid": cfg.StorageRegistry.StorageUsersMountID,
-			"spaces": map[string]interface{}{
-				"personal": map[string]interface{}{
+			"spaces": map[string]any{
+				"personal": map[string]any{
 					"mount_point":   "/users",
 					"path_template": "/users/{{.Space.Owner.Id.OpaqueId}}",
 				},
-				"project": map[string]interface{}{
+				"project": map[string]any{
 					"mount_point":   "/projects",
 					"path_template": "/projects/{{.Space.Name}}",
 				},
@@ -154,16 +159,16 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 		},
 		cfg.StorageSharesEndpoint: {
 			"providerid": utils.ShareStorageProviderID,
-			"spaces": map[string]interface{}{
-				"virtual": map[string]interface{}{
+			"spaces": map[string]any{
+				"virtual": map[string]any{
 					// The root of the share jail is mounted here
 					"mount_point": "/users/{{.CurrentUser.Id.OpaqueId}}/Shares",
 				},
-				"grant": map[string]interface{}{
+				"grant": map[string]any{
 					// Grants are relative to a space root that the gateway will determine with a stat
 					"mount_point": ".",
 				},
-				"mountpoint": map[string]interface{}{
+				"mountpoint": map[string]any{
 					// The jail needs to be filled with mount points
 					// .Space.Name is a path relative to the mount point
 					"mount_point":   "/users/{{.CurrentUser.Id.OpaqueId}}/Shares",
@@ -174,11 +179,11 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 		// public link storage returns the mount id of the actual storage
 		cfg.StoragePublicLinkEndpoint: {
 			"providerid": utils.PublicStorageProviderID,
-			"spaces": map[string]interface{}{
-				"grant": map[string]interface{}{
+			"spaces": map[string]any{
+				"grant": map[string]any{
 					"mount_point": ".",
 				},
-				"mountpoint": map[string]interface{}{
+				"mountpoint": map[string]any{
 					"mount_point":   "/public",
 					"path_template": "/public/{{.Space.Root.OpaqueId}}",
 				},
@@ -186,11 +191,11 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 		},
 		cfg.OCMEndpoint: {
 			"providerid": utils.OCMStorageProviderID,
-			"spaces": map[string]interface{}{
-				"grant": map[string]interface{}{
+			"spaces": map[string]any{
+				"grant": map[string]any{
 					"mount_point": ".",
 				},
-				"mountpoint": map[string]interface{}{
+				"mountpoint": map[string]any{
 					"mount_point":   "/ocm",
 					"path_template": "/ocm/{{.Space.Root.OpaqueId}}",
 				},
@@ -200,15 +205,15 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 	}
 	// enable the default rule for vault storage provider configuration
 	if cfg.EnableVaultMode {
-		rules[cfg.StorageUsersVaultEndpoint] = map[string]interface{}{
+		rules[cfg.StorageUsersVaultEndpoint] = map[string]any{
 			"providerid": utils.VaultStorageProviderID,
-			"spaces": map[string]interface{}{
-				"personal": map[string]interface{}{
+			"spaces": map[string]any{
+				"personal": map[string]any{
 					// The mount point must have the "vault/" prefix to be picked up by the vault storage provider
 					"mount_point":   "/vault/users",
 					"path_template": "/vault/users/{{.Space.Owner.Id.OpaqueId}}",
 				},
-				"project": map[string]interface{}{
+				"project": map[string]any{
 					// The mount point must have the "vault/" prefix to be picked up by the vault storage provider
 					"mount_point":   "/vault/projects",
 					"path_template": "/vault/projects/{{.Space.Name}}",

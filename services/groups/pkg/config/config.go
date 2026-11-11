@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
@@ -20,7 +21,7 @@ type Config struct {
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"GROUPS_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token." introductionVersion:"pre5.0"`
 
-	Driver  string  `yaml:"driver" env:"GROUPS_DRIVER" desc:"The driver which should be used by the groups service. Supported values are 'ldap' and 'owncloudsql'." introductionVersion:"pre5.0"`
+	Driver  string  `yaml:"driver" env:"GROUPS_DRIVER" desc:"The driver which should be used by the groups service. Supported value is 'ldap'." introductionVersion:"pre5.0"`
 	Drivers Drivers `yaml:"drivers"`
 
 	Context context.Context `yaml:"-"`
@@ -52,8 +53,7 @@ type GRPCConfig struct {
 }
 
 type Drivers struct {
-	LDAP        LDAPDriver        `yaml:"ldap"`
-	OwnCloudSQL OwnCloudSQLDriver `yaml:"owncloudsql"`
+	LDAP LDAPDriver `yaml:"ldap"`
 
 	JSON JSONDriver   `yaml:"json,omitempty"` // not supported by the oCIS product, therefore not part of docs
 	REST RESTProvider `yaml:"rest,omitempty"` // not supported by the oCIS product, therefore not part of docs
@@ -65,6 +65,9 @@ type LDAPDriver struct {
 	Insecure                 bool            `yaml:"insecure" env:"OCIS_LDAP_INSECURE;GROUPS_LDAP_INSECURE" desc:"Disable TLS certificate validation for the LDAP connections. Do not set this in production environments." introductionVersion:"pre5.0"`
 	BindDN                   string          `yaml:"bind_dn" env:"OCIS_LDAP_BIND_DN;GROUPS_LDAP_BIND_DN" desc:"LDAP DN to use for simple bind authentication with the target LDAP server." introductionVersion:"pre5.0"`
 	BindPassword             string          `yaml:"bind_password" env:"OCIS_LDAP_BIND_PASSWORD;GROUPS_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'." introductionVersion:"pre5.0"`
+	RetryMaxCount            int             `yaml:"retry_max_count"  env:"OCIS_LDAP_RETRY_MAX_COUNT;GROUPS_LDAP_RETRY_MAX_COUNT"   desc:"Maximum number of retries for failed LDAP operations. Applies to both read and write operations (with different retryable error sets). Default 1." introductionVersion:"8.2.0"`
+	RetryBaseDelay           time.Duration   `yaml:"retry_base_delay" env:"OCIS_LDAP_RETRY_BASE_DELAY;GROUPS_LDAP_RETRY_BASE_DELAY" desc:"Base delay for exponential backoff between LDAP retries (e.g. '100ms'). Set to 0 to disable backoff." introductionVersion:"8.2.0"`
+	RetryMaxDelay            time.Duration   `yaml:"retry_max_delay"  env:"OCIS_LDAP_RETRY_MAX_DELAY;GROUPS_LDAP_RETRY_MAX_DELAY"   desc:"Maximum delay cap for exponential backoff between LDAP retries (e.g. '5s'). 0 (default) uses the library default cap of 60s." introductionVersion:"8.2.0"`
 	UserBaseDN               string          `yaml:"user_base_dn" env:"OCIS_LDAP_USER_BASE_DN;GROUPS_LDAP_USER_BASE_DN" desc:"Search base DN for looking up LDAP users." introductionVersion:"pre5.0"`
 	GroupBaseDN              string          `yaml:"group_base_dn" env:"OCIS_LDAP_GROUP_BASE_DN;GROUPS_LDAP_GROUP_BASE_DN" desc:"Search base DN for looking up LDAP groups." introductionVersion:"pre5.0"`
 	UserScope                string          `yaml:"user_scope" env:"OCIS_LDAP_USER_SCOPE;GROUPS_LDAP_USER_SCOPE" desc:"LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'." introductionVersion:"pre5.0"`
@@ -75,11 +78,15 @@ type LDAPDriver struct {
 	UserObjectClass          string          `yaml:"user_object_class" env:"OCIS_LDAP_USER_OBJECTCLASS;GROUPS_LDAP_USER_OBJECTCLASS" desc:"The object class to use for users in the default user search filter ('inetOrgPerson')." introductionVersion:"pre5.0"`
 	GroupObjectClass         string          `yaml:"group_object_class" env:"OCIS_LDAP_GROUP_OBJECTCLASS;GROUPS_LDAP_GROUP_OBJECTCLASS" desc:"The object class to use for groups in the default group search filter ('groupOfNames')." introductionVersion:"pre5.0"`
 	IDP                      string          `yaml:"idp" env:"OCIS_URL;OCIS_OIDC_ISSUER;GROUPS_IDP_URL" desc:"The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider." introductionVersion:"pre5.0"`
-	MasterID                 string          `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master instance ID for multi-instance setups. When set, LDAP user filters are enhanced to also match users belonging to the master instance." introductionVersion:"7.0"`
+	MasterID                 string          `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master instance ID for multi-instance setups. When set, LDAP user filters are enhanced to also match users belonging to the master instance. Also set 'user_filter'. Without an explicit 'user_filter', this instance resolves every user in the shared LDAP directory." introductionVersion:"7.0"`
 	UserMemberAttribute      string          `yaml:"user_member_attribute" env:"OCIS_LDAP_USER_MEMBER_ATTRIBUTE" desc:"LDAP attribute that marks a user as a member of an instance." introductionVersion:"7.0"`
 	UserGuestAttribute       string          `yaml:"user_guest_attribute" env:"OCIS_LDAP_USER_GUEST_ATTRIBUTE" desc:"LDAP attribute that marks a user as a guest of an instance." introductionVersion:"7.0"`
 	UserSchema               LDAPUserSchema  `yaml:"user_schema"`
 	GroupSchema              LDAPGroupSchema `yaml:"group_schema"`
+
+	PoolEnabled         bool          `yaml:"pool_enabled" env:"OCIS_LDAP_POOL_ENABLED;GROUPS_LDAP_POOL_ENABLED" desc:"Enable a bounded pool of LDAP connections instead of a single long-lived reconnecting connection. Concurrent requests then no longer serialize on one connection." introductionVersion:"8.2.0"`
+	PoolSize            int           `yaml:"pool_size" env:"OCIS_LDAP_POOL_SIZE;GROUPS_LDAP_POOL_SIZE" desc:"Maximum number of concurrently open LDAP connections when 'OCIS_LDAP_POOL_ENABLED' is 'true'. Defaults to 5 when unset or <= 0." introductionVersion:"8.2.0"`
+	PoolCheckoutTimeout time.Duration `yaml:"pool_checkout_timeout" env:"OCIS_LDAP_POOL_CHECKOUT_TIMEOUT;GROUPS_LDAP_POOL_CHECKOUT_TIMEOUT" desc:"Maximum time to wait for a pooled LDAP connection to become available once the pool is exhausted. Defaults to 30s when unset or <= 0. See the Environment Variable Types description for more details." introductionVersion:"8.2.0"`
 }
 
 type LDAPUserSchema struct {
@@ -97,19 +104,6 @@ type LDAPGroupSchema struct {
 	DisplayName     string `yaml:"display_name" env:"OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME;GROUPS_LDAP_GROUP_SCHEMA_DISPLAYNAME" desc:"LDAP Attribute to use for the displayname of groups (often the same as groupname attribute)." introductionVersion:"pre5.0"`
 	Groupname       string `yaml:"group_name" env:"OCIS_LDAP_GROUP_SCHEMA_GROUPNAME;GROUPS_LDAP_GROUP_SCHEMA_GROUPNAME" desc:"LDAP Attribute to use for the name of groups." introductionVersion:"pre5.0"`
 	Member          string `yaml:"member" env:"OCIS_LDAP_GROUP_SCHEMA_MEMBER;GROUPS_LDAP_GROUP_SCHEMA_MEMBER" desc:"LDAP Attribute that is used for group members." introductionVersion:"pre5.0"`
-}
-
-type OwnCloudSQLDriver struct {
-	DBUsername         string `yaml:"db_username" env:"GROUPS_OWNCLOUDSQL_DB_USERNAME" desc:"Database user to use for authenticating with the owncloud database." introductionVersion:"pre5.0"`
-	DBPassword         string `yaml:"db_password" env:"GROUPS_OWNCLOUDSQL_DB_PASSWORD" desc:"Password for the database user." introductionVersion:"pre5.0"`
-	DBHost             string `yaml:"db_host" env:"GROUPS_OWNCLOUDSQL_DB_HOST" desc:"Hostname of the database server." introductionVersion:"pre5.0"`
-	DBPort             int    `yaml:"db_port" env:"GROUPS_OWNCLOUDSQL_DB_PORT" desc:"Network port to use for the database connection." introductionVersion:"pre5.0"`
-	DBName             string `yaml:"db_name" env:"GROUPS_OWNCLOUDSQL_DB_NAME" desc:"Name of the owncloud database." introductionVersion:"pre5.0"`
-	IDP                string `yaml:"idp" env:"GROUPS_OWNCLOUDSQL_IDP" desc:"The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider." introductionVersion:"pre5.0"`
-	Nobody             int64  `yaml:"nobody" env:"GROUPS_OWNCLOUDSQL_NOBODY" desc:"Fallback number if no numeric UID and GID properties are provided." introductionVersion:"pre5.0"`
-	JoinUsername       bool   `yaml:"join_username" env:"GROUPS_OWNCLOUDSQL_JOIN_USERNAME" desc:"Join the user properties table to read usernames." introductionVersion:"pre5.0"`
-	JoinOwnCloudUUID   bool   `yaml:"join_owncloud_uuid" env:"GROUPS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID" desc:"Join the user properties table to read user IDs." introductionVersion:"pre5.0"`
-	EnableMedialSearch bool   `yaml:"enable_medial_search" env:"GROUPS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH" desc:"Allow 'medial search' when searching for users instead of just doing a prefix search. This allows finding 'Alice' when searching for 'lic'." introductionVersion:"pre5.0"`
 }
 
 type JSONDriver struct {

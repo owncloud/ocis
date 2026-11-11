@@ -1,5 +1,17 @@
-import { FileAction, useClientService, useConfigStore, useModals } from '@ownclouders/web-pkg'
+import {
+  FileAction,
+  renameResource,
+  useClientService,
+  useConfigStore,
+  useModals,
+  useResourcesStore
+} from '@ownclouders/web-pkg'
+import {
+  PASSWORD_PROTECTED_FOLDER_FILE_EXTENSION,
+  PASSWORD_PROTECTED_FOLDER_RENAMED_MESSAGE
+} from '@ownclouders/web-client'
 import { computed } from 'vue'
+import { dirname, join } from 'path'
 import { useGettext } from 'vue3-gettext'
 import FolderViewModal from '../components/FolderViewModal.vue'
 
@@ -8,6 +20,7 @@ export const useOpenFolderAction = () => {
   const { dispatchModal } = useModals()
   const clientService = useClientService()
   const configStore = useConfigStore()
+  const { upsertResource } = useResourcesStore()
 
   const action = computed<FileAction>(() => ({
     name: 'open-password-protected-folder',
@@ -26,7 +39,8 @@ export const useOpenFolderAction = () => {
           )
         )
       }
-      if (publicLinkUrl.origin !== new URL(configStore.serverUrl).origin) {
+      const serverOrigin = new URL(configStore.serverUrl).origin
+      if (publicLinkUrl.origin !== serverOrigin) {
         throw new Error(
           $pgettext(
             'Error shown when opening a password-protected folder fails because the stored link points to a different server.',
@@ -34,6 +48,39 @@ export const useOpenFolderAction = () => {
           )
         )
       }
+
+      // The real folder is only reachable through the public link session running inside the
+      // modal, so it may be renamed there. The `.psec` pointer file cannot be re-resolved from
+      // the folder afterwards (the two are coupled only by name), so the framed app posts the
+      // new folder name to us at rename time and we keep the `.psec` file in sync here.
+      const onFolderRenamed = async (event: MessageEvent) => {
+        if (event.origin !== serverOrigin) {
+          return
+        }
+        if (event.data?.name !== PASSWORD_PROTECTED_FOLDER_RENAMED_MESSAGE) {
+          return
+        }
+
+        const newName = event.data?.data?.newName
+        const currentName = file.name.replace(
+          new RegExp(`\\.${PASSWORD_PROTECTED_FOLDER_FILE_EXTENSION}$`),
+          ''
+        )
+        if (!newName || newName === currentName) {
+          return
+        }
+
+        const newPsecName = `${newName}.${PASSWORD_PROTECTED_FOLDER_FILE_EXTENSION}`
+        const newPsecPath = join(dirname(file.path), newPsecName)
+
+        await clientService.webdav.moveFiles(space, file, space, { path: newPsecPath })
+
+        const updatedFile = { ...file }
+        renameResource(space, updatedFile, newPsecPath)
+        upsertResource(updatedFile)
+      }
+
+      window.addEventListener('message', onFolderRenamed)
 
       dispatchModal({
         title: resources.at(0).name,
@@ -44,7 +91,10 @@ export const useOpenFolderAction = () => {
           serverUrl: configStore.serverUrl
         }),
         hideConfirmButton: true,
-        cancelText: $gettext('Close folder')
+        cancelText: $gettext('Close folder'),
+        onCancel: () => {
+          window.removeEventListener('message', onFolderRenamed)
+        }
       })
     },
     label: () => $gettext('Open folder'),

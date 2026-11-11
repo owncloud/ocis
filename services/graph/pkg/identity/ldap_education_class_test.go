@@ -50,7 +50,11 @@ func TestCreateEducationClass(t *testing.T) {
 			},
 			nil)
 
-	b, err := getMockedBackend(lm, eduConfig, &logger)
+	// useServerUUID=true keeps the read-back path (the directory assigns the ID),
+	// which is what this test asserts (Search called once, fixed entry returned).
+	c := eduConfig
+	c.UseServerUUID = true
+	b, err := getMockedBackend(lm, c, &logger)
 	assert.Nil(t, err)
 	assert.NotEqual(t, "", b.educationConfig.classObjectClass)
 	class := libregraph.NewEducationClass()
@@ -336,7 +340,7 @@ func TestLDAP_UpdateEducationClass(t *testing.T) {
 		modifyDNData modifyDNData
 		modifyData   modifyData
 		searchData   searchData
-		assertion    func(assert.TestingT, error, ...interface{}) bool
+		assertion    func(assert.TestingT, error, ...any) bool
 	}{
 		{
 			name: "Change name",
@@ -346,7 +350,7 @@ func TestLDAP_UpdateEducationClass(t *testing.T) {
 					DisplayName: &displayNameString,
 				},
 			},
-			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Nil(tt, err) },
+			assertion: func(tt assert.TestingT, err error, i ...any) bool { return assert.Nil(tt, err) },
 			modifyData: modifyData{
 				arg: &ldap.ModifyRequest{
 					DN: "ocEducationExternalId=Math0123",
@@ -380,7 +384,7 @@ func TestLDAP_UpdateEducationClass(t *testing.T) {
 					ExternalId: &externalIDs[0],
 				},
 			},
-			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Nil(tt, err) },
+			assertion: func(tt assert.TestingT, err error, i ...any) bool { return assert.Nil(tt, err) },
 			modifyData: modifyData{
 				arg: &ldap.ModifyRequest{},
 			},
@@ -409,7 +413,7 @@ func TestLDAP_UpdateEducationClass(t *testing.T) {
 					ExternalId:  &externalIDs[0],
 				},
 			},
-			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Nil(tt, err) },
+			assertion: func(tt assert.TestingT, err error, i ...any) bool { return assert.Nil(tt, err) },
 			modifyData: modifyData{
 				arg: &ldap.ModifyRequest{
 					DN: "ocEducationExternalId=Math3210,ou=groups,dc=test",
@@ -448,7 +452,7 @@ func TestLDAP_UpdateEducationClass(t *testing.T) {
 					Id: &changeString,
 				},
 			},
-			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Error(tt, err) },
+			assertion: func(tt assert.TestingT, err error, i ...any) bool { return assert.Error(tt, err) },
 			modifyData: modifyData{
 				arg: &ldap.ModifyRequest{},
 			},
@@ -471,7 +475,7 @@ func TestLDAP_UpdateEducationClass(t *testing.T) {
 					Description: &changeString,
 				},
 			},
-			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Error(tt, err) },
+			assertion: func(tt assert.TestingT, err error, i ...any) bool { return assert.Error(tt, err) },
 			modifyData: modifyData{
 				arg: &ldap.ModifyRequest{},
 			},
@@ -494,7 +498,7 @@ func TestLDAP_UpdateEducationClass(t *testing.T) {
 					Classification: &changeString,
 				},
 			},
-			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Error(tt, err) },
+			assertion: func(tt assert.TestingT, err error, i ...any) bool { return assert.Error(tt, err) },
 			modifyData: modifyData{
 				arg: &ldap.ModifyRequest{},
 			},
@@ -517,7 +521,7 @@ func TestLDAP_UpdateEducationClass(t *testing.T) {
 					Members: []libregraph.User{*libregraph.NewUser("display name", "username")},
 				},
 			},
-			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Error(tt, err) },
+			assertion: func(tt assert.TestingT, err error, i ...any) bool { return assert.Error(tt, err) },
 			modifyData: modifyData{
 				arg: &ldap.ModifyRequest{},
 			},

@@ -20,6 +20,9 @@ package store
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"os"
 	"strings"
 	"time"
 
@@ -28,6 +31,7 @@ import (
 	"github.com/go-micro/plugins/v4/store/redis"
 	redisopts "github.com/go-redis/redis/v8"
 	"github.com/nats-io/nats.go"
+	"github.com/owncloud/reva/v2/pkg/natsauth"
 	"github.com/owncloud/reva/v2/pkg/store/etcd"
 	"github.com/owncloud/reva/v2/pkg/store/memory"
 	"go-micro.dev/v4/logger"
@@ -55,6 +59,12 @@ const (
 	TypeNatsJSKV = "nats-js-kv"
 )
 
+// UsesNats returns true when a store of the given type connects to NATS.
+// Only these stores use the NATS credentials.
+func UsesNats(storeType string) bool {
+	return storeType == TypeNatsJS || storeType == TypeNatsJSKV
+}
+
 // Create initializes a new store
 func Create(opts ...microstore.Option) microstore.Store {
 	options := &microstore.Options{
@@ -65,6 +75,12 @@ func Create(opts ...microstore.Option) microstore.Store {
 	}
 
 	storeType, _ := options.Context.Value(typeContextKey{}).(string)
+
+	if tlsOpts, ok := options.Context.Value(tlsContextKey{}).(tlsOptions); ok && tlsOpts.enable &&
+		!UsesNats(storeType) {
+		logger.Logf(logger.WarnLevel,
+			"reva-store: TLS requested but store type %q does not support TLS — settings ignored", storeType)
+	}
 
 	switch storeType {
 	case TypeNoop:
@@ -174,6 +190,37 @@ func defaultNatsOptions(options *microstore.Options) nats.Options {
 		natsOptions.User = auth[0]
 		natsOptions.Password = auth[1]
 	}
+	if creds, ok := options.Context.Value(credentialsContextKey{}).(credentialsOptions); ok {
+		credsOpt, err := natsauth.CredentialsOption(creds.credsFile, creds.creds)
+		switch {
+		case err != nil && creds.creds == "":
+			// Create cannot return an error. A .creds file can appear or become
+			// valid later, for example when a secret is mounted after the start.
+			// So each connect attempt reads the file again.
+			logger.Logf(logger.ErrorLevel, "reva-store: %v", err)
+			credsOpt = natsauth.Option(creds.credsFile, "")
+		case err != nil:
+			// The content cannot change. Make each connect attempt fail with the
+			// real cause instead of an authorization error from the server.
+			logger.Logf(logger.ErrorLevel, "reva-store: %v", err)
+			credsOpt = func(o *nats.Options) error {
+				o.UserJWT = func() (string, error) { return "", err }
+				o.SignatureCB = func([]byte) ([]byte, error) { return nil, err }
+				return nil
+			}
+		}
+		if credsOpt != nil {
+			if natsOptions.User != "" || natsOptions.Password != "" {
+				logger.Logf(logger.WarnLevel, "reva-store: nats jwt credentials are configured, ignoring username and password")
+			}
+			natsOptions.User, natsOptions.Password = "", ""
+			_ = credsOpt(&natsOptions)
+		}
+	}
+	if tlsOpts, ok := options.Context.Value(tlsContextKey{}).(tlsOptions); ok && tlsOpts.enable {
+		natsOptions.TLSConfig = BuildNatsTLSConfig(tlsOpts.insecure, tlsOpts.rootCACert)
+		natsOptions.Secure = true
+	}
 	natsOptions.DisconnectedErrCB = func(_ *nats.Conn, err error) {
 		logger.Logf(logger.WarnLevel, "reva-store: nats connection disconnected: %v", err)
 	}
@@ -184,4 +231,26 @@ func defaultNatsOptions(options *microstore.Options) nats.Options {
 		logger.Logf(logger.ErrorLevel, "reva-store: nats connection closed")
 	}
 	return natsOptions
+}
+
+// BuildNatsTLSConfig constructs a tls.Config for NATS client connections.
+// insecure skips certificate verification; rootCACert is an optional path to a
+// PEM file whose CA is used to validate the server certificate.
+func BuildNatsTLSConfig(insecure bool, rootCACert string) *tls.Config {
+	tlsConf := &tls.Config{MinVersion: tls.VersionTLS12, InsecureSkipVerify: insecure} //nolint:gosec
+	if rootCACert != "" {
+		b, err := os.ReadFile(rootCACert)
+		if err != nil {
+			logger.Logf(logger.WarnLevel, "reva-store: failed to read TLS root CA cert %q: %v", rootCACert, err)
+		} else {
+			pool := x509.NewCertPool()
+			if pool.AppendCertsFromPEM(b) {
+				tlsConf.RootCAs = pool
+				tlsConf.InsecureSkipVerify = false
+			} else {
+				logger.Logf(logger.WarnLevel, "reva-store: no valid PEM certificates found in %q", rootCACert)
+			}
+		}
+	}
+	return tlsConf
 }

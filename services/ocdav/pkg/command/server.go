@@ -7,6 +7,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/broker"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/runner"
 	ohttp "github.com/owncloud/ocis/v2/ocis-pkg/service/http"
@@ -48,7 +49,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			// init reva shared config explicitly as the go-micro based ocdav does not use
 			// the reva runtime. But we need e.g. the shared client settings to be initialized
-			sc := map[string]interface{}{
+			sc := map[string]any{
 				"jwt_secret":                cfg.TokenManager.JWTSecret,
 				"gatewaysvc":                cfg.Reva.Address,
 				"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
@@ -57,13 +58,21 @@ func Server(cfg *config.Config) *cli.Command {
 			if err := sharedconf.Decode(sc); err != nil {
 				logger.Error().Err(err).Msg("error decoding shared config for ocdav")
 			}
+
+			corsAllowCredentials := cfg.HTTP.CORS.AllowCredentials
+			if corsAllowCredentials && cors.AllowsAnyOrigin(cfg.HTTP.CORS.AllowedOrigins) {
+				logger.Warn().
+					Strs("allowed_origins", cfg.HTTP.CORS.AllowedOrigins).
+					Msg("cors: refusing to allow credentials together with a wildcard origin, disabling allow_credentials")
+				corsAllowCredentials = false
+			}
 			opts := []ocdav.Option{
 				ocdav.Name(cfg.HTTP.Namespace + "." + cfg.Service.Name),
 				ocdav.Version(version.GetString()),
 				ocdav.Context(ctx),
 				ocdav.Logger(logger.Logger),
 				ocdav.Address(cfg.HTTP.Addr),
-				ocdav.AllowCredentials(cfg.HTTP.CORS.AllowCredentials),
+				ocdav.AllowCredentials(corsAllowCredentials),
 				ocdav.AllowedMethods(cfg.HTTP.CORS.AllowedMethods),
 				ocdav.AllowedHeaders(cfg.HTTP.CORS.AllowedHeaders),
 				ocdav.AllowedOrigins(cfg.HTTP.CORS.AllowedOrigins),
@@ -71,6 +80,7 @@ func Server(cfg *config.Config) *cli.Command {
 				ocdav.WebdavNamespace(cfg.WebdavNamespace),
 				ocdav.OCMNamespace(cfg.OCMNamespace),
 				ocdav.AllowDepthInfinity(cfg.AllowPropfindDepthInfinity),
+				ocdav.DisablePropfindPublicLinkResolution(cfg.DisablePropfindPublicLinkResolution),
 				ocdav.SharesNamespace(cfg.SharesNamespace),
 				ocdav.Timeout(cfg.Timeout),
 				ocdav.Insecure(cfg.Insecure),

@@ -122,7 +122,18 @@ export default class Collaborator {
       'account page'
     )
     await collaboratorInputLocator.focus()
-    await page.locator('.vs--open').waitFor()
+    try {
+      await page.locator('.vs--open').waitFor({ timeout: 10000 })
+    } catch {
+      // the a11y scan above can give the vue-select dropdown enough time to close again, and a
+      // bare focus() doesn't reliably reopen it - redo the exact fill that opened it the first
+      // time instead of guessing at a different interaction
+      await Promise.all([
+        page.waitForResponse((resp) => resp.url().includes('users') && resp.status() === 200),
+        collaboratorInputLocator.fill(fillValue)
+      ])
+      await page.locator('.vs--open').waitFor()
+    }
     await page
       .locator(util.format(Collaborator.collaboratorDropdownItem, collaborator.displayName))
       .first() // in CI, resolves to two elements

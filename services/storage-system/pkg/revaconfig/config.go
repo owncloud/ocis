@@ -7,26 +7,26 @@ import (
 )
 
 // StorageSystemFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
-func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
+func StorageSystemFromStruct(cfg *config.Config) map[string]any {
 	localEndpoint := pkgconfig.LocalEndpoint(cfg.GRPC.Protocol, cfg.GRPC.Addr)
 
-	rcfg := map[string]interface{}{
-		"shared": map[string]interface{}{
+	rcfg := map[string]any{
+		"shared": map[string]any{
 			"jwt_secret":                cfg.TokenManager.JWTSecret,
 			"gatewaysvc":                cfg.Reva.Address,
 			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 			"grpc_client_options":       cfg.Reva.GetGRPCClientConfig(),
 		},
-		"grpc": map[string]interface{}{
+		"grpc": map[string]any{
 			"network": cfg.GRPC.Protocol,
 			"address": cfg.GRPC.Addr,
-			"tls_settings": map[string]interface{}{
+			"tls_settings": map[string]any{
 				"enabled":     cfg.GRPC.TLS.Enabled,
 				"certificate": cfg.GRPC.TLS.Cert,
 				"key":         cfg.GRPC.TLS.Key,
 			},
-			"services": map[string]interface{}{
-				"gateway": map[string]interface{}{
+			"services": map[string]any{
+				"gateway": map[string]any{
 					// registries are located on the gateway
 					"authregistrysvc":    localEndpoint,
 					"storageregistrysvc": localEndpoint,
@@ -40,13 +40,13 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 					"cache_store":    "noop",
 					"cache_database": "system",
 				},
-				"userprovider": map[string]interface{}{
+				"userprovider": map[string]any{
 					"driver": "memory",
-					"drivers": map[string]interface{}{
-						"memory": map[string]interface{}{
-							"users": map[string]interface{}{
-								"serviceuser": map[string]interface{}{
-									"id": map[string]interface{}{
+					"drivers": map[string]any{
+						"memory": map[string]any{
+							"users": map[string]any{
+								"serviceuser": map[string]any{
+									"id": map[string]any{
 										"opaqueId": cfg.SystemUserID,
 										"idp":      "internal",
 										"type":     userpb.UserType_USER_TYPE_PRIMARY,
@@ -58,77 +58,77 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 						},
 					},
 				},
-				"authregistry": map[string]interface{}{
+				"authregistry": map[string]any{
 					"driver": "static",
-					"drivers": map[string]interface{}{
-						"static": map[string]interface{}{
-							"rules": map[string]interface{}{
+					"drivers": map[string]any{
+						"static": map[string]any{
+							"rules": map[string]any{
 								"machine": localEndpoint,
 							},
 						},
 					},
 				},
-				"authprovider": map[string]interface{}{
+				"authprovider": map[string]any{
 					"auth_manager": "machine",
-					"auth_managers": map[string]interface{}{
-						"machine": map[string]interface{}{
+					"auth_managers": map[string]any{
+						"machine": map[string]any{
 							"api_key":      cfg.SystemUserAPIKey,
 							"gateway_addr": localEndpoint,
 						},
 					},
 				},
-				"permissions": map[string]interface{}{
+				"permissions": map[string]any{
 					"driver": "demo",
-					"drivers": map[string]interface{}{
-						"demo": map[string]interface{}{},
+					"drivers": map[string]any{
+						"demo": map[string]any{},
 					},
 				},
-				"storageregistry": map[string]interface{}{
+				"storageregistry": map[string]any{
 					"driver": "static",
-					"drivers": map[string]interface{}{
-						"static": map[string]interface{}{
-							"rules": map[string]interface{}{
-								"/": map[string]interface{}{
+					"drivers": map[string]any{
+						"static": map[string]any{
+							"rules": map[string]any{
+								"/": map[string]any{
 									"address": localEndpoint,
 								},
 							},
 						},
 					},
 				},
-				"storageprovider": map[string]interface{}{
+				"storageprovider": map[string]any{
 					"driver":          cfg.Driver,
 					"drivers":         metadataDrivers(localEndpoint, cfg),
 					"data_server_url": cfg.DataServerURL,
 				},
 			},
-			"interceptors": map[string]interface{}{
-				"prometheus": map[string]interface{}{
+			"interceptors": map[string]any{
+				"prometheus": map[string]any{
 					"namespace": "ocis",
 					"subsystem": "storage_system",
 				},
 			},
 		},
-		"http": map[string]interface{}{
+		"http": map[string]any{
 			"network": cfg.HTTP.Protocol,
 			"address": cfg.HTTP.Addr,
 			// no datagateway needed as the metadata clients directly talk to the dataprovider with the simple protocol
-			"services": map[string]interface{}{
-				"dataprovider": map[string]interface{}{
+			"services": map[string]any{
+				"dataprovider": map[string]any{
 					"prefix":  "data",
 					"driver":  cfg.Driver,
 					"drivers": metadataDrivers(localEndpoint, cfg),
-					"data_txs": map[string]interface{}{
-						"simple": map[string]interface{}{
+					"data_txs": map[string]any{
+						"simple": map[string]any{
 							"cache_store":    "noop",
 							"cache_database": "system",
 							"cache_table":    "stat",
 						},
-						"spaces": map[string]interface{}{
+						"spaces": map[string]any{
 							"cache_store":    "noop",
 							"cache_database": "system",
 							"cache_table":    "stat",
 						},
-						"tus": map[string]interface{}{
+						"tus": map[string]any{
 							"cache_store":    "noop",
 							"cache_database": "system",
 							"cache_table":    "stat",
@@ -136,8 +136,8 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 					},
 				},
 			},
-			"middlewares": map[string]interface{}{
-				"prometheus": map[string]interface{}{
+			"middlewares": map[string]any{
+				"prometheus": map[string]any{
 					"namespace": "ocis",
 					"subsystem": "storage_system",
 				},
@@ -147,9 +147,9 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 	return rcfg
 }
 
-func metadataDrivers(localEndpoint string, cfg *config.Config) map[string]interface{} {
-	return map[string]interface{}{
-		"ocis": map[string]interface{}{
+func metadataDrivers(localEndpoint string, cfg *config.Config) map[string]any {
+	return map[string]any{
+		"ocis": map[string]any{
 			"metadata_backend":           "messagepack",
 			"root":                       cfg.Drivers.OCIS.Root,
 			"user_layout":                "{{.Id.OpaqueId}}",
@@ -159,18 +159,23 @@ func metadataDrivers(localEndpoint string, cfg *config.Config) map[string]interf
 			"max_acquire_lock_cycles":    cfg.Drivers.OCIS.MaxAcquireLockCycles,
 			"lock_cycle_duration_factor": cfg.Drivers.OCIS.LockCycleDurationFactor,
 			"disable_versioning":         true,
-			"statcache": map[string]interface{}{
+			"statcache": map[string]any{
 				"cache_store":    "noop",
 				"cache_database": "system",
 			},
-			"filemetadatacache": map[string]interface{}{
-				"cache_store":               cfg.FileMetadataCache.Store,
-				"cache_nodes":               cfg.FileMetadataCache.Nodes,
-				"cache_database":            cfg.FileMetadataCache.Database,
-				"cache_ttl":                 cfg.FileMetadataCache.TTL,
-				"cache_disable_persistence": cfg.FileMetadataCache.DisablePersistence,
-				"cache_auth_username":       cfg.FileMetadataCache.AuthUsername,
-				"cache_auth_password":       cfg.FileMetadataCache.AuthPassword,
+			"filemetadatacache": map[string]any{
+				"cache_store":                   cfg.FileMetadataCache.Store,
+				"cache_nodes":                   cfg.FileMetadataCache.Nodes,
+				"cache_database":                cfg.FileMetadataCache.Database,
+				"cache_ttl":                     cfg.FileMetadataCache.TTL,
+				"cache_disable_persistence":     cfg.FileMetadataCache.DisablePersistence,
+				"cache_auth_username":           cfg.FileMetadataCache.AuthUsername,
+				"cache_auth_password":           cfg.FileMetadataCache.AuthPassword,
+				"cache_creds_file":              cfg.FileMetadataCache.CredsFile,
+				"cache_creds":                   cfg.FileMetadataCache.Creds,
+				"cache_enable_tls":              cfg.FileMetadataCache.EnableTLS,
+				"cache_tls_insecure":            cfg.FileMetadataCache.TLSInsecure,
+				"cache_tls_root_ca_certificate": cfg.FileMetadataCache.TLSRootCACertificate,
 			},
 		},
 	}

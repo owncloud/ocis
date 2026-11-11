@@ -5,7 +5,7 @@ import { unref } from 'vue'
 import {
   defaultComponentMocks,
   RouteLocation,
-  mockAxiosResolve,
+  mockHttpResponse,
   getComposableWrapper
 } from '@ownclouders/web-test-helpers'
 
@@ -22,7 +22,7 @@ describe('resetLogo', () => {
     it('should show message on request success', () => {
       getWrapper({
         setup: async ({ actions }, { clientService, router }) => {
-          clientService.httpAuthenticated.delete.mockResolvedValue(mockAxiosResolve())
+          clientService.httpAuthenticated.delete.mockResolvedValue(mockHttpResponse())
           await unref(actions)[0].handler()
           vi.runAllTimers()
           expect(router.go).toHaveBeenCalledTimes(1)

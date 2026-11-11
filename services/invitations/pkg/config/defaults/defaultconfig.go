@@ -33,11 +33,12 @@ func DefaultConfig() *config.Config {
 			Name: "invitations",
 		},
 		Keycloak: config.Keycloak{
-			BasePath:     "",
-			ClientID:     "",
-			ClientSecret: "",
-			ClientRealm:  "",
-			UserRealm:    "",
+			BasePath:       "",
+			ClientID:       "",
+			ClientSecret:   "",
+			ClientRealm:    "",
+			UserRealm:      "",
+			ExecuteActions: []string{"UPDATE_PASSWORD", "VERIFY_EMAIL"},
 		},
 	}
 }

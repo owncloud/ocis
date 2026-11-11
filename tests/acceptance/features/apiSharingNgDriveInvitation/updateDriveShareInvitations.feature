@@ -1,3 +1,4 @@
+@env-config
 Feature: Update permission of a share
   As a user
   I want to update drive invitations
