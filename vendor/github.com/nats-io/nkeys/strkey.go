@@ -216,6 +216,19 @@ func IsValidPublicKey(src string) bool {
 	return err == nil
 }
 
+// Small-order Ed25519 encodings from libsodium 1.0.18's ge25519_has_small_order. The sign bit is
+// ignored when comparing, so these cover all eight points, including noncanonical aliases with y = p and p+1.
+// https://github.com/jedisct1/libsodium/blob/1.0.18/src/libsodium/crypto_core/ed25519/ref10/ed25519_ref10.c#L965-L1022
+var smallOrderPublicKeys = [...][32]byte{
+	{},
+	{1},
+	{38, 232, 149, 143, 194, 178, 39, 176, 69, 195, 244, 137, 242, 239, 152, 240, 213, 223, 172, 5, 211, 198, 51, 57, 177, 56, 2, 136, 109, 83, 252, 5},
+	{199, 23, 106, 112, 61, 77, 216, 79, 186, 60, 11, 118, 13, 16, 103, 15, 42, 32, 83, 250, 44, 57, 204, 198, 78, 199, 253, 119, 146, 172, 3, 122},
+	{236, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 127},
+	{237, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 127},
+	{238, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 127},
+}
+
 func decodePublicKey(public string) (PrefixByte, []byte, error) {
 	raw, err := decode([]byte(public))
 	if err != nil {
@@ -228,37 +241,46 @@ func decodePublicKey(public string) (PrefixByte, []byte, error) {
 	if len(raw[1:]) != ed25519.PublicKeySize {
 		return PrefixByteUnknown, nil, ErrInvalidPublicKey
 	}
+	if pre != PrefixByteCurve {
+		key := raw[1:]
+		for i := range smallOrderPublicKeys {
+			bad := &smallOrderPublicKeys[i]
+			if key[31]&127 == bad[31] && bytes.Equal(key[:31], bad[:31]) {
+				return PrefixByteUnknown, nil, ErrInvalidPublicKey
+			}
+		}
+	}
 	return pre, raw[1:], nil
 }
 
 // IsValidPublicUserKey will decode and verify the string is a valid encoded Public User Key.
 func IsValidPublicUserKey(src string) bool {
-	_, err := Decode(PrefixByteUser, []byte(src))
-	return err == nil
+	return isValidPublicKey(src, PrefixByteUser)
 }
 
 // IsValidPublicAccountKey will decode and verify the string is a valid encoded Public Account Key.
 func IsValidPublicAccountKey(src string) bool {
-	_, err := Decode(PrefixByteAccount, []byte(src))
-	return err == nil
+	return isValidPublicKey(src, PrefixByteAccount)
 }
 
 // IsValidPublicServerKey will decode and verify the string is a valid encoded Public Server Key.
 func IsValidPublicServerKey(src string) bool {
-	_, err := Decode(PrefixByteServer, []byte(src))
-	return err == nil
+	return isValidPublicKey(src, PrefixByteServer)
 }
 
 // IsValidPublicClusterKey will decode and verify the string is a valid encoded Public Cluster Key.
 func IsValidPublicClusterKey(src string) bool {
-	_, err := Decode(PrefixByteCluster, []byte(src))
-	return err == nil
+	return isValidPublicKey(src, PrefixByteCluster)
 }
 
 // IsValidPublicOperatorKey will decode and verify the string is a valid encoded Public Operator Key.
 func IsValidPublicOperatorKey(src string) bool {
-	_, err := Decode(PrefixByteOperator, []byte(src))
-	return err == nil
+	return isValidPublicKey(src, PrefixByteOperator)
+}
+
+func isValidPublicKey(src string, expected PrefixByte) bool {
+	prefix, _, err := decodePublicKey(src)
+	return err == nil && prefix == expected
 }
 
 // IsValidPublicCurveKey will decode and verify the string is a valid encoded Public Curve Key.
