@@ -1023,7 +1023,7 @@ var _ = Describe("Notifications grouped send", func() {
 			expectedHTMLBody:    buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`executant has shared "secrets of the board" with you.`}),
 			done:                make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.ShareCreated{}).String(),
+			Type: reflect.TypeFor[events.ShareCreated]().String(),
 			Event: events.ShareCreated{
 				Sharer:        executant.GetId(),
 				GranteeUserID: receiver.GetId(),
@@ -1042,7 +1042,7 @@ Even though this share has been revoked you still might have access through othe
 			expectedHTMLBody: buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`Your share to secrets of the board has expired at 2023-04-17 16:42:00<br><br>Even though this share has been revoked you still might have access through other shares and/or space memberships.`}),
 			done:             make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.ShareExpired{}).String(),
+			Type: reflect.TypeFor[events.ShareExpired]().String(),
 			Event: events.ShareExpired{
 				ShareOwner:     executant.GetId(),
 				GranteeGroupID: &group.GroupId{},
@@ -1061,7 +1061,7 @@ Even though this share has been revoked you still might have access through othe
 			expectedHTMLBody: buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`executant has unshared 'secrets of the board' with you.<br><br>Even though this share has been revoked you still might have access through other shares and/or space memberships.`}),
 			done:             make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.ShareRemoved{}).String(),
+			Type: reflect.TypeFor[events.ShareRemoved]().String(),
 			Event: events.ShareRemoved{
 				Executant:      executant.GetId(),
 				GranteeGroupID: &group.GroupId{},
@@ -1077,7 +1077,7 @@ Even though this share has been revoked you still might have access through othe
 			expectedHTMLBody:    buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`executant has invited you to join "secret space".`}),
 			done:                make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.SpaceShared{}).String(),
+			Type: reflect.TypeFor[events.SpaceShared]().String(),
 			Event: events.SpaceShared{
 				Executant:      executant.GetId(),
 				Creator:        executant.GetId(),
@@ -1096,7 +1096,7 @@ You might still have access through your other groups or direct membership.`}),
 			expectedHTMLBody: buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`executant has removed you from "secret space".<br><br>You might still have access through your other groups or direct membership.`}),
 			done:             make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.SpaceUnshared{}).String(),
+			Type: reflect.TypeFor[events.SpaceUnshared]().String(),
 			Event: events.SpaceUnshared{
 				Executant:      executant.GetId(),
 				GranteeGroupID: &group.GroupId{},
@@ -1114,7 +1114,7 @@ Even though this membership has expired you still might have access through othe
 			expectedHTMLBody: buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`Your membership of space secret space has expired at 2023-04-17 16:42:00<br><br>Even though this membership has expired you still might have access through other shares and/or space memberships`}),
 			done:             make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.SpaceMembershipExpired{}).String(),
+			Type: reflect.TypeFor[events.SpaceMembershipExpired]().String(),
 			Event: events.SpaceMembershipExpired{
 				SpaceOwner:     executant.GetId(),
 				GranteeGroupID: &group.GroupId{},
@@ -1138,7 +1138,7 @@ Even though this membership has expired you still might have access through othe
 			done:             make(chan struct{}),
 		}, []events.Event{
 			{
-				Type: reflect.TypeOf(events.ShareCreated{}).String(),
+				Type: reflect.TypeFor[events.ShareCreated]().String(),
 				Event: events.ShareCreated{
 					Sharer:        executant.GetId(),
 					GranteeUserID: receiver.GetId(),
@@ -1147,7 +1147,7 @@ Even though this membership has expired you still might have access through othe
 				},
 			},
 			{
-				Type: reflect.TypeOf(events.SpaceMembershipExpired{}).String(),
+				Type: reflect.TypeFor[events.SpaceMembershipExpired]().String(),
 				Event: events.SpaceMembershipExpired{
 					SpaceOwner:     executant.GetId(),
 					GranteeGroupID: &group.GroupId{},
@@ -1167,7 +1167,7 @@ Even though this membership has expired you still might have access through othe
 			expectedHTMLBody:    buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`executant has shared "secrets of the board" with you.`}),
 			done:                make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.ShareCreated{}).String(),
+			Type: reflect.TypeFor[events.ShareCreated]().String(),
 			Event: events.ShareCreated{
 				Sharer:        executant.GetId(),
 				GranteeUserID: receiver.GetId(),
@@ -1186,7 +1186,7 @@ Even though this share has been revoked you still might have access through othe
 			expectedHTMLBody: buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`Your share to secrets of the board has expired at 2023-04-17 16:42:00<br><br>Even though this share has been revoked you still might have access through other shares and/or space memberships.`}),
 			done:             make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.ShareExpired{}).String(),
+			Type: reflect.TypeFor[events.ShareExpired]().String(),
 			Event: events.ShareExpired{
 				ShareOwner:     executant.GetId(),
 				GranteeGroupID: &group.GroupId{},
@@ -1205,7 +1205,7 @@ Even though this share has been revoked you still might have access through othe
 			expectedHTMLBody: buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`executant has unshared 'secrets of the board' with you.<br><br>Even though this share has been revoked you still might have access through other shares and/or space memberships.`}),
 			done:             make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.ShareRemoved{}).String(),
+			Type: reflect.TypeFor[events.ShareRemoved]().String(),
 			Event: events.ShareRemoved{
 				Executant:      executant.GetId(),
 				GranteeGroupID: &group.GroupId{},
@@ -1221,7 +1221,7 @@ Even though this share has been revoked you still might have access through othe
 			expectedHTMLBody:    buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`executant has invited you to join "secret space".`}),
 			done:                make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.SpaceShared{}).String(),
+			Type: reflect.TypeFor[events.SpaceShared]().String(),
 			Event: events.SpaceShared{
 				Executant:      executant.GetId(),
 				Creator:        executant.GetId(),
@@ -1240,7 +1240,7 @@ You might still have access through your other groups or direct membership.`}),
 			expectedHTMLBody: buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`executant has removed you from "secret space".<br><br>You might still have access through your other groups or direct membership.`}),
 			done:             make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.SpaceUnshared{}).String(),
+			Type: reflect.TypeFor[events.SpaceUnshared]().String(),
 			Event: events.SpaceUnshared{
 				Executant:      executant.GetId(),
 				GranteeGroupID: &group.GroupId{},
@@ -1258,7 +1258,7 @@ Even though this membership has expired you still might have access through othe
 			expectedHTMLBody: buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`Your membership of space secret space has expired at 2023-04-17 16:42:00<br><br>Even though this membership has expired you still might have access through other shares and/or space memberships`}),
 			done:             make(chan struct{}),
 		}, []events.Event{{
-			Type: reflect.TypeOf(events.SpaceMembershipExpired{}).String(),
+			Type: reflect.TypeFor[events.SpaceMembershipExpired]().String(),
 			Event: events.SpaceMembershipExpired{
 				SpaceOwner:     executant.GetId(),
 				GranteeGroupID: &group.GroupId{},
@@ -1282,7 +1282,7 @@ Even though this membership has expired you still might have access through othe
 			done:             make(chan struct{}),
 		}, []events.Event{
 			{
-				Type: reflect.TypeOf(events.ShareCreated{}).String(),
+				Type: reflect.TypeFor[events.ShareCreated]().String(),
 				Event: events.ShareCreated{
 					Sharer:        executant.GetId(),
 					GranteeUserID: receiver.GetId(),
@@ -1291,7 +1291,7 @@ Even though this membership has expired you still might have access through othe
 				},
 			},
 			{
-				Type: reflect.TypeOf(events.SpaceMembershipExpired{}).String(),
+				Type: reflect.TypeFor[events.SpaceMembershipExpired]().String(),
 				Event: events.SpaceMembershipExpired{
 					SpaceOwner:     executant.GetId(),
 					GranteeGroupID: &group.GroupId{},
