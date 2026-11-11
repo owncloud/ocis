@@ -13,7 +13,7 @@
     "@codemirror/state": "^6.5.2",
     "@codemirror/view": "^6.38.2",
     "dompurify": "^3.4.17",
-    "mermaid": "^11.12.2"
+    "mermaid": "^12.3.0"
   },
   "devDependencies": {
     "@ownclouders/web-test-helpers": "workspace:*"
