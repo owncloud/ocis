@@ -143,7 +143,7 @@
   "dependencies": {
     "@chevrotain/regexp-to-ast": "^11.2.0",
     "crelt": "^1.0.6",
-    "mermaid": "^11.16.1",
+    "mermaid": "^12.3.0",
     "vscode-jsonrpc": "^8.2.1",
     "vscode-languageserver-types": "^3.17.5"
   }
