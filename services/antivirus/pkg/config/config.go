@@ -72,7 +72,8 @@ type Scanner struct {
 
 // ClamAV provides configuration option for clamav
 type ClamAV struct {
-	Socket string `yaml:"socket" env:"ANTIVIRUS_CLAMAV_SOCKET" desc:"The socket clamav is running on. Note the default value is an example which needs adaption according your OS." introductionVersion:"pre5.0"`
+	Socket  string        `yaml:"socket" env:"ANTIVIRUS_CLAMAV_SOCKET" desc:"The socket clamav is running on. Note the default value is an example which needs adaption according your OS." introductionVersion:"pre5.0"`
+	Timeout time.Duration `yaml:"scan_timeout" env:"ANTIVIRUS_CLAMAV_SCAN_TIMEOUT" desc:"Scan timeout for the ClamAV client. Defaults to '5m' (5 minutes). After the timeout, the scan attempt fails and postprocessing retries it with backoff. See the Environment Variable Types description for more details." introductionVersion:"9.0.0"`
 }
 
 // ICAP provides configuration options for icap
