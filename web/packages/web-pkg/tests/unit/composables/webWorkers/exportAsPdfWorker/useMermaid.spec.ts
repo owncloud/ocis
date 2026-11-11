@@ -108,6 +108,30 @@ A --> B
       })
     })
 
+    it('should render the chart in a container with an explicit text color', async () => {
+      await new Promise<void>((resolve, reject) => {
+        getWrapper({
+          setup: async ({ preprocessMermaidCharts }) => {
+            const content = '```mermaid\ngraph TD\nA --> B\n```'
+            let colorWhenCaptured: string
+            vi.mocked(html2canvas).mockImplementation((element: HTMLElement) => {
+              colorWhenCaptured = element.style.color
+              return Promise.resolve(mock<HTMLCanvasElement>(mockCanvas))
+            })
+
+            try {
+              await preprocessMermaidCharts(content)
+
+              expect(colorWhenCaptured).toBe('rgb(0, 0, 0)')
+              resolve()
+            } catch (error) {
+              reject(error)
+            }
+          }
+        })
+      })
+    })
+
     it('should handle multiple Mermaid charts in the same content', async () => {
       await new Promise<void>((resolve, reject) => {
         getWrapper({
