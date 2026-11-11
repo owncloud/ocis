@@ -152,7 +152,7 @@ func AutoAcceptShares(baseCtx context.Context, ev events.ShareCreated, autoAccep
 	}()
 
 	wg := sync.WaitGroup{}
-	for i := 0; i < maxConcurrency; i++ {
+	for range maxConcurrency {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

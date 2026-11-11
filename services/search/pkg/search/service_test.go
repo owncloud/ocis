@@ -236,7 +236,7 @@ var _ = Describe("Searchprovider", func() {
 				Mtime: &typesv1beta1.Timestamp{Seconds: 5000},
 			}
 			dirInfos := make([]*sprovider.ResourceInfo, numDirs)
-			for i := 0; i < numDirs; i++ {
+			for i := range numDirs {
 				dirInfos[i] = &sprovider.ResourceInfo{
 					Id:    &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: fmt.Sprintf("dir-%d", i)},
 					Type:  sprovider.ResourceType_RESOURCE_TYPE_CONTAINER,
@@ -247,7 +247,7 @@ var _ = Describe("Searchprovider", func() {
 
 			// Pre-build file infos for each directory (map for O(1) dispatch).
 			fileInfoByDir := make(map[string]*sprovider.ResourceInfo, numDirs)
-			for i := 0; i < numDirs; i++ {
+			for i := range numDirs {
 				dirID := fmt.Sprintf("dir-%d", i)
 				fileInfoByDir[dirID] = &sprovider.ResourceInfo{
 					Id:       &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: fmt.Sprintf("file-%d", i)},
@@ -327,7 +327,7 @@ var _ = Describe("Searchprovider", func() {
 			// Use a map for O(1) lookup instead of linear scan (matters at 10k dirs).
 			indexedIDs := make(map[string]bool, numDirs+1)
 			indexedIDs["storageid$spaceid!spaceid"] = true
-			for i := 0; i < numDirs; i++ {
+			for i := range numDirs {
 				indexedIDs[fmt.Sprintf("storageid$spaceid!dir-%d", i)] = true
 			}
 			indexedResource := &engine.Resource{Document: content.Document{Mtime: indexedMtime}, Extracted: true}

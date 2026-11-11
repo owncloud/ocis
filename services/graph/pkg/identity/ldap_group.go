@@ -371,7 +371,7 @@ func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs 
 		// might have done that in parallel. In that case
 		// (LDAPResultNoSuchAttribute) we need to retry the modification
 		// without to delete.
-		for j := 0; j < 2; j++ {
+		for range 2 {
 			mr.Add(i.groupAttributeMap.member, newMemberDN)
 			if err := i.conn.Modify(&mr); err != nil {
 				if lerr, ok := err.(*ldap.Error); ok {

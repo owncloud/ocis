@@ -151,7 +151,7 @@ func initialize(numNodes int, numRevisions int) string {
 		os.Exit(1)
 	}
 
-	for i := 0; i < numNodes; i++ {
+	for range numNodes {
 		path := lookup.Pathify(uuid.New().String(), 4, 2)
 		dir := filepath.Dir(path)
 		if err := os.MkdirAll(base+_basePath+dir, fs.ModePerm); err != nil {
@@ -165,7 +165,7 @@ func initialize(numNodes int, numRevisions int) string {
 			os.RemoveAll(base)
 			os.Exit(1)
 		}
-		for i := 0; i < numRevisions; i++ {
+		for i := range numRevisions {
 			os.Create(base + _basePath + path + ".REV.2024-05-22T07:32:53.89969" + strconv.Itoa(i) + "Z")
 		}
 	}

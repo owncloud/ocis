@@ -318,7 +318,7 @@ func BenchmarkSyscallsCommand(cfg *config.Config) *cli.Command {
 func benchmark(iterations int, path string) error {
 	tests := map[string]func() error{
 		"lockedfile open(wo,c,t) close": func() error {
-			for i := 0; i < iterations; i++ {
+			for range iterations {
 				lockedFile, err := lockedfile.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0600)
 				if err != nil {
 					return err
@@ -328,7 +328,7 @@ func benchmark(iterations int, path string) error {
 			return nil
 		},
 		"stat": func() error {
-			for i := 0; i < iterations; i++ {
+			for range iterations {
 				_, err := os.Stat(path)
 				if err != nil {
 					return err
@@ -337,7 +337,7 @@ func benchmark(iterations int, path string) error {
 			return nil
 		},
 		"fopen(ro) close": func() error {
-			for i := 0; i < iterations; i++ {
+			for range iterations {
 				h, err := os.OpenFile(path, os.O_RDONLY, 0600)
 				if err != nil {
 					return err
@@ -347,7 +347,7 @@ func benchmark(iterations int, path string) error {
 			return nil
 		},
 		"fopen(wo,t) write close": func() error {
-			for i := 0; i < iterations; i++ {
+			for range iterations {
 				h, err := os.OpenFile(path, os.O_TRUNC|os.O_WRONLY, 0600)
 				if err != nil {
 					return err
@@ -362,7 +362,7 @@ func benchmark(iterations int, path string) error {
 			return nil
 		},
 		"fopen(ro) read close": func() error {
-			for i := 0; i < iterations; i++ {
+			for range iterations {
 				bytes := make([]byte, 0, 10)
 				h, err := os.OpenFile(path, os.O_RDONLY, 0600)
 				if err != nil {
@@ -378,7 +378,7 @@ func benchmark(iterations int, path string) error {
 			return nil
 		},
 		"xattr-set": func() error {
-			for i := 0; i < iterations; i++ {
+			for range iterations {
 				err := xattr.Set(path, "user.test", []byte("123456"))
 				if err != nil {
 					return err
@@ -387,7 +387,7 @@ func benchmark(iterations int, path string) error {
 			return nil
 		},
 		"xattr-get": func() error {
-			for i := 0; i < iterations; i++ {
+			for range iterations {
 				_, err := xattr.Get(path, "user.test")
 				if err != nil {
 					return err
