@@ -257,14 +257,18 @@ func Unmarshal(principal string, v []byte) (e *ACE, err error) {
 		if e, err = unmarshalKV(s); err != nil {
 			return nil, err
 		}
+		// the principal must have the form "<type>:<id>"
+		if len(principal) < 2 || principal[1] != ':' {
+			return nil, fmt.Errorf("invalid ace principal %q", principal)
+		}
 		e.principal = principal
 		// check consistency of Flags and principal type
 		if strings.Contains(e.flags, "g") {
-			if principal[:1] != "g" {
+			if principal[0] != 'g' {
 				return nil, fmt.Errorf("inconsistent ace: expected group")
 			}
 		} else {
-			if principal[:1] != "u" {
+			if principal[0] != 'u' {
 				return nil, fmt.Errorf("inconsistent ace: expected user")
 			}
 		}
@@ -407,32 +411,39 @@ func unmarshalKV(s string) (*ACE, error) {
 		return nil, fmt.Errorf("more than one row of ace kvs")
 	}
 	for i := range records[0] {
-		kv := strings.Split(records[0][i], "=")
-		switch kv[0] {
+		if records[0][i] == "" {
+			// the old parser also ignored empty fields
+			continue
+		}
+		key, value, ok := strings.Cut(records[0][i], "=")
+		if !ok {
+			return nil, fmt.Errorf("invalid ace key value pair %q", records[0][i])
+		}
+		switch key {
 		case "t":
-			e._type = kv[1]
+			e._type = value
 		case "f":
-			e.flags = kv[1]
+			e.flags = value
 		case "p":
-			e.permissions = kv[1]
+			e.permissions = value
 		case "s":
-			v, err := strconv.Atoi(kv[1])
+			v, err := strconv.Atoi(value)
 			if err != nil {
 				return nil, err
 			}
 			e.shareTime = v
 		case "c":
-			e.creator = kv[1]
+			e.creator = value
 		case "e":
-			v, err := strconv.ParseInt(kv[1], 10, 64)
+			v, err := strconv.ParseInt(value, 10, 64)
 			if err != nil {
 				return nil, err
 			}
 			e.expires = v
 		case "w":
-			e.password = kv[1]
+			e.password = value
 		case "l":
-			e.label = kv[1]
+			e.label = value
 			// TODO default ... log unknown keys? or add as opaque? hm we need that for tagged shares ...
 		}
 	}
