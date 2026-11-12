@@ -45,7 +45,8 @@ const configureMermaid = () => {
   mermaid.initialize({
     startOnLoad: false,
     securityLevel: 'strict',
-    theme: isDark() ? 'dark' : 'default'
+    theme: isDark() ? 'dark' : 'default',
+    layout: 'dagre'
   })
 }
 

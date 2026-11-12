@@ -9,6 +9,7 @@
       read-only
       :toolbars="[]"
       :sanitize="sanitize"
+      no-echarts
     />
     <md-editor
       v-else
@@ -23,6 +24,7 @@
       :auto-focus="autoFocus"
       :sanitize="sanitize"
       :toolbars-exclude="['save', 'github']"
+      no-echarts
       @on-change="(value) => $emit('update:currentContent', value)"
       @on-upload-img="onUploadImg"
     >
@@ -352,14 +354,10 @@ config({
     // (composition.ts: noCropperScript) — this stub keeps that request from being made.
     cropper: {
       instance: class {} as never
-    },
-    // The toolbar has no chart-insertion entry and no echarts dependency is installed;
-    // md-editor-v3 still CDN-injects echarts from unpkg unless an instance is registered,
-    // so this stub keeps that request from being made (same approach as cropper above).
-    echarts: {
-      instance: class {} as never
     }
   },
+  // mermaid 12 lays out diagrams with ELK by default, keep the dagre layout used so far
+  mermaidConfig: (base) => ({ ...base, layout: 'dagre' }),
   markdownItConfig(md) {
     md.renderer.rules.link_open = function (tokens, idx, options, _, self) {
       const token = tokens[idx]

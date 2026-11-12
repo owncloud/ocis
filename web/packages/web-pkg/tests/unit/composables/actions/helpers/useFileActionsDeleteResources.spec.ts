@@ -4,6 +4,7 @@ import { FolderResource, Resource, SpaceResource, TrashResource } from '@ownclou
 import {
   defaultComponentMocks,
   getComposableWrapper,
+  RouteLocation,
   useGetMatchingSpaceMock
 } from '../../../../../src/testing'
 import { useDeleteWorker } from '../../../../../src/composables/webWorkers/deleteWorker'
@@ -137,6 +138,45 @@ describe('deleteResources', () => {
       })
     })
 
+    it('updates the size of the project space after deleting from its root', async () => {
+      const projectSpace = {
+        id: 'project-1',
+        driveType: 'project',
+        size: 104947000,
+        spaceQuota: { used: 104947000 }
+      } as unknown as SpaceResource
+      const deletedFile = mock<Resource>({
+        id: '2',
+        name: 'big.bin',
+        path: '/big.bin',
+        storageId: projectSpace.id,
+        spaceId: projectSpace.id
+      })
+      const updatedDrive = mock<SpaceResource>({
+        id: projectSpace.id,
+        size: 47000,
+        spaceQuota: { used: 47000 }
+      })
+
+      const { getWorkerCallbackDone } = getWrapper({
+        currentFolder: { id: projectSpace.id, path: '/', spaceId: projectSpace.id },
+        currentRouteName: 'files-spaces-generic',
+        spaceDriveType: 'project',
+        result: [deletedFile],
+        getDriveResult: updatedDrive,
+        stubActions: false,
+        setup: ({ filesList_delete }) => {
+          useSpacesStore().addSpaces([projectSpace])
+          filesList_delete([deletedFile])
+        }
+      })
+      await getWorkerCallbackDone()
+
+      const space = useSpacesStore().spaces.find(({ id }) => id === projectSpace.id)
+      expect(space.size).toBe(47000)
+      expect(space.spaceQuota).toEqual(updatedDrive.spaceQuota)
+    })
+
     describe('undo action on the success message', () => {
       const deletedFile = mock<Resource>({
         id: '2',
@@ -247,7 +287,10 @@ function getWrapper({
   getFileInfoResult,
   listFilesResult = { resource: mock<Resource>(), children: [] },
   spaceDriveType = 'personal',
-  canRestoreFromTrashbin = true
+  canRestoreFromTrashbin = true,
+  currentRouteName = undefined,
+  getDriveResult = undefined,
+  stubActions = true
 }: {
   currentFolder: FolderResource
   setup: (
@@ -265,9 +308,14 @@ function getWrapper({
   listFilesResult?: { resource: Resource; children: Resource[] }
   spaceDriveType?: string
   canRestoreFromTrashbin?: boolean
+  currentRouteName?: string
+  getDriveResult?: SpaceResource
+  stubActions?: boolean
 }) {
   const mocks = {
-    ...defaultComponentMocks(),
+    ...defaultComponentMocks({
+      ...(currentRouteName && { currentRoute: mock<RouteLocation>({ name: currentRouteName }) })
+    }),
     space: mockDeep<SpaceResource>({
       id: 'personal',
       driveType: spaceDriveType,
@@ -275,6 +323,7 @@ function getWrapper({
     })
   }
   mocks.$clientService.webdav.deleteFile.mockResolvedValue(undefined)
+  mocks.$clientService.graphAuthenticated.drives.getDrive.mockResolvedValue(getDriveResult)
   mocks.$clientService.webdav.getFileInfo.mockResolvedValue(getFileInfoResult)
   mocks.$clientService.webdav.listFiles.mockImplementation((_, __, opts) => {
     if (opts?.isTrash) {
@@ -314,7 +363,7 @@ function getWrapper({
       {
         mocks,
         provide: mocks,
-        pluginOptions: { piniaOptions: { resourcesStore: { currentFolder } } }
+        pluginOptions: { piniaOptions: { stubActions, resourcesStore: { currentFolder } } }
       }
     )
   }

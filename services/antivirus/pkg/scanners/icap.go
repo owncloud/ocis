@@ -2,6 +2,7 @@ package scanners
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -29,20 +30,30 @@ func NewICAP(icapURL string, icapService string, timeout time.Duration) (ICAP, e
 	endpoint.Scheme = "icap"
 	endpoint.Path = icapService
 
-	client, err := ic.NewClient(
-		ic.WithICAPConnectionTimeout(timeout),
-	)
-	if err != nil {
-		return ICAP{}, err
+	// the icap client keeps a single connection which must not be shared between
+	// concurrent scans, so every scan gets its own client.
+	newClient := func() (Scanner, error) {
+		client, err := ic.NewClient(
+			ic.WithICAPConnectionTimeout(timeout),
+		)
+		if err != nil {
+			return nil, err
+		}
+		return &client, nil
 	}
 
-	return ICAP{Client: &client, URL: endpoint.String()}, nil
+	return ICAP{NewClient: newClient, URL: endpoint.String()}, nil
 }
+
+// ClientFactory returns the client used for a single scan.
+// Scan is called concurrently, so implementations must not hand out a client
+// which is still in use by another scan.
+type ClientFactory func() (Scanner, error)
 
 // ICAP is responsible for scanning files using an ICAP server
 type ICAP struct {
-	Client Scanner
-	URL    string
+	NewClient ClientFactory
+	URL       string
 }
 
 // Scan scans a file using the ICAP server
@@ -50,12 +61,21 @@ func (s ICAP) Scan(in Input) (Result, error) {
 	ctx := context.TODO()
 	result := Result{}
 
+	if s.NewClient == nil {
+		return result, errors.New("icap: no client factory configured")
+	}
+
+	client, err := s.NewClient()
+	if err != nil {
+		return result, err
+	}
+
 	optReq, err := ic.NewRequest(ctx, ic.MethodOPTIONS, s.URL, nil, nil)
 	if err != nil {
 		return result, err
 	}
 
-	optRes, err := s.Client.Do(optReq)
+	optRes, err := client.Do(optReq)
 	if err != nil {
 		return result, err
 	}
@@ -82,7 +102,7 @@ func (s ICAP) Scan(in Input) (Result, error) {
 		}
 	}
 
-	res, err := s.Client.Do(req)
+	res, err := client.Do(req)
 	if err != nil {
 		return result, err
 	}

@@ -185,11 +185,7 @@ export const useFileActionsRestore = () => {
         // Reload quota
         const graphClient = clientService.graphAuthenticated
         const updatedSpace = await graphClient.drives.getDrive(space.id, sharesStore.graphRoles)
-        spacesStore.updateSpaceField({
-          id: updatedSpace.id,
-          field: 'spaceQuota',
-          value: updatedSpace.spaceQuota
-        })
+        spacesStore.updateSpaceUsage(updatedSpace)
       }
 
       if (failed.length) {
