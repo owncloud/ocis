@@ -377,7 +377,9 @@ jobs:
   e2e-tests:
     name: e2e-${{ matrix.suite }}
     needs: [build-and-test]
-    runs-on: ubuntu-latest
+    # pinned: Playwright 1.56.1 doesn't support ubuntu-latest's ubuntu-26.04 image yet
+    # https://github.com/microsoft/playwright/issues/40117
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
