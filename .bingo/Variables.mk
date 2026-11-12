@@ -1,29 +1,15 @@
 # Auto generated binary variables helper managed by https://github.com/bwplotka/bingo v0.10. DO NOT EDIT.
 # All tools are designed to be build inside $GOBIN.
 BINGO_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
-# Expand each $(shell ...) value one time only. A "?=" variable runs its $(shell ...)
-# again on each use. With GNU Make 4.4, $(shell ...) also gets the exported variables,
-# and these values then run the commands again and again. A value from the environment
-# or from the command line still has precedence.
-ifeq ($(origin GOPATH),undefined)
-GOPATH := $(shell go env GOPATH)
-endif
+GOPATH ?= $(shell go env GOPATH)
 GOBIN  ?= $(firstword $(subst :, ,${GOPATH}))/bin
-ifeq ($(origin GO),undefined)
-GO     := $(shell which go)
-endif
+GO     ?= $(shell which go)
 
 # Ensure bingo-managed tools are always built for the host platform,
 # even when GOOS/GOARCH are set for cross-compilation of other targets.
-ifeq ($(origin GOHOSTOS),undefined)
-GOHOSTOS     := $(shell $(GO) env GOHOSTOS)
-endif
-ifeq ($(origin GOHOSTARCH),undefined)
-GOHOSTARCH   := $(shell $(GO) env GOHOSTARCH)
-endif
-ifeq ($(origin GOHOSTARM),undefined)
-GOHOSTARM    := $(shell $(GO) env GOHOSTARM)
-endif
+GOHOSTOS     ?= $(shell $(GO) env GOHOSTOS)
+GOHOSTARCH   ?= $(shell $(GO) env GOHOSTARCH)
+GOHOSTARM    ?= $(shell $(GO) env GOHOSTARM)
 
 # Below generated variables ensure that every time a tool under each variable is invoked, the correct version
 # will be used; reinstalling only if needed.
