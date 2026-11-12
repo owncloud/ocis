@@ -44,7 +44,7 @@ export class ResourceTransfer extends ConflictDialog {
   }
 
   showResultMessage(
-    errors: { resourceName: string; isFolder?: boolean; error: Error }[],
+    errors: { resourceName: string; incomplete?: boolean; error: Error }[],
     movedResources: Array<Resource>,
     transferType: TransferType
   ) {
@@ -85,7 +85,7 @@ export class ResourceTransfer extends ConflictDialog {
   }
 
   private getFailureTitle(
-    errors: { resourceName: string; isFolder?: boolean; error: Error }[],
+    errors: { resourceName: string; incomplete?: boolean; error: Error }[],
     transferType: TransferType
   ): string {
     const errorCount = errors.length
@@ -99,9 +99,8 @@ export class ResourceTransfer extends ConflictDialog {
           params
         )
       case TransferType.DUPLICATE:
-        // a folder copy that is cut off (e.g. by a timeout) leaves the part copied so far
-        // behind, a file copy leaves nothing
-        if (errors.every(({ isFolder, error }) => isFolder && this.endedWithoutAnswer(error))) {
+        // the duplicated folders exist, but some of their content is missing
+        if (errors.every(({ incomplete }) => incomplete)) {
           return this.$ngettext(
             'Duplication of "%{name}" incomplete',
             'Duplication of %{count} resources incomplete',
@@ -123,11 +122,6 @@ export class ResourceTransfer extends ConflictDialog {
           params
         )
     }
-  }
-
-  /** The request ended without any answer from the server, so there is no status code. */
-  private endedWithoutAnswer(error: Error): boolean {
-    return error instanceof HttpError && !error.statusCode
   }
 
   private getInsufficientQuotaDescription(transferType: TransferType): string {
