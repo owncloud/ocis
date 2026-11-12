@@ -108,7 +108,9 @@ jobs:
   local-api-tests:
     name: ${{ matrix.suite }}
     needs: [build-and-test]
-    runs-on: ubuntu-latest
+    # pinned: libcurl 8.12.0 in /opt/libcurl breaks the system curl 8.18.0 of ubuntu-latest's ubuntu-26.04 image
+    # ("undefined symbol: curl_multi_notify_enable")
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -289,7 +291,9 @@ jobs:
   core-api-tests:
     name: ${{ matrix.suite }}
     needs: [build-and-test]
-    runs-on: ubuntu-latest
+    # pinned: libcurl 8.12.0 in /opt/libcurl breaks the system curl 8.18.0 of ubuntu-latest's ubuntu-26.04 image
+    # ("undefined symbol: curl_multi_notify_enable")
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -377,7 +381,9 @@ jobs:
   e2e-tests:
     name: e2e-${{ matrix.suite }}
     needs: [build-and-test]
-    runs-on: ubuntu-latest
+    # pinned: Playwright 1.56.1 doesn't support ubuntu-latest's ubuntu-26.04 image yet
+    # https://github.com/microsoft/playwright/issues/40117
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
