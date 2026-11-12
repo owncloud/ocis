@@ -1,0 +1,28 @@
+# Snyk (https://snyk.io) policy file
+#
+# exclude.code applies to Snyk Code (static analysis) only. It takes test code and
+# test tooling out of the analysis. None of these files is compiled into the ocis
+# binary or built into the web bundle; their findings are fixture values such as
+# test passwords, test tokens and test keys.
+#
+# vendor/ and product code are not excluded on purpose. Findings there are reviewed
+# one by one and ignored through the Snyk ignore approval workflow.
+# Snyk Open Source is not affected by this block.
+#
+# Snyk matches a directory name at any depth, so "tests/**" may already cover the
+# two web entries. They are listed so the intent is explicit.
+version: v1.25.0
+ignore: {}
+patch: {}
+exclude:
+  code:
+    # Go unit tests, compiled only by "go test"
+    - "**/*_test.go"
+    # Acceptance tests, test runners and test helper programs
+    - tests/**
+    # Web end-to-end tests and shared test setup
+    - web/tests/**
+    # Unit tests, mocks and fixtures of each web package
+    - web/packages/*/tests/**
+    # CI helper that reports flaky tests
+    - tools/ci-reporter/**
