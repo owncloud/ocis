@@ -1,4 +1,4 @@
-Enhancement: Add a command to remove the trash bin access from existing space viewers
+Enhancement: Add a command to remove trash access from existing space viewers
 
 The "Can view" space role no longer allows listing the trash bin of the space.
 The permissions of a space member are stored when the member is added, so

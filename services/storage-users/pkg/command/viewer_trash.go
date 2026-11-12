@@ -21,14 +21,15 @@ import (
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"github.com/urfave/cli/v2"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/proto"
 )
 
+type viewerTrashResult string
+
 const (
-	_viewerTrashWouldFix = "would fix"
-	_viewerTrashFixed    = "fixed"
-	_viewerTrashFailed   = "failed"
-	_viewerTrashCheck    = "check manually"
+	_viewerTrashWouldFix viewerTrashResult = "would fix"
+	_viewerTrashFixed    viewerTrashResult = "fixed"
+	_viewerTrashFailed   viewerTrashResult = "failed"
+	_viewerTrashCheck    viewerTrashResult = "check manually"
 )
 
 // viewerTrashClient is the part of the storage provider API that FixViewerTrash needs.
@@ -43,8 +44,8 @@ type viewerTrashEntry struct {
 	spaceID   string
 	spaceName string
 	member    string
-	result    string
-	reason    string // why it failed
+	result    viewerTrashResult
+	reason    error // why it failed
 }
 
 // viewerTrashReport is what a run of FixViewerTrash found and did.
@@ -53,10 +54,10 @@ type viewerTrashReport struct {
 	entries       []viewerTrashEntry
 }
 
-func (r viewerTrashReport) count(result string) int {
+func (r viewerTrashReport) countMatchingResults(result viewerTrashResult) int {
 	n := 0
 	for _, e := range r.entries {
-		if e.result == result {
+		if string(e.result) == string(result) {
 			n++
 		}
 	}
@@ -128,9 +129,11 @@ func FixViewerTrash(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
-			printViewerTrashReport(os.Stdout, report, dryRun)
+			if err := printViewerTrashReport(os.Stdout, report, dryRun); err != nil {
+				return err
+			}
 
-			if failed := report.count(_viewerTrashFailed); failed > 0 {
+			if failed := report.countMatchingResults(_viewerTrashFailed); failed > 0 {
 				return fmt.Errorf("%d member(s) could not be changed", failed)
 			}
 			return nil
@@ -141,7 +144,7 @@ func FixViewerTrash(cfg *config.Config) *cli.Command {
 // oldSpaceViewerPermissions returns the permissions that "Can view" members got
 // before the role lost the trash bin access.
 func oldSpaceViewerPermissions() *provider.ResourcePermissions {
-	p := proto.Clone(conversions.NewSpaceViewerRole().CS3ResourcePermissions()).(*provider.ResourcePermissions)
+	p := conversions.NewSpaceViewerRole().CS3ResourcePermissions()
 	p.ListRecycle = true
 	return p
 }
@@ -149,12 +152,16 @@ func oldSpaceViewerPermissions() *provider.ResourcePermissions {
 // fixedSpaceViewerPermissions returns the permissions of the "Can view" role
 // without the trash bin access.
 func fixedSpaceViewerPermissions() *provider.ResourcePermissions {
-	p := proto.Clone(conversions.NewSpaceViewerRole().CS3ResourcePermissions()).(*provider.ResourcePermissions)
+	p := conversions.NewSpaceViewerRole().CS3ResourcePermissions()
 	p.ListRecycle = false
 	return p
 }
 
-func fixViewerTrash(ctx context.Context, client viewerTrashClient, onlySpaceID string, dryRun bool) (viewerTrashReport, error) {
+// fixViewerTrash checks the members of the project spaces and removes the trash
+// bin access from those with the old "Can view" permissions. If spaceIDFilter is
+// empty, all project spaces are checked, otherwise only that space. With dryRun
+// nothing is changed, the report only lists what would be changed.
+func fixViewerTrash(ctx context.Context, client viewerTrashClient, spaceIDFilter string, dryRun bool) (viewerTrashReport, error) {
 	report := viewerTrashReport{}
 
 	res, err := client.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{
@@ -177,24 +184,29 @@ func fixViewerTrash(ctx context.Context, client viewerTrashClient, onlySpaceID s
 	found := false
 
 	for _, space := range res.GetStorageSpaces() {
-		if onlySpaceID != "" && !sameSpace(space.GetId().GetOpaqueId(), onlySpaceID) {
+		if spaceIDFilter != "" && !sameSpace(space.GetId().GetOpaqueId(), spaceIDFilter) {
 			continue
 		}
 		found = true
 		report.spacesChecked++
 
-		spaceEntry := viewerTrashEntry{spaceID: shortSpaceID(space), spaceName: space.GetName()}
+		// show the space ID in the "storage$space" form that the web UI and the
+		// Graph API use, so it can be passed to --space-id as it is
+		spaceEntry := viewerTrashEntry{
+			spaceID:   storagespace.FormatStorageID(space.GetRoot().GetStorageId(), space.GetRoot().GetSpaceId()),
+			spaceName: space.GetName(),
+		}
 
 		grantsRes, err := client.ListGrants(ctx, &provider.ListGrantsRequest{
 			Ref: &provider.Reference{ResourceId: space.GetRoot()},
 		})
 		switch {
 		case err != nil:
-			spaceEntry.result, spaceEntry.reason = _viewerTrashFailed, fmt.Sprintf("could not list members: %v", err)
+			spaceEntry.result, spaceEntry.reason = _viewerTrashFailed, fmt.Errorf("could not list members: %w", err)
 			report.entries = append(report.entries, spaceEntry)
 			continue
 		case grantsRes.GetStatus().GetCode() != rpc.Code_CODE_OK:
-			spaceEntry.result, spaceEntry.reason = _viewerTrashFailed, fmt.Sprintf("could not list members: %s", statusString(grantsRes.GetStatus()))
+			spaceEntry.result, spaceEntry.reason = _viewerTrashFailed, fmt.Errorf("could not list members: %s", statusString(grantsRes.GetStatus()))
 			report.entries = append(report.entries, spaceEntry)
 			continue
 		}
@@ -211,7 +223,7 @@ func fixViewerTrash(ctx context.Context, client viewerTrashClient, onlySpaceID s
 					break
 				}
 				if err := removeTrashAccess(ctx, client, space, g, fixedPerms); err != nil {
-					entry.result, entry.reason = _viewerTrashFailed, err.Error()
+					entry.result, entry.reason = _viewerTrashFailed, err
 					break
 				}
 				entry.result = _viewerTrashFixed
@@ -226,8 +238,8 @@ func fixViewerTrash(ctx context.Context, client viewerTrashClient, onlySpaceID s
 		}
 	}
 
-	if onlySpaceID != "" && !found {
-		return report, fmt.Errorf("project space not found: %s", onlySpaceID)
+	if spaceIDFilter != "" && !found {
+		return report, fmt.Errorf("project space not found: %s", spaceIDFilter)
 	}
 	return report, nil
 }
@@ -245,7 +257,7 @@ func removeTrashAccess(ctx context.Context, client viewerTrashClient, space *pro
 		Ref:    &provider.Reference{ResourceId: space.GetRoot()},
 		Grant: &provider.Grant{
 			Grantee:     g.GetGrantee(),
-			Permissions: proto.Clone(fixedPerms).(*provider.ResourcePermissions),
+			Permissions: fixedPerms,
 			Expiration:  g.GetExpiration(),
 			Creator:     g.GetCreator(),
 		},
@@ -264,16 +276,6 @@ func statusString(s *rpc.Status) string {
 		return s.GetCode().String()
 	}
 	return s.GetCode().String() + " " + s.GetMessage()
-}
-
-// shortSpaceID returns the space ID in the "storage$space" form that the web UI
-// and the Graph API use, so it can be passed to --space-id as it is.
-func shortSpaceID(space *provider.StorageSpace) string {
-	root := space.GetRoot()
-	if root.GetStorageId() == "" || root.GetSpaceId() == "" {
-		return space.GetId().GetOpaqueId()
-	}
-	return storagespace.FormatStorageID(root.GetStorageId(), root.GetSpaceId())
 }
 
 // sameSpace compares two space IDs by their space part, so that
@@ -295,26 +297,36 @@ func granteeString(g *provider.Grantee) string {
 	}
 }
 
-func printViewerTrashReport(w io.Writer, report viewerTrashReport, dryRun bool) {
+// printViewerTrashReport writes the report table and the summary line to w. The
+// table is the only record of which members were changed, so a write error is
+// returned and must not be ignored.
+func printViewerTrashReport(w io.Writer, report viewerTrashReport, dryRun bool) error {
 	if len(report.entries) > 0 {
 		table := tablewriter.NewTable(w)
 		table.Header("space id", "space name", "member", "result")
 		for _, e := range report.entries {
-			result := e.result
-			if e.reason != "" {
-				result += ": " + e.reason
+			result := string(e.result)
+			if e.reason != nil {
+				result += ": " + e.reason.Error()
 			}
-			_ = table.Append([]string{e.spaceID, e.spaceName, e.member, result})
+			if err := table.Append([]string{e.spaceID, e.spaceName, e.member, result}); err != nil {
+				return fmt.Errorf("could not add a row to the report: %w", err)
+			}
 		}
-		_ = table.Render()
+		if err := table.Render(); err != nil {
+			return fmt.Errorf("could not print the report: %w", err)
+		}
 	}
 
-	changed := report.count(_viewerTrashFixed)
+	changed := report.countMatchingResults(_viewerTrashFixed)
 	verb := "changed"
 	if dryRun {
-		changed = report.count(_viewerTrashWouldFix)
+		changed = report.countMatchingResults(_viewerTrashWouldFix)
 		verb = "would change"
 	}
-	fmt.Fprintf(w, "spaces checked: %d, members %s: %d, failed: %d, check manually: %d\n",
-		report.spacesChecked, verb, changed, report.count(_viewerTrashFailed), report.count(_viewerTrashCheck))
+	if _, err := fmt.Fprintf(w, "spaces checked: %d, members %s: %d, failed: %d, check manually: %d\n",
+		report.spacesChecked, verb, changed, report.countMatchingResults(_viewerTrashFailed), report.countMatchingResults(_viewerTrashCheck)); err != nil {
+		return fmt.Errorf("could not print the summary: %w", err)
+	}
+	return nil
 }

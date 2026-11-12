@@ -143,8 +143,8 @@ func newFakeStorage() *fakeViewerTrashStorage {
 	}
 }
 
-func resultsByMember(report viewerTrashReport) map[string]string {
-	results := map[string]string{}
+func resultsByMember(report viewerTrashReport) map[string]viewerTrashResult {
+	results := map[string]viewerTrashResult{}
 	for _, e := range report.entries {
 		results[e.member] = e.result
 	}
@@ -177,7 +177,7 @@ func TestFixViewerTrashDryRun(t *testing.T) {
 		require.Equal(t, "storage$space-1", e.spaceID, "the report shows the space ID in the form --space-id takes")
 	}
 	require.Equal(t, 1, report.spacesChecked, "only project spaces are checked")
-	require.Equal(t, map[string]string{
+	require.Equal(t, map[string]viewerTrashResult{
 		"user old-viewer":        _viewerTrashWouldFix,
 		"group old-viewer-group": _viewerTrashWouldFix,
 		"user file-viewer":       _viewerTrashCheck,
@@ -191,7 +191,7 @@ func TestFixViewerTrash(t *testing.T) {
 	report, err := fixViewerTrash(context.Background(), storage, "", false)
 	require.NoError(t, err)
 
-	require.Equal(t, map[string]string{
+	require.Equal(t, map[string]viewerTrashResult{
 		"user old-viewer":        _viewerTrashFixed,
 		"group old-viewer-group": _viewerTrashFixed,
 		"user file-viewer":       _viewerTrashCheck,
@@ -224,7 +224,7 @@ func TestFixViewerTrash(t *testing.T) {
 	report, err = fixViewerTrash(context.Background(), storage, "", false)
 	require.NoError(t, err)
 	require.Empty(t, storage.updates)
-	require.Equal(t, 0, report.count(_viewerTrashFixed))
+	require.Equal(t, 0, report.countMatchingResults(_viewerTrashFixed))
 }
 
 func TestFixViewerTrashOneSpace(t *testing.T) {
@@ -237,7 +237,7 @@ func TestFixViewerTrashOneSpace(t *testing.T) {
 			report, err := fixViewerTrash(context.Background(), storage, id, true)
 			require.NoError(t, err)
 			require.Equal(t, 1, report.spacesChecked)
-			require.Equal(t, map[string]string{"user other-viewer": _viewerTrashWouldFix}, resultsByMember(report))
+			require.Equal(t, map[string]viewerTrashResult{"user other-viewer": _viewerTrashWouldFix}, resultsByMember(report))
 		})
 	}
 
@@ -258,7 +258,7 @@ func TestFixViewerTrashFailures(t *testing.T) {
 	require.Contains(t, results["user old-viewer"], _viewerTrashFailed)
 	require.Equal(t, _viewerTrashFixed, results["group old-viewer-group"], "the other members are still changed")
 	require.Equal(t, 2, report.spacesChecked)
-	require.Equal(t, 2, report.count(_viewerTrashFailed), "the failing member and the space whose members could not be listed")
+	require.Equal(t, 2, report.countMatchingResults(_viewerTrashFailed), "the failing member and the space whose members could not be listed")
 	for _, e := range report.entries {
 		if e.member == "group old-viewer-group" {
 			require.Empty(t, e.reason, "a failure must not carry over to the next member")
@@ -267,8 +267,25 @@ func TestFixViewerTrashFailures(t *testing.T) {
 
 	// the summary reports the failures
 	var out bytes.Buffer
-	printViewerTrashReport(&out, report, false)
+	require.NoError(t, printViewerTrashReport(&out, report, false))
 	require.Contains(t, out.String(), "failed: CODE_PERMISSION_DENIED")
 	require.Contains(t, out.String(), "failed: could not list members: connection refused")
 	require.Contains(t, out.String(), "spaces checked: 2, members changed: 1, failed: 2, check manually: 1")
+}
+
+// failingWriter fails every write, like a full disk or a closed pipe.
+type failingWriter struct{}
+
+func (failingWriter) Write([]byte) (int, error) {
+	return 0, errors.New("disk full")
+}
+
+func TestPrintViewerTrashReportWriteError(t *testing.T) {
+	report, err := fixViewerTrash(context.Background(), newFakeStorage(), "", true)
+	require.NoError(t, err)
+	require.NotEmpty(t, report.entries)
+
+	err = printViewerTrashReport(failingWriter{}, report, true)
+	require.Error(t, err, "a report that could not be written must not look like a success")
+	require.Contains(t, err.Error(), "disk full")
 }
