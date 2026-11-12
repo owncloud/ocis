@@ -323,6 +323,10 @@
         },
         "userId": {
           "type": "string"
+        },
+        "force": {
+          "type": "boolean",
+          "description": "force indexes all resources again, including those that are already\nindexed and unchanged."
         }
       }
     },
