@@ -320,8 +320,9 @@ class SettingsHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
+	 * @param array $headers
 	 *
 	 * @return string
 	 *
@@ -330,14 +331,16 @@ class SettingsHelper {
 	 */
 	public static function getLanguageSettingValue(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
+		array $headers = [],
 	): string {
 		$response = self::getValuesBySettingID(
 			$baseUrl,
 			self::PROFILE_SETTINGS['language'],
 			$user,
 			$password,
+			$headers,
 		);
 		Assert::assertEquals(201, $response->getStatusCode(), "Failed to get values list");
 
@@ -386,8 +389,9 @@ class SettingsHelper {
 	/**
 	 * @param string $baseUrl
 	 * @param string $settingId
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
+	 * @param array $headers
 	 *
 	 * @return ResponseInterface
 	 *
@@ -397,8 +401,9 @@ class SettingsHelper {
 	public static function getValuesBySettingID(
 		string $baseUrl,
 		string $settingId,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
+		array $headers = [],
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "values-get-by-unique-identifiers");
 		$body = json_encode(
@@ -412,7 +417,7 @@ class SettingsHelper {
 			$fullUrl,
 			$user,
 			$password,
-			[],
+			$headers,
 			$body,
 		);
 	}
