@@ -12,3 +12,5 @@ strictly-positive `lastModified` and otherwise omits the field entirely, so
 the server falls back to stamping the upload with its own current time.
 Uploads of ordinary `File` objects with a valid `lastModified` are
 unaffected.
+
+https://github.com/owncloud/ocis/pull/13450
