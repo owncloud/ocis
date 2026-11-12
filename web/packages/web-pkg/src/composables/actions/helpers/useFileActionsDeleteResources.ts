@@ -41,7 +41,7 @@ export const useFileActionsDeleteResources = () => {
   const { $gettext, $ngettext } = language
   const clientService = useClientService()
   const { dispatchModal } = useModals()
-  const { personalSpace, updateSpaceField, getSpacesByName } = useSpacesStore()
+  const { personalSpace, updateSpaceUsage, getSpacesByName } = useSpacesStore()
   const sharesStore = useSharesStore()
   const { startWorker } = useDeleteWorker({
     concurrentRequests: configStore.options.concurrentRequests.resourceBatchActions
@@ -359,11 +359,7 @@ export const useFileActionsDeleteResources = () => {
                 unref(resources)[0].storageId,
                 sharesStore.graphRoles
               )
-              updateSpaceField({
-                id: updatedSpace.id,
-                field: 'spaceQuota',
-                value: updatedSpace.spaceQuota
-              })
+              updateSpaceUsage(updatedSpace)
             }
 
             if (

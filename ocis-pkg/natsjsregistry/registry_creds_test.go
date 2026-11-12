@@ -141,7 +141,7 @@ func TestCredentialsOptionFirstCallFails(t *testing.T) {
 func TestCredentialsOptionContent(t *testing.T) {
 	t.Setenv(_natsCredsEnv, string(natstest.Creds(t)))
 	n := &storeregistry{}
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		opt, err := n.credentialsOption()
 		require.NoError(t, err)
 		o := nats.GetDefaultOptions()

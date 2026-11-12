@@ -9,12 +9,18 @@ import PasteWorker from './worker?worker'
 
 export type PasteWorkerReturnData = {
   successful: Resource[]
-  failed: { resourceName: string; message: string; statusCode: number; xReqId: string }[]
+  failed: {
+    resourceName: string
+    isFolder: boolean
+    message: string
+    statusCode: number
+    xReqId: string
+  }[]
 }
 
 type CallbackOptions = {
   successful: Resource[]
-  failed: { resourceName: string; error: HttpError }[]
+  failed: { resourceName: string; isFolder: boolean; error: HttpError }[]
 }
 
 /**
@@ -43,8 +49,8 @@ export const usePasteWorker = () => {
       const { successful, failed } = JSON.parse(e.data) as PasteWorkerReturnData
 
       // construct http error based on the parsed error data
-      const failedWithErrors = failed.map(({ resourceName, ...errorData }) => {
-        return { resourceName, error: createHttpError(errorData) }
+      const failedWithErrors = failed.map(({ resourceName, isFolder, ...errorData }) => {
+        return { resourceName, isFolder, error: createHttpError(errorData) }
       })
 
       callback({ successful, failed: failedWithErrors })

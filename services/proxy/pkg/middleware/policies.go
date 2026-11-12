@@ -33,7 +33,7 @@ type (
 		Code    string `json:"code"`
 		Message string `json:"message"`
 		// The structure of this object is service-specific
-		Innererror map[string]interface{} `json:"innererror,omitempty"`
+		Innererror map[string]any `json:"innererror,omitempty"`
 	}
 )
 
@@ -148,7 +148,7 @@ func RenderError(w http.ResponseWriter, r *http.Request, evaluateReq *pService.E
 		filename = path.Base(evaluateReq.Environment.GetRequest().GetPath())
 	}
 
-	innererror := map[string]interface{}{
+	innererror := map[string]any{
 		"date": time.Now().UTC().Format(time.RFC3339),
 	}
 

@@ -555,7 +555,7 @@ type testConfigStrict struct {
 
 func TestInvalidStrict(t *testing.T) {
 	cases := []struct {
-		decoder             func(interface{}) error
+		decoder             func(any) error
 		rootValue           string
 		nestedValue         string
 		rootValueImplicit   string
@@ -794,11 +794,11 @@ func TestExport(t *testing.T) {
 
 func TestDecodePointerPrimitives(t *testing.T) {
 	type testConfigPointerPrimitives struct {
-		BoolPtr    *bool   `env:"TEST_BOOL_PTR"`
-		IntPtr     *int    `env:"TEST_INT_PTR"`
-		StringPtr  *string `env:"TEST_STRING_PTR"`
+		BoolPtr    *bool    `env:"TEST_BOOL_PTR"`
+		IntPtr     *int     `env:"TEST_INT_PTR"`
+		StringPtr  *string  `env:"TEST_STRING_PTR"`
 		Float64Ptr *float64 `env:"TEST_FLOAT64_PTR"`
-		
+
 		UnsetBoolPtr *bool `env:"TEST_UNSET_BOOL_PTR"`
 	}
 

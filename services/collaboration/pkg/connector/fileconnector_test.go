@@ -78,7 +78,7 @@ var _ = Describe("FileConnector", func() {
 			"iat": now.Unix(),
 			"iss": "https://ocis.jp.solidgear.prv",
 			"jti": "fBWi7AXhQPUhah2CWEPTQKpCfgpFlAiL",
-			"lg.i": map[string]interface{}{
+			"lg.i": map[string]any{
 				"dn": "bro",
 				"id": "ownCloudUUID=faf11647-7451-4b9a-bffe-3b5ddcc5972b",
 				"un": "brotato",
@@ -999,7 +999,7 @@ var _ = Describe("FileConnector", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(200))
 			Expect(response.Headers).To(BeNil())
-			rBody := response.Body.(map[string]interface{})
+			rBody := response.Body.(map[string]any)
 			Expect(rBody["Name"]).To(Equal("newDocument.docx"))
 			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
 			Expect(rBody["HostEditUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/newDocument.docx?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
@@ -1054,7 +1054,7 @@ var _ = Describe("FileConnector", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(200))
 			Expect(response.Headers).To(BeNil())
-			rBody := response.Body.(map[string]interface{})
+			rBody := response.Body.(map[string]any)
 			Expect(rBody["Name"]).To(Equal("file.pdf"))
 			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
 			Expect(rBody["HostEditUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/file.pdf?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
@@ -1126,7 +1126,7 @@ var _ = Describe("FileConnector", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(200))
 			Expect(response.Headers).To(BeNil())
-			rBody := response.Body.(map[string]interface{})
+			rBody := response.Body.(map[string]any)
 			Expect(rBody["Name"]).To(MatchRegexp(`[a-zA-Z0-9_-] file\.pdf`))
 			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
 			Expect(rBody["HostEditUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/" + url.PathEscape(path.Base(*newFilePath)) + "?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
@@ -1250,7 +1250,7 @@ var _ = Describe("FileConnector", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(200))
 			Expect(response.Headers).To(BeNil())
-			rBody := response.Body.(map[string]interface{})
+			rBody := response.Body.(map[string]any)
 			Expect(rBody["Name"]).To(Equal("newDocument.docx"))
 			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
 			Expect(rBody["HostEditUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/newDocument.docx?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
@@ -1309,7 +1309,7 @@ var _ = Describe("FileConnector", func() {
 			Expect(response.Status).To(Equal(409))
 			Expect(response.Headers[connector.HeaderWopiLock]).To(Equal("zzz999"))
 			Expect(response.Headers[connector.HeaderWopiValidRT]).To(MatchRegexp(`[a-zA-Z0-9_-] convFile\.pdf`))
-			rBody := response.Body.(map[string]interface{})
+			rBody := response.Body.(map[string]any)
 			Expect(rBody["Name"]).To(Equal("convFile.pdf"))
 			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
 			Expect(rBody["HostEditUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/convFile.pdf?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
@@ -1649,7 +1649,7 @@ var _ = Describe("FileConnector", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(200))
 			Expect(response.Headers).To(BeNil())
-			rBody := response.Body.(map[string]interface{})
+			rBody := response.Body.(map[string]any)
 			Expect(rBody["Name"]).To(MatchRegexp(`^[a-zA-Z0-9_-]+ newFile$`))
 		})
 
@@ -1707,7 +1707,7 @@ var _ = Describe("FileConnector", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(200))
 			Expect(response.Headers).To(BeNil())
-			rBody := response.Body.(map[string]interface{})
+			rBody := response.Body.(map[string]any)
 			Expect(rBody["Name"]).To(Equal("newFile"))
 		})
 	})
@@ -3867,7 +3867,7 @@ var _ = Describe("FileConnector", func() {
 			jsonBytes, err := json.Marshal(response.Body)
 			Expect(err).ToNot(HaveOccurred())
 
-			var jsonMap map[string]interface{}
+			var jsonMap map[string]any
 			Expect(json.Unmarshal(jsonBytes, &jsonMap)).ToNot(HaveOccurred())
 
 			for _, key := range []string{

@@ -16,12 +16,12 @@ func NewHandlerWrapper(limit int) server.HandlerWrapper {
 	}
 
 	token := make(chan struct{}, limit)
-	for i := 0; i < limit; i++ {
+	for range limit {
 		token <- struct{}{}
 	}
 
 	return func(h server.HandlerFunc) server.HandlerFunc {
-		return func(ctx context.Context, req server.Request, rsp interface{}) error {
+		return func(ctx context.Context, req server.Request, rsp any) error {
 			select {
 			case <-ctx.Done():
 				return ctx.Err()

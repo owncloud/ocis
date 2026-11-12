@@ -36,7 +36,7 @@ func GenerateRandomString(chars string, length int) (string, error) {
 
 func generateString(chars string, length int) (string, error) {
 	ret := make([]byte, length)
-	for i := 0; i < length; i++ {
+	for i := range length {
 		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(chars))))
 		if err != nil {
 			return "", err

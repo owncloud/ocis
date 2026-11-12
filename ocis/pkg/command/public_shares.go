@@ -156,8 +156,8 @@ func findCorruptPublicShares(db persistence.PublicShares) []corruptShare {
 // decodePublicShare extracts the cs3 PublicShare from a raw persistence entry.
 // The persistence stores each entry as map{"share": <json-encoded-PublicShare>, "password": <string>}.
 // It returns ok=false when the entry does not match that shape.
-func decodePublicShare(raw interface{}) (*link.PublicShare, bool) {
-	m, ok := raw.(map[string]interface{})
+func decodePublicShare(raw any) (*link.PublicShare, bool) {
+	m, ok := raw.(map[string]any)
 	if !ok {
 		return nil, false
 	}

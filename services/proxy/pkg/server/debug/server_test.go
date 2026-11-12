@@ -23,7 +23,7 @@ const secretMarker = "SECRET-MARKER-"
 func setSecrets(t *testing.T, v reflect.Value, path string, found map[string]string) {
 	t.Helper()
 	switch v.Kind() {
-	case reflect.Ptr:
+	case reflect.Pointer:
 		if v.Type().Elem().Kind() != reflect.Struct {
 			return
 		}

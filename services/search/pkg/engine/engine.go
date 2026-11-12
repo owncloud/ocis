@@ -12,9 +12,9 @@ import (
 
 	searchMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
-	bleveEngine "github.com/owncloud/ocis/v2/services/search/pkg/engine/bleve"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
+	bleveEngine "github.com/owncloud/ocis/v2/services/search/pkg/engine/bleve"
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/bleve"
 )
 
@@ -101,7 +101,7 @@ func getFragmentValue(m search.FieldFragmentMap, key string, idx int) string {
 	return val[idx]
 }
 
-func getFieldValue[T any](m map[string]interface{}, key string) (out T) {
+func getFieldValue[T any](m map[string]any, key string) (out T) {
 	val, ok := m[key]
 	if !ok {
 		return
@@ -112,9 +112,9 @@ func getFieldValue[T any](m map[string]interface{}, key string) (out T) {
 	return
 }
 
-func getFieldSliceValue[T any](m map[string]interface{}, key string) (out []T) {
-	iv := getFieldValue[interface{}](m, key)
-	add := func(v interface{}) {
+func getFieldSliceValue[T any](m map[string]any, key string) (out []T) {
+	iv := getFieldValue[any](m, key)
+	add := func(v any) {
 		cv, ok := v.(T)
 		if !ok {
 			return
@@ -129,7 +129,7 @@ func getFieldSliceValue[T any](m map[string]interface{}, key string) (out []T) {
 	switch v := iv.(type) {
 	case T:
 		add(v)
-	case []interface{}:
+	case []any:
 		for _, rv := range v {
 			add(rv)
 		}

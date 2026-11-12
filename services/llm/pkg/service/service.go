@@ -59,7 +59,7 @@ func (s *Service) HandleChatCompletions(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(body, &raw); err != nil {
 		writeError(w, http.StatusBadRequest, "invalid JSON body")
 		return

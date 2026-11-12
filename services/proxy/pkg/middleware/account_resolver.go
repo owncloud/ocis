@@ -124,7 +124,7 @@ func (m accountResolver) verifyUser(w http.ResponseWriter, req *http.Request, us
 	m.next.ServeHTTP(w, req)
 }
 
-func (m accountResolver) resolveUserFromClaims(w http.ResponseWriter, req *http.Request, claims map[string]interface{}) {
+func (m accountResolver) resolveUserFromClaims(w http.ResponseWriter, req *http.Request, claims map[string]any) {
 	ctx := req.Context()
 
 	isMember, isGuest := m.resolveUserType(claims)
@@ -227,7 +227,7 @@ func (m accountResolver) resolveUserFromClaims(w http.ResponseWriter, req *http.
 	m.next.ServeHTTP(w, req)
 }
 
-func (m accountResolver) resolveUserType(claims map[string]interface{}) (isMember bool, isGuest bool) {
+func (m accountResolver) resolveUserType(claims map[string]any) (isMember bool, isGuest bool) {
 	if !m.multiInstance {
 		// single instance behaviour - any user is considered a member
 		return true, false
@@ -279,7 +279,7 @@ func readClaim(key string, claims map[string]any) []string {
 	return nil
 }
 
-func readUserIDClaim(path string, claims map[string]interface{}) (string, error) {
+func readUserIDClaim(path string, claims map[string]any) (string, error) {
 	// happy path
 	value, _ := claims[path].(string)
 	if value != "" {
@@ -294,10 +294,10 @@ func readUserIDClaim(path string, claims map[string]interface{}) (string, error)
 	lastSegment := len(segments) - 1
 	for i := range segments {
 		if i < lastSegment {
-			if castedClaims, ok := subclaims[segments[i]].(map[string]interface{}); ok {
+			if castedClaims, ok := subclaims[segments[i]].(map[string]any); ok {
 				subclaims = castedClaims
-			} else if castedClaims, ok := subclaims[segments[i]].(map[interface{}]interface{}); ok {
-				subclaims = make(map[string]interface{}, len(castedClaims))
+			} else if castedClaims, ok := subclaims[segments[i]].(map[any]any); ok {
+				subclaims = make(map[string]any, len(castedClaims))
 				for k, v := range castedClaims {
 					if s, ok := k.(string); ok {
 						subclaims[s] = v

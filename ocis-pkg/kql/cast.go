@@ -10,7 +10,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/query"
 )
 
-func toNode[T ast.Node](in interface{}) (T, error) {
+func toNode[T ast.Node](in any) (T, error) {
 	var t T
 	out, ok := in.(T)
 	if !ok {
@@ -20,7 +20,7 @@ func toNode[T ast.Node](in interface{}) (T, error) {
 	return out, nil
 }
 
-func toNodes[T ast.Node](in interface{}) ([]T, error) {
+func toNodes[T ast.Node](in any) ([]T, error) {
 	switch v := in.(type) {
 	case T:
 		return []T{v}, nil
@@ -28,7 +28,7 @@ func toNodes[T ast.Node](in interface{}) ([]T, error) {
 		return v, nil
 	case []*ast.OperatorNode, []*ast.DateTimeNode, []*ast.NumericNode:
 		return toNodes[T](v)
-	case []interface{}:
+	case []any:
 		var nodes []T
 		for _, el := range v {
 			node, err := toNodes[T](el)
@@ -47,11 +47,11 @@ func toNodes[T ast.Node](in interface{}) ([]T, error) {
 	}
 }
 
-func toString(in interface{}) (string, error) {
+func toString(in any) (string, error) {
 	switch v := in.(type) {
 	case []byte:
 		return string(v), nil
-	case []interface{}:
+	case []any:
 		var str string
 
 		for i := range v {
@@ -71,7 +71,7 @@ func toString(in interface{}) (string, error) {
 	}
 }
 
-func toFloat64(in interface{}) (float64, error) {
+func toFloat64(in any) (float64, error) {
 	s, err := toString(in)
 	if err != nil {
 		return 0, err
@@ -80,7 +80,7 @@ func toFloat64(in interface{}) (float64, error) {
 	return strconv.ParseFloat(s, 64)
 }
 
-func toTime(in interface{}) (time.Time, error) {
+func toTime(in any) (time.Time, error) {
 	ts, err := toString(in)
 	if err != nil {
 		return time.Time{}, err
@@ -89,7 +89,7 @@ func toTime(in interface{}) (time.Time, error) {
 	return now.Parse(ts)
 }
 
-func toTimeRange(in interface{}) (*time.Time, *time.Time, error) {
+func toTimeRange(in any) (*time.Time, *time.Time, error) {
 	var from, to time.Time
 
 	value, err := toString(in)

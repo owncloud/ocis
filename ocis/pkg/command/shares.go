@@ -123,7 +123,7 @@ func cleanup(c *cli.Context, cfg *config.Config) error {
 	if !ok {
 		return configlog.ReturnError(errors.New("Unknown share manager type '" + driver + "'"))
 	}
-	mgr, err := f(rcfg[driver].(map[string]interface{}))
+	mgr, err := f(rcfg[driver].(map[string]any))
 	if err != nil {
 		return configlog.ReturnError(err)
 	}
@@ -287,7 +287,7 @@ func cleanOrphanedGrants(c *cli.Context, cfg *config.Config) error {
 			if cfg.Sharing.UserSharingDriver == jsoncs3Driver {
 				rcfg := revaShareConfig(cfg.Sharing)
 				if f, ok := registry.NewFuncs[jsoncs3Driver]; ok {
-					if mgr, mErr := f(rcfg[jsoncs3Driver].(map[string]interface{})); mErr == nil {
+					if mgr, mErr := f(rcfg[jsoncs3Driver].(map[string]any)); mErr == nil {
 						l := logger()
 						zerolog.SetGlobalLevel(zerolog.InfoLevel)
 						cleanCtx := l.WithContext(serviceUserCtx)
@@ -359,7 +359,7 @@ func preprocessReconcileJsoncs3(ctx context.Context, cfg *config.Config, dryRun,
 
 	rcfg := revaShareConfig(cfg.Sharing)
 	if f, ok := registry.NewFuncs[jsoncs3Driver]; ok {
-		if mgr, mErr := f(rcfg[jsoncs3Driver].(map[string]interface{})); mErr == nil {
+		if mgr, mErr := f(rcfg[jsoncs3Driver].(map[string]any)); mErr == nil {
 			l := logger()
 			zerolog.SetGlobalLevel(zerolog.InfoLevel)
 			cleanCtx := l.WithContext(ctx)
@@ -648,7 +648,7 @@ func postprocessReconcileJsoncs3AfterRemovals(
 	}
 	rcfg := revaShareConfig(cfg.Sharing)
 	if f, ok := registry.NewFuncs[jsoncs3Driver]; ok {
-		if mgr, mErr := f(rcfg[jsoncs3Driver].(map[string]interface{})); mErr == nil {
+		if mgr, mErr := f(rcfg[jsoncs3Driver].(map[string]any)); mErr == nil {
 			l := logger()
 			zerolog.SetGlobalLevel(zerolog.InfoLevel)
 			cleanCtx := l.WithContext(ctx)

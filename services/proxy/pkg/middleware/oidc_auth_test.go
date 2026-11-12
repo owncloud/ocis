@@ -124,7 +124,7 @@ var _ = Describe("Authenticating requests", Label("OIDCAuthenticator"), func() {
 			// but keep the store record itself readable (no Expiry) to simulate
 			// the window where the entry has not been evicted yet while its
 			// cached expiry has passed.
-			cachedClaims := map[string]interface{}{
+			cachedClaims := map[string]any{
 				"sub": "cached-subject",
 				"exp": time.Now().Add(-time.Hour).Unix(),
 			}
@@ -161,7 +161,7 @@ var _ = Describe("Authenticating requests", Label("OIDCAuthenticator"), func() {
 			sha3.ShakeSum256(hash, []byte(token))
 			encodedHash := base64.URLEncoding.EncodeToString(hash)
 
-			value, err := msgpack.MarshalAsMap(map[string]interface{}{
+			value, err := msgpack.MarshalAsMap(map[string]any{
 				"sub": "cached-subject",
 				"exp": time.Now().Add(-time.Hour).Unix(),
 			})

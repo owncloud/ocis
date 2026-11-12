@@ -141,7 +141,7 @@ func NewIndexGetterPersistentScale(rootDir string, mapping mapping.IndexMapping)
 func (i *IndexGetterPersistentScale) GetIndex(opts ...GetIndexOption) (bleve.Index, func(), error) {
 	options := newGetIndexOptions(opts...)
 	destination := filepath.Join(i.rootDir, "bleve")
-	params := map[string]interface{}{
+	params := map[string]any{
 		"read_only": options.ReadOnly,
 	}
 

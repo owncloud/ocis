@@ -172,6 +172,55 @@ describe('spaces', () => {
       })
     })
   })
+  describe('method "updateSpaceUsage"', () => {
+    it('sets quota and size of the space from the fetched drive', () => {
+      getWrapper({
+        setup: (instance) => {
+          const space = mock<SpaceResource>({ id: '1', size: 47000, spaceQuota: { used: 47000 } })
+          instance.addSpaces([space])
+
+          const drive = mock<SpaceResource>({
+            id: '1',
+            size: 104947000,
+            spaceQuota: { used: 104947000, total: 1000000000 }
+          })
+          instance.updateSpaceUsage(drive)
+
+          expect(instance.spaces[0].spaceQuota).toEqual(drive.spaceQuota)
+          expect(instance.spaces[0].size).toBe(104947000)
+        }
+      })
+    })
+    it('keeps the size if the fetched drive has no quota', () => {
+      getWrapper({
+        setup: (instance) => {
+          const space = mock<SpaceResource>({ id: '1', size: 47000, spaceQuota: { used: 47000 } })
+          instance.addSpaces([space])
+
+          instance.updateSpaceUsage({
+            id: '1',
+            size: undefined,
+            spaceQuota: undefined
+          } as SpaceResource)
+
+          expect(instance.spaces[0].spaceQuota).toBeUndefined()
+          expect(instance.spaces[0].size).toBe(47000)
+        }
+      })
+    })
+    it('does nothing if the space is not loaded', () => {
+      getWrapper({
+        setup: (instance) => {
+          const space = mock<SpaceResource>({ id: '1', size: 47000 })
+          instance.addSpaces([space])
+
+          instance.updateSpaceUsage(mock<SpaceResource>({ id: '2', size: 1 }))
+
+          expect(instance.spaces[0].size).toBe(47000)
+        }
+      })
+    })
+  })
   describe('method "loadSpaces"', () => {
     it('correctly loads personal and project spaces', () => {
       getWrapper({

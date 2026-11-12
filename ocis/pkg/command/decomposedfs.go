@@ -373,7 +373,7 @@ func printAttribs(attribs map[string][]byte, onlyAttribute string) {
 }
 
 func attribToString(attrib []byte) string {
-	for i := 0; i < len(attrib); i++ {
+	for i := range attrib {
 		if attrib[i] < 32 || attrib[i] >= 127 {
 			return "0s" + base64.StdEncoding.EncodeToString(attrib)
 		}

@@ -33,8 +33,8 @@ func TestBackend_CreateUser(t *testing.T) {
 	}
 	type mockInputs struct {
 		funcName string
-		args     []interface{}
-		returns  []interface{}
+		args     []any
+		returns  []any
 	}
 	tests := []struct {
 		name        string
@@ -56,7 +56,7 @@ func TestBackend_CreateUser(t *testing.T) {
 			clientMocks: []mockInputs{
 				{
 					funcName: "CreateUser",
-					args: []interface{}{
+					args: []any{
 						mock.Anything,
 						userRealm,
 						mock.Anything, // can't match on the user because it generates a UUID internally.
@@ -65,13 +65,13 @@ func TestBackend_CreateUser(t *testing.T) {
 							kcpkg.UserActionVerifyEmail,
 						},
 					},
-					returns: []interface{}{
+					returns: []any{
 						"test-id",
 						nil,
 					},
 				},
 			},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 		},
@@ -87,7 +87,7 @@ func TestBackend_CreateUser(t *testing.T) {
 			clientMocks: []mockInputs{
 				{
 					funcName: "CreateUser",
-					args: []interface{}{
+					args: []any{
 						mock.Anything,
 						userRealm,
 						mock.Anything,
@@ -95,13 +95,13 @@ func TestBackend_CreateUser(t *testing.T) {
 							kcpkg.UserActionUpdatePassword,
 						},
 					},
-					returns: []interface{}{
+					returns: []any{
 						"test-id",
 						nil,
 					},
 				},
 			},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 		},
@@ -133,8 +133,8 @@ func TestBackend_SendMail(t *testing.T) {
 	}
 	type mockInputs struct {
 		funcName string
-		args     []interface{}
-		returns  []interface{}
+		args     []any
+		returns  []any
 	}
 	tests := []struct {
 		name        string
@@ -152,7 +152,7 @@ func TestBackend_SendMail(t *testing.T) {
 			clientMocks: []mockInputs{
 				{
 					funcName: "SendActionsMail",
-					args: []interface{}{
+					args: []any{
 						mock.Anything,
 						userRealm,
 						"test-id",
@@ -161,12 +161,12 @@ func TestBackend_SendMail(t *testing.T) {
 							kcpkg.UserActionVerifyEmail,
 						},
 					},
-					returns: []interface{}{
+					returns: []any{
 						nil,
 					},
 				},
 			},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 		},
@@ -179,7 +179,7 @@ func TestBackend_SendMail(t *testing.T) {
 			clientMocks: []mockInputs{
 				{
 					funcName: "SendActionsMail",
-					args: []interface{}{
+					args: []any{
 						mock.Anything,
 						userRealm,
 						"test-id",
@@ -187,12 +187,12 @@ func TestBackend_SendMail(t *testing.T) {
 							kcpkg.UserActionUpdatePassword,
 						},
 					},
-					returns: []interface{}{
+					returns: []any{
 						nil,
 					},
 				},
 			},
-			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+			assertion: func(t assert.TestingT, err error, args ...any) bool {
 				return assert.Nil(t, err, args...)
 			},
 		},

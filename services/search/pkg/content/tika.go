@@ -88,10 +88,7 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 
 	var reader io.Reader = data
 	if ri.Size > t.ContentExtractionSizeLimit {
-		limit := t.ContentExtractionSizeLimit
-		if limit > math.MaxInt64 {
-			limit = math.MaxInt64
-		}
+		limit := min(t.ContentExtractionSizeLimit, math.MaxInt64)
 		reader = io.LimitReader(data, int64(limit)) //nolint:gosec // overflow guarded above
 	}
 

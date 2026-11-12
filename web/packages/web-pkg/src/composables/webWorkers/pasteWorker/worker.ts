@@ -89,6 +89,7 @@ self.onmessage = async (e: MessageEvent) => {
         console.error(e)
         failed.push({
           resourceName: resource.name,
+          isFolder: resource.isFolder,
           message: e?.message,
           statusCode: e?.statusCode,
           xReqId: e?.response?.headers?.get('x-request-id')

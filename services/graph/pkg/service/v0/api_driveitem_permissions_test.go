@@ -138,9 +138,9 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
-			driveItemInvite.ExpirationDateTime = libregraph.PtrTime(time.Now().Add(time.Hour))
+			driveItemInvite.ExpirationDateTime = new(time.Now().Add(time.Hour))
 			createShareResponse.Share = &collaboration.Share{
 				Id:         &collaboration.ShareId{OpaqueId: "123"},
 				Expiration: utils.TimeToTS(*driveItemInvite.ExpirationDateTime),
@@ -158,9 +158,9 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("GetGroup", mock.Anything, mock.Anything).Return(getGroupResponse, nil)
 			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("2"), LibreGraphRecipientType: libregraph.PtrString("group")},
+				{ObjectId: new("2"), LibreGraphRecipientType: new("group")},
 			}
-			driveItemInvite.ExpirationDateTime = libregraph.PtrTime(time.Now().Add(time.Hour))
+			driveItemInvite.ExpirationDateTime = new(time.Now().Add(time.Hour))
 			createShareResponse.Share = &collaboration.Share{
 				Id:         &collaboration.ShareId{OpaqueId: "123"},
 				Expiration: utils.TimeToTS(*driveItemInvite.ExpirationDateTime),
@@ -193,7 +193,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 
 				gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 				driveItemInvite.Recipients = []libregraph.DriveRecipient{
-					{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+					{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 				}
 				createShareResponse.Share = &collaboration.Share{Id: &collaboration.ShareId{OpaqueId: "123"}}
 				// the sharer may share the resource
@@ -261,7 +261,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 					capturedReq = args.Get(1).(*collaboration.CreateShareRequest)
 				}).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
 			driveItemInvite.ExpirationDateTime = nil
 			createShareResponse.Share = &collaboration.Share{
@@ -288,7 +288,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 					capturedReq = args.Get(1).(*collaboration.CreateShareRequest)
 				}).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("2"), LibreGraphRecipientType: libregraph.PtrString("group")},
+				{ObjectId: new("2"), LibreGraphRecipientType: new("group")},
 			}
 			driveItemInvite.ExpirationDateTime = nil
 			createShareResponse.Share = &collaboration.Share{
@@ -310,7 +310,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 					capturedReq = args.Get(1).(*collaboration.CreateShareRequest)
 				}).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
 			driveItemInvite.ExpirationDateTime = nil
 			createShareResponse.Share = &collaboration.Share{
@@ -330,7 +330,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 					capturedReq = args.Get(1).(*collaboration.CreateShareRequest)
 				}).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("2"), LibreGraphRecipientType: libregraph.PtrString("group")},
+				{ObjectId: new("2"), LibreGraphRecipientType: new("group")},
 			}
 			driveItemInvite.ExpirationDateTime = nil
 			createShareResponse.Share = &collaboration.Share{
@@ -350,10 +350,10 @@ var _ = Describe("DriveItemPermissionsService", func() {
 					capturedReq = args.Get(1).(*collaboration.CreateShareRequest)
 				}).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
 			explicit := time.Now().Add(time.Hour)
-			driveItemInvite.ExpirationDateTime = libregraph.PtrTime(explicit)
+			driveItemInvite.ExpirationDateTime = new(explicit)
 			createShareResponse.Share = &collaboration.Share{
 				Id: &collaboration.ShareId{OpaqueId: "123"},
 			}
@@ -367,7 +367,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
 			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleViewerID}
 
@@ -383,7 +383,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
 			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleEditorID}
 
@@ -396,7 +396,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 
 		It("fails with when trying to set a space role on a file", func() {
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
 			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleManagerID}
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
@@ -407,7 +407,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 
 		It("fails with when trying to set a folder role on a file", func() {
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
 			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleEditorID}
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
@@ -419,7 +419,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		It("fails with when trying to set a file role on a folder", func() {
 			statResponse.Info.Type = provider.ResourceType_RESOURCE_TYPE_CONTAINER
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
 			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleFileEditorID}
 			permission, err := driveItemPermissionsService.Invite(context.Background(), driveItemId, driveItemInvite)
@@ -432,7 +432,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
 			driveItemInvite.Roles = nil
 			driveItemInvite.LibreGraphPermissionsActions = []string{unifiedrole.DriveItemContentRead}
@@ -523,9 +523,9 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			gatewayClient.On("CreateShare", mock.Anything, mock.Anything).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
-			driveItemInvite.ExpirationDateTime = libregraph.PtrTime(time.Now().Add(time.Hour))
+			driveItemInvite.ExpirationDateTime = new(time.Now().Add(time.Hour))
 			createShareResponse.Share = &collaboration.Share{
 				Id:         &collaboration.ShareId{OpaqueId: "123"},
 				Expiration: utils.TimeToTS(*driveItemInvite.ExpirationDateTime),
@@ -558,7 +558,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 					capturedReq = args.Get(1).(*collaboration.CreateShareRequest)
 				}).Return(createShareResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
 			driveItemInvite.ExpirationDateTime = nil
 			createShareResponse.Share = &collaboration.Share{
@@ -572,9 +572,9 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		It("rejects to add a user to a personal space", func() {
 			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listSpacesResponse, nil)
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("user")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("user")},
 			}
-			driveItemInvite.ExpirationDateTime = libregraph.PtrTime(time.Now().Add(time.Hour))
+			driveItemInvite.ExpirationDateTime = new(time.Now().Add(time.Hour))
 			createShareResponse.Share = &collaboration.Share{
 				Id:         &collaboration.ShareId{OpaqueId: "123"},
 				Expiration: utils.TimeToTS(*driveItemInvite.ExpirationDateTime),
@@ -1565,8 +1565,8 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 		invite = libregraph.DriveItemInvite{
 			Recipients: []libregraph.DriveRecipient{
 				{
-					ObjectId:                libregraph.PtrString("1"),
-					LibreGraphRecipientType: libregraph.PtrString("user")},
+					ObjectId:                new("1"),
+					LibreGraphRecipientType: new("user")},
 			},
 			Roles: []string{unifiedrole.UnifiedRoleViewerID},
 		}
@@ -1774,7 +1774,7 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 			expectedPermission.SetRoles([]string{unifiedrole.UnifiedRoleEditorID})
 			expectedPermission.SetGrantedToV2(libregraph.SharePointIdentitySet{
 				User: &libregraph.Identity{
-					Id:          libregraph.PtrString("4c510ada-c86b-4815-8820-42cdf82c3d51"),
+					Id:          new("4c510ada-c86b-4815-8820-42cdf82c3d51"),
 					DisplayName: "Albert Einstein",
 				},
 			})

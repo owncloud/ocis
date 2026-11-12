@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/go-ldap/ldap/v3"
@@ -454,13 +455,7 @@ func (i *LDAP) AddUsersToEducationSchool(ctx context.Context, schoolNumberOrID s
 
 	for _, userEntry := range userEntries {
 		currentSchools := userEntry.GetEqualFoldAttributeValues(i.educationConfig.memberOfSchoolAttribute)
-		found := false
-		for _, currentSchool := range currentSchools {
-			if currentSchool == schoolID {
-				found = true
-				break
-			}
-		}
+		found := slices.Contains(currentSchools, schoolID)
 		if !found {
 			mr := ldap.ModifyRequest{DN: userEntry.DN}
 			mr.Add(i.educationConfig.memberOfSchoolAttribute, []string{schoolID})
@@ -602,13 +597,7 @@ func (i *LDAP) AddClassesToEducationSchool(ctx context.Context, schoolNumberOrID
 
 	for _, classEntry := range classEntries {
 		currentSchools := classEntry.GetEqualFoldAttributeValues(i.educationConfig.memberOfSchoolAttribute)
-		found := false
-		for _, currentSchool := range currentSchools {
-			if currentSchool == schoolID {
-				found = true
-				break
-			}
-		}
+		found := slices.Contains(currentSchools, schoolID)
 		if !found {
 			mr := ldap.ModifyRequest{DN: classEntry.DN}
 			mr.Add(i.educationConfig.memberOfSchoolAttribute, []string{schoolID})

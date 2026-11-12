@@ -109,7 +109,7 @@ func (s Thumbnails) TransferTokenValidator(next http.Handler) http.Handler {
 		logger := s.logger.SubloggerWithRequestID(r.Context())
 		tokenString := r.Header.Get("Transfer-Token")
 		claims := &tjwt.ThumbnailClaims{}
-		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
 			if token.Method != jwt.SigningMethodHS256 {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}

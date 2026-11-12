@@ -146,12 +146,12 @@ func TestHandleChatCompletions_HappyPath_RelaysUpstreamResponse(t *testing.T) {
 		t.Fatalf("expected upstream Authorization header, got %q", receivedAuth)
 	}
 
-	var got map[string]interface{}
+	var got map[string]any
 	if err := json.Unmarshal(rec.Body.Bytes(), &got); err != nil {
 		t.Fatalf("expected valid JSON relayed back, got error: %v, body: %s", err, rec.Body.String())
 	}
 
-	var forwarded map[string]interface{}
+	var forwarded map[string]any
 	if err := json.Unmarshal(receivedBody, &forwarded); err != nil {
 		t.Fatalf("expected valid JSON forwarded to upstream, got error: %v, body: %s", err, receivedBody)
 	}
@@ -189,7 +189,7 @@ func TestHandleChatCompletions_ModelOverride_ReplacesClientModel(t *testing.T) {
 		t.Fatalf("expected 200, got %d, body: %s", rec.Code, rec.Body.String())
 	}
 
-	var forwarded map[string]interface{}
+	var forwarded map[string]any
 	if err := json.Unmarshal(receivedBody, &forwarded); err != nil {
 		t.Fatalf("expected valid JSON forwarded to upstream, got error: %v, body: %s", err, receivedBody)
 	}
@@ -251,7 +251,7 @@ func TestHandleChatCompletions_ClientDisconnect_CancelsUpstreamCall(t *testing.T
 func TestHandleChatCompletions_InvalidRequestDoesNotConsumeQuota(t *testing.T) {
 	svc := newTestService(t, "http://unused.invalid", 1)
 
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		rec := httptest.NewRecorder()
 		svc.HandleChatCompletions(rec, requestWithUser([]byte(`{"model":"m","messages":[]}`), "user-1"))
 		if rec.Code != http.StatusBadRequest {

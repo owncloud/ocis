@@ -60,7 +60,7 @@ var _ = Describe("NATS credentials fields", func() {
 				}
 			}
 		}
-		walk(reflect.TypeOf(config.Config{}))
+		walk(reflect.TypeFor[config.Config]())
 
 		Expect(problems).To(BeEmpty())
 		// The walk must find the credentials, or the test checks nothing.
