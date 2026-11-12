@@ -418,12 +418,47 @@ https://owncloud.com
 			},
 		}),
 
+		Entry("Share Expired", events.Event{
+			Event: events.ShareExpired{
+				ShareOwner:     sharer.GetId(),
+				GranteeGroupID: &group.GroupId{OpaqueId: "vaultgroup"},
+				ExpiredAt:      time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC),
+				ItemID:         vaultResourceID,
+			},
+		}),
+
+		Entry("Share Removed", events.Event{
+			Event: events.ShareRemoved{
+				Executant:      sharer.GetId(),
+				GranteeGroupID: &group.GroupId{OpaqueId: "vaultgroup"},
+				ItemID:         vaultResourceID,
+			},
+		}),
+
 		Entry("Added to Space", events.Event{
 			Event: events.SpaceShared{
 				Executant:      sharer.GetId(),
 				Creator:        sharer.GetId(),
 				GranteeGroupID: &group.GroupId{OpaqueId: "vaultgroup"},
 				ID:             vaultSpaceID,
+			},
+		}),
+
+		Entry("Removed from Space", events.Event{
+			Event: events.SpaceUnshared{
+				Executant:      sharer.GetId(),
+				GranteeGroupID: &group.GroupId{OpaqueId: "vaultgroup"},
+				ID:             vaultSpaceID,
+			},
+		}),
+
+		Entry("Space Expired", events.Event{
+			Event: events.SpaceMembershipExpired{
+				SpaceOwner:     sharer.GetId(),
+				GranteeGroupID: &group.GroupId{OpaqueId: "vaultgroup"},
+				SpaceID:        vaultSpaceID,
+				SpaceName:      "vault space",
+				ExpiredAt:      time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC),
 			},
 		}),
 	)

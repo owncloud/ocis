@@ -128,7 +128,11 @@ var _ = Describe("UserlogService vault events", func() {
 			service.ValueClient(vc),
 			service.RegisteredEvents([]events.Unmarshaller{
 				events.ShareCreated{},
+				events.ShareRemoved{},
+				events.ShareExpired{},
 				events.SpaceShared{},
+				events.SpaceUnshared{},
+				events.SpaceMembershipExpired{},
 			}),
 			service.TraceProvider(trace.NewNoopTracerProvider()),
 		)
@@ -161,10 +165,30 @@ var _ = Describe("UserlogService vault events", func() {
 			GranteeGroupID: vaultGroup,
 			ItemID:         vaultResourceID,
 		}),
+		Entry("Share Removed", events.ShareRemoved{
+			Executant:      &user.UserId{OpaqueId: "sharer"},
+			GranteeGroupID: vaultGroup,
+			ItemID:         vaultResourceID,
+		}),
+		Entry("Share Expired", events.ShareExpired{
+			ShareOwner:     &user.UserId{OpaqueId: "sharer"},
+			GranteeGroupID: vaultGroup,
+			ItemID:         vaultResourceID,
+		}),
 		Entry("Added to Space", events.SpaceShared{
 			Executant:      &user.UserId{OpaqueId: "sharer"},
 			GranteeGroupID: vaultGroup,
 			ID:             vaultSpaceID,
+		}),
+		Entry("Removed from Space", events.SpaceUnshared{
+			Executant:      &user.UserId{OpaqueId: "sharer"},
+			GranteeGroupID: vaultGroup,
+			ID:             vaultSpaceID,
+		}),
+		Entry("Space Membership Expired", events.SpaceMembershipExpired{
+			SpaceOwner:     &user.UserId{OpaqueId: "sharer"},
+			GranteeGroupID: vaultGroup,
+			SpaceID:        vaultSpaceID,
 		}),
 	)
 

@@ -1325,7 +1325,33 @@ class FeatureContext extends BehatVariablesContext {
 	public function userSendsHTTPMethodToUrl(string $user, string $verb, string $url): void {
 		$user = $this->getActualUsername($user);
 		$endpoint = $this->substituteInLineCodes($url, $user);
-		$this->setResponse($this->sendingToWithDirectUrl($user, $verb, $endpoint));
+		$this->setResponse($this->sendingToWithDirectUrlAsUser($user, $verb, $endpoint));
+	}
+
+	/**
+	 * Sends the request with basic auth, or with the access token when the test runs with Keycloak.
+	 * A Keycloak user cannot use basic auth.
+	 *
+	 * @param string $user
+	 * @param string $verb
+	 * @param string $url
+	 * @param string|null $body
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	private function sendingToWithDirectUrlAsUser(
+		string $user,
+		string $verb,
+		string $url,
+		?string $body = null,
+	): ResponseInterface {
+		if (\TestHelpers\KeycloakHelper::isTestingWithKeycloak()) {
+			$accessToken = $this->getOcisUserToken($user)['token']['accessToken'];
+			$headers = ['Authorization' => 'Bearer ' . $accessToken];
+			return $this->sendingToWithDirectUrl(null, $verb, $url, $body, null, $headers);
+		}
+		return $this->sendingToWithDirectUrl($user, $verb, $url, $body);
 	}
 
 	/**
@@ -1443,6 +1469,7 @@ class FeatureContext extends BehatVariablesContext {
 
 	/**
 	 * @When user :user sends HTTP method :method to URL :davPath with content :content
+	 * @When user :user tries to send HTTP method :method to URL :davPath with content :content
 	 *
 	 * @param string $user
 	 * @param string $method
@@ -1457,7 +1484,7 @@ class FeatureContext extends BehatVariablesContext {
 		string $davPath,
 		string $content,
 	): void {
-		$this->setResponse($this->sendingToWithDirectUrl($user, $method, $davPath, $content));
+		$this->setResponse($this->sendingToWithDirectUrlAsUser($user, $method, $davPath, $content));
 	}
 
 	/**
@@ -1480,7 +1507,7 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @param string $user
+	 * @param string|null $user null sends the request without basic auth
 	 * @param string $verb
 	 * @param string $url
 	 * @param string|null $body
@@ -1491,7 +1518,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws GuzzleException
 	 */
 	public function sendingToWithDirectUrl(
-		string $user,
+		?string $user,
 		string $verb,
 		string $url,
 		?string $body = null,
@@ -1504,7 +1531,7 @@ class FeatureContext extends BehatVariablesContext {
 		}
 		$fullUrl = $this->getBaseUrl() . "/$url";
 
-		if ($password === null) {
+		if ($password === null && $user !== null) {
 			$password = $this->getPasswordForUser($user);
 		}
 
