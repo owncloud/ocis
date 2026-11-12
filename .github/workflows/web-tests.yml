@@ -8,6 +8,12 @@ on:
 permissions:
   contents: read
 
+# Pull request runs cancel their predecessor on the same PR. Every other
+# event gets its own group, so pushes and scheduled runs never cancel each other.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   detect-web-changes:
     name: detect-web-changes
