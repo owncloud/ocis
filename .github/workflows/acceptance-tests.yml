@@ -317,7 +317,7 @@ jobs:
           TIKA_IMAGE: ${{ matrix.tika_image }}
 
       - name: Upload raw coverage data
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-coverage-${{ matrix.suite }}
@@ -367,7 +367,7 @@ jobs:
           BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
 
       - name: Upload raw coverage data
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-coverage-cli-${{ matrix.suite }}
@@ -417,7 +417,7 @@ jobs:
           BEHAT_SUITES="${{ matrix.suite }}" OCIS_LDAP_POOL_ENABLED=true python3 tests/acceptance/run-github.py
 
       - name: Upload raw coverage data
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-coverage-ldap-pool-${{ matrix.suite }}
@@ -515,7 +515,7 @@ jobs:
           python3 tests/acceptance/run-github.py
 
       - name: Upload raw coverage data
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-coverage-core-${{ matrix.suite }}
