@@ -631,7 +631,7 @@ func (fs *Decomposedfs) UpdateStorageSpace(ctx context.Context, req *provider.Up
 
 	}
 
-	if !restore && len(metadata) == 0 && !permissions.IsViewer(sp) {
+	if !restore && len(metadata) == 0 && !permissions.IsSpaceViewer(sp) {
 		// you may land here when making an update request without changes
 		// check if user has access to the drive before continuing
 		return &provider.UpdateStorageSpaceResponse{
@@ -639,10 +639,10 @@ func (fs *Decomposedfs) UpdateStorageSpace(ctx context.Context, req *provider.Up
 		}, nil
 	}
 
-	if !permissions.IsManager(sp) {
+	if !permissions.IsSpaceManager(sp) {
 		// We are not a space manager. We need to check for additional permissions.
 		k := []string{prefixes.NameAttr, prefixes.SpaceDescriptionAttr}
-		if !permissions.IsEditor(sp) {
+		if !permissions.IsSpaceEditor(sp) {
 			k = append(k, prefixes.SpaceReadmeAttr, prefixes.SpaceAliasAttr, prefixes.SpaceImageAttr)
 		}
 
@@ -871,7 +871,7 @@ func (fs *Decomposedfs) StorageSpaceFromNode(ctx context.Context, n *node.Node, 
 	user := ctxpkg.ContextMustGetUser(ctx)
 	if checkPermissions && n.SpaceRoot.IsDisabled(ctx) {
 		rp, err := fs.p.AssemblePermissions(ctx, n)
-		if err != nil || !permissions.IsManager(rp) {
+		if err != nil || !permissions.IsSpaceManager(rp) {
 			return nil, errtypes.PermissionDenied(fmt.Sprintf("user %s is not allowed to list deleted spaces %s", user.Username, n.ID))
 		}
 	}
@@ -1172,7 +1172,8 @@ func canDeleteSpace(ctx context.Context, spaceID string, typ string, purge bool,
 	}
 
 	// space managers are allowed to disable and delete their project spaces
-	if rp, err := p.AssemblePermissions(ctx, n); err == nil && permissions.IsManager(rp) {
+	rp, err := p.AssemblePermissions(ctx, n)
+	if err == nil && permissions.IsSpaceManager(rp) {
 		return nil
 	}
 

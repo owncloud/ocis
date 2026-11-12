@@ -270,7 +270,7 @@ func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
 			// an unmapped error is an infrastructure problem, not a property of the
 			// requested file: log it at error level so it is visible in production.
 			logger.Error().Err(err).Msg("could not get thumbnail")
-			renderError(w, r, errInternalError(err.Error()))
+			renderError(w, r, errInternalError("could not get thumbnail"))
 			return
 		}
 		logger.Debug().Err(err).Msg("could not get thumbnail")
@@ -372,7 +372,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 			// an unmapped error is an infrastructure problem, not a property of the
 			// requested file: log it at error level so it is visible in production.
 			logger.Error().Err(err).Msg("could not get thumbnail")
-			renderError(w, r, errInternalError(err.Error()))
+			renderError(w, r, errInternalError("could not get thumbnail"))
 			return
 		}
 		logger.Debug().Err(err).Msg("could not get thumbnail")
@@ -421,7 +421,7 @@ func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
 			// an unmapped error is an infrastructure problem, not a property of the
 			// requested file: log it at error level so it is visible in production.
 			logger.Error().Err(err).Msg("could not get thumbnail")
-			renderError(w, r, errInternalError(err.Error()))
+			renderError(w, r, errInternalError("could not get thumbnail"))
 			return
 		}
 		logger.Debug().Err(err).Msg("could not get thumbnail")
@@ -470,7 +470,7 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 			// an unmapped error is an infrastructure problem, not a property of the
 			// requested file: log it at error level so it is visible in production.
 			logger.Error().Err(err).Msg("could not get thumbnail")
-			renderError(w, r, errInternalError(err.Error()))
+			renderError(w, r, errInternalError("could not get thumbnail"))
 			return
 		}
 		logger.Debug().Err(err).Msg("could not get thumbnail")
@@ -488,7 +488,7 @@ func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w
 
 	dlReq, err := tracing.GetNewRequest(r.Context(), http.MethodGet, rsp.DataEndpoint, http.NoBody)
 	if err != nil {
-		renderError(w, r, errInternalError(err.Error()))
+		renderError(w, r, errInternalError("could not download thumbnail"))
 		logger.Error().Err(err).Msg("could not create download thumbnail request")
 		return
 	}
@@ -496,7 +496,7 @@ func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w
 
 	dlRsp, err := client.Do(dlReq)
 	if err != nil {
-		renderError(w, r, errInternalError(err.Error()))
+		renderError(w, r, errInternalError("could not download thumbnail"))
 		logger.Error().Err(err).Msg("could not download thumbnail: transport error")
 		return
 	}

@@ -711,6 +711,9 @@ var _ = Describe("Users", func() {
 				user := &libregraph.User{}
 				user.SetId("user1")
 
+				// anyone can get the userId
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
+
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 				valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
 					Return(&settings.GetValueResponse{
@@ -750,6 +753,13 @@ var _ = Describe("Users", func() {
 			It("includes the personal space if requested", func() {
 				user := &libregraph.User{}
 				user.SetId("user1")
+
+				// requires privileges
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
 
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 				gatewayClient.On("GetQuota", mock.Anything, mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
@@ -810,6 +820,13 @@ var _ = Describe("Users", func() {
 				user := &libregraph.User{}
 				user.SetId("user1")
 
+				// requires privileges
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
+
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 				gatewayClient.On("GetQuota", mock.Anything, mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
 					Status:     status.NewOK(ctx),
@@ -861,6 +878,13 @@ var _ = Describe("Users", func() {
 			It("expands the appRoleAssignments", func() {
 				user := &libregraph.User{}
 				user.SetId("user1")
+
+				// requires privileges
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
 
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 
@@ -1225,6 +1249,12 @@ var _ = Describe("Users", func() {
 
 				expectedUser.SetMail("mail@mail.test")
 				expectedUser.SetDisplayName("New Display Name")
+				// requires privileges
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
 				identityBackend.On("UpdateUser", mock.Anything, user.GetId(), mock.Anything).Return(expectedUser, nil)
 
 				data, err := json.Marshal(userUpdate)
