@@ -35,6 +35,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/auth/scope"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/natsauth"
+	"github.com/owncloud/reva/v2/pkg/publicshare"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/grants"
 	"github.com/owncloud/reva/v2/pkg/store"
@@ -181,7 +182,7 @@ func (m *manager) Authenticate(ctx context.Context, token, secret string) (*user
 	// Reject internal links — they require authentication and cannot be accessed anonymously.
 	// An internal link has no effective permissions.
 	if grants.PermissionsEqual(publicShareResponse.GetShare().GetPermissions().GetPermissions(), &provider.ResourcePermissions{}) {
-		return nil, nil, errtypes.PermissionDenied("internal links require authentication and cannot be accessed anonymously")
+		return nil, nil, errtypes.PermissionDenied(publicshare.InternalLinkRejectedMessage)
 	}
 
 	var owner *user.User

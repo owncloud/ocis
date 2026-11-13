@@ -13,6 +13,7 @@ use Behat\Gherkin\Node\PyStringNode;
 use PHPUnit\Framework\Assert;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
+use TestHelpers\KeycloakHelper;
 use TestHelpers\OcsApiHelper;
 use TestHelpers\SettingsHelper;
 use TestHelpers\BehatHelper;
@@ -104,16 +105,27 @@ class NotificationContext implements Context {
 	 */
 	public function listAllNotifications(string $user): ResponseInterface {
 		$this->setUserRecipient($user);
+		// A Keycloak user cannot use basic auth, so authenticate with the access token.
+		$authHeaders = [];
+		$username = $this->featureContext->getActualUsername($user);
+		$password = $this->featureContext->getPasswordForUser($user);
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$authHeaders['Authorization'] = 'Bearer '
+				. $this->featureContext->getOcisUserToken($user)['token']['accessToken'];
+			$username = null;
+			$password = null;
+		}
 		$language = SettingsHelper::getLanguageSettingValue(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getActualUsername($user),
-			$this->featureContext->getPasswordForUser($user),
+			$username,
+			$password,
+			$authHeaders,
 		);
-		$headers = ["accept-language" => $language];
+		$headers = ["accept-language" => $language] + $authHeaders;
 		return OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getActualUsername($user),
-			$this->featureContext->getPasswordForUser($user),
+			$username,
+			$password,
 			'GET',
 			$this->notificationEndpointPath . '?format=json',
 			[],

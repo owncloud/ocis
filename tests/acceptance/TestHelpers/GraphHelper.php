@@ -1934,11 +1934,13 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user null sends the request without basic auth
+	 * @param string|null $password
 	 * @param string $spaceId
 	 * @param string $itemId
 	 * @param string $permissionId
+	 * @param array $headers
+	 * @param bool $isVault
 	 *
 	 * @return ResponseInterface
 	 *
@@ -1946,27 +1948,31 @@ class GraphHelper {
 	 */
 	public static function removeAccessToSpaceItem(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
 		string $spaceId,
 		string $itemId,
 		string $permissionId,
+		array $headers = [],
+		bool $isVault = false,
 	): ResponseInterface {
-		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions/$permissionId");
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions/$permissionId", $isVault);
 		return HttpRequestHelper::delete(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders(),
+			\array_merge(self::getRequestHeaders(), $headers),
 		);
 	}
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user null sends the request without basic auth
+	 * @param string|null $password
 	 * @param string $spaceId
 	 * @param string $permissionId
+	 * @param array $headers
+	 * @param bool $isVault
 	 *
 	 * @return ResponseInterface
 	 *
@@ -1974,17 +1980,19 @@ class GraphHelper {
 	 */
 	public static function removeAccessToSpace(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
 		string $spaceId,
 		string $permissionId,
+		array $headers = [],
+		bool $isVault = false,
 	): ResponseInterface {
-		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/permissions/$permissionId");
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/permissions/$permissionId", $isVault);
 		return HttpRequestHelper::delete(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders(),
+			\array_merge(self::getRequestHeaders(), $headers),
 		);
 	}
 

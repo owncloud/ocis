@@ -1936,7 +1936,7 @@ class SpacesContext implements Context {
 	 * @param string $isVault
 	 * @param string $withRetry
 	 *
-	 * @return void
+	 * @return string the id of the created space, for the step 'we save it into'
 	 *
 	 * @throws GuzzleException
 	 * @throws Exception
@@ -1946,7 +1946,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $isVault,
 		string $withRetry,
-	): void {
+	): string {
 		$space = ["name" => $spaceName];
 		$isVault = trim($isVault) === "in vault";
 		$withRetry = trim($withRetry) === "with retry";
@@ -1973,6 +1973,7 @@ class SpacesContext implements Context {
 		} else {
 			$this->addToCreatedSpace($user, $space);
 		}
+		return $space->id;
 	}
 
 	/**
