@@ -1106,7 +1106,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   all-acceptance-tests:
-    needs: [detect-changes, local-api-tests, cli-tests, ldap-pool-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests, external-ldap-tests, external-ldap-distributed-tests, nats-jwt-tests, nats-jwt-startup-check]
+    needs: [detect-changes, build-and-test, local-api-tests, cli-tests, ldap-pool-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests, external-ldap-tests, external-ldap-distributed-tests, nats-jwt-tests, nats-jwt-startup-check]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: always()
@@ -1118,7 +1118,8 @@ jobs:
             echo "Docs-only change — skipping tests is expected."
             exit 0
           fi
-          if [[ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+          # Outside docs-only every needed job must have run: a skipped one means tests did not run
+          if [[ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped') }}" == "true" ]]; then
             exit 1
           fi
         env:
