@@ -134,6 +134,9 @@ const cancelUploadButton = '//button[contains(@id, "cancel-upload")]'
 const filesContextMenuAction = 'div[id^="context-menu-drop"] button.oc-files-actions-%s-trigger'
 const highlightedFileRowSelector = '#files-space-table tr.oc-table-highlighted'
 const emptyTrashbinButtonSelector = '.oc-files-actions-empty-trash-bin-trigger'
+const emptyTrashbinAppBarButtonSelector =
+  '.files-app-bar-actions .oc-files-actions-empty-trash-bin-trigger'
+const emptyTrashbinMessageSelector = '#files-trashbin-empty'
 const resourceLockIcon =
   '//*[@data-test-resource-name="%s"]/ancestor::tr//td//span[@data-test-indicator-type="resource-locked"]'
 const sharesNavigationButtonSelector = '.oc-sidebar-nav [data-nav-name="files-shares"]'
@@ -1726,6 +1729,27 @@ export const emptyTrashbin = async ({ page }: { page: Page }): Promise<void> => 
   )
   const message = await page.locator(notificationMessageDialog).textContent()
   expect(message).toBe('All deleted files were removed')
+}
+
+export const expectEmptyTrashbinMessageToBeVisible = async ({
+  page,
+  message
+}: {
+  page: Page
+  message: string
+}): Promise<void> => {
+  const emptyTrashbinMessage = page.locator(emptyTrashbinMessageSelector)
+  await expect(emptyTrashbinMessage).toBeVisible()
+  await expect(emptyTrashbinMessage).toContainText(message)
+}
+
+export const expectEmptyTrashbinButtonNotToBeVisible = async ({
+  page
+}: {
+  page: Page
+}): Promise<void> => {
+  // the fix filters the action out of the batch action list instead of disabling the button
+  await expect(page.locator(emptyTrashbinAppBarButtonSelector)).toHaveCount(0)
 }
 
 export const expectThatDeleteButtonIsNotVisible = async (
