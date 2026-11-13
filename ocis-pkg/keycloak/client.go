@@ -17,6 +17,17 @@ const (
 	_userTypeAttr = "OWNCLOUD_USER_TYPE"
 )
 
+// TokenError is returned when getting the access token for a request fails.
+// The request itself was not sent to Keycloak then. Error() returns the
+// message of the underlying error unchanged.
+type TokenError struct {
+	Err error
+}
+
+func (e *TokenError) Error() string { return e.Err.Error() }
+
+func (e *TokenError) Unwrap() error { return e.Err }
+
 // ConcreteClient represents a concrete implementation of a keycloak client
 type ConcreteClient struct {
 	keycloak     GoCloak
@@ -90,6 +101,15 @@ func (c *ConcreteClient) SendActionsMail(ctx context.Context, realm, userID stri
 	return c.keycloak.ExecuteActionsEmail(ctx, token.AccessToken, realm, params)
 }
 
+// DeleteUser deletes the user with the given *keycloak* ID from the realm.
+func (c *ConcreteClient) DeleteUser(ctx context.Context, realm, userID string) error {
+	token, err := c.getToken(ctx)
+	if err != nil {
+		return err
+	}
+	return c.keycloak.DeleteUser(ctx, token.AccessToken, realm, userID)
+}
+
 // getUserByParams looks up a user by the given parameters.
 func (c *ConcreteClient) getUserByParams(ctx context.Context, realm string, params gocloak.GetUsersParams) (*libregraph.User, error) {
 	token, err := c.getToken(ctx)
@@ -148,9 +168,17 @@ func (c *ConcreteClient) GetPIIReport(ctx context.Context, realm, username strin
 	}, nil
 }
 
-// getToken gets a fresh token for the request.
+// getToken gets a fresh token for the request. All its errors are *TokenError.
 // TODO: set a token on the struct and check if it's still valid before requesting a new one.
 func (c *ConcreteClient) getToken(ctx context.Context) (*gocloak.JWT, error) {
+	token, err := c.fetchToken(ctx)
+	if err != nil {
+		return nil, &TokenError{Err: err}
+	}
+	return token, nil
+}
+
+func (c *ConcreteClient) fetchToken(ctx context.Context) (*gocloak.JWT, error) {
 	token, err := c.keycloak.LoginClient(ctx, c.clientID, c.clientSecret, c.realm)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get token: %w", err)

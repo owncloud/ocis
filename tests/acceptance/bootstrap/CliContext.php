@@ -1149,6 +1149,45 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @When the administrator recalculates the treesize of space :space of user :user using the CLI
+	 *
+	 * @param string $spaceName
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorRecalculatesTheTreesizeOfSpaceUsingTheCli(string $spaceName, string $user): void {
+		$space = $this->featureContext->spacesContext->getSpaceByName($user, $spaceName);
+		$this->featureContext->setResponse($this->recalculateTreesize($space['id']));
+	}
+
+	/**
+	 * @When the administrator recalculates the treesize of space with id :spaceId using the CLI
+	 *
+	 * @param string $spaceId
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorRecalculatesTheTreesizeOfSpaceWithIdUsingTheCli(string $spaceId): void {
+		$this->featureContext->setResponse($this->recalculateTreesize($spaceId));
+	}
+
+	/**
+	 * @param string $spaceId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	protected function recalculateTreesize(string $spaceId): ResponseInterface {
+		$body = [
+			"command" => "storage-users spaces recalculate-treesize --space-id=$spaceId",
+		];
+		return CliHelper::runCommand($body);
+	}
+
+	/**
 	 * @When administrator deletes :space space with :retentionPeriod retention period using the CLI
 	 *
 	 * @param string $space
