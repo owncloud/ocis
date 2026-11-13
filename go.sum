@@ -736,6 +736,8 @@ github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245 h1:J
 github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245/go.mod h1:z61VMGAJRtR1nbgXWiNoCkxUXP1B3Je9rMuJbnGd+Og=
 github.com/owncloud/reva/v2 v2.0.0-20261109105443-35b75d9cfbfb h1:cZ7iXzqdWHvwQdMu+DeOeCkgtPZggz59VimUqvyuICg=
 github.com/owncloud/reva/v2 v2.0.0-20261109105443-35b75d9cfbfb/go.mod h1:aPTQk4pFJ2kmLnkiyBtRrg1Q4O/ItWXrr05XeLvZz8Y=
+github.com/owncloud/reva/v2 v2.0.0-20261113124054-e2d9251c0d47 h1:9DyrJGOZ9TfTtFg0RSrWYEd97IBVmyLepgYssjPL7jY=
+github.com/owncloud/reva/v2 v2.0.0-20261113124054-e2d9251c0d47/go.mod h1:aPTQk4pFJ2kmLnkiyBtRrg1Q4O/ItWXrr05XeLvZz8Y=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/patrickmn/go-cache v2.1.0+incompatible h1:HRMgzkcYKYpi3C8ajMPV8OFXaaRUnok+kx1WdO15EQc=
