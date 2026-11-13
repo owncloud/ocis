@@ -212,9 +212,15 @@ func (c *Cache) Add(ctx context.Context, storageID, spaceID, shareID string, sha
 
 // Remove removes a share from the cache
 func (c *Cache) Remove(ctx context.Context, storageID, spaceID, shareID string) error {
+	return c.RemoveMany(ctx, storageID, spaceID, []string{shareID})
+}
+
+// RemoveMany removes the given shares of one space with one upload.
+// It does not upload when none of the shares is in the space.
+func (c *Cache) RemoveMany(ctx context.Context, storageID, spaceID string, shareIDs []string) error {
 	ctx, span := tracer.Start(ctx, "Remove")
 	defer span.End()
-	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID), attribute.String("cs3.shareid", shareID))
+	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID), attribute.Int("cs3.sharecount", len(shareIDs)))
 
 	unlock := c.LockSpace(spaceID)
 	defer unlock()
@@ -232,11 +238,20 @@ func (c *Cache) Remove(ctx context.Context, storageID, spaceID, shareID string) 
 		if !ok {
 			return nil
 		}
-		space, _ := spaces.Spaces.Load(spaceID)
+		space, ok := spaces.Spaces.Load(spaceID)
 		if !ok {
 			return nil
 		}
-		delete(space.Shares, shareID)
+		removed := false
+		for _, shareID := range shareIDs {
+			if _, ok := space.Shares[shareID]; ok {
+				delete(space.Shares, shareID)
+				removed = true
+			}
+		}
+		if !removed {
+			return nil // nothing to remove, do not upload
+		}
 
 		return c.Persist(ctx, storageID, spaceID)
 	}
@@ -245,7 +260,7 @@ func (c *Cache) Remove(ctx context.Context, storageID, spaceID, shareID string) 
 		Str("hostname", os.Getenv("HOSTNAME")).
 		Str("storageID", storageID).
 		Str("spaceID", spaceID).
-		Str("shareID", shareID).Logger()
+		Int("shareCount", len(shareIDs)).Logger()
 
 	err := cas.RetryPersist(ctx, 100, persistFunc,
 		func() error { return c.resyncAfterConflict(ctx, storageID, spaceID) },
