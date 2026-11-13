@@ -447,4 +447,8 @@ export class Resource {
     await po.duplicateMultipleResources({ page: this.#page, resources, method })
     await this.#page.goto(startUrl)
   }
+
+  async getDeletedFilesPermissionDeinedMessage(): Promise<string> {
+    return po.getDeletedFilesPermissionDeinedMessage({ page: this.#page })
+  }
 }
