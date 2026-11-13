@@ -7,6 +7,12 @@ on:
 permissions:
   contents: read
 
+# Pull request runs cancel their predecessor on the same PR. Every other
+# event gets its own group, so pushes and scheduled runs never cancel each other.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   detect-changes:
     name: detect-changes
@@ -190,6 +196,7 @@ jobs:
       GOCOVERDIR: ${{ github.workspace }}/coverage-reports
     strategy:
       fail-fast: false
+      max-parallel: 8
       matrix:
         suite:
           # contract & locks
@@ -328,7 +335,7 @@ jobs:
           TIKA_IMAGE: ${{ matrix.tika_image }}
 
       - name: Upload raw coverage data
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-coverage-${{ matrix.suite }}
@@ -378,7 +385,7 @@ jobs:
           BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
 
       - name: Upload raw coverage data
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-coverage-cli-${{ matrix.suite }}
@@ -428,7 +435,7 @@ jobs:
           BEHAT_SUITES="${{ matrix.suite }}" OCIS_LDAP_POOL_ENABLED=true python3 tests/acceptance/run-github.py
 
       - name: Upload raw coverage data
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-coverage-ldap-pool-${{ matrix.suite }}
@@ -444,6 +451,7 @@ jobs:
       GOCOVERDIR: ${{ github.workspace }}/coverage-reports
     strategy:
       fail-fast: false
+      max-parallel: 4
       matrix:
         suite:
           - "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
@@ -543,7 +551,7 @@ jobs:
           python3 tests/acceptance/run-github.py
 
       - name: Upload raw coverage data
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-coverage-core-${{ matrix.suite }}
@@ -559,6 +567,7 @@ jobs:
     timeout-minutes: 120
     strategy:
       fail-fast: false
+      max-parallel: 4
       matrix:
         include:
           - suite: part-1
@@ -1056,7 +1065,7 @@ jobs:
   acceptance-coverage:
     name: acceptance-coverage
     needs: [detect-changes, local-api-tests, cli-tests, ldap-pool-tests, core-api-tests]
-    if: always() && github.event_name == 'pull_request' && needs.detect-changes.outputs.docs-only != 'true'
+    if: ${{ !cancelled() && github.event_name == 'pull_request' && needs.detect-changes.outputs.docs-only != 'true' }}
     runs-on: ubuntu-latest
     env:
       GOCOVERDIR: ${{ github.workspace }}/coverage-reports
