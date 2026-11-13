@@ -45,6 +45,23 @@ export async function userShouldSeeNoNotifications({
   expect(messages).toHaveLength(0)
 }
 
+export async function userShouldNotSeeNotifications({
+  stepUser,
+  unexpectedMessages
+}: {
+  stepUser: string
+  unexpectedMessages: string[]
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const application = new objects.runtime.Application({ page })
+  const messages = await application.getNotificationMessages()
+
+  for (const message of unexpectedMessages) {
+    expect(messages).not.toContain(substitute(message))
+  }
+}
+
 export async function userWaitsForTokenRenewal({
   stepUser,
   renewalType
