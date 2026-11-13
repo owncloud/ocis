@@ -21,5 +21,10 @@ document. A purge of a space with 20 group shares did 41 uploads and now does
 When a space is deleted, the share manager now logs the errors of the share
 cleanup. Before, it sent them to a disabled logger.
 
+A Remove on the created cache or on the group cache no longer panics when the
+user or group has no entry for the space of the share, or when the share ID
+has no delimiter. Before, the panic stopped the sharing service, also in an
+unshare and in the cleanup of orphaned shares.
+
 https://github.com/owncloud/ocis/pull/13460
 https://github.com/owncloud/reva/pull/813
