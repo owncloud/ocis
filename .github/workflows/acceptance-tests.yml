@@ -43,7 +43,7 @@ jobs:
           fi
 
           # Get changed files between the PR base and head
-          CHANGED_FILES=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" 2>/dev/null || git diff --name-only HEAD~1)
+          CHANGED_FILES=$(git diff --no-renames --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" 2>/dev/null || git diff --no-renames --name-only HEAD~1)
 
           # Patterns that are considered documentation/non-code changes
           DOCS_ONLY=true
@@ -1116,6 +1116,11 @@ jobs:
     steps:
       - name: Check all jobs passed
         run: |
+          # detect-changes also lints the changelog; its failure must fail the gate even on docs-only
+          if [[ "${NEEDS_DETECT_CHANGES_RESULT}" != "success" ]]; then
+            echo "detect-changes did not succeed: ${NEEDS_DETECT_CHANGES_RESULT}"
+            exit 1
+          fi
           # If docs-only, all test jobs are expected to be skipped — that's a pass
           if [[ "${NEEDS_DETECT_CHANGES_OUTPUTS_DOCS_ONLY}" == "true" ]]; then
             echo "Docs-only change — skipping tests is expected."
@@ -1126,3 +1131,4 @@ jobs:
           fi
         env:
           NEEDS_DETECT_CHANGES_OUTPUTS_DOCS_ONLY: ${{ needs.detect-changes.outputs.docs-only }}
+          NEEDS_DETECT_CHANGES_RESULT: ${{ needs.detect-changes.result }}
