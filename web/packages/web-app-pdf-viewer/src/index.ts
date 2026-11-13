@@ -34,6 +34,7 @@ const appInfo = {
   extensions: [
     {
       extension: 'pdf',
+      mimeType: 'application/pdf',
       routeName: 'pdf-viewer'
     }
   ]
