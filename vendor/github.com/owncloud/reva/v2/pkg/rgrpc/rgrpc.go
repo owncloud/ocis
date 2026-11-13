@@ -24,6 +24,7 @@ import (
 	"io"
 	"net"
 	"sort"
+	"sync"
 	"time"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -141,12 +142,17 @@ func (c *config) init() {
 
 // Server is a gRPC server.
 type Server struct {
-	s              *grpc.Server
 	conf           *config
-	listener       net.Listener
 	log            zerolog.Logger
 	tracerProvider trace.TracerProvider
-	services       map[string]Service
+
+	// mu protects the fields below. Start writes them in one goroutine. Stop and GracefulStop read them in another goroutine.
+	mu       sync.Mutex
+	s        *grpc.Server
+	listener net.Listener
+	services map[string]Service
+	// stopped is true after the first call to Stop or GracefulStop. A Start that finishes later must not serve.
+	stopped bool
 }
 
 // NewServer returns a new Server.
@@ -189,22 +195,38 @@ func NewServer(m interface{}, log zerolog.Logger, tp trace.TracerProvider) (*Ser
 		conf.TLSSettings.tlsConfig = &tls.Config{Certificates: []tls.Certificate{cert}}
 	}
 
-	server := &Server{conf: conf, log: log, tracerProvider: tp, services: map[string]Service{}}
+	server := &Server{conf: conf, log: log, tracerProvider: tp}
 
 	return server, nil
 }
 
 // Start starts the server.
+// The grpc server exists only after all service constructors return. Some constructors are slow,
+// for example when they retry a NATS connection. A Stop or GracefulStop can come during this time.
+// Then Start closes the services and returns nil. It does not serve.
 func (s *Server) Start(ln net.Listener) error {
-	if err := s.registerServices(); err != nil {
-		err = errors.Wrap(err, "unable to register services")
-		return err
-	}
+	grpcServer, services, err := s.registerServices()
 
+	s.mu.Lock()
+	s.services = services
+	if err != nil || s.stopped {
+		s.mu.Unlock()
+		_ = ln.Close()
+		if err != nil {
+			return errors.Wrap(err, "unable to register services")
+		}
+		s.log.Info().Msg("rgrpc: server stopped before it started to serve")
+		s.cleanupServices()
+		return nil
+	}
+	s.s = grpcServer
 	s.listener = ln
+	s.mu.Unlock()
+
 	s.log.Info().Msgf("grpc server listening at %s:%s", s.Network(), s.Address())
-	err := s.s.Serve(s.listener)
-	if err != nil {
+	err = grpcServer.Serve(ln)
+	// Serve returns ErrServerStopped when a stop came after s.s was set but before Serve started.
+	if err != nil && err != grpc.ErrServerStopped {
 		err = errors.Wrap(err, "serve failed")
 		return err
 	}
@@ -229,31 +251,35 @@ func (s *Server) isServiceEnabled(svcName string) bool {
 	return false
 }
 
-func (s *Server) registerServices() error {
+// registerServices creates the services and the grpc server. It does not store them in s.
+// It returns the services that it created also when it returns an error.
+func (s *Server) registerServices() (*grpc.Server, map[string]Service, error) {
+	services := map[string]Service{}
 	for svcName := range s.conf.Services {
 		if s.isServiceEnabled(svcName) {
 			newFunc := Services[svcName]
-			svc, err := newFunc(s.conf.Services[svcName], s.s, &s.log)
+			// The grpc server does not exist yet. The constructors get nil, as before.
+			svc, err := newFunc(s.conf.Services[svcName], nil, &s.log)
 			if err != nil {
-				return errors.Wrapf(err, "rgrpc: grpc service %s could not be started,", svcName)
+				return nil, services, errors.Wrapf(err, "rgrpc: grpc service %s could not be started,", svcName)
 			}
-			s.services[svcName] = svc
+			services[svcName] = svc
 			s.log.Info().Msgf("rgrpc: grpc service enabled: %s", svcName)
 		} else {
 			message := fmt.Sprintf("rgrpc: grpc service %s does not exist", svcName)
-			return errors.New(message)
+			return nil, services, errors.New(message)
 		}
 	}
 
 	// obtain list of unprotected endpoints
 	unprotected := []string{}
-	for _, svc := range s.services {
+	for _, svc := range services {
 		unprotected = append(unprotected, svc.UnprotectedEndpoints()...)
 	}
 
 	opts, err := s.getInterceptors(unprotected)
 	if err != nil {
-		return err
+		return nil, services, err
 	}
 
 	if s.conf.TLSSettings.tlsConfig != nil {
@@ -269,7 +295,7 @@ func (s *Server) registerServices() error {
 
 	grpcServer := grpc.NewServer(opts...)
 
-	for _, svc := range s.services {
+	for _, svc := range services {
 		svc.Register(grpcServer)
 	}
 
@@ -278,14 +304,18 @@ func (s *Server) registerServices() error {
 		reflection.Register(grpcServer)
 	}
 
-	s.s = grpcServer
-
-	return nil
+	return grpcServer, services, nil
 }
 
 // TODO(labkode): make closing with deadline.
+// It closes each service one time only, also when Stop runs after GracefulStop.
 func (s *Server) cleanupServices() {
-	for name, svc := range s.services {
+	s.mu.Lock()
+	services := s.services
+	s.services = nil
+	s.mu.Unlock()
+
+	for name, svc := range services {
 		if err := svc.Close(); err != nil {
 			s.log.Error().Err(err).Msgf("error closing service %q", name)
 		} else {
@@ -295,17 +325,31 @@ func (s *Server) cleanupServices() {
 }
 
 // Stop stops the server.
+// It is safe to call Stop before Start, and while Start creates the services.
 func (s *Server) Stop() error {
-	s.s.Stop()
+	if gs := s.markStopped(); gs != nil {
+		gs.Stop()
+	}
 	s.cleanupServices()
 	return nil
 }
 
 // GracefulStop gracefully stops the server.
+// It is safe to call GracefulStop before Start, and while Start creates the services.
 func (s *Server) GracefulStop() error {
-	s.s.GracefulStop()
+	if gs := s.markStopped(); gs != nil {
+		gs.GracefulStop()
+	}
 	s.cleanupServices()
 	return nil
+}
+
+// markStopped prevents a later Start from serving. It returns the grpc server, or nil if it does not exist yet.
+func (s *Server) markStopped() *grpc.Server {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.stopped = true
+	return s.s
 }
 
 // Network returns the network type.
