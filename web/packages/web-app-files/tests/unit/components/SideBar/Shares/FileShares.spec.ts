@@ -1,6 +1,6 @@
 import FileShares from '../../../../../src/components/SideBar/Shares/FileShares.vue'
 import { mock } from 'vitest-mock-extended'
-import { Resource } from '@ownclouders/web-client'
+import { Resource, VAULT_STORAGE_PROVIDER_ID } from '@ownclouders/web-client'
 import { SpaceResource } from '@ownclouders/web-client'
 import { v4 as uuidV4 } from 'uuid'
 import { CollaboratorShare, ShareRole, ShareTypes } from '@ownclouders/web-client'
@@ -53,6 +53,35 @@ describe('FileShares', () => {
     })
   })
 
+  describe('invite collaborator help', () => {
+    const hasVaultGroupHint = (wrapper: VueWrapper<any, any>) =>
+      wrapper.vm.inviteCollaboratorHelp.list.some(
+        ({ text }: { text: string }) => text === 'Groups in the vault'
+      )
+
+    it('explains group shares for a vault resource', () => {
+      const { wrapper } = getWrapper({
+        vaultEnabled: true,
+        resource: mock<Resource>({
+          isReceivedShare: () => false,
+          canShare: () => true,
+          storageId: VAULT_STORAGE_PROVIDER_ID
+        })
+      })
+      expect(hasVaultGroupHint(wrapper)).toBeTruthy()
+    })
+    it('does not explain group shares for a resource outside the vault', () => {
+      const { wrapper } = getWrapper({
+        vaultEnabled: true,
+        resource: mock<Resource>({
+          isReceivedShare: () => false,
+          canShare: () => true,
+          storageId: 'some-other-provider'
+        })
+      })
+      expect(hasVaultGroupHint(wrapper)).toBeFalsy()
+    })
+  })
   describe('collaborators list', () => {
     let collaborators: CollaboratorShare[]
     beforeEach(() => {
@@ -169,7 +198,8 @@ function getWrapper({
   spaceMembers = [],
   user = undefined,
   ancestorMetaData = {},
-  canShare = true
+  canShare = true,
+  vaultEnabled = false
 }: {
   mountType?: typeof mount
   resource?: Resource
@@ -179,11 +209,13 @@ function getWrapper({
   user?: User
   ancestorMetaData?: AncestorMetaData
   canShare?: boolean
+  vaultEnabled?: boolean
 } = {}) {
   vi.mocked(useCanShare).mockReturnValue({ canShare: () => canShare })
 
   const capabilities = {
-    files_sharing: { deny_access: false }
+    files_sharing: { deny_access: false },
+    vault: { enabled: vaultEnabled }
   } satisfies Partial<CapabilityStore['capabilities']>
 
   if (spaceMembers.length) {
