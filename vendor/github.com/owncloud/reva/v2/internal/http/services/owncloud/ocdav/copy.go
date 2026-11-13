@@ -20,6 +20,7 @@ package ocdav
 
 import (
 	"context"
+	goerrors "errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -43,6 +44,11 @@ import (
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"github.com/rs/zerolog"
 )
+
+// errCopySourceProcessing is returned when a file that is part of the copy is
+// still in postprocessing, so its content cannot be downloaded yet. It is
+// reported to the client as 425 Too Early so that it can retry later.
+var errCopySourceProcessing = goerrors.New("copy source is still being processed")
 
 type copy struct {
 	source      *provider.Reference
@@ -133,8 +139,14 @@ func (s *svc) handlePathCopy(w http.ResponseWriter, r *http.Request, ns string) 
 	}
 
 	if err := s.executePathCopy(ctx, s.gatewaySelector, w, r, cp); err != nil {
+		if goerrors.Is(err, errCopySourceProcessing) {
+			sublog.Debug().Err(err).Msg("copy source is still being processed")
+			w.WriteHeader(http.StatusTooEarly)
+			return
+		}
 		sublog.Error().Err(err).Str("depth", cp.depth.String()).Msg("error executing path copy")
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 	w.WriteHeader(cp.successCode)
 }
@@ -298,6 +310,9 @@ func (s *svc) executePathCopy(ctx context.Context, selector pool.Selectable[gate
 			errors.HandleWebdavError(log, w, b, err)
 			return nil
 		}
+		if httpDownloadRes.StatusCode == http.StatusTooEarly {
+			return errCopySourceProcessing
+		}
 		if httpDownloadRes.StatusCode != http.StatusOK {
 			return fmt.Errorf("status code %d", httpDownloadRes.StatusCode)
 		}
@@ -369,8 +384,14 @@ func (s *svc) handleSpacesCopy(w http.ResponseWriter, r *http.Request, spaceID s
 
 	err = s.executeSpacesCopy(ctx, w, s.gatewaySelector, cp)
 	if err != nil {
+		if goerrors.Is(err, errCopySourceProcessing) {
+			sublog.Debug().Err(err).Msg("copy source is still being processed")
+			w.WriteHeader(http.StatusTooEarly)
+			return
+		}
 		sublog.Error().Err(err).Str("depth", cp.depth.String()).Msg("error descending directory")
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 	w.WriteHeader(cp.successCode)
 }
@@ -522,6 +543,9 @@ func (s *svc) executeSpacesCopy(ctx context.Context, w http.ResponseWriter, sele
 			b, err := errors.Marshal(http.StatusForbidden, http.StatusText(http.StatusForbidden), "", strconv.Itoa(http.StatusForbidden))
 			errors.HandleWebdavError(log, w, b, err)
 			return nil
+		}
+		if httpDownloadRes.StatusCode == http.StatusTooEarly {
+			return errCopySourceProcessing
 		}
 		if httpDownloadRes.StatusCode != http.StatusOK {
 			return fmt.Errorf("status code %d", httpDownloadRes.StatusCode)

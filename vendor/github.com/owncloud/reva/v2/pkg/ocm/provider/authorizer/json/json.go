@@ -108,6 +108,24 @@ func normalizeDomain(d string) (string, error) {
 	return u.Host, nil
 }
 
+// verify that wildcardDomain is a wildcard DNS record, and that the
+// targetDomain is inside.
+// The function follows the checks for a wildcard DNS record:
+// - Wildcard must be the leftmost domain, otherwise it won't be considered
+// as a wildcard domain and this function will return false.
+// - The wildcard domain must have a top-level domain ("com", "org", etc)
+// and a domain. Wildcard must be at least in the subdomain. For example
+// "*.server.prv" or "*.sub.company.org". Wildcard in the domain, such as
+// "*.org" won't be allowed and it will return false.
+// - Nested wildcards such as "*.*.server.prv" will only be allowed for the
+// leftmost domain, any other wildcard will be interpreted as a regular char.
+func matchWildcardDomain(wildcardDomain, targetDomain string) bool {
+	return strings.HasPrefix(wildcardDomain, "*.") && // leftmost domain is wildcard
+		strings.Count(wildcardDomain, ".") >= 2 && // at least 3 labels -> wildcard is in subdomain or lower
+		strings.HasSuffix(targetDomain, wildcardDomain[1:]) && // target domain is inside
+		strings.Count(wildcardDomain, ".") == strings.Count(targetDomain, ".") // same number of labels
+}
+
 func (a *authorizer) GetInfoByDomain(_ context.Context, domain string) (*ocmprovider.ProviderInfo, error) {
 	normalizedDomain, err := normalizeDomain(domain)
 	if err != nil {
@@ -115,12 +133,22 @@ func (a *authorizer) GetInfoByDomain(_ context.Context, domain string) (*ocmprov
 	}
 	for _, p := range a.providers {
 		// we can exit early if this an exact match
-		if strings.Contains(p.Domain, normalizedDomain) {
+		if p.Domain == normalizedDomain {
 			return p, nil
 		}
 
-		// check if the domain matches a regex
-		if ok, err := regexp.MatchString(p.Domain, normalizedDomain); ok && err == nil {
+		// try an exact match without the port in the p.Domain
+		colon := strings.LastIndexByte(p.Domain, ':')
+		if colon != -1 && strings.Count(p.Domain, ":") == 1 {
+			// FIXME: IPV6 requires additional changes
+			host := p.Domain[:colon]
+			if host == normalizedDomain {
+				return p, nil
+			}
+		}
+
+		if matchWildcardDomain(p.Domain, normalizedDomain) {
+			// check if the domain matches a wildcard domain
 			// overwrite wildcards with the actual domain
 			var services []*ocmprovider.Service
 			for _, s := range p.Services {

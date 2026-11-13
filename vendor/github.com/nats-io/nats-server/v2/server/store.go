@@ -103,6 +103,7 @@ type StreamStore interface {
 	LoadNextMsg(filter string, wc bool, start uint64, smp *StoreMsg) (sm *StoreMsg, skip uint64, err error)
 	LoadNextMsgMulti(sl *gsl.SimpleSublist, start uint64, smp *StoreMsg) (sm *StoreMsg, skip uint64, err error)
 	LoadLastMsg(subject string, sm *StoreMsg) (*StoreMsg, error)
+	LoadLastSeq(subject string) (uint64, error)
 	LoadPrevMsg(filter string, wc bool, start uint64, smp *StoreMsg) (sm *StoreMsg, skip uint64, err error)
 	LoadPrevMsgMulti(sl *gsl.SimpleSublist, start uint64, smp *StoreMsg) (sm *StoreMsg, skip uint64, err error)
 	RemoveMsg(seq uint64) (bool, error)
@@ -832,6 +833,12 @@ func (smo *StoreMsg) copy(sm *StoreMsg) {
 	// We set cap on header in case someone wants to expand it.
 	sm.hdr, sm.msg = sm.buf[:len(smo.hdr):len(smo.hdr)], sm.buf[len(smo.hdr):]
 	sm.subj, sm.seq, sm.ts = smo.subj, smo.seq, smo.ts
+}
+
+// Copy all fields, cloning the subject string.
+func (smo *StoreMsg) deepCopy(sm *StoreMsg) {
+	smo.copy(sm)
+	sm.subj = strings.Clone(smo.subj)
 }
 
 // Clear all fields except underlying buffer but reset that if present to [:0].

@@ -14,11 +14,11 @@ type inAntithesisWithoutCgoHandler struct {
 	outputFile *os.File
 }
 
-func (h *inAntithesisWithoutCgoHandler) output(message string) {
+func (h *inAntithesisWithoutCgoHandler) output(message []byte) {
 	if len(message) == 0 {
 		return
 	}
-	h.outputFile.WriteString(message + "\n")
+	h.outputFile.Write(append(message, '\n'))
 }
 
 func (h *inAntithesisWithoutCgoHandler) random() uint64 {

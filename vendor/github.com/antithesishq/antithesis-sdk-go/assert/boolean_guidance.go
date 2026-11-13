@@ -2,11 +2,7 @@
 
 package assert
 
-import (
-	"sync"
-
-	"github.com/antithesishq/antithesis-sdk-go/internal"
-)
+import "sync"
 
 // TODO: Someday this tracker should also start deduplicating
 // guidance, but there are some complicated policy questions
@@ -26,14 +22,10 @@ func getBooleanGuidanceEntry(messageKey string) *booleanGuidance {
 	return entry.(*booleanGuidance)
 }
 
-func (tI *booleanGuidance) send_value(bgI *booleanGuidanceInfo) {
+func (tI *booleanGuidance) send_value(bgI *guidanceInfo) {
 	if tI == nil {
 		return
 	}
 
-	emitBooleanGuidance(bgI)
-}
-
-func emitBooleanGuidance(bgI *booleanGuidanceInfo) error {
-	return internal.Json_data(map[string]any{"antithesis_guidance": bgI})
+	emitGuidance(bgI)
 }
