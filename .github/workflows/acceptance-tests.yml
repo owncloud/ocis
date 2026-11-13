@@ -1106,7 +1106,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   all-acceptance-tests:
-    needs: [detect-changes, local-api-tests, cli-tests, ldap-pool-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests, external-ldap-tests, external-ldap-distributed-tests, nats-jwt-tests, nats-jwt-startup-check]
+    needs: [detect-changes, build-and-test, local-api-tests, cli-tests, ldap-pool-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests, external-ldap-tests, external-ldap-distributed-tests, nats-jwt-tests, nats-jwt-startup-check]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: always()
