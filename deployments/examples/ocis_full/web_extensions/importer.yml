@@ -6,9 +6,10 @@ services:
         aliases:
           - ${COMPANION_DOMAIN:-companion.owncloud.test}
   ocis:
-    volumes:
+    configs:
       # the cloud importer needs to be enabled in the web.yaml
-      - ./config/ocis/apps.yaml:/etc/ocis/apps.yaml
+      - source: apps_yaml
+        target: /etc/ocis/apps.yaml
     depends_on:
       importer-init:
         condition: service_completed_successfully

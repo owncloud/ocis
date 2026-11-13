@@ -1,10 +1,13 @@
 import mermaid from 'mermaid'
 import html2canvas from 'html2canvas'
 import { useGettext } from 'vue3-gettext'
+import { PDF_THEME } from './pdfConfig'
+import { pdfColorToCssRgb } from './helpers'
 
 mermaid.initialize({
   startOnLoad: false,
-  theme: 'default'
+  theme: 'default',
+  layout: 'dagre'
 })
 
 /**
@@ -27,6 +30,9 @@ async function renderMermaidToDataURL(
   container.style.position = 'absolute'
   container.style.left = '-9999px'
   container.style.background = '#fff'
+  // set an explicit color so the container does not inherit theme colors that
+  // html2canvas cannot parse (e.g. oklch), same as for KaTeX formulas
+  container.style.color = pdfColorToCssRgb(PDF_THEME.color.text)
   container.innerHTML = svg
   document.body.appendChild(container)
 

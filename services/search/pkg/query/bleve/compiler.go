@@ -428,7 +428,7 @@ func numericQuery(n *ast.NumericNode) bleveQuery.Query {
 
 func newQueryStringQueryList(k string, v ...string) []bleveQuery.Query {
 	list := make([]bleveQuery.Query, len(v))
-	for i := 0; i < len(v); i++ {
+	for i := range v {
 		list[i] = bleveQuery.NewQueryStringQuery(k + ":" + v[i])
 	}
 	return list

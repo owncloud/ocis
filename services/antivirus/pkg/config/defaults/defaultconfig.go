@@ -33,7 +33,8 @@ func DefaultConfig() *config.Config {
 		Scanner: config.Scanner{
 			Type: "clamav",
 			ClamAV: config.ClamAV{
-				Socket: "/run/clamav/clamd.ctl",
+				Socket:  "/run/clamav/clamd.ctl",
+				Timeout: 5 * time.Minute,
 			},
 			ICAP: config.ICAP{
 				URL:     "icap://127.0.0.1:1344",

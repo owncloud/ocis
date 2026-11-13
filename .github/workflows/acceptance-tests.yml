@@ -7,6 +7,12 @@ on:
 permissions:
   contents: read
 
+# Pull request runs cancel their predecessor on the same PR. Every other
+# event gets its own group, so pushes and scheduled runs never cancel each other.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   detect-changes:
     name: detect-changes
@@ -190,6 +196,7 @@ jobs:
       GOCOVERDIR: ${{ github.workspace }}/coverage-reports
     strategy:
       fail-fast: false
+      max-parallel: 8
       matrix:
         suite:
           # contract & locks
@@ -252,12 +259,27 @@ jobs:
           extensions: curl, xml, mbstring, zip, ldap, gd
           tools: composer
 
+      - name: Check the libcurl version of PHP
+        id: php-libcurl
+        # PHP needs libcurl 8.12.0 or newer. ubuntu-24.04 has libcurl 8.5.0, so the next steps
+        # compile libcurl 8.12.0. ubuntu-26.04 has libcurl 8.18.0, so these steps do not run there.
+        run: |
+          echo "PHP curl: $(php -r 'echo curl_version()["version"];')"
+          if php -r 'exit(version_compare(curl_version()["version"], "8.12.0", "<") ? 0 : 1);'; then
+            echo "build=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "build=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "image=${ImageOS}" >> "$GITHUB_OUTPUT"
+
       - name: Cache libcurl 8.12.0
+        if: steps.php-libcurl.outputs.build == 'true'
         id: cache-libcurl
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: /opt/libcurl
-          key: libcurl-8.12.0-${{ runner.os }}
+          # The image is part of the key: a library from one image must not run on another image.
+          key: libcurl-8.12.0-${{ runner.os }}-${{ steps.php-libcurl.outputs.image }}
 
       - name: Install libcurl 8.12.0 build dependencies
         # Always run: libvips-dev is needed at runtime (govips thumbnails in the pre-built binary)
@@ -267,7 +289,7 @@ jobs:
           sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
 
       - name: Compile libcurl 8.12.0 from source
-        if: steps.cache-libcurl.outputs.cache-hit != 'true'
+        if: steps.php-libcurl.outputs.build == 'true' && steps.cache-libcurl.outputs.cache-hit != 'true'
         run: |
           cd /tmp
           curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
@@ -277,14 +299,17 @@ jobs:
           make -j$(nproc) --silent
           sudo make install --silent
 
-      - name: Restore libcurl ldconfig
-        # Always run: on cache hit the .so files are restored to /opt/libcurl/lib but
-        # /etc/ld.so.cache on the fresh runner doesn't know about them yet.
-        # Without ldconfig, PHP's curl extension can't find libcurl even though it's present.
+      - name: Use libcurl 8.12.0 for the next steps
+        if: steps.php-libcurl.outputs.build == 'true'
+        # Do not add /opt/libcurl/lib to the global ldconfig path. A newer system curl
+        # (8.18.0 on ubuntu-26.04) fails with the older library:
+        # "undefined symbol: curl_multi_notify_enable".
+        # LD_LIBRARY_PATH applies only to the next steps of this job.
+        run: echo "LD_LIBRARY_PATH=/opt/libcurl/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+
+      - name: Check that PHP uses libcurl 8.12.0 or newer
         run: |
-          echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
-          sudo ldconfig
-          /opt/libcurl/bin/curl --version | head -1
+          curl --version | head -1
           php -r '
             $v = curl_version()["version"];
             echo "PHP curl: $v\n";
@@ -310,7 +335,7 @@ jobs:
           TIKA_IMAGE: ${{ matrix.tika_image }}
 
       - name: Upload raw coverage data
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-coverage-${{ matrix.suite }}
@@ -360,7 +385,7 @@ jobs:
           BEHAT_SUITES="${{ matrix.suite }}" python3 tests/acceptance/run-github.py
 
       - name: Upload raw coverage data
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-coverage-cli-${{ matrix.suite }}
@@ -410,7 +435,7 @@ jobs:
           BEHAT_SUITES="${{ matrix.suite }}" OCIS_LDAP_POOL_ENABLED=true python3 tests/acceptance/run-github.py
 
       - name: Upload raw coverage data
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-coverage-ldap-pool-${{ matrix.suite }}
@@ -426,6 +451,7 @@ jobs:
       GOCOVERDIR: ${{ github.workspace }}/coverage-reports
     strategy:
       fail-fast: false
+      max-parallel: 4
       matrix:
         suite:
           - "coreApiAuth,coreApiCapabilities,coreApiFavorites,coreApiMain,coreApiVersions"
@@ -448,12 +474,27 @@ jobs:
           extensions: curl, xml, mbstring, zip, ldap, gd
           tools: composer
 
+      - name: Check the libcurl version of PHP
+        id: php-libcurl
+        # PHP needs libcurl 8.12.0 or newer. ubuntu-24.04 has libcurl 8.5.0, so the next steps
+        # compile libcurl 8.12.0. ubuntu-26.04 has libcurl 8.18.0, so these steps do not run there.
+        run: |
+          echo "PHP curl: $(php -r 'echo curl_version()["version"];')"
+          if php -r 'exit(version_compare(curl_version()["version"], "8.12.0", "<") ? 0 : 1);'; then
+            echo "build=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "build=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "image=${ImageOS}" >> "$GITHUB_OUTPUT"
+
       - name: Cache libcurl 8.12.0
+        if: steps.php-libcurl.outputs.build == 'true'
         id: cache-libcurl
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: /opt/libcurl
-          key: libcurl-8.12.0-${{ runner.os }}
+          # The image is part of the key: a library from one image must not run on another image.
+          key: libcurl-8.12.0-${{ runner.os }}-${{ steps.php-libcurl.outputs.image }}
 
       - name: Install libcurl 8.12.0 build dependencies
         # Always run: libvips-dev is needed at runtime (govips thumbnails in the pre-built binary)
@@ -463,7 +504,7 @@ jobs:
           sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
 
       - name: Compile libcurl 8.12.0 from source
-        if: steps.cache-libcurl.outputs.cache-hit != 'true'
+        if: steps.php-libcurl.outputs.build == 'true' && steps.cache-libcurl.outputs.cache-hit != 'true'
         run: |
           cd /tmp
           curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
@@ -473,14 +514,17 @@ jobs:
           make -j$(nproc) --silent
           sudo make install --silent
 
-      - name: Restore libcurl ldconfig
-        # Always run: on cache hit the .so files are restored to /opt/libcurl/lib but
-        # /etc/ld.so.cache on the fresh runner doesn't know about them yet.
-        # Without ldconfig, PHP's curl extension can't find libcurl even though it's present.
+      - name: Use libcurl 8.12.0 for the next steps
+        if: steps.php-libcurl.outputs.build == 'true'
+        # Do not add /opt/libcurl/lib to the global ldconfig path. A newer system curl
+        # (8.18.0 on ubuntu-26.04) fails with the older library:
+        # "undefined symbol: curl_multi_notify_enable".
+        # LD_LIBRARY_PATH applies only to the next steps of this job.
+        run: echo "LD_LIBRARY_PATH=/opt/libcurl/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+
+      - name: Check that PHP uses libcurl 8.12.0 or newer
         run: |
-          echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
-          sudo ldconfig
-          /opt/libcurl/bin/curl --version | head -1
+          curl --version | head -1
           php -r '
             $v = curl_version()["version"];
             echo "PHP curl: $v\n";
@@ -507,7 +551,7 @@ jobs:
           python3 tests/acceptance/run-github.py
 
       - name: Upload raw coverage data
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-coverage-core-${{ matrix.suite }}
@@ -521,6 +565,7 @@ jobs:
     timeout-minutes: 120
     strategy:
       fail-fast: false
+      max-parallel: 4
       matrix:
         include:
           - suite: part-1
@@ -898,10 +943,127 @@ jobs:
       - name: Run external-LDAP distributed smoke
         run: tests/ldap-smoke-distributed/run.sh
 
+  # API tests against a stand-alone NATS server in operator (JWT) mode. The embedded nats service
+  # does not support JWT, so oCIS runs with OCIS_EXCLUDE_RUN_SERVICES=nats. The caches and the
+  # userlog store use memory by default; OCIS_CACHE_STORE and OCIS_PERSISTENT_STORE move them to
+  # NATS (nats-js-kv). The other stores use NATS by default.
+  # tests/nats-jwt/verify.sh then checks that every client used the creds.
+  nats-jwt-tests:
+    needs: [build-and-test]
+    name: natsJwt-${{ matrix.name }}-${{ matrix.creds }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # events: postprocessing, storage-users, activitylog, search; stores: postprocessing, activitylog
+          - name: events-stores
+            creds: file
+            suites: apiAsyncUpload,apiActivities,apiSearch1
+          # events: sharing; stores: storage-system (shares), storage-publiclink (password links)
+          - name: sharing
+            creds: content
+            suites: apiSharingNgShares,apiSharingNgItemLinkShare
+          # userlog, eventhistory, and notifications (needs email)
+          - name: notifications
+            creds: file
+            suites: apiNotification
+            extra_consumers: notifications
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip, ldap, gd
+          tools: composer
+
+      - name: Start NATS in operator mode
+        run: tests/nats-jwt/start-nats.sh
+        env:
+          NATS_JWT_DIR: ${{ runner.temp }}/nats-jwt
+
+      - name: Run ${{ matrix.suites }} with NATS JWT credentials (${{ matrix.creds }})
+        env:
+          NATS_JWT_DIR: ${{ runner.temp }}/nats-jwt
+          CREDS_MODE: ${{ matrix.creds }}
+          BEHAT_SUITES: ${{ matrix.suites }}
+          OCIS_EXCLUDE_RUN_SERVICES: nats
+          OCIS_CACHE_STORE: nats-js-kv
+          OCIS_PERSISTENT_STORE: nats-js-kv
+        run: |
+          if [ "$CREDS_MODE" = "file" ]; then
+            export OCIS_NATS_CREDS_FILE="$NATS_JWT_DIR/user.creds"
+          else
+            OCIS_NATS_CREDS="$(cat "$NATS_JWT_DIR/user.creds")"
+            export OCIS_NATS_CREDS
+          fi
+          python3 tests/acceptance/run-github.py
+
+      # Run the checks also when the tests fail: a client without creds is the first thing to rule out.
+      - name: Verify the NATS JWT account state
+        if: ${{ !cancelled() }}
+        env:
+          NATS_JWT_DIR: ${{ runner.temp }}/nats-jwt
+          NATS_JWT_EXTRA_BUCKETS: ${{ matrix.extra_buckets }}
+          NATS_JWT_EXTRA_CONSUMERS: ${{ matrix.extra_consumers }}
+        run: tests/nats-jwt/verify.sh
+
+      - name: NATS server log
+        if: failure()
+        run: docker logs nats-jwt
+
+  # Starts oCIS with the services that are off by default (audit, policies, antivirus, notifications),
+  # and checks the /readyz endpoints. The readiness checks of the services use the creds.
+  nats-jwt-startup-check:
+    name: natsJwt-startup-check
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.1 --activate
+
+      # web/idp assets must be embedded for `ocis server` to come up (same as run-github.py)
+      - name: Generate assets
+        run: make ci-node-generate
+
+      - name: Build oCIS
+        run: make -C ocis build
+
+      - name: Run the NATS JWT startup check
+        run: tests/nats-jwt/startup-check.sh
+        env:
+          NATS_JWT_DIR: ${{ runner.temp }}/nats-jwt
+
   acceptance-coverage:
     name: acceptance-coverage
     needs: [detect-changes, local-api-tests, cli-tests, ldap-pool-tests, core-api-tests]
-    if: always() && github.event_name == 'pull_request' && needs.detect-changes.outputs.docs-only != 'true'
+    if: ${{ !cancelled() && github.event_name == 'pull_request' && needs.detect-changes.outputs.docs-only != 'true' }}
     runs-on: ubuntu-latest
     env:
       GOCOVERDIR: ${{ github.workspace }}/coverage-reports
@@ -942,7 +1104,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   all-acceptance-tests:
-    needs: [detect-changes, local-api-tests, cli-tests, ldap-pool-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests, external-ldap-tests, external-ldap-distributed-tests]
+    needs: [detect-changes, local-api-tests, cli-tests, ldap-pool-tests, core-api-tests, litmus, cs3api, wopi-builtin, wopi-cs3, e2e-tests, external-ldap-tests, external-ldap-distributed-tests, nats-jwt-tests, nats-jwt-startup-check]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: always()

@@ -1157,13 +1157,7 @@ func sortUsers(req *godata.GoDataRequest, users []*libregraph.User) ([]*libregra
 func isValidUserType(userType string) bool {
 	userType = strings.ToLower(userType)
 
-	for _, value := range []string{"member", "guest"} {
-		if userType == value {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains([]string{"member", "guest"}, userType)
 }
 
 func (g Graph) searchOCMAcceptedUsers(ctx context.Context, odataReq *godata.GoDataRequest) ([]*libregraph.User, error) {

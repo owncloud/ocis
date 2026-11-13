@@ -31,7 +31,7 @@ func TestCollaboraSetPropertiesVersion(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cinfo := &Collabora{}
-			cinfo.SetProperties(map[string]interface{}{
+			cinfo.SetProperties(map[string]any{
 				KeyVersion: tt.version,
 			})
 
@@ -71,7 +71,7 @@ func TestCollaboraJSONMarshallingIncludesVersion(t *testing.T) {
 				t.Fatalf("Failed to marshal JSON: %v", err)
 			}
 
-			var jsonMap map[string]interface{}
+			var jsonMap map[string]any
 			if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
 				t.Fatalf("Failed to unmarshal JSON: %v", err)
 			}
@@ -120,7 +120,7 @@ func TestCollaboraSetPropertiesLastModifiedTime(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cinfo := &Collabora{}
-			cinfo.SetProperties(map[string]interface{}{
+			cinfo.SetProperties(map[string]any{
 				KeyLastModifiedTime: tt.lastModifiedTime,
 			})
 
@@ -160,7 +160,7 @@ func TestCollaboraJSONMarshallingIncludesLastModifiedTime(t *testing.T) {
 				t.Fatalf("Failed to marshal JSON: %v", err)
 			}
 
-			var jsonMap map[string]interface{}
+			var jsonMap map[string]any
 			if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
 				t.Fatalf("Failed to unmarshal JSON: %v", err)
 			}
@@ -204,7 +204,7 @@ func TestCollaboraSetPropertiesReadOnly(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cinfo := &Collabora{}
-			cinfo.SetProperties(map[string]interface{}{
+			cinfo.SetProperties(map[string]any{
 				KeyReadOnly: tt.readOnly,
 			})
 
@@ -243,7 +243,7 @@ func TestCollaboraJSONMarshallingIncludesReadOnly(t *testing.T) {
 				t.Fatalf("Failed to marshal JSON: %v", err)
 			}
 
-			var jsonMap map[string]interface{}
+			var jsonMap map[string]any
 			if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
 				t.Fatalf("Failed to unmarshal JSON: %v", err)
 			}
@@ -282,7 +282,7 @@ func TestCollaboraSetPropertiesSupportsUpdate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cinfo := &Collabora{}
-			cinfo.SetProperties(map[string]interface{}{
+			cinfo.SetProperties(map[string]any{
 				KeySupportsUpdate: tt.supportsUpdate,
 			})
 
@@ -321,7 +321,7 @@ func TestCollaboraJSONMarshallingIncludesSupportsUpdate(t *testing.T) {
 				t.Fatalf("Failed to marshal JSON: %v", err)
 			}
 
-			var jsonMap map[string]interface{}
+			var jsonMap map[string]any
 			if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
 				t.Fatalf("Failed to unmarshal JSON: %v", err)
 			}
@@ -360,7 +360,7 @@ func TestCollaboraSetPropertiesIsAnonymousUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cinfo := &Collabora{}
-			cinfo.SetProperties(map[string]interface{}{
+			cinfo.SetProperties(map[string]any{
 				KeyIsAnonymousUser: tt.isAnonymous,
 			})
 
@@ -382,7 +382,7 @@ func TestCollaboraJSONOmitsIsAnonymousUserWhenFalse(t *testing.T) {
 		t.Fatalf("Failed to marshal JSON: %v", err)
 	}
 
-	var jsonMap map[string]interface{}
+	var jsonMap map[string]any
 	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
 		t.Fatalf("Failed to unmarshal JSON: %v", err)
 	}
@@ -404,7 +404,7 @@ func TestCollaboraJSONIncludesIsAnonymousUserWhenTrue(t *testing.T) {
 		t.Fatalf("Failed to marshal JSON: %v", err)
 	}
 
-	var jsonMap map[string]interface{}
+	var jsonMap map[string]any
 	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
 		t.Fatalf("Failed to unmarshal JSON: %v", err)
 	}
@@ -446,7 +446,7 @@ func TestCollaboraSetPropertiesURLProperties(t *testing.T) {
 	for _, prop := range urlPropertyCases {
 		t.Run(prop.name, func(t *testing.T) {
 			cinfo := &Collabora{}
-			cinfo.SetProperties(map[string]interface{}{
+			cinfo.SetProperties(map[string]any{
 				prop.key: prop.value,
 			})
 
@@ -463,7 +463,7 @@ func TestCollaboraSetPropertiesURLProperties(t *testing.T) {
 func TestCollaboraJSONMarshallingIncludesURLProperties(t *testing.T) {
 	cinfo := &Collabora{}
 	for _, prop := range urlPropertyCases {
-		cinfo.SetProperties(map[string]interface{}{prop.key: prop.value})
+		cinfo.SetProperties(map[string]any{prop.key: prop.value})
 	}
 
 	jsonBytes, err := json.Marshal(cinfo)
@@ -471,7 +471,7 @@ func TestCollaboraJSONMarshallingIncludesURLProperties(t *testing.T) {
 		t.Fatalf("Failed to marshal JSON: %v", err)
 	}
 
-	var jsonMap map[string]interface{}
+	var jsonMap map[string]any
 	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
 		t.Fatalf("Failed to unmarshal JSON: %v", err)
 	}
@@ -498,7 +498,7 @@ func TestCollaboraJSONOmitsEmptyURLProperties(t *testing.T) {
 		t.Fatalf("Failed to marshal JSON: %v", err)
 	}
 
-	var jsonMap map[string]interface{}
+	var jsonMap map[string]any
 	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
 		t.Fatalf("Failed to unmarshal JSON: %v", err)
 	}
@@ -513,7 +513,7 @@ func TestCollaboraJSONOmitsEmptyURLProperties(t *testing.T) {
 // TestCollaboraSetPropertiesAllURLPropertiesSimultaneously covers brief item 4: setting
 // all 7 URL properties in a single SetProperties call must set all of them correctly.
 func TestCollaboraSetPropertiesAllURLPropertiesSimultaneously(t *testing.T) {
-	props := make(map[string]interface{}, len(urlPropertyCases))
+	props := make(map[string]any, len(urlPropertyCases))
 	for _, prop := range urlPropertyCases {
 		props[prop.key] = prop.value
 	}
@@ -549,7 +549,7 @@ var breadcrumbPropertyCases = []struct {
 // TestCollaboraSetPropertiesBreadcrumbProperties covers brief item 1: SetProperties with
 // all four breadcrumb properties must set each of them correctly.
 func TestCollaboraSetPropertiesBreadcrumbProperties(t *testing.T) {
-	props := make(map[string]interface{}, len(breadcrumbPropertyCases))
+	props := make(map[string]any, len(breadcrumbPropertyCases))
 	for _, prop := range breadcrumbPropertyCases {
 		props[prop.key] = prop.value
 	}
@@ -570,7 +570,7 @@ func TestCollaboraSetPropertiesBreadcrumbProperties(t *testing.T) {
 func TestCollaboraJSONMarshallingIncludesBreadcrumbProperties(t *testing.T) {
 	cinfo := &Collabora{}
 	for _, prop := range breadcrumbPropertyCases {
-		cinfo.SetProperties(map[string]interface{}{prop.key: prop.value})
+		cinfo.SetProperties(map[string]any{prop.key: prop.value})
 	}
 
 	jsonBytes, err := json.Marshal(cinfo)
@@ -578,7 +578,7 @@ func TestCollaboraJSONMarshallingIncludesBreadcrumbProperties(t *testing.T) {
 		t.Fatalf("Failed to marshal JSON: %v", err)
 	}
 
-	var jsonMap map[string]interface{}
+	var jsonMap map[string]any
 	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
 		t.Fatalf("Failed to unmarshal JSON: %v", err)
 	}
@@ -606,7 +606,7 @@ func TestCollaboraJSONOmitsEmptyBreadcrumbProperties(t *testing.T) {
 		t.Fatalf("Failed to marshal JSON: %v", err)
 	}
 
-	var jsonMap map[string]interface{}
+	var jsonMap map[string]any
 	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
 		t.Fatalf("Failed to unmarshal JSON: %v", err)
 	}
@@ -624,7 +624,7 @@ func TestCollaboraJSONOmitsEmptyBreadcrumbProperties(t *testing.T) {
 // marshalled JSON.
 func TestCollaboraJSONMixedBreadcrumbProperties(t *testing.T) {
 	cinfo := &Collabora{}
-	cinfo.SetProperties(map[string]interface{}{
+	cinfo.SetProperties(map[string]any{
 		KeyBreadcrumbBrandName:  "ownCloud",
 		KeyBreadcrumbFolderName: "Documents",
 	})
@@ -634,7 +634,7 @@ func TestCollaboraJSONMixedBreadcrumbProperties(t *testing.T) {
 		t.Fatalf("Failed to marshal JSON: %v", err)
 	}
 
-	var jsonMap map[string]interface{}
+	var jsonMap map[string]any
 	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
 		t.Fatalf("Failed to unmarshal JSON: %v", err)
 	}
@@ -678,7 +678,7 @@ func TestCollaboraSetPropertiesPostMessageProperties(t *testing.T) {
 		t.Run(prop.name, func(t *testing.T) {
 			for _, value := range []bool{true, false} {
 				cinfo := &Collabora{}
-				cinfo.SetProperties(map[string]interface{}{
+				cinfo.SetProperties(map[string]any{
 					prop.key: value,
 				})
 
@@ -696,7 +696,7 @@ func TestCollaboraSetPropertiesPostMessageProperties(t *testing.T) {
 func TestCollaboraJSONMarshallingIncludesPostMessageProperties(t *testing.T) {
 	cinfo := &Collabora{}
 	for _, prop := range postMessagePropertyCases {
-		cinfo.SetProperties(map[string]interface{}{prop.key: true})
+		cinfo.SetProperties(map[string]any{prop.key: true})
 	}
 
 	jsonBytes, err := json.Marshal(cinfo)
@@ -704,7 +704,7 @@ func TestCollaboraJSONMarshallingIncludesPostMessageProperties(t *testing.T) {
 		t.Fatalf("Failed to marshal JSON: %v", err)
 	}
 
-	var jsonMap map[string]interface{}
+	var jsonMap map[string]any
 	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
 		t.Fatalf("Failed to unmarshal JSON: %v", err)
 	}
@@ -732,7 +732,7 @@ func TestCollaboraJSONOmitsPostMessagePropertiesWhenFalse(t *testing.T) {
 		t.Fatalf("Failed to marshal JSON: %v", err)
 	}
 
-	var jsonMap map[string]interface{}
+	var jsonMap map[string]any
 	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
 		t.Fatalf("Failed to unmarshal JSON: %v", err)
 	}
@@ -748,7 +748,7 @@ func TestCollaboraJSONOmitsPostMessagePropertiesWhenFalse(t *testing.T) {
 // setting all 5 PostMessage properties to true in a single SetProperties call must set
 // all of them correctly.
 func TestCollaboraSetPropertiesAllPostMessagePropertiesSimultaneously(t *testing.T) {
-	props := make(map[string]interface{}, len(postMessagePropertyCases))
+	props := make(map[string]any, len(postMessagePropertyCases))
 	for _, prop := range postMessagePropertyCases {
 		props[prop.key] = true
 	}
@@ -781,7 +781,7 @@ var collaboraSpecificPropertyCases = []struct {
 // IsUserLocked=true must set the field.
 func TestCollaboraSetPropertiesIsUserLocked(t *testing.T) {
 	cinfo := &Collabora{}
-	cinfo.SetProperties(map[string]interface{}{
+	cinfo.SetProperties(map[string]any{
 		KeyIsUserLocked: true,
 	})
 
@@ -794,7 +794,7 @@ func TestCollaboraSetPropertiesIsUserLocked(t *testing.T) {
 // IsAdminUser=true must set the field.
 func TestCollaboraSetPropertiesIsAdminUser(t *testing.T) {
 	cinfo := &Collabora{}
-	cinfo.SetProperties(map[string]interface{}{
+	cinfo.SetProperties(map[string]any{
 		KeyIsAdminUser: true,
 	})
 
@@ -810,7 +810,7 @@ func TestCollaboraSetPropertiesCollaboraSpecificPropertiesFalse(t *testing.T) {
 	for _, prop := range collaboraSpecificPropertyCases {
 		t.Run(prop.name, func(t *testing.T) {
 			cinfo := &Collabora{}
-			cinfo.SetProperties(map[string]interface{}{
+			cinfo.SetProperties(map[string]any{
 				prop.key: false,
 			})
 
@@ -832,7 +832,7 @@ func TestCollaboraJSONOmitsCollaboraSpecificPropertiesWhenFalse(t *testing.T) {
 		t.Fatalf("Failed to marshal JSON: %v", err)
 	}
 
-	var jsonMap map[string]interface{}
+	var jsonMap map[string]any
 	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
 		t.Fatalf("Failed to unmarshal JSON: %v", err)
 	}
@@ -857,7 +857,7 @@ func TestCollaboraJSONIncludesCollaboraSpecificPropertiesWhenTrue(t *testing.T) 
 		t.Fatalf("Failed to marshal JSON: %v", err)
 	}
 
-	var jsonMap map[string]interface{}
+	var jsonMap map[string]any
 	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
 		t.Fatalf("Failed to unmarshal JSON: %v", err)
 	}

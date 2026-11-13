@@ -49,6 +49,12 @@ describe('User Menu component', () => {
       expect(wrapper.html()).toMatchSnapshot()
     })
   })
+  describe('when email is set', () => {
+    it('does not show the email', () => {
+      const wrapper = getMountedWrapper({ used: basicQuota, total: totalQuota }, email)
+      expect(wrapper.text()).not.toContain(email)
+    })
+  })
   describe('when quota is below 80%', () => {
     it('renders a primary quota progress bar', () => {
       const wrapper = getMountedWrapper(

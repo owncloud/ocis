@@ -137,10 +137,11 @@ func globWorkersD4(base string) <-chan string {
 }
 
 func initialize(numNodes int, numRevisions int) string {
-	base := "test_temp_" + uuid.New().String()
-	if err := os.Mkdir(base, os.ModePerm); err != nil {
+	// Create the test data in the temp directory of the system, not in the source tree.
+	// Other tools, for example golangci-lint, read the source tree while the tests run.
+	base, err := os.MkdirTemp("", "test_temp_")
+	if err != nil {
 		fmt.Println("Error creating test_temp directory", err)
-		os.RemoveAll(base)
 		os.Exit(1)
 	}
 
@@ -151,7 +152,7 @@ func initialize(numNodes int, numRevisions int) string {
 		os.Exit(1)
 	}
 
-	for i := 0; i < numNodes; i++ {
+	for range numNodes {
 		path := lookup.Pathify(uuid.New().String(), 4, 2)
 		dir := filepath.Dir(path)
 		if err := os.MkdirAll(base+_basePath+dir, fs.ModePerm); err != nil {
@@ -165,7 +166,7 @@ func initialize(numNodes int, numRevisions int) string {
 			os.RemoveAll(base)
 			os.Exit(1)
 		}
-		for i := 0; i < numRevisions; i++ {
+		for i := range numRevisions {
 			os.Create(base + _basePath + path + ".REV.2024-05-22T07:32:53.89969" + strconv.Itoa(i) + "Z")
 		}
 	}

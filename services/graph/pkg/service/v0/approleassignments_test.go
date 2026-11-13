@@ -115,7 +115,7 @@ var _ = Describe("AppRoleAssignments", func() {
 	Describe("ListAppRoleAssignments", func() {
 		It("lists the appRoleAssignments", func() {
 			user := &libregraph.User{
-				Id: libregraph.PtrString("user1"),
+				Id: new("user1"),
 			}
 			assignments := []*settingsmsg.UserRoleAssignment{
 				{
@@ -153,7 +153,7 @@ var _ = Describe("AppRoleAssignments", func() {
 	Describe("CreateAppRoleAssignment", func() {
 		It("creates an appRoleAssignment", func() {
 			user := &libregraph.User{
-				Id: libregraph.PtrString("user1"),
+				Id: new("user1"),
 			}
 			userRoleAssignment := &settingsmsg.UserRoleAssignment{
 				Id:          "some-appRoleAssignment-ID",
@@ -586,7 +586,7 @@ var _ = Describe("AppRoleAssignments", func() {
 	Describe("DeleteAppRoleAssignment", func() {
 		It("deletes an appRoleAssignment", func() {
 			user := &libregraph.User{
-				Id: libregraph.PtrString("user1"),
+				Id: new("user1"),
 			}
 
 			assignments := []*settingsmsg.UserRoleAssignment{

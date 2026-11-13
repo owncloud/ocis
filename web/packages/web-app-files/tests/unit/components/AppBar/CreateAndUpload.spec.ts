@@ -138,22 +138,69 @@ describe('CreateAndUpload component', () => {
   })
   describe('method "onUploadComplete"', () => {
     it.each([
-      { driveType: 'personal', updated: 1 },
-      { driveType: 'project', updated: 1 },
-      { driveType: 'share', updated: 0 },
-      { driveType: 'public', updated: 0 }
-    ])('updates the space quota for supported drive types: %s', async ({ driveType, updated }) => {
+      { driveType: 'personal', updated: true },
+      { driveType: 'project', updated: true },
+      { driveType: 'share', updated: false },
+      { driveType: 'public', updated: false }
+    ])('updates the space usage for supported drive types: %s', async ({ driveType, updated }) => {
       const file = mock<OcUppyFile>({ meta: { driveType, spaceId: '1' } })
       const spaces = [
         mock<SpaceResource>({ id: file.meta.spaceId, isOwner: () => driveType === 'personal' })
       ]
       const { wrapper, mocks } = getWrapper({ spaces })
+      const updatedDrive = mock<SpaceResource>({ id: file.meta.spaceId })
       const graphMock = mocks.$clientService.graphAuthenticated
-      graphMock.drives.getDrive.mockResolvedValue(mock<SpaceResource>())
+      graphMock.drives.getDrive.mockResolvedValue(updatedDrive)
       await (wrapper.vm as any).onUploadComplete({ successful: [file], failed: [] })
       const spacesStore = useSpacesStore()
-      expect(spacesStore.updateSpaceField).toHaveBeenCalledTimes(updated)
+      if (updated) {
+        expect(spacesStore.updateSpaceUsage).toHaveBeenCalledWith(updatedDrive)
+      } else {
+        expect(spacesStore.updateSpaceUsage).not.toHaveBeenCalled()
+      }
     })
+    it.each([
+      { target: 'the current folder', currentFolderId: 'itemId', reloads: true },
+      { target: 'a subfolder', currentFolderId: 'subfolderId', reloads: false }
+    ])(
+      'updates the size of the space after an upload into $target',
+      async ({ currentFolderId, reloads }) => {
+        const eventSpy = vi.spyOn(eventBus, 'publish')
+        const projectSpace = {
+          id: '1',
+          driveType: 'project',
+          size: 47000,
+          spaceQuota: { used: 47000 },
+          isOwner: () => false
+        } as unknown as SpaceResource
+        const { wrapper, mocks } = getWrapper({
+          itemId: 'itemId',
+          space: projectSpace,
+          spaces: [projectSpace],
+          stubActions: false
+        })
+        const file = mock<OcUppyFile>({
+          meta: { driveType: 'project', spaceId: projectSpace.id, currentFolderId }
+        })
+        const graphMock = mocks.$clientService.graphAuthenticated
+        const updatedDrive = mock<SpaceResource>({
+          id: projectSpace.id,
+          size: 104947000,
+          spaceQuota: { used: 104947000 }
+        })
+        graphMock.drives.getDrive.mockResolvedValue(updatedDrive)
+        await (wrapper.vm as any).onUploadComplete({ successful: [file], failed: [] })
+
+        const space = useSpacesStore().spaces.find(({ id }) => id === projectSpace.id)
+        expect(space.size).toBe(104947000)
+        expect(space.spaceQuota).toEqual(updatedDrive.spaceQuota)
+        if (reloads) {
+          expect(eventSpy).toHaveBeenCalledWith('app.files.list.load')
+        } else {
+          expect(eventSpy).not.toHaveBeenCalledWith('app.files.list.load')
+        }
+      }
+    )
     it('reloads the file list if files were uploaded to the current path', async () => {
       const eventSpy = vi.spyOn(eventBus, 'publish')
       const itemId = 'itemId'
@@ -201,6 +248,7 @@ function getWrapper({
   newFileAction = false,
   areFileExtensionsShown = false,
   isCuttingAndPastingIntoSameFolder = false,
+  stubActions = true,
   createActions = [
     mock<FileAction>({ label: () => 'Plain text file', ext: 'txt' }),
     mock<FileAction>({ label: () => 'Mark-down file', ext: 'md' }),
@@ -218,6 +266,7 @@ function getWrapper({
   areFileExtensionsShown?: boolean
   createActions?: FileAction[]
   isCuttingAndPastingIntoSameFolder?: boolean
+  stubActions?: boolean
 } = {}) {
   const capabilities = {
     spaces: { enabled: true },
@@ -226,6 +275,7 @@ function getWrapper({
 
   const plugins = defaultPlugins({
     piniaOptions: {
+      stubActions,
       spacesState: { spaces },
       capabilityState: { capabilities },
       clipboardState: { resources: clipboardResources },

@@ -135,10 +135,10 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 	m.Use(options.Middleware...)
 
 	spacePropertiesCache := ttlcache.New(
-		ttlcache.WithTTL[string, interface{}](
+		ttlcache.WithTTL[string, any](
 			time.Duration(options.Config.Spaces.ExtendedSpacePropertiesCacheTTL),
 		),
-		ttlcache.WithDisableTouchOnHit[string, interface{}](),
+		ttlcache.WithDisableTouchOnHit[string, any](),
 	)
 	go spacePropertiesCache.Start()
 
@@ -207,6 +207,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 			microstore.Table(options.Config.Cache.Table),
 			store.DisablePersistence(options.Config.Cache.DisablePersistence),
 			store.Authentication(options.Config.Cache.AuthUsername, options.Config.Cache.AuthPassword),
+			store.Credentials(options.Config.Cache.CredsFile, options.Config.Cache.Creds),
 			store.TLS(options.Config.Cache.EnableTLS, options.Config.Cache.TLSInsecure, options.Config.Cache.TLSRootCACertificate),
 		}
 		m := roles.NewManager(

@@ -67,9 +67,8 @@
               :userid="onPremisesSamAccountName"
               :user-name="user.displayName"
             />
-            <span class="profile-info-wrapper" :class="{ 'oc-py-xs': !user.mail }">
+            <span class="profile-info-wrapper oc-py-xs">
               <span class="oc-display-block" v-text="user.displayName" />
-              <span v-if="user.mail" class="oc-text-small" v-text="user.mail" />
               <quota-information
                 v-if="quotaEnabled"
                 :quota="quota"

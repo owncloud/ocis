@@ -72,6 +72,17 @@ describe('MermaidPreviewPane', () => {
     expect(wrapper.find('.mermaid-preview-pane-error__detail').text()).toBe('boom')
   })
 
+  it('initializes mermaid with the dagre layout', async () => {
+    vi.mocked(mermaid.parse).mockResolvedValue({ diagramType: 'flowchart' } as never)
+    vi.mocked(mermaid.render).mockResolvedValue({ svg: '<svg></svg>' } as never)
+
+    getWrapper('graph TD')
+    await flush()
+    expect(mermaid.initialize).toHaveBeenLastCalledWith(
+      expect.objectContaining({ layout: 'dagre' })
+    )
+  })
+
   it('re-renders with the dark theme when the theme store flips to dark', async () => {
     vi.mocked(mermaid.parse).mockResolvedValue({ diagramType: 'flowchart' } as never)
     vi.mocked(mermaid.render).mockResolvedValue({ svg: '<svg></svg>' } as never)

@@ -519,6 +519,7 @@ var supportedLangs = []language.Tag{
 	language.German,
 	language.French,
 	language.Dutch,
+	language.Czech,
 }
 var langMatcher = language.NewMatcher(supportedLangs)
 

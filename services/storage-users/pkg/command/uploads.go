@@ -127,7 +127,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 				os.Exit(1)
 			}
 			drivers := revaconfig.StorageProviderDrivers(cfg)
-			driverConf, ok := drivers[cfg.Driver].(map[string]interface{})
+			driverConf, ok := drivers[cfg.Driver].(map[string]any)
 			if !ok {
 				fmt.Fprintf(os.Stderr, "No configuration found for filesystem driver '%s'\n", cfg.Driver)
 				os.Exit(1)
@@ -403,7 +403,11 @@ func DeleteStaleProcessingNodes(cfg *config.Config) *cli.Command {
 				spaceIDs = append(spaceIDs, ctx.String("spaceid"))
 			} else {
 				fmt.Println("Scanning all spaces for stale processing nodes...")
-				spaceIDs = globSpaceIDs(cfg)
+				var err error
+				spaceIDs, err = globSpaceIDs(cfg)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error %v\n", err)
+				}
 			}
 
 			if verbose {
@@ -438,12 +442,11 @@ func DeleteStaleProcessingNodes(cfg *config.Config) *cli.Command {
 }
 
 // globSpaceIDs returns a list of all space IDs in the storage root
-func globSpaceIDs(cfg *config.Config) []string {
+func globSpaceIDs(cfg *config.Config) ([]string, error) {
 	fsys := os.DirFS(cfg.Drivers.OCIS.Root)
 	dirs, err := fs.Glob(fsys, "spaces/*/*/nodes")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error globbing spaces root directory %s: %v\n", cfg.Drivers.OCIS.Root, err)
-		return []string{}
+		return []string{}, fmt.Errorf("globbing spaces root directory %s: %w", cfg.Drivers.OCIS.Root, err)
 	}
 
 	spaceIDs := []string{}
@@ -452,7 +455,7 @@ func globSpaceIDs(cfg *config.Config) []string {
 		// spaceID is 9d408cec-8f0a-4d33-8715-89df1217a10c
 		spaceIDs = append(spaceIDs, strings.ReplaceAll(strings.TrimSuffix(strings.TrimPrefix(dir, "spaces/"), "/nodes"), "/", ""))
 	}
-	return spaceIDs
+	return spaceIDs, nil
 }
 
 // delete stale processing nodes for a given spaceID
@@ -507,7 +510,7 @@ func deleteStaleNode(cfg *config.Config, path string, dryRun bool, verbose bool,
 		fmt.Fprintf(os.Stderr, "Error reading file %s: %s\n", path, err)
 		return 0
 	}
-	var mpkData map[string]interface{}
+	var mpkData map[string]any
 	if err := msgpack.Unmarshal(b, &mpkData); err != nil {
 		fmt.Fprintf(os.Stderr, "Error unmarshaling file %s: %s\n", path, err)
 		return 0
@@ -562,7 +565,7 @@ func deleteStaleNode(cfg *config.Config, path string, dryRun bool, verbose bool,
 	return 1
 }
 
-func extractProcessingID(mpkData map[string]interface{}) string {
+func extractProcessingID(mpkData map[string]any) string {
 	processingID := ""
 	for k, v := range mpkData {
 		vStr := string(v.([]byte))

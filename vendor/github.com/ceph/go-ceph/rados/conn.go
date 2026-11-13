@@ -6,6 +6,7 @@ package rados
 import "C"
 
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/ceph/go-ceph/internal/cutil"
@@ -69,12 +70,21 @@ func (c *Conn) Connect() error {
 	return nil
 }
 
-// Shutdown disconnects from the cluster.
+// Shutdown disconnects from the cluster and releases the cluster handle.
+// It may be called before Connect. Subsequent calls have no effect.
 func (c *Conn) Shutdown() {
-	if err := c.ensureConnected(); err != nil {
-		return
+	runtime.SetFinalizer(c, nil)
+	c.releaseClusterHandle()
+}
+
+// releaseClusterHandle performs the native cleanup shared by explicit
+// shutdown and the garbage-collector fallback.
+func (c *Conn) releaseClusterHandle() {
+	if c.cluster != nil {
+		C.rados_shutdown(c.cluster)
+		c.cluster = nil
 	}
-	freeConn(c)
+	c.connected = false
 }
 
 // ReadConfigFile configures the connection using a Ceph configuration file.
@@ -111,22 +121,22 @@ func (c *Conn) OpenIOContext(pool string) (*IOContext, error) {
 
 // ListPools returns the names of all existing pools.
 func (c *Conn) ListPools() (names []string, err error) {
-	buf := make([]byte, 4096)
-	for {
-		ret := C.rados_pool_list(c.cluster,
+	var (
+		buf []byte
+		ret C.int
+	)
+	retry.WithTries(4096, 16, func(size int) retry.Hint {
+		buf = make([]byte, size)
+		ret = C.rados_pool_list(c.cluster,
 			(*C.char)(unsafe.Pointer(&buf[0])), C.size_t(len(buf)))
-		if ret < 0 {
-			return nil, getError(ret)
-		}
-
-		if int(ret) > len(buf) {
-			buf = make([]byte, ret)
-			continue
-		}
-
-		names = cutil.SplitSparseBuffer(buf[:ret])
-		return names, nil
+		err = getErrorIfNegative(ret)
+		return retry.Size(int(ret)).If(err == nil && int(ret) > size)
+	})
+	if err != nil {
+		return nil, err
 	}
+	names = cutil.SplitSparseBuffer(buf[:ret])
+	return names, nil
 }
 
 // SetConfigOption sets the value of the configuration option identified by
@@ -300,14 +310,23 @@ func (c *Conn) GetPoolByName(name string) (int64, error) {
 
 // GetPoolByID returns the name of a pool by a given ID.
 func (c *Conn) GetPoolByID(id int64) (string, error) {
-	buf := make([]byte, 4096)
 	if err := c.ensureConnected(); err != nil {
 		return "", err
 	}
 	cid := C.int64_t(id)
-	ret := C.rados_pool_reverse_lookup(c.cluster, cid, (*C.char)(unsafe.Pointer(&buf[0])), C.size_t(len(buf)))
-	if ret < 0 {
-		return "", getError(ret)
+	var (
+		buf []byte
+		err error
+	)
+	retry.WithSizes(4096, 1<<18, func(size int) retry.Hint {
+		buf = make([]byte, size)
+		ret := C.rados_pool_reverse_lookup(
+			c.cluster, cid, (*C.char)(unsafe.Pointer(&buf[0])), C.size_t(len(buf)))
+		err = getErrorIfNegative(ret)
+		return retry.DoubleSize.If(err == errRange)
+	})
+	if err != nil {
+		return "", err
 	}
 	return C.GoString((*C.char)(unsafe.Pointer(&buf[0]))), nil
 }

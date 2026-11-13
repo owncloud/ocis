@@ -194,6 +194,19 @@ export const useSpacesStore = defineStore('spaces', () => {
     }
   }
 
+  /**
+   * Refreshes quota and size of a loaded space from a freshly fetched drive (e.g. after an upload,
+   * delete or restore). The space size is the used quota of the drive. It is shown as the total in
+   * the footer of the file list, where the space is the current folder of a project space root.
+   * A drive without quota leaves the stored size untouched.
+   */
+  const updateSpaceUsage = ({ id, spaceQuota, size }: SpaceResource) => {
+    updateSpaceField({ id, field: 'spaceQuota', value: spaceQuota })
+    if (size !== undefined) {
+      updateSpaceField({ id, field: 'size', value: size })
+    }
+  }
+
   const loadSpaces = async ({
     graphClient,
     isInVault
@@ -304,6 +317,7 @@ export const useSpacesStore = defineStore('spaces', () => {
     removeSpace,
     upsertSpace,
     updateSpaceField,
+    updateSpaceUsage,
     loadSpaces,
     loadMountPoints,
     reloadProjectSpaces,

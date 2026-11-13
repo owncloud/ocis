@@ -211,7 +211,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 		permission.GrantedToV2 = &libregraph.SharePointIdentitySet{
 			Group: &libregraph.Identity{
 				DisplayName: group.GetDisplayName(),
-				Id:          conversions.ToPointer(group.GetId()),
+				Id:          new(group.GetId()),
 			},
 		}
 		createShareRequest := createShareRequestToGroup(group, statResponse.GetInfo(), cs3ResourcePermissions)
@@ -249,8 +249,8 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 		permission.GrantedToV2 = &libregraph.SharePointIdentitySet{
 			User: &libregraph.Identity{
 				DisplayName:        user.GetDisplayName(),
-				Id:                 conversions.ToPointer(user.GetId()),
-				LibreGraphUserType: conversions.ToPointer(user.GetUserType()),
+				Id:                 new(user.GetId()),
+				LibreGraphUserType: new(user.GetUserType()),
 			},
 		}
 
@@ -310,7 +310,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 	}
 
 	if shareid != "" {
-		permission.Id = conversions.ToPointer(shareid)
+		permission.Id = new(shareid)
 	} else if IsSpaceRoot(statResponse.GetInfo().GetId()) {
 		// permissions on a space root are not handled by a share manager so
 		// they don't get a share-id
@@ -871,7 +871,7 @@ func (api DriveItemPermissionsApi) Invite(w http.ResponseWriter, r *http.Request
 	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, &ListResponse{Value: []interface{}{permission}})
+	render.JSON(w, r, &ListResponse{Value: []any{permission}})
 }
 
 // SpaceRootInvite handles DriveItemInvite requests on a space root
@@ -903,7 +903,7 @@ func (api DriveItemPermissionsApi) SpaceRootInvite(w http.ResponseWriter, r *htt
 	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, &ListResponse{Value: []interface{}{permission}})
+	render.JSON(w, r, &ListResponse{Value: []any{permission}})
 }
 
 // ListPermissions handles ListPermissions requests

@@ -30,14 +30,14 @@ func TestGroupsClaimPresent(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		claims map[string]interface{}
+		claims map[string]any
 		want   bool
 	}{
-		{"claim absent", map[string]interface{}{"other": "x"}, false},
-		{"claim null", map[string]interface{}{claim: nil}, false},
-		{"empty claims", map[string]interface{}{}, false},
-		{"present but empty", map[string]interface{}{claim: []interface{}{}}, true},
-		{"present with groups", map[string]interface{}{claim: []interface{}{"admins"}}, true},
+		{"claim absent", map[string]any{"other": "x"}, false},
+		{"claim null", map[string]any{claim: nil}, false},
+		{"empty claims", map[string]any{}, false},
+		{"present but empty", map[string]any{claim: []any{}}, true},
+		{"present with groups", map[string]any{claim: []any{"admins"}}, true},
 	}
 
 	for _, tt := range tests {
@@ -56,8 +56,8 @@ func TestSyncGroupMemberships_GroupsClaimUnconfigured(t *testing.T) {
 			autoProvisionClaims: config.AutoProvisionClaims{Groups: ""},
 		},
 	}
-	claims := map[string]interface{}{
-		"groups": []interface{}{"admins"},
+	claims := map[string]any{
+		"groups": []any{"admins"},
 	}
 	if err := b.SyncGroupMemberships(context.Background(), &cs3.User{}, claims); err != nil {
 		t.Fatal(err)
@@ -124,7 +124,7 @@ func newGraphServer(t *testing.T, existingGroup string, currentGroups []string, 
 			w.WriteHeader(http.StatusNoContent)
 			return
 		case strings.Contains(rest, "/members/") && r.Method == http.MethodDelete:
-			gid := strings.SplitN(rest, "/members/", 2)[0]
+			gid, _, _ := strings.Cut(rest, "/members/")
 			calls.mu.Lock()
 			calls.delMember = append(calls.delMember, gid)
 			calls.mu.Unlock()
@@ -235,7 +235,7 @@ func TestSyncGroupMemberships_ClaimSet_CreatesAndJoins(t *testing.T) {
 
 	b := newSyncBackend(t, srv, config.AutoProvisionClaims{Groups: "groups"})
 
-	claims := map[string]interface{}{"groups": []interface{}{"new-group"}}
+	claims := map[string]any{"groups": []any{"new-group"}}
 	if err := b.SyncGroupMemberships(context.Background(), testUser(), claims); err != nil {
 		t.Fatal(err)
 	}
@@ -259,7 +259,7 @@ func TestSyncGroupMemberships_ExistingGroupJoined(t *testing.T) {
 
 	b := newSyncBackend(t, srv, config.AutoProvisionClaims{Groups: "groups"})
 
-	claims := map[string]interface{}{"groups": []interface{}{"admin"}}
+	claims := map[string]any{"groups": []any{"admin"}}
 	if err := b.SyncGroupMemberships(context.Background(), testUser(), claims); err != nil {
 		t.Fatal(err)
 	}
@@ -282,7 +282,7 @@ func TestSyncGroupMemberships_Deprovision(t *testing.T) {
 
 	b := newSyncBackend(t, srv, config.AutoProvisionClaims{Groups: "groups"})
 
-	claims := map[string]interface{}{"groups": []interface{}{}}
+	claims := map[string]any{"groups": []any{}}
 	if err := b.SyncGroupMemberships(context.Background(), testUser(), claims); err != nil {
 		t.Fatal(err)
 	}

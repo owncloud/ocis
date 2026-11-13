@@ -28,7 +28,7 @@ import (
 func TestExtractRolesArray(t *testing.T) {
 	byt := []byte(`{"roles":["a","b"]}`)
 
-	claims := map[string]interface{}{}
+	claims := map[string]any{}
 	err := json.Unmarshal(byt, &claims)
 	if err != nil {
 		t.Fatal(err)
@@ -49,7 +49,7 @@ func TestExtractRolesArray(t *testing.T) {
 func TestExtractRolesString(t *testing.T) {
 	byt := []byte(`{"roles":"a"}`)
 
-	claims := map[string]interface{}{}
+	claims := map[string]any{}
 	err := json.Unmarshal(byt, &claims)
 	if err != nil {
 		t.Fatal(err)
@@ -67,7 +67,7 @@ func TestExtractRolesString(t *testing.T) {
 func TestExtractRolesPathArray(t *testing.T) {
 	byt := []byte(`{"sub":{"roles":["a","b"]}}`)
 
-	claims := map[string]interface{}{}
+	claims := map[string]any{}
 	err := json.Unmarshal(byt, &claims)
 	if err != nil {
 		t.Fatal(err)
@@ -88,7 +88,7 @@ func TestExtractRolesPathArray(t *testing.T) {
 func TestExtractRolesPathString(t *testing.T) {
 	byt := []byte(`{"sub":{"roles":"a"}}`)
 
-	claims := map[string]interface{}{}
+	claims := map[string]any{}
 	err := json.Unmarshal(byt, &claims)
 	if err != nil {
 		t.Fatal(err)
@@ -106,7 +106,7 @@ func TestExtractRolesPathString(t *testing.T) {
 func TestExtractEscapedRolesPathString(t *testing.T) {
 	byt := []byte(`{"sub.roles":"a"}`)
 
-	claims := map[string]interface{}{}
+	claims := map[string]any{}
 	err := json.Unmarshal(byt, &claims)
 	if err != nil {
 		t.Fatal(err)
@@ -124,7 +124,7 @@ func TestExtractEscapedRolesPathString(t *testing.T) {
 func TestNoRoles(t *testing.T) {
 	byt := []byte(`{"sub":{"foo":"a"}}`)
 
-	claims := map[string]interface{}{}
+	claims := map[string]any{}
 	err := json.Unmarshal(byt, &claims)
 	if err != nil {
 		t.Fatal(err)
@@ -281,7 +281,7 @@ func TestMapGuestRole(t *testing.T) {
 		name    string
 		mapping []config.RoleMapping
 		roleIDs map[string]string
-		claims  map[string]interface{}
+		claims  map[string]any
 		want    string
 		wantErr bool
 	}{
@@ -289,42 +289,42 @@ func TestMapGuestRole(t *testing.T) {
 			name:    "spaceadmin gets the mapped role",
 			mapping: spaceAdminMapping,
 			roleIDs: roleIDs,
-			claims:  map[string]interface{}{"roles": []interface{}{"spaceadmin"}},
+			claims:  map[string]any{"roles": []any{"spaceadmin"}},
 			want:    "user-light-vault",
 		},
 		{
 			name:    "spaceadmin with more claim values gets the mapped role",
 			mapping: spaceAdminMapping,
 			roleIDs: roleIDs,
-			claims:  map[string]interface{}{"roles": []interface{}{"user", "spaceadmin"}},
+			claims:  map[string]any{"roles": []any{"user", "spaceadmin"}},
 			want:    "user-light-vault",
 		},
 		{
 			name:    "user keeps the guest role",
 			mapping: spaceAdminMapping,
 			roleIDs: roleIDs,
-			claims:  map[string]interface{}{"roles": []interface{}{"user"}},
+			claims:  map[string]any{"roles": []any{"user"}},
 			want:    "user-light",
 		},
 		{
 			name:    "guest without roles claim keeps the guest role",
 			mapping: spaceAdminMapping,
 			roleIDs: roleIDs,
-			claims:  map[string]interface{}{"sub": "someone"},
+			claims:  map[string]any{"sub": "someone"},
 			want:    "user-light",
 		},
 		{
 			name:    "mapping to an unknown role is an error",
 			mapping: spaceAdminMapping,
 			roleIDs: map[string]string{"user-light": "user-light-id"},
-			claims:  map[string]interface{}{"roles": []interface{}{"spaceadmin"}},
+			claims:  map[string]any{"roles": []any{"spaceadmin"}},
 			wantErr: true,
 		},
 		{
 			name:    "unknown role of a non-matching mapping is no error",
 			mapping: spaceAdminMapping,
 			roleIDs: map[string]string{"user-light": "user-light-id"},
-			claims:  map[string]interface{}{"roles": []interface{}{"user"}},
+			claims:  map[string]any{"roles": []any{"user"}},
 			want:    "user-light",
 		},
 		{
@@ -334,7 +334,7 @@ func TestMapGuestRole(t *testing.T) {
 				{ClaimValue: ".*", RoleName: "user-light"},
 			},
 			roleIDs: roleIDs,
-			claims:  map[string]interface{}{"roles": []interface{}{"spaceadmin"}},
+			claims:  map[string]any{"roles": []any{"spaceadmin"}},
 			want:    "user-light-vault",
 		},
 	}
@@ -424,7 +424,7 @@ func TestUpdateUserRoleAssignmentMapsGuestRole(t *testing.T) {
 	}}
 
 	user := &cs3user.User{Id: &cs3user.UserId{OpaqueId: userOpaqueID}}
-	claims := map[string]interface{}{"roles": []interface{}{"spaceadmin"}}
+	claims := map[string]any{"roles": []any{"spaceadmin"}}
 
 	if _, err := ra.UpdateUserRoleAssignment(context.Background(), user, claims, "user-light"); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -478,7 +478,7 @@ func TestUpdateUserRoleAssignmentFailsOnUnknownGuestRole(t *testing.T) {
 	}}
 
 	user := &cs3user.User{Id: &cs3user.UserId{OpaqueId: "user-1"}}
-	claims := map[string]interface{}{"roles": []interface{}{"spaceadmin"}}
+	claims := map[string]any{"roles": []any{"spaceadmin"}}
 
 	_, err := ra.UpdateUserRoleAssignment(context.Background(), user, claims, "user-light")
 	if err == nil || !strings.Contains(err.Error(), "unknown role 'user-light-vault'") {
@@ -487,7 +487,7 @@ func TestUpdateUserRoleAssignmentFailsOnUnknownGuestRole(t *testing.T) {
 	roleService.AssertNotCalled(t, "AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything)
 
 	// a guest that no mapping matches gets the guest role, which must exist too
-	claims = map[string]interface{}{"roles": []interface{}{"user"}}
+	claims = map[string]any{"roles": []any{"user"}}
 	_, err = ra.UpdateUserRoleAssignment(context.Background(), user, claims, "no-such-guest-role")
 	if err == nil || !strings.Contains(err.Error(), "unknown role 'no-such-guest-role'") {
 		t.Fatalf("expected an error for an unknown guest role, got %v", err)
@@ -587,7 +587,7 @@ func TestGuestRoleNameRefreshesRoles(t *testing.T) {
 		Token:  "service-token",
 	}, nil)
 
-	claims := map[string]interface{}{"roles": []interface{}{"spaceadmin"}}
+	claims := map[string]any{"roles": []any{"spaceadmin"}}
 	cached := map[string]string{"user-light": "user-light-id"}
 
 	tests := []struct {

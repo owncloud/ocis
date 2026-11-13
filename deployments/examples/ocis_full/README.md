@@ -27,6 +27,20 @@ Upgrading an existing deployment that still has data in the old named
 volumes? Run `./migrate-volumes.sh` once, before starting the stack, to copy
 data from the old volumes into the new `./data/` directories.
 
+## Collabora
+
+When Collabora is enabled (`COLLABORA=:collabora.yml`), the example uses the following recommended configuration:
+
+- `COLLABORA_ADMIN_USER` and `COLLABORA_ADMIN_PASSWORD` must be set in `.env`. There are no defaults.
+- Collabora runs on its own internal network (`collabora-net`) that is only shared with the proxy and the
+  collaboration service. It has no access to the other services of the example.
+- `config/coolwsd/coolwsd.xml` is mounted into the Collabora container. It restricts the hosts Collabora may
+  talk to (the WOPI host, i.e. the collaboration service) and pins the accepted WOPI host. If you change the
+  WOPI source of the collaboration service, adjust the host in this file accordingly.
+- The file is based on the default configuration of the Collabora image tag set in `COLLABORA_DOCKER_TAG`.
+  When you update the tag, compare it with the default `/etc/coolwsd/coolwsd.xml` of the new image and merge
+  changes.
+
 ## Optional Services
 
 ### Keycloak
@@ -46,3 +60,13 @@ Note that Workflows requires the `ocis-apps` volume provided by the web extensio
 To use Workflows *automations* (scheduled or event-triggered runs, rather than only manual "Run now"), the backend mints oCIS app-passwords on the user's behalf, which requires oCIS's `auth-app` service. App-password support (`PROXY_ENABLE_APP_AUTH`) and the `auth-app` service are both off by default, since they widen the oCIS instance's authentication surface, so you must explicitly:
 - Set `PROXY_ENABLE_APP_AUTH=true` in the `.env` file.
 - Add `auth-app` to `START_ADDITIONAL_SERVICES` in the `.env` file, e.g. `START_ADDITIONAL_SERVICES="notifications,auth-app"`.
+
+### MCP Server
+
+The [oCIS MCP Server](https://github.com/owncloud/ocis-mcp-server) exposes this deployment as a set of AI-accessible tools over the Model Context Protocol (MCP), so AI assistants such as Claude can manage users, spaces, files and shares through natural language. It can be optionally enabled by uncommenting the corresponding variable in the `.env` file:
+- `OCIS_MCP=:mcp.yml`
+
+It is reachable at `https://${OCIS_MCP_DOMAIN:-mcp.owncloud.test}` once enabled. Two things must be configured in `.env` before it will start:
+- `OCIS_MCP_HTTP_SECRET` — a shared secret every MCP client must send as `Authorization: Bearer <secret>`. The container refuses to start without it.
+- `OCIS_MCP_APP_TOKEN_USER` / `OCIS_MCP_APP_TOKEN_VALUE` — an oCIS app token, created with `docker-compose exec ocis ocis auth-app create --user-name="admin" --expiration="8760h"`.
+  **Note:** the `auth-app` service is not started by default — add `auth-app` to `START_ADDITIONAL_SERVICES` in `.env` first, or the command above will silently create an empty token.

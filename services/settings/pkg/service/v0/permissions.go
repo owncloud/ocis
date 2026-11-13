@@ -1,6 +1,8 @@
 package svc
 
 import (
+	"slices"
+
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 )
 
@@ -35,12 +37,7 @@ func getFilteredPermissionsByOperations(permissions []*settingsmsg.Permission, o
 
 // isAnyOperationFulfilled checks if the permissions is about any of the operations
 func isAnyOperationFulfilled(permission *settingsmsg.Permission, operations []settingsmsg.Permission_Operation) bool {
-	for _, operation := range operations {
-		if operation == permission.Operation {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(operations, permission.Operation)
 }
 
 // isConstraintFulfilled checks if one of the permissions has the same or a parent of the constraint.
