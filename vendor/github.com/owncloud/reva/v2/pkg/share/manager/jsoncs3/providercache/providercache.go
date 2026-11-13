@@ -232,7 +232,7 @@ func (c *Cache) Remove(ctx context.Context, storageID, spaceID, shareID string) 
 		if !ok {
 			return nil
 		}
-		space, _ := spaces.Spaces.Load(spaceID)
+		space, ok := spaces.Spaces.Load(spaceID)
 		if !ok {
 			return nil
 		}
@@ -445,7 +445,8 @@ func (c *Cache) PurgeSpace(ctx context.Context, storageID, spaceID string) error
 	if !ok {
 		return nil
 	}
-	newShares := &Shares{}
+	// Keep a non-nil map. A later Add to the same space writes into it.
+	newShares := &Shares{Shares: map[string]*collaboration.Share{}}
 	if space, ok := spaces.Spaces.Load(spaceID); ok {
 		newShares.Etag = space.Etag // keep the etag to allow overwriting the state on the server
 	}

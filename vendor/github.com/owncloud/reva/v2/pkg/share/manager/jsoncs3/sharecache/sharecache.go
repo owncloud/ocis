@@ -172,9 +172,12 @@ func (c *Cache) Remove(ctx context.Context, userid, shareID string) error {
 			UserShares: map[string]*SpaceShareIDs{},
 		})
 
+		// The user can have no entry for the space of the share. Then there is nothing to delete.
+		// Persist anyway: when the in-memory cache is stale, the etag conflict causes a resync and a retry.
 		if loaded {
-			// remove share id
-			delete(us.UserShares[ssid].IDs, shareID)
+			if space := us.UserShares[ssid]; space != nil {
+				delete(space.IDs, shareID)
+			}
 		}
 
 		return c.Persist(ctx, userid)
