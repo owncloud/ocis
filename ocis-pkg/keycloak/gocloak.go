@@ -10,6 +10,7 @@ import (
 type GoCloak interface {
 	CreateUser(ctx context.Context, token, realm string, user gocloak.User) (string, error)
 	GetUsers(ctx context.Context, token, realm string, params gocloak.GetUsersParams) ([]*gocloak.User, error)
+	DeleteUser(ctx context.Context, token, realm, userID string) error
 	ExecuteActionsEmail(ctx context.Context, token, realm string, params gocloak.ExecuteActionsEmail) error
 	LoginClient(ctx context.Context, clientID, clientSecret, realm string, scopes ...string) (*gocloak.JWT, error)
 	RetrospectToken(ctx context.Context, accessToken, clientID, clientSecret, realm string) (*gocloak.IntroSpectTokenResult, error)
