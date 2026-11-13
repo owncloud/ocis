@@ -1161,9 +1161,10 @@ export const pasteResource = async (args: moveOrCopyResourceArgs): Promise<void>
     await Promise.all([
       page.waitForResponse(
         (resp) =>
-          resp.url().endsWith(resource) &&
-          resp.ok &&
-          resp.request().method() === action.toUpperCase()
+          (resp.url().endsWith(resource) &&
+            resp.ok &&
+            resp.request().method() === action.toUpperCase()) ||
+          (action === 'copy' && isFolderCopyDoneResponse(resp, resource))
       ),
       option === 'replace'
         ? page.locator(actionSecondaryConfirmationButton).click()
@@ -2756,10 +2757,26 @@ export const duplicateResource = async ({
   }
 }
 
+/**
+ * A folder is copied file by file instead of with one COPY request. Its copy is done when the
+ * files list fetches the new folder, which got a " (n)" suffix to keep it next to the original.
+ */
+const isFolderCopyDoneResponse = (resp: Response, resource: string): boolean => {
+  if (resp.request().method() !== 'PROPFIND' || resp.status() !== 207) {
+    return false
+  }
+  const escapedName = resource.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const path = decodeURIComponent(new URL(resp.url()).pathname)
+  return new RegExp(`/${escapedName} \\(\\d+\\)/?$`).test(path)
+}
+
 const waitForResourceDuplicationResponse = (page: Page, resource: string): Promise<Response> => {
   return page.waitForResponse(
     (resp) =>
-      resp.url().endsWith(resource) && resp.status() === 201 && resp.request().method() === 'COPY'
+      (resp.url().endsWith(resource) &&
+        resp.status() === 201 &&
+        resp.request().method() === 'COPY') ||
+      isFolderCopyDoneResponse(resp, resource)
   )
 }
 

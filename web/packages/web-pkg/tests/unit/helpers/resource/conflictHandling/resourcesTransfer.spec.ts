@@ -217,14 +217,14 @@ describe('resourcesTransfer', () => {
       { resourceNames: ['a'], title: 'Duplication of "a" incomplete' },
       { resourceNames: ['a', 'b'], title: 'Duplication of 2 resources incomplete' }
     ])(
-      'says the duplication of a folder is incomplete when it got no answer',
+      'says the duplication is incomplete when the folders miss some of their content',
       ({ resourceNames, title }) => {
         const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
 
         buildTransfer(projectSpace()).showResultMessage(
           resourceNames.map((resourceName) => ({
             resourceName,
-            isFolder: true,
+            incomplete: true,
             error: noAnswerError()
           })),
           [],
@@ -235,34 +235,17 @@ describe('resourcesTransfer', () => {
       }
     )
 
-    it('says the duplication of a file failed when it got no answer', () => {
+    it('says the duplication failed when it got no answer and nothing was created', () => {
       const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
 
       buildTransfer(projectSpace()).showResultMessage(
-        [{ resourceName: 'a', isFolder: false, error: noAnswerError() }],
+        [{ resourceName: 'a', error: noAnswerError() }],
         [],
         TransferType.DUPLICATE
       )
 
       expect(showErrorMessage).toHaveBeenCalledWith(
         expect.objectContaining({ title: 'Failed to duplicate "a"' })
-      )
-    })
-
-    it('says the duplication of folders and files failed when none got an answer', () => {
-      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
-
-      buildTransfer(projectSpace()).showResultMessage(
-        [
-          { resourceName: 'a', isFolder: true, error: noAnswerError() },
-          { resourceName: 'b', isFolder: false, error: noAnswerError() }
-        ],
-        [],
-        TransferType.DUPLICATE
-      )
-
-      expect(showErrorMessage).toHaveBeenCalledWith(
-        expect.objectContaining({ title: 'Failed to duplicate 2 resources' })
       )
     })
 
@@ -273,7 +256,6 @@ describe('resourcesTransfer', () => {
         [
           {
             resourceName: 'a',
-            isFolder: true,
             error: createHttpError({ message: 'nope', statusCode: 403, xReqId: '1' })
           }
         ],
@@ -286,13 +268,13 @@ describe('resourcesTransfer', () => {
       )
     })
 
-    it('says the duplication failed when only some of the resources got no answer', () => {
+    it('says the duplication failed when only some of the resources are incomplete', () => {
       const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
 
       buildTransfer(projectSpace()).showResultMessage(
         [
-          { resourceName: 'a', isFolder: true, error: noAnswerError() },
-          { resourceName: 'b', isFolder: true, error: quotaError() }
+          { resourceName: 'a', incomplete: true, error: noAnswerError() },
+          { resourceName: 'b', error: quotaError() }
         ],
         [],
         TransferType.DUPLICATE
@@ -306,11 +288,11 @@ describe('resourcesTransfer', () => {
     it.each([
       { transferType: TransferType.COPY, title: 'Failed to copy "a"' },
       { transferType: TransferType.MOVE, title: 'Failed to move "a"' }
-    ])('keeps saying copy and move failed when they got no answer', ({ transferType, title }) => {
+    ])('keeps saying copy and move failed when incomplete', ({ transferType, title }) => {
       const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
 
       buildTransfer(projectSpace()).showResultMessage(
-        [{ resourceName: 'a', isFolder: true, error: noAnswerError() }],
+        [{ resourceName: 'a', incomplete: true, error: noAnswerError() }],
         [],
         transferType
       )
