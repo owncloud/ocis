@@ -242,12 +242,27 @@ jobs:
           extensions: curl, xml, mbstring, zip, ldap, gd
           tools: composer
 
+      - name: Check the libcurl version of PHP
+        id: php-libcurl
+        # PHP needs libcurl 8.12.0 or newer. ubuntu-24.04 has libcurl 8.5.0, so the next steps
+        # compile libcurl 8.12.0. ubuntu-26.04 has libcurl 8.18.0, so these steps do not run there.
+        run: |
+          echo "PHP curl: $(php -r 'echo curl_version()["version"];')"
+          if php -r 'exit(version_compare(curl_version()["version"], "8.12.0", "<") ? 0 : 1);'; then
+            echo "build=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "build=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "image=${ImageOS}" >> "$GITHUB_OUTPUT"
+
       - name: Cache libcurl 8.12.0
+        if: steps.php-libcurl.outputs.build == 'true'
         id: cache-libcurl
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: /opt/libcurl
-          key: libcurl-8.12.0-${{ runner.os }}
+          # The image is part of the key: a library from one image must not run on another image.
+          key: libcurl-8.12.0-${{ runner.os }}-${{ steps.php-libcurl.outputs.image }}
 
       - name: Install libcurl 8.12.0 build dependencies
         # Always run: libvips-dev is needed at runtime (govips thumbnails in the pre-built binary)
@@ -257,7 +272,7 @@ jobs:
           sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
 
       - name: Compile libcurl 8.12.0 from source
-        if: steps.cache-libcurl.outputs.cache-hit != 'true'
+        if: steps.php-libcurl.outputs.build == 'true' && steps.cache-libcurl.outputs.cache-hit != 'true'
         run: |
           cd /tmp
           curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
@@ -267,14 +282,17 @@ jobs:
           make -j$(nproc) --silent
           sudo make install --silent
 
-      - name: Restore libcurl ldconfig
-        # Always run: on cache hit the .so files are restored to /opt/libcurl/lib but
-        # /etc/ld.so.cache on the fresh runner doesn't know about them yet.
-        # Without ldconfig, PHP's curl extension can't find libcurl even though it's present.
+      - name: Use libcurl 8.12.0 for the next steps
+        if: steps.php-libcurl.outputs.build == 'true'
+        # Do not add /opt/libcurl/lib to the global ldconfig path. A newer system curl
+        # (8.18.0 on ubuntu-26.04) fails with the older library:
+        # "undefined symbol: curl_multi_notify_enable".
+        # LD_LIBRARY_PATH applies only to the next steps of this job.
+        run: echo "LD_LIBRARY_PATH=/opt/libcurl/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+
+      - name: Check that PHP uses libcurl 8.12.0 or newer
         run: |
-          echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
-          sudo ldconfig
-          /opt/libcurl/bin/curl --version | head -1
+          curl --version | head -1
           php -r '
             $v = curl_version()["version"];
             echo "PHP curl: $v\n";
@@ -432,12 +450,27 @@ jobs:
           extensions: curl, xml, mbstring, zip, ldap, gd
           tools: composer
 
+      - name: Check the libcurl version of PHP
+        id: php-libcurl
+        # PHP needs libcurl 8.12.0 or newer. ubuntu-24.04 has libcurl 8.5.0, so the next steps
+        # compile libcurl 8.12.0. ubuntu-26.04 has libcurl 8.18.0, so these steps do not run there.
+        run: |
+          echo "PHP curl: $(php -r 'echo curl_version()["version"];')"
+          if php -r 'exit(version_compare(curl_version()["version"], "8.12.0", "<") ? 0 : 1);'; then
+            echo "build=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "build=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "image=${ImageOS}" >> "$GITHUB_OUTPUT"
+
       - name: Cache libcurl 8.12.0
+        if: steps.php-libcurl.outputs.build == 'true'
         id: cache-libcurl
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: /opt/libcurl
-          key: libcurl-8.12.0-${{ runner.os }}
+          # The image is part of the key: a library from one image must not run on another image.
+          key: libcurl-8.12.0-${{ runner.os }}-${{ steps.php-libcurl.outputs.image }}
 
       - name: Install libcurl 8.12.0 build dependencies
         # Always run: libvips-dev is needed at runtime (govips thumbnails in the pre-built binary)
@@ -447,7 +480,7 @@ jobs:
           sudo NEEDRESTART_MODE=a apt-get install -y libssl-dev libnghttp2-dev libpsl-dev libldap-dev libssh-dev zlib1g-dev libvips-dev
 
       - name: Compile libcurl 8.12.0 from source
-        if: steps.cache-libcurl.outputs.cache-hit != 'true'
+        if: steps.php-libcurl.outputs.build == 'true' && steps.cache-libcurl.outputs.cache-hit != 'true'
         run: |
           cd /tmp
           curl -sLO https://curl.se/download/curl-8.12.0.tar.gz
@@ -457,14 +490,17 @@ jobs:
           make -j$(nproc) --silent
           sudo make install --silent
 
-      - name: Restore libcurl ldconfig
-        # Always run: on cache hit the .so files are restored to /opt/libcurl/lib but
-        # /etc/ld.so.cache on the fresh runner doesn't know about them yet.
-        # Without ldconfig, PHP's curl extension can't find libcurl even though it's present.
+      - name: Use libcurl 8.12.0 for the next steps
+        if: steps.php-libcurl.outputs.build == 'true'
+        # Do not add /opt/libcurl/lib to the global ldconfig path. A newer system curl
+        # (8.18.0 on ubuntu-26.04) fails with the older library:
+        # "undefined symbol: curl_multi_notify_enable".
+        # LD_LIBRARY_PATH applies only to the next steps of this job.
+        run: echo "LD_LIBRARY_PATH=/opt/libcurl/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+
+      - name: Check that PHP uses libcurl 8.12.0 or newer
         run: |
-          echo "/opt/libcurl/lib" | sudo tee /etc/ld.so.conf.d/libcurl-8.conf
-          sudo ldconfig
-          /opt/libcurl/bin/curl --version | head -1
+          curl --version | head -1
           php -r '
             $v = curl_version()["version"];
             echo "PHP curl: $v\n";
@@ -501,7 +537,9 @@ jobs:
   e2e-tests:
     name: e2e-${{ matrix.suite }}
     needs: [build-and-test]
-    runs-on: ubuntu-latest
+    # pinned: Playwright 1.59.1 doesn't support ubuntu-latest's ubuntu-26.04 image yet
+    # https://github.com/microsoft/playwright/issues/40117
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     strategy:
       fail-fast: false
