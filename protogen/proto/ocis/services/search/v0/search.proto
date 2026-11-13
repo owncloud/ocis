@@ -104,6 +104,9 @@ message SearchIndexResponse {
 message IndexSpaceRequest {
   string space_id = 1;
   string user_id = 2;
+  // force indexes all resources again, including those that are already
+  // indexed and unchanged.
+  bool force = 3;
 }
 
 message IndexSpaceResponse {
