@@ -17,7 +17,7 @@
     "@ownclouders/web-pkg": "workspace:*",
     "lodash-es": "^4.18.1",
     "mark.js": "^8.11.1",
-    "pinia": "3.0.4",
+    "pinia": "4.1.0",
     "vue3-gettext": "^4.0.1",
     "vue-router": "5.0.6"
   }

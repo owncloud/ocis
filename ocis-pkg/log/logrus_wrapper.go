@@ -2,6 +2,7 @@ package log
 
 import (
 	"io"
+	"maps"
 
 	"github.com/rs/zerolog"
 	"github.com/sirupsen/logrus"
@@ -53,11 +54,9 @@ func (h *LogrusWrapper) Fire(entry *logrus.Entry) error {
 }
 
 // Convert logrus fields to zerolog
-func zeroLogFields(fields logrus.Fields) map[string]interface{} {
-	fm := make(map[string]interface{})
-	for k, v := range fields {
-		fm[k] = v
-	}
+func zeroLogFields(fields logrus.Fields) map[string]any {
+	fm := make(map[string]any)
+	maps.Copy(fm, fields)
 
 	return fm
 }

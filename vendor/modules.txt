@@ -19,8 +19,8 @@ github.com/BurntSushi/toml/internal
 # github.com/CiscoM31/godata v1.0.11
 ## explicit; go 1.19
 github.com/CiscoM31/godata
-# github.com/KimMachineGun/automemlimit v0.7.5
-## explicit; go 1.22.0
+# github.com/KimMachineGun/automemlimit v1.0.1
+## explicit; go 1.21.0
 github.com/KimMachineGun/automemlimit/memlimit
 # github.com/Masterminds/goutils v1.1.1
 ## explicit
@@ -288,8 +288,8 @@ github.com/cenkalti/backoff
 # github.com/cenkalti/backoff/v5 v5.0.3
 ## explicit; go 1.23
 github.com/cenkalti/backoff/v5
-# github.com/ceph/go-ceph v0.41.0
-## explicit; go 1.25.0
+# github.com/ceph/go-ceph v0.42.1
+## explicit; go 1.26.0
 github.com/ceph/go-ceph/cephfs
 github.com/ceph/go-ceph/cephfs/admin
 github.com/ceph/go-ceph/common/admin/manager
@@ -444,8 +444,8 @@ github.com/felixge/httpsnoop
 ## explicit; go 1.23
 github.com/fsnotify/fsnotify
 github.com/fsnotify/fsnotify/internal
-# github.com/gabriel-vasile/mimetype v1.4.15
-## explicit; go 1.21
+# github.com/gabriel-vasile/mimetype v1.4.16
+## explicit; go 1.24
 github.com/gabriel-vasile/mimetype
 github.com/gabriel-vasile/mimetype/internal/cdf
 github.com/gabriel-vasile/mimetype/internal/charset
@@ -468,7 +468,7 @@ github.com/go-acme/lego/v4/challenge
 # github.com/go-asn1-ber/asn1-ber v1.5.8
 ## explicit; go 1.13
 github.com/go-asn1-ber/asn1-ber
-# github.com/go-chi/chi/v5 v5.4.0
+# github.com/go-chi/chi/v5 v5.5.0
 ## explicit; go 1.24
 github.com/go-chi/chi/v5
 github.com/go-chi/chi/v5/middleware
@@ -575,8 +575,8 @@ github.com/go-logr/stdr
 # github.com/go-micro/plugins/v4/client/grpc v1.2.1
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/client/grpc
-# github.com/go-micro/plugins/v4/events/natsjs v1.2.2
-## explicit; go 1.17
+# github.com/go-micro/plugins/v4/events/natsjs v1.2.2 => github.com/kobergj/plugins/v4/events/natsjs v1.2.1-0.20261030085317-811a2ded849b
+## explicit; go 1.26.10
 github.com/go-micro/plugins/v4/events/natsjs
 # github.com/go-micro/plugins/v4/logger/zerolog v1.2.0
 ## explicit; go 1.17
@@ -593,8 +593,8 @@ github.com/go-micro/plugins/v4/server/http
 # github.com/go-micro/plugins/v4/store/nats-js v1.2.1
 ## explicit; go 1.21
 github.com/go-micro/plugins/v4/store/nats-js
-# github.com/go-micro/plugins/v4/store/nats-js-kv v0.0.0-20240726082623-6831adfdcdc4 => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20260609111813-fc78af4c9138
-## explicit; go 1.21
+# github.com/go-micro/plugins/v4/store/nats-js-kv v0.0.0-20240726082623-6831adfdcdc4 => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20261030085317-811a2ded849b
+## explicit; go 1.26.10
 github.com/go-micro/plugins/v4/store/nats-js-kv
 # github.com/go-micro/plugins/v4/store/redis v1.2.1
 ## explicit; go 1.17
@@ -613,7 +613,7 @@ github.com/go-playground/locales/en
 # github.com/go-playground/universal-translator v0.18.2
 ## explicit; go 1.26
 github.com/go-playground/universal-translator
-# github.com/go-playground/validator/v10 v10.30.5
+# github.com/go-playground/validator/v10 v10.30.6
 ## explicit; go 1.26.0
 github.com/go-playground/validator/v10
 github.com/go-playground/validator/v10/translations/en
@@ -805,7 +805,7 @@ github.com/hashicorp/go-plugin/runner
 # github.com/hashicorp/yamux v0.1.2
 ## explicit; go 1.20
 github.com/hashicorp/yamux
-# github.com/huandu/xstrings v1.6.2
+# github.com/huandu/xstrings v1.6.3
 ## explicit; go 1.12
 github.com/huandu/xstrings
 # github.com/iancoleman/strcase v0.3.0
@@ -851,22 +851,13 @@ github.com/justinas/alice
 # github.com/kevinburke/ssh_config v1.2.0
 ## explicit
 github.com/kevinburke/ssh_config
-# github.com/klauspost/compress v1.20.1
+# github.com/klauspost/compress v1.20.3
 ## explicit; go 1.25
-github.com/klauspost/compress
 github.com/klauspost/compress/flate
-github.com/klauspost/compress/fse
-github.com/klauspost/compress/gzip
-github.com/klauspost/compress/huff0
-github.com/klauspost/compress/internal/cpuinfo
 github.com/klauspost/compress/internal/le
 github.com/klauspost/compress/internal/race
 github.com/klauspost/compress/internal/regmask
-github.com/klauspost/compress/internal/snapref
 github.com/klauspost/compress/s2
-github.com/klauspost/compress/snappy
-github.com/klauspost/compress/zstd
-github.com/klauspost/compress/zstd/internal/xxhash
 # github.com/klauspost/cpuid/v2 v2.4.0
 ## explicit; go 1.24.0
 github.com/klauspost/cpuid/v2
@@ -975,8 +966,8 @@ github.com/libregraph/idm/server
 github.com/libregraph/idm/server/handler
 github.com/libregraph/idm/server/handler/boltdb
 github.com/libregraph/idm/server/handler/ldif
-# github.com/libregraph/lico v0.68.0
-## explicit; go 1.25.0
+# github.com/libregraph/lico v0.69.0
+## explicit; go 1.26.0
 github.com/libregraph/lico
 github.com/libregraph/lico/bootstrap
 github.com/libregraph/lico/bootstrap/backends/guest
@@ -995,6 +986,7 @@ github.com/libregraph/lico/identity/authorities
 github.com/libregraph/lico/identity/authorities/samlext
 github.com/libregraph/lico/identity/clients
 github.com/libregraph/lico/identity/managers
+github.com/libregraph/lico/identity/resources
 github.com/libregraph/lico/managers
 github.com/libregraph/lico/oidc
 github.com/libregraph/lico/oidc/code
@@ -1023,10 +1015,10 @@ github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.22
 ## explicit; go 1.21
 github.com/mattn/go-isatty
-# github.com/mattn/go-runewidth v0.0.23
+# github.com/mattn/go-runewidth v0.0.24
 ## explicit; go 1.20
 github.com/mattn/go-runewidth
-# github.com/mattn/go-sqlite3 v1.14.52
+# github.com/mattn/go-sqlite3 v1.14.53
 ## explicit; go 1.21
 github.com/mattn/go-sqlite3
 # github.com/maxymania/go-system v0.0.0-20170110133659-647cc364bf0b
@@ -1051,8 +1043,8 @@ github.com/minio/highwayhash
 # github.com/minio/md5-simd v1.1.2
 ## explicit; go 1.14
 github.com/minio/md5-simd
-# github.com/minio/minio-go/v7 v7.3.0
-## explicit; go 1.25.0
+# github.com/minio/minio-go/v7 v7.4.1
+## explicit; go 1.26.0
 github.com/minio/minio-go/v7
 github.com/minio/minio-go/v7/pkg/cors
 github.com/minio/minio-go/v7/pkg/credentials
@@ -1100,7 +1092,7 @@ github.com/munnerz/goautoneg
 # github.com/nats-io/jwt/v2 v2.8.2
 ## explicit; go 1.25.0
 github.com/nats-io/jwt/v2
-# github.com/nats-io/nats-server/v2 v2.15.1
+# github.com/nats-io/nats-server/v2 v2.15.2
 ## explicit; go 1.26.0
 github.com/nats-io/nats-server/v2/conf
 github.com/nats-io/nats-server/v2/internal/ldap
@@ -1118,7 +1110,7 @@ github.com/nats-io/nats-server/v2/server/stree
 github.com/nats-io/nats-server/v2/server/sysmem
 github.com/nats-io/nats-server/v2/server/thw
 github.com/nats-io/nats-server/v2/server/tpm
-# github.com/nats-io/nats.go v1.54.0
+# github.com/nats-io/nats.go v1.55.0
 ## explicit; go 1.26.0
 github.com/nats-io/nats.go
 github.com/nats-io/nats.go/encoders/builtin
@@ -1189,7 +1181,7 @@ github.com/onsi/ginkgo/reporters/stenographer
 github.com/onsi/ginkgo/reporters/stenographer/support/go-colorable
 github.com/onsi/ginkgo/reporters/stenographer/support/go-isatty
 github.com/onsi/ginkgo/types
-# github.com/onsi/ginkgo/v2 v2.33.0
+# github.com/onsi/ginkgo/v2 v2.34.0
 ## explicit; go 1.25.0
 github.com/onsi/ginkgo/v2
 github.com/onsi/ginkgo/v2/config
@@ -1321,8 +1313,8 @@ github.com/orcaman/concurrent-map
 # github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245
 ## explicit; go 1.18
 github.com/owncloud/libre-graph-api-go
-# github.com/owncloud/reva/v2 v2.0.0-20261022133635-764ed1d17629
-## explicit; go 1.26.0
+# github.com/owncloud/reva/v2 v2.0.0-20261109105443-35b75d9cfbfb
+## explicit; go 1.26.10
 github.com/owncloud/reva/v2/cmd/revad/internal/grace
 github.com/owncloud/reva/v2/cmd/revad/runtime
 github.com/owncloud/reva/v2/internal/grpc/interceptors/appctx
@@ -1504,6 +1496,7 @@ github.com/owncloud/reva/v2/pkg/metrics/driver/xcloud
 github.com/owncloud/reva/v2/pkg/metrics/reader
 github.com/owncloud/reva/v2/pkg/micro/ocdav
 github.com/owncloud/reva/v2/pkg/mime
+github.com/owncloud/reva/v2/pkg/natsauth
 github.com/owncloud/reva/v2/pkg/ocm/client
 github.com/owncloud/reva/v2/pkg/ocm/invite
 github.com/owncloud/reva/v2/pkg/ocm/invite/repository/json
@@ -1617,13 +1610,6 @@ github.com/owncloud/reva/v2/pkg/storage/fs/localhome
 github.com/owncloud/reva/v2/pkg/storage/fs/nextcloud
 github.com/owncloud/reva/v2/pkg/storage/fs/ocis
 github.com/owncloud/reva/v2/pkg/storage/fs/ocis/blobstore
-github.com/owncloud/reva/v2/pkg/storage/fs/posix
-github.com/owncloud/reva/v2/pkg/storage/fs/posix/blobstore
-github.com/owncloud/reva/v2/pkg/storage/fs/posix/lookup
-github.com/owncloud/reva/v2/pkg/storage/fs/posix/options
-github.com/owncloud/reva/v2/pkg/storage/fs/posix/timemanager
-github.com/owncloud/reva/v2/pkg/storage/fs/posix/trashbin
-github.com/owncloud/reva/v2/pkg/storage/fs/posix/tree
 github.com/owncloud/reva/v2/pkg/storage/fs/registry
 github.com/owncloud/reva/v2/pkg/storage/fs/s3
 github.com/owncloud/reva/v2/pkg/storage/fs/s3ng
@@ -1661,7 +1647,6 @@ github.com/owncloud/reva/v2/pkg/storage/utils/indexer/index
 github.com/owncloud/reva/v2/pkg/storage/utils/indexer/option
 github.com/owncloud/reva/v2/pkg/storage/utils/localfs
 github.com/owncloud/reva/v2/pkg/storage/utils/metadata
-github.com/owncloud/reva/v2/pkg/storage/utils/middleware
 github.com/owncloud/reva/v2/pkg/storage/utils/sync
 github.com/owncloud/reva/v2/pkg/storage/utils/templates
 github.com/owncloud/reva/v2/pkg/storage/utils/walker
@@ -1694,9 +1679,6 @@ github.com/owncloud/reva/v2/tests/cs3mocks/mocks
 # github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c
 ## explicit; go 1.12
 github.com/oxtoacart/bpool
-# github.com/pablodz/inotifywaitgo v0.0.12
-## explicit; go 1.24.1
-github.com/pablodz/inotifywaitgo/inotifywaitgo
 # github.com/patrickmn/go-cache v2.1.0+incompatible
 ## explicit
 github.com/patrickmn/go-cache
@@ -1706,13 +1688,6 @@ github.com/pbnjay/memory
 # github.com/philhofer/fwd v1.2.0
 ## explicit; go 1.20
 github.com/philhofer/fwd
-# github.com/pierrec/lz4/v4 v4.1.26
-## explicit; go 1.17
-github.com/pierrec/lz4/v4
-github.com/pierrec/lz4/v4/internal/lz4block
-github.com/pierrec/lz4/v4/internal/lz4errors
-github.com/pierrec/lz4/v4/internal/lz4stream
-github.com/pierrec/lz4/v4/internal/xxh32
 # github.com/pjbgf/sha1cd v0.6.0
 ## explicit; go 1.22
 github.com/pjbgf/sha1cd
@@ -1728,8 +1703,8 @@ github.com/pkg/xattr
 ## explicit; go 1.16
 github.com/pquerna/cachecontrol
 github.com/pquerna/cachecontrol/cacheobject
-# github.com/prometheus/alertmanager v0.34.1
-## explicit; go 1.25.0
+# github.com/prometheus/alertmanager v0.34.2
+## explicit; go 1.26.0
 github.com/prometheus/alertmanager/alert
 github.com/prometheus/alertmanager/featurecontrol
 github.com/prometheus/alertmanager/matcher/compat
@@ -1812,57 +1787,6 @@ github.com/segmentio/asm/cpu/arm64
 github.com/segmentio/asm/cpu/cpuid
 github.com/segmentio/asm/cpu/x86
 github.com/segmentio/asm/internal/unsafebytes
-# github.com/segmentio/kafka-go v0.4.51
-## explicit; go 1.23
-github.com/segmentio/kafka-go
-github.com/segmentio/kafka-go/compress
-github.com/segmentio/kafka-go/compress/gzip
-github.com/segmentio/kafka-go/compress/lz4
-github.com/segmentio/kafka-go/compress/snappy
-github.com/segmentio/kafka-go/compress/zstd
-github.com/segmentio/kafka-go/protocol
-github.com/segmentio/kafka-go/protocol/addoffsetstotxn
-github.com/segmentio/kafka-go/protocol/addpartitionstotxn
-github.com/segmentio/kafka-go/protocol/alterclientquotas
-github.com/segmentio/kafka-go/protocol/alterconfigs
-github.com/segmentio/kafka-go/protocol/alterpartitionreassignments
-github.com/segmentio/kafka-go/protocol/alteruserscramcredentials
-github.com/segmentio/kafka-go/protocol/apiversions
-github.com/segmentio/kafka-go/protocol/consumer
-github.com/segmentio/kafka-go/protocol/createacls
-github.com/segmentio/kafka-go/protocol/createpartitions
-github.com/segmentio/kafka-go/protocol/createtopics
-github.com/segmentio/kafka-go/protocol/deleteacls
-github.com/segmentio/kafka-go/protocol/deletegroups
-github.com/segmentio/kafka-go/protocol/deletetopics
-github.com/segmentio/kafka-go/protocol/describeacls
-github.com/segmentio/kafka-go/protocol/describeclientquotas
-github.com/segmentio/kafka-go/protocol/describeconfigs
-github.com/segmentio/kafka-go/protocol/describegroups
-github.com/segmentio/kafka-go/protocol/describeuserscramcredentials
-github.com/segmentio/kafka-go/protocol/electleaders
-github.com/segmentio/kafka-go/protocol/endtxn
-github.com/segmentio/kafka-go/protocol/fetch
-github.com/segmentio/kafka-go/protocol/findcoordinator
-github.com/segmentio/kafka-go/protocol/heartbeat
-github.com/segmentio/kafka-go/protocol/incrementalalterconfigs
-github.com/segmentio/kafka-go/protocol/initproducerid
-github.com/segmentio/kafka-go/protocol/joingroup
-github.com/segmentio/kafka-go/protocol/leavegroup
-github.com/segmentio/kafka-go/protocol/listgroups
-github.com/segmentio/kafka-go/protocol/listoffsets
-github.com/segmentio/kafka-go/protocol/listpartitionreassignments
-github.com/segmentio/kafka-go/protocol/metadata
-github.com/segmentio/kafka-go/protocol/offsetcommit
-github.com/segmentio/kafka-go/protocol/offsetdelete
-github.com/segmentio/kafka-go/protocol/offsetfetch
-github.com/segmentio/kafka-go/protocol/produce
-github.com/segmentio/kafka-go/protocol/rawproduce
-github.com/segmentio/kafka-go/protocol/saslauthenticate
-github.com/segmentio/kafka-go/protocol/saslhandshake
-github.com/segmentio/kafka-go/protocol/syncgroup
-github.com/segmentio/kafka-go/protocol/txnoffsetcommit
-github.com/segmentio/kafka-go/sasl
 # github.com/segmentio/ksuid v1.0.4
 ## explicit; go 1.12
 github.com/segmentio/ksuid
@@ -1875,12 +1799,13 @@ github.com/sergi/go-diff/diffmatchpatch
 # github.com/sethvargo/go-password v0.4.0
 ## explicit; go 1.25
 github.com/sethvargo/go-password/password
-# github.com/shamaton/msgpack/v2 v2.4.2
+# github.com/shamaton/msgpack/v2 v2.4.4
 ## explicit; go 1.20
 github.com/shamaton/msgpack/v2
 github.com/shamaton/msgpack/v2/def
 github.com/shamaton/msgpack/v2/ext
 github.com/shamaton/msgpack/v2/internal/common
+github.com/shamaton/msgpack/v2/internal/common/decodingutil
 github.com/shamaton/msgpack/v2/internal/decoding
 github.com/shamaton/msgpack/v2/internal/encoding
 github.com/shamaton/msgpack/v2/internal/stream/decoding
@@ -2081,8 +2006,8 @@ go.etcd.io/bbolt
 go.etcd.io/bbolt/errors
 go.etcd.io/bbolt/internal/common
 go.etcd.io/bbolt/internal/freelist
-# go.etcd.io/etcd/api/v3 v3.7.2
-## explicit; go 1.26
+# go.etcd.io/etcd/api/v3 v3.7.3
+## explicit; go 1.26.0
 go.etcd.io/etcd/api/v3/authpb
 go.etcd.io/etcd/api/v3/etcdserverpb
 go.etcd.io/etcd/api/v3/membershippb
@@ -2090,8 +2015,8 @@ go.etcd.io/etcd/api/v3/mvccpb
 go.etcd.io/etcd/api/v3/v3rpc/rpctypes
 go.etcd.io/etcd/api/v3/version
 go.etcd.io/etcd/api/v3/versionpb
-# go.etcd.io/etcd/client/pkg/v3 v3.7.2
-## explicit; go 1.26
+# go.etcd.io/etcd/client/pkg/v3 v3.7.3
+## explicit; go 1.26.0
 go.etcd.io/etcd/client/pkg/v3/fileutil
 go.etcd.io/etcd/client/pkg/v3/logutil
 go.etcd.io/etcd/client/pkg/v3/systemd
@@ -2099,8 +2024,8 @@ go.etcd.io/etcd/client/pkg/v3/tlsutil
 go.etcd.io/etcd/client/pkg/v3/transport
 go.etcd.io/etcd/client/pkg/v3/types
 go.etcd.io/etcd/client/pkg/v3/verify
-# go.etcd.io/etcd/client/v3 v3.7.2
-## explicit; go 1.26
+# go.etcd.io/etcd/client/v3 v3.7.3
+## explicit; go 1.26.0
 go.etcd.io/etcd/client/v3
 go.etcd.io/etcd/client/v3/credentials
 go.etcd.io/etcd/client/v3/internal/endpoint
@@ -2566,5 +2491,6 @@ stash.kopano.io/kgol/rndm
 # github.com/studio-b12/gowebdav => github.com/kobergj/gowebdav v0.0.0-20251030165916-532350997dde
 # github.com/egirna/icap-client => github.com/kobergj/icap-client v0.0.0-20250116172800-8eaa5022532b
 # github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c
-# github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20260609111813-fc78af4c9138
+# github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20261030085317-811a2ded849b
+# github.com/go-micro/plugins/v4/events/natsjs => github.com/kobergj/plugins/v4/events/natsjs v1.2.1-0.20261030085317-811a2ded849b
 # go-micro.dev/v4 => github.com/kobergj/go-micro/v4 v4.0.0-20250610135441-d0b187215699

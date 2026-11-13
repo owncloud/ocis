@@ -1222,7 +1222,7 @@ var _ = Describe("Graph", func() {
 					drive := libregraph.NewDrive("thename")
 					drive.SetSpecial([]libregraph.DriveItem{{
 						Id:            &imageFileID,
-						SpecialFolder: &libregraph.SpecialFolder{Name: libregraph.PtrString("image")},
+						SpecialFolder: &libregraph.SpecialFolder{Name: new("image")},
 					}})
 					driveJson, err := json.Marshal(drive)
 					Expect(err).ToNot(HaveOccurred())
@@ -1332,7 +1332,7 @@ var _ = Describe("Graph", func() {
 				drive := libregraph.NewDrive("thename")
 				drive.SetSpecial([]libregraph.DriveItem{{
 					Id:            &readmeFileID,
-					SpecialFolder: &libregraph.SpecialFolder{Name: libregraph.PtrString("readme")},
+					SpecialFolder: &libregraph.SpecialFolder{Name: new("readme")},
 				}})
 				driveJson, err := json.Marshal(drive)
 				Expect(err).ToNot(HaveOccurred())
@@ -1461,7 +1461,7 @@ var _ = Describe("Graph", func() {
 		Describe("GetAllDrivesV1 (unrestricted listing)", func() {
 			listedDriveIDs := func() []string {
 				var lr struct {
-					Value []map[string]interface{} `json:"value"`
+					Value []map[string]any `json:"value"`
 				}
 				body, _ := io.ReadAll(rr.Body)
 				Expect(json.Unmarshal(body, &lr)).To(Succeed())

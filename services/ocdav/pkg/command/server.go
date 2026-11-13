@@ -49,7 +49,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			// init reva shared config explicitly as the go-micro based ocdav does not use
 			// the reva runtime. But we need e.g. the shared client settings to be initialized
-			sc := map[string]interface{}{
+			sc := map[string]any{
 				"jwt_secret":                cfg.TokenManager.JWTSecret,
 				"gatewaysvc":                cfg.Reva.Address,
 				"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,

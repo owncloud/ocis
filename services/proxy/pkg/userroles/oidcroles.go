@@ -36,7 +36,7 @@ func NewOIDCRoleAssigner(opts ...Option) UserRoleAssigner {
 	}
 }
 
-func extractRoles(rolesClaim string, claims map[string]interface{}) (map[string]struct{}, error) {
+func extractRoles(rolesClaim string, claims map[string]any) (map[string]struct{}, error) {
 
 	claimRoles := map[string]struct{}{}
 	// happy path
@@ -56,7 +56,7 @@ func extractRoles(rolesClaim string, claims map[string]interface{}) (map[string]
 		for _, cr := range v {
 			claimRoles[cr] = struct{}{}
 		}
-	case []interface{}:
+	case []any:
 		for _, cri := range v {
 			cr, ok := cri.(string)
 			if !ok {
@@ -92,7 +92,7 @@ func matchesClaimMapping(mappingValue string, claimRoles map[string]struct{}) bo
 
 // UpdateUserRoleAssignment assigns the role "User" to the supplied user. Unless the user
 // already has a different role assigned.
-func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *cs3user.User, claims map[string]interface{}, overwriteRole string) (*cs3user.User, error) {
+func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *cs3user.User, claims map[string]any, overwriteRole string) (*cs3user.User, error) {
 	userID := user.GetId().GetOpaqueId()
 	logger := ra.logger.SubloggerWithRequestID(ctx).With().Str("userid", userID).Logger()
 	roleNamesToRoleIDs, err := ra.roleNamesToRoleIDs(ctx, roleCacheTTL)
@@ -236,7 +236,7 @@ func GuestRoleMapping(cfg *config.Config) ([]config.RoleMapping, error) {
 // that knows this role. A role that the cached map does not know can be a new role, so
 // guestRoleName reads the roles again one time. An unknown role is an error: do not assign an
 // empty role id.
-func (ra oidcRoleAssigner) guestRoleName(ctx context.Context, claims map[string]interface{}, guestRole string, roleNamesToRoleIDs map[string]string) (string, map[string]string, error) {
+func (ra oidcRoleAssigner) guestRoleName(ctx context.Context, claims map[string]any, guestRole string, roleNamesToRoleIDs map[string]string) (string, map[string]string, error) {
 	resolve := func(roleNamesToRoleIDs map[string]string) (string, error) {
 		roleName := guestRole
 		if len(ra.guestMapping) > 0 {
@@ -271,7 +271,7 @@ func (ra oidcRoleAssigner) guestRoleName(ctx context.Context, claims map[string]
 // user's roles claim, or guestRole when nothing matches. A mapping to a role that does not exist
 // is an error: it can only be a misconfiguration, and falling back to guestRole could give the
 // guest more permissions than the mapped role was meant to.
-func (ra oidcRoleAssigner) mapGuestRole(claims map[string]interface{}, guestRole string, roleNamesToRoleIDs map[string]string) (string, error) {
+func (ra oidcRoleAssigner) mapGuestRole(claims map[string]any, guestRole string, roleNamesToRoleIDs map[string]string) (string, error) {
 	claimRoles, err := extractRoles(ra.rolesClaim, claims)
 	if err != nil || len(claimRoles) == 0 {
 		// a guest without roles claim is valid, log at debug level to help find a wrong claim name

@@ -8,7 +8,6 @@ import (
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/validate"
 )
@@ -23,15 +22,15 @@ var _ = Describe("libregraph", func() {
 	BeforeEach(func() {
 		ctx = context.Background()
 		driveRecipient = libregraph.DriveRecipient{
-			ObjectId:                conversions.ToPointer("1"),
-			LibreGraphRecipientType: conversions.ToPointer("user"),
+			ObjectId:                new("1"),
+			LibreGraphRecipientType: new("user"),
 		}
 
 		driveItemInvite = libregraph.DriveItemInvite{
 			Recipients:                   []libregraph.DriveRecipient{driveRecipient},
 			Roles:                        []string{unifiedrole.UnifiedRoleEditorID},
 			LibreGraphPermissionsActions: []string{unifiedrole.DriveItemVersionsUpdate},
-			ExpirationDateTime:           libregraph.PtrTime(time.Now().Add(time.Hour)),
+			ExpirationDateTime:           new(time.Now().Add(time.Hour)),
 		}
 	})
 
@@ -106,7 +105,7 @@ var _ = Describe("libregraph", func() {
 		Entry("fail: dive recipients", func() (libregraph.DriveItemInvite, bool) {
 			driveItemInvite.Roles = nil
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
-				{ObjectId: libregraph.PtrString("1"), LibreGraphRecipientType: libregraph.PtrString("dive")},
+				{ObjectId: new("1"), LibreGraphRecipientType: new("dive")},
 			}
 			return driveItemInvite, false
 		}),
@@ -114,13 +113,13 @@ var _ = Describe("libregraph", func() {
 			driveItemInvite.Roles = nil
 			driveItemInvite.Recipients = []libregraph.DriveRecipient{
 				driveRecipient,
-				{ObjectId: libregraph.PtrString("2"), LibreGraphRecipientType: libregraph.PtrString("group")},
+				{ObjectId: new("2"), LibreGraphRecipientType: new("group")},
 			}
 			return driveItemInvite, false
 		}),
 		Entry("fail: expirationDateTime in the past", func() (libregraph.DriveItemInvite, bool) {
 			driveItemInvite.Roles = nil
-			driveItemInvite.ExpirationDateTime = libregraph.PtrTime(time.Now().Add(-time.Hour))
+			driveItemInvite.ExpirationDateTime = new(time.Now().Add(-time.Hour))
 			return driveItemInvite, false
 		}),
 	)
@@ -165,23 +164,23 @@ var _ = Describe("libregraph", func() {
 				return driveRecipient, false
 			},
 			func() (libregraph.DriveRecipient, bool) {
-				driveRecipient.ObjectId = conversions.ToPointer("")
+				driveRecipient.ObjectId = new("")
 				return driveRecipient, false
 			},
 		),
 		Entry("succeed: valid role",
 			func() (libregraph.DriveRecipient, bool) {
-				driveRecipient.LibreGraphRecipientType = conversions.ToPointer("user")
+				driveRecipient.LibreGraphRecipientType = new("user")
 				return driveRecipient, true
 			},
 			func() (libregraph.DriveRecipient, bool) {
-				driveRecipient.LibreGraphRecipientType = conversions.ToPointer("group")
+				driveRecipient.LibreGraphRecipientType = new("group")
 				return driveRecipient, true
 			},
 		),
 		Entry("fail: invalid role",
 			func() (libregraph.DriveRecipient, bool) {
-				driveRecipient.LibreGraphRecipientType = conversions.ToPointer("foo")
+				driveRecipient.LibreGraphRecipientType = new("foo")
 				return driveRecipient, false
 			},
 			func() (libregraph.DriveRecipient, bool) {

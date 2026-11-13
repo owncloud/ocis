@@ -7,7 +7,7 @@ import (
 )
 
 func HammerMutex(m *NamedRWMutex, loops int, c chan bool) {
-	for i := 0; i < loops; i++ {
+	for i := range loops {
 		id := fmt.Sprintf("%v", i)
 		m.Lock(id)
 		m.Unlock(id)
@@ -24,10 +24,10 @@ func TestNamedRWMutex(t *testing.T) {
 	c := make(chan bool)
 	r := 10
 
-	for i := 0; i < r; i++ {
+	for range r {
 		go HammerMutex(&m, 2000, c)
 	}
-	for i := 0; i < r; i++ {
+	for range r {
 		<-c
 	}
 }

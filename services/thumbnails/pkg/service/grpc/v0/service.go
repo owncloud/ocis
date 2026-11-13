@@ -164,7 +164,7 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetTh
 	}
 
 	defer r.Close()
-	ppOpts := map[string]interface{}{
+	ppOpts := map[string]any{
 		"fontFileMap": g.preprocessorOpts.TxtFontFileMap,
 	}
 	pp := preprocessor.ForType(sRes.GetInfo().GetMimeType(), ppOpts)
@@ -256,7 +256,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 		return "", merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
 	}
 	defer r.Close()
-	ppOpts := map[string]interface{}{
+	ppOpts := map[string]any{
 		"fontFileMap": g.preprocessorOpts.TxtFontFileMap,
 	}
 	pp := preprocessor.ForType(sRes.GetInfo().GetMimeType(), ppOpts)

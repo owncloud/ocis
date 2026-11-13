@@ -23,7 +23,7 @@ services:
       WEB_OIDC_SCOPE: "openid profile email acr"
 
   postgres:
-    image: postgres:alpine
+    image: postgres:18-alpine
     networks:
       ocis-net:
     volumes:

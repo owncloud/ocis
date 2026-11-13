@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/config"
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/config/defaults"
 
@@ -34,5 +35,5 @@ func ParseConfig(cfg *config.Config) error {
 
 // Validate validates the config
 func Validate(cfg *config.Config) error {
-	return nil
+	return shared.CheckNatsCredentials(cfg.Service.Name, cfg.Store.Store, cfg.Store.CredsFile, cfg.Store.Creds)
 }

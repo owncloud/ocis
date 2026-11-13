@@ -257,10 +257,7 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 	})
 
 	// Spawn workers that'll concurrently work the queue
-	numWorkers := 20
-	if len(spaces) < numWorkers {
-		numWorkers = len(spaces)
-	}
+	numWorkers := min(len(spaces), 20)
 	for i := 0; i < numWorkers; i++ {
 		errg.Go(func() error {
 			for space := range work {
@@ -826,7 +823,7 @@ func marshalToStringMap[T libregraph.MappedNullable](source T, target map[string
 	}
 }
 
-func valueToString(value interface{}) string {
+func valueToString(value any) string {
 	if value == nil {
 		return ""
 	}

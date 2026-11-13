@@ -127,7 +127,7 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 	indexMapping.DefaultAnalyzer = keyword.Name
 	indexMapping.DefaultMapping = docMapping
 	err := indexMapping.AddCustomAnalyzer(lowercaseKeywordAnalyzer,
-		map[string]interface{}{
+		map[string]any{
 			"type":      custom.Name,
 			"tokenizer": single.Name,
 			"token_filters": []string{
@@ -140,7 +140,7 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 	}
 
 	err = indexMapping.AddCustomAnalyzer("fulltext",
-		map[string]interface{}{
+		map[string]any{
 			"type":      custom.Name,
 			"tokenizer": unicode.Name,
 			"token_filters": []string{
@@ -492,7 +492,7 @@ func (b *Bleve) getResource(bleveIndex bleve.Index, id string) (*Resource, error
 }
 
 func newPointerOfType[T any]() *T {
-	t := reflect.TypeOf((*T)(nil)).Elem()
+	t := reflect.TypeFor[T]()
 	ptr := reflect.New(t).Interface()
 	return ptr.(*T)
 }
@@ -506,7 +506,7 @@ func getFieldName(structField reflect.StructField) string {
 	return strings.Split(tag, ",")[0]
 }
 
-func unmarshalInterfaceMap(out any, flatMap map[string]interface{}, prefix string) bool {
+func unmarshalInterfaceMap(out any, flatMap map[string]any, prefix string) bool {
 	nonEmpty := false
 	obj := reflect.ValueOf(out).Elem()
 	for i := 0; i < obj.NumField(); i++ {
@@ -515,12 +515,12 @@ func unmarshalInterfaceMap(out any, flatMap map[string]interface{}, prefix strin
 		mapKey := prefix + getFieldName(structField)
 
 		if value, ok := flatMap[mapKey]; ok {
-			if field.Kind() == reflect.Ptr {
+			if field.Kind() == reflect.Pointer {
 				alloc := reflect.New(field.Type().Elem())
 				elemType := field.Type().Elem()
 
 				// convert time strings from index for search requests
-				if elemType == reflect.TypeOf(timestamppb.Timestamp{}) {
+				if elemType == reflect.TypeFor[timestamppb.Timestamp]() {
 					if strValue, ok := value.(string); ok {
 						if parsedTime, err := time.Parse(time.RFC3339, strValue); err == nil {
 							alloc.Elem().Set(reflect.ValueOf(*timestamppb.New(parsedTime)))
@@ -532,7 +532,7 @@ func unmarshalInterfaceMap(out any, flatMap map[string]interface{}, prefix strin
 				}
 
 				// convert time strings from index for libregraph structs when updating resources
-				if elemType == reflect.TypeOf(time.Time{}) {
+				if elemType == reflect.TypeFor[time.Time]() {
 					if strValue, ok := value.(string); ok {
 						if parsedTime, err := time.Parse(time.RFC3339, strValue); err == nil {
 							alloc.Elem().Set(reflect.ValueOf(parsedTime))
@@ -553,7 +553,7 @@ func unmarshalInterfaceMap(out any, flatMap map[string]interface{}, prefix strin
 	return nonEmpty
 }
 
-func getAudioValue[T any](fields map[string]interface{}) *T {
+func getAudioValue[T any](fields map[string]any) *T {
 	if !strings.HasPrefix(getFieldValue[string](fields, "MimeType"), "audio/") {
 		return nil
 	}
@@ -566,7 +566,7 @@ func getAudioValue[T any](fields map[string]interface{}) *T {
 	return nil
 }
 
-func getImageValue[T any](fields map[string]interface{}) *T {
+func getImageValue[T any](fields map[string]any) *T {
 	var image = newPointerOfType[T]()
 	if ok := unmarshalInterfaceMap(image, fields, "image."); ok {
 		return image
@@ -575,7 +575,7 @@ func getImageValue[T any](fields map[string]interface{}) *T {
 	return nil
 }
 
-func getLocationValue[T any](fields map[string]interface{}) *T {
+func getLocationValue[T any](fields map[string]any) *T {
 	var location = newPointerOfType[T]()
 	if ok := unmarshalInterfaceMap(location, fields, "location."); ok {
 		return location
@@ -584,7 +584,7 @@ func getLocationValue[T any](fields map[string]interface{}) *T {
 	return nil
 }
 
-func getPhotoValue[T any](fields map[string]interface{}) *T {
+func getPhotoValue[T any](fields map[string]any) *T {
 	var photo = newPointerOfType[T]()
 
 	if ok := unmarshalInterfaceMap(photo, fields, "photo."); ok {

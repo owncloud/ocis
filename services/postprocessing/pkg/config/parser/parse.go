@@ -3,9 +3,11 @@ package parser
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config/defaults"
 	"github.com/owncloud/reva/v2/pkg/events"
@@ -47,14 +49,9 @@ func Validate(cfg *config.Config) error {
 			cfg.Postprocessing.Steps = append(cfg.Postprocessing.Steps, string(events.PPStepDelay))
 		}
 	}
-	return nil
+	return shared.CheckNatsCredentials(cfg.Service.Name, cfg.Store.Store, cfg.Store.CredsFile, cfg.Store.Creds)
 }
 
 func contains(all []string, candidate events.Postprocessingstep) bool {
-	for _, s := range all {
-		if s == string(candidate) {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(all, string(candidate))
 }

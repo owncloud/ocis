@@ -3,8 +3,11 @@ package keycloak
 
 import (
 	"context"
+	"errors"
+	"net/http"
 	"strings"
 
+	"github.com/Nerzal/gocloak/v13"
 	"github.com/google/uuid"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
@@ -78,10 +81,10 @@ func (b Backend) CreateUser(ctx context.Context, invitation *invitations.Invitat
 		Msg("Creating new user")
 	user := &libregraph.User{
 		Mail:                     &invitation.InvitedUserEmailAddress,
-		AccountEnabled:           boolP(true),
+		AccountEnabled:           new(true),
 		OnPremisesSamAccountName: invitation.InvitedUserEmailAddress,
-		Id:                       stringP(u.String()),
-		UserType:                 stringP(userType),
+		Id:                       new(u.String()),
+		UserType:                 new(userType),
 	}
 
 	id, err := b.client.CreateUser(ctx, b.userRealm, user, b.userActions)
@@ -107,8 +110,48 @@ func (b Backend) CreateUser(ctx context.Context, invitation *invitations.Invitat
 func (b Backend) CanSendMail() bool { return true }
 
 // SendMail sends a mail to the user with details on how to redeem the invitation.
+// Errors that certainly mean no mail was sent are marked with
+// invitations.Rejected, which keeps their message unchanged.
 func (b Backend) SendMail(ctx context.Context, id string) error {
-	return b.client.SendActionsMail(ctx, b.userRealm, id, b.userActions)
+	err := b.client.SendActionsMail(ctx, b.userRealm, id, b.userActions)
+	if isDefiniteRejection(err) {
+		return invitations.Rejected(err)
+	}
+	return err
+}
+
+// isDefiniteRejection reports whether err certainly means that no mail was
+// sent. Only these cases qualify:
+//
+//   - Getting the access token failed: the execute-actions request was never
+//     sent.
+//   - A 4xx response: Keycloak refused the request before sending anything,
+//     e.g. 400 for invalid required actions or a user without email, 401/403
+//     for missing permissions, 404 for an unknown user, 409.
+//   - A 500 response: Keycloak answers "Failed to send execute actions email"
+//     when sending the mail failed.
+//
+// Everything else leaves the outcome unknown, because Keycloak may have sent
+// the mail anyway: other 5xx responses (502, 503 and 504 or the 52x codes of
+// Cloudflare usually come from a proxy in front of Keycloak that may have
+// forwarded the request), transport errors (gocloak reports them with code
+// 0), timeouts and cancelled contexts.
+func isDefiniteRejection(err error) bool {
+	var tokenErr *keycloak.TokenError
+	if errors.As(err, &tokenErr) {
+		return true
+	}
+	var apiErr *gocloak.APIError
+	if !errors.As(err, &apiErr) {
+		return false
+	}
+	return (apiErr.Code >= http.StatusBadRequest && apiErr.Code < http.StatusInternalServerError) ||
+		apiErr.Code == http.StatusInternalServerError
+}
+
+// DeleteUser deletes the user with the given identifier from the keycloak backend.
+func (b Backend) DeleteUser(ctx context.Context, id string) error {
+	return b.client.DeleteUser(ctx, b.userRealm, id)
 }
 
 // parseUserActions converts the configured Keycloak required-action strings
@@ -131,6 +174,3 @@ func parseUserActions(executeActions []string) []keycloak.UserAction {
 	}
 	return actions
 }
-
-func boolP(b bool) *bool       { return &b }
-func stringP(s string) *string { return &s }

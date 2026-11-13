@@ -20,67 +20,67 @@ func TestBuildInfo(t *testing.T) {
 		},
 		{
 			alias:        "processing",
-			filter:       storage.UploadSessionFilter{Processing: boolPtr(true)},
+			filter:       storage.UploadSessionFilter{Processing: new(true)},
 			expectedInfo: "Processing sessions:",
 		},
 		{
 			alias:        "processing and not expired",
-			filter:       storage.UploadSessionFilter{Processing: boolPtr(true), Expired: boolPtr(false)},
+			filter:       storage.UploadSessionFilter{Processing: new(true), Expired: new(false)},
 			expectedInfo: "Processing, not expired sessions:",
 		},
 		{
 			alias:        "processing and expired",
-			filter:       storage.UploadSessionFilter{Processing: boolPtr(true), Expired: boolPtr(true)},
+			filter:       storage.UploadSessionFilter{Processing: new(true), Expired: new(true)},
 			expectedInfo: "Processing, expired sessions:",
 		},
 		{
 			alias:        "with id",
-			filter:       storage.UploadSessionFilter{ID: strPtr("123")},
+			filter:       storage.UploadSessionFilter{ID: new("123")},
 			expectedInfo: "Session with id '123':",
 		},
 		{
 			alias:        "processing, not expired and not virus infected",
-			filter:       storage.UploadSessionFilter{Processing: boolPtr(true), Expired: boolPtr(false), HasVirus: boolPtr(false)},
+			filter:       storage.UploadSessionFilter{Processing: new(true), Expired: new(false), HasVirus: new(false)},
 			expectedInfo: "Processing, not expired, not virusinfected sessions:",
 		},
 		{
 			alias:        "not virusinfected",
-			filter:       storage.UploadSessionFilter{HasVirus: boolPtr(false)},
+			filter:       storage.UploadSessionFilter{HasVirus: new(false)},
 			expectedInfo: "Not virusinfected sessions:",
 		},
 		{
 			alias:        "expired and virusinfected",
-			filter:       storage.UploadSessionFilter{Expired: boolPtr(true), HasVirus: boolPtr(true)},
+			filter:       storage.UploadSessionFilter{Expired: new(true), HasVirus: new(true)},
 			expectedInfo: "Expired, virusinfected sessions:",
 		},
 		{
 			alias:        "expired and not virus infected",
-			filter:       storage.UploadSessionFilter{Expired: boolPtr(true), HasVirus: boolPtr(false)},
+			filter:       storage.UploadSessionFilter{Expired: new(true), HasVirus: new(false)},
 			expectedInfo: "Expired, not virusinfected sessions:",
 		},
 		{
 			alias:        "processing, not expired, virus infected and with id (note: this makes no sense)",
-			filter:       storage.UploadSessionFilter{Processing: boolPtr(true), Expired: boolPtr(false), HasVirus: boolPtr(true), ID: strPtr("123")},
+			filter:       storage.UploadSessionFilter{Processing: new(true), Expired: new(false), HasVirus: new(true), ID: new("123")},
 			expectedInfo: "Processing, not expired, virusinfected session with id '123':",
 		},
 		{
 			alias:        "orphaned",
-			filter:       storage.UploadSessionFilter{Orphaned: boolPtr(true)},
+			filter:       storage.UploadSessionFilter{Orphaned: new(true)},
 			expectedInfo: "Orphaned sessions:",
 		},
 		{
 			alias:        "not orphaned",
-			filter:       storage.UploadSessionFilter{Orphaned: boolPtr(false)},
+			filter:       storage.UploadSessionFilter{Orphaned: new(false)},
 			expectedInfo: "Not orphaned sessions:",
 		},
 		{
 			alias:        "processing and orphaned",
-			filter:       storage.UploadSessionFilter{Processing: boolPtr(true), Orphaned: boolPtr(true)},
+			filter:       storage.UploadSessionFilter{Processing: new(true), Orphaned: new(true)},
 			expectedInfo: "Processing, orphaned sessions:",
 		},
 		{
 			alias:        "expired, not virus infected and orphaned",
-			filter:       storage.UploadSessionFilter{Expired: boolPtr(true), HasVirus: boolPtr(false), Orphaned: boolPtr(true)},
+			filter:       storage.UploadSessionFilter{Expired: new(true), HasVirus: new(false), Orphaned: new(true)},
 			expectedInfo: "Expired, not virusinfected, orphaned sessions:",
 		},
 	}
@@ -94,12 +94,4 @@ func TestBuildInfo(t *testing.T) {
 			require.Equal(t, expectedInfo, buildInfo(filter))
 		})
 	}
-}
-
-func boolPtr(b bool) *bool {
-	return &b
-}
-
-func strPtr(s string) *string {
-	return &s
 }

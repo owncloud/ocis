@@ -1,7 +1,6 @@
 package svc
 
 import (
-	"context"
 	"encoding/json"
 	"testing"
 
@@ -625,9 +624,9 @@ var testCases = []struct {
 			// AuditEventGroupMemberAdded fields
 			require.Equal(t, "gid-123", ev.GroupID)
 			require.Equal(t, "uid-member", ev.UserID)
-    },
+		},
 	},
-  {
+	{
 		Alias: "Tags added",
 		SystemEvent: events.Event{
 			Event: events.TagsAdded{
@@ -684,8 +683,7 @@ func TestAuditLogging(t *testing.T) {
 	outch := make(chan []byte)
 	defer close(outch)
 
-	ctx, cancel := context.WithCancel(context.TODO())
-	defer cancel()
+	ctx := t.Context()
 
 	go StartAuditLogger(ctx, inch, l, Marshal("json", l), func(b []byte) {
 		outch <- b

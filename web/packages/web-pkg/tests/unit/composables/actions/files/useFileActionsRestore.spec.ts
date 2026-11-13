@@ -5,7 +5,11 @@ import {
   getComposableWrapper,
   RouteLocation
 } from '../../../../../src/testing'
-import { useMessages, useResourcesStore } from '../../../../../src/composables/piniaStores'
+import {
+  useMessages,
+  useResourcesStore,
+  useSpacesStore
+} from '../../../../../src/composables/piniaStores'
 import { unref } from 'vue'
 import { HttpError, Resource, TrashResource } from '@ownclouders/web-client'
 import { ProjectSpaceResource, SpaceResource } from '@ownclouders/web-client'
@@ -107,6 +111,25 @@ describe('restore', () => {
       const { removeResources, upsertResources } = useResourcesStore()
       expect(removeResources).toHaveBeenCalledTimes(0)
       expect(upsertResources).toHaveBeenCalledWith([restoredResource])
+    })
+
+    it('should update quota and size of the space from the fetched drive', async () => {
+      const resourcesToRestore = [{ id: '1', path: '/1', name: 'file1' }] as TrashResource[]
+      const updatedDrive = mock<SpaceResource>({ id: 'space-1', size: 104947000 })
+
+      const { getWorkerCallbackDone } = getWrapper({
+        invalidLocation: true,
+        setup: ({ restoreResources }, { space }) => {
+          restoreResources(space, resourcesToRestore, [])
+        },
+        restoreResult: { successful: resourcesToRestore, failed: [] },
+        getFileInfoResult: mock<Resource>({ id: '1', path: '/1', name: 'file1' }),
+        getDriveResult: updatedDrive
+      })
+      await getWorkerCallbackDone()
+
+      const { updateSpaceUsage } = useSpacesStore()
+      expect(updateSpaceUsage).toHaveBeenCalledWith(updatedDrive)
     })
 
     it('should upsert the resolvable resources even when one lookup fails', async () => {
@@ -235,6 +258,7 @@ function getWrapper({
   getFileInfoResult,
   getFileInfoImplementation,
   existingResources = [],
+  getDriveResult = mock<SpaceResource>(),
   setup
 }: {
   existingResources?: Resource[]
@@ -246,6 +270,7 @@ function getWrapper({
   }
   getFileInfoResult?: Resource
   getFileInfoImplementation?: (...args: any[]) => Promise<Resource>
+  getDriveResult?: SpaceResource
   setup: (
     instance: ReturnType<typeof useFileActionsRestore>,
     {
@@ -280,7 +305,7 @@ function getWrapper({
   } else {
     mocks.$clientService.webdav.getFileInfo.mockResolvedValue(getFileInfoResult)
   }
-  mocks.$clientService.graphAuthenticated.drives.getDrive.mockResolvedValue(mock<SpaceResource>())
+  mocks.$clientService.graphAuthenticated.drives.getDrive.mockResolvedValue(getDriveResult)
 
   return {
     mocks,

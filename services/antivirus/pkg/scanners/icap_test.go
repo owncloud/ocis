@@ -19,7 +19,10 @@ func TestICAP_Scan(t *testing.T) {
 		earlyExitErr = errors.New("stop here")
 		testUrl      = "icap://test"
 		client       = mocks.NewScanner(t)
-		scanner      = &scanners.ICAP{Client: client, URL: testUrl}
+		scanner      = &scanners.ICAP{
+			NewClient: func() (scanners.Scanner, error) { return client, nil },
+			URL:       testUrl,
+		}
 	)
 
 	t.Run("it sends a OPTIONS request to determine details", func(t *testing.T) {

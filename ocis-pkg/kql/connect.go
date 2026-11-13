@@ -1,6 +1,7 @@
 package kql
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
@@ -108,10 +109,8 @@ func (c DefaultConnector) Connect(head ast.Node, neighbor ast.Node, connections 
 		if i == 0 {
 			// no connection is necessary here because an `AND` or `OR` edge is already present
 			// exit
-			for _, skipValue := range []string{BoolOR, BoolAND} {
-				if node.Value == skipValue {
-					return nil
-				}
+			if slices.Contains([]string{BoolOR, BoolAND}, node.Value) {
+				return nil
 			}
 
 			// if neighbor node negotiates, an AND edge is needed
