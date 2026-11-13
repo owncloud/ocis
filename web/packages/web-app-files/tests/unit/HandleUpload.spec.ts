@@ -64,6 +64,59 @@ describe('HandleUpload', () => {
     expect(processedFiles[0].meta.routeDriveAliasAndItem).toEqual(route.params.driveAliasAndItem)
     expect(processedFiles[0].meta.routeShareId).toEqual(route.query.shareId)
   })
+  describe('mtime', () => {
+    it('omits the mtime key when the file data is a plain Blob without lastModified', () => {
+      const { instance, mocks } = getWrapper()
+      mocks.uppy.getPlugin.mockReturnValue(mock<UppyPlugin>())
+      const fileToUpload = mock<OcUppyFile>({ name: 'name', data: new Blob() })
+      const uploadFolder = mock<Resource>({ id: '1', path: '/' })
+
+      const processedFiles = instance.prepareFiles([fileToUpload], uploadFolder)
+
+      expect('mtime' in processedFiles[0].meta).toBe(false)
+    })
+    it('omits the mtime key when the file is a File with lastModified 0', () => {
+      const { instance, mocks } = getWrapper()
+      mocks.uppy.getPlugin.mockReturnValue(mock<UppyPlugin>())
+      const fileToUpload = mock<OcUppyFile>({
+        name: 'name',
+        data: { lastModified: 0 } as File
+      })
+      const uploadFolder = mock<Resource>({ id: '1', path: '/' })
+
+      const processedFiles = instance.prepareFiles([fileToUpload], uploadFolder)
+
+      expect('mtime' in processedFiles[0].meta).toBe(false)
+    })
+    it('derives mtime in seconds from a File with a valid lastModified', () => {
+      const { instance, mocks } = getWrapper()
+      mocks.uppy.getPlugin.mockReturnValue(mock<UppyPlugin>())
+      const lastModified = 1700000000000
+      const fileToUpload = mock<OcUppyFile>({
+        name: 'name',
+        data: { lastModified } as File
+      })
+      const uploadFolder = mock<Resource>({ id: '1', path: '/' })
+
+      const processedFiles = instance.prepareFiles([fileToUpload], uploadFolder)
+
+      expect(processedFiles[0].meta.mtime).toEqual(lastModified / 1000)
+    })
+    it('deletes a pre-existing mtime key from file.meta when there is no valid lastModified', () => {
+      const { instance, mocks } = getWrapper()
+      mocks.uppy.getPlugin.mockReturnValue(mock<UppyPlugin>())
+      const fileToUpload = mock<OcUppyFile>({
+        name: 'name',
+        data: new Blob(),
+        meta: { relativePath: undefined, mtime: NaN }
+      })
+      const uploadFolder = mock<Resource>({ id: '1', path: '/' })
+
+      const processedFiles = instance.prepareFiles([fileToUpload], uploadFolder)
+
+      expect('mtime' in processedFiles[0].meta).toBe(false)
+    })
+  })
   describe('method createDirectoryTree', () => {
     it('creates a directory for a single file with a relative folder given', async () => {
       const { instance, mocks } = getWrapper()
