@@ -7,7 +7,6 @@ import (
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	keycloak "github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
-
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -79,6 +78,54 @@ func (_c *Client_CreateUser_Call) Return(_a0 string, _a1 error) *Client_CreateUs
 }
 
 func (_c *Client_CreateUser_Call) RunAndReturn(run func(context.Context, string, *libregraph.User, []keycloak.UserAction) (string, error)) *Client_CreateUser_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteUser provides a mock function with given fields: ctx, realm, userID
+func (_m *Client) DeleteUser(ctx context.Context, realm string, userID string) error {
+	ret := _m.Called(ctx, realm, userID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteUser")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) error); ok {
+		r0 = rf(ctx, realm, userID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Client_DeleteUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteUser'
+type Client_DeleteUser_Call struct {
+	*mock.Call
+}
+
+// DeleteUser is a helper method to define mock.On call
+//   - ctx context.Context
+//   - realm string
+//   - userID string
+func (_e *Client_Expecter) DeleteUser(ctx interface{}, realm interface{}, userID interface{}) *Client_DeleteUser_Call {
+	return &Client_DeleteUser_Call{Call: _e.mock.On("DeleteUser", ctx, realm, userID)}
+}
+
+func (_c *Client_DeleteUser_Call) Run(run func(ctx context.Context, realm string, userID string)) *Client_DeleteUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *Client_DeleteUser_Call) Return(_a0 error) *Client_DeleteUser_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Client_DeleteUser_Call) RunAndReturn(run func(context.Context, string, string) error) *Client_DeleteUser_Call {
 	_c.Call.Return(run)
 	return _c
 }

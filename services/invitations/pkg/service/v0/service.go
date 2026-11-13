@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/backends/keycloak"
@@ -11,6 +13,14 @@ import (
 )
 
 const (
+	// createUserTimeout bounds creating the guest in the backend.
+	createUserTimeout = 10 * time.Second
+	// sendMailTimeout bounds sending the invitation mail. Keycloak sends the
+	// mail via SMTP before it answers, so this is longer than the others.
+	sendMailTimeout = 30 * time.Second
+	// rollbackTimeout bounds the cleanup of a user whose invitation failed.
+	rollbackTimeout = 10 * time.Second
+
 	OwnCloudInstanceRel = "http://invitations.owncloud/rel/server-instance"
 	OpenIDConnectRel    = "http://openid.net/specs/connect/1.0/issuer"
 )
@@ -42,6 +52,9 @@ type Backend interface {
 	CanSendMail() bool
 	// SendMail sends a mail to the user with details on how to reedeem the invitation.
 	SendMail(ctx context.Context, identifier string) error
+	// DeleteUser deletes a previously created user. It is used to roll back
+	// the creation when the invitation can not be completed.
+	DeleteUser(ctx context.Context, identifier string) error
 }
 
 // New returns a new instance of Service
@@ -83,19 +96,75 @@ func (s svc) Invite(ctx context.Context, invitation *invitations.Invitation) (*i
 		return nil, ErrMissingEmail
 	}
 
-	id, err := s.backend.CreateUser(ctx, invitation)
+	// Creating the guest, sending the mail and rolling back belong together:
+	// once the guest has been created, an aborted mail call leaves a guest
+	// that can not be invited again. So they do not inherit the cancellation
+	// of the request (e.g. a client disconnect), and each call is bounded by
+	// its own timeout instead.
+	ctx = context.WithoutCancel(ctx)
+
+	id, err := s.createUser(ctx, invitation)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", ErrBackend, err)
+	}
+	if id == "" {
+		s.log.Error().
+			Str("email", invitation.InvitedUserEmailAddress).
+			Msgf("The backend returned no user id for the guest %s. The guest may have been created but can not be addressed, no invitation mail was sent. Check the backend and remove the guest there before inviting again", invitation.InvitedUserEmailAddress)
+		return nil, fmt.Errorf("%w: %s", ErrBackend, "no user id returned for the created user")
 	}
 
 	// As we only have a single backend, and that backend supports email, we don't have
 	// any code to handle mailing ourself yet.
 	if s.backend.CanSendMail() {
-		err := s.backend.SendMail(ctx, id)
-		if err != nil {
+		if err := s.sendMail(ctx, id); err != nil {
+			s.rollback(ctx, invitation.InvitedUserEmailAddress, id, err)
 			return nil, fmt.Errorf("%w: %s", ErrBackend, err)
 		}
 	}
 
 	return invitation, nil
+}
+
+func (s svc) createUser(ctx context.Context, invitation *invitations.Invitation) (string, error) {
+	ctx, cancel := context.WithTimeout(ctx, createUserTimeout)
+	defer cancel()
+	return s.backend.CreateUser(ctx, invitation)
+}
+
+func (s svc) sendMail(ctx context.Context, id string) error {
+	ctx, cancel := context.WithTimeout(ctx, sendMailTimeout)
+	defer cancel()
+	return s.backend.SendMail(ctx, id)
+}
+
+// rollback deletes the user created for the invitation after sending the
+// invitation mail failed with mailErr. The guest can not redeem the invitation
+// without the mail, and a leftover user would make every retry fail with a
+// conflict. It only deletes if the failure is certain: if the outcome is
+// unknown (e.g. timeout), the mail may have been sent and the invitation is
+// working, so the user is kept. ctx must not carry the request cancellation.
+func (s svc) rollback(ctx context.Context, email, id string, mailErr error) {
+	if !errors.Is(mailErr, invitations.ErrRejected) {
+		// Logged as error, not warning: the invitation request failed and may
+		// need an operator to act, as the guest blocks inviting the address
+		// again if the mail did not arrive.
+		s.log.Error().
+			Str("userID", id).
+			Str("email", email).
+			Err(mailErr).
+			Msgf("Sending the invitation mail failed with an unknown outcome. The guest was kept, the invitation mail may or may not have been sent. If it did not arrive, remove the guest %s (user id %s) in Keycloak before inviting the address again", email, id)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, rollbackTimeout)
+	defer cancel()
+	if err := s.backend.DeleteUser(ctx, id); err != nil {
+		s.log.Error().
+			Str("userID", id).
+			Str("email", email).
+			Err(err).
+			AnErr("mailError", mailErr).
+			Msgf("Sending the invitation mail failed and removing the guest %s (user id %s) failed. Remove the guest manually, otherwise inviting this address again fails", email, id)
+	}
 }
