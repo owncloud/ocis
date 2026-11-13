@@ -404,3 +404,54 @@ Feature: Remove access to a drive item
       | Space Viewer     | 403         | should      |
       | Space Editor     | 403         | should      |
       | Manager          | 204         | should not  |
+
+
+  Scenario Outline: user tries to remove an already-removed user from project space using permissions endpoint
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has sent the following space share invitation:
+      | space           | NewSpace           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    And user "Alice" has removed the access of user "Brian" from space "NewSpace"
+    When user "Alice" removes the access of user "Brian" from space "NewSpace" using permissions endpoint of the Graph API
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message",
+              "innererror"
+            ],
+            "properties": {
+              "code": {
+                "const": "itemNotFound"
+              },
+              "message": {
+                "type": "string",
+                "pattern": "error: not found"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
