@@ -65,11 +65,11 @@ $(GOVULNCHECK): $(BINGO_DIR)/govulncheck.mod
 	@echo "(re)installing $(GOBIN)/govulncheck-v1.1.4"
 	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=govulncheck.mod -o=$(GOBIN)/govulncheck-v1.1.4 "golang.org/x/vuln/cmd/govulncheck"
 
-MOCKERY := $(GOBIN)/mockery-v2.53.5
+MOCKERY := $(GOBIN)/mockery-v2.53.8
 $(MOCKERY): $(BINGO_DIR)/mockery.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/mockery-v2.53.5"
-	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=mockery.mod -o=$(GOBIN)/mockery-v2.53.5 "github.com/vektra/mockery/v2"
+	@echo "(re)installing $(GOBIN)/mockery-v2.53.8"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=mockery.mod -o=$(GOBIN)/mockery-v2.53.8 "github.com/vektra/mockery/v2"
 
 PIGEON := $(GOBIN)/pigeon-v1.2.1
 $(PIGEON): $(BINGO_DIR)/pigeon.mod
