@@ -570,8 +570,8 @@ github.com/kevinburke/ssh_config v1.6.0 h1:J1FBfmuVosPHf5GRdltRLhPJtJpTlMdKTBjRg
 github.com/kevinburke/ssh_config v1.6.0/go.mod h1:q2RIzfka+BXARoNexmF9gkxEX7DmvbW9P4hIVx2Kg4M=
 github.com/kisielk/errcheck v1.5.0/go.mod h1:pFxgyoBC7bSaBwPgfKdkLd5X25qrDl4LWUI2bnpBCr8=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
-github.com/klauspost/compress v1.20.0 h1:a3C1ke2ohxFymNlb2HWAHjDeKCI90scRskErZkR0ezA=
-github.com/klauspost/compress v1.20.0/go.mod h1:LUdAzn7YLVvxLpc7y3V1m40wESHTgc1422pwwBSKYuI=
+github.com/klauspost/compress v1.20.3 h1:zWNoFqq/lSuYQRim3dUXlXeA0IqwuZGicdG5ZTfY5j4=
+github.com/klauspost/compress v1.20.3/go.mod h1:LUdAzn7YLVvxLpc7y3V1m40wESHTgc1422pwwBSKYuI=
 github.com/klauspost/cpuid/v2 v2.0.1/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa0213Md/qVLRg=
 github.com/klauspost/cpuid/v2 v2.4.0 h1:S6Hrbc7+ywsr0r+RLapfGBHfyefhCTwEh3A0tV913Dw=
 github.com/klauspost/cpuid/v2 v2.4.0/go.mod h1:19jmZ9mjzoF//ddRSUsv0zfBTJWh3QJh9FNxZTMrGxU=
@@ -735,8 +735,8 @@ github.com/orcaman/concurrent-map v1.0.0 h1:I/2A2XPCb4IuQWcQhBhSwGfiuybl/J0ev9HD
 github.com/orcaman/concurrent-map v1.0.0/go.mod h1:Lu3tH6HLW3feq74c2GC+jIMS/K2CFcDWnWD9XkenwhI=
 github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245 h1:JRidLTAKhnvyLMRtVtSF4lhBa0NSAOs6fof+d6JnKII=
 github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245/go.mod h1:z61VMGAJRtR1nbgXWiNoCkxUXP1B3Je9rMuJbnGd+Og=
-github.com/owncloud/reva/v2 v2.0.0-20261103122503-bb724be57312 h1:ygVkvHLmb0rNkZD+kwtsP5QkAsRib6gg4spWgQutQpA=
-github.com/owncloud/reva/v2 v2.0.0-20261103122503-bb724be57312/go.mod h1:BxBZoLbpILgxfiiyGOi5KAMSHCIJ6Kqg9Gbk1LU9fLQ=
+github.com/owncloud/reva/v2 v2.0.0-20261113122439-d74730112e09 h1:btx/lotpAQF0HHK+GMspEQwZaGwwQAQ3lPxCW2hsqpc=
+github.com/owncloud/reva/v2 v2.0.0-20261113122439-d74730112e09/go.mod h1:BxBZoLbpILgxfiiyGOi5KAMSHCIJ6Kqg9Gbk1LU9fLQ=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pablodz/inotifywaitgo v0.0.12 h1:DVJJTFMDlSAdO46yisPF2vzozs/r+4k6ih8MVghq78M=

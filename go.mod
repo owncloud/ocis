@@ -67,7 +67,7 @@ require (
 	github.com/open-policy-agent/opa v1.19.0
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245
-	github.com/owncloud/reva/v2 v2.0.0-20261103122503-bb724be57312
+	github.com/owncloud/reva/v2 v2.0.0-20261113122439-d74730112e09
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.12
 	github.com/prometheus/client_golang v1.24.1
@@ -241,7 +241,7 @@ require (
 	github.com/json-iterator/go v1.1.13-0.20220915233716-71ac16282d12 // indirect
 	github.com/juliangruber/go-intersect v1.1.0 // indirect
 	github.com/kevinburke/ssh_config v1.6.0 // indirect
-	github.com/klauspost/compress v1.20.0 // indirect
+	github.com/klauspost/compress v1.20.3 // indirect
 	github.com/klauspost/cpuid/v2 v2.4.0 // indirect
 	github.com/klauspost/crc32 v1.3.0 // indirect
 	github.com/kovidgoyal/go-parallel v1.1.1 // indirect
