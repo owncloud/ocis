@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"net"
 	"os/signal"
 
 	"github.com/urfave/cli/v2"
@@ -75,6 +76,16 @@ func Server(cfg *config.Config) *cli.Command {
 					Certificates: []tls.Certificate{crt},
 				}
 			}
+			authConfigured := cfg.Nats.AuthUsername != "" || cfg.Nats.AuthPassword != ""
+			if !authConfigured && !isLoopbackHost(cfg.Nats.Host) {
+				logger.Warn().
+					Str("host", cfg.Nats.Host).
+					Msg("the NATS event bus is bound to a non-loopback address without authentication: " +
+						"any client able to reach this port can publish forged internal events. " +
+						"Set OCIS_EVENTS_AUTH_USERNAME and OCIS_EVENTS_AUTH_PASSWORD (and enable TLS), " +
+						"or bind the broker to a loopback/isolated network only")
+			}
+
 			natsServer, err := nats.NewNATSServer(
 				logging.NewLogWrapper(logger),
 				nats.Host(cfg.Nats.Host),
@@ -83,6 +94,7 @@ func Server(cfg *config.Config) *cli.Command {
 				nats.StoreDir(cfg.Nats.StoreDir),
 				nats.TLSConfig(tlsConf),
 				nats.AllowNonTLS(!cfg.Nats.EnableTLS),
+				nats.Auth(cfg.Nats.AuthUsername, cfg.Nats.AuthPassword),
 			)
 			if err != nil {
 				return err
@@ -105,4 +117,20 @@ func Server(cfg *config.Config) *cli.Command {
 			return nil
 		},
 	}
+}
+
+// isLoopbackHost reports whether host refers to the local loopback interface,
+// in which case binding the broker without authentication is acceptable.
+// Unparsable or non-IP hosts are treated as non-loopback so the warning errs
+// on the side of caution.
+func isLoopbackHost(host string) bool {
+	if host == "localhost" {
+		return true
+	}
+	// An empty host makes the NATS server listen on all interfaces, so it must
+	// not be treated as loopback.
+	if ip := net.ParseIP(host); ip != nil {
+		return ip.IsLoopback()
+	}
+	return false
 }
