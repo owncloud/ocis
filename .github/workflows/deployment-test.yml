@@ -46,16 +46,22 @@ jobs:
         run: |
           echo "127.0.0.1 ocis.owncloud.test collabora.owncloud.test keycloak.owncloud.test mail.owncloud.test minio.owncloud.test onlyoffice.owncloud.test tika ldap.owncloud.test ocis.ocm.owncloud.test ocis.ocm.next.owncloud.test collabora.ocm.owncloud.test" | sudo tee -a /etc/hosts
 
+      - name: Generate collabora credentials
+        run: |
+          set -e
+
+          # the Collabora admin console requires explicit credentials. Persist them via
+          # $GITHUB_ENV so every later step (including the teardown) can interpolate them.
+          PASSWORD="$(openssl rand -hex 16)"
+          echo "::add-mask::$PASSWORD"
+          echo "COLLABORA_ADMIN_USER=admin" >> "$GITHUB_ENV"
+          echo "COLLABORA_ADMIN_PASSWORD=$PASSWORD" >> "$GITHUB_ENV"
+
       - name: Run compose stack
         working-directory: deployments/examples/${{ matrix.example }}
         run: |
           set -e
           echo "=== Running ${{ matrix.example }} ==="
-          
-          # the Collabora admin console requires explicit credentials
-          export COLLABORA_ADMIN_USER=admin
-          COLLABORA_ADMIN_PASSWORD="$(openssl rand -hex 16)"
-          export COLLABORA_ADMIN_PASSWORD
 
           if [ "${{ matrix.example }}" = "ocis_ocm" ]; then
             export INSECURE=true
