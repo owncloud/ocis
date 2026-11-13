@@ -137,10 +137,11 @@ func globWorkersD4(base string) <-chan string {
 }
 
 func initialize(numNodes int, numRevisions int) string {
-	base := "test_temp_" + uuid.New().String()
-	if err := os.Mkdir(base, os.ModePerm); err != nil {
+	// Create the test data in the temp directory of the system, not in the source tree.
+	// Other tools, for example golangci-lint, read the source tree while the tests run.
+	base, err := os.MkdirTemp("", "test_temp_")
+	if err != nil {
 		fmt.Println("Error creating test_temp directory", err)
-		os.RemoveAll(base)
 		os.Exit(1)
 	}
 
