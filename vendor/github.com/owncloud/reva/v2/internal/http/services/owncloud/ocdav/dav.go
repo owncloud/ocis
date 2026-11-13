@@ -36,11 +36,13 @@ import (
 	"github.com/owncloud/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/publicshare"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/rhttp/router"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/grants"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
+	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/metadata"
 )
@@ -318,6 +320,19 @@ func (h *DavHandler) Handler(s *svc) http.Handler {
 			case res.Status.Code == rpc.Code_CODE_PERMISSION_DENIED:
 				fallthrough
 			case res.Status.Code == rpc.Code_CODE_UNAUTHENTICATED:
+				// The publicshares auth manager refuses internal links. They have no password,
+				// so asking for one is wrong: the client must log in instead. This keeps the
+				// answers given before that check was added: 401 Bearer for an anonymous request,
+				// 404 for a logged-in user who has no access to the resource.
+				if !hasValidBasicAuthHeader && strings.Contains(res.GetStatus().GetMessage(), publicshare.InternalLinkRejectedMessage) {
+					if !userExists {
+						writeMissingBearerAuth(w, r, log)
+						return
+					}
+					log.Debug().Str("token", token).Msg("internal link: user has no access to the resource")
+					w.WriteHeader(http.StatusNotFound)
+					return
+				}
 				w.WriteHeader(http.StatusUnauthorized)
 				if hasValidBasicAuthHeader {
 					b, err := errors.Marshal(http.StatusUnauthorized, "Username or password was incorrect", "", ErrInvalidCredentials)
@@ -367,10 +382,7 @@ func (h *DavHandler) Handler(s *svc) http.Handler {
 			case sRes.Status.Code == rpc.Code_CODE_OK && grants.PermissionsEqual(sRes.GetInfo().GetPermissionSet(), &provider.ResourcePermissions{}):
 				// If the link is internal
 				if !userExists {
-					w.Header().Add(WwwAuthenticate, fmt.Sprintf("Bearer realm=\"%s\", charset=\"UTF-8\"", r.Host))
-					w.WriteHeader(http.StatusUnauthorized)
-					b, err := errors.Marshal(http.StatusUnauthorized, "No 'Authorization: Bearer' header found", "", ErrMissingBearerAuth)
-					errors.HandleWebdavError(log, w, b, err)
+					writeMissingBearerAuth(w, r, log)
 					return
 				}
 				fallthrough
@@ -403,6 +415,15 @@ func (h *DavHandler) Handler(s *svc) http.Handler {
 			errors.HandleWebdavError(log, w, b, err)
 		}
 	})
+}
+
+// writeMissingBearerAuth tells the client that the internal link can only be opened by a logged-in user.
+// Web reacts to ErrMissingBearerAuth by sending the user to the login and then to the private link.
+func writeMissingBearerAuth(w http.ResponseWriter, r *http.Request, log *zerolog.Logger) {
+	w.Header().Add(WwwAuthenticate, fmt.Sprintf("Bearer realm=\"%s\", charset=\"UTF-8\"", r.Host))
+	w.WriteHeader(http.StatusUnauthorized)
+	b, err := errors.Marshal(http.StatusUnauthorized, "No 'Authorization: Bearer' header found", "", ErrMissingBearerAuth)
+	errors.HandleWebdavError(log, w, b, err)
 }
 
 func getTokenStatInfo(ctx context.Context, selector pool.Selectable[gatewayv1beta1.GatewayAPIClient], token string) (*provider.StatResponse, error) {

@@ -38,6 +38,12 @@ const (
 	// StorageIDFilterType defines a new filter type for storage id.
 	// TODO: Remove this once the filter type is in the CS3 API.
 	StorageIDFilterType link.ListPublicSharesRequest_Filter_Type = 4
+
+	// InternalLinkRejectedMessage is the reason the publicshares auth manager gives when it
+	// refuses to authenticate an internal link. Internal links have no password: only logged-in
+	// users who already have access to the resource can open them. ocdav looks for this message
+	// to tell the client to log in instead of asking for a password.
+	InternalLinkRejectedMessage = "internal links require authentication and cannot be accessed anonymously"
 )
 
 // Manager manipulates public shares.
