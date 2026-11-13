@@ -63,6 +63,10 @@ type config struct {
 	UserGroupsCacheSize     int                               `mapstructure:"usergroups_cache_size"`
 	ScopeExpansionCacheSize int                               `mapstructure:"scope_expansion_cache_size"`
 	MFAEnabled              bool                              `mapstructure:"mfa_enabled"`
+	// VaultModeRequired denies access to users who do not hold the VaultMode permission.
+	VaultModeRequired     bool `mapstructure:"vault_mode_required"`
+	VaultModeCacheSize    int  `mapstructure:"vault_mode_cache_size"`
+	VaultModeCacheSeconds int  `mapstructure:"vault_mode_cache_seconds"`
 }
 
 func parseConfig(m map[string]interface{}) (*config, error) {
@@ -71,6 +75,13 @@ func parseConfig(m map[string]interface{}) (*config, error) {
 		err = errors.Wrap(err, "auth: error decoding conf")
 		return nil, err
 	}
+	if c.VaultModeCacheSize == 0 {
+		c.VaultModeCacheSize = 5000
+	}
+	if c.VaultModeCacheSeconds == 0 {
+		c.VaultModeCacheSeconds = 30
+	}
+	initVaultModeCache(c.VaultModeCacheSize, time.Duration(c.VaultModeCacheSeconds)*time.Second)
 	return c, nil
 }
 
@@ -163,6 +174,16 @@ func NewUnary(m map[string]interface{}, unprotected []string, tp trace.TracerPro
 				return mfaResponse(ctx, req, info)
 			}
 		}
+		if conf.VaultModeRequired && u.Id.Type != userpb.UserType_USER_TYPE_SERVICE {
+			allowed, err := hasVaultMode(ctx, u, conf.GatewayAddr)
+			if err != nil {
+				log.Error().Err(err).Str("user_id", u.Id.OpaqueId).Msg("could not check the vault mode permission")
+			}
+			if !allowed {
+				log.Debug().Str("user_id", u.Id.OpaqueId).Msg("vault mode permission is required")
+				return denyResponse(ctx, req, info, vaultModeRequiredMsg)
+			}
+		}
 
 		span.SetAttributes(semconv.EnduserIDKey.String(u.Id.OpaqueId))
 
@@ -182,6 +203,7 @@ func NewStream(m map[string]interface{}, unprotected []string, tp trace.TracerPr
 	if conf.TokenManager == "" {
 		conf.TokenManager = "jwt"
 	}
+	conf.GatewayAddr = sharedconf.GetGatewaySVC(conf.GatewayAddr)
 
 	if conf.UserGroupsCacheSize == 0 {
 		conf.UserGroupsCacheSize = 10000
@@ -258,6 +280,16 @@ func NewStream(m map[string]interface{}, unprotected []string, tp trace.TracerPr
 			if !ctxpkg.HasMFA(ctx) {
 				log.Warn().Str("user_id", u.Id.OpaqueId).Msg("MFA is required")
 				return status.Errorf(codes.PermissionDenied, "MFA required to access vault storage")
+			}
+		}
+		if conf.VaultModeRequired && u.Id.Type != userpb.UserType_USER_TYPE_SERVICE {
+			allowed, err := hasVaultMode(ctx, u, conf.GatewayAddr)
+			if err != nil {
+				log.Error().Err(err).Str("user_id", u.Id.OpaqueId).Msg("could not check the vault mode permission")
+			}
+			if !allowed {
+				log.Debug().Str("user_id", u.Id.OpaqueId).Msg("vault mode permission is required")
+				return status.Errorf(codes.PermissionDenied, vaultModeRequiredMsg)
 			}
 		}
 		wrapped := newWrappedServerStream(ctx, ss)
