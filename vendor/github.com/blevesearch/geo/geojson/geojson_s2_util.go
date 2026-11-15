@@ -173,11 +173,13 @@ func polygonsContainsLineStrings(s2pgns []*s2.Polygon,
 	return true
 }
 
+// ------------------------------------------------------------------------
+// rectangleIntersectsWithPolygons reports whether the rectangle intersects any
+// of the given polygons.
 func rectangleIntersectsWithPolygons(s2rect *s2.Rect,
 	s2pgns []*s2.Polygon) bool {
-	s2pgnFromRect := s2PolygonFromS2Rectangle(s2rect)
 	for _, s2pgn := range s2pgns {
-		if s2pgn.Intersects(s2pgnFromRect) {
+		if rectangleIntersectsPolygon(s2rect, s2pgn) {
 			return true
 		}
 	}
@@ -185,11 +187,172 @@ func rectangleIntersectsWithPolygons(s2rect *s2.Rect,
 	return false
 }
 
+// rectangleIntersectsPolygon reports whether the rectangle and the polygon have
+// at least one point in common.
+func rectangleIntersectsPolygon(s2rect *s2.Rect, s2pgn *s2.Polygon) bool {
+	if s2rect.IsEmpty() || s2pgn == nil || s2pgn.IsEmpty() {
+		return false
+	}
+
+	if s2pgn.IsFull() {
+		return true
+	}
+
+	if !s2rect.Intersects(s2pgn.RectBound()) {
+		return false
+	}
+
+	// The two regions intersect if the rectangle meets the boundary of the
+	// polygon anywhere.
+	if rectangleIntersectsPolygonBoundary(s2rect, s2pgn) {
+		return true
+	}
+
+	// The boundary of the polygon do not intersect, the only remaining
+	// possibility is the rectangle lying entirely inside the polygon
+	centre := s2.PointFromLatLng(s2rect.Center())
+
+	return polygonsIntersectsPoint([]*s2.Polygon{s2pgn}, &centre)
+}
+
+// rectangleIntersectsPolygonBoundary reports whether the rectangle contains any
+// part of the boundary of the polygon, holes included.
+func rectangleIntersectsPolygonBoundary(s2rect *s2.Rect,
+	s2pgn *s2.Polygon) bool {
+	for _, loop := range s2pgn.Loops() {
+		if !s2rect.Intersects(loop.RectBound()) {
+			continue
+		}
+
+		for i := 0; i < loop.NumEdges(); i++ {
+			edge := loop.Edge(i)
+			if s2rect.IntersectsEdge(edge.V0, edge.V1) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+// rectangleContainsPolygons reports whether the rectangle contains every one of
+// the given polygons.
+func rectangleContainsPolygons(s2rect *s2.Rect, s2pgns []*s2.Polygon) bool {
+	for _, s2pgn := range s2pgns {
+		if !rectangleContainsPolygon(s2rect, s2pgn) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// rectangleContainsPolygon reports whether the rectangle contains the polygon.
+func rectangleContainsPolygon(s2rect *s2.Rect, s2pgn *s2.Polygon) bool {
+	return s2rect.ContainsPolygon(s2pgn)
+}
+
+// polygonsContainsRectangle reports whether any one of the polygons contains
+// the whole rectangle.
+func polygonsContainsRectangle(s2pgns []*s2.Polygon, s2rect *s2.Rect) bool {
+	for _, s2pgn := range s2pgns {
+		if polygonContainsRectangle(s2pgn, s2rect) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// polygonContainsRectangle reports whether the polygon contains every point of
+// the rectangle.
+func polygonContainsRectangle(s2pgn *s2.Polygon, s2rect *s2.Rect) bool {
+	if s2pgn == nil || s2rect.IsEmpty() || s2pgn.IsEmpty() {
+		return false
+	}
+
+	if s2pgn.IsFull() {
+		return true
+	}
+
+	if !s2pgn.RectBound().ContainsRect(*s2rect) {
+		return false
+	}
+
+	// If the boundary of the polygon runs through the interior of the rectangle
+	// then part of the rectangle lies outside the polygon, or inside one of its
+	// holes.
+	for _, loop := range s2pgn.Loops() {
+		if !s2rect.Intersects(loop.RectBound()) {
+			continue
+		}
+
+		for i := 0; i < loop.NumEdges(); i++ {
+			edge := loop.Edge(i)
+			if s2rect.InteriorIntersectsEdge(edge.V0, edge.V1) {
+				return false
+			}
+		}
+	}
+
+	// The boundary of the polygon stays out of the rectangle, so the rectangle
+	// lies either wholly inside or wholly outside the polygon and a single
+	// point decides which.
+	centre := s2.PointFromLatLng(s2rect.Center())
+
+	return polygonsIntersectsPoint([]*s2.Polygon{s2pgn}, &centre)
+}
+
+// rectangleIntersectsWithLineStrings reports whether the rectangle intersects
+// any of the given linestrings.
 func rectangleIntersectsWithLineStrings(s2rect *s2.Rect,
 	polylines []*s2.Polyline) bool {
-	s2pgnFromRect := s2PolygonFromS2Rectangle(s2rect)
-	return polylineIntersectsPolygons(polylines, []*s2.Polygon{s2pgnFromRect})
+	if s2rect.IsEmpty() {
+		return false
+	}
+
+	for _, pl := range polylines {
+		if pl == nil || len(*pl) == 0 {
+			continue
+		}
+
+		if !s2rect.Intersects(pl.RectBound()) {
+			continue
+		}
+
+		if len(*pl) == 1 {
+			if s2rect.ContainsPoint((*pl)[0]) {
+				return true
+			}
+
+			continue
+		}
+
+		for i := 0; i < pl.NumEdges(); i++ {
+			edge := pl.Edge(i)
+			if s2rect.IntersectsEdge(edge.V0, edge.V1) {
+				return true
+			}
+		}
+	}
+
+	return false
 }
+
+// rectangleContainsLineStrings reports whether the rectangle contains every one
+// of the given linestrings.
+func rectangleContainsLineStrings(s2rect *s2.Rect,
+	polylines []*s2.Polyline) bool {
+	for _, pl := range polylines {
+		if !s2rect.ContainsPolyline(pl) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// ------------------------------------------------------------------------
 
 func s2PolygonFromCoordinates(coordinates [][][]float64) *s2.Polygon {
 	loops := make([]*s2.Loop, 0, len(coordinates))
@@ -208,17 +371,6 @@ func s2PolygonFromCoordinates(coordinates [][][]float64) *s2.Polygon {
 
 	rv := s2.PolygonFromOrientedLoops(loops)
 	return rv
-}
-
-func s2PolygonFromS2Rectangle(s2rect *s2.Rect) *s2.Polygon {
-	loops := make([]*s2.Loop, 0, 1)
-	var points []s2.Point
-	for j := 0; j < 4; j++ {
-		points = append(points, s2.PointFromLatLng(s2rect.Vertex(j%4)))
-	}
-
-	loops = append(loops, s2.LoopFromPoints(points))
-	return s2.PolygonFromLoops(loops)
 }
 
 func DeduplicateTerms(terms []string) []string {
