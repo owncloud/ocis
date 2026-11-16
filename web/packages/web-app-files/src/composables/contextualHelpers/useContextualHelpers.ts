@@ -63,6 +63,20 @@ export const useContextualHelpers = () => {
     })
   )
 
+  const shareInviteCollaboratorHelpVault = computed<ContextualHelperData>(() =>
+    filterContextHelper({
+      title: '',
+      list: [
+        { text: $gettext('Groups in the vault'), headline: true },
+        {
+          text: $gettext(
+            'If you share with a group, only group members with vault access will receive a notification and can access the share.'
+          )
+        }
+      ]
+    })
+  )
+
   const shareSpaceAddMemberHelp = computed<ContextualHelperData>(() =>
     filterContextHelper({
       title: $gettext('Add members to this Space'),
@@ -134,6 +148,7 @@ export const useContextualHelpers = () => {
   return {
     shareInviteCollaboratorHelp,
     shareInviteCollaboratorHelpCern,
+    shareInviteCollaboratorHelpVault,
     shareSpaceAddMemberHelp,
     shareViaLinkHelp,
     shareViaIndirectLinkHelp,
