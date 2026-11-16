@@ -3010,7 +3010,23 @@ class GraphContext implements Context {
 		string $resource,
 		string $spaceName,
 	): void {
-		$this->featureContext->setResponse($this->getActivities($user, $resource, $spaceName));
+		// Activities are written asynchronously via NATS. Retry on an empty list so
+		// that the test does not fail just because the event has not been processed yet.
+		$retried = 0;
+		do {
+			$response = $this->getActivities($user, $resource, $spaceName);
+			$jsonBody = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+			$isEmpty = $response->getStatusCode() === 200
+				&& empty((array)($jsonBody->value ?? []));
+			if ($isEmpty && $retried < HttpRequestHelper::maxHTTPRequestRetries()) {
+				$retried++;
+				echo "Activity list for '$resource' is empty, retrying ($retried)...\n";
+				\usleep(500 * 1000);
+			} else {
+				break;
+			}
+		} while (true);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
