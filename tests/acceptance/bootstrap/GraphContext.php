@@ -3021,7 +3021,7 @@ class GraphContext implements Context {
 				&& empty((array)($this->featureContext->getJsonDecodedResponseBodyContent($response)->value ?? []));
 			if ($isEmpty && $retried < HttpRequestHelper::maxHTTPRequestRetries()) {
 				$retried++;
-				echo "Activity list for '$resource' is empty, retrying ($retried)...\n";
+				echo "[INFO] Activity list for '$resource' is empty, retrying ($retried)...\n";
 				\usleep(500 * 1000);
 			} else {
 				break;
