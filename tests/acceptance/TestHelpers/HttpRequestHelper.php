@@ -294,6 +294,15 @@ class HttpRequestHelper {
 			$loopAgain = !$sendExceptionHappened && ($response->getStatusCode() === self::HTTP_TOO_EARLY ||
 						($response->getStatusCode() === self::HTTP_CONFLICT && $isGivenStep)) &&
 						$sendCount <= $sendRetryLimit;
+			// After a configuration reload oCIS may restart and briefly return 5xx.
+			// Given steps should retry rather than fail on this transient unavailability.
+			if ($isGivenStep
+				&& $response->getStatusCode() >= HttpResponse::HTTP_INTERNAL_SERVER_ERROR
+				&& $response->getStatusCode() !== HttpResponse::HTTP_INSUFFICIENT_STORAGE
+				&& $sendCount <= $sendRetryLimit) {
+				$loopAgain = true;
+				echo "[INFO] Received " . $response->getStatusCode() . " response in Given step. Retrying...\n";
+			}
 			if ($retryOn5xxForK8s && OcisConfigHelper::isK8s()) {
 				$loopAgain = $loopAgain || ($response->getStatusCode() >= HttpResponse::HTTP_INTERNAL_SERVER_ERROR &&
 							$sendCount <= $sendRetryLimit
