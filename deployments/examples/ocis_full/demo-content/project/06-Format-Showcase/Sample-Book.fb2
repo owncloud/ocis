@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">
+  <description>
+    <title-info>
+      <genre>compjournalism</genre>
+      <author><first-name>oCIS</first-name><last-name>Demo</last-name></author>
+      <book-title>Sample FictionBook</book-title>
+      <lang>en</lang>
+    </title-info>
+    <document-info>
+      <author><nickname>oCIS Format Showcase</nickname></author>
+      <id>sample-fb2-showcase</id>
+      <version>1.0</version>
+    </document-info>
+  </description>
+  <body>
+    <section>
+      <title><p>Sample Chapter</p></title>
+      <p>This is a sample FictionBook (.fb2) document generated for the oCIS format showcase.</p>
+    </section>
+  </body>
+</FictionBook>
