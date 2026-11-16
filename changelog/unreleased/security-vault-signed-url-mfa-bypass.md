@@ -12,7 +12,7 @@ The signing-key endpoint now issues a separate, MFA-bound signing key only to
 requests that already carry MFA, and the proxy grants the MFA status to a
 signed URL only when the URL was signed with that MFA-bound key and the user's
 MFA session is still valid. First-factor-only sessions, basic auth and app
-tokens no longer inherit MFA. The MFA status and the MFA-bound key are also
-cleared on logout. Signed downloads in the regular Drive are unaffected.
+tokens no longer inherit MFA. Signed downloads in the regular Drive are
+unaffected.
 
 https://github.com/owncloud/ocis/pull/13485

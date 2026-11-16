@@ -23,15 +23,6 @@ type StaticRouteHandler struct {
 	OidcHttpClient  *http.Client
 	EventsPublisher events.Publisher
 	UserProvider    backend.UserBackend
-	// MFAStore holds the per-user MFA status record ("mfa:<userID>", see
-	// services/proxy/pkg/middleware/mfa.go's key()). It is deleted for the
-	// resolved user on a verified back-channel logout.
-	MFAStore microstore.Store
-	// SigningKeyStore holds the per-user MFA-bound signing key
-	// ("<userID>:mfa", see services/proxy/pkg/middleware/signed_url_auth.go's
-	// mfaSigningKeyName()). It is deleted for the resolved user on a
-	// verified back-channel logout.
-	SigningKeyStore microstore.Store
 }
 
 type jse struct {

@@ -14,6 +14,7 @@ import (
 	ocsm "github.com/owncloud/ocis/v2/services/ocs/pkg/middleware"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/response"
+	"github.com/owncloud/reva/v2/pkg/autoprop"
 	microstore "go-micro.dev/v4/store"
 )
 
@@ -43,6 +44,12 @@ func NewService(opts ...Option) Service {
 			account.Logger(options.Logger),
 			account.JWTSecret(options.Config.TokenManager.JWTSecret)),
 		)
+		// Reconstruct reva's auto-propagated metadata (e.g. the MFA status the
+		// proxy set) from the forwarded headers into the request context, so
+		// handlers can read it via revactx. Without this, revactx.HasMFA is
+		// always false here and GetSigningKey could never issue the MFA-bound
+		// signing key. Mirrors the graph service (see its service.go).
+		r.Use(autoprop.NewHttpHandler())
 		r.Use(ocsm.OCSFormatCtx) // updates request Accept header according to format=(json|xml) query parameter
 		r.Route("/v{version:(1|2)}.php", func(r chi.Router) {
 			r.Use(response.VersionCtx) // stores version in context

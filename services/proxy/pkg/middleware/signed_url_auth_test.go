@@ -11,6 +11,7 @@ import (
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/stretchr/testify/assert"
@@ -308,7 +309,7 @@ func TestSignedURLAuth_signatureIsValid_mfaKeyMatchSetsBreadcrumb(t *testing.T) 
 	pua := newTestAuthenticator(s, now)
 
 	mfaKey := []byte("mfa-bound-signing-key")
-	require.NoError(t, s.Write(&store.Record{Key: mfaSigningKeyName("useri"), Value: mfaKey}))
+	require.NoError(t, s.Write(&store.Record{Key: mfa.SigningKeyName("useri"), Value: mfaKey}))
 
 	r := signSignedRequest(t, pua, "GET", "http://cloud.example.net/", signedURLParams(now.Add(-time.Minute)), mfaKey, false)
 	r = r.WithContext(userContext("useri"))
@@ -344,7 +345,7 @@ func TestSignedURLAuth_signatureIsValid_noMatch(t *testing.T) {
 	s := store.NewMemoryStore()
 	pua := newTestAuthenticator(s, now)
 
-	require.NoError(t, s.Write(&store.Record{Key: mfaSigningKeyName("useri"), Value: []byte("mfa-bound-signing-key")}))
+	require.NoError(t, s.Write(&store.Record{Key: mfa.SigningKeyName("useri"), Value: []byte("mfa-bound-signing-key")}))
 	require.NoError(t, s.Write(&store.Record{Key: "useri", Value: []byte("normal-signing-key")}))
 
 	r := signSignedRequest(t, pua, "GET", "http://cloud.example.net/", signedURLParams(now.Add(-time.Minute)), []byte("some-other-key"), false)
@@ -365,7 +366,7 @@ func TestSignedURLAuth_signatureIsValid_dollarWorkaround(t *testing.T) {
 		s := store.NewMemoryStore()
 		pua := newTestAuthenticator(s, now)
 		mfaKey := []byte("mfa-bound-signing-key")
-		require.NoError(t, s.Write(&store.Record{Key: mfaSigningKeyName("useri"), Value: mfaKey}))
+		require.NoError(t, s.Write(&store.Record{Key: mfa.SigningKeyName("useri"), Value: mfaKey}))
 
 		r := signSignedRequest(t, pua, "GET", "http://cloud.example.net/a$b", signedURLParams(now.Add(-time.Minute)), mfaKey, true)
 		r = r.WithContext(userContext("useri"))

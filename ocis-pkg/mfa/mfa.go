@@ -10,6 +10,15 @@ import (
 // to forward the access token.
 const MFAHeader = "X-Multi-Factor-Authentication"
 
+// SigningKeyName returns the store key under which a user's MFA-bound
+// signing key is kept. It is the single source of truth shared by the ocs
+// service that issues the key (services/ocs/pkg/service/v0) and the proxy
+// signed-URL authenticator that reads it (services/proxy/pkg/middleware),
+// so the two sides cannot drift apart.
+func SigningKeyName(userID string) string {
+	return userID + ":mfa"
+}
+
 // MFARequiredHeader is the header returned by the server if step-up authentication is required.
 const MFARequiredHeader = "X-Ocis-Mfa-Required"
 

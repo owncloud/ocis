@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
@@ -38,14 +39,6 @@ var (
 		_paramOCVerb,
 	}
 )
-
-// mfaSigningKeyName returns the store key for a user's MFA-bound signing
-// key. This naming is a contract with the ocs service's GetSigningKey
-// handler (services/ocs/pkg/service/v0/users.go), which writes the
-// MFA-bound key under this same name. Keep both sides in sync.
-func mfaSigningKeyName(userID string) string {
-	return userID + ":mfa"
-}
 
 // mfaKeyBreadcrumbKey is the context key for the request-scoped breadcrumb
 // that marks a request whose signed-URL signature matched the MFA-bound
@@ -190,12 +183,15 @@ func (m SignedURLAuthenticator) signatureIsValid(req *http.Request) (err error) 
 
 	// The MFA-bound key not existing for this user is the common case (no
 	// MFA session has ever issued one) and is not itself an error; it only
-	// means this particular signed URL was not produced with it.
-	if mfaKey, ok, rerr := m.readSigningKey(mfaSigningKeyName(userID)); rerr == nil && ok {
-		if m.signatureMatches(u, signatureInURL, mfaKey) {
-			*req = *req.WithContext(setMFAKeyBreadcrumb(req.Context()))
-			return nil
-		}
+	// means this particular signed URL was not produced with it. A real
+	// store error, however, is logged so a broken store does not silently
+	// look like "no MFA key".
+	mfaKey, ok, rerr := m.readSigningKey(mfa.SigningKeyName(userID))
+	if rerr != nil {
+		m.Logger.Error().Err(rerr).Str("userid", userID).Msg("could not retrieve MFA-bound signing key")
+	} else if ok && m.signatureMatches(u, signatureInURL, mfaKey) {
+		*req = *req.WithContext(setMFAKeyBreadcrumb(req.Context()))
+		return nil
 	}
 
 	signingKey, ok, err := m.readSigningKey(userID)

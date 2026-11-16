@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	cs3user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/response"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
@@ -41,7 +42,7 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 	// MFA-bound key under any code path.
 	storeKey := userID
 	if revactx.HasMFA(r.Context()) {
-		storeKey = mfaSigningKeyName(userID)
+		storeKey = mfa.SigningKeyName(userID)
 	}
 
 	res, err := o.store.Read(storeKey)
@@ -81,12 +82,4 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 		User:       userID,
 		SigningKey: signingKey,
 	}))
-}
-
-// mfaSigningKeyName returns the store key for a user's MFA-bound signing key.
-// This naming is a contract with the proxy's signed-URL verifier
-// (services/proxy/pkg/middleware/signed_url_auth.go), which reads the
-// MFA-bound key under this same name. Keep both sides in sync.
-func mfaSigningKeyName(userID string) string {
-	return userID + ":mfa"
 }
