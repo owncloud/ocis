@@ -149,3 +149,8 @@ configs:
       workflows:
         config:
           backendUrl: https://${OCIS_DOMAIN:-ocis.owncloud.test}/workflows/api/v1beta1
+      ai-sensitive-data-scanner:
+        config:
+          llm:
+            endpoint: 'https://${OCIS_DOMAIN:-ocis.owncloud.test}/graph/v1beta1/extensions/org.libregraph/llm'
+            model: '${AI_LLM_MODEL_DEFAULT:-llama3.2}'
