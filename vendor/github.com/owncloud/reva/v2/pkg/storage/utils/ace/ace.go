@@ -247,13 +247,17 @@ func (e *ACE) Marshal() (string, []byte) {
 
 // Unmarshal parses a principal string and byte[] into an ACE
 func Unmarshal(principal string, v []byte) (e *ACE, err error) {
+	if len(v) == 0 {
+		return nil, fmt.Errorf("empty ace")
+	}
 	// first byte indicates type of value
 	switch v[0] {
 	case 0: // = ':' separated key=value pairs
 		s := string(v[1:])
-		if e, err = unmarshalKV(s); err == nil {
-			e.principal = principal
+		if e, err = unmarshalKV(s); err != nil {
+			return nil, err
 		}
+		e.principal = principal
 		// check consistency of Flags and principal type
 		if strings.Contains(e.flags, "g") {
 			if principal[:1] != "g" {
