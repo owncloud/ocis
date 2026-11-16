@@ -299,7 +299,8 @@ class HttpRequestHelper {
 			if ($isGivenStep
 				&& $response->getStatusCode() >= HttpResponse::HTTP_INTERNAL_SERVER_ERROR
 				&& $response->getStatusCode() !== HttpResponse::HTTP_INSUFFICIENT_STORAGE
-				&& $sendCount <= $sendRetryLimit) {
+				&& $sendCount <= $sendRetryLimit
+			) {
 				$loopAgain = true;
 				echo "[INFO] Received " . $response->getStatusCode() . " response in Given step. Retrying...\n";
 			}
