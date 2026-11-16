@@ -31,7 +31,18 @@ Feature: Restore files, folder
       | space-role   |
       | Manager      |
       | Space Editor |
-      | Space Viewer |
+
+
+  Scenario: space viewer cannot list deleted files in the trash bin of the space
+    Given user "Alice" has sent the following space share invitation:
+      | space           | restore objects |
+      | sharee          | Brian           |
+      | shareType       | user            |
+      | permissionsRole | Space Viewer    |
+    And user "Alice" has removed the file "newFolder/file.txt" from space "restore objects"
+    And user "Alice" has removed the folder "newFolder" from space "restore objects"
+    When user "Brian" lists all deleted files in the trash bin of the space "restore objects"
+    Then the HTTP status code should be "403"
 
 
   Scenario Outline: user can restore a folder with some objects from the trash via the webDav API
@@ -45,7 +56,7 @@ Feature: Restore files, folder
     Then the HTTP status code should be "<http-status-code>"
     And for user "<user>" the space "restore objects" <should-or-not-be-in-space> contain these entries:
       | newFolder |
-    And as "<user>" folder "newFolder" <should-or-not-be-in-trash> exist in the trashbin of the space "restore objects"
+    And as "Alice" folder "newFolder" <should-or-not-be-in-trash> exist in the trashbin of the space "restore objects"
     Examples:
       | user  | space-role   | http-status-code | should-or-not-be-in-space | should-or-not-be-in-trash |
       | Alice | Manager      | 201              | should                    | should not                |
@@ -65,7 +76,7 @@ Feature: Restore files, folder
     Then the HTTP status code should be "<http-status-code>"
     And for user "<user>" folder "newFolder" of the space "restore objects" <should-or-not-be-in-space> contain these files:
       | file.txt |
-    And as "<user>" file "file.txt" <should-or-not-be-in-trash> exist in the trashbin of the space "restore objects"
+    And as "Alice" file "file.txt" <should-or-not-be-in-trash> exist in the trashbin of the space "restore objects"
     Examples:
       | user  | space-role   | http-status-code | should-or-not-be-in-space | should-or-not-be-in-trash |
       | Alice | Manager      | 201              | should                    | should not                |
@@ -84,7 +95,7 @@ Feature: Restore files, folder
     And user "Alice" has removed the file "newFolder/file.txt" from space "restore objects"
     When user "Brian" deletes the file "file.txt" from the trash of the space "restore objects"
     Then the HTTP status code should be "<http-status-code>"
-    And as "Brian" file "file.txt" <should-or-not-be-in-trash> exist in the trashbin of the space "restore objects"
+    And as "Alice" file "file.txt" <should-or-not-be-in-trash> exist in the trashbin of the space "restore objects"
     Examples:
       | space-role   | http-status-code | should-or-not-be-in-trash |
       | Manager      | 204              | should not                |
