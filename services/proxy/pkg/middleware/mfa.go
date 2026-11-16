@@ -88,9 +88,15 @@ func (m MultiFactorAuthentication) ServeHTTP(w http.ResponseWriter, req *http.Re
 		// from claims directly.
 		//
 		// Fall back to the stored MFA status from the most recent request with MFA
-		// of the user. This allows, for example, a signed-URL archiver download to
-		// succeed when the user has recently proven MFA in their browser session.
-		if m.readMFAFromStore(ctx) {
+		// of the user, but only for a request that itself carries the MFA-bound
+		// signing-key breadcrumb (set by the signed-URL authenticator when the
+		// signature matched the MFA-bound key). This allows, for example, a
+		// vault signed-URL archiver download to succeed when the user has
+		// recently proven MFA in their browser session, while a claims-less
+		// request without that breadcrumb - basic auth, app tokens, or a
+		// signed URL verified against the normal key - can never inherit MFA
+		// from another session's stored record, however fresh.
+		if hasMFAKeyBreadcrumb(ctx) && m.readMFAFromStore(ctx) {
 			ctx = revactx.SetMFA(ctx)
 		}
 

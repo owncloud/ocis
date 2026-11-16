@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
+	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/go-chi/render"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/utils"
@@ -13,6 +15,24 @@ import (
 	"github.com/shamaton/msgpack/v2"
 	microstore "go-micro.dev/v4/store"
 )
+
+// mfaRecordKey returns the store key for a user's per-user MFA status
+// record. This naming is a contract with the proxy MFA middleware's key()
+// (services/proxy/pkg/middleware/mfa.go), which writes and reads the
+// record under this same name. Keep both sides in sync.
+func mfaRecordKey(userID string) string {
+	return "mfa:" + userID
+}
+
+// mfaSigningKeyName returns the store key for a user's MFA-bound signing
+// key. This naming is a contract with the ocs service's GetSigningKey
+// handler (services/ocs/pkg/service/v0/users.go) and the proxy's
+// signed-URL authenticator's mfaSigningKeyName()
+// (services/proxy/pkg/middleware/signed_url_auth.go), which write/read the
+// key under this same name. Keep all three in sync.
+func mfaSigningKeyName(userID string) string {
+	return userID + ":mfa"
+}
 
 // handle backchannel logout requests as per https://openid.net/specs/openid-connect-backchannel-1_0.html#BCRequest
 func (s *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Request) {
@@ -47,10 +67,16 @@ func (s *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Re
 	}
 
 	for _, record := range records {
-		err := s.publishBackchannelLogoutEvent(r.Context(), record, logoutToken)
-		if err != nil {
-			s.Logger.Warn().Err(err).Msg("could not publish backchannel logout event")
+		user, resolveErr := s.resolveLogoutUser(r.Context(), record)
+		if resolveErr != nil {
+			s.Logger.Warn().Err(resolveErr).Msg("could not resolve user for backchannel logout")
+		} else {
+			if err := s.publishBackchannelLogoutEvent(r.Context(), user, logoutToken); err != nil {
+				s.Logger.Warn().Err(err).Msg("could not publish backchannel logout event")
+			}
+			s.deleteMFAState(logger, user.GetId().GetOpaqueId())
 		}
+
 		err = s.UserInfoCache.Delete(string(record.Value))
 		if err != nil && !errors.Is(err, microstore.ErrNotFound) {
 			// Spec requires us to return a 400 BadRequest when the session could not be destroyed
@@ -72,32 +98,39 @@ func (s *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Re
 	render.JSON(w, r, nil)
 }
 
-// publishBackchannelLogoutEvent publishes a backchannel logout event when the callback revived from the identity provider
-func (s StaticRouteHandler) publishBackchannelLogoutEvent(ctx context.Context, record *microstore.Record, logoutToken *oidc.LogoutToken) error {
-	if s.EventsPublisher == nil {
-		return fmt.Errorf("the events publisher is not set")
-	}
+// resolveLogoutUser resolves the user behind the logging-out session from a
+// userinfo-cache record, as needed both to publish the backchannel logout
+// event and to clean up that user's MFA-related state.
+func (s StaticRouteHandler) resolveLogoutUser(ctx context.Context, record *microstore.Record) (*cs3.User, error) {
 	urecords, err := s.UserInfoCache.Read(string(record.Value))
 	if err != nil {
-		return fmt.Errorf("reading userinfo cache: %w", err)
+		return nil, fmt.Errorf("reading userinfo cache: %w", err)
 	}
 	if len(urecords) == 0 {
-		return fmt.Errorf("userinfo not found")
+		return nil, fmt.Errorf("userinfo not found")
 	}
 
 	var claims map[string]any
 	if err = msgpack.UnmarshalAsMap(urecords[0].Value, &claims); err != nil {
-		return fmt.Errorf("could not unmarshal userinfo: %w", err)
+		return nil, fmt.Errorf("could not unmarshal userinfo: %w", err)
 	}
 
 	oidcClaim, ok := claims[s.Config.UserOIDCClaim].(string)
 	if !ok {
-		return fmt.Errorf("could not get claim %w", err)
+		return nil, fmt.Errorf("could not get claim %s", s.Config.UserOIDCClaim)
 	}
 
 	user, _, err := s.UserProvider.GetUserByClaims(ctx, s.Config.UserCS3Claim, oidcClaim)
 	if err != nil || user.GetId() == nil {
-		return fmt.Errorf("could not get user by claims: %w", err)
+		return nil, fmt.Errorf("could not get user by claims: %w", err)
+	}
+	return user, nil
+}
+
+// publishBackchannelLogoutEvent publishes a backchannel logout event when the callback revived from the identity provider
+func (s StaticRouteHandler) publishBackchannelLogoutEvent(ctx context.Context, user *cs3.User, logoutToken *oidc.LogoutToken) error {
+	if s.EventsPublisher == nil {
+		return fmt.Errorf("the events publisher is not set")
 	}
 
 	e := events.BackchannelLogout{
@@ -110,4 +143,28 @@ func (s StaticRouteHandler) publishBackchannelLogoutEvent(ctx context.Context, r
 		return fmt.Errorf("could not publish user created event %w", err)
 	}
 	return nil
+}
+
+// deleteMFAState deletes the resolved user's per-user MFA status record and
+// MFA-bound signing key, closing the window during which other sessions of
+// that user could use the stored MFA status or that key. Deletion is
+// best-effort: any error is logged but never surfaces as a backchannel
+// logout failure, so the existing userinfo-cache cleanup and spec-mandated
+// response behavior are unaffected.
+func (s StaticRouteHandler) deleteMFAState(logger log.Logger, userID string) {
+	if userID == "" {
+		return
+	}
+
+	if s.MFAStore != nil {
+		if err := s.MFAStore.Delete(mfaRecordKey(userID)); err != nil && !errors.Is(err, microstore.ErrNotFound) {
+			logger.Warn().Err(err).Str("userID", userID).Msg("could not delete MFA status record at backchannel logout")
+		}
+	}
+
+	if s.SigningKeyStore != nil {
+		if err := s.SigningKeyStore.Delete(mfaSigningKeyName(userID)); err != nil && !errors.Is(err, microstore.ErrNotFound) {
+			logger.Warn().Err(err).Str("userID", userID).Msg("could not delete MFA-bound signing key at backchannel logout")
+		}
+	}
 }

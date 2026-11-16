@@ -188,6 +188,8 @@ func Server(cfg *config.Config) *cli.Command {
 				Proxy:           rp,
 				EventsPublisher: publisher,
 				UserProvider:    userProvider,
+				MFAStore:        signingKeyStore,
+				SigningKeyStore: signingKeyStore,
 			}
 			if err != nil {
 				return fmt.Errorf("failed to initialize reverse proxy: %w", err)
