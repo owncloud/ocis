@@ -1,3 +1,7 @@
 scan:
   skip-files:
     - vendor/github.com/crewjam/saml/xmlenc/fuzz.go
+    # lico vendors a bun.lock that is never installed or built by ocis.
+    # The lockfile ships decode-uri-component@0.5.0 (CVE-2026-118664, HIGH).
+    # Proper fix is bumping the dependency in lico and cutting a new release.
+    - vendor/**/bun.lock
