@@ -314,7 +314,9 @@ class SettingsHelper {
 					throw $e;
 				}
 				$retried++;
-				echo "JsonException reading settings values-list, retrying ($retried): {$e->getMessage()}\n";
+				$body = (string)$response->getBody();
+				$tail = \substr($body, -100);
+				echo "[INFO] JsonException reading settings values-list (body length: " . \strlen($body) . ", last 100 chars: '$tail'), retrying ($retried): {$e->getMessage()}\n";
 				\usleep(500 * 1000);
 			}
 		} while (true);
