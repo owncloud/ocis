@@ -182,7 +182,6 @@ Feature: permissions role definitions
                           "libre.graph/driveItem/content/read",
                           "libre.graph/driveItem/permissions/read",
                           "libre.graph/driveItem/children/read",
-                          "libre.graph/driveItem/deleted/read",
                           "libre.graph/driveItem/basic/read"
                         ]
                       },
