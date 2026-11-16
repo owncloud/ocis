@@ -3015,9 +3015,10 @@ class GraphContext implements Context {
 		$retried = 0;
 		do {
 			$response = $this->getActivities($user, $resource, $spaceName);
-			$jsonBody = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+			// Only decode the body for 200 responses — non-200 bodies may not be JSON
+			// and would throw a JsonException before the Then step can check the status.
 			$isEmpty = $response->getStatusCode() === 200
-				&& empty((array)($jsonBody->value ?? []));
+				&& empty((array)($this->featureContext->getJsonDecodedResponseBodyContent($response)->value ?? []));
 			if ($isEmpty && $retried < HttpRequestHelper::maxHTTPRequestRetries()) {
 				$retried++;
 				echo "Activity list for '$resource' is empty, retrying ($retried)...\n";
