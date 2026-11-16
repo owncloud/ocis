@@ -513,6 +513,7 @@ func (s *service) UpdatePublicShare(ctx context.Context, req *link.UpdatePublicS
 	}
 
 	isInternalLink := isInternalLink(req, ps)
+	updatePermissions := req.GetUpdate().GetType() == link.UpdatePublicShareRequest_Update_TYPE_PERMISSIONS
 
 	// check if the user has the permission in the user role
 	if !publicshare.IsCreatedByUser(ps, user) {
@@ -543,6 +544,38 @@ func (s *service) UpdatePublicShare(ctx context.Context, req *link.UpdatePublicS
 
 	}
 
+	// Promoting an internal link (empty permissions) to a non-internal (public) link is
+	// equivalent to creating a public link and must pass the same authorization checks as
+	// CreatePublicShare. These checks are deliberately NOT skipped for the share creator:
+	// creating an internal link is unprivileged, so the type change is the point at which the
+	// public-sharing policy and the resharing authority have to be (re-)enforced.
+	wasInternalLink := grants.PermissionsEqual(ps.GetPermissions().GetPermissions(), &provider.ResourcePermissions{})
+	if updatePermissions && wasInternalLink && !isInternalLink {
+		if !s.conf.EnablePublicSharing {
+			return &link.UpdatePublicShareResponse{
+				Status: status.NewPermissionDenied(ctx, nil, "public sharing is disabled"),
+			}, nil
+		}
+
+		if !sRes.GetInfo().GetPermissionSet().AddGrant {
+			return &link.UpdatePublicShareResponse{
+				Status: status.NewInvalidArg(ctx, "no share permission"),
+			}, nil
+		}
+
+		canWriteLink, err := utils.CheckPermission(ctx, permission.WritePublicLink, gatewayClient)
+		if err != nil {
+			return &link.UpdatePublicShareResponse{
+				Status: status.NewInternal(ctx, "failed check user permission to write public link"),
+			}, err
+		}
+		if !canWriteLink {
+			return &link.UpdatePublicShareResponse{
+				Status: status.NewPermissionDenied(ctx, nil, "no permission to create public links"),
+			}, nil
+		}
+	}
+
 	if !isInternalLink && !publicshare.IsCreatedByUser(ps, user) {
 		if !sRes.GetInfo().GetPermissionSet().UpdateGrant {
 			return &link.UpdatePublicShareResponse{
@@ -552,7 +585,6 @@ func (s *service) UpdatePublicShare(ctx context.Context, req *link.UpdatePublicS
 	}
 
 	// check if the user can change the permissions to the desired permissions
-	updatePermissions := req.GetUpdate().GetType() == link.UpdatePublicShareRequest_Update_TYPE_PERMISSIONS
 	if updatePermissions &&
 		!isInternalLink &&
 		!conversions.SufficientCS3Permissions(
