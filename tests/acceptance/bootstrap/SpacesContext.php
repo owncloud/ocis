@@ -3776,18 +3776,43 @@ class SpacesContext implements Context {
 		string $object,
 		string $spaceName,
 	): void {
+		$this->userDeletesObjectFoundByUserFromTrashRequest($user, $object, $user, $spaceName);
+	}
+
+	/**
+	 * The trash item is looked up by another user, so that the DELETE can also be
+	 * sent by a user who cannot list the trash (e.g. a Space Viewer).
+	 *
+	 * @When user :user tries to delete the file/folder :resource found by user :finder from the trash of the space :spaceName
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $finder
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function userDeletesObjectFoundByUserFromTrashRequest(
+		string $user,
+		string $resource,
+		string $finder,
+		string $spaceName,
+	): void {
 		// find object in trash
-		$objectsInTrash = $this->getObjectsInTrashbin($user, $spaceName);
+		$objectsInTrash = $this->getObjectsInTrashbin($finder, $spaceName);
 		$pathToDeletedObject = "";
 		foreach ($objectsInTrash as $objectInTrash) {
-			if ($objectInTrash["name"] === $object) {
+			if ($objectInTrash["name"] === $resource) {
 				$pathToDeletedObject = $objectInTrash["href"];
 			}
 		}
 
 		if ($pathToDeletedObject === "") {
 			throw new Exception(
-				__METHOD__ . " Object '$object' was not found in the trashbin of space '$spaceName' by user '$user'",
+				__METHOD__ . " Object '$resource' was not found in the trashbin of space '$spaceName'"
+				. " by user '$finder'",
 			);
 		}
 
