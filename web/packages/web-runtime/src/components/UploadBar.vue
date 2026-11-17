@@ -846,6 +846,17 @@ defineExpose({
 
 <style lang="scss">
 .upload-bar {
+  // keep the whole panel on screen: the snackbar sits 20px above the bottom edge, so leave
+  // 20px at the top too; only the item list shrinks and scrolls when space runs out
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px);
+
+  > * {
+    flex-shrink: 0;
+  }
+
   @media (max-width: 640px) {
     margin: 0 auto;
   }
@@ -866,15 +877,13 @@ defineExpose({
     color: var(--oc-color-text-default);
   }
 
-  // cap the list so the title bar and "Hide details" stay on screen with many uploads
+  // half the screen at most; shrinks further when the panel hits its own max-height
   .upload-bar-items {
+    flex: 0 1 auto;
+    min-height: 0;
     max-height: 50vh;
+    max-height: 50dvh;
     overflow-y: auto;
-  }
-
-  // the error log renders below the list, so leave room for it
-  .upload-bar-items.has-errors {
-    max-height: calc(50vh - 100px);
   }
 
   .upload-bar-danger {
