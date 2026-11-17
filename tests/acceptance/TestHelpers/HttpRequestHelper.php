@@ -294,12 +294,25 @@ class HttpRequestHelper {
 			$loopAgain = !$sendExceptionHappened && ($response->getStatusCode() === self::HTTP_TOO_EARLY ||
 						($response->getStatusCode() === self::HTTP_CONFLICT && $isGivenStep)) &&
 						$sendCount <= $sendRetryLimit;
-			if ($retryOn5xxForK8s && OcisConfigHelper::isK8s()) {
-				$loopAgain = $loopAgain || ($response->getStatusCode() >= HttpResponse::HTTP_INTERNAL_SERVER_ERROR &&
-							$sendCount <= $sendRetryLimit
-							&& $response->getStatusCode() !== HttpResponse::HTTP_INSUFFICIENT_STORAGE);
-				if ($loopAgain && $response->getStatusCode() >= HttpResponse::HTTP_INTERNAL_SERVER_ERROR) {
-					echo "[INFO][K8s] Received " . $response->getStatusCode() . " response. Retrying...\n";
+			if ($retryOn5xxForK8s && (OcisConfigHelper::isK8s() || $isGivenStep)) {
+				$statusCode = $response->getStatusCode();
+				// On K8s: retry any 5xx except 507 (storage full).
+				// For Given steps outside K8s: only retry 502/503/504 — these are the
+				// gateway/unavailable codes from a service restart. Retrying real 500s
+				// would mask failures and POST/PUT that slipped through on 500 would
+				// hit a 409 on the next attempt that is not retried.
+				$is5xx = OcisConfigHelper::isK8s()
+					? ($statusCode >= HttpResponse::HTTP_INTERNAL_SERVER_ERROR
+						&& $statusCode !== HttpResponse::HTTP_INSUFFICIENT_STORAGE)
+					: \in_array($statusCode, [502, 503, 504]);
+				if ($is5xx && $sendCount <= $sendRetryLimit) {
+					$loopAgain = true;
+					// Reset so that a subsequent 409 (e.g. user-just-created after a
+					// restart) can still be retried by the condition above.
+					$sendExceptionHappened = false;
+					$prefix = OcisConfigHelper::isK8s() ? "[INFO][K8s]" : "[INFO]";
+					$suffix = ($isGivenStep && !OcisConfigHelper::isK8s()) ? " in Given step" : "";
+					echo "$prefix Received $statusCode response$suffix. Retrying...\n";
 				}
 			}
 			if ($loopAgain) {
