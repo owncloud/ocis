@@ -866,8 +866,15 @@ defineExpose({
     color: var(--oc-color-text-default);
   }
 
+  // cap the list so the title bar and "Hide details" stay on screen with many uploads
   .upload-bar-items {
+    max-height: 50vh;
     overflow-y: auto;
+  }
+
+  // the error log renders below the list, so leave room for it
+  .upload-bar-items.has-errors {
+    max-height: calc(50vh - 100px);
   }
 
   .upload-bar-danger {
