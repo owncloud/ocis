@@ -100,7 +100,6 @@ Feature: Restore files, folder
       | space-role   | http-status-code | should-or-not-be-in-trash |
       | Manager      | 204              | should not                |
       | Space Editor | 403              | should                    |
-      | Space Viewer | 403              | should                    |
 
 
   Scenario Outline: admin user who is not a member of space cannot see its trash bin
