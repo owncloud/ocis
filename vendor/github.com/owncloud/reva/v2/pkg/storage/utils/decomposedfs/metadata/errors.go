@@ -32,6 +32,11 @@ import (
 // when a key is absent from the metadata map. Callers use IsAttrUnset() rather
 // than comparing against this value directly so that the real xattr backend
 // (which returns a syscall.ENODATA errno) is also handled.
+//
+// TODO(upstream): this sentinel and the matching IsAttrUnset changes were
+// patched directly into the oCIS vendor tree (owncloud/ocis PR #13493).
+// Once the equivalent fix lands in owncloud/reva and the reva dependency is
+// bumped here, this vendor patch can be dropped via `go mod vendor`.
 var ErrAttrUnset = errors.New("attribute not set")
 
 // IsNotExist checks if there is a os not exists error buried inside the xattr error,
