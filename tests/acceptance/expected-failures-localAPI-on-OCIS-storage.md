@@ -249,26 +249,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSearch2/tagSearch.feature:226](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch2/tagSearch.feature#L226)
 - [apiSearch2/tagSearch.feature:293](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch2/tagSearch.feature#L293)
 - [apiSearch2/tagSearch.feature:294](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch2/tagSearch.feature#L294)
-- [apiSearchContent/contentSearch.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L25)
-- [apiSearchContent/contentSearch.feature:26](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L26)
-- [apiSearchContent/contentSearch.feature:49](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L49)
-- [apiSearchContent/contentSearch.feature:50](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L50)
-- [apiSearchContent/contentSearch.feature:82](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L82)
-- [apiSearchContent/contentSearch.feature:83](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L83)
-- [apiSearchContent/contentSearch.feature:110](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L110)
-- [apiSearchContent/contentSearch.feature:111](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L111)
-- [apiSearchContent/contentSearch.feature:129](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L129)
-- [apiSearchContent/contentSearch.feature:130](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L130)
-- [apiSearchContent/contentSearch.feature:146](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L146)
-- [apiSearchContent/contentSearch.feature:147](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L147)
-- [apiSearchContent/contentSearch.feature:162](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L162)
-- [apiSearchContent/contentSearch.feature:163](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L163)
-- [apiSearchContent/contentSearch.feature:185](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L185)
-- [apiSearchContent/contentSearch.feature:186](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L186)
-- [apiSearchContent/contentSearch.feature:214](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L214)
-- [apiSearchContent/contentSearch.feature:215](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L215)
-- [apiSearchContent/contentSearch.feature:266](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L266)
-- [apiSearchContent/contentSearch.feature:267](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L267)
 
 #### [Readiness check for some services returns 500 status code](https://github.com/owncloud/ocis/issues/10661)
 
@@ -379,14 +359,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraphUser/editUser.feature:231](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/editUser.feature#L231)
 - [apiGraphUser/editUser.feature:235](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/editUser.feature#L235)
 - [apiGraphUser/getUser.feature:696](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/getUser.feature#L696)
-
-#### [metadata search gives 500](https://github.com/owncloud/ocis/issues/12230)
-- [apiSearchContent/metadataSerch.feature:30](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/metadataSerch.feature#L30)
-- [apiSearchContent/metadataSerch.feature:53](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/metadataSerch.feature#L53)
-- [apiSearchContent/metadataSerch.feature:78](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/metadataSerch.feature#L78)
-- [apiSearchContent/metadataSerch.feature:108](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/metadataSerch.feature#L108)
-- [apiSearchContent/metadataSerch.feature:140](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/metadataSerch.feature#L140)
-
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
