@@ -142,6 +142,14 @@ export class Resource {
     await this.#page.goto(startUrl)
   }
 
+  async expectEmptyTrashbinMessageToBeVisible(message: string): Promise<void> {
+    return await po.expectEmptyTrashbinMessageToBeVisible({ page: this.#page, message })
+  }
+
+  async expectEmptyTrashbinButtonNotToBeVisible(): Promise<void> {
+    return await po.expectEmptyTrashbinButtonNotToBeVisible({ page: this.#page })
+  }
+
   async expectThatDeleteTrashBinButtonIsNotVisible(
     args: Omit<po.deleteResourceTrashbinArgs, 'page'>
   ): Promise<void> {

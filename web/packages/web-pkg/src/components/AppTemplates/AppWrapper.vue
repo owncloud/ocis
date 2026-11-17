@@ -91,7 +91,7 @@ import { HttpError } from '@ownclouders/web-client'
 import { dirname } from 'path'
 import { useFileActionsOpenWithApp } from '../../composables/actions/files/useFileActionsOpenWithApp'
 import { UnsavedChangesModal } from '../Modals'
-import { formatFileSize, getSharedDriveItem } from '../../helpers'
+import { formatFileSize, getSharedDriveItem, isResourceMatchingFileType } from '../../helpers'
 import toNumber from 'lodash-es/toNumber'
 import { useAuthService } from '../../composables/authContext/useAuthService'
 
@@ -198,6 +198,12 @@ const {
 })
 
 const { applicationMeta } = useAppMeta({ applicationId: applicationId, appsStore })
+
+const isResourceSupported = computed(() => {
+  return appsStore.fileExtensions
+    .filter(({ app }) => app === applicationId)
+    .some((fileExtension) => isResourceMatchingFileType(unref(resource), fileExtension))
+})
 
 const fileSizeLimit = computed(() => {
   return unref(applicationMeta).meta?.fileSizeLimit
@@ -360,6 +366,15 @@ const loadFileTask = useTask(function* (signal) {
     }
 
     if (unref(hasProp('url'))) {
+      if (!unref(isResourceSupported)) {
+        loadingError.value = new Error(
+          $gettext('This file type is not supported by %{appName}.', {
+            appName: $gettext(unref(applicationMeta).name)
+          })
+        )
+        return
+      }
+
       url.value = yield getUrlForResource(unref(space), unref(resource), {
         ...urlForResourceOptions,
         signal

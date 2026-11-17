@@ -203,7 +203,7 @@ USAGE:
    ocis storage-users spaces recalculate-treesize [command options]
 
 OPTIONS:
-   --space-id value, -s value  Space ID to recalculate (omit to process all spaces)
+   --space-id value, -s value  Space ID to recalculate, either <storage-id>$<space-id>!<opaque-id>, <storage-id>$<space-id> or the bare <space-id> (omit to process all spaces)
    --dry-run                   Only show which treesizes would be corrected without writing them (default: true)
    --verbose, -v               Enable verbose logging (default: false)
    --help, -h                  show help
@@ -216,6 +216,31 @@ ocis storage-users spaces recalculate-treesize --space-id 43972c79-f7ce-441b-9fe
 # correct them
 ocis storage-users spaces recalculate-treesize --space-id 43972c79-f7ce-441b-9fe0-cf5170e4d61e --dry-run=false
 ```
+
+The `--space-id` flag accepts the space id as exposed by the graph API, WebDAV and the web UI,
+for example `storage-users-1$43972c79-f7ce-441b-9fe0-cf5170e4d61e` or the project form
+`storage-users-1$43972c79-f7ce-441b-9fe0-cf5170e4d61e!43972c79-f7ce-441b-9fe0-cf5170e4d61e`,
+as well as the bare space id `43972c79-f7ce-441b-9fe0-cf5170e4d61e`.
+
+If a space cannot be processed, for example because it does not exist, the command reports the
+error, still processes the remaining spaces and exits with a non-zero exit code. The same
+applies if a node in a space cannot be read or written, or a child link cannot be resolved or
+points back to one of its ancestors: its parents are then not written, as their sum would be
+incomplete. The error is printed once, naming the affected node. In all-spaces mode the command also fails if it finds no spaces, for example
+because of a wrong `STORAGE_USERS_OCIS_ROOT`. It prints `All treesizes are correct` only if every
+space was processed successfully.
+
+Important: stop the `storage-users` service before running the command with `--dry-run=false`
+and start it again afterwards. The service serves the treesize from the file metadata cache
+(`STORAGE_USERS_FILEMETADATA_CACHE_*`, the default TTL is 24 minutes). A repair done while the
+service is running is therefore not visible until the cache entry expires, and a write to the
+space in that window can overwrite the repaired value.
+
+Restarting the service only clears the cache for the default in-memory store
+(`STORAGE_USERS_FILEMETADATA_CACHE_STORE=memory`). With a persistent or shared store such as
+`nats-js-kv` or `redis-sentinel`, the stale entries survive the restart. In that case clear the
+cache while `storage-users` is stopped, or wait until the TTL (`STORAGE_USERS_FILEMETADATA_CACHE_TTL`)
+has expired, before relying on the repaired values.
 
 Note: the command reads the metadata of every node in the space, so it is I/O intensive on
 large spaces. Prefer targeting a single space with `--space-id` over processing all spaces.
@@ -337,7 +362,8 @@ ocis storage-users spaces <command>
 
 ```plaintext
 COMMANDS:
-   purge  Purge disabled spaces that exceed the retention period
+   purge             Purge disabled spaces that exceed the retention period
+   fix-viewer-trash  Remove the trash bin access from "Can view" space members that were added before the role lost it
 ```
 
 #### Purge (delete permanently) Disabled Spaces
@@ -375,6 +401,38 @@ ocis storage-users spaces purge --type=personal --verbose --dry-run=false
 - Only processes spaces that are in 'trashed' state
 - The `--dry-run` flag defaults to `true` to prevent accidental purging
 - Retention period supports human-readable formats (e.g., '336h', '14d', '720h')
+
+#### Remove the Trash Bin Access from Existing "Can view" Members
+
+The `Can view` space role has changed and now prevents the listing of the space's trash bin. As the permissions of space members were stored when they were added, members who received the `Can view` role before this change can still list the trash bin. The members list shows these members as having "Custom permissions". This command removes access to the trash bin from affected members. Afterwards, they have the same permissions as new `Can view` members.
+
+```bash
+ocis storage-users spaces fix-viewer-trash [command options]
+```
+
+**Options:**
+- `--dry-run, -d` - Only show which members would be changed (default: true)
+- `--space-id, -s` - Only check this space (optional, omit to check all project spaces)
+
+**Examples:**
+
+```bash
+# Dry run to see which members would be changed (recommended first step)
+ocis storage-users spaces fix-viewer-trash
+
+# Change the members of one space
+ocis storage-users spaces fix-viewer-trash --space-id='f46bae39-b2e4-48c7-a1bc-26169b1ffc2e$2d274464-0d11-4334-9f66-391cbe38c8a5' --dry-run=false
+
+# Change the members of all project spaces
+ocis storage-users spaces fix-viewer-trash --dry-run=false
+```
+
+**Important Notes:**
+- Run the command after updating to an oCIS version where the `Can view` role has no trash bin access. Older versions refuse to run it without `--dry-run`, because the changed members would lose the download button there.
+- The command only changes members whose permissions are exactly the ones of the old `Can view` role. Who added the member and the expiration date are kept.
+- Read-only members that can still list the trash bin but have other permissions are listed as `check manually` and are not changed.
+- The command works through the running storage-users service, internally logged in with the service account, so oCIS does not need to be stopped. It only checks the spaces of the storage-users service it is started for. When the vault storage is used, run it for the `storage-users-vault` service as well.
+- Running the command again is safe, members that were already changed are not listed again.
 
 ### Manage Trash-Bin Items
 

@@ -14,6 +14,7 @@ import {
   UserStore,
   locationPublicLink,
   formatFileSize,
+  getUploadMtimeMeta,
   OcUppyFile,
   OcUppyMeta,
   OcUppyBody
@@ -166,11 +167,15 @@ export class HandleUpload extends BasePlugin<PluginOpts, OcUppyMeta, OcUppyBody>
       }
 
       file[this.getUploadPluginName()] = { endpoint }
+      // tus sends every meta key that is present, so an invalid mtime must be absent rather than
+      // undefined; drop any incoming value and only re-add it from a valid `lastModified`
+      const incomingMeta = { ...file.meta }
+      delete incomingMeta.mtime
       file.meta = {
-        ...file.meta,
+        ...incomingMeta,
         // file data
         name: file.name,
-        mtime: (file.data as File).lastModified / 1000,
+        ...getUploadMtimeMeta(file.data),
         // current path & space
         spaceId: unref(this.space).id,
         spaceName: unref(this.space).name,

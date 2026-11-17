@@ -5,8 +5,11 @@ package keycloak_test
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"testing"
 
+	"github.com/Nerzal/gocloak/v13"
 	kcpkg "github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/backends/keycloak"
@@ -203,6 +206,62 @@ func TestBackend_SendMail(t *testing.T) {
 			}
 			b := keycloak.NewWithClient(log.NopLogger(), c, userRealm, tt.userActions)
 			tt.assertion(t, b.SendMail(ctx, tt.args.id))
+		})
+	}
+}
+
+func TestBackend_DeleteUser(t *testing.T) {
+	t.Run("deletes the user in the user realm", func(t *testing.T) {
+		c := &mocks.Client{}
+		c.On("DeleteUser", mock.Anything, userRealm, "test-id").Return(nil)
+		b := keycloak.NewWithClient(log.NopLogger(), c, userRealm, nil)
+		assert.NoError(t, b.DeleteUser(context.Background(), "test-id"))
+		c.AssertExpectations(t)
+	})
+	t.Run("returns the client error", func(t *testing.T) {
+		c := &mocks.Client{}
+		c.On("DeleteUser", mock.Anything, userRealm, "test-id").Return(errors.New("boom"))
+		b := keycloak.NewWithClient(log.NopLogger(), c, userRealm, nil)
+		assert.EqualError(t, b.DeleteUser(context.Background(), "test-id"), "boom")
+	})
+}
+
+func TestBackend_SendMailClassifiesErrors(t *testing.T) {
+	tests := []struct {
+		name     string
+		err      error
+		rejected bool
+	}{
+		{"400 invalid actions is a definite rejection", &gocloak.APIError{Code: 400, Message: "400 Bad Request"}, true},
+		{"wrapped keycloak http error", fmt.Errorf("wrapped: %w", &gocloak.APIError{Code: 400, Message: "400"}), true},
+		{"401 is a definite rejection", &gocloak.APIError{Code: 401, Message: "401 Unauthorized"}, true},
+		{"403 is a definite rejection", &gocloak.APIError{Code: 403, Message: "403 Forbidden"}, true},
+		{"404 is a definite rejection", &gocloak.APIError{Code: 404, Message: "404 Not Found"}, true},
+		{"409 is a definite rejection", &gocloak.APIError{Code: 409, Message: "409 Conflict"}, true},
+		{"500 failed to send email is a definite rejection", &gocloak.APIError{Code: 500, Message: "500 Internal Server Error"}, true},
+		{"token failure is a definite rejection", &kcpkg.TokenError{Err: errors.New("failed to get token: boom")}, true},
+		{"wrapped token failure", fmt.Errorf("wrapped: %w", &kcpkg.TokenError{Err: context.Canceled}), true},
+		{"501 is unknown", &gocloak.APIError{Code: 501, Message: "501 Not Implemented"}, false},
+		{"502 from a proxy is unknown", &gocloak.APIError{Code: 502, Message: "502 Bad Gateway"}, false},
+		{"503 is unknown", &gocloak.APIError{Code: 503, Message: "503 Service Unavailable"}, false},
+		{"504 from a proxy is unknown", &gocloak.APIError{Code: 504, Message: "504 Gateway Timeout"}, false},
+		{"524 from cloudflare is unknown", &gocloak.APIError{Code: 524, Message: "524"}, false},
+		{"3xx is unknown", &gocloak.APIError{Code: 302, Message: "302 Found"}, false},
+		{"transport error (code 0) is unknown", &gocloak.APIError{Code: 0, Message: "connection reset"}, false},
+		{"context canceled is unknown", context.Canceled, false},
+		{"deadline exceeded is unknown", context.DeadlineExceeded, false},
+		{"plain error is unknown", errors.New("boom"), false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &mocks.Client{}
+			c.On("SendActionsMail", mock.Anything, userRealm, "test-id", mock.Anything).Return(tt.err)
+			b := keycloak.NewWithClient(log.NopLogger(), c, userRealm, nil)
+			err := b.SendMail(context.Background(), "test-id")
+			assert.ErrorIs(t, err, tt.err)
+			assert.Equal(t, tt.rejected, errors.Is(err, invitations.ErrRejected))
+			// The classification must not show up in the message sent to API clients.
+			assert.EqualError(t, err, tt.err.Error())
 		})
 	}
 }

@@ -42,6 +42,7 @@ import { storeToRefs } from 'pinia'
 import { useEmbedMode } from '../../embedMode'
 import { RouteRecordName } from 'vue-router'
 import { isLocationActive } from '../../../router/utils'
+import { isResourceMatchingFileExtension } from '../../../helpers/resource/fileExtension'
 
 export const EDITOR_MODE_EDIT = 'edit'
 export const EDITOR_MODE_CREATE = 'create'
@@ -165,19 +166,7 @@ export const useFileActions = () => {
               return false
             }
 
-            if (resources[0].extension && fileExtension.extension) {
-              return resources[0].extension.toLowerCase() === fileExtension.extension.toLowerCase()
-            }
-
-            if (resources[0].mimeType && fileExtension.mimeType) {
-              return (
-                resources[0].mimeType.toLowerCase() === fileExtension.mimeType.toLowerCase() ||
-                resources[0].mimeType.split('/')[0].toLowerCase() ===
-                  fileExtension.mimeType.toLowerCase()
-              )
-            }
-
-            return false
+            return isResourceMatchingFileExtension(resources[0], fileExtension)
           },
           hasPriority: fileExtension.hasPriority,
           class: `oc-files-actions-${kebabCase(appInfo.name).toLowerCase()}-trigger`
