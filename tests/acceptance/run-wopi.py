@@ -332,7 +332,10 @@ def main() -> int:
         procs.append(ocis_proc)
 
         wait_for(lambda: ocis_healthy(OCIS_URL), 300, "ocis")
-        wait_for(lambda: app_registry_ready(OCIS_URL), 60, "app registry")
+        # cs3 only: in builtin mode app-provider is excluded and the collaboration
+        # service (started later) registers the mime types, so /app/list stays empty here.
+        if wopi_type == "cs3":
+            wait_for(lambda: app_registry_ready(OCIS_URL), 60, "app registry")
         print("ocis ready.", flush=True)
 
         # --- Wait for fakeoffice discovery endpoint before starting WOPI service ---
