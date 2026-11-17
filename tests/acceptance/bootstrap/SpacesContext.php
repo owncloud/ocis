@@ -3812,7 +3812,8 @@ class SpacesContext implements Context {
 
 		if ($pathToDeletedObject === "") {
 			throw new Exception(
-				__METHOD__ . " Object '$resource' was not found in the trashbin of space '$spaceName' by user '$finder'",
+				__METHOD__ . " Object '$resource' was not found in the trashbin of space '$spaceName'"
+				. " by user '$finder'",
 			);
 		}
 
