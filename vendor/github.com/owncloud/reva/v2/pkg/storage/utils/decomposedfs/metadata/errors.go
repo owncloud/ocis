@@ -28,6 +28,17 @@ import (
 	"github.com/pkg/xattr"
 )
 
+// ErrAttrUnset is returned by the messagepack and in-process cache backends
+// when a key is absent from the metadata map. Callers use IsAttrUnset() rather
+// than comparing against this value directly so that the real xattr backend
+// (which returns a syscall.ENODATA errno) is also handled.
+//
+// TODO(upstream): this sentinel and the matching IsAttrUnset changes were
+// patched directly into the oCIS vendor tree (owncloud/ocis PR #13493).
+// Once the equivalent fix lands in owncloud/reva and the reva dependency is
+// bumped here, this vendor patch can be dropped via `go mod vendor`.
+var ErrAttrUnset = errors.New("attribute not set")
+
 // IsNotExist checks if there is a os not exists error buried inside the xattr error,
 // as we cannot just use os.IsNotExist().
 func IsNotExist(err error) bool {
@@ -58,9 +69,18 @@ func IsErrRange(err error) bool {
 	return false
 }
 
-// IsAttrUnset checks the xattr.ENOATTR from the xattr package which redifines it as ENODATA on platforms that do not natively support it (eg. linux)
-// see https://github.com/pkg/xattr/blob/8725d4ccc0fcef59c8d9f0eaf606b3c6f962467a/xattr_linux.go#L19-L22
+// IsAttrUnset reports whether err indicates an absent metadata key.
+//
+// Two backends produce this condition:
+//   - messagepack / in-process cache: wraps ErrAttrUnset (detectable via errors.Is)
+//   - real xattr backend: wraps syscall.ENODATA (== xattr.ENOATTR on Linux)
+//     see https://github.com/pkg/xattr/blob/8725d4ccc0fcef59c8d9f0eaf606b3c6f962467a/xattr_linux.go#L19-L22
 func IsAttrUnset(err error) bool {
+	// xattr.Error.Unwrap() returns the inner Err, so errors.Is traverses it.
+	if errors.Is(err, ErrAttrUnset) {
+		return true
+	}
+	// Legacy path: real xattr backend still returns a raw syscall.Errno.
 	if xerr, ok := errors.Cause(err).(*xattr.Error); ok {
 		if serr, ok2 := xerr.Err.(syscall.Errno); ok2 {
 			return serr == xattr.ENOATTR
