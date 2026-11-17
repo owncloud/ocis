@@ -105,6 +105,27 @@ def wopi_discovery_ready(url: str) -> bool:
     return r.stdout.strip() == "200"
 
 
+def app_registry_ready(ocis_url: str) -> bool:
+    # Wait until the app registry has at least one mime-type entry. The gateway
+    # returns "error finding app providers" until the app-provider service has
+    # finished registering — causing OpenInApp to fail with 500 even though
+    # ocis_healthy() already passes.
+    r = subprocess.run(
+        ["curl", "-sk", "-uadmin:admin",
+         f"{ocis_url}/app/list",
+         "-w", "\n%{http_code}"],
+        capture_output=True, text=True,
+    )
+    lines = r.stdout.strip().splitlines()
+    if not lines or lines[-1] != "200":
+        return False
+    try:
+        body = json.loads("\n".join(lines[:-1]))
+        return bool(body.get("mime-types"))
+    except Exception:
+        return False
+
+
 def base_server_env(repo_root: Path, ocis_config_dir: str, ocis_public_url: str,
                     bridge_ip: str, wopi_type: str) -> dict:
     """
@@ -312,6 +333,10 @@ def main() -> int:
         procs.append(ocis_proc)
 
         wait_for(lambda: ocis_healthy(OCIS_URL), 300, "ocis")
+        # cs3 only: in builtin mode app-provider is excluded and the collaboration
+        # service (started later) registers the mime types, so /app/list stays empty here.
+        if wopi_type == "cs3":
+            wait_for(lambda: app_registry_ready(OCIS_URL), 60, "app registry")
         print("ocis ready.", flush=True)
 
         # --- Wait for fakeoffice discovery endpoint before starting WOPI service ---
