@@ -19,7 +19,6 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"math"
 	"os"
@@ -1249,6 +1248,24 @@ func (a *Account) EnableJetStream(limits map[string]JetStreamAccountLimits, tq c
 	jsa := &jsAccount{js: js, account: a, limits: limits, streams: make(map[string]*stream), sendq: sendq, usage: make(map[string]*jsaStorage)}
 	jsa.storeDir = filepath.Join(js.config.StoreDir, a.Name)
 
+	// Make sure the account's streams directory exists before the account is
+	// published, so that stream creation can't race with its setup. Do this
+	// before starting the usage timer and subscription below, so there is
+	// nothing to tear down if it fails.
+	sdir := filepath.Join(jsa.storeDir, streamsDir)
+	hasState := false
+	if _, err := os.Stat(sdir); err == nil {
+		hasState = true
+	} else if os.IsNotExist(err) {
+		if err := os.MkdirAll(sdir, defaultDirPerms); err != nil {
+			js.mu.Unlock()
+			return fmt.Errorf("could not create storage streams directory - %v", err)
+		}
+	} else {
+		js.mu.Unlock()
+		return fmt.Errorf("could not create storage streams directory - %v", err)
+	}
+
 	// A single server does not need to do the account updates at this point.
 	if js.cluster != nil || !s.standAloneMode() {
 		jsa.usageMu.Lock()
@@ -1286,17 +1303,7 @@ func (a *Account) EnableJetStream(limits map[string]JetStreamAccountLimits, tq c
 	// Clean up any old snapshots that were orphaned while staging.
 	os.RemoveAll(filepath.Join(js.config.StoreDir, snapStagingDir))
 
-	sdir := filepath.Join(jsa.storeDir, streamsDir)
-	if _, err := os.Stat(sdir); os.IsNotExist(err) {
-		if err := os.MkdirAll(sdir, defaultDirPerms); err != nil {
-			return fmt.Errorf("could not create storage streams directory - %v", err)
-		}
-		// Just need to make sure we can write to the directory.
-		// Remove the directory will create later if needed.
-		os.RemoveAll(sdir)
-		// when empty remove parent directory, which may have been created as well
-		os.Remove(jsa.storeDir)
-	} else {
+	if hasState {
 		// Restore any state here.
 		s.Debugf("Recovering JetStream state for account %q", a.Name)
 	}
@@ -1340,16 +1347,10 @@ func (a *Account) EnableJetStream(limits map[string]JetStreamAccountLimits, tq c
 				buf = nbuf
 			}
 
-			var cfg FileConsumerInfo
-			decoder := json.NewDecoder(bytes.NewReader(buf))
-			decoder.DisallowUnknownFields()
-			strictErr := decoder.Decode(&cfg)
-			if strictErr != nil {
-				cfg = FileConsumerInfo{}
-				if err := json.Unmarshal(buf, &cfg); err != nil {
-					s.Warnf("    Error unmarshalling consumer metafile %q: %v", metafile, err)
-					continue
-				}
+			cfg, strictErr, err := decodeConfig[FileConsumerInfo](buf)
+			if err != nil {
+				s.Warnf("    Error unmarshalling consumer metafile %q: %v", metafile, err)
+				continue
 			}
 			if supported := supportsRequiredApiLevel(cfg.Metadata); !supported || strictErr != nil {
 				var offlineReason string
@@ -1413,6 +1414,14 @@ func (a *Account) EnableJetStream(limits map[string]JetStreamAccountLimits, tq c
 			obs, err := mset.addConsumerWithAssignment(&cfg.ConsumerConfig, _EMPTY_, nil, true, ActionCreateOrUpdate, false)
 			if err != nil {
 				s.Warnf("    Error adding consumer '%s > %s > %s': %v", a.Name, mset.name(), cfg.Name, err)
+				// The deliver subject will never be valid, so remove the consumer.
+				// Otherwise recreating it would reuse this config.
+				if IsNatsErr(err, JSConsumerInvalidDeliverSubject) {
+					s.Warnf("    Removing consumer '%s > %s > %s' with reserved deliver subject %q", a.Name, mset.name(), cfg.Name, cfg.DeliverSubject)
+					if err := os.RemoveAll(filepath.Join(odir, ofi.Name())); err != nil {
+						s.Warnf("    Error removing consumer '%s > %s > %s': %v", a.Name, mset.name(), cfg.Name, err)
+					}
+				}
 				continue
 			}
 			if isEphemeral {
@@ -1490,17 +1499,13 @@ func (a *Account) EnableJetStream(limits map[string]JetStreamAccountLimits, tq c
 			plaintext = false
 		}
 
-		var cfg FileStreamInfo
-		decoder := json.NewDecoder(bytes.NewReader(buf))
-		decoder.DisallowUnknownFields()
-		strictErr := decoder.Decode(&cfg)
-		if strictErr != nil {
-			cfg = FileStreamInfo{}
-			if err := json.Unmarshal(buf, &cfg); err != nil {
-				s.Warnf("  Error unmarshalling stream metafile %q: %v", metafile, err)
-				return nil
-			}
+		cfg, strictErr, err := decodeConfig[FileStreamInfo](buf)
+		if err != nil {
+			s.Warnf("  Error unmarshalling stream metafile %q: %v", metafile, err)
+			return nil
 		}
+		// An unsupported stream also needs a storage type.
+		fixCfgUnsetStorage(&cfg.StreamConfig)
 		if supported := supportsRequiredApiLevel(cfg.Metadata); !supported || strictErr != nil {
 			var offlineReason string
 			if !supported {
@@ -2914,6 +2919,11 @@ func (s *Server) resourcesExceededError(storeType StorageType) {
 	}
 }
 
+// Returns whether a domain name can't be told apart from another JetStream subject.
+func isReservedDomainName(domain string) bool {
+	return domain == "ACK" || domain == "FC" || domain == "SNAPSHOT" || domain == "EVENT"
+}
+
 // For validating options.
 func validateJetStreamOptions(o *Options) error {
 	// in non operator mode, the account names need to be configured
@@ -2956,7 +2966,7 @@ func validateJetStreamOptions(o *Options) error {
 			if d == _EMPTY_ {
 				continue
 			}
-			if sub := fmt.Sprintf(jsDomainAPI, d); !IsValidSubject(sub) {
+			if sub := fmt.Sprintf(jsDomainAPI, d); !IsValidSubject(sub) || isReservedDomainName(d) {
 				return fmt.Errorf("default_js_domain contains account %q with invalid domain name %q", a, d)
 			}
 		}
@@ -2968,6 +2978,9 @@ func validateJetStreamOptions(o *Options) error {
 
 		if !isValidName(o.JetStreamDomain) {
 			return fmt.Errorf("invalid domain name: may not contain ., * or >")
+		}
+		if isReservedDomainName(o.JetStreamDomain) {
+			return fmt.Errorf("invalid domain name: %q is reserved", o.JetStreamDomain)
 		}
 	}
 	// If not clustered no checks needed past here.
@@ -3002,6 +3015,15 @@ func fixCfgMirrorWithDedupWindow(cfg *StreamConfig) {
 	}
 	if cfg.Duplicates != 0 {
 		cfg.Duplicates = 0
+	}
+}
+
+// fixCfgUnsetStorage defaults an unset storage type to file storage, like checkStreamCfg does.
+// Decoding leaves an unknown storage type of an unsupported stream unset.
+// The config can't be marshaled without a storage type.
+func fixCfgUnsetStorage(cfg *StreamConfig) {
+	if cfg != nil && cfg.Storage == 0 {
+		cfg.Storage = FileStorage
 	}
 }
 

@@ -1,5 +1,8 @@
 # Changelog
 
+## [v2.4.5](https://github.com/shamaton/msgpack/compare/v2.4.4...v2.4.5) - 2026-11-08
+- fix: handle interface destinations holding pointers or requiring methods by @shamaton in https://github.com/shamaton/msgpack/pull/153
+
 ## [v2.4.4](https://github.com/shamaton/msgpack/compare/v2.4.3...v2.4.4) - 2026-10-20
 - fix: validate 32-bit declared lengths in the buffer decoder (v2) by @shamaton in https://github.com/shamaton/msgpack/pull/144
 

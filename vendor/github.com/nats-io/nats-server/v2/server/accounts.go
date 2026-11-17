@@ -527,19 +527,23 @@ func (a *Account) updateRemoteServer(m *AccountNumConns) []*client {
 		}
 	}
 	// Now check leafnodes.
-	mtlce := a.mleafs != jwt.NoLimit && (a.nleafs+a.nrleafs > a.mleafs)
-	if mtlce {
+	var overLeafs int
+	if a.mleafs != jwt.NoLimit && (a.nleafs+a.nrleafs > a.mleafs) {
+		overLeafs = int(a.nleafs + a.nrleafs - a.mleafs)
+	}
+	// Release before the leaf list lock, since that one is held while taking client locks.
+	a.mu.Unlock()
+
+	if overLeafs > 0 {
 		// Take ones from the end.
 		a.lmu.RLock()
 		leafs := a.lleafs
-		over := int(a.nleafs + a.nrleafs - a.mleafs)
-		if over < len(leafs) {
-			leafs = leafs[len(leafs)-over:]
+		if overLeafs < len(leafs) {
+			leafs = leafs[len(leafs)-overLeafs:]
 		}
 		clients = append(clients, leafs...)
 		a.lmu.RUnlock()
 	}
-	a.mu.Unlock()
 
 	// If we have exceeded our max clients this will be populated.
 	return clients
@@ -673,6 +677,14 @@ func (a *Account) MaxTotalConnectionsReached() bool {
 	return mtce
 }
 
+// maxTotalConnectionsExceeded returns true if the account has more client
+// connections than its limit, counting connections already registered.
+func (a *Account) maxTotalConnectionsExceeded() bool {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	return a.mconns != jwt.NoLimit && len(a.clients)-int(a.sysclients)+int(a.nrclients) > int(a.mconns)
+}
+
 // MaxActiveConnections return the set limit for the account system
 // wide for total number of active connections.
 func (a *Account) MaxActiveConnections() int {
@@ -795,6 +807,12 @@ func (a *Account) AddWeightedMappings(src string, dests ...*MapDest) error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
+	// Account scoped mapping functions (e.g. {{account-hash()}}) are resolved into literals here, once.
+	pctx := subjectPlaceholderContext{account: a.Name}
+	var perr error
+	if src, perr = expandSubjectPlaceholders(src, pctx); perr != nil {
+		return perr
+	}
 	if !IsValidSubject(src) {
 		return ErrBadSubject
 	}
@@ -804,10 +822,14 @@ func (a *Account) AddWeightedMappings(src string, dests ...*MapDest) error {
 
 	tw := make(map[string]uint8)
 	for _, d := range dests {
-		if _, ok := seen[d.Subject]; ok {
-			return fmt.Errorf("duplicate entry for %q", d.Subject)
+		dest, err := expandSubjectPlaceholders(d.Subject, pctx)
+		if err != nil {
+			return err
 		}
-		seen[d.Subject] = struct{}{}
+		if _, ok := seen[dest]; ok {
+			return fmt.Errorf("duplicate entry for %q", dest)
+		}
+		seen[dest] = struct{}{}
 		if d.Weight > 100 {
 			return fmt.Errorf("individual weights need to be <= 100")
 		}
@@ -815,11 +837,10 @@ func (a *Account) AddWeightedMappings(src string, dests ...*MapDest) error {
 		if tw[d.Cluster] > 100 {
 			return fmt.Errorf("total weight needs to be <= 100")
 		}
-		err := ValidateMapping(src, d.Subject)
-		if err != nil {
+		if err = ValidateMapping(src, dest); err != nil {
 			return err
 		}
-		tr, err := NewSubjectTransform(src, d.Subject)
+		tr, err := NewSubjectTransform(src, dest)
 		if err != nil {
 			return err
 		}
@@ -913,6 +934,10 @@ func (a *Account) AddWeightedMappings(src string, dests ...*MapDest) error {
 func (a *Account) RemoveMapping(src string) bool {
 	a.mu.Lock()
 	defer a.mu.Unlock()
+	// Sources are stored with account scoped mapping functions resolved.
+	if expanded, err := expandSubjectPlaceholders(src, subjectPlaceholderContext{account: a.Name}); err == nil {
+		src = expanded
+	}
 	for i, m := range a.mappings {
 		if m.src == src {
 			// Swap last one into this spot. Its ok to change order.
@@ -3572,9 +3597,17 @@ func (s *Server) updateAccountClaimsWithRefresh(a *Account, ac *jwt.AccountClaim
 		}
 	}
 	// collect mappings that need to be removed
+	// Mapping sources are stored with account scoped mapping functions resolved, compare against the same.
+	pctx := subjectPlaceholderContext{account: a.Name}
+	claimMappings := make(map[string]struct{}, len(ac.Mappings))
+	for sub := range ac.Mappings {
+		if src, err := expandSubjectPlaceholders(string(sub), pctx); err == nil {
+			claimMappings[src] = struct{}{}
+		}
+	}
 	removeList := []string{}
 	for _, m := range a.mappings {
-		if _, ok := ac.Mappings[jwt.Subject(m.src)]; !ok {
+		if _, ok := claimMappings[m.src]; !ok {
 			removeList = append(removeList, m.src)
 		}
 	}
@@ -3614,15 +3647,18 @@ func (s *Server) updateAccountClaimsWithRefresh(a *Account, ac *jwt.AccountClaim
 
 	jsEnabled := s.JetStreamEnabled()
 
-	streamTokenExpirationChanged := false
-	serviceTokenExpirationChanged := false
-
 	for _, e := range ac.Exports {
+		// Account scoped mapping functions (e.g. {{account-hash()}}) are resolved into literals here, once.
+		subject, err := expandSubjectPlaceholders(string(e.Subject), pctx)
+		if err != nil {
+			s.Errorf("Error adding %s export %q for account [%s]: %v", e.Type, e.Subject, tl, err)
+			continue
+		}
 		switch e.Type {
 		case jwt.Stream:
-			s.Debugf("Adding stream export %q for %s", e.Subject, tl)
+			s.Debugf("Adding stream export %q for %s", subject, tl)
 			if err := a.addStreamExportWithAccountPos(
-				string(e.Subject), authAccounts(e.TokenReq), e.AccountTokenPosition,
+				subject, authAccounts(e.TokenReq), e.AccountTokenPosition,
 			); err != nil {
 				s.Debugf("Error adding stream export to account [%s]: %v", tl, err.Error())
 			}
@@ -3636,12 +3672,12 @@ func (s *Server) updateAccountClaimsWithRefresh(a *Account, ac *jwt.AccountClaim
 				rt = Chunked
 			}
 			if err := a.addServiceExportWithResponseAndAccountPos(
-				string(e.Subject), rt, authAccounts(e.TokenReq), e.AccountTokenPosition,
+				subject, rt, authAccounts(e.TokenReq), e.AccountTokenPosition,
 			); err != nil {
 				s.Debugf("Error adding service export to account [%s]: %v", tl, err)
 				continue
 			}
-			sub := string(e.Subject)
+			sub := subject
 			if e.Latency != nil {
 				if err := a.TrackServiceExportWithSampling(sub, string(e.Latency.Results), int(e.Latency.Sampling)); err != nil {
 					hdrNote := _EMPTY_
@@ -3662,41 +3698,22 @@ func (s *Server) updateAccountClaimsWithRefresh(a *Account, ac *jwt.AccountClaim
 			}
 		}
 
-		var revocationChanged *bool
 		var ea *exportAuth
 
 		a.mu.Lock()
 		switch e.Type {
 		case jwt.Stream:
-			revocationChanged = &streamTokenExpirationChanged
-			if se, ok := a.exports.streams[string(e.Subject)]; ok && se != nil {
+			if se, ok := a.exports.streams[subject]; ok && se != nil {
 				ea = &se.exportAuth
 			}
 		case jwt.Service:
-			revocationChanged = &serviceTokenExpirationChanged
-			if se, ok := a.exports.services[string(e.Subject)]; ok && se != nil {
+			if se, ok := a.exports.services[subject]; ok && se != nil {
 				ea = &se.exportAuth
 			}
 		}
+		// Revocation changes are detected when comparing the exports against old below.
 		if ea != nil {
-			oldRevocations := ea.actsRevoked
-			if len(e.Revocations) == 0 {
-				// remove all, no need to evaluate existing imports
-				ea.actsRevoked = nil
-			} else if len(oldRevocations) == 0 {
-				// add all, existing imports need to be re evaluated
-				ea.actsRevoked = e.Revocations
-				*revocationChanged = true
-			} else {
-				ea.actsRevoked = e.Revocations
-				// diff, existing imports need to be conditionally re evaluated, depending on:
-				// if a key was added, or it's timestamp increased
-				for k, t := range e.Revocations {
-					if tOld, ok := oldRevocations[k]; !ok || tOld < t {
-						*revocationChanged = true
-					}
-				}
-			}
+			ea.actsRevoked = e.Revocations
 		}
 		a.mu.Unlock()
 	}
@@ -3715,6 +3732,14 @@ func (s *Server) updateAccountClaimsWithRefresh(a *Account, ac *jwt.AccountClaim
 		acc.mu.RLock()
 		atl := acc.traceLabel()
 		acc.mu.RUnlock()
+		// Account scoped mapping functions (e.g. {{account-hash-import()}}) are resolved into literals here, once.
+		// Work on a copy of the claim so that everything kept for this import uses the resolved subjects.
+		ic := *i
+		if err := expandImportClaimPlaceholders(&ic, subjectPlaceholderContext{account: a.Name, importAccount: acc.Name}); err != nil {
+			s.Errorf("Error adding %s import %q for account [%s]: %v", i.Type, i.Subject, tl, err)
+			continue
+		}
+		i := &ic
 		// Grab from and to
 		from, to := string(i.Subject), i.GetTo()
 		switch i.Type {
@@ -3729,7 +3754,7 @@ func (s *Server) updateAccountClaimsWithRefresh(a *Account, ac *jwt.AccountClaim
 				err = a.AddStreamImportWithClaim(acc, from, to, i)
 			}
 			if err != nil {
-				s.Debugf("Error adding stream import to account [%s]: %v", tl, err.Error())
+				s.Errorf("Error adding stream import %q from account %s to account %s: %v", i.Subject, atl, tl, err)
 				incompleteImports = append(incompleteImports, i)
 			}
 		case jwt.Service:
@@ -3739,7 +3764,7 @@ func (s *Server) updateAccountClaimsWithRefresh(a *Account, ac *jwt.AccountClaim
 			}
 			s.Debugf("Adding service import %s:%q for %s:%q", atl, from, tl, to)
 			if err := a.AddServiceImportWithClaim(acc, from, to, i); err != nil {
-				s.Debugf("Error adding service import to account [%s]: %v", tl, err.Error())
+				s.Errorf("Error adding service import %q from account %s to account %s: %v", i.Subject, atl, tl, err)
 				incompleteImports = append(incompleteImports, i)
 			}
 		}
@@ -3754,7 +3779,7 @@ func (s *Server) updateAccountClaimsWithRefresh(a *Account, ac *jwt.AccountClaim
 		}
 	}
 	// Now check if stream exports have changed.
-	if !a.checkStreamExportsEqual(old) || signersChanged || streamTokenExpirationChanged {
+	if !a.checkStreamExportsEqual(old) || signersChanged {
 		clients := map[*client]struct{}{}
 		// We need to check all accounts that have an import claim from this account.
 		awcsti := map[string]struct{}{}
@@ -3789,7 +3814,7 @@ func (s *Server) updateAccountClaimsWithRefresh(a *Account, ac *jwt.AccountClaim
 		}
 	}
 	// Now check if service exports have changed.
-	if !a.checkServiceExportsEqual(old) || signersChanged || serviceTokenExpirationChanged {
+	if !a.checkServiceExportsEqual(old) || signersChanged {
 		// We must only allow one goroutine to go through here, otherwise we could deadlock
 		// due to locking two accounts in succession.
 		s.mu.Lock()
@@ -4150,7 +4175,7 @@ func buildPermissionsFromJwt(uc *jwt.Permissions) *Permissions {
 
 // Helper to build internal NKeyUser.
 func buildInternalNkeyUser(uc *jwt.UserClaims, acts map[string]struct{}, acc *Account) *NkeyUser {
-	nu := &NkeyUser{Nkey: uc.Subject, Account: acc, AllowedConnectionTypes: acts, Issued: uc.IssuedAt}
+	nu := &NkeyUser{Nkey: uc.Subject, Account: acc, AllowedConnectionTypes: acts, Issued: uc.IssuedAt, limits: &uc.NatsLimits}
 	if uc.IssuerAccount != _EMPTY_ {
 		nu.SigningKey = uc.Issuer
 	}
@@ -4473,14 +4498,23 @@ func validateAccountClaimMappings(claim *jwt.AccountClaims) error {
 	if claim == nil {
 		return nil
 	}
-	for src, wms := range claim.Mappings {
-		if !IsValidSubject(string(src)) {
+	// The claim subject is the account public key, which is the name of the account once built.
+	pctx := subjectPlaceholderContext{account: claim.Subject}
+	for rawSrc, wms := range claim.Mappings {
+		src, err := expandSubjectPlaceholders(string(rawSrc), pctx)
+		if err != nil {
+			return fmt.Errorf("mapping %q: %w", rawSrc, err)
+		}
+		if !IsValidSubject(src) {
 			return fmt.Errorf("mapping %q: %w", src, ErrBadSubject)
 		}
 		seen := make(map[string]struct{})
 		tw := make(map[string]uint8)
 		for _, m := range wms {
-			dest := string(m.Subject)
+			dest, err := expandSubjectPlaceholders(string(m.Subject), pctx)
+			if err != nil {
+				return fmt.Errorf("mapping %q -> %q: %w", src, m.Subject, err)
+			}
 			if _, ok := seen[dest]; ok {
 				return fmt.Errorf("mapping %q: duplicate entry for %q", src, dest)
 			}
@@ -4493,13 +4527,37 @@ func validateAccountClaimMappings(claim *jwt.AccountClaims) error {
 			if tw[m.Cluster] > 100 {
 				return fmt.Errorf("mapping %q: total weight needs to be <= 100", src)
 			}
-			if err := ValidateMapping(string(src), dest); err != nil {
+			if err := ValidateMapping(src, dest); err != nil {
 				return fmt.Errorf("mapping %q -> %q: %v", src, dest, err)
 			}
-			if _, err := NewSubjectTransform(string(src), dest); err != nil {
+			if _, err := NewSubjectTransform(src, dest); err != nil {
 				return fmt.Errorf("mapping %q -> %q: %v", src, dest, err)
 			}
 		}
+	}
+	return nil
+}
+
+// expandImportClaimPlaceholders resolves the account scoped mapping functions in the subjects of an import claim.
+func expandImportClaimPlaceholders(i *jwt.Import, ctx subjectPlaceholderContext) error {
+	subject, err := expandSubjectPlaceholders(string(i.Subject), ctx)
+	if err != nil {
+		return err
+	}
+	i.Subject = jwt.Subject(subject)
+	if i.LocalSubject != _EMPTY_ {
+		local, err := expandSubjectPlaceholders(string(i.LocalSubject), ctx)
+		if err != nil {
+			return err
+		}
+		i.LocalSubject = jwt.RenamingSubject(local)
+	}
+	if to := i.GetTo(); to != _EMPTY_ {
+		to, err := expandSubjectPlaceholders(to, ctx)
+		if err != nil {
+			return err
+		}
+		i.To = jwt.Subject(to) //nolint:staticcheck // deprecated field, still honored by the server.
 	}
 	return nil
 }
