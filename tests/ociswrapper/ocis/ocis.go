@@ -138,6 +138,38 @@ func WaitForConnection() (bool, string) {
 			}
 
 			log.Println("oCIS server is ready to accept requests")
+
+			// Wait for all core services to report ready via /readyz before
+			// returning. The proxy endpoint becoming 200 is not enough — services
+			// like storage-users, sharing, and gateway can still be initialising,
+			// causing 5xx errors in the first few test steps.
+			coreServices := []string{
+				"gateway",
+				"sharing",
+				"storageusers",
+				"storageshares",
+				"proxy",
+				"graph",
+				"settings",
+				"frontend",
+				"users",
+			}
+
+			type serviceResult struct {
+				service string
+				ok      bool
+			}
+			results := make(chan serviceResult, len(coreServices))
+			for _, svc := range coreServices {
+				svc := svc
+				go func() { results <- serviceResult{svc, waitServiceReady(svc)} }()
+			}
+			for range coreServices {
+				if r := <-results; !r.ok {
+					return false, fmt.Sprintf("Timeout waiting for %s to become ready", r.service)
+				}
+			}
+
 			return true, "oCIS server is up and running"
 		}
 	}
