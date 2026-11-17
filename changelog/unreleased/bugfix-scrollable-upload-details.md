@@ -5,3 +5,5 @@ the upload panel grew the list past the top of the screen. The list could not
 be scrolled and "Hide details" was out of reach until the page was reloaded.
 The list now has a maximum height and scrolls, so the panel's title bar and
 buttons stay visible.
+
+https://github.com/owncloud/ocis/pull/13494
