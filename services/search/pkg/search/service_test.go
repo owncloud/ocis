@@ -409,11 +409,18 @@ var _ = Describe("Searchprovider", func() {
 			pathMissing map[string]bool // GetPath answers NOT_FOUND
 			pathBroken  map[string]bool // GetPath answers with an internal error
 			indexed     map[string]bool // already indexed and unchanged
-			newService  = func(maxConsecutiveFailures int) *search.Service {
+			// failedAt: indexed by name only, extraction failed at that time.
+			failedAt map[string]time.Time
+			// failedRetryInterval is the SEARCH_EXTRACTOR_FAILED_RETRY_INTERVAL of newService.
+			failedRetryInterval time.Duration
+			now                 = time.Date(2026, 11, 17, 12, 0, 0, 0, time.UTC)
+			newService          = func(maxConsecutiveFailures int) *search.Service {
 				cfg := &config.Config{}
 				cfg.Extractor.MaxConsecutiveFailures = maxConsecutiveFailures
+				cfg.Extractor.FailedRetryInterval = failedRetryInterval
 				s := search.NewService(gatewaySelector, indexClient, extractor, logger, cfg)
 				s.SetExtractionRetryDelay(time.Millisecond)
+				s.SetNow(func() time.Time { return now })
 				return s
 			}
 			spaceID = &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"}
@@ -426,6 +433,8 @@ var _ = Describe("Searchprovider", func() {
 			pathMissing = map[string]bool{}
 			pathBroken = map[string]bool{}
 			indexed = map[string]bool{}
+			failedAt = map[string]time.Time{}
+			failedRetryInterval = 0
 			gatewayClient.On("GetUserByClaim", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserByClaimResponse{
 				Status: status.NewOK(context.Background()),
 				User:   user,
@@ -497,13 +506,17 @@ var _ = Describe("Searchprovider", func() {
 			}, nil)
 			indexClient.On("Lookup", mock.Anything).Return(
 				func(id string) *engine.Resource {
+					indexedMtime := content.Document{Mtime: time.Unix(6000, 0).UTC().Format(time.RFC3339Nano)}
 					if indexed[id] {
-						return &engine.Resource{ID: id, Extracted: true, Document: content.Document{Mtime: time.Unix(6000, 0).UTC().Format(time.RFC3339Nano)}}
+						return &engine.Resource{ID: id, Extracted: true, Document: indexedMtime}
+					}
+					if t, ok := failedAt[id]; ok {
+						return &engine.Resource{ID: id, ExtractionFailedAt: t.Format(time.RFC3339Nano), Document: indexedMtime}
 					}
 					return nil
 				},
 				func(id string) error {
-					if indexed[id] {
+					if _, ok := failedAt[id]; indexed[id] || ok {
 						return nil
 					}
 					return engine.ErrResourceNotFound
@@ -666,6 +679,95 @@ var _ = Describe("Searchprovider", func() {
 
 			err := newService(2).IndexSpace(context.Background(), spaceID)
 			Expect(err).ShouldNot(HaveOccurred(), "failures separated by a healthy file are not consecutive")
+		})
+
+		Describe("with a retry interval for failed extractions", func() {
+			var (
+				file0     string
+				extracted []string
+			)
+			BeforeEach(func() {
+				failedRetryInterval = 24 * time.Hour
+				file0 = storagespace.FormatResourceID(fileInfos[0].Id)
+				extracted = nil
+				extractor.On("Extract", mock.Anything, mock.MatchedBy(func(ri *sprovider.ResourceInfo) bool {
+					return ri.GetId().GetOpaqueId() == "file-0"
+				}), mock.Anything).Run(func(args mock.Arguments) {
+					extracted = append(extracted, "file-0")
+				}).Return(content.Document{}, errors.New("extractor timed out"))
+				extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+					extracted = append(extracted, args.Get(1).(*sprovider.ResourceInfo).GetId().GetOpaqueId())
+				}).Return(content.Document{}, nil)
+			})
+
+			It("indexes a file whose extraction failed by name only, dated", func() {
+				err := newService(5).IndexSpace(context.Background(), spaceID)
+				Expect(err).ShouldNot(HaveOccurred())
+				indexClient.AssertCalled(GinkgoT(), "Upsert", file0, mock.MatchedBy(func(r engine.Resource) bool {
+					return !r.Extracted && r.Path == "./file-0.pdf" && r.Content == "" &&
+						r.ExtractionFailedAt == now.Format(time.RFC3339Nano)
+				}))
+				indexClient.AssertNumberOfCalls(GinkgoT(), "Upsert", numFiles)
+			})
+
+			It("leaves an unchanged file alone while its failure is recent", func() {
+				failedAt[file0] = now.Add(-time.Hour)
+
+				err := newService(5).IndexSpace(context.Background(), spaceID)
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(extracted).To(ConsistOf("file-1", "file-2", "file-3", "file-4", "file-5"))
+				indexClient.AssertNumberOfCalls(GinkgoT(), "Upsert", numFiles-1)
+			})
+
+			It("tries a file again once the interval has passed", func() {
+				failedAt[file0] = now.Add(-25 * time.Hour)
+
+				err := newService(5).IndexSpace(context.Background(), spaceID)
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(extracted).To(ContainElement("file-0"))
+			})
+
+			It("tries a file again as soon as it has changed", func() {
+				failedAt[file0] = now.Add(-time.Hour)
+				fileInfos[0].Mtime = &typesv1beta1.Timestamp{Seconds: 7000} // newer than the index entry
+
+				err := newService(5).IndexSpace(context.Background(), spaceID)
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(extracted).To(ContainElement("file-0"))
+			})
+
+			It("tries a file on every walk when the interval is 0", func() {
+				failedRetryInterval = 0
+				failedAt[file0] = now.Add(-time.Hour)
+
+				err := newService(5).IndexSpace(context.Background(), spaceID)
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(extracted).To(ContainElement("file-0"))
+				indexClient.AssertNumberOfCalls(GinkgoT(), "Upsert", numFiles-1) // and records nothing
+			})
+
+			It("does not count a skipped file towards the abort threshold", func() {
+				for _, fi := range fileInfos {
+					failedAt[storagespace.FormatResourceID(fi.Id)] = now.Add(-time.Hour)
+				}
+
+				err := newService(1).IndexSpace(context.Background(), spaceID)
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(extracted).To(BeEmpty())
+			})
+
+			It("records nothing when the walk's context ends during the extraction", func() {
+				ctx, cancel := context.WithCancel(context.Background())
+				defer cancel()
+				extractor.ExpectedCalls = nil
+				extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Run(func(_ mock.Arguments) {
+					cancel()
+				}).Return(content.Document{}, errors.New("context canceled"))
+
+				err := newService(5).IndexSpace(ctx, spaceID)
+				Expect(err).Should(HaveOccurred())
+				indexClient.AssertNotCalled(GinkgoT(), "Upsert", mock.Anything, mock.Anything)
+			})
 		})
 	})
 
