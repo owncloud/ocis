@@ -14,7 +14,18 @@ import signal
 import time
 import tempfile
 import shutil
+import threading
 from pathlib import Path
+
+
+def filter_tls_noise(proc):
+    def _reader():
+        for line in proc.stderr:
+            if b"TLS handshake error" not in line:
+                sys.stderr.buffer.write(line)
+                sys.stderr.buffer.flush()
+    threading.Thread(target=_reader, daemon=True).start()
+
 
 # ---------------------------------------------------------------------------
 # Config sourced from .drone.star
@@ -464,7 +475,9 @@ def main() -> int:
          "--admin-username", "admin",
          "--admin-password", "admin"],
         env=server_env,
+        stderr=subprocess.PIPE,
     )
+    filter_tls_noise(wrapper_proc)
     procs.append(wrapper_proc)
 
     # start federation ocis server (second instance on port 10200)
@@ -499,7 +512,9 @@ def main() -> int:
         fed_proc = subprocess.Popen(
             [str(ocis_bin), "server"],
             env=fed_env,
+            stderr=subprocess.PIPE,
         )
+        filter_tls_noise(fed_proc)
         procs.append(fed_proc)
 
     # ---------------------------------------------------------------------------
@@ -593,7 +608,9 @@ def main() -> int:
             environment["COLLABORATION_APP_ADDR"] = "http://localhost:8080"
         environment["COLLABORATION_WOPI_SRC"] = f"http://localhost:{ports['http']}"
         print(f"Starting {service_name}...")
-        return [subprocess.Popen([str(ocis_bin), "collaboration", "server"], env=environment)]
+        collab_proc = subprocess.Popen([str(ocis_bin), "collaboration", "server"], env=environment, stderr=subprocess.PIPE)
+        filter_tls_noise(collab_proc)
+        return [collab_proc]
 
     def ocisHealthCheck(name, services=[]):
         # drone: curl healthz + readyz on each service (timeout 300s)
@@ -651,6 +668,40 @@ def main() -> int:
         if cfg["federationServer"]:
             wait_for(lambda: ocis_healthy(ocis_fed_url), 300, "federation ocis")
             print("federation ocis ready.")
+
+        if cfg["vaultStorage"]:
+            vault_data_dir = Path.home() / "ocis/storage/users-vault"
+            vault_data_dir.mkdir(parents=True, exist_ok=True)
+            # Inherit the full server env so the process has PATH, OCIS_JWT_SECRET,
+            # OCIS_CONFIG_DIR, SSL settings, etc. — then override with vault-specific values.
+            vault_env = {
+                **server_env,
+                "STORAGE_USERS_ENABLE_VAULT_MODE": "true",
+                "STORAGE_USERS_SERVICE_NAME": "storage-users-vault",
+                "STORAGE_USERS_GRPC_ADDR": "localhost:19285",
+                "STORAGE_USERS_HTTP_ADDR": "localhost:19286",
+                "STORAGE_USERS_DATA_SERVER_URL": "http://localhost:19286/data",
+                "STORAGE_USERS_DEBUG_ADDR": "localhost:19287",
+                "STORAGE_USERS_OCIS_ROOT": str(vault_data_dir),
+                "STORAGE_USERS_EVENTS_CONSUMER_GROUP": "vault-dcfs",
+            }
+            print("Starting storage-users-vault...")
+            vault_proc = subprocess.Popen(
+                [str(ocis_bin), "storage-users", "server"],
+                env=vault_env,
+                stderr=subprocess.PIPE,
+            )
+            filter_tls_noise(vault_proc)
+            procs.append(vault_proc)
+            wait_for(
+                lambda: subprocess.run(
+                    ["curl", "-sf", "http://localhost:19287/healthz"],
+                    capture_output=True,
+                ).returncode == 0,
+                120, "storage-users-vault",
+            )
+            print("vault ready.")
+
 
         # expected failures file
         if acceptance_test_type == "core-api":
