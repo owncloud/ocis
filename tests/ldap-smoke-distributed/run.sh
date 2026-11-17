@@ -112,7 +112,7 @@ env \
   OCIS_LOG_COLOR="false" \
   OCIS_INSECURE="true" \
   PROXY_ENABLE_BASIC_AUTH="true" \
-  "$OCIS_BIN" server &
+  "$OCIS_BIN" server 2> >(grep -v "TLS handshake error" >&2) &
 OCIS_PID=$!
 
 echo -n "[*] Waiting for oCIS "
