@@ -12,8 +12,19 @@ import shutil
 import signal
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
+
+
+def filter_tls_noise(proc):
+    def _reader():
+        for line in proc.stderr:
+            if b"TLS handshake error" not in line:
+                sys.stderr.buffer.write(line)
+                sys.stderr.buffer.flush()
+    threading.Thread(target=_reader, daemon=True).start()
+
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -197,7 +208,9 @@ def main() -> int:
     ocis_proc = subprocess.Popen(
         [str(ocis_bin), "server"],
         env=server_env,
+        stderr=subprocess.PIPE,
     )
+    filter_tls_noise(ocis_proc)
 
     def cleanup(*_):
         try:
