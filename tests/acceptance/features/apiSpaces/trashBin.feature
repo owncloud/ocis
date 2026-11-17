@@ -93,13 +93,14 @@ Feature: Restore files, folder
       | permissionsRole | <space-role>    |
     And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And user "Alice" has removed the file "newFolder/file.txt" from space "restore objects"
-    When user "Brian" deletes the file "file.txt" from the trash of the space "restore objects"
+    When user "Brian" tries to delete the file "file.txt" found by user "Alice" from the trash of the space "restore objects"
     Then the HTTP status code should be "<http-status-code>"
     And as "Alice" file "file.txt" <should-or-not-be-in-trash> exist in the trashbin of the space "restore objects"
     Examples:
       | space-role   | http-status-code | should-or-not-be-in-trash |
       | Manager      | 204              | should not                |
       | Space Editor | 403              | should                    |
+      | Space Viewer | 403              | should                    |
 
 
   Scenario Outline: admin user who is not a member of space cannot see its trash bin
