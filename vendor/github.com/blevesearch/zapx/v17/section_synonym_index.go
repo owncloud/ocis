@@ -298,7 +298,7 @@ func (so *synonymIndexOpaque) writeThesauri(w *FileWriter) error {
 	buf := so.grabBuf(binary.MaxVarintLen64)
 
 	if so.builder == nil {
-		so.builder, err = vellum.New(&so.builderBuf, nil)
+		so.builder, err = vellum.New(&so.builderBuf, vellumBuilderOpts)
 		if err != nil {
 			return err
 		}
@@ -573,7 +573,7 @@ func mergeAndPersistSynonymSection(segments []*SegmentBase, dropsIn []*roaring.B
 	thesaurusAddrs := make(map[int]int)
 
 	var vellumBuf bytes.Buffer
-	newVellum, err := vellum.New(&vellumBuf, nil)
+	newVellum, err := vellum.New(&vellumBuf, vellumBuilderOpts)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -21,11 +21,10 @@ func SetData(data map[string]any) {
 
 // SetData for override the Config.Data
 func (c *Config) SetData(data map[string]any) {
-	c.lock.Lock()
-	c.data = data
-	c.lock.Unlock()
-
-	c.fireHook(OnSetData)
+	_ = c.writeAndHook(OnSetData, func() error {
+		c.data = data
+		return nil
+	})
 }
 
 // Set value by key. setByPath default is true
@@ -39,24 +38,32 @@ func (c *Config) Set(key string, val any, setByPath ...bool) (err error) {
 		return ErrReadonly
 	}
 
-	c.lock.Lock()
-	defer c.lock.Unlock()
-
 	sep := c.opts.Delimiter
 	if key = formatKey(key, string(sep)); key == "" {
 		return ErrKeyIsEmpty
 	}
 
-	defer c.fireHook(OnSetValue)
+	// tip: the lock order is hookMu -> lock, see Config.writeAndHook().
+	return c.writeAndHook(OnSetValue, func() error {
+		return c.setValue(key, val, sep, setByPath)
+	})
+}
+
+// setValue set the value to data by key. the c.lock must be locked by the caller.
+func (c *Config) setValue(key string, val any, sep byte, setByPath []bool) error {
+	if c.data == nil {
+		c.data = make(map[string]any)
+	}
+
 	if strings.IndexByte(key, sep) == -1 {
 		c.data[key] = val
-		return
+		return nil
 	}
 
 	// disable set by path.
 	if len(setByPath) > 0 && !setByPath[0] {
 		c.data[key] = val
-		return
+		return nil
 	}
 
 	// set by path

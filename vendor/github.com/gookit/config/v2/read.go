@@ -1,6 +1,10 @@
 package config
 
 import (
+	"maps"
+	"math"
+	"reflect"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -16,6 +20,9 @@ func Exists(key string, findByPath ...bool) bool { return dc.Exists(key, findByP
 
 // Exists key exists check
 func (c *Config) Exists(key string, findByPath ...bool) (ok bool) {
+	c.lock.RLock()
+	defer c.lock.RUnlock()
+
 	sep := c.opts.Delimiter
 	if key = formatKey(key, string(sep)); key == "" {
 		return
@@ -35,55 +42,8 @@ func (c *Config) Exists(key string, findByPath ...bool) (ok bool) {
 		return
 	}
 
-	keys := strings.Split(key, string(sep))
-	topK := keys[0]
-
-	// find top item data based on top key
-	var item any
-	if item, ok = c.data[topK]; !ok {
-		return
-	}
-	for _, k := range keys[1:] {
-		switch typeData := item.(type) {
-		case map[string]int: // is map(from Set)
-			if item, ok = typeData[k]; !ok {
-				return
-			}
-		case map[string]string: // is map(from Set)
-			if item, ok = typeData[k]; !ok {
-				return
-			}
-		case map[string]any: // is map(decode from toml/json/yaml.v3)
-			if item, ok = typeData[k]; !ok {
-				return
-			}
-		case map[any]any: // is map(decode from yaml.v2)
-			if item, ok = typeData[k]; !ok {
-				return
-			}
-		case []int: // is array(is from Set)
-			i, err := strconv.Atoi(k)
-			if err != nil || i >= len(typeData) {
-				return false
-			}
-			item = typeData[i]
-		case []string: // is array(is from Set)
-			i, err := strconv.Atoi(k)
-			if err != nil || i >= len(typeData) {
-				return false
-			}
-			item = typeData[i]
-		case []any: // is array(load from file)
-			i, err := strconv.Atoi(k)
-			if err != nil || i >= len(typeData) {
-				return false
-			}
-			item = typeData[i]
-		default: // error
-			return false
-		}
-	}
-	return true
+	_, ok = maputil.GetByPathKeys(c.data, strings.Split(key, string(sep)))
+	return
 }
 
 /*************************************************************
@@ -120,6 +80,9 @@ func Keys() []string { return dc.Keys() }
 
 // Keys get all config data
 func (c *Config) Keys() []string {
+	c.lock.RLock()
+	defer c.lock.RUnlock()
+
 	keys := make([]string, 0, len(c.data))
 	for key := range c.data {
 		keys = append(keys, key)
@@ -176,77 +139,40 @@ func (c *Config) GetValue(key string, findByPath ...bool) (value any, ok bool) {
 		return
 	}
 
+	// find by path, the bracket index syntax (eg. "top.arr[1]") is handled there
 	keys := strings.Split(key, string(sep))
-	topK := keys[0]
-
-	// find top item data based on top key
-	var item any
-	if item, ok = c.data[topK]; !ok {
-		// c.addError(ErrNotFound)
-		return
+	if val, found := maputil.GetByPathKeys(c.data, keys); found {
+		return val, true
 	}
 
-	// find child
-	// NOTICE: don't merge case, will result in an error.
-	// e.g. case []int, []string
-	// OR
-	// case []int:
-	// case []string:
-	for _, k := range keys[1:] {
-		switch typeData := item.(type) {
-		case map[string]int: // is map(from Set)
-			if item, ok = typeData[k]; !ok {
-				return
-			}
-		case map[string]string: // is map(from Set)
-			if item, ok = typeData[k]; !ok {
-				return
-			}
-		case map[string]any: // is map(decode from toml/json)
-			if item, ok = typeData[k]; !ok {
-				return
-			}
-		case map[any]any: // is map(decode from yaml)
-			if item, ok = typeData[k]; !ok {
-				return
-			}
-		case []int: // is array(is from Set)
-			i, err := strconv.Atoi(k)
+	c.recordGetPathError(key, keys)
+	return nil, false
+}
 
-			// check slice index
-			if err != nil || len(typeData) <= i {
-				ok = false
-				c.addError(err)
-				return
+// recordGetPathError reports a path that runs into a value which cannot have sub-keys,
+// eg. "name.sub" when "name" is a string. A missing key stays silent, as before.
+func (c *Config) recordGetPathError(key string, keys []string) {
+	for i := len(keys) - 1; i >= 1; i-- {
+		if val, ok := maputil.GetByPathKeys(c.data, keys[:i]); ok {
+			if !canHaveSubValue(val) {
+				c.addErrorf("cannot get value of the key '%s'", key)
 			}
-
-			item = typeData[i]
-		case []string: // is array(is from Set)
-			i, err := strconv.Atoi(k)
-			if err != nil || len(typeData) <= i {
-				ok = false
-				c.addError(err)
-				return
-			}
-
-			item = typeData[i]
-		case []any: // is array(load from file)
-			i, err := strconv.Atoi(k)
-			if err != nil || len(typeData) <= i {
-				ok = false
-				c.addError(err)
-				return
-			}
-
-			item = typeData[i]
-		default: // error
-			ok = false
-			c.addErrorf("cannot get value of the key '%s'", key)
 			return
 		}
 	}
+}
 
-	return item, true
+// canHaveSubValue reports whether the value can be walked into by a sub key.
+func canHaveSubValue(val any) bool {
+	if val == nil {
+		return false
+	}
+
+	switch reflect.ValueOf(val).Kind() {
+	case reflect.Map, reflect.Slice, reflect.Array:
+		return true
+	}
+	return false
 }
 
 /*************************************************************
@@ -279,12 +205,15 @@ func (c *Config) MustString(key string) string {
 }
 
 func (c *Config) getString(key string) (value string, ok bool) {
+	enableCache := c.opts.EnableCache
+	var gen uint64
+
 	// find from cache
-	if c.opts.EnableCache && len(c.strCache) > 0 {
-		value, ok = c.strCache[key]
-		if ok {
+	if enableCache {
+		if value, ok = c.cachedString(key); ok {
 			return
 		}
+		gen = c.cacheGeneration()
 	}
 
 	val, ok := c.GetValue(key)
@@ -308,11 +237,8 @@ func (c *Config) getString(key string) (value string, ok bool) {
 	}
 
 	// add cache
-	if ok && c.opts.EnableCache {
-		if c.strCache == nil {
-			c.strCache = make(map[string]string)
-		}
-		c.strCache[key] = value
+	if enableCache {
+		c.cacheString(gen, key, value)
 	}
 	return
 }
@@ -325,7 +251,12 @@ func (c *Config) Int(key string, defVal ...int) (value int) {
 	i64, exist := c.tryInt64(key)
 
 	if exist {
-		value = int(i64)
+		// the int64 value may be out of the int range on 32-bit platforms
+		if i64 > math.MaxInt || i64 < math.MinInt {
+			c.addErrorf("the int value '%d' of key '%s' is out of range", i64, key)
+		} else {
+			value = int(i64)
+		}
 	} else if len(defVal) > 0 {
 		value = defVal[0]
 	}
@@ -337,10 +268,10 @@ func Uint(key string, defVal ...uint) uint { return dc.Uint(key, defVal...) }
 
 // Uint get a int value, if not found return default value
 func (c *Config) Uint(key string, defVal ...uint) (value uint) {
-	i64, exist := c.tryInt64(key)
+	u64, exist := c.tryUint(key)
 
 	if exist {
-		value = uint(i64)
+		value = uint(u64)
 	} else if len(defVal) > 0 {
 		value = defVal[0]
 	}
@@ -366,10 +297,26 @@ func (c *Config) tryInt64(key string) (value int64, ok bool) {
 	if !ok {
 		return
 	}
-
-	value, err := strconv.ParseInt(strVal, 10, 0)
+	value, err := strconv.ParseInt(strVal, 10, 64)
 	if err != nil {
 		c.addError(err)
+		value = 0 // reset the value on error, don't return the clamped max/min value
+	}
+	return
+}
+
+// try to get an uint value by given key
+func (c *Config) tryUint(key string) (value uint64, ok bool) {
+	strVal, ok := c.getString(key)
+	if !ok {
+		return
+	}
+
+	// the bitSize is the platform uint width, so a value out of range records an error
+	value, err := strconv.ParseUint(strVal, 10, strconv.IntSize)
+	if err != nil {
+		c.addError(err)
+		value = 0 // reset the value on error, don't return the clamped max value
 	}
 	return
 }
@@ -422,6 +369,7 @@ func (c *Config) Float(key string, defVal ...float64) (value float64) {
 	value, err := strconv.ParseFloat(str, 64)
 	if err != nil {
 		c.addError(err)
+		value = 0 // reset the value on error, don't return the clamped +Inf/-Inf
 	}
 	return
 }
@@ -470,6 +418,9 @@ func (c *Config) Bool(key string, defVal ...bool) (value bool) {
 func Ints(key string) []int { return dc.Ints(key) }
 
 // Ints get config data as an int slice/array
+//
+// Note: when ParseEnv is enabled, a string elem is parsed by ParseEnvValue before
+// the conversion, so a "${PORT}" elem reads the env value.
 func (c *Config) Ints(key string) (arr []int) {
 	rawVal, ok := c.GetValue(key)
 	if !ok {
@@ -479,10 +430,21 @@ func (c *Config) Ints(key string) (arr []int) {
 	switch typeData := rawVal.(type) {
 	case []int:
 		arr = typeData
+	case []string: // from Set
+		for _, v := range typeData {
+			iv, err := mathutil.ToInt(c.parseEnvValue(v))
+			if err != nil {
+				c.addError(err)
+				arr = arr[0:0] // reset
+				return
+			}
+
+			arr = append(arr, iv)
+		}
 	case []any:
 		for _, v := range typeData {
-			iv, err := mathutil.ToInt(v)
 			// iv, err := strconv.Atoi(fmt.Sprintf("%v", v))
+			iv, err := mathutil.ToInt(c.parseEnvValue(v))
 			if err != nil {
 				c.addError(err)
 				arr = arr[0:0] // reset
@@ -501,6 +463,9 @@ func (c *Config) Ints(key string) (arr []int) {
 func IntMap(key string) map[string]int { return dc.IntMap(key) }
 
 // IntMap get config data as a map[string]int
+//
+// Note: when ParseEnv is enabled, a string value is parsed by ParseEnvValue before
+// the conversion, so a "${PORT}" value reads the env value.
 func (c *Config) IntMap(key string) (mp map[string]int) {
 	rawVal, ok := c.GetValue(key)
 	if !ok {
@@ -510,11 +475,22 @@ func (c *Config) IntMap(key string) (mp map[string]int) {
 	switch typeData := rawVal.(type) {
 	case map[string]int: // from Set
 		mp = typeData
+	case map[string]string: // from Set
+		mp = make(map[string]int, len(typeData))
+		for k, v := range typeData {
+			iv, err := mathutil.ToInt(c.parseEnvValue(v))
+			if err != nil {
+				c.addError(err)
+				mp = map[string]int{} // reset
+				return
+			}
+			mp[k] = iv
+		}
 	case map[string]any: // decode from json,toml
 		mp = make(map[string]int)
 		for k, v := range typeData {
 			// iv, err := strconv.Atoi(fmt.Sprintf("%v", v))
-			iv, err := mathutil.ToInt(v)
+			iv, err := mathutil.ToInt(c.parseEnvValue(v))
 			if err != nil {
 				c.addError(err)
 				mp = map[string]int{} // reset
@@ -526,7 +502,7 @@ func (c *Config) IntMap(key string) (mp map[string]int) {
 		mp = make(map[string]int)
 		for k, v := range typeData {
 			// iv, err := strconv.Atoi(fmt.Sprintf( "%v", v))
-			iv, err := mathutil.ToInt(v)
+			iv, err := mathutil.ToInt(c.parseEnvValue(v))
 			if err != nil {
 				c.addError(err)
 				mp = map[string]int{} // reset
@@ -547,14 +523,20 @@ func (c *Config) IntMap(key string) (mp map[string]int) {
 func Strings(key string) []string { return dc.Strings(key) }
 
 // Strings get config data as a string slice/array
+//
+// Note: when ParseEnv is enabled, a string elem is parsed by ParseEnvValue and a copy
+// of the []string value is returned. Otherwise the []string value of the config data
+// may be returned directly, do not change the returned slice in that case.
 func (c *Config) Strings(key string) (arr []string) {
-	var ok bool
+	enableCache := c.opts.EnableCache
+	var gen uint64
+
 	// find from cache
-	if c.opts.EnableCache && len(c.sArrCache) > 0 {
-		arr, ok = c.sArrCache[key]
-		if ok {
-			return
+	if enableCache {
+		if cached, ok := c.cachedStringArr(key); ok {
+			return cached
 		}
+		gen = c.cacheGeneration()
 	}
 
 	rawVal, ok := c.GetValue(key)
@@ -565,10 +547,15 @@ func (c *Config) Strings(key string) (arr []string) {
 	switch typeData := rawVal.(type) {
 	case []string:
 		arr = typeData
+		if c.opts.ParseEnv {
+			arr = slices.Clone(typeData)
+			for i, value := range arr {
+				arr[i] = envutil.ParseEnvValue(value)
+			}
+		}
 	case []any:
 		for _, v := range typeData {
-			// arr = append(arr, fmt.Sprintf("%v", v))
-			arr = append(arr, strutil.MustString(v))
+			arr = append(arr, c.parseEnvString(v))
 		}
 	default:
 		c.addErrorf("value cannot be convert to []string, key is '%s'", key)
@@ -576,13 +563,25 @@ func (c *Config) Strings(key string) (arr []string) {
 	}
 
 	// add cache
-	if c.opts.EnableCache {
-		if c.sArrCache == nil {
-			c.sArrCache = make(map[string]strArr)
-		}
-		c.sArrCache[key] = arr
+	if enableCache {
+		c.cacheStringArr(gen, key, arr)
 	}
 	return
+}
+
+// parseEnvString convert a slice elem value to a string. a string elem is parsed by
+// ParseEnv when it is enabled, the other types use strutil.MustString as before.
+// parseEnvValue parses the ${VAR} references of a string value when ParseEnv is
+// enabled. Any other value, and any value with ParseEnv off, is returned as-is.
+func (c *Config) parseEnvValue(value any) any {
+	if str, ok := value.(string); ok && c.opts.ParseEnv {
+		return envutil.ParseEnvValue(str)
+	}
+	return value
+}
+
+func (c *Config) parseEnvString(value any) string {
+	return strutil.MustString(c.parseEnvValue(value))
 }
 
 // StringsBySplit get []string by split a string value.
@@ -600,15 +599,20 @@ func (c *Config) StringsBySplit(key, sep string) (ss []string) {
 func StringMap(key string) map[string]string { return dc.StringMap(key) }
 
 // StringMap get config data as a map[string]string
+//
+// Note: when ParseEnv is enabled, a map[string]string value from Set or LoadData is
+// parsed by ParseEnvValue and a copy of it is returned. Otherwise the map[string]string
+// value of the config data is returned directly, do not change the returned map in that case.
 func (c *Config) StringMap(key string) (mp map[string]string) {
-	var ok bool
+	enableCache := c.opts.EnableCache
+	var gen uint64
 
 	// find from cache
-	if c.opts.EnableCache && len(c.sMapCache) > 0 {
-		mp, ok = c.sMapCache[key]
-		if ok {
-			return
+	if enableCache {
+		if cached, ok := c.cachedStringMap(key); ok {
+			return cached
 		}
+		gen = c.cacheGeneration()
 	}
 
 	rawVal, ok := c.GetValue(key)
@@ -619,6 +623,12 @@ func (c *Config) StringMap(key string) (mp map[string]string) {
 	switch typeData := rawVal.(type) {
 	case map[string]string: // from Set
 		mp = typeData
+		if c.opts.ParseEnv {
+			mp = maps.Clone(typeData)
+			for k, v := range mp {
+				mp[k] = envutil.ParseEnvValue(v)
+			}
+		}
 	case map[string]any: // decode from json,toml,yaml.v3
 		mp = make(map[string]string, len(typeData))
 
@@ -657,11 +667,8 @@ func (c *Config) StringMap(key string) (mp map[string]string) {
 	}
 
 	// add cache
-	if c.opts.EnableCache {
-		if c.sMapCache == nil {
-			c.sMapCache = make(map[string]strMap)
-		}
-		c.sMapCache[key] = mp
+	if enableCache {
+		c.cacheStringMap(gen, key, mp)
 	}
 	return
 }

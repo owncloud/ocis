@@ -114,7 +114,7 @@ func mergeAndPersistInvertedSection(segments []*SegmentBase, dropsIn []*roaring.
 	locEncoder := newChunkedIntCoder(1024, newSegDocCount-1)
 
 	var vellumBuf bytes.Buffer
-	newVellum, err := vellum.New(&vellumBuf, nil)
+	newVellum, err := vellum.New(&vellumBuf, vellumBuilderOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -475,7 +475,7 @@ func (io *invertedIndexOpaque) writeDicts(w *FileWriter) error {
 	var docTermMap [][]byte
 
 	if io.builder == nil {
-		io.builder, err = vellum.New(&io.builderBuf, nil)
+		io.builder, err = vellum.New(&io.builderBuf, vellumBuilderOpts)
 		if err != nil {
 			return err
 		}

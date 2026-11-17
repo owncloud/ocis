@@ -1,22 +1,22 @@
 module github.com/owncloud/ocis/v2
 
-go 1.26.10
+go 1.27
 
 require (
 	dario.cat/mergo v1.0.2
 	github.com/CiscoM31/godata v1.0.11
-	github.com/KimMachineGun/automemlimit v1.0.1
+	github.com/KimMachineGun/automemlimit v1.0.2
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc/v2 v2.1.0
 	github.com/Nerzal/gocloak/v13 v13.9.0
 	github.com/bbalet/stopwords v1.0.0
 	github.com/beevik/etree v1.8.1
-	github.com/blevesearch/bleve/v2 v2.6.1
+	github.com/blevesearch/bleve/v2 v2.6.3
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/cenkalti/backoff/v5 v5.0.3
 	github.com/coreos/go-oidc/v3 v3.21.0
 	github.com/cs3org/go-cs3apis v0.0.0-20241105092511-3ad35d174fc1
-	github.com/davidbyttow/govips/v2 v2.19.0
+	github.com/davidbyttow/govips/v2 v2.20.0
 	github.com/dhowden/tag v0.0.0-20240417053706-3d75831295e8
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/egirna/icap-client v0.1.1
@@ -42,31 +42,31 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/google/go-tika v0.3.1
 	github.com/google/uuid v1.6.0
-	github.com/gookit/config/v2 v2.2.9
+	github.com/gookit/config/v2 v2.2.10
 	github.com/gorilla/mux v1.8.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.31.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.33.0
 	github.com/invopop/validation v0.8.0
 	github.com/jellydator/ttlcache/v2 v2.11.1
 	github.com/jellydator/ttlcache/v3 v3.4.1
 	github.com/jinzhu/now v1.1.5
 	github.com/justinas/alice v1.2.0
-	github.com/kovidgoyal/imaging v1.8.23
-	github.com/leonelquinteros/gotext v1.7.2
+	github.com/kovidgoyal/imaging v1.9.0
+	github.com/leonelquinteros/gotext v1.8.0
 	github.com/libregraph/idm v0.5.0
 	github.com/libregraph/lico v0.69.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mna/pigeon v1.3.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/nats-io/jwt/v2 v2.8.2
+	github.com/nats-io/jwt/v2 v2.8.3
 	github.com/nats-io/nats-server/v2 v2.15.2
 	github.com/nats-io/nats.go v1.55.0
-	github.com/nats-io/nkeys v0.4.16
+	github.com/nats-io/nkeys v0.4.17
 	github.com/olekukonko/tablewriter v1.1.5
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/ginkgo/v2 v2.34.0
 	github.com/onsi/gomega v1.44.0
-	github.com/open-policy-agent/opa v1.21.1
+	github.com/open-policy-agent/opa v1.22.2
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245
 	github.com/owncloud/reva/v2 v2.0.0-20261111122448-2d13639eb8b5
@@ -77,18 +77,18 @@ require (
 	github.com/rogpeppe/go-internal v1.16.0
 	github.com/rs/cors v1.11.1
 	github.com/rs/zerolog v1.35.1
-	github.com/shamaton/msgpack/v2 v2.4.4
+	github.com/shamaton/msgpack/v2 v2.4.5
 	github.com/sirupsen/logrus v1.10.2
 	github.com/spf13/afero v1.15.0
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.12.1
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.6
-	github.com/tidwall/gjson v1.20.0
+	github.com/tidwall/gjson v1.20.2
 	github.com/tus/tusd/v2 v2.10.1
 	github.com/unrolled/secure v1.17.0
 	github.com/urfave/cli/v2 v2.27.7
-	github.com/xhit/go-simple-mail/v2 v2.16.0
+	github.com/xhit/go-simple-mail/v2 v2.17.0
 	go-micro.dev/v4 v4.11.0
 	go.etcd.io/bbolt v1.5.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.72.0
@@ -100,14 +100,14 @@ require (
 	go.opentelemetry.io/otel/sdk v1.47.0
 	go.opentelemetry.io/otel/trace v1.47.0
 	golang.org/x/crypto v0.58.0
-	golang.org/x/exp v0.0.0-20260908205506-85c1c2202aba
-	golang.org/x/image v0.46.0
+	golang.org/x/exp v0.0.0-20261014143641-f0251eb4aa3e
+	golang.org/x/image v0.47.0
 	golang.org/x/net v0.62.0
-	golang.org/x/oauth2 v0.37.0
-	golang.org/x/sync v0.24.0
-	golang.org/x/term v0.47.0
-	golang.org/x/text v0.43.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20260928230214-8a89bd6388cc
+	golang.org/x/oauth2 v0.38.0
+	golang.org/x/sync v0.25.0
+	golang.org/x/term v0.48.0
+	golang.org/x/text v0.44.0
+	google.golang.org/genproto/googleapis/api v0.0.0-20261026165753-2ffab32bce7e
 	google.golang.org/grpc v1.86.0-dev
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v2 v2.4.0
@@ -139,23 +139,23 @@ require (
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/bits-and-blooms/bitset v1.24.2 // indirect
 	github.com/blevesearch/bleve_index_api v1.4.1 // indirect
-	github.com/blevesearch/geo v0.2.6 // indirect
+	github.com/blevesearch/geo v0.2.8 // indirect
 	github.com/blevesearch/go-faiss v1.1.5 // indirect
 	github.com/blevesearch/go-porterstemmer v1.0.3 // indirect
 	github.com/blevesearch/gtreap v0.1.1 // indirect
 	github.com/blevesearch/mmap-go v1.2.0 // indirect
-	github.com/blevesearch/scorch_segment_api/v2 v2.4.10 // indirect
+	github.com/blevesearch/scorch_segment_api/v2 v2.4.11 // indirect
 	github.com/blevesearch/segment v0.9.1 // indirect
 	github.com/blevesearch/snowballstem v0.9.0 // indirect
 	github.com/blevesearch/upsidedown_store_api v1.0.2 // indirect
-	github.com/blevesearch/vellum v1.2.0 // indirect
+	github.com/blevesearch/vellum v1.2.1 // indirect
 	github.com/blevesearch/zapx/v11 v11.4.3 // indirect
 	github.com/blevesearch/zapx/v12 v12.4.3 // indirect
 	github.com/blevesearch/zapx/v13 v13.4.3 // indirect
 	github.com/blevesearch/zapx/v14 v14.4.3 // indirect
 	github.com/blevesearch/zapx/v15 v15.4.3 // indirect
 	github.com/blevesearch/zapx/v16 v16.3.4 // indirect
-	github.com/blevesearch/zapx/v17 v17.2.3 // indirect
+	github.com/blevesearch/zapx/v17 v17.2.5 // indirect
 	github.com/bluele/gcache v0.0.2 // indirect
 	github.com/bombsimon/logrusr/v3 v3.1.0 // indirect
 	github.com/ceph/go-ceph v0.42.1 // indirect
@@ -225,7 +225,7 @@ require (
 	github.com/google/go-tpm v0.9.8 // indirect
 	github.com/google/pprof v0.0.0-20260604005048-7023385849c0 // indirect
 	github.com/google/renameio/v2 v2.0.2 // indirect
-	github.com/gookit/goutil v0.8.0 // indirect
+	github.com/gookit/goutil v0.8.6 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/schema v1.4.1 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
@@ -294,7 +294,6 @@ require (
 	github.com/prometheus/common v0.72.0 // indirect
 	github.com/prometheus/procfs v0.22.0 // indirect
 	github.com/prometheus/statsd_exporter v0.22.8 // indirect
-	github.com/rcrowley/go-metrics v0.0.0-20250401214520-65e299d6c5c9 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/russellhaering/goxmldsig v1.6.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
@@ -309,14 +308,13 @@ require (
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/stretchr/objx v0.5.3 // indirect
 	github.com/studio-b12/gowebdav v0.9.0 // indirect
-	github.com/tchap/go-patricia/v2 v2.3.3 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
-	github.com/tidwall/pretty v1.2.1 // indirect
+	github.com/tidwall/pretty v1.3.0 // indirect
 	github.com/tinylib/msgp v1.6.4 // indirect
 	github.com/toorop/go-dkim v0.0.0-20201103131630-e1cd1a0a5208 // indirect
 	github.com/trustelem/zxcvbn v1.0.1 // indirect
 	github.com/valyala/fastjson v1.6.10 // indirect
-	github.com/vektah/gqlparser/v2 v2.5.37 // indirect
+	github.com/vektah/gqlparser/v2 v2.5.58 // indirect
 	github.com/wk8/go-ordered-map v1.0.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
@@ -337,12 +335,12 @@ require (
 	go.uber.org/zap v1.27.1 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
-	golang.org/x/mod v0.41.0 // indirect
-	golang.org/x/sys v0.49.0 // indirect
+	golang.org/x/mod v0.42.0 // indirect
+	golang.org/x/sys v0.50.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
-	golang.org/x/tools v0.51.0 // indirect
+	golang.org/x/tools v0.52.0 // indirect
 	google.golang.org/genproto v0.0.0-20260622175928-b703f567277d // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260928230214-8a89bd6388cc // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b // indirect
 	gopkg.in/cenkalti/backoff.v1 v1.1.0 // indirect
 	gopkg.in/ini.v1 v1.67.3 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect

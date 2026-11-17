@@ -76,6 +76,11 @@ func ToTimeIn(s string, loc *time.Location, layouts ...string) (t time.Time, err
 	}
 
 	// auto match use some commonly layouts.
+	if len(s) > 19 && s[10] == 'T' && (s[19] == '.' || s[19] == ',') {
+		if parsed, parseErr := time.ParseInLocation(time.RFC3339Nano, s, loc); parseErr == nil {
+			return parsed, nil
+		}
+	}
 	strLn := len(s)
 	maybeLayouts, ok := layoutMap[strLn]
 	if !ok {
@@ -158,8 +163,8 @@ func ParseSizeRange(expr string, opt *ParseSizeOpt) (min, max uint64, err error)
 	}
 
 	// parse size range. eg: "1KB~2MB"
-	if strings.IndexByte(expr, '~') > -1 {
-		s1, s2 := TrimCut(expr, "~")
+	if strings.IndexByte(expr, opt.SepChar) > -1 {
+		s1, s2 := TrimCut(expr, string(opt.SepChar))
 		if s1 != "" {
 			min, err = ToByteSize(s1)
 			if err != nil {
@@ -217,6 +222,9 @@ func ToByteSize(sizeStr string) (uint64, error) {
 	}
 
 	if sizeStr[lastPos] == 'b' || sizeStr[lastPos] == 'B' {
+		if lastPos == 0 {
+			return 0, ErrInvalidSizeExpr
+		}
 		// last second char is k,m,g,t
 		lastSec := sizeStr[lastPos-1]
 		if lastSec > 'A' {
