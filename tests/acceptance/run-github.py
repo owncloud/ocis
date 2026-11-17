@@ -13,7 +13,18 @@ import signal
 import time
 import tempfile
 import shutil
+import threading
 from pathlib import Path
+
+
+def filter_tls_noise(proc):
+    def _reader():
+        for line in proc.stderr:
+            if b"TLS handshake error" not in line:
+                sys.stderr.buffer.write(line)
+                sys.stderr.buffer.flush()
+    threading.Thread(target=_reader, daemon=True).start()
+
 
 # ---------------------------------------------------------------------------
 
@@ -607,7 +618,9 @@ def main() -> int:
          "--admin-username", "admin",
          "--admin-password", "admin"],
         env=server_env,
+        stderr=subprocess.PIPE,
     )
+    filter_tls_noise(wrapper_proc)
     procs.append(wrapper_proc)
 
     # start federation ocis server (second instance on port 10200)
@@ -642,7 +655,9 @@ def main() -> int:
         fed_proc = subprocess.Popen(
             [str(ocis_bin), "server"],
             env=fed_env,
+            stderr=subprocess.PIPE,
         )
+        filter_tls_noise(fed_proc)
         procs.append(fed_proc)
 
     # ---------------------------------------------------------------------------
@@ -750,7 +765,9 @@ def main() -> int:
             environment["COLLABORATION_APP_ADDR"] = "http://localhost:8080"
         environment["COLLABORATION_WOPI_SRC"] = f"http://localhost:{ports['http']}"
         print(f"Starting {service_name}...")
-        return [subprocess.Popen([str(ocis_bin), "collaboration", "server"], env=environment)]
+        collab_proc = subprocess.Popen([str(ocis_bin), "collaboration", "server"], env=environment, stderr=subprocess.PIPE)
+        filter_tls_noise(collab_proc)
+        return [collab_proc]
 
     def ocisHealthCheck(name, services=[]):
         # drone: curl healthz + readyz on each service (timeout 300s)
@@ -834,7 +851,9 @@ def main() -> int:
             vault_proc = subprocess.Popen(
                 [str(ocis_bin), "storage-users", "server"],
                 env=vault_env,
+                stderr=subprocess.PIPE,
             )
+            filter_tls_noise(vault_proc)
             procs.append(vault_proc)
             wait_for(
                 lambda: subprocess.run(
