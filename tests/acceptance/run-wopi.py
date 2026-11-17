@@ -16,8 +16,19 @@ import socket
 import subprocess
 import sys
 import time
+import threading
 import urllib.parse
 from pathlib import Path
+
+
+def filter_tls_noise(proc):
+    def _reader():
+        for line in proc.stderr:
+            if b"TLS handshake error" not in line:
+                sys.stderr.buffer.write(line)
+                sys.stderr.buffer.flush()
+    threading.Thread(target=_reader, daemon=True).start()
+
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -295,7 +306,8 @@ def main() -> int:
         )
 
         print("Starting ocis...", flush=True)
-        ocis_proc = subprocess.Popen([str(ocis_bin), "server"], env=server_env)
+        ocis_proc = subprocess.Popen([str(ocis_bin), "server"], env=server_env, stderr=subprocess.PIPE)
+        filter_tls_noise(ocis_proc)
         procs.append(ocis_proc)
 
         wait_for(lambda: ocis_healthy(OCIS_URL), 300, "ocis")
@@ -318,7 +330,9 @@ def main() -> int:
             collab_proc = subprocess.Popen(
                 [str(ocis_bin), "collaboration", "server"],
                 env=collab_env,
+                stderr=subprocess.PIPE,
             )
+            filter_tls_noise(collab_proc)
             procs.append(collab_proc)
         else:
             # cs3: patch wopiserver.conf (replace container hostname with bridge_ip),
