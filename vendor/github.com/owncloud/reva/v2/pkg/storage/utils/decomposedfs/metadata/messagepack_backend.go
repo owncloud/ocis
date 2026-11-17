@@ -72,7 +72,7 @@ func (b MessagePackBackend) Get(ctx context.Context, path, key string) ([]byte, 
 	}
 	val, ok := attribs[key]
 	if !ok {
-		return []byte{}, &xattr.Error{Op: "mpk.get", Path: path, Name: key, Err: xattr.ENOATTR}
+		return []byte{}, &xattr.Error{Op: "mpk.get", Path: path, Name: key, Err: ErrAttrUnset}
 	}
 	return val, nil
 }
@@ -85,7 +85,7 @@ func (b MessagePackBackend) GetInt64(ctx context.Context, path, key string) (int
 	}
 	val, ok := attribs[key]
 	if !ok {
-		return 0, &xattr.Error{Op: "mpk.get", Path: path, Name: key, Err: xattr.ENOATTR}
+		return 0, &xattr.Error{Op: "mpk.get", Path: path, Name: key, Err: ErrAttrUnset}
 	}
 	i, err := strconv.ParseInt(string(val), 10, 64)
 	if err != nil {
