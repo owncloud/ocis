@@ -288,13 +288,41 @@ describe('Collabora Save As postMessage handling', () => {
   })
 })
 
+describe('view mode', () => {
+  it.each([
+    { isReadOnly: true, canDownload: true, expected: 'read' },
+    { isReadOnly: true, canDownload: false, expected: 'view' },
+    { isReadOnly: false, canDownload: true, expected: 'write' }
+  ])(
+    'requests "$expected" when isReadOnly=$isReadOnly and canDownload=$canDownload',
+    async ({ isReadOnly, canDownload, expected }) => {
+      const makeRequest = vi
+        .fn()
+        .mockResolvedValue({ ok: true, status: 200, data: providerSuccessResponseGet })
+      createShallowMountWrapper(makeRequest, { isReadOnly, canDownload })
+      await flushPromises()
+      expect(makeRequest).toHaveBeenCalledWith(
+        'POST',
+        expect.stringContaining(`view_mode=${expected}`),
+        expect.anything()
+      )
+    }
+  )
+})
+
 function createShallowMountWrapper(
   makeRequest = vi.fn().mockResolvedValue({ status: 200 }),
   {
     appName = 'example-app',
     isReadOnly = false,
-    openAsPreview = true
-  }: { appName?: string; isReadOnly?: boolean; openAsPreview?: boolean | string[] } = {}
+    openAsPreview = true,
+    canDownload = false
+  }: {
+    appName?: string
+    isReadOnly?: boolean
+    openAsPreview?: boolean | string[]
+    canDownload?: boolean
+  } = {}
 ) {
   vi.mocked(useRequest).mockImplementation(() => ({
     makeRequest
@@ -327,7 +355,7 @@ function createShallowMountWrapper(
     wrapper: shallowMount(App, {
       props: {
         space: null,
-        resource: mock<Resource>({ name: 'document.odt' }),
+        resource: mock<Resource>({ name: 'document.odt', canDownload: () => canDownload }),
         isReadOnly
       },
       global: {
