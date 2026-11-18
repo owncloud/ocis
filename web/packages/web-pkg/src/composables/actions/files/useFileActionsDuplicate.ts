@@ -11,7 +11,7 @@ import { isProjectSpaceResource, Resource, SpaceResource } from '@ownclouders/we
 import { useRouter } from '../../router'
 import { useResourcesStore } from '../../piniaStores'
 import { storeToRefs } from 'pinia'
-import { ResourceTransfer, TransferType } from '../../../helpers/resource'
+import { getResourcesAtTarget, ResourceTransfer, TransferType } from '../../../helpers/resource'
 import { useClientService } from '../../clientService'
 import { usePasteWorker } from '../../webWorkers/pasteWorker'
 
@@ -50,10 +50,19 @@ export const useFileActionsDuplicate = () => {
       return
     }
 
+    const originalCurrentFolderId = unref(currentFolder)?.id
+
     startWorker(transferData, async ({ successful, failed }) => {
       resourceTransfer.showResultMessage(failed, successful, TransferType.DUPLICATE)
 
-      if (!successful.length) {
+      // incomplete folder copies exist too, so they are shown as well
+      const resourcesAtTarget = getResourcesAtTarget(successful, failed)
+      if (!resourcesAtTarget.length) {
+        return
+      }
+
+      // user has navigated to another location meanwhile -> no need to update store
+      if (unref(currentFolder) && originalCurrentFolderId !== unref(currentFolder).id) {
         return
       }
 
@@ -61,7 +70,7 @@ export const useFileActionsDuplicate = () => {
       const loadingResources: Promise<void>[] = []
       const fetchedResources: Resource[] = []
 
-      for (const resource of successful) {
+      for (const resource of resourcesAtTarget) {
         loadingResources.push(
           (async () => {
             const movedResource = await clientService.webdav.getFileInfo(targetSpace, resource)
