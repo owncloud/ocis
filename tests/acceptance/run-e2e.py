@@ -71,8 +71,12 @@ def main() -> int:
     mfa_needed = os.environ.get("MFA_NEEDED", "").lower() == "true"
     oidc_needed = os.environ.get("OIDC_NEEDED", "").lower() == "true"
     oidc_iframe_needed = os.environ.get("OIDC_IFRAME_NEEDED", "").lower() == "true"
-    # MFA mode runs ocis behind keycloak with TOTP enforced
-    keycloak_needed = keycloak_needed or mfa_needed
+    vault_storage_needed = (
+        os.environ.get("VAULT_STORAGE_NEEDED", "").lower() == "true"
+        or os.environ.get("VAULT_MODE", "").lower() == "true"
+    )
+    # MFA and vault mode run ocis behind keycloak
+    keycloak_needed = keycloak_needed or mfa_needed or vault_storage_needed
 
     repo_root = Path(__file__).resolve().parents[2]
     ocis_bin = repo_root / "ocis/bin/ocis"
