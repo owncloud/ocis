@@ -3,6 +3,7 @@ package bleve
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/blevesearch/bleve/v2"
 	bleveQuery "github.com/blevesearch/bleve/v2/search/query"
@@ -388,6 +389,14 @@ func dateTimeQuery(n *ast.DateTimeNode) bleveQuery.Query {
 	case "<=":
 		q.End.Time = n.Value
 		q.InclusiveEnd = &[]bool{true}[0]
+	case "=", ":":
+		// Date equality: match any time within the same calendar day [day, day+24h)
+		start := n.Value.UTC().Truncate(24 * time.Hour)
+		end := start.Add(24 * time.Hour)
+		q.Start.Time = start
+		q.InclusiveStart = &[]bool{true}[0]
+		q.End.Time = end
+		q.InclusiveEnd = &[]bool{false}[0]
 	default:
 		return nil
 	}
