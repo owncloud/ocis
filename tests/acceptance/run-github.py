@@ -194,13 +194,14 @@ def merged_config(suites: list) -> dict:
         "tikaNeeded": False,
         "federationServer": False,
         "collaborationServiceNeeded": False,
+        "vaultStorage": False,
         "extraServerEnvironment": {},
         "extraEnvironment": {},
     }
     for suite in suites:
         cfg = _SUITE_TO_CONFIG.get(suite, {})
         for flag in ("emailNeeded", "antivirusNeeded", "tikaNeeded",
-                     "federationServer", "collaborationServiceNeeded"):
+                     "federationServer", "collaborationServiceNeeded", "vaultStorage"):
             if cfg.get(flag):
                 merged[flag] = True
         merged["extraServerEnvironment"].update(cfg.get("extraServerEnvironment", {}))
