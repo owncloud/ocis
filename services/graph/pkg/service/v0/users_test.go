@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -271,7 +272,7 @@ var _ = Describe("Users", func() {
 					Id: libregraph.PtrString("user"),
 				}
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
-				roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: assignments}, nil)
+				roleService.On("ListRoleAssignmentsFiltered", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: assignments}, nil)
 				valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
 					Return(&settings.GetValueResponse{
 						Value: &settingsmsg.ValueWithIdentifier{
@@ -616,14 +617,16 @@ var _ = Describe("Users", func() {
 						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
 					},
 				}, nil)
-				roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(func(ctx context.Context, in *settings.ListRoleAssignmentsRequest, opts ...client.CallOption) *settings.ListRoleAssignmentsResponse {
-					return &settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{
-						{
+				roleService.On("ListRoleAssignmentsFiltered", mock.Anything, mock.Anything, mock.Anything).Return(func(ctx context.Context, in *settings.ListRoleAssignmentsFilteredRequest, opts ...client.CallOption) *settings.ListRoleAssignmentsResponse {
+					assignments := make([]*settingsmsg.UserRoleAssignment, 0, len(in.GetFilters()))
+					for _, f := range in.GetFilters() {
+						assignments = append(assignments, &settingsmsg.UserRoleAssignment{
 							Id:          "some-appRoleAssignment-ID",
-							AccountUuid: in.GetAccountUuid(),
+							AccountUuid: f.GetAccountUuid(),
 							RoleId:      "some-appRole-ID",
-						},
-					}}
+						})
+					}
+					return &settings.ListRoleAssignmentsResponse{Assignments: assignments}
 				}, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$expand=appRoleAssignments", nil)
@@ -656,6 +659,36 @@ var _ = Describe("Users", func() {
 				Expect(responseUsers[1].GetAppRoleAssignments()[0].GetPrincipalId()).To(Equal("user2"))
 				Expect(responseUsers[1].GetAppRoleAssignments()[0].GetResourceId()).To(Equal("some-application-ID"))
 
+			})
+
+			It("resolves appRoleAssignments for all users in a single bulk call, not one per user", func() {
+				const numUsers = 20
+				users := make([]*libregraph.User, 0, numUsers)
+				for i := 0; i < numUsers; i++ {
+					u := &libregraph.User{}
+					u.SetId(fmt.Sprintf("user%d", i))
+					u.SetMail(fmt.Sprintf("user%d@example.com", i))
+					users = append(users, u)
+				}
+				identityBackend.On("GetUsers", mock.Anything, mock.Anything, mock.Anything).Return(users, nil)
+
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
+				roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{}, nil)
+				roleService.On("ListRoleAssignmentsFiltered", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$expand=appRoleAssignments", nil)
+				r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+				r = r.WithContext(revactx.SetMFA(r.Context()))
+				svc.GetUsers(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+				roleService.AssertNumberOfCalls(GinkgoT(), "ListRoleAssignmentsFiltered", 1)
+				roleService.AssertNumberOfCalls(GinkgoT(), "ListRoleAssignments", 0)
 			})
 		})
 
@@ -1752,7 +1785,7 @@ var _ = Describe("Users", func() {
 						RoleId:      "some-appRole-ID",
 					},
 				}
-				roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: assignments}, nil)
+				roleService.On("ListRoleAssignmentsFiltered", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: assignments}, nil)
 				valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
 					Return(&settings.GetValueResponse{
 						Value: &settingsmsg.ValueWithIdentifier{
