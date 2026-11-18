@@ -3,6 +3,7 @@ package bleve
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/blevesearch/bleve/v2"
 	bleveQuery "github.com/blevesearch/bleve/v2/search/query"
@@ -369,6 +370,77 @@ func mimeType(k, v string) (bleveQuery.Query, bool) {
 		return bleveQuery.NewQueryStringQuery(k + ":" + v), false
 	}
 }
+
+func dateTimeQuery(n *ast.DateTimeNode) bleveQuery.Query {
+	if n.Operator == nil {
+		return nil
+	}
+
+	q := &bleveQuery.DateRangeQuery{
+		Start:    bleveQuery.BleveQueryTime{},
+		End:      bleveQuery.BleveQueryTime{},
+		FieldVal: getField(n.Key),
+	}
+
+	switch n.Operator.Value {
+	case ">":
+		q.Start.Time = n.Value
+		q.InclusiveStart = &[]bool{false}[0]
+	case ">=":
+		q.Start.Time = n.Value
+		q.InclusiveStart = &[]bool{true}[0]
+	case "<":
+		q.End.Time = n.Value
+		q.InclusiveEnd = &[]bool{false}[0]
+	case "<=":
+		q.End.Time = n.Value
+		q.InclusiveEnd = &[]bool{true}[0]
+	case "=", ":":
+		// Date equality: match any time within the same calendar day [day, day+24h)
+		start := n.Value.UTC().Truncate(24 * time.Hour)
+		end := start.Add(24 * time.Hour)
+		q.Start.Time = start
+		q.InclusiveStart = &[]bool{true}[0]
+		q.End.Time = end
+		q.InclusiveEnd = &[]bool{false}[0]
+	default:
+		return nil
+	}
+
+	return q
+}
+
+func numericQuery(n *ast.NumericNode) bleveQuery.Query {
+	if n.Operator == nil {
+		return nil
+	}
+
+	var minVal, maxVal *float64
+	var minInclusive, maxInclusive *bool
+	val := n.Value
+
+	switch n.Operator.Value {
+	case ">":
+		minVal = &val
+		minInclusive = &[]bool{false}[0]
+	case ">=":
+		minVal = &val
+		minInclusive = &[]bool{true}[0]
+	case "<":
+		maxVal = &val
+		maxInclusive = &[]bool{false}[0]
+	case "<=":
+		maxVal = &val
+		maxInclusive = &[]bool{true}[0]
+	default:
+		return nil
+	}
+
+	q := bleve.NewNumericRangeInclusiveQuery(minVal, maxVal, minInclusive, maxInclusive)
+	q.SetField(getField(n.Key))
+	return q
+}
+
 
 func newQueryStringQueryList(k string, v ...string) []bleveQuery.Query {
 	list := make([]bleveQuery.Query, len(v))

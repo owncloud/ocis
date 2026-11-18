@@ -12,6 +12,8 @@ import sys
 import shlex
 import subprocess
 import signal
+import tempfile
+import threading
 import time
 import shutil
 from pathlib import Path
@@ -45,6 +47,16 @@ def ocis_healthy(ocis_url: str, use_basic_auth: bool = True) -> bool:
 def run(cmd: list, env: dict = None, check: bool = True, cwd=None):
     e = {**os.environ, **(env or {})}
     return subprocess.run(cmd, env=e, check=check, cwd=cwd)
+
+
+def filter_tls_noise(proc):
+    def _reader():
+        for line in proc.stderr:
+            if b"TLS handshake error" not in line:
+                sys.stderr.buffer.write(line)
+                sys.stderr.buffer.flush()
+    t = threading.Thread(target=_reader, daemon=True)
+    t.start()
 
 
 def main() -> int:
@@ -228,7 +240,9 @@ def main() -> int:
         ocis_proc = subprocess.Popen(
             [str(ocis_bin), "server"],
             env=server_env,
+            stderr=subprocess.PIPE,
         )
+        filter_tls_noise(ocis_proc)
     else:
         ocis_proc = subprocess.Popen(
             [str(wrapper_bin), "serve",
@@ -237,7 +251,9 @@ def main() -> int:
              "--admin-username", "admin",
              "--admin-password", "admin"],
             env=server_env,
+            stderr=subprocess.PIPE,
         )
+        filter_tls_noise(ocis_proc)
     procs.append(ocis_proc)
 
     def cleanup(*_):
@@ -253,6 +269,95 @@ def main() -> int:
     try:
         wait_for(lambda: ocis_healthy(ocis_url, use_basic_auth=not keycloak_needed), 300, "ocis")
         print("ocis ready.")
+
+        if tika_needed:
+            wait_for(lambda: tika_warm(tika_url), 60, "tika warm-up")
+            print("tika warm.")
+
+        if not keycloak_needed:
+            wait_for(lambda: search_ready(ocis_url), 60, "search service")
+            print("search ready.")
+
+        if collaboration_needed:
+            # WOPI bridges: one per office app, started only after ocis itself is up
+            # so they can register with its gateway. Ported from setup_wopi_collabora
+            # / setup_wopi_onlyoffice in tests/actions/setup-services.sh.
+            wopi_common = {
+                "MICRO_REGISTRY": "nats-js-kv",
+                "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
+                "COLLABORATION_APP_INSECURE": "true",
+                "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": "true",
+                "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
+                "COLLABORATION_WOPI_SECRET": "some-wopi-secret",
+            }
+            collabora_env = {
+                **os.environ, **wopi_common,
+                "COLLABORATION_GRPC_ADDR": "0.0.0.0:9301",
+                "COLLABORATION_HTTP_ADDR": "0.0.0.0:9300",
+                "COLLABORATION_DEBUG_ADDR": "0.0.0.0:9304",
+                "COLLABORATION_APP_NAME": "Collabora",
+                "COLLABORATION_APP_ADDR": "https://127.0.0.1:9980",
+                "COLLABORATION_APP_ICON": "https://127.0.0.1:9980/favicon.ico",
+                "COLLABORATION_WOPI_SRC": "http://127.0.0.1:9300",
+            }
+            onlyoffice_env = {
+                **os.environ, **wopi_common,
+                "COLLABORATION_GRPC_ADDR": "0.0.0.0:9303",
+                "COLLABORATION_HTTP_ADDR": "0.0.0.0:9302",
+                "COLLABORATION_DEBUG_ADDR": "0.0.0.0:9305",
+                "COLLABORATION_APP_NAME": "OnlyOffice",
+                "COLLABORATION_APP_PRODUCT": "OnlyOffice",
+                "COLLABORATION_APP_ADDR": "https://127.0.0.1:443",
+                "COLLABORATION_APP_ICON": "https://127.0.0.1/web-apps/apps/documenteditor/main/resources/img/favicon.ico",
+                "COLLABORATION_WOPI_SRC": "http://127.0.0.1:9302",
+            }
+            collab_proc = subprocess.Popen(
+                [str(ocis_bin), "collaboration", "server"],
+                env=collabora_env,
+                stderr=subprocess.PIPE,
+            )
+            filter_tls_noise(collab_proc)
+            procs.append(collab_proc)
+            oo_proc = subprocess.Popen(
+                [str(ocis_bin), "collaboration", "server"],
+                env=onlyoffice_env,
+                stderr=subprocess.PIPE,
+            )
+            filter_tls_noise(oo_proc)
+            procs.append(oo_proc)
+            wait_for(lambda: app_providers_ready(ocis_url), 150, "Collabora/OnlyOffice app providers")
+            print("app providers ready.")
+
+        if federated_needed:
+            # Second, independent ocis instance for OCM federation tests. See the
+            # federated_env comment above main() for its port-mapping source.
+            # OCIS_BASE_DATA_PATH must match federated_env's, or init writes the
+            # proxy cert under the default ~/.ocis (colliding with the primary
+            # instance's) instead of federated_data_dir, and the server then
+            # generates its own untrusted one lazily at startup.
+            run([str(ocis_bin), "init", "--insecure", "true"],
+                env={
+                    "OCIS_CONFIG_DIR": str(federated_config_dir),
+                    "OCIS_BASE_DATA_PATH": str(federated_data_dir),
+                })
+            federated_cert = federated_data_dir / "proxy/server.crt"
+            if federated_cert.exists():
+                subprocess.run(
+                    ["sudo", "cp", str(federated_cert),
+                     "/usr/local/share/ca-certificates/ocis-federated.crt"],
+                    check=True,
+                )
+                subprocess.run(["sudo", "update-ca-certificates"], check=True)
+            federated_proc = subprocess.Popen(
+                [str(ocis_bin), "server"],
+                env=federated_env,
+                stderr=subprocess.PIPE,
+            )
+            filter_tls_noise(federated_proc)
+            procs.append(federated_proc)
+            wait_for(lambda: ocis_healthy(federated_url, use_basic_auth=True), 300, "ocis-federated")
+            print("ocis-federated ready.")
+
 
         playwright_env = {
             **os.environ,
@@ -270,6 +375,66 @@ def main() -> int:
                 "KEYCLOAK": "true",
                 "KEYCLOAK_HOST": "localhost:8443",
             })
+            keycloak_cert = repo_root / "keycloak-certs/keycloakcrt.pem"
+            if keycloak_cert.exists():
+                trusted_certs.append(keycloak_cert)
+
+        if mfa_needed:
+            playwright_env["MFA"] = "true"
+
+        if vault_storage_needed:
+            vault_data_dir = Path.home() / "ocis/storage/users-vault"
+            vault_data_dir.mkdir(parents=True, exist_ok=True)
+            playwright_env["VAULT_MODE"] = "true"
+
+            vault_env = {
+                **server_env,
+                "STORAGE_USERS_ENABLE_VAULT_MODE": "true",
+                "STORAGE_USERS_SERVICE_NAME": "storage-users-vault",
+                "STORAGE_USERS_GRPC_ADDR": "127.0.0.1:19285",
+                "STORAGE_USERS_HTTP_ADDR": "127.0.0.1:19286",
+                "STORAGE_USERS_DATA_SERVER_URL": "http://127.0.0.1:19286/data",
+                "STORAGE_USERS_DEBUG_ADDR": "127.0.0.1:19287",
+                "STORAGE_USERS_OCIS_ROOT": str(vault_data_dir),
+                "STORAGE_USERS_EVENTS_CONSUMER_GROUP": "vault-dcfs",
+                "PROXY_CSP_CONFIG_FILE_LOCATION": str(repo_root / "tests/config/ci/csp.yaml")
+            }
+
+            print("Starting storage-users-vault...")
+
+            vault_proc = subprocess.Popen(
+                [str(ocis_bin), "storage-users", "server"],
+                env=vault_env,
+                stderr=subprocess.PIPE,
+            )
+            filter_tls_noise(vault_proc)
+            procs.append(vault_proc)
+
+            wait_for(
+                lambda: subprocess.run(
+                    ["curl", "-sf", "http://127.0.0.1:19287/healthz"],
+                    capture_output=True,
+                ).returncode == 0,
+                120,
+                "storage-users-vault",
+            )
+
+            print("vault ready.")
+
+        if federated_needed:
+            playwright_env["FEDERATED_BASE_URL_OCIS"] = "localhost:10200"
+            trusted_certs.append(federated_cert)
+
+        if len(trusted_certs) > 1:
+            # NODE_EXTRA_CA_CERTS takes a single file; concatenate every self-signed
+            # cert in play (oCIS, Keycloak, federated instance) so node-fetch/axios
+            # calls made directly against any of them are trusted too.
+            bundle = tempfile.NamedTemporaryFile(
+                mode="w", suffix=".pem", prefix="ocis-ca-bundle-", delete=False)
+            for cert in trusted_certs:
+                bundle.write(cert.read_text())
+            bundle.close()
+            playwright_env["NODE_EXTRA_CA_CERTS"] = bundle.name
 
         print(f"Running e2e: {e2e_args}")
         result = subprocess.run(
