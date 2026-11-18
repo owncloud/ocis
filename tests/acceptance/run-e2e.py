@@ -16,6 +16,7 @@ import shlex
 import subprocess
 import signal
 import tempfile
+import threading
 import time
 import shutil
 from pathlib import Path
@@ -114,6 +115,16 @@ def load_env_file(path: Path) -> dict:
 def run(cmd: list, env: dict = None, check: bool = True, cwd=None):
     e = {**os.environ, **(env or {})}
     return subprocess.run(cmd, env=e, check=check, cwd=cwd)
+
+
+def filter_tls_noise(proc):
+    def _reader():
+        for line in proc.stderr:
+            if b"TLS handshake error" not in line:
+                sys.stderr.buffer.write(line)
+                sys.stderr.buffer.flush()
+    t = threading.Thread(target=_reader, daemon=True)
+    t.start()
 
 
 def main() -> int:
@@ -440,7 +451,9 @@ def main() -> int:
         ocis_proc = subprocess.Popen(
             [str(ocis_bin), "server"],
             env=server_env,
+            stderr=subprocess.PIPE,
         )
+        filter_tls_noise(ocis_proc)
     else:
         ocis_proc = subprocess.Popen(
             [str(wrapper_bin), "serve",
@@ -449,7 +462,9 @@ def main() -> int:
              "--admin-username", "admin",
              "--admin-password", "admin"],
             env=server_env,
+            stderr=subprocess.PIPE,
         )
+        filter_tls_noise(ocis_proc)
     procs.append(ocis_proc)
 
     def cleanup(*_):
@@ -509,8 +524,20 @@ def main() -> int:
                 "COLLABORATION_APP_ICON": "https://127.0.0.1/web-apps/apps/documenteditor/main/resources/img/favicon.ico",
                 "COLLABORATION_WOPI_SRC": "http://127.0.0.1:9302",
             }
-            procs.append(subprocess.Popen([str(ocis_bin), "collaboration", "server"], env=collabora_env))
-            procs.append(subprocess.Popen([str(ocis_bin), "collaboration", "server"], env=onlyoffice_env))
+            collab_proc = subprocess.Popen(
+                [str(ocis_bin), "collaboration", "server"],
+                env=collabora_env,
+                stderr=subprocess.PIPE,
+            )
+            filter_tls_noise(collab_proc)
+            procs.append(collab_proc)
+            oo_proc = subprocess.Popen(
+                [str(ocis_bin), "collaboration", "server"],
+                env=onlyoffice_env,
+                stderr=subprocess.PIPE,
+            )
+            filter_tls_noise(oo_proc)
+            procs.append(oo_proc)
             wait_for(lambda: app_providers_ready(ocis_url), 150, "Collabora/OnlyOffice app providers")
             print("app providers ready.")
 
@@ -537,7 +564,9 @@ def main() -> int:
             federated_proc = subprocess.Popen(
                 [str(ocis_bin), "server"],
                 env=federated_env,
+                stderr=subprocess.PIPE,
             )
+            filter_tls_noise(federated_proc)
             procs.append(federated_proc)
             wait_for(lambda: ocis_healthy(federated_url, use_basic_auth=True), 300, "ocis-federated")
             print("ocis-federated ready.")
@@ -592,7 +621,9 @@ def main() -> int:
             vault_proc = subprocess.Popen(
                 [str(ocis_bin), "storage-users", "server"],
                 env=vault_env,
+                stderr=subprocess.PIPE,
             )
+            filter_tls_noise(vault_proc)
             procs.append(vault_proc)
 
             wait_for(
