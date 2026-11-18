@@ -30,37 +30,53 @@ func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRole
 		return nil, err
 	}
 	ctx := context.TODO()
+	ass, stale, err := s.readRoleAssignments(ctx, accountUUID)
+	if err != nil || !stale {
+		return ass, err
+	}
+	// The listing named an assignment that is gone, for example because
+	// another pod changed the role. An incomplete list can make the proxy
+	// assign the default role and so replace the real role. The cache dropped
+	// the stale listing, so read the account folder again.
+	ass, _, err = s.readRoleAssignments(ctx, accountUUID)
+	return ass, err
+}
+
+// readRoleAssignments reads the assignments of the account folder. stale is
+// true when the listing named an assignment that is gone.
+func (s *Store) readRoleAssignments(ctx context.Context, accountUUID string) (ass []*settingsmsg.UserRoleAssignment, stale bool, err error) {
 	assIDs, err := s.mdc.ReadDir(ctx, accountPath(accountUUID))
 	switch err.(type) {
 	case nil:
 		// continue
 	case errtypes.NotFound:
-		return make([]*settingsmsg.UserRoleAssignment, 0), nil
+		return make([]*settingsmsg.UserRoleAssignment, 0), false, nil
 	default:
-		return nil, err
+		return nil, false, err
 	}
 
-	ass := make([]*settingsmsg.UserRoleAssignment, 0, len(assIDs))
+	ass = make([]*settingsmsg.UserRoleAssignment, 0, len(assIDs))
 	for _, assID := range assIDs {
 		b, err := s.mdc.SimpleDownload(ctx, assignmentPath(accountUUID, assID))
 		switch err.(type) {
 		case nil:
 			// continue
 		case errtypes.NotFound:
+			stale = true
 			continue
 		default:
-			return nil, err
+			return nil, false, err
 		}
 
 		a := &settingsmsg.UserRoleAssignment{}
 		err = json.Unmarshal(b, a)
 		if err != nil {
-			return nil, err
+			return nil, false, err
 		}
 
 		ass = append(ass, a)
 	}
-	return ass, nil
+	return ass, stale, nil
 }
 
 // ListRoleAssignmentsByRole returns all role assignmentes matching the give roleID
@@ -89,7 +105,8 @@ func (s *Store) ListRoleAssignmentsByRole(roleID string) ([]*settingsmsg.UserRol
 		case nil:
 			// continue
 		case errtypes.NotFound:
-			return make([]*settingsmsg.UserRoleAssignment, 0), nil
+			// this account folder is gone, the other accounts still count
+			continue
 		default:
 			return nil, err
 		}
