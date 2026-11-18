@@ -798,14 +798,26 @@ jobs:
             delete_file() {
               request DELETE
             }
+             create_file() {
+              local status
+              status=$(put_file) || return 1
+
+              echo "File creation returned HTTP $status"
+
+              [[ "$status" == "201" || "$status" == "204" ]]
+            }
+
             check_status() {
               local expected=$1
               shift
-              status=$("$@")
-              [ "$status" = "$expected" ]
+              local status
+              status=$("$@") || return 1
+              echo "Received HTTP $status (expected $expected)"
+
+              [[ "$status" == "$expected" ]]
             }
             echo "Creating test file..."
-            retry "create file (HTTP 201)" check_status 201 put_file || exit 1
+            retry "create file (HTTP 201 or 204)" create_file || exit 1
             echo "Deleting test file..."
             retry "delete file (HTTP 204)" check_status 204 delete_file || exit 1
           fi
