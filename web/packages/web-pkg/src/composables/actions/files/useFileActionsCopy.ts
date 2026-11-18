@@ -1,6 +1,7 @@
 import {
   isLocationCommonActive,
   isLocationPublicActive,
+  isLocationSharesActive,
   isLocationSpacesActive
 } from '../../../router'
 import { computed, unref } from 'vue'
@@ -52,6 +53,7 @@ export const useFileActionsCopy = () => {
         isVisible: ({ resources }) => {
           if (
             !isLocationSpacesActive(router, 'files-spaces-generic') &&
+            !isLocationSharesActive(router, 'files-shares-with-me') &&
             !isLocationPublicActive(router, 'files-public-link') &&
             !isLocationCommonActive(router, 'files-common-favorites') &&
             !isLocationCommonActive(router, 'files-common-search')
