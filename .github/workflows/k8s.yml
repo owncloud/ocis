@@ -613,9 +613,12 @@ jobs:
               realm_file=tests/config/ci/ocis-ci-realm.dist.json
             fi
             # Point the realm's web client at the Kubernetes ingress.
-            sed -e "s|https://localhost:9200|${TEST_SERVER_URL}|g" \
-                -e "s|https://ocis-server:9200|${TEST_SERVER_URL}|g" \
+            sed \
+              -e "s|https://localhost:9200|${TEST_SERVER_URL}|g" \
+              -e "s|https://ocis-server:9200|${TEST_SERVER_URL}|g" \
               "$realm_file" > /tmp/ocis-realm.json
+
+            echo "Starting Keycloak using realm: $realm_file"
 
             docker run -d --name keycloak --network host \
               -e OCIS_DOMAIN="$TEST_SERVER_URL" \
@@ -631,7 +634,7 @@ jobs:
               -e KC_HTTPS_CERTIFICATE_FILE=/keycloak-certs/keycloakcrt.pem \
               -e KC_HTTPS_CERTIFICATE_KEY_FILE=/keycloak-certs/keycloakkey.pem \
               -v "$(pwd)/keycloak-certs:/keycloak-certs:ro" \
-              -v /tmp/ocis-realm.json:/opt/keycloak/data/import/ocis-mfa-ci-realm.dist.json:ro \
+              -v "/tmp/ocis-realm.json:/opt/keycloak/data/import/oCIS-realm.json:ro" \
               quay.io/keycloak/keycloak:26.5.6 \
               start-dev --proxy-headers xforwarded \
               --spi-connections-http-client-default-disable-trust-manager=true \
