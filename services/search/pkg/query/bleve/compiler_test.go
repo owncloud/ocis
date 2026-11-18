@@ -317,22 +317,19 @@ func Test_compile(t *testing.T) {
 			args: &ast.Ast{
 				Nodes: []ast.Node{
 					&ast.DateTimeNode{
-						Key: "mtime",
-						// "=" is not supported by bleve, ignore
+						Key:      "mtime",
 						Operator: &ast.OperatorNode{Value: "="},
 						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
 					},
 					&ast.OperatorNode{Value: "AND"},
 					&ast.DateTimeNode{
-						Key: "mtime",
-						// ":" is not supported by bleve, ignore
+						Key:      "mtime",
 						Operator: &ast.OperatorNode{Value: ":"},
 						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
 					},
 					&ast.OperatorNode{Value: "AND"},
 					&ast.DateTimeNode{
-						Key: "mtime",
-						// no operator, skip
+						Key:   "mtime",
 						Value: timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
 					},
 					&ast.OperatorNode{Value: "AND"},
@@ -362,6 +359,20 @@ func Test_compile(t *testing.T) {
 				},
 			},
 			want: query.NewConjunctionQuery([]query.Query{
+				func() query.Query {
+					// "=" maps to a 24-hour day range [UTC day start, UTC day start + 24h)
+					dayStart := timeMustParse(t, "2023-09-05T08:42:11.23554+02:00").UTC().Truncate(24 * time.Hour)
+					q := query.NewDateRangeInclusiveQuery(dayStart, dayStart.Add(24*time.Hour), &[]bool{true}[0], &[]bool{false}[0])
+					q.FieldVal = "Mtime"
+					return q
+				}(),
+				func() query.Query {
+					// ":" maps to the same 24-hour day range
+					dayStart := timeMustParse(t, "2023-09-05T08:42:11.23554+02:00").UTC().Truncate(24 * time.Hour)
+					q := query.NewDateRangeInclusiveQuery(dayStart, dayStart.Add(24*time.Hour), &[]bool{true}[0], &[]bool{false}[0])
+					q.FieldVal = "Mtime"
+					return q
+				}(),
 				func() query.Query {
 					q := query.NewDateRangeInclusiveQuery(timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"), time.Time{}, &[]bool{false}[0], nil)
 					q.FieldVal = "Mtime"
@@ -560,6 +571,128 @@ func Test_compile(t *testing.T) {
 				func() query.Query {
 					q := query.NewDateRangeInclusiveQuery(time.Time{}, timeMustParse(t, "2024-12-31T00:00:00Z"), nil, &[]bool{false}[0])
 					q.FieldVal = "photo.takenDateTime"
+					return q
+				}(),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `photo.takenDateTime=2008-10-22`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "photo.takenDateTime",
+						Operator: &ast.OperatorNode{Value: "="},
+						Value:    timeMustParse(t, "2008-10-22T00:00:00Z"),
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				func() query.Query {
+					dayStart := timeMustParse(t, "2008-10-22T00:00:00Z").UTC().Truncate(24 * time.Hour)
+					q := query.NewDateRangeInclusiveQuery(dayStart, dayStart.Add(24*time.Hour), &[]bool{true}[0], &[]bool{false}[0])
+					q.FieldVal = "photo.takenDateTime"
+					return q
+				}(),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `size>=1048576`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.NumericNode{
+						Key:      "size",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    1048576,
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				func() query.Query {
+					min := 1048576.0
+					inclusive := true
+					q := query.NewNumericRangeInclusiveQuery(&min, nil, &inclusive, nil)
+					q.SetField("Size")
+					return q
+				}(),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `size<=10485760`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.NumericNode{
+						Key:      "size",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    10485760,
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				func() query.Query {
+					max := 10485760.0
+					inclusive := true
+					q := query.NewNumericRangeInclusiveQuery(nil, &max, nil, &inclusive)
+					q.SetField("Size")
+					return q
+				}(),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `photo.iso>100 AND photo.iso<3200`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.NumericNode{
+						Key:      "photo.iso",
+						Operator: &ast.OperatorNode{Value: ">"},
+						Value:    100,
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.NumericNode{
+						Key:      "photo.iso",
+						Operator: &ast.OperatorNode{Value: "<"},
+						Value:    3200,
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				func() query.Query {
+					min := 100.0
+					inclusive := false
+					q := query.NewNumericRangeInclusiveQuery(&min, nil, &inclusive, nil)
+					q.SetField("photo.iso")
+					return q
+				}(),
+				func() query.Query {
+					max := 3200.0
+					inclusive := false
+					q := query.NewNumericRangeInclusiveQuery(nil, &max, nil, &inclusive)
+					q.SetField("photo.iso")
+					return q
+				}(),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `photo.fNumber>=2.8`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.NumericNode{
+						Key:      "photo.fNumber",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    2.8,
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				func() query.Query {
+					min := 2.8
+					inclusive := true
+					q := query.NewNumericRangeInclusiveQuery(&min, nil, &inclusive, nil)
+					q.SetField("photo.fNumber")
 					return q
 				}(),
 			}),

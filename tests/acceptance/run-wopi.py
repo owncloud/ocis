@@ -17,8 +17,19 @@ import socket
 import subprocess
 import sys
 import time
+import threading
 import urllib.parse
 from pathlib import Path
+
+
+def filter_tls_noise(proc):
+    def _reader():
+        for line in proc.stderr:
+            if b"TLS handshake error" not in line:
+                sys.stderr.buffer.write(line)
+                sys.stderr.buffer.flush()
+    threading.Thread(target=_reader, daemon=True).start()
+
 
 # ---------------------------------------------------------------------------
 # Constants (mirroring .drone.star)
@@ -92,6 +103,27 @@ def wopi_discovery_ready(url: str) -> bool:
         capture_output=True, text=True,
     )
     return r.stdout.strip() == "200"
+
+
+def app_registry_ready(ocis_url: str) -> bool:
+    # Wait until the app registry has at least one mime-type entry. The gateway
+    # returns "error finding app providers" until the app-provider service has
+    # finished registering — causing OpenInApp to fail with 500 even though
+    # ocis_healthy() already passes.
+    r = subprocess.run(
+        ["curl", "-sk", "-uadmin:admin",
+         f"{ocis_url}/app/list",
+         "-w", "\n%{http_code}"],
+        capture_output=True, text=True,
+    )
+    lines = r.stdout.strip().splitlines()
+    if not lines or lines[-1] != "200":
+        return False
+    try:
+        body = json.loads("\n".join(lines[:-1]))
+        return bool(body.get("mime-types"))
+    except Exception:
+        return False
 
 
 def base_server_env(repo_root: Path, ocis_config_dir: str, ocis_public_url: str,
@@ -296,10 +328,15 @@ def main() -> int:
         )
 
         print("Starting ocis...", flush=True)
-        ocis_proc = subprocess.Popen([str(ocis_bin), "server"], env=server_env)
+        ocis_proc = subprocess.Popen([str(ocis_bin), "server"], env=server_env, stderr=subprocess.PIPE)
+        filter_tls_noise(ocis_proc)
         procs.append(ocis_proc)
 
         wait_for(lambda: ocis_healthy(OCIS_URL), 300, "ocis")
+        # cs3 only: in builtin mode app-provider is excluded and the collaboration
+        # service (started later) registers the mime types, so /app/list stays empty here.
+        if wopi_type == "cs3":
+            wait_for(lambda: app_registry_ready(OCIS_URL), 60, "app registry")
         print("ocis ready.", flush=True)
 
         # --- Wait for fakeoffice discovery endpoint before starting WOPI service ---
@@ -319,7 +356,9 @@ def main() -> int:
             collab_proc = subprocess.Popen(
                 [str(ocis_bin), "collaboration", "server"],
                 env=collab_env,
+                stderr=subprocess.PIPE,
             )
+            filter_tls_noise(collab_proc)
             procs.append(collab_proc)
         else:
             # cs3: patch wopiserver.conf (replace container hostname with bridge_ip),
