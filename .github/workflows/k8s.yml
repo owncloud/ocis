@@ -733,7 +733,7 @@ jobs:
           bash tests/config/k8s/expose-nodeports.sh collaboration-fakeoffice 9304 30304
 
       - name: Expose proxy readyz
-        if: ${{ matrix.suite == 'vault-storage' }}
+        if: ${{ matrix.suite == 'vault-storage' || matrix.suite == 'keycloak' }}
         run: |
           (
             while true; do
@@ -776,7 +776,7 @@ jobs:
             return 1
           }
 
-          if [[ "${{ matrix.suite }}" == "vault-storage" ]]; then
+          if [[ "${{ matrix.suite }}" == "vault-storage" || "${{ matrix.suite }}" == "keycloak" ]]; then
             retry "proxy readyz" curl -sf http://localhost:19205/readyz || exit 1
             else
               echo "Creating test file in oCIS..."
@@ -798,7 +798,7 @@ jobs:
             delete_file() {
               request DELETE
             }
-             create_file() {
+            create_file() {
               local status
               status=$(put_file) || return 1
 
