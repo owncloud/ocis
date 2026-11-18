@@ -44,6 +44,60 @@ def ocis_healthy(ocis_url: str, use_basic_auth: bool = True) -> bool:
     return r.stdout.strip() == "200"
 
 
+def search_ready(ocis_url: str) -> bool:
+    # WebDAV REPORT returning 207 proves auth-basic is registered in the gateway,
+    # the search service is alive, and the NATS startup backlog has drained.
+    body = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<oc:search-files xmlns:oc="http://owncloud.org/ns">'
+        '<oc:search><oc:pattern>warmup-probe</oc:pattern><oc:limit>1</oc:limit></oc:search>'
+        '</oc:search-files>'
+    )
+    cmd = [
+        "curl", "-sk", "-uadmin:admin",
+        "-X", "REPORT",
+        "-H", "Content-Type: application/xml",
+        "-d", body,
+        f"{ocis_url}/dav/spaces",
+        "-w", "%{http_code}", "-o", "/dev/null",
+    ]
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    return r.stdout.strip() == "207"
+
+
+def tika_warm(tika_url: str) -> bool:
+    # Force a JVM extraction before tests start so cold-start latency doesn't
+    # delay the async upload→index pipeline past the test's poll window.
+    cmd = [
+        "curl", "-sf",
+        "-X", "PUT",
+        "-H", "Content-Type: text/plain",
+        "-d", "warmup",
+        f"{tika_url}/tika",
+        "-w", "%{http_code}", "-o", "/dev/null",
+    ]
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    return r.stdout.strip() == "200"
+
+
+def app_providers_ready(ocis_url: str) -> bool:
+    # Collabora and OnlyOffice register asynchronously with the app registry
+    # over their WOPI bridge connection; don't start tests until both are up.
+    cmd = ["curl", "-sk", "-uadmin:admin", f"{ocis_url}/app/list"]
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    if r.returncode != 0 or not r.stdout.strip():
+        return False
+    try:
+        data = json.loads(r.stdout)
+    except json.JSONDecodeError:
+        return False
+    names = set()
+    for mime in data.get("mime-types", []):
+        for provider in mime.get("app_providers", []):
+            names.add(provider.get("name"))
+    return "Collabora" in names and "OnlyOffice" in names
+
+
 def run(cmd: list, env: dict = None, check: bool = True, cwd=None):
     e = {**os.environ, **(env or {})}
     return subprocess.run(cmd, env=e, check=check, cwd=cwd)
@@ -68,6 +122,16 @@ def main() -> int:
 
     tika_needed = os.environ.get("TIKA_NEEDED", "").lower() == "true"
     keycloak_needed = os.environ.get("KEYCLOAK_NEEDED", "").lower() == "true"
+    mfa_needed = os.environ.get("MFA_NEEDED", "").lower() == "true"
+    oidc_needed = os.environ.get("OIDC_NEEDED", "").lower() == "true"
+    oidc_iframe_needed = os.environ.get("OIDC_IFRAME_NEEDED", "").lower() == "true"
+    collaboration_needed = os.environ.get("COLLABORATION_NEEDED", "").lower() == "true"
+    federated_needed = os.environ.get("FEDERATED_NEEDED", "").lower() == "true"
+    vault_storage_needed = (
+        os.environ.get("VAULT_STORAGE_NEEDED", "").lower() == "true"
+        or os.environ.get("VAULT_MODE", "").lower() == "true"
+    )
+    keycloak_needed = keycloak_needed or mfa_needed or vault_storage_needed
 
     repo_root = Path(__file__).resolve().parents[2]
     ocis_bin = repo_root / "ocis/bin/ocis"
@@ -266,6 +330,8 @@ def main() -> int:
     signal.signal(signal.SIGTERM, cleanup)
     signal.signal(signal.SIGINT, cleanup)
 
+    tika_url = "http://localhost:9998"
+
     try:
         wait_for(lambda: ocis_healthy(ocis_url, use_basic_auth=not keycloak_needed), 300, "ocis")
         print("ocis ready.")
@@ -369,6 +435,8 @@ def main() -> int:
             "NODE_EXTRA_CA_CERTS": str(ocis_cert),
             "BROWSER": "chromium",
         }
+
+        trusted_certs = [ocis_cert]
 
         if keycloak_needed:
             playwright_env.update({
