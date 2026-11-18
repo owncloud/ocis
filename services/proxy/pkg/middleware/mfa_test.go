@@ -37,13 +37,24 @@ func oidcRequest(acr string) *http.Request {
 	return req.WithContext(oidc.NewContext(req.Context(), map[string]any{"acr": acr}))
 }
 
-// signedURLRequest has no OIDC claims.
+// signedURLRequest has no OIDC claims and no MFA-bound-key breadcrumb. It
+// represents a claims-less request that was not authenticated with the
+// MFA-bound signing key: a normal-key-signed URL, basic auth, or an app
+// token.
 func signedURLRequest() *http.Request {
 	req := httptest.NewRequest(http.MethodGet, "https://example.com/dav/spaces/vault?OC-Signature=abc", nil)
 	return req.WithContext(revactx.ContextSetUser(req.Context(), mfaTestUser))
 }
 
-func TestMultiFactor_signedURLInheritsMFAFromOIDCRequest(t *testing.T) {
+// mfaKeySignedURLRequest has no OIDC claims but does carry the MFA-bound
+// signing-key breadcrumb, as set by the signed-URL authenticator when a
+// signature matches the MFA-bound key.
+func mfaKeySignedURLRequest() *http.Request {
+	req := signedURLRequest()
+	return req.WithContext(setMFAKeyBreadcrumb(req.Context()))
+}
+
+func TestMultiFactor_mfaKeySignedURLInheritsMFAFromOIDCRequestWhileRecordFresh(t *testing.T) {
 	cfg := config.MFAConfig{Enabled: true, AuthLevelNames: []string{"advanced"}, SessionDuration: 60}
 	s := store.NewMemoryStore()
 	var hasMFA bool
@@ -57,8 +68,64 @@ func TestMultiFactor_signedURLInheritsMFAFromOIDCRequest(t *testing.T) {
 	assert.Greater(t, records[0].Expiry, time.Duration(0))
 	assert.LessOrEqual(t, records[0].Expiry, 60*time.Second)
 
+	// A request carrying the MFA-bound-key breadcrumb inherits MFA from the
+	// fresh stored record.
+	hasMFA = false
+	mfaChain(cfg, s, &hasMFA).ServeHTTP(httptest.NewRecorder(), mfaKeySignedURLRequest())
+	assert.True(t, hasMFA)
+}
+
+// TestMultiFactor_mfaKeySignedURLWithStaleRecordHasNoMFA proves that even a
+// request carrying the MFA-bound-key breadcrumb does not inherit MFA once
+// the stored per-user record is stale.
+func TestMultiFactor_mfaKeySignedURLWithStaleRecordHasNoMFA(t *testing.T) {
+	cfg := config.MFAConfig{Enabled: true, AuthLevelNames: []string{"advanced"}, SessionDuration: 60}
+	s := store.NewMemoryStore()
+	var hasMFA bool
+
+	verifiedAt := time.Now().Add(-61 * time.Second).Unix()
+	assert.NoError(t, s.Write(&store.Record{
+		Key:   key(mfaTestUser.GetId().GetOpaqueId()),
+		Value: []byte(strconv.FormatInt(verifiedAt, 10)),
+	}))
+
+	mfaChain(cfg, s, &hasMFA).ServeHTTP(httptest.NewRecorder(), mfaKeySignedURLRequest())
+	assert.False(t, hasMFA)
+}
+
+// TestMultiFactor_signedURLWithoutMFAKeyBreadcrumbNeverInheritsMFA is the
+// regression test for OCISDEV-1699 / SECOPS-322 F-1.1: a claims-less
+// request without the MFA-bound-key breadcrumb (e.g. a normal-key-signed
+// URL, basic auth, or an app token) must never inherit MFA, even though the
+// user's stored per-user record is fresh because another one of their
+// sessions recently passed MFA.
+func TestMultiFactor_signedURLWithoutMFAKeyBreadcrumbNeverInheritsMFA(t *testing.T) {
+	cfg := config.MFAConfig{Enabled: true, AuthLevelNames: []string{"advanced"}, SessionDuration: 60}
+	s := store.NewMemoryStore()
+	var hasMFA bool
+
+	mfaChain(cfg, s, &hasMFA).ServeHTTP(httptest.NewRecorder(), oidcRequest("advanced"))
+	assert.True(t, hasMFA)
+
 	hasMFA = false
 	mfaChain(cfg, s, &hasMFA).ServeHTTP(httptest.NewRecorder(), signedURLRequest())
+	assert.False(t, hasMFA)
+}
+
+// TestMultiFactor_mfaKeySignedVaultDownloadRegressionOCISDEV1503 guards
+// against reopening OCISDEV-1503: a vault signed-URL download, signed with
+// the MFA-bound key, must still succeed while the stored MFA record is
+// fresh.
+func TestMultiFactor_mfaKeySignedVaultDownloadRegressionOCISDEV1503(t *testing.T) {
+	cfg := config.MFAConfig{Enabled: true, AuthLevelNames: []string{"advanced"}, SessionDuration: 60}
+	s := store.NewMemoryStore()
+	var hasMFA bool
+
+	mfaChain(cfg, s, &hasMFA).ServeHTTP(httptest.NewRecorder(), oidcRequest("advanced"))
+	assert.True(t, hasMFA)
+
+	hasMFA = false
+	mfaChain(cfg, s, &hasMFA).ServeHTTP(httptest.NewRecorder(), mfaKeySignedURLRequest())
 	assert.True(t, hasMFA)
 }
 
