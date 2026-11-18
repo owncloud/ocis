@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"testing"
 
@@ -138,6 +139,27 @@ func TestEditOwnRoleAssignment(t *testing.T) {
 	res = v0.AssignRoleToUserResponse{}
 	err = svc.AssignRoleToUser(ctxWithUUID, &req, &res)
 	assert.Nil(t, err)
+}
+
+// The self-assign path of the default role must fail closed. If the store
+// cannot read the old assignments, the user can have a role already, for
+// example Admin. A write then replaces that role with "User".
+func TestSelfAssignFailsWhenAssignmentsCannotBeRead(t *testing.T) {
+	manager := &mocks.Manager{}
+	svc := Service{
+		manager: manager,
+	}
+	manager.On("ListRoleAssignments", mock.Anything).Return(nil, errors.New("storage-system is not available"))
+
+	req := v0.AssignRoleToUserRequest{
+		AccountUuid: "61445573-4dbe-4d56-88dc-88ab47aceba7",
+		RoleId:      defaults.BundleUUIDRoleUser,
+	}
+	res := v0.AssignRoleToUserResponse{}
+	err := svc.AssignRoleToUser(ctxWithUUID, &req, &res)
+
+	assert.Error(t, err)
+	manager.AssertNotCalled(t, "WriteRoleAssignment", mock.Anything, mock.Anything)
 }
 
 func TestRemoveOwnRoleAssignment(t *testing.T) {
