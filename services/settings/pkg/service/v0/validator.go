@@ -126,18 +126,49 @@ func validateListRoleAssignments(req *settingssvc.ListRoleAssignmentsRequest) er
 	return validation.Validate(req.AccountUuid, requireAccountID...)
 }
 
+const maxAccountRoleAssignmentFilters = 500
+
 func validateListRoleAssignmentsFiltered(req *settingssvc.ListRoleAssignmentsFilteredRequest) error {
 	return validation.ValidateStruct(
 		req,
 		validation.Field(&req.Filters,
 			validation.Required,
-			validation.Length(1, 1),
+			validation.Length(1, 0),
 			validation.Each(validation.By(validateUserRoleAssignmentFilter)),
+			validation.By(validateUserRoleAssignmentFilters),
 		),
 	)
 }
 
-func validateUserRoleAssignmentFilter(values interface{}) error {
+// Role filters are capped at one because ListRoleAssignmentsByRole only ever reads filters[0].
+func validateUserRoleAssignmentFilters(value any) error {
+	filters, ok := value.([]*settingsmsg.UserRoleAssignmentFilter)
+	if !ok {
+		return errors.New("expected []UserRoleAssignmentFilter")
+	}
+	if len(filters) == 0 {
+		return nil
+	}
+	filterType := filters[0].GetType()
+	for _, f := range filters {
+		if f.GetType() != filterType {
+			return errors.New("filters must all be of the same type")
+		}
+	}
+	switch filterType {
+	case settingsmsg.UserRoleAssignmentFilter_TYPE_ROLE:
+		if len(filters) > 1 {
+			return errors.New("only one role filter is supported per request")
+		}
+	case settingsmsg.UserRoleAssignmentFilter_TYPE_ACCOUNT:
+		if len(filters) > maxAccountRoleAssignmentFilters {
+			return fmt.Errorf("at most %d account filters are supported per request", maxAccountRoleAssignmentFilters)
+		}
+	}
+	return nil
+}
+
+func validateUserRoleAssignmentFilter(values any) error {
 	filter, ok := values.(*settingsmsg.UserRoleAssignmentFilter)
 	if !ok {
 		return errors.New("expected UserRoleAssignmentFilter")
