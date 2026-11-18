@@ -60,6 +60,14 @@ type DateTimeNode struct {
 	Value    time.Time
 }
 
+// NumericNode represents a float64 value with a comparison operator
+type NumericNode struct {
+	*Base
+	Key      string
+	Operator *OperatorNode
+	Value    float64
+}
+
 // OperatorNode represents an operator value like
 // AND, OR, NOT, =, <= ... and so on
 type OperatorNode struct {
@@ -81,6 +89,8 @@ func NodeKey(n Node) string {
 		return node.Key
 	case *DateTimeNode:
 		return node.Key
+	case *NumericNode:
+		return node.Key
 	case *BooleanNode:
 		return node.Key
 	case *GroupNode:
@@ -96,6 +106,8 @@ func NodeValue(n Node) interface{} {
 	case *StringNode:
 		return node.Value
 	case *DateTimeNode:
+		return node.Value
+	case *NumericNode:
 		return node.Value
 	case *BooleanNode:
 		return node.Value
