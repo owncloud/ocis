@@ -20,4 +20,4 @@ as `failed_earlier`. An extraction cut short because the walk's context ended
 records nothing. The default, 0, keeps the current behaviour: every walk retries
 such files and nothing is recorded.
 
-https://github.com/owncloud/ocis/pull/XXXXX
+https://github.com/owncloud/ocis/pull/13506
