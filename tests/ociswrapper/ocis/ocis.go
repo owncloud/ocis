@@ -146,8 +146,8 @@ func WaitForConnection() (bool, string) {
 			coreServices := []string{
 				"gateway",
 				"sharing",
-				"storageusers",
-				"storageshares",
+				"storage-users",
+				"storage-shares",
 				"proxy",
 				"graph",
 				"settings",
