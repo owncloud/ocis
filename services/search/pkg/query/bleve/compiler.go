@@ -125,35 +125,20 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 				next = q
 			}
 		case *ast.DateTimeNode:
-			q := &bleveQuery.DateRangeQuery{
-				Start:          bleveQuery.BleveQueryTime{},
-				End:            bleveQuery.BleveQueryTime{},
-				InclusiveStart: nil,
-				InclusiveEnd:   nil,
-				FieldVal:       getField(n.Key),
-			}
-
-			if n.Operator == nil {
+			q := dateTimeQuery(n)
+			if q == nil {
 				continue
 			}
-
-			switch n.Operator.Value {
-			case ">":
-				q.Start.Time = n.Value
-				q.InclusiveStart = &[]bool{false}[0]
-			case ">=":
-				q.Start.Time = n.Value
-				q.InclusiveStart = &[]bool{true}[0]
-			case "<":
-				q.End.Time = n.Value
-				q.InclusiveEnd = &[]bool{false}[0]
-			case "<=":
-				q.End.Time = n.Value
-				q.InclusiveEnd = &[]bool{true}[0]
-			default:
+			if prev == nil {
+				prev = q
+			} else {
+				next = q
+			}
+		case *ast.NumericNode:
+			q := numericQuery(n)
+			if q == nil {
 				continue
 			}
-
 			if prev == nil {
 				prev = q
 			} else {
