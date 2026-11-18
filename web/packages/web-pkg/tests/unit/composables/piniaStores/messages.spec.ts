@@ -1,10 +1,39 @@
-import { useMessages } from '../../../../src/composables/piniaStores'
+import { getXRequestIdsLog, useMessages } from '../../../../src/composables/piniaStores'
+import { createHttpError } from '@ownclouders/web-client'
 import { createPinia, setActivePinia } from 'pinia'
 import { getComposableWrapper } from '../../../../src/testing'
+
+describe('getXRequestIdsLog', () => {
+  it('lists the request id of each error and leaves out errors without one', () => {
+    const log = getXRequestIdsLog([
+      createHttpError({ message: 'a', statusCode: 502, xReqId: 'req-1' }),
+      // a request that got no answer has no request id
+      createHttpError({ message: 'b', statusCode: undefined, xReqId: undefined }),
+      new Error('c'),
+      createHttpError({ message: 'd', statusCode: 403, xReqId: 'req-2' })
+    ])
+
+    expect(log).toBe('X-Request-Id: req-1\r\nX-Request-Id: req-2')
+  })
+})
 
 describe('useMessages', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+  })
+
+  describe('method "showErrorMessage"', () => {
+    it('puts the request ids of the errors into the details', () => {
+      getWrapper({
+        setup: (instance) => {
+          const message = instance.showErrorMessage({
+            title: 'failed',
+            errors: [createHttpError({ message: 'a', statusCode: 502, xReqId: 'req-1' })]
+          })
+          expect(message.errorLogContent).toBe('X-Request-Id: req-1')
+        }
+      })
+    })
   })
 
   describe('method "triggerLatestAction"', () => {

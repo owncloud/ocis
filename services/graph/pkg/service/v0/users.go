@@ -104,18 +104,37 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Graph) fetchAppRoleAssignments(ctx context.Context, accountuuid string) ([]libregraph.AppRoleAssignment, error) {
-	lrar, err := g.roleService.ListRoleAssignments(ctx, &settingssvc.ListRoleAssignmentsRequest{
-		AccountUuid: accountuuid,
-	})
+	byAccount, err := g.fetchAppRoleAssignmentsForUsers(ctx, []string{accountuuid})
 	if err != nil {
 		return []libregraph.AppRoleAssignment{}, err
 	}
-
-	values := make([]libregraph.AppRoleAssignment, 0, len(lrar.Assignments))
-	for _, assignment := range lrar.GetAssignments() {
-		values = append(values, g.assignmentToAppRoleAssignment(assignment))
+	if assignments := byAccount[accountuuid]; assignments != nil {
+		return assignments, nil
 	}
-	return values, nil
+	return []libregraph.AppRoleAssignment{}, nil
+}
+
+func (g Graph) fetchAppRoleAssignmentsForUsers(ctx context.Context, accountUUIDs []string) (map[string][]libregraph.AppRoleAssignment, error) {
+	if len(accountUUIDs) == 0 {
+		return nil, nil
+	}
+	filters := make([]*settingsmsg.UserRoleAssignmentFilter, 0, len(accountUUIDs))
+	for _, id := range accountUUIDs {
+		filters = append(filters, &settingsmsg.UserRoleAssignmentFilter{
+			Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ACCOUNT,
+			Term: &settingsmsg.UserRoleAssignmentFilter_AccountUuid{AccountUuid: id},
+		})
+	}
+	lrar, err := g.roleService.ListRoleAssignmentsFiltered(ctx, &settingssvc.ListRoleAssignmentsFilteredRequest{Filters: filters})
+	if err != nil {
+		return nil, err
+	}
+	byAccount := make(map[string][]libregraph.AppRoleAssignment, len(accountUUIDs))
+	for _, assignment := range lrar.GetAssignments() {
+		// WriteRoleAssignment always sets AccountUuid from the same uuid used for the storage path.
+		byAccount[assignment.GetAccountUuid()] = append(byAccount[assignment.GetAccountUuid()], g.assignmentToAppRoleAssignment(assignment))
+	}
+	return byAccount, nil
 }
 
 // GetUserDrive implements the Service interface.
@@ -417,14 +436,39 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 	expandAppRoleAssignments := slices.Contains(exp, appRoleAssignments)
 	expandMemberOf := slices.Contains(exp, "memberOf")
-	for _, u := range users {
-		if expandAppRoleAssignments && u.AppRoleAssignments == nil {
-			u.AppRoleAssignments, err = g.fetchAppRoleAssignments(r.Context(), u.GetId())
-			if err != nil {
-				// TODO I think we should not continue here, see http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionexpand
-				// > The $expand system query option indicates the related entities and stream values that MUST be represented inline. The service MUST return the specified content, and MAY choose to return additional information.
-				logger.Debug().Err(err).Str("userid", u.GetId()).Msg("could not get appRoleAssignments when listing user")
+
+	var assignmentsByAccount map[string][]libregraph.AppRoleAssignment
+	if expandAppRoleAssignments {
+		seen := make(map[string]struct{}, len(users))
+		accountUUIDs := make([]string, 0, len(users))
+		for _, u := range users {
+			if u.AppRoleAssignments != nil {
+				continue
 			}
+			id := u.GetId()
+			if _, ok := seen[id]; ok {
+				continue
+			}
+			seen[id] = struct{}{}
+			accountUUIDs = append(accountUUIDs, id)
+		}
+		assignmentsByAccount, err = g.fetchAppRoleAssignmentsForUsers(r.Context(), accountUUIDs)
+		if err != nil {
+			// TODO I think we should not continue here, see http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionexpand
+			// > The $expand system query option indicates the related entities and stream values that MUST be represented inline. The service MUST return the specified content, and MAY choose to return additional information.
+			logger.Debug().Err(err).Strs("accountIDs", accountUUIDs).Msg("could not get appRoleAssignments when listing users")
+		}
+	}
+
+	for _, u := range users {
+		// AppRoleAssignments may already be set by the appRoleID $filter path (filterUsersByAppRoleID);
+		// this nil check must stay, or it gets overwritten with the batched-fetch result below.
+		if expandAppRoleAssignments && u.AppRoleAssignments == nil {
+			assignments := assignmentsByAccount[u.GetId()]
+			if assignments == nil {
+				assignments = []libregraph.AppRoleAssignment{}
+			}
+			u.AppRoleAssignments = assignments
 		}
 		if expandMemberOf {
 			if u.MemberOf == nil {
