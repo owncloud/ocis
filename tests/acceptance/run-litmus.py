@@ -68,6 +68,10 @@ def base_server_env(repo_root: Path, ocis_config_dir: str, ocis_public_url: str)
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
         "EVENTHISTORY_STORE": "memory",
         "WEB_UI_CONFIG_FILE": str(repo_root / "tests/config/ci/ocis-config.json"),
+        # Litmus is a synchronous WebDAV compliance suite: it PUTs a file and
+        # immediately GETs it. Async uploads would make oCIS return 425 Too Early
+        # on that GET before post-processing completes, causing a spurious failure.
+        "OCIS_ASYNC_UPLOADS": "false",
     }
 
 
