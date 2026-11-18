@@ -58,6 +58,19 @@ describe('copy', () => {
           }
         })
       })
+      it('returns true in the "shared with me" view if "canDownload" is true', () => {
+        getWrapper({
+          routeName: 'files-shares-with-me',
+          setup: ({ actions }) => {
+            expect(
+              unref(actions)[0].isVisible({
+                space: null,
+                resources: [mock<Resource>({ id: '1', canDownload: () => true })]
+              })
+            ).toBeTruthy()
+          }
+        })
+      })
       it('returns false if "canDownload" is false', () => {
         getWrapper({
           searchLocation: false,
@@ -77,13 +90,13 @@ describe('copy', () => {
 
 function getWrapper({
   searchLocation = false,
+  routeName = searchLocation ? 'files-common-search' : 'files-spaces-generic',
   setup
 }: {
-  searchLocation: boolean
+  searchLocation?: boolean
+  routeName?: string
   setup: (instance: ReturnType<typeof useFileActionsCopy>) => void
 }) {
-  const routeName = searchLocation ? 'files-common-search' : 'files-spaces-generic'
-
   const mocks = {
     ...defaultComponentMocks({ currentRoute: mock<RouteLocation>({ name: routeName }) }),
     space: {
