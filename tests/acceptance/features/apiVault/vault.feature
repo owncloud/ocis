@@ -1207,22 +1207,60 @@ Feature: vault
       | shareType       | group         |
       | permissionsRole | Viewer        |
       | storage         | vault         |
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
       {
         "type": "object",
-        "required": ["error"],
+        "required": [
+          "value"
+        ],
         "properties": {
-          "error": {
-            "type": "object",
-            "required": ["code", "message"],
-            "properties": {
-              "code": {
-                "const": "accessDenied"
-              },
-              "message": {
-                "const": "grantee is not allowed to access vault resources"
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "group"
+                  ],
+                  "properties": {
+                    "group": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "displayName": {
+                          "type": "string",
+                          "const": "vault-group"
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%group_id_pattern%$"
+                        }
+                      }
+                    }
+                  }
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
+                }
               }
             }
           }
