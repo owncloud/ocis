@@ -39,6 +39,13 @@ type ContentConnectorService interface {
 	PutFile(ctx context.Context, stream io.Reader, streamLength int64, lockID string) (*ConnectorResponse, error)
 }
 
+const (
+	// getFileTooEarlyMaxAttempts bounds the retry when the storage backend is still
+	// finishing async post-processing (OCIS_ASYNC_UPLOADS=true) right after a PutFile.
+	getFileTooEarlyMaxAttempts = 3
+	getFileTooEarlyRetryDelay  = 150 * time.Millisecond
+)
+
 // ContentConnector implements the "File contents" endpoint.
 // Basically, the ContentConnector handles downloads (GetFile) and
 // uploads (PutFile)
@@ -151,18 +158,29 @@ func (c *ContentConnector) GetFile(ctx context.Context, w http.ResponseWriter) e
 
 	// Prepare the request to download the file
 	// public link downloads have the token in the download endpoint
-	httpReq, err := newHttpRequest(ctx, wopiContext, http.MethodGet, downloadEndpoint, downloadToken, bytes.NewReader([]byte("")))
-	if err != nil {
-		logger.Error().Err(err).Msg("GetFile: Could not create the request to the endpoint")
-		return err
-	}
+	var httpResp *http.Response
+	for attempt := 1; attempt <= getFileTooEarlyMaxAttempts; attempt++ {
+		httpReq, err := newHttpRequest(ctx, wopiContext, http.MethodGet, downloadEndpoint, downloadToken, bytes.NewReader([]byte("")))
+		if err != nil {
+			logger.Error().Err(err).Msg("GetFile: Could not create the request to the endpoint")
+			return err
+		}
 
-	httpResp, err := httpClient.Do(httpReq)
-	if err != nil {
-		logger.Error().Err(err).Msg("GetFile: Get request to the download endpoint failed")
-		return err
-	}
+		httpResp, err = httpClient.Do(httpReq)
+		if err != nil {
+			logger.Error().Err(err).Msg("GetFile: Get request to the download endpoint failed")
+			return err
+		}
 
+		if httpResp.StatusCode != http.StatusTooEarly {
+			break
+		}
+		// the file is still in async post-processing from a preceding PutFile; retry
+		httpResp.Body.Close()
+		if attempt < getFileTooEarlyMaxAttempts {
+			time.Sleep(getFileTooEarlyRetryDelay)
+		}
+	}
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {

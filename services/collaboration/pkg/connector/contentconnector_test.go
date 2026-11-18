@@ -34,9 +34,10 @@ var _ = Describe("ContentConnector", func() {
 		cfg             *config.Config
 		wopiCtx         middleware.WopiContext
 
-		srv           *httptest.Server
-		srvReqHeader  http.Header
-		randomContent string
+		srv                 *httptest.Server
+		srvReqHeader        http.Header
+		randomContent       string
+		processingRequests  int
 	)
 
 	BeforeEach(func() {
@@ -62,6 +63,7 @@ var _ = Describe("ContentConnector", func() {
 		}
 
 		randomContent = "This is the content of the test.txt file"
+		processingRequests = 0
 		srv = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			srvReqHeader = req.Header // save the request header to check later
 			switch req.URL.Path {
@@ -69,6 +71,16 @@ var _ = Describe("ContentConnector", func() {
 				w.WriteHeader(404)
 			case "/download/test.txt":
 				w.Write([]byte(randomContent))
+			case "/download/processing.txt":
+				processingRequests++
+				if processingRequests <= 2 {
+					w.WriteHeader(http.StatusTooEarly)
+					return
+				}
+				w.Write([]byte(randomContent))
+			case "/download/still-processing.txt":
+				processingRequests++
+				w.WriteHeader(http.StatusTooEarly)
 			case "/upload/failed.png":
 				w.WriteHeader(404)
 			case "/upload/test.txt":
@@ -187,6 +199,48 @@ var _ = Describe("ContentConnector", func() {
 			Expect(srvReqHeader.Get("X-Reva-Transfer")).To(Equal("MyDownloadToken"))
 			Expect(err).To(Succeed())
 			Expect(sb.Body.String()).To(Equal(randomContent))
+		})
+
+		It("Download request retries while the file is still post-processing", func() {
+			sb := httptest.NewRecorder()
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("InitiateFileDownload", mock.Anything, mock.Anything).Times(1).Return(&gateway.InitiateFileDownloadResponse{
+				Status: status.NewOK(ctx),
+				Protocols: []*gateway.FileDownloadProtocol{
+					{
+						Protocol:         "simple",
+						DownloadEndpoint: srv.URL + "/download/processing.txt",
+						Token:            "MyDownloadToken",
+					},
+				},
+			}, nil)
+
+			err := cc.GetFile(ctx, sb)
+			Expect(err).To(Succeed())
+			Expect(sb.Body.String()).To(Equal(randomContent))
+			Expect(processingRequests).To(Equal(3))
+		})
+
+		It("Download request gives up after the file stays in post-processing too long", func() {
+			sb := httptest.NewRecorder()
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+
+			gatewayClient.On("InitiateFileDownload", mock.Anything, mock.Anything).Times(1).Return(&gateway.InitiateFileDownloadResponse{
+				Status: status.NewOK(ctx),
+				Protocols: []*gateway.FileDownloadProtocol{
+					{
+						Protocol:         "simple",
+						DownloadEndpoint: srv.URL + "/download/still-processing.txt",
+						Token:            "MyDownloadToken",
+					},
+				},
+			}, nil)
+
+			err := cc.GetFile(ctx, sb)
+			Expect(err).To(HaveOccurred())
+			conErr := err.(*connector.ConnectorError)
+			Expect(conErr.HttpCodeOut).To(Equal(500))
 		})
 
 		It("ViewOnlyMode Download request success", func() {
