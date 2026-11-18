@@ -18,6 +18,12 @@ env:
   OCIS_WRAPPER_URL: http://localhost:5200
   K8S: true
 
+# Pull request runs cancel their predecessor on the same PR. Every other
+# event gets its own group, so pushes and scheduled runs never cancel each other.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   api-tests:
     name: ${{ matrix.suite }}-k8s
@@ -32,6 +38,7 @@ jobs:
 
     strategy:
       fail-fast: false
+      max-parallel: 8
       matrix:
         include:
           - suite: apiContract
@@ -457,6 +464,7 @@ jobs:
 
     strategy:
       fail-fast: false
+      max-parallel: 3
       matrix:
         include:
           # - suite: part-1
