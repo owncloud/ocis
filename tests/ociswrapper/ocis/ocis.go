@@ -146,8 +146,8 @@ func WaitForConnection() (bool, string) {
 			coreServices := []string{
 				"gateway",
 				"sharing",
-				"storageusers",
-				"storageshares",
+				"storage-users",
+				"storage-shares",
 				"proxy",
 				"graph",
 				"settings",
@@ -171,6 +171,33 @@ func WaitForConnection() (bool, string) {
 			}
 
 			return true, "oCIS server is up and running"
+		}
+	}
+}
+
+// waitServiceReady polls http://localhost:<debugPort>/readyz until 200 or 30 s.
+func waitServiceReady(service string) bool {
+	port := config.GetServiceDebugPort(service)
+	url := fmt.Sprintf("http://localhost:%d/readyz", port)
+	timeout := time.After(30 * time.Second)
+	client := http.Client{Timeout: 2 * time.Second}
+
+	for {
+		select {
+		case <-timeout:
+			log.Println(fmt.Sprintf("Timeout waiting for %s /readyz on port %d", service, port))
+			return false
+		default:
+			res, err := client.Get(url)
+			if err == nil && res.StatusCode == 200 {
+				res.Body.Close()
+				log.Println(fmt.Sprintf("%s service is ready (readyz port %d)", service, port))
+				return true
+			}
+			if res != nil {
+				res.Body.Close()
+			}
+			time.Sleep(500 * time.Millisecond)
 		}
 	}
 }
