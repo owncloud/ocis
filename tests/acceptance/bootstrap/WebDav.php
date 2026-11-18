@@ -4868,6 +4868,15 @@ trait WebDav {
 			$href = (string)$item->xpath("d:href")[0];
 			$shareRootXml = $item->xpath("d:propstat//oc:shareroot");
 			$resourcePath = \preg_replace($hrefRegex, "", $href);
+			// oCIS returns spaces-format hrefs for all DAV path versions (see issue #7060);
+			// if the expected-path regex did not match, fall back to spaces-format parsing
+			if ($resourcePath === $href) {
+				$spacesHrefRegex = '/^(\/remote\.php)?\/dav\/spaces\/[a-zA-Z0-9\-_$!:%]+/';
+				$fallback = \preg_replace($spacesHrefRegex, "", $href);
+				if ($fallback !== $href) {
+					$resourcePath = $fallback;
+				}
+			}
 			// do not try to parse the resource path
 			// if the item to search is space itself
 			if (!GraphHelper::isSpaceId($entryNameToSearch ?? '')) {

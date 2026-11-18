@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	cs3user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/response"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
@@ -35,7 +36,16 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 	// use the user's UUID
 	userID := u.Id.OpaqueId
 
-	res, err := o.store.Read(userID)
+	// A request that itself currently carries MFA is issued the MFA-bound key
+	// instead of the normal key. A request without MFA keeps getting the
+	// normal key, unchanged. A non-MFA request must never receive the
+	// MFA-bound key under any code path.
+	storeKey := userID
+	if revactx.HasMFA(r.Context()) {
+		storeKey = mfa.SigningKeyName(userID)
+	}
+
+	res, err := o.store.Read(storeKey)
 	if err == nil && len(res) > 0 {
 		o.mustRender(w, r, response.DataRender(&data.SigningKey{
 			User:       userID,
@@ -62,7 +72,7 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 	}
 	signingKey := hex.EncodeToString(key)
 
-	err = o.store.Write(&store.Record{Key: userID, Value: []byte(signingKey)})
+	err = o.store.Write(&store.Record{Key: storeKey, Value: []byte(signingKey)})
 	if err != nil {
 		o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, "could not persist signing key"))
 		return

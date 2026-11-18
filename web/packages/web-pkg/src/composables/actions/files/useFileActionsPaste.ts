@@ -17,7 +17,12 @@ import {
   useMessages,
   useResourcesStore
 } from '../../piniaStores'
-import { ClipboardActions, ResourceTransfer, TransferType } from '../../../helpers'
+import {
+  ClipboardActions,
+  getResourcesAtTarget,
+  ResourceTransfer,
+  TransferType
+} from '../../../helpers'
 import { storeToRefs } from 'pinia'
 import { usePasteWorker } from '../../webWorkers/pasteWorker'
 
@@ -96,10 +101,15 @@ export const useFileActionsPaste = () => {
 
     const originalCurrentFolderId = unref(currentFolder)?.id
 
-    startWorker(transferData, async ({ successful, failed }) => {
-      resourceTransfer.showResultMessage(failed, successful, unref(transferType))
+    // a cut between spaces is turned into a copy when resolving the transfer data
+    const resolvedTransferType = transferData[0].transferType
 
-      if (!successful.length) {
+    startWorker(transferData, async ({ successful, failed }) => {
+      resourceTransfer.showResultMessage(failed, successful, resolvedTransferType)
+
+      // incomplete folder copies exist too, so they are shown as well
+      const resourcesAtTarget = getResourcesAtTarget(successful, failed)
+      if (!resourcesAtTarget.length) {
         return
       }
 
@@ -112,7 +122,7 @@ export const useFileActionsPaste = () => {
       const loadingResources: Promise<void>[] = []
       const fetchedResources: Resource[] = []
 
-      for (const resource of successful) {
+      for (const resource of resourcesAtTarget) {
         loadingResources.push(
           (async () => {
             const movedResource = await clientService.webdav.getFileInfo(targetSpace, resource)

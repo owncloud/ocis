@@ -1,13 +1,16 @@
 import { basename, join } from 'path'
 import type { Resource, SpaceResource } from '@ownclouders/web-client'
-import { ResolveStrategy, TransferType, type TransferData } from './types'
+import { ResolveStrategy, TransferType, type TransferData, type TransferFailure } from './types'
 import { ConflictDialog } from './conflictDialog'
 import { resolveFileNameDuplicate, isResourceBeeingMovedToSameLocation } from './conflictUtils'
 import type { ClientService } from '../../../services'
-import { useMessages } from '../../../composables'
+import { getXRequestIdsLog, useMessages } from '../../../composables'
 import { Ref, unref } from 'vue'
 import type { Language } from 'vue3-gettext'
 import { HttpError } from '@ownclouders/web-client'
+
+/** At most this many lines of what wasn't copied are shown in the details, the rest is counted. */
+const NOT_COPIED_LOG_LIMIT = 100
 
 export class ResourceTransfer extends ConflictDialog {
   constructor(
@@ -44,7 +47,7 @@ export class ResourceTransfer extends ConflictDialog {
   }
 
   showResultMessage(
-    errors: { resourceName: string; incomplete?: boolean; error: Error }[],
+    errors: TransferFailure[],
     movedResources: Array<Resource>,
     transferType: TransferType
   ) {
@@ -53,8 +56,9 @@ export class ResourceTransfer extends ConflictDialog {
       if (count === 0) {
         return
       }
+      // a duplicate is a copy too
       const title =
-        transferType === TransferType.COPY
+        transferType === TransferType.COPY || transferType === TransferType.DUPLICATE
           ? this.$ngettext(
               '%{count} item was copied successfully',
               '%{count} items were copied successfully',
@@ -71,27 +75,90 @@ export class ResourceTransfer extends ConflictDialog {
       messageStore.showMessage({ title, status: 'success' })
       return
     }
-    const title = this.getFailureTitle(errors, transferType)
-    let description = ''
-    if (errors.some(({ error }) => error instanceof HttpError && error.statusCode === 507)) {
-      description = this.getInsufficientQuotaDescription(transferType)
+    const incomplete = this.isIncomplete(errors, transferType)
+    const title = this.getFailureTitle(errors, transferType, incomplete)
+    const descriptions: string[] = []
+    if (incomplete) {
+      descriptions.push(this.getCopiedItemsDescription(errors))
     }
+    if (errors.some(({ error }) => error instanceof HttpError && error.statusCode === 507)) {
+      descriptions.push(this.getInsufficientQuotaDescription(transferType))
+    }
+    const description = descriptions.filter(Boolean).join(' ')
     const messageStore = useMessages()
     messageStore.showErrorMessage({
       title,
       ...(description && { desc: description }),
-      errors: errors.map(({ error }) => error)
+      errors: errors.map(({ error }) => error),
+      ...(incomplete && { errorLogContent: this.getNotCopiedLog(errors) })
     })
   }
 
+  /** The copied folders exist, but some of their content is missing. Moves are one request. */
+  private isIncomplete(errors: TransferFailure[], transferType: TransferType): boolean {
+    return transferType !== TransferType.MOVE && errors.every(({ incomplete }) => incomplete)
+  }
+
+  /**
+   * E.g. "87 of 100 items copied.", empty when the folders didn't contain any known item. There is no
+   * verb, so the plural form only has to agree with the total ("of 100 items").
+   */
+  private getCopiedItemsDescription(errors: TransferFailure[]): string {
+    const copied = errors.reduce((sum, { incomplete }) => sum + incomplete.copiedItems, 0)
+    const total = errors.reduce((sum, { incomplete }) => sum + incomplete.totalItems, 0)
+    if (total === 0) {
+      return ''
+    }
+    return this.$ngettext(
+      '%{copied} of %{total} item copied.',
+      '%{copied} of %{total} items copied.',
+      total,
+      { copied: copied.toString(), total: total.toString() }
+    )
+  }
+
+  /** What the "Details" of the message show: what wasn't copied, then the request ids. */
+  private getNotCopiedLog(errors: TransferFailure[]): string {
+    const lines = errors
+      .flatMap(({ incomplete }) => incomplete.notCopied)
+      .sort((a, b) => a.localeCompare(b))
+
+    // a big failure, e.g. running out of storage, can leave thousands of items behind
+    const shownLines = lines.slice(0, NOT_COPIED_LOG_LIMIT)
+    const hiddenCount = lines.length - shownLines.length
+    const requestIds = getXRequestIdsLog(errors.map(({ error }) => error))
+
+    return [
+      this.$gettext('Not copied:'),
+      ...shownLines,
+      ...(hiddenCount
+        ? [
+            this.$ngettext('…and %{count} more item', '…and %{count} more items', hiddenCount, {
+              count: hiddenCount.toString()
+            })
+          ]
+        : []),
+      ...(requestIds ? ['', requestIds] : [])
+    ].join('\r\n')
+  }
+
   private getFailureTitle(
-    errors: { resourceName: string; incomplete?: boolean; error: Error }[],
-    transferType: TransferType
+    errors: TransferFailure[],
+    transferType: TransferType,
+    incomplete: boolean
   ): string {
     const errorCount = errors.length
     const params = { name: errors[0]?.resourceName, count: errorCount.toString() }
     switch (transferType) {
       case TransferType.COPY:
+        if (incomplete) {
+          return this.$ngettext(
+            'Copy of "%{name}" incomplete',
+            'Copy of %{count} resources incomplete',
+            errorCount,
+            params
+          )
+        }
         return this.$ngettext(
           'Failed to copy "%{name}"',
           'Failed to copy %{count} resources',
@@ -99,8 +166,7 @@ export class ResourceTransfer extends ConflictDialog {
           params
         )
       case TransferType.DUPLICATE:
-        // the duplicated folders exist, but some of their content is missing
-        if (errors.every(({ incomplete }) => incomplete)) {
+        if (incomplete) {
           return this.$ngettext(
             'Duplication of "%{name}" incomplete',
             'Duplication of %{count} resources incomplete',

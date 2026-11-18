@@ -3,8 +3,12 @@ import { useWebWorkersStore } from '../../piniaStores/webWorkers'
 import { useConfigStore } from '../../piniaStores'
 import { useLoadingService } from '../../loadingService'
 import { useRequestHeaders } from '../../requestHeaders'
-import { createHttpError, type HttpError, type Resource } from '@ownclouders/web-client'
-import type { TransferData } from '../../../helpers/resource/conflictHandling'
+import { createHttpError, type Resource } from '@ownclouders/web-client'
+import type {
+  IncompleteCopy,
+  TransferData,
+  TransferFailure
+} from '../../../helpers/resource/conflictHandling'
 import PasteWorker from './worker?worker'
 
 export type PasteWorkerReturnData = {
@@ -12,7 +16,7 @@ export type PasteWorkerReturnData = {
   failed: {
     resourceName: string
     // a folder copy that created the folder but missed some of its content
-    incomplete?: boolean
+    incomplete?: IncompleteCopy
     message: string
     statusCode: number
     xReqId: string
@@ -21,7 +25,7 @@ export type PasteWorkerReturnData = {
 
 type CallbackOptions = {
   successful: Resource[]
-  failed: { resourceName: string; incomplete?: boolean; error: HttpError }[]
+  failed: TransferFailure[]
 }
 
 /**

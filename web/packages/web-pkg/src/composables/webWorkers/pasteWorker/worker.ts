@@ -1,5 +1,5 @@
 import PQueue from 'p-queue'
-import { join } from 'path'
+import { basename, join } from 'path'
 import { webdav as _webdav, type Resource, type SpaceResource } from '@ownclouders/web-client'
 import type { WorkerTopic } from '../../piniaStores/webWorkers'
 import { TransferType } from '../../../helpers/resource/conflictHandling/types'
@@ -16,6 +16,16 @@ type MessageData = {
 type FolderContent = {
   files: Resource[]
   folders: { folder: Resource; content: FolderContent }[]
+  // the folder couldn't be listed, so its content is unknown and it isn't copied
+  notRead?: boolean
+}
+
+/** What a folder copy collects on its way, see `IncompleteCopy` for the result. */
+type FolderCopyProgress = {
+  errors: unknown[]
+  totalItems: number
+  missingItems: number
+  notCopied: string[]
 }
 
 type Message = {
@@ -76,6 +86,13 @@ self.onmessage = async (e: MessageEvent) => {
     xReqId: e?.response?.headers?.get('x-request-id')
   })
 
+  /**
+   * Only one error per resource reaches the message. Running out of storage is the one failure the
+   * message explains, so it wins over the first error.
+   */
+  const getReportedError = (errors: unknown[]) =>
+    errors.find((e: any) => e?.statusCode === 507) ?? errors[0]
+
   const collectError = (errors: unknown[]) => (e: unknown) => {
     console.error(e)
     errors.push(e)
@@ -88,7 +105,7 @@ self.onmessage = async (e: MessageEvent) => {
 
   /**
    * Lists the given children of a folder and all of their subfolders. Errors are collected instead
-   * of thrown, a subfolder that can't be listed counts as empty.
+   * of thrown, a subfolder that can't be listed is marked as not read.
    */
   const listFolderContent = async (
     sourceSpace: SpaceResource,
@@ -99,50 +116,89 @@ self.onmessage = async (e: MessageEvent) => {
       children
         .filter((child) => child.isFolder)
         .map(async (child) => {
-          let grandChildren: Resource[] = []
           try {
-            grandChildren = await listChildren(sourceSpace, child)
+            const grandChildren = await listChildren(sourceSpace, child)
+            return {
+              folder: child,
+              content: await listFolderContent(sourceSpace, grandChildren, errors)
+            }
           } catch (e) {
             collectError(errors)(e)
-          }
-          return {
-            folder: child,
-            content: await listFolderContent(sourceSpace, grandChildren, errors)
+            return { folder: child, content: { files: [], folders: [], notRead: true } }
           }
         })
     )
     return { files: children.filter((child) => !child.isFolder), folders }
   }
 
+  /** The files and folders inside listed folder content, at any depth. */
+  const countItems = (content: FolderContent): number =>
+    content.folders.reduce(
+      (count, { content }) => count + countItems(content),
+      content.files.length + content.folders.length
+    )
+
   /**
    * Copies listed folder content with one request per file and per subfolder. Errors are collected
-   * instead of thrown, so one failing item doesn't stop the rest from being copied.
+   * instead of thrown, so one failing item doesn't stop the rest from being copied. `displayPath`
+   * is the original folder's path as shown to the user, it starts with the original name of the
+   * folder being copied (a duplicate gets a new name, e.g. "Project (1)", the original keeps it).
    */
   const copyFolderContent = async (
     sourceSpace: SpaceResource,
     content: FolderContent,
     targetSpace: SpaceResource,
     targetPath: string,
-    errors: unknown[]
+    displayPath: string,
+    progress: FolderCopyProgress
   ) => {
+    progress.totalItems += content.files.length + content.folders.length
+
     const copyFile = (file: Resource) =>
       queue
         .add(() =>
           webdav.copyFiles(sourceSpace, file, targetSpace, { path: join(targetPath, file.name) })
         )
-        .catch(collectError(errors))
+        .catch((e) => {
+          collectError(progress.errors)(e)
+          progress.missingItems++
+          progress.notCopied.push(join(displayPath, file.name))
+        })
+
+    // the folder and everything known inside it is missing, it's named once instead of listing all
+    // of its content
+    const markFolderNotCopied = (content: FolderContent, folderDisplayPath: string) => {
+      const itemsInFolder = countItems(content)
+      progress.totalItems += itemsInFolder
+      progress.missingItems += 1 + itemsInFolder
+      progress.notCopied.push(`${folderDisplayPath}/`)
+    }
 
     const copySubfolder = async ({ folder, content }: FolderContent['folders'][number]) => {
       const folderTargetPath = join(targetPath, folder.name)
+      const folderDisplayPath = join(displayPath, folder.name)
+      if (content.notRead) {
+        // its content is unknown, so it isn't created at all rather than left empty in the copy
+        markFolderNotCopied(content, folderDisplayPath)
+        return
+      }
       try {
         await queue.add(() =>
           webdav.createFolder(targetSpace, { path: folderTargetPath, fetchFolder: false })
         )
       } catch (e) {
-        collectError(errors)(e)
+        collectError(progress.errors)(e)
+        markFolderNotCopied(content, folderDisplayPath)
         return
       }
-      await copyFolderContent(sourceSpace, content, targetSpace, folderTargetPath, errors)
+      await copyFolderContent(
+        sourceSpace,
+        content,
+        targetSpace,
+        folderTargetPath,
+        folderDisplayPath,
+        progress
+      )
     }
 
     await Promise.all([...content.files.map(copyFile), ...content.folders.map(copySubfolder)])
@@ -155,19 +211,32 @@ self.onmessage = async (e: MessageEvent) => {
    * The whole folder gets listed before anything is created, so folders created by this copy can
    * never show up in the listing (e.g. when the target is reached through another space).
    * Throws if the folder itself can't be listed or created, so nothing gets created then. Resolves
-   * with the errors of its content otherwise.
+   * with what was collected while copying its content otherwise.
    */
-  const copyFolderFileByFile = async (data: TransferData) => {
-    const errors: unknown[] = []
+  const copyFolderFileByFile = async (data: TransferData): Promise<FolderCopyProgress> => {
+    const progress: FolderCopyProgress = {
+      errors: [],
+      totalItems: 0,
+      missingItems: 0,
+      notCopied: []
+    }
     const children = await listChildren(data.sourceSpace, data.resource)
-    const content = await listFolderContent(data.sourceSpace, children, errors)
+    const content = await listFolderContent(data.sourceSpace, children, progress.errors)
 
     await queue.add(() =>
       webdav.createFolder(data.targetSpace, { path: data.path, fetchFolder: false })
     )
 
-    await copyFolderContent(data.sourceSpace, content, data.targetSpace, data.path, errors)
-    return errors
+    await copyFolderContent(
+      data.sourceSpace,
+      content,
+      data.targetSpace,
+      data.path,
+      // `resource.name` is the name of the copy already, the original name is the end of its path
+      basename(data.resource.path) || data.resource.name,
+      progress
+    )
+    return progress
   }
 
   /** The target lies inside the source folder, e.g. "/a" pasted into "/a/b". */
@@ -188,10 +257,19 @@ self.onmessage = async (e: MessageEvent) => {
       // these stay one request: replacing a folder (the server deletes the existing folder first)
       // and copying a folder into itself (the server rejects that)
       if (isCopy && resource.isFolder && !data.overwrite && !isCopyIntoItself(data)) {
-        const errors = await copyFolderFileByFile(data)
+        const { errors, totalItems, missingItems, notCopied } = await copyFolderFileByFile(data)
         if (errors.length) {
           // the folder exists but misses some of its content
-          failed.push({ resourceName: resource.name, incomplete: true, ...getErrorData(errors[0]) })
+          failed.push({
+            resourceName: resource.name,
+            incomplete: {
+              path: data.path,
+              copiedItems: totalItems - missingItems,
+              totalItems,
+              notCopied
+            },
+            ...getErrorData(getReportedError(errors))
+          })
           return
         }
       } else if (isCopy) {

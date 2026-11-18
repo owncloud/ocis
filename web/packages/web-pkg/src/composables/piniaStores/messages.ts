@@ -5,6 +5,17 @@ import { HttpError } from '@ownclouders/web-client'
 
 type MessageError = Error | HttpError
 
+/**
+ * The request ids of the given errors, one "X-Request-Id: …" line each, as shown in the details of an
+ * error message. Errors without a request id (e.g. a request that got no answer) are left out.
+ */
+export const getXRequestIdsLog = (errors: MessageError[]): string =>
+  errors
+    .map((error) => (error as HttpError).response?.headers?.get('x-request-id'))
+    .filter(Boolean)
+    .map((xRequestId) => `X-Request-Id: ${xRequestId}`)
+    .join('\r\n')
+
 export interface MessageAction {
   label: string
   ariaLabel?: string
@@ -31,24 +42,12 @@ export const useMessages = defineStore('messages', () => {
     return message
   }
 
-  const getXRequestIdsFromErrors = (errors: Message['errors']) => {
-    const getXRequestID = (error: MessageError) => {
-      return (error as HttpError).response?.headers?.get('x-request-id')
-    }
-
-    return errors
-      .map((error) => getXRequestID(error))
-      .filter((xRequestId) => xRequestId !== null)
-      .map((item) => `X-Request-Id: ${item}`)
-      .join('\r\n')
-  }
-
   const showErrorMessage = (data: Omit<Message, 'id'>) => {
     const message = {
       id: uuidV4() as string,
       status: 'danger',
       timeout: 0,
-      ...(data.errors && { errorLogContent: getXRequestIdsFromErrors(data.errors) }),
+      ...(data.errors && { errorLogContent: getXRequestIdsLog(data.errors) }),
       ...data
     }
 
