@@ -706,13 +706,13 @@ jobs:
             bash tests/config/k8s/expose-external-svc.sh fakeoffice:8080
           fi
 
-      - name: Deploy oCIS
+      - name: Deploy oCIS for e2e tests
         run: |
           cd tests/config/k8s
           kubectl get pods -n "$TEST_SERVER_DOMAIN" -Aw &
-          make deploy-ocis
+          make deploy-ocis-e2e
           if [[ "${{ matrix.suite }}"  == "ocm" ]]; then
-            OCM=true make deploy-ocis
+            OCM=true make deploy-ocis-e2e
           fi
 
       - name: Expose node ports
