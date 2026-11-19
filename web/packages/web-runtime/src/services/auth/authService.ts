@@ -21,6 +21,7 @@ import {
 } from '../../router'
 import { unref } from 'vue'
 import { Ability } from '@ownclouders/web-client'
+import { User as OcUser } from '@ownclouders/web-client/graph/generated'
 import { Language } from 'vue3-gettext'
 import { PublicLinkType } from '@ownclouders/web-client'
 import { WebWorkersStore } from '@ownclouders/web-pkg'
@@ -152,7 +153,7 @@ export class AuthService implements AuthServiceInterface {
     if (to.params.scope === 'vault') {
       // Permissions known: send an unentitled user to accessDenied instead of the IdP.
       if (this.authStore.userContextReady && !this.ability.can('read-all', 'Vault')) {
-        return this.denyVaultAccess()
+        return this.denyVaultAccess(this.userStore.user?.preferredLanguage)
       }
 
       // Capabilities only — the full context loads vault spaces, which 401 without MFA and crash.
@@ -165,15 +166,16 @@ export class AuthService implements AuthServiceInterface {
 
       // Address-bar navigation: permissions unloaded — load them and deny before MFA.
       if (user && !user.expired && !this.authStore.userContextReady) {
+        let graphUser: OcUser
         try {
-          await this.userManager.loadUserAbilities()
+          graphUser = await this.userManager.loadUserAbilities()
         } catch (e) {
           // Can't confirm access: deny, don't hand off to MFA or leave a blank page.
           console.error('failed to load vault abilities on cold load, denying access:', e)
           return { name: 'accessDenied' }
         }
         if (!this.ability.can('read-all', 'Vault')) {
-          return this.denyVaultAccess()
+          return this.denyVaultAccess(graphUser.preferredLanguage)
         }
       }
 
@@ -530,14 +532,21 @@ export class AuthService implements AuthServiceInterface {
    * button) would then show the regular app as the vault and load vault spaces, which fails.
    * Such a page shows the denial outside the vault, with a full page load that replaces the
    * vault URL in the browser history.
+   *
+   * The reloaded page doesn't load the user (the `accessDenied` route needs no login), so it
+   * would show the browser language. The `lang` query makes it start in the user's language.
    */
-  private denyVaultAccess(): RouteLocationRaw | false {
+  private denyVaultAccess(preferredLanguage?: string): RouteLocationRaw | false {
     const accessDenied = { name: 'accessDenied', query: { reason: 'forbidden' } }
     if (!this.configStore.isInVault) {
       return accessDenied
     }
 
-    this.navigateOutsideVault(this.router.resolve(accessDenied).href, { replace: true })
+    const reloadTarget = {
+      ...accessDenied,
+      query: { ...accessDenied.query, ...(preferredLanguage && { lang: preferredLanguage }) }
+    }
+    this.navigateOutsideVault(this.router.resolve(reloadTarget).href, { replace: true })
     // cancel the vault navigation, the page reloads outside the vault
     return false
   }
