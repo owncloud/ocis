@@ -20,4 +20,4 @@ A new step in the workflow reads the environment of the oCIS process. The step
 fails the job when one of the settings is missing. Thus a test does not run with
 the wrong settings.
 
-https://github.com/owncloud/ocis/pull/13534
+https://github.com/owncloud/ocis/pull/13536
