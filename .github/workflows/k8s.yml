@@ -563,6 +563,7 @@ jobs:
           ENABLE_OCM: ${{ matrix.suite == 'ocm' }}
           ENABLE_SHORT_IDP_TOKEN_EXPIRY: ${{ matrix.suite == 'oidc' || matrix.suite == 'oidc-iframe' }}
           ENABLE_OIDC_OFFLINE_ACCESS: ${{ matrix.suite == 'oidc' }}
+          ENABLE_E2E_ROLES: "true"
         run: |
           cd tests/config/k8s
           make prepare-charts
