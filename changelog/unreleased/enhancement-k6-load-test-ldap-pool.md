@@ -11,6 +11,8 @@ settings:
 - `OCIS_LDAP_POOL_ENABLED=true` uses a pool of LDAP connections.
 - `OCIS_LDAP_POOL_SIZE=20` sets 20 connections for each pool.
 - `OCIS_LDAP_UPDATE_LAST_SIGNIN_DATE=false` stops the LDAP write at each login.
+- `PROXY_OIDC_SKIP_USER_INFO=true` reads the user claims from the access token.
+  The proxy then does not call the userinfo endpoint of the IdP for a new token.
 - `SHARING_USER_JSONCS3_MAX_CONCURRENCY=5` limits the parallel work of the
   share manager.
 

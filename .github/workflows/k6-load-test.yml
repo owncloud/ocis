@@ -66,10 +66,14 @@ jobs:
           # OCIS_LDAP_UPDATE_LAST_SIGNIN_DATE=false stops the LDAP write on each
           # login. The default is true, so each of the k6 logins writes to LDAP.
           #
+          # PROXY_OIDC_SKIP_USER_INFO=true makes the proxy read the user claims
+          # from the access token. Without it each new token calls the userinfo
+          # endpoint of the IdP, and this call binds to LDAP again.
+          #
           # SHARING_USER_JSONCS3_MAX_CONCURRENCY limits the parallel go-routines
           # of the jsoncs3 share manager. The share removal uses at least 3.
           ssh $SSH_OPTS "loadtest@$OCIS_HOST" \
-            "OCIS_COMMIT_ID='$OCIS_COMMIT_ID' OCIS_LDAP_POOL_ENABLED=true OCIS_LDAP_POOL_SIZE=20 OCIS_LDAP_UPDATE_LAST_SIGNIN_DATE=false SHARING_USER_JSONCS3_MAX_CONCURRENCY=5 /usr/local/bin/ocis.sh start"
+            "OCIS_COMMIT_ID='$OCIS_COMMIT_ID' OCIS_LDAP_POOL_ENABLED=true OCIS_LDAP_POOL_SIZE=20 OCIS_LDAP_UPDATE_LAST_SIGNIN_DATE=false PROXY_OIDC_SKIP_USER_INFO=true SHARING_USER_JSONCS3_MAX_CONCURRENCY=5 /usr/local/bin/ocis.sh start"
 
       # The variables reach the oCIS process only if ocis.sh passes its
       # environment on. Fail here, and not after a 30 minute run.
@@ -80,6 +84,7 @@ jobs:
              grep -x "OCIS_LDAP_POOL_ENABLED=true" /tmp/ocis-env.$$ &&
              grep -x "OCIS_LDAP_POOL_SIZE=20" /tmp/ocis-env.$$ &&
              grep -x "OCIS_LDAP_UPDATE_LAST_SIGNIN_DATE=false" /tmp/ocis-env.$$ &&
+             grep -x "PROXY_OIDC_SKIP_USER_INFO=true" /tmp/ocis-env.$$ &&
              grep -x "SHARING_USER_JSONCS3_MAX_CONCURRENCY=5" /tmp/ocis-env.$$;
              rc=$?; rm -f /tmp/ocis-env.$$; exit $rc'
 
