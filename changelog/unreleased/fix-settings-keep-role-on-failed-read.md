@@ -18,4 +18,4 @@ We fixed these causes:
   gone. The settings service now skips only that account.
 
 https://github.com/owncloud/ocis/pull/13535
-https://github.com/owncloud/reva/pull/820
+https://github.com/owncloud/reva/pull/822
