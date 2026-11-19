@@ -1244,7 +1244,7 @@ func mapHasKey(checkMap map[string][]byte, keys ...string) bool {
 }
 
 func isGrantExpired(g *provider.Grant) bool {
-	if g.Expiration == nil {
+	if g == nil || g.Expiration == nil {
 		return false
 	}
 	return time.Now().After(time.Unix(int64(g.Expiration.Seconds), int64(g.Expiration.Nanos)))

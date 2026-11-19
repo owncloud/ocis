@@ -30,16 +30,12 @@ import (
 // #include <stdint.h>
 // #include <stdlib.h>
 //
+// typedef void (*go_fuzz_flush_fn)(void);
 // typedef void (*go_fuzz_json_data_fn)(const char *data, size_t size);
 // void
-// go_fuzz_json_data(void *f, const char *data, size_t size) {
+// go_fuzz_json_data(void *f, void *flush, const char *data, size_t size) {
 //   ((go_fuzz_json_data_fn)f)(data, size);
-// }
-//
-// typedef void (*go_fuzz_flush_fn)(void);
-// void
-// go_fuzz_flush(void *f) {
-//   ((go_fuzz_flush_fn)f)();
+//   ((go_fuzz_flush_fn)flush)();
 // }
 //
 // typedef uint64_t (*go_fuzz_get_random_fn)(void);
@@ -93,15 +89,13 @@ type voidstarHandler struct {
 	leaseGeneration  *uint64
 }
 
-func (h *voidstarHandler) output(message string) {
+func (h *voidstarHandler) output(message []byte) {
 	msg_len := len(message)
 	if msg_len == 0 {
 		return
 	}
-	cstrMessage := C.CString(message)
-	defer C.free(unsafe.Pointer(cstrMessage))
-	C.go_fuzz_json_data(h.fuzzJsonData, cstrMessage, C.ulong(msg_len))
-	C.go_fuzz_flush(h.fuzzFlush)
+	// One cgo call keeps the Go buffer pinned through delivery and flushing.
+	C.go_fuzz_json_data(h.fuzzJsonData, h.fuzzFlush, (*C.char)(unsafe.Pointer(&message[0])), C.size_t(msg_len))
 }
 
 func (h *voidstarHandler) random() uint64 {

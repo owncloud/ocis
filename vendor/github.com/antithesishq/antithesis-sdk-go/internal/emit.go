@@ -15,7 +15,7 @@ func Json_data(v any) error {
 	if data, err := json.Marshal(v); err != nil {
 		return err
 	} else {
-		handler.output(string(data))
+		handler.output(data)
 		return nil
 	}
 }
@@ -45,7 +45,8 @@ func InitCoverage(num_edges uint64, symbols string) uint64 {
 }
 
 type libHandler interface {
-	output(message string)
+	// output consumes its buffer synchronously and may append a newline.
+	output(message []byte)
 	random() uint64
 	notify(edge uint64) bool
 	notify_v2(edge uint64, hits uint64) (uint64, bool)
@@ -70,13 +71,13 @@ type localHandler struct {
 	outputFile *os.File // can be nil
 }
 
-func (h *localHandler) output(message string) {
+func (h *localHandler) output(message []byte) {
 	msg_len := len(message)
 	if msg_len == 0 {
 		return
 	}
 	if h.outputFile != nil {
-		h.outputFile.WriteString(message + "\n")
+		h.outputFile.Write(append(message, '\n'))
 	}
 }
 
@@ -127,7 +128,7 @@ func emitVersionMessage() {
 		"protocol_version": Protocol_Version,
 	}
 	if data, err := json.Marshal(map[string]any{"antithesis_sdk": versionBlock}); err == nil {
-		handler.output(string(data))
+		handler.output(data)
 	}
 }
 

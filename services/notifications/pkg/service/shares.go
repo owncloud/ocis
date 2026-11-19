@@ -4,6 +4,7 @@ import (
 	"context"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	"github.com/owncloud/ocis/v2/ocis-pkg/vault"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/email"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"github.com/owncloud/reva/v2/pkg/events"
@@ -33,7 +34,7 @@ func (s eventsNotifier) handleShareCreated(baseCtx context.Context, e events.Sha
 		return
 	}
 
-	granteeList := s.ensureGranteeList(ctx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
+	granteeList := s.ensureGranteeList(ctx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID, vault.IsVaultStorage(e.ItemID.GetStorageId()))
 	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventShareCreated)
 
 	recipientsInstant, recipientsDaily, recipientsInstantWeekly := s.splitter.execute(ctx, filteredGrantees)
@@ -123,7 +124,7 @@ func (s eventsNotifier) handleShareExpired(baseCtx context.Context, e events.Sha
 		return
 	}
 
-	granteeList := s.ensureGranteeList(ctx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
+	granteeList := s.ensureGranteeList(ctx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID, vault.IsVaultStorage(e.ItemID.GetStorageId()))
 	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventShareExpired)
 
 	recipientsInstant, recipientsDaily, recipientsInstantWeekly := s.splitter.execute(ctx, filteredGrantees)
@@ -183,7 +184,7 @@ func (s eventsNotifier) handleShareRemoved(baseCtx context.Context, e events.Sha
 		return
 	}
 
-	granteeList := s.ensureGranteeList(ctx, executant.GetId(), e.GranteeUserID, e.GranteeGroupID)
+	granteeList := s.ensureGranteeList(ctx, executant.GetId(), e.GranteeUserID, e.GranteeGroupID, vault.IsVaultStorage(e.ItemID.GetStorageId()))
 	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventShareRemoved)
 
 	recipientsInstant, recipientsDaily, recipientsInstantWeekly := s.splitter.execute(ctx, filteredGrantees)
