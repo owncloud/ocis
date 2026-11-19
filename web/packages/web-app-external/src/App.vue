@@ -385,7 +385,8 @@ watch(
       return
     }
 
-    let viewMode = 'view'
+    const readOnlyViewMode = props.resource.canDownload?.() ? 'read' : 'view'
+    let viewMode = readOnlyViewMode
 
     if (!props.isReadOnly) {
       viewMode = unref(viewModeQueryValue) || 'write'
@@ -397,7 +398,7 @@ watch(
         isPublicSpaceResource(props.space) ||
         isProjectSpaceResource(props.space))
     ) {
-      viewMode = 'view'
+      viewMode = readOnlyViewMode
     }
     loadAppUrl.perform(viewMode)
   },
