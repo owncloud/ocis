@@ -24,6 +24,8 @@ vi.mock('vue-router', async (importOriginal) => ({
   useRoute: vi.fn(() => ({ meta: { title: 'lorem title' }, to: '/lorem' }))
 }))
 
+vi.mock('../../src/composables/head', () => ({ useHead: vi.fn() }))
+
 vi.mock('@vueuse/core', async (importOriginal) => ({
   ...(await importOriginal<any>()),
   MaybeElement: vi.fn(),
