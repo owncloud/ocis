@@ -440,3 +440,18 @@ Feature: Internal link share of resources
       }
       """
     And the last 2 link shares should have the same id
+
+
+  Scenario: anonymous PROPFIND on an internal link share must ask for a bearer token, not basic auth
+    Given user "Alice" has uploaded file with content "test content" to "textfile.txt"
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | permissionsRole | Internal     |
+    When the public sends "PROPFIND" request to the last public link share using the public WebDAV API
+    Then the HTTP status code should be "401"
+    And the value of the item "/d:error/s:exception" in the response should be "Sabre\DAV\Exception\NotAuthenticated"
+    And the value of the item "/d:error/s:errorcode" in the response should be "ERR_MISSING_BEARER_AUTH"
+    And the following headers should match these regular expressions
+      | WWW-Authenticate | /^Bearer/ |
