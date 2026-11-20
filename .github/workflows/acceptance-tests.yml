@@ -43,13 +43,15 @@ jobs:
           fi
 
           # Get changed files between the PR base and head
-          CHANGED_FILES=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" 2>/dev/null || git diff --name-only HEAD~1)
+          CHANGED_FILES=$(git diff --no-renames --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" 2>/dev/null || git diff --no-renames --name-only HEAD~1)
 
           # Patterns that are considered documentation/non-code changes
           DOCS_ONLY=true
           while IFS= read -r file; do
             case "$file" in
               .github/workflows/*) DOCS_ONLY=false; break ;;
+              # LDAP seed and schemas mounted by the external LDAP acceptance tests
+              deployments/examples/ocis_ldap/config/ldap/*) DOCS_ONLY=false; break ;;
               .github/*|.vscode/*|changelog/*|docs/*|deployments/*) ;;
               */CHANGELOG.md|*/CONTRIBUTING.md|*/README.md|CHANGELOG.md|CONTRIBUTING.md|LICENSE|README.md) ;;
               *) DOCS_ONLY=false; break ;;
@@ -58,6 +60,11 @@ jobs:
 
           echo "docs-only=$DOCS_ONLY" >> "$GITHUB_OUTPUT"
           echo "Changed files docs-only: $DOCS_ONLY"
+
+      # Runs here rather than in build-and-test so that changelog-only PRs, which
+      # count as docs-only and skip the build, are linted too
+      - name: Lint changelog entries
+        run: make changelog-lint
 
   build-and-test:
     name: build-and-test
@@ -107,7 +114,6 @@ jobs:
           make govulncheck                                                                                                     > /tmp/govulncheck.log 2>&1 & PIDS+=($!)
           make ci-node-generate                                                                                                > /tmp/node-gen.log    2>&1 & PIDS+=($!)
           make ci-go-generate                                                                                                  > /tmp/go-gen.log      2>&1 & PIDS+=($!)
-          make changelog-lint                                                                                                   > /tmp/changelog-lint.log 2>&1 & PIDS+=($!)
 
           FAILED=0
           for PID in "${PIDS[@]}"; do wait "$PID" || FAILED=1; done
@@ -130,7 +136,6 @@ jobs:
           echo "=== govulncheck ==="      && cat /tmp/govulncheck.log
           echo "=== ci-node-generate ===" && cat /tmp/node-gen.log
           echo "=== ci-go-generate ==="   && cat /tmp/go-gen.log
-          echo "=== changelog-lint ===" && cat /tmp/changelog-lint.log
 
           exit $FAILED
 
@@ -1111,6 +1116,11 @@ jobs:
     steps:
       - name: Check all jobs passed
         run: |
+          # detect-changes also lints the changelog; its failure must fail the gate even on docs-only
+          if [[ "${NEEDS_DETECT_CHANGES_RESULT}" != "success" ]]; then
+            echo "detect-changes did not succeed: ${NEEDS_DETECT_CHANGES_RESULT}"
+            exit 1
+          fi
           # If docs-only, all test jobs are expected to be skipped — that's a pass
           if [[ "${NEEDS_DETECT_CHANGES_OUTPUTS_DOCS_ONLY}" == "true" ]]; then
             echo "Docs-only change — skipping tests is expected."
@@ -1121,3 +1131,4 @@ jobs:
           fi
         env:
           NEEDS_DETECT_CHANGES_OUTPUTS_DOCS_ONLY: ${{ needs.detect-changes.outputs.docs-only }}
+          NEEDS_DETECT_CHANGES_RESULT: ${{ needs.detect-changes.result }}
