@@ -101,16 +101,7 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			oidcHTTPClient := &http.Client{
-				Transport: &http.Transport{
-					TLSClientConfig: &tls.Config{
-						MinVersion:         tls.VersionTLS12,
-						InsecureSkipVerify: cfg.OIDC.Insecure, //nolint:gosec
-					},
-					DisableKeepAlives: true,
-				},
-				Timeout: time.Second * 10,
-			}
+			oidcHTTPClient := newOIDCHTTPClient(cfg.OIDC.Insecure)
 
 			oidcClient := oidc.NewOIDCClient(
 				oidc.WithAccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
@@ -271,16 +262,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 		logger.Fatal().Msgf("Invalid role assignment driver '%s'", cfg.RoleAssignment.Driver)
 	}
 
-	oidcHTTPClient := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				MinVersion:         tls.VersionTLS12,
-				InsecureSkipVerify: cfg.OIDC.Insecure, //nolint:gosec
-			},
-			DisableKeepAlives: true,
-		},
-		Timeout: time.Second * 10,
-	}
+	oidcHTTPClient := newOIDCHTTPClient(cfg.OIDC.Insecure)
 
 	var authenticators []middleware.Authenticator
 	if cfg.EnableBasicAuth {
@@ -387,4 +369,21 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			middleware.ServiceAccount(cfg.ServiceAccount.ServiceAccountID, cfg.ServiceAccount.ServiceAccountSecret),
 		),
 	)
+}
+
+// newOIDCHTTPClient returns the HTTP client for the calls to the OIDC provider.
+// The client keeps idle connections. Without it, each call opens a new
+// connection with a new TLS handshake and uses one more port.
+func newOIDCHTTPClient(insecure bool) *http.Client {
+	return &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				MinVersion:         tls.VersionTLS12,
+				InsecureSkipVerify: insecure, //nolint:gosec
+			},
+			MaxIdleConnsPerHost: 100,
+			IdleConnTimeout:     proxy.IdleConnTimeout,
+		},
+		Timeout: time.Second * 10,
+	}
 }

@@ -23,11 +23,20 @@ import (
 	"crypto/tls"
 	"io"
 	"net/http"
+	"time"
 
 	"go.opencensus.io/plugin/ochttp"
 
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/pkg/errors"
+)
+
+const (
+	// maxIdleConnsPerHost is the number of idle connections that a client keeps
+	// for each host.
+	maxIdleConnsPerHost = 100
+	// idleConnTimeout is the time after which a client closes an idle connection.
+	idleConnTimeout = 30 * time.Second
 )
 
 // GetHTTPClient returns an http client with open census tracing support.
@@ -38,6 +47,13 @@ func GetHTTPClient(opts ...Option) *http.Client {
 
 	tr := http.DefaultTransport.(*http.Transport).Clone()
 	tr.DisableKeepAlives = options.DisableKeepAlive
+	// The default of Go is 2 idle connections for each host. A client that
+	// sends parallel requests to one host closes the extra connections after
+	// each request and opens new ones. This wastes ports.
+	tr.MaxIdleConnsPerHost = maxIdleConnsPerHost
+	// Close idle connections before a server or a load balancer closes them.
+	// The usual lowest idle timeout on the way is 60 seconds.
+	tr.IdleConnTimeout = idleConnTimeout
 	tr.TLSClientConfig = &tls.Config{
 		InsecureSkipVerify: options.Insecure,
 	}

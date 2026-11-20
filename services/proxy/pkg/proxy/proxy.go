@@ -19,6 +19,11 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// IdleConnTimeout is the time after which the proxy closes an idle connection
+// of an outgoing HTTP client. Keep it lower than the idle timeout of every
+// server and network device on the way. The usual lowest value is 60 seconds.
+const IdleConnTimeout = 30 * time.Second
+
 // MultiHostReverseProxy extends "httputil" to support multiple hosts with different policies
 type MultiHostReverseProxy struct {
 	httputil.ReverseProxy
@@ -72,25 +77,43 @@ func NewMultiHostReverseProxy(opts ...Option) (*MultiHostReverseProxy, error) {
 		}
 		tlsConf.RootCAs = certs
 	}
-	// equals http.DefaultTransport except TLSClientConfig
-	transport := &http.Transport{
+	rp.Transport = middleware.GetOtelhttpClientTransport(newBackendTransport(tlsConf), options.TraceProvider)
+	return rp, nil
+}
+
+func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	p.ReverseProxy.ServeHTTP(w, r)
+}
+
+// newBackendTransport returns the transport for the requests to the backends.
+// It equals http.DefaultTransport except TLSClientConfig, the idle connection
+// limits and IdleConnTimeout.
+func newBackendTransport(tlsConf *tls.Config) *http.Transport {
+	return &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{
 			Timeout:   30 * time.Second,
 			KeepAlive: 30 * time.Second,
 			DualStack: true,
 		}).DialContext,
-		ForceAttemptHTTP2:     true,
-		MaxIdleConns:          100,
-		IdleConnTimeout:       90 * time.Second,
+		ForceAttemptHTTP2: true,
+		// Zero means no limit for all hosts together. In a deployment with one
+		// pod for each service replica, each pod is one host. A global limit of
+		// 100 would leave only a few idle connections for each pod.
+		MaxIdleConns: 0,
+		// The default is 2 idle connections for each backend. The backends use
+		// HTTP/1.1, so each request needs its own connection. With more than 2
+		// parallel requests, the transport closes the extra connections after the
+		// request and opens new ones for the next requests. This wastes ports.
+		MaxIdleConnsPerHost: 100,
+		// The oCIS HTTP servers set no idle timeout. Load balancers and ingress
+		// controllers between the proxy and a backend often close idle connections
+		// after 60 seconds. The proxy closes its idle connections first. If it
+		// did not, it would send a request on a closed connection. The transport
+		// does not repeat such a request for methods like PUT, POST or PROPFIND.
+		IdleConnTimeout:       IdleConnTimeout,
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
 		TLSClientConfig:       tlsConf,
 	}
-	rp.Transport = middleware.GetOtelhttpClientTransport(transport, options.TraceProvider)
-	return rp, nil
-}
-
-func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	p.ReverseProxy.ServeHTTP(w, r)
 }
