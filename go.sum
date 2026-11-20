@@ -738,6 +738,8 @@ github.com/owncloud/reva/v2 v2.0.0-20261116143721-bb7318101453 h1:bWmeAvMrhkQiwe
 github.com/owncloud/reva/v2 v2.0.0-20261116143721-bb7318101453/go.mod h1:XPrMnYmNuOkO6qjyQOymDby3aUg3SAdmiiwfq2AJTHk=
 github.com/owncloud/reva/v2 v2.0.0-20261120124503-36e2962e2654 h1:Wbye+YfYZ+P0zwyj5/wkgbYf4Y55i0qiXNZ47o8FfjM=
 github.com/owncloud/reva/v2 v2.0.0-20261120124503-36e2962e2654/go.mod h1:XPrMnYmNuOkO6qjyQOymDby3aUg3SAdmiiwfq2AJTHk=
+github.com/owncloud/reva/v2 v2.0.0-20261120135208-37ffb768665c h1:epneKXr+nMBsJgdOI5cDYqNt9a5KajncxlJzG/PhuW4=
+github.com/owncloud/reva/v2 v2.0.0-20261120135208-37ffb768665c/go.mod h1:XPrMnYmNuOkO6qjyQOymDby3aUg3SAdmiiwfq2AJTHk=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/patrickmn/go-cache v2.1.0+incompatible h1:HRMgzkcYKYpi3C8ajMPV8OFXaaRUnok+kx1WdO15EQc=
