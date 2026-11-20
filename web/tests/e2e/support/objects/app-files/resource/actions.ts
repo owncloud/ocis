@@ -123,6 +123,7 @@ const currentPageSelector =
 const itemsPerPageDropDownOptionSelector =
   '//li[contains(@class,"vs__dropdown-option") and text()="%s"]'
 const footerTextSelector = '//*[@data-testid="files-list-footer-info"]'
+const fileSizeSelector = '.oc-table-data-cell-size .oc-resource-size'
 const filesTableRowSelector = 'tbody tr'
 const itemsPerPageDropDownSelector = '.vs__actions'
 const filesPaginationNavSelector = '.files-pagination'
@@ -2854,4 +2855,62 @@ export const verifyTopbarResourceName = async ({
 
   await expect(topbarResourceName).toBeVisible()
   await expect(topbarResourceName).toHaveAttribute('data-test-resource-name', expectedName)
+}
+
+export const convertToBytes = (sizeString: string): number => {
+  const normalizedSize = sizeString.trim().toUpperCase()
+  const sizeUnit = normalizedSize.replace(/[0-9.,]+/g, '').trim()
+  const size = parseFloat(normalizedSize)
+
+  switch (sizeUnit) {
+    case 'GB':
+      return size * 1024 ** 3
+    case 'MB':
+      return size * 1024 ** 2
+    case 'KB':
+      return size * 1024
+    case 'B':
+    case '':
+      return size
+    default:
+      throw new Error(`Invalid size unit: ${sizeUnit}`)
+  }
+}
+
+export const getFileListFooterTotalSize = async ({ page }: { page: Page }): Promise<number> => {
+  const footerText = await getFileListFooterText({ page })
+  const fileCountMatch = footerText.match(/\((\d+)\s+files?\b/i)
+  if (fileCountMatch && Number(fileCountMatch[1]) === 0) {
+    return 0
+  }
+  const match = footerText.match(/with\s+([\d.,]+\s*[KMGT]?B)\s+in total/i)
+  if (!match) {
+    throw new Error(`Unable to get total file size from footer: ${footerText}`)
+  }
+  return convertToBytes(match[1])
+}
+
+export const getFileSizeFromTable = async ({
+  page,
+  fileName
+}: {
+  page: Page
+  fileName: string
+}): Promise<number> => {
+  const resourceLocator = page.locator(`[data-test-resource-name="${fileName}"]`)
+
+  const row = page
+    .locator('tr')
+    .filter({
+      has: resourceLocator
+    })
+    .first()
+
+  const sizeText = await row.locator(fileSizeSelector).textContent()
+
+  if (!sizeText) {
+    throw new Error(`Unable to get file size for "${fileName}" from the table`)
+  }
+
+  return convertToBytes(sizeText)
 }

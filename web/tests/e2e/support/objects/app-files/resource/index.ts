@@ -324,6 +324,17 @@ export class Resource {
     return po.getFileListFooterText({ page: this.#page })
   }
 
+  async getFileListFooterTotalSize(): Promise<number> {
+    return po.getFileListFooterTotalSize({ page: this.#page })
+  }
+
+  async getFileSizeFromTable(fileName: string): Promise<number> {
+    return po.getFileSizeFromTable({
+      page: this.#page,
+      fileName
+    })
+  }
+
   countNumberOfResourcesInThePage(): Promise<number> {
     return po.countNumberOfResourcesInThePage({ page: this.#page })
   }

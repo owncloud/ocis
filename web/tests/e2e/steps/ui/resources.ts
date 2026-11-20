@@ -1645,3 +1645,29 @@ export async function userOpensResourceInNewTab({
   const resourceObject = new objects.applicationFiles.Resource({ page })
   return resourceObject.openResourceInNewTab(resource)
 }
+
+export async function userGetsFileListFooterTotalSize({
+  stepUser
+}: {
+  stepUser: string
+}): Promise<number> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const resourceObject = new objects.applicationFiles.Resource({ page })
+
+  return await resourceObject.getFileListFooterTotalSize()
+}
+
+export async function userGetsFileSizeFromTable({
+  stepUser,
+  fileName
+}: {
+  stepUser: string
+  fileName: string
+}): Promise<number> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const resourceObject = new objects.applicationFiles.Resource({ page })
+
+  return await resourceObject.getFileSizeFromTable(fileName)
+}

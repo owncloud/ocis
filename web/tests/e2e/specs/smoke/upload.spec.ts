@@ -2,6 +2,7 @@ import { test } from '../../environment/test'
 import * as api from '../../steps/api/api'
 import * as ui from '../../steps/ui/index'
 import { fileAction, application, resourcePage } from '../../environment/constants'
+import { expect } from '@playwright/test'
 
 test.describe('internal link share', () => {
   test.beforeEach(async () => {
@@ -110,6 +111,7 @@ test.describe('internal link share', () => {
     // And "Alice" logs out
     await ui.userLogsOut({ stepUser: 'Alice' })
   })
+
   test('upload multiple small files', { tag: '@predefined-users' }, async () => {
     // When "Alice" uploads 50 small files in personal space
     await ui.userUploadsMultipleFilesInPersonalSpace({ stepUser: 'Alice', numberOfFiles: 50 })
@@ -175,6 +177,7 @@ test.describe('internal link share', () => {
     // And "Alice" logs out
     await ui.userLogsOut({ stepUser: 'Alice' })
   })
+
   test('Upload large file when insufficient quota', async () => {
     // Given "Admin" logs in
     await ui.userLogsIn({ stepUser: 'Admin' })
@@ -208,5 +211,40 @@ test.describe('internal link share', () => {
     })
     // And "Alice" logs out
     await ui.userLogsOut({ stepUser: 'Alice' })
+  })
+
+  test('Space total size is updated immediately after uploading a file', async () => {
+    const fileName = 'simple.pdf'
+
+    await api.userHasAssignedRolesToUsers({
+      stepUser: 'Admin',
+      users: [{ id: 'Alice', role: 'Space Admin' }]
+    })
+    await api.userHasCreatedProjectSpaces({
+      stepUser: 'Alice',
+      spaces: [{ name: 'Marketing', id: 'marketing.1' }]
+    })
+    await ui.userNavigatesToSpace({ stepUser: 'Alice', space: 'marketing.1' })
+
+    await ui.userEnablesShowHiddenFilesOption({ stepUser: 'Alice' })
+
+    const initialTotalSize = await ui.userGetsFileListFooterTotalSize({
+      stepUser: 'Alice'
+    })
+
+    await ui.userUploadsResources({
+      stepUser: 'Alice',
+      resources: [{ name: fileName }]
+    })
+
+    const uploadedFileSize = await ui.userGetsFileSizeFromTable({
+      stepUser: 'Alice',
+      fileName
+    })
+    const expectedTotalSize = initialTotalSize + uploadedFileSize
+
+    await expect
+      .poll(() => ui.userGetsFileListFooterTotalSize({ stepUser: 'Alice' }))
+      .toBe(expectedTotalSize)
   })
 })
