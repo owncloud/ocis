@@ -389,9 +389,21 @@ func (cs3 *CS3) Download(ctx context.Context, req DownloadRequest) (*DownloadRes
 	//   dreq.Opaque = utils.AppendPlainToOpaque(dreq.Opaque, "if-none-match", strings.Join(req.IfNoneMatch, ","))
 	// }
 
+	// InitiateFileDownload does not read the file. It only returns the
+	// download URL. So an error from this call is a connection error, for
+	// example Unavailable from a dead replica. The error does not mean that
+	// the file is missing. For a missing file, the GET request below gets
+	// HTTP 404, and that gives NotFound.
+	//
+	// Return the error as it is. Do not change it to NotFound. A caller that
+	// gets NotFound continues as if the file does not exist. For example, the
+	// settings service then replaces the role of a user with the default role.
 	res, err := client.InitiateFileDownload(ctx, &dreq)
 	if err != nil {
-		return nil, errtypes.NotFound(dreq.Ref.Path)
+		return nil, err
+	}
+	if res.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		return nil, errtypes.NewErrtypeFromStatus(res.GetStatus())
 	}
 
 	var endpoint string
