@@ -58,6 +58,41 @@ func init() {
 // a goroutine that waits for the lifetime of the process.
 const defaultAuthRPCTimeout = 10 * time.Second
 
+// dataGatewayMaxIdleConns is the number of idle connections that the data
+// gateway client keeps for each host. The default of Go is 2. The metadata
+// storage sends many parallel requests to one host. With the default, the
+// transport closes the extra connections after each request and opens new
+// ones for the next requests. This wastes ports.
+const dataGatewayMaxIdleConns = 100
+
+// dataGatewayIdleConnTimeout is the time after which the data gateway client
+// closes an idle connection. Servers and load balancers on the way often close
+// idle connections after 60 seconds. The client must close them first.
+// Otherwise it sends a request on a closed connection, and the transport does
+// not repeat a PUT or POST request.
+const dataGatewayIdleConnTimeout = 30 * time.Second
+
+// dataGatewayTransport is the transport of all data gateway clients. All CS3
+// instances share it, so they share one pool of idle connections.
+var dataGatewayTransport = newDataGatewayTransport()
+
+// newDataGatewayTransport returns a copy of the default transport of Go with a
+// larger pool of idle connections for each host.
+func newDataGatewayTransport() *http.Transport {
+	tr, ok := http.DefaultTransport.(*http.Transport)
+	if ok {
+		tr = tr.Clone()
+	} else {
+		tr = &http.Transport{Proxy: http.ProxyFromEnvironment}
+	}
+	tr.MaxIdleConnsPerHost = dataGatewayMaxIdleConns
+	tr.IdleConnTimeout = dataGatewayIdleConnTimeout
+	if tr.MaxIdleConns != 0 && tr.MaxIdleConns < dataGatewayMaxIdleConns {
+		tr.MaxIdleConns = dataGatewayMaxIdleConns
+	}
+	return tr
+}
+
 // CS3 represents a metadata storage with a cs3 storage backend
 type CS3 struct {
 	SpaceRoot *provider.ResourceId
@@ -79,7 +114,7 @@ func NewCS3(gwAddr, providerAddr string) (s *CS3) {
 		providerAddr:      providerAddr,
 		gatewayAddr:       gwAddr,
 		authRPCTimeout:    defaultAuthRPCTimeout,
-		dataGatewayClient: http.DefaultClient,
+		dataGatewayClient: &http.Client{Transport: dataGatewayTransport},
 	}
 }
 
@@ -438,6 +473,44 @@ func (cs3 *CS3) Delete(ctx context.Context, path string) error {
 	}
 
 	return nil
+}
+
+// WasRecentlyDeleted checks the recycle bin within a short window so a
+// long-settled deletion doesn't block a legitimate empty read.
+func (cs3 *CS3) WasRecentlyDeleted(ctx context.Context, path string) (bool, error) {
+	ctx, span := tracer.Start(ctx, "WasRecentlyDeleted")
+	defer span.End()
+
+	client, err := cs3.providerClient()
+	if err != nil {
+		return false, err
+	}
+	ctx, err = cs3.getAuthContext(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	target := utils.MakeRelativePath(path)
+	now := time.Now()
+	res, err := client.ListRecycle(ctx, &provider.ListRecycleRequest{
+		Ref:      &provider.Reference{ResourceId: cs3.SpaceRoot},
+		FromTs:   utils.TimeToTS(now.Add(-5 * time.Minute)),
+		ToTs:     utils.TimeToTS(now),
+		PageSize: 1000,
+	})
+	if err != nil {
+		return false, err
+	}
+	if res.Status.Code != rpc.Code_CODE_OK {
+		return false, errtypes.NewErrtypeFromStatus(res.Status)
+	}
+
+	for _, item := range res.RecycleItems {
+		if item.GetRef().GetPath() == target {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 // ReadDir returns the entries in a given directory
