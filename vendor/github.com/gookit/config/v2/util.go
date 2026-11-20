@@ -35,6 +35,12 @@ func ValDecodeHookFunc(parseEnv, parseTime bool) mapstructure.DecodeHookFunc {
 		if parseTime && str[0] >= '0' && str[0] <= '9' {
 			return reflects.ToTimeOrDuration(str, t)
 		}
+		if parseTime && str[0] == '-' {
+			if parsed, err := reflects.ToTimeOrDuration(str, t); err == nil {
+				return parsed, nil
+			}
+			// Signed numbers without units still use the normal decoder below.
+		}
 		return str, nil
 	}
 }

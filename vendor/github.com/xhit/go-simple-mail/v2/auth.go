@@ -96,8 +96,7 @@ func (a *loginAuth) start(server *serverInfo) (string, []byte, error) {
 	if server.name != a.host {
 		return "", nil, errors.New("wrong host name")
 	}
-	resp := []byte(a.username)
-	return "LOGIN", resp, nil
+	return "LOGIN", nil, nil
 }
 
 func (a *loginAuth) next(fromServer []byte, more bool) ([]byte, error) {
