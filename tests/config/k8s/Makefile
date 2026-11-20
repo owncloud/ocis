@@ -32,6 +32,7 @@ prepare-charts:
 	sed 's|https://ocis-server:9200|https://$(DOMAIN)|g' ../ci/ocis-config.json > $(CHART_REPO)/web-config.json
 	@if [ "$(ENABLE_WOPI)" = "true" ]; then sed -i 's|"files",|"files", "external",|' $(CHART_REPO)/web-config.json; fi
 	@if [ "$(ENABLE_OCM)" = "true" ]; then sed -i 's|"files",|"files", "ocm",|' $(CHART_REPO)/web-config.json; fi
+	@if [ "$(ENABLE_OIDC_OFFLINE_ACCESS)" = "true" ]; then sed -i 's|"scope": "openid profile email"|"scope": "openid profile email offline_access"|' $(CHART_REPO)/web-config.json; fi
 	kubectl create configmap -n $(DOMAIN) ocis-web-config \
 		--from-file=web-config.json=$(CHART_REPO)/web-config.json || true
 	kubectl create configmap -n $(DOMAIN) ocis-translations \
