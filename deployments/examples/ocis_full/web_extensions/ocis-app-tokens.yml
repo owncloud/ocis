@@ -1,0 +1,32 @@
+---
+# NOTE: ocis-app-tokens (community web app by mschlachter, listed in
+# owncloud/awesome-ocis) has no published docker image - it's distributed as
+# a static JS bundle (manifest.json + index.js) via GitHub releases:
+# https://github.com/mschlachter/ocis-app-tokens
+# Requires the Auth App Service, see the note next to OCIS_APP_TOKENS in .env.
+services:
+  ocis:
+    depends_on:
+      ocis-app-tokens-init:
+        condition: service_completed_successfully
+
+  ocis-app-tokens-init:
+    image: alpine:3.22
+    user: root
+    volumes:
+      - ./data/ocis-apps:/apps
+    entrypoint:
+      - /bin/sh
+    environment:
+      APP_TOKENS_URL: "https://github.com/mschlachter/ocis-app-tokens/releases/download/v0.1.0/ocis-app-tokens-v0.1.0.zip"
+      # sha256 of the v0.1.0 release zip, so a re-published release can't change what gets installed
+      APP_TOKENS_SHA256: "8c8ccb5c48c5223936a440fe165143c7ceaa1aa059a5f9948a336ab321ff1d7f"
+    command:
+      - "-c"
+      - |
+        set -e
+        apk add --no-cache curl unzip
+        curl -fsSL "$$APP_TOKENS_URL" -o /tmp/app.zip
+        echo "$$APP_TOKENS_SHA256  /tmp/app.zip" | sha256sum -c -
+        mkdir -p /apps/ocis-app-tokens
+        unzip -o /tmp/app.zip -d /apps/ocis-app-tokens
