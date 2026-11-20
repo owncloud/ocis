@@ -8,7 +8,9 @@ import { useFileActionsDuplicate } from '../../../../../src/composables/actions'
 import { mock } from 'vitest-mock-extended'
 import { unref } from 'vue'
 import { ListFilesResult } from '@ownclouders/web-client/webdav'
+import type { TransferFailure } from '../../../../../src/helpers/resource/conflictHandling/types'
 import { usePasteWorker } from '../../../../../src/composables/webWorkers/pasteWorker'
+import { useResourcesStore } from '../../../../../src/composables/piniaStores'
 
 vi.mock('../../../../../src/composables/webWorkers/pasteWorker', () => ({
   usePasteWorker: vi.fn().mockReturnValue({
@@ -19,6 +21,7 @@ vi.mock('../../../../../src/composables/webWorkers/pasteWorker', () => ({
 vi.mock('../../../../../src/helpers/resource/conflictHandling/transfer', () => {
   const ResourceTransfer = vi.fn()
   ResourceTransfer.prototype.getTransferData = vi.fn().mockReturnValue([{}])
+  ResourceTransfer.prototype.showResultMessage = vi.fn()
 
   return {
     ResourceTransfer
@@ -120,6 +123,93 @@ describe('duplicate', () => {
         }
       })
     })
+
+    // what the paste worker reports back, see `usePasteWorker`
+    const runWorkerCallback = async (result: {
+      successful: Resource[]
+      failed: TransferFailure[]
+    }) => {
+      const { startWorker } = usePasteWorker()
+      const [, callback] = vi.mocked(startWorker).mock.calls.at(-1)
+      await callback(result)
+    }
+
+    it('shows an incomplete folder copy in the files list right away', async () => {
+      await getWrapper({
+        routeName: 'files-spaces-generic',
+        currentFolder: mock<Resource>({ path: '/', canCreate: () => true }),
+        setup: async ({ actions }, { $clientService }) => {
+          const resource = mock<Resource>({ storageId: mockSpace.id, path: '/folder' })
+          const copy = mock<Resource>({ path: '/folder (1)' })
+          $clientService.webdav.getFileInfo.mockResolvedValue(copy)
+
+          await unref(actions)[0].handler({ space: mockSpace, resources: [resource] })
+          await runWorkerCallback({
+            successful: [],
+            failed: [
+              {
+                resourceName: 'folder (1)',
+                incomplete: {
+                  path: '/folder (1)',
+                  copiedItems: 1,
+                  totalItems: 2,
+                  notCopied: ['folder/b.txt']
+                },
+                error: new Error()
+              }
+            ]
+          })
+
+          expect($clientService.webdav.getFileInfo).toHaveBeenCalledWith(mockSpace, {
+            path: '/folder (1)'
+          })
+          const { upsertResources } = useResourcesStore()
+          expect(upsertResources).toHaveBeenCalledWith([copy])
+        }
+      }).done
+    })
+
+    it('leaves the files list alone when the user opened another folder meanwhile', async () => {
+      await getWrapper({
+        routeName: 'files-spaces-generic',
+        currentFolder: mock<Resource>({ id: 'folder-1', path: '/', canCreate: () => true }),
+        setup: async ({ actions }, { $clientService }) => {
+          const resource = mock<Resource>({ storageId: mockSpace.id, path: '/folder' })
+
+          await unref(actions)[0].handler({ space: mockSpace, resources: [resource] })
+          // a big copy takes a while, the user opens another folder before it is done
+          const resourcesStore = useResourcesStore()
+          resourcesStore.currentFolder = mock<Resource>({ id: 'folder-2', path: '/other' })
+          await runWorkerCallback({
+            successful: [mock<Resource>({ path: '/folder (1)' })],
+            failed: []
+          })
+
+          expect($clientService.webdav.getFileInfo).not.toHaveBeenCalled()
+          expect(resourcesStore.upsertResources).not.toHaveBeenCalled()
+        }
+      }).done
+    })
+
+    it('leaves the files list alone when nothing was created', async () => {
+      await getWrapper({
+        routeName: 'files-spaces-generic',
+        currentFolder: mock<Resource>({ path: '/', canCreate: () => true }),
+        setup: async ({ actions }, { $clientService }) => {
+          const resource = mock<Resource>({ storageId: mockSpace.id, path: '/folder' })
+
+          await unref(actions)[0].handler({ space: mockSpace, resources: [resource] })
+          await runWorkerCallback({
+            successful: [],
+            failed: [{ resourceName: 'folder (1)', error: new Error() }]
+          })
+
+          expect($clientService.webdav.getFileInfo).not.toHaveBeenCalled()
+          const { upsertResources } = useResourcesStore()
+          expect(upsertResources).not.toHaveBeenCalled()
+        }
+      }).done
+    })
   })
 })
 
@@ -131,18 +221,20 @@ function getWrapper({
   setup: (
     instance: ReturnType<typeof useFileActionsDuplicate>,
     mocks: ReturnType<typeof defaultComponentMocks>
-  ) => void
+  ) => void | Promise<void>
   routeName: string
   currentFolder: Resource
 }) {
   const mocks = defaultComponentMocks({ currentRoute: mock<RouteLocation>({ name: routeName }) })
 
+  // the composable wrapper runs `setup` on mount without waiting for it, `done` lets a test wait
+  let done: void | Promise<void>
   return {
     mocks,
     wrapper: getComposableWrapper(
       () => {
         const instance = useFileActionsDuplicate()
-        setup(instance, mocks)
+        done = setup(instance, mocks)
       },
       {
         mocks,
@@ -154,6 +246,7 @@ function getWrapper({
           }
         }
       }
-    )
+    ),
+    done
   }
 }

@@ -26,6 +26,7 @@ use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Stream\StreamInterface;
 use TestHelpers\OcisHelper;
+use TestHelpers\OcisConfigHelper;
 use TestHelpers\UploadHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\HttpRequestHelper;
@@ -1725,7 +1726,34 @@ trait WebDav {
 			. "'$source' to '$destination' for user '$user'",
 			$response,
 		);
+		$this->waitForPostprocessingToFinish($user, $destination);
 		return $response->getHeader('oc-fileid');
+	}
+
+	/**
+	 * With async uploads, an upload returns before the postprocessing of the file
+	 * has finished. Until it finishes, the file content can't be used yet (e.g. it
+	 * can't be downloaded or copied) and the events that are sent when it finishes
+	 * (e.g. for activities) haven't been sent yet.
+	 * Wait until the file is no longer in postprocessing so that the steps of a
+	 * scenario start from a stable state.
+	 * HEAD returns 425 (Too Early) while the file is in postprocessing, and the
+	 * request is retried by HttpRequestHelper::sendRequest until it isn't.
+	 * Scenarios that change the postprocessing config (e.g. delay it on purpose)
+	 * need the file to stay in postprocessing, so they don't wait.
+	 *
+	 * @param string $user
+	 * @param string $path
+	 * @param string|null $spaceId
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function waitForPostprocessingToFinish(string $user, string $path, ?string $spaceId = null): void {
+		if (OcisConfigHelper::isPostprocessingReconfigured()) {
+			return;
+		}
+		$this->makeDavRequest($user, "HEAD", $path, [], null, $spaceId);
 	}
 
 	/**
@@ -2337,6 +2365,7 @@ trait WebDav {
 			"HTTP status code was not 201 or 204 while trying to upload file '$destination' for user '$user'",
 			$response,
 		);
+		$this->waitForPostprocessingToFinish($user, $destination);
 		return $response->getHeader('oc-fileid');
 	}
 
@@ -4839,6 +4868,15 @@ trait WebDav {
 			$href = (string)$item->xpath("d:href")[0];
 			$shareRootXml = $item->xpath("d:propstat//oc:shareroot");
 			$resourcePath = \preg_replace($hrefRegex, "", $href);
+			// oCIS returns spaces-format hrefs for all DAV path versions (see issue #7060);
+			// if the expected-path regex did not match, fall back to spaces-format parsing
+			if ($resourcePath === $href) {
+				$spacesHrefRegex = '/^(\/remote\.php)?\/dav\/spaces\/[a-zA-Z0-9\-_$!:%]+/';
+				$fallback = \preg_replace($spacesHrefRegex, "", $href);
+				if ($fallback !== $href) {
+					$resourcePath = $fallback;
+				}
+			}
 			// do not try to parse the resource path
 			// if the item to search is space itself
 			if (!GraphHelper::isSpaceId($entryNameToSearch ?? '')) {

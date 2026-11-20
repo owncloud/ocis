@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -244,6 +245,20 @@ func TestListPermissionsOfOtherUser(t *testing.T) {
 	assert.Contains(t, err.Error(), req.AccountUuid)
 }
 
+// tooManyAccountFilters returns one more account filter than validateUserRoleAssignmentFilters allows.
+func tooManyAccountFilters() []*settingsmsg.UserRoleAssignmentFilter {
+	filters := make([]*settingsmsg.UserRoleAssignmentFilter, 0, maxAccountRoleAssignmentFilters+1)
+	for i := 0; i <= maxAccountRoleAssignmentFilters; i++ {
+		filters = append(filters, &settingsmsg.UserRoleAssignmentFilter{
+			Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ACCOUNT,
+			Term: &settingsmsg.UserRoleAssignmentFilter_AccountUuid{
+				AccountUuid: fmt.Sprintf("account-%d", i),
+			},
+		})
+	}
+	return filters
+}
+
 func TestListRoleAssignmentsFilteredValidation(t *testing.T) {
 	manager := &mocks.Manager{}
 	svc := Service{
@@ -333,6 +348,50 @@ func TestListRoleAssignmentsFilteredValidation(t *testing.T) {
 			},
 			statusCode: http.StatusBadRequest,
 		},
+		"mixed account and role filters, both otherwise valid": {
+			req: &v0.ListRoleAssignmentsFilteredRequest{
+				Filters: []*settingsmsg.UserRoleAssignmentFilter{
+					{
+						Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ACCOUNT,
+						Term: &settingsmsg.UserRoleAssignmentFilter_AccountUuid{
+							AccountUuid: "61445573-4dbe-4d56-88dc-88ab47aceba7",
+						},
+					},
+					{
+						Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ROLE,
+						Term: &settingsmsg.UserRoleAssignmentFilter_RoleId{
+							RoleId: "aceb15b8-7486-479f-ae32-c91118e07a39",
+						},
+					},
+				},
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		"two valid role filters": {
+			req: &v0.ListRoleAssignmentsFilteredRequest{
+				Filters: []*settingsmsg.UserRoleAssignmentFilter{
+					{
+						Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ROLE,
+						Term: &settingsmsg.UserRoleAssignmentFilter_RoleId{
+							RoleId: "aceb15b8-7486-479f-ae32-c91118e07a39",
+						},
+					},
+					{
+						Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ROLE,
+						Term: &settingsmsg.UserRoleAssignmentFilter_RoleId{
+							RoleId: "bceb15b8-7486-479f-ae32-c91118e07a39",
+						},
+					},
+				},
+			},
+			statusCode: http.StatusBadRequest,
+		},
+		"too many account filters": {
+			req: &v0.ListRoleAssignmentsFilteredRequest{
+				Filters: tooManyAccountFilters(),
+			},
+			statusCode: http.StatusBadRequest,
+		},
 	}
 
 	for name, test := range tests {
@@ -401,6 +460,59 @@ func TestListRoleAssignmentsFilteredByAccount(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestListRoleAssignmentsFilteredByMultipleAccounts(t *testing.T) {
+	accountA := "61445573-4dbe-4d56-88dc-88ab47aceba7"
+	accountB := "72556684-5ecf-5e67-99ed-99bc58bdfc98"
+
+	manager := &mocks.Manager{}
+	manager.On("ListRoleAssignments", accountA).Return([]*settingsmsg.UserRoleAssignment{
+		{Id: "00000000-0000-0000-0000-000000000001", AccountUuid: accountA, RoleId: "aceb15b8-7486-479f-ae32-c91118e07a39"},
+	}, nil)
+	manager.On("ListRoleAssignments", accountB).Return([]*settingsmsg.UserRoleAssignment{
+		{Id: "00000000-0000-0000-0000-000000000002", AccountUuid: accountB, RoleId: "aceb15b8-7486-479f-ae32-c91118e07a39"},
+	}, nil)
+	svc := Service{manager: manager}
+
+	req := &v0.ListRoleAssignmentsFilteredRequest{
+		Filters: []*settingsmsg.UserRoleAssignmentFilter{
+			{Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ACCOUNT, Term: &settingsmsg.UserRoleAssignmentFilter_AccountUuid{AccountUuid: accountA}},
+			{Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ACCOUNT, Term: &settingsmsg.UserRoleAssignmentFilter_AccountUuid{AccountUuid: accountB}},
+		},
+	}
+	res := v0.ListRoleAssignmentsResponse{}
+	err := svc.ListRoleAssignmentsFiltered(ctxWithUUID, req, &res)
+	assert.NoError(t, err)
+	assert.Len(t, res.Assignments, 2)
+
+	gotAccounts := []string{res.Assignments[0].GetAccountUuid(), res.Assignments[1].GetAccountUuid()}
+	assert.ElementsMatch(t, []string{accountA, accountB}, gotAccounts)
+}
+
+func TestListRoleAssignmentsFilteredByAccountPartialFailure(t *testing.T) {
+	accountGood := "61445573-4dbe-4d56-88dc-88ab47aceba7"
+	accountBad := "72556684-5ecf-5e67-99ed-99bc58bdfc98"
+
+	manager := &mocks.Manager{}
+	manager.On("ListRoleAssignments", accountGood).Return([]*settingsmsg.UserRoleAssignment{
+		{Id: "00000000-0000-0000-0000-000000000001", AccountUuid: accountGood, RoleId: "aceb15b8-7486-479f-ae32-c91118e07a39"},
+	}, nil)
+	manager.On("ListRoleAssignments", accountBad).Return(nil, assert.AnError)
+	svc := Service{manager: manager}
+
+	req := &v0.ListRoleAssignmentsFilteredRequest{
+		Filters: []*settingsmsg.UserRoleAssignmentFilter{
+			{Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ACCOUNT, Term: &settingsmsg.UserRoleAssignmentFilter_AccountUuid{AccountUuid: accountGood}},
+			{Type: settingsmsg.UserRoleAssignmentFilter_TYPE_ACCOUNT, Term: &settingsmsg.UserRoleAssignmentFilter_AccountUuid{AccountUuid: accountBad}},
+		},
+	}
+	res := v0.ListRoleAssignmentsResponse{}
+	err := svc.ListRoleAssignmentsFiltered(ctxWithUUID, req, &res)
+	// one account erroring among several must not fail the whole batch or discard the others' results
+	assert.NoError(t, err)
+	assert.Len(t, res.Assignments, 1)
+	assert.Equal(t, accountGood, res.Assignments[0].GetAccountUuid())
 }
 
 func TestListRoleAssignmentsFilteredByRole(t *testing.T) {

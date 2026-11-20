@@ -5,6 +5,7 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	cs3permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
@@ -23,6 +24,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rgrpc/status"
 	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -371,8 +373,35 @@ func (g Service) ListRoleAssignmentsFiltered(ctx context.Context, req *settingss
 	var err error
 	switch filters[0].GetType() {
 	case settingsmsg.UserRoleAssignmentFilter_TYPE_ACCOUNT:
-		accountUUID := getValidatedAccountUUID(ctx, filters[0].GetAccountUuid())
-		r, err = g.manager.ListRoleAssignments(accountUUID)
+		accountUUIDs := make([]string, len(filters))
+		for i, f := range filters {
+			accountUUIDs[i] = getValidatedAccountUUID(ctx, f.GetAccountUuid())
+			if accountUUIDs[i] == "" {
+				return merrors.BadRequest(g.id, "invalid account uuid")
+			}
+		}
+
+		// each goroutine below owns a disjoint index of perAccount, so no lock is needed to collect results
+		perAccount := make([][]*settingsmsg.UserRoleAssignment, len(filters))
+		group := new(errgroup.Group)
+		group.SetLimit(10)
+		for i, accountUUID := range accountUUIDs {
+			group.Go(func() error {
+				assignments, aerr := g.manager.ListRoleAssignments(accountUUID)
+				if aerr != nil {
+					if len(filters) == 1 {
+						return aerr
+					}
+					// don't let one bad account in a batch erase every other account's results
+					g.logger.Error().Err(aerr).Str("accountid", accountUUID).Msg("failed to list role assignments for account, skipping")
+					return nil
+				}
+				perAccount[i] = assignments
+				return nil
+			})
+		}
+		err = group.Wait()
+		r = slices.Concat(perAccount...)
 	case settingsmsg.UserRoleAssignmentFilter_TYPE_ROLE:
 		roleID := filters[0].GetRoleId()
 		r, err = g.manager.ListRoleAssignmentsByRole(roleID)

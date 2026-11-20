@@ -28,6 +28,7 @@ const (
 	FeatureUTF8StrictMode        = "utf8-strict-mode"
 	FeatureAutoGOMEMLIMIT        = "auto-gomemlimit"
 	FeatureEventRecorder         = "event-recorder"
+	FeatureMutedAlertsInNflog    = "muted-alerts-in-nflog"
 )
 
 var AllowedFlags = []string{
@@ -38,6 +39,7 @@ var AllowedFlags = []string{
 	FeatureUTF8StrictMode,
 	FeatureAutoGOMEMLIMIT,
 	FeatureEventRecorder,
+	FeatureMutedAlertsInNflog,
 }
 
 type Flagger interface {
@@ -48,6 +50,7 @@ type Flagger interface {
 	UTF8StrictMode() bool
 	EnableAutoGOMEMLIMIT() bool
 	EnableEventRecorder() bool
+	EnableMutedAlertsInNflog() bool
 }
 
 type Flags struct {
@@ -59,6 +62,7 @@ type Flags struct {
 	utf8StrictMode               bool
 	enableAutoGOMEMLIMIT         bool
 	enableEventRecorder          bool
+	enableMutedAlertsInNflog     bool
 }
 
 func (f *Flags) EnableAlertNamesInMetrics() bool {
@@ -87,6 +91,10 @@ func (f *Flags) EnableAutoGOMEMLIMIT() bool {
 
 func (f *Flags) EnableEventRecorder() bool {
 	return f.enableEventRecorder
+}
+
+func (f *Flags) EnableMutedAlertsInNflog() bool {
+	return f.enableMutedAlertsInNflog
 }
 
 type flagOption func(flags *Flags)
@@ -127,6 +135,12 @@ func enableEventRecorder() flagOption {
 	}
 }
 
+func enableMutedAlertsInNflog() flagOption {
+	return func(configs *Flags) {
+		configs.enableMutedAlertsInNflog = true
+	}
+}
+
 func enableAlertNamesInMetrics() flagOption {
 	return func(configs *Flags) {
 		configs.enableAlertNamesInMetrics = true
@@ -160,10 +174,13 @@ func NewFlags(logger *slog.Logger, features string) (Flagger, error) {
 			logger.Warn("UTF-8 strict mode enabled")
 		case FeatureAutoGOMEMLIMIT:
 			opts = append(opts, enableAutoGOMEMLIMIT())
-			logger.Warn("Automatically set GOMEMLIMIT to match the Linux container or system memory limit.")
+			logger.Error("Deprecated: auto-gomemlimit will be removed in v0.35. Please use the new command line flag --auto-gomemlimit instead.")
 		case FeatureEventRecorder:
 			opts = append(opts, enableEventRecorder())
 			logger.Warn("Experimental event recorder enabled")
+		case FeatureMutedAlertsInNflog:
+			opts = append(opts, enableMutedAlertsInNflog())
+			logger.Warn("Experimental muted alerts in the notification log enabled")
 		default:
 			return nil, fmt.Errorf("unknown option '%s' for --enable-feature", feature)
 		}
@@ -195,3 +212,5 @@ func (n NoopFlags) UTF8StrictMode() bool { return false }
 func (n NoopFlags) EnableAutoGOMEMLIMIT() bool { return false }
 
 func (n NoopFlags) EnableEventRecorder() bool { return false }
+
+func (n NoopFlags) EnableMutedAlertsInNflog() bool { return false }

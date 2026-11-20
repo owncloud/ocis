@@ -256,7 +256,6 @@ func NewSpaceViewerRole() *Role {
 			InitiateFileDownload: true,
 			ListContainer:        true,
 			ListGrants:           true,
-			ListRecycle:          true,
 			Stat:                 true,
 		},
 		ocsPermissions: PermissionRead,
@@ -597,7 +596,6 @@ func RoleFromResourcePermissions(rp *provider.ResourcePermissions, islink bool) 
 		return r
 	}
 	if rp.ListContainer &&
-		rp.ListRecycle &&
 		rp.Stat &&
 		rp.GetPath &&
 		rp.GetQuota &&

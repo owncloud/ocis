@@ -56,8 +56,40 @@ jobs:
       - name: Build and start oCIS on the target
         id: start
         run: |
+          # OCIS_LDAP_POOL_ENABLED makes graph, users, groups and auth-basic use a
+          # pool of LDAP connections. Without it each service queues all LDAP
+          # calls on one connection, and the load test measures that queue.
+          #
+          # OCIS_LDAP_POOL_SIZE is the number of connections of each pool. The
+          # default of 5 is low for this load.
+          #
+          # OCIS_LDAP_UPDATE_LAST_SIGNIN_DATE=false stops the LDAP write on each
+          # login. The default is true, so each of the k6 logins writes to LDAP.
+          #
+          # SHARING_USER_JSONCS3_MAX_CONCURRENCY raises the parallel go-routines
+          # of the jsoncs3 share manager from the default of 1 to 5. The share
+          # removal uses at least 3.
+          #
+          # IDP_ACCESS_TOKEN_EXPIRATION=3600 sets the lifetime of the access token
+          # to 1 hour. The default is 5 minutes. With 5 minutes, each VU logs in
+          # again every 295 seconds, and the logins come in bursts. The LDAP pool
+          # does not cover the LDAP connection of the IDP login. With 1 hour, each
+          # VU logs in once, and the test measures less of the login.
           ssh $SSH_OPTS "loadtest@$OCIS_HOST" \
-            "OCIS_COMMIT_ID='$OCIS_COMMIT_ID' /usr/local/bin/ocis.sh start"
+            "OCIS_COMMIT_ID='$OCIS_COMMIT_ID' OCIS_LDAP_POOL_ENABLED=true OCIS_LDAP_POOL_SIZE=20 OCIS_LDAP_UPDATE_LAST_SIGNIN_DATE=false SHARING_USER_JSONCS3_MAX_CONCURRENCY=5 IDP_ACCESS_TOKEN_EXPIRATION=3600 /usr/local/bin/ocis.sh start"
+
+      # The variables reach the oCIS process only if ocis.sh passes its
+      # environment on. Fail here, and not after a 30 minute run.
+      - name: Check that the oCIS process has the load test settings
+        run: |
+          ssh $SSH_OPTS "loadtest@$OCIS_HOST" \
+            'tr "\0" "\n" < /proc/$(pgrep -f "^[^ ]*bin/ocis server" | head -n 1)/environ > /tmp/ocis-env.$$ &&
+             grep -x "OCIS_LDAP_POOL_ENABLED=true" /tmp/ocis-env.$$ &&
+             grep -x "OCIS_LDAP_POOL_SIZE=20" /tmp/ocis-env.$$ &&
+             grep -x "OCIS_LDAP_UPDATE_LAST_SIGNIN_DATE=false" /tmp/ocis-env.$$ &&
+             grep -x "SHARING_USER_JSONCS3_MAX_CONCURRENCY=5" /tmp/ocis-env.$$ &&
+             grep -x "IDP_ACCESS_TOKEN_EXPIRATION=3600" /tmp/ocis-env.$$;
+             rc=$?; rm -f /tmp/ocis-env.$$; exit $rc'
 
       - name: Show the oCIS build log
         if: failure() && steps.start.outcome == 'failure'

@@ -247,3 +247,24 @@ Feature: List upload sessions via CLI command
     When the administrator waits for "3" seconds
     Then for user "Alice" file "file2.txt" of space "Personal" should be in postprocessing
     And the content of file "file1.txt" for user "Alice" should be "uploaded content"
+
+
+  Scenario: resume all uploads with finished postprocessing, but not the uploads still in an unfinished step, using postprocessing command
+    Given the config "POSTPROCESSING_DELAY" has been set to "3s"
+    And user "Alice" has uploaded file with content "finished content" to "finished.txt"
+    And the administrator has waited for "1" seconds
+    # "customstep" is never completed by any service, so the upload stays in this step
+    And the following configs have been set:
+      | service        | config               | value      |
+      | postprocessing | POSTPROCESSING_STEPS | customstep |
+    And user "Alice" has uploaded file with content "unfinished content" to "unfinished.txt"
+    And the administrator has stopped the server
+    And the administrator has started the server
+    When the administrator waits for "3" seconds
+    Then for user "Alice" file "finished.txt" of space "Personal" should be in postprocessing
+    And for user "Alice" file "unfinished.txt" of space "Personal" should be in postprocessing
+    When the administrator resumes all the upload sessions using the postprocessing command
+    Then the command should be successful
+    When the administrator waits for "3" seconds
+    Then the content of file "finished.txt" for user "Alice" should be "finished content"
+    And for user "Alice" file "unfinished.txt" of space "Personal" should be in postprocessing

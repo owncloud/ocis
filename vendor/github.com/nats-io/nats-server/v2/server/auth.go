@@ -70,6 +70,8 @@ type NkeyUser struct {
 	AllowedConnectionTypes map[string]struct{} `json:"connection_types,omitempty"`
 	ProxyRequired          bool                `json:"proxy_required,omitempty"`
 	defaultPerms           bool
+	// Limits from the user JWT, set if built from one.
+	limits *jwt.NatsLimits
 }
 
 // User is for multiple accounts/users.
@@ -676,6 +678,12 @@ func (s *Server) processClientOrLeafAuthentication(c *client, opts *Options) (au
 		return false
 	}
 
+	// Clear any previous callout authorization. processClientOrLeafCallout
+	// sets this flag only after successfully authorizing the client.
+	c.mu.Lock()
+	c.flags.clear(authCallout)
+	c.mu.Unlock()
+
 	// Indicate if this connection came from a trusted proxy. Note that if
 	// trustedProxy could be false even if the connection is proxied, but it
 	// means that there was no trusted proxy configured.
@@ -761,17 +769,18 @@ func (s *Server) processClientOrLeafAuthentication(c *client, opts *Options) (au
 		if !skip {
 			authorized, reason = s.processClientOrLeafCallout(c, opts, proxyRequired, trustedProxy, ujwt)
 		}
-		// Check if we are authorized and in the auth callout account, and if so add in deny publish permissions for the auth subject.
+		// Check if we are authorized and in the auth callout account, and if so add in deny permissions for the auth subject.
 		if authorized {
-			var authAccountName string
-			if juc == nil && opts.AuthCallout != nil {
-				authAccountName = opts.AuthCallout.Account
-			} else if juc != nil {
-				authAccountName = acc.Name
-			}
 			c.mu.Lock()
-			if c.acc != nil && c.acc.Name == authAccountName {
-				c.mergeDenyPermissions(pub, []string{AuthCalloutSubject})
+			var inAuthAccount bool
+			if juc == nil && opts.AuthCallout != nil {
+				inAuthAccount = c.acc != nil && c.acc.Name == opts.AuthCallout.Account
+			} else if juc != nil {
+				// Any account with external auth receives auth requests, also if another account placed us there.
+				inAuthAccount = c.acc.hasExternalAuth()
+			}
+			if inAuthAccount {
+				c.denyAuthCalloutSubjects(skip)
 			}
 			c.mu.Unlock()
 		} else {

@@ -83,6 +83,13 @@ test.describe('Trashbin delete', () => {
     // And "Alice" empties the trashbin
     await ui.userEmptiesTrashbin({ stepUser: 'Alice' })
 
+    // Then the trashbin should be empty and the empty trash bin button should not be displayed
+    await ui.userShouldSeeEmptyTrashbinMessage({
+      stepUser: 'Alice',
+      message: 'You have no deleted files'
+    })
+    await ui.userShouldNotSeeEmptyTrashbinButton({ stepUser: 'Alice' })
+
     // And "Alice" logs out
     await ui.userLogsOut({ stepUser: 'Alice' })
   })

@@ -3,7 +3,8 @@ import {
   ConfigStore,
   useAuthStore,
   useConfigStore,
-  useMessages
+  useMessages,
+  useUserStore
 } from '@ownclouders/web-pkg'
 import { mock } from 'vitest-mock-extended'
 import { Router } from 'vue-router'
@@ -544,17 +545,26 @@ describe('AuthService', () => {
       canAccessVault,
       userContextReady,
       getUser,
-      isInVault = false
+      isInVault = false,
+      preferredLanguage
     }: {
       canAccessVault: boolean
       userContextReady: boolean
       getUser: () => Promise<User>
       isInVault?: boolean
+      preferredLanguage?: string
     }) => {
       const authService = new AuthService()
       const mockSignInRedirect = vi.fn()
 
-      const mockLoadUserAbilities = vi.fn().mockResolvedValue(undefined)
+      // the logged-in user as loaded from the graph `/me` endpoint
+      const graphUser = {
+        id: 'user-id',
+        displayName: 'User',
+        onPremisesSamAccountName: 'user',
+        preferredLanguage
+      }
+      const mockLoadUserAbilities = vi.fn().mockResolvedValue(graphUser)
       const mockUpdateContext = vi.fn().mockResolvedValue(undefined)
       Object.defineProperty(authService, 'userManager', {
         value: mock<UserManager>({
@@ -582,6 +592,11 @@ describe('AuthService', () => {
       authStore.userContextReady = userContextReady
       const configStore = useConfigStore()
       configStore.isInVault = isInVault
+      const userStore = useUserStore()
+      // the full user context sets the user before it reports the context as ready
+      if (userContextReady) {
+        userStore.user = graphUser
+      }
       authService.initialize(
         configStore,
         null,
@@ -591,7 +606,7 @@ describe('AuthService', () => {
           $gettext: (msg: string) => msg,
           $pgettext: (_context: string, msg: string) => msg
         } as unknown as Language,
-        null,
+        userStore,
         authStore,
         capabilityStore,
         null
@@ -706,6 +721,63 @@ describe('AuthService', () => {
           replace: true
         })
         expect(mockSignInRedirect).not.toHaveBeenCalled()
+      })
+
+      // The reloaded access-denied page doesn't load the user, so it can't know their language.
+      it('on a cold load, keeps the user language for the reloaded page', async () => {
+        const { authService } = setupVaultAuthService({
+          canAccessVault: false,
+          userContextReady: false,
+          getUser: () =>
+            Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: false })),
+          isInVault: true,
+          preferredLanguage: 'de'
+        })
+        const navigateSpy = spyNavigateOutsideVault(authService)
+
+        const result = await authService.initializeContext(vaultRoute)
+
+        expect(result).toBe(false)
+        expect(navigateSpy).toHaveBeenCalledWith('/access-denied?reason=forbidden&lang=de', {
+          replace: true
+        })
+      })
+
+      it('with known permissions, keeps the user language for the reloaded page', async () => {
+        const { authService } = setupVaultAuthService({
+          canAccessVault: false,
+          userContextReady: true,
+          getUser: () =>
+            Promise.resolve(mock<User>({ profile: { acr: 'advanced' }, expired: false })),
+          isInVault: true,
+          preferredLanguage: 'de'
+        })
+        const navigateSpy = spyNavigateOutsideVault(authService)
+
+        const result = await authService.initializeContext(vaultRoute)
+
+        expect(result).toBe(false)
+        expect(navigateSpy).toHaveBeenCalledWith('/access-denied?reason=forbidden&lang=de', {
+          replace: true
+        })
+      })
+
+      it('leaves the language to the browser for a user without a language setting', async () => {
+        const { authService } = setupVaultAuthService({
+          canAccessVault: false,
+          userContextReady: false,
+          getUser: () =>
+            Promise.resolve(mock<User>({ profile: { acr: 'regular' }, expired: false })),
+          isInVault: true,
+          preferredLanguage: ''
+        })
+        const navigateSpy = spyNavigateOutsideVault(authService)
+
+        await authService.initializeContext(vaultRoute)
+
+        expect(navigateSpy).toHaveBeenCalledWith('/access-denied?reason=forbidden', {
+          replace: true
+        })
       })
 
       it('does not reload the page for an entitled user', async () => {
