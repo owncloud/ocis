@@ -75,6 +75,13 @@
    make deploy-ocis
    ```
 
+   > [!TIP]
+   > For e2e tests, deploy with the additional unified roles that e2e expects:
+   >
+   > ```bash
+   > make deploy-ocis-e2e
+   > ```
+
 5. Check the ocis logs
 
    ```bash

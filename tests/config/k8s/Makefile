@@ -9,6 +9,12 @@ ifeq ($(OCM), true)
 	DOMAIN := federation-ocis-server
 endif
 
+# Additional Helm values for e2e deployments: e2e tests use unified roles that
+# are disabled by default, while API acceptance tests rely on the server's
+# default role list.
+WEB_E2E_VALUES := $(abspath ./web-e2e-values.yaml)
+HELM_EXTRA_VALUES :=
+
 .PHONY: create-cluster
 create-cluster:
 	@echo $(LOGS_DIR)
@@ -38,12 +44,16 @@ prepare-charts:
 		--from-file=de_LC_MESSAGES_notifications.po=../translations/de/LC_MESSAGES/notifications.po \
 		--from-file=es_LC_MESSAGES_notifications.po=../translations/es/LC_MESSAGES/notifications.po || true
 
-.PHONY: deploy-ocis
+.PHONY: deploy-ocis deploy-ocis-e2e
 deploy-ocis:
 	@sed -i 's|externalDomain:.*|externalDomain: $(DOMAIN)|' $(CHART_REPO)/charts/ocis/ci/deployment-values.yaml
 	helm install -n $(DOMAIN) --create-namespace \
-		--values $(CHART_REPO)/charts/ocis/ci/deployment-values.yaml \
+		--values $(CHART_REPO)/charts/ocis/ci/deployment-values.yaml $(HELM_EXTRA_VALUES) \
 		--wait --timeout 5m0s ocis $(CHART_REPO)/charts/ocis/
+
+# Same deploy as deploy-ocis, but also passes the e2e role overlay.
+deploy-ocis-e2e:
+	$(MAKE) deploy-ocis HELM_EXTRA_VALUES="--values $(WEB_E2E_VALUES)"
 
 .PHONY: show-logs
 show-logs:
