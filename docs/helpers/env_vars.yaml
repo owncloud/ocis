@@ -12382,7 +12382,8 @@ SHARING_USER_JSONCS3_MAX_CONCURRENCY:
   type: int
   description: Maximum number of concurrent go-routines. Higher values can potentially
     get work done faster but will also cause more load on the system. Values of 0
-    or below will be ignored and the default value will be used.
+    or below will be ignored and the default value will be used. The removal of shares
+    always uses at least 3 concurrent go-routines.
   introductionVersion: 7.0.0
   deprecationVersion: ""
   removalVersion: ""
