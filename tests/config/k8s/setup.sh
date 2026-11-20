@@ -66,8 +66,6 @@ fi
 
 if [[ "$ENABLE_KEYCLOAK" == "true" ]]; then
     sed -i '/^  keycloak:/{n;s|enabled: false|enabled: true|;}' $CFG_DIR/values.yaml
-else
-    sed -i '/^  keycloak:/{n;s|enabled: true|enabled: false|;}' $CFG_DIR/values.yaml
 fi
 
 if [[ "$ENABLE_WOPI" == "true" ]]; then
@@ -118,7 +116,6 @@ if [[ "$ENABLE_AUTH_APP" == "true" ]]; then
 fi
 
 if [[ "$ENABLE_KEYCLOAK" == "true" || "$ENABLE_VAULT" == "true" ]]; then
-    # Keycloak is external to the cluster, so allow the browser to reach it.
     sed -i "/defaultSrc:/i\\        - 'https://keycloak:8443/'" $CFG_DIR/values.yaml
     sed -i "/imgSrc:/i\\        - 'https://keycloak:8443/'" $CFG_DIR/values.yaml
 fi

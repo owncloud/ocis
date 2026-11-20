@@ -612,7 +612,9 @@ jobs:
             else
               realm_file=tests/config/ci/ocis-ci-realm.dist.json
             fi
-            # Point the realm's web client at the Kubernetes ingress.
+
+            # patch the realm so the "web" client's redirect/origin URLs match
+            # the k8s ingress domain instead of the non-k8s "localhost:9200" one
             sed \
               -e "s|https://localhost:9200|${TEST_SERVER_URL}|g" \
               -e "s|https://ocis-server:9200|${TEST_SERVER_URL}|g" \
@@ -798,26 +800,13 @@ jobs:
             delete_file() {
               request DELETE
             }
-            create_file() {
-              local status
-              status=$(put_file) || return 1
-
-              echo "File creation returned HTTP $status"
-
-              [[ "$status" == "201" || "$status" == "204" ]]
-            }
 
             check_status() {
               local expected=$1
               shift
-              local status
-              status=$("$@") || return 1
-              echo "Received HTTP $status (expected $expected)"
-
-              [[ "$status" == "$expected" ]]
             }
             echo "Creating test file..."
-            retry "create file (HTTP 201 or 204)" create_file || exit 1
+            retry "create file (HTTP 201)" check_status 201 put_file || exit 1
             echo "Deleting test file..."
             retry "delete file (HTTP 204)" check_status 204 delete_file || exit 1
           fi
