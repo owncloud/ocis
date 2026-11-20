@@ -179,3 +179,84 @@ func TestMultiFactor_disabledDoesNotPersist(t *testing.T) {
 	_, err := s.Read(key(mfaTestUser.GetId().GetOpaqueId()))
 	assert.ErrorIs(t, err, store.ErrNotFound)
 }
+
+func enforcedMFAConfig() config.MFAConfig {
+	return config.MFAConfig{
+		Enabled:                true,
+		AuthLevelNames:         []string{"advanced"},
+		SessionDuration:        60,
+		EnforceSessionDuration: true,
+		IssuedAtClaim:          "auth_time",
+	}
+}
+
+func oidcRequestWithClaims(claims map[string]any) *http.Request {
+	req := httptest.NewRequest(http.MethodGet, "https://example.com/dav/spaces/vault", nil)
+	return req.WithContext(oidc.NewContext(req.Context(), claims))
+}
+
+func TestMultiFactor_enforcedSessionDuration(t *testing.T) {
+	now := time.Now()
+	tests := []struct {
+		name   string
+		claims map[string]any
+		want   bool
+	}{
+		{name: "fresh", claims: map[string]any{"acr": "advanced", "auth_time": float64(now.Add(-30 * time.Second).Unix())}, want: true},
+		{name: "expired", claims: map[string]any{"acr": "advanced", "auth_time": float64(now.Add(-61 * time.Second).Unix())}, want: false},
+		{name: "missing", claims: map[string]any{"acr": "advanced"}, want: false},
+		{name: "not a number", claims: map[string]any{"acr": "advanced", "auth_time": "yesterday"}, want: false},
+		{name: "zero", claims: map[string]any{"acr": "advanced", "auth_time": float64(0)}, want: false},
+		{name: "in the future", claims: map[string]any{"acr": "advanced", "auth_time": float64(now.Add(time.Minute).Unix())}, want: false},
+		{name: "fresh without mfa acr", claims: map[string]any{"acr": "regular", "auth_time": float64(now.Unix())}, want: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var hasMFA bool
+			mfaChain(enforcedMFAConfig(), store.NewMemoryStore(), &hasMFA).ServeHTTP(httptest.NewRecorder(), oidcRequestWithClaims(tt.claims))
+			assert.Equal(t, tt.want, hasMFA)
+		})
+	}
+}
+
+func TestMultiFactor_customIssuedAtClaim(t *testing.T) {
+	cfg := enforcedMFAConfig()
+	cfg.IssuedAtClaim = "loa_times.advanced"
+	var hasMFA bool
+
+	claims := map[string]any{
+		"acr":       "advanced",
+		"auth_time": float64(time.Now().Add(-time.Hour).Unix()),
+		"loa_times": map[string]any{"advanced": float64(time.Now().Add(-10 * time.Second).Unix())},
+	}
+	mfaChain(cfg, store.NewMemoryStore(), &hasMFA).ServeHTTP(httptest.NewRecorder(), oidcRequestWithClaims(claims))
+	assert.True(t, hasMFA)
+}
+
+func TestMultiFactor_enforcementDisabledIgnoresMFATime(t *testing.T) {
+	cfg := enforcedMFAConfig()
+	cfg.EnforceSessionDuration = false
+	var hasMFA bool
+
+	claims := map[string]any{"acr": "advanced", "auth_time": float64(time.Now().Add(-24 * time.Hour).Unix())}
+	mfaChain(cfg, store.NewMemoryStore(), &hasMFA).ServeHTTP(httptest.NewRecorder(), oidcRequestWithClaims(claims))
+	assert.True(t, hasMFA)
+}
+
+// TestMultiFactor_storeFallbackDoesNotOutliveMFASession proves that a signed-URL download can't
+// extend MFA beyond the original session: the store record holds the MFA time from the claim.
+func TestMultiFactor_storeFallbackDoesNotOutliveMFASession(t *testing.T) {
+	s := store.NewMemoryStore()
+	var hasMFA bool
+
+	verifiedAt := time.Now().Add(-50 * time.Second)
+	claims := map[string]any{"acr": "advanced", "auth_time": float64(verifiedAt.Unix())}
+	mfaChain(enforcedMFAConfig(), s, &hasMFA).ServeHTTP(httptest.NewRecorder(), oidcRequestWithClaims(claims))
+	assert.True(t, hasMFA)
+
+	records, err := s.Read(key(mfaTestUser.GetId().GetOpaqueId()))
+	assert.NoError(t, err)
+	assert.Len(t, records, 1)
+	assert.Equal(t, strconv.FormatInt(verifiedAt.Unix(), 10), string(records[0].Value))
+	assert.LessOrEqual(t, records[0].Expiry, 10*time.Second)
+}

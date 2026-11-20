@@ -160,6 +160,11 @@ export const useCapabilityStore = defineStore('capabilities', () => {
 
   const authMfaEnabled = computed(() => unref(capabilities).auth.mfa.enabled)
   const authMfaRequiredLevelname = computed(() => unref(capabilities).auth.mfa.levelnames.at(0))
+  const authMfaSessionDuration = computed(() => unref(capabilities).auth.mfa.session_duration)
+  const authMfaEnforceSessionDuration = computed(
+    () => unref(capabilities).auth.mfa.enforce_session_duration
+  )
+  const authMfaIssuedAtClaim = computed(() => unref(capabilities).auth.mfa.issued_at_claim)
 
   const vaultEnabled = computed(() => unref(capabilities).vault?.enabled)
   const vaultDefaultShareExpirationDays = computed(
@@ -216,6 +221,9 @@ export const useCapabilityStore = defineStore('capabilities', () => {
     searchContent,
     authMfaEnabled,
     authMfaRequiredLevelname,
+    authMfaSessionDuration,
+    authMfaEnforceSessionDuration,
+    authMfaIssuedAtClaim,
     vaultEnabled,
     vaultDefaultShareExpirationDays
   }

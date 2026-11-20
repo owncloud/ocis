@@ -53,6 +53,14 @@ func Validate(cfg *config.Config) error {
 		)
 	}
 
+	if cfg.MultiFactorAuthentication.Enabled && cfg.MultiFactorAuthentication.EnforceSessionDuration &&
+		cfg.MultiFactorAuthentication.IssuedAtClaim == "" {
+		return fmt.Errorf(
+			"Missing value for 'mfa.issued_at_claim' in service %s. Must be set when 'mfa.enforce_session_duration' is enabled.",
+			cfg.Service.Name,
+		)
+	}
+
 	if cfg.ServiceAccount.ServiceAccountID == "" {
 		return shared.MissingServiceAccountID(cfg.Service.Name)
 	}

@@ -37,23 +37,27 @@ func MultiFactor(cfg config.MFAConfig, opts ...Option) func(next http.Handler) h
 
 	return func(next http.Handler) http.Handler {
 		return &MultiFactorAuthentication{
-			next:            next,
-			logger:          logger,
-			enabled:         cfg.Enabled,
-			authLevelNames:  cfg.AuthLevelNames,
-			store:           options.MFAStore,
-			sessionDuration: mfaSessionDuration(cfg),
+			next:                   next,
+			logger:                 logger,
+			enabled:                cfg.Enabled,
+			authLevelNames:         cfg.AuthLevelNames,
+			store:                  options.MFAStore,
+			sessionDuration:        mfaSessionDuration(cfg),
+			enforceSessionDuration: cfg.EnforceSessionDuration,
+			issuedAtClaim:          cfg.IssuedAtClaim,
 		}
 	}
 }
 
 // MultiFactorAuthentication is a authenticator that checks for mfa on specific paths
 type MultiFactorAuthentication struct {
-	next            http.Handler
-	logger          log.Logger
-	enabled         bool
-	authLevelNames  []string
-	sessionDuration time.Duration
+	next                   http.Handler
+	logger                 log.Logger
+	enabled                bool
+	authLevelNames         []string
+	sessionDuration        time.Duration
+	enforceSessionDuration bool
+	issuedAtClaim          string
 	// store holds the time of the last request with MFA of a user, so that requests
 	// without claims (e.g. signed-URL downloads) can inherit the MFA status. Nil when
 	// no store is configured.
@@ -111,15 +115,44 @@ func (m MultiFactorAuthentication) ServeHTTP(w http.ResponseWriter, req *http.Re
 		m.logger.Debug().Str("path", req.URL.Path).Interface("required", m.authLevelNames).Err(err).Msg("acr claim not set in access token")
 	} else if !m.containsMFA(value) {
 		m.logger.Debug().Str("acr", value).Str("url", req.URL.Path).Msg("accessing path without mfa")
-	} else {
+	} else if verifiedAt, ok := m.mfaVerifiedAt(claims, req.URL.Path); ok {
 		m.logger.Debug().Str("acr", value).Str("url", req.URL.Path).Msg("mfa authenticated")
 		ctx = revactx.SetMFA(ctx)
-		m.writeMFAToStore(ctx)
+		m.writeMFAToStore(ctx, verifiedAt)
 	}
 
-	// MFA status will only be true if the acr claim contains the proper value,
-	// otherwise it wll be false (removed from the context early)
+	// MFA status will only be true if the acr claim contains the proper value and,
+	// if enforced, the MFA is recent enough. Otherwise it will be false (removed
+	// from the context early)
 	m.next.ServeHTTP(w, req.WithContext(ctx))
+}
+
+// mfaVerifiedAt returns the time the MFA was performed and whether it is still within the
+// session duration. Without enforcement the MFA counts as performed now.
+func (m MultiFactorAuthentication) mfaVerifiedAt(claims map[string]any, path string) (time.Time, bool) {
+	now := time.Now()
+	if !m.enforceSessionDuration {
+		return now, true
+	}
+
+	issuedAt, err := oidc.ReadNumericClaim(m.issuedAtClaim, claims)
+	if err != nil {
+		m.logger.Warn().Err(err).Str("path", path).Str("claim", m.issuedAtClaim).Msg("denying mfa, MFA time claim missing or invalid")
+		return time.Time{}, false
+	}
+	verifiedAt := time.Unix(issuedAt, 0)
+	switch {
+	case issuedAt <= 0:
+		m.logger.Warn().Str("path", path).Str("claim", m.issuedAtClaim).Int64("value", issuedAt).Msg("denying mfa, MFA time claim is not set")
+		return time.Time{}, false
+	case verifiedAt.After(now):
+		m.logger.Warn().Str("path", path).Str("claim", m.issuedAtClaim).Time("verifiedAt", verifiedAt).Msg("denying mfa, MFA time claim is in the future")
+		return time.Time{}, false
+	case now.Sub(verifiedAt) >= m.sessionDuration:
+		m.logger.Debug().Str("path", path).Str("claim", m.issuedAtClaim).Time("verifiedAt", verifiedAt).Msg("denying mfa, MFA session expired")
+		return time.Time{}, false
+	}
+	return verifiedAt, true
 }
 
 // readMFAFromStore checks if the user had MFA in an OIDC request within the session duration.
@@ -140,18 +173,18 @@ func (m MultiFactorAuthentication) readMFAFromStore(ctx context.Context) bool {
 	return time.Since(time.Unix(verifiedAt, 0)) < m.sessionDuration
 }
 
-// writeMFAToStore stores the time of the last request with MFA of the user, so that requests
+// writeMFAToStore stores the time the MFA of the user was performed, so that requests
 // without claims (e.g. signed-URL downloads) can inherit the MFA status, see readMFAFromStore.
-func (m MultiFactorAuthentication) writeMFAToStore(ctx context.Context) {
+func (m MultiFactorAuthentication) writeMFAToStore(ctx context.Context, verifiedAt time.Time) {
 	userID := mfaUserID(ctx)
 	if m.store == nil || userID == "" {
 		return
 	}
 	if err := m.store.Write(&microstore.Record{
 		Key:   key(userID),
-		Value: []byte(strconv.FormatInt(time.Now().Unix(), 10)),
+		Value: []byte(strconv.FormatInt(verifiedAt.Unix(), 10)),
 		// redis honors the expiry, nats-js-kv uses the TTL of the bucket instead
-		Expiry: m.sessionDuration,
+		Expiry: m.sessionDuration - time.Since(verifiedAt),
 	}); err != nil {
 		m.logger.Error().Err(err).Str("userID", userID).Msg("failed to write MFA status to store")
 	}

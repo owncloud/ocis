@@ -165,6 +165,9 @@ type CapabilitiesMFA struct {
 	Enabled         bool     `json:"enabled,omitempty" xml:"enabled,omitempty" mapstructure:"enabled"`
 	LevelNames      []string `json:"levelnames,omitempty" xml:"levelnames,omitempty" mapstructure:"levelnames"`
 	SessionDuration int      `json:"session_duration,omitempty" xml:"session_duration,omitempty" mapstructure:"session_duration"`
+
+	EnforceSessionDuration bool   `json:"enforce_session_duration,omitempty" xml:"enforce_session_duration,omitempty" mapstructure:"enforce_session_duration"`
+	IssuedAtClaim          string `json:"issued_at_claim,omitempty" xml:"issued_at_claim,omitempty" mapstructure:"issued_at_claim"`
 }
 
 // Spaces lets a service configure its advertised options related to Storage Spaces.

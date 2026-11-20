@@ -42,6 +42,23 @@ const stepUpRequest = (target: string) => ({
   state: { mfaStepUpTarget: target }
 })
 
+const withMfaSessionDuration = (
+  authService: AuthService,
+  duration = 3600,
+  { enforce = true, claim = 'auth_time' }: { enforce?: boolean; claim?: string } = {}
+) => {
+  Object.defineProperty(authService, 'capabilityStore', {
+    value: mock<CapabilityStore>({
+      authMfaSessionDuration: duration,
+      authMfaEnforceSessionDuration: enforce,
+      authMfaIssuedAtClaim: claim
+    })
+  })
+}
+
+const jwt = (claims: Record<string, unknown>) =>
+  ['header', btoa(JSON.stringify(claims)).replace(/=+$/, ''), 'signature'].join('.')
+
 describe('AuthService', () => {
   describe('signInCallback', () => {
     it.each([
@@ -384,6 +401,7 @@ describe('AuthService', () => {
 
     it('when user is not authenticated, should redirect to login page', async () => {
       const authService = new AuthService()
+      withMfaSessionDuration(authService)
 
       Object.defineProperty(authService, 'userManager', {
         value: mock<UserManager>({
@@ -400,6 +418,7 @@ describe('AuthService', () => {
 
     it('when user is authenticated and acr is not the one required, should redirect to login page', async () => {
       const authService = new AuthService()
+      withMfaSessionDuration(authService)
 
       Object.defineProperty(authService, 'userManager', {
         value: mock<UserManager>({
@@ -418,6 +437,7 @@ describe('AuthService', () => {
 
     it('when user is authenticated and acr is the one required but access token is expired, should redirect to login page', async () => {
       const authService = new AuthService()
+      withMfaSessionDuration(authService)
 
       Object.defineProperty(authService, 'userManager', {
         value: mock<UserManager>({
@@ -436,6 +456,7 @@ describe('AuthService', () => {
 
     it('when user is authenticated and acr is the one required, should not redirect to login page', async () => {
       const authService = new AuthService()
+      withMfaSessionDuration(authService)
 
       Object.defineProperty(authService, 'userManager', {
         value: mock<UserManager>({
@@ -450,12 +471,140 @@ describe('AuthService', () => {
       expect(mockSignInRedirect).not.toHaveBeenCalled()
     })
 
+    describe('MFA session duration', () => {
+      const advancedUser = (claims: Record<string, unknown>) =>
+        mock<User>({ profile: { acr: 'advanced' }, access_token: jwt(claims), expired: false })
+      const secondsAgo = (seconds: number) => Math.floor(Date.now() / 1000) - seconds
+
+      const setup = (
+        user: User,
+        duration?: number,
+        options?: { enforce?: boolean; claim?: string }
+      ) => {
+        const signinRedirect = vi.fn()
+        const authService = new AuthService()
+        withMfaSessionDuration(authService, duration, options)
+        Object.defineProperty(authService, 'userManager', {
+          value: mock<UserManager>({
+            getUser: vi.fn().mockResolvedValue(user),
+            signinRedirect,
+            setPostLoginRedirectUrl: vi.fn()
+          })
+        })
+        return { authService, signinRedirect }
+      }
+
+      it('does not redirect while the MFA is within the session duration', async () => {
+        const { authService, signinRedirect } = setup(advancedUser({ auth_time: secondsAgo(60) }))
+
+        expect(await authService.requireAcr('advanced', '/')).toBe(true)
+        expect(signinRedirect).not.toHaveBeenCalled()
+      })
+
+      it('redirects once the MFA is older than the session duration', async () => {
+        const { authService, signinRedirect } = setup(
+          advancedUser({ auth_time: secondsAgo(121) }),
+          120
+        )
+
+        await authService.requireAcr('advanced', '/')
+        expect(signinRedirect).toHaveBeenCalledWith(stepUpRequest('/'))
+      })
+
+      it('falls back to the default session duration when none is configured', async () => {
+        const { authService, signinRedirect } = setup(
+          advancedUser({ auth_time: secondsAgo(3601) }),
+          0
+        )
+
+        await authService.requireAcr('advanced', '/')
+        expect(signinRedirect).toHaveBeenCalledWith(stepUpRequest('/'))
+      })
+
+      it('reads the configured claim of the access token', async () => {
+        const { authService, signinRedirect } = setup(
+          advancedUser({ auth_time: secondsAgo(10), mfaAuthTime: secondsAgo(3601) }),
+          3600,
+          { claim: 'mfaAuthTime' }
+        )
+
+        await authService.requireAcr('advanced', '/')
+        expect(signinRedirect).toHaveBeenCalled()
+      })
+
+      it('reads a nested claim', async () => {
+        const { authService, signinRedirect } = setup(
+          advancedUser({ loa: { times: secondsAgo(3601) } }),
+          3600,
+          { claim: 'loa.times' }
+        )
+
+        await authService.requireAcr('advanced', '/')
+        expect(signinRedirect).toHaveBeenCalled()
+      })
+
+      it('reads a claim with an escaped dot', async () => {
+        const { authService, signinRedirect } = setup(
+          advancedUser({ loa: { times: secondsAgo(10) }, 'loa.times': secondsAgo(3601) }),
+          3600,
+          { claim: 'loa\\.times' }
+        )
+
+        await authService.requireAcr('advanced', '/')
+        expect(signinRedirect).toHaveBeenCalled()
+      })
+
+      it('names the expired MFA time when the IdP answered the step-up with it', async () => {
+        const { authService, signinRedirect } = setup(advancedUser({ auth_time: secondsAgo(3601) }))
+        Object.defineProperty(authService, 'language', {
+          value: { $gettext: (msg: string) => msg, $pgettext: (_c: string, msg: string) => msg }
+        })
+        ;(authService as any).stepUpReturnTarget = '/'
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+
+        expect(await authService.requireAcr('advanced', '/')).toBe(false)
+        expect(signinRedirect).not.toHaveBeenCalled()
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining('"auth_time" is 3601s old'))
+      })
+
+      it('does not check the MFA time when enforcement is disabled', async () => {
+        const { authService, signinRedirect } = setup(
+          advancedUser({ auth_time: secondsAgo(3601) }),
+          3600,
+          { enforce: false }
+        )
+
+        expect(await authService.requireAcr('advanced', '/')).toBe(true)
+        expect(signinRedirect).not.toHaveBeenCalled()
+      })
+
+      it('leaves the decision to the proxy for an opaque access token', async () => {
+        const { authService, signinRedirect } = setup(
+          mock<User>({ profile: { acr: 'advanced' }, access_token: 'opaque-token', expired: false })
+        )
+
+        expect(await authService.requireAcr('advanced', '/')).toBe(true)
+        expect(signinRedirect).not.toHaveBeenCalled()
+      })
+
+      it.each([
+        ['a missing claim', {}],
+        ['a non-numeric claim', { auth_time: 'yesterday' }]
+      ])('redirects for %s, like the proxy denies it', async (_, claims) => {
+        const { authService, signinRedirect } = setup(advancedUser(claims))
+
+        await authService.requireAcr('advanced', '/')
+        expect(signinRedirect).toHaveBeenCalledWith(stepUpRequest('/'))
+      })
+    })
+
     describe('MFA step-up loop protection', () => {
       const adminRoute = '/admin-settings/users'
 
       const setupRequireAcr = (user: User) => {
         const signinRedirect = vi.fn()
         const authService = new AuthService()
+        withMfaSessionDuration(authService)
         Object.defineProperty(authService, 'userManager', {
           value: mock<UserManager>({
             getUser: vi.fn().mockResolvedValue(user),
@@ -580,7 +729,10 @@ describe('AuthService', () => {
       const ability = { can: vi.fn().mockReturnValue(canAccessVault) } as unknown as Ability
       const capabilityStore = mock<CapabilityStore>({
         isInitialized: true,
-        authMfaRequiredLevelname: 'advanced'
+        authMfaRequiredLevelname: 'advanced',
+        authMfaSessionDuration: 3600,
+        authMfaEnforceSessionDuration: true,
+        authMfaIssuedAtClaim: 'auth_time'
       })
       const router = createRouter({
         routes: [{ path: '/access-denied', name: 'accessDenied', component: {} }]
@@ -647,6 +799,26 @@ describe('AuthService', () => {
       expect(mockSignInRedirect).toHaveBeenCalledWith(
         expect.objectContaining({ acr_values: 'advanced' })
       )
+    })
+
+    it('when the MFA time is older than the session duration, enforces MFA again', async () => {
+      const { authService, mockSignInRedirect } = setupVaultAuthService({
+        canAccessVault: true,
+        userContextReady: true,
+        getUser: () =>
+          Promise.resolve(
+            mock<User>({
+              profile: { acr: 'advanced' },
+              access_token: jwt({ auth_time: Math.floor(Date.now() / 1000) - 3601 }),
+              expired: false
+            })
+          )
+      })
+
+      const result = await authService.initializeContext(vaultRoute)
+
+      expect(result).toBeUndefined()
+      expect(mockSignInRedirect).toHaveBeenCalledWith(stepUpRequest('/vault'))
     })
 
     it('when there is no authenticated user (cold load), does not deny and hands off to the IdP for login', async () => {

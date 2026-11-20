@@ -2813,7 +2813,7 @@
       "alias": "loa level 2",
       "config": {
         "loa-condition-level": "2",
-        "loa-max-age": "36000"
+        "loa-max-age": "3600"
       }
     },
     {
