@@ -2,6 +2,7 @@ package parser
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -41,4 +42,15 @@ func TestValidateMaxConsecutiveFailures(t *testing.T) {
 			assert.NoError(t, err)
 		})
 	}
+}
+
+func TestValidateFailedRetryInterval(t *testing.T) {
+	assert.Zero(t, defaults.DefaultConfig().Extractor.FailedRetryInterval, "off by default: every walk retries a failed file")
+
+	cfg := validConfig()
+	cfg.Extractor.FailedRetryInterval = 24 * time.Hour
+	assert.NoError(t, Validate(cfg))
+
+	cfg.Extractor.FailedRetryInterval = -time.Second
+	assert.ErrorContains(t, Validate(cfg), "SEARCH_EXTRACTOR_FAILED_RETRY_INTERVAL")
 }

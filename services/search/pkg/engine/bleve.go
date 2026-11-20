@@ -89,6 +89,12 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 	docMapping.AddFieldMappingsAt("Tags", lowercaseMapping)
 	docMapping.AddFieldMappingsAt("Content", fulltextFieldMapping)
 
+	// Bookkeeping only: stored so the walk can read it back, never searched.
+	storedOnlyMapping := bleve.NewTextFieldMapping()
+	storedOnlyMapping.Index = false
+	storedOnlyMapping.IncludeInAll = false
+	docMapping.AddFieldMappingsAt("ExtractionFailedAt", storedOnlyMapping)
+
 	// Add explicit Photo field mappings to ensure fields are stored
 	photoMapping := bleve.NewDocumentMapping()
 	photoStringMapping := bleve.NewTextFieldMapping()
@@ -475,6 +481,8 @@ func (b *Bleve) getResource(bleveIndex bleve.Index, id string) (*Resource, error
 		Type:      uint64(getFieldValue[float64](fields, "Type")),
 		Deleted:   getFieldValue[bool](fields, "Deleted"),
 		Extracted: getFieldValue[bool](fields, "Extracted"),
+
+		ExtractionFailedAt: getFieldValue[string](fields, "ExtractionFailedAt"),
 		Document: content.Document{
 			Name:     getFieldValue[string](fields, "Name"),
 			Title:    getFieldValue[string](fields, "Title"),
