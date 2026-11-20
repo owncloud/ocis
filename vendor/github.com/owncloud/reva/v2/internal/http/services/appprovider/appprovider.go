@@ -366,7 +366,7 @@ func (s *svc) handleOpen(openMode int) http.HandlerFunc {
 			return
 		}
 
-		viewMode, err := getViewModeFromPublicScope(ctx)
+		viewMode, err := getViewModeFromPublicScope(ctx, statRes.GetInfo())
 		if err != nil {
 			writeError(w, r, appErrorPermissionDenied, "permission denied to open the application", err)
 			return
@@ -611,13 +611,16 @@ func getViewMode(res *provider.ResourceInfo, vm string) gateway.OpenInAppRequest
 }
 
 // try to get the view mode from a publicshare scope
-func getViewModeFromPublicScope(ctx context.Context) (gateway.OpenInAppRequest_ViewMode, error) {
+func getViewModeFromPublicScope(ctx context.Context, res *provider.ResourceInfo) (gateway.OpenInAppRequest_ViewMode, error) {
 	scopes, ok := ctxpkg.ContextGetScopes(ctx)
 	if ok {
 		for key, scope := range scopes {
 			if strings.HasPrefix(key, "publicshare:") {
 				switch scope.GetRole() {
 				case providerv1beta1.Role_ROLE_VIEWER:
+					if res.GetPermissionSet().GetInitiateFileDownload() {
+						return gateway.OpenInAppRequest_VIEW_MODE_READ_ONLY, nil
+					}
 					return gateway.OpenInAppRequest_VIEW_MODE_VIEW_ONLY, nil
 				case providerv1beta1.Role_ROLE_EDITOR:
 					return gateway.OpenInAppRequest_VIEW_MODE_READ_WRITE, nil
