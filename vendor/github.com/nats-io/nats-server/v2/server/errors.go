@@ -174,6 +174,9 @@ var (
 	// ErrServerNotRunning is used to signal an error that a server is not running.
 	ErrServerNotRunning = errors.New("server is not running")
 
+	// ErrConfigReloadNotSupported signals a config change that requires a restart instead of a reload.
+	ErrConfigReloadNotSupported = errors.New("config reload not supported")
+
 	// ErrServerNameHasSpaces signals that the server name contains spaces, which is not allowed.
 	ErrServerNameHasSpaces = errors.New("server name cannot contain spaces")
 
@@ -248,6 +251,10 @@ var (
 
 	// ErrMappingDestinationNotSupportedForImport is returned when you try to use a mapping function other than wildcard in a transform that needs to be reversible (i.e. an import)
 	ErrMappingDestinationNotSupportedForImport = fmt.Errorf("%w: the only mapping function allowed for import transforms is {{Wildcard()}}", ErrInvalidMappingDestination)
+
+	// ErrMappingFunctionNotAvailable is returned when an account scoped mapping function (e.g. {{account-hash()}}) is used
+	// somewhere its value is not available, or where such functions are not supported.
+	ErrMappingFunctionNotAvailable = fmt.Errorf("%w: function is not available in this context", ErrInvalidMappingDestination)
 )
 
 // mappingDestinationErr is a type of subject mapping destination error

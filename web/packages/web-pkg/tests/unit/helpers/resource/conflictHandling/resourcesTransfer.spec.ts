@@ -2,7 +2,9 @@ import {
   ResolveConflict,
   ResourceTransfer,
   TransferType,
-  resolveFileNameDuplicate
+  resolveFileNameDuplicate,
+  getResourcesAtTarget,
+  type IncompleteCopy
 } from '../../../../../src/helpers/resource/conflictHandling'
 import { mock, mockDeep, mockReset } from 'vitest-mock-extended'
 import { buildSpace, createHttpError, Resource, SpaceResource } from '@ownclouders/web-client'
@@ -175,6 +177,18 @@ describe('resourcesTransfer', () => {
       createHttpError({ message: 'Insufficient Storage', statusCode: 507, xReqId: '1' })
 
     it.each([
+      { transferType: TransferType.DUPLICATE, title: '1 item was copied successfully' },
+      { transferType: TransferType.COPY, title: '1 item was copied successfully' },
+      { transferType: TransferType.MOVE, title: '1 item was moved successfully' }
+    ])('names the action that succeeded', ({ transferType, title }) => {
+      const showMessage = vi.spyOn(useMessages(), 'showMessage')
+
+      buildTransfer(projectSpace()).showResultMessage([], [mock<Resource>()], transferType)
+
+      expect(showMessage).toHaveBeenCalledWith(expect.objectContaining({ title }))
+    })
+
+    it.each([
       { transferType: TransferType.DUPLICATE, title: 'Failed to duplicate "a"' },
       { transferType: TransferType.COPY, title: 'Failed to copy "a"' },
       { transferType: TransferType.MOVE, title: 'Failed to move "a"' }
@@ -213,18 +227,27 @@ describe('resourcesTransfer', () => {
     const noAnswerError = () =>
       createHttpError({ message: 'Failed to fetch', statusCode: undefined, xReqId: undefined })
 
+    // what the paste worker reports for a folder that misses some of its content
+    const incompleteCopy = (copy: Partial<IncompleteCopy> = {}): IncompleteCopy => ({
+      path: '/a',
+      copiedItems: 1,
+      totalItems: 2,
+      notCopied: ['a/b.txt'],
+      ...copy
+    })
+
     it.each([
       { resourceNames: ['a'], title: 'Duplication of "a" incomplete' },
       { resourceNames: ['a', 'b'], title: 'Duplication of 2 resources incomplete' }
     ])(
-      'says the duplication of a folder is incomplete when it got no answer',
+      'says the duplication is incomplete when the folders miss some of their content',
       ({ resourceNames, title }) => {
         const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
 
         buildTransfer(projectSpace()).showResultMessage(
           resourceNames.map((resourceName) => ({
             resourceName,
-            isFolder: true,
+            incomplete: incompleteCopy(),
             error: noAnswerError()
           })),
           [],
@@ -235,34 +258,17 @@ describe('resourcesTransfer', () => {
       }
     )
 
-    it('says the duplication of a file failed when it got no answer', () => {
+    it('says the duplication failed when it got no answer and nothing was created', () => {
       const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
 
       buildTransfer(projectSpace()).showResultMessage(
-        [{ resourceName: 'a', isFolder: false, error: noAnswerError() }],
+        [{ resourceName: 'a', error: noAnswerError() }],
         [],
         TransferType.DUPLICATE
       )
 
       expect(showErrorMessage).toHaveBeenCalledWith(
         expect.objectContaining({ title: 'Failed to duplicate "a"' })
-      )
-    })
-
-    it('says the duplication of folders and files failed when none got an answer', () => {
-      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
-
-      buildTransfer(projectSpace()).showResultMessage(
-        [
-          { resourceName: 'a', isFolder: true, error: noAnswerError() },
-          { resourceName: 'b', isFolder: false, error: noAnswerError() }
-        ],
-        [],
-        TransferType.DUPLICATE
-      )
-
-      expect(showErrorMessage).toHaveBeenCalledWith(
-        expect.objectContaining({ title: 'Failed to duplicate 2 resources' })
       )
     })
 
@@ -273,7 +279,6 @@ describe('resourcesTransfer', () => {
         [
           {
             resourceName: 'a',
-            isFolder: true,
             error: createHttpError({ message: 'nope', statusCode: 403, xReqId: '1' })
           }
         ],
@@ -286,13 +291,13 @@ describe('resourcesTransfer', () => {
       )
     })
 
-    it('says the duplication failed when only some of the resources got no answer', () => {
+    it('says the duplication failed when only some of the resources are incomplete', () => {
       const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
 
       buildTransfer(projectSpace()).showResultMessage(
         [
-          { resourceName: 'a', isFolder: true, error: noAnswerError() },
-          { resourceName: 'b', isFolder: true, error: quotaError() }
+          { resourceName: 'a', incomplete: incompleteCopy(), error: noAnswerError() },
+          { resourceName: 'b', error: quotaError() }
         ],
         [],
         TransferType.DUPLICATE
@@ -304,18 +309,189 @@ describe('resourcesTransfer', () => {
     })
 
     it.each([
-      { transferType: TransferType.COPY, title: 'Failed to copy "a"' },
-      { transferType: TransferType.MOVE, title: 'Failed to move "a"' }
-    ])('keeps saying copy and move failed when they got no answer', ({ transferType, title }) => {
+      { resourceNames: ['a'], title: 'Copy of "a" incomplete' },
+      { resourceNames: ['a', 'b'], title: 'Copy of 2 resources incomplete' }
+    ])(
+      'says the copy is incomplete when the folders miss some of their content',
+      ({ resourceNames, title }) => {
+        const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+        buildTransfer(projectSpace()).showResultMessage(
+          resourceNames.map((resourceName) => ({
+            resourceName,
+            incomplete: incompleteCopy(),
+            error: noAnswerError()
+          })),
+          [],
+          TransferType.COPY
+        )
+
+        expect(showErrorMessage).toHaveBeenCalledWith(expect.objectContaining({ title }))
+      }
+    )
+
+    it('keeps saying the move failed, a move is never incomplete', () => {
       const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
 
       buildTransfer(projectSpace()).showResultMessage(
-        [{ resourceName: 'a', isFolder: true, error: noAnswerError() }],
+        [{ resourceName: 'a', incomplete: incompleteCopy(), error: noAnswerError() }],
         [],
-        transferType
+        TransferType.MOVE
       )
 
-      expect(showErrorMessage).toHaveBeenCalledWith(expect.objectContaining({ title }))
+      expect(showErrorMessage).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Failed to move "a"' })
+      )
+      expect(showErrorMessage).toHaveBeenCalledWith(
+        expect.not.objectContaining({ errorLogContent: expect.anything() })
+      )
+    })
+
+    it.each([
+      {
+        copies: [incompleteCopy({ copiedItems: 87, totalItems: 100 })],
+        desc: '87 of 100 items copied.'
+      },
+      {
+        copies: [incompleteCopy({ copiedItems: 0, totalItems: 1 })],
+        desc: '0 of 1 item copied.'
+      },
+      {
+        copies: [
+          incompleteCopy({ copiedItems: 1, totalItems: 2 }),
+          incompleteCopy({ copiedItems: 3, totalItems: 4 })
+        ],
+        desc: '4 of 6 items copied.'
+      }
+    ])('says how many files were copied: $desc', ({ copies, desc }) => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(projectSpace()).showResultMessage(
+        copies.map((incomplete, i) => ({
+          resourceName: `folder${i}`,
+          incomplete,
+          error: noAnswerError()
+        })),
+        [],
+        TransferType.DUPLICATE
+      )
+
+      expect(showErrorMessage).toHaveBeenCalledWith(expect.objectContaining({ desc }))
+    })
+
+    it('leaves the count out when the folder contains no known item', () => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(projectSpace()).showResultMessage(
+        [
+          {
+            resourceName: 'a',
+            incomplete: incompleteCopy({ copiedItems: 0, totalItems: 0, notCopied: ['a/empty/'] }),
+            error: noAnswerError()
+          }
+        ],
+        [],
+        TransferType.DUPLICATE
+      )
+
+      expect(showErrorMessage).toHaveBeenCalledWith(
+        expect.not.objectContaining({ desc: expect.anything() })
+      )
+    })
+
+    it('adds why the files could not be copied when the storage is full', () => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(projectSpace()).showResultMessage(
+        [
+          {
+            resourceName: 'a',
+            incomplete: incompleteCopy({ copiedItems: 87, totalItems: 100 }),
+            error: quotaError()
+          }
+        ],
+        [],
+        TransferType.DUPLICATE
+      )
+
+      expect(showErrorMessage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          desc: '87 of 100 items copied. The file cannot be duplicated because there is not enough storage left in "Group Space".'
+        })
+      )
+    })
+
+    it('lists what was not copied in the details, followed by the request ids', () => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(projectSpace()).showResultMessage(
+        [
+          {
+            resourceName: 'b',
+            incomplete: incompleteCopy({ notCopied: ['b/z.txt'] }),
+            error: createHttpError({ message: 'nope', statusCode: 502, xReqId: 'req-2' })
+          },
+          {
+            resourceName: 'a',
+            incomplete: incompleteCopy({ notCopied: ['a/sub/', 'a/a.txt', 'a/old/'] }),
+            error: createHttpError({ message: 'nope', statusCode: 502, xReqId: 'req-1' })
+          }
+        ],
+        [],
+        TransferType.DUPLICATE
+      )
+
+      expect(showErrorMessage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          errorLogContent: [
+            'Not copied:',
+            'a/a.txt',
+            'a/old/',
+            'a/sub/',
+            'b/z.txt',
+            '',
+            'X-Request-Id: req-2',
+            'X-Request-Id: req-1'
+          ].join('\r\n')
+        })
+      )
+    })
+
+    it('shows at most 100 lines of what was not copied, and counts the rest', () => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+      const notCopied = Array.from({ length: 105 }, (_, i) => `a/${String(i).padStart(3, '0')}.txt`)
+
+      buildTransfer(projectSpace()).showResultMessage(
+        [{ resourceName: 'a', incomplete: incompleteCopy({ notCopied }), error: noAnswerError() }],
+        [],
+        TransferType.DUPLICATE
+      )
+
+      const [[message]] = showErrorMessage.mock.calls
+      const lines = message.errorLogContent.split('\r\n')
+      expect(lines).toHaveLength(1 + 100 + 1)
+      expect(lines[1]).toBe('a/000.txt')
+      expect(lines[100]).toBe('a/099.txt')
+      expect(lines[101]).toBe('…and 5 more items')
+    })
+
+    it('leaves the details to the request ids when only some of the resources are incomplete', () => {
+      const showErrorMessage = vi.spyOn(useMessages(), 'showErrorMessage')
+
+      buildTransfer(projectSpace()).showResultMessage(
+        [
+          { resourceName: 'a', incomplete: incompleteCopy(), error: noAnswerError() },
+          { resourceName: 'b', error: quotaError() }
+        ],
+        [],
+        TransferType.DUPLICATE
+      )
+
+      const [[message]] = showErrorMessage.mock.calls
+      expect(message.errorLogContent).toBeUndefined()
+      expect(message.desc).toBe(
+        'The file cannot be duplicated because there is not enough storage left in "Group Space".'
+      )
     })
 
     it.each([
@@ -410,5 +586,26 @@ describe('resourcesTransfer', () => {
 
     expect(namingClash).toBeTruthy()
     expect(noNamingClash).toBeFalsy()
+  })
+})
+
+describe('getResourcesAtTarget', () => {
+  it('returns the completely transferred resources and the incomplete folder copies', () => {
+    const incomplete: IncompleteCopy = {
+      path: '/partly (1)',
+      copiedItems: 1,
+      totalItems: 2,
+      notCopied: ['partly (1)/b.txt']
+    }
+
+    const resources = getResourcesAtTarget(
+      [mock<Resource>({ path: '/done (1)' })],
+      [
+        { resourceName: 'partly (1)', incomplete, error: new Error() },
+        { resourceName: 'nothing (1)', error: new Error() }
+      ]
+    )
+
+    expect(resources.map(({ path }) => path)).toEqual(['/done (1)', '/partly (1)'])
   })
 })

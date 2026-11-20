@@ -25,14 +25,13 @@ jobs:
   # root-level L10N_MODULES/sub_path: . sync above (that job has no
   # package.json at the repo root, so a pnpm install there would be a
   # no-op/fail). Run it as its own invocation scoped to sub_path: web,
-  # sequenced after `sync` since the reusable workflow always pushes to
-  # the same hardcoded chore/translations-update branch.
+  # with its own PR branch so it does not overwrite the `sync` PR.
   sync-web:
-    needs: sync
     uses: owncloud/reusable-workflows/.github/workflows/translation-sync.yml@main
     with:
       mode: make
       package_manager: pnpm
+      pr_branch: chore/translations-update-web
       reviewers: kobergj,mmattel
       sub_path: web
     secrets:

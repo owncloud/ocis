@@ -299,10 +299,30 @@ class SettingsHelper {
 		?string $password,
 		array $headers = [],
 	): bool {
-		$response = self::getValuesList($baseUrl, $user, $password, $headers);
-		Assert::assertEquals(201, $response->getStatusCode(), "Failed to get values list");
-
-		$valuesList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response);
+		// The settings API occasionally returns a truncated response body under CI
+		// load, causing json_decode to throw. Retry the full HTTP call so we get
+		// a fresh response instead of re-parsing the same corrupt bytes.
+		$retried = 0;
+		do {
+			$response = self::getValuesList($baseUrl, $user, $password, $headers);
+			Assert::assertEquals(201, $response->getStatusCode(), "Failed to get values list");
+			try {
+				$valuesList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response);
+				break;
+			} catch (\JsonException $e) {
+				if ($retried >= HttpRequestHelper::maxHTTPRequestRetries()) {
+					throw $e;
+				}
+				$retried++;
+				$body = (string)$response->getBody();
+				$tail = \substr($body, -100);
+				$len = \strlen($body);
+				echo "[INFO] JsonException reading settings values-list"
+					. " (body length: $len, last 100 chars: '$tail'),"
+					. " retrying ($retried): {$e->getMessage()}\n";
+				\usleep(500 * 1000);
+			}
+		} while (true);
 
 		if (empty($valuesList)) {
 			// default is true
@@ -320,8 +340,9 @@ class SettingsHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
+	 * @param array $headers
 	 *
 	 * @return string
 	 *
@@ -330,14 +351,16 @@ class SettingsHelper {
 	 */
 	public static function getLanguageSettingValue(
 		string $baseUrl,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
+		array $headers = [],
 	): string {
 		$response = self::getValuesBySettingID(
 			$baseUrl,
 			self::PROFILE_SETTINGS['language'],
 			$user,
 			$password,
+			$headers,
 		);
 		Assert::assertEquals(201, $response->getStatusCode(), "Failed to get values list");
 
@@ -386,8 +409,9 @@ class SettingsHelper {
 	/**
 	 * @param string $baseUrl
 	 * @param string $settingId
-	 * @param string $user
-	 * @param string $password
+	 * @param string|null $user
+	 * @param string|null $password
+	 * @param array $headers
 	 *
 	 * @return ResponseInterface
 	 *
@@ -397,8 +421,9 @@ class SettingsHelper {
 	public static function getValuesBySettingID(
 		string $baseUrl,
 		string $settingId,
-		string $user,
-		string $password,
+		?string $user,
+		?string $password,
+		array $headers = [],
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "values-get-by-unique-identifiers");
 		$body = json_encode(
@@ -412,7 +437,7 @@ class SettingsHelper {
 			$fullUrl,
 			$user,
 			$password,
-			[],
+			$headers,
 			$body,
 		);
 	}

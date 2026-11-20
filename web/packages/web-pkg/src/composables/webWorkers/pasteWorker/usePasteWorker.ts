@@ -3,15 +3,20 @@ import { useWebWorkersStore } from '../../piniaStores/webWorkers'
 import { useConfigStore } from '../../piniaStores'
 import { useLoadingService } from '../../loadingService'
 import { useRequestHeaders } from '../../requestHeaders'
-import { createHttpError, type HttpError, type Resource } from '@ownclouders/web-client'
-import type { TransferData } from '../../../helpers/resource/conflictHandling'
+import { createHttpError, type Resource } from '@ownclouders/web-client'
+import type {
+  IncompleteCopy,
+  TransferData,
+  TransferFailure
+} from '../../../helpers/resource/conflictHandling'
 import PasteWorker from './worker?worker'
 
 export type PasteWorkerReturnData = {
   successful: Resource[]
   failed: {
     resourceName: string
-    isFolder: boolean
+    // a folder copy that created the folder but missed some of its content
+    incomplete?: IncompleteCopy
     message: string
     statusCode: number
     xReqId: string
@@ -20,7 +25,7 @@ export type PasteWorkerReturnData = {
 
 type CallbackOptions = {
   successful: Resource[]
-  failed: { resourceName: string; isFolder: boolean; error: HttpError }[]
+  failed: TransferFailure[]
 }
 
 /**
@@ -49,8 +54,8 @@ export const usePasteWorker = () => {
       const { successful, failed } = JSON.parse(e.data) as PasteWorkerReturnData
 
       // construct http error based on the parsed error data
-      const failedWithErrors = failed.map(({ resourceName, isFolder, ...errorData }) => {
-        return { resourceName, isFolder, error: createHttpError(errorData) }
+      const failedWithErrors = failed.map(({ resourceName, incomplete, ...errorData }) => {
+        return { resourceName, incomplete, error: createHttpError(errorData) }
       })
 
       callback({ successful, failed: failedWithErrors })

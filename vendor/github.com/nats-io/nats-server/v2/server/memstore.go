@@ -941,7 +941,7 @@ func (ms *memStore) multiLastSeqsLocked(filters []string, maxSeq uint64, maxAllo
 			} else if ss.Msgs > 1 {
 				// The last is greater than maxSeq.
 				s := bytesToString(subj)
-				for seq := maxSeq; seq > 0; seq-- {
+				for seq := maxSeq; seq >= ss.First; seq-- {
 					if sm, ok := ms.msgs[seq]; ok && sm.subj == s {
 						addIfNotDupe(seq)
 						break
@@ -1620,7 +1620,7 @@ func (ms *memStore) PurgeEx(subject string, sequence, keep uint64) (purged uint6
 	// sequence filter; sequence >= 1 clamps the upper bound to sequence-1
 	// (so sequence == 1 purges nothing).
 	last := ss.Last
-	if sequence >= 1 {
+	if sequence >= 1 && sequence <= last {
 		last = sequence - 1
 	}
 	var bytes, lowSeq uint64
@@ -1920,25 +1920,46 @@ func (ms *memStore) LoadLastMsg(subject string, smp *StoreMsg) (*StoreMsg, error
 	return ms.loadLastLocked(subject, smp)
 }
 
-// Lock should be held.
-func (ms *memStore) loadLastLocked(subject string, smp *StoreMsg) (*StoreMsg, error) {
-	var sm *StoreMsg
-	var ok bool
+// LoadLastSeq will return the sequence of the last message that matches a given subject.
+// The subject can be a wildcard.
+func (ms *memStore) LoadLastSeq(subject string) (uint64, error) {
+	// This needs to be a write lock, as lastSeqLocked can
+	// mutate the per-subject state.
+	ms.mu.Lock()
+	defer ms.mu.Unlock()
+	seq := ms.lastSeqLocked(subject)
+	// Only report sequences LoadLastMsg would find a message for.
+	if _, ok := ms.msgs[seq]; !ok {
+		return 0, ErrStoreMsgNotFound
+	}
+	return seq, nil
+}
 
+// lastSeqLocked returns the last sequence for a subject, or zero if no message matches.
+// Write lock should be held, for recalculateForSubj.
+func (ms *memStore) lastSeqLocked(subject string) uint64 {
 	if subject == _EMPTY_ || subject == fwcs {
-		sm, ok = ms.msgs[ms.state.LastSeq]
-	} else if subjectIsLiteral(subject) {
-		var ss *SimpleState
-		if ss, ok = ms.fss.Find(stringToBytes(subject)); ok && ss.Msgs > 0 {
+		return ms.state.LastSeq
+	}
+	if subjectIsLiteral(subject) {
+		if ss, ok := ms.fss.Find(stringToBytes(subject)); ok && ss.Msgs > 0 {
 			// Check if we need to recalculate. We only care about the last sequence.
 			if ss.lastNeedsUpdate {
 				ms.recalculateForSubj(subject, ss)
 			}
-			sm, ok = ms.msgs[ss.Last]
+			return ss.Last
 		}
-	} else if ss := ms.filteredStateLocked(1, subject, true); ss.Msgs > 0 {
-		sm, ok = ms.msgs[ss.Last]
+		return 0
 	}
+	if ss := ms.filteredStateLocked(1, subject, true); ss.Msgs > 0 {
+		return ss.Last
+	}
+	return 0
+}
+
+// Lock should be held.
+func (ms *memStore) loadLastLocked(subject string, smp *StoreMsg) (*StoreMsg, error) {
+	sm, ok := ms.msgs[ms.lastSeqLocked(subject)]
 	if !ok || sm == nil {
 		return nil, ErrStoreMsgNotFound
 	}
@@ -2953,8 +2974,12 @@ func (o *consumerMemStore) UpdateAcks(dseq, sseq uint64) error {
 	// We do this regardless.
 	delete(o.state.Redelivered, sseq)
 
+	// Check for AckAll (or AckFlowControl which functions like AckAll).
+	ackAll := o.cfg.AckPolicy == AckAll || o.cfg.AckPolicy == AckFlowControl
+
 	// On restarts the old leader may get a replay from the raft logs that are old.
-	if dseq <= o.state.AckFloor.Consumer {
+	// AckAll checks the stream sequence, since older servers could set the delivery floor above pending messages.
+	if (ackAll && sseq <= o.state.AckFloor.Stream) || (!ackAll && dseq <= o.state.AckFloor.Consumer) {
 		return nil
 	}
 
@@ -2962,8 +2987,11 @@ func (o *consumerMemStore) UpdateAcks(dseq, sseq uint64) error {
 		return ErrStoreMsgNotFound
 	}
 
-	// Check for AckAll here (or AckFlowControl which functions like AckAll).
-	if o.cfg.AckPolicy == AckAll || o.cfg.AckPolicy == AckFlowControl {
+	if ackAll {
+		// Use the original delivery sequence.
+		if p := o.state.Pending[sseq]; dseq > p.Sequence && p.Sequence > 0 {
+			dseq = p.Sequence
+		}
 		sgap := sseq - o.state.AckFloor.Stream
 		o.state.AckFloor.Consumer = dseq
 		o.state.AckFloor.Stream = sseq
@@ -2979,6 +3007,11 @@ func (o *consumerMemStore) UpdateAcks(dseq, sseq uint64) error {
 				delete(o.state.Pending, seq)
 				delete(o.state.Redelivered, seq)
 			}
+		}
+		// Nothing pending, so move the floor up to the last delivered message.
+		if len(o.state.Pending) == 0 {
+			o.state.AckFloor.Consumer = o.state.Delivered.Consumer
+			o.state.AckFloor.Stream = o.state.Delivered.Stream
 		}
 		return nil
 	}

@@ -11,6 +11,7 @@ import { useAuthStore, useCapabilityStore } from '../piniaStores'
 import { XHRUploadOptions } from '@uppy/xhr-upload'
 import { useClientService } from '../clientService'
 import { useGettext } from 'vue3-gettext'
+import { getUploadMtimeHeader } from '../../helpers'
 
 interface UploadOptions {
   uppyService: UppyService
@@ -51,7 +52,10 @@ export function useUpload(options: UploadOptions) {
           req.setHeader('Accept-Language', headers['Accept-Language'])
           req.setHeader('Initiator-ID', headers['Initiator-ID'])
           if (file?.isRemote) {
-            req.setHeader('x-oc-mtime', ((file?.data as File)?.lastModified / 1000).toFixed(0))
+            const { 'x-oc-mtime': mtimeHeaderValue } = getUploadMtimeHeader(file?.data)
+            if (mtimeHeaderValue !== undefined) {
+              req.setHeader('x-oc-mtime', mtimeHeaderValue)
+            }
           }
           resolve()
         }),
@@ -64,7 +68,7 @@ export function useUpload(options: UploadOptions) {
     ;(options as any)['headers'] = (file: OcUppyFile) => {
       if (!!file.xhrUpload || file?.isRemote) {
         return {
-          'x-oc-mtime': ((file?.data as File)?.lastModified / 1000).toFixed(0),
+          ...getUploadMtimeHeader(file?.data),
           ...getHeaders()
         }
       }
@@ -77,10 +81,12 @@ export function useUpload(options: UploadOptions) {
     return {
       timeout: 60000,
       endpoint: '',
-      headers: (file) => ({
-        'x-oc-mtime': ((file?.data as File)?.lastModified / 1000).toFixed(0),
-        ...getHeaders()
-      })
+      headers: (file) => {
+        return {
+          ...getUploadMtimeHeader(file?.data),
+          ...getHeaders()
+        }
+      }
     }
   })
 
