@@ -77,6 +77,18 @@ impacts on previews as only a part of the image will be shown. When using an _op
 
 To apply one of those, a query parameter has to be added to the request, like `?processor=fit`. If no query parameter or processor is added, the default behaviour applies which is `resize` for gifs and `thumbnail` for all others.
 
+## Animated GIF Thumbnails
+
+GIF thumbnails preserve animation by default. Set
+`THUMBNAILS_GIF_FIRST_FRAME_ONLY=true` (or `thumbnail.gif_first_frame_only: true`
+in the thumbnails service YAML configuration) to generate static thumbnails
+from only the first frame. This reduces decoding CPU time and memory use for
+animations with many frames. The original file remains unchanged for the media
+viewer.
+
+The setting applies when generating thumbnails. Existing cached thumbnails
+retain their previous behavior until they are removed and regenerated.
+
 ## Deleting Thumbnails
 
 As of now, there is no automated thumbnail deletion. This is especially true when a source file gets deleted or moved. This situation will be solved at a later stage. For the time being, if you run short on physical thumbnails space, you have to manually delete the thumbnail store to free space. Thumbnails will then be recreated on request.
