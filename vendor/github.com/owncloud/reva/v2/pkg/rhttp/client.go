@@ -23,6 +23,7 @@ import (
 	"crypto/tls"
 	"io"
 	"net/http"
+	"time"
 
 	"go.opencensus.io/plugin/ochttp"
 
@@ -31,27 +32,46 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	// maxIdleConnsPerHost is the number of idle connections that a client keeps
+	// for each host.
+	maxIdleConnsPerHost = 100
+	// idleConnTimeout is the time after which a client closes an idle connection.
+	idleConnTimeout = 30 * time.Second
+)
+
 // GetHTTPClient returns an http client with open census tracing support.
 // TODO(labkode): harden it.
 // https://medium.com/@nate510/don-t-use-go-s-default-http-client-4804cb19f779
 func GetHTTPClient(opts ...Option) *http.Client {
 	options := newOptions(opts...)
 
-	tr := http.DefaultTransport.(*http.Transport).Clone()
-	tr.DisableKeepAlives = options.DisableKeepAlive
-	tr.TLSClientConfig = &tls.Config{
-		MinVersion:         options.MinVersion,
-		InsecureSkipVerify: options.Insecure,
-	}
-
 	httpClient := &http.Client{
 		Timeout: options.Timeout,
 		Transport: &ochttp.Transport{
-			Base: autoprop.NewHttpRoundTripper(tr),
+			Base: autoprop.NewHttpRoundTripper(newTransport(options)),
 		},
 	}
 
 	return httpClient
+}
+
+// newTransport returns the base transport of the client that GetHTTPClient returns.
+func newTransport(options Options) *http.Transport {
+	tr := http.DefaultTransport.(*http.Transport).Clone()
+	tr.DisableKeepAlives = options.DisableKeepAlive
+	// The default of Go is 2 idle connections for each host. A client that
+	// sends parallel requests to one host closes the extra connections after
+	// each request and opens new ones. This wastes ports.
+	tr.MaxIdleConnsPerHost = maxIdleConnsPerHost
+	// Close idle connections before a server or a load balancer closes them.
+	// The usual lowest idle timeout on the way is 60 seconds.
+	tr.IdleConnTimeout = idleConnTimeout
+	tr.TLSClientConfig = &tls.Config{
+		MinVersion:         options.MinVersion,
+		InsecureSkipVerify: options.Insecure,
+	}
+	return tr
 }
 
 // NewRequest creates an HTTP request that sets the token if it is passed in ctx.
