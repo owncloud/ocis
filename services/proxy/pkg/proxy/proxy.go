@@ -94,6 +94,7 @@ func newBackendTransport(tlsConf *tls.Config) *http.Transport {
 		DialContext: (&net.Dialer{
 			Timeout:   30 * time.Second,
 			KeepAlive: 30 * time.Second,
+			DualStack: true,
 		}).DialContext,
 		ForceAttemptHTTP2: true,
 		// Zero means no limit for all hosts together. In a deployment with one
