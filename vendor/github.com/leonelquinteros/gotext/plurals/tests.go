@@ -22,6 +22,14 @@ func (e notequal) test(n uint32) bool {
 	return n != e.value
 }
 
+type literalTest struct {
+	value uint32
+}
+
+func (l literalTest) test(n uint32) bool {
+	return l.value != 0
+}
+
 type gt struct {
 	value   uint32
 	flipped bool
@@ -77,6 +85,9 @@ type and struct {
 }
 
 func (e and) test(n uint32) bool {
+	if e.left == nil || e.right == nil {
+		return false
+	}
 	if !e.left.test(n) {
 		return false
 	}
@@ -89,6 +100,9 @@ type or struct {
 }
 
 func (e or) test(n uint32) bool {
+	if e.left == nil || e.right == nil {
+		return false
+	}
 	if e.left.test(n) {
 		return true
 	}
@@ -101,5 +115,8 @@ type pipe struct {
 }
 
 func (e pipe) test(n uint32) bool {
+	if e.modifier == nil || e.action == nil {
+		return false
+	}
 	return e.action.test(e.modifier.calc(n))
 }

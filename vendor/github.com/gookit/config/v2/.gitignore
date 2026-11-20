@@ -19,3 +19,6 @@
 vendor
 #go.sum
 .xenv.toml
+
+# dump produced by TestIssues_59 (kept out of git; the test writes to t.TempDir)
+testdata/issues59.ini
