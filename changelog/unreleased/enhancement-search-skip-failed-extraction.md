@@ -1,4 +1,4 @@
-Enhancement: Reindex can leave files whose extraction failed alone until they change
+Enhancement: Leave files whose extraction failed alone until they change
 
 Every `IndexSpace` walk sent every file that was not indexed to the content
 extractor again, including files whose extraction had already failed. A file
