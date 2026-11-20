@@ -57,20 +57,33 @@ func Option(credsFile, creds string) nats.Option {
 		return nats.UserCredentialBytes([]byte(creds))
 	case credsFile != "":
 		return func(o *nats.Options) error {
+			// content shares one read between UserJWT and SignatureCB per attempt,
+			// since NATS always calls both together.
+			var content []byte
 			o.UserJWT = func() (string, error) {
-				content, err := os.ReadFile(credsFile)
+				c, err := os.ReadFile(credsFile)
 				if err != nil {
 					return "", err
 				}
-				defer wipe(content)
-				return nkeys.ParseDecoratedJWT(content)
+				content = c
+				jwt, err := nkeys.ParseDecoratedJWT(content)
+				if err != nil {
+					wipe(content)
+					content = nil
+					return "", err
+				}
+				return jwt, nil
 			}
 			o.SignatureCB = func(nonce []byte) ([]byte, error) {
-				content, err := os.ReadFile(credsFile)
-				if err != nil {
-					return nil, err
+				defer func() { wipe(content); content = nil }()
+				if content == nil {
+					// Defensive: NATS always calls UserJWT first.
+					c, err := os.ReadFile(credsFile)
+					if err != nil {
+						return nil, err
+					}
+					content = c
 				}
-				defer wipe(content)
 				kp, err := nkeys.ParseDecoratedNKey(content)
 				if err != nil {
 					return nil, err
