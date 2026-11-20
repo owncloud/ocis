@@ -55,7 +55,7 @@ func HandleEvents(s Searcher, bus events.Consumer, logger log.Logger, cfg *confi
 	}
 
 	indexSpaceDebouncer := NewSpaceDebouncer(time.Duration(cfg.Events.DebounceDuration)*time.Millisecond, func(ctx context.Context, id *provider.StorageSpaceId) {
-		if err := s.IndexSpace(ctx, id); err != nil {
+		if err := s.IndexSpace(ctx, id, false); err != nil {
 			logger.Error().Err(err).Interface("spaceID", id).Msg("error while indexing a space")
 		}
 	})

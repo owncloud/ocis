@@ -179,9 +179,42 @@ var _ = Describe("Searchprovider", func() {
 				Status: status.NewOK(context.Background()),
 				Info:   ri,
 			}, nil)
-			err := s.IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			err := s.IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"}, false)
 			Expect(err).ShouldNot(HaveOccurred())
 			indexClient.AssertNumberOfCalls(GinkgoT(), "Upsert", 1)
+		})
+
+		Context("with a file that is already indexed and unchanged", func() {
+			BeforeEach(func() {
+				gatewayClient.On("GetUserByClaim", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserByClaimResponse{
+					Status: status.NewOK(context.Background()),
+					User:   user,
+				}, nil)
+				extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
+				indexClient.On("Upsert", mock.Anything, mock.Anything).Return(nil)
+				indexClient.On("Lookup", mock.Anything).Return(&engine.Resource{
+					Document:  content.Document{Mtime: time.Unix(int64(ri.Mtime.Seconds), 0).UTC().Format(time.RFC3339Nano)},
+					Extracted: true,
+				}, nil)
+				gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+					Status: status.NewOK(context.Background()),
+					Info:   ri,
+				}, nil)
+			})
+
+			It("skips the file", func() {
+				err := s.IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"}, false)
+				Expect(err).ShouldNot(HaveOccurred())
+				extractor.AssertNotCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
+				indexClient.AssertNotCalled(GinkgoT(), "Upsert", mock.Anything, mock.Anything)
+			})
+
+			It("indexes the file again when forced", func() {
+				err := s.IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"}, true)
+				Expect(err).ShouldNot(HaveOccurred())
+				extractor.AssertNumberOfCalls(GinkgoT(), "Extract", 1)
+				indexClient.AssertNumberOfCalls(GinkgoT(), "Upsert", 1)
+			})
 		})
 
 		It("walks the space skipping .space directory", func() {
@@ -205,7 +238,7 @@ var _ = Describe("Searchprovider", func() {
 
 			indexClient.AssertNotCalled(GinkgoT(), "Upsert", mock.Anything, mock.Anything)
 			indexClient.AssertNotCalled(GinkgoT(), "Search", mock.Anything, mock.Anything)
-			err := s.IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			err := s.IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"}, false)
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 
@@ -347,7 +380,7 @@ var _ = Describe("Searchprovider", func() {
 				upsertCount.Add(1)
 			}).Return(nil)
 
-			err := s.IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			err := s.IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"}, false)
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(int(upsertCount.Load())).To(Equal(numDirs), "every unindexed file inside an already-indexed directory must be visited")
 		})
@@ -385,7 +418,7 @@ var _ = Describe("Searchprovider", func() {
 				Info:   processingFile,
 			}, nil)
 
-			err := s.IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			err := s.IndexSpace(context.Background(), &sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"}, false)
 			Expect(err).ShouldNot(HaveOccurred())
 
 			// The skip gate fires before any index lookup or extraction.
@@ -516,7 +549,7 @@ var _ = Describe("Searchprovider", func() {
 			missing["file-0"] = true
 			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
 
-			err := newService(1).IndexSpace(context.Background(), spaceID)
+			err := newService(1).IndexSpace(context.Background(), spaceID, false)
 			Expect(err).ShouldNot(HaveOccurred(), "a file deleted since it was listed is skipped, never counted")
 			indexClient.AssertNumberOfCalls(GinkgoT(), "Upsert", numFiles-1)
 		})
@@ -531,7 +564,7 @@ var _ = Describe("Searchprovider", func() {
 			}), mock.Anything).Return(content.Document{}, errors.New("extractor down"))
 			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
 
-			err := newService(2).IndexSpace(context.Background(), spaceID)
+			err := newService(2).IndexSpace(context.Background(), spaceID, false)
 			Expect(err).Should(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("aborting index walk: 2 consecutive extraction failures"))
 		})
@@ -542,7 +575,7 @@ var _ = Describe("Searchprovider", func() {
 				missing[fi.Id.OpaqueId] = true
 			}
 
-			err := newService(5).IndexSpace(context.Background(), spaceID)
+			err := newService(5).IndexSpace(context.Background(), spaceID, false)
 			Expect(err).Should(HaveOccurred(), "an outage must not report the space as indexed")
 			Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("index walk incomplete: %d of %d files were not found", numFiles, numFiles)))
 			extractor.AssertNotCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
@@ -555,7 +588,7 @@ var _ = Describe("Searchprovider", func() {
 				extracted = append(extracted, args.Get(1).(*sprovider.ResourceInfo).GetId().GetOpaqueId())
 			}).Return(content.Document{}, nil)
 
-			err := newService(5).IndexSpace(context.Background(), spaceID)
+			err := newService(5).IndexSpace(context.Background(), spaceID, false)
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(extracted).To(ConsistOf("file-0", "file-1", "file-2", "file-3", "file-4", "file-5"))
 			gatewayClient.AssertNumberOfCalls(GinkgoT(), "GetPath", 1) // only the stale node needs the ID fallback
@@ -566,7 +599,7 @@ var _ = Describe("Searchprovider", func() {
 			pathMissing["file-1"] = true
 			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
 
-			err := newService(1).IndexSpace(context.Background(), spaceID)
+			err := newService(1).IndexSpace(context.Background(), spaceID, false)
 			Expect(err).ShouldNot(HaveOccurred(), "a vanished file is not an extraction failure")
 			indexClient.AssertNumberOfCalls(GinkgoT(), "Upsert", numFiles-1)
 		})
@@ -576,7 +609,7 @@ var _ = Describe("Searchprovider", func() {
 			pathBroken["file-1"] = true
 			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
 
-			err := newService(1).IndexSpace(context.Background(), spaceID)
+			err := newService(1).IndexSpace(context.Background(), spaceID, false)
 			Expect(err).Should(HaveOccurred(), "a storage failure must not look like a deleted file")
 			Expect(err.Error()).To(ContainSubstring("aborting index walk: 1 consecutive extraction failures"))
 		})
@@ -584,7 +617,7 @@ var _ = Describe("Searchprovider", func() {
 		It("resolves healthy files by path, without a GetPath call", func() {
 			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
 
-			err := newService(5).IndexSpace(context.Background(), spaceID)
+			err := newService(5).IndexSpace(context.Background(), spaceID, false)
 			Expect(err).ShouldNot(HaveOccurred())
 			indexClient.AssertNumberOfCalls(GinkgoT(), "Upsert", numFiles)
 			gatewayClient.AssertNotCalled(GinkgoT(), "GetPath", mock.Anything, mock.Anything)
@@ -593,7 +626,7 @@ var _ = Describe("Searchprovider", func() {
 		It("aborts after the configured number of consecutive extraction failures", func() {
 			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, errors.New("extractor down"))
 
-			err := newService(2).IndexSpace(context.Background(), spaceID)
+			err := newService(2).IndexSpace(context.Background(), spaceID, false)
 			Expect(err).Should(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("aborting index walk: 2 consecutive extraction failures"))
 			indexClient.AssertNotCalled(GinkgoT(), "Upsert", mock.Anything, mock.Anything)
@@ -605,7 +638,7 @@ var _ = Describe("Searchprovider", func() {
 				extractCalls.Add(1)
 			}).Return(content.Document{}, errors.New("extractor down"))
 
-			err := newService(0).IndexSpace(context.Background(), spaceID)
+			err := newService(0).IndexSpace(context.Background(), spaceID, false)
 			Expect(err).ShouldNot(HaveOccurred(), "with the abort disabled the walk finishes despite failures")
 			Expect(int(extractCalls.Load())).To(Equal(numFiles*6), "every file was attempted, each with all retries")
 		})
@@ -615,7 +648,7 @@ var _ = Describe("Searchprovider", func() {
 				statBroken[fi.Id.OpaqueId] = true
 			}
 
-			err := newService(2).IndexSpace(context.Background(), spaceID)
+			err := newService(2).IndexSpace(context.Background(), spaceID, false)
 			Expect(err).Should(HaveOccurred(), "a storage or auth error must not look like a deleted file")
 			Expect(err.Error()).To(ContainSubstring("aborting index walk: 2 consecutive extraction failures"))
 			extractor.AssertNotCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
@@ -630,7 +663,7 @@ var _ = Describe("Searchprovider", func() {
 				cancel() // e.g. the index command's request timeout fires during the walk
 			}).Return(content.Document{}, nil)
 
-			err := newService(0).IndexSpace(ctx, spaceID)
+			err := newService(0).IndexSpace(ctx, spaceID, false)
 			Expect(err).Should(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("index walk stopped"))
 			Expect(int(extractCalls.Load())).To(Equal(1), "no file after the cancellation was attempted")
@@ -648,7 +681,7 @@ var _ = Describe("Searchprovider", func() {
 			s := newService(0)
 			s.SetExtractionRetryDelay(time.Hour)
 			done := make(chan error, 1)
-			go func() { done <- s.IndexSpace(ctx, spaceID) }()
+			go func() { done <- s.IndexSpace(ctx, spaceID, false) }()
 
 			var err error
 			Eventually(done, 5*time.Second).Should(Receive(&err), "the retry wait must end with the context, not after an hour")
@@ -664,7 +697,7 @@ var _ = Describe("Searchprovider", func() {
 			}
 			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, errors.New("cannot extract"))
 
-			err := newService(2).IndexSpace(context.Background(), spaceID)
+			err := newService(2).IndexSpace(context.Background(), spaceID, false)
 			Expect(err).ShouldNot(HaveOccurred(), "failures separated by a healthy file are not consecutive")
 		})
 	})

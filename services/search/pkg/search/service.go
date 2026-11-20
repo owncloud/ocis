@@ -58,7 +58,7 @@ var (
 // Searcher is the interface to the SearchService
 type Searcher interface {
 	Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error)
-	IndexSpace(ctx context.Context, rID *provider.StorageSpaceId) error
+	IndexSpace(ctx context.Context, rID *provider.StorageSpaceId, force bool) error
 	TrashItem(ctx context.Context, rID *provider.ResourceId)
 	UpsertItem(ctx context.Context, ref *provider.Reference)
 	UpdateTags(ctx context.Context, ref *provider.Reference)
@@ -477,8 +477,11 @@ const (
 	_missingMinCount = 5
 )
 
-// IndexSpace (re)indexes all resources of a given space.
-func (s *Service) IndexSpace(ctx context.Context, spaceID *provider.StorageSpaceId) error {
+// IndexSpace (re)indexes all resources of a given space. Resources that are
+// already indexed and unchanged are skipped, unless force is set: then every
+// resource is extracted and indexed again, e.g. after the extractor
+// configuration changed.
+func (s *Service) IndexSpace(ctx context.Context, spaceID *provider.StorageSpaceId, force bool) error {
 	ownerCtx, err := getAuthContext(ctx, s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
 	if err != nil {
 		return err
@@ -539,7 +542,7 @@ func (s *Service) IndexSpace(ctx context.Context, spaceID *provider.StorageSpace
 
 		resourceID := storagespace.FormatResourceID(info.Id)
 		r, err := s.engine.Lookup(resourceID)
-		if err == nil && r.Extracted {
+		if !force && err == nil && r.Extracted {
 			fileMtime := utils.TSToTime(info.Mtime)
 			docMtime, parseErr := time.Parse(time.RFC3339Nano, r.Mtime)
 			if parseErr == nil && !docMtime.Before(fileMtime) {
