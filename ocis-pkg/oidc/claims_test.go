@@ -180,3 +180,36 @@ func TestWalkSegments(t *testing.T) {
 		t.Run(test.name, test.run)
 	}
 }
+
+func TestReadNumericClaim(t *testing.T) {
+	tests := []struct {
+		name    string
+		path    string
+		claims  map[string]any
+		want    int64
+		wantErr bool
+	}{
+		{name: "float64", path: "auth_time", claims: map[string]any{"auth_time": float64(1700000000)}, want: 1700000000},
+		{name: "int", path: "auth_time", claims: map[string]any{"auth_time": 1700000000}, want: 1700000000},
+		{name: "int64", path: "auth_time", claims: map[string]any{"auth_time": int64(1700000000)}, want: 1700000000},
+		{name: "uint32", path: "auth_time", claims: map[string]any{"auth_time": uint32(1700000000)}, want: 1700000000},
+		{name: "json.Number", path: "auth_time", claims: map[string]any{"auth_time": json.Number("1700000000")}, want: 1700000000},
+		{name: "nested path", path: "loa.times", claims: map[string]any{"loa": map[string]any{"times": float64(1700000000)}}, want: 1700000000},
+		{name: "escaped dot", path: "loa\\.times", claims: map[string]any{"loa.times": float64(1700000000)}, want: 1700000000},
+		{name: "missing", path: "auth_time", claims: map[string]any{}, wantErr: true},
+		{name: "string", path: "auth_time", claims: map[string]any{"auth_time": "1700000000"}, wantErr: true},
+		{name: "invalid json.Number", path: "auth_time", claims: map[string]any{"auth_time": json.Number("abc")}, wantErr: true},
+		{name: "broken path", path: "loa.times", claims: map[string]any{"loa": "x"}, wantErr: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := oidc.ReadNumericClaim(tt.path, tt.claims)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if got != tt.want {
+				t.Errorf("expected %d, got %d", tt.want, got)
+			}
+		})
+	}
+}

@@ -134,7 +134,10 @@ type JWKS struct {
 type MFAConfig struct {
 	Enabled         bool     `yaml:"enabled" env:"OCIS_MFA_ENABLED" desc:"Enable MFA enforcement. If enabled users need to complete MFA before they can access specific paths" introductionVersion:"7.3.0"`
 	AuthLevelNames  []string `yaml:"auth_level_name" env:"OCIS_MFA_AUTH_LEVEL_NAMES" desc:"This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA)." introductionVersion:"7.3.0"`
-	SessionDuration int      `yaml:"session_duration" env:"OCIS_MFA_SESSION_DURATION" desc:"The duration in seconds that a multi-factor authentication session is valid for non-OIDC requests. Defaults to 3600 (1 hour)." introductionVersion:"7.3.0"`
+	SessionDuration int      `yaml:"session_duration" env:"OCIS_MFA_SESSION_DURATION" desc:"The duration in seconds that a multi-factor authentication session is valid. With 'enforce_session_duration' enabled, MFA is denied once the time in the 'issued_at_claim' is older than this. It also limits how long requests without OIDC claims, like signed URLs, inherit the MFA status. Defaults to 3600 (1 hour)." introductionVersion:"7.3.0"`
+
+	EnforceSessionDuration bool   `yaml:"enforce_session_duration" env:"OCIS_MFA_ENFORCE_SESSION_DURATION" desc:"Deny MFA once the multi-factor authentication is older than 'session_duration', based on the time in the 'issued_at_claim'. If disabled, MFA only depends on the ACR claim and lasts as long as the access token is accepted. Requires the identity provider to provide the claim in the access token or the userinfo response." introductionVersion:"9.0.0"`
+	IssuedAtClaim          string `yaml:"issued_at_claim" env:"OCIS_MFA_ISSUED_AT_CLAIM" desc:"The claim that holds the time the multi-factor authentication was performed, as POSIX timestamp in seconds. Nested claims can be accessed using '.' as separator. Defaults to the standard OIDC claim 'auth_time'." introductionVersion:"9.0.0"`
 }
 
 // Cache is a TTL cache configuration.
