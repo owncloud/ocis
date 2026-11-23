@@ -20,6 +20,7 @@ package pool
 
 import (
 	"fmt"
+	"math/rand"
 	"strings"
 	"sync"
 
@@ -45,7 +46,9 @@ import (
 	"github.com/owncloud/reva/v2/pkg/registry"
 	"github.com/pkg/errors"
 	"github.com/sercand/kuberesolver/v5"
+	mRegistry "go-micro.dev/v4/registry"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/connectivity"
 )
 
 func init() {
@@ -82,6 +85,27 @@ func GetSelector[T any](k string, id string, f func(cc grpc.ClientConnInterface)
 	return newSelector
 }
 
+// cachedClient pairs a grpc client with the connection backing it, so Next
+// can check the connection's health before handing the client back out.
+type cachedClient[T any] struct {
+	conn   *grpc.ClientConn
+	client T
+}
+
+// healthy reports whether the cached connection is safe to hand out again.
+// A connection only becomes TransientFailure or Shutdown after a real RPC on
+// it has already failed - a connection that was never used for an RPC stays
+// Idle, so it is treated as healthy here (there is no way to probe
+// reachability without using it).
+func (c cachedClient[T]) healthy() bool {
+	switch c.conn.GetState() {
+	case connectivity.TransientFailure, connectivity.Connecting, connectivity.Shutdown:
+		return false
+	default:
+		return true
+	}
+}
+
 type Selector[T any] struct {
 	id            string
 	clientFactory func(cc grpc.ClientConnInterface) T
@@ -101,47 +125,99 @@ func (s *Selector[T]) Next(opts ...Option) (T, error) {
 		opt(&options)
 	}
 
-	target := s.id
 	// if the target is given as a recognized gRPC URI, skip registry lookup
 	// see https://github.com/grpc/grpc/blob/master/doc/naming.md#name-syntax
 	prefix := strings.SplitN(s.id, ":", 2)[0]
 	switch {
-	case prefix == "dns":
-		fallthrough
-	case prefix == "unix":
-		fallthrough
-	case prefix == "kubernetes":
-		// use target as is and skip registry lookup
+	case prefix == "dns", prefix == "unix", prefix == "kubernetes":
+		// use the id as is and skip registry lookup
+		return s.loadOrNewClient(s.id, allOpts)
 	case options.registry != nil:
-		// use service registry to look up address
+		// use the service registry to look up every known node, and pick
+		// the first one that is ready
 		services, err := options.registry.GetService(s.id)
 		if err != nil {
 			return *new(T), fmt.Errorf("%s: %w", s.id, err)
 		}
 
-		nodeAddress, err := registry.GetNodeAddress(services)
-		if err != nil {
-			return *new(T), fmt.Errorf("%s: %w", s.id, err)
-		}
-		target = nodeAddress
+		targets := shuffledTargets(services)
+		return s.nextHealthy(targets, allOpts)
 	default:
-		// if no registry is available, use the target as is
+		// if no registry is available, use the id as is
+		return s.loadOrNewClient(s.id, allOpts)
+	}
+}
+
+// nextHealthy walks targets in the given order. It returns the client for
+// the first target that is ready. A target with no cache entry is also a
+// candidate, since Next has no way to know its state without dialing it. If
+// no target is ready, nextHealthy reuses the first one found, so the caller
+// gets a real error from a real attempt instead of a fabricated one.
+func (s *Selector[T]) nextHealthy(targets []string, opts []Option) (T, error) {
+	if len(targets) == 0 {
+		return *new(T), fmt.Errorf("%s: no nodes found in registry", s.id)
+	}
+	var fallback *cachedClient[T]
+	for _, target := range targets {
+		cached, ok := s.clientMap.Load(target)
+		if !ok {
+			return s.newClient(target, opts)
+		}
+
+		cc := cached.(cachedClient[T])
+		if cc.healthy() {
+			return cc.client, nil
+		}
+		if fallback == nil {
+			fallback = &cc
+		}
 	}
 
-	existingClient, ok := s.clientMap.Load(target)
-	if ok {
-		return existingClient.(T), nil
-	}
+	return fallback.client, nil
+}
 
-	conn, err := NewConn(target, allOpts...)
+// loadOrNewClient returns the cached client for target, creating a new one if
+// none exists yet. It does not check health: target was not looked up
+// through the registry, so there is no alternative node to fall back to.
+func (s *Selector[T]) loadOrNewClient(target string, opts []Option) (T, error) {
+	if cached, ok := s.clientMap.Load(target); ok {
+		return cached.(cachedClient[T]).client, nil
+	}
+	return s.newClient(target, opts)
+}
+
+// newClient creates a new connection to target, wraps it in a client and caches
+// both under target.
+func (s *Selector[T]) newClient(target string, opts []Option) (T, error) {
+	conn, err := NewConn(target, opts...)
 	if err != nil {
 		return *new(T), errors.Wrap(err, fmt.Sprintf("could not create connection for %s to %s", s.id, target))
 	}
 
-	newClient := s.clientFactory(conn)
-	s.clientMap.Store(target, newClient)
+	newClient := cachedClient[T]{conn: conn, client: s.clientFactory(conn)}
+	// if another goroutine already created a client for this target, use it instead
+	if existing, loaded := s.clientMap.LoadOrStore(target, newClient); loaded {
+		_ = conn.Close()
+		return existing.(cachedClient[T]).client, nil
+	}
 
-	return newClient, nil
+	return newClient.client, nil
+}
+
+// shuffledTargets flattens every node address out of services and returns
+// them in random order, so repeated calls spread load across all known
+// nodes instead of always preferring the same one.
+func shuffledTargets(services []*mRegistry.Service) []string {
+	var targets []string
+	for _, svc := range services {
+		for _, node := range svc.Nodes {
+			targets = append(targets, node.Address)
+		}
+	}
+	rand.Shuffle(len(targets), func(i, j int) {
+		targets[i], targets[j] = targets[j], targets[i]
+	})
+	return targets
 }
 
 // GatewaySelector returns a Selector[gateway.GatewayAPIClient].
