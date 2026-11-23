@@ -417,4 +417,52 @@ test.describe('password-protected folder operation', () => {
     // And "Alice" logs out
     await ui.userLogsOut({ stepUser: 'Alice' })
   })
+
+  test('should keep the .psec pointer file in sync when renaming a password-protected folder', async () => {
+    await ui.userLogsIn({ stepUser: 'Alice' })
+    await ui.userEnablesShowHiddenFilesOption({ stepUser: 'Alice' })
+
+    await ui.userCreatesResources({
+      stepUser: 'Alice',
+      resources: [
+        { name: 'folder1', type: 'Password Protected Folder', password: '%public%' },
+        { name: 'folder2', type: 'Password Protected Folder', password: '%public%' }
+      ]
+    })
+    await ui.userOpensResource({
+      stepUser: 'Alice',
+      resource: 'folder1.psec'
+    })
+    await ui.userUnlocksPasswordProtectedFolderWithPassword({
+      stepUser: 'Alice',
+      password: '%public%'
+    })
+    await ui.userRenamesPasswordProtectedFolderFromFolderView({
+      stepUser: 'Alice',
+      resource: 'folder1',
+      newResourceName: 'renamed-folder1'
+    })
+    await ui.userClosesThePasswordProtectedFolderModal({ stepUser: 'Alice' })
+    await ui.userOpensResource({
+      stepUser: 'Alice',
+      resource: '.PasswordProtectedFolders/projects/Personal/folder2'
+    })
+    await ui.userRenamesResource({
+      stepUser: 'Alice',
+      resource: 'folder2',
+      newResourceName: 'renamed-folder2'
+    })
+    await ui.userShouldSeeResources({
+      listType: 'files list',
+      stepUser: 'Alice',
+      resources: ['renamed-folder1', 'renamed-folder2']
+    })
+
+    await ui.userNavigatesToPersonalSpacePage({ stepUser: 'Alice' })
+    await ui.userShouldSeeResources({
+      listType: 'files list',
+      stepUser: 'Alice',
+      resources: ['renamed-folder1.psec', 'renamed-folder2.psec']
+    })
+  })
 })

@@ -967,6 +967,24 @@ export async function userRenamesResource({
   await resourceObject.rename({ resource, newName: newResourceName })
 }
 
+export async function userRenamesPasswordProtectedFolderFromFolderView({
+  stepUser,
+  resource,
+  newResourceName
+}: {
+  stepUser: string
+  resource: string
+  newResourceName: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const resourceObject = new objects.applicationFiles.Resource({ page })
+  await resourceObject.renamePasswordProtectedFolderFromFolderView({
+    resource,
+    newName: newResourceName
+  })
+}
+
 export async function userShouldNotSeeVersionPanelForFiles({
   stepUser,
   file,

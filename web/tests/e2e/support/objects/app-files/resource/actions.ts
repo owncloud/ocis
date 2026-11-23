@@ -1502,6 +1502,23 @@ export const renameResource = async (args: renameResourceArgs): Promise<void> =>
   )
 }
 
+export const renamePasswordProtectedFolderFromFolderView = async (
+  args: renameResourceArgs
+): Promise<void> => {
+  const { page, newName } = args
+  const frame = page.frameLocator('#iframe-folder-view')
+
+  await frame.getByRole('button', { name: 'Show actions for current folder' }).click()
+  await frame.getByRole('button', { name: 'Rename', exact: true }).click()
+
+  await frame.locator(fileRenameInput).clear()
+  await frame.locator(fileRenameInput).fill(newName)
+
+  await Promise.all([
+    page.waitForResponse((resp) => resp.status() === 201 && resp.request().method() === 'MOVE'),
+    frame.locator(util.format(actionConfirmationButton, 'Rename')).click()
+  ])
+}
 /**/
 
 export interface resourceVersionArgs {
