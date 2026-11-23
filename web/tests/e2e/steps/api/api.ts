@@ -344,3 +344,19 @@ export async function userHasDisabledAutoAcceptingShare({
   const user = world.usersEnvironment.getUser({ key: stepUser })
   await api.settings.configureAutoAcceptShare({ user, state: false })
 }
+
+export async function userHasDeletedResourcesInSpace({
+  stepUser,
+  spaceName,
+  resources
+}: {
+  stepUser: string
+  spaceName: string
+  resources: string[]
+}) {
+  const world = getWorld()
+  const user = world.usersEnvironment.getUser({ key: stepUser })
+  for (const folder of resources) {
+    await api.dav.deleteSpaceResource({ user, spaceType: 'project', spaceName, folder })
+  }
+}

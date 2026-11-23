@@ -152,6 +152,7 @@ const activitySidebarPanel = 'sidebar-panel-activities'
 const activitySidebarPanelBodyContent = '#sidebar-panel-activities .sidebar-panel__body-content'
 const contextMenuAction = '//*[@id="oc-files-context-actions-context"]//span[text()="%s"]'
 const textEditorContentContainer = '#space-description-preview-preview'
+const deletedFilesPermissionDeniedMessage = '#files-trashbin-forbidden'
 
 export const clickResource = async ({
   page,
@@ -2854,4 +2855,14 @@ export const verifyTopbarResourceName = async ({
 
   await expect(topbarResourceName).toBeVisible()
   await expect(topbarResourceName).toHaveAttribute('data-test-resource-name', expectedName)
+}
+
+export const getDeletedFilesPermissionDeinedMessage = async ({
+  page
+}: {
+  page: Page
+}): Promise<string> => {
+  const forbiddenMessage = page.locator(deletedFilesPermissionDeniedMessage)
+  await expect(forbiddenMessage).toBeVisible()
+  return forbiddenMessage.innerText()
 }

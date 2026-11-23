@@ -1645,3 +1645,18 @@ export async function userOpensResourceInNewTab({
   const resourceObject = new objects.applicationFiles.Resource({ page })
   return resourceObject.openResourceInNewTab(resource)
 }
+
+export async function userShouldSeeDeletedFilesPermissionDeniedMessage({
+  stepUser
+}: {
+  stepUser: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const resourceObject = new objects.applicationFiles.Resource({ page })
+  const deletedFilesPermissionDeniedMessage =
+    await resourceObject.getDeletedFilesPermissionDeinedMessage()
+  expect(deletedFilesPermissionDeniedMessage).toBe(
+    'Unable to load deleted files. You do not have permission to view them.'
+  )
+}
