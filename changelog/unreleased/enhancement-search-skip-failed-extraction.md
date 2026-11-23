@@ -11,13 +11,22 @@ whose extraction failed was not indexed at all, so it could not be found by its
 name either.
 
 With the new `SEARCH_EXTRACTOR_FAILED_RETRY_INTERVAL` set (for example `24h`), a
-file whose extraction fails is indexed by its name and metadata only, together
-with the time of the failure. Later walks skip it while it is unchanged and the
-interval has not passed. A changed file is extracted again straight away.
-Skipped files neither count towards nor reset
-`SEARCH_EXTRACTOR_MAX_CONSECUTIVE_FAILURES`, and the walk summary reports them
-as `failed_earlier`. An extraction cut short because the walk's context ended
-records nothing. The default, 0, keeps the current behaviour: every walk retries
-such files and nothing is recorded.
+failed extraction during a space walk is recorded with the time of the failure.
+A file with no index entry yet is indexed by its name and metadata only; a file
+that already has one keeps its indexed content and metadata. Later walks skip
+the file while it is unchanged and the interval has not passed. Any change of
+its mtime or size, restoring an older version included, has it extracted again
+straight away. Only failures that are down to the file are recorded: not a
+failure on upload (the next walk tries the file again), not one where every
+attempt failed to reach the extractor, not one for a file that was deleted in
+the meantime, and the failures of a run that aborts the walk on
+`SEARCH_EXTRACTOR_MAX_CONSECUTIVE_FAILURES` are forgotten again. Skipped files
+neither count towards nor reset that threshold, and the walk summary reports
+them as `failed_earlier`. The default, 0, keeps the current behaviour: every
+walk retries such files and nothing is recorded.
+
+The new index field is stored but not searchable in indexes created from this
+version on. An existing index maps it dynamically, so its value (a timestamp)
+is also searchable there; this is harmless.
 
 https://github.com/owncloud/ocis/pull/13506

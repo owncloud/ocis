@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"path/filepath"
 	"slices"
 	"sort"
@@ -505,10 +506,13 @@ func (s *Service) IndexSpace(ctx context.Context, spaceID *provider.StorageSpace
 	// failures counts extraction failures in a row. A file that was indexed or
 	// was already indexed and unchanged resets it; a file that is not found
 	// (deleted since it was listed) neither counts nor resets it.
+	// recordedInStreak holds the files whose failure was recorded during the
+	// current run of failures.
 	var (
 		failures                                  int
 		indexedCount, unchangedCount, failedCount int
 		missingCount, failedEarlierCount          int
+		recordedInStreak                          []string
 	)
 
 	w := walker.NewWalker(s.gatewaySelector)
@@ -560,6 +564,7 @@ func (s *Service) IndexSpace(ctx context.Context, spaceID *provider.StorageSpace
 				s.logger.Debug().Str("path", relPath).Msg("element hasn't changed. Skipping.")
 				unchangedCount++
 				failures = 0
+				recordedInStreak = nil
 				return nil
 			}
 		}
@@ -577,10 +582,13 @@ func (s *Service) IndexSpace(ctx context.Context, spaceID *provider.StorageSpace
 		// the ID the walker listed still finds it. So retry by ID only after
 		// a not-found: a healthy file costs no extra GetPath call.
 		ref := &provider.Reference{Path: relPath, ResourceId: &rootID}
-		err = s.upsertItem(ownerCtx, ref, _extractionRetries)
+		recorded, err := s.upsertItem(ownerCtx, ref, _extractionRetries, true)
 		if errors.Is(err, errResourceNotFound) && info.GetId() != nil {
 			s.logger.Debug().Str("path", relPath).Msg("resource not found by path, retrying by ID")
-			err = s.upsertItem(ownerCtx, &provider.Reference{ResourceId: info.GetId()}, _extractionRetries)
+			recorded, err = s.upsertItem(ownerCtx, &provider.Reference{ResourceId: info.GetId()}, _extractionRetries, true)
+		}
+		if recorded {
+			recordedInStreak = append(recordedInStreak, resourceID)
 		}
 		if err != nil {
 			if errors.Is(err, errResourceNotFound) {
@@ -597,6 +605,10 @@ func (s *Service) IndexSpace(ctx context.Context, spaceID *provider.StorageSpace
 				Msg("extraction failed after retries")
 
 			if s.maxConsecutiveFailures > 0 && failures >= s.maxConsecutiveFailures {
+				// A run of failures long enough to abort points at the extractor,
+				// not at these files: forget the failures recorded during it, so
+				// the files are tried again on the next walk.
+				s.forgetFailedExtractions(recordedInStreak)
 				return fmt.Errorf("aborting index walk: %d consecutive extraction failures, last error: %w", failures, err)
 			}
 			return nil
@@ -604,6 +616,7 @@ func (s *Service) IndexSpace(ctx context.Context, spaceID *provider.StorageSpace
 
 		indexedCount++
 		failures = 0
+		recordedInStreak = nil
 		return nil
 	})
 
@@ -648,7 +661,10 @@ func (s *Service) TrashItem(_ context.Context, rID *provider.ResourceId) {
 
 // UpsertItem indexes or stores Resource data fields.
 func (s *Service) UpsertItem(ctx context.Context, ref *provider.Reference) {
-	err := s.upsertItem(ctx, ref, 0)
+	// A single extraction attempt that fails here (an upload while the
+	// extractor restarts, say) is not recorded: the next walk tries the file
+	// again, as before.
+	_, err := s.upsertItem(ctx, ref, 0, false)
 	switch {
 	case err == nil:
 	case errors.Is(err, errResourceNotFound):
@@ -660,31 +676,42 @@ func (s *Service) UpsertItem(ctx context.Context, ref *provider.Reference) {
 
 // upsertItem is the core extraction-and-index method. When retries > 0,
 // a failed extraction is retried up to that many times with a fixed delay.
-func (s *Service) upsertItem(ctx context.Context, ref *provider.Reference, retries int) error {
+// With recordFailure, a failed extraction that is down to the file is recorded
+// (see recordFailedExtraction); recorded reports whether that happened.
+func (s *Service) upsertItem(ctx context.Context, ref *provider.Reference, retries int, recordFailure bool) (recorded bool, err error) {
 	ctx2, stat, path, err := s.resolve(ctx, ref)
 	if err != nil {
-		return fmt.Errorf("could not resolve resource info for %s: %w", refString(ref), err)
+		return false, fmt.Errorf("could not resolve resource info for %s: %w", refString(ref), err)
 	}
 
 	if slices.Contains(_skipPathNames, path) || slices.Contains(_skipPathDirs, path) {
 		s.logger.Info().Str("path", path).Msg("file won't be indexed")
-		return nil
+		return false, nil
 	}
 
 	for _, skipPath := range _skipPathDirs {
 		if strings.HasPrefix(path, skipPath+"/") {
 			s.logger.Info().Str("path", path).Msg("file is in a directory that won't be indexed")
-			return nil
+			return false, nil
 		}
 	}
 
 	resourceID := storagespace.FormatResourceID(stat.Info.Id)
 
 	var doc content.Document
+	// fileFailed: at least one attempt reached the extractor and failed on
+	// this file. When every attempt failed to connect, the extractor was down
+	// and the failure says nothing about the file. An extractor that hits its
+	// own timeout typically restarts, so the attempts after the first one fail
+	// to connect: one attempt that got through is enough.
+	fileFailed := false
 	for attempt := range retries + 1 {
 		doc, err = s.extractor.Extract(ctx2, stat.Info)
 		if err == nil {
 			break
+		}
+		if !unreachable(err) {
+			fileFailed = true
 		}
 		if attempt < retries {
 			s.logger.Debug().Err(err).
@@ -695,27 +722,38 @@ func (s *Service) upsertItem(ctx context.Context, ref *provider.Reference, retri
 			select {
 			case <-ctx.Done():
 				t.Stop()
-				return fmt.Errorf("extraction for %s stopped: %w", path, ctx.Err())
+				return false, fmt.Errorf("extraction for %s stopped: %w", path, ctx.Err())
 			case <-t.C:
 			}
 		}
 	}
 	if err != nil {
 		err = fmt.Errorf("extraction failed for %s: %w", path, err)
-		s.recordFailedExtraction(ctx, resourceID, path, stat.GetInfo())
-		return err
+		// An extraction cut short by the context ending says nothing about the file.
+		if recordFailure && fileFailed && ctx.Err() == nil {
+			recorded = s.recordFailedExtraction(ctx2, resourceID, path, stat.GetInfo())
+		}
+		return recorded, err
 	}
 
 	r := newResource(resourceID, path, stat.GetInfo(), doc)
 	r.Extracted = true
 
 	if err = s.engine.Upsert(r.ID, r); err != nil {
-		return fmt.Errorf("index upsert for %s: %w", path, err)
+		return false, fmt.Errorf("index upsert for %s: %w", path, err)
 	}
 
 	logDocCount(s.engine, s.logger)
 	s.storeExtractedMetadata(ctx2, ref, doc)
-	return nil
+	return false, nil
+}
+
+// unreachable reports whether err says a service could not be connected to at
+// all, as when the extractor is restarting, rather than failing while it
+// worked on the file.
+func unreachable(err error) bool {
+	var opErr *net.OpError
+	return errors.As(err, &opErr) && opErr.Op == "dial"
 }
 
 // newResource builds the index entry for a resource from its stat info and
@@ -740,14 +778,25 @@ func newResource(resourceID, path string, info *provider.ResourceInfo, doc conte
 	return r
 }
 
-// recordFailedExtraction indexes a file whose content extraction failed by its
-// name and metadata only, and notes when that happened, so that IndexSpace
-// can leave it alone until it changes or failedRetryInterval has passed. It
-// does nothing when failedRetryInterval is 0, or when the extraction was cut
-// short by the context ending, which says nothing about the file.
-func (s *Service) recordFailedExtraction(ctx context.Context, resourceID, path string, info *provider.ResourceInfo) {
-	if s.failedRetryInterval <= 0 || ctx.Err() != nil {
-		return
+// recordFailedExtraction notes in the index that the content extraction of a
+// file failed and when, so that IndexSpace can leave the file alone until it
+// changes or failedRetryInterval has passed. It reports whether it recorded
+// anything; it does nothing when failedRetryInterval is 0.
+//
+// An entry that already exists keeps what was indexed before (its content,
+// photo and location metadata, tags and Deleted flag): only the fields that say
+// which version of the file failed, and when, change. A file with no entry yet
+// gets one with its name and metadata only.
+func (s *Service) recordFailedExtraction(ctx context.Context, resourceID, path string, info *provider.ResourceInfo) bool {
+	if s.failedRetryInterval <= 0 {
+		return false
+	}
+
+	// A file trashed or deleted while it was being extracted, a likely cause of
+	// the failure, must not come back into the index.
+	if _, err := statResource(ctx, &provider.Reference{ResourceId: info.GetId()}, s.gatewaySelector); err != nil {
+		s.logger.Debug().Err(err).Str("path", path).Msg("not recording the failed extraction: the file is gone")
+		return false
 	}
 
 	// Basic extraction only reads the stat info, so it cannot fail like the
@@ -757,19 +806,42 @@ func (s *Service) recordFailedExtraction(ctx context.Context, resourceID, path s
 		var doc content.Document
 		doc, err = basic.Extract(ctx, info)
 		if err == nil {
-			r := newResource(resourceID, path, info, doc)
-			r.ExtractionFailedAt = s.now().UTC().Format(time.RFC3339Nano)
-			err = s.engine.Upsert(r.ID, r)
+			failedAt := s.now().UTC().Format(time.RFC3339Nano)
+			err = s.engine.Update(resourceID, func(r *engine.Resource) {
+				r.Mtime = doc.Mtime
+				r.Size = doc.Size
+				r.Extracted = false
+				r.ExtractionFailedAt = failedAt
+			})
+			if errors.Is(err, engine.ErrResourceNotFound) {
+				r := newResource(resourceID, path, info, doc)
+				r.ExtractionFailedAt = failedAt
+				err = s.engine.Upsert(r.ID, r)
+			}
 		}
 	}
 	if err != nil {
 		s.logger.Error().Err(err).Str("path", path).Msg("could not record the failed extraction in the index")
+		return false
+	}
+	return true
+}
+
+// forgetFailedExtractions clears the recorded failures of the given index
+// entries, so that the next walk tries those files again.
+func (s *Service) forgetFailedExtractions(ids []string) {
+	for _, id := range ids {
+		if err := s.engine.Update(id, func(r *engine.Resource) { r.ExtractionFailedAt = "" }); err != nil {
+			s.logger.Error().Err(err).Str("id", id).Msg("could not clear a recorded failed extraction")
+		}
 	}
 }
 
 // failedEarlierAndUnchanged reports whether the indexed resource r records a
 // failed extraction that is younger than failedRetryInterval, for a file that
-// has not changed since.
+// has not changed since. Any other mtime or size counts as a change, an older
+// mtime included (restoring an earlier version), and a failure dated in the
+// future (clock skew) counts as expired.
 func (s *Service) failedEarlierAndUnchanged(r *engine.Resource, info *provider.ResourceInfo) bool {
 	if s.failedRetryInterval <= 0 || r == nil || r.Extracted || r.ExtractionFailedAt == "" {
 		return false
@@ -778,11 +850,12 @@ func (s *Service) failedEarlierAndUnchanged(r *engine.Resource, info *provider.R
 		return false
 	}
 	failedAt, err := time.Parse(time.RFC3339Nano, r.ExtractionFailedAt)
-	if err != nil || s.now().Sub(failedAt) >= s.failedRetryInterval {
+	now := s.now()
+	if err != nil || failedAt.After(now) || now.Sub(failedAt) >= s.failedRetryInterval {
 		return false
 	}
 	docMtime, err := time.Parse(time.RFC3339Nano, r.Mtime)
-	if err != nil || docMtime.Before(utils.TSToTime(info.GetMtime())) {
+	if err != nil || !docMtime.Equal(utils.TSToTime(info.GetMtime())) || r.Size != info.GetSize() {
 		return false
 	}
 	return true
@@ -839,7 +912,10 @@ func (s *Service) UpdateTags(ctx context.Context, ref *provider.Reference) {
 		}
 	}
 
-	// Update only the tags field on the existing indexed resource.
+	// Update only the tags field on the existing indexed resource. This
+	// includes an entry recorded for a failed extraction: a tag change does
+	// not change the content, so it does not retry the extraction. The walk
+	// does, once the file changes or the retry interval has passed.
 	err := s.engine.Update(resourceID, func(r *engine.Resource) {
 		r.Tags = newTags
 	})
