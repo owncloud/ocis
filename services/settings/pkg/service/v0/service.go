@@ -430,7 +430,14 @@ func (g Service) AssignRoleToUser(ctx context.Context, req *settingssvc.AssignRo
 	case ownAccountUUID == req.GetAccountUuid():
 		// Allow users to assign themself to the user or user light role
 		// deny any other attempt to change	the user's own assignment
-		if r, err := g.manager.ListRoleAssignments(req.GetAccountUuid()); err == nil && len(r) > 0 {
+		r, err := g.manager.ListRoleAssignments(req.GetAccountUuid())
+		if err != nil {
+			// fail closed: the user can have a role already, and the write
+			// below replaces it
+			g.logger.Error().Err(err).Str("userid", ownAccountUUID).Msg("could not check the existing role assignments")
+			return merrors.InternalServerError(g.id, "could not check the existing role assignments")
+		}
+		if len(r) > 0 {
 			return merrors.Forbidden(g.id, "Changing own role assignment forbidden")
 		}
 		if req.GetRoleId() != defaults.BundleUUIDRoleUser && req.GetRoleId() != defaults.BundleUUIDRoleUserLight {

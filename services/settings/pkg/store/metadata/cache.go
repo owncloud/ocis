@@ -6,6 +6,7 @@ import (
 
 	olog "github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
+	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/store"
 	"github.com/shamaton/msgpack/v2"
 	microstore "go-micro.dev/v4/store"
@@ -28,6 +29,14 @@ func (c *CachedMDC) SimpleDownload(ctx context.Context, id string) ([]byte, erro
 	}
 	b, err := c.next.SimpleDownload(ctx, id)
 	if err != nil {
+		if _, ok := err.(errtypes.IsNotFound); ok {
+			// the file is gone, so a cached listing of its folder is stale.
+			// Another pod can change the folder, and that pod does not clear
+			// the caches of this pod.
+			if derr := c.dirsCache.Delete(path.Dir(id)); derr != nil {
+				c.logger.Error().Err(derr).Msg("SimpleDownload: failed to clear dirs cache")
+			}
+		}
 		return nil, err
 	}
 

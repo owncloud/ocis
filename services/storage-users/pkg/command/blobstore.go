@@ -3,6 +3,7 @@ package command
 import (
 	"bytes"
 	"crypto/rand"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -14,6 +15,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config/parser"
 	"github.com/owncloud/reva/v2/pkg/bytesize"
+	"github.com/owncloud/reva/v2/pkg/errtypes"
 	ocisbs "github.com/owncloud/reva/v2/pkg/storage/fs/ocis/blobstore"
 	s3bs "github.com/owncloud/reva/v2/pkg/storage/fs/s3ng/blobstore"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/node"
@@ -202,6 +204,12 @@ func downloadBlob(bs tree.Blobstore, blobID, spaceID string, blobSize int64) err
 			rc, err = bs.Download(n)
 		}
 		if err != nil {
+			// The ocis blobstore returns a NotFound error when the blob file
+			// does not exist. Keep the message that names the blob read.
+			var notFound errtypes.IsNotFound
+			if errors.As(err, &notFound) {
+				return fmt.Errorf("download failed: could not read blob: %w", err)
+			}
 			return fmt.Errorf("download failed: %w", err)
 		}
 	}
