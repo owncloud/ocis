@@ -42,6 +42,7 @@ import (
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/exp/maps"
+	"google.golang.org/protobuf/proto"
 )
 
 var tracer trace.Tracer
@@ -147,6 +148,38 @@ func (c *Cache) isSpaceCached(storageID, spaceID string) bool {
 	return ok
 }
 
+// hasAll reports if the space is in memory and has all the given shares.
+func (c *Cache) hasAll(storageID, spaceID string, shareIDs ...string) bool {
+	spaces, ok := c.Providers.Load(storageID)
+	if !ok {
+		return false
+	}
+	space, ok := spaces.Spaces.Load(spaceID)
+	if !ok {
+		return false
+	}
+	for _, shareID := range shareIDs {
+		if _, ok := space.Shares[shareID]; !ok {
+			return false
+		}
+	}
+	return true
+}
+
+// dropOnFailedUpload drops the space from memory after a failed upload that
+// is not a CAS conflict. The memory state is then different from the file,
+// and the etag did not change, so a sync gets NotModified and keeps it.
+// After the drop, the next call reads the file. A CAS conflict syncs anyway.
+// Call it with the space lock held.
+func (c *Cache) dropOnFailedUpload(err error, storageID, spaceID string) {
+	if err == nil || cas.IsConflict(err) {
+		return
+	}
+	if spaces, ok := c.Providers.Load(storageID); ok {
+		spaces.Spaces.Delete(spaceID)
+	}
+}
+
 // Add adds a share to the cache
 func (c *Cache) Add(ctx context.Context, storageID, spaceID, shareID string, share *collaboration.Share) error {
 	ctx, span := tracer.Start(ctx, "Add")
@@ -188,7 +221,10 @@ func (c *Cache) Add(ctx context.Context, storageID, spaceID, shareID string, sha
 		log.Info().Interface("shares", maps.Keys(space.Shares)).Str("New share", shareID).Msg("Adding share to space")
 		space.Shares[shareID] = share
 
-		return c.Persist(ctx, storageID, spaceID)
+		err := c.Persist(ctx, storageID, spaceID)
+		// With the share in memory, this pod lists a share that is not in the file.
+		c.dropOnFailedUpload(err, storageID, spaceID)
+		return err
 	}
 
 	err = cas.RetryPersist(ctx, 100, persistFunc,
@@ -212,44 +248,75 @@ func (c *Cache) Add(ctx context.Context, storageID, spaceID, shareID string, sha
 
 // Remove removes a share from the cache
 func (c *Cache) Remove(ctx context.Context, storageID, spaceID, shareID string) error {
+	_, err := c.RemoveMany(ctx, storageID, spaceID, []string{shareID})
+	return err
+}
+
+// RemoveMany removes the given shares of one space with one upload.
+// It does not upload when none of the shares is in the space.
+// It returns the IDs that this call removed. A share that another caller
+// removed first is not in the result. The CAS upload makes sure that only one
+// caller removes a share, also across pods.
+func (c *Cache) RemoveMany(ctx context.Context, storageID, spaceID string, shareIDs []string) ([]string, error) {
 	ctx, span := tracer.Start(ctx, "Remove")
 	defer span.End()
-	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID), attribute.String("cs3.shareid", shareID))
+	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID), attribute.Int("cs3.sharecount", len(shareIDs)))
 
 	unlock := c.LockSpace(spaceID)
 	defer unlock()
 	span.AddEvent("got lock")
 
-	if !c.isSpaceCached(storageID, spaceID) {
+	// When a share is not in memory, sync first. A cold or stale cache does
+	// not show if the share is in the file. For example, a listing that got a
+	// temporary NotFound stores an empty space. Without the sync, the removal
+	// does not upload and the share stays in the file. When all shares are in
+	// memory, the CAS write in Persist detects stale state.
+	if !c.hasAll(storageID, spaceID, shareIDs...) {
 		err := c.syncWithRetry(ctx, storageID, spaceID)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
+	var removed []string
 	persistFunc := func() error {
+		// A CAS conflict syncs the space and calls this function again.
+		removed = nil
 		spaces, ok := c.Providers.Load(storageID)
 		if !ok {
 			return nil
 		}
-		space, _ := spaces.Spaces.Load(spaceID)
+		space, ok := spaces.Spaces.Load(spaceID)
 		if !ok {
 			return nil
 		}
-		delete(space.Shares, shareID)
+		for _, shareID := range shareIDs {
+			if _, ok := space.Shares[shareID]; ok {
+				delete(space.Shares, shareID)
+				removed = append(removed, shareID)
+			}
+		}
+		if len(removed) == 0 {
+			return nil // nothing to remove, do not upload
+		}
 
-		return c.Persist(ctx, storageID, spaceID)
+		err := c.Persist(ctx, storageID, spaceID)
+		// Without the shares in memory, a retry finds nothing to remove and does not upload.
+		c.dropOnFailedUpload(err, storageID, spaceID)
+		return err
 	}
 
 	log := appctx.GetLogger(ctx).With().
 		Str("hostname", os.Getenv("HOSTNAME")).
 		Str("storageID", storageID).
 		Str("spaceID", spaceID).
-		Str("shareID", shareID).Logger()
+		Int("shareCount", len(shareIDs)).Logger()
 
 	err := cas.RetryPersist(ctx, 100, persistFunc,
 		func() error { return c.resyncAfterConflict(ctx, storageID, spaceID) },
-		func(err error) { log.Debug().Err(err).Msg("CAS conflict persisting removed provider share, retrying...") },
+		func(err error) {
+			log.Debug().Err(err).Msg("CAS conflict persisting removed provider share, retrying...")
+		},
 		func(err error) {
 			span.SetStatus(codes.Error, fmt.Sprintf("persisting removed provider share failed. giving up: %s", err.Error()))
 			log.Error().Err(err).Msg("persisting removed provider share failed")
@@ -262,8 +329,94 @@ func (c *Cache) Remove(ctx context.Context, storageID, spaceID, shareID string) 
 	)
 	if err == nil {
 		span.SetStatus(codes.Ok, "")
+		return removed, nil
 	}
-	return err
+	return nil, err
+}
+
+// Update changes one share and uploads the space. It reads the share under
+// the space lock and gives a copy to the update function. A CAS conflict syncs
+// the space and calls the update function again with the new share.
+// The cache keeps the old share until the upload succeeds.
+// Update returns NotFound when the space does not have the share. Then it does
+// not upload, so it does not write a share that a parallel caller removed.
+func (c *Cache) Update(ctx context.Context, storageID, spaceID, shareID string, update func(*collaboration.Share)) (*collaboration.Share, error) {
+	ctx, span := tracer.Start(ctx, "Update")
+	defer span.End()
+	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID), attribute.String("cs3.shareid", shareID))
+
+	unlock := c.LockSpace(spaceID)
+	defer unlock()
+	span.AddEvent("got lock")
+
+	// When the share is not in memory, sync first, as in RemoveMany. Else
+	// Update returns NotFound for a share that is in the file.
+	if !c.hasAll(storageID, spaceID, shareID) {
+		if err := c.syncWithRetry(ctx, storageID, spaceID); err != nil {
+			return nil, err
+		}
+	}
+
+	var updated *collaboration.Share
+	persistFunc := func() error {
+		// A CAS conflict syncs the space and calls this function again.
+		updated = nil
+		spaces, ok := c.Providers.Load(storageID)
+		if !ok {
+			return nil
+		}
+		space, ok := spaces.Spaces.Load(spaceID)
+		if !ok {
+			return nil
+		}
+		old, ok := space.Shares[shareID]
+		if !ok || old == nil {
+			return nil // the share is gone, do not upload
+		}
+		s := proto.Clone(old).(*collaboration.Share)
+		update(s)
+		space.Shares[shareID] = s
+
+		err := c.Persist(ctx, storageID, spaceID)
+		if err != nil {
+			// Put the old share back, so that memory agrees with the file.
+			// Persist does not change the etag when the upload fails.
+			space.Shares[shareID] = old
+			return err
+		}
+		updated = s
+		return nil
+	}
+
+	log := appctx.GetLogger(ctx).With().
+		Str("hostname", os.Getenv("HOSTNAME")).
+		Str("storageID", storageID).
+		Str("spaceID", spaceID).
+		Str("shareID", shareID).Logger()
+
+	err := cas.RetryPersist(ctx, 100, persistFunc,
+		func() error { return c.resyncAfterConflict(ctx, storageID, spaceID) },
+		func(err error) {
+			log.Debug().Err(err).Msg("CAS conflict persisting updated provider share, retrying...")
+		},
+		func(err error) {
+			span.SetStatus(codes.Error, fmt.Sprintf("persisting updated provider share failed. giving up: %s", err.Error()))
+			log.Error().Err(err).Msg("persisting updated provider share failed")
+		},
+		func(err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+			log.Error().Err(err).Msg("persisting updated provider share failed. giving up.")
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	if updated == nil {
+		return nil, errtypes.NotFound(shareID)
+	}
+	span.SetStatus(codes.Ok, "")
+	return updated, nil
 }
 
 // Get returns one entry from the cache
@@ -359,6 +512,15 @@ func (c *Cache) ListSpace(ctx context.Context, storageID, spaceID string) (*Shar
 	return shares, nil
 }
 
+// SpaceFileMissing reports if a Stat of the space file returns NotFound.
+// Use it as a second proof after a download got NotFound. It returns false
+// for all other results, also for errors.
+func (c *Cache) SpaceFileMissing(ctx context.Context, storageID, spaceID string) bool {
+	_, err := c.storage.Stat(ctx, spaceJSONPath(storageID, spaceID))
+	_, notFound := err.(errtypes.NotFound)
+	return notFound
+}
+
 // Persist persists the data of one space
 func (c *Cache) Persist(ctx context.Context, storageID, spaceID string) error {
 	ctx, span := tracer.Start(ctx, "Persist")
@@ -445,7 +607,8 @@ func (c *Cache) PurgeSpace(ctx context.Context, storageID, spaceID string) error
 	if !ok {
 		return nil
 	}
-	newShares := &Shares{}
+	// Add does not sync a space that is in memory, and it writes to this map.
+	newShares := &Shares{Shares: map[string]*collaboration.Share{}}
 	if space, ok := spaces.Spaces.Load(spaceID); ok {
 		newShares.Etag = space.Etag // keep the etag to allow overwriting the state on the server
 	}
