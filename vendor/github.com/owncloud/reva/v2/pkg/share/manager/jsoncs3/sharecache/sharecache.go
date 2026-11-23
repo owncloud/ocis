@@ -276,6 +276,13 @@ func (c *Cache) doSync(ctx context.Context, userID string, resetOnNotFound bool)
 			return err
 		}
 		c.UserShares.Store(userID, &UserShareCache{UserShares: map[string]*SpaceShareIDs{}})
+		if resetOnNotFound {
+			// Create the empty file, so the next sync gets a NotModified instead of
+			// another NotFound plus a trash lookup.
+			if err := c.Persist(ctx, userID); err != nil {
+				log.Warn().Err(err).Msg("failed to create empty share cache file")
+			}
+		}
 		span.SetStatus(codes.Ok, "")
 		return nil
 	case errtypes.NotModified:
