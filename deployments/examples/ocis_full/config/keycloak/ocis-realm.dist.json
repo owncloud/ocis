@@ -792,6 +792,24 @@
         "/quantum-lovers",
         "/users"
       ]
+    },
+    {
+      "id": "c7d2a0a4-5b1e-4f0e-9a3c-2f6b8d4e1a90",
+      "username": "service-account-invitations",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": false,
+      "serviceAccountClientId": "invitations",
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [],
+      "clientRoles": {
+        "realm-management": [
+          "manage-users"
+        ]
+      },
+      "notBefore": 0,
+      "groups": []
     }
   ],
   "scopeMappings": [
@@ -864,6 +882,44 @@
         "offline_access",
         "microprofile-jwt"
       ]
+    },
+    {
+      "id": "4b0c6e2d-8f3a-4d71-b5e9-6a1f2c3d4e5f",
+      "clientId": "invitations",
+      "name": "Invitations service",
+      "description": "Used by the oCIS invitations service to create guest users and send them the invitation email.",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "__INVITATIONS_CLIENT_SECRET__",
+      "redirectUris": [],
+      "webOrigins": [],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "frontchannelLogout": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "oauth2.device.authorization.grant.enabled": "false",
+        "oidc.ciba.grant.enabled": "false"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": 0,
+      "defaultClientScopes": [
+        "web-origins",
+        "profile",
+        "roles",
+        "basic",
+        "email"
+      ],
+      "optionalClientScopes": []
     },
     {
       "id": "9850adad-7910-4b67-a790-da6444361618",
