@@ -49,6 +49,10 @@ func Validate(cfg *config.Config) error {
 		return fmt.Errorf("%s: SEARCH_EXTRACTOR_MAX_CONSECUTIVE_FAILURES must be 0 (never abort) or greater, got %d",
 			cfg.Service.Name, cfg.Extractor.MaxConsecutiveFailures)
 	}
+	if cfg.Extractor.FailedRetryInterval < 0 {
+		return fmt.Errorf("%s: SEARCH_EXTRACTOR_FAILED_RETRY_INTERVAL must be 0 (retry on every walk) or greater, got %s",
+			cfg.Service.Name, cfg.Extractor.FailedRetryInterval)
+	}
 
 	return nil
 }

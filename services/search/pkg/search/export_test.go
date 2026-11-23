@@ -7,3 +7,8 @@ import "time"
 func (s *Service) SetExtractionRetryDelay(d time.Duration) {
 	s.extractionRetryDelay = d
 }
+
+// SetNow replaces the clock the service uses to date failed extractions.
+func (s *Service) SetNow(now func() time.Time) {
+	s.now = now
+}
