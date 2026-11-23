@@ -486,9 +486,9 @@ jobs:
           - suite: keycloak
             args: "--type playwright --suites journeys,keycloak"
             keycloak: true
-          # - suite: mfa
-          #   args: "--type playwright --suites mfa"
-          #   mfa: true
+          - suite: mfa
+            args: "--type playwright --suites mfa"
+            mfa: true
           - suite: oidc
             args: "--type playwright specs/oidc/refreshToken.spec.ts"
             oidc: true
@@ -563,6 +563,7 @@ jobs:
           ENABLE_OCM: ${{ matrix.suite == 'ocm' }}
           ENABLE_SHORT_IDP_TOKEN_EXPIRY: ${{ matrix.suite == 'oidc' || matrix.suite == 'oidc-iframe' }}
           ENABLE_OIDC_OFFLINE_ACCESS: ${{ matrix.suite == 'oidc' }}
+          ENABLE_MFA: ${{ matrix.suite == 'mfa' }}
         run: |
           cd tests/config/k8s
           make prepare-charts
