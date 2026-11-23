@@ -233,6 +233,9 @@ func (d *decoder) jumpOffset(offset int) (int, error) {
 		offset = o + l
 
 	case d.isFixSlice(code):
+		if err = d.enter(); err != nil {
+			return 0, err
+		}
 		l := int(code - def.FixArray)
 		for i := 0; i < l; i++ {
 			offset, err = d.jumpOffset(offset)
@@ -240,9 +243,13 @@ func (d *decoder) jumpOffset(offset int) (int, error) {
 				return 0, err
 			}
 		}
+		d.depth--
 	case code == def.Array16:
 		bs, o, err := d.readSize2(offset)
 		if err != nil {
+			return 0, err
+		}
+		if err = d.enter(); err != nil {
 			return 0, err
 		}
 		l := int(binary.BigEndian.Uint16(bs))
@@ -252,6 +259,7 @@ func (d *decoder) jumpOffset(offset int) (int, error) {
 				return 0, err
 			}
 		}
+		d.depth--
 		offset = o
 	case code == def.Array32:
 		bs, o, err := d.readSize4(offset)
@@ -262,15 +270,22 @@ func (d *decoder) jumpOffset(offset int) (int, error) {
 		if err != nil {
 			return 0, err
 		}
+		if err = d.enter(); err != nil {
+			return 0, err
+		}
 		for i := 0; i < l; i++ {
 			o, err = d.jumpOffset(o)
 			if err != nil {
 				return 0, err
 			}
 		}
+		d.depth--
 		offset = o
 
 	case d.isFixMap(code):
+		if err = d.enter(); err != nil {
+			return 0, err
+		}
 		l := int(code - def.FixMap)
 		for i := 0; i < l*2; i++ {
 			offset, err = d.jumpOffset(offset)
@@ -278,9 +293,13 @@ func (d *decoder) jumpOffset(offset int) (int, error) {
 				return 0, err
 			}
 		}
+		d.depth--
 	case code == def.Map16:
 		bs, o, err := d.readSize2(offset)
 		if err != nil {
+			return 0, err
+		}
+		if err = d.enter(); err != nil {
 			return 0, err
 		}
 		l := int(binary.BigEndian.Uint16(bs))
@@ -290,6 +309,7 @@ func (d *decoder) jumpOffset(offset int) (int, error) {
 				return 0, err
 			}
 		}
+		d.depth--
 		offset = o
 	case code == def.Map32:
 		bs, o, err := d.readSize4(offset)
@@ -298,6 +318,9 @@ func (d *decoder) jumpOffset(offset int) (int, error) {
 		}
 		l, err := decodingutil.LengthFromUint32(binary.BigEndian.Uint32(bs))
 		if err != nil {
+			return 0, err
+		}
+		if err = d.enter(); err != nil {
 			return 0, err
 		}
 		// skip key and value per entry; l*2 could overflow on 32-bit platforms
@@ -309,6 +332,7 @@ func (d *decoder) jumpOffset(offset int) (int, error) {
 				}
 			}
 		}
+		d.depth--
 		offset = o
 
 	default:

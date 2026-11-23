@@ -49,7 +49,7 @@ import (
 
 // Default Constants
 const (
-	Version                   = "1.55.0"
+	Version                   = "1.56.0"
 	DefaultURL                = "nats://127.0.0.1:4222"
 	DefaultPort               = 4222
 	DefaultMaxReconnect       = 60
@@ -354,7 +354,8 @@ type Options struct {
 	Secure bool
 
 	// TLSConfig is a custom TLS configuration to use for secure
-	// transports.
+	// transports. Setting it, RootCAsCB or TLSCertCB asks for TLS with
+	// every server, as Secure does.
 	TLSConfig *tls.Config
 
 	// TLSCertCB is used to fetch and return custom tls certificate.
@@ -693,6 +694,9 @@ type Conn struct {
 	ar            bool // abort reconnect
 	rqch          chan struct{}
 	ws            bool // true if a websocket connection
+	awaitInfo     bool // wait for the INFO after the first PONG before connected
+	// tlsReason says what made the client ask for TLS.
+	tlsReason string
 
 	// New style response handler
 	respSub       string               // The wildcard subject
@@ -911,6 +915,12 @@ func (m *Msg) headerSize() (int, error) {
 }
 
 func (m *Msg) headerBytes() ([]byte, error) {
+	var b bytes.Buffer
+	return m.encodeHeaders(&b)
+}
+
+// encodeHeaders writes the headers into an empty buffer.
+func (m *Msg) encodeHeaders(b *bytes.Buffer) ([]byte, error) {
 	var hdr []byte
 	hdrSize, err := m.headerSize()
 	if hdrSize == 0 || err != nil {
@@ -921,14 +931,13 @@ func (m *Msg) headerBytes() ([]byte, error) {
 	// is intended to be a valid implementation of the io.StringWriter interface.
 	// This implementation cannot actually fail in practice, so it is safe to
 	// ignore write errors here.
-	var b bytes.Buffer
 	b.Grow(hdrSize)
 	_, _ = b.WriteString(hdrLine)
 	for k, vs := range m.Header {
 		for _, v := range vs {
 			_, _ = b.WriteString(k)
 			_, _ = b.WriteString(": ")
-			writeHeaderValue(&b, v)
+			writeHeaderValue(b, v)
 			_, _ = b.WriteString(crlf)
 		}
 	}
@@ -2020,9 +2029,16 @@ func (o Options) Connect() (*Conn, error) {
 		}
 	}
 
+	nc.tlsReason = nc.Opts.tlsReason()
+
 	// If the TLSHandshakeFirst option is specified, make sure that
 	// the Secure boolean is true.
 	if nc.Opts.TLSHandshakeFirst {
+		nc.Opts.Secure = true
+	}
+
+	// A TLS configuration asks for TLS.
+	if nc.Opts.TLSConfig != nil || nc.Opts.RootCAsCB != nil || nc.Opts.TLSCertCB != nil {
 		nc.Opts.Secure = true
 	}
 
@@ -2099,6 +2115,7 @@ var _CRLF_BYTES_ = []byte(_CRLF_)
 const (
 	_OK_OP_   = "+OK"
 	_ERR_OP_  = "-ERR"
+	_PING_OP_ = "PING"
 	_PONG_OP_ = "PONG"
 	_INFO_OP_ = "INFO"
 )
@@ -2207,18 +2224,25 @@ func (nc *Conn) setupServerPool() error {
 		}
 	}
 
-	// Check for Scheme hint to move to TLS mode.
-	for _, srv := range nc.srvPool {
+	nc.secureFromSchemes(nc.srvPool)
+
+	return nc.pickServer()
+}
+
+// secureFromSchemes asks for TLS when a server in pool has a TLS scheme. One
+// such URL makes the whole connection TLS, at connect as after SetServerPool.
+func (nc *Conn) secureFromSchemes(pool []*Server) {
+	for _, srv := range pool {
 		if srv.URL.Scheme == tlsScheme || srv.URL.Scheme == wsSchemeTLS {
-			// FIXME(dlc), this is for all in the pool, should be case by case.
 			nc.Opts.Secure = true
+			if nc.tlsReason == _EMPTY_ {
+				nc.tlsReason = fmt.Sprintf("the URL %s://%s asks for TLS", srv.URL.Scheme, srv.URL.Host)
+			}
 			if nc.Opts.TLSConfig == nil {
 				nc.Opts.TLSConfig = &tls.Config{MinVersion: tls.VersionTLS12}
 			}
 		}
 	}
-
-	return nc.pickServer()
 }
 
 // Helper function to return scheme
@@ -2266,16 +2290,18 @@ func (nc *Conn) parseServerURL(sURL string, implicit, saveTLSName bool) (*Server
 	var tlsName string
 	if implicit {
 		curl := nc.current.URL
-		// Check to see if we do not have a url.User but current connected
-		// url does. If so copy over.
-		if u.User == nil && curl.User != nil {
-			u.User = curl.User
-		}
+		// Use the reporting server's credentials, never the entry's own.
+		u.User = curl.User
 		// We are checking to see if we have a secure connection and are
 		// adding an implicit server that just has an IP. If so we will remember
-		// the current hostname we are connected to.
+		// the current hostname we are connected to. If we are connected to an
+		// IP ourselves, inherit the name that entry carries.
 		if saveTLSName && hostIsIP(u) {
-			tlsName = curl.Hostname()
+			if hostIsIP(curl) {
+				tlsName = nc.current.tlsName
+			} else {
+				tlsName = curl.Hostname()
+			}
 		}
 	}
 
@@ -2955,9 +2981,15 @@ func (nc *Conn) processConnectInit() error {
 		}
 	}
 
-	// Process the INFO protocol received from the server
+	// Process the INFO protocol received from the server. An INFO read before
+	// TLS is not authenticated, so a failed attempt leaves the server info as
+	// it was.
+	info := nc.info
 	err := nc.processExpectedInfo()
 	if err != nil {
+		if nc.tlsAfterInfo() {
+			nc.info = info
+		}
 		return nc.tlsHandshakeEOF(err)
 	}
 
@@ -2965,6 +2997,9 @@ func (nc *Conn) processConnectInit() error {
 	// Wait for the PONG response (or any error that we get from the server).
 	err = nc.sendConnect()
 	if err != nil {
+		if nc.tlsAfterInfo() {
+			nc.info = info
+		}
 		return nc.tlsHandshakeEOF(err)
 	}
 
@@ -3056,6 +3091,27 @@ func (nc *Conn) connect() (bool, error) {
 	return connectionEstablished, err
 }
 
+// tlsReason names the setting that asks for TLS, if any. Secure comes before
+// the TLS fields because the options that set it fill in TLSConfig too.
+func (o *Options) tlsReason() string {
+	var name string
+	switch {
+	case o.TLSHandshakeFirst:
+		name = "TLSHandshakeFirst"
+	case o.Secure:
+		name = "Secure (set by Secure, RootCAs, ClientCert or ClientTLSConfig)"
+	case o.TLSConfig != nil:
+		name = "TLSConfig"
+	case o.RootCAsCB != nil:
+		name = "RootCAsCB"
+	case o.TLSCertCB != nil:
+		name = "TLSCertCB"
+	default:
+		return _EMPTY_
+	}
+	return name + " asks for TLS"
+}
+
 // This will check to see if the connection should be
 // secure. This can be dictated from either end and should
 // only be called after the INIT protocol has been received.
@@ -3065,7 +3121,11 @@ func (nc *Conn) checkForSecure() error {
 
 	// Check for mismatch in setups
 	if o.Secure && !nc.info.TLSRequired && !nc.info.TLSAvailable {
-		return ErrSecureConnWanted
+		host := nc.current.URL.Host
+		if o.InProcessServer != nil {
+			host = "the in-process server"
+		}
+		return fmt.Errorf("%w: %s and %s does not offer it", ErrSecureConnWanted, nc.tlsReason, host)
 	} else if nc.info.TLSRequired && !o.Secure {
 		// Switch to Secure since server needs TLS.
 		o.Secure = true
@@ -3101,9 +3161,20 @@ func (nc *Conn) processExpectedInfo() error {
 		return ErrNoInfoReceived
 	}
 
-	// Parse the protocol
-	if err := nc.processInfo(c.args); err != nil {
-		return err
+	if c.args != _EMPTY_ {
+		if err := nc.parseInfo(c.args); err != nil {
+			return err
+		}
+	}
+
+	// An INFO read before the TLS upgrade is not authenticated, so its
+	// connect_urls are not used. A server new enough sends the list inside
+	// TLS right after the first PONG, and sendConnect waits for it.
+	nc.awaitInfo = false
+	if nc.tlsAfterInfo() {
+		nc.awaitInfo = !nc.Opts.IgnoreDiscoveredServers && sendsInfoAfterPong(nc.info.Version)
+	} else {
+		nc.updateServerPool()
 	}
 
 	if nc.Opts.Nkey != "" && nc.info.Nonce == "" {
@@ -3117,6 +3188,25 @@ func (nc *Conn) processExpectedInfo() error {
 	}
 
 	return nc.checkForSecure()
+}
+
+// tlsAfterInfo reports whether this attempt starts TLS after the INFO it has
+// read, which was therefore read in plaintext.
+func (nc *Conn) tlsAfterInfo() bool {
+	if nc.ws || nc.Opts.TLSHandshakeFirst {
+		return false
+	}
+	if sd, ok := nc.Opts.CustomDialer.(skipTLSDialer); ok && sd.SkipTLSHandshake() {
+		return false
+	}
+	return nc.Opts.Secure || nc.info.TLSRequired
+}
+
+// sendsInfoAfterPong reports whether a server of this version sends an INFO
+// right after the PONG that answers the first PING.
+func sendsInfoAfterPong(version string) bool {
+	major, minor, _, err := versionComponents(version)
+	return err == nil && (major > 2 || (major == 2 && minor >= 12))
 }
 
 // Sends a protocol control message by queuing into the bufio writer
@@ -3306,10 +3396,44 @@ func (nc *Conn) sendConnect() error {
 		return fmt.Errorf("nats: expected '%s', got '%s'", _PONG_OP_, proto)
 	}
 
+	if nc.awaitInfo {
+		if err := nc.readPostPongInfo(); err != nil {
+			return err
+		}
+	}
+
 	// This is where we are truly connected.
 	nc.changeConnStatus(CONNECTED)
 
 	return nil
+}
+
+// readPostPongInfo reads the INFO that follows the first PONG, answering
+// PINGs on the way, for up to Timeout from now. When the time runs out
+// before anything arrives, the connection goes on without it.
+func (nc *Conn) readPostPongInfo() error {
+	nc.conn.SetDeadline(time.Now().Add(nc.Opts.Timeout))
+	c := &control{}
+	for {
+		proto, err := nc.readProto()
+		if err != nil {
+			if errors.Is(err, os.ErrDeadlineExceeded) && proto == _EMPTY_ {
+				return nil
+			}
+			return err
+		}
+		parseControl(proto, c)
+		switch c.op {
+		case _INFO_OP_:
+			return nc.processInfo(c.args)
+		case _PING_OP_:
+			if err := nc.bw.writeDirect(pongProto); err != nil {
+				return err
+			}
+		default:
+			return fmt.Errorf("nats: expected '%s', got '%s'", _INFO_OP_, strings.TrimRight(proto, "\r\n"))
+		}
+	}
 }
 
 // reads a protocol line.
@@ -3579,6 +3703,10 @@ func (nc *Conn) doReconnect(err error, forceReconnect bool) {
 
 		// Process connect logic
 		if nc.err = nc.processConnectInit(); nc.err != nil {
+			if reconnectErrCB := nc.Opts.ReconnectErrCB; reconnectErrCB != nil {
+				reconnectErr := nc.err
+				nc.ach.push(func() { reconnectErrCB(nc, reconnectErr) })
+			}
 			// Check if we should abort reconnect. If so, break out
 			// of the loop and connection will be closed.
 			if nc.ar {
@@ -4301,29 +4429,42 @@ func (nc *Conn) processOK() {
 	// do nothing
 }
 
-// processInfo is used to parse the info messages sent
-// from the server.
-// This function may update the server pool.
+// processInfo applies an INFO received on an established connection: the
+// server info, the server pool and lame duck mode.
 func (nc *Conn) processInfo(info string) error {
 	if info == _EMPTY_ {
 		return nil
 	}
+	if err := nc.parseInfo(info); err != nil {
+		return err
+	}
+	nc.updateServerPool()
+	if !nc.initc && nc.info.LameDuckMode {
+		if lameDuckModeHandler := nc.Opts.LameDuckModeHandler; lameDuckModeHandler != nil {
+			nc.ach.push(func() { lameDuckModeHandler(nc) })
+		}
+	}
+	return nil
+}
+
+// parseInfo replaces the connection's server info with the parsed INFO.
+func (nc *Conn) parseInfo(info string) error {
 	var ncInfo ServerInfo
 	if err := json.Unmarshal([]byte(info), &ncInfo); err != nil {
 		return err
 	}
-
-	// Copy content into connection's info structure.
 	nc.info = ncInfo
+	return nil
+}
+
+// updateServerPool applies the connect_urls of the server info to the pool.
+func (nc *Conn) updateServerPool() {
 	// The array could be empty/not present on initial connect,
 	// if advertise is disabled on that server, or servers that
 	// did not include themselves in the async INFO protocol.
 	// If empty, do not remove the implicit servers from the pool.
 	if len(nc.info.ConnectURLs) == 0 || nc.Opts.IgnoreDiscoveredServers {
-		if !nc.initc && ncInfo.LameDuckMode && nc.Opts.LameDuckModeHandler != nil {
-			nc.ach.push(func() { nc.Opts.LameDuckModeHandler(nc) })
-		}
-		return nil
+		return
 	}
 	// Note about pool randomization: when the pool was first created,
 	// it was randomized (if allowed). We keep the order the same (removing
@@ -4335,7 +4476,17 @@ func (nc *Conn) processInfo(info string) error {
 	// Transform that to a map for easy lookups
 	tmp := make(map[string]struct{}, len(urls))
 	for _, curl := range urls {
+		// An entry is matched by its address; its user info is never used.
+		if at := strings.LastIndex(curl, "@"); at >= 0 {
+			curl = curl[at+1:]
+		}
 		tmp[curl] = struct{}{}
+	}
+	// A server listed over wss:// is dialed with wss://, also one learned
+	// earlier without TLS.
+	scheme := nc.connScheme()
+	if nc.ws && nc.current != nil && nc.current.URL.Scheme == wsSchemeTLS {
+		scheme = wsSchemeTLS
 	}
 	// Walk the pool and removed the implicit servers that are no longer in the
 	// given array/map
@@ -4348,6 +4499,9 @@ func (nc *Conn) processInfo(info string) error {
 		// Remove from the temp map so that at the end we are left with only
 		// new (or restarted) servers that need to be added to the pool.
 		delete(tmp, curl)
+		if inInfo && srv.isImplicit && scheme == wsSchemeTLS {
+			srv.URL.Scheme = wsSchemeTLS
+		}
 		// Keep servers that were set through Options, but also the one that
 		// we are currently connected to (even if it is a discovered server).
 		if !srv.isImplicit || srv.URL == nc.current.URL {
@@ -4361,8 +4515,9 @@ func (nc *Conn) processInfo(info string) error {
 			i--
 		}
 	}
-	// Figure out if we should save off the current non-IP hostname if we encounter a bare IP.
-	saveTLS := nc.current != nil && !hostIsIP(nc.current.URL)
+	// Figure out if we should save off the current non-IP hostname, or the
+	// name saved on the current IP entry, if we encounter a bare IP.
+	saveTLS := nc.current != nil && (!hostIsIP(nc.current.URL) || nc.current.tlsName != _EMPTY_)
 
 	// If there are any left in the tmp map, these are new (or restarted) servers
 	// and need to be added to the pool.
@@ -4372,7 +4527,7 @@ func (nc *Conn) processInfo(info string) error {
 		if _, present := nc.urls[curl]; !present {
 			hasNew = true
 		}
-		nc.addURLToPool(fmt.Sprintf("%s://%s", nc.connScheme(), curl), true, saveTLS)
+		nc.addURLToPool(fmt.Sprintf("%s://%s", scheme, curl), true, saveTLS)
 	}
 	if hasNew {
 		// Randomize the pool if allowed but leave the first URL in place.
@@ -4385,12 +4540,6 @@ func (nc *Conn) processInfo(info string) error {
 			}
 		}
 	}
-	if !nc.initc && ncInfo.LameDuckMode {
-		if lameDuckModeHandler := nc.Opts.LameDuckModeHandler; lameDuckModeHandler != nil {
-			nc.ach.push(func() { lameDuckModeHandler(nc) })
-		}
-	}
-	return nil
 }
 
 // processAsyncInfo does the same than processInfo, but is called
@@ -4600,6 +4749,9 @@ func DecodeHeadersMsg(data []byte) (Header, error) {
 
 	// Check if we have an inlined status.
 	if len(l) > hdrPreEnd {
+		if l[hdrPreEnd] != ' ' && l[hdrPreEnd] != '\t' {
+			return nil, ErrBadHeaderMsg
+		}
 		var description string
 		status := strings.TrimSpace(l[hdrPreEnd:])
 		if len(status) < statusLen {
@@ -4650,15 +4802,34 @@ func readMIMEHeader(s string) (Header, error) {
 	}
 }
 
+const maxPooledHeaderSize = 64 * 1024
+
+var publishHeaderPool = sync.Pool{
+	New: func() any { return new(bytes.Buffer) },
+}
+
 // PublishMsg publishes the Msg structure, which includes the
 // Subject, an optional Reply and an optional Data field.
 func (nc *Conn) PublishMsg(m *Msg) error {
 	if m == nil {
 		return ErrInvalidMsg
 	}
-	hdr, err := m.headerBytes()
-	if err != nil {
-		return err
+	var hdr []byte
+	if len(m.Header) > 0 {
+		b := publishHeaderPool.Get().(*bytes.Buffer)
+		defer func() {
+			// publish copies the headers into the writer's buffer before returning.
+			// Do not retain unusually large headers in the pool.
+			if b.Cap() <= maxPooledHeaderSize {
+				b.Reset()
+				publishHeaderPool.Put(b)
+			}
+		}()
+		var err error
+		hdr, err = m.encodeHeaders(b)
+		if err != nil {
+			return err
+		}
 	}
 	validateReply := m.Reply != _EMPTY_
 	return nc.publish(m.Subject, m.Reply, validateReply, hdr, m.Data)
@@ -6186,6 +6357,12 @@ func (nc *Conn) resendSubscriptions() {
 	for sid, s := range subs {
 		adjustedMax := uint64(0)
 		s.mu.Lock()
+		// Draining subs are only removed locally once done, so resubscribing
+		// would leave orphaned interest on the server.
+		if s.draining {
+			s.mu.Unlock()
+			continue
+		}
 		// when resending subscriptions, the permissions error should be cleared
 		// since the user may have fixed the permissions issue
 		s.permissionsErr = nil
@@ -6715,6 +6892,9 @@ func (nc *Conn) ServerPool() []Server {
 // can be called while the connection is active. It will return an error if the
 // connection is closed or if any of the provided URLs are invalid.
 //
+// A tls:// URL in the pool makes the client ask for TLS from every server, as
+// one given at connect does. Nothing in a pool turns TLS off.
+//
 // This function does not trigger an immediate reconnect. The new server
 // pool will be used on the next reconnect attempt.
 // If you want to trigger an immediate reconnect to apply the new server pool,
@@ -6764,6 +6944,10 @@ func (nc *Conn) SetServerPool(servers []string) error {
 
 	nc.srvPool = newPool
 	nc.urls = newURLs
+	// A WebSocket pool keeps dialing each URL with its own scheme.
+	if !nc.ws {
+		nc.secureFromSchemes(newPool)
+	}
 
 	// Update nc.current to point to the corresponding server in the new pool
 	// This is important because currentServer() uses pointer equality

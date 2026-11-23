@@ -203,9 +203,17 @@ func (mc *mysqlConn) readHandshakePacket() (data []byte, capabilities capability
 
 	// server version [null terminated string]
 	// connection id [4 bytes]
-	pos := 1 + bytes.IndexByte(data[1:], 0x00) + 1 + 4
+	end := bytes.IndexByte(data[1:], 0x00)
+	if end < 0 {
+		return nil, 0, 0, "", ErrMalformPkt
+	}
+	pos := 1 + end + 1 + 4
 
-	// first part of the password cipher [8 bytes]
+	// first part of the password cipher [8 bytes],
+	// filler [1 byte] and capability flags (lower 2 bytes) [2 bytes]
+	if len(data) < pos+8+1+2 {
+		return nil, 0, 0, "", ErrMalformPkt
+	}
 	authData := data[pos : pos+8]
 
 	// (filler) always 0x00 [1 byte]
@@ -228,6 +236,13 @@ func (mc *mysqlConn) readHandshakePacket() (data []byte, capabilities capability
 	if len(data) > pos {
 		// character set [1 byte]
 		// status flags [2 bytes]
+		// capability flags (upper 2 bytes) [2 bytes]
+		// length of auth-plugin-data [1 byte]
+		// reserved [10 bytes] (MariaDB uses the last 4 for extended capabilities)
+		// the first 12 bytes of the second part of the cipher
+		if len(data) < pos+3+2+7+4+12 {
+			return nil, 0, 0, "", ErrMalformPkt
+		}
 		pos += 3
 		// capability flags (upper 2 bytes) [2 bytes]
 		capabilities |= capabilityFlag(binary.LittleEndian.Uint16(data[pos:pos+2])) << 16
@@ -255,6 +270,9 @@ func (mc *mysqlConn) readHandshakePacket() (data []byte, capabilities capability
 		// which seems to work but technically could have a hidden bug.
 		authData = append(authData, data[pos:pos+12]...)
 		pos += 13
+		if pos > len(data) {
+			pos = len(data)
+		}
 
 		// EOF if version (>= 5.5.7 and < 5.5.10) or (>= 5.6.0 and < 5.6.2)
 		// \NUL otherwise
@@ -343,8 +361,9 @@ func (mc *mysqlConn) writeHandshakeResponsePacket(authResp []byte, plugin string
 		colID, ok := collations[cname]
 		if ok {
 			data[12] = colID
-		} else if len(mc.cfg.charsets) > 0 {
-			// When cfg.charset is set, the collation is set by `SET NAMES <charset> COLLATE <collation>`.
+		} else if len(mc.cfg.charsets) == 0 {
+			// Without cfg.charset, the collation can only be set by this 1-byte ID.
+			// With cfg.charset, it is set by `SET NAMES <charset> COLLATE <collation>`.
 			return fmt.Errorf("unknown collation: %q", cname)
 		}
 	}
@@ -586,14 +605,11 @@ func (mc *okHandler) readResultSetHeaderPacket() (int, bool, error) {
 // Error Packet
 // https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_err_packet.html
 func (mc *mysqlConn) handleErrorPacket(data []byte) error {
-	if data[0] != iERR {
-		return ErrMalformPkt
+	me, err := decodeErrorPacket(data)
+	if err != nil {
+		return err
 	}
-
-	// 0xff [1 byte]
-
-	// Error Number [16 bit uint]
-	errno := binary.LittleEndian.Uint16(data[1:3])
+	errno := me.Number
 
 	// 1792: ER_CANT_EXECUTE_IN_READ_ONLY_TRANSACTION
 	// 1290: ER_OPTION_PREVENTS_STATEMENT (returned by Aurora during failover)
@@ -612,20 +628,26 @@ func (mc *mysqlConn) handleErrorPacket(data []byte) error {
 		return driver.ErrBadConn
 	}
 
-	me := &MySQLError{Number: errno}
+	return me
+}
 
+// decodeErrorPacket has no connection side effects, so it can also be used
+// to report the original server error on a connection we are discarding.
+func decodeErrorPacket(data []byte) (*MySQLError, error) {
+	if len(data) < 3 || data[0] != iERR {
+		return nil, ErrMalformPkt
+	}
+	me := &MySQLError{Number: binary.LittleEndian.Uint16(data[1:3])}
 	pos := 3
-
-	// SQL State [optional: # + 5bytes string]
-	if data[3] == 0x23 {
-		copy(me.SQLState[:], data[4:4+5])
+	if len(data) > pos && data[pos] == '#' {
+		if len(data) < 9 {
+			return nil, ErrMalformPkt
+		}
+		copy(me.SQLState[:], data[4:9])
 		pos = 9
 	}
-
-	// Error Message [string]
 	me.Message = string(data[pos:])
-
-	return me
+	return me, nil
 }
 
 func readStatus(b []byte) statusFlag {
@@ -777,8 +799,8 @@ func (mc *mysqlConn) readColumns(count int, old []mysqlField) ([]mysqlField, err
 		// Filler [uint8]
 		pos++
 
-		// Charset [charset, collation uint8]
-		columns[i].charSet = data[pos]
+		// Charset (collation ID) [uint16]
+		columns[i].charSet = binary.LittleEndian.Uint16(data[pos : pos+2])
 		pos += 2
 
 		// Length [uint32]
@@ -1040,6 +1062,20 @@ func (stmt *mysqlStmt) writeCommandLongData(paramID int, arg []byte) error {
 	return nil
 }
 
+func (stmt *mysqlStmt) reset() error {
+	handleOk := stmt.mc.clearResult()
+	if err := stmt.mc.writeCommandPacketUint32(comStmtReset, stmt.id); err != nil {
+		return err
+	}
+	return handleOk.readResultOK()
+}
+
+type stmtLongData struct {
+	paramID int
+	data    []byte
+	text    string
+}
+
 // Execute Prepared Statement
 // https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_stmt_execute.html
 func (stmt *mysqlStmt) writeExecutePacket(args []driver.Value) error {
@@ -1057,11 +1093,9 @@ func (stmt *mysqlStmt) writeExecutePacket(args []driver.Value) error {
 	// Determine threshold dynamically to avoid packet size shortage.
 	longDataSize := max(mc.maxAllowedPacket/(stmt.paramCount+1), 64)
 
-	// Reset packet-sequence
-	mc.resetSequence()
-
 	var data []byte
 	var err error
+	var longData []stmtLongData
 
 	if len(args) == 0 {
 		data, err = mc.buf.takeBuffer(minPktLen)
@@ -1171,9 +1205,7 @@ func (stmt *mysqlStmt) writeExecutePacket(args []driver.Value) error {
 						)
 						paramValues = append(paramValues, v...)
 					} else {
-						if err := stmt.writeCommandLongData(i, v); err != nil {
-							return err
-						}
+						longData = append(longData, stmtLongData{paramID: i, data: v})
 					}
 					continue
 				}
@@ -1193,9 +1225,7 @@ func (stmt *mysqlStmt) writeExecutePacket(args []driver.Value) error {
 					)
 					paramValues = append(paramValues, v...)
 				} else {
-					if err := stmt.writeCommandLongData(i, []byte(v)); err != nil {
-						return err
-					}
+					longData = append(longData, stmtLongData{paramID: i, text: v})
 				}
 
 			case time.Time:
@@ -1233,6 +1263,29 @@ func (stmt *mysqlStmt) writeExecutePacket(args []driver.Value) error {
 
 		pos += len(paramValues)
 		data = data[:pos]
+	}
+
+	// Validate the execute packet size before long data is sent.
+	if len(data)-4 > mc.maxAllowedPacket {
+		return ErrPktTooLarge
+	}
+
+	// All parameters have now been validated and normalized. Only start writing
+	// after this point so a validation error cannot leave partial long data
+	// associated with the statement on the server.
+	mc.resetSequence()
+	for _, param := range longData {
+		if param.data != nil {
+			err = stmt.writeCommandLongData(param.paramID, param.data)
+		} else {
+			err = stmt.writeCommandLongData(param.paramID, []byte(param.text))
+		}
+		if err != nil {
+			if resetErr := stmt.reset(); resetErr != nil {
+				mc.close()
+			}
+			return err
+		}
 	}
 
 	err = mc.writePacket(data)

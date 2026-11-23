@@ -90,6 +90,17 @@ func New(s metadata.Storage, namespace, filename string, ttl time.Duration) Cach
 	}
 }
 
+// dropOnFailedUpload drops the user from memory after a failed upload that
+// is not a CAS conflict. The memory state is then different from the file,
+// and the etag did not change, so a sync gets NotModified and keeps it.
+// After the drop, the next call reads the file. A CAS conflict syncs anyway.
+// Call it with the user lock held.
+func (c *Cache) dropOnFailedUpload(err error, userid string) {
+	if err != nil && !cas.IsConflict(err) {
+		c.UserShares.Delete(userid)
+	}
+}
+
 // Add adds a share to the cache
 func (c *Cache) Add(ctx context.Context, userid, shareID string) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
@@ -118,7 +129,10 @@ func (c *Cache) Add(ctx context.Context, userid, shareID string) error {
 		// add share id
 		us, _ := c.UserShares.Load(userid)
 		us.UserShares[ssid].IDs[shareID] = struct{}{}
-		return c.Persist(ctx, userid)
+		err := c.Persist(ctx, userid)
+		// With the share in memory, this pod lists a share that is not in the file.
+		c.dropOnFailedUpload(err, userid)
+		return err
 	}
 
 	log := appctx.GetLogger(ctx).With().
@@ -147,43 +161,68 @@ func (c *Cache) Add(ctx context.Context, userid, shareID string) error {
 
 // Remove removes a share for the given user
 func (c *Cache) Remove(ctx context.Context, userid, shareID string) error {
+	return c.RemoveMany(ctx, userid, []string{shareID})
+}
+
+// RemoveMany removes the given shares of one user or group with one upload.
+// The shares can be in different spaces. It does not upload when none of the
+// shares is in the cache.
+func (c *Cache) RemoveMany(ctx context.Context, userid string, shareIDs []string) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
 	unlock := c.lockUser(userid)
 	span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userid))
 	defer unlock()
 
-	if _, ok := c.UserShares.Load(userid); !ok {
-		err := c.syncWithRetry(ctx, userid)
-		if err != nil {
-			return err
+	ssidOf := make(map[string]string, len(shareIDs))
+	for _, shareID := range shareIDs {
+		storageid, spaceid, _ := shareid.Decode(shareID)
+		ssidOf[shareID] = storageid + shareid.IDDelimiter + spaceid
+	}
+
+	// When a share is not in memory, sync first. A cold or stale cache does
+	// not show if the share is in the file. When all shares are in memory,
+	// the CAS write in Persist detects stale state.
+	for shareID, ssid := range ssidOf {
+		if !c.has(userid, ssid, shareID) {
+			if err := c.syncWithRetry(ctx, userid); err != nil {
+				return err
+			}
+			break
 		}
 	}
 
 	ctx, span = appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Remove")
 	defer span.End()
-	span.SetAttributes(attribute.String("cs3.userid", userid), attribute.String("cs3.shareid", shareID))
-
-	storageid, spaceid, _ := shareid.Decode(shareID)
-	ssid := storageid + shareid.IDDelimiter + spaceid
+	span.SetAttributes(attribute.String("cs3.userid", userid), attribute.Int("cs3.sharecount", len(shareIDs)))
 
 	persistFunc := func() error {
-		us, loaded := c.UserShares.LoadOrStore(userid, &UserShareCache{
-			UserShares: map[string]*SpaceShareIDs{},
-		})
-
-		if loaded {
-			// remove share id
-			delete(us.UserShares[ssid].IDs, shareID)
+		removed := false
+		for shareID, ssid := range ssidOf {
+			if c.has(userid, ssid, shareID) {
+				us, _ := c.UserShares.Load(userid)
+				delete(us.UserShares[ssid].IDs, shareID)
+				// An empty space entry makes each listing read the space file again.
+				if len(us.UserShares[ssid].IDs) == 0 {
+					delete(us.UserShares, ssid)
+				}
+				removed = true
+			}
+		}
+		if !removed {
+			return nil // nothing to remove, do not upload
 		}
 
-		return c.Persist(ctx, userid)
+		err := c.Persist(ctx, userid)
+		// Without the shares in memory, a retry finds nothing to remove and does not upload.
+		c.dropOnFailedUpload(err, userid)
+		return err
 	}
 
 	log := appctx.GetLogger(ctx).With().
 		Str("hostname", os.Getenv("HOSTNAME")).
 		Str("userID", userid).
-		Str("shareID", shareID).Logger()
+		Int("shareCount", len(shareIDs)).Logger()
 
 	err := cas.RetryPersist(ctx, 100, persistFunc,
 		func() error { return c.resyncAfterConflict(ctx, userid) },
@@ -276,6 +315,13 @@ func (c *Cache) doSync(ctx context.Context, userID string, resetOnNotFound bool)
 			return err
 		}
 		c.UserShares.Store(userID, &UserShareCache{UserShares: map[string]*SpaceShareIDs{}})
+		if resetOnNotFound {
+			// Create the empty file, so the next sync gets a NotModified instead of
+			// another NotFound plus a trash lookup.
+			if err := c.Persist(ctx, userID); err != nil {
+				log.Warn().Err(err).Msg("failed to create empty share cache file")
+			}
+		}
 		span.SetStatus(codes.Ok, "")
 		return nil
 	case errtypes.NotModified:
@@ -366,6 +412,16 @@ func (c *Cache) syncWithRetry(ctx context.Context, userID string) error {
 
 func (c *Cache) userCreatedPath(userid string) string {
 	return filepath.Join("/", c.namespace, userid, c.filename)
+}
+
+// has reports if the in-memory state has the share. The caller must hold the user lock.
+func (c *Cache) has(userid, ssid, shareID string) bool {
+	us, ok := c.UserShares.Load(userid)
+	if !ok || us.UserShares[ssid] == nil {
+		return false
+	}
+	_, ok = us.UserShares[ssid].IDs[shareID]
+	return ok
 }
 
 func (c *Cache) initializeIfNeeded(userid, ssid string) {
