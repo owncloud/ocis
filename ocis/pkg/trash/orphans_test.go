@@ -135,19 +135,19 @@ func TestPurgeOrphanedFilesKeepsYoungLockFile(t *testing.T) {
 	require.ElementsMatch(t, []string{_nodeID + ".mlock"}, existing(t, base))
 }
 
-func TestPurgeOrphanedFilesRemovesLockFilesOfTrashedNode(t *testing.T) {
+func TestPurgeOrphanedFilesKeepsNodeLockFileOfTrashedNode(t *testing.T) {
 	base := t.TempDir()
 	dir := nodesDir(base)
 	touch(t, filepath.Join(dir, _trashed), old)
 	writeMetadata(t, filepath.Join(dir, _trashed+".mpk"), "blob-1", old)
-	// the old version of Delete left the lock file at the old node path
+	// Delete leaves the lock file at the old node path. A restore uses it again.
 	touch(t, filepath.Join(dir, _nodeID+".mlock"), old)
-	// the lock file of a trashed node that was purged
+	// the lock file of an older trash entry of the same node, which was purged
 	touch(t, filepath.Join(dir, _nodeID+".T.2026-01-01T00:00:00Z.mlock"), old)
 
 	purge(t, base, &fakeBlobstore{}, false)
 
-	require.ElementsMatch(t, []string{_trashed, _trashed + ".mpk"}, existing(t, base))
+	require.ElementsMatch(t, []string{_trashed, _trashed + ".mpk", _nodeID + ".mlock"}, existing(t, base))
 }
 
 func TestPurgeOrphanedFilesRemovesRevisionOfMissingNode(t *testing.T) {
@@ -164,21 +164,43 @@ func TestPurgeOrphanedFilesRemovesRevisionOfMissingNode(t *testing.T) {
 	require.Equal(t, []string{_spaceID + "/blob-2"}, bs.deleted)
 }
 
-func TestPurgeOrphanedFilesKeepsRevisionOfTrashedNode(t *testing.T) {
+func TestPurgeOrphanedFilesRemovesOnlyRevisionLockFilesOfTrashedNode(t *testing.T) {
 	base := t.TempDir()
 	dir := nodesDir(base)
 	touch(t, filepath.Join(dir, _trashed), old)
 	writeMetadata(t, filepath.Join(dir, _trashed+".mpk"), "blob-1", old)
+	touch(t, filepath.Join(dir, _nodeID+".mlock"), old)
 	touch(t, filepath.Join(dir, _revision), old)
 	writeMetadata(t, filepath.Join(dir, _revision+".mpk"), "blob-2", old)
+	touch(t, filepath.Join(dir, _revision+".mlock"), old)
 	bs := &fakeBlobstore{}
 
-	purge(t, base, bs, false)
+	out := purge(t, base, bs, false)
 
+	// a restore brings the revisions back, so only their lock files go
 	require.ElementsMatch(t, []string{
-		_trashed, _trashed + ".mpk", _revision, _revision + ".mpk",
+		_trashed, _trashed + ".mpk", _nodeID + ".mlock", _revision, _revision + ".mpk",
 	}, existing(t, base))
 	require.Empty(t, bs.deleted)
+	require.Contains(t, out, "removed 1 lock files and 0 revisions")
+}
+
+func TestPurgeOrphanedFilesRemovesAllFilesOfPurgedNode(t *testing.T) {
+	base := t.TempDir()
+	dir := nodesDir(base)
+	// the files that stay after a purge from the trash bin
+	touch(t, filepath.Join(dir, _nodeID+".mlock"), old)
+	touch(t, filepath.Join(dir, _revision), old)
+	touch(t, filepath.Join(dir, _revision+".mlock"), old)
+	writeMetadata(t, filepath.Join(dir, _revision+".mpk"), "blob-2", old)
+	touch(t, filepath.Join(dir, "other-node"), old)
+	bs := &fakeBlobstore{}
+
+	out := purge(t, base, bs, false)
+
+	require.ElementsMatch(t, []string{"other-node"}, existing(t, base))
+	require.Equal(t, []string{_spaceID + "/blob-2"}, bs.deleted)
+	require.Contains(t, out, "removed 1 lock files and 1 revisions")
 }
 
 func TestPurgeOrphanedFilesKeepsRevisionWithoutBlobstore(t *testing.T) {

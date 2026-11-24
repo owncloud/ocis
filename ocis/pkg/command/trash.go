@@ -72,7 +72,7 @@ func TrashPurgeEmptyDirsCommand(cfg *config.Config) *cli.Command {
 func TrashPurgeOrphanedFilesCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "purge-orphaned-files",
-		Usage: "purge lock files and revisions of nodes that do not exist",
+		Usage: "purge the orphaned lock files and revisions of deleted nodes",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "basepath",

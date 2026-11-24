@@ -55,9 +55,11 @@ type orphanPurger struct {
 	skipped   int
 }
 
-// PurgeOrphanedFiles removes the files of nodes that do not exist:
-//   - a lock file (.mlock) when its node does not exist
-//   - a revision with its metadata file, its lock file and its blob, when its node does not exist and is not in the trash bin
+// PurgeOrphanedFiles removes the orphaned files of nodes:
+//   - for a node in the trash bin: the lock files of its revisions. The lock file of the node and the revisions stay.
+//   - for a node that does not exist and is not in the trash bin: its lock file, and its revisions
+//     with their metadata files, their lock files and their blobs
+//   - any other lock file (.mlock) when its file does not exist
 func PurgeOrphanedFiles(basePath string, opts PurgeOrphansOptions) error {
 	if opts.Out == nil {
 		opts.Out = os.Stdout
@@ -131,34 +133,45 @@ func (p *orphanPurger) purgeDir(basePath, dir string) error {
 	return errors.Join(errs...)
 }
 
-// purgeLockFile removes a lock file when the file or directory of its node does not exist
+// purgeLockFile removes a lock file when the file or directory of its node does not exist.
+// The lock file of a node in the trash bin stays, because a restore uses it again.
 func (p *orphanPurger) purgeLockFile(dir, name string) error {
-	path := filepath.Join(dir, name)
-	if exists(strings.TrimSuffix(path, _lockSuffix)) {
+	nodePath := strings.TrimSuffix(filepath.Join(dir, name), _lockSuffix)
+	if exists(nodePath) {
+		return nil
+	}
+	trashed, err := isTrashed(nodePath)
+	if err != nil || trashed {
+		return err
+	}
+	return p.removeLockFile(nodePath + _lockSuffix)
+}
+
+// removeLockFile removes a lock file that is not younger than MinAge
+func (p *orphanPurger) removeLockFile(path string) error {
+	if !exists(path) {
 		return nil
 	}
 	if young, err := p.isYoung(path); err != nil || young {
 		return err
 	}
-
 	p.lockFiles++
 	return p.remove(path)
 }
 
-// purgeRevision removes a revision when its node does not exist and is not in the trash bin
+// purgeRevision removes a revision when its node does not exist and is not in the trash bin.
+// When the node is in the trash bin, only the lock file of the revision goes.
 func (p *orphanPurger) purgeRevision(basePath, dir, name string) error {
 	nodePath := filepath.Join(dir, _revisionRegex.FindStringSubmatch(name)[1])
 	if exists(nodePath) {
 		return nil
 	}
-	trashed, err := filepath.Glob(nodePath + node.TrashIDDelimiter + "*")
+	trashed, err := isTrashed(nodePath)
 	if err != nil {
 		return err
 	}
-	for _, t := range trashed {
-		if !strings.HasSuffix(t, _lockSuffix) && !strings.HasSuffix(t, _metadataSuffix) {
-			return nil
-		}
+	if trashed {
+		return p.removeLockFile(filepath.Join(dir, name) + _lockSuffix)
 	}
 
 	path := filepath.Join(dir, name)
@@ -258,6 +271,20 @@ func (p *orphanPurger) verbosef(format string, args ...any) {
 	if p.opts.Verbose {
 		fmt.Fprintf(p.opts.Out, format, args...)
 	}
+}
+
+// isTrashed returns true when the node is in the trash bin: a node file or directory <node>.T.<time> exists
+func isTrashed(nodePath string) (bool, error) {
+	trashed, err := filepath.Glob(nodePath + node.TrashIDDelimiter + "*")
+	if err != nil {
+		return false, err
+	}
+	for _, t := range trashed {
+		if !strings.HasSuffix(t, _lockSuffix) && !strings.HasSuffix(t, _metadataSuffix) {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 func exists(path string) bool {

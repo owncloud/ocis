@@ -235,8 +235,9 @@ ocis trash purge-orphaned-files -p /base/path/storage/users
 
 The command removes:
 
-* A lock file (`.mlock`) when its node does not exist.
-* A revision with its metadata file, its lock file and its blob, when its node does not exist and is not in the trash bin.
+* For a node in the trash bin: the lock files of its revisions. The lock file of the node and the revisions stay, because a restore uses them again.
+* For a node that does not exist and is not in the trash bin: its lock file, and its revisions with their metadata files, their lock files and their blobs.
+* Any other lock file (`.mlock`) when its file does not exist.
 
 This command provides additional options:
 
