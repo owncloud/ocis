@@ -1,8 +1,6 @@
 package xmlenc
 
 import (
-
-	// nolint: gas
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
@@ -51,8 +49,8 @@ func (e ErrIncorrectKeyType) Error() string {
 }
 
 // Decrypt decrypts the encrypted data using the provided key. If the
-// data are encrypted using AES or 3DEC, then the key should be a []byte.
-// If the data are encrypted with PKCS1v15 or RSA-OAEP-MGF1P then key should
+// data are encrypted using AES, then the key should be a []byte.
+// If the data are encrypted with RSA-OAEP-MGF1P then key should
 // be a *rsa.PrivateKey.
 func Decrypt(key interface{}, ciphertextEl *etree.Element) ([]byte, error) {
 	encryptionMethodEl := ciphertextEl.FindElement("./EncryptionMethod")
