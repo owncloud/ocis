@@ -107,7 +107,6 @@ type CS3 struct {
 	dataGatewayClient *http.Client
 }
 
-
 // NewCS3 returns a new CS3 instance. Use an authenticated context and be sure to define SpaceRoot manually.
 func NewCS3(gwAddr, providerAddr string) (s *CS3) {
 	return &CS3{
@@ -485,44 +484,6 @@ func (cs3 *CS3) Delete(ctx context.Context, path string) error {
 	}
 
 	return nil
-}
-
-// WasRecentlyDeleted checks the recycle bin within a short window so a
-// long-settled deletion doesn't block a legitimate empty read.
-func (cs3 *CS3) WasRecentlyDeleted(ctx context.Context, path string) (bool, error) {
-	ctx, span := tracer.Start(ctx, "WasRecentlyDeleted")
-	defer span.End()
-
-	client, err := cs3.providerClient()
-	if err != nil {
-		return false, err
-	}
-	ctx, err = cs3.getAuthContext(ctx)
-	if err != nil {
-		return false, err
-	}
-
-	target := utils.MakeRelativePath(path)
-	now := time.Now()
-	res, err := client.ListRecycle(ctx, &provider.ListRecycleRequest{
-		Ref:      &provider.Reference{ResourceId: cs3.SpaceRoot},
-		FromTs:   utils.TimeToTS(now.Add(-5 * time.Minute)),
-		ToTs:     utils.TimeToTS(now),
-		PageSize: 1000,
-	})
-	if err != nil {
-		return false, err
-	}
-	if res.Status.Code != rpc.Code_CODE_OK {
-		return false, errtypes.NewErrtypeFromStatus(res.Status)
-	}
-
-	for _, item := range res.RecycleItems {
-		if item.GetRef().GetPath() == target {
-			return true, nil
-		}
-	}
-	return false, nil
 }
 
 // ReadDir returns the entries in a given directory
