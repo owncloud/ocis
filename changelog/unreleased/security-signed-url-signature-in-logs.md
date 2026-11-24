@@ -9,4 +9,4 @@ these signatures to send signed requests as the user named in the URL.
 The proxy now logs only the request path and a generic "signature mismatch",
 and compares signatures in constant time.
 
-https://github.com/owncloud/ocis/pull/XXXXX
+https://github.com/owncloud/ocis/pull/13569
