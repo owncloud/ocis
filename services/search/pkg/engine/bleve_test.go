@@ -401,6 +401,28 @@ var _ = Describe("Bleve", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(countB).To(Equal(uint64(1)))
 		})
+
+		It("keeps the date of a failed extraction, and survives a tag update", func() {
+			childResource.ExtractionFailedAt = "2026-11-17T12:00:00Z"
+			Expect(eng.Upsert(childResource.ID, childResource)).To(Succeed())
+
+			Expect(eng.Update(childResource.ID, func(r *engine.Resource) { r.Tags = []string{"later"} })).To(Succeed())
+
+			r, err := eng.Lookup(childResource.ID)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(r.ExtractionFailedAt).To(Equal("2026-11-17T12:00:00Z"))
+			Expect(r.Extracted).To(BeFalse())
+			Expect(r.Tags).To(ConsistOf("later"))
+		})
+
+		It("does not make the failure date searchable", func() {
+			childResource.ExtractionFailedAt = "2026-11-17T12:00:00Z"
+			Expect(eng.Upsert(childResource.ID, childResource)).To(Succeed())
+
+			res, err := idx.Search(bleveSearch.NewSearchRequest(bleveSearch.NewMatchQuery("2026")))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(res.Hits.Len()).To(BeZero())
+		})
 	})
 
 	Describe("Delete", func() {
