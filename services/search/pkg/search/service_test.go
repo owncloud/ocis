@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"net"
 	"net/url"
 	"sync/atomic"
@@ -18,6 +19,7 @@ import (
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
@@ -895,6 +897,22 @@ var _ = Describe("Searchprovider", func() {
 				Expect(extracted).To(Equal([]string{"file-0"}))
 				Expect(stored).NotTo(HaveKey(file0), "the next walk must try it again")
 			})
+		})
+	})
+
+	Describe("addPhotoMetadata", func() {
+		It("does not persist non-finite float facets", func() {
+			photo := libregraph.NewPhoto()
+			photo.SetCameraMake("Canon")
+			photo.SetExposureNumerator(1)
+			photo.SetExposureDenominator(math.Inf(1))
+
+			metadata := map[string]string{}
+			search.AddPhotoMetadata(metadata, photo)
+
+			Expect(metadata).To(HaveKeyWithValue("libre.graph.photo.cameraMake", "Canon"))
+			Expect(metadata).To(HaveKeyWithValue("libre.graph.photo.exposureNumerator", "1"))
+			Expect(metadata).ToNot(HaveKey("libre.graph.photo.exposureDenominator"))
 		})
 	})
 

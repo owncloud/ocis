@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"net"
 	"path/filepath"
 	"slices"
@@ -966,11 +967,24 @@ func marshalToStringMap[T libregraph.MappedNullable](source T, target map[string
 	m, _ := source.ToMap()
 
 	for k, v := range m {
-		if v == nil {
+		if v == nil || isNonFinite(v) {
 			continue
 		}
 		target[prefix+k] = valueToString(v)
 	}
+}
+
+func isNonFinite(v any) bool {
+	var f float64
+	switch x := v.(type) {
+	case *float32:
+		f = float64(*x)
+	case *float64:
+		f = *x
+	default:
+		return false
+	}
+	return math.IsInf(f, 0) || math.IsNaN(f)
 }
 
 func valueToString(value any) string {

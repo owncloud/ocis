@@ -486,6 +486,36 @@ var _ = Describe("Driveitems", func() {
 				Expect(photo.Orientation).To(Equal(libregraph.PtrInt32(1)))
 				Expect(photo.TakenDateTime).To(Equal(new(time.Date(2018, 1, 1, 12, 34, 56, 0, time.UTC))))
 			})
+
+			It("drops non-finite photo values so the item can be encoded", func() {
+				gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(&provider.ListContainerResponse{
+					Status: status.NewOK(ctx),
+					Infos: []*provider.ResourceInfo{
+						{
+							Type:     provider.ResourceType_RESOURCE_TYPE_FILE,
+							Id:       &provider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "opaqueid"},
+							Etag:     "etag",
+							Mtime:    utils.TimeToTS(mtime),
+							MimeType: "image/jpeg",
+							ArbitraryMetadata: &provider.ArbitraryMetadata{
+								Metadata: map[string]string{
+									"libre.graph.photo.cameraMake":          "Canon",
+									"libre.graph.photo.exposureDenominator": "+Inf",
+								},
+							},
+						},
+					},
+				}, nil)
+
+				res := assertItemsList(1)
+				photo := res.Value[0].Photo
+
+				Expect(photo).ToNot(BeNil())
+				Expect(photo.CameraMake).To(Equal(new("Canon")))
+				Expect(photo.ExposureDenominator).To(BeNil())
+				_, err := json.Marshal(res)
+				Expect(err).ToNot(HaveOccurred())
+			})
 		})
 	})
 })

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"net/url"
 	"path"
@@ -592,6 +593,9 @@ func unmarshalStringMap(logger *log.Logger, out any, flatMap map[string]string, 
 				default:
 					err = errors.New("unsupported type")
 					logger.Error().Err(err).Str("type", t.String()).Str("mapKey", mapKey).Msg("target field type for value of mapKey is not supported")
+				}
+				if f, isFloat := tmp.(float64); err == nil && isFloat && (math.IsInf(f, 0) || math.IsNaN(f)) {
+					err = errors.New("non-finite float value")
 				}
 				if err != nil {
 					logger.Error().Err(err).Str("mapKey", mapKey).Msg("unmarshalling failed")
