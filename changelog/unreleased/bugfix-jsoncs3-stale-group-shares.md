@@ -98,7 +98,7 @@ user or group has no entry for the space of the share, or when the share ID
 has no delimiter. Before, the panic stopped the sharing service, also in an
 unshare and in the cleanup of orphaned shares.
 
-https://github.com/owncloud/ocis/pull/13560
+https://github.com/owncloud/ocis/pull/13561
 https://github.com/owncloud/ocis/pull/13545
 https://github.com/owncloud/reva/pull/833
 https://github.com/owncloud/reva/pull/813
