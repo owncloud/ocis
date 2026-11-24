@@ -16,7 +16,7 @@ type ErrorFunction func(w http.ResponseWriter, r *http.Request, err error)
 // "Forbidden" message to the user.
 func DefaultOnError(w http.ResponseWriter, _ *http.Request, err error) {
 	if parseErr, ok := err.(*saml.InvalidResponseError); ok {
-		log.Printf("WARNING: received invalid saml response: %s (now: %s) %s",
+		log.Printf("WARNING: received invalid saml response: %s (now: %s) %s", //nolint:gosec // logging the invalid response is intended
 			parseErr.Response, parseErr.Now, parseErr.PrivateErr)
 	} else {
 		log.Printf("ERROR: %s", err)

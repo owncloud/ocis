@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"slices"
 
 	"github.com/gobwas/httphead"
 )
@@ -22,12 +23,7 @@ func SelectFromSlice(accept []string) func(string) bool {
 		}
 	}
 	return func(p string) bool {
-		for _, ok := range accept {
-			if p == ok {
-				return true
-			}
-		}
-		return false
+		return slices.Contains(accept, p)
 	}
 }
 
@@ -182,18 +178,4 @@ func readLine(br *bufio.Reader) ([]byte, error) {
 
 		return line, nil
 	}
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func nonZero(a, b int) int {
-	if a != 0 {
-		return a
-	}
-	return b
 }
