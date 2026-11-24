@@ -241,7 +241,9 @@ The command removes:
 This command provides additional options:
 
 * `--dry-run` (default: `true`)\
-Do not remove any files but print the files that would be removed.
+Do not remove any files. Print a summary of the files that would be removed.
+* `--verbose` (default: `false`)\
+Print each file that is removed or kept. Without this option, the command prints only the errors and a summary.
 * `--blobstore` (default: `ocis`)\
 The blobstore type. Can be `ocis`, `s3ng` or `none`. For `s3ng`, set the S3NG environment variables of the `storage-users` service. With `none`, the orphaned revisions stay on the disk, because their metadata file holds the only reference to their blob.
 * `--min-age` (default: `1h`)\

@@ -1,6 +1,7 @@
 package command_test
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
 	"testing"
@@ -25,10 +26,19 @@ func orphanedLockFile(t *testing.T, base string) string {
 
 func runPurgeOrphanedFiles(t *testing.T, args ...string) error {
 	t.Helper()
+	_, err := runPurgeOrphanedFilesWithOutput(t, args...)
+	return err
+}
+
+func runPurgeOrphanedFilesWithOutput(t *testing.T, args ...string) (string, error) {
+	t.Helper()
+	out := &bytes.Buffer{}
 	app := &cli.App{
+		Writer:   out,
 		Commands: []*cli.Command{command.TrashPurgeOrphanedFilesCommand(config.DefaultConfig())},
 	}
-	return app.Run(append([]string{"ocis", "purge-orphaned-files"}, args...))
+	err := app.Run(append([]string{"ocis", "purge-orphaned-files"}, args...))
+	return out.String(), err
 }
 
 func TestTrashPurgeOrphanedFilesIsDryRunByDefault(t *testing.T) {
@@ -63,4 +73,18 @@ func TestTrashPurgeOrphanedFilesRejectsUnknownBlobstore(t *testing.T) {
 	orphanedLockFile(t, base)
 
 	require.Error(t, runPurgeOrphanedFiles(t, "--basepath", base, "--blobstore", "unknown"))
+}
+
+func TestTrashPurgeOrphanedFilesPrintsEachFileWithVerbose(t *testing.T) {
+	base := t.TempDir()
+	lockFile := orphanedLockFile(t, base)
+
+	quiet, err := runPurgeOrphanedFilesWithOutput(t, "--basepath", base)
+	require.NoError(t, err)
+	verbose, err := runPurgeOrphanedFilesWithOutput(t, "--basepath", base, "--verbose")
+	require.NoError(t, err)
+
+	require.NotContains(t, quiet, lockFile)
+	require.Contains(t, quiet, "would remove 1 lock files")
+	require.Contains(t, verbose, "would remove "+lockFile)
 }

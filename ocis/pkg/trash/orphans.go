@@ -39,8 +39,10 @@ type PurgeOrphansOptions struct {
 	Blobstore BlobDeleter
 	// MinAge is the minimum age of a file. Younger files stay on the disk.
 	MinAge time.Duration
-	// DryRun prints the files, but does not remove them.
+	// DryRun does not remove files. It only reports them.
 	DryRun bool
+	// Verbose prints each file that is removed or kept. Without it, only errors and the summary are printed.
+	Verbose bool
 	// Out receives the report.
 	Out io.Writer
 }
@@ -168,7 +170,7 @@ func (p *orphanPurger) purgeRevision(basePath, dir, name string) error {
 	}
 
 	if p.opts.Blobstore == nil {
-		fmt.Fprintln(p.opts.Out, "skip revision without blobstore", path)
+		p.verbosef("skip revision without blobstore %s\n", path)
 		return nil
 	}
 
@@ -206,13 +208,13 @@ func (p *orphanPurger) deleteBlob(basePath, revisionPath string) error {
 
 	spaceID := spaceIDFromPath(basePath, revisionPath)
 	if p.opts.DryRun {
-		fmt.Fprintf(p.opts.Out, "would delete blob %s of space %s\n", blobID, spaceID)
+		p.verbosef("would delete blob %s of space %s\n", blobID, spaceID)
 		return nil
 	}
 	if err := p.opts.Blobstore.Delete(&node.Node{SpaceID: spaceID, BlobID: blobID}); err != nil {
 		return err
 	}
-	fmt.Fprintf(p.opts.Out, "deleted blob %s of space %s\n", blobID, spaceID)
+	p.verbosef("deleted blob %s of space %s\n", blobID, spaceID)
 	return nil
 }
 
@@ -227,6 +229,7 @@ func (p *orphanPurger) isYoung(path string) (bool, error) {
 	}
 	if time.Since(info.ModTime()) < p.opts.MinAge {
 		p.skipped++
+		p.verbosef("skip young file %s\n", path)
 		return true, nil
 	}
 	return false, nil
@@ -235,7 +238,7 @@ func (p *orphanPurger) isYoung(path string) (bool, error) {
 func (p *orphanPurger) remove(path string) error {
 	if p.opts.DryRun {
 		if exists(path) {
-			fmt.Fprintln(p.opts.Out, "would remove", path)
+			p.verbosef("would remove %s\n", path)
 		}
 		return nil
 	}
@@ -246,8 +249,15 @@ func (p *orphanPurger) remove(path string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintln(p.opts.Out, "removed", path)
+	p.verbosef("removed %s\n", path)
 	return nil
+}
+
+// verbosef prints the message only in verbose mode
+func (p *orphanPurger) verbosef(format string, args ...any) {
+	if p.opts.Verbose {
+		fmt.Fprintf(p.opts.Out, format, args...)
+	}
 }
 
 func exists(path string) bool {

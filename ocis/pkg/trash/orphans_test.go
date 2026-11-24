@@ -71,14 +71,15 @@ func existing(t *testing.T, base string) []string {
 
 func purge(t *testing.T, base string, bs trash.BlobDeleter, dryRun bool) string {
 	t.Helper()
+	return purgeWithOptions(t, base, trash.PurgeOrphansOptions{Blobstore: bs, DryRun: dryRun})
+}
+
+func purgeWithOptions(t *testing.T, base string, opts trash.PurgeOrphansOptions) string {
+	t.Helper()
 	out := &bytes.Buffer{}
-	err := trash.PurgeOrphanedFiles(base, trash.PurgeOrphansOptions{
-		Blobstore: bs,
-		MinAge:    _minAge,
-		DryRun:    dryRun,
-		Out:       out,
-	})
-	require.NoError(t, err)
+	opts.MinAge = _minAge
+	opts.Out = out
+	require.NoError(t, trash.PurgeOrphanedFiles(base, opts))
 	return out.String()
 }
 
@@ -204,8 +205,56 @@ func TestPurgeOrphanedFilesDryRunRemovesNothing(t *testing.T) {
 
 	require.ElementsMatch(t, []string{_nodeID + ".mlock", _revision, _revision + ".mpk"}, existing(t, base))
 	require.Empty(t, bs.deleted)
+	require.Contains(t, out, "would remove 1 lock files and 1 revisions")
+}
+
+func TestPurgeOrphanedFilesPrintsOnlyTheSummaryByDefault(t *testing.T) {
+	base := t.TempDir()
+	dir := nodesDir(base)
+	touch(t, filepath.Join(dir, _nodeID+".mlock"), old)
+
+	out := purge(t, base, &fakeBlobstore{}, false)
+
+	require.NotContains(t, out, dir)
+	require.Contains(t, out, "removed 1 lock files and 0 revisions")
+}
+
+func TestPurgeOrphanedFilesVerbosePrintsEachFile(t *testing.T) {
+	base := t.TempDir()
+	dir := nodesDir(base)
+	touch(t, filepath.Join(dir, _nodeID+".mlock"), old)
+	touch(t, filepath.Join(dir, _revision), old)
+	writeMetadata(t, filepath.Join(dir, _revision+".mpk"), "blob-2", old)
+
+	out := purgeWithOptions(t, base, trash.PurgeOrphansOptions{Blobstore: &fakeBlobstore{}, DryRun: true, Verbose: true})
+
 	require.Contains(t, out, "would remove "+filepath.Join(dir, _nodeID+".mlock"))
+	require.Contains(t, out, "would delete blob blob-2 of space "+_spaceID)
 	require.Contains(t, out, "would remove "+filepath.Join(dir, _revision))
+	require.Contains(t, out, "would remove "+filepath.Join(dir, _revision+".mpk"))
+}
+
+func TestPurgeOrphanedFilesVerbosePrintsYoungFiles(t *testing.T) {
+	base := t.TempDir()
+	dir := nodesDir(base)
+	touch(t, filepath.Join(dir, _nodeID+".mlock"), young)
+
+	out := purgeWithOptions(t, base, trash.PurgeOrphansOptions{Blobstore: &fakeBlobstore{}, Verbose: true})
+
+	require.Contains(t, out, "skip young file "+filepath.Join(dir, _nodeID+".mlock"))
+}
+
+func TestPurgeOrphanedFilesVerbosePrintsRevisionsWithoutBlobstore(t *testing.T) {
+	base := t.TempDir()
+	dir := nodesDir(base)
+	touch(t, filepath.Join(dir, _revision), old)
+	writeMetadata(t, filepath.Join(dir, _revision+".mpk"), "blob-2", old)
+
+	quiet := purgeWithOptions(t, base, trash.PurgeOrphansOptions{})
+	verbose := purgeWithOptions(t, base, trash.PurgeOrphansOptions{Verbose: true})
+
+	require.NotContains(t, quiet, dir)
+	require.Contains(t, verbose, "skip revision without blobstore "+filepath.Join(dir, _revision))
 }
 
 func TestPurgeOrphanedFilesFailsWithoutNodes(t *testing.T) {

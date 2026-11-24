@@ -3,7 +3,6 @@ package command
 import (
 	"errors"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/owncloud/ocis/v2/ocis/pkg/trash"
@@ -97,6 +96,10 @@ func TrashPurgeOrphanedFilesCommand(cfg *config.Config) *cli.Command {
 				Usage: "do not delete anything, just print what would be deleted",
 				Value: true,
 			},
+			&cli.BoolFlag{
+				Name:  "verbose",
+				Usage: "print each file that is removed or kept. Without it, only errors and the summary are printed",
+			},
 		},
 		Action: func(c *cli.Context) error {
 			basePath := c.String("basepath")
@@ -119,7 +122,8 @@ func TrashPurgeOrphanedFilesCommand(cfg *config.Config) *cli.Command {
 				Blobstore: bs,
 				MinAge:    c.Duration("min-age"),
 				DryRun:    c.Bool("dry-run"),
-				Out:       os.Stdout,
+				Verbose:   c.Bool("verbose"),
+				Out:       c.App.Writer,
 			}); err != nil {
 				fmt.Println(err)
 				return err
