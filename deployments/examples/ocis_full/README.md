@@ -84,6 +84,14 @@ Open Grafana at `http://localhost:3000`, then select **Explore** and the **Tempo
 - `{ resource.service.name = "sharing" && name = "ListReceivedShares" }`: the share listings. Each oCIS service sends its own service name, for example `sharing`, `storage-system` or `proxy`.
 - `{ resource.service.name = "storage-system" && name = "loadAttributes" } >> { name = "os.OpenFile" }`: the attribute reads that go to the disk. A `loadAttributes` span with no `os.OpenFile` child is a hit in the attribute cache.
 
+Tempo 3 also answers TraceQL metrics queries, with no additional configuration. They give rates and percentiles over a time range. Examples for the share manager:
+- `{ resource.service.name = "sharing" && name = "Download" } | count_over_time() by (span.metadata.result)`: the downloads of the share manager by result (`200`, `304`, `404`, `conflict` or `error`).
+- `{ resource.service.name = "sharing" && name = "Upload" && span.metadata.conflict = true } | rate()`: the CAS conflicts for each second.
+- `{ resource.service.name = "sharing" && name = "Grab lock" } | quantile_over_time(duration, .99)`: the 99th percentile of the wait for a lock in the share caches.
+- `{ resource.service.name = "sharing" && name = "getAuthContext" } | rate()`: the machine authentications of the metadata storage.
+
+The span attributes `metadata.path`, `metadata.result`, `metadata.bytes`, `metadata.condition` and `metadata.conflict` come from the metadata storage of reva. Older oCIS versions do not have them.
+
 The ports of Tempo (`4317` for OTLP gRPC and `3200` for the HTTP API) and of Grafana (`3000`) are open only on `127.0.0.1`. You can change them with `TEMPO_OTLP_GRPC_PORT`, `TEMPO_HTTP_PORT` and `GRAFANA_PORT`.
 
 To trace an oCIS binary that runs on the host, start only Tempo and Grafana:
