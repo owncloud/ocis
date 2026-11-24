@@ -15,31 +15,48 @@ test.describe('Vault Mode', { tag: '@predefined-users' }, () => {
     await ui.userLogsIn({ stepUser: 'Alice' })
   })
 
-  test('User with vault permission can access Vault mode with second factor authentication', async () => {
-    await ui.userIsInDriveMode({
-      stepUser: 'Alice'
+  test('Switching between Drive and Vault modes', async () => {
+    await ui.userIsInDriveMode({ stepUser: 'Alice' })
+
+    await ui.userCreatesResources({
+      stepUser: 'Alice',
+      resources: [{ name: 'test.txt', type: 'txtFile', content: 'some content' }]
+    })
+    await ui.userShouldSeeResources({
+      listType: 'files list',
+      stepUser: 'Alice',
+      resources: ['test.txt']
     })
 
-    await ui.userSwitchesToVaultMode({
-      stepUser: 'Alice'
-    })
-
-    await ui.userIsRedirectedToAuthenticatorPage({
-      stepUser: 'Alice'
-    })
-
+    await ui.userSwitchesToVaultMode({ stepUser: 'Alice' })
+    await ui.userIsRedirectedToAuthenticatorPage({ stepUser: 'Alice' })
     await ui.userAuthenticatesWithOTP({ stepUser: 'Alice', deviceName: 'test' })
+    await ui.userIsInVaultMode({ stepUser: 'Alice' })
 
-    await ui.userIsInVaultMode({
-      stepUser: 'Alice'
+    await ui.userCreatesResources({
+      stepUser: 'Alice',
+      resources: [{ name: 'lorem.txt', type: 'txtFile', content: 'some content' }]
+    })
+    await ui.userShouldNotSeeTheResources({
+      listType: 'files list',
+      stepUser: 'Alice',
+      resources: ['test.txt']
+    })
+    await ui.userShouldSeeResources({
+      listType: 'files list',
+      stepUser: 'Alice',
+      resources: ['lorem.txt']
     })
 
-    await ui.userSwitchesToDriveMode({
-      stepUser: 'Alice'
+    await ui.userSwitchesToDriveMode({ stepUser: 'Alice' })
+    await ui.userIsInDriveMode({ stepUser: 'Alice' })
+
+    await ui.userShouldNotSeeTheResources({
+      listType: 'files list',
+      stepUser: 'Alice',
+      resources: ['lorem.txt']
     })
 
-    await ui.userIsInDriveMode({
-      stepUser: 'Alice'
-    })
+    await ui.userLogsOut({ stepUser: 'Alice' })
   })
 })
