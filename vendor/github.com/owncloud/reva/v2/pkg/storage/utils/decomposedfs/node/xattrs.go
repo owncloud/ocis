@@ -25,7 +25,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/metadata"
 	"github.com/pkg/xattr"
 )
 
@@ -122,7 +121,7 @@ func (n *Node) XattrsWithReader(ctx context.Context, r io.Reader) (Attributes, e
 	if n.ID == "" {
 		// Do not try to read the attribute of an empty node. The InternalPath points to the
 		// base nodes directory in this case.
-		return Attributes{}, &xattr.Error{Op: "node.XattrsWithReader", Path: n.InternalPath(), Err: metadata.ErrAttrUnset}
+		return Attributes{}, &xattr.Error{Op: "node.XattrsWithReader", Path: n.InternalPath(), Err: xattr.ENOATTR}
 	}
 
 	if n.xattrsCache != nil {
@@ -163,7 +162,7 @@ func (n *Node) Xattr(ctx context.Context, key string) ([]byte, error) {
 	if n.ID == "" {
 		// Do not try to read the attribute of an empty node. The InternalPath points to the
 		// base nodes directory in this case.
-		return []byte{}, &xattr.Error{Op: "node.Xattr", Path: path, Name: key, Err: metadata.ErrAttrUnset}
+		return []byte{}, &xattr.Error{Op: "node.Xattr", Path: path, Name: key, Err: xattr.ENOATTR}
 	}
 
 	if n.xattrsCache == nil {
@@ -177,7 +176,8 @@ func (n *Node) Xattr(ctx context.Context, key string) ([]byte, error) {
 	if val, ok := n.xattrsCache[key]; ok {
 		return val, nil
 	}
-	return []byte{}, &xattr.Error{Op: "node.Xattr", Path: path, Name: key, Err: metadata.ErrAttrUnset}
+	// wrap the error as xattr does
+	return []byte{}, &xattr.Error{Op: "node.Xattr", Path: path, Name: key, Err: xattr.ENOATTR}
 }
 
 // XattrString returns the string representation of an attribute
