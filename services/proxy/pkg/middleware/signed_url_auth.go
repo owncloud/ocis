@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"crypto/hmac"
 	"crypto/sha512"
 	"encoding/hex"
 	"errors"
@@ -211,8 +212,9 @@ func (m SignedURLAuthenticator) signatureIsValid(req *http.Request) (err error) 
 		return nil
 	}
 
-	computedSignature := m.createSignature(u, signingKey)
-	return fmt.Errorf("signature mismatch: expected %s != actual %s", computedSignature, signatureInURL)
+	// Never put the computed signature into the error: it is a valid
+	// credential for the URL the caller chose, and the error gets logged.
+	return errors.New("signature mismatch")
 }
 
 // readSigningKey reads a signing-key record from the store. It treats
@@ -235,14 +237,14 @@ func (m SignedURLAuthenticator) readSigningKey(key string) (value []byte, ok boo
 // signatureMatches checks the signature against the given key, including
 // the $->%24 reverse-proxy workaround for https://github.com/owncloud/ocis/issues/10180.
 func (m SignedURLAuthenticator) signatureMatches(u, signatureInURL string, signingKey []byte) bool {
-	if m.createSignature(u, signingKey) == signatureInURL {
+	if hmac.Equal([]byte(m.createSignature(u, signingKey)), []byte(signatureInURL)) {
 		return true
 	}
 
 	// try a workaround for https://github.com/owncloud/ocis/issues/10180
 	// Some reverse proxies might replace $ with %24 in the URL leading to a mismatch in the signature
 	uWorkaround := strings.Replace(u, "$", "%24", 1)
-	return m.createSignature(uWorkaround, signingKey) == signatureInURL
+	return hmac.Equal([]byte(m.createSignature(uWorkaround, signingKey)), []byte(signatureInURL))
 }
 
 func (m SignedURLAuthenticator) buildUrlToSign(req *http.Request) string {
@@ -317,12 +319,13 @@ func (m SignedURLAuthenticator) Authenticate(r *http.Request) (*http.Request, er
 	r = r.WithContext(ctx)
 
 	if err := m.validate(r); err != nil {
+		// Log the path only: the query carries the signature, which can still
+		// be valid (e.g. when only the HTTP method did not match).
 		m.Logger.Error().
 			Err(err).
 			Str("authenticator", "signed_url").
 			Str("path", r.URL.Path).
-			Str("url", r.URL.String()).
-			Msg("Could not get user by claim")
+			Msg("signed URL validation failed")
 		return nil, ErrAuthenticationFailed
 	}
 
