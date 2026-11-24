@@ -100,14 +100,16 @@ func DateSN(prefix string) string {
 }
 
 // DateSNOpt 基于时间生成唯一编号
+// A DateSNOpt must not be copied after first use.
 type DateSNOpt struct {
 	Layout string // time layout
 	// RandMax   int    // rand max
-	DateLen   int   // 时间格式长度，后面部分将会进行进制转换 默认 8(yyyyMMdd)
-	ConvBase  int   // DateLen 之后的转换 base 2-64. default 36
+	DateLen  int // 时间格式长度，后面部分将会进行进制转换 默认 8(yyyyMMdd)
+	ConvBase int // DateLen 之后的转换 base 2-64. default 36
 	// EnableSeq bool  // 需要高并发生成时可以启用自增序号。默认不启用
 	SeqMaxVal int   // 自增序号最大值，之后后自动重置
 	globalSeq int64 // 自增，确保同一时刻生成的编号不重复. EnableSeq=true 时启用
+	prepareMu sync.Mutex
 }
 
 // default setting: {时间年到秒14位}
@@ -123,8 +125,8 @@ func NewDateSNOpt() *DateSNOpt {
 	return &DateSNOpt{
 		Layout: "20060102150405.000000",
 		// RandMax:   8999,
-		DateLen:   8,
-		ConvBase:  36,
+		DateLen:  8,
+		ConvBase: 36,
 		// EnableSeq: true,
 		SeqMaxVal: 8999,
 	}
@@ -132,6 +134,9 @@ func NewDateSNOpt() *DateSNOpt {
 
 // prepare for generate
 func (do *DateSNOpt) prepare() {
+	do.prepareMu.Lock()
+	defer do.prepareMu.Unlock()
+
 	if do.DateLen <= 0 {
 		do.DateLen = 8 // default 8 for yyyyMMdd
 	}

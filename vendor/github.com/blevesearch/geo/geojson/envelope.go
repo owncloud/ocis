@@ -244,34 +244,22 @@ func checkEnvelopeContainsShape(s2rect *s2.Rect, shapeIn,
 
 	// check if the other shape is a polygon.
 	if p2, ok := other.(*Polygon); ok {
-		return s2rect.Contains(p2.s2pgn.RectBound()), nil
+		return rectangleContainsPolygon(s2rect, p2.s2pgn), nil
 	}
 
 	// check if the other shape is a multipolygon.
 	if p2, ok := other.(*MultiPolygon); ok {
-		// check the containment for every polygon in the collection.
-		for _, s2pgn := range p2.s2pgns {
-			if !s2rect.Contains(s2pgn.RectBound()) {
-				return false, nil
-			}
-		}
-
-		return true, nil
+		return rectangleContainsPolygons(s2rect, p2.s2pgns), nil
 	}
 
 	// check if the other shape is a linestring.
 	if p2, ok := other.(*LineString); ok {
-		return s2rect.Contains(p2.pl.RectBound()), nil
+		return rectangleContainsLineStrings(s2rect, []*s2.Polyline{p2.pl}), nil
 	}
 
 	// check if the other shape is a multilinestring.
 	if p2, ok := other.(*MultiLineString); ok {
-		for _, pl := range p2.pls {
-			if !s2rect.Contains(pl.RectBound()) {
-				return false, nil
-			}
-		}
-		return true, nil
+		return rectangleContainsLineStrings(s2rect, p2.pls), nil
 	}
 
 	if gc, ok := other.(*GeometryCollection); ok {
