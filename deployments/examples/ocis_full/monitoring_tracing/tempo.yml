@@ -1,0 +1,59 @@
+---
+# Grafana Tempo stores the traces of oCIS. Grafana shows them.
+# Enable this file with TEMPO=:monitoring_tracing/tempo.yml in the .env file.
+# Use it only for tests and debugging.
+services:
+  ocis:
+    # oCIS waits only 1 second for the trace endpoint at the start, and then
+    # fails. Thus start Tempo first.
+    depends_on:
+      tempo:
+        condition: service_started
+    environment:
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: "otlp"
+      OCIS_TRACING_ENDPOINT: tempo:4317
+
+  tempo:
+    image: grafana/tempo:${TEMPO_DOCKER_TAG:-3.1.1}
+    # release notes: https://github.com/grafana/tempo/releases
+    command: "-target=all -config.file=/etc/tempo.yaml"
+    networks:
+      ocis-net:
+    volumes:
+      - ./config/tempo/tempo.yaml:/etc/tempo.yaml:ro
+      - tempo-data:/var/tempo
+    ports:
+      # The ports are open only on the host. A local oCIS binary can then also
+      # send traces with OCIS_TRACING_ENDPOINT=localhost:4317.
+      - "127.0.0.1:${TEMPO_OTLP_GRPC_PORT:-4317}:4317"
+      - "127.0.0.1:${TEMPO_HTTP_PORT:-3200}:3200"
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+
+  grafana:
+    image: grafana/grafana:${GRAFANA_DOCKER_TAG:-13.3.2}
+    # release notes: https://github.com/grafana/grafana/releases
+    networks:
+      ocis-net:
+    depends_on:
+      - tempo
+    volumes:
+      - ./config/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
+    environment:
+      # Anonymous admin access. Do not use this on a public host.
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+    ports:
+      - "127.0.0.1:${GRAFANA_PORT:-3000}:3000"
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+
+volumes:
+  tempo-data:
+
+networks:
+  ocis-net:

@@ -70,3 +70,27 @@ It is reachable at `https://${OCIS_MCP_DOMAIN:-mcp.owncloud.test}` once enabled.
 - `OCIS_MCP_HTTP_SECRET` — a shared secret every MCP client must send as `Authorization: Bearer <secret>`. The container refuses to start without it.
 - `OCIS_MCP_APP_TOKEN_USER` / `OCIS_MCP_APP_TOKEN_VALUE` — an oCIS app token, created with `docker-compose exec ocis ocis auth-app create --user-name="admin" --expiration="8760h"`.
   **Note:** the `auth-app` service is not started by default — add `auth-app` to `START_ADDITIONAL_SERVICES` in `.env` first, or the command above will silently create an empty token.
+
+### Tracing with Grafana Tempo
+
+[Grafana Tempo](https://grafana.com/oss/tempo/) stores the traces of oCIS, and Grafana shows them. Use this setup only for tests and debugging. Grafana gives admin access with no login.
+
+To enable it, uncomment this variable in the `.env` file:
+- `TEMPO=:monitoring_tracing/tempo.yml`
+
+The file sets the tracing settings of oCIS. It sends the traces to `tempo:4317`, also when `MONITORING` is enabled. oCIS waits only 1 second for the trace endpoint at the start, so the file starts Tempo before oCIS.
+
+Open Grafana at `http://localhost:3000`, then select **Explore** and the **Tempo** data source. Example TraceQL queries:
+- `{ resource.service.name = "sharing" && name = "ListReceivedShares" }`: the share listings. Each oCIS service sends its own service name, for example `sharing`, `storage-system` or `proxy`.
+- `{ resource.service.name = "storage-system" && name = "loadAttributes" } >> { name = "os.OpenFile" }`: the attribute reads that go to the disk. A `loadAttributes` span with no `os.OpenFile` child is a hit in the attribute cache.
+
+The ports of Tempo (`4317` for OTLP gRPC and `3200` for the HTTP API) and of Grafana (`3000`) are open only on `127.0.0.1`. You can change them with `TEMPO_OTLP_GRPC_PORT`, `TEMPO_HTTP_PORT` and `GRAFANA_PORT`.
+
+To trace an oCIS binary that runs on the host, start only Tempo and Grafana:
+
+```bash
+docker compose up -d tempo grafana
+OCIS_TRACING_ENABLED=true OCIS_TRACING_TYPE=otlp OCIS_TRACING_ENDPOINT=localhost:4317 ocis server
+```
+
+The traces stay in the `tempo-data` volume. Remove the volume to delete them.
