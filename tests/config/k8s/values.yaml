@@ -16,6 +16,8 @@ insecure:
 features:
   authapp:
     enabled: false
+  keycloak:
+    enabled: false
   vault:
     enabled: false
   mfa:
