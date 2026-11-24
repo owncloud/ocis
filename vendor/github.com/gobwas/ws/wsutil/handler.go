@@ -3,11 +3,10 @@ package wsutil
 import (
 	"errors"
 	"io"
-	"io/ioutil"
 	"strconv"
 
-	"github.com/gobwas/pool/pbytes"
 	"github.com/gobwas/ws"
+	"github.com/gobwas/ws/internal/pool"
 )
 
 // ClosedError returned when peer has closed the connection with appropriate
@@ -81,11 +80,12 @@ func (c ControlHandler) HandlePing(h ws.Header) error {
 	}
 
 	// In other way reply with Pong frame with copied payload.
-	p := pbytes.GetLen(int(h.Length) + ws.HeaderSize(ws.Header{
+	bp := pool.GetBytes(int(h.Length) + ws.HeaderSize(ws.Header{
 		Length: h.Length,
 		Masked: c.State.ClientSide(),
 	}))
-	defer pbytes.Put(p)
+	defer pool.PutBytes(bp)
+	p := *bp
 
 	// Deal with ciphering i/o:
 	// Masking key is used to mask the "Payload data" defined in the same
@@ -116,14 +116,15 @@ func (c ControlHandler) HandlePong(h ws.Header) error {
 		return nil
 	}
 
-	buf := pbytes.GetLen(int(h.Length))
-	defer pbytes.Put(buf)
+	bp := pool.GetBytes(int(h.Length))
+	defer pool.PutBytes(bp)
+	buf := *bp
 
 	// Discard pong message according to the RFC6455:
 	// A Pong frame MAY be sent unsolicited. This serves as a
 	// unidirectional heartbeat. A response to an unsolicited Pong frame
 	// is not expected.
-	_, err := io.CopyBuffer(ioutil.Discard, c.Src, buf)
+	_, err := io.CopyBuffer(io.Discard, c.Src, buf)
 
 	return err
 }
@@ -153,11 +154,12 @@ func (c ControlHandler) HandleClose(h ws.Header) error {
 	}
 
 	// Prepare bytes both for reading reason and sending response.
-	p := pbytes.GetLen(int(h.Length) + ws.HeaderSize(ws.Header{
+	bp := pool.GetBytes(int(h.Length) + ws.HeaderSize(ws.Header{
 		Length: h.Length,
 		Masked: c.State.ClientSide(),
 	}))
-	defer pbytes.Put(p)
+	defer pool.PutBytes(bp)
+	p := *bp
 
 	// Get the subslice to read the frame payload out.
 	subp := p[:h.Length]
