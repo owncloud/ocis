@@ -711,17 +711,24 @@ func (t *Tree) InitNewNode(ctx context.Context, n *node.Node, fsize uint64) (met
 	}
 	h.Close()
 
+	// From here the node file is ours. A failure removes the node file and its metadata,
+	// and releases the lock. The returned unlock func does nothing.
+	fail := func(err error) (metadata.UnlockFunc, error) {
+		t.removeNewNode(ctx, n, unlock)
+		return func() error { return nil }, err
+	}
+
 	// Mark processing immediately so a reader never sees "not processing";
 	// overwritten later with the full status. acquireLock=false: lock already held.
 	if err := n.SetXattrsWithContext(ctx, map[string][]byte{prefixes.StatusPrefix: []byte(node.ProcessingStatus)}, false); err != nil {
-		return unlock, err
+		return fail(err)
 	}
 
 	_, subspan = tracer.Start(ctx, "node.CheckQuota")
 	_, err = node.CheckQuota(ctx, n.SpaceRoot, false, 0, fsize)
 	subspan.End()
 	if err != nil {
-		return unlock, err
+		return fail(err)
 	}
 
 	// link child name to parent if it is new
@@ -737,13 +744,31 @@ func (t *Tree) InitNewNode(ctx context.Context, n *node.Node, fsize uint64) (met
 		log.Info().Err(err).Msg("initNewNode: symlink failed")
 		if errors.Is(err, fs.ErrExist) {
 			log.Info().Err(err).Msg("initNewNode: symlink already exists")
-			return unlock, errtypes.AlreadyExists(n.Name)
+			return fail(errtypes.AlreadyExists(n.Name))
 		}
-		return unlock, errors.Wrap(err, "Decomposedfs: could not symlink child entry")
+		return fail(errors.Wrap(err, "Decomposedfs: could not symlink child entry"))
 	}
 	log.Info().Msg("initNewNode: symlink created")
 
 	return unlock, nil
+}
+
+// removeNewNode removes the files of a node that InitNewNode failed to create.
+// The name link stays: it belongs to the upload that created it.
+func (t *Tree) removeNewNode(ctx context.Context, n *node.Node, unlock metadata.UnlockFunc) {
+	log := appctx.GetLogger(ctx).With().Str("nodeid", n.ID).Logger()
+
+	// remove the node file before the unlock, so nothing can open the node in between
+	if err := os.Remove(n.InternalPath()); err != nil && !errors.Is(err, fs.ErrNotExist) {
+		log.Error().Err(err).Msg("could not remove new node file")
+	}
+	// the unlock removes the lock file
+	if err := unlock(); err != nil {
+		log.Error().Err(err).Msg("could not release new node lock")
+	}
+	if err := t.lookup.MetadataBackend().Purge(ctx, n.InternalPath()); err != nil && !errors.Is(err, fs.ErrNotExist) {
+		log.Error().Err(err).Msg("could not purge new node metadata")
+	}
 }
 
 func (t *Tree) removeNode(ctx context.Context, path, timeSuffix string, n *node.Node) error {
