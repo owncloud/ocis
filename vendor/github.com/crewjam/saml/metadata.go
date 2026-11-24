@@ -38,6 +38,55 @@ type EntitiesDescriptor struct {
 	EntityDescriptors   []EntityDescriptor   `xml:"urn:oasis:names:tc:SAML:2.0:metadata EntityDescriptor"`
 }
 
+// MarshalXML implements xml.Marshaler
+func (m EntitiesDescriptor) MarshalXML(e *xml.Encoder, _ xml.StartElement) error {
+	var validUntil *RelaxedTime
+	var cacheDuration *Duration
+	if m.ValidUntil != nil {
+		vu := RelaxedTime(*m.ValidUntil)
+		validUntil = &vu
+	}
+	if m.CacheDuration != nil {
+		cd := Duration(*m.CacheDuration)
+		cacheDuration = &cd
+	}
+	type Alias EntitiesDescriptor
+	aux := &struct {
+		ValidUntil    *RelaxedTime `xml:"validUntil,attr,omitempty"`
+		CacheDuration *Duration    `xml:"cacheDuration,attr,omitempty"`
+		*Alias
+	}{
+		ValidUntil:    validUntil,
+		CacheDuration: cacheDuration,
+		Alias:         (*Alias)(&m),
+	}
+	return e.Encode(aux)
+}
+
+// UnmarshalXML implements xml.Unmarshaler
+func (m *EntitiesDescriptor) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	type Alias EntitiesDescriptor
+	aux := &struct {
+		ValidUntil    *RelaxedTime `xml:"validUntil,attr,omitempty"`
+		CacheDuration *Duration    `xml:"cacheDuration,attr,omitempty"`
+		*Alias
+	}{
+		Alias: (*Alias)(m),
+	}
+	if err := d.DecodeElement(aux, &start); err != nil {
+		return err
+	}
+	if aux.ValidUntil != nil {
+		t := time.Time(*aux.ValidUntil)
+		m.ValidUntil = &t
+	}
+	if aux.CacheDuration != nil {
+		d := time.Duration(*aux.CacheDuration)
+		m.CacheDuration = &d
+	}
+	return nil
+}
+
 // Metadata as been renamed to EntityDescriptor
 //
 // This change was made to be consistent with the rest of the API which uses names

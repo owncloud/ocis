@@ -3,8 +3,8 @@ package xmlenc
 import (
 	"crypto/aes"
 	"crypto/cipher"
-	"crypto/rand"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"io"
 
@@ -58,8 +58,6 @@ func (e GCM) Encrypt(key interface{}, plaintext []byte, nonce []byte) (*etree.El
 	em.CreateAttr("Algorithm", e.algorithm)
 	em.CreateAttr("xmlns:xenc", "http://www.w3.org/2001/04/xmlenc#")
 
-	plaintext = appendPadding(plaintext, block.BlockSize())
-
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return nil, err
@@ -67,14 +65,20 @@ func (e GCM) Encrypt(key interface{}, plaintext []byte, nonce []byte) (*etree.El
 
 	if nonce == nil {
 		// generate random nonce when it's nil
-		nonce := make([]byte, aesgcm.NonceSize())
-		if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-			panic(err.Error())
+		nonce = make([]byte, aesgcm.NonceSize())
+		if _, err := io.ReadFull(RandReader, nonce); err != nil {
+			return nil, err
 		}
+	} else if len(nonce) != aesgcm.NonceSize() {
+		return nil, fmt.Errorf("nonce must be %d bytes", aesgcm.NonceSize())
 	}
 
-	ciphertext := make([]byte, len(plaintext))
-	text := aesgcm.Seal(nil, nonce, ciphertext, nil)
+	// The nonce is prefixed to the ciphertext, which is what Decrypt reads back.
+	// GCM does not use CBC padding, and Seal must see the caller's plaintext.
+	sealed := aesgcm.Seal(nil, nonce, plaintext, nil)
+	text := make([]byte, 0, len(nonce)+len(sealed))
+	text = append(text, nonce...)
+	text = append(text, sealed...)
 
 	cd := encryptedDataEl.CreateElement("xenc:CipherData")
 	cd.CreateAttr("xmlns:xenc", "http://www.w3.org/2001/04/xmlenc#")
@@ -119,6 +123,12 @@ func (e GCM) Decrypt(key interface{}, ciphertextEl *etree.Element) ([]byte, erro
 		return nil, err
 	}
 
+	// The nonce is prefixed and the tag appended. Anything shorter is malformed
+	// and would make the slicing below panic.
+	if len(ciphertext) < aesgcm.NonceSize()+aesgcm.Overhead() {
+		return nil, errors.New("ciphertext too short")
+	}
+
 	nonce := ciphertext[:aesgcm.NonceSize()]
 	text := ciphertext[aesgcm.NonceSize():]
 
@@ -136,8 +146,24 @@ var (
 		algorithm: "http://www.w3.org/2009/xmlenc11#aes128-gcm",
 		cipher:    aes.NewCipher,
 	}
+
+	// AES192GCM implements AES192-GCM mode for encryption and decryption
+	AES192GCM BlockCipher = GCM{
+		keySize:   24,
+		algorithm: "http://www.w3.org/2009/xmlenc11#aes192-gcm",
+		cipher:    aes.NewCipher,
+	}
+
+	// AES256GCM implements AES256-GCM mode for encryption and decryption
+	AES256GCM BlockCipher = GCM{
+		keySize:   32,
+		algorithm: "http://www.w3.org/2009/xmlenc11#aes256-gcm",
+		cipher:    aes.NewCipher,
+	}
 )
 
 func init() {
 	RegisterDecrypter(AES128GCM)
+	RegisterDecrypter(AES192GCM)
+	RegisterDecrypter(AES256GCM)
 }
