@@ -172,13 +172,15 @@ func (c *ContentConnector) GetFile(ctx context.Context, w http.ResponseWriter) e
 			return err
 		}
 
-		if httpResp.StatusCode != http.StatusTooEarly {
+		if httpResp.StatusCode != http.StatusTooEarly || attempt == getFileTooEarlyMaxAttempts {
 			break
 		}
 		// the file is still in async post-processing from a preceding PutFile; retry
 		httpResp.Body.Close()
-		if attempt < getFileTooEarlyMaxAttempts {
-			time.Sleep(getFileTooEarlyRetryDelay)
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-time.After(getFileTooEarlyRetryDelay):
 		}
 	}
 	defer httpResp.Body.Close()
