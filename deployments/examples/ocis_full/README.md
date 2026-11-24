@@ -82,7 +82,13 @@ The file sets the tracing settings of oCIS. It sends the traces to `tempo:4317`,
 
 Open Grafana at `http://localhost:3000`, then select **Explore** and the **Tempo** data source. Example TraceQL queries:
 - `{ resource.service.name = "sharing" && name = "ListReceivedShares" }`: the share listings. Each oCIS service sends its own service name, for example `sharing`, `storage-system` or `proxy`.
-- `{ resource.service.name = "storage-system" && name = "loadAttributes" } >> { name = "os.OpenFile" }`: the attribute reads that go to the disk. A `loadAttributes` span with no `os.OpenFile` child is a hit in the attribute cache.
+- `{ name = "loadAttributes" } >> { name = "os.OpenFile" }`: the attribute reads that go to the disk. A `loadAttributes` span with no `os.OpenFile` child is a hit in the attribute cache.
+
+Service names in the single binary: this example runs all services in one `ocis` process. Each service sets the global tracer provider at its start, and the last one wins. Some spans use this global provider, so they can carry the service name of another service:
+- the spans of the decomposedfs storage driver, for example `loadAttributes`, `os.OpenFile` and `saveAttributes`
+- the gRPC client spans
+
+For these spans, do not filter by `resource.service.name`. Filter by the trace structure instead, for example `{ resource.service.name = "sharing" && name = "ListReceivedShares" } >> { name = "loadAttributes" }`. The spans of the share manager and of the reva metadata storage use the tracer of their service, so their service name is correct. For the metadata storage, this needs reva with the change of OCISDEV-1736.
 
 Tempo 3 also answers TraceQL metrics queries, with no additional configuration. They give rates and percentiles over a time range. Examples for the share manager:
 - `{ resource.service.name = "sharing" && name = "Download" } | count_over_time() by (span.metadata.result)`: the downloads of the share manager by result (`200`, `304`, `404`, `conflict` or `error`).
@@ -91,6 +97,8 @@ Tempo 3 also answers TraceQL metrics queries, with no additional configuration. 
 - `{ resource.service.name = "sharing" && name = "getAuthContext" } | rate()`: the machine authentications of the metadata storage.
 
 The span attributes `metadata.path`, `metadata.result`, `metadata.bytes`, `metadata.condition` and `metadata.conflict` come from the metadata storage of reva. Older oCIS versions do not have them.
+
+Lost spans under load: the OpenTelemetry SDK keeps at most 2048 spans in its queue, and it drops new spans when the queue is full. It does not log this. For a load test, raise the limit in the environment of oCIS, for example `OTEL_BSP_MAX_QUEUE_SIZE=65536`. Otherwise the counts from the traces are too low.
 
 The ports of Tempo (`4317` for OTLP gRPC and `3200` for the HTTP API) and of Grafana (`3000`) are open only on `127.0.0.1`. You can change them with `TEMPO_OTLP_GRPC_PORT`, `TEMPO_HTTP_PORT` and `GRAFANA_PORT`.
 
