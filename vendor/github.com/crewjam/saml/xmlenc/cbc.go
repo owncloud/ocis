@@ -3,7 +3,7 @@ package xmlenc
 import (
 	"crypto/aes"
 	"crypto/cipher"
-	"crypto/des" // nolint: gas
+	"crypto/des" // nolint: gosec
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -61,7 +61,7 @@ func (e CBC) Encrypt(key interface{}, plaintext []byte, _ []byte) (*etree.Elemen
 
 	plaintext = appendPadding(plaintext, block.BlockSize())
 
-	iv := make([]byte, block.BlockSize())
+	iv := make([]byte, block.BlockSize(), block.BlockSize()+len(plaintext))
 	if _, err := RandReader.Read(iv); err != nil {
 		return nil, err
 	}
@@ -109,12 +109,17 @@ func (e CBC) Decrypt(key interface{}, ciphertextEl *etree.Element) ([]byte, erro
 		return nil, err
 	}
 
-	if len(ciphertext) < block.BlockSize() {
+	// The IV is prefixed, and at least one whole block must follow it.
+	// CryptBlocks panics on input that is not a whole number of blocks.
+	if len(ciphertext) < 2*block.BlockSize() {
 		return nil, errors.New("ciphertext too short")
 	}
+	if len(ciphertext)%block.BlockSize() != 0 {
+		return nil, errors.New("ciphertext is not a whole number of blocks")
+	}
 
-	iv := ciphertext[:aes.BlockSize]
-	ciphertext = ciphertext[aes.BlockSize:]
+	iv := ciphertext[:block.BlockSize()]
+	ciphertext = ciphertext[block.BlockSize():]
 
 	mode := cipher.NewCBCDecrypter(block, iv)
 	plaintext := make([]byte, len(ciphertext))
@@ -150,7 +155,10 @@ var (
 		cipher:    aes.NewCipher,
 	}
 
-	// TripleDES implements 3DES in CBC mode for encryption and decryption
+	// TripleDES implements DES in CBC mode for encryption and decryption. Despite
+	// its name and algorithm URI it takes an 8 byte single DES key, not a 24 byte
+	// 3DES one, so it is not registered as a decrypter: a document naming
+	// tripledes-cbc gets ErrAlgorithmNotImplemented instead of weak decryption.
 	TripleDES BlockCipher = CBC{
 		keySize:   8,
 		algorithm: "http://www.w3.org/2001/04/xmlenc#tripledes-cbc",
@@ -162,13 +170,12 @@ func init() {
 	RegisterDecrypter(AES128CBC)
 	RegisterDecrypter(AES192CBC)
 	RegisterDecrypter(AES256CBC)
-	RegisterDecrypter(TripleDES)
 }
 
 func appendPadding(buf []byte, blockSize int) []byte {
 	paddingBytes := blockSize - (len(buf) % blockSize)
 	padding := make([]byte, paddingBytes)
-	padding[len(padding)-1] = byte(paddingBytes)
+	padding[len(padding)-1] = byte(paddingBytes) //nolint:gosec // paddingBytes <= blockSize, which is at most 16 for AES
 	return append(buf, padding...)
 }
 
