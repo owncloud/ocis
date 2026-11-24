@@ -258,6 +258,21 @@ func (c *Cache) List(ctx context.Context, userid string) (map[string]SpaceShareI
 	if !ok {
 		return r, nil
 	}
+	if us.Etag == "" {
+		// No file exists yet. Create the empty file, so the next sync gets a
+		// NotModified instead of another NotFound. Only a listing does this.
+		// Add writes the file anyway, and RemoveMany does not create it,
+		// because it removes nothing.
+		if err := c.Persist(ctx, userid); err != nil {
+			log := appctx.GetLogger(ctx).With().Str("userID", userid).Logger()
+			if cas.IsConflict(err) {
+				// Another replica created the file. The next sync reads it.
+				log.Debug().Err(err).Msg("empty share cache file already created by another writer")
+			} else {
+				log.Warn().Err(err).Msg("failed to create empty share cache file")
+			}
+		}
+	}
 
 	for ssid, cached := range us.UserShares {
 		r[ssid] = SpaceShareIDs{
@@ -305,23 +320,12 @@ func (c *Cache) doSync(ctx context.Context, userID string, resetOnNotFound bool)
 	case nil:
 		span.AddEvent("updating local cache")
 	case errtypes.NotFound:
-		if reset, trashed := cas.DecideNotFoundReset(ctx, c.storage, userCreatedPath, resetOnNotFound, hadEtag, log); !reset {
+		if !cas.DecideNotFoundReset(resetOnNotFound, hadEtag) {
 			span.SetStatus(codes.Error, err.Error())
-			if trashed {
-				log.Error().Err(err).Msg("lost update: backing file was recently trashed")
-			} else {
-				log.Error().Err(err).Msg("lost update: backing file disappeared mid-retry")
-			}
+			log.Error().Err(err).Msg("lost update: backing file disappeared mid-retry")
 			return err
 		}
 		c.UserShares.Store(userID, &UserShareCache{UserShares: map[string]*SpaceShareIDs{}})
-		if resetOnNotFound {
-			// Create the empty file, so the next sync gets a NotModified instead of
-			// another NotFound plus a trash lookup.
-			if err := c.Persist(ctx, userID); err != nil {
-				log.Warn().Err(err).Msg("failed to create empty share cache file")
-			}
-		}
 		span.SetStatus(codes.Ok, "")
 		return nil
 	case errtypes.NotModified:

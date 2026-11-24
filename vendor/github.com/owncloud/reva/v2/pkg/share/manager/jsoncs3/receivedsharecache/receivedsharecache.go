@@ -395,13 +395,9 @@ func (c *Cache) doSync(ctx context.Context, userID string, resetOnNotFound bool)
 	case nil:
 		span.AddEvent("updating local cache")
 	case errtypes.NotFound:
-		if reset, trashed := cas.DecideNotFoundReset(ctx, c.storage, jsonPath, resetOnNotFound, rss.etag != "", log); !reset {
+		if !cas.DecideNotFoundReset(resetOnNotFound, rss.etag != "") {
 			span.SetStatus(codes.Error, err.Error())
-			if trashed {
-				log.Error().Err(err).Msg("lost update: backing file was recently trashed")
-			} else {
-				log.Error().Err(err).Msg("lost update: backing file disappeared mid-retry")
-			}
+			log.Error().Err(err).Msg("lost update: backing file disappeared mid-retry")
 			return err
 		}
 		c.ReceivedSpaces.Store(userID, &Spaces{Spaces: map[string]*Space{}})

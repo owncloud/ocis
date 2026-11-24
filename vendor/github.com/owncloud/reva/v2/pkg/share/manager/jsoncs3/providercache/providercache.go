@@ -653,14 +653,10 @@ func (c *Cache) doSync(ctx context.Context, storageID, spaceID string, resetOnNo
 	case nil:
 		span.AddEvent("updating local cache")
 	case errtypes.NotFound:
-		if reset, trashed := cas.DecideNotFoundReset(ctx, c.storage, dlreq.Path, resetOnNotFound, space.Etag != "", log); !reset {
+		if !cas.DecideNotFoundReset(resetOnNotFound, space.Etag != "") {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
-			if trashed {
-				log.Error().Err(err).Msg("lost update: backing file was recently trashed")
-			} else {
-				log.Error().Err(err).Msg("lost update: backing file disappeared mid-retry")
-			}
+			log.Error().Err(err).Msg("lost update: backing file disappeared mid-retry")
 			return err
 		}
 		spaces.Spaces.Store(spaceID, &Shares{Shares: map[string]*collaboration.Share{}})
