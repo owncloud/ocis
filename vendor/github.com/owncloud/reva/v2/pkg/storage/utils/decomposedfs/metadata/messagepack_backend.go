@@ -277,7 +277,14 @@ func (b MessagePackBackend) Purge(_ context.Context, path string) error {
 	if err := b.metaCache.RemoveMetadata(b.cacheKey(path)); err != nil {
 		return err
 	}
-	return os.Remove(b.MetadataPath(path))
+	if err := os.Remove(b.MetadataPath(path)); err != nil {
+		return err
+	}
+	// The lock file is kept while the node exists. Remove it with the node.
+	if err := os.Remove(b.LockfilePath(path)); err != nil && !errors.Is(err, fs.ErrNotExist) {
+		return err
+	}
+	return nil
 }
 
 // Rename moves the data for a given path to a new path

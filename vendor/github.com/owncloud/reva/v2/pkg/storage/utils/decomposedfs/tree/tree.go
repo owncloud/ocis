@@ -520,6 +520,8 @@ func (t *Tree) Delete(ctx context.Context, n *node.Node) (err error) {
 
 	// Remove lock file if it exists
 	_ = os.Remove(n.LockFilePath())
+	// Remove the metadata lock file. The node does not exist at this path anymore.
+	_ = os.Remove(t.lookup.MetadataBackend().LockfilePath(nodePath))
 
 	// finally remove the entry from the parent dir
 	if err = os.Remove(path); err != nil {
@@ -749,6 +751,9 @@ func (t *Tree) InitNewNode(ctx context.Context, n *node.Node, fsize uint64) (met
 func (t *Tree) removeNode(ctx context.Context, path, timeSuffix string, n *node.Node) error {
 	logger := appctx.GetLogger(ctx)
 
+	// Delete does not rename the revisions. Get their prefix before the trash suffix is added to the ID.
+	revisionPrefix := n.InternalPath() + node.RevisionIDDelimiter
+
 	if timeSuffix != "" {
 		n.ID = n.ID + node.TrashIDDelimiter + timeSuffix
 	}
@@ -786,9 +791,9 @@ func (t *Tree) removeNode(ctx context.Context, path, timeSuffix string, n *node.
 	}
 
 	// delete revisions
-	revs, err := filepath.Glob(n.InternalPath() + node.RevisionIDDelimiter + "*")
+	revs, err := filepath.Glob(revisionPrefix + "*")
 	if err != nil {
-		logger.Error().Err(err).Str("path", n.InternalPath()+node.RevisionIDDelimiter+"*").Msg("glob failed badly")
+		logger.Error().Err(err).Str("path", revisionPrefix+"*").Msg("glob failed badly")
 		return err
 	}
 	for _, rev := range revs {
@@ -804,6 +809,11 @@ func (t *Tree) removeNode(ctx context.Context, path, timeSuffix string, n *node.
 
 		if err := utils.RemoveItem(rev); err != nil {
 			logger.Error().Err(err).Str("revision", rev).Msg("error removing revision node")
+			return err
+		}
+
+		if err := t.lookup.MetadataBackend().Purge(ctx, rev); err != nil {
+			logger.Error().Err(err).Str("revision", rev).Msg("error purging revision metadata")
 			return err
 		}
 
