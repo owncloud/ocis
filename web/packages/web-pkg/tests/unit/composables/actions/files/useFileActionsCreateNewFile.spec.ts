@@ -118,6 +118,41 @@ describe('useFileActionsCreateNewFile', () => {
         }
       })
     })
+
+    it('should forward ApplicationFileExtension.icon when provided without extension or mimeType', () => {
+      const action = mock<ApplicationFileExtension>({
+        app: 'custom-app',
+        extension: undefined,
+        mimeType: undefined,
+        icon: 'sparkling-2',
+        newFileMenu: { menuTitle: vi.fn() },
+        customHandler: null
+      })
+
+      getWrapper({
+        action,
+        setup(instance) {
+          expect(unref(instance.actions)[0].icon).toBe('sparkling-2')
+        }
+      })
+    })
+
+    it('should set icon to an empty string when ApplicationFileExtension.icon is not provided', () => {
+      const action = mock<ApplicationFileExtension>({
+        app: 'text-editor',
+        extension: 'txt',
+        icon: undefined,
+        newFileMenu: { menuTitle: vi.fn() },
+        customHandler: null
+      })
+
+      getWrapper({
+        action,
+        setup(instance) {
+          expect(unref(instance.actions)[0].icon).toBe('')
+        }
+      })
+    })
   })
 })
 
