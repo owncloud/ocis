@@ -238,6 +238,11 @@ func (b XattrsBackend) Purge(ctx context.Context, path string) error {
 		}
 	}
 
+	// The lock file is kept while the node exists. Remove it with the node.
+	if err := os.Remove(b.LockfilePath(path)); err != nil && !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+
 	return b.metaCache.RemoveMetadata(b.cacheKey(path))
 }
 
