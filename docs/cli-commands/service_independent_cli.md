@@ -224,3 +224,28 @@ This command provides additional options:
 
 * `--dry-run` (default: `true`)\
 Do not remove any empty folders but print the empty folders that would be removed.
+
+#### Purge Orphaned Files
+
+Older versions of oCIS left files on the disk when a user deleted a file or purged it from the trash bin. Each orphaned file uses an inode. Use this command to remove these files:
+
+```bash
+ocis trash purge-orphaned-files -p /base/path/storage/users
+```
+
+The command removes:
+
+* For a node in the trash bin: the lock files of its revisions. The lock file of the node and the revisions stay, because a restore uses them again.
+* For a node that does not exist and is not in the trash bin: its lock file, and its revisions with their metadata files, their lock files and their blobs.
+* Any other lock file (`.mlock`) when its file does not exist.
+
+This command provides additional options:
+
+* `--dry-run` (default: `true`)\
+Do not remove any files. Print a summary of the files that would be removed.
+* `--verbose` (default: `false`)\
+Print each file that is removed or kept. Without this option, the command prints only the errors and a summary.
+* `--blobstore` (default: `ocis`)\
+The blobstore type. Can be `ocis`, `s3ng` or `none`. For `s3ng`, set the S3NG environment variables of the `storage-users` service. With `none`, the orphaned revisions stay on the disk, because their metadata file holds the only reference to their blob.
+* `--min-age` (default: `1h`)\
+Do not remove files that are younger than this duration. You can run the command on a running system. A new node gets its lock file before its node file, so a young lock file can be part of a node that is in creation.
