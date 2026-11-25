@@ -68,6 +68,10 @@ if [[ "$ENABLE_KEYCLOAK" == "true" ]]; then
     sed -i '/^  keycloak:/{n;s|enabled: false|enabled: true|;}' $CFG_DIR/values.yaml
 fi
 
+if [[ "$ENABLE_MFA" == "true" ]]; then
+    sed -i '/^  mfa:/{n;s|enabled: false|enabled: true|;}' $CFG_DIR/values.yaml
+fi
+
 if [[ "$ENABLE_WOPI" == "true" ]]; then
     sed -i '/appsIntegration:/{n;s|false|true|}' $CFG_DIR/values.yaml
     # patch collaboration service
