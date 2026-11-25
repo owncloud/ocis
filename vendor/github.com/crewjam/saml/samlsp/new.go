@@ -2,15 +2,11 @@
 package samlsp
 
 import (
-	"crypto"
-	"crypto/ecdsa"
 	"crypto/rsa"
 	"crypto/x509"
-	"fmt"
 	"net/http"
 	"net/url"
 
-	"github.com/golang-jwt/jwt/v5"
 	dsig "github.com/russellhaering/goxmldsig"
 
 	"github.com/crewjam/saml"
@@ -20,7 +16,7 @@ import (
 type Options struct {
 	EntityID              string
 	URL                   url.URL
-	Key                   crypto.Signer
+	Key                   *rsa.PrivateKey
 	Certificate           *x509.Certificate
 	Intermediates         []*x509.Certificate
 	HTTPClient            *http.Client
@@ -37,23 +33,11 @@ type Options struct {
 	LogoutBindings        []string
 }
 
-func getDefaultSigningMethod(signer crypto.Signer) jwt.SigningMethod {
-	if signer != nil {
-		switch signer.Public().(type) {
-		case *ecdsa.PublicKey:
-			return jwt.SigningMethodES256
-		case *rsa.PublicKey:
-			return jwt.SigningMethodRS256
-		}
-	}
-	return jwt.SigningMethodRS256
-}
-
 // DefaultSessionCodec returns the default SessionCodec for the provided options,
 // a JWTSessionCodec configured to issue signed tokens.
 func DefaultSessionCodec(opts Options) JWTSessionCodec {
 	return JWTSessionCodec{
-		SigningMethod: getDefaultSigningMethod(opts.Key),
+		SigningMethod: defaultJWTSigningMethod,
 		Audience:      opts.URL.String(),
 		Issuer:        opts.URL.String(),
 		MaxAge:        defaultSessionMaxAge,
@@ -83,7 +67,7 @@ func DefaultSessionProvider(opts Options) CookieSessionProvider {
 // options, a JWTTrackedRequestCodec that uses a JWT to encode TrackedRequests.
 func DefaultTrackedRequestCodec(opts Options) JWTTrackedRequestCodec {
 	return JWTTrackedRequestCodec{
-		SigningMethod: getDefaultSigningMethod(opts.Key),
+		SigningMethod: defaultJWTSigningMethod,
 		Audience:      opts.URL.String(),
 		Issuer:        opts.URL.String(),
 		MaxAge:        saml.MaxIssueDelay,
@@ -115,8 +99,7 @@ func DefaultServiceProvider(opts Options) saml.ServiceProvider {
 	if opts.ForceAuthn {
 		forceAuthn = &opts.ForceAuthn
 	}
-
-	signatureMethod := defaultSigningMethodForKey(opts.Key)
+	signatureMethod := dsig.RSASHA1SignatureMethod
 	if !opts.SignRequest {
 		signatureMethod = ""
 	}
@@ -148,25 +131,6 @@ func DefaultServiceProvider(opts Options) saml.ServiceProvider {
 	}
 }
 
-func defaultSigningMethodForKey(key crypto.Signer) string {
-	switch key.(type) {
-	case *rsa.PrivateKey:
-		return dsig.RSASHA1SignatureMethod
-	case *ecdsa.PrivateKey:
-		return dsig.ECDSASHA256SignatureMethod
-	case nil:
-		return ""
-	default:
-		panic(fmt.Sprintf("programming error: unsupported key type %T", key))
-	}
-}
-
-// DefaultAssertionHandler returns the default AssertionHandler for the provided options,
-// a NopAssertionHandler configured to do nothing.
-func DefaultAssertionHandler(_ Options) NopAssertionHandler {
-	return NopAssertionHandler{}
-}
-
 // New creates a new Middleware with the default providers for the
 // given options.
 //
@@ -175,12 +139,11 @@ func DefaultAssertionHandler(_ Options) NopAssertionHandler {
 // in the returned Middleware.
 func New(opts Options) (*Middleware, error) {
 	m := &Middleware{
-		ServiceProvider:  DefaultServiceProvider(opts),
-		Binding:          "",
-		ResponseBinding:  saml.HTTPPostBinding,
-		OnError:          DefaultOnError,
-		Session:          DefaultSessionProvider(opts),
-		AssertionHandler: DefaultAssertionHandler(opts),
+		ServiceProvider: DefaultServiceProvider(opts),
+		Binding:         "",
+		ResponseBinding: saml.HTTPPostBinding,
+		OnError:         DefaultOnError,
+		Session:         DefaultSessionProvider(opts),
 	}
 	m.RequestTracker = DefaultRequestTracker(opts, &m.ServiceProvider)
 	if opts.UseArtifactResponse {

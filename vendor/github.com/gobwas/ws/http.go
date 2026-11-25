@@ -286,16 +286,12 @@ func httpWriteUpgradeRequest(
 	protocols []string,
 	extensions []httphead.Option,
 	header HandshakeHeader,
-	host string,
 ) {
 	bw.WriteString("GET ")
 	bw.WriteString(u.RequestURI())
 	bw.WriteString(" HTTP/1.1\r\n")
 
-	if host == "" {
-		host = u.Host
-	}
-	httpWriteHeader(bw, headerHost, host)
+	httpWriteHeader(bw, headerHost, u.Host)
 
 	httpWriteHeaderBts(bw, headerUpgrade, specHeaderValueUpgrade)
 	httpWriteHeaderBts(bw, headerConnection, specHeaderValueConnection)

@@ -1,9 +1,9 @@
 package wsutil
 
 import (
-	"encoding/binary"
 	"errors"
 	"io"
+	"io/ioutil"
 
 	"github.com/gobwas/ws"
 )
@@ -15,10 +15,6 @@ var ErrNoFrameAdvance = errors.New("no frame advance")
 // ErrFrameTooLarge indicates that a message of length higher than
 // MaxFrameSize was being read.
 var ErrFrameTooLarge = errors.New("frame too large")
-
-// ErrMessageTooLarge indicates that a message of total length higher than
-// MaxMessageSize, that is, of all its fragments together, was being read.
-var ErrMessageTooLarge = errors.New("message too large")
 
 // FrameHandlerFunc handles parsed frame header and its body represented by
 // io.Reader.
@@ -50,43 +46,20 @@ type Reader struct {
 	// header RSV segment.
 	Extensions []RecvExtension
 
-	// MaxFrameSize controls the maximum frame size in bytes that can be read.
-	// A message exceeding that size will return a ErrFrameTooLarge to the
-	// application.
+	// MaxFrameSize controls the maximum frame size in bytes
+	// that can be read. A message exceeding that size will return
+	// a ErrFrameTooLarge to the application.
 	//
 	// Not setting this field means there is no limit.
 	MaxFrameSize int64
 
-	// MaxMessageSize controls the maximum message size in bytes that can be
-	// read, that is, the total length of all fragments of a message. A message
-	// exceeding that size will return a ErrMessageTooLarge to the application
-	// from the NextFrame() call for the first fragment crossing the limit.
-	//
-	// This is the limit RFC 6455 section 10.4 talks about. Note that
-	// MaxFrameSize alone does not bound a fragmented message.
-	//
-	// Not setting this field means there is no limit.
-	MaxMessageSize int64
-
-	// OnContinuation is called by NextFrame() for every continuation frame of
-	// a fragmented message, with its header and body. The body is the same
-	// reader the fragment is then read from, so bytes consumed by the callback
-	// are not returned by Read().
 	OnContinuation FrameHandlerFunc
-
-	// OnIntermediate is called by NextFrame() for a control frame received in
-	// the middle of a fragmented message, with its header and body; the rest
-	// of the body is discarded after the callback returns. If it is nil, such
-	// frames are discarded silently, and only their header is returned.
 	OnIntermediate FrameHandlerFunc
 
-	opCode ws.OpCode                  // Used to store message op code on fragmentation.
-	msgLen int64                      // Declared length of the current message fragments so far.
-	frame  io.Reader                  // Used to as frame reader.
-	raw    io.LimitedReader           // Used to discard frames without cipher.
-	utf8   UTF8Reader                 // Used to check UTF8 sequences if CheckUTF8 is true.
-	tmp    [ws.MaxHeaderSize - 2]byte // Used for reading headers.
-	cr     *CipherReader              // Used by NextFrame() to unmask frame payload.
+	opCode ws.OpCode        // Used to store message op code on fragmentation.
+	frame  io.Reader        // Used to as frame reader.
+	raw    io.LimitedReader // Used to discard frames without cipher.
+	utf8   UTF8Reader       // Used to check UTF8 sequences if CheckUTF8 is true.
 }
 
 // NewReader creates new frame reader that reads from r keeping given state to
@@ -171,7 +144,7 @@ func (r *Reader) Read(p []byte) (n int, err error) {
 // It discards all frames of fragmented message.
 func (r *Reader) Discard() (err error) {
 	for {
-		_, err = io.Copy(io.Discard, &r.raw)
+		_, err = io.Copy(ioutil.Discard, &r.raw)
 		if err != nil {
 			break
 		}
@@ -192,13 +165,13 @@ func (r *Reader) Discard() (err error) {
 // Note that next NextFrame() call must be done after receiving or discarding
 // all current message bytes.
 func (r *Reader) NextFrame() (hdr ws.Header, err error) {
-	hdr, err = r.readHeader(r.Source)
+	hdr, err = ws.ReadHeader(r.Source)
 	if err == io.EOF && r.fragmented() {
 		// If we are in fragmented state EOF means that is was totally
 		// unexpected.
 		//
 		// NOTE: This is necessary to prevent callers such that
-		// io.ReadAll to receive some amount of bytes without an error.
+		// ioutil.ReadAll to receive some amount of bytes without an error.
 		// ReadAll() ignores an io.EOF error, thus caller may think that
 		// whole message fetched, but actually only part of it.
 		err = io.ErrUnexpectedEOF
@@ -213,19 +186,6 @@ func (r *Reader) NextFrame() (hdr ws.Header, err error) {
 	if n := r.MaxFrameSize; n > 0 && hdr.Length > n {
 		return hdr, ErrFrameTooLarge
 	}
-	if !r.fragmented() {
-		// First frame of a message.
-		r.msgLen = 0
-	}
-	if !r.fragmented() || !hdr.OpCode.IsControl() {
-		// Control frames in the middle of a fragmented message do not belong
-		// to it, everything else does. The subtraction can not overflow and
-		// the sum can not exceed the limit.
-		if n := r.MaxMessageSize; n > 0 && hdr.Length > n-r.msgLen {
-			return hdr, ErrMessageTooLarge
-		}
-		r.msgLen += hdr.Length
-	}
 
 	// Save raw reader to use it on discarding frame without ciphering and
 	// other streaming checks.
@@ -236,12 +196,7 @@ func (r *Reader) NextFrame() (hdr ws.Header, err error) {
 
 	frame := io.Reader(&r.raw)
 	if hdr.Masked {
-		if r.cr == nil {
-			r.cr = NewCipherReader(frame, hdr.Mask)
-		} else {
-			r.cr.Reset(frame, hdr.Mask)
-		}
-		frame = r.cr
+		frame = NewCipherReader(frame, hdr.Mask)
 	}
 
 	for _, x := range r.Extensions {
@@ -258,7 +213,7 @@ func (r *Reader) NextFrame() (hdr ws.Header, err error) {
 			}
 			if err == nil {
 				// Ensure that src is empty.
-				_, err = io.Copy(io.Discard, &r.raw)
+				_, err = io.Copy(ioutil.Discard, &r.raw)
 			}
 			return hdr, err
 		}
@@ -304,83 +259,6 @@ func (r *Reader) reset() {
 	r.frame = nil
 	r.utf8 = UTF8Reader{}
 	r.opCode = 0
-	r.msgLen = 0
-}
-
-// readHeader reads a frame header from in.
-func (r *Reader) readHeader(in io.Reader) (h ws.Header, err error) {
-	// Make slice of bytes with capacity 12 that could hold any header.
-	//
-	// The maximum header size is 14, but due to the 2 hop reads,
-	// after first hop that reads first 2 constant bytes, we could reuse 2 bytes.
-	// So 14 - 2 = 12.
-	bts := r.tmp[:2]
-
-	// Prepare to hold first 2 bytes to choose size of next read.
-	_, err = io.ReadFull(in, bts)
-	if err != nil {
-		return h, err
-	}
-	const bit0 = 0x80
-
-	h.Fin = bts[0]&bit0 != 0
-	h.Rsv = (bts[0] & 0x70) >> 4
-	h.OpCode = ws.OpCode(bts[0] & 0x0f)
-
-	var extra int
-
-	if bts[1]&bit0 != 0 {
-		h.Masked = true
-		extra += 4
-	}
-
-	length := bts[1] & 0x7f
-	switch {
-	case length < 126:
-		h.Length = int64(length)
-
-	case length == 126:
-		extra += 2
-
-	case length == 127:
-		extra += 8
-
-	default:
-		err = ws.ErrHeaderLengthUnexpected
-		return h, err
-	}
-
-	if extra == 0 {
-		return h, err
-	}
-
-	// Increase len of bts to extra bytes need to read.
-	// Overwrite first 2 bytes that was read before.
-	bts = bts[:extra]
-	_, err = io.ReadFull(in, bts)
-	if err != nil {
-		return h, err
-	}
-
-	switch {
-	case length == 126:
-		h.Length = int64(binary.BigEndian.Uint16(bts[:2]))
-		bts = bts[2:]
-
-	case length == 127:
-		if bts[0]&0x80 != 0 {
-			err = ws.ErrHeaderLengthMSB
-			return h, err
-		}
-		h.Length = int64(binary.BigEndian.Uint64(bts[:8]))
-		bts = bts[8:]
-	}
-
-	if h.Masked {
-		copy(h.Mask[:], bts)
-	}
-
-	return h, nil
 }
 
 // NextReader prepares next message read from r. It returns header that

@@ -3,7 +3,6 @@ package ws
 import (
 	"bufio"
 	"bytes"
-	"cmp"
 	"context"
 	"crypto/tls"
 	"fmt"
@@ -16,7 +15,7 @@ import (
 	"time"
 
 	"github.com/gobwas/httphead"
-	"github.com/gobwas/ws/internal/pool"
+	"github.com/gobwas/pool/pbufio"
 )
 
 // Constants used by Dialer.
@@ -88,13 +87,6 @@ type Dialer struct {
 	// land.
 	Header HandshakeHeader
 
-	// Host is an optional string that could be used to specify the host during
-	// HTTP upgrade request by setting 'Host' header.
-	//
-	// Default value is an empty string, which results in setting 'Host' header
-	// equal to the URL hostname given to Dialer.Dial().
-	Host string
-
 	// OnStatusError is the callback that will be called after receiving non
 	// "101 Continue" HTTP response status. It receives an io.Reader object
 	// representing server response bytes. That is, it gives ability to parse
@@ -159,7 +151,7 @@ func (d Dialer) Dial(ctx context.Context, urlstr string) (conn net.Conn, br *buf
 
 	// Prepare context to dial with. Initially it is the same as original, but
 	// if d.Timeout is non-zero and points to time that is before ctx.Deadline,
-	// we use shorter context for dial.
+	// we use more shorter context for dial.
 	dialctx := ctx
 
 	var deadline time.Time
@@ -179,18 +171,14 @@ func (d Dialer) Dial(ctx context.Context, urlstr string) (conn net.Conn, br *buf
 			conn.Close()
 		}
 	}()
-	if ctx.Done() == nil {
-		// Context can never be done, so only Timeout can bound the handshake.
+	if ctx == context.Background() {
 		// No need to start I/O interrupter goroutine which is not zero-cost.
 		conn.SetDeadline(deadline)
 		defer conn.SetDeadline(noDeadline)
 	} else {
 		// Context could be canceled or its deadline could be exceeded.
 		// Start the interrupter goroutine to handle context cancelation.
-		//
-		// NOTE: dialctx, not ctx: Timeout bounds the handshake too, not only
-		// the connect, and dialctx is the shorter of the two.
-		done := setupContextDeadliner(dialctx, conn)
+		done := setupContextDeadliner(ctx, conn)
 		defer func() {
 			// Map Upgrade() error to a possible context expiration error. That
 			// is, even if Upgrade() err is nil, context could be already
@@ -263,7 +251,7 @@ func (d Dialer) tlsClient(conn net.Conn, hostname string) net.Conn {
 		config = tlsDefaultConfig()
 	}
 	if config.ServerName == "" {
-		config = config.Clone()
+		config = tlsCloneConfig(config)
 		config.ServerName = hostname
 	}
 	// Do not make conn.Handshake() here because downstairs we will prepare
@@ -303,25 +291,26 @@ func (d Dialer) Upgrade(conn io.ReadWriter, u *url.URL) (br *bufio.Reader, hs Ha
 			headerSeenSecAccept
 	)
 
-	br = pool.GetReader(cmp.Or(d.ReadBufferSize, DefaultClientReadBufferSize))
-	bw := pool.GetWriter(cmp.Or(d.WriteBufferSize, DefaultClientWriteBufferSize))
+	br = pbufio.GetReader(conn,
+		nonZero(d.ReadBufferSize, DefaultClientReadBufferSize),
+	)
+	bw := pbufio.GetWriter(conn,
+		nonZero(d.WriteBufferSize, DefaultClientWriteBufferSize),
+	)
 	defer func() {
-		pool.PutWriter(bw)
+		pbufio.PutWriter(bw)
 		if br.Buffered() == 0 || err != nil {
 			// Server does not wrote additional bytes to the connection or
 			// error occurred. That is, no reason to return buffer.
-			pool.PutReader(br)
+			pbufio.PutReader(br)
 			br = nil
 		}
 	}()
 
-	br.Reset(conn)
-	bw.Reset(conn)
-
 	nonce := make([]byte, nonceSize)
 	initNonce(nonce)
 
-	httpWriteUpgradeRequest(bw, u, nonce, d.Protocols, d.Extensions, d.Header, d.Host)
+	httpWriteUpgradeRequest(bw, u, nonce, d.Protocols, d.Extensions, d.Header)
 	if err := bw.Flush(); err != nil {
 		return br, hs, err
 	}
@@ -459,7 +448,7 @@ func (d Dialer) Upgrade(conn io.ReadWriter, u *url.URL) (br *bufio.Reader, hs Ha
 // contains unprocessed buffered data, that was sent by the server quickly
 // right after handshake.
 func PutReader(br *bufio.Reader) {
-	pool.PutReader(br)
+	pbufio.PutReader(br)
 }
 
 // StatusError contains an unexpected status-line code from the server.

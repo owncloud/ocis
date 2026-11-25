@@ -13,35 +13,47 @@ import (
 // mask the data as to unmask the data.
 func Cipher(payload []byte, mask [4]byte, offset int) {
 	n := len(payload)
-	if n < 16 {
-		// Too short for a single block: the general path below would end up
-		// doing the same byte by byte, only with more bookkeeping.
-		for i := range n {
+	if n < 8 {
+		for i := 0; i < n; i++ {
 			payload[i] ^= mask[(offset+i)%4]
 		}
 		return
 	}
 
-	// Position in the mask after the bytes ciphered before this call.
+	// Calculate position in mask due to previously processed bytes number.
 	mpos := offset % 4
-	// Head: bytes done one by one so that the rest starts at mask[0], which
-	// lets the blocks below use the mask as one 32-bit word.
+	// Count number of bytes will processed one by one from the beginning of payload.
 	ln := remain[mpos]
-	// Tail: bytes done one by one so that the middle is whole 16-byte blocks.
-	rn := (n - ln) % 16
+	// Count number of bytes will processed one by one from the end of payload.
+	// This is done to process payload by 8 bytes in each iteration of main loop.
+	rn := (n - ln) % 8
 
-	for i := range ln {
+	for i := 0; i < ln; i++ {
 		payload[i] ^= mask[(mpos+i)%4]
 	}
 	for i := n - rn; i < n; i++ {
 		payload[i] ^= mask[(mpos+i)%4]
 	}
 
-	// The mask as a little-endian word regardless of the machine's byte
-	// order; the kernels broadcast it and xor it against little-endian loads,
-	// so byte k of every word meets mask[k%4].
-	m := binary.LittleEndian.Uint32(mask[:])
-	cipherBlocks(payload[ln:n-rn], m)
+	// NOTE: we use here binary.LittleEndian regardless of what is real
+	// endianness on machine is. To do so, we have to use binary.LittleEndian in
+	// the masking loop below as well.
+	var (
+		m  = binary.LittleEndian.Uint32(mask[:])
+		m2 = uint64(m)<<32 | uint64(m)
+	)
+	// Skip already processed right part.
+	// Get number of uint64 parts remaining to process.
+	n = (n - ln - rn) >> 3
+	for i := 0; i < n; i++ {
+		var (
+			j     = ln + (i << 3)
+			chunk = payload[j : j+8]
+		)
+		p := binary.LittleEndian.Uint64(chunk)
+		p = p ^ m2
+		binary.LittleEndian.PutUint64(chunk, p)
+	}
 }
 
 // remain maps position in masking key [0,4) to number

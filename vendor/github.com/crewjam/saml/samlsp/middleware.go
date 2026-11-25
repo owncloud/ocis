@@ -40,13 +40,12 @@ import (
 // SAML service provider already has a private key, we borrow that key
 // to sign the JWTs as well.
 type Middleware struct {
-	ServiceProvider  saml.ServiceProvider
-	OnError          func(w http.ResponseWriter, r *http.Request, err error)
-	Binding          string // either saml.HTTPPostBinding or saml.HTTPRedirectBinding
-	ResponseBinding  string // either saml.HTTPPostBinding or saml.HTTPArtifactBinding
-	RequestTracker   RequestTracker
-	Session          SessionProvider
-	AssertionHandler AssertionHandler
+	ServiceProvider saml.ServiceProvider
+	OnError         func(w http.ResponseWriter, r *http.Request, err error)
+	Binding         string // either saml.HTTPPostBinding or saml.HTTPRedirectBinding
+	ResponseBinding string // either saml.HTTPPostBinding or saml.HTTPArtifactBinding
+	RequestTracker  RequestTracker
+	Session         SessionProvider
 }
 
 // ServeHTTP implements http.Handler and serves the SAML-specific HTTP endpoints
@@ -70,7 +69,7 @@ func (m *Middleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (m *Middleware) ServeMetadata(w http.ResponseWriter, _ *http.Request) {
 	buf, _ := xml.MarshalIndent(m.ServiceProvider.Metadata(), "", "  ")
 	w.Header().Set("Content-Type", "application/samlmetadata+xml")
-	if _, err := w.Write(buf); err != nil { //nolint:gosec // buf is our own XML metadata, served as application/samlmetadata+xml
+	if _, err := w.Write(buf); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -97,11 +96,6 @@ func (m *Middleware) ServeACS(w http.ResponseWriter, r *http.Request) {
 	assertion, err := m.ServiceProvider.ParseResponse(r, possibleRequestIDs)
 	if err != nil {
 		m.OnError(w, r, err)
-		return
-	}
-
-	if handlerErr := m.AssertionHandler.HandleAssertion(assertion); handlerErr != nil {
-		m.OnError(w, r, handlerErr)
 		return
 	}
 
@@ -225,13 +219,18 @@ func (m *Middleware) CreateSessionFromAssertion(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	http.Redirect(w, r, redirectURI, http.StatusFound) //nolint:gosec // TODO: with AllowIDPInitiated, redirectURI may come from an unchecked RelayState
+	http.Redirect(w, r, redirectURI, http.StatusFound)
 }
 
 // RequireAttribute returns a middleware function that requires that the
 // SAML attribute `name` be set to `value`. This can be used to require
 // that a remote user be a member of a group. It relies on the Claims assigned
 // to to the context in RequireAccount.
+//
+// For example:
+//
+//	goji.Use(m.RequireAccount)
+//	goji.Use(RequireAttributeMiddleware("eduPersonAffiliation", "Staff"))
 func RequireAttribute(name, value string) func(http.Handler) http.Handler {
 	return func(handler http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

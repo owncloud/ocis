@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"io/ioutil"
 	"net"
 	"net/http"
 
@@ -133,7 +134,7 @@ func (r *prefetchResponseReader) Read(p []byte) (int, error) {
 			io.TeeReader(r.source, r.buffer),
 		), nil)
 		if err == nil {
-			*r.contentLength, _ = io.Copy(io.Discard, resp.Body)
+			*r.contentLength, _ = io.Copy(ioutil.Discard, resp.Body)
 			resp.Body.Close()
 		}
 		bts := r.buffer.Bytes()

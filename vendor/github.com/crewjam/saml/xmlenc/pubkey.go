@@ -125,52 +125,11 @@ func (e RSA) Decrypt(key interface{}, ciphertextEl *etree.Element) ([]byte, erro
 // the block cipher used is AES-256 CBC and the digest method is SHA-256. You can
 // specify other ciphers and digest methods by assigning to BlockCipher or
 // DigestMethod.
-//
-// OAEP implements the older RSA-OAEP (2001 spec) for backward compatibility, you might
-// perfer OAEP_2009_256 over using this method.
 func OAEP() RSA {
 	return RSA{
 		BlockCipher:  AES256CBC,
 		DigestMethod: SHA256,
 		algorithm:    "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p",
-		keyEncrypter: func(e RSA, pubKey *rsa.PublicKey, plaintext []byte) ([]byte, error) {
-			return rsa.EncryptOAEP(e.DigestMethod.Hash(), RandReader, pubKey, plaintext, nil)
-		},
-		keyDecrypter: func(e RSA, privKey *rsa.PrivateKey, ciphertext []byte) ([]byte, error) {
-			return rsa.DecryptOAEP(e.DigestMethod.Hash(), RandReader, privKey, ciphertext, nil)
-		},
-	}
-}
-
-// OAEP_SHA256 returns a version of RSA that implements RSA in OAEP mode. By default
-// the block cipher used is AES-256 CBC and the digest method is SHA-256. You can
-// specify other ciphers and digest methods by assigning to BlockCipher or
-// DigestMethod.
-func OAEP_SHA256() RSA { //nolint:revive
-	return RSA{
-		BlockCipher:  AES256CBC,
-		DigestMethod: SHA256,
-		algorithm:    "http://www.w3.org/2009/xmlenc11#rsa-oaep",
-
-		keyEncrypter: func(e RSA, pubKey *rsa.PublicKey, plaintext []byte) ([]byte, error) {
-			return rsa.EncryptOAEP(e.DigestMethod.Hash(), RandReader, pubKey, plaintext, nil)
-		},
-		keyDecrypter: func(e RSA, privKey *rsa.PrivateKey, ciphertext []byte) ([]byte, error) {
-			return rsa.DecryptOAEP(e.DigestMethod.Hash(), RandReader, privKey, ciphertext, nil)
-		},
-	}
-}
-
-// OAEP_SHA512 returns a version of RSA that implements RSA in OAEP mode. By default
-// the block cipher used is AES-256 CBC and the digest method is SHA-512. You can
-// specify other ciphers and digest methods by assigning to BlockCipher or
-// DigestMethod.
-func OAEP_SHA512() RSA { //nolint:revive
-	return RSA{
-		BlockCipher:  AES256CBC,
-		DigestMethod: SHA512,
-		algorithm:    "http://www.w3.org/2009/xmlenc11#rsa-oaep",
-
 		keyEncrypter: func(e RSA, pubKey *rsa.PublicKey, plaintext []byte) ([]byte, error) {
 			return rsa.EncryptOAEP(e.DigestMethod.Hash(), RandReader, pubKey, plaintext, nil)
 		},
@@ -188,19 +147,16 @@ func PKCS1v15() RSA {
 		BlockCipher:  AES256CBC,
 		DigestMethod: nil,
 		algorithm:    "http://www.w3.org/2001/04/xmlenc#rsa-1_5",
-		keyEncrypter: func(_ RSA, pubKey *rsa.PublicKey, plaintext []byte) ([]byte, error) {
-			return rsa.EncryptPKCS1v15(RandReader, pubKey, plaintext) //nolint:staticcheck // SA1019: rsa-1_5 is an XML-Enc algorithm; opt-in only, see note below
+		keyEncrypter: func(e RSA, pubKey *rsa.PublicKey, plaintext []byte) ([]byte, error) {
+			return rsa.EncryptPKCS1v15(RandReader, pubKey, plaintext)
 		},
-		keyDecrypter: func(_ RSA, privKey *rsa.PrivateKey, ciphertext []byte) ([]byte, error) {
-			return rsa.DecryptPKCS1v15(RandReader, privKey, ciphertext) //nolint:staticcheck // SA1019: rsa-1_5 is an XML-Enc algorithm; opt-in only, see note below
+		keyDecrypter: func(e RSA, privKey *rsa.PrivateKey, ciphertext []byte) ([]byte, error) {
+			return rsa.DecryptPKCS1v15(RandReader, privKey, ciphertext)
 		},
 	}
 }
 
-// PKCS1v15 is not registered as a decrypter. RSA PKCS#1 v1.5 key transport is
-// open to Bleichenbacher padding-oracle attacks, so a document naming rsa-1_5
-// gets ErrAlgorithmNotImplemented. Service provider metadata advertises
-// rsa-oaep-mgf1p only.
 func init() {
 	RegisterDecrypter(OAEP())
+	RegisterDecrypter(PKCS1v15())
 }

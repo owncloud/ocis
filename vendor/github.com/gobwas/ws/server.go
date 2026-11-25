@@ -3,8 +3,6 @@ package ws
 import (
 	"bufio"
 	"bytes"
-	"cmp"
-	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -13,7 +11,7 @@ import (
 	"time"
 
 	"github.com/gobwas/httphead"
-	"github.com/gobwas/ws/internal/pool"
+	"github.com/gobwas/pool/pbufio"
 )
 
 // Constants used by ConnUpgrader.
@@ -157,8 +155,10 @@ type HTTPUpgrader struct {
 func (u HTTPUpgrader) Upgrade(r *http.Request, w http.ResponseWriter) (conn net.Conn, rw *bufio.ReadWriter, hs Handshake, err error) {
 	// Hijack connection first to get the ability to write rejection errors the
 	// same way as in Upgrader.
-	conn, rw, err = http.NewResponseController(w).Hijack()
-	if errors.Is(err, http.ErrNotSupported) {
+	hj, ok := w.(http.Hijacker)
+	if ok {
+		conn, rw, err = hj.Hijack()
+	} else {
 		err = ErrNotHijacker
 	}
 	if err != nil {
@@ -286,9 +286,9 @@ type Upgrader struct {
 	// The argument is only valid until the callback returns.
 	Protocol func([]byte) bool
 
-	// ProtocolCustom allows users to parse Sec-WebSocket-Protocol header manually.
+	// ProtocolCustrom allow user to parse Sec-WebSocket-Protocol header manually.
 	// Note that returned bytes must be valid until Upgrade returns.
-	// If ProtocolCustom is set, it is used instead of Protocol function.
+	// If ProtocolCustom is set, it used instead of Protocol function.
 	ProtocolCustom func([]byte) (string, bool)
 
 	// Extension is a select function that is used to select extensions
@@ -437,15 +437,16 @@ func (u Upgrader) Upgrade(conn io.ReadWriter) (hs Handshake, err error) {
 
 	// Prepare I/O buffers.
 	// TODO(gobwas): make it configurable.
-	br := pool.GetReader(cmp.Or(u.ReadBufferSize, DefaultServerReadBufferSize))
-	bw := pool.GetWriter(cmp.Or(u.WriteBufferSize, DefaultServerWriteBufferSize))
+	br := pbufio.GetReader(conn,
+		nonZero(u.ReadBufferSize, DefaultServerReadBufferSize),
+	)
+	bw := pbufio.GetWriter(conn,
+		nonZero(u.WriteBufferSize, DefaultServerWriteBufferSize),
+	)
 	defer func() {
-		pool.PutReader(br)
-		pool.PutWriter(bw)
+		pbufio.PutReader(br)
+		pbufio.PutWriter(bw)
 	}()
-
-	br.Reset(conn)
-	bw.Reset(conn)
 
 	// Read HTTP request line like "GET /ws HTTP/1.1".
 	rl, err := readLine(br)

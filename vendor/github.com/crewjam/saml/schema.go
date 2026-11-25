@@ -46,7 +46,7 @@ type AuthnRequest struct {
 
 	Subject               *Subject
 	NameIDPolicy          *NameIDPolicy `xml:"urn:oasis:names:tc:SAML:2.0:protocol NameIDPolicy"`
-	Conditions            *Conditions   `xml:"urn:oasis:names:tc:SAML:2.0:assertion Conditions"`
+	Conditions            *Conditions
 	RequestedAuthnContext *RequestedAuthnContext
 	// Scoping               *Scoping // TODO
 
@@ -72,7 +72,7 @@ type LogoutRequest struct {
 	NotOnOrAfter *time.Time `xml:",attr"`
 	Destination  string     `xml:",attr"`
 	Issuer       *Issuer    `xml:"urn:oasis:names:tc:SAML:2.0:assertion Issuer"`
-	NameID       *NameID    `xml:"urn:oasis:names:tc:SAML:2.0:assertion NameID"`
+	NameID       *NameID
 	Signature    *etree.Element
 
 	SessionIndex *SessionIndex `xml:"SessionIndex"`
@@ -353,15 +353,12 @@ func (r *ArtifactResolve) Element() *etree.Element {
 	if r.Issuer != nil {
 		el.AddChild(r.Issuer.Element())
 	}
-	if r.Signature != nil {
-		// ADFS requires that <Signature> come before <Artifact>.
-		// ref: https://github.com/crewjam/saml/issues/535
-		// ref: https://www.wiktorzychla.com/2017/09/adfs-and-saml2-artifact-binding-woes.html
-		el.AddChild(r.Signature)
-	}
 	artifact := etree.NewElement("samlp:Artifact")
 	artifact.SetText(r.Artifact)
 	el.AddChild(artifact)
+	if r.Signature != nil {
+		el.AddChild(r.Signature)
+	}
 	return el
 }
 
@@ -736,12 +733,12 @@ type Assertion struct {
 	Issuer       Issuer    `xml:"urn:oasis:names:tc:SAML:2.0:assertion Issuer"`
 	Signature    *etree.Element
 	Subject      *Subject
-	Conditions   *Conditions `xml:"urn:oasis:names:tc:SAML:2.0:assertion Conditions"`
+	Conditions   *Conditions
 	// Advice *Advice
 	// Statements []Statement
-	AuthnStatements []AuthnStatement `xml:"urn:oasis:names:tc:SAML:2.0:assertion AuthnStatement"`
+	AuthnStatements []AuthnStatement `xml:"AuthnStatement"`
 	// AuthzDecisionStatements []AuthzDecisionStatement
-	AttributeStatements []AttributeStatement `xml:"urn:oasis:names:tc:SAML:2.0:assertion AttributeStatement"`
+	AttributeStatements []AttributeStatement `xml:"AttributeStatement"`
 }
 
 // Element returns an etree.Element representing the object in XML form.
@@ -796,9 +793,9 @@ func (a *Assertion) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 type Subject struct {
 	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion Subject"`
 	// BaseID               *BaseID  ... TODO
-	NameID *NameID `xml:"urn:oasis:names:tc:SAML:2.0:assertion NameID"`
+	NameID *NameID
 	// EncryptedID          *EncryptedID  ... TODO
-	SubjectConfirmations []SubjectConfirmation `xml:"urn:oasis:names:tc:SAML:2.0:assertion SubjectConfirmation"`
+	SubjectConfirmations []SubjectConfirmation `xml:"SubjectConfirmation"`
 }
 
 // Element returns an etree.Element representing the object in XML form.
@@ -868,9 +865,9 @@ func (s *SessionIndex) Element() *etree.Element {
 type SubjectConfirmation struct {
 	Method string `xml:",attr"`
 	// BaseID               *BaseID  ... TODO
-	NameID *NameID `xml:"urn:oasis:names:tc:SAML:2.0:assertion NameID"`
+	NameID *NameID
 	// EncryptedID          *EncryptedID  ... TODO
-	SubjectConfirmationData *SubjectConfirmationData `xml:"urn:oasis:names:tc:SAML:2.0:assertion SubjectConfirmationData"`
+	SubjectConfirmationData *SubjectConfirmationData
 }
 
 // Element returns an etree.Element representing the object in XML form.
@@ -953,9 +950,9 @@ func (s *SubjectConfirmationData) UnmarshalXML(d *xml.Decoder, start xml.StartEl
 type Conditions struct {
 	NotBefore            time.Time             `xml:",attr"`
 	NotOnOrAfter         time.Time             `xml:",attr"`
-	AudienceRestrictions []AudienceRestriction `xml:"urn:oasis:names:tc:SAML:2.0:assertion AudienceRestriction"`
-	OneTimeUse           *OneTimeUse           `xml:"urn:oasis:names:tc:SAML:2.0:assertion OneTimeUse"`
-	ProxyRestriction     *ProxyRestriction     `xml:"urn:oasis:names:tc:SAML:2.0:assertion ProxyRestriction"`
+	AudienceRestrictions []AudienceRestriction `xml:"AudienceRestriction"`
+	OneTimeUse           *OneTimeUse
+	ProxyRestriction     *ProxyRestriction
 }
 
 // Element returns an etree.Element representing the object in XML form.
@@ -1016,7 +1013,7 @@ func (c *Conditions) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error 
 //
 // See http://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf §2.5.1.4
 type AudienceRestriction struct {
-	Audience Audience `xml:"urn:oasis:names:tc:SAML:2.0:assertion Audience"`
+	Audience Audience
 }
 
 // Element returns an etree.Element representing the object in XML form.
@@ -1054,8 +1051,8 @@ func (a *OneTimeUse) Element() *etree.Element {
 //
 // See http://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf §2.5.1.6
 type ProxyRestriction struct {
-	Count     *int       `xml:",attr,omitempty"`
-	Audiences []Audience `xml:"urn:oasis:names:tc:SAML:2.0:assertion Audience"`
+	Count     *int
+	Audiences []Audience
 }
 
 // Element returns an etree.Element representing the object in XML form.
@@ -1074,11 +1071,11 @@ func (a *ProxyRestriction) Element() *etree.Element {
 //
 // See http://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf §2.7.2
 type AuthnStatement struct {
-	AuthnInstant        time.Time        `xml:",attr"`
-	SessionIndex        string           `xml:",attr"`
-	SessionNotOnOrAfter *time.Time       `xml:",attr,omitempty"`
-	SubjectLocality     *SubjectLocality `xml:"urn:oasis:names:tc:SAML:2.0:assertion SubjectLocality"`
-	AuthnContext        AuthnContext     `xml:"urn:oasis:names:tc:SAML:2.0:assertion AuthnContext"`
+	AuthnInstant        time.Time  `xml:",attr"`
+	SessionIndex        string     `xml:",attr"`
+	SessionNotOnOrAfter *time.Time `xml:",attr,omitempty"`
+	SubjectLocality     *SubjectLocality
+	AuthnContext        AuthnContext
 }
 
 // Element returns an etree.Element representing the object in XML form.
@@ -1155,7 +1152,7 @@ func (a *SubjectLocality) Element() *etree.Element {
 //
 // See http://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf §2.7.2.2
 type AuthnContext struct {
-	AuthnContextClassRef *AuthnContextClassRef `xml:"urn:oasis:names:tc:SAML:2.0:assertion AuthnContextClassRef"`
+	AuthnContextClassRef *AuthnContextClassRef
 	// AuthnContextDecl          *AuthnContextDecl        ... TODO
 	// AuthnContextDeclRef       *AuthnContextDeclRef     ... TODO
 	// AuthenticatingAuthorities []AuthenticatingAuthority... TODO
@@ -1188,7 +1185,7 @@ func (a *AuthnContextClassRef) Element() *etree.Element {
 //
 // See http://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf §2.7.3
 type AttributeStatement struct {
-	Attributes []Attribute `xml:"urn:oasis:names:tc:SAML:2.0:assertion Attribute"`
+	Attributes []Attribute `xml:"Attribute"`
 }
 
 // Element returns an etree.Element representing the object in XML form.
@@ -1207,7 +1204,7 @@ type Attribute struct {
 	FriendlyName string           `xml:",attr"`
 	Name         string           `xml:",attr"`
 	NameFormat   string           `xml:",attr"`
-	Values       []AttributeValue `xml:"urn:oasis:names:tc:SAML:2.0:assertion AttributeValue"`
+	Values       []AttributeValue `xml:"AttributeValue"`
 }
 
 // Element returns an etree.Element representing the object in XML form.
@@ -1232,9 +1229,9 @@ func (a *Attribute) Element() *etree.Element {
 //
 // See http://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf §2.7.3.1.1
 type AttributeValue struct {
-	Type   string  `xml:"http://www.w3.org/2001/XMLSchema-instance type,attr"`
-	Value  string  `xml:",chardata"`
-	NameID *NameID `xml:"urn:oasis:names:tc:SAML:2.0:assertion NameID"`
+	Type   string `xml:"http://www.w3.org/2001/XMLSchema-instance type,attr"`
+	Value  string `xml:",chardata"`
+	NameID *NameID
 }
 
 // Element returns an etree.Element representing the object in XML form.
