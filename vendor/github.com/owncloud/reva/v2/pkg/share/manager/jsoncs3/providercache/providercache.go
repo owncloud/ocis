@@ -345,6 +345,15 @@ func (c *Cache) Update(ctx context.Context, storageID, spaceID, shareID string, 
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID), attribute.String("cs3.shareid", shareID))
 
+	switch {
+	case storageID == "":
+		return nil, fmt.Errorf("missing storage id")
+	case spaceID == "":
+		return nil, fmt.Errorf("missing space id")
+	case shareID == "":
+		return nil, fmt.Errorf("missing share id")
+	}
+
 	unlock := c.LockSpace(spaceID)
 	defer unlock()
 	span.AddEvent("got lock")
