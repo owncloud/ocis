@@ -2,7 +2,7 @@
 
 [![](https://godoc.org/github.com/crewjam/saml?status.svg)](http://godoc.org/github.com/crewjam/saml)
 
-![Build Status](https://github.com/crewjam/saml/workflows/Presubmit/badge.svg)
+![Build Status](https://github.com/crewjam/saml/actions/workflows/test.yml/badge.svg)
 
 Package saml contains a partial implementation of the SAML standard in golang.
 SAML is a standard for identity federation, i.e. either allowing a third party to authenticate your users or allowing third parties to rely on us to authenticate their users.
@@ -40,7 +40,15 @@ Each service provider must have an self-signed X.509 key pair established. You c
 
     openssl req -x509 -newkey rsa:2048 -keyout myservice.key -out myservice.cert -days 365 -nodes -subj "/CN=myservice.example.com"
 
-We will use `samlsp.Middleware` to wrap the endpoint we want to protect. Middleware provides both an `http.Handler` to serve the SAML specific URLs **and** a set of wrappers to require the user to be logged in. We also provide the URL where the service provider can fetch the metadata from the IDP at startup. In our case, we'll use [samltest.id](https://samltest.id/), an identity provider designed for testing.
+We will use `samlsp.Middleware` to wrap the endpoint we want to protect. Middleware provides both an `http.Handler` to serve the SAML specific URLs **and** a set of wrappers to require the user to be logged in. We also provide the URL where the service provider can fetch the metadata from the IDP at startup. In our case, we'll use [samltest.dev](https://www.samltest.dev/), an identity provider designed for testing.
+
+samltest.dev gives each app its own IDP, so first create an app with at least one test user. You can do this on the website or with the [API](https://www.samltest.dev/#api):
+
+    curl -X POST https://www.samltest.dev/api/apps \
+      -H "Content-Type: application/json" \
+      -d '{"users":[{"email":"john@example.com","firstName":"John","lastName":"Doe"}]}'
+
+The response contains the app's ID (for example `app_01kg2nmcmp9gey67b0kxpqm643`). The IDP metadata URL for the app is `https://www.samltest.dev/apps/<APP_ID>/metadata`.
 
 ```golang
 package main
@@ -71,7 +79,7 @@ func main() {
 		panic(err) // TODO handle error
 	}
 
-	idpMetadataURL, err := url.Parse("https://samltest.id/saml/idp")
+	idpMetadataURL, err := url.Parse("https://www.samltest.dev/apps/<APP_ID>/metadata")
 	if err != nil {
 		panic(err) // TODO handle error
 	}
@@ -99,22 +107,25 @@ func main() {
 }
 ```
 
-Next we'll have to register our service provider with the identity provider to establish trust from the service provider to the IDP. For [samltest.id](https://samltest.id/), you can do something like:
+Next we'll have to register our service provider with the identity provider to establish trust from the service provider to the IDP. samltest.dev doesn't take an uploaded metadata file. Instead, set the app's SP ACS URL and SP Entity ID, either under "SAML SP Settings" on `https://www.samltest.dev/apps/<APP_ID>` or with the API:
 
-    mdpath=saml-test-$USER-$HOST.xml
-    curl localhost:8000/saml/metadata > $mdpath
+    curl -X PUT https://www.samltest.dev/api/apps/<APP_ID> \
+      -H "Content-Type: application/json" \
+      -d '{"users":[{"email":"john@example.com","firstName":"John","lastName":"Doe"}],
+           "spAcsUrl":"http://localhost:8000/saml/acs",
+           "spEntityId":"http://localhost:8000/saml/metadata"}'
 
-Navigate to https://samltest.id/upload.php and upload the file you fetched.
+By default `samlsp` uses `<root URL>/saml/acs` as the ACS URL and `<root URL>/saml/metadata` as the entity ID. You can view the service provider's metadata at `localhost:8000/saml/metadata`.
 
 Now you should be able to authenticate. The flow should look like this:
 
 1. You browse to `localhost:8000/hello`
 
-1. The middleware redirects you to `https://samltest.id/idp/profile/SAML2/Redirect/SSO`
+1. The middleware redirects you to `https://www.samltest.dev/apps/<APP_ID>/login`
 
-1. samltest.id prompts you for a username and password.
+1. samltest.dev asks which of the app's test users you want to log in as. There is no password.
 
-1. samltest.id returns you an HTML document which contains an HTML form setup to POST to `localhost:8000/saml/acs`. The form is automatically submitted if you have javascript enabled.
+1. samltest.dev returns you an HTML document which contains an HTML form setup to POST to `localhost:8000/saml/acs`. The form is automatically submitted if you have javascript enabled.
 
 1. The local service validates the response, issues a session cookie, and redirects you to the original URL, `localhost:8000/hello`.
 
@@ -130,7 +141,7 @@ The SAML standard is huge and complex with many dark corners and strange, unused
 
 This package supports the **Web SSO** profile. Message flows from the service provider to the IDP are supported using the **HTTP Redirect** binding and the **HTTP POST** binding. Message flows from the IDP to the service provider are supported via the **HTTP POST** binding.
 
-The package can produce signed SAML assertions, and can validate both signed and encrypted SAML assertions. It does not support signed or encrypted requests.
+The package can produce signed SAML assertions, and can validate both signed and encrypted SAML assertions.
 
 ## RelayState
 
@@ -150,7 +161,7 @@ The SAML specification is a collection of PDFs (sadly):
 
 - [SAMLConformance](http://docs.oasis-open.org/security/saml/v2.0/saml-conformance-2.0-os.pdf) includes a support matrix for various parts of the protocol.
 
-[SAMLtest](https://samltest.id/) is a testing ground for SAML service and identity providers.
+[SAMLTest](https://www.samltest.dev/) is a free SAML identity provider and SCIM directory for testing SAML service providers.
 
 ## Security Issues
 

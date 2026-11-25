@@ -346,8 +346,8 @@ github.com/cpuguy83/go-md2man/v2/md2man
 # github.com/crewjam/httperr v0.2.0
 ## explicit; go 1.13
 github.com/crewjam/httperr
-# github.com/crewjam/saml v0.4.14
-## explicit; go 1.19
+# github.com/crewjam/saml v0.5.2
+## explicit; go 1.26.0
 github.com/crewjam/saml
 github.com/crewjam/saml/logger
 github.com/crewjam/saml/samlsp
@@ -654,15 +654,11 @@ github.com/gobwas/glob/syntax
 # github.com/gobwas/httphead v0.1.0
 ## explicit; go 1.15
 github.com/gobwas/httphead
-# github.com/gobwas/pool v0.2.1
-## explicit
-github.com/gobwas/pool
-github.com/gobwas/pool/internal/pmath
-github.com/gobwas/pool/pbufio
-github.com/gobwas/pool/pbytes
-# github.com/gobwas/ws v1.2.1
-## explicit; go 1.15
+# github.com/gobwas/ws v1.5.0
+## explicit; go 1.26
 github.com/gobwas/ws
+github.com/gobwas/ws/internal/pool
+github.com/gobwas/ws/internal/saferio
 github.com/gobwas/ws/wsutil
 # github.com/goccy/go-json v0.10.6
 ## explicit; go 1.19
@@ -692,9 +688,6 @@ github.com/gofrs/flock
 # github.com/gofrs/uuid v4.4.0+incompatible
 ## explicit
 github.com/gofrs/uuid
-# github.com/golang-jwt/jwt/v4 v4.5.2
-## explicit; go 1.16
-github.com/golang-jwt/jwt/v4
 # github.com/golang-jwt/jwt/v5 v5.3.1
 ## explicit; go 1.21
 github.com/golang-jwt/jwt/v5
@@ -1321,7 +1314,7 @@ github.com/orcaman/concurrent-map
 # github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245
 ## explicit; go 1.18
 github.com/owncloud/libre-graph-api-go
-# github.com/owncloud/reva/v2 v2.0.0-20261007102202-1f913eb5c1b8
+# github.com/owncloud/reva/v2 v2.0.0-20261124214136-37752948844c
 ## explicit; go 1.26.0
 github.com/owncloud/reva/v2/cmd/revad/internal/grace
 github.com/owncloud/reva/v2/cmd/revad/runtime
@@ -1572,6 +1565,7 @@ github.com/owncloud/reva/v2/pkg/share/cache/warmup/registry
 github.com/owncloud/reva/v2/pkg/share/manager/cs3
 github.com/owncloud/reva/v2/pkg/share/manager/json
 github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3
+github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3/cas
 github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3/providercache
 github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3/receivedsharecache
 github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3/sharecache
@@ -1800,7 +1794,7 @@ github.com/rs/zerolog/internal/cbor
 github.com/rs/zerolog/internal/json
 github.com/rs/zerolog/log
 github.com/rs/zerolog/pkgerrors
-# github.com/russellhaering/goxmldsig v1.6.0
+# github.com/russellhaering/goxmldsig v1.6.1
 ## explicit; go 1.23.0
 github.com/russellhaering/goxmldsig
 github.com/russellhaering/goxmldsig/etreeutils
