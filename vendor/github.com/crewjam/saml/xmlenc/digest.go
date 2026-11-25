@@ -6,7 +6,7 @@ import (
 	"crypto/sha512"
 	"hash"
 
-	//nolint:staticcheck // We should support this for legacy reasons.
+	//nolint:staticcheck,gosec // We should support this for legacy reasons.
 	"golang.org/x/crypto/ripemd160"
 )
 
@@ -30,20 +30,40 @@ var (
 		hash:      sha1.New,
 	}
 
-	// SHA256 implements the SHA-256 digest method
+	// SHA256 implements the SHA-256 digest method. The algorithm URI is the one
+	// assigned by RFC 4051 section 2.3.2, which lives in the XML Encryption
+	// namespace rather than the XML Signature one.
 	SHA256 = digestMethod{
+		algorithm: "http://www.w3.org/2001/04/xmlenc#sha256",
+		hash:      sha256.New,
+	}
+
+	// SHA512 implements the SHA-512 digest method (RFC 4051 section 2.3.4).
+	SHA512 = digestMethod{
+		algorithm: "http://www.w3.org/2001/04/xmlenc#sha512",
+		hash:      sha512.New,
+	}
+
+	// RIPEMD160 implements the RIPEMD160 digest method (RFC 4051 section 2.3.5).
+	RIPEMD160 = digestMethod{
+		algorithm: "http://www.w3.org/2001/04/xmlenc#ripemd160",
+		hash:      ripemd160.New,
+	}
+
+	// The URIs below were emitted by earlier releases of this package, which
+	// mistakenly placed these digests in the XML Signature namespace. They are
+	// registered so that documents produced by those releases keep decrypting.
+	legacySHA256 = digestMethod{
 		algorithm: "http://www.w3.org/2000/09/xmldsig#sha256",
 		hash:      sha256.New,
 	}
 
-	// SHA512 implements the SHA-512 digest method
-	SHA512 = digestMethod{
+	legacySHA512 = digestMethod{
 		algorithm: "http://www.w3.org/2000/09/xmldsig#sha512",
 		hash:      sha512.New,
 	}
 
-	// RIPEMD160 implements the RIPEMD160 digest method
-	RIPEMD160 = digestMethod{
+	legacyRIPEMD160 = digestMethod{
 		algorithm: "http://www.w3.org/2000/09/xmldsig#ripemd160",
 		hash:      ripemd160.New,
 	}
@@ -54,4 +74,7 @@ func init() {
 	RegisterDigestMethod(SHA256)
 	RegisterDigestMethod(SHA512)
 	RegisterDigestMethod(RIPEMD160)
+	RegisterDigestMethod(legacySHA256)
+	RegisterDigestMethod(legacySHA512)
+	RegisterDigestMethod(legacyRIPEMD160)
 }
