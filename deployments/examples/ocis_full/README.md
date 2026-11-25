@@ -84,11 +84,9 @@ Open Grafana at `http://localhost:3000`, then select **Explore** and the **Tempo
 - `{ resource.service.name = "sharing" && name = "ListReceivedShares" }`: the share listings. Each oCIS service sends its own service name, for example `sharing`, `storage-system` or `proxy`.
 - `{ name = "loadAttributes" } >> { name = "os.OpenFile" }`: the attribute reads that go to the disk. A `loadAttributes` span with no `os.OpenFile` child is a hit in the attribute cache.
 
-Service names in the single binary: this example runs all services in one `ocis` process. Each service sets the global tracer provider at its start, and the last one wins. Some spans use this global provider, so they can carry the service name of another service:
-- the spans of the decomposedfs storage driver, for example `loadAttributes`, `os.OpenFile` and `saveAttributes`
-- the gRPC client spans
+Service names in the single binary: this example runs all services in one `ocis` process. Each span carries the service name of the service that made it, for example `storage-system` for the decomposedfs spans of the metadata documents, `storage-users` for those of the user spaces, and the calling service for a gRPC client span. So you can filter by `resource.service.name`, for example `{ resource.service.name = "storage-system" && name = "loadAttributes" } >> { name = "os.OpenFile" }`.
 
-For these spans, do not filter by `resource.service.name`. Filter by the trace structure instead, for example `{ resource.service.name = "sharing" && name = "ListReceivedShares" } >> { name = "loadAttributes" }`. The spans of the share manager and of the reva metadata storage use the tracer of their service, so their service name is correct. For the metadata storage, this needs reva with the change of OCISDEV-1736.
+This needs reva with the changes of OCISDEV-1736. In older versions, the decomposedfs spans and the gRPC client spans use the global tracer provider. Each service sets it at its start, and the last one wins. These spans then carry the service name of another service. With such a version, filter them by the trace structure, for example `{ resource.service.name = "sharing" && name = "ListReceivedShares" } >> { name = "loadAttributes" }`.
 
 Tempo 3 also answers TraceQL metrics queries, with no additional configuration. They give rates and percentiles over a time range. Examples for the share manager:
 - `{ resource.service.name = "sharing" && name = "Download" } | count_over_time() by (span.metadata.result)`: the downloads of the share manager by result (`200`, `304`, `404`, `conflict` or `error`).
