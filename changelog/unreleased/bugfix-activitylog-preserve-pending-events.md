@@ -6,8 +6,10 @@ activity whose event ID was not yet returned by `eventhistory`. Because
 resource before `eventhistory` stored a newly emitted event permanently removed
 the activity even after `eventhistory` caught up.
 
-Missing events are now only pruned once their activity timestamp is older
-than the configured store TTL (defaulting to `eventhistory`'s 336h retention),
-leaving recently created activities and entries without a timestamp intact.
+Missing events are now kept until `ACTIVITYLOG_STORE_TTL` (defaulting to 336h)
+has elapsed since `activitylog` received the activity, while legacy entries
+without a recorded receive time continue to be pruned on the first miss.
+`ACTIVITYLOG_STORE_TTL` now also governs this pruning and should not be set
+lower than `EVENTHISTORY_STORE_TTL`.
 
 https://github.com/owncloud/ocis/issues/13490

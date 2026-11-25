@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"go-micro.dev/v4/client"
+	microstore "go-micro.dev/v4/store"
 	"google.golang.org/grpc"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -146,6 +147,91 @@ func activityIDs(t *testing.T, svc *ActivitylogService, rid *provider.ResourceId
 	return ids
 }
 
+func seedRawActivities(t *testing.T, svc *ActivitylogService, resourceKey string, acts []RawActivity) {
+	t.Helper()
+	b, err := json.Marshal(acts)
+	require.NoError(t, err)
+	require.NoError(t, svc.store.Write(&microstore.Record{
+		Key:   resourceKey,
+		Value: b,
+	}))
+}
+
+func TestIsActivityExpired(t *testing.T) {
+	now := time.Date(2026, 11, 25, 12, 0, 0, 0, time.UTC)
+	defaultSvc := &ActivitylogService{}
+	customSvc := &ActivitylogService{
+		cfg: &config.Config{
+			Store: config.Store{
+				TTL: 2 * time.Hour,
+			},
+		},
+	}
+
+	testCases := []struct {
+		name     string
+		svc      *ActivitylogService
+		activity RawActivity
+		expected bool
+	}{
+		{
+			name: "missing received_at uses legacy prune behavior",
+			svc:  defaultSvc,
+			activity: RawActivity{
+				EventID:   "legacy-no-received-at",
+				Timestamp: now.Add(-5 * time.Minute),
+			},
+			expected: true,
+		},
+		{
+			name: "within default ttl even with old event timestamp",
+			svc:  defaultSvc,
+			activity: RawActivity{
+				EventID:    "late-backlog-event",
+				Timestamp:  now.Add(-400 * time.Hour),
+				ReceivedAt: now.Add(-5 * time.Minute),
+			},
+			expected: false,
+		},
+		{
+			name: "at default ttl expires",
+			svc:  defaultSvc,
+			activity: RawActivity{
+				EventID:    "at-default-ttl",
+				Timestamp:  now.Add(-_defaultEventTTL),
+				ReceivedAt: now.Add(-_defaultEventTTL),
+			},
+			expected: true,
+		},
+		{
+			name: "within configured store ttl",
+			svc:  customSvc,
+			activity: RawActivity{
+				EventID:    "within-custom-ttl",
+				Timestamp:  now.Add(-10 * time.Hour),
+				ReceivedAt: now.Add(-1 * time.Hour),
+			},
+			expected: false,
+		},
+		{
+			name: "past configured store ttl",
+			svc:  customSvc,
+			activity: RawActivity{
+				EventID:    "past-custom-ttl",
+				Timestamp:  now.Add(-3 * time.Hour),
+				ReceivedAt: now.Add(-3 * time.Hour),
+			},
+			expected: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			require.Equal(t, tc.expected, tc.svc.isActivityExpired(tc.activity, now))
+		})
+	}
+}
+
 func TestHandleGetItemActivities_PreservesPendingEvents(t *testing.T) {
 	svc, eh, rid := newTestActivitylogService(t, nil)
 	now := time.Now()
@@ -156,10 +242,7 @@ func TestHandleGetItemActivities_PreservesPendingEvents(t *testing.T) {
 
 	first := performGetActivities(t, svc, rid)
 	require.Empty(t, first.Activities)
-
-	require.Never(t, func() bool {
-		return len(activityIDs(t, svc, rid)) == 0
-	}, 100*time.Millisecond, 10*time.Millisecond, "newly stored activity must not be deleted while eventhistory catches up")
+	require.Equal(t, []string{"pending-event"}, activityIDs(t, svc, rid))
 
 	eh.On("GetEvents", mock.Anything, &ehsvc.GetEventsRequest{Ids: []string{"pending-event"}}).
 		Return(&ehsvc.GetEventsResponse{
@@ -176,10 +259,13 @@ func TestHandleGetItemActivities_DeletesOnlyExpiredMissingEvents(t *testing.T) {
 	now := time.Now()
 	resKey := storagespace.FormatResourceID(rid)
 
-	require.NoError(t, svc.storeActivity(resKey, "recent-missing", 0, now.Add(-5*time.Minute)))
-	require.NoError(t, svc.storeActivity(resKey, "zero-ts-missing", 0, time.Time{}))
-	require.NoError(t, svc.storeActivity(resKey, "expired-missing", 0, now.Add(-400*time.Hour)))
-	require.NoError(t, svc.storeActivity(resKey, "expired-present", 0, now.Add(-400*time.Hour)))
+	seedRawActivities(t, svc, resKey, []RawActivity{
+		{EventID: "recent-missing", Timestamp: now.Add(-5 * time.Minute), ReceivedAt: now.Add(-5 * time.Minute)},
+		{EventID: "late-event-missing", Timestamp: now.Add(-400 * time.Hour), ReceivedAt: now.Add(-5 * time.Minute)},
+		{EventID: "legacy-missing-received-at", Timestamp: now.Add(-5 * time.Minute)},
+		{EventID: "expired-missing", Timestamp: now.Add(-400 * time.Hour), ReceivedAt: now.Add(-400 * time.Hour)},
+		{EventID: "expired-present", Timestamp: now.Add(-400 * time.Hour), ReceivedAt: now.Add(-400 * time.Hour)},
+	})
 
 	eh.On("GetEvents", mock.Anything, mock.Anything).
 		Return(&ehsvc.GetEventsResponse{
@@ -195,7 +281,7 @@ func TestHandleGetItemActivities_DeletesOnlyExpiredMissingEvents(t *testing.T) {
 		return len(ids) == 3
 	}, time.Second, 10*time.Millisecond)
 
-	require.ElementsMatch(t, []string{"recent-missing", "zero-ts-missing", "expired-present"}, activityIDs(t, svc, rid))
+	require.ElementsMatch(t, []string{"recent-missing", "late-event-missing", "expired-present"}, activityIDs(t, svc, rid))
 }
 
 func TestHandleGetItemActivities_RespectsConfiguredStoreTTL(t *testing.T) {
@@ -207,8 +293,10 @@ func TestHandleGetItemActivities_RespectsConfiguredStoreTTL(t *testing.T) {
 	now := time.Now()
 	resKey := storagespace.FormatResourceID(rid)
 
-	require.NoError(t, svc.storeActivity(resKey, "within-ttl", 0, now.Add(-1*time.Hour)))
-	require.NoError(t, svc.storeActivity(resKey, "past-ttl", 0, now.Add(-3*time.Hour)))
+	seedRawActivities(t, svc, resKey, []RawActivity{
+		{EventID: "within-ttl", Timestamp: now.Add(-1 * time.Hour), ReceivedAt: now.Add(-1 * time.Hour)},
+		{EventID: "past-ttl", Timestamp: now.Add(-3 * time.Hour), ReceivedAt: now.Add(-3 * time.Hour)},
+	})
 
 	eh.On("GetEvents", mock.Anything, mock.Anything).
 		Return(&ehsvc.GetEventsResponse{}, nil).Once()

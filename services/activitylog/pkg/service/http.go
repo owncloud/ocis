@@ -37,8 +37,7 @@ var (
 	_domain = "activitylog"
 )
 
-// _defaultEventTTL matches eventhistory's default store TTL so missing events
-// are only cleaned up once they could have expired from eventhistory.
+// _defaultEventTTL matches eventhistory's default store TTL when ACTIVITYLOG_STORE_TTL is unset.
 const _defaultEventTTL = 336 * time.Hour
 
 // ServeHTTP implements the http.Handler interface.
@@ -387,12 +386,12 @@ func isRename(o, n *provider.Reference) bool {
 }
 
 func (s *ActivitylogService) isActivityExpired(a RawActivity, now time.Time) bool {
-	if a.Timestamp.IsZero() {
-		return false
+	if a.ReceivedAt.IsZero() {
+		return true
 	}
 	ttl := _defaultEventTTL
 	if s.cfg != nil && s.cfg.Store.TTL > 0 {
 		ttl = s.cfg.Store.TTL
 	}
-	return now.Sub(a.Timestamp) >= ttl
+	return now.Sub(a.ReceivedAt) >= ttl
 }
