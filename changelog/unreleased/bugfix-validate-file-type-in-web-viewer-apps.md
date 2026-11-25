@@ -7,4 +7,4 @@ type. The file was then loaded and shown anyway.
 Viewer apps now check that the file type is supported before loading the file
 and show an error message otherwise.
 
-https://github.com/owncloud/ocis/pull/13439
+https://github.com/owncloud/ocis/pull/13585
