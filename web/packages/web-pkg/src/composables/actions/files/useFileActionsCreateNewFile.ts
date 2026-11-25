@@ -164,6 +164,9 @@ export const useFileActionsCreateNewFile = ({ space }: { space?: Ref<SpaceResour
       actions.push({
         name: 'create-new-file',
         icon: appFileExtension.icon || '',
+        ...(appsStore.apps[appFileExtension.app]?.iconFillType && {
+          iconFillType: appsStore.apps[appFileExtension.app].iconFillType
+        }),
         handler: (args) =>
           appFileExtension.customHandler
             ? appFileExtension.customHandler(args, appFileExtension.extension, appFileExtension)

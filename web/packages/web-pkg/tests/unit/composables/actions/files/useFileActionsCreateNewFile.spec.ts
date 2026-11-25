@@ -12,6 +12,7 @@ import {
   RouteLocation
 } from '../../../../../src/testing'
 import { ApplicationFileExtension } from '../../../../../types'
+import { ApplicationInformation } from '../../../../../src/apps'
 import { useResourcesStore } from '../../../../../src/composables/piniaStores'
 
 vi.mock('../../../../../src/composables/actions/files/useFileActions', async (importOriginal) => ({
@@ -137,6 +138,44 @@ describe('useFileActionsCreateNewFile', () => {
       })
     })
 
+    it('should forward the app iconFillType when the app defines one', () => {
+      const action = mock<ApplicationFileExtension>({
+        app: 'custom-app',
+        extension: undefined,
+        mimeType: undefined,
+        icon: 'sparkling-2',
+        newFileMenu: { menuTitle: vi.fn() },
+        customHandler: null
+      })
+
+      getWrapper({
+        action,
+        apps: { 'custom-app': mock<ApplicationInformation>({ iconFillType: 'line' }) },
+        setup(instance) {
+          expect(unref(instance.actions)[0].iconFillType).toBe('line')
+        }
+      })
+    })
+
+    it('should not set iconFillType when the app does not define one', () => {
+      const action = mock<ApplicationFileExtension>({
+        app: 'custom-app',
+        extension: undefined,
+        mimeType: undefined,
+        icon: 'sparkling-2',
+        newFileMenu: { menuTitle: vi.fn() },
+        customHandler: null
+      })
+
+      getWrapper({
+        action,
+        apps: { 'custom-app': mock<ApplicationInformation>({ iconFillType: undefined }) },
+        setup(instance) {
+          expect(unref(instance.actions)[0].iconFillType).toBeUndefined()
+        }
+      })
+    })
+
     it('should set icon to an empty string when ApplicationFileExtension.icon is not provided', () => {
       const action = mock<ApplicationFileExtension>({
         app: 'text-editor',
@@ -166,13 +205,15 @@ function getWrapper({
     newFileMenu: { menuTitle: vi.fn() },
     customHandler: null
   }),
-  currentFolder = mock<Resource>({ id: '1', path: '/' })
+  currentFolder = mock<Resource>({ id: '1', path: '/' }),
+  apps = {}
 }: {
   resolveCreateFile?: boolean
   space?: SpaceResource
   setup: (instance: ReturnType<typeof useFileActionsCreateNewFile>) => void
   action?: ApplicationFileExtension
   currentFolder?: Resource
+  apps?: Record<string, ApplicationInformation>
 }) {
   const mocks = {
     ...defaultComponentMocks({
@@ -205,7 +246,8 @@ function getWrapper({
         pluginOptions: {
           piniaOptions: {
             appsState: {
-              fileExtensions: [action]
+              fileExtensions: [action],
+              apps
             },
             resourcesStore: { currentFolder }
           }

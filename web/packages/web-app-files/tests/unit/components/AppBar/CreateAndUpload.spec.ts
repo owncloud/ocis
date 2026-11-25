@@ -82,6 +82,7 @@ describe('CreateAndUpload component', () => {
             label: () => 'AI Assistant',
             ext: undefined,
             icon: 'sparkling-2',
+            iconFillType: undefined,
             isExternal: false,
             isVisible: () => true
           })
@@ -93,7 +94,25 @@ describe('CreateAndUpload component', () => {
       expect(ocIcon.exists()).toBe(true)
       expect(ocIcon.props('name')).toBe('sparkling-2')
       expect(ocIcon.props('size')).toBe('medium')
+      expect(ocIcon.props('fillType')).toBe('line')
       expect(item.findComponent(ResourceIcon).exists()).toBe(false)
+    })
+    it('should pass the action iconFillType to oc-icon', () => {
+      const { wrapper } = getWrapper({
+        createActions: [
+          mock<FileAction>({
+            label: () => 'AI Assistant',
+            ext: undefined,
+            icon: 'sparkling-2',
+            iconFillType: 'fill',
+            isExternal: false,
+            isVisible: () => true
+          })
+        ]
+      })
+
+      const ocIcon = wrapper.find('.create-list-file').findComponent(OcIcon)
+      expect(ocIcon.props('fillType')).toBe('fill')
     })
     it.each([
       {

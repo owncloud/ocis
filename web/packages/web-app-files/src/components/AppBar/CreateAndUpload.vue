@@ -57,6 +57,7 @@
               <oc-icon
                 v-if="!fileAction.ext && fileAction.icon"
                 :name="fileAction.icon"
+                :fill-type="fileAction.iconFillType || 'line'"
                 size="medium"
               />
               <resource-icon v-else :resource="getIconResource(fileAction)" size="medium" />
