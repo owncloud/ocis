@@ -37,6 +37,10 @@ var (
 	_domain = "activitylog"
 )
 
+// _defaultEventTTL matches eventhistory's default store TTL so missing events
+// are only cleaned up once they could have expired from eventhistory.
+const _defaultEventTTL = 336 * time.Hour
+
 // ServeHTTP implements the http.Handler interface.
 func (s *ActivitylogService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.mux.ServeHTTP(w, r)
@@ -87,13 +91,16 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 	}
 
 	ids := make([]string, 0, len(raw))
-	toDelete := make(map[string]struct{}, len(raw))
+	toDelete := make(map[string]struct{})
+	now := time.Now()
 	for _, a := range raw {
 		if !rawActivityAccepted(a) {
 			continue
 		}
 		ids = append(ids, a.EventID)
-		toDelete[a.EventID] = struct{}{}
+		if s.isActivityExpired(a, now) {
+			toDelete[a.EventID] = struct{}{}
+		}
 	}
 
 	evRes, err := s.evHistory.GetEvents(r.Context(), &ehsvc.GetEventsRequest{Ids: ids})
@@ -377,4 +384,15 @@ func isRename(o, n *provider.Reference) bool {
 		return false
 	}
 	return filepath.Base(o.GetPath()) != filepath.Base(n.GetPath())
+}
+
+func (s *ActivitylogService) isActivityExpired(a RawActivity, now time.Time) bool {
+	if a.Timestamp.IsZero() {
+		return false
+	}
+	ttl := _defaultEventTTL
+	if s.cfg != nil && s.cfg.Store.TTL > 0 {
+		ttl = s.cfg.Store.TTL
+	}
+	return now.Sub(a.Timestamp) >= ttl
 }
