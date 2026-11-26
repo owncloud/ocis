@@ -100,7 +100,7 @@ Lost spans under load: the OpenTelemetry SDK keeps at most 2048 spans in its que
 
 The ports of Tempo (`4317` for OTLP gRPC and `3200` for the HTTP API) and of Grafana (`3000`) are open only on `127.0.0.1`. You can change them with `TEMPO_OTLP_GRPC_PORT`, `TEMPO_HTTP_PORT` and `GRAFANA_PORT`.
 
-To trace an oCIS binary that runs on the host, start only Tempo and Grafana:
+To trace an oCIS binary that runs on the host, enable `TEMPO` in the `.env` file. Then start only Tempo and Grafana:
 
 ```bash
 docker compose up -d tempo grafana
