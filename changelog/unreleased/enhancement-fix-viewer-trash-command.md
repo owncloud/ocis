@@ -10,3 +10,4 @@ bin access from these members. It runs as a dry run by default and only changes
 members whose permissions are exactly the ones of the old "Can view" role.
 
 https://github.com/owncloud/ocis/pull/13393
+https://github.com/owncloud/ocis/pull/13591
