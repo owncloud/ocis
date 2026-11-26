@@ -54,6 +54,9 @@ interface AuthCapability {
   mfa: {
     enabled?: boolean
     levelnames?: string[]
+    session_duration?: number
+    enforce_session_duration?: boolean
+    issued_at_claim?: string
   }
 }
 

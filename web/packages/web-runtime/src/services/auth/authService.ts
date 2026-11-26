@@ -20,6 +20,7 @@ import {
   isUserContextRequired
 } from '../../router'
 import { unref } from 'vue'
+import { User } from 'oidc-client-ts'
 import { Ability } from '@ownclouders/web-client'
 import { User as OcUser } from '@ownclouders/web-client/graph/generated'
 import { Language } from 'vue3-gettext'
@@ -27,6 +28,27 @@ import { PublicLinkType } from '@ownclouders/web-client'
 import { WebWorkersStore } from '@ownclouders/web-pkg'
 import { isSilentRedirectRoute } from '../../helpers/silentRedirect'
 import { vaultStepUpFailedKey } from '../../helpers/vaultStepUp'
+
+const decodeJwtClaims = (token: unknown): Record<string, any> | undefined => {
+  if (typeof token !== 'string') {
+    return undefined
+  }
+  try {
+    const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+    const claims = JSON.parse(atob(payload))
+    return claims && typeof claims === 'object' ? claims : undefined
+  } catch {
+    return undefined
+  }
+}
+
+const readClaim = (claims: Record<string, any>, path: string): unknown =>
+  path in claims
+    ? claims[path]
+    : path
+        .split(/(?<!\\)\./)
+        .map((key) => key.replaceAll('\\.', '.'))
+        .reduce((claim, key) => claim?.[key], claims)
 
 /**
  * Custom OIDC state sent with an MFA step-up request. oidc-client-ts stores it with the
@@ -179,13 +201,14 @@ export class AuthService implements AuthServiceInterface {
         }
       }
 
-      if (!user || user.expired || user.profile.acr !== requiredAcr) {
+      const mfaProblem = user && !user.expired && this.getMfaProblem(user, requiredAcr)
+      if (!user || user.expired || mfaProblem) {
         // `acr_values` is a voluntary claim: an IdP that can't reach the required level
         // (no second factor available/enrolled) returns a lower `acr` instead of an error.
         // Redirecting again would loop forever, so give up once the IdP answered the step-up.
         if (user && !user.expired && this.isStepUpReturn(to.fullPath)) {
           console.warn(
-            `[authService:initializeContext] - MFA step-up returned acr "${user.profile.acr}", required "${requiredAcr}". Not retrying.`
+            `[authService:initializeContext] - MFA step-up returned ${mfaProblem}. Not retrying.`
           )
           this.leaveVaultAfterFailedStepUp()
           // cancel the vault navigation, the page reloads outside the vault
@@ -480,15 +503,14 @@ export class AuthService implements AuthServiceInterface {
     const user = await this.userManager.getUser()
     const isAuthenticated = user && !user.expired
 
-    if (isAuthenticated && user.profile.acr === acrValue) {
+    const mfaProblem = isAuthenticated && this.getMfaProblem(user, acrValue)
+    if (isAuthenticated && !mfaProblem) {
       return true
     }
 
     // `acr_values` is a voluntary claim, see `initializeContext`: don't redirect again
     if (isAuthenticated && this.isStepUpReturn(redirectUrl)) {
-      console.warn(
-        `[authService:requireAcr] - MFA step-up returned acr "${user.profile.acr}", required "${acrValue}". Not retrying.`
-      )
+      console.warn(`[authService:requireAcr] - MFA step-up returned ${mfaProblem}. Not retrying.`)
       this.showStepUpFailedMessage()
       return false
     }
@@ -501,6 +523,38 @@ export class AuthService implements AuthServiceInterface {
   private signinRedirectForStepUp(acrValue: string, target: string) {
     const state: MfaStepUpState = { mfaStepUpTarget: target }
     return this.userManager.signinRedirect({ acr_values: acrValue, state })
+  }
+
+  /**
+   * Returns why the MFA of the user doesn't satisfy `acrValue`, or undefined if it does.
+   */
+  private getMfaProblem(user: User, acrValue: string): string | undefined {
+    if (user.profile.acr !== acrValue) {
+      return `acr "${user.profile.acr}", required "${acrValue}"`
+    }
+    if (!this.capabilityStore.authMfaEnforceSessionDuration) {
+      return undefined
+    }
+    // the proxy alone decides for opaque access tokens
+    const claims = decodeJwtClaims(user.access_token)
+    if (!claims) {
+      return undefined
+    }
+    const claim = this.capabilityStore.authMfaIssuedAtClaim || 'auth_time'
+    const verifiedAt = readClaim(claims, claim)
+    if (typeof verifiedAt !== 'number') {
+      return `MFA time claim "${claim}" missing or not a number in the access token`
+    }
+    const age = Math.floor(Date.now() / 1000 - verifiedAt)
+    if (age >= this.mfaSessionDuration) {
+      return `MFA time claim "${claim}" is ${age}s old, session duration ${this.mfaSessionDuration}s`
+    }
+    return undefined
+  }
+
+  private get mfaSessionDuration(): number {
+    const duration = this.capabilityStore.authMfaSessionDuration
+    return duration > 0 ? duration : 3600
   }
 
   /**

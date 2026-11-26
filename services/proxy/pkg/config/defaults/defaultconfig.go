@@ -101,8 +101,10 @@ func DefaultConfig() *config.Config {
 			EnableTLS: false,
 		},
 		MultiFactorAuthentication: config.MFAConfig{
-			AuthLevelNames:  []string{"advanced"},
-			SessionDuration: 3600,
+			AuthLevelNames:         []string{"advanced"},
+			SessionDuration:        3600,
+			EnforceSessionDuration: true,
+			IssuedAtClaim:          "auth_time",
 		},
 	}
 }

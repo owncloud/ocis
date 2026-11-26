@@ -160,6 +160,19 @@ This feature is disabled by default and requires an external Identity Provider (
 
 If an authenticated user attempts to access a protected route without two-factor authentication (2FA), the server will respond with a 403 Forbidden error and an `X-OCIS-MFA-Required` header.
 
+##### MFA Session Duration
+
+MFA expires after `OCIS_MFA_SESSION_DURATION` seconds (default 3600). The web UI then asks for the second factor again.
+
+The IDP must:
+
+1. Put the time of the MFA into the access token. The default claim is `auth_time`, which Keycloak 25 and later adds by default. Set `OCIS_MFA_ISSUED_AT_CLAIM` to use another claim, for example one with the time of the second factor instead of the login.
+2. Ask for the second factor again once it is older than the session duration. Otherwise it returns the old time and users can't open MFA-protected paths. In Keycloak, set the max age of the MFA level (`loa-max-age`) to `OCIS_MFA_SESSION_DURATION` or lower. With a brokered IDP, set it on the IDP that performs the second factor.
+
+If the claim is missing or invalid, MFA is denied and a warning is logged.
+
+To turn this off, set `OCIS_MFA_ENFORCE_SESSION_DURATION=false`.
+
 #### Impacts
 
 For shares or space memberships based on groups, a renamed or deleted group will impact accessing the resource:

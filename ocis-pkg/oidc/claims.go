@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -73,4 +74,47 @@ func ReadStringClaim(path string, claims map[string]any) (string, error) {
 	}
 
 	return value, fmt.Errorf("claim path '%s' not set or empty", path)
+}
+
+// ReadNumericClaim returns the integer obtained by following the . separated path in the claims
+func ReadNumericClaim(path string, claims map[string]any) (int64, error) {
+	claim, ok := claims[path]
+	if !ok {
+		var err error
+		if claim, err = WalkSegments(SplitWithEscaping(path, ".", "\\"), claims); err != nil {
+			return 0, err
+		}
+	}
+
+	// JSON decodes numbers as float64 or json.Number, the msgpack userinfo cache as sized integers
+	switch v := claim.(type) {
+	case float64:
+		return int64(v), nil
+	case float32:
+		return int64(v), nil
+	case int:
+		return int64(v), nil
+	case int8:
+		return int64(v), nil
+	case int16:
+		return int64(v), nil
+	case int32:
+		return int64(v), nil
+	case int64:
+		return v, nil
+	case uint8:
+		return int64(v), nil
+	case uint16:
+		return int64(v), nil
+	case uint32:
+		return int64(v), nil
+	case uint64:
+		return int64(v), nil
+	case json.Number:
+		return v.Int64()
+	case nil:
+		return 0, fmt.Errorf("claim path '%s' not set", path)
+	default:
+		return 0, fmt.Errorf("claim path '%s' is not a number but '%T'", path, claim)
+	}
 }
