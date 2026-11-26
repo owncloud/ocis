@@ -58,6 +58,16 @@ type Config struct {
 	TLSRootCACert      string        `mapstructure:"cache_tls_root_ca_certificate"`
 	CredsFile          string        `mapstructure:"cache_creds_file"`
 	Creds              string        `mapstructure:"cache_creds"`
+
+	// DecodedAttributesMaxEntries limits the number of decoded node attribute
+	// maps the file metadata cache keeps in its process-local decoded layer.
+	// 0 uses the built-in default (16384), a negative value disables the
+	// decoded layer.
+	DecodedAttributesMaxEntries int `mapstructure:"cache_decoded_attributes_max_entries"`
+	// DecodedAttributesMaxBytes limits the estimated memory in bytes used by
+	// the decoded layer of the file metadata cache. 0 uses the built-in
+	// default (64 MiB), a negative value disables the decoded layer.
+	DecodedAttributesMaxBytes int `mapstructure:"cache_decoded_attributes_max_bytes"`
 }
 
 // Cache handles key value operations on caches

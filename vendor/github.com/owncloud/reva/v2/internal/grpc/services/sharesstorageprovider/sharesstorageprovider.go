@@ -429,14 +429,16 @@ func (s *service) ListStorageSpaces(ctx context.Context, req *provider.ListStora
 				earliestShare := findEarliestShare(receivedShares, shareInfo)
 				var opaque *typesv1beta1.Opaque
 				var mtime *typesv1beta1.Timestamp
+				etag := _defaultSharesJailEtag
 				if earliestShare != nil {
 					if info, ok := shareInfo[earliestShare.GetId().GetOpaqueId()]; ok {
 						mtime = info.Mtime
-						opaque = utils.AppendPlainToOpaque(opaque, "etag", info.Etag)
+						if info.Etag != "" {
+							etag = info.Etag
+						}
 					}
-				} else {
-					opaque = utils.AppendPlainToOpaque(opaque, "etag", _defaultSharesJailEtag)
 				}
+				opaque = utils.AppendPlainToOpaque(opaque, "etag", etag)
 				// only display the shares jail if we have accepted shares
 				opaque = utils.AppendPlainToOpaque(opaque, "spaceAlias", "virtual/shares")
 				space := &provider.StorageSpace{
@@ -499,10 +501,18 @@ func (s *service) ListStorageSpaces(ctx context.Context, req *provider.ListStora
 					}
 				}
 				var opaque *typesv1beta1.Opaque
-				if _, ok := shareInfo[receivedShare.Share.Id.OpaqueId]; !ok {
+				info, ok := shareInfo[receivedShare.Share.Id.OpaqueId]
+				if !ok {
 					// we could not stat the share, skip it
 					continue
 				}
+				// expose the etag of the shared resource so clients can detect changes,
+				// use a stable placeholder if the resource has no etag
+				etag := info.GetEtag()
+				if etag == "" {
+					etag = _defaultSharesJailEtag
+				}
+				opaque = utils.AppendPlainToOpaque(opaque, "etag", etag)
 				// add the resourceID for the grant
 				if receivedShare.Share.ResourceId != nil {
 					opaque = utils.AppendPlainToOpaque(opaque, "grantStorageID", receivedShare.Share.ResourceId.StorageId)
@@ -524,7 +534,7 @@ func (s *service) ListStorageSpaces(ctx context.Context, req *provider.ListStora
 					Owner:     &userv1beta1.User{Id: receivedShare.Share.Owner}, // FIXME actually, the mount point belongs to the recipient
 					// the sharesstorageprovider keeps track of mount points
 					Root:     root,
-					RootInfo: shareInfo[receivedShare.Share.Id.OpaqueId],
+					RootInfo: info,
 				}
 
 				// TODO in the future the spaces registry will handle the alias for share spaces.
@@ -729,7 +739,9 @@ func (s *service) Stat(ctx context.Context, req *provider.StatRequest) (*provide
 		if earliestShare != nil {
 			if info, ok := shareMd[earliestShare.GetId().GetOpaqueId()]; ok {
 				mtime = info.Mtime
-				etag = info.Etag
+				if info.Etag != "" {
+					etag = info.Etag
+				}
 			}
 		}
 		return &provider.StatResponse{

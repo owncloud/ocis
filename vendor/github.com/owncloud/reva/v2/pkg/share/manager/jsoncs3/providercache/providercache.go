@@ -26,7 +26,6 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-	"sync"
 	"time"
 
 	backoff "github.com/cenkalti/backoff/v5"
@@ -35,6 +34,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3/cas"
+	"github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3/keylock"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/mtimesyncedcache"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/metadata"
 	"go.opentelemetry.io/otel"
@@ -53,7 +53,7 @@ func init() {
 
 // Cache holds share information structured by provider and space
 type Cache struct {
-	lockMap sync.Map
+	lockMap keylock.Map
 
 	Providers mtimesyncedcache.Map[string, *Spaces]
 
@@ -120,13 +120,11 @@ func (s *Shares) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// LockSpace locks the cache for a given space and returns an unlock function
-func (c *Cache) LockSpace(spaceID string) func() {
-	v, _ := c.lockMap.LoadOrStore(spaceID, &sync.Mutex{})
-	lock := v.(*sync.Mutex)
-
-	lock.Lock()
-	return func() { lock.Unlock() }
+// LockSpace locks the cache for a given space and returns an unlock function.
+// It gives up with ctx.Err() once ctx is done, so abandoned requests don't stay
+// parked behind a slow holder; the returned unlock func is nil in that case.
+func (c *Cache) LockSpace(ctx context.Context, spaceID string) (func(), error) {
+	return c.lockMap.Lock(ctx, spaceID)
 }
 
 // New returns a new Cache instance
@@ -135,7 +133,6 @@ func New(s metadata.Storage, ttl time.Duration) Cache {
 		Providers: mtimesyncedcache.Map[string, *Spaces]{},
 		storage:   s,
 		ttl:       ttl,
-		lockMap:   sync.Map{},
 	}
 }
 
@@ -195,11 +192,13 @@ func (c *Cache) Add(ctx context.Context, storageID, spaceID, shareID string, sha
 		return fmt.Errorf("missing share id")
 	}
 
-	unlock := c.LockSpace(spaceID)
+	unlock, err := c.LockSpace(ctx, spaceID)
+	if err != nil {
+		return err
+	}
 	defer unlock()
 	span.AddEvent("got lock")
 
-	var err error
 	if !c.isSpaceCached(storageID, spaceID) {
 		err = c.syncWithRetry(ctx, storageID, spaceID)
 		if err != nil {
@@ -262,7 +261,10 @@ func (c *Cache) RemoveMany(ctx context.Context, storageID, spaceID string, share
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID), attribute.Int("cs3.sharecount", len(shareIDs)))
 
-	unlock := c.LockSpace(spaceID)
+	unlock, err := c.LockSpace(ctx, spaceID)
+	if err != nil {
+		return nil, err
+	}
 	defer unlock()
 	span.AddEvent("got lock")
 
@@ -312,7 +314,7 @@ func (c *Cache) RemoveMany(ctx context.Context, storageID, spaceID string, share
 		Str("spaceID", spaceID).
 		Int("shareCount", len(shareIDs)).Logger()
 
-	err := cas.RetryPersist(ctx, 100, persistFunc,
+	err = cas.RetryPersist(ctx, 100, persistFunc,
 		func() error { return c.resyncAfterConflict(ctx, storageID, spaceID) },
 		func(err error) {
 			log.Debug().Err(err).Msg("CAS conflict persisting removed provider share, retrying...")
@@ -345,7 +347,19 @@ func (c *Cache) Update(ctx context.Context, storageID, spaceID, shareID string, 
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID), attribute.String("cs3.shareid", shareID))
 
-	unlock := c.LockSpace(spaceID)
+	switch {
+	case storageID == "":
+		return nil, fmt.Errorf("missing storage id")
+	case spaceID == "":
+		return nil, fmt.Errorf("missing space id")
+	case shareID == "":
+		return nil, fmt.Errorf("missing share id")
+	}
+
+	unlock, err := c.LockSpace(ctx, spaceID)
+	if err != nil {
+		return nil, err
+	}
 	defer unlock()
 	span.AddEvent("got lock")
 
@@ -394,7 +408,7 @@ func (c *Cache) Update(ctx context.Context, storageID, spaceID, shareID string, 
 		Str("spaceID", spaceID).
 		Str("shareID", shareID).Logger()
 
-	err := cas.RetryPersist(ctx, 100, persistFunc,
+	err = cas.RetryPersist(ctx, 100, persistFunc,
 		func() error { return c.resyncAfterConflict(ctx, storageID, spaceID) },
 		func(err error) {
 			log.Debug().Err(err).Msg("CAS conflict persisting updated provider share, retrying...")
@@ -425,7 +439,10 @@ func (c *Cache) Get(ctx context.Context, storageID, spaceID, shareID string, ski
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID), attribute.String("cs3.shareid", shareID))
 
-	unlock := c.LockSpace(spaceID)
+	unlock, err := c.LockSpace(ctx, spaceID)
+	if err != nil {
+		return nil, err
+	}
 	defer unlock()
 	span.AddEvent("got lock")
 
@@ -466,7 +483,10 @@ func (c *Cache) All(ctx context.Context) (*mtimesyncedcache.Map[string, *Spaces]
 		for _, space := range spaces {
 			spaceID := strings.TrimSuffix(space.Name, ".json")
 
-			unlock := c.LockSpace(spaceID)
+			unlock, err := c.LockSpace(ctx, spaceID)
+			if err != nil {
+				return nil, err
+			}
 			span.AddEvent("got lock for space " + spaceID)
 			if err := c.syncWithRetry(ctx, storageID, spaceID); err != nil {
 				unlock()
@@ -485,12 +505,15 @@ func (c *Cache) ListSpace(ctx context.Context, storageID, spaceID string) (*Shar
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID))
 
-	unlock := c.LockSpace(spaceID)
+	unlock, err := c.LockSpace(ctx, spaceID)
+	if err != nil {
+		return nil, err
+	}
 	defer unlock()
 	span.AddEvent("got lock")
 
 	// sync cache, maybe our data is outdated
-	err := c.syncWithRetry(ctx, storageID, spaceID)
+	err = c.syncWithRetry(ctx, storageID, spaceID)
 	if err != nil {
 		return nil, err
 	}
@@ -592,7 +615,10 @@ func (c *Cache) PurgeSpace(ctx context.Context, storageID, spaceID string) error
 	ctx, span := tracer.Start(ctx, "PurgeSpace")
 	defer span.End()
 
-	unlock := c.LockSpace(spaceID)
+	unlock, err := c.LockSpace(ctx, spaceID)
+	if err != nil {
+		return err
+	}
 	defer unlock()
 	span.AddEvent("got lock")
 
