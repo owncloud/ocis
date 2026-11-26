@@ -1,6 +1,19 @@
 ---
 services:
+  traefik:
+    networks:
+      ocis-net:
+        aliases:
+          - ${DRAWIO_DOMAIN:-drawio.owncloud.test}
+
   ocis:
+    environment:
+      # needed by config/ocis/csp.yaml (frame-src) to allow embedding the editor
+      DRAWIO_DOMAIN: ${DRAWIO_DOMAIN:-drawio.owncloud.test}
+    configs:
+      # the drawio url (self-hosted domain) lives in the apps_yaml block in ocis.yml
+      - source: apps_yaml
+        target: /etc/ocis/apps.yaml
     depends_on:
       drawio-init:
         condition: service_completed_successfully
@@ -13,3 +26,30 @@ services:
     entrypoint:
       - /bin/sh
     command: ["-c", "cp -R /var/lib/nginx/html/draw-io/ /apps"]
+
+  # Self-hosted diagrams.net editor, so the draw-io web extension doesn't
+  # depend on the public embed.diagrams.net. See the apps_yaml block in
+  # ocis.yml for the extension config pointing it here, and
+  # config/ocis/csp.yaml for the matching frame-src entry.
+  drawio:
+    image: jgraph/drawio:${DRAWIO_DOCKER_TAG:-32.7.7}
+    networks:
+      ocis-net:
+    environment:
+      DRAWIO_SERVER_URL: https://${DRAWIO_DOMAIN:-drawio.owncloud.test}/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.drawio.entrypoints=https"
+      - "traefik.http.routers.drawio.rule=Host(`${DRAWIO_DOMAIN:-drawio.owncloud.test}`)"
+      - "traefik.http.routers.drawio.tls.certresolver=http"
+      - "traefik.http.routers.drawio.service=drawio"
+      - "traefik.http.services.drawio.loadbalancer.server.port=8080"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:8080/"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always

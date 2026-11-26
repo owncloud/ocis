@@ -122,6 +122,12 @@ configs:
             - WebdavPublicLink
             #- OneDrive # needs a client id and secret
             #- GoogleDrive # needs a client id and secret and an addition to the DNS zone
+      drawio:
+        config:
+          # points the draw-io web extension at the self-hosted instance
+          # (see web_extensions/drawio.yml) instead of its default,
+          # the public https://embed.diagrams.net. Must not end with a slash.
+          url: https://${DRAWIO_DOMAIN:-drawio.owncloud.test}
       external-sites:
         config:
           sites:
