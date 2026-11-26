@@ -806,6 +806,8 @@ jobs:
             check_status() {
               local expected=$1
               shift
+              status=$("$@")
+              [ "$status" = "$expected" ]
             }
             echo "Creating test file..."
             retry "create file (HTTP 201)" check_status 201 put_file || exit 1
