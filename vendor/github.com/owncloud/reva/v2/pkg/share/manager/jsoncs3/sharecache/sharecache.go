@@ -25,7 +25,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"sync"
 	"time"
 
 	backoff "github.com/cenkalti/backoff/v5"
@@ -36,6 +35,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3/cas"
+	"github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3/keylock"
 	"github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3/shareid"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/mtimesyncedcache"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/metadata"
@@ -48,7 +48,7 @@ const tracerName = "sharecache"
 // It functions as an in-memory cache with a persistence layer
 // The storage is sharded by user/group
 type Cache struct {
-	lockMap sync.Map
+	lockMap keylock.Map
 
 	UserShares mtimesyncedcache.Map[string, *UserShareCache]
 
@@ -70,12 +70,10 @@ type SpaceShareIDs struct {
 	IDs map[string]struct{}
 }
 
-func (c *Cache) lockUser(userID string) func() {
-	v, _ := c.lockMap.LoadOrStore(userID, &sync.Mutex{})
-	lock := v.(*sync.Mutex)
-
-	lock.Lock()
-	return func() { lock.Unlock() }
+// lockUser acquires the per-user/group lock, giving up with ctx.Err() once ctx
+// is done so abandoned requests don't stay parked behind a slow holder.
+func (c *Cache) lockUser(ctx context.Context, userID string) (func(), error) {
+	return c.lockMap.Lock(ctx, userID)
 }
 
 // New returns a new Cache instance
@@ -86,7 +84,6 @@ func New(s metadata.Storage, namespace, filename string, ttl time.Duration) Cach
 		namespace:  namespace,
 		filename:   filename,
 		ttl:        ttl,
-		lockMap:    sync.Map{},
 	}
 }
 
@@ -104,9 +101,12 @@ func (c *Cache) dropOnFailedUpload(err error, userid string) {
 // Add adds a share to the cache
 func (c *Cache) Add(ctx context.Context, userid, shareID string) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
-	unlock := c.lockUser(userid)
-	span.End()
+	unlock, err := c.lockUser(ctx, userid)
 	span.SetAttributes(attribute.String("cs3.userid", userid))
+	span.End()
+	if err != nil {
+		return err
+	}
 	defer unlock()
 
 	if _, ok := c.UserShares.Load(userid); !ok {
@@ -140,7 +140,7 @@ func (c *Cache) Add(ctx context.Context, userid, shareID string) error {
 		Str("userID", userid).
 		Str("shareID", shareID).Logger()
 
-	err := cas.RetryPersist(ctx, 100, persistFunc,
+	err = cas.RetryPersist(ctx, 100, persistFunc,
 		func() error { return c.resyncAfterConflict(ctx, userid) },
 		func(err error) { log.Debug().Err(err).Msg("CAS conflict persisting added share, retrying...") },
 		func(err error) {
@@ -169,9 +169,12 @@ func (c *Cache) Remove(ctx context.Context, userid, shareID string) error {
 // shares is in the cache.
 func (c *Cache) RemoveMany(ctx context.Context, userid string, shareIDs []string) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
-	unlock := c.lockUser(userid)
-	span.End()
+	unlock, err := c.lockUser(ctx, userid)
 	span.SetAttributes(attribute.String("cs3.userid", userid))
+	span.End()
+	if err != nil {
+		return err
+	}
 	defer unlock()
 
 	ssidOf := make(map[string]string, len(shareIDs))
@@ -224,7 +227,7 @@ func (c *Cache) RemoveMany(ctx context.Context, userid string, shareIDs []string
 		Str("userID", userid).
 		Int("shareCount", len(shareIDs)).Logger()
 
-	err := cas.RetryPersist(ctx, 100, persistFunc,
+	err = cas.RetryPersist(ctx, 100, persistFunc,
 		func() error { return c.resyncAfterConflict(ctx, userid) },
 		func(err error) { log.Debug().Err(err).Msg("CAS conflict persisting removed share, retrying...") },
 		func(err error) {
@@ -245,9 +248,12 @@ func (c *Cache) RemoveMany(ctx context.Context, userid string, shareIDs []string
 // List return the list of spaces/shares for the given user/group
 func (c *Cache) List(ctx context.Context, userid string) (map[string]SpaceShareIDs, error) {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
-	unlock := c.lockUser(userid)
-	span.End()
+	unlock, err := c.lockUser(ctx, userid)
 	span.SetAttributes(attribute.String("cs3.userid", userid))
+	span.End()
+	if err != nil {
+		return nil, err
+	}
 	defer unlock()
 	if err := c.syncWithRetry(ctx, userid); err != nil {
 		return nil, err

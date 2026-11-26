@@ -25,7 +25,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"sync"
 	"time"
 
 	backoff "github.com/cenkalti/backoff/v5"
@@ -34,6 +33,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3/cas"
+	"github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3/keylock"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/mtimesyncedcache"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/metadata"
 	"go.opentelemetry.io/otel/attribute"
@@ -47,7 +47,7 @@ const tracerName = "receivedsharecache"
 // It functions as an in-memory cache with a persistence layer
 // The storage is sharded by user
 type Cache struct {
-	lockMap sync.Map
+	lockMap keylock.Map
 
 	ReceivedSpaces mtimesyncedcache.Map[string, *Spaces]
 
@@ -80,16 +80,13 @@ func New(s metadata.Storage, ttl time.Duration) Cache {
 		ReceivedSpaces: mtimesyncedcache.Map[string, *Spaces]{},
 		storage:        s,
 		ttl:            ttl,
-		lockMap:        sync.Map{},
 	}
 }
 
-func (c *Cache) lockUser(userID string) func() {
-	v, _ := c.lockMap.LoadOrStore(userID, &sync.Mutex{})
-	lock := v.(*sync.Mutex)
-
-	lock.Lock()
-	return func() { lock.Unlock() }
+// lockUser acquires the per-user lock, giving up with ctx.Err() once ctx is
+// done so abandoned requests don't stay parked behind a slow holder.
+func (c *Cache) lockUser(ctx context.Context, userID string) (func(), error) {
+	return c.lockMap.Lock(ctx, userID)
 }
 
 // dropOnFailedUpload drops the user from memory after a failed upload that
@@ -106,9 +103,12 @@ func (c *Cache) dropOnFailedUpload(err error, userID string) {
 // Add adds a new entry to the cache
 func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaboration.ReceivedShare) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
-	unlock := c.lockUser(userID)
+	unlock, err := c.lockUser(ctx, userID)
 	span.SetAttributes(attribute.String("cs3.userid", userID))
 	span.End()
+	if err != nil {
+		return err
+	}
 	defer unlock()
 
 	if _, ok := c.ReceivedSpaces.Load(userID); !ok {
@@ -122,7 +122,7 @@ func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaborati
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID), attribute.String("cs3.spaceid", spaceID))
 
-	err := c.retryPersist(ctx, userID, spaceID, func() error {
+	err = c.retryPersist(ctx, userID, spaceID, func() error {
 		c.initializeIfNeeded(userID, spaceID)
 
 		rss, _ := c.ReceivedSpaces.Load(userID)
@@ -153,12 +153,15 @@ func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaborati
 // Get returns one entry from the cache
 func (c *Cache) Get(ctx context.Context, userID, spaceID, shareID string) (*State, error) {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
-	unlock := c.lockUser(userID)
+	unlock, err := c.lockUser(ctx, userID)
 	span.SetAttributes(attribute.String("cs3.userid", userID))
 	span.End()
+	if err != nil {
+		return nil, err
+	}
 	defer unlock()
 
-	err := c.syncWithRetry(ctx, userID)
+	err = c.syncWithRetry(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -178,9 +181,12 @@ func (c *Cache) Remove(ctx context.Context, userID, spaceID, shareID string) err
 // It does not upload when none of the shares is in the cache.
 func (c *Cache) RemoveMany(ctx context.Context, userID, spaceID string, shareIDs []string) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
-	unlock := c.lockUser(userID)
+	unlock, err := c.lockUser(ctx, userID)
 	span.SetAttributes(attribute.String("cs3.userid", userID))
 	span.End()
+	if err != nil {
+		return err
+	}
 	defer unlock()
 
 	ctx, span = appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Remove")
@@ -201,7 +207,7 @@ func (c *Cache) RemoveMany(ctx context.Context, userID, spaceID string, shareIDs
 		}
 	}
 
-	err := c.retryPersist(ctx, userID, spaceID, func() error {
+	err = c.retryPersist(ctx, userID, spaceID, func() error {
 		rss, ok := c.ReceivedSpaces.Load(userID)
 		if !ok || rss.Spaces[spaceID] == nil {
 			return nil // nothing to remove, do not upload
@@ -243,10 +249,13 @@ func (c *Cache) List(ctx context.Context, userID string) (map[string]*Space, err
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))
 
-	unlock := c.lockUser(userID)
+	unlock, err := c.lockUser(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
 	defer unlock()
 
-	err := c.syncWithRetry(ctx, userID)
+	err = c.syncWithRetry(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
