@@ -7,6 +7,7 @@ import (
 	"math"
 	"net"
 	"net/url"
+	"slices"
 	"sync/atomic"
 	"syscall"
 	"time"
@@ -961,6 +962,39 @@ var _ = Describe("Searchprovider", func() {
 
 			extractor.AssertNotCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
 			indexClient.AssertNotCalled(GinkgoT(), "Upsert", mock.Anything, mock.Anything)
+		})
+	})
+
+	Describe("UpsertItem stale metadata", func() {
+		It("unsets stored libre.graph keys the new extraction no longer has", func() {
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+				Status: status.NewOK(context.Background()),
+				Info: &sprovider.ResourceInfo{
+					Id:    ri.Id,
+					Path:  ri.Path,
+					Name:  "foo.jpg",
+					Size:  ri.Size,
+					Mtime: ri.Mtime,
+					Type:  sprovider.ResourceType_RESOURCE_TYPE_FILE,
+					ArbitraryMetadata: &sprovider.ArbitraryMetadata{
+						Metadata: map[string]string{
+							"tags":                                  "keep",
+							"libre.graph.photo.exposureDenominator": "+Inf",
+						},
+					},
+				},
+			}, nil)
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{Name: "foo.jpg"}, nil)
+			indexClient.On("Upsert", mock.Anything, mock.Anything).Return(nil)
+			gatewayClient.On("UnsetArbitraryMetadata", mock.Anything, mock.Anything).Return(&sprovider.UnsetArbitraryMetadataResponse{
+				Status: status.NewOK(context.Background()),
+			}, nil)
+
+			s.UpsertItem(context.Background(), &sprovider.Reference{ResourceId: ri.Id})
+
+			gatewayClient.AssertCalled(GinkgoT(), "UnsetArbitraryMetadata", mock.Anything, mock.MatchedBy(func(req *sprovider.UnsetArbitraryMetadataRequest) bool {
+				return slices.Equal(req.GetArbitraryMetadataKeys(), []string{"libre.graph.photo.exposureDenominator"})
+			}))
 		})
 	})
 
