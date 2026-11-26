@@ -110,6 +110,7 @@ import {
 } from '@ownclouders/web-pkg'
 import { isLocationSharesActive } from '@ownclouders/web-pkg'
 import { textUtils } from '../../../helpers/textUtils'
+import { isVaultResource } from '../../../helpers/resource/vault'
 import { isShareSpaceResource, ShareTypes } from '@ownclouders/web-client'
 import InviteCollaboratorForm from './Collaborators/InviteCollaborator/InviteCollaboratorForm.vue'
 import CollaboratorListItem from './Collaborators/ListItem.vue'
@@ -144,7 +145,11 @@ const { getSpaceMembers } = useSpacesStore()
 const configStore = useConfigStore()
 const { options: configOptions } = storeToRefs(configStore)
 
-const { shareInviteCollaboratorHelp, shareInviteCollaboratorHelpCern } = useContextualHelpers()
+const {
+  shareInviteCollaboratorHelp,
+  shareInviteCollaboratorHelpCern,
+  shareInviteCollaboratorHelpVault
+} = useContextualHelpers()
 
 const sharesStore = useSharesStore()
 const { addShare, deleteShare } = sharesStore
@@ -203,14 +208,17 @@ const collaborators = computed(() => {
 
 const inviteCollaboratorHelp = computed(() => {
   const cernFeatures = configOptions.value.cernFeatures
+  const mergedHelp = { ...unref(shareInviteCollaboratorHelp) }
 
   if (cernFeatures) {
-    const mergedHelp = { ...unref(shareInviteCollaboratorHelp) }
     mergedHelp.list = [...unref(shareInviteCollaboratorHelpCern).list, ...mergedHelp.list]
-    return mergedHelp
   }
 
-  return unref(shareInviteCollaboratorHelp)
+  if (isVaultResource(unref(resource), capabilityStore.vaultEnabled)) {
+    mergedHelp.list = [...mergedHelp.list, ...unref(shareInviteCollaboratorHelpVault).list]
+  }
+
+  return mergedHelp
 })
 
 const helpersEnabled = computed(() => {

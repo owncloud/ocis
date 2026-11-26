@@ -1177,6 +1177,7 @@ class SharingNgContext implements Context {
 	 * @param string $space
 	 * @param string|null $resource
 	 * @param string|null $recipient
+	 * @param bool $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -1188,10 +1189,11 @@ class SharingNgContext implements Context {
 		string $space,
 		?string $resource = null,
 		?string $recipient = null,
+		bool $isVault = false,
 	): ResponseInterface {
-		$spaceId = ($this->spacesContext->getSpaceByName($sharer, $space))["id"];
-		$itemId = (isset($resource)) ? $this->spacesContext->getResourceId($sharer, $space, $resource)
-		: $this->spacesContext->getResourceId($sharer, $space, $space);
+		$spaceId = ($this->spacesContext->getSpaceByName($sharer, $space, $isVault))["id"];
+		$itemId = (isset($resource)) ? $this->spacesContext->getResourceId($sharer, $space, $resource, $isVault)
+		: $this->spacesContext->getResourceId($sharer, $space, $space, $isVault);
 
 		$permissionID = "";
 
@@ -1210,15 +1212,34 @@ class SharingNgContext implements Context {
 				: $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
 		}
 
+		[$user, $password, $headers] = $this->getRequestCredentials($sharer);
 		return
 			GraphHelper::removeAccessToSpaceItem(
 				$this->featureContext->getBaseUrl(),
-				$sharer,
-				$this->featureContext->getPasswordForUser($sharer),
+				$user,
+				$password,
 				$spaceId,
 				$itemId,
 				$permissionID,
+				$headers,
+				$isVault,
 			);
+	}
+
+	/**
+	 * Returns the user, the password, and the headers for a request of the given user.
+	 * A Keycloak user cannot use basic auth, so the request uses the access token.
+	 *
+	 * @param string $user
+	 *
+	 * @return array [?string $user, ?string $password, array $headers]
+	 */
+	private function getRequestCredentials(string $user): array {
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$accessToken = $this->featureContext->getOcisUserToken($user)['token']['accessToken'];
+			return [null, null, ['Authorization' => 'Bearer ' . $accessToken]];
+		}
+		return [$user, $this->featureContext->getPasswordForUser($user), []];
 	}
 
 	/**
@@ -1228,6 +1249,7 @@ class SharingNgContext implements Context {
 	 * @param string $shareType (user|group|link)
 	 * @param string $space
 	 * @param string|null $recipient
+	 * @param bool $isVault
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -1238,8 +1260,9 @@ class SharingNgContext implements Context {
 		string $shareType,
 		string $space,
 		?string $recipient = null,
+		bool $isVault = false,
 	): ResponseInterface {
-		$spaceId = ($this->spacesContext->getSpaceByName($sharer, $space))["id"];
+		$spaceId = ($this->spacesContext->getSpaceByName($sharer, $space, $isVault))["id"];
 
 		$permissionID = match ($shareType) {
 			'link' => $this->featureContext->shareNgGetLastCreatedLinkShareID(),
@@ -1248,13 +1271,16 @@ class SharingNgContext implements Context {
 			default => throw new Exception("shareType '$shareType' does not match user|group|link "),
 		};
 
+		[$user, $password, $headers] = $this->getRequestCredentials($sharer);
 		return
 			GraphHelper::removeAccessToSpace(
 				$this->featureContext->getBaseUrl(),
-				$sharer,
-				$this->featureContext->getPasswordForUser($sharer),
+				$user,
+				$password,
 				$spaceId,
 				$permissionID,
+				$headers,
+				$isVault,
 			);
 	}
 
@@ -1283,13 +1309,14 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" removes the access of (user|group) "([^"]*)" from (?:file|folder|resource) "([^"]*)" of space "([^"]*)" using the Graph API$/
+	 * @When /^user "([^"]*)" removes the access of (user|group) "([^"]*)" from (?:file|folder|resource) "([^"]*)" of space "([^"]*)"(| in vault)? using the Graph API$/
 	 *
 	 * @param string $sharer
 	 * @param string $recipientType (user|group)
 	 * @param string $recipient can be both user or group
 	 * @param string $resource
 	 * @param string $space
+	 * @param string $isVault
 	 *
 	 * @return void
 	 * @throws JsonException
@@ -1301,9 +1328,11 @@ class SharingNgContext implements Context {
 		string $recipient,
 		string $resource,
 		string $space,
+		string $isVault = '',
 	): void {
+		$isVault = trim($isVault) === 'in vault';
 		$this->featureContext->setResponse(
-			$this->removeAccessToSpaceItem($sharer, $recipientType, $space, $resource, $recipient),
+			$this->removeAccessToSpaceItem($sharer, $recipientType, $space, $resource, $recipient, $isVault),
 		);
 	}
 
@@ -1372,13 +1401,14 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" removes the access of (user|group) "([^"]*)" from space "([^"]*)" using root endpoint of the Graph API$/
-	 * @When /^user "([^"]*)" tries to remove the access of (user|group) "([^"]*)" from space "([^"]*)" using root endpoint of the Graph API$/
+	 * @When /^user "([^"]*)" removes the access of (user|group) "([^"]*)" from space "([^"]*)"(| in vault)? using root endpoint of the Graph API$/
+	 * @When /^user "([^"]*)" tries to remove the access of (user|group) "([^"]*)" from space "([^"]*)"(| in vault)? using root endpoint of the Graph API$/
 	 *
 	 * @param string $sharer
 	 * @param string $recipientType (user|group)
 	 * @param string $recipient can be both user or group
 	 * @param string $space
+	 * @param string $isVault
 	 *
 	 * @return void
 	 * @throws JsonException
@@ -1389,9 +1419,11 @@ class SharingNgContext implements Context {
 		string $recipientType,
 		string $recipient,
 		string $space,
+		string $isVault = '',
 	): void {
+		$isVault = trim($isVault) === 'in vault';
 		$this->featureContext->setResponse(
-			$this->removeAccessToSpace($sharer, $recipientType, $space, $recipient),
+			$this->removeAccessToSpace($sharer, $recipientType, $space, $recipient, $isVault),
 		);
 	}
 

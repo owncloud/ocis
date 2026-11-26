@@ -32,11 +32,11 @@ import (
 
 	commonTemplates "github.com/prometheus/common/helpers/templates"
 	"github.com/prometheus/common/model"
+	"go.yaml.in/yaml/v2"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"gopkg.in/yaml.v2"
 
-	"github.com/prometheus/alertmanager/types"
+	"github.com/prometheus/alertmanager/alert"
 )
 
 //go:embed default.tmpl email.tmpl
@@ -291,8 +291,24 @@ var DefaultFuncs = FuncMap{
 	"trimSpace": strings.TrimSpace,
 	// join is equal to strings.Join but inverts the argument order
 	// for easier pipelining in templates.
-	"join": func(sep string, s []string) string {
-		return strings.Join(s, sep)
+	"join": func(sep string, v any) (string, error) {
+		if s, ok := v.([]string); ok {
+			return strings.Join(s, sep), nil
+		}
+
+		value := reflect.ValueOf(v)
+		switch {
+		case !value.IsValid():
+			return "", nil
+		case value.Kind() == reflect.Slice, value.Kind() == reflect.Array:
+			parts := make([]string, 0, value.Len())
+			for _, elem := range value.Seq2() {
+				parts = append(parts, fmt.Sprint(elem.Interface()))
+			}
+			return strings.Join(parts, sep), nil
+		default:
+			return "", fmt.Errorf("join expects a slice or array, got %T", v)
+		}
 	},
 	"match": regexp.MatchString,
 	"safeHtml": func(text string) tmplhtml.HTML {
@@ -338,6 +354,14 @@ var DefaultFuncs = FuncMap{
 	// mustToDate parses s into a time.Time using the given layout, returning an error on failure.
 	"mustToDate": func(layout, s string) (time.Time, error) {
 		return time.ParseInLocation(layout, s, time.UTC)
+	},
+	// addDuration parses ds as a Go duration, adds it to t, and returns the resulting Unix milliseconds.
+	"addDuration": func(ds string, t time.Time) (int64, error) {
+		d, err := time.ParseDuration(ds)
+		if err != nil {
+			return 0, err
+		}
+		return t.Add(d).UnixMilli(), nil
 	},
 	"toJson": func(v any) (string, error) {
 		bytes, err := json.Marshal(v)
@@ -559,8 +583,8 @@ func (as Alerts) Resolved() []Alert {
 }
 
 // Data assembles data for template expansion.
-func (t *Template) Data(recv string, groupLabels, routeLabels model.LabelSet, notificationReason string, alerts ...*types.Alert) *Data {
-	typedAlerts := types.Alerts(alerts...)
+func (t *Template) Data(recv string, groupLabels, routeLabels model.LabelSet, notificationReason string, alerts ...*alert.Alert) *Data {
+	typedAlerts := alert.Alerts(alerts...)
 
 	data := &Data{
 		Receiver:           regexp.QuoteMeta(recv),
@@ -574,10 +598,10 @@ func (t *Template) Data(recv string, groupLabels, routeLabels model.LabelSet, no
 		ExternalURL:        t.ExternalURL.String(),
 	}
 
-	// The call to types.Alert is necessary to correctly resolve the internal
+	// The call to alert.Alert is necessary to correctly resolve the internal
 	// representation to the user representation.
 	for _, a := range typedAlerts {
-		alert := Alert{
+		alrt := Alert{
 			Status:       string(a.Status()),
 			Labels:       make(KV, len(a.Labels)),
 			Annotations:  make(KV, len(a.Annotations)),
@@ -587,12 +611,12 @@ func (t *Template) Data(recv string, groupLabels, routeLabels model.LabelSet, no
 			Fingerprint:  a.Fingerprint().String(),
 		}
 		for k, v := range a.Labels {
-			alert.Labels[string(k)] = string(v)
+			alrt.Labels[string(k)] = string(v)
 		}
 		for k, v := range a.Annotations {
-			alert.Annotations[string(k)] = string(v)
+			alrt.Annotations[string(k)] = string(v)
 		}
-		data.Alerts = append(data.Alerts, alert)
+		data.Alerts = append(data.Alerts, alrt)
 	}
 
 	for k, v := range groupLabels {
@@ -652,8 +676,17 @@ func DeepCopyWithTemplate(value any, tmplTextFunc TemplateFunc) (any, error) {
 		if ok == nil {
 			var inlineType any
 			err := yaml.Unmarshal([]byte(parsed), &inlineType)
-			if err != nil || (inlineType != nil && reflect.TypeOf(inlineType).Kind() == reflect.String) {
+			if err != nil {
 				// ignore error, thus the string is not an interface
+				return parsed, ok
+			}
+			if inlineString, isString := inlineType.(string); isString {
+				// Decode an explicit JSON string, such as output from toJson.
+				// Preserve other strings because YAML can remove comments,
+				// whitespace, and line breaks from plain scalar values.
+				if json.Valid([]byte(parsed)) {
+					return inlineString, ok
+				}
 				return parsed, ok
 			}
 			// inlineType holds structured data decoded from the rendered string.
@@ -683,7 +716,7 @@ func DeepCopyWithTemplate(value any, tmplTextFunc TemplateFunc) (any, error) {
 
 		for _, keyMeta := range keys {
 			var err error
-			strKey, isString := keyMeta.Interface().(string)
+			strKey, isString := reflect.TypeAssert[string](keyMeta)
 			if !isString {
 				continue
 			}
@@ -725,7 +758,7 @@ func normalizeYAMLValue(value any) any {
 	case reflect.Map:
 		converted := make(map[string]any, valueMeta.Len())
 		for _, keyMeta := range valueMeta.MapKeys() {
-			strKey, isString := keyMeta.Interface().(string)
+			strKey, isString := reflect.TypeAssert[string](keyMeta)
 			if !isString {
 				continue
 			}

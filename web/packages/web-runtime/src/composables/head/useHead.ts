@@ -1,5 +1,5 @@
 import { computed, unref } from 'vue'
-import { useHead as _useHead } from '@vueuse/head'
+import { useHead as _useHead } from '@unhead/vue'
 import { useCapabilityStore, useThemeStore, getBackendVersion } from '@ownclouders/web-pkg'
 import { storeToRefs } from 'pinia'
 

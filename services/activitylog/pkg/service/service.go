@@ -32,9 +32,10 @@ var _maxActivities = 6000
 
 // RawActivity represents an activity as it is stored in the activitylog store
 type RawActivity struct {
-	EventID   string    `json:"event_id"`
-	Depth     int       `json:"depth"`
-	Timestamp time.Time `json:"timestamp"`
+	EventID    string    `json:"event_id"`
+	Depth      int       `json:"depth"`
+	Timestamp  time.Time `json:"timestamp"`
+	ReceivedAt time.Time `json:"received_at,omitempty"`
 }
 
 // ActivitylogService logs events per resource
@@ -333,9 +334,10 @@ func (a *ActivitylogService) storeActivity(resourceID string, eventID string, de
 	}
 
 	activities = append(activities, RawActivity{
-		EventID:   eventID,
-		Depth:     depth,
-		Timestamp: timestamp,
+		EventID:    eventID,
+		Depth:      depth,
+		Timestamp:  timestamp,
+		ReceivedAt: time.Now(),
 	})
 
 	b, err := json.Marshal(activities)

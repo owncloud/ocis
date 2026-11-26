@@ -73,3 +73,22 @@ func CheckMapKeyValue(key reflect.Value) error {
 	}
 	return nil
 }
+
+// EmptyInterfaceType is the type of interface{}. Decoders compare against
+// it to skip SetInterface on the common path.
+var EmptyInterfaceType = reflect.TypeOf((*interface{})(nil)).Elem()
+
+// SetInterface stores a decoded value into the interface destination rv,
+// leaving rv untouched for nil. Non-empty interfaces only accept values that
+// implement them; reflect.Set would panic otherwise.
+func SetInterface(rv reflect.Value, v interface{}) error {
+	if v == nil {
+		return nil
+	}
+	vv := reflect.ValueOf(v)
+	if t := rv.Type(); !vv.Type().Implements(t) {
+		return fmt.Errorf("%w %v decoding as %v", def.ErrCanNotDecode, vv.Type(), t)
+	}
+	rv.Set(vv)
+	return nil
+}

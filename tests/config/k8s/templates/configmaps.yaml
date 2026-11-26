@@ -18,10 +18,10 @@ data:
   ocmproviders.json: |
     [
       {
-        "name": "ocis",
+        "name": "ocis-server",
         "full_name": "ocis server",
         "organization": "ownCloud",
-        "domain": ".*-server",
+        "domain": "ocis-server",
         "homepage": "https://owncloud.com",
         "services": [
           {
@@ -31,11 +31,33 @@ data:
                 "description": "ownCloud Open Cloud Mesh API"
               },
               "name": "ownCloud - OCM API",
-              "path": "https://.*-server/ocm/",
+              "path": "https://ocis-server/ocm/",
               "is_monitored": true
             },
             "api_version": "0.0.1",
-            "host": ".*-server"
+            "host": "ocis-server"
+          }
+        ]
+      },
+      {
+        "name": "federation-ocis-server",
+        "full_name": "federation ocis server",
+        "organization": "ownCloud",
+        "domain": "federation-ocis-server",
+        "homepage": "https://owncloud.com",
+        "services": [
+          {
+            "endpoint": {
+              "type": {
+                "name": "OCM",
+                "description": "ownCloud Open Cloud Mesh API"
+              },
+              "name": "ownCloud - OCM API",
+              "path": "https://federation-ocis-server/ocm/",
+              "is_monitored": true
+            },
+            "api_version": "0.0.1",
+            "host": "federation-ocis-server"
           }
         ]
       }

@@ -189,6 +189,7 @@ export const getGroups = async (adminUser: User): Promise<Group[]> => {
     path: join('graph', 'v1.0', 'groups'),
     user: adminUser
   })
+  checkResponseStatus(response, 'Failed while fetching groups')
   const data = (await response.json()) as GroupResponse
   return data.value
 }

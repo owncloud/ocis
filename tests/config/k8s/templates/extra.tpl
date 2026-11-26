@@ -73,6 +73,62 @@
 - name: WEB_UI_CONFIG_FILE
   value: /etc/ocis-web-ui/web-config.json
 {{- end -}}
+{{- if .Values.features.keycloak.enabled }}
+{{- if eq .appName "proxy" }}
+- name: PROXY_OIDC_ISSUER
+  value: "https://keycloak:8443/realms/oCIS"
+- name: PROXY_OIDC_REWRITE_WELLKNOWN
+  value: "true"
+- name: PROXY_AUTOPROVISION_ACCOUNTS
+  value: "true"
+- name: PROXY_AUTOPROVISION_CLAIM_GROUPS
+  value: groups
+- name: PROXY_AUTOPROVISION_GROUP_CREATE
+  value: "true"
+- name: PROXY_ROLE_ASSIGNMENT_DRIVER
+  value: oidc
+- name: PROXY_USER_OIDC_CLAIM
+  value: preferred_username
+- name: PROXY_USER_CS3_CLAIM
+  value: username
+- name: OCIS_ADMIN_USER_ID
+  value: ""
+{{- end -}}
+{{- if eq .appName "graph" }}
+- name: GRAPH_ASSIGN_DEFAULT_USER_ROLE
+  value: "false"
+- name: GRAPH_USERNAME_MATCH
+  value: none
+{{- end -}}
+{{- if eq .appName "web" }}
+- name: WEB_OIDC_CLIENT_ID
+  value: web
+{{- end -}}
+{{- if eq .appName "webfinger" }}
+- name: WEBFINGER_OIDC_ISSUER
+  value: "https://keycloak:8443/realms/oCIS"
+{{- end -}}
+{{- if eq .appName "users" }}
+- name: USERS_IDP_URL
+  value: "https://keycloak:8443/realms/oCIS"
+{{- end -}}
+{{- if eq .appName "groups" }}
+- name: GROUPS_IDP_URL
+  value: "https://keycloak:8443/realms/oCIS"
+{{- end -}}
+{{- if eq .appName "ocs" }}
+- name: OCS_IDM_ADDRESS
+  value: "https://keycloak:8443/realms/oCIS"
+{{- end -}}
+{{- if eq .appName "idm" }}
+- name: OCIS_OIDC_ISSUER
+  value: "https://keycloak:8443/realms/oCIS"
+- name: IDM_CREATE_DEMO_USERS
+  value: "false"
+- name: OCIS_ADMIN_USER_ID
+  value: ""
+{{- end -}}
+{{- end -}}
 {{- if .Values.features.vault.enabled }}
 {{- if eq .appName "proxy" }}
 - name: OCIS_ENABLE_VAULT_MODE
@@ -169,5 +225,11 @@
 - name: STORAGE_USERS_MOUNT_ID
   value: "1a01c2c4-4309-4483-a845-842fd56d8622"
 {{- end -}}
+{{- end -}}
+{{- if and (eq .appName "idp") .Values.shortIdpTokenExpiry.enabled }}
+{{/* Shortens the access token lifetime so the oidc/oidc-iframe e2e tests can actually
+     observe a token renewal within their wait window - see values.yaml. */}}
+- name: IDP_ACCESS_TOKEN_EXPIRATION
+  value: "30"
 {{- end -}}
 {{- end -}}

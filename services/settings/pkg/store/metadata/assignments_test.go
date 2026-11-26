@@ -1,6 +1,7 @@
 package store
 
 import (
+	"context"
 	"log"
 	"sync"
 	"testing"
@@ -10,6 +11,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config/defaults"
+	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/stretchr/testify/require"
 )
 
@@ -276,4 +278,95 @@ func TestDeleteAssignment(t *testing.T) {
 			// TODO: do we want a custom error message?
 		})
 	}
+}
+
+// Each settings pod has its own CachedMDC. A role change on one pod does not
+// clear the caches of the other pods. On the other pod, the cached listing of
+// the account folder can then name an assignment file that is gone. The
+// download of that file gives a real NotFound. ListRoleAssignments must not
+// return an empty list in that case: the proxy then assigns the default role
+// and so replaces the new role.
+func TestListRoleAssignmentsWithStaleDirCache(t *testing.T) {
+	backend := &MockedMetadataClient{data: make(map[string][]byte)}
+	newPod := func() *Store {
+		s := &Store{
+			Logger: logger,
+			l:      &sync.Mutex{},
+			cfg:    defaults.DefaultConfig(),
+		}
+		s.cfg.Commons = &shared.Commons{
+			AdminUserID: uuid.Must(uuid.NewV4()).String(),
+		}
+		require.NoError(t, s.initMetadataClient(&CachedMDC{next: backend, cfg: s.cfg, logger: logger}))
+		return s
+	}
+	podA, podB := newPod(), newPod()
+
+	// pod B writes the first role and caches the listing of the account folder
+	_, err := podB.WriteRoleAssignment(einstein, role1)
+	require.NoError(t, err)
+	list, err := podB.ListRoleAssignments(einstein)
+	require.NoError(t, err)
+	require.Len(t, list, 1)
+	require.Equal(t, role1, list[0].RoleId)
+
+	// pod A changes the role, the old assignment file is gone
+	_, err = podA.WriteRoleAssignment(einstein, role2)
+	require.NoError(t, err)
+
+	// the files cache entry on pod B is older than the dirs cache entry, so it
+	// expires first
+	cached, ok := podB.mdc.(*CachedMDC)
+	require.True(t, ok)
+	require.NoError(t, cached.removePrefix(cached.filesCache, accountPath(einstein)))
+
+	list, err = podB.ListRoleAssignments(einstein)
+	require.NoError(t, err)
+	require.Len(t, list, 1, "a stale listing must not hide the current assignment")
+	require.Equal(t, role2, list[0].RoleId)
+}
+
+// goneAccountMDC lists the account folder of gone, but that folder is gone,
+// for example because the listing of the accounts folder is stale.
+type goneAccountMDC struct {
+	*MockedMetadataClient
+	gone string
+}
+
+func (m *goneAccountMDC) ReadDir(ctx context.Context, id string) ([]string, error) {
+	switch id {
+	case accountPath(m.gone):
+		return nil, errtypes.NotFound(id)
+	case accountsFolderLocation:
+		ids, err := m.MockedMetadataClient.ReadDir(ctx, id)
+		return append(ids, m.gone), err
+	default:
+		return m.MockedMetadataClient.ReadDir(ctx, id)
+	}
+}
+
+// One account folder that is gone must not hide the assignments of all
+// other accounts.
+func TestListRoleAssignmentsByRoleSkipsGoneAccount(t *testing.T) {
+	s := &Store{
+		Logger: logger,
+		l:      &sync.Mutex{},
+		cfg:    defaults.DefaultConfig(),
+	}
+	s.cfg.Commons = &shared.Commons{
+		AdminUserID: uuid.Must(uuid.NewV4()).String(),
+	}
+	require.NoError(t, s.initMetadataClient(&goneAccountMDC{
+		MockedMetadataClient: &MockedMetadataClient{data: make(map[string][]byte)},
+		gone:                 moss,
+	}))
+
+	_, err := s.WriteRoleAssignment(einstein, role1)
+	require.NoError(t, err)
+	_, err = s.WriteRoleAssignment(marie, role1)
+	require.NoError(t, err)
+
+	list, err := s.ListRoleAssignmentsByRole(role1)
+	require.NoError(t, err)
+	require.Len(t, list, 2)
 }

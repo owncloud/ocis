@@ -75,6 +75,9 @@ type Resource struct {
 	Deleted   bool
 	Hidden    bool
 	Extracted bool
+	// ExtractionFailedAt is set (RFC 3339) when the content extraction of the
+	// resource failed and it was indexed by its name and metadata only.
+	ExtractionFailedAt string
 }
 
 func resourceIDtoSearchID(id storageProvider.ResourceId) *searchMessage.ResourceID {

@@ -1,16 +1,26 @@
 package middleware
 
 import (
+	"bytes"
 	"context"
+	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"strings"
 	"testing"
 	"time"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	backendmocks "github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend/mocks"
+	userrolesmocks "github.com/owncloud/ocis/v2/services/proxy/pkg/userroles/mocks"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 	"go-micro.dev/v4/store"
 )
 
@@ -215,7 +225,7 @@ func TestSignedURLAuth_validate(t *testing.T) {
 	}{
 		{"2020-02-02T12:30:00.000Z", "http://example.com/example.jpg?OC-Date=2020-02-02T12:29:00.000Z&OC-Expires=invalid", "required OC-Signature parameter not found"},
 		{"2020-02-02T12:30:00.000Z", "http://cloud.example.net/?OC-Credential=alice&OC-Date=2019-05-14T11%3A01%3A58.135Z&OC-Expires=1200&OC-Verb=GET&OC-Signature=f9e53a1ee23caef10f72ec392c1b537317491b687bfdd224c782be197d9ca2b6", "URL is expired"},
-		{"2019-05-14T11:02:00.000Z", "http://cloud.example.net/?OC-Credential=alice&OC-Date=2019-05-14T11%3A01%3A58.135Z&OC-Expires=1200&OC-Verb=GET&OC-Signature=f9e53a1ee23caef10f72ec392c1b537317491b687bfdd224c782be197d9ca2b", "signature mismatch: expected f9e53a1ee23caef10f72ec392c1b537317491b687bfdd224c782be197d9ca2b6 != actual f9e53a1ee23caef10f72ec392c1b537317491b687bfdd224c782be197d9ca2b"},
+		{"2019-05-14T11:02:00.000Z", "http://cloud.example.net/?OC-Credential=alice&OC-Date=2019-05-14T11%3A01%3A58.135Z&OC-Expires=1200&OC-Verb=GET&OC-Signature=f9e53a1ee23caef10f72ec392c1b537317491b687bfdd224c782be197d9ca2b", "signature mismatch"},
 		{"2019-05-14T11:02:00.000Z", "http://cloud.example.net/?OC-Credential=alice&OC-Date=2019-05-14T11%3A01%3A58.135Z&OC-Expires=1200&OC-Verb=GET&OC-Signature=f9e53a1ee23caef10f72ec392c1b537317491b687bfdd224c782be197d9ca2b6", ""},
 		{"2019-05-14T11:02:00.000Z", "http://cloud.example.net/?OC-Date=2019-05-14T11%3A01%3A58.135Z&OC-Expires=1200&OC-Verb=GET&OC-Credential=alice&OC-Signature=f9e53a1ee23caef10f72ec392c1b537317491b687bfdd224c782be197d9ca2b6", ""},
 		{"2019-05-14T11:02:00.000Z", "http://cloud.example.net/?OC-Algo=PBKDF2%2F10000-SHA512&OC-Date=2019-05-14T11%3A01%3A58.135Z&OC-Expires=1200&OC-Verb=GET&OC-Credential=alice&OC-Signature=f9e53a1ee23caef10f72ec392c1b537317491b687bfdd224c782be197d9ca2b6", ""},
@@ -242,4 +252,220 @@ func TestSignedURLAuth_validate(t *testing.T) {
 			assert.EqualError(t, err, tt.errorMessage)
 		}
 	}
+}
+
+// signSignedRequest builds a request for the given verb/base URL/params, signed
+// with the given key, using the authenticator's own canonicalization
+// (buildUrlToSign) so the resulting OC-Signature is valid for signatureIsValid.
+// If workaround is true, the request path keeps a literal "$" but the
+// signature is computed against the %24-substituted form, simulating a
+// reverse proxy that replaces $ with %24 (see signatureMatches).
+func signSignedRequest(t *testing.T, pua SignedURLAuthenticator, verb, baseURL string, params url.Values, key []byte, workaround bool) *http.Request {
+	t.Helper()
+
+	unsigned := httptest.NewRequest(verb, baseURL+"?"+params.Encode(), nil)
+	toSign := pua.buildUrlToSign(unsigned)
+	if workaround {
+		toSign = strings.Replace(toSign, "$", "%24", 1)
+	}
+	sig := pua.createSignature(toSign, key)
+
+	signedParams := url.Values{}
+	for k, v := range params {
+		signedParams[k] = v
+	}
+	signedParams.Set(_paramOCSignature, sig)
+
+	return httptest.NewRequest(verb, baseURL+"?"+signedParams.Encode(), nil)
+}
+
+func signedURLParams(now time.Time) url.Values {
+	params := url.Values{}
+	params.Set(_paramOCCredential, "useri")
+	params.Set(_paramOCDate, now.Format(time.RFC3339))
+	params.Set(_paramOCExpires, "1200")
+	params.Set(_paramOCVerb, "GET")
+	return params
+}
+
+func newTestAuthenticator(s store.Store, now time.Time) SignedURLAuthenticator {
+	return SignedURLAuthenticator{
+		PreSignedURLConfig: config.PreSignedURL{
+			AllowedHTTPMethods: []string{"get"},
+			Enabled:            true,
+		},
+		Store:  s,
+		Logger: log.NewLogger(),
+		Now:    func() time.Time { return now },
+	}
+}
+
+func userContext(userID string) context.Context {
+	u := userpb.User{Id: &userpb.UserId{OpaqueId: userID}, DisplayName: "Test User"}
+	return revactx.ContextSetUser(context.Background(), &u)
+}
+
+// TestSignedURLAuth_signatureIsValid_mfaKeyMatchSetsBreadcrumb covers a URL
+// signed with the MFA-bound key: the signature verifies and the
+// request-scoped breadcrumb is set.
+func TestSignedURLAuth_signatureIsValid_mfaKeyMatchSetsBreadcrumb(t *testing.T) {
+	now, _ := time.Parse(time.RFC3339, "2020-02-02T12:30:00.000Z")
+	s := store.NewMemoryStore()
+	pua := newTestAuthenticator(s, now)
+
+	mfaKey := []byte("mfa-bound-signing-key")
+	require.NoError(t, s.Write(&store.Record{Key: mfa.SigningKeyName("useri"), Value: mfaKey}))
+
+	r := signSignedRequest(t, pua, "GET", "http://cloud.example.net/", signedURLParams(now.Add(-time.Minute)), mfaKey, false)
+	r = r.WithContext(userContext("useri"))
+
+	err := pua.signatureIsValid(r)
+	assert.NoError(t, err)
+	assert.True(t, hasMFAKeyBreadcrumb(r.Context()), "a match against the MFA-bound key must set the breadcrumb")
+}
+
+// TestSignedURLAuth_signatureIsValid_normalKeyMatchNoBreadcrumb covers a URL
+// signed with the normal key: the signature verifies but the breadcrumb is
+// not set.
+func TestSignedURLAuth_signatureIsValid_normalKeyMatchNoBreadcrumb(t *testing.T) {
+	now, _ := time.Parse(time.RFC3339, "2020-02-02T12:30:00.000Z")
+	s := store.NewMemoryStore()
+	pua := newTestAuthenticator(s, now)
+
+	normalKey := []byte("normal-signing-key")
+	require.NoError(t, s.Write(&store.Record{Key: "useri", Value: normalKey}))
+
+	r := signSignedRequest(t, pua, "GET", "http://cloud.example.net/", signedURLParams(now.Add(-time.Minute)), normalKey, false)
+	r = r.WithContext(userContext("useri"))
+
+	err := pua.signatureIsValid(r)
+	assert.NoError(t, err)
+	assert.False(t, hasMFAKeyBreadcrumb(r.Context()), "a match against the normal key must not set the breadcrumb")
+}
+
+// TestSignedURLAuth_signatureIsValid_noMatch covers a URL signed with
+// neither key: authentication fails and the breadcrumb is not set.
+func TestSignedURLAuth_signatureIsValid_noMatch(t *testing.T) {
+	now, _ := time.Parse(time.RFC3339, "2020-02-02T12:30:00.000Z")
+	s := store.NewMemoryStore()
+	pua := newTestAuthenticator(s, now)
+
+	require.NoError(t, s.Write(&store.Record{Key: mfa.SigningKeyName("useri"), Value: []byte("mfa-bound-signing-key")}))
+	require.NoError(t, s.Write(&store.Record{Key: "useri", Value: []byte("normal-signing-key")}))
+
+	r := signSignedRequest(t, pua, "GET", "http://cloud.example.net/", signedURLParams(now.Add(-time.Minute)), []byte("some-other-key"), false)
+	r = r.WithContext(userContext("useri"))
+
+	err := pua.signatureIsValid(r)
+	assert.Error(t, err)
+	assert.False(t, hasMFAKeyBreadcrumb(r.Context()))
+}
+
+// TestSignedURLAuth_signatureIsValid_dollarWorkaround covers the existing
+// $->%24 reverse-proxy workaround (owncloud/ocis#10180) for both the
+// MFA-bound key attempt and the normal key attempt.
+func TestSignedURLAuth_signatureIsValid_dollarWorkaround(t *testing.T) {
+	now, _ := time.Parse(time.RFC3339, "2020-02-02T12:30:00.000Z")
+
+	t.Run("mfa key", func(t *testing.T) {
+		s := store.NewMemoryStore()
+		pua := newTestAuthenticator(s, now)
+		mfaKey := []byte("mfa-bound-signing-key")
+		require.NoError(t, s.Write(&store.Record{Key: mfa.SigningKeyName("useri"), Value: mfaKey}))
+
+		r := signSignedRequest(t, pua, "GET", "http://cloud.example.net/a$b", signedURLParams(now.Add(-time.Minute)), mfaKey, true)
+		r = r.WithContext(userContext("useri"))
+
+		err := pua.signatureIsValid(r)
+		assert.NoError(t, err)
+		assert.True(t, hasMFAKeyBreadcrumb(r.Context()))
+	})
+
+	t.Run("normal key", func(t *testing.T) {
+		s := store.NewMemoryStore()
+		pua := newTestAuthenticator(s, now)
+		normalKey := []byte("normal-signing-key")
+		require.NoError(t, s.Write(&store.Record{Key: "useri", Value: normalKey}))
+
+		r := signSignedRequest(t, pua, "GET", "http://cloud.example.net/a$b", signedURLParams(now.Add(-time.Minute)), normalKey, true)
+		r = r.WithContext(userContext("useri"))
+
+		err := pua.signatureIsValid(r)
+		assert.NoError(t, err)
+		assert.False(t, hasMFAKeyBreadcrumb(r.Context()))
+	})
+}
+
+// TestSignedURLAuth_signatureIsValid_mismatchDoesNotDiscloseSignature checks
+// that a failed verification never puts the server-computed signature into
+// the error. That signature is a valid credential for the URL the caller
+// chose, and the error is logged.
+func TestSignedURLAuth_signatureIsValid_mismatchDoesNotDiscloseSignature(t *testing.T) {
+	now, _ := time.Parse(time.RFC3339, "2020-02-02T12:30:00.000Z")
+	s := store.NewMemoryStore()
+	pua := newTestAuthenticator(s, now)
+
+	normalKey := []byte("normal-signing-key")
+	require.NoError(t, s.Write(&store.Record{Key: "useri", Value: normalKey}))
+
+	r := signSignedRequest(t, pua, "GET", "http://cloud.example.net/", signedURLParams(now.Add(-time.Minute)), []byte("some-other-key"), false)
+	r = r.WithContext(userContext("useri"))
+	computed := pua.createSignature(pua.buildUrlToSign(r), normalKey)
+
+	err := pua.signatureIsValid(r)
+	require.Error(t, err)
+	assert.NotContains(t, err.Error(), computed)
+}
+
+// TestSignedURLAuth_Authenticate_failureLogHasNoSignature checks that a
+// rejected signed URL is logged without any signature: neither the one the
+// server computed nor the one in the request, which may still be valid.
+func TestSignedURLAuth_Authenticate_failureLogHasNoSignature(t *testing.T) {
+	now, _ := time.Parse(time.RFC3339, "2020-02-02T12:30:00.000Z")
+	normalKey := []byte("normal-signing-key")
+	user := &userpb.User{Id: &userpb.UserId{OpaqueId: "useri"}, Username: "useri"}
+	path := "/remote.php/dav/files/useri/"
+
+	newAuth := func(t *testing.T, buf *bytes.Buffer) SignedURLAuthenticator {
+		s := store.NewMemoryStore()
+		require.NoError(t, s.Write(&store.Record{Key: "useri", Value: normalKey}))
+
+		ub := backendmocks.NewUserBackend(t)
+		ub.EXPECT().GetUserByClaims(mock.Anything, "username", "useri").Return(user, "", nil)
+		ura := userrolesmocks.NewUserRoleAssigner(t)
+		ura.EXPECT().ApplyUserRole(mock.Anything, user).Return(user, nil)
+
+		pua := newTestAuthenticator(s, now)
+		pua.UserProvider = ub
+		pua.UserRoleAssigner = ura
+		pua.Logger = log.Logger{Logger: zerolog.New(buf)}
+		return pua
+	}
+
+	t.Run("wrong signature", func(t *testing.T) {
+		var buf bytes.Buffer
+		pua := newAuth(t, &buf)
+		r := signSignedRequest(t, pua, "GET", "http://cloud.example.net"+path, signedURLParams(now.Add(-time.Minute)), []byte("some-other-key"), false)
+		computed := pua.createSignature(pua.buildUrlToSign(r), normalKey)
+		supplied := r.URL.Query().Get(_paramOCSignature)
+
+		_, err := pua.Authenticate(r)
+		require.ErrorIs(t, err, ErrAuthenticationFailed)
+		assert.NotContains(t, buf.String(), computed)
+		assert.NotContains(t, buf.String(), supplied)
+		assert.Contains(t, buf.String(), path)
+	})
+
+	t.Run("valid signature, wrong method", func(t *testing.T) {
+		var buf bytes.Buffer
+		pua := newAuth(t, &buf)
+		signed := signSignedRequest(t, pua, "GET", "http://cloud.example.net"+path, signedURLParams(now.Add(-time.Minute)), normalKey, false)
+		r := httptest.NewRequest(http.MethodHead, signed.URL.String(), nil)
+		supplied := r.URL.Query().Get(_paramOCSignature)
+
+		_, err := pua.Authenticate(r)
+		require.ErrorIs(t, err, ErrAuthenticationFailed)
+		assert.NotContains(t, buf.String(), supplied)
+		assert.Contains(t, buf.String(), path)
+	})
 }

@@ -12,8 +12,19 @@ import shutil
 import signal
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
+
+
+def filter_tls_noise(proc):
+    def _reader():
+        for line in proc.stderr:
+            if b"TLS handshake error" not in line:
+                sys.stderr.buffer.write(line)
+                sys.stderr.buffer.flush()
+    threading.Thread(target=_reader, daemon=True).start()
+
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -57,6 +68,10 @@ def base_server_env(repo_root: Path, ocis_config_dir: str, ocis_public_url: str)
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
         "EVENTHISTORY_STORE": "memory",
         "WEB_UI_CONFIG_FILE": str(repo_root / "tests/config/ci/ocis-config.json"),
+        # Litmus is a synchronous WebDAV compliance suite: it PUTs a file and
+        # immediately GETs it. Async uploads would make oCIS return 425 Too Early
+        # on that GET before post-processing completes, causing a spurious failure.
+        "OCIS_ASYNC_UPLOADS": "false",
     }
 
 
@@ -197,7 +212,9 @@ def main() -> int:
     ocis_proc = subprocess.Popen(
         [str(ocis_bin), "server"],
         env=server_env,
+        stderr=subprocess.PIPE,
     )
+    filter_tls_noise(ocis_proc)
 
     def cleanup(*_):
         try:

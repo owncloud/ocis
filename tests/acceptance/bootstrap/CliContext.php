@@ -1173,6 +1173,20 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @When the administrator resumes all the upload sessions using the postprocessing command
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorResumesAllUploadSessionsUsingPostprocessingCommand(): void {
+		$command = "postprocessing resume";
+		$body = [
+			"command" => $command,
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
 	 * @When the administrator restarts the expired upload sessions using the CLI
 	 *
 	 * @return void
@@ -1242,6 +1256,25 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @When the administrator recalculates the treesize of space :space of user :user using its opaque CS3 ID with the CLI
+	 *
+	 * @param string $spaceName
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorRecalculatesTheTreesizeOfSpaceUsingItsOpaqueCS3IDWithTheCli(
+		string $spaceName,
+		string $user,
+	): void {
+		$space = $this->spacesContext->getSpaceByName($user, $spaceName);
+		Assert::assertArrayHasKey('fileId', $space);
+		Assert::assertStringContainsString('!', $space['fileId']);
+		$this->featureContext->setResponse($this->recalculateTreesize($space['fileId']));
+	}
+
+	/**
 	 * @When the administrator recalculates the treesize of space with id :spaceId using the CLI
 	 *
 	 * @param string $spaceId
@@ -1255,15 +1288,63 @@ class CliContext implements Context {
 
 	/**
 	 * @param string $spaceId
+	 * @param bool $dryRun
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	protected function recalculateTreesize(string $spaceId): ResponseInterface {
+	protected function recalculateTreesize(string $spaceId, bool $dryRun = true): ResponseInterface {
+		$command = "storage-users spaces recalculate-treesize --space-id=$spaceId";
+		if (!$dryRun) {
+			$command .= " --dry-run=false";
+		}
 		$body = [
-			"command" => "storage-users spaces recalculate-treesize --space-id=$spaceId",
+			"command" => $command,
 		];
 		return CliHelper::runCommand($body);
+	}
+
+	/**
+	 * @When the administrator repairs the treesize of space :space of user :user using the CLI
+	 *
+	 * @param string $spaceName
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorRepairsTheTreesizeOfSpaceUsingTheCli(string $spaceName, string $user): void {
+		$space = $this->spacesContext->getSpaceByName($user, $spaceName);
+		$this->featureContext->setResponse($this->recalculateTreesize($space['id'], false));
+	}
+
+	/**
+	 * @Given the administrator has removed the storage link for file :file in space :space of user :user
+	 *
+	 * @param string $file
+	 * @param string $spaceName
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorHasRemovedTheStorageLinkForFile(
+		string $file,
+		string $spaceName,
+		string $user,
+	): void {
+		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
+		$parts = \explode('$', $spaceId);
+		Assert::assertCount(2, $parts, 'Expected a CS3 space ID');
+		$spaceUuid = $parts[1];
+
+		// The space root node lives at spaces/<first 2>/<rest>/nodes/<2/2/2/2>/<rest>.
+		$spacePath = \substr($spaceUuid, 0, 2) . '/' . \substr($spaceUuid, 2);
+		$nodePath = \implode('/', \str_split(\substr($spaceUuid, 0, 8), 2)) . '/' . \substr($spaceUuid, 8);
+		$storageRoot = $this->featureContext->getStorageUsersRoot();
+		$path = "$storageRoot/spaces/$spacePath/nodes/$nodePath/$file";
+		Assert::assertTrue(\is_link($path), "Storage link not found at '$path'");
+		Assert::assertTrue(\unlink($path), "Could not remove storage link '$path'");
 	}
 
 	/**

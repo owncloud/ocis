@@ -26,13 +26,15 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-	"sync"
 	"time"
 
+	backoff "github.com/cenkalti/backoff/v5"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
+	"github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3/cas"
+	"github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3/keylock"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/mtimesyncedcache"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/metadata"
 	"go.opentelemetry.io/otel"
@@ -40,6 +42,7 @@ import (
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/exp/maps"
+	"google.golang.org/protobuf/proto"
 )
 
 var tracer trace.Tracer
@@ -50,7 +53,7 @@ func init() {
 
 // Cache holds share information structured by provider and space
 type Cache struct {
-	lockMap sync.Map
+	lockMap keylock.Map
 
 	Providers mtimesyncedcache.Map[string, *Spaces]
 
@@ -117,13 +120,11 @@ func (s *Shares) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// LockSpace locks the cache for a given space and returns an unlock function
-func (c *Cache) LockSpace(spaceID string) func() {
-	v, _ := c.lockMap.LoadOrStore(spaceID, &sync.Mutex{})
-	lock := v.(*sync.Mutex)
-
-	lock.Lock()
-	return func() { lock.Unlock() }
+// LockSpace locks the cache for a given space and returns an unlock function.
+// It gives up with ctx.Err() once ctx is done, so abandoned requests don't stay
+// parked behind a slow holder; the returned unlock func is nil in that case.
+func (c *Cache) LockSpace(ctx context.Context, spaceID string) (func(), error) {
+	return c.lockMap.Lock(ctx, spaceID)
 }
 
 // New returns a new Cache instance
@@ -132,7 +133,6 @@ func New(s metadata.Storage, ttl time.Duration) Cache {
 		Providers: mtimesyncedcache.Map[string, *Spaces]{},
 		storage:   s,
 		ttl:       ttl,
-		lockMap:   sync.Map{},
 	}
 }
 
@@ -143,6 +143,38 @@ func (c *Cache) isSpaceCached(storageID, spaceID string) bool {
 	}
 	_, ok = spaces.Spaces.Load(spaceID)
 	return ok
+}
+
+// hasAll reports if the space is in memory and has all the given shares.
+func (c *Cache) hasAll(storageID, spaceID string, shareIDs ...string) bool {
+	spaces, ok := c.Providers.Load(storageID)
+	if !ok {
+		return false
+	}
+	space, ok := spaces.Spaces.Load(spaceID)
+	if !ok {
+		return false
+	}
+	for _, shareID := range shareIDs {
+		if _, ok := space.Shares[shareID]; !ok {
+			return false
+		}
+	}
+	return true
+}
+
+// dropOnFailedUpload drops the space from memory after a failed upload that
+// is not a CAS conflict. The memory state is then different from the file,
+// and the etag did not change, so a sync gets NotModified and keeps it.
+// After the drop, the next call reads the file. A CAS conflict syncs anyway.
+// Call it with the space lock held.
+func (c *Cache) dropOnFailedUpload(err error, storageID, spaceID string) {
+	if err == nil || cas.IsConflict(err) {
+		return
+	}
+	if spaces, ok := c.Providers.Load(storageID); ok {
+		spaces.Spaces.Delete(spaceID)
+	}
 }
 
 // Add adds a share to the cache
@@ -160,13 +192,15 @@ func (c *Cache) Add(ctx context.Context, storageID, spaceID, shareID string, sha
 		return fmt.Errorf("missing share id")
 	}
 
-	unlock := c.LockSpace(spaceID)
+	unlock, err := c.LockSpace(ctx, spaceID)
+	if err != nil {
+		return err
+	}
 	defer unlock()
 	span.AddEvent("got lock")
 
-	var err error
 	if !c.isSpaceCached(storageID, spaceID) {
-		err = c.syncWithLock(ctx, storageID, spaceID)
+		err = c.syncWithRetry(ctx, storageID, spaceID)
 		if err != nil {
 			return err
 		}
@@ -186,73 +220,186 @@ func (c *Cache) Add(ctx context.Context, storageID, spaceID, shareID string, sha
 		log.Info().Interface("shares", maps.Keys(space.Shares)).Str("New share", shareID).Msg("Adding share to space")
 		space.Shares[shareID] = share
 
-		return c.Persist(ctx, storageID, spaceID)
+		err := c.Persist(ctx, storageID, spaceID)
+		// With the share in memory, this pod lists a share that is not in the file.
+		c.dropOnFailedUpload(err, storageID, spaceID)
+		return err
 	}
 
-	for retries := 100; retries > 0; retries-- {
-		err = persistFunc()
-		switch err.(type) {
-		case nil:
-			span.SetStatus(codes.Ok, "")
-			return nil
-		case errtypes.Aborted:
-			log.Debug().Msg("aborted when persisting added provider share: etag changed. retrying...")
-			// this is the expected status code from the server when the if-match etag check fails
-			// continue with sync below
-		case errtypes.PreconditionFailed:
-			log.Debug().Msg("precondition failed when persisting added provider share: etag changed. retrying...")
-			// actually, this is the wrong status code and we treat it like errtypes.Aborted because of inconsistencies on the server side
-			// continue with sync below
-		case errtypes.AlreadyExists:
-			log.Debug().Msg("already exists when persisting added provider share. retrying...")
-			// CS3 uses an already exists error instead of precondition failed when using an If-None-Match=* header / IfExists flag in the InitiateFileUpload call.
-			// Thas happens when the cache thinks there is no file.
-			// continue with sync below
-		default:
+	err = cas.RetryPersist(ctx, 100, persistFunc,
+		func() error { return c.resyncAfterConflict(ctx, storageID, spaceID) },
+		func(err error) { log.Debug().Err(err).Msg("CAS conflict persisting added provider share, retrying...") },
+		func(err error) {
 			span.SetStatus(codes.Error, fmt.Sprintf("persisting added provider share failed. giving up: %s", err.Error()))
 			log.Error().Err(err).Msg("persisting added provider share failed")
-			return err
-		}
-		if err := c.syncWithLock(ctx, storageID, spaceID); err != nil {
+		},
+		func(err error) {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
 			log.Error().Err(err).Msg("persisting added provider share failed. giving up.")
-			return err
-		}
+		},
+	)
+	if err == nil {
+		span.SetStatus(codes.Ok, "")
 	}
-
 	return err
 }
 
 // Remove removes a share from the cache
 func (c *Cache) Remove(ctx context.Context, storageID, spaceID, shareID string) error {
+	_, err := c.RemoveMany(ctx, storageID, spaceID, []string{shareID})
+	return err
+}
+
+// RemoveMany removes the given shares of one space with one upload.
+// It does not upload when none of the shares is in the space.
+// It returns the IDs that this call removed. A share that another caller
+// removed first is not in the result. The CAS upload makes sure that only one
+// caller removes a share, also across pods.
+func (c *Cache) RemoveMany(ctx context.Context, storageID, spaceID string, shareIDs []string) ([]string, error) {
 	ctx, span := tracer.Start(ctx, "Remove")
 	defer span.End()
-	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID), attribute.String("cs3.shareid", shareID))
+	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID), attribute.Int("cs3.sharecount", len(shareIDs)))
 
-	unlock := c.LockSpace(spaceID)
+	unlock, err := c.LockSpace(ctx, spaceID)
+	if err != nil {
+		return nil, err
+	}
 	defer unlock()
 	span.AddEvent("got lock")
 
-	if !c.isSpaceCached(storageID, spaceID) {
-		err := c.syncWithLock(ctx, storageID, spaceID)
+	// When a share is not in memory, sync first. A cold or stale cache does
+	// not show if the share is in the file. For example, a listing that got a
+	// temporary NotFound stores an empty space. Without the sync, the removal
+	// does not upload and the share stays in the file. When all shares are in
+	// memory, the CAS write in Persist detects stale state.
+	if !c.hasAll(storageID, spaceID, shareIDs...) {
+		err := c.syncWithRetry(ctx, storageID, spaceID)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
+	var removed []string
 	persistFunc := func() error {
+		// A CAS conflict syncs the space and calls this function again.
+		removed = nil
 		spaces, ok := c.Providers.Load(storageID)
 		if !ok {
 			return nil
 		}
-		space, _ := spaces.Spaces.Load(spaceID)
+		space, ok := spaces.Spaces.Load(spaceID)
 		if !ok {
 			return nil
 		}
-		delete(space.Shares, shareID)
+		for _, shareID := range shareIDs {
+			if _, ok := space.Shares[shareID]; ok {
+				delete(space.Shares, shareID)
+				removed = append(removed, shareID)
+			}
+		}
+		if len(removed) == 0 {
+			return nil // nothing to remove, do not upload
+		}
 
-		return c.Persist(ctx, storageID, spaceID)
+		err := c.Persist(ctx, storageID, spaceID)
+		// Without the shares in memory, a retry finds nothing to remove and does not upload.
+		c.dropOnFailedUpload(err, storageID, spaceID)
+		return err
+	}
+
+	log := appctx.GetLogger(ctx).With().
+		Str("hostname", os.Getenv("HOSTNAME")).
+		Str("storageID", storageID).
+		Str("spaceID", spaceID).
+		Int("shareCount", len(shareIDs)).Logger()
+
+	err = cas.RetryPersist(ctx, 100, persistFunc,
+		func() error { return c.resyncAfterConflict(ctx, storageID, spaceID) },
+		func(err error) {
+			log.Debug().Err(err).Msg("CAS conflict persisting removed provider share, retrying...")
+		},
+		func(err error) {
+			span.SetStatus(codes.Error, fmt.Sprintf("persisting removed provider share failed. giving up: %s", err.Error()))
+			log.Error().Err(err).Msg("persisting removed provider share failed")
+		},
+		func(err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+			log.Error().Err(err).Msg("persisting removed provider share failed. giving up.")
+		},
+	)
+	if err == nil {
+		span.SetStatus(codes.Ok, "")
+		return removed, nil
+	}
+	return nil, err
+}
+
+// Update changes one share and uploads the space. It reads the share under
+// the space lock and gives a copy to the update function. A CAS conflict syncs
+// the space and calls the update function again with the new share.
+// The cache keeps the old share until the upload succeeds.
+// Update returns NotFound when the space does not have the share. Then it does
+// not upload, so it does not write a share that a parallel caller removed.
+func (c *Cache) Update(ctx context.Context, storageID, spaceID, shareID string, update func(*collaboration.Share)) (*collaboration.Share, error) {
+	ctx, span := tracer.Start(ctx, "Update")
+	defer span.End()
+	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID), attribute.String("cs3.shareid", shareID))
+
+	switch {
+	case storageID == "":
+		return nil, fmt.Errorf("missing storage id")
+	case spaceID == "":
+		return nil, fmt.Errorf("missing space id")
+	case shareID == "":
+		return nil, fmt.Errorf("missing share id")
+	}
+
+	unlock, err := c.LockSpace(ctx, spaceID)
+	if err != nil {
+		return nil, err
+	}
+	defer unlock()
+	span.AddEvent("got lock")
+
+	// When the share is not in memory, sync first, as in RemoveMany. Else
+	// Update returns NotFound for a share that is in the file.
+	if !c.hasAll(storageID, spaceID, shareID) {
+		if err := c.syncWithRetry(ctx, storageID, spaceID); err != nil {
+			return nil, err
+		}
+	}
+
+	var updated *collaboration.Share
+	persistFunc := func() error {
+		// A CAS conflict syncs the space and calls this function again.
+		updated = nil
+		spaces, ok := c.Providers.Load(storageID)
+		if !ok {
+			return nil
+		}
+		space, ok := spaces.Spaces.Load(spaceID)
+		if !ok {
+			return nil
+		}
+		old, ok := space.Shares[shareID]
+		if !ok || old == nil {
+			return nil // the share is gone, do not upload
+		}
+		s := proto.Clone(old).(*collaboration.Share)
+		update(s)
+		space.Shares[shareID] = s
+
+		err := c.Persist(ctx, storageID, spaceID)
+		if err != nil {
+			// Put the old share back, so that memory agrees with the file.
+			// Persist does not change the etag when the upload fails.
+			space.Shares[shareID] = old
+			return err
+		}
+		updated = s
+		return nil
 	}
 
 	log := appctx.GetLogger(ctx).With().
@@ -261,34 +408,29 @@ func (c *Cache) Remove(ctx context.Context, storageID, spaceID, shareID string) 
 		Str("spaceID", spaceID).
 		Str("shareID", shareID).Logger()
 
-	var err error
-	for retries := 100; retries > 0; retries-- {
-		err = persistFunc()
-		switch err.(type) {
-		case nil:
-			span.SetStatus(codes.Ok, "")
-			return nil
-		case errtypes.Aborted:
-			log.Debug().Msg("aborted when persisting removed provider share: etag changed. retrying...")
-			// this is the expected status code from the server when the if-match etag check fails
-			// continue with sync below
-		case errtypes.PreconditionFailed:
-			log.Debug().Msg("precondition failed when persisting removed provider share: etag changed. retrying...")
-			// actually, this is the wrong status code and we treat it like errtypes.Aborted because of inconsistencies on the server side
-			// continue with sync below
-		default:
-			span.SetStatus(codes.Error, fmt.Sprintf("persisting removed provider share failed. giving up: %s", err.Error()))
-			log.Error().Err(err).Msg("persisting removed provider share failed")
-			return err
-		}
-		if err := c.syncWithLock(ctx, storageID, spaceID); err != nil {
+	err = cas.RetryPersist(ctx, 100, persistFunc,
+		func() error { return c.resyncAfterConflict(ctx, storageID, spaceID) },
+		func(err error) {
+			log.Debug().Err(err).Msg("CAS conflict persisting updated provider share, retrying...")
+		},
+		func(err error) {
+			span.SetStatus(codes.Error, fmt.Sprintf("persisting updated provider share failed. giving up: %s", err.Error()))
+			log.Error().Err(err).Msg("persisting updated provider share failed")
+		},
+		func(err error) {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
-			log.Error().Err(err).Msg("persisting removed provider share failed. giving up.")
-			return err
-		}
+			log.Error().Err(err).Msg("persisting updated provider share failed. giving up.")
+		},
+	)
+	if err != nil {
+		return nil, err
 	}
-	return err
+	if updated == nil {
+		return nil, errtypes.NotFound(shareID)
+	}
+	span.SetStatus(codes.Ok, "")
+	return updated, nil
 }
 
 // Get returns one entry from the cache
@@ -297,13 +439,16 @@ func (c *Cache) Get(ctx context.Context, storageID, spaceID, shareID string, ski
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID), attribute.String("cs3.shareid", shareID))
 
-	unlock := c.LockSpace(spaceID)
+	unlock, err := c.LockSpace(ctx, spaceID)
+	if err != nil {
+		return nil, err
+	}
 	defer unlock()
 	span.AddEvent("got lock")
 
 	if !skipSync {
 		// sync cache, maybe our data is outdated
-		err := c.syncWithLock(ctx, storageID, spaceID)
+		err := c.syncWithRetry(ctx, storageID, spaceID)
 		if err != nil {
 			return nil, err
 		}
@@ -338,9 +483,13 @@ func (c *Cache) All(ctx context.Context) (*mtimesyncedcache.Map[string, *Spaces]
 		for _, space := range spaces {
 			spaceID := strings.TrimSuffix(space.Name, ".json")
 
-			unlock := c.LockSpace(spaceID)
+			unlock, err := c.LockSpace(ctx, spaceID)
+			if err != nil {
+				return nil, err
+			}
 			span.AddEvent("got lock for space " + spaceID)
-			if err := c.syncWithLock(ctx, storageID, spaceID); err != nil {
+			if err := c.syncWithRetry(ctx, storageID, spaceID); err != nil {
+				unlock()
 				return nil, err
 			}
 			unlock()
@@ -356,12 +505,15 @@ func (c *Cache) ListSpace(ctx context.Context, storageID, spaceID string) (*Shar
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID))
 
-	unlock := c.LockSpace(spaceID)
+	unlock, err := c.LockSpace(ctx, spaceID)
+	if err != nil {
+		return nil, err
+	}
 	defer unlock()
 	span.AddEvent("got lock")
 
 	// sync cache, maybe our data is outdated
-	err := c.syncWithLock(ctx, storageID, spaceID)
+	err = c.syncWithRetry(ctx, storageID, spaceID)
 	if err != nil {
 		return nil, err
 	}
@@ -381,6 +533,15 @@ func (c *Cache) ListSpace(ctx context.Context, storageID, spaceID string) (*Shar
 		Etag:   space.Etag,
 	}
 	return shares, nil
+}
+
+// SpaceFileMissing reports if a Stat of the space file returns NotFound.
+// Use it as a second proof after a download got NotFound. It returns false
+// for all other results, also for errors.
+func (c *Cache) SpaceFileMissing(ctx context.Context, storageID, spaceID string) bool {
+	_, err := c.storage.Stat(ctx, spaceJSONPath(storageID, spaceID))
+	_, notFound := err.(errtypes.NotFound)
+	return notFound
 }
 
 // Persist persists the data of one space
@@ -454,12 +615,15 @@ func (c *Cache) PurgeSpace(ctx context.Context, storageID, spaceID string) error
 	ctx, span := tracer.Start(ctx, "PurgeSpace")
 	defer span.End()
 
-	unlock := c.LockSpace(spaceID)
+	unlock, err := c.LockSpace(ctx, spaceID)
+	if err != nil {
+		return err
+	}
 	defer unlock()
 	span.AddEvent("got lock")
 
 	if !c.isSpaceCached(storageID, spaceID) {
-		err := c.syncWithLock(ctx, storageID, spaceID)
+		err := c.syncWithRetry(ctx, storageID, spaceID)
 		if err != nil {
 			return err
 		}
@@ -469,7 +633,8 @@ func (c *Cache) PurgeSpace(ctx context.Context, storageID, spaceID string) error
 	if !ok {
 		return nil
 	}
-	newShares := &Shares{}
+	// Add does not sync a space that is in memory, and it writes to this map.
+	newShares := &Shares{Shares: map[string]*collaboration.Share{}}
 	if space, ok := spaces.Spaces.Load(spaceID); ok {
 		newShares.Etag = space.Etag // keep the etag to allow overwriting the state on the server
 	}
@@ -478,7 +643,18 @@ func (c *Cache) PurgeSpace(ctx context.Context, storageID, spaceID string) error
 	return c.Persist(ctx, storageID, spaceID)
 }
 
+// syncWithLock treats NotFound as a legitimately empty space (cold-start only).
 func (c *Cache) syncWithLock(ctx context.Context, storageID, spaceID string) error {
+	return c.doSync(ctx, storageID, spaceID, true)
+}
+
+// Unlike syncWithLock, a NotFound here must not reset the cache -- a pending
+// mutation is about to overwrite it, dropping a sibling writer's data.
+func (c *Cache) resyncAfterConflict(ctx context.Context, storageID, spaceID string) error {
+	return c.doSync(ctx, storageID, spaceID, false)
+}
+
+func (c *Cache) doSync(ctx context.Context, storageID, spaceID string, resetOnNotFound bool) error {
 	ctx, span := tracer.Start(ctx, "syncWithLock")
 	defer span.End()
 
@@ -498,14 +674,19 @@ func (c *Cache) syncWithLock(ctx context.Context, storageID, spaceID string) err
 	}
 
 	dlres, err := c.storage.Download(ctx, dlreq)
+
 	switch err.(type) {
 	case nil:
 		span.AddEvent("updating local cache")
 	case errtypes.NotFound:
-		span.SetStatus(codes.Ok, "")
-		if err := c.Persist(ctx, storageID, spaceID); err != nil {
-			log.Warn().Err(err).Msg("failed to create empty provider cache file")
+		if !cas.DecideNotFoundReset(resetOnNotFound, space.Etag != "") {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+			log.Error().Err(err).Msg("lost update: backing file disappeared mid-retry")
+			return err
 		}
+		spaces.Spaces.Store(spaceID, &Shares{Shares: map[string]*collaboration.Share{}})
+		span.SetStatus(codes.Ok, "")
 		return nil
 	case errtypes.NotModified:
 		span.SetStatus(codes.Ok, "")
@@ -530,6 +711,22 @@ func (c *Cache) syncWithLock(ctx context.Context, storageID, spaceID string) err
 	spaces.Spaces.Store(spaceID, newShares)
 	span.SetStatus(codes.Ok, "")
 	return nil
+}
+
+// syncWithRetry retries syncWithLock's cold-start read on transient errors, since callers have no other retry wrapper.
+func (c *Cache) syncWithRetry(ctx context.Context, storageID, spaceID string) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
+	_, err := backoff.Retry(ctx, func() (struct{}, error) {
+		err := c.syncWithLock(ctx, storageID, spaceID)
+		if err != nil && !cas.IsSyncTransient(err) {
+			return struct{}{}, backoff.Permanent(err)
+		}
+		return struct{}{}, err
+	}, backoff.WithBackOff(cas.NewBackoff()), backoff.WithMaxTries(20))
+	return err
 }
 
 func (c *Cache) initializeIfNeeded(storageID, spaceID string) {

@@ -183,25 +183,11 @@ test.describe('check files pagination in project space', () => {
       resources: [{ name: 'textfile.txt', from: 'parent' }]
     })
 
-    // When "Carol" navigates to the trashbin of the project space "team.1"
-    await ui.userNavigatesToTrashbinOfSpace({ stepUser: 'Carol', space: 'team.1' })
+    // Space Viewer (Carol) no longer has ListRecycle permission, so navigating
+    // to the trash bin returns 403 and crashes the page. The correct behavior
+    // (Space Viewer cannot access the trash bin at all) is covered by the
+    // apiSpaces/trashBin.feature acceptance tests.
 
-    // Then "Carol" should not be able to delete following resources from the trashbin
-    //   | resource            |
-    //   | parent/lorem.txt    |
-    //   | parent/textfile.txt |
-    await ui.userShouldNotBeAbleToDeleteResourceFromTrashbin({
-      stepUser: 'Carol',
-      resources: ['parent/textfile.txt', 'parent/lorem.txt']
-    })
-    // And "Carol" should not be able to restore following resources from the trashbin
-    //   | resource            |
-    //   | parent/lorem.txt    |
-    //   | parent/textfile.txt |
-    await ui.userShouldNotBeAbleToRestoreResourceFromTrashbin({
-      stepUser: 'Carol',
-      resources: ['parent/lorem.txt', 'parent/textfile.txt']
-    })
     // When "Brian" navigates to the trashbin of the project space "team.1"
     await ui.userNavigatesToTrashbinOfSpace({ stepUser: 'Brian', space: 'team.1' })
 

@@ -33,19 +33,14 @@ func getTrackerEntry(messageKey string, filename string, classname string) *trac
 	return entry.(*trackerInfo)
 }
 
-func (ti *trackerInfo) emit(ai *assertInfo) {
-	if ti == nil || ai == nil {
+// Build and emit records only after winning the gate, including under contention.
+func (ti *trackerInfo) emit(hit, condition bool, emit func() error) {
+	if !hit {
+		emit()
 		return
 	}
-
-	// Registrations are just sent to voidstar
-	if !ai.Hit {
-		emitAssert(ai)
-		return
-	}
-
 	flag := &ti.passEmitted
-	if !ai.Condition {
+	if !condition {
 		flag = &ti.failEmitted
 	}
 	if flag.Load() {
@@ -56,9 +51,8 @@ func (ti *trackerInfo) emit(ai *assertInfo) {
 	if flag.Load() {
 		return
 	}
-	// The flag is only set on success, so an assertion whose emission
-	// failed is retried on its next evaluation (as before).
-	if emitAssert(ai) == nil {
+	// Failed emissions remain eligible for retry.
+	if emit() == nil {
 		flag.Store(true)
 	}
 }
@@ -80,5 +74,5 @@ func trackerEmitted(id string, condition bool) bool {
 func emitAssert(ai *assertInfo) error {
 	// The version message is emitted by the internal package when the
 	// handler initializes, before any output can happen.
-	return internal.Json_data(wrappedAssertInfo{ai})
+	return internal.Json_data(ai.event())
 }

@@ -22,17 +22,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand/v2"
 	"os"
 	"path"
 	"path/filepath"
-	"sync"
 	"time"
 
+	backoff "github.com/cenkalti/backoff/v5"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
+	"github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3/cas"
+	"github.com/owncloud/reva/v2/pkg/share/manager/jsoncs3/keylock"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/mtimesyncedcache"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/metadata"
 	"go.opentelemetry.io/otel/attribute"
@@ -46,7 +47,7 @@ const tracerName = "receivedsharecache"
 // It functions as an in-memory cache with a persistence layer
 // The storage is sharded by user
 type Cache struct {
-	lockMap sync.Map
+	lockMap keylock.Map
 
 	ReceivedSpaces mtimesyncedcache.Map[string, *Spaces]
 
@@ -79,28 +80,39 @@ func New(s metadata.Storage, ttl time.Duration) Cache {
 		ReceivedSpaces: mtimesyncedcache.Map[string, *Spaces]{},
 		storage:        s,
 		ttl:            ttl,
-		lockMap:        sync.Map{},
 	}
 }
 
-func (c *Cache) lockUser(userID string) func() {
-	v, _ := c.lockMap.LoadOrStore(userID, &sync.Mutex{})
-	lock := v.(*sync.Mutex)
+// lockUser acquires the per-user lock, giving up with ctx.Err() once ctx is
+// done so abandoned requests don't stay parked behind a slow holder.
+func (c *Cache) lockUser(ctx context.Context, userID string) (func(), error) {
+	return c.lockMap.Lock(ctx, userID)
+}
 
-	lock.Lock()
-	return func() { lock.Unlock() }
+// dropOnFailedUpload drops the user from memory after a failed upload that
+// is not a CAS conflict. The memory state is then different from the file,
+// and the etag did not change, so a sync gets NotModified and keeps it.
+// After the drop, the next sync reads the file. A CAS conflict syncs anyway.
+// Call it with the user lock held.
+func (c *Cache) dropOnFailedUpload(err error, userID string) {
+	if err != nil && !cas.IsConflict(err) {
+		c.ReceivedSpaces.Delete(userID)
+	}
 }
 
 // Add adds a new entry to the cache
 func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaboration.ReceivedShare) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
-	unlock := c.lockUser(userID)
-	span.End()
+	unlock, err := c.lockUser(ctx, userID)
 	span.SetAttributes(attribute.String("cs3.userid", userID))
+	span.End()
+	if err != nil {
+		return err
+	}
 	defer unlock()
 
 	if _, ok := c.ReceivedSpaces.Load(userID); !ok {
-		err := c.syncIfStale(ctx, userID)
+		err := c.syncWithRetry(ctx, userID)
 		if err != nil {
 			return err
 		}
@@ -110,7 +122,7 @@ func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaborati
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID), attribute.String("cs3.spaceid", spaceID))
 
-	err := c.retryPersist(ctx, userID, spaceID, func() error {
+	err = c.retryPersist(ctx, userID, spaceID, func() error {
 		c.initializeIfNeeded(userID, spaceID)
 
 		rss, _ := c.ReceivedSpaces.Load(userID)
@@ -124,7 +136,10 @@ func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaborati
 			Hidden:     rs.Hidden,
 		}
 
-		return c.persist(ctx, userID)
+		err := c.persist(ctx, userID)
+		// With the new state in memory, this pod shows a state that is not in the file.
+		c.dropOnFailedUpload(err, userID)
+		return err
 	})
 	if err != nil {
 		span.RecordError(err)
@@ -138,12 +153,15 @@ func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaborati
 // Get returns one entry from the cache
 func (c *Cache) Get(ctx context.Context, userID, spaceID, shareID string) (*State, error) {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
-	unlock := c.lockUser(userID)
-	span.End()
+	unlock, err := c.lockUser(ctx, userID)
 	span.SetAttributes(attribute.String("cs3.userid", userID))
+	span.End()
+	if err != nil {
+		return nil, err
+	}
 	defer unlock()
 
-	err := c.syncIfStale(ctx, userID)
+	err = c.syncWithRetry(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -156,30 +174,64 @@ func (c *Cache) Get(ctx context.Context, userID, spaceID, shareID string) (*Stat
 
 // Remove removes an entry from the cache
 func (c *Cache) Remove(ctx context.Context, userID, spaceID, shareID string) error {
+	return c.RemoveMany(ctx, userID, spaceID, []string{shareID})
+}
+
+// RemoveMany removes the given shares of one user in one space with one upload.
+// It does not upload when none of the shares is in the cache.
+func (c *Cache) RemoveMany(ctx context.Context, userID, spaceID string, shareIDs []string) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
-	unlock := c.lockUser(userID)
-	span.End()
+	unlock, err := c.lockUser(ctx, userID)
 	span.SetAttributes(attribute.String("cs3.userid", userID))
+	span.End()
+	if err != nil {
+		return err
+	}
 	defer unlock()
 
 	ctx, span = appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Remove")
 	defer span.End()
-	span.SetAttributes(attribute.String("cs3.userid", userID), attribute.String("cs3.spaceid", spaceID))
+	span.SetAttributes(attribute.String("cs3.userid", userID), attribute.String("cs3.spaceid", spaceID), attribute.Int("cs3.sharecount", len(shareIDs)))
 
-	err := c.retryPersist(ctx, userID, spaceID, func() error {
-		c.initializeIfNeeded(userID, spaceID)
-
-		rss, _ := c.ReceivedSpaces.Load(userID)
-		receivedSpace := rss.Spaces[spaceID]
-		if receivedSpace.States == nil {
-			receivedSpace.States = map[string]*State{}
+	// When a share is not in memory, sync first. A cold or stale cache does
+	// not show if the share is in received.json. When all shares are in
+	// memory, the CAS write in persist detects stale state.
+	for _, shareID := range shareIDs {
+		if !c.has(userID, spaceID, shareID) {
+			if err := c.syncWithRetry(ctx, userID); err != nil {
+				span.RecordError(err)
+				span.SetStatus(codes.Error, err.Error())
+				return err
+			}
+			break
 		}
-		delete(receivedSpace.States, shareID)
+	}
+
+	err = c.retryPersist(ctx, userID, spaceID, func() error {
+		rss, ok := c.ReceivedSpaces.Load(userID)
+		if !ok || rss.Spaces[spaceID] == nil {
+			return nil // nothing to remove, do not upload
+		}
+		receivedSpace := rss.Spaces[spaceID]
+		removed := false
+		for _, shareID := range shareIDs {
+			if _, ok := receivedSpace.States[shareID]; ok {
+				delete(receivedSpace.States, shareID)
+				removed = true
+			}
+		}
+		if !removed {
+			return nil // nothing to remove, do not upload
+		}
 		if len(receivedSpace.States) == 0 {
 			delete(rss.Spaces, spaceID)
 		}
 
-		return c.persist(ctx, userID)
+		err := c.persist(ctx, userID)
+		// Without the shares in memory, the next attempt finds nothing to
+		// remove, does not upload and reports success.
+		c.dropOnFailedUpload(err, userID)
+		return err
 	})
 	if err != nil {
 		span.RecordError(err)
@@ -197,10 +249,13 @@ func (c *Cache) List(ctx context.Context, userID string) (map[string]*Space, err
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))
 
-	unlock := c.lockUser(userID)
+	unlock, err := c.lockUser(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
 	defer unlock()
 
-	err := c.syncIfStale(ctx, userID)
+	err = c.syncWithRetry(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -223,71 +278,111 @@ func (c *Cache) List(ctx context.Context, userID string) (map[string]*Space, err
 	return spaces, nil
 }
 
-func isSyncTransient(err error) bool {
-	_, isTooEarly := err.(errtypes.IsTooEarly)
-	_, isInternal := err.(errtypes.IsInternalError)
-	return isTooEarly || isInternal
-}
-
 func (c *Cache) retryPersist(ctx context.Context, userID, spaceID string, persistFunc func() error) error {
 	log := appctx.GetLogger(ctx).With().
 		Str("hostname", os.Getenv("HOSTNAME")).
 		Str("userID", userID).
 		Str("spaceID", spaceID).Logger()
 
+	bo := cas.NewBackoff()
+
+	const maxPersistAttempts = 20
+	// independent budget, not derived from maxPersistAttempts: a flaky resync must not starve the persist budget.
+	const maxResyncAttemptsPerFailure = 20
+
 	var err error
-	for attempt := 0; attempt < 20; attempt++ {
+	needsResync := false
+	persistAttempts := 0
+	resyncAttempts := 0
+	for persistAttempts < maxPersistAttempts {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
 		}
-		err = persistFunc()
-		switch err.(type) {
-		case nil:
-			return nil
-		case errtypes.Aborted:
-			// this is the expected status code from the server when the if-match etag check fails
-			// continue with sync below
-			log.Debug().Int("attempt", attempt).Msg("CAS failed: Aborted (etag changed), retrying")
-		case errtypes.PreconditionFailed:
-			// actually, this is the wrong status code and we treat it like errtypes.Aborted because of inconsistencies on the server side
-			// continue with sync below
-			log.Debug().Int("attempt", attempt).Msg("CAS failed: PreconditionFailed (etag changed), retrying")
-		case errtypes.AlreadyExists:
-			// CS3 uses an already exists error instead of precondition failed when using an If-None-Match=* header / IfExists flag in the InitiateFileUpload call.
-			// Thas happens when the cache thinks there is no file.
-			// continue with sync below
-			log.Debug().Int("attempt", attempt).Msg("CAS failed: AlreadyExists (file created concurrently), retrying")
-		case errtypes.TooEarly:
-			// storage-system has an upload in progress for this node; wait for it to finish
-			// continue with sync below
-			log.Debug().Int("attempt", attempt).Msg("CAS failed: TooEarly (upload in progress), retrying")
-		default:
-			log.Error().Int("attempt", attempt).Err(err).Msg("persisting received share failed, giving up")
-			return err
+
+		if needsResync {
+			// a previous persist attempt failed and the re-read to pick up fresh state
+			// was itself transient; keep retrying the re-read instead of hammering
+			// persistFunc again with the same stale in-memory rss/etag
+			serr := c.resyncAfterConflict(ctx, userID)
+			if serr == nil {
+				needsResync = false
+				resyncAttempts = 0
+				continue // fresh state is in memory; retry persistFunc next attempt, no need to wait
+			}
+			// keep err at its last real (persist or resync) failure; never let a
+			// budget-exhausting resync success clobber it into a false nil return
+			err = serr
+			if !cas.IsSyncTransient(serr) {
+				log.Error().Err(serr).Msg("lost update: re-read failed, aborting")
+				return serr
+			}
+			resyncAttempts++
+			if resyncAttempts >= maxResyncAttemptsPerFailure {
+				log.Error().Err(serr).Msg("lost update: resync would not stabilize, giving up")
+				return serr
+			}
+			log.Warn().Err(serr).Msg("lost update: re-read before retry")
+		} else {
+			persistAttempts++
+			err = persistFunc()
+			switch {
+			case err == nil:
+				return nil
+			case cas.IsTransientGRPCStatus(err):
+				log.Debug().Err(err).Msg("persist failed: transient gRPC error, retrying")
+			case cas.IsConflict(err):
+				log.Debug().Err(err).Msg("CAS conflict persisting received share, retrying")
+			default:
+				log.Error().Err(err).Msg("persisting received share failed, giving up")
+				return err
+			}
+			needsResync = true
 		}
-		timer := time.NewTimer(expBackoff(attempt))
+
+		timer := time.NewTimer(bo.NextBackOff())
 		select {
 		case <-timer.C:
 		case <-ctx.Done():
 			timer.Stop()
 			return ctx.Err()
 		}
-		if serr := c.syncIfStale(ctx, userID); serr != nil {
-			if !isSyncTransient(serr) {
-				log.Error().Int("attempt", attempt).Err(serr).Msg("lost update: re-read failed, aborting")
-				return serr
-			}
-			log.Warn().Int("attempt", attempt).Err(serr).Msg("lost update: re-read before retry")
-		}
 	}
 	return err
 }
 
-// syncIfStale pulls the authoritative state from storage when the local replica is stale; caller must hold the user lock.
-func (c *Cache) syncIfStale(ctx context.Context, userID string) error {
-	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "SyncIfStale")
+// syncWithRetry retries sync's cold-start read on transient errors, since
+// Add/Get/List call it directly with no other retry wrapper around it.
+func (c *Cache) syncWithRetry(ctx context.Context, userID string) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
+	_, err := backoff.Retry(ctx, func() (struct{}, error) {
+		err := c.sync(ctx, userID)
+		if err != nil && !cas.IsSyncTransient(err) {
+			return struct{}{}, backoff.Permanent(err)
+		}
+		return struct{}{}, err
+	}, backoff.WithBackOff(cas.NewBackoff()), backoff.WithMaxTries(20))
+	return err
+}
+
+// sync pulls the authoritative state from storage; caller must hold the user
+// lock. Treats NotFound as a legitimately empty user (cold-start only).
+func (c *Cache) sync(ctx context.Context, userID string) error {
+	return c.doSync(ctx, userID, true)
+}
+
+// Unlike sync, a NotFound here must not reset the cache -- a pending mutation
+// is about to overwrite it, dropping a sibling writer's data.
+func (c *Cache) resyncAfterConflict(ctx context.Context, userID string) error {
+	return c.doSync(ctx, userID, false)
+}
+
+func (c *Cache) doSync(ctx context.Context, userID string, resetOnNotFound bool) error {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Sync")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))
 
@@ -299,25 +394,30 @@ func (c *Cache) syncIfStale(ctx context.Context, userID string) error {
 	span.AddEvent("updating cache")
 	//  - update cached list of created shares for the user in memory if changed
 	rss, _ := c.ReceivedSpaces.Load(userID)
-	dlres, err := c.storage.Download(ctx, metadata.DownloadRequest{
+	dlreq := metadata.DownloadRequest{
 		Path:        jsonPath,
 		IfNoneMatch: []string{rss.etag},
-	})
+	}
+	dlres, err := c.storage.Download(ctx, dlreq)
+
 	switch err.(type) {
 	case nil:
 		span.AddEvent("updating local cache")
 	case errtypes.NotFound:
-		span.SetStatus(codes.Ok, "")
-		if err := c.persist(ctx, userID); err != nil {
-			log.Warn().Err(err).Msg("failed to create empty received share cache file")
+		if !cas.DecideNotFoundReset(resetOnNotFound, rss.etag != "") {
+			span.SetStatus(codes.Error, err.Error())
+			log.Error().Err(err).Msg("lost update: backing file disappeared mid-retry")
+			return err
 		}
+		c.ReceivedSpaces.Store(userID, &Spaces{Spaces: map[string]*Space{}})
+		span.SetStatus(codes.Ok, "")
 		return nil
 	case errtypes.NotModified:
 		span.SetStatus(codes.Ok, "")
 		return nil
 	default:
 		span.SetStatus(codes.Error, err.Error())
-		if isSyncTransient(err) {
+		if cas.IsSyncTransient(err) {
 			log.Warn().Err(err).Msg("lost update: re-read transient error")
 		} else {
 			log.Error().Err(err).Msg("lost update: re-read failed")
@@ -344,9 +444,6 @@ func (c *Cache) persist(ctx context.Context, userID string) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Persist")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))
-
-	log := appctx.GetLogger(ctx)
-	log.Debug().Str("user", userID).Msg("receivedsharecache.persist.start")
 
 	rss, ok := c.ReceivedSpaces.Load(userID)
 	if !ok {
@@ -378,7 +475,6 @@ func (c *Cache) persist(ctx context.Context, userID string) error {
 		ur.IfNoneMatch = []string{"*"}
 	}
 
-	log.Debug().Str("user", userID).Str("path", jsonPath).Str("etag", ur.IfMatchEtag).Msg("receivedsharecache.persist.upload")
 	res, err := c.storage.Upload(ctx, ur)
 	if err != nil {
 		span.RecordError(err)
@@ -386,25 +482,22 @@ func (c *Cache) persist(ctx context.Context, userID string) error {
 		return err
 	}
 	rss.etag = res.Etag
-
-	log.Debug().Str("user", userID).Str("etag", res.Etag).Msg("receivedsharecache.persist.done")
 	span.SetStatus(codes.Ok, "")
 	return nil
 }
 
-// expBackoff returns full-jitter delay: rand(0, min(100ms, 2^attempt ms)).
-// attempt:  0    1    2    3    4    5    6    7+
-// max ms:   1    2    4    8   16   32   64  100
-func expBackoff(attempt int) time.Duration {
-	base := time.Duration(1<<uint(attempt)) * time.Millisecond
-	if base > 100*time.Millisecond {
-		base = 100 * time.Millisecond
-	}
-	return time.Duration(rand.Int64N(int64(base) + 1))
-}
-
 func userJSONPath(userID string) string {
 	return filepath.Join("/users", userID, "received.json")
+}
+
+// has reports if the in-memory state has the share. The caller must hold the user lock.
+func (c *Cache) has(userID, spaceID, shareID string) bool {
+	rss, ok := c.ReceivedSpaces.Load(userID)
+	if !ok || rss.Spaces[spaceID] == nil {
+		return false
+	}
+	_, ok = rss.Spaces[spaceID].States[shareID]
+	return ok
 }
 
 func (c *Cache) initializeIfNeeded(userID, spaceID string) {

@@ -1213,6 +1213,9 @@ func (fs *Decomposedfs) StorageSpaceFromNode(ctx context.Context, n *node.Node, 
 	}
 
 	// add rootinfo
+	// Space roots are always directories but carry no type attribute. Set the type
+	// so AsResourceInfo does not have to lstat the root of every listed space.
+	n.SpaceRoot.SetType(provider.ResourceType_RESOURCE_TYPE_CONTAINER)
 	ps, _ := n.SpaceRoot.PermissionSet(ctx)
 	space.RootInfo, _ = n.SpaceRoot.AsResourceInfo(ctx, ps, []string{"quota"}, nil, false)
 
@@ -1244,7 +1247,7 @@ func mapHasKey(checkMap map[string][]byte, keys ...string) bool {
 }
 
 func isGrantExpired(g *provider.Grant) bool {
-	if g.Expiration == nil {
+	if g == nil || g.Expiration == nil {
 		return false
 	}
 	return time.Now().After(time.Unix(int64(g.Expiration.Seconds), int64(g.Expiration.Nanos)))

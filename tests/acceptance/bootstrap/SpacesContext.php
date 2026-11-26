@@ -1936,7 +1936,7 @@ class SpacesContext implements Context {
 	 * @param string $isVault
 	 * @param string $withRetry
 	 *
-	 * @return void
+	 * @return string the id of the created space, for the step 'we save it into'
 	 *
 	 * @throws GuzzleException
 	 * @throws Exception
@@ -1946,7 +1946,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $isVault,
 		string $withRetry,
-	): void {
+	): string {
 		$space = ["name" => $spaceName];
 		$isVault = trim($isVault) === "in vault";
 		$withRetry = trim($withRetry) === "with retry";
@@ -1973,6 +1973,7 @@ class SpacesContext implements Context {
 		} else {
 			$this->addToCreatedSpace($user, $space);
 		}
+		return $space->id;
 	}
 
 	/**
@@ -2270,19 +2271,7 @@ class SpacesContext implements Context {
 		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
 		$fullUrl = "$baseUrl/$davPath/$encodedName";
 
-		// With OCIS_ASYNC_UPLOADS=true in CI, file may still be in postprocessing while copying it.
-		// And the copy operation just returns 500 status code
-		// So retrying the copy operation
-		$retried = 0;
-		do {
-			$response = $this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
-			if ($response->getStatusCode() !== 500) {
-				break;
-			}
-			$retried++;
-			\sleep(1);
-		} while ($retried < STANDARD_RETRY_COUNT);
-
+		$response = $this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -2758,6 +2747,7 @@ class SpacesContext implements Context {
 			true,
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(['201', '204'], "", $response);
+		$this->featureContext->waitForPostprocessingToFinish($user, $destination, $space["id"]);
 		return $response->getHeader('oc-fileid');
 	}
 
@@ -3776,18 +3766,43 @@ class SpacesContext implements Context {
 		string $object,
 		string $spaceName,
 	): void {
+		$this->userDeletesObjectFoundByUserFromTrashRequest($user, $object, $user, $spaceName);
+	}
+
+	/**
+	 * The trash item is looked up by another user, so that the DELETE can also be
+	 * sent by a user who cannot list the trash (e.g. a Space Viewer).
+	 *
+	 * @When user :user tries to delete the file/folder :resource found by user :finder from the trash of the space :spaceName
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $finder
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function userDeletesObjectFoundByUserFromTrashRequest(
+		string $user,
+		string $resource,
+		string $finder,
+		string $spaceName,
+	): void {
 		// find object in trash
-		$objectsInTrash = $this->getObjectsInTrashbin($user, $spaceName);
+		$objectsInTrash = $this->getObjectsInTrashbin($finder, $spaceName);
 		$pathToDeletedObject = "";
 		foreach ($objectsInTrash as $objectInTrash) {
-			if ($objectInTrash["name"] === $object) {
+			if ($objectInTrash["name"] === $resource) {
 				$pathToDeletedObject = $objectInTrash["href"];
 			}
 		}
 
 		if ($pathToDeletedObject === "") {
 			throw new Exception(
-				__METHOD__ . " Object '$object' was not found in the trashbin of space '$spaceName' by user '$user'",
+				__METHOD__ . " Object '$resource' was not found in the trashbin of space '$spaceName'"
+				. " by user '$finder'",
 			);
 		}
 

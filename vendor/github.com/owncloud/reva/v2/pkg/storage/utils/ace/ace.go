@@ -21,6 +21,7 @@ package ace
 import (
 	"bytes"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -247,20 +248,28 @@ func (e *ACE) Marshal() (string, []byte) {
 
 // Unmarshal parses a principal string and byte[] into an ACE
 func Unmarshal(principal string, v []byte) (e *ACE, err error) {
+	if len(v) == 0 {
+		return nil, fmt.Errorf("empty ace")
+	}
 	// first byte indicates type of value
 	switch v[0] {
 	case 0: // = ':' separated key=value pairs
 		s := string(v[1:])
-		if e, err = unmarshalKV(s); err == nil {
-			e.principal = principal
+		if e, err = unmarshalKV(s); err != nil {
+			return nil, err
 		}
+		// the principal must have the form "<type>:<id>"
+		if len(principal) < 2 || principal[1] != ':' {
+			return nil, fmt.Errorf("invalid ace principal %q", principal)
+		}
+		e.principal = principal
 		// check consistency of Flags and principal type
 		if strings.Contains(e.flags, "g") {
-			if principal[:1] != "g" {
+			if principal[0] != 'g' {
 				return nil, fmt.Errorf("inconsistent ace: expected group")
 			}
 		} else {
-			if principal[:1] != "u" {
+			if principal[0] != 'u' {
 				return nil, fmt.Errorf("inconsistent ace: expected user")
 			}
 		}
@@ -387,8 +396,22 @@ func (e *ACE) grantPermissionSet() *provider.ResourcePermissions {
 	return p
 }
 
-func unmarshalKV(s string) (*ACE, error) {
-	e := &ACE{}
+var errMultipleRows = errors.New("more than one row of ace kvs")
+
+// kvFields splits the key value pairs of an ACE into its ':' separated fields.
+// The pairs are a single csv record with ':' as separator.
+func kvFields(s string) ([]string, error) {
+	// Without quotes and further line breaks a csv record terminated by a single
+	// newline is just split at the separator. This is what Marshal writes for
+	// regular grants, so avoid setting up a csv reader (and its read buffer) for
+	// every grant that is read.
+	if line := strings.TrimSuffix(s, "\n"); line != "" && !strings.ContainsAny(line, "\"\r\n") {
+		return strings.Split(line, ":"), nil
+	}
+
+	// The fast path above mirrors these reader settings (separator ':', no comment
+	// character, variable number of fields, no trimming, no lazy quotes). Changing
+	// one without the other makes them parse records differently.
 	r := csv.NewReader(strings.NewReader(s))
 	r.Comma = ':'
 	r.Comment = 0
@@ -400,35 +423,51 @@ func unmarshalKV(s string) (*ACE, error) {
 		return nil, err
 	}
 	if len(records) != 1 {
-		return nil, fmt.Errorf("more than one row of ace kvs")
+		return nil, errMultipleRows
 	}
-	for i := range records[0] {
-		kv := strings.Split(records[0][i], "=")
-		switch kv[0] {
+	return records[0], nil
+}
+
+func unmarshalKV(s string) (*ACE, error) {
+	e := &ACE{}
+	fields, err := kvFields(s)
+	if err != nil {
+		return nil, err
+	}
+	for i := range fields {
+		if fields[i] == "" {
+			// the old parser also ignored empty fields
+			continue
+		}
+		key, value, ok := strings.Cut(fields[i], "=")
+		if !ok {
+			return nil, fmt.Errorf("invalid ace key value pair %q", fields[i])
+		}
+		switch key {
 		case "t":
-			e._type = kv[1]
+			e._type = value
 		case "f":
-			e.flags = kv[1]
+			e.flags = value
 		case "p":
-			e.permissions = kv[1]
+			e.permissions = value
 		case "s":
-			v, err := strconv.Atoi(kv[1])
+			v, err := strconv.Atoi(value)
 			if err != nil {
 				return nil, err
 			}
 			e.shareTime = v
 		case "c":
-			e.creator = kv[1]
+			e.creator = value
 		case "e":
-			v, err := strconv.ParseInt(kv[1], 10, 64)
+			v, err := strconv.ParseInt(value, 10, 64)
 			if err != nil {
 				return nil, err
 			}
 			e.expires = v
 		case "w":
-			e.password = kv[1]
+			e.password = value
 		case "l":
-			e.label = kv[1]
+			e.label = value
 			// TODO default ... log unknown keys? or add as opaque? hm we need that for tagged shares ...
 		}
 	}

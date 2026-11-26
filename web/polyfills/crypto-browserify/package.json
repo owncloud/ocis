@@ -1,0 +1,7 @@
+{
+  "name": "crypto-browserify",
+  "version": "0.0.0-stub",
+  "private": true,
+  "description": "Empty stand-in for crypto-browserify. All nodePolyfills() calls exclude crypto and alias it to polyfills/crypto.js, so the real package is never bundled; node-stdlib-browser only needs it to be resolvable.",
+  "main": "index.js"
+}

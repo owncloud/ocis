@@ -32,6 +32,44 @@ use Psr\Http\Message\ResponseInterface;
  */
 class OcisConfigHelper {
 	/**
+	 * Whether the current scenario changed the postprocessing config
+	 * (e.g. POSTPROCESSING_DELAY or POSTPROCESSING_STEPS).
+	 */
+	private static bool $postprocessingReconfigured = false;
+
+	/**
+	 * @return bool
+	 */
+	public static function isPostprocessingReconfigured(): bool {
+		return self::$postprocessingReconfigured;
+	}
+
+	/**
+	 * @return void
+	 */
+	public static function resetPostprocessingReconfigured(): void {
+		self::$postprocessingReconfigured = false;
+	}
+
+	/**
+	 * Remember if the given envs change the postprocessing config.
+	 * In K8s the envs are grouped by service, so nested arrays are checked too.
+	 *
+	 * @param array $envs
+	 *
+	 * @return void
+	 */
+	private static function trackPostprocessingConfig(array $envs): void {
+		foreach ($envs as $key => $value) {
+			if (\is_array($value)) {
+				self::trackPostprocessingConfig($value);
+			} elseif (\str_starts_with((string) $key, "POSTPROCESSING_")) {
+				self::$postprocessingReconfigured = true;
+			}
+		}
+	}
+
+	/**
 	 * @param string $url
 	 * @param string $method
 	 * @param ?string $body
@@ -99,6 +137,7 @@ class OcisConfigHelper {
 	 * @throws GuzzleException
 	 */
 	public static function reConfigureOcis(array $envs): ResponseInterface {
+		self::trackPostprocessingConfig($envs);
 		$url = self::getWrapperUrl() . "/config";
 		return self::sendRequest($url, "PUT", \json_encode($envs));
 	}
@@ -110,6 +149,7 @@ class OcisConfigHelper {
 	 * @throws GuzzleException
 	 */
 	public static function reConfigureOcisK8s(array $envs): ResponseInterface {
+		self::trackPostprocessingConfig($envs);
 		$url = self::getWrapperUrl() . "/k8s/config";
 		$response = self::sendRequest($url, "PUT", \json_encode($envs));
 		return $response;
@@ -154,6 +194,7 @@ class OcisConfigHelper {
 	 * @throws GuzzleException
 	 */
 	public static function startService(string $service, array $envs = []): ResponseInterface {
+		self::trackPostprocessingConfig($envs);
 		$url = self::getWrapperUrl() . "/services/" . $service;
 		return self::sendRequest($url, "POST", \json_encode($envs));
 	}

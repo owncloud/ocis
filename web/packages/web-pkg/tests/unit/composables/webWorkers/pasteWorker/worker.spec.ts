@@ -233,6 +233,12 @@ describe('paste worker', () => {
     it.each([
       {
         failure: 'a file copy',
+        incomplete: {
+          path: '/folder (1)',
+          copiedItems: 2,
+          totalItems: 3,
+          notCopied: ['folder/a.txt']
+        },
         mockFailure: () =>
           webDavMock.copyFiles.mockImplementation((_s, source) =>
             source.path === '/folder/a.txt'
@@ -242,6 +248,13 @@ describe('paste worker', () => {
       },
       {
         failure: 'creating a subfolder',
+        // the folder is named once, it and its file count as not copied
+        incomplete: {
+          path: '/folder (1)',
+          copiedItems: 1,
+          totalItems: 3,
+          notCopied: ['folder/sub/']
+        },
         mockFailure: () =>
           webDavMock.createFolder.mockImplementation((_s, { path }) =>
             path === '/folder (1)/sub'
@@ -251,6 +264,13 @@ describe('paste worker', () => {
       },
       {
         failure: 'listing a subfolder',
+        // a folder that can't be read isn't copied, what's inside it is unknown
+        incomplete: {
+          path: '/folder (1)',
+          copiedItems: 1,
+          totalItems: 2,
+          notCopied: ['folder/sub/']
+        },
         mockFailure: () =>
           webDavMock.listFiles.mockImplementation((_s, { path }) =>
             path === '/folder/sub'
@@ -261,18 +281,19 @@ describe('paste worker', () => {
                 })
           )
       }
-    ])('returns a folder as incomplete when $failure fails', async ({ mockFailure }) => {
-      vi.spyOn(console, 'error').mockImplementation(() => undefined)
-      mockFolderTree()
-      mockFailure()
+    ])(
+      'returns a folder as incomplete when $failure fails',
+      async ({ incomplete, mockFailure }) => {
+        vi.spyOn(console, 'error').mockImplementation(() => undefined)
+        mockFolderTree()
+        mockFailure()
 
-      const { successful, failed } = await runWorker([folderTransferData()])
+        const { successful, failed } = await runWorker([folderTransferData()])
 
-      expect(successful).toEqual([])
-      expect(failed).toEqual([
-        { resourceName: 'folder', incomplete: true, message: 'Failed to fetch' }
-      ])
-    })
+        expect(successful).toEqual([])
+        expect(failed).toEqual([{ resourceName: 'folder', incomplete, message: 'Failed to fetch' }])
+      }
+    )
 
     it('keeps copying the rest of a folder after one file failed', async () => {
       vi.spyOn(console, 'error').mockImplementation(() => undefined)
@@ -286,6 +307,102 @@ describe('paste worker', () => {
       await runWorker([folderTransferData()])
 
       expect(copiedPaths()).toContainEqual(['/folder/sub/b.txt', '/folder (1)/sub/b.txt'])
+    })
+
+    it('counts a folder that cannot be created and everything below it as not copied', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => undefined)
+      mockFolderTree({
+        '/folder': [
+          { name: 'a.txt', path: '/folder/a.txt', isFolder: false },
+          { name: 'sub', path: '/folder/sub', isFolder: true }
+        ],
+        '/folder/sub': [
+          { name: 'b.txt', path: '/folder/sub/b.txt', isFolder: false },
+          { name: 'deep', path: '/folder/sub/deep', isFolder: true }
+        ],
+        '/folder/sub/deep': [
+          { name: 'c.txt', path: '/folder/sub/deep/c.txt', isFolder: false },
+          { name: 'd.txt', path: '/folder/sub/deep/d.txt', isFolder: false }
+        ]
+      })
+      webDavMock.createFolder.mockImplementation((_s, { path }) =>
+        path === '/folder (1)/sub'
+          ? Promise.reject(new TypeError('Failed to fetch'))
+          : Promise.resolve(undefined)
+      )
+
+      const { failed } = await runWorker([folderTransferData()])
+
+      expect(failed).toEqual([
+        {
+          resourceName: 'folder',
+          incomplete: {
+            path: '/folder (1)',
+            copiedItems: 1,
+            totalItems: 6,
+            notCopied: ['folder/sub/']
+          },
+          message: 'Failed to fetch'
+        }
+      ])
+    })
+
+    it('starts the paths with the original name of each copied folder', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => undefined)
+      mockFolderTree({
+        '/first': [{ name: 'a.txt', path: '/first/a.txt', isFolder: false }],
+        '/second': [{ name: 'a.txt', path: '/second/a.txt', isFolder: false }]
+      })
+      webDavMock.copyFiles.mockRejectedValue(new TypeError('Failed to fetch'))
+
+      // a duplicate already carries the name of the copy, e.g. "first (1)"
+      const { failed } = await runWorker([
+        folderTransferData({
+          resource: { ...folderMock, name: 'first (1)', path: '/first' },
+          path: '/first (1)'
+        }),
+        folderTransferData({
+          resource: { ...folderMock, name: 'second (1)', path: '/second' },
+          path: '/second (1)'
+        })
+      ])
+
+      expect(failed.map(({ incomplete }) => incomplete['notCopied'])).toEqual([
+        ['first/a.txt'],
+        ['second/a.txt']
+      ])
+    })
+
+    it('does not create a folder that cannot be read', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => undefined)
+      mockFolderTree()
+      webDavMock.listFiles.mockImplementation((_s, { path }) =>
+        path === '/folder/sub'
+          ? Promise.reject(new TypeError('Failed to fetch'))
+          : Promise.resolve({ resource: {} as Resource, children: folderTree[path] as Resource[] })
+      )
+
+      await runWorker([folderTransferData()])
+
+      expect(createdPaths()).toEqual(['/folder (1)'])
+    })
+
+    it('reports running out of storage rather than the first error', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => undefined)
+      mockFolderTree()
+      // listing happens before copying, so this is the first error
+      webDavMock.listFiles.mockImplementation((_s, { path }) =>
+        path === '/folder/sub'
+          ? Promise.reject(new TypeError('Failed to fetch'))
+          : Promise.resolve({ resource: {} as Resource, children: folderTree[path] as Resource[] })
+      )
+      webDavMock.copyFiles.mockRejectedValue({ message: 'Insufficient Storage', statusCode: 507 })
+
+      const { failed } = await runWorker([folderTransferData()])
+
+      expect(failed).toEqual([
+        expect.objectContaining({ message: 'Insufficient Storage', statusCode: 507 })
+      ])
     })
 
     it('returns a folder as failed when the folder itself cannot be created', async () => {
