@@ -152,6 +152,45 @@ var _ = Describe("Graph", func() {
 				Expect(rr.Header().Get("X-Ocis-Mfa-Required")).To(Equal("true"))
 			})
 
+			It("lists the drive without its special items when they cannot be encoded", func() {
+				root := &provider.ResourceId{StorageId: "pro-1", SpaceId: "sameID", OpaqueId: "sameID"}
+				mtime := utils.TimeToTS(time.Unix(1, 0))
+				svc.(service.Graph).SeedNonFiniteSpecialDriveItem(root, "pro-1$sameID!image", "", mtime)
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Times(1).Return(&provider.ListStorageSpacesResponse{
+					Status: status.NewOK(ctx),
+					StorageSpaces: []*provider.StorageSpace{
+						{
+							Id:        &provider.StorageSpaceId{OpaqueId: "sameID"},
+							SpaceType: "aspacetype",
+							Root:      root,
+							Mtime:     mtime,
+							Name:      "aspacename",
+							Opaque: &typesv1beta1.Opaque{
+								Map: map[string]*typesv1beta1.OpaqueEntry{
+									service.SpaceImageSpecialFolderName: {Decoder: "plain", Value: []byte("pro-1$sameID!image")},
+								},
+							},
+						},
+					},
+				}, nil)
+				gatewayClient.On("InitiateFileDownload", mock.Anything, mock.Anything).Return(&gateway.InitiateFileDownloadResponse{
+					Status: status.NewNotFound(ctx, "not found"),
+				}, nil)
+				gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
+					Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
+				}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
+				r = r.WithContext(ctx)
+				rr := httptest.NewRecorder()
+				svc.GetDrivesV1(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK), rr.Body.String())
+				body, _ := io.ReadAll(rr.Body)
+				Expect(body).To(ContainSubstring(`"id":"pro-1$sameID"`))
+				Expect(body).ToNot(ContainSubstring("special"))
+			})
+
 			It("can list a space without owner", func() {
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Times(1).Return(&provider.ListStorageSpacesResponse{
 					Status: status.NewOK(ctx),
