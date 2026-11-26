@@ -385,10 +385,10 @@ func checkPolygonIntersectsShape(s2pgn *s2.Polygon, shapeIn,
 
 	// check if the other shape is a envelope.
 	if e, ok := other.(*Envelope); ok {
-		s2pgnInDoc := s2PolygonFromS2Rectangle(e.r)
-		if s2pgn.Intersects(s2pgnInDoc) {
+		if rectangleIntersectsPolygon(e.r, s2pgn) {
 			return true, nil
 		}
+
 		return false, nil
 	}
 
@@ -527,12 +527,8 @@ func checkMultiPolygonContainsShape(s2pgns []*s2.Polygon,
 
 	// check if the other shape is a envelope.
 	if e, ok := other.(*Envelope); ok {
-		// create a polygon from the rectangle and checks the containment.
-		s2pgnInDoc := s2PolygonFromS2Rectangle(e.r)
-		for _, s2pgn := range s2pgns {
-			if s2pgn.Contains(s2pgnInDoc) {
-				return true, nil
-			}
+		if polygonsContainsRectangle(s2pgns, e.r) {
+			return true, nil
 		}
 
 		return false, nil

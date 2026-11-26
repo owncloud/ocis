@@ -163,8 +163,8 @@ func (c *Config) DumpTo(out io.Writer, format string) (n int64, err error) {
 	}
 
 	// write content to out
-	num, _ := fmt.Fprintln(out, string(encoded))
-	return int64(num), nil
+	num, err := fmt.Fprintln(out, string(encoded))
+	return int64(num), err
 }
 
 // DumpToFile use the format(json,yaml,toml) dump config data to a writer

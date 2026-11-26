@@ -26,7 +26,14 @@ import (
 func LoadFiles(sourceFiles ...string) error { return dc.LoadFiles(sourceFiles...) }
 
 // LoadFiles load and parse config files, will fire OnLoadData event
-func (c *Config) LoadFiles(sourceFiles ...string) (err error) {
+func (c *Config) LoadFiles(sourceFiles ...string) error {
+	return c.writeAndHook(OnLoadData, func() error {
+		return c.loadFiles(sourceFiles)
+	})
+}
+
+// loadFiles load and parse config files, the caller must hold the data lock.
+func (c *Config) loadFiles(sourceFiles []string) (err error) {
 	for _, file := range sourceFiles {
 		if err = c.loadFile(file, false, ""); err != nil {
 			return
@@ -43,17 +50,19 @@ func (c *Config) LoadFiles(sourceFiles ...string) (err error) {
 func LoadExists(sourceFiles ...string) error { return dc.LoadExists(sourceFiles...) }
 
 // LoadExists load and parse config files, but will ignore not exists file.
-func (c *Config) LoadExists(sourceFiles ...string) (err error) {
-	for _, file := range sourceFiles {
-		if file == "" {
-			continue
-		}
+func (c *Config) LoadExists(sourceFiles ...string) error {
+	return c.writeAndHook(OnLoadData, func() error {
+		for _, file := range sourceFiles {
+			if file == "" {
+				continue
+			}
 
-		if err = c.loadFile(file, true, ""); err != nil {
-			return
+			if err := c.loadFile(file, true, ""); err != nil {
+				return err
+			}
 		}
-	}
-	return
+		return nil
+	})
 }
 
 // FileFilterFn for check file is should load.
@@ -66,18 +75,33 @@ func LoadFilesByFilter(configFiles []string, filter FileFilterFn) error {
 
 // LoadFilesByFilter load one or multi files by give filter checked, will fire OnLoadData event
 //   - `filter` return format can be emtpy, will auto detect it by file extension
-func (c *Config) LoadFilesByFilter(configFiles []string, filter FileFilterFn) (err error) {
+func (c *Config) LoadFilesByFilter(configFiles []string, filter FileFilterFn) error {
+	// tip: run the filter before the data lock is held, it's a user callback and may
+	// call the getter methods.
+	loadFiles := make([]string, 0, len(configFiles))
+	formats := make([]string, 0, len(configFiles))
 	for _, file := range configFiles {
 		shouldLoad, format := filter(file, c)
 		if !shouldLoad {
 			continue
 		}
 
-		if err = c.loadFile(file, false, format); err != nil {
-			return
-		}
+		loadFiles = append(loadFiles, file)
+		formats = append(formats, format)
 	}
-	return
+
+	if len(loadFiles) == 0 {
+		return nil
+	}
+
+	return c.writeAndHook(OnLoadData, func() error {
+		for i, file := range loadFiles {
+			if err := c.loadFile(file, false, formats[i]); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 // LoadRemote load config data from remote URL.
@@ -102,15 +126,19 @@ func (c *Config) LoadRemote(format, url string) (err error) {
 		return fmt.Errorf("fetch remote config error, reply status code is %d", resp.StatusCode)
 	}
 
-	// read response content
+	// read response content. tip: the request is not run under the data lock
 	bts, err := io.ReadAll(resp.Body)
-	if err == nil {
-		if err = c.parseSourceCode(format, bts); err != nil {
-			return
+	if err != nil {
+		return err
+	}
+
+	return c.writeAndHook(OnLoadData, func() error {
+		if err := c.parseSourceCode(format, bts); err != nil {
+			return err
 		}
 		c.loadedUrls = append(c.loadedUrls, url)
-	}
-	return
+		return nil
+	})
 }
 
 // LoadOSEnv load data from OS ENV
@@ -130,7 +158,7 @@ func (c *Config) LoadOSEnv(keys []string, keyToLower bool) {
 		}
 		_ = c.Set(key, val)
 	}
-	c.fireHook(OnLoadData)
+	c.fireHookScoped(OnLoadData)
 }
 
 // LoadOSEnvs load data from OS ENVs. see Config.LoadOSEnvs
@@ -149,7 +177,7 @@ func (c *Config) LoadOSEnvs(nameToKeyMap map[string]string) {
 		}
 	}
 
-	c.fireHook(OnLoadData)
+	c.fireHookScoped(OnLoadData)
 }
 
 // LoadOSEnvByFilter load OS ENVs by custom fitler func. eg: use for load ENV by prefix.
@@ -171,6 +199,8 @@ func (c *Config) LoadOSEnvByFilter(filterFn func(key string) (loadIt bool, cfgKe
 			_ = c.Set(cfgKey, val)
 		}
 	}
+
+	c.fireHookScoped(OnLoadData)
 }
 
 // support bound types for CLI flags vars
@@ -243,7 +273,7 @@ func (c *Config) LoadFlags(defines []string) (err error) {
 		}
 	})
 
-	c.fireHook(OnLoadData)
+	c.fireHookScoped(OnLoadData)
 	return
 }
 
@@ -260,33 +290,34 @@ func (c *Config) LoadData(dataSources ...any) (err error) {
 		c.opts.Delimiter = defaultDelimiter
 	}
 
-	var loaded bool
-	for _, ds := range dataSources {
-		if smp, ok := ds.(map[string]string); ok {
-			loaded = true
-			c.LoadSMap(smp)
-			continue
-		}
+	return c.writeAndHook(OnLoadData, func() error {
+		for _, ds := range dataSources {
+			if smp, ok := ds.(map[string]string); ok {
+				c.loadSMap(smp)
+				continue
+			}
 
-		err = mergo.Merge(&c.data, ds, c.opts.MergeOptions...)
-		if err != nil {
-			return errorx.WithStack(err)
+			if err := mergo.Merge(&c.data, ds, c.opts.MergeOptions...); err != nil {
+				return errorx.WithStack(err)
+			}
 		}
-		loaded = true
-	}
-
-	if loaded {
-		c.fireHook(OnLoadData)
-	}
-	return
+		return nil
+	})
 }
 
 // LoadSMap to config
 func (c *Config) LoadSMap(smp map[string]string) {
+	_ = c.writeAndHook(OnLoadData, func() error {
+		c.loadSMap(smp)
+		return nil
+	})
+}
+
+// loadSMap set the map data to config, the caller must hold the data lock.
+func (c *Config) loadSMap(smp map[string]string) {
 	for k, v := range smp {
 		c.data[k] = v
 	}
-	c.fireHook(OnLoadData)
 }
 
 // LoadSources load one or multi byte data
@@ -305,18 +336,18 @@ func LoadSources(format string, src []byte, more ...[]byte) error {
 //
 // `))
 func (c *Config) LoadSources(format string, src []byte, more ...[]byte) (err error) {
-	err = c.parseSourceCode(format, src)
-	if err != nil {
-		return
-	}
-
-	for _, sc := range more {
-		err = c.parseSourceCode(format, sc)
-		if err != nil {
-			return
+	return c.writeAndHook(OnLoadData, func() error {
+		if err := c.parseSourceCode(format, src); err != nil {
+			return err
 		}
-	}
-	return
+
+		for _, sc := range more {
+			if err := c.parseSourceCode(format, sc); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 // LoadStrings load one or multi string
@@ -326,18 +357,18 @@ func LoadStrings(format string, str string, more ...string) error {
 
 // LoadStrings load data from source string content.
 func (c *Config) LoadStrings(format string, str string, more ...string) (err error) {
-	err = c.parseSourceCode(format, []byte(str))
-	if err != nil {
-		return
-	}
-
-	for _, s := range more {
-		err = c.parseSourceCode(format, []byte(s))
-		if err != nil {
-			return
+	return c.writeAndHook(OnLoadData, func() error {
+		if err := c.parseSourceCode(format, []byte(str)); err != nil {
+			return err
 		}
-	}
-	return
+
+		for _, s := range more {
+			if err := c.parseSourceCode(format, []byte(s)); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 // LoadFilesByFormat load one or multi config files by give format, will fire OnLoadData event
@@ -346,13 +377,15 @@ func LoadFilesByFormat(format string, configFiles ...string) error {
 }
 
 // LoadFilesByFormat load one or multi files by give format, will fire OnLoadData event
-func (c *Config) LoadFilesByFormat(format string, configFiles ...string) (err error) {
-	for _, file := range configFiles {
-		if err = c.loadFile(file, false, format); err != nil {
-			return
+func (c *Config) LoadFilesByFormat(format string, configFiles ...string) error {
+	return c.writeAndHook(OnLoadData, func() error {
+		for _, file := range configFiles {
+			if err := c.loadFile(file, false, format); err != nil {
+				return err
+			}
 		}
-	}
-	return
+		return nil
+	})
 }
 
 // LoadExistsByFormat load one or multi files by give format, will fire OnLoadData event
@@ -361,13 +394,15 @@ func LoadExistsByFormat(format string, configFiles ...string) error {
 }
 
 // LoadExistsByFormat load one or multi files by give format, will fire OnLoadData event
-func (c *Config) LoadExistsByFormat(format string, configFiles ...string) (err error) {
-	for _, file := range configFiles {
-		if err = c.loadFile(file, true, format); err != nil {
-			return
+func (c *Config) LoadExistsByFormat(format string, configFiles ...string) error {
+	return c.writeAndHook(OnLoadData, func() error {
+		for _, file := range configFiles {
+			if err := c.loadFile(file, true, format); err != nil {
+				return err
+			}
 		}
-	}
-	return
+		return nil
+	})
 }
 
 // LoadOptions for load config from dir.
@@ -452,7 +487,10 @@ func (c *Config) LoadFromDir(dirPath, format string, loFns ...LoadOptFn) (err er
 	if len(dirData) == 0 {
 		return nil
 	}
-	return c.loadDataMap(dirData)
+
+	return c.writeAndHook(OnLoadData, func() error {
+		return c.loadDataMap(dirData)
+	})
 }
 
 // ReloadFiles reload config data use loaded files
@@ -465,35 +503,35 @@ func (c *Config) ReloadFiles() (err error) {
 		return
 	}
 
-	var data map[string]any
-	c.reloading = true
-	c.ClearCaches()
+	// tip: the same lock order as Config.writeAndHook(), but the OnReloadData event is
+	// not fired when the reload is failed.
+	c.hookMu.Lock()
+	defer c.hookMu.Unlock()
 
-	defer func() {
-		// revert to back up data on error
-		if err != nil {
-			c.data = data
-		}
-
-		c.lock.Unlock()
-		c.reloading = false
-
-		if err == nil {
-			c.fireHook(OnReloadData)
-		}
-	}()
-
-	// with lock
+	var bakData map[string]any
 	c.lock.Lock()
-	data = c.data
+	c.reloading = true
+	bakData = c.data
 	c.data = make(map[string]any)
 
-	// reload config files
-	return c.LoadFiles(files...)
+	err = c.loadFiles(files)
+	c.reloading = false
+	if err != nil {
+		// revert to the back up data on error
+		c.data = bakData
+	}
+	c.ClearCaches()
+	c.lock.Unlock()
+
+	if err == nil {
+		c.fireHook(OnReloadData)
+	}
+	return
 }
 
 // load config file, will fire OnLoadData event
 //   - loadExist=false will return error on file not exists
+//   - the caller must hold the data lock.
 func (c *Config) loadFile(file string, loadExist bool, format string) (err error) {
 	fd, err := os.Open(file)
 	if err != nil {
@@ -526,7 +564,7 @@ func (c *Config) loadFile(file string, loadExist bool, format string) (err error
 	return
 }
 
-// parse config source code to Config.
+// parse config source code to Config. the caller must hold the data lock.
 func (c *Config) parseSourceCode(format string, blob []byte) (err error) {
 	data, err := c.parseSourceToMap(format, blob)
 	if err != nil {
@@ -536,6 +574,8 @@ func (c *Config) parseSourceCode(format string, blob []byte) (err error) {
 	return c.loadDataMap(data)
 }
 
+// loadDataMap merge the data map to config data. the caller must hold the data lock,
+// and fire the OnLoadData event by itself.
 func (c *Config) loadDataMap(data map[string]any) (err error) {
 	// first: init config data
 	if len(c.data) == 0 {
@@ -543,10 +583,6 @@ func (c *Config) loadDataMap(data map[string]any) (err error) {
 	} else {
 		// again ... will merge data
 		err = mergo.Merge(&c.data, data, c.opts.MergeOptions...)
-	}
-
-	if !c.reloading && err == nil {
-		c.fireHook(OnLoadData)
 	}
 	return err
 }
