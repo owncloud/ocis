@@ -53,11 +53,11 @@ $(GO_LICENSES): $(BINGO_DIR)/go-licenses.mod
 	@echo "(re)installing $(GOBIN)/go-licenses-v1.5.0"
 	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=go-licenses.mod -o=$(GOBIN)/go-licenses-v1.5.0 "github.com/google/go-licenses"
 
-GOLANGCI_LINT := $(GOBIN)/golangci-lint-v1.64.6
+GOLANGCI_LINT := $(GOBIN)/golangci-lint-v2.15.0
 $(GOLANGCI_LINT): $(BINGO_DIR)/golangci-lint.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/golangci-lint-v1.64.6"
-	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=golangci-lint.mod -o=$(GOBIN)/golangci-lint-v1.64.6 "github.com/golangci/golangci-lint/cmd/golangci-lint"
+	@echo "(re)installing $(GOBIN)/golangci-lint-v2.15.0"
+	@cd $(BINGO_DIR) && GOWORK=off GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOARM=$(GOHOSTARM) $(GO) build -mod=mod -modfile=golangci-lint.mod -o=$(GOBIN)/golangci-lint-v2.15.0 "github.com/golangci/golangci-lint/v2/cmd/golangci-lint"
 
 GOVULNCHECK := $(GOBIN)/govulncheck-v1.1.4
 $(GOVULNCHECK): $(BINGO_DIR)/govulncheck.mod
