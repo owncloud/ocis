@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-11-04 02:15+0000\n"
+"POT-Creation-Date: 2026-11-25 02:17+0000\n"
 "PO-Revision-Date: 2026-01-02 10:52+0000\n"
 "Last-Translator: Martin Zhekov <martin03staff@gmail.com>, 2026\n"
 "Language-Team: Bulgarian (https://app.transifex.com/owncloud-org/teams/6149/bg/)\n"
@@ -87,6 +87,7 @@ msgstr "Пространството е споделено"
 #: pkg/service/templates.go:19
 msgid "The upload of {resource} could not be finalized. Please try again."
 msgstr ""
+"Качването на {resource} не можа да бъде завършено. Моля, опитайте отново."
 
 #: pkg/service/templates.go:18
 msgid "Upload failed"
