@@ -1,0 +1,12 @@
+Aurora - Plain Text Sample
+===========================
+
+This is a plain .txt file included as part of the file-type coverage set for
+the Demo Space.
+
+Status report (2026-07-24):
+- Design: complete
+- Engineering: in progress
+- Pilot rollout: scheduled for 2026-08-24
+
+Contact: [Add contact here]
