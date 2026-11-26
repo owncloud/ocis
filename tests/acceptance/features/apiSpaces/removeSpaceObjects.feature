@@ -25,7 +25,7 @@ Feature: Remove files, folder
     Then the HTTP status code should be "<http-status-code>"
     And for user "<user>" the space "delete objects" <should-or-not-be-in-space> contain these entries:
       | folderForDeleting |
-    And as "<user>" folder "folderForDeleting" <should-or-not-be-in-trash> exist in the trashbin of the space "delete objects"
+    And as "Alice" folder "folderForDeleting" <should-or-not-be-in-trash> exist in the trashbin of the space "delete objects"
     Examples:
       | user  | space-role   | http-status-code | should-or-not-be-in-space | should-or-not-be-in-trash |
       | Alice | Manager      | 204              | should not                | should                    |
@@ -46,7 +46,7 @@ Feature: Remove files, folder
       | folderForDeleting |
     And for user "<user>" folder "folderForDeleting/" of the space "delete objects" <should-or-not-be-in-space> contain these entries:
       | sub1 |
-    And as "<user>" folder "sub1" <should-or-not-be-in-trash> exist in the trashbin of the space "delete objects"
+    And as "Alice" folder "sub1" <should-or-not-be-in-trash> exist in the trashbin of the space "delete objects"
     Examples:
       | user  | space-role   | http-status-code | should-or-not-be-in-space | should-or-not-be-in-trash |
       | Alice | Manager      | 204              | should not                | should                    |
@@ -65,7 +65,7 @@ Feature: Remove files, folder
     Then the HTTP status code should be "<http-status-code>"
     And for user "<user>" the space "delete objects" <should-or-not-be-in-space> contain these entries:
       | text.txt |
-    And as "<user>" file "text.txt" <should-or-not-be-in-trash> exist in the trashbin of the space "delete objects"
+    And as "Alice" file "text.txt" <should-or-not-be-in-trash> exist in the trashbin of the space "delete objects"
     Examples:
       | user  | space-role   | http-status-code | should-or-not-be-in-space | should-or-not-be-in-trash |
       | Alice | Manager      | 204              | should not                | should                    |
