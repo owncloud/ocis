@@ -54,6 +54,7 @@ func DefaultConfig() *config.Config {
 			WebdavAllowInsecure:   false,
 			RevaGateway:           shared.DefaultRevaConfig().Address,
 			CS3AllowInsecure:      false,
+			GifFirstFrameOnly:     false,
 			DataEndpoint:          "http://127.0.0.1:9186/thumbnails/data",
 			MaxInputWidth:         7680,
 			MaxInputHeight:        7680,
