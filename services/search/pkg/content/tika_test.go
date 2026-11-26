@@ -258,6 +258,27 @@ var _ = Describe("Tika", func() {
 			Expect(doc.Location.Altitude).To(Equal(new(227.4)))
 		})
 
+		It("does not set non-finite photo and location values", func() {
+			fullResponse = `[{
+				"tiff:Make": "Canon",
+				"exif:FNumber": "Inf",
+				"exif:FocalLength": "NaN",
+				"geo:lat": "+Inf",
+				"geo:long": "-Inf",
+				"geo:alt": "NaN"
+			}]`
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(doc.Photo).ToNot(BeNil())
+			Expect(doc.Photo.FNumber).To(BeNil())
+			Expect(doc.Photo.FocalLength).To(BeNil())
+			Expect(doc.Location).To(BeNil())
+		})
+
 		It("adds image content", func() {
 			fullResponse = `[
 				{
