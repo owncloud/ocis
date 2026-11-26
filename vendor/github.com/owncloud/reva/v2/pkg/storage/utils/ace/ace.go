@@ -21,6 +21,7 @@ package ace
 import (
 	"bytes"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -398,8 +399,22 @@ func (e *ACE) grantPermissionSet() *provider.ResourcePermissions {
 	return p
 }
 
-func unmarshalKV(s string) (*ACE, error) {
-	e := &ACE{}
+var errMultipleRows = errors.New("more than one row of ace kvs")
+
+// kvFields splits the key value pairs of an ACE into its ':' separated fields.
+// The pairs are a single csv record with ':' as separator.
+func kvFields(s string) ([]string, error) {
+	// Without quotes and further line breaks a csv record terminated by a single
+	// newline is just split at the separator. This is what Marshal writes for
+	// regular grants, so avoid setting up a csv reader (and its read buffer) for
+	// every grant that is read.
+	if line := strings.TrimSuffix(s, "\n"); line != "" && !strings.ContainsAny(line, "\"\r\n") {
+		return strings.Split(line, ":"), nil
+	}
+
+	// The fast path above mirrors these reader settings (separator ':', no comment
+	// character, variable number of fields, no trimming, no lazy quotes). Changing
+	// one without the other makes them parse records differently.
 	r := csv.NewReader(strings.NewReader(s))
 	r.Comma = ':'
 	r.Comment = 0
@@ -411,10 +426,19 @@ func unmarshalKV(s string) (*ACE, error) {
 		return nil, err
 	}
 	if len(records) != 1 {
-		return nil, fmt.Errorf("more than one row of ace kvs")
+		return nil, errMultipleRows
 	}
-	for i := range records[0] {
-		kv := strings.Split(records[0][i], "=")
+	return records[0], nil
+}
+
+func unmarshalKV(s string) (*ACE, error) {
+	e := &ACE{}
+	fields, err := kvFields(s)
+	if err != nil {
+		return nil, err
+	}
+	for i := range fields {
+		kv := strings.Split(fields[i], "=")
 		switch kv[0] {
 		case "t":
 			e._type = kv[1]
