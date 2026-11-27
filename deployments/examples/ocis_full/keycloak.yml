@@ -21,6 +21,15 @@ services:
       GRAPH_USERNAME_MATCH: "none"
       KEYCLOAK_DOMAIN: ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
       WEB_OIDC_SCOPE: "openid profile email acr"
+      # guest invitations: the invitations service creates guests in Keycloak,
+      # which then sends them the invitation email (see MAIL_SERVER in .env)
+      OCIS_ADD_RUN_SERVICES: "${START_ADDITIONAL_SERVICES},invitations"
+      INVITATIONS_KEYCLOAK_BASE_PATH: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
+      INVITATIONS_KEYCLOAK_CLIENT_ID: invitations
+      INVITATIONS_KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_INVITATIONS_CLIENT_SECRET:-invitations-secret}
+      INVITATIONS_KEYCLOAK_CLIENT_REALM: ${KEYCLOAK_REALM:-oCIS}
+      INVITATIONS_KEYCLOAK_USER_REALM: ${KEYCLOAK_REALM:-oCIS}
+      INVITATIONS_KEYCLOAK_INSECURE_SKIP_VERIFY: "${INSECURE:-false}"
 
   postgres:
     image: postgres:18-alpine
@@ -52,6 +61,7 @@ services:
       - "./config/keycloak/ocis-realm.dist.json:/opt/keycloak/data/import-dist/ocis-realm.json"
     environment:
       OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
+      INVITATIONS_CLIENT_SECRET: ${KEYCLOAK_INVITATIONS_CLIENT_SECRET:-invitations-secret}
       KC_HOSTNAME: ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
       KC_DB: postgres
       KC_DB_URL: "jdbc:postgresql://postgres:5432/keycloak"

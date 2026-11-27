@@ -18,6 +18,37 @@ Demo User have different roles on different instances
 
 Users can be invited to instances they are not member of by using their exact email address in space membership or share dialog.
 
+## Guest Invitations
+
+This example does not start the invitations service, so inviting guests by
+email (`/graph/v1.0/invitations`) returns `502`. To enable it:
+
+1. Add an `invitations` client to the realm: a confidential client
+   (`publicClient: false`) with only `serviceAccountsEnabled: true`, and give its
+   service account the `realm-management` client role `manage-users`.
+2. Start the service and point it at Keycloak in the `ocis` container:
+
+   ```yaml
+   OCIS_ADD_RUN_SERVICES: "invitations"
+   INVITATIONS_KEYCLOAK_BASE_PATH: https://keycloak.owncloud.test
+   INVITATIONS_KEYCLOAK_CLIENT_ID: invitations
+   INVITATIONS_KEYCLOAK_CLIENT_SECRET: <client secret>
+   INVITATIONS_KEYCLOAK_CLIENT_REALM: oCIS
+   INVITATIONS_KEYCLOAK_USER_REALM: oCIS
+   ```
+
+   Do this for each instance that should be able to invite guests, using its
+   own client or a shared one. Keep any services already listed in
+   `OCIS_ADD_RUN_SERVICES` and append `invitations` to them (e.g.
+   `"auth-app,invitations"`).
+3. Give the realm a working SMTP server (Realm settings → Email). Keycloak sends
+   the invitation email. If it can't, the invitation fails and the guest is
+   removed again.
+
+The `ocis_full` example has all of this set up when Keycloak is enabled. See the
+[invitations service README](../../../services/invitations/README.md) for all
+settings.
+
 ## Master-ID Configuration
 
 The master-id grants users access to all instances without maintaining instance-specific IDs. Users with the master-id in their `owncloudMemberOf` or `owncloudGuestOf` LDAP attributes can login to any instance.
