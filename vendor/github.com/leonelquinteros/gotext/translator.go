@@ -9,18 +9,20 @@ import (
 	"errors"
 	"io/fs"
 	"os"
+
+	"github.com/leonelquinteros/gotext/plurals"
 )
 
-// Translator interface is used by Locale and Po objects.Translator
+// Translator interface is used by Locale and Po objects.
 // It contains all methods needed to parse translation sources and obtain corresponding translations.
-// Also implements gob.GobEncoder/gob.DobDecoder interfaces to allow serialization of Locale objects.
+// It includes encoding.BinaryMarshaler and encoding.BinaryUnmarshaler methods for Locale serialization.
 type Translator interface {
 	ParseFile(f string)
 	Parse(buf []byte)
-	Get(str string, vars ...interface{}) string
-	GetN(str, plural string, n int, vars ...interface{}) string
-	GetC(str, ctx string, vars ...interface{}) string
-	GetNC(str, plural string, n int, ctx string, vars ...interface{}) string
+	Get(str string, vars ...any) string
+	GetN(str, plural string, n int, vars ...any) string
+	GetC(str, ctx string, vars ...any) string
+	GetNC(str, plural string, n int, ctx string, vars ...any) string
 
 	MarshalBinary() ([]byte, error)
 	UnmarshalBinary([]byte) error
@@ -31,10 +33,10 @@ type Translator interface {
 // It contains all methods needed to parse translation sources and to append entries to the object.
 type AppendTranslator interface {
 	Translator
-	Append(b []byte, str string, vars ...interface{}) []byte
-	AppendN(b []byte, str, plural string, n int, vars ...interface{}) []byte
-	AppendC(b []byte, str, ctx string, vars ...interface{}) []byte
-	AppendNC(b []byte, str, plural string, n int, ctx string, vars ...interface{}) []byte
+	Append(b []byte, str string, vars ...any) []byte
+	AppendN(b []byte, str, plural string, n int, vars ...any) []byte
+	AppendC(b []byte, str, ctx string, vars ...any) []byte
+	AppendNC(b []byte, str, plural string, n int, ctx string, vars ...any) []byte
 }
 
 // TranslatorEncoding is used as intermediary storage to encode Translator objects to Gob.
@@ -63,14 +65,58 @@ type TranslatorEncoding struct {
 // deserialize into a Po-compatible object.
 func (te *TranslatorEncoding) GetTranslator() Translator {
 	po := NewPo()
-	po.domain = NewDomain()
-	po.domain.Headers = te.Headers
+	if te == nil {
+		return po
+	}
+
+	headers := te.Headers
+	if headers == nil {
+		headers = make(HeaderMap)
+	}
+	translations := te.Translations
+	if translations == nil {
+		translations = make(map[string]*Translation)
+	}
+	for id, translation := range translations {
+		if translation == nil {
+			translation = NewTranslation()
+			translation.ID = id
+			translations[id] = translation
+		}
+	}
+	contexts := te.Contexts
+	if contexts == nil {
+		contexts = make(map[string]map[string]*Translation)
+	}
+	for context, translationsForContext := range contexts {
+		if translationsForContext == nil {
+			contexts[context] = make(map[string]*Translation)
+			continue
+		}
+		for id, translation := range translationsForContext {
+			if translation == nil {
+				translation = NewTranslation()
+				translation.ID = id
+				translationsForContext[id] = translation
+			}
+		}
+	}
+
+	po.domain.Headers = headers
 	po.domain.Language = te.Language
 	po.domain.PluralForms = te.PluralForms
 	po.domain.nplurals = te.Nplurals
 	po.domain.plural = te.Plural
-	po.domain.translations = te.Translations
-	po.domain.contextTranslations = te.Contexts
+	po.domain.translations = translations
+	po.domain.contextTranslations = contexts
+
+	if expr, err := plurals.Compile(te.Plural); err == nil {
+		po.domain.pluralforms = expr
+	}
+
+	po.Headers = po.domain.Headers
+	po.Language = po.domain.Language
+	po.PluralForms = po.domain.PluralForms
 
 	return po
 }

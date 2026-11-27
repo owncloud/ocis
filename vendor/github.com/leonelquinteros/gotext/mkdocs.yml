@@ -1,0 +1,40 @@
+site_name: gotext
+site_description: GNU gettext utilities for Go
+site_author: Leonel Quinteros
+repo_url: https://github.com/leonelquinteros/gotext
+edit_uri: edit/master/docs/
+
+theme:
+  name: material
+  palette:
+    primary: indigo
+    accent: indigo
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+
+nav:
+  - Home: index.md
+  - Getting Started: GETTING_STARTED.md
+  - User Guides:
+      - Plural Forms: PLURALS.md
+      - xgotext CLI: xgotext.md
+      - Character Encoding: ENCODING.md
+      - Advanced Usage: ADVANCED.md
+      - Best Practices: BEST_PRACTICES.md
+  - API Reference: https://pkg.go.dev/github.com/leonelquinteros/gotext
+  - Contributing:
+      - Guidelines: CONTRIBUTING.md
+      - Code of Conduct: CODE_OF_CONDUCT.md
+  - License: LICENSE.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences

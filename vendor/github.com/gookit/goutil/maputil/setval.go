@@ -38,14 +38,18 @@ func SetByKeys(mp *map[string]any, keys []string, val any) (err error) {
 	}
 
 	topK := keys[0]
-	if kln == 1 {
+	// the top key may contain a slice index. eg: "list[1]"
+	hasArrKey := hasArrIndex(topK)
+	if kln == 1 && !hasArrKey {
 		mpv[topK] = val
 		return nil
 	}
 
-	if _, ok := mpv[topK]; !ok {
-		mpv[topK] = MakeByKeys(keys[1:], val)
-		return nil
+	if !hasArrKey {
+		if _, ok := mpv[topK]; !ok {
+			mpv[topK] = MakeByKeys(keys[1:], val)
+			return nil
+		}
 	}
 
 	rv := reflect.ValueOf(mp).Elem()
@@ -76,6 +80,12 @@ func setMapByKeys(rv reflect.Value, keys []string, nv reflect.Value) (err error)
 		if pos := strings.IndexRune(key, '['); pos > 0 {
 			var realKey string
 			if realKey, idx, ok = parseArrKeyIndex(key); ok {
+				// the slice index must not be negative
+				if idx < 0 {
+					err = fmt.Errorf("invalid slice index %d in key %q, must not be negative", idx, key)
+					break
+				}
+
 				// update value
 				key = realKey
 				if !isMap {
@@ -155,6 +165,10 @@ func setMapByKeys(rv reflect.Value, keys []string, nv reflect.Value) (err error)
 					}
 				} else {
 					// last - set value
+					if nv, err = setElemValue(nv, tmpV.Type().Elem()); err != nil {
+						break
+					}
+
 					tmpV.Index(idx).Set(nv)
 					rv.SetMapIndex(rftK, tmpV)
 				}
@@ -171,11 +185,15 @@ func setMapByKeys(rv reflect.Value, keys []string, nv reflect.Value) (err error)
 
 			if isSlice {
 				// key is slice index
-				if strutil.IsInt(key) {
-					idx, _ = strconv.Atoi(key)
+				if v, e2 := parseIndexKey(key); e2 == nil {
+					idx = v
 				}
 
 				if idx > -1 {
+					if nv, err = setElemValue(nv, rv.Type().Elem()); err != nil {
+						break
+					}
+
 					wantLen := idx + 1
 					sliLen := rv.Len()
 
@@ -232,7 +250,17 @@ func setMapByKeys(rv reflect.Value, keys []string, nv reflect.Value) (err error)
 					// next key is index number.
 					nxtKey := keys[i+1]
 					if strutil.IsInt(nxtKey) {
-						idx, _ = strconv.Atoi(nxtKey)
+						if idx, err = parseIndexKey(nxtKey); err != nil {
+							break
+						}
+
+						// the elem value will be set directly on the last key
+						if i+1 == maxI {
+							if nv, err = setElemValue(nv, tmpV.Type().Elem()); err != nil {
+								break
+							}
+						}
+
 						sliLen := tmpV.Len()
 						wantLen := idx + 1
 
@@ -276,7 +304,10 @@ func setMapByKeys(rv reflect.Value, keys []string, nv reflect.Value) (err error)
 
 			break
 		} else if isSlice && strutil.IsInt(key) { // (E). slice from ptr slice
-			idx, _ = strconv.Atoi(key)
+			if idx, err = parseIndexKey(key); err != nil {
+				break
+			}
+
 			sliLen := rv.Len()
 			wantLen := idx + 1
 
@@ -315,6 +346,44 @@ func getRealVal(rv reflect.Value) (reflect.Value, bool) {
 	}
 
 	return rv, isPtr
+}
+
+// hasArrIndex check the key contains a slice index. eg: "arr[2]"
+func hasArrIndex(key string) bool {
+	pos := strings.IndexRune(key, '[')
+	return pos > 0 && strings.HasSuffix(key, "]")
+}
+
+// setElemValue returns the value to be set to the slice elem of the given type,
+// and checks the value can be set to it. a nil value is turned into the zero value
+// of the elem type, so it can be set to a nil-able elem type.
+func setElemValue(nv reflect.Value, elemTyp reflect.Type) (reflect.Value, error) {
+	if !nv.IsValid() { // the value is nil
+		switch elemTyp.Kind() {
+		case reflect.Interface, reflect.Ptr, reflect.Map, reflect.Slice, reflect.Chan, reflect.Func:
+			return reflect.Zero(elemTyp), nil
+		}
+		return nv, fmt.Errorf("cannot set a nil value to a %s slice elem", elemTyp)
+	}
+
+	if !nv.Type().AssignableTo(elemTyp) {
+		return nv, fmt.Errorf("cannot set %s value to a %s slice elem", nv.Type(), elemTyp)
+	}
+	return nv, nil
+}
+
+// parseIndexKey parse the slice index from the given key.
+// The index must be a non-negative integer.
+func parseIndexKey(key string) (int, error) {
+	idx, err := strconv.Atoi(key)
+	if err != nil {
+		return 0, fmt.Errorf("invalid slice index %q", key)
+	}
+
+	if idx < 0 {
+		return 0, fmt.Errorf("invalid slice index %d, must not be negative", idx)
+	}
+	return idx, nil
 }
 
 // "arr[2]" => "arr", 2, true

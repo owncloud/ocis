@@ -56,7 +56,13 @@ func Utf8len(s string) int { return utf8.RuneCountInString(s) }
 //	RuneCount(str) = utf8.RuneCountInString(s) // 5 按字算
 func RuneCount(s string) int { return len([]rune(s)) }
 
-// RuneWidth of the rune.
+// RuneWidth of the rune: the number of terminal columns it occupies.
+//
+//   - East Asian Wide and Fullwidth runes take 2 columns.
+//   - Control characters, combining marks (Mn, Me) and format characters (Cf,
+//     e.g. zero width joiner) take 0 columns.
+//   - Everything else takes 1 column, including East Asian Ambiguous runes
+//     (é, Greek, Cyrillic, box drawing ─), as modern terminals render them.
 //
 // Example:
 //
@@ -64,15 +70,11 @@ func RuneCount(s string) int { return len([]rune(s)) }
 //	RuneWidth('a') // 1
 //	RuneWidth('\n') // 0
 func RuneWidth(r rune) int {
-	p := width.LookupRune(r)
-	k := p.Kind()
-
-	// eg: "\n"
-	if k == width.Neutral {
+	if unicode.IsControl(r) || unicode.In(r, unicode.Mn, unicode.Me, unicode.Cf) {
 		return 0
 	}
-
-	if k == width.EastAsianFullwidth || k == width.EastAsianWide || k == width.EastAsianAmbiguous {
+	switch width.LookupRune(r).Kind() {
+	case width.EastAsianFullwidth, width.EastAsianWide:
 		return 2
 	}
 	return 1
@@ -154,27 +156,16 @@ func Utf8Split(s string, w int) []string {
 	ss := make([]string, 0, sw/w+1)
 	for _, r := range s {
 		rw := RuneWidth(r)
-		if tmpW+rw == w {
-			tmpS += string(r)
+		if rw > 0 && tmpW+rw > w && tmpS != "" {
 			ss = append(ss, tmpS)
-
-			tmpW, tmpS = 0, "" // reset
-			continue
+			tmpW, tmpS = 0, ""
 		}
-
-		if tmpW+rw > w {
-			ss = append(ss, tmpS)
-
-			// append to next line.
-			tmpW, tmpS = rw, string(r)
-			continue
-		}
-
+		// Keep zero-width runes with the preceding base even at a full width.
 		tmpW += rw
 		tmpS += string(r)
 	}
 
-	if tmpW > 0 {
+	if tmpS != "" {
 		ss = append(ss, tmpS)
 	}
 	return ss
@@ -186,8 +177,9 @@ func TextWrap(s string, w int) string { return WidthWrap(s, w) }
 // WidthWrap a string by "\n"
 //
 // Example:
-//	s := "hello 你好, world 世界"
-//  s1 := strutil.TextWrap(s, 6) // "hello \n你好, \nworld \n世界"
+//
+//		s := "hello 你好, world 世界"
+//	 s1 := strutil.TextWrap(s, 6) // "hello \n你好, \nworld \n世界"
 func WidthWrap(s string, w int) string {
 	tmpW := 0
 	out := ""
@@ -215,14 +207,21 @@ func WidthWrap(s string, w int) string {
 }
 
 // WordWrap text string and limit width.
+// Spaces between words are retained within a line and count toward its width.
+// A separating space becomes a newline when the next word does not fit;
+// words longer than w are kept whole.
 func WordWrap(s string, w int) string {
 	tmpW := 0
 	out := ""
 
-	for _, sub := range strings.Split(s, " ") {
+	for i, sub := range strings.Split(s, " ") {
 		cw := TextWidth(sub)
-		if tmpW+cw > w {
-			if tmpW != 0 {
+		separator := ""
+		if i > 0 {
+			separator = " "
+		}
+		if tmpW+len(separator)+cw > w {
+			if tmpW != 0 || (out != "" && !strings.HasSuffix(out, "\n")) {
 				out += "\n"
 			}
 
@@ -232,8 +231,8 @@ func WordWrap(s string, w int) string {
 			continue
 		}
 
-		out += sub
-		tmpW += cw
+		out += separator + sub
+		tmpW += len(separator) + cw
 	}
 	return out
 }

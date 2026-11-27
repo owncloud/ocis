@@ -76,42 +76,42 @@ func (mo *Mo) GetDomain() *Domain {
 }
 
 // Get returns the translation for the given string
-func (mo *Mo) Get(str string, vars ...interface{}) string {
+func (mo *Mo) Get(str string, vars ...any) string {
 	return mo.domain.Get(str, vars...)
 }
 
 // Append a translation string into the domain
-func (mo *Mo) Append(b []byte, str string, vars ...interface{}) []byte {
+func (mo *Mo) Append(b []byte, str string, vars ...any) []byte {
 	return mo.domain.Append(b, str, vars...)
 }
 
 // GetN returns the translation for the given string and plural form
-func (mo *Mo) GetN(str, plural string, n int, vars ...interface{}) string {
+func (mo *Mo) GetN(str, plural string, n int, vars ...any) string {
 	return mo.domain.GetN(str, plural, n, vars...)
 }
 
 // AppendN appends a translation string for the given plural form into the domain
-func (mo *Mo) AppendN(b []byte, str, plural string, n int, vars ...interface{}) []byte {
+func (mo *Mo) AppendN(b []byte, str, plural string, n int, vars ...any) []byte {
 	return mo.domain.AppendN(b, str, plural, n, vars...)
 }
 
 // GetC returns the translation for the given string and context
-func (mo *Mo) GetC(str, ctx string, vars ...interface{}) string {
+func (mo *Mo) GetC(str, ctx string, vars ...any) string {
 	return mo.domain.GetC(str, ctx, vars...)
 }
 
 // AppendC appends a translation string for the given context into the domain
-func (mo *Mo) AppendC(b []byte, str, ctx string, vars ...interface{}) []byte {
+func (mo *Mo) AppendC(b []byte, str, ctx string, vars ...any) []byte {
 	return mo.domain.AppendC(b, str, ctx, vars...)
 }
 
 // GetNC returns the translation for the given string, plural form and context
-func (mo *Mo) GetNC(str, plural string, n int, ctx string, vars ...interface{}) string {
+func (mo *Mo) GetNC(str, plural string, n int, ctx string, vars ...any) string {
 	return mo.domain.GetNC(str, plural, n, ctx, vars...)
 }
 
 // AppendNC appends a translation string for the given plural form and context into the domain
-func (mo *Mo) AppendNC(b []byte, str, plural string, n int, ctx string, vars ...interface{}) []byte {
+func (mo *Mo) AppendNC(b []byte, str, plural string, n int, ctx string, vars ...any) []byte {
 	return mo.domain.AppendNC(b, str, plural, n, ctx, vars...)
 }
 
@@ -163,22 +163,18 @@ func (mo *Mo) Parse(buf []byte) {
 	defer mo.domain.trMutex.Unlock()
 	defer mo.domain.pluralMutex.Unlock()
 
-	r := bytes.NewReader(buf)
-
-	var magicNumber uint32
-	if err := binary.Read(r, binary.LittleEndian, &magicNumber); err != nil {
+	if len(buf) < 28 {
 		return
-		// return fmt.Errorf("gettext: %v", err)
 	}
+
 	var bo binary.ByteOrder
-	switch magicNumber {
+	switch binary.LittleEndian.Uint32(buf[:4]) {
 	case MoMagicLittleEndian:
 		bo = binary.LittleEndian
 	case MoMagicBigEndian:
 		bo = binary.BigEndian
 	default:
 		return
-		// return fmt.Errorf("gettext: %v", "invalid magic number")
 	}
 
 	var header struct {
@@ -187,82 +183,58 @@ func (mo *Mo) Parse(buf []byte) {
 		MsgIDCount   uint32
 		MsgIDOffset  uint32
 		MsgStrOffset uint32
-		HashSize     uint32
-		HashOffset   uint32
-	}
-	if err := binary.Read(r, bo, &header); err != nil {
-		return
-		// return fmt.Errorf("gettext: %v", err)
-	}
-	if v := header.MajorVersion; v != 0 && v != 1 {
-		return
-		// return fmt.Errorf("gettext: %v", "invalid version number")
-	}
-	if v := header.MinorVersion; v != 0 && v != 1 {
-		return
-		// return fmt.Errorf("gettext: %v", "invalid version number")
 	}
 
-	msgIDStart := make([]uint32, header.MsgIDCount)
-	msgIDLen := make([]uint32, header.MsgIDCount)
-	if _, err := r.Seek(int64(header.MsgIDOffset), 0); err != nil {
+	bufLen := uint64(len(buf))
+	header.MajorVersion = bo.Uint16(buf[4:6])
+	header.MinorVersion = bo.Uint16(buf[6:8])
+	header.MsgIDCount = bo.Uint32(buf[8:12])
+	header.MsgIDOffset = bo.Uint32(buf[12:16])
+	header.MsgStrOffset = bo.Uint32(buf[16:20])
+
+	if header.MajorVersion != 0 && header.MajorVersion != 1 {
 		return
-		// return fmt.Errorf("gettext: %v", err)
 	}
-	for i := 0; i < int(header.MsgIDCount); i++ {
-		if err := binary.Read(r, bo, &msgIDLen[i]); err != nil {
-			return
-			// return fmt.Errorf("gettext: %v", err)
-		}
-		if err := binary.Read(r, bo, &msgIDStart[i]); err != nil {
-			return
-			// return fmt.Errorf("gettext: %v", err)
-		}
+	if header.MinorVersion != 0 && header.MinorVersion != 1 {
+		return
 	}
 
-	msgStrStart := make([]int32, header.MsgIDCount)
-	msgStrLen := make([]int32, header.MsgIDCount)
-	if _, err := r.Seek(int64(header.MsgStrOffset), 0); err != nil {
+	directorySize := uint64(header.MsgIDCount) * 8
+	if uint64(header.MsgIDOffset)+directorySize > bufLen ||
+		uint64(header.MsgStrOffset)+directorySize > bufLen {
 		return
-		// return fmt.Errorf("gettext: %v", err)
 	}
-	for i := 0; i < int(header.MsgIDCount); i++ {
-		if err := binary.Read(r, bo, &msgStrLen[i]); err != nil {
+
+	for i := uint32(0); i < header.MsgIDCount; i++ {
+		msgIDEntry := int(uint64(header.MsgIDOffset) + uint64(i)*8)
+		msgIDLen := bo.Uint32(buf[msgIDEntry:])
+		msgIDStart := bo.Uint32(buf[msgIDEntry+4:])
+		if uint64(msgIDStart) > bufLen ||
+			uint64(msgIDLen) > bufLen-uint64(msgIDStart) {
 			return
-			// return fmt.Errorf("gettext: %v", err)
 		}
-		if err := binary.Read(r, bo, &msgStrStart[i]); err != nil {
+
+		msgStrEntry := int(uint64(header.MsgStrOffset) + uint64(i)*8)
+		msgStrLen := bo.Uint32(buf[msgStrEntry:])
+		msgStrStart := bo.Uint32(buf[msgStrEntry+4:])
+		if uint64(msgStrStart) > bufLen ||
+			uint64(msgStrLen) > bufLen-uint64(msgStrStart) {
 			return
-			// return fmt.Errorf("gettext: %v", err)
 		}
 	}
 
-	for i := 0; i < int(header.MsgIDCount); i++ {
-		if _, err := r.Seek(int64(msgIDStart[i]), 0); err != nil {
-			return
-			// return fmt.Errorf("gettext: %v", err)
-		}
-		msgIDData := make([]byte, msgIDLen[i])
-		if _, err := r.Read(msgIDData); err != nil {
-			return
-			// return fmt.Errorf("gettext: %v", err)
-		}
+	for i := uint32(0); i < header.MsgIDCount; i++ {
+		msgIDEntry := int(uint64(header.MsgIDOffset) + uint64(i)*8)
+		msgIDLen := bo.Uint32(buf[msgIDEntry:])
+		msgIDStart := bo.Uint32(buf[msgIDEntry+4:])
+		msgIDEnd := int(uint64(msgIDStart) + uint64(msgIDLen))
 
-		if _, err := r.Seek(int64(msgStrStart[i]), 0); err != nil {
-			return
-			// return fmt.Errorf("gettext: %v", err)
-		}
-		msgStrData := make([]byte, msgStrLen[i])
-		if _, err := r.Read(msgStrData); err != nil {
-			return
-			// return fmt.Errorf("gettext: %v", err)
-		}
+		msgStrEntry := int(uint64(header.MsgStrOffset) + uint64(i)*8)
+		msgStrLen := bo.Uint32(buf[msgStrEntry:])
+		msgStrStart := bo.Uint32(buf[msgStrEntry+4:])
+		msgStrEnd := int(uint64(msgStrStart) + uint64(msgStrLen))
 
-		if len(msgIDData) == 0 {
-			mo.addTranslation(msgIDData, msgStrData)
-		} else {
-			mo.addTranslation(msgIDData, msgStrData)
-		}
+		mo.addTranslation(buf[int(msgIDStart):msgIDEnd], buf[int(msgStrStart):msgStrEnd])
 	}
 
 	// Parse headers
@@ -279,36 +251,32 @@ func (mo *Mo) addTranslation(msgid, msgstr []byte) {
 	translation := NewTranslation()
 	var msgctxt []byte
 	var msgidPlural []byte
+	hasContext := false
 
-	d := bytes.Split(msgid, []byte(EotSeparator))
-	if len(d) == 1 {
-		msgid = d[0]
-	} else {
-		msgid, msgctxt = d[1], d[0]
+	if eotIndex := bytes.IndexByte(msgid, EotSeparator[0]); eotIndex >= 0 {
+		hasContext = true
+		msgctxt = msgid[:eotIndex]
+		msgid = msgid[eotIndex+len(EotSeparator):]
 	}
 
-	dd := bytes.Split(msgid, []byte(NulSeparator))
-	if len(dd) > 1 {
-		msgid = dd[0]
-		dd = dd[1:]
+	if nulIndex := bytes.IndexByte(msgid, NulSeparator[0]); nulIndex >= 0 {
+		msgidPlural = msgid[nulIndex+1:]
+		msgid = msgid[:nulIndex]
 	}
-
 	translation.ID = string(msgid)
 
-	msgidPlural = bytes.Join(dd, []byte(NulSeparator))
 	if len(msgidPlural) > 0 {
 		translation.PluralID = string(msgidPlural)
 	}
 
-	ddd := bytes.Split(msgstr, []byte(NulSeparator))
-	if len(ddd) > 0 {
-		for i, s := range ddd {
-			translation.Trs[i] = string(s)
-		}
+	i := 0
+	for s := range bytes.SplitSeq(msgstr, []byte(NulSeparator)) {
+		translation.Trs[i] = string(s)
+		i++
 	}
 
-	if len(msgctxt) > 0 {
-		// With context...
+	if hasContext {
+		// With context, including an explicitly empty context...
 		if _, ok := mo.domain.contextTranslations[string(msgctxt)]; !ok {
 			mo.domain.contextTranslations[string(msgctxt)] = make(map[string]*Translation)
 		}
