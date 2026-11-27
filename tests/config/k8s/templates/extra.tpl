@@ -129,6 +129,16 @@
   value: ""
 {{- end -}}
 {{- end -}}
+{{- if and .Values.features.mfa.enabled (not .Values.features.vault.enabled) }}
+{{- if or (eq .appName "proxy") (eq .appName "frontend") }}
+- name: OCIS_MFA_ENABLED
+  value: "true"
+{{- end -}}
+{{- if eq .appName "web" }}
+- name: WEB_OIDC_SCOPE
+  value: "openid profile email acr"
+{{- end -}}
+{{- end -}}
 {{- if .Values.features.vault.enabled }}
 {{- if eq .appName "proxy" }}
 - name: OCIS_ENABLE_VAULT_MODE

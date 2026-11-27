@@ -486,9 +486,9 @@ jobs:
           - suite: keycloak
             args: "--type playwright --suites journeys,keycloak"
             keycloak: true
-          # - suite: mfa
-          #   args: "--type playwright --suites mfa"
-          #   mfa: true
+          - suite: mfa
+            args: "--type playwright --suites mfa"
+            mfa: true
           - suite: oidc
             args: "--type playwright specs/oidc/refreshToken.spec.ts"
             oidc: true
@@ -558,7 +558,8 @@ jobs:
         env:
           ENABLE_TIKA: ${{ matrix.suite == 'vault-storage' || matrix.suite == 'search' }}
           ENABLE_VAULT: ${{ matrix.suite == 'vault-storage' }}
-          ENABLE_KEYCLOAK: ${{ matrix.suite == 'keycloak' }}
+          ENABLE_KEYCLOAK: ${{ matrix.suite == 'keycloak' || matrix.suite == 'mfa' }}
+          ENABLE_MFA: ${{ matrix.suite == 'mfa' }}
           ENABLE_WOPI: ${{ matrix.suite == 'app-provider' }}
           ENABLE_OCM: ${{ matrix.suite == 'ocm' }}
           ENABLE_SHORT_IDP_TOKEN_EXPIRY: ${{ matrix.suite == 'oidc' || matrix.suite == 'oidc-iframe' }}
@@ -588,7 +589,7 @@ jobs:
             bash tests/config/k8s/expose-external-svc.sh tika:9998
           fi
 
-          if [[ "${{ matrix.suite == 'keycloak' || matrix.suite == 'vault-storage' }}" == "true" ]]; then
+          if [[ "${{ matrix.suite == 'keycloak' || matrix.suite == 'mfa' || matrix.suite == 'vault-storage' }}" == "true" ]]; then
             # GitHub runners ship PostgreSQL pre-installed on 5432, but not always
             # already running - reuse it for keycloak's DB instead of running our
             # own container for it, once it's up.
@@ -609,7 +610,7 @@ jobs:
               -nodes -days 365 -subj "/CN=keycloak"
             chmod 777 keycloak-certs/*
 
-            if [[ "${{ matrix.suite }}" == "vault-storage" ]]; then
+            if [[ "${{ matrix.suite }}" == "vault-storage" || "${{ matrix.suite }}" == "mfa" ]]; then
               realm_file=tests/config/ci/ocis-mfa-ci-realm.dist.json
             else
               realm_file=tests/config/ci/ocis-ci-realm.dist.json
@@ -737,7 +738,7 @@ jobs:
           bash tests/config/k8s/expose-nodeports.sh collaboration-fakeoffice 9304 30304
 
       - name: Expose proxy readyz
-        if: ${{ matrix.suite == 'vault-storage' || matrix.suite == 'keycloak' }}
+        if: ${{ matrix.suite == 'vault-storage' || matrix.suite == 'keycloak' || matrix.suite == 'mfa' }}
         run: |
           (
             while true; do
@@ -780,7 +781,7 @@ jobs:
             return 1
           }
 
-          if [[ "${{ matrix.suite }}" == "vault-storage" || "${{ matrix.suite }}" == "keycloak" ]]; then
+          if [[ "${{ matrix.suite }}" == "vault-storage" || "${{ matrix.suite }}" == "keycloak" || "${{ matrix.suite }}" == "mfa" ]]; then
             retry "proxy readyz" curl -sf http://localhost:19205/readyz || exit 1
             else
               echo "Creating test file in oCIS..."
@@ -820,7 +821,8 @@ jobs:
           E2E_ARGS: "${{ matrix.args }}"
           K8S: ${{ env.K8S }}
           TEST_SERVER_URL: ${{ env.TEST_SERVER_URL }}
-          KEYCLOAK: ${{ matrix.suite == 'keycloak' || matrix.suite == 'vault-storage' }}
+          KEYCLOAK: ${{ matrix.suite == 'keycloak' || matrix.suite == 'mfa' || matrix.suite == 'vault-storage' }}
+          MFA: ${{ matrix.suite == 'mfa' }}
           KEYCLOAK_HOST: keycloak:8443
           VAULT_MODE: ${{ matrix.suite == 'vault-storage' }}
           COLLABORATION_NEEDED: ${{ matrix.collaboration == true && 'true' || 'false' }}
