@@ -54,7 +54,13 @@
               :class="['new-file-btn-' + fileAction.ext]"
               @click="fileAction.handler"
             >
-              <resource-icon :resource="getIconResource(fileAction)" size="medium" />
+              <oc-icon
+                v-if="!fileAction.ext && fileAction.icon"
+                :name="fileAction.icon"
+                :fill-type="fileAction.iconFillType || 'line'"
+                size="medium"
+              />
+              <resource-icon v-else :resource="getIconResource(fileAction)" size="medium" />
               <span class="create-list-file-item-text">{{ fileAction.label() }}</span>
               <span
                 v-if="areFileExtensionsShown && fileAction.ext"

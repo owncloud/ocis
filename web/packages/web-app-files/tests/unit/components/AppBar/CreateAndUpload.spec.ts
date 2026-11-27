@@ -3,6 +3,7 @@ import { mock } from 'vitest-mock-extended'
 import { Resource, SpaceResource } from '@ownclouders/web-client'
 import {
   FileAction,
+  ResourceIcon,
   useFileActionsCreateNewFile,
   useRequest,
   useSpacesStore,
@@ -16,7 +17,7 @@ import { eventBus } from '@ownclouders/web-pkg'
 import { defaultPlugins, shallowMount, defaultComponentMocks } from '@ownclouders/web-test-helpers'
 import { RouteLocation } from 'vue-router'
 import { computed, ref } from 'vue'
-import { OcButton } from '@ownclouders/design-system/components'
+import { OcButton, OcIcon } from '@ownclouders/design-system/components'
 
 vi.mock('@ownclouders/web-pkg', async (importOriginal) => ({
   ...(await importOriginal<any>()),
@@ -74,6 +75,86 @@ describe('CreateAndUpload component', () => {
       const { wrapper } = getWrapper()
       expect(wrapper.html()).toMatchSnapshot()
     })
+    it('should render oc-icon when a new file action has an icon and no extension', () => {
+      const { wrapper } = getWrapper({
+        createActions: [
+          mock<FileAction>({
+            label: () => 'AI Assistant',
+            ext: undefined,
+            icon: 'sparkling-2',
+            iconFillType: undefined,
+            isExternal: false,
+            isVisible: () => true
+          })
+        ]
+      })
+
+      const item = wrapper.find('.create-list-file')
+      const ocIcon = item.findComponent(OcIcon)
+      expect(ocIcon.exists()).toBe(true)
+      expect(ocIcon.props('name')).toBe('sparkling-2')
+      expect(ocIcon.props('size')).toBe('medium')
+      expect(ocIcon.props('fillType')).toBe('line')
+      expect(item.findComponent(ResourceIcon).exists()).toBe(false)
+    })
+    it('should pass the action iconFillType to oc-icon', () => {
+      const { wrapper } = getWrapper({
+        createActions: [
+          mock<FileAction>({
+            label: () => 'AI Assistant',
+            ext: undefined,
+            icon: 'sparkling-2',
+            iconFillType: 'fill',
+            isExternal: false,
+            isVisible: () => true
+          })
+        ]
+      })
+
+      const ocIcon = wrapper.find('.create-list-file').findComponent(OcIcon)
+      expect(ocIcon.props('fillType')).toBe('fill')
+    })
+    it.each([
+      {
+        description: 'an extension and no icon',
+        ext: 'txt',
+        icon: '',
+        isExternal: false
+      },
+      {
+        description: 'an extension and a non-empty icon',
+        ext: 'odt',
+        icon: 'https://example.com/icon.svg',
+        isExternal: true
+      },
+      {
+        description: 'neither an extension nor an icon',
+        ext: undefined,
+        icon: '',
+        isExternal: false
+      }
+    ])(
+      'should render resource-icon when a new file action has $description',
+      ({ ext, icon, isExternal }) => {
+        const { wrapper } = getWrapper({
+          createActions: [
+            mock<FileAction>({
+              label: () => 'New file',
+              ext,
+              icon,
+              isExternal,
+              isVisible: () => true
+            })
+          ]
+        })
+
+        const item = wrapper.find('.create-list-file')
+        const resourceIcon = item.findComponent(ResourceIcon)
+        expect(resourceIcon.exists()).toBe(true)
+        expect(resourceIcon.props('resource')).toEqual({ type: 'file', extension: ext })
+        expect(item.findComponent(OcIcon).exists()).toBe(false)
+      }
+    )
   })
   describe('clipboard buttons', () => {
     it('should show if clipboard is empty', () => {
