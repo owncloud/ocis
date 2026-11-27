@@ -24,7 +24,7 @@ BINARY_REF = {
 LICENSES  = "third-party-licenses.tar.gz"
 
 def sbom_files(v):
-    return [f"ocis-{v}.spdx3.json"]
+    return [f"ocis-{v}.spdx3.json", f"ocis-{v}.cdx.json"]
 
 PROD_TAGS = ("5.0", "7", "8")
 

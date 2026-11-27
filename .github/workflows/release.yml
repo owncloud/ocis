@@ -225,6 +225,19 @@ jobs:
             -reuse-toml REUSE.toml \
             -version "$VERSION" \
             -out "sbom/ocis-${VERSION}.spdx3.json"
+      # CycloneDX SBOM from Trivy (same version and config as security-scan-trivy), for tools that
+      # only read CycloneDX, such as DevGuard.
+      - name: Generate CycloneDX SBOM
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: fs
+          format: cyclonedx
+          output: sbom.cdx.json
+          trivy-config: .trivy.yaml
+      - name: Name CycloneDX SBOM after the release
+        env:
+          VERSION: ${{ needs.determine-release-type.outputs.version }}
+        run: mv sbom.cdx.json "sbom/ocis-${VERSION}.cdx.json"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: sbom

@@ -23,4 +23,6 @@ Use `-npm-cache <file>` to keep the npm license facts between runs; `-help` list
 
 The file name must end in `.spdx3.json`, otherwise SPDX tools such as the online validator read it as SPDX 2.x.
 
+Trivy produces the CycloneDX file that is released next to it (see `release.yml`).
+
 Not covered: binaries and container images (the SBOM lists source dependencies), and a signature of the SBOM.
