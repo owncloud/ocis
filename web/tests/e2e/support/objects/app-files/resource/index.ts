@@ -75,6 +75,12 @@ export class Resource {
     await po.renameResource({ ...args, page: this.#page })
     await this.#page.goto(startUrl)
   }
+  async renamePasswordProtectedFolderFromFolderView(
+    args: Omit<po.renameResourceArgs, 'page'>
+  ): Promise<void> {
+    const startUrl = this.#page.url()
+    await po.renamePasswordProtectedFolderFromFolderView({ ...args, page: this.#page })
+  }
 
   async copy(args: Omit<po.moveOrCopyResourceArgs, 'page' | 'action'>): Promise<void> {
     const startUrl = this.#page.url()
