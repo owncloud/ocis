@@ -227,13 +227,16 @@ func TestBackend_DeleteUser(t *testing.T) {
 }
 
 func TestBackend_SendMailClassifiesErrors(t *testing.T) {
+	// Go 1.27 vet rejects %w with a pointer to a value-receiver error type.
+	// Use an error variable, so that the chain keeps the pointer type.
+	var wrappedAPIErr error = &gocloak.APIError{Code: 400, Message: "400"}
 	tests := []struct {
 		name     string
 		err      error
 		rejected bool
 	}{
 		{"400 invalid actions is a definite rejection", &gocloak.APIError{Code: 400, Message: "400 Bad Request"}, true},
-		{"wrapped keycloak http error", fmt.Errorf("wrapped: %w", &gocloak.APIError{Code: 400, Message: "400"}), true},
+		{"wrapped keycloak http error", fmt.Errorf("wrapped: %w", wrappedAPIErr), true},
 		{"401 is a definite rejection", &gocloak.APIError{Code: 401, Message: "401 Unauthorized"}, true},
 		{"403 is a definite rejection", &gocloak.APIError{Code: 403, Message: "403 Forbidden"}, true},
 		{"404 is a definite rejection", &gocloak.APIError{Code: 404, Message: "404 Not Found"}, true},
