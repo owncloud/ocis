@@ -48,7 +48,7 @@
    ```
 
    > [!TIP]
-   > To run the test suites that require extra services,
+   > To run the test suites that require extra services or roles,
    > use the following appropriate environment variables:
    >
    > - `ENABLE_ANTIVIRUS=true`: Antivirus test suites
@@ -58,6 +58,7 @@
    > - `ENABLE_OCM=true`: OCM test suites
    > - `ENABLE_AUTH_APP=true`: auth-app test suites
    > - `ENABLE_VAULT=true`: Vault test suites (needs `ENABLE_TIKA=true` too)
+   > - `ENABLE_E2E_ROLES=true`: e2e (Playwright) test suites
    >
    > ⚠️ When using the above environment variables,
    > make sure you run the necessary external services and expose them to the cluster.

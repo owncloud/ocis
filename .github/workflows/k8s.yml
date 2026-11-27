@@ -476,8 +476,8 @@ jobs:
             args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 1"
           - suite: part-2
             args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 2"
-          # - suite: part-3
-          #   args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 3"
+          - suite: part-3
+            args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 3"
           # - suite: part-4
           #   args: "--type playwright --total-parts 4 --xsuites search,app-provider,ocm,keycloak,mfa,oidc,vault-storage --run-part 4"
           - suite: search
@@ -563,6 +563,7 @@ jobs:
           ENABLE_OCM: ${{ matrix.suite == 'ocm' }}
           ENABLE_SHORT_IDP_TOKEN_EXPIRY: ${{ matrix.suite == 'oidc' || matrix.suite == 'oidc-iframe' }}
           ENABLE_OIDC_OFFLINE_ACCESS: ${{ matrix.suite == 'oidc' }}
+          ENABLE_E2E_ROLES: "true"
         run: |
           cd tests/config/k8s
           make prepare-charts
