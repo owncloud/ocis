@@ -122,7 +122,7 @@ func MergeL2StrMap(mps ...map[string]map[string]string) map[string]map[string]st
 	for _, mp := range mps {
 		for k, v := range mp {
 			// merge level 2 value
-			if oldV, ok := newMp[k]; ok {
+			if oldV, ok := newMp[k]; ok && oldV != nil {
 				for k1, v1 := range v {
 					oldV[k1] = v1
 				}
@@ -185,9 +185,10 @@ func MakeByPath(path string, val any) (mp map[string]any) {
 func MakeByKeys(keys []string, val any) (mp map[string]any) {
 	size := len(keys)
 
-	// if last key contains slice index, make slice wrap the val
+	// if last key contains slice index, make slice wrap the val.
+	// tip: a negative index is not a valid slice index, keep it as a literal key.
 	lastKey := keys[size-1]
-	if newK, idx, ok := parseArrKeyIndex(lastKey); ok {
+	if newK, idx, ok := parseArrKeyIndex(lastKey); ok && idx >= 0 {
 		// valTyp := reflect.TypeOf(val)
 		sliTyp := reflect.SliceOf(reflect.TypeOf(val))
 		sliVal := reflect.MakeSlice(sliTyp, idx+1, idx+1)

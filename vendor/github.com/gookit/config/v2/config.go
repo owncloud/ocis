@@ -59,8 +59,6 @@ const (
 	defaultDelimiter byte = '.'
 	// default struct tag name for binding data to struct
 	defaultStructTag = "mapstructure"
-	// struct tag name for set default-value on binding data
-	defaultValueTag = "default"
 )
 
 // internal vars
@@ -80,6 +78,10 @@ type Config struct {
 	// config instance name
 	name string
 	lock sync.RWMutex
+	// hookMu serialize the data change with its hook. the hook is fired after the data
+	// lock is released, so a hook can use the getter methods(they take the read lock),
+	// and no other Set/SetData/ClearData can change the data while the hook is running.
+	hookMu sync.Mutex
 
 	// config options
 	opts *Options
@@ -109,6 +111,13 @@ type Config struct {
 	// iMapCache map[string]intMap
 	sArrCache map[string]strArr
 	sMapCache map[string]strMap
+
+	// cacheMu guard the read caches above, see the helpers in cache.go
+	cacheMu sync.Mutex
+	// cacheGen is bumped on every ClearCaches(), a cached value is only stored when the
+	// generation is not changed, so a value read before a data change can not be stored
+	// after it.
+	cacheGen uint64
 }
 
 // New config instance with custom options, default with JSON driver
@@ -235,6 +244,9 @@ func (c *Config) Error() error {
 
 // IsEmpty of the config
 func (c *Config) IsEmpty() bool {
+	c.lock.RLock()
+	defer c.lock.RUnlock()
+
 	return len(c.data) == 0
 }
 
@@ -265,26 +277,58 @@ func (c *Config) ClearAll() {
 
 // ClearData clear data
 func (c *Config) ClearData() {
-	c.fireHook(OnCleanData)
-
-	c.data = make(map[string]any)
-	c.loadedUrls = []string{}
-	c.loadedFiles = []string{}
+	_ = c.writeAndHook(OnCleanData, func() error {
+		c.data = make(map[string]any)
+		c.loadedUrls = []string{}
+		c.loadedFiles = []string{}
+		return nil
+	})
 }
 
-// ClearCaches clear caches
+// ClearCaches clear the read caches
 func (c *Config) ClearCaches() {
-	if c.opts.EnableCache {
-		c.intCache = nil
-		c.strCache = nil
-		c.sMapCache = nil
-		c.sArrCache = nil
-	}
+	c.cacheMu.Lock()
+	defer c.cacheMu.Unlock()
+
+	c.cacheGen++
+	c.intCache = nil
+	c.strCache = nil
+	c.sMapCache = nil
+	c.sArrCache = nil
 }
 
 /*************************************************************
  * helper methods
  *************************************************************/
+
+// writeAndHook run fn with the data write lock held, then fire the hook after the data
+// lock is released. the lock order is hookMu -> lock:
+//
+//   - the hook is fired without the data lock, so it can use the getter methods.
+//   - hookMu is held until the hook returns, so no other Set/SetData/load scope can
+//     change the data while the hook is running, the hook can read the whole data set.
+//   - the read caches are cleared when the data lock is still held, before the hook.
+func (c *Config) writeAndHook(hookName string, fn func() error) error {
+	c.hookMu.Lock()
+	defer c.hookMu.Unlock()
+
+	c.lock.Lock()
+	err := fn()
+	c.ClearCaches()
+	c.lock.Unlock()
+
+	c.fireHook(hookName)
+	return err
+}
+
+// fireHookScoped fire the hook with the hookMu held, for the load paths whose data is
+// already written by the Config.Set() method.
+func (c *Config) fireHookScoped(hookName string) {
+	c.hookMu.Lock()
+	defer c.hookMu.Unlock()
+
+	c.fireHook(hookName)
+}
 
 // fire hook
 func (c *Config) fireHook(name string) {

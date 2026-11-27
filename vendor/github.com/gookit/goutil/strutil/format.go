@@ -200,6 +200,7 @@ func Replaces(str string, pairs map[string]string) string {
 // ReplaceVars replaces simple variables in a string. format: {varName}
 //
 // Usage:
+//
 //	strutil.ReplaceVars("{name}, age is {age}", map[string]string{
 //		"name": "Joe",
 //		"age": "18"
@@ -220,7 +221,7 @@ func ReplaceVars(s string, vars map[string]string) string {
 
 // NewReplacer instance
 func NewReplacer(pairs map[string]string) *strings.Replacer {
-	ss := make([]string, len(pairs)*2)
+	ss := make([]string, 0, len(pairs)*2)
 	for old, newVal := range pairs {
 		ss = append(ss, old, newVal)
 	}
