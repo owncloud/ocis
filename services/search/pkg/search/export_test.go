@@ -12,3 +12,6 @@ func (s *Service) SetExtractionRetryDelay(d time.Duration) {
 func (s *Service) SetNow(now func() time.Time) {
 	s.now = now
 }
+
+// AddPhotoMetadata exposes addPhotoMetadata to the tests.
+var AddPhotoMetadata = addPhotoMetadata

@@ -207,7 +207,7 @@ func (t Tika) getLocation(meta map[string][]string) *libregraph.GeoCoordinates {
 		// Parse altitude value - remove " metres" suffix if present
 		altStr := strings.TrimSuffix(v, " metres")
 		altStr = strings.TrimSuffix(altStr, " m")
-		if alt, err := strconv.ParseFloat(strings.TrimSpace(altStr), 64); err == nil {
+		if alt, err := parseFiniteFloat(strings.TrimSpace(altStr)); err == nil {
 			initLocation()
 			location.SetAltitude(alt)
 			break
@@ -215,14 +215,14 @@ func (t Tika) getLocation(meta map[string][]string) *libregraph.GeoCoordinates {
 	}
 
 	if v, err := getFirstValue(meta, "geo:lat"); err == nil {
-		if i, err := strconv.ParseFloat(v, 64); err == nil {
+		if i, err := parseFiniteFloat(v); err == nil {
 			initLocation()
 			location.SetLatitude(i)
 		}
 	}
 
 	if v, err := getFirstValue(meta, "geo:long"); err == nil {
-		if i, err := strconv.ParseFloat(v, 64); err == nil {
+		if i, err := parseFiniteFloat(v); err == nil {
 			initLocation()
 			location.SetLongitude(i)
 		}
@@ -250,14 +250,14 @@ func (t Tika) getPhoto(meta map[string][]string) *libregraph.Photo {
 	}
 
 	if v, err := getFirstValue(meta, "exif:FNumber"); err == nil {
-		if i, err := strconv.ParseFloat(v, 64); err == nil {
+		if i, err := parseFiniteFloat(v); err == nil {
 			initPhoto()
 			photo.SetFNumber(i)
 		}
 	}
 
 	if v, err := getFirstValue(meta, "exif:FocalLength"); err == nil {
-		if i, err := strconv.ParseFloat(v, 64); err == nil {
+		if i, err := parseFiniteFloat(v); err == nil {
 			initPhoto()
 			photo.SetFocalLength(i)
 		}
@@ -291,9 +291,11 @@ func (t Tika) getPhoto(meta map[string][]string) *libregraph.Photo {
 
 	if v, err := getFirstValue(meta, "exif:ExposureTime"); err == nil {
 		if i, err := strconv.ParseFloat(v, 64); err == nil {
-			initPhoto()
-			photo.SetExposureNumerator(1)
-			photo.SetExposureDenominator(math.Round(1 / i))
+			if d := math.Round(1 / i); d > 0 && !math.IsInf(d, 0) {
+				initPhoto()
+				photo.SetExposureNumerator(1)
+				photo.SetExposureDenominator(d)
+			}
 		}
 	}
 
@@ -385,4 +387,13 @@ func (t Tika) getAudio(meta map[string][]string) *libregraph.Audio {
 func numberOfTotal(v string) string {
 	number, _, _ := strings.Cut(v, "/")
 	return number
+}
+
+// parseFiniteFloat is strconv.ParseFloat that also rejects NaN and ±Inf, which JSON cannot encode.
+func parseFiniteFloat(s string) (float64, error) {
+	f, err := strconv.ParseFloat(s, 64)
+	if err == nil && (math.IsNaN(f) || math.IsInf(f, 0)) {
+		err = fmt.Errorf("non-finite value %q", s)
+	}
+	return f, err
 }

@@ -258,6 +258,27 @@ var _ = Describe("Tika", func() {
 			Expect(doc.Location.Altitude).To(Equal(new(227.4)))
 		})
 
+		It("does not set non-finite photo and location values", func() {
+			fullResponse = `[{
+				"tiff:Make": "Canon",
+				"exif:FNumber": "Inf",
+				"exif:FocalLength": "NaN",
+				"geo:lat": "+Inf",
+				"geo:long": "-Inf",
+				"geo:alt": "NaN"
+			}]`
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(doc.Photo).ToNot(BeNil())
+			Expect(doc.Photo.FNumber).To(BeNil())
+			Expect(doc.Photo.FocalLength).To(BeNil())
+			Expect(doc.Location).To(BeNil())
+		})
+
 		It("adds image content", func() {
 			fullResponse = `[
 				{
@@ -309,6 +330,42 @@ var _ = Describe("Tika", func() {
 			Expect(photo.Iso).To(Equal(libregraph.PtrInt32(100)))
 			Expect(photo.Orientation).To(Equal(libregraph.PtrInt32(1)))
 			Expect(photo.TakenDateTime).To(Equal(new(time.Date(2018, 1, 1, 12, 34, 56, 0, time.UTC))))
+		})
+
+		It("does not set an exposure denominator for a zero exif:ExposureTime", func() {
+			fullResponse = `[
+				{
+					"tiff:Make": "Canon",
+					"exif:ExposureTime": "0"
+				}
+			]`
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(doc.Photo).ToNot(BeNil())
+			Expect(doc.Photo.ExposureDenominator).To(BeNil())
+			Expect(doc.Photo.ExposureNumerator).To(BeNil())
+		})
+
+		It("does not set an exposure denominator that overflows for a tiny exif:ExposureTime", func() {
+			fullResponse = `[
+				{
+					"tiff:Make": "Canon",
+					"exif:ExposureTime": "1e-320"
+				}
+			]`
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(doc.Photo).ToNot(BeNil())
+			Expect(doc.Photo.ExposureDenominator).To(BeNil())
+			Expect(doc.Photo.ExposureNumerator).To(BeNil())
 		})
 
 		It("falls back to Base ISO when exif:IsoSpeedRatings is absent", func() {

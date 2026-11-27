@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"net"
 	"path/filepath"
 	"slices"
@@ -744,7 +745,7 @@ func (s *Service) upsertItem(ctx context.Context, ref *provider.Reference, retri
 	}
 
 	logDocCount(s.engine, s.logger)
-	s.storeExtractedMetadata(ctx2, ref, doc)
+	s.storeExtractedMetadata(ctx2, ref, stat.GetInfo().GetArbitraryMetadata().GetMetadata(), doc)
 	return false, nil
 }
 
@@ -864,17 +865,27 @@ func (s *Service) failedEarlierAndUnchanged(r *engine.Resource, info *provider.R
 // storeExtractedMetadata persists Tika-extracted audio, image, location, and
 // photo metadata back to the storage provider so it is available outside the
 // search index.
-func (s *Service) storeExtractedMetadata(ctx context.Context, ref *provider.Reference, doc content.Document) {
+func (s *Service) storeExtractedMetadata(ctx context.Context, ref *provider.Reference, stored map[string]string, doc content.Document) {
 	metadata := map[string]string{}
 	addAudioMetadata(metadata, doc.Audio)
 	addImageMetadata(metadata, doc.Image)
 	addLocationMetadata(metadata, doc.Location)
 	addPhotoMetadata(metadata, doc.Photo)
-	if len(metadata) == 0 {
+
+	// keys stored by an earlier extraction that this one no longer produced
+	var stale []string
+	for k := range stored {
+		if _, ok := metadata[k]; !ok && isExtractedFacetKey(k) {
+			stale = append(stale, k)
+		}
+	}
+	slices.Sort(stale)
+
+	if len(metadata) == 0 && len(stale) == 0 {
 		return
 	}
 
-	s.logger.Trace().Str("name", doc.Name).Interface("metadata", metadata).Msg("Storing metadata")
+	s.logger.Trace().Str("name", doc.Name).Interface("metadata", metadata).Strs("stale", stale).Msg("Storing metadata")
 
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -882,6 +893,19 @@ func (s *Service) storeExtractedMetadata(ctx context.Context, ref *provider.Refe
 		return
 	}
 
+	if len(stale) > 0 {
+		resp, err := gatewayClient.UnsetArbitraryMetadata(ctx, &provider.UnsetArbitraryMetadataRequest{
+			Ref:                   ref,
+			ArbitraryMetadataKeys: stale,
+		})
+		if err != nil || resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
+			s.logger.Error().Err(err).Int32("status", int32(resp.GetStatus().GetCode())).Msg("error unsetting stale metadata")
+		}
+	}
+
+	if len(metadata) == 0 {
+		return
+	}
 	resp, err := gatewayClient.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
 		Ref: ref,
 		ArbitraryMetadata: &provider.ArbitraryMetadata{
@@ -891,6 +915,15 @@ func (s *Service) storeExtractedMetadata(ctx context.Context, ref *provider.Refe
 	if err != nil || resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		s.logger.Error().Err(err).Int32("status", int32(resp.GetStatus().GetCode())).Msg("error storing metadata")
 	}
+}
+
+func isExtractedFacetKey(k string) bool {
+	for _, p := range []string{"libre.graph.audio.", "libre.graph.image.", "libre.graph.location.", "libre.graph.photo."} {
+		if strings.HasPrefix(k, p) {
+			return true
+		}
+	}
+	return false
 }
 
 // UpdateTags updates only the tags of an already-indexed resource without
@@ -966,11 +999,24 @@ func marshalToStringMap[T libregraph.MappedNullable](source T, target map[string
 	m, _ := source.ToMap()
 
 	for k, v := range m {
-		if v == nil {
+		if v == nil || isNonFinite(v) {
 			continue
 		}
 		target[prefix+k] = valueToString(v)
 	}
+}
+
+func isNonFinite(v any) bool {
+	var f float64
+	switch x := v.(type) {
+	case *float32:
+		f = float64(*x)
+	case *float64:
+		f = *x
+	default:
+		return false
+	}
+	return math.IsInf(f, 0) || math.IsNaN(f)
 }
 
 func valueToString(value any) string {
