@@ -1558,3 +1558,17 @@ Feature: vault
       | User        | 19               |
       | User Light  | 13               |
 
+
+  Scenario Outline: user without vault permission tries to access vault resources
+    Given user "Brian" has been created with default attributes
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
+    And keycloak user "Alice" has been set up in oCIS
+    And keycloak user "Brian" has been set up in oCIS
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "vaultFile.txt" in vault
+    And we save it into "FILEID"
+    When user "Brian" tries to send HTTP method "GET" to URL "/dav/spaces/<<FILEID>>"
+    Then the HTTP status code should be "403"
+    Examples: 
+      | user-role   |
+      | User Light  |
+      | User        |
