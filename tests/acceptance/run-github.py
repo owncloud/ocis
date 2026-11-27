@@ -18,12 +18,23 @@ from pathlib import Path
 
 
 def filter_tls_noise(proc):
+    """Start a daemon thread that forwards proc.stderr to our stderr, dropping
+    TLS handshake noise, and return that thread so callers can join() it
+    before the interpreter shuts down (otherwise the still-running daemon
+    thread can race the main thread for the stderr buffer lock during
+    interpreter finalization and abort the process)."""
     def _reader():
-        for line in proc.stderr:
-            if b"TLS handshake error" not in line:
-                sys.stderr.buffer.write(line)
-                sys.stderr.buffer.flush()
-    threading.Thread(target=_reader, daemon=True).start()
+        try:
+            for line in proc.stderr:
+                if b"TLS handshake error" not in line:
+                    sys.stderr.buffer.write(line)
+                    sys.stderr.buffer.flush()
+        except (ValueError, OSError):
+            # stderr pipe closed underneath us during cleanup
+            pass
+    thread = threading.Thread(target=_reader, daemon=True)
+    thread.start()
+    return thread
 
 
 # ---------------------------------------------------------------------------
@@ -476,6 +487,7 @@ def main() -> int:
 
     # optional services
     procs = []
+    reader_threads = []
 
     if cfg["emailNeeded"]:
         print("Starting mailpit...")
@@ -620,7 +632,7 @@ def main() -> int:
         env=server_env,
         stderr=subprocess.PIPE,
     )
-    filter_tls_noise(wrapper_proc)
+    reader_threads.append(filter_tls_noise(wrapper_proc))
     procs.append(wrapper_proc)
 
     # start federation ocis server (second instance on port 10200)
@@ -657,7 +669,7 @@ def main() -> int:
             env=fed_env,
             stderr=subprocess.PIPE,
         )
-        filter_tls_noise(fed_proc)
+        reader_threads.append(filter_tls_noise(fed_proc))
         procs.append(fed_proc)
 
     # ---------------------------------------------------------------------------
@@ -766,7 +778,7 @@ def main() -> int:
         environment["COLLABORATION_WOPI_SRC"] = f"http://localhost:{ports['http']}"
         print(f"Starting {service_name}...")
         collab_proc = subprocess.Popen([str(ocis_bin), "collaboration", "server"], env=environment, stderr=subprocess.PIPE)
-        filter_tls_noise(collab_proc)
+        reader_threads.append(filter_tls_noise(collab_proc))
         return [collab_proc]
 
     def ocisHealthCheck(name, services=[]):
@@ -814,6 +826,28 @@ def main() -> int:
                 p.terminate()
             except Exception:
                 pass
+        for p in procs:
+            try:
+                p.wait(timeout=10)
+            except Exception:
+                try:
+                    p.kill()
+                except Exception:
+                    pass
+        # Join the stderr-forwarding daemon threads so they are done writing
+        # before the interpreter starts finalizing stdio streams. A daemon
+        # thread still mid-write when the interpreter shuts down can race the
+        # main thread for the stderr buffer lock and abort the process
+        # (_enter_buffered_busy: could not acquire lock ... at interpreter
+        # shutdown).
+        for p in procs:
+            try:
+                if p.stderr:
+                    p.stderr.close()
+            except Exception:
+                pass
+        for t in reader_threads:
+            t.join(timeout=5)
 
     signal.signal(signal.SIGTERM, cleanup)
     signal.signal(signal.SIGINT, cleanup)
@@ -853,7 +887,7 @@ def main() -> int:
                 env=vault_env,
                 stderr=subprocess.PIPE,
             )
-            filter_tls_noise(vault_proc)
+            reader_threads.append(filter_tls_noise(vault_proc))
             procs.append(vault_proc)
             wait_for(
                 lambda: subprocess.run(
@@ -918,4 +952,12 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    code = main()
+    # Skip interpreter finalization so no leftover daemon thread can race
+    # for the stdio buffer locks and abort the process (exit code 134).
+    try:
+        sys.stdout.flush()
+        sys.stderr.flush()
+    except Exception:
+        pass
+    os._exit(code)
