@@ -489,3 +489,54 @@ export async function userNavigatesToSharedViaLinkPage({
   const pageObject = new objects.applicationFiles.page.shares.ViaLink({ page })
   await pageObject.navigate()
 }
+
+export async function userSelectsShareRecipient({
+  stepUser,
+  resource,
+  recipient,
+  type
+}: {
+  stepUser: string
+  resource: string
+  recipient: string
+  type: CollaboratorType
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const shareObject = new objects.applicationFiles.Share({ page })
+  await shareObject.selectRecipient({
+    resource,
+    recipient: {
+      collaborator:
+        type === 'group'
+          ? world.usersEnvironment.getGroup({ key: recipient })
+          : world.usersEnvironment.getUser({ key: recipient }),
+      type
+    }
+  })
+}
+
+export async function userShouldSeeVaultGroupNotice({
+  stepUser
+}: {
+  stepUser: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const shareObject = new objects.applicationFiles.Share({ page })
+  await expect(shareObject.vaultGroupNotice).toBeVisible()
+  await expect(shareObject.vaultGroupNotice).toHaveText(
+    'Group members without vault access will not receive a notification and cannot access the share.'
+  )
+}
+
+export async function userShouldNotSeeVaultGroupNotice({
+  stepUser
+}: {
+  stepUser: string
+}): Promise<void> {
+  const world = getWorld()
+  const { page } = world.actorsEnvironment.getActor({ key: stepUser })
+  const shareObject = new objects.applicationFiles.Share({ page })
+  await expect(shareObject.vaultGroupNotice).toHaveCount(0)
+}

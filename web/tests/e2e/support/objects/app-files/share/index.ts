@@ -1,7 +1,7 @@
 import { Page, Locator } from '@playwright/test'
 import * as po from './actions'
 import { resourceIsNotOpenable, isAcceptedSharePresent, resourceIsSynced } from './utils'
-import { ICollaborator, IAccessDetails } from './collaborator'
+import Collaborator, { ICollaborator, IAccessDetails } from './collaborator'
 import { User } from '../../../types'
 export class Share {
   #page: Page
@@ -100,5 +100,20 @@ export class Share {
 
   async openSharingPanel(resource: string): Promise<void> {
     await po.openSharingPanel(this.#page, resource)
+  }
+
+  async selectRecipient({
+    resource,
+    recipient
+  }: {
+    resource: string
+    recipient: ICollaborator
+  }): Promise<void> {
+    await po.openSharingPanel(this.#page, resource)
+    await Collaborator.addCollaborator({ page: this.#page, collaborator: recipient })
+  }
+
+  get vaultGroupNotice(): Locator {
+    return this.#page.locator('[data-testid="vault-group-notice"]')
   }
 }
