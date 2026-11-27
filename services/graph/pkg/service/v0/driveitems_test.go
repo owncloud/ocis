@@ -1,6 +1,7 @@
 package svc_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -16,6 +17,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
 
@@ -25,6 +27,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/utils"
 	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
@@ -488,6 +491,14 @@ var _ = Describe("Driveitems", func() {
 			})
 
 			It("drops non-finite photo values so the item can be encoded", func() {
+				var logs bytes.Buffer
+				svc, _ = service.NewService(
+					service.Config(cfg),
+					service.WithGatewaySelector(gatewaySelector),
+					service.EventsPublisher(&eventsPublisher),
+					service.WithIdentityBackend(identityBackend),
+					service.Logger(log.Logger{Logger: zerolog.New(&logs)}),
+				)
 				gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(&provider.ListContainerResponse{
 					Status: status.NewOK(ctx),
 					Infos: []*provider.ResourceInfo{
@@ -515,6 +526,11 @@ var _ = Describe("Driveitems", func() {
 				Expect(photo.ExposureDenominator).To(BeNil())
 				_, err := json.Marshal(res)
 				Expect(err).ToNot(HaveOccurred())
+
+				Expect(logs.String()).To(ContainSubstring(`"level":"warn"`))
+				Expect(logs.String()).To(ContainSubstring(`"mapKey":"libre.graph.photo.exposureDenominator"`))
+				Expect(logs.String()).To(ContainSubstring(`"resourceID":"storageid$spaceid!opaqueid"`))
+				Expect(logs.String()).ToNot(ContainSubstring(`"level":"error"`))
 			})
 		})
 	})
