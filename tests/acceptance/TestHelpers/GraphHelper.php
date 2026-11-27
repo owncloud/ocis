@@ -792,26 +792,29 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $adminUser
-	 * @param string $adminPassword
+	 * @param string|null $adminUser
+	 * @param string|null $adminPassword
 	 * @param string $userId
 	 * @param string $groupId
+	 * @param array|null $headers
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function removeUserFromGroup(
 		string $baseUrl,
-		string $adminUser,
-		string $adminPassword,
+		?string $adminUser,
+		?string $adminPassword,
 		string $userId,
 		string $groupId,
+		?array $headers = null,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId . '/members/' . $userId . '/$ref');
 		return HttpRequestHelper::delete(
 			$url,
 			$adminUser,
 			$adminPassword,
+			$headers,
 		);
 	}
 

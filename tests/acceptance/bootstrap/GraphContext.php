@@ -351,12 +351,22 @@ class GraphContext implements Context {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id") ?: WebDavHelper::generateUUIDv4();
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
 		$credentials = $this->getAdminOrUserCredentials($byUser);
+		$requestUser = $credentials['username'];
+		$requestPass = $credentials['password'];
+		$headers = null;
+		if (KeycloakHelper::isTestingWithKeycloak()) {
+			$access_token = $this->featureContext->getOcisUserToken($requestUser)["token"]["accessToken"];
+			$headers = ['Authorization' => 'Bearer ' . $access_token];
+			$requestUser = null;
+			$requestPass = null;
+		}
 		return GraphHelper::removeUserFromGroup(
 			$this->featureContext->getBaseUrl(),
-			$credentials['username'],
-			$credentials['password'],
+			$requestUser,
+			$requestPass,
 			$userId,
 			$groupId,
+			$headers,
 		);
 	}
 
