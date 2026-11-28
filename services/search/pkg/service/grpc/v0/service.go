@@ -162,10 +162,11 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 	return nil
 }
 
-// IndexSpace (re)indexes all resources of a given space.
+// IndexSpace (re)indexes all resources of a given space, or of all spaces if
+// no space id is given. With force set, unchanged resources are indexed again.
 func (s Service) IndexSpace(ctx context.Context, in *searchsvc.IndexSpaceRequest, _ *searchsvc.IndexSpaceResponse) error {
 	if in.GetSpaceId() != "" {
-		return s.searcher.IndexSpace(ctx, &provider.StorageSpaceId{OpaqueId: in.GetSpaceId()})
+		return s.searcher.IndexSpace(ctx, &provider.StorageSpaceId{OpaqueId: in.GetSpaceId()}, in.GetForce())
 	}
 
 	// index all spaces instead
@@ -189,7 +190,7 @@ func (s Service) IndexSpace(ctx context.Context, in *searchsvc.IndexSpaceRequest
 	}
 
 	for _, space := range resp.GetStorageSpaces() {
-		if err := s.searcher.IndexSpace(ownerCtx, space.GetId()); err != nil {
+		if err := s.searcher.IndexSpace(ownerCtx, space.GetId(), in.GetForce()); err != nil {
 			return err
 		}
 	}

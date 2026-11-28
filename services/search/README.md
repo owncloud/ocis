@@ -170,6 +170,14 @@ ocis search index --all-spaces
 
 Note that either `--space $SPACE_ID` or `--all-spaces` must be set.
 
+By default, files that are already indexed and have not changed since are skipped. To index them again anyway, for example after enabling OCR in Tika so that existing files get their text extracted, add `--force`:
+
+```shell
+ocis search index --all-spaces --force
+```
+
+The existing index entries stay searchable while they are being replaced, so there is no search downtime for the space.
+
 The command does not open the index itself: it asks the running search service to do the indexing over gRPC. The search service must therefore be running, and the command works with the default `SEARCH_ENGINE_BLEVE_SCALE=false` (see [Scaling](#scaling)); the service's exclusive lock on the index does not block it.
 
 The command waits for the service to walk the space and gives up after 10 minutes by default. The walk is cancelled when that happens, so a large space, or one where the content extractor is slow on a few files, may need a longer limit: `--timeout 2h` (a Go duration; `0` waits indefinitely).

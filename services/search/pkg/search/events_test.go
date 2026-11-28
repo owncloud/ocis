@@ -32,7 +32,12 @@ var _ = DescribeTable("events",
 		})
 
 		for _, mck := range mcks {
-			s.On(mck, mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
+			args := []any{mock.Anything, mock.Anything}
+			if mck == "IndexSpace" {
+				// events never force a re-index of unchanged files
+				args = append(args, false)
+			}
+			s.On(mck, args...).Return(nil).Run(func(_ mock.Arguments) {
 				calls.Add(1)
 			})
 		}

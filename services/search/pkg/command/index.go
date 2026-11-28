@@ -39,6 +39,10 @@ func Index(cfg *config.Config) *cli.Command {
 				Name:  "all-spaces",
 				Usage: "index all spaces instead. This or --space is required.",
 			},
+			&cli.BoolFlag{
+				Name:  "force",
+				Usage: "index all files again, even those that are already indexed and have not changed, e.g. after enabling OCR in Tika. Without it, unchanged files are skipped.",
+			},
 			&cli.DurationFlag{
 				Name:  "timeout",
 				Usage: "how long to wait for the indexing to finish before giving up, e.g. 2h. The walk is cancelled when the timeout expires. 0 waits indefinitely.",
@@ -78,6 +82,7 @@ func Index(cfg *config.Config) *cli.Command {
 			c := searchsvc.NewSearchProviderService("com.owncloud.api.search", grpcClient)
 			_, err = c.IndexSpace(context.Background(), &searchsvc.IndexSpaceRequest{
 				SpaceId: ctx.String("space"),
+				Force:   ctx.Bool("force"),
 			}, func(opts *client.CallOptions) { opts.RequestTimeout = timeout })
 			if err != nil {
 				fmt.Println("failed to index space: " + err.Error())
