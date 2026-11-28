@@ -22,6 +22,10 @@ BINARY_REF = {
     "darwin-arm64": (MACHO_MAGIC, 64, 0x0100000c),
 }
 LICENSES  = "third-party-licenses.tar.gz"
+
+def sbom_files(v):
+    return [f"ocis-{v}.spdx3.json", f"ocis-{v}.cdx.json"]
+
 PROD_TAGS = ("5.0", "7", "8")
 
 passed = failed = 0
@@ -33,7 +37,7 @@ def fail(msg):
     global failed; failed += 1; print(f"[FAIL] {msg}", file=sys.stderr)
 
 def expected_files(v):
-    return [f for p in BINARY_PLATFORMS for f in (f"ocis-{v}-{p}", f"ocis-{v}-{p}.sha256")] + [LICENSES]
+    return [f for p in BINARY_PLATFORMS for f in (f"ocis-{v}-{p}", f"ocis-{v}-{p}.sha256")] + [LICENSES] + sbom_files(v)
 
 def is_production(v):
     return any(v.startswith(t) for t in PROD_TAGS) and "-" not in v
@@ -168,7 +172,7 @@ def check_run_artifacts(run_id):
         fail(f"run {run_id}: {e}"); return
 
     by_name = {a["name"]: a for a in r.get("artifacts", [])}
-    for name in ("binaries-linux", "binaries-darwin", "third-party-licenses"):
+    for name in ("binaries-linux", "binaries-darwin", "third-party-licenses", "sbom"):
         a = by_name.get(name)
         if not a:                   fail(f"{name}: missing");  continue
         if a.get("expired"):        fail(f"{name}: expired");  continue
