@@ -1,0 +1,28 @@
+# Grafana Tempo in single binary mode, with local storage.
+# Based on example/docker-compose/single-binary/tempo.yaml of Tempo v3.1.1.
+# Use it only for tests and debugging. It keeps the traces on a local volume.
+stream_over_http_enabled: true
+
+server:
+  http_listen_port: 3200
+  log_level: info
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: "0.0.0.0:4317"
+        http:
+          endpoint: "0.0.0.0:4318"
+
+storage:
+  trace:
+    backend: local
+    wal:
+      path: /var/tempo/wal
+    local:
+      path: /var/tempo/blocks
+
+usage_report:
+  reporting_enabled: false

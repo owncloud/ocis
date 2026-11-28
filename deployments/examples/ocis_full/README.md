@@ -70,3 +70,41 @@ It is reachable at `https://${OCIS_MCP_DOMAIN:-mcp.owncloud.test}` once enabled.
 - `OCIS_MCP_HTTP_SECRET` — a shared secret every MCP client must send as `Authorization: Bearer <secret>`. The container refuses to start without it.
 - `OCIS_MCP_APP_TOKEN_USER` / `OCIS_MCP_APP_TOKEN_VALUE` — an oCIS app token, created with `docker-compose exec ocis ocis auth-app create --user-name="admin" --expiration="8760h"`.
   **Note:** the `auth-app` service is not started by default — add `auth-app` to `START_ADDITIONAL_SERVICES` in `.env` first, or the command above will silently create an empty token.
+
+### Tracing with Grafana Tempo
+
+[Grafana Tempo](https://grafana.com/oss/tempo/) stores the traces of oCIS, and Grafana shows them. Use this setup only for tests and debugging. Grafana gives admin access with no login.
+
+To enable it, uncomment this variable in the `.env` file:
+- `TEMPO=:monitoring_tracing/tempo.yml`
+
+The file sets the tracing settings of oCIS. It sends the traces to `tempo:4317`, also when `MONITORING` is enabled. oCIS waits only 1 second for the trace endpoint at the start, so the file starts Tempo before oCIS.
+
+Open Grafana at `http://localhost:3000`, then select **Explore** and the **Tempo** data source. Example TraceQL queries:
+- `{ resource.service.name = "sharing" && name = "ListReceivedShares" }`: the share listings. Each oCIS service sends its own service name, for example `sharing`, `storage-system` or `proxy`.
+- `{ name = "loadAttributes" } >> { name = "os.OpenFile" }`: the attribute reads that go to the disk. A `loadAttributes` span with no `os.OpenFile` child is a hit in the attribute cache.
+
+Service names in the single binary: this example runs all services in one `ocis` process. Each span carries the service name of the service that made it, for example `storage-system` for the decomposedfs spans of the metadata documents, `storage-users` for those of the user spaces, and the calling service for a gRPC client span. So you can filter by `resource.service.name`, for example `{ resource.service.name = "storage-system" && name = "loadAttributes" } >> { name = "os.OpenFile" }`.
+
+This needs reva with the changes of OCISDEV-1736. In older versions, the decomposedfs spans and the gRPC client spans use the global tracer provider. Each service sets it at its start, and the last one wins. These spans then carry the service name of another service. With such a version, filter them by the trace structure, for example `{ resource.service.name = "sharing" && name = "ListReceivedShares" } >> { name = "loadAttributes" }`.
+
+Tempo 3 also answers TraceQL metrics queries, with no additional configuration. They give rates and percentiles over a time range. Examples for the share manager:
+- `{ resource.service.name = "sharing" && name = "Download" } | count_over_time() by (span.metadata.result)`: the downloads of the share manager by result (`200`, `304`, `404`, `conflict` or `error`).
+- `{ resource.service.name = "sharing" && name = "Upload" && span.metadata.conflict = true } | rate()`: the CAS conflicts for each second.
+- `{ resource.service.name = "sharing" && name = "Grab lock" } | quantile_over_time(duration, .99)`: the 99th percentile of the wait for a lock in the share caches.
+- `{ resource.service.name = "sharing" && name = "getAuthContext" } | rate()`: the machine authentications of the metadata storage.
+
+The span attributes `metadata.path`, `metadata.result`, `metadata.bytes`, `metadata.condition` and `metadata.conflict` come from the metadata storage of reva. Older oCIS versions do not have them.
+
+Lost spans under load: the OpenTelemetry SDK keeps at most 2048 spans in its queue, and it drops new spans when the queue is full. It does not log this. For a load test, raise the limit in the environment of oCIS, for example `OTEL_BSP_MAX_QUEUE_SIZE=65536`. Otherwise the counts from the traces are too low.
+
+The ports of Tempo (`4317` for OTLP gRPC and `3200` for the HTTP API) and of Grafana (`3000`) are open only on `127.0.0.1`. You can change them with `TEMPO_OTLP_GRPC_PORT`, `TEMPO_HTTP_PORT` and `GRAFANA_PORT`.
+
+To trace an oCIS binary that runs on the host, enable `TEMPO` in the `.env` file. Then start only Tempo and Grafana:
+
+```bash
+docker compose up -d tempo grafana
+OCIS_TRACING_ENABLED=true OCIS_TRACING_TYPE=otlp OCIS_TRACING_ENDPOINT=localhost:4317 ocis server
+```
+
+The traces stay in the `tempo-data` volume. Remove the volume to delete them.
